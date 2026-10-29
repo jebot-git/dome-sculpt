@@ -18,6 +18,9 @@ void name_valid(const std::string &s) {
   if (s.empty() || s.size() > 256 || s.find('\0') != std::string::npos)
     throw std::invalid_argument("Invalid paint layer name");
 }
+size_t tile_count(const PaintLayer &layer) {
+  return std::count_if(layer.tiles.begin(),layer.tiles.end(),[](const auto &tile){return bool(tile);});
+}
 Vec3 low(Vec3 a, Vec3 b) {
   return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)};
 }
@@ -204,6 +207,8 @@ void PaintedMesh::add_layer(std::string name) {
 void PaintedMesh::delete_layer() {
   if (editing_ || layers_.size() == 1)
     throw std::logic_error("Keep at least one paint layer");
+  const auto &removed = layer(active_);
+  allocated_tiles_ -= tile_count(removed);
   std::erase_if(layers_, [&](auto &l) { return l.id == active_; });
   active_ = layers_.back().id;
   ++revision_;
@@ -246,12 +251,16 @@ void PaintedMesh::begin_stroke() {
   if (!active().visible)
     throw std::logic_error("Show the active paint layer before painting");
   before_ = active().tiles;
+  before_allocated_tiles_ = tile_count(active());
   editing_ = true;
 }
 bool PaintedMesh::pending_changes() const {
   return editing_ && before_ != layer(active_).tiles;
 }
 void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
+  stamp_sampled(b,settings,{});
+}
+void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,const PaintSampler &sampler) {
   settings.validate();
   if (!editing_)
     throw std::logic_error("Begin the paint stroke first");
@@ -269,10 +278,7 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
   float axis2 = dot(axis, axis);
   auto &l = active();
   auto prior = l.tiles;
-  size_t allocated = 0;
-  for (auto &layer : layers_)
-    allocated += std::count_if(layer.tiles.begin(), layer.tiles.end(),
-                               [](auto &p) { return bool(p); });
+  size_t allocated = allocated_tiles_;
   bool changed = false;
   try {
     for (size_t tile = 0; tile < l.tiles.size(); ++tile) {
@@ -297,19 +303,28 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
           float distance = length(t.position - (b.from + axis * u));
           if (distance >= radius)
             continue;
+          auto selected = settings;
+          float projection_opacity = 1;
+          if (sampler) {
+            auto sample = sampler(t.position,t.normal);
+            if (!sample) continue;
+            selected = sample->settings;
+            projection_opacity = sample->opacity;
+          }
           float edge = 1 - distance * distance / (radius * radius),
                 alpha = std::clamp(edge * edge * b.pressure * b.strength *
-                                       settings.flow,
+                                       settings.flow * projection_opacity,
                                    0.f, 1.f);
+          if (!alpha) continue;
           auto &p = copy->pixels[y * 32 + x];
           auto old = p;
-          if (settings.channel == PaintChannel::Mask)
+          if (selected.channel == PaintChannel::Mask)
             p.data[13] =
-                byte(unit(p.data[13]) * (1 - alpha) + settings.mask * alpha);
+                byte(unit(p.data[13]) * (1 - alpha) + selected.mask * alpha);
           else {
-            int channel = int(settings.channel), coverage = 9 + channel;
+            int channel = int(selected.channel), coverage = 9 + channel;
             float previous = unit(p.data[coverage]);
-            if (settings.erase)
+            if (selected.erase)
               p.data[coverage] = byte(previous * (1 - alpha));
             else {
               float next = alpha + previous * (1 - alpha);
@@ -325,14 +340,14 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
               };
               if (channel == 0)
                 for (int k = 0; k < 4; ++k)
-                  mix(k, settings.color[k], k < 3);
+                  mix(k, selected.color[k], k < 3);
               else if (channel == 1)
-                mix(4, settings.metallic, false);
+                mix(4, selected.metallic, false);
               else if (channel == 2)
-                mix(5, settings.roughness, false);
+                mix(5, selected.roughness, false);
               else
                 for (int k = 0; k < 3; ++k)
-                  mix(6 + k, settings.emission[k], true);
+                  mix(6 + k, selected.emission[k], true);
             }
           }
           tile_changed |= p != old;
@@ -349,6 +364,7 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
     l.tiles = std::move(prior);
     throw;
   }
+  allocated_tiles_ = allocated;
   if (changed)
     ++revision_;
 }
@@ -368,7 +384,7 @@ bool PaintedMesh::end_stroke() {
   for (auto &s : redo_)
     history_bytes_ -= s.bytes;
   redo_.clear();
-  undo_.push_back({active_, std::move(before_), tiles, bytes});
+  undo_.push_back({active_, std::move(before_), tiles, bytes,before_allocated_tiles_,tile_count(active())});
   history_bytes_ += bytes;
   while (undo_.size() > 1 &&
          (history_bytes_ > 64 * 1024 * 1024 || undo_.size() > 128)) {
@@ -379,6 +395,7 @@ bool PaintedMesh::end_stroke() {
 }
 void PaintedMesh::cancel_stroke() {
   if (editing_) {
+    allocated_tiles_ = allocated_tiles_ - tile_count(active()) + before_allocated_tiles_;
     active().tiles = std::move(before_);
     editing_ = false;
     ++revision_;
@@ -392,6 +409,7 @@ bool PaintedMesh::undo() {
   auto s = std::move(undo_.back());
   undo_.pop_back();
   active_ = s.layer;
+  allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.before_tiles;
   active().tiles = s.before;
   redo_.push_back(std::move(s));
   ++revision_;
@@ -405,6 +423,7 @@ bool PaintedMesh::redo() {
   auto s = std::move(redo_.back());
   redo_.pop_back();
   active_ = s.layer;
+  allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.after_tiles;
   active().tiles = s.after;
   undo_.push_back(std::move(s));
   ++revision_;
@@ -417,6 +436,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   p->active_ = active_;
   p->next_ = next_;
   p->revision_ = revision_;
+  p->allocated_tiles_ = allocated_tiles_;
   return p;
 }
 std::shared_ptr<const TextureMaps>
@@ -629,6 +649,7 @@ PaintedMesh::reparameterize(Mesh target,
       }
     }
   }
+  result->allocated_tiles_ = allocated / sizeof(PaintTile);
   ++result->revision_;
   return result;
 }
@@ -787,6 +808,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j) {
     result->layers_.push_back(std::move(l));
   }
   result->layer(result->active_);
+  result->allocated_tiles_ = allocated / sizeof(PaintTile);
   return result;
 }
 } // namespace dome

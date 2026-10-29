@@ -1,0 +1,131 @@
+Native image projection and stencil painting
+============================================
+
+The projection kernel is original native C++20 code. It reuses the shared
+SurfaceQuery BVH and existing paint tile/blend/undo implementation; it does not
+introduce a second painter, software viewport readback or Python runtime.
+
+Asset worker:
+  auto image = load_projection_png(user_selected_path);
+  PaintProjection projector(std::move(image),camera,immutable_visibility_mesh,options);
+
+Brush/model worker (inside the normal begin/end paint transaction):
+  painted.begin_stroke();
+  painted.stamp_projection(brush,settings,projector);
+  painted.end_stroke();
+
+Cancel uses painted.cancel_stroke(), exactly as ordinary painting. A failed or
+cancelled individual stamp rolls back all its tile changes, including tiles
+already processed before failure, without erasing earlier stamps in the same
+gesture. The enclosing gesture can then be cancelled to its original state.
+Pressure, strength, flow, capsule falloff, layer visibility, per-channel coverage,
+masking, history limits and exact sparse COW undo remain in the existing core.
+
+Immutable source and live controls
+---------------------------------
+Construction owns an immutable image and visibility geometry snapshot and builds
+the BVH on an asset worker. The application must guard publication and subsequent
+use with target object/source identity and document generation. The visibility
+surface may include other scene geometry, but all positions/normals and camera
+must share the same coordinate system. Do not reuse a projector across geometry
+changes without explicit source validation/rebuild.
+
+with_camera(camera[,options]) returns a new immutable view sharing image/BVH;
+it does not copy image pixels, read files or reconstruct the BVH. This supports
+moving VR projectors, UV stencil transforms and live opacity without a per-stamp
+geometry build. Enabling visibility on a projector constructed without a BVH
+requires a new asset-worker construction. Source changes require that worker too.
+Cancellation callbacks must be cheap/thread-safe; no UI/model work belongs in them.
+
+Coordinate conventions
+----------------------
+Camera is right-handed: +X right, +Y up, -Z forward. Pose is the existing bounded
+CanvasTransform (unit quaternion, uniform positive scale and authoring bounds).
+Orthographic width/height and near/far depths are local pose units, converted by
+its scale. Perspective uses vertical_fov in radians and an explicit aspect ratio.
+The image has a top-left origin: camera-up points toward image row zero. Input
+surface normals are in the same frame. The affine UV transform is
+  u'=a*u+b*v+tx; v'=c*u+d*v+ty
+for [a,b,c,d,tx,ty]; it supports image scale/rotation/translation/mirroring.
+Finite camera/frustum/transform validation rejects singular input before painting.
+
+Samples outside the final transformed image rectangle, near/far range, or facing
+away from the camera are rejected by default. Perspective visibility rays start
+at the camera; orthographic rays start on its near plane. The first BVH hit must
+match the sampled surface distance within visibility_epsilon in shared-frame
+units. Front filtering and visibility can be disabled only explicitly; they are
+separate from the ordinary brush's front_only setting. Bias/tolerance must suit
+the model's scale. This is geometric visibility, not a rendered depth-buffer copy.
+
+PNG and channel semantics
+-------------------------
+Native libpng decodes selected images to the existing Image RGBA8 representation.
+Input-byte, dimension and decoded-pixel limits are checked before pixel storage
+allocation. Default is 64 MiB encoded/16 Mi pixels/max 8192 per dimension; caller may
+choose tighter bounded limits. Memory/file readers reject malformed/truncated,
+empty, changing, oversized and nonregular/FIFO/device inputs. Explicit file paths
+may be Unicode. No file is written by image loading. JPEG/other source formats,
+higher-precision native paint storage and color-managed ICC authoring are not
+implemented here; source precision is the native RGBA8/libpng conversion contract.
+
+Automatic color space decodes sRGB for color/emission images; scalar data and
+stencils stay linear. Explicit SRGB/Linear overrides are available. Color/emission
+filter in linear light, scalar channels stay linear. Coverage mode filters
+premultiplied linear RGB+alpha and unpremultiplies the resulting color, so hidden
+RGB in transparent pixels cannot introduce colored fringes.
+
+ProjectionAlpha::Coverage (default) uses PNG alpha once as paint coverage. Color
+payload alpha is 1 (or explicit brush-tint alpha); thus compositing onto transparent
+material does not square source alpha. ProjectionAlpha::ChannelValue instead
+uses opacity 1 and retains source alpha as channel data, with straight RGBA
+filtering. Use this when importing independent RGBA or using alpha as mask data.
+Scalar R/G/B/luminance/alpha selection is explicit; source alpha can be data or
+coverage according to this option, not an implicit extra blend operation.
+
+Color usage replaces selected brush values with image samples, or multiplies
+brush tint when tint=true. Stencil usage preserves brush values and modulates
+coverage by the selected image scalar; alpha-only stencils apply alpha once.
+The final projection opacity multiplies existing pressure/strength/flow once.
+Color, metallic, roughness, emission, mask and erase all use the same existing
+blend path. Transparent/no-op samples allocate no new paint data.
+
+A per-stamp sample budget bounds projection/visibility work. Cancellation and
+budget exceptions leave no partial stamp. Decoder and BVH resource limits remain
+bounded too. Actual runtime remains a native CPU editing worker; accelerator or
+physical headset/stylus performance has not been tested for this component.
+
+Protected paint data accessor
+-----------------------------
+PaintedMesh::has_paint_data() is O(1), backed by aggregate allocated tile count.
+It conservatively includes hidden/zero-opacity layers, mask-only data and
+retained erased color payload. It does not scan tiles during menu publication.
+Only user edit transitions update counts: ordinary/projected stamp success,
+rollback, stroke cancel/undo/redo, layer deletion, snapshot/decode and UV transfer.
+Stroke counts are per layer, so deleting another layer does not corrupt later
+stroke undo/redo. Derived count is reconstructed from persisted tiles, not trusted
+serialized metadata. The application must use this to prevent destructive mesh/
+atlas rebuilds; it must not clear paint merely to make an action available.
+
+Verification
+------------
+Standalone Release test (core archive built with current paint header):
+  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/projection.cpp src/projection.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-projection-test
+  /tmp/dome-projection-test
+
+Sanitizer run instruments projection, paint and BVH translation units. Remaining
+core/xatlas dependencies use their configured Release archives:
+  c++ -std=c++20 -O0 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Iinclude -Ithird_party/openbrush tests/projection.cpp src/projection.cpp src/paint.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-projection-sanitized
+  ASAN_OPTIONS=detect_leaks=1 /tmp/dome-projection-sanitized
+
+Tests cover PNG/Unicode/FIFO/bounds, camera handedness/pose/scale/FOV/clipping,
+source/view immutability, cheap reconfiguration, front/occlusion rejection,
+alpha/premultiplied filtering/data modes, stencil and scalar color space,
+emission, seam continuity, exact existing undo/redo/cancel, bounded/cancelled
+partial-stamp rollback and all protected-data cache transitions. They operate on
+private temporary/numerical fixtures, not live user projects or sessions.
+Ordinary paint/document/scene/UV/controller suites are separate integration checks.
+
+This foundation does not complete the full FLTK/XR authoring workflow. Image
+choosers, live joystick/stylus menus, retained external-source metadata and
+source-map baseline appearance integration belong to the guarded document/UI
+work tracked in REQUIREMENTS.md. No overall production completion is claimed.

@@ -6,6 +6,7 @@
 #include <memory>
 namespace dome {
 struct Material;
+class PaintProjection;
 struct Image {
   uint32_t width = 0, height = 0;
   std::vector<uint8_t> rgba;
@@ -58,11 +59,14 @@ public:
   void move_layer(int direction);
   void begin_stroke();
   void stamp(const Brush &, const PaintSettings &);
+  void stamp_projection(const Brush &, const PaintSettings &, const PaintProjection &);
   bool end_stroke();
   void cancel_stroke();
   bool in_stroke() const { return editing_; }
   bool pending_changes() const;
   size_t undo_count() const { return undo_.size(); }
+  // Conservative retained data, including hidden/zero-opacity/mask-only tiles.
+  bool has_paint_data() const noexcept { return allocated_tiles_ != 0; }
   bool undo();
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
@@ -77,6 +81,9 @@ public:
 
 private:
   PaintedMesh() = default;
+  struct PaintSample { PaintSettings settings; float opacity = 1; };
+  using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
+  void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &);
   struct SurfaceMap;
   std::shared_ptr<const SurfaceMap> surface_;
   std::vector<PaintLayer> layers_;
@@ -87,12 +94,14 @@ private:
     uint64_t layer;
     Tiles before, after;
     size_t bytes;
+    size_t before_tiles = 0, after_tiles = 0;
   };
   Tiles before_;
   std::deque<Stroke> undo_, redo_;
   size_t history_bytes_ = 0;
   PaintLayer &active();
   const PaintLayer &layer(uint64_t) const;
+  size_t allocated_tiles_ = 0, before_allocated_tiles_ = 0;
 };
 float srgb_to_linear(float);
 float linear_to_srgb(float);
