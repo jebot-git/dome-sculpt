@@ -24,7 +24,8 @@ face target displacements are combined with original continuous body/ocular
 warps. A larger head, larger eye region, narrower jaw/nose and editable colors
 supply toon/anime direction while retaining coherent authored topology. This
 is presently a realistic/toon doll foundation, not polished VRoid-level anime
-artwork. Additional intentional style presets and presentation work remain.
+artwork. Neutral, Toon and Anime presets provide explicit starting proportions; artistic
+polish remains work.
 
 The centred decimetre-scale source uses +X character left, +Y up and +Z front.
 Native conversion fits the requested body height (1.2–2.2 metres), grounds the
@@ -44,6 +45,11 @@ than assigning distant nearest bones. A complete validated 55-role VRM 1
 humanoid semantic mapping covers spine, limbs, fingers, eyes and jaw. This does
 not imply MakeHuman animation/pose-file compatibility or full VRM export.
 
+Eye detail charts now separate pupil disks, brows, upper eyeliner and limbal
+rings so each remains independently paintable. Upper eyeliner follows the actual
+body/eye occlusion contour; iris caps have bounded radial relief and eye surfaces
+have deliberately lower roughness than skin/hair.
+
 Body morphs contain aa/ih/ou/ee/oh, left/right eyelid closures and smile. They
 are editable stable-topology displacements with native vowel identity bindings.
 Their authored source deltas pass through the same style/metric transformations
@@ -51,8 +57,8 @@ as the rest body. Eye and groom parts are independently disconnected surfaces
 but explicitly weighted to their eye/head joints. They do not depend on an
 automatic binding fallback. Eye whites are ellipsoids; iris/pupil caps follow
 their curved front surface. Brows project onto the actual generated body surface.
-The original groom combines a head cap and 24 closed swept locks with stable UV
-cells; no VRoid hair asset or proprietary code is involved.
+The original groom combines a head cap and 24 closed swept locks with separated
+UV cells and nondegenerate root/tip cap charts; no VRoid hair asset or proprietary code is involved.
 
 ## Actual source reuse and licensing
 
@@ -79,11 +85,17 @@ advanced anime eye/lid presets, arbitrary character recognition, collision-free
 hair/skin fitting, springs and hairstyle authoring, age/ethnicity databases,
 shape-key-driven brows, facial capture, production deformation corrective shapes
 and complete VRM packaging remain work. Dark eye-socket rims and the simple
-solid-color iris treatment are visible presentation limitations. A nondegenerate
+simple iris treatment are visible presentation limitations. A nondegenerate
 mesh check is not a proof against self-intersection or an artistic quality test.
 Generated parts should stay grouped in subsequent editing and pose operations.
 
-`tests/humanoid-creator.cpp` checks source counts, complete semantics, exact
+Offline posed preset QA found remaining groom/body penetration in the tuned
+anime preset; no dynamic collision-free claim is made. The next requested
+primary baseline is the separately verified older CC0 VRoid beta models; their
+author grants are distinct from the modern proprietary VRoid presets.
+
+`tests/humanoid-creator.cpp` checks all five parts and all presets against
+PaintedMesh at resolution256 without reindexing/UV replacement, source counts, complete semantics, exact
 metric grounding/height, all full-strength expression morphs, parameter
 roundtrip, stable UV/topology across edits, disconnected part posing, zero groom
 settings, eight extreme combined settings, cancellation and invalid records.

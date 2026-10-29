@@ -74,9 +74,8 @@ void shape(std::vector<Vec3> &p, const HumanoidControls &c) {
     for (float side : {1.f, -1.f}) {
       Vec3 center{side * .3077f, 7.2842f, 1.2453f}, d = v - center;
       float w = std::exp(-((d.x / .65f) * (d.x / .65f) +
-                           (d.y / .42f) * (d.y / .42f))) *
-                smooth(.65f, 1.1f, v.z) * smooth(0, .20f, side * v.x) *
-                smooth(6.7f, 7.0f, v.y);
+                           (d.y / .32f) * (d.y / .32f))) *
+                smooth(.65f, 1.1f, v.z) * smooth(0, .20f, side * v.x);
       v.x +=
           (d.x * c.anime * c.eye_size * .45f + side * c.eye_spacing * .10f) * w;
       v.y += d.y * c.anime * c.eye_size * .80f * w;
@@ -265,19 +264,26 @@ void sphere(Builder &b, Vec3 center, Vec3 radius, uint32_t bone, int side) {
     }
 }
 void iris(Builder &b, Vec3 center, Vec3 radius, float extent, float offset,
-          uint32_t bone, int side) {
-  constexpr int segments = 24, rings = 4;
+          uint32_t bone, int side, bool relief = false) {
+  constexpr int segments = 32, rings = 6;
   uint32_t first = b.vertex(center + Vec3{0, 0, radius.z + offset},
                             {float(side) * .5f + .25f, .5f}, bone);
   for (int r = 1; r <= rings; ++r)
     for (int s = 0; s <= segments; ++s) {
       float a = 2 * pi * float(s) / segments, f = extent * float(r) / rings,
             x = std::cos(a) * f, y = std::sin(a) * f;
-      b.vertex(center + Vec3{radius.x * x, radius.y * y,
-                             radius.z * std::sqrt(1 - f * f) + offset},
-               {float(side) * .5f + .25f + x * .25f / extent,
-                .5f + y * .5f / extent},
-               bone);
+      b.vertex(
+          center +
+              Vec3{radius.x * x, radius.y * y,
+                   radius.z * (std::sqrt(1 - f * f) +
+                               (relief ? .006f * smooth(.29f, .38f, f) *
+                                             std::sin(7 * a) *
+                                             std::sin(pi * float(r) / rings)
+                                       : 0.f)) +
+                       offset},
+          {float(side) * .5f + .25f + x * .25f / extent,
+           .5f + y * .5f / extent},
+          bone);
     }
   for (int s = 0; s < segments; ++s)
     b.triangle(first, first + 1 + s, first + 2 + s);
@@ -288,25 +294,58 @@ void iris(Builder &b, Vec3 center, Vec3 radius, float extent, float offset,
       b.triangle(a, c + 1, a + 1);
     }
 }
-float front_surface(const Mesh &mesh, float x, float y) {
-  float front = -1e6f;
-  for (size_t i = 0; i < mesh.indices.size(); i += 3) {
-    auto a = mesh.positions[mesh.indices[i]],
-         b = mesh.positions[mesh.indices[i + 1]],
-         c = mesh.positions[mesh.indices[i + 2]];
-    float det = (b.y - c.y) * (a.x - c.x) + (c.x - b.x) * (a.y - c.y);
-    if (std::abs(det) < 1e-12f)
-      continue;
-    float u = ((b.y - c.y) * (x - c.x) + (c.x - b.x) * (y - c.y)) / det,
-          v = ((c.y - a.y) * (x - c.x) + (a.x - c.x) * (y - c.y)) / det;
-    if (u >= -1e-5f && v >= -1e-5f && u + v <= 1.00001f)
-      front = std::max(front, u * a.z + v * b.z + (1 - u - v) * c.z);
+class FaceProjector {
+  const Mesh &mesh;
+  Vec3 lo, hi;
+  std::array<std::vector<uint32_t>, 32 * 32> cells;
+  int index(float v, float a, float b) const {
+    return std::clamp(int((v - a) / (b - a) * 32), 0, 31);
   }
-  if (front < -1e5f)
-    fail("Humanoid brow projection missed the face");
-  return front;
-}
-void eyebrow(Builder &b, const Mesh &body, Vec3 center, Vec3 radius, int side) {
+
+public:
+  explicit FaceProjector(const Mesh &m)
+      : mesh(m), lo(m.positions.front()), hi(lo) {
+    for (auto p : m.positions) {
+      lo.x = std::min(lo.x, p.x);
+      lo.y = std::min(lo.y, p.y);
+      hi.x = std::max(hi.x, p.x);
+      hi.y = std::max(hi.y, p.y);
+    }
+    for (uint32_t i = 0; i < m.indices.size(); i += 3) {
+      auto a = m.positions[m.indices[i]], b = m.positions[m.indices[i + 1]],
+           c = m.positions[m.indices[i + 2]];
+      int x0 = index(std::min({a.x, b.x, c.x}), lo.x, hi.x),
+          x1 = index(std::max({a.x, b.x, c.x}), lo.x, hi.x),
+          y0 = index(std::min({a.y, b.y, c.y}), lo.y, hi.y),
+          y1 = index(std::max({a.y, b.y, c.y}), lo.y, hi.y);
+      for (int y = y0; y <= y1; ++y)
+        for (int x = x0; x <= x1; ++x)
+          cells[y * 32 + x].push_back(i);
+    }
+  }
+  float front(float x, float y) const {
+    float result = -1e6f;
+    if (x < lo.x || x > hi.x || y < lo.y || y > hi.y)
+      fail("Humanoid face projection outside body");
+    for (auto i : cells[index(y, lo.y, hi.y) * 32 + index(x, lo.x, hi.x)]) {
+      auto a = mesh.positions[mesh.indices[i]],
+           b = mesh.positions[mesh.indices[i + 1]],
+           c = mesh.positions[mesh.indices[i + 2]];
+      float det = (b.y - c.y) * (a.x - c.x) + (c.x - b.x) * (a.y - c.y);
+      if (std::abs(det) < 1e-12f)
+        continue;
+      float u = ((b.y - c.y) * (x - c.x) + (c.x - b.x) * (y - c.y)) / det,
+            v = ((c.y - a.y) * (x - c.x) + (a.x - c.x) * (y - c.y)) / det;
+      if (u >= -1e-5f && v >= -1e-5f && u + v <= 1.00001f)
+        result = std::max(result, u * a.z + v * b.z + (1 - u - v) * c.z);
+    }
+    if (result < -1e5f)
+      fail("Humanoid face projection missed body");
+    return result;
+  }
+};
+void eyebrow(Builder &b, const FaceProjector &body, Vec3 center, Vec3 radius,
+             int side) {
   uint32_t first = uint32_t(b.part.mesh.positions.size()),
            head = bone_id("head");
   for (int i = 0; i <= 8; ++i) {
@@ -314,14 +353,75 @@ void eyebrow(Builder &b, const Mesh &body, Vec3 center, Vec3 radius, int side) {
           y = center.y + radius.y * (1.6f + .20f * std::sin(pi * t));
     for (int row = 0; row < 2; ++row) {
       float yy = y + (row ? 1 : -1) * radius.y * .07f;
-      float z = front_surface(body, x, yy) + .0008f;
-      b.vertex({x, yy, z}, {float(side) * .5f + t * .5f, float(row)}, head);
+      float z = body.front(x, yy) + .0008f;
+      b.vertex({x, yy, z},
+               {float(side) * .5f + t * .5f, .44f + float(row) * .14f}, head);
     }
   }
   for (uint32_t i = 0; i < 8; ++i) {
     uint32_t a = first + i * 2;
     b.triangle(a, a + 2, a + 1);
     b.triangle(a + 1, a + 2, a + 3);
+  }
+}
+void upper_liner(Builder &b, const FaceProjector &body, Vec3 center,
+                 Vec3 radius, int side) {
+  constexpr int segments = 16;
+  uint32_t first = uint32_t(b.part.mesh.positions.size()),
+           head = bone_id("head");
+  for (int i = 0; i <= segments; ++i) {
+    float t = float(i) / segments, nx = (t - .5f) * 1.88f,
+          x = center.x + nx * radius.x,
+          limit = radius.y * std::sqrt(1 - nx * nx);
+    auto eye_z = [&](float y) {
+      float ny = (y - center.y) / radius.y;
+      return center.z +
+             radius.z * std::sqrt(std::max(0.f, 1 - nx * nx - ny * ny));
+    };
+    auto gap = [&](float y) { return body.front(x, y) - eye_z(y); };
+    float lower = center.y, upper = center.y + limit * .999f;
+    bool bracket = gap(lower) < 0 && gap(upper) >= 0;
+    if (bracket)
+      for (int step = 0; step < 18; ++step) {
+        float middle = (lower + upper) * .5f;
+        if (gap(middle) < 0)
+          lower = middle;
+        else
+          upper = middle;
+      }
+    float y = bracket ? (lower + upper) * .5f : center.y + limit * .45f;
+    float width = radius.y * (.025f + .035f * std::sin(pi * t));
+    for (int row = 0; row < 2; ++row) {
+      float yy = y + (row ? 1 : -1) * width;
+      float z = std::max(body.front(x, yy), eye_z(yy)) + .0006f;
+      b.vertex({x, yy, z},
+               {float(side) * .5f + t * .5f, .62f + float(row) * .14f}, head);
+    }
+  }
+  for (uint32_t i = 0; i < segments; ++i) {
+    uint32_t a = first + i * 2;
+    b.triangle(a, a + 2, a + 1);
+    b.triangle(a + 1, a + 2, a + 3);
+  }
+}
+void limbal_ring(Builder &b, Vec3 center, Vec3 radius, uint32_t eye, int side) {
+  constexpr int segments = 32;
+  uint32_t first = uint32_t(b.part.mesh.positions.size());
+  for (int i = 0; i <= segments; ++i) {
+    float a = 2 * pi * float(i) / segments;
+    for (float f : {.70f, .765f}) {
+      float x = std::cos(a) * f, y = std::sin(a) * f;
+      b.vertex(
+          center + Vec3{radius.x * x, radius.y * y,
+                        radius.z * (std::sqrt(1 - f * f) + .018f)},
+          {float(side) * .5f + .25f + x * .25f, .80f + (.5f + y * .5f) * .19f},
+          eye);
+    }
+  }
+  for (uint32_t i = 0; i < segments; ++i) {
+    uint32_t a = first + i * 2;
+    b.triangle(a, a + 1, a + 2);
+    b.triangle(a + 1, a + 3, a + 2);
   }
 }
 float hair_phi(float angle) {
@@ -379,8 +479,8 @@ void groom(Builder &b, const Frame &f, const HumanoidControls &c) {
                                -std::sin(theta) * std::cos(a) * width +
                                    std::cos(theta) * std::sin(a) * depth};
         b.vertex(f(p),
-                 {float(lock % 6) / 6 + float(side) / sides / 6,
-                  .42f + float(lock / 6) / 4 * .58f + t * .58f / 4},
+                 {(float(lock % 6) + .06f + float(side) / sides * .88f) / 6,
+                  .42f + (float(lock / 6) + .12f + t * .76f) / 4 * .58f},
                  head);
       }
       previous = center;
@@ -476,6 +576,61 @@ HumanoidControls HumanoidControls::decode(const nlohmann::json &j) {
   c.validate();
   return c;
 }
+HumanoidControls humanoid_preset(HumanoidPreset preset) {
+  HumanoidControls c;
+  switch (preset) {
+  case HumanoidPreset::Neutral:
+    c.anime = 0;
+    c.eye_size = 0;
+    c.nose_size = 0;
+    c.mouth_width = 0;
+    c.jaw_width = 0;
+    c.hair_length = .12f;
+    c.fringe = .15f;
+    break;
+  case HumanoidPreset::Toon:
+    c.height = 1.65f;
+    c.anime = .7f;
+    c.build = .15f;
+    c.shoulder_width = .1f;
+    c.waist_width = .1f;
+    c.leg_length = -.25f;
+    c.arm_length = -.15f;
+    c.head_width = .4f;
+    c.head_height = -.25f;
+    c.eye_size = .8f;
+    c.nose_size = -.45f;
+    c.jaw_width = -.3f;
+    c.mouth_width = .1f;
+    c.hair_length = .15f;
+    c.hair_volume = .6f;
+    c.fringe = .5f;
+    break;
+  case HumanoidPreset::Anime:
+    c.height = 1.6f;
+    c.anime = 1;
+    c.build = -.45f;
+    c.shoulder_width = -.4f;
+    c.waist_width = -.15f;
+    c.leg_length = .25f;
+    c.arm_length = -.15f;
+    c.head_width = .35f;
+    c.head_height = -.35f;
+    c.eye_size = 1;
+    c.eye_spacing = .1f;
+    c.nose_size = -.8f;
+    c.mouth_width = -.45f;
+    c.jaw_width = -.6f;
+    c.hair_length = .45f;
+    c.hair_volume = .7f;
+    c.fringe = .7f;
+    break;
+  default:
+    fail("Unknown humanoid style preset");
+  }
+  c.validate();
+  return c;
+}
 void CreatedHumanoid::validate() const {
   controls.validate();
   if (parts.size() != 5)
@@ -498,6 +653,8 @@ void CreatedHumanoid::validate() const {
     reference_rig = std::move(rig);
     if (p.mesh.uv.size() != p.mesh.positions.size())
       fail("Humanoid part requires complete stable UVs");
+    if (!std::isfinite(p.roughness) || p.roughness < 0 || p.roughness > 1)
+      fail("Invalid humanoid material roughness");
     for (float channel : p.color)
       if (!std::isfinite(channel) || channel < 0 || channel > 1)
         fail("Invalid humanoid part color");
@@ -527,6 +684,7 @@ CreatedHumanoid create_humanoid(const HumanoidControls &c,
   auto s = make_rig(p, frame);
   auto mapping = semantics(s);
   HumanoidPart body;
+  body.roughness = .85f;
   body.name = "Body";
   body.color = c.skin_color;
   body.mesh.indices.assign(std::begin(source_triangles),
@@ -592,9 +750,14 @@ CreatedHumanoid create_humanoid(const HumanoidControls &c,
   irises.part.name = "Irises";
   pupils.part.name = "Pupils";
   hair.part.name = "Hair";
+  sclera.part.roughness = .12f;
+  irises.part.roughness = .22f;
+  pupils.part.roughness = .14f;
+  hair.part.roughness = .48f;
   irises.part.color = c.iris_color;
   pupils.part.color = {.008f, .008f, .012f, 1};
   hair.part.color = c.hair_color;
+  FaceProjector projector(out.parts[0].mesh);
   for (int side = 0; side < 2; ++side) {
     checkpoint(cancel);
     std::span<const uint32_t> vertices =
@@ -614,9 +777,14 @@ CreatedHumanoid create_humanoid(const HumanoidControls &c,
     radius = {length(rx), length(ry), length(rz)};
     uint32_t eye = bone_id(side == 0 ? "eye.L" : "eye.R");
     sphere(sclera, center, radius, eye, side);
-    iris(irises, center, radius, .72f, radius.z * .008f, eye, side);
+    iris(irises, center, radius, .72f, radius.z * .008f, eye, side, true);
+    auto pupil_start = pupils.part.mesh.uv.size();
     iris(pupils, center, radius, .29f, radius.z * .016f, eye, side);
-    eyebrow(pupils, out.parts[0].mesh, center, radius, side);
+    for (size_t i = pupil_start; i < pupils.part.mesh.uv.size(); ++i)
+      pupils.part.mesh.uv[i][1] *= .4f;
+    eyebrow(pupils, projector, center, radius, side);
+    upper_liner(pupils, projector, center, radius, side);
+    limbal_ring(pupils, center, radius, eye, side);
   }
   checkpoint(cancel);
   groom(hair, frame, c);

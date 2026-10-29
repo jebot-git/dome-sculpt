@@ -17,12 +17,15 @@ struct HumanoidControls {
   nlohmann::json encode() const;
   static HumanoidControls decode(const nlohmann::json &);
 };
+enum class HumanoidPreset { Neutral, Toon, Anime };
+HumanoidControls humanoid_preset(HumanoidPreset);
 struct HumanoidPart {
   std::string name;
   Mesh mesh;
   DeformationState deformation;
   std::array<float, 4> color{1, 1, 1, 1};
   bool toon = true;
+  float roughness = .8f;
 };
 struct CreatedHumanoid {
   HumanoidControls controls;

@@ -20,10 +20,33 @@ void rejects(auto f, const char *s) {
   }
   require(bad, s);
 }
+void export_fixture(const CreatedHumanoid &avatar,
+                    const std::filesystem::path &path) {
+  std::vector<ObjectSurface> objects;
+  for (size_t i = 0; i < avatar.parts.size(); ++i) {
+    const auto &p = avatar.parts[i];
+    ObjectSurface surface;
+    surface.id = i + 1;
+    surface.name = p.name;
+    surface.material.color = p.color;
+    surface.material.toon = p.toon;
+    surface.material.roughness = p.roughness;
+    surface.mesh = p.mesh;
+    surface.deformation =
+        std::make_shared<const DeformationState>(p.deformation);
+    objects.push_back(std::move(surface));
+  }
+  export_glb(objects, path);
+}
 int main() try {
   auto avatar = create_humanoid();
   require(avatar.parts.size() == 5, "Generator produces coherent body, sclera, "
                                     "iris, pupil and hair surfaces");
+  for (const auto &part : avatar.parts) {
+    PaintedMesh paintable(part.mesh, 256);
+    require(paintable.mesh().positions.size() == part.mesh.positions.size(),
+            "Every creator part retains authored topology when made paintable");
+  }
   auto &body = avatar.parts[0];
   require(body.mesh.positions.size() == 14517 &&
               body.mesh.indices.size() == 80268,
@@ -146,25 +169,30 @@ int main() try {
   json["version"] = 2;
   rejects([&] { HumanoidControls::decode(json); },
           "Future creator records are not silently misinterpreted");
-  if (const char *path = std::getenv("DOME_HUMANOID_FIXTURE")) {
-    std::vector<ObjectSurface> objects;
-    for (size_t i = 0; i < avatar.parts.size(); ++i) {
-      auto &p = avatar.parts[i];
-      Material m;
-      m.color = p.color;
-      m.toon = true;
-      m.roughness = .85f;
-      objects.push_back(
-          {i + 1,
-           p.name,
-           {},
-           m,
-           p.mesh,
-           nullptr,
-           std::make_shared<const DeformationState>(p.deformation)});
+  for (auto preset :
+       {HumanoidPreset::Neutral, HumanoidPreset::Toon, HumanoidPreset::Anime}) {
+    auto styled = create_humanoid(humanoid_preset(preset));
+    styled.validate();
+    for (const auto &part : styled.parts)
+      PaintedMesh paintable(part.mesh, 256);
+    require(styled.parts[1].roughness < styled.parts[0].roughness &&
+                styled.parts[2].roughness < styled.parts[4].roughness,
+            "Eye gloss and body/hair material roughness are deliberate "
+            "per-part values");
+    if (const char *path = std::getenv("DOME_HUMANOID_FIXTURE")) {
+      auto f = std::filesystem::path(path);
+      std::string suffix = preset == HumanoidPreset::Neutral ? "-neutral"
+                           : preset == HumanoidPreset::Toon  ? "-toon"
+                                                             : "-anime";
+      export_fixture(styled,
+                     f.parent_path() / (f.stem().string() + suffix + ".glb"));
     }
-    export_glb(objects, path);
   }
+  rejects([&] { humanoid_preset(static_cast<HumanoidPreset>(999)); },
+          "Unknown style presets are rejected");
+  if (const char *path = std::getenv("DOME_HUMANOID_FIXTURE"))
+    export_fixture(avatar, path);
+
   return 0;
 } catch (const std::exception &e) {
   std::cerr << "FAIL " << e.what() << '\n';
