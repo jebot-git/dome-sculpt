@@ -65,7 +65,8 @@ enum class SpatialCommand {
   SculptOpacity,
   RecoveryRefresh, RecoveryNext, RecoveryPrevious, RecoveryRestore,
   CreateFemale, CreateMale, CreateMakeHuman, DeleteGroup, Ungroup,
-  RigNextJoint, RigPreviousJoint, RigNextMorph, RigPreviousMorph, RigResetPose
+  RigNextJoint, RigPreviousJoint, RigNextMorph, RigPreviousMorph, RigResetPose,
+  BakeSurface, ClearBake, CancelWork
 };
 const std::array<const char *, 12> &spatial_labels(int page);
 std::optional<SpatialCommand> spatial_action(int page, int index);

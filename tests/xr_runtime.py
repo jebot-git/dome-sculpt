@@ -222,6 +222,20 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         else:
             check(info["scene_hash"] == baseinfo["scene_hash"],
                   "Native OpenXR voxel " + mode + " restores the exact initial scene")
+    bake_fixture=root / "bake-input.dsculpt"
+    subprocess.run([str(binary.parent / "dome-sculpt-bake-controls-test"),"--ui-fixture",str(bake_fixture)],check=True)
+    bake_base=json.loads(subprocess.check_output([str(binary),"--project-info",str(bake_fixture)],env=env,text=True))
+    for mode in ("accept","cancel","focus","undo"):
+        result,path=run("bake-"+mode,50 if mode=="undo" else 45,extra=["--open",str(bake_fixture)],mode={"DOME_XR_FIXTURE_BAKE":mode})
+        check(result.returncode==0,"Native OpenXR bake "+mode+" completes with a saved scene")
+        info=json.loads(subprocess.check_output([str(binary),"--project-info",str(path)],env=env,text=True))
+        if mode=="accept":
+            check(info["objects"][0]["baked"] and info["paint_blue_texels"]>1000,
+                  "Joystick baking page and world-distance aim slider publish visible baked source paint")
+            check(info["objects"][1:]==bake_base["objects"][1:],"Native OpenXR baking retains both complete hidden sources")
+        else:
+            check(info["scene_hash"]==bake_base["scene_hash"],"Native OpenXR bake "+mode+" retains or restores the exact pre-bake scene")
+
     paintbase, paintbasepath = run("paint-baseline", 1, extra=["--paint"])
     check(
         paintbase.returncode == 0,

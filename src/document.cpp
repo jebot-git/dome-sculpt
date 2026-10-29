@@ -325,6 +325,13 @@ void Document::publish_locked(bool force) {
       state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
   }
   state_.mesh_active = active.mesh_active;
+  state_.bake_sources = bake_sources_locked();
+  if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
+    state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
+  state_.can_bake=bake_target_ready_locked() && !state_.bake_sources.empty();
+  state_.can_clear_bake=bake_target_ready_locked() && bool(active.painted->baked());
+  auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
+  state_.asset_progress=work.progress;
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
   state_.active_sculpt_layer = volume().active_layer();
   state_.sculpt_layers.clear();
@@ -381,7 +388,10 @@ void Document::finish_locked() {
   // not implicitly execute an action such as creating a remeshed object.
   finish_control_locked(state_.controls.parameter != VrParameter::VoxelSize &&
                         state_.controls.parameter != VrParameter::RigRotation &&
-                        state_.controls.parameter != VrParameter::MorphWeight);
+                        state_.controls.parameter != VrParameter::MorphWeight &&
+                        state_.controls.parameter != VrParameter::BakeSource &&
+                        state_.controls.parameter != VrParameter::BakeDistances &&
+                        state_.controls.parameter != VrParameter::BakeQuality);
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
   if (action_active_locked() && end_action_locked())
@@ -419,6 +429,7 @@ void Document::replace_locked(Scene next, bool clean) {
   state_.error.clear();
   anchored_ = false;
   state_.asset_busy = false;
+  asset_work_.store({});
   state_.recovery_busy = false;
   content_ = next_content_++;
   if (clean)
@@ -1127,6 +1138,8 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality)
+    return bake_target_ready_locked() && !bake_sources_locked().empty();
   if (parameter == VrParameter::RigRotation || parameter == VrParameter::MorphWeight) {
     const auto &o = scene_.active();
     if (state_.asset_busy || state_.recovery_busy || !o.visible || o.locked ||
@@ -1163,6 +1176,15 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality){
+    auto c=state_.controls;
+    if(accept){
+      if(c.parameter==VrParameter::BakeSource){auto ids=bake_sources_locked();state_.bake_source=ids.at(size_t(std::lround(c.value[0])));}
+      else if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
+      else {state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));}
+    }
+    control_before_.reset();control_changed_=false;state_.controls={};return;
+  }
   if (state_.controls.parameter == VrParameter::RigRotation ||
       state_.controls.parameter == VrParameter::MorphWeight) {
     auto controls = state_.controls;
@@ -1284,6 +1306,20 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::BakeSource: {
+      auto ids=bake_sources_locked();c.title="Bake source (hidden sources allowed)";
+      c.maximum=float(ids.size()-1);
+      auto found=std::find(ids.begin(),ids.end(),state_.bake_source);
+      c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
+    }
+    case VrParameter::BakeDistances:
+      c.title="Projection / AO distance (world mm)";c.components=3;c.minimum=.01f;c.maximum=10000;c.logarithmic=true;
+      c.value={state_.bake_settings.front_mm,state_.bake_settings.back_mm,state_.bake_settings.ao_distance_mm,0};
+      for(int k=0;k<3;++k)c.value[k]=std::clamp(c.value[k],c.minimum,c.maximum);
+      break;
+    case VrParameter::BakeQuality:
+      c.title="AO samples / seam padding";c.components=2;
+      c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,0,0};break;
     case VrParameter::RigRotation:
       control_rig_index_ = state_.rig_joint;
       c.title = o.deformation->skeleton->bones.at(control_rig_index_).name + " rotation delta";
@@ -1439,6 +1475,10 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::BakeSource:
+  case VrParameter::BakeDistances:
+  case VrParameter::BakeQuality:
+    break; // Staged operation settings do not mutate the scene or history.
   case VrParameter::RigRotation:
     control_changed_ = c.value[0] != 0 || c.value[1] != 0 || c.value[2] != 0;
     break;
@@ -1544,6 +1584,9 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command==SpatialCommand::CancelWork)return state_.asset_busy && asset_status().cancellable;
+  if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
+  if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
   if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
     auto parameter = command == SpatialCommand::RigNextMorph || command == SpatialCommand::RigPreviousMorph
         ? VrParameter::MorphWeight : VrParameter::RigRotation;
@@ -1666,6 +1709,9 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command==SpatialCommand::CancelWork){cancel_asset_work_locked();return;}
+  if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
+  if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
   if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
     if (!command_enabled_locked(command)) return;
     const auto &d = *scene_.active().deformation;
@@ -1990,7 +2036,7 @@ void Document::file_loop() {
       if (job->scene_operation) {
         auto cancelled = [&] {
           auto state = published_.load();
-          return stopping_.load() || state->generation != job->generation ||
+          return stopping_.load() || (job->work && job->work->cancelled.load()) || state->generation != job->generation ||
                  state->revision != job->revision || state->active_object != job->object;
         };
         job->scene_operation(job->scene, cancelled);
@@ -1999,10 +2045,14 @@ void Document::file_loop() {
         prepared.validate();
         std::lock_guard lock(model_mutex_);
         if (job->generation == state_.generation) {
-          state_.asset_busy = false;
+          if(job->work && job->work->cancelled.load())throw std::runtime_error("Asset operation cancelled");
           if (job->content != content_ || job->revision != state_.revision ||
               job->object != scene_.active().id || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
+          // Keep the lease until every rejection check has completed. Otherwise
+          // a new job could start between this rejection and the catch handler.
+          state_.asset_busy = false;
+          asset_work_.store({});
           Scene before = scene_;
           scene_ = std::move(prepared);
           record_locked({{}, std::move(before), scene_});
@@ -2166,7 +2216,10 @@ void Document::file_loop() {
           if (!job->uv_desktop)
             input_.resume_control(VrParameter::UvEdit);
         }
-        state_.error = e.what();
+        if(job->scene_operation)asset_work_.store({});
+        if(job->work && job->work->cancelled.load()){
+          state_.error.clear();state_.message=job->operation_label+" cancelled";
+        }else state_.error = e.what();
         publish_locked();
       }
       {

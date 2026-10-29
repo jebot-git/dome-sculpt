@@ -17,9 +17,12 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
         {**os.environ, "DOME_SCULPT_MENU_BUS": "1"},
     )
 root = Path(__file__).resolve().parents[1]
-compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1"
+bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
+compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1"
-out = root / ("artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
+bake_flow = os.environ.get("DOME_MENU_BAKE") == "1"
+bake_cancel = os.environ.get("DOME_MENU_BAKE_CANCEL") == "1"
+out = root / ("artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -37,8 +40,8 @@ def check(ok, label):
     assert ok, label
 
 
-async def wait(fn):
-    until = time.monotonic() + 30
+async def wait(fn, timeout=30):
+    until = time.monotonic() + timeout
     while time.monotonic() < until:
         value = fn()
         if value:
@@ -99,6 +102,10 @@ async def main():
         if rig_flow:
             subprocess.run([str(root / "build/dome-sculpt-rig-edit-test"), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
+        if bake_flow:
+            fixture=Path(home,"bake.dsculpt")
+            subprocess.run([str(root / "build/dome-sculpt-bake-controls-test"),"--ui-large-fixture" if bake_cancel else "--ui-fixture",str(fixture)],check=True)
+            arguments.append(str(fixture))
         app = subprocess.Popen(
             arguments, env=env, cwd=home, stdout=log, stderr=log
         )
@@ -115,7 +122,7 @@ async def main():
                     continue
             return None
 
-        window = await wait(lambda: named("Dome Sculpt"))
+        window = await wait(lambda: named("Dome Sculpt"),90)
         window.set_input_focus(X.RevertToParent, X.CurrentTime)
         d.sync()
 
@@ -160,6 +167,102 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if bake_flow:
+            def info():
+                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"),"--project-info",str(fixture)],env=env))
+            def tap(w,x,y):
+                g=w.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
+            baseline=info();nodes,_=await layout()
+            check(nodes["Bake surface..."][1].get("enabled") is True and nodes["Clear baked surface"][1].get("enabled") is False,
+                  "The universal menu enables valid baking and disables absent baked data")
+            if bake_compact:
+                await click("Bake surface...");w=await wait(lambda:named("Bake surface"));g=w.get_geometry()
+                w.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();await asyncio.sleep(.2)
+                def shot():
+                    raw=w.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF)
+                    return Image.frombytes("RGB",(g.width,g.height),raw.data,"raw","BGRX")
+                before=shot();before.save(out / "bake-compact-before.png")
+                check(g.width<=640 and g.height<=360,"A 2x BDF baking dialog fits the compact screen")
+                xtest.fake_input(d,X.MotionNotify,x=g.x+g.width-8,y=g.y+80)
+                for _ in range(5):xtest.fake_input(d,X.ButtonPress,5);xtest.fake_input(d,X.ButtonRelease,5)
+                d.sync();await asyncio.sleep(.3);after=shot();after.save(out / "bake-compact-after.png")
+                footer=max(72,48*2)
+                check(before.crop((0,0,g.width,g.height-footer)).tobytes()!=after.crop((0,0,g.width,g.height-footer)).tobytes() and before.crop((0,g.height-footer,g.width,g.height)).tobytes()==after.crop((0,g.height-footer,g.width,g.height)).tobytes(),
+                      "Large bitmap content scrolls while both baking action buttons remain fixed")
+                key("Escape");await wait(lambda:named("Bake surface") is None)
+                await click("Save");check(info()["scene_hash"]==baseline["scene_hash"],"Compact-screen cancellation preserves the complete source scene")
+                d.close();bus.disconnect();return
+            if not bake_cancel:
+                for action in ("Return","Escape","Control-w","Universal Close"):
+                    await click("Bake surface...");w=await wait(lambda:named("Bake surface"))
+                    w.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+                    nodes,_=await layout()
+                    check(w.get_wm_transient_for().id==window.id and nodes["Bake surface..."][1].get("enabled") is False,
+                          "Baking options retain native modal ownership and isolate document commands: "+action)
+                    if action=="Universal Close":await click("Close Window")
+                    elif action=="Control-w":key("Control_L",True);key("w");key("Control_L",False)
+                    else:key(action)
+                    await wait(lambda:named("Bake surface") is None)
+                    await click("Save")
+                    check(info()["scene_hash"]==baseline["scene_hash"],"Baking options cancel without scene mutation: "+action)
+            await click("Bake surface...");w=await wait(lambda:named("Bake surface"));g=w.get_geometry()
+            w.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+            def pixels():
+                raw=w.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF)
+                return Image.frombytes("RGB",(g.width,g.height),raw.data,"raw","BGRX")
+            if bake_cancel:
+                # Last end of the AO-samples track is the exact integer maximum.
+                tap(w,g.width-42,228)
+            else:
+                before=pixels();xtest.fake_input(d,X.MotionNotify,x=g.x+g.width-70,y=g.y+124)
+                xtest.fake_input(d,X.ButtonPress,4);xtest.fake_input(d,X.ButtonRelease,4);d.sync();await asyncio.sleep(.15)
+                check(pixels().crop((230,108,g.width-30,140)).tobytes()!=before.crop((230,108,g.width-30,140)).tobytes(),
+                      "A wheel over the native logarithmic distance slider updates its visible value")
+            pixels().save(out / "bake-options.png")
+            tap(w,g.width*.75,g.height-46)
+            if bake_cancel:
+                def projecting():
+                    title=str(w.get_wm_name() or "")
+                    if "Baking " not in title:return False
+                    try:return int(title.split("Baking ")[1].split("%")[0])>=10
+                    except ValueError:return False
+                await wait(projecting)
+                check(True,"The native bake dialog reports live progress while projection/AO work is executing")
+                key("Control_L",True);key("w");key("Control_L",False)
+                await wait(lambda:named("Bake surface") is None)
+            else:
+                await wait(lambda:"complete" in str(w.get_wm_name() or ""))
+                check(True,"Native Bake completes asynchronously and reports completion in its visible title")
+                pixels().save(out / "bake-complete.png")
+                await click("Close Window");await wait(lambda:named("Bake surface") is None)
+            for _ in range(200):
+                nodes,_=await layout()
+                if nodes["Save"][1].get("enabled") is True:break
+                await asyncio.sleep(.03)
+            await click("Save");baked=info()
+            if bake_cancel:
+                check(baked["scene_hash"]==baseline["scene_hash"] and nodes["Undo"][1].get("enabled") is False,
+                      "Ctrl+W cancels a running native bake without publishing partial maps or history")
+                d.close();bus.disconnect();return
+            check(baked["objects"][0]["baked"] and baked["paint_blue_texels"]>1000 and baked["objects"][1:]==baseline["objects"][1:],
+                  "Native baking publishes visible source paint and retains both complete hidden source objects")
+            await click("Undo");await click("Save")
+            check(info()["scene_hash"]==baseline["scene_hash"],"Universal Undo restores the complete scene before native baking")
+            await click("Redo");await click("Save")
+            check(info()["scene_hash"]==baked["scene_hash"],"Universal Redo restores the exact baked surface")
+            nodes,_=await layout();check(nodes["Clear baked surface"][1].get("enabled") is True,"The baked target exports an enabled explicit Clear command")
+            await click("Clear baked surface");await asyncio.sleep(.2);await click("Save")
+            check(info()["scene_hash"]==baseline["scene_hash"],"Native Clear retains editable paint layers and original source data")
+            await click("Undo");await click("Save")
+            check(info()["scene_hash"]==baked["scene_hash"],"Universal Undo restores the exact cleared baked surface")
+            await click("Bake surface...");w=await wait(lambda:named("Bake surface"));g=w.get_geometry()
+            tap(w,g.width/2+12,124);tap(w,g.width*.75,g.height-46)
+            await wait(lambda:"failed" in str(w.get_wm_name() or ""))
+            pixels().save(out / "bake-projection-error.png")
+            check(True,"A too-short projection cage shows visible worker failure in the native dialog")
+            await click("Close Window");await wait(lambda:named("Bake surface") is None);await click("Save")
+            check(info()["scene_hash"]==baked["scene_hash"],"Failed native rebaking preserves the complete previous baked surface and sources")
+            d.close();bus.disconnect();return
         if rig_flow:
             def info():
                 return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))

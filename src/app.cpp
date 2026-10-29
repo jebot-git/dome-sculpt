@@ -10,6 +10,7 @@
 #include "rig-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
+#include "bake-editor.hpp"
 #include "ui-conventions.hpp"
 #include "uv-editor.hpp"
 #ifdef DOME_HAS_XR
@@ -355,6 +356,9 @@ struct App {
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
     menu.add("&Scene/Rig and shapekeys...", 0, command, this);
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
+    menu.add("&Mesh/Bake surface...",0,command,this);
+    menu.add("&Mesh/Clear baked surface",0,command,this);
+    menu.add("&File/Cancel background work",0,command,this);
     menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
     menu.add("&Paint/Prepare painting mesh", FL_CTRL | FL_SHIFT | 'p', command,
              this);
@@ -444,6 +448,9 @@ struct App {
     enable("&File/Recovery/Recover project...", !modal && !s->recovery_busy &&
            !s->dirty && !s->asset_busy && !s->recovery_candidates.empty());
     enable("&Mesh/Voxel remesh...", !modal && s->can_voxel_remesh);
+    enable("&Mesh/Bake surface...",!modal && s->can_bake);
+    enable("&Mesh/Clear baked surface",!modal && s->can_clear_bake);
+    enable("&File/Cancel background work",!modal && s->can_cancel_asset);
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Reset &trackball", "&View/Start or stop &XR",
                            "&View/Shading/&PBR", "&View/Shading/&Toon preview"};
@@ -736,6 +743,9 @@ struct App {
       canvas.document.delete_object();
     } else if (label == "Rig and shapekeys...") {
       edit_rig_dialog(canvas.document);
+    } else if(label=="Bake surface..."){edit_bake_dialog(canvas.document);
+    } else if(label=="Clear baked surface"){canvas.document.clear_bake();
+    } else if(label=="Cancel background work"){canvas.document.cancel_asset_work();
     } else if (label == "Voxel remesh...") {
       edit_voxel_remesh(canvas.document);
     } else if (label == "Object and material...") {
@@ -978,6 +988,7 @@ int main(int argc, char **argv) try {
       value.erase("visible");
       objects.push_back({{"id", value.at("id")}, {"name", value.at("name")},
                          {"visible", visible}, {"mesh_active", value.at("mesh_active")},
+                         {"baked",value.contains("painted") && value.at("painted").contains("baked")},
                          {"voxel_size", value.at("volume").at("voxel_size")},
                          {"payload_hash", digest(value)}});
     }

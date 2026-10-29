@@ -285,9 +285,19 @@ void SpatialPalette::raster(const EditorState &s) {
       rect(int(100 + 420 * t - 12) * unit_, (y - 28) * unit_, 24 * unit_,
            56 * unit_, row == c.selected ? accent : fg);
       std::string label;
-      if (c.components > 1)
+      if(c.parameter==VrParameter::BakeDistances)label=std::string(row==0?"Front ":row==1?"Back ":"AO radius ");
+      else if(c.parameter==VrParameter::BakeQuality)label=row==0?"AO samples ":"Padding ";
+      else if (c.components > 1)
         label = std::string(1, (c.parameter == VrParameter::RigRotation ? "XYZ" : "RGBA")[row]) + " ";
-      if (c.parameter == VrParameter::RigRotation)
+      if(c.parameter==VrParameter::BakeSource){
+        size_t index=size_t(std::clamp(std::lround(value),0l,long(s.bake_sources.size()?s.bake_sources.size()-1:0)));
+        auto id=s.bake_sources.empty()?0:s.bake_sources[index];
+        auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==id;});
+        label=found==s.objects.end()?"No source":found->name.substr(0,36)+(found->visible?"":" [hidden]");
+      }
+      else if(c.parameter==VrParameter::BakeQuality)label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
+      else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(value));label+=size;}
+      else if (c.parameter == VrParameter::RigRotation)
         label += std::to_string(int(std::lround(value))) + " deg";
       else if (c.parameter == VrParameter::BrushRadius)
         label += std::to_string(int(std::lround(value * 1000))) + " mm";
@@ -310,7 +320,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
@@ -397,11 +407,11 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11) {
+  if (s.menu_page != 11 && s.menu_page!=12) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 11 ? "Rig and shapekeys"
+  const char *page = s.menu_page==12?"Mesh baking":s.menu_page == 11 ? "Rig and shapekeys"
                      : s.menu_page == 10 ? "Mesh tools"
                      : s.menu_page == 9 ? "Avatars"
                      : s.menu_page == 8 ? "Recovery"
@@ -414,6 +424,11 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==12){
+    auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
+    text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name.substr(0,32),fg);
+    text(320*unit_,318*unit_,s.asset_busy?"Baking "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
+  }
   if (s.menu_page == 11 && s.deformation) {
     auto &d = *s.deformation;
     if (d.skeleton && !d.skeleton->bones.empty())
@@ -443,6 +458,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   std::string signature =
       s.font_file + std::to_string(s.font_pixels) +
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
+      std::to_string(s.bake_source)+":"+std::to_string(int(s.asset_progress*100))+":"+
       std::to_string(s.rig_joint) + ":" + std::to_string(s.morph_target) + ":" +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message + std::to_string(s.recovery_selected) +
       std::to_string(s.recovery_candidates.size()) + s.recovery_error +

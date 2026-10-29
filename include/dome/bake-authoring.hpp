@@ -14,5 +14,6 @@ struct ObjectBakeReport {
 // and target geometry/deformation/layers survive. World-millimetre bounds are
 // converted to target-local units. Failure leaves the detached scene unchanged.
 ObjectBakeReport bake_object(Scene &, uint64_t source, ObjectBakeSettings = {},
-                              const std::function<bool()> &cancelled = {});
+                              const std::function<bool()> &cancelled = {},
+                              const std::function<void(float)> &progress = {});
 } // namespace dome

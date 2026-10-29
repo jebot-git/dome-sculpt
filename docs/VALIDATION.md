@@ -1,102 +1,113 @@
-# Source-aware bake / rig integration — 2026-10-29
+# Native bake authoring controls — 2026-10-29
 
-This stage joins b879ce4 and c95208b, preserving both histories and the complete
-production objective. Their original records are archived in
-VALIDATION-{b879ce4,c95208b}.md and corresponding HANDOFF files. Those historical
-results must not be relabeled as verification of the combined tree.
+This stage extends af492ee. The previous exact record is archived as
+VALIDATION-af492ee.md / HANDOFF-af492ee.md. The complete objective remains
+incomplete; native controls and passing fixtures do not prove every production
+or device requirement. See BAKE-CONTROLS.md for actual user operations and limits.
 
-## Release evidence
+## Native Release and OpenXR
 
-The combined application/core/XR and all 40 registered tests build successfully:
-artifacts/build-source-bake-verified.log. Configure and earlier incremental build
-logs use configure-current-integration.log / configure-source-bake.log and
-build-current-integration.log / build-source-bake.log / build-source-bake-final.log.
+All 41 registered Release CTests passed in 280.73 seconds, zero failures:
+artifacts/tests-bake-controls-full.log and tests-bake-controls-full-detail.log.
+Includes the existing actual-avatar/source/GLB/GPU, UV/paint/worker/history,
+remesh/bake/rig/weight/groom suites plus the new bake-controls suite.
 
-The broad run passed 39/40 suites in 286.20 seconds:
-artifacts/tests-source-bake-final.log. gltf-interoperability failed because the
-merged fixture reset its rig maps to a normal-less texture bundle while still
-asserting four images and a normal binding. The fixture now restores the actual
-normal-bearing bundle; the strong four-image/normal assertion is retained.
+The real-loader synthetic OpenXR report now has 62 checks, zero failures,
+complete=true and status=passed: build/xr-client/report.json. Four new replays
+use the actual joystick Objects/Mesh tools/Baking route, aim-drag world-distance
+slider and saved fixture. Accept publishes blue baked maps and retains both
+complete hidden sources; ray Cancel, focus loss and later global Undo preserve
+or restore the exact initial scene hash. Generic tracking loss is deliberately
+excluded before the focus case so the intended event is isolated. All runtime
+tracking is synthetic and GL is software.
 
-After the final worker/renderer/export corrections and a fresh rebuild, all nine
-affected suites pass in 17.84 seconds: artifacts/tests-source-bake-verified.log.
-They cover glTF/PNG, real software GL, source GPU/maps/preview, native baking,
-full sculpt/paint/voxel/atlas/bake/save/reopen/export workflow and document assets.
-Detailed output is preserved in tests-source-bake-verified-detail.log.
+After final layout and invalid-sector refinements, controller-controls and
+bake-controls passed together in 6.87 seconds:
+artifacts/tests-bake-controls-visible.log. The new native controller suite has
+20 assertions. It checks hidden/locked source selection, logarithmic multi-row
+sliders, integer AO/padding, staged settings without dirty/history changes,
+ray/joystick confirmation, exact Bake/Clear Undo/Redo, focus cancellation,
+generic returned-candidate cancellation, monotonic projection progress and
+actual headset-menu Cancel during running AO work. These final focused tests
+supplement the broad run; the full run preceded the final label-only refinements.
 
-The last two evidence-focused targets pass in 2.46 seconds:
-artifacts/tests-source-bake-evidence.log and corresponding -detail.log. Final
-baked-textures has 38 assertions, including the zero-preliminary-composite check;
-source-gpu has 42 assertions including actual female/male profiles. Thus all 40
-registered suites have passing evidence across the broad and final targeted runs;
-there was not a single 40/40 final-source run. The final targeted repeats were
-required by actual fixture/source changes and the stale-object audit, rather
-than a blanket repetition of unchanged suites.
+## Whole-core ASan/UBSan/leaks
 
-New assertions independently check rotated/mirrored/singular original normal
-views, raw normal/AO/PBR/alpha factors, authoritative explicit tangent frames,
-protected original normal detail, exact source retention, raw/baked/clear/Undo
-preview selection and held immutable snapshots. GPU fixtures compare the actual
-production shader's original-source output with the native bake (within 8-bit
-quantization), then compare a mixed-source bake to a bake-only reference exactly.
-Independent cgltf plus PNG checks verify baked normal bytes and neutral scale/
-UV metadata take precedence over conflicting retained originals; composite AO
-uses ORM red once. This is generic PBR evidence, not complete MToon/VRM parity.
+All six selected whole-core suites passed in 133.78 seconds:
+artifacts/tests-bake-controls-sanitize.log. Includes document assets, baked
+textures, the complete sculpt/paint/voxel/atlas/bake/save/export workflow,
+bake controls, source preview and rig editing. Both C and C++ retain ASan/UBSan
+and frame-pointer flags, including native Mikk/xatlas. UI/XR are OFF; Release
+uses -O1 -g1 -DNDEBUG. ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
+UBSAN_OPTIONS=halt_on_error=1 apply to the runs.
 
-The broad real-loader OpenXR suite passed in 276.50 seconds. Its persisted report
-has 53 checks, zero failures, complete=true/status=passed:
-build/xr-client/report.json. All tracking/controllers are synthetic. Release GPU
-fixtures explicitly use software GL; no physical headset or hardware-accelerator
-completion follows from them. The GPU fixture now labels software-permitted
-runs accurately instead of printing a hardware-only assertion label by default.
+The final expanded bake-controls boundary/interaction suite separately passed
+in 0.85 seconds: artifacts/tests-bake-controls-sanitize-visible.log. Cancellation
+continues to retain the previous candidate/scene/history even if a detached
+operation returns normally after the request. No cancellation flag or progress
+callback grants workers access to mutable model/UI state.
 
-## Whole-core sanitizer evidence
+A final review moved the scene-operation busy/status release after every source
+rejection check, closing a window where another operation could start before the
+old failure handler. Document-assets, bake-controls and rig-editing pass again
+in 2.67 seconds (tests-bake-controls-lease.log); document-assets and bake-controls
+pass under whole-core sanitizers in 1.49 seconds
+(tests-bake-controls-sanitize-lease.log). These focused runs cover that final
+worker change after the broad Release/sanitizer runs above.
 
-Seven selected ASan/UBSan/leak suites pass in 158.54 seconds:
-artifacts/tests-source-bake-sanitize.log. Includes glTF, baked textures, full bake
-workflow, actual source maps, native weight editing, source preview and rig editing.
-Both C and C++ instrument the complete project core and Mikk/xatlas dependencies;
-UI/XR are OFF. Configure uses Release with -O1 -g1 -DNDEBUG, sanitizer flags and
-frame pointers retained. ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
-UBSAN_OPTIONS=halt_on_error=1 apply to the tests. This closes the unfinished
-merged-core sanitizer rebuild recorded in the b879ce4 handoff.
+## Real native FLTK, BDF and universal menus
 
-The final expanded baked-textures target is rebuilt/relinked against the latest
-core and passes separately in 0.56 seconds:
-artifacts/tests-source-bake-sanitize-evidence.log, with full output in the
-corresponding -detail.log. This includes all 38 assertions and the direct-source
-worker path. Logs and CMake cache retain the actual flags; no diagnostic was
-suppressed and C instrumentation was not omitted.
+- Existing general universal menu suite: 53/53, exit 0, failed=0;
+  artifacts/menu-bake-controls-general.log and artifacts/menu/report.json.
+- Bake acceptance/error suite: 19/19, exit 0, failed=0;
+  artifacts/menu-bake-controls-visible.log and artifacts/menu-bake/report.json.
+  Checks actual modal ownership/command isolation; Return/Escape/Ctrl+W/
+  universal Close options cancellation; logarithmic wheel feedback; asynchronous
+  completion; baked source paint and exact retained source payloads; native
+  Save/Undo/Redo/Clear; visible projection failure with the prior bake unchanged.
+- Running bake cancellation: 3/3, exit 0, failed=0;
+  artifacts/menu-bake-controls-cancel-visible.log and
+  artifacts/menu-bake-cancel/report.json. A 512px/256-sample bake reaches live
+  projection progress before Ctrl+W. No partial scene/history is published.
+- Compact 640x360 / 2x Unifont BDF: 4/4, exit 0, failed=0;
+  artifacts/menu-bake-controls-compact-final.log and
+  artifacts/menu-bake-compact/report.json. Measured wrapped text fits the screen,
+  content scrolls and exact action-button footer pixels stay fixed. Cancellation
+  retains the complete source scene. Captures were visually inspected.
 
-## Native frontends and provenance
+Readouts explicitly use the current DomeD bitmap face/size. Visual inspection
+caught default bottom-aligned slider labels and undersized numeric readouts;
+left alignment, measured wrapping and explicit text metrics correct these.
+The final progress-bar accent-only change uses FL_SELECTION_COLOR and passes
+all 19 acceptance/error checks again: artifacts/menu-bake-controls-accent.log,
+exit 0 / failed=0. Its final capture was visually inspected. Screenshots:
+artifacts/menu-bake/{bake-options,bake-complete,bake-projection-error}.png and
+artifacts/menu-bake-compact/bake-compact-{before,after}.png.
 
-- Native FLTK/private DBusMenu general suite: 53/53, exit 0, failed=0;
-  artifacts/menu-source-bake-final.log and artifacts/menu/report.json.
-- Native rig/shapekey modal Apply/cancel/global Undo/Redo suite: 8/8, exit 0,
-  failed=0; menu-source-bake-rig.log and menu-rig/report.json.
-- Real FLTK existing scene-v6 baked-asset compatibility regression: 5/5, exit 0,
-  complete=true/status=passed/failed=0; gui-source-bake-final.log and
-  gui-baked-surface/report.json. Paint overlays, exact GPU Undo and owned UV
-  cancellation retain the canonical normal-mapped preview.
-- All 30 pinned source_sha256 entries match. Mikk's marked C seed-rotation fix,
-  reproducible patch and original/patched hashes remain unchanged.
-- artifacts/linkage-source-bake-final.log resolves the canonical local 22-patch
-  FLTK toolkit and contains no Qt/GTK/Pango runtime frontend. Python remains
-  optional test orchestration; runtime and bake/weight operations are native.
+## Diagnostics and evidence limits
 
-The first test build needed an explicit nlohmann/json.hpp include for the new
-preview persistence assertion. A build audit also caught an older baked-test
-object compiled before added cases; that target was explicitly rebuilt and its
-new assertions verified in detailed output. Neither initial output is reported
-as verification of the expanded cases. Original license notices remain intact.
+Initial private-HOME GUI startup attempts exceeded 30 seconds before any main
+window. A private debugger launch traced Fontconfig's FcConfigGetFontDirs /
+FcConfigBuildFonts / FcFreeTypeQueryAll path inside canonical BDF discovery,
+before App/Document construction: artifacts/bake-startup-backtrace.log. This is
+cold font discovery, not a model deadlock. The harness permits 90 seconds only
+for initial startup; interaction/operation assertions retain 30-second deadlines.
+Cold-start optimization remains a canonical-helper follow-up. Shared BDF helper
+matches qimgvr byte-for-byte; all 30 pinned source hashes remain valid.
 
-## Remaining scope
+The compact test initially sent wheel events without explicitly focusing the
+modal. It now focuses the dialog and uses the visible native scrollbar, matching
+the proven voxel harness. Its content/footer assertions are unchanged. The
+first native focus-cancel fixture compared a logarithmic float to literal 20;
+it now compares the exact prior confirmed setting. An initial sanitizer build
+used a nonexistent assets target; the correct document-assets target was then
+built and all selected checks completed. FLTK readout-width adjustment uses the
+installed 1.4.5 header's value_width API. Earlier diagnostic logs are not passes.
 
-FLTK/XR bake authoring controls and the complete production requirement matrix
-remain unfinished. CPU source sampling is bilinear at texel centers; source mip
-footprints/minification, full authored-tangent/UV1/vertex-color rendering,
-production-size timing/memory/cancellation and complete deformed-consumer
-interoperability need further work. The raw derivative and canonical baked
-normal conventions are explicit; no claim of every glTF material extension is
-made. No fresh external Khronos validation, physical device/backend completion,
-system install or active-session restart occurred in this stage.
+artifacts/linkage-bake-controls-final.log resolves the canonical 22-patch FLTK
+and has no Qt/GTK/Pango frontend dependency. Python remains test orchestration;
+application workers, geometry, baking and controls are native C++20. No system
+installation, active-session restart, physical headset/controller/stylus/3D-mouse
+or accelerator-backend completion is claimed. No new external Khronos validator
+run is claimed. Durable recipes, custom cages, multi-source/partial masks and
+production-scale quality/performance remain further work in the full objective.

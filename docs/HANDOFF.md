@@ -1,76 +1,64 @@
-# Verified source-aware bake / rig integration
+# Native FLTK / XR bake authoring milestone
 
-The full native FLTK VR production objective remains active and incomplete.
-Read AGENTS.md, REQUIREMENTS.md and TOOLKIT.md. Preserve every remaining sculpt,
-UV, texturing, rig/skin/morph, avatar/MToon, glTF/VRM, plugin, device and compute
-requirement. No agents were spawned in this workspace. Remote handoff references
-to agents describe another workspace; do not treat them as live handles here.
+The complete production objective remains active and incomplete. Read AGENTS.md,
+REQUIREMENTS.md, BAKING.txt, BAKE-CONTROLS.md and VALIDATION.md. Preserve all sculpt,
+UV, texture/skin/rig/morph/avatar, MToon/glTF/VRM, named plugin, device and compute
+requirements. No agent was spawned here. No system install, session restart or
+physical-device/backend completion is claimed.
 
-## Integrated history
+This stage extends public af492ee. Its exact handoff/validation are archived as
+HANDOFF-af492ee.md / VALIDATION-af492ee.md. Earlier baked/creator/rig histories
+remain intact; source CC0 VRoid female/male remain primary with MakeHuman explicit.
+Always fetch remote before overlapping work and retain newer commits.
 
-Current work/bake-source-integration joins checkpoint b879ce4 and origin/main
-c95208b. Both histories and their full handoffs/validation are retained under
-HANDOFF-{b879ce4,c95208b}.md and VALIDATION-{b879ce4,c95208b}.md. Historical evidence
-in those files is not fresh verification of this combined source. The public
-checkpoint/baked-creator-handoff-20261029 remains an unchanged recovery point.
+## Implemented
 
-Incoming work preserves direct original GPU source bindings/cache, shared grouped
-GLB rigs, original joint/morph/coordinate provenance, native desktop/controller
-pose and shapekey controls, fitted groom and detached weight-paint kernels.
-The weight helper is now registered in the native core and CTest; it still needs
-interactive weight painting/visualization and guarded scene publication. Source
-CC0 VRoid female/male remain the primary creator bases; MakeHuman is explicit.
+- Mesh > Bake surface: native FLTK source choice (including hidden/locked high
+  sources), logarithmic world-mm front/back/AO sliders with wheel adjustment,
+  integer AO-sample/padding sliders, progress/status/title, asynchronous Bake,
+  rebake and Cancel. Default Enter is Cancel; Escape/Ctrl+W/universal/WM Close
+  cancel options or request cancellation of running work. Clear baked surface
+  removes only the base. Bake/Clear are exact global Undo/Redo transactions.
+- Objects > Mesh tools > Baking (XR page12): joystick-spawned navigation, source
+  selection, three projection/AO-distance ray sliders, two AO/padding rows,
+  explicit Bake/Clear/Cancel work and regular Undo/Redo/save/export. Settings
+  stage until Done; Cancel/focus loss discards them without scene/history edits.
+  Source names/hidden markers and worker progress are visible. Sculpt layers
+  remains on Objects; its duplicate Mesh-tools shortcut now enters Baking.
+- Atomic per-job cancellation/progress shared only as worker status. No worker
+  closure accesses widgets/model state. Cancellation is checked under the model
+  lock before publication, leaves history/source/target exact, clears busy only
+  once terminal and reports cancellation without a false error. File > Cancel
+  background work exposes cancellation for supported scene operations.
+- New native bake-controls suite, four real-loader XR replay variants and native
+  GUI acceptance/cancellation/compact-font suites. --project-info adds a per-object
+  baked flag for durable independent scene comparisons. Numerical/kernel/source
+  preservation, scene-v6 and legacy checkpoint contracts from af492ee remain.
 
-## New bake/source integration
+## Verification and next work
 
-- Scene-v6 baked persistence and legacy standalone baked-v5 compatibility remain
-  alongside modern grouped-v5 source archives. Unbaked scenes still emit v5.
-- Original GPU preview cannot bypass a baked base. Clear restores raw eligibility;
-  scene Undo restores the baked path and immutable source/bake snapshots.
-- Canonical baked normals use Mikk worker tangent corners; original normal views
-  retain sampler/affine derivative GPU handling. Both use bounded shared GPU
-  image/sampler storage. Corner-expanded ranges retain their vertex offsets.
-- The CPU baker now accepts original source-only bindings and retained raw normal
-  views. Default original normals use affine-UV derivative frames (mirrors and
-  normal strength included); explicit supplied tangent frames remain authoritative.
-  Native object baking no longer rejects original normal views. Source models,
-  images, editable target geometry/rig/layers and source object remain intact.
-- Protected/fractional normal coverage converts original source detail into the
-  canonical baked basis before blending. Baked normal export overrides conflicting
-  original views, and composite AO exports from ORM red without reapplying original
-  strength. Source-only export preserves independent original bindings/strengths.
-- Tests add analytic rotated/mirrored/singular normal views, raw normal/AO/alpha/
-  factor transfer, explicit frames, protected detail, exact source retention,
-  raw/baked/clear/Undo preview selection, GPU source-vs-bake shading comparison,
-  and independently decoded mixed-source GLB normal bytes/bindings.
+All 41 registered Release suites passed; the expanded real-loader report has 62
+checks, complete/passed with zero failures. Six selected whole-core C/C++
+ASan/UBSan/leak suites passed. Final boundary/label refinements and a stale-operation lease-release correction
+have focused native and whole-core sanitizer verification. Native GUI result details, captures, exact source scopes and cold
+Fontconfig startup diagnosis are in VALIDATION.md; do not substitute an older
+baseline's evidence. Inspect actual process/log state before restarting jobs.
 
-All 40 registered Release suites have passing evidence across a 39/40 broad
-run and final nine-/two-suite corrections; do not describe it as a single final
-40/40 run. Seven selected whole-core C/C++ ASan/UBSan/leak suites pass. Final
-baked textures have 38 assertions; source GPU 42; source preview 13. Native general
-menus pass 53/53, rig/shapekeys 8/8 and existing baked-v6 GUI compatibility 5/5.
-The real-loader synthetic XR report passes all 53 checks. See VALIDATION.md for
-exact scopes, timings, fixes, logs and remaining verification. Inspect actual
-live processes/handles before restarting tests. No install, active-session restart or physical-device validation
-has occurred. Runtime is C++20/FLTK/EGL/OpenXR/BDF; Python remains test-only.
+Continue full weight painting/visualization and guarded scene integration of its
+registered kernel, conformal/stitching/production atlases and retained source UV
+workflows, retopo/procedural/cut/plugin authoring, complete MToon/VRM/glTF fidelity,
+sculpt production quality and all real devices/compute backends. Durable bake
+recipes, explicit cage editing, partial/multi-source masks, supersampling and
+large-asset VR timing/history memory remain open. Default-source bilinear bake
+sampling and raw derivative normals are not proof of all material extensions or
+full deformed consumer interoperability.
 
-## Next work
+A cold private HOME can make the canonical Fontconfig startup enumerate all
+installed fonts before the app constructs. GDB proved this, rather than a model
+lock. Test startup permits 90 s; interaction checks keep 30 s deadlines. Shared
+bdf_font.hpp remains byte-identical to canonical qimgvr and pinned hashes.
+Profile/fix that cold discovery in the canonical helper, then propagate exact
+copies, instead of casually forking the desktop layer in this repository.
 
-1. Fetch remote main before overlapping work and preserve any newer commits.
-   The b879ce4 checkpoint remains unchanged; this stage incorporates c95208b.
-2. Connect guarded Document::bake_from_object to actual FLTK and XR menus: explicit
-   source picker, world-mm distance/AO/sample/padding sliders and fine wheels,
-   progress/cancel, preview/rebake/clear and cage authoring. Preserve universal
-   menu/modal ownership, Cancel-default Enter, Ctrl+W/Escape and one exact Undo.
-3. Continue full in-headset rig/weights/morphs, production atlas/conformal/stitching,
-   retained source maps during UV changes, layered texturing and multi-source
-   baking. Current CPU raw sampling is bilinear at texel centers; mip footprints,
-   full authored-tangent/UV1/vertex-color fidelity and production performance need
-   further work. Static GPU fixtures do not establish full deformed interchange.
-4. Integrate complete MToon/VRM and every remaining requirement. Other remotely
-   reported UV/MToon/VRM work is not implementation evidence until committed and
-   inspected. Do not shrink the goal to this integration milestone.
-
-Preserve immutable render inputs, worker-only geometry/file/bake work, source and
-revision/generation guards, exact cancellation/Undo, ordered saving and original
-asset archives. Keep the Mikk C seed-rotation fix, hashes, patch and notices.
+Preserve immutable snapshots, worker-only geometry/file work, source/generation/
+revision guards, ordered saving, exact cancellation/Undo and original archives.
