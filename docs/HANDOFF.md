@@ -102,3 +102,37 @@ and creator desktop/XR flows using the same exact history and worker/source
 guards. Continue every remaining REQUIREMENTS row, including robust conformal
 UV/stitch, MToon/VRM, local meshing/masks/resolution and actual compute evidence.
 Do not mark the full goal complete at a component/checkpoint milestone.
+
+## Additional asset-worker/import milestone
+
+Root added Document::edit_scene(label, SceneOperation, AssetSource expected={})
+on the ordered asset worker: detached snapshots, cancellation, validation outside
+model lock, alias detachment, generation/revision/content/selection guards and
+one exact global history transaction. File > Import mesh creates paintable
+supported static OBJ/glTF/GLB objects; unsupported source channels are explicitly
+rejected, and importer diagnostics appear in bounded completion messages.
+See ASSET-WORKER.txt. A conservative prepare-mesh guard now rejects replacing
+retained paint data; existing UV paint transfer is unchanged.
+
+Component milestones now also include4839a1b native tangent-space normal/AO/PBR
+baking, fdb0a7d predicate/budget/cancellation BVH queries and8345a18 constrained
+adaptive triangle remeshing. CMake includes these committed sources/tests.
+Full Release21/21 passed before the added remesh target; subsequent remesh,
+asset-worker/UV/shared-document/baker checks and native OpenXR passed after the
+paint guard/warning reporting refinements. Native universal menu39/39 passes,
+including actual Import file-chooser ownership/cancellation. Logs:
+artifacts/tests-assets-final.log, tests-assets-remesh.log, tests-assets-report.log,
+tests-assets-xr.log and menu-assets.log. Final isolated sanitizer verification
+is being run against this exact commit because agents continue editing shared
+paint/import files. Do not claim its result until the log completes.
+
+Current agents: sculpt_mesh extends lossless PreserveGltf raw node/skin/morph
+import; finish_ab3d1 implements projection/stencil paint and O(1) paint-data
+presence; sculpt_rig implements the CC0 MakeHuman-based humanoid creator with
+VRoid workflow references. Do not stage their uncommitted files. Creator renders
+are artifacts/humanoid-preview.png and humanoid-face.png: coherent authored body
+and original hair/eyes, still a toon/doll foundation rather than polished VRoid
+artwork. Root requested further intentional anime face/preset quality work.
+Next root work: persistent scene groups/creator parameters and native desktop/XR
+creator UI, then rig/weights/morph authoring, paint/bake/import integration and
+remaining full requirement rows. Keep the production goal active.

@@ -82,6 +82,9 @@ struct MeshSnapshot {
   Mesh mesh;
   std::vector<SurfaceRange> ranges;
 };
+struct AssetSource {
+  uint64_t generation = 0, revision = 0, object = 0;
+};
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
   std::shared_ptr<const MeshSnapshot> surface;
@@ -120,6 +123,11 @@ public:
                   int opacity);
   void shading(bool toon);
   void prepare_mesh(uint32_t resolution = 512);
+  // Native asset operations run on the ordered worker against a detached scene.
+  // No callback may retain mutable aliases or access UI/Document/model state.
+  using SceneOperation = std::function<void(Scene &, const std::function<bool()> &)>;
+  void edit_scene(std::string label, SceneOperation, AssetSource expected = {});
+  void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
   bool wait_asset(
       std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void begin_uv();
@@ -220,6 +228,9 @@ private:
     bool create_parent = false;
     bool discover_recovery = false;
     std::optional<RecoveryCandidate> restore_recovery{};
+    SceneOperation scene_operation{};
+    std::string operation_label{};
+    std::shared_ptr<std::string> operation_report{};
   };
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;
@@ -251,5 +262,7 @@ private:
   void mesh_loop();
   void input_loop();
   void file_loop();
+  void queue_scene_operation(std::string, SceneOperation, AssetSource,
+                             std::shared_ptr<std::string>);
 };
 } // namespace dome

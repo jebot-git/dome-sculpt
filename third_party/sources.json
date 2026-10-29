@@ -178,9 +178,10 @@
     "repository": "https://github.com/cnr-isti-vclab/vcglib",
     "commit": "5cae2abc2f9056785b0537dcbe156c40da2aea20",
     "license": "GPL-2.0-or-later",
-    "used": "VertexCoordLaplacianBlend blend semantics in native retopology Jacobi relaxation; no VCG container/frontend dependency. See docs/NATIVE-RETOPOLOGY.md.",
+    "used": "VertexCoordLaplacianBlend blend semantics in native retopology Jacobi relaxation; no VCG container/frontend dependency. See docs/NATIVE-RETOPOLOGY.md. Native split/collapse/flip/relax schedule and edge thresholds in remesh.cpp adapt isotropic-remeshing algorithm semantics with explicit chart/feature constraints; see docs/NATIVE-REMESHING.md.",
     "reference_sha256": {
-      "vcg/complex/algorithms/smooth.h": "07e5d12924fa7f33eac1b21699c81f01c93472007229cd0a7761b24a25da382f"
+      "vcg/complex/algorithms/smooth.h": "07e5d12924fa7f33eac1b21699c81f01c93472007229cd0a7761b24a25da382f",
+      "vcg/complex/algorithms/isotropic_remeshing.h": "66c632d3018a6855acbeed0c4102c69b8608dadb2214f4503a51a6de19c3792c"
     }
   },
   "wings_retopo_reference": {
@@ -188,5 +189,10 @@
     "commit": "2f6672721d83af7bc39717c86deb12a2970ade9f",
     "used": "wings_face.erl outer_edges lines305-315 informs boundary half-edge classification; native stable-ID maps replace winged edge runtime.",
     "reference_sha256": "626d4566ffad4bbd0bd683f0a41d01b572a5153687e126123bcf169b0787f8da"
+  },
+  "native_baker": {
+    "implementation": "src/bake.cpp",
+    "license": "GPL-3.0-or-later",
+    "used": "Original native CPU worker tangent-space normal/AO/composited material bake; shared SurfaceQuery BVH; no viewport readback or external/proprietary baker code. Limits/evidence in docs/BAKING.txt."
   }
 }

@@ -614,6 +614,10 @@ void Document::prepare_locked(uint32_t resolution) {
   if (state_.asset_busy)
     throw std::logic_error("A painting mesh is already being prepared");
   auto &o = scene_.active();
+  if (o.painted)
+    for (auto &layer : o.painted->layers())
+      if (std::any_of(layer.tiles.begin(), layer.tiles.end(), [](auto &tile) { return bool(tile); }))
+        throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
   if (o.deformation)
     throw std::logic_error("Explicitly remove or transfer rig data before replacing its rest mesh");
   if (o.locked || !o.visible)
@@ -1672,6 +1676,35 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if (job->scene_operation) {
+        auto cancelled = [&] {
+          auto state = published_.load();
+          return stopping_.load() || state->generation != job->generation ||
+                 state->revision != job->revision || state->active_object != job->object;
+        };
+        job->scene_operation(job->scene, cancelled);
+        if (cancelled()) throw std::runtime_error("Scene changed during " + job->operation_label);
+        auto prepared = job->scene.snapshot();
+        prepared.validate();
+        std::lock_guard lock(model_mutex_);
+        if (job->generation == state_.generation) {
+          state_.asset_busy = false;
+          if (job->content != content_ || job->revision != state_.revision ||
+              job->object != scene_.active().id || action_active_locked() || control_before_)
+            throw std::runtime_error("Scene changed during " + job->operation_label);
+          Scene before = scene_;
+          scene_ = std::move(prepared);
+          record_locked({{}, std::move(before), scene_});
+          bind_locked();
+          state_.error.clear();
+          state_.message = job->operation_label + " complete";
+          if (job->operation_report && !job->operation_report->empty())
+            state_.message += " | " + *job->operation_report;
+          publish_locked(true);
+        }
+        file_changed_.notify_all();
+        continue;
+      }
       if (job->discover_recovery || job->restore_recovery) {
         if (job->discover_recovery) {
           auto found = RecoveryService::discover(job->path);
@@ -1790,7 +1823,7 @@ void Document::file_loop() {
         publish_locked();
       }
       if (job->generation == state_.generation) {
-        if (job->prepare_mesh || job->uv_mesh || job->restore_recovery)
+        if (job->prepare_mesh || job->uv_mesh || job->restore_recovery || job->scene_operation)
           state_.asset_busy = false;
         if (job->discover_recovery || job->restore_recovery)
           state_.recovery_busy = false;
