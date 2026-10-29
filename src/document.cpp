@@ -868,6 +868,8 @@ void Document::prepare_locked(uint32_t resolution) {
     throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
   if (o.deformation)
     throw std::logic_error("Explicitly remove or transfer rig data before replacing its rest mesh");
+  if (o.appearance || o.material_bindings)
+    throw std::logic_error("The prepared mesh retains original materials; create a separate sculpt target and reproject or bake before replacing it");
   if (o.locked || !o.visible)
     throw std::logic_error(
         "Show and unlock the object before preparing a painting mesh");
@@ -1176,7 +1178,7 @@ void Document::mesh_loop() {
           for (uint32_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(vertex, {1,0,0,1});
           for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
-        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset});
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings});
       }
       if (job->weight_view && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled);
@@ -2076,6 +2078,10 @@ void Document::command_locked(SpatialCommand command) {
       scene_.active().mesh_active = false;
       scene_changed_locked(std::move(before));
     }
+    const auto &source=scene_.active();
+    state_.message=source_is_dormant(source)
+        ? "Volume preview; prepared mesh data is retained. Return to mesh mode to view it."
+        : "Sculpt volume selected";
     return;
   }
   if (command >= SpatialCommand::PaintColor &&
@@ -2420,10 +2426,12 @@ void Document::file_loop() {
           if (!group) throw std::runtime_error("Select a grouped avatar to export");
           for (const auto &object : job->scene.objects())
             if (!in_group(job->scene, object, group)) job->scene.object(object.id).visible = false;
+          job->scene.require_exportable_sources();
           auto report = export_vrm(job->scene.preview_surfaces(), job->path);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
         } else {
+          job->scene.require_exportable_sources();
           auto surfaces = job->scene.preview_surfaces();
           for (auto &surface : surfaces)
             if (surface.mesh.uv.empty()) unwrap(surface.mesh);

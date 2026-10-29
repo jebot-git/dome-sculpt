@@ -48,6 +48,9 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
   GltfDocument result;
   if (objects.empty())
     throw std::invalid_argument("The scene has no visible surface to export");
+  for(const auto &object:objects)if(object.source_dormant)
+    throw std::invalid_argument("Source attributes are dormant for "+object.name+
+      "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");
   auto &j=result.json;
   j = {
       {"asset", {{"version", "2.0"}, {"generator", "Dome Sculpt"}}},
@@ -454,7 +457,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
     auto &material=j["materials"][i]; auto &pbr=material["pbrMetallicRoughness"];
     if(maps.source_only) {
       auto present=[](const Image &image){return image.width || image.height || !image.rgba.empty();};
-      if(!maps.source_maps || present(maps.color) || present(maps.metal_rough) || present(maps.emission) || present(maps.normal) || present(maps.color_coverage) || maps.baked_base || present(maps.baked_normal) || present(maps.baked_coverage))
+      if(!maps.source_maps || present(maps.color) || present(maps.metal_rough) || present(maps.emission) || present(maps.normal) || present(maps.color_coverage) || maps.baked_base || present(maps.baked_normal) || present(maps.baked_coverage) || present(maps.emission_coverage))
         throw std::invalid_argument("Source-only textures require original bindings without derived images");
       const auto &source=*maps.source_maps; source.validate();
       if(source.color.image) pbr["baseColorTexture"]=source_info(source.color);

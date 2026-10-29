@@ -62,7 +62,7 @@ struct CompositeRetention {
     std::lock_guard lock(mutex);if(hit)++hits;else ++builds;
     auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.maps.get()==maps.get();});
     if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
-    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size();
+    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size();
     entry.base=maps->baked_base.get();
     if(maps->source_maps)for(auto slot:{&maps->source_maps->color,&maps->source_maps->metal_rough,&maps->source_maps->emission,&maps->source_maps->normal,&maps->source_maps->occlusion})
       if(slot->image&&std::find(entry.sources.begin(),entry.sources.begin()+entry.count,slot->image.get())==entry.sources.begin()+entry.count)
@@ -632,7 +632,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   return p;
 }
 void BakedTextures::validate(uint32_t resolution) const {
-  if (maps.source_maps || maps.source_only || maps.baked_base || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
+  if (maps.source_maps || maps.source_only || maps.baked_base || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
@@ -762,15 +762,21 @@ PaintedMesh::build_composite(const Material &material) const {
   dimensions(maps->color,{&source.color});
   dimensions(maps->metal_rough,{&source.metal_rough,&source.occlusion});
   dimensions(maps->emission,{&source.emission});
-  if(source_maps_){
+  auto make_coverage=[&](Image &coverage,const Image &base,int component) {
     bool covered=baked_&&std::any_of(baked_->coverage.begin(),baked_->coverage.end(),[](uint8_t x){return x!=0;});
-    for(const auto &l:layers_)if(l.visible&&l.opacity>0){
-      for(const auto &tile:l.tiles)if(tile){for(const auto &p:tile->pixels)if(p.data[13]&&p.data[9]){covered=true;break;}if(covered)break;}
+    for(const auto &layer:layers_)if(layer.visible&&layer.opacity>0) {
+      for(const auto &tile:layer.tiles)if(tile) {
+        for(const auto &pixel:tile->pixels)if(pixel.data[13]&&pixel.data[component]){covered=true;break;}
+        if(covered)break;
+      }
       if(covered)break;
     }
-    auto &coverage=maps->color_coverage;coverage.width=covered?maps->color.width:1;coverage.height=covered?maps->color.height:1;
-    coverage.rgba.assign(size_t(coverage.width)*coverage.height*4,0);for(size_t i=3;i<coverage.rgba.size();i+=4)coverage.rgba[i]=255;
-  }
+    coverage.width=covered?base.width:1;coverage.height=covered?base.height:1;
+    coverage.rgba.assign(size_t(coverage.width)*coverage.height*4,0);
+    for(size_t at=3;at<coverage.rgba.size();at+=4)coverage.rgba[at]=255;
+  };
+  make_coverage(maps->color_coverage,maps->color,9);
+  make_coverage(maps->emission_coverage,maps->emission,12);
   maps->baked_base=baked_;
   if (baked_ && !baked_->maps.normal.rgba.empty()) {
     maps->normal=blank_image(r,true);maps->baked_normal=blank_image(r,true);
@@ -791,11 +797,11 @@ PaintedMesh::build_composite(const Material &material) const {
       uint32_t tx=std::min(r-1,uint32_t(u*r)),ty=std::min(r-1,uint32_t(v*r));
       int32_t owner=surface_->padding[size_t(ty)*r+tx];
       uint32_t px=owner>=0?uint32_t(owner)%r:tx,py=owner>=0?uint32_t(owner)/r:ty;
-      float color_coverage=0;
+      float replacement_coverage=0;
       if (baked_ && owner >= 0) {
         auto values = baked_pixel(*baked_, size_t(owner));
         float a = unit(baked_->coverage[size_t(owner)]);
-        color_coverage=a;
+        replacement_coverage=a;
         if (channel == 0) for (int k=0;k<4;++k) value[k] = value[k]*(1-a)+values[k]*a;
         else if (channel == 1) for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[4+k]*a;
         else for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[7+k]*a;
@@ -803,7 +809,7 @@ PaintedMesh::build_composite(const Material &material) const {
 
       for(auto &l:layers_)if(l.visible&&l.opacity>0&&owner>=0){
         auto &p=pixel(l.id,px,py);float mask=unit(p.data[13])*l.opacity;
-        float weight=mask*unit(p.data[9]);color_coverage=color_coverage*(1-weight)+weight;
+        float weight=mask*unit(p.data[channel==2?12:9]);replacement_coverage=replacement_coverage*(1-weight)+weight;
         auto blend=[&](float base,int data,int coverage,bool srgb){
           float a=mask*unit(p.data[coverage]),paint=unit(p.data[data]);
           if(srgb)paint=srgb_to_linear(paint);
@@ -817,8 +823,9 @@ PaintedMesh::build_composite(const Material &material) const {
       for(int k=0;k<4;++k)image.rgba[at+k]=byte(channel!=1&&k<3?linear_to_srgb(value[k]):value[k]);
       if(channel==0){
         maps->transparent|=value[3]<.999f;
-        if(maps->color_coverage.width==image.width&&maps->color_coverage.height==image.height)maps->color_coverage.rgba[at]=byte(color_coverage);
-      }
+        if(maps->color_coverage.width==image.width&&maps->color_coverage.height==image.height)maps->color_coverage.rgba[at]=byte(replacement_coverage);
+      } else if(channel==2 && maps->emission_coverage.width==image.width && maps->emission_coverage.height==image.height)
+        maps->emission_coverage.rgba[at]=byte(replacement_coverage);
     }
   }
   if (baked_ && !maps->normal.rgba.empty()) {

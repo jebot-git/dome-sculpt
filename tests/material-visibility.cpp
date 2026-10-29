@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/material-bindings.hpp"
 #include <iostream>
 using namespace dome;
 namespace {
@@ -94,6 +95,51 @@ int main() try {
     check(hit(range,origin,1).has_value(),"The authored MToon UV-animation mask freezes alpha coverage correctly");
     range.material.alpha=Material::AlphaMode::Blend;range.material.color[3]=0;
     check(!hit(range,origin,0),"Native opacity overrides participate in retained MToon alpha visibility");
+
+    auto binding=std::make_shared<SourceMaterialBindings>();binding->material=toon;
+    binding->material.parameters.scroll={};binding->material.textures[0].index=99;
+    binding->native_reference.double_sided=true;binding->native_reference.color={1,1,1,1};
+    binding->roles[0].image=std::make_shared<const Image>(Image{2,1,{255,255,255,255,255,255,255,0}});
+    binding->roles[0].min_filter=binding->roles[0].mag_filter=9728;
+    range={1,0,6,opaque};range.appearance=appearance(toon,false,false);range.material_bindings=binding;
+    check(hit(range,{-.5f,0,2})&&!hit(range,{.5f,0,2}),
+          "Explicit current role alpha wins over historical texture indices and original appearance pixels");
+    range.textures=paint->composite(opaque);
+    check(hit(range,{-.5f,0,2})&&!hit(range,{.5f,0,2}),
+          "Protected derived coverage restores current typed role alpha independently of original PBR views");
+    auto incomplete=std::make_shared<SourceMaterialBindings>(*binding);incomplete->roles[0].image.reset();range.material_bindings=incomplete;
+    check(rejects([&]{hit(range,{0,0,2});}),"Incomplete explicit role tables fail before material picking publication");
+    range.material_bindings=binding;
+
+    auto reference=std::make_shared<SourceMaterialBindings>(*binding);
+    reference->material.parameters.alpha_cutoff=.7f;reference->native_reference.alpha_cutoff=.3f;
+    reference->roles[0].image=std::make_shared<const Image>(Image{1,1,{255,255,255,153}});
+    range.textures.reset();range.material_bindings=reference;
+    check(hit(range,{0,0,2}).has_value(),"Native cutoff overrides compare with the resolved baseline rather than original imported material");
+
+    auto protected_binding=std::make_shared<SourceMaterialBindings>(*binding);
+    protected_binding->native_reference.color[3]=.603f;
+    protected_binding->material.parameters.base_color[3]=.72f;protected_binding->material.parameters.alpha_cutoff=.7205f;
+    protected_binding->roles[0].image=std::make_shared<const Image>(Image{1,1,{255,255,255,255}});
+    auto solid=std::make_shared<PaintSourceMaps>();solid->color=protected_binding->roles[0];
+    range.material.color[3]=.603f;range.material_bindings=protected_binding;
+    range.textures=PaintedMesh::from_maps(m,solid,64)->composite(range.material);
+    check(!hit(range,{0,0,2}),"Zero replacement coverage uses exact typed opacity at cutoff instead of quantized generic composite residuals");
+
+    range.material=opaque;range.material_bindings=binding;
+    auto generic=std::make_shared<SourceMaterialBindings>();generic->has_mtoon=false;range.material_bindings=generic;
+    range.textures=paint->preview(material);range.material.alpha=Material::AlphaMode::Mask;
+    check(!hit(range,{-.5f,0,2})&&hit(range,{.5f,0,2}),"Explicit generic provenance suppresses stale typed appearance and preserves current PBR alpha");
+
+    auto no_pbr=std::make_shared<SourceMaterialBindings>(*binding);no_pbr->roles[0].image=std::make_shared<const Image>(Image{1,1,{255,255,255,255}});
+    range.material_bindings=no_pbr;range.material=opaque;
+    range.textures=std::make_shared<PaintedMesh>(m,64)->composite(opaque);
+    check(hit(range,{0,0,2}).has_value(),"Typed overlays on generic paint surfaces need no invented original PBR source map");
+
+    auto secondary=std::make_shared<SourceMaterialBindings>(*binding);secondary->material.textures[0].texcoord=1;
+    range.material_bindings=secondary;range.textures.reset();
+    check(!hit(range,{.5f,0,2}),"Explicit current role UV1 uses retained primitive identity instead of derived UV0");
+    range.appearance.reset();check(rejects([&]{hit(range,{.5f,0,2});}),"Resolved UV1 fails explicitly when primitive provenance is unavailable");
   }
   {
     auto toon=MToonMaterial::from_vrm1({{"alphaMode","MASK"},{"doubleSided",true},{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});

@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/material-bindings.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
   if(!appearance)return {};
@@ -14,6 +15,10 @@ std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance)
   return result;
 }
 int mtoon_coordinate(const MToonTexture&t){int coordinate=t.transform_texcoord>=0?t.transform_texcoord:int(t.texcoord);if(coordinate<0||coordinate>1)throw std::runtime_error("MToon preview requires a retained UV0 or UV1 set");return coordinate;}
+SourceNativeMaterial native_source(const CreatorAppearance &appearance) {
+  const auto &m=appearance.asset->materials.at(size_t(appearance.material));
+  return {m.color,m.emissive,m.alpha==ImportedMaterial::AlphaMode::Opaque?1:m.alpha==ImportedMaterial::AlphaMode::Mask?2:3,m.alpha_cutoff,m.double_sided};
+}
 float mtoon_factor(float typed,float original,float current){if(current==original)return typed;if(original!=0)return typed*current/original;return current==0?typed:current;}
 namespace {
 PaintSourceTexture derived_view(const std::shared_ptr<const TextureMaps> &maps,
@@ -38,21 +43,29 @@ struct Visibility {
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
     if (maps) {
-      if (maps->source_only) { if (maps->source_maps) color = maps->source_maps->color; }
+      if (maps->source_only) {
+        auto present=[](const Image &i){return i.width || i.height || !i.rgba.empty();};
+        if(!maps->source_maps || present(maps->color) || present(maps->metal_rough) ||
+           present(maps->emission) || present(maps->normal) || present(maps->color_coverage) ||
+           present(maps->emission_coverage) || maps->baked_base || present(maps->baked_normal) || present(maps->baked_coverage))
+          throw std::invalid_argument("Visibility source-only maps contain derived payloads");
+        color = maps->source_maps->color;
+      }
       else { color = derived_view(maps, maps->color); factor = 1; }
     }
-    toon = retained_mtoon(r.appearance.get());
+    if(r.material_bindings) {
+      r.material_bindings->validate();
+      if(r.material_bindings->has_mtoon)toon=r.material_bindings->material;
+    } else toon = retained_mtoon(r.appearance.get());
     if (!toon) return;
-    auto &a = *r.appearance;
-    const auto &source = a.asset->materials.at(size_t(a.material));
+    const auto source=r.material_bindings?r.material_bindings->native_reference:native_source(*r.appearance);
     const auto &parameters = toon->parameters;
     cull = parameters.cull;
     if (r.material.double_sided != source.double_sided)
       cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = parameters.alpha == MToonAlpha::Opaque ? Material::AlphaMode::Opaque :
             parameters.alpha == MToonAlpha::Mask ? Material::AlphaMode::Mask : Material::AlphaMode::Blend;
-    auto original = source.alpha == ImportedMaterial::AlphaMode::Opaque ? Material::AlphaMode::Opaque :
-                    source.alpha == ImportedMaterial::AlphaMode::Mask ? Material::AlphaMode::Mask : Material::AlphaMode::Blend;
+    auto original = Material::AlphaMode(source.alpha);
     if (r.material.alpha != Material::AlphaMode::Automatic && r.material.alpha != original) alpha = r.material.alpha;
     cutoff = r.material.alpha_cutoff != source.alpha_cutoff ? r.material.alpha_cutoff : parameters.alpha_cutoff;
     factor = mtoon_factor(parameters.base_color[3], source.color[3], r.material.color[3]);
@@ -60,13 +73,21 @@ struct Visibility {
       PaintSourceTexture view;
       auto &slot = toon->textures[size_t(role)];
       if (slot.index < 0) return view;
-      const auto &texture = a.asset->textures.at(size_t(slot.index));
-      if (texture.image < 0 || size_t(texture.image) >= a.decoded_images->size())
-        throw std::runtime_error("Visibility source texture is unavailable");
-      view.image = a.decoded_images->at(size_t(texture.image));
-      view.wrap_s = texture.wrap_s; view.wrap_t = texture.wrap_t;
-      view.min_filter = texture.min_filter; view.mag_filter = texture.mag_filter;
+      if(r.material_bindings)view=r.material_bindings->roles[size_t(role)];
+      else {
+        const auto &a=*r.appearance;
+        const auto &texture = a.asset->textures.at(size_t(slot.index));
+        if (texture.image < 0 || size_t(texture.image) >= a.decoded_images->size())
+          throw std::runtime_error("Visibility source texture is unavailable");
+        view.image = a.decoded_images->at(size_t(texture.image));
+        view.wrap_s = texture.wrap_s; view.wrap_t = texture.wrap_t;
+        view.min_filter = texture.min_filter; view.mag_filter = texture.mag_filter;
+      }
+      view.validate();
       if (mtoon_coordinate(slot) == 1) {
+        if(!r.appearance || !r.appearance->asset)
+          throw std::runtime_error("Visibility UV1 requires retained primitive provenance");
+        const auto &a=*r.appearance;
         if (!primitive) for (const auto &p : a.asset->primitives)
           if (p.source_mesh == a.source_mesh && p.source_primitive == a.source_primitive) {
             if (primitive) throw std::runtime_error("Visibility source primitive is ambiguous");
@@ -76,8 +97,11 @@ struct Visibility {
             a.source_vertices.empty() || r.first_vertex > mesh.positions.size() ||
             a.source_vertices.size() > mesh.positions.size() - r.first_vertex)
           throw std::runtime_error("Visibility authored UV1 data is unavailable");
-        for (auto id : a.source_vertices) if (id >= primitive->uv1.size())
-          throw std::runtime_error("Visibility UV1 source vertex is invalid");
+        for (auto id : a.source_vertices) {
+          if (id >= primitive->uv1.size())throw std::runtime_error("Visibility UV1 source vertex is invalid");
+          const auto q=primitive->uv1[id];
+          if(!std::isfinite(q[0]) || !std::isfinite(q[1]))throw std::runtime_error("Visibility UV1 is nonfinite");
+        }
         for (size_t i = r.first; i < r.first + r.count; ++i)
           if (mesh.indices[i] < r.first_vertex || mesh.indices[i] - r.first_vertex >= a.source_vertices.size())
             throw std::runtime_error("Visibility UV1 packed index is outside its source range");
@@ -87,8 +111,7 @@ struct Visibility {
     color = original_view(MToonSlot::Base); mask = original_view(MToonSlot::UvMask);
     if (maps && !maps->source_only) {
       coverage = derived_view(maps, maps->color_coverage);
-      if (!maps->source_maps) throw std::runtime_error("Derived visibility requires retained source views");
-      pbr = maps->source_maps->color;
+      if(maps->source_maps)pbr = maps->source_maps->color;
     }
   }
   std::array<float,2> uv(const Mesh &m, uint32_t triangle,
@@ -130,8 +153,8 @@ struct Visibility {
       opacity = factor * sample(color, main_uv);
       if (range.textures && !range.textures->source_only) {
         auto derived = derived_view(range.textures, range.textures->color);
-        opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) *
-                  (1 - sample(coverage,primary,0));
+        const float replacement=sample(coverage,primary,0);
+        if(replacement!=0)opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) * (1-replacement);
       }
     } else opacity = factor * sample(color, primary);
     opacity = std::clamp(opacity, 0.f, 1.f);

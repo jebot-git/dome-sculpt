@@ -1,0 +1,194 @@
+Native source-texture UV bake foundation
+=======================================
+
+The full production objective remains active. bake_source_uv is a bounded,
+detached worker kernel, not yet a user-facing UV commit or a replacement for the
+existing conservative PaintedMesh::reparameterize guard. It returns a reviewable
+new atlas, unfactored PBR/typed MToon bindings and complete editable sparse layers.
+The native adopt factory returns both paint and immutable resolved bindings; Scene
+version 7 persists them. Document integration must adopt both results, validate
+aggregate resources, and create one global history boundary.
+The ordinary UV transfer refusal must not be removed without that integration.
+
+Input and original identity
+---------------------------
+SourceUvBakeInput owns immutable PaintedMesh and optional CreatorAppearance
+snapshots, a destination Mesh and its destination-vertex -> old-paint-vertex map.
+Every ordered face corner must map to the exact old index, position and normal.
+Reordered triangles, modified geometry/normals, invalid remaps, degenerate
+destination UV faces and independent overlapping destination surfaces fail.
+There is no nearest-surface guess, source-file lookup, temporary file or GL
+operation. Both generic and source-backed inputs are accepted; no source factor
+is multiplied into the generated texture pixels.
+
+The result retains the original PaintedMesh/CreatorAppearance, exact target
+mapping and raw avatar/image ownership. Original images, original accessor IDs,
+source UV0/UV1, tangent4/morph/skin data, source JSON and raw GLB are never rewritten.
+This retains the old normal-frame/UV provenance for future explicit tangent
+transport. Geometry/deformation remapping remains the existing UV worker's job.
+
+Textures and material bindings
+-----------------------------
+Five raw PBR slots are sampled independently using the original affine transform,
+nearest/linear sampler and repeat/mirror/clamp addressing: Base RGBA (sRGB RGB,
+linear alpha), metallic/roughness data, emission, normal and AO. Material factors,
+normal strength and AO strength remain authored and apply once downstream.
+
+All supported VRM0/VRM1 MToon surface roles have explicit resolved PaintSourceTexture
+entries. Encodings/channels and source version follow the typed module. UV1 uses
+the exact retained primitive/accessor remap rather than a guessed neighboring
+array. Baked surface views select new UV0 with identity affine transform. Their
+typed surface transforms are reset accordingly. Matcap remains an original
+view-direction image/binding with its original typed transform, not a baked fixed
+camera projection. Missing roles stay missing and retain their semantic defaults.
+
+The original descriptor texture indices remain provenance. They are NEVER
+implicit indices into the new role table. Renderer/export integration must use
+the explicit table or construct/remap a real destination texture registry. The
+source descriptor is not mutated to pretend that new images were original assets.
+A current SourceUvMaterialBindings input explicitly overrides the raw descriptor
+after a first bake. Repeated UV edits sample those current role images and keep
+the prior explicit frozen-time policy; choosing a different frozen time requires
+original-source restoration. Incomplete tables and a second affine transform
+outside the typed descriptor are rejected. Original appearance remains provenance.
+
+Equivalent static plans share one generated immutable Image across PBR/MToon
+roles when image identity, encoding, sampler, UV set/transform and frame semantics
+match. View-dependent source storage is shared directly. After baking, identical original
+texture indices can reference distinct role Images (for example different original
+UV0/UV1 sampling). Linked Base/Shade detection must inspect explicit role identity,
+sampler and UV semantics; original indices alone are not derived binding IDs.
+
+Output atlases retain requested min/mag/mipmap filter metadata, use clamp-to-edge
+addressing and explicit bounded seam padding. They are new finite unit atlases;
+old repeated addressing was evaluated during baking. Original source addressing
+still survives in the retained immutable parent. Zero output resolution chooses
+at least each input image's largest dimension and editable paint resolution;
+nonzero resolution is an explicit resampling choice. No automatic downsampling
+occurs to satisfy a quota. Refiltering and RGBA8 quantization are inherent to this
+static texture bake; it is not bit-exact GPU paint-layer transport. Source sampling
+uses the native nearest/bilinear level-zero reconstruction. Destination mip chains
+are generated from the new atlas; arbitrary original LOD/anisotropic footprints
+cannot remain identical after reparameterization. Small source
+or target triangles may be subpixel at the chosen resolution, as with any finite
+atlas. The original geometry is retained; use an adequate explicit atlas size.
+
+Normal frames and the precise VRM1 limit
+--------------------------------------
+Normal data is decoded without applying material normal strength. Its old
+transformed UV-derivative tangent frame carries the vector into world space; the
+new destination frame converts it back to tangent space. Normal strength commutes
+with tangent-plane rotation and stays authored. Mirrored UV handedness is explicit.
+An original degenerate normal UV gradient uses the current renderer's geometric
+normal fallback. Original authored tangent4 stays retained; the kernel does not
+mislabel the current preview's derivative frame as full authored tangent transport.
+
+Generic PBR flips the completed mapped normal for a backface, and VRM0 faces the
+completed mapped normal toward the view. Their conversion is valid only for the
+current static geometry. An independent anisotropic-deformation fixture proves
+that a fixed rest-atlas normal conversion is not generally pose invariant: even
+a front-facing UV rotation gives a different tangent direction after unequal
+axis scaling. Deformable normal-mapped source UV adoption must remain guarded.
+VRM1 flips geometric N before rebuilding the bitangent. A rotation mixing tangent
+and bitangent cannot generally preserve both face conventions with one converted
+tangent texture. The independent normal helper fixture proves this (equal front
+normals, opposite back normals for a 90-degree frame rotation).
+
+The kernel therefore rejects a VRM1 enabled/nonzero-strength normal role only when
+visible backfaces/outline require that incompatible mixing. Axis-aligned mirror,
+scale and translation remain eligible when both face conventions agree. A
+front-safe back-culled VRM1 material without outline is also eligible. This refusal
+is an explicit interim limitation, not completion of source UV support. Preserved
+original UV/frame transport through arbitrary sculpt/morph/skin deformation, and
+the corresponding glTF tangent export path, remain required to lift it.
+
+Animation policy
+----------------
+Nonzero MToon UV animation is rejected by default: a fixed bake cannot generally
+preserve f(oldUV(newUV)+delta) by animating the new atlas with the same delta.
+FreezeAtTime is an explicit choice and records its exact time/policy. It samples
+the original animation and original version-specific mask at that time, then
+removes animation only from the derived descriptor. Original animated sources
+remain intact. Frozen animated normal coordinates use a local finite-difference
+Jacobian (step 0.001 barycentric) for the current derivative frame; abrupt mask
+boundaries retain this numerical/finite-resolution approximation. No hidden
+animation flattening or guessed user policy occurs.
+
+Editable paint and transactions
+-------------------------------
+Every layer is transferred separately, including hidden/zero-opacity layers,
+names, stable IDs, opacity, mask, color/alpha, metal, roughness, emission and all
+four independent coverage channels. Bilinear transfer interpolates channel values
+in coverage-premultiplied linear space, then unpremultiplies and encodes back to
+the native 14-byte representation. Original four-pass seam ownership is respected
+when sampling paint. Only meaningful sparse tiles allocate new storage. No layer
+is flattened into source pixels or silently deleted.
+
+Existing BakedTextures and fractional/protected coverage are transferred separately
+below editable layers, with coverage-premultiplied linear channel resampling.
+Canonical baked normals use old-to-new Mikk tangent corners, not the raw original
+normal derivative frame. Generated baked images and coverage count toward output
+and combined baked/editable storage budgets. Original baked snapshots stay intact.
+
+The result keeps active layer and original paint ownership. adopt_source_uv_bake
+revalidates exact geometry, source corners, layer identities, sparse tiles, maps
+and retained baked payload. It preserves the original next layer ID and returns
+a fresh paint surface plus an immutable material_bindings holder together.
+The first source paint is a detached COW snapshot; later external source edits
+cannot change retained provenance. Repeated bakes propagate that first origin.
+The factory creates no caller history entry. Cancellation/error publishes no
+partial result and changes no original source/history. Scene v7 persists current
+bindings and deduplicated first origins through the shared native image/model
+archives. See MATERIAL-BINDINGS.md for archive and renderer contracts.
+
+Bounds and integration requirements
+-----------------------------------
+Defaults: 16M pixels per generated image, 256MiB generated image payload, 128MiB
+combined baked payload/sparse layer tiles, 256MiB nominal raster scratch, 128M raster candidates and 256M
+sampling/padding operations. Explicit hard caps remain enforced. Configurable geometry budgets are
+bounded to the normal native 2M vertices/triangles; output size is at most 4096.
+Cancellation is checked per face/row/padding pass and bounded operation batches.
+Raster sizes are released before switching image dimensions. Image output and
+layer memory budgets are independent; bounds are nominal retained payload/scratch,
+not a total-process RSS or allocator/serialization guarantee.
+
+Whole Scene limits still apply separately. Retaining raw GLB plus original decoded
+images plus newly split full-resolution atlases can exceed the shared source-image
+budget or native 256MiB file cap even if each object bake fits. The integrating
+worker MUST preflight the complete candidate Scene/archive before history commit,
+and request an explicit smaller bake resolution if needed. It must not discard
+recovery, originals or layers, nor downsample silently to force a save.
+
+Verification
+------------
+tests/source-uv-bake.cpp exercises sampler/affine/transparent-RGB fidelity, PBR
+channels, normal rotation/mirrors/independent MToon normal transforms/UV1 fallback,
+mask and all editable channel transfer, both source material versions/role image
+sharing, view-dependent Matcap, UV1 identities, explicit animation policy, exact
+geometry guards, cancellation, padding and all eight resource limits. Optional
+actual CC0 female/male arguments cover every19 original parts with an explicitly
+chosen small synthetic per-triangle atlas, retaining all raw/avatar triangles.
+These fixtures test complete source coverage and bounded native execution, not
+the visual quality of a production atlas layout. Release: 58 focused checks and
+40 actual-part/baseline checks passed (98 total), covering 14,804 female and 15,176
+male triangles. Explicit 256 images generated 15,466,496 bytes per baseline.
+Native adoption/archive tests add 30 assertions, including exact disk round-trip,
+shared-origin deduplication, malformed metadata, cancellation and detached COW
+provenance. Source-to-volume previews mark retained material/paint/deformation
+dormant and GLB export refuses before publishing; native restart and original
+mesh restoration retain exact source data. The coherent full-core C/C++
+ASan+UBSan build passes 98 bake, 30 adoption, 40 focused cache and 24 deformation
+assertions with leak detection. This includes empty-volume export preflight,
+source-mode global Undo/Redo and explicit v4/v5/v6 rejection versus v7 dormant
+deformation round-trip with no invented source or material records.
+
+Build the source-uv-bake and source-uv-adopt native test targets against a coherent
+core using matching public headers. Do not mix pre-schema archives with the new
+Scene/Paint/Surface layouts. Pass the two baseline VRM paths to the bake test for
+the optional complete 38-part source-coverage fixture.
+
+The implementation reuses native source sampling, typed MToon UV/version helpers
+and the same coverage-aware layer transfer convention as PaintedMesh. Normal
+basis construction follows the existing native bake.cpp worker kernel. No new
+third-party algorithm or runtime dependency is introduced. Source/spec provenance
+and MIT notices for MToon remain in MTOON.md and MTOON-LICENSE.txt.

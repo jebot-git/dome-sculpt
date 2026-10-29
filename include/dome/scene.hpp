@@ -8,6 +8,7 @@
 #include <memory>
 namespace dome {
 struct CreatorAppearance;
+struct SourceMaterialBindings;
 struct Material {
   std::string name = "Clay";
   std::array<float, 4> color{.58f, .30f, .15f, 1};
@@ -32,7 +33,9 @@ struct SculptObject {
   std::shared_ptr<const DeformationState> deformation{};
   uint64_t group = 0;
   std::shared_ptr<const CreatorAppearance> appearance{};
+  std::shared_ptr<const SourceMaterialBindings> material_bindings{};
 };
+bool source_is_dormant(const SculptObject &);
 struct ObjectSurface {
   uint64_t id = 0;
   std::string name;
@@ -46,6 +49,10 @@ struct ObjectSurface {
   std::vector<SceneGroup> groups{}; // Root-to-leaf path, local object TRS retained.
   CanvasTransform world_transform() const;
   std::shared_ptr<const CreatorAppearance> appearance{};
+  std::shared_ptr<const SourceMaterialBindings> material_bindings{};
+  // Generated volume geometry cannot use dormant source topology/UV metadata.
+  // Export must refuse rather than silently discard the retained source data.
+  bool source_dormant = false;
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.
@@ -77,6 +84,8 @@ public:
   static Scene load(const std::filesystem::path &);
   nlohmann::json encode() const;
   static Scene decode(const nlohmann::json &);
+  // Includes visible empty volume objects, before surface extraction can skip them.
+  void require_exportable_sources() const;
   std::vector<ObjectSurface>
   surfaces(bool atlas = false,
            const std::function<bool()> &cancelled = {}) const;

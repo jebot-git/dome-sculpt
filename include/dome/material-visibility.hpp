@@ -7,9 +7,11 @@
 namespace dome {
 struct CreatorAppearance;
 struct SurfaceRange;
+struct SourceNativeMaterial;
 // Shared by GPU binding and worker-built picking; no metadata parsing on input.
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *);
 int mtoon_coordinate(const MToonTexture &);
+SourceNativeMaterial native_source(const CreatorAppearance &);
 float mtoon_factor(float typed, float original, float current);
 class MaterialSurfaceQuery {
   struct Impl;

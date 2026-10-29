@@ -28,6 +28,8 @@ struct TextureMaps {
   std::shared_ptr<const BakedTextures> baked_base;
   // Padded raw canonical normal and linear R coverage for typed MToon blending.
   Image baked_normal, baked_coverage;
+  // Linear R replacement below/through editable emission, on its own exact grid.
+  Image emission_coverage;
 };
 struct BakedTextures {
   TextureMaps maps;
@@ -131,6 +133,7 @@ public:
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive * = nullptr);
 
 private:
+  friend struct SourceUvBakeAccess;
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
