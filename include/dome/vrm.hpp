@@ -23,10 +23,14 @@ public:
 struct VrmExportOptions {
   std::function<bool()> cancelled;
   size_t max_output_bytes = 256 * 1024 * 1024;
+  // Zero preserves original main/shade dimensions. A nonzero value is an
+  // explicit resampling choice for compiled paint maps, never a hidden fallback.
+  uint32_t paint_resolution = 0;
 };
 struct VrmExportReport {
   size_t meshes = 0, joints = 0, normal_targets_recomputed = 0;
   std::vector<std::string> diagnostics;
+  size_t materials = 0, painted_materials = 0;
 };
 // Source-version-preserving VRM0 only. Requires retained source identities;
 // unsupported versions/features reject rather than being silently converted.

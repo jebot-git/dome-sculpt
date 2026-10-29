@@ -97,6 +97,12 @@ int main() try {
         "orientation");
   check(tangents.size() == 3 && tangents[0][0] == -1 && tangents[0][3] == -1,
         "Base tangent handedness survives proper coordinate rotation");
+  auto generated = o;
+  asset(generated)->primitives[0].tangents.clear();
+  auto generated_channels = SourceMorphTransport(generated).target(0);
+  check(SourceMorphTransport(generated).base_tangents().empty() &&
+            generated_channels.tangents.empty() && generated_channels.normals.size() == 3,
+        "Missing base tangents preserve consumer generation and ignore supplied target tangent deltas per glTF morph rules");
   auto scaled = fixture(2);
   SourceMorphTransport positive(scaled);
   check(positive.frame_valid() &&
@@ -246,6 +252,9 @@ int main() try {
     return std::vector<uint8_t>{std::istreambuf_iterator<char>(f), {}};
   };
   auto bytes = read();
+  auto dormant=reordered;dormant.source_dormant=true;dormant.appearance.reset();dormant.deformation.reset();
+  check(rejects([&]{export_glb({dormant},path);}) && read()==bytes,
+        "Dormant source metadata cannot be silently flattened into a replacement GLB");
   check(rejects([&] { export_glb({changed}, path); }) && read() == bytes,
         "Unsupported changed source directions preserve existing generic GLB "
         "transactionally");

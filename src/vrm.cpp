@@ -3,6 +3,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/mtoon.hpp"
 #include "gltf-document.hpp"
+#include "vrm-painted.hpp"
 #include <bit>
 #include <set>
 namespace dome {
@@ -383,6 +384,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     fail("output must use .vrm");
   if (!options.max_output_bytes || options.max_output_bytes > 256 * 1024 * 1024)
     fail("invalid output resource bound");
+  if (options.paint_resolution && (options.paint_resolution<64 || options.paint_resolution>4096))
+    fail("explicit painted texture resolution must be64..4096");
   VrmExportReport report;
   stop(options);
   if (input_objects.empty())
@@ -637,6 +640,130 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   std::set<std::pair<int, int>> primitives;
   std::vector<int> avatar_joints;
   Json output_properties = Json::array();
+  Json output_materials = Json::array();
+  struct MaterialVariant {
+    int source;
+    std::string source_name, name;
+    Json signature;
+    std::set<std::string> rewritten;
+  };
+  std::vector<MaterialVariant> variants;
+  std::set<int> painted_variants;
+  std::map<int,std::vector<int>> source_variants;
+  std::map<std::string,std::vector<int>> source_material_names;
+  std::set<std::string> reserved_names, emitted_names;
+  for (size_t source=0;source<metadata.source().at("materialProperties").size();++source) {
+    auto name=metadata.source().at("materialProperties")[source].value("name",std::string{});
+    source_material_names[name].push_back(int(source)); reserved_names.insert(name);
+  }
+  struct RoleImage { std::weak_ptr<const Image> owner;int image; };
+  std::map<const Image*,RoleImage,std::less<const Image*>> role_images;
+  if (origin->decoded_images && origin->decoded_images->size()==original_images.size())
+    for (size_t image=0;image<original_images.size();++image)
+      role_images[origin->decoded_images->at(image).get()]={origin->decoded_images->at(image),original_images[image]};
+  std::map<std::array<int,4>,int> role_samplers;
+  for (size_t sampler=0;sampler<j["samplers"].size();++sampler) {
+    const auto &s=j["samplers"][sampler];
+    role_samplers.try_emplace(std::array{s.value("wrapS",10497),s.value("wrapT",10497),s.value("minFilter",0),s.value("magFilter",0)},int(sampler));
+  }
+  std::map<std::pair<int,int>,int> role_textures;
+  for (size_t texture=0;texture<j["textures"].size();++texture) {
+    const auto &t=j["textures"][texture];
+    role_textures.try_emplace(std::pair{t.at("source").get<int>(),t.value("sampler",-1)},int(texture));
+  }
+  auto role_texture=[&](const PaintSourceTexture &role) {
+    stop(options);role.validate();
+    if (!role.image) fail("resolved MToon role has no image");
+    if (size_t(role.image->width)*role.image->height>16*1024*1024)
+      throw std::length_error("VRM role image pixel budget exceeded");
+    int image;
+    if (auto found=role_images.find(role.image.get());found!=role_images.end() && !found->second.owner.expired()) image=found->second.image;
+    else {
+      auto png=role.image->png();
+      if (png.size()>options.max_output_bytes-std::min(binary.size(),options.max_output_bytes))
+        throw std::length_error("VRM role image output budget exceeded");
+      int view=int(j["bufferViews"].size());image=int(j["images"].size());
+      j["bufferViews"].push_back({{"buffer",0},{"byteOffset",binary.size()},{"byteLength",png.size()}});
+      binary.insert(binary.end(),png.begin(),png.end());while(binary.size()%4)binary.push_back(0);
+      j["images"].push_back({{"bufferView",view},{"mimeType","image/png"}});
+      role_images[role.image.get()]={role.image,image};
+    }
+    std::array key{role.wrap_s,role.wrap_t,role.min_filter,role.mag_filter};int sampler;
+    if (auto found=role_samplers.find(key);found!=role_samplers.end()) sampler=found->second;
+    else {
+      sampler=int(j["samplers"].size());Json record={{"wrapS",role.wrap_s},{"wrapT",role.wrap_t}};
+      if(role.min_filter)record["minFilter"]=role.min_filter;
+      if(role.mag_filter)record["magFilter"]=role.mag_filter;
+      j["samplers"].push_back(record);role_samplers[key]=sampler;
+    }
+    auto pair=std::pair{image,sampler};
+    if(auto found=role_textures.find(pair);found!=role_textures.end()) return found->second;
+    int texture=int(j["textures"].size());j["textures"].push_back({{"source",image},{"sampler",sampler}});
+    role_textures[pair]=texture;check_budget();return texture;
+  };
+  // Images may have been encoded by separate generic/typed material paths.
+  // Deduplicate material states by exact embedded image bytes and sampler
+  // semantics, verifying equality after the hash rather than trusting it.
+  struct ImageIdentity { size_t offset=0,size=0;std::string mime;uint64_t hash=0;int canonical=-1; };
+  std::vector<ImageIdentity> image_identities;
+  std::map<std::pair<std::string,uint64_t>,std::vector<int>> image_hashes;
+  auto canonical_image=[&](int id) {
+    while(image_identities.size()<=size_t(id)) {
+      auto current=image_identities.size();const auto &image=j["images"].at(current);
+      const auto &view=j["bufferViews"].at(image.at("bufferView").get<size_t>());
+      ImageIdentity value;value.offset=view.value("byteOffset",size_t{});value.size=view.at("byteLength");value.mime=image.at("mimeType");
+      if(value.offset>binary.size() || value.size>binary.size()-value.offset)fail("material image range is invalid");
+      value.hash=1469598103934665603ull;
+      for(size_t k=0;k<value.size;++k)value.hash=(value.hash^binary[value.offset+k])*1099511628211ull;
+      auto &bucket=image_hashes[{value.mime,value.hash}];value.canonical=int(current);
+      for(int previous:bucket) {
+        const auto &other=image_identities.at(size_t(previous));
+        if(other.size==value.size && std::equal(binary.begin()+other.offset,binary.begin()+other.offset+other.size,binary.begin()+value.offset)) {
+          value.canonical=other.canonical;break;
+        }
+      }
+      if(value.canonical==int(current))bucket.push_back(int(current));
+      image_identities.push_back(std::move(value));
+    }
+    return image_identities.at(size_t(id)).canonical;
+  };
+  auto texture_identity=[&](const Json &value) {
+    auto id=index(value,j["textures"].size(),"emitted material texture",true);
+    if(id==SIZE_MAX)return Json(-1);
+    const auto &texture=j["textures"][id];Json sampler={{"wrapS",10497},{"wrapT",10497}};
+    if(texture.contains("sampler"))sampler=j["samplers"].at(texture.at("sampler").get<size_t>());
+    if(!sampler.contains("wrapS"))sampler["wrapS"]=10497;
+    if(!sampler.contains("wrapT"))sampler["wrapT"]=10497;
+    return Json{{"image",canonical_image(texture.at("source"))},{"sampler",sampler}};
+  };
+  auto material_signature=[&](Json material,Json properties) {
+    material.erase("name");properties.erase("name");
+    auto info=[&](Json &value){value["index"]=texture_identity(value.at("index"));};
+    for(const char *slot:{"normalTexture","occlusionTexture","emissiveTexture"})if(material.contains(slot))info(material[slot]);
+    if(material.contains("pbrMetallicRoughness"))for(const char *slot:{"baseColorTexture","metallicRoughnessTexture"})
+      if(material["pbrMetallicRoughness"].contains(slot))info(material["pbrMetallicRoughness"][slot]);
+    if(properties.contains("textureProperties"))for(auto &texture:properties["textureProperties"].items())texture.value()=texture_identity(texture.value());
+    return Json{{"material",std::move(material)},{"properties",std::move(properties)}};
+  };
+  auto add_material=[&](int source,Json material,Json properties,std::set<std::string> rewritten) {
+    auto signature=material_signature(material,properties);
+    for(int previous:source_variants[source])if(variants[size_t(previous)].signature==signature) {
+      variants[size_t(previous)].rewritten.insert(rewritten.begin(),rewritten.end());return previous;
+    }
+    auto original_name=metadata.source().at("materialProperties").at(size_t(source)).value("name",std::string{});
+    auto source_name=original_name.empty()?"Source material "+std::to_string(source):original_name;
+    auto name=source_name;
+    if(source_material_names.at(original_name).size()>1 || emitted_names.contains(name) ||
+       (original_name.empty() && reserved_names.contains(name))) {
+      auto suffix=" [Dome "+std::to_string(source)+":"+std::to_string(source_variants[source].size()+1)+"]";
+      name=source_name+suffix;size_t collision=0;
+      while(reserved_names.contains(name)||emitted_names.contains(name))name=source_name+suffix+"#"+std::to_string(++collision);
+    }
+    emitted_names.insert(name);material["name"]=name;properties["name"]=name;
+    int id=int(variants.size());source_variants[source].push_back(id);
+    variants.push_back({source,source_name,name,std::move(signature),std::move(rewritten)});
+    output_materials.push_back(std::move(material));output_properties.push_back(std::move(properties));return id;
+  };
   auto remap_info = [&](Json &info) {
     info["index"] =
         mapped(info.at("index"), identities.textures, "material texture");
@@ -648,9 +775,6 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   for (size_t i = 0; i < objects.size(); ++i) {
     stop(options);
     const auto &o = objects[i];
-    if (o.textures && !o.textures->source_only)
-      fail("derived painted MToon export requires exact color coverage and "
-           "shade reconstruction");
     const auto &emitted = document.objects.at(i);
     if (o.groups.empty() || o.groups.back().id != group || !o.deformation ||
         !o.deformation->skeleton || !o.deformation->skin ||
@@ -772,69 +896,100 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
           "baseColorTexture", "metallicRoughnessTexture"})
       if (generated.at("pbrMetallicRoughness").contains(f))
         out_pbr[f] = generated.at("pbrMetallicRoughness").at(f);
-    for (const char *f : {"emissiveTexture", "emissiveFactor", "alphaMode",
+    for (const char *f : {"normalTexture", "occlusionTexture", "emissiveTexture", "emissiveFactor", "alphaMode",
                           "alphaCutoff", "doubleSided"})
       if (generated.contains(f))
         source_material[f] = generated[f];
-    j["materials"][emitted.material] = source_material;
     auto toon = MToonMaterial::from_vrm0(metadata.source()
                                              .at("materialProperties")
                                              .at(size_t(a.source_material)),
                                          asset.textures.size());
-    auto alpha_name = generated.value("alphaMode", "OPAQUE");
-    auto native_alpha = alpha_name == "MASK"    ? MToonAlpha::Mask
-                        : alpha_name == "BLEND" ? MToonAlpha::Blend
-                                                : MToonAlpha::Opaque;
-    if (native_alpha != toon.parameters.alpha ||
-        o.material.double_sided != (toon.parameters.cull == MToonCull::Off))
-      fail("native alpha/cull edits require a corresponding typed MToon "
-           "render-state edit");
-    toon.parameters.alpha_cutoff = o.material.alpha_cutoff;
+    const auto &fallback=asset.materials.at(size_t(a.material));
+    SourceNativeMaterial reference;reference.color=fallback.color;reference.emission=fallback.emissive;
+    reference.alpha=fallback.alpha==ImportedMaterial::AlphaMode::Opaque?int(Material::AlphaMode::Opaque):
+      fallback.alpha==ImportedMaterial::AlphaMode::Mask?int(Material::AlphaMode::Mask):int(Material::AlphaMode::Blend);
+    reference.alpha_cutoff=fallback.alpha_cutoff;reference.double_sided=fallback.double_sided;
+    std::array<PaintSourceTexture,size_t(MToonSlot::Count)> roles;
+    if(o.material_bindings) {
+      o.material_bindings->validate();
+      if(!o.material_bindings->has_mtoon || o.material_bindings->material.version()!=MToonVersion::V0)
+        fail("current source material is not a version-preserving MToon0 binding");
+      toon=o.material_bindings->material;roles=o.material_bindings->roles;reference=o.material_bindings->native_reference;
+      if(o.material_bindings->uv_origin && toon.parameters.normal_enabled && roles[size_t(MToonSlot::Normal)].image)
+        fail("derived UV normal roles require retained original frame/tangent transport before VRM export");
+    } else {
+      if(!a.decoded_images || a.decoded_images->size()!=asset.images.size())fail("source role images are unavailable");
+      for(size_t role=0;role<roles.size();++role)if(toon.textures[role].index>=0) {
+        const auto &texture=asset.textures.at(size_t(toon.textures[role].index));
+        if(texture.image<0 || size_t(texture.image)>=a.decoded_images->size())fail("source MToon role image is missing");
+        auto &view=roles[role];view.image=a.decoded_images->at(size_t(texture.image));
+        if(!view.image)fail("source MToon role has no decoded image");
+        view.wrap_s=texture.wrap_s;view.wrap_t=texture.wrap_t;view.min_filter=texture.min_filter;view.mag_filter=texture.mag_filter;
+      }
+    }
+    reference.validate();
+    if(o.material.alpha!=Material::AlphaMode::Automatic && int(o.material.alpha)!=reference.alpha) {
+      bool blend=o.material.alpha==Material::AlphaMode::Blend;
+      toon.parameters.alpha=blend?MToonAlpha::Blend:o.material.alpha==Material::AlphaMode::Mask?MToonAlpha::Mask:MToonAlpha::Opaque;
+      toon.parameters.depth_write=!blend;toon.parameters.source_blend=blend?5:1;toon.parameters.destination_blend=blend?10:0;
+      toon.parameters.render_queue=blend?3000:o.material.alpha==Material::AlphaMode::Mask?2450:2000;
+    }
+    if(o.material.double_sided!=reference.double_sided)toon.parameters.cull=o.material.double_sided?MToonCull::Off:MToonCull::Back;
+    if(o.material.alpha_cutoff!=reference.alpha_cutoff)toon.parameters.alpha_cutoff=o.material.alpha_cutoff;
+    std::set<std::string> rewritten;
     if (!o.textures || o.textures->source_only) {
-      const auto &fallback = asset.materials.at(size_t(a.material));
-      auto tint = [](float typed, float current, float original) {
-        if (std::abs(current - original) <=
-            std::max(1e-7f, std::abs(original) * 1e-6f))
-          return typed;
-        return original != 0 ? typed * (current / original) : current;
-      };
       for (size_t c = 0; c < 4; ++c)
-        toon.parameters.base_color[c] =
-            tint(toon.parameters.base_color[c], o.material.color[c],
-                 fallback.color[c]);
+        toon.parameters.base_color[c]=detail::vrm_native_factor(toon.parameters.base_color[c],reference.color[c],o.material.color[c]);
       toon.parameters.emission = {
-          tint(toon.parameters.emission.x, o.material.emissive[0],
-               fallback.emissive[0]),
-          tint(toon.parameters.emission.y, o.material.emissive[1],
-               fallback.emissive[1]),
-          tint(toon.parameters.emission.z, o.material.emissive[2],
-               fallback.emissive[2])};
+          detail::vrm_native_factor(toon.parameters.emission.x,reference.emission[0],o.material.emissive[0]),
+          detail::vrm_native_factor(toon.parameters.emission.y,reference.emission[1],o.material.emissive[1]),
+          detail::vrm_native_factor(toon.parameters.emission.z,reference.emission[2],o.material.emissive[2])};
+    } else {
+      if(!o.textures->normal.rgba.empty())fail("typed baked normal export needs explicit canonical tangent conversion");
+      auto compiled=detail::vrm_painted_material(o,std::move(toon),std::move(roles),reference,options.paint_resolution,options.cancelled);
+      toon=std::move(compiled.material);roles=std::move(compiled.roles);rewritten=std::move(compiled.rewritten_properties);
     }
-    auto properties = toon.source_json();
-    if (properties.contains("textureProperties"))
-      for (auto &value : properties["textureProperties"].items())
-        value.value() =
-            mapped(value.value(), identities.textures, "MToon texture", true);
-    if (o.textures && !o.textures->source_only) {
-      if (properties.value("vectorProperties", Json::object())
-              .value("_MainTex", Json::array({0, 0, 1, 1})) !=
-          Json::array({0, 0, 1, 1}))
-        fail("painted MToon0 with nonidentity shared ST needs shade/rim "
-             "rebaking");
-      auto &pbr = generated.at("pbrMetallicRoughness");
-      properties["vectorProperties"]["_Color"] = {1, 1, 1, 1};
-      properties["textureProperties"]["_MainTex"] =
-          pbr.at("baseColorTexture").at("index");
-      properties["vectorProperties"]["_EmissionColor"] = {1, 1, 1, 1};
-      properties["textureProperties"]["_EmissionMap"] =
-          generated.at("emissiveTexture").at("index");
+    if(o.material_bindings && o.material_bindings->uv_origin) {
+      // Source UV baking changes the coordinate domain of these properties.
+      // A later material-value transform cannot silently use the old domain.
+      for(const char *name:{"_MainTex_ST","_MainTex_ST_S","_MainTex_ST_T","_UvAnimScrollX","_UvAnimScrollY","_UvAnimRotation"})rewritten.insert(name);
     }
-    output_properties.push_back(properties);
+    static constexpr std::array<const char*,size_t(MToonSlot::Count)> names={"_MainTex","_ShadeTexture","_BumpMap","_EmissionMap","_RimTexture","_SphereAdd","","_OutlineWidthTexture","_UvAnimMaskTexture","_ReceiveShadowTexture","_ShadingGradeTexture"};
+    std::set<std::string> known_names;
+    for(size_t role=0;role<roles.size();++role)if(*names[role]) {
+      known_names.insert(names[role]);toon.textures[role].index=roles[role].image?role_texture(roles[role]):-1;
+    }
+    auto properties=toon.source_json();
+    if(properties.contains("textureProperties"))for(auto &value:properties["textureProperties"].items())
+      if(!known_names.contains(value.key()))value.value()=mapped(value.value(),identities.textures,"unknown retained MToon texture",true);
+    source_material["alphaMode"]=toon.parameters.alpha==MToonAlpha::Mask?"MASK":toon.parameters.alpha==MToonAlpha::Blend?"BLEND":"OPAQUE";
+    if(toon.parameters.alpha==MToonAlpha::Mask)source_material["alphaCutoff"]=toon.parameters.alpha_cutoff;
+    else source_material.erase("alphaCutoff");
+    source_material["doubleSided"]=toon.parameters.cull==MToonCull::Off;
+    auto material=add_material(a.source_material,std::move(source_material),std::move(properties),std::move(rewritten));
+    if(o.textures && !o.textures->source_only)painted_variants.insert(material);
+    j["meshes"][emitted.mesh]["primitives"][0]["material"]=material;
     check_budget();
   }
   if (primitives.size() != asset.primitives.size())
     fail("source avatar is incomplete; missing source primitives cannot be "
          "silently dropped");
+  // Material-value expressions may legally refer to an unused source material.
+  // Keep that exact source identity instead of dropping its definition merely
+  // because no primitive currently consumes it.
+  for(size_t source=0;source<metadata.source().at("materialProperties").size();++source)if(source_variants[int(source)].empty()) {
+    auto material=original.at("materials").at(source);
+    if(material.contains("extensions"))for(const auto &e:material["extensions"].items())
+      if(e.key()!="KHR_materials_unlit")fail("unused source material extension lacks an explicit remapper");
+    for(const char *slot:{"normalTexture","occlusionTexture","emissiveTexture"})if(material.contains(slot))remap_info(material[slot]);
+    if(material.contains("pbrMetallicRoughness"))for(const char *slot:{"baseColorTexture","metallicRoughnessTexture"})
+      if(material["pbrMetallicRoughness"].contains(slot))remap_info(material["pbrMetallicRoughness"][slot]);
+    auto properties=metadata.source().at("materialProperties").at(source);
+    if(properties.contains("textureProperties"))for(auto &value:properties["textureProperties"].items())
+      value.value()=mapped(value.value(),identities.textures,"unused MToon texture",true);
+    add_material(int(source),std::move(material),std::move(properties),{});
+  }
+  j["materials"]=std::move(output_materials);
   auto vrm = metadata.remap(identities);
   auto scale_vector = [&](Json &v) {
     for (const char *axis : {"x", "y", "z"})
@@ -857,9 +1012,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
         g["hitRadius"] = g.at("hitRadius").get<double>() * fit_scale;
 
   vrm["materialProperties"] = output_properties;
-  // Names are stable source identities for VRM0 material-value expressions.
-  for (auto &expression :
-       vrm["blendShapeMaster"].value("blendShapeGroups", Json::array())) {
+  // VRM0 expressions address material names, while native authoring addresses
+  // original material IDs. Expand an original binding to every distinct state
+  // fork of that ID, never to a same-named but unrelated source material.
+  if(vrm["blendShapeMaster"].contains("blendShapeGroups")) for (auto &expression :
+       vrm["blendShapeMaster"].at("blendShapeGroups")) {
     for (auto &bind : expression.value("binds", Json::array())) {
       size_t mesh =
           index(bind.at("mesh"), j["meshes"].size(), "emitted expression mesh");
@@ -868,13 +1025,21 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
                            .size();
       index(bind.at("index"), targets, "emitted expression morph");
     }
-    for (auto &bind : expression.value("materialValues", Json::array())) {
-      bool found = false;
-      for (auto &material : j["materials"])
-        found |= material.value("name", "") ==
-                 bind.at("materialName").get<std::string>();
-      if (!found)
-        fail("expression material name has no emitted material");
+    if(expression.contains("materialValues")) {
+      Json expanded=Json::array();
+      for(const auto &bind:expression["materialValues"]) {
+        auto found=source_material_names.find(bind.at("materialName").get<std::string>());
+        if(found==source_material_names.end() || found->second.size()!=1)
+          fail("expression material name lacks one exact original material identity");
+        for(int variant:source_variants.at(found->second.front())) {
+          const auto &state=variants.at(size_t(variant));
+          auto property=bind.at("propertyName").get<std::string>();
+          if(state.rewritten.contains(property))
+            fail("paint/source-UV compilation changes expression property "+property+"; an exact expression mapping is required");
+          auto copy=bind;copy["materialName"]=state.name;expanded.push_back(std::move(copy));
+        }
+      }
+      expression["materialValues"]=std::move(expanded);
     }
   }
   vrm["exporterVersion"] = "Dome Sculpt source-preserving VRM0";
@@ -894,6 +1059,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       "physics verification");
   report.meshes = objects.size();
   report.joints = avatar_joints.size();
+  report.materials=variants.size();report.painted_materials=painted_variants.size();
+  if(report.painted_materials) {
+    report.diagnostics.push_back("Painted VRM0 main/shade/emission compiled with explicit coverage; original source material identities and native layers retained");
+    if(options.paint_resolution)report.diagnostics.push_back("Painted texture resolution explicitly resampled to "+std::to_string(options.paint_resolution));
+  }
   if (report.normal_targets_recomputed)
     report.diagnostics.push_back(
         "Changed morph normals recomputed from edited geometry; exact original "
