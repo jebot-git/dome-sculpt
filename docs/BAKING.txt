@@ -1,0 +1,134 @@
+Native mesh baking
+==================
+
+bake_mesh(low,source,options) is a detached native worker operation. It never
+changes a scene, history, material, source mesh or paint map. The application
+must capture immutable inputs, run it on its asset/file worker, then publish
+only if the low/high object identities, document generation and source revisions
+still match. Cancellation/failure returns no partial result. Do not execute the
+baker from a renderer, FLTK callback or OpenXR frame loop.
+
+Inputs and projection
+---------------------
+Low mesh, high source and optional cage share one coordinate system. Transform
+positions/normals correctly before constructing a BakeSource; bounds/ray bias
+are in those units. The mesh processor's SurfaceQuery owns an immutable median
+AABB BVH copy and supplies triangle identity, barycentrics and shading normals.
+This avoids another independent BVH implementation.
+
+The default cage origin is the low point plus its normal*front_distance. The
+ray travels inward through that point and back_distance beyond it. An explicit
+cage has the same vertex identities as the low mesh; every displacement faces
+outward and fits front_distance. There is no unbounded closest-point fallback.
+Geometric winding rejects backfaces by default, independently of vertex normal
+attributes. Accepting backfaces, partial projection and UV overlap requires an
+explicit caller option. The default rejects misses/overlap before publication.
+
+UV rasterization uses texel centers and a half-open edge rule so adjacent low
+triangles do not double-own their common edge. Low UVs fit one unit texture tile;
+degenerate UVs and invalid geometry/tangent/material data fail explicitly.
+Double-precision edge-scale-relative tests retain tiny valid UV triangles;
+rasterization naturally skips triangles covering no output texel centers.
+Projection, AO and even empty/overlapping UV raster work have explicit budgets.
+Output allocation is bounded before rasterization (default 4 Mi texels, maximum
+16 Mi texels/4096 square). Cancellation is checked during BVH construction,
+raster work, AO batches and padding. No Python or graphics readback is used.
+
+Tangents and normal maps
+-----------------------
+Output normal maps default to glTF/OpenGL +Y. normal_y_down selects DirectX -Y.
+The native fallback computes UV derivatives and Gram-Schmidt orthogonalization
+against the interpolated low normal, preserving mirrored UV handedness. Source
+normal maps use the corresponding high tangent frame before projection into
+that low frame. Zero normal-map strength disables normal-map detail.
+
+For assets whose consumer uses generated/imported MikkTSpace tangents, pass the
+actual low_tangents and source.tangents XYZ+W attributes. They are interpolated,
+orthogonalized and retain handedness; mixed handedness within a triangle is an
+explicit input error. This component does NOT claim to implement automatic
+MikkTSpace generation. The caller/mesh pipeline must preserve or generate the
+consumer's actual tangent attributes for precise cross-application consistency.
+
+PBR transfer and color space
+----------------------------
+BakeSource supports per-triangle material IDs, optional linear vertex RGBA,
+shared immutable source maps, source tangent normal maps and material factors.
+PaintedMesh::composite output sets maps_are_composited=true (default), because
+those images already contain the material factors. Imported raw glTF textures
+use false so factors are applied exactly once. UV clamp is default; repeat_uv
+is an explicit source material option. All maps require valid high source UVs.
+
+Base RGB and emission are decoded from sRGB before bilinear filtering, multiplied
+by linear factors/vertex color, then encoded to sRGB. Alpha stays linear. ORM
+stays linear with R=occlusion, G=roughness, B=metallic. Geometry AO multiplies
+source occlusion rather than silently dropping it. No source maps means the
+intrinsic material channels are baked. Alpha is retained and transparency is
+reported in the composited output. This transfers intrinsic material data, not
+lit viewport pixels or tone-mapped appearance.
+
+AO and padding
+--------------
+AO uses deterministic cosine-weighted hemisphere samples (Hammersley/radical
+inverse sequence), a positive configurable ray bias and finite ao_distance.
+No source hit means visible. A nearby finite-distance ceiling fixture matches
+the analytic cosine visibility fraction; a shorter AO radius correctly excludes
+it. AO is geometric ray visibility, not a multiple-bounce lighting bake.
+
+coverage identifies 0 outside UVs, 1 projected, 2 padding, 3 missed projection,
+and 4 protected. The optional exact-resolution writable mask protects selected
+texture regions. Padding is a bounded 8-neighbor multi-source dilation: it copies
+all output channels from a nearest reached owner, with deterministic ties. It
+never blends normals/colors across islands, overwrites another island, crosses
+protected texels, or conceals missed projection texels. This Chebyshev-distance
+padding is not a distance-weighted image blur. Apply only coverage 1/2 to editable
+destination channels; retain protected/unwritten data in the document.
+
+Output and integration
+----------------------
+BakeResult contains detached composited TextureMaps, tangent normal Image,
+ambient-occlusion Image, coverage and projected/missed/overlap/padding/ray/raster
+counts. Image::png performs native encoding. A file/export job can store these
+images only after checking job identity/generation; the central document/paint
+workflow owns editable-layer creation, preview, undo and durable persistence.
+It must not silently flatten existing paint or discard protected channels.
+
+Quality/scope limits
+--------------------
+The kernel is a native CPU worker and has not been accelerator- or headset-tested.
+Sampling is one texel-center projection (AO is multisampled); supersampling,
+UDIM/multiple source UV sets, automatic cage fitting, automatic MikkTSpace tangent
+generation and distributed/out-of-core bake scheduling are not implemented here.
+A dense native sculpt unwrapped directly at 64px exposed an existing atlas
+edge case (eight exactly zero-area UV triangles); baking rejects it explicitly. The
+validated high-to-low sculpt fixture uses a deliberately coarse closed target
+with valid xatlas charts. Dense/small-chart atlas quality remains a separate
+production requirement; it has not been hidden by skipping collapsed faces.
+Source fields/channels are those represented by the native Material/TextureMaps
+contract; no claim of complete glTF/VRM extension/material baking is made.
+This milestone is infrastructure for the full production suite, not completion
+of the remaining FLTK/XR authoring workflow or the overall requirement matrix.
+
+Provenance and validation
+-------------------------
+Baker implementation is original native C++20 code in src/bake.cpp, using the
+workspace's existing Vec3/color conversion helpers and the native SurfaceQuery
+from src/mesh-processing.cpp. No external baker or proprietary plugin code was
+copied. Existing xatlas is used by an integration fixture through the existing
+atlas API, not newly vendored or substituted. Its source provenance remains in
+third_party/sources.json, owned by the main integration agent.
+
+Direct Release test after building the core archive:
+  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/bake.cpp src/bake.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-bake-test
+  /tmp/dome-bake-test
+
+Sanitizer command instruments baker, shared BVH and test code; the existing core
+and xatlas dependencies remain their configured Release archives:
+  c++ -std=c++20 -O0 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Iinclude -Ithird_party/openbrush tests/bake.cpp src/bake.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-bake-sanitized
+  ASAN_OPTIONS=detect_leaks=1 /tmp/dome-bake-sanitized
+
+Fixtures cover tangent/UV handedness, imported tangent preservation, source
+normal maps, alpha/color-space/factor/vertex-color semantics, projection cage and
+backface bounds, analytic AO radius, protected/missed texels, material-island
+padding, overlap policy, cancellation and resource/material validation. A native
+sculpted surface also passes through xatlas charts and native normal PNG encoding.
+No user asset or active session is changed by these private numerical fixtures.
