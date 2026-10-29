@@ -3,6 +3,7 @@
 #include "dome/gltf-export.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/tangents.hpp"
 #include "io.hpp"
 #include "gltf-document.hpp"
 #include <bit>
@@ -153,6 +154,14 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
       };
       attribute(source->uv1,"TEXCOORD_1","VEC2");attribute(source->colors,"COLOR_0","VEC4");
       auto tangents=source_attributes.base_tangents();
+      if(!tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
+        auto canonical=tangent_corners(mesh,cancelled);
+        for(size_t corner=0;corner<canonical.size();++corner) {
+          auto authored=tangents.at(mesh.indices[corner]);auto target=canonical[corner];
+          if(length(Vec3{authored[0]-target[0],authored[1]-target[1],authored[2]-target[2]})>1e-4f || authored[3]*target[3]<0)
+            throw std::invalid_argument("Canonical baked normals conflict with retained source tangents; explicit tangent basis conversion is required");
+        }
+      }
       if(!tangents.empty()){
         begin=data.size();for(auto t:tangents)floats(t);
         attributes["TANGENT"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC4");
@@ -444,7 +453,9 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
     const auto &maps=*objects[i].textures;
     auto &material=j["materials"][i]; auto &pbr=material["pbrMetallicRoughness"];
     if(maps.source_only) {
-      if(!maps.source_maps) throw std::invalid_argument("Source-only textures require source maps");
+      auto present=[](const Image &image){return image.width || image.height || !image.rgba.empty();};
+      if(!maps.source_maps || present(maps.color) || present(maps.metal_rough) || present(maps.emission) || present(maps.normal) || present(maps.color_coverage) || maps.baked_base || present(maps.baked_normal) || present(maps.baked_coverage))
+        throw std::invalid_argument("Source-only textures require original bindings without derived images");
       const auto &source=*maps.source_maps; source.validate();
       if(source.color.image) pbr["baseColorTexture"]=source_info(source.color);
       if(source.metal_rough.image) pbr["metallicRoughnessTexture"]=source_info(source.metal_rough);
@@ -454,17 +465,20 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
       sampler.min_filter=sampler.mag_filter=9729;
       pbr["baseColorFactor"]={1,1,1,1}; pbr["metallicFactor"]=1; pbr["roughnessFactor"]=1;
       pbr["baseColorTexture"]={{"index",texture(maps.color,sampler)}};
-      pbr["metallicRoughnessTexture"]={{"index",texture(maps.metal_rough,sampler)}};
+      int orm=texture(maps.metal_rough,sampler);
+      pbr["metallicRoughnessTexture"]={{"index",orm}};
+      material["occlusionTexture"]={{"index",orm}};
+      if(!maps.normal.rgba.empty()) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
       material["emissiveTexture"]={{"index",texture(maps.emission,sampler)}};
       material["emissiveFactor"]={1,1,1};
     }
     if(maps.source_maps) {
       const auto &source=*maps.source_maps; source.validate();
-      if(source.normal.image) {
+      if(source.normal.image && maps.normal.rgba.empty()) {
         material["normalTexture"]=source_info(source.normal);
         material["normalTexture"]["scale"]=source.normal_scale;
       }
-      if(source.occlusion.image) {
+      if(source.occlusion.image && maps.source_only) {
         material["occlusionTexture"]=source_info(source.occlusion);
         material["occlusionTexture"]["strength"]=source.occlusion_strength;
       }

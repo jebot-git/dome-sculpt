@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <numbers>
+#include <unistd.h>
 #include <nlohmann/json.hpp>
 using namespace dome;
 void require(bool value, const char *message) {
@@ -22,6 +23,12 @@ Scene fixture(bool source_maps=false, uint32_t resolution=128) {
     auto image=std::make_shared<Image>();image->width=image->height=2;
     image->rgba={255,0,0,255,0,255,0,255,0,0,255,255,255,255,0,255};
     auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=image;
+    auto normal=std::make_shared<Image>();normal->width=normal->height=2;
+    normal->rgba={204,128,230,255,128,204,230,255,80,128,230,255,128,80,230,255};
+    maps->normal.image=normal;maps->normal_scale=.6f;
+    maps->normal.uv_transform={0,-1,1,1,0,0};
+    auto ao=std::make_shared<Image>();ao->width=ao->height=2;ao->rgba.assign(16,120);
+    maps->occlusion.image=ao;maps->occlusion_strength=.65f;
     object.painted=PaintedMesh::from_maps(mesh,maps,resolution);
   }else{
     object.painted=std::make_shared<PaintedMesh>(mesh,resolution);
@@ -38,6 +45,25 @@ Scene fixture(bool source_maps=false, uint32_t resolution=128) {
   rig.pose={rig.skeleton->bones[0].rest,rig.skeleton->bones[1].rest};
   rig.pose[1].rotation={std::cos(.1f),0,0,std::sin(.1f)};
   scene.set_deformation(object.id,std::move(rig));scene.validate();return scene;
+}
+Scene baked_fixture() {
+  auto result=fixture();auto &object=result.active();
+  auto mesh=object.painted->mesh();mesh.uv={{.1,.1},{.8,.1},{.1,.45},{.8,.45}};
+  mesh.uv_pins.assign(mesh.positions.size(),0);
+  object.painted=object.painted->reparameterize(mesh);
+  const uint32_t resolution=object.painted->resolution();
+  auto image=[&](std::array<uint8_t,4> color){
+    Image result{resolution,resolution,{}};result.rgba.resize(size_t(resolution)*resolution*4);
+    for(size_t i=0;i<result.rgba.size();i+=4)std::copy(color.begin(),color.end(),result.rgba.begin()+i);
+    return result;
+  };
+  BakedTextures baked;
+  baked.maps.color=image({85,163,44,220});
+  baked.maps.metal_rough=image({170,90,30,255});
+  baked.maps.emission=image({30,10,5,255});
+  baked.maps.normal=image({205,153,226,255});
+  baked.coverage.assign(size_t(resolution)*resolution,255);
+  object.painted->install_bake(std::move(baked));result.validate();return result;
 }
 struct Driver {
   Document &doc;SpatialFrame frame;
@@ -82,7 +108,7 @@ int main(int argc,char**argv)try{
   auto posed_before=scene.active().deformation->preview(scene.active().painted->mesh());auto posed_after=object.deformation->preview(object.painted->mesh());bool same=true;
   for(size_t corner=0;corner<posed_before.indices.size();++corner)same&=length(posed_before.positions[posed_before.indices[corner]]-posed_after.positions[posed_after.indices[corner]])<1e-6f;
   require(same,"Independent skinned/morphed surface remains identical after UV seam remap");
-  auto native=std::filesystem::temp_directory_path()/"dome-uv-workflow-native.dsculpt";split.save(native);require(Scene::load(native).encode()==split.encode(),"Remapped UV/skin/morph state survives exact native restart");std::filesystem::remove(native);
+  auto native=std::filesystem::temp_directory_path()/("dome-uv-workflow-native-"+std::to_string(getpid())+".dsculpt");split.save(native);require(Scene::load(native).encode()==split.encode(),"Remapped UV/skin/morph state survives exact native restart");std::filesystem::remove(native);
   require(document.undo()&&document.copy_scene().encode()==original,"Seam worker edit remains one complete exact global undo");
   for(int attempt=0;attempt<5;++attempt){document.begin_uv();document.edit_uv(UvAction::Conformal);document.end_uv(false);require(document.wait_uv(),"Cancellation closes asynchronous draft without stale resurrection");}
   require(document.copy_scene().encode()==original&&!document.frame().state->uv,"Cancelled solve never changes scene or restores a closed session");
@@ -96,7 +122,46 @@ int main(int argc,char**argv)try{
   accepted_cancel.edit_scene("New authoring after UV cancellation",[](Scene &next,const auto &cancelled){if(cancelled())throw std::runtime_error("cancelled");next.active().material.roughness=.31f;});
   require(accepted_cancel.wait_asset()&&accepted_cancel.copy_scene().active().material.roughness==.31f,
           "Cancelled old UV job cannot clear or overwrite newer guarded scene work");
-  Document sourced;auto source=fixture(true);auto preserved=source.encode();sourced.replace(source);sourced.begin_uv();require(sourced.wait_uv(),"Source image draft validates without modifying source payload");sourced.edit_uv(UvAction::Conformal);require(sourced.wait_uv(),"Source UV solve may preview a detached draft");sourced.end_uv(true);require(sourced.wait_asset(),"Source transfer refusal completes worker state");
+  auto baked_scene=baked_fixture();auto baked_original=baked_scene.encode();
+  require(baked_original.at("version")==6,"Rigged baked UV fixture uses source-aware native Scene v6");
+  Document baked_document;baked_document.replace(baked_scene);baked_document.begin_uv();require(baked_document.wait_uv(),"Baked rigged UV draft validates");
+  baked_document.edit_uv(UvAction::Scale,.7f);baked_document.edit_uv(UvAction::Rotate,std::numbers::pi_v<float>/2);
+  require(baked_document.wait_uv()&&baked_document.frame().state->uv->valid,"Baked UV target rotates inside atlas without changing geometry");
+  baked_document.end_uv(true);require(baked_document.wait_asset()&&baked_document.frame().state->error.empty(),"Baked color/ORM/emission/normal base transfers through guarded UV worker");
+  auto baked_updated=baked_document.copy_scene();const auto &baked_object=baked_updated.active();
+  auto bake=baked_object.painted->baked();require(bake&&!bake->maps.normal.rgba.empty()&&baked_object.deformation&&baked_object.painted->layers().size()==2,
+      "UV transfer retains canonical baked normal, editable layers and complete native rig");
+  const uint32_t resolution=baked_object.painted->resolution();size_t center=(size_t(.275f*resolution)*resolution+size_t(.45f*resolution))*4;
+  Vec3 old_normal=normalized({205/127.5f-1,153/127.5f-1,226/127.5f-1});
+  Vec3 tangent_normal={bake->maps.normal.rgba[center]/127.5f-1,bake->maps.normal.rgba[center+1]/127.5f-1,bake->maps.normal.rgba[center+2]/127.5f-1};
+  // Independent analytic frame after UV90: tangent=-Y, bitangent=+X.
+  Vec3 world_normal=normalized({tangent_normal.y,-tangent_normal.x,tangent_normal.z});
+  require(dot(old_normal,world_normal)>.999f&&bake->maps.normal.rgba[center]<130&&bake->maps.normal.rgba[center+1]>180,
+      "Rotated UV bake transports normal directions into new Mikk basis rather than copying stale RGB vectors");
+  require(bake->coverage[center/4]>250&&bake->maps.metal_rough.rgba[center]==170,
+      "UV transfer preserves baked coverage and AO/ORM channel values independently of paint overlays");
+  auto baked_encoded=baked_updated.encode();require(Scene::decode(baked_encoded).encode()==baked_encoded,
+      "Scene v6 restart retains UV-edited baked normal/coverage plus skin/morph identities exactly");
+  require(baked_document.undo()&&baked_document.copy_scene().encode()==baked_original&&baked_document.redo()&&baked_document.copy_scene().encode()==baked_encoded,
+      "Baked UV normal-frame transfer is one complete exact global undo/redo transaction");
+  PaintedMesh bake_only(baked_scene.active().painted->mesh(),resolution);
+  bake_only.install_bake(*baked_scene.active().painted->baked());
+  auto baked_without_paint=bake_only.reparameterize(baked_object.painted->mesh());
+  baked_without_paint->clear_bake();
+  require(!baked_without_paint->has_paint_data()&&baked_without_paint->storage_bytes()==0,
+      "Baked UV transfer does not miscount image storage as editable tiles after Clear bake");
+  auto legacy=baked_original;legacy["version"]=5;
+  for(auto key:{"groups","next_group_id","source_images","source_models"})legacy.erase(key);
+  for(auto &object:legacy["objects"]){object.erase("group");object.erase("appearance");for(auto key:{"alpha","alpha_cutoff","unlit"})object["material"].erase(key);}
+  auto legacy_loaded=Scene::decode(legacy);legacy_loaded.validate();
+  require(legacy_loaded.active().painted->baked()&&legacy_loaded.active().deformation&&legacy_loaded.encode().at("version")==6,
+      "Legacy baked-v5 native source upgrades while retaining rig and canonical normal maps");
+  Document sourced;auto source=fixture(true);
+  source.active().painted->install_bake(*baked_scene.active().painted->baked());
+  auto preserved=source.encode();
+  require(preserved.at("version")==6&&source.active().painted->source_maps()->normal.image&&source.active().painted->baked(),
+      "Source guard fixture retains independent raw normal/AO bindings and canonical baked normal in Scene v6");
+  sourced.replace(source);sourced.begin_uv();require(sourced.wait_uv(),"Source image draft validates without modifying source payload");sourced.edit_uv(UvAction::Conformal);require(sourced.wait_uv(),"Source UV solve may preview a detached draft");sourced.end_uv(true);require(sourced.wait_asset(),"Source transfer refusal completes worker state");
   require(sourced.frame().state->error.find("all-map bake")!=std::string::npos&&sourced.copy_scene().encode()==preserved&&sourced.frame().state->uv,"Changed source UV publication explicitly refuses before texture/tangent/provenance loss");sourced.end_uv(false);
   Document xr;xr.replace(scene);Driver hand(xr);hand.open();hand.sector(9);hand.sector(7);require(xr.frame().state->uv&&xr.frame().state->controls.parameter==VrParameter::UvEdit,"Real joystick navigation opens native rigged UV workspace");require(xr.wait_uv(),"Controller UV draft finishes validation");
   hand.point(55,165);require(xr.wait_uv(),"Controller side Unwrap button queues detached conformal worker");require(std::abs(xr.frame().state->uv->mesh->uv[2][1]-.45f)<1e-6f,"Controller UV Unwrap dispatches the same exact conformal action");hand.point(299,225.5f);hand.point(460,559);require(xr.wait_uv()&&xr.frame().state->uv->topology->islands.size()==2,

@@ -8,6 +8,8 @@
 #include <nlohmann/json_fwd.hpp>
 namespace dome {
 struct Image;
+struct Mesh;
+struct Vec3;
 struct PaintImageLimits {
   size_t max_image_pixels = 16 * 1024 * 1024;
   size_t max_unique_pixels = 64 * 1024 * 1024;
@@ -50,4 +52,9 @@ std::shared_ptr<const PaintSourceMaps> decode_source_maps(const nlohmann::json &
 // Bilinear interpolation decodes RGB to linear light when srgb=true; alpha and
 // data channels remain linear. Source wrap/mirror/clamp and affine UV are applied.
 std::array<float,4> sample_source_texture(const PaintSourceTexture &, float u, float v, bool srgb);
+// Inputs must be validated once by the worker. Evaluate original normal views
+// in the same affine-UV derivative basis as the raw-source GPU preview. A
+// degenerate UV transform retains the interpolated geometric normal.
+Vec3 source_texture_normal(const Mesh &, const PaintSourceMaps &, size_t triangle,
+                           std::array<float,3> barycentric, float strength = 1);
 } // namespace dome

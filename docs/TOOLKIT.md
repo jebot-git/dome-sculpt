@@ -1,6 +1,7 @@
 # Current DomeD toolkit and conventions
 
-Verified 2026-10-29 against fetched DomeD main
+Current source checked 2026-10-29 against DomeD main
+`282467e727df78c8e7f2452aa05a7747bac854a6`. Earlier builds used
 `742d009f446cffdeb89031664b72885ff6f16a19`, and fltk-vr main
 `4f54821e61993a9212a2d9cd03635342b58acf6a`. The workspace
 `/home/blux/de-xr/DESIGN_CONVENTIONS` and current DomeD README were read.
@@ -61,3 +62,17 @@ Release from clean artifacts/domed-current using that toolkit, with unrelated
 capture work untouched. Build: artifacts/domed-current-build.log. Fresh private
 Wayland/universal-menu8/8 checks pass using that binary and cf6d6b3 client
 (dome-menu-avatars-pinned-final.log). No active compositor/session restart.
+
+## Updated popup behavior at282467e
+
+DomeD main advanced after the above verification. Commit eaeb8e0 changes the
+canonical popup-done patch to keep parent menus open when closing submenus;
+282467e also enlarges the compositor XR mouse-finder pulse. A clean detached
+source worktree is in artifacts/domed-latest-source. The canonical builder is
+successfully built the updated22-patch Release toolkit into artifacts/toolkit-282467e;
+log: artifacts/build-toolkit-282467e.log. Exact new patch hashes and combined
+digest are in third_party/sources.json. The client was rebuilt against this
+prefix; actual linkage resolves its lib64 libraries (linkage-toolkit-282467e.log).
+All47 Release suites pass, native universal menus53/53 and baked-surface GUI5/5
+pass with this toolkit. Earlier compositor checks prove the older compositor;
+the clean latest Release compositor build is still running separately.

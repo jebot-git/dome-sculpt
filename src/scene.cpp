@@ -138,7 +138,7 @@ void Scene::validate(bool deep_sources) const {
   CreatorAssetArchive source_models;
   size_t remap_vertices = 0, source_bytes = 0;
   std::set<const std::vector<uint8_t> *> originals;
-  size_t count = 0, texels = 0, deformation_entries = 0;
+  size_t count = 0, texels = 0, deformation_entries = 0, paint_bytes = 0;
   for (auto &o : objects_) {
     if (!o.id || o.id >= next_ || !ids.insert(o.id).second || !o.volume ||
         o.volume->in_stroke())
@@ -179,8 +179,11 @@ void Scene::validate(bool deep_sources) const {
       for (const auto *slot : {&m.color,&m.metal_rough,&m.emission,&m.normal,&m.occlusion})
         if (slot->image) source_images.add(slot->image);
     }
-    if (o.painted)
+    if (o.painted) {
       texels += size_t(o.painted->resolution()) * o.painted->resolution();
+      paint_bytes += o.painted->storage_bytes();
+    }
+    if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
     if (texels > 16 * 1024 * 1024)
       throw std::length_error("Scene paint-map budget exceeded");
     count += std::max(o.volume->voxels().size(), o.volume->stored_samples());
@@ -191,8 +194,9 @@ void Scene::validate(bool deep_sources) const {
 }
 nlohmann::json Scene::encode() const {
   validate();
+  bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", 5},
+                      {"version", baked ? 6 : 5},
                       {"active", active_},
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
@@ -249,8 +253,15 @@ Scene Scene::decode(const nlohmann::json &j) {
     result.active().volume = std::make_shared<Volume>(Volume::decode(j));
     return result;
   }
-  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5)
+  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6)
     throw std::runtime_error("Unsupported scene version");
+  // The pre-integration baked checkpoint used v5 without group/archive fields.
+  bool legacy_baked5 = j.at("version") == 5 && !j.contains("groups") &&
+      !j.contains("source_images") && !j.contains("source_models") &&
+      std::any_of(j.at("objects").begin(),j.at("objects").end(),[](const auto &o) {
+        return !o.at("painted").is_null() && o.at("painted").contains("baked");
+      });
+  bool archives = j.at("version") >= 5 && !legacy_baked5;
   auto id = [](const nlohmann::json &v) {
     if (!v.is_number_unsigned() &&
         (!v.is_number_integer() || v.get<int64_t>() <= 0))
@@ -261,9 +272,9 @@ Scene Scene::decode(const nlohmann::json &j) {
     return n;
   };
   PaintImageArchive source_images;
-  if (j.at("version") == 5) source_images = PaintImageArchive::decode(j.at("source_images"));
+  if (archives) source_images = PaintImageArchive::decode(j.at("source_images"));
   CreatorAssetArchive source_models;
-  if (j.at("version") == 5) source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
+  if (archives) source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -272,7 +283,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       throw std::runtime_error("Invalid group reference");
     return v.get<uint64_t>();
   };
-  if (j.at("version") == 5) {
+  if (archives) {
     result.next_group_ = id(j.at("next_group_id"));
     const auto &groups = j.at("groups");
     if (!groups.is_array() || groups.size() > 128) throw std::length_error("Invalid group count");
@@ -292,11 +303,11 @@ Scene Scene::decode(const nlohmann::json &j) {
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
   result.objects_.clear();
-  size_t samples = 0, texels = 0, deformation_entries = 0;
+  size_t samples = 0, texels = 0, deformation_entries = 0, paint_bytes = 0;
   for (auto &v : objects) {
     SculptObject o;
     o.id = id(v.at("id"));
-    if (j.at("version") == 5) o.group = nonnegative_id(v.at("group"));
+    if (archives) o.group = nonnegative_id(v.at("group"));
     o.name = v.at("name").get<std::string>();
     o.visible = v.at("visible").get<bool>();
     o.locked = v.at("locked").get<bool>();
@@ -313,7 +324,7 @@ Scene Scene::decode(const nlohmann::json &j) {
                   m.at("emissive").get<std::array<float, 3>>(),
                   m.at("toon").get<bool>(),
                   m.at("double_sided").get<bool>()};
-    if (j.at("version") == 5) {
+    if (archives) {
       auto alpha = m.at("alpha");
       if ((!alpha.is_number_integer() && !alpha.is_number_unsigned()) ||
           alpha.get<int64_t>() < 0 || alpha.get<int64_t>() > 3)
@@ -343,7 +354,11 @@ Scene Scene::decode(const nlohmann::json &j) {
         texels += r * r;
         if (texels > 16 * 1024 * 1024)
           throw std::length_error("Scene paint-map budget exceeded");
-        o.painted = PaintedMesh::decode(v.at("painted"), j.at("version") == 5 ? &source_images : nullptr);
+        if (v.at("painted").contains("baked") && j.at("version") != 6 && !legacy_baked5)
+          throw std::runtime_error("Baked textures require scene version 6");
+        o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr);
+        paint_bytes += o.painted->storage_bytes();
+        if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
       }
     }
     if (j.at("version") >= 4 && !v.at("deformation").is_null()) {
@@ -362,7 +377,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       o.deformation = std::make_shared<const DeformationState>(
           DeformationState::decode(d, o.painted->mesh()));
     }
-    if (j.at("version") == 5 && !v.at("appearance").is_null()) {
+    if (archives && !v.at("appearance").is_null()) {
       remap_vertices += v.at("appearance").at("source_vertices").get_binary().size() / 4;
       if (remap_vertices > 8'000'000) throw std::length_error("Creator source remap budget exceeded");
       o.appearance = decode_creator_appearance(v.at("appearance"), source_models);

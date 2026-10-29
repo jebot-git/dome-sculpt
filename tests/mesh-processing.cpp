@@ -129,6 +129,23 @@ int main() try {
           "Surface rays normalize direction and report physical distance");
   require(!query.raycast({0, 0, .4f}, {0, 0, -1}, .1f),
           "Surface ray distance limits prevent remote hits");
+  bool edges_hit=true, outside_rejected=true;
+  for(float scale:{.001f,1.f,100.f}) {
+    Mesh plane;plane.positions={{-scale,-scale,0},{scale,-scale,0},{scale,scale,0},{-scale,scale,0}};
+    plane.normals.assign(4,{0,0,1});plane.indices={0,1,2,0,2,3};
+    SurfaceQuery surface(plane);
+    for(int k=0;k<101;++k) {
+      float v=(-.95f+1.9f*k/100)*scale;
+      auto direction=normalized(Vec3{.1f+.003f*k,.6f-.004f*k,-1});
+      auto point=Vec3{v,v,0};auto origin=point-direction*(.1234567f*scale);
+      auto hit=surface.raycast(origin,direction,.13f*scale);
+      edges_hit &= hit && length(hit->position-point)<scale*2e-5f;
+      auto outside=Vec3{scale*1.0001f,scale*.3f,0};
+      outside_rejected &= !surface.raycast(outside-direction*(.1234567f*scale),direction,.13f*scale);
+    }
+  }
+  require(edges_hit,"Oblique projections onto shared triangle edges remain watertight across metric scales");
+  require(outside_rejected,"Watertight projection does not expand geometry across real outside gaps");
   auto preserved = query.closest({0, 0, .4f}).distance;
   mesh.positions[0].x = -.3f;
   require(query.closest({0, 0, .4f}).distance == preserved,

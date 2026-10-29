@@ -15,15 +15,27 @@ struct Image {
   void validate() const;
   std::vector<uint8_t> png() const;
 };
+struct BakedTextures;
 struct TextureMaps {
   Image color, metal_rough, emission;
   bool transparent = false;
-  // Original normal/AO views and exact source metadata survive compositing.
   std::shared_ptr<const PaintSourceMaps> source_maps;
-  // Preview-only immutable original bindings; derived Images are intentionally empty.
   bool source_only = false;
-  // Linear R: combined visible color coverage; 1x1 zero for untouched sources.
+  // Linear R: visible source replacement by baked base and editable color.
   Image color_coverage;
+  Image normal; // Canonical Mikk composite for generic PBR consumers.
+  // Original immutable baked payload; no recursive baked payload is allowed.
+  std::shared_ptr<const BakedTextures> baked_base;
+  // Padded raw canonical normal and linear R coverage for typed MToon blending.
+  Image baked_normal, baked_coverage;
+};
+struct BakedTextures {
+  TextureMaps maps;
+  // Linear coverage below editable paint layers: 0 intrinsic material,
+  // 255 baked surface. Fractional values retain filtered UV boundary coverage.
+  std::vector<uint8_t> coverage;
+  void validate(uint32_t resolution) const;
+  size_t storage_bytes() const;
 };
 struct PaintCompositeCacheStats {
   size_t retained_bytes = 0, retained_maps = 0, limit_bytes = 0;
@@ -100,7 +112,7 @@ public:
   bool pending_changes() const;
   size_t undo_count() const { return undo_.size(); }
   // Conservative retained data, including hidden/zero-opacity/mask-only tiles.
-  bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_); }
+  bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_) || bool(baked_); }
   bool undo();
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
@@ -108,6 +120,10 @@ public:
   reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
   std::shared_ptr<const TextureMaps> composite(const Material &) const;
   std::shared_ptr<const TextureMaps> preview(const Material &) const;
+  std::shared_ptr<const BakedTextures> baked() const { return baked_; }
+  void install_bake(BakedTextures);
+  void clear_bake();
+  size_t storage_bytes() const;
   const PaintPixel &pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   std::optional<Vec3> raycast(Vec3, Vec3, float maximum = 20) const;
   Vec3 normal(Vec3) const;
@@ -128,6 +144,7 @@ private:
   std::shared_ptr<const SurfaceMap> surface_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::vector<PaintLayer> layers_;
+  std::shared_ptr<const BakedTextures> baked_;
   uint64_t active_ = 1, next_ = 2, revision_ = 1;
   bool editing_ = false;
   using Tiles = std::vector<std::shared_ptr<const PaintTile>>;

@@ -37,17 +37,36 @@ raster work, AO batches and padding. No Python or graphics readback is used.
 Tangents and normal maps
 -----------------------
 Output normal maps default to glTF/OpenGL +Y. normal_y_down selects DirectX -Y.
-The native fallback computes UV derivatives and Gram-Schmidt orthogonalization
-against the interpolated low normal, preserving mirrored UV handedness. Source
-normal maps use the corresponding high tangent frame before projection into
-that low frame. Zero normal-map strength disables normal-map detail.
+The default now uses the pinned native MikkTSpace implementation
+from mmikk/MikkTSpace at 3e895b49d05ea07e4c2133156cfa94369e19e409, with the marked
+zero-bit seed-rotation correction in 0001-defined-seed-rotate.patch. Instrumenting
+the C source exposed upstream shifts by 32 when the rotate count is zero; both
+sort paths now mask the right-shift count. Original/patched hashes are recorded.
+Frames remain
+per triangle corner: averaging them onto shared vertex IDs would destroy
+mirrored tangent seams. Mesh authoring IDs, skin weights and morph topology
+remain unchanged. Normals, tangent and bitangent are interpolated consistently;
+the baker uses the full inverse of that interpolated frame, matching the GPU
+shader rather than assuming the interpolated basis is orthonormal.
 
-For assets whose consumer uses generated/imported MikkTSpace tangents, pass the
-actual low_tangents and source.tangents XYZ+W attributes. They are interpolated,
-orthogonalized and retain handedness; mixed handedness within a triangle is an
-explicit input error. This component does NOT claim to implement automatic
-MikkTSpace generation. The caller/mesh pipeline must preserve or generate the
-consumer's actual tangent attributes for precise cross-application consistency.
+Explicit low_tangents and source.tangents remain supported for imported consumer
+frames. The existing explicit-attribute path interpolates and orthogonalizes
+these frames and rejects mixed handedness within one triangle. The default
+Mikk path is used for Dome Sculpt's own baked surfaces. Source normal detail is
+read from BakeMaterial.normal_map or its composite TextureMaps.normal channel.
+When neither exists, retained original source normal views are evaluated in the
+same transformed-UV derivative basis as raw GPU preview, including mirrored
+handedness and normal_scale. Explicit supplied high tangents remain authoritative
+instead of that inferred basis. Raw source-only TextureMaps are also valid bake
+inputs: their original color/emission/ORM/AO views and affine wrap addressing are
+sampled directly, with material factors applied once. Sampling remains bilinear
+at texel centers; source mip footprints/minification reconstruction are not part
+of this CPU baker.
+
+Generation is capped at the native 2-million-vertex/triangle surface limits.
+Cancellation is checked before/after Mikk generation; upstream sorting/grouping
+has no internal cancellation callback. It stays on workers, but cancellation
+latency inside that bounded upstream phase is not yet independently proven.
 
 PBR transfer and color space
 ----------------------------
@@ -96,8 +115,8 @@ Quality/scope limits
 --------------------
 The kernel is a native CPU worker and has not been accelerator- or headset-tested.
 Sampling is one texel-center projection (AO is multisampled); supersampling,
-UDIM/multiple source UV sets, automatic cage fitting, automatic MikkTSpace tangent
-generation and distributed/out-of-core bake scheduling are not implemented here.
+UDIM/multiple source UV sets, automatic cage fitting and distributed/out-of-core
+bake scheduling are not implemented here.
 A dense native sculpt unwrapped directly at 64px exposed an existing atlas
 edge case (eight exactly zero-area UV triangles); baking rejects it explicitly. The
 validated high-to-low sculpt fixture uses a deliberately coarse closed target
@@ -117,14 +136,14 @@ copied. Existing xatlas is used by an integration fixture through the existing
 atlas API, not newly vendored or substituted. Its source provenance remains in
 third_party/sources.json, owned by the main integration agent.
 
-Direct Release test after building the core archive:
-  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/bake.cpp src/bake.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-bake-test
-  /tmp/dome-bake-test
+Use the configured CMake targets so pinned xatlas/MikkTSpace dependencies and
+whole-core sanitizer flags remain consistent:
+  cmake --build build --target dome-sculpt-bake-test dome-sculpt-baked-textures-test
+  ctest --test-dir build -R '^(bake|baked-textures)$' --output-on-failure
 
-Sanitizer command instruments baker, shared BVH and test code; the existing core
-and xatlas dependencies remain their configured Release archives:
-  c++ -std=c++20 -O0 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Iinclude -Ithird_party/openbrush tests/bake.cpp src/bake.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-bake-sanitized
-  ASAN_OPTIONS=detect_leaks=1 /tmp/dome-bake-sanitized
+For a sanitizer build, instrument both C and C++ (MikkTSpace is C) and configure
+DOME_BUILD_UI/XR=OFF. See the current HANDOFF.md and VALIDATION.md for actual
+whole-core runs rather than substituting the historical partial-link command.
 
 Fixtures cover tangent/UV handedness, imported tangent preservation, source
 normal maps, alpha/color-space/factor/vertex-color semantics, projection cage and
@@ -132,3 +151,82 @@ backface bounds, analytic AO radius, protected/missed texels, material-island
 padding, overlap policy, cancellation and resource/material validation. A native
 sculpted surface also passes through xatlas charts and native normal PNG encoding.
 No user asset or active session is changed by these private numerical fixtures.
+
+Persistent baked surfaces and guarded object transfer
+----------------------------------------------------
+PaintedMesh now owns an optional immutable BakedTextures base beneath all
+existing editable paint layers. It stores intrinsic color/alpha, linear ORM
+(including AO), sRGB emission, optional linear +Y normal and linear coverage.
+Coverage is independent of color alpha: 0 retains the material, 255 uses the
+bake, and fractional values retain filtered UV boundaries. Rebaking merges
+covered destination texels in linear light; protected/unwritten texels keep
+the previous base. A replacement may not discard an existing normal channel.
+Painting/erasing and local stroke history leave the base intact; snapshots and
+global scene history retain it exactly. clear_bake is explicit and undoable
+through Document::edit_scene. No paint layer is flattened or removed.
+
+UV reparameterization filters color/emission in linear space with premultiplied
+coverage, transfers ORM/AO and reorients normal vectors through old/new Mikk
+frames. A rotated or mirrored chart therefore retains object-space detail.
+Shared geometry/UV flags and deformation vertex identities remain intact.
+Normal maps are not ordinary RGB paint and must never be copied to changed UV
+orientations without this basis conversion.
+
+Scenes containing baked data use version 6; scenes without baked data use v5
+with grouped creator/source archives. Earlier supported scene versions remain
+readable, including the standalone baked-v5 checkpoint from 72d9127. Baked binary image/coverage lengths,
+map dimensions and versions are checked. Per-object maps plus paint tiles share
+a 128 MiB storage cap, the scene has a 256 MiB paint-storage cap plus the existing
+16 Mi texel cap, and the persisted file limit remains 256 MiB. These are storage
+bounds, not a complete transient/history/large-production-mesh memory model.
+Global scene history is still count-limited to 128 entries; a byte budget for
+all retained dense assets remains production work.
+
+Document::bake_from_object(sourceID, ObjectBakeSettings, AssetSource) queues a
+single ordered source-guarded asset transaction. The active target must be a
+visible, unlocked prepared painting mesh. Hidden/locked sources may be read.
+The high source samples its displayed pose/morph state or scalar-field surface;
+its complete original data remain unchanged. All objects use the target-local
+coordinate system, with front/back/AO bounds expressed in world millimetres and
+converted using the composed target world scale, including parent groups. Low targets must currently have unchanged rest
+geometry/normals; posed targets fail explicitly without stripping their rig.
+The bake preserves the target's geometry, deformation, material and paint-layer
+identities and installs only its base maps. Failures, misses, overlaps, stale
+sources and cancellation publish no partial result. One Undo/Redo restores the
+exact editable scene; ordered saves and scene-v6 loading retain the result.
+
+Unpainted original sources feed direct immutable bindings into the worker baker,
+avoiding a preliminary CPU image composite and a second resampling pass. Sources
+with visible paint or a baked base retain their complete composite.
+Original source normal views now participate in object baking; their original
+archive data remain preserved. Protected/fractional destination coverage converts
+original normal detail into canonical Mikk space before blending with the baked
+normal. Thus a partial bake does not neutralize untouched original detail. Raw
+preview eligibility is disabled while any baked base exists and restored by
+explicit clear (with exact global Undo). Changed-UV reparameterization of raw
+source-map objects still requires an explicit bake; it must not silently discard
+their original images or source-authored charts.
+
+The preview consumes worker-generated tangent corners and AO in indirect
+lighting. Render-only corner expansion preserves authoring topology. GLB uses
+normalTexture and shares its linear ORM image with occlusionTexture. Consumers
+which generate default Mikk tangents from the exported rest UVs use the same
+canonical algorithm. Explicit tangent export and full posed/deformed consumer
+shading comparisons remain additional production work; byte/schema validation
+is not a substitute for those interoperability fixtures.
+
+The FLTK/XR bake-source picker, distance/sample sliders, cage editing, preview,
+progress/cancel and clear/rebake commands still need authoring integration.
+The worker API and data path above are verified foundations, not a completed
+headset bake workflow or the full production objective.
+
+Watertight projection
+---------------------
+Curved-normal same-surface fixtures exposed missed projections along shared
+triangle edges in the old float Moller-Trumbore BVH hit test. SurfaceQuery ray
+hits now adapt the dominant-axis shear/edge method in the pinned Blender 5.4
+Alpha isect_ray_tri_watertight_v3[_precalc], using double intermediates and
+finite distance bounds. The BVH slab differences use double arithmetic too.
+Oblique shared-edge rays at millimetre/metre/100-metre scales hit without
+expanding real outside gaps. Existing parity-based voxel filling is unchanged.
+All source roles, exact commits, licenses and hashes are in the manifest.

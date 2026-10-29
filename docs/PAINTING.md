@@ -50,3 +50,9 @@ advanced seam re-unwrapping/stitching, production-scale acceleration, material i
 MToon are pending. Surface picking is a linear triangle scan; immutable surface
 maps and CPU compositing have explicit memory/resolution budgets. Physical
 headset/controller/stylus use has not been verified on this machine.
+
+Baked base maps are now persistent native assets beneath editable paint layers;
+see BAKING.txt. Color/alpha, emission, ORM/AO, normal and filtered coverage survive
+snapshot/save/undo and UV reparameterization. The guarded object bake API is
+available, while its FLTK/XR authoring controls remain unfinished. Scenes with
+this data use version 5; earlier projects remain readable.

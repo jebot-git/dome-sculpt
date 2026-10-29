@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/creation.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
 using namespace dome;
@@ -21,6 +22,19 @@ float value(const Scene &s, uint64_t object, size_t vertex, uint32_t joint) {
 }
 WeightToolSettings tool() { WeightToolSettings s; s.enabled = true; s.strength = .5f; s.mode = WeightBrushMode::Replace; return s; }
 Brush stamp(Vec3 p) { Brush b; b.from = b.to = p; b.radius = .2f; b.normal = {0, 0, 1}; b.pressure = 1; return b; }
+void bake_active(Scene &scene) {
+  auto painted = std::make_shared<PaintedMesh>(*scene.active().painted);
+  auto image = [](std::array<uint8_t,4> color) {
+    Image result{64,64,std::vector<uint8_t>(64*64*4)};
+    for (size_t i=0;i<result.rgba.size();++i) result.rgba[i]=color[i%4];
+    return result;
+  };
+  BakedTextures bake;
+  bake.maps.color=image({200,150,100,255}); bake.maps.metal_rough=image({255,128,0,255});
+  bake.maps.emission=image({0,0,0,255}); bake.maps.normal=image({128,128,255,255});
+  bake.coverage.assign(64*64,255); painted->install_bake(std::move(bake));
+  scene.active().painted=std::move(painted);
+}
 struct Controller {
   Document &doc; SpatialFrame f;
   Controller(Document &d) : doc(d) { f.focused = f.head_valid = true; f.head.position = {0, 1.6f, 0}; f.hands[1].tracked.valid = true; send(); }
@@ -60,6 +74,39 @@ int main(int argc, char **argv) try {
   Document doc; doc.replace(original.snapshot()); doc.weight_settings(settings, 1); check(doc.wait_mesh(), "Weight debug and posed picking snapshot completes on mesh worker");
   check(doc.frame().surface->selected_weights.size() == doc.frame().surface->mesh.positions.size() && doc.frame().surface->picking,
         "Published immutable snapshot includes exact weight attributes and worker-built BVH");
+  {
+    auto baked=original.snapshot(); bake_active(baked);
+    Document combined; combined.replace(std::move(baked)); combined.weight_settings(settings,1);
+    check(combined.wait_mesh() && combined.frame().state->error.empty(),
+          "Baked normal surfaces and weight visualization publish together on the mesh worker");
+    auto surface=combined.frame().surface;
+    check(surface->selected_weights.size()==surface->mesh.positions.size() &&
+          surface->tangents.size()==surface->mesh.positions.size() && surface->picking &&
+          surface->ranges.front().textures && !surface->ranges.front().textures->normal.rgba.empty(),
+          "Canonical tangent expansion retains every weight attribute and posed picking geometry");
+  }
+  {
+    Scene avatar; append_humanoid(avatar,humanoid_baseline_defaults("vroid-beta-female"),"CC0",{},64);
+    auto id=avatar.active().id; bake_active(avatar);
+    auto rest=avatar.active().painted->mesh(); auto appearance=avatar.active().appearance;
+    auto source_vertices=appearance->source_vertices;
+    Document combined; combined.replace(std::move(avatar)); combined.weight_settings(settings,1);
+    check(combined.wait_mesh(std::chrono::seconds(60)) && combined.frame().state->error.empty(),
+          "Actual CC0 avatar publishes canonical baked normals with linked weight visualization");
+    auto surface=combined.frame().surface;
+    auto range=std::find_if(surface->ranges.begin(),surface->ranges.end(),[&](const auto &r){return r.object==id;});
+    check(range!=surface->ranges.end() && range->appearance && range->count==rest.indices.size() &&
+          range->appearance->source_vertices.size()==rest.indices.size(),
+          "Baked avatar render-only corner expansion retains a complete original-image vertex remap");
+    for(size_t corner=0;corner<rest.indices.size();++corner)
+      if(range->appearance->source_vertices[corner]!=source_vertices.at(rest.indices[corner]))
+        throw std::runtime_error("Expanded source UV identity differs from original corner");
+    check(surface->selected_weights.size()==surface->mesh.positions.size() &&
+          surface->tangents.size()==surface->mesh.positions.size() &&
+          combined.copy_scene().object(id).appearance->source_vertices==source_vertices &&
+          appearance->source_vertices==source_vertices,
+          "Every expanded source identity is exact while authored source records stay immutable");
+  }
   check(!doc.frame().state->dirty && doc.begin_desktop(), "Opening weight view changes no saved scene and can acquire a stroke");
   doc.stamp_desktop(stamp(b.from)); doc.cancel_desktop();
   check(doc.copy_scene().encode() == source && !doc.frame().state->dirty, "Cancelled desktop gesture changes no weights or history");

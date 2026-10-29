@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/tangents.hpp"
 #include "dome/creation.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/vrm.hpp"
@@ -1039,32 +1040,46 @@ void Document::mesh_loop() {
       for (auto &o : objects) {
         if (o.deformation) o.mesh = o.preview_mesh();
         auto world = o.world_transform();
-        size_t offset = snapshot->mesh.positions.size(),
-               first = snapshot->mesh.indices.size();
-        for (auto p : o.mesh.positions)
-          snapshot->mesh.positions.push_back(
-              vec(ob::transform(world, obv(p))));
-        if (job->weight_view) {
-          bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
-          for (size_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) {
+        size_t offset = snapshot->mesh.positions.size(), first = snapshot->mesh.indices.size();
+        bool canonical = o.textures && !o.textures->normal.rgba.empty();
+        bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
+        auto frames = canonical ? tangent_corners(o.mesh, [&] { return stopping_.load(); })
+                                : std::vector<Tangent>{};
+        auto append = [&](uint32_t vertex, Tangent tangent) {
+          snapshot->mesh.positions.push_back(vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
+          snapshot->mesh.normals.push_back(vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
+          snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
+          auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
+          snapshot->tangents.push_back({direction.x,direction.y,direction.z,tangent[3]});
+          if (job->weight_view) {
             float value = selected ? 0.f : -1.f;
             if (selected) for (auto influence : o.deformation->skin->vertices.at(vertex))
               if (influence.joint == job->weight_joint) value = influence.weight;
             snapshot->selected_weights.push_back(value);
           }
+        };
+        std::shared_ptr<const CreatorAppearance> appearance = o.appearance;
+        if (canonical) {
+          std::shared_ptr<CreatorAppearance> expanded;
+          if (o.appearance) {
+            if (o.appearance->source_vertices.size() != o.mesh.positions.size())
+              throw std::runtime_error("Render-only source remap differs from rest vertex count");
+            expanded = std::make_shared<CreatorAppearance>(*o.appearance);
+            expanded->source_vertices.clear(); expanded->source_vertices.reserve(o.mesh.indices.size());
+          }
+          // Expand only this render snapshot. Rest meshes, skin/morph indices
+          // and original source records remain immutable in Scene/history.
+          for (size_t corner = 0; corner < o.mesh.indices.size(); ++corner) {
+            auto vertex = o.mesh.indices[corner]; append(vertex, frames.at(corner));
+            snapshot->mesh.indices.push_back(uint32_t(offset + corner));
+            if (expanded) expanded->source_vertices.push_back(o.appearance->source_vertices.at(vertex));
+          }
+          if (expanded) appearance = std::move(expanded);
+        } else {
+          for (uint32_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(vertex, {1,0,0,1});
+          for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
-        for (auto n : o.mesh.normals)
-          snapshot->mesh.normals.push_back(
-              vec(ob::rotate(world.orientation, obv(n))));
-        if (o.mesh.uv.empty())
-          snapshot->mesh.uv.resize(snapshot->mesh.positions.size(), {0, 0});
-        else
-          snapshot->mesh.uv.insert(snapshot->mesh.uv.end(), o.mesh.uv.begin(),
-                                   o.mesh.uv.end());
-        for (auto index : o.mesh.indices)
-          snapshot->mesh.indices.push_back(uint32_t(offset + index));
-        snapshot->ranges.push_back(
-            {o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance, offset});
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset});
       }
       if (job->weight_view && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<SurfaceQuery>(snapshot->mesh, [&] { return stopping_.load(); });

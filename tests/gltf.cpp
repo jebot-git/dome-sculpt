@@ -5,6 +5,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -164,6 +165,31 @@ int main() try {
             "Embedded PNG preserves exact PBR texels and image orientation");
     png_image_free(&decoded);
   }
+  auto detailed_maps = std::make_shared<dome::TextureMaps>(*maps);
+  detailed_maps->normal = {128,128,std::vector<uint8_t>(128*128*4)};
+  for (size_t i=0;i<detailed_maps->normal.rgba.size();++i)
+    detailed_maps->normal.rgba[i]=std::array<uint8_t,4>{128,204,230,255}[i%4];
+  objects[0].textures=detailed_maps;
+  dome::export_glb(objects,path);
+  raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts normal/AO baked GLB");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> detailed(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success && raw->images_count==4 &&
+          raw->materials[0].normal_texture.texture &&
+          raw->materials[0].occlusion_texture.texture==raw->materials[0].pbr_metallic_roughness.metallic_roughness_texture.texture,
+          "glTF exports a tangent normal map and binds AO to the shared linear ORM red channel");
+  auto image=raw->materials[0].normal_texture.texture->image;
+  auto view=image->buffer_view;
+  auto normal_data=static_cast<const uint8_t*>(view->buffer->data)+view->offset;
+  png_image normal{};normal.version=PNG_IMAGE_VERSION;
+  require(png_image_begin_read_from_memory(&normal,normal_data,view->size),"Independent PNG decoder reads the normal map");
+  normal.format=PNG_FORMAT_RGBA;std::vector<uint8_t> normal_bytes(PNG_IMAGE_SIZE(normal));
+  require(png_image_finish_read(&normal,nullptr,normal_bytes.data(),0,nullptr) &&
+          normal_bytes==detailed_maps->normal.rgba,
+          "Normal-map PNG bytes preserve linear XYZ values without an sRGB conversion");
+  png_image_free(&normal);
 
   // Independent source samplers/normal/AO survive both raw and painted modes.
   auto source = std::make_shared<dome::PaintSourceMaps>();
@@ -195,6 +221,11 @@ int main() try {
           sm.normal_texture.texture->sampler->min_filter==9987 &&
           sm.occlusion_texture.texture && sm.occlusion_texture.scale==.35f,
           "Normal/AO scale, UV transform and independent samplers survive export");
+  auto invalid_raw=std::make_shared<dome::TextureMaps>(*source_maps);
+  invalid_raw->baked_base=std::make_shared<const dome::BakedTextures>();
+  auto raw_with_bake=objects;raw_with_bake[0].textures=invalid_raw;
+  bool bypass_rejected=false;try{dome::export_glb(raw_with_bake,path);}catch(const std::invalid_argument&){bypass_rejected=true;}
+  require(bypass_rejected,"Raw source markers cannot bypass an immutable baked payload");
   auto imported=std::make_shared<dome::ImportedAsset>();imported->mode=dome::ImportMode::PreserveGltf;
   dome::ImportedPrimitive source_primitive; source_primitive.mesh=mesh; source_primitive.source_mesh=0; source_primitive.source_primitive=0;
   source_primitive.uv1=mesh.uv;
@@ -219,6 +250,24 @@ int main() try {
           "Original compacted vertex color and secondary UV accessors survive exactly");
   require(cgltf_accessor_read_float(cgltf_find_accessor(&source_p,cgltf_attribute_type_tangent,0),0,source_value,4) && source_value[3]==-1,
           "Source tangent handedness remains authored");
+  // Source-authored tangent preservation is a separate fixture from a bake
+  // that explicitly selects canonical Mikk frames.
+  auto read_file=[&]{std::ifstream input(path,std::ios::binary);return std::vector<uint8_t>{std::istreambuf_iterator<char>(input),{}};};
+  auto existing=read_file();auto conflicting=objects;
+  dome::Mesh tangent_plane;
+  tangent_plane.positions={{0,0,0},{1,0,0},{0,1,0}};
+  tangent_plane.normals.assign(3,{0,0,1});tangent_plane.uv={{0,0},{1,0},{0,1}};tangent_plane.indices={0,1,2};
+  auto conflicting_asset=std::make_shared<dome::ImportedAsset>();conflicting_asset->mode=dome::ImportMode::PreserveGltf;
+  dome::ImportedPrimitive conflicting_primitive;conflicting_primitive.source_mesh=conflicting_primitive.source_primitive=0;
+  conflicting_primitive.mesh=tangent_plane;conflicting_primitive.tangents.assign(3,{0,1,0,1});conflicting_asset->primitives={conflicting_primitive};
+  auto conflicting_identity=std::make_shared<dome::CreatorAppearance>();conflicting_identity->asset=conflicting_asset;
+  conflicting_identity->source_mesh=conflicting_identity->source_primitive=0;conflicting_identity->source_vertices={0,1,2};conflicting_identity->source_basis_quaternion=dome::Quat{};
+  conflicting[0].mesh=tangent_plane;conflicting[0].appearance=conflicting_identity;conflicting[0].textures=detailed_maps;
+  bool conflict_tangent=false;
+  try{dome::export_glb(conflicting,path);}catch(const std::invalid_argument&){conflict_tangent=true;}
+  require(conflict_tangent && read_file()==existing,
+          "Conflicting authored tangents and canonical baked normals reject without replacing output");
+  objects[0].appearance.reset();
   auto derived=std::make_shared<dome::TextureMaps>(*maps); derived->source_maps=source;
   objects[0].textures=derived; dome::export_glb(objects,path);
   raw=nullptr;
@@ -227,16 +276,38 @@ int main() try {
   std::unique_ptr<cgltf_data,decltype(&cgltf_free)> derived_file(raw,cgltf_free);
   require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
           cgltf_validate(raw)==cgltf_result_success &&
-          raw->materials[0].normal_texture.texture && raw->materials[0].occlusion_texture.texture &&
+          raw->materials[0].normal_texture.texture && raw->materials[0].normal_texture.scale==.6f &&
+          raw->materials[0].normal_texture.has_transform &&
+          raw->materials[0].occlusion_texture.texture==raw->materials[0].pbr_metallic_roughness.metallic_roughness_texture.texture &&
+          raw->materials[0].occlusion_texture.scale==1 &&
           raw->materials[0].pbr_metallic_roughness.base_color_factor[0]==1,
-          "Derived composites retain source normal/AO without double factors");
+          "Derived composites retain raw normal binding and composed ORM AO without double factors");
+  auto mixed=std::make_shared<dome::TextureMaps>(*detailed_maps);mixed->source_maps=source;
+  objects[0].textures=mixed;
+  dome::export_glb(objects,path);raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts baked maps with retained original source bindings");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> mixed_file(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success && raw->images_count==4 &&
+          !raw->materials[0].normal_texture.has_transform && raw->materials[0].normal_texture.scale==1 &&
+          raw->materials[0].occlusion_texture.texture==raw->materials[0].pbr_metallic_roughness.metallic_roughness_texture.texture &&
+          raw->materials[0].occlusion_texture.scale==1,
+          "Baked normal and composite AO take precedence over retained raw views without double scale or stale UV transforms");
+  auto mixed_normal=raw->materials[0].normal_texture.texture->image->buffer_view;
+  png_image mixed_png{};mixed_png.version=PNG_IMAGE_VERSION;
+  require(png_image_begin_read_from_memory(&mixed_png,static_cast<const uint8_t*>(mixed_normal->buffer->data)+mixed_normal->offset,mixed_normal->size),
+          "Independent PNG decoder reads mixed-source baked normal");
+  mixed_png.format=PNG_FORMAT_RGBA;std::vector<uint8_t> mixed_bytes(PNG_IMAGE_SIZE(mixed_png));
+  require(png_image_finish_read(&mixed_png,nullptr,mixed_bytes.data(),0,nullptr)&&mixed_bytes==detailed_maps->normal.rgba,
+          "Mixed-source GLB retains the actual baked normal bytes");png_image_free(&mixed_png);
   auto invalid_source=std::make_shared<dome::PaintSourceMaps>(*source);
   invalid_source->normal.uv_transform={1,.5f,0,1,0,0};
   auto invalid_maps=std::make_shared<dome::TextureMaps>(*source_maps); invalid_maps->source_maps=invalid_source;
   objects[0].textures=invalid_maps;
   bool shear_rejected=false; try{dome::export_glb(objects,path);}catch(const std::invalid_argument&){shear_rejected=true;}
   require(shear_rejected,"Unrepresentable texture shear rejects instead of changing texture coordinates");
-  objects[0].textures=maps; objects[0].material=dome::Material{};
+  objects[0].textures=detailed_maps; objects[0].material=dome::Material{};
 
   // Full deformation is exported from the untouched authoring surface, never
   // from the already posed preview. Five influences require a second set.
@@ -351,7 +422,8 @@ int main() try {
                        transform(object_world, preview.positions[0])) < 2e-5f,
           "Independent glTF skin/morph evaluation matches native posed preview "
           "under object rotation/scale");
-  require(raw->images_count == 3, "Rig export retains painted PBR images");
+  require(raw->images_count == 4 && raw->materials[0].normal_texture.texture,
+          "Rig export retains painted PBR and normal images");
   if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
     std::filesystem::copy_file(
         path, std::string(fixture) + ".skin.glb",

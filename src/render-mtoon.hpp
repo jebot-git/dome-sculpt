@@ -26,11 +26,11 @@ return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[t
 )GLSL";
 }
 inline std::string mtoon_renderer_vertex(){return std::string("#version 330 core\n")+mtoon_renderer_common()+R"GLSL(
-layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;
+layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;layout(location=5)in vec4 tangent;
 uniform mat4 model,mvp,view_projection;uniform vec3 camera;
-out vec3 world,n;out vec2 texcoord,texcoord1;out float weight_value;
+out vec3 world,n,canonical_t,canonical_b;out vec2 texcoord,texcoord1;out float weight_value;
 void main(){vec4 p=model*vec4(position,1);vec3 N=dome_mtoon_unit(mat3(model)*normal),V=dome_mtoon_unit(camera-p.xyz);
-world=p.xyz;n=N;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;gl_Position=mvp*vec4(position,1);
+world=p.xyz;n=N;canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(N,canonical_t)*tangent.w;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;gl_Position=mvp*vec4(position,1);
 if(mt_mode==1&&mt_outline==1&&selected_weight<0){float mask=mt_scalar(8,mt_read(8,mt_uv(8,uv,uv1,N,V,1)));
 float width=mt_scalar(7,mt_read(7,mt_uv(7,uv,uv1,N,V,mask)));
 if(int(mt[10].x+.5)==1){world+=N*dome_mtoon_outline_world_width(mt,width);gl_Position=view_projection*vec4(world,1);}
@@ -38,14 +38,28 @@ else if(int(mt[10].x+.5)==2){vec2 projected=(view_projection*vec4(N,0)).xy;vec3 
 vec3 viewNormal=vec3(dot(N,right),dot(N,mt_camera_up),-dot(N,mt_camera_forward));gl_Position.xy+=dome_mtoon_outline_clip_offset(mt,projected,viewNormal,gl_Position.w,mt_aspect,width);}
 }})GLSL";}
 inline std::string mtoon_renderer_fragment(){return R"GLSL(
-uniform vec4 mt_effective_color,mt_native_color;uniform int mt_shade_alias;
+uniform vec4 mt_effective_color,mt_native_color;uniform int mt_shade_alias,mt_baked_normal;
+// Reconstruct canonical detail in coverage-premultiplied space. Protected
+// texels may contain arbitrary unused normal bytes and must not bleed in.
+vec3 mt_baked_detail(out float coverage){
+ivec2 size=textureSize(tex13,0);vec2 p=texcoord*vec2(size)-.5;ivec2 base=ivec2(floor(p));vec2 f=fract(p);vec3 sum=vec3(0);coverage=0;
+for(int y=0;y<2;++y)for(int x=0;x<2;++x){ivec2 q=clamp(base+ivec2(x,y),ivec2(0),size-1);float w=(x==1?f.x:1-f.x)*(y==1?f.y:1-f.y)*texelFetch(tex15,q,0).r;coverage+=w;sum+=(texelFetch(tex13,q,0).rgb*2-1)*w;}
+return coverage>1e-8?sum/coverage:vec3(0,0,1);
+}
 vec4 mt_surface(vec3 geometric,vec3 V,out bool killed){
 vec3 N=dome_mtoon_unit(geometric);float mask=mt_scalar(8,mt_read(8,mt_uv(8,texcoord,texcoord1,N,V,1)));
 vec2 normalUV=mt_uv(2,texcoord,texcoord1,N,V,mask),a=dFdx(normalUV),b=dFdy(normalUV);vec3 dx=dFdx(world),dy=dFdy(world);
 float determinant=a.x*b.y-a.y*b.x;vec4 tangent=vec4(1,0,0,1);bool valid=abs(determinant)>1e-8*max(length(a)*length(b),1e-20);
 if(valid){vec3 T=(dx*b.y-dy*a.y)/determinant,B=(dy*a.x-dx*b.x)/determinant;T=dome_mtoon_unit(T-N*dot(N,T));tangent=vec4(T,dot(cross(N,T),B)<0?-1:1);}
+if(mt_baked_normal==0){
 if(valid)N=dome_mtoon_material_normal(mt,N,tangent,mt_read(2,normalUV).rgb,V,gl_FrontFacing,mt_outline==1);
 else N=dome_mtoon_facing_normal(int(mt[8].x),N,V,gl_FrontFacing,mt_outline==1);
+}else{
+bool back=mt[8].x>.5&&!gl_FrontFacing;vec3 original=back?-N:N;
+if(valid&&mt[11].x>.5){vec3 T=tangent.xyz,B=cross(original,T)*tangent.w,ts=dome_mtoon_normal_map(mt_read(2,normalUV).rgb,mt[6].z);original=dome_mtoon_unit(T*ts.x+B*ts.y+original*ts.z);}
+float coverage;vec3 detail=mt_baked_detail(coverage);vec3 canonical=dome_mtoon_unit(canonical_t*detail.x+(back?-canonical_b:canonical_b)*detail.y+(back?-geometric:geometric)*detail.z);
+N=dome_mtoon_unit(mix(original,canonical,coverage));if(mt[8].x<.5)N=dome_mtoon_facing_normal(0,N,V,gl_FrontFacing,mt_outline==1);
+}
 DomeMToonSamples s;s.base=mt_read(0,mt_uv(0,texcoord,texcoord1,N,V,mask));s.shade=mt_read(1,mt_uv(1,texcoord,texcoord1,N,V,mask)).rgb;
 if(mt_derived[0]!=0){float coverage=mt_read(11,texcoord).r;vec4 original=mt_read(12,mt_uv(12,texcoord,texcoord1,N,V,mask));vec4 pbr=mt_read(14,mt_uv(14,texcoord,texcoord1,N,V,mask));
 vec3 paint=coverage==0?vec3(0):max(vec3(0),s.base.rgb-mt_native_color.rgb*pbr.rgb*(1-coverage));

@@ -3,7 +3,9 @@ Original source GPU preview without CPU texture baking
 
 PaintedMesh::preview(material) selects an immutable TextureMaps marker with
 source_only=true and original source_maps when no visible layer contributes
-channel coverage through its mask/opacity. Its derived Image buffers are empty;
+channel coverage through its mask/opacity and no persistent baked base exists.
+Installing any bake forces the derived preview; clear restores raw eligibility.
+Its derived Image buffers are empty;
 original RGBA images, dimensions, sampler/UV/channel metadata and ownership stay
 unchanged. Eligibility is cached by the existing unique content token, and source
 alpha classification is scanned once per lineage. Hidden, zero-opacity, mask-only,
@@ -25,6 +27,11 @@ factors apply once to raw inputs. Derived composite inputs use neutral factors
 because those factors were baked by the CPU compositor. Raw metal/rough R is not
 implicitly AO: independent raw occlusion R uses occlusion_strength; derived ORM R
 already contains the composed AO. Missing slots use material/neutral defaults.
+Derived canonical normal maps use worker-generated Mikk tangent corners and take
+precedence over retained original normal views. Derived maps with no canonical
+normal continue using their original normal view and derivative basis. The
+bounded GPU image cache retains both kinds with correct linear encoding, and
+geometry-only updates still reuse image storage.
 
 Color/emission images use GL_SRGB8_ALPHA8; ORM/normal/AO use GL_RGBA8. Texture RGB
 is decoded/filterable in linear space, while alpha/data remain linear. Independent

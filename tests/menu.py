@@ -613,6 +613,9 @@ async def main():
         nodes,_=await layout()
         check(nodes["Undo"][1].get("enabled") is True,"UV edits export their own available Undo command")
         await click("Undo")
+        # Menu dispatch and GL redraw complete on separate event-loop turns.
+        # Await the exact restored pixels before checking the exported history.
+        await wait(lambda: uv_pixels().tobytes()==before_uv.tobytes())
         nodes,_=await layout()
         check(uv_pixels().tobytes()==before_uv.tobytes() and nodes["Redo"][1].get("enabled") is True,"Universal Edit Undo restores the UV draft and offers draft Redo")
         await click("Close Window")

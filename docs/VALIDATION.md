@@ -416,3 +416,31 @@ hardware54/software54/instrumented54 and source/morph/UV component scopes are
 recorded in focused docs. This is NOT an exact merged-source full run. Remote
 baking/Mikk af492ee must merge preserving both histories, then get fresh pinned
 Release/GUI/sanitizer checks before publication. Full goal remains incomplete.
+
+
+## Remote source-aware bake merge now in progress
+
+Origin af492ee is being merged preserving both histories. See VALIDATION-af492ee.md
+for the other workspace evidence; it is not fresh validation of this merged tree.
+Scene-v6 baked persistence, original-aware normal/AO projection, canonical Mikk
+tangents and GPU/export coverage must coexist with local MToon/linear targets,
+UV/weight/controller authoring and source morph/VRM guards. Exact merged-source
+Release/GUI/sanitizer verification is still required before push.
+
+## Working merged tree with updated canonical FLTK
+
+DomeD main282467e includes the eaeb8e0 popup-parent fix. Its clean canonical
+22-patch Release toolkit was built into artifacts/toolkit-282467e and the client
+rebuilt against it; actual ldd resolution is in linkage-toolkit-282467e.log.
+All47 Release suites pass147.90s in tests-authoring-merged.log, including the
+real-loader synthetic XR client87.87s. General menus53/53 and baked-surface
+painting/Undo/UV-Cancel5/5 pass in menu-authoring-merged.log and
+baked-gui-authoring-merged.log. Generated bake fixture remains in
+artifacts/bake-workflow-merged; baked-baseline.png was visually inspected.
+The owned merged UV checks pass79existing +55workflow cases, and the renderer
+agent reports64ArcA770/64llvmpipe cases plus39cache cases. Agent GPU sanitizer
+scope instruments renderer/paint/source/tangents/test, with Release core/Mikk
+dependencies and Mesa leak detection disabled; this is not whole-core evidence.
+The working tree includes an unstaged additive lazy-UV helper; these results
+must not be relabeled an exact merge-commit validation. A fresh committed-source
+Release/sanitizer build and current-compositor verification are next.

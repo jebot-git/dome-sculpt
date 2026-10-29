@@ -1,10 +1,15 @@
 # Source-aware glTF export
 
-The native GLB writer preserves independent original normal/AO images, strengths,
-samplers and UV transforms for derived painted surfaces. Source-only texture
-snapshots additionally export raw base/metallic-roughness/emission images with
-material factors applied exactly once. Derived paint composites retain neutral
-factors because their texels already contain those factors.
+The native GLB writer preserves independent original normal images, strengths,
+samplers and UV transforms unless a canonical baked normal channel replaces the
+rendered normal. The retained source archive remains intact. Source-only texture
+snapshots export all raw color/ORM/emission/normal/AO bindings with factors and
+strengths applied once. Derived paint composites export their ORM red channel
+as occlusion, since it already contains original strength and any baked AO; an
+original AO view must not overwrite that composed result. Canonical baked normals
+use their own UV0/clamp/linear binding and scale 1, preserving original raw normal
+metadata only in the source archive. Derived paint composites retain neutral
+material factors because their texels already contain those factors.
 
 PNG images are shared by immutable image identity independently of sampler
 identity. Sampler constants and default omissions survive; a single image can

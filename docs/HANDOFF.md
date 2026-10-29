@@ -10,8 +10,9 @@ No installation or active compositor/display-manager restart has been performed.
 
 Public last local checkpoint was c95208b (application1f6698a). New local agent
 milestones a5a2794/69da9df/2eb45ba/032f67a/b1d1223 add VRM0, conformal UV,
-MToon/linear rendering and shared source morph transport. Root is committing
-native/controller weight painting and background export plus integration hooks.
+MToon/linear rendering and shared source morph transport. Root committed
+native/controller weight painting and background export plus integration hooks
+in f5b912f. The af492ee merge is now resolved but not yet committed.
 
 Remote main advanced to af492ee during this work: a separate workspace merged
 source-aware baking/Mikk tangents and modern archives with c95208b. Fetch is
@@ -66,8 +67,11 @@ decoded), and RGBA8 XR now contains correct linear accent (now format-aware).
 - Previous exact1f6698a:37Release,4whole-core sanitizer,53general menus,8rig,
  8real DomeD checks. These prove that historical source, not pending merge.
 
-Canonical DomeD remote still7322b0e when rechecked, same22FLTK1.4.5 patches and
-fresh Release compositor/toolkit. Preserve unrelated DomeD/qimgvr source edits.
+Canonical DomeD remote advanced to282467e during merge validation; eaeb8e0
+updates the popup patch. The new22-patch Release toolkit has been built into
+artifacts/toolkit-282467e and the client rebuilt against it. A clean latest
+Release compositor build is running separately; see TOOLKIT.md. Preserve
+unrelated DomeD/qimgvr source edits.
 Physical headset/controllers/stylus/3D mouse and accelerator backends remain
 unverified; no full production or all-requirement completion claim.
 
@@ -90,3 +94,21 @@ After merge/pinned verification, continue real weight transfer/auto-bind and rig
 morph creation UI, source UV bake, bake controls, retopology/cuts/procedural tools,
 production sculpt masks/symmetry/local meshing and all device/backend rows. Keep
 full REQUIREMENTS objective active; do not reduce it to avatars or this milestone.
+
+
+## Remote source-aware bake merge now in progress
+
+Origin af492ee is being merged preserving both histories. See HANDOFF-af492ee.md
+for the other workspace evidence; it is not fresh validation of this merged tree.
+Scene-v6 baked persistence, original-aware normal/AO projection, canonical Mikk
+tangents and GPU/export coverage must coexist with local MToon/linear targets,
+UV/weight/controller authoring and source morph/VRM guards. All conflicts are
+resolved, and the full merged Release build succeeds. New regression checks
+cover canonical tangent corners plus per-vertex weights, original source UV
+identity expansion, baked UV normal rotation and bake memory accounting.
+All47 updated-toolkit Release suites pass in147.90s, including the real-loader
+synthetic XR client87.87s (artifacts/tests-authoring-merged.log). General native
+universal menus53/53 and baked-surface GUI5/5 pass; the blue baked capture was
+visually inspected. Native linkage resolves the updated toolkit lib64 files.
+These working-tree results include the unstaged additive lazy-UV helper, so an
+exact committed-source build and sanitizer checks are still required before push.

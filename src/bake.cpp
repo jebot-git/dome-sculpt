@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
+#include "dome/tangents.hpp"
+#include "dome/source-maps.hpp"
 #include <algorithm>
 #include <cmath>
 #include <deque>
@@ -8,6 +10,10 @@
 namespace dome {
 namespace {
 constexpr float Pi = 3.14159265358979323846f;
+const Image *normal_image(const BakeMaterial &material) {
+  if (material.normal_map) return material.normal_map.get();
+  return material.maps && !material.maps->normal.rgba.empty() ? &material.maps->normal : nullptr;
+}
 void cancel(const BakeOptions &o) {
   if (o.cancelled && o.cancelled()) throw std::runtime_error("Mesh baking cancelled");
 }
@@ -74,6 +80,17 @@ struct Channels { std::array<float,4> color; std::array<float,3> emission; float
 Channels material(const BakeMaterial &m, std::array<float,2> uv) {
   Channels result{m.material.color,m.material.emissive,m.material.roughness,m.material.metallic,1};
   if (!m.maps) return result;
+  if(m.maps->source_only){
+    const auto &raw=*m.maps->source_maps;
+    auto color=sample_source_texture(raw.color,uv[0],uv[1],true),
+         orm=sample_source_texture(raw.metal_rough,uv[0],uv[1],false),
+         emission=sample_source_texture(raw.emission,uv[0],uv[1],true);
+    for(int c=0;c<4;++c)result.color[c]*=color[c];
+    for(int c=0;c<3;++c)result.emission[c]*=emission[c];
+    result.roughness*=orm[1];result.metallic*=orm[2];
+    if(raw.occlusion.image)result.ao=1-raw.occlusion_strength*(1-sample_source_texture(raw.occlusion,uv[0],uv[1],false)[0]);
+    return result;
+  }
   auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false),
        emission=sample(m.maps->emission,uv,m.repeat_uv,true);
   for (int i=0;i<4;++i) result.color[i]=color[i]*(m.maps_are_composited?1:result.color[i]);
@@ -142,7 +159,15 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
   for (const auto &m:source.materials) {
     m.material.validate();
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
-    if (m.maps) { m.maps->color.validate(); m.maps->metal_rough.validate(); m.maps->emission.validate(); }
+    if (m.maps) {
+      if(m.maps->source_maps)m.maps->source_maps->validate();
+      if(m.maps->source_only){
+        if(!m.maps->source_maps||m.maps->source_maps->empty())throw std::invalid_argument("Raw bake source needs original texture bindings");
+        if(m.maps->color.width||m.maps->metal_rough.width||m.maps->emission.width||m.maps->normal.width)throw std::invalid_argument("Raw bake source cannot also contain derived maps");
+      }else{m.maps->color.validate(); m.maps->metal_rough.validate(); m.maps->emission.validate();}
+      if (!m.maps->normal.rgba.empty() || m.maps->normal.width || m.maps->normal.height)
+        m.maps->normal.validate();
+    }
     if (m.normal_map) m.normal_map->validate();
     if ((m.maps||m.normal_map)&&source.mesh.uv.size()!=source.mesh.positions.size()) throw std::invalid_argument("Textured high mesh requires UV coordinates");
   }
@@ -169,6 +194,18 @@ void pad(BakeResult &result,const BakeOptions &o) {
 } // namespace
 BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
   cancel(o); validate(low,source,o); SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
+  auto low_frames = o.low_tangents.empty() ? tangent_corners(low, o.cancelled)
+                                         : std::vector<Tangent>{};
+  std::vector<Tangent> high_frames;
+  if (source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
+        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) {
+    high_frames = tangent_corners(source.mesh, o.cancelled);
+    for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
+      auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
+      if (normal_image(source.materials[id]) && source.materials[id].normal_strength > 0)
+        basis(source.mesh, t, normalized(source.mesh.normals[source.mesh.indices[t*3]]), {1,0,0});
+    }
+  }
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
@@ -200,7 +237,15 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
       if (owner[at]!=UINT32_MAX) { ++result.overlapping; continue; }
       owner[at]=uint32_t(triangle);
       auto position=interpolate(low,triangle,bary,false),normal=interpolate(low,triangle,bary,true);
-      auto frame=basis(low,triangle,normal,bary,o.low_tangents); Vec3 offset=normal*o.front_distance;
+      TangentFrame frame;
+      if (o.low_tangents.empty()) {
+        frame = tangent_frame(low, low_frames, triangle, bary);
+        normal = normalized(frame.normal);
+      } else {
+        auto supplied = basis(low,triangle,normal,bary,o.low_tangents);
+        frame = {supplied.tangent, supplied.bitangent, supplied.normal};
+      }
+      Vec3 offset=normal*o.front_distance;
       if (!o.cage_positions.empty()) {
         Vec3 cage; for (int i=0;i<3;++i) cage+=o.cage_positions[low.indices[triangle*3+i]]*bary[i]; offset=cage-position;
       }
@@ -215,13 +260,36 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
       auto channels=material(m,high_uv); auto high_normal=normalized(hit->normal);
       if(!source.colors.empty()){std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];for(int c=0;c<4;++c)channels.color[c]*=tint[c];}
-      if (m.normal_map&&m.normal_strength>0) {
-        auto tangent=basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents); auto sampled=sample(*m.normal_map,high_uv,m.repeat_uv,false);
+      if (normal_image(m)&&m.normal_strength>0) {
+        TangentFrame tangent;
+        if (source.tangents.empty())
+          tangent = tangent_frame(source.mesh, high_frames, hit->triangle, hit->barycentric);
+        else {
+          auto supplied = basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
+          tangent = {supplied.tangent, supplied.bitangent, supplied.normal};
+        }
+        auto sampled=sample(*normal_image(m),high_uv,m.repeat_uv,false);
         auto detail=Vec3{(sampled[0]*2-1)*m.normal_strength,(sampled[1]*2-1)*m.normal_strength,sampled[2]*2-1};
         detail=length(detail)>1e-8f?normalized(detail):Vec3{0,0,1};
-        high_normal=normalized(tangent.tangent*detail.x+tangent.bitangent*detail.y+tangent.normal*detail.z);
+        high_normal=tangent.to_world(detail);
       }
-      Vec3 mapped=normalized(Vec3{dot(high_normal,frame.tangent),dot(high_normal,frame.bitangent),dot(high_normal,frame.normal)});
+      else if(m.maps && m.maps->source_maps && m.normal_strength>0){
+        const auto &raw=*m.maps->source_maps;
+        if(source.tangents.empty() || !raw.normal.image || raw.normal_scale==0)
+          high_normal=source_texture_normal(source.mesh,raw,hit->triangle,hit->barycentric,m.normal_strength);
+        else {
+          // Explicit imported frames remain authoritative; affine UV applies to
+          // the lookup, while the supplied XYZ/handedness defines its basis.
+          auto supplied=basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
+          auto encoded=sample_source_texture(raw.normal,high_uv[0],high_uv[1],false);
+          double scale=double(raw.normal_scale)*m.normal_strength;
+          double x=(encoded[0]*2-1)*scale,y=(encoded[1]*2-1)*scale,z=encoded[2]*2-1;
+          double size=std::hypot(x,y,z);
+          if(size>1e-20)high_normal=TangentFrame{supplied.tangent,supplied.bitangent,supplied.normal}.to_world(
+            {float(x/size),float(y/size),float(z/size)});
+        }
+      }
+      Vec3 mapped=frame.to_tangent(high_normal);
       if (o.normal_y_down) mapped.y=-mapped.y;
       float ao=ambient(query,hit->position,normalized(hit->normal),o,result)*channels.ao;
       for (int c=0;c<3;++c) {

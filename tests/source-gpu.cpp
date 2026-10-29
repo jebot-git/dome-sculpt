@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/render.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/bake.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "graphics.h"
 #include <chrono>
@@ -29,7 +30,7 @@ int difference(const std::vector<uint8_t>&a,const std::vector<uint8_t>&b){int d=
 int main(int argc,char**argv)try{
   bool hardware=argc>1&&std::string(argv[1])=="--hardware";int first=hardware?2:1;
   NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';
-  check(!hardware||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),"Hardware verification uses an actual graphics device rather than software rendering");
+  check(!hardware||(device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos),hardware?"Hardware verification uses an actual graphics device rather than software rendering":"Software-permitted verification uses the reported graphics renderer");
   Framebuffer fbo;SurfaceRenderer renderer;auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(Image{2,1,{255,0,0,255,0,0,255,128}});maps->color.mag_filter=maps->color.min_filter=GL_NEAREST;
   auto p=painted(maps);auto material=white();auto before=paint_composite_cache_stats();auto marker=p->preview(material);
   check(marker->source_only&&marker->color.rgba.empty()&&marker->source_maps->color.image==maps->color.image&&marker->transparent,"Unpainted preview carries exact original image ownership and alpha without allocating derived pixels");
@@ -70,6 +71,38 @@ int main(int argc,char**argv)try{
   auto mip=std::make_shared<PaintSourceMaps>();mip->color.image=pair;mip->color.min_filter=GL_LINEAR_MIPMAP_LINEAR;auto mip_paint=painted(mip);capture(renderer,snapshot(quad(),opaque,mip_paint->preview(opaque)));
   check(renderer.texture_stats().images==1&&renderer.texture_stats().bytes==12,"Original mipmapped sampler generates a GPU mip chain with explicitly accounted storage");
   SurfaceTextureLimits tiny;tiny.max_bytes=4;SurfaceRenderer limited(tiny);check(rejects([&]{capture(limited,scene);})&&limited.texture_stats().images==0,"GPU byte budgets fail explicitly before retaining partial oversized resources");
+  auto original=std::make_shared<PaintSourceMaps>();original->color.image=flat({255,0,0,255});
+  original->normal.image=flat({255,128,128,255});original->normal_scale=.15f;
+  original->normal.uv_transform={0,-1,1,0,1,0};original->occlusion.image=flat({255,255,255,255});
+  BakeSource source_view;source_view.mesh=quad();source_view.materials[0].material=lit;
+  source_view.materials[0].maps=PaintedMesh::from_maps(quad(),original,64)->preview(lit);
+  auto original_pixels=capture(renderer,snapshot(quad(),lit,source_view.materials[0].maps));
+  BakeOptions source_options;source_options.resolution=64;source_options.ao_samples=0;source_options.padding=0;
+  auto transferred=bake_mesh(quad(),source_view,source_options);
+  BakedTextures source_bake;source_bake.maps=std::move(transferred.maps);source_bake.maps.normal=std::move(transferred.normal);
+  for(auto coverage:transferred.coverage)source_bake.coverage.push_back(coverage==1?255:0);
+  Scene transfer_scene;transfer_scene.active().mesh_active=true;transfer_scene.active().material=lit;
+  transfer_scene.active().painted=std::make_shared<PaintedMesh>(quad(),64);transfer_scene.active().painted->install_bake(std::move(source_bake));
+  Document transfer_document;transfer_document.replace(transfer_scene);check(transfer_document.wait_mesh(),"Original-source bake prepares its immutable GPU snapshot");
+  check(difference(original_pixels,capture(renderer,transfer_document.frame().surface))<=6,
+        "Native affine-normal/AO/PBR baking reconstructs independent original-source GPU pixels within8bit quantization");
+  BakedTextures baked;baked.maps.color={64,64,std::vector<uint8_t>(64*64*4)};
+  baked.maps.metal_rough=baked.maps.emission=baked.maps.normal=baked.maps.color;
+  for(size_t i=0;i<baked.maps.color.rgba.size();++i){
+    baked.maps.color.rgba[i]=std::array<uint8_t,4>{30,60,220,255}[i%4];
+    baked.maps.metal_rough.rgba[i]=std::array<uint8_t,4>{0,180,0,255}[i%4];
+    baked.maps.normal.rgba[i]=std::array<uint8_t,4>{128,204,230,255}[i%4];
+  }
+  baked.coverage.assign(64*64,255);
+  Scene baked_scene;baked_scene.active().mesh_active=true;baked_scene.active().material=lit;
+  baked_scene.active().painted=PaintedMesh::from_maps(quad(),original,64);
+  baked_scene.active().painted->install_bake(baked);
+  Document baked_document;baked_document.replace(baked_scene.snapshot());check(baked_document.wait_mesh(),"Mixed source/bake fixture publishes real worker tangent corners");
+  auto mixed_pixels=capture(renderer,baked_document.frame().surface);
+  baked_scene.active().painted=std::make_shared<PaintedMesh>(quad(),64);baked_scene.active().painted->install_bake(std::move(baked));
+  baked_document.replace(baked_scene);check(baked_document.wait_mesh(),"Independent bake-only reference publishes worker tangent corners");
+  check(difference(mixed_pixels,capture(renderer,baked_document.frame().surface))==0,
+        "Source-backed baked GPU output exactly matches bake-only normal/AO/PBR despite conflicting original views and factors");
   for(int arg=first;arg<argc;++arg){auto path=std::filesystem::path(argv[arg]);bool female=path.filename().string().find("female")!=std::string::npos;auto created=create_humanoid(humanoid_baseline_defaults(female?"vroid-beta-female":"vroid-beta-male"),{},path.parent_path().parent_path());auto all=std::make_shared<MeshSnapshot>();auto start=std::chrono::steady_clock::now();auto builds=paint_composite_cache_stats().builds;uint64_t id=1;
     for(auto &part:created.parts){PaintSurfaceOptions options;options.policy=part.source_maps?PaintUvPolicy::SourceAuthored:PaintUvPolicy::Strict;auto mesh=part.source_maps?PaintedMesh::from_maps(part.mesh,part.source_maps,256,options):std::make_shared<PaintedMesh>(part.mesh,256);auto m=white();m.color=part.color;m.roughness=part.roughness;if(part.appearance){auto &a=part.appearance->asset->materials[part.appearance->material];m.metallic=a.metallic;m.emissive=a.emissive;m.double_sided=a.double_sided;m.unlit=a.unlit;m.alpha=a.alpha==ImportedMaterial::AlphaMode::Mask?Material::AlphaMode::Mask:a.alpha==ImportedMaterial::AlphaMode::Blend?Material::AlphaMode::Blend:Material::AlphaMode::Opaque;}
       auto maps=mesh->preview(m);size_t offset=all->mesh.positions.size(),first=all->mesh.indices.size();all->mesh.positions.insert(all->mesh.positions.end(),part.mesh.positions.begin(),part.mesh.positions.end());all->mesh.normals.insert(all->mesh.normals.end(),part.mesh.normals.begin(),part.mesh.normals.end());all->mesh.uv.insert(all->mesh.uv.end(),part.mesh.uv.begin(),part.mesh.uv.end());for(auto index:part.mesh.indices)all->mesh.indices.push_back(uint32_t(offset+index));all->ranges.push_back({id++,first,part.mesh.indices.size(),m,maps,part.appearance,offset});
