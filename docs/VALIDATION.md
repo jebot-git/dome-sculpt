@@ -7,6 +7,32 @@ new bake/weight history regression. The full REQUIREMENTS.md objective remains
 incomplete. All logs/reports/captures below are local ignored artifacts, not files
 distributed by a fresh clone.
 
+## Reconciliation with concurrently advanced main
+
+During final fetch, origin/main had advanced to13b79ab, independently merging
+the same authoring/bake stages. Its exact records are archived in
+HANDOFF-13b79ab.md / VALIDATION-13b79ab.md. Both histories are retained. The broad
+48-suite/six-sanitizer/GUI evidence below was gathered for fa7aba4. The final
+follow-up changes only two palette lines in runtime source: include asset_busy
+in the raster cache signature and use “Working” for any running cancellable
+operation. All document/geometry/input/export headers and implementation remain
+byte-for-byte equal to fa7aba4, confirmed by the runtime diff scope in
+artifacts/source-authoring-main-followup-scope.log. The incoming no-op test
+assertion and mutually exclusive/implicit bake GUI fixture selection are retained.
+
+Affected render/application and weight-test targets were rebuilt with GNU Make
+/fast targets against the already verified unchanged core. Four focused Release
+suites pass in17.05 seconds: controller-controls, spatial-gpu-render, bake-controls
+and weight-authoring (tests-authoring-main-followup.log). The expanded weight
+suite passes with whole-core ASan/UBSan/leaks in20.18 seconds
+(tests-authoring-main-followup-sanitize.log). Build logs use
+build-authoring-main-followup{,-sanitize}.log. These are focused verification of
+the final delta; the full48-suite run below preceded those two palette lines.
+The updated GUI harness also passes4/4 with only DOME_MENU_BAKE_COMPACT=1 (no
+separate bake-flow flag), exit0 and failed=0:
+menu-authoring-main-followup-compact.log. This confirms the incoming implicit
+fixture selection while exercising the final rebuilt application at2x BDF.
+
 ## Release and synthetic OpenXR
 
 All48 registered Release CTests passed in328.08 seconds, zero failures:

@@ -21,9 +21,11 @@ bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
 compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1"
 export_flow = os.environ.get("DOME_MENU_EXPORT") == "1"
-bake_flow = os.environ.get("DOME_MENU_BAKE") == "1"
 bake_cancel = os.environ.get("DOME_MENU_BAKE_CANCEL") == "1"
-out = root / ("artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-export" if export_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
+bake_flow = os.environ.get("DOME_MENU_BAKE") == "1" or bake_cancel or bake_compact
+if sum((rig_flow, export_flow, bake_flow)) > 1:
+    raise ValueError("Select one menu fixture flow: rig, export or bake")
+out = root / ("artifacts/menu-export" if export_flow else "artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -104,7 +106,7 @@ async def main():
             fixture_tool = "dome-sculpt-document-export-test" if export_flow else "dome-sculpt-rig-edit-test"
             subprocess.run([str(root / "build" / fixture_tool), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
-        if bake_flow:
+        elif bake_flow:
             fixture=Path(home,"bake.dsculpt")
             subprocess.run([str(root / "build/dome-sculpt-bake-controls-test"),"--ui-large-fixture" if bake_cancel else "--ui-fixture",str(fixture)],check=True)
             arguments.append(str(fixture))
@@ -169,6 +171,36 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if export_flow:
+            import hashlib, struct
+            original_hash = hashlib.sha256(fixture.read_bytes()).digest()
+            nodes, _ = await layout()
+            check(nodes["Export selected avatar (.vrm)..."][1].get("enabled") is True,
+                  "Source avatar exports an enabled native universal-menu command")
+            await click("Export selected avatar (.vrm)...")
+            w = await wait(lambda: named("Export selected avatar"))
+            check(w.get_wm_transient_for() is not None and w.get_wm_class()[1] == window.get_wm_class()[1],
+                  "Avatar export chooser inherits the document's native application identity")
+            await click("Close Window")
+            await wait(lambda: named("Export selected avatar") is None)
+            check(not Path(home, "Avatar.vrm").exists() and hashlib.sha256(fixture.read_bytes()).digest() == original_hash,
+                  "Universal Close cancels avatar export without output or project mutation")
+            await click("Export selected avatar (.vrm)...")
+            w = await wait(lambda: named("Export selected avatar"))
+            w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync(); key("Return")
+            await wait(lambda: named("Export selected avatar") is None)
+            target = Path(home, "Avatar.vrm")
+            await wait(lambda: target.is_file())
+            payload = target.read_bytes()
+            magic, version, length = struct.unpack_from("<III", payload)
+            size, kind = struct.unpack_from("<II", payload, 12)
+            model = json.loads(payload[20:20+size])
+            check(magic == 0x46546c67 and version == 2 and length == len(payload) and kind == 0x4e4f534a and
+                  len(model["meshes"]) == 19 and len(model["skins"]) == 1 and "VRM" in model["extensions"],
+                  "Native file chooser submits a real grouped VRM container through the background worker")
+            check(hashlib.sha256(fixture.read_bytes()).digest() == original_hash and app.poll() is None,
+                  "Completed avatar export leaves the editable native project and desktop responsive")
+            d.close(); bus.disconnect(); return
         if bake_flow:
             def info():
                 return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"),"--project-info",str(fixture)],env=env))
@@ -265,36 +297,7 @@ async def main():
             await click("Close Window");await wait(lambda:named("Bake surface") is None);await click("Save")
             check(info()["scene_hash"]==baked["scene_hash"],"Failed native rebaking preserves the complete previous baked surface and sources")
             d.close();bus.disconnect();return
-        if export_flow:
-            import hashlib, struct
-            original_hash = hashlib.sha256(fixture.read_bytes()).digest()
-            nodes, _ = await layout()
-            check(nodes["Export selected avatar (.vrm)..."][1].get("enabled") is True,
-                  "Source avatar exports an enabled native universal-menu command")
-            await click("Export selected avatar (.vrm)...")
-            w = await wait(lambda: named("Export selected avatar"))
-            check(w.get_wm_transient_for() is not None and w.get_wm_class()[1] == window.get_wm_class()[1],
-                  "Avatar export chooser inherits the document's native application identity")
-            await click("Close Window")
-            await wait(lambda: named("Export selected avatar") is None)
-            check(not Path(home, "Avatar.vrm").exists() and hashlib.sha256(fixture.read_bytes()).digest() == original_hash,
-                  "Universal Close cancels avatar export without output or project mutation")
-            await click("Export selected avatar (.vrm)...")
-            w = await wait(lambda: named("Export selected avatar"))
-            w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync(); key("Return")
-            await wait(lambda: named("Export selected avatar") is None)
-            target = Path(home, "Avatar.vrm")
-            await wait(lambda: target.is_file())
-            payload = target.read_bytes()
-            magic, version, length = struct.unpack_from("<III", payload)
-            size, kind = struct.unpack_from("<II", payload, 12)
-            model = json.loads(payload[20:20+size])
-            check(magic == 0x46546c67 and version == 2 and length == len(payload) and kind == 0x4e4f534a and
-                  len(model["meshes"]) == 19 and len(model["skins"]) == 1 and "VRM" in model["extensions"],
-                  "Native file chooser submits a real grouped VRM container through the background worker")
-            check(hashlib.sha256(fixture.read_bytes()).digest() == original_hash and app.poll() is None,
-                  "Completed avatar export leaves the editable native project and desktop responsive")
-            d.close(); bus.disconnect(); return
+
         if rig_flow:
             def info():
                 return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))

@@ -448,7 +448,7 @@ void SpatialPalette::raster(const EditorState &s) {
   if(s.menu_page==12){
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name.substr(0,32),fg);
-    text(320*unit_,318*unit_,s.asset_busy?"Baking "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
+    text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
   } else if (s.menu_page == 13 && s.deformation && s.deformation->skeleton) {
     const char *modes[] = {"Add", "Subtract", "Replace", "Smooth"};
     text(320 * unit_, 290 * unit_, s.deformation->skeleton->bones.at(s.rig_joint).name, fg);
@@ -483,7 +483,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   std::string signature =
       s.font_file + std::to_string(s.font_pixels) +
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
-      std::to_string(s.bake_source)+":"+std::to_string(int(s.asset_progress*100))+":"+
+      std::to_string(s.bake_source)+":"+std::to_string(s.asset_busy)+":"+std::to_string(int(s.asset_progress*100))+":"+
       std::to_string(s.rig_joint) + ":" + std::to_string(s.morph_target) + ":" +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message + std::to_string(s.recovery_selected) +
       std::to_string(s.recovery_candidates.size()) + s.recovery_error +

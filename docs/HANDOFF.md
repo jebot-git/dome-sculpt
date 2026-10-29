@@ -5,6 +5,16 @@ This checkpoint on work/integrated-native-authoring combines
 MToon rendering and source-preserving avatar export), preserving both histories.
 Read AGENTS.md and REQUIREMENTS.md; the full production objective is incomplete.
 
+Origin main advanced to13b79ab during validation with a separate merge of these
+same stages. This checkpoint preserves that history too. Its handoff/validation
+are archived as HANDOFF-13b79ab.md / VALIDATION-13b79ab.md. Historical remote agent
+ownership, dirty-work and physical-test notes are not live state in this thread.
+The verified private worker API/enum layout is retained consistently; the final
+runtime delta from fa7aba4 is limited to palette busy-state cache invalidation
+and the accurate generic “Working” label. Incoming GUI fixture guards and the
+no-op cancellation-lease regression are retained alongside our cross-workflow
+regression. See VALIDATION.md for focused follow-up evidence and exact scopes.
+
 The original stage records are HANDOFF-0141926.md / VALIDATION-0141926.md and
 HANDOFF-88cde79.md / VALIDATION-88cde79.md. AGENT-HANDOFF.md describes the discovery
 of these divergent branches; its unimplemented notes apply to the bake-only
