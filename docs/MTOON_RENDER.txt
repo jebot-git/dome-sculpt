@@ -1,0 +1,132 @@
+Integrated native MToon and linear scene transport
+=================================================
+
+SurfaceRenderer now dispatches the retained, typed VRM0/VRM1 MToon material before
+the glTF unlit fallback. The same native OpenGL 3.3 path serves desktop and both
+OpenXR eyes. It uses the separately licensed MToon module (see MTOON.md and
+MTOON-LICENSE.txt), not a substitute preview shader. Original typed material and
+source image ownership are immutable; draw-time factors are local uniforms.
+
+All eleven roles are bound independently: Base, Shade, Normal, Emission, Rim,
+Matcap, Shift, OutlineWidth, UvMask, ReceiveShadow and ShadingGrade. Their explicit
+version-specific color encoding, channel defaults, UV animation and MainTex ST
+rules follow the typed module. Original images use identity-plus-encoding GPU
+sharing, independent samplers and original resolution. UV1 requires the exact
+source primitive, explicit compact-to-authored remap and packed first_vertex;
+missing/ambiguous/out-of-bounds data is rejected, never inferred from names or
+neighboring ranges. Authored UV0 remains unchanged.
+
+Raw material overrides preserve the original typed factor when the native generic
+factor equals its imported value. An edited nonzero imported channel scales the
+typed factor by current/imported. Imported zero plus current zero preserves the
+typed value; an explicit nonzero current override uses that absolute value. No
+silent division by zero or HDR clamp is introduced. Export schema constraints
+are handled independently by the exporter.
+
+Painted source-backed color uses an additional immutable color_coverage Image.
+Linear R is the union of visible color coverage after each mask and layer opacity;
+G/B are zero and A is 255. Untouched color uses a four-byte 1x1 zero sentinel.
+Raw preview markers allocate no coverage. Coverage is derived from authoritative
+layers on reload, participates in cache/GL resource budgets and shares snapshots.
+Hidden/masked/zero-opacity/erased data remains retained authoring data.
+
+For aliased Base/Shade slots (same texture and effective UV semantics), nonzero
+base factors recover the unfactored painted contribution. A zero factor uses
+originalShade*(1-coverage)+paintContribution, preserving untouched shade RGB and
+true black paint. Zero coverage restores original typed samples directly so
+near-zero factors cannot amplify CPU quantization outside painted pixels. Partial
+coverage still has the 8-bit derived texture quantization limit; GPU paint layers
+are a separate remaining task. Distinct Shade maps remain independent. Derived color/emission
+use neutral baked factors. Derived Base/coverage and emission preserve source
+wrap/filter metadata with identity UV transform because composition already
+baked the original affine transform. This is not a promise of painting repeated
+UV domains outside the authoring painter's supported atlas.
+
+Render state uses original queues, culling, depth writes, alpha cutoff, blend
+factors and version-specific alpha equation. VRM0 keeps its MAX alpha equation;
+VRM1 uses source-over alpha. Base then outline passes reuse current deformed world
+geometry, original width texture/channel, world/screen width and original culling;
+VRM0 outline polygon offset is retained. Unsupported destination
+SRC_ALPHA_SATURATE is rejected explicitly. The scene target is single-sampled, so
+alpha-to-coverage state cannot provide multisample antialiasing in this path.
+
+Normal mapping uses a derivative tangent frame from current posed/shaped geometry
+and the selected transformed UV set, with mirrored handedness and version-facing
+rules. Degenerate derivatives retain the geometric normal. Original tangent4 and
+morph tangents remain losslessly retained in the source model, but full tangent
+transport through the native shape/morph/skin pipeline is still required before
+authored tangent4 can be bound correctly. Raw rest tangents are not substituted.
+
+Studio illumination is explicit: one white directional light, hemispherical GI
+and shadow factor 1. Receive-shadow controls are evaluated but there is no scene
+shadow-map generation, reflected environment capture or per-light scene editor
+in this increment. Transparent ranges preserve stable material queue order;
+per-triangle transparent sorting is not implemented here. These are limits on
+scene lighting/compositing, not claims that the retained material is unsupported.
+
+Linear GPU target and output contract
+------------------------------------
+All surface shaders emit straight linear RGBA. Blend operations accumulate RGB in
+a private RGBA16F framebuffer before a fullscreen GPU resolve. No product CPU
+readback, software raster/upload fallback or source downsampling is used. Desktop
+background UI colors are decoded once to linear before clearing.
+
+SurfaceOutputEncoding::Srgb means final RGB is encoded once: hardware conversion
+for an sRGB destination attachment, explicit conversion for UNORM. Linear means
+no final RGB transfer and requires a linear destination attachment. Alpha is
+always linear and never gamma encoded. The destination attachment encoding is
+queried rather than guessed. Generic source-over composition produces
+premultiplied linear scene RGB; original MToon custom blend/alpha equations are
+preserved. OpenXR SOURCE_ALPHA-only transport consumes this accumulated scene
+without adding UNPREMULTIPLIED_ALPHA. The runtime decodes sRGB swapchain RGB before
+composing; a GL_RGBA8 fallback therefore explicitly uses Linear output.
+
+set_deferred_resolve(true) leaves the private linear framebuffer bound after
+draw. XR Palette/Cursor render with their explicit linear-output mode into that
+same target, followed by resolve() before swapchain release. Desktop defaults to
+immediate resolve. Changing output mode or starting a second unresolved view is
+an error. A shared set_frame_time(seconds) is supplied once per stereo frame so
+both eyes and desktop instances use the same process-relative animation epoch.
+
+Targets retain at most two sizes, at most 16M pixels per view and 32M total,
+independent of texture limits. Nominal storage is 12 bytes/pixel (16 with a
+32F+stencil destination depth format), not a total-VRAM claim. Depth format is
+matched and copied for subsequent desktop overlays. Multisampled destination
+attachments are explicitly rejected. Resize/LRU eviction and context abandon
+release/drop handles on the owning GL thread; no old context is touched on loss.
+
+Selected weight visualization
+----------------------------
+MeshSnapshot.selected_weights is either empty or exactly the current vertex
+count. -1 retains ordinary shading. Values [0,1] use an opaque, depth-tested unlit
+blue/cyan/green/yellow/red ramp and suppress material/MToon/outline on eligible
+fragments. Invalid sizes/values are rejected. Geometry-only updates share source
+images and do not upload texture pixels again. The Document worker owns weight
+selection and history; the renderer does not modify geometry or material data.
+
+Verification
+------------
+tests/mtoon-render.cpp exercises the production SurfaceRenderer on windowless
+EGL, comparing V0/V1 roles against the independent native CPU lighting evaluator.
+It verifies encoding, original normal enablement, current-geometry TBN, all scalar
+roles, UV1 identity/errors, deterministic animation/masks, outline texture/geometry,
+weight ramp/sentinel, linear premultiplied transparency, sRGB/UNORM destination
+equivalence, deferred UI, coverage masks/opacity/layers/cancel/restart and
+zero-factor shade/true black paint. Test-only readback is confined to fixtures.
+--hardware rejects llvmpipe/softpipe. Software EGL remains useful for CI.
+
+Arc A770 and llvmpipe: 54 production checks passed. The hardware run also
+passed with ASan+UBSan on the project
+render/paint/test translation units (Release core dependencies; external Mesa
+leak detection disabled). Live GL cleanup is checked explicitly. The existing raw-source GPU fixture also
+passed its 33 checks plus both actual 19-part CC0 baselines: zero CPU composites,
+zero repeated pixel uploads. Measured female preparation/first GPU/repeat was
+47.64/42.10/1.32 ms; male 44.19/25.22/1.24 ms. Full MToon roles retained 23 shared
+GPU images: 83,886,592 / 87,556,608 nominal bytes. These small test-view timings are
+not headset frame-rate claims. No live headset/session or user files were changed.
+
+References: OpenGL 3.3 core section 3.8.17 (sRGB RGB conversion, unchanged alpha):
+https://registry.khronos.org/OpenGL/specs/gl/glspec33.core.pdf
+OpenXR composition layer blending (linear composition and premultiplied input):
+https://registry.khronos.org/OpenXR/specs/1.1/html/xrspec.html#composition-layer-blending
+Pinned MToon source/specification and licensing are recorded in MTOON.md.

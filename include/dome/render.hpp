@@ -16,6 +16,8 @@ Mat4 projection(float left, float right, float down, float up,
 struct SurfaceTextureLimits {
   size_t max_bytes=1024ull*1024*1024,max_images=1024,max_samplers=128;
 };
+// Final RGB transfer only; alpha stays linear. Linear requires a linear target.
+enum class SurfaceOutputEncoding { Srgb, Linear };
 struct SurfaceTextureStats {size_t images=0,samplers=0,bytes=0;uint64_t uploads=0;};
 class SurfaceRenderer {
   GLuint program_ = 0, vao_ = 0, vertices_ = 0, indices_ = 0;
@@ -28,6 +30,12 @@ public:
   SurfaceRenderer();
   explicit SurfaceRenderer(SurfaceTextureLimits);
   SurfaceTextureStats texture_stats() const;
+  void set_frame_time(double seconds);
+  void set_output_encoding(SurfaceOutputEncoding);
+  // Deferred draw leaves a linear framebuffer bound for Cursor/Palette overlays.
+  // Resolve before releasing the XR swapchain image or starting another view.
+  void set_deferred_resolve(bool);
+  void resolve();
   ~SurfaceRenderer();
   void abandon();
   SurfaceRenderer(const SurfaceRenderer &) = delete;
@@ -37,10 +45,12 @@ public:
 };
 class CursorRenderer {
   GLuint program_ = 0, vao_ = 0, buffer_ = 0;
+  bool linear_output_ = false;
 
 public:
   CursorRenderer();
   ~CursorRenderer();
+  void set_linear_output(bool value) { linear_output_=value; }
   void draw(const EditorState &, const Mat4 &);
 };
 } // namespace dome

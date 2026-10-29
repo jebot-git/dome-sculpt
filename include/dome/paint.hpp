@@ -22,6 +22,8 @@ struct TextureMaps {
   std::shared_ptr<const PaintSourceMaps> source_maps;
   // Preview-only immutable original bindings; derived Images are intentionally empty.
   bool source_only = false;
+  // Linear R: combined visible color coverage; 1x1 zero for untouched sources.
+  Image color_coverage;
 };
 struct PaintCompositeCacheStats {
   size_t retained_bytes = 0, retained_maps = 0, limit_bytes = 0;
