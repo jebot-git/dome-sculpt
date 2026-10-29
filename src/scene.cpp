@@ -71,8 +71,27 @@ uint64_t Scene::duplicate(uint64_t id) {
   o.mesh_active = source.mesh_active;
   if (source.painted)
     o.painted = source.painted->snapshot();
+  o.deformation = source.deformation;
   return added;
 }
+Mesh ObjectSurface::preview_mesh() const {
+  return deformation ? deformation->preview(mesh) : mesh;
+}
+void Scene::set_deformation(uint64_t id, DeformationState state) {
+  auto &o = object(id);
+  if (!o.mesh_active || !o.painted || o.painted->in_stroke())
+    throw std::logic_error("Deformation requires a finalized active rest mesh");
+  state.validate(o.painted->mesh());
+  size_t entries = state.resource_entries();
+  for (const auto &other : objects_)
+    if (other.id != id && other.deformation) {
+      entries += other.deformation->resource_entries();
+      if (entries > 8'000'000)
+        throw std::length_error("Scene deformation budget exceeded");
+    }
+  o.deformation = std::make_shared<const DeformationState>(std::move(state));
+}
+void Scene::clear_deformation(uint64_t id) { object(id).deformation.reset(); }
 void Scene::erase(uint64_t id) {
   object(id);
   if (objects_.size() == 1)
@@ -94,7 +113,7 @@ void Scene::validate() const {
   if (objects_.empty() || objects_.size() > 256)
     throw std::length_error("Invalid scene object count");
   std::set<uint64_t> ids;
-  size_t count = 0, texels = 0;
+  size_t count = 0, texels = 0, deformation_entries = 0;
   for (auto &o : objects_) {
     if (!o.id || o.id >= next_ || !ids.insert(o.id).second || !o.volume ||
         o.volume->in_stroke())
@@ -106,6 +125,14 @@ void Scene::validate() const {
     if ((o.mesh_active && !o.painted) || (o.painted && o.painted->in_stroke()))
       throw std::runtime_error(
           "Invalid active mesh or unfinished paint stroke");
+    if (o.deformation) {
+      if (!o.mesh_active || !o.painted)
+        throw std::invalid_argument("Deformation has no active rest mesh");
+      o.deformation->validate(o.painted->mesh());
+      deformation_entries += o.deformation->resource_entries();
+      if (deformation_entries > 8'000'000)
+        throw std::length_error("Scene deformation budget exceeded");
+    }
     if (o.painted)
       texels += size_t(o.painted->resolution()) * o.painted->resolution();
     if (texels > 16 * 1024 * 1024)
@@ -119,7 +146,7 @@ void Scene::validate() const {
 nlohmann::json Scene::encode() const {
   validate();
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", 3},
+                      {"version", 4},
                       {"active", active_},
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
@@ -145,8 +172,10 @@ nlohmann::json Scene::encode() const {
            {"double_sided", m.double_sided}}},
          {"volume", o.volume->encode()},
          {"mesh_active", o.mesh_active},
-         {"painted",
-          o.painted ? o.painted->encode() : nlohmann::json(nullptr)}});
+         {"painted", o.painted ? o.painted->encode() : nlohmann::json(nullptr)},
+         {"deformation", o.deformation
+                             ? o.deformation->encode(o.painted->mesh())
+                             : nlohmann::json(nullptr)}});
   }
   return j;
 }
@@ -158,7 +187,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     result.active().volume = std::make_shared<Volume>(Volume::decode(j));
     return result;
   }
-  if (j.at("version") != 2 && j.at("version") != 3)
+  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4)
     throw std::runtime_error("Unsupported scene version");
   auto id = [](const nlohmann::json &v) {
     if (!v.is_number_unsigned() &&
@@ -175,7 +204,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
   result.objects_.clear();
-  size_t samples = 0, texels = 0;
+  size_t samples = 0, texels = 0, deformation_entries = 0;
   for (auto &v : objects) {
     SculptObject o;
     o.id = id(v.at("id"));
@@ -204,7 +233,7 @@ Scene Scene::decode(const nlohmann::json &j) {
           o.volume->stored_samples() - v.at("volume").at("samples").size();
     if (samples > 4'000'000)
       throw std::length_error("Scene sculpt layer budget exceeded");
-    if (j.at("version") == 3) {
+    if (j.at("version") == 3 || j.at("version") == 4) {
       o.mesh_active = v.at("mesh_active").get<bool>();
       if (!v.at("painted").is_null()) {
         auto &size = v.at("painted").at("resolution");
@@ -218,6 +247,22 @@ Scene Scene::decode(const nlohmann::json &j) {
           throw std::length_error("Scene paint-map budget exceeded");
         o.painted = PaintedMesh::decode(v.at("painted"));
       }
+    }
+    if (j.at("version") == 4 && !v.at("deformation").is_null()) {
+      if (!o.mesh_active || !o.painted)
+        throw std::runtime_error("Deformation has no active rest mesh");
+      const auto &d = v.at("deformation");
+      deformation_entries += d.at("pose").size() + d.at("morph_weights").size();
+      if (!d.at("skin").is_null())
+        for (const auto &row : d.at("skin").at("vertices"))
+          deformation_entries += row.size();
+      if (!d.at("morphs").is_null())
+        for (const auto &target : d.at("morphs").at("targets"))
+          deformation_entries += target.at("delta").size();
+      if (deformation_entries > 8'000'000)
+        throw std::length_error("Scene deformation budget exceeded");
+      o.deformation = std::make_shared<const DeformationState>(
+          DeformationState::decode(d, o.painted->mesh()));
     }
     result.objects_.push_back(std::move(o));
   }
@@ -252,7 +297,8 @@ Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
         unwrap(mesh);
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
-           o.mesh_active ? o.painted->composite(o.material) : nullptr});
+           o.mesh_active ? o.painted->composite(o.material) : nullptr,
+           o.deformation});
     }
   return result;
 }

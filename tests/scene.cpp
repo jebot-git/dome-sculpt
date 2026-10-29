@@ -119,6 +119,9 @@ int main() try {
   j = loaded.encode();
   j["active"] = 999;
   rejects(j, "Missing active objects are rejected");
+  require(
+      loaded.encode().at("version") == 4,
+      "Native scene schema explicitly versions deformation authoring records");
   auto legacy = loaded.encode();
   legacy["version"] = 2;
   for (auto &object : legacy["objects"]) {

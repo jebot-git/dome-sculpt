@@ -2,8 +2,10 @@
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
 #include "dome/scene.hpp"
+#include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <png.h>
 #include <unistd.h>
 int main() try {
@@ -160,6 +162,184 @@ int main() try {
             "Embedded PNG preserves exact PBR texels and image orientation");
     png_image_free(&decoded);
   }
+
+  // Full deformation is exported from the untouched authoring surface, never
+  // from the already posed preview. Five influences require a second set.
+  dome::DeformationState rig(mesh);
+  rig.skeleton = dome::Skeleton{};
+  for (int i = 0; i < 5; ++i) {
+    dome::Bone bone;
+    bone.name = "joint" + std::to_string(i);
+    bone.parent = i ? 0 : -1;
+    bone.rest.translation = {float(i) * .03f, .1f, 0};
+    rig.skeleton->bones.push_back(bone);
+  }
+  rig.skin = dome::SkinWeights{};
+  rig.skin->vertices.assign(mesh.positions.size(),
+                            {{0, .2f}, {1, .2f}, {2, .2f}, {3, .2f}, {4, .2f}});
+  rig.morphs = dome::MorphSet(mesh);
+  auto target_positions = mesh.positions;
+  for (auto &v : target_positions)
+    v.z += .04f;
+  rig.morphs->set_target(mesh, "forward", target_positions);
+  rig.morph_weights = {.6f};
+  for (auto &bone : rig.skeleton->bones)
+    rig.pose.push_back(bone.rest);
+  rig.pose[0].translation.y += .15f;
+  rig.pose[2].rotation =
+      dome::arcball({0, 1, 0}, dome::normalized({.2f, 1, .1f}));
+  rig.expressions = dome::AvatarExpressions{{{"aa", {{"forward", 1}}}}};
+  objects[0].transform = {{.3f, .2f, -.1f}, {0, 0, .6f, .8f}, .75f};
+  objects[0].deformation = std::make_shared<const dome::DeformationState>(rig);
+  dome::export_glb(objects, path);
+  raw = nullptr;
+  require(cgltf_parse_file(&options, path.c_str(), &raw) ==
+              cgltf_result_success,
+          "Independent parser accepts skin/morph GLB");
+  std::unique_ptr<cgltf_data, decltype(&cgltf_free)> skinned(raw, cgltf_free);
+  require(cgltf_load_buffers(&options, raw, path.c_str()) ==
+                  cgltf_result_success &&
+              cgltf_validate(raw) == cgltf_result_success,
+          "Independent validator accepts skin/morph GLB");
+  require(raw->skins_count == 1 && raw->skins[0].joints_count == 5 &&
+              raw->nodes_count == 7,
+          "Skinned hierarchy has one shared object parent, mesh node and all "
+          "joints");
+  auto &skin = raw->skins[0];
+  auto &primitive = raw->meshes[0].primitives[0];
+  require(
+      raw->nodes[1].skin == &skin && raw->nodes[1].parent == nullptr &&
+          skin.joints[0]->parent == &raw->nodes[0],
+      "Object TRS affects joints and skinned surface remains an identity root");
+  auto j0 = cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 0),
+       j1 = cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 1);
+  auto w0 = cgltf_find_accessor(&primitive, cgltf_attribute_type_weights, 0),
+       w1 = cgltf_find_accessor(&primitive, cgltf_attribute_type_weights, 1);
+  require(j0 && j1 && w0 && w1 &&
+              j0->component_type == cgltf_component_type_r_16u,
+          "All five native influences survive JOINTS/WEIGHTS sets without "
+          "truncation");
+  float joints0[4], joints1[4], weights0[4], weights1[4];
+  require(cgltf_accessor_read_float(j0, 0, joints0, 4) &&
+              cgltf_accessor_read_float(j1, 0, joints1, 4) &&
+              cgltf_accessor_read_float(w0, 0, weights0, 4) &&
+              cgltf_accessor_read_float(w1, 0, weights1, 4),
+          "Skin attribute accessors can be read independently");
+  require(joints1[0] == 4 && weights1[0] == .2f && weights1[1] == 0 &&
+              joints1[1] == 0,
+          "Additional joint sets preserve weights and zero-pad unused slots");
+  require(primitive.targets_count == 1 && raw->meshes[0].weights_count == 1 &&
+              raw->meshes[0].weights[0] == .6f,
+          "Morph deltas and default authored morph values are exported");
+  auto extras = nlohmann::json::parse(raw->json, raw->json + raw->json_size)
+                    .at("meshes")[0]
+                    .at("extras");
+  require(extras.at("targetNames")[0] == "forward" &&
+              extras.at("domeSculptExpressions")["visemes"]["aa"][0]["shape"] ==
+                  "forward",
+          "Morph and vowel bindings preserve stable target identities in "
+          "application extras");
+  const cgltf_accessor *delta = nullptr;
+  for (size_t i = 0; i < primitive.targets[0].attributes_count; ++i)
+    if (primitive.targets[0].attributes[i].type ==
+        cgltf_attribute_type_position)
+      delta = primitive.targets[0].attributes[i].data;
+  auto base = cgltf_find_accessor(&primitive, cgltf_attribute_type_position, 0);
+  float base_value[3], delta_value[3];
+  require(delta && cgltf_accessor_read_float(base, 0, base_value, 3) &&
+              cgltf_accessor_read_float(delta, 0, delta_value, 3) &&
+              base_value[2] == mesh.positions[0].z &&
+              std::abs(delta_value[2] - .04f) < 1e-6f,
+          "GLB positions remain rest coordinates while targets contain only "
+          "displacements");
+  auto transform = [](const float *m, dome::Vec3 p) {
+    return dome::Vec3{m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12],
+                      m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13],
+                      m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14]};
+  };
+  auto preview = rig.preview(mesh);
+  dome::Vec3 position{base_value[0] + delta_value[0] * .6f,
+                      base_value[1] + delta_value[1] * .6f,
+                      base_value[2] + delta_value[2] * .6f},
+      weighted{};
+  for (size_t i = 0; i < 5; ++i) {
+    float inverse_bind[16], world[16];
+    require(cgltf_accessor_read_float(skin.inverse_bind_matrices, i,
+                                      inverse_bind, 16),
+            "Inverse-bind MAT4 reads correctly");
+    cgltf_node_transform_world(skin.joints[i], world);
+    weighted += transform(world, transform(inverse_bind, position)) * .2f;
+  }
+  float object_world[16];
+  cgltf_node_transform_world(&raw->nodes[0], object_world);
+  require(dome::length(weighted -
+                       transform(object_world, preview.positions[0])) < 2e-5f,
+          "Independent glTF skin/morph evaluation matches native posed preview "
+          "under object rotation/scale");
+  require(raw->images_count == 3, "Rig export retains painted PBR images");
+  if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
+    std::filesystem::copy_file(
+        path, std::string(fixture) + ".skin.glb",
+        std::filesystem::copy_options::overwrite_existing);
+  auto incomplete = rig;
+  incomplete.humanoid = dome::HumanoidMapping{{{"hips", 0}}};
+  objects[0].deformation =
+      std::make_shared<const dome::DeformationState>(incomplete);
+  bool failed = false;
+  try {
+    dome::export_glb(objects, path);
+  } catch (const std::exception &) {
+    failed = true;
+  }
+  require(failed, "Incomplete humanoid semantics cannot masquerade as complete "
+                  "export metadata");
+  dome::Skeleton human;
+  dome::HumanoidMapping mapping;
+  for (const auto &role : dome::human_roles())
+    if (role.required) {
+      std::string parent = role.parent;
+      while (!parent.empty() && !mapping.joints.contains(parent)) {
+        for (const auto &r : dome::human_roles())
+          if (r.name == parent) {
+            parent = r.parent;
+            break;
+          }
+      }
+      dome::Bone bone;
+      bone.name = role.name;
+      bone.parent = parent.empty() ? -1 : int(mapping.joints.at(parent));
+      bone.rest.translation = {.01f, .03f, .02f};
+      mapping.joints[role.name] = uint32_t(human.bones.size());
+      human.bones.push_back(bone);
+    }
+  auto avatar = rig;
+  avatar.skeleton = human;
+  avatar.pose.clear();
+  avatar.humanoid = mapping;
+  avatar.skin->vertices.assign(mesh.positions.size(), {{0, 1}});
+  objects[0].deformation =
+      std::make_shared<const dome::DeformationState>(avatar);
+  dome::export_glb(objects, path);
+  raw = nullptr;
+  require(cgltf_parse_file(&options, path.c_str(), &raw) ==
+              cgltf_result_success,
+          "Independent parser accepts mapped humanoid GLB");
+  std::unique_ptr<cgltf_data, decltype(&cgltf_free)> humanoid(raw, cgltf_free);
+  require(cgltf_load_buffers(&options, raw, path.c_str()) ==
+                  cgltf_result_success &&
+              cgltf_validate(raw) == cgltf_result_success,
+          "Independent validator accepts mapped humanoid GLB");
+  auto metadata = nlohmann::json::parse(raw->nodes[0].extras.data);
+  auto mapped = metadata.at("domeSculptHumanoid").at("humanBones");
+  require(mapped.size() == 15 &&
+              mapped.at("head").at("node").get<size_t>() < raw->nodes_count &&
+              raw->extensions_used_count == 0,
+          "Complete humanoid roles reference actual joints without claiming "
+          "full VRM export");
+  if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
+    std::filesystem::copy_file(
+        path, std::string(fixture) + ".humanoid.glb",
+        std::filesystem::copy_options::overwrite_existing);
   std::filesystem::remove(path);
   std::cout << "PASS Independent cgltf validation, attributes, indices and "
                "exact metre-space geometry\n";

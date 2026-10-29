@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "deformation.hpp"
 #include "mesh.hpp"
 #include "navigation.hpp"
 #include "paint.hpp"
@@ -22,6 +23,7 @@ struct SculptObject {
   bool mesh_active = false;
   std::shared_ptr<PaintedMesh> painted;
   std::shared_ptr<Volume> volume = std::make_shared<Volume>();
+  std::shared_ptr<const DeformationState> deformation{};
 };
 struct ObjectSurface {
   uint64_t id = 0;
@@ -30,6 +32,9 @@ struct ObjectSurface {
   Material material;
   Mesh mesh;
   std::shared_ptr<const TextureMaps> textures{};
+  std::shared_ptr<const DeformationState> deformation{};
+  // Rest mesh stays untouched for export, authoring and topology validation.
+  Mesh preview_mesh() const;
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.
@@ -45,6 +50,8 @@ public:
   uint64_t add(std::string name, Volume, CanvasTransform = {});
   uint64_t duplicate(uint64_t);
   void erase(uint64_t);
+  void set_deformation(uint64_t, DeformationState);
+  void clear_deformation(uint64_t);
   Scene snapshot() const;
   void validate() const;
   void save(const std::filesystem::path &) const;
