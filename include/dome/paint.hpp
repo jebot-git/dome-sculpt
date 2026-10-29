@@ -21,6 +21,13 @@ struct TextureMaps {
   // Original normal/AO views and exact source metadata survive compositing.
   std::shared_ptr<const PaintSourceMaps> source_maps;
 };
+struct PaintCompositeCacheStats {
+  size_t retained_bytes = 0, retained_maps = 0, limit_bytes = 0;
+  uint64_t hits = 0, builds = 0;
+};
+PaintCompositeCacheStats paint_composite_cache_stats();
+// Global strong retention only; zero disables it without invalidating readers.
+void set_paint_composite_cache_budget(size_t bytes);
 enum class PaintChannel : int { Color, Metallic, Roughness, Emission, Mask };
 struct PaintSettings {
   PaintChannel channel = PaintChannel::Color;
@@ -109,6 +116,10 @@ private:
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &);
   struct SurfaceMap;
+  struct CompositeCache;
+  std::shared_ptr<const TextureMaps> build_composite(const Material &) const;
+  std::shared_ptr<CompositeCache> composite_cache_;
+  uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::vector<PaintLayer> layers_;

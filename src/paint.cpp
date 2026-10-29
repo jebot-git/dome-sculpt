@@ -10,6 +10,9 @@
 #include <png.h>
 #include <set>
 #include <unordered_map>
+#include <atomic>
+#include <mutex>
+#include <list>
 namespace dome {
 namespace {
 uint8_t byte(float v) {
@@ -23,6 +26,60 @@ void name_valid(const std::string &s) {
 size_t tile_count(const PaintLayer &layer) {
   return std::count_if(layer.tiles.begin(),layer.tiles.end(),[](const auto &tile){return bool(tile);});
 }
+uint64_t next_composite_token() {
+  static std::atomic<uint64_t> sequence{1};auto value=sequence.load(std::memory_order_relaxed);
+  while(value!=UINT64_MAX)if(sequence.compare_exchange_weak(value,value+1,std::memory_order_relaxed))return value;
+  throw std::overflow_error("Paint composite content identity exhausted");
+}
+struct CompositeFactors {
+  std::array<float,4> color;
+  std::array<float,3> emission;
+  float metallic,roughness;
+  bool operator==(const CompositeFactors &)const=default;
+};
+struct CompositeRetention {
+  struct Source {size_t references=0,bytes=0;};
+  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};size_t derived=0,count=0;std::array<const Image*,5> sources{};};
+  std::mutex mutex;
+  size_t limit=512*1024*1024,bytes=0;
+  uint64_t hits=0,builds=0;
+  std::list<Entry> entries;
+  std::unordered_map<const Image*,Source> sources;
+  void evict(){
+    auto &e=entries.back();bytes-=e.derived;
+    for(size_t i=0;i<e.count;++i){auto found=sources.find(e.sources[i]);if(!--found->second.references){bytes-=found->second.bytes;sources.erase(found);}}
+    entries.pop_back();
+  }
+  std::shared_ptr<const TextureMaps> find(uint64_t token,const CompositeFactors &factors){
+    std::lock_guard lock(mutex);auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.token==token&&e.factors==factors;});
+    if(found==entries.end())return {};
+    auto result=found->maps;entries.splice(entries.begin(),entries,found);++hits;return result;
+  }
+  void retain(const std::shared_ptr<const TextureMaps> &maps,uint64_t token,const CompositeFactors &factors,bool hit){
+    std::lock_guard lock(mutex);if(hit)++hits;else ++builds;
+    auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.maps.get()==maps.get();});
+    if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
+    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size();
+    if(maps->source_maps)for(auto slot:{&maps->source_maps->color,&maps->source_maps->metal_rough,&maps->source_maps->emission,&maps->source_maps->normal,&maps->source_maps->occlusion})
+      if(slot->image&&std::find(entry.sources.begin(),entry.sources.begin()+entry.count,slot->image.get())==entry.sources.begin()+entry.count)
+        entry.sources[entry.count++]=slot->image.get();
+    size_t isolated=entry.derived;for(size_t i=0;i<entry.count;++i)isolated+=entry.sources[i]->rgba.size();
+    if(isolated>limit)return;
+    auto increment=[&]{size_t n=entry.derived;for(size_t i=0;i<entry.count;++i)if(!sources.contains(entry.sources[i]))n+=entry.sources[i]->rgba.size();return n;};
+    while(!entries.empty()&&(entries.size()>=128||increment()>limit||bytes>limit-increment()))evict();
+    size_t additional=increment();if(additional>limit||bytes>limit-additional)return;
+    // Retention is best effort. A cache-node allocation failure must not turn a
+    // successfully composited immutable frame into a document edit failure.
+    try {
+      entries.push_front(entry);
+      try {for(size_t i=0;i<entry.count;++i)sources.try_emplace(entry.sources[i],Source{0,entry.sources[i]->rgba.size()});}
+      catch(...){for(size_t i=0;i<entry.count;++i){auto p=sources.find(entry.sources[i]);if(p!=sources.end()&&!p->second.references)sources.erase(p);}entries.pop_front();throw;}
+      bytes+=entry.derived;
+      for(size_t i=0;i<entry.count;++i){auto &s=sources.at(entry.sources[i]);if(!s.references++)bytes+=s.bytes;}
+    }catch(const std::bad_alloc&){}
+  }
+};
+CompositeRetention &composite_retention(){static CompositeRetention cache;return cache;}
 Vec3 low(Vec3 a, Vec3 b) {
   return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)};
 }
@@ -30,6 +87,21 @@ Vec3 high(Vec3 a, Vec3 b) {
   return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
 }
 } // namespace
+struct PaintedMesh::CompositeCache {
+  std::mutex mutex;
+  uint64_t token=0;
+  CompositeFactors factors{};
+  std::weak_ptr<const TextureMaps> maps;
+};
+PaintCompositeCacheStats paint_composite_cache_stats(){
+  auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
+  return {cache.bytes,cache.entries.size(),cache.limit,cache.hits,cache.builds};
+}
+void set_paint_composite_cache_budget(size_t bytes){
+  if(bytes>512*1024*1024)throw std::invalid_argument("Paint composite retention budget exceeds 512 MiB");
+  auto &cache=composite_retention();std::lock_guard lock(cache.mutex);cache.limit=bytes;
+  while(!cache.entries.empty()&&cache.bytes>bytes)cache.evict();
+}
 float srgb_to_linear(float v) {
   return v <= .04045f ? v / 12.92f : std::pow((v + .055f) / 1.055f, 2.4f);
 }
@@ -202,6 +274,8 @@ PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options
     throw std::invalid_argument(
         "Paint resolution must be a power of two between 64 and 2048");
   surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r,options);
+  composite_cache_=std::make_shared<CompositeCache>();
+  composite_token_=next_composite_token();
   PaintLayer layer;
   layer.id = 1;
   layer.tiles.resize(surface_->tiles.size());
@@ -243,9 +317,12 @@ void PaintedMesh::delete_layer() {
   if (editing_ || layers_.size() == 1)
     throw std::logic_error("Keep at least one paint layer");
   const auto &removed = layer(active_);
+  bool visible=removed.visible&&removed.opacity>0&&tile_count(removed);
+  uint64_t token=visible?next_composite_token():composite_token_;
   allocated_tiles_ -= tile_count(removed);
   std::erase_if(layers_, [&](auto &l) { return l.id == active_; });
   active_ = layers_.back().id;
+  composite_token_=token;
   ++revision_;
 }
 void PaintedMesh::layer_properties(std::string name, bool visible,
@@ -254,9 +331,13 @@ void PaintedMesh::layer_properties(std::string name, bool visible,
   if (editing_ || !std::isfinite(opacity) || opacity < 0 || opacity > 1)
     throw std::invalid_argument("Invalid paint layer properties");
   auto &l = active();
+  bool previous=l.visible&&l.opacity>0,next=visible&&opacity>0;
+  bool visual=tile_count(l)&&((previous!=next)||(previous&&next&&l.opacity!=opacity));
+  uint64_t token=visual?next_composite_token():composite_token_;
   l.name = std::move(name);
   l.visible = visible;
   l.opacity = opacity;
+  composite_token_=token;
   ++revision_;
 }
 void PaintedMesh::move_layer(int direction) {
@@ -267,7 +348,10 @@ void PaintedMesh::move_layer(int direction) {
   auto index = i - layers_.begin();
   auto to = index + direction;
   if (to >= 0 && to < ptrdiff_t(layers_.size())) {
+    bool visual=layers_[index].visible&&layers_[index].opacity>0&&tile_count(layers_[index])&&layers_[to].visible&&layers_[to].opacity>0&&tile_count(layers_[to]);
+    auto token=visual?next_composite_token():composite_token_;
     std::swap(layers_[index], layers_[to]);
+    composite_token_=token;
     ++revision_;
   }
 }
@@ -287,6 +371,7 @@ void PaintedMesh::begin_stroke() {
     throw std::logic_error("Show the active paint layer before painting");
   before_ = active().tiles;
   before_allocated_tiles_ = tile_count(active());
+  before_composite_token_=composite_token_;
   editing_ = true;
 }
 bool PaintedMesh::pending_changes() const {
@@ -312,6 +397,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
       axis = b.to - b.from, n = normalized(b.normal);
   float axis2 = dot(axis, axis);
   auto &l = active();
+  auto token=l.visible&&l.opacity>0?next_composite_token():composite_token_;
   auto prior = l.tiles;
   size_t allocated = allocated_tiles_;
   bool changed = false;
@@ -406,8 +492,10 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
     throw;
   }
   allocated_tiles_ = allocated;
-  if (changed)
+  if (changed){
+    composite_token_=token;
     ++revision_;
+  }
 }
 bool PaintedMesh::end_stroke() {
   if (!editing_)
@@ -439,6 +527,7 @@ void PaintedMesh::cancel_stroke() {
     allocated_tiles_ = allocated_tiles_ - tile_count(active()) + before_allocated_tiles_;
     active().tiles = std::move(before_);
     editing_ = false;
+    composite_token_=before_composite_token_;
     ++revision_;
   }
 }
@@ -447,12 +536,15 @@ bool PaintedMesh::undo() {
     throw std::logic_error("Finish the paint stroke before undo");
   if (undo_.empty())
     return false;
+  const auto &target=layer(undo_.back().layer);
+  auto token=target.visible&&target.opacity>0?next_composite_token():composite_token_;
   auto s = std::move(undo_.back());
   undo_.pop_back();
   active_ = s.layer;
   allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.before_tiles;
   active().tiles = s.before;
   redo_.push_back(std::move(s));
+  composite_token_=token;
   ++revision_;
   return true;
 }
@@ -461,17 +553,22 @@ bool PaintedMesh::redo() {
     throw std::logic_error("Finish the paint stroke before redo");
   if (redo_.empty())
     return false;
+  const auto &target=layer(redo_.back().layer);
+  auto token=target.visible&&target.opacity>0?next_composite_token():composite_token_;
   auto s = std::move(redo_.back());
   redo_.pop_back();
   active_ = s.layer;
   allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.after_tiles;
   active().tiles = s.after;
   undo_.push_back(std::move(s));
+  composite_token_=token;
   ++revision_;
   return true;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   auto p = std::shared_ptr<PaintedMesh>(new PaintedMesh);
+  p->composite_cache_=composite_cache_;
+  p->composite_token_=composite_token_;
   p->surface_ = surface_;
   p->source_maps_ = source_maps_;
   p->layers_ = layers_;
@@ -498,6 +595,18 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material) const {
   material.validate();
+  CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
+  std::lock_guard lock(composite_cache_->mutex);
+  if(composite_cache_->token==composite_token_&&composite_cache_->factors==factors)
+    if(auto maps=composite_cache_->maps.lock()){composite_retention().retain(maps,composite_token_,factors,true);return maps;}
+  auto maps=composite_retention().find(composite_token_,factors);
+  if(maps){composite_cache_->token=composite_token_;composite_cache_->factors=factors;composite_cache_->maps=maps;return maps;}
+  maps=build_composite(material);
+  composite_cache_->token=composite_token_;composite_cache_->factors=factors;composite_cache_->maps=maps;
+  composite_retention().retain(maps,composite_token_,factors,false);return maps;
+}
+std::shared_ptr<const TextureMaps>
+PaintedMesh::build_composite(const Material &material) const {
   auto maps = std::make_shared<TextureMaps>();
   maps->source_maps=source_maps_;
   uint32_t r=resolution();
@@ -708,6 +817,7 @@ PaintedMesh::reparameterize(Mesh target,
     }
   }
   result->allocated_tiles_ = allocated / sizeof(PaintTile);
+  result->composite_token_=next_composite_token();
   ++result->revision_;
   return result;
 }

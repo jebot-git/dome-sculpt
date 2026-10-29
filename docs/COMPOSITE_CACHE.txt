@@ -1,0 +1,111 @@
+Bounded immutable native paint composite caching
+================================================
+
+PaintedMesh::composite(material) returns shared immutable renderer-ready maps.
+An unchanged snapshot/pose/group/transform/pin job reuses the same pixel buffers
+instead of recomputing full-resolution original textures. Pixel compositing,
+color-space/alpha/channel semantics, source dimensions and source ownership are
+unchanged. This is CPU result reuse, not GPU compositing or downsampling.
+
+Content identity
+----------------
+A process-unique atomic content token identifies actual immutable paint/source
+state. It is independent from revision(): detached snapshots can paint different
+content at equal numeric revisions without colliding. Snapshots share their
+content token and cache lineage; successful visible pixel changes, visible layer
+order/deletion/opacity changes and changed UV transfers get new tokens. Token
+exhaustion explicitly fails before publication instead of wrapping. Source maps
+are immutable and attached before the initial token can be used. Cache state is
+neither serialized nor treated as authoritative document data.
+
+Names, selected layers, empty layers, hidden/zero-opacity paint state and shader
+flags that do not affect composite pixels do not force unnecessary recomputation.
+Current pixel factors are linear material RGBA, emission RGB, metallic and
+roughness. Material validation always runs before lookup. Alpha mode/cutoff,
+unlit/toon/culling and lighting remain renderer state; they do not alter these
+texture pixels. Cancel restores its pre-gesture content identity. Undo/redo use
+new content identities so unrelated layer changes cannot accidentally resurrect
+an older whole-composite state. Existing sparse COW history behavior is preserved.
+
+Concurrency and bounded lifetime
+--------------------------------
+One mutex/weak slot is shared by a snapshot lineage, so simultaneous readers of a
+cold immutable state perform one build. A bounded global LRU also looks up prior
+content/factor combinations, avoiding single-slot thrashing between independently
+painted forks. Different lineages may build concurrently. Cache locks are acquired
+lineage then global; no global operation acquires a lineage lock. Cache const
+reads on immutable snapshots are thread-safe. This does not authorize concurrent
+mutation/read of the same live PaintedMesh or mutable aliases to source images;
+the existing document/model-worker ownership rules remain required.
+
+Global strong retention defaults to 512MiB with a hard maximum 512MiB and 128 map
+entries. set_paint_composite_cache_budget(bytes) can reduce it, including zero.
+paint_composite_cache_stats() reports retained payload bytes/maps, limit, hits and
+completed builds. Accounting includes every derived color/ORM/emission RGBA
+payload and original source Image payload once by shared identity across retained
+maps. Shared source images are not charged repeatedly per material. Individually
+uncacheable maps do not flush unrelated useful entries. Cache-node allocation
+failure simply skips retention after a successful composite; failed pixel builds
+never publish partial cache results.
+
+The LRU owns strong results; per-lineage slots are weak. Eviction releases cached
+frames and source references when no renderer/snapshot client still owns them.
+Live immutable renderer-owned frames remain valid, and their weak slots can
+reuse them after LRU eviction. Lowering a budget does not invalidate external
+owners. The bound is cached payload retention, not total scene/process/GPU memory:
+current/pending renderer frames, source assets, native layers/history, temporary
+cold output buffers and allocator metadata have their separate lifetime/budgets.
+The 128-entry bound also limits cache metadata. Stats and retention hold a small
+global lock, but cold pixel work holds only its lineage lock. Budget changes and
+large reference release belong on a worker, outside headset frame/input handling.
+
+Measured original-source workload
+--------------------------------
+Optimized pre-cache female baseline at editable resolution 256, all 19 original
+parts: 4,995.56ms first pass / 4,995.46ms repeated pass, producing 120,848,384 derived
+RGBA bytes. Repeated source-image charging would incorrectly report 311,435,008
+bytes; unique image accounting retains that full baseline in 202,375,680 bytes.
+
+The native cache fixture measured (under concurrent compiler load):
+  female cold 6,948.5ms, unchanged snapshot pass 0.034710ms;
+  male cold 6,683.7ms, unchanged snapshot pass 0.018873ms.
+
+A mixed female+male scan with no renderer-owned results requires 412,091,392 bytes.
+With 256MiB it demonstrably thrashes: 38 rebuilds and 11,297.4ms on a repeated scan.
+With 512MiB it retains both: 0 rebuilds and 0.036404ms repeated scan. This measured
+multi-object workload is why 512MiB is the default. Users choosing a lower budget
+trade retention for memory; live renderer-owned weak reuse can still help. Timing
+is hardware/load dependent; correctness tests assert pointer/content reuse and
+build counts rather than timing thresholds.
+
+Initial cold baking is still several seconds on this workload. Regenerating a
+new source-backed PaintedMesh lineage does not yet share unpainted source results
+by source-slot semantics across arbitrary lineages. The upcoming direct raw-source
+GPU binding path is needed to avoid that first CPU bake and support immediate
+proportion/geometry regeneration. GPU overlays are separate work. No GPU compute,
+zero-copy upload or overall interactive production completion is claimed here.
+
+Verification
+------------
+Native tests/composite-cache.cpp covers repeated/snapshot/pin reuse; exact color,
+emission/ORM factors; invalid inputs; equal-revision independently painted forks;
+renderer immutability; cancel/undo/redo; visible and hidden layer changes; changed
+UV transfer; eight concurrent cold readers; unique source image accounting;
+quota/entry eviction; oversized entries; zero-retention/live weak reuse and limits.
+Optional actual CC0 baseline paths test every 19-part snapshot and profile mixed
+256/512MiB retention without relying on source downsampling.
+
+After rebuilding core for the changed PaintedMesh header:
+  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/composite-cache.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-composite-cache-test
+  /tmp/dome-composite-cache-test assets/humanoid/vroid/base-female.vrm assets/humanoid/vroid/base-male.vrm
+
+No user project, live session or headset is modified by these tests.
+
+Validated milestone: 33 focused native checks pass optimized Release and
+ASan+UBSan/leak checks, including eight simultaneous immutable snapshot readers.
+Instrumented translation units are composite-cache.cpp and paint.cpp; remaining
+core/xatlas dependencies use their Release archives. The optional real-source
+profile adds two 19-part identity checks and four mixed-budget checks. Existing
+texture-painting 31 and projection 50 regression checks pass with the cached painter.
+ThreadSanitizer was attempted but this toolchain cannot link its missing
+/usr/lib64/libtsan.so.2.0.0 runtime; no TSan-clean claim is made.
