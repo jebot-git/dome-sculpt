@@ -203,6 +203,26 @@ int main() try {
   Scene scene;
   scene.active().painted = std::make_shared<PaintedMesh>(paint);
   scene.active().mesh_active = true;
+  {
+    auto rigged = scene;
+    DeformationState rig(m);
+    rig.skeleton = Skeleton{{{"root", -1, {{0, 0, 0}, {}, {1, 1, 1}}, .5f}}};
+    rig.skin = SkinWeights{};
+    rig.skin->vertices.assign(m.positions.size(), {{0, 1}});
+    rigged.set_deformation(rigged.active().id, rig);
+    Document protected_rig;
+    protected_rig.replace(rigged);
+    bool blocked = false;
+    try {
+      protected_rig.begin_uv();
+    } catch (const std::logic_error &) {
+      blocked = true;
+    }
+    require(blocked && !protected_rig.frame().state->uv &&
+                protected_rig.copy_scene().active().deformation->encode(m) ==
+                    rig.encode(m),
+            "UV editing rejects rigged rest meshes without losing deformation data");
+  }
   Document doc;
   doc.replace(scene);
   doc.begin_uv();
