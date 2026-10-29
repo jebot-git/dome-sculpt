@@ -10,6 +10,7 @@
 #include "creator-editor.hpp"
 #include "rig-editor.hpp"
 #include "weight-editor.hpp"
+#include "skin-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
@@ -389,6 +390,7 @@ struct App {
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
     menu.add("&Scene/Skin weights...", 0, command, this);
+    menu.add("&Scene/Bind or transfer skin...", 0, command, this);
     menu.add("&Scene/Rig and shapekeys...", 0, command, this);
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
     menu.add("&Mesh/Bake surface...",0,command,this);
@@ -530,6 +532,7 @@ struct App {
         std::find_if(s->objects.begin(), s->objects.end(),
                      [&](auto &o) { return o.id == s->active_object; });
     enable("&Scene/Skin weights...", !modal && !s->asset_busy && s->can_paint_weights);
+    enable("&Scene/Bind or transfer skin...", !modal && s->can_configure_skin);
     enable("&Scene/Rig and shapekeys...", !modal && !s->asset_busy &&
            s->mesh_active && bool(s->deformation) && active != s->objects.end() &&
            active->visible && !active->locked);
@@ -785,6 +788,8 @@ struct App {
       canvas.document.duplicate_object();
     } else if (label == "Delete object") {
       canvas.document.delete_object();
+    } else if (label == "Bind or transfer skin...") {
+      edit_skin_dialog(canvas.document);
     } else if (label == "Skin weights...") {
       edit_weights_dialog(canvas.document);
     } else if (label == "Rig and shapekeys...") {

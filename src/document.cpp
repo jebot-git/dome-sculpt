@@ -389,6 +389,14 @@ void Document::publish_locked(bool force) {
   state_.can_paint_weights = active.mesh_active && active.painted && active.visible && !active.locked &&
       active.deformation && active.deformation->skeleton && active.deformation->skin;
   if (!state_.can_paint_weights) state_.weights.enabled = false;
+  state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
+  if(std::find(state_.skin_sources.begin(),state_.skin_sources.end(),state_.skin_options.reference)==state_.skin_sources.end()) {
+    auto self=std::find(state_.skin_sources.begin(),state_.skin_sources.end(),active.id);
+    state_.skin_options.reference=self!=state_.skin_sources.end()?active.id:
+      state_.skin_sources.empty()?0:state_.skin_sources.front();
+  }
+  state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
+  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
   state_.bake_sources = bake_sources_locked();
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
@@ -459,7 +467,8 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::MorphWeight &&
                         state_.controls.parameter != VrParameter::BakeSource &&
                         state_.controls.parameter != VrParameter::BakeDistances &&
-                        state_.controls.parameter != VrParameter::BakeQuality);
+                        state_.controls.parameter != VrParameter::BakeQuality &&
+                        !skin_parameter(state_.controls.parameter));
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
   if (action_active_locked() && end_action_locked())
@@ -1209,6 +1218,9 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(skin_parameter(parameter)) return skin_target_ready_locked() &&
+    (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
+      : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
     return !state_.asset_busy && !state_.recovery_busy && state_.can_paint_weights;
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality)
@@ -1249,6 +1261,23 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(skin_parameter(state_.controls.parameter)) {
+    const auto c=state_.controls;
+    if(accept) {
+      auto &options=state_.skin_options;
+      if(c.parameter==VrParameter::SkinSource) {
+        auto ids=skin_sources_locked(options.mode); options.reference=ids.at(size_t(std::lround(c.value[0])));
+      } else if(c.parameter==VrParameter::SkinMode) options.mode=SkinAuthoringMode(int(std::lround(c.value[0])));
+      else if(c.parameter==VrParameter::SkinDistances) {
+        options.seed_distance=skin_distance_metres(c.value[0]);
+        options.seed_margin=skin_distance_metres(c.value[1]);
+        options.transfer_distance=skin_distance_metres(c.value[2]);
+      } else if(c.parameter==VrParameter::SkinFalloff) options.falloff=c.value[0];
+      else if(c.parameter==VrParameter::SkinInfluences) options.limits.max_influences=uint32_t(std::lround(c.value[0]));
+      else if(c.parameter==VrParameter::SkinPrune) options.limits.prune=c.value[0];
+    }
+    control_before_.reset();control_changed_=false;state_.controls={};return;
+  }
   if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality){
     auto c=state_.controls;
     if(accept){
@@ -1384,6 +1413,23 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::SkinSource: {
+      auto ids=skin_sources_locked(state_.skin_options.mode);c.title="Skin reference (rest space)";
+      c.maximum=float(ids.size()-1);
+      auto found=std::find(ids.begin(),ids.end(),state_.skin_options.reference);
+      c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
+    }
+    case VrParameter::SkinMode:
+      c.title="Automatic bind / weight transfer";c.value[0]=int(state_.skin_options.mode);break;
+    case VrParameter::SkinDistances:
+      c.title="Seed / margin / transfer (world mm)";c.components=3;
+      c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;
+    case VrParameter::SkinFalloff:
+      c.title="Automatic bind distance falloff";c.minimum=1;c.maximum=8;c.value[0]=state_.skin_options.falloff;break;
+    case VrParameter::SkinInfluences:
+      c.title="Maximum skin influences";c.minimum=1;c.maximum=32;c.value[0]=state_.skin_options.limits.max_influences;break;
+    case VrParameter::SkinPrune:
+      c.title="Prune influences below";c.maximum=.99f;c.value[0]=state_.skin_options.limits.prune;break;
     case VrParameter::WeightStrength:
       c.title = "Weight stroke strength"; c.value[0] = state_.weights.strength;
       break;
@@ -1559,6 +1605,13 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::SkinSource:
+  case VrParameter::SkinMode:
+  case VrParameter::SkinDistances:
+  case VrParameter::SkinFalloff:
+  case VrParameter::SkinInfluences:
+  case VrParameter::SkinPrune:
+    break; // Staged operation configuration never changes scene/history.
   case VrParameter::WeightStrength:
     state_.weights.strength = value;
     break;
@@ -1674,6 +1727,9 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
+    !skin_sources_locked(state_.skin_options.mode).empty();
+  if(command==SpatialCommand::SkinUseLocks) return !control_before_ && skin_target_ready_locked() && state_.can_paint_weights;
   if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked)
     return !state_.asset_busy && !state_.recovery_busy && !control_before_ && !action_active_locked() &&
@@ -1805,6 +1861,19 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command==SpatialCommand::BindSkin) {
+    if(command_enabled_locked(command)) {
+      auto options=state_.skin_options;
+      if(state_.skin_use_locks && state_.can_paint_weights) options.locks=state_.weights.locks;
+      else options.locks.clear();
+      queue_bind_skin_locked(std::move(options));
+    }
+    return;
+  }
+  if(command==SpatialCommand::SkinUseLocks) {
+    if(command_enabled_locked(command)) state_.skin_use_locks=!state_.skin_use_locks;
+    return;
+  }
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked) {
     if (!command_enabled_locked(command)) return;
     auto &settings = state_.weights;

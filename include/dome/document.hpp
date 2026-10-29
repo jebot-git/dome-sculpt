@@ -7,6 +7,7 @@
 #include "bake-authoring.hpp"
 #include "uv.hpp"
 #include "weight-authoring.hpp"
+#include "skin-authoring.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -66,6 +67,9 @@ struct EditorState {
   size_t rig_joint = 0, morph_target = 0;
   WeightToolSettings weights;
   bool can_paint_weights = false;
+  SkinAuthoringOptions skin_options;
+  std::vector<uint64_t> skin_sources;
+  bool skin_use_locks = true, can_configure_skin = false, can_bind_skin = false;
   bool can_bake = false, can_clear_bake = false, can_cancel_asset = false;
   float asset_progress = 0;
   uint64_t bake_source = 0;
@@ -180,6 +184,7 @@ public:
   void use_mesh();
   void paint_settings(PaintSettings);
   void weight_settings(WeightToolSettings, std::optional<uint32_t> joint = {}, AssetSource expected = {});
+  void bind_skin(SkinAuthoringOptions, AssetSource expected = {});
   void paint_command(SpatialCommand);
   void sculpt_command(SpatialCommand);
   void sculpt_layer_properties(uint64_t object, uint64_t layer, std::string,
@@ -360,6 +365,9 @@ private:
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
   void queue_clear_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
+  bool skin_target_ready_locked() const;
+  std::vector<uint64_t> skin_sources_locked(SkinAuthoringMode) const;
+  void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {});
   void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome
