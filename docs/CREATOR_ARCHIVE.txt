@@ -1,0 +1,104 @@
+Self-contained original creator asset persistence
+==================================================
+
+CreatorAssetArchive preserves the original immutable VRM/GLB bytes once per
+shared ownership identity, alongside shared PaintImageArchive IDs for every
+already-decoded original image. Per-object appearance records retain authored
+material/mesh/node/primitive IDs and exact native-to-authored vertex mappings.
+No source catalog path, installed baseline, temporary file, Python runtime or
+external-resource resolver is involved in project reload.
+
+Worker integration (one context for the whole Scene):
+  PaintImageArchive images;
+  CreatorAssetArchive models;
+  auto appearance_json=encode_creator_appearance(*object.appearance,models,images);
+  // PaintedMesh::encode(&images) uses this same image context.
+  root["source_models"]=models.encode();
+  root["source_images"]=images.encode();
+
+Worker restoration:
+  auto images=PaintImageArchive::decode(root.at("source_images"));
+  auto models=CreatorAssetArchive::decode(root.at("source_models"),images,limits);
+  auto appearance=decode_creator_appearance(appearance_json,models);
+
+One decoded source entry owns exact original bytes, one preserved ImportedAsset,
+one shared decoded image table and one shared original VRM metadata string.
+Object records share those immutable resources and independently retain their
+vertex remaps. The importer reconstructs source positions/normals, additional UVs,
+vertex colors, tangent handedness, morph positions/normals/tangents, skin inverse
+binds and source instance identity directly from the embedded original. Original
+raw JSON/accessors/unknown extensions remain in the exact source bytes, including
+payload that a future importer may understand. Importer limitations still apply:
+unsupported required extensions/materials fail explicitly; raw preservation does
+not claim current renderer/export support for every authored property.
+
+Original glTF material JSON, VRM0 materialProperties and full VRM metadata are
+reconstructed from source JSON by their original IDs. Native records cannot
+silently replace original provenance with edited material JSON: changes belong
+in separate central editable Material/MToon/avatar state. V1 extensions remain
+in original glTF material/source JSON even when no VRM0 materialProperties exists.
+The current creator appearance identity requires an authored material (importer
+fallback material zero is rejected) and a resolved original instance node.
+
+Every decoded image reference reuses the shared native image archive; PNGs are
+not decoded again during creator restoration. Image count and native image
+validity are checked. PNG IHDR dimensions must match those cached images; pixel
+content is reused as persisted, without claiming a new source-to-cache content
+hash verification. Non-PNG encoded images remain in source/import payload;
+there is no additional JPEG decode/verification implementation here.
+
+Validation and resource bounds
+------------------------------
+Default limits are 16 source assets, 64 MiB/raw asset, 128 MiB total raw source,
+8 MiB/source JSON and 2 million remapped vertices/object. Original GLB magic,
+version/length/JSON header, JSON depth/visit bounds and all outer source budgets
+and image references are checked before source copying/import. The bounded
+import_glb API copies source bytes for its parser, forces PreserveGltf and disables
+filesystem resources, with no base directory to resolve. Cancellation reaches
+metadata parsing, import and long remap loops. Source/image registry publication
+is transactional: failed validation/quota/cancellation preserves their prior state.
+Source vertex records use explicit little-endian uint32 binary data, independent
+of host endian/layout. Missing sources/images, wrong material/node/primitive,
+overflowed integer IDs, truncated/out-of-range remaps and mismatched original
+metadata are rejected. Reusing a model archive with incompatible image registry
+IDs is rejected; all object encoders must share the same image context.
+
+The Scene must separately enforce aggregate source-remap and deformation budgets
+(e.g. 8 million total remap vertices), in addition to its existing 16 Mi editable
+paint texels, 64 Mi unique source-image texels and 256 MiB project-file bounds.
+A document can reach the whole-file cap before any individual registry limit.
+Both verified baselines together contain roughly 34 MiB original GLBs plus
+roughly 196 MiB decoded RGBA, before geometry, paint, skeletons and other metadata.
+Standalone JSON/CBOR serialization, copied source bytes, cgltf parser resources,
+reconstructed ImportedAsset geometry/encoded images and Scene snapshots need
+additional transient worker memory; this is not a hard process-RSS bound.
+No serialization/import or large source ownership release belongs in the headset
+frame/input path. Sources/images must have no mutable aliases after publication.
+Deduplication is by shared identity, not a content-hash or cross-document cache.
+
+Verification
+------------
+Native tests/creator-archive.cpp supplies a fully embedded skinned/morphed GLB
+with PNG alpha, secondary UVs, vertex colors, authored tangents, arbitrary original
+metadata and source-node extras. Fixtures cover duplicate identity, exact native
+restart, source remaps, material/VRM retention, registry limits/atomic rejection,
+malformed references/headers, external-URI rejection, cancellation and image
+header mismatch. Optional command-line paths test both actual CC0 baseline files,
+all 19 authored primitive identities, 25 image references and complete preserved
+source attributes/material metadata. Fixture reads are test input only; native
+restoration itself uses only embedded bytes and existing decoded image IDs.
+
+After rebuilding the core for current headers and adding creator-archive.cpp:
+  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/creator-archive.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-creator-archive-test
+  /tmp/dome-creator-archive-test assets/humanoid/vroid/base-female.vrm assets/humanoid/vroid/base-male.vrm
+
+No overall suite/VRM authoring completeness is claimed by this persistence layer.
+Scene attachment, editable avatar controls, shader/export resolution and complete
+FLTK/XR workflow remain central integration tracked in REQUIREMENTS.md.
+
+Validated milestone: 34 numerical/native/Scene fixtures plus six real-baseline
+checks (40 total) pass optimized Release and ASan+UBSan/leak checks. Sanitized
+translation units are tests/creator-archive.cpp, creator-archive.cpp and import.cpp;
+remaining core/xatlas dependencies use configured Release archives. Original
+female/male sources are 16,323,872 / 17,914,788 bytes, each with 19 primitives and
+25 PNG images; all authored primitive identities and source accessors survive.
