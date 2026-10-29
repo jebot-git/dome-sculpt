@@ -110,7 +110,7 @@ void Scene::validate() const {
       texels += size_t(o.painted->resolution()) * o.painted->resolution();
     if (texels > 16 * 1024 * 1024)
       throw std::length_error("Scene paint-map budget exceeded");
-    count += o.volume->voxels().size();
+    count += std::max(o.volume->voxels().size(), o.volume->stored_samples());
     if (count > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
   }
@@ -154,7 +154,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   Scene result;
   if (j.at("format") != "dome-sculpt")
     throw std::runtime_error("Unsupported scene format");
-  if (j.at("version") == 1) {
+  if (j.at("version") == 1 || (j.at("version") == 2 && j.contains("samples"))) {
     result.active().volume = std::make_shared<Volume>(Volume::decode(j));
     return result;
   }
@@ -199,6 +199,11 @@ Scene Scene::decode(const nlohmann::json &j) {
     if (samples > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
     o.volume = std::make_shared<Volume>(Volume::decode(v.at("volume")));
+    if (o.volume->stored_samples() > v.at("volume").at("samples").size())
+      samples +=
+          o.volume->stored_samples() - v.at("volume").at("samples").size();
+    if (samples > 4'000'000)
+      throw std::length_error("Scene sculpt layer budget exceeded");
     if (j.at("version") == 3) {
       o.mesh_active = v.at("mesh_active").get<bool>();
       if (!v.at("painted").is_null()) {

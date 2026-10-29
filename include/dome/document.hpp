@@ -53,6 +53,12 @@ struct EditorState {
   PaintSettings paint;
   VrControlState controls;
   std::shared_ptr<const UvView> uv;
+  uint64_t active_sculpt_layer = 0;
+  std::vector<std::string> sculpt_layers;
+  std::string sculpt_layer_name;
+  bool sculpt_layer_visible = true, sculpt_layer_locked = false,
+       sculpt_editable = true;
+  float sculpt_layer_opacity = 1;
   uint64_t active_layer = 0;
   bool layer_visible = false;
   std::vector<std::string> paint_layers;
@@ -118,6 +124,9 @@ public:
   void use_mesh();
   void paint_settings(PaintSettings);
   void paint_command(SpatialCommand);
+  void sculpt_command(SpatialCommand);
+  void sculpt_layer_properties(uint64_t object, uint64_t layer, std::string,
+                               bool visible, bool locked, float opacity);
   void report_error(std::string);
   void submit(SpatialFrame);
   void finish_spatial();

@@ -127,3 +127,8 @@ if(TARGET dome-sculpt)
     CONTENT "#!/bin/sh\nexport LD_LIBRARY_PATH=\"$<TARGET_FILE_DIR:fltk::fltk-shared>\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}\"\nexec \"$<TARGET_FILE:dome-sculpt>\" \"\$@\"\n"
     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endif()
+if(BUILD_TESTING)
+ add_executable(dome-sculpt-layers-test tests/sculpt-layers.cpp)
+ target_link_libraries(dome-sculpt-layers-test PRIVATE dome-sculpt-core)
+ add_test(NAME sculpt-layers COMMAND dome-sculpt-layers-test)
+endif()

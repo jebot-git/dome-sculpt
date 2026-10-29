@@ -21,7 +21,8 @@ enum class VrParameter {
   Mask,
   LayerOrder,
   BaseColor,
-  UvEdit
+  UvEdit,
+  SculptOpacity
 };
 struct VrControlState {
   VrParameter parameter = VrParameter::None;

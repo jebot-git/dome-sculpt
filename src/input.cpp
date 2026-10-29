@@ -9,7 +9,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> objects = {
       "New sphere", "New empty",  "Duplicate",  "Next",
       "Previous",   "Visibility", "Lock",       "Delete",
-      "Back",       "Move left",  "Move right", "Center"};
+      "Back",       "Move left",  "Move right", "Sculpt layers"};
   static const std::array<const char *, 12> materials = {
       "Base color", "Blue",      "White",   "Paint tools",
       "Metallic",   "Roughness", "Opacity", "UV editor",
@@ -25,7 +25,12 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Color",      "Metal value", "Rough value", "Emission",
       "Mask value", "Flow",        "Layer alpha", "Brush size",
       "Back",       "Presets",     "Erase",       "Layer order"};
-  return page == 1   ? objects
+  static const std::array<const char *, 12> sculpt = {
+      "Add layer",  "Next layer", "Previous",     "Show layer",
+      "Lock layer", "Strength",   "Delete layer", "Undo",
+      "Back",       "Redo",       "Center",       "Save"};
+  return page == 7   ? sculpt
+         : page == 1 ? objects
          : page == 2 ? materials
          : page == 3 ? paint
          : page == 4 ? colors
@@ -33,6 +38,8 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if (page == 7 && sector == 5)
+    return VrParameter::SculptOpacity;
   if (page == 0) {
     if (sector == 10)
       return VrParameter::BrushRadius;
@@ -71,12 +78,23 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
-  if (index < 0 || index >= 12 || page < 0 || page > 6 || page == 5 ||
+  if (index < 0 || index >= 12 || page < 0 || page > 7 || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if (page == 7) {
+    static const std::array<SpatialCommand, 12> sculpt = {
+        SpatialCommand::SculptAdd,      SpatialCommand::SculptNext,
+        SpatialCommand::SculptPrevious, SpatialCommand::SculptVisible,
+        SpatialCommand::SculptLock,     SpatialCommand::SculptOpacity,
+        SpatialCommand::SculptDelete,   SpatialCommand::Undo,
+        SpatialCommand::Undo,           SpatialCommand::Redo,
+        SpatialCommand::Center,         SpatialCommand::Save};
+    return index == 8 ? std::nullopt
+                      : std::optional<SpatialCommand>(sculpt[index]);
+  }
   if ((page == 0 && (index < 4 || index == 8 || index == 9)) ||
       (page != 0 && index == 8) || (page == 2 && index == 3) ||
-      (page == 3 && index == 11))
+      (page == 3 && index == 11) || (page == 1 && index == 11))
     return {};
   static const std::array<SpatialCommand, 12> root = {
       SpatialCommand::Undo, SpatialCommand::Undo,   SpatialCommand::Undo,
@@ -394,6 +412,9 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 2 && selected_ == 3) {
       page_ = 3;
       selected_ = 0;
+    } else if (page_ == 1 && selected_ == 11) {
+      page_ = 7;
+      selected_ = 0;
     } else if (page_ == 3 && selected_ == 11) {
       page_ = 6;
       selected_ = 0;
@@ -417,7 +438,11 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_ == 4 ? 6 : page_ == 6 ? 3 : page_ == 3 ? 2 : 0;
+      page_ = page_ == 7   ? 1
+              : page_ == 4 ? 6
+              : page_ == 6 ? 3
+              : page_ == 3 ? 2
+                           : 0;
       selected_ = int(tool_);
     } else {
       if (page_ == 0 && selected_ < 4) {

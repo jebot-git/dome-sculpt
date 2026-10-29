@@ -3,4 +3,5 @@
 #include "dome/document.hpp"
 namespace dome {
 void edit_object(Document &);
-}
+void edit_sculpt_layer(Document &);
+} // namespace dome

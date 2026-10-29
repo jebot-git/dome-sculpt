@@ -55,7 +55,14 @@ enum class SpatialCommand {
   FlowDown,
   LayerVisible,
   DeleteLayer,
-  LayerOpacity
+  LayerOpacity,
+  SculptAdd,
+  SculptNext,
+  SculptPrevious,
+  SculptVisible,
+  SculptLock,
+  SculptDelete,
+  SculptOpacity
 };
 const std::array<const char *, 12> &spatial_labels(int page);
 std::optional<SpatialCommand> spatial_action(int page, int index);
@@ -81,6 +88,7 @@ public:
     volume_ = &v;
   }
   void update(const SpatialSample &);
+  void refresh_volume(Volume &v) { volume_ = &v; }
   void cancel();
   bool menu_open() const { return menu_; }
   Vec3 menu_anchor() const { return menu_anchor_; }

@@ -14,8 +14,8 @@
 #endif
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Double_Window.H>
-#include <FL/Fl_Gl_Window.H>
 #include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Gl_Window.H>
 #include <FL/gl.h>
 #include <FL/glu.h>
 #include <bit>
@@ -362,6 +362,16 @@ struct App {
     menu.add("&Paint/Channel/Roughness", '7', command, this, FL_MENU_RADIO);
     menu.add("&Paint/Channel/Emission", '8', command, this, FL_MENU_RADIO);
     menu.add("&Paint/Channel/Layer mask", '9', command, this, FL_MENU_RADIO);
+    menu.add("&Sculpt/Layers/Sculpt layer properties...", 0, command, this);
+    menu.add("&Sculpt/Layers/Add sculpt layer", 0, command, this);
+    menu.add("&Sculpt/Layers/Next sculpt layer", 0, command, this);
+    menu.add("&Sculpt/Layers/Previous sculpt layer", 0, command, this);
+    menu.add("&Sculpt/Layers/Sculpt layer visible", 0, command, this,
+             FL_MENU_TOGGLE);
+    menu.add("&Sculpt/Layers/Sculpt layer locked", 0, command, this,
+             FL_MENU_TOGGLE);
+    menu.add("&Sculpt/Layers/Cycle sculpt strength", 0, command, this);
+    menu.add("&Sculpt/Layers/Delete sculpt layer", 0, command, this);
     menu.add("&Paint/Color/Red paint", 0, command, this);
     menu.add("&Paint/Color/Green paint", 0, command, this);
     menu.add("&Paint/Color/Blue paint", 0, command, this);
@@ -467,6 +477,24 @@ struct App {
     }
     enable("&Scene/&Visible", !modal);
     enable("&Scene/&Locked", !modal);
+    bool sculpt_ready = !modal && !s->asset_busy && !s->mesh_active &&
+                        active != s->objects.end() && active->visible &&
+                        !active->locked;
+    enable("&Sculpt/Layers/Add sculpt layer",
+           sculpt_ready && s->sculpt_layers.size() < 16);
+    enable("&Sculpt/Layers/Next sculpt layer",
+           sculpt_ready && s->sculpt_layers.size() > 1);
+    enable("&Sculpt/Layers/Previous sculpt layer",
+           sculpt_ready && s->sculpt_layers.size() > 1);
+    enable("&Sculpt/Layers/Delete sculpt layer",
+           sculpt_ready && s->sculpt_layers.size() > 1);
+    for (auto path : {"&Sculpt/Layers/Sculpt layer visible",
+                      "&Sculpt/Layers/Sculpt layer locked",
+                      "&Sculpt/Layers/Cycle sculpt strength",
+                      "&Sculpt/Layers/Sculpt layer properties..."})
+      enable(path, sculpt_ready);
+    checked("&Sculpt/Layers/Sculpt layer visible", s->sculpt_layer_visible);
+    checked("&Sculpt/Layers/Sculpt layer locked", s->sculpt_layer_locked);
     const char *tools[] = {"&Sculpt/&Clay", "&Sculpt/Ca&rve", "&Sculpt/&Smooth",
                            "&Sculpt/&Flatten"};
     for (int i = 0; i < 4; ++i) {
@@ -533,6 +561,11 @@ struct App {
       text << " | " << active->name << " (" << info->objects.size()
            << " objects)" << (active->locked ? " [locked]" : "")
            << (active->visible ? "" : " [hidden]");
+    if (!info->mesh_active)
+      text << " | " << info->sculpt_layer_name << " ("
+           << info->sculpt_layers.size() << " layers, "
+           << int(info->sculpt_layer_opacity * 100) << "%)"
+           << (info->sculpt_editable ? "" : " [read only]");
     if (info->mesh_active) {
       text.str("");
       const char *channels[] = {"Color", "Metallic", "Roughness", "Emission",
@@ -697,6 +730,22 @@ struct App {
       canvas.document.use_source();
     } else if (label == "Brush settings...") {
       edit_paint(canvas.document);
+    } else if (label == "Sculpt layer properties...") {
+      edit_sculpt_layer(canvas.document);
+    } else if (label == "Add sculpt layer") {
+      canvas.document.sculpt_command(SpatialCommand::SculptAdd);
+    } else if (label == "Next sculpt layer") {
+      canvas.document.sculpt_command(SpatialCommand::SculptNext);
+    } else if (label == "Previous sculpt layer") {
+      canvas.document.sculpt_command(SpatialCommand::SculptPrevious);
+    } else if (label == "Sculpt layer visible") {
+      canvas.document.sculpt_command(SpatialCommand::SculptVisible);
+    } else if (label == "Sculpt layer locked") {
+      canvas.document.sculpt_command(SpatialCommand::SculptLock);
+    } else if (label == "Cycle sculpt strength") {
+      canvas.document.sculpt_command(SpatialCommand::SculptOpacity);
+    } else if (label == "Delete sculpt layer") {
+      canvas.document.sculpt_command(SpatialCommand::SculptDelete);
     } else if (label == "Add layer")
       canvas.document.paint_command(SpatialCommand::AddLayer);
     else if (label == "Next layer")
@@ -869,7 +918,17 @@ int main(int argc, char **argv) try {
         blue_texels += map->color.rgba[i + 2] > map->color.rgba[i] * 1.5f &&
                        map->color.rgba[i + 2] > 100;
     }
-    std::cout << nlohmann::json{{"paint_blue_texels", blue_texels},
+    auto sculpt_layers = nlohmann::json::array();
+    for (auto &l : volume.layers())
+      sculpt_layers.push_back({{"id", l.id},
+                               {"name", l.name},
+                               {"visible", l.visible},
+                               {"locked", l.locked},
+                               {"opacity", l.opacity},
+                               {"samples", l.delta.size()}});
+    std::cout << nlohmann::json{{"sculpt_layers", sculpt_layers},
+                                {"active_sculpt_layer", volume.active_layer()},
+                                {"paint_blue_texels", blue_texels},
                                 {"uv_hash", uv_hash},
                                 {"paint_hash", paint_hash},
                                 {"painted", scene.active().mesh_active},

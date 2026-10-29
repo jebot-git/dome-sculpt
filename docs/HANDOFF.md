@@ -69,3 +69,35 @@ DOME_TEST_VULKAN_ICD override. No production renderer fallback was changed.
 
 No system installation or active user-session restart was performed. Generated
 builds, toolkit sources/libraries and captured project evidence remain ignored.
+
+
+## Active production goal and sculpt-layer milestone
+
+The user explicitly activated the complete original requirement matrix and
+requested delegation plus validated commit/push milestones. The goal remains
+active; no partial library/build/test milestone completes it.
+
+Native source volumes now have persistent sparse displacement layers, names,
+strength, visibility, locks and stable IDs. Desktop Sculpt/Layers commands,
+properties Apply/Cancel, universal-menu states and XR Object/Sculpt layers
+commands share document transactions. A native XR fixture creates and sculpts a
+new layer and verifies persisted authoring data. See SCULPT-LAYERS.md.
+Volume v2 preserves layered data and rejects silent downgrade; old v1 volumes
+load into Base. COW field/displacement maps keep snapshots immutable and avoid
+whole-map copies until mutation. Field construction validates imported samples.
+
+Validation:11 Release CTests pass (artifacts/tests-sculpt-layers.log),39 native
+synthetic XR assertions,32 actual FLTK universal-menu checks. Eight ASan/UBSan/
+leak-enabled core suites pass (artifacts/tests-layer-sanitize.log); final
+storage-budget/canonical-sample changes also pass focused sanitizer field/layer
+checks (artifacts/tests-layer-sanitize-final.log). No physical-device or
+accelerator claims. The current toolkit and running desktop remain unchanged.
+
+Parallel agents have committed native rig/weights/morph and recovery kernels
+with focused direct tests; these are not yet complete scene/UI workflows.
+Root owns central integration and sculpt controls. Mesh import/processing and
+baking work is in progress independently. Do not overwrite those owned files.
+Next integrate recovery into runtime/source generation, saved-revision cleanup,
+worker discovery/restore and desktop/XR commands, then import/remesh and rigging
+workflows. Keep the complete REQUIREMENTS.md scope, including all plugin
+counterparts and glTF/VRM, active throughout.

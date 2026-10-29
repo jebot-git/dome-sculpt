@@ -446,6 +446,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
         (frame == 12 || frame == 14 || frame == 16 || frame == 18)) ||
        (getenv("DOME_XR_FIXTURE_CONTROLS") && (frame == 12 || frame == 21)) ||
        (getenv("DOME_XR_FIXTURE_UV") && frame == 12) ||
+       (getenv("DOME_XR_FIXTURE_LAYERS") && (frame == 12 || frame == 14)) ||
        (getenv("DOME_XR_FIXTURE_SCENE") &&
         (frame == 12 || frame == 16 || frame == 18 || frame == 20)) ||
        (getenv("DOME_XR_FIXTURE_FILES") &&
@@ -470,6 +471,8 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
       stroke = frame == 19;
     if (getenv("DOME_XR_FIXTURE_UV"))
       stroke = frame == 14 || frame == 20;
+    if (getenv("DOME_XR_FIXTURE_LAYERS"))
+      stroke = frame >= 18 && frame <= 20;
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -536,6 +539,15 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
       out->currentState = {-.8660254f, -.5f};
     if (frame >= 15 && frame <= 18)
       out->currentState = {-1, 0};
+  }
+  if (getenv("DOME_XR_FIXTURE_LAYERS") && right(p->subactionPath) &&
+      a->name == "right_stick") {
+    if (frame == 9 || frame == 10)
+      out->currentState = {-.5f, -.8660254f};
+    if (frame == 11 || frame == 12)
+      out->currentState = {.8660254f, -.5f};
+    if (frame == 13 || frame == 14)
+      out->currentState = {1, 0};
   }
   return XR_SUCCESS;
 }
@@ -609,8 +621,9 @@ FN(GetInstanceProcAddr, XrInstance, const char *name, PFN_xrVoidFunction *out) {
   ENTRY(CreateReferenceSpace)
   ENTRY(DestroySpace)
   ENTRY(CreateActionSet)
-  ENTRY(DestroyActionSet) ENTRY(CreateAction) ENTRY(DestroyAction) ENTRY(
-      StringToPath) ENTRY(PathToString) ENTRY(SuggestInteractionProfileBindings)
+  ENTRY(DestroyActionSet)
+  ENTRY(CreateAction) ENTRY(DestroyAction) ENTRY(StringToPath) ENTRY(
+      PathToString) ENTRY(SuggestInteractionProfileBindings)
       ENTRY(AttachSessionActionSets) ENTRY(CreateActionSpace) ENTRY(
           EnumerateEnvironmentBlendModes) ENTRY(EnumerateViewConfigurationViews)
           ENTRY(EnumerateSwapchainFormats) ENTRY(CreateSwapchain) ENTRY(

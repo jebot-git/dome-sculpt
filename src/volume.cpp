@@ -5,6 +5,7 @@
 #include <fstream>
 #include <limits>
 #include <nlohmann/json.hpp>
+#include <set>
 #include <unistd.h>
 namespace dome {
 Volume::Volume(float voxel, size_t limit)
@@ -13,11 +14,28 @@ Volume::Volume(float voxel, size_t limit)
     throw std::invalid_argument(
         "Voxel size must be between 0.00001 and 1 metres");
 }
+Volume Volume::from_samples(float voxel, Voxels samples) {
+  Volume v(voxel);
+  if (samples.size() > 4'000'000)
+    throw std::length_error("Field sample budget exceeded");
+  auto limit = int64_t(101 / voxel);
+  for (auto &[p, d] : samples) {
+    if (!std::isfinite(d) || std::abs(d) > v.band() ||
+        std::max({std::abs(int64_t(p.x)), std::abs(int64_t(p.y)),
+                  std::abs(int64_t(p.z))}) > limit)
+      throw std::invalid_argument("Invalid imported field sample");
+    if (d < v.band())
+      v.layers_.front().delta.emplace(p, double(d) - v.band());
+  }
+  std::erase_if(samples, [&](const auto &e) { return e.second >= v.band(); });
+  v.cells_ = std::move(samples);
+  return v;
+}
 float Volume::at(Int3 p) const {
   auto it = cells_.find(p);
   return it == cells_.end() ? band() : it->second;
 }
-void Volume::set(Int3 p, float v) {
+void Volume::raw_set(Int3 p, float v) {
   if (at(p) == v)
     return;
   ++revision_;
@@ -26,9 +44,118 @@ void Volume::set(Int3 p, float v) {
   else
     cells_[p] = v;
 }
+
+namespace {
+void layer_name(const std::string &n) {
+  if (n.empty() || n.size() > 256 || n.find('\0') != std::string::npos)
+    throw std::invalid_argument("Invalid sculpt layer name");
+}
+} // namespace
+Volume::Layer &Volume::layer(uint64_t id) {
+  for (auto &l : layers_)
+    if (l.id == id)
+      return l;
+  throw std::out_of_range("Unknown sculpt layer");
+}
+bool Volume::editable_layer() const {
+  for (auto &l : layers_)
+    if (l.id == active_)
+      return l.visible && !l.locked && l.opacity >= .0001f;
+  return false;
+}
+size_t Volume::stored_samples() const {
+  size_t n = 0;
+  for (auto &l : layers_)
+    n += l.delta.size();
+  return n;
+}
+double Volume::sum(Int3 p, uint64_t exclude) const {
+  double v = band();
+  for (auto &l : layers_)
+    if (l.id != exclude && l.visible) {
+      auto i = l.delta.find(p);
+      if (i != l.delta.end())
+        v += i->second * l.opacity;
+    }
+  return v;
+}
+void Volume::set(Int3 p, float v) {
+  auto &l = layer(active_);
+  l.delta[p] = (double(v) - sum(p, active_)) / l.opacity;
+  raw_set(p, v);
+}
+void Volume::clear_history() {
+  undo_.clear();
+  redo_.clear();
+  history_bytes_ = 0;
+}
+void Volume::recompose() {
+  Voxels result;
+  std::unordered_map<Int3, bool, IntHash> keys;
+  for (auto &l : layers_)
+    for (auto &[p, d] : l.delta)
+      keys[p] = true;
+  for (auto &[p, unused] : keys) {
+    float v = std::clamp(float(sum(p)), -band(), band());
+    if (v < band())
+      result.emplace(p, v);
+  }
+  cells_ = std::move(result);
+  ++revision_;
+  clear_history();
+}
+uint64_t Volume::add_layer(std::string name) {
+  if (editing_)
+    throw std::logic_error("Finish sculpt stroke first");
+  layer_name(name);
+  if (layers_.size() >= 16 || next_layer_ == UINT64_MAX)
+    throw std::length_error("Sculpt layer limit reached");
+  Layer l;
+  l.id = next_layer_++;
+  l.name = std::move(name);
+  layers_.push_back(std::move(l));
+  active_ = layers_.back().id;
+  ++revision_;
+  return active_;
+}
+void Volume::select_layer(uint64_t id) {
+  if (editing_)
+    throw std::logic_error("Finish sculpt stroke first");
+  layer(id);
+  active_ = id;
+}
+void Volume::layer_properties(uint64_t id, std::string name, bool visible,
+                              bool locked, float opacity) {
+  if (editing_)
+    throw std::logic_error("Finish sculpt stroke first");
+  layer_name(name);
+  if (!std::isfinite(opacity) || opacity < 0 || opacity > 1)
+    throw std::invalid_argument("Invalid sculpt layer opacity");
+  auto &l = layer(id);
+  l.name = std::move(name);
+  l.visible = visible;
+  l.locked = locked;
+  l.opacity = opacity;
+  recompose();
+}
+void Volume::erase_layer(uint64_t id) {
+  if (editing_)
+    throw std::logic_error("Finish sculpt stroke first");
+  layer(id);
+  if (layers_.size() == 1)
+    throw std::logic_error("Keep at least one sculpt layer");
+  std::erase_if(layers_, [&](auto &l) { return l.id == id; });
+  if (active_ == id)
+    active_ = layers_.front().id;
+  recompose();
+}
+
 Volume Volume::geometry_snapshot() const {
   Volume result(voxel_, history_limit_);
   result.cells_ = cells_;
+  result.layers_ = layers_;
+  result.active_ = active_;
+  result.next_layer_ = next_layer_;
   result.revision_ = revision_;
   return result;
 }
@@ -75,10 +202,14 @@ std::optional<Vec3> Volume::raycast(Vec3 origin, Vec3 direction,
 void Volume::begin_stroke() {
   if (editing_)
     throw std::logic_error("A stroke is already active");
+  if (!editable_layer())
+    throw std::logic_error(
+        "Active sculpt layer is hidden, locked or has zero opacity");
   editing_ = true;
+  before_delta_.clear();
   before_.clear();
 }
-void Volume::stamp(Brush b) {
+void Volume::stamp(Brush b, size_t sample_budget) {
   if (!editing_)
     throw std::logic_error("Begin a stroke before sculpting");
   if (!finite(b.from) || !finite(b.to) || !finite(b.normal) ||
@@ -136,11 +267,21 @@ void Volume::stamp(Brush b) {
     if (!std::isfinite(s.distance))
       throw std::runtime_error(
           "Compute backend returned a non-finite distance");
+  size_t extra = 0;
+  auto &target = layer(active_).delta;
+  for (size_t i = 0; i < keys.size(); ++i)
+    if (samples[i].distance != at(keys[i]) && !target.contains(keys[i]))
+      extra++;
+  if (stored_samples() + extra > std::min(size_t(4'000'000), sample_budget))
+    throw std::length_error("Sculpt layer storage budget exceeded");
   for (size_t i = 0; i < keys.size(); ++i) {
     float old = at(keys[i]), value = samples[i].distance;
     if (value == old)
       continue;
     before_.try_emplace(keys[i], old);
+    auto &d = layer(active_).delta;
+    auto it = d.find(keys[i]);
+    before_delta_.try_emplace(keys[i], it == d.end() ? 0 : it->second);
     set(keys[i], value);
   }
 }
@@ -148,12 +289,21 @@ bool Volume::end_stroke() {
   if (!editing_)
     return false;
   Command command;
+  command.layer = active_;
   command.reserve(before_.size());
   for (auto [p, old] : before_)
-    if (old != at(p))
-      command.push_back({p, old, at(p)});
+    if (old == at(p)) {
+      auto d = before_delta_.at(p);
+      if (d == 0)
+        layer(active_).delta.erase(p);
+      else
+        layer(active_).delta[p] = d;
+    } else
+      command.push_back(
+          {p, old, at(p), before_delta_.at(p), layer(active_).delta.at(p)});
   editing_ = false;
   before_.clear();
+  before_delta_.clear();
   if (command.empty())
     return false;
   for (auto &c : redo_)
@@ -168,8 +318,16 @@ bool Volume::end_stroke() {
   return true;
 }
 void Volume::cancel_stroke() {
-  for (auto [p, old] : before_)
-    set(p, old);
+  for (auto [p, old] : before_) {
+    auto d = before_delta_.at(p);
+    auto &delta = layer(active_).delta;
+    if (d == 0)
+      delta.erase(p);
+    else
+      delta[p] = d;
+    raw_set(p, old);
+  }
+  before_delta_.clear();
   before_.clear();
   editing_ = false;
 }
@@ -180,8 +338,14 @@ bool Volume::undo() {
     return false;
   auto c = std::move(undo_.back());
   undo_.pop_back();
-  for (auto e : c)
-    set(e.key, e.before);
+  for (auto e : c) {
+    auto &d = layer(c.layer).delta;
+    if (e.delta_before == 0)
+      d.erase(e.key);
+    else
+      d[e.key] = e.delta_before;
+    raw_set(e.key, e.before);
+  }
   redo_.push_back(std::move(c));
   return true;
 }
@@ -192,23 +356,48 @@ bool Volume::redo() {
     return false;
   auto c = std::move(redo_.back());
   redo_.pop_back();
-  for (auto e : c)
-    set(e.key, e.after);
+  for (auto e : c) {
+    auto &d = layer(c.layer).delta;
+    if (e.delta_after == 0)
+      d.erase(e.key);
+    else
+      d[e.key] = e.delta_after;
+    raw_set(e.key, e.after);
+  }
   undo_.push_back(std::move(c));
   return true;
 }
 void Volume::save(const std::filesystem::path &path) const {
-  atomic_write(path, nlohmann::json::to_cbor(encode()));
+  auto bytes = nlohmann::json::to_cbor(encode());
+  if (bytes.size() > 128 * 1024 * 1024)
+    throw std::length_error(
+        "Volume project exceeds reloadable file size limit");
+  atomic_write(path, bytes);
 }
 nlohmann::json Volume::encode() const {
   if (editing_)
     throw std::logic_error("End the stroke before saving");
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", 1},
+                      {"version", 2},
                       {"voxel_size", voxel_},
                       {"samples", nlohmann::json::array()}};
   for (auto [p, v] : cells_)
     j["samples"].push_back({p.x, p.y, p.z, v});
+  j["sculpt_layers"] = nlohmann::json::array();
+  j["active_sculpt_layer"] = active_;
+  j["next_sculpt_layer"] = next_layer_;
+  for (auto &l : layers_) {
+    auto ds = nlohmann::json::array();
+    for (auto &[p, d] : l.delta)
+      if (d != 0)
+        ds.push_back({p.x, p.y, p.z, d});
+    j["sculpt_layers"].push_back({{"id", l.id},
+                                  {"name", l.name},
+                                  {"visible", l.visible},
+                                  {"locked", l.locked},
+                                  {"opacity", l.opacity},
+                                  {"delta", std::move(ds)}});
+  }
   return j;
 }
 Volume Volume::load(const std::filesystem::path &path) {
@@ -220,7 +409,8 @@ Volume Volume::load(const std::filesystem::path &path) {
   return decode(j);
 }
 Volume Volume::decode(const nlohmann::json &j) {
-  if (j.at("format") != "dome-sculpt" || j.at("version") != 1)
+  if (j.at("format") != "dome-sculpt" ||
+      (j.at("version") != 1 && j.at("version") != 2))
     throw std::runtime_error("Unsupported project format");
   Volume v(j.at("voxel_size").get<float>());
   auto &samples = j.at("samples");
@@ -251,6 +441,80 @@ Volume Volume::decode(const nlohmann::json &j) {
     if (v.cells_.contains(p))
       throw std::runtime_error("Duplicate project sample");
     v.cells_.emplace(p, d);
+  }
+  std::vector<Int3> outside;
+  for (auto &[p, d] : v.cells_)
+    if (d >= v.band())
+      outside.push_back(p);
+  for (auto p : outside)
+    v.cells_.erase(p);
+  if (j.at("version") == 2 && !j.contains("sculpt_layers"))
+    throw std::runtime_error("Missing sculpt layer data");
+  if (j.contains("sculpt_layers")) {
+    auto &a = j.at("sculpt_layers");
+    if (!a.is_array() || a.empty() || a.size() > 16)
+      throw std::runtime_error("Invalid sculpt layer count");
+    auto id = [](const nlohmann::json &n) {
+      if (!n.is_number_integer() || n.get<int64_t>() <= 0)
+        throw std::runtime_error("Invalid sculpt layer ID");
+      return n.get<uint64_t>();
+    };
+    v.active_ = id(j.at("active_sculpt_layer"));
+    v.next_layer_ = id(j.at("next_sculpt_layer"));
+    v.layers_.clear();
+    std::set<uint64_t> ids;
+    size_t count = 0;
+    for (auto &item : a) {
+      Layer l;
+      l.id = id(item.at("id"));
+      if (l.id >= v.next_layer_ || !ids.insert(l.id).second)
+        throw std::runtime_error("Duplicate sculpt layer ID");
+      l.name = item.at("name").get<std::string>();
+      layer_name(l.name);
+      l.visible = item.at("visible");
+      l.locked = item.at("locked");
+      l.opacity = item.at("opacity");
+      if (!std::isfinite(l.opacity) || l.opacity < 0 || l.opacity > 1)
+        throw std::runtime_error("Invalid sculpt layer opacity");
+      auto &ds = item.at("delta");
+      if (!ds.is_array() || ds.size() > 4'000'000 ||
+          (count += ds.size()) > 4'000'000)
+        throw std::length_error("Sculpt layer storage budget exceeded");
+      for (auto &s : ds) {
+        if (!s.is_array() || s.size() != 4)
+          throw std::runtime_error("Invalid sculpt displacement");
+        Int3 p;
+        int *axes[] = {&p.x, &p.y, &p.z};
+        for (int k = 0; k < 3; k++) {
+          if (!s[k].is_number_integer())
+            throw std::runtime_error("Invalid displacement coordinate");
+          if (s[k].is_number_unsigned() &&
+              s[k].get<uint64_t>() > uint64_t(INT32_MAX))
+            throw std::runtime_error("Displacement coordinate overflow");
+          auto x = s[k].get<int64_t>();
+          if (x < -int64_t(101 / v.voxel_) || x > int64_t(101 / v.voxel_))
+            throw std::runtime_error("Displacement outside workspace");
+          *axes[k] = int(x);
+        }
+        double d = s[3].get<double>();
+        if (!std::isfinite(d) || std::abs(d) > 1e6 ||
+            !l.delta.emplace(p, d).second)
+          throw std::runtime_error("Invalid sculpt displacement value");
+      }
+      v.layers_.push_back(std::move(l));
+    }
+    v.layer(v.active_);
+    auto stored = v.cells_;
+    v.recompose();
+    if (v.cells_.size() != stored.size())
+      throw std::runtime_error("Sculpt layer cache mismatch");
+    for (auto &[p, d] : stored)
+      if (std::abs(v.at(p) - d) > v.voxel_ * 1e-5f)
+        throw std::runtime_error("Sculpt layer cache mismatch");
+    v.cells_ = std::move(stored);
+  } else {
+    for (auto &[p, d] : v.cells_)
+      v.layers_.front().delta[p] = double(d) - v.band();
   }
   return v;
 }

@@ -49,3 +49,8 @@ objects keep their stable UVs and embed PNG color, metallic/roughness and emissi
 maps. Source-stage objects are meshed/unwrapped at export.
 Locks do not exclude objects from export. Advanced UV re-unwrapping/stitching, full MToon, skeletons, morph targets and VRM serialization remain
 tracked in [the full requirements](REQUIREMENTS.md).
+
+
+Source-volume layer authoring and nested volume version2 are documented in
+[SCULPT-LAYERS.md](SCULPT-LAYERS.md). Scene version3 continues to embed the
+validated volume and preserve the explicit source/painted-mesh workflow.

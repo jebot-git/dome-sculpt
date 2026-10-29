@@ -95,8 +95,15 @@ void Document::begin_action_locked() {
 void Document::stamp_action_locked(const Brush &b) {
   if (scene_.active().mesh_active)
     scene_.active().painted->stamp(b, state_.paint);
-  else
-    volume().stamp(b);
+  else {
+    size_t used = 0;
+    for (auto &o : scene_.objects())
+      if (o.id != scene_.active().id)
+        used += std::max(o.volume->stored_samples(), o.volume->voxels().size());
+    if (used > 4'000'000)
+      throw std::length_error("Scene sculpt sample budget exceeded");
+    volume().stamp(b, 4'000'000 - used);
+  }
 }
 bool Document::end_action_locked() {
   return scene_.active().mesh_active ? scene_.active().painted->end_stroke()
@@ -282,6 +289,18 @@ void Document::publish_locked(bool force) {
         *uv_->view().mesh, scene_.object(control_object_).painted->mesh());
   state_.uv = uv_ ? std::make_shared<UvView>(uv_->view()) : nullptr;
   state_.mesh_active = active.mesh_active;
+  state_.active_sculpt_layer = volume().active_layer();
+  state_.sculpt_layers.clear();
+  state_.sculpt_editable = volume().editable_layer();
+  for (auto &l : volume().layers()) {
+    state_.sculpt_layers.push_back(l.name);
+    if (l.id == state_.active_sculpt_layer) {
+      state_.sculpt_layer_name = l.name;
+      state_.sculpt_layer_visible = l.visible;
+      state_.sculpt_layer_locked = l.locked;
+      state_.sculpt_layer_opacity = l.opacity;
+    }
+  }
   state_.active_layer = active.mesh_active ? active.painted->active_layer() : 0;
   state_.paint_layers.clear();
   state_.layer_visible = false;
@@ -361,7 +380,9 @@ void Document::seed() {
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
   if (uv_ || state_.asset_busy || action_active_locked() ||
-      input_.menu_open() || !scene_.active().visible || scene_.active().locked)
+      input_.menu_open() || !scene_.active().visible ||
+      scene_.active().locked ||
+      (!scene_.active().mesh_active && !volume().editable_layer()))
     return false;
   input_.cancel();
   begin_action_locked();
@@ -671,7 +692,9 @@ void Document::process_locked(const SpatialFrame &f) {
   auto object_canvas = ob::compose(state_.canvas, scene_.active().transform);
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
-      !state_.asset_busy && scene_.active().visible && !scene_.active().locked;
+      !state_.asset_busy && scene_.active().visible &&
+      !scene_.active().locked &&
+      (scene_.active().mesh_active || volume().editable_layer());
   input_.painting = scene_.active().mesh_active;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
@@ -906,6 +929,9 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if (parameter == VrParameter::SculptOpacity)
+    return !state_.asset_busy && !scene_.active().mesh_active &&
+           scene_.active().visible && !scene_.active().locked;
   if (parameter == VrParameter::UvEdit) {
     auto &o = scene_.active();
     return !state_.asset_busy && o.mesh_active && o.painted && o.visible &&
@@ -941,6 +967,7 @@ void Document::finish_control_locked(bool accept) {
     state_.controls = {};
     return;
   }
+  bool sculpt_control = state_.controls.parameter == VrParameter::SculptOpacity;
   bool changed = control_changed_;
   if (accept && changed)
     record_locked({{}, *control_before_, scene_});
@@ -953,6 +980,10 @@ void Document::finish_control_locked(bool accept) {
   control_before_.reset();
   control_changed_ = false;
   state_.controls = {};
+  if (sculpt_control) {
+    input_.refresh_volume(volume());
+    bound_volume_ = scene_.active().volume;
+  }
   if (changed)
     publish_locked(true);
 }
@@ -1034,6 +1065,12 @@ void Document::control_event_locked(VrControlEvent event) {
       c.title = "Mask value";
       c.value[0] = state_.paint.mask;
       break;
+    case VrParameter::SculptOpacity: {
+      c.title = "Sculpt layer strength";
+      c.value[0] = state_.sculpt_layer_opacity;
+      o.volume = std::make_shared<Volume>(o.volume->geometry_snapshot());
+      break;
+    }
     case VrParameter::LayerOpacity:
     case VrParameter::LayerOrder: {
       auto &layers = o.painted->layers();
@@ -1109,6 +1146,22 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::SculptOpacity: {
+    auto &v = *o.volume;
+    auto &ls = v.layers();
+    auto l = *std::find_if(ls.begin(), ls.end(),
+                           [&](auto &l) { return l.id == v.active_layer(); });
+    v.layer_properties(l.id, l.name, l.visible, l.locked, value);
+    control_changed_ =
+        value != std::find_if(before.volume->layers().begin(),
+                              before.volume->layers().end(),
+                              [&](auto &l) {
+                                return l.id == before.volume->active_layer();
+                              })
+                     ->opacity;
+    scene_changed = true;
+    break;
+  }
   case VrParameter::BrushRadius:
     state_.radius = value;
     break;
@@ -1190,6 +1243,18 @@ void Document::control_event_locked(VrControlEvent event) {
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
   auto &o = scene_.active();
+  if (command >= SpatialCommand::SculptAdd &&
+      command <= SpatialCommand::SculptOpacity) {
+    if (state_.asset_busy || o.mesh_active || !o.visible || o.locked)
+      return false;
+    auto n = volume().layers().size();
+    return command == SpatialCommand::SculptAdd ? n < 16
+           : command == SpatialCommand::SculptDelete ||
+                   command == SpatialCommand::SculptNext ||
+                   command == SpatialCommand::SculptPrevious
+               ? n > 1
+               : true;
+  }
   if (state_.asset_busy) {
     switch (command) {
     case SpatialCommand::Undo:
@@ -1253,7 +1318,71 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     return true;
   }
 }
+void Document::sculpt_layer_properties(uint64_t object, uint64_t id,
+                                       std::string name, bool visible,
+                                       bool locked, float opacity) {
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  auto &o = scene_.object(object);
+  if (state_.asset_busy || o.mesh_active || o.locked || !o.visible)
+    throw std::logic_error("Sculpt layer properties unavailable");
+  auto next = std::make_shared<Volume>(o.volume->geometry_snapshot());
+  next->layer_properties(id, std::move(name), visible, locked, opacity);
+  Scene before = scene_;
+  o.volume = std::move(next);
+  scene_changed_locked(std::move(before));
+}
+void Document::sculpt_command(SpatialCommand command) {
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  if (command < SpatialCommand::SculptAdd ||
+      command > SpatialCommand::SculptOpacity ||
+      !command_enabled_locked(command))
+    throw std::logic_error("Sculpt layer command unavailable");
+  command_locked(command);
+  publish_locked();
+}
 void Document::command_locked(SpatialCommand command) {
+  if (command >= SpatialCommand::SculptAdd &&
+      command <= SpatialCommand::SculptOpacity) {
+    if (!command_enabled_locked(command))
+      return;
+    Scene before = scene_;
+    auto next = std::make_shared<Volume>(volume().geometry_snapshot());
+    auto ls = next->layers();
+    auto i = std::find_if(ls.begin(), ls.end(), [&](auto &l) {
+      return l.id == next->active_layer();
+    });
+    auto l = *i;
+    switch (command) {
+    case SpatialCommand::SculptAdd:
+      next->add_layer("Sculpt " + std::to_string(ls.size() + 1));
+      break;
+    case SpatialCommand::SculptNext:
+    case SpatialCommand::SculptPrevious:
+      next->select_layer(ls[(size_t(i - ls.begin()) + ls.size() +
+                             (command == SpatialCommand::SculptNext ? 1 : -1)) %
+                            ls.size()]
+                             .id);
+      break;
+    case SpatialCommand::SculptDelete:
+      next->erase_layer(l.id);
+      break;
+    default:
+      next->layer_properties(
+          l.id, l.name,
+          command == SpatialCommand::SculptVisible ? !l.visible : l.visible,
+          command == SpatialCommand::SculptLock ? !l.locked : l.locked,
+          command == SpatialCommand::SculptOpacity
+              ? (l.opacity >= 1 ? .25f : std::min(1.f, l.opacity + .25f))
+              : l.opacity);
+      break;
+    }
+    scene_.active().volume = std::move(next);
+    scene_changed_locked(std::move(before));
+    return;
+  }
+
   if (command == SpatialCommand::MakeMesh) {
     prepare_locked(512);
     return;

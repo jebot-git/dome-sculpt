@@ -131,4 +131,47 @@ void edit_object(Document &document) {
   document.object_properties(object.id, name.value(), visible.value(),
                              locked.value(), t, material);
 }
+void edit_sculpt_layer(Document &document) {
+  auto state = document.frame().state;
+  auto object = state->active_object, layer = state->active_sculpt_layer;
+  int row = std::max(28, dx::size + 12), width = std::max(480, dx::size * 28);
+  DomeDialog window(width, row * 7, "Sculpt layer properties");
+  Fl_Input name(width / 3, row, width * 2 / 3 - 24, row - 4, "Name");
+  name.value(state->sculpt_layer_name.c_str());
+  Fl_Value_Input strength(width / 3, row * 2, width * 2 / 3 - 24, row - 4,
+                          "Strength");
+  strength.bounds(0, 1);
+  strength.step(.01);
+  strength.value(state->sculpt_layer_opacity);
+  Fl_Check_Button visible(24, row * 3, width / 2 - 24, row, "Visible"),
+      locked(width / 2, row * 3, width / 2 - 24, row, "Locked");
+  visible.value(state->sculpt_layer_visible);
+  locked.value(state->sculpt_layer_locked);
+  Fl_Button cancel(width / 2 - 150, row * 5, 140, row, "Cancel"),
+      apply(width / 2 + 10, row * 5, 140, row, "Apply");
+  struct Result {
+    Fl_Window *window;
+    bool accepted = false;
+  } result{&window};
+  cancel.callback(
+      [](Fl_Widget *, void *p) { static_cast<Result *>(p)->window->hide(); },
+      &result);
+  apply.callback(
+      [](Fl_Widget *, void *p) {
+        auto &r = *static_cast<Result *>(p);
+        r.accepted = true;
+        r.window->hide();
+      },
+      &result);
+  window.end();
+  window.set_modal();
+  dx::style(&window);
+  window.show();
+  while (window.shown())
+    Fl::wait();
+  if (result.accepted)
+    document.sculpt_layer_properties(object, layer, name.value(),
+                                     visible.value(), locked.value(),
+                                     float(strength.value()));
+}
 } // namespace dome

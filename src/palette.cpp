@@ -345,6 +345,10 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 10)
         return s.paint.erase;
     }
+    if (s.menu_page == 7 && sector == 3)
+      return s.sculpt_layer_visible;
+    if (s.menu_page == 7 && sector == 4)
+      return s.sculpt_layer_locked;
     if (s.menu_page == 4 && sector == 9)
       return s.layer_visible;
     if (s.menu_page == 6 && sector == 10)
@@ -378,7 +382,8 @@ void SpatialPalette::raster(const EditorState &s) {
   }
   text(320 * unit_, 295 * unit_, "Stick to choose", fg);
   text(320 * unit_, 320 * unit_, "Press to confirm", fg);
-  const char *page = s.menu_page == 1   ? "Objects"
+  const char *page = s.menu_page == 7   ? "Sculpt layers"
+                     : s.menu_page == 1 ? "Objects"
                      : s.menu_page == 2 ? "Material"
                      : s.menu_page == 3 ? "Painting"
                      : s.menu_page == 4 ? "Brush"
@@ -386,7 +391,10 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
-  if (active != s.objects.end())
+  if (s.menu_page == 7) {
+    auto name = s.sculpt_layer_name.substr(0, 28);
+    text(320 * unit_, 580 * unit_, name, fg);
+  } else if (active != s.objects.end())
     text(320 * unit_, 580 * unit_, active->name.substr(0, 28), fg);
   if (!s.error.empty())
     text(320 * unit_, 610 * unit_, s.error.substr(0, 64), fg);
@@ -401,7 +409,10 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message +
       s.error + std::to_string(s.light) + std::to_string(s.accent) +
-      std::to_string(s.opacity) + std::to_string(s.layer_visible) +
+      std::to_string(s.opacity) + s.sculpt_layer_name +
+      std::to_string(s.active_sculpt_layer) +
+      std::to_string(s.sculpt_layer_visible) +
+      std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
   signature += std::to_string(int(s.controls.parameter)) +
                std::to_string(s.controls.selected);

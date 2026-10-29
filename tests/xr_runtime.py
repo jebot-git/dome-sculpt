@@ -131,6 +131,11 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
                 and report.get("tip_pressure_samples", 0) > 0,
                 "MX Ink uses calibrated tip pose and actual tip-force action paths",
             )
+    layers_result,layers_path=run("sculpt-layers",45,mode={"DOME_XR_FIXTURE_LAYERS":"1"})
+    check(layers_result.returncode==0,"Native OpenXR sculpt-layer commands complete and save")
+    layers_info=json.loads(subprocess.check_output([str(binary),"--project-info",str(layers_path)],env=env,text=True))
+    check(len(layers_info["sculpt_layers"])==2 and layers_info["active_sculpt_layer"]==layers_info["sculpt_layers"][1]["id"],"Headset object/layer pages create and select a persistent sculpt layer")
+    check(layers_info["sculpt_layers"][1]["samples"]>0 and layers_info["field_hash"]!=baseinfo["field_hash"],"Tracked pressure strokes populate the new sculpt layer after menu capture ends")
     scene, scene_path = run("scene", 45, mode={"DOME_XR_FIXTURE_SCENE": "1"})
     check(
         scene.returncode == 0,
