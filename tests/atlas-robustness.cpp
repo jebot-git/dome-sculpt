@@ -123,6 +123,14 @@ int main(int argc,char **)try {
       check(true,"Independent GLB accessors retain every original ordered metre-space corner exactly");
     }
   }
+  // Exact dense source from the native baking regression. Its requested64px
+  // atlas needs nine legal repair columns; rounding that to16 falsely refuses.
+  Volume sculpt;sculpt.begin_stroke();Brush clay;clay.radius=.18f;sculpt.stamp(clay);sculpt.end_stroke();
+  auto dense_source=surface_mesh(sculpt),dense=dense_source;detail::AtlasDiagnostics dense_diagnostics;
+  auto dense_info=detail::unwrap_atlas(dense,64,2,&dense_diagnostics);exact_geometry(dense_source,dense);
+  independent_chart_padding(dense,dense_info,2,dense_diagnostics);PaintedMesh dense_paint(dense,128);
+  check(independent_padded_charts(dense,dense_info,2,dense_diagnostics)>0 && dense_diagnostics.u_scale>=.5f,
+        "Actual dense baking sculpt fits non-power-of-two repair capacity with exact geometry, independent padding and strict paint");
   std::filesystem::remove(path);
   }
   auto insufficient=capacity_fixture(),saved=insufficient;bool refused=false;

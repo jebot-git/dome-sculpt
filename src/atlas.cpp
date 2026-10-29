@@ -146,9 +146,14 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
     bool stable=false;
     for(unsigned pass=0;pass<14;++pass) {
       if(!rows)throw capacity();
-      const size_t needed=(separated+rows-1)/rows;columns=1;
-      while(columns<needed && columns<=8192)columns*=2;
-      if(size_t(columns)*cell+2*gutter>atlas->width/2)throw capacity();
+      const size_t needed=(separated+rows-1)/rows,half_width=atlas->width/2;
+      if(half_width<=2*gutter)throw capacity();
+      const size_t maximum_columns=(half_width-2*gutter)/cell;
+      if(needed>maximum_columns)throw capacity();
+      columns=1;
+      // Retain bounded geometric growth, but use the final non-power-of-two
+      // capacity rather than refusing a valid fit (e.g. 9 legal columns).
+      while(columns<needed)columns=uint32_t(std::min(size_t(columns)*2,maximum_columns));
       band=columns*cell;u_offset=float(double(gutter)/atlas->width);u_scale=float(double(atlas->width-band-2*gutter)/atlas->width);
       const size_t previous=separated;
       for(size_t face=0;face<faces;++face)if(!separate[face] && invalid(face,u_scale,u_offset)){separate[face]=1;++separated;}

@@ -21,8 +21,10 @@ preserves the outer sampling footprint. Upstream xatlas deliberately strips
 outer padding; the unchanged V coordinate retains its original border behavior.
 
 Float-quantized transformed faces are checked again. Newly affected faces are
-promoted before publication, and band columns grow in powers of two with a
-fixed pass bound. Geometry, chart capacity, output vertices, dimensions and
+promoted before publication, and band columns grow geometrically with a fixed
+pass bound, clamping the last step to the exact available column capacity.
+Rounding nine legal columns to sixteen must not reject an otherwise valid fit.
+Geometry, chart capacity, output vertices, dimensions and
 final UV determinants are bounded and validated. Capacity failure reports the
 requested resolution and affected count and leaves the caller's mesh unchanged.
 Strict painting validation remains unchanged. Unwrapping still changes the UV
@@ -35,7 +37,7 @@ repaired chart separation; the test does not merely inspect the band's boxes.
 
 ## Validation scope
 
-The 16-case native fixture passes in optimized Release and with
+The initial 16-case native fixture passes in optimized Release and with
 ASan/UBSan/leak detection. Its replacement atlas object and test use only frozen
 publication headers and the root-verified matching Release/instrumented core,
 xatlas and Mikk libraries; dirty primary Volume/Brush headers are excluded.
@@ -50,3 +52,12 @@ capacity diagnostic, then succeeds at 512 pixels under the same strict policy.
 Logs: `artifacts/tests-atlas-robustness-release-final.log` and
 `artifacts/tests-atlas-robustness-sanitize-final.log`. These focused checks are
 separate from the subsequent complete integrated application test run.
+
+The additional dense baking regression uses the unchanged default 0.03 m voxel
+and 0.18 m radius source from `tests/bake.cpp`, with `unwrap(mesh,64,2)`. It needs
+a final nine-column repair band. Exact capacity clamping preserves every face,
+normal, requested chart padding and strict paint validity. The expanded
+17-case fixture passes Release in
+`artifacts/tests-atlas-column-capacity-release.log`; the corresponding whole-core
+sanitizer run is pending at this follow-up checkpoint. The true 41-chart
+insufficient-capacity refusal at 64 pixels remains covered and unchanged.
