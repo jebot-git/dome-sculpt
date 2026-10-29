@@ -41,8 +41,12 @@ becomes ten emitted meshes. First-person mesh annotations and expression binds
 expand to each emitted mesh, and every expression target is independently mapped
 to its native output morph slot. Humanoid bones, first-person head, spring roots,
 centers and collider nodes use exact node remaps. Collider group indices retain
-their original order. Material-value expressions retain source material names,
-which must resolve to actual emitted materials.
+their original order. Material states deduplicate only within their original material ID. Distinct
+painted/native states receive unique output names; material-value expressions
+expand to every applicable state fork. Same-named unrelated original materials
+are never guessed to be one identity. Unused original materials are retained.
+An expression that addresses an altered factor/UV domain rejects until an exact
+property mapping exists, rather than merely renaming a semantically changed bind.
 
 ## Materials and other metadata
 
@@ -58,16 +62,38 @@ constants and source image identity. MToon0 texture properties, including shade,
 rim/matcap and data masks, are remapped explicitly. Material extension paths with
 unknown index semantics reject rather than guessing reference identities.
 
-The ordinary GLB writer neutralizes baked generic paint factors. This VRM0
-milestone supports source-only bindings and raw factor edits; derived painted
-MToon bindings explicitly reject until exact coverage and aliased shade
-reconstruction are available. Dividing by a zero baked base channel cannot
-recover nonzero original shade data. A future painted path must also handle or
-explicitly reject shared nonidentity MainTex ST instead of rebaking only one
-role. Raw factor edits retain original typed factors when the generic fallback
-is unchanged; edited nonzero-source channels use a relative ratio, and edited
-zero-source channels use an explicit absolute override. Schema-unsupported HDR
-base results reject rather than clamp.
+The ordinary GLB writer neutralizes baked generic paint factors. The current
+VRM0 path additionally compiles derived Main/Shade/Emission maps using independent
+color and emission coverage. Fully protected samples retain typed original
+source values; fractional coverage reconstructs the replacement contribution
+without dividing by a zero typed base channel. An aliased shade role receives
+its corresponding paint contribution. HDR shade/emission texture range is
+normalized into explicit VRM0 factors instead of clipped. Untouched emission
+retains its original image and typed factor, preserving unaffected expressions.
+
+Current explicit SourceMaterialBindings supply typed parameters plus resolved
+role images/samplers; original CreatorAppearance IDs and raw avatar remain
+separate provenance. Export never indexes derived role arrays using historical
+source texture IDs. Independent native inspector factors are applied relative
+to the retained native reference once. Raw factor edits preserve original typed
+values when unchanged; nonzero-source edits use a relative ratio and zero-source
+edits use an absolute override. Native alpha/cull/cutoff edits follow the same
+V0 render-state mapping as the viewport. Unsupported HDR main values reject.
+
+Fixed-UV paint plus shared nonidentity ST requires all-slot source UV baking.
+Animated fixed overlays require an explicitly frozen descriptor; export does
+not silently freeze animation. Canonical baked normals still require separate
+typed-normal conversion and explicit tangent export and currently reject here.
+A source-UV derivative normal role is never mislabeled as canonical Mikk data.
+Full derived-normal/consumer interoperability remains unfinished.
+
+VrmExportOptions.paint_resolution defaults to zero, preserving at least the
+original main/shade and coverage dimensions (up to4096). Values64..4096 request
+explicit compiled-map resampling and add a report diagnostic. This does not
+resample retained original encoded source images. The256MiB output limit,
+per-image16Mpixel bound, cancellation and atomic file replacement still apply.
+Compiled image ownership is weakly cached after embedding, so export does not
+retain every large temporary RGBA map merely to deduplicate material states.
 
 Secondary UVs, colors and tangent handedness can be retained in ordinary GLB
 through the original compacted vertex map. Missing requested UV sets and
@@ -144,10 +170,10 @@ provenance/licensing is separately recorded in MTOON.md and MTOON-LICENSE.txt.
 
 - `vrm.secondaryanimation.spring.schema.json` SHA-256 `21b98512fe905d8e363eac64d683a936a451fd71e0a066362482e14b816bc636`.
 
-Native alpha/cull changes that diverge from the retained MToon0 render state
-currently reject until typed state editing is integrated. Cutoff and raw
-base/emission factor edits are mapped directly. Edited authored tangent frames
-also reject rather than silently exporting a stale basis.
+Native alpha/cull/cutoff edits are mapped to matching typed V0 blend/depth/queue
+state when they differ from the explicit native reference. Custom source render
+state stays intact when the inspector is unchanged. Edited authored tangent
+frames still reject rather than silently exporting a stale basis.
 
 ## Coordinate basis and fitted physics
 
@@ -177,14 +203,12 @@ the inverse basis, check all 19 normal accessor directions, measure physics scal
 from native/original bone distances, and verify unknown legacy basis cannot
 replace valid output. Schema success alone does not establish coordinate fidelity.
 
-Derived painted MToon export is currently rejected until the compositor supplies
-exact color coverage and aliased shade reconstruction. In particular, a zero
-base-color channel can retain a nonzero authored shade channel; division by a
-baked factor cannot recover that source information. Raw source previews remain
-exact, including explicit zero-channel color edits. The first native export
-fixtures intentionally use `Scene::preview_surfaces()` for those unpainted source
-bindings. Full painted export is the next integration step, not implied by a
-source-preserving avatar export.
+The original source-only milestone below predated explicit color/emission
+coverage. Current painted compilation uses those grids and original role values
+for protected-channel reconstruction before RGBA8 encoding/quantization. It preserves the zero-base/nonzero-
+shade case, including explicit zero-channel native edits. Canonical normal basis
+conversion, transformed-factor expressions, generated parts, VRM1 and independent
+consumer/device verification remain separate unfinished requirements.
 
 ## Validated milestone evidence
 
@@ -213,3 +237,51 @@ Logs: `artifacts/vrm-native-basis-export.log`,
 reports are under `artifacts/vrm-export-{female,male}/`. None of the generated
 binaries, downloaded schemas, temporary Python environment or external validator
 packages are runtime dependencies or vendored source.
+
+
+## Painted material implementation under integration
+
+A coherent CPU-only snapshot is in artifacts/vrm-painted-snapshot. Its source
+hashes are recorded in artifacts/vrm-painted-snapshot-manifest.json; this is a
+working implementation snapshot, not an exact published commit. Two actual CC0
+avatar fixtures and the pure paint compiler pass162+13 assertions. Together with
+31 source-morph checks, 11 original-frame checks and generic glTF interoperability,
+all five tests pass in92.21s (tests-vrm-painted-sampler-final.log).
+Real painting uses retained editable layers;
+libpng independently decodes emitted green MainTex pixels, cgltf validates the
+container, source-ID material dedup/forks and native immutability are checked,
+and an unaffected material-value expression expands to every fork. An expression
+on a rewritten factor fails atomically and preserves the existing valid output.
+The helper independently checks protected/fractional/full color and HDR emission,
+including opposite64/32 coverage grids and preservation of unpainted emission.
+
+The explicit-role fixture uses a new 2×2 image with an opaque typed texture ID
+outside the original asset table. Its emitted image proves that current roles
+are resolved through the holder rather than accidentally indexed into originals.
+An interim derived normal role fails atomically before replacing valid output.
+Empty original material names remain exact expression identities even if their
+generated output label would collide with a different material's literal name.
+Dormant source attributes on generated volume geometry refuse export before
+replacing an existing valid GLB or VRM; originals stay available for restoration.
+
+All16 emitted baseline/raw/tinted/posed/painted/painted-expression/explicit-role/
+identity-name avatars pass the15 hash-checked pinned official VRM0 schemas and Khronos glTF
+Validator with zero errors. Each retains20 warnings (legacy VRM name and19
+runtime-generated tangent frames). Logs: vrm-painted-official-schema-final3.log
+and vrm-painted-khronos-validation-final3.log. Whole-core C/C++ instrumentation,
+including MikkTSpace and xatlas, passes the same five tests with
+ASan/UBSan/leak detection in185.50s
+(tests-original-frame-sanitize.log). The final bounded frame-vector reservation
+is separately rechecked in Release and sanitizer runs
+(tests-source-frame-reserve-{release,sanitize}.log). Main-tree integration and independent
+graphical-consumer/device verification remain pending; these checks do not
+establish completion of normal-frame or transformed-expression export.
+
+The original-frame tangent contract, versioned primary sources and remaining
+consumer differences are recorded in [NORMAL-FRAME-TRANSPORT.md](NORMAL-FRAME-TRANSPORT.md).
+
+Material expression identity behavior was cross-checked against the official
+UniVRM exporter and runtime at efd20f62f1bf0ac3fcc34de1e497324c5197d146:
+[extension serialization](https://github.com/vrm-c/UniVRM/blob/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM/Runtime/Extensions/glTF_VRMExtensions.cs)
+and [material binding application](https://github.com/vrm-c/UniVRM/blob/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM/Runtime/BlendShape/MaterialValueBindingMerger.cs).
+These are behavioral references; no C# implementation or runtime is incorporated.
