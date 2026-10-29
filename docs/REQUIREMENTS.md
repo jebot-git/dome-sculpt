@@ -26,16 +26,17 @@ shading is inside it.
 | Default trackball/3D mouse input | Trackball orbit/pan/zoom verified in FLTK | Complete intended 3D-mouse device workflow and confirm physical trackball behavior; plain-mouse emulation is optional |
 | Substance-like texturing | Partial: sparse COW paint layers, color/metal/rough/emission/mask channels, pressure capsules across UV seams, compositing, exact history, native FLTK/XR controls, persisted stable UVs and embedded PNG exports tested | Native layered channels, brush/stencil/projection painting, masks, texture sets, bake workflow and editable persistence |
 | Skinning/weight painting | Native locked normalization/prune/mirror/barycentric-transfer and weight-edit kernels tested; scene/UI workflow pending | Native weight painting, constrained normalization, lock/prune, symmetry and reliable transfer |
-| Mesh baking | Not implemented | Normal/AO and required material-channel baking, cage/ray control, seam padding and error handling on real meshes |
-| Remeshing | Only scalar-field surface extraction implemented | Robust mesh-to-volume and topology-preserving/adaptive/isotropic/quad remeshing as appropriate |
+| Mesh baking | Native baker being implemented; no integrated workflow yet | Normal/AO and required material-channel baking, cage/ray control, seam padding and error handling on real meshes |
+| Remeshing | Bounded closed-shell BVH mesh-to-volume with native tests; broader remeshing workflow pending | Robust mesh-to-volume and topology-preserving/adaptive/isotropic/quad remeshing as appropriate |
 | Robust automatic atlasing | xatlas integrated with source mapping and chart packing; initial UV tests | Diverse production fixtures, overlap/stretch/packing bounds, seam preservation, durable chart state |
 | Compact human-editable UVs | Partial: native FLTK/XR chart and vertex editing, explicit cuts, pins, relaxation, packing, filtered paint transfer, gesture-level draft/global undo and persistence tested; conformal re-unwrapping, stitching and production optimization remain pending | Seam marking, island selection, pin/relax, transforms and manual edits in desktop and VR |
 | MToon shaders | Simple toon preview only, not the MToon specification | Native preview and matching VRM material serialization, outlines, transparency, lighting and texture properties |
 | PBR shaders | Shared GGX shader with editable values and painted color/ORM/emission textures; native FLTK and XR controls, independent cgltf/PNG tests and GPU image checks | Native PBR viewport/material editing and glTF material/texture round trips |
+| Anime/toon humanoid creation (additional user requirement) | Agent implementing native parametric body/face/hair authoring based on inspected MakeHuman and VRoid Studio workflows; no completed creator yet | Coherent editable body/face proportions, anime/toon controls, eyes/mouth/hair, stable topology/UVs, humanoid rig/skin/morph outputs, useful desktop/XR authoring, persistence/export and deformation/quality fixtures; explicit source/asset licenses and no proprietary/Python runtime dependency |
 | Humanoid rigging | Validated skeleton/TRS/rest/inverse-bind kernels tested; humanoid fitting and scene/UI workflow pending | Bone placement/fitting, fingers, skeleton validation, coordinate conventions and VR rig-edit workflow |
 | Robust automatic weights | Bounded surface-graph binding kernel with disconnected-component diagnostics tested; production fitting/UI and volume-aware improvements pending | Surface/volume-aware weighting with disconnected parts, thin limbs, topology stress tests and deformation fixtures |
-| CATS basic functionality | Not implemented | Avatar cleanup, bone/material consolidation, pose conventions, shape/viseme tools and export preparation |
-| Auto-Rig Pro basic functionality | Not implemented | Native humanoid auto-fit, editable rig controls and reliable automatic binding; no proprietary code dependency |
+| CATS basic functionality | Native unused-bone compaction and viseme/morph identities tested; scene/UI/export workflow pending | Avatar cleanup, bone/material consolidation, pose conventions, shape/viseme tools and export preparation |
+| Auto-Rig Pro basic functionality | Explicit landmark humanoid fitting and semantic mapping tested; scene/UI/binding workflow pending | Native humanoid auto-fit, editable rig controls and reliable automatic binding; no proprietary code dependency |
 | Divine Cut basic functionality | Not implemented | Interactive cuts, boolean/trim operations, cap/material handling and undo in VR |
 | Retopo Flow basic functionality | Not implemented | Surface-constrained retopology drawing/patches, relax/snap and topology editing in VR |
 | Random Flow basic functionality | Not implemented | Seeded procedural panel/cut/extrusion/detail tools with usable parameters and undo |
@@ -61,3 +62,5 @@ shading is inside it.
    including device reconnect and runtime session-loss recovery.
 
 These are sequencing notes, not reductions of the original goal.
+
+Recovery milestone: native durable service and Document checkpoint/discovery/restore integration are implemented with immutable snapshots and save-boundary cleanup. Desktop/XR controls and transaction tests are under final validation; this does not complete the sculpt or full VR workflow requirements. Native static import, cleanup, BVH and closed-shell voxelization and avatar kernels are in the build; interactive import and rig authoring remain pending.

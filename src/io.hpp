@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include <filesystem>
+#include <fcntl.h>
 #include <span>
 #include <stdexcept>
 #include <unistd.h>
@@ -32,6 +33,15 @@ inline void atomic_write(const std::filesystem::path &path,
     }
     fd = -1;
     std::filesystem::rename(temporary.data(), path);
+    auto parent = path.parent_path();
+    if (parent.empty()) parent = ".";
+    int directory = open(parent.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+    if (directory < 0)
+      throw std::runtime_error("Cannot open output directory for sync");
+    int synced = fsync(directory);
+    int closed = close(directory);
+    if (synced || closed)
+      throw std::runtime_error("Cannot sync output directory");
   } catch (...) {
     if (fd >= 0)
       close(fd);

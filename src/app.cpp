@@ -42,6 +42,8 @@ struct Canvas : Fl_Gl_Window {
   Canvas(int x, int y, int w, int h) : Fl_Gl_Window(x, y, w, h) {
     mode(FL_RGB | FL_DOUBLE | FL_DEPTH | FL_OPENGL3);
     end();
+    document.enable_recovery();
+    document.refresh_recovery();
   }
   ~Canvas() {
     if (renderer) {
@@ -313,6 +315,8 @@ struct App {
     menu.add("&File/&Save", FL_CTRL + 's', command, this);
     menu.add("&File/Save &As...", FL_CTRL | FL_SHIFT | 's', command, this);
     menu.add("&File/Export &glTF (.glb)...", FL_CTRL + 'e', command, this);
+    menu.add("&File/Recovery/Refresh recovery", 0, command, this);
+    menu.add("&File/Recovery/Recover project...", 0, command, this);
     menu.add("&File/Close &Window", FL_CTRL + 'w', command, this);
     if (!dx::dome())
       menu.add("&File/&Quit", FL_CTRL + 'q', command, this);
@@ -429,6 +433,9 @@ struct App {
       if (i >= 0)
         modes[i] = value ? modes[i] | FL_MENU_VALUE : modes[i] & ~FL_MENU_VALUE;
     };
+    enable("&File/Recovery/Refresh recovery", !modal && !s->recovery_busy);
+    enable("&File/Recovery/Recover project...", !modal && !s->recovery_busy &&
+           !s->dirty && !s->asset_busy && !s->recovery_candidates.empty());
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Reset &trackball", "&View/Start or stop &XR",
                            "&View/Shading/&PBR", "&View/Shading/&Toon preview"};
@@ -585,6 +592,10 @@ struct App {
       text.str("");
       text << "XR active | " << hints;
     }
+    auto recovery = canvas.document.recovery_status();
+    if (!recovery.error.empty()) text << " | Recovery: " << recovery.error;
+    else if (!info->recovery_error.empty()) text << " | Recovery: " << info->recovery_error;
+    else if (info->recovery_busy) text << " | Loading recovery";
     status.copy_label(text.str().c_str());
     status.redraw();
     window.copy_label((std::string("Dome Sculpt") +
@@ -647,7 +658,11 @@ struct App {
       canvas.document.end_desktop();
       canvas.sculpting = false;
     }
-    if (label == "New") {
+    if (label == "Refresh recovery") {
+      canvas.document.refresh_recovery();
+    } else if (label == "Recover project...") {
+      if (recover_project(canvas.document)) project.clear();
+    } else if (label == "New") {
       if (discard()) {
         canvas.seed();
         project.clear();
@@ -859,6 +874,8 @@ int main(int argc, char **argv) try {
       else
         throw std::runtime_error("Unknown XR option: " + option);
     }
+    document.enable_recovery();
+    document.refresh_recovery();
     SessionAppearanceMonitor appearance(document);
     if (paint) {
       document.prepare_mesh(256);

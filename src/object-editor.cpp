@@ -3,12 +3,43 @@
 #include "appearance.h"
 #include "ui-conventions.hpp"
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Value_Input.H>
 namespace dome {
+bool recover_project(Document &document) {
+  auto state = document.frame().state;
+  if (state->recovery_candidates.empty()) return false;
+  int row = std::max(28, dx::size + 12), width = std::max(560, dx::size * 34);
+  DomeDialog window(width, row * 6, "Recover project");
+  Fl_Choice choice(20, row, width - 40, row);
+  std::vector<Fl_Menu_Item> items(state->recovery_candidates.size() + 1);
+  for (size_t i = 0; i < state->recovery_candidates.size(); ++i)
+    items[i].label(state->recovery_candidates[i].c_str());
+  choice.copy(items.data());
+  choice.value(0);
+  Fl_Button cancel(width / 2 - 150, row * 4, 140, row, "Cancel"),
+      restore(width / 2 + 10, row * 4, 140, row, "Recover");
+  bool accepted = false;
+  cancel.callback([](Fl_Widget *w, void *) { w->window()->hide(); });
+  restore.callback([](Fl_Widget *w, void *v) {
+    *static_cast<bool *>(v) = true;
+    w->window()->hide();
+  }, &accepted);
+  window.end();
+  window.set_modal();
+  dx::style(&window);
+  window.show();
+  while (window.shown()) Fl::wait();
+  if (accepted && choice.value() >= 0) {
+    document.restore_recovery(size_t(choice.value()));
+    return true;
+  }
+  return false;
+}
 void edit_object(Document &document) {
   auto state = document.frame().state;
   auto item =

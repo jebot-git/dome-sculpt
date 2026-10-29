@@ -382,7 +382,8 @@ void SpatialPalette::raster(const EditorState &s) {
   }
   text(320 * unit_, 295 * unit_, "Stick to choose", fg);
   text(320 * unit_, 320 * unit_, "Press to confirm", fg);
-  const char *page = s.menu_page == 7   ? "Sculpt layers"
+  const char *page = s.menu_page == 8 ? "Recovery"
+                     : s.menu_page == 7   ? "Sculpt layers"
                      : s.menu_page == 1 ? "Objects"
                      : s.menu_page == 2 ? "Material"
                      : s.menu_page == 3 ? "Painting"
@@ -391,13 +392,19 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
-  if (s.menu_page == 7) {
+  if (s.menu_page == 8) {
+    auto name = s.recovery_selected < s.recovery_candidates.size()
+        ? s.recovery_candidates[s.recovery_selected] : "Refresh to find projects";
+    text(320 * unit_, 580 * unit_, name.substr(0, 40), fg);
+  } else if (s.menu_page == 7) {
     auto name = s.sculpt_layer_name.substr(0, 28);
     text(320 * unit_, 580 * unit_, name, fg);
   } else if (active != s.objects.end())
     text(320 * unit_, 580 * unit_, active->name.substr(0, 28), fg);
   if (!s.error.empty())
     text(320 * unit_, 610 * unit_, s.error.substr(0, 64), fg);
+  else if (!s.recovery_error.empty())
+    text(320 * unit_, 610 * unit_, s.recovery_error.substr(0, 64), fg);
   else if (!s.message.empty())
     text(320 * unit_, 610 * unit_, s.message.substr(0, 64), fg);
 }
@@ -407,7 +414,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   std::string signature =
       s.font_file + std::to_string(s.font_pixels) +
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
-      std::to_string(s.active_object) + std::to_string(s.revision) + s.message +
+      std::to_string(s.active_object) + std::to_string(s.revision) + s.message + std::to_string(s.recovery_selected) +
+      std::to_string(s.recovery_candidates.size()) + s.recovery_error +
       s.error + std::to_string(s.light) + std::to_string(s.accent) +
       std::to_string(s.opacity) + s.sculpt_layer_name +
       std::to_string(s.active_sculpt_layer) +

@@ -326,6 +326,7 @@ void Document::publish_locked(bool force) {
                              : command ? command_enabled_locked(*command)
                                        : true;
   }
+  checkpoint_locked();
   published_.store(std::make_shared<EditorState>(state_));
   if (changed) {
     std::lock_guard mesh_lock(mesh_mutex_);
@@ -345,6 +346,9 @@ void Document::finish_locked() {
 void Document::replace(Scene next, bool clean) {
   next.validate();
   std::lock_guard lock(model_mutex_);
+  replace_locked(std::move(next), clean);
+}
+void Document::replace_locked(Scene next, bool clean) {
   finish_locked();
   scene_ = std::move(next);
   bind_locked();
@@ -352,6 +356,11 @@ void Document::replace(Scene next, bool clean) {
   redo_.clear();
   path_.clear();
   ++state_.generation;
+  if (recovery_) {
+    recovery_source_ = {new_recovery_id(), state_.generation, {}};
+    recovery_->set_source(recovery_source_);
+    recovery_content_ = 0;
+  }
   ++state_.input_epoch;
   {
     std::lock_guard queue_lock(input_mutex_);
@@ -362,6 +371,7 @@ void Document::replace(Scene next, bool clean) {
   state_.error.clear();
   anchored_ = false;
   state_.asset_busy = false;
+  state_.recovery_busy = false;
   content_ = next_content_++;
   if (clean)
     saved_content_ = content_;
@@ -569,6 +579,7 @@ void Document::end_uv(bool accept) {
 }
 void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   auto &o = scene_.active();
+  if (o.deformation) throw std::logic_error("UV topology transfer for rigged meshes is not available yet");
   FileJob job{scene_.snapshot(), {},       state_.revision,
               state_.generation, content_, false};
   job.uv_mesh = std::move(mesh);
@@ -603,6 +614,8 @@ void Document::prepare_locked(uint32_t resolution) {
   if (state_.asset_busy)
     throw std::logic_error("A painting mesh is already being prepared");
   auto &o = scene_.active();
+  if (o.deformation)
+    throw std::logic_error("Explicitly remove or transfer rig data before replacing its rest mesh");
   if (o.locked || !o.visible)
     throw std::logic_error(
         "Show and unlock the object before preparing a painting mesh");
@@ -843,6 +856,7 @@ void Document::mesh_loop() {
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
       for (auto &o : objects) {
+        if (o.deformation) o.mesh = o.preview_mesh();
         size_t offset = snapshot->mesh.positions.size(),
                first = snapshot->mesh.indices.size();
         for (auto p : o.mesh.positions)
@@ -893,6 +907,10 @@ void Document::open(const std::filesystem::path &path) {
   replace(std::move(next));
   std::lock_guard lock(model_mutex_);
   path_ = path;
+  if (recovery_) {
+    recovery_source_.source_path = path;
+    recovery_->set_source(recovery_source_);
+  }
 }
 void Document::save(const std::filesystem::path &path) {
   auto completion = std::make_shared<std::promise<void>>();
@@ -908,6 +926,7 @@ void Document::save(const std::filesystem::path &path) {
       throw std::runtime_error("File work queue is full");
     files_.push_back({scene_.snapshot(), path, state_.revision,
                       state_.generation, content_, false, true, completion});
+    files_.back().recovery_source = recovery_source_;
   }
   file_changed_.notify_one();
   result.get();
@@ -918,14 +937,13 @@ void Document::file_locked(bool export_mesh) {
     throw std::logic_error(
         "Wait for mesh/UV preparation before saving or exporting");
   auto path = path_;
+  bool create_parent = path.empty();
   if (path.empty()) {
     const char *state = getenv("XDG_STATE_HOME"), *home = getenv("HOME");
     auto dir =
         state ? std::filesystem::path(state)
               : std::filesystem::path(home ? home : "/tmp") / ".local/state";
     dir /= "dome-sculpt";
-    std::filesystem::create_directories(dir);
-    std::filesystem::permissions(dir, std::filesystem::perms::owner_all);
     path = dir / ("Recovery-" + std::to_string(getpid()) + ".dsculpt");
   }
   if (export_mesh)
@@ -935,6 +953,8 @@ void Document::file_locked(bool export_mesh) {
     throw std::runtime_error("File work queue is full");
   files_.push_back({scene_.snapshot(), path, state_.revision, state_.generation,
                     content_, export_mesh});
+  files_.back().recovery_source = recovery_source_;
+  files_.back().create_parent = create_parent;
   file_changed_.notify_one();
 }
 void Document::request_save(bool export_mesh) {
@@ -950,7 +970,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (parameter == VrParameter::UvEdit) {
     auto &o = scene_.active();
     return !state_.asset_busy && o.mesh_active && o.painted && o.visible &&
-           !o.locked;
+           !o.locked && !o.deformation;
   }
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
@@ -1258,6 +1278,13 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if (command >= SpatialCommand::RecoveryRefresh && command <= SpatialCommand::RecoveryRestore) {
+    if (!recovery_ || state_.recovery_busy) return false;
+    if (command == SpatialCommand::RecoveryRefresh) return true;
+    if (command == SpatialCommand::RecoveryRestore)
+      return !state_.dirty && !state_.asset_busy && !recovery_catalog_.empty();
+    return recovery_catalog_.size() > 1;
+  }
   auto &o = scene_.active();
   if (command >= SpatialCommand::SculptAdd &&
       command <= SpatialCommand::SculptOpacity) {
@@ -1309,7 +1336,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   case SpatialCommand::Duplicate:
     return scene_.objects().size() < 256;
   case SpatialCommand::MakeMesh:
-    return o.visible && !o.locked;
+    return o.visible && !o.locked && !o.deformation;
   case SpatialCommand::EditSource:
     return o.mesh_active;
   case SpatialCommand::PaintColor:
@@ -1359,6 +1386,18 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if (command >= SpatialCommand::RecoveryRefresh && command <= SpatialCommand::RecoveryRestore) {
+    if (!command_enabled_locked(command)) return;
+    if (command == SpatialCommand::RecoveryRefresh) refresh_recovery_locked();
+    else if (command == SpatialCommand::RecoveryRestore)
+      restore_recovery_locked(state_.recovery_selected);
+    else {
+      auto n = recovery_catalog_.size();
+      state_.recovery_selected = (state_.recovery_selected + n +
+          (command == SpatialCommand::RecoveryNext ? 1 : -1)) % n;
+    }
+    return;
+  }
   if (command >= SpatialCommand::SculptAdd &&
       command <= SpatialCommand::SculptOpacity) {
     if (!command_enabled_locked(command))
@@ -1633,6 +1672,35 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if (job->discover_recovery || job->restore_recovery) {
+        if (job->discover_recovery) {
+          auto found = RecoveryService::discover(job->path);
+          std::lock_guard lock(model_mutex_);
+          recovery_catalog_ = std::move(found.candidates);
+          state_.recovery_candidates.clear();
+          state_.recovery_selected = 0;
+          for (auto &c : recovery_catalog_)
+            state_.recovery_candidates.push_back(c.source.source_path.empty()
+                ? "Untitled (" + c.source.id.substr(0, 8) + ")"
+                : c.source.source_path.string());
+          recovery_discovery_error_.clear();
+          for (auto &error : found.errors) recovery_discovery_error_ += error + "\n";
+          if (found.truncated) recovery_discovery_error_ += "Recovery scan limit reached";
+          state_.recovery_busy = false;
+          publish_locked();
+        } else {
+          auto recovered = RecoveryService::load(*job->restore_recovery);
+          std::lock_guard lock(model_mutex_);
+          if (job->generation != state_.generation || job->content != content_)
+            throw std::runtime_error("Document changed while recovery was loading");
+          replace_locked(std::move(recovered), false);
+          state_.message = "Recovered as an unsaved project; save to a new path";
+          state_.recovery_busy = false;
+          publish_locked();
+        }
+        file_changed_.notify_all();
+        continue;
+      }
       if (job->uv_mesh) {
         auto painted = job->scene.object(job->object)
                            .painted->reparameterize(
@@ -1689,6 +1757,10 @@ void Document::file_loop() {
         }
         continue;
       }
+      if (job->create_parent) {
+        std::filesystem::create_directories(job->path.parent_path());
+        std::filesystem::permissions(job->path.parent_path(), std::filesystem::perms::owner_all);
+      }
       if (job->export_mesh) {
         export_glb(job->scene.surfaces(true), job->path);
       } else
@@ -1697,6 +1769,8 @@ void Document::file_loop() {
       if (job->generation == state_.generation) {
         if (!job->export_mesh) {
           saved_content_ = job->content;
+          if (recovery_ && job->recovery_source == recovery_source_)
+            recovery_->discard(job->recovery_source, job->revision);
           if (job->adopt_path)
             path_ = job->path;
         }
@@ -1710,9 +1784,16 @@ void Document::file_loop() {
         job->completion->set_value();
     } catch (const std::exception &e) {
       std::lock_guard lock(model_mutex_);
+      if (job->discover_recovery) {
+        state_.recovery_busy = false;
+        recovery_discovery_error_ = e.what();
+        publish_locked();
+      }
       if (job->generation == state_.generation) {
-        if (job->prepare_mesh || job->uv_mesh)
+        if (job->prepare_mesh || job->uv_mesh || job->restore_recovery)
           state_.asset_busy = false;
+        if (job->discover_recovery || job->restore_recovery)
+          state_.recovery_busy = false;
         state_.error = e.what();
         publish_locked();
       }

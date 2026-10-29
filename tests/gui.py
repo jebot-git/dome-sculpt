@@ -59,6 +59,7 @@ try:
         env = {
             **os.environ,
             "HOME": home,
+            "XDG_STATE_HOME": home + "/state",
             "XDG_RUNTIME_DIR": home,
             "XDG_CONFIG_HOME": home + "/config",
             "XDG_CACHE_HOME": home + "/cache",

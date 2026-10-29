@@ -88,3 +88,32 @@ post-commit prune failure, process death at the publication boundary, corrupt
 latest data fallback, symlink/FIFO rejection and scan/file bounds. It uses only
 unique private temporary fixtures; no live user files or physical XR device.
 This infrastructure does not complete the full production suite requirements.
+
+Document integration (2026-10-29)
+--------------------------------
+The interactive desktop and standalone XR application enable recovery; native
+Document instances are disk-free by default until enable_recovery(root). Every
+completed dirty content transaction queues a cheap immutable snapshot. Active
+strokes, control previews and pending asset results do not queue partial edits.
+Replacement assigns a fresh logical source; already durable earlier checkpoints
+remain recoverable. Pending old-source jobs are invalidated at replacement; an
+unflushed last edit is not guaranteed to survive an immediate document switch.
+File jobs capture the original source/revision, and only successful native saves
+with file AND parent-directory fsync request conditional checkpoint cleanup.
+Save failures preserve checkpoints. The ordinary automatic XR save path also
+creates its output directory on the file worker rather than the input worker.
+
+File > Recovery exposes background Refresh and a native project chooser. Save
+the current project before restoring; the chooser never overwrites a dirty
+project. Recovery opens an unsaved document with a new source identity, and never
+adopts/writes the original source pathname. In XR use Objects > Sculpt layers >
+Recovery; Refresh, Next/Previous and Recover use the same ordered file worker and
+source/content guards. Error/status messages are exposed in the desktop status
+and native document state. The original checkpoint is deliberately retained when
+saving a restored copy, so a mistaken choice cannot destroy the source recovery.
+
+Limitations: polling reports worker failures rather than interrupting the user
+with a modal error; no timed deletion/garbage collection is implemented. Per-source nonblocking
+file locks reject concurrent persistence of an accidentally reused identity;
+fresh runtime documents use unique IDs. Recovery is
+per content transaction, not a promise of capturing an unfinished brush stroke.

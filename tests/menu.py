@@ -73,6 +73,7 @@ async def main():
         env = {
             **os.environ,
             "HOME": home,
+            "XDG_STATE_HOME": home + "/state",
             "XDG_CONFIG_HOME": home + "/config",
             "XDG_CACHE_HOME": home + "/cache",
             "XDG_DATA_HOME": home + "/data",
@@ -170,6 +171,33 @@ async def main():
             and nodes["Undo"][1].get("enabled") is False,
             "Unavailable object and undo commands are exported as disabled",
         )
+        check("Refresh recovery" in nodes and
+              nodes["Recover project..."][1].get("enabled") is False,
+              "Recovery commands use the universal menu and disable empty recovery")
+        await click("Refresh recovery")
+        await asyncio.sleep(0.3)
+        nodes, tree = await layout()
+        check(nodes["Refresh recovery"][1].get("enabled") is True,
+              "Background recovery discovery returns without blocking the native menu")
+        subprocess.run([str(root / "build/dome-sculpt-document-recovery-test"),
+                        "--ui-fixtures", str(Path(home, "state/dome-sculpt/recovery"))], check=True)
+        await click("Refresh recovery")
+        for _ in range(100):
+            nodes, tree = await layout()
+            if nodes["Recover project..."][1].get("enabled") is True: break
+            await asyncio.sleep(0.03)
+        check(nodes["Recover project..."][1].get("enabled") is True,
+              "Native recovery discovery exposes persisted projects")
+        await click("Recover project...")
+        recovery_editor = await wait(lambda: named("Recover project"))
+        check(recovery_editor.get_wm_transient_for().id == window.id,
+              "Recovery chooser uses the document's native modal ownership")
+        await click("Close Window")
+        await asyncio.sleep(0.2)
+        nodes, tree = await layout()
+        check(named("Recover project") is None and
+              nodes["Undo"][1].get("enabled") is False,
+              "Universal Close cancels recovery without changing the document")
         raw = window.get_image(2, 2, 1, 1, X.ZPixmap, 0xFFFFFFFF)
         pixel = Image.frombytes("RGB", (1, 1), raw.data, "raw", "BGRX").getpixel((0, 0))
         check(
@@ -300,13 +328,13 @@ async def main():
         check(chooser.get_wm_transient_for() is not None and chooser.get_wm_class()[1]==window.get_wm_class()[1],"Native file choosers keep the same application identity and dialog relationship")
         await click("Close Window")
         await asyncio.sleep(.3)
-        check(named("Save sculpt project") is None and not list(Path(home).rglob("*.dsculpt")),"Universal Close invokes the chooser's Cancel callback and never saves its default filename")
+        check(named("Save sculpt project") is None and not [p for p in Path(home).rglob("*.dsculpt") if Path(home, "state/dome-sculpt/recovery") not in p.parents],"Universal Close invokes the chooser's Cancel callback and never saves its default filename")
         await click("Save As...")
         chooser=await wait(lambda:named("Save sculpt project"))
         chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
         key("Control_L",True);key("w");key("Control_L",False)
         await asyncio.sleep(.3)
-        check(named("Save sculpt project") is None and not list(Path(home).rglob("*.dsculpt")),"Ctrl+W cancels native Save As before its text field can consume the shortcut")
+        check(named("Save sculpt project") is None and not [p for p in Path(home).rglob("*.dsculpt") if Path(home, "state/dome-sculpt/recovery") not in p.parents],"Ctrl+W cancels native Save As before its text field can consume the shortcut")
         await bus.release_name("com.canonical.AppMenu.Registrar")
         await asyncio.sleep(.7)
         raw=window.get_image(2,2,1,1,X.ZPixmap,0xFFFFFFFF)

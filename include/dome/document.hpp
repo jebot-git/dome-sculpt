@@ -2,6 +2,7 @@
 #pragma once
 #include "input.hpp"
 #include "navigation.hpp"
+#include "recovery.hpp"
 #include "scene.hpp"
 #include "uv.hpp"
 #include <atomic>
@@ -44,6 +45,10 @@ struct EditorState {
   CanvasTransform canvas{}, panel{};
   std::array<SpatialHand, 2> hands{};
   std::string message, error;
+  std::string recovery_error;
+  std::vector<std::string> recovery_candidates;
+  bool recovery_busy = false;
+  size_t recovery_selected = 0;
   std::string font_file;
   int font_pixels = 16;
   bool light = false, toon = false;
@@ -129,6 +134,10 @@ public:
   void sculpt_layer_properties(uint64_t object, uint64_t layer, std::string,
                                bool visible, bool locked, float opacity);
   void report_error(std::string);
+  void enable_recovery(std::filesystem::path = default_recovery_directory());
+  void refresh_recovery();
+  void restore_recovery(size_t index = 0);
+  RecoveryStatus recovery_status() const;
   void submit(SpatialFrame);
   // Platform adapters may deliver a burst with original sample times. Focus
   // loss is ordered after earlier button transitions, not a queue discard.
@@ -164,6 +173,16 @@ private:
   uint64_t last_volume_ = 0, last_paint_ = 0, content_ = 1, saved_content_ = 1,
            next_content_ = 2;
   std::filesystem::path path_;
+  std::unique_ptr<RecoveryService> recovery_;
+  std::filesystem::path recovery_root_;
+  RecoverySource recovery_source_;
+  std::vector<RecoveryCandidate> recovery_catalog_;
+  uint64_t recovery_content_ = 0;
+  std::string recovery_discovery_error_;
+  void replace_locked(Scene, bool clean);
+  void checkpoint_locked();
+  void refresh_recovery_locked();
+  void restore_recovery_locked(size_t);
   std::optional<Scene> control_before_;
   PaintSettings control_settings_;
   float control_radius_ = 0;
@@ -197,6 +216,10 @@ private:
     std::shared_ptr<Volume> source_identity{};
     std::shared_ptr<const Mesh> uv_mesh{};
     std::shared_ptr<PaintedMesh> paint_identity{};
+    RecoverySource recovery_source{};
+    bool create_parent = false;
+    bool discover_recovery = false;
+    std::optional<RecoveryCandidate> restore_recovery{};
   };
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;

@@ -28,8 +28,12 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> sculpt = {
       "Add layer",  "Next layer", "Previous",     "Show layer",
       "Lock layer", "Strength",   "Delete layer", "Undo",
-      "Back",       "Redo",       "Center",       "Save"};
-  return page == 7   ? sculpt
+      "Back",       "Redo",       "Recovery",     "Save"};
+  static const std::array<const char *, 12> recovery = {
+      "Refresh", "Next project", "Previous", "Recover", "Save", "Center",
+      "Undo", "Redo", "Back", "Export glTF", "Objects", "Materials"};
+  return page == 8   ? recovery
+         : page == 7 ? sculpt
          : page == 1 ? objects
          : page == 2 ? materials
          : page == 3 ? paint
@@ -78,9 +82,19 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
-  if (index < 0 || index >= 12 || page < 0 || page > 7 || page == 5 ||
+  if (index < 0 || index >= 12 || page < 0 || page > 8 || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if (page == 8) {
+    static const std::array<SpatialCommand, 12> recovery = {
+      SpatialCommand::RecoveryRefresh, SpatialCommand::RecoveryNext,
+      SpatialCommand::RecoveryPrevious, SpatialCommand::RecoveryRestore,
+      SpatialCommand::Save, SpatialCommand::Center,
+      SpatialCommand::Undo, SpatialCommand::Redo, SpatialCommand::Undo,
+      SpatialCommand::Export, SpatialCommand::Undo, SpatialCommand::Undo};
+    return index == 8 || index > 9 ? std::nullopt
+                                   : std::optional<SpatialCommand>(recovery[index]);
+  }
   if (page == 7) {
     static const std::array<SpatialCommand, 12> sculpt = {
         SpatialCommand::SculptAdd,      SpatialCommand::SculptNext,
@@ -89,7 +103,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
         SpatialCommand::SculptDelete,   SpatialCommand::Undo,
         SpatialCommand::Undo,           SpatialCommand::Redo,
         SpatialCommand::Center,         SpatialCommand::Save};
-    return index == 8 ? std::nullopt
+    return index == 8 || index == 10 ? std::nullopt
                       : std::optional<SpatialCommand>(sculpt[index]);
   }
   if ((page == 0 && (index < 4 || index == 8 || index == 9)) ||
@@ -434,6 +448,12 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 0 && (selected_ == 8 || selected_ == 9)) {
       page_ = selected_ == 8 ? 1 : 2;
       selected_ = 0;
+    } else if (page_ == 7 && selected_ == 10) {
+      page_ = 8;
+      selected_ = 0;
+    } else if (page_ == 8 && (selected_ == 10 || selected_ == 11)) {
+      page_ = selected_ == 10 ? 1 : 2;
+      selected_ = 0;
     } else if (page_ == 2 && selected_ == 3) {
       page_ = 3;
       selected_ = 0;
@@ -464,7 +484,8 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_ == 7   ? 1
+      page_ = page_ == 8   ? 7
+              : page_ == 7 ? 1
               : page_ == 4 ? 6
               : page_ == 6 ? 3
               : page_ == 3 ? 2

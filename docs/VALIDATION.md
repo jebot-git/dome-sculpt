@@ -1,3 +1,24 @@
+# Integrated native authoring and recovery — 2026-10-29
+
+All19 Release CTests pass (50.47 seconds), including native input/recovery,
+rig/avatar/deformation/import/retopology and the real-loader synthetic OpenXR
+client: `artifacts/tests-authoring-milestone.log`. Native GUI22/22 and universal
+menu37/37 checks pass in `artifacts/gui-recovery.log` and
+`artifacts/menu-recovery-chooser.log`. The latter creates actual private
+checkpoint fixtures, discovers them through the application worker and cancels
+the native recovery chooser without changing the current document.
+
+Seven focused whole-core ASan/UBSan/leak suites pass in1.10 seconds:
+`artifacts/tests-recovery-sanitize.log`. Later notification/UI refinements await
+the final focused rebuild; their coverage is not implied by that earlier run.
+Per-component source/validator/sanitizer limits are in RIGGING.md, AVATAR.md,
+DEFORMATION.md, IMPORT-AND-MESH.md and NATIVE-RETOPOLOGY.md.
+
+All local GUI/OpenXR checks select artifacts/toolkit, the canonical22-patch
+Release FLTK build described in TOOLKIT.md. No physical headset/input device,
+accelerator, system installation or session restart is claimed. Earlier remote
+checkpoint evidence below belongs to its stated environment.
+
 # Continuous UV gesture history — 2026-10-29
 
 Native FLTK drags/wheel bursts and XR ray/stick/fine-wheel adjustments now undo

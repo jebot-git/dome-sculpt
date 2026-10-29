@@ -8,6 +8,10 @@ The original notices and licenses on reused source files remain in force.
   surface picking adapts `isect_ray_tri_v3` with a relative determinant epsilon.
   `third_party/blender/BKE_blender_version.h` proves version and cycle for the
   pinned source commit. The reference `.cc` files are not compiled wholesale.
+  Closest-triangle region classification adapts `closest_on_tri_to_point_v3`;
+  sparse locked-weight normalization adapts `BKE_defvert_normalize_ex` mass
+  reservation. Exact hashes and deviations are in `docs/IMPORT-AND-MESH.md`
+  and `docs/RIGGING.md`.
 - OpenBrush Native: Apache-2.0. Its `navigation` and `controller-profiles` sources
   are compiled unchanged, along with the EGL graphics helper. Native session
   lifecycle, controller actions, matrices and BDF palette rendering are adapted
@@ -23,7 +27,7 @@ The original notices and licenses on reused source files remain in force.
 - xatlas: MIT, including the original Thekla/NVIDIA notices in its source.
   Source and LICENSE are under `third_party/xatlas`.
 - cgltf 1.15: MIT notice at the bottom of `third_party/cgltf/cgltf.h`.
-  Used only by the independent native glTF validation test.
+  Compiled by the native static glTF/GLB importer and used by independent export validation.
 
 libpng is linked from the system for native PNG encoding; it is not vendored.
 
@@ -32,3 +36,11 @@ Exact repositories, commits, roles and SHA-256 hashes are recorded in
 references under evaluation, not bundled or linked implementations. Their GUI
 runtimes are not dependencies of Dome Sculpt. Blender Python add-ons named in
 the requirements are workflow targets, not proprietary code dependencies.
+
+VCGlib blended uniform Laplacian semantics inform native retopology relaxation;
+GPL-2.0-or-later source reference, with exact commit/hash and algorithm bounds in
+`docs/NATIVE-RETOPOLOGY.md`. No VCGlib container or MeshLab frontend is linked.
+Wings boundary half-edge classification also informs the native topology maps.
+Official VRM/glTF specifications are normative avatar/export references; no VRM
+schema/code is copied or code license grant inferred. Exact hashes are recorded
+in `docs/AVATAR.md` and `third_party/sources.json`.
