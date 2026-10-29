@@ -22,6 +22,7 @@ struct UvView {
   uint32_t face = 0, vertex = UINT32_MAX;
   int tool = 0; // move, scale, turn
   bool vertices = false, valid = true, can_undo = false, can_redo = false;
+  bool validating = false, committing = false;
   std::array<float, 2> cursor{};
   std::string error;
 };
@@ -46,13 +47,15 @@ enum class UvAction {
 // Both frontends operate the same draft; commit resamples paint off-thread.
 class UvWorkspace {
 public:
-  explicit UvWorkspace(Mesh, uint32_t resolution);
+  explicit UvWorkspace(Mesh, uint32_t resolution, bool defer_validation = false);
   const UvView &view() const { return view_; }
   void edit(UvAction, float x = 0, float y = 0);
+  bool validated(const std::shared_ptr<const Mesh> &, std::string error);
 
 private:
   UvView view_;
   uint32_t resolution_;
+  bool defer_validation_;
   uint64_t revision_ = 1;
   std::vector<UvView> undo_, redo_;
   std::optional<UvView> gesture_;
@@ -62,5 +65,5 @@ private:
   std::vector<uint32_t> selected() const;
 };
 bool uv_changed(const Mesh &, const Mesh &);
-std::string validate_uv(const Mesh &);
+std::string validate_uv(const Mesh &, const std::function<bool()> &cancelled = {});
 } // namespace dome

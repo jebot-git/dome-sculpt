@@ -19,6 +19,54 @@ Release FLTK build described in TOOLKIT.md. No physical headset/input device,
 accelerator, system installation or session restart is claimed. Earlier remote
 checkpoint evidence below belongs to its stated environment.
 
+# Background UV validation — 2026-10-29
+
+Full overlap/bounds/degeneracy checks now run on a cancellable worker outside
+model/input locks. Previews remain editable while checking; accepted immutable
+Apply targets are independently validated on the asset worker before transfer.
+Invalid targets preserve the draft and original paint. Native Apply retains its
+modal until transfer succeeds. Source/session/generation/request guards reject
+stale results, including after undo, cancellation and document replacement.
+
+- All ten Release CTest suites passed in 243.56 s:
+  `artifacts/tests-uv-worker.log`. OpenXR has 40 checks, complete=true,
+  status=passed, zero failures (`build/xr-client/report.json`).
+- Three targeted UV/controller/shared-document ASan/UBSan/leak suites passed in
+  222.75 s: `artifacts/tests-uv-worker-sanitize.log`.
+- Native GUI 23/23 passed: `artifacts/gui-uv-worker-reviewed.log`, including
+  multi-event drag/wheel undo, accepted-transfer completion and global undo.
+- Universal menu 25/25 passed: `artifacts/menu-uv-worker-reviewed.log`.
+- Focused optimized UV/controller/document checks passed in 21.44 s:
+  `artifacts/tests-uv-worker-focused.log`.
+
+An initial menu attempt timed out before a window appeared; the unchanged
+harness subsequently passed all 25 checks. The first GUI run passed 22 checks;
+a later run with the added transfer-completion assertion failed earlier at its
+material setup. Its screenshot showed 0.02 entered in Name while Red remained
+0.58. Setup now uses native Tab focus navigation for the numeric material fields;
+the blue-material assertion remains intact. The final 23-check GUI run passed.
+No earlier/stale report is used in place of those terminal results.
+
+The isolated CPU benchmark uses the same persisted 19,944-triangle fixture and
+20 translation samples as the preceding ~106.3 ms mean / 110.1 ms maximum
+synchronous benchmark. New edit submission: 1.077 ms mean / 2.509 ms maximum;
+final background validation wait: 104.96 ms. Preview valid, every sample applied,
+held snapshots unchanged and whole-gesture undo exact. Validation itself still
+costs ~105 ms. A cost breakdown measured mesh copy 0.047 ms, structural validation
+0.128 ms and UV comparison 0.174 ms. Selection, copies, topology, relaxation and
+packing still execute synchronously; larger production meshes remain unverified.
+
+Reproduce using the excluded-from-all `dome-sculpt-uv-benchmark` CMake target and
+`build/xr-client/paint-baseline.dsculpt`; see UV.md. Benchmark output:
+`artifacts/uv-worker-benchmark.json`; cost profile: `artifacts/uv-cost-profile.log`.
+Fresh builds use canonical DomeD's locally rebuilt 22-patch FLTK toolkit from
+artifacts/toolkit. Actual linkage is in artifacts/linkage-uv-worker.log, without
+Qt/GTK/Pango libraries. Vendored source/toolkit hashes and Git whitespace checks
+pass. No system install/session restart, fresh nested-compositor, physical-device
+or accelerator validation is claimed. Full scope remains incomplete.
+
+Local machine-readable evidence: `artifacts/validation-uv-worker.json`.
+
 # Continuous UV gesture history — 2026-10-29
 
 Native FLTK drags/wheel bursts and XR ray/stick/fine-wheel adjustments now undo

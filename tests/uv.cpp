@@ -23,6 +23,15 @@ int main() try {
           "Adjacent UV faces form one editable chart");
   require(!uv_changed(m, *edit.view().mesh),
           "Opening an older UV mesh without pins/cuts is a semantic no-op");
+  UvWorkspace deferred(m, 128, true);
+  auto first_validation = deferred.view().mesh;
+  deferred.edit(UvAction::Move, .02f, 0);
+  require(deferred.view().validating && !deferred.view().valid &&
+              !deferred.validated(first_validation, {}),
+          "An old validation result cannot approve a newer UV preview");
+  require(deferred.validated(deferred.view().mesh, {}) &&
+              deferred.view().valid && !deferred.view().validating,
+          "Validation approves only the exact immutable mesh it checked");
   UvWorkspace gesture(m, 128);
   gesture.edit(UvAction::BeginGesture);
   for (int i = 0; i < 100; ++i) {
@@ -219,6 +228,7 @@ int main() try {
           "UV redo restores the edited mesh and transferred layers");
   doc.begin_uv();
   doc.edit_uv(UvAction::Move, 3, 0);
+  require(doc.wait_uv(), "Background validation settles the invalid draft");
   bool rejected = false;
   try {
     doc.end_uv(true);
@@ -228,6 +238,35 @@ int main() try {
   require(rejected && doc.frame().state->uv,
           "An invalid Apply keeps the editable draft open");
   doc.end_uv(false);
+  doc.replace(scene);
+  doc.begin_uv();
+  auto held_uv = doc.frame().state->uv->mesh;
+  for (int i = 0; i < 24; ++i)
+    doc.edit_uv(UvAction::Move, i % 2 ? -.01f : .01f, 0);
+  doc.edit_uv(UvAction::Move, 2, 0);
+  require(doc.wait_uv() && !doc.frame().state->uv->valid &&
+              !doc.frame().state->uv->validating && held_uv->uv == m.uv,
+          "The latest invalid preview wins superseded checks without mutating held snapshots");
+  doc.edit_uv(UvAction::Undo);
+  require(doc.wait_uv() && doc.frame().state->uv->valid,
+          "Undo revalidates the restored immutable UV mesh");
+  doc.edit_uv(UvAction::Move, 2, 0);
+  // The worker may finish before Apply or after it. Both orders must retain the
+  // invalid draft and original paint, and permit correction/cancellation.
+  try {
+    doc.end_uv(true);
+  } catch (const std::runtime_error &) {
+  }
+  require(doc.wait_asset() && doc.wait_uv() && doc.frame().state->uv &&
+              !doc.frame().state->uv->valid &&
+              doc.copy_scene().active().painted->encode() == original,
+          "An invalid pending Apply cannot publish paint or discard its editable draft");
+  doc.end_uv(false);
+  doc.begin_uv();
+  doc.edit_uv(UvAction::Move, .03f, 0);
+  doc.replace(scene);
+  require(doc.wait_uv() && !doc.frame().state->uv && !doc.frame().state->dirty,
+          "Replacing the document cancels draft validation without resurrecting an old workspace");
   // Real controller input reaches the same UV workspace through an XR palette.
   doc.replace(scene);
   SpatialFrame frame;
@@ -505,7 +544,7 @@ int main() try {
   require(sphere.wait_asset(std::chrono::seconds(180)),
           "Sculpt surface extraction and automatic atlasing finish");
   sphere.begin_uv();
-  require(sphere.frame().state->uv->valid,
+  require(sphere.wait_uv() && sphere.frame().state->uv->valid,
           "The actual sculpt atlas opens as valid editable UV charts");
   sphere.end_uv(false);
   return 0;

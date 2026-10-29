@@ -33,3 +33,10 @@ fine-wheel rates, exact cancellation and global undo. The XR test harness writes
 incremental reports with a `complete` flag and preserves generated projects and
 UV/restart comparison JSONs under its output directory. Physical-device behavior,
 production-size latency and instance-loss recovery remain unverified.
+
+UV previews now schedule cancellable background validation. An accepted Apply
+captures its exact immutable mesh for independent validation and transfer on the
+asset worker. It remains ordered before later focus loss/shutdown; invalid
+captured targets cannot commit paint. Unaccepted draft checks are invalidated
+on cancellation/replacement and cannot recreate a closed workspace. See UV.md
+for pending-check/commit behavior and the separate wait helpers.

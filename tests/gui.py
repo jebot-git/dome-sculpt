@@ -221,22 +221,32 @@ try:
         d.sync()
         time.sleep(0.3)
 
-        def editor_field(y, text):
-            g = editor.get_geometry()
-            xtest.fake_input(d, X.MotionNotify, x=g.x + 340, y=g.y + y)
-            d.sync()
-            button(True)
-            button(False)
+        def replace_focused(text):
             key("Control_L", True)
             key("a")
             key("Control_L", False)
             for ch in text:
                 key("period" if ch == "." else ch)
 
+        def editor_field(y, text):
+            g = editor.get_geometry()
+            xtest.fake_input(d, X.MotionNotify, x=g.x + 340, y=g.y + y)
+            d.sync()
+            button(True)
+            button(False)
+            replace_focused(text)
+
         editor_field(42, "azure")
-        editor_field(322, "0.02")
-        editor_field(350, "0.06")
-        editor_field(378, "0.9")
+        # Value_Input supports pointer dragging and only gives text focus for a
+        # click. Use the native focus order to avoid a synthetic click being
+        # classified as a drag and replacing the previous field instead.
+        for _ in range(11):
+            key("Tab")
+        replace_focused("0.02")
+        key("Tab")
+        replace_focused("0.06")
+        key("Tab")
+        replace_focused("0.9")
         g = editor.get_geometry()
         raw = editor.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
         Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX").save(
@@ -407,7 +417,16 @@ try:
         g = uv_window.get_geometry()
         xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2+100,y=g.y+g.height-16)
         d.sync();button(True);button(False)
-        time.sleep(3)
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            assert app.poll() is None, (out / "app.log").read_text()
+            if not any("UV editor" in str(w.get_wm_name() or "")
+                       for w in d.screen().root.query_tree().children):
+                break
+            time.sleep(.1)
+        check(not any("UV editor" in str(w.get_wm_name() or "")
+                      for w in d.screen().root.query_tree().children),
+              "The native UV dialog closes after the accepted transfer completes")
         window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
         applied_uv = shot("18-uv-applied")
         check(ImageChops.difference(frozen,applied_uv).getbbox() is None, "Applying UV edits retains the existing three-dimensional surface appearance")

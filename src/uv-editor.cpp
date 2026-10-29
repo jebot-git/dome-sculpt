@@ -16,7 +16,8 @@ class UvCanvas : public Fl_Widget {
   static void wheel_finished(void *data) {
     auto &self = *static_cast<UvCanvas *>(data);
     self.wheeling_ = false;
-    if (self.doc_.frame().state->uv) {
+    auto view = self.doc_.frame().state->uv;
+    if (view && !view->committing) {
       try {
         self.doc_.edit_uv(UvAction::EndGesture);
       } catch (const std::exception &e) {
@@ -27,7 +28,8 @@ class UvCanvas : public Fl_Widget {
   void finish_gesture() {
     Fl::remove_timeout(wheel_finished, this);
     dragging_ = wheeling_ = false;
-    if (doc_.frame().state->uv)
+    auto view = doc_.frame().state->uv;
+    if (view && !view->committing)
       doc_.edit_uv(UvAction::EndGesture);
   }
 
@@ -186,6 +188,11 @@ void edit_uv(Document &doc) {
                                "turn | Pick an edge before Seam")
               : v->error.c_str());
       if (buttons.size() > 5) {
+        for (auto button : buttons)
+          if (v->committing)
+            button->deactivate();
+          else
+            button->activate();
         if (v->can_undo)
           buttons[4]->activate();
         else
@@ -247,7 +254,6 @@ void edit_uv(Document &doc) {
     struct Result {
       Fl_Window *window;
       Document *doc;
-      bool accepted = false;
     } result{&window, &doc};
     cancel.callback(
         [](Fl_Widget *, void *p) { static_cast<Result *>(p)->window->hide(); },
@@ -255,9 +261,13 @@ void edit_uv(Document &doc) {
     apply.callback(
         [](Fl_Widget *, void *p) {
           auto &r = *static_cast<Result *>(p);
-          if (r.doc->frame().state->uv->valid) {
-            r.accepted = true;
-            r.window->hide();
+          auto view = r.doc->frame().state->uv;
+          if (view && view->valid) {
+            try {
+              r.doc->end_uv(true);
+            } catch (const std::exception &e) {
+              r.doc->report_error(e.what());
+            }
           }
         },
         &result);
@@ -276,7 +286,7 @@ void edit_uv(Document &doc) {
       else
         apply.deactivate();
     }
-    doc.end_uv(result.accepted);
+    doc.end_uv(false);
   } catch (...) {
     doc.end_uv(false);
     throw;

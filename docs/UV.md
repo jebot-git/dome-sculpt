@@ -17,7 +17,7 @@ charts in place, places other chart bounds with four-pixel padding and optional
 quarter turns, and applies a shared scale to those charts. Relaxation retains
 boundaries and pins, with a backtracking step to avoid triangle folds. Bounds,
 collapsed triangles and positive-area overlap are checked; invalid drafts remain
-visible and Apply is disabled. Draft Undo/Redo is bounded by 32 entries and a
+visible and known-invalid Apply is disabled. Draft Undo/Redo is bounded by 32 entries and a
 32 MiB target budget (one large prior state is retained).
 
 A pointer drag is one local undo step, regardless of its sample count. XR stick
@@ -30,13 +30,28 @@ an accepted changed gesture replaces the redo branch. Identity transforms do not
 introduce floating-point edits. Closing/cancelling the full UV workspace retains
 the original document asset, as before.
 
+UV overlap/bounds/degeneracy validation runs on a dedicated worker outside the
+model lock. Previews publish immediately as "Checking UVs..."; newer meshes
+cancel obsolete checks. Results require the same immutable mesh, workspace
+session, document generation and request token. Undo/redo can restore a pending
+snapshot and schedule its validation again. Mesh copying, selection, topology,
+relaxation and packing still execute synchronously and need larger-mesh profiling.
+
+Native Apply waits for a checked-valid draft. XR "Check & Apply" can capture a
+preview while checking; the file/asset worker validates that exact target before
+paint transfer. Editing/history are locked while it commits. Invalid targets
+retain the editable draft and original paint. The native dialog stays open until
+transfer succeeds, allowing correction/retry if work fails. An already accepted
+Apply remains ordered ahead of subsequent focus loss; cancelling an unaccepted
+draft cancels its checks and cannot resurrect an old workspace.
+
 In XR, Materials → UV editor opens the same workspace. Ray-pick a chart/vertex,
 then drag or use the stick. Move, Scale and Turn select continuous transform
 modes. Scaling is logarithmic; vertical input supplies a ten-times-finer wheel
 for scale/turn. A stylus can operate a panel opened by a controller. Toolbar
 buttons also expose pins, relaxation, packing, cuts and draft history. Apply or
-the owner's stick press accepts; Cancel, Escape or owner focus/tracking loss
-restores the previous asset. Invalid Apply retains the draft.
+the owner's stick press accepts; before Apply, Cancel, Escape or owner
+focus/tracking loss restores the previous asset. Invalid Apply retains the draft.
 
 Apply transfers every editable paint layer in the background. Triangle identity
 and barycentric coordinates map each destination texel back to its old UVs.
@@ -63,3 +78,19 @@ A reproducible queued-Apply data-loss defect is fixed by
 failure cannot be established from its missing comparison artifacts; subsequent
 native runs pass. The complete production workflow remains unfinished; evidence
 and next steps are in [the handoff](HANDOFF.md).
+
+For native callers, `Document::edit_uv` publishes geometry without waiting for
+validation. `wait_uv` waits for the current workspace's check/commit state;
+`wait_asset` waits for accepted transfer work even if the workspace was closed.
+Direct `UvWorkspace` use remains synchronous unless deferred validation is
+explicitly requested. The optional CPU benchmark can be reproduced after the
+OpenXR fixture has generated its persisted painting baseline:
+
+```sh
+cmake --build build --target dome-sculpt-uv-benchmark
+build/dome-sculpt-uv-benchmark build/xr-client/paint-baseline.dsculpt
+```
+
+It reports edit latency and final background validation wait separately, checks
+that all samples were applied, and verifies exact whole-gesture undo. Its single
+fixture is not production-size or physical-headset performance evidence.

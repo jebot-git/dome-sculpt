@@ -15,7 +15,10 @@ Document::Document() : input_(volume()) {
   input_.parameter_allowed = [this](VrParameter parameter) {
     return parameter_enabled_locked(parameter);
   };
-  input_.control_accept = [this] { return !uv_ || uv_->view().valid; };
+  input_.control_accept = [this] {
+    return !uv_ || (!uv_accept_pending_ &&
+                    (uv_->view().valid || uv_->view().validating));
+  };
   input_.committed = [this] { record_stroke_locked(); };
   input_.backend = {[this] { return action_active_locked(); },
                     [this] { begin_action_locked(); },
@@ -28,6 +31,7 @@ Document::Document() : input_(volume()) {
     mesh_thread_ = std::thread([this] { mesh_loop(); });
     input_thread_ = std::thread([this] { input_loop(); });
     file_thread_ = std::thread([this] { file_loop(); });
+    uv_thread_ = std::thread([this] { uv_loop(); });
   } catch (...) {
     stopping_ = true;
     {
@@ -37,12 +41,15 @@ Document::Document() : input_(volume()) {
     mesh_changed_.notify_all();
     input_changed_.notify_all();
     file_changed_.notify_all();
+    uv_changed_.notify_all();
     if (input_thread_.joinable())
       input_thread_.join();
     if (mesh_thread_.joinable())
       mesh_thread_.join();
     if (file_thread_.joinable())
       file_thread_.join();
+    if (uv_thread_.joinable())
+      uv_thread_.join();
     throw;
   }
 }
@@ -50,6 +57,7 @@ Document::~Document() {
   stopping_ = true;
   mesh_changed_.notify_all();
   input_changed_.notify_all();
+  uv_changed_.notify_all();
   input_thread_.join();
   {
     std::lock_guard lock(file_mutex_);
@@ -58,6 +66,7 @@ Document::~Document() {
   file_changed_.notify_all();
   mesh_thread_.join();
   file_thread_.join();
+  uv_thread_.join();
 }
 EditorSnapshot Document::frame() const {
   auto state = published_.load();
@@ -287,7 +296,18 @@ void Document::publish_locked(bool force) {
   if (uv_)
     control_changed_ = uv_changed(
         *uv_->view().mesh, scene_.object(control_object_).painted->mesh());
-  state_.uv = uv_ ? std::make_shared<UvView>(uv_->view()) : nullptr;
+  schedule_uv_locked();
+  if (uv_) {
+    auto view = std::make_shared<UvView>(uv_->view());
+    view->committing = uv_accept_pending_;
+    if (view->committing) {
+      view->valid = false;
+      view->can_undo = view->can_redo = false;
+      view->error = "Applying UVs...";
+    }
+    state_.uv = std::move(view);
+  } else
+    state_.uv.reset();
   state_.mesh_active = active.mesh_active;
   state_.active_sculpt_layer = volume().active_layer();
   state_.sculpt_layers.clear();
@@ -328,6 +348,10 @@ void Document::publish_locked(bool force) {
   }
   checkpoint_locked();
   published_.store(std::make_shared<EditorState>(state_));
+  {
+    std::lock_guard lock(uv_mutex_);
+    uv_changed_.notify_all();
+  }
   if (changed) {
     std::lock_guard mesh_lock(mesh_mutex_);
     pending_mesh_.emplace(
@@ -337,6 +361,8 @@ void Document::publish_locked(bool force) {
 }
 void Document::finish_locked() {
   finish_control_locked(true);
+  if (uv_accept_pending_)
+    throw std::logic_error("Wait for the accepted UV edit to finish");
   if (action_active_locked() && end_action_locked())
     record_stroke_locked();
   desktop_ = false;
@@ -349,6 +375,7 @@ void Document::replace(Scene next, bool clean) {
   replace_locked(std::move(next), clean);
 }
 void Document::replace_locked(Scene next, bool clean) {
+  finish_control_locked(false);
   finish_locked();
   scene_ = std::move(next);
   bind_locked();
@@ -458,6 +485,8 @@ Vec3 Document::gradient(Vec3 p) const {
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
+  if (uv_accept_pending_)
+    return false;
   if (uv_) {
     bool available = uv_->view().can_undo;
     uv_->edit(UvAction::Undo);
@@ -473,6 +502,8 @@ bool Document::undo() {
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
+  if (uv_accept_pending_)
+    return false;
   if (uv_) {
     bool available = uv_->view().can_redo;
     uv_->edit(UvAction::Redo);
@@ -559,6 +590,8 @@ void Document::edit_uv(UvAction action, float x, float y) {
   std::lock_guard lock(model_mutex_);
   if (!uv_)
     throw std::logic_error("Open the UV editor first");
+  if (uv_accept_pending_)
+    throw std::logic_error("Wait for the accepted UV edit to finish");
   try {
     uv_->edit(action, x, y);
     state_.error.clear();
@@ -571,10 +604,11 @@ void Document::edit_uv(UvAction action, float x, float y) {
 }
 void Document::end_uv(bool accept) {
   std::lock_guard lock(model_mutex_);
-  if (accept && uv_ && !uv_->view().valid)
+  if (accept && uv_ && !uv_->view().valid && !uv_->view().validating)
     throw std::runtime_error(uv_->view().error);
   finish_control_locked(accept);
-  desktop_ = false;
+  if (!uv_accept_pending_)
+    desktop_ = false;
   publish_locked();
 }
 void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
@@ -586,6 +620,8 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   job.paint_identity = o.painted;
   job.object = o.id;
   job.source_revision = o.painted->revision();
+  job.uv_session = uv_session_;
+  job.uv_desktop = desktop_;
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
     throw std::runtime_error("File and asset work queue is full");
@@ -594,6 +630,64 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   state_.message = "Transferring paint to edited UVs...";
   state_.error.clear();
   file_changed_.notify_one();
+}
+bool Document::wait_uv(std::chrono::milliseconds timeout) const {
+  std::unique_lock lock(uv_mutex_);
+  return uv_changed_.wait_for(lock, timeout, [&] {
+    auto state = published_.load();
+    return !state->uv || (!state->uv->validating && !state->uv->committing);
+  });
+}
+void Document::invalidate_uv_locked() {
+  ++uv_request_;
+  uv_scheduled_.reset();
+  std::lock_guard lock(uv_mutex_);
+  uv_validation_.reset();
+  uv_changed_.notify_all();
+}
+void Document::schedule_uv_locked() {
+  if (!uv_ || uv_accept_pending_)
+    return;
+  if (!uv_->view().validating) {
+    if (!uv_scheduled_.expired())
+      invalidate_uv_locked();
+    return;
+  }
+  if (uv_scheduled_.lock() == uv_->view().mesh)
+    return;
+  auto mesh = uv_->view().mesh;
+  uv_scheduled_ = mesh;
+  UvValidationJob job{++uv_request_, uv_session_, state_.generation, mesh};
+  std::lock_guard lock(uv_mutex_);
+  uv_validation_ = std::move(job);
+  uv_changed_.notify_all();
+}
+void Document::uv_loop() {
+  for (;;) {
+    UvValidationJob job;
+    {
+      std::unique_lock lock(uv_mutex_);
+      uv_changed_.wait(lock, [&] { return stopping_ || uv_validation_; });
+      if (stopping_)
+        return;
+      job = std::move(*uv_validation_);
+      uv_validation_.reset();
+    }
+    auto cancelled = [&] { return stopping_ || uv_request_ != job.request; };
+    std::string error;
+    try {
+      error = validate_uv(*job.mesh, cancelled);
+    } catch (const std::exception &e) {
+      if (cancelled())
+        continue;
+      error = e.what();
+    }
+    std::lock_guard lock(model_mutex_);
+    if (!cancelled() && uv_ && uv_session_ == job.session &&
+        state_.generation == job.generation &&
+        uv_->validated(job.mesh, std::move(error)))
+      publish_locked();
+  }
 }
 void Document::use_source() { paint_command(SpatialCommand::EditSource); }
 void Document::use_mesh() { paint_command(SpatialCommand::PaintColor); }
@@ -773,7 +867,7 @@ void Document::process_locked(const SpatialFrame &f) {
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
-    if (uv_)
+    if (uv_ && !uv_accept_pending_)
       uv_->edit(UvAction::Undo);
     else if (!state_.asset_busy) {
       finish_locked();
@@ -781,7 +875,7 @@ void Document::process_locked(const SpatialFrame &f) {
     }
   }
   if (f.hands[0].redo || f.hands[1].redo) {
-    if (uv_)
+    if (uv_ && !uv_accept_pending_)
       uv_->edit(UvAction::Redo);
     else if (!state_.asset_busy) {
       finish_locked();
@@ -986,15 +1080,27 @@ void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
   if (uv_) {
-    if (accept && !uv_->view().valid)
+    if (accept && uv_accept_pending_)
+      return;
+    if (accept && !uv_->view().valid && !uv_->view().validating)
       throw std::runtime_error(uv_->view().error);
     if (accept) {
       auto draft = uv_->view().mesh;
       auto &old = scene_.active().painted->mesh();
       bool changed = uv_changed(*draft, old);
-      if (changed)
+      if (changed) {
+        uv_->edit(UvAction::EndGesture);
         queue_uv_locked(draft);
+        uv_accept_pending_ = true;
+        invalidate_uv_locked();
+        if (!desktop_)
+          input_.resume_control(VrParameter::UvEdit);
+        return;
+      }
     }
+    invalidate_uv_locked();
+    ++uv_session_;
+    uv_accept_pending_ = false;
     uv_.reset();
     state_.uv.reset();
     control_before_.reset();
@@ -1038,7 +1144,8 @@ void Document::control_event_locked(VrControlEvent event) {
     c.parameter = event.parameter;
     if (event.parameter == VrParameter::UvEdit) {
       try {
-        uv_.emplace(o.painted->mesh(), o.painted->resolution());
+        ++uv_session_;
+        uv_.emplace(o.painted->mesh(), o.painted->resolution(), true);
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();
@@ -1130,6 +1237,8 @@ void Document::control_event_locked(VrControlEvent event) {
   }
   if (!control_before_ || event.parameter != state_.controls.parameter)
     return;
+  if (uv_accept_pending_ && event.type != VrControlEventType::Cancel)
+    return;
   auto &c = state_.controls;
   if (uv_ && event.type != VrControlEventType::Confirm &&
       event.type != VrControlEventType::Cancel) {
@@ -1151,7 +1260,7 @@ void Document::control_event_locked(VrControlEvent event) {
   if (event.type == VrControlEventType::Confirm ||
       event.type == VrControlEventType::Cancel) {
     if (event.type == VrControlEventType::Confirm && uv_ &&
-        !uv_->view().valid) {
+        !uv_->view().valid && !uv_->view().validating) {
       state_.error = uv_->view().error;
       input_.resume_control(VrParameter::UvEdit);
       return;
@@ -1702,9 +1811,14 @@ void Document::file_loop() {
         continue;
       }
       if (job->uv_mesh) {
-        auto painted = job->scene.object(job->object)
-                           .painted->reparameterize(
-                               *job->uv_mesh, [&] { return stopping_.load(); });
+        auto error = validate_uv(*job->uv_mesh, [&] { return stopping_.load(); });
+        if (!error.empty())
+          throw std::runtime_error(error);
+        auto &source = job->scene.object(job->object);
+        bool changed = uv_changed(*job->uv_mesh, source.painted->mesh());
+        auto painted = changed ? source.painted->reparameterize(
+                                     *job->uv_mesh, [&] { return stopping_.load(); })
+                               : source.painted;
         std::lock_guard lock(model_mutex_);
         if (job->generation == state_.generation) {
           state_.asset_busy = false;
@@ -1713,11 +1827,20 @@ void Document::file_loop() {
               o.painted->revision() != job->source_revision)
             throw std::runtime_error(
                 "The mesh changed during UV paint transfer; retry");
+          if (uv_ && uv_session_ == job->uv_session && uv_accept_pending_) {
+            input_.complete_control();
+            finish_control_locked(false);
+            if (job->uv_desktop)
+              desktop_ = false;
+          }
           Scene before = scene_;
           o.painted = std::move(painted);
           state_.message = "UVs and paint updated";
           state_.error.clear();
-          scene_changed_locked(std::move(before));
+          if (changed)
+            scene_changed_locked(std::move(before));
+          else
+            publish_locked();
         }
         std::lock_guard file_lock(file_mutex_);
         file_changed_.notify_all();
@@ -1794,6 +1917,14 @@ void Document::file_loop() {
           state_.asset_busy = false;
         if (job->discover_recovery || job->restore_recovery)
           state_.recovery_busy = false;
+        if (job->uv_mesh && uv_ && uv_accept_pending_ &&
+            uv_session_ == job->uv_session) {
+          uv_accept_pending_ = false;
+          uv_->validated(job->uv_mesh, e.what());
+          invalidate_uv_locked();
+          if (!job->uv_desktop)
+            input_.resume_control(VrParameter::UvEdit);
+        }
         state_.error = e.what();
         publish_locked();
       }

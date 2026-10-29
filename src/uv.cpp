@@ -132,7 +132,7 @@ bool uv_changed(const Mesh &a, const Mesh &b) {
   }
   return false;
 }
-std::string validate_uv(const Mesh &m) {
+std::string validate_uv(const Mesh &m, const std::function<bool()> &cancelled) {
   try {
     m.validate();
   } catch (const std::exception &e) {
@@ -146,6 +146,8 @@ std::string validate_uv(const Mesh &m) {
   constexpr int grid = 64;
   std::vector<std::vector<uint32_t>> buckets(grid * grid);
   for (uint32_t f = 0; f < m.indices.size() / 3; ++f) {
+    if (cancelled && cancelled())
+      throw std::runtime_error("UV validation cancelled");
     P p[3];
     for (int k = 0; k < 3; ++k)
       p[k] = m.uv[m.indices[f * 3 + k]];
@@ -162,6 +164,8 @@ std::string validate_uv(const Mesh &m) {
     std::set<uint32_t> visited;
     for (int y = y0; y <= y1; ++y)
       for (int x = x0; x <= x1; ++x) {
+        if (cancelled && cancelled())
+          throw std::runtime_error("UV validation cancelled");
         auto &bucket = buckets[y * grid + x];
         for (auto g : bucket)
           if (visited.insert(g).second && overlap(m, f, g))
@@ -171,8 +175,8 @@ std::string validate_uv(const Mesh &m) {
   }
   return {};
 }
-UvWorkspace::UvWorkspace(Mesh m, uint32_t resolution)
-    : resolution_(resolution) {
+UvWorkspace::UvWorkspace(Mesh m, uint32_t resolution, bool defer_validation)
+    : resolution_(resolution), defer_validation_(defer_validation) {
   if (resolution < 64 || resolution > 2048)
     throw std::invalid_argument("Invalid UV resolution");
   if (m.uv_pins.empty())
@@ -215,10 +219,21 @@ void UvWorkspace::publish(Mesh m, bool topology) {
   bool pending = gesture_ && uv_changed(m, *gesture_->mesh);
   view_.can_undo = pending || !undo_.empty();
   view_.can_redo = !pending && !redo_.empty();
-  view_.error = validate_uv(m);
-  view_.valid = view_.error.empty();
+  view_.validating = defer_validation_;
+  view_.error = defer_validation_ ? "Checking UVs..." : validate_uv(m);
+  view_.valid = !view_.validating && view_.error.empty();
   view_.mesh = std::make_shared<Mesh>(std::move(m));
   view_.revision = ++revision_;
+}
+bool UvWorkspace::validated(const std::shared_ptr<const Mesh> &mesh,
+                            std::string error) {
+  if (view_.mesh != mesh || !view_.validating)
+    return false;
+  view_.error = std::move(error);
+  view_.validating = false;
+  view_.valid = view_.error.empty();
+  view_.revision = ++revision_;
+  return true;
 }
 std::vector<uint32_t> UvWorkspace::selected() const {
   if (view_.vertices)

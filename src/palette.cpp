@@ -162,9 +162,10 @@ void SpatialPalette::raster(const EditorState &s) {
                     : v.vertices  ? "UV vertices: drag / stick to move"
                                   : "UV islands: drag / stick to move")
                  : v.error.substr(0, 65),
-         v.valid ? fg : Color{255, 150, 100, 255});
+         v.valid || v.validating || v.committing ? fg : Color{255, 150, 100, 255});
     auto button = [&](int column, int y, const char *name,
                       bool selected = false, bool disabled = false) {
+      disabled = disabled || v.committing;
       rect((40 + 94 * column) * unit_, y * unit_, 88 * unit_,
            (y == 68 ? 34 : 42) * unit_,
            selected ? accent
@@ -254,9 +255,10 @@ void SpatialPalette::raster(const EditorState &s) {
       }
     rect(60 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, grid);
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_,
-         v.valid ? accent : grid);
+         !v.committing && (v.valid || v.validating) ? accent : grid);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
-    text(470 * unit_, 616 * unit_, "Apply / Press", fg);
+    text(470 * unit_, 616 * unit_,
+         v.committing ? "Applying..." : v.validating ? "Check & Apply" : "Apply / Press", fg);
     return;
   }
   if (s.controls.parameter != VrParameter::None) {

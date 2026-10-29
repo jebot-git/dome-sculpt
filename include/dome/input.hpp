@@ -116,6 +116,14 @@ public:
     uv_stick_active_ = uv_gesture_open_ = false;
     uv_pointer_ = 0;
   }
+  void complete_control() {
+    parameter_ = VrParameter::None;
+    page_ = parent_page_;
+    selected_ = parent_sector_;
+    control_armed_ = false;
+    uv_dragging_ = uv_stick_active_ = uv_gesture_open_ = false;
+    uv_pointer_ = 0;
+  }
   float radius = .1f, strength = 1;
   bool edit_allowed = true;
   std::function<void()> committed;

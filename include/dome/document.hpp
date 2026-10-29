@@ -125,6 +125,7 @@ public:
   void begin_uv();
   void edit_uv(UvAction, float x = 0, float y = 0);
   void end_uv(bool accept);
+  bool wait_uv(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void use_source();
   void cancel_spatial_menu();
   void use_mesh();
@@ -189,6 +190,20 @@ private:
   bool control_changed_ = false;
   uint64_t control_object_ = 0;
   std::optional<UvWorkspace> uv_;
+  uint64_t uv_session_ = 0;
+  bool uv_accept_pending_ = false;
+  struct UvValidationJob {
+    uint64_t request, session, generation;
+    std::shared_ptr<const Mesh> mesh;
+  };
+  mutable std::mutex uv_mutex_;
+  mutable std::condition_variable uv_changed_;
+  std::optional<UvValidationJob> uv_validation_;
+  std::weak_ptr<const Mesh> uv_scheduled_;
+  std::atomic<uint64_t> uv_request_{0};
+  void schedule_uv_locked();
+  void invalidate_uv_locked();
+  void uv_loop();
   void queue_uv_locked(std::shared_ptr<const Mesh>);
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
@@ -220,13 +235,16 @@ private:
     bool create_parent = false;
     bool discover_recovery = false;
     std::optional<RecoveryCandidate> restore_recovery{};
+
+    uint64_t uv_session = 0;
+    bool uv_desktop = false;
   };
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;
   std::deque<FileJob> files_;
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
-  std::thread mesh_thread_, input_thread_, file_thread_;
+  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_;
   void publish_locked(bool force_geometry = false);
   void record_locked(History);
   void record_stroke_locked();
