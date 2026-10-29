@@ -3,9 +3,7 @@
 // (Apache-2.0).
 #include "dome/palette.hpp"
 #include <cstdio>
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_FONT_FORMATS_H
+#include "palette-text.hpp"
 namespace dome {
 namespace {
 GLuint shader(GLenum kind, const char *text) {
@@ -62,65 +60,16 @@ SpatialPalette::~SpatialPalette() {
   glDeleteProgram(program_);
 }
 void SpatialPalette::font(const EditorState &s) {
-  if (s.font_file == font_ && s.font_pixels == pixels_ && !glyphs_.empty())
+  if (s.font_file == font_ && s.font_pixels == pixels_ && text_font_)
     return;
-  FT_Library library{};
-  FT_Face face{};
-  if (FT_Init_FreeType(&library))
-    throw std::runtime_error("Cannot initialize menu font");
-  if (FT_New_Face(library, s.font_file.c_str(), 0, &face)) {
-    FT_Done_FreeType(library);
-    throw std::runtime_error("Spatial menus need the selected DomeD BDF font");
-  }
-  try {
-    auto format = FT_Get_Font_Format(face);
-    if (!format || std::string(format) != "BDF" || face->num_fixed_sizes < 1)
-      throw std::runtime_error("Spatial menus support BDF bitmap fonts only");
-    int strike = 0;
-    for (int i = 1; i < face->num_fixed_sizes; ++i)
-      if (std::abs(face->available_sizes[i].height - s.font_pixels) <
-          std::abs(face->available_sizes[strike].height - s.font_pixels))
-        strike = i;
-    if (FT_Select_Size(face, strike))
-      throw std::runtime_error("Cannot select menu font size");
-    glyphs_.clear();
-    for (uint32_t c = 32; c < 127; ++c) {
-      if (FT_Load_Char(face, c,
-                       FT_LOAD_RENDER | FT_LOAD_MONOCHROME |
-                           FT_LOAD_TARGET_MONO))
-        continue;
-      auto &b = face->glyph->bitmap;
-      Glyph g{int(b.width),
-              int(b.rows),
-              face->glyph->bitmap_left,
-              face->glyph->bitmap_top,
-              int(face->glyph->advance.x / 64),
-              {}};
-      g.alpha.resize(size_t(g.width) * g.height);
-      for (int y = 0; y < g.height; ++y)
-        for (int x = 0; x < g.width; ++x) {
-          auto row = b.buffer +
-                     (b.pitch >= 0 ? y : g.height - y - 1) * std::abs(b.pitch);
-          g.alpha[y * g.width + x] =
-              b.pixel_mode == FT_PIXEL_MODE_MONO
-                  ? ((row[x / 8] & (128 >> (x % 8))) ? 255 : 0)
-                  : row[x];
-        }
-      glyphs_[c] = std::move(g);
-    }
-    font_ = s.font_file;
-    pixels_ = s.font_pixels;
-    unit_ = std::max(1, (pixels_ + 15) / 16);
-    width_ = 640 * unit_;
-    height_ = 640 * unit_;
-  } catch (...) {
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
-    throw;
-  }
-  FT_Done_Face(face);
-  FT_Done_FreeType(library);
+  auto selected = std::make_unique<palette_text::Font>(s.font_file, s.font_pixels);
+  text_font_ = std::move(selected);
+  font_ = s.font_file;
+  pixels_ = std::clamp(s.font_pixels, 4, 128);
+  unit_ = std::max(1, (pixels_ + 15) / 16);
+  width_ = height_ = 640 * unit_;
 }
+
 void SpatialPalette::raster(const EditorState &s) {
   font(s);
   rgba_.assign(size_t(width_) * height_ * 4, 0);
@@ -137,22 +86,21 @@ void SpatialPalette::raster(const EditorState &s) {
           rgba_[(size_t(row) * width_ + col) * 4 + k] = c[k];
   };
   auto text = [&](int center, int baseline, const std::string &label,
-                  Color color) {
-    int advance = 0;
-    for (unsigned char c : label)
-      if (glyphs_.contains(c))
-        advance += glyphs_.at(c).advance;
-    int x = center - advance / 2;
-    for (unsigned char c : label) {
-      auto found = glyphs_.find(c);
-      if (found == glyphs_.end())
-        continue;
-      auto &g = found->second;
+                  Color color, int maximum = 0) {
+    // Keep all labels inside their existing palette cell. User names/errors
+    // are clipped by measured advance at complete grapheme boundaries.
+    int room = maximum > 0 ? maximum : std::max(0, 2 * std::min(center - 8 * unit_, width_ - center - 8 * unit_));
+    auto line = text_font_->layout(label, room);
+    int x = center - line.advance / 2;
+    for (auto &placed : line.glyphs) {
+      auto &g = *placed.bitmap;
       for (int y = 0; y < g.height; ++y)
         for (int col = 0; col < g.width; ++col)
-          if (g.alpha[y * g.width + col])
-            rect(x + g.left + col, baseline - g.top + y, 1, 1, color);
-      x += g.advance;
+          if (g.alpha[size_t(y) * g.width + col] &&
+              x + placed.x + g.left + col >= center - room / 2 &&
+              x + placed.x + g.left + col < center + (room + 1) / 2)
+            rect(x + placed.x + g.left + col,
+                 baseline - placed.y - g.top + y, 1, 1, color);
     }
   };
   rect(0, 0, width_, height_, bg);
@@ -165,7 +113,7 @@ void SpatialPalette::raster(const EditorState &s) {
                     : v.tool == 2 ? "UV turn: slide / vertical fine wheel"
                     : v.vertices  ? "UV vertices: drag / stick to move"
                                   : "UV islands: drag / stick to move")
-                 : v.error.substr(0, 65),
+                 : v.error,
          v.valid || v.validating || v.committing ? fg : Color{255, 150, 100, 255});
     auto button = [&](int column, int y, const char *name,
                       bool selected = false, bool disabled = false) {
@@ -308,7 +256,7 @@ void SpatialPalette::raster(const EditorState &s) {
         auto index=size_t(std::clamp(std::lround(value),0l,long(s.skin_sources.empty()?0:s.skin_sources.size()-1)));
         auto id=s.skin_sources.empty()?0:s.skin_sources[index];
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==id;});
-        label=found==s.objects.end()?"No reference":found->name.substr(0,36)+(found->visible?"":" [hidden]");
+        label=found==s.objects.end()?"No reference":found->name+(found->visible?"":" [hidden]");
       }
       else if(c.parameter==VrParameter::SkinMode)label=value<.5f?"Automatic binding":"Barycentric transfer";
       else if(c.parameter==VrParameter::SkinDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(skin_distance_metres(value))*1000);label+=size;}
@@ -318,7 +266,7 @@ void SpatialPalette::raster(const EditorState &s) {
         size_t index=size_t(std::clamp(std::lround(value),0l,long(s.bake_sources.size()?s.bake_sources.size()-1:0)));
         auto id=s.bake_sources.empty()?0:s.bake_sources[index];
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==id;});
-        label=found==s.objects.end()?"No source":found->name.substr(0,36)+(found->visible?"":" [hidden]");
+        label=found==s.objects.end()?"No source":found->name+(found->visible?"":" [hidden]");
       }
       else if(c.parameter==VrParameter::BakeQuality)label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
       else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(value));label+=size;}
@@ -427,7 +375,28 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    text(x, y + pixels_ / 3, labels[i], label_color);
+    const std::string label = labels[i];
+    int cell = 102 * unit_;
+    auto fitted = text_font_->layout(label, cell);
+    size_t split = std::string::npos;
+    int balance = cell + 1;
+    if (fitted.text != label)
+      for (size_t at = label.find(' '); at != std::string::npos; at = label.find(' ', at + 1)) {
+        auto left = text_font_->layout(label.substr(0, at), cell);
+        auto right = text_font_->layout(label.substr(at + 1), cell);
+        if (left.text == label.substr(0, at) && right.text == label.substr(at + 1) &&
+            std::max(left.advance, right.advance) < balance) {
+          split = at;
+          balance = std::max(left.advance, right.advance);
+        }
+      }
+    if (split == std::string::npos)
+      text(x, y + pixels_ / 3, label, label_color, cell);
+    else {
+      int spacing = pixels_ + 2 * unit_;
+      text(x, y + pixels_ / 3 - spacing / 2, label.substr(0, split), label_color, cell);
+      text(x, y + pixels_ / 3 + spacing / 2, label.substr(split + 1), label_color, cell);
+    }
     if (auto value = marked(i)) {
       int mx = x - 51 * unit_, my = y - 4 * unit_;
       rect(mx, my, 8 * unit_, unit_, label_color);
@@ -460,13 +429,13 @@ void SpatialPalette::raster(const EditorState &s) {
                              [&](auto &o) { return o.id == s.active_object; });
   if(s.menu_page==14) {
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==s.skin_options.reference;});
-    text(320*unit_,285*unit_,source==s.objects.end()?"Choose reference rig":source->name.substr(0,34),fg);
+    text(320*unit_,285*unit_,source==s.objects.end()?"Choose reference rig":source->name,fg);
     size_t locks=s.skin_use_locks?size_t(std::count(s.weights.locks.begin(),s.weights.locks.end(),uint8_t(1))):0;
     text(320*unit_,318*unit_,std::string(s.skin_options.mode==SkinAuthoringMode::Automatic?"Automatic":"Transfer")+" / "+std::to_string(locks)+" locked",fg);
   }
   if(s.menu_page==12){
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
-    text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name.substr(0,32),fg);
+    text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name,fg);
     text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
   } else if (s.menu_page == 13 && s.deformation && s.deformation->skeleton) {
     const char *modes[] = {"Add", "Subtract", "Replace", "Smooth"};
@@ -483,18 +452,18 @@ void SpatialPalette::raster(const EditorState &s) {
   if (s.menu_page == 8) {
     auto name = s.recovery_selected < s.recovery_candidates.size()
         ? s.recovery_candidates[s.recovery_selected] : "Refresh to find projects";
-    text(320 * unit_, 580 * unit_, name.substr(0, 40), fg);
+    text(320 * unit_, 580 * unit_, name, fg);
   } else if (s.menu_page == 7) {
-    auto name = s.sculpt_layer_name.substr(0, 28);
+    auto name = s.sculpt_layer_name;
     text(320 * unit_, 580 * unit_, name, fg);
   } else if (active != s.objects.end())
-    text(320 * unit_, 580 * unit_, active->name.substr(0, 28), fg);
+    text(320 * unit_, 580 * unit_, active->name, fg);
   if (!s.error.empty())
-    text(320 * unit_, 610 * unit_, s.error.substr(0, 64), fg);
+    text(320 * unit_, 610 * unit_, s.error, fg);
   else if (!s.recovery_error.empty())
-    text(320 * unit_, 610 * unit_, s.recovery_error.substr(0, 64), fg);
+    text(320 * unit_, 610 * unit_, s.recovery_error, fg);
   else if (!s.message.empty())
-    text(320 * unit_, 610 * unit_, s.message.substr(0, 64), fg);
+    text(320 * unit_, 610 * unit_, s.message, fg);
 }
 void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   if (!s.menu)
@@ -516,6 +485,21 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   signature += std::to_string(s.weights.enabled) + std::to_string(s.weights.symmetry) +
       std::to_string(s.weights.linked) + std::to_string(int(s.weights.mode));
   for (auto lock : s.weights.locks) signature += lock ? "1" : "0";
+  auto label_signature = [&](const std::string &label) {
+    signature += ":" + std::to_string(label.size()) + ":" + label;
+  };
+  for (auto &object : s.objects) {
+    signature += ":" + std::to_string(object.id) + (object.visible ? "1" : "0");
+    label_signature(object.name);
+  }
+  for (auto &candidate : s.recovery_candidates) label_signature(candidate);
+  if (s.deformation) {
+    if (s.deformation->skeleton && s.rig_joint < s.deformation->skeleton->bones.size())
+      label_signature(s.deformation->skeleton->bones[s.rig_joint].name);
+    if (s.deformation->morphs && s.morph_target < s.deformation->morphs->targets.size())
+      label_signature(s.deformation->morphs->targets[s.morph_target].name);
+  }
+  label_signature(s.controls.title);
   signature += std::to_string(int(s.controls.parameter)) +
                std::to_string(s.controls.selected);
   if (s.uv)
