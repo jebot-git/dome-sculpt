@@ -1,0 +1,15 @@
+{
+  "accessed": "2026-10-29",
+  "references": [
+    {
+      "url": "https://vroid.com/en/studio",
+      "basis": "Body/face parameters, separate color/shape editing and adjustable hair chunks as workflow references",
+      "reuse": "No source, meshes, textures, presets or branding incorporated"
+    },
+    {
+      "url": "https://vroid.com/en/studio/guidelines",
+      "basis": "Official distinction between creator-owned work and proprietary pixiv presets, and the separate license required for a generator based on its provided meshes/textures",
+      "reuse": "Terms inspection only; this generator uses CC0 MakeHuman data and original geometry instead"
+    }
+  ]
+}
