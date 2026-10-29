@@ -218,13 +218,20 @@ struct Bvh {
     return nearest(p, b, best);
   }
   double closest_hit(Vec3 p, int n, double best, uint32_t &triangle,
-                     Vec3 &position) const {
+                     Vec3 &position, const SurfaceQueryOptions &options,
+                     size_t &visited) const {
+    cancel(options.cancelled);
     auto &node = nodes[n];
     if (node.box.distance2(p) > best)
       return best;
     if (node.left < 0) {
       for (size_t i = node.start; i < node.start + node.count; i++) {
+        if (++visited > options.max_triangle_tests)
+          throw std::length_error(
+              "Closest surface triangle work budget exceeded");
         auto t = order[i];
+        if (options.triangle_filter && !options.triangle_filter(t))
+          continue;
         auto q = closest(p, point(t, 0), point(t, 1), point(t, 2));
         auto d = p - q;
         double distance = dot(d, d);
@@ -239,8 +246,8 @@ struct Bvh {
     int a = node.left, b = node.right;
     if (nodes[a].box.distance2(p) > nodes[b].box.distance2(p))
       std::swap(a, b);
-    best = closest_hit(p, a, best, triangle, position);
-    return closest_hit(p, b, best, triangle, position);
+    best = closest_hit(p, a, best, triangle, position, options, visited);
+    return closest_hit(p, b, best, triangle, position, options, visited);
   }
   void ray_hit(Vec3 p, Vec3 d, int n, double &best, uint32_t &triangle,
                std::array<float, 3> &bary) const {
@@ -354,13 +361,22 @@ SurfaceQuery::SurfaceQuery(const Mesh &m, const std::function<bool()> &fn) {
 SurfaceQuery::~SurfaceQuery() = default;
 SurfaceQuery::SurfaceQuery(SurfaceQuery &&) noexcept = default;
 SurfaceQuery &SurfaceQuery::operator=(SurfaceQuery &&) noexcept = default;
-SurfaceHit SurfaceQuery::closest(Vec3 p) const {
+SurfaceHit SurfaceQuery::closest(Vec3 p) const { return closest(p, {}); }
+SurfaceHit SurfaceQuery::closest(Vec3 p,
+                                 const SurfaceQueryOptions &options) const {
+  cancel(options.cancelled);
+  if (!options.max_triangle_tests || options.max_triangle_tests > 2'000'000)
+    throw std::invalid_argument("Invalid closest surface query budget");
   if (!impl_ || !finite(p) ||
       std::max({std::abs(p.x), std::abs(p.y), std::abs(p.z)}) > 1000)
     throw std::invalid_argument("Invalid closest-surface query");
-  uint32_t triangle = 0;
+  uint32_t triangle = UINT32_MAX;
   Vec3 position;
-  double d2 = impl_->tree.closest_hit(p, 0, INFINITY, triangle, position);
+  size_t visited = 0;
+  double d2 = impl_->tree.closest_hit(p, 0, INFINITY, triangle, position,
+                                      options, visited);
+  if (triangle == UINT32_MAX)
+    throw std::runtime_error("No eligible source surface triangle");
   auto a = impl_->tree.point(triangle, 0), b = impl_->tree.point(triangle, 1),
        c = impl_->tree.point(triangle, 2);
   auto ab = b - a, ac = c - a, ap = position - a;
@@ -378,6 +394,7 @@ SurfaceHit SurfaceQuery::closest(Vec3 p) const {
   float sum = bary[0] + bary[1] + bary[2];
   for (auto &f : bary)
     f /= sum;
+  cancel(options.cancelled);
   return impl_->hit(triangle, position, bary, float(std::sqrt(d2)));
 }
 std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,

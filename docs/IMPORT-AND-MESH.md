@@ -62,8 +62,12 @@ positions. Cleanup preserves distinct corner attributes, UV pins and seam flags.
 
 `SurfaceQuery` owns an immutable mesh/BVH snapshot, exposes closest triangle,
 barycentrics, interpolated normal and ray distance, and supports concurrent
-read-only queries. This is shared with native baking rather than copying a
-second triangle query implementation.
+read-only queries. The additive `closest(point, SurfaceQueryOptions)` overload
+accepts a cheap triangle filter, cancellation and a per-query triangle budget;
+it rejects empty eligible sets. This keeps subsequent source projection within
+an original component/chart. Filters must be thread safe and nonblocking. This
+is shared with native baking rather than copying a second triangle query
+implementation.
 
 `mesh_to_volume()` requires closed, consistently oriented triangle shells and
 uses BVH closest distance with odd-even ray parity. Nested shells retain cavities.
