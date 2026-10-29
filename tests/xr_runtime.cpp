@@ -458,6 +458,10 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
     count("stereo_submissions");
   } else
     count("empty_submissions");
+  // Synchronize external interruption with a real in-progress controller
+  // stroke; the parent never relies on an arbitrary startup delay.
+  if(frame==16) if(auto marker=getenv("DOME_XR_FIXTURE_SIGNAL_READY"))
+    std::ofstream(marker)<<frame<<'\n';
   return XR_SUCCESS;
 }
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,

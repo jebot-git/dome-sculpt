@@ -529,4 +529,20 @@ bake-options capture was visually inspected for BDF/layout. Toolkit/compositor
 source still282467e when rechecked. Remote0141926 changes only documentation;
 the merged application source remains7cc. Future dirty schema/lazy-UV/skin/signal
 changes are outside this evidence. No new installation/session restart occurred.
+# XR signal shutdown and oneAPI compiler qualification
 
+The unmodified7cc client failed the synchronized SIGINT regression because it
+did not write the requested final save (tests-xr-signal-before.log). A candidate
+app with signal-stop handling, compiled against the exact7cc headers and linked
+to its unchanged core/render/other UI objects, passes all83 real-loader XR checks
+(tests-xr-signal-after.log). Both SIGINT/SIGTERM exit0, balance eye/frame resource
+calls, preserve the independently completed stroke and cancel the unfinished
+gesture. This is the signal candidate proof, not yet a combined lazy-UV/schema
+build. The old physical test's exit143/recovery-only behavior is retained above
+as historical evidence; the fix does not retroactively change it.
+
+The ONEAPI configure probe now compiles and links a real SYCL queue/kernel.
+System clang22 accepting -fsycl but missing sycl/sycl.hpp fails configure with
+the explicit SDK diagnostic; user-owned official DPC++7.2.0 passes the probe.
+Logs: configure-oneapi-missing-sdk.log and configure-oneapi-complete-sdk.log.
+Compiler qualification/device enumeration alone do not prove production compute.

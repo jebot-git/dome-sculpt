@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exercise the real loader/client with a synthetic runtime and real GL images."""
 
-import contextlib, json, os, shutil, signal, subprocess, sys, tempfile
+import contextlib, json, os, shutil, signal, subprocess, sys, tempfile, time
 from pathlib import Path
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
@@ -96,6 +96,46 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
             [str(binary), "--project-info", str(base)], env=env, text=True
         )
     )
+    committed, committed_path = run("signal-committed", 7)
+    check(committed.returncode == 0, "Signal baseline completes a controller stroke before the next gesture")
+    committed_info = json.loads(subprocess.check_output(
+        [str(binary), "--project-info", str(committed_path)], env=env, text=True))
+    check(committed_info["field_hash"] != baseinfo["field_hash"],
+          "Signal baseline independently retains a real accepted controller edit")
+    for stop_signal in (signal.SIGINT, signal.SIGTERM):
+        name = "signal-" + stop_signal.name.lower()
+        marker = root / (name + ".ready")
+        target = root / (name + ".dsculpt")
+        report_path = output / (name + ".json")
+        e = {**env, "DOME_XR_FIXTURE_REPORT": str(report_path),
+             "DOME_XR_FIXTURE_SIGNAL_READY": str(marker)}
+        with (output / (name + ".log")).open("w") as log:
+            process = subprocess.Popen([str(binary), "--xr", "--save", str(target)],
+                                       env=e, stdout=log, stderr=subprocess.STDOUT)
+            try:
+                deadline = time.monotonic() + 40
+                while not marker.is_file() and process.poll() is None and time.monotonic() < deadline:
+                    time.sleep(.005)
+                check(marker.is_file() and process.poll() is None,
+                      name + " reaches a rendered controller stroke before interruption")
+                process.send_signal(stop_signal)
+                process.wait(timeout=40)
+            finally:
+                if process.poll() is None:
+                    process.kill()
+                    process.wait(timeout=5)
+        check(process.returncode == 0 and target.is_file(),
+              name + " exits normally and writes the requested final native save")
+        report = json.loads(report_path.read_text())
+        check(report["frames_waited"] == report["frames_begun"] == report["frames_ended"]
+              and report["acquires"] == report["image_waits"] == report["releases"]
+              and report["swapchains_destroyed"] == 2,
+              name + " balances the interrupted frame and releases both eye swapchains")
+        info = json.loads(subprocess.check_output([str(binary), "--project-info", str(target)],
+                                                 env=env, text=True))
+        check(info["field_hash"] == committed_info["field_hash"],
+              name + " retains the completed stroke and cancels the unfinished gesture before final saving")
+        shutil.copy2(target, output / target.name)
     for name, mode in [
         ("controller", None),
         ("stylus", {"DOME_XR_FIXTURE_STYLUS": "1"}),

@@ -129,6 +129,11 @@ The default is a DomeD overlay, requiring `XR_EXTX_overlay`,
 a primary XR session. The reference space is STAGE when available, otherwise
 LOCAL. Per-eye poses and fields of view come from the runtime.
 
+In standalone XR mode, SIGINT or SIGTERM requests normal shutdown. The current
+frame finishes, completed edits and accepted file work drain, and `--save`
+writes the final native project. Unfinished gestures are cancelled. This also
+releases the OpenXR session without stopping DomeD.
+
 Squeeze one controller to move the canvas; squeeze both to rotate and scale it.
 Trigger pressure sculpts at the tracked tip. Press the joystick to anchor the
 BDF menu, tilt it to select and press again to confirm. Starting at the right

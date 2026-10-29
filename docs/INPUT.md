@@ -40,3 +40,14 @@ asset worker. It remains ordered before later focus loss/shutdown; invalid
 captured targets cannot commit paint. Unaccepted draft checks are invalidated
 on cancellation/replacement and cannot recreate a closed workspace. See UV.md
 for pending-check/commit behavior and the separate wait helpers.
+# Standalone XR process termination
+
+SIGINT and SIGTERM set a lock-free stop flag; the handler performs no rendering,
+I/O, model editing or cleanup. The normal XR loop finishes the current frame and
+uses the existing shutdown boundary: drain queued completed strokes/accepted
+operations, cancel unfinished gestures, release session resources, wait for
+pending accepted asset work and perform the requested CLI final save. Previous
+signal handlers are restored on exit. Real-loader regressions synchronize the
+signal with a rendered second stroke and compare the saved volume to an
+independently completed first stroke, proving both retained edits and exact
+unfinished-gesture cancellation for SIGINT and SIGTERM.

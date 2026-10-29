@@ -25,12 +25,42 @@
 #include <FL/gl.h>
 #include <FL/glu.h>
 #include <bit>
+#include <atomic>
+#include <csignal>
 #include <functional>
 #include <iostream>
 #include <sstream>
 #include <thread>
 using namespace dome;
 namespace {
+#ifdef DOME_HAS_XR
+// A signal handler only requests a stop. Frame completion, input draining,
+// OpenXR cleanup and final saving happen normally on the application threads.
+std::atomic_bool standalone_xr_stop{false};
+static_assert(std::atomic_bool::is_always_lock_free);
+void request_standalone_xr_stop(int) {
+  standalone_xr_stop.store(true, std::memory_order_relaxed);
+}
+class StandaloneXrSignals {
+  using Handler = void (*)(int);
+  Handler previous_int_, previous_term_;
+public:
+  StandaloneXrSignals() {
+    standalone_xr_stop.store(false);
+    previous_int_ = std::signal(SIGINT, request_standalone_xr_stop);
+    if (previous_int_ == SIG_ERR) throw std::runtime_error("Cannot install XR interrupt handler");
+    previous_term_ = std::signal(SIGTERM, request_standalone_xr_stop);
+    if (previous_term_ == SIG_ERR) {
+      std::signal(SIGINT, previous_int_);
+      throw std::runtime_error("Cannot install XR termination handler");
+    }
+  }
+  ~StandaloneXrSignals() {
+    std::signal(SIGTERM, previous_term_);
+    std::signal(SIGINT, previous_int_);
+  }
+};
+#endif
 struct Canvas : Fl_Gl_Window {
   Document document;
   std::unique_ptr<SurfaceRenderer> renderer;
@@ -903,6 +933,7 @@ int main(int argc, char **argv) try {
     return 0;
   }
   if (argc >= 2 && std::string(argv[1]) == "--xr") {
+    StandaloneXrSignals termination;
     Document document;
     document.seed();
     unsigned frames = 0;
@@ -933,7 +964,7 @@ int main(int argc, char **argv) try {
     }
     document.wait_mesh();
     {
-      XrSculpt xr(document, nullptr, overlay);
+      XrSculpt xr(document, &standalone_xr_stop, overlay);
       xr.run(frames);
     }
     if (!save.empty()) {
