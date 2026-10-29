@@ -209,6 +209,37 @@ int main(int argc, char **argv) try {
   renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
   if (capture("paint-undo") != frozen)
     throw std::runtime_error("Paint undo did not restore exact GPU pixels");
+  auto swatch = std::make_shared<MeshSnapshot>();
+  swatch->mesh.positions = {{-.4f,-.4f,0},{.4f,-.4f,0},{.4f,.4f,0},{-.4f,.4f,0}};
+  swatch->mesh.normals.assign(4,{0,0,1});
+  swatch->mesh.uv = {{{0,0}},{{1,0}},{{1,1}},{{0,1}}};
+  swatch->mesh.indices = {0,1,2,0,2,3};
+  auto maps = std::make_shared<TextureMaps>();
+  maps->color = {1,1,{128,64,192,64}};
+  maps->metal_rough = {1,1,{255,255,0,255}};
+  maps->emission = {1,1,{0,0,0,255}}; maps->transparent = true;
+  Material material; material.color={1,1,1,1}; material.unlit=true;
+  material.alpha=Material::AlphaMode::Opaque;
+  auto sample = [&](Material m) {
+    auto snapshot=std::make_shared<MeshSnapshot>(*swatch);
+    snapshot->ranges={{123,0,6,m,maps}};
+    renderer.draw(snapshot,model,vp,{},640,480);
+    std::array<uint8_t,4> pixel{};
+    glReadPixels(320,240,1,1,GL_RGBA,GL_UNSIGNED_BYTE,pixel.data());
+    return pixel;
+  };
+  auto close = [](auto actual,std::array<int,3> expected) {
+    for(int i=0;i<3;++i)if(std::abs(int(actual[i])-expected[i])>2)return false;
+    return true;
+  };
+  if(!close(sample(material),{128,64,192}))
+    throw std::runtime_error("Unlit source colors were lit/tone-mapped or opaque alpha was blended");
+  material.alpha=Material::AlphaMode::Mask; material.alpha_cutoff=.5f;
+  if(!close(sample(material),{48,48,48}))throw std::runtime_error("Source alpha mask failed to discard");
+  material.alpha_cutoff=.2f;
+  if(!close(sample(material),{128,64,192}))throw std::runtime_error("Source alpha mask failed to retain opaque coverage");
+  material.alpha=Material::AlphaMode::Blend;
+  if(!close(sample(material),{68,52,84}))throw std::runtime_error("Source blend alpha was not preserved");
   glDeleteRenderbuffers(1, &depth);
   glDeleteTextures(1, &color);
   glDeleteFramebuffers(1, &fbo);

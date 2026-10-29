@@ -9,7 +9,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> objects = {
       "New sphere", "New empty",  "Duplicate",  "Next",
       "Previous",   "Visibility", "Lock",       "Delete",
-      "Back",       "Move left",  "Move right", "Sculpt layers"};
+      "Back",       "Move left",  "Avatars",    "Sculpt layers"};
   static const std::array<const char *, 12> materials = {
       "Base color", "Blue",      "White",   "Paint tools",
       "Metallic",   "Roughness", "Opacity", "UV editor",
@@ -32,7 +32,11 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> recovery = {
       "Refresh", "Next project", "Previous", "Recover", "Save", "Center",
       "Undo", "Redo", "Back", "Export glTF", "Objects", "Materials"};
-  return page == 8   ? recovery
+  static const std::array<const char *, 12> avatars = {
+      "Female CC0", "Male CC0", "MakeHuman", "Next part", "Previous part", "Center part",
+      "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
+  return page == 9   ? avatars
+         : page == 8 ? recovery
          : page == 7 ? sculpt
          : page == 1 ? objects
          : page == 2 ? materials
@@ -82,9 +86,17 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
-  if (index < 0 || index >= 12 || page < 0 || page > 8 || page == 5 ||
+  if (index < 0 || index >= 12 || page < 0 || page > 9 || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if (page == 9) {
+    static const std::array<SpatialCommand,12> avatars = {
+      SpatialCommand::CreateFemale, SpatialCommand::CreateMale, SpatialCommand::CreateMakeHuman,
+      SpatialCommand::Next, SpatialCommand::Previous, SpatialCommand::Center,
+      SpatialCommand::DeleteGroup, SpatialCommand::Ungroup, SpatialCommand::Undo,
+      SpatialCommand::Undo, SpatialCommand::Redo, SpatialCommand::Save};
+    return index == 8 ? std::nullopt : std::optional<SpatialCommand>(avatars[index]);
+  }
   if (page == 8) {
     static const std::array<SpatialCommand, 12> recovery = {
       SpatialCommand::RecoveryRefresh, SpatialCommand::RecoveryNext,
@@ -108,7 +120,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   }
   if ((page == 0 && (index < 4 || index == 8 || index == 9)) ||
       (page != 0 && index == 8) || (page == 2 && index == 3) ||
-      (page == 3 && index == 11) || (page == 1 && index == 11))
+      (page == 3 && index == 11) || (page == 1 && (index == 10 || index == 11)))
     return {};
   static const std::array<SpatialCommand, 12> root = {
       SpatialCommand::Undo, SpatialCommand::Undo,   SpatialCommand::Undo,
@@ -457,6 +469,9 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 2 && selected_ == 3) {
       page_ = 3;
       selected_ = 0;
+    } else if (page_ == 1 && selected_ == 10) {
+      page_ = 9;
+      selected_ = 0;
     } else if (page_ == 1 && selected_ == 11) {
       page_ = 7;
       selected_ = 0;
@@ -484,7 +499,8 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_ == 8   ? 7
+      page_ = page_ == 9   ? 1
+              : page_ == 8 ? 7
               : page_ == 7 ? 1
               : page_ == 4 ? 6
               : page_ == 6 ? 3

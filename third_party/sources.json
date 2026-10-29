@@ -194,5 +194,17 @@
     "implementation": "src/bake.cpp",
     "license": "GPL-3.0-or-later",
     "used": "Original native CPU worker tangent-space normal/AO/composited material bake; shared SurfaceQuery BVH; no viewport readback or external/proprietary baker code. Limits/evidence in docs/BAKING.txt."
+  },
+  "makehuman_assets": {
+    "repository": "https://github.com/makehumancommunity/makehuman",
+    "commit": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
+    "license": "CC0-1.0 asset data only; AGPL runtime code not included",
+    "used": "Authored hm08 body, targets, rig and weights for explicit MakeHuman baseline; converted offline into native data with original conversion tool. Exact per-file grants/hashes in assets/humanoid/SOURCES.json."
+  },
+  "vroid_cc0_assets": {
+    "license": "CC0-1.0, explicit historical beta model grants and matching embedded author metadata",
+    "used": "Primary female/male native humanoid baselines, complete original source bytes and full-resolution images retained for native authoring/persistence. Current non-CC0 presets are not used. No proprietary VRoid runtime.",
+    "manifest": "assets/humanoid/vroid/SOURCES.json",
+    "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
   }
 }

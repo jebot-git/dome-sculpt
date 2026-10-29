@@ -120,7 +120,7 @@ int main() try {
   j["active"] = 999;
   rejects(j, "Missing active objects are rejected");
   require(
-      loaded.encode().at("version") == 4,
+      loaded.encode().at("version") == 5,
       "Native scene schema explicitly versions deformation authoring records");
   auto legacy = loaded.encode();
   legacy["version"] = 2;

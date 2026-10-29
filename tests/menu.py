@@ -208,6 +208,18 @@ async def main():
         nodes, tree = await layout()
         check(named("Import static mesh") is None and nodes["Undo"][1].get("enabled") is False,
               "Universal Close cancels mesh import without changing scene history")
+        await click("Create humanoid...")
+        creator = await wait(lambda: named("Create humanoid"))
+        check(creator.get_wm_transient_for().id == window.id,
+              "Humanoid controls use the document's native modal ownership")
+        nodes, tree = await layout()
+        check(nodes["Create humanoid..."][1].get("enabled") is False,
+              "Humanoid parameter editing isolates scene commands")
+        await click("Close Window")
+        await asyncio.sleep(0.2)
+        nodes, tree = await layout()
+        check(named("Create humanoid") is None and nodes["Undo"][1].get("enabled") is False,
+              "Universal Close cancels humanoid creation without geometry or history changes")
         raw = window.get_image(2, 2, 1, 1, X.ZPixmap, 0xFFFFFFFF)
         pixel = Image.frombytes("RGB", (1, 1), raw.data, "raw", "BGRX").getpixel((0, 0))
         check(

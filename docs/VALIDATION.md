@@ -1,3 +1,18 @@
+# Actual CC0 grouped avatar integration — 2026-10-29
+
+All28 Release suites passed in56.86s (`artifacts/tests-avatar-controls.log`),
+including actual female/male grouped native creation/restart, joystick creation/
+group operations, independent grouped glTF skin evaluation and synthetic OpenXR.
+Native universal-menu42/42 passed (`menu-creator.log`); explicit source unlit/
+opaque/mask/blend GPU checks passed (`tests-source-alpha.log`). Actual file
+save/reopen QA retained exact source and parameters with files119,795,368bytes
+female /124,948,360bytes male, below256MiB (`vroid-native-workflow-qa.log`).
+
+The newly registered source-uv target and actual baseline arguments for source
+map/archive tests await a final pinned run. Shared component sanitizer results
+retain their own scope. Root combined pinned verification is next. No physical
+input/headset/accelerator-backend or integrated full MToon/VRM completion claimed.
+
 # Guarded asset-worker and native import milestone — 2026-10-29
 
 All21 Release suites passed in50.68 seconds (`artifacts/tests-assets-final.log`).

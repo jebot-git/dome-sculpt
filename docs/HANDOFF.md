@@ -1,138 +1,96 @@
-# Current agent handoff — native authoring milestones
+# Current handoff — actual CC0 VRoid creation integration
 
-The full production objective remains ACTIVE and INCOMPLETE. Read REQUIREMENTS.md,
-the original HANDOFF-466ebd1.md, workspace AGENTS.md and DESIGN_CONVENTIONS.
-The previous local toolkit/layer/input/UV history is archived unchanged in
-HANDOFF-toolkit-and-layers.md; remote checkpoints are archived separately.
+The original full production objective is ACTIVE and INCOMPLETE. Read
+REQUIREMENTS.md, HANDOFF-466ebd1.md, workspace AGENTS.md and DESIGN_CONVENTIONS.
+Previous detailed history/state is archived in HANDOFF-creator-integration-history.md.
+User explicitly authorizes delegation and milestone commits/pushes. New avatars
+must use verified historical CC0 VRoid Studio models as the primary baseline;
+MakeHuman is an explicit alternative, not a substitute for that requirement.
 
-## User steering
+## Current implementation
 
-Commit and push at validated milestones. The additional user requirement is
-robust native anime/toon humanoid creation based on MakeHuman and VRoid Studio;
-it is now a requirement row and assigned to the avatar agent. License actual
-code/assets explicitly; proprietary VRoid assets/runtime and MakeHuman Python
-runtime are not implied dependencies. The production suite is not complete.
+Native C++20 FLTK desktop/OpenXR. Source/image/model work runs on ordered workers;
+renderers acquire immutable snapshots, exact global history handles transactions.
+Canonical22-patch DomeD FLTK Release toolkit is artifacts/toolkit; see TOOLKIT.md.
+Use build/run-dome-sculpt or prepend its lib64 directory to inherited library
+paths. Do not restart sessions or overwrite unrelated DomeD/qimgvr work.
 
-## Environment
+Scene v5 reads2/3/4. Groups have parents, transforms, creator parameters and exact
+snapshots; desktop picking/XR input/render/GLB all compose group transforms once.
+Explicit source alpha modes/cutoff and standard unlit material preview/export are
+implemented. This is not full MToon/VRM: normal/AO/MToon shader/export and avatar
+meta/constraints/spring bones still require implementation and verification.
 
-Use optimized Release builds and the canonical latest committed DomeD toolkit
-in artifacts/toolkit. TOOLKIT.md records DomeD742d009, FLTK1.4.5,22 patches and
-full hashes. build/run-dome-sculpt selects that actual toolkit before inherited
-same-SONAME libraries. The fresh compositor was built separately; no active
-session restart or system installation occurred. Preserve unrelated parent
-DomeD capture and qimgvr appearance work. Do not merge old fltk-vr snapshots
-by replacing local history. Git author per command is jebot-git / GitHub noreply.
+Actual CC0 beta female/male sources are bundled under assets/humanoid/vroid,
+with exact official author grants/hashes and matching embedded CC0 metadata.
+Native controls schema2 chooses vroid-beta-female/male or makehuman-hm08; legacy
+schema1 preserves MH. Source bytes/rig/images/UVs/morphs/material metadata survive
+native projects through shared source_models/source_images archives. Original
+source payloads remain intact even for features not yet previewed/exported.
 
-## Implemented milestones
+Creator parts use source-authored UV painting only for verified source appearance:
+shared/mirrored charts paint together,28 zero-area UV faces retain rendering
+geometry but are explicitly unpaintable. Ordinary authoring remains strict.
+Source/archive/image budgets and whole native256MiB file limit remain enforced.
+Deep source JSON checks stay on asset/file workers; source-preserving native
+scalar commands use shallow checks on already validated immutable payloads.
 
-- c0adaa5: persistent COW sculpt displacement layers, exact transaction history,
-  native FLTK and controller layer controls, nested volume v2 with legacy import.
-- e00b5e8: bounded durable recovery worker and malformed/crash/storage fixtures.
-- c6976a3 / ee9225a: skeleton, constrained sparse weights, graph binding,
-  transfer/mirror and topology-identified morph foundations.
-- a2177ba: bounded native static OBJ/glTF/GLB import, retained resource/attribute
-  payload, cleanup source maps, immutable BVH and closed-shell mesh-to-volume.
-- 7d11883: humanoid semantics, marked-human fitting, safe bone compaction and
-  expression/morph identity kernels, with official specification provenance.
-- c4df13b: stable-ID native retopology and attribute/provenance-preserving capped
-  plane cuts, with explicit unsupported topology/contour failures.
-- 0c5f323: immutable per-object deformation, scene v4 reading2/3, detached
-  rest/preview geometry, full influence-group and POSITION morph GLB export.
-  Both skin/humanoid fixtures have zero Khronos validator issues. Humanoid data
-  is application extras; no VRM extension is claimed. See DEFORMATION.md.
-- Merged remote d8e3699 and36feedd, preserving ordered input/focus/session fixes
-  and gesture-level UV undo alongside the local milestones. Both histories
-  were pushed through e78ddc0 before the subsequent component commits.
+Native Scene > Create humanoid offers female/male/MH bases, presets and body/face/
+hair/colors, exact modal cancel and keep/replace choices; geometry runs on worker.
+Headset Objects > Avatars offers default CC0 creation, part navigation and group
+operations with exact undo. Full parameter editing/rig/weight/morph workflows
+inside headset remain incomplete. Groups and creator/native/source diagnostics
+need further usability/quality work; do not equate default creation with full VR
+authoring. Parent source data remain retained while geometry/materials are edited.
 
-## Root integration in this milestone
+## Fresh evidence
 
-All committed native foundations above are in CMake/CTest. Document meshing
-uses deformation preview on its worker; GLB export retains rest meshes. UV
-reparameterization/rest-mesh replacement rejects rig data until explicit
-transfer/removal is implemented. No silent topology invalidation.
+- All28 Release CTests passed in56.86s: artifacts/tests-avatar-controls.log.
+  Includes real-loader synthetic OpenXR, both actual grouped CC0 creators/native
+  restart, joystick female creation/group delete/ungroup/undo, independent cgltf
+  grouped skin evaluation and source alpha/unlit GPU cases.
+- Native universal menu42/42 passed: artifacts/menu-creator.log. Actual creator
+  dialog ownership/isolation/cancel, import/recovery chooser cancel included.
+- Explicit GPU source unlit/opaque/mask/blend tests pass: tests-source-alpha.log.
+- Actual append_humanoid ->Scene::save/load ->GLB QA by creator agent passes:
+  artifacts/vroid-native-workflow-qa.log. Female119,795,368bytes, male124,948,360bytes,
+  below256MiB; original19parts/25images/28unpaintable/36,738linked texels preserved.
+- Per-component Release/ASan/UBSan/leak evidence is in component docs. Root final
+  combined pinned-source sanitizer/build verification is next; shared agent ABI
+  can change while working. Verify a detached checkpoint before pushing.
+- No physical headset/controller/stylus/3D mouse or compute accelerator suite
+  completion is claimed. MToon agent reports hardware Arc A770 EGL checks for its
+  standalone module, not integrated renderer or accelerator-backend completion.
 
-Interactive desktop and standalone XR enable recovery; ordinary Document tests
-remain disk-free by default. Completed dirty transactions enqueue immutable
-snapshots, excluding open strokes/control previews/asset work. File jobs capture
-source identity and revision. Native save fsyncs file AND parent directory before
-conditional checkpoint removal. Failed saves keep checkpoints. Recovery scans
-and loads run on the ordered file worker with generation/content guards; restored
-projects are dirty/untitled, and dirty work cannot be replaced. Desktop File >
-Recovery has native Refresh/chooser controls. XR Objects > Sculpt layers >
-Recovery has Refresh/Next/Previous/Recover. Status/errors remain visible. Native
-chooser cancellation preserves the project path. Already durable old-source
-checkpoints survive replacement; unflushed old-source jobs are invalidated.
-The automatic XR output directory is now created on the file worker.
+CMake now registers an additional source-uv suite with actual female/male args,
+and supplies actual baseline args to source-maps/creator-archive tests. These
+expanded registered commands need their final pinned run; do not call the earlier
+28-suite result a29-suite success.
 
-## Evidence
+## Agents and ownership
 
-- artifacts/tests-authoring-milestone.log: all19 Release CTests passed,
-  including real-loader synthetic OpenXR and native recovery joystick tests.
-- artifacts/gui-recovery.log / artifacts/gui/report.json: all22 GUI checks pass.
-- artifacts/menu-recovery-chooser.log / artifacts/menu/report.json: all37 native
-  universal-menu checks pass, including actual persisted recovery discovery,
-  modal ownership and cancellation. Chooser assertions exclude only the private
-  recovery directory, preserving the check for unwanted user-file writes.
-- artifacts/tests-recovery-sanitize.log: seven focused suites pass with the
-  whole native core built using ASan/UBSan/leak detection. Later notification/UI
-  refinements need their final focused rebuild; do not overstate this coverage.
-- Per-component docs record additional optimized/sanitizer checks. Shared-source
-  concurrent builds can catch an agent's intermediate code: the first new GLB
-  fixture build encountered cgltf special targetNames/raw-extras behavior, fixed
-  by the owning agent; the subsequent19-suite run passed. The first menu run's
-  no-files assertion counted intended private recovery checkpoints; it now
-  explicitly rejects all user-project writes outside that private directory.
-- No physical headset/controller/stylus/3D mouse or compute accelerator tested.
+/root/finish_ab3d1: source UV committed79440d0, now optimizing bounded immutable
+composite caching in paint files/tests. Correct fork-aware content tokens are
+required, not revision_ alone. Actual female uncached Scene::surfaces costs~5s
+and120.8MB derived RGBA; unchanged calls must reuse results. Cache bounds unique
+original Image identities to avoid overcharging and thrashing. Later raw GPU
+bindings/overlays are necessary to avoid first CPU bake; no renderer ownership yet.
+/root/sculpt_rig: CC0 adapter/assets committed33164e6, performing actual textured
+native save/restart/GLB/Blender/validator QA with root append helper. Correctly
+reports current GLB normal/AO/MToon limitations; do not overstate appearance parity.
+/root/sculpt_mesh: preserving/memory/legacy VRM0 import committedacc73a1, now NEW
+mtoon.hpp/mtoon.cpp/mtoon-shader.hpp/tests plus focused license/docs. Standalone
+numeric +hardware EGL cases being finalized, no Scene/render/export ownership.
 
-## Continuing work / agents
+Root owns CMake/Scene/groups/creation/Document/app/palette/render/export/central
+docs. Stage only owned files; preserve agents' uncommitted cache/MToon work.
+Use Git author jebot-git,326713999+jebot-git@users.noreply.github.com per command.
+Last pushed checkpoint before this integration is db1d710; it has six pinned
+whole-core sanitizer suites passed (artifacts/tests-assets-pinned-sanitize.log).
 
-User explicitly authorizes delegation; shared filesystem, four total slots.
-/root/finish_ab3d1 owns bake.hpp/bake.cpp/tests and focused docs, then projection/
-stencil paint foundations. Baker rejects genuine collapsed UV triangles;
-dense xatlas64 has eight zero-area triangles and remains an atlas-quality gap.
-/root/sculpt_mesh owns native remeshing and optional backward-compatible BVH
-predicate queries, plus its focused tests/docs. Existing importer/retopo kernels
-are committed; interactive workflows and lossless attribute integration remain.
-/root/sculpt_rig owns NEW humanoid-creator native parameter/asset work, inspecting
-MakeHuman/VRoid official primary sources/licenses. Prior Scene/export integration
-is committed/stable. Do not overwrite agents' in-progress files.
-Root owns Document/app/CMake/manifests/handoff and integration. Next integrate
-native import/mesh operations, baking/projection, full rig/weights/morph authoring
-and creator desktop/XR flows using the same exact history and worker/source
-guards. Continue every remaining REQUIREMENTS row, including robust conformal
-UV/stitch, MToon/VRM, local meshing/masks/resolution and actual compute evidence.
-Do not mark the full goal complete at a component/checkpoint milestone.
-
-## Additional asset-worker/import milestone
-
-Root added Document::edit_scene(label, SceneOperation, AssetSource expected={})
-on the ordered asset worker: detached snapshots, cancellation, validation outside
-model lock, alias detachment, generation/revision/content/selection guards and
-one exact global history transaction. File > Import mesh creates paintable
-supported static OBJ/glTF/GLB objects; unsupported source channels are explicitly
-rejected, and importer diagnostics appear in bounded completion messages.
-See ASSET-WORKER.txt. A conservative prepare-mesh guard now rejects replacing
-retained paint data; existing UV paint transfer is unchanged.
-
-Component milestones now also include4839a1b native tangent-space normal/AO/PBR
-baking, fdb0a7d predicate/budget/cancellation BVH queries and8345a18 constrained
-adaptive triangle remeshing. CMake includes these committed sources/tests.
-Full Release21/21 passed before the added remesh target; subsequent remesh,
-asset-worker/UV/shared-document/baker checks and native OpenXR passed after the
-paint guard/warning reporting refinements. Native universal menu39/39 passes,
-including actual Import file-chooser ownership/cancellation. Logs:
-artifacts/tests-assets-final.log, tests-assets-remesh.log, tests-assets-report.log,
-tests-assets-xr.log and menu-assets.log. Final isolated sanitizer verification
-is being run against this exact commit because agents continue editing shared
-paint/import files. Do not claim its result until the log completes.
-
-Current agents: sculpt_mesh extends lossless PreserveGltf raw node/skin/morph
-import; finish_ab3d1 implements projection/stencil paint and O(1) paint-data
-presence; sculpt_rig implements the CC0 MakeHuman-based humanoid creator with
-VRoid workflow references. Do not stage their uncommitted files. Creator renders
-are artifacts/humanoid-preview.png and humanoid-face.png: coherent authored body
-and original hair/eyes, still a toon/doll foundation rather than polished VRoid
-artwork. Root requested further intentional anime face/preset quality work.
-Next root work: persistent scene groups/creator parameters and native desktop/XR
-creator UI, then rig/weights/morph authoring, paint/bake/import integration and
-remaining full requirement rows. Keep the production goal active.
+Next: commit current reviewable integration, create detached worktree and run
+optimized/pinned sanitizer checks against that exact source, then push milestone.
+Continue native parameter/rig/weights/morph editing in desktop AND headset,
+material/normal/AO/MToon/VRM integration, GPU source/paint efficiency, all remaining
+sculpt/UV/retopo/procedural/device/compute rows. Do not shrink or complete the goal
+at this milestone.

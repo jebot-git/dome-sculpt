@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "dome/humanoid-creator.hpp"
+#include "dome/source-maps.hpp"
+#include "dome/creator-archive.hpp"
 #include "io.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -15,6 +18,8 @@ void name_valid(const std::string &s) {
 void Material::validate() const {
   name_valid(name);
   auto unit = [](float f) { return std::isfinite(f) && f >= 0 && f <= 1; };
+  if (alpha < AlphaMode::Automatic || alpha > AlphaMode::Blend || !unit(alpha_cutoff))
+    throw std::invalid_argument("Invalid material alpha mode/cutoff");
   if (!std::all_of(color.begin(), color.end(), unit) || !unit(metallic) ||
       !unit(roughness) || !std::all_of(emissive.begin(), emissive.end(), unit))
     throw std::invalid_argument("Invalid material channel value");
@@ -72,6 +77,8 @@ uint64_t Scene::duplicate(uint64_t id) {
   if (source.painted)
     o.painted = source.painted->snapshot();
   o.deformation = source.deformation;
+  o.group = source.group;
+  o.appearance = source.appearance;
   return added;
 }
 Mesh ObjectSurface::preview_mesh() const {
@@ -102,6 +109,8 @@ void Scene::erase(uint64_t id) {
 }
 Scene Scene::snapshot() const {
   Scene result = *this;
+  for (auto &g : result.groups_)
+    if (g.humanoid) g.humanoid = std::make_shared<const HumanoidControls>(*g.humanoid);
   for (auto &o : result.objects_) {
     o.volume = std::make_shared<Volume>(o.volume->geometry_snapshot());
     if (o.painted)
@@ -109,10 +118,26 @@ Scene Scene::snapshot() const {
   }
   return result;
 }
-void Scene::validate() const {
+void Scene::validate(bool deep_sources) const {
   if (objects_.empty() || objects_.size() > 256)
     throw std::length_error("Invalid scene object count");
+  if (groups_.size() > 128) throw std::length_error("Scene group limit exceeded");
+  std::set<uint64_t> group_ids;
+  for (auto &g : groups_) {
+    if (!g.id || g.id >= next_group_ || !group_ids.insert(g.id).second)
+      throw std::invalid_argument("Invalid scene group identity");
+    name_valid(g.name);
+    validate_transform(g.transform);
+    if (g.humanoid) g.humanoid->validate();
+    CanvasTransform world{};
+    for (auto &parent : group_path(g.id)) world = ob::compose(world, parent.transform);
+    validate_transform(world);
+  }
   std::set<uint64_t> ids;
+  PaintImageArchive source_images;
+  CreatorAssetArchive source_models;
+  size_t remap_vertices = 0, source_bytes = 0;
+  std::set<const std::vector<uint8_t> *> originals;
   size_t count = 0, texels = 0, deformation_entries = 0;
   for (auto &o : objects_) {
     if (!o.id || o.id >= next_ || !ids.insert(o.id).second || !o.volume ||
@@ -121,6 +146,7 @@ void Scene::validate() const {
           "Invalid scene object identity or unfinished stroke");
     name_valid(o.name);
     validate_transform(o.transform);
+    validate_transform(world_transform(o.id));
     o.material.validate();
     if ((o.mesh_active && !o.painted) || (o.painted && o.painted->in_stroke()))
       throw std::runtime_error(
@@ -132,6 +158,26 @@ void Scene::validate() const {
       deformation_entries += o.deformation->resource_entries();
       if (deformation_entries > 8'000'000)
         throw std::length_error("Scene deformation budget exceeded");
+    }
+    if (o.appearance) {
+      if (!o.painted || o.appearance->source_vertices.size() != o.painted->mesh().positions.size())
+        throw std::invalid_argument("Creator source does not match its rest mesh");
+      remap_vertices += o.appearance->source_vertices.size();
+      if (remap_vertices > 8'000'000) throw std::length_error("Creator source remap budget exceeded");
+      const auto &a = *o.appearance;
+      if (!a.original_bytes || !a.asset || !a.decoded_images || a.original_bytes->size() > 64 * 1024 * 1024)
+        throw std::invalid_argument("Missing or oversized creator source");
+      if (originals.insert(a.original_bytes.get()).second) source_bytes += a.original_bytes->size();
+      if (originals.size() > 16 || source_bytes > 128 * 1024 * 1024)
+        throw std::length_error("Creator source archive budget exceeded");
+      if (deep_sources) source_models.add(a, source_images);
+      else for (auto &image : *a.decoded_images) source_images.add(image);
+    }
+    if (o.painted && o.painted->source_maps()) {
+      const auto &m = *o.painted->source_maps();
+      m.validate();
+      for (const auto *slot : {&m.color,&m.metal_rough,&m.emission,&m.normal,&m.occlusion})
+        if (slot->image) source_images.add(slot->image);
     }
     if (o.painted)
       texels += size_t(o.painted->resolution()) * o.painted->resolution();
@@ -146,15 +192,28 @@ void Scene::validate() const {
 nlohmann::json Scene::encode() const {
   validate();
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", 4},
+                      {"version", 5},
                       {"active", active_},
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
+  PaintImageArchive source_images;
+  CreatorAssetArchive source_models;
+  j["next_group_id"] = next_group_;
+  j["groups"] = nlohmann::json::array();
+  for (auto &g : groups_) {
+    auto t = g.transform;
+    j["groups"].push_back({{"id", g.id}, {"parent", g.parent}, {"name", g.name},
+      {"translation", {t.position.x,t.position.y,t.position.z}},
+      {"rotation", {t.orientation.x,t.orientation.y,t.orientation.z,t.orientation.w}},
+      {"scale", t.scale}, {"humanoid", g.humanoid ? g.humanoid->encode() : nlohmann::json(nullptr)}});
+  }
   for (auto &o : objects_) {
     auto t = o.transform;
     auto &m = o.material;
     j["objects"].push_back(
         {{"id", o.id},
+         {"group", o.group},
+         {"appearance", o.appearance ? encode_creator_appearance(*o.appearance, source_models, source_images) : nlohmann::json(nullptr)},
          {"name", o.name},
          {"visible", o.visible},
          {"locked", o.locked},
@@ -169,14 +228,17 @@ nlohmann::json Scene::encode() const {
            {"roughness", m.roughness},
            {"emissive", m.emissive},
            {"toon", m.toon},
-           {"double_sided", m.double_sided}}},
+           {"double_sided", m.double_sided},
+           {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
          {"volume", o.volume->encode()},
          {"mesh_active", o.mesh_active},
-         {"painted", o.painted ? o.painted->encode() : nlohmann::json(nullptr)},
+         {"painted", o.painted ? o.painted->encode(&source_images) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
                              ? o.deformation->encode(o.painted->mesh())
                              : nlohmann::json(nullptr)}});
   }
+  j["source_images"] = source_images.encode();
+  j["source_models"] = source_models.encode();
   return j;
 }
 Scene Scene::decode(const nlohmann::json &j) {
@@ -187,7 +249,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     result.active().volume = std::make_shared<Volume>(Volume::decode(j));
     return result;
   }
-  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4)
+  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5)
     throw std::runtime_error("Unsupported scene version");
   auto id = [](const nlohmann::json &v) {
     if (!v.is_number_unsigned() &&
@@ -198,8 +260,34 @@ Scene Scene::decode(const nlohmann::json &j) {
       throw std::runtime_error("Invalid scene ID");
     return n;
   };
+  PaintImageArchive source_images;
+  if (j.at("version") == 5) source_images = PaintImageArchive::decode(j.at("source_images"));
+  CreatorAssetArchive source_models;
+  if (j.at("version") == 5) source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
+  size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
+  auto nonnegative_id = [&](const nlohmann::json &v) {
+    if (!v.is_number_unsigned() && (!v.is_number_integer() || v.get<int64_t>() < 0))
+      throw std::runtime_error("Invalid group reference");
+    return v.get<uint64_t>();
+  };
+  if (j.at("version") == 5) {
+    result.next_group_ = id(j.at("next_group_id"));
+    const auto &groups = j.at("groups");
+    if (!groups.is_array() || groups.size() > 128) throw std::length_error("Invalid group count");
+    for (const auto &v : groups) {
+      SceneGroup g;
+      g.id = id(v.at("id")); g.parent = nonnegative_id(v.at("parent"));
+      g.name = v.at("name").get<std::string>();
+      auto p = v.at("translation").get<std::array<float,3>>();
+      auto q = v.at("rotation").get<std::array<float,4>>();
+      g.transform = {{p[0],p[1],p[2]}, {q[0],q[1],q[2],q[3]}, v.at("scale").get<float>()};
+      if (!v.at("humanoid").is_null())
+        g.humanoid = std::make_shared<const HumanoidControls>(HumanoidControls::decode(v.at("humanoid")));
+      result.groups_.push_back(std::move(g));
+    }
+  }
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
@@ -208,6 +296,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   for (auto &v : objects) {
     SculptObject o;
     o.id = id(v.at("id"));
+    if (j.at("version") == 5) o.group = nonnegative_id(v.at("group"));
     o.name = v.at("name").get<std::string>();
     o.visible = v.at("visible").get<bool>();
     o.locked = v.at("locked").get<bool>();
@@ -224,6 +313,15 @@ Scene Scene::decode(const nlohmann::json &j) {
                   m.at("emissive").get<std::array<float, 3>>(),
                   m.at("toon").get<bool>(),
                   m.at("double_sided").get<bool>()};
+    if (j.at("version") == 5) {
+      auto alpha = m.at("alpha");
+      if ((!alpha.is_number_integer() && !alpha.is_number_unsigned()) ||
+          alpha.get<int64_t>() < 0 || alpha.get<int64_t>() > 3)
+        throw std::runtime_error("Invalid material alpha mode");
+      o.material.alpha = Material::AlphaMode(alpha.get<int>());
+      o.material.alpha_cutoff = m.at("alpha_cutoff").get<float>();
+      o.material.unlit = m.at("unlit").get<bool>();
+    }
     samples += v.at("volume").at("samples").size();
     if (samples > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
@@ -233,7 +331,7 @@ Scene Scene::decode(const nlohmann::json &j) {
           o.volume->stored_samples() - v.at("volume").at("samples").size();
     if (samples > 4'000'000)
       throw std::length_error("Scene sculpt layer budget exceeded");
-    if (j.at("version") == 3 || j.at("version") == 4) {
+    if (j.at("version") >= 3) {
       o.mesh_active = v.at("mesh_active").get<bool>();
       if (!v.at("painted").is_null()) {
         auto &size = v.at("painted").at("resolution");
@@ -245,10 +343,10 @@ Scene Scene::decode(const nlohmann::json &j) {
         texels += r * r;
         if (texels > 16 * 1024 * 1024)
           throw std::length_error("Scene paint-map budget exceeded");
-        o.painted = PaintedMesh::decode(v.at("painted"));
+        o.painted = PaintedMesh::decode(v.at("painted"), j.at("version") == 5 ? &source_images : nullptr);
       }
     }
-    if (j.at("version") == 4 && !v.at("deformation").is_null()) {
+    if (j.at("version") >= 4 && !v.at("deformation").is_null()) {
       if (!o.mesh_active || !o.painted)
         throw std::runtime_error("Deformation has no active rest mesh");
       const auto &d = v.at("deformation");
@@ -263,6 +361,11 @@ Scene Scene::decode(const nlohmann::json &j) {
         throw std::length_error("Scene deformation budget exceeded");
       o.deformation = std::make_shared<const DeformationState>(
           DeformationState::decode(d, o.painted->mesh()));
+    }
+    if (j.at("version") == 5 && !v.at("appearance").is_null()) {
+      remap_vertices += v.at("appearance").at("source_vertices").get_binary().size() / 4;
+      if (remap_vertices > 8'000'000) throw std::length_error("Creator source remap budget exceeded");
+      o.appearance = decode_creator_appearance(v.at("appearance"), source_models);
     }
     result.objects_.push_back(std::move(o));
   }
@@ -298,7 +401,7 @@ Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
            o.mesh_active ? o.painted->composite(o.material) : nullptr,
-           o.deformation});
+           o.deformation, group_path(o.group), o.appearance});
     }
   return result;
 }

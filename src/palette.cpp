@@ -382,7 +382,8 @@ void SpatialPalette::raster(const EditorState &s) {
   }
   text(320 * unit_, 295 * unit_, "Stick to choose", fg);
   text(320 * unit_, 320 * unit_, "Press to confirm", fg);
-  const char *page = s.menu_page == 8 ? "Recovery"
+  const char *page = s.menu_page == 9 ? "Avatars"
+                     : s.menu_page == 8 ? "Recovery"
                      : s.menu_page == 7   ? "Sculpt layers"
                      : s.menu_page == 1 ? "Objects"
                      : s.menu_page == 2 ? "Material"

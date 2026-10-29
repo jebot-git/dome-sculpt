@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/creation.hpp"
 #include <unistd.h>
 #include <utility>
 namespace dome {
@@ -162,7 +163,9 @@ void Document::bind_locked() {
 }
 void Document::scene_changed_locked(Scene before) {
   try {
-    scene_.validate();
+    // Structural commands change only native properties/ownership of already
+    // validated source assets. Bulk source JSON checks stay on asset/file workers.
+    scene_.validate(false);
   } catch (...) {
     scene_ = std::move(before);
     bind_locked();
@@ -223,7 +226,7 @@ uint64_t Document::add_object(bool sphere) {
     next.stamp(b);
     next.end_stroke();
   }
-  CanvasTransform transform = scene_.active().transform;
+  CanvasTransform transform = scene_.world_transform(scene_.active().id);
   transform.position.x += .6f;
   auto id = scene_.add(sphere ? "Clay sphere" : "Empty sculpt", std::move(next),
                        transform);
@@ -404,7 +407,7 @@ void Document::stamp_desktop(Brush b) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_)
     throw std::logic_error("Desktop does not own the active stroke");
-  auto t = scene_.active().transform;
+  auto t = scene_.world_transform(scene_.active().id);
   b.from = world_to_model(t, b.from);
   b.to = world_to_model(t, b.to);
   b.radius /= t.scale;
@@ -435,7 +438,7 @@ void Document::cancel_desktop() {
 }
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
   std::lock_guard lock(model_mutex_);
-  auto t = scene_.active().transform;
+  auto t = scene_.world_transform(scene_.active().id);
   if (!scene_.active().visible || scene_.active().locked)
     return {};
   auto direction = vec(ob::rotate(ob::conjugate(t.orientation), obv(d)));
@@ -449,7 +452,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
 }
 Vec3 Document::gradient(Vec3 p) const {
   std::lock_guard lock(model_mutex_);
-  auto t = scene_.active().transform;
+  auto t = scene_.world_transform(scene_.active().id);
   return vec(
       ob::rotate(t.orientation,
                  obv(scene_.active().mesh_active
@@ -614,10 +617,8 @@ void Document::prepare_locked(uint32_t resolution) {
   if (state_.asset_busy)
     throw std::logic_error("A painting mesh is already being prepared");
   auto &o = scene_.active();
-  if (o.painted)
-    for (auto &layer : o.painted->layers())
-      if (std::any_of(layer.tiles.begin(), layer.tiles.end(), [](auto &tile) { return bool(tile); }))
-        throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
+  if (o.painted && o.painted->has_paint_data())
+    throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
   if (o.deformation)
     throw std::logic_error("Explicitly remove or transfer rig data before replacing its rest mesh");
   if (o.locked || !o.visible)
@@ -721,7 +722,7 @@ void Document::process_locked(const SpatialFrame &f) {
       return;
     }
   }
-  auto object_canvas = ob::compose(state_.canvas, scene_.active().transform);
+  auto object_canvas = ob::compose(state_.canvas, scene_.world_transform(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
       !state_.asset_busy && scene_.active().visible &&
@@ -861,14 +862,15 @@ void Document::mesh_loop() {
       snapshot->generation = job->generation;
       for (auto &o : objects) {
         if (o.deformation) o.mesh = o.preview_mesh();
+        auto world = o.world_transform();
         size_t offset = snapshot->mesh.positions.size(),
                first = snapshot->mesh.indices.size();
         for (auto p : o.mesh.positions)
           snapshot->mesh.positions.push_back(
-              vec(ob::transform(o.transform, obv(p))));
+              vec(ob::transform(world, obv(p))));
         for (auto n : o.mesh.normals)
           snapshot->mesh.normals.push_back(
-              vec(ob::rotate(o.transform.orientation, obv(n))));
+              vec(ob::rotate(world.orientation, obv(n))));
         if (o.mesh.uv.empty())
           snapshot->mesh.uv.resize(snapshot->mesh.positions.size(), {0, 0});
         else
@@ -877,7 +879,7 @@ void Document::mesh_loop() {
         for (auto index : o.mesh.indices)
           snapshot->mesh.indices.push_back(uint32_t(offset + index));
         snapshot->ranges.push_back(
-            {o.id, first, o.mesh.indices.size(), o.material, o.textures});
+            {o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance});
       }
       std::lock_guard lock(mesh_mutex_);
       if (published_.load()->generation == job->generation)
@@ -1282,6 +1284,15 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
+    if (state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked()) return false;
+    if (command <= SpatialCommand::CreateMakeHuman) return scene_.objects().size() <= 237 && scene_.groups().size() < 128;
+    auto group = scene_.active().group;
+    if (!group) return false;
+    for (auto &o : scene_.objects())
+      for (auto &g : scene_.group_path(o.group)) if (g.id == group && o.locked) return false;
+    return true;
+  }
   if (command >= SpatialCommand::RecoveryRefresh && command <= SpatialCommand::RecoveryRestore) {
     if (!recovery_ || state_.recovery_busy) return false;
     if (command == SpatialCommand::RecoveryRefresh) return true;
@@ -1390,6 +1401,24 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
+    if (!command_enabled_locked(command)) return;
+    if (command <= SpatialCommand::CreateMakeHuman) {
+      std::string baseline = command == SpatialCommand::CreateFemale ? "vroid-beta-female"
+          : command == SpatialCommand::CreateMale ? "vroid-beta-male" : "makehuman-hm08";
+      scene_operation_locked("Create humanoid", [baseline](Scene &scene, const auto &cancelled) {
+        auto controls = humanoid_baseline_defaults(baseline);
+        CanvasTransform transform{}; transform.position.y = -controls.height * .5f;
+        append_humanoid(scene, controls, "Humanoid", transform, 256, cancelled);
+      }, {}, {});
+    } else {
+      auto group = scene_.active().group;
+      bool erase = command == SpatialCommand::DeleteGroup;
+      scene_operation_locked(erase ? "Delete avatar group" : "Ungroup avatar",
+        [group, erase](Scene &scene, const auto &) { scene.erase_group(group, erase); }, {}, {});
+    }
+    return;
+  }
   if (command >= SpatialCommand::RecoveryRefresh && command <= SpatialCommand::RecoveryRestore) {
     if (!command_enabled_locked(command)) return;
     if (command == SpatialCommand::RecoveryRefresh) refresh_recovery_locked();
@@ -1578,7 +1607,7 @@ void Document::command_locked(SpatialCommand command) {
       next.stamp(b);
       next.end_stroke();
     }
-    auto transform = o.transform;
+    auto transform = scene_.world_transform(o.id);
     transform.position.x = std::min(100.f, transform.position.x + .6f);
     scene_.add(command == SpatialCommand::NewSphere ? "Clay sphere"
                                                     : "Empty sculpt",
