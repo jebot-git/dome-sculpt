@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "../src/humanoid-sha256.hpp"
+#include "dome/creation.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/projection.hpp"
 #include "dome/source-maps.hpp"
+#include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -23,6 +26,52 @@ void rejects(auto f, const char *s) {
     std::cout << "EXPECTED " << e.what() << '\n';
   }
   require(failed, s);
+}
+void scene_fixture(const std::filesystem::path &directory) {
+  std::filesystem::create_directories(directory);
+  for (std::string gender : {"female", "male"}) {
+    auto start = std::chrono::steady_clock::now();
+    Scene scene;
+    auto group = append_humanoid(
+        scene, humanoid_baseline_defaults("vroid-beta-" + gender),
+        "CC0 VRoid " + gender);
+    size_t parts = 0, unpaintable = 0, linked = 0;
+    for (const auto &o : scene.objects())
+      if (o.group == group) {
+        ++parts;
+        unpaintable +=
+            o.painted->surface_diagnostics().unpaintable_uv_faces.size();
+        linked += o.painted->surface_diagnostics().linked_texels;
+      }
+    require(parts == 19 && unpaintable == 28 && linked == 36738,
+            "Actual grouped baseline keeps every original primitive and "
+            "authored UV exception");
+    std::cout << gender << " append_seconds="
+              << std::chrono::duration<double>(
+                     std::chrono::steady_clock::now() - start)
+                     .count()
+              << '\n';
+    auto native = directory / ("vroid-" + gender + "-native.dsculpt");
+    scene.save(native);
+    auto reopened = Scene::load(native);
+    require(scene.encode() == reopened.encode(),
+            "Full actual source Scene save/reopen retains exact "
+            "material/image/rig/morph/creator state");
+    std::cout << gender
+              << " native_bytes=" << std::filesystem::file_size(native) << '\n';
+    start = std::chrono::steady_clock::now();
+    auto surfaces = reopened.surfaces(true);
+    std::cout << gender << " composite_seconds="
+              << std::chrono::duration<double>(
+                     std::chrono::steady_clock::now() - start)
+                     .count()
+              << '\n';
+    auto output = directory / ("vroid-" + gender + "-native.glb");
+    export_glb(surfaces, output);
+    std::cout << gender
+              << " exported_bytes=" << std::filesystem::file_size(output)
+              << '\n';
+  }
 }
 int main() try {
   std::cout << std::unitbuf;
@@ -77,6 +126,25 @@ int main() try {
                     avatar.parts.front().appearance->decoded_images,
             "Parts share original encoded asset and one immutable decoded "
             "image cache");
+    require(source->source_basis_quaternion &&
+                source->source_basis_quaternion->w == 0 &&
+                source->source_basis_quaternion->x == 0 &&
+                source->source_basis_quaternion->y == 1 &&
+                source->source_basis_quaternion->z == 0,
+            "Explicit authored basis matches proper Y180 source conversion");
+    require(source->source_joint_nodes.size() ==
+                    part.deformation.skeleton->bones.size() &&
+                std::set<uint32_t>(source->source_joint_nodes.begin(),
+                                   source->source_joint_nodes.end())
+                        .size() == source->source_joint_nodes.size(),
+            "Normative joint-to-original-node identity is complete and unique");
+    size_t native_targets =
+        part.deformation.morphs ? part.deformation.morphs->targets.size() : 0;
+    bool mapped = source->source_morph_targets.size() == native_targets;
+    for (size_t i = 0; i < native_targets; ++i)
+      mapped &= source->source_morph_targets[i] == i;
+    require(mapped, "Normative morph identity preserves original source target "
+                    "indices without parsing names");
     const auto &material = asset.materials[source->material];
     require(part.color == material.color &&
                 part.roughness == material.roughness,
@@ -173,6 +241,8 @@ int main() try {
           "Wrong baseline bytes fail identity verification without falling "
           "back to MH or another directory");
   std::filesystem::remove_all(temporary);
+  if (const char *directory = std::getenv("DOME_VROID_SCENE_FIXTURE"))
+    scene_fixture(directory);
   return 0;
 } catch (const std::exception &e) {
   std::cerr << "FAIL " << e.what() << '\n';

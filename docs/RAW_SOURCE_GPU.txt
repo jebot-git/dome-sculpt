@@ -1,0 +1,128 @@
+Original source GPU preview without CPU texture baking
+======================================================
+
+PaintedMesh::preview(material) selects an immutable TextureMaps marker with
+source_only=true and original source_maps when no visible layer contributes
+channel coverage through its mask/opacity and no persistent baked base exists.
+Installing any bake forces the derived preview; clear restores raw eligibility.
+Its derived Image buffers are empty;
+original RGBA images, dimensions, sampler/UV/channel metadata and ownership stay
+unchanged. Eligibility is cached by the existing unique content token, and source
+alpha classification is scanned once per lineage. Hidden, zero-opacity, mask-only,
+fully masked and fully erased coverage remain protected/persisted authoring data.
+Visible overlay coverage falls back to the existing exact composite(material)
+path. No layer is cleared or dropped to make the fast path available.
+
+Scene::preview_surfaces is the viewport-only selector used by the Document mesh
+worker. Scene::surfaces and export retain fully composited image semantics.
+The marker must never be treated as three derived images; consumers must honor
+source_only explicitly. Native persistence continues storing authoritative source
+images/models/layers, not GPU resources or preview markers.
+
+Production OpenGL 3.3 bindings
+-----------------------------
+SurfaceRenderer binds original color, metallic/roughness, emission, normal and
+occlusion slots directly. Original material color/emission/metallic/roughness
+factors apply once to raw inputs. Derived composite inputs use neutral factors
+because those factors were baked by the CPU compositor. Raw metal/rough R is not
+implicitly AO: independent raw occlusion R uses occlusion_strength; derived ORM R
+already contains the composed AO. Missing slots use material/neutral defaults.
+Derived canonical normal maps use worker-generated Mikk tangent corners and take
+precedence over retained original normal views. Derived maps with no canonical
+normal continue using their original normal view and derivative basis. The
+bounded GPU image cache retains both kinds with correct linear encoding, and
+geometry-only updates still reuse image storage.
+
+Color/emission images use GL_SRGB8_ALPHA8; ORM/normal/AO use GL_RGBA8. Texture RGB
+is decoded/filterable in linear space, while alpha/data remain linear. Independent
+GL 3.3 sampler objects preserve each slot's wrap, nearest/linear/mipmap filtering
+and UV0 affine transform, even when multiple roles share one original image.
+Unspecified native sampler filters use linear filtering. Requested mip chains
+are generated on the GPU at original resolution and accounted level by level.
+There is no CPU proxy raster, framebuffer readback or source downsampling in the
+production path. Existing renderer output transfer/tone mapping is retained.
+
+Original normal views use a UV-derivative tangent basis and strength on the GPU,
+including mirrored UV handedness and double-sided facing; degenerate UV gradients
+safely retain geometric normals. AO affects PBR ambient illumination. This is the
+generic PBR path, not integrated MToon dispatch or authored-tangent/vertex-color
+avatar shading. Original MToon/extra roles/tangents/UV1 remain retained and need
+explicit renderer integration using the separate typed MToon module. No claim of
+full original MToon appearance follows from direct texture preview.
+
+Reference checks: Khronos OpenGL 3.3 core specification section 3.8.17 defines sRGB
+RGB conversion with alpha unchanged:
+https://registry.khronos.org/OpenGL/specs/gl/glspec33.core.pdf
+Khronos sample renderer's material_info.glsl provides the independent normal/UV,
+back-facing tangent-frame and material-channel convention reference:
+https://github.com/KhronosGroup/glTF-Sample-Renderer/blob/main/source/Renderer/shaders/material_info.glsl
+The native shader implementation solves the UV-gradient basis directly; no
+external runtime, shader compiler or replacement proxy shader is involved.
+
+Sharing, bounds and failure handling
+-----------------------------------
+GPU image storage is keyed by immutable Image identity plus sRGB/linear encoding;
+normal and scalar roles can share linear storage. Ownership is retained for as
+long as GL storage is retained. Separate per-slot samplers/UV transforms avoid
+mutating a shared image's sampling semantics. Geometry/pose/group-only snapshot
+updates preserve matching GPU images and require zero pixel uploads. Unused image
+and sampler objects are deleted when the current snapshot changes. Derived
+immutable composites also share their existing GPU storage by image identity.
+
+Default resource bounds are 1 GiB nominal texture/mip payload, 1024 image objects and
+128 sampler objects, configurable through SurfaceTextureLimits at construction
+within explicit hard caps. SurfaceRenderer::texture_stats exposes live counts,
+nominal bytes and cumulative uploads. Complete requested source resources are
+preflighted against count/byte/hardware dimension bounds. Failure throws instead
+of silently downsampling or switching to software; partial GPU snapshot state is
+invalidated/cleaned so it cannot become a stale mismatched geometry preview.
+Context-loss abandon drops handles without using a dead GL context.
+
+These bounds describe retained nominal GL image storage, not total VRAM/RSS or
+transient driver/in-flight allocations. Source pixels/layers/native history,
+packed geometry, CPU composite retention and framebuffer/swapchain storage have
+separate ownership/budgets. No GPU context/resource operation belongs on the model
+worker; only original binding selection occurs there. Renderer operations run on
+the owning GL thread.
+
+Verification
+------------
+Native tests/source-gpu.cpp uses the actual production SurfaceRenderer shader on
+windowless EGL. Test-only readback verifies independent source-vs-composite image,
+alpha, sampler/transform/factor fixtures; direct zero-light AO and normal-strength
+lighting fixtures prevent shared omission from masquerading as agreement. It also
+checks mip storage, shared encoding identity, missing slots, zero CPU composite
+builds, geometry-only zero reuploads, stale cleanup and explicit quota failures.
+--hardware rejects llvmpipe/softpipe; software EGL remains useful for CI.
+
+Optional actual female/male CC0 baseline paths measure binding preparation, first
+GPU preview and repeated geometry/group update, asserting no original-source CPU
+composite builds and zero repeated image uploads. All source images stay at their
+original dimensions. Device/headset sessions and user projects are not modified.
+
+A native build linked with render/core/EGL/GL can run:
+  env -u LIBGL_ALWAYS_SOFTWARE ./dome-sculpt-source-gpu-test --hardware assets/humanoid/vroid/base-female.vrm assets/humanoid/vroid/base-male.vrm
+
+GPU overlays, full MToon dispatch and other remaining production workflows are
+tracked separately. Painted overlays continue using correct CPU composites until
+that GPU work lands; this milestone does not claim full suite completion.
+
+Validated hardware milestone
+----------------------------
+Intel Arc A770 (DG2), Mesa windowless EGL: 33 independent GPU assertions pass;
+actual female/male profiles add four source-only/reupload checks (37 total).
+Female binding/SurfaceMap preparation 42.32ms, first GPU draw 44.90ms, changed
+geometry/group draw 0.606ms; male 47.26ms / 20.37ms / 0.520ms. These measurements
+exclude creator-kernel generation, and the draw timings include test glFinish.
+Both original-source first previews execute zero CPU composite builds. Each uses
+20 GPU images at original resolution: 81,527,296 female / 85,197,312 male nominal
+bytes including requested mip levels. Previously the cold CPU compositor alone
+took roughly 5 seconds for 19 parts. Repeated geometry updates upload no image pixels.
+
+ASan+UBSan hardware fixture: 33 assertions pass with project render/paint/test
+translation units instrumented; other core dependencies use Release archives.
+Leak detection is disabled for the external Mesa/EGL driver in this hardware run;
+live GL object/storage cleanup is checked explicitly by the resource fixtures.
+Existing Document-based spatial-render regression awaits the main agent's stable
+rig-authoring Document/EditorState ABI rebuild; this fixture does not instantiate
+Document and does not claim that integration check has passed yet.

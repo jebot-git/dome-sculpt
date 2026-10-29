@@ -286,8 +286,10 @@ void SpatialPalette::raster(const EditorState &s) {
            56 * unit_, row == c.selected ? accent : fg);
       std::string label;
       if (c.components > 1)
-        label = std::string(1, "RGBA"[row]) + " ";
-      if (c.parameter == VrParameter::BrushRadius)
+        label = std::string(1, (c.parameter == VrParameter::RigRotation ? "XYZ" : "RGBA")[row]) + " ";
+      if (c.parameter == VrParameter::RigRotation)
+        label += std::to_string(int(std::lround(value))) + " deg";
+      else if (c.parameter == VrParameter::BrushRadius)
         label += std::to_string(int(std::lround(value * 1000))) + " mm";
       else if (c.parameter == VrParameter::VoxelSize) {
         char size[48];
@@ -308,7 +310,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else {
+    } else if (c.parameter != VrParameter::RigRotation) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
@@ -327,6 +329,8 @@ void SpatialPalette::raster(const EditorState &s) {
     text(170 * unit_, 616 * unit_, "Cancel", fg);
     text(470 * unit_, 616 * unit_,
          c.parameter == VrParameter::VoxelSize ? "Remesh / Press" : "Done / Press", fg);
+    if (c.parameter == VrParameter::RigRotation || c.parameter == VrParameter::MorphWeight)
+      text(320 * unit_, 480 * unit_, "Apply on Done / Press", fg);
     if (c.parameter == VrParameter::VoxelSize) {
       text(320 * unit_, 470 * unit_, "New sculpt from the displayed shape", fg);
       text(320 * unit_, 505 * unit_, "Source retained and hidden", fg);
@@ -393,9 +397,12 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  text(320 * unit_, 295 * unit_, "Stick to choose", fg);
-  text(320 * unit_, 320 * unit_, "Press to confirm", fg);
-  const char *page = s.menu_page == 10 ? "Mesh tools"
+  if (s.menu_page != 11) {
+    text(320 * unit_, 295 * unit_, "Stick to choose", fg);
+    text(320 * unit_, 320 * unit_, "Press to confirm", fg);
+  }
+  const char *page = s.menu_page == 11 ? "Rig and shapekeys"
+                     : s.menu_page == 10 ? "Mesh tools"
                      : s.menu_page == 9 ? "Avatars"
                      : s.menu_page == 8 ? "Recovery"
                      : s.menu_page == 7   ? "Sculpt layers"
@@ -407,6 +414,13 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if (s.menu_page == 11 && s.deformation) {
+    auto &d = *s.deformation;
+    if (d.skeleton && !d.skeleton->bones.empty())
+      text(320 * unit_, 292 * unit_, d.skeleton->bones.at(s.rig_joint).name, fg);
+    if (d.morphs && !d.morphs->targets.empty())
+      text(320 * unit_, 326 * unit_, d.morphs->targets.at(s.morph_target).name, fg);
+  }
   if (s.menu_page == 8) {
     auto name = s.recovery_selected < s.recovery_candidates.size()
         ? s.recovery_candidates[s.recovery_selected] : "Refresh to find projects";
@@ -429,6 +443,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   std::string signature =
       s.font_file + std::to_string(s.font_pixels) +
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
+      std::to_string(s.rig_joint) + ":" + std::to_string(s.morph_target) + ":" +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message + std::to_string(s.recovery_selected) +
       std::to_string(s.recovery_candidates.size()) + s.recovery_error +
       s.error + std::to_string(s.light) + std::to_string(s.accent) +

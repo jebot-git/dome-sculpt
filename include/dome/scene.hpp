@@ -80,8 +80,10 @@ public:
   std::vector<ObjectSurface>
   surfaces(bool atlas = false,
            const std::function<bool()> &cancelled = {}) const;
+  std::vector<ObjectSurface> preview_surfaces(const std::function<bool()> &cancelled = {}) const;
 
 private:
+  std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &) const;
   std::vector<SculptObject> objects_;
   uint64_t active_ = 1, next_ = 2;
   std::vector<SceneGroup> groups_;

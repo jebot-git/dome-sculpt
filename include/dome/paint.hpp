@@ -19,6 +19,7 @@ struct TextureMaps {
   Image color, metal_rough, emission;
   bool transparent = false;
   std::shared_ptr<const PaintSourceMaps> source_maps;
+  bool source_only = false; // Immutable original preview; derived images are empty.
   Image normal; // Optional linear +Y tangent-space map. Empty means no detail.
 };
 struct BakedTextures {
@@ -111,6 +112,7 @@ public:
   std::shared_ptr<PaintedMesh>
   reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
   std::shared_ptr<const TextureMaps> composite(const Material &) const;
+  std::shared_ptr<const TextureMaps> preview(const Material &) const;
   std::shared_ptr<const BakedTextures> baked() const { return baked_; }
   void install_bake(BakedTextures);
   void clear_bake();

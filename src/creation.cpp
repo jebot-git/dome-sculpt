@@ -31,6 +31,7 @@ uint64_t append_humanoid(Scene &scene, const HumanoidControls &controls,
     object.material.color = part.color;
     object.material.roughness = part.roughness;
     object.material.toon = part.toon;
+    object.material.unlit = part.unlit;
     object.appearance = part.appearance;
     if (part.appearance) {
       const auto &source = part.appearance->asset->materials.at(size_t(part.appearance->material));

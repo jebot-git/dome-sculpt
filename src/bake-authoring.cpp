@@ -31,9 +31,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if (source.mesh_active) {
     high.mesh = source.deformation ? source.deformation->preview(source.painted->mesh())
                                    : source.painted->mesh();
-    high.materials[0].maps = source.painted->composite(source.material);
-    if (auto original=source.painted->source_maps(); original && original->normal.image && original->normal_scale>0)
-      throw std::logic_error("Baking retained original normal views requires their tangent/sampler integration; source data was retained");
+    high.materials[0].maps = source.painted->preview(source.material);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
   high.materials[0].material = source.material;

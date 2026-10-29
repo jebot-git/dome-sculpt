@@ -1,89 +1,102 @@
-# Baked-surface / creator integration checkpoint — 2026-10-29
+# Source-aware bake / rig integration — 2026-10-29
 
-This record describes the merge of baked stage 72d9127 and creator baseline
-811eb69. The separate historical records are VALIDATION-72d9127.md and
-VALIDATION-811eb69.md; do not relabel their results as merged-source evidence.
-Newer remote main (observed c95208b) is outside this checkpoint. See HANDOFF.md
-for publication branch, limitations and the full resume sequence.
+This stage joins b879ce4 and c95208b, preserving both histories and the complete
+production objective. Their original records are archived in
+VALIDATION-{b879ce4,c95208b}.md and corresponding HANDOFF files. Those historical
+results must not be relabeled as verification of the combined tree.
 
-## Current source checks
+## Release evidence
 
-- Combined Release configure/build completed successfully, including native FLTK
-  application, OpenXR, MikkTSpace and all 35 registered CTest targets:
-  artifacts/configure-baked-creator-merge.log and
-  artifacts/build-baked-creator-merge.log.
-- Focused baked-textures test passes all 30 assertions:
-  artifacts/tests-baked-creator-cross.log. New integration cases cover legacy
-  standalone baked-v5 upgrade to v6, mixed original shared image archives with
-  baked payloads, composite-cache invalidation/source retention and grouped
-  world-scale cage rejection/success. Existing tangent, normal/AO, UV transfer,
-  exact source/layer/rig retention, cancellation, Undo and ordered save cases pass.
-- Retained end-to-end native sculpt/paint/voxel/atlas/bake/reopen/GLB/render run
-  passes on scene v6: artifacts/workflow-baked-creator-merge.log. Reproduce with
-  build/dome-sculpt-bake-workflow-test --artifacts artifacts/bake-workflow-v6.
-- Real FLTK scene-v6 bake regression passes 5/5 with complete=true,
-  status=passed and zero failures: artifacts/gui-baked-creator-merge.log and
-  artifacts/gui-baked-surface/report.json. Includes painting over the base,
-  exact GPU-pixel Undo and owned UV cancellation. Private bus/display/home;
-  no user document or active session changed.
-- All 30 third_party/sources.json source_sha256 entries match their files.
-  Linkage recorded in artifacts/linkage-baked-creator-merge.log resolves the
-  canonical local toolkit and contains no Qt/GTK/Pango runtime frontend.
-- Integration diff versus 811eb69 passes git diff --check. Original imported
-  upstream license/notice files retain their upstream whitespace and headings;
-  a whole-history diff check flags those verbatim source notices.
+The combined application/core/XR and all 40 registered tests build successfully:
+artifacts/build-source-bake-verified.log. Configure and earlier incremental build
+logs use configure-current-integration.log / configure-source-bake.log and
+build-current-integration.log / build-source-bake.log / build-source-bake-final.log.
 
-## Release and menu verification
+The broad run passed 39/40 suites in 286.20 seconds:
+artifacts/tests-source-bake-final.log. gltf-interoperability failed because the
+merged fixture reset its rig maps to a normal-less texture bundle while still
+asserting four images and a normal binding. The fixture now restores the actual
+normal-bearing bundle; the strong four-image/normal assertion is retained.
 
-All 35 Release CTests pass in 297.96 seconds, zero failures:
-artifacts/tests-baked-creator-merge.log. Includes independent glTF/PNG and
-actual software-GL shading, source archives/UV/cache, groups/creator, voxel,
-paint, document/worker/history, MToon and native bake workflow suites. The
-real-loader synthetic OpenXR suite passes in 266.64 seconds; its persisted
-report contains 53 checks, zero failures, complete=true and status=passed
-(build/xr-client/report.json). Actual female/male composite-cache profiles
-pass in 125.82 seconds under the explicit memory/entry bounds. These timings
-include concurrent validation and are not production performance benchmarks.
+After the final worker/renderer/export corrections and a fresh rebuild, all nine
+affected suites pass in 17.84 seconds: artifacts/tests-source-bake-verified.log.
+They cover glTF/PNG, real software GL, source GPU/maps/preview, native baking,
+full sculpt/paint/voxel/atlas/bake/save/reopen/export workflow and document assets.
+Detailed output is preserved in tests-source-bake-verified-detail.log.
 
-Universal menus pass 53/53, zero failures, with the script exiting 0:
-artifacts/menu-baked-creator-final.log and artifacts/menu/report.json. Includes
-creator isolation/cancel, voxel remesh/feedback/Undo, text history, exact UV Undo
-and Redo, native chooser cancellation and host fallback/restoration. The first
-merged run compared pixels immediately after dispatch before GL redraw. The
-fixture now waits for the same exact pixels before asserting Redo; it does not
-relax the expected image. That initial failed run remains diagnostic evidence
-in artifacts/menu-baked-creator-merge.log, not a pass. A direct system-Python
-attempt lacked optional dbus_next; the documented uv test environment was used.
+The last two evidence-focused targets pass in 2.46 seconds:
+artifacts/tests-source-bake-evidence.log and corresponding -detail.log. Final
+baked-textures has 38 assertions, including the zero-preliminary-composite check;
+source-gpu has 42 assertions including actual female/male profiles. Thus all 40
+registered suites have passing evidence across the broad and final targeted runs;
+there was not a single 40/40 final-source run. The final targeted repeats were
+required by actual fixture/source changes and the stale-object audit, rather
+than a blanket repetition of unchanged suites.
 
-## Pending merged sanitizer validation
+New assertions independently check rotated/mirrored/singular original normal
+views, raw normal/AO/PBR/alpha factors, authoritative explicit tangent frames,
+protected original normal detail, exact source retention, raw/baked/clear/Undo
+preview selection and held immutable snapshots. GPU fixtures compare the actual
+production shader's original-source output with the native bake (within 8-bit
+quantization), then compare a mixed-source bake to a bake-only reference exactly.
+Independent cgltf plus PNG checks verify baked normal bytes and neutral scale/
+UV metadata take precedence over conflicting retained originals; composite AO
+uses ORM red once. This is generic PBR evidence, not complete MToon/VRM parity.
 
-The merged sanitizer configure succeeded. Its rebuild was intentionally stopped
-for the user's checkpoint/handoff request (exit 143), before any sanitizer tests
-started. This is not a compiler diagnostic or a passed merged sanitizer run.
-Logs: artifacts/configure-baked-creator-sanitize.log and
-artifacts/build-baked-creator-sanitize.log. No sanitizer build remains active.
-Resume with the existing configured build rather than deleting its cache:
+The broad real-loader OpenXR suite passed in 276.50 seconds. Its persisted report
+has 53 checks, zero failures, complete=true/status=passed:
+build/xr-client/report.json. All tracking/controllers are synthetic. Release GPU
+fixtures explicitly use software GL; no physical headset or hardware-accelerator
+completion follows from them. The GPU fixture now labels software-permitted
+runs accurately instead of printing a hardware-only assertion label by default.
 
-```sh
-cmake --build build-sanitize --parallel 2 --target \
-  dome-sculpt-baked-textures-test dome-sculpt-composite-cache-test
-ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 \
-  ctest --test-dir build-sanitize --output-on-failure \
-  -R '^(baked-textures|composite-cache)$'
-```
+## Whole-core sanitizer evidence
 
-Both C and C++ have ASan/UBSan/frame-pointer instrumentation; UI/XR are OFF.
-Prior successful whole-core sanitizer evidence is archived under the separate
-72d9127/811eb69 records and must not be reported as verification of this merge.
-Broader merged affected-source/archive/group sanitizer checks remain advisable
-once the two selected integration targets complete.
+Seven selected ASan/UBSan/leak suites pass in 158.54 seconds:
+artifacts/tests-source-bake-sanitize.log. Includes glTF, baked textures, full bake
+workflow, actual source maps, native weight editing, source preview and rig editing.
+Both C and C++ instrument the complete project core and Mikk/xatlas dependencies;
+UI/XR are OFF. Configure uses Release with -O1 -g1 -DNDEBUG, sanitizer flags and
+frame pointers retained. ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
+UBSAN_OPTIONS=halt_on_error=1 apply to the tests. This closes the unfinished
+merged-core sanitizer rebuild recorded in the b879ce4 handoff.
 
-## Scope of evidence
+The final expanded baked-textures target is rebuilt/relinked against the latest
+core and passes separately in 0.56 seconds:
+artifacts/tests-source-bake-sanitize-evidence.log, with full output in the
+corresponding -detail.log. This includes all 38 assertions and the direct-source
+worker path. Logs and CMake cache retain the actual flags; no diagnostic was
+suppressed and C instrumentation was not omitted.
 
-CPU/software GL and synthetic real-loader OpenXR fixtures do not establish
-physical headset/controller/stylus/3D-mouse behavior, production-size latency or
-accelerator backends. No fresh external Khronos validator or system install is
-claimed. Baked normal bindings/bytes and GPU shading do not prove full posed
-consumer interoperability. Raw original source normal views explicitly reject
-object baking until their sampling/tangent semantics are integrated; original
-archives remain retained. Full FLTK/XR bake controls remain unfinished.
+## Native frontends and provenance
+
+- Native FLTK/private DBusMenu general suite: 53/53, exit 0, failed=0;
+  artifacts/menu-source-bake-final.log and artifacts/menu/report.json.
+- Native rig/shapekey modal Apply/cancel/global Undo/Redo suite: 8/8, exit 0,
+  failed=0; menu-source-bake-rig.log and menu-rig/report.json.
+- Real FLTK existing scene-v6 baked-asset compatibility regression: 5/5, exit 0,
+  complete=true/status=passed/failed=0; gui-source-bake-final.log and
+  gui-baked-surface/report.json. Paint overlays, exact GPU Undo and owned UV
+  cancellation retain the canonical normal-mapped preview.
+- All 30 pinned source_sha256 entries match. Mikk's marked C seed-rotation fix,
+  reproducible patch and original/patched hashes remain unchanged.
+- artifacts/linkage-source-bake-final.log resolves the canonical local 22-patch
+  FLTK toolkit and contains no Qt/GTK/Pango runtime frontend. Python remains
+  optional test orchestration; runtime and bake/weight operations are native.
+
+The first test build needed an explicit nlohmann/json.hpp include for the new
+preview persistence assertion. A build audit also caught an older baked-test
+object compiled before added cases; that target was explicitly rebuilt and its
+new assertions verified in detailed output. Neither initial output is reported
+as verification of the expanded cases. Original license notices remain intact.
+
+## Remaining scope
+
+FLTK/XR bake authoring controls and the complete production requirement matrix
+remain unfinished. CPU source sampling is bilinear at texel centers; source mip
+footprints/minification, full authored-tangent/UV1/vertex-color rendering,
+production-size timing/memory/cancellation and complete deformed-consumer
+interoperability need further work. The raw derivative and canonical baked
+normal conventions are explicit; no claim of every glTF material extension is
+made. No fresh external Khronos validation, physical device/backend completion,
+system install or active-session restart occurred in this stage.

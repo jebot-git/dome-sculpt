@@ -18,7 +18,8 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
     )
 root = Path(__file__).resolve().parents[1]
 compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1"
-out = root / ("artifacts/menu-voxel-compact" if compact else "artifacts/menu")
+rig_flow = os.environ.get("DOME_MENU_RIG") == "1"
+out = root / ("artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -93,8 +94,13 @@ async def main():
             config.write_text(json.dumps({"font": "Unifont / Sans-Serif",
                                          "font_size": 16, "font_scale": 2}))
         log = (out / "app.log").open("w")
+        arguments = [str(root / "build/dome-sculpt")]
+        fixture = Path(home, "rig.dsculpt")
+        if rig_flow:
+            subprocess.run([str(root / "build/dome-sculpt-rig-edit-test"), "--ui-fixture", str(fixture)], check=True)
+            arguments.append(str(fixture))
         app = subprocess.Popen(
-            [str(root / "build/dome-sculpt")], env=env, cwd=home, stdout=log, stderr=log
+            arguments, env=env, cwd=home, stdout=log, stderr=log
         )
         processes.append(app)
         d = display.Display(screen)
@@ -154,6 +160,76 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if rig_flow:
+            def info():
+                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
+            def tap(w, x, y):
+                g = w.get_geometry()
+                xtest.fake_input(d, X.MotionNotify, x=g.x+int(x), y=g.y+int(y))
+                xtest.fake_input(d, X.ButtonPress, 1); xtest.fake_input(d, X.ButtonRelease, 1); d.sync()
+            def enter_rotation(w):
+                w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
+                g = w.get_geometry()
+                tap(w, g.width/2+60, 112)
+                key("Control_L", True); key("a"); key("Control_L", False)
+                key("3"); key("0"); key("Tab")
+            baseline = info()
+            nodes, _ = await layout()
+            check(nodes["Rig and shapekeys..."][1].get("enabled") is True,
+                  "Rigged mesh exports enabled native rig authoring command")
+            await click("Rig and shapekeys...")
+            w = await wait(lambda: named("Rig and shapekeys"))
+            nodes, _ = await layout()
+            check(w.get_wm_transient_for().id == window.id and
+                  nodes["Rig and shapekeys..."][1].get("enabled") is False,
+                  "Rig editor inherits document identity and isolates scene commands")
+            enter_rotation(w)
+            g = w.get_geometry()
+            raw = w.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+            Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX").save(out / "rig-options.png")
+            await click("Close Window")
+            await wait(lambda: named("Rig and shapekeys") is None)
+            await click("Save")
+            check(info()["scene_hash"] == baseline["scene_hash"],
+                  "Universal Close cancels staged rig values without modifying native project")
+            await click("Rig and shapekeys...")
+            w = await wait(lambda: named("Rig and shapekeys"))
+            enter_rotation(w)
+            g = w.get_geometry(); tap(w, g.width/2+80, g.height-40)
+            await wait(lambda: named("Rig and shapekeys") is None)
+            for _ in range(200):
+                nodes, _ = await layout()
+                if nodes["Save"][1].get("enabled") is True: break
+                await asyncio.sleep(.03)
+            await click("Save")
+            check(info()["scene_hash"] != baseline["scene_hash"],
+                  "Native Apply commits the entered joint adjustment on the asset worker")
+            await click("Undo"); await click("Save")
+            check(info()["scene_hash"] == baseline["scene_hash"],
+                  "Universal Undo restores the exact complete rigged scene")
+            await click("Redo"); await click("Save")
+            check(info()["scene_hash"] != baseline["scene_hash"],
+                  "Universal Redo reapplies the complete grouped pose transaction")
+            posed = info()["scene_hash"]
+            await click("Rig and shapekeys...")
+            w = await wait(lambda: named("Rig and shapekeys"))
+            w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
+            g = w.get_geometry(); tap(w, g.width/2+60, 400)
+            key("Control_L", True); key("a"); key("Control_L", False)
+            key("0"); key("period"); key("5"); key("Tab")
+            tap(w, g.width/2+80, g.height-40)
+            await wait(lambda: named("Rig and shapekeys") is None)
+            for _ in range(200):
+                nodes, _ = await layout()
+                if nodes["Save"][1].get("enabled") is True: break
+                await asyncio.sleep(.03)
+            await click("Save")
+            check(info()["scene_hash"] != posed,
+                  "Editing native shapekey weight enables and commits that selected target")
+            await click("Undo"); await click("Save")
+            check(info()["scene_hash"] == posed,
+                  "Shapekey Undo preserves the previously accepted grouped pose exactly")
+            d.close(); bus.disconnect(); return
         if compact:
             await click("Voxel remesh...")
             w = await wait(lambda: named("Voxel remesh"))

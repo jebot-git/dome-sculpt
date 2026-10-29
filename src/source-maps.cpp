@@ -125,4 +125,40 @@ std::array<float,4> sample_source_texture(const PaintSourceTexture&t,float u,flo
     for(int c=0;c<4;++c){float value=im.rgba[at+c]/255.f;if(srgb&&c<3)value=srgb_to_linear(value);result[c]+=weight*value;}
   }return result;
 }
+Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
+                           std::array<float,3> bary,float strength) {
+  if(!std::isfinite(strength)||strength<0||strength>4)throw std::invalid_argument("Invalid source normal strength");
+  std::array<uint32_t,3> ids{};Vec3 n{};std::array<float,2> uv{};
+  for(size_t c=0;c<3;++c){
+    ids[c]=mesh.indices.at(triangle*3+c);
+    n+=normalized(mesh.normals.at(ids[c]))*bary[c];
+    auto t=mesh.uv.at(ids[c]);uv[0]+=t[0]*bary[c];uv[1]+=t[1]*bary[c];
+  }
+  n=normalized(n);
+  if(!maps.normal.image||maps.normal_scale==0||strength==0)return n;
+  auto uv0=mesh.uv[ids[0]],uv1=mesh.uv[ids[1]],uv2=mesh.uv[ids[2]];
+  const auto &a=maps.normal.uv_transform;
+  double u1=double(uv1[0])-uv0[0],v1=double(uv1[1])-uv0[1],
+         u2=double(uv2[0])-uv0[0],v2=double(uv2[1])-uv0[1];
+  double x1=a[0]*u1+a[1]*v1,y1=a[2]*u1+a[3]*v1,
+         x2=a[0]*u2+a[1]*v2,y2=a[2]*u2+a[3]*v2;
+  double determinant=x1*y2-x2*y1,scale=std::hypot(x1,y1)*std::hypot(x2,y2);
+  if(!scale||std::abs(determinant)<=scale*1e-8)return n;
+  auto e1=mesh.positions[ids[1]]-mesh.positions[ids[0]],e2=mesh.positions[ids[2]]-mesh.positions[ids[0]];
+  auto direction=[&](double x,double y,double z){
+    double size=std::hypot(x,y,z);if(size<1e-100)return Vec3{};
+    double sign=determinant<0?-1:1;return Vec3{float(x/size*sign),float(y/size*sign),float(z/size*sign)};
+  };
+  auto t=direction(e1.x*y2-e2.x*y1,e1.y*y2-e2.y*y1,e1.z*y2-e2.z*y1),
+       raw_b=direction(e2.x*x1-e1.x*x2,e2.y*x1-e1.y*x2,e2.z*x1-e1.z*x2);
+  t=t-n*dot(n,t);if(length(t)<1e-8f)return n;t=normalized(t);
+  auto b=cross(n,t)*(dot(cross(n,t),raw_b)<0?-1.f:1.f);
+  auto encoded=sample_source_texture(maps.normal,uv[0],uv[1],false);
+  double factor=double(maps.normal_scale)*strength;
+  double dx=(encoded[0]*2-1)*factor,dy=(encoded[1]*2-1)*factor,dz=encoded[2]*2-1;
+  double magnitude=std::hypot(dx,dy,dz);if(magnitude<1e-20)return n;
+  Vec3 detail{float(dx/magnitude),float(dy/magnitude),float(dz/magnitude)};
+  auto result=t*detail.x+b*detail.y+n*detail.z;
+  return length(result)>1e-8f?normalized(result):n;
+}
 } // namespace dome

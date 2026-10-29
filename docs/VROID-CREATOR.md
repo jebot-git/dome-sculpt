@@ -83,9 +83,10 @@ raise a concrete error; they never cause an automatic MH substitution.
 
 Neutral baseline preservation is the first acceptance condition. Body/style
 controls are bounded relative deformations of the actual source; source rig and
-morph data remain the reference. Hair controls do not currently replace these
-preserved hairstyles, and texture/tint editing is distinct from full hairstyle
-construction. Complete VRM springs, look-at/first-person behaviors, constraints,
+morph data remain the reference. Neutral hair controls retain the original19 parts exactly. Nonzero hair
+length, volume or fringe controls append an original fitted swept-lock groom;
+the source hairstyle and all authored geometry remain unchanged. This is an
+editable parameterized extension, not a complete VRoid hair-guide editor. Complete VRM springs, look-at/first-person behaviors, constraints,
 material expressions and exact MToon shader/export parity remain integration
 work. The MH fallback remains useful for its authored anatomy, but is not
 presented as the newly requested CC0 VRoid baseline.
@@ -97,3 +98,92 @@ legacy control migration, cancellation and wrong-source rejection. Tests and
 rendered evidence must distinguish original textured source fidelity from
 currently supported runtime shading. Existing native GLB validation and Blender
 interop fixtures provide the downstream export/visual checks.
+
+## Reproducible textured native roundtrip evidence
+
+The optional native fixture exercises the same `append_humanoid` operation used
+by the guarded Document worker. It saves and reopens a real project, checks exact
+scene-record equality, then exports the reopened scene with original textures:
+
+```sh
+DOME_VROID_SCENE_FIXTURE=artifacts build/dome-sculpt-vroid-creator-test
+blender --background --factory-startup --python tools/render-vroid-fidelity.py -- artifacts
+python3 tools/compare-vroid-fidelity.py artifacts
+```
+
+The Blender step is optional development QA; the comparison script uses Pillow.
+Neither is an application runtime dependency. Native GLBs must already exist;
+the render tool fails if they are absent instead of substituting source files.
+
+Both source-authored baselines insert all19 parts while retaining28 zero-area UV
+faces and36,738 linked texels as explicit source diagnostics. They render all
+source geometry; linked UVs paint shared source pixels and zero-area UV faces
+remain unpaintable without losing render geometry. Their original UV/index/
+skin/morph/remap data survives restart exactly.
+
+Measured on2026-10-29, female native project size was119,795,368bytes and male
+124,948,360bytes, both within the256MiB whole-project limit. Native GLBs exported
+from reopened projects were15,724,236 and14,977,724bytes. Khronos validator
+2.0.0-dev.3.10 reported zero errors, warnings, infos or hints for both exports.
+
+Blender5.4 source/native unlit reference renders retained the authored face,
+iris, skin, clothing and scalp appearance. Mean absolute8-bit channel differences
+were female face0.00635/body0.000816 and male face0.00329/body0.000992; sampling/edge
+pixels account for small nonzero differences. This compares the standard glTF
+unlit fallback on both sides, not full legacy MToon lighting or VRM behavior.
+Native GUI/XR tests are separate from these offline rendered interop fixtures.
+
+A performance gap was also measured: insertion took about0.35seconds, while
+uncached full-resolution `Scene::surfaces` compositing took about5seconds per
+avatar. Immutable composition caching and GPU source/overlay blending remain
+important for interactive editing; source fidelity alone is not a performance
+completion claim.
+
+## Original native fitted groom
+
+`src/humanoid-groom.hpp` shares the original native cap/closed swept-lock kernel
+with the MH fallback. The old MH topology/positions remain byte-equivalent
+(topology identity14369968804387486394). For the actual beta sources a fitted
+head frame, source triangle envelope and final finite-width cross-section clearance constrain
+the generated rest shape. Nonzero controls append2059 vertices and3488 triangles
+with independent nondegenerate UVs. Length changes lock reach; volume changes
+the cap and strand silhouette; fringe changes front tips independently. Source
+images/vertices/UVs/morphs and all19 source parts remain untouched. The additional
+part has its own original256×256 procedural strand image, derived palette,
+strictly validated paint UVs, and exact binding to the source head joint.
+
+The head-rigid extension follows the same source skeleton without creating a
+second guessed bone map. It has no spring simulation or arbitrary-pose collision
+guarantee. Mild head pose and bounded extreme rest shapes have separate ray
+intersection fixtures, including exact long-render controls. Seeded real torso/
+shoulder interiors and2mm inward/outward torso probes verify the ray test can
+detect actual clipping. Normals are normalized before ray classification to
+avoid missing small near-tangent source triangles. Offline Blender full-body
+renders add independent QA.
+`artifacts/vroid-groom-{medium,long,fringe,posed,male}-{face,body}.png` are the
+render examples. Regenerate them with
+`DOME_VROID_GROOM_FIXTURE=artifacts build/dome-sculpt-vroid-groom-test` then
+`blender --background --factory-startup --python tools/render-vroid-groom.py -- artifacts`.
+The hairstyle is a native stylized foundation; flyaways, guide
+editing, strand physics and salon-quality detail remain future work.
+
+Creator source identity explicitly records native joint-to-source node and
+native morph-to-source target arrays, plus an optional original-to-native
+quaternion (beta sources use proper Y180). Absent legacy provenance must not
+authorize VRM metadata reconstruction. A basis change alone does not refit
+collider radii/offsets or first-person offsets after nonrigid proportion edits;
+export must reject unsupported fitted metadata until its local-space fit is
+explicitly remapped. Original metadata remains available unchanged.
+
+Offline collision QA selects the nineteen imported source mesh nodes explicitly;
+Blender creates an unrelated hidden unit `Icosphere` armature widget in
+`glTF_not_exported`. It must not contribute to body BVHs or camera bounds. The
+initial all-data-object report (long33 first-ray/2 two-ray hits) included that
+widget and was invalid; the corrected exact-long source-only report is0/0.
+Native seeded interior and near-surface controls remain independent evidence.
+
+The corrected independent Blender reports were medium/long/fringe/male0
+first-ray and0 bidirectional vertices. A0.24rad posed example still has5 shoulder
+penetrations around0.7–2.4mm; the0.18rad native pose fixture stays clear. This
+explicitly bounds the current head-rigid fit and motivates future pose-aware
+collision/spring handling rather than a claim of collision-free animation.

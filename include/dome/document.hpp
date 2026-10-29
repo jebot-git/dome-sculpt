@@ -55,6 +55,8 @@ struct EditorState {
   bool light = false, toon = false;
   bool mesh_active = false, asset_busy = false, can_undo = false,
        can_redo = false;
+  std::shared_ptr<const DeformationState> deformation;
+  size_t rig_joint = 0, morph_target = 0;
   bool can_voxel_remesh = false;
   float voxel_size_mm = 30;
   std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
@@ -80,6 +82,7 @@ struct SurfaceRange {
   Material material;
   std::shared_ptr<const TextureMaps> textures{};
   std::shared_ptr<const CreatorAppearance> appearance{};
+  size_t first_vertex = 0;
 };
 struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;
@@ -213,6 +216,8 @@ private:
   bool control_changed_ = false;
   uint64_t control_object_ = 0;
   AssetSource control_source_{};
+  uint64_t rig_object_ = 0;
+  size_t control_rig_index_ = 0;
   float control_voxel_mm_ = 30;
   std::optional<UvWorkspace> uv_;
   uint64_t uv_session_ = 0;

@@ -43,6 +43,7 @@ CreatorAppearance appearance(const std::shared_ptr<const std::vector<uint8_t>>&b
 }
 int main(int argc,char**argv)try{
   auto f=fixture();auto raw=std::make_shared<const std::vector<uint8_t>>(f.bytes);auto a=appearance(raw);CreatorAssetArchive assets;PaintImageArchive images;
+  a.source_joint_nodes={0}; a.source_morph_targets={0};a.source_basis_quaternion=Quat{0,0,1,0};
   auto record=encode_creator_appearance(a,assets,images);
   check(assets.size()==1&&assets.bytes()==raw->size()&&images.size()==1,"Creator archive retains one original GLB and one shared decoded image table");
   auto another=a;another.source_vertices={2,1,0};auto duplicate=encode_creator_appearance(another,assets,images);
@@ -53,6 +54,29 @@ int main(int argc,char**argv)try{
     "Self-contained native restart preserves exact raw source and one immutable reconstructed asset per model");
   check(restored->decoded_images->at(0)==restored_images.at(0)&&restored->decoded_images->at(0)->rgba==a.decoded_images->at(0)->rgba,
     "Creator reload reuses native decoded image IDs without PNG decoding or alpha-data loss");
+  check(restored->source_joint_nodes==a.source_joint_nodes,"Exact source joint IDs survive native restart without name inference");
+  check(restored->source_morph_targets==a.source_morph_targets,"Exact source morph IDs survive native restart independently of names/order");
+  auto malformed_targets=record; malformed_targets["source_morph_targets"]=nlohmann::json::binary({0,0,0,0,0,0,0,0});
+  check(rejects([&]{decode_creator_appearance(malformed_targets,restored_assets);}),"Duplicate source morph target IDs reject");
+  malformed_targets["source_morph_targets"]=nlohmann::json::binary({1,0,0,0});
+  check(rejects([&]{decode_creator_appearance(malformed_targets,restored_assets);}),"Out-of-range source morph target IDs reject");
+  auto legacy_targets=record;legacy_targets.erase("source_morph_targets");
+  check(decode_creator_appearance(legacy_targets,restored_assets)->source_morph_targets.empty(),"Legacy missing morph identity remains explicitly unavailable");
+  check(restored->source_basis_quaternion && restored->source_basis_quaternion->w==0 && restored->source_basis_quaternion->y==1,"Exact authored source basis survives native restart");
+  auto bad_basis=record;bad_basis["source_basis_quaternion"]={0,0,0,0};
+  check(rejects([&]{decode_creator_appearance(bad_basis,restored_assets);}),"Zero source quaternion rejects instead of assuming identity");
+  bad_basis["source_basis_quaternion"]={0,1,0};
+  check(rejects([&]{decode_creator_appearance(bad_basis,restored_assets);}),"Malformed source basis dimensions reject");
+  auto legacy_basis=record;legacy_basis.erase("source_basis_quaternion");
+  check(!decode_creator_appearance(legacy_basis,restored_assets)->source_basis_quaternion,"Legacy absent source basis remains unknown rather than guessed identity");
+  auto legacy_record=record; legacy_record.erase("source_joint_nodes");
+  check(decode_creator_appearance(legacy_record,restored_assets)->source_joint_nodes.empty(),"Legacy missing joint mapping remains explicitly unavailable");
+  auto bad_joints=record; bad_joints["source_joint_nodes"]=nlohmann::json::binary({0,0,0,0,0,0,0,0});
+  check(rejects([&]{decode_creator_appearance(bad_joints,restored_assets);}),"Duplicate original joint IDs reject");
+  bad_joints["source_joint_nodes"]=nlohmann::json::binary({255,255,255,127});
+  check(rejects([&]{decode_creator_appearance(bad_joints,restored_assets);}),"Out-of-range original joint IDs reject");
+  bad_joints["source_joint_nodes"]=nlohmann::json::binary({0,0,0});
+  check(rejects([&]{decode_creator_appearance(bad_joints,restored_assets);}),"Truncated packed source joint IDs reject");
   check(restored->source_vertices==a.source_vertices&&other->source_vertices==another.source_vertices,"Independent native vertex remaps survive shared-source restart");
   check(restored->material_json==a.material_json&&restored->mtoon_json==a.mtoon_json&&*restored->vrm_json==*a.vrm_json,
     "Original material and arbitrary MToon/VRM metadata survive native restart exactly");

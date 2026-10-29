@@ -138,6 +138,9 @@ struct PaintedMesh::CompositeCache {
   uint64_t token=0;
   CompositeFactors factors{};
   std::weak_ptr<const TextureMaps> maps;
+  uint64_t preview_token=0;
+  bool source_eligible=false;
+  std::shared_ptr<const TextureMaps> source_preview;
 };
 PaintCompositeCacheStats paint_composite_cache_stats(){
   auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
@@ -626,7 +629,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   return p;
 }
 void BakedTextures::validate(uint32_t resolution) const {
-  if (maps.source_maps) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
+  if (maps.source_maps || maps.source_only) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
@@ -700,6 +703,32 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
   result->source_maps_=std::make_shared<const PaintSourceMaps>(*maps);
   return result;
 }
+std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {
+  material.validate();
+  if(source_maps_ && !baked_){
+    std::lock_guard lock(composite_cache_->mutex);
+    if(composite_cache_->preview_token!=composite_token_){
+      bool contributing=false;
+      for(const auto &l:layers_)if(l.visible&&l.opacity>0){
+        for(const auto &tile:l.tiles)if(tile){
+          for(const auto &p:tile->pixels)if(p.data[13]&&(p.data[9]||p.data[10]||p.data[11]||p.data[12])){contributing=true;break;}
+          if(contributing)break;
+        }
+        if(contributing)break;
+      }
+      composite_cache_->source_eligible=!contributing;composite_cache_->preview_token=composite_token_;
+    }
+    if(composite_cache_->source_eligible){
+      if(!composite_cache_->source_preview){
+        auto marker=std::make_shared<TextureMaps>();marker->source_maps=source_maps_;marker->source_only=true;
+        if(auto image=source_maps_->color.image)for(size_t i=3;i<image->rgba.size();i+=4)if(image->rgba[i]!=255){marker->transparent=true;break;}
+        composite_cache_->source_preview=std::move(marker);
+      }
+      return composite_cache_->source_preview;
+    }
+  }
+  return composite(material);
+}
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material) const {
   material.validate();
@@ -769,12 +798,28 @@ PaintedMesh::build_composite(const Material &material) const {
     }
   }
   if (baked_ && !maps->normal.rgba.empty()) {
+    // Protected/fractional coverage keeps original source normal detail. Convert
+    // that affine-UV derivative frame into the canonical baked tangent basis.
+    std::vector<Tangent> corners;
+    if(source.normal.image && source.normal_scale>0){
+      bool needs_original=false;
+      for(size_t at=0;at<surface_->texels.size();++at)
+        if(surface_->texels[at].covered && baked_->coverage[at]<255){needs_original=true;break;}
+      if(needs_original)corners=tangent_corners(mesh());
+    }
     for (size_t at=0;at<size_t(r)*r;++at) {
       int32_t owner=surface_->padding[at];
       if (owner<0) continue;
       auto values=baked_pixel(*baked_,size_t(owner));
       float a=unit(baked_->coverage[size_t(owner)]);
-      Vec3 n=Vec3{values[10],values[11],values[12]}*a+Vec3{0,0,1}*(1-a);
+      Vec3 original{0,0,1};
+      if(a<1 && !corners.empty()){
+        const auto &texel=surface_->texels[size_t(owner)];
+        std::array<float,3> bary{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]};
+        original=tangent_frame(mesh(),corners,texel.face,bary).to_tangent(
+          source_texture_normal(mesh(),source,texel.face,bary));
+      }
+      Vec3 n=Vec3{values[10],values[11],values[12]}*a+original*(1-a);
       if(length(n)<1e-8f)n={0,0,1};else n=normalized(n);
       maps->normal.rgba[at*4]=byte(n.x*.5f+.5f);
       maps->normal.rgba[at*4+1]=byte(n.y*.5f+.5f);

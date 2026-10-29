@@ -148,6 +148,56 @@ int main() try {
   check(length(normal(rebaked.normal)-normal(maps->normal))<.015f &&
         pixel(rebaked.maps.metal_rough)[0]==80,
         "Baking a previously baked source retains automatic normal-map detail and source AO");
+  auto original_views=std::make_shared<PaintSourceMaps>();
+  original_views->color.image=std::make_shared<const Image>(constant({128,64,255,128}));
+  original_views->normal.image=std::make_shared<const Image>(constant({204,128,230,255}));
+  original_views->normal.uv_transform={0,-1,1,0,1,0};original_views->normal_scale=.5f;
+  original_views->occlusion.image=std::make_shared<const Image>(constant({128,0,0,255}));original_views->occlusion_strength=.6f;
+  auto analytic=normalized(Vec3{.0039215686f*.5f,-.6f*.5f,230/127.5f-1});
+  check(length(source_texture_normal(mesh,*original_views,0,{.2f,.3f,.5f})-analytic)<.001f,
+        "Original normal sampling rotates the affine UV basis and applies strength exactly once");
+  auto mirrored_views=*original_views;mirrored_views.normal.uv_transform={-1,0,0,1,1,0};
+  check(source_texture_normal(mesh,mirrored_views,0,{.2f,.3f,.5f}).x<-.3f,
+        "Mirrored original normal views retain tangent handedness");
+  mirrored_views.normal.uv_transform={0,0,0,0,.5f,.5f};
+  check(length(source_texture_normal(mesh,mirrored_views,0,{.2f,.3f,.5f})-Vec3{0,0,1})<1e-6f,
+        "Singular original normal UV transforms retain geometric shading instead of inventing a tangent");
+  auto original_paint=PaintedMesh::from_maps(mesh,original_views,64);Material original_material;
+  original_material.color={.5f,.7f,.4f,.75f};
+  BakeSource raw_source;raw_source.mesh=mesh;raw_source.materials[0].material=original_material;
+  raw_source.materials[0].maps=original_paint->preview(original_material);
+  auto raw_bake=bake_mesh(mesh,raw_source,options);
+  check(length(normal(raw_bake.normal)-analytic)<.012f &&
+        std::abs(int(pixel(raw_bake.maps.metal_rough)[0])-179)<=1 &&
+        std::abs(int(pixel(raw_bake.maps.color)[0])-92)<=1 &&
+        std::abs(int(pixel(raw_bake.maps.color)[3])-96)<=1,
+        "Baking original GPU bindings retains transformed normals, independent AO, linear alpha and one application of material factors");
+  raw_source.tangents.assign(mesh.positions.size(),{1,0,0,1});
+  auto explicit_raw=bake_mesh(mesh,raw_source,options);
+  check(normal(explicit_raw.normal).x>.3f && std::abs(normal(explicit_raw.normal).y)<.015f,
+        "Explicit imported tangent frames remain authoritative for original normal views");
+  auto protected_bake=textures();
+  for(int y=0;y<64;++y)for(int x=0;x<32;++x)protected_bake.coverage[y*64+x]=0;
+  original_paint->install_bake(std::move(protected_bake));
+  auto protected_maps=original_paint->composite(original_material);
+  auto decode_at=[&](int x){auto p=pixel(protected_maps->normal,x,32);return normalized(Vec3{p[0]/127.5f-1,p[1]/127.5f-1,p[2]/127.5f-1});};
+  check(length(decode_at(24)-analytic)<.012f && decode_at(40).y>.59f,
+        "Protected normal texels retain original affine-UV detail while covered texels use the canonical baked basis");
+  Scene raw_authoring;raw_authoring.active().mesh_active=true;
+  raw_authoring.active().painted=std::make_shared<PaintedMesh>(mesh,64);auto raw_target=raw_authoring.active().id;
+  auto raw_id=raw_authoring.add("Original source detail",Volume{});
+  raw_authoring.active().mesh_active=true;raw_authoring.active().visible=false;
+  raw_authoring.active().material=original_material;
+  raw_authoring.active().painted=PaintedMesh::from_maps(mesh,original_views,64);
+  auto raw_before=raw_authoring.active().painted->encode();raw_authoring.select(raw_target);
+  ObjectBakeSettings raw_settings;raw_settings.ao_samples=0;raw_settings.padding=2;
+  auto raw_composites=paint_composite_cache_stats().builds;
+  bake_object(raw_authoring,raw_id,raw_settings);
+  check(paint_composite_cache_stats().builds==raw_composites,
+        "Original source object baking avoids a preliminary CPU composite and a second image resampling pass");
+  check(raw_authoring.object(raw_id).painted->encode()==raw_before &&
+        length(normal(raw_authoring.active().painted->composite(raw_authoring.active().material)->normal)-analytic)<.012f,
+        "Native object baking now transfers original source normal views without changing their retained archive");
   Scene authoring;
   auto &low=authoring.active();
   low.transform={{.2f,.3f,-.1f},{0,0,.70710678f,.70710678f},2};

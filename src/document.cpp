@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/tangents.hpp"
 #include "dome/creation.hpp"
+#include "dome/rig-edit.hpp"
 #include <unistd.h>
 #include <utility>
 namespace dome {
@@ -312,6 +313,17 @@ void Document::publish_locked(bool force) {
     state_.uv = std::move(view);
   } else
     state_.uv.reset();
+  state_.deformation = active.deformation;
+  if (rig_object_ != active.id) {
+    rig_object_ = active.id;
+    state_.rig_joint = state_.morph_target = 0;
+  }
+  if (active.deformation) {
+    auto &d = *active.deformation;
+    if (d.skeleton) state_.rig_joint = std::min(state_.rig_joint, d.skeleton->bones.size() - 1);
+    if (d.morphs && !d.morphs->targets.empty())
+      state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
+  }
   state_.mesh_active = active.mesh_active;
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
   state_.active_sculpt_layer = volume().active_layer();
@@ -367,7 +379,9 @@ void Document::publish_locked(bool force) {
 void Document::finish_locked() {
   // Starting another command may accept scalar property previews, but must
   // not implicitly execute an action such as creating a remeshed object.
-  finish_control_locked(state_.controls.parameter != VrParameter::VoxelSize);
+  finish_control_locked(state_.controls.parameter != VrParameter::VoxelSize &&
+                        state_.controls.parameter != VrParameter::RigRotation &&
+                        state_.controls.parameter != VrParameter::MorphWeight);
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
   if (action_active_locked() && end_action_locked())
@@ -981,7 +995,7 @@ void Document::mesh_loop() {
     }
     try {
       auto objects =
-          job->scene.surfaces(false, [&] { return stopping_.load(); });
+          job->scene.preview_surfaces([&] { return stopping_.load(); });
       auto snapshot = std::make_shared<MeshSnapshot>();
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
@@ -1004,7 +1018,7 @@ void Document::mesh_loop() {
             snapshot->tangents.push_back({direction.x,direction.y,direction.z,t[3]});
             snapshot->mesh.indices.push_back(uint32_t(offset+c));
           }
-          snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance});
+          snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance, offset});
           continue;
         }
         for (auto p : o.mesh.positions)
@@ -1022,7 +1036,7 @@ void Document::mesh_loop() {
           snapshot->mesh.indices.push_back(uint32_t(offset + index));
         snapshot->tangents.resize(snapshot->mesh.positions.size(), {1,0,0,1});
         snapshot->ranges.push_back(
-            {o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance});
+            {o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance, offset});
       }
       std::lock_guard lock(mesh_mutex_);
       if (published_.load()->generation == job->generation)
@@ -1113,6 +1127,15 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if (parameter == VrParameter::RigRotation || parameter == VrParameter::MorphWeight) {
+    const auto &o = scene_.active();
+    if (state_.asset_busy || state_.recovery_busy || !o.visible || o.locked ||
+        !o.mesh_active || !o.painted || !o.deformation) return false;
+    const auto &d = *o.deformation;
+    return parameter == VrParameter::RigRotation
+        ? d.skeleton && d.skin && !d.skeleton->bones.empty()
+        : d.morphs && !d.morphs->targets.empty();
+  }
   if (parameter == VrParameter::VoxelSize) {
     const auto &o = scene_.active();
     return !state_.asset_busy && !state_.recovery_busy && o.visible && !o.locked &&
@@ -1140,6 +1163,31 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if (state_.controls.parameter == VrParameter::RigRotation ||
+      state_.controls.parameter == VrParameter::MorphWeight) {
+    auto controls = state_.controls;
+    if (accept && control_changed_) {
+      RigEdit edit;
+      if (controls.parameter == VrParameter::RigRotation)
+        edit.joint = JointAdjustment{uint32_t(control_rig_index_),
+                                     {controls.value[0], controls.value[1], controls.value[2]}, {}};
+      else edit.morph = MorphWeightEdit{uint32_t(control_rig_index_), controls.value[0]};
+      auto before = std::move(control_before_);
+      control_before_.reset();
+      try {
+        auto object = control_object_;
+        queue_scene_operation_locked("Edit rig and shapekeys",
+          [object, edit](Scene &scene, const auto &cancelled) { edit_rig(scene, object, edit, cancelled); },
+          control_source_, {});
+      } catch (...) {
+        control_before_ = std::move(before);
+        throw;
+      }
+    } else control_before_.reset();
+    control_changed_ = false;
+    state_.controls = {};
+    return;
+  }
   if (state_.controls.parameter == VrParameter::VoxelSize) {
     if (accept) {
       auto before = std::move(control_before_);
@@ -1236,6 +1284,17 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::RigRotation:
+      control_rig_index_ = state_.rig_joint;
+      c.title = o.deformation->skeleton->bones.at(control_rig_index_).name + " rotation delta";
+      c.components = 3; c.minimum = -180; c.maximum = 180;
+      break;
+    case VrParameter::MorphWeight:
+      control_rig_index_ = state_.morph_target;
+      c.title = o.deformation->morphs->targets.at(control_rig_index_).name;
+      c.minimum = -1; c.maximum = 1;
+      c.value[0] = o.deformation->morph_weights.empty() ? 0 : o.deformation->morph_weights.at(control_rig_index_);
+      break;
     case VrParameter::VoxelSize:
       control_voxel_mm_ = state_.voxel_size_mm;
       c.title = "Voxel remesh size (mm)";
@@ -1380,6 +1439,12 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::RigRotation:
+    control_changed_ = c.value[0] != 0 || c.value[1] != 0 || c.value[2] != 0;
+    break;
+  case VrParameter::MorphWeight:
+    control_changed_ = c.value[0] != (before.deformation->morph_weights.empty() ? 0 : before.deformation->morph_weights.at(control_rig_index_));
+    break;
   case VrParameter::VoxelSize:
     state_.voxel_size_mm = value;
     break;
@@ -1479,6 +1544,11 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
+    auto parameter = command == SpatialCommand::RigNextMorph || command == SpatialCommand::RigPreviousMorph
+        ? VrParameter::MorphWeight : VrParameter::RigRotation;
+    return !control_before_ && !action_active_locked() && parameter_enabled_locked(parameter);
+  }
   if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
     if (state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked()) return false;
     if (command <= SpatialCommand::CreateMakeHuman) return scene_.objects().size() <= 237 && scene_.groups().size() < 128;
@@ -1596,6 +1666,23 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
+    if (!command_enabled_locked(command)) return;
+    const auto &d = *scene_.active().deformation;
+    if (command == SpatialCommand::RigResetPose) {
+      auto object = scene_.active().id;
+      queue_scene_operation_locked("Reset grouped rig pose", [object](Scene &scene, const auto &cancelled) {
+        RigEdit edit; edit.reset_pose = true; edit_rig(scene, object, edit, cancelled);
+      }, {}, {});
+    } else {
+      bool morph = command == SpatialCommand::RigNextMorph || command == SpatialCommand::RigPreviousMorph;
+      auto &index = morph ? state_.morph_target : state_.rig_joint;
+      auto count = morph ? d.morphs->targets.size() : d.skeleton->bones.size();
+      bool next = command == SpatialCommand::RigNextJoint || command == SpatialCommand::RigNextMorph;
+      index = (index + count + (next ? 1 : count - 1)) % count;
+    }
+    return;
+  }
   if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
     if (!command_enabled_locked(command)) return;
     if (command <= SpatialCommand::CreateMakeHuman) {

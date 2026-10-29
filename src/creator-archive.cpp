@@ -2,6 +2,7 @@
 #include "dome/creator-archive.hpp"
 #include <nlohmann/json.hpp>
 #include <span>
+#include <set>
 namespace dome {
 namespace {
 void stop(const CreatorArchiveLimits &l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Creator source persistence cancelled");}
@@ -101,6 +102,21 @@ void validate_mapping(const CreatorAppearance&a,const nlohmann::json &json,const
     if(v>=primitive.mesh.positions.size())throw std::runtime_error("Creator vertex mapping is outside its authored accessor");
     if((++k&4095)==0)stop(l);
   }
+  if(a.source_joint_nodes.size()>256) throw std::length_error("Creator source joint mapping exceeds bounds");
+  std::set<uint32_t> mapped_joints;
+  for(auto node:a.source_joint_nodes)
+    if(node>=a.asset->nodes.size() || !mapped_joints.insert(node).second)
+      throw std::runtime_error("Creator source joint mapping is not unique and in range");
+  if(a.source_morph_targets.size()>128) throw std::length_error("Creator source morph mapping exceeds bounds");
+  std::set<uint32_t> mapped_targets;
+  for(auto target:a.source_morph_targets)
+    if(target>=primitive.morph_targets.size() || !mapped_targets.insert(target).second)
+      throw std::runtime_error("Creator source morph mapping is not unique and in range");
+  if(a.source_basis_quaternion) {
+    auto q=*a.source_basis_quaternion;float norm=q.w*q.w+q.x*q.x+q.y*q.y+q.z*q.z;
+    if(!std::isfinite(norm)||std::abs(norm-1)>1e-5f)
+      throw std::runtime_error("Creator source basis must be a finite unit quaternion");
+  }
   auto [material,mtoon]=material_strings(json,a.source_material);
   if(a.material_json!=material||a.mtoon_json!=mtoon)
     throw std::runtime_error("Retained creator material differs from original source; preserve edits separately");
@@ -176,7 +192,13 @@ CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const Pa
 nlohmann::json encode_creator_appearance(const CreatorAppearance&a,CreatorAssetArchive &assets,PaintImageArchive &images){
   uint32_t source=assets.add(a,images);std::vector<uint8_t> remap;remap.reserve(a.source_vertices.size()*4);
   for(auto v:a.source_vertices)for(int k=0;k<4;++k)remap.push_back(uint8_t(v>>(8*k)));
-  return {{"asset",source},{"material",a.material},{"source_material",a.source_material},{"source_mesh",a.source_mesh},
+  std::vector<uint8_t> joints;
+  for(auto node:a.source_joint_nodes) for(int k=0;k<4;++k) joints.push_back(uint8_t(node>>(8*k)));
+  std::vector<uint8_t> targets;
+  for(auto target:a.source_morph_targets) for(int k=0;k<4;++k) targets.push_back(uint8_t(target>>(8*k)));
+  nlohmann::json basis=nullptr;
+  if(a.source_basis_quaternion){auto q=*a.source_basis_quaternion;basis={q.w,q.x,q.y,q.z};}
+  return {{"source_basis_quaternion",basis},{"source_morph_targets",nlohmann::json::binary(targets)},{"source_joint_nodes",nlohmann::json::binary(joints)},{"asset",source},{"material",a.material},{"source_material",a.source_material},{"source_mesh",a.source_mesh},
     {"source_node",a.source_node},{"source_primitive",a.source_primitive},{"source_vertices",nlohmann::json::binary(remap)}};
 }
 std::shared_ptr<const CreatorAppearance> decode_creator_appearance(const nlohmann::json&j,const CreatorAssetArchive&assets){
@@ -193,6 +215,26 @@ std::shared_ptr<const CreatorAppearance> decode_creator_appearance(const nlohman
   const auto &raw=bytes.get_binary();result->source_vertices.reserve(raw.size()/4);
   for(size_t at=0;at<raw.size();at+=4)result->source_vertices.push_back(word(raw,at));
   result->material_json=std::move(material);result->mtoon_json=std::move(mtoon);
+  if(j.contains("source_joint_nodes")) {
+    const auto &nodes=j.at("source_joint_nodes");
+    if(!nodes.is_binary() || nodes.get_binary().size()%4 || nodes.get_binary().size()>256*4)
+      throw std::runtime_error("Invalid persisted creator source joint mapping");
+    for(size_t at=0;at<nodes.get_binary().size();at+=4)
+      result->source_joint_nodes.push_back(word(nodes.get_binary(),at));
+  }
+  if(j.contains("source_morph_targets")) {
+    const auto &targets=j.at("source_morph_targets");
+    if(!targets.is_binary() || targets.get_binary().size()%4 || targets.get_binary().size()>128*4)
+      throw std::runtime_error("Invalid persisted creator source morph mapping");
+    for(size_t at=0;at<targets.get_binary().size();at+=4)
+      result->source_morph_targets.push_back(word(targets.get_binary(),at));
+  }
+  if(j.contains("source_basis_quaternion") && !j.at("source_basis_quaternion").is_null()) {
+    const auto &basis=j.at("source_basis_quaternion");
+    if(!basis.is_array()||basis.size()!=4)throw std::runtime_error("Invalid persisted creator source basis");
+    for(auto &component:basis)if(!component.is_number())throw std::runtime_error("Invalid creator basis component");
+    result->source_basis_quaternion=Quat{basis[0].get<float>(),basis[1].get<float>(),basis[2].get<float>(),basis[3].get<float>()};
+  }
   validate_mapping(*result,entry.json,assets.limits_);return result;
 }
 } // namespace dome

@@ -54,6 +54,14 @@ frames. The existing explicit-attribute path interpolates and orthogonalizes
 these frames and rejects mixed handedness within one triangle. The default
 Mikk path is used for Dome Sculpt's own baked surfaces. Source normal detail is
 read from BakeMaterial.normal_map or its composite TextureMaps.normal channel.
+When neither exists, retained original source normal views are evaluated in the
+same transformed-UV derivative basis as raw GPU preview, including mirrored
+handedness and normal_scale. Explicit supplied high tangents remain authoritative
+instead of that inferred basis. Raw source-only TextureMaps are also valid bake
+inputs: their original color/emission/ORM/AO views and affine wrap addressing are
+sampled directly, with material factors applied once. Sampling remains bilinear
+at texel centers; source mip footprints/minification reconstruction are not part
+of this CPU baker.
 
 Generation is capped at the native 2-million-vertex/triangle surface limits.
 Cancellation is checked before/after Mikk generation; upstream sorting/grouping
@@ -187,11 +195,17 @@ identities and installs only its base maps. Failures, misses, overlaps, stale
 sources and cancellation publish no partial result. One Undo/Redo restores the
 exact editable scene; ordered saves and scene-v6 loading retain the result.
 
-Raw original source normal views currently fail object baking explicitly until
-their sampler/UV/tangent semantics are integrated. Their original archive data
-remain preserved. Dense native baked normal maps are supported. Changed-UV
-reparameterization of raw source-map objects still requires an explicit bake;
-it must not silently discard their original images or source-authored charts.
+Unpainted original sources feed direct immutable bindings into the worker baker,
+avoiding a preliminary CPU image composite and a second resampling pass. Sources
+with visible paint or a baked base retain their complete composite.
+Original source normal views now participate in object baking; their original
+archive data remain preserved. Protected/fractional destination coverage converts
+original normal detail into canonical Mikk space before blending with the baked
+normal. Thus a partial bake does not neutralize untouched original detail. Raw
+preview eligibility is disabled while any baked base exists and restored by
+explicit clear (with exact global Undo). Changed-UV reparameterization of raw
+source-map objects still requires an explicit bake; it must not silently discard
+their original images or source-authored charts.
 
 The preview consumes worker-generated tangent corners and AO in indirect
 lighting. Render-only corner expansion preserves authoring topology. GLB uses
