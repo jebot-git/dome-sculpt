@@ -1,5 +1,11 @@
 # Native FLTK / XR bake authoring milestone
 
+Checkpoint requested by the user on 2026-10-29: implementation is frozen at
+7817ca2; this follow-up records handoff information only. Start with
+[AGENT-HANDOFF.md](AGENT-HANDOFF.md), especially the newly discovered divergent
+remote authoring checkpoint. Compare and preserve that work before starting
+overlapping weight/UV/render/export implementation. No merge is performed here.
+
 The complete production objective remains active and incomplete. Read AGENTS.md,
 REQUIREMENTS.md, BAKING.txt, BAKE-CONTROLS.md and VALIDATION.md. Preserve all sculpt,
 UV, texture/skin/rig/morph/avatar, MToon/glTF/VRM, named plugin, device and compute
