@@ -181,22 +181,40 @@ UvWorkspace::UvWorkspace(Mesh m, uint32_t resolution)
     m.uv_seams.resize(m.indices.size());
   publish(std::move(m), true);
 }
+void UvWorkspace::remember(UvView before) {
+  auto &m = *before.mesh;
+  size_t bytes = m.positions.size() * sizeof(Vec3) * 2 +
+                 m.uv.size() * sizeof(P) + m.indices.size() * 4 +
+                 m.uv_pins.size() + m.uv_seams.size();
+  undo_.push_back(std::move(before));
+  redo_.clear();
+  while (undo_.size() > 1 &&
+         (undo_.size() > 32 || undo_.size() * bytes > 32 * 1024 * 1024))
+    undo_.erase(undo_.begin());
+}
+void UvWorkspace::finish_gesture(bool cancel) {
+  if (!gesture_)
+    return;
+  auto before = std::move(*gesture_);
+  gesture_.reset();
+  if (cancel)
+    view_ = std::move(before);
+  else if (uv_changed(*view_.mesh, *before.mesh))
+    remember(std::move(before));
+  view_.can_undo = !undo_.empty();
+  view_.can_redo = !redo_.empty();
+  view_.revision = ++revision_;
+}
 void UvWorkspace::publish(Mesh m, bool topology) {
   m.validate();
-  if (view_.mesh && uv_changed(m, *view_.mesh)) {
-    undo_.push_back(view_);
-    redo_.clear();
-    size_t bytes = m.positions.size() * sizeof(Vec3) * 2 +
-                   m.uv.size() * sizeof(P) + m.indices.size() * 4 +
-                   m.uv_pins.size() + m.uv_seams.size();
-    while (undo_.size() > 1 &&
-           (undo_.size() > 32 || undo_.size() * bytes > 32 * 1024 * 1024))
-      undo_.erase(undo_.begin());
+  if (!gesture_ && view_.mesh && uv_changed(m, *view_.mesh)) {
+    remember(view_);
   }
   if (topology || !view_.topology)
     view_.topology = std::make_shared<UvTopology>(m);
-  view_.can_undo = !undo_.empty();
-  view_.can_redo = !redo_.empty();
+  bool pending = gesture_ && uv_changed(m, *gesture_->mesh);
+  view_.can_undo = pending || !undo_.empty();
+  view_.can_redo = !pending && !redo_.empty();
   view_.error = validate_uv(m);
   view_.valid = view_.error.empty();
   view_.mesh = std::make_shared<Mesh>(std::move(m));
@@ -216,6 +234,26 @@ std::vector<uint32_t> UvWorkspace::selected() const {
 void UvWorkspace::edit(UvAction action, float x, float y) {
   if (!std::isfinite(x) || !std::isfinite(y))
     throw std::invalid_argument("Non-finite UV control input");
+  if (action == UvAction::BeginGesture) {
+    if (!gesture_)
+      gesture_ = view_;
+    return;
+  }
+  if (action == UvAction::EndGesture || action == UvAction::CancelGesture) {
+    finish_gesture(action == UvAction::CancelGesture);
+    return;
+  }
+  // Avoid roundoff from center + (point - center) for an identity transform.
+  // A neutral wheel sample must not create an edit or destroy redo history.
+  if ((action == UvAction::Move && x == 0 && y == 0) ||
+      (action == UvAction::Scale && x == 1) ||
+      (action == UvAction::Rotate && x == 0))
+    return;
+  // Picks, mode changes, topology operations and history commands are separate
+  // actions. Only continuous transforms belong to an open gesture.
+  if (action != UvAction::Move && action != UvAction::Scale &&
+      action != UvAction::Rotate)
+    finish_gesture();
   if (action == UvAction::Tool) {
     view_.tool = int(std::clamp(x, 0.f, 2.f));
     view_.revision = ++revision_;
@@ -236,7 +274,6 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
     }
     return;
   }
-  auto m = *view_.mesh;
   if (action == UvAction::VertexMode) {
     view_.vertices = !view_.vertices;
     view_.vertex = UINT32_MAX;
@@ -252,6 +289,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
     return;
   }
   if (action == UvAction::Pick) {
+    const auto &m = *view_.mesh;
     P p{x, y};
     view_.cursor = p;
     if (view_.vertices) {
@@ -294,6 +332,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
     view_.revision = ++revision_;
     return;
   }
+  auto m = *view_.mesh;
   if (action == UvAction::Pin) {
     bool pin = std::any_of(chosen.begin(), chosen.end(),
                            [&](auto i) { return !m.uv_pins[i]; });

@@ -44,8 +44,16 @@ Before a system installation, stage/verify the same toolkit for the installed
 `/opt/fltk-vr/toolkit` runtime and use sudo only for the install step. This task
 has not installed or switched any user session.
 
-For the reconciled checkpoint, those generated toolkit artifacts are not present
-in this workspace. Its available build uses `/opt/fltk-vr/toolkit`; consult
-HANDOFF.md and VALIDATION.md for the scope of post-integration checks. The parent
-DESIGN_CONVENTIONS file is also absent here; the reading above describes upstream
-validation, not a new local reading.
+The reconciled checkpoint `d8e3699` used the older `/opt` build because these
+artifacts were absent. The following gesture-history stage fetched the pinned
+DomeD revision into `artifacts/domed-source`, verified all 22 patch hashes/order
+against the manifest, and rebuilt `artifacts/toolkit` locally. Its builder uses
+an ignored `artifacts/toolkit-deps/sysroot` symlink to the existing local FLTK
+experiment development sysroot for GLU. The source archive comes from the
+installed notice bundle and its checksum was verified by the builder.
+
+The gesture-history build is Release and uses this new configured toolkit; ldd
+with the selected environment confirms both FLTK libraries resolve from it.
+The parent DESIGN_CONVENTIONS file remains absent; current DomeD README and the
+committed universal-menu audit supply available conventions. No installed
+prefix or active session was modified.

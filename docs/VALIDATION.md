@@ -1,3 +1,46 @@
+# Continuous UV gesture history — 2026-10-29
+
+Native FLTK drags/wheel bursts and XR ray/stick/fine-wheel adjustments now undo
+as gestures. Shared workspace regressions preserve exact undo, cancellation,
+redo branching and invalid intermediate drafts. No-op scale input no longer
+introduces floating-point UV edits that destroy redo.
+
+- Nine non-XR suites passed in `artifacts/tests-uv-gesture-final.log`. That
+  aggregate process was terminated with exit 143 during OpenXR; it is not a
+  completed ten-suite success and its incomplete report was not reused.
+- The separate reviewed OpenXR CTest passed in 125.40 s:
+  `artifacts/tests-uv-gesture-xr-reviewed.log`. Its report has 40 checks,
+  status=passed, complete=true and zero failures.
+- All 22 native GUI checks passed in `artifacts/gui-uv-gesture-reviewed.log`,
+  including an actual multi-event mouse drag and wheel burst with one exact
+  image undo each. All 25 universal-menu checks passed in
+  `artifacts/menu-uv-gesture.log`.
+- Three focused ASan/UBSan/leak suites passed in 207.45 s:
+  `artifacts/tests-uv-gesture-sanitize.log` (UV/controller/shared document).
+- Focused optimized UV/controller/document checks passed in 29.23 s:
+  `artifacts/tests-uv-gesture-focused.log`.
+
+The canonical pinned DomeD toolkit was rebuilt locally and its 22 patch hashes,
+application order and combined digest match third_party/sources.json. Source:
+`artifacts/domed-source`; Release libraries: `artifacts/toolkit`. Actual ldd
+resolution is recorded in `artifacts/linkage-uv-gesture.log`; no Qt/GTK/Pango
+libraries are listed. Build logs: `artifacts/build-toolkit-gesture.log`,
+`artifacts/build-uv-gesture-reviewed.log`, and
+`artifacts/build-uv-gesture-sanitize.log`. No system install/session restart,
+new nested-compositor, physical-device or accelerator check is claimed.
+
+The first GUI assertions captured before queued drag processing/repaint finished.
+Temporary traces proved actual coordinate changes and were removed; final GUI
+assertions wait for a changed image and exact restoration. This revealed a real
+remaining synchronous-validation latency limit. A separate isolated benchmark of
+20 serial translations through Document::edit_uv on the persisted 19,944-triangle
+painting fixture measured 106.3 ms mean / 110.1 ms maximum, with exact gesture
+undo. Source/output: `artifacts/uv-gesture-benchmark.cpp` / `.json`. This single
+CPU workload does not prove production-size interaction performance.
+
+Machine-readable local evidence: `artifacts/validation-uv-gesture.json`.
+Full scope remains incomplete in REQUIREMENTS.md; resume via HANDOFF.md.
+
 # Reconciled checkpoint — 2026-10-29
 
 Merged upstream toolkit/test work from `96bc62f` with the ordered-input repair.

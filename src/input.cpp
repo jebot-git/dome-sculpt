@@ -134,9 +134,22 @@ void SpatialInput::cancel() {
   parameter_ = VrParameter::None;
   controls_.clear();
   uv_dragging_ = false;
+  uv_stick_active_ = uv_gesture_open_ = false;
   uv_pointer_ = 0;
   command_.reset();
   devices_.clear();
+}
+void SpatialInput::uv_gesture_begin() {
+  controls_.push_back({VrControlEventType::UvCommand, parameter_,
+                       int(UvAction::BeginGesture)});
+  uv_gesture_open_ = true;
+}
+void SpatialInput::uv_gesture_end(bool force) {
+  if (uv_gesture_open_ && (force || (!uv_dragging_ && !uv_stick_active_))) {
+    controls_.push_back({VrControlEventType::UvCommand, parameter_,
+                         int(UvAction::EndGesture)});
+    uv_gesture_open_ = false;
+  }
 }
 void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
   if (pressed && s.panel_hit && s.panel_v >= 588.f / 640 &&
@@ -146,6 +159,8 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
     if (accept && control_accept && !control_accept())
       return;
     if (cancel || accept) {
+      uv_dragging_ = uv_stick_active_ = uv_gesture_open_ = false;
+      uv_pointer_ = 0;
       controls_.push_back(
           {cancel ? VrControlEventType::Cancel : VrControlEventType::Confirm,
            parameter_});
@@ -160,6 +175,7 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
       if (uv_pointer_ == s.id) {
         uv_dragging_ = false;
         uv_pointer_ = 0;
+        uv_gesture_end();
       }
       return;
     }
@@ -187,6 +203,7 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
               UvAction::Pack,       UvAction::Seam, UvAction::Next};
           action = actions[column];
         }
+        uv_gesture_end(true);
         controls_.push_back(
             {VrControlEventType::UvCommand, parameter_, int(action), value});
       }
@@ -201,6 +218,7 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
         uv_dragging_ = true;
         uv_pointer_ = s.id;
       } else if (uv_dragging_) {
+        uv_gesture_begin();
         if (!uv_mode_)
           controls_.push_back({VrControlEventType::UvMove, parameter_, 0,
                                u - uv_x_, v - uv_y_});
@@ -218,6 +236,7 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
     } else if (uv_pointer_ == s.id) {
       uv_dragging_ = false;
       uv_pointer_ = 0;
+      uv_gesture_end();
     }
     return;
   }
@@ -259,6 +278,7 @@ void SpatialInput::update(const SpatialSample &s) {
     if (uv_pointer_ == s.id) {
       uv_dragging_ = false;
       uv_pointer_ = 0;
+      uv_gesture_end();
     }
     if (s.id == device_)
       cancel();
@@ -311,6 +331,8 @@ void SpatialInput::update(const SpatialSample &s) {
     if (menu_press) {
       if (control_accept && !control_accept())
         return;
+      uv_dragging_ = uv_stick_active_ = uv_gesture_open_ = false;
+      uv_pointer_ = 0;
       controls_.push_back({VrControlEventType::Confirm, parameter_});
       parameter_ = VrParameter::None;
       page_ = parent_page_;
@@ -333,7 +355,9 @@ void SpatialInput::update(const SpatialSample &s) {
       };
       float dx = float(elapsed) * axis(s.stick_x) * .25f,
             dy = -float(elapsed) * axis(s.stick_y) * .25f;
+      uv_stick_active_ = axis(s.stick_x) != 0 || axis(s.stick_y) != 0;
       if (dx || dy) {
+        uv_gesture_begin();
         if (!uv_mode_)
           controls_.push_back(
               {VrControlEventType::UvMove, parameter_, 0, dx, dy});
@@ -348,6 +372,7 @@ void SpatialInput::update(const SpatialSample &s) {
         }
       }
       ray_controls(s, s.trigger && !d.pressed);
+      uv_gesture_end();
       d.pressed = s.trigger;
       return;
     }
@@ -411,6 +436,7 @@ void SpatialInput::update(const SpatialSample &s) {
       parameter_owner_ = device_;
       uv_mode_ = 0;
       uv_dragging_ = false;
+      uv_stick_active_ = uv_gesture_open_ = false;
       uv_pointer_ = 0;
       control_armed_ = false;
       component_ = y_latch_ = 0;

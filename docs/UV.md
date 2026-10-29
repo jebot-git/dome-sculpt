@@ -20,6 +20,16 @@ collapsed triangles and positive-area overlap are checked; invalid drafts remain
 visible and Apply is disabled. Draft Undo/Redo is bounded by 32 entries and a
 32 MiB target budget (one large prior state is retained).
 
+A pointer drag is one local undo step, regardless of its sample count. XR stick
+and fine-wheel adjustments share a step until both axes return to neutral; a
+simultaneous ray drag keeps that gesture open until it also ends. Native wheel
+events group until 250 ms of inactivity. Live previews and Undo remain available
+while a gesture is held. Picks, mode changes, toolbar commands and Undo/Redo end
+the current gesture. No-op or explicitly cancelled gestures retain redo history;
+an accepted changed gesture replaces the redo branch. Identity transforms do not
+introduce floating-point edits. Closing/cancelling the full UV workspace retains
+the original document asset, as before.
+
 In XR, Materials → UV editor opens the same workspace. Ray-pick a chart/vertex,
 then drag or use the stick. Move, Scale and Turn select continuous transform
 modes. Scaling is logarithmic; vertical input supplies a ten-times-finer wheel
