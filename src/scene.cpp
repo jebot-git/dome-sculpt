@@ -389,6 +389,12 @@ Scene Scene::load(const std::filesystem::path &path) {
 }
 std::vector<ObjectSurface>
 Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
+  return surfaces_impl(atlas, false, cancelled);
+}
+std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled) const {
+  return surfaces_impl(false, true, cancelled);
+}
+std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled) const {
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
     if (o.visible) {
@@ -400,7 +406,7 @@ Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
         unwrap(mesh);
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
-           o.mesh_active ? o.painted->composite(o.material) : nullptr,
+           o.mesh_active ? (preview ? o.painted->preview(o.material) : o.painted->composite(o.material)) : nullptr,
            o.deformation, group_path(o.group), o.appearance});
     }
   return result;

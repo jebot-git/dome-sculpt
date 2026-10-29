@@ -980,7 +980,7 @@ void Document::mesh_loop() {
     }
     try {
       auto objects =
-          job->scene.surfaces(false, [&] { return stopping_.load(); });
+          job->scene.preview_surfaces([&] { return stopping_.load(); });
       auto snapshot = std::make_shared<MeshSnapshot>();
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;

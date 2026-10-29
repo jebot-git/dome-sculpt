@@ -180,3 +180,18 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
 endif()
 install(FILES docs/MTOON-LICENSE.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/dome-sculpt)
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-source-gpu-test tests/source-gpu.cpp)
+  target_link_libraries(dome-sculpt-source-gpu-test PRIVATE dome-sculpt-render)
+  add_test(NAME source-gpu COMMAND dome-sculpt-source-gpu-test
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
+  set_tests_properties(source-gpu PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1")
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-preview-test tests/preview.cpp)
+  target_link_libraries(dome-sculpt-preview-test PRIVATE dome-sculpt-core)
+  add_test(NAME source-preview COMMAND dome-sculpt-preview-test)
+endif()
