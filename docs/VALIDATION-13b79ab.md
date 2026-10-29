@@ -529,4 +529,3 @@ bake-options capture was visually inspected for BDF/layout. Toolkit/compositor
 source still282467e when rechecked. Remote0141926 changes only documentation;
 the merged application source remains7cc. Future dirty schema/lazy-UV/skin/signal
 changes are outside this evidence. No new installation/session restart occurred.
-
