@@ -1,38 +1,52 @@
-# Agent resumption entry point — 2026-10-29
+# Agent resumption entry point — 2026-10-30
 
 Read [HANDOFF.md](HANDOFF.md), [../AGENTS.md](../AGENTS.md),
-[VALIDATION.md](VALIDATION.md) and [REQUIREMENTS.md](REQUIREMENTS.md).
-HANDOFF.md is the current checkpoint; older HANDOFF-* files are historical.
+[VALIDATION.md](VALIDATION.md), [RETOPO-AUTHORING.md](RETOPO-AUTHORING.md) and
+[REQUIREMENTS.md](REQUIREMENTS.md). HANDOFF.md is authoritative; HANDOFF-* files
+are historical. The full production goal remains incomplete.
 
-The user requested committing and pushing the current stage for later resumption.
-The application source is at `33f26a29c7eea51d9cb1a4ffb25fed7d2a3ff226`;
-this checkpoint changes documentation only. No retopology integration was
-implemented after that source checkpoint. No agents or validation jobs are left
-running by this task. No system installation or session restart was performed.
+Repository: /home/blux/de-xr/dome-sculpt, branch work/native-retopo-authoring.
+The parent is not a repository. Fetch and inspect status/remotes before editing;
+preserve newer histories and unrelated de-xr repositories. Main implementation
+fdb132b and final source 251cd3d are committed. This checkpoint's later docs
+commit records the verified state. No agents or validation jobs are left running
+by this stage. No system install or active-session restart was performed.
 
-Resume in `/home/blux/de-xr/dome-sculpt`, branch `work/live-weight-feedback`.
-Fetch origin and inspect status and remote histories before editing. Preserve
-newer remote commits and unrelated repositories under `/home/blux/de-xr`.
-The parent directory is not a Git repository. Do not force-push.
+Retopology is now integrated; do not implement the earlier kernel-only plan again.
+Scene has immutable RetopoPatch metadata on SculptObject. Scene v7 embeds the
+independent stable topology codec and source ID beside the derived painted mesh.
+RetopoWorkspace owns source-local topology/reference queries and local history on
+a dedicated Document worker (src/document-retopo.cpp). Frontends publish bounded
+sample jobs; move samples coalesce without crossing press/release/cancel barriers.
+EditorState::retopology is immutable. Session plus generation/revision/active-ID
+checks reject stale work. Input, geometry kernels and GL stay on their respective
+threads; source mutation/save is blocked until explicit Apply/Cancel.
 
-The next investigated task is native retopology authoring. Read
-[NATIVE-RETOPOLOGY.md](NATIVE-RETOPOLOGY.md), `include/dome/retopo.hpp`,
-`src/retopo.cpp` and `tests/retopo.cpp`, then inspect Scene persistence, document
-workers/history, mesh-authoring controls and desktop/XR input/rendering. The
-kernel already supports stable-ID triangle/quad topology, wires, pins, seams,
-projection, relaxation and independent persistence. Document/desktop/XR editing
-is still missing. A separate capped plane-cut kernel also exists.
+The existing desktop/SpatialInput stroke backend handles topology gestures before
+paint/weight/sculpt dispatch. XR page 14 is reached through mesh tools; while a
+workspace exists its joystick menu opens directly. RetopoDistance uses common
+slider controls. Native menus export real availability and Place/Move radios;
+Ctrl+W/Close cancels the projection dialog while retaining the workspace. Undo
+routes to local topology history, then Apply commits exactly one global scene
+transaction. Preserve release-to-rearm: after reopening resets ownership, a fresh
+neutral controller sample must precede the next press.
 
-Before implementing, decide how authoritative topology and source identity will
-persist in Scene, how an unfinished patch is displayed, and how controller and
-mouse gestures cancel or commit exactly one undoable transaction. Keep heavy
-projection/validation/triangulation on workers with immutable publication and
-generation/source guards. Preserve original paint, skin, morphs and source
-archives; retain stable topology rather than only its display triangles. These
-are design questions for the next agent, not an already chosen implementation.
+Apply queues ordered asset work using an appended FileJob::retopo_session marker.
+Success closes the draft; failures/cancellation keep it for correction. Snapshot
+visibility reveals the retained reference while editing a previous target;
+common cancellation/no-op acceptance must force the authored mesh preview back.
+The idle worker drops obsolete BVHs/history outside model/input locks. wait_asset
+first drains an accepted topology barrier, because it can precede asset_busy;
+keep this contract at XR shutdown and ordered final saves. Inspect the 56-case
+retopo-authoring suite before changing these worker/input/history paths.
 
-The full objective remains in REQUIREMENTS.md, including the other unfinished
-sculpt, paint/UV/bake, rig/avatar, plugin, format and device/backend workflows.
-Use the pinned canonical FLTK toolkit and BDF helpers; preserve universal menu,
-Cancel/Close, bitmap appearance and XR controller conventions. See HANDOFF.md
-for the current build environment and the precise scope of existing validation.
+No bridging/extrusion, automatic quads, wire-only scene objects, draft recovery or
+production topology/overlay performance is complete. Atlas UVs are derived and
+do not yet consume topology seams/pins as a prescription. Further Apply creates
+a separate retained version; paint/skin/morph transfer remains explicit. The
+plane-cut kernel still lacks native desktop/XR authoring. Continue these gaps
+and all other production/format/rig/device/backend rows in REQUIREMENTS.md.
+Preserve C++20/FLTK/EGL/OpenXR, canonical BDF Fontconfig/FreeType helpers, DomeD
+universal menu/modal/Cancel conventions and controller sliders/wheels. Build and
+validation environment, exact revision scopes and known limits are in HANDOFF.md
+and VALIDATION.md. No Python runtime or other frontend toolkit is permitted.

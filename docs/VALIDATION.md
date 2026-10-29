@@ -1,109 +1,115 @@
-# Live weights and visible-surface picking — 2026-10-29
+# Native retopology authoring — 2026-10-30
 
-This extends e65db2a; its exact record is archived in VALIDATION-e65db2a.md.
-The broad run below corresponds to bf4fb86. Final displayed-frame/UV1/layout
-refinements have focused tests, explicitly separated below. The full objective
-in REQUIREMENTS.md remains incomplete. artifacts/ and build/ contain ignored
-local evidence; those logs/captures are not distributed by a fresh clone.
+The main implementation is fdb132b, based on checkpoint 3aa47e5. The final
+source is 251cd3de1390f6e6748c73aed4428af5f3e41ece. Broad evidence and final
+focused refinements are separated below. The full production objective in
+REQUIREMENTS.md remains incomplete. Previous live-weight validation is archived
+in VALIDATION-33f26a2.md; older integration records remain intact. Artifacts and
+build directories are ignored local evidence, unavailable in a fresh clone.
 
-## Release and real-loader synthetic XR
+## Broad Release and real-loader synthetic XR
 
-All49 registered Release CTests pass in333.39 seconds, zero failures:
-artifacts/tests-live-weights-full.log and tests-live-weights-full-detail.log.
-Includes new material-visibility, expanded weight-authoring and MToon rendering,
-as well as every retained sculpt/paint/remesh/UV/bake/history/archive/export suite.
+At fdb132b, all 50 registered Release CTests passed in 411.19 seconds, zero
+failures: artifacts/tests-retopo-authoring-full.log and its -detail.log companion.
+This includes the new authoring suite and all existing sculpt, paint, UV, bake,
+archive, humanoid, source/material, format, controller and graphics suites.
 
-The OpenXR CTest passes in223.22 seconds. build/xr-client/report.json has73 checks,
-failed=0, complete=true and status=passed. It retains controller/stylus pressure,
-focus/input ordering, stereo linear/sRGB transport and native bake replays.
-Tracking is synthetic and GL is software; this is not physical-device evidence.
+The OpenXR client CTest passed in 250.10 seconds. build/xr-client/report.json
+has 73 checks, failed=0, complete=true, status=passed. This retains the existing
+real-loader runtime/rebase/pressure/menu/material/UV/bake coverage. Tracking is
+synthetic and graphics are software. New retopology controller gestures are
+covered separately through the production Document/SpatialInput path; the
+73-check loader script does not specifically replay the new topology workflow.
 
-## Worker/history and whole-core sanitizers
+## Final source and whole-core sanitizers
 
-Four selected whole-core C/C++ ASan/UBSan/leak suites pass in28.72 seconds:
-artifacts/tests-live-weights-sanitize.log and its -detail.log companion.
-Suites: document-assets, material-visibility, rig-editing and weight-authoring.
-UI/XR are OFF; C and C++ flags include ASan/UBSan/frame pointers, Release uses
--O1 -g1 -DNDEBUG. Native Mikk/xatlas remain instrumented. Runs set
-ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and UBSAN_OPTIONS=halt_on_error=1.
+Final source 251cd3d passes eight focused Release suites in 33.05 seconds:
+retopology-authoring, retopo, document-assets, weight-authoring,
+controller-controls, spatial-gpu-render, scene-authoring and document-export.
+Logs: tests-retopo-authoring-verified.log and -verified-detail.log.
 
-New weight cases independently verify actual live scalar values before release,
-unchanged Scene/source and immutable prior snapshots, coalesced sample counts,
-frame-density invariance, exact pointer restoration on Undo/Escape, rapid
-cancellation/reacquisition, accepted weight-dependent posed displacement, failed
-final computation restoration, rotated posed normals and real nineteen-part CC0
-avatar preview cancellation across document replacement. Existing linked locks,
-no-op, skin/paint/source identity and one-gesture global history checks remain.
+Four whole-core C/C++ ASan/UBSan/leak suites pass in 23.94 seconds:
+retopology-authoring, retopo, document-assets and weight-authoring. Logs:
+tests-retopo-authoring-verified-sanitize.log and its -detail.log companion.
+UI/XR are OFF in build-sanitize. C and C++ use address/undefined sanitizers and
+frame pointers; Release uses -O1 -g1 -DNDEBUG. Native Mikk/xatlas are instrumented.
+Runs set ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
+UBSAN_OPTIONS=halt_on_error=1. No thread-sanitizer or accelerator proof is claimed.
 
-## Final frame-time, UV1 and BDF layout refinements
+The final retopology suite has 56 assertions. Independent expectations cover
+source projection, ordered outward quad construction, exact immutable gesture
+cancellation and draft/global history, pins/seams and atomic incidence deletion,
+world-distance bounds under rotated/scaled groups, combined skin/morph projection,
+source isolation, real native save/open and exported GLB reimport, malformed source
+references, clean orphan-source refusal, invalid Apply correction, stale document
+replacement, idle BVH release, joystick-only authoring, the distance slider and
+accepted Apply immediately before XR shutdown. Reopen/cancel checks separately
+verify the high reference extent and restored smaller authored target geometry.
 
-After the broad run, the native canvas captures its last drawn material time and
-passes it to the picking overload. This matters when an animated texture is not
-being continuously redrawn. It also refuses a stale displayed geometry revision.
-Packed UV1 corners now validate before a query; BDF hint height is measured.
+The final GPU suite checks visible point/edge feedback, source-surface occlusion,
+linear XR overlay composition and changing controller mode feedback. Captures:
+build/gpu-retopo-{baseline,front,linear,occluded,menu-place,menu-move}.ppm.
+The final mode capture was converted for inspection to
+artifacts/retopo-menu-move-verified.png; shorter New patch / Tool mode / Snap range
+labels fit their sectors. Final successful build logs:
+build-retopo-authoring-shutdown.log and -shutdown-sanitize.log.
 
-Three focused Release suites pass in3.91s (material-visibility, weight-authoring,
-mtoon-render): tests-live-weights-final.log / -detail.log. Material visibility has
-22 checks; the production MToon/linear GPU suite reports75 checks, including
-animated-alpha GPU/picking agreement at explicit frame times, authored mask/
-blend opacity, per-object bindings and geometry behind transparent cutouts.
-Two final whole-core sanitizer suites (material-visibility/weight-authoring)
-pass in14.09s: tests-live-weights-final-sanitize.log / -detail.log.
-The successful final build log is build-live-weights-final-font.log.
+## Native FLTK universal menus
 
-A final review found that the pending-weight guard could throw before clearing
-desktop input ownership when another source-changing command finished a held
-gesture. Cleanup now precedes that guard. A native regression rejects selection
-until the accepted gesture completes, confirms its exact weights/selection, then
-performs a subsequent XR pressure gesture. Weight-authoring passes again in2.94s
-(tests-live-weights-lease.log) and with whole-core sanitizers in12.96s
-(tests-live-weights-lease-sanitize.log). The native application and test were
-rebuilt (build-live-weights-lease{,-sanitize}.log). This final focused run covers
-the ownership change after the broad and native GUI runs above.
+Final product source passes the dedicated normal-size topology flow 12/12 and
+compact 640x360 with 2x Unifont BDF 6/6; both processes exit 0, both reports have
+failed=0. Logs: menu-retopo-authoring-verified.log and -verified-compact.log.
+Reports/captures: artifacts/menu-retopo and artifacts/menu-retopo-compact.
 
-## Native FLTK GUI
+Actual menu export verifies availability and Place/Move radio state, source/save
+isolation, native modal identity and Universal Close, held point feedback without
+scene changes, exact Escape viewport restoration, ordered face Apply/Save,
+retained original payload, one global Undo/Redo and reopening/cancellation.
+Compact coverage checks the real projection slider, fixed action buttons,
+modal cancellation and unchanged native scene. Visually inspected:
+menu-retopo/ordered-corners.png and
+menu-retopo-compact/projection-large-bdf.png. Earlier same-flow runs also passed.
 
-Final normal-size suite:14/14, exit0, report failed0;
-artifacts/menu-live-weights-final-popup.log and menu-rig/report.json. It uses the
-actual FLTK popup to choose the tip joint, holds Shift+mouse pressure, checks a
-live canvas color change before release without changing the saved scene,
-checks exact viewport restoration on Escape, then accepts another stroke and
-uses native universal Undo to restore the complete posed source. Existing modal
-identity, pose/morph editing and source-isolation checks remain.
+The existing general native menu suite passed 53/53 at fdb132b, exit 0,
+failed=0: menu-retopo-general.log and artifacts/menu/report.json. Its coverage
+includes modal text/UV routing, chooser cancellation, host loss/return, sculpt
+layers and voxel authoring. Do not relabel this broad GUI run as final-source
+coverage of the later topology lifetime/shutdown fixes.
 
-Compact640x360,2x Unifont BDF:4/4, exit0, failed0;
-menu-live-weights-compact.log and menu-rig-compact/report.json. Measured hints fit,
-content scrolling changes controls, both action buttons stay fixed, and Escape
-retains the project and main window. Captures visually inspected:
-menu-rig/{weight-options,weight-live-preview}.png and
-menu-rig-compact/weight-compact-{before,after}.png. The earlier native GUI also
-passed14/14 before the final frame/layout change (menu-live-weights.log).
-
-Actual native linkage in linkage-live-weights.log resolves the pinned
+Actual linkage in artifacts/linkage-retopo-authoring.log resolves the pinned
 artifacts/toolkit-authoring/lib FLTK libraries with no Qt/GTK/Pango frontend.
-All30 source_sha256 entries match third_party/sources.json; bdf_font.hpp remains
-byte-identical to canonical qimgvr. No toolkit/third-party source was changed.
+All 30 source_sha256 entries match third_party/sources.json; the BDF helper is
+byte-identical to canonical qimgvr. No toolkit or upstream source changed.
 
-## Diagnostics and limits
+## Diagnostic attempts and limits
 
-The initial added CPU fixture tried to encode UV1 in VRM0, which its source codec
-correctly refuses. The corrected fixture uses V0 UV0 and V1 UV1. A test initially
-used unavailable Vec3 equality and now compares components. A hint measurement
-initially called dx::font as a function; it is the canonical font variable, as
-used by the bake editor. Those initial build/test logs are diagnostics, not passes.
+The first sanitizer build exited 143 (SIGTERM) after completing the core and
+three selected executables, before finishing the weight-authoring target. Its
+process and all compiler children were confirmed absent before continuing. The
+three built whole-core suites passed in 3.10 seconds; that partial build is not
+claimed as the final four-target build. The later shutdown build completed all
+four targets and is the final evidence above.
 
-The first final native GUI attempt selected the already-fully-weighted root joint
-through an asynchronous keyboard popup sequence, so Add correctly produced no
-color change and the harness timed out. Its weight-options capture confirmed the
-root selection. The harness now drags to the second row of the real popup; the
-complete14-check final run is the one cited above. A partial failed0 report is
-not a pass without its process exit and complete expected checks.
+A final reopen/cancel fixture initially pressed the joystick immediately after
+reopening reset input ownership. The required fresh neutral sample was missing,
+so no menu opened and the cancellation assertion failed in Release and sanitizer
+runs (tests-retopo-authoring-final*.log). The corrected fixture explicitly rearms
+and verifies page 14 before Cancel; the successful 56-assertion final runs above
+include the corrected sequence. The earlier failed runs are diagnostics, not
+passes. An intermediate 52-assertion refinement run passed before the reopen
+check was added. The final shutdown test also guards accepted input draining
+before the asset job becomes visible to wait_asset().
 
-Weight previews intentionally freeze posed geometry until release. Full stroke
-recomputation/snapshot upload does not prove production VR timing or bounded
-large-asset history/memory performance. Picking uses base-level nearest/bilinear
-samples, not exact mip/anisotropic footprints. XR strokes remain swept-volume
-brushes. Full automatic rig/bind/transfer, source UV adoption, production sculpt/
-atlas/plugin workflows and full glTF/VRM/MToon interoperability remain incomplete.
-No fresh external Khronos validation, physical device/accelerator execution,
-system installation or active desktop/session restart is claimed.
+These are manual point/edge/triangle/quad workflows. Automatic quad generation,
+bridging/extrusion, edge collapse, wire-only scene objects/draft recovery and
+production-size topology/overlay performance remain unfinished. Source picking
+uses the geometric reference rather than alpha-cutout/geodesic semantics. Atlas
+UVs are derived separately; native seam/pin metadata is not yet an atlas
+prescription. Changed topology creates a new retained version rather than
+implicitly transferring old paint/skin/morph data. Retain the broader unfinished
+sculpt, texture, rig, plugin and full glTF/VRM/MToon requirements.
+
+All validation/build handles were checked to terminal and no validation/compiler
+jobs remained when inspected. No system install, active-session restart, fresh
+external Khronos validation, physical headset/controller/stylus/3D-mouse testing
+or real OneAPI/ROCm/CUDA execution is claimed.

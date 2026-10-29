@@ -1,108 +1,91 @@
-# Resume checkpoint — 2026-10-29
+# Native desktop/XR retopology checkpoint — 2026-10-30
 
-The user requested: “Commit and push current stage, work will resume. Prepare
-agents handoff.” This checkpoint changes documentation only. The application
-source remains at `33f26a29c7eea51d9cb1a4ffb25fed7d2a3ff226`, already published
-to origin/main and origin/work/live-weight-feedback. Both remote refs matched
-that source commit when fetched for this checkpoint. The working branch is
-`work/live-weight-feedback`. The full objective remains incomplete in
-[REQUIREMENTS.md](REQUIREMENTS.md).
+This stage extends 3aa47e5 on work/native-retopo-authoring. Main implementation:
+fdb132b. Final verified application source:
+251cd3de1390f6e6748c73aed4428af5f3e41ece. The full production objective remains
+incomplete in REQUIREMENTS.md. No agents were spawned.
 
-Read [../AGENTS.md](../AGENTS.md), [AGENT-HANDOFF.md](AGENT-HANDOFF.md),
-[VALIDATION.md](VALIDATION.md) and [HANDOFF-33f26a2.md](HANDOFF-33f26a2.md).
-The last file preserves the detailed live-weight milestone handoff. Earlier
-integration records remain in HANDOFF-e65db2a.md and VALIDATION-e65db2a.md.
+Read ../AGENTS.md, RETOPO-AUTHORING.md, VALIDATION.md and AGENT-HANDOFF.md.
+Previous records are preserved in HANDOFF-3aa47e5.md, HANDOFF-33f26a2.md and
+VALIDATION-33f26a2.md; keep all earlier creator/integration history.
 
-## Current application stage
+## Implemented
 
-Desktop/XR skin-weight gestures have real worker-coalesced immutable previews,
-fixed posed geometry until release, exact cancellation and one global Undo on
-acceptance. Material-aware posed picking preserves alpha, culling and retained
-PBR/MToon source semantics. Desktop picking uses the displayed frame timestamp
-and rejects stale geometry. The final source commit also fixes input ownership
-when another command finishes a held gesture while its accepted edit is pending.
-Native compact BDF weight controls and universal-menu tests are retained.
+- A dedicated native topology worker owns a source-constrained stable-ID patch
+  workspace. Desktop Shift+click/drag and controller/stylus pressure share
+  place/select/move gestures, ordered triangle/quad creation, wire edges, pins,
+  seams, relax/snap and atomic incident deletion. Held gestures have exact local
+  cancellation/undo; immutable views are published with source/session guards.
+- Desktop Mesh → Retopology and XR page 14 expose actual commands. Joystick
+  presses open the topology page while editing; Tool mode changes Place/Move,
+  Snap range uses the common slider/ray controls. Desktop has a native BDF modal
+  wheel/slider. Universal menu availability, radio state, modal Close/Cancel,
+  draft Undo/Redo and source/save isolation are retained. Default drag stays
+  trackball navigation.
+- Apply creates a separate atlas-ready mesh, retaining/hiding original assets,
+  in one guarded global scene transaction. Source paint, rig, morphs, layers
+  and archives are preserved. Failure/cancellation retains the draft for retry.
+  Reopened patches display their retained high reference only in render snapshots;
+  cancellation and unchanged Apply restore the authored mesh preview.
+- Scene version 7 stores RetopoPatch source IDs and the independent topology
+  payload beside its triangulated painted mesh. Stable IDs/cursor, quads, wires,
+  pins and seams survive native save/open and duplication. Older scene formats
+  remain supported. glTF export uses the derived atlas triangles.
+- Closing a workspace releases its BVH/history on the idle topology worker.
+  Accepted Apply survives XR shutdown; wait_asset includes the topology-input
+  barrier before waiting for ordered asset work, preventing an early final save.
 
-No application changes were made during the subsequent retopology investigation.
-It inspected the existing topology kernel and requirement gaps only. There is
-no partially implemented UI, Scene schema, worker or input integration to recover.
+## Evidence and environment
 
-## Verified evidence
+At fdb132b, all 50 Release CTests passed in 411.19s. The real-loader synthetic
+OpenXR report passed all 73 checks (complete=true, failed=0); its script retains
+prior XR coverage, not a new retopology-specific loader replay. Final source
+251cd3d passed eight focused Release suites in 33.05s and four whole-core
+ASan/UBSan/leak suites in 23.94s. The topology suite has 56 assertions including
+controller-only authoring, posed/grouped projection, native/GLB persistence,
+reference lifetime, exact histories and immediate accepted-Apply shutdown.
+Final topology native GUI passed 12/12 and compact 2x BDF 6/6, exit 0. General
+native GUI passed 53/53 at fdb132b. VALIDATION.md records exact scopes, logs,
+captures and diagnostic attempts; do not merge these into a claim that the
+broad run used the later source refinements.
 
-Existing local logs/reports were inspected again for this documentation-only
-checkpoint; no new application build/test run is claimed:
+All 30 manifest source hashes and the canonical qimgvr BDF helper match. Use the
+unchanged 282467e / 22-patch DomeD toolkit in artifacts/toolkit-authoring, with
+its lib directory, as described in TOOLKIT.md and AGENTS.md. Launch with
+build/run-dome-sculpt or prepend that directory to LD_LIBRARY_PATH. The
+build-sanitize cache instruments C and C++ across the core with UI/XR OFF.
+GUI orchestration uses uv with dbus-next, python-xlib and pillow, private
+HOME/bus/Xvfb, 90s cold-font startup and 30s interactions. Artifacts/build logs
+are ignored local evidence and do not accompany a fresh clone.
 
-- The bf4fb86 implementation passed all 49 Release CTests in 333.39 seconds.
-  Its real-loader synthetic XR report has 73 checks, failed=0, complete=true,
-  status=passed. Four selected whole-core sanitizer suites passed in 28.72s.
-- Final frame-time/UV1/layout refinements passed three focused Release suites
-  in 3.91s and two whole-core sanitizer suites in 14.09s.
-- The final ownership regression passed Release in 2.94s and whole-core
-  ASan/UBSan/leak checking in 12.96s. Application/test rebuilds succeeded.
-- Native GUI reports retain 14/14 normal-size and 4/4 compact 640x360 at 2x
-  Unifont BDF. These GUI runs precede the final ownership-only fix.
+All build/test handles were confirmed terminal; inspect actual live jobs before
+starting work and never restart solely after an observation timeout. No installed
+application/toolkit or active compositor/session was replaced. No fresh physical
+device/backend or external Khronos validation is claimed.
 
-[VALIDATION.md](VALIDATION.md) names exact logs, scopes, diagnostic attempts and
-limitations. Builds, reports and captures under artifacts/ and build/ are ignored
-local evidence, unavailable in a fresh clone. Synthetic tracking/software GL is
-not physical headset/controller evidence. No installation, active-session restart,
-new external Khronos validation or physical device/accelerator completion is
-claimed. No build/test/application-validation jobs from this task were running
-when inspected. Check live processes before resuming; an observation timeout is
-not grounds to restart a job.
+## Continue the full objective
 
-## Resume work
+Manual topology authoring is a working increment. Continue bridging/extrusion,
+automatic/stroke-assisted patches, wire-only object persistence and draft recovery,
+source/paint/rig transfer and production topology/overlay latency and memory.
+Current topology overlays build bounded CPU line lists per draw; efficient GPU
+caching and production-size evidence remain needed. Projection uses geometric
+source surfaces rather than alpha-cutout/geodesic behavior. Derived atlas UVs do
+not yet honor topology seam/pin metadata as an atlas prescription. Further Apply
+creates a new retained version instead of silently repainting/rebinding old data.
+Reopening requires its referenced source still exist; deleting a source leaves a
+historical ID and gives a clean reopen refusal.
 
-Fetch origin and inspect status/history before editing; preserve any newer remote
-work. The repository is https://github.com/jebot-git/dome-sculpt at
-`/home/blux/de-xr/dome-sculpt`. The parent is not a repository. Preserve unrelated
-de-xr projects. No agents were spawned in this stage.
+Retain every other REQUIREMENTS.md row: production VR sculpt masks/symmetry/
+resolution/local meshing/recovery; texture/stencil/projection/multiset/source-UV/
+atlas/bake quality; interactive plane cuts/booleans and procedural workflows;
+complete CATS/Auto-Rig Pro/Divine Cut/Retopo Flow/Random Flow basics; rig placement/
+fitting/automatic bind/transfer and morph authoring; full MToon/glTF/VRM fidelity;
+physical controllers/stylus/3D-mouse/headsets and real OneAPI/ROCm/CUDA execution.
+Earlier live-weight fixed-pose/preview/picking contracts remain intact. Cold
+Fontconfig discovery is still a canonical qimgvr follow-up.
 
-The next investigated gap is surface-constrained native retopology authoring.
-The existing RetopoMesh kernel has stable IDs, triangle/quad faces, wires,
-projection/relaxation, pins/seams, atomic edits and independent serialization;
-it is not yet integrated into Scene/document/desktop/XR authoring. Read
-NATIVE-RETOPOLOGY.md and the concrete kernel before designing persistence,
-source identity, overlays, input gestures and exact transaction/cancellation
-behavior. AGENT-HANDOFF.md identifies extension points and unresolved choices.
-Retain original assets and stable topology; heavy geometry belongs on workers.
-
-Do not narrow the wider requirements: production sculpt masks/symmetry/local
-meshing, texture/stencil/source-UV/atlas quality, retopology/cut/procedural tools,
-interactive rig/bind/transfer/morph authoring, complete glTF/VRM/MToon fidelity,
-plugin basics and real device/backend validation remain unfinished. Live weight
-previews still recompute bounded strokes and rebuild snapshots; production-size
-latency/memory and efficient updates remain to be evaluated. Alpha picking uses
-base-level sampling; swept-volume painting is not geodesic/occlusion-clipped.
-
-## Build environment and conventions
-
-Use C++20/FLTK/EGL/OpenXR and BDF through canonical Fontconfig/FreeType helpers.
-No Qt/GTK/Pango runtime frontends. Preserve DomeD universal menus, modal/history
-routing, Cancel-default confirmation, Ctrl+W/Escape and controller sliders/wheels.
-Rendering consumes immutable snapshots; retain generation/source guards, ordered
-file work, exact undo and source paint/skin/morph/archive fidelity.
-
-[TOOLKIT.md](TOOLKIT.md) records the pinned DomeD `282467e` toolkit with 22
-verified patches. This workspace uses artifacts/toolkit-authoring and its lib
-directory; older toolkit/lib64 observations are historical. The canonical BDF
-helper and third-party source hashes were unchanged by this stage.
-
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOME_COMPUTE_BACKEND=CPU \
-  -DFLTK_DIR="$PWD/artifacts/toolkit-authoring/share/fltk"
-cmake --build build --parallel 2
-LIBGL_ALWAYS_SOFTWARE=1 \
-  LD_LIBRARY_PATH="$PWD/artifacts/toolkit-authoring/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
-  ctest --test-dir build --output-on-failure -j2
-./build/run-dome-sculpt
-```
-
-Prepare the pinned toolkit first in a fresh checkout. Use the launcher or explicit
-library path to avoid inherited same-SONAME FLTK libraries. GUI orchestration uses
-`uv run --with dbus-next --with python-xlib --with pillow python tests/menu.py`
-with a private HOME/bus/display and the correct library path; Python is optional
-test orchestration only. Cold Fontconfig discovery remains a canonical qimgvr
-follow-up (90s GUI startup, 30s interactions). Do not edit sources while a compiler
-may be reading them. Apply appropriate focused/broad/native/sanitizer validation
-to subsequent source changes and report exact tested revisions.
+Fetch origin and inspect current branch/status/history before overlapping work.
+Repository: https://github.com/jebot-git/dome-sculpt at
+/home/blux/de-xr/dome-sculpt. The parent is not a repository; preserve unrelated
+de-xr projects. Do not reset or force-push newer remote work.
