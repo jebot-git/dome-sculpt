@@ -39,7 +39,8 @@ void export_fixture(const CreatedHumanoid &avatar,
   export_glb(objects, path);
 }
 int main() try {
-  auto avatar = create_humanoid();
+  auto legacy = humanoid_baseline_defaults("makehuman-hm08");
+  auto avatar = create_humanoid(legacy);
   require(avatar.parts.size() == 5, "Generator produces coherent body, sclera, "
                                     "iris, pupil and hair surfaces");
   for (const auto &part : avatar.parts) {
@@ -122,6 +123,7 @@ int main() try {
         "Disconnected eye/hair parts remain fully weighted under head posing");
   }
   HumanoidControls minimal;
+  minimal.baseline = "makehuman-hm08";
   minimal.anime = 0;
   minimal.eye_size = 0;
   minimal.hair_length = 0;
@@ -133,6 +135,7 @@ int main() try {
           "Zero-length groom controls retain valid fixed topology");
   for (int variation = 0; variation < 8; ++variation) {
     HumanoidControls extreme;
+    extreme.baseline = "makehuman-hm08";
     float v = variation & 1 ? 1.f : -1.f;
     extreme.height = variation & 2 ? 1.2f : 2.2f;
     extreme.anime = variation & 4 ? 1 : 0;
@@ -166,12 +169,14 @@ int main() try {
   rejects([&] { create_humanoid({}, [] { return true; }); },
           "Creation supports worker cancellation before producing geometry");
   auto json = avatar.controls.encode();
-  json["version"] = 2;
+  json["version"] = 999;
   rejects([&] { HumanoidControls::decode(json); },
           "Future creator records are not silently misinterpreted");
   for (auto preset :
        {HumanoidPreset::Neutral, HumanoidPreset::Toon, HumanoidPreset::Anime}) {
-    auto styled = create_humanoid(humanoid_preset(preset));
+    auto styled_controls = humanoid_preset(preset, "makehuman-hm08");
+    styled_controls.baseline = "makehuman-hm08";
+    auto styled = create_humanoid(styled_controls);
     styled.validate();
     for (const auto &part : styled.parts)
       PaintedMesh paintable(part.mesh, 256);

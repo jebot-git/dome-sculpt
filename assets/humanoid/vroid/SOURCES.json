@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "vroid-beta-female",
+      "file": "base-female.vrm",
+      "source_archive": "https://opengameart.org/sites/default/files/base_female.zip",
+      "archive_sha256": "bf2717cff70b40a278df56e137dbb699c6499551096fa4c005e9aeca1de68eb3",
+      "file_sha256": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b",
+      "file_bytes": 16323872,
+      "exporter": "VRoidStudio-0.14.0",
+      "gltf_generator": "UniGLTF-1.28",
+      "author": "VRoidプロジェクト",
+      "title": "Base_Female",
+      "license": "CC0-1.0",
+      "embedded_meta": {
+        "version": "",
+        "author": "VRoidプロジェクト",
+        "contactInformation": "",
+        "reference": "",
+        "title": "Base_Female",
+        "texture": 24,
+        "allowedUserName": "Everyone",
+        "violentUssageName": "Allow",
+        "sexualUssageName": "Allow",
+        "commercialUssageName": "Allow",
+        "otherPermissionUrl": "https://hub.vroid.com/license?allowed_to_use_user=everyone&characterization_allowed_user=everyone&corporate_commercial_use=allow&credit=unnecessary&modification=allow&personal_commercial_use=profit&redistribution=allow&sexual_expression=allow&version=1&violent_expression=allow",
+        "licenseName": "CC0",
+        "otherLicenseUrl": "https://hub.vroid.com/license?allowed_to_use_user=everyone&characterization_allowed_user=everyone&corporate_commercial_use=allow&credit=unnecessary&modification=allow&personal_commercial_use=profit&redistribution=allow&sexual_expression=allow&version=1&violent_expression=allow"
+      },
+      "author_license_urls": [
+        "https://vroid.pixiv.help/hc/en-us/articles/900000088126-New-model",
+        "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
+      ],
+      "archive_context_url": "https://opengameart.org/node/170868",
+      "verified": "2026-10-29"
+    },
+    {
+      "id": "vroid-beta-male",
+      "file": "base-male.vrm",
+      "source_archive": "https://opengameart.org/sites/default/files/base_male.zip",
+      "archive_sha256": "8a6049236aae93a31392c56cf2606bd2d3a74711c156e34225616f1ab3cc91b8",
+      "file_sha256": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c",
+      "file_bytes": 17914788,
+      "exporter": "VRoidStudio-0.14.0",
+      "gltf_generator": "UniGLTF-1.28",
+      "author": "VRoidプロジェクト",
+      "title": "Base_Male",
+      "license": "CC0-1.0",
+      "embedded_meta": {
+        "version": "",
+        "author": "VRoidプロジェクト",
+        "contactInformation": "",
+        "reference": "",
+        "title": "Base_Male",
+        "texture": 24,
+        "allowedUserName": "Everyone",
+        "violentUssageName": "Allow",
+        "sexualUssageName": "Allow",
+        "commercialUssageName": "Allow",
+        "otherPermissionUrl": "https://hub.vroid.com/license?allowed_to_use_user=everyone&characterization_allowed_user=everyone&corporate_commercial_use=allow&credit=unnecessary&modification=allow&personal_commercial_use=profit&redistribution=allow&sexual_expression=allow&version=1&violent_expression=allow",
+        "licenseName": "CC0",
+        "otherLicenseUrl": "https://hub.vroid.com/license?allowed_to_use_user=everyone&characterization_allowed_user=everyone&corporate_commercial_use=allow&credit=unnecessary&modification=allow&personal_commercial_use=profit&redistribution=allow&sexual_expression=allow&version=1&violent_expression=allow"
+      },
+      "author_license_urls": [
+        "https://vroid.pixiv.help/hc/en-us/articles/900000088126-New-model",
+        "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
+      ],
+      "archive_context_url": "https://opengameart.org/node/170868",
+      "verified": "2026-10-29"
+    }
+  ]
+}

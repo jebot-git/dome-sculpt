@@ -1,24 +1,43 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "deformation.hpp"
+#include "import.hpp"
+#include "paint.hpp"
 namespace dome {
+struct PaintSourceMaps;
 struct HumanoidControls {
-  float height = 1.7f, anime = .65f;
+  std::string baseline = "vroid-beta-female";
+  float height = 1.5978173f, anime = 0;
   // Signed proportions are bounded to [-1,1]; neutral means the authored base.
   float build = 0, shoulder_width = 0, waist_width = 0;
   float leg_length = 0, arm_length = 0, head_width = 0, head_height = 0;
-  float eye_size = .65f, eye_spacing = 0, nose_size = -.3f;
-  float mouth_width = -.15f, jaw_width = -.2f;
-  float hair_length = .3f, hair_volume = .4f, fringe = .35f;
-  std::array<float, 4> skin_color{.78f, .56f, .43f, 1};
-  std::array<float, 4> iris_color{.12f, .32f, .65f, 1};
-  std::array<float, 4> hair_color{.09f, .035f, .025f, 1};
+  float eye_size = 0, eye_spacing = 0, nose_size = 0;
+  float mouth_width = 0, jaw_width = 0;
+  float hair_length = 0, hair_volume = 0, fringe = 0;
+  std::array<float, 4> skin_color{1, 1, 1, 1};
+  std::array<float, 4> iris_color{1, 1, 1, 1};
+  std::array<float, 4> hair_color{1, 1, 1, 1};
   void validate() const;
   nlohmann::json encode() const;
   static HumanoidControls decode(const nlohmann::json &);
 };
 enum class HumanoidPreset { Neutral, Toon, Anime };
-HumanoidControls humanoid_preset(HumanoidPreset);
+HumanoidControls humanoid_baseline_defaults(std::string_view baseline);
+HumanoidControls
+humanoid_preset(HumanoidPreset,
+                std::string_view baseline = "vroid-beta-female");
+struct CreatorAppearance {
+  std::shared_ptr<const std::vector<uint8_t>> original_bytes;
+  std::shared_ptr<const ImportedAsset> asset;
+  std::shared_ptr<const std::vector<std::shared_ptr<const Image>>>
+      decoded_images;
+  int material = -1, source_mesh = -1, source_node = -1, source_primitive = -1,
+      source_material = -1;
+  // Compacted native vertex -> exact authored primitive accessor vertex.
+  std::vector<uint32_t> source_vertices;
+  std::string material_json, mtoon_json;
+  std::shared_ptr<const std::string> vrm_json;
+};
 struct HumanoidPart {
   std::string name;
   Mesh mesh;
@@ -26,6 +45,8 @@ struct HumanoidPart {
   std::array<float, 4> color{1, 1, 1, 1};
   bool toon = true;
   float roughness = .8f;
+  std::shared_ptr<const CreatorAppearance> appearance;
+  std::shared_ptr<const PaintSourceMaps> source_maps;
 };
 struct CreatedHumanoid {
   HumanoidControls controls;
@@ -33,10 +54,13 @@ struct CreatedHumanoid {
   // All share the same metric rest skeleton and semantic joint indices.
   std::vector<HumanoidPart> parts;
   std::vector<std::string> notes;
+  size_t primary_part = 0;
   void validate() const;
 };
 // Native generator using embedded, explicitly CC0 MakeHuman geometry/targets/
 // rigging data. Additional eyes and groom geometry are original implementation.
-CreatedHumanoid create_humanoid(const HumanoidControls & = {},
-                                const std::function<bool()> &cancelled = {});
+CreatedHumanoid
+create_humanoid(const HumanoidControls & = {},
+                const std::function<bool()> &cancelled = {},
+                const std::filesystem::path &asset_directory = {});
 } // namespace dome

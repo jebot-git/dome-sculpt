@@ -1,4 +1,7 @@
-# Embedded humanoid source assets
+# MakeHuman fallback source assets
+
+The actual primary CC0 VRoid beta files/grants are in [vroid](vroid/README.md).
+This directory also retains the explicit MakeHuman fallback described below.
 
 The shipped `src/humanoid-base.inc` contains graphical data converted from the
 MakeHuman Community repository at revision
@@ -32,6 +35,7 @@ requires no Python or external model files for this creator. Native compilation
 includes the generated arrays directly.
 
 `WORKFLOW-REFERENCES.json` identifies inspected official VRoid Studio workflow
-and guideline pages. VRoid is a workflow reference only. Its proprietary models,
-textures, presets, program source and branding are not incorporated. The
+and guideline pages. The modern proprietary VRoid presets are workflow references only and are not
+incorporated. The separately verified old-beta CC0 models in `vroid/` are actual
+primary source assets; no proprietary application code/runtime is used. The
 original eye and groom geometry is generated in native C++.

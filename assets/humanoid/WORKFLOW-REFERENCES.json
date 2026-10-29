@@ -4,12 +4,12 @@
     {
       "url": "https://vroid.com/en/studio",
       "basis": "Body/face parameters, separate color/shape editing and adjustable hair chunks as workflow references",
-      "reuse": "No source, meshes, textures, presets or branding incorporated"
+      "reuse": "Modern proprietary presets/application source not incorporated; separately verified old-beta CC0 source models are recorded in vroid/SOURCES.json"
     },
     {
       "url": "https://vroid.com/en/studio/guidelines",
       "basis": "Official distinction between creator-owned work and proprietary pixiv presets, and the separate license required for a generator based on its provided meshes/textures",
-      "reuse": "Terms inspection only; this generator uses CC0 MakeHuman data and original geometry instead"
+      "reuse": "General modern terms inspected; explicit older-beta CC0 author grants in vroid/README.md apply to the actual selected baseline assets"
     }
   ]
 }

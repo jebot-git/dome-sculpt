@@ -1,6 +1,10 @@
-# Native humanoid creator foundation
+# MakeHuman creator fallback foundation
 
-`create_humanoid(HumanoidControls, cancelled)` creates five coherent parts:
+New creation uses the actual CC0 VRoid beta baseline described in
+[VROID-CREATOR.md](VROID-CREATOR.md). This document records the explicit
+`makehuman-hm08` fallback and its original native groom.
+
+`create_humanoid` with `baseline="makehuman-hm08"` creates five coherent parts:
 Body, Eyes, Irises, Pupils (including surface-projected brows), and Hair. Each
 part has a mesh, suggested solid material color/toon flag, and validated native
 deformation state with identical semantic joint indices. Root Scene integration
@@ -90,8 +94,8 @@ mesh check is not a proof against self-intersection or an artistic quality test.
 Generated parts should stay grouped in subsequent editing and pose operations.
 
 Offline posed preset QA found remaining groom/body penetration in the tuned
-anime preset; no dynamic collision-free claim is made. The next requested
-primary baseline is the separately verified older CC0 VRoid beta models; their
+anime preset; no dynamic collision-free claim is made. The primary
+baseline is now the separately verified older CC0 VRoid beta models; their
 author grants are distinct from the modern proprietary VRoid presets.
 
 `tests/humanoid-creator.cpp` checks all five parts and all presets against
