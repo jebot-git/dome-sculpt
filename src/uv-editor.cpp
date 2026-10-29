@@ -17,7 +17,7 @@ class UvCanvas : public Fl_Widget {
     auto &self = *static_cast<UvCanvas *>(data);
     self.wheeling_ = false;
     auto view = self.doc_.frame().state->uv;
-    if (view && !view->committing) {
+    if (view && !view->committing && !view->solving) {
       try {
         self.doc_.edit_uv(UvAction::EndGesture);
       } catch (const std::exception &e) {
@@ -29,7 +29,7 @@ class UvCanvas : public Fl_Widget {
     Fl::remove_timeout(wheel_finished, this);
     dragging_ = wheeling_ = false;
     auto view = doc_.frame().state->uv;
-    if (view && !view->committing)
+    if (view && !view->committing && !view->solving)
       doc_.edit_uv(UvAction::EndGesture);
   }
 
@@ -38,6 +38,9 @@ public:
       : Fl_Widget(x, y, w, h), doc_(d) {}
   ~UvCanvas() override { Fl::remove_timeout(wheel_finished, this); }
   int handle(int event) override try {
+    auto view = doc_.frame().state->uv;
+    if (view && (view->solving || view->committing) &&
+        (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)) return 1;
     if (event == FL_FOCUS)
       return 1;
     if (event == FL_UNFOCUS) {
@@ -134,6 +137,13 @@ public:
       for (auto c : e.corners)
         line(m.uv[m.indices[c]], m.uv[m.indices[c / 3 * 3 + (c + 1) % 3]]);
     }
+    if (v.edge < m.indices.size()) {
+      auto a = v.edge, b = a / 3 * 3 + (a + 1) % 3;
+      fl_color(FL_SELECTION_COLOR);
+      fl_line_style(FL_SOLID, 3);
+      line(m.uv[m.indices[a]], m.uv[m.indices[b]]);
+      fl_line_style(0);
+    }
     if (v.vertices)
       for (uint32_t i = 0; i < m.uv.size(); ++i) {
         auto p = m.uv[i];
@@ -159,7 +169,7 @@ void edit_uv(Document &doc) {
         height = std::min(900, sh - 40);
     DomeDialog window(width, height, "UV editor");
     window.begin();
-    UvCanvas canvas(0, row * 2, width, height - row * 4, doc);
+    UvCanvas canvas(0, row * 3, width, height - row * 5, doc);
     Fl_Box status(12, height - row * 2, width - 24, row);
     status.align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
     struct Command {
@@ -180,24 +190,25 @@ void edit_uv(Document &doc) {
         return;
       }
       status.copy_label(
-          !state->error.empty() ? state->error.c_str()
+          v->solving ? state->message.c_str()
+          : !state->error.empty() ? state->error.c_str()
           : v->valid
               ? (v->vertices ? "Vertices: drag | Wheel: scale | Shift+wheel: "
                                "turn | Orange: pinned/cut"
                              : "Islands: drag | Wheel: scale | Shift+wheel: "
-                               "turn | Pick an edge before Seam")
+                               "turn | Pick seam edge for Seam/Stitch")
               : v->error.c_str());
       if (buttons.size() > 5) {
         for (auto button : buttons)
-          if (v->committing)
+          if (v->committing || v->solving)
             button->deactivate();
           else
             button->activate();
-        if (v->can_undo)
+        if (v->can_undo && !v->committing && !v->solving)
           buttons[4]->activate();
         else
           buttons[4]->deactivate();
-        if (v->can_redo)
+        if (v->can_redo && !v->committing && !v->solving)
           buttons[5]->activate();
         else
           buttons[5]->deactivate();
@@ -220,10 +231,12 @@ void edit_uv(Document &doc) {
                             {"Relax", UvAction::Relax, 0},
                             {"Pack", UvAction::Pack, 0},
                             {"Seam", UvAction::Seam, 0},
-                            {"Next", UvAction::Next, 0}};
+                            {"Next", UvAction::Next, 0},
+                            {"Unwrap", UvAction::Conformal, 0},
+                            {"Stitch", UvAction::Stitch, 0}};
     Fl_Button cancel(width / 2 - 180, height - row + 4, 160, row - 8, "Cancel"),
         apply(width / 2 + 20, height - row + 4, 160, row - 8, "Apply");
-    for (int i = 0; i < 12; ++i) {
+    for (size_t i = 0; i < std::size(items); ++i) {
       int col = i % 6, y = (i / 6) * row;
       auto b = new Fl_Button(col * width / 6 + 4, y + 4, width / 6 - 8, row - 8,
                              items[i].label);
@@ -239,7 +252,7 @@ void edit_uv(Document &doc) {
               c.status->copy_label(
                   v->valid ? (v->vertices ? "Vertex mode" : "Island mode")
                            : v->error.c_str());
-              if (v->valid)
+              if (v->valid && !v->solving && !v->committing)
                 c.apply->activate();
               else
                 c.apply->deactivate();
@@ -262,7 +275,7 @@ void edit_uv(Document &doc) {
         [](Fl_Widget *, void *p) {
           auto &r = *static_cast<Result *>(p);
           auto view = r.doc->frame().state->uv;
-          if (view && view->valid) {
+          if (view && view->valid && !view->solving && !view->committing) {
             try {
               r.doc->end_uv(true);
             } catch (const std::exception &e) {
@@ -281,7 +294,7 @@ void edit_uv(Document &doc) {
     while (window.shown()) {
       Fl::wait(.05);
       refresh();
-      if (doc.frame().state->uv && doc.frame().state->uv->valid)
+      if (auto view = doc.frame().state->uv; view && view->valid && !view->solving && !view->committing)
         apply.activate();
       else
         apply.deactivate();

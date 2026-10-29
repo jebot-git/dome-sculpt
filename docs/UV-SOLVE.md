@@ -74,3 +74,49 @@ tie reports a nonmanifold edge rather than being silently repaired. The large
 original MakeHuman first chart produces foldovers and correctly rejects; it
 needs additional cuts or another parameterization. This is explicit scope, not
 an arbitrary-character or production-atlas completion claim.
+
+## Native desktop and XR workflow
+
+The existing UV workspace exposes Unwrap and Stitch, rather than a replacement
+editor. The FLTK dialog keeps continuous dragging/wheel transforms and native
+Edit Undo/Redo; XR retains its existing UV canvas/top/bottom controls and adds
+Unwrap/Stitch buttons beside the canvas. Pick a seam edge before Stitch: the
+operation requires its exact matching two-sided geometric edge. No ambiguous
+mesh-wide search or name-based welding is performed.
+
+Conformal, Stitch, Seam, Relax and Pack execute against an immutable/COW
+workspace copy on the existing UV worker. Their conformal solve, chart topology
+rebuild and validation stay outside the model/input/render locks. Initial
+workspace opening still constructs its first topology through the existing
+constructor; removing that synchronous setup is separate performance work. Results require the same request, session, generation and base mesh
+identity. Cancel/new sessions invalidate old requests; busy drafts cannot undo,
+redo or accept while processing. Each completed operation enters draft history
+once, including the composed original-vertex mapping. Apply uses the ordered
+asset worker for paint transfer and a fully validated detached Scene, then
+publishes one exact global history transaction.
+
+Every workspace vertex retains its original source vertex ID through repeated
+cuts/solves, including draft Undo/Redo. Publication verifies the complete corner
+mapping and exact geometric positions/normals, then copies each skin row and
+morph delta to the new vertex. Skeletons, local poses, morph indices/weights,
+expressions, landmarks and group ownership remain intact. Original creator
+accessor mappings compose through the same map. Scene-wide deformation budgets
+validate before publication; no guessed influence or source identity is added.
+
+Changed original source UVs remain explicitly guarded: original source maps,
+animated MToon UV transforms and authored tangent frames need a coordinated
+all-map bake/reparameterization path. The current transfer refuses before
+changing source pixels/provenance and retains the draft for correction/cancel.
+It does not flatten textured avatars or claim that raw source retention alone
+makes UV changes safe. Plain native rigged meshes support complete UV/paint/
+skin/morph publication. Metadata-only source cuts/pins preserve original UVs and
+can retain their existing source-authored sampling policy.
+
+The new native workflow fixtures exercise asynchronous scheduling, draft/global
+history, actual blended skin/morph results, native restart, source-map refusal,
+request/session cancellation and synthetic controller joystick/ray dispatch for
+both Unwrap and Stitch. `tests/uv-menu.py` runs a separate real FLTK/DBusMenu
+workflow on a private Xvfb display; it is not an actual headset/device test.
+Existing UV focus-boundary regressions distinguish explicit Cancel from a
+confirmed Apply preceding focus loss: the latter remains an accepted ordered
+worker transaction.

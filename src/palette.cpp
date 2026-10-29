@@ -158,7 +158,8 @@ void SpatialPalette::raster(const EditorState &s) {
     auto &v = *s.uv;
     auto &m = *v.mesh;
     text(320 * unit_, 50 * unit_,
-         v.valid ? (v.tool == 1   ? "UV scale: slide / vertical fine wheel"
+         v.solving ? "Processing UV charts..."
+         : v.valid ? (v.tool == 1   ? "UV scale: slide / vertical fine wheel"
                     : v.tool == 2 ? "UV turn: slide / vertical fine wheel"
                     : v.vertices  ? "UV vertices: drag / stick to move"
                                   : "UV islands: drag / stick to move")
@@ -166,7 +167,7 @@ void SpatialPalette::raster(const EditorState &s) {
          v.valid || v.validating || v.committing ? fg : Color{255, 150, 100, 255});
     auto button = [&](int column, int y, const char *name,
                       bool selected = false, bool disabled = false) {
-      disabled = disabled || v.committing;
+      disabled = disabled || v.committing || v.solving;
       rect((40 + 94 * column) * unit_, y * unit_, 88 * unit_,
            (y == 68 ? 34 : 42) * unit_,
            selected ? accent
@@ -189,6 +190,13 @@ void SpatialPalette::raster(const EditorState &s) {
       button(i, 68, top[i], i == v.tool,
              (i == 4 && !v.can_undo) || (i == 5 && !v.can_redo));
       button(i, 538, bottom[i], i == 0 && v.vertices);
+    }
+    for (int i = 0; i < 2; ++i) {
+      int y = 145 + i * 52;
+      rect(8 * unit_, y * unit_, 94 * unit_, 42 * unit_,
+           s.light ? Color{200, 209, 220, uint8_t(s.opacity)} : Color{55, 65, 80, uint8_t(s.opacity)});
+      text(55 * unit_, (y + 29) * unit_, i ? "Stitch" : "Unwrap",
+           v.solving || v.committing ? Color{140, 140, 140, 255} : fg);
     }
     rect(110 * unit_, 110 * unit_, 420 * unit_, 420 * unit_,
          s.light ? Color{208, 208, 208, uint8_t(s.opacity)}
@@ -243,6 +251,10 @@ void SpatialPalette::raster(const EditorState &s) {
         line(m.uv[m.indices[c]], m.uv[m.indices[c / 3 * 3 + (c + 1) % 3]],
              color);
     }
+    if (v.edge < m.indices.size()) {
+      auto a = v.edge, b = a / 3 * 3 + (a + 1) % 3;
+      line(m.uv[m.indices[a]], m.uv[m.indices[b]], accent);
+    }
     if (v.vertices)
       for (uint32_t i = 0; i < m.uv.size(); ++i) {
         auto p = m.uv[i];
@@ -256,10 +268,10 @@ void SpatialPalette::raster(const EditorState &s) {
       }
     rect(60 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, grid);
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_,
-         !v.committing && (v.valid || v.validating) ? accent : grid);
+         !v.committing && !v.solving && (v.valid || v.validating) ? accent : grid);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
     text(470 * unit_, 616 * unit_,
-         v.committing ? "Applying..." : v.validating ? "Check & Apply" : "Apply / Press", fg);
+         v.committing ? "Applying..." : v.solving ? "Working..." : v.validating ? "Check & Apply" : "Apply / Press", fg);
     return;
   }
   if (s.controls.parameter != VrParameter::None) {

@@ -19,10 +19,12 @@ struct UvView {
   std::shared_ptr<const Mesh> mesh;
   std::shared_ptr<const UvTopology> topology;
   uint64_t revision = 1;
-  uint32_t face = 0, vertex = UINT32_MAX;
+  uint32_t face = 0, vertex = UINT32_MAX, edge = UINT32_MAX;
+  // Current draft vertex -> original workspace vertex, composed across cuts.
+  std::shared_ptr<const std::vector<uint32_t>> source_vertices;
   int tool = 0; // move, scale, turn
   bool vertices = false, valid = true, can_undo = false, can_redo = false;
-  bool validating = false, committing = false;
+  bool validating = false, committing = false, solving = false;
   std::array<float, 2> cursor{};
   std::string error;
 };
@@ -42,14 +44,17 @@ enum class UvAction {
   Tool,
   BeginGesture,
   EndGesture,
-  CancelGesture
+  CancelGesture,
+  Conformal,
+  Stitch
 };
 // Both frontends operate the same draft; commit resamples paint off-thread.
 class UvWorkspace {
 public:
   explicit UvWorkspace(Mesh, uint32_t resolution, bool defer_validation = false);
   const UvView &view() const { return view_; }
-  void edit(UvAction, float x = 0, float y = 0);
+  void edit(UvAction, float x = 0, float y = 0,
+            const std::function<bool()> &cancelled = {});
   bool validated(const std::shared_ptr<const Mesh> &, std::string error);
 
 private:
@@ -61,7 +66,8 @@ private:
   std::optional<UvView> gesture_;
   void remember(UvView);
   void finish_gesture(bool cancel = false);
-  void publish(Mesh, bool topology = false);
+  void publish(Mesh, bool topology = false,
+               std::shared_ptr<const std::vector<uint32_t>> mapping = {});
   std::vector<uint32_t> selected() const;
 };
 bool uv_changed(const Mesh &, const Mesh &);
