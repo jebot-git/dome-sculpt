@@ -68,6 +68,13 @@ int main() try {
   auto reflected_bind = reflected.skin_matrices({});
   require(std::abs(reflected_bind[0][0] - 1) < 1e-5f,
           "Nonsingular reflected bone scales retain valid inverse binds");
+  auto centimetres = rig;
+  centimetres.bones[0].rest.scale = {.01f, .01f, .01f};
+  centimetres.bones[1].rest.scale = {.0001f, .0001f, .0001f};
+  auto centimetre_bind = centimetres.skin_matrices({});
+  require(std::abs(centimetre_bind[0][0] - 1) < 1e-5f &&
+              std::abs(centimetre_bind[0][13]) < 1e-5f,
+          "Inverse binds remain scale-relative for nested centimetre joints");
   auto persisted = Skeleton::decode(rig.encode());
   require(persisted.bones[0].parent == 1,
           "Unordered bone hierarchy survives persistence");

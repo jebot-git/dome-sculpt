@@ -70,8 +70,12 @@ RigMatrix inverse(const RigMatrix &m) {
   double a = m[0], b = m[4], c = m[8], d = m[1], e = m[5], f = m[9], g = m[2],
          h = m[6], i = m[10];
   double det = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
-  if (!std::isfinite(det) || std::abs(det) < 1e-15)
-    throw std::runtime_error("Singular joint matrix");
+  double column_product = std::sqrt(a * a + d * d + g * g) *
+                          std::sqrt(b * b + e * e + h * h) *
+                          std::sqrt(c * c + f * f + i * i);
+  if (!std::isfinite(det) || !std::isfinite(column_product) ||
+      column_product == 0 || std::abs(det) <= column_product * 1e-12)
+    throw std::runtime_error("Singular or ill-conditioned joint matrix");
   auto n = identity;
   n[0] = (e * i - f * h) / det;
   n[4] = (c * h - b * i) / det;
@@ -86,6 +90,9 @@ RigMatrix inverse(const RigMatrix &m) {
   n[12] = -p.x;
   n[13] = -p.y;
   n[14] = -p.z;
+  for (float v : n)
+    if (!std::isfinite(v))
+      throw std::runtime_error("Inverse joint matrix overflow");
   return n;
 }
 void validate_map(std::span<const uint32_t> map, size_t count,
