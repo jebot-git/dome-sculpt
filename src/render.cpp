@@ -564,6 +564,8 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
             state.radius * (h.tracked.trigger > .02f
                                 ? .25f + .75f * std::sqrt(h.tracked.trigger)
                                 : 1.f);
+        if (state.retopology)
+          r = std::min(.01f, state.retopology->snap_mm * .00025f) * state.canvas.scale;
         Vec3 color =
             state.tool == Tool::Carve ? Vec3{1, .2f, .2f} : Vec3{.1f, .9f, .5f};
         for (int axis = 0; axis < 3; ++axis)

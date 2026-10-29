@@ -49,8 +49,8 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Back", "Linked parts", "Brush size", "Save"};
   static const std::array<const char *,12> baking={"Source", "Projection bounds", "AO / padding", "Bake surface", "Clear baked", "Cancel work", "Undo", "Redo", "Back", "Save", "Export glTF", "Center object"};
   static const std::array<const char *,12> retopo = {
-      "Start patch", "Place / move", "Make face", "Connect edge", "Delete points", "Relax",
-      "Pin points", "Seam edge", "Back", "Projection distance", "Apply patch", "Cancel patch"};
+      "New patch", "Tool mode", "Make face", "Connect edge", "Delete points", "Relax",
+      "Pin points", "Seam edge", "Back", "Snap range", "Apply patch", "Cancel patch"};
   return page == 14 ? retopo : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh

@@ -12,14 +12,15 @@ Start patch on a visible, unlocked source. On desktop, ordinary dragging remains
 trackball navigation; Shift+click places a point or toggles an existing nearby
 point in the ordered selection. In XR, touch the reference surface with the
 controller/stylus and press/release its pressure trigger. Joystick presses open
-the topology menu. Projection distance is measured in world millimetres and uses
+the topology menu. Its Tool mode switches Place/Move; Snap range adjusts
+projection distance. Distance is measured in document world millimetres and uses
 a native wheel/slider dialog or the common XR joystick/ray slider panel.
 
 Select three or four corners in boundary order and choose Make face. Winding
 follows the reference surface normal, and a successful face clears the selection.
 Connect edge joins two selected endpoints. Seam edge toggles an existing edge's
 seam flag; Pin points toggles projection/relaxation constraints on the selection.
-Place / move switches the XR tool; desktop exposes separate radio commands.
+Tool mode switches the XR tool; desktop exposes separate radio commands.
 Move grabs an existing unpinned point on press and projects its subsequent drag
 to the source. Relax smooths the patch while preserving boundaries, seams and
 pins. Desktop also offers explicit selected-point Snap and Clear selection.
@@ -61,6 +62,10 @@ Apply is exactly one global scene transaction. An asset failure/cancellation
 leaves the original scene unchanged and keeps the draft available for correction
 or retry. Generation, revision, active object and workspace-session guards reject
 stale work. Replacing the document invalidates unconfirmed workspace jobs.
+Accepted Apply survives XR focus/session shutdown. The asset wait includes the
+topology-input barrier before the ordered asset job, so a final committed save
+cannot race that accepted publication. Closing a workspace releases its BVH and
+draft history on the idle topology worker.
 
 ## Worker boundaries and limits
 

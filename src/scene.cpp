@@ -222,9 +222,17 @@ nlohmann::json Scene::encode() const {
       {"rotation", {t.orientation.x,t.orientation.y,t.orientation.z,t.orientation.w}},
       {"scale", t.scale}, {"humanoid", g.humanoid ? g.humanoid->encode() : nlohmann::json(nullptr)}});
   }
+  size_t retopo_bytes = 0;
   for (auto &o : objects_) {
     auto t = o.transform;
     auto &m = o.material;
+    nlohmann::json patch = nullptr;
+    if (o.retopology) {
+      auto payload = o.retopology->topology.encode();
+      retopo_bytes += payload.size();
+      if (retopo_bytes > 64 * 1024 * 1024) throw std::length_error("Scene retopology payload budget exceeded");
+      patch = {{"source", o.retopology->source}, {"topology", std::move(payload)}};
+    }
     j["objects"].push_back(
         {{"id", o.id},
          {"group", o.group},
@@ -247,8 +255,7 @@ nlohmann::json Scene::encode() const {
            {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
          {"volume", o.volume->encode()},
          {"mesh_active", o.mesh_active},
-         {"retopology", o.retopology ? nlohmann::json{{"source", o.retopology->source},
-                               {"topology", o.retopology->topology.encode()}} : nlohmann::json(nullptr)},
+         {"retopology", std::move(patch)},
          {"painted", o.painted ? o.painted->encode(&source_images) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
                              ? o.deformation->encode(o.painted->mesh())

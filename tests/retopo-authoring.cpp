@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/import.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <unistd.h>
 using namespace dome;
 namespace {
 unsigned checks = 0;
@@ -73,6 +75,17 @@ int main(int argc, char **argv) try {
   point(scaled,{0,0,.02f});
   check(std::abs(scaled.view().topology->vertices().begin()->second.position.z)<1e-6f,
         "Rotated grouped source projection preserves local topology and world-millimetre bounds");
+  auto posed=scene.snapshot();const auto &rest=posed.active().painted->mesh();
+  DeformationState deformation(rest);
+  deformation.skeleton=Skeleton{{{"root",-1,{{},{},{1,1,1}},.5f}}};
+  deformation.skin=SkinWeights{};deformation.skin->vertices.assign(rest.positions.size(),{{0,1}});
+  deformation.pose.resize(1);deformation.pose[0].translation.z=.1f;
+  deformation.morphs=MorphSet(rest);auto edited=rest.positions;for(auto &p:edited)p.z+=.1f;
+  deformation.morphs->set_target(rest,"forward",edited);deformation.morph_weights={.75f};
+  posed.set_deformation(1,std::move(deformation));auto posed_before=posed.encode();
+  RetopoWorkspace posed_workspace(posed);point(posed_workspace,{0,0,.18f});
+  check(std::abs(posed_workspace.view().topology->vertices().begin()->second.position.z-.175f)<1e-6f&&posed.encode()==posed_before,
+        "Projection follows the independently expected combined skin pose and morph without changing their rest source");
   check(w.view().topology==quad,"Gesture cancellation restores the exact topology snapshot");
   w.edit(RetopoAction::Mode);point(w,{-.2f,-.2f,0});w.edit(RetopoAction::Pin);
   check(w.view().topology->vertices().begin()->second.pinned,"Pin command persists on selected stable vertices");
@@ -102,13 +115,22 @@ int main(int argc, char **argv) try {
   doc.edit_retopology(RetopoAction::Face);check(doc.wait_retopology()&&doc.frame().state->error.empty(),"Worker validates desktop quad creation");
   auto native=doc.frame().state->retopology->topology->encode();
   doc.end_retopology(true);
-  check(doc.wait_retopology()&&doc.wait_asset()&&!doc.frame().state->retopology&&doc.frame().state->error.empty(),"Apply completes guarded atlas/publication and closes the accepted draft");
+  check(doc.wait_asset()&&!doc.frame().state->retopology&&doc.frame().state->error.empty(),"Asset wait includes accepted topology input, atlas/publication and draft closure");
   auto accepted=doc.copy_scene();auto target=accepted.active().id;
   check(accepted.objects().size()==2&&!accepted.object(1).visible&&accepted.object(1).painted->encode()==scene.object(1).painted->encode()&&
         accepted.active().retopology->topology.encode()==native&&accepted.active().mesh_active,
         "Apply retains the exact original and creates a separate atlas-ready stable-topology mesh");
   auto json=accepted.encode();auto decoded=Scene::decode(json);
   check(json.at("version")==7&&decoded.encode()==json,"Scene version seven round-trips stable topology, source and derived display mesh");
+  auto directory=std::filesystem::temp_directory_path()/("dome-retopo-authoring-"+std::to_string(getpid()));
+  std::filesystem::create_directories(directory);
+  doc.save(directory/"patch.dsculpt");
+  check(Scene::load(directory/"patch.dsculpt").encode()==json,"Actual native file save/open retains the complete editable patch scene");
+  auto exported=doc.export_asset(directory/"patch.glb");exported.get();auto imported=import_mesh(directory/"patch.glb");
+  check(imported.primitives.size()==1&&imported.primitives[0].mesh.indices.size()==6&&
+        !imported.primitives[0].mesh.uv.empty()&&doc.copy_scene().encode()==json,
+        "Ordered glTF export reimports the two atlas triangles without exporting hidden sources or changing native quads");
+  std::filesystem::remove_all(directory);
   check(doc.undo()&&doc.copy_scene().encode()==original,"Exactly one global Undo removes the complete accepted retopology operation");
   check(doc.redo()&&doc.copy_scene().encode()==json,"Global Redo restores the exact source/target scene");
   doc.begin_retopology();check(doc.wait_retopology()&&doc.frame().state->retopology->topology->encode()==native,"Reopen recovers persistent editable quads rather than triangulated output");
@@ -121,11 +143,21 @@ int main(int argc, char **argv) try {
         "Deleted source produces a clean reopen refusal without a stranded draft");
 
   Document cancelled;cancelled.replace(scene.snapshot());cancelled.begin_retopology();check(cancelled.wait_retopology(),"Cancellation fixture initializes");
+  cancelled.end_retopology(true);
+  check(cancelled.wait_retopology()&&cancelled.frame().state->retopology&&!cancelled.frame().state->retopology->committing&&
+        !cancelled.frame().state->error.empty()&&cancelled.copy_scene().encode()==original,
+        "Invalid Apply retains the editable draft and exact scene for correction");
   check(cancelled.begin_desktop(),"Held placement acquires desktop ownership");Brush b;b.from=b.to={0,0,.01f};cancelled.stamp_desktop(b);
   check(cancelled.wait_retopology()&&cancelled.frame().state->retopology->topology->vertices().size()==1,"Held gesture publishes actual topology before release");
   cancelled.cancel_desktop();check(cancelled.wait_retopology()&&cancelled.frame().state->retopology->topology->vertices().empty(),"Focus-loss cancellation restores an unconfirmed gesture exactly");
   point(cancelled,{0,0,0});cancelled.replace(scene.snapshot());
   check(cancelled.wait_retopology()&&!cancelled.frame().state->retopology&&cancelled.copy_scene().encode()==original,"Document replacement invalidates late workspace publications");
+  cancelled.begin_retopology();check(cancelled.wait_retopology(),"Reference-release fixture initializes");
+  std::weak_ptr<const SurfaceQuery> reference=cancelled.frame().state->retopology->source;
+  cancelled.end_retopology(false);
+  auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+  while(!reference.expired()&&std::chrono::steady_clock::now()<deadline)std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  check(reference.expired(),"Closed workspace releases its immutable BVH on the idle worker instead of retaining it until the next session");
 
   Document xr;xr.replace(scene.snapshot());Controller hand(xr);
   hand.send(0,0,0,true);hand.send();hand.sector(8);hand.sector(9);hand.sector(11);
@@ -143,7 +175,19 @@ int main(int argc, char **argv) try {
   check(xr.frame().state->retopology&&xr.frame().state->retopology->snap_mm>=50,"Confirming the XR distance control preserves the draft");
   // Dismiss the root menu if the control returns to its parent, then reopen.
   if (!xr.frame().state->menu) { hand.send(0,0,0,true);hand.send(); }
-  hand.sector(10);check(xr.wait_retopology()&&xr.wait_asset()&&xr.copy_scene().objects().size()==2&&xr.frame().state->error.empty(),
-        "Controller-only workflow applies an atlas-ready native mesh with undo history");
+  hand.sector(10);xr.finish_spatial();
+  check(xr.wait_asset()&&!xr.frame().state->retopology&&xr.copy_scene().objects().size()==2&&xr.frame().state->error.empty(),
+        "Accepted controller Apply survives immediate XR shutdown and asset wait with complete native undo history");
+  auto xr_scene=xr.copy_scene().encode();
+  xr.begin_spatial();
+  xr.begin_retopology();check(xr.wait_retopology()&&xr.wait_mesh(),"Reopened controller patch publishes the retained high-resolution reference");
+  auto extent=[&]{float maximum=-100;for(auto p:xr.frame().surface->mesh.positions)maximum=std::max(maximum,p.x);return maximum;};
+  check(extent()>.4f,"Retopology preview shows the reference extent rather than the smaller authored target");
+  // Reopening resets the input lease; a fresh neutral pose must rearm it.
+  hand.send();hand.send(0,0,0,true);hand.send();
+  check(xr.frame().state->menu&&xr.frame().state->menu_page==14,"A freshly rearmed controller opens the reopened patch menu");
+  hand.sector(11);
+  check(!xr.frame().state->retopology&&xr.wait_mesh()&&extent()<.21f&&xr.copy_scene().encode()==xr_scene,
+        "XR Cancel restores the authored target preview and exact scene after reopening its reference");
   std::cout<<checks<<" checks passed\n";
 } catch(const std::exception &e) {std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

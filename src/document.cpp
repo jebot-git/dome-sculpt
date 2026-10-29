@@ -905,8 +905,14 @@ void Document::prepare_mesh(uint32_t resolution) {
   publish_locked();
 }
 bool Document::wait_asset(std::chrono::milliseconds timeout) const {
+  auto deadline = std::chrono::steady_clock::now() + timeout;
+  // An accepted patch may still be draining topology input before it queues
+  // the ordered asset job. Waiting only for asset_busy can save too early at
+  // an XR shutdown boundary. Unconfirmed workspaces do not block this helper.
+  auto topology = published_.load()->retopology;
+  if (topology && topology->committing && !wait_retopology(timeout)) return false;
   std::unique_lock lock(file_mutex_);
-  return file_changed_.wait_for(lock, timeout,
+  return file_changed_.wait_until(lock, deadline,
                                 [&] { return !published_.load()->asset_busy; });
 }
 void Document::prepare_locked(uint32_t resolution) {

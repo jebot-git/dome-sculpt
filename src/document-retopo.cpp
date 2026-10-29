@@ -77,13 +77,14 @@ void Document::cancel_retopology_locked() {
 void Document::end_retopology(bool accept) {
   std::lock_guard lock(model_mutex_);
   end_retopology_locked(accept);
-  publish_locked(!accept);
+  publish_locked();
 }
 void Document::end_retopology_locked(bool accept) {
   if (!state_.retopology) return;
   if (retopo_accepting_) throw std::logic_error("Cancel background work or wait for the accepted patch");
   if (!accept) {
-    cancel_retopology_locked(); desktop_ = false; input_.cancel(); state_.error.clear(); return;
+    cancel_retopology_locked(); desktop_ = false; input_.cancel(); state_.error.clear();
+    publish_locked(true); return;
   }
   if (!state_.retopology->source) throw std::logic_error("Wait for the source surface");
   if (retopo_stroking_) { end_action_locked(); desktop_ = false; input_.cancel(); }
@@ -109,8 +110,14 @@ void Document::retopo_loop() {
     RetopoJob job;
     {
       std::unique_lock lock(retopo_mutex_);
-      retopo_changed_.wait(lock, [&] { return stopping_.load() || !retopo_jobs_.empty(); });
+      retopo_changed_.wait(lock, [&] {
+        return stopping_.load() || !retopo_jobs_.empty() || (workspace && session != retopo_session_.load());
+      });
       if (stopping_) return;
+      if (workspace && session != retopo_session_.load()) {
+        // Destruction of a large BVH/history also stays off model/input locks.
+        lock.unlock(); workspace.reset(); session = 0; continue;
+      }
       job = std::move(retopo_jobs_.front()); retopo_jobs_.pop_front();
     }
     auto cancelled = [&] { return stopping_.load() || job.session != retopo_session_.load(); };
@@ -128,7 +135,7 @@ void Document::retopo_loop() {
       if (cancelled() || !state_.retopology) continue;
       if (retopo_source_.generation != state_.generation || retopo_source_.revision != state_.revision ||
           retopo_source_.object != scene_.active().id) {
-        cancel_retopology_locked(); state_.error = "Retopology source changed; reopen the workspace"; publish_locked(); continue;
+        cancel_retopology_locked(); state_.error = "Retopology source changed; reopen the workspace"; publish_locked(true); continue;
       }
       --retopo_pending_;
       auto view = std::make_shared<RetopoView>(workspace->view());
@@ -136,7 +143,7 @@ void Document::retopo_loop() {
       state_.retopology = view;
       state_.error.clear(); state_.message.clear();
       if (job.accept) {
-        if (!view->changed) { cancel_retopology_locked(); publish_locked(); continue; }
+        if (!view->changed) { cancel_retopology_locked(); publish_locked(true); continue; }
         auto topology = view->topology; auto source = workspace->source_object(); auto transform = view->transform;
         queue_scene_operation_locked("Apply retopology", [topology, source, transform](Scene &scene, const auto &cancel) {
           publish_retopology(scene, *topology, source, transform, cancel);

@@ -40,3 +40,14 @@ asset worker. It remains ordered before later focus loss/shutdown; invalid
 captured targets cannot commit paint. Unaccepted draft checks are invalidated
 on cancellation/replacement and cannot recreate a closed workspace. See UV.md
 for pending-check/commit behavior and the separate wait helpers.
+
+Native retopology uses the same pressure ownership and focus boundaries, with a
+dedicated topology worker. Joystick navigation reaches page 14 from Mesh tools;
+while editing, a joystick press opens that page directly. Tool mode switches
+Place/Move, and Snap range uses the common logarithmic joystick/ray slider.
+Points project in source-local coordinates with a document-world distance bound.
+Held placement/move cancellation restores its draft baseline; focus/session loss
+retains the surrounding patch workspace. Explicit Apply queues ordered guarded
+asset publication, and later focus loss does not retract that accepted operation.
+The redundant Mesh-tools Undo sector now opens Retopology; root/hardware Undo
+remain available and route to draft history. See RETOPO-AUTHORING.md.
