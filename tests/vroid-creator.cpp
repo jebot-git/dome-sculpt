@@ -77,6 +77,25 @@ int main() try {
                     avatar.parts.front().appearance->decoded_images,
             "Parts share original encoded asset and one immutable decoded "
             "image cache");
+    require(source->source_basis_quaternion &&
+                source->source_basis_quaternion->w == 0 &&
+                source->source_basis_quaternion->x == 0 &&
+                source->source_basis_quaternion->y == 1 &&
+                source->source_basis_quaternion->z == 0,
+            "Explicit authored basis matches proper Y180 source conversion");
+    require(source->source_joint_nodes.size() ==
+                    part.deformation.skeleton->bones.size() &&
+                std::set<uint32_t>(source->source_joint_nodes.begin(),
+                                   source->source_joint_nodes.end())
+                        .size() == source->source_joint_nodes.size(),
+            "Normative joint-to-original-node identity is complete and unique");
+    size_t native_targets =
+        part.deformation.morphs ? part.deformation.morphs->targets.size() : 0;
+    bool mapped = source->source_morph_targets.size() == native_targets;
+    for (size_t i = 0; i < native_targets; ++i)
+      mapped &= source->source_morph_targets[i] == i;
+    require(mapped, "Normative morph identity preserves original source target "
+                    "indices without parsing names");
     const auto &material = asset.materials[source->material];
     require(part.color == material.color &&
                 part.roughness == material.roughness,

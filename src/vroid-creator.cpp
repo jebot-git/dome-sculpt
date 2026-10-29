@@ -6,6 +6,7 @@
 #include <fstream>
 #include <mutex>
 #include <nlohmann/json.hpp>
+#include <numeric>
 #include <set>
 namespace dome {
 CreatedHumanoid create_makehuman_humanoid(const HumanoidControls &,
@@ -542,6 +543,27 @@ CreatedHumanoid create_vroid(const HumanoidControls &c,
     appearance->source_primitive = p.source_primitive;
     appearance->source_vertices = std::move(original);
     appearance->vrm_json = source->vrm_json;
+    appearance->source_basis_quaternion = Quat{0, 0, 1, 0};
+    appearance->source_joint_nodes.assign(skeleton.bones.size(), UINT32_MAX);
+    for (size_t node = 0; node < source->node_to_joint.size(); ++node)
+      if (source->node_to_joint[node] >= 0)
+        appearance->source_joint_nodes[size_t(source->node_to_joint[node])] =
+            uint32_t(node);
+    std::set<uint32_t> unique_nodes;
+    for (size_t joint = 0; joint < skeleton.bones.size(); ++joint) {
+      auto node = appearance->source_joint_nodes[joint];
+      if (node >= a.nodes.size() || !unique_nodes.insert(node).second)
+        fail("source joint-node map is incomplete or not unique");
+      int parent = a.nodes[node].parent;
+      int expected = parent < 0 ? -1 : source->node_to_joint[size_t(parent)];
+      if (skeleton.bones[joint].parent != expected)
+        fail("native joint hierarchy differs from explicit source node "
+             "identity");
+    }
+
+    appearance->source_morph_targets.resize(p.morph_targets.size());
+    std::iota(appearance->source_morph_targets.begin(),
+              appearance->source_morph_targets.end(), 0u);
     appearance->material_json =
         source->json.at("materials").at(p.material - 1).dump();
     appearance->mtoon_json = source->json.at("extensions")

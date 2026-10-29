@@ -37,6 +37,15 @@ struct CreatorAppearance {
   std::vector<uint32_t> source_vertices;
   std::string material_json, mtoon_json;
   std::shared_ptr<const std::string> vrm_json;
+  // Native Skeleton joint index -> exact original glTF node, never name
+  // inferred.
+  std::vector<uint32_t> source_joint_nodes;
+  // Native morph slot -> exact authored target index. Reorder/delete/add must
+  // update or explicitly invalidate this identity; count/name are not proof.
+  std::vector<uint32_t> source_morph_targets;
+  // Explicit original-to-native orientation; absent legacy provenance cannot
+  // authorize coordinate-sensitive VRM metadata export.
+  std::optional<Quat> source_basis_quaternion;
 };
 struct HumanoidPart {
   std::string name;
