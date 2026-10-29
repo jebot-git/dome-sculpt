@@ -1,3 +1,34 @@
+# Scene and material integration checkpoint — 2026-10-29
+
+The persistent scene supports independent sculpt objects, uniform transforms,
+visibility, edit locks and per-object PBR material channels in FLTK and XR.
+
+- All six optimized CTest suites passed: scene authoring, shared document,
+  sculpt geometry, independent glTF interoperability, GPU rendering and the
+  OpenXR client. The scene suite verifies object identities, version-one
+  migration, transformed sculpt isolation, metadata/stroke history, exact
+  persistence, saved-state markers and malformed-input rejection.
+- All 26 synthetic OpenXR checks passed, including creating an independent
+  sculpt and changing its material through joystick submenu actions.
+- All ten private-Xvfb FLTK checks passed, including object duplication/undo,
+  the native object/material inspector, applying a blue material and undoing it.
+  Captures include `artifacts/gui/08-material-editor.png` and
+  `artifacts/gui/09-material-applied.png`.
+- The real EGL/GL rendering fixture displays separate red and blue sculpt
+  objects. Independent cgltf validation checks separate nodes/meshes/materials,
+  exact local geometry, node transforms and PBR values including emission,
+  opacity and double-sided flags.
+- ASan/UBSan/leak checks passed for all four native core suites. The final
+  scene and document suites were rerun after ordered save-queue changes.
+- The save regression queues export and an older asynchronous save ahead of a
+  newer desktop save, then verifies the newest geometry remains on disk after
+  every worker drains. Save-failure/retry and exact cancellation checks pass.
+
+Machine-readable results are in `artifacts/validation-scene.json`. Full native,
+GUI and sanitizer logs are named there. These generated artifacts are excluded
+from source control. The full objective remains active; production authoring,
+painting, rigging, VRM, hardware and accelerator requirements remain unfinished.
+
 # Native XR integration checkpoint — 2026-10-29
 
 The OpenBrush DomeD basis is pinned at

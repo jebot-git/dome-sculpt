@@ -129,6 +129,24 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-client-") as directory:
                 and report.get("tip_pressure_samples", 0) > 0,
                 "MX Ink uses calibrated tip pose and actual tip-force action paths",
             )
+    scene, scene_path = run("scene", 45, mode={"DOME_XR_FIXTURE_SCENE": "1"})
+    check(
+        scene.returncode == 0,
+        "Headset object and material menu pages complete through native OpenXR actions",
+    )
+    info = json.loads(
+        subprocess.check_output(
+            [str(binary), "--project-info", str(scene_path)], env=env, text=True
+        )
+    )
+    check(
+        info["object_count"] == 2,
+        "Joystick object page creates and persists a second independent sculpt",
+    )
+    check(
+        info["active_color"][2] > 0.7 and info["active_color"][0] < 0.1,
+        "Joystick material page updates and persists the active object's blue material",
+    )
     files, _ = run("files", 45, mode={"DOME_XR_FIXTURE_FILES": "1"})
     check(
         files.returncode == 0,

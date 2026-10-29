@@ -248,7 +248,7 @@ int main() try {
   input.update(s);
   check(input.menu_open(), "Joystick press spawns a spatial tool menu");
   s.joystick_press = false;
-  s.stick_y = 1;
+  s.stick_y = .57735027f;
   s.stick_x = 1;
   s.sequence++;
   s.time += .01;

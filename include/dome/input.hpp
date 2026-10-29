@@ -1,10 +1,41 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "volume.hpp"
+#include <functional>
 #include <optional>
 namespace dome {
 enum class DeviceKind { Controller, SpatialStylus };
-enum class SpatialCommand { Undo, Redo, Save, Export };
+enum class SpatialCommand {
+  Undo,
+  Redo,
+  Save,
+  Export,
+  Larger,
+  Smaller,
+  NewSphere,
+  NewEmpty,
+  Duplicate,
+  Next,
+  Previous,
+  Visibility,
+  Lock,
+  Delete,
+  Left,
+  Right,
+  Center,
+  Warm,
+  Blue,
+  White,
+  Dark,
+  MetalUp,
+  MetalDown,
+  RoughUp,
+  RoughDown,
+  Toon,
+  Pbr,
+  Opacity
+};
+const std::array<const char *, 12> &spatial_labels(int page);
 struct SpatialSample {
   uint32_t id = 0;
   uint64_t sequence = 0;
@@ -19,7 +50,11 @@ struct SpatialSample {
 // for each button transition, including transitions between rendering frames.
 class SpatialInput {
 public:
-  explicit SpatialInput(Volume &v) : volume_(v) {}
+  explicit SpatialInput(Volume &v) : volume_(&v) {}
+  void bind(Volume &v) {
+    cancel();
+    volume_ = &v;
+  }
   void update(const SpatialSample &);
   void cancel();
   bool menu_open() const { return menu_; }
@@ -27,6 +62,7 @@ public:
   Tool tool() const { return tool_; }
   Tool menu_selection() const { return Tool(std::min(selected_, 3)); }
   int menu_index() const { return selected_; }
+  int menu_page() const { return page_; }
   void select_tool(Tool tool) {
     tool_ = tool;
     selected_ = int(tool);
@@ -37,9 +73,15 @@ public:
     return c;
   }
   float radius = .1f, strength = 1;
+  bool edit_allowed = true;
+  std::function<void()> committed;
 
 private:
-  Volume &volume_;
+  Volume *volume_;
+  void end_stroke() {
+    if (volume_->end_stroke() && committed)
+      committed();
+  }
   uint32_t device_ = 0;
   struct DeviceState {
     uint64_t sequence = 0;
@@ -49,7 +91,7 @@ private:
   std::unordered_map<uint32_t, DeviceState> devices_;
   bool menu_ = false;
   Tool tool_ = Tool::Clay;
-  int selected_ = 0;
+  int selected_ = 0, page_ = 0;
   std::optional<SpatialCommand> command_;
   Vec3 previous_{}, menu_anchor_{};
 };

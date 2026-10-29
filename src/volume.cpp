@@ -198,6 +198,9 @@ bool Volume::redo() {
   return true;
 }
 void Volume::save(const std::filesystem::path &path) const {
+  atomic_write(path, nlohmann::json::to_cbor(encode()));
+}
+nlohmann::json Volume::encode() const {
   if (editing_)
     throw std::logic_error("End the stroke before saving");
   nlohmann::json j = {{"format", "dome-sculpt"},
@@ -206,8 +209,7 @@ void Volume::save(const std::filesystem::path &path) const {
                       {"samples", nlohmann::json::array()}};
   for (auto [p, v] : cells_)
     j["samples"].push_back({p.x, p.y, p.z, v});
-  auto bytes = nlohmann::json::to_cbor(j);
-  atomic_write(path, bytes);
+  return j;
 }
 Volume Volume::load(const std::filesystem::path &path) {
   if (std::filesystem::file_size(path) > 128 * 1024 * 1024)
@@ -215,6 +217,9 @@ Volume Volume::load(const std::filesystem::path &path) {
   std::ifstream input(path, std::ios::binary);
   std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input)), {});
   auto j = nlohmann::json::from_cbor(bytes);
+  return decode(j);
+}
+Volume Volume::decode(const nlohmann::json &j) {
   if (j.at("format") != "dome-sculpt" || j.at("version") != 1)
     throw std::runtime_error("Unsupported project format");
   Volume v(j.at("voxel_size").get<float>());

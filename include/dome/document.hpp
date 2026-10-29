@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "input.hpp"
-#include "mesh.hpp"
 #include "navigation.hpp"
+#include "scene.hpp"
 #include <atomic>
 #include <condition_variable>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -22,11 +23,20 @@ struct SpatialFrame {
   CanvasTransform head;
   std::array<SpatialHand, 2> hands{};
 };
+struct ObjectInfo {
+  uint64_t id;
+  std::string name;
+  bool visible, locked;
+  CanvasTransform transform;
+  Material material;
+};
 struct EditorState {
   uint64_t revision = 1, generation = 1, input_epoch = 1;
   bool dirty = false, stroking = false, menu = false;
+  uint64_t active_object = 1;
+  std::vector<ObjectInfo> objects;
   Tool tool = Tool::Clay;
-  int menu_index = 0;
+  int menu_index = 0, menu_page = 0;
   float radius = .12f;
   CanvasTransform canvas{}, panel{};
   std::array<SpatialHand, 2> hands{};
@@ -37,9 +47,15 @@ struct EditorState {
   uint32_t accent = 0x6babff;
   int opacity = 255;
 };
+struct SurfaceRange {
+  uint64_t object;
+  size_t first, count;
+  Material material;
+};
 struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;
   Mesh mesh;
+  std::vector<SurfaceRange> ranges;
 };
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
@@ -56,6 +72,14 @@ public:
   Document &operator=(const Document &) = delete;
   EditorSnapshot frame() const;
   Volume copy_volume() const;
+  Scene copy_scene() const;
+  void replace(Scene, bool clean = true);
+  uint64_t add_object(bool sphere = true);
+  void duplicate_object();
+  void delete_object();
+  void select_object(uint64_t);
+  void object_properties(uint64_t, std::string, bool visible, bool locked,
+                         CanvasTransform, Material);
   void replace(Volume, bool clean = true);
   void seed();
   bool begin_desktop();
@@ -85,18 +109,28 @@ public:
 
 private:
   mutable std::mutex model_mutex_;
-  Volume volume_;
+  Scene scene_;
+  std::shared_ptr<Volume> bound_volume_ = scene_.active().volume;
+  Volume &volume() { return *scene_.active().volume; }
+  const Volume &volume() const { return *scene_.active().volume; }
+  struct History {
+    std::shared_ptr<Volume> sculpt;
+    std::optional<Scene> before, after;
+    uint64_t from = 0, to = 0;
+  };
+  std::deque<History> undo_, redo_;
   SpatialInput input_;
   CanvasNavigation navigation_;
   EditorState state_;
   bool desktop_ = false, anchored_ = false;
-  uint64_t last_volume_ = 0, saved_revision_ = 1;
+  uint64_t last_volume_ = 0, content_ = 1, saved_content_ = 1,
+           next_content_ = 2;
   std::filesystem::path path_;
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
   struct MeshJob {
     uint64_t revision, generation;
-    Volume volume;
+    Scene scene;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;
@@ -106,10 +140,12 @@ private:
   std::deque<std::pair<uint64_t, SpatialFrame>> inputs_;
   bool reset_input_ = false, processing_ = false;
   struct FileJob {
-    Volume volume;
+    Scene scene;
     std::filesystem::path path;
-    uint64_t revision, generation;
+    uint64_t revision, generation, content;
     bool export_mesh;
+    bool adopt_path = false;
+    std::shared_ptr<std::promise<void>> completion{};
   };
   std::mutex file_mutex_;
   std::condition_variable file_changed_;
@@ -118,9 +154,15 @@ private:
   std::atomic_bool stopping_{false};
   std::thread mesh_thread_, input_thread_, file_thread_;
   void publish_locked(bool force_geometry = false);
+  void record_locked(History);
+  void record_stroke_locked();
+  void scene_changed_locked(Scene before);
+  bool undo_locked(bool redo);
+  void bind_locked();
   void finish_locked();
   void process_locked(const SpatialFrame &);
   void file_locked(bool export_mesh);
+  void command_locked(SpatialCommand);
   void mesh_loop();
   void input_loop();
   void file_loop();

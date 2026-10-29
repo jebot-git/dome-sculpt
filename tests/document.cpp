@@ -70,6 +70,8 @@ int main() try {
   doc.submit(f);
   require(doc.wait_input() && !doc.frame().state->stroking,
           "Focus loss cancels the in-progress spatial stroke");
+  require(!doc.frame().state->dirty,
+          "Cancelling transient edits does not dirty the restored saved state");
   auto room_before = doc.frame().state->canvas;
   doc.rebase_space(CanvasTransform{{.2f, 0, 0}, {}, 1});
   auto room_after = doc.frame().state->canvas;
@@ -92,12 +94,13 @@ int main() try {
   auto directory = std::filesystem::temp_directory_path() /
                    ("dome-document-" + std::to_string(getpid()));
   std::filesystem::create_directory(directory);
+  Volume::Voxels newest;
   {
     Document writing;
     writing.seed();
     auto target = directory / "saved.dsculpt";
     writing.save(target);
-    auto original = Volume::load(target).voxels();
+    auto original = Scene::load(target).active().volume->voxels();
     require(writing.begin_desktop(), "A saved document can start a new stroke");
     writing.stamp_desktop(b);
     writing.end_desktop();
@@ -113,7 +116,7 @@ int main() try {
     require(!writing.frame().state->error.empty() &&
                 writing.frame().state->dirty,
             "A background save failure keeps the changed document dirty");
-    require(Volume::load(target).voxels() == original,
+    require(Scene::load(target).active().volume->voxels() == original,
             "A failed background save preserves the previous project");
     writing.request_save();
     until = std::chrono::steady_clock::now() + std::chrono::seconds(3);
@@ -123,7 +126,26 @@ int main() try {
     require(!writing.frame().state->dirty &&
                 writing.frame().state->error.empty(),
             "Retrying a failed save publishes success and clears its error");
+    writing.request_save(true);
+    b.from = b.to = {.15f, 0, .3f};
+    require(writing.begin_desktop(),
+            "Editing continues while a glTF export is queued");
+    writing.stamp_desktop(b);
+    writing.end_desktop();
+    writing.request_save();
+    b.from = b.to = {-.15f, 0, .3f};
+    require(writing.begin_desktop(),
+            "A second edit can follow an asynchronous save");
+    writing.stamp_desktop(b);
+    writing.end_desktop();
+    newest = writing.copy_volume().voxels();
+    writing.save(target);
+    require(!writing.frame().state->dirty,
+            "A synchronous save waits behind older file jobs");
   }
+  require(Scene::load(directory / "saved.dsculpt").active().volume->voxels() ==
+              newest,
+          "An older queued XR save cannot overwrite a newer desktop save");
   std::filesystem::remove_all(directory);
   return 0;
 } catch (const std::exception &e) {

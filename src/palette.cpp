@@ -37,9 +37,8 @@ in vec2 texcoord;uniform sampler2D image;out vec4 color;void main(){color=textur
   glGetProgramiv(program_, GL_LINK_STATUS, &good);
   if (!good)
     throw std::runtime_error("Spatial menu program failed");
-  const float vertices[] = {-.3f, -.225f, 0, 1, .3f,  -.225f, 1, 1,
-                            -.3f, .225f,  0, 0, -.3f, .225f,  0, 0,
-                            .3f,  -.225f, 1, 1, .3f,  .225f,  1, 0};
+  const float vertices[] = {-.3f, -.3f, 0, 1, .3f, -.3f, 1, 1, -.3f, .3f, 0, 0,
+                            -.3f, .3f,  0, 0, .3f, -.3f, 1, 1, .3f,  .3f, 1, 0};
   glGenVertexArrays(1, &vao_);
   glGenBuffers(1, &vbo_);
   glBindVertexArray(vao_);
@@ -110,7 +109,7 @@ void SpatialPalette::font(const EditorState &s) {
     pixels_ = s.font_pixels;
     unit_ = std::max(1, (pixels_ + 15) / 16);
     width_ = 640 * unit_;
-    height_ = 480 * unit_;
+    height_ = 640 * unit_;
   } catch (...) {
     FT_Done_Face(face);
     FT_Done_FreeType(library);
@@ -154,30 +153,42 @@ void SpatialPalette::raster(const EditorState &s) {
     }
   };
   rect(0, 0, width_, height_, bg);
-  const char *labels[] = {"Clay", "Carve", "Smooth", "Flatten",
-                          "Undo", "Redo",  "Save",   "Export glTF"};
+  const auto &labels = spatial_labels(s.menu_page);
   constexpr float pi = 3.14159265358979323846f;
-  for (int i = 0; i < 8; ++i) {
-    float a = i * pi / 4;
-    int x = int(320 + 190 * std::cos(a)) * unit_,
-        y = int(240 - 155 * std::sin(a)) * unit_;
-    rect(x - 76 * unit_, y - 28 * unit_, 152 * unit_, 56 * unit_,
+  for (int i = 0; i < 12; ++i) {
+    float a = i * pi / 6;
+    int x = int(320 + 220 * std::cos(a)) * unit_,
+        y = int(320 - 220 * std::sin(a)) * unit_;
+    rect(x - 55 * unit_, y - 20 * unit_, 110 * unit_, 40 * unit_,
          i == s.menu_index ? accent
          : s.light         ? Color{200, 209, 220, 255}
                            : Color{55, 65, 80, 255});
     text(x, y + pixels_ / 3, labels[i], fg);
   }
-  text(320 * unit_, 230 * unit_, "Stick to choose", fg);
-  text(320 * unit_, 255 * unit_, "Press to confirm", fg);
-  text(320 * unit_, 34 * unit_, "Dome Sculpt", fg);
+  text(320 * unit_, 295 * unit_, "Stick to choose", fg);
+  text(320 * unit_, 320 * unit_, "Press to confirm", fg);
+  const char *page = s.menu_page == 1   ? "Objects"
+                     : s.menu_page == 2 ? "Material"
+                                        : "Dome Sculpt";
+  text(320 * unit_, 345 * unit_, page, fg);
+  auto active = std::find_if(s.objects.begin(), s.objects.end(),
+                             [&](auto &o) { return o.id == s.active_object; });
+  if (active != s.objects.end())
+    text(320 * unit_, 580 * unit_, active->name.substr(0, 28), fg);
+  if (!s.error.empty())
+    text(320 * unit_, 610 * unit_, s.error.substr(0, 64), fg);
+  else if (!s.message.empty())
+    text(320 * unit_, 610 * unit_, s.message.substr(0, 64), fg);
 }
 void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   if (!s.menu)
     return;
-  std::string signature = s.font_file + std::to_string(s.font_pixels) +
-                          std::to_string(s.menu_index) +
-                          std::to_string(s.light) + std::to_string(s.accent) +
-                          std::to_string(s.opacity);
+  std::string signature =
+      s.font_file + std::to_string(s.font_pixels) +
+      std::to_string(s.menu_index) + std::to_string(s.menu_page) +
+      std::to_string(s.active_object) + std::to_string(s.revision) + s.message +
+      s.error + std::to_string(s.light) + std::to_string(s.accent) +
+      std::to_string(s.opacity);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture_);
   if (signature != signature_) {

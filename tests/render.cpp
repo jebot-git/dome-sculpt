@@ -93,6 +93,30 @@ int main(int argc, char **argv) try {
       ++blue;
   if (blue < 1000)
     throw std::runtime_error("Spatial menu selection is not visible");
+  auto original = doc.frame().state->active_object;
+  Material red;
+  red.color = {.9f, .025f, .01f, 1};
+  Material azure;
+  azure.color = {.02f, .06f, .9f, 1};
+  doc.object_properties(original, "Red", true, false, {{-.28f, 0, 0}, {}, .6f},
+                        red);
+  auto second = doc.add_object();
+  doc.object_properties(second, "Blue", true, false, {{.28f, 0, 0}, {}, .8f},
+                        azure);
+  if (!doc.wait_mesh())
+    throw std::runtime_error("Multi-object materials did not mesh");
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  auto colored = capture("objects");
+  size_t reds = 0, blues = 0;
+  for (size_t i = 0; i < colored.size(); i += 3) {
+    if (colored[i] > colored[i + 2] * 2 && colored[i] > 70)
+      ++reds;
+    if (colored[i + 2] > colored[i] * 2 && colored[i + 2] > 70)
+      ++blues;
+  }
+  if (reds < 1000 || blues < 1000)
+    throw std::runtime_error(
+        "Objects did not render with independent PBR colors");
   glDeleteRenderbuffers(1, &depth);
   glDeleteTextures(1, &color);
   glDeleteFramebuffers(1, &fbo);

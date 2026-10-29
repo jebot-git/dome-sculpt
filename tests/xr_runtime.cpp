@@ -441,6 +441,8 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
   out->isActive = XR_TRUE;
   out->currentState =
       button && (frame == 8 || frame == 10 ||
+                 (getenv("DOME_XR_FIXTURE_SCENE") &&
+                  (frame == 12 || frame == 16 || frame == 18 || frame == 20)) ||
                  (getenv("DOME_XR_FIXTURE_FILES") &&
                   (frame == 24 || frame == 26 || frame == 28 || frame == 30)));
   out->changedSinceLastSync = button && (frame >= 8 && frame <= 11);
@@ -454,7 +456,9 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
   out->isActive = active;
   out->currentState = 0;
   if (right(p->subactionPath)) {
-    bool stroke = (frame >= 2 && frame <= 5) || (frame >= 13 && frame <= 18);
+    bool stroke =
+        (frame >= 2 && frame <= 5) ||
+        (!getenv("DOME_XR_FIXTURE_SCENE") && frame >= 13 && frame <= 18);
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -471,14 +475,25 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
   out->isActive = XR_TRUE;
   out->currentState = right(p->subactionPath) && a->name == "right_stick" &&
                               frame >= 9 && frame <= 10
-                          ? XrVector2f{1, 1}
+                          ? XrVector2f{.8660254f, .5f}
                           : XrVector2f{0, 0};
   if (getenv("DOME_XR_FIXTURE_FILES") && right(p->subactionPath) &&
       a->name == "right_stick") {
     if (frame == 25 || frame == 26)
-      out->currentState = {0, -1};
+      out->currentState = {-1, 0};
     if (frame == 29 || frame == 30)
-      out->currentState = {1, -1};
+      out->currentState = {-.8660254f, -.5f};
+  }
+  if (getenv("DOME_XR_FIXTURE_SCENE") && right(p->subactionPath) &&
+      a->name == "right_stick") {
+    if (frame == 9 || frame == 10)
+      out->currentState = {-.5f, -.8660254f};
+    if (frame == 11 || frame == 12)
+      out->currentState = {1, 0};
+    if (frame == 17 || frame == 18)
+      out->currentState = {0, -1};
+    if (frame == 19 || frame == 20)
+      out->currentState = {.8660254f, .5f};
   }
   return XR_SUCCESS;
 }
@@ -533,11 +548,12 @@ FN(GetInstanceProcAddr, XrInstance, const char *name, PFN_xrVoidFunction *out) {
   ENTRY(GetInstanceProperties)
   ENTRY(GetSystem)
   ENTRY(GetSystemProperties)
-  ENTRY(GetOpenGLGraphicsRequirementsKHR) ENTRY(CreateSession) ENTRY(
-      DestroySession) ENTRY(EnumerateReferenceSpaces)
-      ENTRY(CreateReferenceSpace) ENTRY(DestroySpace) ENTRY(
-          CreateActionSet) ENTRY(DestroyActionSet) ENTRY(CreateAction)
-          ENTRY(DestroyAction) ENTRY(StringToPath) ENTRY(PathToString) ENTRY(
+  ENTRY(GetOpenGLGraphicsRequirementsKHR)
+  ENTRY(CreateSession)
+  ENTRY(DestroySession) ENTRY(EnumerateReferenceSpaces) ENTRY(
+      CreateReferenceSpace) ENTRY(DestroySpace) ENTRY(CreateActionSet)
+      ENTRY(DestroyActionSet) ENTRY(CreateAction) ENTRY(DestroyAction)
+          ENTRY(StringToPath) ENTRY(PathToString) ENTRY(
               SuggestInteractionProfileBindings) ENTRY(AttachSessionActionSets)
               ENTRY(CreateActionSpace) ENTRY(EnumerateEnvironmentBlendModes)
                   ENTRY(EnumerateViewConfigurationViews) ENTRY(

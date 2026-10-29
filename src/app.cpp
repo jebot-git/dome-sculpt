@@ -4,6 +4,7 @@
 #include "dome/document.hpp"
 #include "dome/mesh.hpp"
 #include "dome/render.hpp"
+#include "object-editor.hpp"
 #ifdef DOME_HAS_XR
 #include "dome/xr.hpp"
 #endif
@@ -310,6 +311,15 @@ struct App {
     menu.add("&Sculpt/&Flatten", '4', command, this);
     menu.add("&Sculpt/Smaller brush", '[', command, this);
     menu.add("&Sculpt/Larger brush", ']', command, this);
+    menu.add("&Scene/New sphere", FL_CTRL | FL_SHIFT | 'n', command, this);
+    menu.add("&Scene/New empty sculpt", 0, command, this);
+    menu.add("&Scene/Duplicate object", FL_CTRL + 'd', command, this);
+    menu.add("&Scene/Delete object", FL_Delete, command, this);
+    menu.add("&Scene/Previous object", FL_CTRL + FL_Page_Up, command, this);
+    menu.add("&Scene/Next object", FL_CTRL + FL_Page_Down, command, this);
+    menu.add("&Scene/Hide or show object", 0, command, this);
+    menu.add("&Scene/Lock or unlock object", 0, command, this);
+    menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
     menu.add("&Mesh/Generate &UV atlas", FL_CTRL + 'u', command, this);
     menu.add("&View/Reset &trackball", 'f', command, this);
     menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
@@ -350,6 +360,13 @@ struct App {
          << " mm | " << compute_backend()
          << " | Drag: trackball  Shift+drag: sculpt  Wheel: zoom";
     auto info = canvas.document.frame().state;
+    auto active =
+        std::find_if(info->objects.begin(), info->objects.end(),
+                     [&](auto &o) { return o.id == info->active_object; });
+    if (active != info->objects.end())
+      text << " | " << active->name << " (" << info->objects.size()
+           << " objects)" << (active->locked ? " [locked]" : "")
+           << (active->visible ? "" : " [hidden]");
     if (!info->error.empty()) {
       text.str("");
       text << info->error;
@@ -436,7 +453,32 @@ struct App {
       canvas.radius = std::max(.02f, canvas.radius * .8f);
     else if (label == "Larger brush")
       canvas.radius = std::min(.5f, canvas.radius * 1.25f);
-    else if (label == "Generate UV atlas") {
+    else if (label == "New sphere" || label == "New empty sculpt") {
+      canvas.document.add_object(label == "New sphere");
+    } else if (label == "Duplicate object") {
+      canvas.document.duplicate_object();
+    } else if (label == "Delete object") {
+      canvas.document.delete_object();
+    } else if (label == "Object and material...") {
+      edit_object(canvas.document);
+    } else if (label == "Next object" || label == "Previous object") {
+      auto state = canvas.document.frame().state;
+      auto found =
+          std::find_if(state->objects.begin(), state->objects.end(),
+                       [&](auto &o) { return o.id == state->active_object; });
+      int index = int(found - state->objects.begin()),
+          count = int(state->objects.size());
+      int next = (index + count + (label == "Next object" ? 1 : -1)) % count;
+      canvas.document.select_object(state->objects[next].id);
+    } else if (label == "Hide or show object" ||
+               label == "Lock or unlock object") {
+      auto scene = canvas.document.copy_scene();
+      auto &o = scene.active();
+      canvas.document.object_properties(
+          o.id, o.name, label == "Hide or show object" ? !o.visible : o.visible,
+          label == "Lock or unlock object" ? !o.locked : o.locked, o.transform,
+          o.material);
+    } else if (label == "Generate UV atlas") {
       canvas.mesh = surface_mesh(canvas.document.copy_volume());
       auto info = unwrap(canvas.mesh);
       std::ostringstream text;
@@ -448,9 +490,7 @@ struct App {
       auto chosen =
           fl_file_chooser("Export static glTF mesh", "*.glb", "Sculpt.glb");
       if (chosen) {
-        auto mesh = surface_mesh(canvas.document.copy_volume());
-        unwrap(mesh);
-        export_glb(mesh, chosen);
+        export_glb(canvas.document.copy_scene().surfaces(true), chosen);
       }
     } else if (label == "Start or stop XR") {
       toggle_xr();
@@ -528,7 +568,8 @@ int main(int argc, char **argv) try {
   }
 #endif
   if (argc == 3 && std::string(argv[1]) == "--project-info") {
-    auto volume = Volume::load(argv[2]);
+    auto scene = Scene::load(argv[2]);
+    auto &volume = *scene.active().volume;
     std::vector<std::pair<Int3, float>> samples(volume.voxels().begin(),
                                                 volume.voxels().end());
     std::sort(samples.begin(), samples.end(),
@@ -543,7 +584,14 @@ int main(int argc, char **argv) try {
           hash *= 1099511628211ULL;
         }
     }
-    std::cout << nlohmann::json{{"samples", samples.size()},
+    std::cout << nlohmann::json{{"object_count", scene.objects().size()},
+                                {"active_object", scene.active().id},
+                                {"active_color", scene.active().material.color},
+                                {"active_metallic",
+                                 scene.active().material.metallic},
+                                {"active_roughness",
+                                 scene.active().material.roughness},
+                                {"samples", samples.size()},
                                 {"voxel_size", volume.voxel_size()},
                                 {"field_hash", hash}}
                      .dump()

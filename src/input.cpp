@@ -1,11 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/input.hpp"
 namespace dome {
+const std::array<const char *, 12> &spatial_labels(int page) {
+  static const std::array<const char *, 12> root = {
+      "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",   "Redo",
+      "Save", "Export glTF", "Objects", "Materials", "Larger", "Smaller"};
+  static const std::array<const char *, 12> objects = {
+      "New sphere", "New empty",  "Duplicate",  "Next",
+      "Previous",   "Visibility", "Lock",       "Delete",
+      "Back",       "Move left",  "Move right", "Center"};
+  static const std::array<const char *, 12> materials = {
+      "Warm clay", "Blue",     "White", "Dark", "Metal +", "Metal -",
+      "Rougher",   "Smoother", "Back",  "Toon", "PBR",     "Opacity"};
+  return page == 1 ? objects : page == 2 ? materials : root;
+}
 void SpatialInput::cancel() {
-  if (volume_.in_stroke())
-    volume_.cancel_stroke();
+  if (volume_->in_stroke())
+    volume_->cancel_stroke();
   device_ = 0;
   menu_ = false;
+  page_ = 0;
   command_.reset();
   devices_.clear();
 }
@@ -57,18 +71,50 @@ void SpatialInput::update(const SpatialSample &s) {
     return;
   }
   if (menu_press) {
-    if (volume_.in_stroke())
-      volume_.end_stroke();
-    menu_ = !menu_;
-    menu_anchor_ = s.tip;
-    if (menu_) {
+    if (volume_->in_stroke())
+      end_stroke();
+    if (!menu_) {
+      menu_ = true;
+      page_ = 0;
+      menu_anchor_ = s.tip;
       device_ = s.id;
       selected_ = int(tool_);
+    } else if (page_ == 0 && (selected_ == 8 || selected_ == 9)) {
+      page_ = selected_ == 8 ? 1 : 2;
+      selected_ = 0;
+    } else if (page_ != 0 && selected_ == 8) {
+      page_ = 0;
+      selected_ = int(tool_);
     } else {
-      if (selected_ < 4)
+      if (page_ == 0 && selected_ < 4)
         tool_ = Tool(selected_);
-      else
-        command_ = SpatialCommand(selected_ - 4);
+      else {
+        static const std::array<SpatialCommand, 12> root = {
+            SpatialCommand::Undo,   SpatialCommand::Undo,
+            SpatialCommand::Undo,   SpatialCommand::Undo,
+            SpatialCommand::Undo,   SpatialCommand::Redo,
+            SpatialCommand::Save,   SpatialCommand::Export,
+            SpatialCommand::Undo,   SpatialCommand::Undo,
+            SpatialCommand::Larger, SpatialCommand::Smaller};
+        static const std::array<SpatialCommand, 12> objects = {
+            SpatialCommand::NewSphere, SpatialCommand::NewEmpty,
+            SpatialCommand::Duplicate, SpatialCommand::Next,
+            SpatialCommand::Previous,  SpatialCommand::Visibility,
+            SpatialCommand::Lock,      SpatialCommand::Delete,
+            SpatialCommand::Undo,      SpatialCommand::Left,
+            SpatialCommand::Right,     SpatialCommand::Center};
+        static const std::array<SpatialCommand, 12> materials = {
+            SpatialCommand::Warm,    SpatialCommand::Blue,
+            SpatialCommand::White,   SpatialCommand::Dark,
+            SpatialCommand::MetalUp, SpatialCommand::MetalDown,
+            SpatialCommand::RoughUp, SpatialCommand::RoughDown,
+            SpatialCommand::Undo,    SpatialCommand::Toon,
+            SpatialCommand::Pbr,     SpatialCommand::Opacity};
+        command_ = (page_ == 1   ? objects
+                    : page_ == 2 ? materials
+                                 : root)[selected_];
+      }
+      menu_ = false;
       device_ = 0;
       d.armed = false;
     }
@@ -79,19 +125,23 @@ void SpatialInput::update(const SpatialSample &s) {
     if (s.stick_x * s.stick_x + s.stick_y * s.stick_y > .25f) {
       constexpr float pi = 3.14159265358979323846f;
       float angle = std::atan2(s.stick_y, s.stick_x);
-      int index = int(std::floor((angle + pi / 8 + 2 * pi) / (pi / 4))) % 8;
+      int index = int(std::floor((angle + pi / 12 + 2 * pi) / (pi / 6))) % 12;
       selected_ = index;
     }
+    d.pressed = s.trigger;
+    return;
+  }
+  if (!edit_allowed) {
     d.pressed = s.trigger;
     return;
   }
   if (s.trigger) {
     if (!d.pressed) {
       device_ = s.id;
-      volume_.begin_stroke();
+      volume_->begin_stroke();
       previous_ = s.tip;
     }
-    if (device_ == s.id && volume_.in_stroke()) {
+    if (device_ == s.id && volume_->in_stroke()) {
       Brush brush;
       brush.from = previous_;
       brush.to = s.tip;
@@ -102,15 +152,15 @@ void SpatialInput::update(const SpatialSample &s) {
       brush.blend = std::min(.025f, radius * .25f);
       brush.tool = tool_;
       try {
-        volume_.stamp(brush);
+        volume_->stamp(brush);
       } catch (...) {
         cancel();
         throw;
       }
       previous_ = s.tip;
     }
-  } else if (d.pressed && device_ == s.id && volume_.in_stroke()) {
-    volume_.end_stroke();
+  } else if (d.pressed && device_ == s.id && volume_->in_stroke()) {
+    end_stroke();
     device_ = 0;
   }
   d.pressed = s.trigger;

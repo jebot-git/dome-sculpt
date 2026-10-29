@@ -56,8 +56,9 @@ and the wheel zooms. Shift+left drag sculpts. `1` selects clay, `2` carve,
 `3` smooth, `4` flatten; brackets change brush radius. `F` resets the view.
 Ctrl+Z / Ctrl+Shift+Z undo/redo complete strokes. Lost focus or Escape cancels
 an in-progress stroke. The viewport uses a native GGX metallic-roughness shader
-with a constant clay material. The View menu switches between PBR and a simple
-toon preview; full MToon properties and material editing remain to be added.
+with editable per-object color, metalness, roughness, emission, opacity and
+culling. The View menu switches between PBR and a simple toon preview; full
+MToon properties and texture authoring remain to be added.
 
 The sparse signed-distance field supports swept capsule strokes, pressure,
 soft unions/subtraction, smoothing and flattening. Transactions retain exact
@@ -66,20 +67,32 @@ degenerate faces. xatlas generates seams and packed UV charts; it preserves the
 mapping back to source geometry. Artist seam controls and a UV editor are not
 implemented yet.
 
-Ctrl+S saves the volume as a private, atomically replaced `.dsculpt` CBOR file.
-The current version stores voxel size and field samples only. Materials,
-rigs, editable charts and shapekeys will require a later document version.
-Ctrl+O reopens it. Ctrl+E exports the current static mesh as `.glb` with normals,
-UV coordinates and a basic glTF metallic-roughness material. This is not yet
-full glTF scene support. VRM export is deliberately unavailable until the
-humanoid rig, metadata, expressions, material and secondary-motion requirements
+Ctrl+S saves the scene as a private, atomically replaced `.dsculpt` CBOR file.
+Version 2 stores separate sculpt objects, stable identities, names, selection,
+uniform object transforms, visibility, locks, sparse fields and PBR material
+values. Version 1 volume projects open as a single-object scene. Ctrl+O reopens
+it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
+transforms, normals, packed UVs and PBR materials. Texture maps, skeletons and
+morph targets are still required for full glTF scene support. VRM export is
+deliberately unavailable until the humanoid rig, metadata, expressions, material and secondary-motion requirements
 are implemented.
+
+The Scene menu creates empty sculpts or clay spheres, duplicates and deletes
+objects, changes selection and toggles visibility or edit locks. Ctrl+D duplicates
+and Ctrl+Shift+N adds a sphere. Alt+Enter opens the native FLTK object/material
+editor, including position, Euler rotation, uniform scale and material channels.
+Each object has an independent field; desktop and spatial brushes transform into
+the selected object's local coordinates. Hidden or locked objects reject edits.
+Scene changes and sculpt strokes share global undo/redo. Returning to a saved
+history position clears the unsaved marker, and cancelling a transient stroke
+retains the previous clean state. Desktop and XR writes share an ordered file
+worker so an older queued save cannot overwrite a newer save request.
 
 `F6` or View → Start/stop XR starts the native stereo worker while leaving the
 FLTK editor available. Both frontends edit the same document and acquire
 immutable mesh snapshots. Spatial sculpt input, surface extraction and XR
-save/export jobs run on separate workers. Input queues are bounded; focus/tracking loss cancels
-the unfinished spatial stroke and requires controls to be released before a new
+save/export jobs run on separate workers. Input queues are bounded; focus and
+tracking loss cancel the unfinished spatial stroke and requires controls to be released before a new
 stroke. Runtime reference-space changes rebase the canvas at the announced time
 and discard queued poses from the old coordinate space.
 
@@ -99,8 +112,13 @@ LOCAL. Per-eye poses and fields of view come from the runtime.
 Squeeze one controller to move the canvas; squeeze both to rotate and scale it.
 Trigger pressure sculpts at the tracked tip. Press the joystick to anchor the
 BDF menu, tilt it to select and press again to confirm. Starting at the right
-and proceeding counterclockwise, its actions are Clay, Carve, Smooth, Flatten,
-Undo, Redo, Save and Export glTF. Save uses the opened project path, or a private
+and proceeding counterclockwise, the twelve root sectors are Clay, Carve,
+Smooth, Flatten, Undo, Redo, Save, Export glTF, Objects, Materials, Larger and
+Smaller. Objects and Materials open submenus; their Back sector returns to the
+root. The object page supports creation, duplication, selection, visibility,
+locking, deletion and basic placement steps. The material page offers color
+presets, metalness, roughness, opacity and PBR/toon preview selection. Save uses
+the opened project path, or a private
 `$XDG_STATE_HOME/dome-sculpt/Recovery-PID.dsculpt` file for untitled work. Export
 uses the corresponding `.glb` path. File errors remain visible in the FLTK
 status area and retain the changed document and prior saved file.
@@ -121,14 +139,17 @@ build/dome-sculpt --export-demo artifacts/sculpt.glb
 ```
 
 Python is used only for test orchestration; the application has no Python
-runtime. The core tests are native C++ and check volume edits, swept strokes, topology, UVs, persistence,
+runtime. The core tests are native C++ and check volume edits, swept strokes,
+topology, UVs, persistence,
 GLB structure, input ownership and OpenBrush canvas transforms. The GUI test
 uses a private bus, HOME and Xvfb display to inspect actual FLTK/OpenGL pixels,
-carve/undo, orbit and view reset. Its report and images are in `artifacts/gui`.
+carve/undo, orbit, view reset, object commands and the native material editor.
+Its report and images are in `artifacts/gui`.
 CTest additionally exercises the shared document workers, real EGL/OpenGL
 PBR/toon/palette rendering, and the real OpenXR loader against a native synthetic
-runtime. Its 23 checks cover stereo submission, controller/stylus edits, focus
-and tracking loss, reference-space changes, file commands and overlay selection.
+runtime. Its 26 checks cover stereo submission, controller/stylus edits, focus
+and tracking loss, reference-space changes, object creation, material changes,
+file commands and overlay selection.
 The installed Monado runtime also completed a bounded 12-frame run with 11
 stereo submissions, but reported a simulated HMD and no controllers. Neither
 fixture establishes physical headset or stylus behavior. ASan/UBSan and leak

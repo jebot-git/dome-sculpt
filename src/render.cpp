@@ -67,18 +67,18 @@ layout(location=0)in vec3 position;layout(location=1)in vec3 normal;
 uniform mat4 model,mvp;out vec3 world,n;
 void main(){vec4 p=model*vec4(position,1);world=p.xyz;n=normalize(mat3(model)*normal);gl_Position=mvp*vec4(position,1);})";
   const char *fragment = R"(#version 330 core
-in vec3 world,n;out vec4 color;uniform vec3 camera;uniform int toon;
+in vec3 world,n;out vec4 color;uniform vec3 camera;uniform int toon;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power){
 vec3 H=normalize(V+L);float NV=max(dot(N,V),0.0001),NL=max(dot(N,L),0.0),NH=max(dot(N,H),0.0),VH=max(dot(V,H),0.0);
-vec3 base=vec3(0.58,0.30,0.15);float rough=0.8,a=rough*rough,a2=a*a;
+vec3 base=base_color.rgb;float rough=max(.04,roughness),a=rough*rough,a2=a*a;
 float d=a2/(PI*pow(NH*NH*(a2-1.0)+1.0,2.0));float k=pow(rough+1.0,2.0)/8.0;
-float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F=vec3(.04)+(1.0-vec3(.04))*pow(1.0-VH,5.0);
-return ((1.0-F)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
-void main(){vec3 N=normalize(n),V=normalize(camera-world),result;
-if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=vec3(.58,.30,.15)*ramp*edge+vec3(.025);}
-else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8))+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0))+.045*vec3(.58,.30,.15);
-result=result/(result+vec3(1));color=vec4(pow(result,vec3(1.0/2.2)),1);})";
+float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F0=mix(vec3(.04),base,metallic);vec3 F=F0+(1.0-F0)*pow(1.0-VH,5.0);
+return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
+void main(){vec3 N=normalize(n)*(gl_FrontFacing?1.0:-1.0),V=normalize(camera-world),result;
+if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base_color.rgb*ramp*edge+vec3(.025);}
+else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8))+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0))+.045*base_color.rgb;
+result+=emission;result=result/(result+vec3(1));color=vec4(pow(result,vec3(1.0/2.2)),base_color.a);})";
   GLuint vs = shader(GL_VERTEX_SHADER, vertex),
          fs = shader(GL_FRAGMENT_SHADER, fragment);
   program_ = glCreateProgram();
@@ -146,9 +146,47 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                      mvp.data());
   glUniform3f(glGetUniformLocation(program_, "camera"), camera.x, camera.y,
               camera.z);
-  glUniform1i(glGetUniformLocation(program_, "toon"), toon ? 1 : 0);
   glBindVertexArray(vao_);
-  glDrawElements(GL_TRIANGLES, GLsizei(count_), GL_UNSIGNED_INT, nullptr);
+  auto draw_range = [&](const Material &material, size_t first, size_t count) {
+    glUniform1i(glGetUniformLocation(program_, "toon"), toon || material.toon);
+    glUniform4fv(glGetUniformLocation(program_, "base_color"), 1,
+                 material.color.data());
+    glUniform3fv(glGetUniformLocation(program_, "emission"), 1,
+                 material.emissive.data());
+    glUniform1f(glGetUniformLocation(program_, "metallic"), material.metallic);
+    glUniform1f(glGetUniformLocation(program_, "roughness"),
+                material.roughness);
+    if (material.double_sided)
+      glDisable(GL_CULL_FACE);
+    else {
+      glEnable(GL_CULL_FACE);
+      glCullFace(GL_BACK);
+    }
+    if (material.color[3] < 1) {
+      glEnable(GL_BLEND);
+      glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
+                          GL_ONE_MINUS_SRC_ALPHA);
+      glDepthMask(GL_FALSE);
+    } else {
+      glDisable(GL_BLEND);
+      glDepthMask(GL_TRUE);
+    }
+    glDrawElements(GL_TRIANGLES, GLsizei(count), GL_UNSIGNED_INT,
+                   reinterpret_cast<void *>(first * sizeof(uint32_t)));
+  };
+  if (cached_->ranges.empty())
+    draw_range(Material{}, 0, count_);
+  else {
+    for (auto &r : cached_->ranges)
+      if (r.material.color[3] >= 1)
+        draw_range(r.material, r.first, r.count);
+    for (auto &r : cached_->ranges)
+      if (r.material.color[3] < 1)
+        draw_range(r.material, r.first, r.count);
+  }
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
+  glDisable(GL_CULL_FACE);
   glBindVertexArray(0);
   glUseProgram(0);
   if (glGetError() != GL_NO_ERROR)

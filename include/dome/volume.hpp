@@ -3,6 +3,7 @@
 #include "brush.hpp"
 #include <deque>
 #include <filesystem>
+#include <nlohmann/json_fwd.hpp>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -26,9 +27,12 @@ public:
   bool undo();
   bool redo();
   bool in_stroke() const { return editing_; }
+  bool pending_changes() const { return !before_.empty(); }
   size_t undo_count() const { return undo_.size(); }
   uint64_t revision() const { return revision_; }
   Volume geometry_snapshot() const;
+  nlohmann::json encode() const;
+  static Volume decode(const nlohmann::json &);
   void save(const std::filesystem::path &) const;
   static Volume load(const std::filesystem::path &);
 
