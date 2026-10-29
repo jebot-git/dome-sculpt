@@ -1811,7 +1811,10 @@ void Document::file_loop() {
             state_.message += " | " + *job->operation_report;
           publish_locked(true);
         }
-        file_changed_.notify_all();
+        {
+          std::lock_guard file_lock(file_mutex_);
+          file_changed_.notify_all();
+        }
         continue;
       }
       if (job->discover_recovery || job->restore_recovery) {
@@ -1840,7 +1843,10 @@ void Document::file_loop() {
           state_.recovery_busy = false;
           publish_locked();
         }
-        file_changed_.notify_all();
+        {
+          std::lock_guard file_lock(file_mutex_);
+          file_changed_.notify_all();
+        }
         continue;
       }
       if (job->uv_mesh) {
