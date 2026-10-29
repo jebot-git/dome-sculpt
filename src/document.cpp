@@ -52,15 +52,12 @@ Document::Document() : input_(volume()) {
     file_thread_ = std::thread([this] { file_loop(); });
     uv_thread_ = std::thread([this] { uv_loop(); });
   } catch (...) {
-    stopping_ = true;
+    request_worker_stop();
     {
       std::lock_guard lock(file_mutex_);
       files_stopping_ = true;
     }
-    mesh_changed_.notify_all();
-    input_changed_.notify_all();
     file_changed_.notify_all();
-    uv_changed_.notify_all();
     if (input_thread_.joinable())
       input_thread_.join();
     if (mesh_thread_.joinable())
@@ -72,11 +69,17 @@ Document::Document() : input_(volume()) {
     throw;
   }
 }
-Document::~Document() {
+void Document::request_worker_stop() {
   stopping_ = true;
-  mesh_changed_.notify_all();
-  input_changed_.notify_all();
-  uv_changed_.notify_all();
+  // The flag is atomic for long-running jobs, but condition waiters still
+  // require a handshake with EACH predicate mutex. Otherwise a notification
+  // can arrive after a false predicate check and before wait registration.
+  { std::lock_guard lock(mesh_mutex_); mesh_changed_.notify_all(); }
+  { std::lock_guard lock(input_mutex_); input_changed_.notify_all(); }
+  { std::lock_guard lock(uv_mutex_); uv_changed_.notify_all(); }
+}
+Document::~Document() {
+  request_worker_stop();
   input_thread_.join();
   {
     std::lock_guard lock(file_mutex_);
@@ -2344,7 +2347,10 @@ void Document::file_loop() {
         state_.message = "Opened " + path_.string();
         publish_locked();
         job->completion->set_value();
-        file_changed_.notify_all();
+        {
+          std::lock_guard file_lock(file_mutex_);
+          file_changed_.notify_all();
+        }
         continue;
       }
       if (job->scene_operation) {

@@ -333,3 +333,13 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-atlas-robustness-test PRIVATE dome-sculpt-core)
   add_test(NAME atlas-robustness COMMAND dome-sculpt-atlas-robustness-test)
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-worker-shutdown-test tests/worker-shutdown.cpp)
+  target_link_libraries(dome-sculpt-worker-shutdown-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-worker-shutdown-test PRIVATE
+    -Wl,--wrap=_ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE
+    -Wl,--wrap=_ZNSt18condition_variable10notify_allEv
+    -Wl,--wrap=pthread_mutex_lock)
+  add_test(NAME worker-shutdown COMMAND dome-sculpt-worker-shutdown-test)
+endif()

@@ -350,6 +350,7 @@ private:
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
   std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_;
+  void request_worker_stop();
   void publish_locked(bool force_geometry = false);
   void record_locked(History);
   void record_stroke_locked();
