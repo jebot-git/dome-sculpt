@@ -173,3 +173,8 @@ stereo submissions, but reported a simulated HMD and no controllers. Neither
 fixture establishes physical headset or stylus behavior. Current results and the native XR UV regression are
 recorded in [the agent handoff](docs/HANDOFF.md). No accelerator hardware tests
 have been performed.
+
+
+Current DomeD/FLTK toolkit selection, runtime-library precedence and the generated
+`build/run-dome-sculpt` launcher are documented in [docs/TOOLKIT.md](docs/TOOLKIT.md).
+Read [docs/HANDOFF.md](docs/HANDOFF.md) before resuming the full production roadmap.

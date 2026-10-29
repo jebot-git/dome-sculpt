@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 """Exercise the real loader/client with a synthetic runtime and real GL images."""
 
-import json, os, signal, subprocess, sys, tempfile
+import contextlib, json, os, signal, subprocess, sys, tempfile
 from pathlib import Path
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
 binary, runtime, output = map(lambda p: Path(p).resolve(), sys.argv[1:])
 output.mkdir(parents=True, exist_ok=True)
 checks = []
+(output / "report.json").write_text(json.dumps({"status":"running", "checks":[], "failed":0})+"\n")
 
 
 def check(ok, label):
     checks.append({"passed": bool(ok), "check": label})
     print(("PASS " if ok else "FAIL ") + label, flush=True)
+    (output / "report.json").write_text(json.dumps({"status":"running" if ok else "failed", "checks":checks, "failed":sum(not c["passed"] for c in checks)}, indent=2)+"\n")
     assert ok, label
 
 
-with tempfile.TemporaryDirectory(prefix="dome-xr-client-") as directory:
+with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as directory:
     root = Path(directory)
     manifest = root / "runtime.json"
     manifest.write_text(
@@ -182,7 +184,10 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-client-") as directory:
     uv_result, uv_path = run("uv",45,extra=["--paint"],mode={"DOME_XR_FIXTURE_UV":"1"})
     check(uv_result.returncode==0,"Native OpenXR UV panel supports joystick entry and ray-operated edit/Apply controls")
     uv_info=json.loads(subprocess.check_output([str(binary),"--project-info",str(uv_path)],env=env,text=True))
-    check(uv_info["uv_hash"]!=basepaint["uv_hash"] and uv_info["field_hash"]==basepaint["field_hash"] and uv_info["paint_hash"]==basepaint["paint_hash"],"XR UV edits persist while retaining the source field and surface material appearance")
+    (output / "uv-comparison.json").write_text(json.dumps({"uv_info":uv_info,"basepaint":basepaint,"project_directory":directory},indent=2)+"\n")
+    check(uv_info["uv_hash"]!=basepaint["uv_hash"],"XR UV coordinates change and persist after Apply")
+    check(uv_info["field_hash"]==basepaint["field_hash"],"XR UV editing preserves the source sculpt field exactly")
+    check(uv_info["paint_hash"]==basepaint["paint_hash"],"XR UV editing retains the uniform surface material appearance")
     controlled, controlpath = run(
         "controls", 45, mode={"DOME_XR_FIXTURE_CONTROLS": "1"}
     )
@@ -230,6 +235,8 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-client-") as directory:
 (output / "report.json").write_text(
     json.dumps(
         {
+            "status": "passed",
+            "project_directory": directory,
             "checks": checks,
             "failed": sum(not c["passed"] for c in checks),
             "synthetic_tracking": True,

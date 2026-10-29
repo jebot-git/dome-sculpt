@@ -150,3 +150,22 @@ This checkpoint establishes a connected native editing path. The full
 production objective remains active; incomplete authoring, scene, material,
 rigging, export and hardware requirements remain in
 [the completion matrix](REQUIREMENTS.md).
+
+
+## 2026-10-29 resume, current DomeD toolkit
+
+See TOOLKIT.md and HANDOFF.md. Release build uses canonical DomeD742d009's
+FLTK1.4.5 and all22 committed patches, rather than the old inherited /opt build.
+Ten native suites pass, with36 real-loader synthetic XR assertions; GUI18/18,
+menu25/25 and newly built nested DomeD8/8 pass. Continuous UV scaling/turning,
+fine-wheel rate and exact cancellation have new focused regressions. Five
+additional UV replays from one exact persisted baseline preserve field/paint
+hashes and change UVs consistently. The old handoff's persistence failure has
+not reproduced; a root cause is not claimed. New artifacts retain projects and
+separate comparison hashes, and a failed run cannot leave a stale passed report.
+
+Latest canonical DomeD was built from a clean pinned worktree. Existing capture
+source edits in DomeD/qimgvr remain untouched. No session restart, installation,
+physical-device test or new sanitizer/accelerator result is claimed. The first
+nested run failed from a distribution-specific software Vulkan manifest path;
+the portable test driver selection fixed the harness, after which all8 pass.

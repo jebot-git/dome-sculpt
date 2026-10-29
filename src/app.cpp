@@ -15,7 +15,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Gl_Window.H>
-#include <FL/fl_file_chooser.H>
+#include <FL/Fl_File_Chooser.H>
 #include <FL/gl.h>
 #include <FL/glu.h>
 #include <bit>

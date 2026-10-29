@@ -48,6 +48,7 @@ Advanced conformal re-unwrapping, stitching, chart distortion/texel-density
 analysis, texture-set/UDIM tools, large-mesh interaction optimization and physical
 headset/stylus validation remain unfinished.
 
-The current native XR continuous-transform persistence regression and pending
-validation are recorded in [the handoff](HANDOFF.md); this is an unfinished
-authoring checkpoint.
+The historical native XR persistence failure did not reproduce in the resumed
+validation. Separate UV/field/paint evidence and the new continuous scale/turn,
+fine-wheel and cancellation checks are recorded in [the handoff](HANDOFF.md).
+The complete production authoring objective remains unfinished.

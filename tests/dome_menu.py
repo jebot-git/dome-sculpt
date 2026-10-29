@@ -2,7 +2,7 @@
 """Native FLTK/Wayland commands through a private running DomeD universal menu.
 Harness setup follows DomeD scripts/test-global-menu.py; no other GUI toolkit.
 """
-import asyncio, json, os, re, signal, socket, subprocess, sys, tempfile, time, urllib.request
+import asyncio, json, os, platform, re, signal, socket, subprocess, sys, tempfile, time, urllib.request
 from pathlib import Path
 from dbus_next.aio import MessageBus
 from dbus_next import Variant
@@ -15,6 +15,9 @@ if os.environ.get("DOME_SCULPT_DOME_BUS") != "1":
 root=Path(__file__).resolve().parents[1]
 compositor=Path(os.environ.get("DOME_COMPOSITOR",root.parent/"dome-compositor/target/release/dome-compositor"))
 out=root/"artifacts/dome-menu";out.mkdir(parents=True,exist_ok=True)
+icd=Path(os.environ["DOME_TEST_VULKAN_ICD"]) if "DOME_TEST_VULKAN_ICD" in os.environ else next((p for p in [Path("/usr/share/vulkan/icd.d/lvp_icd.json"),Path("/usr/share/vulkan/icd.d/lvp_icd."+platform.machine()+".json")] if p.is_file()),None)
+if icd is None or not icd.is_file():raise RuntimeError("Set DOME_TEST_VULKAN_ICD to the installed software Vulkan ICD manifest")
+
 processes=[];checks=[]
 def check(ok,label):
     checks.append({"passed":bool(ok),"check":label});print(("PASS " if ok else "FAIL ")+label,flush=True)
@@ -43,7 +46,7 @@ async def main():
         (config/"keyboard.json").write_text(json.dumps({"ime":False,"layout":"us"}))
         apps=home/"data/applications";apps.mkdir(parents=True)
         (apps/"org.domed.Sculpt.desktop").write_text((root/"packaging/org.domed.Sculpt.desktop").read_text())
-        env={**os.environ,"HOME":tmp,"DISPLAY":screen,"XDG_CONFIG_HOME":str(home/"config"),"XDG_DATA_HOME":str(home/"data"),"XDG_CACHE_HOME":str(home/"cache"),"XDG_RUNTIME_DIR":tmp,"XDG_CURRENT_DESKTOP":"Dome","XDG_SESSION_TYPE":"wayland","VK_DRIVER_FILES":"/usr/share/vulkan/icd.d/lvp_icd.json","LIBGL_ALWAYS_SOFTWARE":"1","LIBGL_KOPPER_DISABLE":"true","DOME_RENDER_CAPTURE":str(out/"render.ppm"),"DOME_LOGIN_SESSION":"0","DOME_PREVIEW_PORT":str(port),"DOME_RENDERER":"vulkan","DOME_START_XR":"0","RUST_LOG":"warn"}
+        env={**os.environ,"HOME":tmp,"DISPLAY":screen,"XDG_CONFIG_HOME":str(home/"config"),"XDG_DATA_HOME":str(home/"data"),"XDG_CACHE_HOME":str(home/"cache"),"XDG_RUNTIME_DIR":tmp,"XDG_CURRENT_DESKTOP":"Dome","XDG_SESSION_TYPE":"wayland","VK_DRIVER_FILES":str(icd),"LIBGL_ALWAYS_SOFTWARE":"1","LIBGL_KOPPER_DISABLE":"true","DOME_RENDER_CAPTURE":str(out/"render.ppm"),"DOME_LOGIN_SESSION":"0","DOME_PREVIEW_PORT":str(port),"DOME_RENDERER":"vulkan","DOME_START_XR":"0","RUST_LOG":"warn"}
         for key in ["WAYLAND_DISPLAY","WAYLAND_SOCKET","FLTK_BACKEND","QT_QPA_PLATFORM","LD_LIBRARY_PATH"]:env.pop(key,None)
         host_process=start([str(compositor),"--backend","nested"],"compositor",env)
         base=f"http://127.0.0.1:{port}"

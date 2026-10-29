@@ -219,6 +219,51 @@ int main() try {
     h.tracked.aim.orientation = s->panel.orientation;
     send(0, 0, false, pressure);
   };
+  auto original_uv = doc.frame().state->uv->mesh->uv;
+  auto edge = [&]() {
+    auto &u = doc.frame().state->uv->mesh->uv;
+    return std::hypot(u[1][0] - u[0][0], u[1][1] - u[0][1]);
+  };
+  float initial_edge = edge();
+  aim(178, 85, .8f);
+  send(); // Select Scale, then release/neutral.
+  for (int i = 0; i < 10; i++)
+    send(-1);
+  float coarse = edge();
+  require(std::abs(coarse / initial_edge - std::exp(-.5f * .69314718f)) < .002f,
+          "Continuous UV stick scaling uses elapsed time and logarithmic size");
+  for (int i = 0; i < 10; i++)
+    send(0, -1);
+  require(std::abs(edge() / coarse - std::exp(-.05f * .69314718f)) < .002f,
+          "UV vertical fine wheel scales at one tenth horizontal speed");
+  auto before_turn = doc.frame().state->uv->mesh->uv;
+  float turn_edge = edge();
+  aim(272, 85, .8f);
+  send(); // Turn mode.
+  for (int i = 0; i < 10; i++)
+    send(1);
+  auto after_turn = doc.frame().state->uv->mesh->uv;
+  auto angle = [](const auto &u) {
+    return std::atan2(u[1][1] - u[0][1], u[1][0] - u[0][0]);
+  };
+  require(std::abs(edge() - turn_edge) < 1e-5f &&
+              std::abs(angle(after_turn) - angle(before_turn) -
+                       .5f * .523598776f) < .002f,
+          "Continuous UV turning changes angle while preserving island scale");
+  frame.focused = false;
+  send();
+  frame.focused = true;
+  send();
+  require(!doc.frame().state->uv && !doc.frame().state->dirty,
+          "Continuous UV transforms cancel exactly on focus loss");
+  doc.cancel_spatial_menu();
+  send();
+  send(0, 0, true);
+  send();
+  sector(9);
+  sector(7);
+  require(doc.frame().state->uv->mesh->uv == original_uv,
+          "Cancelled scale/turn draft retains exact saved UV coordinates");
   aim(257, 257, .8f);
   aim(278, 278, .8f);
   send();

@@ -22,11 +22,11 @@ failure and validation results. Preserve the full objective in
   artifacts directories are ignored. Use appropriate native, GUI, compositor and
   sanitizer checks, and distinguish actual device tests from synthetic fixtures.
 
-Build:
+Build (prepare the current canonical DomeD toolkit as in [docs/TOOLKIT.md](docs/TOOLKIT.md) first):
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit/share/fltk"
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
 ```

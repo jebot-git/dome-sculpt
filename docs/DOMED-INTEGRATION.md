@@ -1,7 +1,7 @@
 # DomeD frontend and XR controls
 
 The reference for this audit is the local DomeD compositor README at commit
-`3565a58178795bc8a7a03f90ca91f40477206f07`, together with qimgvr's canonical
+`742d009f446cffdeb89031664b72885ff6f16a19`, together with qimgvr's canonical
 FLTK appearance and universal-menu helpers recorded in the provenance manifest.
 Shared helper files are unchanged. Dome Sculpt adds native application behavior
 around them; there is no Qt, GTK or Pango frontend.
@@ -51,3 +51,7 @@ private DBusMenu host checks exported menu behavior and native dialog shortcuts.
 A synthetic OpenXR runtime checks the client through the real loader and GL
 swapchains. Physical-device comfort, targeting and sustained frame timing remain
 to be verified.
+
+Current toolkit build selection and runtime-library verification are documented
+in [TOOLKIT.md](TOOLKIT.md). The configured build launcher prevents an inherited
+older FLTK installation from overriding the tested native toolkit.

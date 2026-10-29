@@ -112,7 +112,18 @@ if(DOME_BUILD_UI)
   endif()
   include(third_party/desktop/desktop-menu.cmake)
   de_xr_desktop_menu(dome-sculpt)
-  set_target_properties(dome-sculpt PROPERTIES BUILD_RPATH /opt/fltk-vr/toolkit/lib INSTALL_RPATH /opt/fltk-vr/toolkit/lib)
+  set_target_properties(dome-sculpt PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:fltk::fltk-shared>" INSTALL_RPATH /opt/fltk-vr/toolkit/lib)
   install(TARGETS dome-sculpt RUNTIME DESTINATION bin)
   install(FILES packaging/org.domed.Sculpt.desktop DESTINATION share/applications)
+endif()
+# A login session can inherit older same-SONAME FLTK libraries. Exercise the
+# toolkit selected at configure time, not the login session's installation.
+if(BUILD_TESTING AND TARGET dome-sculpt AND DOME_BUILD_XR)
+  set_tests_properties(openxr-client PROPERTIES ENVIRONMENT_MODIFICATION
+    "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
+endif()
+if(TARGET dome-sculpt)
+  file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/run-dome-sculpt"
+    CONTENT "#!/bin/sh\nexport LD_LIBRARY_PATH=\"$<TARGET_FILE_DIR:fltk::fltk-shared>\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}\"\nexec \"$<TARGET_FILE:dome-sculpt>\" \"\$@\"\n"
+    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 endif()
