@@ -1302,7 +1302,8 @@ void Document::finish_control_locked(bool accept) {
     return;
   }
   if (uv_) {
-    if (accept && uv_solving_) throw std::logic_error("Wait for the UV operation before applying");
+    if (accept && (uv_solving_ || !uv_->view().topology))
+      throw std::logic_error("Wait for the UV workspace before applying");
     if (accept && uv_accept_pending_)
       return;
     if (accept && !uv_->view().valid && !uv_->view().validating)
@@ -1371,7 +1372,8 @@ void Document::control_event_locked(VrControlEvent event) {
     if (event.parameter == VrParameter::UvEdit) {
       try {
         ++uv_session_;
-        uv_.emplace(o.painted->mesh(), o.painted->resolution(), true);
+        uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
+                    o.painted->resolution());
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();
@@ -1526,7 +1528,7 @@ void Document::control_event_locked(VrControlEvent event) {
   if (event.type == VrControlEventType::Confirm ||
       event.type == VrControlEventType::Cancel) {
     if (event.type == VrControlEventType::Confirm && uv_ &&
-        !uv_->view().valid && !uv_->view().validating) {
+        (!uv_->view().topology || (!uv_->view().valid && !uv_->view().validating))) {
       state_.error = uv_->view().error;
       input_.resume_control(VrParameter::UvEdit);
       return;

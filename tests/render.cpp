@@ -166,6 +166,7 @@ int main(int argc, char **argv) try {
   if (!doc.wait_asset() || !doc.frame().state->mesh_active || !doc.wait_mesh())
     throw std::runtime_error("Paint mesh preparation failed");
   doc.begin_uv();
+  if (!doc.wait_uv()) throw std::runtime_error("UV initialization did not finish before palette rendering");
   auto uv_state = slider;
   uv_state.controls.parameter = VrParameter::UvEdit;
   uv_state.uv = doc.frame().state->uv;

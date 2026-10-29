@@ -77,24 +77,38 @@ bool overlap(const Mesh &m, uint32_t f, uint32_t g) {
   return std::abs(sum) > tolerance;
 }
 } // namespace
-UvTopology::UvTopology(const Mesh &m) {
+UvTopology::UvTopology(const Mesh &m)
+    : UvTopology(m, {}, SIZE_MAX) {}
+UvTopology::UvTopology(const Mesh &m, const std::function<bool()> &cancelled,
+                        size_t maximum_work) {
+  size_t work = 0;
+  auto step = [&](size_t amount = 1) {
+    if (amount > maximum_work - work)
+      throw std::runtime_error("UV topology work budget exceeded");
+    work += amount;
+    if (cancelled && cancelled()) throw std::runtime_error("UV topology initialization cancelled");
+  };
+  step();
   m.validate();
   if (m.uv.size() != m.positions.size())
     throw std::invalid_argument("UV editing requires an unwrapped mesh");
   std::map<std::array<float, 3>, uint32_t> points;
   std::vector<uint32_t> canonical;
   for (auto p : m.positions) {
+    step();
     auto [it, added] =
         points.emplace(std::array{p.x, p.y, p.z}, uint32_t(canonical.size()));
     canonical.push_back(it->second);
   }
   std::map<std::pair<uint32_t, uint32_t>, std::vector<uint32_t>> adjacency;
   for (uint32_t c = 0; c < m.indices.size(); ++c) {
+    step();
     auto a = canonical[m.indices[c]], b = canonical[m.indices[next(c)]];
     adjacency[std::minmax(a, b)].push_back(c);
   }
   Dsu regions(m.indices.size() / 3);
   for (auto &[key, corners] : adjacency) {
+    step(corners.size());
     UvEdge e{m.indices[corners[0]], m.indices[next(corners[0])], corners,
              corners.size() != 2};
     if (corners.size() == 2) {
@@ -112,6 +126,7 @@ UvTopology::UvTopology(const Mesh &m) {
   face_island.resize(m.indices.size() / 3);
   std::map<uint32_t, uint32_t> ids;
   for (uint32_t f = 0; f < face_island.size(); ++f) {
+    step();
     auto [it, added] = ids.emplace(regions.root(f), uint32_t(islands.size()));
     if (added)
       islands.emplace_back();
@@ -120,6 +135,7 @@ UvTopology::UvTopology(const Mesh &m) {
   }
 }
 bool uv_changed(const Mesh &a, const Mesh &b) {
+  if (&a == &b) return false;
   if (a.indices.size() != b.indices.size())
     return true;
   for (size_t c = 0; c < a.indices.size(); ++c) {
@@ -175,6 +191,66 @@ std::string validate_uv(const Mesh &m, const std::function<bool()> &cancelled) {
       }
   }
   return {};
+}
+UvWorkspace::UvWorkspace(std::shared_ptr<const Mesh> source, uint32_t resolution)
+    : resolution_(resolution), defer_validation_(true) {
+  if (!source || resolution < 64 || resolution > 2048)
+    throw std::invalid_argument("Invalid immutable UV source or resolution");
+  view_.mesh = std::move(source);
+  view_.valid = false;
+  view_.validating = view_.solving = true;
+  view_.error = "Preparing UV charts...";
+}
+void UvWorkspace::initialize(const std::function<bool()> &cancelled,
+                             UvInitializationLimits limits) {
+  if (view_.topology) return;
+  if (!limits.maximum_vertices || limits.maximum_vertices > 2'000'000 ||
+      !limits.maximum_triangles || limits.maximum_triangles > 2'000'000 ||
+      !limits.maximum_work || limits.maximum_work > 500'000'000 ||
+      limits.maximum_bytes < 1024 || limits.maximum_bytes > 1024ull*1024*1024)
+    throw std::invalid_argument("Invalid UV initialization resource bounds");
+  auto stop = [&] { if (cancelled && cancelled())
+    throw std::runtime_error("UV initialization cancelled"); };
+  stop();
+  const auto &source = *view_.mesh;
+  if (source.positions.size() > limits.maximum_vertices ||
+      source.indices.size()/3 > limits.maximum_triangles)
+    throw std::length_error("UV initialization geometry budget exceeded");
+  if (source.normals.size() != source.positions.size() ||
+      source.uv.size() != source.positions.size() ||
+      (!source.uv_pins.empty() && source.uv_pins.size() != source.positions.size()) ||
+      (!source.uv_seams.empty() && source.uv_seams.size() != source.indices.size()))
+    throw std::invalid_argument("UV initialization requires an unwrapped mesh with matching attribute counts");
+  long double bytes = static_cast<long double>(source.positions.size())*160 +
+                      static_cast<long double>(source.indices.size())*224;
+  if (bytes > limits.maximum_bytes)
+    throw std::length_error("UV initialization memory budget exceeded");
+  if (source.positions.size() + source.indices.size()*2 +
+      source.indices.size()/3 + 1 > limits.maximum_work)
+    throw std::length_error("UV initialization work budget exceeded");
+  // The only deep geometry copy is here, on the worker, after resource checks.
+  Mesh mesh = source;
+  stop();
+  if (mesh.uv_pins.empty()) mesh.uv_pins.resize(mesh.positions.size());
+  if (mesh.uv_seams.empty()) mesh.uv_seams.resize(mesh.indices.size());
+  auto topology = std::make_shared<UvTopology>(mesh, cancelled, limits.maximum_work);
+  auto mapping = std::make_shared<std::vector<uint32_t>>(mesh.positions.size());
+  for (uint32_t i = 0; i < mapping->size(); ++i) {
+    if ((i & 1023) == 0) stop();
+    (*mapping)[i] = i;
+  }
+  auto prepared = std::make_shared<const Mesh>(std::move(mesh));
+  stop();
+  UvView ready = view_;
+  ready.mesh = std::move(prepared);
+  ready.topology = std::move(topology);
+  ready.source_vertices = std::move(mapping);
+  ready.solving = false;
+  ready.validating = true;
+  ready.valid = ready.can_undo = ready.can_redo = false;
+  ready.error = "Checking UVs...";
+  ready.revision = ++revision_;
+  view_ = std::move(ready);
 }
 UvWorkspace::UvWorkspace(Mesh m, uint32_t resolution, bool defer_validation)
     : resolution_(resolution), defer_validation_(defer_validation) {
@@ -236,10 +312,12 @@ void UvWorkspace::publish(Mesh m, bool topology,
 }
 bool UvWorkspace::validated(const std::shared_ptr<const Mesh> &mesh,
                             std::string error) {
-  if (view_.mesh != mesh || !view_.validating)
+  if (view_.mesh != mesh || !view_.validating ||
+      (!view_.topology && error.empty()))
     return false;
   view_.error = std::move(error);
   view_.validating = false;
+  view_.solving = false;
   view_.valid = view_.error.empty();
   view_.revision = ++revision_;
   return true;
@@ -257,6 +335,9 @@ std::vector<uint32_t> UvWorkspace::selected() const {
 }
 void UvWorkspace::edit(UvAction action, float x, float y,
                        const std::function<bool()> &cancelled) {
+  if (!view_.topology)
+    throw std::logic_error(view_.validating ? "UV workspace is initializing; wait or cancel"
+        : "UV workspace unavailable; cancel and reopen: " + view_.error);
   size_t work = 0;
   auto step = [&] {
     if (++work > 50'000'000) throw std::runtime_error("UV edit work budget exceeded");
