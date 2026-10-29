@@ -387,6 +387,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   stop(options);
   if (input_objects.empty())
     fail("no avatar surfaces");
+  for(const auto &object:input_objects)if(object.source_dormant)
+    fail("source attributes are dormant for "+object.name+
+      "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");
   auto objects = input_objects;
   const CreatorAppearance *origin = nullptr;
   uint64_t group = 0;

@@ -18,7 +18,7 @@ struct SurfaceTextureLimits {
 };
 // Final RGB transfer only; alpha stays linear. Linear requires a linear target.
 enum class SurfaceOutputEncoding { Srgb, Linear };
-struct SurfaceTextureStats {size_t images=0,samplers=0,bytes=0;uint64_t uploads=0;};
+struct SurfaceTextureStats {size_t images=0,samplers=0,bytes=0;uint64_t uploads=0;size_t packed_bytes=0;uint64_t pack_builds=0;};
 class SurfaceRenderer {
   GLuint program_ = 0, vao_ = 0, vertices_ = 0, indices_ = 0;
   size_t count_ = 0;

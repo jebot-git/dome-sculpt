@@ -3,9 +3,11 @@
 #include "dome/render.hpp"
 #include <cstddef>
 #include "dome/source-maps.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "render-mtoon.hpp"
 #include "render-target.hpp"
+#include "render-source-pack.hpp"
 #include <chrono>
 #include <unordered_set>
 namespace dome {
@@ -79,6 +81,16 @@ std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance)
 }
 int mtoon_coordinate(const MToonTexture&t){int coordinate=t.transform_texcoord>=0?t.transform_texcoord:int(t.texcoord);if(coordinate<0||coordinate>1)throw std::runtime_error("MToon preview requires a retained UV0 or UV1 set");return coordinate;}
 bool mtoon_shade_alias(const MToonMaterial&m){auto &a=m.textures[0],&b=m.textures[1];return a.index>=0&&a.index==b.index&&mtoon_coordinate(a)==mtoon_coordinate(b)&&(m.version()==MToonVersion::V0||(a.offset==b.offset&&a.scale==b.scale&&a.rotation==b.rotation));}
+bool resolved_shade_alias(const MToonMaterial &m,const std::array<PaintSourceTexture,size_t(MToonSlot::Count)> &roles) {
+  const auto &a=roles[0],&b=roles[1];const auto &x=m.textures[0],&y=m.textures[1];
+  return a.image && a.image==b.image && a.wrap_s==b.wrap_s && a.wrap_t==b.wrap_t &&
+    a.min_filter==b.min_filter && a.mag_filter==b.mag_filter && mtoon_coordinate(x)==mtoon_coordinate(y) &&
+    (m.version()==MToonVersion::V0 || (x.offset==y.offset && x.scale==y.scale && x.rotation==y.rotation));
+}
+SourceNativeMaterial native_source(const CreatorAppearance &appearance) {
+  const auto &m=appearance.asset->materials.at(size_t(appearance.material));
+  return {m.color,m.emissive,m.alpha==ImportedMaterial::AlphaMode::Opaque?1:m.alpha==ImportedMaterial::AlphaMode::Mask?2:3,m.alpha_cutoff,m.double_sided};
+}
 float mtoon_factor(float typed,float original,float current){if(current==original)return typed;if(original!=0)return typed*current/original;return current==0?typed:current;}
 GLenum mtoon_blend(int value){constexpr GLenum factors[]={GL_ZERO,GL_ONE,GL_DST_COLOR,GL_SRC_COLOR,GL_ONE_MINUS_DST_COLOR,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_COLOR,GL_DST_ALPHA,GL_ONE_MINUS_DST_ALPHA,GL_SRC_ALPHA_SATURATE,GL_ONE_MINUS_SRC_ALPHA};if(value<0||value>10)throw std::runtime_error("Unsupported MToon blend factor");return factors[value];}
 }
@@ -91,8 +103,18 @@ struct SurfaceRenderer::TextureState {
   struct ImageResource {std::shared_ptr<const Image> owner;GLuint id=0;bool mips=false;size_t bytes=0;};
   struct Slot {GLuint image=0,sampler=0;std::array<float,6> uv{1,0,0,1,0,0};};
   using Binding=std::array<Slot,16>;
-  struct Toon {std::shared_ptr<const CreatorAppearance> appearance;MToonMaterial material;bool derived=false,shade_alias=false,baked_normal=false;};
+  struct Toon {
+    std::shared_ptr<const CreatorAppearance> appearance;
+    std::shared_ptr<const SourceMaterialBindings> source;
+    MToonMaterial material;SourceNativeMaterial native;
+    std::array<PaintSourceTexture,size_t(MToonSlot::Count)> roles;
+    std::array<PaintSourceTexture,4> packed_views;
+    std::array<bool,4> packed_srgb{true,true,true,false};
+    MToonSourcePacks::Inputs packed_inputs;
+    bool derived=false,shade_alias=false,baked_normal=false;
+  };
   std::unordered_map<uint64_t,Toon> toons;
+  MToonSourcePacks packed_sources;
   std::vector<std::array<float,2>> uv1;
   std::unordered_set<uint64_t> weighted;
   std::optional<double> frame_time;
@@ -112,8 +134,8 @@ struct SurfaceRenderer::TextureState {
   static size_t storage(const Image&i,bool mips){size_t bytes=0;uint32_t w=i.width,h=i.height;for(;;){bytes+=size_t(w)*h*4;if(!mips||(w==1&&h==1))return bytes;w=std::max(1u,w/2);h=std::max(1u,h/2);}}
   static Sampler sampler(const PaintSourceTexture&s){return {s.wrap_s,s.wrap_t,s.min_filter?s.min_filter:GL_LINEAR,s.mag_filter?s.mag_filter:GL_LINEAR};}
   static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
-  SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size(),samplers.size(),bytes,uploads};}
-  void clear(bool release){if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();weighted.clear();}
+  SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size(),samplers.size(),bytes+packed_sources.bytes(),uploads,packed_sources.bytes(),packed_sources.builds()};}
+  void clear(bool release){packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();weighted.clear();}
   void prepare(const MeshSnapshot&mesh){
     if(!mesh.tangents.empty()&&mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Canonical tangent count differs from packed geometry");
     for(auto t:mesh.tangents)if(!finite(Vec3{t[0],t[1],t[2]})||length(Vec3{t[0],t[1],t[2]})<1e-8f||!std::isfinite(t[3])||std::abs(std::abs(t[3])-1)>1e-5f)throw std::invalid_argument("Invalid canonical tangent frame");
@@ -132,6 +154,14 @@ struct SurfaceRenderer::TextureState {
     std::unordered_map<uint64_t,Toon> next_toons;std::vector<std::array<float,2>> next_uv1;
     for(auto &range:mesh.ranges){
       auto maps=range.textures;auto &plan=planned[range.object];
+      if(maps&&maps->source_only) {
+        auto present=[](const Image &image){return image.width||image.height||!image.rgba.empty();};
+        if(!maps->source_maps || maps->source_maps->empty() || maps->baked_base ||
+           present(maps->color)||present(maps->metal_rough)||present(maps->emission)||present(maps->normal)||
+           present(maps->color_coverage)||present(maps->emission_coverage)||present(maps->baked_normal)||present(maps->baked_coverage))
+          throw std::invalid_argument("Raw source preview marker contains derived material payload");
+        maps->source_maps->validate();
+      }
       auto slot=[&](int index,std::shared_ptr<const Image> image,const PaintSourceTexture&view,bool srgb){
         if(!image)return;
         view.validate();image->validate();Key key{image.get(),srgb};auto sample=sampler(view);
@@ -139,26 +169,54 @@ struct SurfaceRenderer::TextureState {
         wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true};
       };
       std::optional<MToonMaterial> typed;
-      if(auto previous=toons.find(range.object);previous!=toons.end()&&previous->second.appearance==range.appearance)typed=previous->second.material;
+      if(range.material_bindings) {
+        range.material_bindings->validate();
+        if(range.material_bindings->has_mtoon)typed=range.material_bindings->material;
+      } else if(auto previous=toons.find(range.object);previous!=toons.end() &&
+                previous->second.appearance==range.appearance && !previous->second.source)typed=previous->second.material;
       else typed=retained_mtoon(range.appearance.get());
       if(typed){
-        Toon toon{range.appearance,*typed,maps&&!maps->source_only,mtoon_shade_alias(*typed)};
-        const auto &appearance=*range.appearance;const auto &asset=*appearance.asset;
+        Toon toon;toon.appearance=range.appearance;toon.source=range.material_bindings;toon.material=*typed;
+        toon.derived=maps&&!maps->source_only;
+        if(toon.source) {toon.roles=toon.source->roles;toon.native=toon.source->native_reference;}
+        else {
+          toon.native=native_source(*range.appearance);const auto &asset=*range.appearance->asset;
+          for(size_t role=0;role<size_t(MToonSlot::Count);++role) {
+            const auto &t=typed->textures[role];if(t.index<0)continue;
+            const auto &texture=asset.textures.at(size_t(t.index));
+            if(texture.image<0 || size_t(texture.image)>=range.appearance->decoded_images->size())
+              throw std::runtime_error("MToon image reference is missing");
+            auto &view=toon.roles[role];view.image=range.appearance->decoded_images->at(texture.image);
+            view.wrap_s=texture.wrap_s;view.wrap_t=texture.wrap_t;
+            view.min_filter=texture.min_filter;view.mag_filter=texture.mag_filter;
+          }
+        }
+        toon.shade_alias=toon.source?resolved_shade_alias(*typed,toon.roles):mtoon_shade_alias(*typed);
         bool needs_uv1=false;
-        auto original=[&](int destination,int role){const auto &t=typed->textures[role];if(t.index<0)return;int coordinate=mtoon_coordinate(t);needs_uv1|=coordinate==1;
-          const auto &texture=asset.textures.at(size_t(t.index));if(texture.image<0||size_t(texture.image)>=appearance.decoded_images->size())throw std::runtime_error("MToon image reference is missing");
-          PaintSourceTexture view;view.image=appearance.decoded_images->at(texture.image);view.wrap_s=texture.wrap_s;view.wrap_t=texture.wrap_t;view.min_filter=texture.min_filter;view.mag_filter=texture.mag_filter;
-          slot(destination,view.image,view,t.encoding==MToonEncoding::Srgb);
+        auto original=[&](int destination,int role) {
+          const auto &t=typed->textures[role];if(t.index<0)return;
+          if(role!=int(MToonSlot::Matcap))needs_uv1|=mtoon_coordinate(t)==1;
+          const auto &view=toon.roles[role];slot(destination,view.image,view,t.encoding==MToonEncoding::Srgb);
         };
         for(int role=0;role<11;++role)original(role,role);
         if(toon.derived){
-          if(!maps->source_maps)throw std::runtime_error("Derived MToon preview lacks its original source views");
-          maps->color_coverage.validate();
+          maps->color_coverage.validate();maps->emission_coverage.validate();
+          PaintSourceMaps empty;const auto &source_maps=maps->source_maps?*maps->source_maps:empty;
           original(12,0);
           auto derived=[&](int destination,const Image&image,const PaintSourceTexture&original,bool srgb){auto view=original;view.uv_transform={1,0,0,1,0,0};if(!view.image)view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;slot(destination,std::shared_ptr<const Image>(maps,&image),view,srgb);};
-          derived(0,maps->color,maps->source_maps->color,true);derived(3,maps->emission,maps->source_maps->emission,true);
-          derived(11,maps->color_coverage,maps->source_maps->color,false);
-          slot(14,maps->source_maps->color.image,maps->source_maps->color,true);
+          derived(0,maps->color,source_maps.color,true);derived(3,maps->emission,source_maps.emission,true);
+          derived(11,maps->color_coverage,source_maps.color,false);
+          slot(14,source_maps.color.image,source_maps.color,true);
+          toon.packed_views={source_maps.color,toon.roles[3],source_maps.emission,source_maps.emission};
+          toon.packed_srgb[1]=typed->textures[3].encoding==MToonEncoding::Srgb;
+          auto &coverage=toon.packed_views[3];coverage.image=std::shared_ptr<const Image>(maps,&maps->emission_coverage);
+          coverage.texcoord=0;coverage.uv_transform={1,0,0,1,0,0};
+          if(!source_maps.emission.image)coverage.wrap_s=coverage.wrap_t=GL_CLAMP_TO_EDGE;
+          for(size_t packed=0;packed<4;++packed) {
+            const auto &view=toon.packed_views[packed];if(!view.image)continue;view.validate();view.image->validate();
+            Key key{view.image.get(),toon.packed_srgb[packed]};auto sample=sampler(view);
+            auto &desired=wanted[key];desired.owner=view.image;desired.mips|=mipmapped(sample);wanted_samplers.insert(sample);
+          }
           if(!maps->normal.rgba.empty()){
             if(!maps->baked_base||maps->baked_normal.rgba.empty()||maps->baked_coverage.rgba.empty()||mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Typed baked normals require original canonical data, coverage and worker tangent corners");
             PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;
@@ -166,6 +224,8 @@ struct SurfaceRenderer::TextureState {
           }
         }
         if(needs_uv1){
+          if(!range.appearance || !range.appearance->asset)throw std::runtime_error("Resolved MToon UV1 requires retained primitive provenance");
+          const auto &appearance=*range.appearance;const auto &asset=*appearance.asset;
           const ImportedPrimitive *primitive=nullptr;for(const auto &p:asset.primitives)if(p.source_mesh==appearance.source_mesh&&p.source_primitive==appearance.source_primitive){if(primitive)throw std::runtime_error("MToon source primitive identity is ambiguous");primitive=&p;}
           if(!primitive||primitive->uv1.size()!=primitive->mesh.positions.size()||appearance.source_vertices.empty()||range.first_vertex>mesh.mesh.positions.size()||appearance.source_vertices.size()>mesh.mesh.positions.size()-range.first_vertex)throw std::runtime_error("MToon selected UV1 data/remap is unavailable");
           if(next_uv1.empty())next_uv1.resize(mesh.mesh.positions.size());
@@ -199,6 +259,15 @@ struct SurfaceRenderer::TextureState {
       auto &i=*desired.owner;if(i.width>uint32_t(maximum)||i.height>uint32_t(maximum))throw std::length_error("Original image exceeds hardware texture dimensions");
       size_t count=storage(i,desired.mips);if(count>limits.max_bytes-bytes)throw std::length_error("GPU original texture byte budget exceeded");bytes+=count;
     }
+    std::vector<MToonSourcePacks::Inputs> source_packs;
+    for(auto &[object,toon]:next_toons)if(toon.derived) {
+      for(size_t view=0;view<4;++view)if(const auto &image=toon.packed_views[view].image) {
+        Key key{image.get(),toon.packed_srgb[view]};
+        toon.packed_inputs[view]={image,0,wanted.at(key).mips,key.srgb};
+      }
+      source_packs.push_back(toon.packed_inputs);
+    }
+    packed_sources.preflight(source_packs,bytes,wanted.size(),limits);
     for(auto it=images.begin();it!=images.end();)if(!wanted.contains(it->first)){glDeleteTextures(1,&it->second.id);it=images.erase(it);}else ++it;
     for(auto it=samplers.begin();it!=samplers.end();)if(!wanted_samplers.contains(it->first)){glDeleteSamplers(1,&it->second);it=samplers.erase(it);}else ++it;
     glActiveTexture(GL_TEXTURE0);glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -219,6 +288,12 @@ struct SurfaceRenderer::TextureState {
       if(glGetError()!=GL_NO_ERROR){glDeleteSamplers(1,&id);throw std::runtime_error("Original GPU sampler allocation failed");}
       try{samplers.emplace(sample,id);}catch(...){glDeleteSamplers(1,&id);throw;}
     }
+    source_packs.clear();
+    for(auto &[object,toon]:next_toons)if(toon.derived) {
+      for(auto &view:toon.packed_inputs)if(view.owner)view.texture=images.at(Key{view.owner.get(),view.srgb}).id;
+      source_packs.push_back(toon.packed_inputs);
+    }
+    packed_sources.prepare(source_packs,bytes,wanted.size(),limits);
     std::unordered_map<uint64_t,Binding> ready;
     for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv};}
     bindings=std::move(ready);toons=std::move(next_toons);uv1=std::move(next_uv1);weighted=std::move(next_weighted);
@@ -341,6 +416,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     cached_ = std::move(mesh);
   }
   glUseProgram(program_);
+  glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
   glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
   auto m = model_matrix(model), mvp = multiply(vp, m);
   glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE,
@@ -412,33 +488,55 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                    reinterpret_cast<void *>(first * sizeof(uint32_t)));
   };
   auto toon_state=[&](const SurfaceRange&r,const TextureState::Toon&t,bool outline){
-    auto state=t.material.render_state(outline);const auto &source=t.appearance->asset->materials.at(size_t(t.appearance->material));
-    auto original=source.alpha==ImportedMaterial::AlphaMode::Opaque?Material::AlphaMode::Opaque:source.alpha==ImportedMaterial::AlphaMode::Mask?Material::AlphaMode::Mask:Material::AlphaMode::Blend;
+    auto state=t.material.render_state(outline);const auto &source=t.native;
+    auto original=Material::AlphaMode(source.alpha);
     if(r.material.alpha!=Material::AlphaMode::Automatic&&r.material.alpha!=original){bool blend=r.material.alpha==Material::AlphaMode::Blend;state.blend=blend;state.depth_write=!blend;state.source_rgb=blend?5:1;state.destination_rgb=blend?10:0;state.source_alpha=t.material.version()==MToonVersion::V0?state.source_rgb:1;state.destination_alpha=state.destination_rgb;state.queue=blend?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;}
     if(!outline&&r.material.double_sided!=source.double_sided)state.cull=r.material.double_sided?MToonCull::Off:MToonCull::Back;
     return state;
   };
   auto draw_toon=[&](const SurfaceRange&r,const TextureState::Toon&t,bool outline){
-    auto u=t.material.gpu_parameters();auto &source=t.appearance->asset->materials.at(size_t(t.appearance->material));std::array<float,4> effective{};
+    auto u=t.material.gpu_parameters();const auto &source=t.native;std::array<float,4> effective{};std::array<float,3> effective_emission{};
     for(int k=0;k<4;++k)effective[k]=mtoon_factor(u[0][k],source.color[k],r.material.color[k]);
-    for(int k=0;k<3;++k)u[2][k]=mtoon_factor(u[2][k],source.emissive[k],r.material.emissive[k]);
+    const auto &emission=t.material.parameters.emission;
+    std::array<float,3> authored_emission{emission.x,emission.y,emission.z};
+    float emission_strength=t.material.parameters.emission_strength;
+    for(int k=0;k<3;++k) {
+      effective_emission[k]=mtoon_factor(authored_emission[k],source.emission[k],r.material.emissive[k]);
+      u[2][k]=effective_emission[k]*emission_strength;
+    }
     u[0]=effective;
-    if(t.derived){u[0]={1,1,1,1};u[2][0]=u[2][1]=u[2][2]=1;}
-    auto original=source.alpha==ImportedMaterial::AlphaMode::Opaque?Material::AlphaMode::Opaque:source.alpha==ImportedMaterial::AlphaMode::Mask?Material::AlphaMode::Mask:Material::AlphaMode::Blend;
+    if(t.derived){u[0]={1,1,1,1};u[2][0]=u[2][1]=u[2][2]=emission_strength;}
+    auto original=Material::AlphaMode(source.alpha);
     if(r.material.alpha!=Material::AlphaMode::Automatic&&r.material.alpha!=original)u[8][1]=r.material.alpha==Material::AlphaMode::Opaque?0:r.material.alpha==Material::AlphaMode::Mask?1:2;
     if(r.material.alpha_cutoff!=source.alpha_cutoff)u[6][3]=r.material.alpha_cutoff;
     std::array<GLint,16> present{},coordinates{},derived{},channels{};std::array<float,32> offsets{},scales{};std::array<float,16> rotations{};std::array<float,6> pbrx{},pbry{};
     auto &binding=textures_->bindings.at(r.object);
-    for(int n=0;n<16;++n){auto &slot=binding[n];glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);present[n]=slot.image!=0;
+    for(int n=0;n<16;++n){auto &slot=binding[n];glActiveTexture(GL_TEXTURE0+n);
+      if(n==14){glBindTexture(GL_TEXTURE_BUFFER,t.derived?textures_->packed_sources.at(t.packed_inputs).texture:0);glBindSampler(n,0);}
+      else {glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);}
+      present[n]=slot.image!=0;
       int role=n==12?0:n==13?3:n;scales[n*2]=scales[n*2+1]=1;
-      if(role<11){auto &texture=t.material.textures[role];coordinates[n]=mtoon_coordinate(texture);offsets[n*2]=texture.offset[0];offsets[n*2+1]=texture.offset[1];scales[n*2]=texture.scale[0];scales[n*2+1]=texture.scale[1];rotations[n]=texture.rotation;channels[n]=texture.channel;}
+      if(role<11){auto &texture=t.material.textures[role];coordinates[n]=role==int(MToonSlot::Matcap)?0:mtoon_coordinate(texture);offsets[n*2]=texture.offset[0];offsets[n*2+1]=texture.offset[1];scales[n*2]=texture.scale[0];scales[n*2+1]=texture.scale[1];rotations[n]=texture.rotation;channels[n]=texture.channel;}
       if(n>=14){int k=n-14;pbrx[k*3]=slot.uv[0];pbrx[k*3+1]=slot.uv[1];pbrx[k*3+2]=slot.uv[4];pbry[k*3]=slot.uv[2];pbry[k*3+1]=slot.uv[3];pbry[k*3+2]=slot.uv[5];}
       auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);
     }
-    if(t.derived)derived[0]=derived[3]=1;
+    if(t.derived) {
+      derived[0]=derived[3]=1;
+      const auto &pack=textures_->packed_sources.at(t.packed_inputs);
+      std::array<std::array<GLint,4>,4> sampling{};
+      for(size_t view=0;view<4;++view)sampling[view]=TextureState::sampler(t.packed_views[view]);
+      glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
+      glUniform4iv(glGetUniformLocation(program_,"mt_pack_levels[0]"),56,pack.levels[0].data());
+      glUniform2iv(glGetUniformLocation(program_,"mt_pack_info[0]"),4,pack.info[0].data());
+      glUniform4iv(glGetUniformLocation(program_,"mt_pack_sampler[0]"),4,sampling[0].data());
+      const auto &uv=t.packed_views[2].uv_transform;
+      pbrx[3]=uv[0];pbrx[4]=uv[1];pbrx[5]=uv[4];pbry[3]=uv[2];pbry[4]=uv[3];pbry[5]=uv[5];
+    }
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),1);glUniform1i(glGetUniformLocation(program_,"mt_outline"),outline);glUniform1i(glGetUniformLocation(program_,"mt_baked_normal"),t.baked_normal);glUniform4fv(glGetUniformLocation(program_,"mt[0]"),12,u[0].data());
     glUniform1iv(glGetUniformLocation(program_,"mt_present[0]"),16,present.data());glUniform1iv(glGetUniformLocation(program_,"mt_coord[0]"),16,coordinates.data());glUniform1iv(glGetUniformLocation(program_,"mt_derived[0]"),16,derived.data());glUniform1iv(glGetUniformLocation(program_,"mt_channel[0]"),16,channels.data());
     glUniform2fv(glGetUniformLocation(program_,"mt_offset[0]"),16,offsets.data());glUniform2fv(glGetUniformLocation(program_,"mt_scale[0]"),16,scales.data());glUniform1fv(glGetUniformLocation(program_,"mt_rotation[0]"),16,rotations.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_x[0]"),2,pbrx.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_y[0]"),2,pbry.data());
+    glUniform3fv(glGetUniformLocation(program_,"mt_effective_emission"),1,effective_emission.data());
+    glUniform3fv(glGetUniformLocation(program_,"mt_native_emission"),1,r.material.emissive.data());
     glUniform4fv(glGetUniformLocation(program_,"mt_effective_color"),1,effective.data());glUniform4fv(glGetUniformLocation(program_,"mt_native_color"),1,r.material.color.data());glUniform1i(glGetUniformLocation(program_,"mt_shade_alias"),t.shade_alias);
     auto state=toon_state(r,t,outline);
     if(state.cull==MToonCull::Off)glDisable(GL_CULL_FACE);else{glEnable(GL_CULL_FACE);glCullFace(state.cull==MToonCull::Front?GL_FRONT:GL_BACK);}

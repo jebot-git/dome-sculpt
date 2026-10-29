@@ -102,6 +102,7 @@ struct SurfaceRange {
   std::shared_ptr<const TextureMaps> textures{};
   std::shared_ptr<const CreatorAppearance> appearance{};
   size_t first_vertex = 0;
+  std::shared_ptr<const SourceMaterialBindings> material_bindings{};
 };
 struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;

@@ -39,7 +39,7 @@ target_include_directories(xatlas PUBLIC third_party/xatlas)
 target_link_libraries(xatlas PRIVATE Threads::Threads)
 add_library(mikktspace STATIC third_party/mikktspace/mikktspace.c)
 target_include_directories(mikktspace PUBLIC third_party/mikktspace)
-add_library(dome-sculpt-core src/volume.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/tangents.cpp src/bake-authoring.cpp src/document-baking.cpp src/creator-archive.cpp src/paint.cpp src/projection.cpp src/source-maps.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/source-morph.cpp src/vrm.cpp src/input.cpp src/document.cpp src/document-uv-solve.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/vroid-groom.cpp src/deformation.cpp src/rig-edit.cpp src/weight-edit.cpp src/weight-authoring.cpp src/skin-authoring.cpp src/document-skin.cpp src/uv-solve.cpp src/import.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
+add_library(dome-sculpt-core src/volume.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/tangents.cpp src/bake-authoring.cpp src/document-baking.cpp src/creator-archive.cpp src/paint.cpp src/projection.cpp src/source-maps.cpp src/material-bindings.cpp src/source-uv-bake.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/source-morph.cpp src/vrm.cpp src/input.cpp src/document.cpp src/document-uv-solve.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/vroid-groom.cpp src/deformation.cpp src/rig-edit.cpp src/weight-edit.cpp src/weight-authoring.cpp src/skin-authoring.cpp src/document-skin.cpp src/uv-solve.cpp src/import.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)
 target_compile_definitions(dome-sculpt-core PRIVATE
@@ -247,6 +247,27 @@ if(BUILD_TESTING)
   target_include_directories(dome-sculpt-document-export-test PRIVATE third_party/cgltf)
   target_link_libraries(dome-sculpt-document-export-test PRIVATE dome-sculpt-core PNG::PNG)
   add_test(NAME document-export COMMAND dome-sculpt-document-export-test)
+endif()
+
+if(BUILD_TESTING)
+  foreach(component source-uv-bake source-uv-adopt)
+    add_executable(dome-sculpt-${component}-test tests/${component}.cpp)
+    target_link_libraries(dome-sculpt-${component}-test PRIVATE dome-sculpt-core)
+  endforeach()
+  add_test(NAME source-uv-bake COMMAND dome-sculpt-source-uv-bake-test
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
+  add_test(NAME source-uv-adopt COMMAND dome-sculpt-source-uv-adopt-test)
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-mtoon-emission-test tests/mtoon-emission.cpp)
+  target_link_libraries(dome-sculpt-mtoon-emission-test PRIVATE dome-sculpt-render)
+  target_link_options(dome-sculpt-mtoon-emission-test PRIVATE
+    -Wl,--wrap=glGetTexImage -Wl,--wrap=glGetIntegerv)
+  add_test(NAME mtoon-emission COMMAND dome-sculpt-mtoon-emission-test)
+  set_tests_properties(mtoon-emission PROPERTIES
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
 
 if(BUILD_TESTING)
