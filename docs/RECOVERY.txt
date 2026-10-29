@@ -1,0 +1,90 @@
+Native crash recovery service
+=============================
+
+RecoveryService owns a single ordered worker. Construct it outside active frame
+work with default_recovery_directory() or a private test/user state directory.
+Construction itself starts no filesystem work. Give each logical document a
+new_recovery_id(), never a filename-derived shared ID. IDs and source generation
+identify a snapshot; source_path is metadata only and is never read or written.
+
+Integration (Document/model lock held only while taking the COW snapshot):
+  RecoverySource source{id, state.generation, path};
+  recovery.set_source(source);
+  recovery.enqueue({source, state.revision, content, scene.snapshot()});
+
+Replace/update source before scheduling replacement snapshots. Old generation
+jobs cannot pass the final metadata commit guard. Monotonic revisions are
+ordered; an unchanged failed revision may be retried. Two pending snapshots
+(default) plus one in-flight scene are retained, coalescing oldest pending work
+under load. One lightweight conditional-discard request may also be pending.
+Snapshots must contain completed transactions; do not checkpoint unresolved
+UV/paint/sculpt drafts or stale pending asset results. The service validates
+through the native Scene serializer on its worker.
+
+Poll status() for pending/busy/error/latest. flush(timeout) means only that the
+queue drained, not that storage succeeded: inspect status().error. Failures are
+sticky until a later successful operation. Destructor/shutdown drains accepted
+work and joins; call it outside frame callbacks. There is no cancellation of a
+native serializer already running and no hard real-time shutdown guarantee.
+
+After a confirmed DURABLE user save, call discard(saved_source,saved_revision).
+Never call it on failed/cancelled saves. A newer recovery revision is retained;
+a stale save completion cannot clear a replacement document. The user-save
+path must fsync its parent directory after atomic rename before recovery cleanup.
+Explicit discard of unsaved work belongs to the user's existing confirmation
+workflow. No recovery snapshot marks a document clean or adopts the source path.
+
+On a startup/file worker, discover(root) returns the newest checksum-valid
+candidate per source plus errors/truncation. load(candidate) rechecks metadata,
+file bounds, identity and checksum before decoding the verified CBOR bytes.
+Report corrupt/inaccessible entries to the native UI; do not silently treat an
+empty candidate list with errors as successful recovery. Recovery/rejection
+must remain a user decision, not an automatic overwrite of the original file.
+
+Persistence protocol
+--------------------
+- Root is an owned 0700 directory; metadata/scenes/locks are private 0600 files.
+  Symlink roots/files, hardlinked files and FIFO/device records are rejected.
+- A random immutable filename contains a native .dsculpt snapshot and versioned
+  JSON .recovery metadata with source identity/path, generation, revision,
+  content ID, monotonic sequence, byte length and FNV-1a64 checksum.
+- The native serializer atomically writes/fsyncs staged scene data. Metadata is
+  written/fsynced separately. Data is renamed first; atomic metadata rename is
+  the publication marker. The directory is fsynced before pruning old records.
+  Newly created directory entries are also synced through their parents.
+- A stale source cannot publish its final metadata. Same-ID concurrent writers
+  are guarded by a nonblocking filesystem lock. Distinct random document IDs
+  allow multiple application instances to share the recovery directory.
+- Two valid checkpoints per source are retained by default. Corrupt newer data
+  falls back to previous valid data with an explicit discovery error. A failed
+  write or directory sync never deletes the previous checkpoint. Prune failure
+  retains extra valid records and reports the error; a later checkpoint retries.
+- Process death before metadata publication can leave ignored staging/orphan
+  files. They are deliberately not deleted by discovery. They count toward the
+  bounded directory scan; repeated interrupted runs may need explicit user/admin
+  cleanup. Do not silently erase unidentified or corrupt recovery data.
+- File size is bounded by the native Scene 256 MiB limit and the configured
+  publication limit. Smaller custom limits reject oversized staged scenes before
+  publication; native serialization may temporarily use its normal 256 MiB budget.
+  Pending snapshot count is bounded, not total memory across all documents or
+  the serializer's temporary native JSON representation. Queue coalescing may
+  reclaim old COW snapshot storage on the submitting thread.
+
+The checksum detects accidental corruption, not adversarial modification by
+another process with the same Unix identity. No Python runtime is involved.
+No active session, original user project, desktop or system install is modified.
+
+Validation
+----------
+Direct Release native test (after core library build):
+  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/recovery.cpp src/recovery.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-recovery-test
+  /tmp/dome-recovery-test
+
+The suite covers editable sculpt layers, original UVs/all paint channels,
+materials/Unicode, private file modes, coalescing while a worker is blocked,
+immutable COW data, exact source-generation commit rejection, bounded flush,
+conditional cleanup, real filesystem write failure and same-revision retry,
+post-commit prune failure, process death at the publication boundary, corrupt
+latest data fallback, symlink/FIFO rejection and scan/file bounds. It uses only
+unique private temporary fixtures; no live user files or physical XR device.
+This infrastructure does not complete the full production suite requirements.
