@@ -247,7 +247,12 @@ int main(int argc, char **argv) try {
   if(errors>60*100*3*3 || normal_change<60*100*3*3)
     throw std::runtime_error("Baked MikkTSpace normal does not reconstruct the reference GPU shading");
   std::cout<<"PASS Canonical MikkTSpace baking reconstructs reference shading through real GPU tangent interpolation\n";
-  BakedTextures occluded;occluded.maps=*surface.active().painted->composite(surface.active().material);
+  // BakedTextures owns canonical channel pixels, not derived composite caches
+  // such as independent paint replacement coverage or retained source aliases.
+  auto composite=surface.active().painted->composite(surface.active().material);
+  BakedTextures occluded;occluded.maps.color=composite->color;
+  occluded.maps.metal_rough=composite->metal_rough;occluded.maps.emission=composite->emission;
+  occluded.maps.normal=composite->normal;occluded.maps.transparent=composite->transparent;
   occluded.coverage.assign(64*64,255);
   for(size_t i=0;i<occluded.maps.metal_rough.rgba.size();i+=4)occluded.maps.metal_rough.rgba[i]=0;
   surface.active().painted->install_bake(std::move(occluded));detailed.replace(surface);

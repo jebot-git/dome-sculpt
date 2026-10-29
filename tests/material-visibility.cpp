@@ -138,8 +138,15 @@ int main() try {
 
     auto secondary=std::make_shared<SourceMaterialBindings>(*binding);secondary->material.textures[0].texcoord=1;
     range.material_bindings=secondary;range.textures.reset();
-    check(!hit(range,{.5f,0,2}),"Explicit current role UV1 uses retained primitive identity instead of derived UV0");
-    range.appearance.reset();check(rejects([&]{hit(range,{.5f,0,2});}),"Resolved UV1 fails explicitly when primitive provenance is unavailable");
+    if (legacy) {
+      check(rejects([&]{hit(range,{.5f,0,2});}), "Legacy MToon rejects unrepresentable edited UV1 metadata");
+      secondary->material.textures[0].texcoord=0;
+      range.appearance.reset();
+      check(hit(range,{-.5f,0,2}).has_value(), "Resolved legacy UV0 roles need no invented original appearance");
+    } else {
+      check(!hit(range,{.5f,0,2}),"Explicit current role UV1 uses retained primitive identity instead of derived UV0");
+      range.appearance.reset();check(rejects([&]{hit(range,{.5f,0,2});}),"Resolved UV1 fails explicitly when primitive provenance is unavailable");
+    }
   }
   {
     auto toon=MToonMaterial::from_vrm1({{"alphaMode","MASK"},{"doubleSided",true},{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});
