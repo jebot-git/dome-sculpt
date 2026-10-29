@@ -160,20 +160,28 @@ std::array<float, 3> closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
 struct SurfaceIndex {
   const Mesh &mesh;
   const std::function<bool()> &cancelled;
+  size_t maximum_work;
+  mutable size_t work = 0;
+  void step(size_t amount = 1) const {
+    if (amount > maximum_work-work) throw std::length_error("Weight transfer work budget exceeded");
+    work += amount;
+    if ((work & 1023) < amount) stop(cancelled);
+  }
   std::vector<uint32_t> triangles;
   struct Node {
     Vec3 lo, hi;
     uint32_t first = 0, count = 0, left = 0, right = 0;
   };
   std::vector<Node> nodes;
-  explicit SurfaceIndex(const Mesh &m, const std::function<bool()> &c)
-      : mesh(m), cancelled(c) {
+  explicit SurfaceIndex(const Mesh &m, const std::function<bool()> &c, size_t budget)
+      : mesh(m), cancelled(c), maximum_work(budget) {
     triangles.resize(m.indices.size() / 3);
     std::iota(triangles.begin(), triangles.end(), 0);
     nodes.reserve(triangles.size() * 2);
     build(0, triangles.size());
   }
   uint32_t build(uint32_t first, uint32_t count) {
+    step();
     stop(cancelled);
     auto idx = uint32_t(nodes.size());
     nodes.emplace_back();
@@ -185,6 +193,7 @@ struct SurfaceIndex {
     n.hi = {-inf, -inf, -inf};
     for (uint32_t k = first; k < first + count; k++)
       for (int v = 0; v < 3; v++) {
+        step();
         auto p = mesh.positions[mesh.indices[triangles[k] * 3 + v]];
         n.lo = {std::min(n.lo.x, p.x), std::min(n.lo.y, p.y),
                 std::min(n.lo.z, p.z)};
@@ -197,6 +206,7 @@ struct SurfaceIndex {
       if (extent.z > (axis ? extent.y : extent.x))
         axis = 2;
       auto coordinate = [&](uint32_t t) {
+        step(3);
         Vec3 p{};
         for (int i = 0; i < 3; i++)
           p += mesh.positions[mesh.indices[t * 3 + i]];
@@ -224,11 +234,13 @@ struct SurfaceIndex {
   }
   void query(uint32_t index, Vec3 p, float &best, uint32_t &triangle,
              std::array<float, 3> &bary) const {
+    step();
     auto &n = nodes[index];
     if (box(index, p) > best)
       return;
     if (n.count) {
       for (uint32_t k = n.first; k < n.first + n.count; k++) {
+        step();
         auto t = triangles[k];
         auto a = mesh.positions[mesh.indices[t * 3]],
              b = mesh.positions[mesh.indices[t * 3 + 1]],
@@ -632,13 +644,21 @@ SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
                              const Mesh &dest, size_t bones, float maximum,
                              WeightLimits limits,
                              const std::function<bool()> &cancelled) {
+  return transfer_weights(source,w,dest,bones,maximum,limits,cancelled,50'000'000);
+}
+SkinWeights transfer_weights(const Mesh &source, const SkinWeights &w,
+                             const Mesh &dest, size_t bones, float maximum,
+                             WeightLimits limits,
+                             const std::function<bool()> &cancelled,size_t maximum_work) {
   mesh_valid(source);
   mesh_valid(dest);
   w.validate(source.positions.size(), bones);
   if (!std::isfinite(maximum) || maximum <= 0 || maximum > 10000)
     throw std::invalid_argument("Invalid weight transfer radius");
   stop(cancelled);
-  SurfaceIndex index(source, cancelled);
+  if (!maximum_work || maximum_work>500'000'000)
+    throw std::invalid_argument("Invalid weight transfer work budget");
+  SurfaceIndex index(source, cancelled, maximum_work);
   SkinWeights out;
   out.vertices.reserve(dest.positions.size());
   for (size_t v = 0; v < dest.positions.size(); v++) {

@@ -279,6 +279,32 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         else:
             check(info["scene_hash"]==bake_base["scene_hash"],"Native OpenXR bake "+mode+" retains or restores the exact pre-bake scene")
 
+    skin_helper=binary.parent / "dome-sculpt-skin-authoring-test"
+    for mode in ("transfer","fitted","focus"):
+        skin_fixture=root / ("skin-"+mode+"-input.dsculpt")
+        subprocess.run([str(skin_helper),"--ui-unbound-fixture" if mode=="fitted" else "--ui-fixture",str(skin_fixture)],check=True)
+        before=json.loads(subprocess.check_output([str(skin_helper),"--inspect",str(skin_fixture)],env=env,text=True))
+        result,path=run("skin-"+mode,45,extra=["--open",str(skin_fixture)],mode={"DOME_XR_FIXTURE_SKIN":mode})
+        check(result.returncode==0,"Native OpenXR skin "+mode+" completes and drains accepted authoring before saving")
+        after=json.loads(subprocess.check_output([str(skin_helper),"--inspect",str(path)],env=env,text=True))
+        if mode=="focus":
+            check(after==before,"Actual OpenXR focus loss cancels the staged skin method without binding or modifying native data")
+            report=json.loads((output / "skin-focus.json").read_text())
+            check(report.get("focus_losses")==1 and report.get("tracking_losses",0)==0,"Skin focus fixture reaches focus loss without an earlier controller tracking cancellation")
+        else:
+            check(after["skinned"],"Actual OpenXR joystick and ray controls publish persistent "+mode+" skin weights")
+            target=0 if mode=="fitted" else 1
+            original_target=dict(before["scene"]["objects"][target]);new_target=dict(after["scene"]["objects"][target])
+            old_deformation=original_target.pop("deformation",None);deformation=new_target.pop("deformation")
+            check(original_target==new_target,"OpenXR skin authoring retains exact target geometry, paint and source properties")
+            other=1-target
+            check(before["scene"]["objects"][other]==after["scene"]["objects"][other],"OpenXR skin authoring leaves the complete reference/other object untouched")
+            if mode=="transfer":
+                source=before["scene"]["objects"][0]["deformation"]
+                check([dict(row) for row in deformation["skin"]["vertices"]]==[dict(row) for row in source["skin"]["vertices"]],"OpenXR method selector transfers independently known reference weights exactly")
+            else:
+                check(all(deformation.get(key)==value for key,value in old_deformation.items() if key!="skin"),"OpenXR binds a previously unweighted fitted skeleton while preserving exact pose, morphs and source identities")
+
     paintbase, paintbasepath = run("paint-baseline", 1, extra=["--paint"])
     check(
         paintbase.returncode == 0,

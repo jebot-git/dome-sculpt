@@ -68,7 +68,8 @@ enum class SpatialCommand {
   RigNextJoint, RigPreviousJoint, RigNextMorph, RigPreviousMorph, RigResetPose,
   BakeSurface, ClearBake, CancelWork,
   ExportAvatar,
-  WeightToggle, WeightMode, WeightSymmetry, WeightLock, WeightLinked
+  WeightToggle, WeightMode, WeightSymmetry, WeightLock, WeightLinked,
+  BindSkin, SkinUseLocks
 };
 const std::array<const char *, 12> &spatial_labels(int page);
 std::optional<SpatialCommand> spatial_action(int page, int index);

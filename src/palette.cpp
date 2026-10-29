@@ -299,11 +299,22 @@ void SpatialPalette::raster(const EditorState &s) {
       rect(int(100 + 420 * t - 12) * unit_, (y - 28) * unit_, 24 * unit_,
            56 * unit_, row == c.selected ? accent : fg);
       std::string label;
-      if(c.parameter==VrParameter::BakeDistances)label=std::string(row==0?"Front ":row==1?"Back ":"AO radius ");
+      if(c.parameter==VrParameter::SkinDistances)label=std::string(row==0?"Seed ":row==1?"Seed margin ":"Transfer ");
+      else if(c.parameter==VrParameter::BakeDistances)label=std::string(row==0?"Front ":row==1?"Back ":"AO radius ");
       else if(c.parameter==VrParameter::BakeQuality)label=row==0?"AO samples ":"Padding ";
       else if (c.components > 1)
         label = std::string(1, (c.parameter == VrParameter::RigRotation ? "XYZ" : "RGBA")[row]) + " ";
-      if(c.parameter==VrParameter::BakeSource){
+      if(c.parameter==VrParameter::SkinSource){
+        auto index=size_t(std::clamp(std::lround(value),0l,long(s.skin_sources.empty()?0:s.skin_sources.size()-1)));
+        auto id=s.skin_sources.empty()?0:s.skin_sources[index];
+        auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==id;});
+        label=found==s.objects.end()?"No reference":found->name.substr(0,36)+(found->visible?"":" [hidden]");
+      }
+      else if(c.parameter==VrParameter::SkinMode)label=value<.5f?"Automatic binding":"Barycentric transfer";
+      else if(c.parameter==VrParameter::SkinDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(skin_distance_metres(value))*1000);label+=size;}
+      else if(c.parameter==VrParameter::SkinFalloff){char size[48];snprintf(size,sizeof(size),"Falloff %.2f",double(value));label=size;}
+      else if(c.parameter==VrParameter::SkinInfluences)label="Max influences "+std::to_string(int(std::lround(value)));
+      else if(c.parameter==VrParameter::BakeSource){
         size_t index=size_t(std::clamp(std::lround(value),0l,long(s.bake_sources.size()?s.bake_sources.size()-1:0)));
         auto id=s.bake_sources.empty()?0:s.bake_sources[index];
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==id;});
@@ -334,7 +345,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && !skin_parameter(c.parameter)) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
@@ -427,11 +438,13 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13) {
+  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 12 ? "Mesh baking" : s.menu_page == 13 ? "Skin weights"
+  const char *page = s.menu_page == 14 ? "Bind / transfer skin"
+                     : s.menu_page == 13 ? "Skin weights"
+                     : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
                      : s.menu_page == 10 ? "Mesh tools"
                      : s.menu_page == 9 ? "Avatars"
@@ -445,6 +458,12 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==14) {
+    auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==s.skin_options.reference;});
+    text(320*unit_,285*unit_,source==s.objects.end()?"Choose reference rig":source->name.substr(0,34),fg);
+    size_t locks=s.skin_use_locks?size_t(std::count(s.weights.locks.begin(),s.weights.locks.end(),uint8_t(1))):0;
+    text(320*unit_,318*unit_,std::string(s.skin_options.mode==SkinAuthoringMode::Automatic?"Automatic":"Transfer")+" / "+std::to_string(locks)+" locked",fg);
+  }
   if(s.menu_page==12){
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name.substr(0,32),fg);
@@ -484,6 +503,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       s.font_file + std::to_string(s.font_pixels) +
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
       std::to_string(s.bake_source)+":"+std::to_string(s.asset_busy)+":"+std::to_string(int(s.asset_progress*100))+":"+
+      std::to_string(s.skin_options.reference)+":"+std::to_string(int(s.skin_options.mode))+":"+std::to_string(s.skin_use_locks)+":"+
       std::to_string(s.rig_joint) + ":" + std::to_string(s.morph_target) + ":" +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message + std::to_string(s.recovery_selected) +
       std::to_string(s.recovery_candidates.size()) + s.recovery_error +

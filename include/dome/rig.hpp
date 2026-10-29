@@ -74,6 +74,13 @@ SkinWeights transfer_weights(const Mesh &source, const SkinWeights &,
                              const Mesh &destination, size_t bone_count,
                              float maximum_distance, WeightLimits = {},
                              const std::function<bool()> &cancelled = {});
+// Account BVH construction/comparison, node and triangle visits; retain the
+// original overload for existing callers while authoring can choose a budget.
+SkinWeights transfer_weights(const Mesh &source, const SkinWeights &,
+                             const Mesh &destination, size_t bone_count,
+                             float maximum_distance, WeightLimits,
+                             const std::function<bool()> &cancelled,
+                             size_t maximum_work);
 std::vector<uint32_t>
 mirror_vertices(const Mesh &, float tolerance = 1e-4f,
                 const std::function<bool()> &cancelled = {});
