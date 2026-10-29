@@ -50,6 +50,31 @@ plus five authoring threads),20 capacity-growth allocations and332 transfers.
 Logs/counts: tests-oneapi-resource-trace.log and oneapi-resource-counts.json.
 Single-run timings are diagnostic, not production performance certification.
 
+## Integrated native frontend and XR execution
+
+The complete Release FLTK/OpenXR application, including Unicode palette and
+native asset controls, also builds with ONEAPI in artifacts/publish-final/build-oneapi.
+Its production compute path runs on the Arc A770 using ONEAPI_DEVICE_SELECTOR=level_zero:0;
+there is no CPU substitution. Five native compute/geometry/controller suites
+pass7.10s (tests-production-oneapi-initial.log), and shared-document separately
+passes6.38s (tests-production-oneapi-document.log).
+
+The complete real-loader synthetic OpenXR suite passes96/96 with that native
+ONEAPI executable, including accepted/focus-cancelled skin binding, baking, UV
+work, controller/stylus inputs, ordered worker files and graceful SIGINT/SIGTERM
+save/cleanup. Log: tests-production-oneapi-final-worker-safe.log (source `6df3cf2`); report complete=true,
+failed=0. Its initial partial run stopped because two fixture helpers had not
+been built; that is retained as a failed harness attempt, not a passing suite.
+The corrected run built both helpers with the same ONEAPI core and headers.
+
+These checks use software EGL graphics to isolate loader/input behavior while
+actual brush compute uses the Arc. Independent material/picking25/25 and Unicode
+palette GPU/layout tests also pass on actual Arc OpenGL. They do not establish
+sustained physical-device performance or every eligible accelerated workload.
+The final96check run includes the bounded atlas repair and worker-shutdown
+handshake from source `6df3cf2`. Earlier native numeric/resource counts retain
+their stated source scopes; future Sample-layout changes require new evidence.
+
 ## Scale-robust extraction
 
 The first actual ONEAPI core run exposed132 open edges around almost-zero sphere

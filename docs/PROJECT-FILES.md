@@ -33,3 +33,9 @@ queued Open cancellation, new-generation invalidation, failures, project path
 adoption, read cancellation and save draining without timing a fast filesystem.
 Combined Release, sanitizer and real FLTK menu evidence must be recorded after
 integration; this document alone is not validation evidence.
+
+Integration additionally verifies Save As recovery epochs: adopting a new path
+invalidates queued recovery work, then schedules cleanup against the current
+epoch and requeues any newer unsaved content. Ordered saves compare recovery
+source identity/generation rather than an obsolete captured path. The original
+recovery-retention assertion passes unchanged under whole-core sanitizers.

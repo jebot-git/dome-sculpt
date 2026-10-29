@@ -1,3 +1,50 @@
+# Verified authoring checkpoint `6df3cf2`; full production goal remains active
+
+The exact optimized application source `6df3cf2` in artifacts/publish-final passes
+all 64 Release suites in 208.57 s (tests-production-final-worker-safe.log), including
+the full real-loader syntheticOpenXR suite in 155.07 s and deterministic worker shutdown.
+The subsequent metadata commit does not change application code.
+
+- Final native universal menus53/53, Skin bind/transfer/history11/11, Unicode
+  input/clipboard/history/save3/3 and actual DomeD Wayland/universal-menu8/8 pass;
+  process exits0, reports failed0. Logs: menu-production-final.log,
+  menu-skin-production-final.log, menu-unicode-production-final.log and
+  dome-menu-production-final.log.
+- Whole-core C/C++ ASan/UBSan/leaks:15 authoring/export suites in 165.53 s, then the
+  final shutdown/file/recovery/GLB/atlas6-suite run in 91.27 s. C Mikk and xatlas are
+  instrumented. Logs: tests-production-integration-sanitize.log and
+  tests-worker-shutdown-sanitize.log. The final atlas capacity refinement has
+  additional17-case sanitizer proof in tests-atlas-column-capacity-sanitize.log.
+- The same native ONEAPI FLTK/OpenXR application passes all 96 syntheticXR checks
+  with Arc A770 compute, complete=true/failed0/exit0. Software EGL isolates loader
+  and input. Log: tests-production-oneapi-final-worker-safe.log. Earlier numeric
+  native5suite7.10s and shared-document6.38s retain separate source scopes.
+- Actual Arc OpenGL and llvmpipe material/picking parity25/25; actual Arc Unicode
+  palette/layout passes. Logs: mtoon-visibility-{software,arc}.log and
+  tests-production-unicode-arc.log. Unicode dark/light/2x captures inspected.
+- 16 baseline/posed/raw/tinted/painted/expression/explicit-role/name-identity avatar
+  variants pass all 15 pinned official VRM0 schemas with blob SHA verification,
+  and Khronos Validator with 0 errors / 20 warnings each. Logs:
+  production-vrm-official-schema.log and production-vrm-khronos.log; JSON hashes
+  in production-vrm-schema-report.json. Warnings remain visible.
+
+Canonical DomeD/FLTK source282467e was rechecked remotely; Release22patch toolkit
+prefix artifacts/toolkit-282467e/lib64 and matching standalone compositor were
+used. No system installation or active session restart occurred. Physical basic
+WiVRn operation was user-confirmed only for8f4d67d, then ended as requested.
+
+Earlier integration attempts below are historical evidence for their sources.
+The60-suite attempt exposed atlas precision and recovery pruning defects; the
+63-suite attempt exposed band rounding and shutdown lost-wakeup defects.
+The old shutdown executable deterministically fails the new native rendezvous;
+fixed code passes. Atlas17 checks and the unchanged bake39 checks pass without
+relaxing geometry/UV/watertightness/timeout assertions.
+
+A newer remote3d19776 native-retopology milestone must still be integrated with
+this checkpoint and independently rebuilt/tested. Its separate published proof
+does not validate a combined schema/page/worker merge. This checkpoint and all
+of its passing checks do not complete the original production objective.
+
 # Authoring and bake-controls integration — merge pending
 
 The full production objective remains active and incomplete. Current work merges
@@ -496,7 +543,7 @@ painting/Undo/UV-Cancel5/5 pass in menu-authoring-merged.log and
 baked-gui-authoring-merged.log. Generated bake fixture remains in
 artifacts/bake-workflow-merged; baked-baseline.png was visually inspected.
 The owned merged UV checks pass79existing +55workflow cases, and the renderer
-agent reports64ArcA770/64llvmpipe cases plus39cache cases. Agent GPU sanitizer
+agent reports64Arc A770/64llvmpipe cases plus39cache cases. Agent GPU sanitizer
 scope instruments renderer/paint/source/tangents/test, with Release core/Mikk
 dependencies and Mesa leak detection disabled; this is not whole-core evidence.
 The working tree includes an unstaged additive lazy-UV helper; these results

@@ -1,41 +1,116 @@
-# Native authoring publication integration; full goal remains active
+# Dome Sculpt production objective remains active
 
-Read AGENTS.md, REQUIREMENTS.md, HANDOFF-466ebd1.md and the parent de-xr
-DESIGN_CONVENTIONS. Native C++20/FLTK desktop/OpenXR, all required authoring,
-interoperability and accelerator workflows remain required. Animation and final
-offline rendering are excluded. Do not mark the goal complete at a checkpoint.
+Read AGENTS.md, REQUIREMENTS.md, HANDOFF-466ebd1.md and the parent
+DESIGN_CONVENTIONS. Complete the whole native C++20 FLTK/OpenXR sculpt, texture,
+UV, rig/skin/morph and avatar suite; animation and final offline rendering are
+excluded. Do not mark the goal complete at a build or checkpoint.
 
-This isolated publication branch combines local d505e97 (deferred UV,
-SIGINT/SIGTERM save/cleanup, actual Arc SYCL and scale-robust meshing) with
-origin e65db2a (independent integration/worker contracts and regressions),
-preserving both histories. Its canonical private queue helper order is work as
-argument5, changed as argument6; every call must agree. No pre-header-change
-archives can validate this source. Additional dirty v7 material/export and skin
-UI work remains in the primary working tree, excluded here until tested/committed.
+## Current integration
 
-Prior exact evidence is intentionally separate:
--6947fb2: all50 Release suites128.14s; native menus53/53 and UV GUI12/12.
- The actual signal/save regressions are included in its full OpenXR suite.
--f7eb5b9 UV patch on7cc:5 Release,5 whole-core ASan/UBSan/leak,12 nativeGUI,
- full syntheticXR and softwareGL; see UV-SOLVE.md for exact scopes/logs.
--d505e97 numerical/SYCL candidate on6947: actualArc production core5/5,
- CPU core38 checks and18 scale cases; see COMPUTE-VALIDATION.md. Most geometry,
- paint,bake andrig work remains host-side; CUDA/AMD hardware unverified.
--Incoming e65 evidence: archived VALIDATION-e65db2a.md; not proof of this merge.
+Application source `6df3cf2` combines both authoring histories, remote main3aa47e5
+(including33f26a2 live immutable weight preview/material-visible picking), native
+skin bind/transfer, v7 immutable material provenance/sourceUV kernels, painted
+VRM0, lazy UV initialization, graceful standalone signals, Arc SYCL, Unicode
+palette and ordered native project Open/Save. All local and remote commits are
+retained; do not force-push/reset. Historical handoffs/validation remain archived.
 
-The current integration requires fresh combined CPU/GUI/OpenXR and appropriate
-native sanitizer/device checks before main publication. Canonical toolkit and
-compositor source282467e, artifactprefix toolkit-282467e, are retained; no system
-installation or active session restart occurred. Physical8f4d67d basic WiVRn
-operation was user-confirmed, then ended with recovery snapshots retained;
-that does not validate every device/workflow or later source changes.
+The scale-robust mesher retains tiny valid closing faces. Full integration found
+xatlas then collapsed some of their UVs. The new bounded atlas repair preserves
+exact geometry/corner order and requested chart padding, promotes only affected
+faces to padded independent charts, and refuses insufficient capacity atomically.
+Strict painting and watertightness assertions are unchanged; see ATLAS-ROBUSTNESS.md.
 
-Primary-tree ownership is queried through collaboration tools, not inferred
-from historical agent names. Current work covers connected Skin bind/transfer,
-v7 immutable source material persistence +GPU emission composition, paintedVRM
-and original normal/tangent transport. Normal-frame sourceUV restrictions stay
-until skin/morph/version-specific rendering/export parity is proven. Preserve
-all source images, original IDs, paint/UV/rig/morph data and accepted-worker
-cancellation/save ordering. Keep every remaining REQUIREMENTS row active,
-including production sculpt masks/symmetry/resolution/local meshing, retopo/cuts/
-procedural/plugin equivalents, fullglTF/VRM, Unicode and physical/compute proof.
+The private worker argument order is operation, expected, report, work, changed,
+rollback-preview. Skin passes an empty work pointer before its changed token;
+weight gestures supply rollback-preview last. Never mix enum/header layouts or
+pre-change archives from the earlier independent integration.
+
+Canonical DomeD main was rechecked at282467e727df78c8e7f2452aa05a7747bac854a6.
+The Release toolkit22patches and compositor match that source. Use explicit
+artifacts/toolkit-282467e/lib64 at runtime; inherited /opt toolkit paths may be
+older. Build/install as regular user and request sudo only for system files.
+No active session/display-manager restart or system installation occurred here.
+
+## Physical test boundary
+
+The user confirmed rudimentary operation of exact8f4d67d on the real WiVRn HMD
+and both controllers, then requested ending it. Only the test process stopped;
+recovery snapshots and physical-test-report.json are retained under
+artifacts/xr-milestone-8f4d67d. DomeD remained running. This proves basic operation,
+not complete workflow/stylus/reconnect/performance validation or later sources.
+Subsequent SIGINT/SIGTERM handling is verified with the real-loader synthetic
+runtime: completed edits save, unfinished gestures cancel, and XR resources exit.
+
+## Verified checkpoint and next integration
+
+The authoritative combined application checkpoint is source `6df3cf2`, built in
+artifacts/publish-final, branch work/production-integrated. All64 Release suites
+pass208.57s, including complete real-loader syntheticXR155.07s. Final native
+menus53/53, Skin bind/transfer/history11/11, Unicode input/clipboard/history3/3
+and actual latest DomeD Wayland/universal-menu8/8 pass with zero failures.
+
+Whole-core C/C++ ASan/UBSan/leak coverage:15 authoring/export suites pass165.53s;
+then the final shutdown/file/recovery/GLB/atlas6-suite pass91.27s covers the latest
+worker and atlas corrections. Atlas17 focused checks also pass in Release and
+whole-core sanitizer overrides, including exact faces and actual low-resolution
+bake capacity; the unchanged bake fixture's39 assertions pass.
+
+All16 generated avatar variants pass the15 hash-checked pinned official VRM0
+schemas and Khronos with zero errors; each retains20 legacy/tangent warnings.
+Actual Arc material/picking25/25 and Unicode palette rendering also pass.
+The complete ONEAPI frontend built from this source passes96/96 syntheticXR
+with actual Arc brush compute; software EGL isolates loader/input behavior.
+Native Arc compute5suites7.10s plus shared-document6.38s are separate evidence.
+
+Earlier full integration failures remain in logs:60suite58/60 exposed UV slivers
+and recovery epoch cleanup;63suite61/63 exposed avoidable power-of-two band
+capacity refusal and an intermittent shutdown hang. Both have real fixes.
+The deterministic shutdown fixture forces the old lost-wakeup schedule and
+fails against old code; all worker notifications now handshake predicate locks.
+No timeout or strict geometry/paint assertion was weakened. See VALIDATION.md.
+
+Remote main subsequently added native desktop/XR retopology in3d19776
+(fdb132b/251cd3d). That newer source is NOT part of the64-suite checkpoint.
+Integrate it next while preserving both histories: Skin already owns page14,
+Masks reserves15, so incoming Retopo must move to16. The divergent Scene v7
+retopo and material archives need explicit combined versioning/compatibility.
+Rebuild all header consumers, include the new worker in safe lifecycle handling,
+and verify the final combined source before claiming publication complete.
+
+## Live unfinished work
+
+The primary main tree may contain later agent work not in the publication build.
+Query collaboration ownership and git state before merging or staging. Preserve
+all such work. The old lazyUV/sourceUV/skin stash is an applied backup, not work
+to apply again. Obsolete prototype trees are not authoritative applications.
+
+- Production masks/symmetry: durable sparse COW masks, constrained brush arithmetic
+ and single-dispatch symmetry are being developed privately with new Sample,
+ Brush and Volume layouts. Desktop/XR authoring, flatVolume3 decoding, full scene
+ quota accounting and matching CPU/SYCL/HIP/CUDA evidence must follow. Do not
+ link this new header layout with the older published core.
+- Original/native frames: private corner-layout, explicit-matrix skin and Shape
+ Jacobian helpers exist; runtime/archive/export integration remains unfinished.
+ Creator Shape evaluates base/target keys individually before linear morphs.
+ Preserve current editable skin/pose while validating relevant original rest and
+ morph identities. No public sourceUV Apply guard has been removed.
+
+Live sourceUV user editing stays guarded: v7 UvDerivative pixels cannot be
+relabelled original-frame data. Future Scene v8/materials v2 records need explicit
+provenance, original/native frame identities, current skin/morph evaluation and
+validated re-bake from immutable origins while preserving current edits.
+
+## Full remaining scope
+
+Every incomplete REQUIREMENTS row remains required: production sculpt
+masks/symmetry/resolution/local meshing and sustained VR; layered projection,
+stencils/texture sets and production baking; complete retopo/cut/procedural/plugin
+workflows; interactive rig/landmarks/fingers/automatic weights and editable morphs;
+robust anime/toon humanoid authoring; full selected glTF/VRM1/constraints/expressions
+and independent graphical consumers; physical headset/controllers/stylus/3D mouse,
+session loss/reconnect, performance, and all eligible compute workloads.
+
+CUDA toolchain/hardware remains unavailable; HIP7.1 compiles gfx1030 but no AMD
+GPU/ROCK device is present. Compile-only or software graphics evidence cannot
+stand in for accelerator execution. CPU remains the default backend. See
+COMPUTE-VALIDATION.md and the exact reports in VALIDATION.md.
