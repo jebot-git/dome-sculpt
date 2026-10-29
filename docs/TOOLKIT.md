@@ -12,7 +12,7 @@ canonical builder includes22 reviewed patches, including window suspension,
 touch and pen input. Exact archive, revision, ordered patch names and SHA256
 values are recorded under `domed_fltk` in third_party/sources.json.
 
-This task built a fresh Release toolkit into `artifacts/toolkit` using a clean
+Upstream checkpoint `96bc62f` built a fresh Release toolkit into `artifacts/toolkit` using a clean
 DomeD worktree at the pinned revision. Existing unrelated capture changes in
 DomeD and the local qimgvr appearance edits were preserved. Committed qimgvr
 helpers still match the vendored copies; no uncommitted helper was imported.
@@ -43,3 +43,9 @@ comes from `FL/Fl_File_Chooser.H`, not the absent `FL/fl_file_chooser.H` header.
 Before a system installation, stage/verify the same toolkit for the installed
 `/opt/fltk-vr/toolkit` runtime and use sudo only for the install step. This task
 has not installed or switched any user session.
+
+For the reconciled checkpoint, those generated toolkit artifacts are not present
+in this workspace. Its available build uses `/opt/fltk-vr/toolkit`; consult
+HANDOFF.md and VALIDATION.md for the scope of post-integration checks. The parent
+DESIGN_CONVENTIONS file is also absent here; the reading above describes upstream
+validation, not a new local reading.

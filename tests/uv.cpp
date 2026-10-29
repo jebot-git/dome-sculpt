@@ -286,6 +286,102 @@ int main() try {
   send();
   require(!doc.frame().state->uv && !doc.frame().state->dirty,
           "XR focus loss discards the UV draft without changing paint");
+  frame.focused = true;
+  send();
+  doc.replace(scene);
+  send();
+  send(0, 0, true);
+  send();
+  sector(9);
+  sector(7);
+  auto panel = doc.frame().state->panel;
+  std::vector<SpatialFrame> burst;
+  auto queued = [&](float x, float y, float pressure, float px, float py,
+                    bool focused = true) {
+    ++frame.sequence;
+    frame.time += .05;
+    frame.focused = focused;
+    auto &h = frame.hands[1];
+    h.x = x;
+    h.y = y;
+    h.joystick = false;
+    h.tracked.trigger = pressure;
+    h.tracked.aimValid = true;
+    h.tracked.aim.position = ob::transform(
+        panel, {(px / 640 - .5f) * .6f, (.5f - py / 640) * .6f, .25f});
+    h.tracked.aim.orientation = panel.orientation;
+    burst.push_back(frame);
+  };
+  queued(0, 0, .8f, 178, 85);
+  queued(0, 0, 0, 178, 85);
+  for (int i = 0; i < 20; ++i)
+    queued(-1, 0, 0, 178, 85);
+  queued(0, 0, .8f, 470, 609);
+  queued(0, 0, 0, 470, 609, false);
+  doc.submit(burst);
+  require(doc.wait_input(std::chrono::seconds(180)) &&
+              doc.wait_asset(std::chrono::seconds(180)),
+          "A burst of controller events and its focus boundary drain in order");
+  require(doc.copy_scene().active().painted->mesh().uv != m.uv,
+          "Focus loss preserves a confirmed UV edit queued before the focus "
+          "boundary");
+  require(doc.undo() && !doc.frame().state->dirty,
+          "A queued accepted UV edit remains one exact undo transaction");
+  frame.focused = true;
+  send();
+  send(0, 0, true);
+  send();
+  sector(9);
+  sector(7);
+  aim(178, 85, .8f);
+  send();
+  require(doc.frame().state->uv->tool == 1,
+          "A controller ray selects continuous UV scaling");
+  for (int i = 0; i < 20; ++i)
+    send(-1);
+  auto span = [](const Mesh &mesh) {
+    float lo = 1, hi = 0;
+    for (auto uv : mesh.uv) {
+      lo = std::min(lo, uv[0]);
+      hi = std::max(hi, uv[0]);
+    }
+    return hi - lo;
+  };
+  float scaled = span(*doc.frame().state->uv->mesh);
+  require(std::abs(scaled - .25f) < 1e-4f,
+          "Full stick deflection halves UV scale in one second");
+  for (int i = 0; i < 20; ++i)
+    send(0, -1);
+  float fine = span(*doc.frame().state->uv->mesh);
+  require(fine < scaled && scaled - fine < (span(m) - scaled) / 3,
+          "The vertical UV scale wheel adjusts ten times more finely");
+  aim(272, 85, .8f);
+  send();
+  require(doc.frame().state->uv->tool == 2,
+          "The same controller panel selects continuous UV turning");
+  auto vertex_angle = [](const Mesh &mesh) {
+    std::array<float, 2> center{};
+    for (auto uv : mesh.uv)
+      for (int k = 0; k < 2; ++k)
+        center[k] += uv[k] / mesh.uv.size();
+    return std::atan2(mesh.uv[0][1] - center[1], mesh.uv[0][0] - center[0]);
+  };
+  float vertex_before_turn = vertex_angle(*doc.frame().state->uv->mesh);
+  for (int i = 0; i < 20; ++i)
+    send(1);
+  float turned = vertex_angle(*doc.frame().state->uv->mesh);
+  require(std::abs((turned - vertex_before_turn) - .523598776f) < 1e-4f,
+          "UV turning follows elapsed controller time at thirty degrees per "
+          "second");
+  for (int i = 0; i < 20; ++i)
+    send(0, 1);
+  require(std::abs((vertex_angle(*doc.frame().state->uv->mesh) - turned) -
+                   .052359878f) < 1e-4f,
+          "The UV rotation wheel retains fine angular control");
+  doc.cancel_spatial_menu();
+  require(!doc.frame().state->dirty &&
+              doc.copy_scene().active().painted->mesh().uv == m.uv,
+          "Cancelling continuous transforms restores exact saved UVs");
   auto malformed = next->encode();
   malformed["mesh"]["uv_pins"] = nlohmann::json::binary({1});
   bool bad = false;

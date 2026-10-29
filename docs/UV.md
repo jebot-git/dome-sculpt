@@ -48,7 +48,8 @@ Advanced conformal re-unwrapping, stitching, chart distortion/texel-density
 analysis, texture-set/UDIM tools, large-mesh interaction optimization and physical
 headset/stylus validation remain unfinished.
 
-The historical native XR persistence failure did not reproduce in the resumed
-validation. Separate UV/field/paint evidence and the new continuous scale/turn,
-fine-wheel and cancellation checks are recorded in [the handoff](HANDOFF.md).
-The complete production authoring objective remains unfinished.
+A reproducible queued-Apply data-loss defect is fixed by
+[ordered spatial input](INPUT.md). The exact cause of the historical native XR
+failure cannot be established from its missing comparison artifacts; subsequent
+native runs pass. The complete production workflow remains unfinished; evidence
+and next steps are in [the handoff](HANDOFF.md).

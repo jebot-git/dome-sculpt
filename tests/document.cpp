@@ -72,6 +72,53 @@ int main() try {
           "Focus loss cancels the in-progress spatial stroke");
   require(!doc.frame().state->dirty,
           "Cancelling transient edits does not dirty the restored saved state");
+  auto original_volume = doc.copy_volume().voxels();
+  auto stroke_burst = [&](bool release, bool lose_focus) {
+    std::vector<SpatialFrame> batch;
+    auto sample = [&](float pressure, bool focus = true) {
+      ++f.sequence;
+      f.time += .01;
+      f.focused = focus;
+      f.hands[1].tracked.trigger = pressure;
+      batch.push_back(f);
+    };
+    sample(0);
+    sample(1);
+    if (release)
+      sample(0);
+    if (lose_focus)
+      sample(0, false);
+    return batch;
+  };
+  doc.submit(stroke_burst(true, true));
+  require(
+      doc.wait_input() && doc.frame().state->dirty &&
+          doc.copy_volume().voxels() != original_volume,
+      "Queued trigger release commits before an ordered focus-loss boundary");
+  require(doc.undo() && !doc.frame().state->dirty &&
+              doc.copy_volume().voxels() == original_volume,
+          "A pre-focus completed stroke still has exact undo");
+  doc.submit(stroke_burst(false, true));
+  require(doc.wait_input() && !doc.frame().state->dirty &&
+              doc.copy_volume().voxels() == original_volume,
+          "Ordered focus loss still cancels an unfinished queued stroke");
+  doc.submit(stroke_burst(true, false));
+  doc.finish_spatial();
+  require(doc.frame().state->dirty &&
+              doc.copy_volume().voxels() != original_volume,
+          "Session shutdown drains a queued release before cancelling input");
+  require(doc.undo() && doc.copy_volume().voxels() == original_volume,
+          "A stroke completed before shutdown remains reversible");
+  doc.submit(stroke_burst(true, false));
+  require(doc.wait_input() && !doc.frame().state->dirty,
+          "A stopped spatial session cannot accept late controller events");
+  doc.begin_spatial();
+  doc.submit(stroke_burst(false, false));
+  doc.finish_spatial();
+  require(!doc.frame().state->dirty &&
+              doc.copy_volume().voxels() == original_volume,
+          "A new spatial session reopens input and shutdown cancels its "
+          "unfinished stroke");
   auto room_before = doc.frame().state->canvas;
   doc.rebase_space(CanvasTransform{{.2f, 0, 0}, {}, 1});
   auto room_after = doc.frame().state->canvas;

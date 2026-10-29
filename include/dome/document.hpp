@@ -9,6 +9,7 @@
 #include <future>
 #include <memory>
 #include <mutex>
+#include <span>
 #include <thread>
 namespace dome {
 struct SpatialHand {
@@ -120,6 +121,9 @@ public:
   void paint_command(SpatialCommand);
   void report_error(std::string);
   void submit(SpatialFrame);
+  // Platform adapters may deliver a burst with original sample times. Focus
+  // loss is ordered after earlier button transitions, not a queue discard.
+  void submit(std::span<const SpatialFrame>);
   void finish_spatial();
   void begin_spatial();
   void rebase_space(std::optional<CanvasTransform>);
@@ -170,7 +174,7 @@ private:
   mutable std::mutex input_mutex_;
   mutable std::condition_variable input_changed_;
   std::deque<std::pair<uint64_t, SpatialFrame>> inputs_;
-  bool reset_input_ = false, processing_ = false;
+  bool reset_input_ = false, processing_ = false, spatial_accepting_ = true;
   struct FileJob {
     Scene scene;
     std::filesystem::path path;

@@ -55,3 +55,6 @@ to be verified.
 Current toolkit build selection and runtime-library verification are documented
 in [TOOLKIT.md](TOOLKIT.md). The configured build launcher prevents an inherited
 older FLTK installation from overriding the tested native toolkit.
+
+Spatial input preserves earlier queued confirmations at focus loss and session
+shutdown; unconfirmed drafts still cancel. See [ordered input](INPUT.md).

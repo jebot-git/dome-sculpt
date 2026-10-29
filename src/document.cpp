@@ -466,14 +466,24 @@ void Document::configure(Tool tool, float radius) {
   publish_locked();
 }
 void Document::submit(SpatialFrame frame) {
+  submit(std::span<const SpatialFrame>(&frame, 1));
+}
+void Document::submit(std::span<const SpatialFrame> frames) {
   std::lock_guard lock(input_mutex_);
-  if (!frame.focused || inputs_.size() >= 64) {
-    inputs_.clear();
-    reset_input_ = true;
+  if (!spatial_accepting_)
+    return;
+  for (auto &frame : frames) {
+    // A focus boundary cancels the unconfirmed action after preceding events
+    // have been processed. Clearing here loses queued release/Apply actions.
+    if (inputs_.size() >= 64) {
+      inputs_.clear();
+      reset_input_ = true;
+    }
+    inputs_.emplace_back(published_.load()->input_epoch, frame);
   }
-  inputs_.emplace_back(published_.load()->input_epoch, std::move(frame));
   input_changed_.notify_one();
 }
+
 void Document::appearance(std::string file, int pixels, bool light,
                           uint32_t accent, int opacity) {
   std::lock_guard lock(model_mutex_);
@@ -593,6 +603,10 @@ void Document::prepare_locked(uint32_t resolution) {
 }
 void Document::begin_spatial() {
   rebase_space({});
+  {
+    std::lock_guard lock(input_mutex_);
+    spatial_accepting_ = true;
+  }
   report_error({});
 }
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
@@ -621,9 +635,10 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
 void Document::finish_spatial() {
   {
     std::lock_guard lock(input_mutex_);
-    inputs_.clear();
-    reset_input_ = false;
+    spatial_accepting_ = false;
   }
+  // The producer has stopped. Drain its last transitions before cancelling an
+  // unfinished action; in particular preserve an Apply just before shutdown.
   if (!wait_input())
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
