@@ -8,20 +8,43 @@ namespace dome {
 namespace {
 class UvCanvas : public Fl_Widget {
   Document &doc_;
-  bool dragging_ = false;
+  bool dragging_ = false, wheeling_ = false;
   float last_u_ = 0, last_v_ = 0;
   int side() const { return std::max(1, std::min(w(), h()) - 40); }
   int left() const { return x() + (w() - side()) / 2; }
   int top() const { return y() + (h() - side()) / 2; }
+  static void wheel_finished(void *data) {
+    auto &self = *static_cast<UvCanvas *>(data);
+    self.wheeling_ = false;
+    if (self.doc_.frame().state->uv) {
+      try {
+        self.doc_.edit_uv(UvAction::EndGesture);
+      } catch (const std::exception &e) {
+        self.doc_.report_error(e.what());
+      }
+    }
+  }
+  void finish_gesture() {
+    Fl::remove_timeout(wheel_finished, this);
+    dragging_ = wheeling_ = false;
+    if (doc_.frame().state->uv)
+      doc_.edit_uv(UvAction::EndGesture);
+  }
 
 public:
   UvCanvas(int x, int y, int w, int h, Document &d)
       : Fl_Widget(x, y, w, h), doc_(d) {}
+  ~UvCanvas() override { Fl::remove_timeout(wheel_finished, this); }
   int handle(int event) override try {
     if (event == FL_FOCUS)
       return 1;
+    if (event == FL_UNFOCUS) {
+      finish_gesture();
+      return 1;
+    }
     if (event == FL_KEYDOWN && (Fl::event_state() & FL_CTRL) &&
         Fl::event_key() == 'z') {
+      finish_gesture();
       doc_.edit_uv(Fl::event_state(FL_SHIFT) ? UvAction::Redo : UvAction::Undo);
       redraw();
       return 1;
@@ -32,7 +55,9 @@ public:
       if (u < 0 || u > 1 || v < 0 || v > 1)
         return 1;
       take_focus();
+      finish_gesture();
       doc_.edit_uv(UvAction::Pick, u, v);
+      doc_.edit_uv(UvAction::BeginGesture);
       dragging_ = true;
       last_u_ = u;
       last_v_ = v;
@@ -42,6 +67,7 @@ public:
     if (event == FL_DRAG && dragging_) {
       float u = float(Fl::event_x() - left()) / side(),
             v = float(Fl::event_y() - top()) / side();
+      doc_.edit_uv(UvAction::BeginGesture);
       doc_.edit_uv(UvAction::Move, u - last_u_, v - last_v_);
       last_u_ = u;
       last_v_ = v;
@@ -49,10 +75,16 @@ public:
       return 1;
     }
     if (event == FL_RELEASE) {
-      dragging_ = false;
+      finish_gesture();
       return 1;
     }
     if (event == FL_MOUSEWHEEL) {
+      if (!wheeling_)
+        finish_gesture();
+      doc_.edit_uv(UvAction::BeginGesture);
+      wheeling_ = true;
+      Fl::remove_timeout(wheel_finished, this);
+      Fl::add_timeout(.25, wheel_finished, this);
       doc_.edit_uv(
           Fl::event_state(FL_SHIFT) ? UvAction::Rotate : UvAction::Scale,
           Fl::event_state(FL_SHIFT) ? -.05f * Fl::event_dy()

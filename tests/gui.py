@@ -356,6 +356,45 @@ try:
             d.sync()
             button(True);button(False)
             time.sleep(.3)
+        def wait_uv_image(before, name, changed):
+            # Native event processing and mesh validation finish asynchronously
+            # relative to XTest. Assert rendered results, not a fixed sleep.
+            deadline = time.monotonic() + 30
+            while True:
+                assert app.poll() is None, (out / "app.log").read_text()
+                image = uv_shot(name)
+                differs = ImageChops.difference(before, image).getbbox() is not None
+                if differs == changed or time.monotonic() >= deadline:
+                    return image
+        # A drag contains many native events, but must be one draft undo.
+        g = uv_window.get_geometry()
+        px, py = g.x + g.width // 2, g.y + g.height // 2
+        xtest.fake_input(d, X.MotionNotify, x=px, y=py)
+        d.sync(); button(True)
+        drag_before = uv_shot("15-uv-drag-start")
+        for i in range(1, 21):
+            xtest.fake_input(d, X.MotionNotify, x=px+i, y=py+i//2)
+            d.sync(); time.sleep(.015)
+        button(False)
+        drag_after = wait_uv_image(drag_before, "15-uv-dragged", True)
+        check(ImageChops.difference(drag_before, drag_after).getbbox() is not None,
+              "A native UV drag publishes continuous chart previews")
+        uv_button(4)
+        check(ImageChops.difference(drag_before, wait_uv_image(drag_before, "15-uv-drag-undo", False)).getbbox() is None,
+              "One native UV undo restores a complete multi-event drag")
+        # Wheel events inside the inactivity interval share an undo step.
+        xtest.fake_input(d, X.MotionNotify, x=px, y=py); d.sync()
+        wheel_before = uv_shot("15-uv-wheel-start")
+        for _ in range(8):
+            xtest.fake_input(d, X.ButtonPress, detail=5)
+            xtest.fake_input(d, X.ButtonRelease, detail=5)
+            d.sync(); time.sleep(.04)
+        time.sleep(.4)
+        check(ImageChops.difference(wheel_before, wait_uv_image(wheel_before, "15-uv-wheel", True)).getbbox() is not None,
+              "A burst of native wheel samples visibly scales the UV chart")
+        uv_button(4)
+        check(ImageChops.difference(wheel_before, wait_uv_image(wheel_before, "15-uv-wheel-undo", False)).getbbox() is None,
+              "One native UV undo restores the complete wheel burst")
         uv_before = uv_shot("15-uv-editor")
         uv_button(0)
         uv_scaled = uv_shot("16-uv-scaled")

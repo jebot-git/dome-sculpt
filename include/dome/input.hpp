@@ -112,6 +112,7 @@ public:
     device_ = parameter_owner_;
     control_armed_ = false;
     uv_dragging_ = false;
+    uv_stick_active_ = uv_gesture_open_ = false;
     uv_pointer_ = 0;
   }
   float radius = .1f, strength = 1;
@@ -140,6 +141,8 @@ private:
       committed();
   }
   void ray_controls(const SpatialSample &, bool pressed);
+  void uv_gesture_begin();
+  void uv_gesture_end(bool force = false);
   bool stroke_active() const {
     return backend.active ? backend.active() : volume_->in_stroke();
   }
@@ -159,7 +162,7 @@ private:
   std::vector<VrControlEvent> controls_;
   std::optional<SpatialCommand> command_;
   Vec3 previous_{}, menu_anchor_{};
-  bool uv_dragging_ = false;
+  bool uv_dragging_ = false, uv_stick_active_ = false, uv_gesture_open_ = false;
   uint32_t uv_pointer_ = 0;
   int uv_mode_ = 0;
   float uv_x_ = 0, uv_y_ = 0;

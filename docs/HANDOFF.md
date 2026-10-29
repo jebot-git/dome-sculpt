@@ -118,3 +118,5 @@ This local workspace DOES have the parent DESIGN_CONVENTIONS and the fresh
 canonical artifacts/toolkit build; remote notes about their absence describe
 the other checkpoint's environment. Continue using TOOLKIT.md's current runtime
 selection and preserve the complete active production objective.
+
+Merged remote milestone `36feedd`: continuous UV pointer and controller interactions now form exact undo gestures; cancellation restores the gesture baseline. Preserved the remote handoff in `docs/HANDOFF-36feedd.md`. Local toolkit provenance remains authoritative for this workspace.

@@ -1119,7 +1119,8 @@ void Document::control_event_locked(VrControlEvent event) {
       else if (event.type == VrControlEventType::UvMove)
         uv_->edit(UvAction::Move, event.value, event.second);
       else if (event.type == VrControlEventType::UvCommand &&
-               event.component >= 0 && event.component <= int(UvAction::Tool))
+               event.component >= 0 &&
+               event.component <= int(UvAction::CancelGesture))
         uv_->edit(UvAction(event.component), event.value, event.second);
       state_.error.clear();
     } catch (const std::exception &e) {

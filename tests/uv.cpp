@@ -23,6 +23,60 @@ int main() try {
           "Adjacent UV faces form one editable chart");
   require(!uv_changed(m, *edit.view().mesh),
           "Opening an older UV mesh without pins/cuts is a semantic no-op");
+  UvWorkspace gesture(m, 128);
+  gesture.edit(UvAction::BeginGesture);
+  for (int i = 0; i < 100; ++i) {
+    gesture.edit(UvAction::BeginGesture); // Repeated device samples are idempotent.
+    gesture.edit(UvAction::Move, .001f, .001f);
+  }
+  auto moved_gesture = gesture.view().mesh;
+  require(gesture.view().can_undo && !gesture.view().can_redo,
+          "An active UV gesture offers Undo before the pointer is released");
+  gesture.edit(UvAction::EndGesture);
+  gesture.edit(UvAction::Undo);
+  require(!uv_changed(m, *gesture.view().mesh) && !gesture.view().can_undo &&
+              gesture.view().can_redo,
+          "One draft undo restores an entire hundred-sample UV drag exactly");
+  gesture.edit(UvAction::BeginGesture);
+  gesture.edit(UvAction::Scale, 1);
+  gesture.edit(UvAction::EndGesture);
+  require(gesture.view().can_redo && !gesture.view().can_undo,
+          "An unchanged gesture preserves the existing redo branch");
+  gesture.edit(UvAction::BeginGesture);
+  gesture.edit(UvAction::Move, .02f, 0);
+  gesture.edit(UvAction::CancelGesture);
+  require(!uv_changed(m, *gesture.view().mesh) && gesture.view().can_redo &&
+              !gesture.view().can_undo,
+          "Cancelling a gesture restores its exact UVs and redo availability");
+  gesture.edit(UvAction::Redo);
+  require(gesture.view().mesh->uv == moved_gesture->uv,
+          "Redo restores every accepted drag sample together");
+  gesture.edit(UvAction::BeginGesture);
+  gesture.edit(UvAction::Move, .02f, 0);
+  gesture.edit(UvAction::Pin); // A discrete command terminates the drag.
+  gesture.edit(UvAction::Undo);
+  require(gesture.view().mesh->uv != moved_gesture->uv &&
+              gesture.view().mesh->uv_pins == moved_gesture->uv_pins,
+          "A pin command remains a separate action after a continuous drag");
+  gesture.edit(UvAction::Undo);
+  require(gesture.view().mesh->uv == moved_gesture->uv,
+          "The preceding drag is still independently reversible");
+  gesture.edit(UvAction::BeginGesture);
+  gesture.edit(UvAction::Move, 2, 0);
+  require(!gesture.view().valid,
+          "Invalid intermediate UVs remain visible during a gesture");
+  gesture.edit(UvAction::Undo);
+  require(gesture.view().valid && gesture.view().mesh->uv == moved_gesture->uv,
+          "Undo during a held gesture restores the last valid draft exactly");
+  gesture.edit(UvAction::Redo);
+  require(!gesture.view().valid,
+          "Redo retains the accepted invalid draft for further correction");
+  gesture.edit(UvAction::Undo);
+  gesture.edit(UvAction::BeginGesture);
+  gesture.edit(UvAction::Scale, .9f);
+  gesture.edit(UvAction::EndGesture);
+  require(!gesture.view().can_redo,
+          "A changed accepted gesture replaces the previous redo branch");
   edit.edit(UvAction::Pick, .35f, .35f);
   edit.edit(UvAction::Seam);
   require(
@@ -265,6 +319,42 @@ int main() try {
   require(doc.frame().state->uv->mesh->uv == original_uv,
           "Cancelled scale/turn draft retains exact saved UV coordinates");
   aim(257, 257, .8f);
+  for (int i = 1; i <= 60; ++i)
+    aim(257 + i * .1f, 257 + i * .1f, .8f);
+  send();
+  auto ray_drag_uv = doc.frame().state->uv->mesh->uv;
+  doc.edit_uv(UvAction::Undo);
+  require(doc.frame().state->uv->mesh->uv == original_uv &&
+              !doc.frame().state->uv->can_undo,
+          "A sixty-sample XR ray drag is one exact local undo step");
+  doc.edit_uv(UvAction::Redo);
+  require(doc.frame().state->uv->mesh->uv == ray_drag_uv,
+          "XR ray-drag redo restores its complete accepted preview");
+  doc.edit_uv(UvAction::Undo);
+  // The idle owning controller must not split a secondary pointer's gesture.
+  auto secondary_aim = [&](float x, float pressure, bool tracked = true) {
+    auto &h = frame.hands[0];
+    h.tracked.valid = tracked;
+    h.tracked.aimValid = true;
+    h.tracked.trigger = pressure;
+    auto panel = doc.frame().state->panel;
+    h.tracked.aim.position = ob::transform(
+        panel, {(x / 640 - .5f) * .6f, (.5f - 257.f / 640) * .6f, .25f});
+    h.tracked.aim.orientation = panel.orientation;
+    send();
+  };
+  secondary_aim(257, 0);
+  secondary_aim(257, .8f);
+  for (int i = 1; i <= 20; ++i)
+    secondary_aim(257 + i * .2f, .8f);
+  secondary_aim(261, .8f, false);
+  require(doc.frame().state->uv && doc.frame().state->uv->mesh->uv != original_uv,
+          "Losing a secondary pointer retains the UV draft and accepted movement");
+  doc.edit_uv(UvAction::Undo);
+  require(doc.frame().state->uv->mesh->uv == original_uv &&
+              !doc.frame().state->uv->can_undo,
+          "Idle owner samples and secondary tracking loss preserve one drag undo");
+  aim(257, 257, .8f);
   aim(278, 278, .8f);
   send();
   require(std::abs(doc.frame().state->uv->mesh->uv[0][0] - .15f) < 1e-5f,
@@ -350,11 +440,28 @@ int main() try {
   float scaled = span(*doc.frame().state->uv->mesh);
   require(std::abs(scaled - .25f) < 1e-4f,
           "Full stick deflection halves UV scale in one second");
+  send();
+  auto stick_scaled_uv = doc.frame().state->uv->mesh->uv;
+  doc.edit_uv(UvAction::Undo);
+  require(doc.frame().state->uv->mesh->uv == m.uv &&
+              !doc.frame().state->uv->can_undo,
+          "Returning the XR stick to neutral closes one scale undo transaction");
+  doc.edit_uv(UvAction::Redo);
+  require(doc.frame().state->uv->mesh->uv == stick_scaled_uv,
+          "A continuous stick adjustment redoes all samples together");
   for (int i = 0; i < 20; ++i)
     send(0, -1);
   float fine = span(*doc.frame().state->uv->mesh);
   require(fine < scaled && scaled - fine < (span(m) - scaled) / 3,
           "The vertical UV scale wheel adjusts ten times more finely");
+  send();
+  auto wheel_scaled_uv = doc.frame().state->uv->mesh->uv;
+  doc.edit_uv(UvAction::Undo);
+  require(doc.frame().state->uv->mesh->uv == stick_scaled_uv,
+          "A separate fine-wheel gesture undoes without losing the coarse scale");
+  doc.edit_uv(UvAction::Redo);
+  require(doc.frame().state->uv->mesh->uv == wheel_scaled_uv,
+          "The fine-wheel gesture restores its exact accepted coordinates");
   aim(272, 85, .8f);
   send();
   require(doc.frame().state->uv->tool == 2,

@@ -2,6 +2,7 @@
 #pragma once
 #include "mesh.hpp"
 #include <memory>
+#include <optional>
 namespace dome {
 struct UvEdge {
   uint32_t a, b;
@@ -37,7 +38,10 @@ enum class UvAction {
   Seam,
   Undo,
   Redo,
-  Tool
+  Tool,
+  BeginGesture,
+  EndGesture,
+  CancelGesture
 };
 // Both frontends operate the same draft; commit resamples paint off-thread.
 class UvWorkspace {
@@ -51,6 +55,9 @@ private:
   uint32_t resolution_;
   uint64_t revision_ = 1;
   std::vector<UvView> undo_, redo_;
+  std::optional<UvView> gesture_;
+  void remember(UvView);
+  void finish_gesture(bool cancel = false);
   void publish(Mesh, bool topology = false);
   std::vector<uint32_t> selected() const;
 };
