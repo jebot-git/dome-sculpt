@@ -1,116 +1,83 @@
-# Full authoring goal; bake-controls merge pending
+# Full Dome Sculpt production goal remains active
 
-Read AGENTS.md, REQUIREMENTS.md, DESIGN_CONVENTIONS in the parent workspace,
-TOOLKIT.md and VALIDATION.md. Preserve the original production objective in
-HANDOFF-466ebd1.md: native C++20/FLTK desktop/OpenXR sculpting, painting, UV,
-rigging, skinning and avatar authoring, full required glTF/VRM, named plugin
-workflow equivalents, input devices and build-time accelerators. Animation and
-final offline rendering are excluded; interactive shading is included. No
-partial checkpoint, build or passing subset completes this goal.
+Read AGENTS.md, docs/REQUIREMENTS.md, docs/HANDOFF-466ebd1.md and the parent
+DESIGN_CONVENTIONS. Native C++20/FLTK desktop/OpenXR remains the required runtime;
+Python is test orchestration only. Animation and final offline rendering are
+excluded. Every production requirement remains required; a milestone or a
+passing build does not complete the goal.
 
-## Current histories and merge
+## Current merged and verified application
 
-Local main is `88cde79`, recording exact application `8f4d67d`. The latter merged
-remote `af492ee` source-aware baking/Mikk with local native/controller weights,
-conformal UV, MToon/linear rendering, source morph transport and source VRM0
-export. Both histories were preserved. The local verified checkpoint is pushed
-on `checkpoint/native-xr-authoring-8f4d67d` at `88cde79`.
+Application7cc0d42 merges local avatar/weights/UV/MToon/source-morph/VRM0 work
+with remote7817ca2 native desktop/XR baking controls. Both histories are retained.
+The earlier88cde79 checkpoint is public on
+checkpoint/native-xr-authoring-8f4d67d. Remote0141926 then added only a divergent
+handoff; that documentation is now being preserved as well. Its
+AGENT-HANDOFF.md describes the pre-integration branch, not live local ownership.
+Never force-push or discard either history.
 
-Remote main then advanced to `7817ca2`, adding native desktop/controller baking
-controls. That commit is now being merged, with no combined-source verification
-yet. Preserve all incoming work; never force-push over it. Incoming handoff and
-validation are archived as HANDOFF-7817ca2.md / VALIDATION-7817ca2.md, and describe
-a different workspace. Older exact histories remain in git and existing archives.
+Exact7cc source: artifacts/verify-bake-controls-merge. All48 Release suites pass
+262.50s, including the real-loader synthetic OpenXR client105.37s. Four whole-core
+ASan/UBSan/leak suites pass6.71s (asset worker, bake controls, UV workflow, weights);
+C Mikk and xatlas dependencies are instrumented too. Native universal menus53/53,
+bake GUI19/19 and real latest DomeD Wayland/universal-menu8/8 pass. Bake dialog
+capture was visually inspected. Logs use bake-controls-pinned / bake-authoring-pinned
+names; see VALIDATION.md. No proof is implied for subsequent dirty features.
 
-All unfinished next-feature changes were saved before this merge in `stash@{0}`:
-`Preserve lazy UV source UV baking and skin authoring during7817 merge`. This
-includes tracked lazy UV hooks/tests/docs and untracked UV initialization/loader,
-all-slot sourceUV and skin-authoring helper files. Do not drop that stash. Restore
-it only after the merge is committed and preserve conflicts explicitly. Query
-live agent state rather than assuming historical agent names are still active.
+Canonical DomeD main was rechecked at282467e; both clean Release compositor and
+22-patch FLTK1.4.5 toolkit include eaeb8e0 popup-parent behavior. Explicit runtime
+library prefix: artifacts/toolkit-282467e/lib64. No system installation or active
+session/display-manager restart was performed; preserve unrelated DomeD/qimgvr work.
 
-## Verified local checkpoint8f4d67d
+## Physical headset test
 
-Exact detached source in artifacts/verify-authoring-merge passed47/47 Release
-suites147.34s and five whole-core ASan/UBSan/leak suites18.24s (GLB
-interoperability, baked persistence, source morphs, UV workflow and weight
-authoring). The C Mikk and xatlas dependencies were instrumented too. Native
-menus53/53, rig/weights12/12, avatar export5/5, baked-surface GUI5/5 and actual
-latest DomeD Wayland/universal-menu8/8 pass with zero process/report failures.
-Logs use authoring-pinned names; see VALIDATION.md for exact scopes.
+The user tested exact8f4d67d on the real WiVRn HMD/controllers and confirmed
+rudimentary functionality, then requested ending it. Only that test process was
+terminated; recent native recovery files were copied into
+artifacts/xr-milestone-8f4d67d. This is basic physical operation, not complete
+workflow/stylus/reconnect/performance validation. SIGTERM bypassed the CLI final
+save, exposing a real graceful-stop gap; root is fixing it with a lock-free stop
+request and real-loader signal/save regressions. Existing shutdown semantics
+preserve completed edits and cancel unfinished gestures.
 
-Canonical FLTK and compositor both come from clean DomeD282467e. Toolkit is
-artifacts/toolkit-282467e; compositor is
-artifacts/domed-282467e-target/release/dome-compositor. Its Release build completed
-in8m03s. Use the updated prefix's lib64 in LD_LIBRARY_PATH; inherited /opt paths
-can override ELF RUNPATH. Preserve unrelated DomeD/qimgvr edits. No system
-installation or active desktop/display-manager restart occurred.
+## Preserved unfinished work and ownership
 
-## Implemented local authoring contracts to preserve
+The stash named Preserve lazy UV source UV baking and skin authoring during7817
+merge was applied cleanly after7cc was committed; stash@{0} remains a backup.
+Do not drop it until its work is safely committed. Shared main has unfinished
+features; do not mistake its old build archives for a coherent current ABI.
+Query collaboration state for actual live ownership.
 
-- Ordered asynchronous Document::export_asset captures committed Scene, returns
-  a future and reports status/errors without blocking UI. GLB exports the scene;
-  native/controller VRM exports the explicitly selected avatar group. Existing
-  files survive unsupported export failures. Source-preserving VRM0 still refuses
-  generated/source-less/painted/unproven cases until they are implemented.
-- Desktop/controller weight gestures collect bounded capsules, then compute
-  posed common-frame edits on a worker. Maximum capsule falloff applies once per
-  original vertex, so frame density does not accumulate strength. Influence
-  locks, cap/prune, explicit symmetry and linked visible parts retain exact source
-  tokens and one global Undo. Constrained no-op strokes add no dirty/history
-  entry. GPU heatmaps and worker BVH target actual posed geometry. FLTK and XR
-  page13 expose settings/joints/modes/locks/symmetry/linked parts.
-- UV solves/stitch/relax/packing run on the UV worker with complete vertex/corner,
-  skin/morph/source remaps and exact pins/history. Accepted Apply survives implicit
-  focus/rebase/shutdown; explicit Cancel invalidates transfer. Original textured
-  source UV edits remain guarded until all-slot bake/adopt is integrated. Initial
-  topology construction is still eager in the committed checkpoint; lazy hooks
-  and initialization tests are preserved in the stash.
-- Rendering uses canonical Mikk tangent corners for baked normals, explicit
-  render-only original-image vertex remaps and complete weight attributes. Rest
-  meshes/skin/morph/source records remain immutable. Protected/fractional normal
-  coverage is retained through PBR/MToon composition. UV changes rotate baked
-  normal detail into the new Mikk frame. Bake bytes are not counted as paint tiles.
-- Shared material time is sampled once per stereo frame. XR explicitly supports
-  linear RGBA8 and sRGB8 transport; scene/cursors/BDF palette compose in a GPU
-  linear target and resolve once. The synthetic runtime inspects actual released
-  textures and retains both format fixtures and ordering/nonblank/menu assertions.
+- merge_contracts: deferred UV topology initialization on the existing worker,
+  bounded/cancellable loading, ready gates, allocation-barrier and GUI/XR tests.
+  Isolated7cc+owned changes are in artifacts/verify-lazy-uv-7cc; new tests need
+  their CMake registration and readiness fixtures committed together.
+- merge_palette: repeated all-slot SourceUV baking/adoption, original layers
+  and baked base preservation, immutable SourceMaterialBindings, Scene archive
+  dedup/quotas, renderer and mesh-snapshot propagation. Public Scene/SurfaceRange
+  layout changes are coordinated but NOT stable until the agent announces a
+  barrier. Original CreatorAppearance/source archives remain unchanged.
+- merge_docs: painted/source-derived VRM0 materials, forks/dedup/expression remaps,
+  consuming the same explicit material-role/freeze descriptor; no implicit
+  flattening of unsupported animated texture behavior or loss of source IDs.
+- Root: skin bind/transfer helper and desktop/XR workflow, graceful CLI XR stop,
+  backend configuration/device validation and integration/publication. New skin
+  helper has9 focused native checks, not yet registered or exposed in UI.
 
-## Incoming7817ca2 bake controls to retain
+Build new integration candidates from frozen source or private worktrees. Never
+link tests against pre-header-change archives. Preserve exact cancellation,
+source tokens, ordered saves, no-op weight history and paint/UV/rig/morph/source
+identities. Commit only owned tested files, with publication coordinated by root.
 
-Mesh → Bake surface exposes hidden/locked source selection, logarithmic world-mm
-front/back/AO bounds, integer AO samples/padding, asynchronous Bake/rebake,
-progress/status and cancellation. Clear removes only the baked base beneath
-editable layers. The native dialog follows Cancel-default Return,
-Escape/Ctrl+W/universal/WM Close. File → Cancel background work cancels supported
-scene operations. Worker progress/cancellation resources never expose mutable
-widgets/model state, and cancellation is checked under the model lock before
-publication. Preserve the local no-op weight transaction while merging this lease
-release/cancellation path.
+## Full remaining scope
 
-Objects → Mesh tools → Baking uses XR page12; weights stay on page13. Source,
-bounds and quality panels stage configuration until Done, with no scene/history
-mutation; Cancel/focus loss discards staged changes. Bake/Clear explicitly start
-one exact global transaction. Existing Sculpt layers remains under Objects.
-Incoming native controls and four synthetic XR accept/cancel/focus/undo replays
-have their own prior-workspace evidence; this combined source still needs its
-own Release, GUI, sanitizer and real-compositor checks before main publication.
-
-## Resume and full remaining scope
-
-Finish the merge with guarded asset work plus no-op weight history, both XR
-transport formats and all native menu flows intact. Rebuild coherent archives
-before testing; stale public-header/library mixtures produce misleading crashes.
-Commit the merge, verify the exact committed source, then push without force after
-rechecking remote. Restore the stash and give the agents their preserved tasks.
-
-Continue source-UV bake/adopt with every material role/UV set, original identity,
-editable layer and baked base preserved; deferred UV initialization; complete
-bind/transfer and fit/rig/morph authoring UI; painted/generated VRM and VRM1;
-retopology/cuts/procedural tools; sculpt masks/symmetry/resolution/local meshing;
-projection/stencils/texture sets; bake recipes/cages/multiple-source masks and
-production quality. Complete XR Unicode and all physical controller/headset/
-stylus/3D-mouse and compute backend requirements. Actual CC0 VRoid female/male
-remain the primary humanoid baseline, with MakeHuman an explicit alternative.
-Keep the full REQUIREMENTS matrix active; do not redefine completion around this
-checkpoint or the avatar subset.
+Follow REQUIREMENTS.md without reducing it to these avatar/bake milestones.
+Continue production sculpt masks/symmetry/resolution/local meshing; painting
+projection/stencils/texture sets and production baking; complete fit/bind/transfer,
+rig/morph creation and editing; retopology/cuts/procedural plugin equivalents;
+Unicode throughout XR; full required glTF/VRM semantics and independent consumers;
+physical devices and actual accelerator workloads. Intel Arc/UHD expose OpenCL
+and LevelZero, but no complete SYCL SDK is installed yet; HIP compiles but no AMD
+GPU is present, and CUDA hardware/toolchain is absent. Root tightened the ONEAPI
+configure check to require headers/runtime, not merely a compiler accepting
+-fsycl. Compile-only or rendering checks do not prove compute-backend execution.

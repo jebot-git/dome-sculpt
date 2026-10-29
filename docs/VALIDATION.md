@@ -502,3 +502,31 @@ dependencies and Mesa leak detection disabled; this is not whole-core evidence.
 The working tree includes an unstaged additive lazy-UV helper; these results
 must not be relabeled an exact merge-commit validation. A fresh committed-source
 Release/sanitizer build and current-compositor verification are next.
+# Physical headset milestone8f4d67d
+
+Launched the exact verified8f4d67d standalone overlay through the installed
+WiVRn runtime. It selected the real WiVRn HMD and both controller devices;
+runtime performance telemetry advanced while the process was running. The
+user reported: "rudimentary functionality confirmed", then requested ending
+the test. Only the test process was terminated (exit143); recent native recovery
+snapshots were copied into artifacts/xr-milestone-8f4d67d first. The requested
+CLI final-save path was not produced by signal termination. The compositor and
+runtime remain running. Local physical-test-report.json records the scope.
+This verifies basic physical operation by user report; it does not validate
+every workflow, sustained performance, stylus, reconnect or full device scope.
+
+# Exact combined native/XR bake-authoring milestone7cc0d42
+
+Frozen source in artifacts/verify-bake-controls-merge passes all48 optimized
+Release suites262.50s, including the real-loader synthetic OpenXR client105.37s
+(tests-bake-controls-pinned.log). Four whole-core ASan/UBSan/leak suites pass6.71s:
+document-assets, bake-controls, uv-workflow and weight-authoring. C Mikk and xatlas
+are instrumented; log tests-bake-controls-pinned-sanitize.log. Native menus53/53,
+bake dialog19/19 and current clean DomeD282467e Wayland/universal-menu8/8 pass
+with failed0 reports and process exits0 (menu-bake-controls-pinned.log,
+menu-bake-authoring-pinned.log, dome-menu-bake-controls-pinned.log). The native
+bake-options capture was visually inspected for BDF/layout. Toolkit/compositor
+source still282467e when rechecked. Remote0141926 changes only documentation;
+the merged application source remains7cc. Future dirty schema/lazy-UV/skin/signal
+changes are outside this evidence. No new installation/session restart occurred.
+
