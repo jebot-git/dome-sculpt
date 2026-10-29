@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "dome/source-maps.hpp"
 #include "io.hpp"
+#include "gltf-document.hpp"
 #include <bit>
 #include <map>
 #include <set>
@@ -19,16 +21,19 @@ void export_glb(const Mesh &mesh, const std::filesystem::path &path) {
 }
 void export_glb(const std::vector<ObjectSurface> &objects,
                 const std::filesystem::path &path) {
-  if (path.extension() != ".glb")
-    throw std::invalid_argument(
-        "This exporter currently writes binary glTF (.glb)");
+  if (path.extension() != ".glb") throw std::invalid_argument("Binary glTF export requires .glb");
+  detail::write_glb(detail::make_gltf(objects),path);
+}
+detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects) {
+  GltfDocument result;
   if (objects.empty())
     throw std::invalid_argument("The scene has no visible surface to export");
-  nlohmann::json j = {
+  auto &j=result.json;
+  j = {
       {"asset", {{"version", "2.0"}, {"generator", "Dome Sculpt"}}},
       {"scene", 0},
       {"scenes", {{{"nodes", nlohmann::json::array()}}}}};
-  std::vector<uint8_t> data;
+  auto &data=result.binary;
   auto floats = [&](auto values) {
     for (float f : values)
       append(data, std::bit_cast<uint32_t>(f));
@@ -83,7 +88,10 @@ void export_glb(const std::vector<ObjectSurface> &objects,
     }
     validate_transform(object.world_transform());
   }
+  struct SharedRig { int root, first_joint, skin; };
+  std::map<std::string, SharedRig> shared_rigs;
   for (auto &o : objects) {
+    GltfObjectIdentity emission;
     auto &mesh = o.mesh;
     mesh.validate();
     o.material.validate();
@@ -153,6 +161,7 @@ void export_glb(const std::vector<ObjectSurface> &objects,
                       5125, "SCALAR");
     int node = int(j["nodes"].size()), material = int(j["materials"].size()),
         mesh_index = int(j["meshes"].size());
+    emission.node=node; emission.mesh=mesh_index; emission.material=material;
     auto t = o.transform;
     auto &m = o.material;
     if (o.groups.empty()) j["scenes"][0]["nodes"].push_back(node);
@@ -204,12 +213,36 @@ void export_glb(const std::vector<ObjectSurface> &objects,
         // scene root because glTF ignores skinned-node ancestor transforms.
         // Rest inverse-bind matrices exclude the object transform.
         int mesh_node = int(j["nodes"].size());
+        emission.node=mesh_node;
         j["nodes"][node].erase("mesh");
         j["nodes"][node]["children"] = nlohmann::json::array({mesh_node});
         j["nodes"].push_back(
             {{"name", o.name + " surface"}, {"mesh", mesh_index}});
+        std::string rig_key;
+        if (o.deformation->skin && !o.groups.empty()) {
+          auto identity = nlohmann::json{{"group",o.groups.back().id},
+            {"skeleton",s.encode()}, {"pose",nlohmann::json::array()},
+            {"object",j["nodes"][node]}};
+          // Object names/mesh identities are irrelevant; TRS must match exactly.
+          identity["object"].erase("name"); identity["object"].erase("children");
+          for(const auto &pose:d.pose) identity["pose"].push_back({
+            {"t",{pose.translation.x,pose.translation.y,pose.translation.z}},
+            {"r",{pose.rotation.w,pose.rotation.x,pose.rotation.y,pose.rotation.z}},
+            {"s",{pose.scale.x,pose.scale.y,pose.scale.z}}});
+          if(d.humanoid) identity["humanoid"]=d.humanoid->encode();
+          rig_key=identity.dump();
+        }
+        if (!rig_key.empty() && shared_rigs.contains(rig_key)) {
+          // All parts retain separate geometry/morphs but share one actual rig.
+          const auto &shared=shared_rigs.at(rig_key);
+          j["nodes"][node].erase("children");
+          j["scenes"][0]["nodes"].push_back(mesh_node);
+          j["nodes"][mesh_node]["skin"]=shared.skin;
+          for(size_t k=0;k<s.bones.size();++k) emission.joints.push_back(uint32_t(shared.first_joint+k));
+        } else {
         int first_joint = int(j["nodes"].size());
         for (size_t index = 0; index < s.bones.size(); ++index) {
+          emission.joints.push_back(uint32_t(first_joint+index));
           const auto &b = s.bones[index];
           const auto &t = d.pose.empty() ? b.rest : d.pose[index];
           j["nodes"].push_back(
@@ -264,6 +297,8 @@ void export_glb(const std::vector<ObjectSurface> &objects,
           j["nodes"][node]["extras"]["domeSculptHumanoid"] = {
               {"version", 1}, {"humanBones", bones}};
         }
+        if(!rig_key.empty()) shared_rigs[rig_key]={node,first_joint,int(j["skins"].size())-1};
+        }
       }
       if (d.expressions)
         j["meshes"][mesh_index]["extras"]["domeSculptExpressions"] =
@@ -280,6 +315,7 @@ void export_glb(const std::vector<ObjectSurface> &objects,
          {"emissiveFactor", m.emissive},
          {"doubleSided", m.double_sided},
          {"alphaMode", m.color[3] < 1 ? "BLEND" : "OPAQUE"}});
+    result.objects.push_back(std::move(emission));
     auto &encoded = j["materials"].back();
     if (m.alpha != Material::AlphaMode::Automatic)
       encoded["alphaMode"] = m.alpha == Material::AlphaMode::Mask ? "MASK" :
@@ -293,43 +329,106 @@ void export_glb(const std::vector<ObjectSurface> &objects,
         used.push_back("KHR_materials_unlit");
     }
   }
-  for (size_t i = 0; i < objects.size(); ++i)
-    if (objects[i].textures) {
-      if (objects[i].mesh.uv.empty())
-        throw std::invalid_argument("Textured meshes require UV coordinates");
-      auto &maps = *objects[i].textures;
-      auto &material = j["materials"][i];
-      if (j["samplers"].empty())
-        j["samplers"] = {{{"magFilter", 9729},
-                          {"minFilter", 9729},
-                          {"wrapS", 33071},
-                          {"wrapT", 33071}}};
-      auto texture = [&](const Image &image) {
-        auto bytes = image.png();
-        int view = int(j["bufferViews"].size()),
-            source = int(j["images"].size()), index = int(j["textures"].size());
-        j["bufferViews"].push_back({{"buffer", 0},
-                                    {"byteOffset", data.size()},
-                                    {"byteLength", bytes.size()}});
-        data.insert(data.end(), bytes.begin(), bytes.end());
-        while (data.size() % 4)
-          data.push_back(0);
-        j["images"].push_back(
-            {{"bufferView", view}, {"mimeType", "image/png"}});
-        j["textures"].push_back({{"source", source}, {"sampler", 0}});
-        return index;
-      };
-      auto &pbr = material["pbrMetallicRoughness"];
-      pbr["baseColorFactor"] = {1, 1, 1, 1};
-      pbr["metallicFactor"] = 1;
-      pbr["roughnessFactor"] = 1;
-      pbr["baseColorTexture"] = {{"index", texture(maps.color)}};
-      pbr["metallicRoughnessTexture"] = {{"index", texture(maps.metal_rough)}};
-      material["emissiveTexture"] = {{"index", texture(maps.emission)}};
-      material["emissiveFactor"] = {1, 1, 1};
-      if (objects[i].material.alpha == Material::AlphaMode::Automatic)
-        material["alphaMode"] = maps.transparent ? "BLEND" : "OPAQUE";
+  // Images are shared independently of samplers and texture-coordinate transforms.
+  std::map<const Image *, int> image_ids;
+  std::map<std::array<int, 4>, int> sampler_ids;
+  std::map<std::pair<int, int>, int> texture_ids;
+  auto use_extension = [&](const char *name) {
+    auto &used = j["extensionsUsed"];
+    if (!used.is_array()) used = nlohmann::json::array();
+    if (std::find(used.begin(), used.end(), name) == used.end()) used.push_back(name);
+  };
+  auto texture = [&](const Image &image, const PaintSourceTexture &slot) {
+    image.validate();
+    int source;
+    if (auto found = image_ids.find(&image); found != image_ids.end()) source = found->second;
+    else {
+      auto bytes = image.png();
+      if (bytes.size() > 256 * 1024 * 1024 - std::min(data.size(), size_t(256 * 1024 * 1024)))
+        throw std::length_error("glTF image resource limit exceeded");
+      int view = int(j["bufferViews"].size());
+      source = int(j["images"].size());
+      j["bufferViews"].push_back({{"buffer",0},{"byteOffset",data.size()},{"byteLength",bytes.size()}});
+      data.insert(data.end(),bytes.begin(),bytes.end());
+      while(data.size()%4) data.push_back(0);
+      j["images"].push_back({{"bufferView",view},{"mimeType","image/png"}});
+      image_ids[&image]=source;
     }
+    std::array key{slot.wrap_s,slot.wrap_t,slot.min_filter,slot.mag_filter};
+    int sampler;
+    if(auto found=sampler_ids.find(key);found!=sampler_ids.end()) sampler=found->second;
+    else {
+      sampler=int(j["samplers"].size());
+      nlohmann::json record={{"wrapS",slot.wrap_s},{"wrapT",slot.wrap_t}};
+      if(slot.min_filter) record["minFilter"]=slot.min_filter;
+      if(slot.mag_filter) record["magFilter"]=slot.mag_filter;
+      j["samplers"].push_back(record); sampler_ids[key]=sampler;
+    }
+    auto key2=std::pair{source,sampler};
+    if(auto found=texture_ids.find(key2);found!=texture_ids.end()) return found->second;
+    int index=int(j["textures"].size());
+    j["textures"].push_back({{"source",source},{"sampler",sampler}});
+    texture_ids[key2]=index; return index;
+  };
+  auto source_info = [&](const PaintSourceTexture &slot) {
+    slot.validate();
+    if(slot.texcoord!=0) throw std::invalid_argument("Export surface has no requested source UV set");
+    nlohmann::json info={{"index",texture(*slot.image,slot)}};
+    const auto &m=slot.uv_transform;
+    if(m!=std::array<float,6>{1,0,0,1,0,0}) {
+      // KHR_texture_transform represents rotation*scale, never arbitrary shear.
+      double sx=std::hypot(double(m[0]),double(m[2]));
+      double rotation=sx>1e-15?std::atan2(double(m[2]),double(m[0])):
+                                      std::atan2(-double(m[1]),double(m[3]));
+      double sy=-std::sin(rotation)*m[1]+std::cos(rotation)*m[3];
+      double scale=std::max({1.,sx,std::abs(sy)});
+      if(std::abs(-std::sin(rotation)*sy-m[1])>1e-6*scale ||
+         std::abs(std::cos(rotation)*sy-m[3])>1e-6*scale)
+        throw std::invalid_argument("Source texture shear cannot be represented by KHR_texture_transform");
+      info["extensions"]["KHR_texture_transform"]={{"offset",{m[4],m[5]}},
+        {"rotation",rotation},{"scale",{sx,sy}}};
+      use_extension("KHR_texture_transform");
+    }
+    return info;
+  };
+  for(size_t i=0;i<objects.size();++i) if(objects[i].textures) {
+    if(objects[i].mesh.uv.empty()) throw std::invalid_argument("Textured meshes require UV coordinates");
+    const auto &maps=*objects[i].textures;
+    auto &material=j["materials"][i]; auto &pbr=material["pbrMetallicRoughness"];
+    if(maps.source_only) {
+      if(!maps.source_maps) throw std::invalid_argument("Source-only textures require source maps");
+      const auto &source=*maps.source_maps; source.validate();
+      if(source.color.image) pbr["baseColorTexture"]=source_info(source.color);
+      if(source.metal_rough.image) pbr["metallicRoughnessTexture"]=source_info(source.metal_rough);
+      if(source.emission.image) material["emissiveTexture"]=source_info(source.emission);
+    } else {
+      PaintSourceTexture sampler; sampler.wrap_s=sampler.wrap_t=33071;
+      sampler.min_filter=sampler.mag_filter=9729;
+      pbr["baseColorFactor"]={1,1,1,1}; pbr["metallicFactor"]=1; pbr["roughnessFactor"]=1;
+      pbr["baseColorTexture"]={{"index",texture(maps.color,sampler)}};
+      pbr["metallicRoughnessTexture"]={{"index",texture(maps.metal_rough,sampler)}};
+      material["emissiveTexture"]={{"index",texture(maps.emission,sampler)}};
+      material["emissiveFactor"]={1,1,1};
+    }
+    if(maps.source_maps) {
+      const auto &source=*maps.source_maps; source.validate();
+      if(source.normal.image) {
+        material["normalTexture"]=source_info(source.normal);
+        material["normalTexture"]["scale"]=source.normal_scale;
+      }
+      if(source.occlusion.image) {
+        material["occlusionTexture"]=source_info(source.occlusion);
+        material["occlusionTexture"]["strength"]=source.occlusion_strength;
+      }
+    }
+    if(!maps.source_only && objects[i].material.alpha==Material::AlphaMode::Automatic)
+      material["alphaMode"]=maps.transparent?"BLEND":"OPAQUE";
+  }
+  return result;
+}
+void detail::write_glb(GltfDocument document,const std::filesystem::path &path) {
+  auto &j=document.json; auto &data=document.binary;
+  while(data.size()%4) data.push_back(0);
   j["buffers"] = {{{"byteLength", data.size()}}};
   std::string text = j.dump();
   while (text.size() % 4)

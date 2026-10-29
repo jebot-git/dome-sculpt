@@ -3,6 +3,7 @@
 #include "cgltf.h"
 #include "dome/scene.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "dome/source-maps.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -163,6 +164,55 @@ int main() try {
             "Embedded PNG preserves exact PBR texels and image orientation");
     png_image_free(&decoded);
   }
+
+  // Independent source samplers/normal/AO survive both raw and painted modes.
+  auto source = std::make_shared<dome::PaintSourceMaps>();
+  auto tiny = std::make_shared<dome::Image>();
+  tiny->width=tiny->height=1; tiny->rgba={127,128,255,191};
+  source->color.image=source->normal.image=source->occlusion.image=tiny;
+  source->normal.wrap_s=33648; source->normal.wrap_t=33071;
+  source->normal.min_filter=9987; source->normal.mag_filter=9728;
+  source->normal.uv_transform={0,-2,3,0,.25f,-.5f};
+  source->normal_scale=.6f; source->occlusion_strength=.35f;
+  auto source_maps=std::make_shared<dome::TextureMaps>();
+  source_maps->source_only=true; source_maps->source_maps=source;
+  objects[0].textures=source_maps; objects[0].material=blue;
+  dome::export_glb(objects,path);
+  raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts raw source textures");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> source_file(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success,"Source texture GLB is valid");
+  auto &sm=raw->materials[0];
+  require(raw->images_count==1 && raw->textures_count==2 && raw->samplers_count==2,
+          "Image bytes are deduplicated independently of sampler identities");
+  require(sm.pbr_metallic_roughness.base_color_factor[0]==blue.color[0] &&
+          sm.emissive_factor[1]==blue.emissive[1],"Raw source textures apply authored factors once");
+  require(sm.normal_texture.texture && sm.normal_texture.scale==.6f &&
+          sm.normal_texture.has_transform && sm.normal_texture.transform.offset[0]==.25f &&
+          sm.normal_texture.texture->sampler->wrap_s==33648 &&
+          sm.normal_texture.texture->sampler->min_filter==9987 &&
+          sm.occlusion_texture.texture && sm.occlusion_texture.scale==.35f,
+          "Normal/AO scale, UV transform and independent samplers survive export");
+  auto derived=std::make_shared<dome::TextureMaps>(*maps); derived->source_maps=source;
+  objects[0].textures=derived; dome::export_glb(objects,path);
+  raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts derived textures with source normal/AO");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> derived_file(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success &&
+          raw->materials[0].normal_texture.texture && raw->materials[0].occlusion_texture.texture &&
+          raw->materials[0].pbr_metallic_roughness.base_color_factor[0]==1,
+          "Derived composites retain source normal/AO without double factors");
+  auto invalid_source=std::make_shared<dome::PaintSourceMaps>(*source);
+  invalid_source->normal.uv_transform={1,.5f,0,1,0,0};
+  auto invalid_maps=std::make_shared<dome::TextureMaps>(*source_maps); invalid_maps->source_maps=invalid_source;
+  objects[0].textures=invalid_maps;
+  bool shear_rejected=false; try{dome::export_glb(objects,path);}catch(const std::invalid_argument&){shear_rejected=true;}
+  require(shear_rejected,"Unrepresentable texture shear rejects instead of changing texture coordinates");
+  objects[0].textures=maps; objects[0].material=dome::Material{};
 
   // Full deformation is exported from the untouched authoring surface, never
   // from the already posed preview. Five influences require a second set.
@@ -386,6 +436,28 @@ int main() try {
   if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
     std::filesystem::copy_file(path, std::string(fixture) + ".grouped.glb",
                                std::filesystem::copy_options::overwrite_existing);
+  auto appearance=std::make_shared<dome::CreatorAppearance>();
+  appearance->asset=std::make_shared<dome::ImportedAsset>();
+  objects[0].appearance=appearance;
+  auto sibling=objects[0]; sibling.id=2; sibling.name="Other creator primitive";
+  dome::export_glb({objects[0],sibling},path);
+  raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts a multipart shared creator rig");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> shared_file(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success && raw->skins_count==1,
+          "Creator primitives share one skin and actual bone hierarchy");
+  size_t shared_meshes=0; for(size_t i=0;i<raw->nodes_count;++i)
+    if(raw->nodes[i].skin==&raw->skins[0]) ++shared_meshes;
+  require(shared_meshes==2 && raw->skins[0].joints_count==5,
+          "Both independent meshes bind the identical five joint nodes");
+  sibling.transform.position.x+=.1f; dome::export_glb({objects[0],sibling},path);
+  raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Differently transformed creator parts remain exportable");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> distinct_file(raw,cgltf_free);
+  require(raw->skins_count==2,"Different object transforms cannot silently merge distinct rigs");
   objects[0].groups[1].parent = 71;
   auto conflict = objects[0]; conflict.groups[0].transform.scale = 2;
   bool conflict_rejected = false;
