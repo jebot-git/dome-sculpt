@@ -124,6 +124,43 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
       attributes["TEXCOORD_0"] =
           add(begin, data.size() - begin, 34962, mesh.uv.size(), 5126, "VEC2");
     }
+    if(o.appearance && o.appearance->asset && !o.appearance->asset->primitives.empty()) {
+      const auto &a=*o.appearance;
+      if(!a.asset || a.source_vertices.size()!=mesh.positions.size())
+        throw std::invalid_argument("Source attribute export requires an exact vertex map");
+      const ImportedPrimitive *source=nullptr;
+      for(const auto &p:a.asset->primitives)
+        if(p.source_mesh==a.source_mesh && p.source_primitive==a.source_primitive) {
+          if(source) throw std::invalid_argument("Ambiguous source attribute primitive");
+          source=&p;
+        }
+      // Hand-created appearance-free surfaces do not claim imported attributes.
+      if(source) {
+        auto attribute=[&](const auto &values,const char *name,const char *type) {
+          if(values.empty())return;
+          begin=data.size();
+          for(auto v:a.source_vertices) {
+            if(v>=values.size()) throw std::invalid_argument("Source attribute vertex index is missing");
+            floats(values[v]);
+          }
+          attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
+        };
+        attribute(source->uv1,"TEXCOORD_1","VEC2");
+        attribute(source->colors,"COLOR_0","VEC4");
+        if(!source->tangents.empty()) {
+          for(size_t v=0;v<a.source_vertices.size();++v) {
+            auto source_vertex=a.source_vertices[v];
+            if(source_vertex>=source->mesh.positions.size() || source_vertex>=source->mesh.normals.size() ||
+               length(mesh.positions[v]-source->mesh.positions[source_vertex])>1e-6f ||
+               length(mesh.normals[v]-source->mesh.normals[source_vertex])>1e-6f ||
+               (source_vertex<source->mesh.uv.size() && (mesh.uv.empty() || mesh.uv[v]!=source->mesh.uv[source_vertex])))
+              throw std::invalid_argument("Edited source tangent frames require explicit tangent recomputation");
+          }
+        }
+        attribute(source->tangents,"TANGENT","VEC4");
+      } else if(!a.asset->primitives.empty())
+        throw std::invalid_argument("Missing source attribute primitive");
+    }
     if (o.deformation && o.deformation->skin) {
       const auto &weights = o.deformation->skin->vertices;
       size_t sets = 0;
@@ -370,10 +407,12 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
     j["textures"].push_back({{"source",source},{"sampler",sampler}});
     texture_ids[key2]=index; return index;
   };
+  bool secondary_uv_available=false;
   auto source_info = [&](const PaintSourceTexture &slot) {
     slot.validate();
-    if(slot.texcoord!=0) throw std::invalid_argument("Export surface has no requested source UV set");
+    if(slot.texcoord!=0 && !(slot.texcoord==1 && secondary_uv_available)) throw std::invalid_argument("Export surface has no requested source UV set");
     nlohmann::json info={{"index",texture(*slot.image,slot)}};
+    if(slot.texcoord) info["texCoord"]=slot.texcoord;
     const auto &m=slot.uv_transform;
     if(m!=std::array<float,6>{1,0,0,1,0,0}) {
       // KHR_texture_transform represents rotation*scale, never arbitrary shear.
@@ -393,6 +432,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
   };
   for(size_t i=0;i<objects.size();++i) if(objects[i].textures) {
     if(objects[i].mesh.uv.empty()) throw std::invalid_argument("Textured meshes require UV coordinates");
+    secondary_uv_available=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_1");
     const auto &maps=*objects[i].textures;
     auto &material=j["materials"][i]; auto &pbr=material["pbrMetallicRoughness"];
     if(maps.source_only) {

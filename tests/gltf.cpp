@@ -195,6 +195,30 @@ int main() try {
           sm.normal_texture.texture->sampler->min_filter==9987 &&
           sm.occlusion_texture.texture && sm.occlusion_texture.scale==.35f,
           "Normal/AO scale, UV transform and independent samplers survive export");
+  auto imported=std::make_shared<dome::ImportedAsset>();
+  dome::ImportedPrimitive source_primitive; source_primitive.mesh=mesh; source_primitive.source_mesh=0; source_primitive.source_primitive=0;
+  source_primitive.uv1=mesh.uv;
+  source_primitive.colors.assign(mesh.positions.size(),{.2f,.4f,.6f,.8f});
+  source_primitive.tangents.assign(mesh.positions.size(),{1,0,0,-1});
+  imported->primitives.push_back(source_primitive);
+  auto source_identity=std::make_shared<dome::CreatorAppearance>();source_identity->asset=imported;
+  source_identity->source_mesh=source_identity->source_primitive=0;
+  for(uint32_t v=0;v<mesh.positions.size();++v)source_identity->source_vertices.push_back(v);
+  objects[0].appearance=source_identity;
+  dome::export_glb(objects,path);raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts preserved secondary UV/color/tangent attributes");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> attributes_file(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success &&
+          raw->materials[0].pbr_metallic_roughness.base_color_texture.texcoord==0,
+          "Source material retains its explicit supported UV binding");
+  auto &source_p=raw->meshes[0].primitives[0];float source_value[4];
+  require(cgltf_find_accessor(&source_p,cgltf_attribute_type_texcoord,1) &&
+          cgltf_accessor_read_float(cgltf_find_accessor(&source_p,cgltf_attribute_type_color,0),0,source_value,4) && source_value[2]==.6f,
+          "Original compacted vertex color and secondary UV accessors survive exactly");
+  require(cgltf_accessor_read_float(cgltf_find_accessor(&source_p,cgltf_attribute_type_tangent,0),0,source_value,4) && source_value[3]==-1,
+          "Source tangent handedness remains authored");
   auto derived=std::make_shared<dome::TextureMaps>(*maps); derived->source_maps=source;
   objects[0].textures=derived; dome::export_glb(objects,path);
   raw=nullptr;
