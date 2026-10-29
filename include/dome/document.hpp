@@ -54,6 +54,8 @@ struct EditorState {
   bool light = false, toon = false;
   bool mesh_active = false, asset_busy = false, can_undo = false,
        can_redo = false;
+  bool can_voxel_remesh = false;
+  float voxel_size_mm = 30;
   std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
                                     true, true, true, true, true, true};
   PaintSettings paint;
@@ -128,6 +130,10 @@ public:
   using SceneOperation = std::function<void(Scene &, const std::function<bool()> &)>;
   void edit_scene(std::string label, SceneOperation, AssetSource expected = {});
   void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
+  void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
+  void begin_voxel_remesh();
+  void edit_voxel_size(float world_voxel_mm);
+  void end_voxel_remesh(bool accept);
   bool wait_asset(
       std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void begin_uv();
@@ -197,6 +203,8 @@ private:
   float control_radius_ = 0;
   bool control_changed_ = false;
   uint64_t control_object_ = 0;
+  AssetSource control_source_{};
+  float control_voxel_mm_ = 30;
   std::optional<UvWorkspace> uv_;
   uint64_t uv_session_ = 0;
   bool uv_accept_pending_ = false;
@@ -282,5 +290,8 @@ private:
   void file_loop();
   void queue_scene_operation(std::string, SceneOperation, AssetSource,
                              std::shared_ptr<std::string>);
+  void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
+                                    std::shared_ptr<std::string>);
+  void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome

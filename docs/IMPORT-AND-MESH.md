@@ -129,3 +129,19 @@ the existing Release core archive. This instruments the importer/processing
 component; it does not constitute sanitizer coverage of every existing core
 translation unit. Logs are written to `artifacts/mesh-import*.log` and
 `artifacts/mesh-processing*.log` by the milestone checks.
+
+## Voxel authoring checkpoint
+
+Mesh > Voxel remesh... and XR Objects > Mesh tools > Voxel remesh share a
+logarithmic world-millimetre control. Explicit confirmation creates a new
+sculpt from the displayed shape on the guarded asset worker. The source is
+retained and hidden with all paint, deformation and sculpt layers; these data
+are not transferred into the new scalar field. Transform and scalar material
+factors are copied. Undo restores the complete prior scene in one transaction.
+
+Closed oriented shells, finite sizes and the retained scene sample budget are
+required. Empty/coarse results, unsupported topology and cancellation leave
+the source unchanged. Source scale converts world spacing to local spacing.
+The in-process native fixture covers posed mesh conversion and controller
+controls; feature-specific GUI, real-loader replay and sanitizer work remain
+in HANDOFF.md. This does not establish complete production remeshing or baking.

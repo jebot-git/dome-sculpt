@@ -309,6 +309,7 @@ void Document::publish_locked(bool force) {
   } else
     state_.uv.reset();
   state_.mesh_active = active.mesh_active;
+  state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
   state_.active_sculpt_layer = volume().active_layer();
   state_.sculpt_layers.clear();
   state_.sculpt_editable = volume().editable_layer();
@@ -360,7 +361,9 @@ void Document::publish_locked(bool force) {
   }
 }
 void Document::finish_locked() {
-  finish_control_locked(true);
+  // Starting another command may accept scalar property previews, but must
+  // not implicitly execute an action such as creating a remeshed object.
+  finish_control_locked(state_.controls.parameter != VrParameter::VoxelSize);
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
   if (action_active_locked() && end_action_locked())
@@ -416,7 +419,7 @@ void Document::seed() {
 }
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
-  if (uv_ || state_.asset_busy || action_active_locked() ||
+  if (control_before_ || uv_ || state_.asset_busy || action_active_locked() ||
       input_.menu_open() || !scene_.active().visible ||
       scene_.active().locked ||
       (!scene_.active().mesh_active && !volume().editable_layer()))
@@ -584,6 +587,33 @@ void Document::begin_uv() {
   finish_locked();
   control_event_locked({VrControlEventType::Begin, VrParameter::UvEdit});
   desktop_ = true;
+  publish_locked();
+}
+void Document::begin_voxel_remesh() {
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  control_event_locked({VrControlEventType::Begin, VrParameter::VoxelSize});
+  desktop_ = true;
+  state_.error.clear();
+  publish_locked();
+}
+void Document::edit_voxel_size(float mm) {
+  std::lock_guard lock(model_mutex_);
+  if (!control_before_ || state_.controls.parameter != VrParameter::VoxelSize)
+    throw std::logic_error("Open the voxel remesh controls first");
+  auto &c = state_.controls;
+  if (!std::isfinite(mm) || mm < c.minimum || mm > c.maximum)
+    throw std::invalid_argument("Voxel size is outside the object's supported range");
+  c.value[0] = state_.voxel_size_mm = mm;
+  state_.error.clear();
+  publish_locked();
+}
+void Document::end_voxel_remesh(bool accept) {
+  std::lock_guard lock(model_mutex_);
+  if (control_before_ && state_.controls.parameter != VrParameter::VoxelSize)
+    throw std::logic_error("Another control owns the document");
+  finish_control_locked(accept);
+  desktop_ = false;
   publish_locked();
 }
 void Document::edit_uv(UvAction action, float x, float y) {
@@ -1062,6 +1092,12 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if (parameter == VrParameter::VoxelSize) {
+    const auto &o = scene_.active();
+    return !state_.asset_busy && !state_.recovery_busy && o.visible && !o.locked &&
+           scene_.objects().size() < 256 &&
+           (o.mesh_active ? bool(o.painted) : o.volume->stored_samples() != 0);
+  }
   if (parameter == VrParameter::SculptOpacity)
     return !state_.asset_busy && !scene_.active().mesh_active &&
            scene_.active().visible && !scene_.active().locked;
@@ -1083,6 +1119,24 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if (state_.controls.parameter == VrParameter::VoxelSize) {
+    if (accept) {
+      auto before = std::move(control_before_);
+      control_before_.reset();
+      try {
+        queue_voxel_sculpt_locked(state_.controls.value[0], control_source_);
+      } catch (...) {
+        control_before_ = std::move(before);
+        throw;
+      }
+    } else {
+      control_before_.reset();
+      state_.voxel_size_mm = control_voxel_mm_;
+    }
+    control_changed_ = false;
+    state_.controls = {};
+    return;
+  }
   if (uv_) {
     if (accept && uv_accept_pending_)
       return;
@@ -1141,6 +1195,7 @@ void Document::control_event_locked(VrControlEvent event) {
     control_settings_ = state_.paint;
     control_radius_ = state_.radius;
     control_object_ = scene_.active().id;
+    control_source_ = {state_.generation, state_.revision, control_object_};
     control_changed_ = false;
     auto &o = scene_.active();
     auto &c = state_.controls;
@@ -1160,6 +1215,15 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::VoxelSize:
+      control_voxel_mm_ = state_.voxel_size_mm;
+      c.title = "Voxel remesh size (mm)";
+      c.minimum = std::max(.01f, .01f * o.transform.scale);
+      c.maximum = std::min(1000.f, 1000.f * o.transform.scale);
+      c.logarithmic = true;
+      c.value[0] = state_.voxel_size_mm =
+          std::clamp(state_.voxel_size_mm, c.minimum, c.maximum);
+      break;
     case VrParameter::BrushRadius:
       c.title = "Brush size";
       c.minimum = .005f;
@@ -1295,6 +1359,9 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::VoxelSize:
+    state_.voxel_size_mm = value;
+    break;
   case VrParameter::SculptOpacity: {
     auto &v = *o.volume;
     auto &ls = v.layers();

@@ -2,6 +2,7 @@
 // Adapted from OpenBrush Native's BDF palette and texture renderer
 // (Apache-2.0).
 #include "dome/palette.hpp"
+#include <cstdio>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_FONT_FORMATS_H
@@ -288,6 +289,11 @@ void SpatialPalette::raster(const EditorState &s) {
         label = std::string(1, "RGBA"[row]) + " ";
       if (c.parameter == VrParameter::BrushRadius)
         label += std::to_string(int(std::lround(value * 1000))) + " mm";
+      else if (c.parameter == VrParameter::VoxelSize) {
+        char size[48];
+        snprintf(size, sizeof(size), "%.2f mm", double(value));
+        label += size;
+      }
       else if (c.parameter == VrParameter::LayerOrder)
         label += "Layer " + std::to_string(int(std::lround(value)) + 1);
       else
@@ -319,7 +325,12 @@ void SpatialPalette::raster(const EditorState &s) {
                  : Color{55, 65, 80, uint8_t(s.opacity)});
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, accent);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
-    text(470 * unit_, 616 * unit_, "Done / Press", fg);
+    text(470 * unit_, 616 * unit_,
+         c.parameter == VrParameter::VoxelSize ? "Remesh / Press" : "Done / Press", fg);
+    if (c.parameter == VrParameter::VoxelSize) {
+      text(320 * unit_, 470 * unit_, "New sculpt from the displayed shape", fg);
+      text(320 * unit_, 505 * unit_, "Source retained and hidden", fg);
+    }
     return;
   }
   auto current = std::find_if(s.objects.begin(), s.objects.end(),

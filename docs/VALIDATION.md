@@ -1,3 +1,29 @@
+# Voxel authoring checkpoint — 2026-10-29
+
+Work-in-progress desktop/XR voxel conversion is recorded over base 90601ca.
+The full Release build, including FLTK frontend and XR libraries, passed using
+the canonical private toolkit: artifacts/build-voxel-checkpoint.log.
+All six affected native suites passed in 21.88 seconds:
+artifacts/tests-voxel-checkpoint.log. These are uv-authoring,
+controller-controls, shared-document, document-recovery, document-assets and
+voxel-authoring. The new voxel-authoring suite also passed independently before
+this checkpoint rebuild; the final run includes the corrected grid-budget
+fixture at 0.1 mm (within the scaled kernel size bounds).
+
+The new native fixture verifies retained exact paint/rig/pose/sculpt layers,
+posed shape sampling, world/object scale and material factors, one-step exact
+Undo/Redo, immediate sculptability, non-mutating option previews, in-process XR
+menu/ray/stick/fine-wheel controls, focus cancellation, coarse/open/budget
+failures, worker cancellation and stale-generation rejection. This controller
+fixture is not a real-loader replay or a physical controller test.
+
+The new FLTK modal compiled successfully. Feature-specific GUI, universal-menu,
+real-loader OpenXR, scalar-field-source and sanitizer checks remain in
+HANDOFF.md. Previous GUI/menu/sanitizer/full-suite results below retain their
+original source scope. No system installation, session restart, hardware or
+accelerator validation occurred for this checkpoint. The full objective is
+unfinished; paint transfer and adaptive remesh authoring remain separate work.
+
 # Final UV-worker and authoring integration — 2026-10-29
 
 Integrated upstream through db1d710, preserving native sculpt layers, recovery,
