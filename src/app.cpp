@@ -34,6 +34,7 @@ namespace {
 struct Canvas : Fl_Gl_Window {
   Document document;
   std::unique_ptr<SurfaceRenderer> renderer;
+  std::unique_ptr<CursorRenderer> cursors;
   std::shared_ptr<const MeshSnapshot> shown_mesh;
   Mesh mesh;
   Quat rotation{};
@@ -55,6 +56,7 @@ struct Canvas : Fl_Gl_Window {
   ~Canvas() {
     if (renderer) {
       make_current();
+      cursors.reset();
       renderer.reset();
     }
   }
@@ -119,6 +121,10 @@ struct Canvas : Fl_Gl_Window {
           document.frame().state->menu) {
         document.cancel_spatial_menu();
         return 1;
+      }
+      if (event == FL_KEYDOWN && Fl::event_key() == FL_Escape && !sculpting &&
+          document.frame().state->retopology) {
+        document.end_retopology(false); invalidate(); return 1;
       }
       if (event == FL_PUSH) {
         take_focus();
@@ -201,6 +207,7 @@ struct Canvas : Fl_Gl_Window {
     if (!context_valid() && renderer) {
       renderer->abandon();
       renderer.reset();
+      if (cursors) { cursors->abandon(); cursors.reset(); }
     }
     if (!renderer)
       renderer = std::make_unique<SurfaceRenderer>();
@@ -217,6 +224,11 @@ struct Canvas : Fl_Gl_Window {
     renderer->set_frame_time(material_time);
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
                    f.state->toon, f.state->light);
+    if (f.state->retopology) {
+      if (!cursors) cursors = std::make_unique<CursorRenderer>();
+      auto overlay = *f.state; overlay.canvas = model; overlay.hands = {};
+      cursors->draw(overlay, vp);
+    }
     if (!capture.empty()) {
       std::vector<uint8_t> pixels(size_t(pixel_w()) * pixel_h() * 3);
       glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -261,7 +273,7 @@ struct App {
   static void tick(void *data) {
     auto &a = *static_cast<App *>(data);
     auto f = a.canvas.document.frame();
-    if (f.surface != a.canvas.shown_mesh)
+    if (f.surface != a.canvas.shown_mesh || f.state->retopology)
       a.canvas.redraw();
     a.dirty = f.state->dirty;
     a.canvas.tool = f.state->tool;
@@ -371,6 +383,20 @@ struct App {
     menu.add("&Mesh/Clear baked surface",0,command,this);
     menu.add("&File/Cancel background work",0,command,this);
     menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
+    menu.add("&Mesh/Retopology/Start patch", 0, command, this);
+    menu.add("&Mesh/Retopology/Place points", 0, command, this, FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&Mesh/Retopology/Move points", 0, command, this, FL_MENU_RADIO);
+    menu.add("&Mesh/Retopology/Make face", 0, command, this);
+    menu.add("&Mesh/Retopology/Connect edge", 0, command, this);
+    menu.add("&Mesh/Retopology/Delete points", 0, command, this);
+    menu.add("&Mesh/Retopology/Pin points", 0, command, this);
+    menu.add("&Mesh/Retopology/Seam edge", 0, command, this);
+    menu.add("&Mesh/Retopology/Relax patch", 0, command, this);
+    menu.add("&Mesh/Retopology/Snap points", 0, command, this);
+    menu.add("&Mesh/Retopology/Clear point selection", 0, command, this);
+    menu.add("&Mesh/Retopology/Projection distance...", 0, command, this);
+    menu.add("&Mesh/Retopology/Apply patch", 0, command, this);
+    menu.add("&Mesh/Retopology/Cancel patch", 0, command, this);
     menu.add("&Paint/Prepare painting mesh", FL_CTRL | FL_SHIFT | 'p', command,
              this);
     menu.add("&Paint/Use painted mesh", 'p', command, this, FL_MENU_RADIO);
@@ -581,6 +607,33 @@ struct App {
                (active->has_mesh || (active->visible && !active->locked)));
     enable("&Paint/Edit source volume",
            !modal && s->mesh_active && !s->asset_busy);
+    if (s->retopology) {
+      for (int i = 0; i < menu.size(); ++i) {
+        auto label = menu.menu()[i].label();
+        if (!label || (menu.mode(i) & FL_SUBMENU)) continue;
+        std::string text = label;
+        text.erase(std::remove(text.begin(), text.end(), '&'), text.end());
+        if (text != "Undo" && text != "Redo" && text != "Close Window" &&
+            text != "Reset trackball" && text != "Start or stop XR" && text != "Cancel background work")
+          modes[i] |= FL_MENU_INACTIVE;
+      }
+    }
+    enable("&Mesh/Retopology/Start patch", !modal && s->can_retopologize);
+    auto retopo = s->retopology;
+    bool editing = !modal && retopo && retopo->source && !retopo->committing && !s->asset_busy;
+    const char *retopo_actions[] = {"Place points", "Move points", "Relax patch", "Clear point selection", "Projection distance..."};
+    for (auto name : retopo_actions) enable((std::string("&Mesh/Retopology/") + name).c_str(), editing);
+    size_t selected = retopo ? retopo->selected.size() : 0;
+    enable("&Mesh/Retopology/Make face", editing && selected >= 3);
+    enable("&Mesh/Retopology/Connect edge", editing && selected == 2);
+    enable("&Mesh/Retopology/Seam edge", editing && selected == 2);
+    enable("&Mesh/Retopology/Pin points", editing && selected != 0);
+    enable("&Mesh/Retopology/Delete points", editing && selected != 0);
+    enable("&Mesh/Retopology/Snap points", editing && selected != 0);
+    enable("&Mesh/Retopology/Apply patch", editing && retopo->topology && !retopo->topology->faces().empty() && retopo->changed);
+    enable("&Mesh/Retopology/Cancel patch", !modal && retopo && !retopo->committing);
+    checked("&Mesh/Retopology/Place points", !retopo || !retopo->moving);
+    checked("&Mesh/Retopology/Move points", retopo && retopo->moving);
     for (int i = 0; i < menu.size(); ++i)
       if (menu.mode(i) != modes[i])
         menu.mode(i, modes[i]);
@@ -621,6 +674,14 @@ struct App {
            << " | Shift+drag: paint | Blue: 0  Red: 1";
       if (info->weight_samples) text << (current_frame.surface->weight_samples >= info->weight_samples
           ? " | Live preview; release to apply" : " | Updating preview; release to apply");
+    }
+    if (info->retopology) {
+      auto &r = *info->retopology;
+      text.str("");
+      text << "Retopology: " << (r.moving ? "Move" : "Place / select")
+           << " | Shift+click/drag | " << r.selected.size() << " selected";
+      if (r.topology) text << " | " << r.topology->faces().size() << " faces";
+      text << (r.committing ? " | Applying" : r.busy ? " | Updating" : " | Mesh > Retopology: face / apply / cancel");
     }
     if (!info->error.empty()) {
       text.str("");
@@ -792,6 +853,22 @@ struct App {
           label == "Locked" ? !o.locked : o.locked, o.transform, o.material);
     } else if (label == "UV editor...") {
       edit_uv(canvas.document);
+    } else if (label == "Start patch") {
+      canvas.document.begin_retopology();
+    } else if (label == "Apply patch" || label == "Cancel patch") {
+      canvas.document.end_retopology(label == "Apply patch");
+    } else if (label == "Place points" || label == "Move points") {
+      if (canvas.document.frame().state->retopology->moving != (label == "Move points"))
+        canvas.document.edit_retopology(RetopoAction::Mode);
+    } else if (label == "Projection distance...") {
+      edit_retopology_distance(canvas.document);
+    } else if (label == "Make face" || label == "Connect edge" || label == "Delete points" ||
+               label == "Pin points" || label == "Seam edge" || label == "Relax patch" ||
+               label == "Snap points" || label == "Clear point selection") {
+      canvas.document.edit_retopology(label == "Make face" ? RetopoAction::Face
+          : label == "Connect edge" ? RetopoAction::Wire : label == "Delete points" ? RetopoAction::Delete
+          : label == "Pin points" ? RetopoAction::Pin : label == "Seam edge" ? RetopoAction::Seam
+          : label == "Relax patch" ? RetopoAction::Relax : label == "Snap points" ? RetopoAction::Snap : RetopoAction::Clear);
     } else if (label == "Prepare painting mesh") {
       canvas.document.prepare_mesh();
     } else if (label == "Use painted mesh") {
@@ -1023,6 +1100,8 @@ int main(int argc, char **argv) try {
     std::cout << nlohmann::json{{"sculpt_layers", sculpt_layers},
                                 {"objects", objects},
                                 {"scene_hash", digest(encoded)},
+                                {"retopology_vertices", scene.active().retopology ? scene.active().retopology->topology.vertices().size() : 0},
+                                {"retopology_faces", scene.active().retopology ? scene.active().retopology->topology.faces().size() : 0},
                                 {"active_sculpt_layer", volume.active_layer()},
                                 {"paint_blue_texels", blue_texels},
                                 {"uv_hash", uv_hash},

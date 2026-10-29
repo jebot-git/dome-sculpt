@@ -247,6 +247,18 @@ void RetopoMesh::remove_vertex(TopologyID id) {
       throw std::runtime_error("Vertex still has incident edges");
   vertices_.erase(id);
 }
+void RetopoMesh::erase_vertices(std::span<const TopologyID> selected) {
+  RetopoMesh draft = *this;
+  std::set<TopologyID> removed(selected.begin(), selected.end());
+  for (auto id : removed) if (!vertices_.contains(id)) throw std::out_of_range("Unknown retopology vertex");
+  std::erase_if(draft.faces_, [&](const auto &item) {
+    return std::any_of(item.second.vertices.begin(), item.second.vertices.end(), [&](auto id) { return removed.contains(id); });
+  });
+  std::erase_if(draft.edges_, [&](const auto &item) { return removed.contains(item.second.a) || removed.contains(item.second.b); });
+  for (auto id : removed) draft.vertices_.erase(id);
+  draft.validate();
+  *this = std::move(draft);
+}
 void RetopoMesh::move_vertex(TopologyID id, Vec3 p) {
   position(p);
   RetopoMesh draft = *this;

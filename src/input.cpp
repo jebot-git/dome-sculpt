@@ -38,7 +38,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
       "Center object", "Paint tools", "Baking", "Materials",
-      "Back", "Move left", "Move right", "Undo"};
+      "Back", "Move left", "Move right", "Retopology"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
       "Next shape", "Previous shape", "Reset pose", "Undo",
@@ -48,7 +48,10 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Strength", "Target", "Symmetry", "Joint lock",
       "Back", "Linked parts", "Brush size", "Save"};
   static const std::array<const char *,12> baking={"Source", "Projection bounds", "AO / padding", "Bake surface", "Clear baked", "Cancel work", "Undo", "Redo", "Back", "Save", "Export glTF", "Center object"};
-  return page == 13 ? weights : page == 12 ? baking
+  static const std::array<const char *,12> retopo = {
+      "Start patch", "Place / move", "Make face", "Connect edge", "Delete points", "Relax",
+      "Pin points", "Seam edge", "Back", "Projection distance", "Apply patch", "Cancel patch"};
+  return page == 14 ? retopo : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
          : page == 9 ? avatars
@@ -62,6 +65,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if (page == 14 && sector == 9) return VrParameter::RetopoDistance;
   if(page==12 && sector>=0 && sector<3)return sector==0?VrParameter::BakeSource:sector==1?VrParameter::BakeDistances:VrParameter::BakeQuality;
   if (page == 13 && sector == 4) return VrParameter::WeightStrength;
   if (page == 13 && sector == 5) return VrParameter::WeightValue;
@@ -112,6 +116,15 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
+  if (page == 14) {
+    static const std::array<SpatialCommand,12> retopo = {
+      SpatialCommand::RetopoBegin, SpatialCommand::RetopoMode, SpatialCommand::RetopoFace,
+      SpatialCommand::RetopoWire, SpatialCommand::RetopoDelete, SpatialCommand::RetopoRelax,
+      SpatialCommand::RetopoPin, SpatialCommand::RetopoSeam, SpatialCommand::Undo,
+      SpatialCommand::Undo, SpatialCommand::RetopoApply, SpatialCommand::RetopoCancel};
+    if (index < 0 || index >= 12 || index == 8 || index == 9) return {};
+    return retopo[index];
+  }
   if(page==12){
     if(index<3 || index==8 || index<0 || index>11)return {};
     static const std::array<SpatialCommand,12> commands={SpatialCommand::BakeSurface,SpatialCommand::BakeSurface,SpatialCommand::BakeSurface,SpatialCommand::BakeSurface,SpatialCommand::ClearBake,SpatialCommand::CancelWork,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::Undo,SpatialCommand::Save,SpatialCommand::Export,SpatialCommand::Center};
@@ -150,7 +163,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
         SpatialCommand::Undo, SpatialCommand::Center, SpatialCommand::Undo,
         SpatialCommand::Undo, SpatialCommand::Undo, SpatialCommand::Undo,
         SpatialCommand::Left, SpatialCommand::Right, SpatialCommand::Undo};
-    return index >= 5 && index <= 8 ? std::nullopt
+    return (index >= 5 && index <= 8) || index == 11 ? std::nullopt
                                     : std::optional<SpatialCommand>(mesh[index]);
   }
   if (page == 8) {
@@ -518,10 +531,10 @@ void SpatialInput::update(const SpatialSample &s) {
       end_stroke();
     if (!menu_) {
       menu_ = true;
-      page_ = 0;
+      page_ = retopology ? 14 : 0;
       menu_anchor_ = s.tip;
       device_ = s.id;
-      selected_ = int(tool_);
+      selected_ = retopology ? 1 : int(tool_);
     } else if (page_ == 0 && (selected_ == 8 || selected_ == 9)) {
       page_ = selected_ == 8 ? 1 : 2;
       selected_ = 0;
@@ -548,6 +561,8 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 1 && selected_ == 9) {
       page_ = 10;
       selected_ = 0;
+    } else if (page_ == 10 && selected_ == 11) {
+      page_ = 14; selected_ = 0;
     } else if (page_ == 10 && (selected_ == 5 || selected_ == 6 || selected_ == 7)) {
       page_ = selected_ == 5 ? 3 : selected_ == 6 ? 12 : 2;
       selected_ = 0;
@@ -575,7 +590,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_ == 13 ? 11 : page_ == 12 ? 10 : page_ == 11 ? 9
+      page_ = page_ == 14 ? 10 : page_ == 13 ? 11 : page_ == 12 ? 10 : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
               : page_ == 8 ? 7
               : page_ == 7 ? 1

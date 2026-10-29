@@ -8,6 +8,7 @@
 #include <memory>
 namespace dome {
 struct CreatorAppearance;
+struct RetopoPatch;
 struct Material {
   std::string name = "Clay";
   std::array<float, 4> color{.58f, .30f, .15f, 1};
@@ -32,6 +33,7 @@ struct SculptObject {
   std::shared_ptr<const DeformationState> deformation{};
   uint64_t group = 0;
   std::shared_ptr<const CreatorAppearance> appearance{};
+  std::shared_ptr<const RetopoPatch> retopology{};
 };
 struct ObjectSurface {
   uint64_t id = 0;

@@ -50,6 +50,7 @@ class CursorRenderer {
 public:
   CursorRenderer();
   ~CursorRenderer();
+  void abandon() { program_ = vao_ = buffer_ = 0; }
   void set_linear_output(bool value) { linear_output_=value; }
   void draw(const EditorState &, const Mat4 &);
 };

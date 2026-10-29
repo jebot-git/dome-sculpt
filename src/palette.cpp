@@ -364,6 +364,13 @@ void SpatialPalette::raster(const EditorState &s) {
   auto current = std::find_if(s.objects.begin(), s.objects.end(),
                               [&](auto &o) { return o.id == s.active_object; });
   auto marked = [&](int sector) -> std::optional<bool> {
+    if (s.menu_page == 14 && s.retopology) {
+      auto &r = *s.retopology;
+      if (sector == 0) return true;
+      if (sector == 1) return r.moving;
+      if (sector == 6 && r.topology && !r.selected.empty())
+        return std::all_of(r.selected.begin(), r.selected.end(), [&](auto id) { return r.topology->vertices().at(id).pinned; });
+    }
     if (s.menu_page == 13) {
       if (sector == 0) return s.weights.enabled;
       if (sector == 6) return s.weights.symmetry;
@@ -427,11 +434,11 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13) {
+  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 12 ? "Mesh baking" : s.menu_page == 13 ? "Skin weights"
+  const char *page = s.menu_page == 14 ? "Retopology" : s.menu_page == 12 ? "Mesh baking" : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 11 ? "Rig and shapekeys"
                      : s.menu_page == 10 ? "Mesh tools"
                      : s.menu_page == 9 ? "Avatars"
@@ -445,7 +452,12 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
-  if(s.menu_page==12){
+  if (s.menu_page == 14) {
+    auto r = s.retopology;
+    text(320 * unit_, 278 * unit_, !r ? "Start a source-constrained patch" : r->moving ? "Move existing points" : "Place / select ordered corners", fg);
+    text(320 * unit_, 310 * unit_, !r ? "Source retained on Apply" : r->committing ? "Applying patch..." : r->busy ? "Updating patch..."
+         : std::to_string(r->selected.size()) + " selected / " + std::to_string(r->topology ? r->topology->faces().size() : 0) + " faces", fg);
+  } else if(s.menu_page==12){
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name.substr(0,32),fg);
     text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
@@ -500,6 +512,12 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
                std::to_string(s.controls.selected);
   if (s.uv)
     signature += std::to_string(s.uv->revision);
+  if (s.retopology) {
+    const auto &r = *s.retopology;
+    signature += ":retopo:" + std::to_string(r.revision) + ":" +
+        std::to_string(reinterpret_cast<uintptr_t>(r.topology.get())) + ":" +
+        std::to_string(r.moving) + ":" + std::to_string(r.busy) + ":" + std::to_string(r.committing);
+  }
   for (float value : s.controls.value)
     signature += std::to_string(value) + ",";
   for (bool enabled : s.menu_enabled)

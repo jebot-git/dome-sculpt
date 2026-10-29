@@ -28,7 +28,8 @@ enum class VrParameter {
   MorphWeight,
   BakeSource, BakeDistances, BakeQuality,
   WeightStrength,
-  WeightValue
+  WeightValue,
+  RetopoDistance
 };
 struct VrControlState {
   VrParameter parameter = VrParameter::None;

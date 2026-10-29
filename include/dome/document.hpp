@@ -7,6 +7,7 @@
 #include "bake-authoring.hpp"
 #include "uv.hpp"
 #include "weight-authoring.hpp"
+#include "retopo-authoring.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -81,6 +82,8 @@ struct EditorState {
   PaintSettings paint;
   VrControlState controls;
   std::shared_ptr<const UvView> uv;
+  std::shared_ptr<const RetopoView> retopology;
+  bool can_retopologize = false;
   uint64_t active_sculpt_layer = 0;
   std::vector<std::string> sculpt_layers;
   std::string sculpt_layer_name;
@@ -179,6 +182,11 @@ public:
   void begin_uv();
   void edit_uv(UvAction, float x = 0, float y = 0);
   void end_uv(bool accept);
+  void begin_retopology();
+  void edit_retopology(RetopoAction);
+  void end_retopology(bool accept);
+  void retopology_distance(float mm);
+  bool wait_retopology(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   bool wait_uv(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void use_source();
   void cancel_spatial_menu();
@@ -264,6 +272,27 @@ private:
   void restore_weight_view_locked(const std::shared_ptr<const MeshSnapshot> &);
   void invalidate_weight_view_locked(bool restore);
   float control_voxel_mm_ = 30;
+  float retopo_snap_mm_ = 50, control_retopo_mm_ = 50;
+  AssetSource retopo_source_{};
+  std::atomic<uint64_t> retopo_session_{0};
+  bool retopo_stroking_ = false, retopo_sampled_ = false, retopo_accepting_ = false;
+  size_t retopo_pending_ = 0;
+  struct RetopoJob {
+    uint64_t session = 0;
+    std::shared_ptr<const Scene> initial;
+    std::optional<RetopoAction> action;
+    Vec3 point{};
+    float snap_mm = 50;
+    bool accept = false, coalescible = false;
+  };
+  mutable std::mutex retopo_mutex_;
+  mutable std::condition_variable retopo_changed_;
+  std::deque<RetopoJob> retopo_jobs_;
+  void begin_retopology_locked();
+  void end_retopology_locked(bool);
+  void cancel_retopology_locked();
+  void queue_retopology_locked(RetopoAction, Vec3 = {}, bool coalescible = false);
+  void retopo_loop();
   std::optional<UvWorkspace> uv_;
   uint64_t uv_session_ = 0;
   bool uv_accept_pending_ = false;
@@ -332,6 +361,7 @@ private:
     std::shared_ptr<bool> operation_changed{};
     AssetExportFormat export_format = AssetExportFormat::Glb;
     std::shared_ptr<const MeshSnapshot> rollback_preview{};
+    uint64_t retopo_session = 0;
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
@@ -339,7 +369,7 @@ private:
   std::deque<FileJob> files_;
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
-  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_;
+  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_;
   void publish_locked(bool force_geometry = false);
   void record_locked(History);
   void record_stroke_locked();
@@ -369,7 +399,7 @@ private:
                              std::shared_ptr<std::string>);
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
-                                    std::shared_ptr<const MeshSnapshot> = {});
+                                    std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0);
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});

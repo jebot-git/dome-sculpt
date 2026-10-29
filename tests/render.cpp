@@ -118,6 +118,37 @@ int main(int argc, char **argv) try {
   pointer.aim.position = ob::transform(slider.panel, {.10875f, .01875f, .3f});
   pointer.aim.orientation = slider.panel.orientation;
   CursorRenderer cursors;
+  {
+    auto overlay = *doc.frame().state; overlay.canvas = model; overlay.hands = {};
+    auto r = std::make_shared<RetopoView>();
+    auto topology = std::make_shared<RetopoMesh>();
+    auto a = topology->add_vertex({{-.2f,0,.8f}}), b = topology->add_vertex({{.2f,0,.8f}});
+    topology->add_edge(a,b); r->topology=topology; r->selected={a,b}; overlay.retopology=r;
+    renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+    auto baseline=capture("retopo-baseline");
+    cursors.draw(overlay,vp);auto front=capture("retopo-front");
+    size_t changed=0;for(size_t i=0;i<front.size();++i)changed+=front[i]!=baseline[i];
+    if(changed<50)throw std::runtime_error("Retopology ordered edges and point markers are invisible");
+    renderer.set_deferred_resolve(true);cursors.set_linear_output(true);
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);renderer.resolve();
+    auto linear=capture("retopo-linear");
+    size_t yellow=0;for(size_t i=0;i<linear.size();i+=3)yellow+=linear[i]>220&&linear[i+1]>140&&linear[i+2]<50;
+    if(yellow<20)throw std::runtime_error("Retopology overlay fails the XR linear composition path");
+    renderer.set_deferred_resolve(false);cursors.set_linear_output(false);
+    auto behind=std::make_shared<RetopoMesh>();
+    a=behind->add_vertex({{-.1f,0,-.8f}});b=behind->add_vertex({{.1f,0,-.8f}});behind->add_edge(a,b);
+    r->topology=behind;r->selected.clear();
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    if(capture("retopo-occluded")!=baseline)throw std::runtime_error("Retopology overlay ignores source surface occlusion");
+    overlay.menu=true;overlay.menu_page=14;overlay.font_file=face.file;overlay.font_pixels=face.pixels;
+    overlay.panel.position={0,0,-.45f};
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);palette.draw(overlay,vp);auto placed=capture("retopo-menu-place");
+    r->moving=true;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);palette.draw(overlay,vp);
+    if(capture("retopo-menu-move")==placed)throw std::runtime_error("Retopology controller mode has no visible menu feedback");
+  }
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  palette.draw(slider, vp);
   cursors.draw(slider, vp);
   auto pointed_slider = capture("slider-pointer");
   size_t pointer_pixels = 0;

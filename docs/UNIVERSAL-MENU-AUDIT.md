@@ -17,10 +17,19 @@ actions are disabled while an asset job runs. Brush limits match the XR range;
 layer actions respect layer counts and pending work. Generate UV atlas now
 publishes an editable asset rather than discarding its generated result.
 
-Edit targets the focused FLTK field, the UV draft or document history. Cut, Copy,
+Edit targets the focused FLTK field, the UV/retopology draft or document history. Cut, Copy,
 Paste and Select All are real exported actions with field/selection/clipboard
 state. UV Undo/Redo is local until Apply commits one document transaction.
 Unrelated document, view and paint commands remain disabled in modal dialogs.
+
+Mesh → Retopology exports actual source-aware commands and Place/Move radio
+states. An unconfirmed patch isolates source-changing and save commands; local
+Undo/Redo and explicit Apply/Cancel remain available. Its projection-distance
+dialog uses native modal ownership, a wheel/slider, fixed action buttons and
+Cancel focus. Universal Close dismisses that dialog while retaining the patch.
+See RETOPO-AUTHORING.md and the DOME_MENU_RETOPO / DOME_MENU_RETOPO_COMPACT flows
+in tests/menu.py. Existing general-menu evidence below remains historical;
+VALIDATION.md records the current source's actual runs.
 
 The default application identity is `org.domed.Sculpt`, including native choosers
 and alerts. A matching desktop entry is installed with the application. FLTK's

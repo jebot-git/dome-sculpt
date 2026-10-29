@@ -3,6 +3,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/creator-archive.hpp"
+#include "dome/retopo-authoring.hpp"
 #include "io.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -79,6 +80,7 @@ uint64_t Scene::duplicate(uint64_t id) {
   o.deformation = source.deformation;
   o.group = source.group;
   o.appearance = source.appearance;
+  o.retopology = source.retopology;
   return added;
 }
 Mesh ObjectSurface::preview_mesh() const {
@@ -138,7 +140,7 @@ void Scene::validate(bool deep_sources) const {
   CreatorAssetArchive source_models;
   size_t remap_vertices = 0, source_bytes = 0;
   std::set<const std::vector<uint8_t> *> originals;
-  size_t count = 0, texels = 0, deformation_entries = 0, paint_bytes = 0;
+  size_t count = 0, texels = 0, deformation_entries = 0, paint_bytes = 0, topology_entries = 0;
   for (auto &o : objects_) {
     if (!o.id || o.id >= next_ || !ids.insert(o.id).second || !o.volume ||
         o.volume->in_stroke())
@@ -148,6 +150,14 @@ void Scene::validate(bool deep_sources) const {
     validate_transform(o.transform);
     validate_transform(world_transform(o.id));
     o.material.validate();
+    if (o.retopology) {
+      const auto &patch = *o.retopology;
+      if (!patch.source || patch.source >= next_ || patch.source == o.id || !o.painted)
+        throw std::invalid_argument("Invalid retopology source or display mesh");
+      topology_entries += patch.topology.vertices().size() + patch.topology.edges().size() + patch.topology.faces().size();
+      if (topology_entries > 1'000'000) throw std::length_error("Scene retopology budget exceeded");
+      if (deep_sources) patch.topology.validate();
+    }
     if ((o.mesh_active && !o.painted) || (o.painted && o.painted->in_stroke()))
       throw std::runtime_error(
           "Invalid active mesh or unfinished paint stroke");
@@ -195,8 +205,9 @@ void Scene::validate(bool deep_sources) const {
 nlohmann::json Scene::encode() const {
   validate();
   bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
+  bool retopology = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return bool(o.retopology); });
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", baked ? 6 : 5},
+                      {"version", retopology ? 7 : baked ? 6 : 5},
                       {"active", active_},
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
@@ -236,6 +247,8 @@ nlohmann::json Scene::encode() const {
            {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
          {"volume", o.volume->encode()},
          {"mesh_active", o.mesh_active},
+         {"retopology", o.retopology ? nlohmann::json{{"source", o.retopology->source},
+                               {"topology", o.retopology->topology.encode()}} : nlohmann::json(nullptr)},
          {"painted", o.painted ? o.painted->encode(&source_images) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
                              ? o.deformation->encode(o.painted->mesh())
@@ -253,7 +266,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     result.active().volume = std::make_shared<Volume>(Volume::decode(j));
     return result;
   }
-  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6)
+  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6 && j.at("version") != 7)
     throw std::runtime_error("Unsupported scene version");
   // The pre-integration baked checkpoint used v5 without group/archive fields.
   bool legacy_baked5 = j.at("version") == 5 && !j.contains("groups") &&
@@ -303,7 +316,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
   result.objects_.clear();
-  size_t samples = 0, texels = 0, deformation_entries = 0, paint_bytes = 0;
+  size_t samples = 0, texels = 0, deformation_entries = 0, paint_bytes = 0, retopo_bytes = 0;
   for (auto &v : objects) {
     SculptObject o;
     o.id = id(v.at("id"));
@@ -354,12 +367,20 @@ Scene Scene::decode(const nlohmann::json &j) {
         texels += r * r;
         if (texels > 16 * 1024 * 1024)
           throw std::length_error("Scene paint-map budget exceeded");
-        if (v.at("painted").contains("baked") && j.at("version") != 6 && !legacy_baked5)
+        if (v.at("painted").contains("baked") && j.at("version") < 6 && !legacy_baked5)
           throw std::runtime_error("Baked textures require scene version 6");
         o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr);
         paint_bytes += o.painted->storage_bytes();
         if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
       }
+    }
+    if (j.at("version") >= 7 && !v.at("retopology").is_null()) {
+      const auto &patch = v.at("retopology");
+      const auto &payload = patch.at("topology").get_ref<const std::string &>();
+      retopo_bytes += payload.size();
+      if (retopo_bytes > 64 * 1024 * 1024) throw std::length_error("Scene retopology payload budget exceeded");
+      o.retopology = std::make_shared<const RetopoPatch>(RetopoPatch{
+          id(patch.at("source")), RetopoMesh::decode(payload)});
     }
     if (j.at("version") >= 4 && !v.at("deformation").is_null()) {
       if (!o.mesh_active || !o.painted)

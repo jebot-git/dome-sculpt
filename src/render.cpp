@@ -478,7 +478,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
 
 CursorRenderer::CursorRenderer() {
   const char *v = R"(#version 330 core
-layout(location=0)in vec3 position;layout(location=1)in vec3 color;uniform mat4 vp;out vec3 tint;void main(){tint=color;gl_Position=vp*vec4(position,1);})";
+layout(location=0)in vec3 position;layout(location=1)in vec3 color;uniform mat4 vp;uniform float depth_bias;out vec3 tint;void main(){tint=color;gl_Position=vp*vec4(position,1);gl_Position.z-=depth_bias*gl_Position.w;})";
   const char *f = R"(#version 330 core
 in vec3 tint;out vec4 color;uniform int linear_output;vec3 decode(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),greaterThan(c,vec3(.04045)));}void main(){color=vec4(linear_output==1?decode(tint):tint,1);})";
   auto vs = shader(GL_VERTEX_SHADER, v), fs = shader(GL_FRAGMENT_SHADER, f);
@@ -509,6 +509,31 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
     vertices.push_back({{a.x, a.y, a.z}, color});
     vertices.push_back({{b.x, b.y, b.z}, color});
   };
+  if (state.retopology && state.retopology->topology) {
+    const auto &view = *state.retopology;
+    auto transform = ob::compose(state.canvas, view.transform);
+    auto point = [&](TopologyID id) {
+      auto p = view.topology->vertices().at(id).position;
+      return ob::transform(transform, {p.x, p.y, p.z});
+    };
+    auto selected = [&](TopologyID id) { return std::find(view.selected.begin(), view.selected.end(), id) != view.selected.end(); };
+    for (const auto &[id, edge] : view.topology->edges()) {
+      (void)id;
+      line(point(edge.a), point(edge.b), selected(edge.a) && selected(edge.b) ? Vec3{1,.8f,.05f}
+                                        : edge.seam ? Vec3{.1f,.8f,1} : Vec3{.1f,1,.3f});
+    }
+    float r = .0025f * state.canvas.scale;
+    for (const auto &[id, vertex] : view.topology->vertices()) {
+      auto p = point(id);
+      Vec3 color = selected(id) ? Vec3{1,.8f,.05f} : vertex.pinned ? Vec3{1,.2f,.8f} : Vec3{.1f,1,.3f};
+      line(p - ob::Vec3{r,0,0}, p + ob::Vec3{r,0,0}, color);
+      line(p - ob::Vec3{0,r,0}, p + ob::Vec3{0,r,0}, color);
+      line(p - ob::Vec3{0,0,r}, p + ob::Vec3{0,0,r}, color);
+    }
+    // Ordered selection remains visible before the first face/edge exists.
+    for (size_t n = 1; n < view.selected.size(); ++n)
+      line(point(view.selected[n-1]), point(view.selected[n]), {1,.8f,.05f});
+  }
   for (auto &h : state.hands)
     if (h.tracked.valid) {
       auto p = h.tracked.grip.position;
@@ -563,6 +588,7 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
   glDepthMask(GL_FALSE);
   glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_,"linear_output"),linear_output_);
+  glUniform1f(glGetUniformLocation(program_,"depth_bias"),state.retopology ? .0001f : 0);
   glUniformMatrix4fv(glGetUniformLocation(program_, "vp"), 1, GL_FALSE,
                      vp.data());
   glBindVertexArray(vao_);
