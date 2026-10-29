@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/import.hpp"
+#include "dome/mesh-authoring.hpp"
 namespace dome {
 SceneDraft Document::draft_scene() const {
   std::lock_guard lock(model_mutex_);
@@ -14,9 +15,9 @@ void Document::edit_scene(std::string label, SceneOperation operation, AssetSour
 void Document::queue_scene_operation(std::string label, SceneOperation operation,
                                     AssetSource expected, std::shared_ptr<std::string> report) {
   std::lock_guard lock(model_mutex_);
-  scene_operation_locked(std::move(label), std::move(operation), expected, std::move(report));
+  queue_scene_operation_locked(std::move(label), std::move(operation), expected, std::move(report));
 }
-void Document::scene_operation_locked(std::string label, SceneOperation operation,
+void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
                                       AssetSource expected, std::shared_ptr<std::string> report) {
   if (label.empty() || label.size() > 256 || label.find('\0') != std::string::npos || !operation)
     throw std::invalid_argument("Invalid asset operation");
@@ -40,6 +41,17 @@ void Document::scene_operation_locked(std::string label, SceneOperation operatio
   state_.message = files_.back().operation_label + "...";
   publish_locked();
   file_changed_.notify_one();
+}
+void Document::remesh_to_sculpt(float world_voxel_mm, AssetSource expected) {
+  std::lock_guard lock(model_mutex_);
+  queue_voxel_sculpt_locked(world_voxel_mm, expected);
+}
+void Document::queue_voxel_sculpt_locked(float world_voxel_mm, AssetSource expected) {
+  if (!std::isfinite(world_voxel_mm) || world_voxel_mm < .01f || world_voxel_mm > 1000)
+    throw std::invalid_argument("Voxel size must be between 0.01 and 1000 mm");
+  queue_scene_operation_locked("Voxel remesh", [world_voxel_mm](Scene &scene, const auto &cancelled) {
+    create_voxel_sculpt(scene, world_voxel_mm, cancelled);
+  }, expected, {});
 }
 void Document::import_asset(const std::filesystem::path &path, uint32_t resolution) {
   if (resolution < 64 || resolution > 2048 || (resolution & (resolution - 1)))

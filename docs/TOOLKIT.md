@@ -47,3 +47,9 @@ has not installed or switched any user session.
 The remote input-order milestone d8e3699 was tested in another workspace using
 /opt libraries; those environment notes are archived in HANDOFF-d8e3699.md.
 This workspace retains the verified current toolkit above.
+
+The UV-worker integration was performed in a separate workspace where the parent
+DESIGN_CONVENTIONS file is absent. Its locally rebuilt artifacts/toolkit matches
+the same pinned archive/22-patch manifest. Current source README and the committed
+menu audit supplied available conventions; do not relabel upstream environment
+readings or logs as fresh local evidence. See the current HANDOFF.md.

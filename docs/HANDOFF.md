@@ -94,3 +94,24 @@ Continue native parameter/rig/weights/morph editing in desktop AND headset,
 material/normal/AO/MToon/VRM integration, GPU source/paint efficiency, all remaining
 sculpt/UV/retopo/procedural/device/compute rows. Do not shrink or complete the goal
 at this milestone.
+
+## Merge in progress / new verification
+
+Remote0c266de added background UV validation, completion-wakeup fixes and native
+voxel remeshing desktop/XR controls. Preserve these alongside CC0 creator work.
+Archived remote handoff/validation in HANDOFF-0c266de.md / VALIDATION-0c266de.md.
+Mesh tools use XR page10 while Avatars stays9; shared locked scene-operation
+helper uses queue_scene_operation_locked. Voxel output now uses composed world
+group placement so grouping cannot change world voxel dimensions/location.
+
+Pinned cf6d6b3 Release29/29 passed126.78s; four whole-core ASan/UBSan/leak suites
+passed55.35s (GLB, groups including actual controller creator, archive and source
+UV). Native pinned universal menu42/42 passed. Latest canonical DomeD7322b0e was
+built Release from artifacts/domed-current, same unchanged22FLTK patches. No
+active session restart. Private nested menu test had stale fixed Scene rows;
+root tests/dome_menu.py now derives row from exported menu entries. This fixed
+dialog opening; a later actual Wayland Edit Cut routing check still fails and
+must be investigated, not weakened. Logs dome-menu-avatars-pinned[-fixed].log.
+The merged source must still build/test before push; current root changes are
+not evidence that the merge is correct. Agents' cache/MToon work is unrelated
+and must not be staged accidentally.

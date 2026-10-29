@@ -2,6 +2,7 @@
 // Adapted from OpenBrush Native's BDF palette and texture renderer
 // (Apache-2.0).
 #include "dome/palette.hpp"
+#include <cstdio>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_FONT_FORMATS_H
@@ -162,9 +163,10 @@ void SpatialPalette::raster(const EditorState &s) {
                     : v.vertices  ? "UV vertices: drag / stick to move"
                                   : "UV islands: drag / stick to move")
                  : v.error.substr(0, 65),
-         v.valid ? fg : Color{255, 150, 100, 255});
+         v.valid || v.validating || v.committing ? fg : Color{255, 150, 100, 255});
     auto button = [&](int column, int y, const char *name,
                       bool selected = false, bool disabled = false) {
+      disabled = disabled || v.committing;
       rect((40 + 94 * column) * unit_, y * unit_, 88 * unit_,
            (y == 68 ? 34 : 42) * unit_,
            selected ? accent
@@ -254,9 +256,10 @@ void SpatialPalette::raster(const EditorState &s) {
       }
     rect(60 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, grid);
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_,
-         v.valid ? accent : grid);
+         !v.committing && (v.valid || v.validating) ? accent : grid);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
-    text(470 * unit_, 616 * unit_, "Apply / Press", fg);
+    text(470 * unit_, 616 * unit_,
+         v.committing ? "Applying..." : v.validating ? "Check & Apply" : "Apply / Press", fg);
     return;
   }
   if (s.controls.parameter != VrParameter::None) {
@@ -286,6 +289,11 @@ void SpatialPalette::raster(const EditorState &s) {
         label = std::string(1, "RGBA"[row]) + " ";
       if (c.parameter == VrParameter::BrushRadius)
         label += std::to_string(int(std::lround(value * 1000))) + " mm";
+      else if (c.parameter == VrParameter::VoxelSize) {
+        char size[48];
+        snprintf(size, sizeof(size), "%.2f mm", double(value));
+        label += size;
+      }
       else if (c.parameter == VrParameter::LayerOrder)
         label += "Layer " + std::to_string(int(std::lround(value)) + 1);
       else
@@ -317,7 +325,12 @@ void SpatialPalette::raster(const EditorState &s) {
                  : Color{55, 65, 80, uint8_t(s.opacity)});
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, accent);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
-    text(470 * unit_, 616 * unit_, "Done / Press", fg);
+    text(470 * unit_, 616 * unit_,
+         c.parameter == VrParameter::VoxelSize ? "Remesh / Press" : "Done / Press", fg);
+    if (c.parameter == VrParameter::VoxelSize) {
+      text(320 * unit_, 470 * unit_, "New sculpt from the displayed shape", fg);
+      text(320 * unit_, 505 * unit_, "Source retained and hidden", fg);
+    }
     return;
   }
   auto current = std::find_if(s.objects.begin(), s.objects.end(),
@@ -382,7 +395,8 @@ void SpatialPalette::raster(const EditorState &s) {
   }
   text(320 * unit_, 295 * unit_, "Stick to choose", fg);
   text(320 * unit_, 320 * unit_, "Press to confirm", fg);
-  const char *page = s.menu_page == 9 ? "Avatars"
+  const char *page = s.menu_page == 10 ? "Mesh tools"
+                     : s.menu_page == 9 ? "Avatars"
                      : s.menu_page == 8 ? "Recovery"
                      : s.menu_page == 7   ? "Sculpt layers"
                      : s.menu_page == 1 ? "Objects"

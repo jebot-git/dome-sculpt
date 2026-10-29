@@ -222,14 +222,24 @@ try:
         time.sleep(0.3)
 
         def editor_field(y, text):
-            g = editor.get_geometry()
-            xtest.fake_input(d, X.MotionNotify, x=g.x + 340, y=g.y + y)
-            d.sync()
-            button(True)
-            button(False)
-            key("Control_L", True)
-            key("a")
-            key("Control_L", False)
+            # Value_Input can classify pointer input as a numeric drag. Confirm
+            # native selection at this row before replacing any text; a click
+            # or a fixed Tab count alone does not prove which field owns focus.
+            for _ in range(5):
+                g = editor.get_geometry()
+                xtest.fake_input(d, X.MotionNotify, x=g.x + 340, y=g.y + y)
+                d.sync(); time.sleep(.1)
+                button(True); button(False)
+                key("Control_L", True); key("a"); key("Control_L", False)
+                time.sleep(.1)
+                raw = editor.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+                image = Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX")
+                selected = image.crop((int(g.width * .4), y-8, g.width-30, y+8))
+                if sum(b > 100 and b > r * 1.2 and b > green * 1.2
+                       for r, green, b in selected.get_flattened_data()) > 8:
+                    break
+            else:
+                raise AssertionError(f"The native field at row {y} did not receive selection")
             for ch in text:
                 key("period" if ch == "." else ch)
 
@@ -407,7 +417,16 @@ try:
         g = uv_window.get_geometry()
         xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2+100,y=g.y+g.height-16)
         d.sync();button(True);button(False)
-        time.sleep(3)
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            assert app.poll() is None, (out / "app.log").read_text()
+            if not any("UV editor" in str(w.get_wm_name() or "")
+                       for w in d.screen().root.query_tree().children):
+                break
+            time.sleep(.1)
+        check(not any("UV editor" in str(w.get_wm_name() or "")
+                      for w in d.screen().root.query_tree().children),
+              "The native UV dialog closes after the accepted transfer completes")
         window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
         applied_uv = shot("18-uv-applied")
         check(ImageChops.difference(frozen,applied_uv).getbbox() is None, "Applying UV edits retains the existing three-dimensional surface appearance")

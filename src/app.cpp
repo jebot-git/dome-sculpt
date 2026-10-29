@@ -8,6 +8,7 @@
 #include "object-editor.hpp"
 #include "creator-editor.hpp"
 #include "paint-editor.hpp"
+#include "mesh-editor.hpp"
 #include "ui-conventions.hpp"
 #include "uv-editor.hpp"
 #ifdef DOME_HAS_XR
@@ -351,6 +352,7 @@ struct App {
              FL_MENU_TOGGLE | FL_MENU_VALUE);
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
+    menu.add("&Mesh/Voxel remesh...", 0, command, this);
     menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
     menu.add("&Paint/Prepare painting mesh", FL_CTRL | FL_SHIFT | 'p', command,
              this);
@@ -439,6 +441,7 @@ struct App {
     enable("&File/Recovery/Refresh recovery", !modal && !s->recovery_busy);
     enable("&File/Recovery/Recover project...", !modal && !s->recovery_busy &&
            !s->dirty && !s->asset_busy && !s->recovery_candidates.empty());
+    enable("&Mesh/Voxel remesh...", !modal && s->can_voxel_remesh);
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Reset &trackball", "&View/Start or stop &XR",
                            "&View/Shading/&PBR", "&View/Shading/&Toon preview"};
@@ -726,6 +729,8 @@ struct App {
       canvas.document.duplicate_object();
     } else if (label == "Delete object") {
       canvas.document.delete_object();
+    } else if (label == "Voxel remesh...") {
+      edit_voxel_remesh(canvas.document);
     } else if (label == "Object and material...") {
       edit_object(canvas.document);
     } else if (label == "Next object" || label == "Previous object") {
@@ -951,7 +956,27 @@ int main(int argc, char **argv) try {
                                {"locked", l.locked},
                                {"opacity", l.opacity},
                                {"samples", l.delta.size()}});
+    auto encoded = scene.encode();
+    auto digest = [](const nlohmann::json &value) {
+      uint64_t result = 1469598103934665603ULL;
+      for (auto byte : nlohmann::json::to_cbor(value)) {
+        result ^= byte;
+        result *= 1099511628211ULL;
+      }
+      return result;
+    };
+    auto objects = nlohmann::json::array();
+    for (auto value : encoded.at("objects")) {
+      bool visible = value.at("visible");
+      value.erase("visible");
+      objects.push_back({{"id", value.at("id")}, {"name", value.at("name")},
+                         {"visible", visible}, {"mesh_active", value.at("mesh_active")},
+                         {"voxel_size", value.at("volume").at("voxel_size")},
+                         {"payload_hash", digest(value)}});
+    }
     std::cout << nlohmann::json{{"sculpt_layers", sculpt_layers},
+                                {"objects", objects},
+                                {"scene_hash", digest(encoded)},
                                 {"active_sculpt_layer", volume.active_layer()},
                                 {"paint_blue_texels", blue_texels},
                                 {"uv_hash", uv_hash},

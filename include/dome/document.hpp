@@ -54,6 +54,8 @@ struct EditorState {
   bool light = false, toon = false;
   bool mesh_active = false, asset_busy = false, can_undo = false,
        can_redo = false;
+  bool can_voxel_remesh = false;
+  float voxel_size_mm = 30;
   std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
                                     true, true, true, true, true, true};
   PaintSettings paint;
@@ -134,11 +136,16 @@ public:
   using SceneOperation = std::function<void(Scene &, const std::function<bool()> &)>;
   void edit_scene(std::string label, SceneOperation, AssetSource expected = {});
   void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
+  void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
+  void begin_voxel_remesh();
+  void edit_voxel_size(float world_voxel_mm);
+  void end_voxel_remesh(bool accept);
   bool wait_asset(
       std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void begin_uv();
   void edit_uv(UvAction, float x = 0, float y = 0);
   void end_uv(bool accept);
+  bool wait_uv(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void use_source();
   void cancel_spatial_menu();
   void use_mesh();
@@ -202,7 +209,23 @@ private:
   float control_radius_ = 0;
   bool control_changed_ = false;
   uint64_t control_object_ = 0;
+  AssetSource control_source_{};
+  float control_voxel_mm_ = 30;
   std::optional<UvWorkspace> uv_;
+  uint64_t uv_session_ = 0;
+  bool uv_accept_pending_ = false;
+  struct UvValidationJob {
+    uint64_t request, session, generation;
+    std::shared_ptr<const Mesh> mesh;
+  };
+  mutable std::mutex uv_mutex_;
+  mutable std::condition_variable uv_changed_;
+  std::optional<UvValidationJob> uv_validation_;
+  std::weak_ptr<const Mesh> uv_scheduled_;
+  std::atomic<uint64_t> uv_request_{0};
+  void schedule_uv_locked();
+  void invalidate_uv_locked();
+  void uv_loop();
   void queue_uv_locked(std::shared_ptr<const Mesh>);
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
@@ -234,6 +257,9 @@ private:
     bool create_parent = false;
     bool discover_recovery = false;
     std::optional<RecoveryCandidate> restore_recovery{};
+
+    uint64_t uv_session = 0;
+    bool uv_desktop = false;
     SceneOperation scene_operation{};
     std::string operation_label{};
     std::shared_ptr<std::string> operation_report{};
@@ -243,7 +269,7 @@ private:
   std::deque<FileJob> files_;
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
-  std::thread mesh_thread_, input_thread_, file_thread_;
+  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_;
   void publish_locked(bool force_geometry = false);
   void record_locked(History);
   void record_stroke_locked();
@@ -268,9 +294,10 @@ private:
   void mesh_loop();
   void input_loop();
   void file_loop();
-  void scene_operation_locked(std::string, SceneOperation, AssetSource,
-                               std::shared_ptr<std::string>);
   void queue_scene_operation(std::string, SceneOperation, AssetSource,
                              std::shared_ptr<std::string>);
+  void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
+                                    std::shared_ptr<std::string>);
+  void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome

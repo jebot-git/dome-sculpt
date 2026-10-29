@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <unistd.h>
 using namespace dome;
 using namespace std::chrono_literals;
@@ -107,5 +108,44 @@ int main(int argc, char **argv) try {
   found = RecoveryService::discover(root);
   check(found.candidates.size() == 1,
         "Save removes only current source checkpoints, retaining original recovery");
+  {
+    Mesh mesh;
+    mesh.positions = {{0, 0, 0}, {1, 0, 0}, {1, 1, 0}, {0, 1, 0}};
+    mesh.normals.assign(4, {0, 0, 1});
+    mesh.indices = {0, 1, 2, 0, 2, 3};
+    mesh.uv = {{.1f, .1f}, {.6f, .1f}, {.6f, .6f}, {.1f, .6f}};
+    Scene painted;
+    painted.active().painted = std::make_shared<PaintedMesh>(mesh, 64);
+    painted.active().mesh_active = true;
+    Document uvdoc;
+    uvdoc.replace(painted);
+    uvdoc.enable_recovery(root / "uv");
+    uvdoc.begin_uv();
+    uvdoc.edit_uv(UvAction::Move, .02f, 0);
+    check(uvdoc.wait_uv() && uvdoc.recovery_status().accepted == 0,
+          "Background-validated UV drafts do not create durable checkpoints");
+    uvdoc.end_uv(false);
+    check(!uvdoc.frame().state->dirty && uvdoc.recovery_status().accepted == 0,
+          "Cancelling the UV draft leaves recovery and saved state unchanged");
+    uvdoc.begin_uv();
+    uvdoc.edit_uv(UvAction::Move, .04f, 0);
+    uvdoc.end_uv(true);
+    check(uvdoc.wait_asset(), "Accepted UV transfer finishes before recovery inspection");
+    wait([&] { return uvdoc.recovery_status().committed == 1; });
+    auto uv_found = RecoveryService::discover(root / "uv");
+    check(uv_found.candidates.size() == 1 && uv_found.errors.empty(),
+          "A completed UV Apply produces exactly one discoverable checkpoint");
+    auto restored = RecoveryService::load(uv_found.candidates.front());
+    check(restored.active().painted->encode() ==
+              uvdoc.copy_scene().active().painted->encode(),
+          "Recovery retains the exact accepted UV mesh and editable paint");
+    uvdoc.begin_uv();
+    uvdoc.edit_uv(UvAction::Move, .01f, 0);
+    uvdoc.replace(painted);
+    check(uvdoc.wait_uv() && !uvdoc.frame().state->uv &&
+              !uvdoc.frame().state->dirty &&
+              RecoveryService::discover(root / "uv").candidates.size() == 1,
+          "Replacement rejects stale UV checks while retaining durable old-source recovery");
+  }
   return 0;
 } catch (const std::exception &e) { std::cerr << e.what() << '\n'; return 1; }

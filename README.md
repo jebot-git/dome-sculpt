@@ -70,16 +70,27 @@ mapping back to source geometry. The native UV editor supports chart/vertex edit
 packing with paint transfer; see [UV authoring](docs/UV.md). Advanced seam-based
 re-parameterization and stitching remain unfinished.
 
+Mesh → Voxel remesh... creates a new editable sculpt from the displayed shape.
+Choose world spacing in millimetres with the logarithmic slider, wheel or arrow
+keys, then explicitly press Remesh. XR exposes the same operation under
+Objects → Mesh tools, with ray dragging, thumbstick and fine-wheel adjustment.
+The original object stays hidden with its paint, rig and layers intact; these
+are not transferred into the new field. One Undo restores the source scene.
+Open shells and oversized grids report an error without changing the source.
+See [mesh authoring](docs/IMPORT-AND-MESH.md) for limits and remaining work.
+
 Ctrl+S saves the scene as a private, atomically replaced `.dsculpt` CBOR file.
-Version 3 stores separate sculpt objects, stable identities, names, selection,
+Version 4 stores separate sculpt objects, stable identities, names, selection,
 uniform object transforms, visibility, locks, sparse fields and PBR material
-values, stable painting meshes, UVs and sparse paint layers. Version 1 volume
-projects and version 2 scenes remain readable. Ctrl+O reopens
-it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
+values, stable painting meshes, UVs, sparse paint/sculpt layers and native
+rig/skin/morph deformation state. Earlier volume/scene versions remain readable.
+Ctrl+O reopens it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
 transforms, normals, packed UVs, PBR materials and embedded painted PNG maps.
-Skeletons, morph targets and import are still required for full glTF scene
-support. VRM export is deliberately unavailable until the humanoid rig, metadata,
-expressions, material and secondary-motion requirements are implemented.
+Skin/inverse-bind/all-influence and POSITION morph GLB export are implemented,
+with initial untextured static authoring import. Full glTF import and extension
+support remain unfinished. VRM export is deliberately unavailable until the
+humanoid rig, metadata, expressions, material and secondary-motion requirements
+are implemented.
 
 The Scene menu creates empty sculpts or clay spheres, duplicates and deletes
 objects, changes selection and toggles visibility or edit locks. Ctrl+D duplicates
