@@ -1,5 +1,11 @@
 # Current DomeD toolkit and conventions
 
+The combined authoring checkout uses the canonical 282467e pin in
+third_party/sources.json and the locally rebuilt artifacts/toolkit-authoring
+prefix. Start with the final “Combined bake/authoring checkout” section and the
+build command in AGENTS.md. The earlier prefix observations below are historical
+evidence; they are not a request to select the older local toolkit.
+
 Current source checked 2026-10-29 against DomeD main
 `282467e727df78c8e7f2452aa05a7747bac854a6`. Earlier builds used
 `742d009f446cffdeb89031664b72885ff6f16a19`, and fltk-vr main
@@ -81,3 +87,16 @@ passes native menus53/53, rig/weights12/12, avatar export5/5, baked GUI5/5 and
 real latest DomeD Wayland/universal-menu8/8. Run with the updated prefix's lib64
 in LD_LIBRARY_PATH, since an inherited /opt path overrides ELF RUNPATH. Neither
 the installed compositor nor the active desktop session was replaced/restarted.
+
+## Combined bake/authoring checkout
+
+This workspace rebuilt the pinned 282467e toolkit into artifacts/toolkit-authoring
+from a clean artifacts/domed-authoring-source worktree. Configure this combined
+checkout with `-DFLTK_DIR="$PWD/artifacts/toolkit-authoring/share/fltk"` and launch
+through build/run-dome-sculpt. Its library directory here is lib (the other
+workspace used lib64). The builder initially lacked the GLU development files;
+artifacts/toolkit-authoring-deps/sysroot now points at the existing verified
+artifacts/toolkit-deps/sysroot, supplying that dependency without installation.
+All 22 patch hashes and their ordered digest match third_party/sources.json.
+The successful build log is artifacts/build-toolkit-authoring-with-sysroot.log.
+See VALIDATION.md for results from the combined application source.

@@ -118,6 +118,49 @@ int main(int argc, char **argv) try {
   auto after = doc.copy_scene().encode();
   check(doc.undo() && doc.copy_scene().encode() == source && doc.redo() && doc.copy_scene().encode() == after,
         "Complete linked weight stroke has one exact global undo/redo entry");
+  {
+    auto scene = original.snapshot();
+    auto target = scene.active().id;
+    auto high = scene.active().painted->mesh();
+    for (auto &p : high.positions) p.z += .01f;
+    auto source_id = scene.add("Hidden bake source", Volume{});
+    scene.active().mesh_active = true;
+    scene.active().visible = false;
+    scene.active().locked = true;
+    scene.active().painted = std::make_shared<PaintedMesh>(std::move(high), 64);
+    scene.active().material.color = {.1f, .2f, .8f, 1};
+    scene.select(target);
+    auto initial = scene.encode();
+    Document workflow; workflow.replace(std::move(scene));
+    ObjectBakeSettings options; options.ao_samples = 0;
+    workflow.bake_from_object(source_id, options);
+    check(workflow.wait_asset() && workflow.frame().state->error.empty(),
+          "A skinned target accepts guarded source-aware baking before weight authoring");
+    auto baked = workflow.copy_scene().encode();
+    workflow.weight_settings(tool(), 1);
+    check(workflow.wait_mesh() && workflow.begin_desktop(),
+          "The baked skinned target acquires a posed weight gesture");
+    workflow.stamp_desktop(stamp(b.from)); workflow.end_desktop();
+    check(workflow.wait_asset() && workflow.frame().state->error.empty() &&
+          !workflow.asset_status().cancellable && !workflow.frame().state->can_cancel_asset,
+          "Weight publication releases the shared cancellation lease without leaking busy state");
+    auto weighted = workflow.copy_scene().encode();
+    check(std::abs(value(workflow.copy_scene(), target, 0, 1) - .5f) < 1e-6f &&
+          weighted["objects"][0]["painted"] == baked["objects"][0]["painted"] &&
+          weighted["objects"].back() == initial["objects"].back(),
+          "A linked weight gesture preserves all baked maps and the complete hidden bake source");
+    check(workflow.undo() && workflow.copy_scene().encode() == baked &&
+          workflow.undo() && workflow.copy_scene().encode() == initial &&
+          workflow.redo() && workflow.copy_scene().encode() == baked &&
+          workflow.redo() && workflow.copy_scene().encode() == weighted,
+          "Bake and linked weight edits retain separate exact global Undo/Redo transactions");
+    workflow.clear_bake();
+    check(workflow.wait_asset() && workflow.frame().state->error.empty() &&
+          !workflow.copy_scene().active().painted->baked() &&
+          workflow.copy_scene().encode()["objects"][0]["deformation"] == weighted["objects"][0]["deformation"] &&
+          workflow.undo() && workflow.copy_scene().encode() == weighted,
+          "Clear baked surface preserves authored weights and undoes the combined scene exactly");
+  }
   Document noop; noop.replace(original.snapshot()); settings.locks = {0, 1}; noop.weight_settings(settings, 1); noop.wait_mesh();
   check(noop.begin_desktop(), "Locked-weight fixture acquires tool without changing model"); noop.stamp_desktop(stamp(b.from)); noop.end_desktop(); noop.wait_asset();
   check(noop.frame().state->error.empty() && !noop.frame().state->dirty && !noop.frame().state->can_undo && noop.copy_scene().encode() == source,

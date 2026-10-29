@@ -172,7 +172,7 @@ bool Document::end_action_locked() {
         *report = std::to_string(result.changed) + " vertices changed, " +
                   std::to_string(result.constrained) + " constrained";
         for (const auto &message : result.diagnostics) *report += "; " + message;
-      }, weight_source_, report, changed);
+      }, weight_source_, report, {}, changed);
     return false;
   }
   return scene_.active().mesh_active ? scene_.active().painted->end_stroke()
@@ -386,9 +386,6 @@ void Document::publish_locked(bool force) {
       state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
   }
   state_.mesh_active = active.mesh_active;
-  state_.can_paint_weights = active.mesh_active && active.painted && active.visible && !active.locked &&
-      active.deformation && active.deformation->skeleton && active.deformation->skin;
-  if (!state_.can_paint_weights) state_.weights.enabled = false;
   state_.bake_sources = bake_sources_locked();
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
@@ -396,6 +393,9 @@ void Document::publish_locked(bool force) {
   state_.can_clear_bake=bake_target_ready_locked() && bool(active.painted->baked());
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
   state_.asset_progress=work.progress;
+  state_.can_paint_weights = active.mesh_active && active.painted && active.visible && !active.locked &&
+      active.deformation && active.deformation->skeleton && active.deformation->skin;
+  if (!state_.can_paint_weights) state_.weights.enabled = false;
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
   auto avatar = avatar_group(scene_, active.id);
   state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
@@ -1209,10 +1209,10 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
-  if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
-    return !state_.asset_busy && !state_.recovery_busy && state_.can_paint_weights;
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
+  if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
+    return !state_.asset_busy && !state_.recovery_busy && state_.can_paint_weights;
   if (parameter == VrParameter::RigRotation || parameter == VrParameter::MorphWeight) {
     const auto &o = scene_.active();
     if (state_.asset_busy || state_.recovery_busy || !o.visible || o.locked ||
@@ -1384,12 +1384,6 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
-    case VrParameter::WeightStrength:
-      c.title = "Weight stroke strength"; c.value[0] = state_.weights.strength;
-      break;
-    case VrParameter::WeightValue:
-      c.title = "Target weight"; c.value[0] = state_.weights.value;
-      break;
     case VrParameter::BakeSource: {
       auto ids=bake_sources_locked();c.title="Bake source (hidden sources allowed)";
       c.maximum=float(ids.size()-1);
@@ -1404,6 +1398,12 @@ void Document::control_event_locked(VrControlEvent event) {
     case VrParameter::BakeQuality:
       c.title="AO samples / seam padding";c.components=2;
       c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,0,0};break;
+    case VrParameter::WeightStrength:
+      c.title = "Weight stroke strength"; c.value[0] = state_.weights.strength;
+      break;
+    case VrParameter::WeightValue:
+      c.title = "Target weight"; c.value[0] = state_.weights.value;
+      break;
     case VrParameter::RigRotation:
       control_rig_index_ = state_.rig_joint;
       c.title = o.deformation->skeleton->bones.at(control_rig_index_).name + " rotation delta";
@@ -1559,16 +1559,16 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::BakeSource:
+  case VrParameter::BakeDistances:
+  case VrParameter::BakeQuality:
+    break; // Staged operation settings do not mutate the scene or history.
   case VrParameter::WeightStrength:
     state_.weights.strength = value;
     break;
   case VrParameter::WeightValue:
     state_.weights.value = value;
     break;
-  case VrParameter::BakeSource:
-  case VrParameter::BakeDistances:
-  case VrParameter::BakeQuality:
-    break; // Staged operation settings do not mutate the scene or history.
   case VrParameter::RigRotation:
     control_changed_ = c.value[0] != 0 || c.value[1] != 0 || c.value[2] != 0;
     break;
@@ -1674,15 +1674,15 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command==SpatialCommand::CancelWork)return state_.asset_busy && asset_status().cancellable;
+  if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
+  if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
   if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked)
     return !state_.asset_busy && !state_.recovery_busy && !control_before_ && !action_active_locked() &&
            state_.can_paint_weights && (command != SpatialCommand::WeightSymmetry || bool(scene_.active().deformation->humanoid));
   if (command == SpatialCommand::ExportAvatar)
     return !state_.asset_busy && !state_.recovery_busy && !control_before_ && state_.can_export_avatar;
-  if(command==SpatialCommand::CancelWork)return state_.asset_busy && asset_status().cancellable;
-  if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
-  if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
   if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
     auto parameter = command == SpatialCommand::RigNextMorph || command == SpatialCommand::RigPreviousMorph
         ? VrParameter::MorphWeight : VrParameter::RigRotation;
@@ -1805,6 +1805,9 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command==SpatialCommand::CancelWork){cancel_asset_work_locked();return;}
+  if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
+  if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked) {
     if (!command_enabled_locked(command)) return;
     auto &settings = state_.weights;
@@ -1823,9 +1826,6 @@ void Document::command_locked(SpatialCommand command) {
     if (command_enabled_locked(command)) file_locked(true, AssetExportFormat::Avatar);
     return;
   }
-  if(command==SpatialCommand::CancelWork){cancel_asset_work_locked();return;}
-  if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
-  if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
   if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
     if (!command_enabled_locked(command)) return;
     const auto &d = *scene_.active().deformation;
@@ -2164,7 +2164,8 @@ void Document::file_loop() {
           if (job->content != content_ || job->revision != state_.revision ||
               job->object != scene_.active().id || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
-          // Retain the lease through all stale/cancellation checks, including no-op weight strokes.
+          // Keep the lease until every rejection check has completed. Otherwise
+          // a new job could start between this rejection and the catch handler.
           state_.asset_busy = false;
           asset_work_.store({});
           bool changed = !job->operation_changed || *job->operation_changed;

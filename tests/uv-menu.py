@@ -75,7 +75,7 @@ async def main():
                     pass
             return None
 
-        window = await wait(lambda: named("Dome Sculpt"))
+        window = await wait(lambda: named("Dome Sculpt"), seconds=90)
         window.set_input_focus(X.RevertToParent, X.CurrentTime)
         connection.sync()
 

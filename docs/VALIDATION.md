@@ -546,3 +546,12 @@ System clang22 accepting -fsycl but missing sycl/sycl.hpp fails configure with
 the explicit SDK diagnostic; user-owned official DPC++7.2.0 passes the probe.
 Logs: configure-oneapi-missing-sdk.log and configure-oneapi-complete-sdk.log.
 Compiler qualification/device enumeration alone do not prove production compute.
+
+## Publication integration with e65db2a
+
+The incoming independent-workspace validation is archived in
+VALIDATION-e65db2a.md. Its worker/enum layout and additional regression checks
+are preserved alongside deferred UV, graceful signals and Arc/mesh fixes. This
+new combined source is not yet covered by either parent's evidence. Root will
+build/test the exact integration before updating origin/main. The ongoing v7
+material/export and skin UI changes in the primary working tree are excluded.

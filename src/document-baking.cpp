@@ -34,7 +34,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
   queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){
     auto result=bake_object(scene,source,settings,cancelled,[work](float p){work->progress.store(p);});
     *report=std::to_string(result.projected)+" texels, "+std::to_string(result.padded)+" padded, "+std::to_string(result.rays)+" rays";
-  },expected,report,{},work);
+  },expected,report,work);
   state_.bake_source=source;state_.bake_settings=settings;publish_locked();
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){

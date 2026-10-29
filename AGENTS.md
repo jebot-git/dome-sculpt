@@ -26,7 +26,7 @@ Build (prepare the current canonical DomeD toolkit as in [docs/TOOLKIT.md](docs/
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit/share/fltk"
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-282467e/share/fltk"
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
 ```

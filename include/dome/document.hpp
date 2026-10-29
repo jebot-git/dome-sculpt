@@ -64,13 +64,13 @@ struct EditorState {
        can_redo = false;
   std::shared_ptr<const DeformationState> deformation;
   size_t rig_joint = 0, morph_target = 0;
-  WeightToolSettings weights;
-  bool can_paint_weights = false;
   bool can_bake = false, can_clear_bake = false, can_cancel_asset = false;
   float asset_progress = 0;
   uint64_t bake_source = 0;
   std::vector<uint64_t> bake_sources;
   ObjectBakeSettings bake_settings;
+  WeightToolSettings weights;
+  bool can_paint_weights = false;
   bool can_voxel_remesh = false;
   bool can_export_avatar = false;
   float voxel_size_mm = 30;
@@ -314,9 +314,9 @@ private:
     SceneOperation scene_operation{};
     std::string operation_label{};
     std::shared_ptr<std::string> operation_report{};
+    std::shared_ptr<AssetWork> work{};
     std::shared_ptr<bool> operation_changed{};
     AssetExportFormat export_format = AssetExportFormat::Glb;
-    std::shared_ptr<AssetWork> work{};
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
@@ -353,8 +353,7 @@ private:
   void queue_scene_operation(std::string, SceneOperation, AssetSource,
                              std::shared_ptr<std::string>);
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
-                                    std::shared_ptr<std::string>, std::shared_ptr<bool> = {},
-                                    std::shared_ptr<AssetWork> = {});
+                                    std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});

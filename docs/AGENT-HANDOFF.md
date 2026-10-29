@@ -1,5 +1,10 @@
 # Resume checkpoint — 2026-10-29
 
+Historical bake-only checkpoint: the divergent histories described here have
+since been combined on work/integrated-native-authoring. For the current source,
+validation and remaining work, start with HANDOFF.md and VALIDATION.md. The
+unimplemented notes below describe the pre-merge branch only.
+
 The user requested: “Commit and push current stage, work will resume. Prepare
 agents handoff.” This checkpoint adds documentation only. The application source
 remains exactly at 7817ca2b16faa7b2455f501039b6a6eb7b0c1d23, the native desktop/XR

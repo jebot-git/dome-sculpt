@@ -28,6 +28,13 @@ The helper still uses a volume brush and per-mesh adjacency for smoothing.
 Interactive automatic binding, weight transfer and durable per-rig tool settings
 remain separate production work. The full objective remains in REQUIREMENTS.md.
 
+Weight changes are computed after release; the current gesture has no live
+deformed-weight preview. Desktop picking uses the displayed posed mesh's BVH,
+but does not yet account for source-texture alpha holes. XR painting uses the
+tracked capsule volume rather than an occlusion-clipped surface brush. These
+limits, large-mesh latency, and physical-controller validation remain production
+work; passing fixture tests do not establish a complete skinning workflow.
+
 tests/weight-authoring.cpp independently checks sample-density invariance,
 geometric coverage, transformed/hidden parts, locks/cancel, source retention,
 posed BVH picking, immutable attributes, desktop/controller transactions and

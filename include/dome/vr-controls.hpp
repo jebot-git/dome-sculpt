@@ -26,9 +26,9 @@ enum class VrParameter {
   VoxelSize,
   RigRotation,
   MorphWeight,
+  BakeSource, BakeDistances, BakeQuality,
   WeightStrength,
-  WeightValue,
-  BakeSource, BakeDistances, BakeQuality
+  WeightValue
 };
 struct VrControlState {
   VrParameter parameter = VrParameter::None;

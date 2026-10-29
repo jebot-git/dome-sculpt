@@ -431,8 +431,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 13 ? "Skin weights"
-                     : s.menu_page == 12 ? "Mesh baking"
+  const char *page = s.menu_page == 12 ? "Mesh baking" : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 11 ? "Rig and shapekeys"
                      : s.menu_page == 10 ? "Mesh tools"
                      : s.menu_page == 9 ? "Avatars"
@@ -446,15 +445,14 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
-  if (s.menu_page == 13 && s.deformation && s.deformation->skeleton) {
-    const char *modes[] = {"Add", "Subtract", "Replace", "Smooth"};
-    text(320 * unit_, 290 * unit_, s.deformation->skeleton->bones.at(s.rig_joint).name, fg);
-    text(320 * unit_, 320 * unit_, modes[int(s.weights.mode)], fg);
-  }
   if(s.menu_page==12){
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name.substr(0,32),fg);
     text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
+  } else if (s.menu_page == 13 && s.deformation && s.deformation->skeleton) {
+    const char *modes[] = {"Add", "Subtract", "Replace", "Smooth"};
+    text(320 * unit_, 290 * unit_, s.deformation->skeleton->bones.at(s.rig_joint).name, fg);
+    text(320 * unit_, 320 * unit_, modes[int(s.weights.mode)], fg);
   }
   if (s.menu_page == 11 && s.deformation) {
     auto &d = *s.deformation;
