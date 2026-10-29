@@ -20,6 +20,8 @@ struct TextureMaps {
   bool transparent = false;
   // Original normal/AO views and exact source metadata survive compositing.
   std::shared_ptr<const PaintSourceMaps> source_maps;
+  // Preview-only immutable original bindings; derived Images are intentionally empty.
+  bool source_only = false;
 };
 struct PaintCompositeCacheStats {
   size_t retained_bytes = 0, retained_maps = 0, limit_bytes = 0;
@@ -103,6 +105,7 @@ public:
   std::shared_ptr<PaintedMesh>
   reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
   std::shared_ptr<const TextureMaps> composite(const Material &) const;
+  std::shared_ptr<const TextureMaps> preview(const Material &) const;
   const PaintPixel &pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   std::optional<Vec3> raycast(Vec3, Vec3, float maximum = 20) const;
   Vec3 normal(Vec3) const;

@@ -2,6 +2,8 @@
 // Matrix helpers adapted from OpenBrush Native (Apache-2.0).
 #include "dome/render.hpp"
 #include <cstddef>
+#include "dome/source-maps.hpp"
+#include <unordered_set>
 namespace dome {
 Mat4 model_matrix(CanvasTransform t) {
   auto x = ob::rotate(t.orientation, {t.scale, 0, 0}),
@@ -61,13 +63,96 @@ GLuint shader(GLenum kind, const char *text) {
   return s;
 }
 } // namespace
-SurfaceRenderer::SurfaceRenderer() {
+struct SurfaceRenderer::TextureState {
+  struct Key {const Image *image=nullptr;bool srgb=false;bool operator==(const Key&)const=default;};
+  struct KeyHash {size_t operator()(const Key&k)const{return std::hash<const Image*>{}(k.image)^(size_t(k.srgb)<<1);}};
+  using Sampler=std::array<int,4>;
+  struct SamplerHash {size_t operator()(const Sampler&s)const{size_t h=0;for(int n:s)h=h*131+size_t(n);return h;}};
+  struct ImageResource {std::shared_ptr<const Image> owner;GLuint id=0;bool mips=false;size_t bytes=0;};
+  struct Slot {GLuint image=0,sampler=0;std::array<float,6> uv{1,0,0,1,0,0};};
+  using Binding=std::array<Slot,5>;
+  SurfaceTextureLimits limits;
+  uint64_t uploads=0;
+  std::unordered_map<Key,ImageResource,KeyHash> images;
+  std::unordered_map<Sampler,GLuint,SamplerHash> samplers;
+  std::unordered_map<uint64_t,Binding> bindings;
+  explicit TextureState(SurfaceTextureLimits l):limits(l){
+    if(!l.max_bytes||l.max_bytes>2ull*1024*1024*1024||!l.max_images||l.max_images>2048||!l.max_samplers||l.max_samplers>256)
+      throw std::invalid_argument("Invalid GPU source texture resource bounds");
+  }
+  static size_t storage(const Image&i,bool mips){size_t bytes=0;uint32_t w=i.width,h=i.height;for(;;){bytes+=size_t(w)*h*4;if(!mips||(w==1&&h==1))return bytes;w=std::max(1u,w/2);h=std::max(1u,h/2);}}
+  static Sampler sampler(const PaintSourceTexture&s){return {s.wrap_s,s.wrap_t,s.min_filter?s.min_filter:GL_LINEAR,s.mag_filter?s.mag_filter:GL_LINEAR};}
+  static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
+  SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size(),samplers.size(),bytes,uploads};}
+  void clear(bool release){if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();}
+  void prepare(const MeshSnapshot&mesh){
+    struct Desired {std::shared_ptr<const Image> owner;bool mips=false;};
+    struct PlanSlot {Key key;Sampler sampler;std::array<float,6>uv;bool present=false;};
+    std::unordered_map<Key,Desired,KeyHash> wanted;
+    std::unordered_set<Sampler,SamplerHash> wanted_samplers;
+    std::unordered_map<uint64_t,std::array<PlanSlot,5>> planned;
+    for(auto &range:mesh.ranges)if(range.textures){
+      auto maps=range.textures;auto &plan=planned[range.object];
+      auto slot=[&](int index,std::shared_ptr<const Image> image,const PaintSourceTexture&view,bool srgb){
+        if(!image)return;
+        view.validate();image->validate();Key key{image.get(),srgb};auto sample=sampler(view);
+        auto &desired=wanted[key];desired.owner=std::move(image);desired.mips|=mipmapped(sample);
+        wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true};
+      };
+      if(maps->source_only){
+        if(!maps->source_maps||maps->source_maps->empty()||maps->color.width||maps->metal_rough.width||maps->emission.width)
+          throw std::runtime_error("Invalid raw source preview marker");
+        maps->source_maps->validate();auto &s=*maps->source_maps;
+        slot(0,s.color.image,s.color,true);slot(1,s.metal_rough.image,s.metal_rough,false);slot(2,s.emission.image,s.emission,true);slot(3,s.normal.image,s.normal,false);slot(4,s.occlusion.image,s.occlusion,false);
+      }else{
+        PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;
+        slot(0,std::shared_ptr<const Image>(maps,&maps->color),view,true);slot(1,std::shared_ptr<const Image>(maps,&maps->metal_rough),view,false);slot(2,std::shared_ptr<const Image>(maps,&maps->emission),view,true);
+        if(maps->source_maps)slot(3,maps->source_maps->normal.image,maps->source_maps->normal,false);
+      }
+    }
+    if(wanted.size()>limits.max_images||wanted_samplers.size()>limits.max_samplers)throw std::length_error("GPU source texture count budget exceeded");
+    size_t bytes=0;GLint maximum=0;glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maximum);
+    for(auto &[key,desired]:wanted){
+      if(auto previous=images.find(key);previous!=images.end())desired.mips|=previous->second.mips;
+      auto &i=*desired.owner;if(i.width>uint32_t(maximum)||i.height>uint32_t(maximum))throw std::length_error("Original image exceeds hardware texture dimensions");
+      size_t count=storage(i,desired.mips);if(count>limits.max_bytes-bytes)throw std::length_error("GPU original texture byte budget exceeded");bytes+=count;
+    }
+    for(auto it=images.begin();it!=images.end();)if(!wanted.contains(it->first)){glDeleteTextures(1,&it->second.id);it=images.erase(it);}else ++it;
+    for(auto it=samplers.begin();it!=samplers.end();)if(!wanted_samplers.contains(it->first)){glDeleteSamplers(1,&it->second);it=samplers.erase(it);}else ++it;
+    glActiveTexture(GL_TEXTURE0);glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+    for(auto &[key,desired]:wanted){
+      auto found=images.find(key);
+      if(found==images.end()){
+        ImageResource resource;resource.owner=desired.owner;glGenTextures(1,&resource.id);glBindTexture(GL_TEXTURE_2D,resource.id);
+        glTexImage2D(GL_TEXTURE_2D,0,key.srgb?GL_SRGB8_ALPHA8:GL_RGBA8,resource.owner->width,resource.owner->height,0,GL_RGBA,GL_UNSIGNED_BYTE,resource.owner->rgba.data());
+        if(glGetError()!=GL_NO_ERROR){glDeleteTextures(1,&resource.id);throw std::runtime_error("Original GPU texture allocation failed");}
+        try{found=images.emplace(key,std::move(resource)).first;}catch(...){glDeleteTextures(1,&resource.id);throw;}++uploads;
+      }
+      auto &resource=found->second;
+      if(desired.mips&&!resource.mips){glBindTexture(GL_TEXTURE_2D,resource.id);glGenerateMipmap(GL_TEXTURE_2D);if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Original GPU mip generation failed");resource.mips=true;}
+      resource.bytes=storage(*resource.owner,resource.mips);
+    }
+    for(auto &sample:wanted_samplers)if(!samplers.contains(sample)){
+      GLuint id=0;glGenSamplers(1,&id);glSamplerParameteri(id,GL_TEXTURE_WRAP_S,sample[0]);glSamplerParameteri(id,GL_TEXTURE_WRAP_T,sample[1]);glSamplerParameteri(id,GL_TEXTURE_MIN_FILTER,sample[2]);glSamplerParameteri(id,GL_TEXTURE_MAG_FILTER,sample[3]);
+      if(glGetError()!=GL_NO_ERROR){glDeleteSamplers(1,&id);throw std::runtime_error("Original GPU sampler allocation failed");}
+      try{samplers.emplace(sample,id);}catch(...){glDeleteSamplers(1,&id);throw;}
+    }
+    std::unordered_map<uint64_t,Binding> ready;
+    for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<5;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv};}
+    bindings=std::move(ready);
+  }
+};
+SurfaceRenderer::SurfaceRenderer():SurfaceRenderer(SurfaceTextureLimits{}){}
+SurfaceTextureStats SurfaceRenderer::texture_stats()const{return textures_->stats();}
+void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=0;cached_.reset();textures_->clear(false);count_=0;}
+
+SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   const char *vertex = R"(#version 330 core
 layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;
 uniform mat4 model,mvp;out vec3 world,n;out vec2 texcoord;
 void main(){vec4 p=model*vec4(position,1);world=p.xyz;texcoord=uv;n=normalize(mat3(model)*normal);gl_Position=mvp*vec4(position,1);})";
   const char *fragment = R"(#version 330 core
-in vec3 world,n;in vec2 texcoord;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int has_maps;uniform sampler2D color_map,orm_map,emission_map;
+in vec3 world,n;in vec2 texcoord;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5];uniform sampler2D color_map,orm_map,emission_map,normal_map,ao_map;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
 vec3 H=normalize(V+L);float NV=max(dot(N,V),0.0001),NL=max(dot(N,L),0.0),NH=max(dot(N,H),0.0),VH=max(dot(V,H),0.0);
@@ -76,11 +161,23 @@ float d=a2/(PI*pow(NH*NH*(a2-1.0)+1.0,2.0));float k=pow(rough+1.0,2.0)/8.0;
 float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F0=mix(vec3(.04),base,metallic);vec3 F=F0+(1.0-F0)*pow(1.0-VH,5.0);
 return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
 vec3 output_srgb(vec3 c){return mix(1.055*pow(max(c,vec3(0)),vec3(1.0/2.4))-.055,12.92*c,lessThanEqual(c,vec3(.0031308)));}
-void main(){vec4 base=base_color;float metal=metallic,rough=roughness;vec3 glow=emission;if(has_maps==1){base*=texture(color_map,texcoord);vec3 orm=texture(orm_map,texcoord).rgb;metal*=orm.b;rough*=orm.g;glow*=texture(emission_map,texcoord).rgb;}if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
+vec2 source_uv(int slot){return vec2(dot(uv_x[slot],vec3(texcoord,1)),dot(uv_y[slot],vec3(texcoord,1)));}
+vec3 unit(vec3 v){float m=max(max(abs(v.x),abs(v.y)),abs(v.z));return m>1e-20?normalize(v/m):vec3(0,0,1);}
+vec3 surface_normal(){
+vec3 N=unit(n);if(slots[3]==1){vec2 uv=source_uv(3),a=dFdx(uv),b=dFdy(uv);vec3 x=dFdx(world),y=dFdy(world);float determinant=a.x*b.y-a.y*b.x;
+if(abs(determinant)>1e-8*max(length(a)*length(b),1e-20)){
+vec3 T=(x*b.y-y*a.y)/determinant,B=(y*a.x-x*b.x)/determinant;T=unit(T-N*dot(N,T));B=unit(cross(N,T))*(dot(cross(N,T),B)<0.0?-1.0:1.0);
+vec3 encoded=texture(normal_map,uv).xyz;vec3 ts=unit(vec3((encoded.xy*2.0-1.0)*normal_scale,encoded.z*2.0-1.0));N=unit(T*ts.x+B*ts.y+N*ts.z);}}
+return gl_FrontFacing?N:-N;}
+void main(){vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
+if(slots[0]==1)base*=texture(color_map,source_uv(0));
+if(slots[1]==1){vec3 orm=texture(orm_map,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
+if(slots[2]==1)glow*=texture(emission_map,source_uv(2)).rgb;
+if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(ao_map,source_uv(4)).r,ao_strength);if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
 if(unlit==1){color=vec4(output_srgb(base.rgb+glow),base.a);return;}
-vec3 N=normalize(n)*(gl_FrontFacing?1.0:-1.0),V=normalize(camera-world),result;
+vec3 N=shading_normal,V=normalize(camera-world),result;
 if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base.rgb*ramp*edge+vec3(.025);}
-else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb;
+else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb*ao;
 result+=glow;result=result/(result+vec3(1));color=vec4(pow(result,vec3(1.0/2.2)),base.a);})";
   GLuint vs = shader(GL_VERTEX_SHADER, vertex),
          fs = shader(GL_FRAGMENT_SHADER, fragment);
@@ -99,8 +196,7 @@ result+=glow;result=result/(result+vec3(1));color=vec4(pow(result,vec3(1.0/2.2))
   glGenBuffers(1, &indices_);
 }
 SurfaceRenderer::~SurfaceRenderer() {
-  for (auto &[id, textures] : textures_)
-    glDeleteTextures(3, textures.data());
+  textures_->clear(true);
   glDeleteBuffers(1, &indices_);
   glDeleteBuffers(1, &vertices_);
   glDeleteVertexArrays(1, &vao_);
@@ -147,29 +243,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                  mesh->mesh.indices.size() * sizeof(uint32_t),
                  mesh->mesh.indices.data(), GL_STATIC_DRAW);
     count_ = mesh->mesh.indices.size();
-    for (auto &[id, textures] : textures_)
-      glDeleteTextures(3, textures.data());
-    textures_.clear();
-    for (auto &r : mesh->ranges)
-      if (r.textures) {
-        auto &ids = textures_[r.object];
-        glGenTextures(3, ids.data());
-        const Image *images[] = {&r.textures->color, &r.textures->metal_rough,
-                                 &r.textures->emission};
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        for (int i = 0; i < 3; ++i) {
-          images[i]->validate();
-          glActiveTexture(GL_TEXTURE0 + i);
-          glBindTexture(GL_TEXTURE_2D, ids[i]);
-          glTexImage2D(GL_TEXTURE_2D, 0, i == 1 ? GL_RGBA8 : GL_SRGB8_ALPHA8,
-                       images[i]->width, images[i]->height, 0, GL_RGBA,
-                       GL_UNSIGNED_BYTE, images[i]->rgba.data());
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        }
-      }
+    try{textures_->prepare(*mesh);}catch(...){textures_->clear(true);cached_.reset();count_=0;throw;}
     cached_ = std::move(mesh);
   }
   glUseProgram(program_);
@@ -189,20 +263,21 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   auto draw_range = [&](const Material &original, size_t first, size_t count,
                         uint64_t id, const TextureMaps *maps) {
     Material material = original;
-    if (maps) {
-      material.color = {1, 1, 1, 1};
-      material.metallic = material.roughness = 1;
-      material.emissive = {1, 1, 1};
-      auto &ids = textures_.at(id);
-      for (int i = 0; i < 3; ++i) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, ids[i]);
-      }
+    if (maps&&!maps->source_only) {
+      material.color={1,1,1,1};material.metallic=material.roughness=1;material.emissive={1,1,1};
     }
-    glUniform1i(glGetUniformLocation(program_, "has_maps"), maps ? 1 : 0);
-    glUniform1i(glGetUniformLocation(program_, "color_map"), 0);
-    glUniform1i(glGetUniformLocation(program_, "orm_map"), 1);
-    glUniform1i(glGetUniformLocation(program_, "emission_map"), 2);
+    std::array<GLint,5> present{};std::array<float,15> ux{},uy{};
+    for(int n=0;n<5;++n){
+      TextureState::Slot slot;if(maps)slot=textures_->bindings.at(id)[n];
+      glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);present[n]=slot.image!=0;
+      ux[n*3]=slot.uv[0];ux[n*3+1]=slot.uv[1];ux[n*3+2]=slot.uv[4];uy[n*3]=slot.uv[2];uy[n*3+1]=slot.uv[3];uy[n*3+2]=slot.uv[5];
+    }
+    glUniform1iv(glGetUniformLocation(program_,"slots[0]"),5,present.data());
+    glUniform3fv(glGetUniformLocation(program_,"uv_x[0]"),5,ux.data());glUniform3fv(glGetUniformLocation(program_,"uv_y[0]"),5,uy.data());
+    glUniform1i(glGetUniformLocation(program_,"map_mode"),maps?(maps->source_only?2:1):0);
+    const char *names[]={"color_map","orm_map","emission_map","normal_map","ao_map"};for(int n=0;n<5;++n)glUniform1i(glGetUniformLocation(program_,names[n]),n);
+    glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps?maps->source_maps->normal_scale:1);
+    glUniform1f(glGetUniformLocation(program_,"ao_strength"),maps&&maps->source_maps?maps->source_maps->occlusion_strength:1);
     glUniform1i(glGetUniformLocation(program_, "toon"), toon || material.toon);
     glUniform1i(glGetUniformLocation(program_, "unlit"), material.unlit);
     glUniform1i(glGetUniformLocation(program_, "alpha_mode"), int(material.alpha));
@@ -242,14 +317,14 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       if (blended(r.material, r.textures.get()))
         draw_range(r.material, r.first, r.count, r.object, r.textures.get());
   }
+  for(int n=0;n<5;++n)glBindSampler(n,0);
   glActiveTexture(GL_TEXTURE0);
   glDepthMask(GL_TRUE);
   glDisable(GL_BLEND);
   glDisable(GL_CULL_FACE);
   glBindVertexArray(0);
   glUseProgram(0);
-  if (glGetError() != GL_NO_ERROR)
-    throw std::runtime_error("Sculpt GPU rendering failed");
+  if (glGetError() != GL_NO_ERROR){textures_->clear(true);cached_.reset();count_=0;throw std::runtime_error("Sculpt GPU rendering failed");}
 }
 
 CursorRenderer::CursorRenderer() {

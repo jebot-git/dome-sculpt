@@ -92,6 +92,9 @@ struct PaintedMesh::CompositeCache {
   uint64_t token=0;
   CompositeFactors factors{};
   std::weak_ptr<const TextureMaps> maps;
+  uint64_t preview_token=0;
+  bool source_eligible=false;
+  std::shared_ptr<const TextureMaps> source_preview;
 };
 PaintCompositeCacheStats paint_composite_cache_stats(){
   auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
@@ -591,6 +594,32 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
   // already be immutable, allowing one original image cache across materials.
   result->source_maps_=std::make_shared<const PaintSourceMaps>(*maps);
   return result;
+}
+std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {
+  material.validate();
+  if(source_maps_){
+    std::lock_guard lock(composite_cache_->mutex);
+    if(composite_cache_->preview_token!=composite_token_){
+      bool contributing=false;
+      for(const auto &l:layers_)if(l.visible&&l.opacity>0){
+        for(const auto &tile:l.tiles)if(tile){
+          for(const auto &p:tile->pixels)if(p.data[13]&&(p.data[9]||p.data[10]||p.data[11]||p.data[12])){contributing=true;break;}
+          if(contributing)break;
+        }
+        if(contributing)break;
+      }
+      composite_cache_->source_eligible=!contributing;composite_cache_->preview_token=composite_token_;
+    }
+    if(composite_cache_->source_eligible){
+      if(!composite_cache_->source_preview){
+        auto marker=std::make_shared<TextureMaps>();marker->source_maps=source_maps_;marker->source_only=true;
+        if(auto image=source_maps_->color.image)for(size_t i=3;i<image->rgba.size();i+=4)if(image->rgba[i]!=255){marker->transparent=true;break;}
+        composite_cache_->source_preview=std::move(marker);
+      }
+      return composite_cache_->source_preview;
+    }
+  }
+  return composite(material);
 }
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material) const {
