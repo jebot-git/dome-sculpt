@@ -6,6 +6,8 @@
 #include "dome/vrm.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/mesh-processing.hpp"
+#include "dome/material-visibility.hpp"
+#include "dome/frame-clock.hpp"
 #include <unistd.h>
 #include <utility>
 namespace dome {
@@ -122,7 +124,9 @@ void Document::begin_action_locked() {
     if (mesh->generation != state_.generation || mesh->revision != state_.revision)
       throw std::logic_error("Wait for the current weight view before painting");
     state_.weights.validate(scene_.active().deformation->skeleton->bones.size());
+    state_.error.clear();
     weight_stroking_ = true; weight_samples_.clear();
+    ++weight_epoch_; weight_base_ = std::move(mesh);
     weight_source_ = {state_.generation, state_.revision, scene_.active().id};
     weight_stroke_settings_ = state_.weights;
     weight_joint_ = uint32_t(state_.rig_joint);
@@ -160,11 +164,14 @@ void Document::stamp_action_locked(const Brush &b) {
 bool Document::end_action_locked() {
   if (weight_stroking_) {
     weight_stroking_ = false;
+    auto base = weight_base_;
+    invalidate_weight_view_locked(false);
     auto samples = std::move(weight_samples_); weight_samples_.clear();
-    if (samples.empty()) return false;
+    if (samples.empty()) { restore_weight_view_locked(base); return false; }
     auto settings = weight_stroke_settings_;
     auto object = weight_source_.object;
     auto report = std::make_shared<std::string>(); auto changed = std::make_shared<bool>(false);
+    try {
     queue_scene_operation_locked("Paint skin weights",
       [samples = std::move(samples), settings, object, report, changed](Scene &scene, const auto &cancelled) {
         auto result = paint_scene_weights(scene, object, samples, settings, cancelled);
@@ -172,18 +179,38 @@ bool Document::end_action_locked() {
         *report = std::to_string(result.changed) + " vertices changed, " +
                   std::to_string(result.constrained) + " constrained";
         for (const auto &message : result.diagnostics) *report += "; " + message;
-      }, weight_source_, report, {}, changed);
+      }, weight_source_, report, {}, changed, base);
+    } catch (...) { restore_weight_view_locked(base); throw; }
     return false;
   }
   return scene_.active().mesh_active ? scene_.active().painted->end_stroke()
                                      : volume().end_stroke();
 }
 void Document::cancel_action_locked() {
-  if (weight_stroking_) { weight_stroking_ = false; weight_samples_.clear(); return; }
+  if (weight_stroking_) {
+    weight_stroking_ = false; weight_samples_.clear();
+    invalidate_weight_view_locked(true);
+    state_.error.clear(); state_.message = "Weight gesture cancelled"; return;
+  }
   if (scene_.active().mesh_active)
     scene_.active().painted->cancel_stroke();
   else
     volume().cancel_stroke();
+}
+void Document::restore_weight_view_locked(const std::shared_ptr<const MeshSnapshot> &base) {
+  if (!base || base->generation != state_.generation || base->revision != state_.revision) return;
+  std::lock_guard lock(mesh_mutex_);
+  mesh_.store(base);
+  mesh_changed_.notify_all();
+}
+void Document::invalidate_weight_view_locked(bool restore) {
+  std::lock_guard lock(mesh_mutex_);
+  ++weight_epoch_;
+  if (pending_mesh_ && pending_mesh_->weight_gesture) pending_mesh_.reset();
+  if (restore && weight_base_ && weight_base_->generation == state_.generation &&
+      weight_base_->revision == state_.revision) mesh_.store(weight_base_);
+  weight_base_.reset();
+  mesh_changed_.notify_all();
 }
 void Document::record_locked(History entry) {
   entry.from = content_;
@@ -422,6 +449,8 @@ void Document::publish_locked(bool force) {
         state_.layer_visible = l.visible;
     }
   state_.stroking = action_active_locked();
+  state_.weight_gesture = weight_stroking_ ? weight_epoch_.load() : 0;
+  state_.weight_samples = weight_stroking_ ? weight_samples_.size() : 0;
   state_.dirty = content_ != saved_content_ || pending_locked() ||
                  control_changed_ || state_.asset_busy;
   state_.tool = input_.tool();
@@ -443,11 +472,20 @@ void Document::publish_locked(bool force) {
     std::lock_guard lock(uv_mutex_);
     uv_changed_.notify_all();
   }
-  if (changed) {
+  bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
+      (weight_scheduled_epoch_ != state_.weight_gesture || weight_scheduled_samples_ != weight_samples_.size());
+  if (changed || weight_preview) {
     std::lock_guard mesh_lock(mesh_mutex_);
     pending_mesh_.emplace(
         MeshJob{state_.revision, state_.generation, scene_.snapshot(), state_.weights.enabled,
-                state_.weights.linked, uint32_t(state_.rig_joint)});
+                state_.weights.linked, uint32_t(state_.rig_joint), 0, {}, {}});
+    if (weight_stroking_ && !weight_samples_.empty()) {
+      pending_mesh_->weight_gesture = state_.weight_gesture;
+      pending_mesh_->weight_samples = weight_samples_;
+      pending_mesh_->weight_settings = weight_stroke_settings_;
+      weight_scheduled_epoch_ = state_.weight_gesture;
+      weight_scheduled_samples_ = weight_samples_.size();
+    }
     mesh_changed_.notify_one();
   }
 }
@@ -462,8 +500,11 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::BakeQuality);
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
+  bool weight_action = weight_stroking_;
   if (action_active_locked() && end_action_locked())
     record_stroke_locked();
+  if (weight_action && state_.asset_busy)
+    throw std::logic_error("Wait for the accepted weight gesture to finish");
   desktop_ = false;
   input_.cancel();
   navigation_.reset();
@@ -474,6 +515,9 @@ void Document::replace(Scene next, bool clean) {
   replace_locked(std::move(next), clean);
 }
 void Document::replace_locked(Scene next, bool clean) {
+  if (weight_stroking_) {
+    cancel_action_locked(); desktop_ = false; input_.cancel();
+  }
   finish_control_locked(false);
   finish_locked();
   scene_ = std::move(next);
@@ -565,7 +609,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation != state_.generation || mesh->revision != state_.revision || !mesh->picking) return {};
-    auto hit = mesh->picking->raycast(p, d, 20);
+    auto hit = mesh->picking->raycast(p, d, 20, render_frame_time());
     if (!hit) return {};
     auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
     return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;
@@ -584,6 +628,11 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
 }
 Vec3 Document::gradient(Vec3 p) const {
   std::lock_guard lock(model_mutex_);
+  if (state_.weights.enabled) {
+    auto mesh = mesh_.load();
+    if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking)
+      return mesh->picking->closest(p).normal;
+  }
   auto t = scene_.world_transform(scene_.active().id);
   return vec(
       ob::rotate(t.orientation,
@@ -601,6 +650,9 @@ bool Document::undo() {
     publish_locked();
     return available;
   }
+  if (weight_stroking_) {
+    cancel_action_locked(); desktop_ = false; input_.cancel(); publish_locked(); return true;
+  }
   if (state_.asset_busy)
     return false;
   finish_locked();
@@ -610,6 +662,7 @@ bool Document::undo() {
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
+  if (weight_stroking_) return false;
   if (uv_accept_pending_ || uv_solving_)
     return false;
   if (uv_) {
@@ -966,6 +1019,8 @@ void Document::process_locked(const SpatialFrame &f) {
   if (f.hands[0].undo || f.hands[1].undo) {
     if (uv_) {
       if (!uv_accept_pending_ && !uv_solving_) apply_uv_action_locked(UvAction::Undo);
+    } else if (weight_stroking_) {
+      cancel_action_locked(); input_.cancel(); desktop_ = false;
     } else if (!state_.asset_busy) {
       finish_locked();
       undo_locked(false);
@@ -974,7 +1029,7 @@ void Document::process_locked(const SpatialFrame &f) {
   if (f.hands[0].redo || f.hands[1].redo) {
     if (uv_) {
       if (!uv_accept_pending_ && !uv_solving_) apply_uv_action_locked(UvAction::Redo);
-    } else if (!state_.asset_busy) {
+    } else if (!state_.asset_busy && !weight_stroking_) {
       finish_locked();
       undo_locked(true);
     }
@@ -1040,21 +1095,36 @@ void Document::mesh_loop() {
       job = std::move(pending_mesh_);
       pending_mesh_.reset();
     }
+    auto cancelled = [&] {
+      auto state = published_.load();
+      return stopping_.load() || state->generation != job->generation || state->revision != job->revision ||
+             (job->weight_gesture && weight_epoch_.load() != job->weight_gesture);
+    };
     try {
-      auto objects =
-          job->scene.preview_surfaces([&] { return stopping_.load(); });
+      std::optional<Scene> proposed;
+      if (job->weight_gesture) {
+        proposed = job->scene.snapshot();
+        paint_scene_weights(*proposed, job->scene.active().id, job->weight_samples,
+                            job->weight_settings, cancelled);
+      }
+      // Keep the gesture's posed geometry fixed. Preview only the candidate
+      // influences, so every capsule addresses the same displayed surface.
+      auto objects = job->scene.preview_surfaces(cancelled);
       auto snapshot = std::make_shared<MeshSnapshot>();
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
+      snapshot->weight_gesture = job->weight_gesture;
+      snapshot->weight_samples = job->weight_samples.size();
       auto weighted = job->weight_view ? weight_objects(job->scene, job->scene.active().id, job->linked_weights)
                                       : std::vector<uint64_t>{};
       for (auto &o : objects) {
         if (o.deformation) o.mesh = o.preview_mesh();
+        if (cancelled()) throw std::runtime_error("Stale surface preview");
         auto world = o.world_transform();
         size_t offset = snapshot->mesh.positions.size(), first = snapshot->mesh.indices.size();
         bool canonical = o.textures && !o.textures->normal.rgba.empty();
         bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
-        auto frames = canonical ? tangent_corners(o.mesh, [&] { return stopping_.load(); })
+        auto frames = canonical ? tangent_corners(o.mesh, cancelled)
                                 : std::vector<Tangent>{};
         auto append = [&](uint32_t vertex, Tangent tangent) {
           snapshot->mesh.positions.push_back(vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
@@ -1064,7 +1134,8 @@ void Document::mesh_loop() {
           snapshot->tangents.push_back({direction.x,direction.y,direction.z,tangent[3]});
           if (job->weight_view) {
             float value = selected ? 0.f : -1.f;
-            if (selected) for (auto influence : o.deformation->skin->vertices.at(vertex))
+            const auto &deformation = proposed ? proposed->object(o.id).deformation : o.deformation;
+            if (selected) for (auto influence : deformation->skin->vertices.at(vertex))
               if (influence.joint == job->weight_joint) value = influence.weight;
             snapshot->selected_weights.push_back(value);
           }
@@ -1093,13 +1164,14 @@ void Document::mesh_loop() {
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset});
       }
       if (job->weight_view && !snapshot->mesh.indices.empty())
-        snapshot->picking = std::make_shared<SurfaceQuery>(snapshot->mesh, [&] { return stopping_.load(); });
+        snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled);
       std::lock_guard lock(mesh_mutex_);
-      if (published_.load()->generation == job->generation)
+      if (!cancelled())
         mesh_.store(std::move(snapshot));
     } catch (const std::exception &e) {
-      if (!stopping_) {
+      if (!cancelled()) {
         std::lock_guard lock(model_mutex_);
+        if (cancelled()) continue;
         state_.error = e.what();
         publish_locked();
       }
@@ -1110,11 +1182,16 @@ void Document::mesh_loop() {
 bool Document::wait_mesh(std::chrono::milliseconds timeout) const {
   auto wanted = published_.load();
   std::unique_lock lock(mesh_mutex_);
-  return mesh_changed_.wait_for(lock, timeout, [&] {
+  auto ready = [&] {
     auto m = mesh_.load();
-    return m->generation == wanted->generation &&
-           m->revision >= wanted->revision;
-  });
+    return m->generation == wanted->generation && m->revision >= wanted->revision &&
+           (!wanted->weight_samples || (m->weight_gesture == wanted->weight_gesture &&
+                                       m->weight_samples >= wanted->weight_samples));
+  };
+  return mesh_changed_.wait_for(lock, timeout, [&] {
+    return ready() || stopping_.load() || published_.load()->generation != wanted->generation ||
+           (wanted->weight_samples && weight_epoch_.load() != wanted->weight_gesture);
+  }) && ready();
 }
 bool Document::wait_input(std::chrono::milliseconds timeout) const {
   std::unique_lock lock(input_mutex_);
@@ -2172,7 +2249,7 @@ void Document::file_loop() {
             scene_ = std::move(prepared);
             record_locked({{}, std::move(before), scene_});
             bind_locked();
-          }
+          } else restore_weight_view_locked(job->rollback_preview);
           state_.error.clear();
           state_.message = job->operation_label + " complete";
           if (job->operation_report && !job->operation_report->empty())
@@ -2317,7 +2394,9 @@ void Document::file_loop() {
           if (!job->uv_desktop)
             input_.resume_control(VrParameter::UvEdit);
         }
-        if(job->scene_operation)asset_work_.store({});
+        if(job->scene_operation) {
+          asset_work_.store({}); restore_weight_view_locked(job->rollback_preview);
+        }
         if(job->work && job->work->cancelled.load()){
           state_.error.clear();state_.message=job->operation_label+" cancelled";
         }else state_.error = e.what();

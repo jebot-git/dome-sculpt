@@ -106,6 +106,81 @@ int main(int argc, char **argv) try {
           combined.copy_scene().object(id).appearance->source_vertices==source_vertices &&
           appearance->source_vertices==source_vertices,
           "Every expanded source identity is exact while authored source records stay immutable");
+    check(combined.begin_desktop(), "Actual-avatar live feedback acquires its immutable source");
+    for (int i = 0; i < 32; ++i) combined.stamp_desktop(stamp(rest.positions.front()));
+    combined.replace(original.snapshot());
+    check(combined.wait_mesh(std::chrono::seconds(60)) && combined.copy_scene().encode() == source &&
+          combined.frame().surface->weight_gesture == 0 && combined.frame().state->error.empty(),
+          "Document replacement cancels actual-avatar previews without publishing an old-generation surface");
+  }
+  {
+    Document live; live.replace(original.snapshot()); live.weight_settings(tool(), 1);
+    check(live.wait_mesh(), "Live weight fixture publishes its original posed snapshot");
+    auto baseline = live.frame().surface;
+    check(live.begin_desktop(), "Live feedback acquires the original gesture geometry");
+    live.stamp_desktop(stamp(b.from));
+    check(live.wait_mesh() && live.frame().surface->weight_samples == 1 &&
+          live.frame().surface->weight_gesture == live.frame().state->weight_gesture,
+          "The mesh worker publishes a heatmap before the pressure gesture is released");
+    auto preview = live.frame().surface;
+    check(preview->selected_weights[0] == .5f && baseline->selected_weights[0] == 0 &&
+          live.copy_scene().encode() == source && !live.frame().state->asset_busy,
+          "Live weight feedback is immutable and changes neither authoritative skin nor file-worker state");
+    check(std::equal(preview->mesh.positions.begin(), preview->mesh.positions.end(),
+                     baseline->mesh.positions.begin(), baseline->mesh.positions.end(),
+                     [](Vec3 a, Vec3 b) { return a.x == b.x && a.y == b.y && a.z == b.z; }) && live.frame().state->can_undo,
+          "Live feedback retains the gesture's posed surface and exposes cancellation through Undo");
+    for (int i = 0; i < 30; ++i) live.stamp_desktop(stamp(b.from));
+    check(live.wait_mesh() && live.frame().surface->weight_samples == 31 &&
+          live.frame().surface->selected_weights == preview->selected_weights,
+          "Coalesced preview requests reach the latest sample count without frame-density accumulation");
+    check(live.undo() && live.frame().surface == baseline && live.copy_scene().encode() == source &&
+          !live.frame().state->dirty && !live.frame().state->can_undo,
+          "Undo cancels unconfirmed weights and immediately restores the original immutable surface");
+    check(live.begin_desktop(), "A cancelled preview releases the gesture lease");
+    live.stamp_desktop(stamp(b.from)); live.wait_mesh();
+    live.cancel_desktop();
+    check(live.frame().surface == baseline && live.copy_scene().encode() == source,
+          "Explicit gesture cancellation restores the original surface without a scene transaction");
+    for (int i = 0; i < 8; ++i) {
+      check(live.begin_desktop(), "Rapid preview cancellation can reacquire the tool");
+      live.stamp_desktop(stamp(b.from)); live.cancel_desktop();
+    }
+    check(live.wait_mesh() && live.frame().surface == baseline && live.frame().state->error.empty(),
+          "Late worker previews cannot overwrite rapid cancellations or leave a false error");
+    check(live.begin_desktop(), "Accepted preview starts a new gesture");
+    live.stamp_desktop(stamp(b.from)); live.wait_mesh(); live.end_desktop();
+    check(live.wait_asset() && live.wait_mesh() &&
+          live.frame().surface->weight_gesture == 0 && live.frame().surface->selected_weights[0] == .5f &&
+          std::abs(value(live.copy_scene(), 1, 0, 1) - .5f) < 1e-6f &&
+          live.undo() && live.copy_scene().encode() == source,
+          "Release replaces the preview with one authoritative and exactly undoable linked skin edit");
+  }
+  {
+    auto scene = original.snapshot();
+    for (auto id : {1u, 2u}) {
+      auto d = *scene.object(id).deformation;
+      d.pose = {d.skeleton->bones[0].rest, d.skeleton->bones[1].rest};
+      d.pose[1].translation.z = .4f; scene.set_deformation(id, d);
+    }
+    Document held; held.replace(std::move(scene)); held.weight_settings(tool(), 1); held.wait_mesh();
+    auto base = held.frame().surface;
+    check(held.begin_desktop(), "Posed live feedback acquires a gesture");
+    held.stamp_desktop(stamp(b.from));
+    check(held.wait_mesh() && held.frame().surface->selected_weights[0] == .5f &&
+          std::abs(held.frame().surface->mesh.positions[0].z) < 1e-6f &&
+          held.copy_scene().active().deformation->skin->vertices[0][0].joint == 0,
+          "The live heatmap previews real influences on frozen posed geometry without changing source weights");
+    held.end_desktop();
+    check(held.wait_asset() && held.wait_mesh() && std::abs(held.frame().surface->mesh.positions[0].z-.2f) < 1e-6f,
+          "Gesture release applies the exact weight-dependent deformation to the displayed mesh");
+    held.undo(); held.wait_mesh(); base = held.frame().surface;
+    check(held.begin_desktop(), "Failed-preview fixture acquires its original surface");
+    auto invalid = stamp(b.from); invalid.radius = 101; held.stamp_desktop(invalid);
+    held.end_desktop();
+    check(held.wait_asset() && held.frame().surface == base && !held.frame().state->dirty &&
+          !held.frame().state->can_undo && !held.frame().state->error.empty(),
+          "A failed final weight computation restores its original preview and leaves history exact");
   }
   check(!doc.frame().state->dirty && doc.begin_desktop(), "Opening weight view changes no saved scene and can acquire a stroke");
   doc.stamp_desktop(stamp(b.from)); doc.cancel_desktop();
@@ -172,6 +247,17 @@ int main(int argc, char **argv) try {
   scene.set_deformation(1, d); scene.object(2).visible = false; posed.replace(std::move(scene)); posed.weight_settings(tool(), 1); posed.wait_mesh();
   auto hit = posed.raycast({0, 0, 2}, {0, 0, -1});
   check(hit && std::abs(hit->z - .4f) < 1e-5f, "Desktop weight picking targets displayed posed geometry rather than rest mesh");
+  {
+    auto rotated = original.snapshot(); auto deformation = *rotated.active().deformation;
+    deformation.pose = {deformation.skeleton->bones[0].rest, deformation.skeleton->bones[1].rest};
+    deformation.pose[0].rotation = {0,.70710678f,0,.70710678f};
+    deformation.pose[0].translation = {.4f,0,0}; rotated.set_deformation(1,deformation);
+    rotated.object(2).visible = false; Document normals; normals.replace(std::move(rotated));
+    normals.weight_settings(tool(),1); normals.wait_mesh();
+    auto surface = normals.raycast({2,0,0},{-1,0,0});
+    check(surface && std::abs(surface->x-.4f) < 1e-5f && length(normals.gradient(*surface)-Vec3{1,0,0}) < 1e-5f,
+          "Weight picking and brush normals both follow the displayed rotated deformation");
+  }
   Document xr; xr.replace(original.snapshot()); settings = tool(); xr.weight_settings(settings, 1); xr.wait_mesh(); Controller hand(xr);
   auto p = ob::transform(xr.frame().state->canvas, {b.from.x, b.from.y, b.from.z}); hand.f.hands[1].tracked.grip.position = p;
   hand.send(); for (int i = 0; i < 40; ++i) hand.send(.8f); hand.send();

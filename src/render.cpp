@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Matrix helpers adapted from OpenBrush Native (Apache-2.0).
 #include "dome/render.hpp"
+#include "dome/material-visibility.hpp"
 #include <cstddef>
 #include "dome/source-maps.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -68,18 +69,7 @@ GLuint shader(GLenum kind, const char *text) {
 }
 } // namespace
 namespace {
-std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
-  if(!appearance)return {};
-  auto parse=[](const std::string&s){if(s.size()>2*1024*1024)throw std::length_error("MToon source metadata exceeds renderer bounds");size_t count=0;return nlohmann::json::parse(s,[&](int depth,nlohmann::json::parse_event_t,const nlohmann::json&){if(depth>32||++count>100000)throw std::length_error("MToon source metadata exceeds renderer bounds");return true;});};
-  std::optional<MToonMaterial> result;
-  if(!appearance->mtoon_json.empty()){auto j=parse(appearance->mtoon_json);if(j.value("shader",std::string{})=="VRM/MToon")result=MToonMaterial::from_vrm0(j,appearance->asset?appearance->asset->textures.size():0);}
-  if(!result&&!appearance->material_json.empty()){auto j=parse(appearance->material_json);if(j.contains("extensions")&&j["extensions"].contains("VRMC_materials_mtoon"))result=MToonMaterial::from_vrm1(j,appearance->asset?appearance->asset->textures.size():0);}
-  if(result&&(!appearance->asset||!appearance->decoded_images||appearance->decoded_images->size()!=appearance->asset->images.size()||appearance->material<0||size_t(appearance->material)>=appearance->asset->materials.size()))throw std::runtime_error("MToon retained image/material source is incomplete");
-  return result;
-}
-int mtoon_coordinate(const MToonTexture&t){int coordinate=t.transform_texcoord>=0?t.transform_texcoord:int(t.texcoord);if(coordinate<0||coordinate>1)throw std::runtime_error("MToon preview requires a retained UV0 or UV1 set");return coordinate;}
 bool mtoon_shade_alias(const MToonMaterial&m){auto &a=m.textures[0],&b=m.textures[1];return a.index>=0&&a.index==b.index&&mtoon_coordinate(a)==mtoon_coordinate(b)&&(m.version()==MToonVersion::V0||(a.offset==b.offset&&a.scale==b.scale&&a.rotation==b.rotation));}
-float mtoon_factor(float typed,float original,float current){if(current==original)return typed;if(original!=0)return typed*current/original;return current==0?typed:current;}
 GLenum mtoon_blend(int value){constexpr GLenum factors[]={GL_ZERO,GL_ONE,GL_DST_COLOR,GL_SRC_COLOR,GL_ONE_MINUS_DST_COLOR,GL_SRC_ALPHA,GL_ONE_MINUS_SRC_COLOR,GL_DST_ALPHA,GL_ONE_MINUS_DST_ALPHA,GL_SRC_ALPHA_SATURATE,GL_ONE_MINUS_SRC_ALPHA};if(value<0||value>10)throw std::runtime_error("Unsupported MToon blend factor");return factors[value];}
 }
 
@@ -254,7 +244,11 @@ if(abs(determinant)>1e-8*max(length(a)*length(b),1e-20)){
 vec3 T=(x*b.y-y*a.y)/determinant,B=(y*a.x-x*b.x)/determinant;T=unit(T-N*dot(N,T));B=unit(cross(N,T))*(dot(cross(N,T),B)<0.0?-1.0:1.0);
 vec3 encoded=texture(tex3,uv).xyz;vec3 ts=unit(vec3((encoded.xy*2.0-1.0)*normal_scale,encoded.z*2.0-1.0));N=unit(T*ts.x+B*ts.y+N*ts.z);}}
 return gl_FrontFacing?N:-N;}
-void main(){if(weight_pass==1){if(weight_value<0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0,0,1),vec3(0,1,1),x):x<2?mix(vec3(0,1,1),vec3(0,1,0),x-1):x<3?mix(vec3(0,1,0),vec3(1,1,0),x-2):mix(vec3(1,1,0),vec3(1,0,0),x-3);color=vec4(ramp,1);return;}if(weight_value>=0)discard;if(mt_mode==1){bool killed;vec4 result=mt_surface(n,unit(camera-world),killed);if(killed)discard;color=vec4(result.rgb,result.a);return;}vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
+void main(){if(weight_pass==1){if(weight_value<0)discard;float opacity;
+if(mt_mode==1){bool killed;vec4 source=mt_surface(n,unit(camera-world),killed);if(killed)discard;opacity=source.a;}
+else{opacity=base_color.a;if(slots[0]==1)opacity*=texture(tex0,source_uv(0)).a;
+if(alpha_mode==1)opacity=1;else if(alpha_mode==2){if(opacity<alpha_cutoff)discard;opacity=1;}}
+if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0,0,1),vec3(0,1,1),x):x<2?mix(vec3(0,1,1),vec3(0,1,0),x-1):x<3?mix(vec3(0,1,0),vec3(1,1,0),x-2):mix(vec3(1,1,0),vec3(1,0,0),x-3);color=vec4(ramp,opacity);return;}if(weight_value>=0)discard;if(mt_mode==1){bool killed;vec4 result=mt_surface(n,unit(camera-world),killed);if(killed)discard;color=vec4(result.rgb,result.a);return;}vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
 if(slots[0]==1)base*=texture(tex0,source_uv(0));
 if(slots[1]==1){vec3 orm=texture(tex1,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
 if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
@@ -449,20 +443,27 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glDrawElements(GL_TRIANGLES,GLsizei(r.count),GL_UNSIGNED_INT,reinterpret_cast<void*>(r.first*sizeof(uint32_t)));glDisable(GL_POLYGON_OFFSET_FILL);
   };
 
-  if (cached_->ranges.empty())
+  if (cached_->ranges.empty()) {
+    glUniform1i(glGetUniformLocation(program_,"weight_pass"),!cached_->selected_weights.empty());
     draw_range(Material{}, 0, count_, 0, nullptr);
+  }
   else {
     std::vector<const SurfaceRange*> ordered;for(auto &r:cached_->ranges)ordered.push_back(&r);
     auto queue=[&](const SurfaceRange&r){auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get())?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return queue(*a)<queue(*b);});
-    for(auto r:ordered){auto typed=textures_->toons.find(r->object);if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get());else{draw_toon(*r,typed->second,false);if(typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)draw_toon(*r,typed->second,true);}}
+    for(auto r:ordered){
+      bool weighted=textures_->weighted.contains(r->object);
+      glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
+      auto typed=textures_->toons.find(r->object);
+      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get());
+      else{
+        draw_toon(*r,typed->second,false);
+        if(!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)
+          draw_toon(*r,typed->second,true);
+      }
+    }
   }
-  if(!textures_->weighted.empty()||(cached_->ranges.empty()&&!cached_->selected_weights.empty())){
-    glUniform1i(glGetUniformLocation(program_,"weight_pass"),1);glUniform1i(glGetUniformLocation(program_,"mt_outline"),0);glDisable(GL_BLEND);glDisable(GL_CULL_FACE);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-    if(cached_->ranges.empty())glDrawElements(GL_TRIANGLES,GLsizei(count_),GL_UNSIGNED_INT,nullptr);
-    for(auto &r:cached_->ranges)if(textures_->weighted.contains(r.object))glDrawElements(GL_TRIANGLES,GLsizei(r.count),GL_UNSIGNED_INT,reinterpret_cast<void*>(r.first*sizeof(uint32_t)));
-    glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
-  }
+  glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
   for(int n=0;n<16;++n)glBindSampler(n,0);
   glActiveTexture(GL_TEXTURE0);
   glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);

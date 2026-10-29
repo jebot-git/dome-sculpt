@@ -35,6 +35,7 @@ struct SurfaceQueryOptions {
   std::function<bool(uint32_t)> triangle_filter;
   std::function<bool()> cancelled;
   size_t max_triangle_tests = 2'000'000;
+  std::function<bool(uint32_t, const std::array<float, 3> &)> ray_filter;
 };
 struct SurfaceHit {
   uint32_t triangle = 0;
@@ -56,11 +57,14 @@ public:
   SurfaceQuery &operator=(SurfaceQuery &&) noexcept;
   SurfaceQuery(const SurfaceQuery &) = delete;
   SurfaceQuery &operator=(const SurfaceQuery &) = delete;
+  const Mesh &mesh() const;
   SurfaceHit closest(Vec3) const;
   // Throws if no eligible triangle exists, cancelled, or budget is exhausted.
   SurfaceHit closest(Vec3, const SurfaceQueryOptions &) const;
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction,
                                     float maximum = 100) const;
+  std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction, float maximum,
+                                    const SurfaceQueryOptions &) const;
 };
 struct VoxelizeOptions {
   float voxel_size = .03f;

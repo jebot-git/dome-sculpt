@@ -386,6 +386,22 @@ async def main():
             window.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
             g = window.get_geometry()
             xtest.fake_input(d, X.MotionNotify, x=g.x+int(g.width*.60), y=g.y+int(g.height*.35)); d.sync()
+            def weight_pixels():
+                raw = window.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+                return Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX")
+            canvas_box = (20, 20, g.width-20, g.height-50)
+            before_preview = weight_pixels().crop(canvas_box).tobytes()
+            key("Shift_L", True)
+            xtest.fake_input(d, X.ButtonPress, 1); d.sync()
+            await wait(lambda: weight_pixels().crop(canvas_box).tobytes() != before_preview)
+            weight_pixels().save(out / "weight-live-preview.png")
+            check(info()["scene_hash"] == posed,
+                  "A held native pressure gesture displays live heatmap feedback without changing the saved scene")
+            key("Escape")
+            xtest.fake_input(d, X.ButtonRelease, 1); d.sync(); key("Shift_L", False)
+            await wait(lambda: weight_pixels().crop(canvas_box).tobytes() == before_preview)
+            check(info()["scene_hash"] == posed,
+                  "Escape restores the exact native viewport after cancelling a live weight preview")
             key("Shift_L", True)
             xtest.fake_input(d, X.ButtonPress, 1); d.sync(); await asyncio.sleep(.15)
             xtest.fake_input(d, X.ButtonRelease, 1); d.sync(); key("Shift_L", False)

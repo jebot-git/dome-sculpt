@@ -283,21 +283,25 @@ struct Bvh {
     return closest_hit(p, b, best, triangle, position, options, visited);
   }
   void ray_hit(Vec3 p, Vec3 d, const SurfaceRay &ray, int n, double &best, uint32_t &triangle,
-               std::array<float, 3> &bary) const {
+               std::array<float, 3> &bary, const SurfaceQueryOptions &options, size_t &visited) const {
+    cancel(options.cancelled);
     auto &node = nodes[n];
     if (!node.box.ray(p, d))
       return;
     if (node.left >= 0) {
-      ray_hit(p, d, ray, node.left, best, triangle, bary);
-      ray_hit(p, d, ray, node.right, best, triangle, bary);
+      ray_hit(p, d, ray, node.left, best, triangle, bary, options, visited);
+      ray_hit(p, d, ray, node.right, best, triangle, bary, options, visited);
       return;
     }
     for (size_t i = node.start; i < node.start + node.count; i++) {
+      if (++visited > options.max_triangle_tests) throw std::length_error("Surface ray triangle budget exceeded");
       auto t = order[i];
+      if (options.triangle_filter && !options.triangle_filter(t)) continue;
       double distance;
       std::array<float,3> coordinates;
       if (!ray.hit(point(t,0),point(t,1),point(t,2),best,distance,coordinates))
         continue;
+      if (options.ray_filter && !options.ray_filter(t, coordinates)) continue;
       best = distance;
       triangle = t;
       bary = coordinates;
@@ -384,6 +388,10 @@ SurfaceQuery::SurfaceQuery(const Mesh &m, const std::function<bool()> &fn) {
   cancel(fn);
 }
 SurfaceQuery::~SurfaceQuery() = default;
+const Mesh &SurfaceQuery::mesh() const {
+  if (!impl_) throw std::logic_error("Moved-from surface query");
+  return impl_->mesh;
+}
 SurfaceQuery::SurfaceQuery(SurfaceQuery &&) noexcept = default;
 SurfaceQuery &SurfaceQuery::operator=(SurfaceQuery &&) noexcept = default;
 SurfaceHit SurfaceQuery::closest(Vec3 p) const { return closest(p, {}); }
@@ -424,6 +432,12 @@ SurfaceHit SurfaceQuery::closest(Vec3 p,
 }
 std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,
                                                 float maximum) const {
+  return raycast(origin, direction, maximum, {});
+}
+std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,
+                                                float maximum, const SurfaceQueryOptions &options) const {
+  cancel(options.cancelled);
+  if (!options.max_triangle_tests) throw std::invalid_argument("Empty surface ray budget");
   if (!impl_ || !finite(origin) || !finite(direction) ||
       !std::isfinite(length(direction)) ||
       std::max({std::abs(origin.x), std::abs(origin.y), std::abs(origin.z)}) >
@@ -435,7 +449,8 @@ std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,
   double best = maximum;
   uint32_t triangle = UINT32_MAX;
   std::array<float, 3> bary{};
-  impl_->tree.ray_hit(origin, direction, SurfaceRay(origin,direction), 0, best, triangle, bary);
+  size_t visited = 0;
+  impl_->tree.ray_hit(origin, direction, SurfaceRay(origin,direction), 0, best, triangle, bary, options, visited);
   if (triangle == UINT32_MAX)
     return {};
   return impl_->hit(triangle, origin + direction * float(best), bary,
