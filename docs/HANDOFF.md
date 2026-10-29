@@ -1,4 +1,4 @@
-# Agent handoff — voxel remesh authoring checkpoint
+# Agent handoff — validated voxel remesh authoring
 
 Repository: https://github.com/jebot-git/dome-sculpt, branch main. This checkpoint
 records work in progress for a later agent; the full objective remains in
@@ -14,6 +14,9 @@ pushing, preserve remote changes, and never force-push this shared branch.
 - Native Mesh > Voxel remesh... opens a shared logarithmic millimetre slider.
   XR reaches the same operation through Objects > Mesh tools > Voxel remesh;
   ray dragging, horizontal stick and the vertical fine wheel adjust the size.
+  The FLTK slider also supports wheel/arrow adjustments with a millimetre
+  readout. Content wraps and scrolls on compact screens; action buttons stay
+  fixed and reachable with doubled bitmap fonts.
   Objects/Move left moved into Mesh tools; existing movement remains available.
 - Confirm queues the existing source-guarded detached scene asset worker.
   A new editable scalar-field object samples the displayed posed/morphed mesh,
@@ -40,31 +43,58 @@ native EGL/OpenXR; canonical shared desktop helpers are unchanged.
 
 ## Verification for this checkpoint
 
-See the newest entry in [VALIDATION.md](VALIDATION.md). Generated logs stay under
-artifacts/ and are ignored. The complete Release build passed, including the FLTK frontend and XR. All
-six affected native suites passed in 21.88 seconds; exact names and log paths
-are recorded there. The initial focused voxel-authoring run also passed.
-The new test exercises Document worker integration, posed source retention,
-scale/material, undo/redo/sculpting, in-process XR ray/stick/fine-wheel controls,
-focus cancellation, invalid inputs, cancellation and generation guards.
+The new verification extends c27dadf. See [VALIDATION.md](VALIDATION.md).
+Generated logs/captures remain under artifacts/ and are ignored.
 
-Earlier 22-suite, GUI 23/23, universal-menu 39/39 and five-suite sanitizer results
-are for the previous UV integration, not fresh proof of this added dialog or
-workflow. No feature-specific real-loader OpenXR replay, physical device,
-accelerator, new sanitizer, system installation or session restart is claimed
-unless explicitly recorded in the latest validation entry.
+- Complete Release build passed with canonical FLTK. All 22 non-XR native/
+  render/appearance CTests passed in 76.25 seconds:
+  artifacts/tests-voxel-native-final.log. The separate real-loader OpenXR CTest
+  passed in 159.81 seconds with 53 complete assertions:
+  artifacts/tests-voxel-xr-verified.log and build/xr-client/report.json.
+- Native GUI regression passed 23/23: artifacts/gui-voxel-regression.log,
+  retaining sculpt/material/paint and exact UV gesture/Apply/global-Undo checks.
+- The expanded universal menu suite passed 50 checks:
+  artifacts/menu-voxel-final-verified.log. It exercises native modal identity,
+  context-aware enabled state, Cancel-default Enter, Escape/Ctrl+W/universal
+  Close, real slider and wheel feedback, visible grid-budget failure, accepted
+  remesh recovery persistence and global Undo. Three additional compact-screen
+  checks pass at 640x360 with a doubled Unifont BDF; content scrolls and buttons
+  stay fixed: artifacts/menu-voxel-compact-final.log. Captures were inspected;
+  a clipped hint discovered visually was shortened/wrapped before the final run.
+- Three whole-core ASan/UBSan/leak suites passed in 64.33 seconds:
+  controller-controls, document-assets and voxel-authoring;
+  artifacts/tests-voxel-sanitize-final.log. The first build wrapper ended with
+  signal 143 before tests; a fresh up-to-date build and final test run completed
+  with exit 0. No sanitizer failure is hidden by that interrupted invocation.
+- The voxel fixture now covers a nonempty scalar-field source, exact retained
+  field/interior/spacing/Undo, and cancellation of options by unrelated commands,
+  in addition to the posed/painted source and worker/transaction checks.
+- OpenXR fixtures navigate actual Mesh tools and the aim slider through the
+  real loader, verify exactly 50 mm spacing and the intact hidden source, and
+  restore the exact baseline scene by ray Cancel, focus cancellation and Undo.
+  The initial Undo replay selected Save due to the fixture's wrong sector;
+  the corrected replay and full 53-check run passed. A final fixture audit
+  separated focus loss from the earlier tracking-loss event: the focus replay
+  reports one focus loss/regain and zero tracking losses before exact scene
+  restoration. These remain synthetic
+  tracking and software GL, not physical headset/controller verification.
+
+The --project-info diagnostic now includes scene_hash and an objects list with
+visibility, mesh state, spacing and payload_hash (all encoded object data except
+visibility). These support persisted cross-process source-retention checks;
+they are diagnostic hashes, not a new project schema or security checksum.
+Linkage: artifacts/linkage-voxel-final.log selects artifacts/toolkit and lists
+no Qt/GTK/Pango dependencies. No installed prefix or session was changed.
 
 ## Resume next
 
-1. Review this checkpoint before extending it. Add native GUI/universal-menu
-   coverage for the new modal: exported enabled state, Cancel-default Enter,
-   Ctrl+W/Escape, slider interaction, explicit Confirm and background failure.
-   Check layout with large BDF sizes/small displays; the dialog currently uses
-   eight font-sized rows and caps width but not height.
-2. Extend the real-loader OpenXR fixture for Objects/Mesh tools/Voxel remesh,
-   exact accepted size, preserved hidden source, cancel/focus and global undo.
-   Add a nonempty scalar-field source fixture alongside the posed painted cube.
-   Run focused whole-core ASan/UBSan/leak verification of the affected paths.
+1. Preserve the verified desktop/XR voxel workflow and inspect remote state
+   before overlapping changes. Continue scene/authoring integration toward the
+   full objective. Keep slider values in world millimetres and the retained
+   source intact; do not silently substitute scalar materials for paint.
+2. Expand production fixtures and resource/cancellation profiling for large
+   meshes and retained scenes. Native GUI/real-loader/sanitizer checks above
+   cover the initial workflow, not all sizes, topology classes or hardware.
 3. Continue full native remeshing/baking authoring with explicit source/target
    paint transfer, robust budgets/error feedback and source preservation. Inspect
    remote changes first: other workspaces previously advanced creator/import/

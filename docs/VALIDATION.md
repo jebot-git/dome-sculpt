@@ -1,3 +1,57 @@
+# Voxel desktop/XR verification — 2026-10-29
+
+This follow-up extends c27dadf with a responsive FLTK modal, real mouse-wheel
+adjustment, existing-sculpt regression coverage and persisted XR diagnostics.
+It keeps all source paint/rig/sculpt data in the retained hidden object. The
+full production objective and paint-transfer/adaptive/baking work remain open.
+
+- Release build passes, including native FLTK and XR. All 22 non-XR CTests
+  passed in 76.25 seconds: artifacts/tests-voxel-native-final.log. This includes
+  the native worker, controller, paint, scene, UV, recovery, import, rig/avatar,
+  deformation, remesh/bake and software-GL rendering suites.
+- The separate real-loader OpenXR CTest passed in 159.81 seconds:
+  artifacts/tests-voxel-xr-verified.log. Its report has 53 checks, zero failures,
+  complete=true and status=passed. New replays use the actual Objects/Mesh
+  tools menu and 50 mm aim slider, preserve the complete hidden source and
+  restore the exact baseline scene by ray Cancel, focus loss and global Undo.
+- Whole-core ASan/UBSan/leak checks passed all three selected suites in
+  64.33 seconds: controller-controls, document-assets and voxel-authoring;
+  artifacts/tests-voxel-sanitize-final.log. The initial build wrapper returned
+  143 before tests started; after inspecting terminal state, an up-to-date
+  build and fresh final three-suite run completed with exit 0.
+- Native GUI regression passed 23/23: artifacts/gui-voxel-regression.log.
+  Existing sculpt/material/paint and UV gesture/Apply/global-Undo checks remain.
+- Three compact-screen checks pass at 640x360 with 2x Unifont BDF:
+  artifacts/menu-voxel-compact-final.log. The measured/wrapped dialog content
+  scrolls while both action buttons stay fixed, and Cancel retains the scene.
+  Captures were visually inspected; a clipped hint was corrected before this
+  final run. The final default-size universal-menu run passed 50/50:
+  artifacts/menu-voxel-final-verified.log, including actual native remesh
+  acceptance, recovery persistence, visible grid-budget failure, cancellation
+  and global Undo.
+
+The expanded native voxel suite verifies a nonempty scalar-field source, exact
+retained field and interior/spacing/Undo, and that another explicit command
+cancels voxel options rather than implicitly remeshing. The test captures the
+previous size rather than assuming a setting reset when replacing a document.
+
+Initial fixture failures were investigated: the XR Undo fixture selected the
+Save sector and was corrected; its isolated replay and complete 53-check run
+then passed. A final fixture audit isolated session focus loss from the
+earlier tracking-loss event; the focus replay now reports one loss/regain and
+zero tracking losses before exact restoration. The first GUI budget-failure attempt clicked the slider border,
+so it did not choose the intended size; the corrected input demonstrates the
+actual visible budget error. A QueryTree/GetProperty modal-destruction race in
+the harness now skips only BadWindow for an already destroyed candidate.
+
+--project-info exposes encoded scene and per-object payload diagnostic hashes,
+visibility and voxel spacing for persisted source comparisons. This does not
+change the project schema. Runtime linkage selects artifacts/toolkit and has
+no Qt/GTK/Pango libraries: artifacts/linkage-voxel-final.log. Python remains
+optional test orchestration. All XR tracking is synthetic, GL is software, and
+physical devices/accelerators and production-size performance remain unproven.
+No system installation or active-session restart occurred.
+
 # Voxel authoring checkpoint — 2026-10-29
 
 Work-in-progress desktop/XR voxel conversion is recorded over base 90601ca.

@@ -952,7 +952,27 @@ int main(int argc, char **argv) try {
                                {"locked", l.locked},
                                {"opacity", l.opacity},
                                {"samples", l.delta.size()}});
+    auto encoded = scene.encode();
+    auto digest = [](const nlohmann::json &value) {
+      uint64_t result = 1469598103934665603ULL;
+      for (auto byte : nlohmann::json::to_cbor(value)) {
+        result ^= byte;
+        result *= 1099511628211ULL;
+      }
+      return result;
+    };
+    auto objects = nlohmann::json::array();
+    for (auto value : encoded.at("objects")) {
+      bool visible = value.at("visible");
+      value.erase("visible");
+      objects.push_back({{"id", value.at("id")}, {"name", value.at("name")},
+                         {"visible", visible}, {"mesh_active", value.at("mesh_active")},
+                         {"voxel_size", value.at("volume").at("voxel_size")},
+                         {"payload_hash", digest(value)}});
+    }
     std::cout << nlohmann::json{{"sculpt_layers", sculpt_layers},
+                                {"objects", objects},
+                                {"scene_hash", digest(encoded)},
                                 {"active_sculpt_layer", volume.active_layer()},
                                 {"paint_blue_texels", blue_texels},
                                 {"uv_hash", uv_hash},

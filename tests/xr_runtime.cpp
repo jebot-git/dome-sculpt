@@ -49,6 +49,10 @@ int instance_tag, session_tag, action_set_tag;
 unsigned frame = 0, event = 0, restart_phase = 0;
 bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
+std::string voxel_mode() {
+  auto mode = getenv("DOME_XR_FIXTURE_VOXEL");
+  return mode ? mode : "";
+}
 XrPath path(std::string text) {
   auto found = paths.find(text);
   if (found != paths.end())
@@ -467,6 +471,13 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
        (getenv("DOME_XR_FIXTURE_FILES") &&
         (frame == 24 || frame == 26 || frame == 28 || frame == 30)));
   out->changedSinceLastSync = button && (frame >= 8 && frame <= 11);
+  if (auto mode = voxel_mode(); !mode.empty()) {
+    out->currentState = button &&
+        (frame == 8 || frame == 10 || frame == 12 || frame == 14 ||
+         ((mode == "accept" || mode == "undo") && frame == 18) ||
+         (mode == "undo" && (frame == 42 || frame == 44)));
+    out->changedSinceLastSync = button;
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
@@ -491,6 +502,8 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if (getenv("DOME_XR_FIXTURE_RESTART"))
       stroke = (frame >= 2 && frame <= 5) || (frame >= 13 && frame <= 18) ||
                frame == 25;
+    if (auto mode = voxel_mode(); !mode.empty())
+      stroke = frame == 16 || (mode == "cancel" && frame == 18);
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -567,6 +580,15 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (frame == 13 || frame == 14)
       out->currentState = {1, 0};
   }
+  if (auto mode = voxel_mode(); !mode.empty() && right(p->subactionPath) &&
+      a->name == "right_stick") {
+    out->currentState = {0, 0};
+    if (frame == 9 || frame == 10) out->currentState = {-.5f, -.8660254f};
+    if (frame == 11 || frame == 12) out->currentState = {0, -1};
+    if (frame == 13 || frame == 14) out->currentState = {.8660254f, .5f};
+    if (mode == "undo" && (frame == 43 || frame == 44))
+      out->currentState = {-.5f, .8660254f};
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStatePose, XrSession, const XrActionStateGetInfo *,
@@ -586,7 +608,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
-  if (frame == 22 && s->action) {
+  if (frame == 22 && s->action && voxel_mode() != "focus") {
     p->locationFlags = 0;
     count("tracking_losses");
   }
@@ -609,6 +631,15 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
       s->action->name == "aim_pose" && right(s->hand) &&
       (frame == 14 || frame == 20)) {
     float x = frame == 14 ? 178 : 470, y = frame == 14 ? 85 : 609;
+    p->pose.position = {.045f + (x / 640 - .5f) * .6f,
+                        1.56f + (.5f - y / 640) * .6f, -.3f};
+  }
+  if (auto mode = voxel_mode(); !mode.empty() && s->action &&
+      s->action->name == "aim_pose" && right(s->hand) &&
+      (frame == 16 || (mode == "cancel" && frame == 18))) {
+    float t = std::log(50.f / .01f) / std::log(1000.f / .01f);
+    float x = frame == 16 ? 100 + 420 * t : 170;
+    float y = frame == 16 ? 300 : 609;
     p->pose.position = {.045f + (x / 640 - .5f) * .6f,
                         1.56f + (.5f - y / 640) * .6f, -.3f};
   }

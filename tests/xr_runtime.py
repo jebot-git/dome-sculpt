@@ -199,6 +199,29 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         info["active_color"][2] > 0.7 and info["active_color"][0] < 0.1,
         "Joystick material page updates and persists the active object's blue material",
     )
+    for mode in ("accept", "cancel", "focus", "undo"):
+        result, path = run("voxel-" + mode, 50 if mode == "undo" else 45,
+                           mode={"DOME_XR_FIXTURE_VOXEL": mode})
+        check(result.returncode == 0,
+              "Native OpenXR voxel " + mode + " finishes with a saved scene")
+        info = json.loads(subprocess.check_output(
+            [str(binary), "--project-info", str(path)], env=env, text=True))
+        if mode == "focus":
+            report = json.loads((output / "voxel-focus.json").read_text())
+            check(report.get("focus_losses") == 1 and
+                  report.get("tracking_losses", 0) == 0,
+                  "The voxel focus fixture reaches session focus loss without earlier tracking cancellation")
+        if mode == "accept":
+            check(info["object_count"] == 2 and not info["painted"] and
+                  abs(info["voxel_size"] - .05) < 1e-6 and info["samples"] > 0,
+                  "Joystick Mesh tools and aim slider create a sculpt at exactly 50 mm")
+            check(info["objects"][0]["visible"] is False and
+                  info["objects"][0]["payload_hash"] == baseinfo["objects"][0]["payload_hash"] and
+                  info["objects"][1]["visible"] is True,
+                  "Native OpenXR remeshing retains the complete source and selects a visible result")
+        else:
+            check(info["scene_hash"] == baseinfo["scene_hash"],
+                  "Native OpenXR voxel " + mode + " restores the exact initial scene")
     paintbase, paintbasepath = run("paint-baseline", 1, extra=["--paint"])
     check(
         paintbase.returncode == 0,

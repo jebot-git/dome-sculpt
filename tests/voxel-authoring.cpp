@@ -137,5 +137,28 @@ int main() try {
   try {doc.remesh_to_sculpt(50,stale);}catch(const std::logic_error&){refused=true;}
   check(refused && !doc.frame().state->asset_busy && doc.copy_scene().encode()==original,
         "Reused source object IDs cannot bypass generation guards");
+  doc.seed();
+  auto scalar_source = doc.copy_scene();
+  auto scalar_before = scalar_source.encode();
+  auto previous_size = doc.frame().state->voxel_size_mm;
+  doc.begin_voxel_remesh();doc.edit_voxel_size(37);
+  doc.duplicate_object();
+  check(doc.copy_scene().objects().size()==2 && !doc.frame().state->asset_busy &&
+        doc.frame().state->voxel_size_mm==previous_size,
+        "An unrelated command cancels action options instead of confirming a remesh");
+  check(doc.undo() && doc.copy_scene().encode()==scalar_before,
+        "Only the explicit unrelated command enters scene history");
+  doc.remesh_to_sculpt(50);
+  check(doc.wait_asset() && doc.frame().state->error.empty() &&
+        doc.copy_scene().objects().size()==2,
+        "An existing nonempty scalar sculpt remeshes through its extracted surface");
+  auto scalar_after = doc.copy_scene();
+  check(!scalar_after.object(scalar_source.active().id).visible &&
+        scalar_after.object(scalar_source.active().id).volume->encode()==scalar_source.active().volume->encode() &&
+        std::abs(scalar_after.active().volume->voxel_size()-.05f)<1e-7f &&
+        scalar_after.active().volume->sample({0,0,0})<0,
+        "Scalar-source remeshing retains the original field and produces solid interior at the requested spacing");
+  check(doc.undo() && doc.copy_scene().encode()==scalar_before,
+        "Scalar-source remeshing has exact scene undo");
   return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

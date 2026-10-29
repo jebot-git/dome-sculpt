@@ -3,9 +3,28 @@
 #include "appearance.h"
 #include "ui-conventions.hpp"
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Scroll.H>
 #include <FL/Fl_Slider.H>
+#include <FL/fl_draw.H>
 #include <cstdio>
 namespace dome {
+namespace {
+class VoxelSlider : public Fl_Slider {
+public:
+  using Fl_Slider::Fl_Slider;
+  int handle(int event) override {
+    if (event == FL_MOUSEWHEEL) {
+      int delta = Fl::event_dy() ? Fl::event_dy() : Fl::event_dx();
+      if (delta && value(clamp(value() - delta * .01))) {
+        set_changed();
+        do_callback();
+      }
+      return 1;
+    }
+    return Fl_Slider::handle(event);
+  }
+};
+} // namespace
 void edit_voxel_remesh(Document &doc) {
   doc.begin_voxel_remesh();
   try {
@@ -13,13 +32,31 @@ void edit_voxel_remesh(Document &doc) {
     int sx, sy, sw, sh;
     Fl::screen_work_area(sx, sy, sw, sh);
     width = std::min(width, sw - 40);
-    DomeDialog window(width, row * 8, "Voxel remesh");
-    Fl_Box description(12, 6, width - 24, row * 2,
-                       "Create a new sculpt from the displayed shape.\n"
-                       "Source paint, rig and layers stay in a hidden object.");
+    const char *description_text =
+        "Create a new sculpt from the displayed shape.\n"
+        "Source paint, rig and layers stay in a hidden object.";
+    const char *hint_text = "Drag, wheel or arrow keys";
+    fl_font(dx::font, dx::size);
+    auto measured_height = [&](const char *text, int minimum) {
+      int text_width = width - 32, text_height = 0;
+      fl_measure(text, text_width, text_height, 0);
+      return std::max(minimum, text_height + 12);
+    };
+    int header = measured_height(description_text, row * 2);
+    int value_height = measured_height("Voxel size: 1000.00 mm", row);
+    int hint_height = measured_height(hint_text, row);
+    int body_height = header + value_height + hint_height + row * 3;
+    int height = std::min(body_height + row, sh - 40);
+    DomeDialog window(width, height, "Voxel remesh");
+    Fl_Scroll scroll(0, 0, width, height - row);
+    scroll.type(Fl_Scroll::VERTICAL);
+    Fl_Group content(0, 0, width - 24, body_height);
+    content.resizable(nullptr);
+    Fl_Box description(12, 6, width - 32, header - 6, description_text);
     description.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-    Fl_Box value(12, row * 2, width - 24, row, "");
-    Fl_Slider slider(24, row * 3, width - 48, row);
+    Fl_Box value(12, header, width - 32, value_height, "");
+    value.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+    VoxelSlider slider(24, header + value_height, width - 48, row);
     slider.type(FL_HOR_NICE_SLIDER);
     slider.bounds(0, 1);
     slider.step(.001);
@@ -41,12 +78,14 @@ void edit_voxel_remesh(Document &doc) {
         state.doc->report_error(e.what());
       }
     }, &state);
-    Fl_Box hint(12, row * 4, width - 24, row,
-                "Voxel size in mm | Drag, wheel or arrow keys");
-    Fl_Box status(12, row * 5, width - 24, row * 2);
+    Fl_Box hint(12, header + value_height + row, width - 32, hint_height, hint_text);
+    hint.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+    Fl_Box status(12, header + value_height + row + hint_height, width - 32, row * 2);
     status.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-    Fl_Button cancel(width / 2 - 160, row * 7 + 4, 140, row - 8, "Cancel"),
-        remesh(width / 2 + 20, row * 7 + 4, 140, row - 8, "Remesh");
+    content.end();
+    scroll.end();
+    Fl_Button cancel(24, height - row + 4, width / 2 - 36, row - 8, "Cancel"),
+        remesh(width / 2 + 12, height - row + 4, width / 2 - 36, row - 8, "Remesh");
     struct Result { Document *doc; Fl_Window *window; } result{&doc, &window};
     cancel.callback([](Fl_Widget *widget, void *) { widget->window()->hide(); });
     remesh.callback([](Fl_Widget *, void *data) {

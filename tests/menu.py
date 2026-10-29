@@ -5,7 +5,7 @@ import asyncio, json, os, signal, subprocess, sys, tempfile, time
 from pathlib import Path
 from dbus_next.aio import MessageBus
 from dbus_next import Variant
-from Xlib import X, XK, display
+from Xlib import X, XK, display, error
 from Xlib.ext import xtest
 from PIL import Image
 
@@ -17,7 +17,8 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
         {**os.environ, "DOME_SCULPT_MENU_BUS": "1"},
     )
 root = Path(__file__).resolve().parents[1]
-out = root / "artifacts/menu"
+compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1"
+out = root / ("artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -58,7 +59,7 @@ async def main():
                 str(wr),
                 "-screen",
                 "0",
-                "1280x900x24",
+                "640x360x24" if compact else "1280x900x24",
                 "-nolisten",
                 "tcp",
             ],
@@ -86,6 +87,11 @@ async def main():
         }
         for key in ("WAYLAND_DISPLAY", "WAYLAND_SOCKET"):
             env.pop(key, None)
+        if compact:
+            config = Path(home, "config/dome/appearance.json")
+            config.parent.mkdir(parents=True)
+            config.write_text(json.dumps({"font": "Unifont / Sans-Serif",
+                                         "font_size": 16, "font_scale": 2}))
         log = (out / "app.log").open("w")
         app = subprocess.Popen(
             [str(root / "build/dome-sculpt")], env=env, cwd=home, stdout=log, stderr=log
@@ -94,14 +100,14 @@ async def main():
         d = display.Display(screen)
 
         def named(text):
-            return next(
-                (
-                    w
-                    for w in d.screen().root.query_tree().children
-                    if text in str(w.get_wm_name() or "")
-                ),
-                None,
-            )
+            for w in d.screen().root.query_tree().children:
+                try:
+                    if text in str(w.get_wm_name() or ""):
+                        return w
+                except error.BadWindow:
+                    # A modal may be destroyed between QueryTree and GetProperty.
+                    continue
+            return None
 
         window = await wait(lambda: named("Dome Sculpt"))
         window.set_input_focus(X.RevertToParent, X.CurrentTime)
@@ -148,6 +154,34 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if compact:
+            await click("Voxel remesh...")
+            w = await wait(lambda: named("Voxel remesh"))
+            w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
+            await asyncio.sleep(.2)
+            g = w.get_geometry()
+            check(g.width <= 600 and g.height <= 320,
+                  "A doubled BDF font keeps voxel options within a 640x360 work area")
+            def shot():
+                raw = w.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+                return Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX")
+            before = shot(); before.save(out / "options-large-bdf.png")
+            for _ in range(5):
+                xtest.fake_input(d, X.MotionNotify, x=g.x+g.width-8, y=g.y+80)
+                xtest.fake_input(d, X.ButtonPress, 5); xtest.fake_input(d, X.ButtonRelease, 5)
+            d.sync(); await asyncio.sleep(.2)
+            after = shot(); after.save(out / "options-scrolled.png")
+            check(before.crop((0,0,g.width,g.height-46)).tobytes() !=
+                  after.crop((0,0,g.width,g.height-46)).tobytes() and
+                  before.crop((0,g.height-46,g.width,g.height)).tobytes() ==
+                  after.crop((0,g.height-46,g.width,g.height)).tobytes(),
+                  "Large-font voxel content scrolls while both action buttons stay fixed")
+            key("Escape"); await wait(lambda: named("Voxel remesh") is None)
+            nodes, _ = await layout()
+            check(app.poll() is None and nodes["Undo"][1].get("enabled") is False,
+                  "Compact-screen cancellation preserves the original sculpt")
+            d.close(); bus.disconnect()
+            return
         nodes, tree = await layout()
         (out / "layout.json").write_text(json.dumps(nodes, indent=2))
         check(
@@ -214,6 +248,105 @@ async def main():
             pixel == (48, 48, 48),
             "The local bar yields to the universal host and exposes the DomeD grey viewport",
         )
+        check("Mesh" in nodes and nodes["Voxel remesh..."][1].get("enabled") is True,
+              "Voxel remeshing exports an enabled command for a nonempty sculpt")
+
+        def tap(w, x, y, button=1):
+            g = w.get_geometry()
+            xtest.fake_input(d, X.MotionNotify, x=g.x+int(x), y=g.y+int(y))
+            d.sync()
+            xtest.fake_input(d, X.ButtonPress, button)
+            xtest.fake_input(d, X.ButtonRelease, button)
+            d.sync()
+
+        def pixels(w, box=None):
+            g = w.get_geometry()
+            raw = w.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+            image = Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX")
+            return image.crop(box) if box else image
+
+        async def voxel_dialog():
+            await click("Voxel remesh...")
+            w = await wait(lambda: named("Voxel remesh"))
+            w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
+            await asyncio.sleep(.2)
+            return w
+
+        for close in ("Return", "Escape", "Ctrl+W", "Universal Close"):
+            w = await voxel_dialog()
+            if close == "Return":
+                nodes, _ = await layout()
+                check(w.get_wm_transient_for().id == window.id and
+                      w.get_wm_class()[1] == window.get_wm_class()[1] and
+                      all(nodes[n][1].get("enabled") is False for n in
+                          ("Voxel remesh...", "New", "Undo", "Brush settings...")),
+                      "Voxel options inherit native application identity and isolate universal commands")
+            if close == "Ctrl+W":
+                key("Control_L", True); key("w"); key("Control_L", False)
+            elif close == "Universal Close":
+                await click("Close Window")
+            else:
+                key(close)
+            await wait(lambda: named("Voxel remesh") is None)
+            nodes, _ = await layout()
+            check(app.poll() is None and nodes["Undo"][1].get("enabled") is False,
+                  close + " cancels voxel options without changing scene history")
+
+        # A real slider and scrollwheel change the millimetre readout. Confirm
+        # only the subsequent explicit button press; merely editing is a draft.
+        w = await voxel_dialog(); g = w.get_geometry(); row = g.height // 8
+        box = (12, row*2, g.width-12, row*3)
+        before = pixels(w, box)
+        tap(w, g.width*.84, row*3.5)
+        await asyncio.sleep(.2)
+        changed = pixels(w, box)
+        check(before.tobytes() != changed.tobytes(),
+              "The native remesh slider updates its visible millimetre readout")
+        tap(w, g.width*.84, row*3.5, 4)
+        await asyncio.sleep(.2)
+        check(changed.tobytes() != pixels(w, box).tobytes(),
+              "A scrollwheel over the native slider adjusts size with visible feedback")
+        # Minimum spacing exceeds the bounded grid budget for this sphere.
+        tap(w, 30, row*3.5)
+        await asyncio.sleep(.2)
+        pixels(w).save(out / "voxel-options.png")
+        gmain = window.get_geometry()
+        status_box = (0, gmain.height-28, gmain.width, gmain.height)
+        status_before = pixels(window, status_box)
+        tap(w, g.width*.75, g.height-row*.5)
+        await wait(lambda: named("Voxel remesh") is None)
+        for _ in range(100):
+            nodes, _ = await layout()
+            if nodes["Voxel remesh..."][1].get("enabled") is True: break
+            await asyncio.sleep(.05)
+        check(nodes["Undo"][1].get("enabled") is False and
+              status_before.tobytes() != pixels(window, status_box).tobytes(),
+              "A rejected voxel grid displays feedback and leaves scene history unchanged")
+        pixels(window).save(out / "voxel-budget-feedback.png")
+
+        recovery_root = Path(home, "state/dome-sculpt/recovery")
+        before_files = set(recovery_root.glob("*.dsculpt"))
+        w = await voxel_dialog(); g = w.get_geometry(); row = g.height // 8
+        # Reopen after the rejected minimum: click a practical coarser spacing.
+        tap(w, g.width*.73, row*3.5)
+        await asyncio.sleep(.2)
+        tap(w, g.width*.75, g.height-row*.5)
+        await wait(lambda: named("Voxel remesh") is None)
+        files = await wait(lambda: set(recovery_root.glob("*.dsculpt"))-before_files)
+        info = json.loads(subprocess.check_output(
+            [str(root / "build/dome-sculpt"), "--project-info", str(next(iter(files)))],
+            env=env, text=True))
+        nodes, _ = await layout()
+        check(info["object_count"] == 2 and not info["painted"] and
+              info["objects"][0]["visible"] is False and info["samples"] > 0 and
+              nodes["Undo"][1].get("enabled") is True,
+              "Explicit native Remesh creates a recovered sculpt and retains a hidden source")
+        await click("Undo")
+        nodes, _ = await layout()
+        check(nodes["Undo"][1].get("enabled") is False and
+              nodes["Delete object"][1].get("enabled") is False and
+              nodes["Redo"][1].get("enabled") is True,
+              "Universal Undo restores the original single-object scene after voxel remeshing")
         check(nodes["Add sculpt layer"][1].get("enabled") is True and nodes["Delete sculpt layer"][1].get("enabled") is False,"Sculpt-layer commands expose context-aware native menu state")
         await click("Add sculpt layer")
         nodes,_=await layout()

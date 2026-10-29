@@ -142,6 +142,8 @@ factors are copied. Undo restores the complete prior scene in one transaction.
 Closed oriented shells, finite sizes and the retained scene sample budget are
 required. Empty/coarse results, unsupported topology and cancellation leave
 the source unchanged. Source scale converts world spacing to local spacing.
-The in-process native fixture covers posed mesh conversion and controller
-controls; feature-specific GUI, real-loader replay and sanitizer work remain
-in HANDOFF.md. This does not establish complete production remeshing or baking.
+Native fixtures cover posed meshes and existing scalar fields, exact retained
+data, transaction/cancellation and controller controls. Native universal-menu,
+compact-screen doubled-BDF, real-loader OpenXR and focused sanitizer checks
+pass; current scope and logs are in HANDOFF.md. This does not establish complete
+production remeshing or baking.
