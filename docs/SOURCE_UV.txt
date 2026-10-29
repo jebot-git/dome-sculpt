@@ -1,0 +1,80 @@
+Explicit original-source UV compatibility
+==========================================
+
+Ordinary PaintedMesh(mesh,resolution) and the three-argument from_maps remain
+strict: overlapping surfaces cannot pretend to be independently paintable, and
+zero-area UV triangles fail. Verified retained originals can explicitly opt in:
+  PaintSurfaceOptions options;
+  options.policy=PaintUvPolicy::SourceAuthored;
+  auto painted=PaintedMesh::from_maps(mesh,source_maps,resolution,options);
+
+Source-authored mode retains original positions, normals, indices, UVs and vertex
+order. It neither unwraps/reindexes nor drops original geometry, and therefore
+keeps native skin/morph/source-vertex bindings intact. Exactly zero-area source
+UV faces stay in the rendered mesh but contribute no paint surface samples.
+surface_diagnostics().unpaintable_uv_faces lists those original triangle IDs.
+A source with only unpaintable UVs remains renderable/protected by its original
+maps and creates no editable pixel coverage. Such a face can still reflect a
+shared texture pixel painted elsewhere; there is no invented independent UV area.
+
+Shared/mirrored UV charts have linked painting, as required by their authored
+texture layout. A texel retains its first mesh-local surface sample plus a bounded
+sparse list of distinct linked surface samples, including independently facing
+normals. Coincident position/normal samples within numerical tolerance are
+collapsed; different original surface candidates are retained. Tile bounds span
+all candidates so brushes reach either mirrored surface. No arbitrary first or
+last triangle silently controls a shared pixel.
+
+A stamp tests candidates against its physical brush sweep/front filter and, for
+projection, the projector's front/frustum/BVH visibility rules. It chooses the
+nearest eligible surface to the sweep, with a stable lowest-face tie break, and
+blends the shared pixel once. If the nearest geometric candidate is invisible,
+a farther visible eligible candidate may paint it. This prevents accidental
+double coverage/flow on shared charts. Ordinary layer masks, source-map baseline,
+exact COW undo/redo/snapshot/cancel and stamp rollback are reused unchanged.
+Linked charts inherently cannot receive independent colors without an explicit
+UV edit/bake. The UI should present diagnostics before such a workflow.
+
+surface_diagnostics() also reports linked texel/additional candidate counts,
+covered texels, raster work and comparison work. Default bounds are 128 Mi raster
+samples, 4 Mi additional sparse candidates, 128 Mi comparison/selection tests,
+and 64 total candidates/texel. Construction and each stamp enforce bounded work;
+quota/cancellation failures reject construction or roll back the whole stamp.
+Construction cancellation callbacks are released when the immutable surface is
+published, so a completed asset does not retain worker/job references. Storage is
+sparse for overlap candidates; the existing primary texel/padding/tile grids still
+scale with editable texture resolution. These limits are not a process-RSS cap.
+
+The policy is explicitly serialized as uv_policy="source-authored" and requires
+retained source maps on decode. Unknown policies reject. Old assets remain strict.
+Diagnostics and candidate sets regenerate from unchanged mesh/UV data on restart;
+current native resource bounds still apply. UVs must still fit the supported
+single texture tile; secondary UV authoring/UDIM/repeat-domain painting are not
+introduced by this compatibility mode. Source-backed UV reparameterization that
+changes UVs still requires the separately explicit bake/transfer workflow.
+
+Verification
+------------
+Native tests/source-uv.cpp covers mirrored/later-surface brush access, single
+coverage on nearby shared surfaces, eligible front normals, projector visibility,
+zero-UV render retention/no coverage, explicit persistence and strict-default
+rejection, sparse/work/per-texel quotas, cancellation and exact rollback/history.
+Optional actual CC0 baseline paths exercise from_maps on all 19 created source
+parts of each model, retaining every triangle/UV/source image/remap and native
+deformation state, then perform shared original-model/image Scene CBOR restart.
+No headset/session/user file is modified.
+
+After rebuilding core for current paint source:
+  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/source-uv.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-source-uv-test
+  /tmp/dome-source-uv-test assets/humanoid/vroid/base-female.vrm assets/humanoid/vroid/base-male.vrm
+
+Validated milestone: 21 numerical/native fixtures plus 42 actual source-part/
+Scene checks (63 total) pass optimized Release and ASan+UBSan/leak checks.
+Instrumented translation units are source-uv.cpp, paint.cpp, projection.cpp and
+mesh-processing.cpp; remaining core/xatlas dependencies use Release archives.
+Both actual models retain 19 parts, 28 unpaintable UV faces and 36,738 linked
+texels at editable resolution 256. Female retains 14,804 triangles, male 15,176.
+Native Scene restart compares all original indices/UVs/source remaps and complete
+native DeformationState encoding. Existing projection 50 and texture-painting 31
+regression checks also pass with the new painter. Actual GPU/headset presentation
+is separate integration work; these tests do not launch a device session.

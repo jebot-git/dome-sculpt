@@ -48,10 +48,27 @@ struct PaintLayer {
   float opacity = 1;
   std::vector<std::shared_ptr<const PaintTile>> tiles;
 };
+enum class PaintUvPolicy { Strict, SourceAuthored };
+struct PaintSurfaceOptions {
+  PaintUvPolicy policy = PaintUvPolicy::Strict;
+  size_t max_raster_samples = 128 * 1024 * 1024;
+  size_t max_additional_candidates = 4 * 1024 * 1024;
+  size_t max_candidate_checks = 128 * 1024 * 1024;
+  uint32_t max_candidates_per_texel = 64;
+  std::function<bool()> cancelled;
+};
+struct PaintSurfaceDiagnostics {
+  PaintUvPolicy policy = PaintUvPolicy::Strict;
+  std::vector<uint32_t> unpaintable_uv_faces;
+  size_t linked_texels = 0, additional_candidates = 0, covered_texels = 0;
+  size_t raster_samples = 0, candidate_checks = 0;
+};
 class PaintedMesh {
 public:
   PaintedMesh(Mesh, uint32_t resolution = 512);
   static std::shared_ptr<PaintedMesh> from_maps(Mesh, std::shared_ptr<const PaintSourceMaps>, uint32_t resolution = 512);
+  static std::shared_ptr<PaintedMesh> from_maps(Mesh, std::shared_ptr<const PaintSourceMaps>, uint32_t resolution, const PaintSurfaceOptions &);
+  const PaintSurfaceDiagnostics &surface_diagnostics() const;
   const std::shared_ptr<const PaintSourceMaps> &source_maps() const noexcept { return source_maps_; }
   const Mesh &mesh() const;
   uint32_t resolution() const;
@@ -87,6 +104,7 @@ public:
 
 private:
   PaintedMesh() = default;
+  PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &);

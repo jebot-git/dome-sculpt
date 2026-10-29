@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 #include <png.h>
 #include <set>
+#include <unordered_map>
 namespace dome {
 namespace {
 uint8_t byte(float v) {
@@ -83,13 +84,26 @@ struct PaintedMesh::SurfaceMap {
   struct Bounds {
     Vec3 lo{INFINITY, INFINITY, INFINITY}, hi{-INFINITY, -INFINITY, -INFINITY};
   };
+  struct Extra { Texel texel; uint32_t next = UINT32_MAX; };
+  struct Head { uint32_t first = UINT32_MAX, count = 0; };
+  PaintSurfaceOptions options;
+  PaintSurfaceDiagnostics diagnostics;
+  std::unordered_map<uint32_t,Head> linked;
+  std::vector<Extra> extra;
   std::vector<Texel> texels;
   std::vector<Bounds> tiles;
   std::vector<int32_t> padding;
-  SurfaceMap(Mesh input, uint32_t r)
-      : mesh(std::move(input)), resolution(r), columns(r / 32),
+  SurfaceMap(Mesh input, uint32_t r, PaintSurfaceOptions opts = {})
+      : mesh(std::move(input)), resolution(r), columns(r / 32),options(std::move(opts)),
         texels(size_t(r) * r), tiles(size_t(columns) * columns),
         padding(size_t(r) * r, -1) {
+    if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored)||
+       !options.max_raster_samples||options.max_raster_samples>512*1024*1024||
+       options.max_additional_candidates>8*1024*1024||!options.max_candidate_checks||options.max_candidate_checks>512*1024*1024||
+       options.max_candidates_per_texel<1||options.max_candidates_per_texel>128)
+      throw std::invalid_argument("Invalid paint surface resource bounds");
+    diagnostics.policy=options.policy;
+    const bool source=options.policy==PaintUvPolicy::SourceAuthored;
     mesh.validate();
     if (mesh.uv.size() != mesh.positions.size())
       throw std::invalid_argument("Painting requires persisted UV coordinates");
@@ -102,9 +116,11 @@ struct PaintedMesh::SurfaceMap {
       auto a = mesh.uv[ids[0]], b = mesh.uv[ids[1]], c = mesh.uv[ids[2]];
       double den = double(b[1] - c[1]) * (a[0] - c[0]) +
                    double(c[0] - b[0]) * (a[1] - c[1]);
-      if (std::abs(den) < 1e-14)
-        throw std::invalid_argument(
-            "Painting requires nondegenerate UV triangles");
+      if(source&&options.cancelled&&options.cancelled())throw std::runtime_error("Source paint surface construction cancelled");
+      if (source?den==0:std::abs(den)<1e-14) {
+        if(!source)throw std::invalid_argument("Painting requires nondegenerate UV triangles");
+        diagnostics.unpaintable_uv_faces.push_back(uint32_t(k/3));continue;
+      }
       int x0 = std::max(0, int(std::floor(std::min({a[0], b[0], c[0]}) * r))),
           x1 = std::min(int(r) - 1,
                         int(std::ceil(std::max({a[0], b[0], c[0]}) * r)));
@@ -113,6 +129,8 @@ struct PaintedMesh::SurfaceMap {
                         int(std::ceil(std::max({a[1], b[1], c[1]}) * r)));
       for (int y = y0; y <= y1; ++y)
         for (int x = x0; x <= x1; ++x) {
+          if(++diagnostics.raster_samples>options.max_raster_samples)throw std::length_error("Paint UV raster work budget exceeded");
+          if((diagnostics.raster_samples&4095)==0&&options.cancelled&&options.cancelled())throw std::runtime_error("Paint surface construction cancelled");
           double u = (x + .5) / r, v = (y + .5) / r;
           float w0 = float(
               ((b[1] - c[1]) * (u - c[0]) + (c[0] - b[0]) * (v - c[1])) / den);
@@ -120,29 +138,42 @@ struct PaintedMesh::SurfaceMap {
                     ((c[1] - a[1]) * (u - c[0]) + (a[0] - c[0]) * (v - c[1])) /
                     den),
                 w2 = 1 - w0 - w1;
-          if (std::min({w0, w1, w2}) < -.000001f)
+          if (!std::isfinite(w0)||!std::isfinite(w1)||!std::isfinite(w2)||std::min({w0, w1, w2}) < -.000001f)
             continue;
           auto p = mesh.positions[ids[0]] * w0 + mesh.positions[ids[1]] * w1 +
                    mesh.positions[ids[2]] * w2;
           size_t index = size_t(y) * r + x;
           auto &t = texels[index];
-          if (t.covered && length(t.position - p) > 1e-4f)
-            throw std::invalid_argument(
-                "Overlapping UV islands cannot be painted independently");
-          t = {p,
-               normalized(mesh.normals[ids[0]] * w0 +
-                          mesh.normals[ids[1]] * w1 +
-                          mesh.normals[ids[2]] * w2),
-               true,
-               uint32_t(k / 3),
-               {w0, w1}};
+          Texel candidate{p,normalized(mesh.normals[ids[0]]*w0+mesh.normals[ids[1]]*w1+mesh.normals[ids[2]]*w2),true,uint32_t(k/3),{w0,w1}};
+          if(!t.covered){t=candidate;++diagnostics.covered_texels;}
+          else if(!source){
+            if(length(t.position-p)>1e-4f)throw std::invalid_argument("Overlapping UV islands cannot be painted independently");
+            t=candidate;
+          }else{
+            auto same=[&](const Texel &other){
+              if(++diagnostics.candidate_checks>options.max_candidate_checks)throw std::length_error("Paint surface comparison budget exceeded");
+              return length(other.position-p)<=1e-5f&&dot(other.normal,candidate.normal)>.9999f;
+            };
+            bool duplicate=same(t);auto found=linked.find(uint32_t(index));
+            if(!duplicate&&found!=linked.end())for(auto at=found->second.first;at!=UINT32_MAX;at=extra[at].next)
+              if(same(extra[at].texel)){duplicate=true;break;}
+            if(!duplicate){
+              auto count=found==linked.end()?0:found->second.count;
+              if(count+1>=options.max_candidates_per_texel||extra.size()>=options.max_additional_candidates)
+                throw std::length_error("Linked source paint surface budget exceeded");
+              auto &head=linked[uint32_t(index)];
+              if(!head.count)++diagnostics.linked_texels;
+              extra.push_back({candidate,head.first});head.first=uint32_t(extra.size()-1);++head.count;
+              ++diagnostics.additional_candidates;
+            }
+          }
           padding[index] = int32_t(index);
           auto &bounds = tiles[size_t(y / 32) * columns + x / 32];
           bounds.lo = low(bounds.lo, p);
           bounds.hi = high(bounds.hi, p);
         }
     }
-    if (std::none_of(texels.begin(), texels.end(),
+    if (!source && std::none_of(texels.begin(), texels.end(),
                      [](auto &t) { return t.covered; }))
       throw std::invalid_argument(
           "UV islands have no covered texels at this resolution");
@@ -162,19 +193,22 @@ struct PaintedMesh::SurfaceMap {
           }
       padding = std::move(next);
     }
+    options.cancelled={};
   }
 };
-PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r) {
+PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r):PaintedMesh(std::move(mesh),r,{}){}
+PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options) {
   if (r < 64 || r > 2048 || (r & (r - 1)))
     throw std::invalid_argument(
         "Paint resolution must be a power of two between 64 and 2048");
-  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r);
+  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r,options);
   PaintLayer layer;
   layer.id = 1;
   layer.tiles.resize(surface_->tiles.size());
   layers_.push_back(std::move(layer));
 }
 const Mesh &PaintedMesh::mesh() const { return surface_->mesh; }
+const PaintSurfaceDiagnostics &PaintedMesh::surface_diagnostics() const {return surface_->diagnostics;}
 uint32_t PaintedMesh::resolution() const { return surface_->resolution; }
 const PaintLayer &PaintedMesh::layer(uint64_t id) const {
   auto i = std::find_if(layers_.begin(), layers_.end(),
@@ -281,6 +315,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
   auto prior = l.tiles;
   size_t allocated = allocated_tiles_;
   bool changed = false;
+  size_t candidate_checks=0;
   try {
     for (size_t tile = 0; tile < l.tiles.size(); ++tile) {
       auto bounds = surface_->tiles[tile];
@@ -294,24 +329,29 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
                ty = uint32_t(tile / surface_->columns) * 32;
       for (uint32_t y = 0; y < 32; ++y)
         for (uint32_t x = 0; x < 32; ++x) {
-          auto &t = surface_->texels[size_t(ty + y) * resolution() + tx + x];
-          if (!t.covered || (settings.front_only && dot(t.normal, n) <= .05f))
-            continue;
-          float u =
-              axis2 > 1e-20f
-                  ? std::clamp(dot(t.position - b.from, axis) / axis2, 0.f, 1.f)
-                  : 0;
-          float distance = length(t.position - (b.from + axis * u));
-          if (distance >= radius)
-            continue;
-          auto selected = settings;
-          float projection_opacity = 1;
-          if (sampler) {
-            auto sample = sampler(t.position,t.normal);
-            if (!sample) continue;
-            selected = sample->settings;
-            projection_opacity = sample->opacity;
+          size_t index=size_t(ty+y)*resolution()+tx+x;
+          const auto &t=surface_->texels[index];
+          float distance=INFINITY,projection_opacity=1;
+          uint32_t selected_face=UINT32_MAX;auto selected=settings;
+          auto consider=[&](const SurfaceMap::Texel &candidate){
+            if(!candidate.covered)return;
+            if(++candidate_checks>surface_->options.max_candidate_checks)throw std::length_error("Paint candidate work budget exceeded");
+            if(settings.front_only&&dot(candidate.normal,n)<=.05f)return;
+            float u=axis2>1e-20f?std::clamp(dot(candidate.position-b.from,axis)/axis2,0.f,1.f):0;
+            float d=length(candidate.position-(b.from+axis*u));
+            if(d>=radius||d>distance+1e-7f||(std::abs(d-distance)<=1e-7f&&candidate.face>=selected_face))return;
+            auto value=settings;float opacity=1;
+            if(sampler){auto sample=sampler(candidate.position,candidate.normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
+            if(opacity<=0)return;
+            distance=d;selected_face=candidate.face;selected=value;projection_opacity=opacity;
+          };
+          consider(t);
+          if(!surface_->linked.empty()){
+            auto found=surface_->linked.find(uint32_t(index));
+            if(found!=surface_->linked.end())for(auto at=found->second.first;at!=UINT32_MAX;at=surface_->extra[at].next)
+              consider(surface_->extra[at].texel);
           }
+          if(selected_face==UINT32_MAX)continue;
           float edge = 1 - distance * distance / (radius * radius),
                 alpha = std::clamp(edge * edge * b.pressure * b.strength *
                                        settings.flow * projection_opacity,
@@ -443,9 +483,13 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
     std::shared_ptr<const PaintSourceMaps> maps,uint32_t resolution) {
+  return from_maps(std::move(mesh),std::move(maps),resolution,{});
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
+    std::shared_ptr<const PaintSourceMaps> maps,uint32_t resolution,const PaintSurfaceOptions &options) {
   if(!maps || maps->empty())throw std::invalid_argument("Original paint maps are empty");
   maps->validate();
-  auto result=std::make_shared<PaintedMesh>(std::move(mesh),resolution);
+  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),resolution,options));
   // Freeze the small bundle of references/metadata. The shared image pixels must
   // already be immutable, allowing one original image cache across materials.
   result->source_maps_=std::make_shared<const PaintSourceMaps>(*maps);
@@ -686,6 +730,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
                       {"active", active_},
                       {"next_id", next_},
                       {"layers", nlohmann::json::array()}};
+  if(surface_->options.policy==PaintUvPolicy::SourceAuthored)j["uv_policy"]="source-authored";
   if(source_maps_){
     PaintImageArchive local;
     j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
@@ -772,8 +817,12 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
        (!resolution.is_number_integer() || resolution.get<int64_t>() < 64)) ||
       resolution.get<uint64_t>() > 2048)
     throw std::runtime_error("Invalid paint resolution");
-  auto result = std::make_shared<PaintedMesh>(
-      std::move(mesh), uint32_t(resolution.get<uint64_t>()));
+  PaintSurfaceOptions surface_options;
+  if(j.contains("uv_policy")){
+    if(j.at("uv_policy")!="source-authored"||!j.contains("source_maps"))throw std::runtime_error("Invalid persisted source UV policy");
+    surface_options.policy=PaintUvPolicy::SourceAuthored;
+  }
+  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options));
   auto positive = [](const nlohmann::json &v) {
     if ((!v.is_number_unsigned() &&
          (!v.is_number_integer() || v.get<int64_t>() <= 0)) ||
