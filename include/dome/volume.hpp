@@ -27,6 +27,8 @@ public:
   bool redo();
   bool in_stroke() const { return editing_; }
   size_t undo_count() const { return undo_.size(); }
+  uint64_t revision() const { return revision_; }
+  Volume geometry_snapshot() const;
   void save(const std::filesystem::path &) const;
   static Volume load(const std::filesystem::path &);
 
@@ -41,6 +43,7 @@ private:
   std::deque<Command> undo_, redo_;
   size_t history_limit_, history_bytes_ = 0;
   bool editing_ = false;
+  uint64_t revision_ = 0;
   void set(Int3, float);
 };
 } // namespace dome

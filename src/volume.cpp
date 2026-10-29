@@ -18,10 +18,19 @@ float Volume::at(Int3 p) const {
   return it == cells_.end() ? band() : it->second;
 }
 void Volume::set(Int3 p, float v) {
+  if (at(p) == v)
+    return;
+  ++revision_;
   if (v >= band())
     cells_.erase(p);
   else
     cells_[p] = v;
+}
+Volume Volume::geometry_snapshot() const {
+  Volume result(voxel_, history_limit_);
+  result.cells_ = cells_;
+  result.revision_ = revision_;
+  return result;
 }
 float Volume::sample(Vec3 p) const {
   if (!finite(p) ||

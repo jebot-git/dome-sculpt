@@ -11,18 +11,18 @@ shading is inside it.
 | --- | --- | --- |
 | Blender 5.4 Alpha basis | Pinned version header and native trackball adaptation | Audit reused sculpt, geometry, rigging and weight algorithms against the pinned baseline; document deviations |
 | Prior Gmsh basis | FLTK, appearance, trackball and XR integration inspected; shared UI helpers reused | Reuse appropriate native meshing/remeshing functionality with real mesh fixtures |
-| Prior OpenBrush DomeD basis | Native controller profiles and one/two-hand navigation compiled; EGL helper retained for transport work | Integrate native XR session lifecycle, spatial UI and shared editing, with input/render tests and headset verification |
+| Prior OpenBrush DomeD basis | Direct EGL/OpenXR transport, profiles, one/two-hand navigation and BDF palette adapted; synthetic runtime and installed simulated-HMD tests pass | Integrate native XR session lifecycle, spatial UI and shared editing, with input/render tests and headset verification |
 | Wings 3D where beneficial | Reference evaluated: winged-edge editing and AutoUV; no Erlang runtime dependency planned | Incorporate suitable topology/workflow techniques and record actual reuse |
 | Seamless3d where beneficial | MIT cross-platform source identified; not incorporated | Evaluate reusable surface/skinning algorithms and integrate where beneficial |
 | OpenFX where beneficial | GPL native modeling/skinning source identified; not incorporated | Evaluate appropriate native geometry/weight functions and integrate where beneficial |
 | MeshLab and related projects where beneficial | Native mesh-processing basis evaluated; not incorporated | Integrate appropriate cleanup, resampling and retopology algorithms without its Qt frontend |
 | Native FLTK suite | Built native C++20 FLTK viewport, BDF appearance and DBusMenu | Complete all authoring controls in FLTK; verify palette/fonts, shortcuts and universal menus |
 | No Python dependency | Runtime is native C++; Python only in optional test harness | Audit all shipped workflow/import/export paths for native implementations |
-| Medium-like robust VR sculpting | Sparse field, clay/carve/smooth/flatten and exact undo tested on CPU | Production-size multi-object/layer sculpting, masks, symmetry, resolution changes, performant local meshing, sustained VR strokes and recovery |
-| Full VR-driven workflow | Spatial edit state and canvas navigation tested; no connected XR renderer yet | Create, sculpt, texture, retopo, unwrap, rig, skin, save and export entirely in headset |
-| VR controllers | OpenBrush profile tables and device-state handling integrated | Live pose/action/haptic mapping; reconnect/focus/session-loss and frame timing verification |
-| Spatial stylus | Device-independent tip/pressure state tested | Actual stylus OpenXR/driver bindings, tip calibration, pressure/buttons and physical stylus verification |
-| Joystick-spawned/driven menus | Menu state, anchored position, sectors and press confirmation tested | Render and navigate every required workflow menu using live joystick actions |
+| Medium-like robust VR sculpting | Sparse field, four tools, shared transactions and background meshing tested on CPU and through synthetic XR input | Production-size multi-object/layer sculpting, masks, symmetry, resolution changes, performant local meshing, sustained VR strokes and recovery |
+| Full VR-driven workflow | Shared FLTK/XR document, stereo sculpting, joystick undo/redo/save/export connected; complete authoring workflow remains pending | Create, sculpt, texture, retopo, unwrap, rig, skin, save and export entirely in headset |
+| VR controllers | Live native action mapping implemented; synthetic controller edits, focus/tracking loss and reference-space changes tested | Live pose/action/haptic mapping; reconnect/focus/session-loss and frame timing verification |
+| Spatial stylus | Native MX Ink calibrated-tip/middle-force/tip-force bindings implemented and exercised through the synthetic runtime; physical verification pending | Actual stylus OpenXR/driver bindings, tip calibration, pressure/buttons and physical stylus verification |
+| Joystick-spawned/driven menus | Eight BDF-rendered anchored sectors with selection highlight; synthetic joystick tool/file commands tested | Render and navigate every required workflow menu using live joystick actions |
 | Default trackball/3D mouse input | Trackball orbit/pan/zoom verified in FLTK | Complete intended 3D-mouse device workflow and confirm physical trackball behavior; plain-mouse emulation is optional |
 | Substance-like texturing | Not implemented | Native layered channels, brush/stencil/projection painting, masks, texture sets, bake workflow and editable persistence |
 | Skinning/weight painting | Not implemented | Native weight painting, constrained normalization, lock/prune, symmetry and reliable transfer |
@@ -30,8 +30,8 @@ shading is inside it.
 | Remeshing | Only scalar-field surface extraction implemented | Robust mesh-to-volume and topology-preserving/adaptive/isotropic/quad remeshing as appropriate |
 | Robust automatic atlasing | xatlas integrated with source mapping and chart packing; initial UV tests | Diverse production fixtures, overlap/stretch/packing bounds, seam preservation, durable chart state |
 | Compact human-editable UVs | Automatic chart generation only | Seam marking, island selection, pin/relax, transforms and manual edits in desktop and VR |
-| MToon shaders | Not implemented | Native preview and matching VRM material serialization, outlines, transparency, lighting and texture properties |
-| PBR shaders | Static export has basic metallic-roughness metadata; preview uses fixed lighting | Native PBR viewport/material editing and glTF material/texture round trips |
+| MToon shaders | Simple toon preview only, not the MToon specification | Native preview and matching VRM material serialization, outlines, transparency, lighting and texture properties |
+| PBR shaders | GGX PBR shader shared by FLTK and XR, with constant clay material; static export has basic metallic-roughness metadata | Native PBR viewport/material editing and glTF material/texture round trips |
 | Humanoid rigging | Not implemented | Bone placement/fitting, fingers, skeleton validation, coordinate conventions and VR rig-edit workflow |
 | Robust automatic weights | Not implemented | Surface/volume-aware weighting with disconnected parts, thin limbs, topology stress tests and deformation fixtures |
 | CATS basic functionality | Not implemented | Avatar cleanup, bone/material consolidation, pose conventions, shape/viseme tools and export preparation |
@@ -49,15 +49,14 @@ shading is inside it.
 
 ## Next integration work
 
-1. Move volume/mesh snapshots behind a shared document interface so FLTK and
-   the reused OpenBrush XR worker can edit/render without blocking each other.
-2. Connect stereo swapchains, native spatial palette, joystick commands and
-   tracked pressure-driven sculpting; add an OpenXR runtime fixture before
-   requesting hardware tests.
-3. Add object/layer scene state, crash recovery, importer/remesher interfaces,
+1. Add object/layer scene state, crash recovery, importer/remesher interfaces,
    and durable material/UV/morph/skeleton data before expanding authoring tools.
-4. Integrate native surface processing, layered painting/baking, humanoid rigging
+2. Extend spatial menus to the complete document and authoring workflows,
+   including error/status feedback and recovery entirely in the headset.
+3. Integrate native surface processing, layered painting/baking, humanoid rigging
    and weight solving, then complete the named plugin-equivalent workflows.
-5. Complete full glTF/VRM and real accelerator implementations/validation.
+4. Complete full glTF/VRM and real accelerator implementations/validation.
+5. Verify sustained use on physical controllers, headset and spatial stylus,
+   including device reconnect and runtime session-loss recovery.
 
 These are sequencing notes, not reductions of the original goal.

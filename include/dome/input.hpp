@@ -4,6 +4,7 @@
 #include <optional>
 namespace dome {
 enum class DeviceKind { Controller, SpatialStylus };
+enum class SpatialCommand { Undo, Redo, Save, Export };
 struct SpatialSample {
   uint32_t id = 0;
   uint64_t sequence = 0;
@@ -24,7 +25,17 @@ public:
   bool menu_open() const { return menu_; }
   Vec3 menu_anchor() const { return menu_anchor_; }
   Tool tool() const { return tool_; }
-  Tool menu_selection() const { return selected_; }
+  Tool menu_selection() const { return Tool(std::min(selected_, 3)); }
+  int menu_index() const { return selected_; }
+  void select_tool(Tool tool) {
+    tool_ = tool;
+    selected_ = int(tool);
+  }
+  std::optional<SpatialCommand> take_command() {
+    auto c = command_;
+    command_.reset();
+    return c;
+  }
   float radius = .1f, strength = 1;
 
 private:
@@ -37,7 +48,9 @@ private:
   };
   std::unordered_map<uint32_t, DeviceState> devices_;
   bool menu_ = false;
-  Tool tool_ = Tool::Clay, selected_ = Tool::Clay;
+  Tool tool_ = Tool::Clay;
+  int selected_ = 0;
+  std::optional<SpatialCommand> command_;
   Vec3 previous_{}, menu_anchor_{};
 };
 } // namespace dome

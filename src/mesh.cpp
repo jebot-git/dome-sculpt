@@ -25,17 +25,21 @@ void Mesh::validate() const {
       throw std::runtime_error("Degenerate mesh triangle");
   }
 }
-Mesh surface_mesh(const Volume &field) {
+Mesh surface_mesh(const Volume &field, const std::function<bool()> &cancelled) {
   Mesh result;
   std::set<Int3> cells;
   static constexpr Int3 corner[] = {{0, 0, 0}, {1, 0, 0}, {1, 1, 0}, {0, 1, 0},
                                     {0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}};
   static constexpr int tetra[][4] = {{0, 5, 1, 6}, {0, 1, 2, 6}, {0, 2, 3, 6},
                                      {0, 3, 7, 6}, {0, 7, 4, 6}, {0, 4, 5, 6}};
-  for (auto [p, d] : field.voxels())
+  size_t visited = 0;
+  for (auto [p, d] : field.voxels()) {
+    if ((++visited % 512) == 0 && cancelled && cancelled())
+      throw std::runtime_error("Meshing cancelled");
     if (d < 0)
       for (auto c : corner)
         cells.insert(p - c);
+  }
   using Edge = std::pair<Int3, Int3>;
   std::map<Edge, uint32_t> vertices;
   auto vertex = [&](Int3 a, Int3 b, float da, float db) {
@@ -71,6 +75,8 @@ Mesh surface_mesh(const Volume &field) {
     result.indices.insert(result.indices.end(), {a, b, c});
   };
   for (auto cell : cells) {
+    if ((++visited % 512) == 0 && cancelled && cancelled())
+      throw std::runtime_error("Meshing cancelled");
     Int3 p[8];
     float d[8];
     for (int i = 0; i < 8; ++i) {

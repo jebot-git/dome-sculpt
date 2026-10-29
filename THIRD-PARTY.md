@@ -8,8 +8,10 @@ The original notices and licenses on reused source files remain in force.
   `third_party/blender/BKE_blender_version.h` proves version and cycle for the
   pinned source commit. The reference `.cc` files are not compiled wholesale.
 - OpenBrush Native: Apache-2.0. Its `navigation` and `controller-profiles` sources
-  are compiled unchanged. Its EGL graphics helper is MIT, with the upstream
-  de-xr notice in `third_party/openbrush/LICENSE.native-graphics`.
+  are compiled unchanged, along with the EGL graphics helper. Native session
+  lifecycle, controller actions, matrices and BDF palette rendering are adapted
+  in `src/xr.cpp`, `src/render.cpp` and `src/palette.cpp`. The graphics helper is
+  MIT, with the upstream de-xr notice in `third_party/openbrush/LICENSE.native-graphics`.
   Apache LICENSE and NOTICE are retained beside these files.
 - Shared de-xr FLTK appearance, native BDF font and universal menu helpers: MIT.
   Copied from the canonical qimgvr tree used by the Gmsh integration.

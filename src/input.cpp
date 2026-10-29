@@ -6,6 +6,7 @@ void SpatialInput::cancel() {
     volume_.cancel_stroke();
   device_ = 0;
   menu_ = false;
+  command_.reset();
   devices_.clear();
 }
 void SpatialInput::update(const SpatialSample &s) {
@@ -62,9 +63,12 @@ void SpatialInput::update(const SpatialSample &s) {
     menu_anchor_ = s.tip;
     if (menu_) {
       device_ = s.id;
-      selected_ = tool_;
+      selected_ = int(tool_);
     } else {
-      tool_ = selected_;
+      if (selected_ < 4)
+        tool_ = Tool(selected_);
+      else
+        command_ = SpatialCommand(selected_ - 4);
       device_ = 0;
       d.armed = false;
     }
@@ -75,8 +79,8 @@ void SpatialInput::update(const SpatialSample &s) {
     if (s.stick_x * s.stick_x + s.stick_y * s.stick_y > .25f) {
       constexpr float pi = 3.14159265358979323846f;
       float angle = std::atan2(s.stick_y, s.stick_x);
-      int index = int(std::floor((angle + pi / 4 + 2 * pi) / (pi / 2))) % 4;
-      selected_ = Tool(index);
+      int index = int(std::floor((angle + pi / 8 + 2 * pi) / (pi / 4))) % 8;
+      selected_ = index;
     }
     d.pressed = s.trigger;
     return;

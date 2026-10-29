@@ -2,17 +2,18 @@
 
 Native C++20/FLTK work toward the full DomeD VR sculpting, material-authoring,
 retopology and avatar-production suite described in [the requirements](docs/REQUIREMENTS.md).
-This is an initial implementation, not a completed Medium/Substance replacement.
+The complete production workflow remains under development.
 There is no Python runtime, Unity or other engine in the application.
 
 The Blender baseline is pinned **5.4.0 Alpha**, commit
 `3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2`. Trackball projection is adapted from
 its native viewport navigation. OpenBrush Native's controller profiles and
-one/two-hand canvas navigation are compiled into the core. DomeD's BDF appearance
+one/two-hand canvas navigation are compiled into the core. Its direct OpenXR
+session, EGL graphics and BDF spatial palette implementations provide the basis
+for the connected stereo sculpting path. DomeD's BDF appearance
 and universal FLTK menu helpers are the same implementation used in the Gmsh
 suite. Exact origins, licenses and source checksums are in
-[third_party/sources.json](third_party/sources.json). The OpenBrush XR session
-transport and palette renderer are not yet connected to this editor.
+[third_party/sources.json](third_party/sources.json).
 
 ## Build
 
@@ -25,9 +26,11 @@ build/dome-sculpt
 ```
 
 Requires a C++20 compiler, CMake 3.24+, nlohmann JSON headers, the patched DomeD
-FLTK 1.4.5, OpenGL/GLU, GIO, Fontconfig, zlib, X11/Wayland development libraries,
-and `wayland-scanner`. xatlas is pinned and vendored, so configuring does not
-fetch its sources. `DOME_BUILD_UI=OFF` builds just the native core and tests.
+FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, GIO, Fontconfig, zlib,
+X11/Wayland development libraries and `wayland-scanner`. xatlas is pinned and
+vendored, so configuring does not fetch its sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
+build just the native core and tests. `BUILD_TESTING=OFF` excludes test harness
+dependencies, including Python.
 The application's default FLTK backend follows its environment; tests explicitly
 use X11 in a private display. No installation or running session changes are
 needed to run the build.
@@ -52,8 +55,9 @@ left drag orbits with an aspect-correct trackball, middle/right drag pans,
 and the wheel zooms. Shift+left drag sculpts. `1` selects clay, `2` carve,
 `3` smooth, `4` flatten; brackets change brush radius. `F` resets the view.
 Ctrl+Z / Ctrl+Shift+Z undo/redo complete strokes. Lost focus or Escape cancels
-an in-progress stroke. The viewport is a basic OpenGL diagnostic preview;
-MToon and physically based preview shaders are still required.
+an in-progress stroke. The viewport uses a native GGX metallic-roughness shader
+with a constant clay material. The View menu switches between PBR and a simple
+toon preview; full MToon properties and material editing remain to be added.
 
 The sparse signed-distance field supports swept capsule strokes, pressure,
 soft unions/subtraction, smoothing and flattening. Transactions retain exact
@@ -71,12 +75,43 @@ full glTF scene support. VRM export is deliberately unavailable until the
 humanoid rig, metadata, expressions, material and secondary-motion requirements
 are implemented.
 
-The spatial-input core accepts controller or stylus tip poses, pressure,
-trigger and joystick transitions. Joystick press anchors a tool menu; stick
-direction chooses a tool and the next press confirms. Input is disarmed across
-tracking/focus loss and timestamp gaps; idle or held secondary hands cannot
-steal an edit. These behaviors are tested with recorded-style samples. There
-is no live controller/stylus adapter or headset sculpting path yet.
+`F6` or View → Start/stop XR starts the native stereo worker while leaving the
+FLTK editor available. Both frontends edit the same document and acquire
+immutable mesh snapshots. Spatial sculpt input, surface extraction and XR
+save/export jobs run on separate workers. Input queues are bounded; focus/tracking loss cancels
+the unfinished spatial stroke and requires controls to be released before a new
+stroke. Runtime reference-space changes rebase the canvas at the announced time
+and discard queued poses from the old coordinate space.
+
+A standalone XR entry point is also available:
+
+```sh
+build/dome-sculpt --probe
+build/dome-sculpt --xr --open model.dsculpt
+build/dome-sculpt --xr --frames 120 --save model.dsculpt
+```
+
+The default is a DomeD overlay, requiring `XR_EXTX_overlay`,
+`XR_KHR_opengl_enable` and `XR_MNDX_egl_enable`. `--exclusive` explicitly selects
+a primary XR session. The reference space is STAGE when available, otherwise
+LOCAL. Per-eye poses and fields of view come from the runtime.
+
+Squeeze one controller to move the canvas; squeeze both to rotate and scale it.
+Trigger pressure sculpts at the tracked tip. Press the joystick to anchor the
+BDF menu, tilt it to select and press again to confirm. Starting at the right
+and proceeding counterclockwise, its actions are Clay, Carve, Smooth, Flatten,
+Undo, Redo, Save and Export glTF. Save uses the opened project path, or a private
+`$XDG_STATE_HOME/dome-sculpt/Recovery-PID.dsculpt` file for untitled work. Export
+uses the corresponding `.glb` path. File errors remain visible in the FLTK
+status area and retain the changed document and prior saved file.
+
+Touch, Index and Vive profiles provide controller actions. MX Ink uses its
+extension-gated calibrated tip pose, middle-button force and tip force bindings;
+the stylus can be used alongside a controller for joystick menus. The FLTK
+appearance selection supplies the XR palette's BDF face, pixel size, light/dark
+theme, accent and opacity. Live physical device behavior remains unverified.
+Rich spatial document dialogs and the rest of the production workflow remain
+in [the tracked requirements](docs/REQUIREMENTS.md).
 
 ## Validation
 
@@ -85,9 +120,17 @@ uv run --with python-xlib --with pillow python tests/gui.py
 build/dome-sculpt --export-demo artifacts/sculpt.glb
 ```
 
-Python is used only for the optional isolated GUI test harness. The core tests
-are native C++ and check volume edits, swept strokes, topology, UVs, persistence,
+Python is used only for test orchestration; the application has no Python
+runtime. The core tests are native C++ and check volume edits, swept strokes, topology, UVs, persistence,
 GLB structure, input ownership and OpenBrush canvas transforms. The GUI test
 uses a private bus, HOME and Xvfb display to inspect actual FLTK/OpenGL pixels,
 carve/undo, orbit and view reset. Its report and images are in `artifacts/gui`.
-No physical headset or stylus verification has been performed.
+CTest additionally exercises the shared document workers, real EGL/OpenGL
+PBR/toon/palette rendering, and the real OpenXR loader against a native synthetic
+runtime. Its 23 checks cover stereo submission, controller/stylus edits, focus
+and tracking loss, reference-space changes, file commands and overlay selection.
+The installed Monado runtime also completed a bounded 12-frame run with 11
+stereo submissions, but reported a simulated HMD and no controllers. Neither
+fixture establishes physical headset or stylus behavior. ASan/UBSan and leak
+checks pass for the native core suites; no accelerator hardware tests have been
+performed.

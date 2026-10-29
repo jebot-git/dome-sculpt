@@ -12,13 +12,32 @@
     "commit": "1373d5e839a9720adaeb187064785f9d9d0e8492",
     "compiled": [
       "navigation.cpp",
-      "controller-profiles.cpp"
+      "controller-profiles.cpp",
+      "graphics.cpp"
     ],
-    "reserved_for_xr_transport": [
-      "graphics.cpp",
-      "graphics.h"
-    ],
-    "license": "Apache-2.0; native EGL helper is MIT"
+    "license": "Apache-2.0; native EGL helper is MIT",
+    "adapted": {
+      "src/xr.cpp": [
+        "src/xr.cpp",
+        "src/xr.h"
+      ],
+      "src/render.cpp": [
+        "src/render.cpp",
+        "src/render.h"
+      ],
+      "src/palette.cpp": [
+        "src/palette.cpp",
+        "src/panel-render.cpp"
+      ]
+    },
+    "adaptation_basis_sha256": {
+      "src/xr.cpp": "b477bebe7cd2d5dc254fe6295dce47a634741ab29f489134d8f84a60c73784ff",
+      "src/xr.h": "47aea4f6349f7b602ce9ffc96a25c609f68794b1c41356d40cd812a376ff986b",
+      "src/render.cpp": "e5fcc80f1fc3b54b1cb721b3da7acab7fb4ebf515abd9c5df7cbf3888aa4bd45",
+      "src/render.h": "80d5d4f5db5e9b454cf8471d2d21b4940e4210386640b86c09dfba5fdf58c715",
+      "src/palette.cpp": "7d2e7846b1cac8083531a0aa4ffcda0dab0bcd419a6fbfd83ffbeac1ce3a5fb1",
+      "src/panel-render.cpp": "b36476f2463860c36f46dddf175e2b7f8e27286fa52bb63eea2d8638d0c5988a"
+    }
   },
   "desktop": {
     "repository": "https://github.com/jebot-git/qimgvr",

@@ -2,6 +2,7 @@
 #pragma once
 #include "volume.hpp"
 #include <array>
+#include <functional>
 namespace dome {
 struct Mesh {
   std::vector<Vec3> positions, normals;
@@ -9,7 +10,7 @@ struct Mesh {
   std::vector<uint32_t> indices;
   void validate() const;
 };
-Mesh surface_mesh(const Volume &);
+Mesh surface_mesh(const Volume &, const std::function<bool()> &cancelled = {});
 struct AtlasInfo {
   uint32_t width = 0, height = 0, charts = 0;
   float utilization = 0;

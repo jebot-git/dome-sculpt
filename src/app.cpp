@@ -1,20 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "appearance.h"
 #include "desktop-menu.h"
+#include "dome/document.hpp"
 #include "dome/mesh.hpp"
+#include "dome/render.hpp"
+#ifdef DOME_HAS_XR
+#include "dome/xr.hpp"
+#endif
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Gl_Window.H>
 #include <FL/fl_file_chooser.H>
 #include <FL/gl.h>
 #include <FL/glu.h>
+#include <bit>
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <thread>
 using namespace dome;
 namespace {
 struct Canvas : Fl_Gl_Window {
-  Volume volume{.03f};
+  Document document;
+  std::unique_ptr<SurfaceRenderer> renderer;
+  std::shared_ptr<const MeshSnapshot> shown_mesh;
   Mesh mesh;
   Quat rotation{};
   Vec3 pan{};
@@ -26,17 +35,18 @@ struct Canvas : Fl_Gl_Window {
   std::string capture;
   std::function<void()> changed;
   Canvas(int x, int y, int w, int h) : Fl_Gl_Window(x, y, w, h) {
-    mode(FL_RGB | FL_DOUBLE | FL_DEPTH);
+    mode(FL_RGB | FL_DOUBLE | FL_DEPTH | FL_OPENGL3);
     end();
   }
+  ~Canvas() {
+    if (renderer) {
+      make_current();
+      renderer.reset();
+    }
+  }
   void seed() {
-    volume = Volume(.03f);
-    volume.begin_stroke();
-    Brush b;
-    b.radius = .4f;
-    b.blend = 0;
-    volume.stamp(b);
-    volume.end_stroke();
+    document.seed();
+    document.wait_mesh();
     invalidate();
   }
   void invalidate() {
@@ -46,8 +56,10 @@ struct Canvas : Fl_Gl_Window {
       changed();
   }
   void update_mesh() {
-    if (dirty_mesh) {
-      mesh = surface_mesh(volume);
+    auto f = document.frame();
+    if (f.surface != shown_mesh) {
+      shown_mesh = f.surface;
+      mesh = f.surface->mesh;
       dirty_mesh = false;
     }
   }
@@ -63,7 +75,7 @@ struct Canvas : Fl_Gl_Window {
                    (1 - 2.f * (y - this->y()) / h()) * tangent, -1};
     Vec3 origin = rotation.inverse().rotate(Vec3{0, 0, distance} - pan);
     direction = rotation.inverse().rotate(normalized(direction));
-    auto hit = volume.raycast(origin, direction, 10);
+    auto hit = document.raycast(origin, direction);
     if (!hit) {
       have_stamp = false;
       return;
@@ -72,11 +84,11 @@ struct Canvas : Fl_Gl_Window {
     brush.from = have_stamp ? last_stamp : *hit;
     brush.to = *hit;
     brush.radius = radius;
-    brush.normal = volume.gradient(*hit);
+    brush.normal = document.gradient(*hit);
     brush.tool = tool;
     brush.strength = tool == Tool::Smooth ? .55f : 1;
     brush.blend = std::min(.025f, radius * .25f);
-    volume.stamp(brush);
+    document.stamp_desktop(brush);
     last_stamp = *hit;
     have_stamp = true;
     invalidate();
@@ -94,7 +106,10 @@ struct Canvas : Fl_Gl_Window {
             Fl::event_button() == FL_LEFT_MOUSE && Fl::event_state(FL_SHIFT);
         have_stamp = false;
         if (sculpting) {
-          volume.begin_stroke();
+          if (!document.begin_desktop()) {
+            sculpting = false;
+            return 1;
+          }
           sculpt_at(last_x, last_y);
         }
         return 1;
@@ -120,7 +135,7 @@ struct Canvas : Fl_Gl_Window {
       }
       if (event == FL_RELEASE) {
         if (sculpting) {
-          volume.end_stroke();
+          document.end_desktop();
           sculpting = false;
           have_stamp = false;
           invalidate();
@@ -129,7 +144,7 @@ struct Canvas : Fl_Gl_Window {
       }
       if (event == FL_UNFOCUS) {
         if (sculpting) {
-          volume.cancel_stroke();
+          document.cancel_desktop();
           sculpting = false;
           have_stamp = false;
           invalidate();
@@ -143,14 +158,14 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_KEYDOWN && Fl::event_key() == FL_Escape && sculpting) {
-        volume.cancel_stroke();
+        document.cancel_desktop();
         sculpting = false;
         invalidate();
         return 1;
       }
     } catch (const std::exception &e) {
-      if (volume.in_stroke())
-        volume.cancel_stroke();
+      if (sculpting)
+        document.cancel_desktop();
       sculpting = false;
       invalidate();
       fl_alert("%s", e.what());
@@ -160,45 +175,23 @@ struct Canvas : Fl_Gl_Window {
   }
   void draw() override {
     update_mesh();
-    glViewport(0, 0, pixel_w(), pixel_h());
-    bool light = Fl::get_color(FL_BACKGROUND_COLOR) > 0x80808000;
-    glClearColor(light ? .72f : .11f, light ? .73f : .13f, light ? .75f : .16f,
-                 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45, double(pixel_w()) / std::max(1, pixel_h()), .01, 100);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    float position[] = {2, 3, 4, 1};
-    glLightfv(GL_LIGHT0, GL_POSITION, position);
-    glTranslatef(pan.x, pan.y, -distance);
-    auto matrix = rotation.matrix();
-    glMultMatrixf(matrix.data());
-    glColor3f(.68f, .39f, .22f);
-    glBegin(GL_TRIANGLES);
-    for (auto i : mesh.indices) {
-      auto n = mesh.normals[i], p = mesh.positions[i];
-      glNormal3f(n.x, n.y, n.z);
-      glVertex3f(p.x, p.y, p.z);
+    if (!context_valid() && renderer) {
+      renderer->abandon();
+      renderer.reset();
     }
-    glEnd();
-    glDisable(GL_LIGHTING);
-    glColor3f(.35f, .38f, .42f);
-    glBegin(GL_LINES);
-    for (int i = -10; i <= 10; ++i) {
-      glVertex3f(i * .1f, -.5f, -1);
-      glVertex3f(i * .1f, -.5f, 1);
-      glVertex3f(-1, -.5f, i * .1f);
-      glVertex3f(1, -.5f, i * .1f);
-    }
-    glEnd();
+    if (!renderer)
+      renderer = std::make_unique<SurfaceRenderer>();
+    CanvasTransform model{{pan.x, pan.y, pan.z},
+                          {rotation.x, rotation.y, rotation.z, rotation.w},
+                          1};
+    ob::Vec3 eye{0, 0, distance};
+    float up = .3926990817f, right = std::atan(std::tan(up) * float(pixel_w()) /
+                                               std::max(1, pixel_h()));
+    auto vp =
+        multiply(projection(-right, right, -up, up), view_matrix(eye, {}));
+    auto f = document.frame();
+    renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
+                   f.state->toon, f.state->light);
     if (!capture.empty()) {
       std::vector<uint8_t> pixels(size_t(pixel_w()) * pixel_h() * 3);
       glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -229,6 +222,74 @@ struct App {
   std::unique_ptr<DesktopMenu> universal;
   bool dirty = false;
   std::filesystem::path project;
+  std::thread xr_worker;
+  std::atomic_bool stop_xr{false}, xr_running{false};
+  uint64_t seen_revision = 0, font_revision = UINT64_MAX;
+  std::string seen_error;
+  ~App() {
+    Fl::remove_timeout(tick, this);
+    stop_xr = true;
+    if (xr_worker.joinable())
+      xr_worker.join();
+  }
+  static void tick(void *data) {
+    auto &a = *static_cast<App *>(data);
+    auto f = a.canvas.document.frame();
+    if (f.surface != a.canvas.shown_mesh)
+      a.canvas.redraw();
+    a.dirty = f.state->dirty;
+    a.canvas.tool = f.state->tool;
+    a.canvas.radius = f.state->radius;
+    if (a.font_revision != dx::font_revision) {
+      a.font_revision = dx::font_revision;
+      int opacity = 255;
+      try {
+        std::ifstream input(dx::config());
+        nlohmann::json j;
+        if (input) {
+          input >> j;
+          opacity = j.value("opacity", 255);
+        }
+      } catch (const std::exception &) {
+      }
+      a.canvas.document.appearance(
+          dx::selected_font.file, dx::size,
+          Fl::get_color(FL_BACKGROUND_COLOR) > 0x80808000,
+          Fl::get_color(FL_SELECTION_COLOR) >> 8, opacity);
+      a.canvas.redraw();
+    }
+    a.update_status();
+    Fl::repeat_timeout(.03, tick, data);
+  }
+  void toggle_xr() {
+#ifdef DOME_HAS_XR
+    if (xr_running) {
+      stop_xr = true;
+      return;
+    }
+    if (xr_worker.joinable())
+      xr_worker.join();
+    stop_xr = false;
+    xr_running = true;
+    xr_worker = std::thread([this] {
+      try {
+        XrSculpt xr(canvas.document, &stop_xr);
+        xr.run();
+      } catch (const std::exception &e) {
+        try {
+          canvas.document.finish_spatial();
+        } catch (const std::exception &) {
+        }
+        canvas.document.report_error(e.what());
+        std::cerr << "XR: " << e.what() << '\n';
+      }
+      xr_running = false;
+    });
+#else
+    fl_alert("This build has no OpenXR support");
+#endif
+  }
+
   App() {
     window.end();
     window.resizable(canvas);
@@ -251,6 +312,12 @@ struct App {
     menu.add("&Sculpt/Larger brush", ']', command, this);
     menu.add("&Mesh/Generate &UV atlas", FL_CTRL + 'u', command, this);
     menu.add("&View/Reset &trackball", 'f', command, this);
+    menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
+    menu.add("&View/Shading/&PBR", 0, command, this);
+    menu.add("&View/Shading/&Toon preview", 0, command, this);
+    canvas.document.appearance(dx::selected_font.file, dx::size,
+                               Fl::get_color(FL_BACKGROUND_COLOR) > 0x80808000,
+                               Fl::get_color(FL_SELECTION_COLOR) >> 8, 255);
     canvas.seed();
     canvas.changed = [this] {
       dirty = true;
@@ -269,8 +336,10 @@ struct App {
         this);
     universal = std::make_unique<DesktopMenu>(window, menu);
     update_status();
+    Fl::add_timeout(.03, tick, this);
   }
   bool discard() {
+    dirty = canvas.document.frame().state->dirty;
     return !dirty || fl_choice("Discard unsaved sculpt changes?", "Cancel",
                                "Discard", nullptr) == 1;
   }
@@ -280,6 +349,18 @@ struct App {
     text << tools[int(canvas.tool)] << " | radius " << int(canvas.radius * 1000)
          << " mm | " << compute_backend()
          << " | Drag: trackball  Shift+drag: sculpt  Wheel: zoom";
+    auto info = canvas.document.frame().state;
+    if (!info->error.empty()) {
+      text.str("");
+      text << info->error;
+    } else if (!info->message.empty()) {
+      text.str("");
+      text << info->message;
+    } else if (xr_running) {
+      auto hints = text.str();
+      text.str("");
+      text << "XR active | " << hints;
+    }
     status.copy_label(text.str().c_str());
     status.redraw();
     window.copy_label((std::string("Dome Sculpt") +
@@ -301,8 +382,8 @@ struct App {
   }
   void action(std::string label) {
     label.erase(std::remove(label.begin(), label.end(), '&'), label.end());
-    if (canvas.volume.in_stroke()) {
-      canvas.volume.end_stroke();
+    if (canvas.sculpting) {
+      canvas.document.end_desktop();
       canvas.sculpting = false;
     }
     if (label == "New") {
@@ -316,8 +397,7 @@ struct App {
         return;
       auto path = fl_file_chooser("Open sculpt project", "*.dsculpt", nullptr);
       if (path) {
-        auto next = Volume::load(path);
-        canvas.volume = std::move(next);
+        canvas.document.open(path);
         canvas.invalidate();
         project = path;
         dirty = false;
@@ -332,17 +412,17 @@ struct App {
           return;
         path = chosen;
       }
-      canvas.volume.save(path);
+      canvas.document.save(path);
       project = path;
       dirty = false;
     } else if (label == "Close") {
       if (discard())
         window.hide();
     } else if (label == "Undo") {
-      if (canvas.volume.undo())
+      if (canvas.document.undo())
         canvas.invalidate();
     } else if (label == "Redo") {
-      if (canvas.volume.redo())
+      if (canvas.document.redo())
         canvas.invalidate();
     } else if (label == "Clay")
       canvas.tool = Tool::Clay;
@@ -357,7 +437,7 @@ struct App {
     else if (label == "Larger brush")
       canvas.radius = std::min(.5f, canvas.radius * 1.25f);
     else if (label == "Generate UV atlas") {
-      canvas.update_mesh();
+      canvas.mesh = surface_mesh(canvas.document.copy_volume());
       auto info = unwrap(canvas.mesh);
       std::ostringstream text;
       text << info.charts << " UV charts packed into " << info.width << " x "
@@ -368,17 +448,25 @@ struct App {
       auto chosen =
           fl_file_chooser("Export static glTF mesh", "*.glb", "Sculpt.glb");
       if (chosen) {
-        canvas.update_mesh();
-        if (canvas.mesh.uv.empty())
-          unwrap(canvas.mesh);
-        export_glb(canvas.mesh, chosen);
+        auto mesh = surface_mesh(canvas.document.copy_volume());
+        unwrap(mesh);
+        export_glb(mesh, chosen);
       }
+    } else if (label == "Start or stop XR") {
+      toggle_xr();
+    } else if (label == "PBR") {
+      canvas.document.shading(false);
+      canvas.redraw();
+    } else if (label == "Toon preview") {
+      canvas.document.shading(true);
+      canvas.redraw();
     } else if (label == "Reset trackball") {
       canvas.rotation = {};
       canvas.pan = {};
       canvas.distance = 2.2f;
       canvas.redraw();
     }
+    canvas.document.configure(canvas.tool, canvas.radius);
     update_status();
   }
 };
@@ -401,12 +489,73 @@ int main(int argc, char **argv) try {
     export_glb(mesh, argv[2]);
     return 0;
   }
+#ifdef DOME_HAS_XR
+  if (argc >= 2 && std::string(argv[1]) == "--probe") {
+    XrSculpt::probe();
+    return 0;
+  }
+  if (argc >= 2 && std::string(argv[1]) == "--xr") {
+    Document document;
+    document.seed();
+    unsigned frames = 0;
+    std::filesystem::path save;
+    bool overlay = true;
+    for (int i = 2; i < argc; ++i) {
+      std::string option = argv[i];
+      if (option == "--open" && i + 1 < argc)
+        document.open(argv[++i]);
+      else if (option == "--save" && i + 1 < argc)
+        save = argv[++i];
+      else if (option == "--frames" && i + 1 < argc)
+        frames = std::stoul(argv[++i]);
+      else if (option == "--exclusive")
+        overlay = false;
+      else
+        throw std::runtime_error("Unknown XR option: " + option);
+    }
+    auto config = bdf_fonts::export_config();
+    setenv("FONTCONFIG_FILE", config.c_str(), 1);
+    auto font = bdf_fonts::resolve("Unifont", "Sans-Serif", 16);
+    document.appearance(font.file, font.pixels, false, 0x6babff, 255);
+    document.wait_mesh();
+    {
+      XrSculpt xr(document, nullptr, overlay);
+      xr.run(frames);
+    }
+    if (!save.empty())
+      document.save(save);
+    return 0;
+  }
+#endif
+  if (argc == 3 && std::string(argv[1]) == "--project-info") {
+    auto volume = Volume::load(argv[2]);
+    std::vector<std::pair<Int3, float>> samples(volume.voxels().begin(),
+                                                volume.voxels().end());
+    std::sort(samples.begin(), samples.end(),
+              [](auto &a, auto &b) { return a.first < b.first; });
+    uint64_t hash = 1469598103934665603ULL;
+    for (auto [p, value] : samples) {
+      uint32_t words[] = {uint32_t(p.x), uint32_t(p.y), uint32_t(p.z),
+                          std::bit_cast<uint32_t>(value)};
+      for (auto word : words)
+        for (int i = 0; i < 4; ++i) {
+          hash ^= uint8_t(word >> (i * 8));
+          hash *= 1099511628211ULL;
+        }
+    }
+    std::cout << nlohmann::json{{"samples", samples.size()},
+                                {"voxel_size", volume.voxel_size()},
+                                {"field_hash", hash}}
+                     .dump()
+              << '\n';
+    return 0;
+  }
   dx::init();
   App app;
   if (argc == 3 && std::string(argv[1]) == "--smoke-test")
     app.canvas.capture = argv[2];
   else if (argc == 2) {
-    app.canvas.volume = Volume::load(argv[1]);
+    app.canvas.document.open(argv[1]);
     app.canvas.invalidate();
     app.project = argv[1];
     app.dirty = false;
