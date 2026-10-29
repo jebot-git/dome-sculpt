@@ -1,81 +1,73 @@
-# Native authoring and bake-control integration
+# Live weight feedback and material-aware picking
 
-This checkpoint on work/integrated-native-authoring combines
-0141926 (desktop/XR bake controls) with 88cde79 (weight painting, conformal UV,
-MToon rendering and source-preserving avatar export), preserving both histories.
-Read AGENTS.md and REQUIREMENTS.md; the full production objective is incomplete.
+This stage extends e65db2a on work/live-weight-feedback. The full production
+objective remains incomplete in REQUIREMENTS.md. Read AGENTS.md and
+WEIGHT-AUTHORING.md. The preceding integration's exact records are archived as
+HANDOFF-e65db2a.md / VALIDATION-e65db2a.md; keep all earlier histories and original
+creator archives. No agents were spawned here.
 
-Origin main advanced to13b79ab during validation with a separate merge of these
-same stages. This checkpoint preserves that history too. Its handoff/validation
-are archived as HANDOFF-13b79ab.md / VALIDATION-13b79ab.md. Historical remote agent
-ownership, dirty-work and physical-test notes are not live state in this thread.
-The verified private worker API/enum layout is retained consistently; the final
-runtime delta from fa7aba4 is limited to palette busy-state cache invalidation
-and the accurate generic “Working” label. Incoming GUI fixture guards and the
-no-op cancellation-lease regression are retained alongside our cross-workflow
-regression. See VALIDATION.md for focused follow-up evidence and exact scopes.
+## Implemented
 
-The original stage records are HANDOFF-0141926.md / VALIDATION-0141926.md and
-HANDOFF-88cde79.md / VALIDATION-88cde79.md. AGENT-HANDOFF.md describes the discovery
-of these divergent branches; its unimplemented notes apply to the bake-only
-branch, not the combined source. Remote agent names are historical, not live
-ownership in this thread. No agents were spawned here.
+- Desktop and XR pressure gestures produce worker-coalesced immutable heatmap
+  previews before release. Candidate influences are real kernel results from the
+  original weights, not a cursor approximation. More samples do not starve an
+  in-flight preview. Posed geometry stays fixed during the gesture; release
+  computes/publishes the complete skin edit and updates actual deformation.
+- Escape/focus loss/Undo restore the original surface without a transaction.
+  Gesture epochs and generation/revision guards reject late previews. Accepted
+  operation failure/cancellation/no-op restores its captured baseline; successful
+  release remains exactly one global Undo. Saves/source-changing operations do
+  not silently capture provisional weights. Document replacement cancels an
+  unconfirmed gesture; held mouse motion after cancellation does not stamp into
+  a released input lease.
+- Posed BVH picking filters material alpha/culling, including original/derived
+  PBR, V0/V1 MToon, V1 UV1, transforms, masks/animation and native overrides.
+  Shared metadata helpers keep GPU and picking semantics together. The weight
+  shader retains each material's alpha/blend/cull state and source bindings,
+  while suppressing outlines. Packed UV1 intervals validate on the worker.
+- The desktop uses the last drawn material-frame timestamp and rejects stale
+  displayed geometry. Native status distinguishes pending/live feedback. BDF
+  hint measurement and a fixed-footer compact weight-dialog regression are added.
 
-## Integrated behavior
+## Verification
 
-- Desktop Mesh > Bake surface and joystick Objects > Mesh tools > Baking
-  (page12) retain source/bounds/AO/padding controls, cancellation/progress and
-  exact Bake/Clear history. Rig > Weights (page13) and desktop Scene > Skin
-  weights retain explicit joints, pressure capsules, locks/limits/pruning,
-  semantic symmetry, visible linked parts and a selected-joint GPU heatmap.
-  Page navigation, labels, slider parameters and command identities coexist.
-- The common scene worker carries both atomic cancellation/progress and an
-  explicit operation-changed result. A wholly constrained weight gesture creates
-  no dirty/history entry. Cancellation and every source rejection check occur
-  before releasing the operation lease. Returned cancelled candidates cannot
-  publish. A new regression bakes a skinned target, paints linked weights,
-  clears the bake, and verifies separate exact global Undo/Redo, retained maps,
-  authored deformation and the complete hidden source.
-- Worker conformal UV/stitching, full deformation/source-identity remaps,
-  source-derived MToon/linear GPU composition, shared source morph transport,
-  background GLB/selected-avatar VRM0 export and their guarded workflows are
-  retained from 88cde79. Canonical Mikk render-only corner expansion retains
-  every weight scalar and original-image vertex identity. It does not mutate
-  rest topology, skin/morph arrays or archived creator data.
-- The canonical 282467e FLTK toolkit was rebuilt locally, with all22 patch
-  hashes verified. Use artifacts/toolkit-authoring as in AGENTS.md/TOOLKIT.md;
-  build/run-dome-sculpt selects its lib directory. Source hashes still match
-  all30 manifest entries; shared BDF helpers remain canonical qimgvr copies.
+The bf4fb86 implementation passes all49 registered Release suites in333.39s,
+including the complete real-loader synthetic XR report:73 checks, passed/complete,
+failed0. Four whole-core C/C++ ASan/UBSan/leak suites pass in28.72s. Final frame-
+time/UV1/layout refinements pass three focused Release suites in3.91s and two
+whole-core sanitizer suites in14.09s. The final native held-preview/rig suite
+passes14/14; compact640x360 at2x Unifont BDF passes4/4. The latest GPU suite has75
+checks and material visibility has22. Exact scopes, captures and diagnostic
+attempts are in VALIDATION.md. All30 upstream source hashes and the canonical
+qimgvr BDF helper still match. The pinned toolkit is unchanged.
 
-## Evidence and remaining work
+A final ownership audit moved desktop/input cleanup before returning the pending
+weight-operation guard. Its new regression accepts the desktop gesture through
+a rejected source-selection request, then successfully paints with XR pressure.
+It passes in Release2.94s and whole-core sanitizers12.96s. The product was rebuilt;
+this focused follow-up is distinct from the earlier broad/native GUI evidence.
 
-All48 registered Release suites pass on the combined source in328.08 seconds.
-The real-loader synthetic XR report is complete/passed with73 checks and zero
-failures. Six selected whole-core C/C++ ASan/UBSan/leak suites pass in153.30
-seconds. Native GUI checks pass: universal menus53, bake19, running cancellation3,
-compact 2x-BDF bake4, rig/weights12, avatar export5 and UV workflow12. See
-VALIDATION.md for exact logs, scope and the interrupted first validation attempt.
-The separate nested DomeD Wayland universal-menu retry passes8/8 with the local
-host binary identified in VALIDATION.md; the active desktop is untouched.
-Neither parent's earlier test results are substituted for these combined runs.
+No system install, active-session restart, fresh external Khronos validation or
+physical headset/controller/stylus/3D-mouse/accelerator completion is claimed.
+All validation handles were checked to terminal; inspect actual process state
+before starting work. Never restart a job because an observation timed out.
 
-Continue the full REQUIREMENTS.md objective. In particular, weight edits still
-compute after release; live stroke feedback, alpha-aware picking, production
-timing, automatic binding/transfer and full rig/morph creation tools remain.
-Conformal/stitching fixtures do not establish production atlas quality or full
-source-map UV bake/adopt. VRM0 source export is deliberately guarded; generated
-or painted avatar export, full VRM1/constraints/expressions and full glTF fidelity
-remain incomplete. Keep the existing retopology/cut kernels and add complete
-desktop/XR workflows, procedural tools and production sculpt/mask/symmetry/local
-meshing. All physical devices and OneAPI/ROCm/CUDA execution remain unverified.
+## Continue the full objective
 
-Cold private-HOME Fontconfig discovery can scan all installed fonts before
-App/Document construction. Initial GUI startup gets90 seconds; interaction
-deadlines remain30 seconds. The UV GUI harness now uses the same startup-only
-allowance. Profile/fix discovery in canonical qimgvr before propagating copies.
+Keep the fixed-pose gesture contract explicit. Preview recomputes bounded
+original-weight gestures and currently rebuilds a surface snapshot: incremental
+weight envelopes, efficient GPU attribute updates and production-size latency/
+memory remain important. Base-level alpha picking does not prove exact distant
+mip/anisotropic coverage. Swept volume painting is not geodesic/occlusion-clipped
+painting. Full automatic bind/transfer, interactive rig placement/fitting and
+morph creation remain unfinished.
 
-Preserve ordered workers, immutable snapshots, source/cancellation guards, exact
-gesture history, retained source archives, BDF fonts and universal menu ownership.
-No system installation, active-session restart or physical-device/backend
-completion is claimed. Inspect real process state before starting validation;
-never treat a tool observation timeout as termination. No agents were spawned.
+Continue source-map UV bake/adopt and production atlas quality, complete
+retopology/cut/procedural authoring, production sculpt masks/symmetry/local
+meshing, full glTF/VRM/MToon fidelity and all real device/backend rows. Retain
+existing remesh/bake, conformal/stitching, pose/morph, source archive/export and
+universal-menu workflows. Cold Fontconfig discovery remains a canonical qimgvr
+follow-up; GUI startup allows90s and interactions retain30s deadlines. Python
+is test orchestration only; authoring remains C++20/FLTK/EGL/OpenXR and BDF.
+
+Always fetch before overlapping work; preserve any newer remote histories.

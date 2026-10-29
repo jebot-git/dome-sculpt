@@ -182,6 +182,19 @@ int main(int argc, char **argv) try {
           !held.frame().state->can_undo && !held.frame().state->error.empty(),
           "A failed final weight computation restores its original preview and leaves history exact");
   }
+  {
+    Document lease; lease.replace(original.snapshot()); lease.weight_settings(tool(),1); lease.wait_mesh();
+    check(lease.begin_desktop(), "Desktop-to-XR lease fixture acquires a weight gesture");
+    lease.stamp_desktop(stamp(b.from));
+    check(rejects([&]{lease.select_object(2);}) && lease.wait_asset() && lease.wait_mesh() &&
+          lease.frame().state->active_object==1 && std::abs(value(lease.copy_scene(),1,0,1)-.5f)<1e-6f,
+          "A source-changing command waits for accepted weights without changing selection or discarding the gesture");
+    Controller hand(lease);hand.f.hands[1].tracked.grip.position=ob::transform(lease.frame().state->canvas,{b.from.x,b.from.y,b.from.z});
+    hand.send();hand.send(.8f);hand.send();
+    check(lease.wait_asset() && lease.frame().state->error.empty() &&
+          std::abs(value(lease.copy_scene(),1,0,1)-.7f)<1e-6f,
+          "Finishing a desktop gesture releases its input ownership so XR pressure can paint immediately afterward");
+  }
   check(!doc.frame().state->dirty && doc.begin_desktop(), "Opening weight view changes no saved scene and can acquire a stroke");
   doc.stamp_desktop(stamp(b.from)); doc.cancel_desktop();
   check(doc.copy_scene().encode() == source && !doc.frame().state->dirty, "Cancelled desktop gesture changes no weights or history");

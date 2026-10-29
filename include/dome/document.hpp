@@ -152,6 +152,7 @@ public:
   void end_desktop();
   void cancel_desktop();
   std::optional<Vec3> raycast(Vec3, Vec3) const;
+  std::optional<Vec3> raycast(Vec3, Vec3, double material_time) const;
   Vec3 gradient(Vec3) const;
   bool undo();
   bool redo();

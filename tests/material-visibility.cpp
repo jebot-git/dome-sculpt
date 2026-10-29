@@ -95,6 +95,12 @@ int main() try {
     range.material.alpha=Material::AlphaMode::Blend;range.material.color[3]=0;
     check(!hit(range,origin,0),"Native opacity overrides participate in retained MToon alpha visibility");
   }
+  {
+    auto toon=MToonMaterial::from_vrm1({{"alphaMode","MASK"},{"doubleSided",true},{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});
+    ranges[0].appearance=appearance(toon,true,false);ranges[0].first_vertex=4;
+    check(rejects([&]{MaterialSurfaceQuery invalid(stacked,ranges);}),
+          "Invalid packed UV1 ranges fail on the worker before any input query");
+  }
   check(rejects([&]{MaterialSurfaceQuery invalid(m,{});}),"Incomplete picking surface ranges fail before publication");
   std::cout<<"CHECKS "<<checks<<'\n';return 0;
 } catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

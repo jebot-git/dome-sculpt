@@ -78,6 +78,9 @@ struct Visibility {
           throw std::runtime_error("Visibility authored UV1 data is unavailable");
         for (auto id : a.source_vertices) if (id >= primitive->uv1.size())
           throw std::runtime_error("Visibility UV1 source vertex is invalid");
+        for (size_t i = r.first; i < r.first + r.count; ++i)
+          if (mesh.indices[i] < r.first_vertex || mesh.indices[i] - r.first_vertex >= a.source_vertices.size())
+            throw std::runtime_error("Visibility UV1 packed index is outside its source range");
       }
       return view;
     };

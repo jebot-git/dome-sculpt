@@ -503,11 +503,13 @@ void Document::finish_locked() {
   bool weight_action = weight_stroking_;
   if (action_active_locked() && end_action_locked())
     record_stroke_locked();
-  if (weight_action && state_.asset_busy)
-    throw std::logic_error("Wait for the accepted weight gesture to finish");
   desktop_ = false;
   input_.cancel();
   navigation_.reset();
+  if (weight_action && state_.asset_busy) {
+    publish_locked();
+    throw std::logic_error("Wait for the accepted weight gesture to finish");
+  }
 }
 void Document::replace(Scene next, bool clean) {
   next.validate();
@@ -605,11 +607,15 @@ void Document::cancel_desktop() {
   }
 }
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
+  return raycast(p, d, render_frame_time());
+}
+std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) const {
+  if (!std::isfinite(material_time)) throw std::invalid_argument("Invalid material pick time");
   std::lock_guard lock(model_mutex_);
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation != state_.generation || mesh->revision != state_.revision || !mesh->picking) return {};
-    auto hit = mesh->picking->raycast(p, d, 20, render_frame_time());
+    auto hit = mesh->picking->raycast(p, d, 20, material_time);
     if (!hit) return {};
     auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
     return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;

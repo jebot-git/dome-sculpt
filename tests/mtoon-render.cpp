@@ -67,6 +67,15 @@ int main(int argc,char**argv)try{
   check(at(draw(renderer,weighted))[3]==0,"V0/V1 selected-joint heatmaps preserve authored alpha-mask holes");
   MaterialSurfaceQuery picking(weighted->mesh,weighted->ranges);
   check(!picking.raycast({0,0,2},{0,0,-1},4),"CPU material picking and the weight viewport agree on transparent MToon coverage");
+  auto animated=alpha;animated.parameters.scroll={.5f,0};
+  auto split=std::make_shared<const Image>(Image{2,1,{255,255,255,0,255,255,255,255}});
+  auto animation=snapshot();animation->ranges[0].appearance=appearance(animated,{split});animation->selected_weights.assign(4,.5f);
+  MaterialSurfaceQuery moving(animation->mesh,animation->ranges);
+  renderer.set_frame_time(0);auto shown=at(draw(renderer,animation));
+  check(shown[3]>0&&moving.raycast({.01f,.01f,2},{0,0,-1},4,0).has_value(),"The displayed material frame time selects visible animated heatmap coverage");
+  renderer.set_frame_time(1);shown=at(draw(renderer,animation));
+  check(shown[3]==0&&!moving.raycast({.01f,.01f,2},{0,0,-1},4,1),"GPU and picking share the same animated alpha holes when the frame time advances");
+  renderer.set_frame_time(0);
   alpha.parameters.alpha=MToonAlpha::Blend;alpha.parameters.alpha_to_coverage=false;alpha.parameters.render_queue=3000;alpha.parameters.source_blend=5;alpha.parameters.destination_blend=10;alpha.parameters.depth_write=false;
   weighted=snapshot();weighted->ranges[0].appearance=appearance(alpha,{image({255,255,255,128})});
   auto original_alpha=at(draw(renderer,weighted))[3];weighted=std::make_shared<MeshSnapshot>(*weighted);weighted->selected_weights.assign(4,.5f);

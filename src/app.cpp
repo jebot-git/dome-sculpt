@@ -40,6 +40,7 @@ struct Canvas : Fl_Gl_Window {
   Vec3 pan{};
   Vec3 ball{}, last_stamp{};
   float distance = 2.2f, radius = .12f;
+  double material_time = 0;
   Tool tool = Tool::Clay;
   bool sculpting = false, have_stamp = false, dirty_mesh = true;
   int last_x = 0, last_y = 0;
@@ -89,7 +90,10 @@ struct Canvas : Fl_Gl_Window {
                    (1 - 2.f * (y - this->y()) / h()) * tangent, -1};
     Vec3 origin = rotation.inverse().rotate(Vec3{0, 0, distance} - pan);
     direction = rotation.inverse().rotate(normalized(direction));
-    auto hit = document.raycast(origin, direction);
+    auto state = document.frame().state;
+    if (state->weights.enabled && (!shown_mesh || shown_mesh->generation != state->generation ||
+        shown_mesh->revision != state->revision)) { have_stamp = false; return; }
+    auto hit = document.raycast(origin, direction, material_time);
     if (!hit) {
       have_stamp = false;
       return;
@@ -209,7 +213,8 @@ struct Canvas : Fl_Gl_Window {
     auto vp =
         multiply(projection(-right, right, -up, up), view_matrix(eye, {}));
     auto f = document.frame();
-    renderer->set_frame_time(render_frame_time());
+    material_time = render_frame_time();
+    renderer->set_frame_time(material_time);
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
                    f.state->toon, f.state->light);
     if (!capture.empty()) {
