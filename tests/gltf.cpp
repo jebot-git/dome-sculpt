@@ -4,6 +4,7 @@
 #include "dome/scene.hpp"
 #include <iostream>
 #include <memory>
+#include <png.h>
 #include <unistd.h>
 int main() try {
   dome::Volume field(.04f);
@@ -104,6 +105,61 @@ int main() try {
               local[0] == mesh.positions[0].x,
           "Second mesh accessors retain correct buffer offsets and local "
           "coordinates");
+  dome::PaintedMesh painting(mesh, 128);
+  dome::PaintSettings ink;
+  ink.color = {.01f, .03f, .95f, 1};
+  b.from = b.to = {0, 0, .38f};
+  b.normal = {0, 0, 1};
+  b.radius = .15f;
+  painting.begin_stroke();
+  painting.stamp(b, ink);
+  painting.end_stroke();
+  auto maps = painting.composite(dome::Material{});
+  objects.resize(1);
+  objects[0].textures = maps;
+  dome::export_glb(objects, path);
+  raw = nullptr;
+  require(cgltf_parse_file(&options, path.c_str(), &raw) ==
+              cgltf_result_success,
+          "Independent parser rejected painted GLB");
+  std::unique_ptr<cgltf_data, decltype(&cgltf_free)> textured(raw, cgltf_free);
+  require(cgltf_load_buffers(&options, raw, path.c_str()) ==
+                  cgltf_result_success &&
+              cgltf_validate(raw) == cgltf_result_success,
+          "Independent validator rejected painted GLB");
+  require(raw->images_count == 3 && raw->textures_count == 3,
+          "Painted GLB embeds three PBR PNG textures");
+  auto &pbr = raw->materials[0].pbr_metallic_roughness;
+  require(
+      pbr.base_color_texture.texture &&
+          pbr.metallic_roughness_texture.texture &&
+          raw->materials[0].emissive_texture.texture &&
+          pbr.base_color_factor[0] == 1 && pbr.metallic_factor == 1 &&
+          pbr.roughness_factor == 1,
+      "glTF binds composite textures without applying material factors twice");
+  const dome::Image *expected[] = {&maps->color, &maps->metal_rough,
+                                   &maps->emission};
+  for (size_t i = 0; i < 3; ++i) {
+    auto &image = raw->images[i];
+    require(image.buffer_view && image.mime_type &&
+                std::string(image.mime_type) == "image/png",
+            "Embedded texture references a PNG buffer view");
+    auto view = image.buffer_view;
+    auto bytes =
+        static_cast<const uint8_t *>(view->buffer->data) + view->offset;
+    png_image decoded{};
+    decoded.version = PNG_IMAGE_VERSION;
+    require(png_image_begin_read_from_memory(&decoded, bytes, view->size),
+            "Independent PNG decoder rejected embedded image bytes");
+    decoded.format = PNG_FORMAT_RGBA;
+    std::vector<uint8_t> rgba(PNG_IMAGE_SIZE(decoded));
+    require(png_image_finish_read(&decoded, nullptr, rgba.data(), 0, nullptr) &&
+                decoded.width == expected[i]->width &&
+                decoded.height == expected[i]->height &&
+                rgba == expected[i]->rgba,
+            "Embedded PNG preserves exact PBR texels and image orientation");
+    png_image_free(&decoded);
+  }
   std::filesystem::remove(path);
   std::cout << "PASS Independent cgltf validation, attributes, indices and "
                "exact metre-space geometry\n";

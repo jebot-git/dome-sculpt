@@ -61,6 +61,7 @@ try:
             "HOME": home,
             "XDG_RUNTIME_DIR": home,
             "XDG_CONFIG_HOME": home + "/config",
+            "XDG_CACHE_HOME": home + "/cache",
             "XDG_DATA_HOME": home + "/data",
             "DISPLAY": screen,
             "FLTK_BACKEND": "x11",
@@ -76,7 +77,7 @@ try:
         )
         processes.append(app)
         d = display.Display(screen)
-        until = time.monotonic() + 30
+        until = time.monotonic() + 90
         window = None
         while time.monotonic() < until:
             assert app.poll() is None, (out / "app.log").read_text()
@@ -262,6 +263,72 @@ try:
             sum(b > 80 and b > r * 1.5 for r, g, b in uncolored.get_flattened_data())
             < blue_pixels / 2,
             "Material edits participate in native scene undo",
+        )
+        key("p")
+        until = time.monotonic() + 8
+        while time.monotonic() < until:
+            assert app.poll() is None, (out / "app.log").read_text()
+            time.sleep(0.1)
+        frozen = shot("11-paint-mesh")
+        key("Alt_L", True)
+        key("p")
+        key("Alt_L", False)
+        until = time.monotonic() + 5
+        brush_editor = None
+        while time.monotonic() < until:
+            brush_editor = next(
+                (
+                    w
+                    for w in d.screen().root.query_tree().children
+                    if "Paint brush" in str(w.get_wm_name() or "")
+                ),
+                None,
+            )
+            if brush_editor:
+                break
+            time.sleep(0.05)
+        check(
+            brush_editor is not None,
+            "Texture brush settings open in a native FLTK editor",
+        )
+        editor = brush_editor
+        editor.set_input_focus(X.RevertToParent, X.CurrentTime)
+        d.sync()
+        time.sleep(0.3)
+        editor_field(68, "0.02")
+        editor_field(96, "0.04")
+        editor_field(124, "0.95")
+        g = editor.get_geometry()
+        raw = editor.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+        Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX").save(
+            out / "12-paint-brush.png"
+        )
+        xtest.fake_input(d, X.MotionNotify, x=g.x + 360, y=g.y + g.height - 34)
+        d.sync()
+        button(True)
+        button(False)
+        time.sleep(0.3)
+        motion(800, 400)
+        key("Shift_L", True)
+        button(True)
+        for x in (805, 815, 825):
+            motion(x, 400)
+        button(False)
+        key("Shift_L", False)
+        time.sleep(0.8)
+        inked = shot("13-texture-paint")
+        check(
+            sum(b > 80 and b > r * 1.5 for r, g, b in inked.get_flattened_data()) > 500,
+            "Shift and trackball drag paints a blue texture patch on the prepared mesh",
+        )
+        key("Control_L", True)
+        key("z")
+        key("Control_L", False)
+        time.sleep(0.8)
+        restored_paint = shot("14-undo-paint")
+        check(
+            ImageChops.difference(frozen, restored_paint).getbbox() is None,
+            "Native paint undo restores exact pre-stroke viewport pixels",
         )
         d.close()
 finally:

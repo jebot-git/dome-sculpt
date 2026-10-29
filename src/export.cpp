@@ -107,6 +107,42 @@ void export_glb(const std::vector<ObjectSurface> &objects,
          {"doubleSided", m.double_sided},
          {"alphaMode", m.color[3] < 1 ? "BLEND" : "OPAQUE"}});
   }
+  for (size_t i = 0; i < objects.size(); ++i)
+    if (objects[i].textures) {
+      if (objects[i].mesh.uv.empty())
+        throw std::invalid_argument("Textured meshes require UV coordinates");
+      auto &maps = *objects[i].textures;
+      auto &material = j["materials"][i];
+      if (j["samplers"].empty())
+        j["samplers"] = {{{"magFilter", 9729},
+                          {"minFilter", 9729},
+                          {"wrapS", 33071},
+                          {"wrapT", 33071}}};
+      auto texture = [&](const Image &image) {
+        auto bytes = image.png();
+        int view = int(j["bufferViews"].size()),
+            source = int(j["images"].size()), index = int(j["textures"].size());
+        j["bufferViews"].push_back({{"buffer", 0},
+                                    {"byteOffset", data.size()},
+                                    {"byteLength", bytes.size()}});
+        data.insert(data.end(), bytes.begin(), bytes.end());
+        while (data.size() % 4)
+          data.push_back(0);
+        j["images"].push_back(
+            {{"bufferView", view}, {"mimeType", "image/png"}});
+        j["textures"].push_back({{"source", source}, {"sampler", 0}});
+        return index;
+      };
+      auto &pbr = material["pbrMetallicRoughness"];
+      pbr["baseColorFactor"] = {1, 1, 1, 1};
+      pbr["metallicFactor"] = 1;
+      pbr["roughnessFactor"] = 1;
+      pbr["baseColorTexture"] = {{"index", texture(maps.color)}};
+      pbr["metallicRoughnessTexture"] = {{"index", texture(maps.metal_rough)}};
+      material["emissiveTexture"] = {{"index", texture(maps.emission)}};
+      material["emissiveFactor"] = {1, 1, 1};
+      material["alphaMode"] = maps.transparent ? "BLEND" : "OPAQUE";
+    }
   j["buffers"] = {{{"byteLength", data.size()}}};
   std::string text = j.dump();
   while (text.size() % 4)

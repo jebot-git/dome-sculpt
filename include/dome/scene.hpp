@@ -2,6 +2,7 @@
 #pragma once
 #include "mesh.hpp"
 #include "navigation.hpp"
+#include "paint.hpp"
 #include <memory>
 namespace dome {
 struct Material {
@@ -18,6 +19,8 @@ struct SculptObject {
   CanvasTransform transform{};
   bool visible = true, locked = false;
   Material material;
+  bool mesh_active = false;
+  std::shared_ptr<PaintedMesh> painted;
   std::shared_ptr<Volume> volume = std::make_shared<Volume>();
 };
 struct ObjectSurface {
@@ -26,6 +29,7 @@ struct ObjectSurface {
   CanvasTransform transform{};
   Material material;
   Mesh mesh;
+  std::shared_ptr<const TextureMaps> textures{};
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.

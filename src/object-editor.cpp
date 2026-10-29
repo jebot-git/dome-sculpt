@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "object-editor.hpp"
 #include "appearance.h"
+#include "ui-conventions.hpp"
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Double_Window.H>
@@ -21,7 +22,7 @@ void edit_object(Document &document) {
   Fl::screen_work_area(sx, sy, sw, sh);
   width = std::min(width, sw - 40);
   int height = std::min(row * 24, sh - 60), label = width * 2 / 5;
-  Fl_Double_Window window(width, height, "Object and material");
+  DomeDialog window(width, height, "Object and material");
   Fl_Scroll scroll(0, 0, width, height - row * 2);
   Fl_Group content(0, 0, width - 24, row * 22);
   content.resizable(nullptr);

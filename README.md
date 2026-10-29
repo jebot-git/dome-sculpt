@@ -7,7 +7,8 @@ There is no Python runtime, Unity or other engine in the application.
 
 The Blender baseline is pinned **5.4.0 Alpha**, commit
 `3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2`. Trackball projection is adapted from
-its native viewport navigation. OpenBrush Native's controller profiles and
+its native viewport navigation; ray/triangle picking is adapted from its native
+geometry math. OpenBrush Native's controller profiles and
 one/two-hand canvas navigation are compiled into the core. Its direct OpenXR
 session, EGL graphics and BDF spatial palette implementations provide the basis
 for the connected stereo sculpting path. DomeD's BDF appearance
@@ -26,7 +27,7 @@ build/dome-sculpt
 ```
 
 Requires a C++20 compiler, CMake 3.24+, nlohmann JSON headers, the patched DomeD
-FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, GIO, Fontconfig, zlib,
+FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, GIO, Fontconfig, libpng, zlib,
 X11/Wayland development libraries and `wayland-scanner`. xatlas is pinned and
 vendored, so configuring does not fetch its sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
 build just the native core and tests. `BUILD_TESTING=OFF` excludes test harness
@@ -58,7 +59,8 @@ Ctrl+Z / Ctrl+Shift+Z undo/redo complete strokes. Lost focus or Escape cancels
 an in-progress stroke. The viewport uses a native GGX metallic-roughness shader
 with editable per-object color, metalness, roughness, emission, opacity and
 culling. The View menu switches between PBR and a simple toon preview; full
-MToon properties and texture authoring remain to be added.
+MToon properties remain to be added. Layered color, metallic, roughness, emission
+and mask painting use a stable mesh and persisted UVs; see [painting](docs/PAINTING.md).
 
 The sparse signed-distance field supports swept capsule strokes, pressure,
 soft unions/subtraction, smoothing and flattening. Transactions retain exact
@@ -68,14 +70,15 @@ mapping back to source geometry. Artist seam controls and a UV editor are not
 implemented yet.
 
 Ctrl+S saves the scene as a private, atomically replaced `.dsculpt` CBOR file.
-Version 2 stores separate sculpt objects, stable identities, names, selection,
+Version 3 stores separate sculpt objects, stable identities, names, selection,
 uniform object transforms, visibility, locks, sparse fields and PBR material
-values. Version 1 volume projects open as a single-object scene. Ctrl+O reopens
+values, stable painting meshes, UVs and sparse paint layers. Version 1 volume
+projects and version 2 scenes remain readable. Ctrl+O reopens
 it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
-transforms, normals, packed UVs and PBR materials. Texture maps, skeletons and
-morph targets are still required for full glTF scene support. VRM export is
-deliberately unavailable until the humanoid rig, metadata, expressions, material and secondary-motion requirements
-are implemented.
+transforms, normals, packed UVs, PBR materials and embedded painted PNG maps.
+Skeletons, morph targets and import are still required for full glTF scene
+support. VRM export is deliberately unavailable until the humanoid rig, metadata,
+expressions, material and secondary-motion requirements are implemented.
 
 The Scene menu creates empty sculpts or clay spheres, duplicates and deletes
 objects, changes selection and toggles visibility or edit locks. Ctrl+D duplicates
@@ -113,11 +116,18 @@ Squeeze one controller to move the canvas; squeeze both to rotate and scale it.
 Trigger pressure sculpts at the tracked tip. Press the joystick to anchor the
 BDF menu, tilt it to select and press again to confirm. Starting at the right
 and proceeding counterclockwise, the twelve root sectors are Clay, Carve,
-Smooth, Flatten, Undo, Redo, Save, Export glTF, Objects, Materials, Larger and
-Smaller. Objects and Materials open submenus; their Back sector returns to the
+Smooth, Flatten, Undo, Redo, Save, Export glTF, Objects, Materials, Brush size and
+Flow. Objects and Materials open submenus; their Back sector returns to the
 root. The object page supports creation, duplication, selection, visibility,
 locking, deletion and basic placement steps. The material page offers color
-presets, metalness, roughness, opacity and PBR/toon preview selection. Save uses
+RGBA color sliders, metalness, roughness, opacity, paint tools and PBR/toon preview
+selection. Value controls open large sliders: aim and hold the trigger to drag,
+or tilt the stick horizontally for continuous adjustment. A scalar control's
+vertical wheel is ten times finer; color controls use vertical tilt to select
+an RGBA row. Press the stick or ray-click Done to accept. Ray-click Cancel or press Escape
+to cancel; lost focus/tracking also restores the original values. Material/layer gestures make one undo step.
+Brush size uses a logarithmic slider. A stylus can drag a panel opened by a
+controller. See [XR controls](docs/DOMED-INTEGRATION.md). Save uses
 the opened project path, or a private
 `$XDG_STATE_HOME/dome-sculpt/Recovery-PID.dsculpt` file for untitled work. Export
 uses the corresponding `.glb` path. File errors remain visible in the FLTK
@@ -125,9 +135,10 @@ status area and retain the changed document and prior saved file.
 
 Touch, Index and Vive profiles provide controller actions. MX Ink uses its
 extension-gated calibrated tip pose, middle-button force and tip force bindings;
-the stylus can be used alongside a controller for joystick menus. The FLTK
+the stylus can be used alongside a controller for joystick menus. The DomeD
 appearance selection supplies the XR palette's BDF face, pixel size, light/dark
-theme, accent and opacity. Live physical device behavior remains unverified.
+theme, accent and 25/50/75/100% chrome opacity, including live updates in standalone
+XR mode. Desktop backgrounds use DomeD dark/light grey. Live physical device behavior remains unverified.
 Rich spatial document dialogs and the rest of the production workflow remain
 in [the tracked requirements](docs/REQUIREMENTS.md).
 
@@ -135,6 +146,7 @@ in [the tracked requirements](docs/REQUIREMENTS.md).
 
 ```sh
 uv run --with python-xlib --with pillow python tests/gui.py
+uv run --with dbus-next --with python-xlib --with pillow python tests/menu.py
 build/dome-sculpt --export-demo artifacts/sculpt.glb
 ```
 
@@ -144,12 +156,13 @@ topology, UVs, persistence,
 GLB structure, input ownership and OpenBrush canvas transforms. The GUI test
 uses a private bus, HOME and Xvfb display to inspect actual FLTK/OpenGL pixels,
 carve/undo, orbit, view reset, object commands and the native material editor.
-Its report and images are in `artifacts/gui`.
+Its report and images are in `artifacts/gui`. A separate private universal-menu
+host tests actual DBusMenu state, dialog shortcuts and Cancel defaults.
 CTest additionally exercises the shared document workers, real EGL/OpenGL
-PBR/toon/palette rendering, and the real OpenXR loader against a native synthetic
-runtime. Its 26 checks cover stereo submission, controller/stylus edits, focus
+PBR/toon/textured-surface/palette/slider rendering, and the real OpenXR loader against a native synthetic
+runtime. Its 32 checks cover stereo submission, controller/stylus edits, focus
 and tracking loss, reference-space changes, object creation, material changes,
-file commands and overlay selection.
+layered painting, continuous slider input, file commands and overlay selection.
 The installed Monado runtime also completed a bounded 12-frame run with 11
 stereo submissions, but reported a simulated HMD and no controllers. Neither
 fixture establishes physical headset or stylus behavior. ASan/UBSan and leak

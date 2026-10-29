@@ -67,7 +67,7 @@ int main(int argc, char **argv) try {
   renderer.draw(doc.frame().surface, model, vp, {}, 640, 480, false, false,
                 true);
   auto light = capture("light");
-  if (pbr[0] >= 80 || light[0] <= 160 || light[0] != light[1] ||
+  if (pbr[0] != 48 || light[0] != 208 || light[0] != light[1] ||
       light[1] != light[2])
     throw std::runtime_error("Appearance does not select grey backgrounds");
   renderer.draw(doc.frame().surface, model, vp, {}, 640, 480, true);
@@ -93,6 +93,48 @@ int main(int argc, char **argv) try {
       ++blue;
   if (blue < 1000)
     throw std::runtime_error("Spatial menu selection is not visible");
+  auto slider = state;
+  slider.panel.position.z = -.7f;
+  slider.controls.parameter = VrParameter::Metallic;
+  slider.controls.title = "Material metalness";
+  slider.controls.value[0] = .2f;
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  palette.draw(slider, vp);
+  auto low_slider = capture("slider-low");
+  slider.controls.value[0] = .8f;
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  palette.draw(slider, vp);
+  auto high_slider = capture("slider-high");
+  size_t changed = 0;
+  for (size_t i = 0; i < low_slider.size(); ++i)
+    changed += low_slider[i] != high_slider[i];
+  if (changed < 1000)
+    throw std::runtime_error(
+        "Controller slider position is not visibly adjustable");
+  auto &pointer = slider.hands[1].tracked;
+  pointer.valid = pointer.aimValid = true;
+  pointer.aim.position = ob::transform(slider.panel, {.10875f, .01875f, .3f});
+  pointer.aim.orientation = slider.panel.orientation;
+  CursorRenderer cursors;
+  cursors.draw(slider, vp);
+  auto pointed_slider = capture("slider-pointer");
+  size_t pointer_pixels = 0;
+  for (size_t i = 0; i < high_slider.size(); ++i)
+    pointer_pixels += high_slider[i] != pointed_slider[i];
+  if (pointer_pixels < 10)
+    throw std::runtime_error(
+        "The controller aim ray and slider reticle are invisible");
+  slider.opacity = 64;
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480, true);
+  palette.draw(slider, vp);
+  std::vector<uint8_t> alpha(640 * 480 * 4);
+  glReadPixels(0, 0, 640, 480, GL_RGBA, GL_UNSIGNED_BYTE, alpha.data());
+  size_t quarter = 0;
+  for (size_t i = 3; i < alpha.size(); i += 4)
+    quarter += alpha[i] == 64;
+  if (quarter < 40000)
+    throw std::runtime_error(
+        "XR controls do not preserve DomeD's 25% chrome preset");
   auto original = doc.frame().state->active_object;
   Material red;
   red.color = {.9f, .025f, .01f, 1};
@@ -117,6 +159,40 @@ int main(int argc, char **argv) try {
   if (reds < 1000 || blues < 1000)
     throw std::runtime_error(
         "Objects did not render with independent PBR colors");
+  doc.select_object(original);
+  doc.prepare_mesh(128);
+  if (!doc.wait_asset() || !doc.frame().state->mesh_active || !doc.wait_mesh())
+    throw std::runtime_error("Paint mesh preparation failed");
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  auto frozen = capture("paint-before");
+  PaintSettings ink;
+  ink.color = {.01f, .95f, .01f, 1};
+  doc.paint_settings(ink);
+  Brush brush;
+  brush.normal = {0, 0, 1};
+  brush.from = brush.to = {-.28f, 0, .22f};
+  brush.radius = .24f;
+  if (!doc.begin_desktop())
+    throw std::runtime_error("Paint transaction unavailable");
+  doc.stamp_desktop(brush);
+  doc.end_desktop();
+  if (!doc.wait_mesh())
+    throw std::runtime_error("Paint preview did not update");
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  auto painted = capture("painted");
+  size_t greens = 0;
+  for (size_t i = 0; i < painted.size(); i += 3)
+    if (painted[i + 1] > 70 && painted[i + 1] > painted[i] * 2 &&
+        painted[i + 1] > painted[i + 2] * 2)
+      ++greens;
+  if (greens < 500)
+    throw std::runtime_error(
+        "Painted PBR texture is not visible in GPU pixels");
+  if (!doc.undo() || !doc.wait_mesh())
+    throw std::runtime_error("Paint undo did not update");
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  if (capture("paint-undo") != frozen)
+    throw std::runtime_error("Paint undo did not restore exact GPU pixels");
   glDeleteRenderbuffers(1, &depth);
   glDeleteTextures(1, &color);
   glDeleteFramebuffers(1, &fbo);

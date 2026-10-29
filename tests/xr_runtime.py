@@ -147,6 +147,55 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-client-") as directory:
         info["active_color"][2] > 0.7 and info["active_color"][0] < 0.1,
         "Joystick material page updates and persists the active object's blue material",
     )
+    paintbase, paintbasepath = run("paint-baseline", 1, extra=["--paint"])
+    check(
+        paintbase.returncode == 0,
+        "Native XR painting starts from a prepared mesh with persistent UVs",
+    )
+    basepaint = json.loads(
+        subprocess.check_output(
+            [str(binary), "--project-info", str(paintbasepath)], env=env, text=True
+        )
+    )
+    painted, paintpath = run(
+        "paint", 45, extra=["--paint"], mode={"DOME_XR_FIXTURE_PAINT": "1"}
+    )
+    check(
+        painted.returncode == 0,
+        "Tracked texture painting and nested paint palette complete in native OpenXR",
+    )
+    info = json.loads(
+        subprocess.check_output(
+            [str(binary), "--project-info", str(paintpath)], env=env, text=True
+        )
+    )
+    check(
+        info["painted"]
+        and info["paint_hash"] != basepaint["paint_hash"]
+        and info["field_hash"] == basepaint["field_hash"],
+        "XR pressure strokes change persistent texture pixels while preserving sculpt geometry",
+    )
+    check(
+        info["paint_blue_texels"] > 20,
+        "Nested joystick brush palette selects blue ink for the tracked paint stroke",
+    )
+    controlled, controlpath = run(
+        "controls", 45, mode={"DOME_XR_FIXTURE_CONTROLS": "1"}
+    )
+    check(
+        controlled.returncode == 0,
+        "Native OpenXR parameter controls complete with thumbstick and aim-ray input",
+    )
+    info = json.loads(
+        subprocess.check_output(
+            [str(binary), "--project-info", str(controlpath)], env=env, text=True
+        )
+    )
+    check(
+        abs(info["active_metallic"] - 0.75) < 0.002
+        and info["field_hash"] == baseinfo["field_hash"],
+        "Controller ray dragging commits the material slider while preserving geometry",
+    )
     files, _ = run("files", 45, mode={"DOME_XR_FIXTURE_FILES": "1"})
     check(
         files.returncode == 0,

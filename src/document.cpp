@@ -9,7 +9,18 @@ Vec3 vec(ob::Vec3 p) { return {p.x, p.y, p.z}; }
 } // namespace
 Document::Document() : input_(volume()) {
   input_.radius = state_.radius;
+  input_.allowed = [this](SpatialCommand command) {
+    return command_enabled_locked(command);
+  };
+  input_.parameter_allowed = [this](VrParameter parameter) {
+    return parameter_enabled_locked(parameter);
+  };
   input_.committed = [this] { record_stroke_locked(); };
+  input_.backend = {[this] { return action_active_locked(); },
+                    [this] { begin_action_locked(); },
+                    [this] { cancel_action_locked(); },
+                    [this](const Brush &b) { stamp_action_locked(b); },
+                    [this] { return end_action_locked(); }};
   published_.store(std::make_shared<EditorState>(state_));
   mesh_.store(std::make_shared<MeshSnapshot>());
   try {
@@ -64,6 +75,38 @@ Scene Document::copy_scene() const {
   std::lock_guard lock(model_mutex_);
   return scene_.snapshot();
 }
+bool Document::action_active_locked() const {
+  auto &o = scene_.active();
+  return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
+}
+bool Document::pending_locked() const {
+  auto &o = scene_.active();
+  return o.mesh_active ? o.painted->pending_changes()
+                       : volume().pending_changes();
+}
+void Document::begin_action_locked() {
+  state_.message.clear();
+  if (scene_.active().mesh_active)
+    scene_.active().painted->begin_stroke();
+  else
+    volume().begin_stroke();
+}
+void Document::stamp_action_locked(const Brush &b) {
+  if (scene_.active().mesh_active)
+    scene_.active().painted->stamp(b, state_.paint);
+  else
+    volume().stamp(b);
+}
+bool Document::end_action_locked() {
+  return scene_.active().mesh_active ? scene_.active().painted->end_stroke()
+                                     : volume().end_stroke();
+}
+void Document::cancel_action_locked() {
+  if (scene_.active().mesh_active)
+    scene_.active().painted->cancel_stroke();
+  else
+    volume().cancel_stroke();
+}
 void Document::record_locked(History entry) {
   entry.from = content_;
   entry.to = next_content_++;
@@ -74,13 +117,23 @@ void Document::record_locked(History entry) {
     undo_.pop_front();
 }
 void Document::record_stroke_locked() {
-  auto target = scene_.active().volume;
-  record_locked({target, {}, {}});
-  size_t count = std::count_if(undo_.begin(), undo_.end(),
-                               [&](auto &h) { return h.sculpt == target; });
-  for (auto it = undo_.begin();
-       count > target->undo_count() && it != undo_.end();) {
-    if (it->sculpt == target) {
+  History h;
+  if (scene_.active().mesh_active)
+    h.paint = scene_.active().painted;
+  else
+    h.sculpt = scene_.active().volume;
+  auto volume_target = h.sculpt;
+  auto paint_target = h.paint;
+  record_locked(std::move(h));
+  auto matches = [&](const History &entry) {
+    return paint_target ? entry.paint == paint_target
+                        : entry.sculpt == volume_target;
+  };
+  size_t available =
+      paint_target ? paint_target->undo_count() : volume_target->undo_count();
+  size_t count = std::count_if(undo_.begin(), undo_.end(), matches);
+  for (auto it = undo_.begin(); count > available && it != undo_.end();) {
+    if (matches(*it)) {
       it = undo_.erase(it);
       --count;
     } else
@@ -91,6 +144,8 @@ void Document::bind_locked() {
   input_.bind(volume());
   bound_volume_ = scene_.active().volume;
   last_volume_ = volume().revision();
+  last_paint_ =
+      scene_.active().mesh_active ? scene_.active().painted->revision() : 0;
   ++state_.input_epoch;
   std::lock_guard lock(input_mutex_);
   inputs_.clear();
@@ -115,12 +170,22 @@ bool Document::undo_locked(bool redo) {
   if (source.empty())
     return false;
   auto &h = source.back();
-  if (h.sculpt) {
+  if (h.paint) {
+    if (!(redo ? h.paint->redo() : h.paint->undo()))
+      return false;
+    for (auto &o : scene_.objects())
+      if (o.painted == h.paint) {
+        scene_.select(o.id);
+        scene_.active().mesh_active = true;
+        break;
+      }
+  } else if (h.sculpt) {
     if (!(redo ? h.sculpt->redo() : h.sculpt->undo()))
       return false;
     for (auto &o : scene_.objects())
       if (o.volume == h.sculpt) {
         scene_.select(o.id);
+        scene_.active().mesh_active = false;
         break;
       }
   } else
@@ -197,22 +262,46 @@ void Document::object_properties(uint64_t id, std::string name, bool visible,
   scene_changed_locked(std::move(before));
 }
 void Document::publish_locked(bool force) {
-  bool changed = force || last_volume_ != volume().revision();
+  auto &active = scene_.active();
+  uint64_t paint_revision = active.mesh_active ? active.painted->revision() : 0;
+  bool changed = force || last_volume_ != volume().revision() ||
+                 last_paint_ != paint_revision;
   if (changed) {
     last_volume_ = volume().revision();
+    last_paint_ = paint_revision;
     ++state_.revision;
   }
   state_.active_object = scene_.active().id;
   state_.objects.clear();
   for (auto &o : scene_.objects())
-    state_.objects.push_back(
-        {o.id, o.name, o.visible, o.locked, o.transform, o.material});
-  state_.stroking = volume().in_stroke();
-  state_.dirty = content_ != saved_content_ || volume().pending_changes();
+    state_.objects.push_back({o.id, o.name, o.visible, o.locked, o.transform,
+                              o.material, o.mesh_active});
+  state_.mesh_active = active.mesh_active;
+  state_.active_layer = active.mesh_active ? active.painted->active_layer() : 0;
+  state_.paint_layers.clear();
+  state_.layer_visible = false;
+  if (active.mesh_active)
+    for (auto &l : active.painted->layers()) {
+      state_.paint_layers.push_back(l.name);
+      if (l.id == state_.active_layer)
+        state_.layer_visible = l.visible;
+    }
+  state_.stroking = action_active_locked();
+  state_.dirty =
+      content_ != saved_content_ || pending_locked() || control_changed_;
   state_.tool = input_.tool();
   state_.menu = input_.menu_open();
   state_.menu_index = input_.menu_index();
   state_.menu_page = input_.menu_page();
+  state_.can_undo = command_enabled_locked(SpatialCommand::Undo);
+  state_.can_redo = command_enabled_locked(SpatialCommand::Redo);
+  for (int i = 0; i < 12; ++i) {
+    auto command = spatial_action(state_.menu_page, i);
+    auto parameter = spatial_parameter(state_.menu_page, i);
+    state_.menu_enabled[i] = parameter ? parameter_enabled_locked(*parameter)
+                             : command ? command_enabled_locked(*command)
+                                       : true;
+  }
   published_.store(std::make_shared<EditorState>(state_));
   if (changed) {
     std::lock_guard mesh_lock(mesh_mutex_);
@@ -222,7 +311,8 @@ void Document::publish_locked(bool force) {
   }
 }
 void Document::finish_locked() {
-  if (volume().in_stroke() && volume().end_stroke())
+  finish_control_locked(true);
+  if (action_active_locked() && end_action_locked())
     record_stroke_locked();
   desktop_ = false;
   input_.cancel();
@@ -247,6 +337,7 @@ void Document::replace(Scene next, bool clean) {
   input_changed_.notify_all();
   state_.error.clear();
   anchored_ = false;
+  state_.asset_busy = false;
   content_ = next_content_++;
   if (clean)
     saved_content_ = content_;
@@ -264,11 +355,11 @@ void Document::seed() {
 }
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
-  if (volume().in_stroke() || input_.menu_open() || !scene_.active().visible ||
-      scene_.active().locked)
+  if (state_.asset_busy || action_active_locked() || input_.menu_open() ||
+      !scene_.active().visible || scene_.active().locked)
     return false;
   input_.cancel();
-  volume().begin_stroke();
+  begin_action_locked();
   desktop_ = true;
   publish_locked();
   return true;
@@ -284,13 +375,13 @@ void Document::stamp_desktop(Brush b) {
   b.blend /= t.scale;
   auto n = ob::rotate(ob::conjugate(t.orientation), obv(b.normal));
   b.normal = vec(n);
-  volume().stamp(b);
+  stamp_action_locked(b);
   publish_locked();
 }
 void Document::end_desktop() {
   std::lock_guard lock(model_mutex_);
   if (desktop_) {
-    if (volume().end_stroke())
+    if (end_action_locked())
       record_stroke_locked();
     desktop_ = false;
     input_.cancel();
@@ -300,7 +391,7 @@ void Document::end_desktop() {
 void Document::cancel_desktop() {
   std::lock_guard lock(model_mutex_);
   if (desktop_) {
-    volume().cancel_stroke();
+    cancel_action_locked();
     desktop_ = false;
     input_.cancel();
     publish_locked();
@@ -312,7 +403,11 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
   if (!scene_.active().visible || scene_.active().locked)
     return {};
   auto direction = vec(ob::rotate(ob::conjugate(t.orientation), obv(d)));
-  auto hit = volume().raycast(world_to_model(t, p), direction, 10 / t.scale);
+  auto hit =
+      scene_.active().mesh_active
+          ? scene_.active().painted->raycast(world_to_model(t, p), direction,
+                                             10 / t.scale)
+          : volume().raycast(world_to_model(t, p), direction, 10 / t.scale);
   return hit ? std::optional<Vec3>(vec(ob::transform(t, obv(*hit))))
              : std::nullopt;
 }
@@ -320,7 +415,10 @@ Vec3 Document::gradient(Vec3 p) const {
   std::lock_guard lock(model_mutex_);
   auto t = scene_.active().transform;
   return vec(
-      ob::rotate(t.orientation, obv(volume().gradient(world_to_model(t, p)))));
+      ob::rotate(t.orientation,
+                 obv(scene_.active().mesh_active
+                         ? scene_.active().painted->normal(world_to_model(t, p))
+                         : volume().gradient(world_to_model(t, p)))));
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
@@ -375,12 +473,64 @@ void Document::shading(bool toon) {
   state_.toon = toon;
   publish_locked();
 }
+void Document::paint_settings(PaintSettings settings) {
+  settings.validate();
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  state_.paint = settings;
+  publish_locked();
+}
+void Document::paint_command(SpatialCommand command) {
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  command_locked(command);
+  publish_locked();
+}
+void Document::use_source() { paint_command(SpatialCommand::EditSource); }
+void Document::use_mesh() { paint_command(SpatialCommand::PaintColor); }
+void Document::prepare_mesh(uint32_t resolution) {
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  prepare_locked(resolution);
+  publish_locked();
+}
+bool Document::wait_asset(std::chrono::milliseconds timeout) const {
+  std::unique_lock lock(file_mutex_);
+  return file_changed_.wait_for(lock, timeout,
+                                [&] { return !published_.load()->asset_busy; });
+}
+void Document::prepare_locked(uint32_t resolution) {
+  if (resolution < 64 || resolution > 2048 || (resolution & (resolution - 1)))
+    throw std::invalid_argument("Invalid paint resolution");
+  if (state_.asset_busy)
+    throw std::logic_error("A painting mesh is already being prepared");
+  auto &o = scene_.active();
+  if (o.locked || !o.visible)
+    throw std::logic_error(
+        "Show and unlock the object before preparing a painting mesh");
+  FileJob job{scene_.snapshot(), {},       state_.revision,
+              state_.generation, content_, false};
+  job.prepare_mesh = true;
+  job.object = o.id;
+  job.source_revision = o.volume->revision();
+  job.source_identity = o.volume;
+  job.resolution = resolution;
+  std::lock_guard lock(file_mutex_);
+  if (files_.size() >= 8)
+    throw std::runtime_error("File and asset work queue is full");
+  files_.push_back(std::move(job));
+  state_.asset_busy = true;
+  state_.error.clear();
+  state_.message = "Preparing painting mesh and UVs...";
+  file_changed_.notify_one();
+}
 void Document::begin_spatial() {
   rebase_space({});
   report_error({});
 }
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
+  finish_control_locked(false);
   if (!desktop_)
     input_.cancel();
   navigation_.reset();
@@ -410,6 +560,7 @@ void Document::finish_spatial() {
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
   if (!desktop_) {
+    finish_control_locked(false);
     input_.cancel();
     navigation_.reset();
     publish_locked();
@@ -420,6 +571,7 @@ void Document::process_locked(const SpatialFrame &f) {
     return;
   if (!f.focused || !f.head_valid || !ob::finite(f.head) ||
       !std::isfinite(f.time) || f.time < 0) {
+    finish_control_locked(false);
     input_.cancel();
     navigation_.reset();
     state_.hands = {};
@@ -435,8 +587,8 @@ void Document::process_locked(const SpatialFrame &f) {
   std::array<TrackedHand, 2> hands{f.hands[0].tracked, f.hands[1].tracked};
   if (!input_.menu_open()) {
     if (auto transform = navigation_.update(hands, state_.canvas)) {
-      if (volume().in_stroke())
-        if (volume().end_stroke())
+      if (action_active_locked())
+        if (end_action_locked())
           record_stroke_locked();
       input_.cancel();
       state_.canvas = *transform;
@@ -450,7 +602,9 @@ void Document::process_locked(const SpatialFrame &f) {
   }
   auto object_canvas = ob::compose(state_.canvas, scene_.active().transform);
   input_.radius = state_.radius / object_canvas.scale;
-  input_.edit_allowed = scene_.active().visible && !scene_.active().locked;
+  input_.edit_allowed =
+      !state_.asset_busy && scene_.active().visible && !scene_.active().locked;
+  input_.painting = scene_.active().mesh_active;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
     const auto &h = f.hands[i];
@@ -470,8 +624,19 @@ void Document::process_locked(const SpatialFrame &f) {
     s.stick_x = h.x;
     s.stick_y = h.y;
     s.kind = h.kind;
+    if (state_.controls.parameter != VrParameter::None && h.tracked.aimValid) {
+      if (auto hit = panel_ray(state_.panel, h.tracked.aim)) {
+        s.panel_hit = true;
+        s.panel_u = hit->u;
+        s.panel_v = hit->v;
+      }
+    }
     input_.update(s);
   }
+  for (auto event : input_.take_controls())
+    control_event_locked(event);
+  if (control_before_ && !input_.menu_open())
+    finish_control_locked(false);
   if (!menu_was && input_.menu_open()) {
     state_.panel = {ob::transform(object_canvas, obv(input_.menu_anchor())),
                     f.head.orientation, 1};
@@ -492,6 +657,13 @@ void Document::process_locked(const SpatialFrame &f) {
     undo_locked(true);
   }
   state_.hands = f.hands;
+  publish_locked();
+}
+void Document::cancel_spatial_menu() {
+  std::lock_guard lock(model_mutex_);
+  finish_control_locked(false);
+  if (!desktop_)
+    input_.cancel();
   publish_locked();
 }
 void Document::input_loop() {
@@ -519,6 +691,7 @@ void Document::input_loop() {
           process_locked(f);
         }
       } catch (const std::exception &e) {
+        finish_control_locked(false);
         if (!desktop_)
           input_.cancel();
         state_.error = e.what();
@@ -559,10 +732,15 @@ void Document::mesh_loop() {
         for (auto n : o.mesh.normals)
           snapshot->mesh.normals.push_back(
               vec(ob::rotate(o.transform.orientation, obv(n))));
+        if (o.mesh.uv.empty())
+          snapshot->mesh.uv.resize(snapshot->mesh.positions.size(), {0, 0});
+        else
+          snapshot->mesh.uv.insert(snapshot->mesh.uv.end(), o.mesh.uv.begin(),
+                                   o.mesh.uv.end());
         for (auto index : o.mesh.indices)
           snapshot->mesh.indices.push_back(uint32_t(offset + index));
         snapshot->ranges.push_back(
-            {o.id, first, o.mesh.indices.size(), o.material});
+            {o.id, first, o.mesh.indices.size(), o.material, o.textures});
       }
       std::lock_guard lock(mesh_mutex_);
       if (published_.load()->generation == job->generation)
@@ -641,7 +819,396 @@ void Document::request_save(bool export_mesh) {
   publish_locked();
   file_locked(export_mesh);
 }
+bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if (state_.asset_busy || parameter == VrParameter::None)
+    return false;
+  auto &o = scene_.active();
+  if (parameter == VrParameter::LayerOpacity ||
+      parameter == VrParameter::LayerOrder)
+    return o.mesh_active && o.painted &&
+           (parameter != VrParameter::LayerOrder ||
+            o.painted->layers().size() > 1);
+  return true;
+}
+void Document::finish_control_locked(bool accept) {
+  if (!control_before_)
+    return;
+  bool changed = control_changed_;
+  if (accept && changed)
+    record_locked({{}, *control_before_, scene_});
+  else
+    scene_ = *control_before_;
+  if (!accept) {
+    state_.paint = control_settings_;
+    state_.radius = control_radius_;
+  }
+  control_before_.reset();
+  control_changed_ = false;
+  state_.controls = {};
+  if (changed)
+    publish_locked(true);
+}
+void Document::control_event_locked(VrControlEvent event) {
+  if (event.type == VrControlEventType::Begin) {
+    finish_control_locked(false);
+    if (!parameter_enabled_locked(event.parameter))
+      throw std::logic_error("This XR control is unavailable");
+    control_before_ = scene_;
+    control_settings_ = state_.paint;
+    control_radius_ = state_.radius;
+    control_object_ = scene_.active().id;
+    control_changed_ = false;
+    auto &o = scene_.active();
+    auto &c = state_.controls;
+    c = {};
+    c.parameter = event.parameter;
+    switch (event.parameter) {
+    case VrParameter::BrushRadius:
+      c.title = "Brush size";
+      c.minimum = .005f;
+      c.maximum = 2;
+      c.logarithmic = true;
+      c.value[0] = state_.radius;
+      break;
+    case VrParameter::Flow:
+      c.title = "Paint flow";
+      c.value[0] = state_.paint.flow;
+      break;
+    case VrParameter::Metallic:
+      c.title = "Material metalness";
+      c.value[0] = o.material.metallic;
+      break;
+    case VrParameter::Roughness:
+      c.title = "Material roughness";
+      c.value[0] = o.material.roughness;
+      break;
+    case VrParameter::Opacity:
+      c.title = "Material opacity";
+      c.value[0] = o.material.color[3];
+      break;
+    case VrParameter::BaseColor:
+      c.title = "Material color";
+      c.components = 4;
+      c.value = o.material.color;
+      break;
+    case VrParameter::InkColor:
+      c.title = "Brush color";
+      c.components = 4;
+      c.value = state_.paint.color;
+      break;
+    case VrParameter::InkEmission:
+      c.title = "Emission color";
+      c.components = 3;
+      for (int i = 0; i < 3; ++i)
+        c.value[i] = state_.paint.emission[i];
+      break;
+    case VrParameter::InkMetallic:
+      c.title = "Paint metalness";
+      c.value[0] = state_.paint.metallic;
+      break;
+    case VrParameter::InkRoughness:
+      c.title = "Paint roughness";
+      c.value[0] = state_.paint.roughness;
+      break;
+    case VrParameter::Mask:
+      c.title = "Mask value";
+      c.value[0] = state_.paint.mask;
+      break;
+    case VrParameter::LayerOpacity:
+    case VrParameter::LayerOrder: {
+      auto &layers = o.painted->layers();
+      auto it = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
+        return l.id == o.painted->active_layer();
+      });
+      c.title = event.parameter == VrParameter::LayerOpacity ? "Layer opacity"
+                                                             : "Layer order";
+      c.value[0] = event.parameter == VrParameter::LayerOpacity
+                       ? it->opacity
+                       : float(it - layers.begin());
+      if (event.parameter == VrParameter::LayerOrder)
+        c.maximum = float(layers.size() - 1);
+      o.painted = o.painted->snapshot();
+      break;
+    }
+    default:
+      break;
+    }
+    state_.message.clear();
+    return;
+  }
+  if (!control_before_ || event.parameter != state_.controls.parameter)
+    return;
+  auto &c = state_.controls;
+  if (event.type == VrControlEventType::Confirm ||
+      event.type == VrControlEventType::Cancel) {
+    finish_control_locked(event.type == VrControlEventType::Confirm);
+    return;
+  }
+  if (event.component < 0 || event.component >= c.components ||
+      !std::isfinite(event.value))
+    return;
+  c.selected = event.component;
+  if (event.type == VrControlEventType::Select)
+    return;
+  float value = c.value[event.component];
+  if (event.type == VrControlEventType::Absolute) {
+    float t = std::clamp(event.value, 0.f, 1.f);
+    value = c.logarithmic ? std::exp(std::log(c.minimum) +
+                                     t * std::log(c.maximum / c.minimum))
+                          : c.minimum + t * (c.maximum - c.minimum);
+  } else
+    value = c.logarithmic ? value * std::exp(event.value * .69314718056f)
+                          : value + event.value * .5f * (c.maximum - c.minimum);
+  value = std::clamp(value, c.minimum, c.maximum);
+  if (value == c.value[event.component])
+    return;
+  c.value[event.component] = value;
+  auto &o = scene_.object(control_object_);
+  auto &before = control_before_->object(control_object_);
+  bool scene_changed = false;
+  switch (c.parameter) {
+  case VrParameter::BrushRadius:
+    state_.radius = value;
+    break;
+  case VrParameter::Flow:
+    state_.paint.flow = value;
+    break;
+  case VrParameter::InkColor:
+    state_.paint.color[event.component] = value;
+    break;
+  case VrParameter::InkEmission:
+    state_.paint.emission[event.component] = value;
+    break;
+  case VrParameter::InkMetallic:
+    state_.paint.metallic = value;
+    break;
+  case VrParameter::InkRoughness:
+    state_.paint.roughness = value;
+    break;
+  case VrParameter::Mask:
+    state_.paint.mask = value;
+    break;
+  case VrParameter::BaseColor:
+    o.material.color[event.component] = value;
+    control_changed_ = o.material.color != before.material.color;
+    scene_changed = true;
+    break;
+  case VrParameter::Metallic:
+    o.material.metallic = value;
+    control_changed_ = value != before.material.metallic;
+    scene_changed = true;
+    break;
+  case VrParameter::Roughness:
+    o.material.roughness = value;
+    control_changed_ = value != before.material.roughness;
+    scene_changed = true;
+    break;
+  case VrParameter::Opacity:
+    o.material.color[3] = value;
+    control_changed_ = value != before.material.color[3];
+    scene_changed = true;
+    break;
+  case VrParameter::LayerOpacity: {
+    auto &layers = o.painted->layers();
+    auto it = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
+      return l.id == o.painted->active_layer();
+    });
+    auto &old = before.painted->layers();
+    auto original = std::find_if(old.begin(), old.end(),
+                                 [&](auto &l) { return l.id == it->id; });
+    o.painted->layer_properties(it->name, it->visible, value);
+    control_changed_ = value != original->opacity;
+    scene_changed = true;
+    break;
+  }
+  case VrParameter::LayerOrder: {
+    auto &layers = o.painted->layers();
+    auto it = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
+      return l.id == o.painted->active_layer();
+    });
+    int index = int(it - layers.begin()), target = int(std::lround(value));
+    while (index != target) {
+      int direction = target > index ? 1 : -1;
+      o.painted->move_layer(direction);
+      index += direction;
+    }
+    auto &old = before.painted->layers();
+    control_changed_ = false;
+    for (size_t i = 0; i < old.size(); ++i)
+      control_changed_ |= old[i].id != o.painted->layers()[i].id;
+    scene_changed = true;
+    break;
+  }
+  default:
+    break;
+  }
+  if (scene_changed)
+    publish_locked(true);
+}
+
+bool Document::command_enabled_locked(SpatialCommand command) const {
+  auto &o = scene_.active();
+  if (state_.asset_busy) {
+    switch (command) {
+    case SpatialCommand::Undo:
+    case SpatialCommand::Redo:
+    case SpatialCommand::Save:
+    case SpatialCommand::Export:
+    case SpatialCommand::MakeMesh:
+    case SpatialCommand::EditSource:
+    case SpatialCommand::PaintColor:
+    case SpatialCommand::PaintMetal:
+    case SpatialCommand::PaintRough:
+    case SpatialCommand::PaintGlow:
+    case SpatialCommand::PaintMask:
+    case SpatialCommand::AddLayer:
+    case SpatialCommand::DeleteLayer:
+      return false;
+    default:
+      break;
+    }
+  }
+  switch (command) {
+  case SpatialCommand::Undo:
+    return !undo_.empty() || pending_locked() || control_changed_;
+  case SpatialCommand::Redo:
+    return !redo_.empty() && !pending_locked() && !control_changed_;
+  case SpatialCommand::Delete:
+    return scene_.objects().size() > 1;
+  case SpatialCommand::Next:
+  case SpatialCommand::Previous:
+    return scene_.objects().size() > 1;
+  case SpatialCommand::NewSphere:
+  case SpatialCommand::NewEmpty:
+  case SpatialCommand::Duplicate:
+    return scene_.objects().size() < 256;
+  case SpatialCommand::MakeMesh:
+    return o.visible && !o.locked;
+  case SpatialCommand::EditSource:
+    return o.mesh_active;
+  case SpatialCommand::PaintColor:
+  case SpatialCommand::PaintMetal:
+  case SpatialCommand::PaintRough:
+  case SpatialCommand::PaintGlow:
+  case SpatialCommand::PaintMask:
+    return o.visible && !o.locked;
+  case SpatialCommand::AddLayer:
+    return o.mesh_active && o.painted && o.painted->layers().size() < 16;
+  case SpatialCommand::DeleteLayer:
+  case SpatialCommand::NextLayer:
+    return o.mesh_active && o.painted && o.painted->layers().size() > 1;
+  case SpatialCommand::LayerVisible:
+  case SpatialCommand::LayerOpacity:
+    return o.mesh_active && bool(o.painted);
+  case SpatialCommand::Larger:
+    return state_.radius < 2;
+  case SpatialCommand::Smaller:
+    return state_.radius > .005f;
+  default:
+    return true;
+  }
+}
 void Document::command_locked(SpatialCommand command) {
+  if (command == SpatialCommand::MakeMesh) {
+    prepare_locked(512);
+    return;
+  }
+  if (command == SpatialCommand::EditSource) {
+    if (scene_.active().mesh_active) {
+      Scene before = scene_;
+      scene_.active().mesh_active = false;
+      scene_changed_locked(std::move(before));
+    }
+    return;
+  }
+  if (command >= SpatialCommand::PaintColor &&
+      command <= SpatialCommand::PaintMask) {
+    state_.message.clear();
+    state_.paint.channel =
+        PaintChannel(int(command) - int(SpatialCommand::PaintColor));
+    auto &o = scene_.active();
+    if (!o.painted)
+      prepare_locked(512);
+    else if (!o.mesh_active) {
+      Scene before = scene_;
+      o.mesh_active = true;
+      scene_changed_locked(std::move(before));
+    }
+    return;
+  }
+  switch (command) {
+  case SpatialCommand::PaintRed:
+    state_.paint.color = {.9f, .02f, .01f, 1};
+    return;
+  case SpatialCommand::PaintGreen:
+    state_.paint.color = {.02f, .8f, .03f, 1};
+    return;
+  case SpatialCommand::PaintBlue:
+    state_.paint.color = {.02f, .04f, .9f, 1};
+    return;
+  case SpatialCommand::PaintWhite:
+    state_.paint.mask = 1;
+    state_.paint.color = {1, 1, 1, 1};
+    return;
+  case SpatialCommand::PaintBlack:
+    state_.paint.mask = 0;
+    state_.paint.color = {0, 0, 0, 1};
+    return;
+  case SpatialCommand::PaintWarm:
+    state_.paint.color = {.8f, .25f, .05f, 1};
+    return;
+  case SpatialCommand::FlowUp:
+    state_.paint.flow = std::min(1.f, state_.paint.flow + .1f);
+    return;
+  case SpatialCommand::FlowDown:
+    state_.paint.flow = std::max(.05f, state_.paint.flow - .1f);
+    return;
+  case SpatialCommand::ErasePaint:
+    state_.paint.erase = !state_.paint.erase;
+    return;
+  default:
+    break;
+  }
+  if (command == SpatialCommand::NextLayer ||
+      command == SpatialCommand::AddLayer ||
+      command == SpatialCommand::DeleteLayer ||
+      command == SpatialCommand::LayerVisible ||
+      command == SpatialCommand::LayerOpacity) {
+    auto &o = scene_.active();
+    if (!o.painted || !o.mesh_active)
+      throw std::logic_error("Prepare or select a painting mesh first");
+    if (command == SpatialCommand::NextLayer) {
+      auto &layers = o.painted->layers();
+      auto i = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
+        return l.id == o.painted->active_layer();
+      });
+      o.painted->select_layer(
+          layers[(size_t(i - layers.begin()) + 1) % layers.size()].id);
+      return;
+    }
+    Scene before = scene_;
+    auto next = o.painted->snapshot();
+    if (command == SpatialCommand::AddLayer)
+      next->add_layer("Paint " +
+                      std::to_string(o.painted->layers().size() + 1));
+    else if (command == SpatialCommand::DeleteLayer)
+      next->delete_layer();
+    else {
+      auto &layers = next->layers();
+      auto &l = *std::find_if(layers.begin(), layers.end(), [&](auto &v) {
+        return v.id == next->active_layer();
+      });
+      next->layer_properties(
+          l.name,
+          command == SpatialCommand::LayerVisible ? !l.visible : l.visible,
+          command == SpatialCommand::LayerOpacity
+              ? (l.opacity > .26f ? l.opacity - .25f : 1.f)
+              : l.opacity);
+    }
+    o.painted = std::move(next);
+    scene_changed_locked(std::move(before));
+    return;
+  }
   switch (command) {
   case SpatialCommand::Undo:
     undo_locked(false);
@@ -776,6 +1343,40 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if (job->prepare_mesh) {
+        auto &source = job->scene.object(job->object);
+        auto mesh =
+            surface_mesh(*source.volume, [&] { return stopping_.load(); });
+        unwrap(mesh, job->resolution);
+        auto painted =
+            std::make_shared<PaintedMesh>(std::move(mesh), job->resolution);
+        std::lock_guard lock(model_mutex_);
+        if (job->generation == state_.generation) {
+          auto it =
+              std::find_if(scene_.objects().begin(), scene_.objects().end(),
+                           [&](auto &o) { return o.id == job->object; });
+          state_.asset_busy = false;
+          if (it == scene_.objects().end() ||
+              it->volume != job->source_identity ||
+              it->volume->revision() != job->source_revision ||
+              action_active_locked())
+            throw std::runtime_error(
+                "The source changed while its painting mesh was being "
+                "prepared; retry on the current object");
+          Scene before = scene_;
+          auto &o = scene_.object(job->object);
+          o.painted = std::move(painted);
+          o.mesh_active = true;
+          state_.message = "Painting mesh ready";
+          state_.error.clear();
+          scene_changed_locked(std::move(before));
+        }
+        {
+          std::lock_guard file_lock(file_mutex_);
+          file_changed_.notify_all();
+        }
+        continue;
+      }
       if (job->export_mesh) {
         export_glb(job->scene.surfaces(true), job->path);
       } else
@@ -798,8 +1399,14 @@ void Document::file_loop() {
     } catch (const std::exception &e) {
       std::lock_guard lock(model_mutex_);
       if (job->generation == state_.generation) {
+        if (job->prepare_mesh)
+          state_.asset_busy = false;
         state_.error = e.what();
         publish_locked();
+      }
+      {
+        std::lock_guard file_lock(file_mutex_);
+        file_changed_.notify_all();
       }
       if (job->completion)
         job->completion->set_exception(std::current_exception());

@@ -119,6 +119,20 @@ int main() try {
   j = loaded.encode();
   j["active"] = 999;
   rejects(j, "Missing active objects are rejected");
+  auto legacy = loaded.encode();
+  legacy["version"] = 2;
+  for (auto &object : legacy["objects"]) {
+    object.erase("mesh_active");
+    object.erase("painted");
+  }
+  auto migrated = Scene::decode(legacy);
+  require(migrated.objects().size() == 2 &&
+              migrated.active().material.color == blue.color &&
+              migrated.active().volume->voxels() ==
+                  loaded.active().volume->voxels() &&
+              !migrated.active().painted && !migrated.active().mesh_active,
+          "Version-two scenes retain material and source geometry without "
+          "painting assets");
   first.active().volume->save(file);
   loaded = Scene::load(file);
   require(loaded.objects().size() == 1 &&

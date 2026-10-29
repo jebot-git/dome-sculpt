@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "volume.hpp"
+#include "vr-controls.hpp"
 #include <functional>
 #include <optional>
 namespace dome {
@@ -33,15 +34,39 @@ enum class SpatialCommand {
   RoughDown,
   Toon,
   Pbr,
-  Opacity
+  Opacity,
+  MakeMesh,
+  EditSource,
+  PaintColor,
+  PaintMetal,
+  PaintRough,
+  PaintGlow,
+  PaintMask,
+  AddLayer,
+  NextLayer,
+  ErasePaint,
+  PaintRed,
+  PaintGreen,
+  PaintBlue,
+  PaintWhite,
+  PaintBlack,
+  PaintWarm,
+  FlowUp,
+  FlowDown,
+  LayerVisible,
+  DeleteLayer,
+  LayerOpacity
 };
 const std::array<const char *, 12> &spatial_labels(int page);
+std::optional<SpatialCommand> spatial_action(int page, int index);
 struct SpatialSample {
   uint32_t id = 0;
   uint64_t sequence = 0;
   double time = 0;
   Vec3 tip{}, normal{0, 1, 0};
   float pressure = 0, stick_x = 0, stick_y = 0;
+  bool panel_hit = false;
+  float panel_u = 0, panel_v = 0;
   bool trigger = false, joystick_press = false, tracked = false,
        focused = false;
   DeviceKind kind = DeviceKind::Controller;
@@ -75,12 +100,30 @@ public:
   float radius = .1f, strength = 1;
   bool edit_allowed = true;
   std::function<void()> committed;
+  std::function<bool(SpatialCommand)> allowed;
+  struct StrokeBackend {
+    std::function<bool()> active;
+    std::function<void()> begin, cancel;
+    std::function<void(const Brush &)> stamp;
+    std::function<bool()> end;
+  } backend;
+  bool painting = false;
+  std::function<bool(VrParameter)> parameter_allowed;
+  std::vector<VrControlEvent> take_controls() {
+    auto result = std::move(controls_);
+    controls_.clear();
+    return result;
+  }
 
 private:
   Volume *volume_;
   void end_stroke() {
-    if (volume_->end_stroke() && committed)
+    if ((backend.end ? backend.end() : volume_->end_stroke()) && committed)
       committed();
+  }
+  void ray_controls(const SpatialSample &, bool pressed);
+  bool stroke_active() const {
+    return backend.active ? backend.active() : volume_->in_stroke();
   }
   uint32_t device_ = 0;
   struct DeviceState {
@@ -91,7 +134,11 @@ private:
   std::unordered_map<uint32_t, DeviceState> devices_;
   bool menu_ = false;
   Tool tool_ = Tool::Clay;
-  int selected_ = 0, page_ = 0;
+  int selected_ = 0, page_ = 0, parent_page_ = 0, parent_sector_ = 0,
+      component_ = 0, y_latch_ = 0;
+  VrParameter parameter_ = VrParameter::None;
+  bool control_armed_ = false;
+  std::vector<VrControlEvent> controls_;
   std::optional<SpatialCommand> command_;
   Vec3 previous_{}, menu_anchor_{};
 };

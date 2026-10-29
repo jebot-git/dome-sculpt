@@ -440,11 +440,15 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
   bool button = right(p->subactionPath) && a->name == "recenter";
   out->isActive = XR_TRUE;
   out->currentState =
-      button && (frame == 8 || frame == 10 ||
-                 (getenv("DOME_XR_FIXTURE_SCENE") &&
-                  (frame == 12 || frame == 16 || frame == 18 || frame == 20)) ||
-                 (getenv("DOME_XR_FIXTURE_FILES") &&
-                  (frame == 24 || frame == 26 || frame == 28 || frame == 30)));
+      button &&
+      (frame == 8 || frame == 10 ||
+       (getenv("DOME_XR_FIXTURE_PAINT") &&
+        (frame == 12 || frame == 14 || frame == 16 || frame == 18)) ||
+       (getenv("DOME_XR_FIXTURE_CONTROLS") && (frame == 12 || frame == 21)) ||
+       (getenv("DOME_XR_FIXTURE_SCENE") &&
+        (frame == 12 || frame == 16 || frame == 18 || frame == 20)) ||
+       (getenv("DOME_XR_FIXTURE_FILES") &&
+        (frame == 24 || frame == 26 || frame == 28 || frame == 30)));
   out->changedSinceLastSync = button && (frame >= 8 && frame <= 11);
   return XR_SUCCESS;
 }
@@ -459,6 +463,10 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     bool stroke =
         (frame >= 2 && frame <= 5) ||
         (!getenv("DOME_XR_FIXTURE_SCENE") && frame >= 13 && frame <= 18);
+    if (getenv("DOME_XR_FIXTURE_PAINT"))
+      stroke = (frame >= 2 && frame <= 5) || (frame == 20);
+    if (getenv("DOME_XR_FIXTURE_CONTROLS"))
+      stroke = frame == 19;
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -495,6 +503,28 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (frame == 19 || frame == 20)
       out->currentState = {.8660254f, .5f};
   }
+  if (getenv("DOME_XR_FIXTURE_PAINT") && right(p->subactionPath) &&
+      a->name == "right_stick") {
+    if (frame == 9 || frame == 10)
+      out->currentState = {0, -1};
+    if (frame == 11 || frame == 12)
+      out->currentState = {0, 1};
+    if (frame == 13 || frame == 14)
+      out->currentState = {.8660254f, -.5f};
+    if (frame == 15 || frame == 16)
+      out->currentState = {0, -1};
+    if (frame == 17 || frame == 18)
+      out->currentState = {.5f, .8660254f};
+  }
+  if (getenv("DOME_XR_FIXTURE_CONTROLS") && right(p->subactionPath) &&
+      a->name == "right_stick") {
+    if (frame == 9 || frame == 10)
+      out->currentState = {0, -1};
+    if (frame == 11 || frame == 12)
+      out->currentState = {-.5f, .8660254f};
+    if (frame >= 14 && frame <= 18)
+      out->currentState = {1, 0};
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStatePose, XrSession, const XrActionStateGetInfo *,
@@ -525,6 +555,11 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
                         1.48f, -.48f};
+  if (getenv("DOME_XR_FIXTURE_CONTROLS") && s->action &&
+      s->action->name == "aim_pose" && right(s->hand) && frame == 19) {
+    p->pose.position = {.045f + (((100 + 420 * .75f) / 640) - .5f) * .6f,
+                        1.56f + (.5f - 300.f / 640) * .6f, -.3f};
+  }
   return XR_SUCCESS;
 }
 FN(ApplyHapticFeedback, XrSession, const XrHapticActionInfo *,
@@ -550,28 +585,27 @@ FN(GetInstanceProcAddr, XrInstance, const char *name, PFN_xrVoidFunction *out) {
   ENTRY(GetSystemProperties)
   ENTRY(GetOpenGLGraphicsRequirementsKHR)
   ENTRY(CreateSession)
-  ENTRY(DestroySession) ENTRY(EnumerateReferenceSpaces) ENTRY(
-      CreateReferenceSpace) ENTRY(DestroySpace) ENTRY(CreateActionSet)
-      ENTRY(DestroyActionSet) ENTRY(CreateAction) ENTRY(DestroyAction)
-          ENTRY(StringToPath) ENTRY(PathToString) ENTRY(
-              SuggestInteractionProfileBindings) ENTRY(AttachSessionActionSets)
-              ENTRY(CreateActionSpace) ENTRY(EnumerateEnvironmentBlendModes)
-                  ENTRY(EnumerateViewConfigurationViews) ENTRY(
-                      EnumerateSwapchainFormats) ENTRY(CreateSwapchain)
-                      ENTRY(DestroySwapchain) ENTRY(
-                          EnumerateSwapchainImages) ENTRY(AcquireSwapchainImage)
-                          ENTRY(WaitSwapchainImage) ENTRY(
-                              ReleaseSwapchainImage) ENTRY(BeginSession)
-                              ENTRY(EndSession) ENTRY(RequestExitSession) ENTRY(
-                                  PollEvent) ENTRY(WaitFrame) ENTRY(BeginFrame)
-                                  ENTRY(EndFrame) ENTRY(LocateViews) ENTRY(
-                                      SyncActions) ENTRY(GetActionStateBoolean)
-                                      ENTRY(GetActionStateFloat)
-                                          ENTRY(GetActionStateVector2f)
-                                              ENTRY(GetActionStatePose) ENTRY(
-                                                  GetCurrentInteractionProfile)
-                                                  ENTRY(LocateSpace) ENTRY(
-                                                      ApplyHapticFeedback)
+  ENTRY(DestroySession)
+  ENTRY(EnumerateReferenceSpaces)
+  ENTRY(CreateReferenceSpace)
+  ENTRY(DestroySpace) ENTRY(CreateActionSet) ENTRY(DestroyActionSet) ENTRY(
+      CreateAction) ENTRY(DestroyAction) ENTRY(StringToPath) ENTRY(PathToString)
+      ENTRY(SuggestInteractionProfileBindings) ENTRY(AttachSessionActionSets)
+          ENTRY(CreateActionSpace) ENTRY(EnumerateEnvironmentBlendModes) ENTRY(
+              EnumerateViewConfigurationViews) ENTRY(EnumerateSwapchainFormats)
+              ENTRY(CreateSwapchain) ENTRY(DestroySwapchain) ENTRY(
+                  EnumerateSwapchainImages) ENTRY(AcquireSwapchainImage)
+                  ENTRY(WaitSwapchainImage) ENTRY(ReleaseSwapchainImage) ENTRY(
+                      BeginSession) ENTRY(EndSession) ENTRY(RequestExitSession)
+                      ENTRY(PollEvent) ENTRY(WaitFrame) ENTRY(BeginFrame)
+                          ENTRY(EndFrame) ENTRY(LocateViews) ENTRY(SyncActions)
+                              ENTRY(GetActionStateBoolean)
+                                  ENTRY(GetActionStateFloat)
+                                      ENTRY(GetActionStateVector2f)
+                                          ENTRY(GetActionStatePose) ENTRY(
+                                              GetCurrentInteractionProfile)
+                                              ENTRY(LocateSpace)
+                                                  ENTRY(ApplyHapticFeedback)
                                                       ENTRY(StopHapticFeedback)
 #undef ENTRY
                                                           *out = nullptr;

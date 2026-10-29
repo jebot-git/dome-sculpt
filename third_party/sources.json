@@ -4,7 +4,7 @@
     "commit": "3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2",
     "version": "5.4.0 Alpha",
     "version_evidence": "third_party/blender/BKE_blender_version.h",
-    "used": "Sphere/hyperbola trackball projection adapted from calctrackballvec in view3d_navigate.cc, lines 713-735. Other Blender kernels are not yet ported.",
+    "used": "Sphere/hyperbola trackball projection adapted from calctrackballvec in view3d_navigate.cc, lines 713-735; ray/triangle picking adapted from isect_ray_tri_v3 in math_geom.cc, lines 1812-1867, with relative determinant epsilon for metre-scale geometry. Other Blender kernels are not yet ported.",
     "license": "GPL-2.0-or-later"
   },
   "openbrush_native": {
@@ -79,7 +79,8 @@
     "third_party/openbrush/LICENSE": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
     "third_party/openbrush/NOTICE": "1f803515edb3051e981a6d9f1bc4eb5f4b10f720c10206bd74d3fba773355cfc",
     "third_party/openbrush/LICENSE.native-graphics": "efaded5e13e8b31b1f90302da538b1d638270b432fddbf705f00fd35d9e8b499",
-    "third_party/cgltf/cgltf.h": "efb169dee911696b5d35fc8e3f7ea0c56d679debc529eba9ca6aa6443ba9d5e9"
+    "third_party/cgltf/cgltf.h": "efb169dee911696b5d35fc8e3f7ea0c56d679debc529eba9ca6aa6443ba9d5e9",
+    "third_party/blender/math_geom.cc.reference": "68114c7b9742363686ab606c54791b2d745df3cb8c339aaac057397fd3c0c419"
   },
   "cgltf": {
     "repository": "https://github.com/jkuhlmann/cgltf",
@@ -87,5 +88,9 @@
     "origin": "Existing pinned header in qimgvr/third_party/cgltf",
     "license": "MIT",
     "used": "Independent native export test only; not linked into the application"
+  },
+  "libpng": {
+    "origin": "System development package, CMake PNG::PNG",
+    "used": "Native PNG encoding for embedded glTF textures and independent decoding tests; not vendored"
   }
 }

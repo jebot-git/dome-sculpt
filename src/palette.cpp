@@ -126,7 +126,7 @@ void SpatialPalette::raster(const EditorState &s) {
                      : Color{31, 37, 45, uint8_t(s.opacity)},
         fg = s.light ? Color{30, 37, 46, 255} : Color{231, 235, 241, 255};
   Color accent{uint8_t(s.accent >> 16), uint8_t(s.accent >> 8),
-               uint8_t(s.accent), 255};
+               uint8_t(s.accent), uint8_t(s.opacity)};
   auto rect = [&](int x, int y, int w, int h, Color c) {
     for (int row = std::max(0, y); row < std::min(height_, y + h); ++row)
       for (int col = std::max(0, x); col < std::min(width_, x + w); ++col)
@@ -153,6 +153,98 @@ void SpatialPalette::raster(const EditorState &s) {
     }
   };
   rect(0, 0, width_, height_, bg);
+  if (s.controls.parameter != VrParameter::None) {
+    auto &c = s.controls;
+    text(320 * unit_, 80 * unit_, c.title, fg);
+    auto normalized = [&](float v) {
+      return std::clamp(
+          c.logarithmic
+              ? std::log(v / c.minimum) / std::log(c.maximum / c.minimum)
+              : (v - c.minimum) / std::max(1e-8f, c.maximum - c.minimum),
+          0.f, 1.f);
+    };
+    for (int row = 0; row < c.components; ++row) {
+      int y = c.components == 1   ? 300
+              : c.components == 4 ? 210 + row * 70
+                                  : 240 + row * 80;
+      float value = c.value[row], t = normalized(value);
+      Color track = s.light ? Color{180, 190, 205, uint8_t(s.opacity)}
+                            : Color{60, 70, 85, uint8_t(s.opacity)};
+      rect(100 * unit_, (y - 8) * unit_, 420 * unit_, 16 * unit_, track);
+      rect(100 * unit_, (y - 8) * unit_, int(420 * t) * unit_, 16 * unit_,
+           accent);
+      rect(int(100 + 420 * t - 12) * unit_, (y - 28) * unit_, 24 * unit_,
+           56 * unit_, row == c.selected ? accent : fg);
+      std::string label;
+      if (c.components > 1)
+        label = std::string(1, "RGBA"[row]) + " ";
+      if (c.parameter == VrParameter::BrushRadius)
+        label += std::to_string(int(std::lround(value * 1000))) + " mm";
+      else if (c.parameter == VrParameter::LayerOrder)
+        label += "Layer " + std::to_string(int(std::lround(value)) + 1);
+      else
+        label += std::to_string(int(std::lround(value * 100))) + "%";
+      text(320 * unit_, (c.components == 1 ? 220 : y - 38) * unit_, label, fg);
+    }
+    if (c.components == 1) {
+      rect(558 * unit_, 232 * unit_, 40 * unit_, 136 * unit_,
+           s.light ? Color{200, 209, 220, uint8_t(s.opacity)}
+                   : Color{55, 65, 80, uint8_t(s.opacity)});
+      int offset = int(normalized(c.value[0]) * 1000) % 16;
+      for (int y = 240 + offset; y < 360; y += 16)
+        rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
+      rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
+    } else {
+      Color swatch{
+          uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
+          uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
+          uint8_t(std::clamp(linear_to_srgb(c.value[2]), 0.f, 1.f) * 255), 255};
+      rect(280 * unit_, 470 * unit_, 80 * unit_, 40 * unit_, swatch);
+    }
+    text(320 * unit_, 530 * unit_, "Aim + trigger: drag slider", fg);
+    text(320 * unit_, 560 * unit_,
+         c.components == 1 ? "Stick: slide / Vertical: fine wheel"
+                           : "Up/down: row / Left/right: value",
+         fg);
+    rect(60 * unit_, 588 * unit_, 220 * unit_, 42 * unit_,
+         s.light ? Color{200, 209, 220, uint8_t(s.opacity)}
+                 : Color{55, 65, 80, uint8_t(s.opacity)});
+    rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, accent);
+    text(170 * unit_, 616 * unit_, "Cancel", fg);
+    text(470 * unit_, 616 * unit_, "Done / Press", fg);
+    return;
+  }
+  auto current = std::find_if(s.objects.begin(), s.objects.end(),
+                              [&](auto &o) { return o.id == s.active_object; });
+  auto marked = [&](int sector) -> std::optional<bool> {
+    if (s.menu_page == 0 && sector < 4)
+      return int(s.tool) == sector;
+    if (s.menu_page == 1 && current != s.objects.end()) {
+      if (sector == 5)
+        return current->visible;
+      if (sector == 6)
+        return current->locked;
+    }
+    if (s.menu_page == 2 && current != s.objects.end()) {
+      if (sector == 9)
+        return current->material.toon;
+      if (sector == 10)
+        return !current->material.toon;
+    }
+    if (s.menu_page == 3) {
+      if (sector == 1)
+        return !s.mesh_active;
+      if (sector >= 2 && sector <= 6)
+        return s.mesh_active && int(s.paint.channel) == sector - 2;
+      if (sector == 10)
+        return s.paint.erase;
+    }
+    if (s.menu_page == 4 && sector == 9)
+      return s.layer_visible;
+    if (s.menu_page == 6 && sector == 10)
+      return s.paint.erase;
+    return {};
+  };
   const auto &labels = spatial_labels(s.menu_page);
   constexpr float pi = 3.14159265358979323846f;
   for (int i = 0; i < 12; ++i) {
@@ -160,15 +252,30 @@ void SpatialPalette::raster(const EditorState &s) {
     int x = int(320 + 220 * std::cos(a)) * unit_,
         y = int(320 - 220 * std::sin(a)) * unit_;
     rect(x - 55 * unit_, y - 20 * unit_, 110 * unit_, 40 * unit_,
-         i == s.menu_index ? accent
-         : s.light         ? Color{200, 209, 220, 255}
-                           : Color{55, 65, 80, 255});
-    text(x, y + pixels_ / 3, labels[i], fg);
+         i == s.menu_index && s.menu_enabled[i] ? accent
+         : s.light ? Color{200, 209, 220, uint8_t(s.opacity)}
+                   : Color{55, 65, 80, uint8_t(s.opacity)});
+    auto label_color = fg;
+    if (!s.menu_enabled[i])
+      for (int c = 0; c < 3; ++c)
+        label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
+    text(x, y + pixels_ / 3, labels[i], label_color);
+    if (auto value = marked(i)) {
+      int mx = x - 51 * unit_, my = y - 4 * unit_;
+      rect(mx, my, 8 * unit_, unit_, label_color);
+      rect(mx, my + 7 * unit_, 8 * unit_, unit_, label_color);
+      rect(mx, my, unit_, 8 * unit_, label_color);
+      rect(mx + 7 * unit_, my, unit_, 8 * unit_, label_color);
+      if (*value)
+        rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
+    }
   }
   text(320 * unit_, 295 * unit_, "Stick to choose", fg);
   text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   const char *page = s.menu_page == 1   ? "Objects"
                      : s.menu_page == 2 ? "Material"
+                     : s.menu_page == 3 ? "Painting"
+                     : s.menu_page == 4 ? "Brush"
                                         : "Dome Sculpt";
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
@@ -188,7 +295,14 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message +
       s.error + std::to_string(s.light) + std::to_string(s.accent) +
-      std::to_string(s.opacity);
+      std::to_string(s.opacity) + std::to_string(s.layer_visible) +
+      std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature += std::to_string(int(s.controls.parameter)) +
+               std::to_string(s.controls.selected);
+  for (float value : s.controls.value)
+    signature += std::to_string(value) + ",";
+  for (bool enabled : s.menu_enabled)
+    signature += enabled ? "1" : "0";
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture_);
   if (signature != signature_) {

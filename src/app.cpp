@@ -4,7 +4,10 @@
 #include "dome/document.hpp"
 #include "dome/mesh.hpp"
 #include "dome/render.hpp"
+#include "dome/session-appearance.hpp"
 #include "object-editor.hpp"
+#include "paint-editor.hpp"
+#include "ui-conventions.hpp"
 #ifdef DOME_HAS_XR
 #include "dome/xr.hpp"
 #endif
@@ -98,6 +101,11 @@ struct Canvas : Fl_Gl_Window {
     try {
       if (event == FL_FOCUS)
         return 1;
+      if (event == FL_KEYDOWN && Fl::event_key() == FL_Escape &&
+          document.frame().state->menu) {
+        document.cancel_spatial_menu();
+        return 1;
+      }
       if (event == FL_PUSH) {
         take_focus();
         last_x = Fl::event_x();
@@ -216,7 +224,7 @@ struct Canvas : Fl_Gl_Window {
   }
 };
 struct App {
-  Fl_Double_Window window{1100, 800, "Dome Sculpt"};
+  SculptWindow window{1100, 800, "Dome Sculpt"};
   DesktopMenuBar menu{0, 0, 1100, 28};
   Canvas canvas{0, 28, 1100, 744};
   Fl_Box status{0, 772, 1100, 28};
@@ -256,9 +264,10 @@ struct App {
       a.canvas.document.appearance(
           dx::selected_font.file, dx::size,
           Fl::get_color(FL_BACKGROUND_COLOR) > 0x80808000,
-          Fl::get_color(FL_SELECTION_COLOR) >> 8, opacity);
+          Fl::get_color(FL_SELECTION_COLOR) >> 8, chrome_opacity(opacity));
       a.canvas.redraw();
     }
+    a.sync_menus();
     a.update_status();
     Fl::repeat_timeout(.03, tick, data);
   }
@@ -302,13 +311,21 @@ struct App {
     menu.add("&File/&Save", FL_CTRL + 's', command, this);
     menu.add("&File/Save &As...", FL_CTRL | FL_SHIFT | 's', command, this);
     menu.add("&File/Export &glTF (.glb)...", FL_CTRL + 'e', command, this);
-    menu.add("&File/&Close", FL_CTRL + 'q', command, this);
+    menu.add("&File/Close &Window", FL_CTRL + 'w', command, this);
+    if (!dx::dome())
+      menu.add("&File/&Quit", FL_CTRL + 'q', command, this);
     menu.add("&Edit/&Undo", FL_CTRL + 'z', command, this);
     menu.add("&Edit/&Redo", FL_CTRL | FL_SHIFT | 'z', command, this);
-    menu.add("&Sculpt/&Clay", '1', command, this);
-    menu.add("&Sculpt/Ca&rve", '2', command, this);
-    menu.add("&Sculpt/&Smooth", '3', command, this);
-    menu.add("&Sculpt/&Flatten", '4', command, this);
+    menu.add("&View/Reset &trackball", 'f', command, this);
+    menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
+    menu.add("&View/Shading/&PBR", 0, command, this,
+             FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&View/Shading/&Toon preview", 0, command, this, FL_MENU_RADIO);
+    menu.add("&Sculpt/&Clay", '1', command, this,
+             FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&Sculpt/Ca&rve", '2', command, this, FL_MENU_RADIO);
+    menu.add("&Sculpt/&Smooth", '3', command, this, FL_MENU_RADIO);
+    menu.add("&Sculpt/&Flatten", '4', command, this, FL_MENU_RADIO);
     menu.add("&Sculpt/Smaller brush", '[', command, this);
     menu.add("&Sculpt/Larger brush", ']', command, this);
     menu.add("&Scene/New sphere", FL_CTRL | FL_SHIFT | 'n', command, this);
@@ -317,14 +334,34 @@ struct App {
     menu.add("&Scene/Delete object", FL_Delete, command, this);
     menu.add("&Scene/Previous object", FL_CTRL + FL_Page_Up, command, this);
     menu.add("&Scene/Next object", FL_CTRL + FL_Page_Down, command, this);
-    menu.add("&Scene/Hide or show object", 0, command, this);
-    menu.add("&Scene/Lock or unlock object", 0, command, this);
+    menu.add("&Scene/&Visible", 0, command, this,
+             FL_MENU_TOGGLE | FL_MENU_VALUE);
+    menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
+    menu.add("&Paint/Prepare painting mesh", FL_CTRL | FL_SHIFT | 'p', command,
+             this);
+    menu.add("&Paint/Use painted mesh", 'p', command, this, FL_MENU_RADIO);
+    menu.add("&Paint/Edit source volume", FL_SHIFT | 'p', command, this,
+             FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&Paint/Brush settings...", FL_ALT | 'p', command, this);
+    menu.add("&Paint/Add layer", FL_CTRL | 'l', command, this);
+    menu.add("&Paint/Next layer", 0, command, this);
+    menu.add("&Paint/Layer visible", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Paint/Delete layer", 0, command, this);
+    menu.add("&Paint/Cycle layer opacity", 0, command, this);
+    menu.add("&Paint/Channel/Base color", '5', command, this,
+             FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&Paint/Channel/Metallic", '6', command, this, FL_MENU_RADIO);
+    menu.add("&Paint/Channel/Roughness", '7', command, this, FL_MENU_RADIO);
+    menu.add("&Paint/Channel/Emission", '8', command, this, FL_MENU_RADIO);
+    menu.add("&Paint/Channel/Layer mask", '9', command, this, FL_MENU_RADIO);
+    menu.add("&Paint/Color/Red paint", 0, command, this);
+    menu.add("&Paint/Color/Green paint", 0, command, this);
+    menu.add("&Paint/Color/Blue paint", 0, command, this);
+    menu.add("&Paint/Color/White paint", 0, command, this);
+    menu.add("&Paint/Color/Black paint", 0, command, this);
+    menu.add("&Paint/Toggle eraser", '0', command, this, FL_MENU_TOGGLE);
     menu.add("&Mesh/Generate &UV atlas", FL_CTRL + 'u', command, this);
-    menu.add("&View/Reset &trackball", 'f', command, this);
-    menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
-    menu.add("&View/Shading/&PBR", 0, command, this);
-    menu.add("&View/Shading/&Toon preview", 0, command, this);
     canvas.document.appearance(dx::selected_font.file, dx::size,
                                Fl::get_color(FL_BACKGROUND_COLOR) > 0x80808000,
                                Fl::get_color(FL_SELECTION_COLOR) >> 8, 255);
@@ -350,8 +387,86 @@ struct App {
   }
   bool discard() {
     dirty = canvas.document.frame().state->dirty;
-    return !dirty || fl_choice("Discard unsaved sculpt changes?", "Cancel",
-                               "Discard", nullptr) == 1;
+    return !dirty || confirm_discard(window);
+  }
+  void sync_menus() {
+    auto s = canvas.document.frame().state;
+    bool modal = Fl::modal() && Fl::modal() != &window;
+    auto enable = [&](const char *path, bool value) {
+      dx::enable_menu(menu, path, value);
+    };
+    auto checked = [&](const char *path, bool value) {
+      int index = menu.find_index(path);
+      if (index < 0)
+        return;
+      int flags = menu.mode(index),
+          next = value ? flags | FL_MENU_VALUE : flags & ~FL_MENU_VALUE;
+      if (flags != next)
+        menu.mode(index, next);
+    };
+    const char *document_actions[] = {"&File/&New",
+                                      "&File/&Open...",
+                                      "&File/&Save",
+                                      "&File/Save &As...",
+                                      "&File/Export &glTF (.glb)...",
+                                      "&Scene/New sphere",
+                                      "&Scene/New empty sculpt",
+                                      "&Scene/Duplicate object",
+                                      "&Scene/Object and material...",
+                                      "&Mesh/Generate &UV atlas"};
+    for (auto path : document_actions)
+      enable(path, !modal && !s->asset_busy);
+    auto input = modal ? dynamic_cast<Fl_Input_ *>(Fl::focus()) : nullptr;
+    enable("&Edit/&Undo", modal ? (input && input->can_undo()) : s->can_undo);
+    enable("&Edit/&Redo", modal ? (input && input->can_redo()) : s->can_redo);
+    enable("&Scene/Delete object",
+           !modal && !s->asset_busy && s->objects.size() > 1);
+    enable("&Scene/Next object", !modal && s->objects.size() > 1);
+    enable("&Scene/Previous object", !modal && s->objects.size() > 1);
+    auto active =
+        std::find_if(s->objects.begin(), s->objects.end(),
+                     [&](auto &o) { return o.id == s->active_object; });
+    if (active != s->objects.end()) {
+      checked("&Scene/&Visible", active->visible);
+      checked("&Scene/&Locked", active->locked);
+    }
+    enable("&Scene/&Visible", !modal);
+    enable("&Scene/&Locked", !modal);
+    const char *tools[] = {"&Sculpt/&Clay", "&Sculpt/Ca&rve", "&Sculpt/&Smooth",
+                           "&Sculpt/&Flatten"};
+    for (int i = 0; i < 4; ++i) {
+      checked(tools[i], int(s->tool) == i);
+      enable(tools[i], !modal && !s->asset_busy);
+    }
+    checked("&Paint/Use painted mesh", s->mesh_active);
+    checked("&Paint/Edit source volume", !s->mesh_active);
+    checked("&Paint/Toggle eraser", s->paint.erase);
+    checked("&Paint/Layer visible", s->layer_visible);
+    const char *channels[] = {
+        "&Paint/Channel/Base color", "&Paint/Channel/Metallic",
+        "&Paint/Channel/Roughness", "&Paint/Channel/Emission",
+        "&Paint/Channel/Layer mask"};
+    for (int i = 0; i < 5; ++i) {
+      checked(channels[i], int(s->paint.channel) == i);
+      enable(channels[i], !modal && !s->asset_busy);
+    }
+    checked("&View/Shading/&PBR", !s->toon);
+    checked("&View/Shading/&Toon preview", s->toon);
+    const char *layer_actions[] = {
+        "&Paint/Add layer", "&Paint/Next layer", "&Paint/Layer visible",
+        "&Paint/Delete layer", "&Paint/Cycle layer opacity"};
+    for (auto path : layer_actions)
+      enable(path, !modal && !s->asset_busy && s->mesh_active);
+    enable("&Paint/Delete layer",
+           !modal && s->mesh_active && s->paint_layers.size() > 1);
+    enable("&Paint/Next layer",
+           !modal && s->mesh_active && s->paint_layers.size() > 1);
+    enable("&Paint/Prepare painting mesh",
+           !modal && !s->asset_busy && active != s->objects.end() &&
+               active->visible && !active->locked);
+    enable("&Paint/Use painted mesh", !modal && !s->asset_busy);
+    enable("&Paint/Edit source volume",
+           !modal && s->mesh_active && !s->asset_busy);
   }
   void update_status() {
     const char *tools[] = {"Clay", "Carve", "Smooth", "Flatten"};
@@ -367,6 +482,14 @@ struct App {
       text << " | " << active->name << " (" << info->objects.size()
            << " objects)" << (active->locked ? " [locked]" : "")
            << (active->visible ? "" : " [hidden]");
+    if (info->mesh_active) {
+      text.str("");
+      const char *channels[] = {"Color", "Metallic", "Roughness", "Emission",
+                                "Mask"};
+      text << "Paint " << channels[int(info->paint.channel)] << " | radius "
+           << int(canvas.radius * 1000) << " mm | " << info->paint_layers.size()
+           << " layers | Shift+drag: paint | P: painted mesh | Shift+P: source";
+    }
     if (!info->error.empty()) {
       text.str("");
       text << info->error;
@@ -399,6 +522,18 @@ struct App {
   }
   void action(std::string label) {
     label.erase(std::remove(label.begin(), label.end(), '&'), label.end());
+    auto modal = Fl::modal();
+    if (modal && modal != &window) {
+      if (label == "Close Window")
+        modal->hide();
+      else if (auto input = dynamic_cast<Fl_Input_ *>(Fl::focus())) {
+        if (label == "Undo")
+          input->undo();
+        else if (label == "Redo")
+          input->redo();
+      }
+      return;
+    }
     if (canvas.sculpting) {
       canvas.document.end_desktop();
       canvas.sculpting = false;
@@ -432,7 +567,7 @@ struct App {
       canvas.document.save(path);
       project = path;
       dirty = false;
-    } else if (label == "Close") {
+    } else if (label == "Close Window" || label == "Quit") {
       if (discard())
         window.hide();
     } else if (label == "Undo") {
@@ -470,15 +605,53 @@ struct App {
           count = int(state->objects.size());
       int next = (index + count + (label == "Next object" ? 1 : -1)) % count;
       canvas.document.select_object(state->objects[next].id);
-    } else if (label == "Hide or show object" ||
-               label == "Lock or unlock object") {
+    } else if (label == "Visible" || label == "Locked") {
       auto scene = canvas.document.copy_scene();
       auto &o = scene.active();
       canvas.document.object_properties(
-          o.id, o.name, label == "Hide or show object" ? !o.visible : o.visible,
-          label == "Lock or unlock object" ? !o.locked : o.locked, o.transform,
-          o.material);
-    } else if (label == "Generate UV atlas") {
+          o.id, o.name, label == "Visible" ? !o.visible : o.visible,
+          label == "Locked" ? !o.locked : o.locked, o.transform, o.material);
+    } else if (label == "Prepare painting mesh") {
+      canvas.document.prepare_mesh();
+    } else if (label == "Use painted mesh") {
+      canvas.document.use_mesh();
+    } else if (label == "Edit source volume") {
+      canvas.document.use_source();
+    } else if (label == "Brush settings...") {
+      edit_paint(canvas.document);
+    } else if (label == "Add layer")
+      canvas.document.paint_command(SpatialCommand::AddLayer);
+    else if (label == "Next layer")
+      canvas.document.paint_command(SpatialCommand::NextLayer);
+    else if (label == "Layer visible")
+      canvas.document.paint_command(SpatialCommand::LayerVisible);
+    else if (label == "Delete layer")
+      canvas.document.paint_command(SpatialCommand::DeleteLayer);
+    else if (label == "Cycle layer opacity")
+      canvas.document.paint_command(SpatialCommand::LayerOpacity);
+    else if (label == "Base color")
+      canvas.document.paint_command(SpatialCommand::PaintColor);
+    else if (label == "Metallic")
+      canvas.document.paint_command(SpatialCommand::PaintMetal);
+    else if (label == "Roughness")
+      canvas.document.paint_command(SpatialCommand::PaintRough);
+    else if (label == "Emission")
+      canvas.document.paint_command(SpatialCommand::PaintGlow);
+    else if (label == "Layer mask")
+      canvas.document.paint_command(SpatialCommand::PaintMask);
+    else if (label == "Red paint")
+      canvas.document.paint_command(SpatialCommand::PaintRed);
+    else if (label == "Green paint")
+      canvas.document.paint_command(SpatialCommand::PaintGreen);
+    else if (label == "Blue paint")
+      canvas.document.paint_command(SpatialCommand::PaintBlue);
+    else if (label == "White paint")
+      canvas.document.paint_command(SpatialCommand::PaintWhite);
+    else if (label == "Black paint")
+      canvas.document.paint_command(SpatialCommand::PaintBlack);
+    else if (label == "Toggle eraser")
+      canvas.document.paint_command(SpatialCommand::ErasePaint);
+    else if (label == "Generate UV atlas") {
       canvas.mesh = surface_mesh(canvas.document.copy_volume());
       auto info = unwrap(canvas.mesh);
       std::ostringstream text;
@@ -506,7 +679,13 @@ struct App {
       canvas.distance = 2.2f;
       canvas.redraw();
     }
-    canvas.document.configure(canvas.tool, canvas.radius);
+    if (label == "Clay" || label == "Carve" || label == "Smooth" ||
+        label == "Flatten")
+      canvas.document.use_source();
+    if (label == "Clay" || label == "Carve" || label == "Smooth" ||
+        label == "Flatten" || label == "Smaller brush" ||
+        label == "Larger brush")
+      canvas.document.configure(canvas.tool, canvas.radius);
     update_status();
   }
 };
@@ -515,6 +694,10 @@ int main(int argc, char **argv) try {
   if (argc == 2 && std::string(argv[1]) == "--version") {
     std::cout << "Dome Sculpt 0.1.0 / " << compute_backend()
               << " / Blender 5.4 Alpha trackball basis\n";
+    return 0;
+  }
+  if (argc == 4 && std::string(argv[1]) == "--export-project") {
+    export_glb(Scene::load(argv[2]).surfaces(true), argv[3]);
     return 0;
   }
   if (argc == 3 && std::string(argv[1]) == "--export-demo") {
@@ -539,7 +722,7 @@ int main(int argc, char **argv) try {
     document.seed();
     unsigned frames = 0;
     std::filesystem::path save;
-    bool overlay = true;
+    bool overlay = true, paint = false;
     for (int i = 2; i < argc; ++i) {
       std::string option = argv[i];
       if (option == "--open" && i + 1 < argc)
@@ -548,15 +731,19 @@ int main(int argc, char **argv) try {
         save = argv[++i];
       else if (option == "--frames" && i + 1 < argc)
         frames = std::stoul(argv[++i]);
+      else if (option == "--paint")
+        paint = true;
       else if (option == "--exclusive")
         overlay = false;
       else
         throw std::runtime_error("Unknown XR option: " + option);
     }
-    auto config = bdf_fonts::export_config();
-    setenv("FONTCONFIG_FILE", config.c_str(), 1);
-    auto font = bdf_fonts::resolve("Unifont", "Sans-Serif", 16);
-    document.appearance(font.file, font.pixels, false, 0x6babff, 255);
+    SessionAppearanceMonitor appearance(document);
+    if (paint) {
+      document.prepare_mesh(256);
+      if (!document.wait_asset() || !document.frame().state->mesh_active)
+        throw std::runtime_error(document.frame().state->error);
+    }
     document.wait_mesh();
     {
       XrSculpt xr(document, nullptr, overlay);
@@ -584,7 +771,26 @@ int main(int argc, char **argv) try {
           hash *= 1099511628211ULL;
         }
     }
-    std::cout << nlohmann::json{{"object_count", scene.objects().size()},
+    uint64_t paint_hash = 1469598103934665603ULL;
+    size_t blue_texels = 0;
+    if (scene.active().painted) {
+      auto map = scene.active().painted->composite(scene.active().material);
+      for (auto byte : map->color.rgba) {
+        paint_hash ^= byte;
+        paint_hash *= 1099511628211ULL;
+      }
+      for (size_t i = 0; i < map->color.rgba.size(); i += 4)
+        blue_texels += map->color.rgba[i + 2] > map->color.rgba[i] * 1.5f &&
+                       map->color.rgba[i + 2] > 100;
+    }
+    std::cout << nlohmann::json{{"paint_blue_texels", blue_texels},
+                                {"paint_hash", paint_hash},
+                                {"painted", scene.active().mesh_active},
+                                {"paint_layers",
+                                 scene.active().painted
+                                     ? scene.active().painted->layers().size()
+                                     : 0},
+                                {"object_count", scene.objects().size()},
                                 {"active_object", scene.active().id},
                                 {"active_color", scene.active().material.color},
                                 {"active_metallic",

@@ -4,7 +4,8 @@ The combined Dome Sculpt application is GPL-3.0-or-later; see LICENSE.
 The original notices and licenses on reused source files remain in force.
 
 - Blender 5.4 Alpha source excerpts/reference files: GPL-2.0-or-later.
-  Trackball sphere/hyperbola projection is adapted from `calctrackballvec`.
+  Trackball sphere/hyperbola projection is adapted from `calctrackballvec`;
+  surface picking adapts `isect_ray_tri_v3` with a relative determinant epsilon.
   `third_party/blender/BKE_blender_version.h` proves version and cycle for the
   pinned source commit. The reference `.cc` files are not compiled wholesale.
 - OpenBrush Native: Apache-2.0. Its `navigation` and `controller-profiles` sources
@@ -19,6 +20,8 @@ The original notices and licenses on reused source files remain in force.
   Source and LICENSE are under `third_party/xatlas`.
 - cgltf 1.15: MIT notice at the bottom of `third_party/cgltf/cgltf.h`.
   Used only by the independent native glTF validation test.
+
+libpng is linked from the system for native PNG encoding; it is not vendored.
 
 Exact repositories, commits, roles and SHA-256 hashes are recorded in
 `third_party/sources.json`. Wings 3D, Seamless3d, OpenFX and MeshLab are currently

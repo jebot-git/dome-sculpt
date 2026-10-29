@@ -29,6 +29,7 @@ struct ObjectInfo {
   bool visible, locked;
   CanvasTransform transform;
   Material material;
+  bool mesh_active = false;
 };
 struct EditorState {
   uint64_t revision = 1, generation = 1, input_epoch = 1;
@@ -44,6 +45,15 @@ struct EditorState {
   std::string font_file;
   int font_pixels = 16;
   bool light = false, toon = false;
+  bool mesh_active = false, asset_busy = false, can_undo = false,
+       can_redo = false;
+  std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
+                                    true, true, true, true, true, true};
+  PaintSettings paint;
+  VrControlState controls;
+  uint64_t active_layer = 0;
+  bool layer_visible = false;
+  std::vector<std::string> paint_layers;
   uint32_t accent = 0x6babff;
   int opacity = 255;
 };
@@ -51,6 +61,7 @@ struct SurfaceRange {
   uint64_t object;
   size_t first, count;
   Material material;
+  std::shared_ptr<const TextureMaps> textures{};
 };
 struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;
@@ -94,6 +105,14 @@ public:
   void appearance(std::string file, int pixels, bool light, uint32_t accent,
                   int opacity);
   void shading(bool toon);
+  void prepare_mesh(uint32_t resolution = 512);
+  bool wait_asset(
+      std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
+  void use_source();
+  void cancel_spatial_menu();
+  void use_mesh();
+  void paint_settings(PaintSettings);
+  void paint_command(SpatialCommand);
   void report_error(std::string);
   void submit(SpatialFrame);
   void finish_spatial();
@@ -117,15 +136,21 @@ private:
     std::shared_ptr<Volume> sculpt;
     std::optional<Scene> before, after;
     uint64_t from = 0, to = 0;
+    std::shared_ptr<PaintedMesh> paint{};
   };
   std::deque<History> undo_, redo_;
   SpatialInput input_;
   CanvasNavigation navigation_;
   EditorState state_;
   bool desktop_ = false, anchored_ = false;
-  uint64_t last_volume_ = 0, content_ = 1, saved_content_ = 1,
+  uint64_t last_volume_ = 0, last_paint_ = 0, content_ = 1, saved_content_ = 1,
            next_content_ = 2;
   std::filesystem::path path_;
+  std::optional<Scene> control_before_;
+  PaintSettings control_settings_;
+  float control_radius_ = 0;
+  bool control_changed_ = false;
+  uint64_t control_object_ = 0;
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
   struct MeshJob {
@@ -146,9 +171,13 @@ private:
     bool export_mesh;
     bool adopt_path = false;
     std::shared_ptr<std::promise<void>> completion{};
+    bool prepare_mesh = false;
+    uint64_t object = 0, source_revision = 0;
+    uint32_t resolution = 512;
+    std::shared_ptr<Volume> source_identity{};
   };
-  std::mutex file_mutex_;
-  std::condition_variable file_changed_;
+  mutable std::mutex file_mutex_;
+  mutable std::condition_variable file_changed_;
   std::deque<FileJob> files_;
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
@@ -159,10 +188,21 @@ private:
   void scene_changed_locked(Scene before);
   bool undo_locked(bool redo);
   void bind_locked();
+  bool action_active_locked() const;
+  bool pending_locked() const;
+  void begin_action_locked();
+  void stamp_action_locked(const Brush &);
+  bool end_action_locked();
+  void cancel_action_locked();
+  void prepare_locked(uint32_t);
   void finish_locked();
   void process_locked(const SpatialFrame &);
   void file_locked(bool export_mesh);
   void command_locked(SpatialCommand);
+  bool command_enabled_locked(SpatialCommand) const;
+  bool parameter_enabled_locked(VrParameter) const;
+  void control_event_locked(VrControlEvent);
+  void finish_control_locked(bool accept);
   void mesh_loop();
   void input_loop();
   void file_loop();

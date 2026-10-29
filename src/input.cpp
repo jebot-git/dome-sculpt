@@ -3,33 +3,187 @@
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> root = {
-      "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",   "Redo",
-      "Save", "Export glTF", "Objects", "Materials", "Larger", "Smaller"};
+      "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",       "Redo",
+      "Save", "Export glTF", "Objects", "Materials", "Brush size", "Flow"};
   static const std::array<const char *, 12> objects = {
       "New sphere", "New empty",  "Duplicate",  "Next",
       "Previous",   "Visibility", "Lock",       "Delete",
       "Back",       "Move left",  "Move right", "Center"};
   static const std::array<const char *, 12> materials = {
-      "Warm clay", "Blue",     "White", "Dark", "Metal +", "Metal -",
-      "Rougher",   "Smoother", "Back",  "Toon", "PBR",     "Opacity"};
-  return page == 1 ? objects : page == 2 ? materials : root;
+      "Base color", "Blue",      "White",   "Paint tools",
+      "Metallic",   "Roughness", "Opacity", "Brush size",
+      "Back",       "Toon",      "PBR",     "Flow"};
+  static const std::array<const char *, 12> paint = {
+      "Make mesh",   "Edit source", "Paint color", "Paint metal",
+      "Paint rough", "Paint glow",  "Mask",        "Add layer",
+      "Back",        "Next layer",  "Erase",       "Controls"};
+  static const std::array<const char *, 12> colors = {
+      "Red",    "Green",  "Blue", "White",      "Black",        "Warm",
+      "Flow +", "Flow -", "Back", "Show layer", "Delete layer", "Layer alpha"};
+  static const std::array<const char *, 12> controls = {
+      "Color",      "Metal value", "Rough value", "Emission",
+      "Mask value", "Flow",        "Layer alpha", "Brush size",
+      "Back",       "Presets",     "Erase",       "Layer order"};
+  return page == 1   ? objects
+         : page == 2 ? materials
+         : page == 3 ? paint
+         : page == 4 ? colors
+         : page == 6 ? controls
+                     : root;
+}
+std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if (page == 0) {
+    if (sector == 10)
+      return VrParameter::BrushRadius;
+    if (sector == 11)
+      return VrParameter::Flow;
+  }
+  if (page == 2) {
+    switch (sector) {
+    case 0:
+      return VrParameter::BaseColor;
+    case 4:
+      return VrParameter::Metallic;
+    case 5:
+      return VrParameter::Roughness;
+    case 6:
+      return VrParameter::Opacity;
+    case 7:
+      return VrParameter::BrushRadius;
+    case 11:
+      return VrParameter::Flow;
+    default:
+      break;
+    }
+  }
+  if (page == 6) {
+    static const std::array<VrParameter, 12> controls = {
+        VrParameter::InkColor,     VrParameter::InkMetallic,
+        VrParameter::InkRoughness, VrParameter::InkEmission,
+        VrParameter::Mask,         VrParameter::Flow,
+        VrParameter::LayerOpacity, VrParameter::BrushRadius,
+        VrParameter::None,         VrParameter::None,
+        VrParameter::None,         VrParameter::LayerOrder};
+    if (sector >= 0 && sector < 12 && controls[sector] != VrParameter::None)
+      return controls[sector];
+  }
+  return {};
+}
+std::optional<SpatialCommand> spatial_action(int page, int index) {
+  if (index < 0 || index >= 12 || page < 0 || page > 6 || page == 5 ||
+      spatial_parameter(page, index))
+    return {};
+  if ((page == 0 && (index < 4 || index == 8 || index == 9)) ||
+      (page != 0 && index == 8) || (page == 2 && index == 3) ||
+      (page == 3 && index == 11))
+    return {};
+  static const std::array<SpatialCommand, 12> root = {
+      SpatialCommand::Undo, SpatialCommand::Undo,   SpatialCommand::Undo,
+      SpatialCommand::Undo, SpatialCommand::Undo,   SpatialCommand::Redo,
+      SpatialCommand::Save, SpatialCommand::Export, SpatialCommand::Undo,
+      SpatialCommand::Undo, SpatialCommand::Larger, SpatialCommand::Smaller};
+  static const std::array<SpatialCommand, 12> objects = {
+      SpatialCommand::NewSphere, SpatialCommand::NewEmpty,
+      SpatialCommand::Duplicate, SpatialCommand::Next,
+      SpatialCommand::Previous,  SpatialCommand::Visibility,
+      SpatialCommand::Lock,      SpatialCommand::Delete,
+      SpatialCommand::Undo,      SpatialCommand::Left,
+      SpatialCommand::Right,     SpatialCommand::Center};
+  static const std::array<SpatialCommand, 12> materials = {
+      SpatialCommand::Warm,    SpatialCommand::Blue,
+      SpatialCommand::White,   SpatialCommand::Dark,
+      SpatialCommand::MetalUp, SpatialCommand::MetalDown,
+      SpatialCommand::RoughUp, SpatialCommand::RoughDown,
+      SpatialCommand::Undo,    SpatialCommand::Toon,
+      SpatialCommand::Pbr,     SpatialCommand::Opacity};
+  static const std::array<SpatialCommand, 12> paint = {
+      SpatialCommand::MakeMesh,   SpatialCommand::EditSource,
+      SpatialCommand::PaintColor, SpatialCommand::PaintMetal,
+      SpatialCommand::PaintRough, SpatialCommand::PaintGlow,
+      SpatialCommand::PaintMask,  SpatialCommand::AddLayer,
+      SpatialCommand::Undo,       SpatialCommand::NextLayer,
+      SpatialCommand::ErasePaint, SpatialCommand::Undo};
+  static const std::array<SpatialCommand, 12> colors = {
+      SpatialCommand::PaintRed,    SpatialCommand::PaintGreen,
+      SpatialCommand::PaintBlue,   SpatialCommand::PaintWhite,
+      SpatialCommand::PaintBlack,  SpatialCommand::PaintWarm,
+      SpatialCommand::FlowUp,      SpatialCommand::FlowDown,
+      SpatialCommand::Undo,        SpatialCommand::LayerVisible,
+      SpatialCommand::DeleteLayer, SpatialCommand::LayerOpacity};
+  if (page == 6)
+    return index == 10
+               ? std::optional<SpatialCommand>(SpatialCommand::ErasePaint)
+               : std::nullopt;
+  return (page == 1   ? objects
+          : page == 2 ? materials
+          : page == 3 ? paint
+          : page == 4 ? colors
+                      : root)[index];
 }
 void SpatialInput::cancel() {
-  if (volume_->in_stroke())
-    volume_->cancel_stroke();
+  if (stroke_active()) {
+    if (backend.cancel)
+      backend.cancel();
+    else
+      volume_->cancel_stroke();
+  }
   device_ = 0;
   menu_ = false;
   page_ = 0;
+  parameter_ = VrParameter::None;
+  controls_.clear();
   command_.reset();
   devices_.clear();
 }
+void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
+  if (pressed && s.panel_hit && s.panel_v >= 588.f / 640 &&
+      s.panel_v <= 630.f / 640) {
+    bool cancel = s.panel_u >= 60.f / 640 && s.panel_u <= 280.f / 640;
+    bool accept = s.panel_u >= 360.f / 640 && s.panel_u <= 580.f / 640;
+    if (cancel || accept) {
+      controls_.push_back(
+          {cancel ? VrControlEventType::Cancel : VrControlEventType::Confirm,
+           parameter_});
+      parameter_ = VrParameter::None;
+      page_ = parent_page_;
+      selected_ = parent_sector_;
+      return;
+    }
+  }
+  bool color = parameter_ == VrParameter::InkColor ||
+               parameter_ == VrParameter::InkEmission ||
+               parameter_ == VrParameter::BaseColor;
+  int components = parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
+  if (s.trigger && s.panel_hit) {
+    int row = 0;
+    float y = .46875f;
+    if (color) {
+      int base = components == 4 ? 210 : 240, step = components == 4 ? 70 : 80;
+      row = int(std::round((s.panel_v * 640 - base) / step));
+      row = std::clamp(row, 0, components - 1);
+      y = (base + row * step) / 640.f;
+    }
+    if (std::abs(s.panel_v - y) < .06f && s.panel_u > .12f &&
+        s.panel_u < .86f) {
+      component_ = row;
+      controls_.push_back(
+          {VrControlEventType::Absolute, parameter_, component_,
+           std::clamp((s.panel_u * 640 - 100) / 420.f, 0.f, 1.f)});
+    }
+  }
+}
 void SpatialInput::update(const SpatialSample &s) {
-  bool valid = s.id && s.tracked && s.focused && finite(s.tip) &&
-               finite(s.normal) && std::isfinite(s.time) && s.time >= 0 &&
-               std::isfinite(s.pressure) && s.pressure >= 0 &&
-               s.pressure <= 1 && std::isfinite(s.stick_x) &&
-               std::isfinite(s.stick_y) && std::abs(s.stick_x) <= 1 &&
-               std::abs(s.stick_y) <= 1;
+  if (controls_.size() > 64) {
+    cancel();
+    return;
+  }
+  bool valid =
+      s.id && s.tracked && s.focused && finite(s.tip) && finite(s.normal) &&
+      std::isfinite(s.time) && s.time >= 0 && std::isfinite(s.pressure) &&
+      s.pressure >= 0 && s.pressure <= 1 && std::isfinite(s.stick_x) &&
+      std::isfinite(s.stick_y) && std::abs(s.stick_x) <= 1 &&
+      std::abs(s.stick_y) <= 1 &&
+      (!s.panel_hit || (std::isfinite(s.panel_u) && std::isfinite(s.panel_v)));
   if (!valid) {
     if (s.id == device_)
       cancel();
@@ -51,6 +205,7 @@ void SpatialInput::update(const SpatialSample &s) {
     }
   }
   auto &d = devices_[s.id];
+  double elapsed = d.time >= 0 ? std::clamp(s.time - d.time, 0.0, .1) : 0;
   d.sequence = s.sequence;
   d.time = s.time;
   if (!d.armed) {
@@ -65,13 +220,63 @@ void SpatialInput::update(const SpatialSample &s) {
   // Idle hands cannot acquire an edit lease. A hand held while another edits
   // must release before it can take ownership of a later stroke.
   if (device_ && device_ != s.id) {
+    if (menu_ && parameter_ != VrParameter::None && control_armed_ &&
+        s.trigger && s.panel_hit) {
+      ray_controls(s, s.trigger && !d.pressed);
+      d.pressed = s.trigger;
+      return;
+    }
     if (s.trigger || s.joystick_press)
       d.armed = false;
     d.pressed = s.trigger;
     return;
   }
+  if (menu_ && parameter_ != VrParameter::None) {
+    if (menu_press) {
+      controls_.push_back({VrControlEventType::Confirm, parameter_});
+      parameter_ = VrParameter::None;
+      page_ = parent_page_;
+      selected_ = parent_sector_;
+      d.pressed = s.trigger;
+      return;
+    }
+    if (!control_armed_) {
+      if (std::abs(s.stick_x) < .25f && std::abs(s.stick_y) < .25f &&
+          !s.trigger)
+        control_armed_ = true;
+      d.pressed = s.trigger;
+      return;
+    }
+    bool color = parameter_ == VrParameter::InkColor ||
+                 parameter_ == VrParameter::InkEmission ||
+                 parameter_ == VrParameter::BaseColor;
+    int components = parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
+    if (color) {
+      if (std::abs(s.stick_y) < .3f)
+        y_latch_ = 0;
+      if (std::abs(s.stick_y) > .6f && !y_latch_) {
+        y_latch_ = 1;
+        component_ =
+            (component_ + (s.stick_y < 0 ? 1 : components - 1)) % components;
+        controls_.push_back(
+            {VrControlEventType::Select, parameter_, component_});
+      }
+    }
+    auto axis = [](float v) {
+      return std::abs(v) > .25f ? std::copysign((std::abs(v) - .25f) / .75f, v)
+                                : 0.f;
+    };
+    float delta = float(elapsed) *
+                  (axis(s.stick_x) + (color ? 0 : axis(s.stick_y) * .1f));
+    if (delta)
+      controls_.push_back(
+          {VrControlEventType::Delta, parameter_, component_, delta});
+    ray_controls(s, s.trigger && !d.pressed);
+    d.pressed = s.trigger;
+    return;
+  }
   if (menu_press) {
-    if (volume_->in_stroke())
+    if (stroke_active())
       end_stroke();
     if (!menu_) {
       menu_ = true;
@@ -82,37 +287,46 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 0 && (selected_ == 8 || selected_ == 9)) {
       page_ = selected_ == 8 ? 1 : 2;
       selected_ = 0;
+    } else if (page_ == 2 && selected_ == 3) {
+      page_ = 3;
+      selected_ = 0;
+    } else if (page_ == 3 && selected_ == 11) {
+      page_ = 6;
+      selected_ = 0;
+    } else if (page_ == 6 && selected_ == 9) {
+      page_ = 4;
+      selected_ = 0;
+    } else if (auto parameter = spatial_parameter(page_, selected_)) {
+      if (parameter_allowed && !parameter_allowed(*parameter)) {
+        d.pressed = s.trigger;
+        return;
+      }
+      parent_page_ = page_;
+      parent_sector_ = selected_;
+      parameter_ = *parameter;
+      control_armed_ = false;
+      component_ = y_latch_ = 0;
+      page_ = 5;
+      controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = 0;
+      page_ = page_ == 4 ? 6 : page_ == 6 ? 3 : page_ == 3 ? 2 : 0;
       selected_ = int(tool_);
     } else {
-      if (page_ == 0 && selected_ < 4)
+      if (page_ == 0 && selected_ < 4) {
+        if (painting && allowed && !allowed(SpatialCommand::EditSource)) {
+          d.pressed = s.trigger;
+          return;
+        }
         tool_ = Tool(selected_);
-      else {
-        static const std::array<SpatialCommand, 12> root = {
-            SpatialCommand::Undo,   SpatialCommand::Undo,
-            SpatialCommand::Undo,   SpatialCommand::Undo,
-            SpatialCommand::Undo,   SpatialCommand::Redo,
-            SpatialCommand::Save,   SpatialCommand::Export,
-            SpatialCommand::Undo,   SpatialCommand::Undo,
-            SpatialCommand::Larger, SpatialCommand::Smaller};
-        static const std::array<SpatialCommand, 12> objects = {
-            SpatialCommand::NewSphere, SpatialCommand::NewEmpty,
-            SpatialCommand::Duplicate, SpatialCommand::Next,
-            SpatialCommand::Previous,  SpatialCommand::Visibility,
-            SpatialCommand::Lock,      SpatialCommand::Delete,
-            SpatialCommand::Undo,      SpatialCommand::Left,
-            SpatialCommand::Right,     SpatialCommand::Center};
-        static const std::array<SpatialCommand, 12> materials = {
-            SpatialCommand::Warm,    SpatialCommand::Blue,
-            SpatialCommand::White,   SpatialCommand::Dark,
-            SpatialCommand::MetalUp, SpatialCommand::MetalDown,
-            SpatialCommand::RoughUp, SpatialCommand::RoughDown,
-            SpatialCommand::Undo,    SpatialCommand::Toon,
-            SpatialCommand::Pbr,     SpatialCommand::Opacity};
-        command_ = (page_ == 1   ? objects
-                    : page_ == 2 ? materials
-                                 : root)[selected_];
+        if (painting)
+          command_ = SpatialCommand::EditSource;
+      } else {
+        auto action = spatial_action(page_, selected_);
+        if (!action || (allowed && !allowed(*action))) {
+          d.pressed = s.trigger;
+          return;
+        }
+        command_ = action;
       }
       menu_ = false;
       device_ = 0;
@@ -138,10 +352,13 @@ void SpatialInput::update(const SpatialSample &s) {
   if (s.trigger) {
     if (!d.pressed) {
       device_ = s.id;
-      volume_->begin_stroke();
+      if (backend.begin)
+        backend.begin();
+      else
+        volume_->begin_stroke();
       previous_ = s.tip;
     }
-    if (device_ == s.id && volume_->in_stroke()) {
+    if (device_ == s.id && stroke_active()) {
       Brush brush;
       brush.from = previous_;
       brush.to = s.tip;
@@ -152,14 +369,17 @@ void SpatialInput::update(const SpatialSample &s) {
       brush.blend = std::min(.025f, radius * .25f);
       brush.tool = tool_;
       try {
-        volume_->stamp(brush);
+        if (backend.stamp)
+          backend.stamp(brush);
+        else
+          volume_->stamp(brush);
       } catch (...) {
         cancel();
         throw;
       }
       previous_ = s.tip;
     }
-  } else if (d.pressed && device_ == s.id && volume_->in_stroke()) {
+  } else if (d.pressed && device_ == s.id && stroke_active()) {
     end_stroke();
     device_ = 0;
   }

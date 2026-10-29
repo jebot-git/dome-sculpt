@@ -564,8 +564,11 @@ void XrSculpt::run(unsigned frameLimit) {
                          {p.position.x, p.position.y, p.position.z}, e.width,
                          e.height, overlayMode, content.state->toon,
                          content.state->light);
-          cursors->draw(*content.state, vp);
+          if (content.state->controls.parameter == VrParameter::None)
+            cursors->draw(*content.state, vp);
           palette->draw(*content.state, vp);
+          if (content.state->controls.parameter != VrParameter::None)
+            cursors->draw(*content.state, vp);
           glFlush();
           XrSwapchainImageReleaseInfo release{
               XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};
