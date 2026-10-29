@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "dome/gltf-export.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include "io.hpp"
@@ -21,10 +22,28 @@ void export_glb(const Mesh &mesh, const std::filesystem::path &path) {
 }
 void export_glb(const std::vector<ObjectSurface> &objects,
                 const std::filesystem::path &path) {
-  if (path.extension() != ".glb") throw std::invalid_argument("Binary glTF export requires .glb");
-  detail::write_glb(detail::make_gltf(objects),path);
+  export_glb(objects,path,GltfExportOptions{});
 }
-detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects) {
+GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
+                           const std::filesystem::path &path,const GltfExportOptions &options) {
+  auto stop=[&]{if(options.cancelled && options.cancelled())throw std::runtime_error("glTF export cancelled");};
+  stop();
+  if(path.extension()!=".glb")throw std::invalid_argument("Binary glTF export requires .glb");
+  if(!options.max_output_bytes || options.max_output_bytes>256*1024*1024)
+    throw std::invalid_argument("Invalid glTF output resource budget");
+  auto document=detail::make_gltf(objects,detail::SourceMorphSpace::Native,
+                                 options.recompute_changed_normals,options.cancelled);
+  document.json["buffers"]={{{"byteLength",document.binary.size()}}};
+  uint64_t bytes=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+
+                    ((uint64_t(document.binary.size())+3)&~uint64_t(3));
+  if(bytes>options.max_output_bytes)throw std::length_error("glTF output resource budget exceeded");
+  GltfExportReport report{objects.size(),document.normal_targets_recomputed,{}};
+  if(report.normal_targets_recomputed)report.diagnostics.push_back(
+    "Source NORMAL deltas recomputed from edited geometry; original authoring data remains unchanged");
+  stop();detail::write_glb(std::move(document),path);return report;
+}
+detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects,
+    SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled) {
   GltfDocument result;
   if (objects.empty())
     throw std::invalid_argument("The scene has no visible surface to export");
@@ -93,6 +112,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
   for (auto &o : objects) {
     GltfObjectIdentity emission;
     auto &mesh = o.mesh;
+    SourceMorphTransport source_attributes(o,source_space,cancelled);
     mesh.validate();
     o.material.validate();
     if (o.deformation)
@@ -124,42 +144,19 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
       attributes["TEXCOORD_0"] =
           add(begin, data.size() - begin, 34962, mesh.uv.size(), 5126, "VEC2");
     }
-    if(o.appearance && o.appearance->asset && !o.appearance->asset->primitives.empty()) {
+    if(auto source=source_attributes.source()) {
       const auto &a=*o.appearance;
-      if(!a.asset || a.source_vertices.size()!=mesh.positions.size())
-        throw std::invalid_argument("Source attribute export requires an exact vertex map");
-      const ImportedPrimitive *source=nullptr;
-      for(const auto &p:a.asset->primitives)
-        if(p.source_mesh==a.source_mesh && p.source_primitive==a.source_primitive) {
-          if(source) throw std::invalid_argument("Ambiguous source attribute primitive");
-          source=&p;
-        }
-      // Hand-created appearance-free surfaces do not claim imported attributes.
-      if(source) {
-        auto attribute=[&](const auto &values,const char *name,const char *type) {
-          if(values.empty())return;
-          begin=data.size();
-          for(auto v:a.source_vertices) {
-            if(v>=values.size()) throw std::invalid_argument("Source attribute vertex index is missing");
-            floats(values[v]);
-          }
-          attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
-        };
-        attribute(source->uv1,"TEXCOORD_1","VEC2");
-        attribute(source->colors,"COLOR_0","VEC4");
-        if(!source->tangents.empty()) {
-          for(size_t v=0;v<a.source_vertices.size();++v) {
-            auto source_vertex=a.source_vertices[v];
-            if(source_vertex>=source->mesh.positions.size() || source_vertex>=source->mesh.normals.size() ||
-               length(mesh.positions[v]-source->mesh.positions[source_vertex])>1e-6f ||
-               length(mesh.normals[v]-source->mesh.normals[source_vertex])>1e-6f ||
-               (source_vertex<source->mesh.uv.size() && (mesh.uv.empty() || mesh.uv[v]!=source->mesh.uv[source_vertex])))
-              throw std::invalid_argument("Edited source tangent frames require explicit tangent recomputation");
-          }
-        }
-        attribute(source->tangents,"TANGENT","VEC4");
-      } else if(!a.asset->primitives.empty())
-        throw std::invalid_argument("Missing source attribute primitive");
+      auto attribute=[&](const auto &values,const char *name,const char *type) {
+        if(values.empty())return;
+        begin=data.size();for(auto v:a.source_vertices){if(v>=values.size())throw std::invalid_argument("Source attribute vertex index is missing");floats(values[v]);}
+        attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
+      };
+      attribute(source->uv1,"TEXCOORD_1","VEC2");attribute(source->colors,"COLOR_0","VEC4");
+      auto tangents=source_attributes.base_tangents();
+      if(!tangents.empty()){
+        begin=data.size();for(auto t:tangents)floats(t);
+        attributes["TANGENT"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC4");
+      }
     }
     if (o.deformation && o.deformation->skin) {
       const auto &weights = o.deformation->skin->vertices;
@@ -220,6 +217,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
       const auto &d = *o.deformation;
       if (d.morphs && !d.morphs->targets.empty()) {
         auto targets = nlohmann::json::array(), names = nlohmann::json::array();
+        size_t native_target=0;
         for (const auto &target : d.morphs->targets) {
           begin = data.size();
           Vec3 low = target.delta.front(), high = low;
@@ -234,7 +232,17 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
                              target.delta.size(), 5126, "VEC3");
           j["accessors"][accessor]["min"] = {low.x, low.y, low.z};
           j["accessors"][accessor]["max"] = {high.x, high.y, high.z};
-          targets.push_back({{"POSITION", accessor}});
+          nlohmann::json channels={{"POSITION",accessor}};
+          auto directions=source_attributes.target(native_target++,recompute_changed_normals);
+          auto direction=[&](const std::vector<Vec3> &values,const char *name){
+            if(values.empty())return;
+            begin=data.size();
+            for(auto p:values)floats(std::array{p.x,p.y,p.z});
+            channels[name]=add(begin,data.size()-begin,34962,values.size(),5126,"VEC3");
+          };
+          direction(directions.normals,"NORMAL");direction(directions.tangents,"TANGENT");
+          result.normal_targets_recomputed+=directions.normals_recomputed;
+          targets.push_back(std::move(channels));
           names.push_back(target.name);
         }
         j["meshes"][mesh_index]["primitives"][0]["targets"] = targets;

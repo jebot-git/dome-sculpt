@@ -195,13 +195,13 @@ int main() try {
           sm.normal_texture.texture->sampler->min_filter==9987 &&
           sm.occlusion_texture.texture && sm.occlusion_texture.scale==.35f,
           "Normal/AO scale, UV transform and independent samplers survive export");
-  auto imported=std::make_shared<dome::ImportedAsset>();
+  auto imported=std::make_shared<dome::ImportedAsset>();imported->mode=dome::ImportMode::PreserveGltf;
   dome::ImportedPrimitive source_primitive; source_primitive.mesh=mesh; source_primitive.source_mesh=0; source_primitive.source_primitive=0;
   source_primitive.uv1=mesh.uv;
   source_primitive.colors.assign(mesh.positions.size(),{.2f,.4f,.6f,.8f});
   source_primitive.tangents.assign(mesh.positions.size(),{1,0,0,-1});
   imported->primitives.push_back(source_primitive);
-  auto source_identity=std::make_shared<dome::CreatorAppearance>();source_identity->asset=imported;
+  auto source_identity=std::make_shared<dome::CreatorAppearance>();source_identity->asset=imported;source_identity->source_basis_quaternion=dome::Quat{};
   source_identity->source_mesh=source_identity->source_primitive=0;
   for(uint32_t v=0;v<mesh.positions.size();++v)source_identity->source_vertices.push_back(v);
   objects[0].appearance=source_identity;
@@ -460,9 +460,6 @@ int main() try {
   if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
     std::filesystem::copy_file(path, std::string(fixture) + ".grouped.glb",
                                std::filesystem::copy_options::overwrite_existing);
-  auto appearance=std::make_shared<dome::CreatorAppearance>();
-  appearance->asset=std::make_shared<dome::ImportedAsset>();
-  objects[0].appearance=appearance;
   auto sibling=objects[0]; sibling.id=2; sibling.name="Other creator primitive";
   dome::export_glb({objects[0],sibling},path);
   raw=nullptr;

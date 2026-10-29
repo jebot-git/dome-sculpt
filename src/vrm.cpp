@@ -572,7 +572,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   if (!uniform_fit)
     fail("nonlinear source rest fitting needs explicit first-person/collider "
          "metadata refitting");
-  auto document = detail::make_gltf(objects);
+  auto document = detail::make_gltf(objects, detail::SourceMorphSpace::Original,
+                                    true, options.cancelled);
+  report.normal_targets_recomputed = document.normal_targets_recomputed;
   auto &j = document.json;
   auto &binary = document.binary;
   auto check_budget = [&] {
@@ -639,32 +641,6 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       for (auto &e : info["extensions"].items())
         if (e.key() != "KHR_texture_transform")
           fail("material texture extension lacks a remapper");
-  };
-  auto add_vectors = [&](const std::vector<Vec3> &values,
-                         const std::vector<uint32_t> &vertices) {
-    size_t start = binary.size();
-    for (auto v : vertices) {
-      if (v >= values.size())
-        fail("morph attribute source vertex is missing");
-      auto p = values[v];
-      for (float f : {p.x, p.y, p.z}) {
-        auto w = std::bit_cast<uint32_t>(f);
-        for (int k = 0; k < 4; ++k)
-          binary.push_back(uint8_t(w >> (k * 8)));
-      }
-    }
-    int view = int(j["bufferViews"].size()),
-        accessor = int(j["accessors"].size());
-    j["bufferViews"].push_back({{"buffer", 0},
-                                {"byteOffset", start},
-                                {"byteLength", binary.size() - start},
-                                {"target", 34962}});
-    j["accessors"].push_back({{"bufferView", view},
-                              {"componentType", 5126},
-                              {"count", vertices.size()},
-                              {"type", "VEC3"}});
-    check_budget();
-    return accessor;
   };
   for (size_t i = 0; i < objects.size(); ++i) {
     stop(options);
@@ -761,83 +737,13 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       fail("missing exact source morph identity map");
     auto &target_map = identities.morph_targets[emitted.mesh];
     target_map.assign(primitive->morph_targets.size(), -1);
-    float source_scale = 1;
-    Vec3 source_offset{};
-    bool source_frame_unchanged = true;
-    if (!a.source_vertices.empty()) {
-      auto first = a.source_vertices.front();
-      if (first >= primitive->mesh.positions.size())
-        fail("source base vertex is missing");
-      auto p0 = primitive->mesh.positions[first], q0 = o.mesh.positions.front();
-      float farthest = 0;
-      for (size_t v = 1; v < a.source_vertices.size(); ++v) {
-        auto id = a.source_vertices[v];
-        if (id >= primitive->mesh.positions.size())
-          fail("source base vertex is missing");
-        auto dp = primitive->mesh.positions[id] - p0;
-        if (dot(dp, dp) > std::max(1e-8f, farthest)) {
-          farthest = dot(dp, dp);
-          source_scale = dot(o.mesh.positions[v] - q0, dp) / farthest;
-        }
-      }
-      source_offset = q0 - p0 * source_scale;
-      if (!std::isfinite(source_scale) || source_scale <= 0)
-        source_frame_unchanged = false;
-      for (size_t v = 0; v < a.source_vertices.size(); ++v) {
-        auto id = a.source_vertices[v];
-        if (id >= primitive->mesh.normals.size() ||
-            length(o.mesh.positions[v] -
-                   (primitive->mesh.positions[id] * source_scale +
-                    source_offset)) > 1e-5f ||
-            length(o.mesh.normals[v] - primitive->mesh.normals[id]) > 1e-5f)
-          source_frame_unchanged = false;
-      }
+    for (size_t target = 0; target < a.source_morph_targets.size(); ++target) {
+      auto source_id = a.source_morph_targets[target];
+      if (source_id >= primitive->morph_targets.size() ||
+          target_map[source_id] >= 0)
+        fail("source morph identity map is not unique and in range");
+      target_map[source_id] = int(target);
     }
-    if (o.deformation->morphs)
-      for (size_t target = 0; target < a.source_morph_targets.size();
-           ++target) {
-        auto source_id = a.source_morph_targets[target];
-        if (source_id >= primitive->morph_targets.size() ||
-            target_map[source_id] >= 0)
-          fail("source morph identity map is not unique and in range");
-        target_map[source_id] = int(target);
-        const auto &source_target = primitive->morph_targets[source_id];
-        auto &out =
-            j["meshes"][emitted.mesh]["primitives"][0]["targets"][target];
-        bool unchanged = source_frame_unchanged;
-        const auto &native_delta = o.deformation->morphs->targets[target].delta;
-        for (size_t v = 0; v < a.source_vertices.size(); ++v) {
-          auto original_vertex = a.source_vertices[v];
-          if (original_vertex >= primitive->mesh.positions.size())
-            fail("source morph vertex is missing");
-          Vec3 source_delta = source_target.positions.empty()
-                                  ? Vec3{}
-                                  : source_target.positions.at(original_vertex);
-          if (length(native_delta[v] - source_delta * source_scale) > 1e-5f)
-            unchanged = false;
-        }
-        if (!source_target.normals.empty() && unchanged)
-          out["NORMAL"] = add_vectors(source_target.normals, a.source_vertices);
-        else if (!unchanged) {
-          std::vector<float> weights(o.deformation->morphs->targets.size(), 0);
-          weights[target] = 1;
-          auto target_mesh = o.deformation->morphs->evaluate(o.mesh, weights);
-          std::vector<Vec3> delta;
-          std::vector<uint32_t> compact;
-          for (size_t v = 0; v < o.mesh.positions.size(); ++v) {
-            delta.push_back(target_mesh.normals[v] - o.mesh.normals[v]);
-            compact.push_back(uint32_t(v));
-          }
-          out["NORMAL"] = add_vectors(delta, compact);
-          ++report.normal_targets_recomputed;
-          if (!source_target.tangents.empty())
-            fail("changed source tangent morph requires explicit tangent "
-                 "recomputation");
-        }
-        if (!source_target.tangents.empty())
-          out["TANGENT"] =
-              add_vectors(source_target.tangents, a.source_vertices);
-      }
     auto source_material =
         original.at("materials").at(size_t(a.source_material));
     if (source_material.contains("extensions"))
@@ -973,8 +879,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
                       j["textures"].size(), j["materials"].size());
   j["extensions"]["VRM"] = vrm;
   extension("VRM");
-  if (j.dump().size() > options.max_output_bytes -
-                            std::min(binary.size(), options.max_output_bytes))
+  j["buffers"] = {{{"byteLength", binary.size()}}};
+  uint64_t output_size = 28 + ((uint64_t(j.dump().size()) + 3) & ~uint64_t(3)) +
+                         ((uint64_t(binary.size()) + 3) & ~uint64_t(3));
+  if (output_size > options.max_output_bytes)
     throw std::length_error("VRM metadata output budget exceeded");
   stop(options);
   report.diagnostics.push_back(
