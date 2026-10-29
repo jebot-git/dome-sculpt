@@ -1,3 +1,54 @@
+# Final UV-worker and authoring integration — 2026-10-29
+
+Integrated upstream through db1d710, preserving native sculpt layers, recovery,
+import/rig/deformation/retopology/baking/remeshing and guarded asset operations.
+UV worker integration is pushed as b8f9920; the completion-notification correction
+is pushed as 1cf7157. No forced history update or remote source loss occurred.
+
+- All 22 Release suites passed in 210.81 s at b8f9920:
+  artifacts/tests-uv-worker-assets.log. Native OpenXR report: 43 checks,
+  complete=true, status=passed, zero failures.
+- The final notification guard was rebuilt and checked with all five affected
+  native suites (27.98 s): artifacts/tests-uv-worker-final.log. It makes asset/
+  recovery completion notification acquire the wait mutex, matching UV work.
+- All five targeted ASan/UBSan/leak suites passed on the final whole core
+  (200.98 s): artifacts/tests-uv-worker-assets-sanitize-final.log. These are UV,
+  controller, shared document, document recovery and document assets, not a
+  claim of fresh sanitizer execution of every kernel's own suite.
+- Final GUI 23/23 passed: artifacts/gui-uv-worker-final-current.log. All real
+  gesture/field/material/paint assertions remain, including exact single-step
+  UV drag/wheel undo and native modal closure after transfer completion.
+- Final universal menu 39/39 passed: artifacts/menu-uv-worker-assets-final.log,
+  including import/recovery chooser identity, ownership and cancellation.
+
+Cross-component tests verify no checkpoint for an open UV draft, exact accepted
+UV/paint checkpoint recovery, no stale-workspace resurrection on replacement,
+and rejection of unsupported rigged-rest UV edits without losing deformation.
+The first integration test build needed a missing JSON definition include, fixed
+before the successful run. A sanitizer multi-target invocation regenerated its
+makefiles but could not resolve the newly added target in that invocation;
+explicit reconfiguration and the subsequent final five-suite run passed.
+
+The integrated GUI Tab-based setup selected the wrong numeric field. Setup now
+confirms a bright native selection in the intended row before typing, retaining
+the final blue-material assertion. The final 23-check run passed. Earlier failed
+attempts and workspace-specific logs below are not substituted for these results.
+
+The final isolated CPU benchmark (20 translations, 19,944 triangles) records
+0.985 ms mean / 1.477 ms maximum edit submission, 106.94 ms final background
+validation wait, every sample applied, valid preview, unchanged held snapshots
+and exact whole-gesture undo. Output: artifacts/uv-worker-benchmark-final.json.
+The preceding synchronous mean was 106.3 ms. This is a submission-latency change;
+validation cost and larger/physical VR workloads remain outside that evidence.
+Build the excluded-from-all dome-sculpt-uv-benchmark target to reproduce (UV.md).
+
+Canonical local FLTK toolkit and vendored hashes pass; linkage is recorded in
+artifacts/linkage-uv-worker-final.log with no Qt/GTK/Pango libraries listed.
+No installed prefix/session was replaced, and no fresh nested-compositor,
+physical-device or accelerator validation is claimed. Full objective remains
+active and incomplete. Machine-readable record:
+artifacts/validation-uv-worker-final.json.
+
 # Guarded asset-worker and native import milestone — 2026-10-29
 
 All21 Release suites passed in50.68 seconds (`artifacts/tests-assets-final.log`).

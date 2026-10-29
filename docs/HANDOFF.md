@@ -61,33 +61,54 @@ kernels still need full desktop/XR authoring integration; full glTF/VRM and the
 creator are not established by these foundations. Remote handoff references to
 uncommitted work/running agents are not verified process handles here.
 
-## Validation provenance
+## Fresh verification and environment
 
-The results below are pre-integration UV-stage evidence. Upstream independently
-recorded 19 native suites, 22 GUI and 37 menu checks in its workspace. Those logs
-are not present here. Fresh combined validation is recorded in VALIDATION.md;
-do not relabel either earlier set as a fresh combined run.
+The UV integration plus upstream work through db1d710 is pushed as b8f9920.
+The follow-up completion-notification guard is pushed as 1cf7157. Asset and
+recovery completion now acquire the condition-variable wait mutex before
+notification, matching the existing UV path and avoiding missed wakeups.
 
-## Build, evidence and measurements
+- Full 22-suite Release baseline passed in 210.81 s at b8f9920:
+  artifacts/tests-uv-worker-assets.log, including 43 complete OpenXR assertions.
+- After the notification correction, all five affected native suites passed
+  in 27.98 s: artifacts/tests-uv-worker-final.log. These cover UV, controller,
+  shared document, document recovery and scene assets.
+- All five targeted whole-core ASan/UBSan/leak suites passed in 200.98 s:
+  artifacts/tests-uv-worker-assets-sanitize-final.log.
+- Final native GUI 23/23 and universal menu 39/39 passed:
+  artifacts/gui-uv-worker-final-current.log and
+  artifacts/menu-uv-worker-assets-final.log. GUI verifies exact gesture undo,
+  real field selection, modal transfer completion and global undo; menu includes
+  recovery/import chooser ownership, cancellation and host handoff.
+- New cross-component tests prove that UV drafts produce no checkpoints,
+  completed Apply preserves exact mesh/paint in recovery, replacement rejects
+  stale checks while retaining durable old-source recovery, and a rigged rest
+  mesh rejects unsupported UV editing without losing deformation data.
 
-Read AGENTS.md and TOOLKIT.md. Release build uses the locally rebuilt canonical
-DomeD 742d009 toolkit in artifacts/toolkit; all 22 patch hashes and vendored
-source hashes match the manifest. The clean upstream is artifacts/domed-source.
-The parent DESIGN_CONVENTIONS file remains absent; current DomeD README and the
-committed menu audit supply available conventions. No installed prefix changed.
+Read AGENTS.md and TOOLKIT.md. Release uses the locally rebuilt canonical
+DomeD742d009 FLTK1.4.5 toolkit in artifacts/toolkit, with all 22 patch and vendored
+source hashes verified. Actual linkage is artifacts/linkage-uv-worker-final.log.
+The parent DESIGN_CONVENTIONS remains absent in this workspace; source README
+and the committed menu audit supplied available conventions. No install/session
+restart, fresh nested-compositor or hardware/accelerator run is claimed.
 
-All ten native suites passed (243.56 s), including 40 complete OpenXR checks.
-Three targeted UV/controller/document ASan/UBSan/leak suites passed (222.75 s).
-Native GUI 23/23 and universal menu 25/25 passed. Results and failed attempts
-are in VALIDATION.md; inspect terminal logs and current report completion fields.
+The final isolated native benchmark on the 19,944-triangle persisted fixture
+reports 0.985 ms mean / 1.477 ms maximum for 20 edit submissions, versus the older
+106.3 ms mean synchronous baseline. Final validation waited 106.94 ms in the
+background. All samples applied, preview valid, held snapshots unchanged, exact
+whole-gesture undo. This improves submission latency, not validation complexity
+or proven physical VR/production-mesh performance. Reproduce with the excluded
+CMake target dome-sculpt-uv-benchmark; see UV.md. Output:
+artifacts/uv-worker-benchmark-final.json. Local machine-readable evidence:
+artifacts/validation-uv-worker-final.json.
 
-The isolated 20-sample CPU benchmark on the same 19,944-triangle fixture reports
-1.077 ms mean / 2.509 ms maximum edit submission, versus the preceding ~106.3 ms
-mean / 110.1 ms maximum synchronous baseline. Final validation waited 104.96 ms
-in the background. Every sample was applied, preview valid, whole-gesture undo
-exact. This is not accelerated validation or a physical headset/production-scale
-performance claim. Reproduce with the excluded-from-all native CMake target
-`dome-sculpt-uv-benchmark` and a persisted painting fixture; see UV.md.
+Earlier UV-only (10 suites/40 XR), initial combined (19 suites/43 XR) and remote
+component evidence remain separate records in VALIDATION.md and archived
+handoffs. Do not relabel them as fresh full coverage of later changes. Final
+focused checks explicitly cover the small notification follow-up. GUI setup
+now verifies native field selection before typing; earlier click/Tab attempts
+failed material setup. All final handles returned exit 0; inspect current live
+processes before starting/restarting validation.
 
 ## Resume work
 
