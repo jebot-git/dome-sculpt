@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "../src/humanoid-sha256.hpp"
+#include "dome/creation.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/projection.hpp"
 #include "dome/source-maps.hpp"
+#include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -23,6 +26,52 @@ void rejects(auto f, const char *s) {
     std::cout << "EXPECTED " << e.what() << '\n';
   }
   require(failed, s);
+}
+void scene_fixture(const std::filesystem::path &directory) {
+  std::filesystem::create_directories(directory);
+  for (std::string gender : {"female", "male"}) {
+    auto start = std::chrono::steady_clock::now();
+    Scene scene;
+    auto group = append_humanoid(
+        scene, humanoid_baseline_defaults("vroid-beta-" + gender),
+        "CC0 VRoid " + gender);
+    size_t parts = 0, unpaintable = 0, linked = 0;
+    for (const auto &o : scene.objects())
+      if (o.group == group) {
+        ++parts;
+        unpaintable +=
+            o.painted->surface_diagnostics().unpaintable_uv_faces.size();
+        linked += o.painted->surface_diagnostics().linked_texels;
+      }
+    require(parts == 19 && unpaintable == 28 && linked == 36738,
+            "Actual grouped baseline keeps every original primitive and "
+            "authored UV exception");
+    std::cout << gender << " append_seconds="
+              << std::chrono::duration<double>(
+                     std::chrono::steady_clock::now() - start)
+                     .count()
+              << '\n';
+    auto native = directory / ("vroid-" + gender + "-native.dsculpt");
+    scene.save(native);
+    auto reopened = Scene::load(native);
+    require(scene.encode() == reopened.encode(),
+            "Full actual source Scene save/reopen retains exact "
+            "material/image/rig/morph/creator state");
+    std::cout << gender
+              << " native_bytes=" << std::filesystem::file_size(native) << '\n';
+    start = std::chrono::steady_clock::now();
+    auto surfaces = reopened.surfaces(true);
+    std::cout << gender << " composite_seconds="
+              << std::chrono::duration<double>(
+                     std::chrono::steady_clock::now() - start)
+                     .count()
+              << '\n';
+    auto output = directory / ("vroid-" + gender + "-native.glb");
+    export_glb(surfaces, output);
+    std::cout << gender
+              << " exported_bytes=" << std::filesystem::file_size(output)
+              << '\n';
+  }
 }
 int main() try {
   std::cout << std::unitbuf;
@@ -192,6 +241,8 @@ int main() try {
           "Wrong baseline bytes fail identity verification without falling "
           "back to MH or another directory");
   std::filesystem::remove_all(temporary);
+  if (const char *directory = std::getenv("DOME_VROID_SCENE_FIXTURE"))
+    scene_fixture(directory);
   return 0;
 } catch (const std::exception &e) {
   std::cerr << "FAIL " << e.what() << '\n';

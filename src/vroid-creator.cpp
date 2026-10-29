@@ -3,6 +3,7 @@
 #include "dome/projection.hpp"
 #include "dome/source-maps.hpp"
 #include "humanoid-sha256.hpp"
+#include "vroid-groom.hpp"
 #include <fstream>
 #include <mutex>
 #include <nlohmann/json.hpp>
@@ -463,6 +464,7 @@ CreatedHumanoid create_vroid(const HumanoidControls &c,
     part.color = material.color;
     part.roughness = material.roughness;
     part.toon = true;
+    part.unlit = material.unlit;
     std::string lower = material.name;
     std::transform(lower.begin(), lower.end(), lower.begin(),
                    [](unsigned char v) { return char(std::tolower(v)); });
@@ -595,9 +597,11 @@ CreatedHumanoid create_vroid(const HumanoidControls &c,
       "independently of preview support; this does not claim complete VRM "
       "export.",
       "Body/style settings are bounded relative modifications; hair controls "
-      "do not synthesize replacement hair for these preserved sources."};
+      "keep source hair unchanged; nonzero controls add an original fitted "
+      "groom extension."};
   for (const auto &w : a.warnings)
     output.notes.push_back(w);
+  creator_detail::append_vroid_groom(output, cancel);
   output.validate();
   stop(cancel);
   return output;

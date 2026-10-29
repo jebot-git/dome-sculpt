@@ -56,6 +56,7 @@ struct HumanoidPart {
   float roughness = .8f;
   std::shared_ptr<const CreatorAppearance> appearance;
   std::shared_ptr<const PaintSourceMaps> source_maps;
+  bool unlit = false;
 };
 struct CreatedHumanoid {
   HumanoidControls controls;

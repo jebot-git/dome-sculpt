@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/humanoid-creator.hpp"
+#include "humanoid-groom.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
 #include <numbers>
@@ -424,87 +425,14 @@ void limbal_ring(Builder &b, Vec3 center, Vec3 radius, uint32_t eye, int side) {
     b.triangle(a + 1, a + 3, a + 2);
   }
 }
-float hair_phi(float angle) {
-  float z = std::cos(angle);
-  return 1.7f - .45f * std::max(0.f, z) + .65f * std::max(0.f, -z);
-}
-Vec3 scalp(float theta, float phi, float volume) {
-  return {std::sin(theta) * std::sin(phi) * (.95f + volume * .12f),
-          7.55f + std::cos(phi) * 1.08f,
-          .35f + std::cos(theta) * std::sin(phi) * (1.20f + volume * .10f)};
-}
-void groom(Builder &b, const Frame &f, const HumanoidControls &c) {
-  constexpr int segments = 32, rings = 10;
-  uint32_t head = bone_id("head");
-  auto top = b.vertex(f(scalp(0, 0, c.hair_volume)), {.5f, 0}, head);
-  for (int r = 1; r <= rings; ++r)
-    for (int s = 0; s <= segments; ++s) {
-      float angle = 2 * pi * float(s) / segments;
-      b.vertex(
-          f(scalp(angle, hair_phi(angle) * float(r) / rings, c.hair_volume)),
-          {float(s) / segments, float(r) / rings * .38f}, head);
-    }
-  for (int s = 0; s < segments; ++s)
-    b.triangle(top, 1 + s, 2 + s);
-  for (int r = 0; r < rings - 1; ++r)
-    for (int s = 0; s < segments; ++s) {
-      uint32_t a = 1 + r * (segments + 1) + s, d = a + segments + 1;
-      b.triangle(a, d, a + 1);
-      b.triangle(a + 1, d, d + 1);
-    }
-  // Closed six-sided swept locks, with separate UV cells and a pointed fan tip.
-  constexpr int locks = 24, steps = 10, sides = 6;
-  for (int lock = 0; lock < locks; ++lock) {
-    float theta = 2 * pi * (float(lock) + .5f) / locks,
-          front = std::max(0.f, std::cos(theta));
-    uint32_t start = uint32_t(b.part.mesh.positions.size());
-    Vec3 previous;
-    for (int row = 0; row < steps; ++row) {
-      float t = float(row) / (steps - 1),
-            phi = .7f + (hair_phi(theta) - .7f) * t;
-      Vec3 center = scalp(theta, phi, c.hair_volume);
-      float drop = std::max(0.f, (t - .55f) / .45f) *
-                   (front > .7f ? c.fringe * .5f : c.hair_length * 4.5f);
-      center.y -= drop;
-      float flare = drop * .08f;
-      center.x += std::sin(theta) * flare;
-      center.z += std::cos(theta) * flare;
-      float width = (.14f + c.hair_volume * .05f) * (1 - .75f * t),
-            depth = .07f * (1 - .6f * t);
-      for (int side = 0; side <= sides; ++side) {
-        float a = 2 * pi * float(side) / sides;
-        Vec3 p = center + Vec3{std::cos(theta) * std::cos(a) * width +
-                                   std::sin(theta) * std::sin(a) * depth,
-                               0,
-                               -std::sin(theta) * std::cos(a) * width +
-                                   std::cos(theta) * std::sin(a) * depth};
-        b.vertex(f(p),
-                 {(float(lock % 6) + .06f + float(side) / sides * .88f) / 6,
-                  .42f + (float(lock / 6) + .12f + t * .76f) / 4 * .58f},
-                 head);
-      }
-      previous = center;
-    }
-    for (int row = 0; row < steps - 1; ++row)
-      for (int side = 0; side < sides; ++side) {
-        uint32_t a = start + row * (sides + 1) + side, d = a + sides + 1;
-        b.triangle(a, d, a + 1);
-        b.triangle(a + 1, d, d + 1);
-      }
-    auto tip = b.vertex(
-        f(previous + Vec3{0, -.07f, 0}),
-        {float(lock % 6) / 6 + .5f / 6, .42f + float(lock / 6 + 1) / 4 * .58f},
-        head);
-    auto cap = b.vertex(
-        f(scalp(theta, .7f, c.hair_volume)),
-        {float(lock % 6) / 6 + .5f / 6, .42f + float(lock / 6) / 4 * .58f},
-        head);
-    for (int side = 0; side < sides; ++side) {
-      uint32_t last = start + (steps - 1) * (sides + 1);
-      b.triangle(tip, last + side + 1, last + side);
-      b.triangle(cap, start + side, start + side + 1);
-    }
-  }
+void groom(Builder &b, const Frame &frame, const HumanoidControls &c) {
+  auto head = bone_id("head");
+  creator_detail::original_groom(
+      {c.hair_length, c.hair_volume, c.fringe},
+      [&](Vec3 p, std::array<float, 2> uv) { return b.vertex(p, uv, head); },
+      [&](uint32_t a, uint32_t d, uint32_t e) { b.triangle(a, d, e); },
+      [&](Vec3 p) { return frame(p); }, [](Vec3 p) { return p; },
+      [](Vec3 p, float, float, float, float) { return p; });
 }
 } // namespace
 void HumanoidControls::validate() const {
