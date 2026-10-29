@@ -208,3 +208,38 @@ intersections and remains documented, not full hair dynamics/collision support.
 Root next pins the fully committed rig+groom source for optimized tests. Pending
 paint TextureMaps.color_coverage ABI change means don't use old main archives
 with new headers; pin verification is isolated from that working code.
+
+
+## Verified published rig/groom checkpoint1f6698a
+
+Fresh detached source in artifacts/verify-rig-groom:
+- All37 Release CTests passed78.17s (tests-rig-groom-pinned.log).
+- Four whole-core ASan/UBSan/leak suites passed20.25s: creator archive,
+  groom, source-preview and rig editing (tests-rig-groom-pinned-sanitize.log).
+- Native general universal-menu53/53, focused rig8/8 and actual latest DomeD
+  Wayland/universal-menu8/8 pass (menu-rig-groom-general-pinned.log,
+  menu-rig-pinned.log, dome-menu-rig-groom-pinned.log). All process exits0 and
+  all JSON reports failed0. Test displays/buses/HOME were private.
+- Canonical DomeD remote main rechecked: still7322b0e; its unchanged22-patch
+  FLTK1.4.5 Release toolkit and rebuilt compositor remain current. No session
+  restart or system installation. No new physical-device/compute evidence.
+
+Weight helper cd064a3 follows this checkpoint as four new independent files;
+42 Release/sanitizer assertions reported by creator agent. It still needs core
+registration and actual desktop/XR weight-paint controls/history/visualization.
+It is not part of the37-suite published application checkpoint. The same agent
+now owns NEW uv-solve.hpp/cpp/tests/docs for full conformal unwrap and explicit
+seam stitching with complete source vertex/corner remaps and exact pins. Root
+will wire worker/UV workspace/native/XR paths; do not run solves on input thread.
+
+Paint agent is implementing TextureMaps.color_coverage plus shared MToon
+renderer/outline/UV1 and frame-time contracts. Current main archives are older
+than that public header change; wait for his final ABI barrier before rebuilding
+main. Source-pinned rig/groom artifacts above remain coherent. Export agent's
+VRM0 source-only actual-avatar outputs pass schema/core glTF validation and
+physics/basis/normal preservation fixtures; final sanitizer, painted coverage,
+generated groom and VRM1/full required semantics remain incomplete. He owns
+export.cpp/gltf-document.hpp/new VRM files. Root next should integrate committed
+VRM export into guarded background File jobs and native/XR export controls,
+finish interactive weights, then UV solve, remaining sculpt/retopo/bake/plugin
+work and physical/compute verification. Preserve full REQUIREMENTS objective.
