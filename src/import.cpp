@@ -9,6 +9,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <numeric>
 #include <set>
 #include <sstream>
@@ -48,11 +49,32 @@ void release(void *user, void *p) {
   static_cast<Budget *>(user)->used -= a->size;
   std::free(a);
 }
+std::string json_text(const char *value, size_t maximum,
+                      Budget *budget = nullptr) {
+  std::string_view raw = value ? value : "";
+  if (raw.size() > maximum)
+    throw std::length_error("glTF string exceeds resource limit");
+  bool escaped = raw.find(char(92)) != std::string_view::npos;
+  if (budget) {
+    if (raw.size() > SIZE_MAX / (escaped ? 6 : 1))
+      throw std::length_error("glTF string resource overflow");
+    budget->take(raw.size() * (escaped ? 6 : 1));
+  }
+  auto decoded = (!escaped && budget)
+                     ? std::string(raw)
+                     : nlohmann::json::parse("\"" + std::string(raw) + "\"")
+                           .get<std::string>();
+  if (decoded.find('\0') != std::string::npos)
+    throw std::runtime_error("NUL in glTF text value");
+  return decoded;
+}
 std::string label(const char *n, const char *fallback) {
-  std::string s = n ? n : fallback;
-  if (s.size() > 1024 || s.find('\0') != std::string::npos)
-    throw std::runtime_error("Imported name exceeds limit");
-  return s;
+  return json_text(n ? n : fallback, 1024);
+}
+std::string owned_label(const char *n, const char *fallback, Budget &b) {
+  auto value = label(n, fallback);
+  b.take(value.size());
+  return value;
 }
 std::vector<uint8_t> read_file(const fs::path &p, size_t limit, Budget &b) {
   std::ifstream f(p, std::ios::binary | std::ios::ate);
@@ -185,19 +207,31 @@ void unit(float v) {
   if (!std::isfinite(v) || v < 0 || v > 1)
     throw std::runtime_error("Imported material value outside0..1");
 }
-void generate_normals(Mesh &m) {
+void generate_normals(Mesh &m, bool display_fallback = false) {
+  std::vector<Vec3> fallback;
+  if (display_fallback)
+    fallback.assign(m.positions.size(), {0, 1, 0});
   m.normals.assign(m.positions.size(), {});
   for (size_t t = 0; t < m.indices.size(); t += 3) {
     auto a = m.indices[t], b = m.indices[t + 1], c = m.indices[t + 2];
     auto n =
         cross(m.positions[b] - m.positions[a], m.positions[c] - m.positions[a]);
+    if (display_fallback)
+      for (auto i : {a, b, c})
+        if (length(m.normals[i]) < 1e-12f)
+          fallback[i] = n;
     m.normals[a] += n;
     m.normals[b] += n;
     m.normals[c] += n;
   }
-  for (auto &n : m.normals) {
-    if (length(n) < 1e-12f)
-      throw std::runtime_error("Cannot derive a surface normal");
+  for (size_t i = 0; i < m.normals.size(); i++) {
+    auto &n = m.normals[i];
+    if (length(n) < 1e-12f) {
+      if (display_fallback)
+        n = fallback[i];
+      else
+        throw std::runtime_error("Cannot derive a surface normal");
+    }
     n = normalized(n);
   }
 }
@@ -271,6 +305,437 @@ std::vector<float> floats(const cgltf_accessor *a, cgltf_type type,
       throw std::runtime_error("Nonfinite glTF attribute");
   return values;
 }
+ImportedMatrix identity_matrix() {
+  return {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+}
+std::string extras(const cgltf_extras &e, Budget &b, const cgltf_data &d) {
+  if (e.start_offset == 0 && e.end_offset == 0)
+    return {};
+  size_t begin = e.start_offset, end = e.end_offset;
+  if (end < begin || end > d.json_size)
+    throw std::runtime_error("Invalid glTF extras bounds");
+  // jsmn string offsets exclude their quotes; preserve any JSON value exactly.
+  if (begin > 0 && end < d.json_size && d.json[begin - 1] == '"' &&
+      d.json[end] == '"') {
+    --begin;
+    ++end;
+  }
+  b.take(end - begin);
+  return std::string(d.json + begin, end - begin);
+}
+std::vector<float> authored_weights(const float *values, size_t count,
+                                    Budget &b) {
+  b.take(count * sizeof(float));
+  std::vector<float> out;
+  for (size_t i = 0; i < count; i++) {
+    if (!std::isfinite(values[i]))
+      throw std::runtime_error("Nonfinite authored morph weight");
+    out.push_back(values[i]);
+  }
+  return out;
+}
+size_t morph_count(const cgltf_mesh &m) {
+  size_t n = 0;
+  for (size_t i = 0; i < m.primitives_count; i++)
+    n = std::max(n, m.primitives[i].targets_count);
+  return n;
+}
+void metadata(const cgltf_data &d, ImportedAsset &out, Budget &b,
+              const ImportLimits &o) {
+  size_t work = 0;
+  auto visit = [&] {
+    if (++work > o.max_metadata_visits)
+      throw std::length_error("glTF hierarchy metadata work budget exceeded");
+    if (work % 256 == 0)
+      stop(o);
+  };
+  out.mode = o.mode;
+  out.extras_json = extras(d.extras, b, d);
+  out.default_scene = d.scene ? int(d.scene - d.scenes) : -1;
+  b.take(d.nodes_count * sizeof(ImportedNode) +
+         d.meshes_count * sizeof(ImportedMesh) +
+         d.skins_count * sizeof(ImportedSkin) +
+         d.scenes_count * sizeof(ImportedScene));
+  std::vector<uint32_t> roots(d.nodes_count);
+  for (size_t i = 0; i < d.nodes_count; i++) {
+    visit();
+    auto &n = d.nodes[i];
+    if (n.has_matrix && (n.has_translation || n.has_rotation || n.has_scale))
+      throw std::runtime_error("Node cannot author both matrix and TRS");
+    if (n.has_mesh_gpu_instancing)
+      throw std::runtime_error(
+          "GPU instancing extension needs a dedicated import path");
+    ImportedNode node;
+    node.name = owned_label(n.name, "Node", b);
+    node.extras_json = extras(n.extras, b, d);
+    node.parent = n.parent ? int(n.parent - d.nodes) : -1;
+    node.mesh = n.mesh ? int(n.mesh - d.meshes) : -1;
+    node.skin = n.skin ? int(n.skin - d.skins) : -1;
+    node.camera = n.camera ? int(n.camera - d.cameras) : -1;
+    node.light = n.light ? int(n.light - d.lights) : -1;
+    if (n.camera || n.light)
+      out.warnings.push_back("Camera/light payload is not imported for node " +
+                             std::to_string(i) + "; source reference retained");
+    node.has_matrix = n.has_matrix;
+    node.has_translation = n.has_translation;
+    node.has_rotation = n.has_rotation;
+    node.has_scale = n.has_scale;
+    std::copy_n(n.translation, 3, node.translation.begin());
+    std::copy_n(n.rotation, 4, node.rotation.begin());
+    std::copy_n(n.scale, 3, node.scale.begin());
+    for (float f : node.translation)
+      if (!std::isfinite(f))
+        throw std::runtime_error("Nonfinite node translation");
+    for (float f : node.scale)
+      if (!std::isfinite(f))
+        throw std::runtime_error("Nonfinite node scale");
+    double q = 0;
+    for (float f : node.rotation) {
+      if (!std::isfinite(f))
+        throw std::runtime_error("Nonfinite node quaternion");
+      q += double(f) * f;
+    }
+    if (std::abs(q - 1) > 1e-4)
+      throw std::runtime_error(
+          "Node rotation quaternion must have unit length");
+    cgltf_node_transform_local(&n, node.local.data());
+    cgltf_node_transform_world(&n, node.world.data());
+    for (auto matrix : {node.local, node.world}) {
+      for (float f : matrix)
+        if (!std::isfinite(f))
+          throw std::runtime_error("Nonfinite node matrix");
+      if (std::abs(matrix[3]) + std::abs(matrix[7]) + std::abs(matrix[11]) +
+              std::abs(matrix[15] - 1) >
+          1e-6f)
+        throw std::runtime_error(
+            "Projective node matrix is not a glTF TRS transform");
+    }
+    b.take(n.children_count * sizeof(uint32_t));
+    for (size_t j = 0; j < n.children_count; j++) {
+      visit();
+      node.children.push_back(uint32_t(n.children[j] - d.nodes));
+    }
+    node.weights = authored_weights(n.weights, n.weights_count, b);
+    if (n.weights_count && (!n.mesh || n.weights_count != morph_count(*n.mesh)))
+      throw std::runtime_error("Node morph default count mismatch");
+    auto *p = &n;
+    while (p->parent) {
+      visit();
+      p = p->parent;
+    }
+    roots[i] = uint32_t(p - d.nodes);
+    out.nodes.push_back(std::move(node));
+  }
+  for (size_t i = 0; i < d.meshes_count; i++) {
+    visit();
+    auto &m = d.meshes[i];
+    if (!m.primitives_count)
+      throw std::runtime_error("glTF mesh has no primitives");
+    ImportedMesh mesh;
+    mesh.name = owned_label(m.name, "Mesh", b);
+    mesh.extras_json = extras(m.extras, b, d);
+    auto n = morph_count(m);
+    if ((m.weights_count && m.weights_count != n) ||
+        (m.target_names_count && m.target_names_count != n))
+      throw std::runtime_error("Mesh morph defaults/names count mismatch");
+    mesh.weights = authored_weights(m.weights, m.weights_count, b);
+    for (size_t t = 0; t < m.target_names_count; t++) {
+      visit();
+      auto name = owned_label(m.target_names[t], "", b);
+      b.take(name.size());
+      mesh.target_names.push_back(std::move(name));
+    }
+    out.meshes.push_back(std::move(mesh));
+  }
+  for (size_t i = 0; i < d.skins_count; i++) {
+    visit();
+    auto &s = d.skins[i];
+    if (!s.joints_count || s.joints_count > d.nodes_count)
+      throw std::runtime_error("Invalid skin joint count");
+    ImportedSkin skin;
+    skin.name = owned_label(s.name, "Skin", b);
+    skin.extras_json = extras(s.extras, b, d);
+    skin.skeleton = s.skeleton ? int(s.skeleton - d.nodes) : -1;
+    b.take(s.joints_count * sizeof(uint32_t));
+    std::set<uint32_t> distinct;
+    uint32_t root = roots[s.joints[0] - d.nodes];
+    for (size_t j = 0; j < s.joints_count; j++) {
+      visit();
+      auto id = uint32_t(s.joints[j] - d.nodes);
+      if (!distinct.insert(id).second || roots[id] != root)
+        throw std::runtime_error(
+            "Skin joints must be unique with a common hierarchy root");
+      skin.joints.push_back(id);
+      if (s.skeleton) {
+        auto *p = s.joints[j];
+        while (p && p != s.skeleton) {
+          visit();
+          p = p->parent;
+        }
+        if (!p)
+          throw std::runtime_error("Skin skeleton is not a joint ancestor");
+      }
+    }
+    if (s.inverse_bind_matrices) {
+      auto *a = s.inverse_bind_matrices;
+      if (a->component_type != cgltf_component_type_r_32f || a->normalized ||
+          a->count < s.joints_count)
+        throw std::runtime_error("Invalid inverse bind matrix accessor");
+      auto values = floats(a, cgltf_type_mat4, a->count, b);
+      b.take(a->count * sizeof(ImportedMatrix));
+      skin.inverse_bind_matrices_authored = true;
+      for (size_t j = 0; j < a->count; j++) {
+        visit();
+        ImportedMatrix matrix;
+        std::copy_n(values.data() + j * 16, 16, matrix.begin());
+        if (j < s.joints_count && (matrix[3] != 0 || matrix[7] != 0 ||
+                                   matrix[11] != 0 || matrix[15] != 1))
+          throw std::runtime_error("Joint inverse bind matrix must be affine");
+        skin.inverse_bind_matrices.push_back(matrix);
+      }
+    }
+    out.skins.push_back(std::move(skin));
+  }
+  std::map<uint32_t, std::set<uint32_t>> scenes_for_root;
+  for (size_t i = 0; i < d.scenes_count; i++) {
+    visit();
+    auto &s = d.scenes[i];
+    ImportedScene scene;
+    scene.name = owned_label(s.name, "Scene", b);
+    scene.extras_json = extras(s.extras, b, d);
+    b.take(s.nodes_count * sizeof(uint32_t));
+    std::set<uint32_t> distinct;
+    for (size_t j = 0; j < s.nodes_count; j++) {
+      visit();
+      auto root = uint32_t(s.nodes[j] - d.nodes);
+      if (!distinct.insert(root).second)
+        throw std::runtime_error("Duplicate scene root");
+      scene.roots.push_back(root);
+      scenes_for_root[root].insert(uint32_t(i));
+    }
+    out.scenes.push_back(std::move(scene));
+  }
+  std::set<std::pair<uint32_t, uint32_t>> checked;
+  for (size_t i = 0; i < d.nodes_count; i++)
+    if (d.nodes[i].skin) {
+      visit();
+      auto skin = uint32_t(d.nodes[i].skin - d.skins);
+      if (!d.nodes[i].mesh)
+        throw std::runtime_error("Skinned node has no mesh");
+      auto jointroot = roots[out.skins[skin].joints[0]];
+      for (auto scene : scenes_for_root[roots[i]]) {
+        visit();
+        if (checked.insert({skin, scene}).second) {
+          if (!scenes_for_root[jointroot].contains(scene))
+            throw std::runtime_error(
+                "Skin common root must belong to the mesh instance scene");
+        }
+      }
+    }
+  stop(o);
+}
+int component_number(cgltf_component_type type) {
+  switch (type) {
+  case cgltf_component_type_r_8u:
+    return 5121;
+  case cgltf_component_type_r_16u:
+    return 5123;
+  case cgltf_component_type_r_32f:
+    return 5126;
+  default:
+    return 0;
+  }
+}
+void deformation(const cgltf_primitive &p, const cgltf_mesh &mesh,
+                 ImportedPrimitive &prim, Budget &b, const ImportLimits &o,
+                 ImportedAsset &out) {
+  size_t count = prim.mesh.positions.size();
+  std::map<uint32_t, std::pair<const cgltf_accessor *, const cgltf_accessor *>>
+      sets;
+  for (size_t i = 0; i < p.attributes_count; i++) {
+    auto &a = p.attributes[i];
+    if (a.type != cgltf_attribute_type_joints &&
+        a.type != cgltf_attribute_type_weights)
+      continue;
+    std::string prefix =
+        a.type == cgltf_attribute_type_joints ? "JOINTS_" : "WEIGHTS_";
+    if (a.index < 0 || a.index > 999999999 || !a.name ||
+        a.name != prefix + std::to_string(a.index))
+      throw std::runtime_error("Invalid influence set semantic index");
+    auto &set = sets[uint32_t(a.index)];
+    auto &slot = a.type == cgltf_attribute_type_joints ? set.first : set.second;
+    if (slot)
+      throw std::runtime_error("Duplicate influence attribute");
+    slot = a.data;
+  }
+  uint32_t expected = 0;
+  for (auto &[id, pair] : sets) {
+    stop(o);
+    auto [j, w] = pair;
+    if (id != expected++ || !j || !w)
+      throw std::runtime_error(
+          "Joint and weight sets must be paired and consecutive");
+    if ((j->component_type != cgltf_component_type_r_8u &&
+         j->component_type != cgltf_component_type_r_16u) ||
+        j->normalized)
+      throw std::runtime_error(
+          "Joint indices must be non-normalized unsigned byte/short VEC4");
+    if ((w->component_type != cgltf_component_type_r_32f &&
+         w->component_type != cgltf_component_type_r_8u &&
+         w->component_type != cgltf_component_type_r_16u) ||
+        (w->component_type == cgltf_component_type_r_32f ? w->normalized
+                                                         : !w->normalized))
+      throw std::runtime_error(
+          "Weights must be float or normalized unsigned byte/short VEC4");
+    auto joints = floats(j, cgltf_type_vec4, count, b),
+         weights = floats(w, cgltf_type_vec4, count, b);
+    b.take(count *
+           (sizeof(std::array<uint32_t, 4>) + sizeof(std::array<float, 4>)));
+    ImportedInfluenceSet set;
+    set.set = id;
+    set.joint_component_type = component_number(j->component_type);
+    set.weight_component_type = component_number(w->component_type);
+    set.weights_normalized = w->normalized;
+    for (size_t v = 0; v < count; v++) {
+      if (v % 512 == 0)
+        stop(o);
+      std::array<uint32_t, 4> joint;
+      std::array<float, 4> weight;
+      for (size_t k = 0; k < 4; k++) {
+        joint[k] = uint32_t(joints[v * 4 + k]);
+        weight[k] = weights[v * 4 + k];
+        if (weight[k] < 0)
+          throw std::runtime_error("Negative skin weight");
+      }
+      set.joints.push_back(joint);
+      set.weights.push_back(weight);
+    }
+    prim.influences.push_back(std::move(set));
+  }
+  bool warned = false;
+  for (size_t v = 0; v < count && !sets.empty(); v++) {
+    if (v % 256 == 0)
+      stop(o);
+    std::vector<uint32_t> active;
+    double sum = 0;
+    uint64_t integer_sum = 0;
+    bool integer = true;
+    size_t nonzero = 0;
+    for (auto &set : prim.influences)
+      for (size_t k = 0; k < 4; k++) {
+        auto weight = set.weights[v][k];
+        sum += weight;
+        if (weight > 0) {
+          active.push_back(set.joints[v][k]);
+          ++nonzero;
+        }
+        if (set.weight_component_type == 5126)
+          integer = false;
+        else
+          integer_sum +=
+              uint64_t(std::llround(
+                  double(weight) *
+                  (set.weight_component_type == 5121 ? 255 : 65535))) *
+              (set.weight_component_type == 5121 ? 257 : 1);
+      }
+    std::sort(active.begin(), active.end());
+    if (std::adjacent_find(active.begin(), active.end()) != active.end())
+      throw std::runtime_error(
+          "Nonzero influences must use distinct joint indices");
+    if (integer && integer_sum != 65535)
+      throw std::runtime_error(
+          "Normalized integer influence weights must sum exactly to one");
+    if (!integer && std::abs(sum - 1) > 2e-7 * std::max(size_t(1), nonzero) &&
+        !warned) {
+      out.warnings.push_back("Authored floating skin weights do not sum to "
+                             "one; values are preserved without normalization");
+      warned = true;
+    }
+  }
+  auto targets = morph_count(mesh);
+  b.take(targets * sizeof(ImportedMorphTarget));
+  prim.morph_targets.resize(targets);
+  prim.morph_targets_authored = p.targets_count != 0;
+  if (p.targets_count && p.targets_count != targets)
+    throw std::runtime_error("Inconsistent explicit morph target counts");
+  for (size_t t = 0; t < p.targets_count; t++) {
+    stop(o);
+    std::set<cgltf_attribute_type> channels;
+    for (size_t a = 0; a < p.targets[t].attributes_count; a++) {
+      auto &attr = p.targets[t].attributes[a];
+      if (attr.index != 0 || !channels.insert(attr.type).second)
+        throw std::runtime_error(
+            "Duplicate/unsupported morph target channel index");
+      std::vector<Vec3> *dest = nullptr;
+      if (attr.type == cgltf_attribute_type_position)
+        dest = &prim.morph_targets[t].positions;
+      else if (attr.type == cgltf_attribute_type_normal)
+        dest = &prim.morph_targets[t].normals;
+      else if (attr.type == cgltf_attribute_type_tangent)
+        dest = &prim.morph_targets[t].tangents;
+      else
+        throw std::runtime_error(
+            "Morph channel requires an explicit supported import path");
+      if (!cgltf_find_accessor(&p, attr.type, 0))
+        throw std::runtime_error("Morph target channel has no base attribute");
+      if (attr.data->component_type != cgltf_component_type_r_32f ||
+          attr.data->normalized)
+        throw std::runtime_error("Core morph differences must use float VEC3");
+      auto values = floats(attr.data, cgltf_type_vec3, count, b);
+      b.take(count * sizeof(Vec3));
+      for (size_t v = 0; v < count; v++) {
+        if (v % 512 == 0)
+          stop(o);
+        dest->push_back({values[v * 3], values[v * 3 + 1], values[v * 3 + 2]});
+      }
+    }
+  }
+}
+void skin_mappings(const cgltf_data &d, ImportedAsset &out,
+                   const ImportLimits &o) {
+  size_t work = 0;
+  std::set<std::pair<int, int>> checked;
+  std::set<int> bound;
+  for (auto &node : out.nodes)
+    if (node.skin >= 0) {
+      bound.insert(node.mesh);
+      if (!checked.insert({node.mesh, node.skin}).second)
+        continue;
+      auto &skin = out.skins[node.skin];
+      for (auto id : out.meshes[node.mesh].primitives) {
+        auto &p = out.primitives[id];
+        if (p.influences.empty())
+          throw std::runtime_error(
+              "Skinned mesh primitive has no joint/weight sets");
+        for (size_t v = 0; v < p.mesh.positions.size(); v++) {
+          if (v % 256 == 0)
+            stop(o);
+          double sum = 0;
+          for (auto &set : p.influences)
+            for (size_t k = 0; k < 4; k++) {
+              if (++work > o.max_metadata_visits)
+                throw std::length_error(
+                    "Skin instance mapping work budget exceeded");
+              if (set.joints[v][k] >= skin.joints.size())
+                throw std::runtime_error("Influence joint slot exceeds an "
+                                         "instancing skin's joint map");
+              sum += set.weights[v][k];
+            }
+          if (sum <= 0)
+            throw std::runtime_error("Skinned vertex has no nonzero influence");
+        }
+      }
+    }
+  for (size_t mesh = 0; mesh < out.meshes.size(); mesh++)
+    if (!bound.contains(int(mesh)))
+      for (auto id : out.meshes[mesh].primitives)
+        if (!out.primitives[id].influences.empty())
+          out.warnings.push_back("Joint/weight data retained for mesh " +
+                                 std::to_string(mesh) +
+                                 " without any bound skin instance");
+  (void)d;
+  stop(o);
+}
 ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
   auto input = read_file(path, o.max_file_bytes, b);
   stop(o);
@@ -285,7 +750,9 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
   if (d.extensions_required_count)
     throw std::runtime_error(
         "Required glTF extensions need an explicit supported import path");
-  if (d.nodes_count > 100000 || d.materials_count > 65536 ||
+  if (d.nodes_count > 100000 || d.meshes_count > 65536 ||
+      d.skins_count > 65536 || d.scenes_count > 65536 ||
+      d.animations_count > 65536 || d.materials_count > 65536 ||
       d.images_count > 65536 || d.textures_count > 65536)
     throw std::length_error("glTF scene/resource count exceeds limit");
   std::vector<std::vector<uint8_t>> buffers(d.buffers_count);
@@ -295,11 +762,12 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
     if (!buf.size || buf.size > o.max_resource_bytes)
       throw std::length_error("Invalid glTF buffer size");
     if (buf.uri) {
-      if (std::string_view(buf.uri).starts_with("data:")) {
+      auto uri = json_text(buf.uri, o.max_file_bytes, &b);
+      if (std::string_view(uri).starts_with("data:")) {
         std::string ignored;
-        buffers[i] = data_uri(buf.uri, ignored, b);
+        buffers[i] = data_uri(uri, ignored, b);
       } else
-        buffers[i] = read_file(resource(path.parent_path(), buf.uri, o),
+        buffers[i] = read_file(resource(path.parent_path(), uri, o),
                                o.max_resource_bytes, b);
       if (buffers[i].size() < buf.size)
         throw std::runtime_error("Truncated glTF buffer");
@@ -322,41 +790,84 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
       stop(o);
     accessor_bounds(d.accessors[i]);
   }
-  if (cgltf_validate(&d) != cgltf_result_success)
-    throw std::runtime_error("Invalid glTF data");
-  // Bound parent depth before cgltf's recursive transform utility.
+  // Bound depth/work before cgltf validation performs parent-chain walks.
+  size_t hierarchy_work = 0;
   for (size_t i = 0; i < d.nodes_count; i++) {
+    if (i % 256 == 0)
+      stop(o);
     auto *p = &d.nodes[i];
     size_t depth = 0;
     while (p) {
+      if (++hierarchy_work > o.max_metadata_visits)
+        throw std::length_error("glTF hierarchy work budget exceeded");
       if (++depth > 256)
         throw std::runtime_error("glTF node hierarchy is too deep");
       p = p->parent;
     }
   }
+  // cgltf1.15 predates the clarified allowance for primitives with implicit
+  // zero targets alongside explicitly morphed primitives. Normalize only the
+  // temporary validator view, then restore authored presence before import.
+  struct ZeroTargets {
+    cgltf_primitive *primitive;
+    std::vector<cgltf_morph_target> zeros;
+  };
+  std::vector<ZeroTargets> implicit;
+  if (o.mode == ImportMode::PreserveGltf)
+    for (size_t i = 0; i < d.meshes_count; i++) {
+      auto &m = d.meshes[i];
+      size_t targets = morph_count(m);
+      for (size_t j = 0; j < m.primitives_count; j++)
+        if (targets && !m.primitives[j].targets_count) {
+          b.take(targets * sizeof(cgltf_morph_target));
+          implicit.push_back(
+              {&m.primitives[j], std::vector<cgltf_morph_target>(targets)});
+        }
+    }
+  for (auto &p : implicit) {
+    p.primitive->targets = p.zeros.data();
+    p.primitive->targets_count = p.zeros.size();
+  }
+  auto validated = cgltf_validate(&d);
+  for (auto &p : implicit) {
+    p.primitive->targets = nullptr;
+    p.primitive->targets_count = 0;
+  }
+  if (validated != cgltf_result_success)
+    throw std::runtime_error("Invalid glTF data");
   ImportedAsset out;
+  out.mode = o.mode;
+  if (o.mode == ImportMode::PreserveGltf)
+    metadata(d, out, b, o);
+  for (size_t i = 0; i < d.animations_count; i++)
+    out.omitted_animations.push_back(
+        {owned_label(d.animations[i].name, "Animation", b),
+         d.animations[i].channels_count, d.animations[i].samplers_count});
   if (d.animations_count)
     out.warnings.push_back("Animation tracks are not imported; the static node "
                            "transforms are retained");
-  if (d.extensions_used_count)
-    out.warnings.push_back("Optional glTF extension data is not part of this "
-                           "static core importer");
+  for (size_t i = 0; i < d.extensions_used_count; i++) {
+    out.extensions_used.push_back(
+        owned_label(d.extensions_used[i], "Extension", b));
+    out.warnings.push_back("Optional extension is not interpreted: " +
+                           out.extensions_used.back());
+  }
   out.materials.push_back({});
   for (size_t i = 0; i < d.images_count; i++) {
     stop(o);
     auto &image = d.images[i];
     ImportedImage im;
-    im.name = label(image.name, "Image");
-    im.mime_type = image.mime_type ? image.mime_type : "";
+    im.name = owned_label(image.name, "Image", b);
+    im.mime_type = owned_label(image.mime_type, "", b);
     if (image.uri) {
-      im.source_uri = image.uri;
-      if (std::string_view(image.uri).starts_with("data:")) {
+      im.source_uri = json_text(image.uri, o.max_file_bytes, &b);
+      if (std::string_view(im.source_uri).starts_with("data:")) {
         std::string mime;
-        im.bytes = data_uri(image.uri, mime, b);
+        im.bytes = data_uri(im.source_uri, mime, b);
         if (im.mime_type.empty())
           im.mime_type = mime;
       } else {
-        auto source = resource(path.parent_path(), image.uri, o);
+        auto source = resource(path.parent_path(), im.source_uri, o);
         im.bytes = read_file(source, o.max_resource_bytes, b);
         if (im.mime_type.empty())
           im.mime_type = mime_for(source);
@@ -404,7 +915,7 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
       throw std::runtime_error(
           "This material requires a non-core glTF shader import path");
     ImportedMaterial material;
-    material.name = label(m.name, "Material");
+    material.name = owned_label(m.name, "Material", b);
     auto &pbr = m.pbr_metallic_roughness;
     std::copy_n(pbr.base_color_factor, 4, material.color.begin());
     std::copy_n(m.emissive_factor, 3, material.emissive.begin());
@@ -462,16 +973,30 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
     for (size_t i = 0; i < d.nodes_count; i++)
       if (!d.nodes[i].parent)
         visit(visit, &d.nodes[i]);
+  struct MeshUse {
+    cgltf_mesh *mesh;
+    cgltf_node *node;
+  };
+  std::vector<MeshUse> uses;
+  const bool preserve = o.mode == ImportMode::PreserveGltf;
+  if (preserve)
+    for (size_t i = 0; i < d.meshes_count; i++)
+      uses.push_back({&d.meshes[i], nullptr});
+  else
+    for (auto *n : nodes)
+      if (n->mesh)
+        uses.push_back({n->mesh, n});
   size_t vertex_count = 0, triangle_count = 0;
-  for (auto *n : nodes) {
+  for (auto use : uses) {
+    auto *n = use.node;
+    auto *mesh = use.mesh;
     stop(o);
-    if (!n->mesh)
-      continue;
-    if (n->skin || n->has_mesh_gpu_instancing)
+    if (!preserve && (n->skin || n->has_mesh_gpu_instancing))
       throw std::runtime_error(
           "Skinned/instanced nodes require a dedicated authoring import path");
-    std::array<float, 16> world{};
-    cgltf_node_transform_world(n, world.data());
+    auto world = identity_matrix();
+    if (!preserve)
+      cgltf_node_transform_world(n, world.data());
     for (float f : world)
       if (!std::isfinite(f))
         throw std::runtime_error("Nonfinite node transform");
@@ -485,10 +1010,10 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
     if (!std::isfinite(det) || !std::isfinite(scale) || scale <= 0 ||
         std::abs(det) < 1e-10 * scale)
       throw std::runtime_error("Singular mesh transform");
-    for (size_t j = 0; j < n->mesh->primitives_count; j++) {
-      auto &p = n->mesh->primitives[j];
-      if (p.type != cgltf_primitive_type_triangles || p.targets_count ||
-          p.has_draco_mesh_compression)
+    for (size_t j = 0; j < mesh->primitives_count; j++) {
+      auto &p = mesh->primitives[j];
+      if (p.type != cgltf_primitive_type_triangles ||
+          (!preserve && p.targets_count) || p.has_draco_mesh_compression)
         throw std::runtime_error(
             "Only static uncompressed triangle primitives are supported");
       auto *pa = cgltf_find_accessor(&p, cgltf_attribute_type_position, 0);
@@ -506,21 +1031,30 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
         throw std::length_error("Too many imported primitives");
       b.take(sizeof(ImportedPrimitive) + 2048);
       ImportedPrimitive prim;
-      prim.name = label(n->name, n->mesh->name ? n->mesh->name : "Mesh") +
-                  " / " + std::to_string(j);
+      prim.name =
+          label(n ? n->name : mesh->name, mesh->name ? mesh->name : "Mesh") +
+          " / " + std::to_string(j);
+      prim.mesh_local = preserve;
+      prim.source_mesh = int(mesh - d.meshes);
+      prim.source_primitive = int(j);
+      prim.source_node = n ? int(n - d.nodes) : -1;
+      if (preserve)
+        prim.extras_json = extras(p.extras, b, d);
       prim.source_world = world;
       prim.material = p.material ? uint32_t(p.material - d.materials) + 1 : 0;
       auto pos = floats(pa, cgltf_type_vec3, count, b);
       auto *na = cgltf_find_accessor(&p, cgltf_attribute_type_normal, 0);
       std::vector<float> normal;
+      prim.normals_authored = na != nullptr;
       if (na)
         normal = floats(na, cgltf_type_vec3, count, b);
       for (size_t k = 0; k < count; k++) {
         if (k % 1024 == 0)
           stop(o);
         Vec3 v{pos[k * 3], pos[k * 3 + 1], pos[k * 3 + 2]};
-        auto vertex = col0 * v.x + col1 * v.y + col2 * v.z +
-                      Vec3{world[12], world[13], world[14]};
+        auto vertex = preserve ? v
+                               : col0 * v.x + col1 * v.y + col2 * v.z +
+                                     Vec3{world[12], world[13], world[14]};
         if (!finite(vertex) || std::max({std::abs(vertex.x), std::abs(vertex.y),
                                          std::abs(vertex.z)}) > 100)
           throw std::runtime_error(
@@ -533,17 +1067,28 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
                    float(det);
           if (!std::isfinite(length(q)) || length(q) < 1e-12f)
             throw std::runtime_error("Zero mesh normal");
-          prim.mesh.normals.push_back(normalized(q));
+          prim.mesh.normals.push_back(preserve ? vn : normalized(q));
         }
       }
       if (p.indices) {
-        if (p.indices->type != cgltf_type_scalar || p.indices->is_sparse ||
+        if (p.indices->type != cgltf_type_scalar ||
+            (!preserve && p.indices->is_sparse) || p.indices->normalized ||
             (p.indices->component_type != cgltf_component_type_r_8u &&
              p.indices->component_type != cgltf_component_type_r_16u &&
              p.indices->component_type != cgltf_component_type_r_32u))
           throw std::runtime_error("Unsupported index accessor");
+        std::vector<float> sparse_indices;
+        if (p.indices->is_sparse)
+          sparse_indices = floats(p.indices, cgltf_type_scalar, indices, b);
         for (size_t k = 0; k < indices; k++) {
-          auto index = cgltf_accessor_read_index(p.indices, k);
+          if (k % 1024 == 0)
+            stop(o);
+          if (p.indices->is_sparse &&
+              (sparse_indices[k] < 0 || sparse_indices[k] >= count))
+            throw std::runtime_error("Sparse triangle index out of range");
+          auto index = p.indices->is_sparse
+                           ? cgltf_size(sparse_indices[k])
+                           : cgltf_accessor_read_index(p.indices, k);
           if (index >= count)
             throw std::runtime_error("Triangle index out of range");
           prim.mesh.indices.push_back(uint32_t(index));
@@ -560,8 +1105,13 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
           if (p.attributes[previous].type == attr.type &&
               p.attributes[previous].index == attr.index)
             throw std::runtime_error("Duplicate glTF vertex attribute");
-        if (attr.index != 0 && attr.type != cgltf_attribute_type_texcoord)
+        if (attr.index != 0 && attr.type != cgltf_attribute_type_texcoord &&
+            !(preserve && (attr.type == cgltf_attribute_type_joints ||
+                           attr.type == cgltf_attribute_type_weights)))
           throw std::runtime_error("Unsupported glTF attribute set");
+        if (preserve && (attr.type == cgltf_attribute_type_joints ||
+                         attr.type == cgltf_attribute_type_weights))
+          continue;
         if (attr.type == cgltf_attribute_type_texcoord &&
             (attr.index == 0 || attr.index == 1)) {
           auto uv = floats(attr.data, cgltf_type_vec2, count, b);
@@ -585,12 +1135,16 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
         } else if (attr.type == cgltf_attribute_type_tangent) {
           auto tangents = floats(attr.data, cgltf_type_vec4, count, b);
           for (size_t k = 0; k < count; k++) {
-            auto q = col0 * tangents[k * 4] + col1 * tangents[k * 4 + 1] +
-                     col2 * tangents[k * 4 + 2];
+            auto q = preserve
+                         ? Vec3{tangents[k * 4], tangents[k * 4 + 1],
+                                tangents[k * 4 + 2]}
+                         : col0 * tangents[k * 4] + col1 * tangents[k * 4 + 1] +
+                               col2 * tangents[k * 4 + 2];
             if (!std::isfinite(length(q)) || length(q) < 1e-12f ||
                 std::abs(std::abs(tangents[k * 4 + 3]) - 1) > 1e-5f)
               throw std::runtime_error("Invalid vertex tangent");
-            q = normalized(q);
+            if (!preserve)
+              q = normalized(q);
             prim.tangents.push_back(
                 {q.x, q.y, q.z, tangents[k * 4 + 3] * (det < 0 ? -1 : 1)});
           }
@@ -599,6 +1153,8 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
           throw std::runtime_error(
               "Unsupported vertex attribute; import would lose data");
       }
+      if (preserve)
+        deformation(p, *mesh, prim, b, o, out);
       if (prim.material >= out.materials.size())
         throw std::runtime_error("Invalid primitive material");
       auto &mat = out.materials[prim.material];
@@ -614,14 +1170,22 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
       for (auto color : prim.colors)
         for (float c : color)
           unit(c);
-      if (!na)
-        generate_normals(prim.mesh);
+      if (!na) {
+        if (preserve)
+          b.take(count * sizeof(Vec3));
+        generate_normals(prim.mesh, preserve);
+      }
       prim.mesh.validate();
+      if (preserve)
+        out.meshes[prim.source_mesh].primitives.push_back(
+            uint32_t(out.primitives.size()));
       out.primitives.push_back(std::move(prim));
     }
   }
-  if (out.primitives.empty())
-    throw std::runtime_error("No static triangle mesh in selected glTF scene");
+  if (preserve)
+    skin_mappings(d, out, o);
+  if (!preserve && out.primitives.empty())
+    throw std::runtime_error("No triangle mesh in imported glTF scene");
   stop(o);
   return out;
 }
@@ -1064,7 +1628,9 @@ ImportedAsset import_mesh(const fs::path &source, const ImportLimits &o) {
       o.max_resource_bytes < o.max_file_bytes ||
       o.max_resource_bytes > 1024ull * 1024 * 1024 || !o.max_vertices ||
       o.max_vertices > 2'000'000 || !o.max_triangles ||
-      o.max_triangles > 2'000'000)
+      o.max_triangles > 2'000'000 || !o.max_metadata_visits ||
+      o.max_metadata_visits > 200'000'000 ||
+      (o.mode != ImportMode::StaticScene && o.mode != ImportMode::PreserveGltf))
     throw std::invalid_argument("Invalid import limits");
   stop(o);
   auto path = fs::canonical(source);

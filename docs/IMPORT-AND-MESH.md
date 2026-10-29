@@ -1,7 +1,9 @@
 # Native import and mesh processing
 
-`import_mesh()` reads static OBJ, glTF 2.0 JSON and GLB into owned native
-`ImportedAsset` data. No Blender, Gmsh, MeshLab frontend or Python runtime is
+`import_mesh()` reads OBJ, glTF 2.0 JSON and GLB into owned native
+`ImportedAsset` data. The default `StaticScene` path bakes static instances;
+explicit `PreserveGltf` hierarchy/skin/morph import is documented in
+`GLTF-PRESERVING-IMPORT.md`. No Blender, Gmsh, MeshLab frontend or Python runtime is
 loaded. Import, cleanup, BVH construction and voxelization are worker operations;
 the caller publishes the returned result only after successful completion and
 checks that the original document generation still matches.
@@ -30,11 +32,12 @@ triangle mappings so external attributes can follow its output. Existing paint
 requires explicit transfer/rebaking; replacing topology must not reuse old UV
 pixels as if they still matched.
 
-Skinning, morph targets, GPU instancing, compressed geometry, non-triangle glTF
-primitives, material extensions and unknown vertex attributes fail explicitly.
+In the default static path, skinning and morph targets reject explicitly.
+GPU instancing, compressed geometry, non-triangle glTF primitives, material
+extensions and unknown vertex attributes fail explicitly.
 Required glTF extensions fail; optional extension presence is reported. Animation
-tracks produce a warning and retain only the static node transforms. This is a
-static asset importer, not animation/rig import. Materials use owned indices;
+tracks produce a warning and retain only the static node transforms. Animation
+playback remains outside both paths. Materials use owned indices;
 there are no parser-owned pointers in the returned asset.
 
 ## Validation and bounds
@@ -117,7 +120,7 @@ extraction, topology rejection, cancellation and grid budgets.
 From the repository root after building the native core:
 
 ```sh
-c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/cgltf tests/mesh-import.cpp src/import.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-import-test
+c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/cgltf -Ithird_party/openbrush tests/mesh-import.cpp src/import.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-import-test
 /tmp/dome-import-test
 c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude tests/mesh-processing.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-processing-test
 /tmp/dome-processing-test
