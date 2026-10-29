@@ -30,6 +30,12 @@ struct CleanupResult {
 // Full attributes and explicit UV seam/pin flags are preserved. Applying this
 // to an already-painted asset requires a separate explicit paint-transfer job.
 CleanupResult cleanup_mesh(const Mesh &, const CleanupOptions & = {});
+struct SurfaceQueryOptions {
+  // Cheap, thread-safe predicate over source triangle IDs; empty accepts all.
+  std::function<bool(uint32_t)> triangle_filter;
+  std::function<bool()> cancelled;
+  size_t max_triangle_tests = 2'000'000;
+};
 struct SurfaceHit {
   uint32_t triangle = 0;
   Vec3 position{}, normal{};
@@ -51,6 +57,8 @@ public:
   SurfaceQuery(const SurfaceQuery &) = delete;
   SurfaceQuery &operator=(const SurfaceQuery &) = delete;
   SurfaceHit closest(Vec3) const;
+  // Throws if no eligible triangle exists, cancelled, or budget is exhausted.
+  SurfaceHit closest(Vec3, const SurfaceQueryOptions &) const;
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction,
                                     float maximum = 100) const;
 };

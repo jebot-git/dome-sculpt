@@ -312,6 +312,7 @@ struct App {
     status.align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
     menu.add("&File/&New", FL_CTRL + 'n', command, this);
     menu.add("&File/&Open...", FL_CTRL + 'o', command, this);
+    menu.add("&File/Import &mesh...", 0, command, this);
     menu.add("&File/&Save", FL_CTRL + 's', command, this);
     menu.add("&File/Save &As...", FL_CTRL | FL_SHIFT | 's', command, this);
     menu.add("&File/Export &glTF (.glb)...", FL_CTRL + 'e', command, this);
@@ -668,6 +669,9 @@ struct App {
         project.clear();
         dirty = false;
       }
+    } else if (label == "Import mesh...") {
+      auto path = fl_file_chooser("Import static mesh", "*.{obj,gltf,glb}", nullptr);
+      if (path) canvas.document.import_asset(path);
     } else if (label == "Open...") {
       if (!discard())
         return;

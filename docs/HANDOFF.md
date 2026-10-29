@@ -50,6 +50,17 @@ another workspace, not verified live handles here. Preserve future remote work.
   when asserting validity and wait_asset for accepted transfers, including when
   the workspace was closed. Standalone UvWorkspace defaults to immediate checks.
 
+## Additional upstream integration
+
+Upstream db1d710 and its preceding three commits add native normal/AO/PBR
+baking, filtered BVH queries, constrained adaptive triangle remeshing and guarded
+Document::edit_scene/static import authoring. Their full handoff is archived in
+HANDOFF-db1d710.md. Preserve the no-silent-attribute-loss import checks, retained
+paint guard and source/revision/content/selection checks. Their bake/remesh
+kernels still need full desktop/XR authoring integration; full glTF/VRM and the
+creator are not established by these foundations. Remote handoff references to
+uncommitted work/running agents are not verified process handles here.
+
 ## Validation provenance
 
 The results below are pre-integration UV-stage evidence. Upstream independently

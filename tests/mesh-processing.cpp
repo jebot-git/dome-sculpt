@@ -97,6 +97,32 @@ int main() try {
           std::abs(closest.barycentric[0] + closest.barycentric[1] +
                    closest.barycentric[2] - 1) < 1e-6f,
       "Reusable BVH closest queries expose triangle identity and barycentrics");
+  auto filtered = query.closest(
+      {0, 0, .4f},
+      {.triangle_filter = [](uint32_t t) { return t < 2; }, .cancelled = {}});
+  require(std::abs(filtered.distance - .6f) < 1e-6f && filtered.triangle < 2,
+          "Filtered BVH closest queries stay on the selected source chart");
+  rejects(
+      [&] {
+        query.closest({0, 0, .4f},
+                      {.triangle_filter = [](uint32_t) { return false; },
+                       .cancelled = {}});
+      },
+      "Empty source filters reject instead of returning an unrelated triangle");
+  rejects(
+      [&] {
+        query.closest({0, 0, .4f},
+                      {.triangle_filter = [](uint32_t) { return false; },
+                       .cancelled = {},
+                       .max_triangle_tests = 1});
+      },
+      "Filtered source traversal enforces triangle work limits");
+  rejects(
+      [&] {
+        query.closest({0, 0, .4f}, {.triangle_filter = {},
+                                    .cancelled = [] { return true; }});
+      },
+      "Filtered source queries honor cancellation");
   auto hit = query.raycast({0, 0, .4f}, {0, 0, -2}, .3f);
   require(hit && std::abs(hit->distance - .2f) < 1e-6f &&
               hit->position.z > .19f,

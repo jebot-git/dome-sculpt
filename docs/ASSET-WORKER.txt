@@ -1,0 +1,43 @@
+Native guarded scene operations
+==============================
+Document::edit_scene(label, operation, AssetSource expected={}) runs native
+asset work on the ordered file/asset worker against a detached Scene snapshot.
+Callbacks receive Scene& and a bounded cancellation predicate; never capture
+Document/UI/render state or retain mutable aliases. An optional captured
+{generation,revision,object} token rejects editors opened against replaced or
+changed sources before enqueueing. The worker also checks generation/revision,
+content identity, active object and unresolved actions before publication.
+
+The callback can produce geometry, rig/weight/morph data, complete creator
+parts or other authored scene changes. It must check cancellation during long
+loops. Validation and a final alias-detaching snapshot run outside the model
+lock. Only a completed valid result becomes one existing scene undo/redo
+transaction; exceptions/cancellation/stale results publish no partial scene.
+The immutable renderer snapshot stays available during work. No additional
+frontend, rendering readback or Python runtime is introduced.
+
+Initial interactive import
+--------------------------
+File > Import mesh invokes the native OBJ/glTF/GLB parser on that worker and
+appends paintable objects in one transaction. Missing UVs are unwrapped there;
+provided supported UV0, normals, geometry and PBR scalar materials survive.
+Source files are read-only. Import warnings are retained in the completion
+message (first eight bounded diagnostics), including approximated MTL lighting
+or ignored animation/optional extension semantics. Import respects remaining scene geometry quotas,
+object/map budgets, confinement, resource cancellation and source generations.
+
+Current authoring representation cannot preserve imported textures, vertex
+colors, authored tangents, UV1 or alpha-cutoff masks; these are explicitly
+rejected without publishing any partial object. The importer kernel itself
+retains more data, documented in IMPORT-AND-MESH.md. Skin/morph import is being
+extended separately. This initial command is deliberately not a full glTF
+round-trip claim. Full textured/rigged import and XR file browsing remain open.
+
+Tests exercise actual native OBJ/MTL/PNG resources, caller/worker separation,
+exact undo/redo, failure rollback, concurrent-source rejection, source tokens
+across reused object IDs, responsive atomic frames and alias detachment.
+
+Mesh preparation also rejects replacement of any mesh with allocated paint
+tiles (including hidden/mask/retained data) until an explicit paint-transfer
+workflow is used. Existing UV edits retain their paint-transfer path. This
+prevents the previous Generate UV atlas/Make mesh path silently losing paint.

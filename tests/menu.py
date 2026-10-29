@@ -198,6 +198,16 @@ async def main():
         check(named("Recover project") is None and
               nodes["Undo"][1].get("enabled") is False,
               "Universal Close cancels recovery without changing the document")
+        await click("Import mesh...")
+        import_chooser = await wait(lambda: named("Import static mesh"))
+        check(import_chooser.get_wm_transient_for() is not None and
+              import_chooser.get_wm_class()[1] == window.get_wm_class()[1],
+              "Mesh import uses the application's native file chooser")
+        await click("Close Window")
+        await asyncio.sleep(0.2)
+        nodes, tree = await layout()
+        check(named("Import static mesh") is None and nodes["Undo"][1].get("enabled") is False,
+              "Universal Close cancels mesh import without changing scene history")
         raw = window.get_image(2, 2, 1, 1, X.ZPixmap, 0xFFFFFFFF)
         pixel = Image.frombytes("RGB", (1, 1), raw.data, "raw", "BGRX").getpixel((0, 0))
         check(

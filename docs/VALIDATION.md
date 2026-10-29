@@ -1,3 +1,18 @@
+# Guarded asset-worker and native import milestone — 2026-10-29
+
+All21 Release suites passed in50.68 seconds (`artifacts/tests-assets-final.log`).
+The subsequently added adaptive-remesh target passed with worker/import/BVH/bake
+checks (`tests-assets-remesh.log`), and the paint-preservation/warning refinements
+passed UV/shared-document/worker/remesh/bake checks (`tests-assets-report.log`).
+The affected real-loader OpenXR client passed separately in56.85 seconds
+(`tests-assets-xr.log`). All39 native universal-menu checks passed, including
+Import chooser ownership and exact cancellation (`menu-assets.log`).
+
+Final source-pinned native sanitizer verification is pending; shared agent
+sources changed during the first build, so its running logs are not treated as
+verification of this exact checkpoint. Prior component/integration evidence
+below retains its stated scope. No physical device/accelerator/install claim.
+
 # Integrated native authoring and recovery — 2026-10-29
 
 All19 Release CTests pass (50.47 seconds), including native input/recovery,
