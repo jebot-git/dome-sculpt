@@ -1,5 +1,21 @@
 # Current authoring integration; full goal remains active
 
+## Verified8f4d67d and incoming bake controls
+
+Exact detached8f4d67d in artifacts/verify-authoring-merge passes47/47 Release
+suites147.34s and5 whole-core ASan/UBSan/leak suites18.24s (GLB interoperability,
+baked persistence, source morphs, UV workflow and weight authoring). The C Mikk
+dependency and xatlas are instrumented as well. Native menus53/53, rig/weights
+12/12, avatar export5/5, baked surface GUI5/5 and latest real DomeD Wayland8/8
+pass. Logs use authoring-pinned names. Canonical toolkit and compositor both
+come from282467e; no system install or active session restart occurred.
+
+Origin main advanced again to7817ca2, adding desktop/XR bake controls, progress
+and cancellation. Preserve and merge it before publishing main. Current clean
+8f proof remains valid independently; it is not proof of the upcoming merge.
+Pending lazy UV, all-slot sourceUV and new bind/transfer helper work must be
+preserved separately through that merge. No full production completion claim.
+
 Read AGENTS.md, REQUIREMENTS.md, DESIGN_CONVENTIONS (parent workspace) and
 TOOLKIT.md. Preserve the original objective in HANDOFF-466ebd1.md; no partial
 checkpoint completes it. Runtime remains C++20/FLTK/EGL/OpenXR, Python test-only.

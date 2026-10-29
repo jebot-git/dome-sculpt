@@ -74,5 +74,10 @@ log: artifacts/build-toolkit-282467e.log. Exact new patch hashes and combined
 digest are in third_party/sources.json. The client was rebuilt against this
 prefix; actual linkage resolves its lib64 libraries (linkage-toolkit-282467e.log).
 All47 Release suites pass, native universal menus53/53 and baked-surface GUI5/5
-pass with this toolkit. Earlier compositor checks prove the older compositor;
-the clean latest Release compositor build is still running separately.
+pass with this toolkit. The clean latest Release compositor build completed in
+8m03s (artifacts/domed-282467e-compositor-build.log); binary is in
+artifacts/domed-282467e-target/release/dome-compositor. Exact pinned8f4d67d
+passes native menus53/53, rig/weights12/12, avatar export5/5, baked GUI5/5 and
+real latest DomeD Wayland/universal-menu8/8. Run with the updated prefix's lib64
+in LD_LIBRARY_PATH, since an inherited /opt path overrides ELF RUNPATH. Neither
+the installed compositor nor the active desktop session was replaced/restarted.

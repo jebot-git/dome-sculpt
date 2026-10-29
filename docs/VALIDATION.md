@@ -1,5 +1,19 @@
 # Merged avatar/UV/voxel verification — 2026-10-29
 
+Latest exact-source evidence:8f4d67d, artifacts/verify-authoring-merge:
+47/47 Release suites147.34s (tests-authoring-pinned.log); five whole-core
+ASan/UBSan/leak suites18.24s (tests-authoring-pinned-sanitize.log), including
+instrumented C Mikk/xatlas dependencies. Native universal menus53/53,
+rig/weight GUI12/12, selected-avatar export5/5, baked-surface GUI5/5 and real
+latest DomeD Wayland/universal-menu8/8 all exit0 with failed0 reports. Logs:
+menu-authoring-pinned.log, menu-weights-authoring-pinned.log,
+menu-export-authoring-pinned.log, baked-gui-authoring-pinned.log and
+dome-menu-authoring-pinned.log. Both FLTK and compositor are built from clean
+DomeD282467e; exact compositor SHA256 is
+d54c05abd1d742c9473f275a670030b1689943242f31d958023b6fb1e6c63732.
+No physical device/accelerator/system installation claim. Remote7817ca2 arrived
+after this pin; these results do not prove that forthcoming bake-controls merge.
+
 Pinned cf6d6b3 passed29/29 optimized suites in126.78s and four whole-core
 ASan/UBSan/leak suites in55.35s (groups with real avatars/controller actions,
 source UV, creator archive and independent glTF). Logs: tests-avatars-pinned.log
