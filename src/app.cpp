@@ -71,6 +71,7 @@ struct Canvas : Fl_Gl_Window {
   Vec3 pan{};
   Vec3 ball{}, last_stamp{};
   float distance = 2.2f, radius = .12f;
+  double material_time = 0;
   Tool tool = Tool::Clay;
   bool sculpting = false, have_stamp = false, dirty_mesh = true;
   int last_x = 0, last_y = 0;
@@ -113,13 +114,17 @@ struct Canvas : Fl_Gl_Window {
                      (h() - 2 * (y - this->y())) / size);
   }
   void sculpt_at(int x, int y) {
+    if (!document.frame().state->stroking) { sculpting = have_stamp = false; return; }
     float aspect = float(w()) / std::max(1, h()),
           tangent = std::tan(22.5f * 3.14159265f / 180);
     Vec3 direction{(2.f * (x - this->x()) / w() - 1) * aspect * tangent,
                    (1 - 2.f * (y - this->y()) / h()) * tangent, -1};
     Vec3 origin = rotation.inverse().rotate(Vec3{0, 0, distance} - pan);
     direction = rotation.inverse().rotate(normalized(direction));
-    auto hit = document.raycast(origin, direction);
+    auto state = document.frame().state;
+    if (state->weights.enabled && (!shown_mesh || shown_mesh->generation != state->generation ||
+        shown_mesh->revision != state->revision)) { have_stamp = false; return; }
+    auto hit = document.raycast(origin, direction, material_time);
     if (!hit) {
       have_stamp = false;
       return;
@@ -239,7 +244,8 @@ struct Canvas : Fl_Gl_Window {
     auto vp =
         multiply(projection(-right, right, -up, up), view_matrix(eye, {}));
     auto f = document.frame();
-    renderer->set_frame_time(render_frame_time());
+    material_time = render_frame_time();
+    renderer->set_frame_time(material_time);
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
                    f.state->toon, f.state->light);
     if (!capture.empty()) {
@@ -618,7 +624,8 @@ struct App {
     text << tools[int(canvas.tool)] << " | radius " << int(canvas.radius * 1000)
          << " mm | " << compute_backend()
          << " | Drag: trackball  Shift+drag: sculpt  Wheel: zoom";
-    auto info = canvas.document.frame().state;
+    auto current_frame = canvas.document.frame();
+    auto info = current_frame.state;
     auto active =
         std::find_if(info->objects.begin(), info->objects.end(),
                      [&](auto &o) { return o.id == info->active_object; });
@@ -645,6 +652,8 @@ struct App {
       text << "Weights " << modes[int(info->weights.mode)] << " | "
            << info->deformation->skeleton->bones.at(info->rig_joint).name
            << " | Shift+drag: paint | Blue: 0  Red: 1";
+      if (info->weight_samples) text << (current_frame.surface->weight_samples >= info->weight_samples
+          ? " | Live preview; release to apply" : " | Updating preview; release to apply");
     }
     if (!info->error.empty()) {
       text.str("");

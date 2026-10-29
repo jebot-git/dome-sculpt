@@ -3,6 +3,7 @@
 #include "dome/mtoon.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/material-visibility.hpp"
 #include "graphics.h"
 #include <iostream>
 using namespace dome;
@@ -59,6 +60,33 @@ int main(int argc,char**argv)try{
  auto widthmasked=outline;widthmasked.textures[7].index=0;auto ws=std::make_shared<MeshSnapshot>(*outlined);ws->ranges[0].appearance=appearance(widthmasked,{image({255,0,255,255})});check(at(draw(renderer,ws),9,48)[3]==0,"MToon1 outline-width role samples linear green and suppresses extrusion at zero");
  for(auto [w,color]:std::vector<std::pair<float,std::array<int,4>>>{{0,{0,0,255,255}},{.25f,{0,255,255,255}},{.5f,{0,255,0,255}},{.75f,{255,255,0,255}},{1,{255,0,0,255}}}){auto weights=std::make_shared<MeshSnapshot>(*outlined);weights->selected_weights.assign(4,w);check(close(at(draw(renderer,weights)),color),"Selected joint weights bypass authored MToon and draw the unlit blue-to-red ramp");check(at(read(),9,48)[3]==0,"Selected weight surfaces suppress their material outlines");}
  auto ordinary=std::make_shared<MeshSnapshot>(*outlined);ordinary->selected_weights.assign(4,-1);check(delta(border,draw(renderer,ordinary))<=1,"Negative weight sentinel preserves ordinary material and outline rendering");ordinary->selected_weights[0]=1.1f;check(rejects([&]{draw(renderer,std::make_shared<MeshSnapshot>(*ordinary));}),"Weight visualization rejects out-of-range values");
+ for(bool legacy:{false,true}){
+  auto alpha=legacy?MToonMaterial::from_vrm0({{"shader","VRM/MToon"},{"floatProperties",{{"_BlendMode",1},{"_CullMode",0}}}}):MToonMaterial::from_vrm1({{"alphaMode","MASK"},{"doubleSided",true},{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}}});
+  alpha.textures[0].index=0;
+  auto transparent=image({255,255,255,0});auto weighted=snapshot();weighted->ranges[0].appearance=appearance(alpha,{transparent});weighted->selected_weights.assign(4,.5f);
+  check(at(draw(renderer,weighted))[3]==0,"V0/V1 selected-joint heatmaps preserve authored alpha-mask holes");
+  MaterialSurfaceQuery picking(weighted->mesh,weighted->ranges);
+  check(!picking.raycast({0,0,2},{0,0,-1},4),"CPU material picking and the weight viewport agree on transparent MToon coverage");
+  auto animated=alpha;animated.parameters.scroll={.5f,0};
+  auto split=std::make_shared<const Image>(Image{2,1,{255,255,255,0,255,255,255,255}});
+  auto animation=snapshot();animation->ranges[0].appearance=appearance(animated,{split});animation->selected_weights.assign(4,.5f);
+  MaterialSurfaceQuery moving(animation->mesh,animation->ranges);
+  renderer.set_frame_time(0);auto shown=at(draw(renderer,animation));
+  check(shown[3]>0&&moving.raycast({.01f,.01f,2},{0,0,-1},4,0).has_value(),"The displayed material frame time selects visible animated heatmap coverage");
+  renderer.set_frame_time(1);shown=at(draw(renderer,animation));
+  check(shown[3]==0&&!moving.raycast({.01f,.01f,2},{0,0,-1},4,1),"GPU and picking share the same animated alpha holes when the frame time advances");
+  renderer.set_frame_time(0);
+  alpha.parameters.alpha=MToonAlpha::Blend;alpha.parameters.alpha_to_coverage=false;alpha.parameters.render_queue=3000;alpha.parameters.source_blend=5;alpha.parameters.destination_blend=10;alpha.parameters.depth_write=false;
+  weighted=snapshot();weighted->ranges[0].appearance=appearance(alpha,{image({255,255,255,128})});
+  auto original_alpha=at(draw(renderer,weighted))[3];weighted=std::make_shared<MeshSnapshot>(*weighted);weighted->selected_weights.assign(4,.5f);
+  check(at(draw(renderer,weighted))[3]==original_alpha&&original_alpha>0&&original_alpha<255,"V0/V1 weight heatmaps retain the material's actual blend-alpha state");
+ }
+ {
+  auto surface=snapshot();auto maps=std::make_shared<TextureMaps>();maps->source_only=true;auto source=std::make_shared<PaintSourceMaps>();source->color.image=image({255,255,255,0});maps->source_maps=source;
+  surface->ranges[0].material.alpha=Material::AlphaMode::Mask;surface->ranges[0].textures=maps;surface->selected_weights.assign(4,1);
+  auto back=quad();for(auto p:back.positions){p.z=.2f;surface->mesh.positions.push_back(p);}surface->mesh.normals.insert(surface->mesh.normals.end(),back.normals.begin(),back.normals.end());surface->mesh.uv.insert(surface->mesh.uv.end(),back.uv.begin(),back.uv.end());for(auto id:back.indices)surface->mesh.indices.push_back(id+4);surface->selected_weights.insert(surface->selected_weights.end(),4,.5f);surface->ranges.push_back({2,6,6,white()});
+  check(close(at(draw(renderer,surface)),{0,255,0,255}),"Separate weighted objects bind their own alpha textures and retain visible geometry behind cutouts");
+ }
  auto source=std::make_shared<PaintSourceMaps>();source->color.image=image({128,192,64,255});auto paint=PaintedMesh::from_maps(quad(),source,64);auto original=paint->composite(white());check(original->color_coverage.width==1&&original->color_coverage.rgba==std::vector<uint8_t>({0,0,0,255}),"Untouched source coverage uses an exact bounded zero sentinel");Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=.6f;PaintSettings p;p.color={0,0,0,1};paint->begin_stroke();paint->stamp(b,p);paint->end_stroke();auto full=paint->composite(white());auto center=[](const Image&i){return i.rgba[(i.height/2*i.width+i.width/2)*4];};check(full->color_coverage.width==full->color.width&&center(full->color_coverage)==255,"True black paint retains full independent linear coverage");paint->layer_properties("Half",true,.5f);auto half=paint->composite(white());check(center(half->color_coverage)==128,"Layer opacity scales exact color coverage independently of black RGB");paint->layer_properties("Hidden",false,1);check(paint->composite(white())->color_coverage.width==1,"Hidden paint returns zero-coverage sentinel without discarding retained tiles");paint->layer_properties("Mask",true,1);p.channel=PaintChannel::Mask;p.mask=.5f;paint->begin_stroke();paint->stamp(b,p);paint->end_stroke();auto masked=paint->composite(white());check(center(masked->color_coverage)==128,"Linear painted masks contribute once to combined color coverage");auto held=paint->snapshot();p.channel=PaintChannel::Color;p.erase=true;paint->begin_stroke();paint->stamp(b,p);paint->cancel_stroke();check(paint->composite(white())==masked&&held->composite(white())==masked,"Cancelled erase preserves immutable source coverage snapshots and cache identity");check(PaintedMesh::decode(paint->encode())->composite(white())->color_coverage.rgba==masked->color_coverage.rgba,"Native source/layer restart reconstructs identical coverage without serializing derived caches");
 
  auto zero=white();zero.color={0,0,0,1};auto shade=typed(false);shade.parameters.base_color={0,0,0,1};shade.parameters.shade_color={1,1,1};shade.parameters.cull=MToonCull::Off;shade.textures[0].index=shade.textures[1].index=0;auto za=appearance(shade,{source->color.image});auto zasset=std::make_shared<ImportedAsset>(*za->asset);zasset->materials[0].color=zero.color;za->asset=zasset;auto zp=PaintedMesh::from_maps(quad(),source,64);auto zs=snapshot(zero);zs->mesh.normals.assign(4,{0,0,-1});zs->ranges[0].appearance=za;zs->ranges[0].textures=zp->preview(zero);auto untouched=draw(renderer,zs);zs->ranges[0].textures=zp->composite(zero);check(delta(untouched,draw(renderer,std::make_shared<MeshSnapshot>(*zs)))<=3,"Derived zero-base-factor MToon shade restores untouched original shade RGB using zero coverage");p.channel=PaintChannel::Color;p.erase=false;p.color={0,0,0,1};zp->begin_stroke();zp->stamp(b,p);zp->end_stroke();zs->ranges[0].textures=zp->composite(zero);check(close(at(draw(renderer,std::make_shared<MeshSnapshot>(*zs))),{0,0,0,255}),"Fully covered true black paint removes aliased shade even when original base factor is zero");zp->layer_properties("Half black",true,.5f);zs->ranges[0].textures=zp->composite(zero);auto halfshade=at(draw(renderer,std::make_shared<MeshSnapshot>(*zs)));check(halfshade[0]>10&&halfshade[1]>halfshade[0]&&halfshade[2]>0,"Partially covered black paint preserves remaining original zero-factor shade channels");

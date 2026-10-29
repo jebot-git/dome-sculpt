@@ -41,6 +41,6 @@ existing guarded scene worker.
 Fixtures cover geometric capsule selection, supplied posed coordinates, explicit
 symmetry/offset planes, immutable smoothing, feasible/impossible locks, pressure,
 identity/budget/cancellation failures and actual nineteen-part CC0 VRoid linked
-weight strokes with unchanged topology/source joint mapping. This is a native
-editing kernel; desktop/XR controls, brush visualization and scene history
-publication are separate integration work.
+weight strokes with unchanged topology/source joint mapping. The desktop/XR controls, worker-coalesced live heatmaps, material-aware posed
+picking and guarded scene history publication are described in
+[WEIGHT-AUTHORING.md](WEIGHT-AUTHORING.md). This helper itself remains detached.

@@ -18,14 +18,15 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
     )
 root = Path(__file__).resolve().parents[1]
 bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
-compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact
-rig_flow = os.environ.get("DOME_MENU_RIG") == "1"
+rig_compact = os.environ.get("DOME_MENU_RIG_COMPACT") == "1"
+compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact
+rig_flow = os.environ.get("DOME_MENU_RIG") == "1" or rig_compact
 export_flow = os.environ.get("DOME_MENU_EXPORT") == "1"
 bake_cancel = os.environ.get("DOME_MENU_BAKE_CANCEL") == "1"
 bake_flow = os.environ.get("DOME_MENU_BAKE") == "1" or bake_cancel or bake_compact
 if sum((rig_flow, export_flow, bake_flow)) > 1:
     raise ValueError("Select one menu fixture flow: rig, export or bake")
-out = root / ("artifacts/menu-export" if export_flow else "artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
+out = root / ("artifacts/menu-rig-compact" if rig_compact else "artifacts/menu-export" if export_flow else "artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -312,6 +313,26 @@ async def main():
                 key("Control_L", True); key("a"); key("Control_L", False)
                 key("3"); key("0"); key("Tab")
             baseline = info()
+            if rig_compact:
+                await click("Skin weights..."); w = await wait(lambda: named("Skin weights"))
+                w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync(); await asyncio.sleep(.2)
+                g = w.get_geometry()
+                def shot():
+                    raw = w.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+                    return Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX")
+                before = shot(); before.save(out / "weight-compact-before.png")
+                check(g.width <= 640 and g.height <= 360, "A 2x BDF skin-weight dialog fits the compact screen")
+                xtest.fake_input(d, X.MotionNotify, x=g.x+g.width-8, y=g.y+100)
+                for _ in range(8): xtest.fake_input(d, X.ButtonPress, 5); xtest.fake_input(d, X.ButtonRelease, 5)
+                d.sync(); await asyncio.sleep(.3); after = shot(); after.save(out / "weight-compact-after.png")
+                check(before.crop((12,8,g.width-40,g.height-96)).tobytes() != after.crop((12,8,g.width-40,g.height-96)).tobytes(),
+                      "The large-bitmap weight options scroll to their lower controls")
+                check(before.crop((0,g.height-88,g.width,g.height)).tobytes() == after.crop((0,g.height-88,g.width,g.height)).tobytes(),
+                      "Both native skin-weight action buttons remain fixed while options scroll")
+                key("Escape"); await wait(lambda: named("Skin weights") is None)
+                check(app.poll() is None and info()["scene_hash"] == baseline["scene_hash"],
+                      "Compact weight-dialog cancellation preserves the native project and main window")
+                d.close(); bus.disconnect(); return
             nodes, _ = await layout()
             check(nodes["Rig and shapekeys..."][1].get("enabled") is True,
                   "Rigged mesh exports enabled native rig authoring command")
@@ -373,9 +394,23 @@ async def main():
             check(w.get_wm_transient_for().id == window.id and nodes["Skin weights..."][1].get("enabled") is False,
                   "Skin-weight controls share native identity and modal scene isolation")
             w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
-            g = w.get_geometry(); tap(w, g.width/2+70, 80)
-            key("space", True); key("Down"); key("Return"); key("space", False)
-            await asyncio.sleep(.2)
+            g = w.get_geometry()
+            visible_before = {p.id for p in d.screen().root.query_tree().children
+                              if p.get_attributes().map_state == X.IsViewable}
+            xtest.fake_input(d, X.MotionNotify, x=g.x+int(g.width/2+70), y=g.y+80)
+            xtest.fake_input(d, X.ButtonPress, 1); d.sync()
+            def joint_popup():
+                for p in d.screen().root.query_tree().children:
+                    try:
+                        geometry = p.get_geometry(); attributes = p.get_attributes()
+                        if p.id not in visible_before and attributes.map_state == X.IsViewable and attributes.override_redirect and geometry.width > 100 and geometry.height < 200:
+                            return p
+                    except error.BadWindow:
+                        pass
+                return None
+            popup = await wait(joint_popup); option = popup.get_geometry()
+            xtest.fake_input(d, X.MotionNotify, x=option.x+int(option.width/2), y=option.y+int(option.height*.75))
+            xtest.fake_input(d, X.ButtonRelease, 1); d.sync(); await asyncio.sleep(.2)
             raw = w.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
             Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX").save(out / "weight-options.png")
             tap(w, g.width/2+80, g.height-40)
@@ -386,6 +421,22 @@ async def main():
             window.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
             g = window.get_geometry()
             xtest.fake_input(d, X.MotionNotify, x=g.x+int(g.width*.60), y=g.y+int(g.height*.35)); d.sync()
+            def weight_pixels():
+                raw = window.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+                return Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX")
+            canvas_box = (20, 20, g.width-20, g.height-50)
+            before_preview = weight_pixels().crop(canvas_box).tobytes()
+            key("Shift_L", True)
+            xtest.fake_input(d, X.ButtonPress, 1); d.sync()
+            await wait(lambda: weight_pixels().crop(canvas_box).tobytes() != before_preview)
+            weight_pixels().save(out / "weight-live-preview.png")
+            check(info()["scene_hash"] == posed,
+                  "A held native pressure gesture displays live heatmap feedback without changing the saved scene")
+            key("Escape")
+            xtest.fake_input(d, X.ButtonRelease, 1); d.sync(); key("Shift_L", False)
+            await wait(lambda: weight_pixels().crop(canvas_box).tobytes() == before_preview)
+            check(info()["scene_hash"] == posed,
+                  "Escape restores the exact native viewport after cancelling a live weight preview")
             key("Shift_L", True)
             xtest.fake_input(d, X.ButtonPress, 1); d.sync(); await asyncio.sleep(.15)
             xtest.fake_input(d, X.ButtonRelease, 1); d.sync(); key("Shift_L", False)

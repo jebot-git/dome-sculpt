@@ -9,6 +9,7 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/fl_ask.H>
+#include <FL/fl_draw.H>
 namespace dome {
 void edit_weights_dialog(Document &doc) {
   auto draft = doc.draft_scene();
@@ -27,11 +28,15 @@ void edit_weights_dialog(Document &doc) {
   Fl_Scroll scroll(0, 0, width, height - row * 2);
   scroll.type(Fl_Scroll::VERTICAL);
   Fl_Group content(0, 0, width - 24, row * 20); content.resizable(nullptr);
-  Fl_Box hint(16, 4, width - 48, row * 2,
-      "Shift+drag on the mesh; trigger near the surface in XR.\n"
-      "Blue is zero, red is one. Each released gesture is one undo step.");
+  const char *instructions =
+      "Live heatmap on the fixed pose; release applies one undo step.\n"
+      "Shift+drag / XR trigger to paint. Blue is zero; red is one.";
+  int measured_width = width - 48, measured_height = 0;
+  fl_font(dx::font, dx::size); fl_measure(instructions, measured_width, measured_height, 0);
+  int hint_height = std::max(row * 2, measured_height + 16);
+  Fl_Box hint(16, 4, width - 48, hint_height - 4, instructions);
   hint.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-  int y = row * 2;
+  int y = hint_height;
   Fl_Choice joint(label, y, width - label - 40, row - 4, "Joint"); y += row;
   std::vector<Fl_Menu_Item> items;
   for (const auto &bone : bones) { Fl_Menu_Item item{}; item.label(bone.name.c_str()); items.push_back(item); }

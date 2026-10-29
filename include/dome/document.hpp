@@ -16,7 +16,7 @@
 #include <span>
 #include <thread>
 namespace dome {
-class SurfaceQuery;
+class MaterialSurfaceQuery;
 struct SpatialHand {
   TrackedHand tracked;
   bool joystick = false, undo = false, redo = false;
@@ -75,6 +75,8 @@ struct EditorState {
   ObjectBakeSettings bake_settings;
   WeightToolSettings weights;
   bool can_paint_weights = false;
+  uint64_t weight_gesture = 0;
+  size_t weight_samples = 0;
   bool can_voxel_remesh = false;
   bool can_export_avatar = false;
   float voxel_size_mm = 30;
@@ -110,7 +112,9 @@ struct MeshSnapshot {
   // Empty: ordinary material view. Otherwise one value per packed vertex;
   // -1: ordinary material, [0,1]: unlit selected-joint weight visualization.
   std::vector<float> selected_weights;
-  std::shared_ptr<const SurfaceQuery> picking;
+  uint64_t weight_gesture = 0;
+  size_t weight_samples = 0;
+  std::shared_ptr<const MaterialSurfaceQuery> picking;
   std::vector<std::array<float,4>> tangents;
 };
 struct AssetSource {
@@ -152,6 +156,7 @@ public:
   void end_desktop();
   void cancel_desktop();
   std::optional<Vec3> raycast(Vec3, Vec3) const;
+  std::optional<Vec3> raycast(Vec3, Vec3, double material_time) const;
   Vec3 gradient(Vec3) const;
   bool undo();
   bool redo();
@@ -257,6 +262,12 @@ private:
   uint32_t weight_joint_ = 0;
   WeightToolSettings weight_stroke_settings_{};
   std::vector<WeightBrush> weight_samples_;
+  std::atomic<uint64_t> weight_epoch_{0};
+  uint64_t weight_scheduled_epoch_ = 0;
+  size_t weight_scheduled_samples_ = 0;
+  std::shared_ptr<const MeshSnapshot> weight_base_;
+  void restore_weight_view_locked(const std::shared_ptr<const MeshSnapshot> &);
+  void invalidate_weight_view_locked(bool restore);
   float control_voxel_mm_ = 30;
   std::optional<UvWorkspace> uv_;
   uint64_t uv_session_ = 0;
@@ -287,6 +298,9 @@ private:
     bool weight_view = false;
     bool linked_weights = true;
     uint32_t weight_joint = 0;
+    uint64_t weight_gesture = 0;
+    std::vector<WeightBrush> weight_samples;
+    WeightToolSettings weight_settings;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;
@@ -322,6 +336,7 @@ private:
     std::shared_ptr<AssetWork> work{};
     std::shared_ptr<bool> operation_changed{};
     AssetExportFormat export_format = AssetExportFormat::Glb;
+    std::shared_ptr<const MeshSnapshot> rollback_preview{};
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
@@ -358,7 +373,8 @@ private:
   void queue_scene_operation(std::string, SceneOperation, AssetSource,
                              std::shared_ptr<std::string>);
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
-                                    std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {});
+                                    std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
+                                    std::shared_ptr<const MeshSnapshot> = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
