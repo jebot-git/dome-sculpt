@@ -122,6 +122,8 @@ int main(int argc, char **argv) try {
   check(noop.begin_desktop(), "Locked-weight fixture acquires tool without changing model"); noop.stamp_desktop(stamp(b.from)); noop.end_desktop(); noop.wait_asset();
   check(noop.frame().state->error.empty() && !noop.frame().state->dirty && !noop.frame().state->can_undo && noop.copy_scene().encode() == source,
         "Wholly constrained gesture reports constraints without creating dirty state or a phantom undo step");
+  check(!noop.frame().state->asset_busy && !noop.asset_status().cancellable && !noop.asset_status().cancelling,
+        "No-op skin-weight completion releases its cancellable worker lease without creating history");
   Document posed; auto scene = original.snapshot(); auto d = *scene.active().deformation;
   d.pose = {d.skeleton->bones[0].rest, d.skeleton->bones[1].rest}; d.pose[0].translation.z = .4f;
   scene.set_deformation(1, d); scene.object(2).visible = false; posed.replace(std::move(scene)); posed.weight_settings(tool(), 1); posed.wait_mesh();

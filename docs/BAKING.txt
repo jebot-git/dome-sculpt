@@ -215,10 +215,12 @@ canonical algorithm. Explicit tangent export and full posed/deformed consumer
 shading comparisons remain additional production work; byte/schema validation
 is not a substitute for those interoperability fixtures.
 
-The FLTK/XR bake-source picker, distance/sample sliders, cage editing, preview,
-progress/cancel and clear/rebake commands still need authoring integration.
-The worker API and data path above are verified foundations, not a completed
-headset bake workflow or the full production objective.
+Native FLTK and XR source selection, distance/AO/sample/padding sliders,
+progress/cancel, viewport result inspection and clear/rebake commands are now
+connected to the guarded worker. See BAKE-CONTROLS.md for navigation, staged
+settings, default-cancel semantics and exact history. Custom cage editing,
+durable recipes, masks/multiple sources and production quality remain additional
+work; this milestone does not complete the full production objective.
 
 Watertight projection
 ---------------------

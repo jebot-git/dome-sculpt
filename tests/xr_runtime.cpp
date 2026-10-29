@@ -51,6 +51,7 @@ int instance_tag, session_tag, action_set_tag;
 unsigned frame = 0, event = 0, restart_phase = 0;
 bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
+std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
 std::string voxel_mode() {
   auto mode = getenv("DOME_XR_FIXTURE_VOXEL");
   return mode ? mode : "";
@@ -503,6 +504,10 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
          (mode == "undo" && (frame == 42 || frame == 44)));
     out->changedSinceLastSync = button;
   }
+  if(auto mode=bake_mode();!mode.empty()){
+    out->currentState=button && (frame==8||frame==10||frame==12||frame==14||frame==16||((mode=="accept"||mode=="undo")&&(frame==20||frame==24))||(mode=="undo"&&(frame==42||frame==44)));
+    out->changedSinceLastSync=button;
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
@@ -529,6 +534,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
                frame == 25;
     if (auto mode = voxel_mode(); !mode.empty())
       stroke = frame == 16 || (mode == "cancel" && frame == 18);
+    if(auto mode=bake_mode();!mode.empty())stroke=frame==18||(mode=="cancel"&&frame==20);
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -614,6 +620,15 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (mode == "undo" && (frame == 43 || frame == 44))
       out->currentState = {-.5f, .8660254f};
   }
+  if(auto mode=bake_mode();!mode.empty() && right(p->subactionPath) && a->name=="right_stick"){
+    out->currentState={0,0};
+    if(frame==9||frame==10)out->currentState={-.5f,-.8660254f};
+    if(frame==11||frame==12)out->currentState={0,-1};
+    if(frame==13||frame==14)out->currentState={-1,0};
+    if(frame==15||frame==16)out->currentState={.8660254f,.5f};
+    if((mode=="accept"||mode=="undo") && frame>=21 && frame<=24)out->currentState={0,1};
+    if(mode=="undo"&&(frame==43||frame==44))out->currentState={-.5f,.8660254f};
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStatePose, XrSession, const XrActionStateGetInfo *,
@@ -633,7 +648,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
-  if (frame == 22 && s->action && voxel_mode() != "focus") {
+  if (frame == 22 && s->action && voxel_mode() != "focus" && bake_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
@@ -667,6 +682,11 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     float y = frame == 16 ? 300 : 609;
     p->pose.position = {.045f + (x / 640 - .5f) * .6f,
                         1.56f + (.5f - y / 640) * .6f, -.3f};
+  }
+  if(auto mode=bake_mode();!mode.empty() && s->action && s->action->name=="aim_pose" && right(s->hand) && (frame==18||(mode=="cancel"&&frame==20))){
+    float t=std::log(20.f/.01f)/std::log(10000.f/.01f);
+    float x=frame==18?100+420*t:170,y=frame==18?240:609;
+    p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
   }
   return XR_SUCCESS;
 }

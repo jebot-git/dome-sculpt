@@ -32,6 +32,7 @@ struct BakeOptions {
   bool normal_y_down = false; // Default is glTF/OpenGL +Y tangent convention.
   uint64_t max_texels = 4'194'304, max_rays = 64'000'000, max_raster_samples = 128'000'000;
   std::function<bool()> cancelled;
+  std::function<void(float)> progress; // Monotonic detached worker fraction [0,1].
 };
 struct BakeResult {
   TextureMaps maps; // Composited sRGB base/emission; linear ORM R=AO,G=rough,B=metal.

@@ -198,7 +198,9 @@ Read [docs/HANDOFF.md](docs/HANDOFF.md) before resuming the full production road
 Native baking uses pinned MikkTSpace tangent corners, Blender-based watertight
 BVH projections and source-guarded object transfer. The bake data/worker API,
 UV normal reorientation and GLB normal/occlusion bindings are implemented;
-FLTK/XR bake authoring controls remain in progress. See [baking](docs/BAKING.txt).
+Mesh → Bake surface and XR Objects → Mesh tools → Baking expose source selection,
+world-mm sliders, AO/padding, progress/cancel and exact Undo. See
+[bake controls](docs/BAKE-CONTROLS.md) and [baking](docs/BAKING.txt).
 
 Reproduce the retained native workflow and open its v6 asset in a private FLTK
 GUI check:

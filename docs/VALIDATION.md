@@ -1,3 +1,47 @@
+# Authoring and bake-controls integration — merge pending
+
+The full production objective remains active and incomplete. Current work merges
+incoming `7817ca2` native bake controls with local `88cde79` / application
+`8f4d67d`. No result below proves this in-progress combined merge. Rebuild and
+verify the final combined source before publishing main; never force-push over
+remote work.
+
+The exact local application checkpoint `8f4d67d` was built in
+`artifacts/verify-authoring-merge` and passed:
+
+- 47/47 Release suites in 147.34 s (`tests-authoring-pinned.log`).
+- Five whole-core ASan/UBSan/leak suites in 18.24 s, including C Mikk/xatlas
+  instrumentation (`tests-authoring-pinned-sanitize.log`): glTF interoperability,
+  baked textures, source morphs, UV workflow and weight authoring.
+- Native universal menus 53/53, rig/weight GUI 12/12, selected-avatar export GUI
+  5/5, baked-surface GUI 5/5 and actual latest DomeD Wayland/universal menus 8/8.
+  All process exits were zero and reports had zero failures. Logs use
+  `authoring-pinned` names; see the exact record below.
+
+FLTK and compositor were built from clean canonical DomeD `282467e`, including
+its updated popup-parent patch. Toolkit: `artifacts/toolkit-282467e`; compositor:
+`artifacts/domed-282467e-target/release/dome-compositor`. The verified local
+checkpoint and evidence notes are published on
+`checkpoint/native-xr-authoring-8f4d67d` at `88cde79`, independently of main.
+
+Incoming `7817ca2` has its own prior-workspace bake-control Release, GUI,
+sanitizer and synthetic XR evidence, archived verbatim in
+[VALIDATION-7817ca2.md](VALIDATION-7817ca2.md). Those results do not establish this
+combined merge. Its desktop/controller bake controls, cancellation/progress,
+source selection and exact Bake/Clear Undo must coexist with local weight
+painting, conformal UV, source VRM export and linear/sRGB XR transport.
+
+Pending lazy-UV initialization, all-slot source-UV baking and bind/transfer helper
+work is preserved in `stash@{0}` (`Preserve lazy UV source UV baking and skin
+authoring during7817 merge`). It is outside both application checkpoints until
+explicitly restored, integrated and verified. No installation, active-session
+restart, physical input/headset or accelerator-backend completion is claimed.
+
+The following records are historical evidence for their stated sources; older
+"pending" notes describe those stages, not the current merge state.
+
+---
+
 # Merged avatar/UV/voxel verification — 2026-10-29
 
 Latest exact-source evidence:8f4d67d, artifacts/verify-authoring-merge:

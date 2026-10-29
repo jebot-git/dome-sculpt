@@ -18,7 +18,8 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
   queue_scene_operation_locked(std::move(label), std::move(operation), expected, std::move(report));
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
-                                      AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<bool> changed) {
+                                      AssetSource expected, std::shared_ptr<std::string> report,
+                                      std::shared_ptr<bool> changed, std::shared_ptr<AssetWork> work) {
   if (label.empty() || label.size() > 256 || label.find('\0') != std::string::npos || !operation)
     throw std::invalid_argument("Invalid asset operation");
   if ((expected.generation && expected.generation != state_.generation) ||
@@ -34,9 +35,11 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   job.operation_label = std::move(label);
   job.operation_report = std::move(report);
   job.operation_changed = std::move(changed);
+  job.work = work ? std::move(work) : std::make_shared<AssetWork>();
   std::lock_guard file_lock(file_mutex_);
   if (files_.size() >= 8) throw std::runtime_error("File and asset work queue is full");
   files_.push_back(std::move(job));
+  asset_work_.store(files_.back().work);
   state_.asset_busy = true;
   state_.error.clear();
   state_.message = files_.back().operation_label + "...";
@@ -46,15 +49,6 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
 void Document::remesh_to_sculpt(float world_voxel_mm, AssetSource expected) {
   std::lock_guard lock(model_mutex_);
   queue_voxel_sculpt_locked(world_voxel_mm, expected);
-}
-void Document::bake_from_object(uint64_t source, ObjectBakeSettings settings, AssetSource expected) {
-  auto report = std::make_shared<std::string>();
-  queue_scene_operation("Bake surface", [source, settings, report](Scene &scene, const auto &cancelled) {
-    auto result = bake_object(scene, source, settings, cancelled);
-    *report = std::to_string(result.projected) + " texels, " +
-              std::to_string(result.padded) + " padded, " +
-              std::to_string(result.rays) + " rays";
-  }, expected, report);
 }
 void Document::queue_voxel_sculpt_locked(float world_voxel_mm, AssetSource expected) {
   if (!std::isfinite(world_voxel_mm) || world_voxel_mm < .01f || world_voxel_mm > 1000)

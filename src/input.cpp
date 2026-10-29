@@ -37,7 +37,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
-      "Center object", "Paint tools", "Sculpt layers", "Materials",
+      "Center object", "Paint tools", "Baking", "Materials",
       "Back", "Move left", "Move right", "Undo"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
@@ -47,7 +47,9 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Paint weights", "Next joint", "Previous joint", "Mode",
       "Strength", "Target", "Symmetry", "Joint lock",
       "Back", "Linked parts", "Brush size", "Save"};
+  static const std::array<const char *,12> baking={"Source", "Projection bounds", "AO / padding", "Bake surface", "Clear baked", "Cancel work", "Undo", "Redo", "Back", "Save", "Export glTF", "Center object"};
   return page == 13 ? weights
+         : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
          : page == 9 ? avatars
@@ -64,6 +66,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   if (page == 13 && sector == 4) return VrParameter::WeightStrength;
   if (page == 13 && sector == 5) return VrParameter::WeightValue;
   if (page == 13 && sector == 10) return VrParameter::BrushRadius;
+  if(page==12 && sector>=0 && sector<3)return sector==0?VrParameter::BakeSource:sector==1?VrParameter::BakeDistances:VrParameter::BakeQuality;
   if (page == 11 && sector == 0) return VrParameter::RigRotation;
   if (page == 11 && sector == 3) return VrParameter::MorphWeight;
   if (page == 10 && sector == 1)
@@ -113,6 +116,11 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   if (index < 0 || index >= 12 || page < 0 || page > 13 || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if(page==12){
+    if(index<3 || index==8)return {};
+    static const std::array<SpatialCommand,12> commands={SpatialCommand::BakeSurface,SpatialCommand::BakeSurface,SpatialCommand::BakeSurface,SpatialCommand::BakeSurface,SpatialCommand::ClearBake,SpatialCommand::CancelWork,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::Undo,SpatialCommand::Save,SpatialCommand::Export,SpatialCommand::Center};
+    return commands[index];
+  }
   if (page == 13) {
     static const std::array<SpatialCommand, 12> weights = {
       SpatialCommand::WeightToggle, SpatialCommand::RigNextJoint, SpatialCommand::RigPreviousJoint,
@@ -343,8 +351,8 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
   bool color = parameter_ == VrParameter::InkColor ||
                parameter_ == VrParameter::InkEmission ||
                parameter_ == VrParameter::BaseColor;
-  bool multi = color || parameter_ == VrParameter::RigRotation;
-  int components = parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
+  bool multi = color || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::BakeQuality;
+  int components = parameter_==VrParameter::BakeQuality?2:parameter_==VrParameter::BakeDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
   if (s.trigger && s.panel_hit) {
     int row = 0;
     float y = .46875f;
@@ -480,8 +488,8 @@ void SpatialInput::update(const SpatialSample &s) {
     bool color = parameter_ == VrParameter::InkColor ||
                  parameter_ == VrParameter::InkEmission ||
                  parameter_ == VrParameter::BaseColor;
-    bool multi = color || parameter_ == VrParameter::RigRotation;
-    int components = parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
+    bool multi = color || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::BakeQuality;
+    int components = parameter_==VrParameter::BakeQuality?2:parameter_==VrParameter::BakeDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
     if (multi) {
       if (std::abs(s.stick_y) < .3f)
         y_latch_ = 0;
@@ -542,7 +550,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 10;
       selected_ = 0;
     } else if (page_ == 10 && (selected_ == 5 || selected_ == 6 || selected_ == 7)) {
-      page_ = selected_ == 5 ? 3 : selected_ == 6 ? 7 : 2;
+      page_ = selected_ == 5 ? 3 : selected_ == 6 ? 12 : 2;
       selected_ = 0;
     } else if (page_ == 3 && selected_ == 11) {
       page_ = 6;
@@ -569,6 +577,7 @@ void SpatialInput::update(const SpatialSample &s) {
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
       page_ = page_ == 13 ? 11
+              : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
               : page_ == 8 ? 7
@@ -595,8 +604,7 @@ void SpatialInput::update(const SpatialSample &s) {
         }
         command_ = action;
       }
-      menu_ = false;
-      device_ = 0;
+      if(page_!=12){menu_ = false;device_ = 0;}
       d.armed = false;
     }
     d.pressed = s.trigger;

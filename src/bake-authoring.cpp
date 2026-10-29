@@ -4,11 +4,13 @@
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
-                              const std::function<bool()> &cancelled) {
+                              const std::function<bool()> &cancelled,
+                              const std::function<void(float)> &progress) {
   auto check = [&] {
     if (cancelled && cancelled()) throw std::runtime_error("Object baking cancelled");
   };
   check();
+  if(progress)progress(0);
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
@@ -54,6 +56,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   options.ao_samples = settings.ao_samples;
   options.padding = settings.padding;
   options.cancelled = cancelled;
+  if(progress)options.progress=[&](float value){progress(.1f+.8f*value);};
   auto result = bake_mesh(target.painted->mesh(), high, options);
   check();
   ObjectBakeReport report{result.projected,result.padded,result.rays};
@@ -69,6 +72,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   next.validate();
   check();
   scene = std::move(next);
+  if(progress)progress(1);
   return report;
 }
 } // namespace dome

@@ -37,6 +37,11 @@ struct ObjectInfo {
   Material material;
   bool mesh_active = false, has_mesh = false;
 };
+struct AssetWork {
+  std::atomic_bool cancelled{false};
+  std::atomic<float> progress{0};
+};
+struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
 struct EditorState {
   uint64_t revision = 1, generation = 1, input_epoch = 1;
   bool dirty = false, stroking = false, menu = false;
@@ -61,6 +66,11 @@ struct EditorState {
   size_t rig_joint = 0, morph_target = 0;
   WeightToolSettings weights;
   bool can_paint_weights = false;
+  bool can_bake = false, can_clear_bake = false, can_cancel_asset = false;
+  float asset_progress = 0;
+  uint64_t bake_source = 0;
+  std::vector<uint64_t> bake_sources;
+  ObjectBakeSettings bake_settings;
   bool can_voxel_remesh = false;
   bool can_export_avatar = false;
   float voxel_size_mm = 30;
@@ -153,6 +163,9 @@ public:
   void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
   void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
   void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
+  void clear_bake(AssetSource expected = {});
+  void cancel_asset_work();
+  AssetStatus asset_status() const;
   void begin_voxel_remesh();
   void edit_voxel_size(float world_voxel_mm);
   void end_voxel_remesh(bool accept);
@@ -303,7 +316,9 @@ private:
     std::shared_ptr<std::string> operation_report{};
     std::shared_ptr<bool> operation_changed{};
     AssetExportFormat export_format = AssetExportFormat::Glb;
+    std::shared_ptr<AssetWork> work{};
   };
+  std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;
   std::deque<FileJob> files_;
@@ -338,7 +353,13 @@ private:
   void queue_scene_operation(std::string, SceneOperation, AssetSource,
                              std::shared_ptr<std::string>);
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
-                                    std::shared_ptr<std::string>, std::shared_ptr<bool> = {});
+                                    std::shared_ptr<std::string>, std::shared_ptr<bool> = {},
+                                    std::shared_ptr<AssetWork> = {});
+  std::vector<uint64_t> bake_sources_locked() const;
+  bool bake_target_ready_locked() const;
+  void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
+  void queue_clear_bake_locked(AssetSource = {});
+  void cancel_asset_work_locked();
   void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome

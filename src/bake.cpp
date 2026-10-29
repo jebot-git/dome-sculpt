@@ -193,6 +193,7 @@ void pad(BakeResult &result,const BakeOptions &o) {
 }
 } // namespace
 BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
+  if(o.progress)o.progress(0);
   cancel(o); validate(low,source,o); SurfaceQuery query(source.mesh,o.cancelled); cancel(o);
   auto low_frames = o.low_tangents.empty() ? tangent_corners(low, o.cancelled)
                                          : std::vector<Tangent>{};
@@ -213,6 +214,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
     *image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   std::vector<uint32_t> owner(pixels,UINT32_MAX);
   for (size_t triangle=0;triangle<low.indices.size()/3;++triangle) {
+    if(o.progress && triangle%64==0)o.progress(.05f+.85f*float(triangle)/float(low.indices.size()/3));
     cancel(o); std::array<std::array<float,2>,3> uv;
     for (int i=0;i<3;++i) uv[i]=low.uv[low.indices[triangle*3+i]];
     double area=edge(uv[0],uv[1],uv[2]),uvscale=std::hypot(double(uv[1][0])-uv[0][0],double(uv[1][1])-uv[0][1])*std::hypot(double(uv[2][0])-uv[0][0],double(uv[2][1])-uv[0][1]);
@@ -311,6 +313,9 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
   if (result.overlapping&&o.fail_on_overlap) throw std::runtime_error("Overlapping low UV coverage: "+std::to_string(result.overlapping)+" texels");
   if (result.missed&&o.fail_on_miss) throw std::runtime_error("Projection missed "+std::to_string(result.missed)+" low UV texels");
   if (!result.projected) throw std::runtime_error("No low UV texels projected onto the high source");
-  cancel(o); if (o.padding) pad(result,o); cancel(o); return result;
+  if(o.progress)o.progress(.9f);
+  cancel(o); if (o.padding) pad(result,o); cancel(o);
+  if(o.progress)o.progress(1);
+  return result;
 }
 } // namespace dome
