@@ -198,6 +198,28 @@
     "license": "GPL-3.0-or-later",
     "used": "Original native CPU worker tangent-space normal/AO/composited material bake; shared SurfaceQuery BVH; no viewport readback or external/proprietary baker code. Limits/evidence in docs/BAKING.txt."
   },
+  "makehuman_assets": {
+    "repository": "https://github.com/makehumancommunity/makehuman",
+    "commit": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
+    "license": "CC0-1.0 asset data only; AGPL runtime code not included",
+    "used": "Authored hm08 body, targets, rig and weights for explicit MakeHuman baseline; converted offline into native data with original conversion tool. Exact per-file grants/hashes in assets/humanoid/SOURCES.json."
+  },
+  "vroid_cc0_assets": {
+    "license": "CC0-1.0, explicit historical beta model grants and matching embedded author metadata",
+    "used": "Primary female/male native humanoid baselines, complete original source bytes and full-resolution images retained for native authoring/persistence. Current non-CC0 presets are not used. No proprietary VRoid runtime.",
+    "manifest": "assets/humanoid/vroid/SOURCES.json",
+    "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
+  },
+  "domed_latest_check": {
+    "commit": "7322b0eea5d63f8f32dd68a0983a55dc5c8b81b3",
+    "fltk_patch_changes_since_742d009": false,
+    "used": "Fresh clean Release compositor build and private nested Wayland/universal-menu verification; existing22-patch toolkit unchanged."
+  },
+  "mtoon": {
+    "implementation": "src/mtoon.cpp; include/dome/mtoon-shader.hpp",
+    "license": "MIT with original Masataka SUMI and VRM Consortium notices",
+    "used": "Native MToon0/1 typed materials and GLSL module; renderer/VRM integration in progress, not claimed complete. Exact primary references/commit/file hashes in docs/MTOON.md and retained notice docs/MTOON-LICENSE.txt."
+  },
   "mikktspace": {
     "repository": "https://github.com/mmikk/MikkTSpace",
     "commit": "3e895b49d05ea07e4c2133156cfa94369e19e409",

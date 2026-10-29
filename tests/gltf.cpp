@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define CGLTF_IMPLEMENTATION
+// The native importer supplies the single MIT cgltf implementation.
 #include "cgltf.h"
 #include "dome/scene.hpp"
+#include "dome/humanoid-creator.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -366,6 +367,57 @@ int main() try {
     std::filesystem::copy_file(
         path, std::string(fixture) + ".humanoid.glb",
         std::filesystem::copy_options::overwrite_existing);
+  // Nested creator groups must affect joint world matrices once, while a
+  // skinned surface stays an identity scene root per glTF skin semantics.
+  objects[0].deformation = std::make_shared<const dome::DeformationState>(rig);
+  dome::CanvasTransform group_transform{};
+  group_transform.position = {1,2,-.5f}; group_transform.scale = 1.3f;
+  group_transform.orientation = {0,std::sin(.2f),0,std::cos(.2f)};
+  dome::CanvasTransform nested{}; nested.position = {.3f,-.2f,.1f}; nested.scale = .7f;
+  objects[0].groups = {{71,0,"Avatar group",group_transform,
+                         std::make_shared<const dome::HumanoidControls>()},
+                       {72,71,"Nested group",nested,{}}};
+  dome::export_glb(objects, path);
+  raw = nullptr;
+  require(cgltf_parse_file(&options, path.c_str(), &raw) == cgltf_result_success,
+          "Independent parser accepts grouped skin export");
+  std::unique_ptr<cgltf_data, decltype(&cgltf_free)> grouped(raw, cgltf_free);
+  require(cgltf_load_buffers(&options, raw, path.c_str()) == cgltf_result_success &&
+          cgltf_validate(raw) == cgltf_result_success,
+          "Independent validator accepts nested group/skin hierarchy");
+  auto &grouped_skin = raw->skins[0];
+  require(raw->nodes_count == 9 && raw->nodes[1].parent == &raw->nodes[0] &&
+          grouped_skin.skeleton->parent == &raw->nodes[1],
+          "Native group parents are actual glTF hierarchy nodes");
+  bool root_surface = false;
+  for (size_t i = 0; i < raw->nodes_count; ++i)
+    if (raw->nodes[i].skin) root_surface = raw->nodes[i].parent == nullptr;
+  require(root_surface, "Grouped skinned surface retains identity root placement");
+  dome::Vec3 grouped_weighted{};
+  for (size_t i = 0; i < 5; ++i) {
+    float inverse_bind[16], world[16];
+    require(cgltf_accessor_read_float(grouped_skin.inverse_bind_matrices, i, inverse_bind, 16),
+            "Grouped inverse binds remain independently readable");
+    cgltf_node_transform_world(grouped_skin.joints[i], world);
+    grouped_weighted += transform(world, transform(inverse_bind, position)) * .2f;
+  }
+  auto native_world = objects[0].world_transform();
+  auto grouped_position = preview.positions[0];
+  auto expected_grouped = ob::transform(native_world, {grouped_position.x,grouped_position.y,grouped_position.z});
+  require(dome::length(grouped_weighted - dome::Vec3{expected_grouped.x,expected_grouped.y,expected_grouped.z}) < 3e-5f,
+          "Independent grouped skin evaluation matches native preview exactly once");
+  auto grouped_json = nlohmann::json::parse(raw->json, raw->json + raw->json_size);
+  require(grouped_json["nodes"][0]["extras"]["domeSculptCreator"]["type"] == "humanoid",
+          "Creator recipe metadata survives glTF grouping without claiming VRM");
+  if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
+    std::filesystem::copy_file(path, std::string(fixture) + ".grouped.glb",
+                               std::filesystem::copy_options::overwrite_existing);
+  objects[0].groups[1].parent = 71;
+  auto conflict = objects[0]; conflict.groups[0].transform.scale = 2;
+  bool conflict_rejected = false;
+  try { dome::export_glb(std::vector<dome::ObjectSurface>{objects[0],conflict},path); }
+  catch (const std::invalid_argument &) { conflict_rejected = true; }
+  require(conflict_rejected, "Conflicting group definitions cannot export ambiguous parents");
   std::filesystem::remove(path);
   std::cout << "PASS Independent cgltf validation, attributes, indices and "
                "exact metre-space geometry\n";

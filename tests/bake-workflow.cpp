@@ -65,9 +65,9 @@ int main(int argc,char **argv)try {
         "The complete bake is one exact native scene Undo/Redo transaction");
   auto path=root/"baked-workflow.dsculpt";
   doc.save(path);auto loaded=Scene::load(path);
-  check(loaded.encode()["version"]==5 && loaded.active().painted->encode()==baked.active().painted->encode() &&
+  check(loaded.encode()["version"]==6 && loaded.active().painted->encode()==baked.active().painted->encode() &&
         loaded.active().volume->voxels()==baked.active().volume->voxels(),
-        "Version 5 native saving and reopening retain the complete baked target and scalar field");
+        "Version 6 native saving and reopening retain the complete baked target and scalar field");
   auto surfaces=loaded.surfaces(true);
   check(surfaces.size()==1 && surfaces[0].id==low_id && surfaces[0].textures &&
         surfaces[0].textures->normal.rgba==maps->normal.rgba,

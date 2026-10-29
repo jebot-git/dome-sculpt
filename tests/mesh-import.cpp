@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/import.hpp"
 #include "dome/mesh-processing.hpp"
+#include "dome/scene.hpp"
 #include <bit>
 #include <fstream>
 #include <iostream>
@@ -307,6 +308,728 @@ int main() try {
               roundtrip.primitives[0].mesh.indices == triangle.indices &&
               roundtrip.primitives[0].mesh.uv == triangle.uv,
           "Actual native GLB export reimports with triangle and UV identity");
+
+  ImportLimits preserve;
+  preserve.mode = ImportMode::PreserveGltf;
+  save(asset / "local.gltf", gltf.dump());
+  auto local = import_mesh(asset / "local.gltf", preserve);
+  require(
+      local.nodes.size() == 2 && local.meshes.size() == 1 &&
+          local.scenes.size() == 1 && local.default_scene == 0 &&
+          local.nodes[1].parent == 0 &&
+          local.nodes[0].children == std::vector<uint32_t>{1} &&
+          local.nodes[1].mesh == 0,
+      "Preserving glTF import retains complete scene, node and mesh identity");
+  require(local.primitives[0].mesh_local &&
+              local.primitives[0].mesh.positions[1].x == 1 &&
+              local.primitives[0].mesh.indices ==
+                  std::vector<uint32_t>({0, 1, 2}) &&
+              local.primitives[0].tangents[0][3] == 1 &&
+              local.nodes[1].world[0] == -2 && local.nodes[1].world[12] == 1 &&
+              local.nodes[1].has_scale,
+          "Mesh-local import retains reflected instance transforms without "
+          "baking geometry or tangent handedness");
+  auto instanced = gltf;
+  instanced["nodes"].push_back(
+      {{"mesh", 0},
+       {"matrix", {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 7, 8, 9, 1}}});
+  instanced["scenes"][0]["nodes"].push_back(2);
+  save(asset / "instances.gltf", instanced.dump());
+  auto instances = import_mesh(asset / "instances.gltf", preserve);
+  require(instances.primitives.size() == 1 && instances.nodes.size() == 3 &&
+              instances.nodes[2].mesh == 0 && instances.nodes[2].has_matrix &&
+              !instances.nodes[2].has_translation &&
+              instances.nodes[2].local[12] == 7,
+          "Shared mesh instances preserve authored matrix-versus-TRS state "
+          "without duplicating mesh data");
+
+  auto morph_json = gltf;
+  auto morph_binary = b;
+  auto append_morph = [&](std::initializer_list<float> values) {
+    auto view = morph_json["bufferViews"].size(),
+         accessor = morph_json["accessors"].size();
+    size_t offset = morph_binary.size();
+    floats(morph_binary, values);
+    morph_json["bufferViews"].push_back({{"buffer", 0},
+                                         {"byteOffset", offset},
+                                         {"byteLength", values.size() * 4}});
+    morph_json["accessors"].push_back({{"bufferView", view},
+                                       {"componentType", 5126},
+                                       {"count", 3},
+                                       {"type", "VEC3"}});
+    return accessor;
+  };
+  auto mp = append_morph({.1f, 0, 0, 0, .2f, 0, 0, 0, .3f}),
+       mn = append_morph({0, .01f, 0, 0, .02f, 0, 0, .03f, 0}),
+       mt = append_morph({.01f, 0, 0, .02f, 0, 0, .03f, 0, 0});
+  morph_json["buffers"][0]["uri"] =
+      "data:application/octet-stream;base64," + b64(morph_binary);
+  morph_json["buffers"][0]["byteLength"] = morph_binary.size();
+  morph_json["meshes"][0]["primitives"][0]["targets"] =
+      Json::array({{{"POSITION", mp}, {"NORMAL", mn}, {"TANGENT", mt}}});
+  morph_json["meshes"][0]["weights"] = {-.5f};
+  morph_json["meshes"][0]["extras"]["targetNames"] = {"squash"};
+  morph_json["nodes"][1]["weights"] = {1.25f};
+  auto unmorphed = morph_json["meshes"][0]["primitives"][0];
+  unmorphed.erase("targets");
+  morph_json["meshes"][0]["primitives"].push_back(unmorphed);
+  save(asset / "morph-channels.gltf", morph_json.dump());
+  auto channels = import_mesh(asset / "morph-channels.gltf", preserve);
+  require(channels.primitives.size() == 2 &&
+              channels.primitives[0].morph_targets[0].positions[0].x == .1f &&
+              channels.primitives[0].morph_targets[0].normals[2].y == .03f &&
+              channels.primitives[0].morph_targets[0].tangents[1].x == .02f,
+          "All authored position, normal and three-component tangent morph "
+          "differences remain in mesh space");
+  require(channels.meshes[0].weights == std::vector<float>{-.5f} &&
+              channels.nodes[1].weights == std::vector<float>{1.25f} &&
+              channels.meshes[0].target_names ==
+                  std::vector<std::string>{"squash"},
+          "Mesh defaults and overriding node morph weights retain authored "
+          "values outside zero-to-one");
+  require(channels.primitives[0].morph_targets_authored &&
+              !channels.primitives[1].morph_targets_authored &&
+              channels.primitives[1].morph_targets.size() == 1 &&
+              channels.primitives[1].morph_targets[0].positions.empty(),
+          "Mixed morphed and unmorphed primitives preserve explicit versus "
+          "implicit zero-target presence");
+  auto reject_morph = [&](Json j, const char *message) {
+    save(asset / "invalid-morph.gltf", j.dump());
+    rejects([&] { import_mesh(asset / "invalid-morph.gltf", preserve); },
+            message);
+  };
+  auto bad_morph = morph_json;
+  bad_morph["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");
+  reject_morph(bad_morph,
+               "Morph channels require their matching base vertex attributes");
+  bad_morph = morph_json;
+  bad_morph["meshes"][0]["primitives"][0]["targets"][0]["TANGENT"] = 5;
+  reject_morph(bad_morph, "Morph tangent differences require VEC3 rather than "
+                          "tangent-handedness VEC4");
+  bad_morph = morph_json;
+  bad_morph["meshes"][0]["primitives"][0]["targets"][0]["TEXCOORD_0"] = 3;
+  reject_morph(bad_morph, "Optional UV morph channels reject explicitly until "
+                          "their import path exists");
+  bad_morph = morph_json;
+  bad_morph["nodes"][1]["weights"] = {0, 1};
+  reject_morph(bad_morph,
+               "Node morph override count must match its source mesh targets");
+  auto sparse_morph = morph_json;
+  auto sparse_morph_bytes = morph_binary;
+  auto index_view = sparse_morph["bufferViews"].size();
+  sparse_morph["bufferViews"].push_back(
+      {{"buffer", 0},
+       {"byteOffset", sparse_morph_bytes.size()},
+       {"byteLength", 1}});
+  sparse_morph_bytes.push_back(0);
+  auto position_view = sparse_morph["accessors"][mp]["bufferView"];
+  sparse_morph["accessors"][mp].erase("bufferView");
+  sparse_morph["accessors"][mp]["sparse"] = {
+      {"count", 1},
+      {"indices", {{"bufferView", index_view}, {"componentType", 5121}}},
+      {"values", {{"bufferView", position_view}}}};
+  sparse_morph["buffers"][0]["uri"] =
+      "data:application/octet-stream;base64," + b64(sparse_morph_bytes);
+  sparse_morph["buffers"][0]["byteLength"] = sparse_morph_bytes.size();
+  save(asset / "sparse-morph.gltf", sparse_morph.dump());
+  auto sparse_channels = import_mesh(asset / "sparse-morph.gltf", preserve);
+  require(
+      sparse_channels.primitives[0].morph_targets[0].positions[0].x == .1f &&
+          length(sparse_channels.primitives[0].morph_targets[0].positions[2]) ==
+              0,
+      "Sparse morph differences decode authored values over implicit all-zero "
+      "base data");
+  auto metadata_limits = preserve;
+  metadata_limits.max_metadata_visits = 1;
+  rejects([&] { import_mesh(asset / "local.gltf", metadata_limits); },
+          "Hierarchy metadata traversal has an explicit work budget");
+
+  DeformationState rig(triangle);
+  rig.skeleton = Skeleton{};
+  for (int i = 0; i < 5; i++) {
+    Bone bone;
+    bone.name = "joint" + std::to_string(i);
+    bone.parent = i ? 0 : -1;
+    bone.rest.translation = {float(i) * .03f, .1f, 0};
+    rig.skeleton->bones.push_back(bone);
+  }
+  rig.skin = SkinWeights{};
+  rig.skin->vertices.assign(3,
+                            {{0, .2f}, {1, .2f}, {2, .2f}, {3, .2f}, {4, .2f}});
+  rig.morphs = MorphSet(triangle);
+  auto morph_positions = triangle.positions;
+  for (auto &v : morph_positions)
+    v.z += .04f;
+  rig.morphs->set_target(triangle, "forward", morph_positions);
+  rig.morph_weights = {.6f};
+  for (auto &bone : rig.skeleton->bones)
+    rig.pose.push_back(bone.rest);
+  rig.pose[0].translation.y += .15f;
+  rig.expressions = AvatarExpressions{{{"aa", {{"forward", 1}}}}};
+  ObjectSurface authored_object;
+  authored_object.id = 1;
+  authored_object.name = "Imported rig";
+  authored_object.transform = {{.3f, .2f, -.1f}, {0, 0, .6f, .8f}, .75f};
+  authored_object.mesh = triangle;
+  std::vector<ObjectSurface> authored = {authored_object};
+  authored[0].deformation = std::make_shared<const DeformationState>(rig);
+  export_glb(authored, asset / "native-rig.glb");
+  rejects([&] { import_mesh(asset / "native-rig.glb"); },
+          "Default static mode keeps explicit authored skin/morph rejection");
+  auto imported_rig = import_mesh(asset / "native-rig.glb", preserve);
+  auto &rig_primitive = imported_rig.primitives[0];
+  require(imported_rig.nodes.size() == 7 && imported_rig.skins.size() == 1 &&
+              imported_rig.meshes.size() == 1 &&
+              imported_rig.nodes[1].skin == 0 &&
+              imported_rig.skins[0].joints.size() == 5 &&
+              rig_primitive.mesh.positions[0].z == triangle.positions[0].z,
+          "Actual native skin/morph GLB reimports all joint nodes and "
+          "untouched rest mesh coordinates");
+  require(rig_primitive.influences.size() == 2 &&
+              rig_primitive.influences[1].joints[0][0] == 4 &&
+              rig_primitive.influences[1].weights[0][0] == .2f &&
+              rig_primitive.influences[1].weights[0][1] == 0,
+          "All native influence sets and zero-padded slots survive without "
+          "truncation or normalization");
+  auto native_ibm = rig.skeleton->inverse_bind();
+  require(imported_rig.skins[0].inverse_bind_matrices_authored &&
+              imported_rig.skins[0].inverse_bind_matrices == native_ibm &&
+              std::abs(imported_rig.skins[0].inverse_bind_matrices[0][13] +
+                       .1f) < 1e-6f,
+          "Authored inverse binds remain exact and distinct from current posed "
+          "node transforms");
+  require(rig_primitive.morph_targets.size() == 1 &&
+              std::abs(rig_primitive.morph_targets[0].positions[0].z - .04f) <
+                  1e-6f &&
+              imported_rig.meshes[0].weights == std::vector<float>{.6f} &&
+              imported_rig.meshes[0].target_names ==
+                  std::vector<std::string>{"forward"} &&
+              Json::parse(imported_rig.meshes[0].extras_json)
+                  .contains("domeSculptExpressions"),
+          "Native GLB morph names, authored weights, displacement arrays and "
+          "expression extras are retained");
+  std::ifstream native_file(asset / "native-rig.glb", std::ios::binary);
+  std::vector<uint8_t> native_bytes(
+      (std::istreambuf_iterator<char>(native_file)), {});
+  auto u32 = [&](size_t i) {
+    return uint32_t(native_bytes[i]) | (uint32_t(native_bytes[i + 1]) << 8) |
+           (uint32_t(native_bytes[i + 2]) << 16) |
+           (uint32_t(native_bytes[i + 3]) << 24);
+  };
+  size_t json_length = u32(12), binary_header = 20 + json_length,
+         binary_length = u32(binary_header);
+  Json native_json = Json::parse(native_bytes.begin() + 20,
+                                 native_bytes.begin() + 20 + json_length);
+  std::vector<uint8_t> native_binary(native_bytes.begin() + binary_header + 8,
+                                     native_bytes.begin() + binary_header + 8 +
+                                         binary_length);
+  auto embedded = [&](Json j, const std::vector<uint8_t> &binary) {
+    j["buffers"][0]["uri"] =
+        "data:application/octet-stream;base64," + b64(binary);
+    j["buffers"][0]["byteLength"] = binary.size();
+    return j;
+  };
+  auto preserve_invalid = [&](Json j, const char *message) {
+    save(asset / "invalid-preserve.gltf", j.dump());
+    rejects([&] { import_mesh(asset / "invalid-preserve.gltf", preserve); },
+            message);
+  };
+  native_json = embedded(native_json, native_binary);
+  auto authored_matrix =
+      native_json["skins"][0]["inverseBindMatrices"].get<size_t>();
+  auto no_ibm = native_json;
+  no_ibm["skins"][0].erase("inverseBindMatrices");
+  save(asset / "implicit-bind.gltf", no_ibm.dump());
+  auto implicit_bind = import_mesh(asset / "implicit-bind.gltf", preserve);
+  require(!implicit_bind.skins[0].inverse_bind_matrices_authored &&
+              implicit_bind.skins[0].inverse_bind_matrices.empty(),
+          "Absent inverse-bind accessor remains explicit implicit identity "
+          "instead of recomputed Skeleton binds");
+  auto broken = native_json;
+  broken["accessors"][authored_matrix]["count"] = 4;
+  preserve_invalid(
+      broken,
+      "Skin inverse-bind accessors cannot have fewer matrices than joints");
+  broken = native_json;
+  broken["skins"][0]["joints"][1] = broken["skins"][0]["joints"][0];
+  preserve_invalid(broken, "Duplicate skin joint nodes reject before mapping");
+  broken = native_json;
+  broken["skins"][0]["skeleton"] = 1;
+  preserve_invalid(broken,
+                   "Authored skin skeleton must be an ancestor of every joint");
+  broken = native_json;
+  broken["scenes"][0]["nodes"] = {1};
+  preserve_invalid(
+      broken,
+      "Skin joint common root must belong to the skinned instance scene");
+  broken = native_json;
+  broken["nodes"][0]["matrix"] = {1, 0, 0, 0, 0, 1, 0, 0,
+                                  0, 0, 1, 0, 0, 0, 0, 1};
+  preserve_invalid(
+      broken, "Conflicting node matrix and TRS authoring rejects explicitly");
+  auto attributes = native_json["meshes"][0]["primitives"][0]["attributes"];
+  auto joints0 = attributes["JOINTS_0"].get<size_t>(),
+       weights0 = attributes["WEIGHTS_0"].get<size_t>(),
+       weights1 = attributes["WEIGHTS_1"].get<size_t>();
+  broken = native_json;
+  broken["meshes"][0]["primitives"][0]["attributes"].erase("WEIGHTS_1");
+  preserve_invalid(broken, "Every joint set needs its matching weight set");
+  broken = native_json;
+  auto &bad_attributes = broken["meshes"][0]["primitives"][0]["attributes"];
+  bad_attributes["JOINTS_2"] = bad_attributes["JOINTS_1"];
+  bad_attributes["WEIGHTS_2"] = bad_attributes["WEIGHTS_1"];
+  bad_attributes.erase("JOINTS_1");
+  bad_attributes.erase("WEIGHTS_1");
+  preserve_invalid(broken,
+                   "Influence semantic sets must be consecutive without gaps");
+  broken = native_json;
+  broken["accessors"][joints0]["normalized"] = true;
+  preserve_invalid(broken, "Joint indices cannot use normalized accessors");
+  broken = native_json;
+  broken["accessors"][weights0]["normalized"] = true;
+  preserve_invalid(broken,
+                   "Floating-point weights cannot be marked normalized");
+  auto accessor_offset = [&](const Json &j, size_t id) {
+    auto &a = j["accessors"][id];
+    return j["bufferViews"][a["bufferView"].get<size_t>()].value("byteOffset",
+                                                                 size_t(0)) +
+           a.value("byteOffset", size_t(0));
+  };
+  auto set_float = [&](std::vector<uint8_t> &bytes, size_t offset,
+                       float value) {
+    auto n = std::bit_cast<uint32_t>(value);
+    for (size_t k = 0; k < 4; k++)
+      bytes[offset + k] = uint8_t(n >> (k * 8));
+  };
+  auto bad_binary = native_binary;
+  set_float(bad_binary, accessor_offset(native_json, authored_matrix) + 12,
+            .1f);
+  preserve_invalid(
+      embedded(native_json, bad_binary),
+      "Authored joint inverse binds require the affine fourth row");
+  bad_binary = native_binary;
+  set_float(bad_binary, accessor_offset(native_json, authored_matrix),
+            std::numeric_limits<float>::quiet_NaN());
+  preserve_invalid(
+      embedded(native_json, bad_binary),
+      "Nonfinite inverse-bind matrix values reject before publication");
+  bad_binary = native_binary;
+  bad_binary[accessor_offset(native_json, joints0)] = 5;
+  bad_binary[accessor_offset(native_json, joints0) + 1] = 0;
+  preserve_invalid(
+      embedded(native_json, bad_binary),
+      "All influence joint slots are checked against every instancing skin");
+  bad_binary = native_binary;
+  bad_binary[accessor_offset(native_json, joints0) + 2] = 0;
+  bad_binary[accessor_offset(native_json, joints0) + 3] = 0;
+  preserve_invalid(embedded(native_json, bad_binary),
+                   "Repeated nonzero joint influences reject instead of "
+                   "merging authored data");
+  bad_binary = native_binary;
+  set_float(bad_binary, accessor_offset(native_json, weights0), -.1f);
+  preserve_invalid(embedded(native_json, bad_binary),
+                   "Negative skin weights reject without normalization");
+  auto append_view = [&](Json &j, std::vector<uint8_t> &bytes,
+                         const std::vector<uint8_t> &payload,
+                         size_t alignment) {
+    while (bytes.size() % alignment)
+      bytes.push_back(0);
+    auto index = j["bufferViews"].size();
+    j["bufferViews"].push_back({{"buffer", 0},
+                                {"byteOffset", bytes.size()},
+                                {"byteLength", payload.size()}});
+    bytes.insert(bytes.end(), payload.begin(), payload.end());
+    return index;
+  };
+  auto trailing = native_json;
+  auto trailing_bytes = native_binary;
+  size_t original_ibm = accessor_offset(native_json, authored_matrix);
+  std::vector<uint8_t> matrices(native_binary.begin() + original_ibm,
+                                native_binary.begin() + original_ibm + 5 * 64);
+  floats(matrices, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, .125f, 0, 0, 1});
+  auto trailing_view = append_view(trailing, trailing_bytes, matrices, 4);
+  trailing["accessors"][authored_matrix]["bufferView"] = trailing_view;
+  trailing["accessors"][authored_matrix]["count"] = 6;
+  save(asset / "trailing-bind.gltf", embedded(trailing, trailing_bytes).dump());
+  auto trailing_bind = import_mesh(asset / "trailing-bind.gltf", preserve);
+  require(trailing_bind.skins[0].inverse_bind_matrices.size() == 6 &&
+              trailing_bind.skins[0].inverse_bind_matrices[5][12] == .125f,
+          "Trailing authored inverse-bind matrices are retained without "
+          "truncation");
+  auto quantized = native_json;
+  auto quantized_bytes = native_binary;
+  std::vector<uint8_t> q8(12, 51), q16;
+  for (int v = 0; v < 3; v++) {
+    word(q16, 13107, 2);
+    for (int k = 1; k < 4; k++)
+      word(q16, 0, 2);
+  }
+  auto q8view = append_view(quantized, quantized_bytes, q8, 1),
+       q16view = append_view(quantized, quantized_bytes, q16, 2);
+  quantized["accessors"][weights0]["bufferView"] = q8view;
+  quantized["accessors"][weights0]["componentType"] = 5121;
+  quantized["accessors"][weights0]["normalized"] = true;
+  quantized["accessors"][weights1]["bufferView"] = q16view;
+  quantized["accessors"][weights1]["componentType"] = 5123;
+  quantized["accessors"][weights1]["normalized"] = true;
+  save(asset / "quantized-skin.gltf",
+       embedded(quantized, quantized_bytes).dump());
+  auto quantized_skin = import_mesh(asset / "quantized-skin.gltf", preserve);
+  require(
+      quantized_skin.primitives[0].influences[0].weight_component_type ==
+              5121 &&
+          quantized_skin.primitives[0].influences[1].weight_component_type ==
+              5123 &&
+          quantized_skin.primitives[0].influences[0].weights[0][0] ==
+              51.f / 255,
+      "Mixed normalized byte/short influence sets preserve their component "
+      "provenance and values");
+  auto invalid_quantized = quantized_bytes;
+  invalid_quantized[quantized["bufferViews"][q8view]["byteOffset"]
+                        .get<size_t>()] = 50;
+  preserve_invalid(embedded(quantized, invalid_quantized),
+                   "Normalized integer weight sums are validated exactly "
+                   "across all influence sets");
+
+  auto sparse_skin = native_json;
+  auto sparse_skin_bytes = native_binary;
+  auto sparse_joint_indices =
+      append_view(sparse_skin, sparse_skin_bytes, {0, 1, 2}, 1);
+  auto weight_offset = accessor_offset(native_json, weights0);
+  std::vector<uint8_t> weight_payload(native_binary.begin() + weight_offset,
+                                      native_binary.begin() + weight_offset +
+                                          3 * 16);
+  auto sparse_weight_values =
+      append_view(sparse_skin, sparse_skin_bytes, weight_payload, 4);
+  sparse_skin["accessors"][weights0].erase("bufferView");
+  sparse_skin["accessors"][weights0]["sparse"] = {
+      {"count", 3},
+      {"indices",
+       {{"bufferView", sparse_joint_indices}, {"componentType", 5121}}},
+      {"values", {{"bufferView", sparse_weight_values}}}};
+  save(asset / "sparse-skin.gltf",
+       embedded(sparse_skin, sparse_skin_bytes).dump());
+  auto sparse_weights = import_mesh(asset / "sparse-skin.gltf", preserve);
+  require(sparse_weights.primitives[0].influences[0].weights[2][3] == .2f,
+          "Sparse influence arrays decode all authored vertices without "
+          "dropping influence sets");
+  auto sparse_index = gltf;
+  auto sparse_index_bytes = b;
+  auto index_offsets = append_view(sparse_index, sparse_index_bytes, {1, 2}, 1);
+  std::vector<uint8_t> index_values;
+  word(index_values, 1, 2);
+  word(index_values, 2, 2);
+  auto index_payload =
+      append_view(sparse_index, sparse_index_bytes, index_values, 2);
+  sparse_index["accessors"][1].erase("bufferView");
+  sparse_index["accessors"][1]["sparse"] = {
+      {"count", 2},
+      {"indices", {{"bufferView", index_offsets}, {"componentType", 5121}}},
+      {"values", {{"bufferView", index_payload}}}};
+  save(asset / "sparse-topology.gltf",
+       embedded(sparse_index, sparse_index_bytes).dump());
+  auto sparse_topology = import_mesh(asset / "sparse-topology.gltf", preserve);
+  require(sparse_topology.primitives[0].mesh.indices ==
+              std::vector<uint32_t>({0, 1, 2}),
+          "Preserving mode decodes sparse triangle indices over their implicit "
+          "zero base");
+  auto animated = native_json;
+  auto animated_bytes = native_binary;
+  std::vector<uint8_t> times, positions;
+  floats(times, {0, 1});
+  floats(positions, {0, 0, 0, 1, 0, 0});
+  auto times_view = append_view(animated, animated_bytes, times, 4),
+       positions_view = append_view(animated, animated_bytes, positions, 4);
+  size_t input_accessor = animated["accessors"].size();
+  animated["accessors"].push_back({{"bufferView", times_view},
+                                   {"componentType", 5126},
+                                   {"count", 2},
+                                   {"type", "SCALAR"}});
+  size_t output_accessor = animated["accessors"].size();
+  animated["accessors"].push_back({{"bufferView", positions_view},
+                                   {"componentType", 5126},
+                                   {"count", 2},
+                                   {"type", "VEC3"}});
+  animated["animations"] = Json::array(
+      {{{"name", "move"},
+        {"samplers", Json::array({{{"input", input_accessor},
+                                   {"output", output_accessor},
+                                   {"interpolation", "LINEAR"}}})},
+        {"channels",
+         Json::array(
+             {{{"sampler", 0},
+               {"target", {{"node", 0}, {"path", "translation"}}}}})}}});
+  animated["extensionsUsed"] = {"EXT_not_interpreted"};
+  animated["nodes"][0]["extras"] = "quoted \\\" custom text";
+  save(asset / "animated-diagnostic.gltf",
+       embedded(animated, animated_bytes).dump());
+  auto animation = import_mesh(asset / "animated-diagnostic.gltf", preserve);
+  require(animation.omitted_animations.size() == 1 &&
+              animation.omitted_animations[0].name == "move" &&
+              animation.omitted_animations[0].channels == 1 &&
+              !animation.warnings.empty(),
+          "Animation omission is explicit with retained clip names and channel "
+          "counts");
+  require(animation.extensions_used ==
+                  std::vector<std::string>{"EXT_not_interpreted"} &&
+              Json::parse(animation.nodes[0].extras_json) ==
+                  animated["nodes"][0]["extras"],
+          "Unknown optional extensions remain diagnostic and arbitrary string "
+          "extras retain exact JSON meaning");
+
+  auto escaped_names = gltf;
+  auto quoted = std::string("root ") + char(34) + " rocket";
+  escaped_names["nodes"][0]["name"] = quoted;
+  auto escaped_json = escaped_names.dump();
+  auto rocket = escaped_json.find("rocket");
+  auto escapes = std::string(1, char(92)) + "ud83d" + char(92) + "ude80";
+  escaped_json.replace(rocket, 6, escapes);
+  save(asset / "unicode-name.gltf", escaped_json);
+  auto unicode = import_mesh(asset / "unicode-name.gltf", preserve);
+  auto expected_name =
+      std::string("root ") + char(34) + " " +
+      std::string({char(0xf0), char(0x9f), char(0x9a), char(0x80)});
+  require(unicode.nodes[0].name == expected_name,
+          "JSON-escaped names decode surrogate pairs without losing stable "
+          "authored identities");
+
+  auto escaped_buffer = gltf;
+  escaped_buffer["buffers"][0]["uri"] = "buffer data.bin";
+  auto escaped_buffer_json = escaped_buffer.dump();
+  auto blank = escaped_buffer_json.find("buffer data.bin") + 6;
+  escaped_buffer_json.replace(blank, 1, std::string(1, char(92)) + "u0020");
+  save(asset / "escaped-buffer.gltf", escaped_buffer_json);
+  require(import_mesh(asset / "escaped-buffer.gltf", preserve)
+                  .primitives[0]
+                  .mesh.positions[1]
+                  .x == 1,
+          "JSON-escaped external resource URIs decode before confined "
+          "filesystem resolution");
+  auto authored_float = native_binary;
+  set_float(authored_float, accessor_offset(native_json, weights0), .3f);
+  save(asset / "authored-float-weight.gltf",
+       embedded(native_json, authored_float).dump());
+  auto float_weight =
+      import_mesh(asset / "authored-float-weight.gltf", preserve);
+  require(float_weight.primitives[0].influences[0].weights[0][0] == .3f &&
+              std::any_of(
+                  float_weight.warnings.begin(), float_weight.warnings.end(),
+                  [](const std::string &s) {
+                    return s.find("without normalization") != std::string::npos;
+                  }),
+          "Non-unit authored float weights remain exact with explicit "
+          "normalization diagnostics");
+  auto zero_weights = native_binary;
+  for (auto accessor : {weights0, weights1})
+    for (size_t k = 0; k < 4; k++)
+      set_float(zero_weights, accessor_offset(native_json, accessor) + k * 4,
+                0);
+  preserve_invalid(
+      embedded(native_json, zero_weights),
+      "Every bound skinned vertex requires at least one nonzero influence");
+  auto shared_skin = native_json;
+  shared_skin["skins"].push_back(shared_skin["skins"][0]);
+  shared_skin["skins"][1]["joints"].erase(
+      shared_skin["skins"][1]["joints"].end() - 1);
+  shared_skin["nodes"].push_back({{"mesh", 0}, {"skin", 1}});
+  shared_skin["scenes"][0]["nodes"].push_back(7);
+  preserve_invalid(shared_skin, "Shared meshes validate joint slots "
+                                "independently against every instancing skin");
+
+  auto hierarchy_only = native_json;
+  hierarchy_only.erase("meshes");
+  hierarchy_only["nodes"][1].erase("mesh");
+  hierarchy_only["nodes"][1].erase("skin");
+  save(asset / "hierarchy-only.gltf", hierarchy_only.dump());
+  auto skeleton_asset = import_mesh(asset / "hierarchy-only.gltf", preserve);
+  require(skeleton_asset.primitives.empty() &&
+              skeleton_asset.nodes.size() == 7 &&
+              skeleton_asset.skins.size() == 1,
+          "Preserving import retains valid skeleton-only hierarchy assets "
+          "without manufacturing geometry");
+  auto excessive_depth = gltf;
+  excessive_depth["nodes"] = Json::array();
+  for (size_t i = 0; i < 258; i++) {
+    Json node = Json::object();
+    if (i + 1 < 258)
+      node["children"] = {i + 1};
+    excessive_depth["nodes"].push_back(node);
+  }
+  excessive_depth["nodes"][257]["mesh"] = 0;
+  save(asset / "deep-hierarchy.gltf", excessive_depth.dump());
+  rejects([&] { import_mesh(asset / "deep-hierarchy.gltf", preserve); },
+          "Hierarchy depth rejects before potentially quadratic validator "
+          "parent walks");
+
+  auto exact_json = gltf;
+  auto exact_binary = b;
+  set_float(exact_binary, 0, -0.f);
+  for (size_t k = 0; k < 3; k++)
+    set_float(exact_binary, 96 + k * 4, .57735026f);
+  save(asset / "exact-authoring.gltf",
+       embedded(exact_json, exact_binary).dump());
+  auto exact = import_mesh(asset / "exact-authoring.gltf", preserve);
+  require(std::signbit(exact.primitives[0].mesh.positions[0].x) &&
+              exact.primitives[0].tangents[0][0] == .57735026f,
+          "Preserving mode copies authored position and tangent floats without "
+          "identity arithmetic or normalization");
+  auto unused_json = gltf;
+  auto unused_binary = b;
+  std::vector<uint8_t> unused_positions;
+  floats(unused_positions, {0, 0, 0, 1, 0, 0, 0, 1, 0, .25f, .25f, 0});
+  auto unused_view =
+      append_view(unused_json, unused_binary, unused_positions, 4);
+  unused_json["accessors"][0]["bufferView"] = unused_view;
+  unused_json["accessors"][0]["count"] = 4;
+  unused_json["meshes"][0]["primitives"][0]["attributes"] = {{"POSITION", 0}};
+  unused_json["meshes"][0]["primitives"][0].erase("material");
+  save(asset / "unused-authoring.gltf",
+       embedded(unused_json, unused_binary).dump());
+  auto unused = import_mesh(asset / "unused-authoring.gltf", preserve);
+  require(unused.primitives[0].mesh.positions.size() == 4 &&
+              !unused.primitives[0].normals_authored &&
+              unused.primitives[0].mesh.normals.size() == 4,
+          "Absent normals use display fallbacks while retaining all "
+          "unreferenced source vertices");
+
+  fs::copy_file(asset / "native-rig.glb", asset / "native-rig.vrm");
+  require(
+      import_mesh(asset / "native-rig.vrm", preserve).skins.size() == 1,
+      "Preserving mode reads native GLB bytes through the VRM extension alias");
+  rejects(
+      [&] { import_mesh(asset / "native-rig.vrm"); },
+      "Default static import does not silently enable VRM authoring semantics");
+  save(asset / "not-binary.vrm", gltf.dump());
+  rejects([&] { import_mesh(asset / "not-binary.vrm", preserve); },
+          "VRM extension aliases require actual GLB magic instead of JSON "
+          "masquerading as binary");
+  auto legacy = preserve;
+  legacy.allow_legacy_vrm_skin_hint = true;
+  rejects([&] { import_mesh(asset / "native-rig.glb", legacy); },
+          "Legacy hint opt-in cannot weaken files without a verified VRM0 "
+          "extension");
+  auto legacy_json = native_json;
+  legacy_json["skins"][0]["skeleton"] = 1;
+  legacy_json["extensions"]["VRM"] = {{"specVersion", "0.0"}};
+  legacy_json["extensionsUsed"] = {"VRM"};
+  save(asset / "legacy-hint.gltf", legacy_json.dump());
+  rejects([&] { import_mesh(asset / "legacy-hint.gltf", preserve); },
+          "VRM0 presence alone does not bypass strict skeleton ancestry "
+          "validation");
+  auto legacy_asset = import_mesh(asset / "legacy-hint.gltf", legacy);
+  require(legacy_asset.skins[0].skeleton == 1 &&
+              legacy_asset.skins[0].skeleton_hint_advisory &&
+              legacy_asset.skins[0].inverse_bind_matrices == native_ibm &&
+              std::any_of(
+                  legacy_asset.warnings.begin(), legacy_asset.warnings.end(),
+                  [](const std::string &s) {
+                    return s.find("retained as advisory") != std::string::npos;
+                  }),
+          "Explicit VRM0 compatibility preserves malformed skeleton hints and "
+          "exact binds with named diagnostics");
+
+  auto unlit_json = native_json;
+  unlit_json["materials"][0]["extensions"]["KHR_materials_unlit"] =
+      Json::object();
+  unlit_json["extensionsUsed"] = {"KHR_materials_unlit"};
+  save(asset / "unlit-preserving.gltf", unlit_json.dump());
+  auto unlit_asset = import_mesh(asset / "unlit-preserving.gltf", preserve);
+  require(unlit_asset.materials[unlit_asset.primitives[0].material].unlit,
+          "Preserving import retains unlit material semantics for overriding "
+          "MToon mapping");
+  auto static_unlit = gltf;
+  static_unlit["materials"][0]["extensions"]["KHR_materials_unlit"] =
+      Json::object();
+  save(asset / "unlit-static.gltf", static_unlit.dump());
+  rejects([&] { import_mesh(asset / "unlit-static.gltf"); },
+          "Static PBR import continues to reject unsupported unlit rendering "
+          "semantics");
+
+  auto memory_asset = import_glb(native_bytes);
+  require(memory_asset.mode == ImportMode::PreserveGltf &&
+              memory_asset.skins.size() == 1 &&
+              memory_asset.primitives[0].influences.size() == 2 &&
+              memory_asset.skins[0].inverse_bind_matrices == native_ibm,
+          "Memory GLB import defaults to preserving complete native skin and "
+          "authored bind payload");
+  auto disposable = native_bytes;
+  auto owned_memory = import_glb(disposable);
+  std::fill(disposable.begin(), disposable.end(), 0);
+  require(owned_memory.primitives[0].morph_targets[0].positions[0].z == .04f &&
+              owned_memory.meshes[0].target_names[0] == "forward",
+          "Returned memory-import metadata and vertex arrays own their data "
+          "independently of caller bytes");
+  auto pack_glb = [&](Json j, const std::vector<uint8_t> &binary) {
+    auto text = j.dump();
+    while (text.size() % 4)
+      text += ' ';
+    auto bin = binary;
+    while (bin.size() % 4)
+      bin.push_back(0);
+    std::vector<uint8_t> blob;
+    word(blob, 0x46546c67);
+    word(blob, 2);
+    word(blob, uint32_t(12 + 8 + text.size() + 8 + bin.size()));
+    word(blob, uint32_t(text.size()));
+    word(blob, 0x4e4f534a);
+    blob.insert(blob.end(), text.begin(), text.end());
+    word(blob, uint32_t(bin.size()));
+    word(blob, 0x004e4942);
+    blob.insert(blob.end(), bin.begin(), bin.end());
+    return blob;
+  };
+  auto memory_embedded = import_glb(pack_glb(gltf, b));
+  require(memory_embedded.images[0].bytes == std::vector<uint8_t>({1, 2, 3, 4}),
+          "Memory GLB permits embedded data-URI images and buffers without "
+          "filesystem access");
+  auto memory_external = gltf;
+  memory_external["buffers"][0]["uri"] = "buffer data.bin";
+  auto memory_blob = pack_glb(memory_external, b);
+  auto old_cwd = fs::current_path();
+  fs::current_path(asset);
+  auto external_limits = preserve;
+  external_limits.external_resources = true;
+  rejects([&] { import_glb(memory_blob, external_limits); },
+          "Memory GLB cannot read an existing CWD external buffer even when "
+          "caller enables external resources");
+  auto image_external = gltf;
+  image_external["images"][0]["uri"] = "textures/albedo.png";
+  rejects([&] { import_glb(pack_glb(image_external, b), external_limits); },
+          "Memory GLB cannot resolve external images from current working "
+          "directory");
+  fs::current_path(old_cwd);
+  auto legacy_memory = import_glb(pack_glb(legacy_json, native_binary), legacy);
+  require(legacy_memory.skins[0].skeleton_hint_advisory &&
+              legacy_memory.skins[0].skeleton == 1,
+          "Memory VRM import shares explicit legacy-hint compatibility and raw "
+          "metadata preservation");
+  rejects([&] { import_glb(native_bytes, {}, ImportMode::StaticScene); },
+          "Explicit memory static mode retains authored skin/morph rejection");
+  auto short_blob = native_bytes;
+  short_blob.resize(short_blob.size() - 8);
+  rejects(
+      [&] { import_glb(short_blob); },
+      "Truncated in-memory GLB rejects before resource/accessor publication");
+  rejects([&] { import_glb(std::span<const uint8_t>{}); },
+          "Empty memory input cannot masquerade as native GLB");
+  auto byte_limits = preserve;
+  byte_limits.max_file_bytes = native_bytes.size() - 1;
+  rejects([&] { import_glb(native_bytes, byte_limits); },
+          "Memory GLB enforces byte quotas before copying caller storage");
+  auto allocation_limits = preserve;
+  allocation_limits.max_file_bytes = native_bytes.size() + 1;
+  allocation_limits.max_resource_bytes = allocation_limits.max_file_bytes;
+  rejects([&] { import_glb(native_bytes, allocation_limits); },
+          "Memory GLB parser and retained arrays share the bounded allocation "
+          "quota");
+
+  auto cancel_preserve = preserve;
+  int preserve_calls = 0;
+  cancel_preserve.cancelled = [&] { return ++preserve_calls > 10; };
+  rejects([&] { import_mesh(asset / "native-rig.glb", cancel_preserve); },
+          "Authored hierarchy/deformation import can cancel before publishing "
+          "a partial asset");
+
   fs::remove_all(root);
   return 0;
 } catch (const std::exception &e) {

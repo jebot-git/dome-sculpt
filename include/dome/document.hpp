@@ -79,6 +79,7 @@ struct SurfaceRange {
   size_t first, count;
   Material material;
   std::shared_ptr<const TextureMaps> textures{};
+  std::shared_ptr<const CreatorAppearance> appearance{};
 };
 struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;
@@ -88,6 +89,10 @@ struct MeshSnapshot {
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0;
+};
+struct SceneDraft {
+  Scene scene;
+  AssetSource source;
 };
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
@@ -105,6 +110,7 @@ public:
   EditorSnapshot frame() const;
   Volume copy_volume() const;
   Scene copy_scene() const;
+  SceneDraft draft_scene() const;
   void replace(Scene, bool clean = true);
   uint64_t add_object(bool sphere = true);
   void duplicate_object();

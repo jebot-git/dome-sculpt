@@ -3,17 +3,22 @@
 #include "dome/import.hpp"
 #include "dome/mesh-authoring.hpp"
 namespace dome {
+SceneDraft Document::draft_scene() const {
+  std::lock_guard lock(model_mutex_);
+  if (state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked())
+    throw std::logic_error("Finish the current action before opening the asset editor");
+  return {scene_.snapshot(), {state_.generation, state_.revision, scene_.active().id}};
+}
 void Document::edit_scene(std::string label, SceneOperation operation, AssetSource expected) {
   queue_scene_operation(std::move(label), std::move(operation), expected, {});
 }
 void Document::queue_scene_operation(std::string label, SceneOperation operation,
                                     AssetSource expected, std::shared_ptr<std::string> report) {
   std::lock_guard lock(model_mutex_);
-  queue_scene_operation_locked(std::move(label), std::move(operation), expected,
-                                std::move(report));
+  queue_scene_operation_locked(std::move(label), std::move(operation), expected, std::move(report));
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
-                                           AssetSource expected, std::shared_ptr<std::string> report) {
+                                      AssetSource expected, std::shared_ptr<std::string> report) {
   if (label.empty() || label.size() > 256 || label.find('\0') != std::string::npos || !operation)
     throw std::invalid_argument("Invalid asset operation");
   if ((expected.generation && expected.generation != state_.generation) ||

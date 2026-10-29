@@ -67,7 +67,7 @@ layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(locat
 uniform mat4 model,mvp;out vec3 world,n,t,b;out vec2 texcoord;
 void main(){vec4 p=model*vec4(position,1);world=p.xyz;texcoord=uv;n=normalize(mat3(model)*normal);t=normalize(mat3(model)*tangent.xyz);b=cross(n,t)*tangent.w;gl_Position=mvp*vec4(position,1);})";
   const char *fragment = R"(#version 330 core
-in vec3 world,n,t,b;in vec2 texcoord;out vec4 color;uniform vec3 camera;uniform int toon;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int has_maps,has_normal;uniform sampler2D color_map,orm_map,emission_map,normal_map;
+in vec3 world,n,t,b;in vec2 texcoord;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int has_maps,has_normal;uniform sampler2D color_map,orm_map,emission_map,normal_map;
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
 vec3 H=normalize(V+L);float NV=max(dot(N,V),0.0001),NL=max(dot(N,L),0.0),NH=max(dot(N,H),0.0),VH=max(dot(V,H),0.0);
@@ -75,7 +75,10 @@ float rough=max(.04,roughness),a=rough*rough,a2=a*a;
 float d=a2/(PI*pow(NH*NH*(a2-1.0)+1.0,2.0));float k=pow(rough+1.0,2.0)/8.0;
 float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F0=mix(vec3(.04),base,metallic);vec3 F=F0+(1.0-F0)*pow(1.0-VH,5.0);
 return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
-void main(){vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;if(has_maps==1){base*=texture(color_map,texcoord);vec3 orm=texture(orm_map,texcoord).rgb;metal*=orm.b;rough*=orm.g;ao=orm.r;glow*=texture(emission_map,texcoord).rgb;}vec3 N=normalize(n);if(has_normal==1){vec3 detail=texture(normal_map,texcoord).rgb*2.0-1.0;N=normalize(t*detail.x+b*detail.y+n*detail.z);}N*=gl_FrontFacing?1.0:-1.0;vec3 V=normalize(camera-world),result;
+vec3 output_srgb(vec3 c){return mix(1.055*pow(max(c,vec3(0)),vec3(1.0/2.4))-.055,12.92*c,lessThanEqual(c,vec3(.0031308)));}
+void main(){vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;if(has_maps==1){base*=texture(color_map,texcoord);vec3 orm=texture(orm_map,texcoord).rgb;metal*=orm.b;rough*=orm.g;ao=orm.r;glow*=texture(emission_map,texcoord).rgb;}if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
+if(unlit==1){color=vec4(output_srgb(base.rgb+glow),base.a);return;}
+vec3 N=normalize(n);if(has_normal==1){vec3 detail=texture(normal_map,texcoord).rgb*2.0-1.0;N=normalize(t*detail.x+b*detail.y+n*detail.z);}N*=gl_FrontFacing?1.0:-1.0;vec3 V=normalize(camera-world),result;
 if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32*ao,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base.rgb*ramp*edge+vec3(.025);}
 else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb*ao;
 result+=glow;result=result/(result+vec3(1));color=vec4(pow(result,vec3(1.0/2.2)),base.a);})";
@@ -186,6 +189,11 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUniform3f(glGetUniformLocation(program_, "camera"), camera.x, camera.y,
               camera.z);
   glBindVertexArray(vao_);
+  auto blended = [](const Material &m, const TextureMaps *maps) {
+    if (m.alpha == Material::AlphaMode::Blend) return true;
+    if (m.alpha != Material::AlphaMode::Automatic) return false;
+    return m.color[3] < 1 || (maps && maps->transparent);
+  };
   auto draw_range = [&](const Material &original, size_t first, size_t count,
                         uint64_t id, const TextureMaps *maps) {
     Material material = original;
@@ -206,6 +214,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glUniform1i(glGetUniformLocation(program_, "orm_map"), 1);
     glUniform1i(glGetUniformLocation(program_, "emission_map"), 2);
     glUniform1i(glGetUniformLocation(program_, "toon"), toon || material.toon);
+    glUniform1i(glGetUniformLocation(program_, "unlit"), material.unlit);
+    glUniform1i(glGetUniformLocation(program_, "alpha_mode"), int(material.alpha));
+    glUniform1f(glGetUniformLocation(program_, "alpha_cutoff"), material.alpha_cutoff);
     glUniform4fv(glGetUniformLocation(program_, "base_color"), 1,
                  material.color.data());
     glUniform3fv(glGetUniformLocation(program_, "emission"), 1,
@@ -219,7 +230,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glEnable(GL_CULL_FACE);
       glCullFace(GL_BACK);
     }
-    if (material.color[3] < 1 || (maps && maps->transparent)) {
+    if (blended(material, maps)) {
       glEnable(GL_BLEND);
       glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
                           GL_ONE_MINUS_SRC_ALPHA);
@@ -235,10 +246,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     draw_range(Material{}, 0, count_, 0, nullptr);
   else {
     for (auto &r : cached_->ranges)
-      if (r.material.color[3] >= 1 && (!r.textures || !r.textures->transparent))
+      if (!blended(r.material, r.textures.get()))
         draw_range(r.material, r.first, r.count, r.object, r.textures.get());
     for (auto &r : cached_->ranges)
-      if (r.material.color[3] < 1 || (r.textures && r.textures->transparent))
+      if (blended(r.material, r.textures.get()))
         draw_range(r.material, r.first, r.count, r.object, r.textures.get());
   }
   glActiveTexture(GL_TEXTURE0);

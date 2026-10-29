@@ -53,3 +53,11 @@ DESIGN_CONVENTIONS file is absent. Its locally rebuilt artifacts/toolkit matches
 the same pinned archive/22-patch manifest. Current source README and the committed
 menu audit supplied available conventions; do not relabel upstream environment
 readings or logs as fresh local evidence. See the current HANDOFF.md.
+
+Latest canonical check: DomeD7322b0eea5d63f8f32dd68a0983a55dc5c8b81b3.
+Its FLTK preparation script/patch set is unchanged from742d009; the existing
+22-patch Release toolkit remains current. Latest DomeD itself was rebuilt
+Release from clean artifacts/domed-current using that toolkit, with unrelated
+capture work untouched. Build: artifacts/domed-current-build.log. Fresh private
+Wayland/universal-menu8/8 checks pass using that binary and cf6d6b3 client
+(dome-menu-avatars-pinned-final.log). No active compositor/session restart.

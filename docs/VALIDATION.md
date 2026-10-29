@@ -1,549 +1,89 @@
-# Persistent baked maps and guarded object transfer — 2026-10-29
+# Baked-surface / creator integration checkpoint — 2026-10-29
 
-This stage adds immutable baked color/alpha, ORM/AO, emission and +Y normal maps
-beneath editable paint, scene-v5 persistence, UV normal reorientation, preview/
-GLB bindings and a guarded native object-bake API. Full FLTK/XR bake controls,
-production performance and the larger objective remain unfinished (HANDOFF.md).
+This record describes the merge of baked stage 72d9127 and creator baseline
+811eb69. The separate historical records are VALIDATION-72d9127.md and
+VALIDATION-811eb69.md; do not relabel their results as merged-source evidence.
+Newer remote main (observed c95208b) is outside this checkpoint. See HANDOFF.md
+for publication branch, limitations and the full resume sequence.
 
-Final source evidence after the Mikk seed correction:
+## Current source checks
 
-- All 24 existing Release CTests passed in 259.98 seconds:
-  artifacts/tests-bake-maps-verified.log. This includes UV/input/paint/scene/
-  workers/recovery/rig/avatar/retopo/remesh/bake, independent GLB/PNG and actual
-  software OpenGL checks. The real-loader XR report has 53 assertions, zero
-  failures, complete=true and status=passed.
-- The subsequently added end-to-end native workflow CTest passes separately
-  in 8.93 seconds: artifacts/tests-bake-workflow-verified.log. Thus all 25
-  registered Release suites passed across these two runs. Its retained-project
-  invocation also passes: artifacts/tests-bake-workflow-final.log and
-  artifacts/bake-workflow/{before-bake,baked-workflow}.dsculpt plus GLB.
-- All six selected whole-core ASan/UBSan/leak suites passed in 165.24 seconds:
-  artifacts/tests-bake-maps-sanitize-verified.log. These instrument both C and
-  C++, including MikkTSpace, and cover UV, painting, BVH, document assets,
-  baking and baked textures. The new full workflow separately passes in
-  80.36 seconds: artifacts/tests-bake-workflow-sanitize-final.log.
-- Existing native GUI 23/23 and universal-menu 50/50 pass:
-  artifacts/gui-bake-maps-final.log and artifacts/menu-bake-maps-final.log.
-  A new real FLTK v5 fixture passes 5/5 on the final baked workflow asset:
-  artifacts/gui-baked-surface-final.log. It opens transferred paint, paints over
-  the base, undoes to exact GPU pixels, and opens/cancels an owned UV modal
-  without losing the normal-mapped preview. Its report resets and records
-  running/complete/failure, so startup failures cannot leave a stale pass.
+- Combined Release configure/build completed successfully, including native FLTK
+  application, OpenXR, MikkTSpace and all 35 registered CTest targets:
+  artifacts/configure-baked-creator-merge.log and
+  artifacts/build-baked-creator-merge.log.
+- Focused baked-textures test passes all 30 assertions:
+  artifacts/tests-baked-creator-cross.log. New integration cases cover legacy
+  standalone baked-v5 upgrade to v6, mixed original shared image archives with
+  baked payloads, composite-cache invalidation/source retention and grouped
+  world-scale cage rejection/success. Existing tangent, normal/AO, UV transfer,
+  exact source/layer/rig retention, cancellation, Undo and ordered save cases pass.
+- Retained end-to-end native sculpt/paint/voxel/atlas/bake/reopen/GLB/render run
+  passes on scene v6: artifacts/workflow-baked-creator-merge.log. Reproduce with
+  build/dome-sculpt-bake-workflow-test --artifacts artifacts/bake-workflow-v6.
+- Real FLTK scene-v6 bake regression passes 5/5 with complete=true,
+  status=passed and zero failures: artifacts/gui-baked-creator-merge.log and
+  artifacts/gui-baked-surface/report.json. Includes painting over the base,
+  exact GPU-pixel Undo and owned UV cancellation. Private bus/display/home;
+  no user document or active session changed.
+- All 30 third_party/sources.json source_sha256 entries match their files.
+  Linkage recorded in artifacts/linkage-baked-creator-merge.log resolves the
+  canonical local toolkit and contains no Qt/GTK/Pango runtime frontend.
+- Integration diff versus 811eb69 passes git diff --check. Original imported
+  upstream license/notice files retain their upstream whitespace and headings;
+  a whole-history diff check flags those verbatim source notices.
 
-The native workflow uses an actual painted sculpt, a retained-source 60 mm
-voxel conversion, a new 512px atlas and the object-bake worker. It verifies
-exact high-source and target-layer retention, unchanged low field/identity,
-one scene Undo/Redo, v5 reopening, visible-target GLB export and render-ready
-worker tangent corners. This validates the data/API path, not unfinished bake
-menus or physical controller interaction with them.
+## Release and menu verification
 
-New focused fixtures verify per-corner mirrored Mikk frames, inversion of
-interpolated curved-normal T/B/N, normal orientation after UV rotation, masked
-linear-light rebaking, immutable snapshots, malformed buffers/schema rejection,
-world/object transforms, hidden posed high sources, unchanged target rig/paint,
-bounded projection failure, cancellation and ordered save. Actual GPU tests
-reconstruct reference high-normal shading and attenuate indirect light through
-ORM AO. Independent cgltf/PNG checks verify normal/occlusion bindings, linear
-normal bytes and retained rig/morph images. No fresh external Khronos validation run is claimed by this stage.
+All 35 Release CTests pass in 297.96 seconds, zero failures:
+artifacts/tests-baked-creator-merge.log. Includes independent glTF/PNG and
+actual software-GL shading, source archives/UV/cache, groups/creator, voxel,
+paint, document/worker/history, MToon and native bake workflow suites. The
+real-loader synthetic OpenXR suite passes in 266.64 seconds; its persisted
+report contains 53 checks, zero failures, complete=true and status=passed
+(build/xr-client/report.json). Actual female/male composite-cache profiles
+pass in 125.82 seconds under the explicit memory/entry bounds. These timings
+include concurrent validation and are not production performance benchmarks.
 
-The integration exposed two real numeric issues. Oblique curved-normal rays
-missed a few shared-edge triangles; the pinned Blender 5.4 watertight shear/edge
-method with double intermediates fixes the gaps while rejecting truly outside
-rays. Fully instrumenting Mikk's C source then exposed upstream shifts by 32
-in both quicksort seed rotations. The marked two-line correction defines zero
-rotations; original/patched hashes and a reproducible patch are recorded. The
-initial failed sanitizer log (tests-bake-maps-sanitize.log) is diagnostic evidence,
-not a pass. The final six-suite run above passes with halt-on-error enabled.
+Universal menus pass 53/53, zero failures, with the script exiting 0:
+artifacts/menu-baked-creator-final.log and artifacts/menu/report.json. Includes
+creator isolation/cancel, voxel remesh/feedback/Undo, text history, exact UV Undo
+and Redo, native chooser cancellation and host fallback/restoration. The first
+merged run compared pixels immediately after dispatch before GL redraw. The
+fixture now waits for the same exact pixels before asserting Redo; it does not
+relax the expected image. That initial failed run remains diagnostic evidence
+in artifacts/menu-baked-creator-merge.log, not a pass. A direct system-Python
+attempt lacked optional dbus_next; the documented uv test environment was used.
 
-Initial fixture setup also needed correction: keeping a normal map in the rig
-GLB correctly increased the expected image count to four, and one falloff stamp
-was insufficient to create the intended blue source. The workflow now uses
-real flow buildup and asserts blue source paint before testing transfer. Its
-strong destination assertion remains. The first GUI attempt used the weak
-source fixture and timed out; the corrected retained v5 fixture passes.
+## Pending merged sanitizer validation
 
-Thirty vendored SHA256 values and clean application of the Mikk patch to the
-recorded upstream source were verified. Source/license roles remain in
-third_party/sources.json. Canonical FLTK linkage has no Qt/GTK/Pango:
-artifacts/linkage-bake-maps-final.log. Runtime remains native C++20/FLTK/EGL/
-OpenXR/BDF; Python is optional test orchestration only. CPU/software GL and
-synthetic XR do not prove physical hardware, accelerator, production-size
-memory or cancellation latency. No system installation/session restart occurred.
-
-# Voxel desktop/XR verification — 2026-10-29
-
-This follow-up extends c27dadf with a responsive FLTK modal, real mouse-wheel
-adjustment, existing-sculpt regression coverage and persisted XR diagnostics.
-It keeps all source paint/rig/sculpt data in the retained hidden object. The
-full production objective and paint-transfer/adaptive/baking work remain open.
-
-- Release build passes, including native FLTK and XR. All 22 non-XR CTests
-  passed in 76.25 seconds: artifacts/tests-voxel-native-final.log. This includes
-  the native worker, controller, paint, scene, UV, recovery, import, rig/avatar,
-  deformation, remesh/bake and software-GL rendering suites.
-- The separate real-loader OpenXR CTest passed in 159.81 seconds:
-  artifacts/tests-voxel-xr-verified.log. Its report has 53 checks, zero failures,
-  complete=true and status=passed. New replays use the actual Objects/Mesh
-  tools menu and 50 mm aim slider, preserve the complete hidden source and
-  restore the exact baseline scene by ray Cancel, focus loss and global Undo.
-- Whole-core ASan/UBSan/leak checks passed all three selected suites in
-  64.33 seconds: controller-controls, document-assets and voxel-authoring;
-  artifacts/tests-voxel-sanitize-final.log. The initial build wrapper returned
-  143 before tests started; after inspecting terminal state, an up-to-date
-  build and fresh final three-suite run completed with exit 0.
-- Native GUI regression passed 23/23: artifacts/gui-voxel-regression.log.
-  Existing sculpt/material/paint and UV gesture/Apply/global-Undo checks remain.
-- Three compact-screen checks pass at 640x360 with 2x Unifont BDF:
-  artifacts/menu-voxel-compact-final.log. The measured/wrapped dialog content
-  scrolls while both action buttons stay fixed, and Cancel retains the scene.
-  Captures were visually inspected; a clipped hint was corrected before this
-  final run. The final default-size universal-menu run passed 50/50:
-  artifacts/menu-voxel-final-verified.log, including actual native remesh
-  acceptance, recovery persistence, visible grid-budget failure, cancellation
-  and global Undo.
-
-The expanded native voxel suite verifies a nonempty scalar-field source, exact
-retained field and interior/spacing/Undo, and that another explicit command
-cancels voxel options rather than implicitly remeshing. The test captures the
-previous size rather than assuming a setting reset when replacing a document.
-
-Initial fixture failures were investigated: the XR Undo fixture selected the
-Save sector and was corrected; its isolated replay and complete 53-check run
-then passed. A final fixture audit isolated session focus loss from the
-earlier tracking-loss event; the focus replay now reports one loss/regain and
-zero tracking losses before exact restoration. The first GUI budget-failure attempt clicked the slider border,
-so it did not choose the intended size; the corrected input demonstrates the
-actual visible budget error. A QueryTree/GetProperty modal-destruction race in
-the harness now skips only BadWindow for an already destroyed candidate.
-
---project-info exposes encoded scene and per-object payload diagnostic hashes,
-visibility and voxel spacing for persisted source comparisons. This does not
-change the project schema. Runtime linkage selects artifacts/toolkit and has
-no Qt/GTK/Pango libraries: artifacts/linkage-voxel-final.log. Python remains
-optional test orchestration. All XR tracking is synthetic, GL is software, and
-physical devices/accelerators and production-size performance remain unproven.
-No system installation or active-session restart occurred.
-
-# Voxel authoring checkpoint — 2026-10-29
-
-Work-in-progress desktop/XR voxel conversion is recorded over base 90601ca.
-The full Release build, including FLTK frontend and XR libraries, passed using
-the canonical private toolkit: artifacts/build-voxel-checkpoint.log.
-All six affected native suites passed in 21.88 seconds:
-artifacts/tests-voxel-checkpoint.log. These are uv-authoring,
-controller-controls, shared-document, document-recovery, document-assets and
-voxel-authoring. The new voxel-authoring suite also passed independently before
-this checkpoint rebuild; the final run includes the corrected grid-budget
-fixture at 0.1 mm (within the scaled kernel size bounds).
-
-The new native fixture verifies retained exact paint/rig/pose/sculpt layers,
-posed shape sampling, world/object scale and material factors, one-step exact
-Undo/Redo, immediate sculptability, non-mutating option previews, in-process XR
-menu/ray/stick/fine-wheel controls, focus cancellation, coarse/open/budget
-failures, worker cancellation and stale-generation rejection. This controller
-fixture is not a real-loader replay or a physical controller test.
-
-The new FLTK modal compiled successfully. Feature-specific GUI, universal-menu,
-real-loader OpenXR, scalar-field-source and sanitizer checks remain in
-HANDOFF.md. Previous GUI/menu/sanitizer/full-suite results below retain their
-original source scope. No system installation, session restart, hardware or
-accelerator validation occurred for this checkpoint. The full objective is
-unfinished; paint transfer and adaptive remesh authoring remain separate work.
-
-# Final UV-worker and authoring integration — 2026-10-29
-
-Integrated upstream through db1d710, preserving native sculpt layers, recovery,
-import/rig/deformation/retopology/baking/remeshing and guarded asset operations.
-UV worker integration is pushed as b8f9920; the completion-notification correction
-is pushed as 1cf7157. No forced history update or remote source loss occurred.
-
-- All 22 Release suites passed in 210.81 s at b8f9920:
-  artifacts/tests-uv-worker-assets.log. Native OpenXR report: 43 checks,
-  complete=true, status=passed, zero failures.
-- The final notification guard was rebuilt and checked with all five affected
-  native suites (27.98 s): artifacts/tests-uv-worker-final.log. It makes asset/
-  recovery completion notification acquire the wait mutex, matching UV work.
-- All five targeted ASan/UBSan/leak suites passed on the final whole core
-  (200.98 s): artifacts/tests-uv-worker-assets-sanitize-final.log. These are UV,
-  controller, shared document, document recovery and document assets, not a
-  claim of fresh sanitizer execution of every kernel's own suite.
-- Final GUI 23/23 passed: artifacts/gui-uv-worker-final-current.log. All real
-  gesture/field/material/paint assertions remain, including exact single-step
-  UV drag/wheel undo and native modal closure after transfer completion.
-- Final universal menu 39/39 passed: artifacts/menu-uv-worker-assets-final.log,
-  including import/recovery chooser identity, ownership and cancellation.
-
-Cross-component tests verify no checkpoint for an open UV draft, exact accepted
-UV/paint checkpoint recovery, no stale-workspace resurrection on replacement,
-and rejection of unsupported rigged-rest UV edits without losing deformation.
-The first integration test build needed a missing JSON definition include, fixed
-before the successful run. A sanitizer multi-target invocation regenerated its
-makefiles but could not resolve the newly added target in that invocation;
-explicit reconfiguration and the subsequent final five-suite run passed.
-
-The integrated GUI Tab-based setup selected the wrong numeric field. Setup now
-confirms a bright native selection in the intended row before typing, retaining
-the final blue-material assertion. The final 23-check run passed. Earlier failed
-attempts and workspace-specific logs below are not substituted for these results.
-
-The final isolated CPU benchmark (20 translations, 19,944 triangles) records
-0.985 ms mean / 1.477 ms maximum edit submission, 106.94 ms final background
-validation wait, every sample applied, valid preview, unchanged held snapshots
-and exact whole-gesture undo. Output: artifacts/uv-worker-benchmark-final.json.
-The preceding synchronous mean was 106.3 ms. This is a submission-latency change;
-validation cost and larger/physical VR workloads remain outside that evidence.
-Build the excluded-from-all dome-sculpt-uv-benchmark target to reproduce (UV.md).
-
-Canonical local FLTK toolkit and vendored hashes pass; linkage is recorded in
-artifacts/linkage-uv-worker-final.log with no Qt/GTK/Pango libraries listed.
-No installed prefix/session was replaced, and no fresh nested-compositor,
-physical-device or accelerator validation is claimed. Full objective remains
-active and incomplete. Machine-readable record:
-artifacts/validation-uv-worker-final.json.
-
-# Guarded asset-worker and native import milestone — 2026-10-29
-
-All21 Release suites passed in50.68 seconds (`artifacts/tests-assets-final.log`).
-The subsequently added adaptive-remesh target passed with worker/import/BVH/bake
-checks (`tests-assets-remesh.log`), and the paint-preservation/warning refinements
-passed UV/shared-document/worker/remesh/bake checks (`tests-assets-report.log`).
-The affected real-loader OpenXR client passed separately in56.85 seconds
-(`tests-assets-xr.log`). All39 native universal-menu checks passed, including
-Import chooser ownership and exact cancellation (`menu-assets.log`).
-
-Final source-pinned native sanitizer verification is pending; shared agent
-sources changed during the first build, so its running logs are not treated as
-verification of this exact checkpoint. Prior component/integration evidence
-below retains its stated scope. No physical device/accelerator/install claim.
-
-# Integrated native authoring and recovery — 2026-10-29
-
-All19 Release CTests pass (50.47 seconds), including native input/recovery,
-rig/avatar/deformation/import/retopology and the real-loader synthetic OpenXR
-client: `artifacts/tests-authoring-milestone.log`. Native GUI22/22 and universal
-menu37/37 checks pass in `artifacts/gui-recovery.log` and
-`artifacts/menu-recovery-chooser.log`. The latter creates actual private
-checkpoint fixtures, discovers them through the application worker and cancels
-the native recovery chooser without changing the current document.
-
-Seven focused whole-core ASan/UBSan/leak suites pass in1.10 seconds:
-`artifacts/tests-recovery-sanitize.log`. Later notification/UI refinements await
-the final focused rebuild; their coverage is not implied by that earlier run.
-Per-component source/validator/sanitizer limits are in RIGGING.md, AVATAR.md,
-DEFORMATION.md, IMPORT-AND-MESH.md and NATIVE-RETOPOLOGY.md.
-
-All local GUI/OpenXR checks select artifacts/toolkit, the canonical22-patch
-Release FLTK build described in TOOLKIT.md. No physical headset/input device,
-accelerator, system installation or session restart is claimed. Earlier remote
-checkpoint evidence below belongs to its stated environment.
-
-# Background UV validation — 2026-10-29
-
-Full overlap/bounds/degeneracy checks now run on a cancellable worker outside
-model/input locks. Previews remain editable while checking; accepted immutable
-Apply targets are independently validated on the asset worker before transfer.
-Invalid targets preserve the draft and original paint. Native Apply retains its
-modal until transfer succeeds. Source/session/generation/request guards reject
-stale results, including after undo, cancellation and document replacement.
-
-- All ten Release CTest suites passed in 243.56 s:
-  `artifacts/tests-uv-worker.log`. OpenXR has 40 checks, complete=true,
-  status=passed, zero failures (`build/xr-client/report.json`).
-- Three targeted UV/controller/shared-document ASan/UBSan/leak suites passed in
-  222.75 s: `artifacts/tests-uv-worker-sanitize.log`.
-- Native GUI 23/23 passed: `artifacts/gui-uv-worker-reviewed.log`, including
-  multi-event drag/wheel undo, accepted-transfer completion and global undo.
-- Universal menu 25/25 passed: `artifacts/menu-uv-worker-reviewed.log`.
-- Focused optimized UV/controller/document checks passed in 21.44 s:
-  `artifacts/tests-uv-worker-focused.log`.
-
-An initial menu attempt timed out before a window appeared; the unchanged
-harness subsequently passed all 25 checks. The first GUI run passed 22 checks;
-a later run with the added transfer-completion assertion failed earlier at its
-material setup. Its screenshot showed 0.02 entered in Name while Red remained
-0.58. Setup now uses native Tab focus navigation for the numeric material fields;
-the blue-material assertion remains intact. The final 23-check GUI run passed.
-No earlier/stale report is used in place of those terminal results.
-
-The isolated CPU benchmark uses the same persisted 19,944-triangle fixture and
-20 translation samples as the preceding ~106.3 ms mean / 110.1 ms maximum
-synchronous benchmark. New edit submission: 1.077 ms mean / 2.509 ms maximum;
-final background validation wait: 104.96 ms. Preview valid, every sample applied,
-held snapshots unchanged and whole-gesture undo exact. Validation itself still
-costs ~105 ms. A cost breakdown measured mesh copy 0.047 ms, structural validation
-0.128 ms and UV comparison 0.174 ms. Selection, copies, topology, relaxation and
-packing still execute synchronously; larger production meshes remain unverified.
-
-Reproduce using the excluded-from-all `dome-sculpt-uv-benchmark` CMake target and
-`build/xr-client/paint-baseline.dsculpt`; see UV.md. Benchmark output:
-`artifacts/uv-worker-benchmark.json`; cost profile: `artifacts/uv-cost-profile.log`.
-Fresh builds use canonical DomeD's locally rebuilt 22-patch FLTK toolkit from
-artifacts/toolkit. Actual linkage is in artifacts/linkage-uv-worker.log, without
-Qt/GTK/Pango libraries. Vendored source/toolkit hashes and Git whitespace checks
-pass. No system install/session restart, fresh nested-compositor, physical-device
-or accelerator validation is claimed. Full scope remains incomplete.
-
-Local machine-readable evidence: `artifacts/validation-uv-worker.json`.
-
-# Continuous UV gesture history — 2026-10-29
-
-Native FLTK drags/wheel bursts and XR ray/stick/fine-wheel adjustments now undo
-as gestures. Shared workspace regressions preserve exact undo, cancellation,
-redo branching and invalid intermediate drafts. No-op scale input no longer
-introduces floating-point UV edits that destroy redo.
-
-- Nine non-XR suites passed in `artifacts/tests-uv-gesture-final.log`. That
-  aggregate process was terminated with exit 143 during OpenXR; it is not a
-  completed ten-suite success and its incomplete report was not reused.
-- The separate reviewed OpenXR CTest passed in 125.40 s:
-  `artifacts/tests-uv-gesture-xr-reviewed.log`. Its report has 40 checks,
-  status=passed, complete=true and zero failures.
-- All 22 native GUI checks passed in `artifacts/gui-uv-gesture-reviewed.log`,
-  including an actual multi-event mouse drag and wheel burst with one exact
-  image undo each. All 25 universal-menu checks passed in
-  `artifacts/menu-uv-gesture.log`.
-- Three focused ASan/UBSan/leak suites passed in 207.45 s:
-  `artifacts/tests-uv-gesture-sanitize.log` (UV/controller/shared document).
-- Focused optimized UV/controller/document checks passed in 29.23 s:
-  `artifacts/tests-uv-gesture-focused.log`.
-
-The canonical pinned DomeD toolkit was rebuilt locally and its 22 patch hashes,
-application order and combined digest match third_party/sources.json. Source:
-`artifacts/domed-source`; Release libraries: `artifacts/toolkit`. Actual ldd
-resolution is recorded in `artifacts/linkage-uv-gesture.log`; no Qt/GTK/Pango
-libraries are listed. Build logs: `artifacts/build-toolkit-gesture.log`,
-`artifacts/build-uv-gesture-reviewed.log`, and
-`artifacts/build-uv-gesture-sanitize.log`. No system install/session restart,
-new nested-compositor, physical-device or accelerator check is claimed.
-
-The first GUI assertions captured before queued drag processing/repaint finished.
-Temporary traces proved actual coordinate changes and were removed; final GUI
-assertions wait for a changed image and exact restoration. This revealed a real
-remaining synchronous-validation latency limit. A separate isolated benchmark of
-20 serial translations through Document::edit_uv on the persisted 19,944-triangle
-painting fixture measured 106.3 ms mean / 110.1 ms maximum, with exact gesture
-undo. Source/output: `artifacts/uv-gesture-benchmark.cpp` / `.json`. This single
-CPU workload does not prove production-size interaction performance.
-
-Machine-readable local evidence: `artifacts/validation-uv-gesture.json`.
-Full scope remains incomplete in REQUIREMENTS.md; resume via HANDOFF.md.
-
-# Reconciled checkpoint — 2026-10-29
-
-Merged upstream toolkit/test work from `96bc62f` with the ordered-input repair.
-The combined build passed. All ten CTest suites passed, including 40 real-loader
-synthetic OpenXR checks (`status=passed`, `complete=true`, zero failures).
-Log: `artifacts/tests-checkpoint-merge.log`; runtime report/comparison projects:
-`build/xr-client/`. The merged UV tests also passed ASan/UBSan/leak checking
-(68.61 seconds): `artifacts/tests-checkpoint-merge-sanitize.log`.
-
-These fresh checks used the available `/opt/fltk-vr/toolkit` installation,
-not upstream's newer ignored canonical-toolkit build, which is absent here.
-Actual linkage is recorded in `artifacts/linkage-checkpoint-merge.log`: patched
-FLTK resolves from that prefix, with no Qt/GTK/Pango libraries listed. Build logs
-are `artifacts/build-checkpoint-merge.log` and its `-sanitize` counterpart.
-Vendored source hashes, Python harness syntax and Git whitespace checks pass.
-No new GUI/nested-compositor, physical-device or accelerator run is claimed.
-The earlier seven-suite sanitizer and upstream current-toolkit evidence below
-remain separate results. See [HANDOFF.md](HANDOFF.md) for resumption instructions.
-
-# Ordered spatial input and session resumption — 2026-10-29
-
-A reproducible queued-confirmation defect is resolved: a focus boundary
-previously cleared queued controller releases and Apply actions. A deterministic
-event burst failed before the fix and passes afterward. The exact cause of the
-historical native XR failure remains unproven because its comparison artifacts
-were unavailable; subsequent native runs pass.
-
-- All ten optimized CPU integration suites passed in
-  `artifacts/tests-input-order-full.log` (223.63 seconds).
-- The subsequent expanded native OpenXR run passed all 38 checks, including
-  stop/IDLE/READY resumption and a new post-resume sculpt stroke
-  (`artifacts/tests-session-resume.log`, 155.65 seconds).
-- All seven native ASan/UBSan/leak suites passed in
-  `artifacts/tests-input-order-sanitize.log` (352.59 seconds).
-- Focused UV/controller/document checks cover queued confirmation before focus
-  loss, cancellation of unfinished work, final event draining at shutdown,
-  rejection of late samples, input reopening, continuous UV scale/turn and fine
-  wheel rates. Their earlier focused run passed in 22.28 seconds.
-- The XR harness resets its report at startup, updates it after each check,
-  records completion/error status and preserves fixture projects and UV/restart
-  comparison JSONs. It cannot leave the old complete report after a later failure.
-
-Machine-readable local evidence is in `artifacts/validation-input.json`.
-See [INPUT.md](INPUT.md) for the contract and [HANDOFF.md](HANDOFF.md) for remaining
-work. These are synthetic/native CPU/software-GL tests; physical devices,
-production-size performance and accelerator execution remain unverified. The
-full objective is active and incomplete.
-
-# UV and universal-menu handoff checkpoint — 2026-10-29
-
-The current stage adds editable UVs and filtered layer transfer, native FLTK/XR
-controls and the universal-menu fixes documented in [the audit](UNIVERSAL-MENU-AUDIT.md).
-The user requested committing/pushing the current stage for later resumption.
-
-- 18 FLTK GUI checks, 25 exporter/dialog menu checks and eight tests through an
-  actual nested DomeD/Wayland compositor passed.
-- Nine suites passed in the latest optimized ten-suite run; the OpenXR suite
-  failed its new continuous UV-transform persistence assertion. Earlier complete
-  ten-suite successes predate the final continuous-transform refinement.
-- All seven native sanitizer suites passed in 331.55 seconds. The completed
-  handle and logs are recorded in [HANDOFF.md](HANDOFF.md).
-- Stale success reports must not override the failing final log. The original
-  production objective remains active and incomplete.
-
-# Layered painting, XR controls and DomeD integration — 2026-10-29
-
-This checkpoint adds stable UV painting assets and sparse editable paint layers,
-controller-oriented parameter controls and concrete DomeD convention fixes.
-The full production objective remains active in [the requirements](REQUIREMENTS.md).
-
-- All nine optimized CTest suites passed: controller controls, texture painting,
-  scene authoring, shared document, sculpt geometry, independent glTF/PNG
-  interoperability, session appearance, real GL rendering and OpenXR client.
-  A final four-suite run covers the updated controller buttons, version-two
-  migration fixture and complete slider framing. A further GL run verifies
-  visible aim-ray/crosshair feedback above the slider panel.
-- All 32 synthetic OpenXR checks passed through the real loader and GL
-  swapchains. The added cases paint and save a blue texture layer, embed its PNG
-  in GLB, adjust a material through continuous stick and aim-ray input, and
-  verify slider interaction leaves source geometry unchanged.
-- All 13 private-Xvfb FLTK checks passed, including opening the native brush
-  editor, painting a visible blue patch and restoring exact viewport pixels
-  with undo. All ten private DBusMenu-host checks passed for real exported
-  actions, radio/enabled states, local-bar handoff, Ctrl+W dialogs and the
-  Cancel-default confirmation. The GUI fixture now isolates its Fontconfig
-  cache and allows a longer startup deadline under concurrent test load.
-- Painting tests cover pressure footprints, independent channels/coverage,
-  layer visibility/masks, exact stroke undo/redo/cancel, immutable snapshots,
-  persistent mesh/UV/layer round trips, independent duplicate edits and malformed
-  input. cgltf parses the exported scene and libpng independently decodes its
-  embedded maps, checking UV indices, PNG rows/bytes, material texture bindings
-  and factors.
-- Controller tests cover continuous preview, scalar fine-wheel rate, ray drag,
-  secondary stylus interaction, RGBA row isolation, logarithmic radius,
-  single-step persistent undo, focus cancellation and ray-clickable Cancel/Done.
-  Trigger capture prevents sculpting behind a control panel.
-- Appearance checks cover live standalone XR BDF face/size/2× scale, theme,
-  accent, 25/50/75/100% chrome presets and recovery from partial preference
-  writes. GL checks cover exact #303030/#d0d0d0 backgrounds, transparent overlay
-  space, moving sliders, visible pointer feedback and 25% panel alpha.
-- Runtime linkage uses the patched FLTK libraries with no Qt, GTK or Pango.
-  Vendored checksums pass; canonical qimgvr appearance/menu helpers are unchanged.
-  Blender ray picking provenance and the system libpng dependency are recorded
-  in the [source manifest](../third_party/sources.json).
-
-All six native suites passed ASan, UBSan and leak checks in the final run
-(279.54 seconds). The initial concurrent sanitizer run exceeded the 60-second asset
-wait in two fixtures; it did not report an address/undefined/leak error. Core
-asset fixtures now allow 180 seconds for instrumented extraction/atlas work,
-while independently checking that render-snapshot reads remain responsive.
-The application still prepares meshes asynchronously.
-
-Reproduce the native instrumentation checks with:
+The merged sanitizer configure succeeded. Its rebuild was intentionally stopped
+for the user's checkpoint/handoff request (exit 143), before any sanitizer tests
+started. This is not a compiler diagnostic or a passed merged sanitizer run.
+Logs: artifacts/configure-baked-creator-sanitize.log and
+artifacts/build-baked-creator-sanitize.log. No sanitizer build remains active.
+Resume with the existing configured build rather than deleting its cache:
 
 ```sh
-cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DDOME_BUILD_UI=OFF -DDOME_BUILD_XR=OFF -DDOME_COMPUTE_BACKEND=CPU \
-  -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" \
-  -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
-cmake --build build-sanitize --parallel 2
-ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
-  ctest --test-dir build-sanitize --output-on-failure
+cmake --build build-sanitize --parallel 2 --target \
+  dome-sculpt-baked-textures-test dome-sculpt-composite-cache-test
+ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 \
+  ctest --test-dir build-sanitize --output-on-failure \
+  -R '^(baked-textures|composite-cache)$'
 ```
 
-Machine-readable evidence is in `artifacts/validation-paint.json`; log paths
-and tested binary hashes are recorded there. These generated artifacts are
-excluded from source control. Physical headset/controller/stylus behavior,
-production-scale performance and CUDA/HIP/SYCL execution are unverified. Baking,
-remeshing, manual UV editing, humanoid rigging, weights, shapekeys, full MToon,
-full glTF/VRM and the remaining plugin-equivalent workflows are unfinished.
+Both C and C++ have ASan/UBSan/frame-pointer instrumentation; UI/XR are OFF.
+Prior successful whole-core sanitizer evidence is archived under the separate
+72d9127/811eb69 records and must not be reported as verification of this merge.
+Broader merged affected-source/archive/group sanitizer checks remain advisable
+once the two selected integration targets complete.
 
-# Scene and material integration checkpoint — 2026-10-29
+## Scope of evidence
 
-The persistent scene supports independent sculpt objects, uniform transforms,
-visibility, edit locks and per-object PBR material channels in FLTK and XR.
-
-- All six optimized CTest suites passed: scene authoring, shared document,
-  sculpt geometry, independent glTF interoperability, GPU rendering and the
-  OpenXR client. The scene suite verifies object identities, version-one
-  migration, transformed sculpt isolation, metadata/stroke history, exact
-  persistence, saved-state markers and malformed-input rejection.
-- All 26 synthetic OpenXR checks passed, including creating an independent
-  sculpt and changing its material through joystick submenu actions.
-- All ten private-Xvfb FLTK checks passed, including object duplication/undo,
-  the native object/material inspector, applying a blue material and undoing it.
-  Captures include `artifacts/gui/08-material-editor.png` and
-  `artifacts/gui/09-material-applied.png`.
-- The real EGL/GL rendering fixture displays separate red and blue sculpt
-  objects. Independent cgltf validation checks separate nodes/meshes/materials,
-  exact local geometry, node transforms and PBR values including emission,
-  opacity and double-sided flags.
-- ASan/UBSan/leak checks passed for all four native core suites. The final
-  scene and document suites were rerun after ordered save-queue changes.
-- The save regression queues export and an older asynchronous save ahead of a
-  newer desktop save, then verifies the newest geometry remains on disk after
-  every worker drains. Save-failure/retry and exact cancellation checks pass.
-
-Machine-readable results are in `artifacts/validation-scene.json`. Full native,
-GUI and sanitizer logs are named there. These generated artifacts are excluded
-from source control. The full objective remains active; production authoring,
-painting, rigging, VRM, hardware and accelerator requirements remain unfinished.
-
-# Native XR integration checkpoint — 2026-10-29
-
-The OpenBrush DomeD basis is pinned at
-`1373d5e839a9720adaeb187064785f9d9d0e8492`; the Blender basis remains 5.4 Alpha
-at `3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2`. Source roles and checked hashes
-are recorded in [the provenance manifest](../third_party/sources.json).
-
-- Optimized CPU build: all five CTest suites passed: shared document,
-  sculpt geometry, independent cgltf interoperability, EGL/OpenGL rendering
-  and native OpenXR client integration.
-- The native synthetic runtime uses the real OpenXR loader and real GL
-  swapchain textures. All 23 client checks passed, covering tracked controller
-  and MX Ink tip-pressure edits, stereo eye rendering, focus/tracking loss,
-  scheduled reference-space rebases, joystick menus, background save/export,
-  and explicit primary-session selection when overlay support is absent.
-- All five private-Xvfb FLTK checks passed: shaded surface, carve, exact undo
-  pixel restoration, default trackball orbit and view reset.
-- ASan, UBSan and leak checks passed for all three native core suites.
-  The shared-document suite was rerun successfully after the final recenter
-  and worker-notification changes.
-- The GPU rendering test checked PBR/toon output, light/dark grey backgrounds,
-  a transparent XR overlay, and visible BDF menu selection. Rendering used
-  software OpenGL; it does not validate CUDA, HIP or SYCL execution.
-- A bounded installed-Monado run exited successfully after 12 frames with
-  11 stereo submissions. Monado reported a simulated HMD and no controllers.
-  Physical headset, controller and stylus behavior remains unverified.
-- Runtime linkage inspection found the patched FLTK frontend and no
-  Qt, GTK or Pango dependencies. No system installation was performed.
-
-Local logs and captures are generated under `artifacts/`, with machine-readable
-results in `artifacts/validation-xr.json`, `artifacts/gui/report.json` and
-`build/xr-client/report.json`. These generated files are intentionally excluded
-from source control. Reproduction commands are in [the README](../README.md).
-
-This checkpoint establishes a connected native editing path. The full
-production objective remains active; incomplete authoring, scene, material,
-rigging, export and hardware requirements remain in
-[the completion matrix](REQUIREMENTS.md).
-
-
-## 2026-10-29 resume, current DomeD toolkit
-
-See TOOLKIT.md and HANDOFF.md. Release build uses canonical DomeD742d009's
-FLTK1.4.5 and all22 committed patches, rather than the old inherited /opt build.
-Ten native suites pass, with36 real-loader synthetic XR assertions; GUI18/18,
-menu25/25 and newly built nested DomeD8/8 pass. Continuous UV scaling/turning,
-fine-wheel rate and exact cancellation have new focused regressions. Five
-additional UV replays from one exact persisted baseline preserve field/paint
-hashes and change UVs consistently. The old handoff's persistence failure has
-not reproduced; a root cause is not claimed. New artifacts retain projects and
-separate comparison hashes, and a failed run cannot leave a stale passed report.
-
-Latest canonical DomeD was built from a clean pinned worktree. Existing capture
-source edits in DomeD/qimgvr remain untouched. No session restart, installation,
-physical-device test or new sanitizer/accelerator result is claimed. The first
-nested run failed from a distribution-specific software Vulkan manifest path;
-the portable test driver selection fixed the harness, after which all8 pass.
+CPU/software GL and synthetic real-loader OpenXR fixtures do not establish
+physical headset/controller/stylus/3D-mouse behavior, production-size latency or
+accelerator backends. No fresh external Khronos validator or system install is
+claimed. Baked normal bindings/bytes and GPU shading do not prove full posed
+consumer interoperability. Raw original source normal views explicitly reject
+object baking until their sampling/tangent semantics are integrated; original
+archives remain retained. Full FLTK/XR bake controls remain unfinished.

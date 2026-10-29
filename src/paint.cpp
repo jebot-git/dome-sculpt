@@ -2,6 +2,7 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "dome/source-maps.hpp"
 #include "dome/scene.hpp"
 #include "dome/tangents.hpp"
 #include <bit>
@@ -9,6 +10,10 @@
 #include <nlohmann/json.hpp>
 #include <png.h>
 #include <set>
+#include <unordered_map>
+#include <atomic>
+#include <mutex>
+#include <list>
 namespace dome {
 namespace {
 uint8_t byte(float v) {
@@ -19,6 +24,63 @@ void name_valid(const std::string &s) {
   if (s.empty() || s.size() > 256 || s.find('\0') != std::string::npos)
     throw std::invalid_argument("Invalid paint layer name");
 }
+size_t tile_count(const PaintLayer &layer) {
+  return std::count_if(layer.tiles.begin(),layer.tiles.end(),[](const auto &tile){return bool(tile);});
+}
+uint64_t next_composite_token() {
+  static std::atomic<uint64_t> sequence{1};auto value=sequence.load(std::memory_order_relaxed);
+  while(value!=UINT64_MAX)if(sequence.compare_exchange_weak(value,value+1,std::memory_order_relaxed))return value;
+  throw std::overflow_error("Paint composite content identity exhausted");
+}
+struct CompositeFactors {
+  std::array<float,4> color;
+  std::array<float,3> emission;
+  float metallic,roughness;
+  bool operator==(const CompositeFactors &)const=default;
+};
+struct CompositeRetention {
+  struct Source {size_t references=0,bytes=0;};
+  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};size_t derived=0,count=0;std::array<const Image*,5> sources{};};
+  std::mutex mutex;
+  size_t limit=512*1024*1024,bytes=0;
+  uint64_t hits=0,builds=0;
+  std::list<Entry> entries;
+  std::unordered_map<const Image*,Source> sources;
+  void evict(){
+    auto &e=entries.back();bytes-=e.derived;
+    for(size_t i=0;i<e.count;++i){auto found=sources.find(e.sources[i]);if(!--found->second.references){bytes-=found->second.bytes;sources.erase(found);}}
+    entries.pop_back();
+  }
+  std::shared_ptr<const TextureMaps> find(uint64_t token,const CompositeFactors &factors){
+    std::lock_guard lock(mutex);auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.token==token&&e.factors==factors;});
+    if(found==entries.end())return {};
+    auto result=found->maps;entries.splice(entries.begin(),entries,found);++hits;return result;
+  }
+  void retain(const std::shared_ptr<const TextureMaps> &maps,uint64_t token,const CompositeFactors &factors,bool hit){
+    std::lock_guard lock(mutex);if(hit)++hits;else ++builds;
+    auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.maps.get()==maps.get();});
+    if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
+    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size();
+    if(maps->source_maps)for(auto slot:{&maps->source_maps->color,&maps->source_maps->metal_rough,&maps->source_maps->emission,&maps->source_maps->normal,&maps->source_maps->occlusion})
+      if(slot->image&&std::find(entry.sources.begin(),entry.sources.begin()+entry.count,slot->image.get())==entry.sources.begin()+entry.count)
+        entry.sources[entry.count++]=slot->image.get();
+    size_t isolated=entry.derived;for(size_t i=0;i<entry.count;++i)isolated+=entry.sources[i]->rgba.size();
+    if(isolated>limit)return;
+    auto increment=[&]{size_t n=entry.derived;for(size_t i=0;i<entry.count;++i)if(!sources.contains(entry.sources[i]))n+=entry.sources[i]->rgba.size();return n;};
+    while(!entries.empty()&&(entries.size()>=128||increment()>limit||bytes>limit-increment()))evict();
+    size_t additional=increment();if(additional>limit||bytes>limit-additional)return;
+    // Retention is best effort. A cache-node allocation failure must not turn a
+    // successfully composited immutable frame into a document edit failure.
+    try {
+      entries.push_front(entry);
+      try {for(size_t i=0;i<entry.count;++i)sources.try_emplace(entry.sources[i],Source{0,entry.sources[i]->rgba.size()});}
+      catch(...){for(size_t i=0;i<entry.count;++i){auto p=sources.find(entry.sources[i]);if(p!=sources.end()&&!p->second.references)sources.erase(p);}entries.pop_front();throw;}
+      bytes+=entry.derived;
+      for(size_t i=0;i<entry.count;++i){auto &s=sources.at(entry.sources[i]);if(!s.references++)bytes+=s.bytes;}
+    }catch(const std::bad_alloc&){}
+  }
+};
+CompositeRetention &composite_retention(){static CompositeRetention cache;return cache;}
 Vec3 low(Vec3 a, Vec3 b) {
   return {std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)};
 }
@@ -71,6 +133,21 @@ Image blank_image(uint32_t r, bool normal = false) {
   return result;
 }
 } // namespace
+struct PaintedMesh::CompositeCache {
+  std::mutex mutex;
+  uint64_t token=0;
+  CompositeFactors factors{};
+  std::weak_ptr<const TextureMaps> maps;
+};
+PaintCompositeCacheStats paint_composite_cache_stats(){
+  auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
+  return {cache.bytes,cache.entries.size(),cache.limit,cache.hits,cache.builds};
+}
+void set_paint_composite_cache_budget(size_t bytes){
+  if(bytes>512*1024*1024)throw std::invalid_argument("Paint composite retention budget exceeds 512 MiB");
+  auto &cache=composite_retention();std::lock_guard lock(cache.mutex);cache.limit=bytes;
+  while(!cache.entries.empty()&&cache.bytes>bytes)cache.evict();
+}
 float srgb_to_linear(float v) {
   return v <= .04045f ? v / 12.92f : std::pow((v + .055f) / 1.055f, 2.4f);
 }
@@ -125,13 +202,26 @@ struct PaintedMesh::SurfaceMap {
   struct Bounds {
     Vec3 lo{INFINITY, INFINITY, INFINITY}, hi{-INFINITY, -INFINITY, -INFINITY};
   };
+  struct Extra { Texel texel; uint32_t next = UINT32_MAX; };
+  struct Head { uint32_t first = UINT32_MAX, count = 0; };
+  PaintSurfaceOptions options;
+  PaintSurfaceDiagnostics diagnostics;
+  std::unordered_map<uint32_t,Head> linked;
+  std::vector<Extra> extra;
   std::vector<Texel> texels;
   std::vector<Bounds> tiles;
   std::vector<int32_t> padding;
-  SurfaceMap(Mesh input, uint32_t r)
-      : mesh(std::move(input)), resolution(r), columns(r / 32),
+  SurfaceMap(Mesh input, uint32_t r, PaintSurfaceOptions opts = {})
+      : mesh(std::move(input)), resolution(r), columns(r / 32),options(std::move(opts)),
         texels(size_t(r) * r), tiles(size_t(columns) * columns),
         padding(size_t(r) * r, -1) {
+    if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored)||
+       !options.max_raster_samples||options.max_raster_samples>512*1024*1024||
+       options.max_additional_candidates>8*1024*1024||!options.max_candidate_checks||options.max_candidate_checks>512*1024*1024||
+       options.max_candidates_per_texel<1||options.max_candidates_per_texel>128)
+      throw std::invalid_argument("Invalid paint surface resource bounds");
+    diagnostics.policy=options.policy;
+    const bool source=options.policy==PaintUvPolicy::SourceAuthored;
     mesh.validate();
     if (mesh.uv.size() != mesh.positions.size())
       throw std::invalid_argument("Painting requires persisted UV coordinates");
@@ -144,9 +234,11 @@ struct PaintedMesh::SurfaceMap {
       auto a = mesh.uv[ids[0]], b = mesh.uv[ids[1]], c = mesh.uv[ids[2]];
       double den = double(b[1] - c[1]) * (a[0] - c[0]) +
                    double(c[0] - b[0]) * (a[1] - c[1]);
-      if (std::abs(den) < 1e-14)
-        throw std::invalid_argument(
-            "Painting requires nondegenerate UV triangles");
+      if(source&&options.cancelled&&options.cancelled())throw std::runtime_error("Source paint surface construction cancelled");
+      if (source?den==0:std::abs(den)<1e-14) {
+        if(!source)throw std::invalid_argument("Painting requires nondegenerate UV triangles");
+        diagnostics.unpaintable_uv_faces.push_back(uint32_t(k/3));continue;
+      }
       int x0 = std::max(0, int(std::floor(std::min({a[0], b[0], c[0]}) * r))),
           x1 = std::min(int(r) - 1,
                         int(std::ceil(std::max({a[0], b[0], c[0]}) * r)));
@@ -155,6 +247,8 @@ struct PaintedMesh::SurfaceMap {
                         int(std::ceil(std::max({a[1], b[1], c[1]}) * r)));
       for (int y = y0; y <= y1; ++y)
         for (int x = x0; x <= x1; ++x) {
+          if(++diagnostics.raster_samples>options.max_raster_samples)throw std::length_error("Paint UV raster work budget exceeded");
+          if((diagnostics.raster_samples&4095)==0&&options.cancelled&&options.cancelled())throw std::runtime_error("Paint surface construction cancelled");
           double u = (x + .5) / r, v = (y + .5) / r;
           float w0 = float(
               ((b[1] - c[1]) * (u - c[0]) + (c[0] - b[0]) * (v - c[1])) / den);
@@ -162,29 +256,42 @@ struct PaintedMesh::SurfaceMap {
                     ((c[1] - a[1]) * (u - c[0]) + (a[0] - c[0]) * (v - c[1])) /
                     den),
                 w2 = 1 - w0 - w1;
-          if (std::min({w0, w1, w2}) < -.000001f)
+          if (!std::isfinite(w0)||!std::isfinite(w1)||!std::isfinite(w2)||std::min({w0, w1, w2}) < -.000001f)
             continue;
           auto p = mesh.positions[ids[0]] * w0 + mesh.positions[ids[1]] * w1 +
                    mesh.positions[ids[2]] * w2;
           size_t index = size_t(y) * r + x;
           auto &t = texels[index];
-          if (t.covered && length(t.position - p) > 1e-4f)
-            throw std::invalid_argument(
-                "Overlapping UV islands cannot be painted independently");
-          t = {p,
-               normalized(mesh.normals[ids[0]] * w0 +
-                          mesh.normals[ids[1]] * w1 +
-                          mesh.normals[ids[2]] * w2),
-               true,
-               uint32_t(k / 3),
-               {w0, w1}};
+          Texel candidate{p,normalized(mesh.normals[ids[0]]*w0+mesh.normals[ids[1]]*w1+mesh.normals[ids[2]]*w2),true,uint32_t(k/3),{w0,w1}};
+          if(!t.covered){t=candidate;++diagnostics.covered_texels;}
+          else if(!source){
+            if(length(t.position-p)>1e-4f)throw std::invalid_argument("Overlapping UV islands cannot be painted independently");
+            t=candidate;
+          }else{
+            auto same=[&](const Texel &other){
+              if(++diagnostics.candidate_checks>options.max_candidate_checks)throw std::length_error("Paint surface comparison budget exceeded");
+              return length(other.position-p)<=1e-5f&&dot(other.normal,candidate.normal)>.9999f;
+            };
+            bool duplicate=same(t);auto found=linked.find(uint32_t(index));
+            if(!duplicate&&found!=linked.end())for(auto at=found->second.first;at!=UINT32_MAX;at=extra[at].next)
+              if(same(extra[at].texel)){duplicate=true;break;}
+            if(!duplicate){
+              auto count=found==linked.end()?0:found->second.count;
+              if(count+1>=options.max_candidates_per_texel||extra.size()>=options.max_additional_candidates)
+                throw std::length_error("Linked source paint surface budget exceeded");
+              auto &head=linked[uint32_t(index)];
+              if(!head.count)++diagnostics.linked_texels;
+              extra.push_back({candidate,head.first});head.first=uint32_t(extra.size()-1);++head.count;
+              ++diagnostics.additional_candidates;
+            }
+          }
           padding[index] = int32_t(index);
           auto &bounds = tiles[size_t(y / 32) * columns + x / 32];
           bounds.lo = low(bounds.lo, p);
           bounds.hi = high(bounds.hi, p);
         }
     }
-    if (std::none_of(texels.begin(), texels.end(),
+    if (!source && std::none_of(texels.begin(), texels.end(),
                      [](auto &t) { return t.covered; }))
       throw std::invalid_argument(
           "UV islands have no covered texels at this resolution");
@@ -204,19 +311,24 @@ struct PaintedMesh::SurfaceMap {
           }
       padding = std::move(next);
     }
+    options.cancelled={};
   }
 };
-PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r) {
+PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r):PaintedMesh(std::move(mesh),r,{}){}
+PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options) {
   if (r < 64 || r > 2048 || (r & (r - 1)))
     throw std::invalid_argument(
         "Paint resolution must be a power of two between 64 and 2048");
-  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r);
+  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r,options);
+  composite_cache_=std::make_shared<CompositeCache>();
+  composite_token_=next_composite_token();
   PaintLayer layer;
   layer.id = 1;
   layer.tiles.resize(surface_->tiles.size());
   layers_.push_back(std::move(layer));
 }
 const Mesh &PaintedMesh::mesh() const { return surface_->mesh; }
+const PaintSurfaceDiagnostics &PaintedMesh::surface_diagnostics() const {return surface_->diagnostics;}
 uint32_t PaintedMesh::resolution() const { return surface_->resolution; }
 const PaintLayer &PaintedMesh::layer(uint64_t id) const {
   auto i = std::find_if(layers_.begin(), layers_.end(),
@@ -250,8 +362,13 @@ void PaintedMesh::add_layer(std::string name) {
 void PaintedMesh::delete_layer() {
   if (editing_ || layers_.size() == 1)
     throw std::logic_error("Keep at least one paint layer");
+  const auto &removed = layer(active_);
+  bool visible=removed.visible&&removed.opacity>0&&tile_count(removed);
+  uint64_t token=visible?next_composite_token():composite_token_;
+  allocated_tiles_ -= tile_count(removed);
   std::erase_if(layers_, [&](auto &l) { return l.id == active_; });
   active_ = layers_.back().id;
+  composite_token_=token;
   ++revision_;
 }
 void PaintedMesh::layer_properties(std::string name, bool visible,
@@ -260,9 +377,13 @@ void PaintedMesh::layer_properties(std::string name, bool visible,
   if (editing_ || !std::isfinite(opacity) || opacity < 0 || opacity > 1)
     throw std::invalid_argument("Invalid paint layer properties");
   auto &l = active();
+  bool previous=l.visible&&l.opacity>0,next=visible&&opacity>0;
+  bool visual=tile_count(l)&&((previous!=next)||(previous&&next&&l.opacity!=opacity));
+  uint64_t token=visual?next_composite_token():composite_token_;
   l.name = std::move(name);
   l.visible = visible;
   l.opacity = opacity;
+  composite_token_=token;
   ++revision_;
 }
 void PaintedMesh::move_layer(int direction) {
@@ -273,7 +394,10 @@ void PaintedMesh::move_layer(int direction) {
   auto index = i - layers_.begin();
   auto to = index + direction;
   if (to >= 0 && to < ptrdiff_t(layers_.size())) {
+    bool visual=layers_[index].visible&&layers_[index].opacity>0&&tile_count(layers_[index])&&layers_[to].visible&&layers_[to].opacity>0&&tile_count(layers_[to]);
+    auto token=visual?next_composite_token():composite_token_;
     std::swap(layers_[index], layers_[to]);
+    composite_token_=token;
     ++revision_;
   }
 }
@@ -292,12 +416,17 @@ void PaintedMesh::begin_stroke() {
   if (!active().visible)
     throw std::logic_error("Show the active paint layer before painting");
   before_ = active().tiles;
+  before_allocated_tiles_ = tile_count(active());
+  before_composite_token_=composite_token_;
   editing_ = true;
 }
 bool PaintedMesh::pending_changes() const {
   return editing_ && before_ != layer(active_).tiles;
 }
 void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
+  stamp_sampled(b,settings,{});
+}
+void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,const PaintSampler &sampler) {
   settings.validate();
   if (!editing_)
     throw std::logic_error("Begin the paint stroke first");
@@ -314,12 +443,11 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
       axis = b.to - b.from, n = normalized(b.normal);
   float axis2 = dot(axis, axis);
   auto &l = active();
+  auto token=l.visible&&l.opacity>0?next_composite_token():composite_token_;
   auto prior = l.tiles;
-  size_t allocated = 0;
-  for (auto &layer : layers_)
-    allocated += std::count_if(layer.tiles.begin(), layer.tiles.end(),
-                               [](auto &p) { return bool(p); });
+  size_t allocated = allocated_tiles_;
   bool changed = false;
+  size_t candidate_checks=0;
   try {
     for (size_t tile = 0; tile < l.tiles.size(); ++tile) {
       auto bounds = surface_->tiles[tile];
@@ -333,29 +461,43 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
                ty = uint32_t(tile / surface_->columns) * 32;
       for (uint32_t y = 0; y < 32; ++y)
         for (uint32_t x = 0; x < 32; ++x) {
-          auto &t = surface_->texels[size_t(ty + y) * resolution() + tx + x];
-          if (!t.covered || (settings.front_only && dot(t.normal, n) <= .05f))
-            continue;
-          float u =
-              axis2 > 1e-20f
-                  ? std::clamp(dot(t.position - b.from, axis) / axis2, 0.f, 1.f)
-                  : 0;
-          float distance = length(t.position - (b.from + axis * u));
-          if (distance >= radius)
-            continue;
+          size_t index=size_t(ty+y)*resolution()+tx+x;
+          const auto &t=surface_->texels[index];
+          float distance=INFINITY,projection_opacity=1;
+          uint32_t selected_face=UINT32_MAX;auto selected=settings;
+          auto consider=[&](const SurfaceMap::Texel &candidate){
+            if(!candidate.covered)return;
+            if(++candidate_checks>surface_->options.max_candidate_checks)throw std::length_error("Paint candidate work budget exceeded");
+            if(settings.front_only&&dot(candidate.normal,n)<=.05f)return;
+            float u=axis2>1e-20f?std::clamp(dot(candidate.position-b.from,axis)/axis2,0.f,1.f):0;
+            float d=length(candidate.position-(b.from+axis*u));
+            if(d>=radius||d>distance+1e-7f||(std::abs(d-distance)<=1e-7f&&candidate.face>=selected_face))return;
+            auto value=settings;float opacity=1;
+            if(sampler){auto sample=sampler(candidate.position,candidate.normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
+            if(opacity<=0)return;
+            distance=d;selected_face=candidate.face;selected=value;projection_opacity=opacity;
+          };
+          consider(t);
+          if(!surface_->linked.empty()){
+            auto found=surface_->linked.find(uint32_t(index));
+            if(found!=surface_->linked.end())for(auto at=found->second.first;at!=UINT32_MAX;at=surface_->extra[at].next)
+              consider(surface_->extra[at].texel);
+          }
+          if(selected_face==UINT32_MAX)continue;
           float edge = 1 - distance * distance / (radius * radius),
                 alpha = std::clamp(edge * edge * b.pressure * b.strength *
-                                       settings.flow,
+                                       settings.flow * projection_opacity,
                                    0.f, 1.f);
+          if (!alpha) continue;
           auto &p = copy->pixels[y * 32 + x];
           auto old = p;
-          if (settings.channel == PaintChannel::Mask)
+          if (selected.channel == PaintChannel::Mask)
             p.data[13] =
-                byte(unit(p.data[13]) * (1 - alpha) + settings.mask * alpha);
+                byte(unit(p.data[13]) * (1 - alpha) + selected.mask * alpha);
           else {
-            int channel = int(settings.channel), coverage = 9 + channel;
+            int channel = int(selected.channel), coverage = 9 + channel;
             float previous = unit(p.data[coverage]);
-            if (settings.erase)
+            if (selected.erase)
               p.data[coverage] = byte(previous * (1 - alpha));
             else {
               float next = alpha + previous * (1 - alpha);
@@ -371,14 +513,14 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
               };
               if (channel == 0)
                 for (int k = 0; k < 4; ++k)
-                  mix(k, settings.color[k], k < 3);
+                  mix(k, selected.color[k], k < 3);
               else if (channel == 1)
-                mix(4, settings.metallic, false);
+                mix(4, selected.metallic, false);
               else if (channel == 2)
-                mix(5, settings.roughness, false);
+                mix(5, selected.roughness, false);
               else
                 for (int k = 0; k < 3; ++k)
-                  mix(6 + k, settings.emission[k], true);
+                  mix(6 + k, selected.emission[k], true);
             }
           }
           tile_changed |= p != old;
@@ -395,8 +537,11 @@ void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
     l.tiles = std::move(prior);
     throw;
   }
-  if (changed)
+  allocated_tiles_ = allocated;
+  if (changed){
+    composite_token_=token;
     ++revision_;
+  }
 }
 bool PaintedMesh::end_stroke() {
   if (!editing_)
@@ -414,7 +559,7 @@ bool PaintedMesh::end_stroke() {
   for (auto &s : redo_)
     history_bytes_ -= s.bytes;
   redo_.clear();
-  undo_.push_back({active_, std::move(before_), tiles, bytes});
+  undo_.push_back({active_, std::move(before_), tiles, bytes,before_allocated_tiles_,tile_count(active())});
   history_bytes_ += bytes;
   while (undo_.size() > 1 &&
          (history_bytes_ > 64 * 1024 * 1024 || undo_.size() > 128)) {
@@ -425,8 +570,10 @@ bool PaintedMesh::end_stroke() {
 }
 void PaintedMesh::cancel_stroke() {
   if (editing_) {
+    allocated_tiles_ = allocated_tiles_ - tile_count(active()) + before_allocated_tiles_;
     active().tiles = std::move(before_);
     editing_ = false;
+    composite_token_=before_composite_token_;
     ++revision_;
   }
 }
@@ -435,11 +582,15 @@ bool PaintedMesh::undo() {
     throw std::logic_error("Finish the paint stroke before undo");
   if (undo_.empty())
     return false;
+  const auto &target=layer(undo_.back().layer);
+  auto token=target.visible&&target.opacity>0?next_composite_token():composite_token_;
   auto s = std::move(undo_.back());
   undo_.pop_back();
   active_ = s.layer;
+  allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.before_tiles;
   active().tiles = s.before;
   redo_.push_back(std::move(s));
+  composite_token_=token;
   ++revision_;
   return true;
 }
@@ -448,25 +599,34 @@ bool PaintedMesh::redo() {
     throw std::logic_error("Finish the paint stroke before redo");
   if (redo_.empty())
     return false;
+  const auto &target=layer(redo_.back().layer);
+  auto token=target.visible&&target.opacity>0?next_composite_token():composite_token_;
   auto s = std::move(redo_.back());
   redo_.pop_back();
   active_ = s.layer;
+  allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.after_tiles;
   active().tiles = s.after;
   undo_.push_back(std::move(s));
+  composite_token_=token;
   ++revision_;
   return true;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   auto p = std::shared_ptr<PaintedMesh>(new PaintedMesh);
+  p->composite_cache_=composite_cache_;
+  p->composite_token_=composite_token_;
   p->surface_ = surface_;
+  p->source_maps_ = source_maps_;
   p->layers_ = layers_;
   p->baked_ = baked_;
   p->active_ = active_;
   p->next_ = next_;
   p->revision_ = revision_;
+  p->allocated_tiles_ = allocated_tiles_;
   return p;
 }
 void BakedTextures::validate(uint32_t resolution) const {
+  if (maps.source_maps) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
@@ -492,6 +652,7 @@ size_t PaintedMesh::storage_bytes() const {
 void PaintedMesh::install_bake(BakedTextures incoming) {
   if (editing_) throw std::logic_error("Finish the paint stroke before baking");
   incoming.validate(resolution());
+  auto token = next_composite_token();
   if (baked_ && !baked_->maps.normal.rgba.empty() && incoming.maps.normal.rgba.empty())
     throw std::invalid_argument("A replacement bake must retain the existing normal channel");
   if (storage_bytes() - (baked_ ? baked_->storage_bytes() : 0) +
@@ -518,79 +679,108 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
           incoming.storage_bytes() > 128 * 1024 * 1024)
     throw std::length_error("Baked maps exceed paint storage budget");
   baked_ = std::make_shared<const BakedTextures>(std::move(incoming));
+  composite_token_ = token;
   ++revision_;
 }
 void PaintedMesh::clear_bake() {
   if (editing_) throw std::logic_error("Finish the paint stroke before clearing a bake");
-  if (baked_) { baked_.reset(); ++revision_; }
+  if (baked_) { auto token = next_composite_token(); baked_.reset(); composite_token_ = token; ++revision_; }
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
+    std::shared_ptr<const PaintSourceMaps> maps,uint32_t resolution) {
+  return from_maps(std::move(mesh),std::move(maps),resolution,{});
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
+    std::shared_ptr<const PaintSourceMaps> maps,uint32_t resolution,const PaintSurfaceOptions &options) {
+  if(!maps || maps->empty())throw std::invalid_argument("Original paint maps are empty");
+  maps->validate();
+  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),resolution,options));
+  // Freeze the small bundle of references/metadata. The shared image pixels must
+  // already be immutable, allowing one original image cache across materials.
+  result->source_maps_=std::make_shared<const PaintSourceMaps>(*maps);
+  return result;
 }
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material) const {
   material.validate();
+  CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
+  std::lock_guard lock(composite_cache_->mutex);
+  if(composite_cache_->token==composite_token_&&composite_cache_->factors==factors)
+    if(auto maps=composite_cache_->maps.lock()){composite_retention().retain(maps,composite_token_,factors,true);return maps;}
+  auto maps=composite_retention().find(composite_token_,factors);
+  if(maps){composite_cache_->token=composite_token_;composite_cache_->factors=factors;composite_cache_->maps=maps;return maps;}
+  maps=build_composite(material);
+  composite_cache_->token=composite_token_;composite_cache_->factors=factors;composite_cache_->maps=maps;
+  composite_retention().retain(maps,composite_token_,factors,false);return maps;
+}
+std::shared_ptr<const TextureMaps>
+PaintedMesh::build_composite(const Material &material) const {
   auto maps = std::make_shared<TextureMaps>();
-  uint32_t r = resolution();
-  for (auto image : {&maps->color, &maps->metal_rough, &maps->emission}) {
-    image->width = image->height = r;
-    image->rgba.resize(size_t(r) * r * 4);
-  }
-  if (baked_ && !baked_->maps.normal.rgba.empty())
-    maps->normal = blank_image(r, true);
-  for (uint32_t y = 0; y < r; ++y)
-    for (uint32_t x = 0; x < r; ++x) {
-      auto color = material.color;
-      auto emission = material.emissive;
-      float metal = material.metallic, rough = material.roughness, ao = 1;
-      int32_t owner = surface_->padding[size_t(y) * r + x];
-      uint32_t px = owner >= 0 ? uint32_t(owner) % r : x,
-               py = owner >= 0 ? uint32_t(owner) / r : y;
-      Vec3 detail{0, 0, 1};
+  maps->source_maps=source_maps_;
+  uint32_t r=resolution();
+  const PaintSourceMaps empty;
+  const auto &source=source_maps_?*source_maps_:empty;
+  auto dimensions=[&](Image &image,std::initializer_list<const PaintSourceTexture*> views){
+    image.width=image.height=r;
+    for(auto view:views)if(view->image){image.width=std::max(image.width,view->image->width);image.height=std::max(image.height,view->image->height);}
+    if(size_t(image.width)*image.height>16*1024*1024)
+      throw std::length_error("Composited original texture exceeds output pixel budget");
+    image.rgba.resize(size_t(image.width)*image.height*4);
+  };
+  dimensions(maps->color,{&source.color});
+  dimensions(maps->metal_rough,{&source.metal_rough,&source.occlusion});
+  dimensions(maps->emission,{&source.emission});
+  if (baked_ && !baked_->maps.normal.rgba.empty()) maps->normal = blank_image(r, true);
+  for(int channel=0;channel<3;++channel){
+    auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
+    for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
+      float u=(float(x)+.5f)/image.width,v=(float(y)+.5f)/image.height;
+      auto sampled=sample_source_texture(channel==0?source.color:channel==1?source.metal_rough:source.emission,u,v,channel!=1);
+      std::array<float,4> value{};
+      if(channel==0)for(int k=0;k<4;++k)value[k]=material.color[k]*sampled[k];
+      else if(channel==1){
+        float ao=source.occlusion.image?sample_source_texture(source.occlusion,u,v,false)[0]:1;
+        value={1-source.occlusion_strength*(1-ao),material.roughness*sampled[1],material.metallic*sampled[2],1};
+      }else{for(int k=0;k<3;++k)value[k]=material.emissive[k]*sampled[k];value[3]=1;}
+      uint32_t tx=std::min(r-1,uint32_t(u*r)),ty=std::min(r-1,uint32_t(v*r));
+      int32_t owner=surface_->padding[size_t(ty)*r+tx];
+      uint32_t px=owner>=0?uint32_t(owner)%r:tx,py=owner>=0?uint32_t(owner)/r:ty;
       if (baked_ && owner >= 0) {
         auto values = baked_pixel(*baked_, size_t(owner));
         float a = unit(baked_->coverage[size_t(owner)]);
-        for (int c = 0; c < 4; ++c) color[c] = color[c] * (1-a) + values[c] * a;
-        ao = 1-a + values[4]*a;
-        rough = rough*(1-a) + values[5]*a;
-        metal = metal*(1-a) + values[6]*a;
-        for (int c = 0; c < 3; ++c) emission[c] = emission[c]*(1-a) + values[7+c]*a;
-        auto vector = Vec3{values[10], values[11], values[12]}*a + detail*(1-a);
-        if (length(vector) > 1e-8f) detail = normalized(vector);
+        if (channel == 0) for (int k=0;k<4;++k) value[k] = value[k]*(1-a)+values[k]*a;
+        else if (channel == 1) for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[4+k]*a;
+        else for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[7+k]*a;
       }
-      for (auto &l : layers_)
-        if (l.visible && l.opacity > 0 && owner >= 0) {
-          auto &p = pixel(l.id, px, py);
-          float mask = unit(p.data[13]) * l.opacity;
-          auto blend = [&](float base, int value, int coverage, bool srgb) {
-            float v = unit(p.data[value]);
-            if (srgb)
-              v = srgb_to_linear(v);
-            float a = mask * unit(p.data[coverage]);
-            return base * (1 - a) + v * a;
-          };
-          for (int k = 0; k < 4; ++k)
-            color[k] = blend(color[k], k, 9, k < 3);
-          metal = blend(metal, 4, 10, false);
-          rough = blend(rough, 5, 11, false);
-          for (int k = 0; k < 3; ++k)
-            emission[k] = blend(emission[k], 6 + k, 12, true);
-        }
-      size_t i = (size_t(y) * r + x) * 4;
-      for (int k = 0; k < 3; ++k) {
-        maps->color.rgba[i + k] = byte(linear_to_srgb(color[k]));
-        maps->emission.rgba[i + k] = byte(linear_to_srgb(emission[k]));
+      for(auto &l:layers_)if(l.visible&&l.opacity>0&&owner>=0){
+        auto &p=pixel(l.id,px,py);float mask=unit(p.data[13])*l.opacity;
+        auto blend=[&](float base,int data,int coverage,bool srgb){
+          float a=mask*unit(p.data[coverage]),paint=unit(p.data[data]);
+          if(srgb)paint=srgb_to_linear(paint);
+          return base*(1-a)+paint*a;
+        };
+        if(channel==0)for(int k=0;k<4;++k)value[k]=blend(value[k],k,9,k<3);
+        else if(channel==1){value[1]=blend(value[1],5,11,false);value[2]=blend(value[2],4,10,false);}
+        else for(int k=0;k<3;++k)value[k]=blend(value[k],6+k,12,true);
       }
-      maps->color.rgba[i + 3] = byte(color[3]);
-      maps->transparent |= color[3] < .999f;
-      maps->metal_rough.rgba[i] = byte(ao);
-      maps->metal_rough.rgba[i + 1] = byte(rough);
-      maps->metal_rough.rgba[i + 2] = byte(metal);
-      maps->metal_rough.rgba[i + 3] = 255;
-      maps->emission.rgba[i + 3] = 255;
-      if (!maps->normal.rgba.empty()) {
-        maps->normal.rgba[i] = byte(detail.x*.5f+.5f);
-        maps->normal.rgba[i+1] = byte(detail.y*.5f+.5f);
-        maps->normal.rgba[i+2] = byte(detail.z*.5f+.5f);
-      }
+      size_t at=(size_t(y)*image.width+x)*4;
+      for(int k=0;k<4;++k)image.rgba[at+k]=byte(channel!=1&&k<3?linear_to_srgb(value[k]):value[k]);
+      if(channel==0)maps->transparent|=value[3]<.999f;
     }
+  }
+  if (baked_ && !maps->normal.rgba.empty()) {
+    for (size_t at=0;at<size_t(r)*r;++at) {
+      int32_t owner=surface_->padding[at];
+      if (owner<0) continue;
+      auto values=baked_pixel(*baked_,size_t(owner));
+      float a=unit(baked_->coverage[size_t(owner)]);
+      Vec3 n=Vec3{values[10],values[11],values[12]}*a+Vec3{0,0,1}*(1-a);
+      if(length(n)<1e-8f)n={0,0,1};else n=normalized(n);
+      maps->normal.rgba[at*4]=byte(n.x*.5f+.5f);
+      maps->normal.rgba[at*4+1]=byte(n.y*.5f+.5f);
+      maps->normal.rgba[at*4+2]=byte(n.z*.5f+.5f);
+    }
+  }
   return maps;
 }
 std::optional<Vec3> PaintedMesh::raycast(Vec3 origin, Vec3 direction,
@@ -669,6 +859,8 @@ PaintedMesh::reparameterize(Mesh target,
     ++result->revision_;
     return result;
   }
+  if(source_maps_)
+    throw std::invalid_argument("UV transfer of original source maps requires an explicit bake; original maps were retained");
   auto surface = std::make_shared<SurfaceMap>(std::move(target), resolution());
   result->surface_ = surface;
   std::shared_ptr<BakedTextures> transferred;
@@ -792,6 +984,8 @@ PaintedMesh::reparameterize(Mesh target,
       }
     }
   }
+  result->allocated_tiles_ = allocated / sizeof(PaintTile);
+  result->composite_token_=next_composite_token();
   ++result->revision_;
   return result;
 }
@@ -807,13 +1001,19 @@ uint32_t word(const std::vector<uint8_t> &bytes, size_t offset) {
   return v;
 }
 } // namespace
-nlohmann::json PaintedMesh::encode() const {
+nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
   if (editing_)
     throw std::logic_error("Finish the paint stroke before saving");
   nlohmann::json j = {{"resolution", resolution()},
                       {"active", active_},
                       {"next_id", next_},
                       {"layers", nlohmann::json::array()}};
+  if(surface_->options.policy==PaintUvPolicy::SourceAuthored)j["uv_policy"]="source-authored";
+  if(source_maps_){
+    PaintImageArchive local;
+    j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
+    if(!archive)j["source_images"]=local.encode();
+  }
   std::vector<uint8_t> positions, normals, uv, indices;
   for (auto p : mesh().positions)
     for (float f : {p.x, p.y, p.z})
@@ -859,7 +1059,7 @@ nlohmann::json PaintedMesh::encode() const {
   }
   return j;
 }
-std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j) {
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive) {
   auto &m = j.at("mesh");
   auto blob = [&](const char *name, size_t stride,
                   size_t limit) -> const std::vector<uint8_t> & {
@@ -903,8 +1103,12 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j) {
        (!resolution.is_number_integer() || resolution.get<int64_t>() < 64)) ||
       resolution.get<uint64_t>() > 2048)
     throw std::runtime_error("Invalid paint resolution");
-  auto result = std::make_shared<PaintedMesh>(
-      std::move(mesh), uint32_t(resolution.get<uint64_t>()));
+  PaintSurfaceOptions surface_options;
+  if(j.contains("uv_policy")){
+    if(j.at("uv_policy")!="source-authored"||!j.contains("source_maps"))throw std::runtime_error("Invalid persisted source UV policy");
+    surface_options.policy=PaintUvPolicy::SourceAuthored;
+  }
+  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options));
   auto positive = [](const nlohmann::json &v) {
     if ((!v.is_number_unsigned() &&
          (!v.is_number_integer() || v.get<int64_t>() <= 0)) ||
@@ -977,6 +1181,16 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j) {
     if (!normal.empty()) baked.maps.normal = {r, r, std::move(normal)};
     baked.coverage = bytes("coverage", size_t(r)*r);
     result->install_bake(std::move(baked));
+  }
+  result->allocated_tiles_ = allocated / sizeof(PaintTile);
+  if(j.contains("source_maps")){
+    if(archive){
+      if(j.contains("source_images"))throw std::runtime_error("Ambiguous original texture archive");
+      result->source_maps_=decode_source_maps(j.at("source_maps"),*archive);
+    }else{
+      auto local=PaintImageArchive::decode(j.at("source_images"));
+      result->source_maps_=decode_source_maps(j.at("source_maps"),local);
+    }
   }
   return result;
 }

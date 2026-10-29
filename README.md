@@ -84,9 +84,9 @@ Ctrl+S saves the scene as a private, atomically replaced `.dsculpt` CBOR file.
 Version 4 stores separate sculpt objects, stable identities, names, selection,
 uniform object transforms, visibility, locks, sparse fields and PBR material
 values, stable painting meshes, UVs, sparse paint/sculpt layers and native
-rig/skin/morph deformation state. Scenes with baked base maps use version 5,
-adding persistent normal/AO/PBR data beneath editable paint layers. Earlier
-volume/scene versions remain readable.
+rig/skin/morph deformation state. Version 5 adds groups and retained creator/source archives; version 6 adds
+persistent normal/AO/PBR baked maps beneath editable paint layers. Earlier
+volume/scene versions, including the standalone baked-v5 checkpoint, remain readable.
 Ctrl+O reopens it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
 transforms, normals, packed UVs, PBR materials and embedded painted PNG maps.
 Skin/inverse-bind/all-influence and POSITION morph GLB export are implemented,
@@ -200,7 +200,7 @@ BVH projections and source-guarded object transfer. The bake data/worker API,
 UV normal reorientation and GLB normal/occlusion bindings are implemented;
 FLTK/XR bake authoring controls remain in progress. See [baking](docs/BAKING.txt).
 
-Reproduce the retained native workflow and open its v5 asset in a private FLTK
+Reproduce the retained native workflow and open its v6 asset in a private FLTK
 GUI check:
 
 ```sh

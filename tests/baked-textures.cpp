@@ -2,6 +2,7 @@
 #include "dome/bake.hpp"
 #include "dome/document.hpp"
 #include "dome/tangents.hpp"
+#include "dome/source-maps.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <unistd.h>
@@ -103,8 +104,34 @@ int main() try {
   check(rejects([&]{PaintedMesh::decode(corrupt);}),"Malformed persisted normal buffers are rejected");
   Scene scene;scene.active().painted=painted.snapshot();scene.active().mesh_active=true;
   auto encoded=scene.encode();
-  check(encoded["version"]==5 && Scene::decode(encoded).encode()==encoded,
-        "Scene version 5 preserves baked surfaces without changing authoring vertex identities");
+  check(encoded["version"]==6 && Scene::decode(encoded).encode()==encoded,
+        "Scene version 6 preserves baked surfaces without changing authoring vertex identities");
+  auto legacy=encoded;legacy["version"]=5;
+  for(auto key:{"groups","next_group_id","source_images","source_models"})legacy.erase(key);
+  for(auto &object:legacy["objects"]) {
+    object.erase("group");object.erase("appearance");
+    for(auto key:{"alpha","alpha_cutoff","unlit"})object["material"].erase(key);
+  }
+  auto legacy_loaded=Scene::decode(legacy);
+  check(legacy_loaded.active().painted->encode()==painted.encode() && legacy_loaded.encode()["version"]==6,
+        "The pre-integration baked-v5 checkpoint upgrades without confusing grouped creator archives");
+  auto originals=std::make_shared<PaintSourceMaps>();
+  originals->color.image=std::make_shared<const Image>(constant({255,0,0,255}));
+  auto combined=PaintedMesh::from_maps(mesh,originals,64);
+  auto original_frame=combined->composite(material);
+  auto overlay=textures();overlay.coverage.assign(64*64,0);
+  for(int y=0;y<64;++y)for(int x=32;x<64;++x)overlay.coverage[y*64+x]=255;
+  combined->install_bake(overlay);auto combined_frame=combined->composite(material);
+  check(combined_frame!=original_frame && combined_frame->source_maps &&
+        combined_frame->source_maps->color.image==originals->color.image &&
+        pixel(combined_frame->color,24,32)==pixel(original_frame->color,24,32) &&
+        pixel(combined_frame->color,40,32)==std::array<uint8_t,4>{25,50,220,128},
+        "Baking invalidates cached composites and preserves original source images beneath protected texels");
+  Scene combined_scene;combined_scene.active().painted=combined;combined_scene.active().mesh_active=true;
+  auto combined_encoded=combined_scene.encode();auto combined_loaded=Scene::decode(combined_encoded);
+  check(combined_loaded.encode()==combined_encoded && combined_loaded.active().painted->source_maps() &&
+        combined_loaded.active().painted->baked(),
+        "Scene v6 round-trips original shared image archives and baked maps together");
   encoded["version"]=4;
   check(rejects([&]{Scene::decode(encoded);}),"A baked scene cannot masquerade as a lossy older schema");
   Document doc;doc.replace(scene);auto prior=doc.copy_scene().encode();
@@ -162,6 +189,14 @@ int main() try {
         "A short world-space cage fails atomically instead of falling back to an unrelated surface");
   check(rejects([&]{bake_object(failed,source_id,settings,[]{return true;});}) && failed.encode()==source_before,
         "Cancelled authoring bake never replaces target channels or source state");
+  auto grouped=failed;auto group=grouped.add_group("Scaled bake group",{{.1f,.2f,0},{},1.5f});
+  grouped.object(source_id).group=group;grouped.object(target_id).group=group;
+  auto grouped_before=grouped.encode();
+  check(rejects([&]{bake_object(grouped,source_id,settings);}) && grouped.encode()==grouped_before,
+        "Group world scale keeps a 25 mm cage shorter than the 30 mm displayed source offset");
+  auto longer=settings;longer.front_mm=45;
+  check(bake_object(grouped,source_id,longer).projected>2000 && grouped.active().group==group,
+        "A sufficient world-space cage bakes grouped sources without reparenting the target");
   auto posed=failed;auto active_rig=*posed.active().deformation;
   active_rig.pose={active_rig.skeleton->bones[0].rest};active_rig.pose[0].translation.z=.1f;
   posed.set_deformation(target_id,active_rig);auto posed_before=posed.encode();

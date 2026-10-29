@@ -63,7 +63,8 @@ enum class SpatialCommand {
   SculptLock,
   SculptDelete,
   SculptOpacity,
-  RecoveryRefresh, RecoveryNext, RecoveryPrevious, RecoveryRestore
+  RecoveryRefresh, RecoveryNext, RecoveryPrevious, RecoveryRestore,
+  CreateFemale, CreateMale, CreateMakeHuman, DeleteGroup, Ungroup
 };
 const std::array<const char *, 12> &spatial_labels(int page);
 std::optional<SpatialCommand> spatial_action(int page, int index);

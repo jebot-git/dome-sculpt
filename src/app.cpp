@@ -6,6 +6,7 @@
 #include "dome/render.hpp"
 #include "dome/session-appearance.hpp"
 #include "object-editor.hpp"
+#include "creator-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "ui-conventions.hpp"
@@ -340,6 +341,7 @@ struct App {
     menu.add("&Sculpt/&Flatten", '4', command, this, FL_MENU_RADIO);
     menu.add("&Sculpt/Smaller brush", '[', command, this);
     menu.add("&Sculpt/Larger brush", ']', command, this);
+    menu.add("&Scene/Create &humanoid...", 0, command, this);
     menu.add("&Scene/New sphere", FL_CTRL | FL_SHIFT | 'n', command, this);
     menu.add("&Scene/New empty sculpt", 0, command, this);
     menu.add("&Scene/Duplicate object", FL_CTRL + 'd', command, this);
@@ -719,7 +721,9 @@ struct App {
       canvas.radius = std::max(.005f, canvas.radius * .8f);
     else if (label == "Larger brush")
       canvas.radius = std::min(2.f, canvas.radius * 1.25f);
-    else if (label == "New sphere" || label == "New empty sculpt") {
+    else if (label == "Create humanoid...") {
+      create_humanoid_dialog(canvas.document);
+    } else if (label == "New sphere" || label == "New empty sculpt") {
       canvas.document.add_object(label == "New sphere");
     } else if (label == "Duplicate object") {
       canvas.document.duplicate_object();

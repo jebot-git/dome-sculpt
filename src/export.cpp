@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "dome/humanoid-creator.hpp"
 #include "io.hpp"
 #include <bit>
+#include <map>
+#include <set>
 #include <nlohmann/json.hpp>
 namespace dome {
 namespace {
@@ -43,6 +46,43 @@ void export_glb(const std::vector<ObjectSurface> &objects,
                               {"type", type}});
     return int(j["accessors"].size()) - 1;
   };
+  std::map<uint64_t, int> group_nodes;
+  std::map<uint64_t, nlohmann::json> group_records;
+  for (const auto &object : objects) {
+    uint64_t parent = 0;
+    std::set<uint64_t> path;
+    for (const auto &g : object.groups) {
+      if (!g.id || g.parent != parent || !path.insert(g.id).second || path.size() > 128 ||
+          g.name.empty() || g.name.size() > 256 || g.name.find('\0') != std::string::npos)
+        throw std::invalid_argument("Invalid export group path");
+      validate_transform(g.transform);
+      auto t = g.transform;
+      nlohmann::json node = {{"name", g.name},
+        {"translation", {t.position.x,t.position.y,t.position.z}},
+        {"rotation", {t.orientation.x,t.orientation.y,t.orientation.z,t.orientation.w}},
+        {"scale", {t.scale,t.scale,t.scale}}};
+      if (g.humanoid) {
+        g.humanoid->validate();
+        node["extras"]["domeSculptCreator"] = {{"type", "humanoid"}, {"version", 1},
+                                               {"controls", g.humanoid->encode()}};
+      }
+      auto record = node;
+      record["parentId"] = parent;
+      if (auto it = group_records.find(g.id); it != group_records.end()) {
+        if (it->second != record) throw std::invalid_argument("Conflicting export group definitions");
+      } else {
+        if (group_nodes.size() >= 128) throw std::length_error("Export group limit exceeded");
+        int index = int(j["nodes"].size());
+        j["nodes"].push_back(std::move(node));
+        group_nodes[g.id] = index;
+        group_records[g.id] = std::move(record);
+        if (parent) j["nodes"][group_nodes.at(parent)]["children"].push_back(index);
+        else j["scenes"][0]["nodes"].push_back(index);
+      }
+      parent = g.id;
+    }
+    validate_transform(object.world_transform());
+  }
   for (auto &o : objects) {
     auto &mesh = o.mesh;
     mesh.validate();
@@ -115,7 +155,8 @@ void export_glb(const std::vector<ObjectSurface> &objects,
         mesh_index = int(j["meshes"].size());
     auto t = o.transform;
     auto &m = o.material;
-    j["scenes"][0]["nodes"].push_back(node);
+    if (o.groups.empty()) j["scenes"][0]["nodes"].push_back(node);
+    else j["nodes"][group_nodes.at(o.groups.back().id)]["children"].push_back(node);
     j["nodes"].push_back(
         {{"name", o.name},
          {"mesh", mesh_index},
@@ -239,6 +280,18 @@ void export_glb(const std::vector<ObjectSurface> &objects,
          {"emissiveFactor", m.emissive},
          {"doubleSided", m.double_sided},
          {"alphaMode", m.color[3] < 1 ? "BLEND" : "OPAQUE"}});
+    auto &encoded = j["materials"].back();
+    if (m.alpha != Material::AlphaMode::Automatic)
+      encoded["alphaMode"] = m.alpha == Material::AlphaMode::Mask ? "MASK" :
+                             m.alpha == Material::AlphaMode::Blend ? "BLEND" : "OPAQUE";
+    if (m.alpha == Material::AlphaMode::Mask) encoded["alphaCutoff"] = m.alpha_cutoff;
+    if (m.unlit) {
+      encoded["extensions"]["KHR_materials_unlit"] = nlohmann::json::object();
+      auto &used = j["extensionsUsed"];
+      if (!used.is_array()) used = nlohmann::json::array();
+      if (std::find(used.begin(), used.end(), "KHR_materials_unlit") == used.end())
+        used.push_back("KHR_materials_unlit");
+    }
   }
   for (size_t i = 0; i < objects.size(); ++i)
     if (objects[i].textures) {
@@ -278,7 +331,8 @@ void export_glb(const std::vector<ObjectSurface> &objects,
         material["normalTexture"] = {{"index", texture(maps.normal)}};
       material["emissiveTexture"] = {{"index", texture(maps.emission)}};
       material["emissiveFactor"] = {1, 1, 1};
-      material["alphaMode"] = maps.transparent ? "BLEND" : "OPAQUE";
+      if (objects[i].material.alpha == Material::AlphaMode::Automatic)
+        material["alphaMode"] = maps.transparent ? "BLEND" : "OPAQUE";
     }
   j["buffers"] = {{{"byteLength", data.size()}}};
   std::string text = j.dump();

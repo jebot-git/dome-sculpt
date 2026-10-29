@@ -9,6 +9,7 @@ uint64_t create_voxel_sculpt(Scene &scene, float world_voxel_mm,
     throw std::invalid_argument("Voxel size must be between 0.01 and 1000 mm");
   scene.validate();
   auto source = scene.active();
+  auto placement = scene.world_transform(source.id);
   if (!source.visible || source.locked)
     throw std::logic_error("Show and unlock the source before voxel remeshing");
   if (scene.objects().size() >= 256)
@@ -29,7 +30,7 @@ uint64_t create_voxel_sculpt(Scene &scene, float world_voxel_mm,
   if (mesh.indices.empty())
     throw std::runtime_error("The source has no surface to remesh");
   VoxelizeOptions options;
-  options.voxel_size = world_voxel_mm * .001f / source.transform.scale;
+  options.voxel_size = world_voxel_mm * .001f / placement.scale;
   options.max_grid_points = 4'000'000 - used;
   options.cancelled = cancelled;
   auto volume = mesh_to_volume(mesh, options);
@@ -39,7 +40,7 @@ uint64_t create_voxel_sculpt(Scene &scene, float world_voxel_mm,
   if (cancelled && cancelled())
     throw std::runtime_error("Voxel remeshing cancelled");
   auto name = source.name.size() <= 250 ? source.name + " voxel" : "Voxel sculpt";
-  auto id = scene.add(std::move(name), std::move(volume), source.transform);
+  auto id = scene.add(std::move(name), std::move(volume), placement);
   scene.object(id).material = source.material;
   scene.object(source.id).visible = false;
   return id;

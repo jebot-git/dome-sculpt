@@ -44,3 +44,11 @@ Wings boundary half-edge classification also informs the native topology maps.
 Official VRM/glTF specifications are normative avatar/export references; no VRM
 schema/code is copied or code license grant inferred. Exact hashes are recorded
 in `docs/AVATAR.md` and `third_party/sources.json`.
+
+MakeHuman authored body/target/rig/weight assets are CC0-1.0. Exact pinned grants,
+original credits and asset hashes are in assets/humanoid. No AGPL application
+code or Python runtime is linked. The native converter is original project code.
+VRoid Studio historical beta Base_Female/Base_Male are explicitly CC0-1.0 and
+retain the original author metadata. Exact original files, SHA256 hashes and
+primary-source grant evidence are in assets/humanoid/vroid/SOURCES.json. Current
+restricted VRoid presets and proprietary application code are not included.

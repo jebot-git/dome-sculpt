@@ -164,8 +164,9 @@ Shared geometry/UV flags and deformation vertex identities remain intact.
 Normal maps are not ordinary RGB paint and must never be copied to changed UV
 orientations without this basis conversion.
 
-Scenes containing baked data use version 5; older v1-v4 projects remain readable,
-and scenes without baked data still use v4. Baked binary image/coverage lengths,
+Scenes containing baked data use version 6; scenes without baked data use v5
+with grouped creator/source archives. Earlier supported scene versions remain
+readable, including the standalone baked-v5 checkpoint from 72d9127. Baked binary image/coverage lengths,
 map dimensions and versions are checked. Per-object maps plus paint tiles share
 a 128 MiB storage cap, the scene has a 256 MiB paint-storage cap plus the existing
 16 Mi texel cap, and the persisted file limit remains 256 MiB. These are storage
@@ -179,12 +180,18 @@ visible, unlocked prepared painting mesh. Hidden/locked sources may be read.
 The high source samples its displayed pose/morph state or scalar-field surface;
 its complete original data remain unchanged. All objects use the target-local
 coordinate system, with front/back/AO bounds expressed in world millimetres and
-converted using target scale. Low targets must currently have unchanged rest
+converted using the composed target world scale, including parent groups. Low targets must currently have unchanged rest
 geometry/normals; posed targets fail explicitly without stripping their rig.
 The bake preserves the target's geometry, deformation, material and paint-layer
 identities and installs only its base maps. Failures, misses, overlaps, stale
 sources and cancellation publish no partial result. One Undo/Redo restores the
-exact editable scene; ordered saves and scene-v5 loading retain the result.
+exact editable scene; ordered saves and scene-v6 loading retain the result.
+
+Raw original source normal views currently fail object baking explicitly until
+their sampler/UV/tangent semantics are integrated. Their original archive data
+remain preserved. Dense native baked normal maps are supported. Changed-UV
+reparameterization of raw source-map objects still requires an explicit bake;
+it must not silently discard their original images or source-authored charts.
 
 The preview consumes worker-generated tangent corners and AO in indirect
 lighting. Render-only corner expansion preserves authoring topology. GLB uses

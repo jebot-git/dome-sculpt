@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Open a generated scene-v5 fixture in real FLTK; paint/undo and cancel UVs."""
+"""Open a generated scene-v6 fixture in real FLTK; paint/undo and cancel UVs."""
 import json, os, signal, subprocess, sys, tempfile, time
 from pathlib import Path
 from Xlib import X, XK, display, error
@@ -75,7 +75,7 @@ try:
             return sum(b>90 and b>r*1.5 and b>g*1.2 for r,g,b in zip(raw[0::3],raw[1::3],raw[2::3]))
         wait(lambda: blue(shot())>1000)
         time.sleep(.3); baseline = shot(); baseline.save(out / "baked-baseline.png")
-        check(blue(baseline)>1000, "FLTK opens a scene-v5 baked sculpt with visible transferred surface paint")
+        check(blue(baseline)>1000, "FLTK opens a scene-v6 baked sculpt with visible transferred surface paint")
         g = window.get_geometry()
         key("Shift_L",True)
         xtest.fake_input(d,X.MotionNotify,x=g.x+550,y=g.y+365); d.sync(); time.sleep(.15)

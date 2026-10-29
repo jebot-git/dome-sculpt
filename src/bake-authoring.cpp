@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
+#include "dome/source-maps.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -31,10 +32,13 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     high.mesh = source.deformation ? source.deformation->preview(source.painted->mesh())
                                    : source.painted->mesh();
     high.materials[0].maps = source.painted->composite(source.material);
+    if (auto original=source.painted->source_maps(); original && original->normal.image && original->normal_scale>0)
+      throw std::logic_error("Baking retained original normal views requires their tangent/sampler integration; source data was retained");
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);
   high.materials[0].material = source.material;
-  auto relative = ob::compose(ob::inverse(target.transform), source.transform);
+  auto target_world = scene.world_transform(target.id);
+  auto relative = ob::compose(ob::inverse(target_world), scene.world_transform(source.id));
   for (auto &p : high.mesh.positions) {
     auto world = ob::transform(relative, {p.x,p.y,p.z});
     p = {world.x,world.y,world.z};
@@ -45,10 +49,10 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   BakeOptions options;
   options.resolution = target.painted->resolution();
-  options.front_distance = settings.front_mm * .001f / target.transform.scale;
-  options.back_distance = settings.back_mm * .001f / target.transform.scale;
-  options.ao_distance = settings.ao_distance_mm * .001f / target.transform.scale;
-  options.ray_bias = .0001f / target.transform.scale;
+  options.front_distance = settings.front_mm * .001f / target_world.scale;
+  options.back_distance = settings.back_mm * .001f / target_world.scale;
+  options.ao_distance = settings.ao_distance_mm * .001f / target_world.scale;
+  options.ray_bias = .0001f / target_world.scale;
   options.ao_samples = settings.ao_samples;
   options.padding = settings.padding;
   options.cancelled = cancelled;
