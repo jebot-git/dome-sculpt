@@ -115,3 +115,21 @@ must be investigated, not weakened. Logs dome-menu-avatars-pinned[-fixed].log.
 The merged source must still build/test before push; current root changes are
 not evidence that the merge is correct. Agents' cache/MToon work is unrelated
 and must not be staged accidentally.
+
+Latest merge verification completed:26abf41 preserved both histories; all30
+Release suites passed77.44s. Fixed only test menu navigation assumptions, not
+application Cut/Close behavior. Latest DomeD7322 host +cf6pinnedclient passes
+all8 real Wayland/universal-menu checks (dome-menu-avatars-pinned-final.log).
+cf6pinned29Release/four whole-core sanitizer suites also passed. Source cache
+b9e48b5 and MToon modulea830193 committed; root now registers their tests and
+license, but actual MToon renderer/export remains work in progress.
+
+Root will create a fresh merged checkpoint worktree and verify it before push.
+Main working tree has separate GPU-preview/groom/export/joint-map changes by
+agents; do not stage them into this checkpoint accidentally. Next root development
+build must include vroid-groom.cpp and copy part.unlit, then coordinate current
+TextureMaps.source_only API/renderer pImpl before rebuilding renderer. Root should
+add Scene::preview_surfaces +Document preview selector when stable; keep export
+surfaces composited. The last pinned source has no raw GPU marker and is valid
+as its own historical baseline. Agent definitions/ongoing scopes remain in team
+messages. Full original goal stays active and incomplete.

@@ -33,7 +33,7 @@ find_package(PNG REQUIRED)
 add_library(xatlas STATIC third_party/xatlas/xatlas.cpp)
 target_include_directories(xatlas PUBLIC third_party/xatlas)
 target_link_libraries(xatlas PRIVATE Threads::Threads)
-add_library(dome-sculpt-core src/volume.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/creator-archive.cpp src/paint.cpp src/projection.cpp src/source-maps.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/input.cpp src/document.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/deformation.cpp src/import.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
+add_library(dome-sculpt-core src/volume.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/creator-archive.cpp src/paint.cpp src/projection.cpp src/source-maps.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/input.cpp src/document.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/deformation.cpp src/import.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)
 target_compile_definitions(dome-sculpt-core PRIVATE
@@ -150,10 +150,10 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING)
-  foreach(component mesh-import mesh-processing document-recovery document-assets voxel-authoring deformation retopo remesh bake groups humanoid-creator projection source-maps vroid-creator creator-archive source-uv)
+  foreach(component mesh-import mesh-processing document-recovery document-assets voxel-authoring deformation retopo remesh bake groups humanoid-creator projection source-maps vroid-creator creator-archive source-uv composite-cache mtoon)
     add_executable(dome-sculpt-${component}-test tests/${component}.cpp)
     target_link_libraries(dome-sculpt-${component}-test PRIVATE dome-sculpt-core)
-    if(component STREQUAL "source-maps" OR component STREQUAL "source-uv" OR component STREQUAL "creator-archive")
+    if(component STREQUAL "source-maps" OR component STREQUAL "source-uv" OR component STREQUAL "creator-archive" OR component STREQUAL "composite-cache" OR component STREQUAL "mtoon")
       add_test(NAME ${component} COMMAND dome-sculpt-${component}-test
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
@@ -170,3 +170,13 @@ if(BUILD_TESTING)
 endif()
 
 install(DIRECTORY assets/humanoid DESTINATION ${CMAKE_INSTALL_DATADIR}/dome-sculpt/assets)
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-mtoon-gpu-test tests/mtoon.cpp)
+  target_compile_definitions(dome-sculpt-mtoon-gpu-test PRIVATE DOME_MTOON_GPU=1)
+  target_link_libraries(dome-sculpt-mtoon-gpu-test PRIVATE dome-sculpt-render)
+  add_test(NAME mtoon-gpu COMMAND dome-sculpt-mtoon-gpu-test
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
+endif()
+install(FILES docs/MTOON-LICENSE.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/dome-sculpt)

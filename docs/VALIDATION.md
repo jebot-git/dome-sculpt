@@ -1,3 +1,25 @@
+# Merged avatar/UV/voxel verification — 2026-10-29
+
+Pinned cf6d6b3 passed29/29 optimized suites in126.78s and four whole-core
+ASan/UBSan/leak suites in55.35s (groups with real avatars/controller actions,
+source UV, creator archive and independent glTF). Logs: tests-avatars-pinned.log
+and tests-avatars-pinned-sanitize.log. Native universal menu42/42 passed.
+
+After preserving remote0c266de UV/voxel/wakeup work, combined30/30 Release
+checks passed in77.44s (tests-avatar-merge.log). XR pages9Avatars/10Mesh tools
+are distinct and source voxel output composes group world placement.
+
+Latest clean DomeD7322b0e Release build uses unchanged canonical22-patch FLTK.
+Private Wayland/universal-menu8/8 passed with pinned cf6client and latest host
+(dome-menu-avatars-pinned-final.log). Initial test assumptions broke because
+new menu items shifted rows and Right enters submenus. The harness now chooses
+actual exported rows, navigates headers with Left and explicitly selects Close;
+all original Cut/Undo/modal/desktop-routing checks remain.
+
+Cache and MToon component targets are newly registered with actual baseline
+arguments. They have their own component checks; full exact merged checkpoint
+verification is next, with no full MToon/VRM/device/backend completion claim.
+
 # Actual CC0 grouped avatar integration — 2026-10-29
 
 All28 Release suites passed in56.86s (`artifacts/tests-avatar-controls.log`),

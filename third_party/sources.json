@@ -206,5 +206,15 @@
     "used": "Primary female/male native humanoid baselines, complete original source bytes and full-resolution images retained for native authoring/persistence. Current non-CC0 presets are not used. No proprietary VRoid runtime.",
     "manifest": "assets/humanoid/vroid/SOURCES.json",
     "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
+  },
+  "domed_latest_check": {
+    "commit": "7322b0eea5d63f8f32dd68a0983a55dc5c8b81b3",
+    "fltk_patch_changes_since_742d009": false,
+    "used": "Fresh clean Release compositor build and private nested Wayland/universal-menu verification; existing22-patch toolkit unchanged."
+  },
+  "mtoon": {
+    "implementation": "src/mtoon.cpp; include/dome/mtoon-shader.hpp",
+    "license": "MIT with original Masataka SUMI and VRM Consortium notices",
+    "used": "Native MToon0/1 typed materials and GLSL module; renderer/VRM integration in progress, not claimed complete. Exact primary references/commit/file hashes in docs/MTOON.md and retained notice docs/MTOON-LICENSE.txt."
   }
 }

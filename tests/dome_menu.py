@@ -12,7 +12,7 @@ from PIL import Image
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
 if os.environ.get("DOME_SCULPT_DOME_BUS") != "1":
     os.execvpe("dbus-run-session", ["dbus-run-session", "--", sys.executable, *sys.argv], {**os.environ,"DOME_SCULPT_DOME_BUS":"1"})
-root=Path(__file__).resolve().parents[1]
+root=Path(os.environ.get("DOME_SCULPT_TEST_ROOT",Path(__file__).resolve().parents[1]))
 compositor=Path(os.environ.get("DOME_COMPOSITOR",root.parent/"dome-compositor/target/release/dome-compositor"))
 out=root/"artifacts/dome-menu";out.mkdir(parents=True,exist_ok=True)
 icd=Path(os.environ["DOME_TEST_VULKAN_ICD"]) if "DOME_TEST_VULKAN_ICD" in os.environ else next((p for p in [Path("/usr/share/vulkan/icd.d/lvp_icd.json"),Path("/usr/share/vulkan/icd.d/lvp_icd."+platform.machine()+".json")] if p.is_file()),None)
@@ -92,16 +92,29 @@ async def main():
             nodes=await layout();await menu.call_event(nodes[label][0],"clicked",Variant("i",0),0);await asyncio.sleep(.5)
         async def header(index):
             await chord("Super_L","F10")
-            for _ in range(index):await key("Right")
+            # Right descends into a selected submenu (e.g. File/Recovery).
+            # Left at the root always changes headers, including behind modals.
+            top=await menu.call_get_layout(0,1,[])
+            count=len(top[1][2])+3 # System, application and shell Window.
+            for _ in range((count-index)%count):await key("Left")
             await asyncio.sleep(.2)
         async def first(index,down=0):
             await header(index);await key("Home")
             for _ in range(down):await key("Down")
             await key("Return");await asyncio.sleep(.5)
-        await first(6,2) # System / application / File / Edit / View / Sculpt / Scene
+        async def native_command(heading,index,label):
+            nodes=await layout()
+            subtree=await menu.call_get_layout(nodes[heading][0],1,[])
+            rows=[]
+            for child in subtree[1][2]:
+                ident,props,_=child.value
+                values={k:v.value for k,v in props.items()}
+                if values.get("type")!="separator" and values.get("enabled",True):rows.append(ident)
+            await first(index,rows.index(nodes[label][0]))
+        await native_command("Scene",6,"Duplicate object")
         nodes=await layout()
         check(nodes["Delete object"][1].get("enabled") is True,"DomeD Super+F10 and header/row navigation activate the actual exported Duplicate command")
-        await first(6,8)
+        await native_command("Scene",6,"Object and material...")
         dialog=await wait(lambda:named("Object and material"))
         check(dialog["app_id"]==window["app_id"] and scene()["focused"]==dialog["id"],"DomeD focuses the native parameter dialog as part of the same application")
         (out/"dialog.json").write_text(json.dumps(scene(),indent=2))
@@ -117,7 +130,7 @@ async def main():
         await first(3) # Now Undo is enabled before Cut/Copy.
         nodes=await layout()
         check(nodes["Select All"][1].get("enabled") is True,"Universal Edit Undo restores dialog text through the real compositor")
-        await first(2) # File contains only enabled Close Window while modal.
+        await native_command("File",2,"Close Window")
         await wait(lambda:named("Object and material") is None)
         check(client.poll() is None,"The compositor's universal File Close cancels the modal dialog and retains the sculpt document")
         await header(9) # Shell-owned Window follows the application's seven exported menus.
