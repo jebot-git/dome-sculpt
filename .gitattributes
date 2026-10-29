@@ -1,3 +1,4 @@
 # Keep the pinned upstream references and license byte-for-byte, including their
 # original whitespace. Authored project sources retain normal whitespace checks.
 third_party/wings/* -whitespace
+third_party/mikktspace/* -whitespace

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/tangents.hpp"
 #include <unistd.h>
 #include <utility>
 namespace dome {
@@ -987,6 +988,23 @@ void Document::mesh_loop() {
         if (o.deformation) o.mesh = o.preview_mesh();
         size_t offset = snapshot->mesh.positions.size(),
                first = snapshot->mesh.indices.size();
+        if (o.textures && !o.textures->normal.rgba.empty()) {
+          auto frames = tangent_corners(o.mesh, [&] { return stopping_.load(); });
+          // Render-only corner expansion preserves authoring/rest vertex IDs,
+          // skin weights and morph topology, including mirrored tangent seams.
+          for (size_t c = 0; c < o.mesh.indices.size(); ++c) {
+            auto v = o.mesh.indices[c];
+            snapshot->mesh.positions.push_back(vec(ob::transform(o.transform, obv(o.mesh.positions[v]))));
+            snapshot->mesh.normals.push_back(vec(ob::rotate(o.transform.orientation, obv(o.mesh.normals[v]))));
+            snapshot->mesh.uv.push_back(o.mesh.uv[v]);
+            auto t = frames[c];
+            auto direction = vec(ob::rotate(o.transform.orientation, obv({t[0],t[1],t[2]})));
+            snapshot->tangents.push_back({direction.x,direction.y,direction.z,t[3]});
+            snapshot->mesh.indices.push_back(uint32_t(offset+c));
+          }
+          snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures});
+          continue;
+        }
         for (auto p : o.mesh.positions)
           snapshot->mesh.positions.push_back(
               vec(ob::transform(o.transform, obv(p))));
@@ -1000,6 +1018,7 @@ void Document::mesh_loop() {
                                    o.mesh.uv.end());
         for (auto index : o.mesh.indices)
           snapshot->mesh.indices.push_back(uint32_t(offset + index));
+        snapshot->tangents.resize(snapshot->mesh.positions.size(), {1,0,0,1});
         snapshot->ranges.push_back(
             {o.id, first, o.mesh.indices.size(), o.material, o.textures});
       }

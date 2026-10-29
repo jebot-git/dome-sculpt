@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdf_font.hpp"
 #include "dome/palette.hpp"
+#include "dome/bake.hpp"
 #include "graphics.h"
 #include <fstream>
 #include <iostream>
@@ -209,6 +210,55 @@ int main(int argc, char **argv) try {
   renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
   if (capture("paint-undo") != frozen)
     throw std::runtime_error("Paint undo did not restore exact GPU pixels");
+  Mesh low;
+  low.positions={{-.6f,-.4f,0},{.6f,-.4f,0},{.6f,.4f,0},{-.6f,.4f,0}};
+  low.normals={normalized({-.6f,0,.8f}),normalized({.6f,0,.8f}),
+                normalized({.6f,.5f,.6f}),normalized({-.6f,.5f,.6f})};
+  low.uv={{{.125f,.125f}},{{.875f,.125f}},{{.875f,.875f}},{{.125f,.875f}}};
+  low.indices={0,1,2,0,2,3};
+  BakeSource high;high.mesh=low;high.mesh.normals.assign(4,normalized({0,.7f,.714f}));
+  high.materials[0].material.color={.5f,.5f,.5f,1};
+  BakeOptions bake;bake.resolution=64;bake.padding=4;bake.ao_samples=0;
+  auto result=bake_mesh(low,high,bake);
+  BakedTextures baked;baked.maps=std::move(result.maps);baked.maps.normal=std::move(result.normal);
+  for(auto c:result.coverage)baked.coverage.push_back(c==1||c==2?255:0);
+  Scene surface;surface.active().material=high.materials[0].material;
+  surface.active().mesh_active=true;surface.active().painted=std::make_shared<PaintedMesh>(low,64);
+  Document detailed;detailed.replace(surface);
+  if(!detailed.wait_mesh())throw std::runtime_error("No curved-normal test surface");
+  renderer.draw(detailed.frame().surface,model,vp,{},640,480);
+  auto geometric=capture("bake-geometric");
+  surface.active().painted->install_bake(std::move(baked));detailed.replace(surface);
+  if(!detailed.wait_mesh())throw std::runtime_error("No normal-mapped tangent snapshot");
+  renderer.draw(detailed.frame().surface,model,vp,{},640,480);
+  auto mapped=capture("bake-normal");
+  surface.active().painted=std::make_shared<PaintedMesh>(high.mesh,64);detailed.replace(surface);
+  if(!detailed.wait_mesh())throw std::runtime_error("No reference shading surface");
+  renderer.draw(detailed.frame().surface,model,vp,{},640,480);
+  auto reference=capture("bake-reference");
+  size_t errors=0,normal_change=0;
+  for(int y=210;y<270;++y)for(int x=270;x<370;++x)for(int c=0;c<3;++c){
+    size_t at=(size_t(y)*640+x)*3+c;
+    errors+=std::abs(int(mapped[at])-int(reference[at]));
+    normal_change+=std::abs(int(mapped[at])-int(geometric[at]));
+  }
+  if(errors>60*100*3*3 || normal_change<60*100*3*3)
+    throw std::runtime_error("Baked MikkTSpace normal does not reconstruct the reference GPU shading");
+  std::cout<<"PASS Canonical MikkTSpace baking reconstructs reference shading through real GPU tangent interpolation\n";
+  BakedTextures occluded;occluded.maps=*surface.active().painted->composite(surface.active().material);
+  occluded.coverage.assign(64*64,255);
+  for(size_t i=0;i<occluded.maps.metal_rough.rgba.size();i+=4)occluded.maps.metal_rough.rgba[i]=0;
+  surface.active().painted->install_bake(std::move(occluded));detailed.replace(surface);
+  if(!detailed.wait_mesh())throw std::runtime_error("No AO shading surface");
+  renderer.draw(detailed.frame().surface,model,vp,{},640,480);
+  auto shadow=capture("bake-ao");size_t ambient_change=0;
+  for(int y=210;y<270;++y)for(int x=270;x<370;++x)for(int c=0;c<3;++c){
+    size_t at=(size_t(y)*640+x)*3+c;
+    if(shadow[at]>reference[at])throw std::runtime_error("AO increased indirect surface lighting");
+    ambient_change+=reference[at]-shadow[at];
+  }
+  if(ambient_change<60*100*3)throw std::runtime_error("Baked AO is absent from GPU indirect shading");
+  std::cout<<"PASS Baked occlusion attenuates indirect GPU shading through the ORM red channel\n";
   glDeleteRenderbuffers(1, &depth);
   glDeleteTextures(1, &color);
   glDeleteFramebuffers(1, &fbo);

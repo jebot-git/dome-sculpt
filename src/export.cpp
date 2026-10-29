@@ -271,7 +271,11 @@ void export_glb(const std::vector<ObjectSurface> &objects,
       pbr["metallicFactor"] = 1;
       pbr["roughnessFactor"] = 1;
       pbr["baseColorTexture"] = {{"index", texture(maps.color)}};
-      pbr["metallicRoughnessTexture"] = {{"index", texture(maps.metal_rough)}};
+      int orm = texture(maps.metal_rough);
+      pbr["metallicRoughnessTexture"] = {{"index", orm}};
+      material["occlusionTexture"] = {{"index", orm}};
+      if (!maps.normal.rgba.empty() || maps.normal.width || maps.normal.height)
+        material["normalTexture"] = {{"index", texture(maps.normal)}};
       material["emissiveTexture"] = {{"index", texture(maps.emission)}};
       material["emissiveFactor"] = {1, 1, 1};
       material["alphaMode"] = maps.transparent ? "BLEND" : "OPAQUE";

@@ -15,6 +15,15 @@ struct Image {
 struct TextureMaps {
   Image color, metal_rough, emission;
   bool transparent = false;
+  Image normal; // Optional linear +Y tangent-space map. Empty means no detail.
+};
+struct BakedTextures {
+  TextureMaps maps;
+  // Linear coverage below editable paint layers: 0 intrinsic material,
+  // 255 baked surface. Fractional values retain filtered UV boundary coverage.
+  std::vector<uint8_t> coverage;
+  void validate(uint32_t resolution) const;
+  size_t storage_bytes() const;
 };
 enum class PaintChannel : int { Color, Metallic, Roughness, Emission, Mask };
 struct PaintSettings {
@@ -69,6 +78,10 @@ public:
   std::shared_ptr<PaintedMesh>
   reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
   std::shared_ptr<const TextureMaps> composite(const Material &) const;
+  std::shared_ptr<const BakedTextures> baked() const { return baked_; }
+  void install_bake(BakedTextures);
+  void clear_bake();
+  size_t storage_bytes() const;
   const PaintPixel &pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   std::optional<Vec3> raycast(Vec3, Vec3, float maximum = 20) const;
   Vec3 normal(Vec3) const;
@@ -80,6 +93,7 @@ private:
   struct SurfaceMap;
   std::shared_ptr<const SurfaceMap> surface_;
   std::vector<PaintLayer> layers_;
+  std::shared_ptr<const BakedTextures> baked_;
   uint64_t active_ = 1, next_ = 2, revision_ = 1;
   bool editing_ = false;
   using Tiles = std::vector<std::shared_ptr<const PaintTile>>;

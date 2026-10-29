@@ -162,6 +162,31 @@ int main() try {
             "Embedded PNG preserves exact PBR texels and image orientation");
     png_image_free(&decoded);
   }
+  auto detailed_maps = std::make_shared<dome::TextureMaps>(*maps);
+  detailed_maps->normal = {128,128,std::vector<uint8_t>(128*128*4)};
+  for (size_t i=0;i<detailed_maps->normal.rgba.size();++i)
+    detailed_maps->normal.rgba[i]=std::array<uint8_t,4>{128,204,230,255}[i%4];
+  objects[0].textures=detailed_maps;
+  dome::export_glb(objects,path);
+  raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts normal/AO baked GLB");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> detailed(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success && raw->images_count==4 &&
+          raw->materials[0].normal_texture.texture &&
+          raw->materials[0].occlusion_texture.texture==raw->materials[0].pbr_metallic_roughness.metallic_roughness_texture.texture,
+          "glTF exports a tangent normal map and binds AO to the shared linear ORM red channel");
+  auto image=raw->materials[0].normal_texture.texture->image;
+  auto view=image->buffer_view;
+  auto normal_data=static_cast<const uint8_t*>(view->buffer->data)+view->offset;
+  png_image normal{};normal.version=PNG_IMAGE_VERSION;
+  require(png_image_begin_read_from_memory(&normal,normal_data,view->size),"Independent PNG decoder reads the normal map");
+  normal.format=PNG_FORMAT_RGBA;std::vector<uint8_t> normal_bytes(PNG_IMAGE_SIZE(normal));
+  require(png_image_finish_read(&normal,nullptr,normal_bytes.data(),0,nullptr) &&
+          normal_bytes==detailed_maps->normal.rgba,
+          "Normal-map PNG bytes preserve linear XYZ values without an sRGB conversion");
+  png_image_free(&normal);
 
   // Full deformation is exported from the untouched authoring surface, never
   // from the already posed preview. Five influences require a second set.
@@ -276,7 +301,8 @@ int main() try {
                        transform(object_world, preview.positions[0])) < 2e-5f,
           "Independent glTF skin/morph evaluation matches native posed preview "
           "under object rotation/scale");
-  require(raw->images_count == 3, "Rig export retains painted PBR images");
+  require(raw->images_count == 4 && raw->materials[0].normal_texture.texture,
+          "Rig export retains painted PBR and normal images");
   if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
     std::filesystem::copy_file(
         path, std::string(fixture) + ".skin.glb",

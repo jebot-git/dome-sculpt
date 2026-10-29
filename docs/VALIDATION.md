@@ -1,3 +1,75 @@
+# Persistent baked maps and guarded object transfer — 2026-10-29
+
+This stage adds immutable baked color/alpha, ORM/AO, emission and +Y normal maps
+beneath editable paint, scene-v5 persistence, UV normal reorientation, preview/
+GLB bindings and a guarded native object-bake API. Full FLTK/XR bake controls,
+production performance and the larger objective remain unfinished (HANDOFF.md).
+
+Final source evidence after the Mikk seed correction:
+
+- All 24 existing Release CTests passed in 259.98 seconds:
+  artifacts/tests-bake-maps-verified.log. This includes UV/input/paint/scene/
+  workers/recovery/rig/avatar/retopo/remesh/bake, independent GLB/PNG and actual
+  software OpenGL checks. The real-loader XR report has 53 assertions, zero
+  failures, complete=true and status=passed.
+- The subsequently added end-to-end native workflow CTest passes separately
+  in 8.93 seconds: artifacts/tests-bake-workflow-verified.log. Thus all 25
+  registered Release suites passed across these two runs. Its retained-project
+  invocation also passes: artifacts/tests-bake-workflow-final.log and
+  artifacts/bake-workflow/{before-bake,baked-workflow}.dsculpt plus GLB.
+- All six selected whole-core ASan/UBSan/leak suites passed in 165.24 seconds:
+  artifacts/tests-bake-maps-sanitize-verified.log. These instrument both C and
+  C++, including MikkTSpace, and cover UV, painting, BVH, document assets,
+  baking and baked textures. The new full workflow separately passes in
+  80.36 seconds: artifacts/tests-bake-workflow-sanitize-final.log.
+- Existing native GUI 23/23 and universal-menu 50/50 pass:
+  artifacts/gui-bake-maps-final.log and artifacts/menu-bake-maps-final.log.
+  A new real FLTK v5 fixture passes 5/5 on the final baked workflow asset:
+  artifacts/gui-baked-surface-final.log. It opens transferred paint, paints over
+  the base, undoes to exact GPU pixels, and opens/cancels an owned UV modal
+  without losing the normal-mapped preview. Its report resets and records
+  running/complete/failure, so startup failures cannot leave a stale pass.
+
+The native workflow uses an actual painted sculpt, a retained-source 60 mm
+voxel conversion, a new 512px atlas and the object-bake worker. It verifies
+exact high-source and target-layer retention, unchanged low field/identity,
+one scene Undo/Redo, v5 reopening, visible-target GLB export and render-ready
+worker tangent corners. This validates the data/API path, not unfinished bake
+menus or physical controller interaction with them.
+
+New focused fixtures verify per-corner mirrored Mikk frames, inversion of
+interpolated curved-normal T/B/N, normal orientation after UV rotation, masked
+linear-light rebaking, immutable snapshots, malformed buffers/schema rejection,
+world/object transforms, hidden posed high sources, unchanged target rig/paint,
+bounded projection failure, cancellation and ordered save. Actual GPU tests
+reconstruct reference high-normal shading and attenuate indirect light through
+ORM AO. Independent cgltf/PNG checks verify normal/occlusion bindings, linear
+normal bytes and retained rig/morph images. No fresh external Khronos validation run is claimed by this stage.
+
+The integration exposed two real numeric issues. Oblique curved-normal rays
+missed a few shared-edge triangles; the pinned Blender 5.4 watertight shear/edge
+method with double intermediates fixes the gaps while rejecting truly outside
+rays. Fully instrumenting Mikk's C source then exposed upstream shifts by 32
+in both quicksort seed rotations. The marked two-line correction defines zero
+rotations; original/patched hashes and a reproducible patch are recorded. The
+initial failed sanitizer log (tests-bake-maps-sanitize.log) is diagnostic evidence,
+not a pass. The final six-suite run above passes with halt-on-error enabled.
+
+Initial fixture setup also needed correction: keeping a normal map in the rig
+GLB correctly increased the expected image count to four, and one falloff stamp
+was insufficient to create the intended blue source. The workflow now uses
+real flow buildup and asserts blue source paint before testing transfer. Its
+strong destination assertion remains. The first GUI attempt used the weak
+source fixture and timed out; the corrected retained v5 fixture passes.
+
+Thirty vendored SHA256 values and clean application of the Mikk patch to the
+recorded upstream source were verified. Source/license roles remain in
+third_party/sources.json. Canonical FLTK linkage has no Qt/GTK/Pango:
+artifacts/linkage-bake-maps-final.log. Runtime remains native C++20/FLTK/EGL/
+OpenXR/BDF; Python is optional test orchestration only. CPU/software GL and
+synthetic XR do not prove physical hardware, accelerator, production-size
+memory or cancellation latency. No system installation/session restart occurred.
+
 # Voxel desktop/XR verification — 2026-10-29
 
 This follow-up extends c27dadf with a responsive FLTK modal, real mouse-wheel

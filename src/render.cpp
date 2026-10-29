@@ -63,11 +63,11 @@ GLuint shader(GLenum kind, const char *text) {
 } // namespace
 SurfaceRenderer::SurfaceRenderer() {
   const char *vertex = R"(#version 330 core
-layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;
-uniform mat4 model,mvp;out vec3 world,n;out vec2 texcoord;
-void main(){vec4 p=model*vec4(position,1);world=p.xyz;texcoord=uv;n=normalize(mat3(model)*normal);gl_Position=mvp*vec4(position,1);})";
+layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec4 tangent;
+uniform mat4 model,mvp;out vec3 world,n,t,b;out vec2 texcoord;
+void main(){vec4 p=model*vec4(position,1);world=p.xyz;texcoord=uv;n=normalize(mat3(model)*normal);t=normalize(mat3(model)*tangent.xyz);b=cross(n,t)*tangent.w;gl_Position=mvp*vec4(position,1);})";
   const char *fragment = R"(#version 330 core
-in vec3 world,n;in vec2 texcoord;out vec4 color;uniform vec3 camera;uniform int toon;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int has_maps;uniform sampler2D color_map,orm_map,emission_map;
+in vec3 world,n,t,b;in vec2 texcoord;out vec4 color;uniform vec3 camera;uniform int toon;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int has_maps,has_normal;uniform sampler2D color_map,orm_map,emission_map,normal_map;
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
 vec3 H=normalize(V+L);float NV=max(dot(N,V),0.0001),NL=max(dot(N,L),0.0),NH=max(dot(N,H),0.0),VH=max(dot(V,H),0.0);
@@ -75,9 +75,9 @@ float rough=max(.04,roughness),a=rough*rough,a2=a*a;
 float d=a2/(PI*pow(NH*NH*(a2-1.0)+1.0,2.0));float k=pow(rough+1.0,2.0)/8.0;
 float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F0=mix(vec3(.04),base,metallic);vec3 F=F0+(1.0-F0)*pow(1.0-VH,5.0);
 return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
-void main(){vec4 base=base_color;float metal=metallic,rough=roughness;vec3 glow=emission;if(has_maps==1){base*=texture(color_map,texcoord);vec3 orm=texture(orm_map,texcoord).rgb;metal*=orm.b;rough*=orm.g;glow*=texture(emission_map,texcoord).rgb;}vec3 N=normalize(n)*(gl_FrontFacing?1.0:-1.0),V=normalize(camera-world),result;
-if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base.rgb*ramp*edge+vec3(.025);}
-else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb;
+void main(){vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;if(has_maps==1){base*=texture(color_map,texcoord);vec3 orm=texture(orm_map,texcoord).rgb;metal*=orm.b;rough*=orm.g;ao=orm.r;glow*=texture(emission_map,texcoord).rgb;}vec3 N=normalize(n);if(has_normal==1){vec3 detail=texture(normal_map,texcoord).rgb*2.0-1.0;N=normalize(t*detail.x+b*detail.y+n*detail.z);}N*=gl_FrontFacing?1.0:-1.0;vec3 V=normalize(camera-world),result;
+if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32*ao,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base.rgb*ramp*edge+vec3(.025);}
+else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb*ao;
 result+=glow;result=result/(result+vec3(1));color=vec4(pow(result,vec3(1.0/2.2)),base.a);})";
   GLuint vs = shader(GL_VERTEX_SHADER, vertex),
          fs = shader(GL_FRAGMENT_SHADER, fragment);
@@ -97,7 +97,7 @@ result+=glow;result=result/(result+vec3(1));color=vec4(pow(result,vec3(1.0/2.2))
 }
 SurfaceRenderer::~SurfaceRenderer() {
   for (auto &[id, textures] : textures_)
-    glDeleteTextures(3, textures.data());
+    glDeleteTextures(4, textures.data());
   glDeleteBuffers(1, &indices_);
   glDeleteBuffers(1, &vertices_);
   glDeleteVertexArrays(1, &vao_);
@@ -120,13 +120,15 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     struct Vertex {
       Vec3 p, n;
       std::array<float, 2> uv;
+      std::array<float, 4> tangent;
     };
     std::vector<Vertex> v;
     v.reserve(mesh->mesh.positions.size());
     for (size_t i = 0; i < mesh->mesh.positions.size(); ++i)
       v.push_back(
           {mesh->mesh.positions[i], mesh->mesh.normals[i],
-           mesh->mesh.uv.empty() ? std::array<float, 2>{} : mesh->mesh.uv[i]});
+           mesh->mesh.uv.empty() ? std::array<float, 2>{} : mesh->mesh.uv[i],
+           mesh->tangents.empty() ? std::array<float,4>{1,0,0,1} : mesh->tangents.at(i)});
     glBindVertexArray(vao_);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_);
     glBufferData(GL_ARRAY_BUFFER, v.size() * sizeof(Vertex), v.data(),
@@ -139,26 +141,32 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           reinterpret_cast<void *>(offsetof(Vertex, uv)));
     glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          reinterpret_cast<void *>(offsetof(Vertex, tangent)));
+    glEnableVertexAttribArray(3);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  mesh->mesh.indices.size() * sizeof(uint32_t),
                  mesh->mesh.indices.data(), GL_STATIC_DRAW);
     count_ = mesh->mesh.indices.size();
     for (auto &[id, textures] : textures_)
-      glDeleteTextures(3, textures.data());
+      glDeleteTextures(4, textures.data());
     textures_.clear();
     for (auto &r : mesh->ranges)
       if (r.textures) {
         auto &ids = textures_[r.object];
-        glGenTextures(3, ids.data());
+        glGenTextures(4, ids.data());
         const Image *images[] = {&r.textures->color, &r.textures->metal_rough,
-                                 &r.textures->emission};
+                                 &r.textures->emission, &r.textures->normal};
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 4; ++i) {
+          if (i == 3 && images[i]->rgba.empty() && !images[i]->width && !images[i]->height) continue;
           images[i]->validate();
+          if (i == 3 && mesh->tangents.size() != mesh->mesh.positions.size())
+            throw std::invalid_argument("Normal-mapped snapshots require worker-generated tangent corners");
           glActiveTexture(GL_TEXTURE0 + i);
           glBindTexture(GL_TEXTURE_2D, ids[i]);
-          glTexImage2D(GL_TEXTURE_2D, 0, i == 1 ? GL_RGBA8 : GL_SRGB8_ALPHA8,
+          glTexImage2D(GL_TEXTURE_2D, 0, (i == 1 || i == 3) ? GL_RGBA8 : GL_SRGB8_ALPHA8,
                        images[i]->width, images[i]->height, 0, GL_RGBA,
                        GL_UNSIGNED_BYTE, images[i]->rgba.data());
           glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -186,12 +194,14 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       material.metallic = material.roughness = 1;
       material.emissive = {1, 1, 1};
       auto &ids = textures_.at(id);
-      for (int i = 0; i < 3; ++i) {
+      for (int i = 0; i < 4; ++i) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, ids[i]);
       }
     }
     glUniform1i(glGetUniformLocation(program_, "has_maps"), maps ? 1 : 0);
+    glUniform1i(glGetUniformLocation(program_, "has_normal"), maps && !maps->normal.rgba.empty() ? 1 : 0);
+    glUniform1i(glGetUniformLocation(program_, "normal_map"), 3);
     glUniform1i(glGetUniformLocation(program_, "color_map"), 0);
     glUniform1i(glGetUniformLocation(program_, "orm_map"), 1);
     glUniform1i(glGetUniformLocation(program_, "emission_map"), 2);

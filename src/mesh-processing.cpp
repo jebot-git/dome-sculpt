@@ -104,7 +104,7 @@ struct Bounds {
           return false;
         continue;
       }
-      double a = (ls[k] - ps[k]) / ds[k], b = (hs[k] - ps[k]) / ds[k];
+      double a = (double(ls[k]) - ps[k]) / ds[k], b = (double(hs[k]) - ps[k]) / ds[k];
       if (a > b)
         std::swap(a, b);
       lo_t = std::max(lo_t, a);
@@ -112,6 +112,39 @@ struct Bounds {
       if (lo_t > hi_t)
         return false;
     }
+    return true;
+  }
+};
+// Dominant-axis shear/edge tests adapted from Blender 5.4 Alpha's
+// isect_ray_tri_watertight_v3[_precalc] (GPL-2.0-or-later), pinned in
+// third_party/blender/math_geom.cc.reference. Double intermediates retain
+// identical shared-edge expressions, avoiding holes between adjacent faces.
+struct SurfaceRay {
+  Vec3 origin;
+  int x, y, z;
+  double sx, sy, sz;
+  SurfaceRay(Vec3 p, Vec3 direction) : origin(p) {
+    float d[] = {direction.x,direction.y,direction.z};
+    z = std::abs(d[0]) > std::abs(d[1]) ? 0 : 1;
+    if (std::abs(d[2]) > std::abs(d[z])) z = 2;
+    x = (z+1)%3; y = (x+1)%3;
+    if (d[z] < 0) std::swap(x,y);
+    sz = 1. / d[z]; sx = d[x]*sz; sy = d[y]*sz;
+  }
+  bool hit(Vec3 a, Vec3 b, Vec3 c, double maximum, double &distance,
+            std::array<float,3> &bary) const {
+    auto shear = [&](Vec3 v) {
+      double p[] = {double(v.x)-origin.x,double(v.y)-origin.y,double(v.z)-origin.z};
+      return std::array<double,3>{p[x]-sx*p[z],p[y]-sy*p[z],p[z]};
+    };
+    auto av=shear(a),bv=shear(b),cv=shear(c);
+    double u=cv[0]*bv[1]-cv[1]*bv[0], v=av[0]*cv[1]-av[1]*cv[0],
+           w=bv[0]*av[1]-bv[1]*av[0], det=u+v+w;
+    if (((u<0 || v<0 || w<0) && (u>0 || v>0 || w>0)) || !det || !std::isfinite(det))
+      return false;
+    distance=(u*av[2]+v*bv[2]+w*cv[2])*sz/det;
+    if (!std::isfinite(distance) || distance < 0 || distance > maximum) return false;
+    bary={float(u/det),float(v/det),float(w/det)};
     return true;
   }
 };
@@ -249,33 +282,25 @@ struct Bvh {
     best = closest_hit(p, a, best, triangle, position, options, visited);
     return closest_hit(p, b, best, triangle, position, options, visited);
   }
-  void ray_hit(Vec3 p, Vec3 d, int n, double &best, uint32_t &triangle,
+  void ray_hit(Vec3 p, Vec3 d, const SurfaceRay &ray, int n, double &best, uint32_t &triangle,
                std::array<float, 3> &bary) const {
     auto &node = nodes[n];
     if (!node.box.ray(p, d))
       return;
     if (node.left >= 0) {
-      ray_hit(p, d, node.left, best, triangle, bary);
-      ray_hit(p, d, node.right, best, triangle, bary);
+      ray_hit(p, d, ray, node.left, best, triangle, bary);
+      ray_hit(p, d, ray, node.right, best, triangle, bary);
       return;
     }
     for (size_t i = node.start; i < node.start + node.count; i++) {
       auto t = order[i];
-      auto a = point(t, 0), e1 = point(t, 1) - a, e2 = point(t, 2) - a,
-           h = cross(d, e2);
-      double det = dot(e1, h),
-             scale = std::sqrt(double(dot(e1, e1)) * dot(e2, e2));
-      if (std::abs(det) < 1e-10 * scale)
-        continue;
-      double inv = 1 / det;
-      auto s = p - a, q = cross(s, e1);
-      double u = dot(s, h) * inv, v = dot(d, q) * inv,
-             distance = dot(e2, q) * inv;
-      if (u < 0 || v < 0 || u + v > 1 || distance < 0 || distance > best)
+      double distance;
+      std::array<float,3> coordinates;
+      if (!ray.hit(point(t,0),point(t,1),point(t,2),best,distance,coordinates))
         continue;
       best = distance;
       triangle = t;
-      bary = {float(1 - u - v), float(u), float(v)};
+      bary = coordinates;
     }
   }
   void intersections(Vec3 p, Vec3 d, int n, std::vector<double> &hits,
@@ -410,7 +435,7 @@ std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,
   double best = maximum;
   uint32_t triangle = UINT32_MAX;
   std::array<float, 3> bary{};
-  impl_->tree.ray_hit(origin, direction, 0, best, triangle, bary);
+  impl_->tree.ray_hit(origin, direction, SurfaceRay(origin,direction), 0, best, triangle, bary);
   if (triangle == UINT32_MAX)
     return {};
   return impl_->hit(triangle, origin + direction * float(best), bary,

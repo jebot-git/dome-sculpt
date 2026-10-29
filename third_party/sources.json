@@ -4,7 +4,7 @@
     "commit": "3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2",
     "version": "5.4.0 Alpha",
     "version_evidence": "third_party/blender/BKE_blender_version.h",
-    "used": "Sphere/hyperbola trackball projection adapted from calctrackballvec in view3d_navigate.cc, lines 713-735; ray/triangle picking adapted from isect_ray_tri_v3 in math_geom.cc, lines 1812-1867, with relative determinant epsilon for metre-scale geometry. Other Blender kernels are not yet ported. Closest triangle region classification in mesh-processing.cpp adapts closest_on_tri_to_point_v3 lines 1045-1178 of pinned math_geom.cc. Sparse locked-weight normalization adapts BKE_defvert_normalize_ex mass-reservation semantics from deform.cc; armature_skinning.cc evaluated, heat solver not ported.",
+    "used": "Sphere/hyperbola trackball projection adapted from calctrackballvec in view3d_navigate.cc, lines 713-735; ray/triangle picking adapted from isect_ray_tri_v3 in math_geom.cc, lines 1812-1867, with relative determinant epsilon for metre-scale geometry. Other Blender kernels are not yet ported. Closest triangle region classification in mesh-processing.cpp adapts closest_on_tri_to_point_v3 lines 1045-1178 of pinned math_geom.cc. Sparse locked-weight normalization adapts BKE_defvert_normalize_ex mass-reservation semantics from deform.cc; armature_skinning.cc evaluated, heat solver not ported. BVH SurfaceQuery ray hits adapt isect_ray_tri_watertight_v3[_precalc] lines 1945-2045, with double intermediates and finite-distance bounds, avoiding shared-edge projection holes.",
     "license": "GPL-2.0-or-later",
     "rig_reference_sha256": {
       "deform.cc": "4cf438a44ce906bdece4a94625955ecc5aa52dc11c56b0d1f49843277a1e9ac1",
@@ -87,7 +87,10 @@
     "third_party/blender/math_geom.cc.reference": "68114c7b9742363686ab606c54791b2d745df3cb8c339aaac057397fd3c0c419",
     "third_party/wings/auv_segment.erl.reference": "c7c2cb95a7b42cf9a63b9c2a46c4292e7a53fa399e2abf85f96c087cecd4b968",
     "third_party/wings/auv_placement.erl.reference": "5655cdac8b2d7368ca5e0a0100ed59857e5f4883c0f0701e7efbe46903f74264",
-    "third_party/wings/license.terms": "0bd697a5f57b02fe3b70f68da29d256ac027a43c371f153e9de19ce6b67f19d7"
+    "third_party/wings/license.terms": "0bd697a5f57b02fe3b70f68da29d256ac027a43c371f153e9de19ce6b67f19d7",
+    "third_party/mikktspace/mikktspace.h": "17fc433894f24c73753d548086cc4d8c5c0379f4a6edfb98b5da243e4f0bc3d0",
+    "third_party/mikktspace/mikktspace.c": "8c6710b29f4e783ae2c2091b6eabb9ade8f1dc74b847686aab404fd502155c6b",
+    "third_party/mikktspace/0001-defined-seed-rotate.patch": "c5349269bf6fbb6c7a257f870872912676712ad5b6f499559406a40e09f60e5c"
   },
   "cgltf": {
     "repository": "https://github.com/jkuhlmann/cgltf",
@@ -194,5 +197,22 @@
     "implementation": "src/bake.cpp",
     "license": "GPL-3.0-or-later",
     "used": "Original native CPU worker tangent-space normal/AO/composited material bake; shared SurfaceQuery BVH; no viewport readback or external/proprietary baker code. Limits/evidence in docs/BAKING.txt."
+  },
+  "mikktspace": {
+    "repository": "https://github.com/mmikk/MikkTSpace",
+    "commit": "3e895b49d05ea07e4c2133156cfa94369e19e409",
+    "license": "Zlib (notices retained in both source files)",
+    "used": "Canonical native per-corner tangent frames for baking, baked-map UV transfer, preview and glTF consumer consistency; upstream header unchanged; C implementation carries the marked zero-bit seed-rotation correction recorded here.",
+    "upstream_sha256": {
+      "mikktspace.c": "de87e74107df766ce68108801262bd8d53899414236b59810509a8fc2a51e288",
+      "mikktspace.h": "17fc433894f24c73753d548086cc4d8c5c0379f4a6edfb98b5da243e4f0bc3d0"
+    },
+    "local_patches": [
+      {
+        "file": "third_party/mikktspace/0001-defined-seed-rotate.patch",
+        "sha256": "c5349269bf6fbb6c7a257f870872912676712ad5b6f499559406a40e09f60e5c",
+        "reason": "Define both zero-bit quicksort seed rotations; upstream shifts a 32-bit unsigned value by 32 when t=0 (UBSan)."
+      }
+    ]
   }
 }

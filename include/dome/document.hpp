@@ -4,6 +4,7 @@
 #include "navigation.hpp"
 #include "recovery.hpp"
 #include "scene.hpp"
+#include "bake-authoring.hpp"
 #include "uv.hpp"
 #include <atomic>
 #include <condition_variable>
@@ -83,6 +84,7 @@ struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;
   Mesh mesh;
   std::vector<SurfaceRange> ranges;
+  std::vector<std::array<float,4>> tangents;
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0;
@@ -131,6 +133,7 @@ public:
   void edit_scene(std::string label, SceneOperation, AssetSource expected = {});
   void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
   void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
+  void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
   void begin_voxel_remesh();
   void edit_voxel_size(float world_voxel_mm);
   void end_voxel_remesh(bool accept);

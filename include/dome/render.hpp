@@ -17,7 +17,7 @@ class SurfaceRenderer {
   GLuint program_ = 0, vao_ = 0, vertices_ = 0, indices_ = 0;
   size_t count_ = 0;
   std::shared_ptr<const MeshSnapshot> cached_;
-  std::unordered_map<uint64_t, std::array<GLuint, 3>> textures_;
+  std::unordered_map<uint64_t, std::array<GLuint, 4>> textures_;
 
 public:
   SurfaceRenderer();

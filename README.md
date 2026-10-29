@@ -58,7 +58,8 @@ and the wheel zooms. Shift+left drag sculpts. `1` selects clay, `2` carve,
 Ctrl+Z / Ctrl+Shift+Z undo/redo complete strokes. Lost focus or Escape cancels
 an in-progress stroke. The viewport uses a native GGX metallic-roughness shader
 with editable per-object color, metalness, roughness, emission, opacity and
-culling. The View menu switches between PBR and a simple toon preview; full
+culling. The viewport also consumes persistent baked normal and AO maps. The View menu
+switches between PBR and a simple toon preview; full
 MToon properties remain to be added. Layered color, metallic, roughness, emission
 and mask painting use a stable mesh and persisted UVs; see [painting](docs/PAINTING.md).
 
@@ -83,7 +84,9 @@ Ctrl+S saves the scene as a private, atomically replaced `.dsculpt` CBOR file.
 Version 4 stores separate sculpt objects, stable identities, names, selection,
 uniform object transforms, visibility, locks, sparse fields and PBR material
 values, stable painting meshes, UVs, sparse paint/sculpt layers and native
-rig/skin/morph deformation state. Earlier volume/scene versions remain readable.
+rig/skin/morph deformation state. Scenes with baked base maps use version 5,
+adding persistent normal/AO/PBR data beneath editable paint layers. Earlier
+volume/scene versions remain readable.
 Ctrl+O reopens it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
 transforms, normals, packed UVs, PBR materials and embedded painted PNG maps.
 Skin/inverse-bind/all-influence and POSITION morph GLB export are implemented,
@@ -191,3 +194,19 @@ have been performed.
 Current DomeD/FLTK toolkit selection, runtime-library precedence and the generated
 `build/run-dome-sculpt` launcher are documented in [docs/TOOLKIT.md](docs/TOOLKIT.md).
 Read [docs/HANDOFF.md](docs/HANDOFF.md) before resuming the full production roadmap.
+
+Native baking uses pinned MikkTSpace tangent corners, Blender-based watertight
+BVH projections and source-guarded object transfer. The bake data/worker API,
+UV normal reorientation and GLB normal/occlusion bindings are implemented;
+FLTK/XR bake authoring controls remain in progress. See [baking](docs/BAKING.txt).
+
+Reproduce the retained native workflow and open its v5 asset in a private FLTK
+GUI check:
+
+```sh
+cmake --build build --target dome-sculpt-bake-workflow-test
+build/dome-sculpt-bake-workflow-test --artifacts artifacts/bake-workflow
+LD_LIBRARY_PATH="$PWD/artifacts/toolkit/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+  uv run --with python-xlib --with pillow python tests/baked_gui.py \
+  artifacts/bake-workflow/baked-workflow.dsculpt
+```
