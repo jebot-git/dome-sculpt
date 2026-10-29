@@ -23,7 +23,9 @@ enum class VrParameter {
   BaseColor,
   UvEdit,
   SculptOpacity,
-  VoxelSize
+  VoxelSize,
+  RigRotation,
+  MorphWeight
 };
 struct VrControlState {
   VrParameter parameter = VrParameter::None;

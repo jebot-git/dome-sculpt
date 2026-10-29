@@ -33,13 +33,18 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Refresh", "Next project", "Previous", "Recover", "Save", "Center",
       "Undo", "Redo", "Back", "Export glTF", "Objects", "Materials"};
   static const std::array<const char *, 12> avatars = {
-      "Female CC0", "Male CC0", "MakeHuman", "Next part", "Previous part", "Center part",
+      "Female CC0", "Male CC0", "MakeHuman", "Next part", "Previous part", "Rig and shapes",
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
       "Center object", "Paint tools", "Sculpt layers", "Materials",
       "Back", "Move left", "Move right", "Undo"};
-  return page == 10 ? mesh
+  static const std::array<const char *, 12> rig = {
+      "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
+      "Next shape", "Previous shape", "Reset pose", "Undo",
+      "Back", "Redo", "Save", "Export glTF"};
+  return page == 11 ? rig
+         : page == 10 ? mesh
          : page == 9 ? avatars
          : page == 8 ? recovery
          : page == 7 ? sculpt
@@ -51,6 +56,8 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if (page == 11 && sector == 0) return VrParameter::RigRotation;
+  if (page == 11 && sector == 3) return VrParameter::MorphWeight;
   if (page == 10 && sector == 1)
     return VrParameter::VoxelSize;
   if (page == 10 && sector == 3)
@@ -95,16 +102,24 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
-  if (index < 0 || index >= 12 || page < 0 || page > 10 || page == 5 ||
+  if (index < 0 || index >= 12 || page < 0 || page > 11 || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if (page == 11) {
+    static const std::array<SpatialCommand, 12> rig = {
+      SpatialCommand::Undo, SpatialCommand::RigNextJoint, SpatialCommand::RigPreviousJoint,
+      SpatialCommand::Undo, SpatialCommand::RigNextMorph, SpatialCommand::RigPreviousMorph,
+      SpatialCommand::RigResetPose, SpatialCommand::Undo, SpatialCommand::Undo,
+      SpatialCommand::Redo, SpatialCommand::Save, SpatialCommand::Export};
+    return index == 8 ? std::nullopt : std::optional<SpatialCommand>(rig[index]);
+  }
   if (page == 9) {
     static const std::array<SpatialCommand,12> avatars = {
       SpatialCommand::CreateFemale, SpatialCommand::CreateMale, SpatialCommand::CreateMakeHuman,
       SpatialCommand::Next, SpatialCommand::Previous, SpatialCommand::Center,
       SpatialCommand::DeleteGroup, SpatialCommand::Ungroup, SpatialCommand::Undo,
       SpatialCommand::Undo, SpatialCommand::Redo, SpatialCommand::Save};
-    return index == 8 ? std::nullopt : std::optional<SpatialCommand>(avatars[index]);
+    return index == 8 || index == 5 ? std::nullopt : std::optional<SpatialCommand>(avatars[index]);
   }
   if (page == 10) {
     static const std::array<SpatialCommand, 12> mesh = {
@@ -305,11 +320,12 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
   bool color = parameter_ == VrParameter::InkColor ||
                parameter_ == VrParameter::InkEmission ||
                parameter_ == VrParameter::BaseColor;
-  int components = parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
+  bool multi = color || parameter_ == VrParameter::RigRotation;
+  int components = parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
   if (s.trigger && s.panel_hit) {
     int row = 0;
     float y = .46875f;
-    if (color) {
+    if (multi) {
       int base = components == 4 ? 210 : 240, step = components == 4 ? 70 : 80;
       row = int(std::round((s.panel_v * 640 - base) / step));
       row = std::clamp(row, 0, components - 1);
@@ -441,8 +457,9 @@ void SpatialInput::update(const SpatialSample &s) {
     bool color = parameter_ == VrParameter::InkColor ||
                  parameter_ == VrParameter::InkEmission ||
                  parameter_ == VrParameter::BaseColor;
-    int components = parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
-    if (color) {
+    bool multi = color || parameter_ == VrParameter::RigRotation;
+    int components = parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color ? 4 : 1;
+    if (multi) {
       if (std::abs(s.stick_y) < .3f)
         y_latch_ = 0;
       if (std::abs(s.stick_y) > .6f && !y_latch_) {
@@ -458,7 +475,7 @@ void SpatialInput::update(const SpatialSample &s) {
                                 : 0.f;
     };
     float delta = float(elapsed) *
-                  (axis(s.stick_x) + (color ? 0 : axis(s.stick_y) * .1f));
+                  (axis(s.stick_x) + (multi ? 0 : axis(s.stick_y) * .1f));
     if (delta)
       controls_.push_back(
           {VrControlEventType::Delta, parameter_, component_, delta});
@@ -486,6 +503,9 @@ void SpatialInput::update(const SpatialSample &s) {
       selected_ = 0;
     } else if (page_ == 2 && selected_ == 3) {
       page_ = 3;
+      selected_ = 0;
+    } else if (page_ == 9 && selected_ == 5) {
+      page_ = 11;
       selected_ = 0;
     } else if (page_ == 1 && selected_ == 10) {
       page_ = 9;
@@ -523,7 +543,8 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = (page_ == 9 || page_ == 10) ? 1
+      page_ = page_ == 11 ? 9
+              : (page_ == 9 || page_ == 10) ? 1
               : page_ == 8 ? 7
               : page_ == 7 ? 1
               : page_ == 4 ? 6

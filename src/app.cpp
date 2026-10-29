@@ -7,6 +7,7 @@
 #include "dome/session-appearance.hpp"
 #include "object-editor.hpp"
 #include "creator-editor.hpp"
+#include "rig-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "ui-conventions.hpp"
@@ -352,6 +353,7 @@ struct App {
              FL_MENU_TOGGLE | FL_MENU_VALUE);
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
+    menu.add("&Scene/Rig and shapekeys...", 0, command, this);
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
     menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
     menu.add("&Paint/Prepare painting mesh", FL_CTRL | FL_SHIFT | 'p', command,
@@ -484,6 +486,9 @@ struct App {
     auto active =
         std::find_if(s->objects.begin(), s->objects.end(),
                      [&](auto &o) { return o.id == s->active_object; });
+    enable("&Scene/Rig and shapekeys...", !modal && !s->asset_busy &&
+           s->mesh_active && bool(s->deformation) && active != s->objects.end() &&
+           active->visible && !active->locked);
     if (active != s->objects.end()) {
       checked("&Scene/&Visible", active->visible);
       checked("&Scene/&Locked", active->locked);
@@ -729,6 +734,8 @@ struct App {
       canvas.document.duplicate_object();
     } else if (label == "Delete object") {
       canvas.document.delete_object();
+    } else if (label == "Rig and shapekeys...") {
+      edit_rig_dialog(canvas.document);
     } else if (label == "Voxel remesh...") {
       edit_voxel_remesh(canvas.document);
     } else if (label == "Object and material...") {

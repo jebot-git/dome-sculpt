@@ -333,3 +333,30 @@ source edits in DomeD/qimgvr remain untouched. No session restart, installation,
 physical-device test or new sanitizer/accelerator result is claimed. The first
 nested run failed from a distribution-specific software Vulkan manifest path;
 the portable test driver selection fixed the harness, after which all8 pass.
+
+
+## Pose/shapekey and source-preview integration
+
+- Exact811eb69 was built in a detached worktree:33/33 Release tests passed in
+  83.60s, plus four whole-core ASan/UBSan/leak suites in167.83s. It was pushed
+  to origin/main without force, preserving remote0c266de history.
+- Native rig authoring focused suite passes both actual CC0 avatars, independent
+  weighted vertex rotation, all19 linked source parts, unchanged paint/source
+  identities, native restart, guarded worker/undo/redo, staged controller XYZ
+  and shapekey accept/cancel. Related controller/document/groups/glTF suites
+  pass5/5 in6.67s (artifacts/tests-rig-regression.log).
+- Whole-core rig editing ASan/UBSan with leak detection passes in8.52s
+  (tests-rig-sanitize.log). This covers native operations, not FLTK/driver code.
+- Focused private-bus/Xvfb FLTK menu workflow passes8/8: native modal ownership,
+  parameter entry, universal Close cancellation, worker Apply, exact pose
+  Undo/Redo and shapekey Apply/Undo (menu-rig-expanded.log). Dialog capture
+  menu-rig/rig-options.png was visually inspected for BDF/geometry/layout.
+- Source-preview regression proves actual Document mesh workers publish raw
+  original image bindings with zero CPU composites, while exports and painted
+  overlays still receive complete composites (tests-preview.log).
+
+The source-preview-only checkpoint0231951 has a fresh detached optimized build
+under artifacts/verify-preview; all35 registered Release suites passed in96.65s (tests-preview-pinned.log). This
+working rig evidence is separate from that pinned source. A combined pinned run
+is still required after the root rig commit and agent dependencies. No physical
+input-device or compute-backend verification and no installation is claimed.

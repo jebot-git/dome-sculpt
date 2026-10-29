@@ -133,3 +133,66 @@ add Scene::preview_surfaces +Document preview selector when stable; keep export
 surfaces composited. The last pinned source has no raw GPU marker and is valid
 as its own historical baseline. Agent definitions/ongoing scopes remain in team
 messages. Full original goal stays active and incomplete.
+
+
+## Current continuation — verified milestone published
+
+Exact811eb69 passed all33 registered Release suites in83.60s and four focused
+whole-core ASan/UBSan/leak suites in167.83s (UV,Document,voxel,composite cache).
+Logs: tests-merged-pinned.log / tests-merged-pinned-sanitize.log. It was pushed
+without force to origin/main after checking remote0c266de. The goal stays active.
+
+New committed source-aware GLB01f444f retains normal/AO maps, samplers and UV
+bindings and shares identical grouped native rigs. Raw GPU preview6532be0 binds
+original source maps with bounded image/sampler resources;37 Arc A770 assertions
+pass including actual female/male. First preview avoids all CPU composites:
+female42.32ms preparation+44.90ms GPU, male47.26+20.37ms; subsequent geometry/group
+updates0.606/0.520ms and zero image reuploads. Renderer regression also passes on
+Arc. This is generic PBR/unlit; real MToon integration is underway, not complete.
+Root Scene::preview_surfaces /Document selector is separate uncommitted wiring.
+
+Root added rig-edit.hpp/cpp and native rig-editor dialog plus XR page11 via
+Avatars sector5. Changes stage values and use one guarded worker/undo operation
+on confirmation. Desktop supports local XYZ rotation/translation deltas, linked
+exact-native-rig group poses, reset and selected-part shapekey weights; XR stages
+three-axis rotation and shapekey sliders, bone/shape selection/reset. First
+focused native/controller suite passes; actualCC0 and GUI extension checks are
+being added. Do not claim full skeleton placement, weight painting or morph
+creation from these pose/weight controls. These root files, CMake registrations
+and docs are not yet committed and must wait for coherent dependencies.
+
+Agent scopes: finish_ab3d1 now owns shared MToon renderer/outline integration
+following its GPU checkpoint. sculpt_mesh owns VRM export/source archive; real
+VRM0 outputs passed pinned official schema and cgltf checks, but a source-basis
+metadata issue is under correction before commit. Explicit original-to-native
+basis provenance was authorized; no guessing by model names. sculpt_rig owns
+original fitted groom, CC0 fidelity QA, then proposed native weight-paint helper
+(new files only) for root UI wiring. Public-header changes must finish before
+fresh combined core/UI/sanitizer runs; stale archives are not valid evidence.
+No system installation, session restart or physical-device/backend completion.
+
+
+Rig current evidence: extended suite passes actual female/male nineteen-part
+head posing and exact source identity retention (tests-rig-edit-actual.log).
+Focused FLTK/universal-menu8/8 passes with staged rotation cancel, Apply and exact
+Undo/Redo, shapekey weight Apply/Undo (menu-rig-expanded.log). The captured dialog
+was visually inspected and uses canonical BDF/theme; final pinned combined build
+is still required after agent source commits. New whole-core rig sanitizer build
+is active under build-rig-sanitize (artifacts/build-rig-sanitize.log); inspect its
+actual session/process before restarting. Rig/Scene preview integration remains
+uncommitted and source/reference state continues to be held intact.
+
+
+Current rig milestone dependencies:0d52a51 committed explicit adapter/header
+joint/morph/basis identities without groom changes; f9a8bbf committed exact
+archive persistence and53 checks independently of VRM. Root rig checkpoint can
+now build without unpublished groom code. Root working CMake includes groom
+source/tests but the rig commit stages only rig registration, not those groom
+lines. Root creation.cpp part.unlit remains reserved for the upcoming groom
+integration. Renderer MToon coverage work remains in paint agent files.
+
+Latest rig evidence:5/5 related Release suites passed6.67s, whole-core rig
+ASan/UBSan/leaks passed8.52s, actual female/male linked rig/identity tests pass,
+and native FLTK/menu8/8 pass with screenshot inspected. Source-preview0231951
+build complete; all35 detached Release suites passed96.65s (tests-preview-pinned.log). Root rig milestone must get
+its own exact-source build; preserve incomplete requirements and agent scopes.
