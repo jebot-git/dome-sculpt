@@ -1,0 +1,115 @@
+Original source maps below native paint layers
+==============================================
+
+PaintedMesh::from_maps(mesh,shared_ptr<const PaintSourceMaps>,paint_resolution)
+retains original decoded RGBA8 images separately from the sparse editable layers.
+It freezes a small copy of the source slot references and metadata, shares image
+storage and creates no full-image paint tiles. Source images must be immutable
+before submission: no mutable aliases may change their pixels. Creator/import
+workers can cache one decoded Image per original image ID and reuse it across
+all material objects/slots. The original encoded asset, license/provenance,
+material factors and extra VRM/MToon payload stay with the owning document asset;
+this API does not replace those records.
+
+PaintSourceMaps has color, metal_rough, emission, normal and occlusion slots.
+Each retains an independent Image with original width/height/alpha/transparent
+RGB, glTF wrap/filter constants, TEXCOORD index and affine UV transform. Source
+normal_scale and occlusion_strength are separate. Native preview/compositing
+currently supports mapped TEXCOORD_0 only; other indices reject explicitly.
+Zero-scale/constant affine UV transforms are legitimate. Repeat, mirrored repeat,
+clamp and nearest/linear magnification addressing are supported. Minification
+mipmap/filter metadata is preserved; the CPU compositor does not implement image
+LOD/mip pyramids. Original UV row zero follows Image row zero. Root/import must
+convert source conventions consistently rather than silently flip textures.
+
+Material.color and Material.emissive are linear factors multiplying decoded sRGB
+source RGB once; alpha and ORM are linear. Source metallic/roughness use B/G;
+independent source occlusion R is mixed with white by occlusion_strength and
+published in output ORM R. Sparse paint layers then blend over the factored
+baseline using the existing channel coverage/mask/history path. Source alpha is
+channel data, independent from paint coverage. In particular alpha-zero RGB is
+retained in original storage and in unpainted texel-center composite output.
+No destructive source resampling, color-factor baking or flattening into 14-byte
+paint pixels occurs. Erase/undo/cancel and hidden layers reveal the original.
+
+Derived composite color/ORM/emission each have independent rectangular dimensions
+at least as large as their source dimensions and editable paint resolution.
+Independent occlusion/ORM dimensions are combined with bounded resampling for
+preview. Full original images remain authoritative: transformed-UV/mixed-size
+outputs are derived previews, not replacements for their source. Each output is
+bounded to 16 Mi texels. TextureMaps::source_maps retains original normal/AO views
+and all source slot metadata so shaders/exporters can consume them. This kernel
+does not itself complete tangent normal mapping, MToon shading, alpha-mode/cutoff,
+secondary UV mapping or original multi-material export integration. Original
+normal and other payload must be retained/diagnosed by those paths, not omitted.
+
+Snapshots share the immutable source bundle. has_paint_data() returns true for
+original source maps even when editable layers have no tiles, protecting authored
+appearance from replacement. Reparameterize with unchanged UVs keeps sources.
+Changing UVs currently rejects source-backed assets with an explicit bake
+required error; a lossy automatic transfer is not performed. Existing paint-only
+UV transfer remains unchanged.
+
+Shared document persistence
+---------------------------
+PaintImageArchive deduplicates by Image identity and preserves exact binary RGBA
+plus dimensions. Default resource bounds: 16 Mi texels/image, 64 Mi unique texels,
+256images; dimensions are bounded by native Image to 8192 each. Limits are separate
+from the editable surface/paint resolution budget. Quota failures reject before
+new image allocation/publication and leave the archive unchanged. The caller
+must account one shared archive across the whole document, including sources
+retained outside ordinary PBR slots (such as MToon shade/outline maps).
+
+Document writing:
+  PaintImageArchive images;
+  for(each object) object_json["painted"]=painted->encode(&images);
+  root_json["source_images"]=images.encode();
+
+Document reading (before decoding objects):
+  auto images=PaintImageArchive::decode(root_json.at("source_images"));
+  auto painted=PaintedMesh::decode(object_json.at("painted"),&images);
+
+Source slot records reference shared image IDs. Each decoded object keeps shared
+image ownership after the temporary archive is destroyed. encode/decode without
+archive pointers produce/read self-contained source_images on a standalone asset.
+Both registries at once are rejected as ambiguous. No-source legacy native assets
+need no archive and retain their old representation. Decoding validates counts,
+dimensions, exact byte lengths, sampler/channel interpretation and image IDs;
+missing data fails rather than silently reverting to a flat material.
+
+Binary native serialization deliberately preserves native RGBA bytes exactly.
+It is not a compressed texture cache. The existing whole-file 256 MiB cap must
+still include geometry/paint/material data; documents can reach that cap before
+64 Mi unique source pixels. JSON/CBOR serialization and copies need transient
+worker memory beyond retained image bytes. No real-time allocation or disk I/O
+belongs in the headset frame/input path. Higher-precision/ICC authoring is outside
+the native RGBA8 contract; retain original encoded assets for such future work.
+
+Verification
+------------
+Native tests/source-maps.cpp covers exact non-square alpha-zero data, factor and
+linear/sRGB channel rules, normal/AO retention, affine UV and sampler boundaries,
+shared archive ownership, standalone/document restarts, malformed references,
+quotas, source-layer undo/redo/cancel/snapshot, safe UV rejection and old assets.
+Optional arguments are CC0 baseline VRM paths; these decode every source PNG,
+verify exact archive restart and resolve all core source material slots to the
+shared cache. This bounded GLB
+fixture extraction does not relax product importer material checks; unlit/MToon
+creator import and original extended-slot metadata are verified by their own
+components.
+Both downloaded beta VRoid baselines have 25 PNG images; all are supported natively.
+
+Build/test after updating the core archive for the current headers:
+  c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude -Ithird_party/openbrush tests/source-maps.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-source-maps-test
+  /tmp/dome-source-maps-test assets/humanoid/vroid/base-female.vrm assets/humanoid/vroid/base-male.vrm
+
+No device/session/user project is modified by these tests. Whole-suite completion
+and full original VRM renderer/export fidelity require the central document,
+creator, shader and export integration tracked in REQUIREMENTS.md.
+
+Validated milestone: 43 numerical/native/Scene checks plus four checks over both
+actual CC0 baselines (47 total) pass optimized Release and ASan+UBSan/leak checks.
+Instrumented files are source-maps.cpp, paint.cpp, projection.cpp and
+mesh-processing.cpp; remaining core/xatlas dependencies use their Release archive.
+The female baseline has 25,166,016 unique texels, male 26,083,520, each 25 images and
+15 materials. Neither decoded image cache is duplicated per material.

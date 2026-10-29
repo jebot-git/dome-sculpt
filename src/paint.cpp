@@ -2,6 +2,7 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "dome/source-maps.hpp"
 #include "dome/scene.hpp"
 #include <bit>
 #include <cstring>
@@ -432,6 +433,7 @@ bool PaintedMesh::redo() {
 std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   auto p = std::shared_ptr<PaintedMesh>(new PaintedMesh);
   p->surface_ = surface_;
+  p->source_maps_ = source_maps_;
   p->layers_ = layers_;
   p->active_ = active_;
   p->next_ = next_;
@@ -439,54 +441,64 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   p->allocated_tiles_ = allocated_tiles_;
   return p;
 }
+std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
+    std::shared_ptr<const PaintSourceMaps> maps,uint32_t resolution) {
+  if(!maps || maps->empty())throw std::invalid_argument("Original paint maps are empty");
+  maps->validate();
+  auto result=std::make_shared<PaintedMesh>(std::move(mesh),resolution);
+  // Freeze the small bundle of references/metadata. The shared image pixels must
+  // already be immutable, allowing one original image cache across materials.
+  result->source_maps_=std::make_shared<const PaintSourceMaps>(*maps);
+  return result;
+}
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material) const {
   material.validate();
   auto maps = std::make_shared<TextureMaps>();
-  uint32_t r = resolution();
-  for (auto image : {&maps->color, &maps->metal_rough, &maps->emission}) {
-    image->width = image->height = r;
-    image->rgba.resize(size_t(r) * r * 4);
-  }
-  for (uint32_t y = 0; y < r; ++y)
-    for (uint32_t x = 0; x < r; ++x) {
-      auto color = material.color;
-      auto emission = material.emissive;
-      float metal = material.metallic, rough = material.roughness;
-      int32_t owner = surface_->padding[size_t(y) * r + x];
-      uint32_t px = owner >= 0 ? uint32_t(owner) % r : x,
-               py = owner >= 0 ? uint32_t(owner) / r : y;
-      for (auto &l : layers_)
-        if (l.visible && l.opacity > 0 && owner >= 0) {
-          auto &p = pixel(l.id, px, py);
-          float mask = unit(p.data[13]) * l.opacity;
-          auto blend = [&](float base, int value, int coverage, bool srgb) {
-            float v = unit(p.data[value]);
-            if (srgb)
-              v = srgb_to_linear(v);
-            float a = mask * unit(p.data[coverage]);
-            return base * (1 - a) + v * a;
-          };
-          for (int k = 0; k < 4; ++k)
-            color[k] = blend(color[k], k, 9, k < 3);
-          metal = blend(metal, 4, 10, false);
-          rough = blend(rough, 5, 11, false);
-          for (int k = 0; k < 3; ++k)
-            emission[k] = blend(emission[k], 6 + k, 12, true);
-        }
-      size_t i = (size_t(y) * r + x) * 4;
-      for (int k = 0; k < 3; ++k) {
-        maps->color.rgba[i + k] = byte(linear_to_srgb(color[k]));
-        maps->emission.rgba[i + k] = byte(linear_to_srgb(emission[k]));
+  maps->source_maps=source_maps_;
+  uint32_t r=resolution();
+  const PaintSourceMaps empty;
+  const auto &source=source_maps_?*source_maps_:empty;
+  auto dimensions=[&](Image &image,std::initializer_list<const PaintSourceTexture*> views){
+    image.width=image.height=r;
+    for(auto view:views)if(view->image){image.width=std::max(image.width,view->image->width);image.height=std::max(image.height,view->image->height);}
+    if(size_t(image.width)*image.height>16*1024*1024)
+      throw std::length_error("Composited original texture exceeds output pixel budget");
+    image.rgba.resize(size_t(image.width)*image.height*4);
+  };
+  dimensions(maps->color,{&source.color});
+  dimensions(maps->metal_rough,{&source.metal_rough,&source.occlusion});
+  dimensions(maps->emission,{&source.emission});
+  for(int channel=0;channel<3;++channel){
+    auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
+    for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
+      float u=(float(x)+.5f)/image.width,v=(float(y)+.5f)/image.height;
+      auto sampled=sample_source_texture(channel==0?source.color:channel==1?source.metal_rough:source.emission,u,v,channel!=1);
+      std::array<float,4> value{};
+      if(channel==0)for(int k=0;k<4;++k)value[k]=material.color[k]*sampled[k];
+      else if(channel==1){
+        float ao=source.occlusion.image?sample_source_texture(source.occlusion,u,v,false)[0]:1;
+        value={1-source.occlusion_strength*(1-ao),material.roughness*sampled[1],material.metallic*sampled[2],1};
+      }else{for(int k=0;k<3;++k)value[k]=material.emissive[k]*sampled[k];value[3]=1;}
+      uint32_t tx=std::min(r-1,uint32_t(u*r)),ty=std::min(r-1,uint32_t(v*r));
+      int32_t owner=surface_->padding[size_t(ty)*r+tx];
+      uint32_t px=owner>=0?uint32_t(owner)%r:tx,py=owner>=0?uint32_t(owner)/r:ty;
+      for(auto &l:layers_)if(l.visible&&l.opacity>0&&owner>=0){
+        auto &p=pixel(l.id,px,py);float mask=unit(p.data[13])*l.opacity;
+        auto blend=[&](float base,int data,int coverage,bool srgb){
+          float a=mask*unit(p.data[coverage]),paint=unit(p.data[data]);
+          if(srgb)paint=srgb_to_linear(paint);
+          return base*(1-a)+paint*a;
+        };
+        if(channel==0)for(int k=0;k<4;++k)value[k]=blend(value[k],k,9,k<3);
+        else if(channel==1){value[1]=blend(value[1],5,11,false);value[2]=blend(value[2],4,10,false);}
+        else for(int k=0;k<3;++k)value[k]=blend(value[k],6+k,12,true);
       }
-      maps->color.rgba[i + 3] = byte(color[3]);
-      maps->transparent |= color[3] < .999f;
-      maps->metal_rough.rgba[i] = 255;
-      maps->metal_rough.rgba[i + 1] = byte(rough);
-      maps->metal_rough.rgba[i + 2] = byte(metal);
-      maps->metal_rough.rgba[i + 3] = 255;
-      maps->emission.rgba[i + 3] = 255;
+      size_t at=(size_t(y)*image.width+x)*4;
+      for(int k=0;k<4;++k)image.rgba[at+k]=byte(channel!=1&&k<3?linear_to_srgb(value[k]):value[k]);
+      if(channel==0)maps->transparent|=value[3]<.999f;
     }
+  }
   return maps;
 }
 std::optional<Vec3> PaintedMesh::raycast(Vec3 origin, Vec3 direction,
@@ -565,6 +577,8 @@ PaintedMesh::reparameterize(Mesh target,
     ++result->revision_;
     return result;
   }
+  if(source_maps_)
+    throw std::invalid_argument("UV transfer of original source maps requires an explicit bake; original maps were retained");
   auto surface = std::make_shared<SurfaceMap>(std::move(target), resolution());
   result->surface_ = surface;
   for (auto &l : result->layers_)
@@ -665,13 +679,18 @@ uint32_t word(const std::vector<uint8_t> &bytes, size_t offset) {
   return v;
 }
 } // namespace
-nlohmann::json PaintedMesh::encode() const {
+nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
   if (editing_)
     throw std::logic_error("Finish the paint stroke before saving");
   nlohmann::json j = {{"resolution", resolution()},
                       {"active", active_},
                       {"next_id", next_},
                       {"layers", nlohmann::json::array()}};
+  if(source_maps_){
+    PaintImageArchive local;
+    j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
+    if(!archive)j["source_images"]=local.encode();
+  }
   std::vector<uint8_t> positions, normals, uv, indices;
   for (auto p : mesh().positions)
     for (float f : {p.x, p.y, p.z})
@@ -709,7 +728,7 @@ nlohmann::json PaintedMesh::encode() const {
   }
   return j;
 }
-std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j) {
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive) {
   auto &m = j.at("mesh");
   auto blob = [&](const char *name, size_t stride,
                   size_t limit) -> const std::vector<uint8_t> & {
@@ -809,6 +828,15 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j) {
   }
   result->layer(result->active_);
   result->allocated_tiles_ = allocated / sizeof(PaintTile);
+  if(j.contains("source_maps")){
+    if(archive){
+      if(j.contains("source_images"))throw std::runtime_error("Ambiguous original texture archive");
+      result->source_maps_=decode_source_maps(j.at("source_maps"),*archive);
+    }else{
+      auto local=PaintImageArchive::decode(j.at("source_images"));
+      result->source_maps_=decode_source_maps(j.at("source_maps"),local);
+    }
+  }
   return result;
 }
 } // namespace dome

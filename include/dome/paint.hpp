@@ -7,6 +7,8 @@
 namespace dome {
 struct Material;
 class PaintProjection;
+struct PaintSourceMaps;
+class PaintImageArchive;
 struct Image {
   uint32_t width = 0, height = 0;
   std::vector<uint8_t> rgba;
@@ -16,6 +18,8 @@ struct Image {
 struct TextureMaps {
   Image color, metal_rough, emission;
   bool transparent = false;
+  // Original normal/AO views and exact source metadata survive compositing.
+  std::shared_ptr<const PaintSourceMaps> source_maps;
 };
 enum class PaintChannel : int { Color, Metallic, Roughness, Emission, Mask };
 struct PaintSettings {
@@ -47,6 +51,8 @@ struct PaintLayer {
 class PaintedMesh {
 public:
   PaintedMesh(Mesh, uint32_t resolution = 512);
+  static std::shared_ptr<PaintedMesh> from_maps(Mesh, std::shared_ptr<const PaintSourceMaps>, uint32_t resolution = 512);
+  const std::shared_ptr<const PaintSourceMaps> &source_maps() const noexcept { return source_maps_; }
   const Mesh &mesh() const;
   uint32_t resolution() const;
   uint64_t revision() const { return revision_; }
@@ -66,7 +72,7 @@ public:
   bool pending_changes() const;
   size_t undo_count() const { return undo_.size(); }
   // Conservative retained data, including hidden/zero-opacity/mask-only tiles.
-  bool has_paint_data() const noexcept { return allocated_tiles_ != 0; }
+  bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_); }
   bool undo();
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
@@ -76,8 +82,8 @@ public:
   const PaintPixel &pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   std::optional<Vec3> raycast(Vec3, Vec3, float maximum = 20) const;
   Vec3 normal(Vec3) const;
-  nlohmann::json encode() const;
-  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &);
+  nlohmann::json encode(PaintImageArchive * = nullptr) const;
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive * = nullptr);
 
 private:
   PaintedMesh() = default;
@@ -86,6 +92,7 @@ private:
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &);
   struct SurfaceMap;
   std::shared_ptr<const SurfaceMap> surface_;
+  std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::vector<PaintLayer> layers_;
   uint64_t active_ = 1, next_ = 2, revision_ = 1;
   bool editing_ = false;
