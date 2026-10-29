@@ -196,3 +196,15 @@ ASan/UBSan/leaks passed8.52s, actual female/male linked rig/identity tests pass,
 and native FLTK/menu8/8 pass with screenshot inspected. Source-preview0231951
 build complete; all35 detached Release suites passed96.65s (tests-preview-pinned.log). Root rig milestone must get
 its own exact-source build; preserve incomplete requirements and agent scopes.
+
+
+Groom21024fd is now committed; root integrates its core/test registration and
+part.unlit material flag with an actual20part grouped-pose/native-restart check.
+Both rig/groom integration suites pass3.57s (tests-groom-integration.log).
+Corrected independent Blender mesh QA excludes importer bone-widget Icosphere,
+which is absent from the exported avatar. Actual source/groom rest intersections
+are0 for medium,long,fringe,male; a.24rad rigid-head pose still has5small shoulder
+intersections and remains documented, not full hair dynamics/collision support.
+Root next pins the fully committed rig+groom source for optimized tests. Pending
+paint TextureMaps.color_coverage ABI change means don't use old main archives
+with new headers; pin verification is isolated from that working code.

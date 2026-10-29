@@ -156,5 +156,21 @@ int main(int argc, char **argv) try {
     check(avatar.active().deformation->morph_weights[0] == .35f && avatar.active().appearance == appearance,
           "Actual source shapekey edits change only weights and preserve source identity archive");
   }
+  Scene groomed;
+  auto controls = humanoid_baseline_defaults("vroid-beta-female");
+  controls.hair_length = .4f; controls.hair_volume = .5f; controls.fringe = .3f;
+  append_humanoid(groomed, controls, "Groomed CC0", {}, 64);
+  auto head = groomed.active().deformation->humanoid->joints.at("head");
+  RigEdit head_edit; head_edit.joint = JointAdjustment{head, {0, 10, 0}, {}};
+  edit_rig(groomed, groomed.active().id, head_edit);
+  const auto &hair = groomed.objects().back();
+  check(groomed.objects().size() == 21 && hair.material.unlit && !hair.appearance &&
+        hair.deformation->pose.at(head).rotation.y == groomed.active().deformation->pose.at(head).rotation.y,
+        "Original generated groom uses its unlit material and follows the exact grouped head rig");
+  auto restart = Scene::decode(groomed.encode());
+  check(restart.objects().size() == 21 && restart.objects().back().material.unlit &&
+        restart.objects().back().deformation->pose.at(head).rotation.y == hair.deformation->pose.at(head).rotation.y &&
+        restart.objects().back().painted->source_maps(),
+        "Groom texture and grouped pose survive actual CC0 native restart together");
   return 0;
 } catch (const std::exception &e) { std::cerr << "FAIL " << e.what() << '\n'; return 1; }

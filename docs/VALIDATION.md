@@ -360,3 +360,10 @@ under artifacts/verify-preview; all35 registered Release suites passed in96.65s 
 working rig evidence is separate from that pinned source. A combined pinned run
 is still required after the root rig commit and agent dependencies. No physical
 input-device or compute-backend verification and no installation is claimed.
+
+
+Groom integration: registered native groom suite and actual append_humanoid
+20part pose/native restart fixture pass2/2 in3.57s. Original groom material uses
+its declared unlit appearance and follows the exact head pose across group
+parts. Source-neutral19parts and original archives remain intact. Independent
+Blender QA details and known posed collision limit are in VROID-CREATOR.md.
