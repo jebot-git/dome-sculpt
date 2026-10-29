@@ -341,7 +341,7 @@ size_t morph_count(const cgltf_mesh &m) {
   return n;
 }
 void metadata(const cgltf_data &d, ImportedAsset &out, Budget &b,
-              const ImportLimits &o) {
+              const ImportLimits &o, bool legacy_hint) {
   size_t work = 0;
   auto visit = [&] {
     if (++work > o.max_metadata_visits)
@@ -472,10 +472,18 @@ void metadata(const cgltf_data &d, ImportedAsset &out, Budget &b,
           visit();
           p = p->parent;
         }
-        if (!p)
-          throw std::runtime_error("Skin skeleton is not a joint ancestor");
+        if (!p) {
+          if (!legacy_hint)
+            throw std::runtime_error("Skin skeleton is not a joint ancestor");
+          skin.skeleton_hint_advisory = true;
+        }
       }
     }
+    if (skin.skeleton_hint_advisory)
+      out.warnings.push_back(
+          "Legacy VRM0 skin " + std::to_string(i) + " skeleton hint node " +
+          std::to_string(skin.skeleton) +
+          " is not a joint ancestor; raw hint is retained as advisory");
     if (s.inverse_bind_matrices) {
       auto *a = s.inverse_bind_matrices;
       if (a->component_type != cgltf_component_type_r_32f || a->normalized ||
@@ -736,8 +744,11 @@ void skin_mappings(const cgltf_data &d, ImportedAsset &out,
   (void)d;
   stop(o);
 }
-ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
-  auto input = read_file(path, o.max_file_bytes, b);
+ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
+                   std::vector<uint8_t> input, bool require_glb = false) {
+  if (require_glb && (input.size() < 4 || input[0] != 'g' || input[1] != 'l' ||
+                      input[2] != 'T' || input[3] != 'F'))
+    throw std::runtime_error("VRM alias requires native GLB magic");
   stop(o);
   cgltf_options options{};
   options.memory = {allocate, release, &b};
@@ -837,8 +848,28 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
     throw std::runtime_error("Invalid glTF data");
   ImportedAsset out;
   out.mode = o.mode;
+  bool legacy_hint = false;
+  if (o.allow_legacy_vrm_skin_hint) {
+    if (o.mode != ImportMode::PreserveGltf)
+      throw std::invalid_argument(
+          "Legacy VRM hint compatibility requires preserving import");
+    for (size_t i = 0; i < d.data_extensions_count; i++)
+      if (label(d.data_extensions[i].name, "") == "VRM") {
+        std::string_view raw =
+            d.data_extensions[i].data ? d.data_extensions[i].data : "";
+        if (raw.size() > SIZE_MAX / 6)
+          throw std::length_error("VRM metadata resource overflow");
+        b.take(raw.size() * 6);
+        auto vrm = nlohmann::json::parse(raw);
+        legacy_hint =
+            vrm.is_object() && vrm.value("specVersion", std::string{}) == "0.0";
+      }
+    if (!legacy_hint)
+      throw std::invalid_argument("Legacy skin hint compatibility requires a "
+                                  "top-level VRM0.0 extension");
+  }
   if (o.mode == ImportMode::PreserveGltf)
-    metadata(d, out, b, o);
+    metadata(d, out, b, o, legacy_hint);
   for (size_t i = 0; i < d.animations_count; i++)
     out.omitted_animations.push_back(
         {owned_label(d.animations[i].name, "Animation", b),
@@ -911,7 +942,7 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
         m.has_transmission || m.has_volume || m.has_ior || m.has_specular ||
         m.has_sheen || m.has_emissive_strength || m.has_iridescence ||
         m.has_diffuse_transmission || m.has_anisotropy || m.has_dispersion ||
-        m.unlit)
+        (m.unlit && o.mode != ImportMode::PreserveGltf))
       throw std::runtime_error(
           "This material requires a non-core glTF shader import path");
     ImportedMaterial material;
@@ -928,6 +959,12 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b) {
     unit(material.metallic);
     unit(material.roughness);
     material.double_sided = m.double_sided;
+    material.unlit = m.unlit;
+    if (m.unlit)
+      out.warnings.push_back("KHR_materials_unlit retained for material " +
+                             std::to_string(i) +
+                             "; renderer must use unlit or overriding MToon "
+                             "semantics, not PBR equivalence");
     material.alpha = m.alpha_mode == cgltf_alpha_mode_blend
                          ? ImportedMaterial::AlphaMode::Blend
                      : m.alpha_mode == cgltf_alpha_mode_mask
@@ -1622,8 +1659,7 @@ ImportedAsset obj(const fs::path &path, const ImportLimits &o, Budget &b) {
   stop(o);
   return out;
 }
-} // namespace
-ImportedAsset import_mesh(const fs::path &source, const ImportLimits &o) {
+void validate_import_limits(const ImportLimits &o) {
   if (!o.max_file_bytes || o.max_file_bytes > 512 * 1024 * 1024 ||
       o.max_resource_bytes < o.max_file_bytes ||
       o.max_resource_bytes > 1024ull * 1024 * 1024 || !o.max_vertices ||
@@ -1632,6 +1668,10 @@ ImportedAsset import_mesh(const fs::path &source, const ImportLimits &o) {
       o.max_metadata_visits > 200'000'000 ||
       (o.mode != ImportMode::StaticScene && o.mode != ImportMode::PreserveGltf))
     throw std::invalid_argument("Invalid import limits");
+}
+} // namespace
+ImportedAsset import_mesh(const fs::path &source, const ImportLimits &o) {
+  validate_import_limits(o);
   stop(o);
   auto path = fs::canonical(source);
   if (!fs::is_regular_file(path))
@@ -1643,7 +1683,30 @@ ImportedAsset import_mesh(const fs::path &source, const ImportLimits &o) {
   if (ext == ".obj")
     return obj(path, o, budget);
   if (ext == ".gltf" || ext == ".glb")
-    return gltf(path, o, budget);
+    return gltf(path, o, budget, read_file(path, o.max_file_bytes, budget));
+  if (ext == ".vrm") {
+    if (o.mode != ImportMode::PreserveGltf)
+      throw std::invalid_argument(
+          "Native VRM aliases require PreserveGltf mode");
+    return gltf(path, o, budget, read_file(path, o.max_file_bytes, budget),
+                true);
+  }
   throw std::runtime_error("Unsupported mesh import format (use OBJ/glTF/GLB)");
+}
+ImportedAsset import_glb(std::span<const uint8_t> bytes, ImportLimits limits,
+                         ImportMode mode) {
+  limits.mode = mode;
+  limits.external_resources = false;
+  validate_import_limits(limits);
+  stop(limits);
+  if (bytes.size() > limits.max_file_bytes)
+    throw std::length_error("Memory GLB exceeds input byte limit");
+  if (bytes.size() < 4 || bytes[0] != 'g' || bytes[1] != 'l' ||
+      bytes[2] != 'T' || bytes[3] != 'F')
+    throw std::runtime_error("Memory import requires native GLB magic");
+  Budget budget{0, limits.max_resource_bytes};
+  budget.take(bytes.size());
+  std::vector<uint8_t> input(bytes.begin(), bytes.end());
+  return gltf({}, limits, budget, std::move(input), true);
 }
 } // namespace dome

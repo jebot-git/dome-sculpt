@@ -117,7 +117,7 @@ Animation import is outside this component. Clip names, channel/sampler counts
 and explicit warnings are returned in `omitted_animations`; no animation tracks
 or playback interoperability is claimed. Required extensions reject. Optional
 extension names and named omission diagnostics remain visible; unsupported
-material shaders, texture transforms/compression, GPU instancing and geometry
+other material shaders, texture transforms/compression, GPU instancing and geometry
 compression still reject. Additional UV sets beyond UV1, additional color sets,
 unknown/custom vertex attributes, non-triangle primitive modes and other unsupported
 semantics retain explicit rejection. Camera/light payload and general extension
@@ -128,6 +128,41 @@ The authoring integration must persist this payload and supply correct deformati
 and material/texture mapping before exposing preserving import as an editable
 scene operation. The existing default authoring path intentionally keeps its
 explicit static-only gate.
+
+## Self-contained memory GLB and explicit legacy VRM compatibility
+
+`import_glb(span<const uint8_t>, ImportLimits = {}, ImportMode = PreserveGltf)`
+parses native GLB/VRM bytes directly. Its explicit third mode argument overrides
+`limits.mode`. It enforces byte/allocation limits before copying, validates GLB
+magic and uses the same accessor, skin, morph, extension and cancellation paths.
+It always forces external resources off and has no filesystem base path. Existing
+files in the current directory cannot become dependencies, even when the caller
+sets `external_resources=true`. Embedded BIN and data-URI resources are supported;
+external buffers/images reject. Returned payloads own all data independently of
+caller bytes. No temporary file is created.
+
+Preserving file import also recognizes `.vrm` as a native GLB-magic alias.
+Default static import does not silently enable VRM authoring behavior, and JSON
+content named `.vrm` rejects. Original GLB bytes can be archived once per asset to
+reconstruct this payload after restart without relying on the source path.
+
+Some original CC0 VRoid0.14/UniGLTF1.28 beta assets contain a non-ancestor
+`skin.skeleton` hint even though their actual joint hierarchy and inverse binds
+are intact. Strict glTF import still rejects this. The explicit opt-in
+`ImportLimits.allow_legacy_vrm_skin_hint` applies only in preserving mode with a
+parsed top-level `VRM` extension declaring `specVersion="0.0"`; setting it on an
+ordinary glTF or absent/other VRM version rejects. A non-ancestor hint remains
+unchanged, `ImportedSkin.skeleton_hint_advisory` is set and a named warning is
+returned. Joint common roots, scene membership, mappings and authored binds stay
+strict. The verified creator adapter opts in only for its hash-verified original
+CC0 sources. This is an advisory metadata policy, not a generic malformed glTF
+fallback or an implicit rig repair.
+
+Preserving mode additionally retains `ImportedMaterial.unlit` with a named
+renderer-mapping diagnostic. Static PBR import still rejects unlit materials.
+This allows legacy VRM/MToon sources that declare `KHR_materials_unlit` to retain
+their authored semantics; it does not claim PBR equivalence or implement MToon
+rendering. Required-extension gates remain unchanged.
 
 ## Primary specification and implementation provenance
 
@@ -173,3 +208,14 @@ build instruments `import.cpp`, `mesh-processing.cpp` and this suite, linked to
 the existing Release core archive; it does not instrument every export/deformation
 translation unit. Logs are `artifacts/mesh-import.log` and
 `artifacts/mesh-import-sanitizers.log`.
+
+The follow-up memory/legacy milestone passes 97 native Release and
+ASan/UBSan/leak assertions. Pure memory import also passes the actual creator
+reference assets: female SHA-256
+`1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b`
+(87 nodes), male SHA-256
+`ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c`
+(71 nodes). Each retains 2 skins, 19 primitives, 25 images, 15 unlit materials and
+one unchanged advisory skeleton hint under explicit legacy opt-in. Asset origins
+and CC0 terms are recorded in `assets/humanoid/vroid/SOURCES.json`. The actual
+source smoke log is `artifacts/vrm-memory-import.log`.

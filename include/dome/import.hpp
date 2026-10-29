@@ -2,6 +2,7 @@
 #pragma once
 #include "mesh.hpp"
 #include <filesystem>
+#include <span>
 #include <string>
 namespace dome {
 enum class ImportMode { StaticScene, PreserveGltf };
@@ -15,6 +16,9 @@ struct ImportLimits {
   std::function<bool()> cancelled;
   ImportMode mode = ImportMode::StaticScene;
   size_t max_metadata_visits = 50'000'000;
+  // Explicit VRM0 compatibility: retain non-ancestor skeleton hints as
+  // advisory.
+  bool allow_legacy_vrm_skin_hint = false;
 };
 struct ImportedImage {
   std::string name, mime_type, source_uri;
@@ -30,7 +34,7 @@ struct ImportedMaterial {
   std::array<float, 3> emissive{};
   float metallic = 1, roughness = 1, alpha_cutoff = .5f, normal_scale = 1,
         occlusion_strength = 1;
-  bool double_sided = false;
+  bool double_sided = false, unlit = false;
   enum class AlphaMode { Opaque, Mask, Blend } alpha = AlphaMode::Opaque;
   int color_texcoord = 0, metal_rough_texcoord = 0, normal_texcoord = 0,
       occlusion_texcoord = 0, emissive_texcoord = 0;
@@ -64,7 +68,7 @@ struct ImportedSkin {
   std::string name, extras_json;
   std::vector<uint32_t> joints; // Slot -> original glTF node index.
   int skeleton = -1;
-  bool inverse_bind_matrices_authored = false;
+  bool inverse_bind_matrices_authored = false, skeleton_hint_advisory = false;
   // Preserve the entire authored accessor, including trailing matrices.
   // Empty with authored=false means implicit identity per joint.
   std::vector<ImportedMatrix> inverse_bind_matrices;
@@ -122,4 +126,9 @@ struct ImportedAsset {
 // images are retained as encoded bytes; this function does not decode them.
 ImportedAsset import_mesh(const std::filesystem::path &,
                           const ImportLimits & = {});
+// Bounded native GLB/VRM bytes, never a filesystem resource resolver. The
+// explicit mode argument defaults to preservation and overrides limits.mode.
+// external_resources is forced false; GLB BIN and embedded data-URIs only.
+ImportedAsset import_glb(std::span<const uint8_t>, ImportLimits limits = {},
+                         ImportMode mode = ImportMode::PreserveGltf);
 } // namespace dome

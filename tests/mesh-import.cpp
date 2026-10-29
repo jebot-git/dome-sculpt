@@ -892,6 +892,137 @@ int main() try {
           "Absent normals use display fallbacks while retaining all "
           "unreferenced source vertices");
 
+  fs::copy_file(asset / "native-rig.glb", asset / "native-rig.vrm");
+  require(
+      import_mesh(asset / "native-rig.vrm", preserve).skins.size() == 1,
+      "Preserving mode reads native GLB bytes through the VRM extension alias");
+  rejects(
+      [&] { import_mesh(asset / "native-rig.vrm"); },
+      "Default static import does not silently enable VRM authoring semantics");
+  save(asset / "not-binary.vrm", gltf.dump());
+  rejects([&] { import_mesh(asset / "not-binary.vrm", preserve); },
+          "VRM extension aliases require actual GLB magic instead of JSON "
+          "masquerading as binary");
+  auto legacy = preserve;
+  legacy.allow_legacy_vrm_skin_hint = true;
+  rejects([&] { import_mesh(asset / "native-rig.glb", legacy); },
+          "Legacy hint opt-in cannot weaken files without a verified VRM0 "
+          "extension");
+  auto legacy_json = native_json;
+  legacy_json["skins"][0]["skeleton"] = 1;
+  legacy_json["extensions"]["VRM"] = {{"specVersion", "0.0"}};
+  legacy_json["extensionsUsed"] = {"VRM"};
+  save(asset / "legacy-hint.gltf", legacy_json.dump());
+  rejects([&] { import_mesh(asset / "legacy-hint.gltf", preserve); },
+          "VRM0 presence alone does not bypass strict skeleton ancestry "
+          "validation");
+  auto legacy_asset = import_mesh(asset / "legacy-hint.gltf", legacy);
+  require(legacy_asset.skins[0].skeleton == 1 &&
+              legacy_asset.skins[0].skeleton_hint_advisory &&
+              legacy_asset.skins[0].inverse_bind_matrices == native_ibm &&
+              std::any_of(
+                  legacy_asset.warnings.begin(), legacy_asset.warnings.end(),
+                  [](const std::string &s) {
+                    return s.find("retained as advisory") != std::string::npos;
+                  }),
+          "Explicit VRM0 compatibility preserves malformed skeleton hints and "
+          "exact binds with named diagnostics");
+
+  auto unlit_json = native_json;
+  unlit_json["materials"][0]["extensions"]["KHR_materials_unlit"] =
+      Json::object();
+  unlit_json["extensionsUsed"] = {"KHR_materials_unlit"};
+  save(asset / "unlit-preserving.gltf", unlit_json.dump());
+  auto unlit_asset = import_mesh(asset / "unlit-preserving.gltf", preserve);
+  require(unlit_asset.materials[unlit_asset.primitives[0].material].unlit,
+          "Preserving import retains unlit material semantics for overriding "
+          "MToon mapping");
+  auto static_unlit = gltf;
+  static_unlit["materials"][0]["extensions"]["KHR_materials_unlit"] =
+      Json::object();
+  save(asset / "unlit-static.gltf", static_unlit.dump());
+  rejects([&] { import_mesh(asset / "unlit-static.gltf"); },
+          "Static PBR import continues to reject unsupported unlit rendering "
+          "semantics");
+
+  auto memory_asset = import_glb(native_bytes);
+  require(memory_asset.mode == ImportMode::PreserveGltf &&
+              memory_asset.skins.size() == 1 &&
+              memory_asset.primitives[0].influences.size() == 2 &&
+              memory_asset.skins[0].inverse_bind_matrices == native_ibm,
+          "Memory GLB import defaults to preserving complete native skin and "
+          "authored bind payload");
+  auto disposable = native_bytes;
+  auto owned_memory = import_glb(disposable);
+  std::fill(disposable.begin(), disposable.end(), 0);
+  require(owned_memory.primitives[0].morph_targets[0].positions[0].z == .04f &&
+              owned_memory.meshes[0].target_names[0] == "forward",
+          "Returned memory-import metadata and vertex arrays own their data "
+          "independently of caller bytes");
+  auto pack_glb = [&](Json j, const std::vector<uint8_t> &binary) {
+    auto text = j.dump();
+    while (text.size() % 4)
+      text += ' ';
+    auto bin = binary;
+    while (bin.size() % 4)
+      bin.push_back(0);
+    std::vector<uint8_t> blob;
+    word(blob, 0x46546c67);
+    word(blob, 2);
+    word(blob, uint32_t(12 + 8 + text.size() + 8 + bin.size()));
+    word(blob, uint32_t(text.size()));
+    word(blob, 0x4e4f534a);
+    blob.insert(blob.end(), text.begin(), text.end());
+    word(blob, uint32_t(bin.size()));
+    word(blob, 0x004e4942);
+    blob.insert(blob.end(), bin.begin(), bin.end());
+    return blob;
+  };
+  auto memory_embedded = import_glb(pack_glb(gltf, b));
+  require(memory_embedded.images[0].bytes == std::vector<uint8_t>({1, 2, 3, 4}),
+          "Memory GLB permits embedded data-URI images and buffers without "
+          "filesystem access");
+  auto memory_external = gltf;
+  memory_external["buffers"][0]["uri"] = "buffer data.bin";
+  auto memory_blob = pack_glb(memory_external, b);
+  auto old_cwd = fs::current_path();
+  fs::current_path(asset);
+  auto external_limits = preserve;
+  external_limits.external_resources = true;
+  rejects([&] { import_glb(memory_blob, external_limits); },
+          "Memory GLB cannot read an existing CWD external buffer even when "
+          "caller enables external resources");
+  auto image_external = gltf;
+  image_external["images"][0]["uri"] = "textures/albedo.png";
+  rejects([&] { import_glb(pack_glb(image_external, b), external_limits); },
+          "Memory GLB cannot resolve external images from current working "
+          "directory");
+  fs::current_path(old_cwd);
+  auto legacy_memory = import_glb(pack_glb(legacy_json, native_binary), legacy);
+  require(legacy_memory.skins[0].skeleton_hint_advisory &&
+              legacy_memory.skins[0].skeleton == 1,
+          "Memory VRM import shares explicit legacy-hint compatibility and raw "
+          "metadata preservation");
+  rejects([&] { import_glb(native_bytes, {}, ImportMode::StaticScene); },
+          "Explicit memory static mode retains authored skin/morph rejection");
+  auto short_blob = native_bytes;
+  short_blob.resize(short_blob.size() - 8);
+  rejects(
+      [&] { import_glb(short_blob); },
+      "Truncated in-memory GLB rejects before resource/accessor publication");
+  rejects([&] { import_glb(std::span<const uint8_t>{}); },
+          "Empty memory input cannot masquerade as native GLB");
+  auto byte_limits = preserve;
+  byte_limits.max_file_bytes = native_bytes.size() - 1;
+  rejects([&] { import_glb(native_bytes, byte_limits); },
+          "Memory GLB enforces byte quotas before copying caller storage");
+  auto allocation_limits = preserve;
+  allocation_limits.max_file_bytes = native_bytes.size() + 1;
+  allocation_limits.max_resource_bytes = allocation_limits.max_file_bytes;
+  rejects([&] { import_glb(native_bytes, allocation_limits); },
+          "Memory GLB parser and retained arrays share the bounded allocation "
+          "quota");
+
   auto cancel_preserve = preserve;
   int preserve_calls = 0;
   cancel_preserve.cancelled = [&] { return ++preserve_calls > 10; };
