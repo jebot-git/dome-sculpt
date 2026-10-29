@@ -1,0 +1,72 @@
+{
+  "blender": {
+    "repository": "https://github.com/blender/blender",
+    "commit": "3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2",
+    "version": "5.4.0 Alpha",
+    "version_evidence": "third_party/blender/BKE_blender_version.h",
+    "used": "Sphere/hyperbola trackball projection adapted from calctrackballvec in view3d_navigate.cc, lines 713-735. Other Blender kernels are not yet ported.",
+    "license": "GPL-2.0-or-later"
+  },
+  "openbrush_native": {
+    "repository": "https://github.com/jebot-git/openbrush-native",
+    "commit": "1373d5e839a9720adaeb187064785f9d9d0e8492",
+    "compiled": [
+      "navigation.cpp",
+      "controller-profiles.cpp"
+    ],
+    "reserved_for_xr_transport": [
+      "graphics.cpp",
+      "graphics.h"
+    ],
+    "license": "Apache-2.0; native EGL helper is MIT"
+  },
+  "desktop": {
+    "repository": "https://github.com/jebot-git/qimgvr",
+    "commit": "42962a7e132212268ff05067881bbf5e1f5fc94c",
+    "used": "DomeD FLTK BDF appearance and universal menu, shared with the Gmsh integration",
+    "license": "MIT"
+  },
+  "gmsh": {
+    "repository": "https://github.com/jebot-git/gmsh-xr",
+    "local_commit": "2ed37a92b4a6862a7ea1ff620ea5e37b8c6070f1",
+    "used": "Native FLTK/DomeD integration reference; no Gmsh mesh algorithms linked yet"
+  },
+  "xatlas": {
+    "repository": "https://github.com/jpcy/xatlas",
+    "commit": "f700c7790aaa030e794b52ba7791a05c085faf0c",
+    "used": "Native chart generation and atlas packing",
+    "license": "MIT"
+  },
+  "source_sha256": {
+    "third_party/desktop/appearance.h": "25525e1d43c3036c5fc9ddd99e3c9621e8f9439147412b9bcfc1f2152201f591",
+    "third_party/desktop/bdf_font.hpp": "5738a6826aea224c96c0578d7ba1e34e43f63e86ca6a675c710ced8438bfb154",
+    "third_party/desktop/desktop-menu.h": "cfbd67120ea23a607e158ef7260409ce4fc5201915e5791096be3b6962f196f5",
+    "third_party/desktop/desktop-menu.cpp": "51ab33c3d7a2d8cd76a4cedbfd05d410a7d5d7137b94f89b3e9f9e54562c4cab",
+    "third_party/desktop/desktop-menu.cmake": "2520c100f2828747a4b8dfdee2f3faa742faf43c02fa73c6adba8d9ad6ce8ada",
+    "third_party/desktop/appmenu.xml": "7d0251ee00d3d4bc7ee41e3cd1161beaf68a0c18c4f56f48ff1907a475846022",
+    "third_party/xatlas/xatlas.cpp": "0ed0283aad005c94738cb0cc4612dba264379d29dea5b3c9b242f2d4752d5df4",
+    "third_party/xatlas/xatlas.h": "e7675335ad8ab1c1cc9060ad153cf6b8ba2ee914282044eb5f02c49590218fbd",
+    "third_party/xatlas/LICENSE": "2c16d5b1c2808277fe975b4f70f0fd9afc9b3bcf04e6c676665a82cb2d5579e3",
+    "third_party/blender/BKE_blender_version.h": "aa1d349a0717adbe8fc2f238fb35328a3e932c19bd7258d3a31e946438395c7e",
+    "third_party/blender/math_rotation_c.cc.reference": "236c4cc99d65108a2329c0c21845b5a1a4d8b41ed1dacab2c7a8c4cb0f9fc34a",
+    "third_party/blender/view3d_navigate.cc.reference": "116ce45088455d3b8d6509849c342c2f314a206410d1af8536b0a106c689b940",
+    "third_party/openbrush/brush-math.h": "f095f039739934352c96f3a02b38a9b74a469c35edbe3b17d37f244172e71360",
+    "third_party/openbrush/navigation.h": "cd1289278712838924e5c5ec009a203df7054aef44d44862a5bc986b87a56263",
+    "third_party/openbrush/navigation.cpp": "9adc7a5a6a79cc999c9e220d12c8f8739b3c97685b36d4ea88a48db509461b70",
+    "third_party/openbrush/controller-profiles.h": "013e8ecd56f1f29fe4ee939680cf49db971bf2ce57c899db95f7780ce676edcb",
+    "third_party/openbrush/controller-profiles.cpp": "417735908c92e886a1dfca913c9b246215274307a516ec2f438c192e80ce58f3",
+    "third_party/openbrush/graphics.h": "202a6b8d84b5aa55fd4dec6d9e53d4a90adf5383974571c490a1404b3a1fcbbd",
+    "third_party/openbrush/graphics.cpp": "9c2be55b5f5d9a67f68940856f2ba34189863fff0b4a33001a977aa1271bb547",
+    "third_party/openbrush/LICENSE": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+    "third_party/openbrush/NOTICE": "1f803515edb3051e981a6d9f1bc4eb5f4b10f720c10206bd74d3fba773355cfc",
+    "third_party/openbrush/LICENSE.native-graphics": "efaded5e13e8b31b1f90302da538b1d638270b432fddbf705f00fd35d9e8b499",
+    "third_party/cgltf/cgltf.h": "efb169dee911696b5d35fc8e3f7ea0c56d679debc529eba9ca6aa6443ba9d5e9"
+  },
+  "cgltf": {
+    "repository": "https://github.com/jkuhlmann/cgltf",
+    "version": "1.15",
+    "origin": "Existing pinned header in qimgvr/third_party/cgltf",
+    "license": "MIT",
+    "used": "Independent native export test only; not linked into the application"
+  }
+}

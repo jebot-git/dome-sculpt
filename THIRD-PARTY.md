@@ -1,0 +1,25 @@
+# Third-party sources
+
+The combined Dome Sculpt application is GPL-3.0-or-later; see LICENSE.
+The original notices and licenses on reused source files remain in force.
+
+- Blender 5.4 Alpha source excerpts/reference files: GPL-2.0-or-later.
+  Trackball sphere/hyperbola projection is adapted from `calctrackballvec`.
+  `third_party/blender/BKE_blender_version.h` proves version and cycle for the
+  pinned source commit. The reference `.cc` files are not compiled wholesale.
+- OpenBrush Native: Apache-2.0. Its `navigation` and `controller-profiles` sources
+  are compiled unchanged. Its EGL graphics helper is MIT, with the upstream
+  de-xr notice in `third_party/openbrush/LICENSE.native-graphics`.
+  Apache LICENSE and NOTICE are retained beside these files.
+- Shared de-xr FLTK appearance, native BDF font and universal menu helpers: MIT.
+  Copied from the canonical qimgvr tree used by the Gmsh integration.
+- xatlas: MIT, including the original Thekla/NVIDIA notices in its source.
+  Source and LICENSE are under `third_party/xatlas`.
+- cgltf 1.15: MIT notice at the bottom of `third_party/cgltf/cgltf.h`.
+  Used only by the independent native glTF validation test.
+
+Exact repositories, commits, roles and SHA-256 hashes are recorded in
+`third_party/sources.json`. Wings 3D, Seamless3d, OpenFX and MeshLab are currently
+references under evaluation, not bundled or linked implementations. Their GUI
+runtimes are not dependencies of Dome Sculpt. Blender Python add-ons named in
+the requirements are workflow targets, not proprietary code dependencies.
