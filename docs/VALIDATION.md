@@ -402,3 +402,17 @@ export.cpp/gltf-document.hpp/new VRM files. Root next should integrate committed
 VRM export into guarded background File jobs and native/XR export controls,
 finish interactive weights, then UV solve, remaining sculpt/retopo/bake/plugin
 work and physical/compute verification. Preserve full REQUIREMENTS objective.
+
+
+## Current authoring before remoteaf492ee merge
+
+Working integrated build completed;44registered suites have evidence across
+42/44 broad run plus two corrected focused suites. Export test now independently
+decodes red PNG (generic factors are neutralized); XR fixture now reads released
+texture and checks correct linear/sRGB display colors, with both swapchain modes.
+Focused export passes6.11s, full real-loader XR passes68.06s. Native rig/weights
+GUI12/12 and avatar export GUI5/5 pass; screenshots inspected. Shared MToon
+hardware54/software54/instrumented54 and source/morph/UV component scopes are
+recorded in focused docs. This is NOT an exact merged-source full run. Remote
+baking/Mikk af492ee must merge preserving both histories, then get fresh pinned
+Release/GUI/sanitizer checks before publication. Full goal remains incomplete.

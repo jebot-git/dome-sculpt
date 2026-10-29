@@ -19,7 +19,8 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
 root = Path(__file__).resolve().parents[1]
 compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1"
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1"
-out = root / ("artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
+export_flow = os.environ.get("DOME_MENU_EXPORT") == "1"
+out = root / ("artifacts/menu-export" if export_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -96,8 +97,9 @@ async def main():
         log = (out / "app.log").open("w")
         arguments = [str(root / "build/dome-sculpt")]
         fixture = Path(home, "rig.dsculpt")
-        if rig_flow:
-            subprocess.run([str(root / "build/dome-sculpt-rig-edit-test"), "--ui-fixture", str(fixture)], check=True)
+        if rig_flow or export_flow:
+            fixture_tool = "dome-sculpt-document-export-test" if export_flow else "dome-sculpt-rig-edit-test"
+            subprocess.run([str(root / "build" / fixture_tool), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
         app = subprocess.Popen(
             arguments, env=env, cwd=home, stdout=log, stderr=log
@@ -160,6 +162,36 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if export_flow:
+            import hashlib, struct
+            original_hash = hashlib.sha256(fixture.read_bytes()).digest()
+            nodes, _ = await layout()
+            check(nodes["Export selected avatar (.vrm)..."][1].get("enabled") is True,
+                  "Source avatar exports an enabled native universal-menu command")
+            await click("Export selected avatar (.vrm)...")
+            w = await wait(lambda: named("Export selected avatar"))
+            check(w.get_wm_transient_for() is not None and w.get_wm_class()[1] == window.get_wm_class()[1],
+                  "Avatar export chooser inherits the document's native application identity")
+            await click("Close Window")
+            await wait(lambda: named("Export selected avatar") is None)
+            check(not Path(home, "Avatar.vrm").exists() and hashlib.sha256(fixture.read_bytes()).digest() == original_hash,
+                  "Universal Close cancels avatar export without output or project mutation")
+            await click("Export selected avatar (.vrm)...")
+            w = await wait(lambda: named("Export selected avatar"))
+            w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync(); key("Return")
+            await wait(lambda: named("Export selected avatar") is None)
+            target = Path(home, "Avatar.vrm")
+            await wait(lambda: target.is_file())
+            payload = target.read_bytes()
+            magic, version, length = struct.unpack_from("<III", payload)
+            size, kind = struct.unpack_from("<II", payload, 12)
+            model = json.loads(payload[20:20+size])
+            check(magic == 0x46546c67 and version == 2 and length == len(payload) and kind == 0x4e4f534a and
+                  len(model["meshes"]) == 19 and len(model["skins"]) == 1 and "VRM" in model["extensions"],
+                  "Native file chooser submits a real grouped VRM container through the background worker")
+            check(hashlib.sha256(fixture.read_bytes()).digest() == original_hash and app.poll() is None,
+                  "Completed avatar export leaves the editable native project and desktop responsive")
+            d.close(); bus.disconnect(); return
         if rig_flow:
             def info():
                 return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
@@ -229,6 +261,38 @@ async def main():
             await click("Undo"); await click("Save")
             check(info()["scene_hash"] == posed,
                   "Shapekey Undo preserves the previously accepted grouped pose exactly")
+            await click("Skin weights...")
+            w = await wait(lambda: named("Skin weights"))
+            nodes, _ = await layout()
+            check(w.get_wm_transient_for().id == window.id and nodes["Skin weights..."][1].get("enabled") is False,
+                  "Skin-weight controls share native identity and modal scene isolation")
+            w.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
+            g = w.get_geometry(); tap(w, g.width/2+70, 80)
+            key("space", True); key("Down"); key("Return"); key("space", False)
+            await asyncio.sleep(.2)
+            raw = w.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+            Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX").save(out / "weight-options.png")
+            tap(w, g.width/2+80, g.height-40)
+            await wait(lambda: named("Skin weights") is None)
+            await asyncio.sleep(.4); await click("Save")
+            check(info()["scene_hash"] == posed, "Weight-view configuration changes no model data or history")
+            for _ in range(14): await click("Larger brush")
+            window.set_input_focus(X.RevertToParent, X.CurrentTime); d.sync()
+            g = window.get_geometry()
+            xtest.fake_input(d, X.MotionNotify, x=g.x+int(g.width*.60), y=g.y+int(g.height*.35)); d.sync()
+            key("Shift_L", True)
+            xtest.fake_input(d, X.ButtonPress, 1); d.sync(); await asyncio.sleep(.15)
+            xtest.fake_input(d, X.ButtonRelease, 1); d.sync(); key("Shift_L", False)
+            for _ in range(200):
+                nodes, _ = await layout()
+                if nodes["Save"][1].get("enabled") is True: break
+                await asyncio.sleep(.03)
+            await asyncio.sleep(.2); await click("Save")
+            raw = window.get_image(0, 0, g.width, g.height, X.ZPixmap, 0xFFFFFFFF)
+            Image.frombytes("RGB", (g.width, g.height), raw.data, "raw", "BGRX").save(out / "weight-gesture.png")
+            check(info()["scene_hash"] != posed, "Actual Shift-drag in the native viewport paints persistent skin weights")
+            await click("Undo"); await click("Save")
+            check(info()["scene_hash"] == posed, "Universal Undo restores exactly one complete native weight gesture")
             d.close(); bus.disconnect(); return
         if compact:
             await click("Voxel remesh...")

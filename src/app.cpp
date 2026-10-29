@@ -2,12 +2,14 @@
 #include "appearance.h"
 #include "desktop-menu.h"
 #include "dome/document.hpp"
+#include "dome/frame-clock.hpp"
 #include "dome/mesh.hpp"
 #include "dome/render.hpp"
 #include "dome/session-appearance.hpp"
 #include "object-editor.hpp"
 #include "creator-editor.hpp"
 #include "rig-editor.hpp"
+#include "weight-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "ui-conventions.hpp"
@@ -205,6 +207,7 @@ struct Canvas : Fl_Gl_Window {
     auto vp =
         multiply(projection(-right, right, -up, up), view_matrix(eye, {}));
     auto f = document.frame();
+    renderer->set_frame_time(render_frame_time());
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
                    f.state->toon, f.state->light);
     if (!capture.empty()) {
@@ -319,6 +322,7 @@ struct App {
     menu.add("&File/&Save", FL_CTRL + 's', command, this);
     menu.add("&File/Save &As...", FL_CTRL | FL_SHIFT | 's', command, this);
     menu.add("&File/Export &glTF (.glb)...", FL_CTRL + 'e', command, this);
+    menu.add("&File/Export selected avatar (.vrm)...", 0, command, this);
     menu.add("&File/Recovery/Refresh recovery", 0, command, this);
     menu.add("&File/Recovery/Recover project...", 0, command, this);
     menu.add("&File/Close &Window", FL_CTRL + 'w', command, this);
@@ -353,6 +357,7 @@ struct App {
              FL_MENU_TOGGLE | FL_MENU_VALUE);
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
+    menu.add("&Scene/Skin weights...", 0, command, this);
     menu.add("&Scene/Rig and shapekeys...", 0, command, this);
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
     menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
@@ -479,6 +484,7 @@ struct App {
     enable("&Edit/&Redo",
            modal ? (input ? input->can_redo() : s->uv && s->uv->can_redo)
                  : s->can_redo);
+    enable("&File/Export selected avatar (.vrm)...", !modal && !s->asset_busy && s->can_export_avatar);
     enable("&Scene/Delete object",
            !modal && !s->asset_busy && s->objects.size() > 1);
     enable("&Scene/Next object", !modal && s->objects.size() > 1);
@@ -486,6 +492,7 @@ struct App {
     auto active =
         std::find_if(s->objects.begin(), s->objects.end(),
                      [&](auto &o) { return o.id == s->active_object; });
+    enable("&Scene/Skin weights...", !modal && !s->asset_busy && s->can_paint_weights);
     enable("&Scene/Rig and shapekeys...", !modal && !s->asset_busy &&
            s->mesh_active && bool(s->deformation) && active != s->objects.end() &&
            active->visible && !active->locked);
@@ -591,6 +598,13 @@ struct App {
       text << "Paint " << channels[int(info->paint.channel)] << " | radius "
            << int(canvas.radius * 1000) << " mm | " << info->paint_layers.size()
            << " layers | Shift+drag: paint | P: painted mesh | Shift+P: source";
+    }
+    if (info->weights.enabled) {
+      text.str("");
+      const char *modes[] = {"Add", "Subtract", "Replace", "Smooth"};
+      text << "Weights " << modes[int(info->weights.mode)] << " | "
+           << info->deformation->skeleton->bones.at(info->rig_joint).name
+           << " | Shift+drag: paint | Blue: 0  Red: 1";
     }
     if (!info->error.empty()) {
       text.str("");
@@ -734,6 +748,8 @@ struct App {
       canvas.document.duplicate_object();
     } else if (label == "Delete object") {
       canvas.document.delete_object();
+    } else if (label == "Skin weights...") {
+      edit_weights_dialog(canvas.document);
     } else if (label == "Rig and shapekeys...") {
       edit_rig_dialog(canvas.document);
     } else if (label == "Voxel remesh...") {
@@ -817,10 +833,13 @@ struct App {
       canvas.document.prepare_mesh();
     } else if (label == "Export glTF (.glb)...") {
       auto chosen =
-          fl_file_chooser("Export static glTF mesh", "*.glb", "Sculpt.glb");
+          fl_file_chooser("Export glTF scene", "*.glb", "Sculpt.glb");
       if (chosen) {
-        export_glb(canvas.document.copy_scene().surfaces(true), chosen);
+        canvas.document.export_asset(chosen);
       }
+    } else if (label == "Export selected avatar (.vrm)...") {
+      auto chosen = fl_file_chooser("Export selected avatar", "*.vrm", "Avatar.vrm");
+      if (chosen) canvas.document.export_asset(chosen, AssetExportFormat::Avatar);
     } else if (label == "Start or stop XR") {
       toggle_xr();
     } else if (label == "PBR") {

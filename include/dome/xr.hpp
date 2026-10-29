@@ -32,6 +32,7 @@ class XrSculpt {
   std::vector<Eye> eyes;
   XrSessionState state = XR_SESSION_STATE_UNKNOWN;
   bool running = false, quit = false, overlayMode = true;
+  SurfaceOutputEncoding output_encoding_ = SurfaceOutputEncoding::Linear;
   std::unique_ptr<SurfaceRenderer> renderer;
   std::unique_ptr<SpatialPalette> palette;
   std::unique_ptr<CursorRenderer> cursors;

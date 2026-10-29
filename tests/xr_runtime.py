@@ -99,6 +99,7 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
     for name, mode in [
         ("controller", None),
         ("stylus", {"DOME_XR_FIXTURE_STYLUS": "1"}),
+        ("controller-srgb", {"DOME_XR_FIXTURE_SRGB": "1"}),
     ]:
         result, path = run(name, 45, mode=mode)
         check(
@@ -148,6 +149,8 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
             report.get("palette_images", 0) > 0,
             name + " joystick menu is rasterized into submitted eye images",
         )
+        check(report["swapchain_format"] == (35907 if name == "controller-srgb" else 32856),
+              name + " uses the explicit sRGB or linear OpenXR swapchain transport")
         if name == "stylus":
             bindings = report["bindings"][
                 "/interaction_profiles/logitech/mx_ink_stylus_logitech"

@@ -35,6 +35,8 @@ struct Space {
 };
 struct Swap {
   GLuint texture[2]{};
+  GLuint read_fbo = 0;
+  int64_t format = GL_RGBA8;
   uint32_t width, height, index = 0;
   bool acquired = false, waited = false;
   int eye;
@@ -246,7 +248,7 @@ FN(EnumerateSwapchainFormats, XrSession, uint32_t cap, uint32_t *n,
    int64_t *p) {
   *n = 1;
   if (cap)
-    p[0] = GL_RGBA8;
+    p[0] = getenv("DOME_XR_FIXTURE_SRGB") ? GL_SRGB8_ALPHA8 : GL_RGBA8;
   return XR_SUCCESS;
 }
 FN(CreateSwapchain, XrSession, const XrSwapchainCreateInfo *p,
@@ -255,6 +257,9 @@ FN(CreateSwapchain, XrSession, const XrSwapchainCreateInfo *p,
   s->width = p->width;
   s->height = p->height;
   s->eye = chains.size();
+  s->format = p->format;
+  report["swapchain_format"] = p->format;
+  glGenFramebuffers(1, &s->read_fbo);
   glGenTextures(2, s->texture);
   for (auto id : s->texture) {
     glBindTexture(GL_TEXTURE_2D, id);
@@ -269,6 +274,7 @@ FN(CreateSwapchain, XrSession, const XrSwapchainCreateInfo *p,
 FN(DestroySwapchain, XrSwapchain p) {
   auto s = reinterpret_cast<Swap *>(p);
   glDeleteTextures(2, s->texture);
+  glDeleteFramebuffers(1, &s->read_fbo);
   count("swapchains_destroyed");
   return XR_SUCCESS;
 }
@@ -312,13 +318,32 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
   s->acquired = false;
   count("releases");
   std::vector<uint8_t> bytes(size_t(s->width) * s->height * 4);
+  // Inspect the actual released image, independent of the application's read
+  // framebuffer binding. RGBA8 swapchains contain linear premultiplied RGB;
+  // SRGB8 swapchains store the corresponding sRGB transfer encoding.
+  GLint previous_read = 0;
+  glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &previous_read);
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, s->read_fbo);
+  glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                         s->texture[s->index], 0);
+  if (glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    return XR_ERROR_RUNTIME_FAILURE;
   glReadPixels(0, 0, s->width, s->height, GL_RGBA, GL_UNSIGNED_BYTE,
                bytes.data());
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, GLuint(previous_read));
+  if (glGetError() != GL_NO_ERROR) return XR_ERROR_RUNTIME_FAILURE;
+  auto displayed = [&](uint8_t value) {
+    if (s->format == GL_SRGB8_ALPHA8) return int(value);
+    float linear = value / 255.f;
+    float encoded = linear <= .0031308f ? linear * 12.92f
+        : 1.055f * std::pow(linear, 1 / 2.4f) - .055f;
+    return int(std::lround(encoded * 255));
+  };
   int opaque = 0, blue = 0;
   for (size_t i = 0; i < bytes.size(); i += 4) {
     if (bytes[i + 3] > 0)
       ++opaque;
-    if (bytes[i] < 150 && bytes[i + 1] > 130 && bytes[i + 2] > 220)
+    if (displayed(bytes[i]) < 150 && displayed(bytes[i + 1]) > 130 && displayed(bytes[i + 2]) > 220)
       ++blue;
   }
   if (opaque > 100)

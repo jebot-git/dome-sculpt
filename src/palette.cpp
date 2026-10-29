@@ -25,7 +25,9 @@ SpatialPalette::SpatialPalette() {
   const char *vertex = R"(#version 330 core
 layout(location=0)in vec2 position;layout(location=1)in vec2 uv;uniform mat4 matrix;out vec2 texcoord;void main(){texcoord=uv;gl_Position=matrix*vec4(position,0,1);})";
   const char *fragment = R"(#version 330 core
-in vec2 texcoord;uniform sampler2D image;out vec4 color;void main(){color=texture(image,texcoord);})";
+in vec2 texcoord;uniform sampler2D image;uniform bool linearOutput;out vec4 color;
+vec3 encodeSrgb(vec3 c){return mix(12.92*c,1.055*pow(max(c,vec3(0)),vec3(1./2.4))-.055,step(vec3(.0031308),c));}
+void main(){color=texture(image,texcoord);if(!linearOutput)color.rgb=encodeSrgb(color.rgb);})";
   auto v = shader(GL_VERTEX_SHADER, vertex),
        f = shader(GL_FRAGMENT_SHADER, fragment);
   program_ = glCreateProgram();
@@ -167,7 +169,7 @@ void SpatialPalette::raster(const EditorState &s) {
          v.valid || v.validating || v.committing ? fg : Color{255, 150, 100, 255});
     auto button = [&](int column, int y, const char *name,
                       bool selected = false, bool disabled = false) {
-      disabled = disabled || v.committing || v.solving;
+      disabled = disabled || v.committing || v.solving || !v.topology;
       rect((40 + 94 * column) * unit_, y * unit_, 88 * unit_,
            (y == 68 ? 34 : 42) * unit_,
            selected ? accent
@@ -196,7 +198,7 @@ void SpatialPalette::raster(const EditorState &s) {
       rect(8 * unit_, y * unit_, 94 * unit_, 42 * unit_,
            s.light ? Color{200, 209, 220, uint8_t(s.opacity)} : Color{55, 65, 80, uint8_t(s.opacity)});
       text(55 * unit_, (y + 29) * unit_, i ? "Stitch" : "Unwrap",
-           v.solving || v.committing ? Color{140, 140, 140, 255} : fg);
+           v.solving || v.committing || !v.topology ? Color{140, 140, 140, 255} : fg);
     }
     rect(110 * unit_, 110 * unit_, 420 * unit_, 420 * unit_,
          s.light ? Color{208, 208, 208, uint8_t(s.opacity)}
@@ -235,7 +237,7 @@ void SpatialPalette::raster(const EditorState &s) {
       line({p, 0}, {p, 1}, grid);
       line({0, p}, {1, p}, grid);
     }
-    for (auto &e : v.topology->edges) {
+    if (v.topology) for (auto &e : v.topology->edges) {
       bool selected = false;
       for (auto c : e.corners)
         selected |=
@@ -352,6 +354,12 @@ void SpatialPalette::raster(const EditorState &s) {
   auto current = std::find_if(s.objects.begin(), s.objects.end(),
                               [&](auto &o) { return o.id == s.active_object; });
   auto marked = [&](int sector) -> std::optional<bool> {
+    if (s.menu_page == 13) {
+      if (sector == 0) return s.weights.enabled;
+      if (sector == 6) return s.weights.symmetry;
+      if (sector == 7) return !s.weights.locks.empty() && s.weights.locks.at(s.rig_joint);
+      if (sector == 9) return s.weights.linked;
+    }
     if (s.menu_page == 0 && sector < 4)
       return int(s.tool) == sector;
     if (s.menu_page == 1 && current != s.objects.end()) {
@@ -409,11 +417,12 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11) {
+  if (s.menu_page != 11 && s.menu_page != 13) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 11 ? "Rig and shapekeys"
+  const char *page = s.menu_page == 13 ? "Skin weights"
+                     : s.menu_page == 11 ? "Rig and shapekeys"
                      : s.menu_page == 10 ? "Mesh tools"
                      : s.menu_page == 9 ? "Avatars"
                      : s.menu_page == 8 ? "Recovery"
@@ -426,6 +435,11 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if (s.menu_page == 13 && s.deformation && s.deformation->skeleton) {
+    const char *modes[] = {"Add", "Subtract", "Replace", "Smooth"};
+    text(320 * unit_, 290 * unit_, s.deformation->skeleton->bones.at(s.rig_joint).name, fg);
+    text(320 * unit_, 320 * unit_, modes[int(s.weights.mode)], fg);
+  }
   if (s.menu_page == 11 && s.deformation) {
     auto &d = *s.deformation;
     if (d.skeleton && !d.skeleton->bones.empty())
@@ -464,6 +478,9 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_visible) +
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature += std::to_string(s.weights.enabled) + std::to_string(s.weights.symmetry) +
+      std::to_string(s.weights.linked) + std::to_string(int(s.weights.mode));
+  for (auto lock : s.weights.locks) signature += lock ? "1" : "0";
   signature += std::to_string(int(s.controls.parameter)) +
                std::to_string(s.controls.selected);
   if (s.uv)
@@ -477,7 +494,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   if (signature != signature_) {
     raster(s);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width_, height_, 0, GL_RGBA,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, width_, height_, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, rgba_.data());
     signature_ = signature;
   }
@@ -490,6 +507,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
                       GL_ONE_MINUS_SRC_ALPHA);
   glUseProgram(program_);
+  glUniform1i(glGetUniformLocation(program_, "linearOutput"), linear_output_);
   auto m = multiply(vp, model_matrix(s.panel));
   glUniformMatrix4fv(glGetUniformLocation(program_, "matrix"), 1, GL_FALSE,
                      m.data());

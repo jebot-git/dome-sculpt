@@ -25,7 +25,9 @@ enum class VrParameter {
   SculptOpacity,
   VoxelSize,
   RigRotation,
-  MorphWeight
+  MorphWeight,
+  WeightStrength,
+  WeightValue
 };
 struct VrControlState {
   VrParameter parameter = VrParameter::None;

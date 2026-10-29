@@ -22,6 +22,7 @@ int main(int argc, char **argv) try {
   if (!doc.wait_mesh())
     throw std::runtime_error("No mesh snapshot");
   NativeGraphics graphics;
+  std::cout << "GPU " << glGetString(GL_RENDERER) << '\n';
   SurfaceRenderer renderer;
   SpatialPalette palette;
   GLuint fbo, color, depth;

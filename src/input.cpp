@@ -42,8 +42,13 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
       "Next shape", "Previous shape", "Reset pose", "Undo",
-      "Back", "Redo", "Save", "Export glTF"};
-  return page == 11 ? rig
+      "Back", "Redo", "Weights", "Export avatar"};
+  static const std::array<const char *, 12> weights = {
+      "Paint weights", "Next joint", "Previous joint", "Mode",
+      "Strength", "Target", "Symmetry", "Joint lock",
+      "Back", "Linked parts", "Brush size", "Save"};
+  return page == 13 ? weights
+         : page == 11 ? rig
          : page == 10 ? mesh
          : page == 9 ? avatars
          : page == 8 ? recovery
@@ -56,6 +61,9 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if (page == 13 && sector == 4) return VrParameter::WeightStrength;
+  if (page == 13 && sector == 5) return VrParameter::WeightValue;
+  if (page == 13 && sector == 10) return VrParameter::BrushRadius;
   if (page == 11 && sector == 0) return VrParameter::RigRotation;
   if (page == 11 && sector == 3) return VrParameter::MorphWeight;
   if (page == 10 && sector == 1)
@@ -102,16 +110,24 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
-  if (index < 0 || index >= 12 || page < 0 || page > 11 || page == 5 ||
+  if (index < 0 || index >= 12 || page < 0 || page > 13 || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if (page == 13) {
+    static const std::array<SpatialCommand, 12> weights = {
+      SpatialCommand::WeightToggle, SpatialCommand::RigNextJoint, SpatialCommand::RigPreviousJoint,
+      SpatialCommand::WeightMode, SpatialCommand::Undo, SpatialCommand::Undo,
+      SpatialCommand::WeightSymmetry, SpatialCommand::WeightLock, SpatialCommand::Undo,
+      SpatialCommand::WeightLinked, SpatialCommand::Undo, SpatialCommand::Save};
+    return index == 8 ? std::nullopt : std::optional<SpatialCommand>(weights[index]);
+  }
   if (page == 11) {
     static const std::array<SpatialCommand, 12> rig = {
       SpatialCommand::Undo, SpatialCommand::RigNextJoint, SpatialCommand::RigPreviousJoint,
       SpatialCommand::Undo, SpatialCommand::RigNextMorph, SpatialCommand::RigPreviousMorph,
       SpatialCommand::RigResetPose, SpatialCommand::Undo, SpatialCommand::Undo,
-      SpatialCommand::Redo, SpatialCommand::Save, SpatialCommand::Export};
-    return index == 8 ? std::nullopt : std::optional<SpatialCommand>(rig[index]);
+      SpatialCommand::Redo, SpatialCommand::Save, SpatialCommand::ExportAvatar};
+    return index == 8 || index == 10 ? std::nullopt : std::optional<SpatialCommand>(rig[index]);
   }
   if (page == 9) {
     static const std::array<SpatialCommand,12> avatars = {
@@ -511,6 +527,8 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 2 && selected_ == 3) {
       page_ = 3;
       selected_ = 0;
+    } else if (page_ == 11 && selected_ == 10) {
+      page_ = 13; selected_ = 0;
     } else if (page_ == 9 && selected_ == 5) {
       page_ = 11;
       selected_ = 0;
@@ -550,7 +568,8 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_ == 11 ? 9
+      page_ = page_ == 13 ? 11
+              : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
               : page_ == 8 ? 7
               : page_ == 7 ? 1

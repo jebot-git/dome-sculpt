@@ -5,6 +5,7 @@
 #include "recovery.hpp"
 #include "scene.hpp"
 #include "uv.hpp"
+#include "weight-authoring.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -13,6 +14,7 @@
 #include <span>
 #include <thread>
 namespace dome {
+class SurfaceQuery;
 struct SpatialHand {
   TrackedHand tracked;
   bool joystick = false, undo = false, redo = false;
@@ -56,7 +58,10 @@ struct EditorState {
        can_redo = false;
   std::shared_ptr<const DeformationState> deformation;
   size_t rig_joint = 0, morph_target = 0;
+  WeightToolSettings weights;
+  bool can_paint_weights = false;
   bool can_voxel_remesh = false;
+  bool can_export_avatar = false;
   float voxel_size_mm = 30;
   std::array<bool, 12> menu_enabled{true, true, true, true, true, true,
                                     true, true, true, true, true, true};
@@ -87,6 +92,10 @@ struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;
   Mesh mesh;
   std::vector<SurfaceRange> ranges;
+  // Empty: ordinary material view. Otherwise one value per packed vertex;
+  // -1: ordinary material, [0,1]: unlit selected-joint weight visualization.
+  std::vector<float> selected_weights;
+  std::shared_ptr<const SurfaceQuery> picking;
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0;
@@ -95,6 +104,7 @@ struct SceneDraft {
   Scene scene;
   AssetSource source;
 };
+enum class AssetExportFormat { Glb, Avatar };
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
   std::shared_ptr<const MeshSnapshot> surface;
@@ -153,6 +163,7 @@ public:
   void cancel_spatial_menu();
   void use_mesh();
   void paint_settings(PaintSettings);
+  void weight_settings(WeightToolSettings, std::optional<uint32_t> joint = {}, AssetSource expected = {});
   void paint_command(SpatialCommand);
   void sculpt_command(SpatialCommand);
   void sculpt_layer_properties(uint64_t object, uint64_t layer, std::string,
@@ -170,6 +181,10 @@ public:
   void begin_spatial();
   void rebase_space(std::optional<CanvasTransform>);
   void save(const std::filesystem::path &);
+  // Captures a committed scene and performs ordered file work asynchronously.
+  // Ignoring the returned promise never blocks the UI thread.
+  std::future<void> export_asset(const std::filesystem::path &,
+                                AssetExportFormat = AssetExportFormat::Glb);
   void open(const std::filesystem::path &);
   void request_save(bool export_mesh = false);
   bool
@@ -209,19 +224,28 @@ private:
   void restore_recovery_locked(size_t);
   std::optional<Scene> control_before_;
   PaintSettings control_settings_;
+  WeightToolSettings control_weights_;
   float control_radius_ = 0;
   bool control_changed_ = false;
   uint64_t control_object_ = 0;
   AssetSource control_source_{};
   uint64_t rig_object_ = 0;
   size_t control_rig_index_ = 0;
+  bool weight_stroking_ = false;
+  AssetSource weight_source_{};
+  uint32_t weight_joint_ = 0;
+  WeightToolSettings weight_stroke_settings_{};
+  std::vector<WeightBrush> weight_samples_;
   float control_voxel_mm_ = 30;
   std::optional<UvWorkspace> uv_;
   uint64_t uv_session_ = 0;
   bool uv_accept_pending_ = false;
+  bool uv_solving_ = false;
   struct UvValidationJob {
     uint64_t request, session, generation;
     std::shared_ptr<const Mesh> mesh;
+    std::optional<UvAction> operation;
+    std::shared_ptr<UvWorkspace> workspace;
   };
   mutable std::mutex uv_mutex_;
   mutable std::condition_variable uv_changed_;
@@ -231,12 +255,17 @@ private:
   void schedule_uv_locked();
   void invalidate_uv_locked();
   void uv_loop();
+  void queue_uv_operation_locked(UvAction);
+  void apply_uv_action_locked(UvAction, float = 0, float = 0);
   void queue_uv_locked(std::shared_ptr<const Mesh>);
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
   struct MeshJob {
     uint64_t revision, generation;
     Scene scene;
+    bool weight_view = false;
+    bool linked_weights = true;
+    uint32_t weight_joint = 0;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;
@@ -257,6 +286,7 @@ private:
     uint32_t resolution = 512;
     std::shared_ptr<Volume> source_identity{};
     std::shared_ptr<const Mesh> uv_mesh{};
+    std::shared_ptr<const std::vector<uint32_t>> uv_source_vertices{};
     std::shared_ptr<PaintedMesh> paint_identity{};
     RecoverySource recovery_source{};
     bool create_parent = false;
@@ -268,6 +298,8 @@ private:
     SceneOperation scene_operation{};
     std::string operation_label{};
     std::shared_ptr<std::string> operation_report{};
+    std::shared_ptr<bool> operation_changed{};
+    AssetExportFormat export_format = AssetExportFormat::Glb;
   };
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;
@@ -290,7 +322,8 @@ private:
   void prepare_locked(uint32_t);
   void finish_locked();
   void process_locked(const SpatialFrame &);
-  void file_locked(bool export_mesh);
+  void file_locked(bool export_mesh, AssetExportFormat = AssetExportFormat::Glb);
+  void process_uv_transfer(FileJob &);
   void command_locked(SpatialCommand);
   bool command_enabled_locked(SpatialCommand) const;
   bool parameter_enabled_locked(VrParameter) const;
@@ -302,7 +335,7 @@ private:
   void queue_scene_operation(std::string, SceneOperation, AssetSource,
                              std::shared_ptr<std::string>);
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
-                                    std::shared_ptr<std::string>);
+                                    std::shared_ptr<std::string>, std::shared_ptr<bool> = {});
   void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome
