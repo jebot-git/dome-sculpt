@@ -5,6 +5,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -220,6 +221,53 @@ int main() try {
           sm.normal_texture.texture->sampler->min_filter==9987 &&
           sm.occlusion_texture.texture && sm.occlusion_texture.scale==.35f,
           "Normal/AO scale, UV transform and independent samplers survive export");
+  auto invalid_raw=std::make_shared<dome::TextureMaps>(*source_maps);
+  invalid_raw->baked_base=std::make_shared<const dome::BakedTextures>();
+  auto raw_with_bake=objects;raw_with_bake[0].textures=invalid_raw;
+  bool bypass_rejected=false;try{dome::export_glb(raw_with_bake,path);}catch(const std::invalid_argument&){bypass_rejected=true;}
+  require(bypass_rejected,"Raw source markers cannot bypass an immutable baked payload");
+  auto imported=std::make_shared<dome::ImportedAsset>();imported->mode=dome::ImportMode::PreserveGltf;
+  dome::ImportedPrimitive source_primitive; source_primitive.mesh=mesh; source_primitive.source_mesh=0; source_primitive.source_primitive=0;
+  source_primitive.uv1=mesh.uv;
+  source_primitive.colors.assign(mesh.positions.size(),{.2f,.4f,.6f,.8f});
+  source_primitive.tangents.assign(mesh.positions.size(),{1,0,0,-1});
+  imported->primitives.push_back(source_primitive);
+  auto source_identity=std::make_shared<dome::CreatorAppearance>();source_identity->asset=imported;source_identity->source_basis_quaternion=dome::Quat{};
+  source_identity->source_mesh=source_identity->source_primitive=0;
+  for(uint32_t v=0;v<mesh.positions.size();++v)source_identity->source_vertices.push_back(v);
+  objects[0].appearance=source_identity;
+  dome::export_glb(objects,path);raw=nullptr;
+  require(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,
+          "Independent parser accepts preserved secondary UV/color/tangent attributes");
+  std::unique_ptr<cgltf_data,decltype(&cgltf_free)> attributes_file(raw,cgltf_free);
+  require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
+          cgltf_validate(raw)==cgltf_result_success &&
+          raw->materials[0].pbr_metallic_roughness.base_color_texture.texcoord==0,
+          "Source material retains its explicit supported UV binding");
+  auto &source_p=raw->meshes[0].primitives[0];float source_value[4];
+  require(cgltf_find_accessor(&source_p,cgltf_attribute_type_texcoord,1) &&
+          cgltf_accessor_read_float(cgltf_find_accessor(&source_p,cgltf_attribute_type_color,0),0,source_value,4) && source_value[2]==.6f,
+          "Original compacted vertex color and secondary UV accessors survive exactly");
+  require(cgltf_accessor_read_float(cgltf_find_accessor(&source_p,cgltf_attribute_type_tangent,0),0,source_value,4) && source_value[3]==-1,
+          "Source tangent handedness remains authored");
+  // Source-authored tangent preservation is a separate fixture from a bake
+  // that explicitly selects canonical Mikk frames.
+  auto read_file=[&]{std::ifstream input(path,std::ios::binary);return std::vector<uint8_t>{std::istreambuf_iterator<char>(input),{}};};
+  auto existing=read_file();auto conflicting=objects;
+  dome::Mesh tangent_plane;
+  tangent_plane.positions={{0,0,0},{1,0,0},{0,1,0}};
+  tangent_plane.normals.assign(3,{0,0,1});tangent_plane.uv={{0,0},{1,0},{0,1}};tangent_plane.indices={0,1,2};
+  auto conflicting_asset=std::make_shared<dome::ImportedAsset>();conflicting_asset->mode=dome::ImportMode::PreserveGltf;
+  dome::ImportedPrimitive conflicting_primitive;conflicting_primitive.source_mesh=conflicting_primitive.source_primitive=0;
+  conflicting_primitive.mesh=tangent_plane;conflicting_primitive.tangents.assign(3,{0,1,0,1});conflicting_asset->primitives={conflicting_primitive};
+  auto conflicting_identity=std::make_shared<dome::CreatorAppearance>();conflicting_identity->asset=conflicting_asset;
+  conflicting_identity->source_mesh=conflicting_identity->source_primitive=0;conflicting_identity->source_vertices={0,1,2};conflicting_identity->source_basis_quaternion=dome::Quat{};
+  conflicting[0].mesh=tangent_plane;conflicting[0].appearance=conflicting_identity;conflicting[0].textures=detailed_maps;
+  bool conflict_tangent=false;
+  try{dome::export_glb(conflicting,path);}catch(const std::invalid_argument&){conflict_tangent=true;}
+  require(conflict_tangent && read_file()==existing,
+          "Conflicting authored tangents and canonical baked normals reject without replacing output");
+  objects[0].appearance.reset();
   auto derived=std::make_shared<dome::TextureMaps>(*maps); derived->source_maps=source;
   objects[0].textures=derived; dome::export_glb(objects,path);
   raw=nullptr;
@@ -228,9 +276,12 @@ int main() try {
   std::unique_ptr<cgltf_data,decltype(&cgltf_free)> derived_file(raw,cgltf_free);
   require(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success &&
           cgltf_validate(raw)==cgltf_result_success &&
-          raw->materials[0].normal_texture.texture && raw->materials[0].occlusion_texture.texture &&
+          raw->materials[0].normal_texture.texture && raw->materials[0].normal_texture.scale==.6f &&
+          raw->materials[0].normal_texture.has_transform &&
+          raw->materials[0].occlusion_texture.texture==raw->materials[0].pbr_metallic_roughness.metallic_roughness_texture.texture &&
+          raw->materials[0].occlusion_texture.scale==1 &&
           raw->materials[0].pbr_metallic_roughness.base_color_factor[0]==1,
-          "Derived composites retain source normal/AO without double factors");
+          "Derived composites retain raw normal binding and composed ORM AO without double factors");
   auto mixed=std::make_shared<dome::TextureMaps>(*detailed_maps);mixed->source_maps=source;
   objects[0].textures=mixed;
   dome::export_glb(objects,path);raw=nullptr;
@@ -481,9 +532,6 @@ int main() try {
   if (const char *fixture = std::getenv("DOME_GLTF_FIXTURE"))
     std::filesystem::copy_file(path, std::string(fixture) + ".grouped.glb",
                                std::filesystem::copy_options::overwrite_existing);
-  auto appearance=std::make_shared<dome::CreatorAppearance>();
-  appearance->asset=std::make_shared<dome::ImportedAsset>();
-  objects[0].appearance=appearance;
   auto sibling=objects[0]; sibling.id=2; sibling.name="Other creator primitive";
   dome::export_glb({objects[0],sibling},path);
   raw=nullptr;

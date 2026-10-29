@@ -3,12 +3,26 @@
 #include "dome/tangents.hpp"
 #include "dome/creation.hpp"
 #include "dome/rig-edit.hpp"
+#include "dome/vrm.hpp"
+#include "dome/gltf-export.hpp"
+#include "dome/mesh-processing.hpp"
 #include <unistd.h>
 #include <utility>
 namespace dome {
 namespace {
 ob::Vec3 obv(Vec3 p) { return {p.x, p.y, p.z}; }
 Vec3 vec(ob::Vec3 p) { return {p.x, p.y, p.z}; }
+uint64_t avatar_group(const Scene &scene, uint64_t object) {
+  auto group = scene.object(object).group;
+  auto path = scene.group_path(group);
+  for (auto it = path.rbegin(); it != path.rend(); ++it)
+    if (it->humanoid) return it->id;
+  return group;
+}
+bool in_group(const Scene &scene, const SculptObject &object, uint64_t group) {
+  auto path = scene.group_path(object.group);
+  return group && std::any_of(path.begin(), path.end(), [group](const auto &g) { return g.id == group; });
+}
 } // namespace
 Document::Document() : input_(volume()) {
   input_.radius = state_.radius;
@@ -19,7 +33,7 @@ Document::Document() : input_(volume()) {
     return parameter_enabled_locked(parameter);
   };
   input_.control_accept = [this] {
-    return !uv_ || (!uv_accept_pending_ &&
+    return !uv_ || (!uv_solving_ && !uv_accept_pending_ &&
                     (uv_->view().valid || uv_->view().validating));
   };
   input_.committed = [this] { record_stroke_locked(); };
@@ -89,22 +103,48 @@ Scene Document::copy_scene() const {
   return scene_.snapshot();
 }
 bool Document::action_active_locked() const {
+  if (weight_stroking_) return true;
   auto &o = scene_.active();
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if (weight_stroking_) return !weight_samples_.empty();
   auto &o = scene_.active();
   return o.mesh_active ? o.painted->pending_changes()
                        : volume().pending_changes();
 }
 void Document::begin_action_locked() {
   state_.message.clear();
+  if (state_.weights.enabled) {
+    if (!state_.can_paint_weights || state_.asset_busy)
+      throw std::logic_error("Skin weight painting is unavailable");
+    auto mesh = mesh_.load();
+    if (mesh->generation != state_.generation || mesh->revision != state_.revision)
+      throw std::logic_error("Wait for the current weight view before painting");
+    state_.weights.validate(scene_.active().deformation->skeleton->bones.size());
+    weight_stroking_ = true; weight_samples_.clear();
+    weight_source_ = {state_.generation, state_.revision, scene_.active().id};
+    weight_stroke_settings_ = state_.weights;
+    weight_joint_ = uint32_t(state_.rig_joint);
+    return;
+  }
   if (scene_.active().mesh_active)
     scene_.active().painted->begin_stroke();
   else
     volume().begin_stroke();
 }
 void Document::stamp_action_locked(const Brush &b) {
+  if (weight_stroking_) {
+    if (!finite(b.from) || !finite(b.to) || !std::isfinite(b.radius) || b.radius <= 0 ||
+        !std::isfinite(b.pressure) || b.pressure < 0 || b.pressure > 1)
+      throw std::invalid_argument("Invalid weight stroke geometry or pressure");
+    if (!b.pressure) return;
+    if (weight_samples_.size() >= 4096) throw std::length_error("Weight gesture sample budget exceeded");
+    WeightBrush sample; sample.from = b.from; sample.to = b.to;
+    sample.radius = b.radius; sample.pressure = b.pressure; sample.strength = 1;
+    sample.joint = weight_joint_; weight_samples_.push_back(sample);
+    return;
+  }
   if (scene_.active().mesh_active)
     scene_.active().painted->stamp(b, state_.paint);
   else {
@@ -118,10 +158,28 @@ void Document::stamp_action_locked(const Brush &b) {
   }
 }
 bool Document::end_action_locked() {
+  if (weight_stroking_) {
+    weight_stroking_ = false;
+    auto samples = std::move(weight_samples_); weight_samples_.clear();
+    if (samples.empty()) return false;
+    auto settings = weight_stroke_settings_;
+    auto object = weight_source_.object;
+    auto report = std::make_shared<std::string>(); auto changed = std::make_shared<bool>(false);
+    queue_scene_operation_locked("Paint skin weights",
+      [samples = std::move(samples), settings, object, report, changed](Scene &scene, const auto &cancelled) {
+        auto result = paint_scene_weights(scene, object, samples, settings, cancelled);
+        *changed = result.changed != 0;
+        *report = std::to_string(result.changed) + " vertices changed, " +
+                  std::to_string(result.constrained) + " constrained";
+        for (const auto &message : result.diagnostics) *report += "; " + message;
+      }, weight_source_, report, {}, changed);
+    return false;
+  }
   return scene_.active().mesh_active ? scene_.active().painted->end_stroke()
                                      : volume().end_stroke();
 }
 void Document::cancel_action_locked() {
+  if (weight_stroking_) { weight_stroking_ = false; weight_samples_.clear(); return; }
   if (scene_.active().mesh_active)
     scene_.active().painted->cancel_stroke();
   else
@@ -305,6 +363,8 @@ void Document::publish_locked(bool force) {
   if (uv_) {
     auto view = std::make_shared<UvView>(uv_->view());
     view->committing = uv_accept_pending_;
+    view->solving = uv_solving_;
+    if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
     if (view->committing) {
       view->valid = false;
       view->can_undo = view->can_redo = false;
@@ -317,6 +377,7 @@ void Document::publish_locked(bool force) {
   if (rig_object_ != active.id) {
     rig_object_ = active.id;
     state_.rig_joint = state_.morph_target = 0;
+    state_.weights.locks.clear();
   }
   if (active.deformation) {
     auto &d = *active.deformation;
@@ -332,7 +393,13 @@ void Document::publish_locked(bool force) {
   state_.can_clear_bake=bake_target_ready_locked() && bool(active.painted->baked());
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
   state_.asset_progress=work.progress;
+  state_.can_paint_weights = active.mesh_active && active.painted && active.visible && !active.locked &&
+      active.deformation && active.deformation->skeleton && active.deformation->skin;
+  if (!state_.can_paint_weights) state_.weights.enabled = false;
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
+  auto avatar = avatar_group(scene_, active.id);
+  state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
+      [&](const auto &o) { return o.appearance && o.appearance->vrm_json && in_group(scene_, o, avatar); });
   state_.active_sculpt_layer = volume().active_layer();
   state_.sculpt_layers.clear();
   state_.sculpt_editable = volume().editable_layer();
@@ -379,7 +446,8 @@ void Document::publish_locked(bool force) {
   if (changed) {
     std::lock_guard mesh_lock(mesh_mutex_);
     pending_mesh_.emplace(
-        MeshJob{state_.revision, state_.generation, scene_.snapshot()});
+        MeshJob{state_.revision, state_.generation, scene_.snapshot(), state_.weights.enabled,
+                state_.weights.linked, uint32_t(state_.rig_joint)});
     mesh_changed_.notify_one();
   }
 }
@@ -494,6 +562,14 @@ void Document::cancel_desktop() {
 }
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
   std::lock_guard lock(model_mutex_);
+  if (state_.weights.enabled) {
+    auto mesh = mesh_.load();
+    if (mesh->generation != state_.generation || mesh->revision != state_.revision || !mesh->picking) return {};
+    auto hit = mesh->picking->raycast(p, d, 20);
+    if (!hit) return {};
+    auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
+    return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;
+  }
   auto t = scene_.world_transform(scene_.active().id);
   if (!scene_.active().visible || scene_.active().locked)
     return {};
@@ -517,7 +593,7 @@ Vec3 Document::gradient(Vec3 p) const {
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
-  if (uv_accept_pending_)
+  if (uv_accept_pending_ || uv_solving_)
     return false;
   if (uv_) {
     bool available = uv_->view().can_undo;
@@ -534,7 +610,7 @@ bool Document::undo() {
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
-  if (uv_accept_pending_)
+  if (uv_accept_pending_ || uv_solving_)
     return false;
   if (uv_) {
     bool available = uv_->view().can_redo;
@@ -596,20 +672,47 @@ void Document::report_error(std::string error) {
 void Document::shading(bool toon) {
   std::lock_guard lock(model_mutex_);
   state_.toon = toon;
-  publish_locked();
+  bool weight_view = std::exchange(state_.weights.enabled, false);
+  publish_locked(weight_view);
 }
 void Document::paint_settings(PaintSettings settings) {
   settings.validate();
   std::lock_guard lock(model_mutex_);
   finish_locked();
+  bool weights = std::exchange(state_.weights.enabled, false);
   state_.paint = settings;
-  publish_locked();
+  publish_locked(weights);
+}
+void Document::weight_settings(WeightToolSettings settings, std::optional<uint32_t> joint, AssetSource expected) {
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  if ((expected.generation && expected.generation != state_.generation) ||
+      (expected.revision && expected.revision != state_.revision) ||
+      (expected.object && expected.object != scene_.active().id))
+    throw std::logic_error("The weight editor source changed; reopen the editor");
+  if (state_.asset_busy || state_.recovery_busy)
+    throw std::logic_error("Wait for pending authoring work before changing the weight tool");
+  const auto &o = scene_.active();
+  if (settings.enabled && !state_.can_paint_weights)
+    throw std::logic_error("Select a visible, unlocked skinned mesh");
+  size_t bones = o.deformation && o.deformation->skeleton ? o.deformation->skeleton->bones.size() : 1;
+  if (!o.deformation) settings.locks.clear();
+  settings.validate(bones);
+  if (joint && *joint >= bones) throw std::out_of_range("Weight joint identity is out of range");
+  if (settings.symmetry && (!o.deformation || !o.deformation->humanoid))
+    throw std::logic_error("Symmetry requires explicit humanoid joint mapping");
+  state_.weights = std::move(settings);
+  if (joint) state_.rig_joint = *joint;
+  publish_locked(true);
 }
 void Document::paint_command(SpatialCommand command) {
   std::lock_guard lock(model_mutex_);
   finish_locked();
+  bool normal_paint = command == SpatialCommand::MakeMesh || command == SpatialCommand::EditSource ||
+      (command >= SpatialCommand::PaintColor && command <= SpatialCommand::LayerOpacity);
+  bool weight_view = normal_paint && std::exchange(state_.weights.enabled, false);
   command_locked(command);
-  publish_locked();
+  publish_locked(weight_view);
 }
 void Document::begin_uv() {
   std::lock_guard lock(model_mutex_);
@@ -645,22 +748,6 @@ void Document::end_voxel_remesh(bool accept) {
   desktop_ = false;
   publish_locked();
 }
-void Document::edit_uv(UvAction action, float x, float y) {
-  std::lock_guard lock(model_mutex_);
-  if (!uv_)
-    throw std::logic_error("Open the UV editor first");
-  if (uv_accept_pending_)
-    throw std::logic_error("Wait for the accepted UV edit to finish");
-  try {
-    uv_->edit(action, x, y);
-    state_.error.clear();
-  } catch (const std::exception &e) {
-    state_.error = e.what();
-    publish_locked();
-    throw;
-  }
-  publish_locked();
-}
 void Document::end_uv(bool accept) {
   std::lock_guard lock(model_mutex_);
   if (accept && uv_ && !uv_->view().valid && !uv_->view().validating)
@@ -672,10 +759,10 @@ void Document::end_uv(bool accept) {
 }
 void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   auto &o = scene_.active();
-  if (o.deformation) throw std::logic_error("UV topology transfer for rigged meshes is not available yet");
   FileJob job{scene_.snapshot(), {},       state_.revision,
               state_.generation, content_, false};
   job.uv_mesh = std::move(mesh);
+  job.uv_source_vertices = uv_->view().source_vertices;
   job.paint_identity = o.painted;
   job.object = o.id;
   job.source_revision = o.painted->revision();
@@ -689,64 +776,6 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   state_.message = "Transferring paint to edited UVs...";
   state_.error.clear();
   file_changed_.notify_one();
-}
-bool Document::wait_uv(std::chrono::milliseconds timeout) const {
-  std::unique_lock lock(uv_mutex_);
-  return uv_changed_.wait_for(lock, timeout, [&] {
-    auto state = published_.load();
-    return !state->uv || (!state->uv->validating && !state->uv->committing);
-  });
-}
-void Document::invalidate_uv_locked() {
-  ++uv_request_;
-  uv_scheduled_.reset();
-  std::lock_guard lock(uv_mutex_);
-  uv_validation_.reset();
-  uv_changed_.notify_all();
-}
-void Document::schedule_uv_locked() {
-  if (!uv_ || uv_accept_pending_)
-    return;
-  if (!uv_->view().validating) {
-    if (!uv_scheduled_.expired())
-      invalidate_uv_locked();
-    return;
-  }
-  if (uv_scheduled_.lock() == uv_->view().mesh)
-    return;
-  auto mesh = uv_->view().mesh;
-  uv_scheduled_ = mesh;
-  UvValidationJob job{++uv_request_, uv_session_, state_.generation, mesh};
-  std::lock_guard lock(uv_mutex_);
-  uv_validation_ = std::move(job);
-  uv_changed_.notify_all();
-}
-void Document::uv_loop() {
-  for (;;) {
-    UvValidationJob job;
-    {
-      std::unique_lock lock(uv_mutex_);
-      uv_changed_.wait(lock, [&] { return stopping_ || uv_validation_; });
-      if (stopping_)
-        return;
-      job = std::move(*uv_validation_);
-      uv_validation_.reset();
-    }
-    auto cancelled = [&] { return stopping_ || uv_request_ != job.request; };
-    std::string error;
-    try {
-      error = validate_uv(*job.mesh, cancelled);
-    } catch (const std::exception &e) {
-      if (cancelled())
-        continue;
-      error = e.what();
-    }
-    std::lock_guard lock(model_mutex_);
-    if (!cancelled() && uv_ && uv_session_ == job.session &&
-        state_.generation == job.generation &&
-        uv_->validated(job.mesh, std::move(error)))
-      publish_locked();
-  }
 }
 void Document::use_source() { paint_command(SpatialCommand::EditSource); }
 void Document::use_mesh() { paint_command(SpatialCommand::PaintColor); }
@@ -801,8 +830,10 @@ void Document::begin_spatial() {
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_) {
-    finish_control_locked(false);
+    bool accepted_uv = uv_accept_pending_;
+    if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
+    if (accepted_uv) input_.take_controls();
   }
   navigation_.reset();
   state_.hands = {};
@@ -832,8 +863,10 @@ void Document::finish_spatial() {
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
   if (!desktop_) {
-    finish_control_locked(false);
+    bool accepted_uv = uv_accept_pending_;
+    if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
+    if (accepted_uv) input_.take_controls();
     navigation_.reset();
     publish_locked();
   }
@@ -843,8 +876,10 @@ void Document::process_locked(const SpatialFrame &f) {
     return;
   if (!f.focused || !f.head_valid || !ob::finite(f.head) ||
       !std::isfinite(f.time) || f.time < 0) {
-    finish_control_locked(false);
+    bool accepted_uv = uv_accept_pending_;
+    if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
+    if (accepted_uv) input_.take_controls();
     navigation_.reset();
     state_.hands = {};
     publish_locked();
@@ -877,7 +912,8 @@ void Document::process_locked(const SpatialFrame &f) {
   input_.edit_allowed =
       !state_.asset_busy && scene_.active().visible &&
       !scene_.active().locked &&
-      (scene_.active().mesh_active || volume().editable_layer());
+      (scene_.active().mesh_active || volume().editable_layer()) &&
+      (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
   input_.painting = scene_.active().mesh_active;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
@@ -909,7 +945,7 @@ void Document::process_locked(const SpatialFrame &f) {
   }
   for (auto event : input_.take_controls())
     control_event_locked(event);
-  if (control_before_ && !input_.menu_open())
+  if (control_before_ && !uv_accept_pending_ && !input_.menu_open())
     finish_control_locked(false);
   if (!menu_was && input_.menu_open()) {
     state_.panel = {ob::transform(object_canvas, obv(input_.menu_anchor())),
@@ -928,17 +964,17 @@ void Document::process_locked(const SpatialFrame &f) {
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
-    if (uv_ && !uv_accept_pending_)
-      uv_->edit(UvAction::Undo);
-    else if (!state_.asset_busy) {
+    if (uv_) {
+      if (!uv_accept_pending_ && !uv_solving_) apply_uv_action_locked(UvAction::Undo);
+    } else if (!state_.asset_busy) {
       finish_locked();
       undo_locked(false);
     }
   }
   if (f.hands[0].redo || f.hands[1].redo) {
-    if (uv_ && !uv_accept_pending_)
-      uv_->edit(UvAction::Redo);
-    else if (!state_.asset_busy) {
+    if (uv_) {
+      if (!uv_accept_pending_ && !uv_solving_) apply_uv_action_locked(UvAction::Redo);
+    } else if (!state_.asset_busy) {
       finish_locked();
       undo_locked(true);
     }
@@ -1010,45 +1046,54 @@ void Document::mesh_loop() {
       auto snapshot = std::make_shared<MeshSnapshot>();
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
+      auto weighted = job->weight_view ? weight_objects(job->scene, job->scene.active().id, job->linked_weights)
+                                      : std::vector<uint64_t>{};
       for (auto &o : objects) {
         if (o.deformation) o.mesh = o.preview_mesh();
         auto world = o.world_transform();
-        size_t offset = snapshot->mesh.positions.size(),
-               first = snapshot->mesh.indices.size();
-        if (o.textures && !o.textures->normal.rgba.empty()) {
-          auto frames = tangent_corners(o.mesh, [&] { return stopping_.load(); });
-          // Render-only corner expansion preserves authoring/rest vertex IDs,
-          // skin weights and morph topology, including mirrored tangent seams.
-          for (size_t c = 0; c < o.mesh.indices.size(); ++c) {
-            auto v = o.mesh.indices[c];
-            snapshot->mesh.positions.push_back(vec(ob::transform(world, obv(o.mesh.positions[v]))));
-            snapshot->mesh.normals.push_back(vec(ob::rotate(world.orientation, obv(o.mesh.normals[v]))));
-            snapshot->mesh.uv.push_back(o.mesh.uv[v]);
-            auto t = frames[c];
-            auto direction = vec(ob::rotate(world.orientation, obv({t[0],t[1],t[2]})));
-            snapshot->tangents.push_back({direction.x,direction.y,direction.z,t[3]});
-            snapshot->mesh.indices.push_back(uint32_t(offset+c));
+        size_t offset = snapshot->mesh.positions.size(), first = snapshot->mesh.indices.size();
+        bool canonical = o.textures && !o.textures->normal.rgba.empty();
+        bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
+        auto frames = canonical ? tangent_corners(o.mesh, [&] { return stopping_.load(); })
+                                : std::vector<Tangent>{};
+        auto append = [&](uint32_t vertex, Tangent tangent) {
+          snapshot->mesh.positions.push_back(vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
+          snapshot->mesh.normals.push_back(vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
+          snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
+          auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
+          snapshot->tangents.push_back({direction.x,direction.y,direction.z,tangent[3]});
+          if (job->weight_view) {
+            float value = selected ? 0.f : -1.f;
+            if (selected) for (auto influence : o.deformation->skin->vertices.at(vertex))
+              if (influence.joint == job->weight_joint) value = influence.weight;
+            snapshot->selected_weights.push_back(value);
           }
-          snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance, offset});
-          continue;
+        };
+        std::shared_ptr<const CreatorAppearance> appearance = o.appearance;
+        if (canonical) {
+          std::shared_ptr<CreatorAppearance> expanded;
+          if (o.appearance) {
+            if (o.appearance->source_vertices.size() != o.mesh.positions.size())
+              throw std::runtime_error("Render-only source remap differs from rest vertex count");
+            expanded = std::make_shared<CreatorAppearance>(*o.appearance);
+            expanded->source_vertices.clear(); expanded->source_vertices.reserve(o.mesh.indices.size());
+          }
+          // Expand only this render snapshot. Rest meshes, skin/morph indices
+          // and original source records remain immutable in Scene/history.
+          for (size_t corner = 0; corner < o.mesh.indices.size(); ++corner) {
+            auto vertex = o.mesh.indices[corner]; append(vertex, frames.at(corner));
+            snapshot->mesh.indices.push_back(uint32_t(offset + corner));
+            if (expanded) expanded->source_vertices.push_back(o.appearance->source_vertices.at(vertex));
+          }
+          if (expanded) appearance = std::move(expanded);
+        } else {
+          for (uint32_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(vertex, {1,0,0,1});
+          for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
-        for (auto p : o.mesh.positions)
-          snapshot->mesh.positions.push_back(
-              vec(ob::transform(world, obv(p))));
-        for (auto n : o.mesh.normals)
-          snapshot->mesh.normals.push_back(
-              vec(ob::rotate(world.orientation, obv(n))));
-        if (o.mesh.uv.empty())
-          snapshot->mesh.uv.resize(snapshot->mesh.positions.size(), {0, 0});
-        else
-          snapshot->mesh.uv.insert(snapshot->mesh.uv.end(), o.mesh.uv.begin(),
-                                   o.mesh.uv.end());
-        for (auto index : o.mesh.indices)
-          snapshot->mesh.indices.push_back(uint32_t(offset + index));
-        snapshot->tangents.resize(snapshot->mesh.positions.size(), {1,0,0,1});
-        snapshot->ranges.push_back(
-            {o.id, first, o.mesh.indices.size(), o.material, o.textures, o.appearance, offset});
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset});
       }
+      if (job->weight_view && !snapshot->mesh.indices.empty())
+        snapshot->picking = std::make_shared<SurfaceQuery>(snapshot->mesh, [&] { return stopping_.load(); });
       std::lock_guard lock(mesh_mutex_);
       if (published_.load()->generation == job->generation)
         mesh_.store(std::move(snapshot));
@@ -1106,7 +1151,31 @@ void Document::save(const std::filesystem::path &path) {
   result.get();
 }
 
-void Document::file_locked(bool export_mesh) {
+std::future<void> Document::export_asset(const std::filesystem::path &path,
+                                       AssetExportFormat format) {
+  if (path.empty() || (format != AssetExportFormat::Glb && format != AssetExportFormat::Avatar))
+    throw std::invalid_argument("Choose an export filename and supported format");
+  auto completion = std::make_shared<std::promise<void>>();
+  auto result = completion->get_future();
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  if (state_.asset_busy || state_.recovery_busy)
+    throw std::logic_error("Wait for pending authoring work before exporting");
+  if (format == AssetExportFormat::Avatar && !state_.can_export_avatar)
+    throw std::logic_error("Select a source avatar group to export");
+  FileJob job{scene_.snapshot(), path, state_.revision, state_.generation, content_, true};
+  job.object = scene_.active().id; job.export_format = format; job.completion = completion;
+  {
+    std::lock_guard file_lock(file_mutex_);
+    if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
+    files_.push_back(std::move(job));
+  }
+  state_.error.clear(); state_.message = "Exporting " + path.string();
+  publish_locked();
+  file_changed_.notify_one();
+  return result;
+}
+void Document::file_locked(bool export_mesh, AssetExportFormat format) {
   if (state_.asset_busy)
     throw std::logic_error(
         "Wait for mesh/UV preparation before saving or exporting");
@@ -1121,7 +1190,7 @@ void Document::file_locked(bool export_mesh) {
     path = dir / ("Recovery-" + std::to_string(getpid()) + ".dsculpt");
   }
   if (export_mesh)
-    path.replace_extension(".glb");
+    path.replace_extension(format == AssetExportFormat::Avatar ? ".vrm" : ".glb");
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
     throw std::runtime_error("File work queue is full");
@@ -1129,6 +1198,8 @@ void Document::file_locked(bool export_mesh) {
                     content_, export_mesh});
   files_.back().recovery_source = recovery_source_;
   files_.back().create_parent = create_parent;
+  files_.back().export_format = format;
+  files_.back().object = scene_.active().id;
   file_changed_.notify_one();
 }
 void Document::request_save(bool export_mesh) {
@@ -1140,6 +1211,8 @@ void Document::request_save(bool export_mesh) {
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
+  if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
+    return !state_.asset_busy && !state_.recovery_busy && state_.can_paint_weights;
   if (parameter == VrParameter::RigRotation || parameter == VrParameter::MorphWeight) {
     const auto &o = scene_.active();
     if (state_.asset_busy || state_.recovery_busy || !o.visible || o.locked ||
@@ -1161,7 +1234,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (parameter == VrParameter::UvEdit) {
     auto &o = scene_.active();
     return !state_.asset_busy && o.mesh_active && o.painted && o.visible &&
-           !o.locked && !o.deformation;
+           !o.locked;
   }
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
@@ -1229,6 +1302,7 @@ void Document::finish_control_locked(bool accept) {
     return;
   }
   if (uv_) {
+    if (accept && uv_solving_) throw std::logic_error("Wait for the UV operation before applying");
     if (accept && uv_accept_pending_)
       return;
     if (accept && !uv_->view().valid && !uv_->view().validating)
@@ -1265,6 +1339,7 @@ void Document::finish_control_locked(bool accept) {
     scene_ = *control_before_;
   if (!accept) {
     state_.paint = control_settings_;
+    state_.weights = control_weights_;
     state_.radius = control_radius_;
   }
   control_before_.reset();
@@ -1284,6 +1359,7 @@ void Document::control_event_locked(VrControlEvent event) {
       throw std::logic_error("This XR control is unavailable");
     control_before_ = scene_;
     control_settings_ = state_.paint;
+    control_weights_ = state_.weights;
     control_radius_ = state_.radius;
     control_object_ = scene_.active().id;
     control_source_ = {state_.generation, state_.revision, control_object_};
@@ -1320,6 +1396,12 @@ void Document::control_event_locked(VrControlEvent event) {
     case VrParameter::BakeQuality:
       c.title="AO samples / seam padding";c.components=2;
       c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,0,0};break;
+    case VrParameter::WeightStrength:
+      c.title = "Weight stroke strength"; c.value[0] = state_.weights.strength;
+      break;
+    case VrParameter::WeightValue:
+      c.title = "Target weight"; c.value[0] = state_.weights.value;
+      break;
     case VrParameter::RigRotation:
       control_rig_index_ = state_.rig_joint;
       c.title = o.deformation->skeleton->bones.at(control_rig_index_).name + " rotation delta";
@@ -1421,20 +1503,20 @@ void Document::control_event_locked(VrControlEvent event) {
   }
   if (!control_before_ || event.parameter != state_.controls.parameter)
     return;
-  if (uv_accept_pending_ && event.type != VrControlEventType::Cancel)
+  if ((uv_accept_pending_ || uv_solving_) && event.type != VrControlEventType::Cancel)
     return;
   auto &c = state_.controls;
   if (uv_ && event.type != VrControlEventType::Confirm &&
       event.type != VrControlEventType::Cancel) {
     try {
       if (event.type == VrControlEventType::UvPick)
-        uv_->edit(UvAction::Pick, event.value, event.second);
+        apply_uv_action_locked(UvAction::Pick, event.value, event.second);
       else if (event.type == VrControlEventType::UvMove)
-        uv_->edit(UvAction::Move, event.value, event.second);
+        apply_uv_action_locked(UvAction::Move, event.value, event.second);
       else if (event.type == VrControlEventType::UvCommand &&
                event.component >= 0 &&
-               event.component <= int(UvAction::CancelGesture))
-        uv_->edit(UvAction(event.component), event.value, event.second);
+               event.component <= int(UvAction::Stitch))
+        apply_uv_action_locked(UvAction(event.component), event.value, event.second);
       state_.error.clear();
     } catch (const std::exception &e) {
       state_.error = e.what();
@@ -1479,6 +1561,12 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::BakeDistances:
   case VrParameter::BakeQuality:
     break; // Staged operation settings do not mutate the scene or history.
+  case VrParameter::WeightStrength:
+    state_.weights.strength = value;
+    break;
+  case VrParameter::WeightValue:
+    state_.weights.value = value;
+    break;
   case VrParameter::RigRotation:
     control_changed_ = c.value[0] != 0 || c.value[1] != 0 || c.value[2] != 0;
     break;
@@ -1587,6 +1675,12 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::CancelWork)return state_.asset_busy && asset_status().cancellable;
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
+  if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
+  if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked)
+    return !state_.asset_busy && !state_.recovery_busy && !control_before_ && !action_active_locked() &&
+           state_.can_paint_weights && (command != SpatialCommand::WeightSymmetry || bool(scene_.active().deformation->humanoid));
+  if (command == SpatialCommand::ExportAvatar)
+    return !state_.asset_busy && !state_.recovery_busy && !control_before_ && state_.can_export_avatar;
   if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
     auto parameter = command == SpatialCommand::RigNextMorph || command == SpatialCommand::RigPreviousMorph
         ? VrParameter::MorphWeight : VrParameter::RigRotation;
@@ -1712,6 +1806,24 @@ void Document::command_locked(SpatialCommand command) {
   if(command==SpatialCommand::CancelWork){cancel_asset_work_locked();return;}
   if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
   if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
+  if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked) {
+    if (!command_enabled_locked(command)) return;
+    auto &settings = state_.weights;
+    if (command == SpatialCommand::WeightToggle) settings.enabled = !settings.enabled;
+    if (command == SpatialCommand::WeightLinked) settings.linked = !settings.linked;
+    if (command == SpatialCommand::WeightSymmetry) settings.symmetry = !settings.symmetry;
+    if (command == SpatialCommand::WeightMode) settings.mode = WeightBrushMode((int(settings.mode) + 1) % 4);
+    if (command == SpatialCommand::WeightLock) {
+      settings.locks.resize(scene_.active().deformation->skeleton->bones.size());
+      settings.locks.at(state_.rig_joint) = !settings.locks.at(state_.rig_joint);
+    }
+    publish_locked(command == SpatialCommand::WeightToggle || command == SpatialCommand::WeightLinked);
+    return;
+  }
+  if (command == SpatialCommand::ExportAvatar) {
+    if (command_enabled_locked(command)) file_locked(true, AssetExportFormat::Avatar);
+    return;
+  }
   if (command >= SpatialCommand::RigNextJoint && command <= SpatialCommand::RigResetPose) {
     if (!command_enabled_locked(command)) return;
     const auto &d = *scene_.active().deformation;
@@ -1726,6 +1838,7 @@ void Document::command_locked(SpatialCommand command) {
       auto count = morph ? d.morphs->targets.size() : d.skeleton->bones.size();
       bool next = command == SpatialCommand::RigNextJoint || command == SpatialCommand::RigNextMorph;
       index = (index + count + (next ? 1 : count - 1)) % count;
+      if (state_.weights.enabled && !morph) publish_locked(true);
     }
     return;
   }
@@ -2053,15 +2166,18 @@ void Document::file_loop() {
           // a new job could start between this rejection and the catch handler.
           state_.asset_busy = false;
           asset_work_.store({});
-          Scene before = scene_;
-          scene_ = std::move(prepared);
-          record_locked({{}, std::move(before), scene_});
-          bind_locked();
+          bool changed = !job->operation_changed || *job->operation_changed;
+          if (changed) {
+            Scene before = scene_;
+            scene_ = std::move(prepared);
+            record_locked({{}, std::move(before), scene_});
+            bind_locked();
+          }
           state_.error.clear();
           state_.message = job->operation_label + " complete";
           if (job->operation_report && !job->operation_report->empty())
             state_.message += " | " + *job->operation_report;
-          publish_locked(true);
+          publish_locked(changed);
         }
         {
           std::lock_guard file_lock(file_mutex_);
@@ -2102,39 +2218,7 @@ void Document::file_loop() {
         continue;
       }
       if (job->uv_mesh) {
-        auto error = validate_uv(*job->uv_mesh, [&] { return stopping_.load(); });
-        if (!error.empty())
-          throw std::runtime_error(error);
-        auto &source = job->scene.object(job->object);
-        bool changed = uv_changed(*job->uv_mesh, source.painted->mesh());
-        auto painted = changed ? source.painted->reparameterize(
-                                     *job->uv_mesh, [&] { return stopping_.load(); })
-                               : source.painted;
-        std::lock_guard lock(model_mutex_);
-        if (job->generation == state_.generation) {
-          state_.asset_busy = false;
-          auto &o = scene_.object(job->object);
-          if (o.painted != job->paint_identity ||
-              o.painted->revision() != job->source_revision)
-            throw std::runtime_error(
-                "The mesh changed during UV paint transfer; retry");
-          if (uv_ && uv_session_ == job->uv_session && uv_accept_pending_) {
-            input_.complete_control();
-            finish_control_locked(false);
-            if (job->uv_desktop)
-              desktop_ = false;
-          }
-          Scene before = scene_;
-          o.painted = std::move(painted);
-          state_.message = "UVs and paint updated";
-          state_.error.clear();
-          if (changed)
-            scene_changed_locked(std::move(before));
-          else
-            publish_locked();
-        }
-        std::lock_guard file_lock(file_mutex_);
-        file_changed_.notify_all();
+        process_uv_transfer(*job);
         continue;
       }
       if (job->prepare_mesh) {
@@ -2175,8 +2259,25 @@ void Document::file_loop() {
         std::filesystem::create_directories(job->path.parent_path());
         std::filesystem::permissions(job->path.parent_path(), std::filesystem::perms::owner_all);
       }
+      std::string export_diagnostics;
       if (job->export_mesh) {
-        export_glb(job->scene.surfaces(true), job->path);
+        if (job->export_format == AssetExportFormat::Avatar) {
+          auto group = avatar_group(job->scene, job->object);
+          if (!group) throw std::runtime_error("Select a grouped avatar to export");
+          for (const auto &object : job->scene.objects())
+            if (!in_group(job->scene, object, group)) job->scene.object(object.id).visible = false;
+          auto report = export_vrm(job->scene.preview_surfaces(), job->path);
+          for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
+            export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
+        } else {
+          auto surfaces = job->scene.preview_surfaces();
+          for (auto &surface : surfaces)
+            if (surface.mesh.uv.empty()) unwrap(surface.mesh);
+          GltfExportOptions options; options.recompute_changed_normals = true;
+          auto report = export_glb(surfaces, job->path, options);
+          for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
+            export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
+        }
       } else
         job->scene.save(job->path);
       std::lock_guard lock(model_mutex_);
@@ -2191,7 +2292,7 @@ void Document::file_loop() {
         state_.error.clear();
         state_.message =
             std::string(job->export_mesh ? "Exported " : "Saved ") +
-            job->path.string();
+            job->path.string() + export_diagnostics;
         publish_locked();
       }
       if (job->completion)

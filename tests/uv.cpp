@@ -212,16 +212,23 @@ int main() try {
     rigged.set_deformation(rigged.active().id, rig);
     Document protected_rig;
     protected_rig.replace(rigged);
-    bool blocked = false;
-    try {
-      protected_rig.begin_uv();
-    } catch (const std::logic_error &) {
-      blocked = true;
-    }
-    require(blocked && !protected_rig.frame().state->uv &&
-                protected_rig.copy_scene().active().deformation->encode(m) ==
-                    rig.encode(m),
-            "UV editing rejects rigged rest meshes without losing deformation data");
+    protected_rig.begin_uv();
+    require(protected_rig.wait_uv(), "Rigged UV draft validates on the UV worker");
+    protected_rig.edit_uv(UvAction::Pick, .35f, .35f);
+    protected_rig.edit_uv(UvAction::Seam);
+    require(protected_rig.wait_uv(), "Rigged seam split runs off the input lock");
+    protected_rig.end_uv(true);
+    require(protected_rig.wait_asset(), "Rigged seam publication waits for validated paint/deformation transfer");
+    auto published = protected_rig.copy_scene();
+    const auto &updated = published.active();
+    updated.deformation->validate(updated.painted->mesh());
+    require(updated.painted->mesh().positions.size() == 6 &&
+                updated.deformation->skin->vertices.size() == 6 &&
+                updated.deformation->source == morph_topology_id(updated.painted->mesh()),
+            "UV seam editing preserves rigged rest source and remaps every duplicated skin vertex");
+    require(protected_rig.undo() &&
+                protected_rig.copy_scene().active().deformation->encode(m) == rig.encode(m),
+            "Rigged UV publication undoes the complete native deformation exactly");
   }
   Document doc;
   doc.replace(scene);

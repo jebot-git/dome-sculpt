@@ -40,15 +40,16 @@ and UV0 affine transform, even when multiple roles share one original image.
 Unspecified native sampler filters use linear filtering. Requested mip chains
 are generated on the GPU at original resolution and accounted level by level.
 There is no CPU proxy raster, framebuffer readback or source downsampling in the
-production path. Existing renderer output transfer/tone mapping is retained.
+production path. Final scene transfer now uses a linear floating-point GPU target
+and explicit output encoding; see MTOON_RENDER.txt.
 
 Original normal views use a UV-derivative tangent basis and strength on the GPU,
 including mirrored UV handedness and double-sided facing; degenerate UV gradients
 safely retain geometric normals. AO affects PBR ambient illumination. This is the
-generic PBR path, not integrated MToon dispatch or authored-tangent/vertex-color
-avatar shading. Original MToon/extra roles/tangents/UV1 remain retained and need
-explicit renderer integration using the separate typed MToon module. No claim of
-full original MToon appearance follows from direct texture preview.
+generic PBR normal path. Retained MToon roles/UV1 and original outline/render
+state are now dispatched through the typed module in the shared renderer; see
+MTOON_RENDER.txt for the verified behavior and remaining authored-tangent/scene
+lighting limits.
 
 Reference checks: Khronos OpenGL 3.3 core specification section 3.8.17 defines sRGB
 RGB conversion with alpha unchanged:
@@ -103,8 +104,9 @@ original dimensions. Device/headset sessions and user projects are not modified.
 A native build linked with render/core/EGL/GL can run:
   env -u LIBGL_ALWAYS_SOFTWARE ./dome-sculpt-source-gpu-test --hardware assets/humanoid/vroid/base-female.vrm assets/humanoid/vroid/base-male.vrm
 
-GPU overlays, full MToon dispatch and other remaining production workflows are
-tracked separately. Painted overlays continue using correct CPU composites until
+GPU paint overlays and other remaining production workflows are tracked
+separately; typed MToon/outline/linear transfer integration is documented in
+MTOON_RENDER.txt. Painted overlays continue using correct CPU composites until
 that GPU work lands; this milestone does not claim full suite completion.
 
 Validated hardware milestone
@@ -123,6 +125,6 @@ ASan+UBSan hardware fixture: 33 assertions pass with project render/paint/test
 translation units instrumented; other core dependencies use Release archives.
 Leak detection is disabled for the external Mesa/EGL driver in this hardware run;
 live GL object/storage cleanup is checked explicitly by the resource fixtures.
-Existing Document-based spatial-render regression awaits the main agent's stable
-rig-authoring Document/EditorState ABI rebuild; this fixture does not instantiate
-Document and does not claim that integration check has passed yet.
+The existing Document-based spatial-render regression also passed after the
+stable rig-authoring ABI rebuild at the raw-source checkpoint. Follow-on MToon,
+coverage and linear-target verification is recorded separately in MTOON_RENDER.txt.

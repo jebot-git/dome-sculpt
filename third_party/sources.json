@@ -111,7 +111,7 @@
   },
   "domed_fltk": {
     "repository": "https://github.com/jebot-git/DomeD",
-    "commit": "742d009f446cffdeb89031664b72885ff6f16a19",
+    "commit": "282467e727df78c8e7f2452aa05a7747bac854a6",
     "version": "1.4.5",
     "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
     "patches_in_application_order": [
@@ -140,7 +140,7 @@
     ],
     "patch_sha256": {
       "native/toolkit-hooks/fltk-1.4.5-bitmap-fonts.patch": "5a4318d315dae55e7e5d3fff18d3875d16a0a1886a413501d5e97ba51f6d6261",
-      "native/toolkit-hooks/fltk-1.4.5-popup-done.patch": "a61aebf98cf042af2e60464497837ddd75ece36e05b57085aabda9bd01e3f5c4",
+      "native/toolkit-hooks/fltk-1.4.5-popup-done.patch": "76694f92a2ba25a91c487cf19024f4d83fd1f0492dada4da2f7df462b110b2c1",
       "native/toolkit-hooks/fltk-1.4.5-depth-buffer.patch": "136b1a9605bde5a5e759b42b96fea9c83fd10b85c2818cf8a8ab01f3b1c2b578",
       "native/toolkit-hooks/fltk-1.4.5-borderless-app-id.patch": "4c1fbd6cd5d6e57a3d729cfbec2ac51101c86e7b52d10f441caa8598efb2083a",
       "native/toolkit-hooks/fltk-1.4.5-bitmap-styles.patch": "7954242bc1afe7a7433b294b178c8cf16ebd9e7bef30cb02f09819e7079c223a",
@@ -162,8 +162,8 @@
       "native/toolkit-hooks/fltk-1.4.5-touch-input.patch": "80b54a5f69889f4197f1a3a7dfffaa8a70a493b1192983c0ae21ffaa588ce27a",
       "native/toolkit-hooks/fltk-1.4.5-pen-input.patch": "f90bab41cb33c949bd4efe2659f6e103d06611fdaeb98b06e8af0dd817f44152"
     },
-    "combined_patch_sha256": "0b92e96a5db21ee93820784c8a560f9b18b3bf756915c66495d1b49f4b841229",
-    "used": "Release FLTK build including current window suspension, touch, pen, file-picker and BDF patches. Runtime-selected library directory is prepended by the generated development launcher and OpenXR CTest."
+    "combined_patch_sha256": "9b869ee77efecceba935eade4a86a412302894e68072ab99aca13b06c35b6822",
+    "used": "Release FLTK 1.4.5 with all22 canonical patches, including eaeb8e0 parent-menu preservation on submenu close. Runtime-selected library directory is prepended by the development launcher and OpenXR CTest."
   },
   "vrm_specification": {
     "repository": "https://github.com/vrm-c/vrm-specification",
@@ -211,9 +211,9 @@
     "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
   },
   "domed_latest_check": {
-    "commit": "7322b0eea5d63f8f32dd68a0983a55dc5c8b81b3",
-    "fltk_patch_changes_since_742d009": false,
-    "used": "Fresh clean Release compositor build and private nested Wayland/universal-menu verification; existing22-patch toolkit unchanged."
+    "commit": "282467e727df78c8e7f2452aa05a7747bac854a6",
+    "fltk_patch_changes_since_742d009": true,
+    "used": "Canonical remote main rechecked during merge; clean source worktree. Updated Release FLTK and compositor builds and matching GUI/Wayland verification are recorded separately in TOOLKIT.md and VALIDATION.md."
   },
   "mtoon": {
     "implementation": "src/mtoon.cpp; include/dome/mtoon-shader.hpp",

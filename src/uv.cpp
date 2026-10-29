@@ -3,6 +3,7 @@
 // Copyright (c) 2001-2011 Dan Gudmundsson, Bjorn Gustavsson.
 // Original permissive notice: third_party/wings/license.terms.
 #include "dome/uv.hpp"
+#include "dome/uv-solve.hpp"
 #include <bit>
 #include <map>
 #include <numeric>
@@ -189,7 +190,8 @@ void UvWorkspace::remember(UvView before) {
   auto &m = *before.mesh;
   size_t bytes = m.positions.size() * sizeof(Vec3) * 2 +
                  m.uv.size() * sizeof(P) + m.indices.size() * 4 +
-                 m.uv_pins.size() + m.uv_seams.size();
+                 m.uv_pins.size() + m.uv_seams.size() +
+                 (before.source_vertices ? before.source_vertices->size() * sizeof(uint32_t) : 0);
   undo_.push_back(std::move(before));
   redo_.clear();
   while (undo_.size() > 1 &&
@@ -209,13 +211,20 @@ void UvWorkspace::finish_gesture(bool cancel) {
   view_.can_redo = !redo_.empty();
   view_.revision = ++revision_;
 }
-void UvWorkspace::publish(Mesh m, bool topology) {
+void UvWorkspace::publish(Mesh m, bool topology,
+                          std::shared_ptr<const std::vector<uint32_t>> mapping) {
   m.validate();
   if (!gesture_ && view_.mesh && uv_changed(m, *view_.mesh)) {
     remember(view_);
   }
   if (topology || !view_.topology)
     view_.topology = std::make_shared<UvTopology>(m);
+  if (mapping) view_.source_vertices = std::move(mapping);
+  if (!view_.source_vertices) {
+    auto ids = std::make_shared<std::vector<uint32_t>>(m.positions.size());
+    std::iota(ids->begin(), ids->end(), 0);
+    view_.source_vertices = std::move(ids);
+  }
   bool pending = gesture_ && uv_changed(m, *gesture_->mesh);
   view_.can_undo = pending || !undo_.empty();
   view_.can_redo = !pending && !redo_.empty();
@@ -246,7 +255,14 @@ std::vector<uint32_t> UvWorkspace::selected() const {
       vertices.insert(view_.mesh->indices[f * 3 + k]);
   return {vertices.begin(), vertices.end()};
 }
-void UvWorkspace::edit(UvAction action, float x, float y) {
+void UvWorkspace::edit(UvAction action, float x, float y,
+                       const std::function<bool()> &cancelled) {
+  size_t work = 0;
+  auto step = [&] {
+    if (++work > 50'000'000) throw std::runtime_error("UV edit work budget exceeded");
+    if (cancelled && cancelled()) throw std::runtime_error("UV edit cancelled");
+  };
+  step();
   if (!std::isfinite(x) || !std::isfinite(y))
     throw std::invalid_argument("Non-finite UV control input");
   if (action == UvAction::BeginGesture) {
@@ -291,7 +307,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
   }
   if (action == UvAction::VertexMode) {
     view_.vertices = !view_.vertices;
-    view_.vertex = UINT32_MAX;
+    view_.vertex = view_.edge = UINT32_MAX;
     view_.revision = ++revision_;
     return;
   }
@@ -299,7 +315,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
     auto &t = *view_.topology;
     auto i = (t.face_island[view_.face] + 1) % t.islands.size();
     view_.face = t.islands[i][0];
-    view_.vertex = UINT32_MAX;
+    view_.vertex = view_.edge = UINT32_MAX;
     view_.revision = ++revision_;
     return;
   }
@@ -337,7 +353,47 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
         }
       }
   found:
+    view_.edge = view_.face * 3;
+    {
+      float nearest = INFINITY;
+      for (uint32_t k = 0; k < 3; ++k) {
+        auto corner = view_.face * 3 + k;
+        auto a = m.uv[m.indices[corner]], b = m.uv[m.indices[next(corner)]];
+        auto d = sub(b, a), q = sub(p, a);
+        float squared = d[0]*d[0]+d[1]*d[1];
+        float t = squared > 0 ? std::clamp((q[0]*d[0]+q[1]*d[1])/squared, 0.f, 1.f) : 0;
+        auto delta = sub(q, mul(d, t));
+        float distance = delta[0]*delta[0]+delta[1]*delta[1];
+        if (distance < nearest) { nearest = distance; view_.edge = corner; }
+      }
+    }
     view_.revision = ++revision_;
+    return;
+  }
+  if (action == UvAction::Conformal || action == UvAction::Stitch) {
+    UvSolveOptions options;
+    options.seed_faces = {view_.face};
+    UvSolveResult solved;
+    if (action == UvAction::Conformal)
+      solved = conformal_uv(*view_.mesh, options, cancelled);
+    else {
+      if (view_.edge == UINT32_MAX)
+        throw std::runtime_error("Pick the UV seam edge to stitch first");
+      auto edge = std::find_if(view_.topology->edges.begin(), view_.topology->edges.end(),
+          [&](const UvEdge &e) { return std::find(e.corners.begin(), e.corners.end(), view_.edge) != e.corners.end(); });
+      if (edge == view_.topology->edges.end() || !edge->seam || edge->corners.size() != 2)
+        throw std::runtime_error("Select a seam with exactly two matching geometric edge sides");
+      std::array pair{UvStitchEdge{edge->corners[0], edge->corners[1]}};
+      solved = stitch_uv(*view_.mesh, pair, 1e-6, options, cancelled);
+    }
+    auto mapping = std::make_shared<std::vector<uint32_t>>();
+    mapping->reserve(solved.source_vertices.size());
+    for (auto source : solved.source_vertices) {
+      step();
+      mapping->push_back(view_.source_vertices->at(source));
+    }
+    view_.vertex = view_.edge = UINT32_MAX;
+    publish(std::move(solved.mesh), true, std::move(mapping));
     return;
   }
   auto chosen = selected();
@@ -398,16 +454,17 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
       }
     Mesh split;
     split.uv_seams = m.uv_seams;
-    std::map<std::array<uint32_t, 4>, uint32_t> vertices;
+    std::map<std::array<uint32_t, 2>, uint32_t> vertices;
+    auto mapping = std::make_shared<std::vector<uint32_t>>();
     for (uint32_t c = 0; c < m.indices.size(); ++c) {
+      step();
       auto i = m.indices[c];
       auto n = m.normals[i];
-      auto key = std::array{fans.root(c), std::bit_cast<uint32_t>(n.x),
-                            std::bit_cast<uint32_t>(n.y),
-                            std::bit_cast<uint32_t>(n.z)};
+      auto key = std::array{fans.root(c), i};
       auto [it, added] =
           vertices.emplace(key, uint32_t(split.positions.size()));
       if (added) {
+        mapping->push_back(view_.source_vertices->at(i));
         split.positions.push_back(m.positions[i]);
         split.normals.push_back(n);
         split.uv.push_back(m.uv[i]);
@@ -416,8 +473,8 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
         split.uv_pins[it->second] |= m.uv_pins[i];
       split.indices.push_back(it->second);
     }
-    view_.vertex = UINT32_MAX;
-    publish(std::move(split), true);
+    view_.vertex = view_.edge = UINT32_MAX;
+    publish(std::move(split), true, std::move(mapping));
     return;
   } else if (action == UvAction::Relax) {
     std::vector<std::set<uint32_t>> neighbors(m.positions.size());
@@ -438,6 +495,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
       for (int k = 0; k < 3; ++k)
         movable.insert(m.indices[f * 3 + k]);
     for (int iteration = 0; iteration < 20; ++iteration) {
+      step();
       auto uv = m.uv;
       for (auto i : movable)
         if (!boundary[i] && !m.uv_pins[i] && !neighbors[i].empty()) {
@@ -505,6 +563,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
       auto subtract = [&](Rect box) {
         std::vector<Rect> next;
         for (auto r : free) {
+          step();
           if (box.x >= r.x + r.w || box.x + box.w <= r.x ||
               box.y >= r.y + r.h || box.y + box.h <= r.y) {
             next.push_back(r);
@@ -524,6 +583,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
         free = std::move(next);
         for (size_t a = 0; a < free.size(); ++a)
           for (size_t b = a + 1; b < free.size();) {
+            step();
             auto u = free[a], v = free[b];
             auto contains = [](Rect a, Rect b) {
               return b.x >= a.x - 1e-7 && b.y >= a.y - 1e-7 &&
@@ -553,6 +613,7 @@ void UvWorkspace::edit(UvAction action, float x, float y) {
           float score = INFINITY;
           for (size_t k = 0; k < free.size(); ++k)
             for (int turn = 0; turn < 2; ++turn) {
+              step();
               float w = size[turn] + 2 * pad, h = size[1 - turn] + 2 * pad;
               auto r = free[k];
               if (w <= r.w && h <= r.h && std::min(r.w - w, r.h - h) < score) {

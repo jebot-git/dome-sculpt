@@ -18,7 +18,7 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
   queue_scene_operation_locked(std::move(label), std::move(operation), expected, std::move(report));
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
-                                      AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work) {
+                                      AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed) {
   if (label.empty() || label.size() > 256 || label.find('\0') != std::string::npos || !operation)
     throw std::invalid_argument("Invalid asset operation");
   if ((expected.generation && expected.generation != state_.generation) ||
@@ -34,6 +34,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   job.operation_label = std::move(label);
   job.operation_report = std::move(report);
   job.work = work ? std::move(work) : std::make_shared<AssetWork>();
+  job.operation_changed = std::move(changed);
   std::lock_guard file_lock(file_mutex_);
   if (files_.size() >= 8) throw std::runtime_error("File and asset work queue is full");
   files_.push_back(std::move(job));

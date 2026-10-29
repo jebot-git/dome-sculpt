@@ -1,6 +1,13 @@
 # Current DomeD toolkit and conventions
 
-Verified 2026-10-29 against fetched DomeD main
+The combined authoring checkout uses the canonical 282467e pin in
+third_party/sources.json and the locally rebuilt artifacts/toolkit-authoring
+prefix. Start with the final “Combined bake/authoring checkout” section and the
+build command in AGENTS.md. The earlier prefix observations below are historical
+evidence; they are not a request to select the older local toolkit.
+
+Current source checked 2026-10-29 against DomeD main
+`282467e727df78c8e7f2452aa05a7747bac854a6`. Earlier builds used
 `742d009f446cffdeb89031664b72885ff6f16a19`, and fltk-vr main
 `4f54821e61993a9212a2d9cd03635342b58acf6a`. The workspace
 `/home/blux/de-xr/DESIGN_CONVENTIONS` and current DomeD README were read.
@@ -61,3 +68,35 @@ Release from clean artifacts/domed-current using that toolkit, with unrelated
 capture work untouched. Build: artifacts/domed-current-build.log. Fresh private
 Wayland/universal-menu8/8 checks pass using that binary and cf6d6b3 client
 (dome-menu-avatars-pinned-final.log). No active compositor/session restart.
+
+## Updated popup behavior at282467e
+
+DomeD main advanced after the above verification. Commit eaeb8e0 changes the
+canonical popup-done patch to keep parent menus open when closing submenus;
+282467e also enlarges the compositor XR mouse-finder pulse. A clean detached
+source worktree is in artifacts/domed-latest-source. The canonical builder is
+successfully built the updated22-patch Release toolkit into artifacts/toolkit-282467e;
+log: artifacts/build-toolkit-282467e.log. Exact new patch hashes and combined
+digest are in third_party/sources.json. The client was rebuilt against this
+prefix; actual linkage resolves its lib64 libraries (linkage-toolkit-282467e.log).
+All47 Release suites pass, native universal menus53/53 and baked-surface GUI5/5
+pass with this toolkit. The clean latest Release compositor build completed in
+8m03s (artifacts/domed-282467e-compositor-build.log); binary is in
+artifacts/domed-282467e-target/release/dome-compositor. Exact pinned8f4d67d
+passes native menus53/53, rig/weights12/12, avatar export5/5, baked GUI5/5 and
+real latest DomeD Wayland/universal-menu8/8. Run with the updated prefix's lib64
+in LD_LIBRARY_PATH, since an inherited /opt path overrides ELF RUNPATH. Neither
+the installed compositor nor the active desktop session was replaced/restarted.
+
+## Combined bake/authoring checkout
+
+This workspace rebuilt the pinned 282467e toolkit into artifacts/toolkit-authoring
+from a clean artifacts/domed-authoring-source worktree. Configure this combined
+checkout with `-DFLTK_DIR="$PWD/artifacts/toolkit-authoring/share/fltk"` and launch
+through build/run-dome-sculpt. Its library directory here is lib (the other
+workspace used lib64). The builder initially lacked the GLU development files;
+artifacts/toolkit-authoring-deps/sysroot now points at the existing verified
+artifacts/toolkit-deps/sysroot, supplying that dependency without installation.
+All 22 patch hashes and their ordered digest match third_party/sources.json.
+The successful build log is artifacts/build-toolkit-authoring-with-sysroot.log.
+See VALIDATION.md for results from the combined application source.

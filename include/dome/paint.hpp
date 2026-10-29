@@ -15,12 +15,19 @@ struct Image {
   void validate() const;
   std::vector<uint8_t> png() const;
 };
+struct BakedTextures;
 struct TextureMaps {
   Image color, metal_rough, emission;
   bool transparent = false;
   std::shared_ptr<const PaintSourceMaps> source_maps;
-  bool source_only = false; // Immutable original preview; derived images are empty.
-  Image normal; // Optional linear +Y tangent-space map. Empty means no detail.
+  bool source_only = false;
+  // Linear R: visible source replacement by baked base and editable color.
+  Image color_coverage;
+  Image normal; // Canonical Mikk composite for generic PBR consumers.
+  // Original immutable baked payload; no recursive baked payload is allowed.
+  std::shared_ptr<const BakedTextures> baked_base;
+  // Padded raw canonical normal and linear R coverage for typed MToon blending.
+  Image baked_normal, baked_coverage;
 };
 struct BakedTextures {
   TextureMaps maps;

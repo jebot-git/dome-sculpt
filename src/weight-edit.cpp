@@ -26,6 +26,15 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
                               size_t bones, const WeightBrush &brush,
                               WeightEditOptions options,
                               const std::function<bool()> &cancelled) {
+  return edit_weights(surfaces, bones, std::span<const WeightBrush>(&brush, 1), std::move(options), cancelled);
+}
+WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
+                              size_t bones, std::span<const WeightBrush> brushes,
+                              WeightEditOptions options,
+                              const std::function<bool()> &cancelled) {
+  if (brushes.empty() || brushes.size() > 4096)
+    throw std::length_error("Weight gesture must contain 1 to 4096 capsule samples");
+  const auto &brush = brushes.front();
   auto unit = [](float value) { return std::isfinite(value) && value >= 0 && value <= 1; };
   if (!bones || bones > 256 || brush.joint >= bones || !bounded(brush.from) ||
       !bounded(brush.to) || !std::isfinite(brush.radius) || brush.radius <= 0 ||
@@ -38,6 +47,11 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
       !std::isfinite(options.limits.prune) || options.limits.prune < 0 || options.limits.prune >= 1 ||
       brush.mode < WeightBrushMode::Add || brush.mode > WeightBrushMode::Smooth)
     throw std::invalid_argument("Invalid weight brush, locks or resource bounds");
+  for (const auto &sample : brushes)
+    if (!bounded(sample.from) || !bounded(sample.to) || !unit(sample.pressure) ||
+        !unit(sample.strength) || !std::isfinite(sample.radius) || sample.radius <= 0 || sample.radius > 100 ||
+        sample.joint != brush.joint || sample.mode != brush.mode || sample.value != brush.value)
+      throw std::invalid_argument("Invalid or inconsistent weight gesture capsule");
   if (std::any_of(options.locks.begin(), options.locks.end(),
                   [](uint8_t lock) { return lock > 1; }))
     throw std::invalid_argument("Weight locks must be boolean");
@@ -103,8 +117,12 @@ WeightEditResult edit_weights(std::span<const WeightPaintSurface> surfaces,
     for (size_t vertex = 0; vertex < mesh.positions.size(); ++vertex) {
       step();
       Vec3 p = surface.positions.empty() ? mesh.positions[vertex] : surface.positions[vertex];
-      float direct = capsule(p, brush, false, plane),
-            mirror = options.symmetry ? capsule(p, brush, true, plane) : 0;
+      float direct = 0, mirror = 0;
+      for (const auto &sample : brushes) {
+        step(options.symmetry ? 2 : 1);
+        direct = std::max(direct, capsule(p, sample, false, plane));
+        if (options.symmetry) mirror = std::max(mirror, capsule(p, sample, true, plane));
+      }
       if (direct == 0 && mirror == 0) continue;
       ++edited.affected;
       bool constrained = false;

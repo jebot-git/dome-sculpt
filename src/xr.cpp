@@ -2,6 +2,7 @@
 // Session lifecycle adapted from OpenBrush Native (Apache-2.0); see
 // third_party/openbrush/NOTICE.
 #include "dome/xr.hpp"
+#include "dome/frame-clock.hpp"
 #include <algorithm>
 #include <cstring>
 #include <iostream>
@@ -58,8 +59,12 @@ XrSculpt::XrSculpt(Document &value, std::atomic_bool *stopping, bool overlay)
     setup(overlay);
     document.begin_spatial();
     renderer = std::make_unique<SurfaceRenderer>();
+    renderer->set_output_encoding(output_encoding_);
+    renderer->set_deferred_resolve(true);
     palette = std::make_unique<SpatialPalette>();
+    palette->set_linear_output(true);
     cursors = std::make_unique<CursorRenderer>();
+    cursors->set_linear_output(true);
   } catch (...) {
     cleanup();
     throw;
@@ -316,6 +321,7 @@ void XrSculpt::setup(bool overlay) {
                        : GL_RGBA8;
   if (std::find(formats.begin(), formats.end(), format) == formats.end())
     throw std::runtime_error("RGBA swapchains unavailable");
+  output_encoding_ = format == GL_SRGB8_ALPHA8 ? SurfaceOutputEncoding::Srgb : SurfaceOutputEncoding::Linear;
   eyes.resize(n);
   for (size_t i = 0; i < n; ++i) {
     auto &e = eyes[i];
@@ -515,6 +521,7 @@ void XrSculpt::run(unsigned frameLimit) {
     }
     input(frame.predictedDisplayTime);
     auto content = document.frame();
+    renderer->set_frame_time(render_frame_time());
     std::vector<XrCompositionLayerProjectionView> layers(
         eyes.size(), {XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW});
     XrCompositionLayerProjection layer{XR_TYPE_COMPOSITION_LAYER_PROJECTION};
@@ -570,6 +577,7 @@ void XrSculpt::run(unsigned frameLimit) {
           palette->draw(*content.state, vp);
           if (content.state->controls.parameter != VrParameter::None)
             cursors->draw(*content.state, vp);
+          renderer->resolve();
           glFlush();
           XrSwapchainImageReleaseInfo release{
               XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};

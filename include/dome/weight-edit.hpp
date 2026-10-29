@@ -47,4 +47,10 @@ struct WeightEditResult {
 WeightEditResult edit_weights(std::span<const WeightPaintSurface>, size_t bones,
                               const WeightBrush &, WeightEditOptions = {},
                               const std::function<bool()> &cancelled = {});
+// One gesture uses the maximum capsule falloff, evaluated from original
+// weights once. Repeated frame samples cannot accumulate weight merely because
+// a device reports more frequently. Joint/mode/target must match across samples.
+WeightEditResult edit_weights(std::span<const WeightPaintSurface>, size_t bones,
+                              std::span<const WeightBrush>, WeightEditOptions = {},
+                              const std::function<bool()> &cancelled = {});
 } // namespace dome

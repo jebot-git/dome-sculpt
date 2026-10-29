@@ -23,6 +23,7 @@ int main(int argc, char **argv) try {
   if (!doc.wait_mesh())
     throw std::runtime_error("No mesh snapshot");
   NativeGraphics graphics;
+  std::cout << "GPU " << glGetString(GL_RENDERER) << '\n';
   SurfaceRenderer renderer;
   SpatialPalette palette;
   GLuint fbo, color, depth;
@@ -289,7 +290,7 @@ int main(int argc, char **argv) try {
   material.alpha_cutoff=.2f;
   if(!close(sample(material),{128,64,192}))throw std::runtime_error("Source alpha mask failed to retain opaque coverage");
   material.alpha=Material::AlphaMode::Blend;
-  if(!close(sample(material),{68,52,84}))throw std::runtime_error("Source blend alpha was not preserved");
+  if(!close(sample(material),{78,53,110}))throw std::runtime_error("Source blend must accumulate linear RGB before the final sRGB transfer");
   glDeleteRenderbuffers(1, &depth);
   glDeleteTextures(1, &color);
   glDeleteFramebuffers(1, &fbo);
