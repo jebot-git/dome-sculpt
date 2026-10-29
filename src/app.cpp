@@ -8,6 +8,7 @@
 #include "object-editor.hpp"
 #include "paint-editor.hpp"
 #include "ui-conventions.hpp"
+#include "uv-editor.hpp"
 #ifdef DOME_HAS_XR
 #include "dome/xr.hpp"
 #endif
@@ -224,6 +225,7 @@ struct Canvas : Fl_Gl_Window {
   }
 };
 struct App {
+  DomeEventDispatch events;
   SculptWindow window{1100, 800, "Dome Sculpt"};
   DesktopMenuBar menu{0, 0, 1100, 28};
   Canvas canvas{0, 28, 1100, 744};
@@ -316,6 +318,10 @@ struct App {
       menu.add("&File/&Quit", FL_CTRL + 'q', command, this);
     menu.add("&Edit/&Undo", FL_CTRL + 'z', command, this);
     menu.add("&Edit/&Redo", FL_CTRL | FL_SHIFT | 'z', command, this);
+    menu.add("&Edit/Cu&t", FL_CTRL + 'x', command, this);
+    menu.add("&Edit/&Copy", FL_CTRL + 'c', command, this);
+    menu.add("&Edit/&Paste", FL_CTRL + 'v', command, this);
+    menu.add("&Edit/Select &All", FL_CTRL + 'a', command, this);
     menu.add("&View/Reset &trackball", 'f', command, this);
     menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
     menu.add("&View/Shading/&PBR", 0, command, this,
@@ -338,6 +344,7 @@ struct App {
              FL_MENU_TOGGLE | FL_MENU_VALUE);
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
+    menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
     menu.add("&Paint/Prepare painting mesh", FL_CTRL | FL_SHIFT | 'p', command,
              this);
     menu.add("&Paint/Use painted mesh", 'p', command, this, FL_MENU_RADIO);
@@ -392,18 +399,31 @@ struct App {
   void sync_menus() {
     auto s = canvas.document.frame().state;
     bool modal = Fl::modal() && Fl::modal() != &window;
+    std::vector<int> modes;
+    for (int i = 0; i < menu.size(); ++i) {
+      auto item = menu.menu() + i;
+      int flags = menu.mode(i);
+      if (item->label() && !(flags & FL_SUBMENU))
+        flags = (!modal && !s->asset_busy) ? flags & ~FL_MENU_INACTIVE
+                                           : flags | FL_MENU_INACTIVE;
+      modes.push_back(flags);
+    }
     auto enable = [&](const char *path, bool value) {
-      dx::enable_menu(menu, path, value);
+      int i = menu.find_index(path);
+      if (i >= 0)
+        modes[i] =
+            value ? modes[i] & ~FL_MENU_INACTIVE : modes[i] | FL_MENU_INACTIVE;
     };
     auto checked = [&](const char *path, bool value) {
-      int index = menu.find_index(path);
-      if (index < 0)
-        return;
-      int flags = menu.mode(index),
-          next = value ? flags | FL_MENU_VALUE : flags & ~FL_MENU_VALUE;
-      if (flags != next)
-        menu.mode(index, next);
+      int i = menu.find_index(path);
+      if (i >= 0)
+        modes[i] = value ? modes[i] | FL_MENU_VALUE : modes[i] & ~FL_MENU_VALUE;
     };
+    enable("&File/Close &Window", true);
+    const char *views[] = {"&View/Reset &trackball", "&View/Start or stop &XR",
+                           "&View/Shading/&PBR", "&View/Shading/&Toon preview"};
+    for (auto path : views)
+      enable(path, !modal);
     const char *document_actions[] = {"&File/&New",
                                       "&File/&Open...",
                                       "&File/&Save",
@@ -416,9 +436,24 @@ struct App {
                                       "&Mesh/Generate &UV atlas"};
     for (auto path : document_actions)
       enable(path, !modal && !s->asset_busy);
-    auto input = modal ? dynamic_cast<Fl_Input_ *>(Fl::focus()) : nullptr;
-    enable("&Edit/&Undo", modal ? (input && input->can_undo()) : s->can_undo);
-    enable("&Edit/&Redo", modal ? (input && input->can_redo()) : s->can_redo);
+    auto input = dynamic_cast<Fl_Input_ *>(Fl::focus());
+    if (input && (!input->active_r() || !input->visible_r() ||
+                  input->window() != (modal ? Fl::modal() : &window)))
+      input = nullptr;
+    bool selection = input && input->insert_position() != input->mark();
+    bool copyable = selection && input->input_type() != FL_SECRET_INPUT;
+    enable("&Edit/Cu&t", copyable && !input->readonly());
+    enable("&Edit/&Copy", copyable);
+    enable("&Edit/&Paste",
+           input && !input->readonly() &&
+               Fl::clipboard_contains(Fl::clipboard_plain_text));
+    enable("&Edit/Select &All", input && input->size() > 0);
+    enable("&Edit/&Undo",
+           modal ? (input ? input->can_undo() : s->uv && s->uv->can_undo)
+                 : s->can_undo);
+    enable("&Edit/&Redo",
+           modal ? (input ? input->can_redo() : s->uv && s->uv->can_redo)
+                 : s->can_redo);
     enable("&Scene/Delete object",
            !modal && !s->asset_busy && s->objects.size() > 1);
     enable("&Scene/Next object", !modal && s->objects.size() > 1);
@@ -438,6 +473,9 @@ struct App {
       checked(tools[i], int(s->tool) == i);
       enable(tools[i], !modal && !s->asset_busy);
     }
+    enable("&Sculpt/Smaller brush",
+           !modal && !s->asset_busy && s->radius > .005f);
+    enable("&Sculpt/Larger brush", !modal && !s->asset_busy && s->radius < 2);
     checked("&Paint/Use painted mesh", s->mesh_active);
     checked("&Paint/Edit source volume", !s->mesh_active);
     checked("&Paint/Toggle eraser", s->paint.erase);
@@ -457,16 +495,29 @@ struct App {
         "&Paint/Delete layer", "&Paint/Cycle layer opacity"};
     for (auto path : layer_actions)
       enable(path, !modal && !s->asset_busy && s->mesh_active);
-    enable("&Paint/Delete layer",
-           !modal && s->mesh_active && s->paint_layers.size() > 1);
-    enable("&Paint/Next layer",
-           !modal && s->mesh_active && s->paint_layers.size() > 1);
+    enable("&Paint/Add layer", !modal && !s->asset_busy && s->mesh_active &&
+                                   s->paint_layers.size() < 16);
+    enable("&Paint/Delete layer", !modal && !s->asset_busy && s->mesh_active &&
+                                      s->paint_layers.size() > 1);
+    enable("&Paint/Next layer", !modal && !s->asset_busy && s->mesh_active &&
+                                    s->paint_layers.size() > 1);
+    enable("&Mesh/UV editor...", !modal && !s->asset_busy && s->mesh_active &&
+                                     active != s->objects.end() &&
+                                     active->visible && !active->locked);
     enable("&Paint/Prepare painting mesh",
            !modal && !s->asset_busy && active != s->objects.end() &&
                active->visible && !active->locked);
-    enable("&Paint/Use painted mesh", !modal && !s->asset_busy);
+    enable("&Mesh/Generate &UV atlas", !modal && !s->asset_busy &&
+                                           active != s->objects.end() &&
+                                           active->visible && !active->locked);
+    enable("&Paint/Use painted mesh",
+           !modal && !s->asset_busy && active != s->objects.end() &&
+               (active->has_mesh || (active->visible && !active->locked)));
     enable("&Paint/Edit source volume",
            !modal && s->mesh_active && !s->asset_busy);
+    for (int i = 0; i < menu.size(); ++i)
+      if (menu.mode(i) != modes[i])
+        menu.mode(i, modes[i]);
   }
   void update_status() {
     const char *tools[] = {"Clay", "Carve", "Smooth", "Flatten"};
@@ -523,14 +574,39 @@ struct App {
   void action(std::string label) {
     label.erase(std::remove(label.begin(), label.end(), '&'), label.end());
     auto modal = Fl::modal();
+    if (label == "Cut" || label == "Copy" || label == "Paste" ||
+        label == "Select All") {
+      auto input = dynamic_cast<Fl_Input_ *>(Fl::focus());
+      if (!input || !input->active_r() || !input->visible_r() ||
+          input->window() != (modal ? modal : &window))
+        return;
+      if (label == "Select All")
+        input->insert_position(input->size(), 0);
+      else if (label == "Paste" && !input->readonly())
+        Fl::paste(*input, 1);
+      else if (input->input_type() != FL_SECRET_INPUT) {
+        if (label == "Copy")
+          input->copy(1);
+        else if (label == "Cut" && !input->readonly()) {
+          input->copy(1);
+          input->cut();
+        }
+      }
+      return;
+    }
     if (modal && modal != &window) {
       if (label == "Close Window")
-        modal->hide();
+        modal->do_callback();
       else if (auto input = dynamic_cast<Fl_Input_ *>(Fl::focus())) {
         if (label == "Undo")
           input->undo();
         else if (label == "Redo")
           input->redo();
+      } else if (canvas.document.frame().state->uv) {
+        if (label == "Undo")
+          canvas.document.edit_uv(UvAction::Undo);
+        else if (label == "Redo")
+          canvas.document.edit_uv(UvAction::Redo);
       }
       return;
     }
@@ -585,9 +661,9 @@ struct App {
     else if (label == "Flatten")
       canvas.tool = Tool::Flatten;
     else if (label == "Smaller brush")
-      canvas.radius = std::max(.02f, canvas.radius * .8f);
+      canvas.radius = std::max(.005f, canvas.radius * .8f);
     else if (label == "Larger brush")
-      canvas.radius = std::min(.5f, canvas.radius * 1.25f);
+      canvas.radius = std::min(2.f, canvas.radius * 1.25f);
     else if (label == "New sphere" || label == "New empty sculpt") {
       canvas.document.add_object(label == "New sphere");
     } else if (label == "Duplicate object") {
@@ -611,6 +687,8 @@ struct App {
       canvas.document.object_properties(
           o.id, o.name, label == "Visible" ? !o.visible : o.visible,
           label == "Locked" ? !o.locked : o.locked, o.transform, o.material);
+    } else if (label == "UV editor...") {
+      edit_uv(canvas.document);
     } else if (label == "Prepare painting mesh") {
       canvas.document.prepare_mesh();
     } else if (label == "Use painted mesh") {
@@ -652,13 +730,7 @@ struct App {
     else if (label == "Toggle eraser")
       canvas.document.paint_command(SpatialCommand::ErasePaint);
     else if (label == "Generate UV atlas") {
-      canvas.mesh = surface_mesh(canvas.document.copy_volume());
-      auto info = unwrap(canvas.mesh);
-      std::ostringstream text;
-      text << info.charts << " UV charts packed into " << info.width << " x "
-           << info.height << " (" << int(info.utilization * 100)
-           << "% occupied)";
-      fl_message("%s", text.str().c_str());
+      canvas.document.prepare_mesh();
     } else if (label == "Export glTF (.glb)...") {
       auto chosen =
           fl_file_chooser("Export static glTF mesh", "*.glb", "Sculpt.glb");
@@ -749,8 +821,12 @@ int main(int argc, char **argv) try {
       XrSculpt xr(document, nullptr, overlay);
       xr.run(frames);
     }
-    if (!save.empty())
+    if (!save.empty()) {
+      if (!document.wait_asset(std::chrono::seconds(180)))
+        throw std::runtime_error(
+            "Pending mesh/UV work did not finish before saving");
       document.save(save);
+    }
     return 0;
   }
 #endif
@@ -771,6 +847,16 @@ int main(int argc, char **argv) try {
           hash *= 1099511628211ULL;
         }
     }
+    uint64_t uv_hash = 1469598103934665603ULL;
+    if (scene.active().painted)
+      for (auto uv : scene.active().painted->mesh().uv)
+        for (float f : uv) {
+          auto word = std::bit_cast<uint32_t>(f);
+          for (int i = 0; i < 4; ++i) {
+            uv_hash ^= uint8_t(word >> (i * 8));
+            uv_hash *= 1099511628211ULL;
+          }
+        }
     uint64_t paint_hash = 1469598103934665603ULL;
     size_t blue_texels = 0;
     if (scene.active().painted) {
@@ -784,6 +870,7 @@ int main(int argc, char **argv) try {
                        map->color.rgba[i + 2] > 100;
     }
     std::cout << nlohmann::json{{"paint_blue_texels", blue_texels},
+                                {"uv_hash", uv_hash},
                                 {"paint_hash", paint_hash},
                                 {"painted", scene.active().mesh_active},
                                 {"paint_layers",
@@ -804,6 +891,7 @@ int main(int argc, char **argv) try {
               << '\n';
     return 0;
   }
+  Fl_Window::default_xclass("org.domed.Sculpt");
   dx::init();
   App app;
   if (argc == 3 && std::string(argv[1]) == "--smoke-test")

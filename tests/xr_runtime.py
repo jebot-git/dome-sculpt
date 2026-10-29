@@ -179,6 +179,10 @@ with tempfile.TemporaryDirectory(prefix="dome-xr-client-") as directory:
         info["paint_blue_texels"] > 20,
         "Nested joystick brush palette selects blue ink for the tracked paint stroke",
     )
+    uv_result, uv_path = run("uv",45,extra=["--paint"],mode={"DOME_XR_FIXTURE_UV":"1"})
+    check(uv_result.returncode==0,"Native OpenXR UV panel supports joystick entry and ray-operated edit/Apply controls")
+    uv_info=json.loads(subprocess.check_output([str(binary),"--project-info",str(uv_path)],env=env,text=True))
+    check(uv_info["uv_hash"]!=basepaint["uv_hash"] and uv_info["field_hash"]==basepaint["field_hash"] and uv_info["paint_hash"]==basepaint["paint_hash"],"XR UV edits persist while retaining the source field and surface material appearance")
     controlled, controlpath = run(
         "controls", 45, mode={"DOME_XR_FIXTURE_CONTROLS": "1"}
     )

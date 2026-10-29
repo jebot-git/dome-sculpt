@@ -1,3 +1,19 @@
+# UV and universal-menu handoff checkpoint — 2026-10-29
+
+The current stage adds editable UVs and filtered layer transfer, native FLTK/XR
+controls and the universal-menu fixes documented in [the audit](UNIVERSAL-MENU-AUDIT.md).
+The user requested committing/pushing the current stage for later resumption.
+
+- 18 FLTK GUI checks, 25 exporter/dialog menu checks and eight tests through an
+  actual nested DomeD/Wayland compositor passed.
+- Nine suites passed in the latest optimized ten-suite run; the OpenXR suite
+  failed its new continuous UV-transform persistence assertion. Earlier complete
+  ten-suite successes predate the final continuous-transform refinement.
+- All seven native sanitizer suites passed in 331.55 seconds. The completed
+  handle and logs are recorded in [HANDOFF.md](HANDOFF.md).
+- Stale success reports must not override the failing final log. The original
+  production objective remains active and incomplete.
+
 # Layered painting, XR controls and DomeD integration — 2026-10-29
 
 This checkpoint adds stable UV painting assets and sparse editable paint layers,

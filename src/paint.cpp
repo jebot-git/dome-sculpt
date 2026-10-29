@@ -73,6 +73,8 @@ struct PaintedMesh::SurfaceMap {
   struct Texel {
     Vec3 position, normal;
     bool covered = false;
+    uint32_t face = 0;
+    std::array<float, 2> bary{};
   };
   struct Bounds {
     Vec3 lo{INFINITY, INFINITY, INFINITY}, hi{-INFINITY, -INFINITY, -INFINITY};
@@ -127,7 +129,9 @@ struct PaintedMesh::SurfaceMap {
                normalized(mesh.normals[ids[0]] * w0 +
                           mesh.normals[ids[1]] * w1 +
                           mesh.normals[ids[2]] * w2),
-               true};
+               true,
+               uint32_t(k / 3),
+               {w0, w1}};
           padding[index] = int32_t(index);
           auto &bounds = tiles[size_t(y / 32) * columns + x / 32];
           bounds.lo = low(bounds.lo, p);
@@ -512,6 +516,122 @@ Vec3 PaintedMesh::normal(Vec3 point) const {
   }
   return result;
 }
+std::shared_ptr<PaintedMesh>
+PaintedMesh::reparameterize(Mesh target,
+                            const std::function<bool()> &cancelled) const {
+  if (editing_)
+    throw std::logic_error("Finish the paint stroke before editing UVs");
+  target.validate();
+  if (target.indices.size() != mesh().indices.size() ||
+      target.uv.size() != target.positions.size())
+    throw std::invalid_argument(
+        "UV editing must preserve the triangle surface");
+  bool same = true;
+  for (size_t c = 0; c < target.indices.size(); ++c) {
+    auto a = target.indices[c], b = mesh().indices[c];
+    auto p = target.positions[a], q = mesh().positions[b],
+         n = target.normals[a], o = mesh().normals[b];
+    if (p.x != q.x || p.y != q.y || p.z != q.z || n.x != o.x || n.y != o.y ||
+        n.z != o.z)
+      throw std::invalid_argument(
+          "UV editing cannot change triangle geometry or order");
+    same &= target.uv[a] == mesh().uv[b];
+  }
+  auto result = snapshot();
+  if (same) {
+    auto surface = std::make_shared<SurfaceMap>(*surface_);
+    surface->mesh = std::move(target);
+    result->surface_ = std::move(surface);
+    ++result->revision_;
+    return result;
+  }
+  auto surface = std::make_shared<SurfaceMap>(std::move(target), resolution());
+  result->surface_ = surface;
+  for (auto &l : result->layers_)
+    l.tiles.assign(surface->tiles.size(), {});
+  std::vector<std::vector<std::shared_ptr<PaintTile>>> writable(layers_.size());
+  for (auto &tiles : writable)
+    tiles.resize(surface->tiles.size());
+  size_t allocated = 0;
+  for (uint32_t y = 0; y < resolution(); ++y) {
+    if (cancelled && cancelled())
+      throw std::runtime_error("UV paint transfer cancelled");
+    for (uint32_t x = 0; x < resolution(); ++x) {
+      auto &t = surface->texels[size_t(y) * resolution() + x];
+      if (!t.covered)
+        continue;
+      auto f = t.face * 3;
+      float w[] = {t.bary[0], t.bary[1], 1 - t.bary[0] - t.bary[1]};
+      std::array<float, 2> uv{};
+      for (int k = 0; k < 3; ++k)
+        for (int d = 0; d < 2; ++d)
+          uv[d] += mesh().uv[mesh().indices[f + k]][d] * w[k];
+      float px = uv[0] * resolution() - .5f, py = uv[1] * resolution() - .5f;
+      int bx = int(std::floor(px)), by = int(std::floor(py));
+      float fx = px - bx, fy = py - by;
+      size_t at[4];
+      float weights[4];
+      for (int k = 0; k < 4; ++k) {
+        auto sx = std::clamp(bx + (k & 1), 0, int(resolution()) - 1),
+             sy = std::clamp(by + (k >> 1), 0, int(resolution()) - 1);
+        int32_t owner = surface_->padding[size_t(sy) * resolution() + sx];
+        at[k] = owner >= 0 ? size_t(owner) : size_t(sy) * resolution() + sx;
+        weights[k] = ((k & 1) ? fx : 1 - fx) * ((k >> 1) ? fy : 1 - fy);
+      }
+      for (size_t li = 0; li < layers_.size(); ++li) {
+        PaintPixel samples[4];
+        for (int k = 0; k < 4; ++k)
+          samples[k] =
+              pixel(layers_[li].id, at[k] % resolution(), at[k] / resolution());
+        PaintPixel p;
+        for (int group = 0; group < 4; ++group) {
+          int first = group == 0   ? 0
+                      : group == 1 ? 4
+                      : group == 2 ? 5
+                                   : 6,
+              count = group == 0   ? 4
+                      : group == 3 ? 3
+                                   : 1;
+          float coverage = 0;
+          for (int k = 0; k < 4; ++k)
+            coverage += weights[k] * unit(samples[k].data[9 + group]);
+          p.data[9 + group] = byte(coverage);
+          if (coverage > 1e-8f)
+            for (int c = 0; c < count; ++c) {
+              bool srgb = (group == 0 && c < 3) || group == 3;
+              float value = 0;
+              for (int k = 0; k < 4; ++k) {
+                float v = unit(samples[k].data[first + c]);
+                if (srgb)
+                  v = srgb_to_linear(v);
+                value += weights[k] * unit(samples[k].data[9 + group]) * v;
+              }
+              value /= coverage;
+              p.data[first + c] = byte(srgb ? linear_to_srgb(value) : value);
+            }
+        }
+        float mask = 0;
+        for (int k = 0; k < 4; ++k)
+          mask += weights[k] * unit(samples[k].data[13]);
+        p.data[13] = byte(mask);
+        if (p == PaintPixel{})
+          continue;
+        size_t tile = size_t(y / 32) * surface->columns + x / 32;
+        auto &dest = writable[li][tile];
+        if (!dest) {
+          allocated += sizeof(PaintTile);
+          if (allocated > 128 * 1024 * 1024)
+            throw std::length_error("UV transfer exceeds paint storage budget");
+          dest = std::make_shared<PaintTile>();
+          result->layers_[li].tiles[tile] = dest;
+        }
+        dest->pixels[size_t(y % 32) * 32 + x % 32] = p;
+      }
+    }
+  }
+  ++result->revision_;
+  return result;
+}
 namespace {
 void word(std::vector<uint8_t> &out, uint32_t v) {
   for (int k = 0; k < 4; ++k)
@@ -547,6 +667,8 @@ nlohmann::json PaintedMesh::encode() const {
                {"normals", nlohmann::json::binary(normals)},
                {"uv", nlohmann::json::binary(uv)},
                {"indices", nlohmann::json::binary(indices)}};
+  j["mesh"]["uv_pins"] = nlohmann::json::binary(mesh().uv_pins);
+  j["mesh"]["uv_seams"] = nlohmann::json::binary(mesh().uv_seams);
   for (auto &l : layers_) {
     nlohmann::json tiles = nlohmann::json::array();
     for (size_t i = 0; i < l.tiles.size(); ++i)
@@ -594,6 +716,17 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j) {
                        std::bit_cast<float>(word(uv, i + 4))});
   for (size_t i = 0; i < indices.size(); i += 4)
     mesh.indices.push_back(word(indices, i));
+  auto flags = [&](const char *key, size_t count, std::vector<uint8_t> &out) {
+    if (!m.contains(key))
+      return;
+    auto &v = m.at(key);
+    if (!v.is_binary() ||
+        (!v.get_binary().empty() && v.get_binary().size() != count))
+      throw std::runtime_error("Invalid persisted UV edit flags");
+    out.assign(v.get_binary().begin(), v.get_binary().end());
+  };
+  flags("uv_pins", mesh.positions.size(), mesh.uv_pins);
+  flags("uv_seams", mesh.indices.size(), mesh.uv_seams);
   auto &resolution = j.at("resolution");
   if ((!resolution.is_number_unsigned() &&
        (!resolution.is_number_integer() || resolution.get<int64_t>() < 64)) ||

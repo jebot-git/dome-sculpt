@@ -8,6 +8,7 @@ struct Mesh {
   std::vector<Vec3> positions, normals;
   std::vector<std::array<float, 2>> uv;
   std::vector<uint32_t> indices;
+  std::vector<uint8_t> uv_pins, uv_seams;
   void validate() const;
 };
 Mesh surface_mesh(const Volume &, const std::function<bool()> &cancelled = {});

@@ -330,6 +330,50 @@ try:
             ImageChops.difference(frozen, restored_paint).getbbox() is None,
             "Native paint undo restores exact pre-stroke viewport pixels",
         )
+        key("Alt_L", True)
+        key("u")
+        key("Alt_L", False)
+        deadline = time.monotonic() + 30
+        uv_window = None
+        while time.monotonic() < deadline:
+            uv_window = next((w for w in d.screen().root.query_tree().children if "UV editor" in str(w.get_wm_name() or "")), None)
+            if uv_window:
+                break
+            time.sleep(.05)
+        check(uv_window is not None, "The editable UV atlas opens as a native FLTK dialog")
+        uv_window.set_input_focus(X.RevertToParent, X.CurrentTime)
+        d.sync()
+        def uv_shot(name):
+            time.sleep(.3)
+            g = uv_window.get_geometry()
+            raw = uv_window.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF)
+            image = Image.frombytes("RGB",(g.width,g.height),raw.data,"raw","BGRX")
+            image.save(out / (name + ".png"))
+            return image.crop((20,80,g.width-20,g.height-80))
+        def uv_button(column):
+            g = uv_window.get_geometry()
+            xtest.fake_input(d,X.MotionNotify,x=g.x+int(g.width*(column+.5)/6),y=g.y+16)
+            d.sync()
+            button(True);button(False)
+            time.sleep(.3)
+        uv_before = uv_shot("15-uv-editor")
+        uv_button(0)
+        uv_scaled = uv_shot("16-uv-scaled")
+        check(ImageChops.difference(uv_before,uv_scaled).getbbox() is not None, "A native UV scale control visibly edits the selected island")
+        uv_button(4)
+        uv_undo = uv_shot("17-uv-undo")
+        check(ImageChops.difference(uv_before,uv_undo).getbbox() is None, "Draft UV undo restores exact chart pixels")
+        uv_button(0)
+        g = uv_window.get_geometry()
+        xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2+100,y=g.y+g.height-16)
+        d.sync();button(True);button(False)
+        time.sleep(3)
+        window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+        applied_uv = shot("18-uv-applied")
+        check(ImageChops.difference(frozen,applied_uv).getbbox() is None, "Applying UV edits retains the existing three-dimensional surface appearance")
+        key("Control_L",True);key("z");key("Control_L",False)
+        time.sleep(.8)
+        check(ImageChops.difference(frozen,shot("19-uv-global-undo")).getbbox() is None, "A committed UV edit participates in native global undo")
         d.close()
 finally:
     for p in reversed(processes):

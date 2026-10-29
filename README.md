@@ -66,8 +66,9 @@ The sparse signed-distance field supports swept capsule strokes, pressure,
 soft unions/subtraction, smoothing and flattening. Transactions retain exact
 sample values for undo/redo. The mesher welds shared intersections and discards
 degenerate faces. xatlas generates seams and packed UV charts; it preserves the
-mapping back to source geometry. Artist seam controls and a UV editor are not
-implemented yet.
+mapping back to source geometry. The native UV editor supports chart/vertex edits, pins, cuts, relaxation and
+packing with paint transfer; see [UV authoring](docs/UV.md). Advanced seam-based
+re-parameterization and stitching remain unfinished.
 
 Ctrl+S saves the scene as a private, atomically replaced `.dsculpt` CBOR file.
 Version 3 stores separate sculpt objects, stable identities, names, selection,
@@ -142,11 +143,15 @@ XR mode. Desktop backgrounds use DomeD dark/light grey. Live physical device beh
 Rich spatial document dialogs and the rest of the production workflow remain
 in [the tracked requirements](docs/REQUIREMENTS.md).
 
+The universal-menu audit covers main, parameter, UV and file-dialog contexts;
+see [the audit](docs/UNIVERSAL-MENU-AUDIT.md).
+
 ## Validation
 
 ```sh
 uv run --with python-xlib --with pillow python tests/gui.py
 uv run --with dbus-next --with python-xlib --with pillow python tests/menu.py
+uv run --with dbus-next --with python-xlib --with pillow python tests/dome_menu.py
 build/dome-sculpt --export-demo artifacts/sculpt.glb
 ```
 
@@ -160,11 +165,11 @@ Its report and images are in `artifacts/gui`. A separate private universal-menu
 host tests actual DBusMenu state, dialog shortcuts and Cancel defaults.
 CTest additionally exercises the shared document workers, real EGL/OpenGL
 PBR/toon/textured-surface/palette/slider rendering, and the real OpenXR loader against a native synthetic
-runtime. Its 32 checks cover stereo submission, controller/stylus edits, focus
+runtime. Its 34 checks cover stereo submission, controller/stylus edits, focus
 and tracking loss, reference-space changes, object creation, material changes,
 layered painting, continuous slider input, file commands and overlay selection.
 The installed Monado runtime also completed a bounded 12-frame run with 11
 stereo submissions, but reported a simulated HMD and no controllers. Neither
-fixture establishes physical headset or stylus behavior. ASan/UBSan and leak
-checks pass for the native core suites; no accelerator hardware tests have been
-performed.
+fixture establishes physical headset or stylus behavior. Current results and the native XR UV regression are
+recorded in [the agent handoff](docs/HANDOFF.md). No accelerator hardware tests
+have been performed.

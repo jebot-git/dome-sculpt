@@ -9,6 +9,13 @@ void Mesh::validate() const {
   if (normals.size() != positions.size() ||
       (!uv.empty() && uv.size() != positions.size()))
     throw std::runtime_error("Mesh attribute count mismatch");
+  if ((!uv_pins.empty() && uv_pins.size() != positions.size()) ||
+      (!uv_seams.empty() && uv_seams.size() != indices.size()) ||
+      std::any_of(uv_pins.begin(), uv_pins.end(),
+                  [](auto v) { return v > 1; }) ||
+      std::any_of(uv_seams.begin(), uv_seams.end(),
+                  [](auto v) { return v > 1; }))
+    throw std::runtime_error("Invalid UV pins or seam flags");
   for (size_t i = 0; i < positions.size(); ++i) {
     if (!finite(positions[i]) || !finite(normals[i]))
       throw std::runtime_error("Non-finite mesh vertex");

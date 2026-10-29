@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/input.hpp"
+#include "dome/uv.hpp"
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> root = {
@@ -11,7 +12,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Back",       "Move left",  "Move right", "Center"};
   static const std::array<const char *, 12> materials = {
       "Base color", "Blue",      "White",   "Paint tools",
-      "Metallic",   "Roughness", "Opacity", "Brush size",
+      "Metallic",   "Roughness", "Opacity", "UV editor",
       "Back",       "Toon",      "PBR",     "Flow"};
   static const std::array<const char *, 12> paint = {
       "Make mesh",   "Edit source", "Paint color", "Paint metal",
@@ -49,7 +50,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
     case 6:
       return VrParameter::Opacity;
     case 7:
-      return VrParameter::BrushRadius;
+      return VrParameter::UvEdit;
     case 11:
       return VrParameter::Flow;
     default:
@@ -132,6 +133,8 @@ void SpatialInput::cancel() {
   page_ = 0;
   parameter_ = VrParameter::None;
   controls_.clear();
+  uv_dragging_ = false;
+  uv_pointer_ = 0;
   command_.reset();
   devices_.clear();
 }
@@ -140,6 +143,8 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
       s.panel_v <= 630.f / 640) {
     bool cancel = s.panel_u >= 60.f / 640 && s.panel_u <= 280.f / 640;
     bool accept = s.panel_u >= 360.f / 640 && s.panel_u <= 580.f / 640;
+    if (accept && control_accept && !control_accept())
+      return;
     if (cancel || accept) {
       controls_.push_back(
           {cancel ? VrControlEventType::Cancel : VrControlEventType::Confirm,
@@ -149,6 +154,72 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
       selected_ = parent_sector_;
       return;
     }
+  }
+  if (parameter_ == VrParameter::UvEdit) {
+    if (!s.trigger) {
+      if (uv_pointer_ == s.id) {
+        uv_dragging_ = false;
+        uv_pointer_ = 0;
+      }
+      return;
+    }
+    float x = s.panel_u * 640, y = s.panel_v * 640;
+    if (pressed && ((y >= 68 && y <= 102) || (y >= 538 && y <= 580)) &&
+        x >= 40 && x < 600) {
+      int column = int((x - 40) / 94);
+      if (column < 6 && (x - 40 - column * 94) < 88) {
+        UvAction action;
+        float value = 0;
+        if (y < 110) {
+          if (column < 3) {
+            uv_mode_ = column;
+            action = UvAction::Tool;
+            value = float(column);
+          } else {
+            action = column == 3   ? UvAction::Rotate
+                     : column == 4 ? UvAction::Undo
+                                   : UvAction::Redo;
+            value = column == 3 ? 1.570796327f : 0;
+          }
+        } else {
+          static const UvAction actions[] = {
+              UvAction::VertexMode, UvAction::Pin,  UvAction::Relax,
+              UvAction::Pack,       UvAction::Seam, UvAction::Next};
+          action = actions[column];
+        }
+        controls_.push_back(
+            {VrControlEventType::UvCommand, parameter_, int(action), value});
+      }
+      return;
+    }
+    if (x >= 110 && x <= 530 && y >= 110 && y <= 530) {
+      if (uv_pointer_ && uv_pointer_ != s.id)
+        return;
+      float u = (x - 110) / 420, v = (y - 110) / 420;
+      if (pressed) {
+        controls_.push_back({VrControlEventType::UvPick, parameter_, 0, u, v});
+        uv_dragging_ = true;
+        uv_pointer_ = s.id;
+      } else if (uv_dragging_) {
+        if (!uv_mode_)
+          controls_.push_back({VrControlEventType::UvMove, parameter_, 0,
+                               u - uv_x_, v - uv_y_});
+        else {
+          float delta = (u - uv_x_) - (v - uv_y_) * .1f;
+          auto action = uv_mode_ == 1 ? UvAction::Scale : UvAction::Rotate;
+          float value =
+              uv_mode_ == 1 ? std::exp(delta * 2) : delta * 3.14159265f;
+          controls_.push_back(
+              {VrControlEventType::UvCommand, parameter_, int(action), value});
+        }
+      }
+      uv_x_ = u;
+      uv_y_ = v;
+    } else if (uv_pointer_ == s.id) {
+      uv_dragging_ = false;
+      uv_pointer_ = 0;
+    }
+    return;
   }
   bool color = parameter_ == VrParameter::InkColor ||
                parameter_ == VrParameter::InkEmission ||
@@ -185,6 +256,10 @@ void SpatialInput::update(const SpatialSample &s) {
       std::abs(s.stick_y) <= 1 &&
       (!s.panel_hit || (std::isfinite(s.panel_u) && std::isfinite(s.panel_v)));
   if (!valid) {
+    if (uv_pointer_ == s.id) {
+      uv_dragging_ = false;
+      uv_pointer_ = 0;
+    }
     if (s.id == device_)
       cancel();
     else
@@ -220,8 +295,9 @@ void SpatialInput::update(const SpatialSample &s) {
   // Idle hands cannot acquire an edit lease. A hand held while another edits
   // must release before it can take ownership of a later stroke.
   if (device_ && device_ != s.id) {
+
     if (menu_ && parameter_ != VrParameter::None && control_armed_ &&
-        s.trigger && s.panel_hit) {
+        (s.panel_hit || uv_dragging_)) {
       ray_controls(s, s.trigger && !d.pressed);
       d.pressed = s.trigger;
       return;
@@ -233,6 +309,8 @@ void SpatialInput::update(const SpatialSample &s) {
   }
   if (menu_ && parameter_ != VrParameter::None) {
     if (menu_press) {
+      if (control_accept && !control_accept())
+        return;
       controls_.push_back({VrControlEventType::Confirm, parameter_});
       parameter_ = VrParameter::None;
       page_ = parent_page_;
@@ -244,6 +322,32 @@ void SpatialInput::update(const SpatialSample &s) {
       if (std::abs(s.stick_x) < .25f && std::abs(s.stick_y) < .25f &&
           !s.trigger)
         control_armed_ = true;
+      d.pressed = s.trigger;
+      return;
+    }
+    if (parameter_ == VrParameter::UvEdit) {
+      auto axis = [](float v) {
+        return std::abs(v) > .25f
+                   ? std::copysign((std::abs(v) - .25f) / .75f, v)
+                   : 0.f;
+      };
+      float dx = float(elapsed) * axis(s.stick_x) * .25f,
+            dy = -float(elapsed) * axis(s.stick_y) * .25f;
+      if (dx || dy) {
+        if (!uv_mode_)
+          controls_.push_back(
+              {VrControlEventType::UvMove, parameter_, 0, dx, dy});
+        else {
+          float delta =
+              float(elapsed) * (axis(s.stick_x) + axis(s.stick_y) * .1f);
+          auto action = uv_mode_ == 1 ? UvAction::Scale : UvAction::Rotate;
+          float value = uv_mode_ == 1 ? std::exp(delta * .69314718f)
+                                      : delta * .523598776f;
+          controls_.push_back(
+              {VrControlEventType::UvCommand, parameter_, int(action), value});
+        }
+      }
+      ray_controls(s, s.trigger && !d.pressed);
       d.pressed = s.trigger;
       return;
     }
@@ -304,6 +408,10 @@ void SpatialInput::update(const SpatialSample &s) {
       parent_page_ = page_;
       parent_sector_ = selected_;
       parameter_ = *parameter;
+      parameter_owner_ = device_;
+      uv_mode_ = 0;
+      uv_dragging_ = false;
+      uv_pointer_ = 0;
       control_armed_ = false;
       component_ = y_latch_ = 0;
       page_ = 5;

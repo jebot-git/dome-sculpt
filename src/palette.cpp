@@ -153,6 +153,112 @@ void SpatialPalette::raster(const EditorState &s) {
     }
   };
   rect(0, 0, width_, height_, bg);
+  if (s.controls.parameter == VrParameter::UvEdit && s.uv) {
+    auto &v = *s.uv;
+    auto &m = *v.mesh;
+    text(320 * unit_, 50 * unit_,
+         v.valid ? (v.tool == 1   ? "UV scale: slide / vertical fine wheel"
+                    : v.tool == 2 ? "UV turn: slide / vertical fine wheel"
+                    : v.vertices  ? "UV vertices: drag / stick to move"
+                                  : "UV islands: drag / stick to move")
+                 : v.error.substr(0, 65),
+         v.valid ? fg : Color{255, 150, 100, 255});
+    auto button = [&](int column, int y, const char *name,
+                      bool selected = false, bool disabled = false) {
+      rect((40 + 94 * column) * unit_, y * unit_, 88 * unit_,
+           (y == 68 ? 34 : 42) * unit_,
+           selected ? accent
+                    : (s.light ? Color{200, 209, 220, uint8_t(s.opacity)}
+                               : Color{55, 65, 80, uint8_t(s.opacity)}));
+      text((84 + 94 * column) * unit_, (y + (y == 68 ? 25 : 29)) * unit_, name,
+           disabled ? Color{uint8_t((int(fg[0]) + bg[0]) / 2),
+                            uint8_t((int(fg[1]) + bg[1]) / 2),
+                            uint8_t((int(fg[2]) + bg[2]) / 2), 255}
+                    : fg);
+    };
+    const char *top[] = {"Move", "Scale", "Turn", "Turn 90", "Undo", "Redo"};
+    const char *bottom[] = {v.vertices ? "Vertices" : "Islands",
+                            "Pin",
+                            "Relax",
+                            "Pack",
+                            "Seam",
+                            "Next"};
+    for (int i = 0; i < 6; ++i) {
+      button(i, 68, top[i], i == v.tool,
+             (i == 4 && !v.can_undo) || (i == 5 && !v.can_redo));
+      button(i, 538, bottom[i], i == 0 && v.vertices);
+    }
+    rect(110 * unit_, 110 * unit_, 420 * unit_, 420 * unit_,
+         s.light ? Color{208, 208, 208, uint8_t(s.opacity)}
+                 : Color{48, 48, 48, uint8_t(s.opacity)});
+    auto line = [&](std::array<float, 2> a, std::array<float, 2> b,
+                    Color color) {
+      for (int k = 0; k < 2; ++k) {
+        a[k] = std::clamp(a[k], 0.f, 1.f);
+        b[k] = std::clamp(b[k], 0.f, 1.f);
+      }
+      int x0 = int((110 + 420 * a[0]) * unit_),
+          y0 = int((110 + 420 * a[1]) * unit_),
+          x1 = int((110 + 420 * b[0]) * unit_),
+          y1 = int((110 + 420 * b[1]) * unit_);
+      int dx = std::abs(x1 - x0), dy = -std::abs(y1 - y0),
+          sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1, err = dx + dy;
+      for (;;) {
+        rect(x0, y0, unit_, unit_, color);
+        if (x0 == x1 && y0 == y1)
+          break;
+        int e = 2 * err;
+        if (e >= dy) {
+          err += dy;
+          x0 += sx;
+        }
+        if (e <= dx) {
+          err += dx;
+          y0 += sy;
+        }
+      }
+    };
+    Color grid = s.light ? Color{170, 170, 170, uint8_t(s.opacity)}
+                         : Color{70, 70, 70, uint8_t(s.opacity)};
+    for (int i = 0; i <= 8; ++i) {
+      float p = i / 8.f;
+      line({p, 0}, {p, 1}, grid);
+      line({0, p}, {1, p}, grid);
+    }
+    for (auto &e : v.topology->edges) {
+      bool selected = false;
+      for (auto c : e.corners)
+        selected |=
+            v.topology->face_island[c / 3] == v.topology->face_island[v.face];
+      Color color = selected
+                        ? Color{uint8_t(s.accent >> 16), uint8_t(s.accent >> 8),
+                                uint8_t(s.accent), 255}
+                        : fg;
+      if (std::any_of(e.corners.begin(), e.corners.end(),
+                      [&](auto c) { return m.uv_seams[c]; }))
+        color = {255, 170, 80, 255};
+      for (auto c : e.corners)
+        line(m.uv[m.indices[c]], m.uv[m.indices[c / 3 * 3 + (c + 1) % 3]],
+             color);
+    }
+    if (v.vertices)
+      for (uint32_t i = 0; i < m.uv.size(); ++i) {
+        auto p = m.uv[i];
+        if (p[0] < 0 || p[0] > 1 || p[1] < 0 || p[1] > 1)
+          continue;
+        int size = i == v.vertex ? 9 : 5;
+        Color color = m.uv_pins[i] ? Color{255, 170, 80, 255} : fg;
+        rect(int((110 + 420 * p[0] - size / 2.f) * unit_),
+             int((110 + 420 * p[1] - size / 2.f) * unit_), size * unit_,
+             size * unit_, color);
+      }
+    rect(60 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, grid);
+    rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_,
+         v.valid ? accent : grid);
+    text(170 * unit_, 616 * unit_, "Cancel", fg);
+    text(470 * unit_, 616 * unit_, "Apply / Press", fg);
+    return;
+  }
   if (s.controls.parameter != VrParameter::None) {
     auto &c = s.controls;
     text(320 * unit_, 80 * unit_, c.title, fg);
@@ -299,6 +405,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
   signature += std::to_string(int(s.controls.parameter)) +
                std::to_string(s.controls.selected);
+  if (s.uv)
+    signature += std::to_string(s.uv->revision);
   for (float value : s.controls.value)
     signature += std::to_string(value) + ",";
   for (bool enabled : s.menu_enabled)

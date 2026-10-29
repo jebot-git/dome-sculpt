@@ -20,7 +20,8 @@ enum class VrParameter {
   InkRoughness,
   Mask,
   LayerOrder,
-  BaseColor
+  BaseColor,
+  UvEdit
 };
 struct VrControlState {
   VrParameter parameter = VrParameter::None;
@@ -36,13 +37,16 @@ enum class VrControlEventType {
   Absolute,
   Select,
   Confirm,
-  Cancel
+  Cancel,
+  UvPick,
+  UvMove,
+  UvCommand
 };
 struct VrControlEvent {
   VrControlEventType type;
   VrParameter parameter;
   int component = 0;
-  float value = 0;
+  float value = 0, second = 0;
 };
 struct PanelRayHit {
   ob::Vec3 point;

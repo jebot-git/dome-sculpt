@@ -163,6 +163,22 @@ int main(int argc, char **argv) try {
   doc.prepare_mesh(128);
   if (!doc.wait_asset() || !doc.frame().state->mesh_active || !doc.wait_mesh())
     throw std::runtime_error("Paint mesh preparation failed");
+  doc.begin_uv();
+  auto uv_state = slider;
+  uv_state.controls.parameter = VrParameter::UvEdit;
+  uv_state.uv = doc.frame().state->uv;
+  uv_state.opacity = 255;
+  renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
+  palette.draw(uv_state, vp);
+  auto uv_capture = capture("uv-editor");
+  size_t edges = 0;
+  for (size_t i = 0; i < uv_capture.size(); i += 3)
+    edges += uv_capture[i] < 150 && uv_capture[i + 1] > 130 &&
+             uv_capture[i + 2] > 200;
+  if (edges < 1000)
+    throw std::runtime_error(
+        "UV chart selection and edit controls are invisible in XR");
+  doc.end_uv(false);
   renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
   auto frozen = capture("paint-before");
   PaintSettings ink;

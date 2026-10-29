@@ -97,6 +97,15 @@ public:
     command_.reset();
     return c;
   }
+  void resume_control(VrParameter parameter) {
+    parameter_ = parameter;
+    page_ = 5;
+    menu_ = true;
+    device_ = parameter_owner_;
+    control_armed_ = false;
+    uv_dragging_ = false;
+    uv_pointer_ = 0;
+  }
   float radius = .1f, strength = 1;
   bool edit_allowed = true;
   std::function<void()> committed;
@@ -109,6 +118,7 @@ public:
   } backend;
   bool painting = false;
   std::function<bool(VrParameter)> parameter_allowed;
+  std::function<bool()> control_accept;
   std::vector<VrControlEvent> take_controls() {
     auto result = std::move(controls_);
     controls_.clear();
@@ -125,7 +135,7 @@ private:
   bool stroke_active() const {
     return backend.active ? backend.active() : volume_->in_stroke();
   }
-  uint32_t device_ = 0;
+  uint32_t device_ = 0, parameter_owner_ = 0;
   struct DeviceState {
     uint64_t sequence = 0;
     double time = -1;
@@ -141,5 +151,9 @@ private:
   std::vector<VrControlEvent> controls_;
   std::optional<SpatialCommand> command_;
   Vec3 previous_{}, menu_anchor_{};
+  bool uv_dragging_ = false;
+  uint32_t uv_pointer_ = 0;
+  int uv_mode_ = 0;
+  float uv_x_ = 0, uv_y_ = 0;
 };
 } // namespace dome

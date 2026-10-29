@@ -445,6 +445,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
        (getenv("DOME_XR_FIXTURE_PAINT") &&
         (frame == 12 || frame == 14 || frame == 16 || frame == 18)) ||
        (getenv("DOME_XR_FIXTURE_CONTROLS") && (frame == 12 || frame == 21)) ||
+       (getenv("DOME_XR_FIXTURE_UV") && frame == 12) ||
        (getenv("DOME_XR_FIXTURE_SCENE") &&
         (frame == 12 || frame == 16 || frame == 18 || frame == 20)) ||
        (getenv("DOME_XR_FIXTURE_FILES") &&
@@ -467,6 +468,8 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
       stroke = (frame >= 2 && frame <= 5) || (frame == 20);
     if (getenv("DOME_XR_FIXTURE_CONTROLS"))
       stroke = frame == 19;
+    if (getenv("DOME_XR_FIXTURE_UV"))
+      stroke = frame == 14 || frame == 20;
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -525,6 +528,15 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if (frame >= 14 && frame <= 18)
       out->currentState = {1, 0};
   }
+  if (getenv("DOME_XR_FIXTURE_UV") && right(p->subactionPath) &&
+      a->name == "right_stick") {
+    if (frame == 9 || frame == 10)
+      out->currentState = {0, -1};
+    if (frame == 11 || frame == 12)
+      out->currentState = {-.8660254f, -.5f};
+    if (frame >= 15 && frame <= 18)
+      out->currentState = {-1, 0};
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStatePose, XrSession, const XrActionStateGetInfo *,
@@ -560,6 +572,13 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position = {.045f + (((100 + 420 * .75f) / 640) - .5f) * .6f,
                         1.56f + (.5f - 300.f / 640) * .6f, -.3f};
   }
+  if (getenv("DOME_XR_FIXTURE_UV") && s->action &&
+      s->action->name == "aim_pose" && right(s->hand) &&
+      (frame == 14 || frame == 20)) {
+    float x = frame == 14 ? 178 : 470, y = frame == 14 ? 85 : 609;
+    p->pose.position = {.045f + (x / 640 - .5f) * .6f,
+                        1.56f + (.5f - y / 640) * .6f, -.3f};
+  }
   return XR_SUCCESS;
 }
 FN(ApplyHapticFeedback, XrSession, const XrHapticActionInfo *,
@@ -588,22 +607,23 @@ FN(GetInstanceProcAddr, XrInstance, const char *name, PFN_xrVoidFunction *out) {
   ENTRY(DestroySession)
   ENTRY(EnumerateReferenceSpaces)
   ENTRY(CreateReferenceSpace)
-  ENTRY(DestroySpace) ENTRY(CreateActionSet) ENTRY(DestroyActionSet) ENTRY(
-      CreateAction) ENTRY(DestroyAction) ENTRY(StringToPath) ENTRY(PathToString)
-      ENTRY(SuggestInteractionProfileBindings) ENTRY(AttachSessionActionSets)
-          ENTRY(CreateActionSpace) ENTRY(EnumerateEnvironmentBlendModes) ENTRY(
-              EnumerateViewConfigurationViews) ENTRY(EnumerateSwapchainFormats)
-              ENTRY(CreateSwapchain) ENTRY(DestroySwapchain) ENTRY(
-                  EnumerateSwapchainImages) ENTRY(AcquireSwapchainImage)
-                  ENTRY(WaitSwapchainImage) ENTRY(ReleaseSwapchainImage) ENTRY(
-                      BeginSession) ENTRY(EndSession) ENTRY(RequestExitSession)
-                      ENTRY(PollEvent) ENTRY(WaitFrame) ENTRY(BeginFrame)
-                          ENTRY(EndFrame) ENTRY(LocateViews) ENTRY(SyncActions)
-                              ENTRY(GetActionStateBoolean)
-                                  ENTRY(GetActionStateFloat)
-                                      ENTRY(GetActionStateVector2f)
-                                          ENTRY(GetActionStatePose) ENTRY(
-                                              GetCurrentInteractionProfile)
+  ENTRY(DestroySpace)
+  ENTRY(CreateActionSet)
+  ENTRY(DestroyActionSet) ENTRY(CreateAction) ENTRY(DestroyAction) ENTRY(
+      StringToPath) ENTRY(PathToString) ENTRY(SuggestInteractionProfileBindings)
+      ENTRY(AttachSessionActionSets) ENTRY(CreateActionSpace) ENTRY(
+          EnumerateEnvironmentBlendModes) ENTRY(EnumerateViewConfigurationViews)
+          ENTRY(EnumerateSwapchainFormats) ENTRY(CreateSwapchain) ENTRY(
+              DestroySwapchain) ENTRY(EnumerateSwapchainImages)
+              ENTRY(AcquireSwapchainImage) ENTRY(WaitSwapchainImage) ENTRY(
+                  ReleaseSwapchainImage) ENTRY(BeginSession) ENTRY(EndSession)
+                  ENTRY(RequestExitSession) ENTRY(PollEvent) ENTRY(WaitFrame)
+                      ENTRY(BeginFrame) ENTRY(EndFrame) ENTRY(LocateViews)
+                          ENTRY(SyncActions) ENTRY(GetActionStateBoolean)
+                              ENTRY(GetActionStateFloat)
+                                  ENTRY(GetActionStateVector2f)
+                                      ENTRY(GetActionStatePose)
+                                          ENTRY(GetCurrentInteractionProfile)
                                               ENTRY(LocateSpace)
                                                   ENTRY(ApplyHapticFeedback)
                                                       ENTRY(StopHapticFeedback)

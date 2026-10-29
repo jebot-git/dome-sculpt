@@ -80,7 +80,10 @@
     "third_party/openbrush/NOTICE": "1f803515edb3051e981a6d9f1bc4eb5f4b10f720c10206bd74d3fba773355cfc",
     "third_party/openbrush/LICENSE.native-graphics": "efaded5e13e8b31b1f90302da538b1d638270b432fddbf705f00fd35d9e8b499",
     "third_party/cgltf/cgltf.h": "efb169dee911696b5d35fc8e3f7ea0c56d679debc529eba9ca6aa6443ba9d5e9",
-    "third_party/blender/math_geom.cc.reference": "68114c7b9742363686ab606c54791b2d745df3cb8c339aaac057397fd3c0c419"
+    "third_party/blender/math_geom.cc.reference": "68114c7b9742363686ab606c54791b2d745df3cb8c339aaac057397fd3c0c419",
+    "third_party/wings/auv_segment.erl.reference": "c7c2cb95a7b42cf9a63b9c2a46c4292e7a53fa399e2abf85f96c087cecd4b968",
+    "third_party/wings/auv_placement.erl.reference": "5655cdac8b2d7368ca5e0a0100ed59857e5f4883c0f0701e7efbe46903f74264",
+    "third_party/wings/license.terms": "0bd697a5f57b02fe3b70f68da29d256ac027a43c371f153e9de19ce6b67f19d7"
   },
   "cgltf": {
     "repository": "https://github.com/jkuhlmann/cgltf",
@@ -92,5 +95,11 @@
   "libpng": {
     "origin": "System development package, CMake PNG::PNG",
     "used": "Native PNG encoding for embedded glTF textures and independent decoding tests; not vendored"
+  },
+  "wings": {
+    "repository": "https://github.com/dgud/wings",
+    "commit": "2f6672721d83af7bc39717c86deb12a2970ade9f",
+    "license": "Permissive license.terms retained verbatim",
+    "used": "AutoUV uv_to_charts/collect_chart_fun UV-continuity partitioning and explicit-cut design adapted to C++ disjoint sets and UV corner fans in src/uv.cpp. Placement source inspected as a reference, not compiled. No Erlang runtime."
   }
 }

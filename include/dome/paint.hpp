@@ -66,6 +66,8 @@ public:
   bool undo();
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
+  std::shared_ptr<PaintedMesh>
+  reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
   std::shared_ptr<const TextureMaps> composite(const Material &) const;
   const PaintPixel &pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   std::optional<Vec3> raycast(Vec3, Vec3, float maximum = 20) const;

@@ -15,6 +15,7 @@ Document::Document() : input_(volume()) {
   input_.parameter_allowed = [this](VrParameter parameter) {
     return parameter_enabled_locked(parameter);
   };
+  input_.control_accept = [this] { return !uv_ || uv_->view().valid; };
   input_.committed = [this] { record_stroke_locked(); };
   input_.backend = {[this] { return action_active_locked(); },
                     [this] { begin_action_locked(); },
@@ -275,7 +276,11 @@ void Document::publish_locked(bool force) {
   state_.objects.clear();
   for (auto &o : scene_.objects())
     state_.objects.push_back({o.id, o.name, o.visible, o.locked, o.transform,
-                              o.material, o.mesh_active});
+                              o.material, o.mesh_active, bool(o.painted)});
+  if (uv_)
+    control_changed_ = uv_changed(
+        *uv_->view().mesh, scene_.object(control_object_).painted->mesh());
+  state_.uv = uv_ ? std::make_shared<UvView>(uv_->view()) : nullptr;
   state_.mesh_active = active.mesh_active;
   state_.active_layer = active.mesh_active ? active.painted->active_layer() : 0;
   state_.paint_layers.clear();
@@ -287,8 +292,8 @@ void Document::publish_locked(bool force) {
         state_.layer_visible = l.visible;
     }
   state_.stroking = action_active_locked();
-  state_.dirty =
-      content_ != saved_content_ || pending_locked() || control_changed_;
+  state_.dirty = content_ != saved_content_ || pending_locked() ||
+                 control_changed_ || state_.asset_busy;
   state_.tool = input_.tool();
   state_.menu = input_.menu_open();
   state_.menu_index = input_.menu_index();
@@ -355,8 +360,8 @@ void Document::seed() {
 }
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
-  if (state_.asset_busy || action_active_locked() || input_.menu_open() ||
-      !scene_.active().visible || scene_.active().locked)
+  if (uv_ || state_.asset_busy || action_active_locked() ||
+      input_.menu_open() || !scene_.active().visible || scene_.active().locked)
     return false;
   input_.cancel();
   begin_action_locked();
@@ -422,6 +427,14 @@ Vec3 Document::gradient(Vec3 p) const {
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
+  if (uv_) {
+    bool available = uv_->view().can_undo;
+    uv_->edit(UvAction::Undo);
+    publish_locked();
+    return available;
+  }
+  if (state_.asset_busy)
+    return false;
   finish_locked();
   bool changed = undo_locked(false);
   publish_locked();
@@ -429,6 +442,14 @@ bool Document::undo() {
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
+  if (uv_) {
+    bool available = uv_->view().can_redo;
+    uv_->edit(UvAction::Redo);
+    publish_locked();
+    return available;
+  }
+  if (state_.asset_busy)
+    return false;
   finish_locked();
   bool changed = undo_locked(true);
   publish_locked();
@@ -486,6 +507,52 @@ void Document::paint_command(SpatialCommand command) {
   command_locked(command);
   publish_locked();
 }
+void Document::begin_uv() {
+  std::lock_guard lock(model_mutex_);
+  finish_locked();
+  control_event_locked({VrControlEventType::Begin, VrParameter::UvEdit});
+  desktop_ = true;
+  publish_locked();
+}
+void Document::edit_uv(UvAction action, float x, float y) {
+  std::lock_guard lock(model_mutex_);
+  if (!uv_)
+    throw std::logic_error("Open the UV editor first");
+  try {
+    uv_->edit(action, x, y);
+    state_.error.clear();
+  } catch (const std::exception &e) {
+    state_.error = e.what();
+    publish_locked();
+    throw;
+  }
+  publish_locked();
+}
+void Document::end_uv(bool accept) {
+  std::lock_guard lock(model_mutex_);
+  if (accept && uv_ && !uv_->view().valid)
+    throw std::runtime_error(uv_->view().error);
+  finish_control_locked(accept);
+  desktop_ = false;
+  publish_locked();
+}
+void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
+  auto &o = scene_.active();
+  FileJob job{scene_.snapshot(), {},       state_.revision,
+              state_.generation, content_, false};
+  job.uv_mesh = std::move(mesh);
+  job.paint_identity = o.painted;
+  job.object = o.id;
+  job.source_revision = o.painted->revision();
+  std::lock_guard lock(file_mutex_);
+  if (files_.size() >= 8)
+    throw std::runtime_error("File and asset work queue is full");
+  files_.push_back(std::move(job));
+  state_.asset_busy = true;
+  state_.message = "Transferring paint to edited UVs...";
+  state_.error.clear();
+  file_changed_.notify_one();
+}
 void Document::use_source() { paint_command(SpatialCommand::EditSource); }
 void Document::use_mesh() { paint_command(SpatialCommand::PaintColor); }
 void Document::prepare_mesh(uint32_t resolution) {
@@ -530,9 +597,10 @@ void Document::begin_spatial() {
 }
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
-  finish_control_locked(false);
-  if (!desktop_)
+  if (!desktop_) {
+    finish_control_locked(false);
     input_.cancel();
+  }
   navigation_.reset();
   state_.hands = {};
   ++state_.input_epoch;
@@ -644,17 +712,30 @@ void Document::process_locked(const SpatialFrame &f) {
                             ob::rotate(f.head.orientation, {0, .08f, -.18f});
   }
   if (auto c = input_.take_command()) {
+    if (uv_ && !uv_->view().valid) {
+      input_.resume_control(VrParameter::UvEdit);
+      publish_locked();
+      return;
+    }
     finish_locked();
     command_locked(*c);
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
-    finish_locked();
-    undo_locked(false);
+    if (uv_)
+      uv_->edit(UvAction::Undo);
+    else if (!state_.asset_busy) {
+      finish_locked();
+      undo_locked(false);
+    }
   }
   if (f.hands[0].redo || f.hands[1].redo) {
-    finish_locked();
-    undo_locked(true);
+    if (uv_)
+      uv_->edit(UvAction::Redo);
+    else if (!state_.asset_busy) {
+      finish_locked();
+      undo_locked(true);
+    }
   }
   state_.hands = f.hands;
   publish_locked();
@@ -781,6 +862,8 @@ void Document::save(const std::filesystem::path &path) {
   {
     std::lock_guard lock(model_mutex_);
     finish_locked();
+    if (state_.asset_busy)
+      throw std::logic_error("Wait for mesh/UV preparation before saving");
     publish_locked();
     std::lock_guard file_lock(file_mutex_);
     if (files_.size() >= 8)
@@ -793,6 +876,9 @@ void Document::save(const std::filesystem::path &path) {
 }
 
 void Document::file_locked(bool export_mesh) {
+  if (state_.asset_busy)
+    throw std::logic_error(
+        "Wait for mesh/UV preparation before saving or exporting");
   auto path = path_;
   if (path.empty()) {
     const char *state = getenv("XDG_STATE_HOME"), *home = getenv("HOME");
@@ -820,6 +906,11 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if (parameter == VrParameter::UvEdit) {
+    auto &o = scene_.active();
+    return !state_.asset_busy && o.mesh_active && o.painted && o.visible &&
+           !o.locked;
+  }
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
   auto &o = scene_.active();
@@ -833,6 +924,23 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if (uv_) {
+    if (accept && !uv_->view().valid)
+      throw std::runtime_error(uv_->view().error);
+    if (accept) {
+      auto draft = uv_->view().mesh;
+      auto &old = scene_.active().painted->mesh();
+      bool changed = uv_changed(*draft, old);
+      if (changed)
+        queue_uv_locked(draft);
+    }
+    uv_.reset();
+    state_.uv.reset();
+    control_before_.reset();
+    control_changed_ = false;
+    state_.controls = {};
+    return;
+  }
   bool changed = control_changed_;
   if (accept && changed)
     record_locked({{}, *control_before_, scene_});
@@ -862,6 +970,18 @@ void Document::control_event_locked(VrControlEvent event) {
     auto &c = state_.controls;
     c = {};
     c.parameter = event.parameter;
+    if (event.parameter == VrParameter::UvEdit) {
+      try {
+        uv_.emplace(o.painted->mesh(), o.painted->resolution());
+        c.title = "UV editor";
+      } catch (...) {
+        control_before_.reset();
+        state_.controls = {};
+        throw;
+      }
+      state_.message.clear();
+      return;
+    }
     switch (event.parameter) {
     case VrParameter::BrushRadius:
       c.title = "Brush size";
@@ -939,8 +1059,30 @@ void Document::control_event_locked(VrControlEvent event) {
   if (!control_before_ || event.parameter != state_.controls.parameter)
     return;
   auto &c = state_.controls;
+  if (uv_ && event.type != VrControlEventType::Confirm &&
+      event.type != VrControlEventType::Cancel) {
+    try {
+      if (event.type == VrControlEventType::UvPick)
+        uv_->edit(UvAction::Pick, event.value, event.second);
+      else if (event.type == VrControlEventType::UvMove)
+        uv_->edit(UvAction::Move, event.value, event.second);
+      else if (event.type == VrControlEventType::UvCommand &&
+               event.component >= 0 && event.component <= int(UvAction::Tool))
+        uv_->edit(UvAction(event.component), event.value, event.second);
+      state_.error.clear();
+    } catch (const std::exception &e) {
+      state_.error = e.what();
+    }
+    return;
+  }
   if (event.type == VrControlEventType::Confirm ||
       event.type == VrControlEventType::Cancel) {
+    if (event.type == VrControlEventType::Confirm && uv_ &&
+        !uv_->view().valid) {
+      state_.error = uv_->view().error;
+      input_.resume_control(VrParameter::UvEdit);
+      return;
+    }
     finish_control_locked(event.type == VrControlEventType::Confirm);
     return;
   }
@@ -1063,6 +1205,9 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     case SpatialCommand::PaintMask:
     case SpatialCommand::AddLayer:
     case SpatialCommand::DeleteLayer:
+    case SpatialCommand::NextLayer:
+    case SpatialCommand::LayerVisible:
+    case SpatialCommand::LayerOpacity:
       return false;
     default:
       break;
@@ -1343,6 +1488,28 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if (job->uv_mesh) {
+        auto painted = job->scene.object(job->object)
+                           .painted->reparameterize(
+                               *job->uv_mesh, [&] { return stopping_.load(); });
+        std::lock_guard lock(model_mutex_);
+        if (job->generation == state_.generation) {
+          state_.asset_busy = false;
+          auto &o = scene_.object(job->object);
+          if (o.painted != job->paint_identity ||
+              o.painted->revision() != job->source_revision)
+            throw std::runtime_error(
+                "The mesh changed during UV paint transfer; retry");
+          Scene before = scene_;
+          o.painted = std::move(painted);
+          state_.message = "UVs and paint updated";
+          state_.error.clear();
+          scene_changed_locked(std::move(before));
+        }
+        std::lock_guard file_lock(file_mutex_);
+        file_changed_.notify_all();
+        continue;
+      }
       if (job->prepare_mesh) {
         auto &source = job->scene.object(job->object);
         auto mesh =
@@ -1399,7 +1566,7 @@ void Document::file_loop() {
     } catch (const std::exception &e) {
       std::lock_guard lock(model_mutex_);
       if (job->generation == state_.generation) {
-        if (job->prepare_mesh)
+        if (job->prepare_mesh || job->uv_mesh)
           state_.asset_busy = false;
         state_.error = e.what();
         publish_locked();

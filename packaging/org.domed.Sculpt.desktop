@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Dome Sculpt
+Comment=Native sculpting and texture authoring for desktop and XR
+Exec=dome-sculpt %f
+Icon=applications-graphics
+Terminal=false
+Categories=Graphics;3DGraphics;
+StartupWMClass=org.domed.Sculpt

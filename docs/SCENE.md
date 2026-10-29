@@ -25,7 +25,9 @@ undo back to the saved state clear the unsaved marker.
 `.dsculpt` version 3 is native CBOR with a `dome-sculpt` format marker, object
 array, next ID and active ID. Objects contain the fields above and their volume
 samples, an optional binary stable mesh/UV asset, active stage, layer metadata,
-and sparse 32×32 paint tiles. Version 1 volume files upgrade to a single object
+and sparse 32×32 paint tiles. Optional `uv_pins` and per-face-corner `uv_seams`
+binary fields retain manual UV state. UV edits preserve triangle order and
+geometry, and transfer editable paint layers through the asset worker. Version 1 volume files upgrade to a single object
 and version 2 scenes open without painting assets. Undo history,
 canvas pose and transient input are excluded. Malformed identities, transforms,
 material ranges and volume samples are rejected before replacing a document.
@@ -45,5 +47,5 @@ GLB export currently includes all visible nonempty objects, separate mesh nodes,
 uniform transforms, normals, packed UVs and PBR material channels. Painted
 objects keep their stable UVs and embed PNG color, metallic/roughness and emission
 maps. Source-stage objects are meshed/unwrapped at export.
-Locks do not exclude objects from export. Manual UV editing, full MToon, skeletons, morph targets and VRM serialization remain
+Locks do not exclude objects from export. Advanced UV re-unwrapping/stitching, full MToon, skeletons, morph targets and VRM serialization remain
 tracked in [the full requirements](REQUIREMENTS.md).

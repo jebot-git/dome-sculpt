@@ -4,7 +4,7 @@ Press P to prepare a painting mesh from the selected sculpt, or return to its
 existing mesh. Preparation runs SDF extraction and xatlas off the input/render
 threads, then publishes a stable mesh with persistent UVs. The desktop default
 is 512×512; `--xr --paint` prepares 256×256 before entering XR. Core resolution
-support is 64–2048 square powers of two. This is not a manual UV editor.
+support is 64–2048 square powers of two. Alt+U opens the [manual UV editor](UV.md), which transfers paint when UVs change.
 
 Shift+P returns to the retained sculpt source. Source sculpting does not deform
 or reproject the previous painted mesh. P returns to that mesh; Paint → Prepare
@@ -46,7 +46,7 @@ output.glb` exports a saved project without opening an editor.
 
 This is an initial layered painting implementation. Stencils, image projection,
 texture-set/UDIM workflows, normal/AO baking, paint transfer after remeshing,
-manual seam/UV tools, production-scale acceleration, material import and full
+advanced seam re-unwrapping/stitching, production-scale acceleration, material import and full
 MToon are pending. Surface picking is a linear triangle scan; immutable surface
 maps and CPU compositing have explicit memory/resolution budgets. Physical
 headset/controller/stylus use has not been verified on this machine.

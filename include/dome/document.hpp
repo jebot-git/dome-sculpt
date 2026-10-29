@@ -3,6 +3,7 @@
 #include "input.hpp"
 #include "navigation.hpp"
 #include "scene.hpp"
+#include "uv.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -29,7 +30,7 @@ struct ObjectInfo {
   bool visible, locked;
   CanvasTransform transform;
   Material material;
-  bool mesh_active = false;
+  bool mesh_active = false, has_mesh = false;
 };
 struct EditorState {
   uint64_t revision = 1, generation = 1, input_epoch = 1;
@@ -51,6 +52,7 @@ struct EditorState {
                                     true, true, true, true, true, true};
   PaintSettings paint;
   VrControlState controls;
+  std::shared_ptr<const UvView> uv;
   uint64_t active_layer = 0;
   bool layer_visible = false;
   std::vector<std::string> paint_layers;
@@ -108,6 +110,9 @@ public:
   void prepare_mesh(uint32_t resolution = 512);
   bool wait_asset(
       std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
+  void begin_uv();
+  void edit_uv(UvAction, float x = 0, float y = 0);
+  void end_uv(bool accept);
   void use_source();
   void cancel_spatial_menu();
   void use_mesh();
@@ -151,6 +156,8 @@ private:
   float control_radius_ = 0;
   bool control_changed_ = false;
   uint64_t control_object_ = 0;
+  std::optional<UvWorkspace> uv_;
+  void queue_uv_locked(std::shared_ptr<const Mesh>);
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
   struct MeshJob {
@@ -175,6 +182,8 @@ private:
     uint64_t object = 0, source_revision = 0;
     uint32_t resolution = 512;
     std::shared_ptr<Volume> source_identity{};
+    std::shared_ptr<const Mesh> uv_mesh{};
+    std::shared_ptr<PaintedMesh> paint_identity{};
   };
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;
