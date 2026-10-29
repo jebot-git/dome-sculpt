@@ -378,6 +378,7 @@ void Document::publish_locked(bool force) {
     last_paint_ = paint_revision;
     ++state_.revision;
   }
+  state_.project_path = path_;
   state_.active_object = scene_.active().id;
   state_.objects.clear();
   for (auto &o : scene_.objects())
@@ -1215,34 +1216,53 @@ bool Document::wait_input(std::chrono::milliseconds timeout) const {
   return input_changed_.wait_for(
       lock, timeout, [&] { return inputs_.empty() && !processing_; });
 }
-void Document::open(const std::filesystem::path &path) {
-  auto next = Scene::load(path);
-  replace(std::move(next));
+void Document::open(const std::filesystem::path &path) { open_async(path).get(); }
+void Document::save(const std::filesystem::path &path) { save_async(path).get(); }
+std::future<void> Document::open_async(const std::filesystem::path &path) {
+  if (path.empty()) throw std::invalid_argument("Choose a project filename");
+  auto completion = std::make_shared<std::promise<void>>();
+  auto result = completion->get_future();
   std::lock_guard lock(model_mutex_);
-  path_ = path;
-  if (recovery_) {
-    recovery_source_.source_path = path;
-    recovery_->set_source(recovery_source_);
+  finish_locked();
+  if (state_.asset_busy || state_.recovery_busy)
+    throw std::logic_error("Wait for pending authoring work before opening a project");
+  auto work = std::make_shared<AssetWork>();
+  FileJob job{};
+  job.path = path; job.revision = state_.revision; job.generation = state_.generation;
+  job.content = content_; job.open_project = true; job.completion = completion;
+  job.work = work; job.operation_label = "Open project";
+  {
+    std::lock_guard file_lock(file_mutex_);
+    if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
+    files_.push_back(std::move(job));
   }
+  asset_work_.store(std::move(work));
+  state_.asset_busy = true; state_.error.clear(); state_.message = "Opening " + path.string();
+  publish_locked(); file_changed_.notify_one();
+  return result;
 }
-void Document::save(const std::filesystem::path &path) {
+std::future<void> Document::save_async(const std::filesystem::path &path) {
+  if (path.empty()) throw std::invalid_argument("Choose a project filename");
   auto completion = std::make_shared<std::promise<void>>();
   auto result = completion->get_future();
   {
     std::lock_guard lock(model_mutex_);
     finish_locked();
-    if (state_.asset_busy)
-      throw std::logic_error("Wait for mesh/UV preparation before saving");
+    if (state_.asset_busy || state_.recovery_busy)
+      throw std::logic_error("Wait for pending authoring work before saving");
     publish_locked();
-    std::lock_guard file_lock(file_mutex_);
-    if (files_.size() >= 8)
-      throw std::runtime_error("File work queue is full");
-    files_.push_back({scene_.snapshot(), path, state_.revision,
-                      state_.generation, content_, false, true, completion});
-    files_.back().recovery_source = recovery_source_;
+    {
+      std::lock_guard file_lock(file_mutex_);
+      if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
+      files_.push_back({scene_.snapshot(), path, state_.revision,
+                        state_.generation, content_, false, true, completion});
+      files_.back().recovery_source = recovery_source_;
+    }
+    state_.error.clear(); state_.message = "Saving " + path.string();
+    publish_locked();
   }
   file_changed_.notify_one();
-  result.get();
+  return result;
 }
 
 std::future<void> Document::export_asset(const std::filesystem::path &path,
@@ -2306,6 +2326,27 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if (job->open_project) {
+        auto cancelled = [&] {
+          return stopping_.load() || job->work->cancelled.load() ||
+                 published_.load()->generation != job->generation;
+        };
+        auto next = Scene::load(job->path, cancelled);
+        std::lock_guard lock(model_mutex_);
+        if (cancelled() || content_ != job->content || action_active_locked() || control_before_)
+          throw std::runtime_error("Project loading cancelled or document changed");
+        replace_locked(std::move(next), true);
+        path_ = job->path;
+        if (recovery_) {
+          recovery_source_.source_path = path_;
+          recovery_->set_source(recovery_source_);
+        }
+        state_.message = "Opened " + path_.string();
+        publish_locked();
+        job->completion->set_value();
+        file_changed_.notify_all();
+        continue;
+      }
       if (job->scene_operation) {
         auto cancelled = [&] {
           auto state = published_.load();
@@ -2446,10 +2487,22 @@ void Document::file_loop() {
       if (job->generation == state_.generation) {
         if (!job->export_mesh) {
           saved_content_ = job->content;
-          if (recovery_ && job->recovery_source == recovery_source_)
-            recovery_->discard(job->recovery_source, job->revision);
-          if (job->adopt_path)
+          bool current_recovery = recovery_ && job->recovery_source.id == recovery_source_.id &&
+                                  job->recovery_source.generation == recovery_source_.generation;
+          if (job->adopt_path) {
             path_ = job->path;
+            if (recovery_ && recovery_source_.source_path != path_) {
+              recovery_source_.source_path = path_;
+              recovery_->set_source(recovery_source_);
+              // A path change invalidates older queued recovery work. A
+              // newer live edit still needs a checkpoint after this Save.
+              recovery_content_ = 0;
+            }
+          }
+          // Updating the source path changes the recovery epoch and clears
+          // queued work. Schedule cleanup afterwards against the new epoch.
+          if (current_recovery)
+            recovery_->discard(recovery_source_, job->revision);
         }
         state_.error.clear();
         state_.message =
@@ -2467,7 +2520,7 @@ void Document::file_loop() {
         publish_locked();
       }
       if (job->generation == state_.generation) {
-        if (job->prepare_mesh || job->uv_mesh || job->restore_recovery || job->scene_operation)
+        if (job->open_project || job->prepare_mesh || job->uv_mesh || job->restore_recovery || job->scene_operation)
           state_.asset_busy = false;
         if (job->discover_recovery || job->restore_recovery)
           state_.recovery_busy = false;
@@ -2482,6 +2535,7 @@ void Document::file_loop() {
         if(job->scene_operation) {
           asset_work_.store({}); restore_weight_view_locked(job->rollback_preview);
         }
+        if(job->open_project) asset_work_.store({});
         if(job->work && job->work->cancelled.load()){
           state_.error.clear();state_.message=job->operation_label+" cancelled";
         }else state_.error = e.what();

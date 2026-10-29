@@ -626,6 +626,7 @@ struct App {
          << " | Drag: trackball  Shift+drag: sculpt  Wheel: zoom";
     auto current_frame = canvas.document.frame();
     auto info = current_frame.state;
+    project = info->project_path;
     auto active =
         std::find_if(info->objects.begin(), info->objects.end(),
                      [&](auto &o) { return o.id == info->active_object; });
@@ -750,10 +751,7 @@ struct App {
         return;
       auto path = fl_file_chooser("Open sculpt project", "*.dsculpt", nullptr);
       if (path) {
-        canvas.document.open(path);
-        canvas.invalidate();
-        project = path;
-        dirty = false;
+        canvas.document.open_async(path);
       }
     } else if (label == "Save" || label == "Save As...") {
       auto path = project;
@@ -765,9 +763,7 @@ struct App {
           return;
         path = chosen;
       }
-      canvas.document.save(path);
-      project = path;
-      dirty = false;
+      canvas.document.save_async(path);
     } else if (label == "Close Window" || label == "Quit") {
       if (discard())
         window.hide();
@@ -1088,10 +1084,7 @@ int main(int argc, char **argv) try {
   if (argc == 3 && std::string(argv[1]) == "--smoke-test")
     app.canvas.capture = argv[2];
   else if (argc == 2) {
-    app.canvas.document.open(argv[1]);
-    app.canvas.invalidate();
-    app.project = argv[1];
-    app.dirty = false;
+    app.canvas.document.open_async(argv[1]);
     app.update_status();
   } else if (argc != 1) {
     std::cerr << "Usage: dome-sculpt [project.dsculpt] [--smoke-test image.ppm "

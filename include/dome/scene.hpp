@@ -82,6 +82,7 @@ public:
   void validate(bool deep_sources = true) const;
   void save(const std::filesystem::path &) const;
   static Scene load(const std::filesystem::path &);
+  static Scene load(const std::filesystem::path &, const std::function<bool()> &cancelled);
   nlohmann::json encode() const;
   static Scene decode(const nlohmann::json &);
   // Includes visible empty volume objects, before surface extraction can skip them.

@@ -157,7 +157,10 @@ async def main():
 
         async def click(label):
             nodes, _ = await layout()
+            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow) else None
             await menu.call_event(nodes[label][0], "clicked", Variant("i", 0), 0)
+            if saved is not None:
+                await wait(lambda: fixture.stat().st_mtime_ns != saved)
             await asyncio.sleep(0.4)
 
         def key(name, down=None):

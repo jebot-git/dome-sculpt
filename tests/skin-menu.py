@@ -107,7 +107,10 @@ async def main():
 
         async def command(label):
             nodes = await layout()
+            saved = fixture.stat().st_mtime_ns if label == "Save" else None
             await menu.call_event(nodes[label][0], "clicked", Variant("i", 0), 0)
+            if saved is not None:
+                await wait(lambda: fixture.stat().st_mtime_ns != saved)
             await asyncio.sleep(.25)
 
         def tap(widget, x, y):

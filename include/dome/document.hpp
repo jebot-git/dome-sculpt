@@ -54,6 +54,7 @@ struct EditorState {
   CanvasTransform canvas{}, panel{};
   std::array<SpatialHand, 2> hands{};
   std::string message, error;
+  std::filesystem::path project_path;
   std::string recovery_error;
   std::vector<std::string> recovery_candidates;
   bool recovery_busy = false;
@@ -208,6 +209,8 @@ public:
   void begin_spatial();
   void rebase_space(std::optional<CanvasTransform>);
   void save(const std::filesystem::path &);
+  std::future<void> save_async(const std::filesystem::path &);
+  std::future<void> open_async(const std::filesystem::path &);
   // Captures a committed scene and performs ordered file work asynchronously.
   // Ignoring the returned promise never blocks the UI thread.
   std::future<void> export_asset(const std::filesystem::path &,
@@ -317,6 +320,7 @@ private:
     bool export_mesh;
     bool adopt_path = false;
     std::shared_ptr<std::promise<void>> completion{};
+    bool open_project = false;
     bool prepare_mesh = false;
     uint64_t object = 0, source_revision = 0;
     uint32_t resolution = 512;
