@@ -43,3 +43,7 @@ comes from `FL/Fl_File_Chooser.H`, not the absent `FL/fl_file_chooser.H` header.
 Before a system installation, stage/verify the same toolkit for the installed
 `/opt/fltk-vr/toolkit` runtime and use sudo only for the install step. This task
 has not installed or switched any user session.
+
+The remote input-order milestone d8e3699 was tested in another workspace using
+/opt libraries; those environment notes are archived in HANDOFF-d8e3699.md.
+This workspace retains the verified current toolkit above.

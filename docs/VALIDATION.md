@@ -1,3 +1,51 @@
+# Reconciled checkpoint — 2026-10-29
+
+Merged upstream toolkit/test work from `96bc62f` with the ordered-input repair.
+The combined build passed. All ten CTest suites passed, including 40 real-loader
+synthetic OpenXR checks (`status=passed`, `complete=true`, zero failures).
+Log: `artifacts/tests-checkpoint-merge.log`; runtime report/comparison projects:
+`build/xr-client/`. The merged UV tests also passed ASan/UBSan/leak checking
+(68.61 seconds): `artifacts/tests-checkpoint-merge-sanitize.log`.
+
+These fresh checks used the available `/opt/fltk-vr/toolkit` installation,
+not upstream's newer ignored canonical-toolkit build, which is absent here.
+Actual linkage is recorded in `artifacts/linkage-checkpoint-merge.log`: patched
+FLTK resolves from that prefix, with no Qt/GTK/Pango libraries listed. Build logs
+are `artifacts/build-checkpoint-merge.log` and its `-sanitize` counterpart.
+Vendored source hashes, Python harness syntax and Git whitespace checks pass.
+No new GUI/nested-compositor, physical-device or accelerator run is claimed.
+The earlier seven-suite sanitizer and upstream current-toolkit evidence below
+remain separate results. See [HANDOFF.md](HANDOFF.md) for resumption instructions.
+
+# Ordered spatial input and session resumption — 2026-10-29
+
+A reproducible queued-confirmation defect is resolved: a focus boundary
+previously cleared queued controller releases and Apply actions. A deterministic
+event burst failed before the fix and passes afterward. The exact cause of the
+historical native XR failure remains unproven because its comparison artifacts
+were unavailable; subsequent native runs pass.
+
+- All ten optimized CPU integration suites passed in
+  `artifacts/tests-input-order-full.log` (223.63 seconds).
+- The subsequent expanded native OpenXR run passed all 38 checks, including
+  stop/IDLE/READY resumption and a new post-resume sculpt stroke
+  (`artifacts/tests-session-resume.log`, 155.65 seconds).
+- All seven native ASan/UBSan/leak suites passed in
+  `artifacts/tests-input-order-sanitize.log` (352.59 seconds).
+- Focused UV/controller/document checks cover queued confirmation before focus
+  loss, cancellation of unfinished work, final event draining at shutdown,
+  rejection of late samples, input reopening, continuous UV scale/turn and fine
+  wheel rates. Their earlier focused run passed in 22.28 seconds.
+- The XR harness resets its report at startup, updates it after each check,
+  records completion/error status and preserves fixture projects and UV/restart
+  comparison JSONs. It cannot leave the old complete report after a later failure.
+
+Machine-readable local evidence is in `artifacts/validation-input.json`.
+See [INPUT.md](INPUT.md) for the contract and [HANDOFF.md](HANDOFF.md) for remaining
+work. These are synthetic/native CPU/software-GL tests; physical devices,
+production-size performance and accelerator execution remain unverified. The
+full objective is active and incomplete.
+
 # UV and universal-menu handoff checkpoint — 2026-10-29
 
 The current stage adds editable UVs and filtered layer transfer, native FLTK/XR

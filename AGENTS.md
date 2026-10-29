@@ -1,7 +1,7 @@
 # Dome Sculpt agent entry point
 
-Read [docs/HANDOFF.md](docs/HANDOFF.md) first for the latest checkpoint, known
-failure and validation results. Preserve the full objective in
+Read [docs/HANDOFF.md](docs/HANDOFF.md) first for the latest checkpoint, remaining
+work and validation results. Preserve the full objective in
 [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md); this checkpoint is not completion.
 
 - Runtime: native C++20, FLTK frontends and direct EGL/OpenXR. Python is optional

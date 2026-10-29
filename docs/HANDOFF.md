@@ -25,7 +25,7 @@ See TOOLKIT.md and third_party/sources.json for exact provenance/reproduction.
 - Added controller regressions for logarithmic continuous UV scaling, fine-wheel
   rate, rotation with retained scale, and exact focus-cancel/reopen coordinates.
 
-## Evidence and unresolved historical failure
+## Initial evidence and subsequent ordered-input correction
 
 The prior handoff's local logs were not committed, so they were unavailable in
 this fresh clone. Its reported UV persistence failure has NOT reproduced here.
@@ -101,3 +101,20 @@ Next integrate recovery into runtime/source generation, saved-revision cleanup,
 worker discovery/restore and desktop/XR commands, then import/remesh and rigging
 workflows. Keep the complete REQUIREMENTS.md scope, including all plugin
 counterparts and glTF/VRM, active throughout.
+
+
+## Remote input-order milestone merged during production work
+
+Remote d8e3699 was published while local layers/recovery/rig foundations were
+being developed. Both histories are preserved. Its archived environment/evidence
+is in HANDOFF-d8e3699.md. It reproduced the old UV confirmation loss with a
+burst: focus handling discarded earlier Apply/release events. The merged fix
+orders focus cancellation after prior transitions, drains accepted input before
+shutdown, rejects late input, and reopens input at each native OpenXR READY.
+The original preservation assertions and both new test sets are retained.
+The initial local inability to reproduce is historical, not the final diagnosis.
+
+This local workspace DOES have the parent DESIGN_CONVENTIONS and the fresh
+canonical artifacts/toolkit build; remote notes about their absence describe
+the other checkpoint's environment. Continue using TOOLKIT.md's current runtime
+selection and preserve the complete active production objective.

@@ -1,24 +1,49 @@
 #!/usr/bin/env python3
 """Exercise the real loader/client with a synthetic runtime and real GL images."""
 
-import contextlib, json, os, signal, subprocess, sys, tempfile
+import contextlib, json, os, shutil, signal, subprocess, sys, tempfile
 from pathlib import Path
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
 binary, runtime, output = map(lambda p: Path(p).resolve(), sys.argv[1:])
 output.mkdir(parents=True, exist_ok=True)
 checks = []
-(output / "report.json").write_text(json.dumps({"status":"running", "checks":[], "failed":0})+"\n")
+project_directory = None
+
+
+def write_report(complete=False, error=None):
+    report = {
+        "checks": checks,
+        "failed": sum(not c["passed"] for c in checks),
+        "synthetic_tracking": True,
+        "complete": complete,
+        "status": "failed" if error is not None or any(not c["passed"] for c in checks) else ("passed" if complete else "running"),
+        "project_directory": project_directory,
+    }
+    if error is not None:
+        report["error"] = error
+    (output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+
+
+def harness_error(kind, error, traceback):
+    write_report(error=f"{kind.__name__}: {error}")
+    sys.__excepthook__(kind, error, traceback)
+
+
+sys.excepthook = harness_error
+write_report()
 
 
 def check(ok, label):
     checks.append({"passed": bool(ok), "check": label})
     print(("PASS " if ok else "FAIL ") + label, flush=True)
-    (output / "report.json").write_text(json.dumps({"status":"running" if ok else "failed", "checks":checks, "failed":sum(not c["passed"] for c in checks)}, indent=2)+"\n")
+    write_report()
     assert ok, label
 
 
 with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as directory:
+    project_directory = directory
+    write_report()
     root = Path(directory)
     manifest = root / "runtime.json"
     manifest.write_text(
@@ -57,6 +82,8 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
                 stderr=subprocess.STDOUT,
                 timeout=40,
             )
+        if target.is_file():
+            shutil.copy2(target, output / (name + ".dsculpt"))
         return p, target
 
     baseline, base = run("baseline", 1)
@@ -136,6 +163,24 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
     layers_info=json.loads(subprocess.check_output([str(binary),"--project-info",str(layers_path)],env=env,text=True))
     check(len(layers_info["sculpt_layers"])==2 and layers_info["active_sculpt_layer"]==layers_info["sculpt_layers"][1]["id"],"Headset object/layer pages create and select a persistent sculpt layer")
     check(layers_info["sculpt_layers"][1]["samples"]>0 and layers_info["field_hash"]!=baseinfo["field_hash"],"Tracked pressure strokes populate the new sculpt layer after menu capture ends")
+    prefix, prefix_path = run("restart-prefix", 23)
+    check(prefix.returncode == 0, "Session restart comparison captures the completed pre-stop sculpt")
+    restarted, restart_path = run("restart", 45, mode={"DOME_XR_FIXTURE_RESTART": "1"})
+    check(restarted.returncode == 0, "Native OpenXR resumes after STOPPING, IDLE and a new READY state")
+    restart_report = json.loads((output / "restart.json").read_text())
+    check(
+        restart_report.get("sessions_begun") == 2
+        and restart_report.get("sessions_ended") == 1
+        and restart_report.get("restart_states") == 8,
+        "The client ends the old running session and begins the resumed session exactly once",
+    )
+    restart_info = json.loads(subprocess.check_output([str(binary), "--project-info", str(restart_path)], env=env, text=True))
+    prefix_info = json.loads(subprocess.check_output([str(binary), "--project-info", str(prefix_path)], env=env, text=True))
+    (output / "restart-comparison.json").write_text(json.dumps({"prefix": prefix_info, "resumed": restart_info}, indent=2) + "\n")
+    check(
+        restart_info["field_hash"] != prefix_info["field_hash"],
+        "A released and re-pressed controller sculpts again after the resumed session",
+    )
     scene, scene_path = run("scene", 45, mode={"DOME_XR_FIXTURE_SCENE": "1"})
     check(
         scene.returncode == 0,
@@ -237,16 +282,4 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         explicit.returncode == 0,
         "Primary XR sessions require the explicit exclusive option",
     )
-(output / "report.json").write_text(
-    json.dumps(
-        {
-            "status": "passed",
-            "project_directory": directory,
-            "checks": checks,
-            "failed": sum(not c["passed"] for c in checks),
-            "synthetic_tracking": True,
-        },
-        indent=2,
-    )
-    + "\n"
-)
+write_report(complete=True)

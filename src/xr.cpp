@@ -443,6 +443,7 @@ void XrSculpt::events() {
         begin.primaryViewConfigurationType =
             XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
         XR(xrBeginSession(session, &begin));
+        document.begin_spatial();
         running = true;
       } else if (state == XR_SESSION_STATE_STOPPING) {
         finishStroke();

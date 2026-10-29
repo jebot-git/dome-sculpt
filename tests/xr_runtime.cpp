@@ -46,7 +46,7 @@ std::map<std::string, XrPath> paths;
 std::map<XrPath, std::string> names;
 Json report = Json::object();
 int instance_tag, session_tag, action_set_tag;
-unsigned frame = 0, event = 0;
+unsigned frame = 0, event = 0, restart_phase = 0;
 bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 XrPath path(std::string text) {
@@ -347,6 +347,21 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->session = reinterpret_cast<XrSession>(&session_tag);
     return XR_SUCCESS;
   }
+  if (getenv("DOME_XR_FIXTURE_RESTART") && frame >= 23 && restart_phase < 8) {
+    static constexpr XrSessionState states[] = {
+        XR_SESSION_STATE_VISIBLE,  XR_SESSION_STATE_SYNCHRONIZED,
+        XR_SESSION_STATE_STOPPING, XR_SESSION_STATE_IDLE,
+        XR_SESSION_STATE_READY,    XR_SESSION_STATE_SYNCHRONIZED,
+        XR_SESSION_STATE_VISIBLE,  XR_SESSION_STATE_FOCUSED};
+    if (restart_phase == 3 && report.value("sessions_ended", 0) != 1)
+      return XR_ERROR_RUNTIME_FAILURE;
+    auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
+    e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
+    e->session = reinterpret_cast<XrSession>(&session_tag);
+    e->state = states[restart_phase++];
+    count("restart_states");
+    return XR_SUCCESS;
+  }
   if (frame >= 30 && !lost) {
     lost = true;
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
@@ -473,6 +488,9 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
       stroke = frame == 14 || frame == 20;
     if (getenv("DOME_XR_FIXTURE_LAYERS"))
       stroke = frame >= 18 && frame <= 20;
+    if (getenv("DOME_XR_FIXTURE_RESTART"))
+      stroke = (frame >= 2 && frame <= 5) || (frame >= 13 && frame <= 18) ||
+               frame == 25;
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -579,6 +597,9 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
                         1.48f, -.48f};
+  if (getenv("DOME_XR_FIXTURE_RESTART") && s->action && right(s->hand) &&
+      frame >= 24 && frame <= 26)
+    p->pose.position = {-.22f, 1.48f, -.48f};
   if (getenv("DOME_XR_FIXTURE_CONTROLS") && s->action &&
       s->action->name == "aim_pose" && right(s->hand) && frame == 19) {
     p->pose.position = {.045f + (((100 + 420 * .75f) / 640) - .5f) * .6f,
@@ -622,21 +643,22 @@ FN(GetInstanceProcAddr, XrInstance, const char *name, PFN_xrVoidFunction *out) {
   ENTRY(DestroySpace)
   ENTRY(CreateActionSet)
   ENTRY(DestroyActionSet)
-  ENTRY(CreateAction) ENTRY(DestroyAction) ENTRY(StringToPath) ENTRY(
-      PathToString) ENTRY(SuggestInteractionProfileBindings)
-      ENTRY(AttachSessionActionSets) ENTRY(CreateActionSpace) ENTRY(
-          EnumerateEnvironmentBlendModes) ENTRY(EnumerateViewConfigurationViews)
-          ENTRY(EnumerateSwapchainFormats) ENTRY(CreateSwapchain) ENTRY(
-              DestroySwapchain) ENTRY(EnumerateSwapchainImages)
-              ENTRY(AcquireSwapchainImage) ENTRY(WaitSwapchainImage) ENTRY(
-                  ReleaseSwapchainImage) ENTRY(BeginSession) ENTRY(EndSession)
-                  ENTRY(RequestExitSession) ENTRY(PollEvent) ENTRY(WaitFrame)
-                      ENTRY(BeginFrame) ENTRY(EndFrame) ENTRY(LocateViews)
-                          ENTRY(SyncActions) ENTRY(GetActionStateBoolean)
-                              ENTRY(GetActionStateFloat)
-                                  ENTRY(GetActionStateVector2f)
-                                      ENTRY(GetActionStatePose)
-                                          ENTRY(GetCurrentInteractionProfile)
+  ENTRY(CreateAction)
+  ENTRY(DestroyAction) ENTRY(StringToPath) ENTRY(PathToString)
+      ENTRY(SuggestInteractionProfileBindings) ENTRY(AttachSessionActionSets)
+          ENTRY(CreateActionSpace) ENTRY(EnumerateEnvironmentBlendModes) ENTRY(
+              EnumerateViewConfigurationViews) ENTRY(EnumerateSwapchainFormats)
+              ENTRY(CreateSwapchain) ENTRY(DestroySwapchain) ENTRY(
+                  EnumerateSwapchainImages) ENTRY(AcquireSwapchainImage)
+                  ENTRY(WaitSwapchainImage) ENTRY(ReleaseSwapchainImage) ENTRY(
+                      BeginSession) ENTRY(EndSession) ENTRY(RequestExitSession)
+                      ENTRY(PollEvent) ENTRY(WaitFrame) ENTRY(BeginFrame)
+                          ENTRY(EndFrame) ENTRY(LocateViews) ENTRY(SyncActions)
+                              ENTRY(GetActionStateBoolean)
+                                  ENTRY(GetActionStateFloat)
+                                      ENTRY(GetActionStateVector2f)
+                                          ENTRY(GetActionStatePose) ENTRY(
+                                              GetCurrentInteractionProfile)
                                               ENTRY(LocateSpace)
                                                   ENTRY(ApplyHapticFeedback)
                                                       ENTRY(StopHapticFeedback)

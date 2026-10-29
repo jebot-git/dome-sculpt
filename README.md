@@ -96,8 +96,10 @@ worker so an older queued save cannot overwrite a newer save request.
 FLTK editor available. Both frontends edit the same document and acquire
 immutable mesh snapshots. Spatial sculpt input, surface extraction and XR
 save/export jobs run on separate workers. Input queues are bounded; focus and
-tracking loss cancel the unfinished spatial stroke and requires controls to be released before a new
-stroke. Runtime reference-space changes rebase the canvas at the announced time
+tracking loss cancels the unfinished spatial stroke and requires controls to be
+released before a new stroke. Focus boundaries retain earlier queued confirmations;
+shutdown drains prior events, and native session resumption reopens input. See
+[ordered input](docs/INPUT.md). Runtime reference-space changes rebase the canvas at the announced time
 and discard queued poses from the old coordinate space.
 
 A standalone XR entry point is also available:
@@ -165,13 +167,13 @@ Its report and images are in `artifacts/gui`. A separate private universal-menu
 host tests actual DBusMenu state, dialog shortcuts and Cancel defaults.
 CTest additionally exercises the shared document workers, real EGL/OpenGL
 PBR/toon/textured-surface/palette/slider rendering, and the real OpenXR loader against a native synthetic
-runtime. Its 34 checks cover stereo submission, controller/stylus edits, focus
+runtime. Its checks cover stereo submission, controller/stylus edits, focus
 and tracking loss, reference-space changes, object creation, material changes,
 layered painting, continuous slider input, file commands and overlay selection.
 The installed Monado runtime also completed a bounded 12-frame run with 11
 stereo submissions, but reported a simulated HMD and no controllers. Neither
-fixture establishes physical headset or stylus behavior. Current results and the native XR UV regression are
-recorded in [the agent handoff](docs/HANDOFF.md). No accelerator hardware tests
+fixture establishes physical headset or stylus behavior. Current validation and remaining production work are recorded in
+[the agent handoff](docs/HANDOFF.md). No accelerator hardware tests
 have been performed.
 
 
