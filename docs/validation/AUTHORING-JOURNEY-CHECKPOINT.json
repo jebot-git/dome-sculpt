@@ -1,0 +1,39 @@
+{
+  "recorded_utc": "2026-10-30T12:05:09.916301+00:00",
+  "base": "beae6cdb2417b594e8313992ac0de64bbc95f6d8",
+  "goal": "active; full original and new additional requirements remain incomplete",
+  "physical_headset": "no new run",
+  "installed": false,
+  "new_native_checks": {
+    "journey": 29,
+    "projection": 15,
+    "tangents": 11
+  },
+  "GUI_checks": {
+    "normal": 7,
+    "compact_double_BDF": 4
+  },
+  "synthetic_XR_checks": {
+    "original": 150,
+    "resolution": 17,
+    "procedural": 11,
+    "projection": 11
+  },
+  "qualification_notes": "Full CPU114 predates final UI-only layout and test-only chart selection/XR policy additions; final focused6+GUI11+XR4 rerun. SAN focused3 entire C/C++ core. No all114 SAN claim. Direct six Arc GL fixtures; OneAPI new3 and policyXR. See prose for retained initial failures/stale prototype consumer diagnosis.",
+  "logs_sha256": {
+    "tests-journey-all-native.log": "fe20b9155c42ae2e0b33fa5bd33111951b2aaee62c6d3e5c7307f4a433e50048",
+    "tests-journey-cpu-final-focused-corrected.log": "3b1377b7ef8e3a0e50b0d26b65986053529116b048417d13d0d88b3ab7386610",
+    "tests-journey-sanitize-final.log": "4ab51aef76df4248d46a91fdfffec652df91886cf5d82aac3dc69df280f01e23",
+    "tests-journey-xr-all-final.log": "1b5794ad03a37f048ed3e1034603eed368fca9f37b7c837716da6c8626c6755a",
+    "tests-bake-policy-gui-final.log": "eafa97e66c28c1d04c3d3de2fabb09602550712b4fe8a151c596add34fe0eb5a",
+    "tests-bake-policy-gui-compact-final.log": "0ad2c19cac1b9f08e40d589c268703a84bd9ad03478eddc14a466687dd2c1976",
+    "tests-journey-oneapi-new3-final.log": "4c95cb70de291975e9036281fdb68ab35495a4b9ecefd95cfe313868d1877a86",
+    "tests-journey-oneapi-policy-xr.log": "d26da00471dfb66f893800775acf2666d74b402a49866bc3be155a152fcb3a94",
+    "tests-journey-arc-normal-frame-render.log": "c1f4b5aa3aaeff79e3feb345798acdd350cc4899262ccb702ddf1511cebd2e3e",
+    "tests-journey-arc-normal-frame-consumer.log": "7b4e8b79ab3837506d9806de4cea2bcb2f36cfa3d8fefbb818815b2a5d6d8f05",
+    "tests-journey-arc-normal-frame-vrm-consumer.log": "badb0f9ad958ae9003c12d97815041207a3cfe6632c0bf7a1e832fc2e1adbe32",
+    "tests-journey-arc-source-color-render.log": "ee485d2e39b8f48714087baede45d158a2bb4680a60bb3e26a32ae763f5ae65d",
+    "tests-journey-arc-source-color-vrm.log": "811a9e21d7ba8ab9b38c761e14679f16467f2b08b7a6088ab582115510348184",
+    "tests-journey-arc-document-render-buffers.log": "e003450a71f916370f351d61a8d7964e10e22fa56afe90868915b47cd2b4a492"
+  }
+}

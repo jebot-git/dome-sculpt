@@ -7,6 +7,7 @@
 #include "dome/vrm.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/mesh-processing.hpp"
+#include "dome/mesh-authoring.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
@@ -631,6 +632,7 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::BakeSource &&
                         state_.controls.parameter != VrParameter::BakeDistances &&
                         state_.controls.parameter != VrParameter::BakeQuality &&
+                        state_.controls.parameter != VrParameter::BakeProjection &&
                         !skin_parameter(state_.controls.parameter) &&
                         !sculpt_parameter(state_.controls.parameter) &&
                         !procedural_parameter(state_.controls.parameter));
@@ -1672,7 +1674,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if(skin_parameter(parameter)) return skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
-  if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality)
+  if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
   if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
     return !state_.asset_busy && !state_.recovery_busy && state_.can_paint_weights;
@@ -1783,11 +1785,12 @@ void Document::finish_control_locked(bool accept) {
     }
     control_before_.reset(); control_changed_ = false; state_.controls = {}; return;
   }
-  if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality){
+  if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality || state_.controls.parameter==VrParameter::BakeProjection){
     auto c=state_.controls;
     if(accept){
       if(c.parameter==VrParameter::BakeSource){auto ids=bake_sources_locked();state_.bake_source=ids.at(size_t(std::lround(c.value[0])));}
       else if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
+      else if(c.parameter==VrParameter::BakeProjection){state_.bake_settings.allow_partial=c.value[0]>=.5f;state_.bake_settings.allow_backfaces=c.value[1]>=.5f;}
       else {state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));}
     }
     control_before_.reset();control_changed_=false;state_.controls={};return;
@@ -1969,6 +1972,9 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value={state_.bake_settings.front_mm,state_.bake_settings.back_mm,state_.bake_settings.ao_distance_mm,0};
       for(int k=0;k<3;++k)c.value[k]=std::clamp(c.value[k],c.minimum,c.maximum);
       break;
+    case VrParameter::BakeProjection:
+      c.title="Projection: partial / backfaces";c.components=2;
+      c.value={state_.bake_settings.allow_partial?1.f:0.f,state_.bake_settings.allow_backfaces?1.f:0.f,0,0};break;
     case VrParameter::BakeQuality:
       c.title="AO samples / seam padding";c.components=2;
       c.value={state_.bake_settings.ao_samples/256.f,state_.bake_settings.padding/64.f,0,0};break;
@@ -2157,6 +2163,7 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::BakeSource:
   case VrParameter::BakeDistances:
   case VrParameter::BakeQuality:
+  case VrParameter::BakeProjection:
     break; // Staged operation settings do not mutate the scene or history.
   case VrParameter::SkinSource:
   case VrParameter::SkinMode:
@@ -2972,6 +2979,7 @@ void Document::file_loop() {
         auto &source = job->scene.object(job->object);
         auto mesh =
             surface_mesh(*source.volume, [&] { return stopping_.load(); });
+        condition_sculpt_normals(mesh,[&] { return stopping_.load(); });
         unwrap(mesh, job->resolution);
         auto painted =
             std::make_shared<PaintedMesh>(std::move(mesh), job->resolution);

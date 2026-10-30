@@ -1,0 +1,23 @@
+--- a/mikktspace.c
++++ b/mikktspace.c
+@@ -1417,6 +1417,20 @@
+ 			// between the two edge vectors
+ 			fCos = vdot(v1,v2); fCos=fCos>1?1:(fCos<(-1) ? (-1) : fCos);
+ 			fAngle = (float) acos(fCos);
++#ifdef DOME_MIKK_ROBUST_ACUTE_ANGLES
++            /* Dome Sculpt conditional retry: acos(float dot) loses nonzero
++             * acute angles when the dot rounds to1. Preserve projected edges
++             * and recover their angle from a double cross/dot pair. This does
++             * not manufacture a direction when the projected frame is singular.
++             * The normal upstream entry points are compiled without this flag. */
++            if (fAngle == 0.0f) {
++                const double cx=(double)v1.y*v2.z-(double)v1.z*v2.y;
++                const double cy=(double)v1.z*v2.x-(double)v1.x*v2.z;
++                const double cz=(double)v1.x*v2.y-(double)v1.y*v2.x;
++                const double dp=(double)v1.x*v2.x+(double)v1.y*v2.y+(double)v1.z*v2.z;
++                fAngle=(float)atan2(sqrt(cx*cx+cy*cy+cz*cz),dp);
++            }
++#endif
+ 			fMagS = pTriInfos[f].fMagS;
+ 			fMagT = pTriInfos[f].fMagT;
+ 

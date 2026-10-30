@@ -266,6 +266,13 @@ struct SurfaceIndex {
 void Skeleton::validate() const {
   if (bones.empty() || bones.size() > 256)
     throw std::length_error("Skeleton must have1..256 bones");
+  if(inverse_bind_override) {
+    if(inverse_bind_override->size()!=bones.size())throw std::invalid_argument("Imported inverse-bind count differs from native bones");
+    for(const auto&m:*inverse_bind_override){for(float f:m)if(!std::isfinite(f))throw std::invalid_argument("Imported inverse binds must be finite");
+      if(m[3]!=0||m[7]!=0||m[11]!=0||m[15]!=1)throw std::invalid_argument("Imported inverse binds must be affine");}
+  }
+  auto affine=[](const RigMatrix&m){for(float f:m)if(!std::isfinite(f))throw std::invalid_argument("Imported affine rest matrices must be finite");if(m[3]!=0||m[7]!=0||m[11]!=0||m[15]!=1)throw std::invalid_argument("Imported rest matrices must be affine");};
+  if(space_matrix)affine(*space_matrix);
   std::set<std::string> names;
   for (size_t i = 0; i < bones.size(); i++) {
     auto &b = bones[i];
@@ -274,7 +281,7 @@ void Skeleton::validate() const {
         b.parent >= int(bones.size()) || b.parent == int(i) ||
         !std::isfinite(b.length) || b.length <= 1e-6f || b.length > 1000)
       throw std::invalid_argument("Invalid bone hierarchy/name/length");
-    matrix(b.rest);
+    matrix(b.rest);if(b.rest_matrix)affine(*b.rest_matrix);
     std::set<int> seen;
     for (int p = int(i); p >= 0; p = bones[p].parent) {
       if (p >= int(bones.size()) || p < -1 || !seen.insert(p).second)
@@ -282,21 +289,30 @@ void Skeleton::validate() const {
     }
   }
 }
+std::vector<RigMatrix> Skeleton::local_matrices(std::span<const JointTransform> local) const {
+  validate();if(!local.empty()&&local.size()!=bones.size())throw std::invalid_argument("Pose joint count mismatch");
+  std::vector<RigMatrix> out;out.reserve(bones.size());for(size_t i=0;i<bones.size();++i){
+    auto m = matrix(local.empty() ? bones[i].rest : local[i]);
+    if(bones[i].rest_matrix){const auto &rest=bones[i].rest;
+      auto same=[&](const JointTransform&t){return t.translation.x==rest.translation.x&&t.translation.y==rest.translation.y&&t.translation.z==rest.translation.z&&t.rotation.w==rest.rotation.w&&t.rotation.x==rest.rotation.x&&t.rotation.y==rest.rotation.y&&t.rotation.z==rest.rotation.z&&t.scale.x==rest.scale.x&&t.scale.y==rest.scale.y&&t.scale.z==rest.scale.z;};
+      m=local.empty()||same(local[i])?*bones[i].rest_matrix:multiply(m,multiply(inverse(matrix(rest)),*bones[i].rest_matrix));
+    }
+    out.push_back(m);
+  }return out;
+}
 std::vector<RigMatrix>
 Skeleton::world(std::span<const JointTransform> local) const {
-  validate();
-  if (!local.empty() && local.size() != bones.size())
-    throw std::invalid_argument("Pose joint count mismatch");
+  auto transforms=local_matrices(local);
   std::vector<RigMatrix> out(bones.size());
   std::vector<bool> done(bones.size());
   std::function<void(size_t)> visit = [&](size_t i) {
-    if (done[i])
-      return;
-    auto m = matrix(local.empty() ? bones[i].rest : local[i]);
+    if (done[i])return;
+    auto m=transforms[i];
     if (bones[i].parent >= 0) {
       visit(bones[i].parent);
       m = multiply(out[bones[i].parent], m);
     }
+    else if(space_matrix)m=multiply(*space_matrix,m);
     for (float v : m)
       if (!std::isfinite(v) || std::abs(v) > 1e12f)
         throw std::runtime_error("Joint transform overflow");
@@ -317,6 +333,8 @@ Skeleton::segments(std::span<const JointTransform> local) const {
   return out;
 }
 std::vector<RigMatrix> Skeleton::inverse_bind() const {
+  validate();
+  if(inverse_bind_override)return *inverse_bind_override;
   auto out = world();
   for (auto &m : out)
     m = inverse(m);
@@ -331,7 +349,10 @@ Skeleton::skin_matrices(std::span<const JointTransform> local) const {
 }
 nlohmann::json Skeleton::encode() const {
   validate();
-  auto j = nlohmann::json{{"version", 1}, {"bones", nlohmann::json::array()}};
+  const bool imported=inverse_bind_override||space_matrix||std::any_of(bones.begin(),bones.end(),[](const auto&b){return bool(b.rest_matrix);});
+  auto j = nlohmann::json{{"version", imported?2:1}, {"bones", nlohmann::json::array()}};
+  if(imported)j["space_matrix"]=space_matrix?nlohmann::json(*space_matrix):nlohmann::json(nullptr);
+  if(inverse_bind_override)j["inverse_bind_override"]=*inverse_bind_override;
   for (auto &b : bones) {
     auto &t = b.rest;
     j["bones"].push_back(
@@ -342,13 +363,15 @@ nlohmann::json Skeleton::encode() const {
          {"scale", {t.scale.x, t.scale.y, t.scale.z}},
          {"length", b.length},
          {"deform", b.deform}});
+    if(imported)j["bones"].back()["rest_matrix"]=b.rest_matrix?nlohmann::json(*b.rest_matrix):nlohmann::json(nullptr);
   }
   return j;
 }
 Skeleton Skeleton::decode(const nlohmann::json &j) {
-  if (j.at("version") != 1 || !j.at("bones").is_array() ||
+  if ((!j.at("version").is_number_integer() || (j.at("version") != 1 && j.at("version") != 2)) || !j.at("bones").is_array() ||
       j.at("bones").empty() || j.at("bones").size() > 256)
     throw std::runtime_error("Unsupported/invalid skeleton record");
+  if(j.at("version")==1&&j.contains("inverse_bind_override"))throw std::runtime_error("Explicit inverse binds require skeleton version two");
   Skeleton s;
   for (auto &v : j.at("bones")) {
     Bone b;
@@ -365,8 +388,15 @@ Skeleton Skeleton::decode(const nlohmann::json &j) {
     b.rest = {{p[0], p[1], p[2]}, {r[0], r[1], r[2], r[3]}, {q[0], q[1], q[2]}};
     b.length = v.at("length");
     b.deform = v.at("deform");
+    if(j.at("version")==1&&v.contains("rest_matrix"))throw std::runtime_error("Imported rest matrix requires skeleton version two");
+    if(j.at("version")==2&&v.contains("rest_matrix")&&!v.at("rest_matrix").is_null()){const auto&m=v.at("rest_matrix");if(!m.is_array()||m.size()!=16)throw std::runtime_error("Invalid imported rest matrix dimensions");for(const auto&f:m)if(!f.is_number())throw std::runtime_error("Invalid imported rest component");b.rest_matrix=m.get<RigMatrix>();}
     s.bones.push_back(std::move(b));
   }
+  if(j.at("version")==2&&j.contains("inverse_bind_override")){const auto&bind=j.at("inverse_bind_override");if(!bind.is_array()||bind.size()!=s.bones.size())throw std::runtime_error("Invalid authored inverse-bind dimensions");
+    s.inverse_bind_override=std::vector<RigMatrix>{};s.inverse_bind_override->reserve(bind.size());
+    for(const auto&m:bind){if(!m.is_array()||m.size()!=16)throw std::runtime_error("Invalid authored inverse-bind matrix dimensions");for(const auto&f:m)if(!f.is_number())throw std::runtime_error("Invalid authored inverse-bind component");s.inverse_bind_override->push_back(m.get<RigMatrix>());}}
+  if(j.at("version")==1&&j.contains("space_matrix"))throw std::runtime_error("Imported root space requires skeleton version two");
+  if(j.at("version")==2&&j.contains("space_matrix")&&!j.at("space_matrix").is_null()){const auto&m=j.at("space_matrix");if(!m.is_array()||m.size()!=16)throw std::runtime_error("Invalid imported root-space dimensions");for(const auto&f:m)if(!f.is_number())throw std::runtime_error("Invalid imported root-space component");s.space_matrix=m.get<RigMatrix>();}
   s.validate();
   return s;
 }

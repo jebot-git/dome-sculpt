@@ -1,11 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/creator-archive.hpp"
+#include "dome/import-source.hpp"
+#include "dome/import-image.hpp"
 #include <nlohmann/json.hpp>
 #include <span>
 #include <set>
 namespace dome {
 namespace {
 void stop(const CreatorArchiveLimits &l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Creator source persistence cancelled");}
+size_t source_size(const CreatorAppearance &a,const CreatorArchiveLimits &l){
+  size_t bytes=a.original_bytes?a.original_bytes->size():0;
+  if(a.source_receipt){a.source_receipt->validate(l.import_limits);auto raw=a.source_receipt->stored_bytes();
+    if(raw>l.max_asset_bytes || bytes>l.max_asset_bytes-raw)throw std::length_error("Original source plus canonical adapter exceeds native asset budget");
+    bytes+=raw;}
+  return bytes;
+}
 void limits_valid(const CreatorArchiveLimits &l){
   if(!l.max_assets||l.max_assets>256||!l.max_asset_bytes||l.max_asset_bytes>128*1024*1024||
       !l.max_total_bytes||l.max_total_bytes>256*1024*1024||!l.max_json_bytes||l.max_json_bytes>16*1024*1024||
@@ -67,6 +76,11 @@ void validate_images(const ImportedAsset &asset,const std::vector<std::shared_pt
   for(size_t i=0;i<images.size();++i){
     if(!images[i])throw std::runtime_error("Creator decoded source image is missing");
     images[i]->validate();const auto &encoded=asset.images[i];
+    if(encoded.mime_type=="image/jpeg"){
+      auto size=imported_image_dimensions(encoded);
+      if(size[0]!=images[i]->width || size[1]!=images[i]->height)
+        throw std::runtime_error("Creator decoded image dimensions differ from original JPEG");
+    }
     if(encoded.mime_type=="image/png"){
       const auto &b=encoded.bytes;
       constexpr uint8_t magic[]={137,80,78,71,13,10,26,10};
@@ -137,6 +151,7 @@ uint32_t CreatorAssetArchive::add(const CreatorAppearance &a,PaintImageArchive &
   for(size_t i=0;i<entries_.size();++i)if(entries_[i]->source.original_bytes.get()==a.original_bytes.get()){
     const auto &entry=*entries_[i];
     validate_mapping(a,entry.json,limits_);
+    if(a.source_receipt!=entry.source.source_receipt)throw std::runtime_error("Shared canonical source has different raw source receipt identity");
     if(entry.source.decoded_images->size()!=a.decoded_images->size())throw std::runtime_error("Creator shared source image count changed");
     auto next_images=images;
     for(size_t k=0;k<a.decoded_images->size();++k){
@@ -145,19 +160,22 @@ uint32_t CreatorAssetArchive::add(const CreatorAppearance &a,PaintImageArchive &
     }
     images=std::move(next_images);return uint32_t(i);
   }
-  if(entries_.size()>=limits_.max_assets||a.original_bytes->size()>limits_.max_total_bytes-bytes_)
+  const auto stored=source_size(a,limits_);
+  if(entries_.size()>=limits_.max_assets||stored>limits_.max_total_bytes-bytes_)
     throw std::length_error("Creator original source archive budget exceeded");
   auto entry=std::make_shared<Entry>();entry->json=source_json(*a.original_bytes,limits_);
   validate_mapping(a,entry->json,limits_);validate_images(*a.asset,*a.decoded_images);
-  entry->source.original_bytes=a.original_bytes;entry->source.asset=a.asset;entry->source.decoded_images=a.decoded_images;entry->source.vrm_json=a.vrm_json;
+  entry->source.source_receipt=a.source_receipt;entry->source.original_bytes=a.original_bytes;entry->source.asset=a.asset;entry->source.decoded_images=a.decoded_images;entry->source.vrm_json=a.vrm_json;
   // Commit both archives together only after every reference and quota validates.
   auto next_images=images;
   for(auto &image:*a.decoded_images){stop(limits_);entry->image_ids.push_back(next_images.add(image));}
-  entries_.push_back(std::move(entry));bytes_+=a.original_bytes->size();images=std::move(next_images);return uint32_t(entries_.size()-1);
+  entries_.push_back(std::move(entry));bytes_+=stored;images=std::move(next_images);return uint32_t(entries_.size()-1);
 }
 nlohmann::json CreatorAssetArchive::encode()const{
   auto result=nlohmann::json::array();
-  for(auto &e:entries_){stop(limits_);result.push_back({{"original_glb",nlohmann::json::binary(*e->source.original_bytes)},{"images",e->image_ids}});}
+  for(auto &e:entries_){stop(limits_);nlohmann::json entry={{"original_glb",nlohmann::json::binary(*e->source.original_bytes)},{"images",e->image_ids}};
+    if(e->source.source_receipt)entry["original_source"]=e->source.source_receipt->encode();
+    result.push_back(std::move(entry));}
   return result;
 }
 CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const PaintImageArchive &images,CreatorArchiveLimits l){
@@ -172,11 +190,19 @@ CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const Pa
     auto json=source_json(raw.get_binary(),l);
     size_t count=json.contains("images")?json.at("images").size():0;
     if(count!=ids.size())throw std::runtime_error("Creator decoded image count differs from embedded source");
-    total+=raw.get_binary().size();
+    size_t stored=raw.get_binary().size();
+    if(value.contains("original_source")){
+      auto bytes=ImportSourceReceipt::encoded_bytes(value.at("original_source"),l.import_limits);
+      if(bytes>l.max_asset_bytes || stored>l.max_asset_bytes-bytes || bytes>l.max_total_bytes-total-stored)
+        throw std::length_error("Original source and canonical adapter exceed native source budget");
+      stored+=bytes;
+    }
+    total+=stored;
     for(auto &id:ids)images.at(integer(id,UINT32_MAX));
   }
   for(auto &value:j){
     stop(l);auto entry=std::make_shared<Entry>();const auto &raw=value.at("original_glb").get_binary();
+    if(value.contains("original_source"))entry->source.source_receipt=ImportSourceReceipt::decode(value.at("original_source"),l.import_limits);
     entry->source.original_bytes=std::make_shared<const std::vector<uint8_t>>(raw.begin(),raw.end());entry->json=source_json(*entry->source.original_bytes,l);
     ImportLimits options=l.import_limits;options.mode=ImportMode::PreserveGltf;options.external_resources=false;
     options.max_file_bytes=std::min(options.max_file_bytes,l.max_asset_bytes);
@@ -186,7 +212,7 @@ CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const Pa
     auto decoded=std::make_shared<std::vector<std::shared_ptr<const Image>>>();
     for(auto &id:value.at("images")){auto index=integer(id,UINT32_MAX);entry->image_ids.push_back(index);decoded->push_back(images.at(index));}
     validate_images(*entry->source.asset,*decoded);entry->source.decoded_images=std::move(decoded);entry->source.vrm_json=vrm_string(entry->json);
-    result.bytes_+=raw.size();result.entries_.push_back(std::move(entry));stop(l);
+    result.bytes_+=source_size(entry->source,l);result.entries_.push_back(std::move(entry));stop(l);
   }return result;
 }
 nlohmann::json encode_creator_appearance(const CreatorAppearance&a,CreatorAssetArchive &assets,PaintImageArchive &images){

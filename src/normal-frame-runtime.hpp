@@ -111,7 +111,7 @@ inline PosedNormalFrames normal_frame_preview(const NormalFrameSet &set,const No
   set.validate(false);std::unordered_map<uint64_t,float> weights;
   for(size_t slot=0;slot<set.current_targets.size();++slot)weights[set.current_targets[slot]]=deformation && !deformation->morph_weights.empty()?deformation->morph_weights.at(slot):0;
   std::vector<RigMatrix> linear,normal;
-  if(deformation && deformation->skeleton && deformation->skin && !deformation->pose.empty()) {
+  if(deformation && deformation->skeleton && deformation->skin && (!deformation->pose.empty() || deformation->skeleton->inverse_bind_override)) {
     linear=deformation->skeleton->skin_matrices(deformation->pose);normal.reserve(linear.size());for(const auto &m:linear)normal.push_back(source_frame_inverse_transpose(m));
   }
   PosedNormalFrames out;const std::array<std::shared_ptr<const NormalFrames>,3> roles{set.pbr,set.mtoon,set.canonical};

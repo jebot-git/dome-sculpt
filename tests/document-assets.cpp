@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/import-source.hpp"
+#include "dome/humanoid-creator.hpp"
+#include <nlohmann/json.hpp>
 #include <condition_variable>
 #include <fstream>
 #include <iostream>
@@ -10,6 +13,13 @@ namespace {
 void check(bool ok, const char *label) {
   if (!ok) throw std::runtime_error(label);
   std::cout << "PASS " << label << '\n';
+}
+nlohmann::json canonical(const Scene &scene) {
+  auto j=scene.encode();for(auto &o:j["objects"]) {
+    auto &v=o["volume"];std::sort(v["samples"].begin(),v["samples"].end());
+    for(auto &l:v["sculpt_layers"])std::sort(l["delta"].begin(),l["delta"].end());
+    if(v.contains("sculpt_mask"))std::sort(v["sculpt_mask"]["values"].begin(),v["sculpt_mask"]["values"].end());
+  }return j;
 }
 struct Gate {
   std::mutex mutex;
@@ -127,9 +137,24 @@ int main() try {
     std::ofstream material(directory / "input.mtl");
     material << "newmtl textured\nmap_Kd color.png\n";
     std::ofstream file(bad); file << "mtllib input.mtl\nusemtl textured\nv 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n"; }
+  auto before_textured=canonical(doc.copy_scene());
   doc.import_asset(bad,64);
-  check(doc.wait_asset() && doc.frame().state->objects.size() == 3 &&
-        doc.frame().state->error.find("Textured material authoring") != std::string::npos,
-        "Unsupported textured materials never produce lossy partial import");
+  check(doc.wait_asset() && canonical(doc.copy_scene())==before_textured &&
+        doc.frame().state->error.find("missing the referenced UV set") != std::string::npos,
+        "Textured OBJ without authored UVs refuses atomically with the actual UV diagnostic");
+  const std::string textured_source="mtllib input.mtl\nusemtl textured\nv 0 0 0\nv 1 0 0\nv 0 1 0\nvt 0.1 0.1\nvt 0.9 0.1\nvt 0.1 0.9\nf 1/1 2/2 3/3\n";
+  {std::ofstream file(bad);file<<textured_source;}
+  doc.import_asset(bad,64);
+  check(doc.wait_asset() && doc.frame().state->error.empty() && doc.frame().state->objects.size()==4,
+        "Supported textured OBJ imports on the native worker instead of the removed blanket material refusal");
+  auto textured=doc.copy_scene();auto appearance=textured.active().appearance;
+  check(appearance && appearance->source_receipt && appearance->source_receipt->format==ImportSourceFormat::Obj &&
+        std::string(appearance->source_receipt->root.bytes->begin(),appearance->source_receipt->root.bytes->end())==textured_source &&
+        appearance->source_receipt->resources.size()==2 && appearance->decoded_images->size()==1 &&
+        appearance->decoded_images->at(0)->rgba==std::vector<uint8_t>({255,0,0,255}),
+        "Actual textured OBJ retains exact original file, MTL and PNG bundle with unchanged decoded pixels");
+  auto accepted_textured=canonical(textured);
+  check(doc.undo() && canonical(doc.copy_scene())==before_textured && doc.redo() && canonical(doc.copy_scene())==accepted_textured,
+        "Textured OBJ capture and material adoption share one exact native Undo and Redo");
   return 0;
 } catch (const std::exception &e) { std::cerr << e.what() << '\n'; return 1; }

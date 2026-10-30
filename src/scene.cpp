@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "scene-feature-version.hpp"
+#include "dome/import-source.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/creator-archive.hpp"
@@ -171,7 +173,10 @@ void Scene::validate(bool deep_sources) const {
     if(remap_vertices>8'000'000)throw std::length_error("Creator source remap budget exceeded");
     if(!a.original_bytes || !a.asset || !a.decoded_images || a.original_bytes->size()>64*1024*1024)
       throw std::invalid_argument("Missing or oversized creator source");
-    if(originals.insert(a.original_bytes.get()).second)source_bytes+=a.original_bytes->size();
+    if(a.source_receipt)a.source_receipt->validate();
+    size_t stored=a.original_bytes->size()+(a.source_receipt?a.source_receipt->stored_bytes():0);
+    if(stored>64*1024*1024)throw std::length_error("Original source plus canonical adapter exceeds native asset budget");
+    if(originals.insert(a.original_bytes.get()).second)source_bytes+=stored;
     if(originals.size()>16 || source_bytes>128*1024*1024)throw std::length_error("Creator source archive budget exceeded");
     if(deep_sources)source_models.add(a,source_images);
     else for(const auto &image:*a.decoded_images)source_images.add(image);
@@ -252,9 +257,10 @@ nlohmann::json Scene::encode() const {
   bool resolved=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.material_bindings) || (!o.mesh_active && bool(o.deformation));});
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
   const bool framed=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){if(!o.material_bindings)return false;const auto &b=*o.material_bindings;return bool(b.normal_frames) || (b.uv_origin && (b.uv_origin->deformation || !b.uv_origin->creator_kind.empty() || !b.sampling_reparameterized));});
-  const bool extended=resolved || retopology;
+  unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
+  const bool extended=resolved || retopology || feature_version>=8;
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", framed ? 9 : extended ? 8 : baked ? 6 : 5},
+                      {"version", std::max(feature_version,unsigned(framed ? 9 : extended ? 8 : baked ? 6 : 5))},
                       {"active", active_},
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
@@ -329,7 +335,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>9)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>11)throw std::runtime_error("Unsupported scene version");
   const auto &objects=j.at("objects");
   if(!objects.is_array() || objects.empty() || objects.size()>256)throw std::length_error("Invalid scene object count");
   // Bound the complete serialized sculpt payload before decoding any object.
@@ -482,10 +488,16 @@ Scene Scene::decode(const nlohmann::json &j) {
   PaintImageArchive source_images;
   if (archives) source_images = PaintImageArchive::decode(j.at("source_images"));
   CreatorAssetArchive source_models;
-  if (archives) source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
+  if (archives) {
+    if(version<11)for(const auto &model:j.at("source_models"))if(model.contains("original_source"))
+      throw std::runtime_error("Original format source receipts require scene version eleven");
+    source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
+  }
+  if(material_fields)for(const auto&origin:j.at("source_materials").at("origins"))if(origin.contains("deformation")&&detail::minimum_deformation_scene_version(origin.at("deformation"))>version)throw std::runtime_error("Retained explicit inverse binds require scene version eleven");
   size_t preflight_deformation=material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0;
   if(version>=4)for(const auto &o:objects)if(!o.at("deformation").is_null()) {
     const auto &d=o.at("deformation");
+    if(detail::minimum_deformation_scene_version(d)>version)throw std::runtime_error("Explicit inverse binds require scene version eleven");
     preflight_deformation+=d.at("pose").size()+d.at("morph_weights").size();
     if(!d.at("skin").is_null())for(const auto &v:d.at("skin").at("vertices"))preflight_deformation+=v.size();
     if(!d.at("morphs").is_null())for(const auto &t:d.at("morphs").at("targets"))preflight_deformation+=t.at("delta").size();

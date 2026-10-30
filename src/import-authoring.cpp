@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/import-authoring.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "dome/import-source.hpp"
+#include "dome/import-native.hpp"
+#include "dome/import-image.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/projection.hpp"
+#include "import-skin.hpp"
 #include "source-tangent-frames.hpp"
 #include "text-utf8.hpp"
 #include <fstream>
@@ -26,32 +30,6 @@ uint32_t word(std::span<const uint8_t> b, size_t at) {
     throw std::runtime_error("Truncated authoring source GLB");
   return uint32_t(b[at]) | uint32_t(b[at + 1]) << 8 |
          uint32_t(b[at + 2]) << 16 | uint32_t(b[at + 3]) << 24;
-}
-std::shared_ptr<const std::vector<uint8_t>>
-original_glb(const std::filesystem::path &path,
-             const ImportAuthoringOptions &o) {
-  auto count = std::filesystem::file_size(path);
-  // The existing native immutable-source archive is bounded at64MiB per asset.
-  if (count > std::min(o.limits.max_file_bytes, size_t(64 * 1024 * 1024)))
-    throw std::length_error(
-        "Original source exceeds native appearance archive budget");
-  auto bytes = std::make_shared<std::vector<uint8_t>>(size_t(count));
-  std::ifstream file(path, std::ios::binary);
-  size_t at = 0;
-  while (at < bytes->size()) {
-    stop(o);
-    auto n = std::min(bytes->size() - at, size_t(65536));
-    if (!file.read(reinterpret_cast<char *>(bytes->data() + at), n))
-      throw std::runtime_error("Cannot read complete authoring source");
-    at += n;
-  }
-  if (bytes->size() < 28 || word(*bytes, 0) != 0x46546c67 ||
-      word(*bytes, 4) != 2 || word(*bytes, 8) != bytes->size() ||
-      word(*bytes, 16) != 0x4e4f534a)
-    throw std::runtime_error(
-        "This authoring stage requires self-contained GLB; original .gltf "
-        "resource bundle adoption remains required");
-  return bytes;
 }
 CanvasTransform similarity(const ImportedNode &n) {
   const auto &m = n.local;
@@ -201,41 +179,21 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   auto extension = path.extension().string();
   for (auto &c : extension)
     c = char(std::tolower(static_cast<unsigned char>(c)));
-  if (extension == ".obj") {
-    options.limits.mode = ImportMode::StaticScene;
-    auto asset = import_mesh(path, options.limits);
-    output.diagnostics = asset.warnings;
-    for (auto &p : asset.primitives) {
-      stop(options);
-      const auto &m = asset.materials.at(p.material);
-      if (m.color_texture >= 0 || m.metal_rough_texture >= 0 ||
-          m.normal_texture >= 0 || m.occlusion_texture >= 0 ||
-          m.emissive_texture >= 0)
-        throw std::runtime_error(
-            "Textured material authoring for OBJ requires original-resource "
-            "adoption; source was not changed");
-      auto mesh = std::move(p.mesh);
-      if (mesh.uv.empty())
-        unwrap(mesh, options.paint_resolution);
-      auto id = output.scene.add(name(p.name, "Imported mesh"), Volume{});
-      auto &object = output.scene.object(id);
-      object.material = native_material(asset.materials.at(p.material));
-      object.painted = std::make_shared<PaintedMesh>(std::move(mesh),
-                                                     options.paint_resolution);
-      object.mesh_active = true;
-      output.objects.push_back(id);
-    }
-    output.scene.validate();
-    return output;
-  }
-  auto bytes = original_glb(path, options);
+  options.choices.validate();
+  options.limits.max_file_bytes=std::min(options.limits.max_file_bytes,size_t(64*1024*1024));
+  auto captured=(extension==".obj" || extension==".fbx" ||
+      options.choices.format==ImportSourceFormat::Obj || options.choices.format==ImportSourceFormat::Fbx)
+      ? capture_native_source(path,options.choices,options.limits)
+      : capture_gltf_source(path,options.choices,options.limits);
+  auto bytes=captured.canonical_glb;
   options.limits.mode = ImportMode::PreserveGltf;
   options.limits.external_resources = false;
   auto asset =
       std::make_shared<const ImportedAsset>(import_glb(*bytes, options.limits));
   const auto json = nlohmann::json::parse(
       bytes->begin() + 20, bytes->begin() + 20 + word(*bytes, 12));
-  output.diagnostics = asset->warnings;
+  output.diagnostics = captured.diagnostics;
+  output.diagnostics.insert(output.diagnostics.end(),asset->warnings.begin(),asset->warnings.end());
   if (asset->nodes.empty())
     throw std::runtime_error("Imported source has no instantiated scene nodes");
   std::vector<uint32_t> roots;
@@ -271,10 +229,6 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
           throw std::runtime_error(
               "This model omits normals; generated flat-normal authoring is "
               "not ready yet. Export authored normals before importing.");
-        if (!p.influences.empty())
-          throw std::runtime_error(
-              "Authored skin/inverse-bind adoption is required before "
-              "importing this source; source was not changed");
         if (p.material == 0)
           throw std::runtime_error(
               "Implicit default-material provenance adoption is required "
@@ -294,10 +248,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   size_t pixels = 0;
   for (const auto &encoded : asset->images) {
     stop(options);
-    if (encoded.mime_type != "image/png")
-      throw std::runtime_error("Native authoring image decoder currently "
-                               "requires PNG; JPEG adoption remains required");
-    auto image = decode_projection_png(encoded.bytes);
+    auto image = decode_import_image(encoded,64*1024*1024-pixels,options.limits.cancelled);
     auto count = size_t(image.width) * image.height;
     if (count > 64 * 1024 * 1024 - pixels)
       throw std::length_error("Imported decoded image budget exceeded");
@@ -326,6 +277,9 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       object.material = native_material(m);
       auto appearance = std::make_shared<CreatorAppearance>();
       appearance->original_bytes = bytes;
+      if(captured.original->root.bytes!=bytes || captured.original->format!=ImportSourceFormat::Glb ||
+          captured.original->options!=ImportOptions{})
+        appearance->source_receipt=captured.original;
       appearance->asset = asset;
       appearance->decoded_images = images;
       appearance->material = int(p.material);
@@ -407,6 +361,19 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         }
         deformation.morph_weights =
             node.weights.empty() ? source_mesh.weights : node.weights;
+        deformation.validate(object.painted->mesh());
+        object.deformation =
+            std::make_shared<const DeformationState>(std::move(deformation));
+      }
+      if (node.skin >= 0 && !p.influences.empty()) {
+        auto rig = detail::imported_rig(*asset, n, options.limits.cancelled);
+        DeformationState deformation =
+            object.deformation ? *object.deformation
+                               : DeformationState(object.painted->mesh());
+        deformation.skeleton = rig.skeleton;
+        deformation.skin =
+            detail::imported_weights(p, rig, remap, options.limits.cancelled);
+        appearance->source_joint_nodes = rig.source_nodes;
         deformation.validate(object.painted->mesh());
         object.deformation =
             std::make_shared<const DeformationState>(std::move(deformation));

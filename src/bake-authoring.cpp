@@ -55,11 +55,18 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   options.ray_bias = .0001f / target_world.scale;
   options.ao_samples = settings.ao_samples;
   options.padding = settings.padding;
+  options.fail_on_miss = !settings.allow_partial;options.allow_backfaces=settings.allow_backfaces;
   options.cancelled = cancelled;
   if(progress)options.progress=[&](float value){progress(.1f+.8f*value);};
   auto result = bake_mesh(target.painted->mesh(), high, options);
   check();
-  ObjectBakeReport report{result.projected,result.padded,result.rays};
+  if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
+  ObjectBakeReport report{result.projected,result.padded,result.rays,result.missed};
+  if(auto prior=target.painted->baked())
+    for(size_t i=0;i<result.coverage.size();++i) {
+      if((i&1023)==0)check();
+      if(result.coverage[i]==3 && prior->coverage[i])++report.preserved_misses;
+    }
   BakedTextures textures;
   textures.maps = std::move(result.maps);
   textures.maps.normal = std::move(result.normal);

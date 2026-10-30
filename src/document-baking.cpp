@@ -33,7 +33,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
   queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){
     auto result=bake_object(scene,source,settings,cancelled,[work](float p){work->progress.store(p);});
-    *report=std::to_string(result.projected)+" texels, "+std::to_string(result.padded)+" padded, "+std::to_string(result.rays)+" rays";
+    *report=std::to_string(result.projected)+" projected, "+std::to_string(result.missed)+" missed ("+std::to_string(result.preserved_misses)+" kept from prior bake)";
   },expected,report,work);
   state_.bake_source=source;state_.bake_settings=settings;publish_locked();
 }

@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 #include <nlohmann/json_fwd.hpp>
 #include <span>
+#include <optional>
 namespace dome {
 using RigMatrix = std::array<float, 16>;
 struct JointTransform {
@@ -16,10 +17,20 @@ struct Bone {
   JointTransform rest;
   float length = .1f;
   bool deform = true;
+  // Exact imported local affine rest authority. TRS remains the editable
+  // reference: posed matrix = TRS(pose) * inverse(TRS(rest)) * exact_rest.
+  std::optional<RigMatrix> rest_matrix;
 };
 struct Skeleton {
   std::vector<Bone> bones;
+  // Engaged means an imported/custom bind space, including glTF's implicit
+  // identity case. Bone-aligned native matrices; raw trailing accessor elements
+  // and source joint identities remain in immutable import provenance.
+  std::optional<std::vector<RigMatrix>> inverse_bind_override;
+  // Optional exact root/bind-space transform, without adding a synthetic joint.
+  std::optional<RigMatrix> space_matrix;
   void validate() const;
+  std::vector<RigMatrix> local_matrices(std::span<const JointTransform> local = {}) const;
   std::vector<RigMatrix>
   world(std::span<const JointTransform> local = {}) const;
   std::vector<std::array<Vec3, 2>>

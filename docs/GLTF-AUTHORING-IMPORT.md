@@ -72,6 +72,10 @@ with an incorrectly converted transform. The independent test consumer now
 correctly applies node.weights before mesh.weights, which earlier generated
 native exports had not exercised.
 
+The subsequent [authored-bind foundation](GLTF-AUTHORED-BINDS.md) adds actual
+source skin adoption within the current group admission limits, with explicit
+bind/rest/frame/export/Scene11 evidence and remaining full-affine guards.
+
 ## Required remaining implementation
 
 - Arbitrary nonuniform/reflected affine hierarchy, with exact original node IDs,
