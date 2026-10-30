@@ -11,7 +11,7 @@ struct RetopoPatch {
 };
 enum class RetopoAction {
   BeginGesture, Sample, EndGesture, CancelGesture,
-  Mode, Face, Wire, Delete, Pin, Seam, Relax, Snap, Clear, Undo, Redo
+  Mode, Face, Wire, Delete, Pin, Seam, Relax, Snap, Clear, Undo, Redo, PlaceMode, MoveMode
 };
 struct RetopoView {
   std::shared_ptr<const RetopoMesh> topology;

@@ -87,7 +87,10 @@ void Document::cancel_cut_locked(){
 void Document::end_cut(bool accept){std::lock_guard lock(model_mutex_);end_cut_locked(accept);publish_locked();}
 void Document::end_cut_locked(bool accept){
   if(!state_.cut)return;
-  if(state_.cut->committing)throw std::logic_error("Cancel background work or wait for the accepted cut");
+  if(state_.cut->committing){
+    if(!accept&&state_.asset_busy){cancel_asset_work_locked();return;}
+    throw std::logic_error("Cancel background work or wait for the accepted cut");
+  }
   if(!accept){finish_control_locked(false);cancel_cut_locked();input_.cancel();desktop_=false;state_.error.clear();return;}
   if(control_before_||state_.cut->busy)throw std::logic_error("Finish plane controls and wait for the cut preview");
   auto preview=state_.cut->preview;

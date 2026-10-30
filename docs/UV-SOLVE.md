@@ -86,10 +86,10 @@ mesh-wide search or name-based welding is performed.
 
 Conformal, Stitch, Seam, Relax and Pack execute against an immutable/COW
 workspace copy on the existing UV worker. Their conformal solve, chart topology
-rebuild and validation stay outside the model/input/render locks. Initial
-workspace opening still constructs its first topology through the existing
-constructor; removing that synchronous setup is separate performance work. Results require the same request, session, generation and base mesh
-identity. Cancel/new sessions invalidate old requests; busy drafts cannot undo,
+rebuild and validation stay outside the model/input/render locks. Opening the
+workspace now retains an immutable mesh alias and schedules initial geometry,
+identity-map and topology construction on that same worker. Results require the
+same request, session, generation and base mesh identity. Cancel/new sessions invalidate old requests; busy drafts cannot undo,
 redo or accept while processing. Each completed operation enters draft history
 once, including the composed original-vertex mapping. Apply uses the ordered
 asset worker for paint transfer and a fully validated detached Scene, then
@@ -120,3 +120,61 @@ workflow on a private Xvfb display; it is not an actual headset/device test.
 Existing UV focus-boundary regressions distinguish explicit Cancel from a
 confirmed Apply preceding focus loss: the latter remains an accepted ordered
 worker transaction.
+
+## Deferred initialization API
+
+An additive `UvWorkspace(shared_ptr<const Mesh>, resolution)` constructor creates
+a loading stub without copying/validating geometry, allocating identity arrays
+or constructing topology. It retains the immutable source ownership directly.
+`initialize(cancelled, limits)` performs the one deep mesh copy, default pin/seam
+buffers, exact vertex identity map and topology construction on a worker. It
+publishes them together only after every stage succeeds; cancellation/failure
+leaves the stub exact. Source attribute-count, vertex/triangle, work and estimated
+peak memory checks precede the geometry copy. Topology traversals check bounded
+work and cancellation while building point/edge/chart maps.
+
+The old eager constructor remains available and preserves its behavior for
+standalone callers. Both desktop and XR Document opening hooks use the alias
+constructor. A loading workspace enters the existing cancellable UV worker
+queue, whose publication checks mesh ownership/address, source revision,
+request/session and document generation. A replaced document or cancelled older
+request cannot publish into a newer session. Null-topology canvas and palette
+guards support a loading/error view with disabled editing/Confirm/history and
+available Cancel. Failed initialization cannot be approved by an empty
+validation result or edited as though a ready workspace existed.
+
+`tests/uv-initialize.cpp` counts actual allocations: a loading stub for25,921
+vertices and51,200 triangles allocates31 bytes, rather than geometry/topology
+arrays. Fixtures also cover retained source lifetime, detached-copy isolation,
+worker-thread initialization, cancellation during map construction, malformed
+attributes, failure/budget states and a real CC0 MakeHuman body.
+
+The registered `uv-loader` fixture opens a real native project, then blocks the
+UV worker's first geometry allocation with a deterministic barrier. It verifies
+zero matching geometry allocations on the model/input thread, disabled loading
+Confirm/history, immediate Cancel, a new session while the old request is
+blocked, source/generation replacement and controller focus cancellation. The
+fixtures also inject failure at the worker's first geometry allocation, proving
+an actionable memory error, disabled approval and exact cancel/reopen recovery.
+These are native/synthetic-controller checks; they do not constitute physical headset
+verification. Existing UV/render/recovery fixtures wait for public UV readiness
+before ready-dependent edits, rather than sleeping or requiring a synchronous
+constructor. Fresh current-core and GUI results follow.
+
+Fresh isolated source at `artifacts/verify-lazy-uv-7cc` starts from7cc0d42 and
+contains only this UV initialization patch and its registered tests, excluding
+other unfinished authoring changes. Its five Release UV/recovery suites pass
+in5.03s (`artifacts/tests-uv-lazy-7cc.log`); actual FLTK/DBusMenu UV controls
+pass12/12 (`artifacts/menu-uv-lazy-7cc.log`), with the unwrapped capture visually
+inspected. Software spatial rendering passes4.05s, and the unchanged full
+real-loader synthetic XR suite passes110.52s
+(`artifacts/tests-uv-lazy-7cc-xr-final.log`). The first selective XR invocation
+stopped before UV because its private build lacked the bake-fixture helper;
+building that existing helper fixed the invocation, without changing assertions
+or runtime timing. All five fresh whole-core ASan/UBSan/leak suites pass41.77s
+(`artifacts/tests-uv-lazy-7cc-sanitize.log`), with native core, xatlas and C Mikk
+dependencies instrumented; this includes initialization failure and loader
+cancellation/replacement recovery.
+This evidence does not include the root's subsequent signal-shutdown change,
+other next-feature work, physical headset/controller verification or production
+UV performance certification.

@@ -17,7 +17,7 @@ class UvCanvas : public Fl_Widget {
     auto &self = *static_cast<UvCanvas *>(data);
     self.wheeling_ = false;
     auto view = self.doc_.frame().state->uv;
-    if (view && !view->committing && !view->solving) {
+    if (view && !view->committing && !view->solving && view->topology) {
       try {
         self.doc_.edit_uv(UvAction::EndGesture);
       } catch (const std::exception &e) {
@@ -29,7 +29,7 @@ class UvCanvas : public Fl_Widget {
     Fl::remove_timeout(wheel_finished, this);
     dragging_ = wheeling_ = false;
     auto view = doc_.frame().state->uv;
-    if (view && !view->committing && !view->solving)
+    if (view && !view->committing && !view->solving && view->topology)
       doc_.edit_uv(UvAction::EndGesture);
   }
 
@@ -39,7 +39,7 @@ public:
   ~UvCanvas() override { Fl::remove_timeout(wheel_finished, this); }
   int handle(int event) override try {
     auto view = doc_.frame().state->uv;
-    if (view && (view->solving || view->committing) &&
+    if (view && (view->solving || view->committing || !view->topology) &&
         (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)) return 1;
     if (event == FL_FOCUS)
       return 1;
@@ -111,6 +111,7 @@ public:
     fl_push_clip(x(), y(), w(), h());
     fl_color(s->light ? fl_rgb_color(208, 208, 208) : fl_rgb_color(48, 48, 48));
     fl_rectf(x(), y(), w(), h());
+    if (!v.topology) { fl_pop_clip(); return; }
     auto line = [&](std::array<float, 2> a, std::array<float, 2> b) {
       for (int k = 0; k < 2; ++k) {
         a[k] = std::clamp(a[k], -1.f, 2.f);
@@ -200,7 +201,7 @@ void edit_uv(Document &doc) {
               : v->error.c_str());
       if (buttons.size() > 5) {
         for (auto button : buttons)
-          if (v->committing || v->solving)
+          if (v->committing || v->solving || !v->topology)
             button->deactivate();
           else
             button->activate();

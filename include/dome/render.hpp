@@ -18,7 +18,7 @@ struct SurfaceTextureLimits {
 };
 // Final RGB transfer only; alpha stays linear. Linear requires a linear target.
 enum class SurfaceOutputEncoding { Srgb, Linear };
-struct SurfaceTextureStats {size_t images=0,samplers=0,bytes=0;uint64_t uploads=0;};
+struct SurfaceTextureStats {size_t images=0,samplers=0,bytes=0;uint64_t uploads=0;size_t packed_bytes=0;uint64_t pack_builds=0;};
 class SurfaceRenderer {
   GLuint program_ = 0, vao_ = 0, vertices_ = 0, indices_ = 0;
   size_t count_ = 0;
@@ -43,14 +43,18 @@ public:
             const Mat4 &view_projection, ob::Vec3 camera, int width, int height,
             bool transparent = false, bool toon = false, bool light = false);
 };
+struct RetopoOverlayStats {size_t vertices=0,bytes=0;uint64_t uploads=0;};
 class CursorRenderer {
   GLuint program_ = 0, vao_ = 0, buffer_ = 0;
   bool linear_output_ = false;
+  struct OverlayCache;
+  std::unique_ptr<OverlayCache> overlay_;
 
 public:
   CursorRenderer();
   ~CursorRenderer();
-  void abandon() { program_ = vao_ = buffer_ = 0; }
+  void abandon();
+  RetopoOverlayStats retopology_stats() const;
   void set_linear_output(bool value) { linear_output_=value; }
   void draw(const EditorState &, const Mat4 &);
 };

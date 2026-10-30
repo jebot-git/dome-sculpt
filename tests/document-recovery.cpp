@@ -121,6 +121,7 @@ int main(int argc, char **argv) try {
     uvdoc.replace(painted);
     uvdoc.enable_recovery(root / "uv");
     uvdoc.begin_uv();
+    check(uvdoc.wait_uv(), "UV initialization finishes before recovery draft edits");
     uvdoc.edit_uv(UvAction::Move, .02f, 0);
     check(uvdoc.wait_uv() && uvdoc.recovery_status().accepted == 0,
           "Background-validated UV drafts do not create durable checkpoints");
@@ -128,6 +129,7 @@ int main(int argc, char **argv) try {
     check(!uvdoc.frame().state->dirty && uvdoc.recovery_status().accepted == 0,
           "Cancelling the UV draft leaves recovery and saved state unchanged");
     uvdoc.begin_uv();
+    check(uvdoc.wait_uv(), "UV initialization finishes before recovery draft edits");
     uvdoc.edit_uv(UvAction::Move, .04f, 0);
     uvdoc.end_uv(true);
     check(uvdoc.wait_asset(), "Accepted UV transfer finishes before recovery inspection");
@@ -140,6 +142,7 @@ int main(int argc, char **argv) try {
               uvdoc.copy_scene().active().painted->encode(),
           "Recovery retains the exact accepted UV mesh and editable paint");
     uvdoc.begin_uv();
+    check(uvdoc.wait_uv(), "UV initialization finishes before recovery draft edits");
     uvdoc.edit_uv(UvAction::Move, .01f, 0);
     uvdoc.replace(painted);
     check(uvdoc.wait_uv() && !uvdoc.frame().state->uv &&

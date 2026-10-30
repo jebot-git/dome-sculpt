@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
+#include <new>
 namespace dome {
 namespace {
 bool heavy_uv(UvAction action) {
@@ -65,7 +66,16 @@ void Document::schedule_uv_locked() {
   if (uv_scheduled_.lock() == uv_->view().mesh) return;
   auto mesh = uv_->view().mesh;
   uv_scheduled_ = mesh;
-  UvValidationJob job{++uv_request_, uv_session_, state_.generation, mesh, {}, {}};
+  const bool initializing = !uv_->view().topology;
+  if (initializing) {
+    // Source lease is captured after publish_locked has accounted for any
+    // just-finished stroke, without copying its geometry on this thread.
+    control_source_ = {state_.generation, state_.revision, control_object_};
+    uv_solving_ = true;
+    state_.message = "Preparing UV charts...";
+  }
+  UvValidationJob job{++uv_request_, uv_session_, state_.generation, mesh, {},
+      initializing ? std::make_shared<UvWorkspace>(*uv_) : nullptr};
   std::lock_guard lock(uv_mutex_);
   uv_validation_ = std::move(job);
   uv_changed_.notify_all();
@@ -83,14 +93,20 @@ void Document::uv_loop() {
     auto cancelled = [&] { return stopping_ || uv_request_ != job.request; };
     std::string error;
     bool completed = false;
+    const bool workspace_job = bool(job.workspace);
+    const bool initializing = workspace_job && !job.operation;
     try {
-      if (job.operation) {
-        job.workspace->edit(*job.operation, 0, 0, cancelled);
+      if (workspace_job) {
+        if (job.operation) job.workspace->edit(*job.operation, 0, 0, cancelled);
+        else job.workspace->initialize(cancelled);
         auto result = job.workspace->view().mesh;
         error = validate_uv(*result, cancelled);
         job.workspace->validated(result, error);
         completed = true;
       } else error = validate_uv(*job.mesh, cancelled);
+    } catch (const std::bad_alloc &) {
+      if (cancelled()) continue;
+      error = "Not enough memory to prepare UV charts; cancel and reopen the editor";
     } catch (const std::exception &failure) {
       if (cancelled()) continue;
       error = failure.what();
@@ -98,8 +114,22 @@ void Document::uv_loop() {
     std::lock_guard lock(model_mutex_);
     if (cancelled() || !uv_ || uv_session_ != job.session ||
         state_.generation != job.generation) continue;
+    if (initializing) {
+      const auto &source = scene_.active();
+      bool same_owner = source.painted && !job.mesh.owner_before(source.painted) &&
+                        !source.painted.owner_before(job.mesh);
+      if (!same_owner || source.id != control_object_ ||
+          job.mesh.get() != &source.painted->mesh() ||
+          state_.revision != control_source_.revision) {
+        finish_control_locked(false);
+        state_.error = "The UV source changed while loading; reopen the editor";
+        state_.message.clear();
+        publish_locked();
+        continue;
+      }
+    }
     if (uv_->view().mesh != job.mesh) {
-      if (job.operation) {
+      if (workspace_job) {
         uv_solving_ = false;
         uv_scheduled_.reset();
         state_.error = "The UV draft changed during processing; retry";
@@ -107,14 +137,16 @@ void Document::uv_loop() {
       }
       continue;
     }
-    if (job.operation) {
+    if (workspace_job) {
       uv_solving_ = false;
       uv_scheduled_.reset();
       if (completed) {
         uv_ = std::move(*job.workspace);
         state_.error.clear();
-        state_.message = "UV operation complete; Apply publishes UVs and transferred paint";
+        state_.message = initializing ? "UV charts ready" :
+            "UV operation complete; Apply publishes UVs and transferred paint";
       } else {
+        if (initializing) uv_->validated(job.mesh, error);
         state_.error = std::move(error);
         state_.message.clear();
       }

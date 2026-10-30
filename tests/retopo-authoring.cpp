@@ -45,7 +45,18 @@ struct Controller {
 };
 }
 int main(int argc, char **argv) try {
-  if (argc == 3 && std::string(argv[1]) == "--ui-fixture") { plane().save(argv[2]); return 0; }
+  if ((argc == 3 || (argc == 4 && std::string(argv[3]) == "--retain-sculpt")) &&
+      std::string(argv[1]) == "--ui-fixture") {
+    auto fixture = plane();
+    if (argc == 4) {
+      // The XR case also retains a real committed sculpt under the reference.
+      // Keep the existing native GUI fixture unchanged without this option.
+      auto &field = *fixture.active().volume;
+      field.begin_stroke(); Brush seed; seed.radius = .18f; seed.blend = 0;
+      field.stamp(seed); field.end_stroke();
+    }
+    fixture.save(argv[2]); return 0;
+  }
   auto scene=plane(); auto original=scene.encode();
   RetopoWorkspace w(scene);
   point(w,{-.2f,-.2f,.02f}); auto first=w.view();
@@ -107,6 +118,11 @@ int main(int argc, char **argv) try {
 
   Document doc;doc.replace(scene.snapshot());doc.begin_retopology();
   check(doc.wait_retopology()&&doc.frame().state->retopology->source,"Reference BVH initializes off the interaction thread");
+  doc.edit_retopology(RetopoAction::MoveMode);doc.edit_retopology(RetopoAction::MoveMode);
+  check(doc.wait_retopology()&&doc.frame().state->retopology->moving,"Repeated native Move radio selections are idempotent across queued worker updates");
+  doc.edit_retopology(RetopoAction::PlaceMode);doc.edit_retopology(RetopoAction::PlaceMode);
+  check(doc.wait_retopology()&&!doc.frame().state->retopology->moving,"Repeated native Place radio selections never toggle back to Move");
+
   point(doc,{-.2f,-.2f,.02f});point(doc,{.2f,-.2f,.02f});point(doc,{.2f,.2f,.02f});point(doc,{-.2f,.2f,.02f});
   check(doc.copy_scene().encode()==original&&doc.frame().state->dirty,"Desktop drafts are visibly dirty without mutating source scene or global history");
   check(doc.undo()&&doc.wait_retopology()&&doc.frame().state->retopology->topology->vertices().size()==3,"Universal Undo routes to the retopology draft");
@@ -121,7 +137,10 @@ int main(int argc, char **argv) try {
         accepted.active().retopology->topology.encode()==native&&accepted.active().mesh_active,
         "Apply retains the exact original and creates a separate atlas-ready stable-topology mesh");
   auto json=accepted.encode();auto decoded=Scene::decode(json);
-  check(json.at("version")==7&&decoded.encode()==json,"Scene version seven round-trips stable topology, source and derived display mesh");
+  check(rejects([&]{doc.prepare_mesh(64);})&&doc.copy_scene().encode()==json,
+        "Preparing a replacement mesh cannot discard persistent editable topology");
+
+  check(json.at("version")==8&&decoded.encode()==json,"Combined Scene version eight round-trips stable topology, source and derived display mesh");
   auto directory=std::filesystem::temp_directory_path()/("dome-retopo-authoring-"+std::to_string(getpid()));
   std::filesystem::create_directories(directory);
   doc.save(directory/"patch.dsculpt");
@@ -142,6 +161,20 @@ int main(int argc, char **argv) try {
   check(rejects([&]{orphan.begin_retopology();})&&!orphan.frame().state->retopology,
         "Deleted source produces a clean reopen refusal without a stranded draft");
 
+  {
+    Document locked_source;locked_source.seed();auto frozen=locked_source.copy_scene();
+    auto &volume=*frozen.active().volume;auto layer=volume.add_layer("Protected inactive layer");
+    volume.layer_properties(layer,"Protected inactive layer",false,true,0);
+    auto exact=frozen.encode();locked_source.replace(frozen.snapshot());locked_source.begin_retopology();
+    check(locked_source.wait_retopology()&&locked_source.frame().state->retopology->source,
+          "Retopology can read a visible source whose active geometry layer is hidden, locked and zero-strength");
+    point(locked_source,{0,0,.4f});
+    check(locked_source.frame().state->retopology->topology->vertices().size()==1&&locked_source.copy_scene().encode()==exact,
+          "Desktop retopology places draft points without editing its protected source layer");
+    locked_source.end_retopology(false);
+    frozen.active().locked=true;locked_source.replace(frozen.snapshot());
+    check(rejects([&]{locked_source.begin_retopology();}),"Object locks still prevent retopology authoring");
+  }
   Document cancelled;cancelled.replace(scene.snapshot());cancelled.begin_retopology();check(cancelled.wait_retopology(),"Cancellation fixture initializes");
   cancelled.end_retopology(true);
   check(cancelled.wait_retopology()&&cancelled.frame().state->retopology&&!cancelled.frame().state->retopology->committing&&
@@ -161,7 +194,7 @@ int main(int argc, char **argv) try {
 
   Document xr;xr.replace(scene.snapshot());Controller hand(xr);
   hand.send(0,0,0,true);hand.send();hand.sector(8);hand.sector(9);hand.sector(11);
-  check(xr.frame().state->menu_page==14,"Joystick navigation opens the retopology workflow from mesh tools");
+  check(xr.frame().state->menu_page==16,"Joystick navigation opens the retopology workflow from mesh tools");
   hand.sector(0);check(xr.wait_retopology()&&xr.frame().state->retopology,"Controller menu creates the same native worker workspace");
   for(auto p:std::array<Vec3,3>{{{-.2f,-.2f,.01f},{.2f,-.2f,.01f},{0,.2f,.01f}}}) {
     hand.f.hands[1].tracked.grip.position=ob::transform(xr.frame().state->canvas,{p.x,p.y,p.z});
@@ -185,7 +218,7 @@ int main(int argc, char **argv) try {
   check(extent()>.4f,"Retopology preview shows the reference extent rather than the smaller authored target");
   // Reopening resets the input lease; a fresh neutral pose must rearm it.
   hand.send();hand.send(0,0,0,true);hand.send();
-  check(xr.frame().state->menu&&xr.frame().state->menu_page==14,"A freshly rearmed controller opens the reopened patch menu");
+  check(xr.frame().state->menu&&xr.frame().state->menu_page==16,"A freshly rearmed controller opens the reopened patch menu");
   hand.sector(11);
   check(!xr.frame().state->retopology&&xr.wait_mesh()&&extent()<.21f&&xr.copy_scene().encode()==xr_scene,
         "XR Cancel restores the authored target preview and exact scene after reopening its reference");

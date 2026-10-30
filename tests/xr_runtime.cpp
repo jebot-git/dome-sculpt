@@ -52,6 +52,14 @@ unsigned frame = 0, event = 0, restart_phase = 0;
 bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
+std::string skin_mode(){auto mode=getenv("DOME_XR_FIXTURE_SKIN");return mode?mode:"";}
+std::string retopo_mode(){auto mode=getenv("DOME_XR_FIXTURE_RETOPO");return mode?mode:"";}
+std::string cut_mode(){auto mode=getenv("DOME_XR_FIXTURE_CUT");return mode?mode:"";}
+unsigned cut_step=0;
+bool cut_preview_ready=false,cut_apply_ready=false;
+unsigned retopo_step = 0;
+bool retopo_source_ready = false, retopo_apply_ready = false;
+
 std::string voxel_mode() {
   auto mode = getenv("DOME_XR_FIXTURE_VOXEL");
   return mode ? mode : "";
@@ -351,6 +359,44 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     count(s->eye ? "right_eye_nonblank" : "left_eye_nonblank");
   if (blue > 30)
     count("palette_images");
+  const bool cut_wait=!cut_mode().empty() && (cut_step==20 || (cut_mode()=="accept" && cut_step==30));
+  if (cut_wait || (!retopo_mode().empty() && (retopo_step == 27 || retopo_step == 60))) {
+    const bool initial=cut_wait?cut_step==20:retopo_step==27;
+    const int sector = cut_wait?7:initial?0:10;
+    float angle = sector * 6.28318530718f / 12;
+    float world_x = (cut_wait?.045f:0.f) + .6f * 220.f / 640 * std::cos(angle);
+    float world_y = 1.56f + .6f * 220.f / 640 * std::sin(angle);
+    float eye_x = (s->eye ? .032f : -.032f) + (frame >= 38 ? -.2f : 0);
+    const float distance=cut_wait?.66f:1.01f;
+    int cx = int(std::lround(s->width * .5f * (1 + (world_x - eye_x) / (distance * std::tan(.6f)))));
+    int cy = int(std::lround(s->height * .5f * (1 + (world_y - 1.6f) / (distance * std::tan(.6f)))));
+    int accent = 0, inspected = 0;
+    for (int y = std::max(0,cy-3); y <= std::min(int(s->height)-1,cy+3); ++y)
+      for (int x = std::max(0,cx-8); x <= std::min(int(s->width)-1,cx+8); ++x) {
+        size_t at = (size_t(y) * s->width + x) * 4;
+        ++inspected;
+        if (displayed(bytes[at]) < 150 && displayed(bytes[at+1]) > 130 && displayed(bytes[at+2]) > 220) ++accent;
+      }
+    const char *pixels_key = cut_wait?(initial?"cut_preview_accent_pixels":"cut_apply_accent_pixels"):
+        initial?"retopo_source_accent_pixels":"retopo_apply_accent_pixels";
+    report[pixels_key] = std::max(report.value(pixels_key,0),accent);
+    if (inspected && accent * 2 > inspected) {
+      bool first = cut_wait?(initial?!cut_preview_ready:!cut_apply_ready):initial?!retopo_source_ready:!retopo_apply_ready;
+      if (first) if (auto path = getenv("DOME_XR_FIXTURE_REPORT")) {
+        std::ofstream capture(std::string(path) + (cut_wait?(initial?".cut-preview-ready.ppm":".cut-apply-ready.ppm"):
+            initial?".source-ready.ppm":".apply-ready.ppm"), std::ios::binary);
+        capture << "P6\n" << s->width << ' ' << s->height << "\n255\n";
+        for (int y = int(s->height)-1; y >= 0; --y) for (unsigned x = 0; x < s->width; ++x)
+          for (int channel = 0; channel < 3; ++channel)
+            capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+channel])));
+      }
+      if(cut_wait){
+        if(initial){cut_preview_ready=true;report["cut_preview_ready"]=true;}
+        else{cut_apply_ready=true;report["cut_apply_ready"]=true;}
+      }else if (initial) { retopo_source_ready = true; report["retopo_source_ready"] = true; }
+      else { retopo_apply_ready = true; report["retopo_apply_ready"] = true; }
+    }
+  }
   return XR_SUCCESS;
 }
 FN(BeginSession, XrSession, const XrSessionBeginInfo *) {
@@ -392,7 +438,10 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("restart_states");
     return XR_SUCCESS;
   }
-  if (frame >= 30 && !lost) {
+  auto retopo = retopo_mode();
+  unsigned focus_frame = !cut_mode().empty()?cut_step:retopo.empty() ? frame : retopo_step;
+  unsigned focus_at = !cut_mode().empty()?90:retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
+  if (focus_frame >= focus_at && !lost) {
     lost = true;
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
     e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
@@ -401,7 +450,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_losses");
     return XR_SUCCESS;
   }
-  if (frame >= 33 && !regained) {
+  if (focus_frame >= focus_at + 3 && !regained) {
     regained = true;
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
     e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
@@ -410,7 +459,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_regains");
     return XR_SUCCESS;
   }
-  if (frame >= 35 && !reference_event) {
+  if (retopo.empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -427,6 +476,17 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
 FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   std::this_thread::sleep_for(std::chrono::milliseconds(18));
   ++frame;
+  if (auto mode=retopo_mode(); !mode.empty()) {
+    bool waiting = (retopo_step == 27 && !retopo_source_ready) ||
+                   (mode!="unconfirmed" && retopo_step == 60 && !retopo_apply_ready);
+    if (!waiting) ++retopo_step;
+    report["retopo_script_step"] = retopo_step;
+  }
+  if(auto mode=cut_mode();!mode.empty()){
+    bool waiting=(cut_step==20&&!cut_preview_ready)||(mode=="accept"&&cut_step==30&&!cut_apply_ready);
+    if(!waiting)++cut_step;
+    report["cut_script_step"]=cut_step;
+  }
   p->predictedDisplayTime = 1000000000 + frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
   p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
@@ -458,12 +518,17 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
     count("stereo_submissions");
   } else
     count("empty_submissions");
+  // Synchronize external interruption with a real in-progress controller
+  // stroke; the parent never relies on an arbitrary startup delay.
+  if(frame==16) if(auto marker=getenv("DOME_XR_FIXTURE_SIGNAL_READY"))
+    std::ofstream(marker)<<frame<<'\n';
+  if(!cut_mode().empty())save(); // Preserve actual progress even if a later stage stalls.
   return XR_SUCCESS;
 }
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 ? 0
+  state->viewStateFlags = frame == 27 && skin_mode()!="focus" && retopo_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
@@ -508,6 +573,25 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->currentState=button && (frame==8||frame==10||frame==12||frame==14||frame==16||((mode=="accept"||mode=="undo")&&(frame==20||frame==24))||(mode=="undo"&&(frame==42||frame==44)));
     out->changedSinceLastSync=button;
   }
+  if(auto mode=skin_mode();!mode.empty()) {
+    out->currentState=button && (frame==8 || frame==10 || frame==12 || frame==14 || frame==16 || frame==18 || frame==20 ||
+      (mode!="focus" && (frame==24 || frame==26)));
+    out->changedSinceLastSync=button;
+  }
+  if (auto mode = retopo_mode(); !mode.empty()) {
+    auto step = retopo_step;
+    bool common = step==8 || step==10 || step==12 || step==16 || step==18 || step==20 ||
+                  step==22 || step==24 || step==26 || step==28;
+    bool apply = (mode=="accept" || mode=="focus") && (step==56 || step==58 || step==62);
+    out->currentState = button && (common || apply);
+    out->changedSinceLastSync = button;
+  }
+  if(auto mode=cut_mode();!mode.empty()){
+    auto step=cut_step;
+    out->currentState=button&&(step==8||step==10||step==12||step==14||step==16||step==18||step==22||
+                               (mode=="accept"&&(step==26||step==32)));
+    out->changedSinceLastSync=button;
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
@@ -535,10 +619,19 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if (auto mode = voxel_mode(); !mode.empty())
       stroke = frame == 16 || (mode == "cancel" && frame == 18);
     if(auto mode=bake_mode();!mode.empty())stroke=frame==18||(mode=="cancel"&&frame==20);
+    if(!skin_mode().empty())stroke=frame==22;
+    if (auto mode = retopo_mode(); !mode.empty()) {
+      auto step = retopo_step;
+      stroke = mode!="committed" && (step==32 || (mode=="focus" ? (step>=36 && step<=41) || step==48 || step==52
+                                                                             : step==36 || step==40));
+    }
+    if(!cut_mode().empty())stroke=cut_step==24;
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
       out->currentState = .9f;
+      if (!retopo_mode().empty()) count("retopo_pressure_samples");
+      if (!cut_mode().empty()) count("cut_slider_samples");
       count(a->name == "tip_force" ? "tip_pressure_samples"
                                    : "trigger_pressure_samples");
     }
@@ -629,6 +722,35 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if((mode=="accept"||mode=="undo") && frame>=21 && frame<=24)out->currentState={0,1};
     if(mode=="undo"&&(frame==43||frame==44))out->currentState={-.5f,.8660254f};
   }
+  if(!skin_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
+    out->currentState={0,0};
+    if(frame==9 || frame==10)out->currentState={-.5f,-.8660254f};
+    if(frame==11 || frame==12 || frame==15 || frame==16)out->currentState={.5f,-.8660254f};
+    if(frame==13 || frame==14)out->currentState={-.8660254f,.5f};
+    if(frame==17 || frame==18)out->currentState={.8660254f,-.5f};
+    if(frame==19 || frame==20)out->currentState={.8660254f,.5f};
+    if(frame==25 || frame==26)out->currentState={-.8660254f,-.5f};
+  }
+  if (!retopo_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
+    auto step=retopo_step;
+    out->currentState={0,0};
+    if(step==9 || step==10 || step==19 || step==20) out->currentState={0,-1};
+    if(step==11 || step==12) out->currentState={.8660254f,.5f};
+    if(step==17 || step==18) out->currentState={-.5f,-.8660254f};
+    if(step==21 || step==22) out->currentState={.8660254f,-.5f};
+    if(step==23 || step==24 || step==27 || step==28) out->currentState={1,0};
+    if(step==57 || step==58) out->currentState={.5f,.8660254f};
+    if(step>=60 && step<=62) out->currentState={.5f,-.8660254f};
+  }
+  if(!cut_mode().empty()&&right(p->subactionPath)&&a->name=="right_stick"){
+    auto step=cut_step;out->currentState={0,0};
+    if(step==9||step==10)out->currentState={-.5f,-.8660254f};
+    if(step==11||step==12)out->currentState={0,-1};
+    if(step==13||step==14)out->currentState={-.5f,.8660254f};
+    if(step==15||step==16)out->currentState={1,0};
+    if(step==19||step==20||(step>=29&&step<=32))out->currentState={-.8660254f,-.5f};
+    if(step==21||step==22)out->currentState={.8660254f,.5f};
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStatePose, XrSession, const XrActionStateGetInfo *,
@@ -648,7 +770,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
-  if (frame == 22 && s->action && voxel_mode() != "focus" && bake_mode().empty()) {
+  if (frame == 22 && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && cut_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
@@ -687,6 +809,22 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     float t=std::log(20.f/.01f)/std::log(10000.f/.01f);
     float x=frame==18?100+420*t:170,y=frame==18?240:609;
     p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
+  }
+  if(auto mode=skin_mode();!mode.empty() && s->action && s->action->name=="aim_pose" && right(s->hand) && frame==22) {
+    float t=mode=="fitted"?0.f:1.f;
+    p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
+  }
+  if(!cut_mode().empty()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&cut_step==24){
+    p->pose.position={.045f+((100+420*.6f)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
+  }
+  if (auto mode=retopo_mode(); !mode.empty() && s->action && right(s->hand)) {
+    float x=0,y=0;
+    auto step=retopo_step;
+    if(step==32) { x=-.2f; y=-.2f; }
+    else if(mode=="focus" && step>=36 && step<=41) { x=.35f; y=.25f; }
+    else if(step==36 || step==48) { x=.2f; y=-.2f; }
+    else if(step==40 || step==52) { x=0; y=.2f; }
+    p->pose.position={x,1.48f+y,-.83f};
   }
   return XR_SUCCESS;
 }

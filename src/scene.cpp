@@ -3,17 +3,30 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/creator-archive.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/retopo-authoring.hpp"
 #include "io.hpp"
+#include "text-utf8.hpp"
 #include <fstream>
+#include <map>
 #include <nlohmann/json.hpp>
 #include <set>
 namespace dome {
 namespace {
 void name_valid(const std::string &s) {
-  if (s.empty() || s.size() > 256 || s.find('\0') != std::string::npos)
+  if (s.empty() || s.size() > 256 || s.find('\0') != std::string::npos || !text::valid_utf8(s))
     throw std::invalid_argument(
-        "Names must contain 1 to 256 bytes without NUL");
+        "Names must contain 1 to 256 valid UTF-8 bytes without NUL");
+}
+void retopology_acyclic(const std::map<uint64_t,uint64_t> &references) {
+  for(const auto &reference:references) {
+    std::set<uint64_t> visited;auto current=reference.first;
+    for(;;) {
+      auto found=references.find(current);if(found==references.end())break;
+      if(!visited.insert(current).second)throw std::invalid_argument("Retopology reference cycle");
+      current=found->second;
+    }
+  }
 }
 } // namespace
 void Material::validate() const {
@@ -33,6 +46,15 @@ void validate_transform(CanvasTransform t) {
       std::max({std::abs(t.position.x), std::abs(t.position.y),
                 std::abs(t.position.z)}) > 100)
     throw std::invalid_argument("Invalid object transform");
+}
+bool source_is_dormant(const SculptObject &o) {
+  return !o.mesh_active && bool(o.appearance || o.material_bindings || o.deformation || o.retopology ||
+    (o.painted && (o.painted->source_maps() || o.painted->baked() || o.painted->has_paint_data())));
+}
+void Scene::require_exportable_sources() const {
+  for(const auto &o:objects_)if(o.visible && source_is_dormant(o))
+    throw std::invalid_argument("Original source data is dormant for "+o.name+
+      "; restore the original mesh or explicitly reproject and bake its source data before export");
 }
 Scene::Scene() {
   SculptObject object;
@@ -69,7 +91,8 @@ uint64_t Scene::add(std::string name, Volume v, CanvasTransform t) {
 }
 uint64_t Scene::duplicate(uint64_t id) {
   auto source = object(id);
-  auto name = source.name.substr(0, 240) + " copy";
+  name_valid(source.name);
+  auto name = text::utf8_prefix(source.name, 240) + " copy";
   auto added = add(name, source.volume->geometry_snapshot(), source.transform);
   auto &o = object(added);
   o.material = source.material;
@@ -80,6 +103,7 @@ uint64_t Scene::duplicate(uint64_t id) {
   o.deformation = source.deformation;
   o.group = source.group;
   o.appearance = source.appearance;
+  o.material_bindings = source.material_bindings;
   o.retopology = source.retopology;
   return added;
 }
@@ -140,7 +164,33 @@ void Scene::validate(bool deep_sources) const {
   CreatorAssetArchive source_models;
   size_t remap_vertices = 0, source_bytes = 0;
   std::set<const std::vector<uint8_t> *> originals;
-  size_t count = 0, texels = 0, deformation_entries = 0, paint_bytes = 0, topology_entries = 0;
+  size_t count = 0, texels = 0, deformation_entries = 0, paint_bytes = 0, origin_vertices = 0, topology_entries = 0;
+  std::map<uint64_t,uint64_t> retopology_sources;
+  SourceMaterialArchive source_materials;
+  std::set<const PaintedMesh *> retained_paint;
+  auto retain_appearance = [&](const CreatorAppearance &a, size_t vertices) {
+    if(a.source_vertices.size()!=vertices)throw std::invalid_argument("Creator source does not match its retained mesh");
+    remap_vertices+=a.source_vertices.size();
+    if(remap_vertices>8'000'000)throw std::length_error("Creator source remap budget exceeded");
+    if(!a.original_bytes || !a.asset || !a.decoded_images || a.original_bytes->size()>64*1024*1024)
+      throw std::invalid_argument("Missing or oversized creator source");
+    if(originals.insert(a.original_bytes.get()).second)source_bytes+=a.original_bytes->size();
+    if(originals.size()>16 || source_bytes>128*1024*1024)throw std::length_error("Creator source archive budget exceeded");
+    if(deep_sources)source_models.add(a,source_images);
+    else for(const auto &image:*a.decoded_images)source_images.add(image);
+  };
+  auto retain_paint = [&](const std::shared_ptr<const PaintedMesh> &paint,bool origin) {
+    if(!paint || (origin && !retained_paint.insert(paint.get()).second))return;
+    if(paint->in_stroke())throw std::invalid_argument("Retained UV paint source has an unfinished stroke");
+    if(const auto &maps=paint->source_maps()) {
+      maps->validate();
+      for(const auto *slot:{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion})
+        if(slot->image)source_images.add(slot->image);
+    }
+    texels+=size_t(paint->resolution())*paint->resolution();paint_bytes+=paint->storage_bytes();
+    if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
+    if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
+  };
   for (auto &o : objects_) {
     if (!o.id || o.id >= next_ || !ids.insert(o.id).second || !o.volume ||
         o.volume->in_stroke())
@@ -150,69 +200,64 @@ void Scene::validate(bool deep_sources) const {
     validate_transform(o.transform);
     validate_transform(world_transform(o.id));
     o.material.validate();
-    if (o.retopology) {
-      const auto &patch = *o.retopology;
-      if (!patch.source || patch.source >= next_ || patch.source == o.id || !o.painted)
-        throw std::invalid_argument("Invalid retopology source or display mesh");
-      topology_entries += patch.topology.vertices().size() + patch.topology.edges().size() + patch.topology.faces().size();
-      if (topology_entries > 1'000'000) throw std::length_error("Scene retopology budget exceeded");
-      if (deep_sources) patch.topology.validate();
+    if(o.retopology) {
+      const auto &patch=*o.retopology;
+      if(!patch.source || patch.source>=next_ || patch.source==o.id || !o.painted)
+        throw std::invalid_argument("Invalid retopology source or retained display mesh");
+      topology_entries+=patch.topology.vertices().size()+patch.topology.edges().size()+patch.topology.faces().size();
+      if(topology_entries>1'000'000)throw std::length_error("Scene retopology budget exceeded");
+      if(deep_sources)patch.topology.validate();
+      retopology_sources.emplace(o.id,patch.source);
     }
     if ((o.mesh_active && !o.painted) || (o.painted && o.painted->in_stroke()))
       throw std::runtime_error(
           "Invalid active mesh or unfinished paint stroke");
     if (o.deformation) {
-      if (!o.mesh_active || !o.painted)
-        throw std::invalid_argument("Deformation has no active rest mesh");
+      if (!o.painted)
+        throw std::invalid_argument("Deformation has no retained rest mesh");
       o.deformation->validate(o.painted->mesh());
       deformation_entries += o.deformation->resource_entries();
       if (deformation_entries > 8'000'000)
         throw std::length_error("Scene deformation budget exceeded");
     }
-    if (o.appearance) {
-      if (!o.painted || o.appearance->source_vertices.size() != o.painted->mesh().positions.size())
-        throw std::invalid_argument("Creator source does not match its rest mesh");
-      remap_vertices += o.appearance->source_vertices.size();
-      if (remap_vertices > 8'000'000) throw std::length_error("Creator source remap budget exceeded");
-      const auto &a = *o.appearance;
-      if (!a.original_bytes || !a.asset || !a.decoded_images || a.original_bytes->size() > 64 * 1024 * 1024)
-        throw std::invalid_argument("Missing or oversized creator source");
-      if (originals.insert(a.original_bytes.get()).second) source_bytes += a.original_bytes->size();
-      if (originals.size() > 16 || source_bytes > 128 * 1024 * 1024)
-        throw std::length_error("Creator source archive budget exceeded");
-      if (deep_sources) source_models.add(a, source_images);
-      else for (auto &image : *a.decoded_images) source_images.add(image);
+    if(o.appearance) {
+      if(!o.painted)throw std::invalid_argument("Creator source has no rest mesh");
+      retain_appearance(*o.appearance,o.painted->mesh().positions.size());
     }
-    if (o.painted && o.painted->source_maps()) {
-      const auto &m = *o.painted->source_maps();
-      m.validate();
-      for (const auto *slot : {&m.color,&m.metal_rough,&m.emission,&m.normal,&m.occlusion})
-        if (slot->image) source_images.add(slot->image);
+    retain_paint(o.painted,false);
+    if(o.material_bindings) {
+      if(!o.painted)throw std::invalid_argument("Resolved material has no persisted painting mesh");
+      source_materials.add(o.material_bindings);
     }
-    if (o.painted) {
-      texels += size_t(o.painted->resolution()) * o.painted->resolution();
-      paint_bytes += o.painted->storage_bytes();
-    }
-    if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
-    if (texels > 16 * 1024 * 1024)
-      throw std::length_error("Scene paint-map budget exceeded");
     count += std::max(o.volume->voxels().size(), o.volume->stored_samples());
     if (count > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
   }
+  for(const auto &binding:source_materials.bindings())
+    for(const auto &view:binding->roles)if(view.image)source_images.add(view.image);
+  for(const auto &origin:source_materials.origins()) {
+    retain_paint(origin->paint,true);origin_vertices+=origin->paint->mesh().positions.size();
+    if(origin_vertices>8'000'000)throw std::length_error("Retained original UV geometry exceeds scene budget");
+    if(origin->appearance)retain_appearance(*origin->appearance,origin->paint->mesh().positions.size());
+    for(const auto &view:origin->roles)if(view.image)source_images.add(view.image);
+  }
+  retopology_acyclic(retopology_sources);
   object(active_);
 }
 nlohmann::json Scene::encode() const {
   validate();
   bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
-  bool retopology = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return bool(o.retopology); });
+  bool resolved=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.material_bindings) || (!o.mesh_active && bool(o.deformation));});
+  bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
+  const bool extended=resolved || retopology;
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", retopology ? 7 : baked ? 6 : 5},
+                      {"version", extended ? 8 : baked ? 6 : 5},
                       {"active", active_},
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
   PaintImageArchive source_images;
   CreatorAssetArchive source_models;
+  SourceMaterialArchive source_materials;
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
@@ -222,16 +267,15 @@ nlohmann::json Scene::encode() const {
       {"rotation", {t.orientation.x,t.orientation.y,t.orientation.z,t.orientation.w}},
       {"scale", t.scale}, {"humanoid", g.humanoid ? g.humanoid->encode() : nlohmann::json(nullptr)}});
   }
-  size_t retopo_bytes = 0;
+  size_t retopo_bytes=0;
   for (auto &o : objects_) {
     auto t = o.transform;
     auto &m = o.material;
-    nlohmann::json patch = nullptr;
-    if (o.retopology) {
-      auto payload = o.retopology->topology.encode();
-      retopo_bytes += payload.size();
-      if (retopo_bytes > 64 * 1024 * 1024) throw std::length_error("Scene retopology payload budget exceeded");
-      patch = {{"source", o.retopology->source}, {"topology", std::move(payload)}};
+    nlohmann::json patch=nullptr;
+    if(o.retopology) {
+      auto payload=o.retopology->topology.encode();
+      if(payload.size()>64*1024*1024-retopo_bytes)throw std::length_error("Scene retopology payload budget exceeded");
+      retopo_bytes+=payload.size();patch={{"source",o.retopology->source},{"topology",std::move(payload)}};
     }
     j["objects"].push_back(
         {{"id", o.id},
@@ -255,26 +299,60 @@ nlohmann::json Scene::encode() const {
            {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
          {"volume", o.volume->encode()},
          {"mesh_active", o.mesh_active},
-         {"retopology", std::move(patch)},
          {"painted", o.painted ? o.painted->encode(&source_images) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
                              ? o.deformation->encode(o.painted->mesh())
                              : nlohmann::json(nullptr)}});
+    if(extended) {
+      j["objects"].back()["material_bindings"]=o.material_bindings
+        ?nlohmann::json(source_materials.add(o.material_bindings)):nlohmann::json(nullptr);
+      j["objects"].back()["retopology"]=std::move(patch);
+    }
   }
+  if(extended)j["source_materials"]=source_materials.encode(source_images,source_models);
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
   return j;
 }
 Scene Scene::decode(const nlohmann::json &j) {
   Scene result;
-  if (j.at("format") != "dome-sculpt")
-    throw std::runtime_error("Unsupported scene format");
-  if (j.at("version") == 1 || (j.at("version") == 2 && j.contains("samples"))) {
-    result.active().volume = std::make_shared<Volume>(Volume::decode(j));
-    return result;
+  if(j.at("format")!="dome-sculpt" || !j.at("version").is_number_integer())
+    throw std::runtime_error("Unsupported scene format or version type");
+  const auto version=j.at("version").get<int64_t>();
+  if(version==1 || (version==2 && j.contains("samples"))) {
+    result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if (j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6 && j.at("version") != 7)
-    throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>8)throw std::runtime_error("Unsupported scene version");
+  const auto &objects=j.at("objects");
+  if(!objects.is_array() || objects.empty() || objects.size()>256)throw std::length_error("Invalid scene object count");
+  size_t binding_keys=0,retopology_keys=0;
+  for(const auto &object:objects) {
+    if(!object.is_object())throw std::runtime_error("Invalid scene object record");
+    binding_keys+=object.contains("material_bindings");retopology_keys+=object.contains("retopology");
+  }
+  bool material_fields=false,retopology_fields=false;
+  if(version>=7) {
+    // Two independent historical writers used version seven. Presence declares
+    // a complete feature shape; malformed/partial material data must never be
+    // reinterpreted as the other format merely because retopology is present.
+    if(version>=8 || j.contains("source_materials") || binding_keys) {
+      if(!j.contains("source_materials") || binding_keys!=objects.size())
+        throw std::runtime_error("Incomplete source-material scene fields");
+      material_fields=true;
+    }
+    if(version>=8 || retopology_keys) {
+      if(retopology_keys!=objects.size())throw std::runtime_error("Incomplete retopology scene fields");
+      retopology_fields=true;
+    }
+    if(!material_fields && !retopology_fields)throw std::runtime_error("Unknown legacy version-seven scene shape");
+  } else {
+    if(j.contains("source_materials"))throw std::runtime_error("Resolved source materials require scene version seven or later");
+    for(const auto &object:objects)
+      if((object.contains("material_bindings") && !object.at("material_bindings").is_null()) ||
+         (object.contains("retopology") && !object.at("retopology").is_null()))
+        throw std::runtime_error("Retained material/topology records require scene version seven or later");
+  }
+  const bool dormant_deformation=version>=8 || (version==7 && material_fields);
   // The pre-integration baked checkpoint used v5 without group/archive fields.
   bool legacy_baked5 = j.at("version") == 5 && !j.contains("groups") &&
       !j.contains("source_images") && !j.contains("source_models") &&
@@ -282,6 +360,43 @@ Scene Scene::decode(const nlohmann::json &j) {
         return !o.at("painted").is_null() && o.at("painted").contains("baked");
       });
   bool archives = j.at("version") >= 5 && !legacy_baked5;
+  if(j.at("version")>=7) {
+    // Include retained original paint surfaces before any implicit UV raster
+    // allocation; a tiny file must not request hundreds of huge SurfaceMaps.
+    size_t pixels=0,storage=0;
+    auto preflight=[&](const nlohmann::json &paint) {
+      if(paint.is_null())return;
+      const auto &resolution=paint.at("resolution");
+      if(!resolution.is_number_unsigned() && (!resolution.is_number_integer() || resolution.get<int64_t>()<64))
+        throw std::runtime_error("Invalid retained painting resolution");
+      auto r=resolution.get<uint64_t>();
+      if(r<64 || r>2048 || (r&(r-1)))throw std::runtime_error("Invalid retained painting resolution");
+      pixels+=size_t(r)*r;
+      const auto &layers=paint.at("layers");
+      if(!layers.is_array() || layers.empty() || layers.size()>16)throw std::runtime_error("Invalid retained paint layers");
+      for(const auto &layer:layers) {
+        if(!layer.at("tiles").is_array())throw std::runtime_error("Invalid retained paint tiles");
+        storage+=layer.at("tiles").size()*sizeof(PaintTile);
+      }
+      if(paint.contains("baked"))for(const auto *key:{"color","orm","emission","normal","coverage"}) {
+        const auto &bytes=paint.at("baked").at(key);
+        if(!bytes.is_binary())throw std::runtime_error("Invalid retained baked buffer");
+        storage+=bytes.get_binary().size();
+      }
+      if(pixels>16*1024*1024 || storage>256*1024*1024)
+        throw std::length_error("Scene retained painting allocations exceed budget");
+    };
+    if(material_fields) {
+      const auto &materials=j.at("source_materials");
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || materials.at("version")!=1 ||
+         !materials.at("paints").is_array() || materials.at("paints").size()>256)
+        throw std::runtime_error("Invalid retained source-material archive");
+      for(const auto &paint:materials.at("paints"))preflight(paint);
+    }
+    if(!j.at("objects").is_array() || j.at("objects").empty() || j.at("objects").size()>256)
+      throw std::runtime_error("Invalid scene object count");
+    for(const auto &object:j.at("objects"))preflight(object.at("painted"));
+  }
   auto id = [](const nlohmann::json &v) {
     if (!v.is_number_unsigned() &&
         (!v.is_number_integer() || v.get<int64_t>() <= 0))
@@ -291,10 +406,50 @@ Scene Scene::decode(const nlohmann::json &j) {
       throw std::runtime_error("Invalid scene ID");
     return n;
   };
+  const auto next_id=id(j.at("next_id"));
+  std::set<uint64_t> scene_ids;
+  for(const auto &object:objects) {
+    const auto object_id=id(object.at("id"));
+    if(object_id>=next_id || !scene_ids.insert(object_id).second)throw std::runtime_error("Invalid scene object identity");
+  }
+  if(!scene_ids.contains(id(j.at("active"))))throw std::runtime_error("Invalid active scene identity");
+  if(retopology_fields) {
+    size_t payload_bytes=0,entries=0;std::map<uint64_t,uint64_t> references;
+    for(const auto &object:objects)if(!object.at("retopology").is_null()) {
+      const auto &patch=object.at("retopology");
+      if(!patch.is_object() || patch.size()!=2 || !patch.at("topology").is_string())
+        throw std::runtime_error("Invalid retopology record");
+      if(object.at("painted").is_null())throw std::runtime_error("Retopology has no retained display mesh");
+      const auto source=id(patch.at("source")),object_id=id(object.at("id"));
+      if(source>=next_id || source==object_id)throw std::runtime_error("Invalid retopology source reference");
+      references.emplace(object_id,source);
+      const auto &payload=patch.at("topology").get_ref<const std::string &>();
+      if(payload.size()>64*1024*1024-payload_bytes)throw std::length_error("Scene retopology payload budget exceeded");
+      payload_bytes+=payload.size();
+      // Count every patch before allocating any persistent topology maps.
+      // The temporary parse is independently byte/depth bounded; RetopoMesh's
+      // decoder still validates all IDs, rows and geometry afterwards.
+      auto metadata=nlohmann::json::parse(payload,[](int depth,nlohmann::json::parse_event_t,nlohmann::json &) {
+        if(depth>32)throw std::length_error("Topology JSON nesting exceeds limit");
+        return true;
+      });
+      if(!metadata.is_object() || metadata.size()!=5 || !metadata.at("version").is_number_integer() || metadata.at("version")!=1)
+        throw std::runtime_error("Unsupported topology format");
+      for(const auto *field:{"vertices","edges","faces"}) {
+        const auto &records=metadata.at(field);const size_t maximum=std::string_view(field)=="edges"?300'000:100'000;
+        if(!records.is_array() || records.size()>maximum)throw std::length_error("Topology record budget exceeded");
+        entries+=records.size();
+        if(entries>1'000'000)throw std::length_error("Scene retopology budget exceeded");
+      }
+    }
+    retopology_acyclic(references);
+  }
   PaintImageArchive source_images;
   if (archives) source_images = PaintImageArchive::decode(j.at("source_images"));
   CreatorAssetArchive source_models;
   if (archives) source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
+  SourceMaterialArchive source_materials;
+  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -319,11 +474,8 @@ Scene Scene::decode(const nlohmann::json &j) {
       result.groups_.push_back(std::move(g));
     }
   }
-  const auto &objects = j.at("objects");
-  if (!objects.is_array() || objects.empty() || objects.size() > 256)
-    throw std::length_error("Invalid scene object count");
   result.objects_.clear();
-  size_t samples = 0, texels = 0, deformation_entries = 0, paint_bytes = 0, retopo_bytes = 0;
+  size_t samples = 0, texels = 0, deformation_entries = 0, paint_bytes = 0;
   for (auto &v : objects) {
     SculptObject o;
     o.id = id(v.at("id"));
@@ -381,17 +533,14 @@ Scene Scene::decode(const nlohmann::json &j) {
         if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
       }
     }
-    if (j.at("version") >= 7 && !v.at("retopology").is_null()) {
-      const auto &patch = v.at("retopology");
-      const auto &payload = patch.at("topology").get_ref<const std::string &>();
-      retopo_bytes += payload.size();
-      if (retopo_bytes > 64 * 1024 * 1024) throw std::length_error("Scene retopology payload budget exceeded");
-      o.retopology = std::make_shared<const RetopoPatch>(RetopoPatch{
-          id(patch.at("source")), RetopoMesh::decode(payload)});
+    if(retopology_fields && !v.at("retopology").is_null()) {
+      const auto &patch=v.at("retopology");
+      o.retopology=std::make_shared<const RetopoPatch>(RetopoPatch{
+        id(patch.at("source")),RetopoMesh::decode(patch.at("topology").get_ref<const std::string &>())});
     }
     if (j.at("version") >= 4 && !v.at("deformation").is_null()) {
-      if (!o.mesh_active || !o.painted)
-        throw std::runtime_error("Deformation has no active rest mesh");
+      if (!o.painted || (!o.mesh_active && !dormant_deformation))
+        throw std::runtime_error("Dormant deformation requires a retained rest mesh and source-material scene schema");
       const auto &d = v.at("deformation");
       deformation_entries += d.at("pose").size() + d.at("morph_weights").size();
       if (!d.at("skin").is_null())
@@ -410,6 +559,12 @@ Scene Scene::decode(const nlohmann::json &j) {
       if (remap_vertices > 8'000'000) throw std::length_error("Creator source remap budget exceeded");
       o.appearance = decode_creator_appearance(v.at("appearance"), source_models);
     }
+    if(material_fields && !v.at("material_bindings").is_null()) {
+      const auto &binding=v.at("material_bindings");
+      if((!binding.is_number_unsigned() && (!binding.is_number_integer() || binding.get<int64_t>()<0)) ||
+         binding.get<uint64_t>()>UINT32_MAX)throw std::runtime_error("Invalid resolved material identity");
+      o.material_bindings=source_materials.at(binding.get<uint32_t>());
+    }
     result.objects_.push_back(std::move(o));
   }
   result.validate();
@@ -421,17 +576,35 @@ void Scene::save(const std::filesystem::path &path) const {
     throw std::length_error("Scene exceeds file size limit");
   atomic_write(path, bytes);
 }
-Scene Scene::load(const std::filesystem::path &path) {
-  if (std::filesystem::file_size(path) > 256 * 1024 * 1024)
+Scene Scene::load(const std::filesystem::path &path) { return load(path, {}); }
+Scene Scene::load(const std::filesystem::path &path, const std::function<bool()> &cancelled) {
+  constexpr size_t limit = 256 * 1024 * 1024;
+  auto check = [&] { if (cancelled && cancelled()) throw std::runtime_error("Project loading cancelled"); };
+  check();
+  if (std::filesystem::file_size(path) > limit)
     throw std::length_error("Scene exceeds file size limit");
   std::ifstream input(path, std::ios::binary);
-  if (!input)
-    throw std::runtime_error("Cannot open scene");
-  std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input)), {});
-  return decode(nlohmann::json::from_cbor(bytes));
+  if (!input) throw std::runtime_error("Cannot open scene");
+  std::vector<uint8_t> bytes;
+  std::array<char, 65536> chunk;
+  while (input) {
+    check();
+    input.read(chunk.data(), chunk.size());
+    auto count = size_t(input.gcount());
+    if (count > limit - bytes.size()) throw std::length_error("Scene exceeds file size limit");
+    bytes.insert(bytes.end(), chunk.data(), chunk.data() + count);
+  }
+  if (!input.eof()) throw std::runtime_error("Cannot read scene");
+  check();
+  auto json = nlohmann::json::from_cbor(bytes);
+  check();
+  auto result = decode(json);
+  check();
+  return result;
 }
 std::vector<ObjectSurface>
 Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
+  require_exportable_sources();
   return surfaces_impl(atlas, false, cancelled);
 }
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled) const {
@@ -450,7 +623,10 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
            o.mesh_active ? (preview ? o.painted->preview(o.material) : o.painted->composite(o.material)) : nullptr,
-           o.deformation, group_path(o.group), o.appearance});
+           o.mesh_active ? o.deformation : nullptr, group_path(o.group),
+           o.mesh_active ? o.appearance : nullptr,
+           o.mesh_active ? o.material_bindings : nullptr,
+           source_is_dormant(o)});
     }
   return result;
 }

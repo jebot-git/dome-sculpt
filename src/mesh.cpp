@@ -3,6 +3,20 @@
 #include <map>
 #include <set>
 namespace dome {
+namespace {
+// The input coordinates are floats, but a fixed square-metre area cutoff
+// incorrectly deletes valid small faces and opens otherwise closed isosurfaces.
+// Evaluate the actual cross product in double precision; only collinear or
+// coincident positions are geometrically degenerate, independent of units.
+std::array<double,3> face_cross(Vec3 a,Vec3 b,Vec3 c) {
+  double x=double(b.x)-a.x,y=double(b.y)-a.y,z=double(b.z)-a.z;
+  double u=double(c.x)-a.x,v=double(c.y)-a.y,w=double(c.z)-a.z;
+  return {y*w-z*v,z*u-x*w,x*v-y*u};
+}
+bool zero_face(const std::array<double,3> &n) {
+  return n[0]==0 && n[1]==0 && n[2]==0;
+}
+}
 void Mesh::validate() const {
   if (positions.empty() || indices.empty() || indices.size() % 3)
     throw std::runtime_error("Mesh has no triangle surface");
@@ -28,7 +42,7 @@ void Mesh::validate() const {
         throw std::runtime_error("Mesh index out of bounds");
     auto a = positions[indices[t]], b = positions[indices[t + 1]],
          c = positions[indices[t + 2]];
-    if (dot(cross(b - a, c - a), cross(b - a, c - a)) < 1e-20f)
+    if (zero_face(face_cross(a,b,c)))
       throw std::runtime_error("Degenerate mesh triangle");
   }
 }
@@ -73,11 +87,10 @@ Mesh surface_mesh(const Volume &field, const std::function<bool()> &cancelled) {
   auto triangle = [&](uint32_t a, uint32_t b, uint32_t c, Vec3 outward) {
     if (a == b || b == c || a == c)
       return;
-    Vec3 n = cross(result.positions[b] - result.positions[a],
-                   result.positions[c] - result.positions[a]);
-    if (dot(n, n) < 1e-20f)
+    auto n=face_cross(result.positions[a],result.positions[b],result.positions[c]);
+    if (zero_face(n))
       return;
-    if (dot(n, outward) < 0)
+    if (n[0]*outward.x+n[1]*outward.y+n[2]*outward.z < 0)
       std::swap(b, c);
     result.indices.insert(result.indices.end(), {a, b, c});
   };
@@ -94,7 +107,9 @@ Mesh surface_mesh(const Volume &field, const std::function<bool()> &cancelled) {
       int inside[4], outside[4], ni = 0, no = 0;
       Vec3 in{}, out{};
       for (auto v : tet) {
-        Vec3 point{float(p[v].x), float(p[v].y), float(p[v].z)};
+        // Winding depends only on relative corner positions. Large grid
+        // coordinates must not erase the centroid difference through rounding.
+        Vec3 point{float(p[v].x-cell.x), float(p[v].y-cell.y), float(p[v].z-cell.z)};
         if (d[v] < 0) {
           inside[ni++] = v;
           in += point;

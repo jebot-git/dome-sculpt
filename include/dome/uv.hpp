@@ -14,6 +14,8 @@ struct UvTopology {
   std::vector<std::vector<uint32_t>> islands;
   std::vector<UvEdge> edges;
   explicit UvTopology(const Mesh &);
+  UvTopology(const Mesh &, const std::function<bool()> &cancelled,
+             size_t maximum_work);
 };
 struct UvView {
   std::shared_ptr<const Mesh> mesh;
@@ -48,10 +50,21 @@ enum class UvAction {
   Conformal,
   Stitch
 };
+struct UvInitializationLimits {
+  size_t maximum_vertices = 200'000, maximum_triangles = 400'000;
+  size_t maximum_work = 50'000'000, maximum_bytes = 256 * 1024 * 1024;
+};
 // Both frontends operate the same draft; commit resamples paint off-thread.
 class UvWorkspace {
 public:
   explicit UvWorkspace(Mesh, uint32_t resolution, bool defer_validation = false);
+  // Constant-work loading stub: retains an immutable source without geometry
+  // copies, validation, identity arrays or topology construction.
+  UvWorkspace(std::shared_ptr<const Mesh>, uint32_t resolution);
+  // Worker-only transactional initialization. Cancellation/failure leaves this
+  // stub exact; validate its initialized mesh separately before publication.
+  void initialize(const std::function<bool()> &cancelled = {},
+                  UvInitializationLimits = {});
   const UvView &view() const { return view_; }
   void edit(UvAction, float x = 0, float y = 0,
             const std::function<bool()> &cancelled = {});

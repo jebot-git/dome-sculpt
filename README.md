@@ -44,10 +44,12 @@ needed to run the build.
 - `ONEAPI`: SYCL GPU kernel; configure with `-DCMAKE_CXX_COMPILER=icpx` and install
   the matching GPU driver/runtime.
 
-Accelerator implementations have not been compiled or run on this machine,
-which currently has none of those development toolchains. Requested GPU
-backends fail rather than silently changing to CPU. Passing CPU checks does
-not establish accelerator correctness or performance.
+The ONEAPI production core and brush path have now run on the Intel Arc A770,
+including CPU-reference, native model/undo and missing-GPU checks. Its queue and
+bounded device buffers are reused; only changed distances return to the host.
+HIP has compile-only evidence on this host; CUDA and AMD hardware execution
+remain unverified. Requested GPU backends fail rather than silently changing
+to CPU. See [compute validation and scope](docs/COMPUTE-VALIDATION.md).
 
 ## Current native workflow
 
@@ -129,6 +131,11 @@ The default is a DomeD overlay, requiring `XR_EXTX_overlay`,
 a primary XR session. The reference space is STAGE when available, otherwise
 LOCAL. Per-eye poses and fields of view come from the runtime.
 
+In standalone XR mode, SIGINT or SIGTERM requests normal shutdown. The current
+frame finishes, completed edits and accepted file work drain, and `--save`
+writes the final native project. Unfinished gestures are cancelled. This also
+releases the OpenXR session without stopping DomeD.
+
 Squeeze one controller to move the canvas; squeeze both to rotate and scale it.
 Trigger pressure sculpts at the tracked tip. Press the joystick to anchor the
 BDF menu, tilt it to select and press again to confirm. Starting at the right
@@ -186,9 +193,11 @@ and tracking loss, reference-space changes, object creation, material changes,
 layered painting, continuous slider input, file commands and overlay selection.
 The installed Monado runtime also completed a bounded 12-frame run with 11
 stereo submissions, but reported a simulated HMD and no controllers. Neither
-fixture establishes physical headset or stylus behavior. Current validation and remaining production work are recorded in
-[the agent handoff](docs/HANDOFF.md). No accelerator hardware tests
-have been performed.
+fixture establishes physical headset or stylus behavior. The user subsequently
+confirmed basic operation of milestone8f4d67d on the real WiVRn HMD/controllers;
+full device workflows remain unverified. Current validation and remaining work
+are recorded in [the agent handoff](docs/HANDOFF.md) and
+[compute evidence](docs/COMPUTE-VALIDATION.md).
 
 
 Current DomeD/FLTK toolkit selection, runtime-library precedence and the generated

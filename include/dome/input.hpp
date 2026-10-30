@@ -69,6 +69,7 @@ enum class SpatialCommand {
   BakeSurface, ClearBake, CancelWork,
   ExportAvatar,
   WeightToggle, WeightMode, WeightSymmetry, WeightLock, WeightLinked,
+  BindSkin, SkinUseLocks,
   RetopoBegin, RetopoMode, RetopoFace, RetopoWire, RetopoDelete, RetopoRelax,
   RetopoPin, RetopoSeam, RetopoApply, RetopoCancel,
   CutBegin, CutHand, CutFlip, CutCap, CutApply, CutCancel

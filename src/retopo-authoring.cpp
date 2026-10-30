@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
+#include "text-utf8.hpp"
 namespace dome {
 namespace {
 ob::Vec3 obv(Vec3 p) { return {p.x, p.y, p.z}; }
@@ -12,7 +13,11 @@ RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()>
   const auto &active = scene.active();
   if (!active.visible || active.locked) throw std::logic_error("Show and unlock the object before retopology");
   source_object_ = active.retopology ? active.retopology->source : active.id;
-  const auto &source = scene.object(source_object_);
+  auto source_it = std::find_if(scene.objects().begin(), scene.objects().end(),
+                                [&](const auto &object) { return object.id == source_object_; });
+  if (source_it == scene.objects().end())
+    throw std::logic_error("Retopology reference deleted or unavailable; restore or choose a source");
+  const auto &source = *source_it;
   view_.transform = scene.world_transform(active.id);
   auto source_transform = scene.world_transform(source.id);
   auto mesh = source.mesh_active ? (source.deformation ? source.deformation->preview(source.painted->mesh())
@@ -69,8 +74,10 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
       auto &to = action == RetopoAction::Undo ? redo_ : undo_;
       if (!from.empty()) { to.push_back(view_); view_ = from.back(); from.pop_back(); }
     }
-  } else if (action == RetopoAction::Mode) {
-    finish_gesture(false); view_.moving = !view_.moving;
+  } else if (action == RetopoAction::Mode || action == RetopoAction::PlaceMode || action == RetopoAction::MoveMode) {
+    const bool moving = action == RetopoAction::Mode ? !view_.moving : action == RetopoAction::MoveMode;
+    if (moving == view_.moving && !gesture_) return;
+    finish_gesture(false); view_.moving = moving;
   } else if (action == RetopoAction::Clear) {
     finish_gesture(false); view_.selected.clear();
   } else {
@@ -161,6 +168,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
                             CanvasTransform transform, const std::function<bool()> &cancelled) {
   stop(cancelled);
   auto previous = scene.active();
+  if (!text::valid_utf8(previous.name)) throw std::invalid_argument("Object names must be valid UTF-8");
   if (!previous.visible || previous.locked) throw std::logic_error("Retopology target changed");
   scene.object(source);
   auto triangles = topology.triangulate(cancelled);
@@ -170,7 +178,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   auto painted = std::make_shared<PaintedMesh>(std::move(triangles.mesh), 512);
   auto patch = std::make_shared<const RetopoPatch>(RetopoPatch{source, topology});
   // Construct all heavy/throwing data before modifying the detached scene.
-  auto id = scene.add(previous.name.substr(0, 240) + " retopo", Volume{}, transform);
+  auto id = scene.add(text::utf8_prefix(previous.name,240) + " retopo", Volume{}, transform);
   auto &object = scene.object(id);
   object.painted = std::move(painted); object.mesh_active = true;
   object.material = previous.material; object.retopology = std::move(patch);

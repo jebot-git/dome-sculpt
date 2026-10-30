@@ -10,6 +10,9 @@ void require(bool yes, const char *message) {
     throw std::runtime_error(message);
   std::cout << "PASS " << message << '\n';
 }
+bool rejects_value(auto fn) {
+  try {fn();return false;} catch(const std::exception &) {return true;}
+}
 void rejects(auto fn, const char *message) {
   bool failed = false;
   try {
@@ -133,10 +136,16 @@ int main() try {
     o.erase("deformation");
   require(!Scene::decode(legacy).active().deformation,
           "Version-three mesh scenes migrate without invented deformation");
-  auto bad = loaded.encode();
-  bad["objects"][0]["mesh_active"] = false;
-  rejects([&] { Scene::decode(bad); },
-          "Deformation on an inactive rest mesh is rejected");
+  for(int version:{4,5,6}) {
+    auto active=loaded.encode();active["version"]=version;auto bad=active;bad["objects"][0]["mesh_active"]=false;
+    require(!rejects_value([&]{Scene::decode(active);}) && rejects_value([&]{Scene::decode(bad);}),
+            "Old scene formats accept active rest meshes and reject newly invented dormant deformation semantics");
+  }
+  auto dormant = loaded;dormant.object(dormant.objects().front().id).mesh_active=false;auto dormant_encoded=dormant.encode();
+  require(dormant_encoded["version"]==8 && Scene::decode(dormant_encoded).encode()==dormant_encoded &&
+          dormant_encoded["source_materials"]["bindings"].empty() && dormant_encoded["source_materials"]["origins"].empty() && dormant_encoded["source_materials"]["paints"].empty() &&
+          dormant_encoded["source_images"]==loaded.encode()["source_images"] && dormant_encoded["source_models"]==loaded.encode()["source_models"],
+          "Dormant deformation uses version 8 and retains its exact rest mesh through native restart");
   loaded.active().painted = std::make_shared<PaintedMesh>(stale, 64);
   rejects([&] { loaded.validate(); },
           "Scene validation detects reparameterized/replaced source indices");

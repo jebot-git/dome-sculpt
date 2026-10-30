@@ -29,9 +29,13 @@ enum class VrParameter {
   BakeSource, BakeDistances, BakeQuality,
   WeightStrength,
   WeightValue,
+  SkinSource, SkinMode, SkinDistances, SkinFalloff, SkinInfluences, SkinPrune,
   RetopoDistance,
   CutOffset, CutDirection, CutCapColor
 };
+inline bool skin_parameter(VrParameter parameter) {
+  return parameter>=VrParameter::SkinSource && parameter<=VrParameter::SkinPrune;
+}
 struct VrControlState {
   VrParameter parameter = VrParameter::None;
   std::string title;

@@ -10,6 +10,7 @@
 #include "creator-editor.hpp"
 #include "rig-editor.hpp"
 #include "weight-editor.hpp"
+#include "skin-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
@@ -25,12 +26,42 @@
 #include <FL/gl.h>
 #include <FL/glu.h>
 #include <bit>
+#include <atomic>
+#include <csignal>
 #include <functional>
 #include <iostream>
 #include <sstream>
 #include <thread>
 using namespace dome;
 namespace {
+#ifdef DOME_HAS_XR
+// A signal handler only requests a stop. Frame completion, input draining,
+// OpenXR cleanup and final saving happen normally on the application threads.
+std::atomic_bool standalone_xr_stop{false};
+static_assert(std::atomic_bool::is_always_lock_free);
+void request_standalone_xr_stop(int) {
+  standalone_xr_stop.store(true, std::memory_order_relaxed);
+}
+class StandaloneXrSignals {
+  using Handler = void (*)(int);
+  Handler previous_int_, previous_term_;
+public:
+  StandaloneXrSignals() {
+    standalone_xr_stop.store(false);
+    previous_int_ = std::signal(SIGINT, request_standalone_xr_stop);
+    if (previous_int_ == SIG_ERR) throw std::runtime_error("Cannot install XR interrupt handler");
+    previous_term_ = std::signal(SIGTERM, request_standalone_xr_stop);
+    if (previous_term_ == SIG_ERR) {
+      std::signal(SIGINT, previous_int_);
+      throw std::runtime_error("Cannot install XR termination handler");
+    }
+  }
+  ~StandaloneXrSignals() {
+    std::signal(SIGTERM, previous_term_);
+    std::signal(SIGINT, previous_int_);
+  }
+};
+#endif
 struct Canvas : Fl_Gl_Window {
   Document document;
   std::unique_ptr<SurfaceRenderer> renderer;
@@ -381,6 +412,7 @@ struct App {
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
     menu.add("&Scene/Skin weights...", 0, command, this);
+    menu.add("&Scene/Bind or transfer skin...", 0, command, this);
     menu.add("&Scene/Rig and shapekeys...", 0, command, this);
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
     menu.add("&Mesh/Bake surface...",0,command,this);
@@ -544,6 +576,7 @@ struct App {
         std::find_if(s->objects.begin(), s->objects.end(),
                      [&](auto &o) { return o.id == s->active_object; });
     enable("&Scene/Skin weights...", !modal && !s->asset_busy && s->can_paint_weights);
+    enable("&Scene/Bind or transfer skin...", !modal && s->can_configure_skin);
     enable("&Scene/Rig and shapekeys...", !modal && !s->asset_busy &&
            s->mesh_active && bool(s->deformation) && active != s->objects.end() &&
            active->visible && !active->locked);
@@ -643,14 +676,14 @@ struct App {
     enable("&Mesh/Retopology/Delete points", editing && selected != 0);
     enable("&Mesh/Retopology/Snap points", editing && selected != 0);
     enable("&Mesh/Retopology/Apply patch", editing && retopo->topology && !retopo->topology->faces().empty() && retopo->changed);
-    enable("&Mesh/Retopology/Cancel patch", !modal && retopo && !retopo->committing);
+    enable("&Mesh/Retopology/Cancel patch", !modal && retopo && (!s->asset_busy || s->can_cancel_asset));
     checked("&Mesh/Retopology/Place points", !retopo || !retopo->moving);
     checked("&Mesh/Retopology/Move points", retopo && retopo->moving);
     enable("&Mesh/Plane cut/Start cut",!modal&&s->can_cut);
     auto cut=s->cut;bool cutting=!modal&&cut&&!cut->committing&&!s->asset_busy;
     for(auto label:{"Offset...","Direction...","Cap color...","Flip kept side","Cap cut"})
       enable((std::string("&Mesh/Plane cut/")+label).c_str(),cutting&&cut->ready);
-    enable("&Mesh/Plane cut/Cancel cut",cutting);
+    enable("&Mesh/Plane cut/Cancel cut",!modal&&cut&&(!cut->committing||s->can_cancel_asset));
     enable("&Mesh/Plane cut/Apply cut",cutting&&!cut->busy&&cut->preview&&cut->preview_request==cut->request&&cut->preview->changed);
     checked("&Mesh/Plane cut/Cap cut",!cut||cut->settings.cap);
     checked("&Mesh/Plane cut/Flip kept side",cut&&cut->settings.flipped);
@@ -666,6 +699,7 @@ struct App {
          << " | Drag: trackball  Shift+drag: sculpt  Wheel: zoom";
     auto current_frame = canvas.document.frame();
     auto info = current_frame.state;
+    project = info->project_path;
     auto active =
         std::find_if(info->objects.begin(), info->objects.end(),
                      [&](auto &o) { return o.id == info->active_object; });
@@ -800,10 +834,7 @@ struct App {
         return;
       auto path = fl_file_chooser("Open sculpt project", "*.dsculpt", nullptr);
       if (path) {
-        canvas.document.open(path);
-        canvas.invalidate();
-        project = path;
-        dirty = false;
+        canvas.document.open_async(path);
       }
     } else if (label == "Save" || label == "Save As...") {
       auto path = project;
@@ -815,9 +846,7 @@ struct App {
           return;
         path = chosen;
       }
-      canvas.document.save(path);
-      project = path;
-      dirty = false;
+      canvas.document.save_async(path);
     } else if (label == "Close Window" || label == "Quit") {
       if (discard())
         window.hide();
@@ -847,6 +876,8 @@ struct App {
       canvas.document.duplicate_object();
     } else if (label == "Delete object") {
       canvas.document.delete_object();
+    } else if (label == "Bind or transfer skin...") {
+      edit_skin_dialog(canvas.document);
     } else if (label == "Skin weights...") {
       edit_weights_dialog(canvas.document);
     } else if (label == "Rig and shapekeys...") {
@@ -890,8 +921,7 @@ struct App {
     } else if (label == "Apply patch" || label == "Cancel patch") {
       canvas.document.end_retopology(label == "Apply patch");
     } else if (label == "Place points" || label == "Move points") {
-      if (canvas.document.frame().state->retopology->moving != (label == "Move points"))
-        canvas.document.edit_retopology(RetopoAction::Mode);
+      canvas.document.edit_retopology(label == "Move points" ? RetopoAction::MoveMode : RetopoAction::PlaceMode);
     } else if (label == "Projection distance...") {
       edit_retopology_distance(canvas.document);
     } else if (label == "Make face" || label == "Connect edge" || label == "Delete points" ||
@@ -1021,6 +1051,7 @@ int main(int argc, char **argv) try {
     return 0;
   }
   if (argc >= 2 && std::string(argv[1]) == "--xr") {
+    StandaloneXrSignals termination;
     Document document;
     document.seed();
     unsigned frames = 0;
@@ -1051,13 +1082,19 @@ int main(int argc, char **argv) try {
     }
     document.wait_mesh();
     {
-      XrSculpt xr(document, nullptr, overlay);
+      XrSculpt xr(document, &standalone_xr_stop, overlay);
       xr.run(frames);
     }
     if (!save.empty()) {
       if (!document.wait_asset(std::chrono::seconds(180)))
         throw std::runtime_error(
             "Pending mesh/UV work did not finish before saving");
+      // A standalone session has no desktop to resume an unconfirmed patch.
+      // Accepted work has drained above; discard only the remaining draft.
+      if (auto view = document.frame().state->retopology; view && !view->committing)
+        document.end_retopology(false);
+      if (auto view = document.frame().state->cut; view && !view->committing)
+        document.end_cut(false);
       document.save(save);
     }
     return 0;
@@ -1123,6 +1160,10 @@ int main(int argc, char **argv) try {
     for (auto value : encoded.at("objects")) {
       bool visible = value.at("visible");
       value.erase("visible");
+      // Plain scenes omit the v8 feature keys; extended scenes include nulls
+      // for unaffected objects. Hash their identical semantic payload equally.
+      for (const auto *key : {"material_bindings", "retopology"})
+        if (value.contains(key) && value.at(key).is_null()) value.erase(key);
       objects.push_back({{"id", value.at("id")}, {"name", value.at("name")},
                          {"visible", visible}, {"mesh_active", value.at("mesh_active")},
                          {"baked",value.contains("painted") && value.at("painted").contains("baked")},
@@ -1163,10 +1204,7 @@ int main(int argc, char **argv) try {
   if (argc == 3 && std::string(argv[1]) == "--smoke-test")
     app.canvas.capture = argv[2];
   else if (argc == 2) {
-    app.canvas.document.open(argv[1]);
-    app.canvas.invalidate();
-    app.project = argv[1];
-    app.dirty = false;
+    app.canvas.document.open_async(argv[1]);
     app.update_status();
   } else if (argc != 1) {
     std::cerr << "Usage: dome-sculpt [project.dsculpt] [--smoke-test image.ppm "

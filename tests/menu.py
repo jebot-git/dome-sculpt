@@ -173,7 +173,10 @@ async def main():
 
         async def click(label):
             nodes, _ = await layout()
+            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow or retopo_flow) else None
             await menu.call_event(nodes[label][0], "clicked", Variant("i", 0), 0)
+            if saved is not None:
+                await wait(lambda: fixture.stat().st_mtime_ns != saved)
             await asyncio.sleep(0.4)
 
         def key(name, down=None):
@@ -336,6 +339,7 @@ async def main():
                   "Actual retopology tool switching updates exported radio feedback")
             await click("Apply patch");await ready("Save");await click("Save")
             accepted=info()
+            (out / "accepted-scene.json").write_text(json.dumps({"baseline": baseline, "accepted": accepted}, indent=2))
             check(len(accepted["objects"])==2 and accepted["retopology_vertices"]==4 and accepted["retopology_faces"]==1
                   and accepted["objects"][0]["payload_hash"]==baseline["objects"][0]["payload_hash"]
                   and accepted["objects"][0]["visible"] is False,

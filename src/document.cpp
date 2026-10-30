@@ -54,17 +54,12 @@ Document::Document() : input_(volume()) {
     retopo_thread_ = std::thread([this] { retopo_loop(); });
     cut_thread_ = std::thread([this] { cut_loop(); });
   } catch (...) {
-    stopping_ = true;
+    request_worker_stop();
     {
       std::lock_guard lock(file_mutex_);
       files_stopping_ = true;
     }
-    mesh_changed_.notify_all();
-    input_changed_.notify_all();
     file_changed_.notify_all();
-    uv_changed_.notify_all();
-    retopo_changed_.notify_all();
-    cut_changed_.notify_all();
     if (input_thread_.joinable())
       input_thread_.join();
     if (mesh_thread_.joinable())
@@ -78,13 +73,19 @@ Document::Document() : input_(volume()) {
     throw;
   }
 }
-Document::~Document() {
+void Document::request_worker_stop() {
   stopping_ = true;
-  mesh_changed_.notify_all();
-  input_changed_.notify_all();
-  uv_changed_.notify_all();
-  retopo_changed_.notify_all();
-  cut_changed_.notify_all();
+  // The flag is atomic for long-running jobs, but condition waiters still
+  // require a handshake with EACH predicate mutex. Otherwise a notification
+  // can arrive after a false predicate check and before wait registration.
+  { std::lock_guard lock(mesh_mutex_); mesh_changed_.notify_all(); }
+  { std::lock_guard lock(input_mutex_); input_changed_.notify_all(); }
+  { std::lock_guard lock(uv_mutex_); uv_changed_.notify_all(); }
+  { std::lock_guard lock(retopo_mutex_); retopo_changed_.notify_all(); }
+  { std::lock_guard lock(cut_mutex_); cut_changed_.notify_all(); }
+}
+Document::~Document() {
+  request_worker_stop();
   input_thread_.join();
   {
     std::lock_guard lock(file_mutex_);
@@ -410,6 +411,7 @@ void Document::publish_locked(bool force) {
     last_paint_ = paint_revision;
     ++state_.revision;
   }
+  state_.project_path = path_;
   state_.active_object = scene_.active().id;
   state_.objects.clear();
   for (auto &o : scene_.objects())
@@ -448,6 +450,14 @@ void Document::publish_locked(bool force) {
   state_.can_cut = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && active.visible && !active.locked && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||active.volume->stored_samples()!=0);
+  state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
+  if(std::find(state_.skin_sources.begin(),state_.skin_sources.end(),state_.skin_options.reference)==state_.skin_sources.end()) {
+    auto self=std::find(state_.skin_sources.begin(),state_.skin_sources.end(),active.id);
+    state_.skin_options.reference=self!=state_.skin_sources.end()?active.id:
+      state_.skin_sources.empty()?0:state_.skin_sources.front();
+  }
+  state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
+  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
   state_.can_retopologize = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && active.visible && !active.locked &&
       scene_.objects().size() < 256 && (active.mesh_active || active.volume->stored_samples() != 0);
@@ -547,7 +557,8 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::MorphWeight &&
                         state_.controls.parameter != VrParameter::BakeSource &&
                         state_.controls.parameter != VrParameter::BakeDistances &&
-                        state_.controls.parameter != VrParameter::BakeQuality);
+                        state_.controls.parameter != VrParameter::BakeQuality &&
+                        !skin_parameter(state_.controls.parameter));
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
   bool weight_action = weight_stroking_;
@@ -618,7 +629,7 @@ bool Document::begin_desktop() {
   if (control_before_ || uv_ || state_.asset_busy || action_active_locked() ||
       input_.menu_open() || !scene_.active().visible ||
       scene_.active().locked ||
-      (!scene_.active().mesh_active && !volume().editable_layer()))
+      (!state_.retopology && !scene_.active().mesh_active && !volume().editable_layer()))
     return false;
   if (state_.retopology && (!state_.retopology->source || retopo_accepting_)) return false;
   input_.cancel();
@@ -940,8 +951,12 @@ void Document::prepare_locked(uint32_t resolution) {
   auto &o = scene_.active();
   if (o.painted && o.painted->has_paint_data())
     throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
+  if (o.retopology)
+    throw std::logic_error("The mesh retains editable retopology; use a separate sculpt target before replacing its geometry");
   if (o.deformation)
     throw std::logic_error("Explicitly remove or transfer rig data before replacing its rest mesh");
+  if (o.appearance || o.material_bindings)
+    throw std::logic_error("The prepared mesh retains original materials; create a separate sculpt target and reproject or bake before replacing it");
   if (o.locked || !o.visible)
     throw std::logic_error(
         "Show and unlock the object before preparing a painting mesh");
@@ -1264,7 +1279,7 @@ void Document::mesh_loop() {
           for (uint32_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(vertex, {1,0,0,1});
           for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
-        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset});
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings});
       }
       if (job->weight_view && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled);
@@ -1305,34 +1320,53 @@ bool Document::wait_input(std::chrono::milliseconds timeout) const {
   return input_changed_.wait_for(
       lock, timeout, [&] { return inputs_.empty() && !processing_; });
 }
-void Document::open(const std::filesystem::path &path) {
-  auto next = Scene::load(path);
-  replace(std::move(next));
+void Document::open(const std::filesystem::path &path) { open_async(path).get(); }
+void Document::save(const std::filesystem::path &path) { save_async(path).get(); }
+std::future<void> Document::open_async(const std::filesystem::path &path) {
+  if (path.empty()) throw std::invalid_argument("Choose a project filename");
+  auto completion = std::make_shared<std::promise<void>>();
+  auto result = completion->get_future();
   std::lock_guard lock(model_mutex_);
-  path_ = path;
-  if (recovery_) {
-    recovery_source_.source_path = path;
-    recovery_->set_source(recovery_source_);
+  finish_locked();
+  if (state_.asset_busy || state_.recovery_busy)
+    throw std::logic_error("Wait for pending authoring work before opening a project");
+  auto work = std::make_shared<AssetWork>();
+  FileJob job{};
+  job.path = path; job.revision = state_.revision; job.generation = state_.generation;
+  job.content = content_; job.open_project = true; job.completion = completion;
+  job.work = work; job.operation_label = "Open project";
+  {
+    std::lock_guard file_lock(file_mutex_);
+    if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
+    files_.push_back(std::move(job));
   }
+  asset_work_.store(std::move(work));
+  state_.asset_busy = true; state_.error.clear(); state_.message = "Opening " + path.string();
+  publish_locked(); file_changed_.notify_one();
+  return result;
 }
-void Document::save(const std::filesystem::path &path) {
+std::future<void> Document::save_async(const std::filesystem::path &path) {
+  if (path.empty()) throw std::invalid_argument("Choose a project filename");
   auto completion = std::make_shared<std::promise<void>>();
   auto result = completion->get_future();
   {
     std::lock_guard lock(model_mutex_);
     finish_locked();
-    if (state_.asset_busy)
-      throw std::logic_error("Wait for mesh/UV preparation before saving");
+    if (state_.asset_busy || state_.recovery_busy)
+      throw std::logic_error("Wait for pending authoring work before saving");
     publish_locked();
-    std::lock_guard file_lock(file_mutex_);
-    if (files_.size() >= 8)
-      throw std::runtime_error("File work queue is full");
-    files_.push_back({scene_.snapshot(), path, state_.revision,
-                      state_.generation, content_, false, true, completion});
-    files_.back().recovery_source = recovery_source_;
+    {
+      std::lock_guard file_lock(file_mutex_);
+      if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
+      files_.push_back({scene_.snapshot(), path, state_.revision,
+                        state_.generation, content_, false, true, completion});
+      files_.back().recovery_source = recovery_source_;
+    }
+    state_.error.clear(); state_.message = "Saving " + path.string();
+    publish_locked();
   }
   file_changed_.notify_one();
-  result.get();
+  return result;
 }
 
 std::future<void> Document::export_asset(const std::filesystem::path &path,
@@ -1399,6 +1433,9 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
   if (state_.retopology) return false;
+  if(skin_parameter(parameter)) return skin_target_ready_locked() &&
+    (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
+      : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
   if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
@@ -1441,6 +1478,23 @@ void Document::finish_control_locked(bool accept) {
     return;
   if(state_.controls.parameter==VrParameter::CutOffset||state_.controls.parameter==VrParameter::CutDirection||state_.controls.parameter==VrParameter::CutCapColor){
     finish_cut_parameter_locked(accept);return;
+  }
+  if(skin_parameter(state_.controls.parameter)) {
+    const auto c=state_.controls;
+    if(accept) {
+      auto &options=state_.skin_options;
+      if(c.parameter==VrParameter::SkinSource) {
+        auto ids=skin_sources_locked(options.mode); options.reference=ids.at(size_t(std::lround(c.value[0])));
+      } else if(c.parameter==VrParameter::SkinMode) options.mode=SkinAuthoringMode(int(std::lround(c.value[0])));
+      else if(c.parameter==VrParameter::SkinDistances) {
+        options.seed_distance=skin_distance_metres(c.value[0]);
+        options.seed_margin=skin_distance_metres(c.value[1]);
+        options.transfer_distance=skin_distance_metres(c.value[2]);
+      } else if(c.parameter==VrParameter::SkinFalloff) options.falloff=c.value[0];
+      else if(c.parameter==VrParameter::SkinInfluences) options.limits.max_influences=uint32_t(std::lround(c.value[0]));
+      else if(c.parameter==VrParameter::SkinPrune) options.limits.prune=c.value[0];
+    }
+    control_before_.reset();control_changed_=false;state_.controls={};return;
   }
   if (state_.controls.parameter == VrParameter::RetopoDistance) {
     retopo_snap_mm_ = accept ? state_.controls.value[0] : control_retopo_mm_;
@@ -1503,7 +1557,8 @@ void Document::finish_control_locked(bool accept) {
     return;
   }
   if (uv_) {
-    if (accept && uv_solving_) throw std::logic_error("Wait for the UV operation before applying");
+    if (accept && (uv_solving_ || !uv_->view().topology))
+      throw std::logic_error("Wait for the UV workspace before applying");
     if (accept && uv_accept_pending_)
       return;
     if (accept && !uv_->view().valid && !uv_->view().validating)
@@ -1572,7 +1627,8 @@ void Document::control_event_locked(VrControlEvent event) {
     if (event.parameter == VrParameter::UvEdit) {
       try {
         ++uv_session_;
-        uv_.emplace(o.painted->mesh(), o.painted->resolution(), true);
+        uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
+                    o.painted->resolution());
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();
@@ -1591,6 +1647,23 @@ void Document::control_event_locked(VrControlEvent event) {
       c.minimum=-180;c.maximum=180;c.value={cut_settings_.yaw,cut_settings_.pitch,0,0};break;
     case VrParameter::CutCapColor:
       control_cut_settings_=cut_settings_;c.title="Cut cap RGBA";c.components=4;c.value=cut_settings_.cap_material.color;break;
+    case VrParameter::SkinSource: {
+      auto ids=skin_sources_locked(state_.skin_options.mode);c.title="Skin reference (rest space)";
+      c.maximum=float(ids.size()-1);
+      auto found=std::find(ids.begin(),ids.end(),state_.skin_options.reference);
+      c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
+    }
+    case VrParameter::SkinMode:
+      c.title="Automatic bind / weight transfer";c.value[0]=int(state_.skin_options.mode);break;
+    case VrParameter::SkinDistances:
+      c.title="Seed / margin / transfer (world mm)";c.components=3;
+      c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;
+    case VrParameter::SkinFalloff:
+      c.title="Automatic bind distance falloff";c.minimum=1;c.maximum=8;c.value[0]=state_.skin_options.falloff;break;
+    case VrParameter::SkinInfluences:
+      c.title="Maximum skin influences";c.minimum=1;c.maximum=32;c.value[0]=state_.skin_options.limits.max_influences;break;
+    case VrParameter::SkinPrune:
+      c.title="Prune influences below";c.maximum=.99f;c.value[0]=state_.skin_options.limits.prune;break;
     case VrParameter::RetopoDistance:
       control_retopo_mm_ = retopo_snap_mm_;
       c.title = "Retopology projection distance (mm)";
@@ -1739,7 +1812,7 @@ void Document::control_event_locked(VrControlEvent event) {
   if (event.type == VrControlEventType::Confirm ||
       event.type == VrControlEventType::Cancel) {
     if (event.type == VrControlEventType::Confirm && uv_ &&
-        !uv_->view().valid && !uv_->view().validating) {
+        (!uv_->view().topology || (!uv_->view().valid && !uv_->view().validating))) {
       state_.error = uv_->view().error;
       input_.resume_control(VrParameter::UvEdit);
       return;
@@ -1785,6 +1858,13 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::BakeDistances:
   case VrParameter::BakeQuality:
     break; // Staged operation settings do not mutate the scene or history.
+  case VrParameter::SkinSource:
+  case VrParameter::SkinMode:
+  case VrParameter::SkinDistances:
+  case VrParameter::SkinFalloff:
+  case VrParameter::SkinInfluences:
+  case VrParameter::SkinPrune:
+    break; // Staged operation configuration never changes scene/history.
   case VrParameter::WeightStrength:
     state_.weights.strength = value;
     break;
@@ -1898,9 +1978,10 @@ void Document::control_event_locked(VrControlEvent event) {
 bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::CutBegin)return state_.can_cut;
   if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
-    if(!state_.cut||state_.cut->committing||state_.asset_busy||control_before_)return false;
+    if(!state_.cut||control_before_)return false;
     auto &v=*state_.cut;
-    if(command==SpatialCommand::CutCancel)return true;
+    if(command==SpatialCommand::CutCancel)return !v.committing||(state_.asset_busy&&asset_status().cancellable);
+    if(v.committing||state_.asset_busy)return false;
     if(!cut_bake_source_)return false;
     if(command==SpatialCommand::CutApply)return !v.busy&&v.preview&&v.preview_request==v.request&&v.preview->changed;
     return true;
@@ -1912,10 +1993,14 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     if(command==SpatialCommand::Redo)return !cut_redo_.empty()&&!control_before_;
     return false;
   }
-  if (command == SpatialCommand::RetopoBegin) return state_.can_retopologize;
+  if (command == SpatialCommand::RetopoBegin)
+    return state_.retopology ? state_.retopology->source && !retopo_accepting_ && !state_.asset_busy && !control_before_
+                             : state_.can_retopologize;
   if (command >= SpatialCommand::RetopoMode && command <= SpatialCommand::RetopoCancel) {
-    if (!state_.retopology || retopo_accepting_ || state_.asset_busy || control_before_) return false;
-    if (command == SpatialCommand::RetopoCancel) return true;
+    if (!state_.retopology || control_before_) return false;
+    if (command == SpatialCommand::RetopoCancel)
+      return !state_.asset_busy || asset_status().cancellable;
+    if (retopo_accepting_ || state_.asset_busy) return false;
     auto &v = *state_.retopology;
     if (!v.source || !v.topology) return false;
     if (command == SpatialCommand::RetopoFace) return v.selected.size() >= 3;
@@ -1934,6 +2019,9 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::CancelWork)return state_.asset_busy && asset_status().cancellable;
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
+  if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
+    !skin_sources_locked(state_.skin_options.mode).empty();
+  if(command==SpatialCommand::SkinUseLocks) return !control_before_ && skin_target_ready_locked() && state_.can_paint_weights;
   if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked)
     return !state_.asset_busy && !state_.recovery_busy && !control_before_ && !action_active_locked() &&
@@ -2071,7 +2159,11 @@ void Document::command_locked(SpatialCommand command) {
     return;
   }
   if(state_.cut&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo)){cut_history_locked(command==SpatialCommand::Redo);return;}
-  if (command == SpatialCommand::RetopoBegin) { begin_retopology_locked(); return; }
+  if (command == SpatialCommand::RetopoBegin) {
+    if (!command_enabled_locked(command)) return;
+    if (!state_.retopology) begin_retopology_locked();
+    return; // Existing workspaces resume through the input menu-close boundary.
+  }
   if (command >= SpatialCommand::RetopoMode && command <= SpatialCommand::RetopoCancel) {
     if (!command_enabled_locked(command)) return;
     if (command == SpatialCommand::RetopoApply || command == SpatialCommand::RetopoCancel)
@@ -2094,6 +2186,19 @@ void Document::command_locked(SpatialCommand command) {
   if(command==SpatialCommand::CancelWork){cancel_asset_work_locked();return;}
   if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
   if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
+  if(command==SpatialCommand::BindSkin) {
+    if(command_enabled_locked(command)) {
+      auto options=state_.skin_options;
+      if(state_.skin_use_locks && state_.can_paint_weights) options.locks=state_.weights.locks;
+      else options.locks.clear();
+      queue_bind_skin_locked(std::move(options));
+    }
+    return;
+  }
+  if(command==SpatialCommand::SkinUseLocks) {
+    if(command_enabled_locked(command)) state_.skin_use_locks=!state_.skin_use_locks;
+    return;
+  }
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked) {
     if (!command_enabled_locked(command)) return;
     auto &settings = state_.weights;
@@ -2210,6 +2315,10 @@ void Document::command_locked(SpatialCommand command) {
       scene_.active().mesh_active = false;
       scene_changed_locked(std::move(before));
     }
+    const auto &source=scene_.active();
+    state_.message=source_is_dormant(source)
+        ? "Volume preview; prepared mesh data is retained. Return to mesh mode to view it."
+        : "Sculpt volume selected";
     return;
   }
   if (command >= SpatialCommand::PaintColor &&
@@ -2434,6 +2543,30 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if (job->open_project) {
+        auto cancelled = [&] {
+          return stopping_.load() || job->work->cancelled.load() ||
+                 published_.load()->generation != job->generation;
+        };
+        auto next = Scene::load(job->path, cancelled);
+        std::lock_guard lock(model_mutex_);
+        if (cancelled() || content_ != job->content || action_active_locked() || control_before_)
+          throw std::runtime_error("Project loading cancelled or document changed");
+        replace_locked(std::move(next), true);
+        path_ = job->path;
+        if (recovery_) {
+          recovery_source_.source_path = path_;
+          recovery_->set_source(recovery_source_);
+        }
+        state_.message = "Opened " + path_.string();
+        publish_locked();
+        job->completion->set_value();
+        {
+          std::lock_guard file_lock(file_mutex_);
+          file_changed_.notify_all();
+        }
+        continue;
+      }
       if (job->scene_operation) {
         auto cancelled = [&] {
           auto state = published_.load();
@@ -2556,10 +2689,12 @@ void Document::file_loop() {
           if (!group) throw std::runtime_error("Select a grouped avatar to export");
           for (const auto &object : job->scene.objects())
             if (!in_group(job->scene, object, group)) job->scene.object(object.id).visible = false;
+          job->scene.require_exportable_sources();
           auto report = export_vrm(job->scene.preview_surfaces(), job->path);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
         } else {
+          job->scene.require_exportable_sources();
           auto surfaces = job->scene.preview_surfaces();
           for (auto &surface : surfaces)
             if (surface.mesh.uv.empty()) unwrap(surface.mesh);
@@ -2574,10 +2709,22 @@ void Document::file_loop() {
       if (job->generation == state_.generation) {
         if (!job->export_mesh) {
           saved_content_ = job->content;
-          if (recovery_ && job->recovery_source == recovery_source_)
-            recovery_->discard(job->recovery_source, job->revision);
-          if (job->adopt_path)
+          bool current_recovery = recovery_ && job->recovery_source.id == recovery_source_.id &&
+                                  job->recovery_source.generation == recovery_source_.generation;
+          if (job->adopt_path) {
             path_ = job->path;
+            if (recovery_ && recovery_source_.source_path != path_) {
+              recovery_source_.source_path = path_;
+              recovery_->set_source(recovery_source_);
+              // A path change invalidates older queued recovery work. A
+              // newer live edit still needs a checkpoint after this Save.
+              recovery_content_ = 0;
+            }
+          }
+          // Updating the source path changes the recovery epoch and clears
+          // queued work. Schedule cleanup afterwards against the new epoch.
+          if (current_recovery)
+            recovery_->discard(recovery_source_, job->revision);
         }
         state_.error.clear();
         state_.message =
@@ -2595,7 +2742,7 @@ void Document::file_loop() {
         publish_locked();
       }
       if (job->generation == state_.generation) {
-        if (job->prepare_mesh || job->uv_mesh || job->restore_recovery || job->scene_operation)
+        if (job->open_project || job->prepare_mesh || job->uv_mesh || job->restore_recovery || job->scene_operation)
           state_.asset_busy = false;
         if (job->discover_recovery || job->restore_recovery)
           state_.recovery_busy = false;
@@ -2618,6 +2765,7 @@ void Document::file_loop() {
             view->busy = view->committing = false; view->error = e.what(); state_.retopology = view;
           }
         }
+        if(job->open_project) asset_work_.store({});
         if(job->work && job->work->cancelled.load()){
           state_.error.clear();state_.message=job->operation_label+" cancelled";
         }else state_.error = e.what();

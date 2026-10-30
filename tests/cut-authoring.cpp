@@ -46,6 +46,15 @@ struct Controller {
 }
 int main(int argc,char **argv)try{
   if(argc==3&&std::string(argv[1])=="--ui-fixture"){fixture().save(argv[2]);return 0;}
+  if(argc==3&&std::string(argv[1])=="--inspect"){
+    auto scene=Scene::load(argv[2]);auto mesh=combined(scene);auto minimum=mesh.positions.front().x,maximum=minimum;
+    for(auto point:mesh.positions){minimum=std::min(minimum,point.x);maximum=std::max(maximum,point.x);}
+    std::cout<<nlohmann::json{{"scene",scene.encode()},{"x_min",minimum},{"x_max",maximum},
+      {"closed",inspect_mesh(mesh).closed_manifold()}}.dump()<<'\n';return 0;
+  }
+  check(spatial_parameter(14,0)==VrParameter::SkinSource&&spatial_parameter(16,9)==VrParameter::RetopoDistance&&
+        spatial_parameter(17,1)==VrParameter::CutOffset&&!spatial_action(15,0)&&!spatial_action(18,0),
+        "Skin, reserved masks, retopology and plane-cut pages retain independent native command routing");
   // Two nearby surfaces distinguish exact provenance from a nearest ray.
   Mesh low;low.positions={{0,0,0},{1,0,0},{0,1,0}};low.normals.assign(3,{0,0,1});low.uv={{0,0},{1,0},{0,1}};low.indices={0,1,2};
   BakeSource layers;layers.mesh=low;for(auto p:low.positions){p.z+=.001f;layers.mesh.positions.push_back(p);}
@@ -164,7 +173,7 @@ int main(int argc,char **argv)try{
         "Grouped cut parts retain the world-space half-space and closed boundary while the original rig/morph data stays exact");
   Document xr;xr.replace(source.snapshot());Controller hand(xr);
   hand.send(0,0,true);hand.send();hand.sector(8);hand.sector(9);hand.sector(4);
-  check(xr.frame().state->menu_page==15,"Joystick navigation reaches the native plane-cut page");
+  check(xr.frame().state->menu_page==17,"Joystick navigation reaches the native plane-cut page");
   hand.sector(0);check(xr.wait_cut()&&xr.frame().state->cut,"Controller Start cut initializes the same native worker workspace");
   hand.send(0,0,true);hand.send();hand.sector(2);
   check(xr.frame().state->controls.parameter==VrParameter::CutDirection&&xr.frame().state->controls.components==2,

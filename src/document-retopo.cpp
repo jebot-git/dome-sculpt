@@ -11,7 +11,12 @@ void Document::begin_retopology_locked() {
   if (state_.retopology || state_.asset_busy || state_.recovery_busy || control_before_ ||
       action_active_locked() || !o.visible || o.locked || scene_.objects().size() >= 256)
     throw std::logic_error("Finish the current action; show and unlock a source with room for a new patch");
-  if (o.retopology) scene_.object(o.retopology->source);
+  if (o.retopology) {
+    const auto source = o.retopology->source;
+    if (std::none_of(scene_.objects().begin(), scene_.objects().end(),
+                     [source](const auto &object) { return object.id == source; }))
+      throw std::logic_error("Retopology reference deleted or unavailable; restore or choose a source");
+  }
   retopo_source_ = {state_.generation, state_.revision, o.id};
   retopo_stroking_ = retopo_sampled_ = retopo_accepting_ = false;
   state_.weights.enabled = false;
@@ -81,7 +86,13 @@ void Document::end_retopology(bool accept) {
 }
 void Document::end_retopology_locked(bool accept) {
   if (!state_.retopology) return;
-  if (retopo_accepting_) throw std::logic_error("Cancel background work or wait for the accepted patch");
+  if (retopo_accepting_ && accept)
+    throw std::logic_error("Cancel background work or wait for the accepted patch");
+  if (!accept && retopo_accepting_ && state_.asset_busy) {
+    // The ordered asset stage owns publication now. Request its cancellation;
+    // on completion it restores the editable draft rather than losing work.
+    cancel_asset_work_locked(); return;
+  }
   if (!accept) {
     cancel_retopology_locked(); desktop_ = false; input_.cancel(); state_.error.clear();
     publish_locked(true); return;

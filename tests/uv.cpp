@@ -233,6 +233,7 @@ int main() try {
   Document doc;
   doc.replace(scene);
   doc.begin_uv();
+  require(doc.wait_uv(), "UV initialization finishes before ready-dependent draft edits");
   doc.edit_uv(UvAction::Move, .2f, .1f);
   require(doc.frame().state->dirty && !doc.begin_desktop(),
           "The UV draft owns input and reports unsaved changes");
@@ -242,6 +243,7 @@ int main() try {
           "Cancelling the UV draft retains exact paint and the clean history "
           "position");
   doc.begin_uv();
+  require(doc.wait_uv(), "UV initialization finishes before ready-dependent draft edits");
   doc.edit_uv(UvAction::Move, .2f, .1f);
   doc.end_uv(true);
   require(doc.wait_asset(std::chrono::seconds(180)) &&
@@ -254,6 +256,7 @@ int main() try {
   require(doc.redo() && doc.copy_scene().active().painted->mesh().uv != m.uv,
           "UV redo restores the edited mesh and transferred layers");
   doc.begin_uv();
+  require(doc.wait_uv(), "UV initialization finishes before ready-dependent draft edits");
   doc.edit_uv(UvAction::Move, 3, 0);
   require(doc.wait_uv(), "Background validation settles the invalid draft");
   bool rejected = false;
@@ -267,6 +270,7 @@ int main() try {
   doc.end_uv(false);
   doc.replace(scene);
   doc.begin_uv();
+  require(doc.wait_uv(), "UV initialization finishes before ready-dependent draft edits");
   auto held_uv = doc.frame().state->uv->mesh;
   for (int i = 0; i < 24; ++i)
     doc.edit_uv(UvAction::Move, i % 2 ? -.01f : .01f, 0);
@@ -290,6 +294,7 @@ int main() try {
           "An invalid pending Apply cannot publish paint or discard its editable draft");
   doc.end_uv(false);
   doc.begin_uv();
+  require(doc.wait_uv(), "UV initialization finishes before ready-dependent draft edits");
   doc.edit_uv(UvAction::Move, .03f, 0);
   doc.replace(scene);
   require(doc.wait_uv() && !doc.frame().state->uv && !doc.frame().state->dirty,
@@ -327,6 +332,8 @@ int main() try {
   send();
   sector(9);
   sector(7);
+  require(doc.wait_uv() && doc.frame().state->uv && doc.frame().state->uv->topology,
+          "Controller UV workspace initializes before geometry editing");
   require(doc.frame().state->uv &&
               doc.frame().state->controls.parameter == VrParameter::UvEdit,
           "Joystick Material / UV editor opens the in-headset editing panel");
@@ -382,6 +389,8 @@ int main() try {
   send();
   sector(9);
   sector(7);
+  require(doc.wait_uv() && doc.frame().state->uv && doc.frame().state->uv->topology,
+          "Controller UV workspace initializes before geometry editing");
   require(doc.frame().state->uv->mesh->uv == original_uv,
           "Cancelled scale/turn draft retains exact saved UV coordinates");
   aim(257, 257, .8f);
@@ -437,6 +446,8 @@ int main() try {
   send();
   sector(9);
   sector(7);
+  require(doc.wait_uv() && doc.frame().state->uv && doc.frame().state->uv->topology,
+          "Controller UV workspace initializes before geometry editing");
   send(1);
   frame.focused = false;
   send();
@@ -450,6 +461,8 @@ int main() try {
   send();
   sector(9);
   sector(7);
+  require(doc.wait_uv() && doc.frame().state->uv && doc.frame().state->uv->topology,
+          "Controller UV workspace initializes before geometry editing");
   auto panel = doc.frame().state->panel;
   std::vector<SpatialFrame> burst;
   auto queued = [&](float x, float y, float pressure, float px, float py,
@@ -489,6 +502,8 @@ int main() try {
   send();
   sector(9);
   sector(7);
+  require(doc.wait_uv() && doc.frame().state->uv && doc.frame().state->uv->topology,
+          "Controller UV workspace initializes before geometry editing");
   aim(178, 85, .8f);
   send();
   require(doc.frame().state->uv->tool == 1,

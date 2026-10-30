@@ -12,7 +12,10 @@ Start patch on a visible, unlocked source. On desktop, ordinary dragging remains
 trackball navigation; Shift+click places a point or toggles an existing nearby
 point in the ordered selection. In XR, touch the reference surface with the
 controller/stylus and press/release its pressure trigger. Joystick presses open
-the topology menu. Its Tool mode switches Place/Move; Snap range adjusts
+the topology menu. Its Tool mode switches Place/Move; opening the menu in an existing workspace offers
+Resume patch, which closes the menu without resetting the draft. Starting,
+resuming or changing the tool closes the menu so pressure reaches the surface.
+Snap range adjusts
 projection distance. Distance is measured in document world millimetres and uses
 a native wheel/slider dialog or the common XR joystick/ray slider panel.
 
@@ -49,20 +52,23 @@ the generated triangles. Each further Apply creates another retained version;
 it does not transfer the previous target's paint or rig onto changed topology.
 Use the existing explicit bake/authoring workflows where transfer is required.
 
-Scene version 7 stores each patch's source object ID and independent versioned
+Scene version 8 stores each patch's source object ID and independent versioned
 RetopoMesh payload alongside the derived painted mesh. Vertex/edge/face IDs,
 allocation cursor, wires, unfinished vertices, pins and seams survive save/open.
 The atlas is a separate derived UV layout; retopology seam/pin records are retained
 for topology editing and are not yet an atlas seam/pin prescription. glTF exports
 the triangulated mesh with its atlas. Native quad/edit records remain in the
-native scene. A patch may retain a historical source ID after source deletion;
+native scene. Complete legacy retopology-only version-7 scenes remain readable;
+version 8 also preserves immutable source materials and dormant deformation.
+A patch may retain a historical source ID after source deletion;
 reopening requires that source still exist. Duplication retains the records.
 
 Apply is exactly one global scene transaction. An asset failure/cancellation
 leaves the original scene unchanged and keeps the draft available for correction
 or retry. Generation, revision, active object and workspace-session guards reject
 stale work. Replacing the document invalidates unconfirmed workspace jobs.
-Accepted Apply survives XR focus/session shutdown. The asset wait includes the
+Accepted Apply survives XR focus/session shutdown. Standalone shutdown cancels
+a remaining unconfirmed draft before its requested final save. The asset wait includes the
 topology-input barrier before the ordered asset job, so a final committed save
 cannot race that accepted publication. Closing a workspace releases its BVH and
 draft history on the idle topology worker.

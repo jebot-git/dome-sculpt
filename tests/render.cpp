@@ -78,7 +78,7 @@ int main(int argc, char **argv) try {
     cursor.draw(state,vp);auto gizmo=capture("cut-gizmo");
     size_t changed=0;for(size_t i=0;i<gizmo.size();++i)changed+=gizmo[i]!=cut[i];
     if(changed<100)throw std::runtime_error("Cut plane grid and retained-side indicator are invisible");
-    state.menu=true;state.menu_page=15;state.panel.position={0,0,-.45f};state.font_file=face.file;state.font_pixels=face.pixels;
+    state.menu=true;state.menu_page=17;state.panel.position={0,0,-.45f};state.font_file=face.file;state.font_pixels=face.pixels;
     renderer.draw(doc.frame().surface,model,vp,{},640,480);palette.draw(state,vp);capture("cut-menu");
     doc.end_cut(false);
     if(doc.frame().surface->clipped_object)throw std::runtime_error("Cancel leaves a stale clipped viewport");
@@ -146,6 +146,55 @@ int main(int argc, char **argv) try {
     cursors.draw(overlay,vp);auto front=capture("retopo-front");
     size_t changed=0;for(size_t i=0;i<front.size();++i)changed+=front[i]!=baseline[i];
     if(changed<50)throw std::runtime_error("Retopology ordered edges and point markers are invisible");
+    const auto first_upload=cursors.retopology_stats();
+    if(!first_upload.uploads || !first_upload.vertices || first_upload.bytes>64*1024*1024)
+      throw std::runtime_error("Retopology overlay has no bounded retained GPU geometry");
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    auto stereo=vp;stereo[12]+=.015f;
+    renderer.draw(doc.frame().surface,model,stereo,{},640,480);cursors.draw(overlay,stereo);
+    auto reused=cursors.retopology_stats();
+    if(reused.uploads!=first_upload.uploads || reused.bytes!=first_upload.bytes)
+      throw std::runtime_error("Static and stereo retopology views rebuild or reupload unchanged topology");
+    auto view_copy=std::make_shared<RetopoView>(*r);overlay.retopology=view_copy;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    if(cursors.retopology_stats().uploads!=first_upload.uploads)
+      throw std::runtime_error("Equivalent immutable retopology view copies lose GPU geometry ownership");
+    overlay.retopology=r;r->selected={a};
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    auto selected_upload=cursors.retopology_stats().uploads;
+    if(selected_upload!=first_upload.uploads+1 || capture("retopo-selection-cache")==front)
+      throw std::runtime_error("Retopology selection changes do not refresh cached colors and ordered lines");
+    r->selected={a,b};auto base_canvas=overlay.canvas;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    const auto before_motion=cursors.retopology_stats().uploads;auto stationary=capture("retopo-motion-base");
+    if(before_motion!=selected_upload+1)throw std::runtime_error("Restoring ordered retopology selection does not refresh cached colors");
+    overlay.canvas.position.x+=.04f;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);auto canvas_motion=capture("retopo-canvas-motion");
+    if(cursors.retopology_stats().uploads!=before_motion || canvas_motion==stationary)
+      throw std::runtime_error("Retopology canvas motion must update GPU transforms without geometry uploads");
+    r->transform.position.x+=.03f;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    auto object_motion=capture("retopo-object-motion");
+    if(cursors.retopology_stats().uploads!=before_motion || object_motion==canvas_motion)
+      throw std::runtime_error("Retopology object motion must update GPU transforms without geometry uploads");
+    overlay.canvas.scale*=1.2f;r->transform.scale*=1.1f;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    if(cursors.retopology_stats().uploads!=before_motion || capture("retopo-marker-scale")==object_motion)
+      throw std::runtime_error("Retopology marker and object scaling must stay on GPU without geometry uploads");
+    ++r->revision;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    if(cursors.retopology_stats().uploads!=before_motion+1)throw std::runtime_error("Retopology revision does not invalidate cached geometry");
+    overlay.canvas=base_canvas;r->transform={};
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);
+    GLuint saved_vao=0,saved_buffer=0;glGenVertexArrays(1,&saved_vao);glGenBuffers(1,&saved_buffer);
+    glBindVertexArray(saved_vao);glBindBuffer(GL_ARRAY_BUFFER,saved_buffer);glBufferData(GL_ARRAY_BUFFER,16,nullptr,GL_STATIC_DRAW);
+    glUseProgram(0);glDisable(GL_DEPTH_TEST);glDepthMask(GL_FALSE);glDepthFunc(GL_GREATER);
+    cursors.draw(overlay,vp);GLint vao=0,buffer=0,program=0,function=0;GLboolean mask=GL_TRUE;
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING,&vao);glGetIntegerv(GL_ARRAY_BUFFER_BINDING,&buffer);glGetIntegerv(GL_CURRENT_PROGRAM,&program);glGetIntegerv(GL_DEPTH_FUNC,&function);glGetBooleanv(GL_DEPTH_WRITEMASK,&mask);
+    if(GLuint(vao)!=saved_vao || GLuint(buffer)!=saved_buffer || program || function!=GL_GREATER || mask || glIsEnabled(GL_DEPTH_TEST))
+      throw std::runtime_error("Retopology overlay leaks caller GL program, buffer or depth state");
+    glBindVertexArray(0);glBindBuffer(GL_ARRAY_BUFFER,0);glDeleteBuffers(1,&saved_buffer);glDeleteVertexArrays(1,&saved_vao);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);glEnable(GL_DEPTH_TEST);
+    std::cout<<"PASS Retopology GPU geometry reuses stereo/static views, invalidates edits and restores caller GL state\n";
     renderer.set_deferred_resolve(true);cursors.set_linear_output(true);
     renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);renderer.resolve();
     auto linear=capture("retopo-linear");
@@ -154,10 +203,12 @@ int main(int argc, char **argv) try {
     renderer.set_deferred_resolve(false);cursors.set_linear_output(false);
     auto behind=std::make_shared<RetopoMesh>();
     a=behind->add_vertex({{-.1f,0,-.8f}});b=behind->add_vertex({{.1f,0,-.8f}});behind->add_edge(a,b);
+    const auto before_topology=cursors.retopology_stats().uploads;
     r->topology=behind;r->selected.clear();
     renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    if(cursors.retopology_stats().uploads!=before_topology+1)throw std::runtime_error("Replacing immutable retopology ownership does not invalidate cached geometry");
     if(capture("retopo-occluded")!=baseline)throw std::runtime_error("Retopology overlay ignores source surface occlusion");
-    overlay.menu=true;overlay.menu_page=14;overlay.font_file=face.file;overlay.font_pixels=face.pixels;
+    overlay.menu=true;overlay.menu_page=16;overlay.font_file=face.file;overlay.font_pixels=face.pixels;
     overlay.panel.position={0,0,-.45f};
     renderer.draw(doc.frame().surface,model,vp,{},640,480);palette.draw(overlay,vp);auto placed=capture("retopo-menu-place");
     r->moving=true;
@@ -167,6 +218,8 @@ int main(int argc, char **argv) try {
   renderer.draw(doc.frame().surface, model, vp, {}, 640, 480);
   palette.draw(slider, vp);
   cursors.draw(slider, vp);
+  if(cursors.retopology_stats().vertices || cursors.retopology_stats().bytes)
+    throw std::runtime_error("Leaving retopology retains obsolete overlay GPU geometry");
   auto pointed_slider = capture("slider-pointer");
   size_t pointer_pixels = 0;
   for (size_t i = 0; i < high_slider.size(); ++i)
@@ -214,6 +267,7 @@ int main(int argc, char **argv) try {
   if (!doc.wait_asset() || !doc.frame().state->mesh_active || !doc.wait_mesh())
     throw std::runtime_error("Paint mesh preparation failed");
   doc.begin_uv();
+  if (!doc.wait_uv()) throw std::runtime_error("UV initialization did not finish before palette rendering");
   auto uv_state = slider;
   uv_state.controls.parameter = VrParameter::UvEdit;
   uv_state.uv = doc.frame().state->uv;
@@ -294,7 +348,12 @@ int main(int argc, char **argv) try {
   if(errors>60*100*3*3 || normal_change<60*100*3*3)
     throw std::runtime_error("Baked MikkTSpace normal does not reconstruct the reference GPU shading");
   std::cout<<"PASS Canonical MikkTSpace baking reconstructs reference shading through real GPU tangent interpolation\n";
-  BakedTextures occluded;occluded.maps=*surface.active().painted->composite(surface.active().material);
+  // BakedTextures owns canonical channel pixels, not derived composite caches
+  // such as independent paint replacement coverage or retained source aliases.
+  auto composite=surface.active().painted->composite(surface.active().material);
+  BakedTextures occluded;occluded.maps.color=composite->color;
+  occluded.maps.metal_rough=composite->metal_rough;occluded.maps.emission=composite->emission;
+  occluded.maps.normal=composite->normal;occluded.maps.transparent=composite->transparent;
   occluded.coverage.assign(64*64,255);
   for(size_t i=0;i<occluded.maps.metal_rough.rgba.size();i+=4)occluded.maps.metal_rough.rgba[i]=0;
   surface.active().painted->install_bake(std::move(occluded));detailed.replace(surface);

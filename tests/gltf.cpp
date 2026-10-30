@@ -226,6 +226,10 @@ int main() try {
   auto raw_with_bake=objects;raw_with_bake[0].textures=invalid_raw;
   bool bypass_rejected=false;try{dome::export_glb(raw_with_bake,path);}catch(const std::invalid_argument&){bypass_rejected=true;}
   require(bypass_rejected,"Raw source markers cannot bypass an immutable baked payload");
+  invalid_raw=std::make_shared<dome::TextureMaps>(*source_maps);
+  invalid_raw->emission_coverage=*source->color.image;raw_with_bake[0].textures=invalid_raw;
+  bypass_rejected=false;try{dome::export_glb(raw_with_bake,path);}catch(const std::invalid_argument&){bypass_rejected=true;}
+  require(bypass_rejected,"Raw source markers cannot hide an independent derived emission coverage grid");
   auto imported=std::make_shared<dome::ImportedAsset>();imported->mode=dome::ImportMode::PreserveGltf;
   dome::ImportedPrimitive source_primitive; source_primitive.mesh=mesh; source_primitive.source_mesh=0; source_primitive.source_primitive=0;
   source_primitive.uv1=mesh.uv;

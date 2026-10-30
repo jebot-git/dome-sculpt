@@ -7,6 +7,7 @@
 #include "bake-authoring.hpp"
 #include "uv.hpp"
 #include "weight-authoring.hpp"
+#include "skin-authoring.hpp"
 #include "retopo-authoring.hpp"
 #include "cut-authoring.hpp"
 #include <atomic>
@@ -55,6 +56,7 @@ struct EditorState {
   CanvasTransform canvas{}, panel{};
   std::array<SpatialHand, 2> hands{};
   std::string message, error;
+  std::filesystem::path project_path;
   std::string recovery_error;
   std::vector<std::string> recovery_candidates;
   bool recovery_busy = false;
@@ -66,6 +68,9 @@ struct EditorState {
        can_redo = false;
   std::shared_ptr<const DeformationState> deformation;
   size_t rig_joint = 0, morph_target = 0;
+  SkinAuthoringOptions skin_options;
+  std::vector<uint64_t> skin_sources;
+  bool skin_use_locks = true, can_configure_skin = false, can_bind_skin = false;
   bool can_bake = false, can_clear_bake = false, can_cancel_asset = false;
   float asset_progress = 0;
   uint64_t bake_source = 0;
@@ -106,6 +111,7 @@ struct SurfaceRange {
   std::shared_ptr<const TextureMaps> textures{};
   std::shared_ptr<const CreatorAppearance> appearance{};
   size_t first_vertex = 0;
+  std::shared_ptr<const SourceMaterialBindings> material_bindings{};
 };
 struct MeshSnapshot {
   uint64_t revision = 0, generation = 0;
@@ -205,6 +211,7 @@ public:
   void use_mesh();
   void paint_settings(PaintSettings);
   void weight_settings(WeightToolSettings, std::optional<uint32_t> joint = {}, AssetSource expected = {});
+  void bind_skin(SkinAuthoringOptions, AssetSource expected = {});
   void paint_command(SpatialCommand);
   void sculpt_command(SpatialCommand);
   void sculpt_layer_properties(uint64_t object, uint64_t layer, std::string,
@@ -222,6 +229,8 @@ public:
   void begin_spatial();
   void rebase_space(std::optional<CanvasTransform>);
   void save(const std::filesystem::path &);
+  std::future<void> save_async(const std::filesystem::path &);
+  std::future<void> open_async(const std::filesystem::path &);
   // Captures a committed scene and performs ordered file work asynchronously.
   // Ignoring the returned promise never blocks the UI thread.
   std::future<void> export_asset(const std::filesystem::path &,
@@ -370,6 +379,7 @@ private:
     bool export_mesh;
     bool adopt_path = false;
     std::shared_ptr<std::promise<void>> completion{};
+    bool open_project = false;
     bool prepare_mesh = false;
     uint64_t object = 0, source_revision = 0;
     uint32_t resolution = 512;
@@ -401,6 +411,7 @@ private:
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
   std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_, cut_thread_;
+  void request_worker_stop();
   void publish_locked(bool force_geometry = false);
   void record_locked(History);
   void record_stroke_locked();
@@ -437,6 +448,9 @@ private:
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
   void queue_clear_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
+  bool skin_target_ready_locked() const;
+  std::vector<uint64_t> skin_sources_locked(SkinAuthoringMode) const;
+  void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {});
   void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome

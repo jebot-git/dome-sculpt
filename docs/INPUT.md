@@ -40,9 +40,20 @@ asset worker. It remains ordered before later focus loss/shutdown; invalid
 captured targets cannot commit paint. Unaccepted draft checks are invalidated
 on cancellation/replacement and cannot recreate a closed workspace. See UV.md
 for pending-check/commit behavior and the separate wait helpers.
+# Standalone XR process termination
+
+SIGINT and SIGTERM set a lock-free stop flag; the handler performs no rendering,
+I/O, model editing or cleanup. The normal XR loop finishes the current frame and
+uses the existing shutdown boundary: drain queued completed strokes/accepted
+operations, cancel unfinished gestures, release session resources, wait for
+pending accepted asset work and perform the requested CLI final save. Previous
+signal handlers are restored on exit. Real-loader regressions synchronize the
+signal with a rendered second stroke and compare the saved volume to an
+independently completed first stroke, proving both retained edits and exact
+unfinished-gesture cancellation for SIGINT and SIGTERM.
 
 Native retopology uses the same pressure ownership and focus boundaries, with a
-dedicated topology worker. Joystick navigation reaches page 14 from Mesh tools;
+dedicated topology worker. Joystick navigation reaches page 16 from Mesh tools;
 while editing, a joystick press opens that page directly. Tool mode switches
 Place/Move, and Snap range uses the common logarithmic joystick/ray slider.
 Points project in source-local coordinates with a document-world distance bound.
@@ -52,8 +63,16 @@ asset publication, and later focus loss does not retract that accepted operation
 The redundant Mesh-tools Undo sector now opens Retopology; root/hardware Undo
 remain available and route to draft history. See RETOPO-AUTHORING.md.
 
-Plane-cut authoring uses page 15, reached from Mesh tools sector 4 (Center remains
-available on the baking page). While cutting, joystick presses open page 15
+Retopology page16 uses cell0 as New patch / Resume patch. Starting or resuming
+closes the menu so pressure can place/move points; Tool mode also resumes the
+canvas. Face/edge/pin/relax commands can keep the page open for chaining, with
+Resume available afterward. Apply/Cancel close the menu; a subsequent joystick
+press reopens the active patch page. Skin14 and reserved Masks15 remain separate.
+Standalone CLI final save cancels only an unconfirmed patch after accepted work
+drains; stopping embedded XR retains the draft for desktop continuation.
+
+Plane-cut authoring uses page 17, reached from Mesh tools sector 4 (Center remains
+available on the baking page). While cutting, joystick presses open page 17
 directly. Offset, two-row Direction and four-row Cap color use the common
 joystick/ray controls. From hand captures the confirming menu device's current
 grip in document space, rather than preferring an idle right controller.

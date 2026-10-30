@@ -1,7 +1,8 @@
 # Native plane-cut authoring
 
 Mesh → Plane cut starts a shared native desktop/XR workspace on the visible,
-unlocked active object. In XR, use Objects → Mesh tools → Plane cut. While the
+unlocked active object. In XR, use Objects → Mesh tools → Plane cut (page 17). Skin page 14,
+reserved Masks page 15 and Retopology page 16 retain their own routing. While the
 workspace is active, a joystick press opens its cut page directly. Ordinary
 desktop dragging remains trackball navigation; cutting does not repurpose the
 sculpt/paint pressure gesture.
@@ -59,7 +60,11 @@ the retained source.
 The whole operation is one guarded global scene transaction, including group,
 visibility, geometry, material and bake changes. Failure/cancellation publishes
 no partial scene and retains the draft for correction or retry. Accepted Apply
-survives XR shutdown and uses the ordered asset worker. A wholly retained
+survives XR shutdown and uses the ordered asset worker. Cancel cut during
+accepted publication requests cancellation from that worker; acknowledgement
+retains the exact draft and source for correction or retry. A subsequent Cancel
+closes the retained workspace. Standalone XR final save drains accepted work and
+discards only a remaining unconfirmed draft. A wholly retained
 half-space closes as a no-op without allocating output objects or global Undo.
 Native save/open retains both outputs and hidden source through the existing
 group/baked-surface codecs; glTF exports the visible shell/cap material primitives.

@@ -110,9 +110,9 @@ int main(int argc,char**argv)try{
   require(same,"Independent skinned/morphed surface remains identical after UV seam remap");
   auto native=std::filesystem::temp_directory_path()/("dome-uv-workflow-native-"+std::to_string(getpid())+".dsculpt");split.save(native);require(Scene::load(native).encode()==split.encode(),"Remapped UV/skin/morph state survives exact native restart");std::filesystem::remove(native);
   require(document.undo()&&document.copy_scene().encode()==original,"Seam worker edit remains one complete exact global undo");
-  for(int attempt=0;attempt<5;++attempt){document.begin_uv();document.edit_uv(UvAction::Conformal);document.end_uv(false);require(document.wait_uv(),"Cancellation closes asynchronous draft without stale resurrection");}
+  for(int attempt=0;attempt<5;++attempt){document.begin_uv();require(document.wait_uv(),"UV initialization completes before solver cancellation fixture");document.edit_uv(UvAction::Conformal);document.end_uv(false);require(document.wait_uv(),"Cancellation closes asynchronous draft without stale resurrection");}
   require(document.copy_scene().encode()==original&&!document.frame().state->uv,"Cancelled solve never changes scene or restores a closed session");
-  document.begin_uv();document.edit_uv(UvAction::Conformal);document.end_uv(false);document.begin_uv();require(document.wait_uv(),"New UV session rejects earlier solver result");require(document.frame().state->uv->mesh->uv==rectangle().uv,"Prior session cannot overwrite new draft UV identity");document.end_uv(false);
+  document.begin_uv();require(document.wait_uv(),"UV initialization completes before solver cancellation fixture");document.edit_uv(UvAction::Conformal);document.end_uv(false);document.begin_uv();require(document.wait_uv(),"New UV session rejects earlier solver result");require(document.frame().state->uv->mesh->uv==rectangle().uv,"Prior session cannot overwrite new draft UV identity");document.end_uv(false);
   Document accepted_cancel;auto detailed=fixture(false,512);auto detailed_original=detailed.encode();accepted_cancel.replace(detailed);
   accepted_cancel.begin_uv();require(accepted_cancel.wait_uv(),"Detailed cancellation draft validates");
   accepted_cancel.edit_uv(UvAction::Conformal);require(accepted_cancel.wait_uv(),"Detailed cancellation solve completes before Apply");

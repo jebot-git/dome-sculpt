@@ -1,120 +1,151 @@
-# Native plane-cut checkpoint — 2026-10-30
+# Plane-cut and production integration — in progress
 
-The user requested committing/pushing the current stage and preparing a handoff;
-further implementation is deferred until work resumes. Application source:
-`5b0f9f5ff317031ae92b800d094a62be532a3cf8`, based on `3d19776`, branch
-`work/native-plane-cuts`. The later documentation commit records this checkpoint.
-The full production objective in [REQUIREMENTS.md](REQUIREMENTS.md) is incomplete.
-No agents were spawned for this stage.
+This branch merges plane-cut checkpoint de3f433 / source5b0f9f5 with production
+main2c89e8d / source79fe64a, preserving both histories. Integration build and
+verification are in progress; the older evidence below does not validate the
+combined tree. Current branch: work/plane-cut-integration.
 
-Read [../AGENTS.md](../AGENTS.md), [AGENT-HANDOFF.md](AGENT-HANDOFF.md),
-[VALIDATION.md](VALIDATION.md) and [PLANE-CUTS.md](PLANE-CUTS.md). Prior records
-are archived in HANDOFF-3d19776.md, VALIDATION-3d19776.md and
-AGENT-HANDOFF-3d19776.md; preserve earlier history too.
+Plane cut uses XR page17; Skin14, reserved Masks15 and Retopo16 retain their
+production routing. The cut worker uses the predicate-mutex shutdown handshake,
+and the deterministic shutdown fixture now includes all six workers. Standalone
+XR final save also discards an unconfirmed cut after accepted assets drain.
+The original/native normal-frame guards and combined Scene8 codecs are retained.
 
-## Remote integration is the first resumption task
+Earlier handoffs and validation are preserved in HANDOFF-2c89e8d.md,
+VALIDATION-2c89e8d.md, AGENT-HANDOFF-2c89e8d.md and corresponding -de3f433 files.
+See PLANE-CUTS.md for the active-object cut implementation and its production gaps.
+The full REQUIREMENTS.md objective remains incomplete. No agents were spawned.
+Actual local toolkit prefix is artifacts/toolkit-authoring, with lib (not lib64).
+Use the build override in AGENTS.md; do not link stale pre-integration archives.
 
-The checkpoint fetch found newer remote main `2c89e8d`, whose application merge
-is `79fe64a`. It integrates this branch's earlier retopology base with additional
-Scene8, material, skin, Unicode, worker shutdown and other production work.
-This plane-cut source has NOT been merged with that newer main. Publish this
-checkpoint on its feature branch; do not overwrite or force-push main.
+The following is historical production-main context, retained until integration
+verification is recorded:
 
-Fetch again before resuming and read the latest remote HANDOFF/VALIDATION as
-well as these branch-specific records. Preserve both histories and integrate
-the plane-cut changes into the current production line. Known overlaps include:
+# Dome Sculpt production objective remains active
 
-- XR pages: this branch has Retopo14 and Cut15; newer main uses Skin14,
-  reserves Masks15 and uses Retopo16. Allocate a nonconflicting cut page and
-  update menu routing, labels and tests together.
-- Document worker lifecycle: preserve newer predicate-mutex shutdown handshakes
-  for all workers, including the new cut worker, and existing cancellation/save
-  barriers. Source/header/library layout must remain coherent during validation.
-- Scene8, material bindings, normal-frame provenance and newer GPU overlays must
-  survive integration. New shell output is static PBR and must not silently
-  relabel legacy normal pixels or claim source rig/MToon-extension transfer.
-- Reconcile actual availability/check states, input parameter IDs, render
-  snapshot metadata, CMake/test registration and the requirements ledger.
+Read AGENTS.md, REQUIREMENTS.md, HANDOFF-466ebd1.md and the parent
+DESIGN_CONVENTIONS. Complete the whole native C++20 FLTK/OpenXR sculpt, texture,
+UV, rig/skin/morph and avatar suite; animation and final offline rendering are
+excluded. Do not mark the goal complete at a build or checkpoint.
 
-All evidence below applies to `5b0f9f5`, not the unperformed combined merge.
-Do not replace newer main's validation with these older-base counts. The current
-main handoff reports broader evidence; inspect its exact revision scopes there.
+## Combined Retopo and authoring integration
 
-## Implemented in this stage
+Application source `79fe64a` integrates remote main3d19776 (fdb132b/251cd3d Retopo)
+with the fully verified authoring source6df3cf2 and metadata500f321. All histories
+are preserved. Skin stays on page14, Masks reserves15, Retopo uses16. The schema
+writer uses Scene8 for immutable materials, dormant deformation or Retopo; both
+complete legacy Scene7 feature shapes remain readable. Partial feature records,
+invalid UTF-8, cyclic references and aggregate resource overruns reject.
 
-- Native active-object plane workspace shared by desktop and XR: offset in
-  document millimetres, yaw/pitch, cap RGBA, flipped retained side, cap toggle,
-  controller/stylus grip placement and local Undo/Redo. From hand respects the
-  device confirming the command, including a left menu with both hands tracked.
-- Native Mesh → Plane cut and XR Mesh tools commands with actual enabled/check
-  states. BDF modal wheel/slider controls have scrolling content, fixed action
-  buttons, Cancel default, universal Close and exact control cancellation.
-  Default dragging remains trackball navigation; source/save edits are isolated.
-- Dedicated worker and immutable preview: original selected PBR/MToon surfaces
-  are clipped in the GPU, with real cap geometry, a plane grid and retained-side
-  indicator. The authoritative Scene stays unchanged until explicit Apply.
-- Apply publishes a new group, editable shell and independent cap, retaining
-  the exact original as hidden. Exact source-triangle/barycentric bake mapping
-  transfers PBR paint without choosing nearby surfaces by projection rays.
-  Original paint, UVs, skin, morphs, layers, archives and topology are retained.
-  New geometry is static at the displayed pose, using fresh 512-pixel atlases.
-- Guarded ordered asset work gives one global Undo transaction. Invalid previews
-  cannot apply an older plane; failure/cancellation retains the draft for retry.
-  No-op Apply allocates nothing. Accepted Apply is included in wait_asset and
-  survives the existing XR shutdown/final-save boundary.
+Retopo runs on its own worker with the same predicate-mutex shutdown handshake
+as the other four workers. Native Place/Move commands are idempotent. XR New,
+Resume and Mode close the menu to expose pressure input. Cancel covers both the
+pre-asset drain and cancellable asset phase; standalone shutdown discards a
+remaining unconfirmed draft before final save. Preparing another mesh cannot
+overwrite retained editable topology. Missing references report a useful error.
 
-## Verification and environment
+The immutable overlay cache retains local topology in GPU buffers. Canvas,
+object and stereo transformations are GPU uniforms; changing view does not
+rebuild or upload topology. Existing material visibility, picking, PBO composition
+and weight previews are retained. Generated/duplicated Unicode names preserve
+UTF-8 code points. The project-info payload digest treats absent and null optional
+Scene8 keys identically; it still hashes all nonnull source payload data.
 
-All 51 Release CTests pass in 332.27s, including the 73-check real-loader
-synthetic OpenXR report. Four whole-core C/C++ ASan/UBSan/leak suites pass in
-45.28s. The cut suite has 55 assertions; existing retopology has 56. Dedicated
-native GUI passes 12/12 normal and 6/6 compact 640x360 with 2x Unifont BDF.
-The loader script retains prior XR coverage; new cut-specific controllers are
-tested through production Document/SpatialInput and GPU fixtures separately.
-Software graphics/synthetic tracking do not prove physical-device operation.
-See VALIDATION.md for logs, exact scopes, fixture corrections and limitations.
+Use fresh build-retopo headers/libraries, never pre-Retopo archives. Its67 native
+Release suites pass121.84s. Full real-loader syntheticXR117/117 passes (including
+all original96 and21 Retopo checks). Whole-core C/C++ ASan/UBSan/leaks14/14
+pass102.12s. Retopo GPU fixtures pass on actual Arc and llvmpipe. Final combined
+GUI checks pass: Retopo12/12, compact2xBDF6/6, general menu53/53, Skin11/11,
+Unicode3/3 and actual latest DomeD native Wayland8/8. Test scripts were copied
+unchanged into artifacts/retopo-ui-staging with build symlinked to build-retopo,
+so the old6df3cf2 build was not accidentally exercised. All jobs are terminal.
+The staged DomeD harness needed its packaging directory symlink; the initial
+missing-file harness failure remains recorded. No physical-device or new Arc
+compute execution claim is made for this newer source.
 
-All 30 manifest source hashes and the canonical qimgvr BDF helper match. This
-branch uses the unchanged DomeD toolkit 282467e / 22 patches, prefix
-`artifacts/toolkit-authoring`, library directory `lib`. See TOOLKIT.md. Newer
-main documents a different local toolkit prefix; do not assume directories match.
+Canonical DomeD/FLTK main was rechecked at282467e727df78c8e7f2452aa05a7747bac854a6.
+Use Release toolkit22patches prefix artifacts/toolkit-282467e/lib64 explicitly;
+inherited /opt libraries may be older. Matching standalone compositor is under
+artifacts/domed-282467e-target/release. No active session restart or system
+installation occurred. Build as regular user; sudo only for system files.
 
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU \
-  -DFLTK_DIR="$PWD/artifacts/toolkit-authoring/share/fltk"
-cmake --build build --parallel 2
-LIBGL_ALWAYS_SOFTWARE=1 LD_LIBRARY_PATH="$PWD/artifacts/toolkit-authoring/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
-  ctest --test-dir build --output-on-failure -j2
-./build/run-dome-sculpt
-```
+## Physical test boundary
 
-GUI orchestration uses optional Python test dependencies dbus-next, python-xlib
-and pillow, private HOME/bus/Xvfb, 90s cold-font startup and 30s interactions.
-The runtime remains C++20/FLTK/EGL/OpenXR with canonical BDF Fontconfig/FreeType;
-no Python runtime or Qt/GTK/Pango frontend is introduced. All validation handles
-were terminal; inspect actual processes before starting another build. Artifacts
-and builds are ignored local evidence, unavailable in a fresh clone. No system
-install, active-session restart, fresh external Khronos validation or physical
-device/accelerator test was performed for this checkpoint.
+The user confirmed rudimentary operation of exact8f4d67d on the real WiVRn HMD
+and both controllers, then requested ending it. Only the test process stopped;
+recovery snapshots and physical-test-report.json are retained under
+artifacts/xr-milestone-8f4d67d. DomeD remained running. This proves basic operation,
+not complete workflow/stylus/reconnect/performance validation or later sources.
+Subsequent SIGINT/SIGTERM handling is verified with the real-loader synthetic
+runtime: completed edits save, unfinished gestures cancel, and XR resources exit.
 
-## Work after reconciliation
+## Verified checkpoint and next integration
 
-The next cut gap is repeated cutting across a generated shell/cap group. Current
-commands affect only the active object: its open shell alone cannot receive a
-closed cap; open trim affects no sibling cap. Implement a coherent multi-part,
-multi-material source/output transaction rather than inferring groups by name.
-General Booleans, nested/touching contour robustness, durable cut recipes,
-quality/resolution controls, editable skin/morph transfer and draft recovery
-remain unfinished. Source extraction expands render corners, so production
-vertex compaction, GPU caching and large-mesh latency/memory evidence are needed.
-This stage does not complete Divine Cut functionality.
+The authoritative combined application checkpoint is source `6df3cf2`, built in
+artifacts/publish-final, branch work/production-integrated. All64 Release suites
+pass208.57s, including complete real-loader syntheticXR155.07s. Final native
+menus53/53, Skin bind/transfer/history11/11, Unicode input/clipboard/history3/3
+and actual latest DomeD Wayland/universal-menu8/8 pass with zero failures.
 
-Preserve every other REQUIREMENTS.md row: full sculpt/texture/UV/retopology,
-rig/skin/morph/avatar/plugin workflows, format/material fidelity and physical
-controller/stylus/3D-mouse/headset plus OneAPI/ROCm/CUDA evidence. Compare against
-newer main before treating any earlier gap as absent or reimplementing it.
+Whole-core C/C++ ASan/UBSan/leak coverage:15 authoring/export suites pass165.53s;
+then the final shutdown/file/recovery/GLB/atlas6-suite pass91.27s covers the latest
+worker and atlas corrections. Atlas17 focused checks also pass in Release and
+whole-core sanitizer overrides, including exact faces and actual low-resolution
+bake capacity; the unchanged bake fixture's39 assertions pass.
 
-Repository: https://github.com/jebot-git/dome-sculpt at
-`/home/blux/de-xr/dome-sculpt`. The parent is not a repository. Preserve unrelated
-de-xr repositories and all newer remote histories.
+All16 generated avatar variants pass the15 hash-checked pinned official VRM0
+schemas and Khronos with zero errors; each retains20 legacy/tangent warnings.
+Actual Arc material/picking25/25 and Unicode palette rendering also pass.
+The complete ONEAPI frontend built from this source passes96/96 syntheticXR
+with actual Arc brush compute; software EGL isolates loader/input behavior.
+Native Arc compute5suites7.10s plus shared-document6.38s are separate evidence.
+
+Earlier full integration failures remain in logs:60suite58/60 exposed UV slivers
+and recovery epoch cleanup;63suite61/63 exposed avoidable power-of-two band
+capacity refusal and an intermittent shutdown hang. Both have real fixes.
+The deterministic shutdown fixture forces the old lost-wakeup schedule and
+fails against old code; all worker notifications now handshake predicate locks.
+No timeout or strict geometry/paint assertion was weakened. See VALIDATION.md.
+
+This earlier checkpoint remains separately published at
+checkpoint/authoring-6df3cf2 with metadata500f321; see HANDOFF-500f321.md.
+Remote3d19776's independent pre-merge proof is archived separately. Neither its
+proof nor the64-suite checkpoint substitutes for combined verification above.
+
+## Live unfinished work
+
+The primary main tree may contain later agent work not in the publication build.
+Query collaboration ownership and git state before merging or staging. Preserve
+all such work. The old lazyUV/sourceUV/skin stash is an applied backup, not work
+to apply again. Obsolete prototype trees are not authoritative applications.
+
+- Production masks/symmetry: durable sparse COW masks, constrained brush arithmetic
+ and single-dispatch symmetry are being developed privately with new Sample,
+ Brush and Volume layouts. Desktop/XR authoring, flatVolume3 decoding, full scene
+ quota accounting and matching CPU/SYCL/HIP/CUDA evidence must follow. Do not
+ link this new header layout with the older published core.
+- Original/native frames: private corner-layout, explicit-matrix skin and Shape
+ Jacobian helpers exist; runtime/archive/export integration remains unfinished.
+ Creator Shape evaluates base/target keys individually before linear morphs.
+ Preserve current editable skin/pose while validating relevant original rest and
+ morph identities. No public sourceUV Apply guard has been removed.
+
+Live sourceUV user editing stays guarded: v7 UvDerivative pixels cannot be
+relabelled original-frame data. Future Scene v9/materials v2 records need explicit
+provenance, original/native frame identities, current skin/morph evaluation and
+validated re-bake from immutable origins while preserving current edits.
+
+## Full remaining scope
+
+Every incomplete REQUIREMENTS row remains required: production sculpt
+masks/symmetry/resolution/local meshing and sustained VR; layered projection,
+stencils/texture sets and production baking; complete retopo/cut/procedural/plugin
+workflows; interactive rig/landmarks/fingers/automatic weights and editable morphs;
+robust anime/toon humanoid authoring; full selected glTF/VRM1/constraints/expressions
+and independent graphical consumers; physical headset/controllers/stylus/3D mouse,
+session loss/reconnect, performance, and all eligible compute workloads.
+
+CUDA toolchain/hardware remains unavailable; HIP7.1 compiles gfx1030 but no AMD
+GPU/ROCK device is present. Compile-only or software graphics evidence cannot
+stand in for accelerator execution. CPU remains the default backend. See
+COMPUTE-VALIDATION.md and the exact reports in VALIDATION.md.
