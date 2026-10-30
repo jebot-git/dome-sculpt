@@ -90,6 +90,7 @@ private:
   std::vector<PolygonEdge> edges_;
   PolygonId next_ = 1;
   friend struct PolygonKernel;
+  friend struct PolygonSourceAccess;
   friend PolygonEditResult
   edit_polygon(const PolygonMesh &, const PolygonEdit &, const PolygonLimits &);
 };

@@ -168,3 +168,30 @@ alpha and surrounding GL state. Final screenshots are retained in
 The same five suites pass with complete own C/C++ core, support libraries and
 renderer instrumented by ASan/UBSan and leak detection in14.12s, with no reports.
 These are direct renderer/model proofs, not FLTK/XR workflow proofs.
+
+## Verified imported N-gon preparation
+
+`prepare_polygon_topology` recovers source face loops from the native adapter's
+version1 `dome_source_polygons` witness. It proves ordered native-to-canonical
+triangle correspondence, disjoint/exhaustive face ranges, exact original-corner
+attributes and directed triangle-boundary agreement. Shared original control
+points must have identical rest positions; different face corners retain their
+own UVs and normal-seam hard edges. Legitimate identical native accessor splits
+are accepted, incompatible splits refuse. The result retains a packed-corner to
+original native vertex map. Missing face metadata produces explicit triangles;
+it never infers quads by merging coplanar triangles.
+
+Metadata is read through a bounded native SAX reader, including duplicate-key,
+integer/version, depth, array-domain and aggregate work limits. Fault injection
+found that a temporary DOM's `nlohmann::json_value::destroy` can allocate inside
+its noexcept cleanup and terminate on failure. The new reader builds no DOM and
+requires no allocation during cleanup. No allocation sites are filtered out.
+
+This detached helper passes30 functional checks, all565 measured cancellation
+checkpoints and all671 measured allocation failures with exact original
+positions/normals/UV/indices, source bytes and successful retry. Fresh complete
+own C/C++ core/support ASan/UBSan/leak builds pass the same two fixtures in0.70s;
+Release passes in0.05s. These are synthetic exact-witness consumer tests; the
+combined current native-adapter path, Scene12 retained-origin codec, paint/rig
+conversion, FLTK controls and actual XR workflow still require integration and
+validation. The helper alone does not authorize loss of source attributes.
