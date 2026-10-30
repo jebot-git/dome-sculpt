@@ -20,6 +20,8 @@ struct Hand{
 };
 }
 int main(int argc,char**argv)try{
+ if(argc==3&&std::string(argv[1])=="--ui-fixture"){auto s=source(false);auto a=s.active().affine_edit->matrix().matrix();a[12]=a[13]=a[14]=0;s.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(a));s.active().material.unlit=true;s.active().material.color={.05f,.15f,.9f,1};s.save(argv[2]);return 0;}
+ if(argc==3&&std::string(argv[1])=="--inspect"){auto s=Scene::load(argv[2]);auto image=s.active().painted->pixel(1,32,32);std::cout<<nlohmann::json{{"scene",s.encode()},{"center_coverage",image.data[9]}}.dump()<<'\n';return 0;}
  const auto home=std::filesystem::temp_directory_path()/("dome-affine-contact-"+std::to_string(getpid()));std::filesystem::create_directories(home);setenv("HOME",home.c_str(),1);setenv("XDG_STATE_HOME",home.c_str(),1);setenv("XDG_CONFIG_HOME",home.c_str(),1);
  struct Cleanup{std::filesystem::path p;~Cleanup(){std::error_code ec;std::filesystem::remove_all(p,ec);}}cleanup{home};
  for(bool posed:{false,true}){

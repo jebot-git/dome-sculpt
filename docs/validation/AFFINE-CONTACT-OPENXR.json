@@ -1,0 +1,54 @@
+{
+  "source": "c638fee",
+  "status": "private test-only qualification; full affine import/authoring goal remains active",
+  "product_scope": "actual optimized FLTK/OpenXR frontend and coherent c638 core/support; only runtime/helper fixtures replaced with matching public/JSON headers and link maps",
+  "software": {
+    "assertions": 10,
+    "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+    "cases": [
+      "accept",
+      "focus"
+    ],
+    "report": "artifacts/loader-software-final/report.json",
+    "vendor": "Mesa",
+    "balanced_images": 56
+  },
+  "hardware": {
+    "assertions": 10,
+    "selector": "DRI_PRIME=0",
+    "host_device": "Intel Arc A770 at0000:03:00.0 (ordinal selection is host-specific)",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "cases": [
+      "accept",
+      "focus"
+    ],
+    "report": "artifacts/loader-arc-primary/report.json",
+    "vendor": "Intel",
+    "balanced_images": 56
+  },
+  "negative": {
+    "selector": "DRI_PRIME=1",
+    "renderer": "Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+    "exit": 1,
+    "reason": "strict requested Arc device assertion; functional hardware results not counted"
+  },
+  "scope_limits": [
+    "synthetic controller/head tracking, no physical HMD",
+    "actual stereo GL images and balanced ownership, no pacing/performance guarantee",
+    "static reflected/sheared source contact, no new held-motion graphics or prepared-normal interpretation claim",
+    "source c638 owncore sanitizer9 and controller57 qualify separately; merged Scene14/15/16 union still requires parent validation"
+  ],
+  "sha256": {
+    "CMakeLists.txt": "d665f4872c0242a22cb84527a0134c1755115a98b46ae4b55faf8cbc7e4d9a52",
+    "tests/affine-contact.cpp": "9d40bef988d3072d7a18854bb85d2daea78f3f1307fc9caa832c97ee32f9c229",
+    "tests/affine-contact-xr.py": "4d9ea04206ad791f6f98bc524a50aa9c8f95dce9480215981b5989628ba4a6c5",
+    "tests/xr_runtime.cpp": "f6176fd9537f34acd3f4a2d00ef1555b5c69dfe2153981c524acf69534a8ae47"
+  },
+  "logs": {
+    "artifacts/test-loader-software.log": "08a024c2fdcc108411b2b5ab8fe487b4feaa330e255d11b1d51578f833678876",
+    "artifacts/test-loader-software-final.log": "e647d9f457f433002e776ed9b89839c6cf8f9b08e840901039696470d3e17d10",
+    "artifacts/test-loader-arc.log": "622b33d87aa4e03ca1a775bf50788120484281e6ebe189f93ed638646fbb7e3a",
+    "artifacts/test-loader-arc-primary.log": "e647d9f457f433002e776ed9b89839c6cf8f9b08e840901039696470d3e17d10",
+    "artifacts/fixture-build-manifest.json": "083ff706cae71a931eb3e9728a3377346c94eb1f5f6be9a962e53c9cb71e6cec"
+  }
+}

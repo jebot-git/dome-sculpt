@@ -1008,3 +1008,11 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-normal-bake-encoding-test PRIVATE dome-sculpt-core)
   add_test(NAME normal-bake-frame-encoding COMMAND dome-sculpt-normal-bake-encoding-test)
 endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-affine-contact-test)
+  add_test(NAME affine-contact-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/affine-contact-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-affine-contact-test> ${CMAKE_CURRENT_BINARY_DIR}/affine-contact-xr)
+  set_tests_properties(affine-contact-openxr PROPERTIES TIMEOUT 150)
+endif()
