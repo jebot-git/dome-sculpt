@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "affine-matrix.hpp"
+#include "affine-factor.hpp"
+#include "dome/source-placement.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/scene.hpp"
 #include "dome/gltf-export.hpp"
@@ -81,6 +83,22 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
                               {"type", type}});
     return int(j["accessors"].size()) - 1;
   };
+  // A native affine edit is represented by two individually valid TRS nodes;
+  // original source locals remain separate exact matrices. Never serialize a
+  // sheared world/inverse transform as a single glTF node.matrix.
+  auto edit_nodes = [&](const std::shared_ptr<const NativeAffineEdit> &edit) {
+    std::vector<nlohmann::json> nodes;
+    if(edit)for(const auto &factor:factor_edit_for_gltf(edit->matrix(),cancelled).nodes)
+      nodes.push_back({{"matrix",factor.float_matrix()}});
+    return nodes;
+  };
+  auto attach = [&](int parent,nlohmann::json node) {
+    if(cancelled&&cancelled())throw std::runtime_error("glTF export cancelled");
+    const int index=int(j["nodes"].size());j["nodes"].push_back(std::move(node));
+    if(parent<0)j["scenes"][0]["nodes"].push_back(index);
+    else j["nodes"][parent]["children"].push_back(index);
+    return index;
+  };
   std::map<uint64_t, int> group_nodes;
   std::map<uint64_t, nlohmann::json> group_records;
   for (const auto &object : objects) {
@@ -101,22 +119,24 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         node["extras"]["domeSculptCreator"] = {{"type", "humanoid"}, {"version", 1},
                                                {"controls", g.humanoid->encode()}};
       }
-      auto record = node;
-      record["parentId"] = parent;
+      auto chain=edit_nodes(g.affine_edit);chain.push_back(std::move(node));
+      if(g.source_placement) {
+        g.source_placement->validate();
+        // Keep the original local float bits; native edits never overwrite it.
+        chain.push_back({{"matrix",g.source_placement->model->asset->nodes.at(g.source_placement->source_node).local}});
+      }
+      auto record=nlohmann::json{{"parentId",parent},{"chain",chain}};
       if (auto it = group_records.find(g.id); it != group_records.end()) {
         if (it->second != record) throw std::invalid_argument("Conflicting export group definitions");
       } else {
         if (group_nodes.size() >= 128) throw std::length_error("Export group limit exceeded");
-        int index = int(j["nodes"].size());
-        j["nodes"].push_back(std::move(node));
-        group_nodes[g.id] = index;
-        group_records[g.id] = std::move(record);
-        if (parent) j["nodes"][group_nodes.at(parent)]["children"].push_back(index);
-        else j["scenes"][0]["nodes"].push_back(index);
+        int leaf=parent?group_nodes.at(parent):-1;
+        for(auto &part:chain)leaf=attach(leaf,std::move(part));
+        group_nodes[g.id]=leaf;group_records[g.id]=std::move(record);
       }
       parent = g.id;
     }
-    validate_transform(object.world_transform());
+    (void)object.world_matrix();
   }
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
@@ -221,20 +241,19 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       append(data, index);
     int indices = add(begin, data.size() - begin, 34963, mesh.indices.size(),
                       5125, "SCALAR");
-    int node = int(j["nodes"].size()), material = int(j["materials"].size()),
-        mesh_index = int(j["meshes"].size());
-    emission.node=node; emission.mesh=mesh_index; emission.material=material;
+    int parent=o.groups.empty()?-1:group_nodes.at(o.groups.back().id);
+    for(auto &prefix:edit_nodes(o.affine_edit))parent=attach(parent,std::move(prefix));
+    int material = int(j["materials"].size()),mesh_index = int(j["meshes"].size());
     auto t = o.transform;
     auto &m = o.material;
-    if (o.groups.empty()) j["scenes"][0]["nodes"].push_back(node);
-    else j["nodes"][group_nodes.at(o.groups.back().id)]["children"].push_back(node);
-    j["nodes"].push_back(
+    const int node=attach(parent,
         {{"name", o.name},
          {"mesh", mesh_index},
          {"translation", {t.position.x, t.position.y, t.position.z}},
          {"rotation",
           {t.orientation.x, t.orientation.y, t.orientation.z, t.orientation.w}},
          {"scale", {t.scale, t.scale, t.scale}}});
+    emission.node=node; emission.mesh=mesh_index; emission.material=material;
     j["meshes"].push_back({{"name", o.name},
                            {"primitives",
                             {{{"attributes", attributes},
@@ -300,6 +319,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
             {"object",j["nodes"][node]}};
           // Object names/mesh identities are irrelevant; TRS must match exactly.
           identity["object"].erase("name"); identity["object"].erase("children");
+          if(o.affine_edit)identity["nativeAffineEdit"]=o.affine_edit->matrix().matrix();
           for(const auto &pose:d.pose) identity["pose"].push_back({
             {"t",{pose.translation.x,pose.translation.y,pose.translation.z}},
             {"r",{pose.rotation.w,pose.rotation.x,pose.rotation.y,pose.rotation.z}},

@@ -1,0 +1,78 @@
+{
+  "scope": "cpp-only changed exporter and new fixture linked before immutable ad9 matching support; public headers byte-compared; old export.cpp.o excluded by linkmap",
+  "release": {
+    "assertions": 61,
+    "cancellation_boundaries": 16,
+    "exit": 0,
+    "build_manifest": {
+      "source_commit": "ad9e03506ba26ebb90d6fc08874144fb234e9dcd",
+      "flags": [
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic"
+      ],
+      "support": "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13",
+      "sha256": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13/libdome-sculpt-core.a": "720d1b3f29de8bb0bbf7f09f0161205e890c519b1d5d4884e8e1932d9618a6ba",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13/libdome-sculpt-affine.a": "ec92cb0d777e57d3677d4559fdaef4b05bc3b7eac295fc932abc42e46c5f694f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13/libdome-sculpt-polygon.a": "2c9ceeeb231259a7cf5d5b3046af735a42e6ccb2c50a5884836135adeb863e14",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13/libxatlas.a": "857197d99bcd240466d3825247513ba58c4d7f613ac8af0fcedc16aac4a23d00",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13/libmikktspace.a": "bd5ee4474919785e41c04b183e1e587c63b09c77267edb918da6f55f004cf61f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13/libmikktspace-robust.a": "9467b7dc305031f27d62d15416344c0db51fcadb44e4f497e75be3510f3a7c32",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13/libufbx.a": "1a8dbf285301bf3d46939fafce231f751e672c466b29faec50dc74d118dc917b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/affine-consumers-ad9e035/src/export.cpp": "a6d0bf37c9349611711faa7fd9a764b4b586c4ea1632a812007953cad7d92ba6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/affine-consumers-ad9e035/tests/affine-export.cpp": "50188467f58698390f3c215965731362b3cbf9e85f1d94872321f70e13c70d3f"
+      }
+    }
+  },
+  "sanitize": {
+    "assertions": 61,
+    "cancellation_boundaries": 16,
+    "exit": 0,
+    "own_support": "fresh ad9 whole C/C++ ASan/UBSan/leak build",
+    "system_libraries": "not instrumented",
+    "build_manifest": {
+      "source_commit": "ad9e03506ba26ebb90d6fc08874144fb234e9dcd",
+      "flags": [
+        "-O1",
+        "-g1",
+        "-DNDEBUG",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-std=gnu++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic"
+      ],
+      "support": "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize",
+      "sha256": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize/libdome-sculpt-core.a": "225d2f7d6b9302586c6d7965eb05d6c03c90c116d94679c5b57bbf5d1d4103e2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize/libdome-sculpt-affine.a": "2b26bbd2e3f86fdf204253a45628ebdcfced85fe20c278d22d2ac04fbbad3ab7",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize/libdome-sculpt-polygon.a": "8156acc353b1254528893366fc390db590a3c99d5cd8e42bd6121ba744147129",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize/libxatlas.a": "113c7061d45b7465742b04c10280f1280d77d9fc238e841bcf8d31c6ccce61d9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize/libmikktspace.a": "bd6392394951bfca3efe47580466bb829e240adf96c277dc283779548c94564d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize/libmikktspace-robust.a": "7d9b98f6361e76e243767fb9dc406bc90df3a67b062cb660f7a00509d5b5f41e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/import-affine-scene13-84d9/build-scene13-sanitize/libufbx.a": "0660a02584850ff75b7f57fb4556ddb3879557b32c03148d412cf7916b28f7ac",
+        "/home/blux/de-xr/dome-sculpt/artifacts/affine-consumers-ad9e035/src/export.cpp": "a6d0bf37c9349611711faa7fd9a764b4b586c4ea1632a812007953cad7d92ba6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/affine-consumers-ad9e035/tests/affine-export.cpp": "50188467f58698390f3c215965731362b3cbf9e85f1d94872321f70e13c70d3f"
+      }
+    }
+  },
+  "regressions": [
+    "gltf",
+    "source-morph",
+    "vrm"
+  ],
+  "negative": {
+    "source": "unchanged ad9 export.cpp",
+    "exit": 1,
+    "diagnostic": "This surface has exact affine placement; use world_matrix"
+  },
+  "sources": {
+    "src/export.cpp": "a6d0bf37c9349611711faa7fd9a764b4b586c4ea1632a812007953cad7d92ba6",
+    "tests/affine-export.cpp": "50188467f58698390f3c215965731362b3cbf9e85f1d94872321f70e13c70d3f"
+  }
+}
