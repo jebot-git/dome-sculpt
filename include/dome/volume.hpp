@@ -97,6 +97,8 @@ public:
   static Volume load(const std::filesystem::path &);
 
 private:
+  friend class Document;
+  void swap_state(Volume &) noexcept;
   struct GeometryHistory;
   using GeometryHistoryPtr = std::shared_ptr<const GeometryHistory>;
   GeometryHistoryPtr geometry_history_, geometry_start_;

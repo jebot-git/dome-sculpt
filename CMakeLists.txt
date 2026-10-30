@@ -41,7 +41,7 @@ add_library(mikktspace STATIC third_party/mikktspace/mikktspace.c)
 target_include_directories(mikktspace PUBLIC third_party/mikktspace)
 add_library(dome-sculpt-core src/volume.cpp src/volume-raycast.cpp src/sculpt-mask.cpp src/sculpt-resolution.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/tangents.cpp src/bake-authoring.cpp src/document-baking.cpp src/creator-archive.cpp src/paint.cpp src/projection.cpp src/source-maps.cpp src/material-bindings.cpp src/source-uv-bake.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/source-morph.cpp src/vrm.cpp src/input.cpp src/document.cpp src/document-uv-solve.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/vroid-groom.cpp src/deformation.cpp src/rig-edit.cpp src/weight-edit.cpp src/weight-authoring.cpp src/material-visibility.cpp src/skin-authoring.cpp src/document-skin.cpp src/uv-solve.cpp src/import.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
-target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp)
+target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-transaction.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/document-cut.cpp)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)
 target_compile_definitions(dome-sculpt-core PRIVATE
@@ -90,6 +90,19 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-resolution-allocation-test tests/sculpt-resolution-allocation.cpp)
   target_link_libraries(dome-sculpt-resolution-allocation-test PRIVATE dome-sculpt-core)
   add_test(NAME sculpt-resolution-allocation COMMAND dome-sculpt-resolution-allocation-test)
+  add_executable(dome-sculpt-document-transactions-test tests/document-transactions.cpp)
+  target_link_libraries(dome-sculpt-document-transactions-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-document-transactions-test PRIVATE
+    -Wl,--wrap=_ZN4dome8Document11TransactionC1ERS0_
+    -Wl,--wrap=_ZN4dome8Document11Transaction6commitEb
+    -Wl,--wrap=_ZN4dome8Document11TransactionD1Ev
+    -Wl,--wrap=_ZN4dome8Document19process_uv_transferERNS0_7FileJobE
+    -Wl,--wrap=_ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE
+    -Wl,--wrap=_ZN4dome5Scene4loadERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE)
+  foreach(endpoint structural scalar control undo paint-undo sculpt-undo asset uv open save recovery asset-queue uv-queue open-queue save-queue export-queue native-begin-queue native-save-queue prepare-queue refresh-queue restore-queue restore postcommit)
+    add_test(NAME transaction-${endpoint} COMMAND dome-sculpt-document-transactions-test ${endpoint})
+  endforeach()
   add_library(dome-sculpt-native-gui-gate SHARED tests/native-gui-gate.cpp)
   target_link_libraries(dome-sculpt-native-gui-gate PRIVATE ${CMAKE_DL_LIBS} Threads::Threads)
   add_executable(dome-sculpt-native-allocation-test tests/native-strokes-allocation.cpp)

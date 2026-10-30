@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/import.hpp"
 #include "dome/mesh-authoring.hpp"
+#include "document-transaction.hpp"
 namespace dome {
 SceneDraft Document::draft_scene() const {
   std::lock_guard lock(model_mutex_);
@@ -32,7 +33,6 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
     throw std::logic_error("Apply or cancel retopology before starting asset work");
   if (state_.cut && (!cut_session || cut_session != cut_session_.load()))
     throw std::logic_error("Apply or cancel the plane cut before starting asset work");
-  publish_locked();
   FileJob job{scene_.snapshot(), {}, state_.revision, state_.generation, content_, false};
   job.object = scene_.active().id;
   job.scene_operation = std::move(operation);
@@ -45,12 +45,15 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   job.cut_session = cut_session;
   std::lock_guard file_lock(file_mutex_);
   if (files_.size() >= 8) throw std::runtime_error("File and asset work queue is full");
+  Transaction transaction(*this);
   files_.push_back(std::move(job));
+  try {
   asset_work_.store(files_.back().work);
   state_.asset_busy = true;
   state_.error.clear();
   state_.message = files_.back().operation_label + "...";
-  publish_locked();
+  publish_locked(false,false);transaction.commit();
+  }catch(...){files_.pop_back();throw;}
   file_changed_.notify_one();
 }
 void Document::remesh_to_sculpt(float world_voxel_mm, AssetSource expected) {

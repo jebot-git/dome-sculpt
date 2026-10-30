@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
 #include <new>
+#include "document-transaction.hpp"
 namespace dome {
 namespace {
 bool heavy_uv(UvAction action) {
@@ -57,28 +58,12 @@ void Document::invalidate_uv_locked() {
   uv_validation_.reset();
   uv_changed_.notify_all();
 }
-void Document::schedule_uv_locked() {
-  if (!uv_ || uv_accept_pending_ || uv_solving_) return;
-  if (!uv_->view().validating) {
-    if (!uv_scheduled_.expired()) invalidate_uv_locked();
-    return;
-  }
-  if (uv_scheduled_.lock() == uv_->view().mesh) return;
-  auto mesh = uv_->view().mesh;
-  uv_scheduled_ = mesh;
-  const bool initializing = !uv_->view().topology;
-  if (initializing) {
-    // Source lease is captured after publish_locked has accounted for any
-    // just-finished stroke, without copying its geometry on this thread.
-    control_source_ = {state_.generation, state_.revision, control_object_};
-    uv_solving_ = true;
-    state_.message = "Preparing UV charts...";
-  }
-  UvValidationJob job{++uv_request_, uv_session_, state_.generation, mesh, {},
-      initializing ? std::make_shared<UvWorkspace>(*uv_) : nullptr};
-  std::lock_guard lock(uv_mutex_);
-  uv_validation_ = std::move(job);
-  uv_changed_.notify_all();
+std::optional<Document::UvValidationJob> Document::prepare_uv_schedule_locked() {
+  if (!uv_ || uv_accept_pending_ || uv_solving_ || !uv_->view().validating ||
+      uv_scheduled_.lock() == uv_->view().mesh) return {};
+  auto mesh=uv_->view().mesh;
+  return UvValidationJob{0,uv_session_,state_.generation,mesh,{},
+      !uv_->view().topology?std::make_shared<UvWorkspace>(*uv_):nullptr};
 }
 void Document::uv_loop() {
   for (;;) {
@@ -269,19 +254,13 @@ void Document::process_uv_transfer(FileJob &job) {
     if (current.painted != job.paint_identity ||
         current.painted->revision() != job.source_revision)
       throw std::runtime_error("The source mesh changed during UV transfer");
-    input_.complete_control();
-    finish_control_locked(false);
-    if (job.uv_desktop) desktop_ = false;
-    if (changed) {
-      Scene before = scene_;
-      scene_ = std::move(prepared);
-      record_locked({{}, std::move(before), scene_});
-      bind_locked();
-    }
-    state_.asset_busy = false;
-    state_.message = "UVs, paint and deformation identities updated";
-    state_.error.clear();
-    publish_locked(changed);
+    Transaction transaction(*this);
+    transaction.finish_uv();
+    if(job.uv_desktop)desktop_=false;
+    if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
+    state_.asset_busy=false;state_.message="UVs, paint and deformation identities updated";state_.error.clear();
+    publish_locked(changed,false);transaction.commit();
+
   }
   std::lock_guard lock(file_mutex_);
   file_changed_.notify_all();

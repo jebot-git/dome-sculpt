@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/material-visibility.hpp"
+#include "document-transaction.hpp"
 #include <pthread.h>
 namespace dome {
 namespace {
@@ -18,8 +19,15 @@ bool Document::begin_native_stroke(){
   auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
   session->source={state_.generation,state_.revision,o.id};session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
   session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;
-  {std::lock_guard queue(native_mutex_);if(native_jobs_.size()>=8){state_.error="Desktop gesture queue is full; retry after pending cancellation finishes";publish_locked();return false;}native_jobs_.push_back(session);}
-  input_.cancel();native_stroke_=std::move(session);desktop_=true;state_.error.clear();state_.message="Desktop stroke";state_.native_samples=0;publish_locked();native_changed_.notify_all();return true;
+  std::lock_guard queue(native_mutex_);
+  if(native_jobs_.size()>=8){state_.error="Desktop gesture queue is full; retry after pending cancellation finishes";publish_locked();return false;}
+  Transaction transaction(*this);native_jobs_.push_back(session);
+  try{
+    input_.cancel();native_stroke_=std::move(session);desktop_=true;state_.error.clear();state_.message="Desktop stroke";state_.native_samples=0;
+    publish_locked(false,false);transaction.commit();
+  }catch(...){native_jobs_.pop_back();throw;}
+  native_changed_.notify_all();return true;
+
 }
 bool Document::sample_native_stroke(NativeStrokeSample sample){
   if(!std::isfinite(sample.material_time)||!finite(sample.origin)||!finite(sample.direction)||length(sample.direction)<1e-8f||!std::isfinite(sample.brush.radius)||sample.brush.radius<=0||sample.brush.radius>5||!std::isfinite(sample.brush.pressure)||sample.brush.pressure<0||sample.brush.pressure>1)throw std::invalid_argument("Invalid native stroke sample");

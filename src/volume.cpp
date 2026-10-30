@@ -812,4 +812,30 @@ Volume Volume::decode(const nlohmann::json &j) {
   v.geometry_history_.reset();
   return v;
 }
+void Volume::swap_state(Volume &other) noexcept {
+  using std::swap;
+  static_assert(noexcept(swap(geometry_history_,other.geometry_history_)));swap(geometry_history_,other.geometry_history_);
+  static_assert(noexcept(swap(geometry_start_,other.geometry_start_)));swap(geometry_start_,other.geometry_start_);
+  static_assert(noexcept(swap(mask_,other.mask_)));swap(mask_,other.mask_);
+  static_assert(noexcept(swap(settings_,other.settings_)));swap(settings_,other.settings_);
+  static_assert(noexcept(swap(mask_start_,other.mask_start_)));swap(mask_start_,other.mask_start_);
+  static_assert(noexcept(swap(cells_start_,other.cells_start_)));swap(cells_start_,other.cells_start_);
+  static_assert(noexcept(swap(delta_start_,other.delta_start_)));swap(delta_start_,other.delta_start_);
+  static_assert(noexcept(swap(mask_stroke_,other.mask_stroke_)));swap(mask_stroke_,other.mask_stroke_);
+  static_assert(noexcept(swap(mask_changed_,other.mask_changed_)));swap(mask_changed_,other.mask_changed_);
+  static_assert(noexcept(swap(layers_,other.layers_)));swap(layers_,other.layers_);
+  static_assert(noexcept(swap(active_,other.active_)));swap(active_,other.active_);
+  static_assert(noexcept(swap(next_layer_,other.next_layer_)));swap(next_layer_,other.next_layer_);
+  static_assert(noexcept(swap(before_delta_,other.before_delta_)));swap(before_delta_,other.before_delta_);
+  static_assert(noexcept(swap(voxel_,other.voxel_)));swap(voxel_,other.voxel_);
+  static_assert(noexcept(swap(band_,other.band_)));swap(band_,other.band_);
+  static_assert(noexcept(swap(cells_,other.cells_)));swap(cells_,other.cells_);
+  static_assert(noexcept(swap(before_,other.before_)));swap(before_,other.before_);
+  static_assert(noexcept(swap(undo_,other.undo_)));swap(undo_,other.undo_);
+  static_assert(noexcept(swap(redo_,other.redo_)));swap(redo_,other.redo_);
+  static_assert(noexcept(swap(history_limit_,other.history_limit_)));swap(history_limit_,other.history_limit_);
+  static_assert(noexcept(swap(history_bytes_,other.history_bytes_)));swap(history_bytes_,other.history_bytes_);
+  static_assert(noexcept(swap(editing_,other.editing_)));swap(editing_,other.editing_);
+  static_assert(noexcept(swap(revision_,other.revision_)));swap(revision_,other.revision_);
+}
 } // namespace dome

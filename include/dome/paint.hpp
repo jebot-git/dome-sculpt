@@ -138,6 +138,8 @@ public:
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive * = nullptr);
 
 private:
+  friend class Document;
+  void swap_state(PaintedMesh &) noexcept;
   friend struct SourceUvBakeAccess;
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);

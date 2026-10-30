@@ -168,6 +168,7 @@ struct EditorSnapshot {
 // frame loop.
 class Document {
   friend struct DocumentNativeTestAccess;
+  friend struct DocumentTransactionTestAccess;
 public:
   Document();
   ~Document();
@@ -287,6 +288,8 @@ private:
     uint64_t from = 0, to = 0;
     std::shared_ptr<PaintedMesh> paint{};
   };
+  class Transaction;
+  Transaction *transaction_ = nullptr;
   std::deque<History> undo_, redo_;
   SpatialInput input_;
   CanvasNavigation navigation_;
@@ -301,7 +304,7 @@ private:
   std::vector<RecoveryCandidate> recovery_catalog_;
   uint64_t recovery_content_ = 0;
   std::string recovery_discovery_error_;
-  void replace_locked(Scene, bool clean);
+  void replace_locked(Scene, bool clean, std::filesystem::path = {}, std::string message = {});
   void checkpoint_locked();
   void refresh_recovery_locked();
   void restore_recovery_locked(size_t);
@@ -381,7 +384,7 @@ private:
   std::optional<UvValidationJob> uv_validation_;
   std::weak_ptr<const Mesh> uv_scheduled_;
   std::atomic<uint64_t> uv_request_{0};
-  void schedule_uv_locked();
+  std::optional<UvValidationJob> prepare_uv_schedule_locked();
   void invalidate_uv_locked();
   void uv_loop();
   void queue_uv_operation_locked(UvAction);
