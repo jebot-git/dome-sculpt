@@ -1,0 +1,44 @@
+{
+  "base": "085d353",
+  "status": "PRIVATE WIP; graphical qualification blocked; do not publish as full support",
+  "implemented": [
+    "hybrid original-chain adoption: old native similarity route preserved; all selected original nodes use one immutable SourceNodePlacement model when any node needs affine authority",
+    "inverse/world preflight and exact original local matrices separated from identity native edit deltas",
+    "verified bounded two-TRS export of sheared skin bind-space, separate rig-root/rig-leaf references, original IBMs unchanged"
+  ],
+  "completed": {
+    "source_chain_independent_checks": 821,
+    "initial_native_suites": 5,
+    "initial_native_seconds": 0.24,
+    "combined_release": "7/8 pass; affine skin graphical case fails54",
+    "frontface_reference_followup": "baseline skin pass; affine skin residual18, tolerance2 unchanged"
+  },
+  "negative_or_open": [
+    "independent shared consumer originally hardcodedCCW; corrected from core glTF spec negative determinant rule",
+    "remaining reflected tangent/bitangent handedness witness not implemented or resolved",
+    "no sanitizer, new actual native affine-import GUI or Arc qualification for this route",
+    "material0/no-material, UV1, no-map overlapping source UV and remaining FBX/animation constraints still explicit required scope"
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "77da9a676fd4b64a312552b174ab15f0bfac17c0b6da17cb1a45dc3b1d009434",
+    "src/import-authoring.cpp": "500aa71c9c28bb4ec27e73adff9a561054d69542cef8ea42f02fbc6e03ff875c",
+    "src/export.cpp": "45ea7333c08fa01e5fda09b357d91b6684c5e434a00d46e164100d454b8819fd",
+    "tests/import-source-chain.cpp": "7011f7ffaad3f8a469cc2555165ba9e7a7b5e0daab3a3b64bf1b986b0cbdc4f1",
+    "tests/import-authoring.cpp": "3f573c87ade6c3dabac2f0ffb9d5e9f9564f4de39eb23901cf30f88645139524",
+    "tests/import-options.cpp": "b640e2e0ccc7918e200f69cda1e3015e5cfa06c4e8b0f221b69980452fb463f7",
+    "tests/import-skin.cpp": "e234cb8f2ab97fe68864b1b32b7da367a4732b6ee22391ba2b8e897b8c1e7ebb",
+    "tests/import-source.cpp": "ce151fa9cfa46e6bd5489005d60e2becd72185ef8e4519c9aa213e2a88fc6b92",
+    "tests/import-skin-render.cpp": "acecaa25b53e41bf20ce07014bd74269379f731a0c0b2663b24f11a512156ecc",
+    "tests/source-color-consumer.hpp": "63ddb9ca205bdb35de23f6a384edd602022b38586ecfaa031a8bbaf4a41c5a9c"
+  },
+  "logs": {
+    "artifacts/configure-chain-release.log": "fface66120c28c599499a4f394b55a101816938baf0d6a83ccd10f718bc56b03",
+    "artifacts/build-chain-release.log": "18753dfc1ec4a706d461409c07e4b0927e5cd1681f91aedb16e77b953970eaf1",
+    "artifacts/test-chain-release.log": "ee88b3732cd691b638dedf85c290a23acd6e10a86378682f9fd7cd0cd43e8444",
+    "artifacts/test-source-chain-first.log": "d62eb91ab5069f60b9ed06f3c241cee62037924616b643c602ca1ac37f49da4e",
+    "artifacts/build-chain-render-release.log": "958304cbb4c6e31001a39b55fa8e64208be2cac40e2acf40c918a92e9bc0b5a9",
+    "artifacts/test-chain-render-release.log": "15a9774e3c2921c9f3e6c9865e27ed3875d5fdf2da003b78859e54ebd6f9c098",
+    "artifacts/test-chain-reference-front.log": "a4d05e8ca2c762338758160dfc6a57ec32390be2ab6bb3ff95a862b57c844c65"
+  },
+  "live_jobs": []
+}
