@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "document-held-affine.hpp"
 #include "dome/material-visibility.hpp"
 #include "document-transaction.hpp"
 #include "document-authority-transition.hpp"
@@ -13,6 +14,10 @@ CanvasTransform Document::object_world_transform_locked(uint64_t id) const {
   if(state_.object_grabbing && state_.held_object==id)
     return ob::compose(ob::compose(world,ob::inverse(scene_.object(id).transform)),held_preview_transform_);
   return world;
+}
+AffineTransform Document::object_world_matrix_locked(uint64_t id) const {
+  if(state_.object_grabbing&&state_.held_object==id&&held_affine_)return held_affine_->world(held_preview_transform_);
+  return scene_.world_matrix(id);
 }
 bool Document::object_editable_locked(uint64_t id) const {
   auto found=std::find_if(scene_.objects().begin(),scene_.objects().end(),[&](const auto &o){return o.id==id;});
@@ -36,7 +41,7 @@ bool Document::invalidate_object_authority_locked() {
   invalidate_uv_locked();
   // Accepted polygon cancellation follows successful permission publication.
   if(!polygon_accepting_)cancel_asset_work_locked();
-  state_.object_grabbing=false;object_navigation_.reset();navigation_.reset();
+  state_.object_grabbing=false;held_affine_.reset();object_navigation_.reset();navigation_.reset();
   ++state_.edit_authority;return false;
 }
 bool Document::held_weight_pending_locked() const {auto work=asset_work_.load();return state_.asset_busy&&work&&work->held_weight&&!work->cancelled.load();}
@@ -45,10 +50,10 @@ void Document::configure_object_grab_locked(bool mode,bool isolate){
   if(state_.object_grab_mode==mode && state_.isolate_held==isolate)return;
   if(held_weight_pending_locked())throw std::logic_error("Wait for the accepted held weight edit before changing grab controls");
   const bool picking_change=state_.object_grab_mode!=mode;
-  const bool keep_motion=state_.object_grabbing&&!picking_change;const auto pose=held_preview_transform_,start=held_start_transform_;const auto nav=object_navigation_;const bool desktop=desktop_;
+  const bool keep_motion=state_.object_grabbing&&!picking_change;const auto pose=held_preview_transform_,start=held_start_transform_;const auto nav=object_navigation_;const bool desktop=desktop_;const auto affine=held_affine_;
   AuthorityTransition transition(*this);const bool changed=invalidate_object_authority_locked();
   state_.object_grab_mode=mode;state_.isolate_held=isolate;
-  if(keep_motion){state_.object_grabbing=true;held_preview_transform_=pose;held_start_transform_=start;object_navigation_=nav;desktop_=desktop;}
+  if(keep_motion){state_.object_grabbing=true;held_preview_transform_=pose;held_start_transform_=start;object_navigation_=nav;desktop_=desktop;held_affine_=affine;}
   if(!mode)state_.held_object=0;
   publish_locked(changed||picking_change,false);transition.commit();
 }
@@ -66,11 +71,12 @@ bool Document::begin_object_grab(uint64_t id){std::lock_guard lock(model_mutex_)
 bool Document::begin_object_grab_locked(uint64_t id){
   if(!state_.object_grab_mode||state_.asset_busy||state_.recovery_busy)return false;
   const auto &object=scene_.object(id);if(!object.visible||object.locked)return false;
-  if(scene_.has_affine_placement(id))throw std::logic_error("Affine object holding requires the complete world-delta controller path");
   const bool polygon_motion=state_.polygon && !polygon_accepting_ && id==polygon_source_.object && polygon_source_matches_locked();
   if(state_.polygon&&!polygon_motion)return false;
   AuthorityTransition transition(*this);const bool changed=polygon_motion?false:invalidate_object_authority_locked();scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;
-  state_.held_object=id;held_preview_transform_=held_start_transform_=scene_.object(id).transform;state_.object_grabbing=true;publish_locked(changed,false);transition.commit();return true;
+  state_.held_object=id;held_preview_transform_=held_start_transform_=scene_.object(id).transform;state_.object_grabbing=true;
+  held_affine_=scene_.has_affine_placement(id)?std::make_shared<const HeldAffine>(scene_,id):nullptr;
+  publish_locked(changed,false);transition.commit();return true;
 }
 void Document::move_held_object(CanvasTransform local){std::lock_guard lock(model_mutex_);move_held_object_locked(local);}
 void Document::move_held_object_locked(CanvasTransform local){
@@ -79,9 +85,27 @@ void Document::move_held_object_locked(CanvasTransform local){
   if(!state_.object_grabbing || !state_.held_object)throw std::logic_error("Begin an object grab first");
   require_object_editable_locked(state_.held_object);
   if(equal_transform(held_preview_transform_,local))return;
-  const auto previous=held_preview_transform_;held_preview_transform_=local;
-  try{publish_locked(false,false);}catch(...){held_preview_transform_=previous;throw;}
+  const auto previous=held_preview_transform_;const auto affine=held_affine_;const auto navigation=object_navigation_;
+  if(affine){auto candidate=std::make_shared<HeldAffine>(*affine);candidate->rebase(local);held_affine_=std::move(candidate);object_navigation_.reset();}
+  held_preview_transform_=local;
+  try{publish_locked(false,false);}catch(...){held_preview_transform_=previous;held_affine_=affine;object_navigation_=navigation;throw;}
 }
+void Document::move_held_object_world(CanvasTransform delta){std::lock_guard lock(model_mutex_);move_held_object_world_locked(delta);}
+void Document::move_held_object_world_locked(CanvasTransform delta) {
+  (void)affine_similarity(delta);
+  if(!state_.object_grabbing||!state_.held_object)throw std::logic_error("Begin an object grab first");
+  if(held_polygon_pending_locked())throw std::logic_error("Wait for the accepted polygon edit before moving its captured pose");
+  require_object_editable_locked(state_.held_object);
+  if(!held_affine_){
+    auto parent=ob::compose(scene_.world_transform(state_.held_object),ob::inverse(scene_.object(state_.held_object).transform));
+    move_held_object_locked(ob::compose(ob::inverse(parent),ob::compose(delta,scene_.world_transform(state_.held_object))));return;
+  }
+  const auto previous=held_affine_;
+  if(equal_transform(ob::compose(delta,previous->base_pivot),previous->preview_pivot))return;
+  auto candidate=std::make_shared<HeldAffine>(*previous);candidate->move(delta);held_affine_=std::move(candidate);
+  try{publish_locked(false,false);}catch(...){held_affine_=previous;throw;}
+}
+
 void Document::update_object_grab_locked(const SpatialFrame &frame){
   std::array<TrackedHand,2> hands{frame.hands[0].tracked,frame.hands[1].tracked};
   for(size_t i=0;i<2;++i)if(!hands[i].valid||hands[i].squeeze<=.55f)polygon_grip_latch_[i]=false;
@@ -103,12 +127,23 @@ void Document::update_object_grab_locked(const SpatialFrame &frame){
     }
     if(!begin_object_grab_locked(target))return;
   }
-  auto world=ob::compose(state_.canvas,object_world_transform_locked(state_.held_object));
-  if(auto moved=object_navigation_.update(hands,world)){
-    auto parent=ob::compose(scene_.world_transform(state_.held_object),ob::inverse(scene_.object(state_.held_object).transform));
-    auto local=ob::compose(ob::inverse(parent),ob::compose(ob::inverse(state_.canvas),*moved));
-    move_held_object_locked(local);
-  }
+  const auto navigation=object_navigation_;
+  try {
+    if(held_affine_) {
+      const auto world=ob::compose(state_.canvas,held_affine_->preview_pivot);
+      if(auto moved=object_navigation_.update(hands,world)) {
+        const auto pivot=ob::compose(ob::inverse(state_.canvas),*moved);
+        move_held_object_world_locked(ob::compose(pivot,ob::inverse(held_affine_->base_pivot)));
+      }
+    } else {
+      auto world=ob::compose(state_.canvas,object_world_transform_locked(state_.held_object));
+      if(auto moved=object_navigation_.update(hands,world)){
+        auto parent=ob::compose(scene_.world_transform(state_.held_object),ob::inverse(scene_.object(state_.held_object).transform));
+        auto local=ob::compose(ob::inverse(parent),ob::compose(ob::inverse(state_.canvas),*moved));
+        move_held_object_locked(local);
+      }
+    }
+  }catch(...){object_navigation_=navigation;throw;}
   if(!object_navigation_.grabbing()){
     finish_object_grab_locked(true,!state_.polygon);
   }
@@ -119,11 +154,11 @@ void Document::finish_object_grab_locked(bool accept,bool release){
   if(action_active_locked()&&!polygon_accepting_){if(accept){if(end_action_locked())record_stroke_locked();}else cancel_action_locked();}
   if(accept&&held_weight_pending_locked()){object_navigation_.reset();desktop_=false;state_.message="Finishing held weight edit...";publish_locked(false,false);return;}
   if(!accept&&held_weight_pending_locked())cancel_asset_work_locked();
-  const auto id=state_.held_object;auto &object=scene_.object(id);const bool changed=!equal_transform(held_preview_transform_,held_start_transform_);
+  const auto id=state_.held_object;auto &object=scene_.object(id);const bool changed=!equal_transform(held_preview_transform_,held_start_transform_)||(held_affine_&&held_affine_->preview_edit!=object.affine_edit);
   AuthorityTransition authority(*this);Transaction transaction(*this);
   if(release&&state_.edit_authority==UINT64_MAX)throw std::overflow_error("Object editing authority exhausted");
-  if(changed&&accept){auto before=scene_.snapshot();object.transform=held_preview_transform_;record_locked({{},std::move(before),scene_});}
-  state_.object_grabbing=false;desktop_=false;object_navigation_.reset();if(release){state_.held_object=0;++state_.edit_authority;input_.cancel();}
+  if(changed&&accept){auto before=scene_.snapshot();object.transform=held_preview_transform_;if(held_affine_)object.affine_edit=held_affine_->preview_edit;record_locked({{},std::move(before),scene_});}
+  state_.object_grabbing=false;held_affine_.reset();desktop_=false;object_navigation_.reset();if(release){state_.held_object=0;++state_.edit_authority;input_.cancel();}
   const bool need_picking=release&&state_.object_grab_mode&&!mesh_.load()->picking;
   publish_locked((changed&&accept)||need_picking,false);
   if(state_.polygon&&!release)rebase_polygon_transform_locked();

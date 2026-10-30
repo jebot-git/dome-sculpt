@@ -498,7 +498,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
                               o.material, o.mesh_active, bool(o.painted),object_editable_locked(o.id),
                               o.visible && state_.isolate_held && state_.held_object && o.id!=state_.held_object,
                               affine?CanvasTransform{}:object_world_transform_locked(o.id),!affine});
-    if(affine)state_.objects.back().affine_world=scene_.world_matrix(o.id);
+    if(affine)state_.objects.back().affine_world=object_world_matrix_locked(o.id);
   }
   if (uv_)
     control_changed_ = uv_changed(
@@ -1221,10 +1221,11 @@ void Document::process_locked(const SpatialFrame &f) {
       return;
     }
   }
-  auto object_canvas = ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
+  const bool affine_target=scene_.has_affine_placement(scene_.active().id);
+  auto object_canvas = affine_target?state_.canvas:ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
-      !state_.asset_busy && object_editable_locked(scene_.active().id) &&
+      !affine_target && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;

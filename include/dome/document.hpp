@@ -217,6 +217,8 @@ public:
   void object_visibility(uint64_t, bool, AssetSource expected = {});
   bool begin_object_grab(uint64_t);
   void move_held_object(CanvasTransform local);
+  // Absolute world-similarity delta from the current grab/rebase anchor.
+  void move_held_object_world(CanvasTransform delta);
   void end_object_grab(bool accept = true);
   std::optional<uint64_t> pick_object(Vec3,Vec3,double material_time=0) const;
   void replace(Volume, bool clean = true);
@@ -344,7 +346,11 @@ private:
   SpatialInput input_;
   CanvasNavigation navigation_, object_navigation_;
   CanvasTransform held_start_transform_{},held_preview_transform_{};
+  struct HeldAffine;
+  std::shared_ptr<const HeldAffine> held_affine_;
   CanvasTransform object_world_transform_locked(uint64_t) const;
+  AffineTransform object_world_matrix_locked(uint64_t) const;
+  void move_held_object_world_locked(CanvasTransform);
   bool object_editable_locked(uint64_t) const;
   bool invalidate_object_authority_locked();
   void finish_object_grab_locked(bool accept, bool release);

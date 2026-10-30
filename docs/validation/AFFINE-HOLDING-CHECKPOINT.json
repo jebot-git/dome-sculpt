@@ -1,0 +1,32 @@
+{
+  "base": "9491b50",
+  "release": {
+    "controller_checks": 44,
+    "main_thread_oom_assertions": 173,
+    "main_thread_oom_boundaries": 42,
+    "software_graphics_checks": 27,
+    "arc_a770_graphics_checks": 27,
+    "native_fltk_checks": 11,
+    "static_gpu_regressions": 13,
+    "toolkit": "eee23b7"
+  },
+  "sanitize": "pending; actual worker-thread denial also needs separate b395ff3 fix",
+  "logs": "artifacts/held-proof",
+  "sha256": {
+    "CMakeLists.txt": "ce4a8c91b55a57c378f43675f593e9c0200bccc82559bccd60b6ac6167ac3c68",
+    "include/dome/document.hpp": "9d166b01c220133a5bbd2004251cf519e6394c9cbda8e881452e1544bca02b98",
+    "src/app.cpp": "4fb09d3d460fe2896c1a5de2b8133d5b64bd3720450be5386c183e3e2f190686",
+    "src/document-authority-transition.hpp": "2356c1b56488961f8380a1868afc679334ec581b5956658cbe3fb8f9c30f86a2",
+    "src/document-interaction.cpp": "32caa9708ed913c02f368e2c5780f7ec14149b56fb1e06be5b52daa6454aa7e2",
+    "src/document-native.cpp": "f81b9a1b9c31edf3fe3ef84533a2cd79aeca23de2a8d78ab665ff9aaa1eca6c2",
+    "src/document-transaction.cpp": "311852260453f388ffc742141e4bcea8f1d62ec1b89093864e24039c8240c8a3",
+    "src/document-transaction.hpp": "7e97c7b1e63aa5fc9aa4c6cf1ccda39b99c4df064f2e2d2952eaf55d54c0e5de",
+    "src/document.cpp": "952d9050c7d3f13d95b745f0ba816d2c9db3716c2d756b41123647641628994b",
+    "src/render-mtoon.hpp": "396b6f63a8adb9f27ec46e4f77b269177cda567c69e42334e3d473116985a2da",
+    "src/render.cpp": "c1bfee23b23c097414caffdfdac1b415b612b5645652286bf0baaee7f4758923",
+    "src/document-held-affine.hpp": "aeffd1926af86f6ff6460373a209515a4075fde2f97317854eaf0ff653e03abb",
+    "tests/affine-held-menu.py": "67176a9ae68ed3e7695d64c7a2decb1058d4760a6d5e4393af5f425ac770b3e2",
+    "tests/affine-held-render.cpp": "7815687908ec41216d5090ab7dfa77d4185cad336051ef4cb2f559ece42b57ac",
+    "tests/affine-held.cpp": "daa2a6f675e407b59296757cc6fcb939cc8676020b59ca3421ab3ab700f347b1"
+  }
+}

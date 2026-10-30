@@ -20,6 +20,7 @@ bool Document::begin_native_stroke(){
   std::lock_guard lock(model_mutex_);auto &o=scene_.active();
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
+  if(scene_.has_affine_placement(o.id)&&state_.object_grabbing)return false;
   if(scene_.has_affine_placement(o.id)&&!o.mesh_active){state_.message="Affine sculpt strokes require the full field metric path";publish_locked();return false;}
   auto preview=mesh_.load();
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision){state_.message="Wait for the current surface before painting";publish_locked();return false;}

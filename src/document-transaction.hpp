@@ -25,6 +25,9 @@ class Document::Transaction {
   uint64_t import_request_=0;
   std::shared_ptr<AssetWork> work_;
   std::shared_ptr<NativeStroke> native_;
+  std::shared_ptr<const HeldAffine> held_affine_;
+  CanvasTransform held_start_,held_preview_;
+  CanvasNavigation object_navigation_;
   bool native_end_=false;
   std::deque<History> *undo_source_=nullptr,*undo_destination_=nullptr;
   std::optional<UvWorkspace> removed_uv_;

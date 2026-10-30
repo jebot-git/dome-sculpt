@@ -121,7 +121,7 @@ struct Canvas : Fl_Gl_Window {
     return trackball((2 * (x - this->x()) - w()) / size,
                      (h() - 2 * (y - this->y())) / size);
   }
-  bool native_stroke=false, suppress_drag=false, object_drag=false,polygon_drag=false;
+  bool native_stroke=false, suppress_drag=false, object_drag=false,polygon_drag=false,drag_affine=false;
   void polygon_at(int x,int y,PolygonAction action) {
     float aspect=float(w())/std::max(1,h()),tangent=std::tan(22.5f*3.14159265f/180);
     Vec3 direction{(2.f*(x-this->x())/w()-1)*aspect*tangent,(1-2.f*(y-this->y())/h())*tangent,-1};
@@ -129,7 +129,7 @@ struct Canvas : Fl_Gl_Window {
     direction=rotation.inverse().rotate(normalized(direction));
     document.polygon_pointer(origin,direction,action,Fl::event_state(FL_CTRL));invalidate();
   }
-  CanvasTransform drag_local{},drag_parent{};
+  CanvasTransform drag_local{},drag_parent{},drag_world_delta{};
   void sculpt_at(int x, int y) {
     if (!document.frame().state->stroking) { sculpting = have_stamp = false; return; }
     float aspect = float(w()) / std::max(1, h()),
@@ -214,7 +214,7 @@ struct Canvas : Fl_Gl_Window {
           Vec3 direction{(2.f*(last_x-this->x())/w()-1)*aspect*tangent,(1-2.f*(last_y-this->y())/h())*tangent,-1};
           auto origin=rotation.inverse().rotate(Vec3{0,0,distance}-pan);direction=rotation.inverse().rotate(normalized(direction));
           auto picked=document.pick_object(origin,direction,material_time);
-          if(picked && document.begin_object_grab(*picked)){object_drag=true;auto scene=document.copy_scene();drag_local=scene.object(*picked).transform;drag_parent=ob::compose(scene.world_transform(*picked),ob::inverse(drag_local));}
+          if(picked && document.begin_object_grab(*picked)){object_drag=true;auto scene=document.copy_scene();drag_local=scene.object(*picked).transform;drag_affine=scene.has_affine_placement(*picked);drag_world_delta={};if(!drag_affine)drag_parent=ob::compose(scene.world_transform(*picked),ob::inverse(drag_local));}
           else suppress_drag=true;
           return 1;
         }
@@ -236,8 +236,9 @@ struct Canvas : Fl_Gl_Window {
         else if(object_drag){
           if(!document.frame().state->object_grabbing){object_drag=false;suppress_drag=true;return 1;}
           auto delta=rotation.inverse().rotate(Vec3{(x-last_x)*distance*.0015f,-(y-last_y)*distance*.0015f,0});
-          auto local=ob::rotate(ob::conjugate(drag_parent.orientation),{delta.x,delta.y,delta.z})*(1.f/drag_parent.scale);
-          drag_local.position=drag_local.position+local;document.move_held_object(drag_local);invalidate();
+          if(drag_affine){drag_world_delta.position=drag_world_delta.position+ob::Vec3{delta.x,delta.y,delta.z};document.move_held_object_world(drag_world_delta);}
+          else{auto local=ob::rotate(ob::conjugate(drag_parent.orientation),{delta.x,delta.y,delta.z})*(1.f/drag_parent.scale);
+            drag_local.position=drag_local.position+local;document.move_held_object(drag_local);}invalidate();
         }else if (sculpting)
           sculpt_at(x, y);
         else if (Fl::event_state(FL_BUTTON1)) {

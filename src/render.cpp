@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Matrix helpers adapted from OpenBrush Native (Apache-2.0).
 #include "dome/render.hpp"
+#include "dome/source-placement.hpp"
 #include "dome/material-visibility.hpp"
 #include <cstddef>
 #include <limits>
@@ -549,6 +550,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
   }
   glUseProgram(program_);
+  glUniform1i(glGetUniformLocation(program_,"affine_motion"),0);
+  glUniform1f(glGetUniformLocation(program_,"model_hand"),1);
+  glFrontFace(GL_CCW);
   glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
   glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
   glUniform1f(glGetUniformLocation(program_,"ghost_opacity"),1);
@@ -712,7 +716,22 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       if(current!=display.end()&&!current->visible)continue;
       if(current!=display.end() && current->world_transform_valid && r->world_frame_valid)
         object_model=ob::compose(model,ob::compose(current->world_transform,ob::inverse(r->object_world)));
-      const auto local_model=model_matrix(object_model),local_mvp=multiply(vp,local_model);
+      auto local_model=model_matrix(object_model);
+      const bool affine_preview=current!=display.end()&&current->affine_world&&r->affine_world&&current->affine_world->matrix()!=r->affine_world->matrix();
+      bool reversing=false;
+      if(affine_preview) {
+        auto delta=(*current->affine_world)*r->affine_world->inverse();
+        auto full=affine_similarity(model)*delta;
+        local_model=full.float_matrix();const auto inverse=full.inverse().matrix();
+        std::array<float,9> normal{};
+        for(size_t c=0;c<3;++c)for(size_t row=0;row<3;++row){normal[c*3+row]=float(inverse[row*4+c]);if(!std::isfinite(normal[c*3+row]))throw std::overflow_error("Affine preview normal matrix exceeds GPU range");}
+        glUniformMatrix3fv(glGetUniformLocation(program_,"normal_model"),1,GL_FALSE,normal.data());
+        reversing=delta.orientation()==AffineOrientation::Reversing;
+      }
+      glUniform1i(glGetUniformLocation(program_,"affine_motion"),affine_preview);
+      glUniform1f(glGetUniformLocation(program_,"model_hand"),reversing?-1.f:1.f);
+      glFrontFace(reversing?GL_CW:GL_CCW);
+      const auto local_mvp=multiply(vp,local_model);
       glUniformMatrix4fv(glGetUniformLocation(program_,"model"),1,GL_FALSE,local_model.data());
       glUniformMatrix4fv(glGetUniformLocation(program_,"mvp"),1,GL_FALSE,local_mvp.data());
       ghost_pass=is_ghost(r->object);glUniform1f(glGetUniformLocation(program_,"ghost_opacity"),ghost_pass?.18f:1.f);
@@ -728,6 +747,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       }
     }
   }
+  glFrontFace(GL_CCW);
   glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
   for(int n=0;n<16;++n)glBindSampler(n,0);
   glActiveTexture(GL_TEXTURE0);
