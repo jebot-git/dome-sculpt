@@ -30,16 +30,16 @@ void properties(const Volume &a,const Volume &b) {
 }
 }
 int main() try {
- auto source=sphere();auto original=ordered(source);auto history=source.undo_count();auto owner=&source.voxels();
+ auto source=sphere();auto original=ordered(source);auto history=source.undo_count();auto owner=source.geometry_owner();
  SculptResolutionOptions options;options.voxel_size=source.voxel_size();
  auto no_op=resample_sculpt(source,options);
- check(!no_op.replacement && !no_op.report.changed && &source.voxels()==owner && source.undo_count()==history && ordered(source)==original,"Same voxel spacing is an exact no-op with original geometry/history ownership");
+ check(!no_op.replacement && !no_op.report.changed && source.geometry_owner()==owner && source.undo_count()==history && ordered(source)==original,"Same voxel spacing is an exact no-op with original geometry/history ownership");
  options.voxel_size=.02f;auto fine=resample_sculpt(source,options);
  check(fine.replacement && fine.report.changed && fine.replacement->voxel_size()==.02f && fine.replacement->band()==source.band(),"Refinement retains the original physical metre band rather than shifting the layer baseline");
  check(fine.replacement->geometry_snapshot().band()==source.band(),"Immutable geometry snapshots retain the physical band");
  check(fine.report.source.closed_manifold() && fine.report.target.closed_manifold() && fine.report.source.components==fine.report.target.components && fine.report.source_euler==fine.report.target_euler,"Refinement preserves independently inspected closed topology");
  check(fine.report.maximum_surface_bound<=.02001f && fine.report.minimum_normal_dot>=.5f,"Bidirectional surface distance is certified and sampled normals meet explicit bounds");
- check(ordered(source)==original && &fine.replacement->voxels()!=owner,"Resolution result is detached and original geometry remains untouched");
+ check(ordered(source)==original && fine.replacement->geometry_owner()!=owner,"Resolution result is detached and original geometry remains untouched");
  auto encoded=fine.replacement->encode();
  check(encoded["version"]==4 && encoded["distance_band"]==source.band(),"Changed physical band persists with strict independent Volume4 data");
  check(ordered(Volume::decode(encoded))==ordered(*fine.replacement),"Volume4 reload retains exact resampled field/layers/band");

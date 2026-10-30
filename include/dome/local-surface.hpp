@@ -26,7 +26,7 @@ class SurfaceGeometry {
 public:
   explicit SurfaceGeometry(const Volume &);
   const Volume::GeometryOwner &geometry_owner() const { return samples_; }
-  const Volume::Voxels &voxels() const { return *samples_; }
+  Volume::VoxelView voxels() const { return Volume::VoxelView(samples_); }
   float voxel_size() const { return voxel_; }
   float band() const { return band_; }
   float at(Int3) const;

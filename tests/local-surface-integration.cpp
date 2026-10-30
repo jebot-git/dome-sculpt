@@ -285,7 +285,7 @@ int main(int argc, char **argv) try {
   auto base = v.geometry_snapshot();
   auto owner = base.geometry_owner();
   auto cache = LocalSurfaceCache::build(v);
-  std::weak_ptr<const Volume::Voxels> expired;
+  std::weak_ptr<const Volume::VoxelStorage> expired;
   for (int i = 0; i < 8; ++i) {
     stroke(v, brush({.32f, float(i - 4) * .016f, .07f},
                     i % 2 ? Tool::Clay : Tool::Carve));

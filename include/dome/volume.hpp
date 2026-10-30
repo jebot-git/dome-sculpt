@@ -17,7 +17,9 @@ struct SculptResolutionResult;
 class Volume {
 public:
   using Voxels = std::unordered_map<Int3, float, IntHash>;
-  using GeometryOwner = std::shared_ptr<const Voxels>;
+  using VoxelStorage = CowMap<Int3,float,IntHash>::Storage;
+  using VoxelView = CowMap<Int3,float,IntHash>::View;
+  using GeometryOwner = std::shared_ptr<const VoxelStorage>;
   struct GeometryRegion {
     Int3 minimum, maximum;
   };
@@ -49,7 +51,7 @@ public:
   float mask_at(Int3) const;
   float mask_sample(Vec3) const;
   float mask_default() const { return mask_.background; }
-  const Voxels &mask_values() const { return mask_.values.read(); }
+  VoxelView mask_values() const { return mask_.values.read(); }
   bool fill_mask(float, const std::function<bool()> &cancelled = {});
   bool invert_mask(const std::function<bool()> &cancelled = {});
   struct Layer {
@@ -71,7 +73,7 @@ public:
   explicit Volume(float voxel = .03f, size_t history_limit = 64 * 1024 * 1024);
   float voxel_size() const { return voxel_; }
   float band() const { return band_; }
-  const Voxels &voxels() const { return cells_.read(); }
+  VoxelView voxels() const { return cells_.read(); }
   float at(Int3 p) const;
   float sample(Vec3 p) const;
   Vec3 gradient(Vec3 p) const;
@@ -93,6 +95,7 @@ public:
   nlohmann::json encode() const;
   static Volume decode(const nlohmann::json &);
   static Volume from_samples(float voxel, Voxels);
+  static Volume from_samples(float voxel, const VoxelView &);
   void save(const std::filesystem::path &) const;
   static Volume load(const std::filesystem::path &);
 
@@ -132,14 +135,14 @@ private:
   void push_command(Command);
   std::vector<Layer> layers_{Layer{}};
   uint64_t active_ = 1, next_layer_ = 2;
-  std::unordered_map<Int3, double, IntHash> before_delta_;
+  CowMap<Int3, double, IntHash> before_delta_;
   Layer &layer(uint64_t);
   double sum(Int3, uint64_t exclude = 0) const;
   void recompose();
   void clear_history();
   float voxel_, band_;
   CowMap<Int3, float, IntHash> cells_;
-  Voxels before_;
+  CowMap<Int3, float, IntHash> before_;
   std::deque<Command> undo_, redo_;
   size_t history_limit_, history_bytes_ = 0;
   bool editing_ = false;

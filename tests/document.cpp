@@ -185,7 +185,7 @@ int main() try {
             "A second edit can follow an asynchronous save");
     writing.stamp_desktop(b);
     writing.end_desktop();
-    newest = writing.copy_volume().voxels();
+    newest = writing.copy_volume().voxels().materialize();
     writing.save(target);
     require(!writing.frame().state->dirty,
             "A synchronous save waits behind older file jobs");
