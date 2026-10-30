@@ -16,7 +16,9 @@ root=Path(os.environ.get("DOME_SCULPT_TEST_ROOT",Path(__file__).resolve().parent
 compositor=Path(os.environ.get("DOME_COMPOSITOR",root.parent/"dome-compositor/target/release/dome-compositor"))
 build=Path(os.environ.get("DOME_SCULPT_TEST_BUILD",root/"build"))
 mask_flow=os.environ.get("DOME_SCULPT_MASK_DOME")=="1"
-out=root/("artifacts/dome-menu-sculpt-mask" if mask_flow else "artifacts/dome-menu");out.mkdir(parents=True,exist_ok=True)
+resolution_flow=os.environ.get("DOME_SCULPT_RESOLUTION_DOME")=="1"
+assert not (mask_flow and resolution_flow),"Select one DomeD workflow"
+out=root/("artifacts/dome-menu-resolution" if resolution_flow else "artifacts/dome-menu-sculpt-mask" if mask_flow else "artifacts/dome-menu");out.mkdir(parents=True,exist_ok=True)
 icd=Path(os.environ["DOME_TEST_VULKAN_ICD"]) if "DOME_TEST_VULKAN_ICD" in os.environ else next((p for p in [Path("/usr/share/vulkan/icd.d/lvp_icd.json"),Path("/usr/share/vulkan/icd.d/lvp_icd."+platform.machine()+".json")] if p.is_file()),None)
 if icd is None or not icd.is_file():raise RuntimeError("Set DOME_TEST_VULKAN_ICD to the installed software Vulkan ICD manifest")
 
@@ -58,8 +60,9 @@ async def main():
         log=(out/"compositor.log").read_text();wayland=re.search(r"Dome Wayland socket: (\S+)",log)[1]
         arguments=[str(build/"dome-sculpt")]
         fixture=home/"masks.dsculpt"
-        if mask_flow:
-            subprocess.run([str(build/"dome-sculpt-mask-document-test"),"--ui-fixture",str(fixture)],check=True)
+        if mask_flow or resolution_flow:
+            helper="dome-sculpt-resolution-document-test" if resolution_flow else "dome-sculpt-mask-document-test"
+            subprocess.run([str(build/helper),"--ui-fixture",str(fixture)],check=True)
             arguments.append(str(fixture))
         client=start(arguments,"client",{**env,"WAYLAND_DISPLAY":wayland,"FLTK_BACKEND":"wayland"},cwd=tmp)
         def named(title):return next((w for w in scene()["windows"] if title in w["title"]),None)
@@ -123,6 +126,70 @@ async def main():
                 values={k:v.value for k,v in props.items()}
                 if values.get("type")!="separator" and values.get("enabled",True):rows.append(ident)
             await first(index,rows.index(nodes[label][0]))
+        if resolution_flow:
+            def inspect():
+                result=json.loads(subprocess.check_output([str(build/"dome-sculpt-resolution-document-test"),"--inspect",str(fixture)]))
+                for obj in result["objects"]:
+                    volume=obj["volume"];volume["samples"].sort()
+                    for layer in volume.get("sculpt_layers",[]):layer["delta"].sort()
+                    if "sculpt_mask" in volume:volume["sculpt_mask"]["values"].sort()
+                return result
+            async def save():
+                for _ in range(300):
+                    nodes=await layout()
+                    if nodes["Save"][1].get("enabled",True):break
+                    await asyncio.sleep(.04)
+                else:raise AssertionError("Resolution worker did not enable Save")
+                before=fixture.stat().st_mtime_ns
+                await exported("Save")
+                await wait(lambda:fixture.stat().st_mtime_ns!=before)
+                return inspect()
+            async def options():
+                await native_command("Sculpt",4,"Resolution...")
+                return await wait(lambda:named("Sculpt resolution"))
+            async def closed():
+                await wait(lambda:named("Sculpt resolution") is None)
+            async def tap(dialog,x,y):
+                current=scene();hg=host.get_geometry()
+                def placed(ident):
+                    target=next(w for w in current["windows"] if w["id"]==ident)
+                    popup=next((p for p in current["popups"] if p["id"]==ident),None)
+                    if popup is None:return target["desktop"]
+                    parent=placed(popup["parent"]);anchor=popup["anchor"]
+                    return {"x":max(0,min(parent["x"]+anchor["x"],hg.width-anchor["w"])),
+                            "y":max(36,min(parent["y"]+anchor["y"],hg.height-60-anchor["h"])),
+                            "w":anchor["w"],"h":anchor["h"]}
+                rect=placed(dialog["id"])
+                xtest.fake_input(d,X.MotionNotify,x=int(hg.x+rect["x"]+x(rect)),y=int(hg.y+rect["y"]+y(rect)));d.sync()
+                xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync();await asyncio.sleep(.2)
+            original=inspect();dialog=await options();nodes=await layout()
+            (out/"resolution-modal.json").write_text(json.dumps(scene(),indent=2))
+            check(dialog["app_id"]==window["app_id"] and scene()["focused"]==dialog["id"] and not nodes["Resolution..."][1].get("enabled",True),
+                  "DomeD focuses native resolution controls and isolates document commands under the same application identity")
+            await key("Return");await closed()
+            check(await save()==original,"Native Wayland Return activates Cancel and preserves the complete sculpt")
+            dialog=await options();await tap(dialog,lambda r:r["w"]*.25,lambda r:198)
+            await tap(dialog,lambda r:280,lambda r:124)
+            await exported("Select All");await exported("Copy");nodes=await layout()
+            check(nodes["Cut"][1].get("enabled",False),"Wayland resolution numeric input routes native universal text editing")
+            await native_command("File",2,"Close Window");await closed()
+            check(await save()==original and client.poll() is None,"DomeD universal File Close cancels a changed resolution draft without closing the application")
+            dialog=await options();await tap(dialog,lambda r:r["w"]*.25,lambda r:198)
+            await tap(dialog,lambda r:r["w"]/2+80,lambda r:r["h"]-48);await closed()
+            accepted=await save();volume=accepted["objects"][0]["volume"]
+            check(abs(volume["voxel_size"]-.02)<1e-6 and volume["version"]==4 and abs(volume["distance_band"]-.16)<1e-6,
+                  "Actual Wayland Half spacing and Apply save a20mm Volume4 with the original physical distance band")
+            metadata=lambda v:[{k:x for k,x in layer.items() if k!="delta"} for layer in v["sculpt_layers"]]
+            check(volume["samples"]!=original["objects"][0]["volume"]["samples"] and metadata(volume)==metadata(original["objects"][0]["volume"]),
+                  "Resolution changes lattice samples while retaining exact displacement-layer identities and properties")
+            await native_command("Edit",3,"Undo")
+            check(await save()==original and not (await layout())["Undo"][1].get("enabled",True),"One DomeD universal Undo restores the entire original field and history boundary")
+            await native_command("Edit",3,"Redo")
+            check(await save()==accepted,"DomeD universal Redo restores the exact accepted resolution and physical band")
+            dialog=await options();await tap(dialog,lambda r:r["w"]*.25,lambda r:198)
+            await chord("Control_L","w");await closed()
+            check(await save()==accepted and client.poll() is None,"DomeD Ctrl+W cancels further resolution changes and retains the authored project")
+            d.close();bus.disconnect();return
         if mask_flow:
             def inspect():
                 scene=json.loads(subprocess.check_output([str(build/"dome-sculpt-mask-document-test"),"--inspect",str(fixture)]))
