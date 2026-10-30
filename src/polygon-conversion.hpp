@@ -2,6 +2,10 @@
 #pragma once
 #include "dome/polygon-scene.hpp"
 namespace dome {
+// One source-capture seam for topology conversion and explicit strict-UV color
+// preparation. Every direct origin retains its own complete prior authority.
+std::shared_ptr<const PolygonOrigin>
+capture_polygon_origin(const SculptObject &, CanvasTransform);
 bool polygon_conversion_required(const SculptObject &);
 PolygonMesh
 prepare_polygon_workspace_topology(const SculptObject &, bool convert_source,
