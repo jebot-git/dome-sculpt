@@ -58,3 +58,9 @@ VRoid Studio historical beta Base_Female/Base_Male are explicitly CC0-1.0 and
 retain the original author metadata. Exact original files, SHA256 hashes and
 primary-source grant evidence are in assets/humanoid/vroid/SOURCES.json. Current
 restricted VRoid presets and proprietary application code are not included.
+
+- JSON for Modern C++3.12.0: MIT, matching full/forward headers pinned under
+  `third_party/nlohmann`. Upstream allocation-free destruction and conditional
+  scalar comparison exception contracts are backported; unrelated parser/API
+  changes are excluded. Original/later notices, exact patch series and hashes
+  are retained. All consumers must be rebuilt together.

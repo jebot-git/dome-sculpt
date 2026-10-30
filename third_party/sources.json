@@ -489,5 +489,29 @@
     },
     "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack; no Pango application frontend, no outlines, no system installation.",
     "verified_at_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9"
+  },
+  "nlohmann_json": {
+    "repository": "https://github.com/nlohmann/json",
+    "version": "3.12.0",
+    "commit": "55f93686c01528224f448c19128836e7df245f72",
+    "license": "MIT",
+    "files": [
+      "single_include/nlohmann/json.hpp",
+      "single_include/nlohmann/json_fwd.hpp",
+      "LICENSE.MIT"
+    ],
+    "original_json_sha256": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63",
+    "backport_commit": "d20c4dcd894728cd6a25e8e96533adf85fd17223",
+    "backport": "Allocation-free link-reversal destruction, direct iterative path;3.12 typed-null container child compatibility guards; no develop parser/API/data-layout changes",
+    "sha256": {
+      "nlohmann/json.hpp": "d271a2726129eefecfaec4b58e42c2a798430b8cca6844cd876d0f0555b7aef2",
+      "nlohmann/json_fwd.hpp": "fb6aa70cbece087f37ab4685c182b287c53be54f785f981b9db9d30d2d028b37",
+      "LICENSE.MIT": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
+      "LICENSE.MIT.backport": "d64d1b4d948aa7751cfb613c02dc246aab7b358d760053e6580f01affe946906",
+      "patches/allocation-free-destruction.patch": "f475ea67b72145a9b1f953c710517c5e0b3d7b24001ea739bb8e9a651c30fd8a",
+      "patches/scalar-comparison-exceptions.patch": "ab365e97a5233eeb0237ac7dca5e2296cec2d990c1af55c445185f99c74250b6"
+    },
+    "backport_source_sha256": "e0a972ebd29ec61bdbe6856fe7faee1b3b114b8ca5a79f2b9a0873cbc0243434",
+    "scalar_backport": "All16 existing3.12 scalar comparison wrapper exception specifications use upstream d20c4dcd conditional is_nothrow_constructible; dependent lhs/rhs types for friends, unchanged comparison bodies"
   }
 }
