@@ -58,3 +58,13 @@ local ordering correction changes no successful values, bytes, API or layout;
 normal and diagnostic standalone tests force assertions on and inject every
 measured factory allocation. It does not claim strong replacement semantics for
 all external JSON constructors or universal JSON out-of-memory safety.
+
+`patches/null-promotion-exceptions.patch` applies next. Nine existing member
+null-to-array/object promotions (indexing, push, emplacement and update) allocate
+the container before committing its new tag. A failed creation preserves null;
+later insertion failures may retain valid intermediate containers as before.
+This fixes the demonstrated nested MToon extension failure without disabling
+invariants or claiming strong transaction semantics for every JSON mutator.
+Normal/diagnostic tests force assertions, cover every site plus nested chains,
+check valid owners and existing values, and retry after every measured denial.
+External constructor replacement paths remain outside this correction.

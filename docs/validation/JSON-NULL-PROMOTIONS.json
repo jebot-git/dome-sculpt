@@ -1,0 +1,46 @@
+{
+  "scope": "Standalone JSON3.12 member null-to-container promotion safety; no Scene14 API requirement",
+  "prior_dependency_fix": "21e140e",
+  "assertions": "Forced -UNDEBUG in normal/JSON_DIAGNOSTICS even for optimized Release",
+  "source": {
+    "CMakeLists.txt": "fd8f152b4e601378675011243197d24842825632992152ebbcaabf350fca0eac",
+    "tests/json-promotion-memory.cpp": "0d737e32d37d3daa157327262c2517746c0b1879d2a4490d830e671fd68635cb",
+    "third_party/nlohmann/nlohmann/json.hpp": "f4f577fdca98116462d72a35f132876c3f55c52c8a238f64896f5cf63ea479b8",
+    "third_party/nlohmann/patches/null-promotion-exceptions.patch": "57169d8b53dde8f984ffa713ce0d5e4b6b41ac7256954cd3f6f63ac0f5b45cf2",
+    "third_party/nlohmann/README.md": "cb28c650d9d4f6b3a49569cc25ef1ee6029f6bc8714ce2268f652c2bc22d7341",
+    "third_party/sources.json": "79ab3f630a6504ddc3d300a8fbd5a1171bad48dcdee4cff032897a1bfc13d066"
+  },
+  "logs": {
+    "artifacts/tests-scene14-json-promotion.log": "32d98463ee6583db04d2d22cd690e33672c6ed3722fd0ecb2cb4509bc0eb6349",
+    "artifacts/tests-scene14-json-promotion-sanitize.log": "32172d48f21e096a177b88c3db1f1b6ad021aff97a53d77b26f613ee7054d9e4",
+    "artifacts/json-promotion-before-report.json": "045f3c261b342f4608a7e0d0d7119ee72528b01e531b46d63fb5385ff35f18a2",
+    "artifacts/debug-scene14-json-object-assert.log": "8b3ab6986394650127846d8858510ec9dc7c3787bd221d9736dc2e6b8d17361f",
+    "artifacts/tests-scene14-sanitize-faults-fixed.log": "8657d36dce85813178215af0ad228698e3ef857dca19868c52235a7daa9c8e4f"
+  },
+  "proof": {
+    "release_suites": 2,
+    "asan_ubsan_leaks_suites": 2,
+    "per_mode_actual_persistent_denial_boundaries": 42,
+    "member_sites": 9,
+    "diagnostic_cases": 11,
+    "all_original_header_negative_signals": "SIGABRT",
+    "valid_state_existing_values_serialization_exact_retry": true,
+    "sequential_patch_byte_exact": true
+  },
+  "actual_scene_negative": {
+    "seconds": 106.21,
+    "call_chain": [
+      "Scene::decode",
+      "SourceMaterialArchive::decode",
+      "MToonMaterial::known",
+      "nested object indexing",
+      "parent map destruction of object-tag/null child"
+    ]
+  },
+  "limits": [
+    "Whole-scene/core qualification after this fix is separate",
+    "Mutable JSON may retain valid intermediate containers after later insertion failure",
+    "External constructor replacement paths are unchanged",
+    "No universal JSON OOM or strong transaction claim"
+  ]
+}

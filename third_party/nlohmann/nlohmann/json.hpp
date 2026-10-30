@@ -22289,8 +22289,8 @@ public:
         // implicitly convert null value to an empty array
         if (is_null())
         {
-            m_data.m_type = value_t::array;
             m_data.m_value.array = create<array_t>();
+            m_data.m_type = value_t::array;
             assert_invariant();
         }
 
@@ -22348,8 +22348,8 @@ public:
         // implicitly convert null value to an empty object
         if (is_null())
         {
-            m_data.m_type = value_t::object;
             m_data.m_value.object = create<object_t>();
+            m_data.m_type = value_t::object;
             assert_invariant();
         }
 
@@ -22401,8 +22401,8 @@ public:
         // implicitly convert null value to an empty object
         if (is_null())
         {
-            m_data.m_type = value_t::object;
             m_data.m_value.object = create<object_t>();
+            m_data.m_type = value_t::object;
             assert_invariant();
         }
 
@@ -23323,8 +23323,8 @@ public:
         // transform null object into an array
         if (is_null())
         {
-            m_data.m_type = value_t::array;
             m_data.m_value = value_t::array;
+            m_data.m_type = value_t::array;
             assert_invariant();
         }
 
@@ -23356,8 +23356,8 @@ public:
         // transform null object into an array
         if (is_null())
         {
-            m_data.m_type = value_t::array;
             m_data.m_value = value_t::array;
+            m_data.m_type = value_t::array;
             assert_invariant();
         }
 
@@ -23388,8 +23388,8 @@ public:
         // transform null object into an object
         if (is_null())
         {
-            m_data.m_type = value_t::object;
             m_data.m_value = value_t::object;
+            m_data.m_type = value_t::object;
             assert_invariant();
         }
 
@@ -23444,8 +23444,8 @@ public:
         // transform null object into an array
         if (is_null())
         {
-            m_data.m_type = value_t::array;
             m_data.m_value = value_t::array;
+            m_data.m_type = value_t::array;
             assert_invariant();
         }
 
@@ -23469,8 +23469,8 @@ public:
         // transform null object into an object
         if (is_null())
         {
-            m_data.m_type = value_t::object;
             m_data.m_value = value_t::object;
+            m_data.m_type = value_t::object;
             assert_invariant();
         }
 
@@ -23645,8 +23645,8 @@ public:
         // implicitly convert null value to an empty object
         if (is_null())
         {
-            m_data.m_type = value_t::object;
             m_data.m_value.object = create<object_t>();
+            m_data.m_type = value_t::object;
             assert_invariant();
         }
 
