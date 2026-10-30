@@ -2,13 +2,15 @@
 #include "dome/creator-archive.hpp"
 #include "dome/import-source.hpp"
 #include "dome/import-image.hpp"
+#include "cgltf.h"
+#include <bit>
 #include <nlohmann/json.hpp>
 #include <span>
 #include <set>
 namespace dome {
 namespace {
 void stop(const CreatorArchiveLimits &l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Creator source persistence cancelled");}
-size_t source_size(const CreatorAppearance &a,const CreatorArchiveLimits &l){
+size_t source_size(const CreatorSourceModel &a,const CreatorArchiveLimits &l){
   size_t bytes=a.original_bytes?a.original_bytes->size():0;
   if(a.source_receipt){a.source_receipt->validate(l.import_limits);auto raw=a.source_receipt->stored_bytes();
     if(raw>l.max_asset_bytes || bytes>l.max_asset_bytes-raw)throw std::length_error("Original source plus canonical adapter exceeds native asset budget");
@@ -92,6 +94,65 @@ void validate_images(const ImportedAsset &asset,const std::vector<std::shared_pt
     }
   }
 }
+// A model-wide hierarchy has no primitive mapping to vouch for its node table.
+// Authenticate its local graph against the captured canonical JSON. The same
+// cgltf transform primitive as the original parser preserves float evaluation
+// and signed zeros; no geometry/image reimport or filesystem read is needed.
+void validate_model_nodes(const CreatorSourceModel &source,const nlohmann::json &json,
+                          const CreatorArchiveLimits &limits) {
+  const size_t count=json.contains("nodes")?json.at("nodes").size():0;
+  if((json.contains("nodes")&&!json.at("nodes").is_array()) || count>100000 ||
+      count!=source.asset->nodes.size())
+    throw std::runtime_error("Original model node table differs from canonical source");
+  std::vector<int> parents(count,-1);size_t work=0;
+  auto visit=[&]{if(++work>limits.import_limits.max_metadata_visits)throw std::length_error("Original model node witness budget exceeded");if((work&255)==0)stop(limits);};
+  for(size_t i=0;i<count;++i) {
+    visit();const auto &raw=json.at("nodes").at(i);const auto &node=source.asset->nodes[i];
+    if(!raw.is_object())throw std::runtime_error("Original model node must be an object");
+    cgltf_node value{};value.rotation[3]=1;value.scale[0]=value.scale[1]=value.scale[2]=1;
+    value.has_matrix=raw.contains("matrix");value.has_translation=raw.contains("translation");
+    value.has_rotation=raw.contains("rotation");value.has_scale=raw.contains("scale");
+    if(value.has_matrix&&(value.has_translation||value.has_rotation||value.has_scale))
+      throw std::runtime_error("Original model node mixes matrix and TRS authority");
+    if(value.has_matrix){auto m=raw.at("matrix").get<std::array<float,16>>();std::copy(m.begin(),m.end(),value.matrix);}
+    if(value.has_translation){auto p=raw.at("translation").get<std::array<float,3>>();std::copy(p.begin(),p.end(),value.translation);}
+    if(value.has_rotation){auto q=raw.at("rotation").get<std::array<float,4>>();std::copy(q.begin(),q.end(),value.rotation);}
+    if(value.has_scale){auto s=raw.at("scale").get<std::array<float,3>>();std::copy(s.begin(),s.end(),value.scale);}
+    ImportedMatrix local{};cgltf_node_transform_local(&value,local.data());
+    for(float x:local)if(!std::isfinite(x))throw std::runtime_error("Original model node has a nonfinite canonical matrix");
+    if(bool(value.has_matrix)!=node.has_matrix || bool(value.has_translation)!=node.has_translation ||
+        bool(value.has_rotation)!=node.has_rotation || bool(value.has_scale)!=node.has_scale ||
+        std::bit_cast<std::array<uint32_t,16>>(local)!=std::bit_cast<std::array<uint32_t,16>>(node.local))
+      throw std::runtime_error("Original model local transform differs from captured source");
+    auto reference=[&](const char*key){return raw.contains(key)?int(integer(raw.at(key))):-1;};
+    if(reference("mesh")!=node.mesh || reference("skin")!=node.skin)
+      throw std::runtime_error("Original model node mesh/skin reference differs from captured source");
+    const size_t children=raw.contains("children")?raw.at("children").size():0;
+    if((raw.contains("children")&&!raw.at("children").is_array()) || children!=node.children.size())
+      throw std::runtime_error("Original model child table differs from captured source");
+    for(size_t child=0;child<children;++child) {
+      visit();const auto id=integer(raw.at("children").at(child));
+      if(id>=count || node.children[child]!=id || parents[id]!=-1)
+        throw std::runtime_error("Original model child identity is repeated or differs from captured source");
+      parents[id]=int(i);
+    }
+    const size_t weights=raw.contains("weights")?raw.at("weights").size():0;
+    if((raw.contains("weights")&&!raw.at("weights").is_array()) || weights!=node.weights.size())
+      throw std::runtime_error("Original model node morph weights differ from captured source");
+    for(size_t w=0;w<weights;++w){visit();const float value=raw.at("weights").at(w).get<float>();if(!std::isfinite(value)||value!=node.weights[w])throw std::runtime_error("Original model node morph weight differs from captured source");}
+  }
+  for(size_t i=0;i<count;++i)if(parents[i]!=source.asset->nodes[i].parent)
+    throw std::runtime_error("Original model parent authority differs from captured source");
+  std::vector<uint8_t> state(count);
+  for(size_t i=0;i<count;++i) {
+    int at=int(i);
+    while(at>=0 && state[size_t(at)]==0){visit();state[size_t(at)]=1;at=parents[size_t(at)];}
+    if(at>=0 && state[size_t(at)]==1)throw std::runtime_error("Original model node hierarchy is cyclic");
+    at=int(i);
+    while(at>=0 && state[size_t(at)]==1){visit();state[size_t(at)]=2;at=parents[size_t(at)];}
+  }
+  stop(limits);
+}
 const ImportedPrimitive &mapped_primitive(const CreatorAppearance&a){
   if(!a.asset||!a.original_bytes||!a.decoded_images||a.asset->mode!=ImportMode::PreserveGltf)
     throw std::invalid_argument("Creator appearance lacks immutable preserved source data");
@@ -140,22 +201,35 @@ void validate_mapping(const CreatorAppearance&a,const nlohmann::json &json,const
 }
 }
 struct CreatorAssetArchive::Entry {
-  CreatorAppearance source;
+  std::shared_ptr<const CreatorSourceModel> source;
   nlohmann::json json;
   std::vector<uint32_t> image_ids;
 };
 CreatorAssetArchive::CreatorAssetArchive(CreatorArchiveLimits l):limits_(std::move(l)){limits_valid(limits_);}
 uint32_t CreatorAssetArchive::add(const CreatorAppearance &a,PaintImageArchive &images){
+  return add_source(CreatorSourceModel(a),&a,images);
+}
+uint32_t CreatorAssetArchive::add_model(const CreatorSourceModel &a,PaintImageArchive &images){
+  return add_source(a,nullptr,images);
+}
+std::shared_ptr<const CreatorSourceModel> CreatorAssetArchive::model(uint32_t id) const {
+  stop(limits_);
+  if(id>=entries_.size())throw std::out_of_range("Original source model reference is missing");
+  return entries_[id]->source;
+}
+uint32_t CreatorAssetArchive::add_source(const CreatorSourceModel &a,const CreatorAppearance *appearance,PaintImageArchive &images){
   stop(limits_);
   if(!a.original_bytes||!a.asset||!a.decoded_images)throw std::invalid_argument("Missing retained creator source");
-  for(size_t i=0;i<entries_.size();++i)if(entries_[i]->source.original_bytes.get()==a.original_bytes.get()){
+  if(a.asset->mode!=ImportMode::PreserveGltf)throw std::invalid_argument("Original source model must retain mesh-local source data");
+  for(size_t i=0;i<entries_.size();++i)if(entries_[i]->source->original_bytes.get()==a.original_bytes.get()){
     const auto &entry=*entries_[i];
-    validate_mapping(a,entry.json,limits_);
-    if(a.source_receipt!=entry.source.source_receipt)throw std::runtime_error("Shared canonical source has different raw source receipt identity");
-    if(entry.source.decoded_images->size()!=a.decoded_images->size())throw std::runtime_error("Creator shared source image count changed");
+    if(appearance)validate_mapping(*appearance,entry.json,limits_);
+    if(a.asset!=entry.source->asset || a.source_receipt!=entry.source->source_receipt)
+      throw std::runtime_error("Shared canonical source has different parsed/raw source authority");
+    if(entry.source->decoded_images->size()!=a.decoded_images->size())throw std::runtime_error("Creator shared source image count changed");
     auto next_images=images;
     for(size_t k=0;k<a.decoded_images->size();++k){
-      if(a.decoded_images->at(k)!=entry.source.decoded_images->at(k))throw std::runtime_error("Creator shared source image identity changed");
+      if(a.decoded_images->at(k)!=entry.source->decoded_images->at(k))throw std::runtime_error("Creator shared source image identity changed");
       if(next_images.add(a.decoded_images->at(k))!=entry.image_ids[k])throw std::runtime_error("Creator source and image archive identities differ");
     }
     images=std::move(next_images);return uint32_t(i);
@@ -164,8 +238,14 @@ uint32_t CreatorAssetArchive::add(const CreatorAppearance &a,PaintImageArchive &
   if(entries_.size()>=limits_.max_assets||stored>limits_.max_total_bytes-bytes_)
     throw std::length_error("Creator original source archive budget exceeded");
   auto entry=std::make_shared<Entry>();entry->json=source_json(*a.original_bytes,limits_);
-  validate_mapping(a,entry->json,limits_);validate_images(*a.asset,*a.decoded_images);
-  entry->source.source_receipt=a.source_receipt;entry->source.original_bytes=a.original_bytes;entry->source.asset=a.asset;entry->source.decoded_images=a.decoded_images;entry->source.vrm_json=a.vrm_json;
+  validate_model_nodes(a,entry->json,limits_);
+  if(appearance)validate_mapping(*appearance,entry->json,limits_);
+  validate_images(*a.asset,*a.decoded_images);
+  const auto source_vrm=vrm_string(entry->json);
+  if(bool(a.vrm_json)!=bool(source_vrm) ||
+      (a.vrm_json && *a.vrm_json!=*source_vrm))
+    throw std::runtime_error("Original model VRM metadata differs from canonical source");
+  entry->source=std::make_shared<const CreatorSourceModel>(a);
   // Commit both archives together only after every reference and quota validates.
   auto next_images=images;
   for(auto &image:*a.decoded_images){stop(limits_);entry->image_ids.push_back(next_images.add(image));}
@@ -173,8 +253,8 @@ uint32_t CreatorAssetArchive::add(const CreatorAppearance &a,PaintImageArchive &
 }
 nlohmann::json CreatorAssetArchive::encode()const{
   auto result=nlohmann::json::array();
-  for(auto &e:entries_){stop(limits_);nlohmann::json entry={{"original_glb",nlohmann::json::binary(*e->source.original_bytes)},{"images",e->image_ids}};
-    if(e->source.source_receipt)entry["original_source"]=e->source.source_receipt->encode();
+  for(auto &e:entries_){stop(limits_);nlohmann::json entry={{"original_glb",nlohmann::json::binary(*e->source->original_bytes)},{"images",e->image_ids}};
+    if(e->source->source_receipt)entry["original_source"]=e->source->source_receipt->encode();
     result.push_back(std::move(entry));}
   return result;
 }
@@ -202,17 +282,18 @@ CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const Pa
   }
   for(auto &value:j){
     stop(l);auto entry=std::make_shared<Entry>();const auto &raw=value.at("original_glb").get_binary();
-    if(value.contains("original_source"))entry->source.source_receipt=ImportSourceReceipt::decode(value.at("original_source"),l.import_limits);
-    entry->source.original_bytes=std::make_shared<const std::vector<uint8_t>>(raw.begin(),raw.end());entry->json=source_json(*entry->source.original_bytes,l);
+    auto model=std::make_shared<CreatorSourceModel>();
+    if(value.contains("original_source"))model->source_receipt=ImportSourceReceipt::decode(value.at("original_source"),l.import_limits);
+    model->original_bytes=std::make_shared<const std::vector<uint8_t>>(raw.begin(),raw.end());entry->json=source_json(*model->original_bytes,l);
     ImportLimits options=l.import_limits;options.mode=ImportMode::PreserveGltf;options.external_resources=false;
     options.max_file_bytes=std::min(options.max_file_bytes,l.max_asset_bytes);
     options.cancelled=[a=l.cancelled,b=options.cancelled]{return (a&&a())||(b&&b());};
     options.allow_legacy_vrm_skin_hint=entry->json.contains("extensions")&&entry->json.at("extensions").contains("VRM");
-    entry->source.asset=std::make_shared<const ImportedAsset>(import_glb(*entry->source.original_bytes,options,ImportMode::PreserveGltf));
+    model->asset=std::make_shared<const ImportedAsset>(import_glb(*model->original_bytes,options,ImportMode::PreserveGltf));
     auto decoded=std::make_shared<std::vector<std::shared_ptr<const Image>>>();
     for(auto &id:value.at("images")){auto index=integer(id,UINT32_MAX);entry->image_ids.push_back(index);decoded->push_back(images.at(index));}
-    validate_images(*entry->source.asset,*decoded);entry->source.decoded_images=std::move(decoded);entry->source.vrm_json=vrm_string(entry->json);
-    result.bytes_+=source_size(entry->source,l);result.entries_.push_back(std::move(entry));stop(l);
+    validate_images(*model->asset,*decoded);model->decoded_images=std::move(decoded);model->vrm_json=vrm_string(entry->json);
+    result.bytes_+=source_size(*model,l);entry->source=std::move(model);result.entries_.push_back(std::move(entry));stop(l);
   }return result;
 }
 nlohmann::json encode_creator_appearance(const CreatorAppearance&a,CreatorAssetArchive &assets,PaintImageArchive &images){
@@ -230,7 +311,10 @@ nlohmann::json encode_creator_appearance(const CreatorAppearance&a,CreatorAssetA
 std::shared_ptr<const CreatorAppearance> decode_creator_appearance(const nlohmann::json&j,const CreatorAssetArchive&assets){
   stop(assets.limits_);auto id=integer(j.at("asset"),UINT32_MAX);
   if(id>=assets.entries_.size())throw std::runtime_error("Creator source asset reference is missing");
-  const auto &entry=*assets.entries_[id];auto result=std::make_shared<CreatorAppearance>(entry.source);
+  const auto &entry=*assets.entries_[id];auto result=std::make_shared<CreatorAppearance>();
+  const auto &model=*entry.source;
+  result->original_bytes=model.original_bytes;result->source_receipt=model.source_receipt;
+  result->asset=model.asset;result->decoded_images=model.decoded_images;result->vrm_json=model.vrm_json;
   result->material=int(integer(j.at("material")));result->source_material=int(integer(j.at("source_material")));
   result->source_mesh=int(integer(j.at("source_mesh")));result->source_node=int(integer(j.at("source_node")));result->source_primitive=int(integer(j.at("source_primitive")));
   auto &bytes=j.at("source_vertices");

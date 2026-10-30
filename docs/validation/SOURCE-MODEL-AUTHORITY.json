@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "base": "a693941",
+  "source_base": "84d9fe6",
+  "scope": "entire changed creator-archive.cpp +new test; exact84d9 immutable coherent Release support; ASan/UBSan/leak instrumentation on changed source/test ONLY",
+  "public_existing_class_layout_change": false,
+  "scene_or_archive_version_change": false,
+  "source_model_record_shape_change": false,
+  "results": {
+    "release": "pass",
+    "changed_source_asan_ubsan_leaks": "pass",
+    "assertions_per_run": 4680,
+    "persistent_add_allocations": 466,
+    "persistent_decode_allocations": 1083,
+    "add_cancellation_boundaries": 3,
+    "existing_creators": [
+      "creator-archive",
+      "vroid-creator"
+    ]
+  },
+  "old_archive_member_excluded": "libdome-sculpt-core.a(creator-archive.cpp.o)",
+  "source_sha256": {
+    "CMakeLists.txt": "9d1b127e2cd7b6a7ca52fd475d4ffcdd77054b1e10deae14c38eb4ea6ea424e0",
+    "include/dome/creator-archive.hpp": "aa0cafa0d182ae65a1579f6c0d52d77212bbf483852ad64ed0f2e1da9223c24c",
+    "src/creator-archive.cpp": "bd68c41a9c29a913cf3cba40014321e5908da0e1ac3beb60fc6a8dc60d2004f9",
+    "tests/source-model.cpp": "de6de030f73b553476d241d8fe29d8ea1740382d14ba0bfa266bdf7fea546b6f"
+  },
+  "proof_sha256": {
+    "build-source-model-release.log": "86eeea17bccca40ae68f5617f99d0e0bfa947512eb18d1a3937539ae33f2bc75",
+    "test-source-model-release.log": "fb53ef70f2eb11d6fd58cbdf0b341fa3fa6b7969c3d9add2edd94ba858876610",
+    "build-source-model-sanitize.log": "e680b55e160456093b799320228364fc712b30a2e25f7e97a8e12a094d7039e7",
+    "test-source-model-sanitize.log": "fb53ef70f2eb11d6fd58cbdf0b341fa3fa6b7969c3d9add2edd94ba858876610",
+    "build-common-model-creator-archive.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "test-common-model-creator-archive.log": "60fd2d67068f0376c44fa64ada654f13cc13973724cb73841050d94d80bc70af",
+    "build-common-model-vroid-creator.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "test-common-model-vroid-creator.log": "0d5bad2596f123ccd5882f0babf1994969bf092fd349b158194ee75d72f88005"
+  },
+  "pending": [
+    "fresh whole-core consumers after actual Scene13 placement fields",
+    "actual affine Scene adoption/render/edit/pick/export interoperability"
+  ]
+}
