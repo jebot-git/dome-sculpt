@@ -101,3 +101,36 @@ injected allocation preserves the exact old authority and successful retry.
 Logs retain initial compile errors and subsequent passing snapshots. This scope
 is the polygon library and fixtures; it is not a full-core, native UI, GPU or
 headset proof. Native/VR authoring integration remains in progress.
+
+## Worker-ready component workspace checkpoint
+
+`PolygonWorkspace` now provides immutable topology/render/selection snapshots,
+actual BVH ray selection of original N-gon faces or nearby visible vertices and
+edges, additive/toggle/all selection, bounded local Undo/Redo, exact Cancel,
+no-op gestures and a high-water identity ticket across history branches. A
+complete topology command is prepared before its local history node is accepted.
+Continuous Move publishes only total displacement and the worker-prepared vertex
+mask; CPU triangles, normals, UVs and BVH keep the same owners during motion.
+Accepted End validates and reconstructs final authoritative geometry once.
+An invalid/rejected End retains explicit Cancel ownership. This is GPU-ready
+preview data; an actual GPU renderer and frontend routing are still pending.
+
+The workspace owns no Document/model authority and does not perform Scene
+publication on its own. The central held-object API from `9f188b5` is integrated
+on private merge `aa5b026` (with VRoid baseline `47e49217`); a fresh core and the
+polygon/holding native tests pass3/3 in0.37s. Existing stored lock/material flags
+remain independent of held isolation. Future Document integration must route
+component admission and publication through the central editable predicate and
+edit-authority epoch, cancel on authority changes and block object-grab motion
+while a changed/unaccepted component draft exists.
+
+The exact workspace implementation passes29 native checks and3,229 individually
+injected allocation boundaries (1,925 topology-command;1,304 accepted Move-End),
+optimized2/2 in0.73s. The same2 suites pass with complete own C/C++ core support
+instrumented by ASan/UBSan/leaks in12.40s. Fault cases retain the exact visible
+snapshot, topology/render/selection owners, revision, identity cursor, prior
+Undo/Redo and actual successful retry. Initial native tests independently prove
+actual BVH selection, immutable preview owners, one local gesture transition,
+source persistence, canceled and rejected gestures, empty-mesh Undo and ID
+retirement across branching. No actual FLTK, XR, GPU or Scene12 source-conversion
+completion is claimed by these workspace tests.
