@@ -26,8 +26,12 @@ HumanoidControls humanoid_baseline_defaults(std::string_view baseline);
 HumanoidControls
 humanoid_preset(HumanoidPreset,
                 std::string_view baseline = "vroid-beta-female");
+struct ImportSourceReceipt;
 struct CreatorAppearance {
+  // Canonical GLB authority for primitive/material/accessor identities. For
+  // converted formats, raw original bytes live in the separate source receipt.
   std::shared_ptr<const std::vector<uint8_t>> original_bytes;
+  std::shared_ptr<const ImportSourceReceipt> source_receipt;
   std::shared_ptr<const ImportedAsset> asset;
   std::shared_ptr<const std::vector<std::shared_ptr<const Image>>>
       decoded_images;

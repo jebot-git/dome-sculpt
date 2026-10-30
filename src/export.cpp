@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "affine-matrix.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/scene.hpp"
 #include "dome/gltf-export.hpp"
@@ -311,6 +312,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           j["nodes"][mesh_node]["skin"]=shared.skin;
           for(size_t k=0;k<s.bones.size();++k) emission.joints.push_back(uint32_t(shared.first_joint+k));
         } else {
+        const auto local_matrices=s.local_matrices(d.pose);
         int first_joint = int(j["nodes"].size());
         for (size_t index = 0; index < s.bones.size(); ++index) {
           emission.joints.push_back(uint32_t(first_joint+index));
@@ -323,10 +325,13 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
                {"rotation",
                 {t.rotation.x, t.rotation.y, t.rotation.z, t.rotation.w}},
                {"scale", {t.scale.x, t.scale.y, t.scale.z}}});
+          if(b.rest_matrix){if(!detail::gltf_trs_matrix(local_matrices[index]))throw std::invalid_argument("Exact joint affine requires hierarchy-preserving glTF transport; a sheared node matrix is not valid glTF");j["nodes"].back().erase("translation");j["nodes"].back().erase("rotation");j["nodes"].back().erase("scale");j["nodes"].back()["matrix"]=local_matrices[index];}
         }
+        int rig_parent=node;
+        if(s.space_matrix){if(!detail::gltf_trs_matrix(*s.space_matrix))throw std::invalid_argument("Sheared bind-space requires hierarchy-preserving glTF transport");rig_parent=int(j["nodes"].size());j["nodes"].push_back({{"name",o.name+" bind space"},{"matrix",*s.space_matrix},{"children",nlohmann::json::array()}});j["nodes"][node]["children"].push_back(rig_parent);}
         for (size_t index = 0; index < s.bones.size(); ++index) {
           int parent = s.bones[index].parent < 0
-                           ? node
+                           ? rig_parent
                            : first_joint + s.bones[index].parent;
           j["nodes"][parent]["children"].push_back(first_joint + int(index));
         }
@@ -334,7 +339,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           j["nodes"][node]["children"] = nlohmann::json::array();
           j["scenes"][0]["nodes"].push_back(mesh_node);
           // Restore rig roots after detaching the skinned surface.
-          for (size_t index = 0; index < s.bones.size(); ++index)
+          if(s.space_matrix)j["nodes"][node]["children"].push_back(rig_parent);
+          else for (size_t index = 0; index < s.bones.size(); ++index)
             if (s.bones[index].parent < 0)
               j["nodes"][node]["children"].push_back(first_joint + int(index));
           begin = data.size();

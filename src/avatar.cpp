@@ -341,12 +341,13 @@ AvatarCompaction compact_avatar(const Skeleton &s, const SkinWeights &w,
         mark(i.joint);
   if (std::none_of(keep.begin(), keep.end(), [](auto k) { return k != 0; }))
     fail("no retained avatar joints");
-  AvatarCompaction out;
+  AvatarCompaction out;out.skeleton.space_matrix=s.space_matrix;
   out.old_to_new.assign(s.bones.size(), UINT32_MAX);
   for (size_t i = 0; i < keep.size(); ++i)
     if (keep[i]) {
       out.old_to_new[i] = uint32_t(out.skeleton.bones.size());
       out.skeleton.bones.push_back(s.bones[i]);
+      if(s.inverse_bind_override){if(!out.skeleton.inverse_bind_override)out.skeleton.inverse_bind_override=std::vector<RigMatrix>{};out.skeleton.inverse_bind_override->push_back(s.inverse_bind_override->at(i));}
     }
   for (auto &b : out.skeleton.bones)
     if (b.parent >= 0)

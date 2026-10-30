@@ -1,0 +1,17 @@
+ufbx v0.23.1, commit 26a482ae66871d7de36eb722aa060bce95bce274
+https://github.com/ufbx/ufbx/tree/v0.23.1
+Vendored native C source/header, unmodified. Selected MIT license (see LICENSE).
+No Python runtime or proprietary FBX SDK is used.
+
+Primary evaluation: ufbx exposes native hierarchy, instances, geometric/pivot/
+inheritance helpers, material maps, corner attributes, skins, blend shapes, OBJ
+MTL and bounded allocators/progress callbacks. OpenFBX was considered, but ufbx's
+explicit coordinate/inheritance policies and OBJ+FBX shared native reader fit
+source-retaining authoring. v0.23.1 includes September 2026 adversarial input
+bounds fixes. External I/O must use Dome Sculpt's confined capture callback;
+never enable ufbx's default arbitrary filesystem resolver.
+
+https://ufbx.github.io/reference/
+https://ufbx.github.io/elements/nodes/
+https://ufbx.github.io/changelog/
+https://github.com/nem0/OpenFBX

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "scene-feature-version.hpp"
 #include "dome/material-bindings.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/vrm.hpp"
@@ -397,6 +398,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   for(const auto &object:input_objects)if(object.source_dormant)
     fail("source attributes are dormant for "+object.name+
       "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");
+  for(const auto&o:input_objects)if(detail::minimum_scene_version(o.deformation.get())>=11)
+    fail("Imported affine/inverse-bind state requires proven original-space VRM transport; export GLB or restore the original rig meanwhile");
   auto objects = input_objects;
   const CreatorAppearance *origin = nullptr;
   uint64_t group = 0;
