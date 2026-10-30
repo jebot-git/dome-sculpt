@@ -6,6 +6,16 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Current integration
 
+Product sources21e140e +c166f3b (primary0a19281 +5916801) repair pinned JSON
+binary factories and nine null-to-container promotions that could terminate
+while unwinding allocation failure. Both real assertion negatives and dependency
+patches are retained. The coherent optimized primary CPU build passes207/207
+in393.73s; four forced-assert normal/diagnostic standalone ASan/UBSan/leak suites
+pass in0.03s. This is not whole-current-core sanitizer or OS-wide OOM proof.
+The Release is staged at artifacts/stage-json-5916801 under configured/usr/local;
+no system install or session restart occurred. See JSON-BINARY-FACTORIES.md,
+JSON-NULL-PROMOTIONS.md and validation/JSON-ALLOCATION-INTEGRATION.json.
+
 Product sources b395ff3 +5ffbfea (primary283d701 +2b89aeb) recover input/file
 worker error publication during persistent allocation denial. Normal failures
 publish their status before completing a file promise; under memory pressure,

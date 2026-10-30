@@ -1,5 +1,10 @@
 # Full objective and completion evidence
 
+Pinned JSON binary/container allocation repairs have coherent primary Release
+207-suite and standalone forced-assert sanitizer4 proof in
+validation/JSON-ALLOCATION-INTEGRATION.json. This does not qualify the private
+combined affine/color/normal/shapekey candidate or complete the production goal.
+
 Input/file worker failure publication now retains the original exception and
 source through persistent allocation denial; corrected Release14/SAN14 and
 actual FLTK export7 proof is scoped in WORKER-PUBLICATION.md and its integration
