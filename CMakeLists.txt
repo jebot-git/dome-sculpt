@@ -437,7 +437,7 @@ if(BUILD_TESTING)
     -Wl,--wrap=fsync)
   add_test(NAME retopo-cancellation-boundaries COMMAND dome-sculpt-retopo-boundaries-test)
 endif()
-# Private original-frame prototype: no publication/default behavior change.
+# Retained normal-frame archive, runtime, export and consumer regressions.
 if(BUILD_TESTING)
   add_executable(dome-sculpt-normal-frame-archive-test tests/normal-frame-archive.cpp)
   target_link_libraries(dome-sculpt-normal-frame-archive-test PRIVATE dome-sculpt-core)

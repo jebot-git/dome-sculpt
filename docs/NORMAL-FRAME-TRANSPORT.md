@@ -1,4 +1,12 @@
-# Normal frame transport contracts under development
+# Normal frame transport contracts and implementation scope
+
+The contract research below is retained as historical design evidence. The
+current Scene9/material2 implementation is in normal-frames.cpp,
+normal-frame-runtime.hpp and normal-frame-export.hpp; its implemented and
+remaining cases are documented in NORMAL-FRAME-EXPORT-STATUS.md. Original
+attribute roles now have explicit retained authority and independent rendered
+consumers. Legacy UvDerivative payloads retain their original restrictions.
+The following earlier prototype sections are not current runtime proof.
 
 Changing a texture's sampling atlas must not silently change the frame in which
 its normal vectors are encoded. The current `SourceMaterialNormalFrame::UvDerivative`
