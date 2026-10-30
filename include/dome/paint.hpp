@@ -96,6 +96,7 @@ public:
   const PaintSurfaceDiagnostics &surface_diagnostics() const;
   const std::shared_ptr<const PaintSourceMaps> &source_maps() const noexcept { return source_maps_; }
   const Mesh &mesh() const;
+  std::shared_ptr<const Mesh> mesh_owner() const;
   uint32_t resolution() const;
   uint64_t revision() const { return revision_; }
   const std::vector<PaintLayer> &layers() const { return layers_; }

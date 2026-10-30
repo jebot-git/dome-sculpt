@@ -173,7 +173,7 @@ inline void complete_collinear_surface(Mesh &mesh,
   // Float quantization can reverse a tiny triangle's geometric cross product
   // even though its tetrahedron's topological orientation did not change.
   // Restore directed manifold adjacency, choosing each component's global sign
-  // to preserve the greatest original face area. No position/face is removed.
+  // to preserve the greatest TOTAL original face area (sum over the component). No position/face is removed.
   struct HalfEdge {
     uint32_t a, b, face;
     uint8_t side, forward;

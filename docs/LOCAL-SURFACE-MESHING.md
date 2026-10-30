@@ -1,29 +1,26 @@
 # Local surface extraction foundation
 
-This private milestone starts at `2c89e8d`. It does not yet replace Document's
-whole-object mesh publication or the renderer's whole-mesh GPU upload.
+The original foundation is commit `37e38c7`, based on `2c89e8d`. Its current
+private follow-up merges mask/symmetry milestone `20c132d` and connects the cache
+to authenticated Volume changes and the actual Document worker. See
+[AUTHENTICATED-LOCAL-MESHING.md](AUTHENTICATED-LOCAL-MESHING.md) for the current
+integration contract and evidence; the initial timing evidence below remains
+explicitly historical.
 
-`LocalSurfaceCache` holds an immutable `Volume::geometry_snapshot()` strongly.
-The held snapshot keeps the COW sample map alive: comparison of `&voxels()` and
-voxel size is safe against allocation-address reuse. Revision numbers alone are
-not identities. A geometry-identical update returns the exact same cache and
-does no extraction or assembly, even when layer/view metadata changed.
+`LocalSurfaceCache` now retains a minimal immutable `SurfaceGeometry`: the
+strong const SDF sample-map owner, voxel size and physical distance band. It
+retains **no Volume, displacement layers, masks, controls or authoring history**.
+Sampler arithmetic matches Volume at/sample/gradient. Retired authoring data is
+therefore releasable even when geometry is unchanged and the same cache is
+reused. Cache bytes now include a sample-map storage estimate as well as tile
+payloads. These are retained payload estimates, not a process RSS limit.
 
-An update requires the exact previous cache owner plus complete inclusive dirty
-**sample** regions, including positive changes and removed samples. Wrong-base
-owners and changed maps without regions refuse. The current standalone contract
-trusts the producer's declaration of completeness; it cannot detect omitted
-changes without scanning both entire maps. Do not feed estimated brush bounds
-unless the producer guarantees they contain every changed sample. Full build is
-the safe route when delta provenance is unavailable.
-
-The coordinated future Volume interface is `geometry_owner()` and
-`GeometryChange`/`geometry_change()`: a strong geometry owner, parent owner,
-complete sample regions, or an explicit full-rebuild marker. Stamp, undo, redo,
-cancel, removals and layer recomposition must publish that metadata atomically
-with the COW map. Mask/settings changes retain geometry identity. Producer and
-Document integration remain separate work; no shared Volume/Scene schema was
-changed for this module.
+The public `update(field,cancel,report)` queries `Volume::geometry_change()` from
+its strongly held map owner. It accepts no caller-supplied dirty boxes. Real
+mutations publish bounded changed-key sample regions atomically with the COW map;
+skipped revisions coalesce through control-block ancestry. Unknown, replaced,
+expired or over-capacity history rebuilds safely. Mask/settings edits retain
+geometry identity. Full `geometry_snapshot()` authoring semantics are preserved.
 
 Extraction uses fixed 8 by 8 by 8 cell tiles with immutable shared payloads.
 Only dirty tiles are rebuilt. Unchanged tile pointers remain identical. A bounded
@@ -46,14 +43,14 @@ regions by the retained maximum radius, also covering new crossings. Positive
 samples outside crossing cells can therefore invalidate normals without changing
 positions. The maximum is retained conservatively across updates.
 
-`materialize()` is an explicit, cancellable O(surface) adapter for export and
-legacy consumers. A merge queue restores global lexicographic cell order;
-edge resolution, winding, exact topology completion and first-used compaction
-match the corrected reference mesher. Tile packets are extraction requests,
-not independently finalized render meshes. Incremental GPU seam ownership and
-chunk uploads are still required before the application can avoid full assembly
-and upload on every geometry edit. No GPU speedup or complete application
-integration is claimed by this foundation.
+`materialize()` remains an explicit cancellable O(surface) adapter for current
+Document packing, export and legacy consumers. A merge queue restores global
+lexicographic cell order; edge resolution, winding, exact topology completion and
+first-used compaction match the corrected reference mesher. Tile packets are
+extraction requests, not independently finalized render meshes. Incremental GPU
+seam ownership and chunk uploads remain unfinished. Static geometry identity is
+now produced for separate renderer buffer reuse; it does not make CPU packing or
+full geometry-change GPU upload incremental.
 
 ## Exact representable topology
 
@@ -77,7 +74,13 @@ This changes indices without moving coordinates or deleting legitimate tiny
 faces. The reproduced sphere becomes closed with 4058 vertices / 8112 faces.
 A bounded adjacency pass also restores consistently directed face winding when
 quantization reverses a tiny face cross product. Its component sign preserves
-the greatest original face area. This correction is private pending root review.
+the maximum total original face area (summed across the component). Closedness evidence is fixture-scoped: completion returns early when there are
+no collapsed/cut requests, so it is not a universal manifold validator for
+arbitrary scalar fields. A small collinear defect can trigger a whole-surface
+orientation sort, bounded by 16 million work steps, 256 MiB orientation scratch,
+48 million output indices and 64 splits per edge. Large surfaces can therefore
+refuse even when the affected defect is small. This correction is private pending
+root review.
 Ambiguous
 or unsupported exact subdivision refuses atomically rather than silently
 publishing incomplete geometry. Limits cover work and per-edge split points.

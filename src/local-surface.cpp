@@ -34,7 +34,7 @@ static constexpr Int3 corner[] = {{0, 0, 0}, {1, 0, 0}, {1, 1, 0}, {0, 1, 0},
 static constexpr int tetra[][4] = {{0, 5, 1, 6}, {0, 1, 2, 6}, {0, 2, 3, 6},
                                    {0, 3, 7, 6}, {0, 7, 4, 6}, {0, 4, 5, 6}};
 
-SurfaceCell extract_cell(const Volume &field, Int3 cell) {
+SurfaceCell extract_cell(const SurfaceGeometry &field, Int3 cell) {
   SurfaceCell result;
   result.coordinate = cell;
   Int3 p[8];
@@ -128,8 +128,9 @@ size_t tile_bytes(const SurfaceTile &t) {
              c.outward.capacity() * sizeof(Vec3);
   return bytes;
 }
-std::shared_ptr<const SurfaceTile> make_tile(const Volume &field, Int3 key,
-                                             Work &work, size_t available) {
+std::shared_ptr<const SurfaceTile> make_tile(const SurfaceGeometry &field,
+                                             Int3 key, Work &work,
+                                             size_t available) {
   stop(work.cancel);
   // Preflight the exact fixed maximum before allocating transient packets.
   constexpr size_t maximum =
@@ -200,6 +201,33 @@ void insert_tile(std::set<Int3> &keys, Int3 key, size_t limit) {
     throw std::length_error("Local surface dirty tile limit exceeded");
 }
 } // namespace
+SurfaceGeometry::SurfaceGeometry(const Volume &v)
+    : samples_(v.geometry_owner()), voxel_(v.voxel_size()), band_(v.band()) {}
+float SurfaceGeometry::at(Int3 p) const {
+  auto found = samples_->find(p);
+  return found == samples_->end() ? band_ : found->second;
+}
+float SurfaceGeometry::sample(Vec3 p) const {
+  if (!finite(p) ||
+      std::max({std::abs(p.x), std::abs(p.y), std::abs(p.z)}) > 1001)
+    throw std::invalid_argument("Invalid field sample position");
+  p = p / voxel_;
+  Int3 q{int(std::floor(p.x)), int(std::floor(p.y)), int(std::floor(p.z))};
+  Vec3 f = p - Vec3{float(q.x), float(q.y), float(q.z)};
+  float result = 0;
+  for (int z = 0; z < 2; ++z)
+    for (int y = 0; y < 2; ++y)
+      for (int x = 0; x < 2; ++x)
+        result += at(q + Int3{x, y, z}) * (x ? f.x : 1 - f.x) *
+                  (y ? f.y : 1 - f.y) * (z ? f.z : 1 - f.z);
+  return result;
+}
+Vec3 SurfaceGeometry::gradient(Vec3 p) const {
+  return normalized(
+      {sample(p + Vec3{voxel_, 0, 0}) - sample(p - Vec3{voxel_, 0, 0}),
+       sample(p + Vec3{0, voxel_, 0}) - sample(p - Vec3{0, voxel_, 0}),
+       sample(p + Vec3{0, 0, voxel_}) - sample(p - Vec3{0, 0, voxel_})});
+}
 Int3 LocalSurfaceCache::tile_coordinate(Int3 cell) {
   return {floor_div8(cell.x), floor_div8(cell.y), floor_div8(cell.z)};
 }
@@ -211,7 +239,7 @@ LocalSurfaceCache::Ptr LocalSurfaceCache::build(const Volume &field,
   if (field.voxels().size() > limits.samples)
     throw std::length_error("Local surface sample limit exceeded");
   auto result = std::shared_ptr<LocalSurfaceCache>(new LocalSurfaceCache);
-  result->source_ = std::make_shared<const Volume>(field.geometry_snapshot());
+  result->source_ = std::make_shared<const SurfaceGeometry>(field);
   result->limits_ = limits;
   Work work{limits, {}, std::move(cancel)};
   std::set<Int3> keys;
@@ -222,7 +250,15 @@ LocalSurfaceCache::Ptr LocalSurfaceCache::build(const Volume &field,
       for (auto offset : corner)
         insert_tile(keys, tile_coordinate(p - offset), limits.tiles);
   }
-  size_t bytes = sizeof(LocalSurfaceCache);
+  const size_t source_bytes =
+      sizeof(Volume::Voxels) + result->source_->voxels().size() * 64 +
+      result->source_->voxels().bucket_count() * sizeof(void *);
+  if (source_bytes > limits.bytes)
+    throw std::length_error(
+        "Local surface retained sample-map byte limit exceeded");
+  work.stats.source_bytes = source_bytes;
+  size_t bytes =
+      sizeof(LocalSurfaceCache) + sizeof(SurfaceGeometry) + source_bytes;
   for (auto key : keys) {
     auto tile = make_tile(*result->source_, key, work,
                           limits.bytes > bytes ? limits.bytes - bytes : 0);
@@ -241,13 +277,45 @@ LocalSurfaceCache::Ptr LocalSurfaceCache::build(const Volume &field,
   return result;
 }
 LocalSurfaceCache::Ptr
-LocalSurfaceCache::update(const Volume &field, const Owner &base,
-                          std::span<const SurfaceSampleRegion> regions,
-                          Cancel cancel) const {
+LocalSurfaceCache::update(const Volume &field, Cancel cancel,
+                          LocalSurfaceUpdateReport *report) const {
   stop(cancel);
-  if (base != source_)
-    throw std::invalid_argument(
-        "Local surface delta belongs to a different source owner");
+  auto change = field.geometry_change(source_->geometry_owner());
+  LocalSurfaceUpdateReport result;
+  result.ancestry_events = change.events;
+  if (field.voxel_size() == source_->voxel_size() &&
+      field.band() == source_->band() &&
+      change.kind == Volume::GeometryChange::Kind::Unchanged) {
+    result.kind = LocalSurfaceUpdateReport::Kind::Reused;
+    if (report)
+      *report = result;
+    return shared_from_this();
+  }
+  if (field.voxel_size() == source_->voxel_size() &&
+      field.band() == source_->band() &&
+      change.kind == Volume::GeometryChange::Kind::Local) {
+    try {
+      auto next = update_regions(field, change.regions(), cancel);
+      result.kind = LocalSurfaceUpdateReport::Kind::Local;
+      if (report)
+        *report = result;
+      return next;
+    } catch (const std::length_error &) {
+      stop(cancel);
+      result.capacity_fallback = true;
+    }
+  }
+  auto next = build(field, limits_, cancel);
+  result.kind = LocalSurfaceUpdateReport::Kind::Rebuild;
+  if (report)
+    *report = result;
+  return next;
+}
+LocalSurfaceCache::Ptr
+LocalSurfaceCache::update_regions(const Volume &field,
+                                  std::span<const SurfaceSampleRegion> regions,
+                                  Cancel cancel) const {
+  stop(cancel);
   if (field.voxel_size() != source_->voxel_size())
     throw std::invalid_argument(
         "Local surface voxel size changed; rebuild required");
@@ -292,12 +360,20 @@ LocalSurfaceCache::update(const Volume &field, const Owner &base,
           insert_tile(dirty, {int(x), int(y), int(z)}, limits_.dirty_tiles);
   }
   auto result = std::shared_ptr<LocalSurfaceCache>(new LocalSurfaceCache);
-  result->source_ = std::make_shared<const Volume>(field.geometry_snapshot());
+  result->source_ = std::make_shared<const SurfaceGeometry>(field);
   result->limits_ = limits_;
   result->tiles_ = tiles_;
   result->support_halo_ = support_halo_;
   Work work{limits_, {}, std::move(cancel)};
-  size_t bytes = stats_.bytes, reused = tiles_.size();
+  const size_t source_bytes =
+      sizeof(Volume::Voxels) + result->source_->voxels().size() * 64 +
+      result->source_->voxels().bucket_count() * sizeof(void *);
+  if (source_bytes > limits_.bytes)
+    throw std::length_error(
+        "Local surface retained sample-map byte limit exceeded");
+  work.stats.source_bytes = source_bytes;
+  size_t bytes = stats_.bytes - stats_.source_bytes + source_bytes,
+         reused = tiles_.size();
   for (auto key : dirty) {
     auto old = result->tiles_.find(key);
     if (old != result->tiles_.end()) {

@@ -334,6 +334,7 @@ PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options
   layers_.push_back(std::move(layer));
 }
 const Mesh &PaintedMesh::mesh() const { return surface_->mesh; }
+std::shared_ptr<const Mesh> PaintedMesh::mesh_owner() const { return {surface_, &surface_->mesh}; }
 const PaintSurfaceDiagnostics &PaintedMesh::surface_diagnostics() const {return surface_->diagnostics;}
 uint32_t PaintedMesh::resolution() const { return surface_->resolution; }
 const PaintLayer &PaintedMesh::layer(uint64_t id) const {

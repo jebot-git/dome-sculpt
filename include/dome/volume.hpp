@@ -2,17 +2,36 @@
 #pragma once
 #include "brush.hpp"
 #include "cow-map.hpp"
+#include <array>
 #include <deque>
 #include <filesystem>
 #include <functional>
 #include <nlohmann/json_fwd.hpp>
 #include <optional>
+#include <span>
 #include <unordered_map>
 #include <vector>
 namespace dome {
 class Volume {
 public:
   using Voxels = std::unordered_map<Int3, float, IntHash>;
+  using GeometryOwner = std::shared_ptr<const Voxels>;
+  struct GeometryRegion {
+    Int3 minimum, maximum;
+  };
+  struct GeometryChange {
+    enum class Kind { Unchanged, Local, Rebuild };
+    static constexpr size_t maximum_regions = 128;
+    Kind kind = Kind::Rebuild;
+    std::array<GeometryRegion, maximum_regions> samples{};
+    size_t count = 0, events = 0;
+    std::span<const GeometryRegion> regions() const {
+      return {samples.data(), count};
+    }
+  };
+  // Ephemeral authenticated history, deliberately absent from native archives.
+  GeometryOwner geometry_owner() const { return cells_.owner(); }
+  GeometryChange geometry_change(const GeometryOwner &) const;
   enum class MaskTool : int { Add, Subtract, Smooth };
   struct SculptSettings {
     unsigned symmetry_axes = 0; // X=1, Y=2, Z=4, object-local planes.
@@ -58,7 +77,8 @@ public:
                               float maximum = 20) const;
   void begin_stroke();
   void stamp(Brush brush, size_t sample_budget = 4'000'000);
-  void stamp(Brush, size_t sample_budget, const std::function<bool()> &cancelled);
+  void stamp(Brush, size_t sample_budget,
+             const std::function<bool()> &cancelled);
   bool end_stroke();
   void cancel_stroke();
   bool undo();
@@ -75,6 +95,14 @@ public:
   static Volume load(const std::filesystem::path &);
 
 private:
+  struct GeometryHistory;
+  using GeometryHistoryPtr = std::shared_ptr<const GeometryHistory>;
+  GeometryHistoryPtr geometry_history_, geometry_start_;
+  static void geometry_include(GeometryChange &, Int3);
+  static void geometry_include(GeometryChange &, GeometryRegion);
+  GeometryHistoryPtr
+  prepare_geometry_history(const CowMap<Int3, float, IntHash> &,
+                           const GeometryChange &) const;
   struct MaskState {
     CowMap<Int3, float, IntHash> values;
     float background = 0;
@@ -105,7 +133,6 @@ private:
   Layer &layer(uint64_t);
   double sum(Int3, uint64_t exclude = 0) const;
   void recompose();
-  void raw_set(Int3, float);
   void clear_history();
   float voxel_;
   CowMap<Int3, float, IntHash> cells_;
@@ -114,6 +141,5 @@ private:
   size_t history_limit_, history_bytes_ = 0;
   bool editing_ = false;
   uint64_t revision_ = 0;
-  void set(Int3, float);
 };
 } // namespace dome

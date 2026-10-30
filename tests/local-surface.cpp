@@ -171,9 +171,7 @@ int main(int argc, char **argv) try {
       auto regions = changed(old, field);
       if (regions.empty())
         continue;
-      local += ms([&] {
-        cache = cache->update(field, cache->source_owner(), regions);
-      });
+      local += ms([&] { cache = cache->update(field); });
       built += cache->stats().tiles_built;
       reused += cache->stats().tiles_reused;
       Mesh ref, out;
@@ -276,12 +274,20 @@ int main(int argc, char **argv) try {
   {
     auto original = shape(0);
     auto cache = LocalSurfaceCache::build(original);
-    auto data = original.voxels();
-    Int3 q{11, 1, 0};
-    data[q] = original.at(q) * .5f;
-    auto edited = Volume::from_samples(original.voxel_size(), std::move(data));
-    std::array<SurfaceSampleRegion, 1> region{{{q, q}}};
-    auto updated = cache->update(edited, cache->source_owner(), region);
+    auto edited = original.geometry_snapshot();
+    Brush brush;
+    brush.tool = Tool::Flatten;
+    brush.radius = .025f;
+    brush.normal = {1, 0, 0};
+    brush.blend = 0;
+    brush.from = brush.to = {.425f, .04f, 0};
+    edited.begin_stroke();
+    edited.stamp(brush);
+    edited.end_stroke();
+    LocalSurfaceUpdateReport report;
+    auto updated = cache->update(edited, {}, &report);
+    check(report.kind == LocalSurfaceUpdateReport::Kind::Local,
+          "Positive-only normal edit uses authenticated local metadata");
     auto a = cache->materialize(), b = updated->materialize();
     check(a.indices == b.indices && a.positions.size() == b.positions.size() &&
               std::equal(a.positions.begin(), a.positions.end(),
@@ -295,19 +301,19 @@ int main(int argc, char **argv) try {
           "Dirty halo refreshes positive-only central-difference dependencies");
     auto layer = original.add_layer("metadata");
     original.select_layer(layer);
-    check(cache->update(original, cache->source_owner(), {}) == cache,
+    check(cache->update(original) == cache,
           "Layer/view metadata changes reuse exact geometry owner despite "
           "revision changes");
   }
   {
     auto field = shape(2, .0001f, {100000, -100000, 99999});
     auto cache = LocalSurfaceCache::build(field);
-    auto data = field.voxels();
-    Int3 q{100006, -99999, 99999};
-    data[q] = -.0001f;
-    auto edited = Volume::from_samples(field.voxel_size(), std::move(data));
-    std::array<SurfaceSampleRegion, 1> region{{{q, q}}};
-    auto next = cache->update(edited, cache->source_owner(), region);
+    auto edited = field.geometry_snapshot();
+    stamp(edited, {10.0006f, -9.9999f, 9.9999f}, Tool::Carve, .00018f);
+    LocalSurfaceUpdateReport report;
+    auto next = cache->update(edited, {}, &report);
+    check(report.kind == LocalSurfaceUpdateReport::Kind::Local,
+          "Large-coordinate edit authenticates actual changed sample regions");
     check(same(next->materialize(), surface_mesh(edited)),
           "Large signed lattice coordinates use measured float sampling halo "
           "exactly");
@@ -328,7 +334,7 @@ int main(int argc, char **argv) try {
   auto old = field.geometry_snapshot();
   stamp(field, {.36f, .05f, .03f});
   auto regions = changed(old, field);
-  auto update = cache->update(field, cache->source_owner(), regions);
+  auto update = cache->update(field);
   check(same(update->materialize(), surface_mesh(field)),
         "Localized geometry update equals full reference extraction");
   size_t shared = 0;
@@ -342,24 +348,26 @@ int main(int argc, char **argv) try {
   check(same(before, cache->materialize()),
         "An older cache and its strongly-held COW source survive editing "
         "unchanged");
-  check(update->update(field, update->source_owner(), {}) == update,
+  check(update->update(field) == update,
         "Geometry owner no-op returns same cache without flattening");
-  check(fails([&] { cache->update(field, update->source_owner(), regions); }),
-        "Cross-object or wrong-branch base owner is refused");
-  check(fails([&] { cache->update(field, cache->source_owner(), {}); }),
-        "Changed geometry with missing dirty provenance is refused");
+  check(field.geometry_change(Volume(.04f).geometry_owner()).kind ==
+            Volume::GeometryChange::Kind::Rebuild,
+        "Cross-object source owner requires a safe full rebuild");
+  check(field.geometry_change(cache->source_owner()->geometry_owner()).kind ==
+            Volume::GeometryChange::Kind::Local,
+        "Actual Volume mutations authenticate complete dirty provenance");
   auto active = update;
   check(field.undo(), "Fixture stroke can undo");
-  auto undo = active->update(field, active->source_owner(), regions);
+  auto undo = active->update(field);
   check(same(undo->materialize(), before),
         "Undo dirty sample removals restore exact prior surface");
   check(field.redo(), "Fixture stroke can redo");
-  auto redo = undo->update(field, undo->source_owner(), regions);
+  auto redo = undo->update(field);
   check(same(redo->materialize(), active->materialize()),
         "Redo creates equivalent geometry on a new COW branch");
   auto empty = Volume(field.voxel_size());
   auto remove = changed(field, empty);
-  auto gone = redo->update(empty, redo->source_owner(), remove);
+  auto gone = redo->update(empty);
   check(gone->tiles().empty() && gone->materialize().indices.empty(),
         "Removing all negative samples erases stale tile geometry");
   Volume blank(.04f);
@@ -372,7 +380,7 @@ int main(int argc, char **argv) try {
           i % 3 == 0 ? Tool::Carve : Tool::Clay, .07f);
     auto delta = changed(previous, field);
     if (!delta.empty())
-      redo = redo->update(field, redo->source_owner(), delta);
+      redo = redo->update(field);
     check(same(redo->materialize(), surface_mesh(field)),
           "Long mixed-sign stroke sequence remains reference-equivalent");
   }
@@ -388,10 +396,7 @@ int main(int argc, char **argv) try {
   stamp(field, {.2f, .3f, .1f}, Tool::Carve, .1f);
   auto delta = changed(previous, field);
   polls = 0;
-  check(fails([&] {
-          redo->update(field, redo->source_owner(), delta,
-                       [&] { return ++polls > 2; });
-        }) &&
+  check(fails([&] { redo->update(field, [&] { return ++polls > 2; }); }) &&
             same(redo->materialize(), surface_mesh(previous)),
         "Canceled local update preserves published cache atomically");
   for (int mode = 0; mode < 5; ++mode) {
@@ -412,9 +417,13 @@ int main(int argc, char **argv) try {
           }),
           "Sample/tile/work/byte/vertex limits refuse bounded work");
   }
-  std::array<SurfaceSampleRegion, 1> bad{{{{INT32_MIN, 0, 0}, {0, 0, 0}}}};
-  check(fails([&] { redo->update(field, redo->source_owner(), bad); }),
-        "Dirty coordinate overflow refuses before tile arithmetic");
+  auto replaced = Volume::from_samples(field.voxel_size(), field.voxels());
+  LocalSurfaceUpdateReport fallback;
+  auto fresh = redo->update(replaced, {}, &fallback);
+  check(fallback.kind == LocalSurfaceUpdateReport::Kind::Rebuild &&
+            same(fresh->materialize(), surface_mesh(replaced)),
+        "Unrelated replacement storage rebuilds safely without caller-supplied "
+        "bounds");
   std::cout << checks << " local surface checks passed\n";
 } catch (const std::exception &e) {
   std::cerr << "FAIL " << e.what() << '\n';

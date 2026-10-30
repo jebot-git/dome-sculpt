@@ -16,6 +16,10 @@ template <class Key, class Value, class Hash> class CowMap {
   }
 
 public:
+  // A held const owner authenticates immutable COW storage across snapshots.
+  // Writers detach while this owner exists; weak owners can compare control
+  // block identity without retaining a succession of potentially large maps.
+  std::shared_ptr<const Map> owner() const { return data_; }
   const Map &read() const { return *data_; }
   auto begin() const { return data_->cbegin(); }
   auto end() const { return data_->cend(); }

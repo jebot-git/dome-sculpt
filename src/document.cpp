@@ -9,6 +9,8 @@
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "sculpt-ui-values.hpp"
+#include "dome/local-surface.hpp"
+#include "geometry-identity.hpp"
 #include <unistd.h>
 #include <utility>
 namespace dome {
@@ -1194,11 +1196,12 @@ void Document::input_loop() {
 }
 void Document::mesh_loop() {
   struct CachedSculpt {
-    std::shared_ptr<const Volume> owner;
+    LocalSurfaceCache::Ptr tiles;
     Mesh mesh;
   };
   std::unordered_map<uint64_t, CachedSculpt> sculpt_cache;
   uint64_t cache_generation = 0;
+  std::shared_ptr<const geometry_detail::Identity> geometry_identity;
   while (!stopping_) {
     std::optional<MeshJob> job;
     {
@@ -1230,19 +1233,48 @@ void Document::mesh_loop() {
           return o.id == entry.first && o.visible && !o.mesh_active;
         });
       });
-      auto objects = job->scene.preview_surfaces(cancelled, [&](uint64_t id, const Volume &source) {
-        auto &cache = sculpt_cache[id];
-        // Retain the COW owner: comparing addresses alone would permit allocator
-        // reuse after a real geometry edit. Mask/control changes retain this map.
-        if (!cache.owner || &cache.owner->voxels() != &source.voxels() ||
-            cache.owner->voxel_size() != source.voxel_size()) {
-          auto owner = std::make_shared<const Volume>(source.geometry_snapshot());
-          auto mesh = surface_mesh(source, cancelled);
-          cache = {std::move(owner), std::move(mesh)};
+      SculptMeshingStats meshing;
+      auto worker_start=std::chrono::steady_clock::now();
+      auto objects=job->scene.preview_surfaces(cancelled,[&](uint64_t id,const Volume &source) {
+        auto &cache=sculpt_cache[id];
+        auto start=std::chrono::steady_clock::now();
+        LocalSurfaceUpdateReport report;
+        auto candidate=cache.tiles?cache.tiles->update(source,cancelled,&report):LocalSurfaceCache::build(source,{},cancelled);
+        meshing.extraction_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+        if(candidate==cache.tiles) {
+          ++meshing.objects_reused;meshing.reused_tiles+=candidate->tiles().size();
+        } else {
+          if(report.kind==LocalSurfaceUpdateReport::Kind::Local)++meshing.local_updates;
+          else {++meshing.full_rebuilds;if(cache.tiles)++meshing.history_fallbacks;}
+          if(report.capacity_fallback)++meshing.capacity_fallbacks;
+          meshing.rebuilt_tiles+=candidate->stats().tiles_built;
+          meshing.reused_tiles+=candidate->stats().tiles_reused;
+          meshing.samples_scanned+=candidate->stats().samples_scanned;
+          meshing.cells_evaluated+=candidate->stats().cells_evaluated;
+          start=std::chrono::steady_clock::now();
+          auto mesh=candidate->materialize(cancelled);
+          meshing.materialize_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
+          if(cancelled())throw std::runtime_error("Stale local surface preview");
+          cache={std::move(candidate),std::move(mesh)};
         }
         return cache.mesh;
       });
+      auto dependencies=std::make_shared<geometry_detail::Identity>();
+      dependencies->generation=job->generation;
+      dependencies->objects.reserve(job->scene.objects().size());
+      for(const auto &o:job->scene.objects())if(o.visible) {
+        geometry_detail::Dependency dep;dep.object=o.id;dep.world=job->scene.world_transform(o.id);
+        if(o.mesh_active)dep.paint=o.painted->mesh_owner();
+        else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
+        dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;
+        auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
+        dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
+        dependencies->objects.push_back(std::move(dep));
+      }
+      std::shared_ptr<const geometry_detail::Identity> identity=geometry_identity&&geometry_identity->matches(*dependencies)?geometry_identity:std::move(dependencies);
       auto snapshot = std::make_shared<MeshSnapshot>();
+      snapshot->geometry_identity=identity;
+      snapshot->sculpt_meshing=meshing;
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
       snapshot->weight_gesture = job->weight_gesture;
@@ -1300,9 +1332,12 @@ void Document::mesh_loop() {
       }
       if (job->weight_view && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled);
+      snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       std::lock_guard lock(mesh_mutex_);
-      if (!cancelled())
+      if (!cancelled()) {
+        geometry_identity=std::move(identity);
         mesh_.store(std::move(snapshot));
+      }
     } catch (const std::exception &e) {
       if (!cancelled()) {
         std::lock_guard lock(model_mutex_);

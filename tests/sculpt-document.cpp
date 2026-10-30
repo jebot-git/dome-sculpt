@@ -17,6 +17,10 @@ void release_sync() {std::lock_guard lock(sync_mutex);sync_released=true;sync_ch
 void require(bool value,const char *message) { if(!value) throw std::runtime_error(message); }
 template<class F> void refuses(F call,const char *message) { bool rejected=false;try{call();}catch(const std::exception &){rejected=true;}require(rejected,message); }
 AssetSource lease(const Document &d) { auto s=d.frame().state;return {s->generation,s->revision,s->active_object}; }
+bool reused(const Document &d) {
+  auto frame=d.frame();const auto &s=frame.surface->sculpt_meshing;
+  return s.objects_reused>0&&s.local_updates==0&&s.full_rebuilds==0&&s.rebuilt_tiles==0&&s.cells_evaluated==0&&s.samples_scanned==0&&s.materialize_ms==0;
+}
 void mesh(Document &d) { require(d.wait_mesh(),"current immutable surface ready");require(d.frame().state->error.empty(),"no asynchronous surface error"); }
 Volume sphere() { Volume v(.05f);v.begin_stroke();Brush b;b.radius=.23f;b.blend=0;v.stamp(b);v.end_stroke();return v.geometry_snapshot(); }
 }
@@ -47,7 +51,7 @@ int main(int argc,char **argv) {
   const auto original=d.copy_volume().voxels();const auto baseline_extractions=extractions.load();
   settings.symmetry_axes=5;settings.symmetry_origin={.01f,-.02f,.03f};settings.mask_edit=true;
   const auto stale=lease(d);d.sculpt_settings(settings,stale);mesh(d);
-  require(extractions==baseline_extractions,"controls retain cached COW source geometry");
+  require(extractions==baseline_extractions&&reused(d),"controls retain cached COW source geometry without tile extraction/assembly");
   require(d.frame().state->can_undo && d.frame().state->sculpt_settings.mask_edit,"native controls one history record");
   refuses([&]{d.sculpt_settings(settings,stale);},"stale native control lease refused");
   refuses([&]{d.sculpt_mask_fill(0,stale);},"stale bulk mask lease refused before queueing");
@@ -60,7 +64,7 @@ int main(int argc,char **argv) {
   d.cancel_desktop();mesh(d);require(d.copy_volume().mask_values().empty(),"cancel retains exact sparse protection");
   require(d.begin_desktop(),"mask stroke restart");d.stamp_desktop(b);d.end_desktop();mesh(d);
   require(!d.copy_volume().mask_values().empty() && d.copy_volume().voxels()==original,"mask stroke changes protection only");
-  require(extractions==baseline_extractions,"mask stroke does not extract source geometry again");
+  require(extractions==baseline_extractions&&reused(d),"mask stroke does not extract tiles or assemble source geometry again");
   auto snapshot=d.frame().surface;require(snapshot->sculpt_masks.size()==snapshot->mesh.positions.size(),"immutable overlay matches packed vertices");
   bool protected_vertex=false;
   auto volume=d.copy_volume();for(size_t i=0;i<snapshot->mesh.positions.size();++i) {
