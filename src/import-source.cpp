@@ -8,6 +8,7 @@
 #include <map>
 #include <nlohmann/json.hpp>
 #include <set>
+#include <utility>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -63,16 +64,19 @@ int beneath(int root,const std::string &name) {
   if(fd>=0 || errno!=ENOSYS) return fd;
   // Older kernels: deliberately disallow all symlinks instead of weakening
   // confinement through a check-then-open path race.
-  int current=dup(root); if(current<0)return -1;
+  Fd current(fcntl(root,F_DUPFD_CLOEXEC,0));
+  if(current.value<0)return -1;
   std::filesystem::path p(name);
   for(auto i=p.begin();i!=p.end();++i) {
     auto next=i;++next;
     int flags=O_RDONLY|O_CLOEXEC|O_NOFOLLOW|O_NONBLOCK;
     if(next!=p.end())flags|=O_DIRECTORY;
-    int fd2=openat(current,i->c_str(),flags);close(current);current=fd2;
-    if(current<0)break;
+    int fd2=openat(current.value,i->c_str(),flags);
+    const int saved_errno=errno;
+    close(current.value);current.value=fd2;
+    if(fd2<0){errno=saved_errno;return -1;}
   }
-  return current;
+  return std::exchange(current.value,-1);
 }
 std::shared_ptr<const std::vector<uint8_t>> read(int root,const std::string &name,
     const ImportLimits &l,size_t remaining) {
@@ -153,7 +157,7 @@ struct ImportSourceCapture::State {
   std::map<std::string,size_t> names;
   size_t total=0;
   bool finished=false;
-  explicit State(int fd):directory(fd){}
+  State()=default;
 };
 size_t ImportSourceReceipt::stored_bytes() const {
   size_t result=root.bytes?root.bytes->size():0;
@@ -216,8 +220,10 @@ ImportSourceCapture::ImportSourceCapture(const std::filesystem::path &path,Impor
   auto parent=path.parent_path();if(parent.empty())parent=".";
   Fd directory(open(parent.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC));
   if(directory.value<0)throw std::runtime_error("Cannot open model source directory");
-  state_=std::make_unique<State>(dup(directory.value));
-  if(state_->directory.value<0)throw std::runtime_error("Cannot retain model source directory");
+  // Keep the open descriptor in its stack owner until allocating State has
+  // succeeded. Evaluating dup() as a make_unique argument leaked on bad_alloc.
+  state_=std::make_unique<State>();
+  state_->directory.value=std::exchange(directory.value,-1);
   state_->limits=std::move(limits);state_->receipt.options=options;
   state_->receipt.format=options.format==ImportSourceFormat::Automatic?format(path.extension().string()):options.format;
   auto name=normalized(path.filename().generic_string());

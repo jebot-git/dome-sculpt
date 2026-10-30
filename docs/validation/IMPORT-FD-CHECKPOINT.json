@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "base": "1651b374cd113a3f5305ed0f1f580a1e5c1a7b2e",
+  "scope": "private cpp/test-only incremental proof; exact immutable whole-instrumented1651 core/support with fully instrumented replacement source/test; no fresh full rebuild",
+  "api_or_schema_change": false,
+  "old_archive_object_excluded": "libdome-sculpt-core.a(import-source.cpp.o)",
+  "identical_public_and_json_files": 69,
+  "release_flags": "-O3 -DNDEBUG -std=gnu++20",
+  "sanitizer_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20",
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "results": {
+    "release": [
+      {
+        "name": "release-flat",
+        "returncode": 0,
+        "seconds": 1.7399814219679683
+      },
+      {
+        "name": "release-textured",
+        "returncode": 0,
+        "seconds": 2.130126590025611
+      },
+      {
+        "name": "release-skinned",
+        "returncode": 0,
+        "seconds": 2.9429066539742053
+      },
+      {
+        "name": "release-flat-fallback",
+        "returncode": 0,
+        "seconds": 1.7489573609782383
+      },
+      {
+        "name": "release-textured-fallback",
+        "returncode": 0,
+        "seconds": 2.134605536935851
+      },
+      {
+        "name": "release-skinned-fallback",
+        "returncode": 0,
+        "seconds": 2.926640936988406
+      }
+    ],
+    "sanitize": [
+      {
+        "name": "sanitize-flat",
+        "returncode": 0,
+        "seconds": 19.900209550978616
+      },
+      {
+        "name": "sanitize-textured",
+        "returncode": 0,
+        "seconds": 23.655198804917745
+      },
+      {
+        "name": "sanitize-skinned",
+        "returncode": 0,
+        "seconds": 33.64808398205787
+      },
+      {
+        "name": "sanitize-flat-fallback",
+        "returncode": 0,
+        "seconds": 22.54009198595304
+      },
+      {
+        "name": "sanitize-textured-fallback",
+        "returncode": 0,
+        "seconds": 28.978976886020973
+      },
+      {
+        "name": "sanitize-skinned-fallback",
+        "returncode": 0,
+        "seconds": 45.461780122015625
+      }
+    ],
+    "allocation_failures_per_build": 13883,
+    "cancel_points_per_build": 396,
+    "existing_source_capture_checks_release": 50
+  },
+  "negative_evidence": {
+    "state_allocation": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/json-import-ec537a8/artifacts/negative-import-fd.log",
+      "allocation": 43,
+      "fd_before": 4,
+      "fd_after": 5,
+      "actual_exit": 42
+    },
+    "fallback_path_allocation": {
+      "path": "artifacts/negative-fallback-state-only.log",
+      "allocation": 552,
+      "actual_exit": 1
+    }
+  },
+  "source_sha256": {
+    "src/import-source.cpp": "d7c6f4bbbc498a24577c050955b2898097fde7d5ec2adf9b8caee4776e2745ec",
+    "tests/import-memory.cpp": "c8e0072d45ef990cee24db98753a8c4be53a5623ab098906249cc32411900b17",
+    "CMakeLists.txt": "b59055e8767f0517f41e9fd0451fc4e22bb8e6dff47feb9e13a130821f23bd3d"
+  },
+  "artifacts_sha256": {
+    "artifacts/test-fd-release-flat-fallback.log": "9cc0e7611788b63cb71ec803180807f66241cdf0dba5d5c3fa6bcb8d4f3874ab",
+    "artifacts/test-fd-release-flat.log": "e6f58c34732d8c529dfe964e8e99381f49f20a1adabf44c5fe96a4e7281453f8",
+    "artifacts/test-fd-release-skinned-fallback.log": "915f5c0d545f7f3846f2f0faa8121ed9a647380bbc9d6302740dab5b8cd3d3a5",
+    "artifacts/test-fd-release-skinned.log": "12c78d174e2ec6d17b87538ada06e3d1e0e0ccc3d007fba55329da8049458c2a",
+    "artifacts/test-fd-release-textured-fallback.log": "7dc8e8fd6d3dbd043c9e4ed15a0ecfa0c4b27aca95c7e5ccd307dcafe240ae28",
+    "artifacts/test-fd-release-textured.log": "2cec25595a7cfdbfc178d8f3cd1d3d2a4ea79a6f4c6c967eb890ee0a2d1fb319",
+    "artifacts/test-fd-sanitize-flat-fallback.log": "9cc0e7611788b63cb71ec803180807f66241cdf0dba5d5c3fa6bcb8d4f3874ab",
+    "artifacts/test-fd-sanitize-flat.log": "e6f58c34732d8c529dfe964e8e99381f49f20a1adabf44c5fe96a4e7281453f8",
+    "artifacts/test-fd-sanitize-skinned-fallback.log": "915f5c0d545f7f3846f2f0faa8121ed9a647380bbc9d6302740dab5b8cd3d3a5",
+    "artifacts/test-fd-sanitize-skinned.log": "12c78d174e2ec6d17b87538ada06e3d1e0e0ccc3d007fba55329da8049458c2a",
+    "artifacts/test-fd-sanitize-textured-fallback.log": "7dc8e8fd6d3dbd043c9e4ed15a0ecfa0c4b27aca95c7e5ccd307dcafe240ae28",
+    "artifacts/test-fd-sanitize-textured.log": "2cec25595a7cfdbfc178d8f3cd1d3d2a4ea79a6f4c6c967eb890ee0a2d1fb319",
+    "artifacts/test-fd-source-capture.log": "874411447f320b1b29c993ec3374a04c2676422b4660405dff0ef982b5f5a198",
+    "artifacts/negative-fallback-state-only.log": "6963b54a666eb2703f7de1b54433a70cc21f65cdb9e05524d83ef585e79e720c",
+    "artifacts/negative-fallback-state-only-status.json": "d887af91c78cd669eef985b0a0be0a8906b2fba886075100839793893f9bd767",
+    "artifacts/fd-header-coherence.json": "77016e4ed66812a5d7974fb5a7a7ba72ba6c9ea02ea4fa610722b623803a83fb",
+    "artifacts/build-fd-release.log": "e4e357720426c78444050a20f775904d3db69194adbde18b1a2878b75163da8f",
+    "artifacts/build-fd-sanitize.log": "b1d09e1cc79f6551e1b9e46fb8ae655403c5c67210c708cfa12faafcb811e396",
+    "artifacts/build-fd-source-capture.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "negative_original_sha256": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/json-import-ec537a8/artifacts/negative-import-fd.log": "41a3d7c7407349e018c952eff1173199a12bcc6b5de8dd2f914407b3e99eb3be",
+    "/home/blux/de-xr/dome-sculpt/artifacts/json-import-ec537a8/artifacts/negative-import-fd-status.json": "2d629fe538f3833715e5a81c7c0eba9bf0bb4ad15a56faa85b76f40cdef4a896"
+  },
+  "binary_and_map_sha256": {
+    "artifacts/fd-release/import-memory": "699227d578e770bc470b1102494f3abe414e3538eca45a87534ff6d410176895",
+    "artifacts/fd-sanitize/import-memory": "29831ad6a6ca4a85bb47a37e1616d3747b1d35ad7d01c877589b228739000d83",
+    "artifacts/fd-release/link.map": "c7f241d63614cf0555266d081f83b9c1ccae3c03975ea08f5a52bd8082eaf1f8",
+    "artifacts/fd-sanitize/link.map": "f5223ad79488169753de71ac852f6ee38670ba16b5c7e6ecf07771f9c196555a",
+    "artifacts/fd-release/state-only": "60648accf33cdd12ce8459fc9230c6fac1a647bc82fcaee1e4d3e4685b28a8f3",
+    "artifacts/fd-release/source-capture": "75dc9278f8e93dabe371ccc1a5084fa077096af435e39cbb061ce2e19ac65bcf"
+  },
+  "integration_requirement": "fresh rebuild all consumers with matching vendored JSON headers; no Scene12 required; preserve full import remaining scope"
+}

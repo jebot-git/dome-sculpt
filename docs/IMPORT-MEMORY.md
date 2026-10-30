@@ -72,8 +72,6 @@ The subsequent OS-resource audit found a real failure outside ASan's heap scope:
 `make_unique<State>(dup(directory.value))` evaluates `dup` before allocating its
 owner. Failing that allocation leaks a directory descriptor. The actual wrapper
 probe at allocation43 observed4→5 open descriptors and exited42, while ordinary
-heap/source tests still passed. That negative evidence is retained. Removing the
-unnecessary duplication and transferring an already-owned RAII handle only after
-successful owner allocation is the next narrow change. This checkpoint does not
-claim directory-descriptor OOM ownership is complete before that fix and its
-explicit descriptor regression pass.
+heap/source tests still passed. That negative evidence is retained. The original 1651b37 checkpoint did not claim descriptor OOM ownership was
+complete. The separately qualified fix and real descriptor/fallback regression
+are recorded in [IMPORT-FD-OWNERSHIP.md](IMPORT-FD-OWNERSHIP.md).
