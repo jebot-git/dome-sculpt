@@ -4,6 +4,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/material-bindings.hpp"
+#include "source-colors.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
   if(!appearance)return {};
@@ -38,6 +39,7 @@ struct Visibility {
   std::optional<MToonMaterial> toon;
   PaintSourceTexture color, mask, coverage, pbr;
   const ImportedPrimitive *primitive = nullptr;
+  std::vector<std::array<float,4>> vertex_colors;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh) : range(r) {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
@@ -57,7 +59,14 @@ struct Visibility {
       r.material_bindings->validate();
       if(r.material_bindings->has_mtoon)toon=r.material_bindings->material;
     } else toon = retained_mtoon(r.appearance.get());
-    if (!toon) return;
+    if (!toon) {
+      if(r.appearance)vertex_colors=detail::source_vertex_colors(r.appearance.get(),r.appearance->source_vertices.size());
+      if(!vertex_colors.empty()) {
+        if(r.first_vertex>mesh.positions.size() || vertex_colors.size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility vertex-color domain is outside packed geometry");
+        for(size_t c=r.first;c<r.first+r.count;++c){const auto v=mesh.indices.at(c);if(v<r.first_vertex || v-r.first_vertex>=vertex_colors.size())throw std::invalid_argument("Visibility vertex-color identity is outside its packed range");}
+      }
+      return;
+    }
     const auto source=r.material_bindings?r.material_bindings->native_reference:native_source(*r.appearance);
     const auto &parameters = toon->parameters;
     cull = parameters.cull;
@@ -156,9 +165,12 @@ struct Visibility {
         const float replacement=sample(coverage,primary,0);
         if(replacement!=0)opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) * (1-replacement);
       }
-    } else opacity = factor * sample(color, primary);
+    } else {
+      opacity = factor * sample(color, primary);
+      if(!vertex_colors.empty()){float a=0;for(size_t k=0;k<3;++k)a+=bary[k]*vertex_colors.at(m.indices[first+k]-range.first_vertex)[3];opacity*=a;}
+    }
     opacity = std::clamp(opacity, 0.f, 1.f);
-    return opacity > 0 && (alpha != Material::AlphaMode::Mask || opacity >= cutoff);
+    return alpha == Material::AlphaMode::Mask ? opacity >= cutoff : opacity > 0;
   }
 };
 } // namespace

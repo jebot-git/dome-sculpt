@@ -111,6 +111,7 @@ struct SurfaceRenderer::TextureState {
   MToonSourcePacks packed_sources;
   std::vector<std::array<float,2>> uv1;
   std::unordered_set<uint64_t> weighted;
+  std::unordered_set<uint64_t> vertex_alpha;
   std::optional<double> frame_time;
   std::chrono::steady_clock::time_point started=std::chrono::steady_clock::now();
   SurfaceTextureLimits limits;
@@ -129,7 +130,7 @@ struct SurfaceRenderer::TextureState {
   static Sampler sampler(const PaintSourceTexture&s){return {s.wrap_s,s.wrap_t,s.min_filter?s.min_filter:GL_LINEAR,s.mag_filter?s.mag_filter:GL_LINEAR};}
   static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
   SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size(),samplers.size(),bytes+packed_sources.bytes(),uploads,packed_sources.bytes(),packed_sources.builds()};}
-  void clear(bool release){packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();weighted.clear();}
+  void clear(bool release){packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();weighted.clear();vertex_alpha.clear();}
   void prepare(const MeshSnapshot&mesh,bool geometry_changed){
     if(geometry_changed && (!mesh.mesh.positions.empty() || !mesh.mesh.indices.empty()))mesh.mesh.validate();
     const auto count=mesh.mesh.positions.size();
@@ -138,6 +139,16 @@ struct SurfaceRenderer::TextureState {
       if(geometry_changed)for(auto v:values){float n=length(v);if(!finite(v)||!std::isfinite(n)||n<1e-8f)throw std::invalid_argument("Retained normal frame direction is invalid");}
     };
     normals_valid(mesh.source_normals);normals_valid(mesh.canonical_normals);
+    if(!mesh.source_colors.empty() && mesh.source_colors.size()!=count)throw std::invalid_argument("Source vertex-color count differs from geometry");
+    if(geometry_changed) {
+      for(auto color:mesh.source_colors)for(float c:color)if(!std::isfinite(c) || c<0 || c>1)throw std::invalid_argument("Source vertex colors must be finite linear RGBA");
+      vertex_alpha.clear();
+      if(mesh.ranges.empty() && std::any_of(mesh.source_colors.begin(),mesh.source_colors.end(),[](const auto &c){return c[3]<1;}))vertex_alpha.insert(0);
+      if(!mesh.source_colors.empty())for(const auto &r:mesh.ranges) {
+        if(r.first>mesh.mesh.indices.size() || r.count>mesh.mesh.indices.size()-r.first)throw std::invalid_argument("Source vertex-alpha range is invalid");
+        for(size_t c=r.first;c<r.first+r.count;++c)if(mesh.source_colors.at(mesh.mesh.indices[c])[3]<1){vertex_alpha.insert(r.object);break;}
+      }
+    }
     if(!mesh.source_tangents.empty() && mesh.source_tangents.size()!=count)throw std::invalid_argument("Retained tangent frame size differs from geometry");
     if(geometry_changed)for(auto t:mesh.source_tangents){float n=length(Vec3{t[0],t[1],t[2]});if(!finite(Vec3{t[0],t[1],t[2]})||!std::isfinite(n)||n<1e-8f||(t[3]!=-1&&t[3]!=1))throw std::invalid_argument("Retained tangent frame is invalid");}
     for(const auto &range:mesh.ranges) {
@@ -332,7 +343,7 @@ void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   auto vertex=mtoon_renderer_vertex();
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;
+in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -371,9 +382,11 @@ vec3 sculpt_mask_color(vec3 rgb){return mask_value>0?rgb*(1.0-.72*clamp(mask_val
 void main(){if(clip_enabled==1&&dot(clip_plane.xyz,cut_position)<clip_plane.w)discard;if(weight_pass==1){if(weight_value<0)discard;float opacity;
 if(mt_mode==1){bool killed;vec4 source=mt_surface(n,unit(camera-world),killed);if(killed)discard;opacity=source.a;}
 else{opacity=base_color.a;if(slots[0]==1)opacity*=texture(tex0,source_uv(0)).a;
+opacity*=source_color.a;
 if(alpha_mode==1)opacity=1;else if(alpha_mode==2){if(opacity<alpha_cutoff)discard;opacity=1;}}
 if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0,0,1),vec3(0,1,1),x):x<2?mix(vec3(0,1,1),vec3(0,1,0),x-1):x<3?mix(vec3(0,1,0),vec3(1,1,0),x-2):mix(vec3(1,1,0),vec3(1,0,0),x-3);color=vec4(ramp,opacity);return;}if(weight_value>=0)discard;if(mt_mode==1){bool killed;vec4 result=mt_surface(n,unit(camera-world),killed);if(killed)discard;color=vec4(sculpt_mask_color(result.rgb),result.a);return;}vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
 if(slots[0]==1)base*=texture(tex0,source_uv(0));
+base*=source_color;
 if(slots[1]==1){vec3 orm=texture(tex1,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
 if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
 if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength);if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
@@ -444,7 +457,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                  mesh->mesh.uv.size()!=cached_->mesh.uv.size() ||
                  mesh->source_normals.size()!=cached_->source_normals.size() ||
                  mesh->canonical_normals.size()!=cached_->canonical_normals.size() ||
-                 mesh->source_tangents.size()!=cached_->source_tangents.size()))
+                 mesh->source_tangents.size()!=cached_->source_tangents.size() ||
+                 mesh->source_colors.size()!=cached_->source_colors.size()))
       throw std::invalid_argument("Shared geometry identity has inconsistent packed counts");
     try{textures_->prepare(*mesh,!reuse);}catch(...){textures_->clear(true);cached_.reset();count_=0;throw;}
     glBindVertexArray(vao_);
@@ -458,7 +472,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       const bool has_frames=!mesh->source_normals.empty() || !mesh->canonical_normals.empty() || !mesh->source_tangents.empty();
       const size_t vertex_bytes=render_detail::buffer_bytes(count,sizeof(Vertex));
       const size_t frame_bytes=has_frames?render_detail::buffer_bytes(count,sizeof(FrameVertex)):0;
-      const size_t geometry_bytes=render_detail::buffer_sum(vertex_bytes,frame_bytes);
+      const size_t color_bytes=render_detail::buffer_bytes(mesh->source_colors.size(),sizeof(std::array<float,4>));
+      const size_t color_offset=render_detail::buffer_sum(vertex_bytes,frame_bytes);
+      const size_t geometry_bytes=render_detail::buffer_sum(color_offset,color_bytes);
       const size_t index_bytes=render_detail::buffer_bytes(mesh->mesh.indices.size(),sizeof(uint32_t));
       std::vector<Vertex> vertices;
       vertices.reserve(count);
@@ -468,11 +484,11 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
           textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],
           mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i]});
       glBindBuffer(GL_ARRAY_BUFFER,vertices_);
-      if(has_frames) {
+      if(has_frames || color_bytes) {
         // Optional direction block shares the static geometry lifetime without
         // increasing ordinary sculpt vertices or concatenating host buffers.
-        std::vector<FrameVertex> frames;frames.reserve(count);
-        for(size_t i=0;i<count;++i)frames.push_back({
+        std::vector<FrameVertex> frames;if(has_frames)frames.reserve(count);
+        if(has_frames)for(size_t i=0;i<count;++i)frames.push_back({
           mesh->source_normals.empty()?mesh->mesh.normals[i]:mesh->source_normals[i],
           mesh->canonical_normals.empty()?mesh->mesh.normals[i]:mesh->canonical_normals[i],
           mesh->source_tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->source_tangents[i]});
@@ -480,6 +496,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         check_surface_buffer("Surface geometry buffer allocation failed");
         if(vertex_bytes)glBufferSubData(GL_ARRAY_BUFFER,0,GLsizeiptr(vertex_bytes),vertices.data());
         if(frame_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(vertex_bytes),GLsizeiptr(frame_bytes),frames.data());
+        if(color_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(color_offset),GLsizeiptr(color_bytes),mesh->source_colors.data());
       } else glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes),vertices.data(),GL_STATIC_DRAW);
       check_surface_buffer("Surface vertex buffer upload failed");
       glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),nullptr);glEnableVertexAttribArray(0);
@@ -492,6 +509,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         glVertexAttribPointer(8,4,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,source_t)));glEnableVertexAttribArray(8);
         glVertexAttribPointer(9,3,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,canonical_n)));glEnableVertexAttribArray(9);
       } else for(GLuint attribute:{7,8,9})glDisableVertexAttribArray(attribute);
+      if(color_bytes){glVertexAttribPointer(10,4,GL_FLOAT,GL_FALSE,sizeof(std::array<float,4>),reinterpret_cast<void*>(color_offset));glEnableVertexAttribArray(10);}
+      else glDisableVertexAttribArray(10);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices_);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(index_bytes),mesh->mesh.indices.data(),GL_STATIC_DRAW);
       check_surface_buffer("Surface index buffer upload failed");
@@ -521,6 +540,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   // them for every draw, including stereo reuse and interleaved renderers.
   if(cached_->selected_weights.empty())glVertexAttrib1f(4,-1);
   if(cached_->sculpt_masks.empty())glVertexAttrib1f(6,-1);
+  if(cached_->source_colors.empty())glVertexAttrib4f(10,1,1,1,1);
   if(cached_->source_normals.empty() && cached_->canonical_normals.empty() && cached_->source_tangents.empty()) {
     glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
   }
@@ -544,10 +564,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUniform1f(glGetUniformLocation(program_,"mt_aspect"),float(width)/height);
   auto seconds=textures_->frame_time.value_or(std::chrono::duration<double>(std::chrono::steady_clock::now()-textures_->started).count());glUniform1f(glGetUniformLocation(program_,"mt_time"),float(seconds));
   glBindVertexArray(vao_);
-  auto blended = [](const Material &m, const TextureMaps *maps) {
+  auto blended = [&](const Material &m, const TextureMaps *maps,uint64_t id) {
     if (m.alpha == Material::AlphaMode::Blend) return true;
     if (m.alpha != Material::AlphaMode::Automatic) return false;
-    return m.color[3] < 1 || (maps && maps->transparent);
+    return m.color[3] < 1 || (maps && maps->transparent) || textures_->vertex_alpha.contains(id);
   };
   auto draw_range = [&](const Material &original, size_t first, size_t count,
                         uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false) {
@@ -595,7 +615,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glEnable(GL_CULL_FACE);
       glCullFace(GL_BACK);
     }
-    if (blended(material, maps)) {
+    if (blended(material, maps,id)) {
       glEnable(GL_BLEND);
       glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
                           GL_ONE_MINUS_SRC_ALPHA);
@@ -674,7 +694,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   }
   else {
     std::vector<const SurfaceRange*> ordered;for(auto &r:cached_->ranges)ordered.push_back(&r);
-    auto queue=[&](const SurfaceRange&r){auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get())?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
+    auto queue=[&](const SurfaceRange&r){auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get(),r.object)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return queue(*a)<queue(*b);});
     for(auto r:ordered){
       glUniform1i(glGetUniformLocation(program_,"clip_enabled"),cached_->clipped_object&&r->object==cached_->clipped_object);

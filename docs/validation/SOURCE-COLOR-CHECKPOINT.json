@@ -1,0 +1,474 @@
+{
+  "format": 1,
+  "created_utc": "2026-10-30T05:08:16.744975+00:00",
+  "base": "40ea548f71384d377ad8e853bbdea8632346d2c5",
+  "scope": "Static original COLOR_0 under POSITION/NORMAL/TANGENT morphs and skin; COLOR/UV morph channels, generic advanced GUI import, and general colored-target bake preparation remain required follow-up. No push/install/primary changes.",
+  "sources": {
+    "CMakeLists.txt": {
+      "blob": "84e75b9b65b0d3cae3f718a0bda36f7e96584dd7",
+      "sha256": "d0967ad1d2d2cbcef56232809591c68a7d40a7db6afef2c471094031f0cf3edd"
+    },
+    "docs/NORMAL-FRAME-EXPORT-STATUS.md": {
+      "blob": "cccbdece6b5030a4cf91405cebc0369a01efe47d",
+      "sha256": "2a5aff6349325621cb2f2805ebc3d518c65351af7ff154e839db7ab920cfade5"
+    },
+    "docs/SOURCE-VERTEX-COLORS.md": {
+      "blob": "790d129e2b68f8ba1d9206078b7c3ce4390ecdf6",
+      "sha256": "db5d604f5cd0365fda0a6df9dbb5b3561c7effb1e43ede850bdebfc27634d1b3"
+    },
+    "include/dome/document.hpp": {
+      "blob": "ccd04dbed6a9343ffc55f1c4e93e165cc4a10c7e",
+      "sha256": "949530aa2fc4f55f2488e5906411ee60986b5fe8ca8d790e641290b5d65d05fa"
+    },
+    "src/document-cut.cpp": {
+      "blob": "a7c08887ac42e5b2efac3357c6e577c0224d384a",
+      "sha256": "0ad570bc6a1057e4b8cb0d2deb13acc746be23e0f10e2b12d0c0cb2419825837"
+    },
+    "src/document.cpp": {
+      "blob": "8920541bc109d809fbe4d407250da2fd0b0ac828",
+      "sha256": "185a7b3ac8d8727ca234a4a73302bae99c8c4ee6ff7eeaad2c4c097a6ccc2be0"
+    },
+    "src/material-visibility.cpp": {
+      "blob": "0d50d67d889cad21c94a6136d5fb4cf553e3f03f",
+      "sha256": "5b27736326da3739f56a8e644d7be5225a5074c1dbc73a151261a5984679a638"
+    },
+    "src/render-mtoon.hpp": {
+      "blob": "6e0d4c14a8424565e68a81c076f950af19ba5aea",
+      "sha256": "3de8f44ad2cc731a836037e8fa83d9045b7abb8e71195d3ea40e1c60a54b11d0"
+    },
+    "src/render.cpp": {
+      "blob": "1f780e02de9112beb1f6404f9143cfc7ec516df8",
+      "sha256": "695dc7dd5b85545c25f967c1b0b876a469b3b1ed4e93ff48aed922433e8eefe8"
+    },
+    "src/source-colors.hpp": {
+      "blob": "a078dd7afeb73ac1a53cb097ee87eb15755df08b",
+      "sha256": "5af007e8744bb2d5cff2c1cef9b935187c4a16a8ba8361d35ddeef90b1d4507f"
+    },
+    "tests/source-color-consumer.hpp": {
+      "blob": "6128f7b9849d7477a0a8d88f9f193c950635b536",
+      "sha256": "ce39a70a1cd1f1a634440912e00eeebb035f8932a2951ba9d2c105ab7634738d"
+    },
+    "tests/source-color-fixtures.hpp": {
+      "blob": "5b918120436ee554db688dc0107d4e1b79c2d7dd",
+      "sha256": "c738ce72eea329b5a83c9c0b2c74f00e7d5c606103cfbf52367e7c2762f1d8d7"
+    },
+    "tests/source-color-render.cpp": {
+      "blob": "2803db00ce093572d7c031c6c4c41e09ba08caf4",
+      "sha256": "7f5746a73977751d755f4cf26daf7355a2271cc96be5e9dc207764d2c0bd39bd"
+    },
+    "tests/source-color-vrm-consumer.cpp": {
+      "blob": "f514ccffb839f89905b8875abd933a13d66fcaac",
+      "sha256": "8afc0d2db82085c8834e6ce5995687dd00f19966c4f7f561e025dcf57cf82f20"
+    }
+  },
+  "release": {
+    "build_type": "Release",
+    "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+    "backend": "CPU",
+    "ui": true,
+    "xr": false,
+    "toolkit_prefix": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e",
+    "binaries": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-source-color-render-test",
+        "bytes": 7180280,
+        "sha256": "c10b8eee0079fde59ee7ebd3804d14b024e062fcda78b4fb2efb6cba8f37c3bd"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-source-color-vrm-test",
+        "bytes": 7180448,
+        "sha256": "faf95874c63cd813c2d38b91edd8a53bc5ddf52e6bc49b76794b01e89c7dc250"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-material-visibility-test",
+        "bytes": 4587728,
+        "sha256": "194114b041a45dfa1bdb9607ecb6999310ab447eed13c3c0a9933c0c1df40539"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-mtoon-render-test",
+        "bytes": 4938408,
+        "sha256": "d205a9af7d7d26c741fd5df5198ac30515e2261e4c4649570c635258dbe429d9"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-mtoon-emission-test",
+        "bytes": 4976352,
+        "sha256": "0c2151df289f06286861adfdaa6686fd7da06535f87758a8f055dd0143428762"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-mask-render-test",
+        "bytes": 4967544,
+        "sha256": "d473195624ba9b3088821ed6a21be7f7d7f1765a76aba4f4445e3772a89d338b"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-mtoon-visibility-test",
+        "bytes": 4979944,
+        "sha256": "7aea29530e505c55959ae6994a583c97d958565cc3041d5b7287dc97285bec11"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-normal-frame-render-test",
+        "bytes": 7036792,
+        "sha256": "e1254319c38bf10af1912de41a8427f5519b620602623ffdc95b2ccd85eff35b"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-render-buffers-test",
+        "bytes": 4966080,
+        "sha256": "3d260d56e3425f6d06d263ccc80b71f2e9ab162aad4a330fc91151ec09116dc5"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-document-render-buffers-test",
+        "bytes": 6981664,
+        "sha256": "c4722f827c040b5753328e1f76ab6f035400facd401de96b61a645d43c1f80ba"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-document-render-capacity-test",
+        "bytes": 6847568,
+        "sha256": "20d0f36901d19508c798f1ac121fdbd0ca3c5a0d282d0321793587a86b45a11a"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/dome-sculpt-weight-authoring-test",
+        "bytes": 6708216,
+        "sha256": "ced87cc03a94e6f98af9ee5c247ce53c77b8f264e648c79656b7dfbe884cf419"
+      }
+    ],
+    "libraries": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libdome-sculpt-core.a",
+        "bytes": 14427710,
+        "sha256": "74ced56db2b4b118f40ebc3fa6aa573f29f10cc38b00a40eb27d54e065966178"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libdome-sculpt-render.a",
+        "bytes": 566276,
+        "sha256": "1039cf51e9c465eae4876a43900b1cb952a513a2ae1b42a1a086fb59bc3bcb94"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libxatlas.a",
+        "bytes": 301242,
+        "sha256": "cc267eddfd391935b3f8ff5df05f04bbbeb6d057a8854fc2c8d3ff616bad5f60"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libmikktspace.a",
+        "bytes": 30118,
+        "sha256": "4e1fba0ef39e5522f0c96e4e5c8493f84330a85807b3837e04d97c64386e4f2f"
+      }
+    ]
+  },
+  "results": {
+    "software_color_checks": 100,
+    "software_avatar_checks": 41,
+    "software_independent_max_channel_error": 0,
+    "cpu_visibility_checks": 40,
+    "software_color_visibility_tests": "3/3 passed54.32s",
+    "software_regressions": "9/9 passed260.14s",
+    "arc_device": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "arc_color_checks": 100,
+    "arc_color_max_channel_error": 1,
+    "arc_avatar_checks": 41,
+    "arc_avatar_max_channel_error": 0,
+    "arc_regressions": {
+      "normal_frames": 47,
+      "mtoon": 81,
+      "emission": 43,
+      "mask": 38,
+      "visibility": 25,
+      "buffer": 24,
+      "document_buffer": 22,
+      "ordinary_capacity": 19
+    },
+    "khronos_models": 34,
+    "khronos_errors": 0,
+    "khronos_warnings": 7,
+    "official_vrm_schemas": 15,
+    "vrm_models": 7,
+    "vrm_errors": 0,
+    "arc_export_bytes_equal_validated_software": true,
+    "self_contained_depfiles": 77,
+    "untracked_noncheckpoint_dependencies": []
+  },
+  "sanitizers": {
+    "state": "whole-core C and C++ ASan/UBSan/leak build in progress; tests not yet run",
+    "session": 56238,
+    "build": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san",
+    "log": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-san-build.log",
+    "claimed_pass": false
+  },
+  "evidence": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-final-build.log",
+      "bytes": 1561,
+      "sha256": "0871cc11c5d22ddcd0c5940b22654fea8adaac996a4fa0ca827f1ad38eecfd45"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-final-software.log",
+      "bytes": 470,
+      "sha256": "515a883db0232c39480a6d28c41752a0628305a5ff3b56e1e3f7c63301bc657d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-final-software-details.log",
+      "bytes": 22614,
+      "sha256": "d93a0fc06ccde6661aa1fddd5b6aa1884629cfe8a76956db44ffdf43a522eeda"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-regression-build.log",
+      "bytes": 2818,
+      "sha256": "3168ef2fa05fe8d77a00193faeb4800a67d114eb09ce5328636a6ec069b0966b"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-regression-software.log",
+      "bytes": 1092,
+      "sha256": "97fa91060d4c7dc55958b603c2075bcc1f3b5240bbb445cc4ad3af705b8f158f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-regression-software-details.log",
+      "bytes": 38711,
+      "sha256": "b419b9c9f9dc9546f4b2400c7101705b70873a5c40ad6af7a67046b9edfacc9a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-khronos.log",
+      "bytes": 1991,
+      "sha256": "1fdc5337e4bb3c818a25dcb5705e79577d836eb29114e628add9b2a7f3548c50"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-khronos-report.json",
+      "bytes": 87485,
+      "sha256": "b8daf5e1dff2847e1b6e5f2784b095f60d71a4f5d43bceab9600e8df44091f6d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-vrm-schemas.log",
+      "bytes": 992,
+      "sha256": "ffeeb4c3f0a7976528ca2fab5664317cbf0a3be36e2c5ea03324b540d106309a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-vrm-schema-report.json",
+      "bytes": 1275,
+      "sha256": "eb3c26897aaa4f4e246ddf5c089a96c037a959d5691121d7e001cd7a09743c42"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-self-contained.json",
+      "bytes": 595,
+      "sha256": "e424b59d0c3f718ca074dca8dd306af01571f872c08c97e4a6bc606ecf93a88e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-document-render-buffers.log",
+      "bytes": 1906,
+      "sha256": "e003450a71f916370f351d61a8d7964e10e22fa56afe90868915b47cd2b4a492"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-document-render-capacity.log",
+      "bytes": 1985,
+      "sha256": "aee88a8caeaa1b8d6484e5d07115db46789169464a28c15067e1a075ea9c9a51"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-mask-render.log",
+      "bytes": 2725,
+      "sha256": "ac0d57e28e33658c6ba79d1de81ff05515e83b660c23fe51700b7d377a562269"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-mtoon-emission.log",
+      "bytes": 4683,
+      "sha256": "11aa1bc57afa44472a472f455a1b068670df0ee307305791f6611c0173eb9515"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-mtoon-render.log",
+      "bytes": 7101,
+      "sha256": "7f817b87553325b06872e77ebbcd7a62c258cdbade3f0295f628993eb164c504"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-mtoon-visibility.log",
+      "bytes": 2379,
+      "sha256": "435ca4a388996cd23f6dd5a1291c8977fd5404827536b9b15c803b2f1a6f1348"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-normal-frame-render.log",
+      "bytes": 4784,
+      "sha256": "c1f4b5aa3aaeff79e3feb345798acdd350cc4899262ccb702ddf1511cebd2e3e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-render-buffers.log",
+      "bytes": 1930,
+      "sha256": "59352667dddf2d4cf3244f03f0d81f50a31774f5d977635c042201684ff5b5a2"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-render.log",
+      "bytes": 11871,
+      "sha256": "ee485d2e39b8f48714087baede45d158a2bb4680a60bb3e26a32ae763f5ae65d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-vrm.log",
+      "bytes": 5358,
+      "sha256": "811a9e21d7ba8ab9b38c761e14679f16467f2b08b7a6088ab582115510348184"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-1-0.glb",
+      "bytes": 3972,
+      "sha256": "f8475c84bf4e1d309415a319488d24559f254ddc68797732095cd7a8393d6d3a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-1-100.glb",
+      "bytes": 3972,
+      "sha256": "e77bf5d460aa68eee487b385acb0f2794a64c7a874d77c4840a92a60513eee51"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-1-35.glb",
+      "bytes": 3988,
+      "sha256": "2685906f84c1b58176d8532b6e4962cc4f2d261f5af5954255f6f749df35ce11"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-2-0.glb",
+      "bytes": 4004,
+      "sha256": "07a9f42bedad5152230f1b580349850be729743ae1d715d67953bc9c4fc21514"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-2-100.glb",
+      "bytes": 4004,
+      "sha256": "177f47341ba67a523b424158e56f971b5fdf8ef9a4f5116c7aca82de63a46ec2"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-2-35.glb",
+      "bytes": 4020,
+      "sha256": "25adc6a9c59f19a9c7809f66d2431852f815549a1f3a1c0b2660e73076113897"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-3-0.glb",
+      "bytes": 3972,
+      "sha256": "f4cecf62678ad0043eba9cb2d26fd917d17b6668972937ec1a79232f1bfed566"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-3-100.glb",
+      "bytes": 3972,
+      "sha256": "8fb3849b6a69f14e9793248b8a47629632ec5d6ee4d292a674ac9aa8683bb526"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-0-3-35.glb",
+      "bytes": 3988,
+      "sha256": "b98b1f5d238900c852c24b6d738c735bafc1968a44e06d023b4765c274be9a47"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-1-0.glb",
+      "bytes": 5632,
+      "sha256": "efd31826cbe7c7983fecbc1241f77cb7f63642ebfd3891d9a2efa8b54b19ea6e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-1-100.glb",
+      "bytes": 5632,
+      "sha256": "5014b0d693101f9bd18c88d855a4116cddd4106c014b3dd71267d8dfe5485d15"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-1-35.glb",
+      "bytes": 5644,
+      "sha256": "bc0e68a9c2fe41a144c29bbbc1cbabd914d559b0d99bac00a795469ab146971e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-2-0.glb",
+      "bytes": 5660,
+      "sha256": "978a6b9f4533fd59852f3c9e0a05a50b915eee1361fe9c0c6b21cae4efef5dc7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-2-100.glb",
+      "bytes": 5660,
+      "sha256": "d584e70dafc8565ea4e55f24563ce3191a5b80f457351dcc7f1f699ea10c22ef"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-2-35.glb",
+      "bytes": 5676,
+      "sha256": "df740c5f2798e81bf4bfcfc2cccfa9df5867c4aacaa7900c3a4dfa7f1d9d24f3"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-3-0.glb",
+      "bytes": 5628,
+      "sha256": "8e7d4f18dbe4b827c8ed68960dd0c08a7803b973ae37f23e4066bbaa80e7bafe"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-3-100.glb",
+      "bytes": 5628,
+      "sha256": "b0bd6949b429dafcf708fb34af8e684fba9c55a34026afa2a91018dd64108f83"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-1-3-35.glb",
+      "bytes": 5644,
+      "sha256": "3d24fb14fb790f6dc93c5a1ffdd1d339bb55d3ce5e9c34a3f6f5eb75266f2cb9"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-1-0.glb",
+      "bytes": 8592,
+      "sha256": "a295bcf56836c6a5f7829f99d6ba8fd8b5577788ff84e30ef8b96f40dda696a6"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-1-100.glb",
+      "bytes": 8592,
+      "sha256": "243e837c38761c543ab0a4a77f8ffef7fe19eb37a090aa9b573c55324a6be53a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-1-35.glb",
+      "bytes": 8608,
+      "sha256": "ffec3e7fb86cc915488801d9e7fb9e9e68c8c3d1fa7c4503e4bf7f1efb2ded4a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-2-0.glb",
+      "bytes": 8624,
+      "sha256": "54e7ba20a39f81d2fb698484e003ec620591b2713a49b921225f7617a1bd87c7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-2-100.glb",
+      "bytes": 8624,
+      "sha256": "72799547fc454dc2f500dd01e79343fec5756e36dd94d21da30bc662ee0f28cb"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-2-35.glb",
+      "bytes": 8640,
+      "sha256": "380dbc816973a718cec13dec9fe02ef3934bf87bd585e0f617f5ae9ba4d2446c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-3-0.glb",
+      "bytes": 8592,
+      "sha256": "fdfde486de77cee542fed73fb266c72b3a9237035a47c27732860337c353cf2a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-3-100.glb",
+      "bytes": 8592,
+      "sha256": "959d7da3cb7968714cf466c053ca30a36bd4f2993e5e55376658a8030b04a760"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-2-3-35.glb",
+      "bytes": 8608,
+      "sha256": "6ac07ffe4ec6952342d64a0f4ee0e2791cb779e8a21819eb8a6b7405a2980b8b"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-vrm-0-0.vrm",
+      "bytes": 25308456,
+      "sha256": "272f996a40a0d843030796f52e15c9d0e464d02fe406b697e56b98f23bd4401d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-vrm-0-100.vrm",
+      "bytes": 25308456,
+      "sha256": "44fc0e6e475bbc7c1745338e5439be2fb37e912db9b2d9d5fb3c3245067a75c4"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-vrm-0-35.vrm",
+      "bytes": 25308604,
+      "sha256": "59861401d22dca20924aa47495f79261b63ab5b791e84014fc635698fc80393c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-vrm-1-0.vrm",
+      "bytes": 20990392,
+      "sha256": "bfc6524f0bd86d57d5ba075b8f40b9d8b678834e3dcd28bd4d563fe60fadc710"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-vrm-1-100.vrm",
+      "bytes": 20990392,
+      "sha256": "a7cfd937b2f3cd419bc19f59495b59b436742703b6502b2e6ca9c92dff29e971"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-vrm-1-35.vrm",
+      "bytes": 20990540,
+      "sha256": "dcfe5cde2e4b4a4cba6fd134548ba59f37e01c469ce2cd9c66ff99fb28d5fb09"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/source-color-vrm-canonical.vrm",
+      "bytes": 15427076,
+      "sha256": "633f97e2043b9e0ca48afa07fef06a695b9bbf4aa395add6bfdd05a103e5ffbe"
+    }
+  ]
+}

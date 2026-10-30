@@ -40,6 +40,7 @@ std::shared_ptr<const MeshSnapshot> preview_snapshot(const MeshSnapshot &base,co
       if(!result->source_normals.empty())result->source_normals.push_back(cap.normals[n]);
       if(!result->canonical_normals.empty())result->canonical_normals.push_back(cap.normals[n]);
       if(!result->source_tangents.empty())result->source_tangents.push_back({1,0,0,1});
+      if(!result->source_colors.empty())result->source_colors.push_back({1,1,1,1});
       if(!result->selected_weights.empty())result->selected_weights.push_back(-1);
       if(!result->sculpt_masks.empty())result->sculpt_masks.push_back(-1);}
     for(auto vertex:cap.indices)result->mesh.indices.push_back(uint32_t(offset+vertex));

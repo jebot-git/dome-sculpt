@@ -9,6 +9,7 @@
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
+#include "source-colors.hpp"
 #include "sculpt-ui-values.hpp"
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
@@ -1322,6 +1323,8 @@ void Document::mesh_loop() {
                                       : std::vector<uint64_t>{};
       std::unordered_set<uint64_t> frame_objects;
       for (auto &o : objects) {
+        auto colors=detail::source_vertex_colors(o.appearance.get(),o.mesh.positions.size(),cancelled);
+        if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
         const bool canonical=o.textures && !o.textures->normal.rgba.empty();
         // Existing bakes without captured canonical authority use the historical
@@ -1380,6 +1383,7 @@ void Document::mesh_loop() {
         auto frames = canonical && !retained ? tangent_corners(o.mesh, cancelled)
                                             : std::vector<Tangent>{};
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
+          if(!colors.empty() || !snapshot->source_colors.empty())snapshot->source_colors.push_back(colors.empty()?std::array<float,4>{1,1,1,1}:colors.at(vertex));
           snapshot->mesh.positions.push_back(vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
           snapshot->mesh.normals.push_back(vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
