@@ -1,6 +1,6 @@
 # Paged storage with native resolution, plane cuts and DomeD
 
-The private production candidate merges paging `a135f48` with product source
+The published production milestone merges paging `a135f48` with product source
 `803479d`, preserving both histories, native resolution/Volume4, plane cuts,
 six-worker shutdown and the original-bind VRM expression fix. Published
 resolution checkpoint `27b14d9` is retained in the ancestry. Product C++ and
@@ -92,6 +92,5 @@ manifest; the later one-fixture followup is distinguished from the full run.
 
 All logs, source/artifact hashes, runtime configuration, GUI reports and exact
 scope are in `artifacts/paged-production-manifest-<checkpoint>.json`. Artifacts
-are local and ignored; a fresh clone does not contain them. This candidate is
-private until the parent integration publishes it. No push, install or HMD
-launch was performed by this task.
+are local and ignored; a fresh clone does not contain them. The parent publication preserves these exact proof scopes. The child performed
+no push, install or HMD launch.

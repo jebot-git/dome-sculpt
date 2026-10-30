@@ -1,10 +1,11 @@
-# Continue the full production goal after resolution/VRM identity milestone
+# Continue the full production goal after paged storage integration
 
 Read REQUIREMENTS.md, HANDOFF-466ebd1.md, current HANDOFF.md and VALIDATION.md.
-Application803479d preserves a4af86d+fff726f (merge5985858), nativeResolution/
-Volume4 and the VRM original-bind fix. Tests ee2b57d/19ad5aa are separate from
-product source. The full goal remains active/incomplete. Exact prior handoffs
-are archived with-a4af86d; never overwrite their proof scopes.
+Product `ee6f539` combines `803479d` with paging `a135f48`; verified checkpoint
+`2135d8d` preserves published `27b14d9`. Native resolution/Volume4, plane cuts
+and the VRM original-bind fix remain. Font lifecycle/reload changes are test-only.
+The full goal remains active/incomplete. Exact prior handoffs are archived with
+`-27b14d9`; never overwrite their proof scopes.
 
 Canonical DomeD282467e FLTK1.4.5+22 patches uses artifacts/toolkit-282467e/lib64.
 Use explicit FLTK_DIR and runtime LD_LIBRARY_PATH, verify actual ldd resolution;
@@ -21,9 +22,10 @@ Do not overwrite Document wholesale when merging private seventh-worker work.
 
 Incoming private production tasks (inspect process/log state before waiting or
 restarting; no observation-timeout restarts):
-- paged-production-803479d: current-field/Volume4/cut integration ofa135 storage;
-  local roots/views must not flatten hidden full maps. Preserve exact uniform/
-  affine mask interpolation and all sampling/history/Cancel semantics.
+- paged production is integrated: preserve immutable owning views,64 shards/16³
+  adaptive pages and tracked budget. No hidden flattening. Preserve exact
+  uniform/affine mask math, physical band and sampling/history/Cancel semantics.
+  Fine-resolution picking acceleration is separate pending work.
 - desktop-strokes-fff726f: ordered seventh-worker native gestures, evaluated
   paint mapping, source lease and accepted Save/Close/destructor drain.
 - frame-runtime-prototype: retained rawN/T/canonical frames, Scene9/material2,

@@ -1,9 +1,9 @@
 # Full objective and completion evidence
 
-Application source 4755e62 combines plane-cut source 2ec8a5a and sculpt protection /
-symmetry source 20c132d, preserving both histories. Combined verification is recorded
-in VALIDATION.md, including exact protection/cut interoperation and geometry-only
-source availability. Every remaining row stays required. See HANDOFF.md.
+Current product merge `ee6f539` combines `803479d` and paged storage `a135f48`,
+preserving published `27b14d9`, resolution/Volume4, plane cuts and VRM identity.
+Combined proof and exact earlier archives are in VALIDATION.md/HANDOFF.md.
+Every remaining row stays required; this checkpoint does not complete the goal.
 
 The goal is the complete native FLTK VR production workflow requested by the
 user. An executable, a successful build, or the initial tests do not complete
@@ -24,7 +24,7 @@ shading is inside it.
 | Native FLTK suite | Native C++20 FLTK desktop/OpenXR, canonical appearance/BDF/universal menus, modal history and actual DomeD Wayland routing implemented and tested. Native project Open/Save now use the ordered worker with filesystem-barrier cancellation/history/path/recovery regressions; full production authoring controls remain incomplete | Complete all authoring controls in FLTK; verify palette/fonts, shortcuts and universal menus |
 | Unicode | BDF-first XR UTF-8 layout, Fontconfig/FreeType fallback, HarfBuzz shaping, ICU bidi/graphemes and bounded clipping/cache implemented; native Latin/CJK clipboard/history/save3/3, renderer/layout fixtures and syntheticXR96/96 pass in exact private Unicode milestone; combined integration checks also pass. Physical IME/XR text-entry workflows remain part of full-device/workflow verification | Correct UTF-8 decoding/glyph loading, clipping and non-ASCII name/input fixtures in desktop/XR |
 | No Python dependency | Runtime is native C++; Python only in optional test harness | Audit all shipped workflow/import/export paths for native implementations |
-| Medium-like robust VR sculpting | Native masks/symmetry, authenticated local extraction and separate static/scalar GPU buffers coexist with six-worker cuts. Native FLTK/XR resolution now resamples independent layers/masks through guarded background publication, physical-band Volume4, topology/distance/normal/layer quality bounds, exact cancellation/history and legacy/default compatibility. Combined803479d passes88 native suites, CPU/Arc150+17 syntheticXR,15 focused whole-core sanitizer suites and151 GUI/compositor checks. Paged storage, background desktop mutation, bounded assembly/tile uploads and sustained production/device performance remain ongoing | Production-size multi-object/layer sculpting, masks, symmetry, resolution changes, performant local meshing, sustained VR strokes and recovery |
+| Medium-like robust VR sculpting | Native masks/symmetry, authenticated local extraction and separate static/scalar GPU buffers coexist with six-worker cuts. Native FLTK/XR resolution now resamples independent layers/masks through guarded background publication, physical-band Volume4, topology/distance/normal/layer quality bounds, exact cancellation/history and legacy/default compatibility. Persistent adaptive paged storage preserves exact state through 12,920 allocation-fault boundaries; combined 91 native/sanitizer suites, CPU/Arc 150+17 synthetic XR and 151 GUI/compositor checks pass. Background desktop mutation, bounded assembly/tile uploads and sustained production/device performance remain ongoing | Production-size multi-object/layer sculpting, masks, symmetry, resolution changes, performant local meshing, sustained VR strokes and recovery |
 | Full VR-driven workflow | Shared persistent object/material scene; stereo sculpting, painting, editable UVs and joystick workflow pages connected; complete authoring workflow remains pending | Create, sculpt, texture, retopo, unwrap, rig, skin, save and export entirely in headset |
 | VR controllers | Live native action mapping implemented; synthetic controller edits, ordered focus/shutdown boundaries, native stop/resume, tracking loss and reference-space changes tested | Live pose/action/haptic mapping; reconnect/focus/session-loss and frame timing verification |
 | Spatial stylus | Native MX Ink calibrated-tip/middle-force/tip-force bindings implemented and exercised through the synthetic runtime; physical verification pending | Actual stylus OpenXR/driver bindings, tip calibration, pressure/buttons and physical stylus verification |
