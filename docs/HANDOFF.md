@@ -1,10 +1,22 @@
-# Cancellable exports and polygon/color authoring
+# Worker recovery, cancellable exports and polygon/color authoring
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains active. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Current integration
+
+Product sources b395ff3 +5ffbfea (primary283d701 +2b89aeb) recover input/file
+worker error publication during persistent allocation denial. Normal failures
+publish their status before completing a file promise; under memory pressure,
+the original exception still reaches the future and bounded notices retry on
+the same worker. Original input/file/export SIGABRT negatives are retained.
+Corrected own-core/support sanitizer14/14 passes63.36s; primary coherent Release
+14/14 passes22.11s and actual FLTK export Cancel/retry7 passes. The optimized
+frontend is staged using its configured /usr/local prefix; no system install or
+session change occurred. Read WORKER-PUBLICATION.md and
+validation/WORKER-PUBLICATION-INTEGRATION.json for scope. Native gesture, mesh,
+UV and retopology worker allocation-failure paths remain separate work.
 
 Product source `4cf3032` adds explicit queued/running GLB and VRM cancellation
 through File / Cancel background work and actual controller Cancel work. Its
@@ -40,25 +52,30 @@ internal authoring cancellation into accepted output.
 ## Active delegated work
 
 - merge_contracts: full Scene12 polygon workflow is integrated. Private frozen
-  `df3d3b2` adds actual raw COLOR_0 corner provenance and bounded topology
-  transport. Its new consumer branch adds transient shared RGBA data and actual
-  render/export/picking fixtures. No Scene14 persistent current-color authoring
-  is enabled yet, and old source/prepared guards remain. Finish consumers,
-  persistence/history and actual frontend workflows before removing those guards.
-- merge_palette: `a5ef50f8` is integrated. New normal-bake work investigates a
-  separately versioned Scene15 interpretation for generic native and retained
-  artist frames, curved/mixed-skin/morph transport and fractional coverage.
-  Foundational math/schema validation is not independent pixel parity.
-- merge_docs: private affine math/hierarchy, interaction, common source ownership
-  and bounded export factorization are validated prerequisites. Scene13 source
-  placement and native affine edit prefixes are still being implemented. Full
-  affine imports remain guarded until codec/effective-matrix/render/pick/paint/
-  held/export consumers are connected. Preserve source local chains and exact
-  normal/reflection behavior rather than projecting shear to TRS.
+  consumer14ca381 is qualified; private Scene14 product0c890a8 implements durable
+  current corner RGBA, source-retaining posed conversion, history/save/reopen,
+  native painting/picking and actual FLTK/XR flows. Initial SAN15/16 exposed a
+  pinned JSON binary-factory exception-safety assertion; dependency-only fix
+  21e140e and final coherent qualification remain separate from this milestone.
+- merge_palette: integrated a5ef50f8 is followed by frozen helperca67572 and a
+  connected private Scene15 normal-preparation branch. Actual native/controller,
+  FLTK, GLB/VRM software/A770 and selected sanitizer proof exists; final revised
+  normal-strength/disable/UV guards and OneAPI qualification are ongoing.
+  General source-normal adapters and UV adoption remain required.
+- merge_docs: Scene13 codecad9, GLB89f31e3 and application9491b50/cbf6890 are
+  qualified private dependencies. Held checkpoint298b6a8 has actual native,
+  FLTK and software/A770 motion proof. General affine import admission and XR
+  painting remain guarded while final consumers are connected. Preserve exact
+  local affine chains and normal/reflection behavior.
+- Root: private Scene16 key toolsfb29fde +receipt34d39c8 have actual kernel23,
+  controller46, GUI7+9 and persistent-denial2493 proof, plus fresh whole-core/
+  support sanitizer9/9 in78.33s. A separate selected-key freehand branch now
+  connects the ordered native worker to desktop/controller strokes; it remains
+  private and needs its own GUI/graphical/sanitizer and joint-integration proof.
 
-Scene13/14/15 reservations are coordinated feature minima, not already supported
-archive versions. Preserve recursive source-feature checks and every existing
-canonical/source-color authority boundary when merging them.
+Scene13/14/15/16 are coordinated private feature minima, not published archive
+support. Preserve recursive source-feature checks, all retained-source edges,
+aggregate budgets and existing normal/color authority when combining them.
 
 Only the old8f4d67d rudimentary milestone has physical headset confirmation. The
 user ended that test. Synthetic/runtime/GPU fixtures are separate evidence; no

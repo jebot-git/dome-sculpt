@@ -28,16 +28,43 @@
     "seconds": 9.9,
     "worker_modes": 7,
     "worker_assertions": 51,
-    "log": "artifacts/test-worker-regressions.log"
+    "log": "artifacts/test-worker-regressions.log",
+    "ordering_followup": {
+      "suites": 8,
+      "seconds": 7.95,
+      "log": "artifacts/test-worker-ordering-release.log"
+    }
   },
   "sanitize": {
-    "state": "not run at source checkpoint"
+    "exit": 0,
+    "ctest_suites": 14,
+    "seconds": 63.36,
+    "log": "artifacts/test-worker-sanitize-ordering.log",
+    "initial_exit": 8,
+    "initial_suites_passed": 13,
+    "initial_failure": "document-export readiness/status race; existing oracle unchanged",
+    "initial_log": "artifacts/test-worker-sanitize-initial-13of14.log",
+    "flags": "Own C/CXX core and bundled support -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer; exe -fsanitize=address,undefined",
+    "environment": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+    "system_libraries": "not instrumented"
   },
   "sha256": {
     "CMakeLists.txt": "939e37cfb803a46581ac9e2b56bd84040d6c2ff72779e19f6f939224903a672d",
     "include/dome/document.hpp": "00b25fdb96c2595858978534da3a54450aa67fa108f72255416b1903f0321f58",
+    "src/document-worker-errors.cpp": "bb632d98c7a191caa530464bff39317dd5708bd577aba5243e42d97218b2fd88",
     "src/document.cpp": "fec9554900f5cb0b0c1a3e2ac03f9443eadcd5b832e704d87734bd081598c804",
-    "src/document-worker-errors.cpp": "f975faf28206066aef968d58359faf5f94c1e28740c1083ca4baeb5b99bc830c",
     "tests/worker-publication.cpp": "820cb0e892b12e478e1b9e2baaa03e21049e6f6fd4f1da3cb4bc9e10fcd46344"
-  }
+  },
+  "source_commit": "5ffbfea",
+  "proof_sha256": {
+    "artifacts/test-worker-sanitize-ordering.log": "08b927f7a7ade54aaf81d4663e34084b47e49a49780de8927187e659bd4a48c5",
+    "artifacts/test-worker-sanitize-initial-13of14.log": "7616e97603338b697b1c3862a0e040449aada76e1b5a8aca0d98017cb3773d37",
+    "artifacts/test-worker-ordering-release.log": "6c4f25f76aa5b5c10b45d7dddf3ccd0627df91ff6014f8fab378fed0669a4922",
+    "artifacts/test-worker-regressions.log": "e28f02605d1f80693b65d8db8a4698ef9173ac7c47266f27f1d5e2dbc00705d1"
+  },
+  "remaining_scope": [
+    "native gesture worker error publication",
+    "mesh/UV/retopo/other worker catch-publication OOM paths",
+    "no OS-wide OOM or assertion-enabled JSON qualification"
+  ]
 }

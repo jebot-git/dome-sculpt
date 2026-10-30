@@ -47,3 +47,24 @@ include permanent allocation denial for wide/deep/map/ordered/binary/discarded
 values, allocator ownership, exact legacy CBOR, coherent native archives, and the
 original whole-scene encode and retained-source allocation-boundary reproducers.
 A standalone successful destructor probe alone does not complete those gates.
+
+The additional local `patches/binary-factory-exceptions.patch` applies after both
+backports. All four `basic_json::binary` factories allocate their payload while
+the local result still has its original null tag, committing the binary tag only
+after success. Otherwise a failed allocation destroys a fully constructed
+binary-tagged result with a null payload and asserts when invariants are enabled.
+The exact native Scene14 `PaintedMesh::encode` negative stack is retained. This
+local ordering correction changes no successful values, bytes, API or layout;
+normal and diagnostic standalone tests force assertions on and inject every
+measured factory allocation. It does not claim strong replacement semantics for
+all external JSON constructors or universal JSON out-of-memory safety.
+
+`patches/null-promotion-exceptions.patch` applies next. Nine existing member
+null-to-array/object promotions (indexing, push, emplacement and update) allocate
+the container before committing its new tag. A failed creation preserves null;
+later insertion failures may retain valid intermediate containers as before.
+This fixes the demonstrated nested MToon extension failure without disabling
+invariants or claiming strong transaction semantics for every JSON mutator.
+Normal/diagnostic tests force assertions, cover every site plus nested chains,
+check valid owners and existing values, and retry after every measured denial.
+External constructor replacement paths remain outside this correction.

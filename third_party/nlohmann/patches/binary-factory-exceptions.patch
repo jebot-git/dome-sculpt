@@ -1,0 +1,22 @@
+--- a/single_include/nlohmann/json.hpp
++++ b/single_include/nlohmann/json.hpp
+@@ -21167,0 +21168,2 @@
++        // Commit the tag only after payload allocation succeeds.
++        res.m_data.m_value = init;
+@@ -21169 +21170,0 @@
+-        res.m_data.m_value = init;
+@@ -21178,0 +21180,2 @@
++        // Commit the tag only after payload allocation succeeds.
++        res.m_data.m_value = binary_t(init, subtype);
+@@ -21180 +21182,0 @@
+-        res.m_data.m_value = binary_t(init, subtype);
+@@ -21189,0 +21192,2 @@
++        // Commit the tag only after payload allocation succeeds.
++        res.m_data.m_value = std::move(init);
+@@ -21191 +21194,0 @@
+-        res.m_data.m_value = std::move(init);
+@@ -21200,0 +21204,2 @@
++        // Commit the tag only after payload allocation succeeds.
++        res.m_data.m_value = binary_t(std::move(init), subtype);
+@@ -21202 +21206,0 @@
+-        res.m_data.m_value = binary_t(std::move(init), subtype);

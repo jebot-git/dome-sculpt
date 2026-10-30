@@ -1,5 +1,10 @@
 # Full objective and completion evidence
 
+Input/file worker failure publication now retains the original exception and
+source through persistent allocation denial; corrected Release14/SAN14 and
+actual FLTK export7 proof is scoped in WORKER-PUBLICATION.md and its integration
+receipt. Other worker failure paths and the complete production matrix remain.
+
 Explicit snapshot-export cancellation extends the polygon/color milestone; see
 EXPORT-CANCELLATION.md and its receipt for scoped Release14/SAN14/GUI7 proof.
 The polygon/color integration extends published7152f5e; see
