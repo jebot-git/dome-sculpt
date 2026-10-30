@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/humanoid-creator.hpp"
+#include "dome/material-bindings.hpp"
 #include "import-skin-fixtures.hpp"
 #include <iostream>
 #include <unistd.h>
@@ -41,9 +42,14 @@ int main(int argc, char **argv) try {
   } cleanup{directory};
   ImportAuthoringOptions options;
   options.paint_resolution = 64;
-  for (bool authored : {false, true}) {
+  for (bool flat_normals : {false, true}) for (bool authored : {false, true}) {
     auto f = skinned(authored);
-    auto path = directory / (authored ? "authored.glb" : "implicit.glb");
+    const std::string prefix = flat_normals ? "flat-" : "";
+    if (flat_normals) {
+      f.j["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");
+      f.j["meshes"][0]["primitives"][0]["targets"][0].erase("NORMAL");
+    }
+    auto path = directory / (prefix + (authored ? "authored.glb" : "implicit.glb"));
     f.save(path);
     auto prepared = prepare_authoring_import(Scene{}, path, options);
     for (auto id : prepared.objects) {
@@ -85,6 +91,12 @@ int main(int argc, char **argv) try {
       check(o.deformation->pose.empty(),
             "Original current joint transforms and bind matrices evaluate "
             "correctly without an invented nonempty pose");
+      if (flat_normals)
+        check(!p.normals_authored && o.painted->mesh().positions.size()==6 &&
+            o.deformation->skin->vertices.size()==6 &&
+            o.appearance->source_vertices==std::vector<uint32_t>{0,1,2,0,2,3} &&
+            o.material_bindings->normal_frames->pbr->tangents.empty(),
+            "Missing normals split and retain exact joint influences, morph slots and raw source identities without adopting ignored tangents");
     }
     check(true, authored ? "Actual native import matches independent "
                            "nonconventional authored-IBM world positions while "
@@ -92,7 +104,7 @@ int main(int argc, char **argv) try {
                          : "Actual native import uses glTF implicit identity "
                            "inverse binds rather than inverse-rest guesses");
     auto saved =
-        directory / (authored ? "authored.dsculpt" : "implicit.dsculpt");
+        directory / (prefix + (authored ? "authored.dsculpt" : "implicit.dsculpt"));
     prepared.scene.save(saved);
     auto restarted = Scene::load(saved);
     check(restarted.encode() == prepared.scene.encode() &&
@@ -108,8 +120,8 @@ int main(int argc, char **argv) try {
                         .inverse_bind_matrices[2][12] == 99,
             "Unused trailing authored inverse-bind accessor matrices remain in "
             "immutable original provenance");
-    auto output = directory /
-                  (authored ? "emitted-authored.glb" : "emitted-implicit.glb");
+    auto output = directory / (prefix +
+                  (authored ? "emitted-authored.glb" : "emitted-implicit.glb"));
     export_glb(prepared.scene.surfaces(), output);
     ImportLimits limits;
     limits.mode = ImportMode::PreserveGltf;

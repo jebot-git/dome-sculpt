@@ -132,7 +132,7 @@ frames(const ImportedPrimitive &p, const ImportedMaterial &m,
   f->source_vertices = p.mesh.indices;
   f->source_corners.resize(p.mesh.indices.size());
   std::iota(f->source_corners.begin(), f->source_corners.end(), 0);
-  const bool tangent = !p.tangents.empty() || m.normal_texture >= 0;
+  const bool tangent = (p.normals_authored && !p.tangents.empty()) || m.normal_texture >= 0;
   if (tangent) {
     const auto &uv = m.normal_texcoord == 1 ? p.uv1 : p.mesh.uv;
     auto original = detail::source_tangent_frames(p, uv, cancelled);
@@ -145,12 +145,22 @@ frames(const ImportedPrimitive &p, const ImportedMaterial &m,
       f->targets.push_back({t + 1, std::move(original.normal_targets[t]),
                             std::move(original.targets[t])});
   } else {
-    for (auto v : p.mesh.indices)
-      f->normals.push_back(p.mesh.normals[v]);
+    if (p.normals_authored)
+      for (auto v : p.mesh.indices) f->normals.push_back(p.mesh.normals[v]);
+    else
+      f->normals = detail::source_flat_mesh(p.mesh, {}, cancelled).normals;
     for (size_t t = 0; t < p.morph_targets.size(); ++t) {
       NormalFrameTarget target;
       target.id = t + 1;
-      if (!p.morph_targets[t].normals.empty())
+      if (!p.normals_authored) {
+        auto posed = detail::source_flat_mesh(p.mesh, p.morph_targets[t].positions, cancelled);
+        target.normals.reserve(f->normals.size());
+        for (size_t c = 0; c < f->normals.size(); ++c) {
+          if ((c & 1023) == 0 && cancelled && cancelled())
+            throw std::runtime_error("Generated source normals cancelled");
+          target.normals.push_back(posed.normals[c] - f->normals[c]);
+        }
+      } else if (!p.morph_targets[t].normals.empty())
         for (auto v : p.mesh.indices)
           target.normals.push_back(p.morph_targets[t].normals[v]);
       f->targets.push_back(std::move(target));
@@ -225,10 +235,6 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     if (node.mesh >= 0) {
       for (auto primitive : asset->meshes.at(size_t(node.mesh)).primitives) {
         const auto &p = asset->primitives.at(primitive);
-        if (!p.normals_authored)
-          throw std::runtime_error(
-              "This model omits normals; generated flat-normal authoring is "
-              "not ready yet. Export authored normals before importing.");
         if (p.material == 0)
           throw std::runtime_error(
               "Implicit default-material provenance adoption is required "
@@ -297,7 +303,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         throw std::runtime_error(
             "Generic glTF import must not substitute PBR for retained VRM "
             "material semantics; use the VRM authoring adapter");
-      Mesh mesh = p.mesh;
+      Mesh mesh = p.normals_authored ? p.mesh
+                                   : detail::source_flat_mesh(p.mesh, {}, options.limits.cancelled);
       const bool generated_uv = mesh.uv.empty();
       if (generated_uv)
         unwrap(mesh, options.paint_resolution);
