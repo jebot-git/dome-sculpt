@@ -73,3 +73,12 @@ native grid fixture links the same exact core/support. It is not a fresh whole
 frontend sanitizer qualification or a real Wayland/HMD test. Standard reproduction
 after a coherent build is DOME_SHAPE_STROKES=1 DOME_SCULPT_TEST_BUILD=build running
 tests/shapekey-menu.py, with DOME_SHAPE_COMPACT=1 for the compact variant.
+
+The frozen cc36463 native/core source subsequently passed a fresh whole-own-core/
+support C/C++ ASan/UBSan/leak run: 11 selected suites in 83.75s, including the new
+draft and controller stroke paths and the existing Scene16 persistent-denial
+fixture. Configuration is UI OFF / XR ON; no instrumented frontend, renderer or
+loader is built/executed by this selection. Actual persistent denial inside the
+native gesture worker's diagnostic catch remains a separate agent scope. The
+new test does not qualify all binary/material source allocation paths or the
+separate JSON dependency fixes. See validation/SHAPEKEY-SCULPT-SAN.json.
