@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/tangents.hpp"
 #include "mikktspace.h"
+extern "C" tbool dome_mikk_robust_genTangSpaceDefault(const SMikkTSpaceContext *);
 namespace dome {
 std::vector<Tangent> tangent_corners(const Mesh &mesh,
                                      const std::function<bool()> &cancelled) {
@@ -53,11 +54,23 @@ std::vector<Tangent> tangent_corners(const Mesh &mesh,
   if (!genTangSpaceDefault(&context))
     throw std::runtime_error("MikkTSpace tangent generation failed");
   check();
-  for (auto t : data.result)
-    if (!finite(Vec3{t[0], t[1], t[2]}) ||
-        std::abs(length(Vec3{t[0], t[1], t[2]}) - 1) > .001f ||
-        std::abs(std::abs(t[3]) - 1) > 1e-5f)
-      throw std::runtime_error("MikkTSpace produced an invalid tangent frame");
+  auto valid=[&] {
+    for(auto t:data.result)
+      if(!finite(Vec3{t[0],t[1],t[2]}) ||
+         std::abs(length(Vec3{t[0],t[1],t[2]})-1)>.001f ||
+         std::abs(std::abs(t[3])-1)>1e-5f)return false;
+    return true;
+  };
+  if(!valid()) {
+    // Keep every entirely valid upstream result EXACT. The retry only
+    // recovers lost nonzero corner weights; it cannot repair authored normals
+    // that make the projected UV frame intrinsically singular.
+    std::fill(data.result.begin(),data.result.end(),Tangent{});check();
+    if(!dome_mikk_robust_genTangSpaceDefault(&context))
+      throw std::runtime_error("MikkTSpace acute-angle recovery failed");
+    check();
+    if(!valid())throw std::runtime_error("MikkTSpace produced an invalid tangent frame");
+  }
   return std::move(data.result);
 }
 TangentFrame tangent_frame(const Mesh &mesh, std::span<const Tangent> corners,

@@ -5,9 +5,10 @@ namespace dome {
 struct ObjectBakeSettings {
   float front_mm = 50, back_mm = 50, ao_distance_mm = 250;
   uint32_t ao_samples = 16, padding = 8;
+  bool allow_partial = false, allow_backfaces = false;
 };
 struct ObjectBakeReport {
-  uint64_t projected = 0, padded = 0, rays = 0;
+  uint64_t projected = 0, padded = 0, rays = 0, missed = 0, preserved_misses = 0;
 };
 // Bake the displayed source into the active target's rest UVs beneath its
 // existing editable paint layers. Hidden sources are valid; all source data
