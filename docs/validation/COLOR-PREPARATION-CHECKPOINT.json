@@ -1,0 +1,178 @@
+{
+  "status": "qualified private checkpoint; no push, installation or headset execution",
+  "base_commit": "3a3d7a2081e929a017b95d4b67f8e85a6fefd98f",
+  "branch": "work/colored-bake-production-3a",
+  "source_tree": "artifacts/colored-bake-production-3a",
+  "latest_main_at_freeze": "b312b98992f21f43b967efeef7fd16a6a4351b94",
+  "font_provenance": {
+    "approved_commit": "69bd085",
+    "path": "src/palette-text.cpp",
+    "sha256": "8327700e3f08353ec5e6fdbf7d33649d77e2d3500b0ce0d7c47cf8e0f298e3cb",
+    "runtime": "bitmap-runtime-6feb62b",
+    "FLTK": "1.4.5+22, toolkit-282467e"
+  },
+  "build": {
+    "type": "Release, regular user",
+    "backend": "CPU",
+    "all_targets": "passed",
+    "whole_core_sanitizers": "ASan+UBSan+leak detection, no suppressions"
+  },
+  "validation": {
+    "full_native_run": {
+      "passed": 157,
+      "total": 158,
+      "seconds": 368.02,
+      "only_failure": "UV fixture required obsolete blanket all-map diagnostic"
+    },
+    "corrected_uv_rerun": {
+      "passed": 1,
+      "total": 1,
+      "seconds": 0.08,
+      "scope": "precise deformed-frame refusal; exact draft mesh/remap owners, Scene, Undo/Redo/dirty"
+    },
+    "whole_core_sanitizers": {
+      "initial_suites": 6,
+      "passed": 6,
+      "seconds": 12.04,
+      "additional_strengthened_uv": 1
+    },
+    "actual_A770": {
+      "native_normal_PBR_assertions": 99,
+      "native_normal_VRM_dual_assertions": 72,
+      "prepared_fractional_assertions": 321,
+      "actual_normal_max_pixel_error": 0,
+      "prepared_max_pixel_error": 1
+    },
+    "native_GUI": {
+      "new_normal": 8,
+      "new_compact_including_real_bake_and_quality_scroll": 8,
+      "legacy_projection": 7
+    },
+    "actual_loader": {
+      "color_controller_stereo_assertions": 11,
+      "all_five_XR_workflows_in_full_regression": "passed"
+    },
+    "official_validators": {
+      "Khronos": "27 actual GLB/VRM files; zero errors; no severity overrides or muted diagnostics",
+      "VRM0": "9 files, 15 pinned schema blobs; zero errors"
+    }
+  },
+  "ABI_notes": [
+    "Append-only ObjectBakeSettings color fields, report fields and BakeColors parameter",
+    "PaintLayer optional PBR tiles, PaintColorProjection, TextureMaps PBR plane and BakedTextures interpretation extend public layouts; fresh coherent build required",
+    "NormalFrames and MeshSnapshot public layouts/codecs unchanged"
+  ],
+  "merge_requirements": [
+    "Preserve current main held/object authority, Source edit epochs, import/options pages and centralized 24-page registry; this tree has older3a UI base",
+    "Scene10/material3 feature scans must compose with Scene11 and future Scene12 PolygonOrigin DAG budgets, including prepared PBR tiles/images and receipt original_deformation/original_material",
+    "Preserve source-authored/polygon-authored distinct UV policy and safe checked-string decoder comparisons from newer work",
+    "SourceNormal capture is new-bake-only computed Mikk equality, not historical relabeling"
+  ],
+  "limitations": [
+    "Conservative portable normal capture only: curved directions, normal/tangent target deltas, mixed-joint and incompatible source frames remain explicitly guarded",
+    "Next required route is versioned new-bake original-frame interpretation with exact PBR/MToon interpolation and independent dynamic consumer proof",
+    "Standalone UI restore of retained preconversion state after reopen remains unimplemented; global Undo and complete persisted origin exist",
+    "UV1 source-map sampling/paint support, arbitrary topology/current-color conversion and actual COLOR_n/TEXCOORD_n morph import/export remain required",
+    "Quality field bound is static RGBA projection; observed complete material errors are declared LOD0 probes, not a universal mip/lighting guarantee"
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "14afc572481dba2402c769d1f91633ff58b4c083b37fc87a089d48b0698b9734",
+    "docs/COLOR-PREPARATION.md": "661d04b49232e2586c05a13fd30511a2383a0c627559703737c3dd7c19f0f631",
+    "include/dome/bake-authoring.hpp": "cf13d5755e5f7ad7a1882ed137c60011f77ccc27035ad5f877fce62ac3e12612",
+    "include/dome/bake.hpp": "0893d7b2ad5884f4a705987d863c4a5c7338eabf58ac52bf87b19e343b1f392a",
+    "include/dome/color-preparation.hpp": "484258912d44626ab938af770df43bd0c7ea63102642cd2c2a79adba0cb79a23",
+    "include/dome/material-bindings.hpp": "43d34af1264a79ccf1fd3de5618e9e6364e2627221a0eca0b3f9c29a55f24843",
+    "include/dome/paint.hpp": "8d6f29c4a13042db5a0ef6398ae4b1b7176ba5b89a138192a8d6fdb483c4366f",
+    "include/dome/vr-controls.hpp": "f49b3a7ecd8a4b869ae94e34b3374c317dde083d4d82a650943f1a1c23945dc7",
+    "src/bake-authoring.cpp": "2972db5547c10694c0ec0f0c54f70371644255b8d26a613893e1792871a2c58e",
+    "src/bake-canonical-frame.hpp": "7d6a479343c5915f25cff2e49d558a57fbed928468edce5eee104a6b90070340",
+    "src/bake-editor.cpp": "91397e5ffd262334565b3b9626b7e1c55dc812859c97ac69529739a92e1e9df2",
+    "src/bake.cpp": "df60c5bb8c3d9b3eb8fd25f3e2ff98145933cc04b1d0b13f46ecaa2c1fe7e29c",
+    "src/color-preparation.cpp": "b12fda838911082082eaf02eeba9288298005c87e61b22b2cd125625d6d7b940",
+    "src/color-projection-quality.hpp": "6a125a90c9bf398589fc5daf915ba9388ef0515993ee31d0c05acfd5be3c5c25",
+    "src/document-baking.cpp": "d6cbe69abd748c90825fe934b4f8ae6906d1f05255db6bc7627e97b4569d6f25",
+    "src/document-uv-solve.cpp": "2107f5e72564f60016a8257246715de27b495c9d7539668f3a5d4e2a6947f788",
+    "src/document.cpp": "e0d4725a0cce4e3382fb1c82aaa042268a345e14fd93bec43ff406c834b4b813",
+    "src/export.cpp": "9b875ac3c04f3cef6fc775d2b1e67223245c48dc4e9c6f0f0c1bd8d7e08fc938",
+    "src/input.cpp": "a7acda2ecc10b8ad3b7b2c88ac710df7745a86ed80f88b7e17a0d273763da427",
+    "src/material-bindings.cpp": "fb5b3d474aeb2489e74526827a8f5705698606f0404b7b2a2b70a23c98e77a05",
+    "src/material-visibility.cpp": "d62e37b48d9798e9a5bde156aca6fb1ceb91e8ab9e3c0f4c0664dbab05b3a25f",
+    "src/paint-color-access.hpp": "7210001de0ee7457e8fe7322761032ba62a597c8f86607595b7f66aaa33ddf48",
+    "src/paint.cpp": "3e4b96be6f44658f069f427908c353009e6af6e747f13157aed28471e777fa1a",
+    "src/palette-text.cpp": "8327700e3f08353ec5e6fdbf7d33649d77e2d3500b0ce0d7c47cf8e0f298e3cb",
+    "src/palette.cpp": "ecb4e780f8aafc2567ebef7710b8a2018d023aea4276992ebbed66f6c4a8d889",
+    "src/prepared-color-state.hpp": "590e3389c6ed35c7b8177126bbd30fbcf4293165a04fc8767165a451c459d441",
+    "src/render.cpp": "594e2ccf922f97cce5985b650e6e910c0c8cd13b9f3b321022de0f4f7fe977fe",
+    "src/scene-feature-version.hpp": "2fbb918eeded40a1b689a61fd7517019fe9fb82c004938079ff223936dfe8f1d",
+    "src/scene.cpp": "6bacca104d3eee54f4e9f3af7dcb13ff989fdeda2d134222a9df934d81182231",
+    "src/source-uv-bake.cpp": "ae923d03c8f247b2b0c8491b58d973c9a1ff27b860943a886be9bd77749ce1b4",
+    "tests/bake-color-controls.cpp": "22178b960d363305dd697e1f7c3c4a413ca8dce0096e470cd9ba166e3b22714e",
+    "tests/bake-color-menu.py": "93302b2d3d47ebf74c47e2001417d8e856fc3d59e467631a48d1a6d94d74adf8",
+    "tests/bake-color-xr.py": "434b23e9d214579cb149312fbefbd6455c3afffc19552e9045c316f6cc9249b9",
+    "tests/color-preparation-render.cpp": "ea6103ede307c5cc4d27ce12203d9dd69fa2d2849feec233ca931c593179c82e",
+    "tests/color-preparation.cpp": "d228681c5b02e5f16ead2354de7a1aaf1d728b3350088f9bfa04a1b74def16a7",
+    "tests/color-projection-quality.cpp": "9f7fdf056882b4b26e044b70f79368c591b9e6fce6d05c161308052eabad805b",
+    "tests/colored-bake-render.cpp": "18c64131565dfaed27ad0d22ed55f1e270dc11c2fc7bad280525ffa1a5c13557",
+    "tests/colored-bake-vrm-render.cpp": "38792a21a6cc8c520885a03ec8fc7b2ab08080568a39f475438c0a3fae408153",
+    "tests/colored-bake-workflow.cpp": "a6e83df7411b4c30b8029f42bee6ee9afc93588bbb761439d75d9b393506c747",
+    "tests/colored-vrm-bake-fixture.hpp": "27dc180f48aa2743c55ea9f987a4976fdbbb2deb9ebbe399f8e4d98bc1fcd9bd",
+    "tests/source-color-fixtures.hpp": "3d79041b8657a0b83daaa2ba1cc43c341f4cb210e5dbfed80a72f4c7428ff813",
+    "tests/uv-workflow.cpp": "9ef7d1de5db813ae216c50923c6811cfeade2bc8de4f08e5d204a5a67bab1419",
+    "tests/xr_runtime.cpp": "a9e6bec1e27c69cfec0cd2ea1f277dbebf98fb4d0281a8552c6fe5a3c887d0e6"
+  },
+  "binary_sha256": {
+    "build/dome-sculpt": "71dd8c0ee6691a09cd9d7cbb5c5d4614d7148fbf67d23c8713a552ad8b25e75a",
+    "build/libdome-sculpt-core.a": "ccb0f890326fc3aa42180a60ba77c7109ab4f84f0cde8ad41c09945ff57cf427",
+    "build/libdome-sculpt-render.a": "14c1273c0aa4ac41d926551c74d42194f348981d65c7f84257789b7b1a1a8fe3",
+    "build/libdome-sculpt-test-runtime.so": "8f42d5dcf291eb82682122742e3812aa0d7c7b7ba627815761d509f98429f1de",
+    "build/dome-sculpt-color-preparation-test": "7f3b22206ca7fced12619682834da9f76385bd36b3706b6c64d38bf9bcd37fa3",
+    "build/dome-sculpt-color-projection-quality-test": "7da7c0d865a94d08c2500060ff06754d6b1509459d58d019a9bc3b009e230866",
+    "build/dome-sculpt-colored-bake-workflow-test": "37f5e7d26e7bdd753ca4c1b6ea1b69cb968bc1849ca318750b84e06f6e38e071",
+    "build/dome-sculpt-colored-bake-render-test": "485ffcb0a599ec04d04067a2cfe3d1aa04d10a7b740f451b1263c6b649aa554f",
+    "build/dome-sculpt-colored-bake-vrm-render-test": "03e2cd59fd4f533db2179ef4e8b771a496ce16536cef2ec406303423ff771272",
+    "build/dome-sculpt-color-preparation-render-test": "bdd841d76bcc84f1ad1bd568ec77041460042debc56dc3e4ba7ea0dab7d2f7d1",
+    "build/dome-sculpt-bake-color-controls-test": "31de93d57185c1da1b3047e80d18aaa6ae1af938802a9918d5326163a1c3601d",
+    "build/dome-sculpt-uv-workflow-test": "1985d91323fd94c310e3d0f89d423eab854e17e4b4e6f0db6c74c34bc406bd6a",
+    "build-color-san/libdome-sculpt-core.a": "c2db70d8b664c846d294cc84fdc8a83f9b8a518d4d6dc2d4a06f7d3c879297cd",
+    "build-color-san/libdome-sculpt-render.a": "7984ad1a84d809c0951c1ff340e1b70334a795fd01ba5d077986c1393ba33e6b",
+    "build-color-san/dome-sculpt-color-preparation-test": "408a9e30a3bf71fa842ff3d926eb8a0c137bb3b068e057ad23c3ba8fdb53ffd7",
+    "build-color-san/dome-sculpt-color-projection-quality-test": "df9a430b4316fa1938da9afa1ab24f31fe1a96da81e0532171596a8a857d4324",
+    "build-color-san/dome-sculpt-colored-bake-workflow-test": "81864a087f2889e57b2ee24898246882a9246cc9a53f26d8aece4d87049d8c59",
+    "build-color-san/dome-sculpt-colored-bake-render-test": "af345d770bdef6eadf33821f2dd3ea071c0021c7c4fd7f879a6056c054037229",
+    "build-color-san/dome-sculpt-colored-bake-vrm-render-test": "1115b3bdf11987d7e603dfc5823d82f9cf08ecd7455d9cf30d9d9d42722b4ba5",
+    "build-color-san/dome-sculpt-bake-color-controls-test": "8d60a8264c213b42a6f38203ee13da9ccc88dbabd8b6b87ec22cd1c0cd1242d4",
+    "build-color-san/dome-sculpt-uv-workflow-test": "aee798eb2e1af9cb84988e5043077d4e161d2908ce68fd02052fd6d909476aea"
+  },
+  "log_sha256": {
+    "../colored-bake-full-release-build.log": "372694b664d05cee05602e786cd3e6776c1b936582c69fb9d10cebdc769ebfb9",
+    "../colored-bake-full-native.log": "db818775a0486dc2d291beebd2e8d72f18b070bcb2c12b1ca71df71372e40116",
+    "../colored-bake-uv-guard-rerun.log": "78d3d596b58fbb396c4d6fc5b967c16420d4c4959197fefe7d47091118c0f2f3",
+    "../colored-bake-san-build.log": "ef4f28112a1301dabf8adb32eff02328b49e2e3cdfa812c7507d84739c6419d3",
+    "../colored-bake-san-tests.log": "e0f704acfaee885b13fd75c5d8d11fcb3f952b3d4d599d25f56754fc326b6492",
+    "../colored-bake-uv-guard-san-build.log": "0b3a30e688e7e191e25a38f761b2a703561fc64a7a3b3f0592db583f3494f757",
+    "../colored-bake-uv-guard-san.log": "c5c0a1c12eecc3bd0117003dd1de1b9d2ff549f7ca9c38b974f42d4696e95aef",
+    "../colored-bake-actual-render-arc.log": "c61ee7b792ad984f1e420b55663d5d7051fc36d7661b921e4e6591ea0b85e87a",
+    "../colored-bake-vrm-arc.log": "8b708852cbeb65d8ae40143093b1eb0b0a84383aa956caffa7019cf52dfcce6c",
+    "../colored-bake-prepared-render-arc.log": "48a500cb159d10e2d092c47ffe59222c1682988ad2b1ed357b50454cdf2ae57a",
+    "../colored-bake-native-menu-adaptive-final.log": "5c4fb016024a9a335750f0786d1e5696d140f20d2c0ceaad900fa901224fd0a8",
+    "../colored-bake-native-menu-compact-quality-final.log": "dd6b8d3af9d95c3d9f10b60e72fb940ce27f94b8574bb2a1985d52c9758ec7c4",
+    "../colored-bake-native-projection-menu-regression.log": "eafa97e66c28c1d04c3d3de2fabb09602550712b4fe8a151c596add34fe0eb5a",
+    "../colored-bake-actual-openxr.log": "62d20453f34419fff1632c6fc2fe23c4928dec5ee1ec99a2c1e10349707d0891",
+    "../colored-bake-khronos.log": "8c830ed5727c52648981e0862a88d396892a4d000a9bfbe624bf01d09d4f8bfc",
+    "../colored-bake-vrm-schema.log": "cd46990b2b85938ea4dbbb3fd05d6b2339b5468bae4cb17742e07127e7b91006",
+    "../colored-bake-adaptive-status-build.log": "75d5c66c8745101fa24725fad5a81b845ffb74260037d787c1a3f9e35afadc2c"
+  },
+  "proof_sha256": {
+    "artifacts/menu-bake-color-workflow/report.json": "35463d6d5017a0f25b5a1c36de1f8c3073d296910d8ad143e66f5f799eff3d0c",
+    "artifacts/menu-bake-color-compact/report.json": "172ff8a2271bdcc633d7371caf5e6ffc111d0f10baa3d520967f9929dd054d00",
+    "artifacts/menu-bake-policy-workflow/report.json": "0a8734b5af36d325225df5cef1a684e59136b1ebde439b731bed6db0044ef0ab",
+    "artifacts/menu-bake-color-workflow/color-options.png": "421cb8e8a4a33e1bc1b21ae3f9a595d99894e1936cbceb6e1a3a12e89416c8eb",
+    "artifacts/menu-bake-color-compact/color-quality-complete.png": "398624e43ec084667c8d682076f7bd9d3db7931836daa98aa367e6de41528a66",
+    "build/bake-color-xr/report.json": "c788df6e80a113655916481024e23d3e777c8940694ddfce2d078737c4435194"
+  },
+  "validator_report_sha256": {
+    "docs/validation/COLOR-BAKE-KHRONOS.json": "1385e0720f494941165f857578d3cdfb799fcecbf4c56472b7384568012736c8",
+    "docs/validation/COLOR-BAKE-VRM-SCHEMAS.json": "d12da9adf64ff55212a62908edb31f51549f6e56b9e10598512bdf608273cc2b"
+  },
+  "parked_prototype": "artifacts/color-bake-be1858c unchanged; all21 original handoff hashes verified before continuation"
+}

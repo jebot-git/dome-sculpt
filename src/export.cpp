@@ -9,6 +9,7 @@
 #include "io.hpp"
 #include "gltf-document.hpp"
 #include "normal-frame-export.hpp"
+#include "prepared-color-state.hpp"
 #include <bit>
 #include <map>
 #include <set>
@@ -120,6 +121,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
   for (const auto &input : objects) {
+    if(input.material_bindings&&input.material_bindings->color_preparation)
+      input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
     if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled);
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
@@ -167,7 +170,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         begin=data.size();for(auto v:a.source_vertices){if(v>=values.size())throw std::invalid_argument("Source attribute vertex index is missing");floats(values[v]);}
         attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
       };
-      attribute(source->uv1,"TEXCOORD_1","VEC2");attribute(source->colors,"COLOR_0","VEC4");
+      attribute(source->uv1,"TEXCOORD_1","VEC2");if(!detail::prepared_color_state(o.material_bindings.get(),o.textures.get()))attribute(source->colors,"COLOR_0","VEC4");
       if(!frame)tangents=source_attributes->base_tangents();
       if(!frame && !tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
         auto canonical=tangent_corners(mesh,cancelled);
@@ -479,6 +482,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     if(objects[i].mesh.uv.empty()) throw std::invalid_argument("Textured meshes require UV coordinates");
     secondary_uv_available=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_1");
     const auto &maps=*objects[i].textures;
+    const bool prepared_color=detail::prepared_color_state(objects[i].material_bindings.get(),&maps);
     auto &material=j["materials"][i]; auto &pbr=material["pbrMetallicRoughness"];
     if(maps.source_only) {
       auto present=[](const Image &image){return image.width || image.height || !image.rgba.empty();};
@@ -492,7 +496,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       PaintSourceTexture sampler; sampler.wrap_s=sampler.wrap_t=33071;
       sampler.min_filter=sampler.mag_filter=9729;
       pbr["baseColorFactor"]={1,1,1,1}; pbr["metallicFactor"]=1; pbr["roughnessFactor"]=1;
-      pbr["baseColorTexture"]={{"index",texture(maps.color,sampler)}};
+      pbr["baseColorTexture"]={{"index",texture(prepared_color?maps.pbr_color:maps.color,sampler)}};
       int orm=texture(maps.metal_rough,sampler);
       pbr["metallicRoughnessTexture"]={{"index",orm}};
       material["occlusionTexture"]={{"index",orm}};
@@ -512,7 +516,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       }
     }
     if(!maps.source_only && objects[i].material.alpha==Material::AlphaMode::Automatic)
-      material["alphaMode"]=maps.transparent?"BLEND":"OPAQUE";
+      material["alphaMode"]=(prepared_color?maps.pbr_transparent:maps.transparent)?"BLEND":"OPAQUE";
     if(result.objects[i].canonical_normal.image) {
       material["normalTexture"]=source_info(result.objects[i].canonical_normal);
       material["normalTexture"]["scale"]=1;

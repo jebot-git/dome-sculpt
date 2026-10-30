@@ -11,6 +11,7 @@
 #include "render-target.hpp"
 #include "render-source-pack.hpp"
 #include "render-buffer-size.hpp"
+#include "prepared-color-state.hpp"
 #include <chrono>
 #include <unordered_set>
 namespace dome {
@@ -192,6 +193,7 @@ struct SurfaceRenderer::TextureState {
         auto &desired=wanted[key];desired.owner=std::move(image);desired.mips|=mipmapped(sample);
         wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true};
       };
+      const bool prepared_color=detail::prepared_color_state(range.material_bindings.get(),maps.get(),geometry_changed);
       std::optional<MToonMaterial> typed;
       if(range.material_bindings) {
         range.material_bindings->validate(geometry_changed);
@@ -272,7 +274,8 @@ struct SurfaceRenderer::TextureState {
         PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;
         auto color=view,emission=view;if(maps->source_maps){if(maps->source_maps->color.image)color=maps->source_maps->color;if(maps->source_maps->emission.image)emission=maps->source_maps->emission;}
         color.uv_transform=emission.uv_transform={1,0,0,1,0,0};
-        slot(0,std::shared_ptr<const Image>(maps,&maps->color),color,true);slot(1,std::shared_ptr<const Image>(maps,&maps->metal_rough),view,false);slot(2,std::shared_ptr<const Image>(maps,&maps->emission),emission,true);
+        if(prepared_color){color=view;color.min_filter=color.mag_filter=GL_LINEAR;}
+        slot(0,std::shared_ptr<const Image>(maps,prepared_color?&maps->pbr_color:&maps->color),color,true);slot(1,std::shared_ptr<const Image>(maps,&maps->metal_rough),view,false);slot(2,std::shared_ptr<const Image>(maps,&maps->emission),emission,true);
         if(!maps->normal.rgba.empty()){
           if(mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Normal-mapped snapshots require worker-generated tangent corners");
           slot(3,std::shared_ptr<const Image>(maps,&maps->normal),view,false);
@@ -569,7 +572,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   auto blended = [&](const Material &m, const TextureMaps *maps,uint64_t id) {
     if (m.alpha == Material::AlphaMode::Blend) return true;
     if (m.alpha != Material::AlphaMode::Automatic) return false;
-    return m.color[3] < 1 || (maps && maps->transparent) || textures_->vertex_alpha.contains(id);
+    return m.color[3] < 1 || (maps && (maps->color_projection?maps->pbr_transparent:maps->transparent)) || textures_->vertex_alpha.contains(id);
   };
   bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,

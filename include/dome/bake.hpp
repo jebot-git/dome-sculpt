@@ -37,6 +37,9 @@ struct BakeOptions {
   // triangle and source barycentrics per low corner. Empty retains ray baking.
   std::vector<uint32_t> source_triangles;
   std::vector<std::array<float,3>> source_corner_barycentrics;
+  // Produce independent common/material-component and resolved PBR color in
+  // one projection pass. False preserves the legacy vertex-color bake output.
+  bool separate_pbr_color=false;
 };
 struct BakeResult {
   TextureMaps maps; // Composited sRGB base/emission; linear ORM R=AO,G=rough,B=metal.

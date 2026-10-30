@@ -1,0 +1,51 @@
+{
+  "schema_commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+  "verified_schema_blobs": 15,
+  "models": [
+    {
+      "path": "build/colored-vrm-0-0.vrm",
+      "sha256": "406b8798cfd97e91faf8f716e8b6534f30b3bbdbeb78ae69cbe0229d7d356b8d",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-0-100.vrm",
+      "sha256": "de376c7a42044bc6bceb1c9ed35b06bd2dbe46e7720274884c866a91eaedbf25",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-0-35.vrm",
+      "sha256": "c8e94248fc0df329af41d44f4ded53f5e9840f66dbf98c80596caca17d255603",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-1-0.vrm",
+      "sha256": "b1c4360e705f64be1ab82f9248bfe31b5108c6c81ed888b4c26f0fdf32169b73",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-1-100.vrm",
+      "sha256": "ae91b9ff8d627e8a52c714e438f53927ef07ae95044bcc21c1264ae4f65d2009",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-1-35.vrm",
+      "sha256": "528c7fcf1ef597503b73aa92d65ecaab41dee450f79e26856a8c46cbd19eb9b9",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-2-0.vrm",
+      "sha256": "f67c860adb4b4269fe4e009076ddd0aef78c932ea02147d5c2c3bcc5c63a078b",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-2-100.vrm",
+      "sha256": "32382bf6e4f35a9d5bb0bc330726e2bbe7cd7c816d545c262f2e03b8c70a19a7",
+      "errors": []
+    },
+    {
+      "path": "build/colored-vrm-2-35.vrm",
+      "sha256": "cdc7dfb6ff6b6081556114a26e81046232c9b306bcc3b3a7a62be3ecbfa723d3",
+      "errors": []
+    }
+  ]
+}

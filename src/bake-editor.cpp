@@ -14,15 +14,20 @@ namespace {
 class BakeSlider:public Fl_Value_Slider {
 public:
   using Fl_Value_Slider::Fl_Value_Slider;
-  bool logarithmic=false;
+  bool logarithmic=false,fractional=false;
   double physical()const{return logarithmic?std::exp(std::log(.01)+value()*std::log(1000000.)):value();}
   void physical(double v){value(logarithmic?std::log(std::clamp(v,.01,10000.)/.01)/std::log(1000000.):v);}
-  int format(char *buffer)override{return snprintf(buffer,32,logarithmic?"%.2f":"%.0f",physical());}
+  int format(char *buffer)override{return snprintf(buffer,32,fractional?"%.3f":logarithmic?"%.2f":"%.0f",physical());}
   int handle(int event)override{
     if(event==FL_MOUSEWHEEL){
+      // Nested groups can offer wheel events to an offscreen child. Leave
+      // those to the containing scroll view instead of changing hidden values.
+      if(!Fl::event_inside(this))return 0;
+      for(auto *p=parent();p;p=p->parent())
+        if(dynamic_cast<Fl_Scroll*>(p)&&!Fl::event_inside(p))return 0;
       int d=Fl::event_dy()?Fl::event_dy():Fl::event_dx();
       double old=value();
-      physical(logarithmic?physical()*std::exp(-d*.025):clamp(value()-d));
+      physical(logarithmic?physical()*std::exp(-d*.025):clamp(value()-d*step()));
       if(value()!=old){set_changed();do_callback();}return 1;
     }
     return Fl_Value_Slider::handle(event);
@@ -34,13 +39,13 @@ void edit_bake_dialog(Document &doc){
   if(!state->can_bake)throw std::logic_error("Prepare a visible, unlocked target and a different source before baking");
   auto expected=draft.source;auto target=expected.object;
   int row=std::max(36,dx::size+16),sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);
-  int width=std::min(std::max(640,dx::size*42),sw-40),height=std::min(row*17,sh-40);
+  int width=std::min(std::max(640,dx::size*42),sw-40),height=std::min(row*19,sh-40);
   DomeDialog window(width,height,"Bake surface");
   Fl_Scroll scroll(0,0,width,height-row*2);scroll.type(Fl_Scroll::VERTICAL);
-  Fl_Group content(0,0,width-24,row*13);content.resizable(nullptr);
+  Fl_Group content(0,0,width-24,row*15);content.resizable(nullptr);
   const char *description="Bake into the selected target's UVs below editable paint.\nSource geometry, rig and paint stay intact. Bounds use world mm.";
   fl_font(dx::font,dx::size);
-  auto measured=[&](const char*text,int minimum){int w=width-48,h=0;fl_measure(text,w,h,0);return std::max(minimum,h+16);};
+  auto measured=[&](const char*text,int minimum){fl_font(dx::font,dx::size);int w=width-48,h=0;fl_measure(text,w,h,0);return std::max(minimum,h+16);};
   int header=measured(description,row*2);
   Fl_Box hint(16,4,width-48,header-4,description);
   hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
@@ -56,12 +61,15 @@ void edit_bake_dialog(Document &doc){
   BakeSlider samples(label,y,width-label-40,row-6,"AO samples");y+=row;
   BakeSlider padding(label,y,width-label-40,row-6,"Padding (pixels)");y+=row;
   auto settings=state->bake_settings;
-  std::array<BakeSlider*,5> sliders{&front,&back,&ao,&samples,&padding};
-  std::array<double,5> initial{settings.front_mm,settings.back_mm,settings.ao_distance_mm,double(settings.ao_samples),double(settings.padding)};
-  for(size_t i=0;i<5;++i){auto &v=*sliders[i];v.type(FL_HOR_NICE_SLIDER);v.align(FL_ALIGN_LEFT);v.textfont(dx::font);v.textsize(dx::size);v.value_width(std::max(60,dx::size*6));v.logarithmic=i<3;v.bounds(0,i<3?1:i==3?256:64);v.step(i<3?.001:1);v.physical(initial[i]);}
+  BakeSlider color_error(label,0,width-label-40,row-6,"Color error (0..1)");
+  std::array<BakeSlider*,6> sliders{&front,&back,&ao,&samples,&padding,&color_error};
+  std::array<double,6> initial{settings.front_mm,settings.back_mm,settings.ao_distance_mm,double(settings.ao_samples),double(settings.padding),settings.color_error};
+  for(size_t i=0;i<6;++i){auto &v=*sliders[i];v.type(FL_HOR_NICE_SLIDER);v.align(FL_ALIGN_LEFT);v.textfont(dx::font);v.textsize(dx::size);v.value_width(std::max(60,dx::size*6));v.logarithmic=i<3;v.fractional=i==5;v.bounds(0,i<3||i==5?1:i==3?256:64);v.step(i<3||i==5?.001:1);v.physical(initial[i]);}
   Fl_Check_Button partial(20,y,width-56,row,"Allow partial projection");partial.value(settings.allow_partial);y+=row;
   Fl_Check_Button backfaces(20,y,width-56,row,"Allow backface projection");backfaces.value(settings.allow_backfaces);y+=row;
-  const char *help="Partial projection keeps unprojected areas and reports misses.\nDrag or wheel to adjust; 0 samples disables AO. Bake is one Undo step.";
+  Fl_Check_Button colors(20,y,width-56,row,"Prepare source colors");colors.value(settings.prepare_colors);y+=row;
+  color_error.position(label,y);y+=row;
+  const char *help="Partial projection keeps unprojected areas and reports misses.\nColor preparation retains original colors and editable layers.\nDrag or wheel to adjust; 0 samples disables AO. Bake is one Undo step.";
   int help_height=measured(help,row);
   Fl_Box adjustment(16,y,width-48,help_height,help);y+=help_height;
   adjustment.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
@@ -69,10 +77,11 @@ void edit_bake_dialog(Document &doc){
   Fl_Box status(16,y,width-48,row*2);status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   content.size(width-24,y);content.end();scroll.end();
   Fl_Button close(24,height-row*2+8,width/2-36,row,"Cancel"),bake(width/2+12,height-row*2+8,width/2-36,row,"Bake");
-  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source;std::array<BakeSlider*,5> fields;std::vector<uint64_t>*ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces;bool running=false,ever_ran=false;} run{&doc,&window,&source,sliders,&ids,&expected,&partial,&backfaces};
+  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source;std::array<BakeSlider*,6> fields;std::vector<uint64_t>*ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*colors;bool running=false,ever_ran=false;} run{&doc,&window,&source,sliders,&ids,&expected,&partial,&backfaces,&colors};
   close.callback([](Fl_Widget*w,void*p){auto &r=*static_cast<Run*>(p);if(r.running && r.doc->frame().state->asset_busy)r.doc->cancel_asset_work();else w->window()->hide();},&run);
   bake.callback([](Fl_Widget*,void*p){auto &r=*static_cast<Run*>(p);try{
     ObjectBakeSettings s;s.front_mm=float(r.fields[0]->physical());s.back_mm=float(r.fields[1]->physical());s.ao_distance_mm=float(r.fields[2]->physical());s.ao_samples=uint32_t(std::lround(r.fields[3]->value()));s.padding=uint32_t(std::lround(r.fields[4]->value()));
+    s.prepare_colors=r.colors->value();s.color_error=float(r.fields[5]->value());
     s.allow_partial=r.partial->value();s.allow_backfaces=r.backfaces->value();
     r.doc->bake_from_object(r.ids->at(size_t(r.source->value())),s,*r.expected);r.running=r.ever_ran=true;
   }catch(const std::exception&e){r.doc->report_error(e.what());}},&run);
@@ -85,13 +94,17 @@ void edit_bake_dialog(Document &doc){
       if(s->active_object==target && s->generation==expected.generation)expected=doc.draft_scene().source;
     }
     if(s->active_object!=target || s->generation!=expected.generation){window.hide();break;}
-    if(run.running){partial.deactivate();backfaces.deactivate();source.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
-    else {partial.activate();backfaces.activate();source.activate();for(auto f:sliders)f->activate();bake.activate();close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}
+    if(run.running){colors.deactivate();partial.deactivate();backfaces.deactivate();source.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
+    else {colors.activate();partial.activate();backfaces.activate();source.activate();for(auto f:sliders)f->activate();bake.activate();close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}
     std::string title="Bake surface";
     if(run.running)title+=work.cancelling?" - Cancelling...":" - Baking "+std::to_string(std::min(99,int(work.progress*100)))+"%";
     else if(run.ever_ran)title+=!s->error.empty()?" - failed":s->message.find("cancelled")!=std::string::npos?" - cancelled":" - complete";
     if(title!=window.label())window.copy_label(title.c_str());
-    status.copy_label((!run.ever_ran&&!run.running?std::string("Choose a source, projection bounds and policy."):s->error.empty()?s->message:s->error).c_str());Fl::wait(.05);
+    auto status_text=!run.ever_ran&&!run.running?std::string("Choose a source, projection bounds and policy."):s->error.empty()?s->message:s->error;
+    int status_height=measured(status_text.c_str(),row*2);
+    status.copy_label(status_text.c_str());
+    if(status.h()!=status_height){status.size(width-48,status_height);content.size(width-24,status.y()+status_height-content.y());scroll.redraw();}
+    Fl::wait(.05);
   }
   if(run.running)doc.cancel_asset_work();
 }

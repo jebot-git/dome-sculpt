@@ -287,6 +287,7 @@ void SpatialPalette::raster(const EditorState &s) {
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==id;});
         label=found==s.objects.end()?"No source":found->name+(found->visible?"":" [hidden]");
       }
+      else if(c.parameter==VrParameter::BakeColors){if(row==0)label=std::string("Prepare source colors: ")+(value>=.5f?"Yes":"No");else{char text[64];snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));label=text;}}
       else if(c.parameter==VrParameter::BakeProjection)label=std::string(row==0?"Partial projection: ":"Backfaces: ")+(value>=.5f?"Allow":"Refuse");
       else if(c.parameter==VrParameter::BakeQuality)label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
       else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(value));label+=size;}
@@ -314,7 +315,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && c.parameter!=VrParameter::BakeColors && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),

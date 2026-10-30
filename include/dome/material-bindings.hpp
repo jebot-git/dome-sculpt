@@ -9,6 +9,7 @@ class PaintedMesh;
 class CreatorAssetArchive;
 struct CreatorAppearance;
 struct DeformationState;
+struct SourceColorPreparation;
 enum class SourceUvAnimationPolicy { RejectAnimated, FreezeAtTime };
 // Canonical Mikk normals belong to PaintedMesh::baked(), not this role table.
 enum class SourceMaterialNormalFrame { UvDerivative, OriginalAttributes };
@@ -48,6 +49,7 @@ struct SourceMaterialBindings {
   std::shared_ptr<const SourceUvOrigin> uv_origin;
   std::shared_ptr<const NormalFrameSet> normal_frames;
   bool sampling_reparameterized=false;
+  std::shared_ptr<const SourceColorPreparation> color_preparation;
   void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;
