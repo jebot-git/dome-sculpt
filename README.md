@@ -112,9 +112,11 @@ Humanoid creation offers only verified CC0 VRoid female/male bases. MakeHuman
 default geometry and creation choices are removed, while existing authored legacy
 projects remain loadable/exportable. Individual visibility, physical holding,
 transparent ghosts with exclusive editing, and shared native/XR import options
-are integrated. Full polygon editing remains work in progress. The current
-[integration evidence](docs/HOLDING-IMPORT-INTEGRATION.md) records exact test scopes
-and the remaining driver fault limitation.
+are integrated. The shared native/controller polygon workspace now retains editable
+N-gons, practical topology tools, exact history and complete original sources.
+Explicit source-color preparation and baking preserve distinct PBR/common planes.
+See the [combined milestone](docs/POLYGON-COLOR-INTEGRATION.md) for qualification
+and remaining topology/color, deformation and production requirements.
 
 The Scene menu creates empty sculpts or clay spheres, duplicates and deletes
 objects, changes selection and toggles visibility or edit locks. Ctrl+D duplicates
