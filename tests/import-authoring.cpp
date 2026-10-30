@@ -31,7 +31,13 @@ int main(int argc, char **argv) try {
     return 0;
   }
   Fixture fixture;
-  if (argc == 3 && std::string(argv[1]) == "--ui-fixture") {
+  if (argc == 3 && (std::string(argv[1]) == "--ui-fixture" || std::string(argv[1]) == "--ui-flat-fixture")) {
+    if (std::string(argv[1]) == "--ui-flat-fixture") {
+      fixture.j["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");
+      fixture.j["meshes"][0]["primitives"][0]["targets"][0].erase("NORMAL");
+      fixture.j["materials"][0]["normalTexture"]={{"index",0},{"scale",.8f}};
+      fixture.j["materials"][0].erase("extensions");
+    }
     fixture.save(argv[2]);
     return 0;
   }
