@@ -1,115 +1,116 @@
-# Native retopology authoring — 2026-10-30
+# Native plane-cut verification — 2026-10-30
 
-The main implementation is fdb132b, based on checkpoint 3aa47e5. The final
-source is 251cd3de1390f6e6748c73aed4428af5f3e41ece. Broad evidence and final
-focused refinements are separated below. The full production objective in
-REQUIREMENTS.md remains incomplete. Previous live-weight validation is archived
-in VALIDATION-33f26a2.md; older integration records remain intact. Artifacts and
-build directories are ignored local evidence, unavailable in a fresh clone.
+Application source `5b0f9f5ff317031ae92b800d094a62be532a3cf8`, based on
+`3d19776`, branch `work/native-plane-cuts`. The source commit contains the exact
+product/test tree used below; subsequent handoff changes are documentation only.
+Prior evidence is preserved in VALIDATION-3d19776.md and older archives.
+Artifacts/build directories are ignored local evidence, absent in a fresh clone.
 
-## Broad Release and real-loader synthetic XR
+This branch is not integrated with newer remote main `2c89e8d` / source
+`79fe64a`, discovered during checkpoint fetch. These counts do not validate that
+main or the future combined merge. See HANDOFF.md for reconciliation requirements.
 
-At fdb132b, all 50 registered Release CTests passed in 411.19 seconds, zero
-failures: artifacts/tests-retopo-authoring-full.log and its -detail.log companion.
-This includes the new authoring suite and all existing sculpt, paint, UV, bake,
-archive, humanoid, source/material, format, controller and graphics suites.
+## Release and real-loader synthetic XR
 
-The OpenXR client CTest passed in 250.10 seconds. build/xr-client/report.json
-has 73 checks, failed=0, complete=true, status=passed. This retains the existing
-real-loader runtime/rebase/pressure/menu/material/UV/bake coverage. Tracking is
-synthetic and graphics are software. New retopology controller gestures are
-covered separately through the production Document/SpatialInput path; the
-73-check loader script does not specifically replay the new topology workflow.
+All 51 registered Release CTests pass, zero failures, in 332.27s. Logs:
+`artifacts/tests-plane-cut-full.log`, `-full-detail.log` and the preserved full
+individual output `artifacts/tests-plane-cut-full-output.log`.
+Final complete build: `artifacts/build-plane-cut-verified.log`.
 
-## Final source and whole-core sanitizers
+The real-loader OpenXR client CTest passes in 221.64s.
+`build/xr-client/report.json`: 73 checks, failed=0, complete=true, status=passed,
+synthetic_tracking=true. Existing loader/rebase/stereo/pressure/menu/material/UV/
+bake coverage is retained. The script does not specifically replay the new cut
+workflow. Cut-specific controller/stylus cases instead exercise production
+Document/SpatialInput plus separate GPU fixtures. Software GL and synthetic
+tracking are not physical headset/controller verification.
 
-Final source 251cd3d passes eight focused Release suites in 33.05 seconds:
-retopology-authoring, retopo, document-assets, weight-authoring,
-controller-controls, spatial-gpu-render, scene-authoring and document-export.
-Logs: tests-retopo-authoring-verified.log and -verified-detail.log.
+The cut-authoring suite has 55 assertions. Coverage includes exact source mapping
+versus a nearby competing surface, malformed mapping rejection, closed cap and
+material topology, real editable paint/ORM/emission/normal transfer, UTF-8 group
+name bounds, cancellation without partial publication, source/save isolation,
+coalesced immutable previews, current-request validity, parameter rollback/local
+history, single global Apply history, native save/open and glTF reimport, stale
+replacement/no-op handling, transformed groups plus skin/morph displayed pose,
+joystick multirow sliders, grip placement, left-menu ownership with both hands
+tracked and accepted Apply immediately before XR shutdown. The existing
+retopology authoring suite retains 56 checks.
 
-Four whole-core C/C++ ASan/UBSan/leak suites pass in 23.94 seconds:
-retopology-authoring, retopo, document-assets and weight-authoring. Logs:
-tests-retopo-authoring-verified-sanitize.log and its -detail.log companion.
-UI/XR are OFF in build-sanitize. C and C++ use address/undefined sanitizers and
-frame pointers; Release uses -O1 -g1 -DNDEBUG. Native Mikk/xatlas are instrumented.
-Runs set ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
-UBSAN_OPTIONS=halt_on_error=1. No thread-sanitizer or accelerator proof is claimed.
+GPU tests verify actual selected-source clipping, visible cap/plane feedback,
+menu capture and restored unclipped state. Captures:
+`build/gpu-cut-{surface,gizmo,menu}.ppm`. Six new V0/V1 MToon checks verify selected
+clipping, exact kept-side shading and isolation from other object identities.
+No new physical GPU or canvas-rotation-specific test is claimed for this stage.
 
-The final retopology suite has 56 assertions. Independent expectations cover
-source projection, ordered outward quad construction, exact immutable gesture
-cancellation and draft/global history, pins/seams and atomic incidence deletion,
-world-distance bounds under rotated/scaled groups, combined skin/morph projection,
-source isolation, real native save/open and exported GLB reimport, malformed source
-references, clean orphan-source refusal, invalid Apply correction, stale document
-replacement, idle BVH release, joystick-only authoring, the distance slider and
-accepted Apply immediately before XR shutdown. Reopen/cancel checks separately
-verify the high reference extent and restored smaller authored target geometry.
+## Whole-core sanitizers
 
-The final GPU suite checks visible point/edge feedback, source-surface occlusion,
-linear XR overlay composition and changing controller mode feedback. Captures:
-build/gpu-retopo-{baseline,front,linear,occluded,menu-place,menu-move}.ppm.
-The final mode capture was converted for inspection to
-artifacts/retopo-menu-move-verified.png; shorter New patch / Tool mode / Snap range
-labels fit their sectors. Final successful build logs:
-build-retopo-authoring-shutdown.log and -shutdown-sanitize.log.
+Four C/C++ ASan/UBSan/leak suites pass in 45.28s: retopology-authoring,
+cut-authoring, document-assets and bake. Logs:
+`artifacts/tests-plane-cut-sanitize.log`, `-sanitize-detail.log` and
+`artifacts/tests-plane-cut-sanitize-output.log`. Final successful instrumented
+build: `artifacts/build-plane-cut-verified-sanitize.log`.
 
-## Native FLTK universal menus
+The build-sanitize configuration has UI/XR OFF, C and C++ core plus native
+Mikk/xatlas instrumented with `-fsanitize=address,undefined`, frame pointers and
+Release `-O1 -g1 -DNDEBUG`. Runs set
+`ASAN_OPTIONS=detect_leaks=1:halt_on_error=1` and
+`UBSAN_OPTIONS=halt_on_error=1`. No TSAN or accelerator evidence is claimed.
 
-Final product source passes the dedicated normal-size topology flow 12/12 and
-compact 640x360 with 2x Unifont BDF 6/6; both processes exit 0, both reports have
-failed=0. Logs: menu-retopo-authoring-verified.log and -verified-compact.log.
-Reports/captures: artifacts/menu-retopo and artifacts/menu-retopo-compact.
+## Native FLTK menus and bitmap appearance
 
-Actual menu export verifies availability and Place/Move radio state, source/save
-isolation, native modal identity and Universal Close, held point feedback without
-scene changes, exact Escape viewport restoration, ordered face Apply/Save,
-retained original payload, one global Undo/Redo and reopening/cancellation.
-Compact coverage checks the real projection slider, fixed action buttons,
-modal cancellation and unchanged native scene. Visually inspected:
-menu-retopo/ordered-corners.png and
-menu-retopo-compact/projection-large-bdf.png. Earlier same-flow runs also passed.
+Dedicated normal cut GUI flow passes 12/12, compact 640x360 with 2x Unifont BDF
+passes 6/6. Both processes exit 0, both reports have failed=0. Logs:
+`artifacts/menu-plane-cut.log`, `artifacts/menu-plane-cut-compact.log`.
+Reports/captures: `artifacts/menu-cut`, `artifacts/menu-cut-compact`.
 
-The existing general native menu suite passed 53/53 at fdb132b, exit 0,
-failed=0: menu-retopo-general.log and artifacts/menu/report.json. Its coverage
-includes modal text/UV routing, chooser cancellation, host loss/return, sculpt
-layers and voxel authoring. Do not relabel this broad GUI run as final-source
-coverage of the later topology lifetime/shutdown fixes.
+Actual universal menu export checks availability and checkbox state, source/save
+isolation, live viewport feedback without authoritative Scene changes, native
+modal ownership, Universal Close exact restoration, local Undo/Redo, cap toggle,
+Apply/Save retained source and baked outputs, one global Undo/Redo and later
+workspace cancellation. Compact checks verify four readable RGBA controls,
+scrolling content with fixed Cancel/Done and source-preserving cancellation.
+Visually inspected `menu-cut/cut-live-preview.png` and
+`menu-cut-compact/cap-controls-after.png`. The former shows retained textured
+geometry and the edge-on plane at the default camera; the latter shows readable
+large bitmap labels/values without overlapping the action footer.
 
-Actual linkage in artifacts/linkage-retopo-authoring.log resolves the pinned
-artifacts/toolkit-authoring/lib FLTK libraries with no Qt/GTK/Pango frontend.
-All 30 source_sha256 entries match third_party/sources.json; the BDF helper is
-byte-identical to canonical qimgvr. No toolkit or upstream source changed.
+The existing general menu suite was not rerun this stage; its historical results
+remain in VALIDATION-3d19776.md. Do not relabel those as current-source evidence.
+Optional test orchestration uses dbus-next/python-xlib/pillow under private
+HOME/bus/Xvfb with 90s cold-font startup and 30s interactions. Python is not a
+runtime frontend or workflow dependency.
 
-## Diagnostic attempts and limits
+All 30 source_sha256 entries match `third_party/sources.json`. The shared BDF
+helper is byte-identical to `../qimgvr/fltk/bdf_font.hpp`. Actual final linkage in
+`artifacts/linkage-plane-cut.log` resolves FLTK from
+`artifacts/toolkit-authoring/lib` with no Qt/GTK/Pango frontend. The toolkit is
+unchanged pinned DomeD 282467e / 22 patches. Build/launch commands are in
+HANDOFF.md; do not substitute older installed libraries.
 
-The first sanitizer build exited 143 (SIGTERM) after completing the core and
-three selected executables, before finishing the weight-authoring target. Its
-process and all compiler children were confirmed absent before continuing. The
-three built whole-core suites passed in 3.10 seconds; that partial build is not
-claimed as the final four-target build. The later shutdown build completed all
-four targets and is the final evidence above.
+## Diagnostics and limits
 
-A final reopen/cancel fixture initially pressed the joystick immediately after
-reopening reset input ownership. The required fresh neutral sample was missing,
-so no menu opened and the cancellation assertion failed in Release and sanitizer
-runs (tests-retopo-authoring-final*.log). The corrected fixture explicitly rearms
-and verifies page 14 before Cancel; the successful 56-assertion final runs above
-include the corrected sequence. The earlier failed runs are diagnostics, not
-passes. An intermediate 52-assertion refinement run passed before the reopen
-check was added. The final shutdown test also guards accepted input draining
-before the asset job becomes visible to wait_asset().
+Earlier prototype/focused logs precede the final owner/paint/group assertions;
+the final broad and sanitizer runs above include all refinements. An expanded
+paint fixture initially used its default Y normal while painting a Z face;
+setting the correct dab normal fixed the fixture. An owner-control fixture used
+Up from row zero, which correctly wraps to Alpha; Down selects Green. The fixture
+was corrected without changing the common input convention. Diagnostic logs
+`tests-plane-cut-expanded.log` and `tests-plane-cut-owner.log` are failed
+attempts, not successful evidence. Initial misleading-indentation warnings were
+cleaned before the final builds. A test-insertion script pattern mismatch was
+corrected before the final broad run.
 
-These are manual point/edge/triangle/quad workflows. Automatic quad generation,
-bridging/extrusion, edge collapse, wire-only scene objects/draft recovery and
-production-size topology/overlay performance remain unfinished. Source picking
-uses the geometric reference rather than alpha-cutout/geodesic semantics. Atlas
-UVs are derived separately; native seam/pin metadata is not yet an atlas
-prescription. Changed topology creates a new retained version rather than
-implicitly transferring old paint/skin/morph data. Retain the broader unfinished
-sculpt, texture, rig, plugin and full glTF/VRM/MToon requirements.
+Cuts currently operate on one active object. Repeated cuts of generated shell
+and cap siblings, general Boolean operations, nested/touching contours and
+self-intersection repair remain unfinished. Closed caps require consistently
+oriented manifolds and reject ambiguous/near-vertex/empty cases. Extraction
+expands selected render corners, so effective vertex budgets and production
+compaction/performance need work. Output uses static PBR with 512-pixel atlases;
+it does not recreate all original MToon/UV1/extensions or bind new skin/morphs.
+Original assets remain retained. Durable recipes, quality controls, unconfirmed
+draft recovery and the wider production objective remain incomplete.
 
-All validation/build handles were checked to terminal and no validation/compiler
-jobs remained when inspected. No system install, active-session restart, fresh
-external Khronos validation, physical headset/controller/stylus/3D-mouse testing
-or real OneAPI/ROCm/CUDA execution is claimed.
+Build/test handles were confirmed terminal and no matching validation/compiler
+jobs remained at checkpoint inspection. No system installation, active-session
+restart, fresh external Khronos validation, physical-device testing or real
+OneAPI/ROCm/CUDA execution was performed for this checkpoint.
