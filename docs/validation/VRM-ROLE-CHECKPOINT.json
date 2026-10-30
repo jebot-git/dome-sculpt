@@ -1,0 +1,306 @@
+{
+  "format": 1,
+  "parent_commit": "d3e5e61aee5471b4c391a1cd6f804e76da2aff0f",
+  "scope": "resolved VRM0 base/shade current-role alias and exactly-zero common overlay preservation; no Scene10 schema",
+  "owned_source": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/CMakeLists.txt",
+      "bytes": 36027,
+      "sha256": "f68cbccd586f3ff47910b3c157dd4d2175860c3d5d9c14f210bebcea90422fe5"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/src/vrm-painted.hpp",
+      "bytes": 12215,
+      "sha256": "fc0d100b150134fcfe94fc1c00b4599f275cd0d312afa05e50c117b414cdbc74"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/tests/vrm-painted.cpp",
+      "bytes": 10815,
+      "sha256": "eb108b8235e335c9597df6224cee7f6d94e2760cf01b9148738a5454aca2d1fc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/tests/vrm-role-consumer.cpp",
+      "bytes": 14769,
+      "sha256": "0fd1fcc70f31e596904cb422512ec336133b00cfd118be043f8982503a893093"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/tests/vrm-role-consumer.hpp",
+      "bytes": 20932,
+      "sha256": "16e7c3dde8aa5c2bf8e7e1578aceec61959c5532f6bfa03cb9e3b5700b2e9392"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/docs/VRM-RESOLVED-ROLE-EXPORT.md",
+      "bytes": 5466,
+      "sha256": "75f6141bd7ea30a2a45651a73182b788a3a0b90b073ca938afff9cc448091e20"
+    }
+  ],
+  "public_headers_identical_to_support": 52,
+  "support_commit": "d3e5e61aee5471b4c391a1cd6f804e76da2aff0f",
+  "support_archives": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libdome-sculpt-core.a",
+      "bytes": 14427710,
+      "sha256": "74ced56db2b4b118f40ebc3fa6aa573f29f10cc38b00a40eb27d54e065966178"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libdome-sculpt-render.a",
+      "bytes": 566276,
+      "sha256": "1039cf51e9c465eae4876a43900b1cb952a513a2ae1b42a1a086fb59bc3bcb94"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libxatlas.a",
+      "bytes": 301242,
+      "sha256": "cc267eddfd391935b3f8ff5df05f04bbbeb6d057a8854fc2c8d3ff616bad5f60"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build/libmikktspace.a",
+      "bytes": 30118,
+      "sha256": "4e1fba0ef39e5522f0c96e4e5c8493f84330a85807b3837e04d97c64386e4f2f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libdome-sculpt-core.a",
+      "bytes": 571631912,
+      "sha256": "a6d46b4ec5d93b42ec00d51741a2a3cf6796bbf4edf3a52d26b32893ebd8c5df"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libdome-sculpt-render.a",
+      "bytes": 26845178,
+      "sha256": "0d8b33f351235250903776593f37b6b327b47951fa7d24d35ecf3dca459f61e4"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libxatlas.a",
+      "bytes": 11071798,
+      "sha256": "e9c70f6c054a8bb2f940decab2f6730e8dac19b93da9f7df25f3fcc7aeadfadf"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libmikktspace.a",
+      "bytes": 844470,
+      "sha256": "7b11a4e7d6a9d99a87bb6e03795f2bf08ab3ab8e55e5da43e8bda95372677f28"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/commands.json",
+      "bytes": 7649,
+      "sha256": "5457bac5f78484e53ab5a7ff421c9129efa61ea2c8f918ec704d2da5710ffff6"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/fixture.o",
+      "bytes": 987296,
+      "sha256": "f0b04405b9a47b80d2b3462139ecf5a094648bb744a90711d1d620f73af2d8fb"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/unit.o",
+      "bytes": 165816,
+      "sha256": "b359c9cb9e5e23d8b260bcb9b8b35b65c635fa5a51fff2bc5f791253282f9281"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role",
+      "bytes": 7092632,
+      "sha256": "9d0d1e8a08a6ef89a1e90c9418a7a06d51bc4527c3fa3a3789223835a75e4119"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-animated.vrm",
+      "bytes": 17283928,
+      "sha256": "2394eabec197aba34f49c6204b41ad613bb36e4d644bc52b55e5140e280f26be"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-before",
+      "bytes": 7084232,
+      "sha256": "46eb3d308a3df6101f88a0d290a3999cbeca97598b6c86ccd014d5b33d7cd2d6"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-before.map",
+      "bytes": 3294517,
+      "sha256": "3087ebbc8bbff9267f3d38ff14f71038d73af9bc2aa6a8efc2d77ecb5b03d4c1"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-old-resolved-0.vrm",
+      "bytes": 17285940,
+      "sha256": "d4ab0bd6419966917909713695fe8422beb77e6857817b122d9b0316615a9167"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-raw.vrm",
+      "bytes": 16532428,
+      "sha256": "b40fd0108500ade5688d48cafb5e52b4bb3d69cdba665ed9182a129c7bd45bb1"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-resolved-0.vrm",
+      "bytes": 17293156,
+      "sha256": "9829bab430dd8d431e7e2aad903de2dcb747ab511ae1e1adfdda52fb903ad5e0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-resolved-100.vrm",
+      "bytes": 17293156,
+      "sha256": "507c8f6805493335247f36847878992baf39740b9d0b1da3dd6e388268d6c4d4"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-resolved-35.vrm",
+      "bytes": 17293304,
+      "sha256": "d8fad8d88b1ce9587c8fdbaebe0f90defe4d46792099f83e12c9ce4ed9b80814"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-unit",
+      "bytes": 5078904,
+      "sha256": "b236af887798c8862ec4db432c0892d4b6ccf90249ee3c3fd7ca7388c80b6d0a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role-unit.map",
+      "bytes": 2005955,
+      "sha256": "862be5fff1aa9210e050e25b1f407a6d7ab57b5b51b86b9cc611b42caeef5699"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm-role.map",
+      "bytes": 3243486,
+      "sha256": "7ac7f9e8e18ae4ee63ea6422ac3bdfcbefe30bffaccc73bf5ba2eeca8b4e125a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-qualified/vrm.o",
+      "bytes": 773840,
+      "sha256": "f2ffda1226d175be6b7e55f5d323f9617c6600e7ac33adadbac7c2c8ab2cbabf"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/fixture.o",
+      "bytes": 22533800,
+      "sha256": "001b0e8bc89b77446d9e61d4db8c7112e77c62edaa042d95eadb670994da569d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/unit.o",
+      "bytes": 4422984,
+      "sha256": "0eeb21ce639349d716c4674f373a6d5b30196dc73d90628750742cfe33dd245f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role",
+      "bytes": 237879192,
+      "sha256": "01f38cb85617a836133f81c257132652397cf618078fa789181756a6663e555d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role-animated.vrm",
+      "bytes": 17283928,
+      "sha256": "2394eabec197aba34f49c6204b41ad613bb36e4d644bc52b55e5140e280f26be"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role-raw.vrm",
+      "bytes": 16532428,
+      "sha256": "b40fd0108500ade5688d48cafb5e52b4bb3d69cdba665ed9182a129c7bd45bb1"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role-resolved-0.vrm",
+      "bytes": 17293156,
+      "sha256": "9829bab430dd8d431e7e2aad903de2dcb747ab511ae1e1adfdda52fb903ad5e0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role-resolved-100.vrm",
+      "bytes": 17293156,
+      "sha256": "507c8f6805493335247f36847878992baf39740b9d0b1da3dd6e388268d6c4d4"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role-resolved-35.vrm",
+      "bytes": 17293304,
+      "sha256": "d8fad8d88b1ce9587c8fdbaebe0f90defe4d46792099f83e12c9ce4ed9b80814"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role-unit",
+      "bytes": 137747192,
+      "sha256": "07dfe63d49481ed54659c50545cc4528465ef64386de0a548dd0ade9f45fcbe6"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role-unit.map",
+      "bytes": 6059481,
+      "sha256": "da01947f6d3803a68a4c3d10471ac2d18c4ec3626cf2d3c7b39c74a573c738e8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm-role.map",
+      "bytes": 9429416,
+      "sha256": "b9994126647d02e47e143797202f242734eec5c5bd1e36a4e89a951d948327fa"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-d3e5e61/build-sanitized/vrm.o",
+      "bytes": 17546712,
+      "sha256": "2cef59908519b65620128ad922ab0abd02709852c9d731ff179f49560b2cb19b"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-vrm-role-software.log",
+      "bytes": 2695,
+      "sha256": "3ddba9c101272be7a03c8638b2c9c3e79c8b2318e3007981c5b3c97756388a06"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-vrm-role-unit-software.log",
+      "bytes": 1426,
+      "sha256": "6b140d8560808a083a7e8d2c1bb819f01234b5ab895e58a91887a267cf7a74e4"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-vrm-role-san.log",
+      "bytes": 2695,
+      "sha256": "3ddba9c101272be7a03c8638b2c9c3e79c8b2318e3007981c5b3c97756388a06"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-vrm-role-unit-san.log",
+      "bytes": 1426,
+      "sha256": "6b140d8560808a083a7e8d2c1bb819f01234b5ab895e58a91887a267cf7a74e4"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-arc.log",
+      "bytes": 2704,
+      "sha256": "84120a9fd21ae3b2823865a3149015a7e1a871b03631f50d5bfb464f049d5933"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-old-negative.log",
+      "bytes": 313,
+      "sha256": "c83562bbd448b081efafe1464de3b2dc42a6896554f7a5f2d9deb067e0191340"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-configure.log",
+      "bytes": 1716,
+      "sha256": "23e410fd07ee7a9978bc9c8e52d385185229af1dd41dd08263fd99439ca5f223"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-khronos.log",
+      "bytes": 407,
+      "sha256": "d392ba11b8dd1c4f2ee9af7a7a71c4ef2de91582987bb2dc973146d9556fbc3c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-vrm-schema.log",
+      "bytes": 963,
+      "sha256": "9ee552e0e830bca26593e02d388ec57ad28ea322f97d6b48070df7a8efebd891"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-khronos-report.json",
+      "bytes": 81719,
+      "sha256": "ddedff47ffd6de8bf34f1efbe2a25758a24b898283b590b6d19074140f4c5e7d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-role-vrm-schema-report.json",
+      "bytes": 1151,
+      "sha256": "ecfda67eb204268257ee960e879cc3d57cae92a0918178c32069d021f86901ae"
+    }
+  ],
+  "results": {
+    "release_software_graphical": 20,
+    "release_unit": 14,
+    "arc_graphical": 20,
+    "sanitizer_graphical": 20,
+    "sanitizer_unit": 14,
+    "sanitizers": "ASan+UBSan with leak detection; changed exporter/fixture/unit plus complete instrumented support archives",
+    "max_byte_error": {
+      "resolved": 1,
+      "raw": 0,
+      "animated": 0
+    },
+    "old_exporter_negative": {
+      "exit": 1,
+      "first_case_error": 25
+    },
+    "khronos_models": 6,
+    "khronos_errors": 0,
+    "official_VRM0_models": 6,
+    "official_VRM0_errors": 0,
+    "schemas_verified": 15
+  },
+  "limitations": [
+    "Actual nineteen-part avatar with explicit fixture overlay maps, not complete native painting coverage",
+    "Simple shadow-ramp graphical consumer with no normal texture/rim/matcap/outline/UV animation mask",
+    "Qualification overrides VRM TU against exact header-identical frozen archives; not a fresh full native suite",
+    "General color preparation receipts, bake/UV/restart and actual color/UV morph targets remain separate required work"
+  ]
+}

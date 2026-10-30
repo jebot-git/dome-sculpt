@@ -109,6 +109,8 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-document-transactions-test tests/document-transactions.cpp)
   target_link_libraries(dome-sculpt-document-transactions-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-document-transactions-test PRIVATE
+    -Wl,--wrap=_ZN4dome24prepare_authoring_importERKNS_5SceneERKNSt10filesystem7__cxx114pathENS_22ImportAuthoringOptionsE
+    -Wl,--wrap=_ZN4dome24procedural_sculpt_objectERNS_5SceneEmRKNS_23ProceduralSculptOptionsEPNS_22ProceduralSculptReportE
     -Wl,--wrap=_ZN4dome8Document11TransactionC1ERS0_
     -Wl,--wrap=_ZN4dome8Document11Transaction6commitEb
     -Wl,--wrap=_ZN4dome8Document11TransactionD1Ev
@@ -116,7 +118,7 @@ if(BUILD_TESTING)
     -Wl,--wrap=_ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE
     -Wl,--wrap=_ZN4dome5Scene4loadERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE
     -Wl,--wrap=_ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE)
-  foreach(endpoint structural scalar control undo paint-undo sculpt-undo asset uv open save recovery asset-queue uv-queue open-queue save-queue export-queue native-begin-queue native-save-queue prepare-queue refresh-queue restore-queue restore postcommit)
+  foreach(endpoint structural scalar control undo paint-undo sculpt-undo asset import procedural uv open save recovery asset-queue uv-queue open-queue save-queue export-queue native-begin-queue native-save-queue prepare-queue refresh-queue restore-queue restore postcommit)
     add_test(NAME transaction-${endpoint} COMMAND dome-sculpt-document-transactions-test ${endpoint})
   endforeach()
   add_library(dome-sculpt-native-gui-gate SHARED tests/native-gui-gate.cpp)
@@ -638,4 +640,12 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   target_link_libraries(dome-sculpt-source-color-vrm-test PRIVATE dome-sculpt-render)
   add_test(NAME source-color-vrm COMMAND dome-sculpt-source-color-vrm-test ${CMAKE_CURRENT_BINARY_DIR}/source-color-vrm)
   set_tests_properties(source-color-vrm PROPERTIES TIMEOUT 300 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-vrm-role-consumer-test tests/vrm-role-consumer.cpp)
+  target_include_directories(dome-sculpt-vrm-role-consumer-test PRIVATE third_party/cgltf)
+  target_link_libraries(dome-sculpt-vrm-role-consumer-test PRIVATE dome-sculpt-render)
+  add_test(NAME vrm-role-consumer COMMAND dome-sculpt-vrm-role-consumer-test ${CMAKE_CURRENT_BINARY_DIR}/vrm-role)
+  set_tests_properties(vrm-role-consumer PROPERTIES TIMEOUT 300 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()

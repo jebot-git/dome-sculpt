@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/import-authoring.hpp"
 #include <nlohmann/json.hpp>
 #include <atomic>
 #include <cstdlib>
@@ -40,6 +41,14 @@ extern "C" Scene load_wrap(const std::filesystem::path &p,const std::function<bo
 extern "C" Scene recovery_load_real(const RecoveryCandidate&,RecoveryOptions) asm("__real__ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE");
 extern "C" Scene recovery_load_wrap(const RecoveryCandidate&,RecoveryOptions) asm("__wrap__ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE");
 extern "C" Scene recovery_load_wrap(const RecoveryCandidate &c,RecoveryOptions o){auto s=recovery_load_real(c,std::move(o));permitted=true;return s;}
+// Observe only the real detached helper's successful return. Preparation itself
+// is outside this publication-allocation scope; production has no fixture hook.
+extern "C" ImportedAuthoring import_real(const Scene&,const std::filesystem::path&,ImportAuthoringOptions) asm("__real__ZN4dome24prepare_authoring_importERKNS_5SceneERKNSt10filesystem7__cxx114pathENS_22ImportAuthoringOptionsE");
+extern "C" ImportedAuthoring import_wrap(const Scene&,const std::filesystem::path&,ImportAuthoringOptions) asm("__wrap__ZN4dome24prepare_authoring_importERKNS_5SceneERKNSt10filesystem7__cxx114pathENS_22ImportAuthoringOptionsE");
+extern "C" ImportedAuthoring import_wrap(const Scene &s,const std::filesystem::path &p,ImportAuthoringOptions o){auto result=import_real(s,p,std::move(o));permitted=true;return result;}
+extern "C" bool procedural_real(Scene&,uint64_t,const ProceduralSculptOptions&,ProceduralSculptReport*) asm("__real__ZN4dome24procedural_sculpt_objectERNS_5SceneEmRKNS_23ProceduralSculptOptionsEPNS_22ProceduralSculptReportE");
+extern "C" bool procedural_wrap(Scene&,uint64_t,const ProceduralSculptOptions&,ProceduralSculptReport*) asm("__wrap__ZN4dome24procedural_sculpt_objectERNS_5SceneEmRKNS_23ProceduralSculptOptionsEPNS_22ProceduralSculptReportE");
+extern "C" bool procedural_wrap(Scene &s,uint64_t id,const ProceduralSculptOptions &o,ProceduralSculptReport *r){auto result=procedural_real(s,id,o,r);permitted=true;return result;}
 namespace dome {struct DocumentTransactionTestAccess {
  static auto tokens(const Document &d){std::lock_guard lock(d.model_mutex_);return std::tuple{d.content_,d.next_content_,d.saved_content_,d.undo_.size(),d.redo_.size(),d.state_.revision,d.state_.generation,d.recovery_content_};}
  static auto source(const Document &d){std::lock_guard lock(d.model_mutex_);return d.native_source_scene_;}
@@ -60,10 +69,12 @@ Scene fixture(){
 }
 std::filesystem::path recovery_path(){return std::filesystem::temp_directory_path()/("dome-transaction-recovery-"+std::to_string(getpid()));}
 std::filesystem::path fixture_path();
+std::filesystem::path import_path(){auto p=fixture_path();p.replace_extension(".input.glb");return p;}
+Volume detail_sphere(){Volume v(.04f);v.begin_stroke();Brush b;b.radius=.237f;b.from=b.to={.013f,.017f,-.011f};b.blend=0;v.stamp(b);v.end_stroke();return v.geometry_snapshot();}
 std::string restore_id;
 Volume coarse_sculpt(){Volume::Voxels samples;for(int z=-1;z<=1;++z)for(int y=-1;y<=1;++y)for(int x=-1;x<=1;++x)samples.emplace(Int3{x,y,z},length(Vec3{.2f*x,.2f*y,.2f*z})-.23f);return Volume::from_samples(.2f,std::move(samples));}
 std::unique_ptr<Document> setup(const std::string &mode){
- auto d=std::make_unique<Document>();d->replace(fixture());require(d->wait_mesh(),"Baseline mesh ready");
+ auto d=std::make_unique<Document>();auto initial=fixture();if(mode=="procedural")initial.add("Procedural target",detail_sphere());d->replace(initial);require(d->wait_mesh(),"Baseline mesh ready");
  auto properties=[&](const char *name){auto o=d->copy_scene().active();d->object_properties(o.id,name,o.visible,o.locked,o.transform,o.material);};
  properties("Retained history A");properties("Retained history B");require(d->undo(),"Create retained redo");require(d->wait_mesh(),"History baseline ready");
  if(mode=="control"){DocumentTransactionTestAccess::begin_control(*d);require(d->wait_mesh(),"Accepted color preview is fully ready before its allocation baseline");}
@@ -103,6 +114,8 @@ void execute(Document &d,const std::string &mode){
  else if(mode=="save"||mode=="native-save"){d.save(fixture_path());}
  else if(mode=="open"){d.open(fixture_path());}
  else if(mode=="asset"){d.edit_scene("Asset allocation fixture",[](Scene &s,const auto &){s.active().name="Accepted asset";permitted=true;});require(d.wait_asset(),"Asset worker drains");}
+ else if(mode=="import"){d.import_asset(import_path(),64);require(d.wait_asset(),"Actual import worker drains");}
+ else if(mode=="procedural"){ProceduralSculptOptions o;o.rows=o.columns=1;o.density=1;o.depth=.12f;d.apply_procedural_sculpt(o);require(d.wait_asset(),"Actual procedural worker drains");}
  else if(mode=="uv"){d.end_uv(true);require(d.wait_asset(),"UV transfer drains");}
  else {
   permitted=true;whole=mode!="control"&&mode!="recovery"&&mode!="postcommit";
@@ -126,9 +139,13 @@ int main(int argc,char **argv)try{
   require(refused&&invalid.objects().size()==1&&invalid.active().id==1,"Invalid duplicate transform refuses before object or identity publication");
  }
  if(mode=="open"||mode=="open-queue"){auto f=fixture();f.active().name="Loaded replacement";f.save(fixture_path());permitted=false;}
+ if(mode=="import")export_glb(fixture().surfaces(),import_path());
  postcommit_mode=mode=="postcommit";phase_tracking=!mode.ends_with("-queue")&&!postcommit_mode;
  auto measured=setup(mode);calls=0;failure=0;permitted=inside=whole=false;enabled=true;execute(*measured,mode);enabled=false;
- size_t count=calls.load();std::cerr<<"Measured "<<mode<<": "<<count<<" allocation boundaries\n";require(count>10,"Real allocation boundaries were observed");require(measured->frame().state->error.empty(),"Measured endpoint succeeds");auto expected=measured->copy_scene().encode();measured.reset();
+ size_t count=calls.load();std::cerr<<"Measured "<<mode<<": "<<count<<" allocation boundaries\n";require(count>10,"Real allocation boundaries were observed");require(measured->frame().state->error.empty(),"Measured endpoint succeeds");auto expected=measured->copy_scene().encode();
+ if(mode=="import")require(measured->copy_scene().objects().size()==2&&bool(measured->copy_scene().active().appearance),"Actual imported source is retained in the publication fixture");
+ if(mode=="procedural")require(measured->copy_scene().active().volume->layers().size()==2,"Actual procedural layer is retained in the publication fixture");
+ measured.reset();
  for(size_t boundary=1;boundary<=count;++boundary){
   auto d=setup(mode);auto original=d->copy_scene().encode();auto tokens=DocumentTransactionTestAccess::tokens(*d);auto source=DocumentTransactionTestAccess::source(*d);auto mesh=d->frame().surface;auto publication=d->frame().state;auto recovery=d->recovery_status();auto draft=d->frame().state->uv?d->frame().state->uv->mesh:nullptr;
   calls=0;failure=boundary;hit=false;permitted=inside=whole=false;enabled=true;
@@ -142,7 +159,7 @@ int main(int argc,char **argv)try{
   require(d->copy_scene().encode()==original,"Failed endpoint preserves exact Scene, original source maps and painting");
   require(DocumentTransactionTestAccess::tokens(*d)==tokens,"Failed endpoint preserves history/redo/content/nextContent/revision/generation/recovery identities");
   require(DocumentTransactionTestAccess::source(*d)==source&&d->frame().surface==mesh,"Failed endpoint never exposes candidate source cache or mesh");
-  if(mode!="asset"&&mode!="uv"&&mode!="save"&&mode!="open"&&mode!="export"&&mode!="restore"&&!mode.ends_with("-queue"))require(d->frame().state==publication,"Failed synchronous endpoint retains exact published editor state");
+  if(mode!="asset"&&mode!="import"&&mode!="procedural"&&mode!="uv"&&mode!="save"&&mode!="open"&&mode!="export"&&mode!="restore"&&!mode.ends_with("-queue"))require(d->frame().state==publication,"Failed synchronous endpoint retains exact published editor state");
   if(mode=="prepare-queue"){
    require(!d->frame().state->asset_busy,"Rejected prepare retains no busy lease");d->prepare_mesh(64);require(d->wait_asset()&&d->frame().state->error.empty(),"Rejected prepare can retry");
    require(d->copy_scene().encode()["objects"][0]==original["objects"][0],"Preparation retry preserves the independent original source and painting");
@@ -173,11 +190,23 @@ int main(int argc,char **argv)try{
    d->end_uv(true);require(d->wait_asset()&&d->frame().state->error.empty()&&!d->frame().state->uv,"Actual failed UV Apply can retry without reopening or losing the draft");
   }else if(mode=="control"){
    require(DocumentTransactionTestAccess::control(*d),"Failed scalar acceptance retains its exact active control");DocumentTransactionTestAccess::finish_control(*d);
+  }else if(mode=="import"||mode=="procedural"){
+   require(!d->frame().state->asset_busy&&!d->asset_status().cancellable,"Failed actual workflow publication releases its busy source lease");
+   execute(*d,mode);require(d->frame().state->error.empty()&&d->copy_scene().encode()==expected,"Actual failed workflow retries to its exact prepared source and paint state");
+   auto retained=d->copy_scene().encode()["objects"][0],prior=original["objects"][0];
+   // Scene9 adds absent-equivalent optional null fields to every object when
+   // the imported source first introduces retained material bindings. Compare
+   // the entire payload, normalizing only these two codec-prescribed nulls.
+   for(auto *value:{&retained,&prior})for(const char *key:{"material_bindings","retopology"})if(value->contains(key)&&(*value)[key].is_null())value->erase(key);
+   if(retained!=prior)std::cerr<<nlohmann::json::diff(prior,retained).dump(2)<<'\n';
+   require(retained==prior,"Workflow retry retains the independent original source maps and painting");
+   require(d->undo()&&d->copy_scene().encode()==original,"Retried workflow is exactly one undoable transition");
+   require(d->redo()&&d->copy_scene().encode()==expected,"Retried workflow redo restores its exact source/layer output");
   }else if(mode=="asset"||mode=="asset-queue"){
    require(!d->frame().state->asset_busy&&!d->asset_status().cancellable,"Failed asset releases busy lease and remains retryable");
    d->edit_scene("Retry asset",[](Scene &s,const auto &){s.active().name="Accepted asset";});require(d->wait_asset()&&d->frame().state->error.empty(),"Actual failed asset can retry");
   }else require(d->redo(),"Earlier redo remains available after allocation failure");
  }
- std::filesystem::remove(fixture_path());std::filesystem::remove_all(recovery_path());auto exported=fixture_path();exported.replace_extension(".glb");std::filesystem::remove(exported);
+ std::filesystem::remove(fixture_path());std::filesystem::remove(import_path());std::filesystem::remove_all(recovery_path());auto exported=fixture_path();exported.replace_extension(".glb");std::filesystem::remove(exported);
  std::cout<<"PASS "<<mode<<": every one of "<<count<<" real endpoint allocation boundaries; "<<(mode=="postcommit"?"accepted Scene/history retained through persistence failure":"exact scene/history/cache/lease rollback and retry")<<"\n";return 0;
 }catch(const std::exception &e){enabled=false;whole=permitted=inside=false;std::cerr<<e.what()<<'\n';return 1;}

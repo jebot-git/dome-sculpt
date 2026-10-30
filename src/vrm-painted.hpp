@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/material-bindings.hpp"
+#include "dome/material-visibility.hpp"
 #include "dome/scene.hpp"
 #include <set>
 namespace dome::detail {
@@ -34,19 +35,15 @@ inline VrmPaintedMaterial vrm_painted_material(
     const std::function<bool()> &cancelled) {
   auto stop = [&] { if (cancelled && cancelled()) throw std::runtime_error("VRM paint compilation cancelled"); };
   stop();
-  if (material.version() != MToonVersion::V0 || !object.textures || object.textures->source_only ||
-      !object.textures->source_maps)
+  if (material.version() != MToonVersion::V0 || !object.textures || object.textures->source_only || !object.textures->source_maps)
     throw std::invalid_argument("VRM0 painted material requires explicit source views and derived maps");
   material.validate(); object.material.validate(); reference.validate();
   const auto &maps = *object.textures;
-  maps.source_maps->validate(); maps.color.validate(); maps.emission.validate(); maps.color_coverage.validate(); maps.emission_coverage.validate();
+  const auto &source=*maps.source_maps;
+  source.validate(); maps.color.validate(); maps.emission.validate(); maps.color_coverage.validate(); maps.emission_coverage.validate();
   for(const auto *image:{&maps.color,&maps.color_coverage,&maps.emission,&maps.emission_coverage})
     if(size_t(image->width)*image->height>16*1024*1024)
       throw std::length_error("VRM0 paint input image pixel budget exceeded");
-  if (material.parameters.scroll != std::array<float,2>{} || material.parameters.rotation_speed != 0)
-    throw std::invalid_argument("VRM0 fixed-UV paint requires an explicitly frozen animated material");
-  if (material.textures[0].offset != std::array<float,2>{} || material.textures[0].scale != std::array<float,2>{1,1})
-    throw std::invalid_argument("VRM0 shared source ST requires all-slot source UV baking before painted export");
   for (const auto &role : roles) {
     role.validate();
     if (role.texcoord || role.uv_transform!=std::array<float,6>{1,0,0,1,0,0})
@@ -54,6 +51,21 @@ inline VrmPaintedMaterial vrm_painted_material(
   }
   for (auto uv : object.mesh.uv) if (uv[0] < 0 || uv[0] > 1 || uv[1] < 0 || uv[1] > 1)
     throw std::invalid_argument("VRM0 painted export requires an explicit unit UV atlas");
+  bool color_replaced=false,emission_replaced=false;
+  for(size_t i=0;i<maps.color_coverage.rgba.size();i+=4)color_replaced|=maps.color_coverage.rgba[i]!=0;
+  for(size_t i=0;i<maps.emission_coverage.rgba.size();i+=4)emission_replaced|=maps.emission_coverage.rgba[i]!=0;
+  if(!color_replaced && !emission_replaced) {
+    // A prepared core-PBR plane alone does not alter MToon. Keep raw roles,
+    // animation and expression factor identity instead of inventing a fixed-UV
+    // rewrite for an overlay with exactly zero contribution.
+    for(size_t c=0;c<4;++c)material.parameters.base_color[c]=vrm_native_factor(material.parameters.base_color[c],reference.color[c],object.material.color[c]);
+    material.parameters.emission={vrm_native_factor(material.parameters.emission.x,reference.emission[0],object.material.emissive[0]),vrm_native_factor(material.parameters.emission.y,reference.emission[1],object.material.emissive[1]),vrm_native_factor(material.parameters.emission.z,reference.emission[2],object.material.emissive[2])};
+    material.validate();return {std::move(material),std::move(roles),{},0};
+  }
+  if (material.parameters.scroll != std::array<float,2>{} || material.parameters.rotation_speed != 0)
+    throw std::invalid_argument("VRM0 fixed-UV paint requires an explicitly frozen animated material");
+  if (material.textures[0].offset != std::array<float,2>{} || material.textures[0].scale != std::array<float,2>{1,1})
+    throw std::invalid_argument("VRM0 shared source ST requires all-slot source UV baking before painted export");
   std::array<float,4> effective{};
   for (size_t c=0;c<4;++c) {
     effective[c]=vrm_native_factor(material.parameters.base_color[c],reference.color[c],object.material.color[c]);
@@ -71,10 +83,10 @@ inline VrmPaintedMaterial vrm_painted_material(
     auto view=source;if(!view.image)view=sampler();view.texcoord=0;view.uv_transform={1,0,0,1,0,0};
     view.image=std::shared_ptr<const Image>(object.textures,&image);return view;
   };
-  auto color=composite_view(maps.color,maps.source_maps->color);
-  auto coverage=composite_view(maps.color_coverage,maps.source_maps->color);
-  auto emission=composite_view(maps.emission,maps.source_maps->emission);
-  auto emission_coverage=composite_view(maps.emission_coverage,maps.source_maps->emission);
+  auto color=composite_view(maps.color,source.color);
+  auto coverage=composite_view(maps.color_coverage,source.color);
+  auto emission=composite_view(maps.emission,source.emission);
+  auto emission_coverage=composite_view(maps.emission_coverage,source.emission);
   bool paint_emission=false;
   for(size_t i=0;i<maps.emission_coverage.rgba.size();i+=4)paint_emission|=maps.emission_coverage.rgba[i]!=0;
   auto size=std::max({maps.color.width,maps.color.height,maps.emission.width,maps.emission.height,
@@ -86,6 +98,12 @@ inline VrmPaintedMaterial vrm_painted_material(
   if (size<1 || size>4096 || size_t(size)*size>16*1024*1024)
     throw std::length_error("VRM0 painted texture pixel budget exceeded");
   bool alias=vrm_role_alias(roles[0],roles[1],material.textures[0],material.textures[1]);
+  if(object.material_bindings) {
+    const auto &a=roles[0],&b=roles[1];const auto &x=material.textures[0],&y=material.textures[1];
+    alias=a.image && a.image==b.image && a.wrap_s==b.wrap_s && a.wrap_t==b.wrap_t &&
+      a.min_filter==b.min_filter && a.mag_filter==b.mag_filter && mtoon_coordinate(x)==mtoon_coordinate(y) &&
+      (material.version()==MToonVersion::V0 || (x.offset==y.offset && x.scale==y.scale && x.rotation==y.rotation));
+  }
   auto base=std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(size_t(size)*size*4)});
   auto shade=alias?std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(size_t(size)*size*4)}):nullptr;
   auto emitted=paint_emission?std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(size_t(size)*size*4)}):nullptr;
@@ -94,7 +112,7 @@ inline VrmPaintedMaterial vrm_painted_material(
   auto values=[&](float u,float v) {
     auto composed=sample_source_texture(color,u,v,true);
     auto mask=sample_source_texture(coverage,u,v,false)[0];
-    auto pbr=sample_source_texture(maps.source_maps->color,u,v,true);
+    auto pbr=sample_source_texture(source.color,u,v,true);
     auto original=sample_source_texture(roles[0],u,v,true);
     std::array<float,4> main{};
     std::array<float,3> dark{};
@@ -114,7 +132,7 @@ inline VrmPaintedMaterial vrm_painted_material(
   auto emission_values=[&](float u,float v) {
     auto composed=sample_source_texture(emission,u,v,true);
     auto mask=sample_source_texture(emission_coverage,u,v,false)[0];
-    auto pbr=sample_source_texture(maps.source_maps->emission,u,v,true);
+    auto pbr=sample_source_texture(source.emission,u,v,true);
     auto original=sample_source_texture(roles[3],u,v,true);
     std::array<float,3> result{};
     for(size_t c=0;c<3;++c) {

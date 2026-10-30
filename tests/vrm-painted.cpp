@@ -101,6 +101,14 @@ int main() try {
   auto independent=detail::vrm_painted_material(object,nonalias,roles,reference,64,{});
   check(independent.roles[1].image==base && independent.material.parameters.shade_color.y==typed.parameters.shade_color.y,
         "Separate material role identities do not acquire shadow paint merely because images happen to match");
+  auto resolved=object;auto binding=std::make_shared<SourceMaterialBindings>();binding->material=nonalias;binding->roles=roles;binding->native_reference=reference;resolved.material_bindings=binding;
+  auto resolved_alias=detail::vrm_painted_material(resolved,nonalias,roles,reference,64,{});
+  check(resolved_alias.roles[1].image->rgba==compiled.roles[1].image->rgba && resolved_alias.material.parameters.shade_color.y==compiled.material.parameters.shade_color.y,
+        "Resolved current shade/base roles alias by image, sampler and UV identity even when historical texture indices differ");
+  auto protected_maps=std::make_shared<TextureMaps>(*maps);protected_maps->color_coverage=image(1,{0,0,0,255});protected_maps->emission_coverage=image(1,{0,0,0,255});resolved.textures=protected_maps;
+  auto preserved=typed;preserved.parameters.scroll={.1f,.2f};auto untouched=detail::vrm_painted_material(resolved,preserved,roles,reference,64,{});
+  check(untouched.roles[0].image==roles[0].image && untouched.material.parameters.scroll==preserved.parameters.scroll && untouched.rewritten_properties.empty(),
+        "Exactly zero common color/emission replacement preserves animated MToon roles and expression property identity");
   auto full=detail::vrm_painted_material(object,typed,roles,reference,0,{});
   check(full.roles[0].image->width==128 && full.roles[1].image->width==128,
         "Default painted export preserves original role resolution rather than silently choosing paint resolution");
