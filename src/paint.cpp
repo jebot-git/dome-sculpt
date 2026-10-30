@@ -728,6 +728,10 @@ void PaintedMesh::clear_bake() {
   if (editing_) throw std::logic_error("Finish the paint stroke before clearing a bake");
   if (baked_) { auto token = next_composite_token(); baked_.reset(); composite_token_ = token; ++revision_; }
 }
+std::shared_ptr<PaintedMesh> PaintedMesh::from_mesh(Mesh mesh,uint32_t resolution,const PaintSurfaceOptions &options) {
+  if(options.policy!=PaintUvPolicy::Strict)throw std::invalid_argument("Untextured source-authored UV persistence requires explicit original-source authority");
+  return std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),resolution,options));
+}
 std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
     std::shared_ptr<const PaintSourceMaps> maps,uint32_t resolution) {
   return from_maps(std::move(mesh),std::move(maps),resolution,{});

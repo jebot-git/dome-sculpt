@@ -91,6 +91,7 @@ struct PaintSurfaceDiagnostics {
 class PaintedMesh {
 public:
   PaintedMesh(Mesh, uint32_t resolution = 512);
+  static std::shared_ptr<PaintedMesh> from_mesh(Mesh, uint32_t resolution, const PaintSurfaceOptions &);
   static std::shared_ptr<PaintedMesh> from_maps(Mesh, std::shared_ptr<const PaintSourceMaps>, uint32_t resolution = 512);
   static std::shared_ptr<PaintedMesh> from_maps(Mesh, std::shared_ptr<const PaintSourceMaps>, uint32_t resolution, const PaintSurfaceOptions &);
   const PaintSurfaceDiagnostics &surface_diagnostics() const;

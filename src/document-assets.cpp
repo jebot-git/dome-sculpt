@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/import.hpp"
+#include "dome/import-authoring.hpp"
 #include "dome/mesh-authoring.hpp"
 namespace dome {
 SceneDraft Document::draft_scene() const {
@@ -69,54 +70,11 @@ void Document::import_asset(const std::filesystem::path &path, uint32_t resoluti
     throw std::invalid_argument("Invalid paint resolution");
   auto report = std::make_shared<std::string>();
   queue_scene_operation("Import mesh", [path, resolution, report](Scene &scene, const auto &cancelled) {
-    ImportLimits limits;
-    size_t vertices = 0, triangles = 0;
-    for (auto &o : scene.objects()) if (o.painted) {
-      vertices += o.painted->mesh().positions.size();
-      triangles += o.painted->mesh().indices.size() / 3;
-    }
-    if (vertices >= limits.max_vertices || triangles >= limits.max_triangles)
-      throw std::length_error("Scene mesh budget exhausted");
-    limits.max_vertices -= vertices;
-    limits.max_triangles -= triangles;
-    limits.cancelled = cancelled;
-    auto asset = import_mesh(path, limits);
-    for (size_t i = 0; i < std::min<size_t>(asset.warnings.size(), 8); ++i) {
-      if (!report->empty()) *report += "; ";
-      *report += asset.warnings[i].substr(0, 200);
-    }
-    if (asset.warnings.size() > 8) *report += "; additional import diagnostics omitted";
-    if (asset.primitives.size() > 256 - scene.objects().size())
-      throw std::length_error("Import exceeds the scene object limit");
-    for (auto &primitive : asset.primitives) {
-      if (cancelled()) throw std::runtime_error("Import cancelled");
-      const auto &m = asset.materials.at(primitive.material);
-      // Authoring currently stores UV0 PBR scalar materials. Refuse data that
-      // cannot round-trip yet, rather than stripping source attributes/maps.
-      if (!primitive.colors.empty() || !primitive.tangents.empty() || !primitive.uv1.empty())
-        throw std::runtime_error("Authoring import of vertex colors, authored tangents or UV1 is not available yet; source data was not changed");
-      if (m.color_texture >= 0 || m.metal_rough_texture >= 0 || m.normal_texture >= 0 ||
-          m.occlusion_texture >= 0 || m.emissive_texture >= 0)
-        throw std::runtime_error("Textured material authoring import is not available yet; source data was not changed");
-      if (m.alpha == ImportedMaterial::AlphaMode::Mask)
-        throw std::runtime_error("Alpha-mask material import is not available yet");
-      Material material;
-      material.name = m.name;
-      material.color = m.color;
-      if (m.alpha == ImportedMaterial::AlphaMode::Opaque) material.color[3] = 1;
-      material.metallic = m.metallic;
-      material.roughness = m.roughness;
-      material.emissive = m.emissive;
-      material.double_sided = m.double_sided;
-      material.validate();
-      if (primitive.mesh.uv.empty()) unwrap(primitive.mesh, resolution);
-      auto painted = std::make_shared<PaintedMesh>(std::move(primitive.mesh), resolution);
-      auto id = scene.add(primitive.name.empty() ? "Imported mesh" : primitive.name, Volume{});
-      auto &object = scene.object(id);
-      object.material = std::move(material);
-      object.painted = std::move(painted);
-      object.mesh_active = true;
-    }
+    ImportAuthoringOptions options;options.paint_resolution=resolution;options.limits.cancelled=cancelled;
+    auto prepared=prepare_authoring_import(scene,path,std::move(options));
+    for(size_t i=0;i<std::min<size_t>(prepared.diagnostics.size(),8);++i){if(!report->empty())*report+="; ";*report+=prepared.diagnostics[i].substr(0,200);}
+    if(prepared.diagnostics.size()>8)*report+="; additional import diagnostics omitted";
+    scene=std::move(prepared.scene);
   }, {}, report);
 }
 } // namespace dome
