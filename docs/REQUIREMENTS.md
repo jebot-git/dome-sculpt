@@ -1,9 +1,9 @@
 # Full objective and completion evidence
 
-The current integration combines plane-cut source2ec8a5a and sculpt protection /
-symmetry source20c132d, preserving both histories. Build/verification are underway;
-only final-source evidence recorded in VALIDATION.md proves the combined behavior.
-Every remaining row stays required. See HANDOFF.md for the current checkpoint.
+Application source 4755e62 combines plane-cut source 2ec8a5a and sculpt protection /
+symmetry source 20c132d, preserving both histories. Combined verification is recorded
+in VALIDATION.md, including exact protection/cut interoperation and geometry-only
+source availability. Every remaining row stays required. See HANDOFF.md.
 
 The goal is the complete native FLTK VR production workflow requested by the
 user. An executable, a successful build, or the initial tests do not complete

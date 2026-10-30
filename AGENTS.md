@@ -25,10 +25,10 @@ work and validation results. Preserve the full objective in
 Build (prepare the current canonical DomeD toolkit as in [docs/TOOLKIT.md](docs/TOOLKIT.md) first):
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+cmake -S . -B build-cut-sculpt -DCMAKE_BUILD_TYPE=Release \
   -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-authoring/share/fltk"
-cmake --build build --parallel 2
-ctest --test-dir build --output-on-failure
+cmake --build build-cut-sculpt --parallel 2
+ctest --test-dir build-cut-sculpt --output-on-failure
 ```
 
 The user authorized committing and pushing checkpoints to the public repository.

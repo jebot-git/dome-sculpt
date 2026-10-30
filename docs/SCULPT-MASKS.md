@@ -1,10 +1,12 @@
 # Sculpt protection and object-local symmetry
 
-This milestone implements bounded sculpt protection and object-local symmetry
-with native FLTK and XR authoring controls, exact history/cancellation and GPU
-protection/mirror feedback. The complete CPU and actual Arc ONEAPI real-loader
-regression suites pass140/140 checks each. Resolution changes, sparse local meshing and
-sustained production-scale stroke performance remain separate active work.
+Upstream source 20c132d implements bounded sculpt protection and object-local
+symmetry with native FLTK/XR controls, exact history/cancellation and GPU feedback.
+Its CPU and actual Arc ONEAPI 140-check reports are historical evidence for that
+source. Current combined source 4755e62 adds cut interoperation and exact constant
+sampling; its own verification scopes are in VALIDATION.md. Do not transfer the
+old device/backend proof to the newer source. Resolution changes, sparse local
+meshing and sustained production-scale strokes remain separate active work.
 
 ## Cut integration and constant sampling
 
@@ -250,7 +252,7 @@ instrumentation test is excluded from that accelerator scope. Logs:
 ONEAPI build/Arc test logs.
 
 
-Final application source20c132d passes all73 native Release suites in173.67s,
+Final application source 20c132d passes all73 native Release suites in173.67s,
 whole-core C/C++ ASan/UBSan/leaks17/17 in186.49s, actual Arc native12/12 in6.15s,
 and the full140-check real-loader suite on both CPU and Arc compute. The original
 117 cases are retained alongside23 mask cases. See VALIDATION.md for exact logs,
