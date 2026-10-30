@@ -5,13 +5,14 @@ Document::Transaction::Transaction(Document &d):d_(d),before_(d.scene_),state_(d
     control_before_(d.control_before_),bound_(d.bound_volume_),source_(d.native_source_scene_),
     path_(d.path_),recovery_source_(d.recovery_source_),volume_(d.last_volume_),paint_(d.last_paint_),
     content_(d.content_),next_(d.next_content_),saved_(d.saved_content_),recovery_(d.recovery_content_),rig_(d.rig_object_),
-    desktop_(d.desktop_),anchored_(d.anchored_),control_changed_(d.control_changed_),uv_accept_(d.uv_accept_pending_),uv_solving_(d.uv_solving_),control_source_(d.control_source_),work_(d.asset_work_.load()),native_(d.native_stroke_) {
+    desktop_(d.desktop_),anchored_(d.anchored_),control_changed_(d.control_changed_),uv_accept_(d.uv_accept_pending_),uv_solving_(d.uv_solving_),control_source_(d.control_source_),import_settings_(d.import_settings_),import_view_(d.import_view_),import_source_(d.import_source_),import_request_(d.import_request_.load()),work_(d.asset_work_.load()),native_(d.native_stroke_) {
     if(d.transaction_)throw std::logic_error("Nested document transaction");
     d.transaction_=this;
   }
 
 void Document::Transaction::commit(bool checkpoint) noexcept {
     committed_=true;d_.transaction_=nullptr;
+    if(advance_import_)d_.import_request_.store(import_request_+1);
     if(undo_source_)undo_source_->pop_back();
     if(recorded_)while(d_.undo_.size()>128)d_.undo_.pop_front();
     if(rebind_){std::lock_guard lock(d_.input_mutex_);d_.inputs_.clear();d_.reset_input_=false;d_.input_changed_.notify_all();}
@@ -31,6 +32,7 @@ Document::Transaction::~Transaction() noexcept {
     d_.control_before_=std::move(control_before_);d_.control_changed_=control_changed_;d_.control_source_=control_source_;
     if(finish_uv_)d_.uv_=std::move(removed_uv_);
     d_.uv_accept_pending_=uv_accept_;d_.uv_solving_=uv_solving_;
+    d_.import_settings_=std::move(import_settings_);d_.import_view_=std::move(import_view_);d_.import_source_=import_source_;d_.import_request_.store(import_request_);
     d_.asset_work_.store(std::move(work_));d_.native_stroke_=std::move(native_);
     d_.bound_volume_=std::move(bound_);d_.native_source_scene_=std::move(source_);
     d_.path_=std::move(path_);d_.recovery_source_=std::move(recovery_source_);

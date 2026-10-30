@@ -5,6 +5,7 @@
 #include "sculpt-ui-values.hpp"
 #include "dome/palette.hpp"
 #include <cstdio>
+#include <bit>
 #include "palette-text.hpp"
 namespace dome {
 namespace {
@@ -262,6 +263,7 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::ProceduralSeed)label="Seed "+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::ProceduralDepth){char text[64];snprintf(text,sizeof(text),"Depth %.4g world mm",double(value));label=text;}
       else if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
+      else if(c.parameter==VrParameter::ImportUnitScale){char unit[80];snprintf(unit,sizeof(unit),"%.7g metres per input unit",double(value));label=unit;}
       else if(c.parameter==VrParameter::SculptResolution) {
         char spacing[80];snprintf(spacing,sizeof(spacing),"Spacing %.6g world mm",double(value));label=spacing;
       }
@@ -312,7 +314,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
@@ -342,6 +344,7 @@ void SpatialPalette::raster(const EditorState &s) {
   auto current = std::find_if(s.objects.begin(), s.objects.end(),
                               [&](auto &o) { return o.id == s.active_object; });
   auto marked = [&](int sector) -> std::optional<bool> {
+    if(s.menu_page==23&&s.importing&&sector==5)return s.importing->settings.choices.materials;
     if(s.menu_page==17&&s.cut){if(sector==0)return true;if(sector==5)return s.cut->settings.flipped;if(sector==6)return s.cut->settings.cap;}
     if (s.menu_page == 16 && s.retopology) {
       auto &r = *s.retopology;
@@ -441,11 +444,11 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17) {
+  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page != 21 && s.menu_page != 23) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -466,6 +469,20 @@ void SpatialPalette::raster(const EditorState &s) {
     const char *patterns[]={"Raised panels","Recessed cuts","Mixed detail"};
     text(320*unit_,285*unit_,std::string(patterns[unsigned(o.pattern)])+" / seed "+std::to_string(o.seed),fg);
     text(320*unit_,318*unit_,s.asset_busy?"Generating / Cancel work":"Apply creates a new sculpt layer",fg);
+  }
+  if(s.menu_page==21||s.menu_page==23){
+    auto v=s.importing;
+    if(s.menu_page==23&&v){
+      const auto &o=v->settings.choices;char custom[80]{};if(o.units==ImportUnits::Custom)snprintf(custom,sizeof(custom)," %.7g",o.custom_metres_per_unit);
+      text(320*unit_,270*unit_,std::string(import_format_label(o.format))+(o.materials?" / Materials on":" / Materials off"),fg);
+      text(320*unit_,295*unit_,std::string(import_units_label(o.units))+custom+" / "+import_axes_label(o.axes),fg);
+      text(320*unit_,320*unit_,std::string(import_normals_label(o.normals))+" / Paint "+std::to_string(v->settings.paint_resolution),fg);
+    }else{
+      text(320*unit_,270*unit_,!v?"Browse for GLB, glTF, OBJ or FBX":v->busy?"Reading folder...":v->entries.empty()?(v->error.empty()?"No models or folders":v->error):
+        std::to_string(v->selected+1)+"/"+std::to_string(v->entries.size())+(v->entries[v->selected].directory?" Folder: ":" Model: ")+v->entries[v->selected].name,fg);
+      if(v){text(320*unit_,295*unit_,(!v->error.empty()&&!v->entries.empty()?v->error+" / ":std::string{})+v->directory.string(),fg);
+        text(320*unit_,320*unit_,std::string(import_units_label(v->settings.choices.units))+" / "+import_axes_label(v->settings.choices.axes)+" / "+std::to_string(v->settings.paint_resolution),fg);}
+    }
   }
   if(s.menu_page==17){auto c=s.cut;
     text(320*unit_,278*unit_,!c?"Start an editable cutting plane":c->committing?"Applying cut...":c->busy?"Updating preview...":"Apply retains the source",fg);
@@ -539,6 +556,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
   signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
+  if(s.importing)signature+=":import:"+std::to_string(s.importing->request)+":"+std::to_string(s.importing->selected)+":"+std::to_string(s.importing->busy)+s.importing->directory.string()+s.importing->error+
+    std::to_string(int(s.importing->settings.choices.format))+std::to_string(s.importing->settings.choices.materials)+std::to_string(std::bit_cast<uint64_t>(s.importing->settings.choices.custom_metres_per_unit))+std::to_string(int(s.importing->settings.choices.units))+std::to_string(int(s.importing->settings.choices.axes))+std::to_string(int(s.importing->settings.choices.normals))+std::to_string(s.importing->settings.paint_resolution);
   signature += ":sculpt:" + std::to_string(s.sculpt_settings.symmetry_axes) + ":" +
       std::to_string(s.sculpt_settings.mask_edit) + ":" + std::to_string(s.sculpt_settings.mask_visible) + ":" +
       std::to_string(int(s.sculpt_settings.mask_tool));

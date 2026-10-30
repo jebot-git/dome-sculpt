@@ -38,7 +38,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
       "Plane cut", "Paint tools", "Baking", "Materials",
-      "Back", "Holding", "Move right", "Retopology"};
+      "Back", "Holding", "Import", "Retopology"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
       "Next shape", "Previous shape", "Reset pose", "Undo",
@@ -58,7 +58,9 @@ const std::array<const char *, 12> &spatial_labels(int page) {
     "Mirror X", "Mirror Y", "Back", "Mirror Z", "Planes / view", "Cancel work"};
   static const std::array<const char *,12> procedural={"Pattern","Face","Grid","Coverage / shape","Depth","Seed","Apply detail","Next seed","Back","Undo","Redo","Cancel work"};
   static const std::array<const char *,12> holding={"Object grab mode","Hold selected","Release held","Ghost others","Visibility","Previous","Next","Center","Back","Move left","Move right","Cancel motion"};
-  return page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
+  static const std::array<const char*,12> importing={"Browse / refresh","Previous file","Next file","Open folder","Parent folder","Options","Import","Cancel","Back","Undo","Redo","Save"};
+  static const std::array<const char*,12> import_options={"Format","Units","Axes","Normals","Paint size","Materials","Custom unit","Defaults","Back","Refresh folder","Import","Cancel"};
+  return page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
          : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
@@ -78,6 +80,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
     static const VrParameter params[]={VrParameter::ProceduralPattern,VrParameter::ProceduralFace,VrParameter::ProceduralGrid,VrParameter::ProceduralCoverage,VrParameter::ProceduralDepth,VrParameter::ProceduralSeed};
     return params[sector];
   }
+  if(page==23&&sector==6)return VrParameter::ImportUnitScale;
   if(page==17&&sector>=1&&sector<=3)return sector==1?VrParameter::CutOffset:sector==2?VrParameter::CutDirection:VrParameter::CutCapColor;
   if (page == 15) {
     if (sector == 1) return VrParameter::SculptMaskMode;
@@ -149,6 +152,16 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
     static const SpatialCommand commands[]={SpatialCommand::ProceduralApply,SpatialCommand::ProceduralNextSeed,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::CancelWork};
     return commands[index-6];
   }
+  if(page==21){
+    static const std::array<SpatialCommand,12> actions={SpatialCommand::ImportBrowse,SpatialCommand::ImportPrevious,SpatialCommand::ImportNext,SpatialCommand::ImportOpen,
+      SpatialCommand::ImportParent,SpatialCommand::Undo,SpatialCommand::ImportApply,SpatialCommand::ImportCancel,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::Save};
+    return index==5||index==8?std::nullopt:std::optional<SpatialCommand>(actions[index]);
+  }
+  if(page==23){
+    static const std::array<SpatialCommand,12> actions={SpatialCommand::ImportFormat,SpatialCommand::ImportUnits,SpatialCommand::ImportAxes,SpatialCommand::ImportNormals,
+      SpatialCommand::ImportResolution,SpatialCommand::ImportMaterials,SpatialCommand::Undo,SpatialCommand::ImportDefaults,SpatialCommand::Undo,SpatialCommand::ImportBrowse,SpatialCommand::ImportApply,SpatialCommand::ImportCancel};
+    return index==6||index==8?std::nullopt:std::optional<SpatialCommand>(actions[index]);
+  }
   if(page==17){
     static const std::array<SpatialCommand,12> cut={SpatialCommand::CutBegin,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Undo,
       SpatialCommand::CutHand,SpatialCommand::CutFlip,SpatialCommand::CutCap,SpatialCommand::CutApply,SpatialCommand::Undo,
@@ -209,7 +222,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
         SpatialCommand::Undo, SpatialCommand::Center, SpatialCommand::Undo,
         SpatialCommand::Undo, SpatialCommand::Undo, SpatialCommand::Undo,
         SpatialCommand::Left, SpatialCommand::Right, SpatialCommand::Undo};
-    return (index >= 4 && index <= 9) || index == 11 ? std::nullopt
+    return (index >= 4 && index <= 11) ? std::nullopt
                                     : std::optional<SpatialCommand>(mesh[index]);
   }
   if (page == 8) {
@@ -618,6 +631,10 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 10;
       selected_ = 0;
     } else if(page_==10&&selected_==9){page_=20;selected_=0;
+    } else if (page_ == 10 && selected_ == 10) {
+      page_=21;selected_=0;command_=SpatialCommand::ImportBrowse;command_device_=s.id;
+    } else if(page_==21&&selected_==5){
+      page_=23;selected_=0;
     } else if (page_ == 10 && selected_ == 11) {
       page_ = 16; selected_ = 0;
     } else if(page_==10&&selected_==4){
@@ -649,7 +666,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = (page_ == 16 || page_ == 17 || page_==20) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
@@ -682,7 +699,7 @@ void SpatialInput::update(const SpatialSample &s) {
           (*command_ == SpatialCommand::RetopoBegin || *command_ == SpatialCommand::RetopoMode ||
            *command_ == SpatialCommand::RetopoApply || *command_ == SpatialCommand::RetopoCancel);
       const bool resume_mask = page_ == 15 && command_ && *command_ == SpatialCommand::SculptMaskResume;
-      if((page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20) || resume_retopology || resume_mask){menu_ = false;device_ = 0;}
+      if((page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23) || resume_retopology || resume_mask){menu_ = false;device_ = 0;}
       d.armed = false;
     }
     d.pressed = s.trigger;

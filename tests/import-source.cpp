@@ -10,6 +10,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <unistd.h>
+#include <set>
 using namespace dome;
 namespace fs=std::filesystem;
 namespace {
@@ -63,8 +64,8 @@ int main(int argc,char **argv){try{
   check(obj.primitives[0].normals_authored && obj.primitives[0].mesh.normals[0].z==1,"native OBJ missing normal flat policy explicit in canonical adapter");
   check(native.original->format==ImportSourceFormat::Obj && native.original->root.bytes!=native.canonical_glb && !native.diagnostics.empty(),"unitless OBJ assumed metre choice diagnosed and raw exact");
   options.units=ImportUnits::Millimetres;auto metric=capture_native_source(root/"asset.obj",options);auto metric_asset=import_glb(*metric.canonical_glb);
-  bool scaled=false;for(const auto &n:metric_asset.nodes)scaled|=std::abs(n.local[0]-.001f)<1e-9;
-  check(scaled,"explicit OBJ millimetre units applied as hierarchy conversion");
+  bool scaled=false;for(const auto &n:metric_asset.nodes)if(n.mesh>=0){const auto &p=metric_asset.primitives[metric_asset.meshes[n.mesh].primitives[0]].mesh.positions[1];scaled|=std::abs(n.world[0]*p.x+n.world[4]*p.y+n.world[8]*p.z+n.world[12]-.001f)<1e-9;}
+  check(scaled,"explicit OBJ millimetres produce exact physical coordinates once");
   write(root/"material.mtl","newmtl Red\nKd 1 0 0\n");write(root/"material.obj","mtllib material.mtl\no material\nv 0 0 0\nv 1 0 0\nv 0 1 0\nusemtl Red\nf 1 2 3\n");
   auto material=capture_native_source(root/"material.obj");auto ma=import_glb(*material.canonical_glb);
   check(material.original->resources.size()==1 && material.original->resources[0].name=="material.mtl","OBJ MTL captured through confined native callback");
@@ -85,6 +86,28 @@ int main(int argc,char **argv){try{
   write(root/"multi.obj","mtllib materials/nested.mtl second.mtl\no multi\nv 0 0 0\nv 1 0 0\nv 0 1 0\nvt 0 0\nvt 1 0\nvt 0 1\nusemtl Painted\nf 1/1 2/2 3/3\nusemtl Second\nf 1/1 2/2 3/3\n");
   auto multi=capture_native_source(root/"multi.obj");auto multiple=import_glb(*multi.canonical_glb);
   check(multi.original->resources.size()==3 && multiple.primitives.size()==2,"all OBJ mtllib files captured with their distinct material directories");
+  auto millimetre_options=ImportAuthoringOptions{64,{},{}};millimetre_options.choices.units=ImportUnits::Millimetres;
+  std::string metres_obj="o metre\nv 0 0 0\nv 1000 0 0\nv 0 1000 0\nf 1 2 3\n";write(root/"metres.obj",metres_obj);
+  auto metre_scene=prepare_authoring_import(Scene{},root/"metres.obj",millimetre_options);
+  const auto &metre_object=metre_scene.scene.object(metre_scene.objects[0]);auto local=metre_object.painted->mesh().positions[1];
+  auto world=metre_scene.scene.world_transform(metre_object.id);auto physical=ob::transform(world,{local.x,local.y,local.z});
+  check(std::abs(physical.x-1)<1e-6 && local.x==1 && metre_object.appearance->source_receipt->options.units==ImportUnits::Millimetres,
+      "1000mm OBJ adopts metre-local geometry without false 100m raw-coordinate refusal");
+  write(root/"quad.obj","o quad\nv 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nf 1 2 3 4\n");
+  auto quad=import_glb(*capture_native_source(root/"quad.obj").canonical_glb);
+  auto metadata=nlohmann::json::parse(quad.primitives[0].extras_json);const auto &polygons=metadata.at("dome_source_polygons");
+  check(metadata.at("dome_source_polygons_version")==1 && polygons.size()==1 && polygons[0].at("vertices").size()==4 && polygons[0].at("triangle_count")==2,
+      "original OBJ N-gon identity and ordered corner loop retained across triangulation");
+  std::set<uint32_t> original_control_points;for(auto vertex:polygons[0].at("vertices"))original_control_points.insert(metadata.at("dome_source_vertices").at(vertex.get<size_t>()).get<uint32_t>());
+  check(original_control_points==std::set<uint32_t>{0,1,2,3} && metadata.at("dome_source_corners").size()==6,
+      "N-gon canonical corner witnesses retain original control-point identities");
+  ImportLimits work;work.max_metadata_visits=15;bool bounded_face=false;
+  try{capture_native_source(root/"quad.obj",{},work);}catch(const std::length_error &error){bounded_face=std::string_view(error.what()).find("triangulation exceeds bounded work")!=std::string_view::npos;}
+  check(bounded_face,"native concave-polygon triangulation reserves quadratic work before entering uncancellable C helper");
+  ImportOptions without_materials;without_materials.materials=false;
+  auto retained_textures=capture_native_source(root/"textured.obj",without_materials);auto no_material=import_glb(*retained_textures.canonical_glb);
+  check(no_material.images.empty()&&retained_textures.original->resources.size()==2&&retained_textures.original->resources[1].bytes->size()==native_color.png().size(),
+      "explicit material omission still retains exact original MTL and texture resources");
   auto authored=prepare_authoring_import(Scene{},root/"scene.gltf",{64,{},{}});
   auto scene_json=authored.scene.encode();check(scene_json.at("version")==11,"converted original-source receipt selects Scene11");
   auto restored=Scene::decode(scene_json);const auto &appearance=*restored.object(authored.objects.front()).appearance;
@@ -158,6 +181,18 @@ Connections: {
   auto smooth=import_glb(*capture_native_source(root/"fold.obj",options).canonical_glb);
   auto normal=smooth.primitives[0].mesh.normals[0];
   check(std::abs(normal.y-std::sqrt(.5f))<1e-6&&std::abs(normal.z-std::sqrt(.5f))<1e-6,"explicit smooth normal option area-weights shared original control points");
+  std::string authored_cm(fbx.original->root.bytes->begin(),fbx.original->root.bytes->end());
+  auto replace_once=[](std::string &value,std::string_view from,std::string_view to){auto at=value.find(from);if(at==value.npos)throw std::runtime_error("Native unit/axes fixture source not found");value.replace(at,from.size(),to);};
+  replace_once(authored_cm,"UnitScaleFactor\", \"double\", \"Number\", \"\",100","UnitScaleFactor\", \"double\", \"Number\", \"\",1");
+  replace_once(authored_cm,"a: 0,0,0,1,0,0,0,1,0","a: 0,0,0,200,0,0,0,200,0");
+  replace_once(authored_cm,"UpAxis\", \"int\", \"Integer\", \"\",1","UpAxis\", \"int\", \"Integer\", \"\",2");
+  replace_once(authored_cm,"FrontAxis\", \"int\", \"Integer\", \"\",2","FrontAxis\", \"int\", \"Integer\", \"\",1");
+  replace_once(authored_cm,"FrontAxisSign\", \"int\", \"Integer\", \"\",1","FrontAxisSign\", \"int\", \"Integer\", \"\",-1");
+  write(root/"authored-cm-zup.fbx",authored_cm);auto physical_scene=prepare_authoring_import(Scene{},root/"authored-cm-zup.fbx",{64,{},{}});
+  const auto &physical_object=physical_scene.scene.object(physical_scene.objects[0]);const auto &physical_mesh=physical_object.painted->mesh();
+  auto point0=physical_mesh.positions[physical_mesh.indices[2]];auto physical_world=ob::transform(physical_scene.scene.world_transform(physical_object.id),{point0.x,point0.y,point0.z});
+  check(std::abs(physical_world.z+2)<1e-5&&std::abs(physical_world.y)<1e-5&&physical_object.appearance->source_receipt->options.units==ImportUnits::FromFile,
+      "authored FBX centimetres and Z-up convert to metre-local native coordinates without overrides");
   // Standard native JPEG decode, bounded output and strict truncated-input error.
   jpeg_compress_struct encoder{};jpeg_error_mgr errors{};encoder.err=jpeg_std_error(&errors);jpeg_create_compress(&encoder);
   unsigned char *jpeg_bytes=nullptr;unsigned long jpeg_size=0;jpeg_mem_dest(&encoder,&jpeg_bytes,&jpeg_size);

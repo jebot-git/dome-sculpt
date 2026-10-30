@@ -53,8 +53,8 @@ struct Converter {
   std::vector<std::string> diagnostics;
   std::map<std::pair<const ufbx_texture*,std::string>,uint32_t> textures;
   std::map<std::string,std::string> material_directories;
-  size_t vertices=0,triangles=0;
-  double root_scale=1;
+  size_t vertices=0,triangles=0,triangulation_work=0;
+  double coordinate_scale=1;
   std::array<double,4> root_rotation{0,0,0,1};
   Converter(ImportSourceCapture &c,const ImportOptions &o,ufbx_scene &s,ImportLimits l)
       :builder(std::move(l)),capture(c),options(o),source(s){}
@@ -63,27 +63,39 @@ struct Converter {
     // claim to be FBX's raw 64-bit object ID (retained in the original bytes).
     return {{"dome_source_ufbx_element",element.element_id}};
   }
+  std::shared_ptr<const std::vector<uint8_t>> texture_bytes(const ufbx_texture &t,const std::string &directory) {
+    if(t.content.size){
+      if(t.content.size>builder.limits.max_resource_bytes)throw std::length_error("Embedded native texture byte budget exceeded");
+      auto p=static_cast<const uint8_t*>(t.content.data);
+      return std::make_shared<const std::vector<uint8_t>>(p,p+t.content.size);
+    }
+    auto name=string(t.filename);
+    if(name.empty() || name.front()=='/' || name.find(':')!=name.npos)name=string(t.relative_filename);
+    std::replace(name.begin(),name.end(),'\\','/');
+    if(capture.source().format==ImportSourceFormat::Obj){
+      auto relative=string(t.relative_filename);std::replace(relative.begin(),relative.end(),'\\','/');
+      name=(std::filesystem::path(directory)/relative).lexically_normal().generic_string();
+    }
+    return capture.resource(name);
+  }
+  void retain_texture_sources(){
+    if(capture.source().format==ImportSourceFormat::Fbx){
+      for(auto *t:source.textures){builder.stop();if(t->type==UFBX_TEXTURE_FILE&&!t->content.size)(void)texture_bytes(*t,{});}
+    }else{
+      std::set<std::pair<const ufbx_texture*,std::string>> retained;
+      for(auto *m:source.materials){auto directory=material_directories.contains(string(m->name))?material_directories.at(string(m->name)):std::string{};
+        for(const auto &link:m->textures)if(link.texture)for(auto *t:link.texture->file_textures){builder.stop();
+          if(!t->content.size&&retained.emplace(t,directory).second)(void)texture_bytes(*t,directory);}
+      }
+    }
+  }
   uint32_t texture(const ufbx_texture &t,const std::string &directory) {
     if(auto found=textures.find({&t,directory});found!=textures.end())return found->second;
     if(t.type!=UFBX_TEXTURE_FILE || t.has_uv_transform)
       throw std::runtime_error("Layered/procedural/transformed FBX/OBJ texture requires an explicit native material adapter");
     if(!string(t.uv_set).empty() && string(t.uv_set)!="default" && string(t.uv_set)!="UVMap")
       throw std::runtime_error("Named native texture UV set requires explicit per-primitive source-UV binding");
-    std::shared_ptr<const std::vector<uint8_t>> encoded;
-    if(t.content.size) {
-      if(t.content.size>builder.limits.max_resource_bytes)throw std::length_error("Embedded native texture byte budget exceeded");
-      auto p=static_cast<const uint8_t*>(t.content.data);
-      encoded=std::make_shared<const std::vector<uint8_t>>(p,p+t.content.size);
-    } else {
-      auto name=string(t.filename);
-      if(name.empty() || name.front()=='/' || name.find(':')!=name.npos)
-        name=string(t.relative_filename);
-      // Windows separators are format syntax, never an OS absolute-path escape.
-      std::replace(name.begin(),name.end(),'\\','/');
-      if(capture.source().format==ImportSourceFormat::Obj)
-        name=(std::filesystem::path(directory)/string(t.relative_filename)).lexically_normal().generic_string();
-      encoded=capture.resource(name);
-    }
+    auto encoded=texture_bytes(t,directory);
     std::string mime;
     constexpr uint8_t png[]={137,80,78,71,13,10,26,10};
     if(encoded->size()>=8&&std::equal(std::begin(png),std::end(png),encoded->begin()))mime="image/png";
@@ -147,16 +159,21 @@ struct Converter {
       smooth.resize(m.num_vertices);
       for(auto face:m.faces){
         builder.stop();auto weighted=ufbx_get_weighted_face_normal(&m.vertex_position,face);
-        for(uint32_t i=0;i<face.num_indices;++i){auto vertex=m.vertex_indices[face.index_begin+i];auto &n=smooth.at(vertex);n.x+=weighted.x;n.y+=weighted.y;n.z+=weighted.z;}
+        for(uint32_t i=0;i<face.num_indices;++i){if((i&4095)==0)builder.stop();auto vertex=m.vertex_indices[face.index_begin+i];auto &n=smooth.at(vertex);n.x+=weighted.x;n.y+=weighted.y;n.z+=weighted.z;}
       }
       for(auto &n:smooth){builder.stop();if(dot3(n,n)>0)n=normalize3(n);}
       diagnostics.push_back("Mesh '"+string(m.name)+"': explicit area-weighted smooth normals generated across shared control points.");
     }
     std::vector<uint32_t> tri(m.max_face_triangles*3);
-    struct Attributes {std::vector<float> position,normal,uv,uv1,color,tangent;std::vector<uint32_t> source_vertex,source_corner;};
+    struct Attributes {std::vector<float> position,normal,uv,uv1,color,tangent;std::vector<uint32_t> source_vertex,source_corner;nlohmann::json polygons=nlohmann::json::array();};
     std::map<uint32_t,Attributes> parts;
     for(size_t f=0;f<m.faces.count;++f) {
       builder.stop();auto face=m.faces[f];
+      const size_t budget=std::min(builder.limits.max_metadata_visits,size_t(50'000'000));
+      if(!face.num_indices || face.num_indices>budget/face.num_indices ||
+          size_t(face.num_indices)*face.num_indices>budget-triangulation_work)
+        throw std::length_error("Native polygon triangulation exceeds bounded work budget");
+      triangulation_work+=size_t(face.num_indices)*face.num_indices;
       if(m.face_hole.count&&m.face_hole[f])throw std::runtime_error("Native polygon holes require explicit topology conversion");
       size_t count=ufbx_triangulate_face(tri.data(),tri.size(),&m,face);
       if(count!=face.num_indices-2)throw std::runtime_error("Native polygon triangulation failed");
@@ -164,8 +181,9 @@ struct Converter {
       uint32_t slot=m.face_material.count?m.face_material[f]:0;
       if(node.materials.count && slot>=node.materials.count)throw std::runtime_error("Native face material slot is outside instance binding");
       uint32_t material=node.materials.count?node.materials[slot]->typed_id+1:0;
-      auto &a=parts[material];
+      auto &a=parts[material];const size_t first_vertex=a.source_vertex.size();
       for(size_t t=0;t<count;++t) {
+        if((t&4095)==0)builder.stop();
         auto p0=ufbx_get_vertex_vec3(&m.vertex_position,tri[t*3]),p1=ufbx_get_vertex_vec3(&m.vertex_position,tri[t*3+1]),p2=ufbx_get_vertex_vec3(&m.vertex_position,tri[t*3+2]);
         auto flat=normalize3(cross3(subtract(p1,p0),subtract(p2,p0)));
         for(size_t k=0;k<3;++k) {
@@ -175,7 +193,7 @@ struct Converter {
           auto n=options.normals==ImportNormals::GenerateSmooth?smooth.at(m.vertex_indices[corner]):
               options.normals==ImportNormals::GenerateFlat||!m.vertex_normal.exists?flat:ufbx_get_vertex_vec3(&m.vertex_normal,corner);
           if(dot3(n,n)==0)throw std::runtime_error("Explicit smooth normals cancel at a source vertex");
-          a.position.insert(a.position.end(),{real(p.x),real(p.y),real(p.z)});a.normal.insert(a.normal.end(),{real(n.x),real(n.y),real(n.z)});
+          a.position.insert(a.position.end(),{real(p.x*coordinate_scale),real(p.y*coordinate_scale),real(p.z*coordinate_scale)});a.normal.insert(a.normal.end(),{real(n.x),real(n.y),real(n.z)});
           if(m.vertex_uv.exists){auto uv=ufbx_get_vertex_vec2(&m.vertex_uv,corner);a.uv.insert(a.uv.end(),{real(uv.x),real(uv.y)});}
           if(m.uv_sets.count>1){auto uv=ufbx_get_vertex_vec2(&m.uv_sets[1].vertex_uv,corner);a.uv1.insert(a.uv1.end(),{real(uv.x),real(uv.y)});}
           if(m.vertex_color.exists){auto c=ufbx_get_vertex_vec4(&m.vertex_color,corner);a.color.insert(a.color.end(),{real(c.x),real(c.y),real(c.z),real(c.w)});}
@@ -188,6 +206,13 @@ struct Converter {
           a.source_vertex.push_back(m.vertex_indices[corner]);a.source_corner.push_back(corner);
         }
       }
+      std::map<uint32_t,uint32_t> corners;
+      for(size_t v=first_vertex;v<a.source_corner.size();++v)corners.try_emplace(a.source_corner[v],uint32_t(v));
+      std::vector<uint32_t> loop;loop.reserve(face.num_indices);
+      for(uint32_t c=0;c<face.num_indices;++c){auto found=corners.find(face.index_begin+c);
+        if(found==corners.end())throw std::runtime_error("Native triangulation omitted an original face corner");
+        loop.push_back(found->second);}
+      a.polygons.push_back({{"source_face",f},{"vertices",std::move(loop)},{"first_triangle",first_vertex/3},{"triangle_count",count}});
     }
     nlohmann::json primitives=nlohmann::json::array();
     for(auto &[material,a]:parts) {
@@ -198,6 +223,7 @@ struct Converter {
       if(!a.tangent.empty())attributes["TANGENT"]=builder.floats(a.tangent,4);
       // Exact canonical vertex -> pinned parser control-point/corner identities.
       auto provenance=identity(m.element);provenance["dome_source_vertices"]=a.source_vertex;provenance["dome_source_corners"]=a.source_corner;
+      provenance["dome_source_polygons_version"]=1;provenance["dome_source_polygons"]=std::move(a.polygons);
       provenance["dome_normals_generated"]=!m.vertex_normal.exists || options.normals!=ImportNormals::Preserve;
       primitives.push_back({{"attributes",std::move(attributes)},{"material",material},{"mode",4},{"extras",std::move(provenance)}});
     }
@@ -212,11 +238,11 @@ struct Converter {
       throw std::runtime_error("Native curved/procedural source geometry requires explicit tessellation options");
     if(source.anim_stacks.count)diagnostics.push_back("Animation tracks are retained in original bytes; playback is outside authoring import.");
     if(source.cameras.count || source.lights.count)diagnostics.push_back("Source cameras and lights retained; final rendering is outside authoring import.");
-    materials();j["nodes"]=nlohmann::json::array();j["meshes"]=nlohmann::json::array();
+    retain_texture_sources();materials();j["nodes"]=nlohmann::json::array();j["meshes"]=nlohmann::json::array();
     std::map<std::vector<uint32_t>,uint32_t> shared_meshes;
     for(auto *n:source.nodes) {
       builder.stop();auto t=n->local_transform;
-      nlohmann::json node={{"name",string(n->name)},{"translation",{real(t.translation.x),real(t.translation.y),real(t.translation.z)}},
+      nlohmann::json node={{"name",string(n->name)},{"translation",{real(t.translation.x*coordinate_scale),real(t.translation.y*coordinate_scale),real(t.translation.z*coordinate_scale)}},
           {"rotation",{real(t.rotation.x),real(t.rotation.y),real(t.rotation.z),real(t.rotation.w)}},
           {"scale",{real(t.scale.x),real(t.scale.y),real(t.scale.z)}},{"extras",identity(n->element)}};
       if(n->inherit_mode!=UFBX_INHERIT_MODE_NORMAL || (n->mesh&&n->has_geometry_transform))
@@ -233,12 +259,12 @@ struct Converter {
     }
     if(!triangles)throw std::runtime_error("Native source has no triangle mesh");
     auto root=source.root_node->typed_id;
-    if(root_scale!=1 || root_rotation!=std::array<double,4>{0,0,0,1}){
+    if(root_rotation!=std::array<double,4>{0,0,0,1}){
       root=uint32_t(j["nodes"].size());j["nodes"].push_back({{"name","Input units / axes"},{"children",{source.root_node->typed_id}},
-        {"scale",{real(root_scale),real(root_scale),real(root_scale)}},{"rotation",root_rotation},{"extras",{{"dome_import_conversion",true}}}});
+        {"rotation",root_rotation},{"extras",{{"dome_import_conversion",true}}}});
     }
     j["scenes"]=nlohmann::json::array({{{"nodes",{root}}}});j["scene"]=0;
-    j["extras"]={{"dome_source_adapter","ufbx-0.23.1-native-1"}};
+    j["extras"]={{"dome_source_adapter","ufbx-0.23.1-native-2"},{"dome_canonical_position_units","metres"},{"dome_source_geometry_unit_scale",source.metadata.geometry_scale},{"dome_source_unit_override_scale",coordinate_scale}};
     return builder.finish();
   }
 };
@@ -263,7 +289,7 @@ CapturedImportSource capture_native_source(const std::filesystem::path &path,Imp
   load.inherit_mode_handling=UFBX_INHERIT_MODE_HANDLING_HELPER_NODES;
   if(original.format==ImportSourceFormat::Obj || options.axes==ImportAxes::FromFile)
     load.target_axes=ufbx_axes_right_handed_y_up;
-  load.target_unit_meters=1;
+  load.target_unit_meters=1;load.space_conversion=UFBX_SPACE_CONVERSION_MODIFY_GEOMETRY;
   load.obj_axes=options.axes==ImportAxes::ZUp?ufbx_axes_right_handed_z_up:ufbx_axes_right_handed_y_up;
   double unit=options.units==ImportUnits::Centimetres?.01:options.units==ImportUnits::Millimetres?.001:options.units==ImportUnits::Custom?options.custom_metres_per_unit:1;
   load.obj_unit_meters=unit;
@@ -279,7 +305,7 @@ CapturedImportSource capture_native_source(const std::filesystem::path &path,Imp
     if(options.units!=ImportUnits::FromFile){
       auto file_unit=scene->settings.unit_meters;
       if(!std::isfinite(file_unit)||file_unit<=0)throw std::runtime_error("FBX unit metadata is not a finite positive distance");
-      converter.root_scale=unit/file_unit;
+      converter.coordinate_scale=unit/file_unit;
       converter.diagnostics.push_back("FBX authored units explicitly overridden; original metadata retained.");
     }
     if(options.axes==ImportAxes::ZUp){const double s=std::sqrt(.5);converter.root_rotation={-s,0,0,s};}
@@ -291,6 +317,6 @@ CapturedImportSource capture_native_source(const std::filesystem::path &path,Imp
   // Every canonical accessor is validated by the independent existing importer
   // before the detached authoring Scene can adopt any object.
   (void)import_glb(*result,limits);
-  return capture.finish(result,"ufbx v0.23.1 26a482ae native adapter 1",std::move(converter.diagnostics));
+  return capture.finish(result,"ufbx v0.23.1 26a482ae native adapter 2",std::move(converter.diagnostics));
 }
 } // namespace dome

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "input.hpp"
+#include "import-browser.hpp"
 #include "navigation.hpp"
 #include "recovery.hpp"
 #include "scene.hpp"
@@ -66,6 +67,7 @@ struct EditorState {
   std::array<SpatialHand, 2> hands{};
   std::string message, error;
   std::filesystem::path project_path;
+  std::shared_ptr<const ImportView> importing;
   std::string recovery_error;
   std::vector<std::string> recovery_candidates;
   bool recovery_busy = false;
@@ -232,6 +234,12 @@ public:
   using SceneOperation = std::function<void(Scene &, const std::function<bool()> &)>;
   void edit_scene(std::string label, SceneOperation, AssetSource expected = {});
   void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
+  AssetSource begin_import() const; // Capture before opening native options.
+  void import_asset(const std::filesystem::path &, const ImportSettings &, AssetSource expected = {});
+  ImportSettings import_settings() const;
+  void configure_import(ImportSettings);
+  void open_import_browser(std::filesystem::path = {});
+  void import_action(SpatialCommand);
   void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
   void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
   void clear_bake(AssetSource expected = {});
@@ -334,6 +342,14 @@ private:
   uint64_t last_volume_ = 0, last_paint_ = 0, content_ = 1, saved_content_ = 1,
            next_content_ = 2;
   std::filesystem::path path_;
+  ImportSettings import_settings_;
+  AssetSource import_source_{};
+  std::shared_ptr<const ImportView> import_view_;
+  std::atomic<uint64_t> import_request_{0};
+  void import_asset_locked(const std::filesystem::path &,const ImportSettings &,AssetSource expected = {});
+  void browse_import_locked(const std::filesystem::path &);
+  void import_command_locked(SpatialCommand);
+  bool import_command_enabled_locked(SpatialCommand) const;
   std::unique_ptr<RecoveryService> recovery_;
   std::filesystem::path recovery_root_;
   RecoverySource recovery_source_;
@@ -512,6 +528,8 @@ private:
     std::shared_ptr<NativeStroke> native_capture{};
     std::shared_ptr<const Scene> capture_scene{};
     uint64_t edit_authority=0,isolation_target=0;
+    bool discover_import=false;
+    uint64_t import_request=0;
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
@@ -520,6 +538,8 @@ private:
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
   std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_, cut_thread_, native_thread_;
+  void discover_import_file(const FileJob &);
+  void import_listing_error(const FileJob &,const std::exception &);
   void request_worker_stop();
   void publish_locked(bool force_geometry = false, bool checkpoint = true);
   void record_locked(History);

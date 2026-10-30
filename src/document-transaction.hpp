@@ -19,12 +19,16 @@ class Document::Transaction {
   bool desktop_,anchored_,control_changed_,uv_accept_,uv_solving_;
   AssetSource control_source_;
   std::deque<History> redo_,undo_;
+  ImportSettings import_settings_;
+  std::shared_ptr<const ImportView> import_view_;
+  AssetSource import_source_;
+  uint64_t import_request_=0;
   std::shared_ptr<AssetWork> work_;
   std::shared_ptr<NativeStroke> native_;
   bool native_end_=false;
   std::deque<History> *undo_source_=nullptr,*undo_destination_=nullptr;
   std::optional<UvWorkspace> removed_uv_;
-  bool replaced_=false,recorded_=false,committed_=false,rebind_=false,finish_uv_=false,finish_retopo_=false,finish_cut_=false;
+  bool replaced_=false,recorded_=false,committed_=false,rebind_=false,finish_uv_=false,finish_retopo_=false,finish_cut_=false,advance_import_=false;
 public:
   explicit Transaction(Document &);
   Transaction(const Transaction &)=delete;
@@ -60,6 +64,13 @@ public:
   }
   void finish_retopo(){d_.state_.retopology.reset();finish_retopo_=true;}
   void finish_cut(){d_.state_.cut.reset();finish_cut_=true;}
+  // Private view reset may precede publication, but a scanner must not observe
+  // irreversible cancellation until publication succeeds (including OOM).
+  uint64_t advance_import_request(){
+    if(import_request_==UINT64_MAX)throw std::overflow_error("Import request identity exhausted");
+    advance_import_=true;return import_request_+1;
+  }
+  void invalidate_import(){advance_import_request();d_.import_view_.reset();d_.import_source_={};}
   void commit(bool checkpoint=true) noexcept;
   ~Transaction() noexcept;
 };
