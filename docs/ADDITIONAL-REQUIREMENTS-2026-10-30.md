@@ -50,6 +50,9 @@ undo/retry. Runtime remains native C/C++ without a Python or proprietary SDK
 frontend dependency. Independent format/interoperability and real UI fixtures
 must cover the implemented behavior.
 
-All four additions remain incomplete until implementation and matching
-validation establish the requested functionality. The existing MakeHuman option
-and OBJ parser alone do not satisfy these additions.
+Completion requires implementation and matching validation at the requested
+workflow scope. The polygon/color milestone now connects actual native/controller
+editing and Scene12 sources. Hiding/held ghosts, VRoid-only defaults and shared
+FBX/OBJ options are integrated. Richer topology/color transport, complete import
+conversion and full production/device workflows remain required; see the current
+requirement matrix and POLYGON-COLOR-INTEGRATION.md.

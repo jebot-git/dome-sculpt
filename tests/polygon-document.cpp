@@ -44,6 +44,17 @@ unsigned checks=0;
 void check(bool value,const char *message){if(!value)throw std::runtime_error(message);++checks;std::cout<<"PASS "<<message<<std::endl;}
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&){return true;}}
 Scene fixture(){return polygon_test::fixture();}
+Scene admission_fixture(){
+ auto scene=fixture();const auto target=scene.active().id;
+ auto reference=scene.add("Skin and bake source",Volume{});
+ auto &source=scene.object(reference);source.mesh_active=true;
+ source.transform.position={2,0,0};
+ source.painted=std::make_shared<PaintedMesh>(scene.object(target).painted->mesh(),64);
+ auto rig=std::make_shared<DeformationState>(source.painted->mesh());
+ rig->skeleton=Skeleton{};Bone root;root.name="Root";rig->skeleton->bones.push_back(root);
+ rig->skin=SkinWeights{};rig->skin->vertices.assign(source.painted->mesh().positions.size(),{{0,1}});
+ source.deformation=std::move(rig);scene.select(target);scene.validate();return scene;
+}
 
 void ready(Document &d){check(d.wait_polygon(),"Ordered polygon worker reaches ready state");auto e=d.frame().state->error;if(!e.empty())throw std::runtime_error(e);}
 void picked(Document &d){d.polygon_pointer({0,0,3},{0,0,-1},PolygonAction::Pick);ready(d);check(d.frame().state->polygon->selection->ids.size()==1,"Real object-local ray selects one visible N-gon");}
@@ -52,7 +63,31 @@ void extrude(Document &d){picked(d);d.edit_polygon(PolygonAction::Extrude);ready
 int main(int argc,char **argv)try{
  if(argc==3&&std::string_view(argv[1])=="--sculpt-fixture"){Document d;d.seed();d.save(argv[2]);return 0;}
  if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
- if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--xr-fixture")){auto scene=fixture();if(std::string_view(argv[1])=="--xr-fixture")scene.active().transform.scale=.35f;scene.save(argv[2]);return 0;}
+ if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--xr-fixture")){auto scene=std::getenv("DOME_POLYGON_ADMISSION")?admission_fixture():fixture();if(std::string_view(argv[1])=="--xr-fixture")scene.active().transform.scale=.35f;scene.save(argv[2]);return 0;}
+ {
+  Document tools;tools.replace(admission_fixture());
+  check(tools.wait_mesh(),"Admission fixture publishes the actual prepared target and rigged reference");
+  const auto before=tools.copy_scene().encode();
+  auto available=[&]{auto s=tools.frame().state;return s->can_bake&&s->can_configure_skin&&s->can_cut&&s->can_retopologize;};
+  auto unavailable=[&]{auto s=tools.frame().state;return !s->can_bake&&!s->can_clear_bake&&!s->can_configure_skin&&!s->can_bind_skin&&!s->can_cut&&!s->can_retopologize;};
+  check(available(),"A prepared target with a real rigged reference exposes eligible mesh operations");
+  tools.begin_polygon();check(tools.wait_polygon(),"Polygon admission workspace becomes ready");
+  check(unavailable(),"Polygon workspace disables conflicting bake, skin, cut and retopology capabilities");
+  check(refuses([&]{tools.begin_cut();})&&refuses([&]{tools.begin_retopology();})&&
+        refuses([&]{tools.bake_from_object(2);})&&tools.copy_scene().encode()==before,
+        "Disabled polygon-context operations also refuse without mutating the original Scene");
+  tools.end_polygon(false);check(available(),"Cancelling polygon editing restores the eligible operations");
+  tools.begin_cut();check(tools.wait_cut(),"Plane-cut admission workspace becomes ready");
+  check(unavailable(),"Plane-cut workspace keeps unrelated asset capabilities unavailable");
+  tools.end_cut(false);check(available(),"Cancelling the cut restores the eligible operations");
+  tools.begin_retopology();check(tools.wait_retopology(),"Retopology admission workspace becomes ready");
+  check(unavailable(),"Retopology workspace keeps unrelated asset capabilities unavailable");
+  tools.end_retopology(false);check(available(),"Cancelling retopology restores the eligible operations");
+  tools.begin_uv();check(bool(tools.frame().state->uv),"Actual native UV editor opens on the prepared target");
+  check(unavailable(),"UV workspace keeps conflicting asset capabilities unavailable");
+  tools.end_uv(false);check(available()&&tools.copy_scene().encode()==before,
+        "Cancelling UV editing restores capabilities and preserves complete Scene/history");
+ }
  auto directory=std::filesystem::temp_directory_path()/("dome-polygon-doc-"+std::to_string(getpid()));std::filesystem::create_directories(directory);
  Document d;d.replace(fixture());check(d.wait_mesh(),"Committed source surface is ready");auto original=d.copy_scene().encode();auto initial=d.frame().state;
  d.begin_polygon();ready(d);check(d.frame().state->polygon->topology->faces().size()==6,"Native workspace retains six real quads instead of its twelve display triangles");
