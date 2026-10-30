@@ -1,10 +1,15 @@
 # Current DomeD toolkit and conventions
 
-The combined authoring checkout uses the canonical 282467e pin in
-third_party/sources.json and the locally rebuilt artifacts/toolkit-authoring
-prefix. Start with the final “Combined bake/authoring checkout” section and the
-build command in AGENTS.md. The earlier prefix observations below are historical
-evidence; they are not a request to select the older local toolkit.
+The current combined local-meshing/GPU/plane-cut integration uses canonical DomeD
+`282467e727df78c8e7f2452aa05a7747bac854a6`, rechecked against remote HEAD on
+2026-10-30. This workstation rebuilt its22 patches as optimized FLTK1.4.5 under
+`artifacts/toolkit-282467e`; its libraries are in **lib64**. Configure with
+`-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/share/fltk` and
+prepend that prefix's lib64 to LD_LIBRARY_PATH. Explicit `ldd` confirms all three
+FLTK libraries resolve there. See AGENTS.md and VALIDATION.md. Older prefixes,
+including toolkit-authoring/lib from a separate environment, are historical
+evidence below and must not override this current selection. No active session
+or installed toolkit was replaced or restarted.
 
 Current source checked 2026-10-29 against DomeD main
 `282467e727df78c8e7f2452aa05a7747bac854a6`. Earlier builds used

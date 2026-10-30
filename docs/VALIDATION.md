@@ -1,154 +1,149 @@
-# Combined cut and sculpt protection verification — 2026-10-30
+# Authenticated local meshing/GPU/plane-cut verification — 2026-10-30
 
-Application source 4755e62665c55ea6f70aa4cfda04b6c657f951d5 merges feature 55dafa0 /
-source 2ec8a5a with main 9a0cfc4 / source 20c132d. Harness-only3e602ae adds the
-canonical90s cold-BDF startup allowance; it does not alter product source or
-interaction/publication assertions. All 182 product hashes match 4755e62 in
-artifacts/cut-sculpt-product-freeze.json. Later handoff edits are documentation.
-The full production objective remains incomplete. Prior proof is preserved
-separately in VALIDATION-55dafa0.md and VALIDATION-9a0cfc4.md.
+Application source `cf89a81c45d36c1ed538a3f24bbab56869d25e2f` combines source
+`42b2ff3` and remote `a8af3f8` with both histories retained. Test-only `91ceb04`
+changes two cut-fixture offsets; test-only `8b8dc60` adds native Unicode input
+acknowledgement. Product code/headers remain identical to cf89a81. The full
+production goal remains incomplete. Exact incoming proof is archived in
+VALIDATION-a8af3f8.md, with prior scopes retained in their original archives.
 
-Builds/artifacts are ignored local evidence and do not accompany a fresh clone.
-Logs below are under artifacts/ unless stated otherwise.
+Local logs and ignored binary/source/report manifest:
+`artifacts/local-cut-gpu-final-manifest-8b8dc60.json`. They do not accompany a
+fresh clone. The branch worktree is artifacts/local-cut-gpu-integration; logs
+listed below are in the parent artifacts directory. Native CPU build, full
+OneAPI build and whole-core sanitizer build use separate coherent directories.
 
-## Release and real-loader XR
+## Toolchain and source identity
 
-All 76 registered Release suites pass across two terminal runs at the same product
-source:75 non-XR CTests in 625.60s, then openxr-client in 372.17s. Logs:
-tests-cut-sculpt-native.log / -native-detail.log / -native-output.log and
-tests-cut-sculpt-xr.log / -xr-detail.log / -xr-output.log.
+- Current DomeD HEAD rechecked2026-10-30:
+  282467e727df78c8e7f2452aa05a7747bac854a6. Its canonical22 patches build optimized
+  FLTK1.4.5 at artifacts/toolkit-282467e/**lib64**. CMake uses explicit FLTK_DIR
+  ending share/fltk. Saved ldd reports verify all three FLTK libraries there;
+  no Qt/GTK/Pango frontend library or unresolved dependency is linked.
+- Local CPU Intel i7-12700, GCC16.2.1; Release uses-O3/-DNDEBUG. OneAPI uses the
+  pinned official DPC++7.2 compiler5680988bb38bd45f13081394fba43588c5f5e395 and
+  archive385586a25e75ac727883f0be5e442dec0ee81b3c20f9a29037a79921ad2f1728.
+  Existing separate libumf compatibility/provenance is unchanged. Runtime uses
+  ONEAPI_DEVICE_SELECTOR=level_zero:0 and actual Arc A770; no CPU substitution.
+- Whole-core C/C++ sanitizer archives and renderer/test consumers were rebuilt
+  coherently with-O1/-g1/ASan/UBSan/frame-pointers, leak detection and halt-on-error.
+  UI is disabled for this build; direct native EGL render consumers are included.
+  An initial target-list typo stopped after existing targets; the follow-up
+  completed the correctly named mask/render/native targets before testing.
 
-The final real-loader report build-cut-sculpt/xr-client/report.json has 150 checks,
-failed=0, complete=true, status=passed; copied to report-cut-sculpt-xr.json. It
-retains upstream 140 and the 10 cut checks. The per-client40-second bound is
-unchanged. Actual GL availability drives asynchronous cut/mask readiness; tests
-use joystick, ray sliders and pressure, then inspect native geometry/source data.
-Cut Apply yields a closed grouped shell/cap at independently expected
-x=0.06928203m; unconfirmed standalone shutdown preserves the exact original.
-Masks include mirrored pressure positions, four-row origins/view, focus/Cancel,
-bulk publication/reopening and exact Undo. Existing input, UV, bake, skin,
-retopology, stereo/resource/rebase and save/shutdown coverage remains.
+## CPU Release and synthetic XR
 
-Tracking and graphics are synthetic/software in that harness. This is not
-physical HMD/controller/stylus, reconnect or production performance proof.
+All80 non-XR native suites pass in484.25s (serial run alongside other isolated
+validation). Log tests-local-cut-gpu-native.log and retained-detail.log. This is
+regression-suite wall time, not a stroke/frame performance measurement. It
+includes cut authoring/cancellation, source paint/bake/UV/material/skin/morph/VRM,
+scene/Volume compatibility, exact allocation-failure transactions, six-worker
+shutdown, local extraction/journal ownership, tiny geometry and actual GL checks.
 
-Cut-authoring now has 68 assertions. New cases cover exact protected Volume v3 /
-symmetry retention, ordinary cap sentinels, source-edit isolation, cancellation,
-white paint unaffected by the display overlay, new-output overlay cleanup and
-Undo. Mask-only fields are excluded from cut/retopo/voxel/bake geometry choices.
-The original nearby-surface provenance, mapped paint/channels, pose/group,
-invalid/stale/no-op, native/glTF and controller ownership cases remain. Independent
-mask regressions require exact constant samples, finite-position rejection,
-constant sparse cells and a known affine field. Eight focused suites pass 2.62s
-before the final broad runs: tests-cut-sculpt-refined.log.
+CPU real-loader synthetic report build/xr-local-cut-gpu/report.json passes
+150/150, complete=true, status=passed, failed=0; log tests-local-cut-gpu-xr.log.
+It retains all140 earlier checks and10 cut checks. Tracking is synthetic and
+EGL uses llvmpipe, while real GL textures/eye ownership, joystick/ray/pressure,
+focus/rebase/restart, accepted/unconfirmed shutdown, cancellation/source identity
+and native saved geometry are exercised. Original per-client40s limits remain.
+No physical HMD/controller/stylus/device performance claim follows.
+
+## Actual Arc OneAPI and rendering
+
+Fresh complete native FLTK/OpenXR OneAPI build passes17 selected native suites
+in7.80s. Logs tests-local-cut-gpu-oneapi-native.log and -native-detail.log. Exact
+selected suites are recorded in the log, including actual sculpt/controller/
+mask kernels, local surfaces, cuts, file/geometry/shutdown regressions and the
+explicit missing-GPU failure. The compute oracle reports actual Intel Arc A770,
+184 independent endpoints,224 CPU-reference batches/445088 samples, maximum
+error8.9407e-08, bounded2M chunk/concurrency and no silent CPU fallback.
+
+The complete OneAPI real-loader run also passes150/150, complete=true/failed=0:
+build-oneapi/xr-local-cut-gpu/report.json and tests-local-cut-gpu-oneapi-xr.log.
+Its tracking/GL transport is synthetic/software, while eligible brush computation
+executes on Arc. This distinction is preserved in the manifest.
+
+Separate direct EGL fixtures require hardware and print actual Mesa Intel Arc
+A770/DG2. They all pass:
+
+| Fixture | Assertions | Log suffix after tests-local-cut-gpu-oneapi- |
+| --- | ---: | --- |
+| Actual Document → GL buffers |22| document-arc.log |
+| Buffer traffic/UV1/cache/error recovery |24| buffers-arc.log |
+| PBR/MToon/linear/outline/clipping |81| mtoon-arc.log |
+| Protection/mirrors/scalar overlay |38| masks-arc.log |
+| Material visibility/picking |25| visibility-arc.log |
+
+The actual Document fixture wraps real glBufferData and checks independent
+pixels. Mask/material/texture-only edits retain geometry, a real local Carve
+invalidates it, object transforms reuse extraction but update world buffers,
+cap geometry gets a unique key, the second eye reuses it, cap-free planes update
+uniforms without geometry uploads and Cancel restores exact pixels/source/key.
+Scalar streams still upload on changed snapshots; geometry edits still upload
+complete arrays. No per-tile GPU, frame-rate or production completion claim.
 
 ## Whole-core sanitizers
 
-All 23 selected C/C++ ASan/UBSan/leak suites pass in 320.94s, zero failures:
-sculpt geometry/layers, shared document, durable/document recovery, document
-assets, project files, scene compatibility, shutdown; mask controller/document/
-symmetry/dispatch/transactions; retopology authoring/cancellation; cut authoring/
-cancellation; skin authoring, bake, glTF interoperability, atlas robustness and
-SourceUV adoption. Logs: tests-cut-sculpt-sanitize.log, -sanitize-detail.log and
--sanitize-output.log; build-cut-sculpt-sanitize.log.
+24/24 pass345.57s with ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1. Logs
+build-local-cut-gpu-sanitize.log, -sanitize-render.log,
+tests-local-cut-gpu-sanitize.log and -sanitize-detail.log. The first build log's
+unknown target is the corrected invocation typo described above, not a passing
+build claim. All archives/tests in the executed set match current headers/core.
 
-build-sanitize has UI/XR OFF. Core C/C++, native Mikk and xatlas are instrumented
-with -fsanitize=address,undefined and frame pointers; Release uses-O1 -g1 -DNDEBUG.
-Runs set ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
-UBSAN_OPTIONS=halt_on_error=1. All affected layout consumers were rebuilt.
-No TSAN or new accelerator execution is claimed.
+Coverage: cut-authoring/cancellation-boundaries, controller-controls,
+texture-painting, scene-authoring, shared-document, mesh-degeneracy, all five
+mask/controller/document/symmetry/dispatch/transaction tests, sculpt-geometry,
+sculpt-layers, bake, scene-schema-compat, six-worker shutdown, local-surface,
+authenticated-local-surface, actual Document buffers, renderer buffers, mask
+renderer, MToon renderer and visibility/picking. The ordered asset cancellation
+barrier and real allocation-failure/rollback cases remain active.
 
-The deterministic shutdown fixture includes all six workers. fsync barriers
-exercise accepted cut/retopo cancellation and retry without arbitrary race sleeps
-or partial publication. The instrumented mask fixture retains preparation/
-post-compute allocation failures and allocation-free rollback assertions.
+## Native GUI and actual DomeD compositor
 
-## Native FLTK and BDF
+All125 assertions pass across private buses/displays/projects; no active session
+was restarted. Normal/compact cut screenshots were inspected. Logs:
 
-All 125 GUI checks pass. Every process exits0 and each report has failed 0:
-
-| Flow | Checks | Log prefix menu-cut-sculpt- |
+| Workflow | Assertions | Log suffix after tests-local-cut-gpu- |
 | --- | ---: | --- |
-| Masks/symmetry | 17 | mask.log |
-| Masks, compact2× BDF | 5 | mask-compact.log |
-| Plane cut | 12 | cut.log |
-| Plane cut, compact2× BDF | 6 | cut-compact.log |
-| Retopology | 12 | retopo.log |
-| Retopology, compact2× BDF | 6 | retopo-compact.log |
-| General menus | 53 | general.log |
-| Skin | 11 | skin.log |
-| Unicode | 3 | unicode.log |
+| General FLTK/universal menu |53| menu-final.log |
+| Native cut workspace |12| cut-menu.log |
+| Compact640×360/2×BDF cut controls |6| cut-compact.log |
+| Mask/symmetry/worker/history |17| mask-menu.log |
+| Compact mask controls |5| mask-compact.log |
+| Native skin/bind/transfer |11| skin-menu.log |
+| Unicode keyboard/clipboard/save/history |4| unicode-acknowledged.log |
+| Actual DomeD Wayland mask menu |9| mask-wayland.log |
+| Actual DomeD Wayland/menu/history |8| wayland.log |
 
-Scripts were copied unchanged to artifacts/cut-sculpt-ui/tests and its build
-symlink targets build-cut-sculpt, not an older executable. Reports/captures are
-under artifacts/cut-sculpt-ui/artifacts. Optional uv orchestration uses dbus-next,
-python-xlib and pillow with private HOME/bus/Xvfb. Runtime remains native C++.
-The mask harness now matches the existing90s cold startup allowance; interactions
-keep 30s. Actual exported availability/check/radio state, modal ownership,
-Cancel-default/Close/Ctrl+W, text/UV/draft/global history, chooser callbacks,
-host loss/return, pressure feedback, publication and retained data are exercised.
+Optional Python orchestration uses cached uv environments with dbus-next,
+python-xlib and Pillow; these are not product runtime dependencies. The actual
+DomeD compositor is the local canonical282467e release. GVFS/private-bus teardown
+messages do not replace assertions or process status; both compositor commands
+exit0 and reports pass. General menu behavior retains shell-owned Window actions,
+Ctrl+W modal cancellation, native appearance/BDF and application identity.
 
-Visually inspected current mask-options.png and mask-options-end.png at 600x320
-with 2× BDF: readable wrapped text, scrollable content and fixed Cancel/Apply without
-overlap. painted-protection.png shows actual pressure feedback on retained
-geometry. Compact cut controls and retopo/skin/menu reports retain their complete
-independent assertions. No new actual DomeD Wayland-host run is claimed; its
-older9+8 checks remain scoped to source 20c132d in the archived validation.
+An initial system-python invocation lacked optional dbus-next and stopped before
+GUI startup. After using the existing cached environment, an initial Unicode run
+saved one missing injected character. Inspection showed the temporary keymap was
+restored after XSync, which acknowledges only the server. An unchanged isolated
+run passed; the strengthened fixture retains the map until the actual native
+UTF-8 clipboard returns every expected character. It passes4 checks, including
+the original exact model/clipboard/history/save assertions. Earlier failure and
+isolated logs are retained; no product Unicode code or expected bytes were relaxed.
 
-All 30 source_sha256 entries match third_party/sources.json and the BDF helper
-matches canonical ../qimgvr/fltk/bdf_font.hpp. Actual linkage in
-linkage-cut-sculpt.log resolves artifacts/toolkit-authoring/lib FLTK with no
-Qt/GTK/Pango frontend. Canonical toolkit 282467e / 22 patches is unchanged.
+## Earlier performance and physical scope
 
-## Actual Intel graphics
+Pre-cut42b2ff3 has its own immutable manifest
+artifacts/local-gpu-final-manifest-42b2ff3.json:78 native/CPU140/Arc140/Arc15native,
+Document15/buffer24 and nativeGUI/compositor evidence. Authenticated producer886
+has separate21-suite whole-core sanitizer proof and actual24-edit API-to-ready
+measurements in AUTHENTICATED-LOCAL-MESHING.md. Those timings compare against
+extraction-only oracles, not a baseline Document/GPU frame time, and do not apply
+as production guarantees to this combined source.
 
-Three additional processes pass with LIBGL_ALWAYS_SOFTWARE=0 on
-Mesa Intel(R) Graphics (ADL-N). MToon 81 and protection/mirror 38 checks pass their
---hardware guards, which reject llvmpipe/softpipe. The complete spatial render
-fixture passes, including actual clipped plane/cap/menu, cached retopo transforms,
-BDF palette, canonical normals and AO. Logs:
-tests-cut-sculpt-hardware-{mtoon,mask,spatial}.log. Captures:
-gpu-cut-sculpt-hardware-*.ppm. This proves local OpenGL rendering, not Arc/ONEAPI
-compute or physical XR input/tracking.
-
-## Diagnostics and limits
-
-Initial build-cut-sculpt.log completes; the first five focused suites pass 4/5.
-The added exact protected-cut oracle exposed real uniform-mask drift:
-cut-mask-probe.log records 0.7499998212..0.7500000596 for global 0.75, exact -1 caps
-and matching attribute counts. No assertion was loosened. Nested interpolation
-plus the validated uniform shortcut correct the math. An intermediate compile
-used CowMap::empty, which is absent; supported size()==0 corrects the mistake.
-build-cut-sculpt-refined.log retains that failure, refined2.log is successful.
-GCC15's unchanged write_glb vector-path warning remains in the initial full build;
-current sanitizer glTF/authoring cases pass, with no new warning in edited code.
-
-Initial mask GUI launches used an incorrect compact environment flag, both chose
-normal flow/output, and timed out at 30s before window discovery. Their logs are
-menu-cut-sculpt-mask-initial.log / mask-compact-initial.log, with the raced output
-preserved as menu-sculpt-mask-misconfigured. Correct flag
-DOME_SCULPT_MASK_COMPACT=1 selects the independent compact flow; only cold startup
-was aligned to the existing90s budget. Final 17+5 checks preserve all data oracles.
-
-The first full XR attempt, concurrent with sanitizer/hardware checks, completed
-102 checks without assertion failures but timed out its cut client after 40s.
-Its incremental report had56 completed frames, enabled preview/Apply and a real
-slider sample; no worker deadlock was inferred. The timed-out process was
-confirmed terminal before retry. Failed logs/details/output and all reports are
-preserved as tests-cut-sculpt-xr*-concurrent-failed* and
-artifacts/xr-cut-sculpt-concurrent-failed. The final complete isolated replay
-passes 150 with the same40-second deadline and unchanged product/oracles.
-This comparison does not replace profiling or certify cold/software latency.
-
-Cuts remain active-object operations. Group-wide repeated cuts, general Booleans,
-stronger contours, source compaction/GPU caching, durable recipes, quality,
-complete material/skin/morph transfer and draft recovery remain unfinished.
-Static output uses 512-pixel PBR atlases while originals retain their full data.
-Production local meshing/storage/resolution and every remaining REQUIREMENTS row
-stay open; no complete Divine Cut or full application claim follows here.
-
-All build/test/app handles were checked terminal; final inventory found none.
-No system installation, session restart, fresh external Khronos validation,
-physical XR/input-device or new OneAPI/ROCm/CUDA execution occurred. No local
-icpx/sycl-ls/hipcc/nvcc was found in PATH, standard prefixes or local tool/artifact
-roots. Prior Arc/ONEAPI/HIP results remain scoped to their archived sources.
+Only8f4d67d has the user's rudimentary physical WiVRn confirmation. That test was
+ended and recovery snapshots/report retained. No new physical test, installation,
+session/display-manager restart, AMD/CUDA execution or full production completion
+is claimed. Remaining requirements, private branches and bottlenecks are explicit
+in HANDOFF.md and REQUIREMENTS.md.

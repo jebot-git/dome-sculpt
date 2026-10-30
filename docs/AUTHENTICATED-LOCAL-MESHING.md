@@ -1,5 +1,12 @@
 # Authenticated local meshing and geometry identity
 
+The producer and GPU consumer are combined with six-worker native plane-cut
+authoring in `cf89a81` (test-only follow-up `91ceb04`). The implementation and
+proof below describe its earlier pinned foundation; current combined checks are
+in [VALIDATION.md](VALIDATION.md). Whole-map stamp/history copies, complete
+packed-array assembly and geometric-edit VBO replacement remain open production
+bottlenecks. Paged storage and resolution controls are separate ongoing branches.
+
 This private follow-up combines `37e38c7` local extraction with the complete
 `20c132d` mask/symmetry, 24-byte Sample and five-worker Document milestone.
 The merge checkpoint is `092dd8a`; no shared primary files or installations were

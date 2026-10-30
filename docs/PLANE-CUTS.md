@@ -124,3 +124,13 @@ remain editable in the retained source. Unconfirmed workspace recovery and
 production-size latency/memory need further work. Physical controllers/stylus,
 headsets and real accelerator execution remain distinct verification requirements.
 The complete goal remains in REQUIREMENTS.md.
+
+## Immutable GPU geometry dependency
+
+In combined `cf89a81`, cap previews own unique immutable packed-geometry tokens.
+Appending cap vertices/indices must not inherit the source field/mesh token.
+Clip-only previews retain the source token and update uniforms; a new capped
+plane must refresh geometry even when vertex/index counts happen to match.
+Cap protection values remain the ordinary -1 sentinel, and source scalar values
+and scene data remain immutable. The actual Document-to-GL regression and
+combined validation are described in GPU-BUFFER-REUSE.md and VALIDATION.md.

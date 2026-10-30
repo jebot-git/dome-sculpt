@@ -64,3 +64,26 @@ No full-workflow/device/frame-rate or complete local-meshing claim follows.
 Document still flattens/copies complete packed arrays; geometric edits still
 replace the whole geometry buffer. Authenticated local extraction is integrated in the private CPU adapter. Bounded
 tile assembly/seam ownership and incremental per-tile GPU updates remain required.
+
+## Combined application and plane cuts
+
+Application source `cf89a81`, followed by test-only `91ceb04`, preserves remote
+`a8af3f8` plane cuts and the authenticated producer. A cap preview owns a distinct
+immutable geometry identity because appended cap vertices/indices differ from
+the original source. Each changed capped plane gets a new owner; both eyes of
+one immutable preview reuse it. A cap-free preview retains the source identity
+and changes clipping uniforms. Cancel restores the original snapshot and key.
+
+The actual Document-to-GL fixture now passes22 software assertions: original
+mask/material/paint/geometry/transform cases plus cap ownership, original mask
+and cap sentinel preservation, second-eye reuse, changed-cap uploads, cap-free
+uniform-only changes and exact cancellation pixels. The fixture deliberately
+uses planes clear of source vertices; vertex-touching contours remain explicitly
+unsupported by the cut kernel. Combined hardware, full native/GUI/XR and whole-
+core sanitizer results are recorded separately in VALIDATION.md after completion.
+
+The pre-cut `42b2ff3` source passed78 native suites, CPU and actual-Arc OneAPI
+140-check synthetic XR runs,15 Arc native suites,15 actual Document/GL and24
+buffer assertions, plus native menu/compositor workflows. Its immutable evidence
+is in artifacts/local-gpu-final-manifest-42b2ff3.json. These are prior pinned
+results, not substitutes for the combined cut checks.
