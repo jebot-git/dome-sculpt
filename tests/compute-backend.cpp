@@ -12,6 +12,9 @@
 #ifdef DOME_TEST_SYCL
 #include <sycl/sycl.hpp>
 #endif
+#ifdef DOME_TEST_CUDA
+#include <cuda_runtime_api.h>
+#endif
 namespace dome { void dome_reference_apply_brush(std::span<Sample>,const Brush &); }
 using namespace dome;
 namespace {
@@ -33,8 +36,24 @@ int main(int argc,char **argv) try {
       std::cout<<"PASS missing GPU fails explicitly and retains host samples: "<<error.what()<<'\n';return 0;
     }
     throw std::runtime_error("GPU backend silently succeeded without an eligible GPU");
+#elif defined(DOME_TEST_CUDA)
+    int devices = 0;
+    auto status = cudaGetDeviceCount(&devices);
+    check(status == cudaErrorInsufficientDriver || status == cudaErrorNoDevice ||
+          (status == cudaSuccess && devices == 0),
+          "Missing-GPU fixture still has an eligible CUDA device or an unexpected runtime error");
+    std::cout << "CUDA availability probe: " << cudaGetErrorString(status)
+              << "; visible devices=" << devices << '\n';
+    std::vector<Sample> values{{{0,0,0},.04f,-.02f}}; auto before=values;
+    try { apply_brush(values,Brush{}); }
+    catch (const std::exception &error) {
+      check(identical(values,before),"Unavailable CUDA GPU partially changed host samples");
+      std::cout << "PASS missing CUDA GPU fails explicitly and retains host samples: "
+                << error.what() << '\n'; return 0;
+    }
+    throw std::runtime_error("CUDA backend silently succeeded without an eligible GPU");
 #else
-    throw std::runtime_error("Missing-GPU check requires the SYCL test build");
+    throw std::runtime_error("Missing-GPU check requires a qualified GPU test build");
 #endif
   }
 #ifdef DOME_TEST_SYCL
@@ -42,6 +61,15 @@ int main(int argc,char **argv) try {
   auto device=selected.get_device();check(device.is_gpu(),"SYCL selected a CPU fallback");
   std::cout<<"Actual eligible GPU: "<<device.get_info<sycl::info::device::name>()
            <<" / "<<device.get_info<sycl::info::device::vendor>()<<'\n';
+#endif
+#ifdef DOME_TEST_CUDA
+  int device_index = 0; cudaDeviceProp device{};
+  auto device_status = cudaGetDevice(&device_index);
+  check(device_status == cudaSuccess, cudaGetErrorString(device_status));
+  device_status = cudaGetDeviceProperties(&device, device_index);
+  check(device_status == cudaSuccess, cudaGetErrorString(device_status));
+  std::cout << "Actual eligible GPU: " << device.name << " / CUDA compute "
+            << device.major << '.' << device.minor << '\n';
 #endif
   Brush brush;brush.from=brush.to={};brush.radius=.1f;brush.band=.2f;
   brush.pressure=brush.strength=1;brush.blend=0;brush.normal={0,1,0};
