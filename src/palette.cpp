@@ -263,6 +263,7 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::ProceduralSeed)label="Seed "+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::ProceduralDepth){char text[64];snprintf(text,sizeof(text),"Depth %.4g world mm",double(value));label=text;}
       else if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
+      else if(c.parameter==VrParameter::ShapeRestore)label=value>=.5f?"Restore complete original state":"Cancel (default)";
       else if(c.parameter==VrParameter::PolygonConversion)label=value>=1.5f?"Restore retained original source":value>=.5f?(s.polygon_requires_conversion?"Convert visible shape / retain source":"Edit current native polygons"):"Cancel (default)";
       else if(c.parameter==VrParameter::PolygonDistance){char size[64];snprintf(size,sizeof(size),"Distance %.6g world mm",double(value));label=size;}
       else if(c.parameter==VrParameter::PolygonCuts)label="Cuts "+std::to_string(int(std::lround(value)));
@@ -453,11 +454,11 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
+  if (s.menu_page != 24 && s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -473,6 +474,11 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==24){
+    const auto *keys=s.deformation&&s.deformation->morphs?&*s.deformation->morphs:nullptr;
+    text(320*unit_,280*unit_,keys&&!keys->targets.empty()?keys->targets.at(std::min(s.morph_target,keys->targets.size()-1)).name:"Create a shape target",fg);
+    text(320*unit_,312*unit_,s.asset_busy?"Authoring / Cancel work":s.shape_sculpt?"Sculpt target; pose and other keys retained":std::to_string(keys?keys->targets.size():0)+" targets; original retained",fg);
+  }
   if(s.menu_page==19||s.menu_page==22){
     auto p=s.polygon;
     text(320*unit_,280*unit_,!p?(s.polygon_requires_conversion?"Explicit conversion; original retained":"Start native N-gon editing"):p->committing?"Applying topology + captured pose...":p->busy?"Updating components...":std::to_string(p->selection?p->selection->ids.size():0)+" selected / "+std::to_string(p->topology?p->topology->faces().size():0)+" faces",fg);

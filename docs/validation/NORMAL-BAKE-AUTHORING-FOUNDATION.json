@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "parent": "f0fbbbc9739cc66c67bcb201e62cacb88d37616f",
+  "scope": "Detached private helpers only; no Scene15/render/bake/export/UI adoption",
+  "source": {
+    "CMakeLists.txt": "984963f09c76880bdc836d3ee02dbbd776cbf90c216ffa90e8d7f8376a6a50f0",
+    "src/normal-bake-frames.hpp": "294203120ad74b309b3f142cfc968d73889428d0c4a7ff193c15c5cdeb8c5b40",
+    "src/normal-bake-frames.cpp": "b64fd6a0a112a3c9f3efc972c5f69ef3af39c653ff81f87689c51abcf915a39a",
+    "src/normal-bake-encoding.hpp": "c3dfb163c63100598d80c25836a757de742f3a93ce6a4045ab5e32309f8ce170",
+    "tests/normal-bake-frames.cpp": "e0bfee1b36c01c239b6ebcab87ccd5a3f7975f12d4cf18d1d1848f5e56bdfaf9",
+    "tests/normal-bake-encoding.cpp": "a93e5bb172f265c18a9affe04d0619d6e9356e0e3207149e6e6785e69662affa",
+    "docs/NORMAL-BAKE-AUTHORING-FOUNDATION.md": "e9b87e4fd360ba7e51f618d95e77fd313df011cdc8d6afafb7290edd18cc997e"
+  },
+  "dependencies": {
+    "include/dome/avatar.hpp": "1850232616222ecc48d73f281bb3160afbfa0a15a30cd6b6444d779fed7f1866",
+    "include/dome/brush.hpp": "60b61ab21cae66c2a5fdf560c610c1b9a0ba600953d44baa90a97ef8dfc4aac1",
+    "include/dome/cow-map.hpp": "313ed0271bd68475b309518aca3d66ecb583936eba4f134211dfcda38cbd98d2",
+    "include/dome/deformation.hpp": "21cfc5c2baec53ee57940586c2e2b85cf3c3e027ffb4cfb366e577a6bd5bcc49",
+    "include/dome/humanoid-creator.hpp": "5d834229fc4a8f824e52f22db56d9bf833608e35ee5f240d6eab9eb33d838d1a",
+    "include/dome/import.hpp": "455e15db69a1c02df31812666e33af0f1738574d131a6cc1b57bed27b442b46a",
+    "include/dome/material-bindings.hpp": "43d34af1264a79ccf1fd3de5618e9e6364e2627221a0eca0b3f9c29a55f24843",
+    "include/dome/math.hpp": "838e53b6c6c3881b3b73ea93bb680be268947a5b28b6e4657771e43b1f1d1f3f",
+    "include/dome/mesh.hpp": "c4d9196f4d6c8a817da71b7849a44196f5f317ad05da59cb5efae1ccb932fd5f",
+    "include/dome/mtoon.hpp": "d452ce2a3615de38b918bb0fbd63d103f5e016d47db71ea1c474871e7d4c430d",
+    "include/dome/normal-frames.hpp": "1c9b22240da185c11fc5babce936a9127dc67eec028e6a9a09ebb730ab87edb9",
+    "include/dome/paint.hpp": "487c1b1608fece4471ded41e7c4ed5f900df9a248aa5c9e4e4a91596a75a4a6d",
+    "include/dome/rig.hpp": "b26516a736519420990cfa125311286751c5f2f89a4043314f519325ccd2f77f",
+    "include/dome/sculpt-storage.hpp": "33c6f86d8d4ef6d5d3be560da2ccbeca9ded02491c1045213479ce056dc7d9bc",
+    "include/dome/source-maps.hpp": "80d22b6ec8709b0adcbb7d9eb70024d0c581a231b6f28c836bd2fef92710a4b4",
+    "include/dome/tangents.hpp": "94a6ff78b1ed0c27aa3e5da8b2991fc1e69a91aab43738a19dd3efc6ac25b1d4",
+    "include/dome/volume.hpp": "27d97b346073f815f5228d62e86fe49f9f523891d60d89bb567d79c8b783cab7",
+    "src/normal-bake-encoding.hpp": "c3dfb163c63100598d80c25836a757de742f3a93ce6a4045ab5e32309f8ce170",
+    "src/normal-bake-frames.cpp": "b64fd6a0a112a3c9f3efc972c5f69ef3af39c653ff81f87689c51abcf915a39a",
+    "src/normal-bake-frames.hpp": "294203120ad74b309b3f142cfc968d73889428d0c4a7ff193c15c5cdeb8c5b40",
+    "src/normal-frame-runtime.hpp": "d957ae22ba0ef5fc77d5f4ed3c4eeaee940ed9bb8bcbdd38396fa6bb2c67aa71",
+    "src/source-flat-normals.hpp": "6092f67dd59afdc69e51c29f60bc078d0ad7dc37ebfc03ab5a776b5bea751dc3",
+    "src/source-frame-skin.hpp": "2cde6ec0b76a40bef1147f8549274d6a7ebf8d20eb2a5cb48ede1fc1363f6925",
+    "src/source-tangent-frames.hpp": "d836e397355b9d1425d4365a60c6613863cf3b1dadaf261bb44afcdf33874b39",
+    "tests/normal-bake-encoding.cpp": "a93e5bb172f265c18a9affe04d0619d6e9356e0e3207149e6e6785e69662affa",
+    "tests/normal-bake-frames.cpp": "e0bfee1b36c01c239b6ebcab87ccd5a3f7975f12d4cf18d1d1848f5e56bdfaf9",
+    "third_party/nlohmann/nlohmann/json.hpp": "d271a2726129eefecfaec4b58e42c2a798430b8cca6844cd876d0f0555b7aef2",
+    "third_party/nlohmann/nlohmann/json_fwd.hpp": "fb6aa70cbece087f37ab4685c182b287c53be54f785f981b9db9d30d2d028b37"
+  },
+  "untracked_dependencies": [],
+  "artifacts": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/original-normal-bake-a5ef/build-prototype/normal-bake-frames": "9aa3d61e264fd1292ea78ae4b2ba5575494a1fbfa5cc3ad3c9f831c963cf49f8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/original-normal-bake-a5ef/build-prototype/normal-bake-frames-sanitize": "fdce8aae80325130cad157a5e57459564df6c221ac6b23b2dab8f5f32594631c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/original-normal-bake-a5ef/build-prototype/normal-bake-encoding": "43699b12c452b62431ad542f942731fb48df88cea9274f7b1bcc3307e03f94bb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/original-normal-bake-a5ef/build-prototype/normal-bake-encoding-sanitize": "5e717f5140efdedf588bbc0ccfa99887d65b20ff138bb5bccb5a1102b41a81d8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/original-normal-bake-a5ef/build-prototype/normal-bake-frames.map": "49fdfa87b911011ccec3e687313ecdc6c1fba3541ed8de1e88b47d46d1bb268e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/original-normal-bake-a5ef/build-prototype/normal-bake-frames-sanitize.map": "fc76d7da3871ad5fc050cd522ddb3e51f97ba44a54efe05ea6a8c43097c8c26e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/original-normal-bake-a5ef/build-prototype/normal-bake-dependencies.d": "7b01921d6d12038013c228e4e4a2b8ea794936c8fcb3c03dd0f681c4de2c970b"
+  },
+  "logs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-bake-a5-frames-native.log": "75926a39899a53c2c8d07001a65cb3fe95c569e5c05658b780aed6b01d52e793",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-bake-a5-frames-sanitize.log": "75926a39899a53c2c8d07001a65cb3fe95c569e5c05658b780aed6b01d52e793",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-bake-a5-encoding-native.log": "49b009876da79f2ded9a7f43018aa5ad49b9bc8ac4d47dabe77e5353a97172ac",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-bake-a5-encoding-sanitize.log": "49b009876da79f2ded9a7f43018aa5ad49b9bc8ac4d47dabe77e5353a97172ac"
+  },
+  "linked_core_archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/production-union-7152/build/libdome-sculpt-core.a": "3ee27c46d77e8b6b8907b80ff0bb1e7539a7773db4b3971fbd26025337e0ebae",
+    "/home/blux/de-xr/dome-sculpt/artifacts/frozen-union-84-sanitize-core/libdome-sculpt-core.a": "6dd1b1fab1bb0c403e13e013735bd281d86589198273d0a4c639c50594e0df4e"
+  },
+  "completed": {
+    "native_frame_assertions": 26,
+    "focused_instrumented_frame_assertions": 26,
+    "native_encoding_assertions": 16,
+    "instrumented_encoding_assertions": 16
+  },
+  "not_claimed": [
+    "fresh whole-current-source sanitizer",
+    "new GPU or independent GLB/VRM pixels",
+    "new UI/controller workflow",
+    "Scene15 archive or bake interpretation"
+  ]
+}

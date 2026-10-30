@@ -33,6 +33,7 @@ struct PolygonOrigin {
   // Scene13 exact placement authority; world_transform remains legacy-only
   // provenance. IDs in the capsule are snapshots, not live hierarchy links.
   std::shared_ptr<const SourcePlacementCapsule> placement{};
+  std::shared_ptr<const PolygonOrigin> shape_source{};
 };
 // Compare the active painted REST derivative only. Posed preview positions and
 // unrelated source attributes must not replace the editable topology authority.

@@ -1,0 +1,31 @@
+# Detached normal/frame authoring foundation
+
+This checkpoint adds reusable private worker helpers, not a new normal-bake product interpretation. Existing bake payloads, Scene versions, renderer policy, export guards, and UI behavior are unchanged. The connected Scene15 conversion/worker/codec/render/export workflow remains required.
+
+## APIs
+
+`normal_bake_frame_candidate(mesh, deformation, binding, options)` returns a detached candidate for an explicitly requested authoring conversion. Generic native geometry mints base normals and Mikk tangents plus a normal/tangent delta for **every** native morph key. Key meshes are evaluated individually at weight1 before skin; current preview weights do not contaminate key creation. A retained full PBR role is reused exactly. An N-only retained role keeps every artist base/target normal and original corner/vertex ID, and newly authors tangent attributes from current native UV0. Inactive targets require captured native POSITION authority; raw source target indices cannot stand in for a nonlinear creator's native key.
+
+The candidate deliberately chooses one PBR/MToon attribute target and removes canonical from the candidate only. This is a proposed **authoring conversion**, not permission to adopt it: the owner must retain the full original binding, paint, appearance, deformation, creator provenance and exact origin lease, and qualify the role-specific texture conversion. Differing original MToon roles, original canonical data, and historical normal pixels must remain in that owning before-state. A rest-only angular receipt does not prove deformation or material parity.
+
+`normal_bake_author_native_target(rest, baseFrame, editedPositions, stableID, options)` emits one newly authored native key: current-vertex POSITION delta and exact ordered-corner N/T deltas. It never edits the supplied base frame or existing target arrays. New native geometric normals are intentional authoring; they are not a restoration of arbitrary artist normal directions. The caller owns stable target registry updates and retains replaced keys/source IDs. Target W cannot change in a standard glTF morph; incompatible handedness is refused.
+
+`normal_bake_target_origin_positions(current, origin, deltas, options)` maps current native vertex POSITION deltas to the captured origin domain by **ordered triangle corners**, checking exact rest positions. Split copies must agree. An unmapped origin vertex is refused rather than silently assigned zero. After UV splitting, do not store a current-vertex array as `FrameTargetIdentity.positions` without this conversion (or another explicit validated whole-origin authoring route). No coordinate matching or averaging is used.
+
+## Integration constraints
+
+Appending/replacing a native morph slot must update the explicit current-slot to stable-ID mapping and every retained material role's N/T target channels in registry order. POSITION-only replacement cannot inherit old artist N/T by name/count. Preserve original imported target IDs separately for expression/VRM remapping. A native-only target must not be assigned a fabricated original source target index. Existing original frames and creator Shape keys remain immutable.
+
+The future Scene15 normal-preparation receipt must be updated/retained atomically with changes to its target frame authority. A prepared-normal receipt must never certify a stale target set after shape-key edits. Until an explicit receipt reauthoring/quality route exists, operations on prepared-normal targets need an actionable guard. Do not relabel historical canonical bakes, bypass original-frame matching, or infer source authority from an Origin pointer alone.
+
+Frame creation stays detached; the caller must recheck cancellation, current object edit authority/source lease and expected revision before publishing one history entry. Neither helper mutates Scene, pose, skin, material, layers, visibility or locks. Per-operation memory/work/corner quotas apply to this explicit retained-frame operation, not ordinary aggregate rendering.
+
+## Encoding research and proof limits
+
+`normal-bake-encoding.hpp` supplies a double-precision inverse and explicit per-vertex/per-fragment basis policies. The independent Gauss-Jordan/forward fixture demonstrates why legacy MToon0 raw TBN and a normalized-column PBR consumer can require separate normal planes, and why normalized world-normal coverage does not commute with tangent-space blending under nonorthogonal frames. These are CPU mathematical tests; no GPU/native/export parity is claimed here.
+
+The inspected primary consumer is Khronos Sample Renderer revision `6e8a3d1aaa6f07e9f1310a488453e21325677786`: [primitive.vert](https://github.com/KhronosGroup/glTF-Sample-Renderer/blob/6e8a3d1aaa6f07e9f1310a488453e21325677786/source/Renderer/shaders/primitive.vert#L138-L151), [animation.glsl](https://github.com/KhronosGroup/glTF-Sample-Renderer/blob/6e8a3d1aaa6f07e9f1310a488453e21325677786/source/Renderer/shaders/animation.glsl#L43-L86), and [material_info.glsl](https://github.com/KhronosGroup/glTF-Sample-Renderer/blob/6e8a3d1aaa6f07e9f1310a488453e21325677786/source/Renderer/shaders/material_info.glsl#L137-L170). Its normalization order is a pinned consumer convention, not a claim that all glTF/Unity consumers use identical interpolation. The encoding fixture captures the variable-angle morph counterexample to normalizing bitangent only after interpolation. No existing shader is changed by this checkpoint. Legacy MToon0 provenance remains in NORMAL-FRAME-TRANSPORT.md.
+
+## Qualification
+
+26 focused native helper assertions and26 assertions with the new helper/test fully instrumented by ASan/UBSan/leak detection pass. The latter links byte-frozen fully instrumented84 core/vendor archives; it is focused compatibility evidence, not a fresh whole-current-source sanitizer run. Native linking uses the coherent final production-union core.16 independent encoding assertions pass native and with ASan/UBSan/leaks. The tests compare generated key endpoints to Mikk/MorphSet contracts, preserve artist N/raw IDs, exercise inactive keys, exact split remapping, negative authority/budget/cancel/W cases, and use a separate Gauss-Jordan oracle for encoding. No actual GPU, new UI, Scene15 archive or independent GLB/VRM pixel proof is included.

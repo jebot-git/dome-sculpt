@@ -12,6 +12,7 @@ namespace dome::detail {
 // Scene12 is the first format owning complete polygon source histories. Its
 // bounded graph may retain all older frame/color/bind/source receipt features.
 inline unsigned minimum_scene_version(const PolygonAuthority *p);
+inline unsigned minimum_scene_version(const PolygonOrigin *p);
 inline unsigned minimum_scene_version(const DeformationState *d) {
   if (!d || !d->skeleton)
     return 0;
@@ -34,17 +35,26 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
   return result;
 }
-inline unsigned minimum_scene_version(const PolygonAuthority *p) {
-  unsigned result=0;std::set<const PolygonAuthority*> seen;
-  while(p) {
-    if(seen.size()>=512 || !seen.insert(p).second)throw std::invalid_argument("Invalid retained polygon feature-version graph");
-    result=std::max(result,12u);const auto&o=p->origin;if(!o)break;
-    result=std::max({result,o->placement?13u:0u,minimum_scene_version(o->deformation.get()),
-      minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
-    p=o->polygon.get();
-  }
-  return result;
+inline unsigned source_feature_version(const PolygonAuthority *root,const PolygonOrigin *source) {
+  unsigned result=0;std::set<const PolygonAuthority*> active_a,done_a;std::set<const PolygonOrigin*> active_o,done_o;
+  std::function<void(const PolygonAuthority*,size_t)> authority;std::function<void(const PolygonOrigin*,size_t)> origin;
+  authority=[&](auto a,size_t depth){if(!a)return;
+    if(depth>32||active_a.contains(a)||done_a.size()+done_o.size()>512)throw std::invalid_argument("Invalid retained object feature-version graph");
+    if(done_a.contains(a))return;
+    active_a.insert(a);result=std::max(result,12u);
+    origin(a->origin.get(),depth);active_a.erase(a);done_a.insert(a);
+  };
+  origin=[&](auto o,size_t depth){if(!o)return;
+    if(depth>32||active_o.contains(o)||done_a.size()+done_o.size()>512)throw std::invalid_argument("Invalid retained object feature-version graph");
+    if(done_o.contains(o))return;
+    active_o.insert(o);
+    result=std::max({result,o->placement?13u:0u,o->shape_source?16u:0u,minimum_scene_version(o->deformation.get()),minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
+    authority(o->polygon.get(),depth+1);origin(o->shape_source.get(),depth+1);active_o.erase(o);done_o.insert(o);
+  };
+  if(root)authority(root,1);else if(source){result=16;origin(source,1);}return result;
 }
+inline unsigned minimum_scene_version(const PolygonAuthority *p){return source_feature_version(p,nullptr);}
+inline unsigned minimum_scene_version(const PolygonOrigin *p){return source_feature_version(nullptr,p);}
 inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
   if (d.is_null() || d.at("skeleton").is_null())
     return 0;
