@@ -349,6 +349,7 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 6 && r.topology && !r.selected.empty())
         return std::all_of(r.selected.begin(), r.selected.end(), [&](auto id) { return r.topology->vertices().at(id).pinned; });
     }
+    if(s.menu_page==20){if(sector==0)return s.object_grab_mode;if(sector==3)return s.isolate_held;if(sector==4&&current!=s.objects.end())return current->visible;}
     if(s.menu_page==15) {
       if(sector==0) return s.sculpt_settings.mask_edit;
       if(sector==6) return (s.sculpt_settings.symmetry_axes&1)!=0;
@@ -443,7 +444,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"

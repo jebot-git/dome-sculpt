@@ -38,7 +38,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
       "Plane cut", "Paint tools", "Baking", "Materials",
-      "Back", "Move left", "Move right", "Retopology"};
+      "Back", "Holding", "Move right", "Retopology"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
       "Next shape", "Previous shape", "Reset pose", "Undo",
@@ -57,7 +57,8 @@ const std::array<const char *, 12> &spatial_labels(int page) {
     "Paint mask", "Mask mode", "Strength", "Protect all", "Clear mask", "Invert mask",
     "Mirror X", "Mirror Y", "Back", "Mirror Z", "Planes / view", "Cancel work"};
   static const std::array<const char *,12> procedural={"Pattern","Face","Grid","Coverage / shape","Depth","Seed","Apply detail","Next seed","Back","Undo","Redo","Cancel work"};
-  return page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
+  static const std::array<const char *,12> holding={"Object grab mode","Hold selected","Release held","Ghost others","Visibility","Previous","Next","Center","Back","Move left","Move right","Cancel motion"};
+  return page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
          : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
@@ -139,7 +140,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
-  if (index < 0 || index >= 12 || page < 0 || page > 18 || page == 5 ||
+  if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
       spatial_parameter(page, index))
     return {};
   if(page==18) {
@@ -192,6 +193,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
       SpatialCommand::Redo, SpatialCommand::Save, SpatialCommand::ExportAvatar};
     return index == 8 || index == 10 ? std::nullopt : std::optional<SpatialCommand>(rig[index]);
   }
+  if(page==20){static const std::array<SpatialCommand,12> actions={SpatialCommand::ObjectGrabMode,SpatialCommand::HoldObject,SpatialCommand::ReleaseObject,SpatialCommand::GhostOthers,SpatialCommand::Visibility,SpatialCommand::Previous,SpatialCommand::Next,SpatialCommand::Center,SpatialCommand::Center,SpatialCommand::Left,SpatialCommand::Right,SpatialCommand::CancelObjectGrab};return index==8?std::nullopt:std::optional<SpatialCommand>(actions[index]);}
   if (page == 9) {
     static const std::array<SpatialCommand,12> avatars = {
       SpatialCommand::CreateFemale, SpatialCommand::CreateMale, SpatialCommand::Center,
@@ -206,7 +208,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
         SpatialCommand::Undo, SpatialCommand::Center, SpatialCommand::Undo,
         SpatialCommand::Undo, SpatialCommand::Undo, SpatialCommand::Undo,
         SpatialCommand::Left, SpatialCommand::Right, SpatialCommand::Undo};
-    return (index >= 4 && index <= 8) || index == 11 ? std::nullopt
+    return (index >= 4 && index <= 9) || index == 11 ? std::nullopt
                                     : std::optional<SpatialCommand>(mesh[index]);
   }
   if (page == 8) {
@@ -271,6 +273,9 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
     return index == 10
                ? std::optional<SpatialCommand>(SpatialCommand::ErasePaint)
                : std::nullopt;
+  // Future registered-page handlers must return above; unknown pages cannot
+  // accidentally fall through to the root menu's commands.
+  if(page>4)return {};
   return (page == 1   ? objects
           : page == 2 ? materials
           : page == 3 ? paint
@@ -611,6 +616,7 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 1 && selected_ == 9) {
       page_ = 10;
       selected_ = 0;
+    } else if(page_==10&&selected_==9){page_=20;selected_=0;
     } else if (page_ == 10 && selected_ == 11) {
       page_ = 16; selected_ = 0;
     } else if(page_==10&&selected_==4){
@@ -642,7 +648,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = (page_ == 16 || page_ == 17) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = (page_ == 16 || page_ == 17 || page_==20) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
@@ -675,7 +681,7 @@ void SpatialInput::update(const SpatialSample &s) {
           (*command_ == SpatialCommand::RetopoBegin || *command_ == SpatialCommand::RetopoMode ||
            *command_ == SpatialCommand::RetopoApply || *command_ == SpatialCommand::RetopoCancel);
       const bool resume_mask = page_ == 15 && command_ && *command_ == SpatialCommand::SculptMaskResume;
-      if((page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18) || resume_retopology || resume_mask){menu_ = false;device_ = 0;}
+      if((page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20) || resume_retopology || resume_mask){menu_ = false;device_ = 0;}
       d.armed = false;
     }
     d.pressed = s.trigger;

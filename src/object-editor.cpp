@@ -9,6 +9,7 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Value_Input.H>
+#include <FL/fl_ask.H>
 namespace dome {
 bool recover_project(Document &document) {
   auto state = document.frame().state;
@@ -39,6 +40,15 @@ bool recover_project(Document &document) {
     return true;
   }
   return false;
+}
+void edit_visibility(Document &document){
+ auto state=document.frame().state;int row=std::max(28,dx::size+12),sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);
+ int width=std::min(std::max(480,dx::size*30),sw-40),height=std::min(row*int(state->objects.size()+3),sh-60);
+ DomeDialog window(width,height,"Objects visibility");Fl_Scroll scroll(0,0,width,height-row*2);
+ struct Entry{Document *document;uint64_t id,generation;};std::vector<Entry> entries;entries.reserve(state->objects.size());int y=row/2;
+ for(const auto &object:state->objects){entries.push_back({&document,object.id,state->generation});auto *check=new Fl_Check_Button(16,y,width-48,row,object.name.c_str());check->copy_label(object.name.c_str());check->value(object.visible);
+  check->callback([](Fl_Widget*w,void*p){auto &e=*static_cast<Entry*>(p);try{if(e.document->frame().state->generation!=e.generation)throw std::logic_error("The document changed; reopen visibility controls");e.document->object_visibility(e.id,static_cast<Fl_Check_Button*>(w)->value(),{e.generation,0,e.id,0});}catch(const std::exception&error){fl_alert("%s",error.what());}},&entries.back());y+=row;}
+ scroll.end();Fl_Button close(width/2-70,height-row*1.5,140,row,"Close");close.callback([](Fl_Widget*w,void*){w->window()->hide();});window.end();window.set_modal();dx::style(&window);window.show();while(window.shown())Fl::wait();
 }
 void edit_object(Document &document) {
   auto state = document.frame().state;
@@ -160,7 +170,7 @@ void edit_object(Document &document) {
   material.toon = toon.value();
   material.double_sided = double_sided.value();
   document.object_properties(object.id, name.value(), visible.value(),
-                             locked.value(), t, material);
+                             locked.value(), t, material,{state->generation,state->revision,object.id,state->edit_authority});
 }
 void edit_sculpt_layer(Document &document) {
   auto state = document.frame().state;

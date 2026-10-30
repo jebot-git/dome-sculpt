@@ -1,0 +1,103 @@
+{
+  "format": 1,
+  "feature": "Held object GPU motion, ghost isolation and individual visibility",
+  "baseline": "7ac40f69a54f3fa8df1b23a8d08dff8a8a6e655f",
+  "kernel_checkpoint": "9f188b51f46971e0a10aca624a9823d99a20e286",
+  "toolkit": {
+    "DomeD": "282467e",
+    "FLTK": "1.4.5+22",
+    "ui_runtime_library_path": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64"
+  },
+  "scope": {
+    "scene_schema_changed": false,
+    "private_only": true,
+    "installed": false,
+    "pushed": false,
+    "physical_headset_test": false,
+    "world_space_asset_motion_policy": "Release motion before asset admission; only local held weights are tagged for accepted worker completion",
+    "polygon_policy": "Coordinated future integration cancels drafts at invalidate_object_authority_locked and blocks moving grabs against changed drafts",
+    "ordinary_default": "workspace grips, original rendering and material/visibility/lock persistence unchanged"
+  },
+  "qualification": {
+    "focused_ctest_suites": 38,
+    "authority_checks": 62,
+    "controller_checks": 29,
+    "native_gui_checks": 11,
+    "compact_visibility_checks": 9,
+    "gpu_checks_software_and_Arc": 36,
+    "MToon_regression_Arc": 81,
+    "whole_core_ASan_UBSan_leaks": "both native suites pass; entire core+renderer instrumented renderer36 passes; no suppressions",
+    "additional_render_buffer_reuse_suite": 1
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "846326f8205aca41ef1481ba117a25cac6138cddbb8f24596ed1f9dfc6596419",
+    "docs/HELD-OBJECT-AUTHORITY.md": "38ffd8fab93c56741ea686ce7dde061d32b9f8bc67c66c0edeec5f81a6d9df69",
+    "include/dome/document.hpp": "17498a487dc95a41d7e1af3c7317657e45574f66b3b7ffdfb1530327a2344a1a",
+    "include/dome/input.hpp": "4983d549ba959d0fed5a8b42e1004bb6a9e7f7d9f5479fcf3b15f7eac56ee1e5",
+    "include/dome/material-visibility.hpp": "f67cd018930115f3c8bf945822331f58fc75e89ea4e3eb89303747017fd0826f",
+    "include/dome/render.hpp": "5745f96fa9fda5f46958e60605df41fdb88d9139731b9a4286e6cd762431f35a",
+    "src/app.cpp": "157f194713fcf0e5d760f7b5344a5ab5897a4cb6efd97085783af8a4e5f2fb4e",
+    "src/document-assets.cpp": "92fb8575ee3c34cd6bc54997d46179545873c603f2935500d7c647018c0a872d",
+    "src/document-authority-transition.hpp": "98190b875434e5a4b1f57d35f87774afd7e335cf1f9a1de95407799608c2ee05",
+    "src/document-authority.hpp": "78187cede6c8e4d500f8f2980b16d4d648fdd241666fec5e61354e6644bd8f12",
+    "src/document-baking.cpp": "7719644dbc382916b73454b1bf22e693d7982a6d5766d021e57de75a5f5cd6c5",
+    "src/document-cut.cpp": "8f96aaab33cad2aa724907f7b7ccce681c00207ea8a6f02a1ebd21272c5f1353",
+    "src/document-interaction.cpp": "8092a13a1804685bc1c76aa45184d3a5aa41b7131014eba9d4fb075707dbcab2",
+    "src/document-native.cpp": "b8080a586951c53d4c25b548521b41f664f35af8fb73c5c94de8af993077e4a2",
+    "src/document-retopo.cpp": "5cae51d11b4fceb3111f5f7103539b29cc266b16ac8f2256abc43ae54a542a1c",
+    "src/document-sculpt.cpp": "a2dda2cd24940ea27cd3bdaf13b2094fc4cb235c46e3330abb5b85a98bcce7d6",
+    "src/document-skin.cpp": "dd3e217fa047c9d8d7e935b6a8e9e940459ecd557a17cb3ab8924be8bd39bc6d",
+    "src/document-uv-solve.cpp": "d43c758c0a9fcd17532bdf5c0ce4cbc0acfa28b42dca92ac8f3ac6f74c9be0a5",
+    "src/document.cpp": "062587d067def5af134d4fb8e3035104535c9f3f6c7d42e1e3e0c9caf54c0545",
+    "src/input.cpp": "677207ef80440a95cf38e758af97944bf106f4bcddd464cc8158d26edcd308fd",
+    "src/material-visibility.cpp": "02b18123289818bdb7b8baad186877f74300e9805bb98485baf111e340b78a74",
+    "src/object-editor.cpp": "c597e3617238392b430802fdea0994811e064747724b09b1a0cabdcf77d9787c",
+    "src/object-editor.hpp": "ddfe9860be2ec8e4425544da66181f2e547229c209dad8939266c4f0860374b3",
+    "src/palette.cpp": "7bea2ba0fa725089b696b5d5bd2a6f017083dad2ec83c37ba8e69f4ed5f54e1d",
+    "src/render.cpp": "6716555947a8af57f750e34dbff0995e10a5ba74fc3b32494b14f11974edf7fb",
+    "src/xr.cpp": "9156dd20f66f0cfe41153b2df7112a1aca3e6ccc3158da4fbeca4e8c9ed42e74",
+    "tests/groups.cpp": "c2baa96c98f80a87c0395cb8aa11aab9329e621274410580463e8e98c2ef89c8",
+    "tests/held-object-menu.py": "6b66b5ec811f882bb0fd143d10db59b7676b5af3e20dc02fab06e1edf16e2c18",
+    "tests/object-hold-edit.cpp": "fcd12552a2826c6df2946e9e7c2747814ee0a2077b340aebedcd561715025f7e",
+    "tests/object-isolation-render.cpp": "b71846d14f561885e912005e100808588ee2216d797b605c54f77ef35dd64f93",
+    "tests/object-isolation.cpp": "ccdd797eaa3e1a714392662926642b4ae563cdde57ecaf096e60e09a9d534947"
+  },
+  "binary_sha256": {
+    "build/dome-sculpt": "fa59df75b8f6d3bee3e513d1cbb7315f41a21920791968f9030135c8aefae2a6",
+    "build/dome-sculpt-object-isolation-test": "3317e3b23ee82fc920e47774a4b1bc80b1c534b67211bb8eb8f28831b8f3eb10",
+    "build/dome-sculpt-object-hold-edit-test": "69d1cbebe343de5549662bd537556802f0481ed2f2617a1ebc8113a14abd0ed8",
+    "build/dome-sculpt-object-isolation-render-test": "75b98d3e21241e8d585696518bc66b8f62ada2392458bb78a27d19e59b8a030d",
+    "build/dome-sculpt-mtoon-render-test": "c8a30f81c4d57694076ea7df64e11fa578d1f406429ece66389755dcaae0ca71",
+    "build/dome-sculpt-groups-test": "df9596884762a46abb3627f498b3b4f0c75545eeb391527a2bc041980feca539",
+    "build/libdome-sculpt-core.a": "9b00425c3cb91fefb54cfa971612cd1338c2265de0e03e204ed5b7a515f7362e",
+    "build/libdome-sculpt-render.a": "df1c85fd1815ddace32f824cb5a523269071a6e022b118482925ad17a026ffad",
+    "build/libdome-sculpt-xr.a": "d8023dd927d8caec8b0f60a7567fed9bfc807cb506b95ad2e26dceed359650ba",
+    "build-held-sanitize/dome-sculpt-object-isolation-test": "fe4962f8603f79f567fac08041815d56caeb0ed6b25018a89a619198a583541f",
+    "build-held-sanitize/dome-sculpt-object-hold-edit-test": "b7a31a3d52468853af1a02bfc0bcf9716ef5cff3c8d8f87c7818b3d69e890d83",
+    "build-held-sanitize/dome-sculpt-object-isolation-render-test": "57919d8646f24e3497c04c2f590628f1f66220a157138a142ce72605da44c8da"
+  },
+  "log_sha256": {
+    "../held-registry-release-build.log": "72b68e10dc29ade084777ab5ec3f5932e10f72ed9da6b97ebbc2efeedcb14235",
+    "../held-registry-sanitize-build.log": "32a6d62e82bac4a3c7466d35bee296c426510d1757a24b8b331da65f34481f1b",
+    "../held-render-sanitize-build.log": "b635244b89231ed1ae7ac95240a85053e88d6299b789cbf6dada7f3007f3d0dd",
+    "../held-frozen-regressions.log": "46999fc5e8aba0a471935644e56cedaf7d3f34b06e48b97c5faefc17f8ebb16a",
+    "../held-whole-core-sanitize-registry.log": "eb9f84f218d05c52671a5fb17c05511649187a55cb929395a55d07046c1a95c1",
+    "../held-frozen-controller-sanitize.log": "18b22e53b3f4a6839f186641e05b23f08458c29e4668da56f60330ae07920616",
+    "../held-render-whole-sanitize.log": "334d81eb529fb2bd98dcb5842a55e3f1c9f9b809a3c5db1b2bd563014fe66bf3",
+    "../held-frozen-arc.log": "a9bf76ba2e3273dfb3fa5aecfdefd09347069700e06ebd94b6397a2c493b54f4",
+    "../held-frozen-mtoon-arc.log": "7f817b87553325b06872e77ebbcd7a62c258cdbade3f0295f628993eb164c504",
+    "../held-frozen-gui.log": "01320705ec7fcd1779ba4565055c2ebfe4934703461abb1730b3693f298a5bf6",
+    "../held-frozen-gui-compact.log": "6394e28218177497a6b96a22dd45971e8e2988de7c3aede0ca293bede7fe199f",
+    "../held-frozen-authority.log": "b6e1e02b05a77b517d1e9876e28dab043f175df41b6b13389e36fbea40becaeb",
+    "../held-frozen-buffer-regression.log": "0c76e0581572dc29a76b0e814d95bec694e4f574c56b45b24749e35c00af1b9c"
+  },
+  "build_configuration": {
+    "release": "# CMAKE generated file: DO NOT EDIT!\n# Generated by \"Unix Makefiles\" Generator, CMake Version 4.3\n\n# compile CXX with /usr/bin/c++\nCXX_DEFINES = -DDOME_SCULPT_INSTALLED_ASSETS=\\\"/usr/local/share/dome-sculpt/assets/humanoid\\\" -DDOME_SCULPT_SOURCE_ASSETS=\\\"/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/assets/humanoid\\\"\n\nCXX_INCLUDES = -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/include -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/cgltf -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/xatlas -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/mikktspace\n\nCXX_FLAGS = -O3 -DNDEBUG -std=gnu++20 -Wall -Wextra -Wpedantic\n\n",
+    "sanitizer": "# CMAKE generated file: DO NOT EDIT!\n# Generated by \"Unix Makefiles\" Generator, CMake Version 4.3\n\n# compile CXX with /usr/bin/c++\nCXX_DEFINES = -DDOME_SCULPT_INSTALLED_ASSETS=\\\"/usr/local/share/dome-sculpt/assets/humanoid\\\" -DDOME_SCULPT_SOURCE_ASSETS=\\\"/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/assets/humanoid\\\"\n\nCXX_INCLUDES = -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/include -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/cgltf -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/xatlas -I/home/blux/de-xr/dome-sculpt/artifacts/held-isolation-76ed/third_party/mikktspace\n\nCXX_FLAGS = -O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer -O2 -g -DNDEBUG -std=gnu++20 -Wall -Wextra -Wpedantic\n\n"
+  },
+  "required_remaining": [
+    "Parked general colored-target bake Scene10/PBR projection, layers and quality receipts",
+    "Actual COLOR_n/TEXCOORD_n morph import/export",
+    "Future Polygon19/22 and Import21/23 semantic integration; authoritative affine world matrices"
+  ]
+}

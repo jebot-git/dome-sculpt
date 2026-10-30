@@ -61,7 +61,7 @@ int main() try {
   scene.erase_group(a);
   check(scene.groups().empty() && scene.objects().size() == 1 && scene.active().group == 0,
         "Deleting the last group retains a valid empty sculpt document");
-  check(std::string(spatial_labels(9)[2])=="Center part" && spatial_command(9,2)==SpatialCommand::Center,"XR avatar page replaces the removed mesh choice with a useful center action");
+  check(std::string(spatial_labels(9)[2])=="Center part" && spatial_action(9,2)==SpatialCommand::Center,"XR avatar page replaces the removed mesh choice with a useful center action");
   Document document;
   const auto legacy_before=document.copy_scene().encode();document.paint_command(SpatialCommand::CreateMakeHuman);
   check(document.copy_scene().encode()==legacy_before && !document.frame().state->asset_busy,"Removed MakeHuman creation command cannot be invoked through legacy controller bindings");

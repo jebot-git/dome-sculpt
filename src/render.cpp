@@ -343,7 +343,7 @@ void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   auto vertex=mtoon_renderer_vertex();
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;
+in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -379,22 +379,23 @@ return gl_FrontFacing?N:-N;}
 // Masking darkens final linear RGB, retaining the material's lighting, alpha,
 // cutout, depth and blend rules. Zero and the ordinary-object sentinel are exact.
 vec3 sculpt_mask_color(vec3 rgb){return mask_value>0?rgb*(1.0-.72*clamp(mask_value,0.0,1.0)):rgb;}
+vec4 ghost_color(vec4 c){return ghost_opacity<1.0?vec4(mix(c.rgb,vec3(.35,.5,.7),.5),c.a*ghost_opacity):c;}
 void main(){if(clip_enabled==1&&dot(clip_plane.xyz,cut_position)<clip_plane.w)discard;if(weight_pass==1){if(weight_value<0)discard;float opacity;
 if(mt_mode==1){bool killed;vec4 source=mt_surface(n,unit(camera-world),killed);if(killed)discard;opacity=source.a;}
 else{opacity=base_color.a;if(slots[0]==1)opacity*=texture(tex0,source_uv(0)).a;
 opacity*=source_color.a;
 if(alpha_mode==1)opacity=1;else if(alpha_mode==2){if(opacity<alpha_cutoff)discard;opacity=1;}}
-if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0,0,1),vec3(0,1,1),x):x<2?mix(vec3(0,1,1),vec3(0,1,0),x-1):x<3?mix(vec3(0,1,0),vec3(1,1,0),x-2):mix(vec3(1,1,0),vec3(1,0,0),x-3);color=vec4(ramp,opacity);return;}if(weight_value>=0)discard;if(mt_mode==1){bool killed;vec4 result=mt_surface(n,unit(camera-world),killed);if(killed)discard;color=vec4(sculpt_mask_color(result.rgb),result.a);return;}vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
+if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0,0,1),vec3(0,1,1),x):x<2?mix(vec3(0,1,1),vec3(0,1,0),x-1):x<3?mix(vec3(0,1,0),vec3(1,1,0),x-2):mix(vec3(1,1,0),vec3(1,0,0),x-3);color=ghost_color(vec4(ramp,opacity));return;}if(weight_value>=0&&ghost_opacity>=1.0)discard;if(mt_mode==1){bool killed;vec4 result=mt_surface(n,unit(camera-world),killed);if(killed)discard;color=ghost_color(vec4(sculpt_mask_color(result.rgb),result.a));return;}vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
 if(slots[0]==1)base*=texture(tex0,source_uv(0));
 base*=source_color;
 if(slots[1]==1){vec3 orm=texture(tex1,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
 if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
 if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength);if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
-if(unlit==1){color=vec4(sculpt_mask_color(base.rgb+glow),base.a);return;}
+if(unlit==1){color=ghost_color(vec4(sculpt_mask_color(base.rgb+glow),base.a));return;}
 vec3 N=shading_normal,V=normalize(camera-world),result;
 if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32*ao,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base.rgb*ramp*edge+vec3(.025);}
 else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb*ao;
-result+=glow;result=result/(result+vec3(1));color=vec4(sculpt_mask_color(result),base.a);})GLSL";
+result+=glow;result=result/(result+vec3(1));color=ghost_color(vec4(sculpt_mask_color(result),base.a));})GLSL";
   GLuint vs = shader(GL_VERTEX_SHADER, vertex.c_str()),
          fs = shader(GL_FRAGMENT_SHADER, fragment.c_str());
   program_ = glCreateProgram();
@@ -426,7 +427,7 @@ SurfaceRenderer::~SurfaceRenderer() {
 void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                            CanvasTransform model, const Mat4 &vp,
                            ob::Vec3 camera, int width, int height,
-                           bool transparent, bool toon, bool light) {
+                           bool transparent, bool toon, bool light, std::span<const ObjectInfo> display) {
   if(!mesh)throw std::invalid_argument("Missing sculpt mesh snapshot");
   try{
   textures_->target.begin(width,height,textures_->output);
@@ -547,6 +548,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
   glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
+  glUniform1f(glGetUniformLocation(program_,"ghost_opacity"),1);
   glUniform1i(glGetUniformLocation(program_,"clip_enabled"),0);
   auto plane=cached_->clip_plane;
   glUniform4f(glGetUniformLocation(program_,"clip_plane"),plane.normal.x,plane.normal.y,plane.normal.z,plane.offset);
@@ -569,6 +571,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     if (m.alpha != Material::AlphaMode::Automatic) return false;
     return m.color[3] < 1 || (maps && maps->transparent) || textures_->vertex_alpha.contains(id);
   };
+  bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,
                         uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false) {
     Material material = original;
@@ -624,6 +627,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glDisable(GL_BLEND);
       glDepthMask(GL_TRUE);
     }
+    if(ghost_pass){glEnable(GL_BLEND);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);}
     glDrawElements(GL_TRIANGLES, GLsizei(count), GL_UNSIGNED_INT,
                    reinterpret_cast<void *>(first * sizeof(uint32_t)));
   };
@@ -685,6 +689,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glBlendEquationSeparate(GL_FUNC_ADD,state.maximum_alpha?GL_MAX:GL_FUNC_ADD);glDepthMask(state.depth_write?GL_TRUE:GL_FALSE);glDepthFunc(GL_LEQUAL);
     if(state.alpha_to_coverage)glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);else glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     if(outline&&t.material.version()==MToonVersion::V0){glEnable(GL_POLYGON_OFFSET_FILL);glPolygonOffset(1,1);}else glDisable(GL_POLYGON_OFFSET_FILL);
+    if(ghost_pass){glEnable(GL_BLEND);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDepthMask(GL_FALSE);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);}
     glDrawElements(GL_TRIANGLES,GLsizei(r.count),GL_UNSIGNED_INT,reinterpret_cast<void*>(r.first*sizeof(uint32_t)));glDisable(GL_POLYGON_OFFSET_FILL);
   };
 
@@ -694,17 +699,27 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   }
   else {
     std::vector<const SurfaceRange*> ordered;for(auto &r:cached_->ranges)ordered.push_back(&r);
-    auto queue=[&](const SurfaceRange&r){auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get(),r.object)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
+    auto is_ghost=[&](uint64_t id){auto i=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});return i!=display.end() && i->ghost;};
+    auto queue=[&](const SurfaceRange&r){if(is_ghost(r.object))return 3500;auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get(),r.object)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return queue(*a)<queue(*b);});
     for(auto r:ordered){
+      auto object_model=model;
+      auto current=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==r->object;});
+      if(current!=display.end()&&!current->visible)continue;
+      if(current!=display.end() && current->world_transform_valid && r->world_frame_valid)
+        object_model=ob::compose(model,ob::compose(current->world_transform,ob::inverse(r->object_world)));
+      const auto local_model=model_matrix(object_model),local_mvp=multiply(vp,local_model);
+      glUniformMatrix4fv(glGetUniformLocation(program_,"model"),1,GL_FALSE,local_model.data());
+      glUniformMatrix4fv(glGetUniformLocation(program_,"mvp"),1,GL_FALSE,local_mvp.data());
+      ghost_pass=is_ghost(r->object);glUniform1f(glGetUniformLocation(program_,"ghost_opacity"),ghost_pass?.18f:1.f);
       glUniform1i(glGetUniformLocation(program_,"clip_enabled"),cached_->clipped_object&&r->object==cached_->clipped_object);
-      bool weighted=textures_->weighted.contains(r->object);
+      bool weighted=!ghost_pass && textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(r->object);
       if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame);
       else{
         draw_toon(*r,typed->second,false);
-        if(!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)
+        if(!ghost_pass&&!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)
           draw_toon(*r,typed->second,true);
       }
     }

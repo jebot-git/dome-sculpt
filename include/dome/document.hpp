@@ -48,6 +48,7 @@ struct ObjectInfo {
 struct AssetWork {
   std::atomic_bool cancelled{false};
   std::atomic<float> progress{0};
+  bool held_weight=false; // Immutable job kind; set before queue publication.
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
 struct EditorState {
@@ -201,7 +202,7 @@ public:
   void configure_object_grab(bool mode, bool isolate);
   void hold_object(uint64_t);
   void release_held_object(bool accept = true);
-  void object_visibility(uint64_t, bool);
+  void object_visibility(uint64_t, bool, AssetSource expected = {});
   bool begin_object_grab(uint64_t);
   void move_held_object(CanvasTransform local);
   void end_object_grab(bool accept = true);
@@ -310,6 +311,7 @@ private:
     uint64_t from = 0, to = 0;
     std::shared_ptr<PaintedMesh> paint{};
   };
+  class AuthorityTransition;
   class Transaction;
   Transaction *transaction_ = nullptr;
   std::deque<History> undo_, redo_;
@@ -321,6 +323,8 @@ private:
   bool invalidate_object_authority_locked();
   void finish_object_grab_locked(bool accept, bool release);
   bool begin_object_grab_locked(uint64_t);
+  bool held_weight_pending_locked() const;
+  void configure_object_grab_locked(bool,bool);
   void move_held_object_locked(CanvasTransform);
   void update_object_grab_locked(const SpatialFrame &);
   void require_object_editable_locked(uint64_t) const;
