@@ -1,0 +1,425 @@
+{
+  "base": "803479d7478af8e771cdc3dbb6b2d1ad72728d77",
+  "scope": "Private retained original/native frames checkpoint; complete colored/painted glTF and deforming canonical conversion remain open",
+  "files": {
+    "CMakeLists.txt": {
+      "bytes": 33542,
+      "sha256": "7ec15b755b2317553b9926d099360ad1d3ab26935e58b33c53d91c5fe597aa59",
+      "git_blob": "0ef3a012ebae8203683c298e2196319e08a24617"
+    },
+    "docs/NORMAL-FRAME-EXPORT-STATUS.md": {
+      "bytes": 7884,
+      "sha256": "52f6736874c832fd1e9e573d3024a82d3f8d9c072923a0987c4c44077df04f03",
+      "git_blob": "ed1e0080777e1703bda60033c6532ebb084c5fb3"
+    },
+    "include/dome/document.hpp": {
+      "bytes": 19669,
+      "sha256": "09e0c58b89096a6d0ec76ee1da0790ac4884b9b68e3491487bdf4a9841321f11",
+      "git_blob": "c4fb266703cd1e75a0aaa997400e06adce1b40c3"
+    },
+    "include/dome/humanoid-creator.hpp": {
+      "bytes": 3300,
+      "sha256": "676b316075f4aaf4896e185e8ad57958d3b3d28b0adab350b47a0f38354d38e7",
+      "git_blob": "73bfee0706bc351bbf83ef11457d6c84e6483cad"
+    },
+    "include/dome/material-bindings.hpp": {
+      "bytes": 3279,
+      "sha256": "ae6c51ac20c9eebdf7a11d27e13659a75bead9dede4e1b6c09661ee4feff1b09",
+      "git_blob": "0e998cf635c43ca9267f3b1b9c6fb6f2ba49a417"
+    },
+    "include/dome/normal-frames.hpp": {
+      "bytes": 2645,
+      "sha256": "1c9b22240da185c11fc5babce936a9127dc67eec028e6a9a09ebb730ab87edb9",
+      "git_blob": "f84ce4d3430c9b109da6a72d9af02c866993ea8b"
+    },
+    "include/dome/source-uv-bake.hpp": {
+      "bytes": 4172,
+      "sha256": "9cfad4ed2879048e2af0c9557da8dc110b15f2f29151852ae60d81abcbb02f46",
+      "git_blob": "f8854e0abcf158813f85ee00fe7b1d48c5d36b8e"
+    },
+    "src/creation.cpp": {
+      "bytes": 4285,
+      "sha256": "33130975f15bc9903f0f4bc5eae9562cc990c1e1f50b99a69ed4013bb24ee1c1",
+      "git_blob": "786c82935eb78c185fa62b1fa42944149a9a7509"
+    },
+    "src/document-cut.cpp": {
+      "bytes": 13181,
+      "sha256": "3c34e1c3d51b364edffeef30bb64ae1c6e54dfb2cb9575f00dee54873df6d2c1",
+      "git_blob": "5bfa89febdfcf142f4c89b35dbe1be51dec66265"
+    },
+    "src/document.cpp": {
+      "bytes": 131004,
+      "sha256": "b9e3d9936be50a836f8504dad00f6499084cbcbdc60dcc8a9bce0d49bf36f47f",
+      "git_blob": "1556494365158ace13ae553d0851aeaf73005c35"
+    },
+    "src/export.cpp": {
+      "bytes": 27926,
+      "sha256": "5088cc58b101cef47fb161b08759b89f513964f81feb3e3619532d3579db07fd",
+      "git_blob": "96c0caffba9804220b96e46c28837281f15b0284"
+    },
+    "src/gltf-document.hpp": {
+      "bytes": 814,
+      "sha256": "0e0430e1a3f5dbd33728598aec4c5d47a0396dd966d46d1070ddf5f44d58eecc",
+      "git_blob": "4cf205d5e135ad5504ca555f52f0e9d248af58b3"
+    },
+    "src/material-bindings.cpp": {
+      "bytes": 20350,
+      "sha256": "2a9e32d654fd7ba3c5fa1a72d2da485f4b80d40954b1eabd0ee8732740cb1038",
+      "git_blob": "ae2aea8811d5f1c567e0a21df12f88cfa3e99a3a"
+    },
+    "src/normal-frame-export.hpp": {
+      "bytes": 15364,
+      "sha256": "89be1bf58a75dbf7d43b2f1cff925285ad9d64ba7d880cb34701381b6cf06d19",
+      "git_blob": "e10fcf748f240c8251d16bde09fd2084961e374b"
+    },
+    "src/normal-frame-runtime.hpp": {
+      "bytes": 11965,
+      "sha256": "38c3da18af5787caa1da0f4b12e20817c62be23ab1a593af8c7e74b656910fc6",
+      "git_blob": "e55ada3bc8d26e9d9f9ad9df144bf5e41e173f77"
+    },
+    "src/normal-frames.cpp": {
+      "bytes": 17123,
+      "sha256": "54cc04f7cae1c0f4f6a08795f194e7f69cfc15375689bd307c9038b38580e5e8",
+      "git_blob": "5f05fa76a5e117324f300f75d8a371c47f7aa8eb"
+    },
+    "src/render-mtoon.hpp": {
+      "bytes": 11365,
+      "sha256": "84d8234477473ca770ce183cfe1a2323b0b83f753cb0c164e6fd294d31f2c6ca",
+      "git_blob": "e4af63c0f558d48b4a681b197f336338bc04f5e9"
+    },
+    "src/render.cpp": {
+      "bytes": 67056,
+      "sha256": "b7b75a2ff31abbdf5de439106c0f10abb998d61b81984ccb9305c60f83a3caf1",
+      "git_blob": "0ca0fb4b9b1a3ff0c0860461d9684b259f48a88c"
+    },
+    "src/scene.cpp": {
+      "bytes": 35297,
+      "sha256": "99c6c5791c8ffe2effc86bf6dbd4d35d44edc17ef80bd092d569a64a81a64ea8",
+      "git_blob": "77950185c0387b5fe7ab39364c5085123e948579"
+    },
+    "src/source-frame-shape.hpp": {
+      "bytes": 5710,
+      "sha256": "5b45b76c72f12aeed457043e926c346b76b1d2cd4d8cc2f066961e53fda93f61",
+      "git_blob": "81ebf4199c8251877fe8c9ac3bd1bffbfa350b1a"
+    },
+    "src/source-frame-skin.hpp": {
+      "bytes": 3805,
+      "sha256": "2cde6ec0b76a40bef1147f8549274d6a7ebf8d20eb2a5cb48ede1fc1363f6925",
+      "git_blob": "a00105cb0c50fe0564f31d3ef0b722fb8840b74d"
+    },
+    "src/source-tangent-frames.hpp": {
+      "bytes": 6677,
+      "sha256": "43884050ef716b904cd7b3df78b0c57cb9c3b516b1fbc498b1cea0d0a4fda37f",
+      "git_blob": "aea14a8e937774ffb5c46fc03edb21da950eab8e"
+    },
+    "src/source-uv-bake.cpp": {
+      "bytes": 30769,
+      "sha256": "cf9b30a952599ba7c3fe503af8ddb0029f98dd98ee266be5bea5094af87c7a0d",
+      "git_blob": "1a45fd0cd5c77275559d006b5df6ab600fdddc52"
+    },
+    "src/vrm.cpp": {
+      "bytes": 55568,
+      "sha256": "c5585a0b221fe3bad5cedf1cf89cdd8a290972be021f2d5900dc493133de811b",
+      "git_blob": "53ecab7ed3f6152a99a144eee7bd6c377700a755"
+    },
+    "src/vroid-creator.cpp": {
+      "bytes": 30078,
+      "sha256": "59dac836c7da853d93e405057816aae1382d2a1b84a5a2133f5a066808b9ea0c",
+      "git_blob": "7b0ce0364eac246ec7c08548f99be25a7111f422"
+    },
+    "tests/normal-frame-archive.cpp": {
+      "bytes": 6264,
+      "sha256": "65ac3ffeb4a8f4e0403d7550178ae57985a946a5b8a88c39ac7262fd6ef4e459",
+      "git_blob": "6a25ed3d75bd8e7d502e0d576a854755179ca9fd"
+    },
+    "tests/normal-frame-consumer.cpp": {
+      "bytes": 6438,
+      "sha256": "782873991ea438eb83e66d2064a028a5171724015fba4b1c8d0eaa048be32ea3",
+      "git_blob": "98152f8b98d5b586dffc974c46c66292b7a3a462"
+    },
+    "tests/normal-frame-consumer.hpp": {
+      "bytes": 13680,
+      "sha256": "adf95bab5bb2b6a521da5f28811b1ca8f1ad089d165784bcd063b75e59e2afce",
+      "git_blob": "6c1c2ce53c074af247eac46b80461063da4f8433"
+    },
+    "tests/normal-frame-creator.cpp": {
+      "bytes": 2664,
+      "sha256": "c419e6978b1a7c6762188875e90eaf96bfcd9db3cf08aa1b968e59969de19c1f",
+      "git_blob": "9d2889e33906525e8ae03aa0240985b82c99b221"
+    },
+    "tests/normal-frame-export.cpp": {
+      "bytes": 13305,
+      "sha256": "e00d7a059df7ea5d7aa3abe921a4ceb965eec650c39bab9ce755ce8f3bacdaec",
+      "git_blob": "32873ff7a20792fb01539cdab033a2a0cd3459c7"
+    },
+    "tests/normal-frame-fixtures.hpp": {
+      "bytes": 1324,
+      "sha256": "7ee101230d4a6af00c645f852febd5cc1390188c920d29b420e5b07164dc1e78",
+      "git_blob": "72066eb934cc96461792fcfd8a8e4b1f0ae82c95"
+    },
+    "tests/normal-frame-render.cpp": {
+      "bytes": 18288,
+      "sha256": "c10cf5223ca6f56cf47eade8ed106ddadd52f0e53218dd147b0df968ca6ae219",
+      "git_blob": "8d4f37c4b365ae1a900a1edfa7014b3cb86d19fe"
+    },
+    "tests/normal-frame-runtime.cpp": {
+      "bytes": 10985,
+      "sha256": "07961f54b512ea8e7270bb380c670d3a2a8f3cbbe5c63090fa7cd405b6f214a2",
+      "git_blob": "5172c14dc618d86a2686d0d43bb7243674e9fe53"
+    },
+    "tests/normal-frame-uv.cpp": {
+      "bytes": 6542,
+      "sha256": "587d55684c80bc538fb2a3fe1992ba68370b2abd856f82891d3e4d4f4b89c764",
+      "git_blob": "48c386e5b36ffdade19d4b3a8b955096d14fd4a9"
+    },
+    "tests/normal-frame-vrm-consumer.cpp": {
+      "bytes": 10428,
+      "sha256": "94fea4129229f5a87820987255af984bb30f4387621eee4747dfb7bb9e098a8f",
+      "git_blob": "6adc1fe19ecc90f4c5ffa6082cb5f488329d3c39"
+    },
+    "tests/scene-compat.cpp": {
+      "bytes": 10616,
+      "sha256": "e5c46438a68d42a01600ab686bdc1e7b88cb8d039acea697dcfeae5210407017",
+      "git_blob": "89177401da981c8960d6c03391eb4aac30b1b03e"
+    },
+    "tests/vrm.cpp": {
+      "bytes": 40977,
+      "sha256": "eebb9496e678f42d3082710d3c155586ed3b7bf3060d341544e9d6bfb333ce99",
+      "git_blob": "05bad692189385ba5ada86a68f7b8bf635e5c5da"
+    }
+  },
+  "release_binaries": {
+    "libdome-sculpt-core.a": {
+      "bytes": 14409340,
+      "sha256": "93c28adbc12983ebc027978497c14fb035a8e423fa285cb42e6b865a545266a7"
+    },
+    "libdome-sculpt-render.a": {
+      "bytes": 556730,
+      "sha256": "3c0c20320ff06a8dad4ba13c29f3e5d620e03e838bee097a6b34c6646f45a5d1"
+    },
+    "dome-sculpt-normal-frame-archive-test": {
+      "bytes": 4521968,
+      "sha256": "023662d592f9931e018cf41ad5699da1e362062dc2f94d9eb4d95f494322d083"
+    },
+    "dome-sculpt-normal-frame-runtime-test": {
+      "bytes": 6753640,
+      "sha256": "5f2f45a6514a92cd33a2f6993d3246a56bae8be6b951645d49b600547fff427b"
+    },
+    "dome-sculpt-normal-frame-export-test": {
+      "bytes": 4781968,
+      "sha256": "74da27b3b4561a5c2765b90d4039ebf93b24c53b4b5764c5083adbb3d3f4b2b6"
+    },
+    "dome-sculpt-normal-frame-creator-test": {
+      "bytes": 6632856,
+      "sha256": "d4fa8e52ddc475d1b6c83918816a1f96cb0da3b99dac227040705d24534324b5"
+    },
+    "dome-sculpt-normal-frame-render-test": {
+      "bytes": 7024816,
+      "sha256": "9847abfda711b738882bba88a512fe1ff35489c4a86676ac513cbe16d2860e84"
+    },
+    "dome-sculpt-normal-frame-uv-test": {
+      "bytes": 7080456,
+      "sha256": "ceca948edd0d195d79a97e3fb9be6043b7b03fd4d6d3d2c1427b6f0c087590ca"
+    },
+    "dome-sculpt-normal-frame-consumer-test": {
+      "bytes": 7105656,
+      "sha256": "f3399885380533ddd1404df33044ecdcca8b07b6b665dc95b1db9e0851310ee5"
+    },
+    "dome-sculpt-normal-frame-vrm-consumer-test": {
+      "bytes": 7136704,
+      "sha256": "54540b668bab46eb6e2041298a5bdb4f1b8360d08f6803372e4077d5e36b4314"
+    },
+    "dome-sculpt-render-buffers-test": {
+      "bytes": 4962088,
+      "sha256": "83c11d65450b09da3343cbbfd675e34ad8b5702e0be2bb5a057390056e4e9430"
+    },
+    "dome-sculpt-document-render-buffers-test": {
+      "bytes": 6969688,
+      "sha256": "6934805f0560a6016797c40b89b3c4435f5f27437366301957df5cff287870c4"
+    },
+    "dome-sculpt-mtoon-render-test": {
+      "bytes": 4934416,
+      "sha256": "513d1246185b264be1d7ef2c8cc4dd674db9a758cc7168260aac778146bdb5f4"
+    },
+    "dome-sculpt-mtoon-emission-test": {
+      "bytes": 4972352,
+      "sha256": "1d172d035fa43edd803462190a25b21c12d2cac43758ce6338609e4c528634a4"
+    },
+    "dome-sculpt-mask-render-test": {
+      "bytes": 4963552,
+      "sha256": "3d82f18e6ba602b7e1f5be627453bbaa634bad90fc6c67015001c00bef010cc7"
+    },
+    "dome-sculpt-mtoon-visibility-test": {
+      "bytes": 4971856,
+      "sha256": "f943cf0b8d85e7531557c4fed30ec94ce2a6e5e4e1d325e5b7f0291742de766f"
+    },
+    "dome-sculpt-scene-compat-test": {
+      "bytes": 4566024,
+      "sha256": "fe80d8ea4222a2e5bde272c741b137eee6704d7dd40dfd733cfb1272d0806599"
+    },
+    "dome-sculpt-cut-authoring-test": {
+      "bytes": 6692712,
+      "sha256": "7ff438922fe0d2c350f0d58162ea612bf5da92e01e70c81ea4c102eadaaa060f"
+    },
+    "dome-sculpt-resolution-authenticated-test": {
+      "bytes": 4646680,
+      "sha256": "347bea446d5486bbb790aa19a0283299ab1deda3d2379188e52ab7083deec3ca"
+    }
+  },
+  "san_binaries": {
+    "libdome-sculpt-core.a": {
+      "bytes": 312794226,
+      "sha256": "48a91034c0391734a01f9423ce554a547625e247d277e2c95f3f37b82ff82480"
+    },
+    "dome-sculpt-normal-frame-archive-test": {
+      "bytes": 69976344,
+      "sha256": "baa8baa5fd3eb8ef06f34572d8cbbd0059130df22be50c22553090cb15c58156"
+    },
+    "dome-sculpt-normal-frame-runtime-test": {
+      "bytes": 137038944,
+      "sha256": "83bd90c94723b5ea5e74abbe0e286ada97d365d12752c86627de81a83c6095c6"
+    },
+    "dome-sculpt-normal-frame-export-test": {
+      "bytes": 76745736,
+      "sha256": "d4f7408e9050dabb0b9b72e49a975b85a6dafdee99e69615a2909247eb1a4bab"
+    },
+    "dome-sculpt-normal-frame-creator-test": {
+      "bytes": 130771736,
+      "sha256": "27c2311562e253059c1330a5cefc7010a4eb0b3240ac12c520a4fa0af1b21b48"
+    },
+    "dome-sculpt-scene-compat-test": {
+      "bytes": 70095864,
+      "sha256": "f88836ae7108494770e4b6fbf65ef4af933d31c0662a73fbeddd9fde29f47506"
+    },
+    "dome-sculpt-cut-authoring-test": {
+      "bytes": 132275088,
+      "sha256": "b70a22f9e0468ec02e96da7dd0e3dd1a9db30e55def0912c36082aeca3a0b09c"
+    },
+    "dome-sculpt-resolution-authenticated-test": {
+      "bytes": 72354728,
+      "sha256": "f774e0134250accffa33b3b73e5fe6c5c7475f86fe5bc7b92dc6f8d03081033e"
+    }
+  },
+  "evidence": {
+    "frame-runtime-803-arc-buffers.log": {
+      "bytes": 1930,
+      "sha256": "59352667dddf2d4cf3244f03f0d81f50a31774f5d977635c042201684ff5b5a2"
+    },
+    "frame-runtime-803-arc-document-buffers.log": {
+      "bytes": 1906,
+      "sha256": "e003450a71f916370f351d61a8d7964e10e22fa56afe90868915b47cd2b4a492"
+    },
+    "frame-runtime-803-arc-emission.log": {
+      "bytes": 4683,
+      "sha256": "11aa1bc57afa44472a472f455a1b068670df0ee307305791f6611c0173eb9515"
+    },
+    "frame-runtime-803-arc-frame.log": {
+      "bytes": 4784,
+      "sha256": "c1f4b5aa3aaeff79e3feb345798acdd350cc4899262ccb702ddf1511cebd2e3e"
+    },
+    "frame-runtime-803-arc-mask.log": {
+      "bytes": 2725,
+      "sha256": "ac0d57e28e33658c6ba79d1de81ff05515e83b660c23fe51700b7d377a562269"
+    },
+    "frame-runtime-803-arc-mtoon.log": {
+      "bytes": 7101,
+      "sha256": "7f817b87553325b06872e77ebbcd7a62c258cdbade3f0295f628993eb164c504"
+    },
+    "frame-runtime-803-arc-pbr-consumer.log": {
+      "bytes": 3277,
+      "sha256": "7b4e8b79ab3837506d9806de4cea2bcb2f36cfa3d8fefbb818815b2a5d6d8f05"
+    },
+    "frame-runtime-803-arc-spatial.log": {
+      "bytes": 513,
+      "sha256": "4cd7ade11fdff35395fe837c72e3882415a90ca8d1007a4e043a123b0f93c499"
+    },
+    "frame-runtime-803-arc-uv.log": {
+      "bytes": 2245,
+      "sha256": "814d5180432183faf04d18ed64008e3c808c715a3d11a0582b6e5374db52dade"
+    },
+    "frame-runtime-803-arc-visibility.log": {
+      "bytes": 2379,
+      "sha256": "435ca4a388996cd23f6dd5a1291c8977fd5404827536b9b15c803b2f1a6f1348"
+    },
+    "frame-runtime-803-arc-vrm-consumer.log": {
+      "bytes": 2952,
+      "sha256": "badb0f9ad958ae9003c12d97815041207a3cfe6632c0bf7a1e832fc2e1adbe32"
+    },
+    "frame-runtime-803-corrected-test.log": {
+      "bytes": 686,
+      "sha256": "322543c4114af032efe18bd84061f5a53c850ab8c8188e8f3c8dfb10ac3c15f2"
+    },
+    "frame-runtime-803-final-gpu-software.log": {
+      "bytes": 905,
+      "sha256": "c911d027da162edc698c7e54faa69de0f48cde7804d356e7d69b0ff1812ee590"
+    },
+    "frame-runtime-803-software-transcript.log": {
+      "bytes": 24452,
+      "sha256": "429d9689bab0f92338948eb923684409c40b7ce298a20d7797aee768ce351dab"
+    },
+    "frame-runtime-803-san-test.log": {
+      "bytes": 897,
+      "sha256": "b886da9947b4dcc6aa524224e7c67dd0c7a59ebe8814b881b113c779826b4356"
+    },
+    "frame-runtime-803-san-transcript.log": {
+      "bytes": 22522,
+      "sha256": "353009b0bb538ec10691959ca1ac79936e2e1d906eccee9fd32ff3867c531384"
+    },
+    "frame-runtime-803-regression-software.log": {
+      "bytes": 468,
+      "sha256": "030ad5db3706c3ab03fd0a0731ea9443b523900711c9a23cbac72cdbc5a9bbf4"
+    },
+    "frame-runtime-803-regression-software2.log": {
+      "bytes": 361,
+      "sha256": "ef3105471c86ffbcb52000638c1e7276dacee00eea732aaad33b553a84630be6"
+    },
+    "frame-runtime-803-khronos-final.log": {
+      "bytes": 3941,
+      "sha256": "b7ae83ac1c388a09b6c54ee2c1e0e14810b564a9b2273f306cf545a84a203788"
+    },
+    "frame-runtime-803-vrm-schemas-final.log": {
+      "bytes": 1988,
+      "sha256": "f522535442179ecf843aadc2590735b3436783c6db143f771db00bb3d7a4bdd3"
+    },
+    "frame-khronos-report.json": {
+      "bytes": 258132,
+      "sha256": "6d0ff8345accfdd5ea5b7615f5a667258f66a46228cc794b6c13e0fb03593563"
+    },
+    "frame-vrm-schema-report.json": {
+      "bytes": 3721,
+      "sha256": "0ed91ff3c5a4ed1a7c8ef967e5587201c738eb8375479f62a4ef6b8bcf79ef1a"
+    }
+  },
+  "assets": {
+    "assets/humanoid/vroid/base-female.vrm": {
+      "bytes": 16323872,
+      "sha256": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b"
+    },
+    "assets/humanoid/vroid/base-male.vrm": {
+      "bytes": 17914788,
+      "sha256": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c"
+    }
+  },
+  "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+  "release": "Release, CPU compute, native EGL/UI enabled, XR executable disabled",
+  "san": "Whole C and C++ core incl xatlas/Mikk, -O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer; detect_leaks=1/halt_on_error=1",
+  "proofs": {
+    "cpu_corrected_ctests": 5,
+    "software_frame_buffer_ctests": 7,
+    "software_default_regression_ctests": 5,
+    "whole_core_san_ctests": 7,
+    "arc_jobs": 11,
+    "arc_frame_checks": 47,
+    "arc_pbr_consumer_checks": 25,
+    "arc_vrm_consumer_checks": 23,
+    "arc_uv_checks": 22,
+    "pixel_max_rgba_error": 1,
+    "low_level_canonical_vrm_pixel_error": 0
+  },
+  "limits": [
+    "Graphical fixtures do not apply COLOR_0 yet; original color attributes are retained; full versioned colored authoring/export is next required work",
+    "Native Paint tiny/unowned original UV coverage remains guarded; positive VRM canonical fixture explicitly supplies a complete low-level atlas",
+    "Live SourceUV Apply UI remains guarded; legacy derivative migration is explicit",
+    "Canonical normal blend outside proven exact static/rigid subset and nonlinear VRM bone-local metadata reauthoring remain open"
+  ]
+}

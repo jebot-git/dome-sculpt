@@ -26,6 +26,7 @@ struct SourceUvBakeInput {
   std::shared_ptr<const CreatorAppearance> appearance;
   std::shared_ptr<const SourceUvMaterialBindings> current_material;
   std::optional<SourceNativeMaterial> native_material;
+  std::shared_ptr<const DeformationState> current_deformation;
   Mesh target;
   // Destination vertex -> original PaintedMesh vertex. Every ordered corner
   // must map exactly; topology/geometry/order changes are not nearest-projected.
@@ -42,8 +43,12 @@ struct SourceUvBakeResult {
   uint64_t active_layer = 0;
   std::shared_ptr<const PaintedMesh> original_paint;
   std::shared_ptr<const CreatorAppearance> original_appearance;
+  std::shared_ptr<const SourceMaterialBindings> original_material;
   std::shared_ptr<const SourceUvOrigin> uv_origin;
   SourceNativeMaterial native_reference;
+  std::shared_ptr<const NormalFrameSet> normal_frames;
+  std::shared_ptr<const DeformationState> deformation;
+  std::shared_ptr<const CreatorAppearance> appearance;
   // Explicit resolved role table. Original descriptor texture indices remain
   // provenance, NEVER implicit indices into this table. Consumers must use the
   // table or explicitly build/remap a new asset registry when exporting.
@@ -68,6 +73,8 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput &,
 struct SourceUvAdoption {
   std::shared_ptr<PaintedMesh> paint;
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
+  std::shared_ptr<const DeformationState> deformation;
+  std::shared_ptr<const CreatorAppearance> appearance;
 };
 // Revalidate a detached result and adopt both paint and source provenance.
 // Caller publishes BOTH components only after whole-Scene resource validation.

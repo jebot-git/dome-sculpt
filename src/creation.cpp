@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/creation.hpp"
+#include "dome/material-bindings.hpp"
+#include "dome/material-visibility.hpp"
 namespace dome {
 uint64_t append_humanoid(Scene &scene, const HumanoidControls &controls,
                          std::string name, CanvasTransform transform,
@@ -46,6 +48,22 @@ uint64_t append_humanoid(Scene &scene, const HumanoidControls &controls,
     object.painted = std::move(painted);
     object.mesh_active = true;
     result.set_deformation(id, std::move(part.deformation));
+    if(part.normal_frames) {
+      auto binding=std::make_shared<SourceMaterialBindings>();auto typed=retained_mtoon(part.appearance.get());
+      binding->has_mtoon=bool(typed);if(typed)binding->material=*typed;
+      binding->normal_frames=part.normal_frames;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
+      binding->native_reference=native_source(*part.appearance);
+      if(typed)for(size_t role=0;role<binding->roles.size();++role) {
+        int index=typed->textures[role].index;if(index<0)continue;
+        const auto &texture=part.appearance->asset->textures.at(size_t(index));
+        auto &view=binding->roles[role];view.image=part.appearance->decoded_images->at(size_t(texture.image));
+        view.wrap_s=texture.wrap_s;view.wrap_t=texture.wrap_t;view.min_filter=texture.min_filter;view.mag_filter=texture.mag_filter;
+      }
+      auto origin=std::make_shared<SourceUvOrigin>();origin->paint=object.painted->snapshot();origin->appearance=part.appearance;
+      origin->material=typed;origin->roles=binding->roles;origin->deformation=object.deformation;
+      origin->creator_kind="vroid-shape";origin->creator_version=1;origin->creator_parameters=controls.encode().dump();
+      binding->uv_origin=std::move(origin);binding->validate();object.material_bindings=std::move(binding);
+    }
   }
   if (created.primary_part >= parts.size()) throw std::runtime_error("Invalid creator primary part");
   result.select(parts[created.primary_part]);

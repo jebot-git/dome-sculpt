@@ -8,11 +8,14 @@
 #include "dome/mesh-processing.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
+#include "normal-frame-runtime.hpp"
 #include "sculpt-ui-values.hpp"
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
 #include <unistd.h>
 #include <utility>
+#include <unordered_map>
+#include <unordered_set>
 namespace dome {
 namespace {
 ob::Vec3 obv(Vec3 p) { return {p.x, p.y, p.z}; }
@@ -1225,6 +1228,15 @@ void Document::mesh_loop() {
   };
   std::unordered_map<uint64_t, CachedSculpt> sculpt_cache;
   uint64_t cache_generation = 0;
+  struct FrameLayoutCache {
+    std::weak_ptr<const Mesh> mesh;
+    std::weak_ptr<const NormalFrameSet> frames;
+    std::shared_ptr<const detail::NormalFrameLayout> layout;
+    size_t bytes=0;
+  };
+  std::unordered_map<uint64_t,FrameLayoutCache> frame_layouts;
+  size_t frame_layout_bytes=0;uint64_t frame_layout_builds=0;
+  constexpr size_t frame_layout_limit=128*1024*1024;
   std::shared_ptr<const geometry_detail::Identity> geometry_identity;
   while (!stopping_) {
     std::optional<MeshJob> job;
@@ -1305,21 +1317,64 @@ void Document::mesh_loop() {
       snapshot->weight_samples = job->weight_samples.size();
       auto weighted = job->weight_view ? weight_objects(job->scene, job->scene.active().id, job->linked_weights)
                                       : std::vector<uint64_t>{};
+      std::unordered_set<uint64_t> frame_objects;
       for (auto &o : objects) {
+        auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
+        std::shared_ptr<const detail::NormalFrameLayout> retained_layout;
+        std::optional<detail::PosedNormalFrames> retained_pose;
+        const size_t source_role=o.material_bindings && o.material_bindings->has_mtoon?1:0;
+        if(retained) {
+          detail::normal_frame_current_authority(*o.material_bindings,o.mesh,o.deformation.get(),cancelled);
+          if(!(source_role?retained->mtoon:retained->pbr))throw std::invalid_argument("Selected material has no retained source normal frame");
+          frame_objects.insert(o.id);auto mesh_owner=job->scene.object(o.id).painted->mesh_owner();
+          auto old=frame_layouts.find(o.id);
+          if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained)retained_layout=old->second.layout;
+          else {
+            retained_layout=std::make_shared<const detail::NormalFrameLayout>(detail::normal_frame_layout(o.mesh,*retained,cancelled));
+            size_t bytes=(retained_layout->vertices.size()+retained_layout->corners.size()+retained_layout->indices.size())*sizeof(uint32_t);
+            if(bytes>frame_layout_limit)throw std::length_error("Immutable normal frame layout exceeds cache budget");
+            if(old!=frame_layouts.end()){frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
+            while(!frame_layouts.empty() && (frame_layouts.size()>=256 || bytes>frame_layout_limit-frame_layout_bytes)){auto expired=frame_layouts.begin();frame_layout_bytes-=expired->second.bytes;frame_layouts.erase(expired);}
+            frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,retained_layout,bytes});frame_layout_bytes+=bytes;++frame_layout_builds;
+          }
+          bool needs_canonical=o.textures && !o.textures->normal.rgba.empty();
+          retained_pose=detail::normal_frame_preview(*retained,*retained_layout,o.deformation.get(),cancelled,(1u<<source_role)|(needs_canonical?4u:0u));
+          if(snapshot->source_normals.empty()) {
+            snapshot->source_normals=snapshot->mesh.normals;snapshot->canonical_normals=snapshot->mesh.normals;
+            snapshot->source_tangents.assign(snapshot->mesh.positions.size(),{1,0,0,1});
+          }
+        }
         if (o.deformation) o.mesh = o.preview_mesh();
         if (cancelled()) throw std::runtime_error("Stale surface preview");
         auto world = o.world_transform();
         size_t offset = snapshot->mesh.positions.size(), first = snapshot->mesh.indices.size();
         bool canonical = o.textures && !o.textures->normal.rgba.empty();
+        const size_t packed_vertices=retained_layout?retained_layout->vertices.size():canonical?o.mesh.indices.size():o.mesh.positions.size();
+        if(offset>2'000'000 || packed_vertices>2'000'000-offset || first>6'000'000 || o.mesh.indices.size()>6'000'000-first)throw std::length_error("Packed surface preview exceeds native renderer geometry limits");
         bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
-        auto frames = canonical ? tangent_corners(o.mesh, cancelled)
-                                : std::vector<Tangent>{};
-        auto append = [&](uint32_t vertex, Tangent tangent) {
+        if(retained && canonical && (!retained->canonical || retained_pose->tangents[2].empty()))
+          throw std::invalid_argument("Baked normal detail requires an explicit retained canonical frame");
+        auto frames = canonical && !retained ? tangent_corners(o.mesh, cancelled)
+                                            : std::vector<Tangent>{};
+        auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
           snapshot->mesh.positions.push_back(vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
           snapshot->mesh.normals.push_back(vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
           snapshot->tangents.push_back({direction.x,direction.y,direction.z,tangent[3]});
+          if(retained || !snapshot->source_normals.empty()) {
+            auto source=o.mesh.normals.at(vertex),canonical_normal=source;
+            std::array<float,4> source_tangent{1,0,0,1};
+            if(retained) {
+              source=retained_pose->normals[source_role].at(frame_vertex);
+              if(!retained_pose->normals[2].empty())canonical_normal=retained_pose->normals[2].at(frame_vertex);
+              if(!retained_pose->tangents[source_role].empty())source_tangent=retained_pose->tangents[source_role].at(frame_vertex);
+            }
+            snapshot->source_normals.push_back(vec(ob::rotate(world.orientation,obv(source))));
+            snapshot->canonical_normals.push_back(vec(ob::rotate(world.orientation,obv(canonical_normal))));
+            auto t=vec(ob::rotate(world.orientation,obv({source_tangent[0],source_tangent[1],source_tangent[2]})));
+            snapshot->source_tangents.push_back({t.x,t.y,t.z,source_tangent[3]});
+          }
           if (job->sculpt_mask_view)
             snapshot->sculpt_masks.push_back(o.id == job->scene.active().id
                 ? job->scene.object(o.id).volume->mask_sample(o.mesh.positions.at(vertex)) : -1.f);
@@ -1332,7 +1387,16 @@ void Document::mesh_loop() {
           }
         };
         std::shared_ptr<const CreatorAppearance> appearance = o.appearance;
-        if (canonical) {
+        if(retained) {
+          std::shared_ptr<CreatorAppearance> expanded;
+          if(o.appearance){expanded=std::make_shared<CreatorAppearance>(*o.appearance);expanded->source_vertices.clear();expanded->source_vertices.reserve(retained_layout->vertices.size());}
+          for(size_t v=0;v<retained_layout->vertices.size();++v) {
+            auto vertex=retained_layout->vertices[v];auto tangent=canonical?retained_pose->tangents[2].at(v):Tangent{1,0,0,1};
+            append(vertex,tangent,v);if(expanded)expanded->source_vertices.push_back(o.appearance->source_vertices.at(vertex));
+          }
+          for(auto v:retained_layout->indices)snapshot->mesh.indices.push_back(uint32_t(offset+v));
+          if(expanded)appearance=std::move(expanded);
+        } else if (canonical) {
           std::shared_ptr<CreatorAppearance> expanded;
           if (o.appearance) {
             if (o.appearance->source_vertices.size() != o.mesh.positions.size())
@@ -1352,8 +1416,10 @@ void Document::mesh_loop() {
           for (uint32_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(vertex, {1,0,0,1});
           for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
-        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings});
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty())});
       }
+      for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
+      snapshot->normal_frame_layout_builds=frame_layout_builds;
       if (job->weight_view && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled);
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();

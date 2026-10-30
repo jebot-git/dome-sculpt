@@ -47,6 +47,7 @@ struct CreatorAppearance {
   // authorize coordinate-sensitive VRM metadata export.
   std::optional<Quat> source_basis_quaternion;
 };
+struct NormalFrameSet;
 struct HumanoidPart {
   std::string name;
   Mesh mesh;
@@ -57,6 +58,7 @@ struct HumanoidPart {
   std::shared_ptr<const CreatorAppearance> appearance;
   std::shared_ptr<const PaintSourceMaps> source_maps;
   bool unlit = false;
+  std::shared_ptr<const NormalFrameSet> normal_frames; // Private prototype.
 };
 struct CreatedHumanoid {
   HumanoidControls controls;

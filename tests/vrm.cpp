@@ -85,8 +85,12 @@ void compare_skin(cgltf_data *data, const std::vector<ObjectSurface> &objects) {
         skin = data->nodes[n].skin;
     if (!skin)
       throw std::runtime_error("Missing independent skin");
-    for (size_t v : {size_t(0), object.mesh.positions.size() / 2,
-                     object.mesh.positions.size() - 1}) {
+    // A retained tangent seam may split/reorder vertices. Ordered triangle
+    // corners preserve the exact native identity through that legal change.
+    for (size_t corner : {size_t(0), object.mesh.indices.size() / 2,
+                          object.mesh.indices.size() - 1}) {
+      size_t v=cgltf_accessor_read_index(primitive.indices,corner);
+      size_t native_vertex=object.mesh.indices.at(corner);
       auto positions =
           cgltf_find_accessor(&primitive, cgltf_attribute_type_position, 0);
       float authored[3];
@@ -133,7 +137,7 @@ void compare_skin(cgltf_data *data, const std::vector<ObjectSurface> &objects) {
             weighted += transformed(world, transformed(ibm, p)) * values[k];
           }
       }
-      auto reference = expected.positions[v];
+      auto reference = expected.positions[native_vertex];
       if (object.appearance && object.appearance->source_basis_quaternion)
         reference =
             object.appearance->source_basis_quaternion->inverse().rotate(
@@ -410,11 +414,12 @@ int main(int argc, char **argv) try {
       auto normals = cgltf_find_accessor(&raw->meshes[i].primitives[0],
                                          cgltf_attribute_type_normal, 0);
       float normal[3];
-      check(normals && cgltf_accessor_read_float(normals, 0, normal, 3),
+      auto vertex=cgltf_accessor_read_index(raw->meshes[i].primitives[0].indices,0);
+      check(normals && cgltf_accessor_read_float(normals, vertex, normal, 3),
             "Independent source-basis normal accessor is readable");
       auto expected =
           objects[i].appearance->source_basis_quaternion->inverse().rotate(
-              objects[i].mesh.normals[0]);
+              objects[i].mesh.normals[objects[i].mesh.indices[0]]);
       check(length(Vec3{normal[0], normal[1], normal[2]} - expected) < 1e-6f,
             "Exported normal follows explicit inverse source basis");
     }
@@ -569,7 +574,7 @@ int main(int argc, char **argv) try {
     auto unsupported_uv=objects;auto derivative=material_binding(unsupported_uv[shared_part]);
     auto origin=std::make_shared<SourceUvOrigin>();origin->paint=reopened.object(objects[shared_part].id).painted;
     origin->appearance=objects[shared_part].appearance;origin->material=derivative->material;origin->roles=derivative->roles;
-    derivative->uv_origin=origin;unsupported_uv[shared_part].material_bindings=derivative;
+    derivative->uv_origin=origin;derivative->sampling_reparameterized=true;unsupported_uv[shared_part].material_bindings=derivative;
     check(rejects([&]{export_vrm(unsupported_uv,explicit_path);}) && read(explicit_path)==explicit_bytes,
           "Derived normal frames cannot silently replace original tangent and morph transport under deformation");
     size_t tinted_part = SIZE_MAX;

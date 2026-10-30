@@ -4,6 +4,7 @@
 #include "dome/source-maps.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/material-bindings.hpp"
+#include "normal-frame-runtime.hpp"
 #include "dome/retopo-authoring.hpp"
 #include "io.hpp"
 #include "text-utf8.hpp"
@@ -228,17 +229,22 @@ void Scene::validate(bool deep_sources) const {
     retain_paint(o.painted,false);
     if(o.material_bindings) {
       if(!o.painted)throw std::invalid_argument("Resolved material has no persisted painting mesh");
-      source_materials.add(o.material_bindings);
+      source_materials.add(o.material_bindings,deep_sources);
+      if(deep_sources && o.material_bindings->normal_frames)detail::normal_frame_current_authority(*o.material_bindings,o.painted->mesh(),o.deformation.get());
     }
     count += std::max(o.volume->voxels().size(), o.volume->stored_samples());
     if (count > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
   }
+  NormalFrameArchive normal_frames;
+  for(const auto &binding:source_materials.bindings())if(binding->normal_frames)normal_frames.add(binding->normal_frames,deep_sources);
+  normal_frames.storage_bytes();
   for(const auto &binding:source_materials.bindings())
     for(const auto &view:binding->roles)if(view.image)source_images.add(view.image);
   for(const auto &origin:source_materials.origins()) {
     retain_paint(origin->paint,true);origin_vertices+=origin->paint->mesh().positions.size();
     if(origin_vertices>8'000'000)throw std::length_error("Retained original UV geometry exceeds scene budget");
+    if(origin->deformation){deformation_entries+=origin->deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes retained original frame authority");}
     if(origin->appearance)retain_appearance(*origin->appearance,origin->paint->mesh().positions.size());
     for(const auto &view:origin->roles)if(view.image)source_images.add(view.image);
   }
@@ -250,9 +256,10 @@ nlohmann::json Scene::encode() const {
   bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
   bool resolved=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.material_bindings) || (!o.mesh_active && bool(o.deformation));});
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
+  const bool framed=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){if(!o.material_bindings)return false;const auto &b=*o.material_bindings;return bool(b.normal_frames) || (b.uv_origin && (b.uv_origin->deformation || !b.uv_origin->creator_kind.empty() || !b.sampling_reparameterized));});
   const bool extended=resolved || retopology;
   nlohmann::json j = {{"format", "dome-sculpt"},
-                      {"version", extended ? 8 : baked ? 6 : 5},
+                      {"version", framed ? 9 : extended ? 8 : baked ? 6 : 5},
                       {"active", active_},
                       {"next_id", next_},
                       {"objects", nlohmann::json::array()}};
@@ -327,7 +334,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>8)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>9)throw std::runtime_error("Unsupported scene version");
   const auto &objects=j.at("objects");
   if(!objects.is_array() || objects.empty() || objects.size()>256)throw std::length_error("Invalid scene object count");
   // Bound the complete serialized sculpt payload before decoding any object.
@@ -421,7 +428,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || materials.at("version")!=1 ||
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);
@@ -481,6 +488,14 @@ Scene Scene::decode(const nlohmann::json &j) {
   if (archives) source_images = PaintImageArchive::decode(j.at("source_images"));
   CreatorAssetArchive source_models;
   if (archives) source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
+  size_t preflight_deformation=material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0;
+  if(version>=4)for(const auto &o:objects)if(!o.at("deformation").is_null()) {
+    const auto &d=o.at("deformation");
+    preflight_deformation+=d.at("pose").size()+d.at("morph_weights").size();
+    if(!d.at("skin").is_null())for(const auto &v:d.at("skin").at("vertices"))preflight_deformation+=v.size();
+    if(!d.at("morphs").is_null())for(const auto &t:d.at("morphs").at("targets"))preflight_deformation+=t.at("delta").size();
+    if(preflight_deformation>8'000'000)throw std::length_error("Scene original and current deformation allocations exceed budget");
+  }
   SourceMaterialArchive source_materials;
   if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models);
   size_t remap_vertices = 0;
@@ -508,7 +523,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     }
   }
   result.objects_.clear();
-  size_t samples = 0, texels = 0, deformation_entries = 0, paint_bytes = 0;
+  size_t samples = 0, texels = 0, deformation_entries = material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0, paint_bytes = 0;
   for (auto &v : objects) {
     SculptObject o;
     o.id = id(v.at("id"));
