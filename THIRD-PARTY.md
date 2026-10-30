@@ -45,9 +45,10 @@ Official VRM/glTF specifications are normative avatar/export references; no VRM
 schema/code is copied or code license grant inferred. Exact hashes are recorded
 in `docs/AVATAR.md` and `third_party/sources.json`.
 
-MakeHuman authored body/target/rig/weight assets are CC0-1.0. Exact pinned grants,
-original credits and asset hashes are in assets/humanoid. No AGPL application
-code or Python runtime is linked. The native converter is original project code.
+MakeHuman default geometry/targets/rig/weight arrays and the mesh converter have
+been removed. Historical CC0 grants, credits and hashes remain as references in
+docs/references/makehuman for existing user projects; no MakeHuman default model
+or AGPL application code/Python runtime is bundled.
 VRoid Studio historical beta Base_Female/Base_Male are explicitly CC0-1.0 and
 retain the original author metadata. Exact original files, SHA256 hashes and
 primary-source grant evidence are in assets/humanoid/vroid/SOURCES.json. Current

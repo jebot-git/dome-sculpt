@@ -12,8 +12,6 @@
 #include <numeric>
 #include <set>
 namespace dome {
-CreatedHumanoid create_makehuman_humanoid(const HumanoidControls &,
-                                          const std::function<bool()> &);
 namespace {
 struct AssetIdentity {
   const char *id;
@@ -668,7 +666,7 @@ CreatedHumanoid create_humanoid(const HumanoidControls &c,
                                 const std::filesystem::path &assets) {
   c.validate();
   if (c.baseline == "makehuman-hm08")
-    return create_makehuman_humanoid(c, cancel);
+    throw std::invalid_argument("MakeHuman base meshes are no longer bundled. Existing projects retain their saved mesh, paint and rig; create a new CC0 VRoid female or male avatar to use creator controls.");
   return create_vroid(c, cancel, assets);
 }
 } // namespace dome

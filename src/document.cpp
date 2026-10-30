@@ -2309,9 +2309,10 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
         ? VrParameter::MorphWeight : VrParameter::RigRotation;
     return !control_before_ && !action_active_locked() && parameter_enabled_locked(parameter);
   }
+  if(command==SpatialCommand::CreateMakeHuman)return false;
   if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
     if (state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked()) return false;
-    if (command <= SpatialCommand::CreateMakeHuman) return scene_.objects().size() <= 237 && scene_.groups().size() < 128;
+    if (command == SpatialCommand::CreateFemale || command == SpatialCommand::CreateMale) return scene_.objects().size() <= 237 && scene_.groups().size() < 128;
     auto group = scene_.active().group;
     if (!group) return false;
     for (auto &o : scene_.objects())
@@ -2534,9 +2535,8 @@ void Document::command_locked(SpatialCommand command) {
   }
   if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
     if (!command_enabled_locked(command)) return;
-    if (command <= SpatialCommand::CreateMakeHuman) {
-      std::string baseline = command == SpatialCommand::CreateFemale ? "vroid-beta-female"
-          : command == SpatialCommand::CreateMale ? "vroid-beta-male" : "makehuman-hm08";
+    if (command == SpatialCommand::CreateFemale || command == SpatialCommand::CreateMale) {
+      std::string baseline = command == SpatialCommand::CreateFemale ? "vroid-beta-female" : "vroid-beta-male";
       queue_scene_operation_locked("Create humanoid", [baseline](Scene &scene, const auto &cancelled) {
         auto controls = humanoid_baseline_defaults(baseline);
         CanvasTransform transform{}; transform.position.y = -controls.height * .5f;

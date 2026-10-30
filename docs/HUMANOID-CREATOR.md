@@ -1,3 +1,7 @@
+# Historical MakeHuman creator foundation
+
+This document is historical reference. The MakeHuman default mesh, native generated arrays and converter have been removed. New creation uses only CC0 VRoid female/male; see VROID-CREATOR.md. Existing projects keep their own saved geometry, paint, rig and legacy metadata and are not automatically replaced.
+
 # MakeHuman creator fallback foundation
 
 New creation uses the actual CC0 VRoid beta baseline described in
