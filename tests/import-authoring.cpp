@@ -31,7 +31,13 @@ int main(int argc, char **argv) try {
     return 0;
   }
   Fixture fixture;
-  if (argc == 3 && std::string(argv[1]) == "--ui-fixture") {
+  if (argc == 3 && (std::string(argv[1]) == "--ui-fixture" || std::string(argv[1]) == "--ui-flat-fixture")) {
+    if (std::string(argv[1]) == "--ui-flat-fixture") {
+      fixture.j["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");
+      fixture.j["meshes"][0]["primitives"][0]["targets"][0].erase("NORMAL");
+      fixture.j["materials"][0]["normalTexture"]={{"index",0},{"scale",.8f}};
+      fixture.j["materials"][0].erase("extensions");
+    }
     fixture.save(argv[2]);
     return 0;
   }
@@ -159,16 +165,55 @@ int main(int argc, char **argv) try {
   missing.j["meshes"][0]["primitives"][0]["targets"][0].erase("NORMAL");
   auto missing_path = directory / "missing-normal.glb";
   missing.save(missing_path);
-  bool missing_refused = false;
-  try {
-    prepare_authoring_import(source, missing_path, options);
-  } catch (const std::runtime_error &e) {
-    missing_refused = std::string(e.what()).find("generated flat-normal") !=
-                      std::string::npos;
+  auto flat = prepare_authoring_import(source, missing_path, options);
+  const auto &flat_object = flat.scene.object(flat.objects[0]);
+  const auto &flat_frame = *flat_object.material_bindings->normal_frames->pbr;
+  check(flat_object.painted->mesh().positions.size()==6 &&
+      flat_object.appearance->source_vertices==std::vector<uint32_t>{0,1,2,0,2,3} &&
+      !flat_object.appearance->asset->primitives[0].normals_authored &&
+      flat_object.appearance->asset->primitives[0].tangents[0][3]==-1,
+      "Absent NORMAL derives split editable geometry and preserves exact original absence, vertices and ignored tangents");
+  bool flat_directions=flat_frame.tangents.empty() && flat_frame.normals.size()==6 &&
+      flat_frame.targets[0].normals.size()==6;
+  for(size_t c=0;c<flat_frame.normals.size();++c)
+    flat_directions&=length(flat_frame.normals[c]-Vec3{0,0,1})<1e-7f &&
+        length(flat_frame.targets[0].normals[c])==0;
+  check(flat_directions && source.encode()==unchanged,
+      "No-normal-texture import ignores supplied tangents and generates base and morph flat normal authority without mutating the source");
+  auto flat_saved=directory/"flat.dsculpt";
+  flat.scene.save(flat_saved);
+  check(Scene::load(flat_saved).encode()==flat.scene.encode(),
+      "Generated flat frames, immutable raw absence and complete source deformation survive native save/restart");
+  auto flat_normal_map=missing;
+  flat_normal_map.j["materials"][0]["normalTexture"]={{"index",0},{"texCoord",0}};
+  auto flat_normal_map_path=directory/"missing-normal-map.glb";
+  flat_normal_map.save(flat_normal_map_path);
+  auto mapped_flat=prepare_authoring_import(source,flat_normal_map_path,options);
+  const auto &mapped_frame=*mapped_flat.scene.object(mapped_flat.objects[0]).material_bindings->normal_frames->pbr;
+  check(mapped_frame.generated_tangents && mapped_frame.generated_uv==0 &&
+      mapped_frame.tangents.size()==6 && mapped_frame.targets[0].tangents.size()==6 &&
+      mapped_frame.tangents[0][3]==1,
+      "Missing NORMAL with a UV0 normal texture generates original-basis Mikk base and morph frames instead of the supplied opposite handedness");
+  auto flat_uv1=flat_normal_map;
+  flat_uv1.j["materials"][0]["normalTexture"]["texCoord"]=1;
+  auto flat_uv1_path=directory/"missing-normal-uv1.glb";flat_uv1.save(flat_uv1_path);
+  bool uv1_guard=false;
+  try { prepare_authoring_import(source,flat_uv1_path,options); }
+  catch(const std::invalid_argument &e) {
+    uv1_guard=std::string_view(e.what()).find("require TEXCOORD_0")!=std::string_view::npos;
   }
-  check(missing_refused && source.encode() == unchanged,
-        "Absent NORMAL never promotes smoothed display fallback or ignored "
-        "TANGENT into authored flat-normal authority");
+  check(uv1_guard && source.encode()==unchanged,
+      "Existing UV1 paint-source restriction stays explicit and source-exact; full UV1 sampling/provenance remains required");
+  auto flat_no_uv=no_uv;
+  flat_no_uv.j["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");
+  flat_no_uv.j["meshes"][0]["primitives"][0]["targets"][0].erase("NORMAL");
+  auto flat_no_uv_path=directory/"missing-normal-no-uv.glb";
+  flat_no_uv.save(flat_no_uv_path);
+  auto atlased_flat=prepare_authoring_import(source,flat_no_uv_path,options);
+  const auto &atlased_flat_object=atlased_flat.scene.object(atlased_flat.objects[0]);
+  check(!atlased_flat_object.painted->mesh().uv.empty() &&
+      atlased_flat_object.material_bindings->normal_frames->pbr->source_vertices==std::vector<uint32_t>{0,1,2,0,2,3},
+      "Missing NORMAL and UV0 can generate an editable atlas without changing ordered original corner identities");
   for (int cut : {1, 3, 8, 16, 24}) {
     auto cancelled = options;
     int calls = 0;

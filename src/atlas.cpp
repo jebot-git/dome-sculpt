@@ -4,16 +4,55 @@
 #include "uv-overlap.hpp"
 #include "xatlas.h"
 #include <memory>
+#include <mutex>
+#include <exception>
+#include <atomic>
 namespace dome {
 namespace {
+// xatlas may invoke progress on arbitrary native workers. Serialize the caller's
+// predicate and capture every exception before returning across the C callback.
+// This context outlives Atlas destruction, including AddMesh task completion.
+class AtlasCancellation {
+  const std::function<bool()> &predicate_;
+  std::mutex mutex_;
+  std::exception_ptr error_;
+  bool cancelled_ = false;
+  std::atomic_bool synchronization_failed_{false};
+public:
+  explicit AtlasCancellation(const std::function<bool()> &predicate):predicate_(predicate){}
+  bool progress() noexcept {
+    try {
+      std::lock_guard lock(mutex_);
+      if(cancelled_||error_)return false;
+      try {cancelled_=predicate_&&predicate_();}
+      catch(...){error_=std::current_exception();}
+      return !cancelled_&&!error_;
+    } catch(...) {synchronization_failed_.store(true);return false;}
+  }
+  void checkpoint() {
+    if(!predicate_)return;
+    if(synchronization_failed_.load())throw std::runtime_error("Atlas cancellation synchronization failed");
+    (void)progress();
+    std::exception_ptr error;bool cancelled;
+    {std::lock_guard lock(mutex_);error=error_;cancelled=cancelled_;}
+    if(error)std::rethrow_exception(error);
+    if(cancelled)throw std::runtime_error("UV atlas preparation cancelled");
+  }
+  static bool callback(xatlas::ProgressCategory,int,void *context) noexcept {
+    return static_cast<AtlasCancellation*>(context)->progress();
+  }
+};
 // Use precisely the float differences consumed by strict paint rasterization.
 double paint_uv_area(const std::array<float,2> &a,const std::array<float,2> &b,
                      const std::array<float,2> &c) {
   return double(b[1]-c[1])*(a[0]-c[0])+double(c[0]-b[0])*(a[1]-c[1]);
 }
 }
-AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding,AtlasDiagnostics *diagnostics) {
+AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding,AtlasDiagnostics *diagnostics,const std::function<bool()> &cancelled) {
+  AtlasCancellation cancellation(cancelled);
+  cancellation.checkpoint();
   mesh.validate();
+  cancellation.checkpoint();
   if (resolution < 64 || resolution > 8192 || padding > resolution / 8)
     throw std::invalid_argument("Invalid atlas resolution or padding");
   constexpr size_t maximum_vertices=2'000'000, maximum_corners=6'000'000;
@@ -23,18 +62,21 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
       xatlas::Create(), xatlas::Destroy);
   if (!atlas)
     throw std::bad_alloc();
+  if(cancelled)xatlas::SetProgressCallback(atlas.get(),AtlasCancellation::callback,&cancellation);
   // xatlas rejects triangles using an absolute area epsilon. Authoring units
   // are metres, and valid small sculpt features can fall below that epsilon.
   // Parameterize normalized positions, then keep original metre-space geometry
   // through xref. Do not discard tiny faces and leave holes in the export.
   Vec3 low = mesh.positions.front(), high = low;
   for (auto p : mesh.positions) {
+    cancellation.checkpoint();
     low = {std::min(low.x, p.x), std::min(low.y, p.y), std::min(low.z, p.z)};
     high = {std::max(high.x, p.x), std::max(high.y, p.y),
             std::max(high.z, p.z)};
   }
   double minimum_area = INFINITY;
   for (size_t i = 0; i < mesh.indices.size(); i += 3) {
+    cancellation.checkpoint();
     auto a = mesh.positions[mesh.indices[i]],
          b = mesh.positions[mesh.indices[i + 1]],
          c = mesh.positions[mesh.indices[i + 2]];
@@ -51,8 +93,10 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
   std::array<double,3> center{(double(low.x)+high.x)*.5,(double(low.y)+high.y)*.5,(double(low.z)+high.z)*.5};
   std::vector<Vec3> normalized_positions;
   normalized_positions.reserve(mesh.positions.size());
-  for (auto p : mesh.positions)
+  for (auto p : mesh.positions) {
+    cancellation.checkpoint();
     normalized_positions.push_back({float((double(p.x)-center[0])*scale),float((double(p.y)-center[1])*scale),float((double(p.z)-center[2])*scale)});
+  }
   xatlas::MeshDecl input{};
   input.vertexCount = uint32_t(mesh.positions.size());
   input.vertexPositionData = normalized_positions.data();
@@ -63,6 +107,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
   input.indexData = mesh.indices.data();
   input.indexFormat = xatlas::IndexFormat::UInt32;
   auto error = xatlas::AddMesh(atlas.get(), input);
+  cancellation.checkpoint();
   if (error != xatlas::AddMeshError::Success)
     throw std::runtime_error(std::string("Atlas input: ") +
                              xatlas::StringForEnum(error));
@@ -75,6 +120,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
   pack.rotateCharts = true;
   pack.bruteForce = true;
   xatlas::Generate(atlas.get(), chart, pack);
+  cancellation.checkpoint();
   if (atlas->meshCount != 1 || atlas->atlasCount != 1 || !atlas->width ||
       !atlas->height || atlas->width>8192 || atlas->height>8192)
     throw std::runtime_error(
@@ -86,6 +132,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
       throw std::length_error("Generated atlas exceeds native vertex limits or changed the source face count");
     value.positions.reserve(generated->vertexCount);value.normals.reserve(generated->vertexCount);value.uv.reserve(generated->vertexCount);
     for(uint32_t i=0;i<generated->vertexCount;++i) {
+      cancellation.checkpoint();
       const auto &v=generated->vertexArray[i];
       if(v.xref>=mesh.positions.size())throw std::runtime_error("Invalid generated chart mapping");
       value.positions.push_back(mesh.positions[v.xref]);value.normals.push_back(mesh.normals[v.xref]);
@@ -107,6 +154,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
   size_t separated=0;
   constexpr double safe_area=1e-12; // Margin above strict paint's 1e-14 cutoff.
   auto invalid=[&](size_t face,float u_scale,float u_offset=0) {
+    cancellation.checkpoint();
     std::array<std::array<float,2>,3> uv;
     for(size_t k=0;k<3;++k) {
       auto id=output.indices[face*3+k];uv[k]=output.uv[id];
@@ -126,7 +174,8 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
       // Promote one colliding face at a time, preferring the smallest footprint.
       // No vertex is moved in its old chart, so adjacent faces cannot fold.
       auto chosen=area(a)<area(b)?a:b;if(!separate[chosen]){separate[chosen]=1;++separated;}return true;
-    });
+    },cancelled);
+    cancellation.checkpoint();
   };
   for(size_t face=0;face<faces;++face)if(invalid(face,1)){separate[face]=1;++separated;}
   separate_overlaps(1,0);
@@ -135,7 +184,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
     // The later affine U compression must not shrink existing chart padding.
     // Repack only on fallback, with at least twice the requested padding and
     // bilinear margin; the reserved-band bound below guarantees U scale >= .5.
-    pack.padding=2*(padding+1);xatlas::PackCharts(atlas.get(),pack);
+    pack.padding=2*(padding+1);xatlas::PackCharts(atlas.get(),pack);cancellation.checkpoint();
     if(atlas->meshCount!=1 || atlas->atlasCount!=1 || !atlas->width || !atlas->height || atlas->width>8192 || atlas->height>8192)
       throw std::length_error("Atlas at requested resolution "+std::to_string(resolution)+" cannot preserve chart padding while reserving "+
         std::to_string(initial)+" independent padded small-face charts; increase resolution or reduce padding");
@@ -160,6 +209,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
     // At most 13 passes are possible for the supported 8192-pixel bound.
     bool stable=false;
     for(unsigned pass=0;pass<14;++pass) {
+      cancellation.checkpoint();
       if(!rows)throw capacity();
       const size_t needed=(separated+rows-1)/rows,half_width=atlas->width/2;
       if(half_width<=2*gutter)throw capacity();
@@ -184,6 +234,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
     std::vector<uint8_t> active_charts(generated->chartCount);
     size_t chart=0;
     for(size_t face=0;face<faces;++face)for(size_t k=0;k<3;++k) {
+      cancellation.checkpoint();
       const uint32_t old=output.indices[face*3+k];uint32_t id;
       if(separate[face]) {
         if(repaired.positions.size()>=maximum_vertices)throw std::length_error("Atlas small-face charts exceed the native vertex budget");
@@ -211,6 +262,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
   }
   double occupied=0;
   for(size_t c=0;c<output.indices.size();c+=3) {
+    cancellation.checkpoint();
     auto a=output.uv[output.indices[c]],b=output.uv[output.indices[c+1]],d=output.uv[output.indices[c+2]];
     const double area=std::abs(paint_uv_area(a,b,d));
     if(!std::isfinite(area) || area<1e-14)throw std::runtime_error("Atlas produced a nonpaintable UV face after bounded repair");
@@ -226,9 +278,16 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
     for(size_t face=0;face<faces;++face)report.face_charts[face]=separate[face]?next++:
       uint32_t(generated->vertexArray[generated->indexArray[face*3]].chartIndex);
   }
+  cancellation.checkpoint();
   mesh = std::move(output);
   if(diagnostics)*diagnostics=std::move(report);
   return info;
+}
+AtlasInfo detail::unwrap_atlas(Mesh &mesh,uint32_t resolution,uint32_t padding,AtlasDiagnostics *diagnostics) {
+  return detail::unwrap_atlas(mesh,resolution,padding,diagnostics,{});
+}
+AtlasInfo unwrap(Mesh &mesh,uint32_t resolution,uint32_t padding,const std::function<bool()> &cancelled) {
+  return detail::unwrap_atlas(mesh,resolution,padding,nullptr,cancelled);
 }
 AtlasInfo unwrap(Mesh &mesh,uint32_t resolution,uint32_t padding) {
   return detail::unwrap_atlas(mesh,resolution,padding,nullptr);

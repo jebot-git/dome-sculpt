@@ -11,4 +11,6 @@ struct AtlasDiagnostics {
   float u_scale = 1, u_offset = 0;
 };
 AtlasInfo unwrap_atlas(Mesh &,uint32_t resolution,uint32_t padding,AtlasDiagnostics *);
+AtlasInfo unwrap_atlas(Mesh &,uint32_t resolution,uint32_t padding,AtlasDiagnostics *,
+                       const std::function<bool()> &cancelled);
 }

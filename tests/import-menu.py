@@ -13,7 +13,8 @@ if os.environ.get('DOME_IMPORT_TEST_BUS')!='1':
 ROOT=Path(__file__).resolve().parents[1]
 BUILD=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',ROOT/'build'))
 MODE=os.environ.get('DOME_IMPORT_FORMAT','glb').lower()
-OUT=ROOT/('artifacts/menu-import-'+MODE if MODE!='glb' else 'artifacts/menu-import-skin' if os.environ.get('DOME_IMPORT_HELPER') else 'artifacts/menu-import-authoring');OUT.mkdir(parents=True,exist_ok=True)
+FLAT=os.environ.get('DOME_IMPORT_FLAT')=='1'
+OUT=ROOT/('artifacts/menu-import-flat-'+MODE if FLAT else 'artifacts/menu-import-'+MODE if MODE!='glb' else 'artifacts/menu-import-skin' if os.environ.get('DOME_IMPORT_HELPER') else 'artifacts/menu-import-authoring');OUT.mkdir(parents=True,exist_ok=True)
 checks=[];processes=[]
 def check(value,message):
     checks.append({'passed':bool(value),'check':message});(OUT/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks)},indent=2)+'\n')
@@ -37,10 +38,10 @@ async def main():
         subprocess.run([helper,'--empty-project',str(project)],check=True,env=env)
         if MODE in ('obj','fbx'):asset.write_bytes((ROOT/'tests/fixtures'/('import-twins.'+MODE)).read_bytes())
         elif MODE=='gltf':
-            intermediary=Path(home,'fixture.glb');subprocess.run([helper,'--ui-fixture',str(intermediary)],check=True,env=env)
+            intermediary=Path(home,'fixture.glb');subprocess.run([helper,'--ui-flat-fixture' if FLAT else '--ui-fixture',str(intermediary)],check=True,env=env)
             raw=intermediary.read_bytes();count=struct.unpack_from('<I',raw,12)[0];source=json.loads(raw[20:20+count]);binary=raw[28+count:]
             source['buffers'][0]['uri']='geometry.bin';Path(home,'geometry.bin').write_bytes(binary);asset.write_text(json.dumps(source))
-        else:subprocess.run([helper,'--ui-fixture',str(asset)],check=True,env=env)
+        else:subprocess.run([helper,'--ui-flat-fixture' if FLAT else '--ui-fixture',str(asset)],check=True,env=env)
         original_asset=hashlib.sha256(asset.read_bytes()).digest();log=(OUT/'app.log').open('w');app=subprocess.Popen([str(BUILD/'dome-sculpt'),str(project)],cwd=home,env=env,stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
         def named(title):
             for w in d.screen().root.query_tree().children:
@@ -120,6 +121,11 @@ async def main():
         nodes=await ready(True);check(nodes['Undo'][1].get('enabled',False),'Explicit native options Import submits the source-retaining model on a background worker as one history operation')
         await command('Save');accepted=inspect();check(len(accepted['objects'])==3 and len(accepted['groups'])==int(os.environ.get('DOME_IMPORT_GROUPS','5' if MODE=='fbx' else '4')) and sum(o['mesh_active'] for o in accepted['objects'])==2,'Actual native import and Save preserve all objects and editable node hierarchy')
         check(accepted['version']==int(os.environ.get('DOME_IMPORT_VERSION','11' if MODE!='glb' else '9')) and accepted['source_models'] and accepted['source_materials']['bindings'],'Native Save includes canonical source, frame, image, material and deformation archives')
+        if FLAT:
+            raw=bytes(accepted['source_models'][0]['original_glb']['bytes']);count=struct.unpack_from('<I',raw,12)[0];source=json.loads(raw[20:20+count])
+            frames=accepted['source_materials']['normal_frames']['frames']
+            check('NORMAL' not in source['meshes'][0]['primitives'][0]['attributes'] and frames and all(f['generated'] and f['generated_uv']==0 for f in frames),'Real native flat-normal import retains raw absence and saves generated original-frame Mikk authority')
+            if MODE=='glb':check(raw==asset.read_bytes(),'Native flat import saves the exact original GLB without inserting generated attributes into it')
         if MODE!='glb':
             receipt=accepted['source_models'][0]['original_source']
             check(receipt['format']=={'gltf':2,'obj':3,'fbx':4}[MODE] and bytes(receipt['root']['bytes']['bytes'])==asset.read_bytes(),'Native Save keeps original format bytes separately from canonical GLB')

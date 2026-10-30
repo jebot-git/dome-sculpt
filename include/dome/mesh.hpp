@@ -17,5 +17,7 @@ struct AtlasInfo {
   float utilization = 0;
 };
 AtlasInfo unwrap(Mesh &, uint32_t resolution = 1024, uint32_t padding = 4);
+AtlasInfo unwrap(Mesh &, uint32_t resolution, uint32_t padding,
+                 const std::function<bool()> &cancelled);
 void export_glb(const Mesh &, const std::filesystem::path &);
 } // namespace dome
