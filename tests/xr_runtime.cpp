@@ -50,6 +50,7 @@ Json report = Json::object();
 int instance_tag, session_tag, action_set_tag;
 unsigned frame = 0, physical_frame = 0, event = 0, restart_phase = 0;
 unsigned menu_completion_event = 0;
+std::string affine_contact_mode(){auto p=getenv("DOME_XR_FIXTURE_AFFINE_CONTACT");return p?p:"";}
 bool menu_gate() { return getenv("DOME_XR_FIXTURE_MENU_GATE") != nullptr; }
 bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
@@ -287,6 +288,8 @@ FN(CreateSwapchain, XrSession, const XrSwapchainCreateInfo *p,
   s->eye = chains.size();
   s->format = p->format;
   report["swapchain_format"] = p->format;
+  if(auto v=glGetString(GL_VENDOR))report["gl_vendor"]=reinterpret_cast<const char*>(v);
+  if(auto v=glGetString(GL_RENDERER))report["gl_renderer"]=reinterpret_cast<const char*>(v);
   glGenFramebuffers(1, &s->read_fbo);
   glGenTextures(2, s->texture);
   for (auto id : s->texture) {
@@ -531,6 +534,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!procedural_mode().empty())focus_at=procedural_mode()=="focus"?20:90;
   if(!polygon_mode().empty())focus_at=polygon_mode()=="focus"?30:90;
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
+  if(!affine_contact_mode().empty())focus_at=affine_contact_mode()=="focus"?12:90;
   if (focus_frame >= focus_at && !lost) {
     lost = true;
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
@@ -648,7 +652,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && affine_contact_mode().empty() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
@@ -669,6 +673,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
   auto a = reinterpret_cast<Action *>(p->action);
   bool button = right(p->subactionPath) && a->name == "recenter";
   out->isActive = XR_TRUE;
+  if(!affine_contact_mode().empty()){out->currentState=XR_FALSE;out->changedSinceLastSync=XR_FALSE;return XR_SUCCESS;}
   out->currentState =
       button &&
       (frame == 8 || frame == 10 ||
@@ -784,6 +789,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
         mode=="noop"?false:polygon_stage()==22||(mode=="focus"&&polygon_stage()>=28&&polygon_stage()<=32);
       if(polygon_color_conversion())stroke=polygon_step==18||polygon_step==22;
     }
+    if(!affine_contact_mode().empty())stroke=frame>=8&&frame<=18;
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
@@ -802,6 +808,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
    XrActionStateVector2f *out) {
   auto a = reinterpret_cast<Action *>(p->action);
   out->isActive = XR_TRUE;
+  if(!affine_contact_mode().empty()){out->currentState={0,0};return XR_SUCCESS;}
   out->currentState = right(p->subactionPath) && a->name == "right_stick" &&
                               frame >= 9 && frame <= 10
                           ? XrVector2f{.8660254f, .5f}
@@ -981,11 +988,12 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
-  if (frame == 22 && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
+  if (frame == 22 && affine_contact_mode().empty() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
   p->pose.orientation = {0, 0, 0, 1};
+  if(!affine_contact_mode().empty()){p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.85f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if (s->reference == XR_REFERENCE_SPACE_TYPE_VIEW && !s->action)
     p->pose.position = {frame >= 38 && polygon_mode().empty() ? -.2f : 0, 1.6f, 0};
   else

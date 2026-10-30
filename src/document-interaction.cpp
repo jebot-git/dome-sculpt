@@ -80,6 +80,7 @@ bool Document::begin_object_grab_locked(uint64_t id){
 }
 void Document::move_held_object(CanvasTransform local){std::lock_guard lock(model_mutex_);move_held_object_locked(local);}
 void Document::move_held_object_locked(CanvasTransform local){
+  if(native_stroke_&&native_stroke_->held_basis)throw std::logic_error("Finish contact painting before changing the native held transform");
   validate_transform(local);
   if(held_polygon_pending_locked())throw std::logic_error("Wait for the accepted polygon edit before moving its captured pose");
   if(!state_.object_grabbing || !state_.held_object)throw std::logic_error("Begin an object grab first");
@@ -151,6 +152,10 @@ void Document::update_object_grab_locked(const SpatialFrame &frame){
 void Document::finish_object_grab_locked(bool accept,bool release){
   if(!state_.object_grabbing)return;
   if(release&&held_polygon_pending_locked())accept=false;
+  if(native_stroke_&&native_stroke_->held_basis){
+    if(accept){if(state_.edit_authority==UINT64_MAX)throw std::overflow_error("Object editing authority exhausted");native_stroke_->release_held=true;end_native_locked(true);object_navigation_.reset();state_.message="Finishing held contact paint...";publish_locked(false,false);return;}
+    cancel_native_locked();
+  }
   if(action_active_locked()&&!polygon_accepting_){if(accept){if(end_action_locked())record_stroke_locked();}else cancel_action_locked();}
   if(accept&&held_weight_pending_locked()){object_navigation_.reset();desktop_=false;state_.message="Finishing held weight edit...";publish_locked(false,false);return;}
   if(!accept&&held_weight_pending_locked())cancel_asset_work_locked();

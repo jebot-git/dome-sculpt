@@ -1249,7 +1249,7 @@ void Document::process_locked(const SpatialFrame &f) {
   auto object_canvas = affine_target?state_.canvas:ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
-      !affine_target && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
+      !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
   if(state_.shape_sculpt)input_.edit_allowed=false;

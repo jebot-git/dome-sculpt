@@ -543,6 +543,8 @@ private:
     NativeStrokeSpace space=NativeStrokeSpace::Ray;
     int menu_page=24;
     std::optional<Vec3> contact_previous;
+    std::shared_ptr<const HeldAffine> held_basis;
+    std::atomic_bool release_held{false};
     std::atomic_bool menu_after{false};
     PaintSettings paint;
     std::deque<NativeStrokeSample> samples;

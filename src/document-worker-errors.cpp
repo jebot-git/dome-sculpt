@@ -57,6 +57,10 @@ void Document::native_worker_error_locked(const std::shared_ptr<NativeStroke>&se
     // begin_native_locked cancelled SpatialInput before publication, so there
     // is no synchronous edit callback left to run during failure cleanup.
     input_.cancel();state_.native_samples=0;
+    if(session->held_basis&&state_.object_grabbing&&state_.held_object==session->source.object){
+      state_.object_grabbing=false;state_.held_object=0;held_affine_.reset();object_navigation_.reset();
+      if(state_.edit_authority!=UINT64_MAX)++state_.edit_authority;
+    }
     if(session->source.generation==state_.generation&&session->source.revision==state_.revision){
       std::lock_guard mesh(mesh_mutex_);pending_mesh_.reset();mesh_.store(session->original_preview);mesh_changed_.notify_all();
     }

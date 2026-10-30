@@ -94,7 +94,8 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-native-worker-publication-test PRIVATE dome-sculpt-core)
   add_test(NAME native-worker-publication COMMAND dome-sculpt-native-worker-publication-test)
   add_test(NAME native-worker-generation COMMAND dome-sculpt-native-worker-publication-test replace)
-  set_tests_properties(native-worker-publication native-worker-generation PROPERTIES TIMEOUT 45)
+  add_test(NAME native-worker-held-publication COMMAND dome-sculpt-native-worker-publication-test held)
+  set_tests_properties(native-worker-publication native-worker-generation native-worker-held-publication PROPERTIES TIMEOUT 45)
   add_executable(dome-sculpt-worker-publication-test tests/worker-publication.cpp)
   target_link_libraries(dome-sculpt-worker-publication-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-worker-publication-test PRIVATE -Wl,--wrap=fsync)
@@ -1099,4 +1100,12 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-bake-normal-controls-test tests/bake-normal-controls.cpp)
   target_link_libraries(dome-sculpt-bake-normal-controls-test PRIVATE dome-sculpt-core)
   add_test(NAME bake-normal-controller COMMAND dome-sculpt-bake-normal-controls-test)
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-affine-contact-test)
+  add_test(NAME affine-contact-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/affine-contact-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-affine-contact-test> ${CMAKE_CURRENT_BINARY_DIR}/affine-contact-xr)
+  set_tests_properties(affine-contact-openxr PROPERTIES TIMEOUT 150)
 endif()
