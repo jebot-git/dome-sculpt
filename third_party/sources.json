@@ -261,5 +261,21 @@
     "source": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.4.1.json",
     "used": "Optional user-local development compiler/runtime, not vendored application code or a driver. Full optimized native FLTK/OpenXR build, requiredC++20,compute86/sm86 and explicit nonempty missing-GPU failure verified. Actual NVIDIA numerical/device execution remains required.",
     "license": "Each NVIDIA component license is retained under the staged toolkit licenses directory. No toolkit binaries are committed."
+  },
+  "wings_polygon_edit": {
+    "repository": "https://github.com/dgud/wings",
+    "commit": "2f6672721d83af7bc39717c86deb12a2970ade9f",
+    "license": "Wings permissive license; third_party/wings/license.terms",
+    "implementation": [
+      "include/dome/polygon.hpp",
+      "src/polygon.cpp"
+    ],
+    "used": "Native adaptation of never-reused component allocation, corner-side attributes, selected-region outer-boundary extrusion and validate-before-accept dissolve discipline. Ordered native N-gons and indexed adjacency replace Erlang winged-edge tables; reference code is not a runtime dependency. Per-face UV seam refusal is stricter than upstream merging.",
+    "reference_sha256": {
+      "third_party/wings/wings.hrl.reference": "c78519257c7363b8a0cc712caeef40ca17b7dd6910b3b33a83fd527283c7186c",
+      "third_party/wings/wings_we.erl.reference": "2034ae7bb82f45ac0c77bfeb75da1cc78d565cff7c1a1b16fe48756459233895",
+      "third_party/wings/wings_extrude_face.erl.reference": "9bf7c7d690d740ce257af796537806147c5886ba87de027c178a72fcdfbfdfb9",
+      "third_party/wings/wings_dissolve.erl.reference": "9519948c56c41f80810a3a38d9704b8dae2be1c18caa86d0d5007fd2547f4c2b"
+    }
   }
 }
