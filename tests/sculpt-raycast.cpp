@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/volume.hpp"
 #include "dome/mesh.hpp"
+#include "ray-corridor.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 using namespace dome;
@@ -53,8 +54,9 @@ int main()try {
  }
  Volume empty(.00001f);check(!empty.raycast({0,0,1},{0,0,-1},2),"Empty high-resolution fields reject without whole-field scanning or traversal");
  auto tiny=physical(.00001f,.00004f);sphere(tiny,{},.000021f);
- bool exhausted=false;try{tiny.raycast({0,0,1},{0,0,-1},2);}catch(const std::length_error &){exhausted=true;}
- check(exhausted,"Unreachable fine-grid ray budgets report exhaustion rather than silently pretending no surface");
+ check(bool(tiny.raycast({0,0,1},{0,0,-1},2)),"Fine-grid picking skips empty camera space and finds actual10um geometry");
+ auto dense=test::dense_ray_corridor();bool exhausted=false;try{dense.raycast({0,0,1},{0,0,-1},2);}catch(const std::length_error &){exhausted=true;}
+ check(exhausted,"Genuinely dense candidate-cell traversal still reports bounded exhaustion explicitly");
  bool invalid=false;try{nominal.raycast({0,0,1},{INFINITY,0,0},2);}catch(const std::invalid_argument &){invalid=true;}
  check(invalid,"Invalid ray directions are refused explicitly");
  std::cout<<"PASS "<<checks<<" bounded trilinear ray checks\n";return 0;
