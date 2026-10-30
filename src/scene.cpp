@@ -6,6 +6,7 @@
 #include "dome/source-maps.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/color-preparation.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/retopo-authoring.hpp"
 #include "io.hpp"
@@ -227,6 +228,15 @@ void Scene::validate(bool deep_sources) const {
       retain_appearance(*o.appearance,o.painted->mesh().positions.size());
     }
     retain_paint(o.painted,false);
+    const auto projection=o.painted?o.painted->color_projection():nullptr;
+    const auto preparation=o.material_bindings?o.material_bindings->color_preparation:nullptr;
+    if(bool(projection)!=bool(preparation))throw std::invalid_argument("Current color projection and retained preparation differ");
+    if(projection) {
+      if(projection->vertex_rgba!=preparation->projection->vertex_rgba || projection->maximum_error!=preparation->projection->maximum_error || projection->quality_cells!=preparation->projection->quality_cells)
+        throw std::invalid_argument("Current color projection is not the recorded prepared field");
+      projection->validate(o.painted->resolution());source_images.add(projection->vertex_rgba);
+      if(deep_sources)preparation->validate_current(o.painted->mesh(),o.appearance.get());
+    }
     if(o.material_bindings) {
       if(!o.painted)throw std::invalid_argument("Resolved material has no persisted painting mesh");
       source_materials.add(o.material_bindings,deep_sources);
@@ -242,11 +252,22 @@ void Scene::validate(bool deep_sources) const {
   for(const auto &binding:source_materials.bindings())
     for(const auto &view:binding->roles)if(view.image)source_images.add(view.image);
   for(const auto &origin:source_materials.origins()) {
-    retain_paint(origin->paint,true);origin_vertices+=origin->paint->mesh().positions.size();
+    const bool fresh_paint=!retained_paint.contains(origin->paint.get());
+    retain_paint(origin->paint,true);if(fresh_paint)origin_vertices+=origin->paint->mesh().positions.size();
     if(origin_vertices>8'000'000)throw std::length_error("Retained original UV geometry exceeds scene budget");
     if(origin->deformation){deformation_entries+=origin->deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes retained original frame authority");}
     if(origin->appearance)retain_appearance(*origin->appearance,origin->paint->mesh().positions.size());
     for(const auto &view:origin->roles)if(view.image)source_images.add(view.image);
+  }
+  std::set<const SourceColorPreparation *> preparations;
+  for(const auto &binding:source_materials.bindings())if(binding->color_preparation && preparations.insert(binding->color_preparation.get()).second) {
+    const auto &p=*binding->color_preparation;p.validate(deep_sources);
+    source_images.add(p.projection->vertex_rgba);source_images.add(p.initial_projection->vertex_rgba);
+    const bool fresh_paint=!retained_paint.contains(p.original_paint.get());
+    retain_paint(p.original_paint,true);if(fresh_paint)origin_vertices+=p.original_paint->mesh().positions.size();
+    if(origin_vertices>8'000'000)throw std::length_error("Color preparation original geometry exceeds scene budget");
+    if(p.original_deformation){deformation_entries+=p.original_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes preconversion color authority");}
+    if(p.original_appearance)retain_appearance(*p.original_appearance,p.original_paint->mesh().positions.size());
   }
   retopology_acyclic(retopology_sources);
   object(active_);
@@ -418,18 +439,27 @@ Scene Scene::decode(const nlohmann::json &j) {
       for(const auto &layer:layers) {
         if(!layer.at("tiles").is_array())throw std::runtime_error("Invalid retained paint tiles");
         storage+=layer.at("tiles").size()*sizeof(PaintTile);
+        if(layer.contains("pbr_color_tiles")) {
+          if(version<10 || !layer.at("pbr_color_tiles").is_array())throw std::runtime_error("Prepared PBR layers require scene10");
+          storage+=layer.at("pbr_color_tiles").size()*sizeof(PaintColorTile);
+        }
       }
       if(paint.contains("baked"))for(const auto *key:{"color","orm","emission","normal","coverage"}) {
         const auto &bytes=paint.at("baked").at(key);
         if(!bytes.is_binary())throw std::runtime_error("Invalid retained baked buffer");
         storage+=bytes.get_binary().size();
       }
+      if(paint.contains("color_projection") && version<10)throw std::runtime_error("Prepared color projection requires scene10");
+      if(paint.contains("baked") && paint.at("baked").at("version")!=1) {
+        if(version<10 || paint.at("baked").at("version")!=2 || !paint.at("baked").at("pbr_color").is_binary())throw std::runtime_error("Resolved baked PBR requires scene10");
+        storage+=paint.at("baked").at("pbr_color").get_binary().size();
+      }
       if(pixels>16*1024*1024 || storage>256*1024*1024)
         throw std::length_error("Scene retained painting allocations exceed budget");
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2)) ||
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);
@@ -494,6 +524,8 @@ Scene Scene::decode(const nlohmann::json &j) {
     source_models = CreatorAssetArchive::decode(j.at("source_models"), source_images);
   }
   if(material_fields)for(const auto&origin:j.at("source_materials").at("origins"))if(origin.contains("deformation")&&detail::minimum_deformation_scene_version(origin.at("deformation"))>version)throw std::runtime_error("Retained explicit inverse binds require scene version eleven");
+  if(material_fields&&j.at("source_materials").contains("color_preparations"))for(const auto &preparation:j.at("source_materials").at("color_preparations"))
+    if(detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::runtime_error("Preconversion explicit inverse binds require scene version eleven");
   size_t preflight_deformation=material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0;
   if(version>=4)for(const auto &o:objects)if(!o.at("deformation").is_null()) {
     const auto &d=o.at("deformation");
@@ -572,6 +604,11 @@ Scene Scene::decode(const nlohmann::json &j) {
     if (j.at("version") >= 3) {
       o.mesh_active = v.at("mesh_active").get<bool>();
       if (!v.at("painted").is_null()) {
+        if(version<10) {
+          const auto &paint=v.at("painted");
+          if(paint.contains("color_projection") || (paint.contains("baked") && paint.at("baked").at("version")!=1))throw std::runtime_error("Prepared paint requires scene10");
+          for(const auto &layer:paint.at("layers"))if(layer.contains("pbr_color_tiles"))throw std::runtime_error("Prepared PBR layers require scene10");
+        }
         auto &size = v.at("painted").at("resolution");
         if ((!size.is_number_unsigned() &&
              (!size.is_number_integer() || size.get<int64_t>() < 64)) ||

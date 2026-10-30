@@ -34,6 +34,8 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
   queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){
     auto result=bake_object(scene,source,settings,cancelled,[work](float p){work->progress.store(p);});
     *report=std::to_string(result.projected)+" projected, "+std::to_string(result.missed)+" missed ("+std::to_string(result.preserved_misses)+" kept from prior bake)";
+    if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
+    if(result.canonical_captured)*report+="; verified normal frame captured";
   },expected,report,work);
   state_.bake_source=source;state_.bake_settings=settings;publish_locked();
 }

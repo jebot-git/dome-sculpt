@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-bindings.hpp"
+#include "dome/color-preparation.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/paint.hpp"
 #include "dome/deformation.hpp"
@@ -70,6 +71,7 @@ void SourceMaterialBindings::validate(bool deep) const {
      (animation_frozen && animation_policy!=SourceUvAnimationPolicy::FreezeAtTime))
     throw std::invalid_argument("Invalid derived material frame or animation provenance");
   if(sampling_reparameterized && !uv_origin)throw std::invalid_argument("Reparameterized sampling requires retained original provenance");
+  if(color_preparation)color_preparation->validate(deep);
   native_reference.validate();
   roles_valid(has_mtoon?std::optional<MToonMaterial>(material):std::nullopt,roles);
   if(animation_frozen && has_mtoon &&
@@ -122,6 +124,9 @@ uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings
   if(found!=bindings_.end())return uint32_t(found-bindings_.begin());
   if(bindings_.size()>=256)throw std::length_error("Resolved material archive count exceeds budget");
   value->validate(deep);
+  if(value->color_preparation && value->color_preparation->original_material)
+    add(value->color_preparation->original_material,deep);
+  if(bindings_.size()>=256)throw std::length_error("Resolved material archive count exceeds budget");
   if(value->uv_origin && std::find(origins_.begin(),origins_.end(),value->uv_origin)==origins_.end()) {
     if(origins_.size()>=256)throw std::length_error("Original UV source archive count exceeds budget");
     origins_.push_back(value->uv_origin);
@@ -132,18 +137,37 @@ const std::shared_ptr<const SourceMaterialBindings> &SourceMaterialArchive::at(u
   return bindings_.at(id);
 }
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models) const {
-  const bool extended=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->normal_frames) || (b->uv_origin && !b->sampling_reparameterized);}) || std::any_of(origins_.begin(),origins_.end(),[](const auto &o){return bool(o->deformation)||!o->creator_kind.empty();});
+  const bool prepared=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->color_preparation);});
+  const bool extended=prepared || std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->normal_frames) || (b->uv_origin && !b->sampling_reparameterized);}) || std::any_of(origins_.begin(),origins_.end(),[](const auto &o){return bool(o->deformation)||!o->creator_kind.empty();});
   NormalFrameArchive frames;
-  nlohmann::json output={{"version",extended?2:1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
+  nlohmann::json output={{"version",prepared?3:extended?2:1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
   std::vector<std::shared_ptr<const PaintedMesh>> paints;
+  auto paint_id=[&](const std::shared_ptr<const PaintedMesh> &paint){
+    auto found=std::find(paints.begin(),paints.end(),paint);
+    if(found!=paints.end())return size_t(found-paints.begin());
+    if(paints.size()>=256)throw std::length_error("Retained paint archive count exceeds budget");
+    const auto id=paints.size();paints.push_back(paint);output["paints"].push_back(paint->encode(&images));return id;
+  };
+  std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;
+  if(prepared) {
+    output["color_preparations"]=nlohmann::json::array();
+    for(const auto &binding:bindings_)if(binding->color_preparation && std::find(preparations.begin(),preparations.end(),binding->color_preparation)==preparations.end()) {
+      const auto &p=*binding->color_preparation;p.validate();preparations.push_back(binding->color_preparation);
+      auto before=std::find(bindings_.begin(),bindings_.end(),p.original_material);
+      if(p.original_material && before==bindings_.end())throw std::logic_error("Missing color preparation original binding");
+      output["color_preparations"].push_back({{"version",1},{"projection",encode_color_projection(*p.projection,images)},
+        {"initial_projection",encode_color_projection(*p.initial_projection,images)},{"receipt",p.receipt.encode()},
+        {"paint",paint_id(p.original_paint)},
+        {"appearance",p.original_appearance?encode_creator_appearance(*p.original_appearance,models,images):nlohmann::json(nullptr)},
+        {"deformation",p.original_deformation?p.original_deformation->encode(p.original_paint->mesh()):nlohmann::json(nullptr)},
+        {"before_binding",p.original_material?nlohmann::json(size_t(before-bindings_.begin())):nlohmann::json(nullptr)}});
+    }
+  }
   size_t metadata=0;
   for(const auto &origin:origins_) {
     metadata+=metadata_bytes(origin->material);
     if(metadata>16*1024*1024)throw std::length_error("Scene resolved material metadata exceeds budget");
-    auto paint=std::find(paints.begin(),paints.end(),origin->paint);
-    size_t paint_id=size_t(paint-paints.begin());
-    if(paint==paints.end()) {paints.push_back(origin->paint);output["paints"].push_back(origin->paint->encode(&images));}
-    output["origins"].push_back({{"paint",paint_id},
+    output["origins"].push_back({{"paint",paint_id(origin->paint)},
       {"appearance",origin->appearance?encode_creator_appearance(*origin->appearance,models,images):nlohmann::json(nullptr)},
       {"material",origin->material?origin->material->encode():nlohmann::json(nullptr)},
       {"roles",encode_roles(origin->roles,images)}});
@@ -162,6 +186,10 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
         {"alpha",binding->native_reference.alpha},{"alpha_cutoff",binding->native_reference.alpha_cutoff},
         {"double_sided",binding->native_reference.double_sided}}},
       {"origin",binding->uv_origin?nlohmann::json(size_t(origin-origins_.begin())):nlohmann::json(nullptr)}});
+    if(prepared) {
+      const auto found=std::find(preparations.begin(),preparations.end(),binding->color_preparation);
+      output["bindings"].back()["color_preparation"]=binding->color_preparation?nlohmann::json(size_t(found-preparations.begin())):nlohmann::json(nullptr);
+    }
     if(extended){output["bindings"].back()["frames"]=binding->normal_frames?nlohmann::json(frames.add(binding->normal_frames)):nlohmann::json(nullptr);output["bindings"].back()["sampling_reparameterized"]=binding->sampling_reparameterized;}
   }
   if(extended)output["normal_frames"]=frames.encode();
@@ -170,11 +198,11 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
   size_t entries=0;
   if(input.at("version")==1)return 0;
-  if(input.at("version")!=2 || !input.at("origins").is_array() || input.at("origins").size()>256)
+  if((input.at("version")!=2 && input.at("version")!=3) || !input.at("origins").is_array() || input.at("origins").size()>256)
     throw std::runtime_error("Invalid original deformation archive");
   auto add=[&](size_t n){if(n>8'000'000-entries)throw std::length_error("Original deformation archive exceeds scene budget");entries+=n;};
-  for(const auto &origin:input.at("origins"))if(!origin.at("deformation").is_null()) {
-    const auto &d=origin.at("deformation");
+  auto count=[&](const nlohmann::json &d) {
+    if(d.is_null())return;
     if(!d.at("pose").is_array() || d.at("pose").size()>256 || !d.at("morph_weights").is_array() || d.at("morph_weights").size()>128)
       throw std::runtime_error("Invalid original deformation preview dimensions");
     add(d.at("pose").size());add(d.at("morph_weights").size());
@@ -188,15 +216,30 @@ size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
       if(!targets.is_array() || targets.size()>128)throw std::runtime_error("Invalid original morph count");
       for(const auto &t:targets){const auto &v=t.at("delta");if(!v.is_array() || v.size()>2'000'000)throw std::runtime_error("Invalid original morph positions");add(v.size());}
     }
+  };
+  for(const auto &origin:input.at("origins"))count(origin.at("deformation"));
+  if(input.at("version")==3) {
+    const auto &preparations=input.at("color_preparations");
+    if(!preparations.is_array() || preparations.empty() || preparations.size()>256)throw std::runtime_error("Invalid color preparation archive");
+    for(const auto &p:preparations)count(p.at("deformation"));
   }
   return entries;
 }
 SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
                                                    const CreatorAssetArchive &models) {
-  if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
+  if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2 && input.at("version")!=3) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
      !input.at("bindings").is_array() || input.at("bindings").size()>256)
     throw std::runtime_error("Invalid resolved material archive");
-  const bool extended=input.at("version")==2;
+  const bool prepared=input.at("version")==3;
+  const bool extended=input.at("version")!=1;
+  if(!prepared) {
+    if(input.contains("color_preparations"))throw std::runtime_error("Color preparations require material archive3");
+    for(const auto &b:input.at("bindings"))if(b.contains("color_preparation"))throw std::runtime_error("Color preparation references require material archive3");
+    for(const auto &p:input.at("paints")) {
+      if(p.contains("color_projection") || (p.contains("baked") && p.at("baked").at("version")!=1))throw std::runtime_error("Prepared paint requires material archive3");
+      for(const auto &l:p.at("layers"))if(l.contains("pbr_color_tiles"))throw std::runtime_error("Prepared paint layers require material archive3");
+    }
+  }
   if(!extended){if(input.contains("normal_frames"))throw std::runtime_error("Normal frames require material archive2");for(const auto &o:input.at("origins"))if(o.contains("deformation")||o.contains("creator"))throw std::runtime_error("Native frame origin requires material archive2");for(const auto &b:input.at("bindings"))if(b.contains("frames") || b.contains("sampling_reparameterized"))throw std::runtime_error("Normal frame references require material archive2");}
   deformation_entries(input);
   NormalFrameArchive frames;if(extended)frames=NormalFrameArchive::decode(input.at("normal_frames"));
@@ -217,10 +260,19 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     for(const auto &layer:layers) {
       if(!layer.at("tiles").is_array())throw std::runtime_error("Invalid original UV tiles");
       tile_bytes+=layer.at("tiles").size()*sizeof(PaintTile);
+      if(layer.contains("pbr_color_tiles")) {
+        if(!layer.at("pbr_color_tiles").is_array())throw std::runtime_error("Invalid original PBR color tiles");
+        tile_bytes+=layer.at("pbr_color_tiles").size()*sizeof(PaintColorTile);
+      }
     }
     if(paint.contains("baked"))for(const auto *key:{"color","orm","emission","normal","coverage"}) {
       const auto &bytes=paint.at("baked").at(key);
       if(!bytes.is_binary())throw std::runtime_error("Invalid original UV baked buffer");
+      tile_bytes+=bytes.get_binary().size();
+    }
+    if(paint.contains("baked") && paint.at("baked").contains("pbr_color")) {
+      const auto &bytes=paint.at("baked").at("pbr_color");
+      if(!bytes.is_binary())throw std::runtime_error("Invalid original baked PBR buffer");
       tile_bytes+=bytes.get_binary().size();
     }
     if(texels>16*1024*1024 || vertices>8'000'000 || tile_bytes>256*1024*1024)
@@ -241,6 +293,8 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
       if(!value.at("creator").is_null()){const auto &c=value.at("creator");origin->creator_kind=c.at("kind").get<std::string>();if(!c.is_object() || c.size()!=3 || !c.at("version").is_number_integer() || c.at("version")!=1)throw std::runtime_error("Unsupported creator frame version");origin->creator_version=1;origin->creator_parameters=c.at("parameters").get<std::string>();}}
     output.origins_.push_back(std::move(origin));
   }
+  std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;
+  if(prepared)preparations.resize(input.at("color_preparations").size());
   for(const auto &value:input.at("bindings")) {
     if(value.at("normal_frame")!="uv-derivative" && (!extended || value.at("normal_frame")!="original-attributes"))throw std::runtime_error("Unsupported derived material normal frame");
     auto binding=std::make_shared<SourceMaterialBindings>();
@@ -264,8 +318,24 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     binding->native_reference.double_sided=native.at("double_sided").get<bool>();
     if(!value.at("origin").is_null())binding->uv_origin=output.origins_.at(index(value.at("origin"),output.origins_.size()));
     binding->sampling_reparameterized=extended?value.at("sampling_reparameterized").get<bool>():bool(binding->uv_origin);
+    if(prepared && !value.at("color_preparation").is_null()) {
+      const auto id=index(value.at("color_preparation"),preparations.size());
+      if(!preparations[id]) {
+        const auto &v=input.at("color_preparations").at(id);
+        if(!v.is_object() || v.size()!=8 || !v.at("version").is_number_integer() || v.at("version")!=1)throw std::runtime_error("Unsupported retained color preparation");
+        auto p=std::make_shared<SourceColorPreparation>();
+        p->projection=decode_color_projection(v.at("projection"),images);p->initial_projection=decode_color_projection(v.at("initial_projection"),images);
+        p->receipt=ColorPreparationReceipt::decode(v.at("receipt"));p->original_paint=paints.at(index(v.at("paint"),paints.size()));
+        if(!v.at("appearance").is_null())p->original_appearance=decode_creator_appearance(v.at("appearance"),models);
+        if(!v.at("deformation").is_null())p->original_deformation=std::make_shared<const DeformationState>(DeformationState::decode(v.at("deformation"),p->original_paint->mesh()));
+        if(!v.at("before_binding").is_null())p->original_material=output.bindings_.at(index(v.at("before_binding"),output.bindings_.size()));
+        p->validate();preparations[id]=std::move(p);
+      }
+      binding->color_preparation=preparations[id];
+    }
     binding->validate();output.bindings_.push_back(std::move(binding));
   }
+  if(std::any_of(preparations.begin(),preparations.end(),[](const auto &p){return !p;}))throw std::runtime_error("Unreferenced color preparation record");
   return output;
 }
 } // namespace dome

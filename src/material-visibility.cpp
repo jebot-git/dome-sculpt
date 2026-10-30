@@ -5,6 +5,7 @@
 #include "dome/source-maps.hpp"
 #include "dome/material-bindings.hpp"
 #include "source-colors.hpp"
+#include "prepared-color-state.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
   if(!appearance)return {};
@@ -44,6 +45,7 @@ struct Visibility {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
+    const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get());
     if (maps) {
       if (maps->source_only) {
         auto present=[](const Image &i){return i.width || i.height || !i.rgba.empty();};
@@ -60,7 +62,8 @@ struct Visibility {
       if(r.material_bindings->has_mtoon)toon=r.material_bindings->material;
     } else toon = retained_mtoon(r.appearance.get());
     if (!toon) {
-      if(r.appearance)vertex_colors=detail::source_vertex_colors(r.appearance.get(),r.appearance->source_vertices.size());
+      if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
+      if(r.appearance && !prepared)vertex_colors=detail::source_vertex_colors(r.appearance.get(),r.appearance->source_vertices.size());
       if(!vertex_colors.empty()) {
         if(r.first_vertex>mesh.positions.size() || vertex_colors.size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility vertex-color domain is outside packed geometry");
         for(size_t c=r.first;c<r.first+r.count;++c){const auto v=mesh.indices.at(c);if(v<r.first_vertex || v-r.first_vertex>=vertex_colors.size())throw std::invalid_argument("Visibility vertex-color identity is outside its packed range");}
