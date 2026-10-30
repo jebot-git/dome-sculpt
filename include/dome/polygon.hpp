@@ -64,6 +64,13 @@ struct PolygonRender {
   std::vector<PolygonId> vertices, corners, triangle_faces;
 };
 struct PolygonEditResult;
+// Transient exact transfer from a result corner to corners of the input mesh.
+// IDs refer to corner sides, never merely to shared topological vertices.
+struct PolygonCornerSource {
+  PolygonId corner = 0;
+  std::vector<std::pair<PolygonId, double>> weights;
+};
+struct PolygonAttributeEditResult;
 // Polygon authority is separate from its triangulated display derivative.
 // Every selectable component and every face corner has a never-reused ID.
 class PolygonMesh {
@@ -99,6 +106,18 @@ struct PolygonEditResult {
   std::optional<PolygonMesh> replacement;
   std::vector<PolygonId> created_vertices, created_faces;
 };
+struct PolygonAttributeEditResult {
+  PolygonEditResult geometry;
+  // Only new/changed corner attributes need an entry. Existing corner IDs
+  // absent from this list retain their input value exactly.
+  std::vector<PolygonCornerSource> corner_sources;
+};
+// Optional attribute tracing preserves the original three-argument operation
+// and its default arithmetic/allocation behavior. Transfers are convex, sorted,
+// bounded to128 contributors/corner and8M total entries, and cancellable.
+PolygonAttributeEditResult
+edit_polygon_with_corner_sources(const PolygonMesh &, const PolygonEdit &,
+                                 const PolygonLimits & = {});
 // Detached/transactional. Cancellation, invalid topology and resource failures
 // leave the source and its next-ID counter untouched. A genuine no-op has no
 // replacement, so callers must not create a history entry.

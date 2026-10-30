@@ -199,6 +199,59 @@ struct PolygonKernel {
   PolygonMesh mesh;
   Budget &budget;
   std::set<Key> propagated_hard{};
+  bool trace_corners = false;
+  size_t source_entries = 0;
+  std::set<Id> input_corners;
+  std::map<Id, std::vector<std::pair<Id, double>>> corner_sources;
+  static PolygonAttributeEditResult
+  edit(const PolygonMesh &, const PolygonEdit &, const PolygonLimits &, bool);
+  void record_corner(Id id, std::span<const std::pair<Id, double>> parts) {
+    if (!trace_corners)
+      return;
+    std::map<Id, double> merged;
+    for (auto [corner, weight] : parts) {
+      budget.step();
+      if (!std::isfinite(weight) || weight < 0)
+        throw std::invalid_argument(
+            "Invalid polygon corner interpolation weight");
+      if (weight == 0)
+        continue;
+      auto add = [&](Id source, double value) {
+        budget.step();
+        merged[source] += weight * value;
+        if (merged.size() > budget.limits.maximum_provenance)
+          throw std::length_error(
+              "Polygon corner interpolation exceeds its identity budget");
+      };
+      if (auto found = corner_sources.find(corner);
+          found != corner_sources.end())
+        for (auto [source, value] : found->second)
+          add(source, value);
+      else {
+        if (!input_corners.contains(corner))
+          throw std::invalid_argument(
+              "Polygon corner interpolation has no input witness");
+        add(corner, 1);
+      }
+    }
+    double sum = 0;
+    for (auto [source, weight] : merged)
+      sum += weight;
+    if (!std::isfinite(sum) || !(sum > 0))
+      throw std::invalid_argument("Polygon corner interpolation is empty");
+    std::vector<std::pair<Id, double>> weights;
+    for (auto [source, weight] : merged)
+      if (weight > 0)
+        weights.emplace_back(source, weight / sum);
+    auto previous = corner_sources.find(id);
+    size_t old = previous == corner_sources.end() ? 0 : previous->second.size();
+    if (weights.size() > 8'000'000 - (source_entries - old))
+      throw std::length_error(
+          "Polygon corner interpolation storage exceeds its budget");
+    const auto count = weights.size();
+    corner_sources.insert_or_assign(id, std::move(weights));
+    source_entries = source_entries - old + count;
+  }
   void expansion(size_t vertices, size_t faces, size_t corners) {
     size_t existing = 0;
     for (auto &f : mesh.faces_) {
@@ -215,12 +268,22 @@ struct PolygonKernel {
       throw std::overflow_error("Polygon component identities exhausted");
     return mesh.next_++;
   }
-  PolygonCorner corner(Id v, std::array<float, 2> uv, bool generated) {
-    return {fresh(), v, uv, generated};
+  PolygonCorner
+  corner(Id v, std::array<float, 2> uv, bool generated,
+         std::initializer_list<std::pair<Id, double>> sources = {}) {
+    auto id = fresh();
+    record_corner(id, sources);
+    return {id, v, uv, generated};
   }
   std::map<Id, size_t> vertex_index, face_index, edge_index;
-  PolygonKernel(PolygonMesh value, Budget &b)
-      : mesh(std::move(value)), budget(b) {
+  PolygonKernel(PolygonMesh value, Budget &b, bool attributes = false)
+      : mesh(std::move(value)), budget(b), trace_corners(attributes) {
+    if (trace_corners)
+      for (const auto &face : mesh.faces_)
+        for (const auto &corner : face.corners) {
+          budget.step();
+          input_corners.insert(corner.id);
+        }
     refresh_vertices();
     refresh_faces();
     refresh_edges();
@@ -545,9 +608,12 @@ struct PolygonKernel {
             PolygonFace side;
             side.id = fresh();
             side.material = f.material;
-            side.corners = {corner(a, {0, 0}, true), corner(z, {1, 0}, true),
-                            corner(copied[z], {1, 1}, true),
-                            corner(copied[a], {0, 1}, true)};
+            auto ca = f.corners[i].id,
+                 cz = f.corners[(i + 1) % f.corners.size()].id;
+            side.corners = {corner(a, {0, 0}, true, {{ca, 1}}),
+                            corner(z, {1, 0}, true, {{cz, 1}}),
+                            corner(copied[z], {1, 1}, true, {{cz, 1}}),
+                            corner(copied[a], {0, 1}, true, {{ca, 1}})};
             sides.push_back(std::move(side));
           }
         }
@@ -615,6 +681,7 @@ struct PolygonKernel {
         nv.id = fresh();
         nv.position = f3(q);
         std::array<float, 2> uv{};
+        std::array<std::pair<Id, double>, 3> color_sources{};
         for (auto t : g.triangles) {
           budget.step();
           auto a = g.xy[t[0]], b = g.xy[t[1]], c = g.xy[t[2]];
@@ -631,6 +698,9 @@ struct PolygonKernel {
             uv[k] = float(w0 * original.corners[t[0]].uv[k] +
                           w1 * original.corners[t[1]].uv[k] +
                           w2 * original.corners[t[2]].uv[k]);
+          color_sources = {{{original.corners[t[0]].id, w0},
+                            {original.corners[t[1]].id, w1},
+                            {original.corners[t[2]].id, w2}}};
           found = true;
           break;
         }
@@ -638,8 +708,12 @@ struct PolygonKernel {
           throw std::invalid_argument(
               "Inset distance leaves the original face");
         append_vertex(std::move(nv));
-        inner.push_back(corner(mesh.vertices_.back().id, uv,
-                               original.corners[i].generated_uv));
+        auto c = corner(mesh.vertices_.back().id, uv,
+                        original.corners[i].generated_uv,
+                        {{color_sources[0].first, color_sources[0].second},
+                         {color_sources[1].first, color_sources[1].second},
+                         {color_sources[2].first, color_sources[2].second}});
+        inner.push_back(std::move(c));
       }
       // An excessive inset can cross opposing edges while every point remains
       // inside. Positive corner orientation and reduced positive area are
@@ -658,11 +732,15 @@ struct PolygonKernel {
         side.material = original.material;
         side.corners = {
             corner(original.corners[i].vertex, original.corners[i].uv,
-                   original.corners[i].generated_uv),
+                   original.corners[i].generated_uv,
+                   {{original.corners[i].id, 1}}),
             corner(original.corners[j].vertex, original.corners[j].uv,
-                   original.corners[j].generated_uv),
-            corner(inner[j].vertex, inner[j].uv, inner[j].generated_uv),
-            corner(inner[i].vertex, inner[i].uv, inner[i].generated_uv)};
+                   original.corners[j].generated_uv,
+                   {{original.corners[j].id, 1}}),
+            corner(inner[j].vertex, inner[j].uv, inner[j].generated_uv,
+                   {{inner[j].id, 1}}),
+            corner(inner[i].vertex, inner[i].uv, inner[i].generated_uv,
+                   {{inner[i].id, 1}})};
         sides.push_back(std::move(side));
       }
       face(id) = std::move(top);
@@ -708,10 +786,12 @@ struct PolygonKernel {
       f.id = fresh();
       f.material = a.material;
       f.corners = {
-          corner(a.corners[i].vertex, {0, 0}, true),
-          corner(a.corners[j].vertex, {1, 0}, true),
-          corner(z.corners[(offset + n - j) % n].vertex, {1, 1}, true),
-          corner(z.corners[(offset + n - i) % n].vertex, {0, 1}, true)};
+          corner(a.corners[i].vertex, {0, 0}, true, {{a.corners[i].id, 1}}),
+          corner(a.corners[j].vertex, {1, 0}, true, {{a.corners[j].id, 1}}),
+          corner(z.corners[(offset + n - j) % n].vertex, {1, 1}, true,
+                 {{z.corners[(offset + n - j) % n].id, 1}}),
+          corner(z.corners[(offset + n - i) % n].vertex, {0, 1}, true,
+                 {{z.corners[(offset + n - i) % n].id, 1}})};
       append_face(std::move(f));
     }
   }
@@ -798,15 +878,36 @@ struct PolygonKernel {
     v.provenance = std::move(provenance);
     for (auto &f : mesh.faces_) {
       std::vector<PolygonCorner> out;
+      std::map<Id, std::vector<Id>> groups;
       for (auto c : f.corners) {
         budget.step();
         if (ids.contains(c.vertex))
           c.vertex = target;
-        if (out.empty() || out.back().vertex != c.vertex)
+        if (out.empty() || out.back().vertex != c.vertex) {
           out.push_back(c);
+          if (trace_corners)
+            groups[c.id].push_back(c.id);
+        } else if (trace_corners)
+          groups[out.back().id].push_back(c.id);
       }
-      if (out.size() > 1 && out.front().vertex == out.back().vertex)
+      if (out.size() > 1 && out.front().vertex == out.back().vertex) {
+        if (trace_corners) {
+          auto &front = groups.at(out.front().id);
+          auto &back = groups.at(out.back().id);
+          front.insert(front.end(), back.begin(), back.end());
+        }
         out.pop_back();
+      }
+      if (trace_corners)
+        for (const auto &c : out) {
+          const auto &group = groups.at(c.id);
+          if (group.size() > 1) {
+            std::vector<std::pair<Id, double>> weights;
+            for (auto id : group)
+              weights.emplace_back(id, 1.0 / group.size());
+            record_corner(c.id, weights);
+          }
+        }
       f.corners = std::move(out);
     }
     std::erase_if(mesh.faces_, [](auto &f) { return f.corners.size() < 3; });
@@ -882,7 +983,9 @@ struct PolygonKernel {
           out.push_back(corner(v,
                                {c.uv[0] * (1 - t) + z.uv[0] * t,
                                 c.uv[1] * (1 - t) + z.uv[1] * t},
-                               c.generated_uv || z.generated_uv));
+                               c.generated_uv || z.generated_uv,
+                               {{c.id, 1 - double(j) / double(cuts + 1)},
+                                {z.id, double(j) / double(cuts + 1)}}));
         }
       }
       f.corners = std::move(out);
@@ -925,8 +1028,12 @@ struct PolygonKernel {
     second.material = old.material;
     for (size_t i = y;; i = (i + 1) % old.corners.size()) {
       auto c = old.corners[i];
-      if (i == x || i == y)
+      if (i == x || i == y) {
+        auto original_corner = c.id;
         c.id = fresh();
+        const std::pair<Id, double> source{original_corner, 1};
+        record_corner(c.id, {&source, 1});
+      }
       second.corners.push_back(c);
       if (i == x)
         break;
@@ -1083,9 +1190,10 @@ PolygonRender PolygonMesh::triangulate(const PolygonLimits &limits) const {
   }
   return out;
 }
-PolygonEditResult edit_polygon(const PolygonMesh &source,
-                               const PolygonEdit &edit,
-                               const PolygonLimits &limits) {
+PolygonAttributeEditResult PolygonKernel::edit(const PolygonMesh &source,
+                                               const PolygonEdit &edit,
+                                               const PolygonLimits &limits,
+                                               bool attributes) {
   Budget budget{limits};
   PolygonKernel::validate(source, budget);
   if (!finite(edit.delta) || !std::isfinite(edit.amount))
@@ -1096,7 +1204,7 @@ PolygonEditResult edit_polygon(const PolygonMesh &source,
       edit.selection.mode != PolygonSelectionMode::Edge &&
       edit.selection.mode != PolygonSelectionMode::Face)
     throw std::invalid_argument("Unknown polygon selection mode");
-  PolygonKernel k{source, budget};
+  PolygonKernel k{source, budget, attributes};
   k.mesh.next_ = std::max(k.mesh.next_, edit.first_id);
   auto ids = k.selected(edit.selection);
   if (edit.operation == PolygonOperation::Move) {
@@ -1166,15 +1274,36 @@ PolygonEditResult edit_polygon(const PolygonMesh &source,
     if (k.propagated_hard.contains(key(e.a, e.b)))
       e.hard = true;
   PolygonKernel::validate(k.mesh, budget);
-  PolygonEditResult result;
+  PolygonAttributeEditResult result;
+  if (attributes)
+    for (const auto &face : k.mesh.faces_)
+      for (const auto &corner : face.corners) {
+        if (auto found = k.corner_sources.find(corner.id);
+            found != k.corner_sources.end()) {
+          budget.step();
+          result.corner_sources.push_back({corner.id, found->second});
+        }
+      }
+  auto &geometry_result = result.geometry;
   for (auto &v : k.mesh.vertices_)
     if (v.id >= source.next_id())
-      result.created_vertices.push_back(v.id);
+      geometry_result.created_vertices.push_back(v.id);
   for (auto &f : k.mesh.faces_)
     if (f.id >= source.next_id())
-      result.created_faces.push_back(f.id);
-  result.replacement = std::move(k.mesh);
+      geometry_result.created_faces.push_back(f.id);
+  geometry_result.replacement = std::move(k.mesh);
   return result;
+}
+PolygonEditResult edit_polygon(const PolygonMesh &source,
+                               const PolygonEdit &edit,
+                               const PolygonLimits &limits) {
+  return PolygonKernel::edit(source, edit, limits, false).geometry;
+}
+PolygonAttributeEditResult
+edit_polygon_with_corner_sources(const PolygonMesh &source,
+                                 const PolygonEdit &edit,
+                                 const PolygonLimits &limits) {
+  return PolygonKernel::edit(source, edit, limits, true);
 }
 nlohmann::json PolygonMesh::encode() const {
   nlohmann::json j = {{"version", 1},
