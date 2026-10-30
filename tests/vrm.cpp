@@ -226,6 +226,15 @@ int main(int argc, char **argv) try {
             binds[1]["mesh"] == 7 && binds[1]["index"] == 0,
         "Split source meshes expand expressions with independently reordered "
         "morph identities");
+  auto inserted = map;
+  inserted.morph_targets[5] = {1, 2};
+  inserted.morph_targets[7] = {0, 1};
+  auto independently = metadata.remap(inserted);
+  const auto &independent_binds =
+      independently["blendShapeMaster"]["blendShapeGroups"][0]["binds"];
+  check(independent_binds[0]["index"] == 2 && independent_binds[1]["index"] == 1 &&
+            metadata.source() == source,
+        "Each emitted mesh remaps the immutable original expression target even after native-only target insertion");
   check(result["firstPerson"]["meshAnnotations"].size() == 2 &&
             result["secondaryAnimation"]["boneGroups"][0]["bones"][1] == 102 &&
             result["secondaryAnimation"]["colliderGroups"][0]["node"] == 101,

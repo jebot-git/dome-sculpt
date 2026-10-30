@@ -345,14 +345,15 @@ Json Vrm0Metadata::remap(const Vrm0IdentityMap &map) const {
     for (auto &group : result["blendShapeMaster"]["blendShapeGroups"])
       if (group.contains("binds")) {
         Json expanded = Json::array();
-        for (auto bind : group["binds"])
-          for (auto mesh : mapped_mesh(bind.at("mesh"), map)) {
+        for (const auto &source_bind : group["binds"])
+          for (auto mesh : mapped_mesh(source_bind.at("mesh"), map)) {
+            auto bind = source_bind;
             bind["mesh"] = mesh;
             auto found = map.morph_targets.find(mesh);
             if (found == map.morph_targets.end())
               fail("expression mesh has no exact morph map");
             bind["index"] =
-                mapped(bind.at("index"), found->second, "expression target");
+                mapped(source_bind.at("index"), found->second, "expression target");
             expanded.push_back(bind);
           }
         group["binds"] = expanded;
