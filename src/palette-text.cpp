@@ -80,8 +80,9 @@ struct Font::Impl {
     if (FT_New_Face(library, file.c_str(), index, &f->ft))
       throw std::runtime_error("Cannot load spatial menu font");
     auto format = FT_Get_Font_Format(f->ft);
-    if (!format || std::string(format) != "BDF" || FT_IS_SCALABLE(f->ft) || !f->ft->num_fixed_sizes)
-      throw std::runtime_error("Spatial menus need native DomeD BDF fonts");
+    if (!format || (std::string_view(format) != "BDF" && std::string_view(format) != "PCF") ||
+        FT_IS_SCALABLE(f->ft) || !f->ft->num_fixed_sizes)
+      throw std::runtime_error("Spatial menus need native DomeD BDF or PCF fonts");
     FT_Select_Charmap(f->ft, FT_ENCODING_UNICODE);
     if (f->ft->num_fixed_sizes) {
       int strike = 0;
@@ -132,7 +133,9 @@ struct Font::Impl {
     FcPatternAddString(pattern, FC_FAMILY, reinterpret_cast<const FcChar8 *>("monospace"));
     FcPatternAddInteger(pattern, FC_SPACING, FC_MONO);
     FcPatternAddBool(pattern, FC_SCALABLE, FcFalse);
-    FcPatternAddString(pattern, FC_FONTFORMAT, reinterpret_cast<const FcChar8 *>("BDF"));
+    // Fontconfig intersects repeated fontformat values. Query nonscalable
+    // candidates and validate each decoded face in add(), allowing both native
+    // bitmap formats without admitting embedded SFNT bitmap/outline fallbacks.
     FcPatternAddDouble(pattern, FC_PIXEL_SIZE, pixels);
     FcPatternAddCharSet(pattern, FC_CHARSET, chars); FcCharSetDestroy(chars);
     FcConfigSubstitute(nullptr, pattern, FcMatchPattern); FcDefaultSubstitute(pattern);

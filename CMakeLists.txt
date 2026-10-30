@@ -211,7 +211,10 @@ if(BUILD_TESTING)
 endif()
 if(DOME_BUILD_UI OR DOME_BUILD_XR)
   find_package(PkgConfig REQUIRED)
-  pkg_check_modules(NATIVEGL REQUIRED IMPORTED_TARGET egl gl freetype2 fontconfig harfbuzz icu-i18n icu-uc)
+  # FindPkgConfig searches accumulated -L directories in order. Resolve the
+  # selected bitmap runtime before GL's system directory, which can contain
+  # different FreeType/HarfBuzz libraries with the same SONAMEs.
+  pkg_check_modules(NATIVEGL REQUIRED IMPORTED_TARGET freetype2 harfbuzz egl gl fontconfig icu-i18n icu-uc)
   add_library(dome-sculpt-render src/render.cpp src/palette.cpp src/palette-text.cpp third_party/openbrush/graphics.cpp)
   target_link_libraries(dome-sculpt-render PUBLIC dome-sculpt-core PkgConfig::NATIVEGL)
   if(BUILD_TESTING)
