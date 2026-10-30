@@ -34,4 +34,8 @@ controller45actual frames, stylus45, sRGB47; the sRGB case needed2 acknowledged
 wait frames. Each renders4 palette eye images and completes balanced ownership,
 focus and reference-space checks. This demonstrates an actual asynchronous wait
 rather than adding an arbitrary delay or removing the visibility assertion.
-The full loader regression is recorded separately after this focused proof.
+The complete main OneAPI loader regression then passes all150 checks with
+exit0 using unchanged product40ea548 and this test-only fixture. Resolution17
+passed separately before the fixture change. This full run retains all pressure,
+paint, UV, retopo, cuts, masks, shutdown, file-worker and session assertions.
+Initial failed logs and reports are preserved, and no product fix is claimed.
