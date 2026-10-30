@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Adapted from OpenBrush Native's BDF palette and texture renderer
 // (Apache-2.0).
+
+#include "sculpt-ui-values.hpp"
 #include "dome/palette.hpp"
 #include <cstdio>
 #include "palette-text.hpp"
@@ -253,7 +255,12 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::CutDirection)label=row==0?"Yaw ":"Pitch ";
       else if (c.components > 1)
         label = std::string(1, (c.parameter == VrParameter::RigRotation ? "XYZ" : "RGBA")[row]) + " ";
-      if(c.parameter==VrParameter::SkinSource){
+      if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
+      else if(c.parameter==VrParameter::SculptPlanes) {
+        if(row==3) label=std::string("Protection view ")+(value>=.5f?"On":"Off");
+        else {char size[64];snprintf(size,sizeof(size),"%c %.2f mm", "XYZ"[row],double(sculpt_plane_metres(value))*1000);label=size;}
+      }
+      else if(c.parameter==VrParameter::SkinSource){
         auto index=size_t(std::clamp(std::lround(value),0l,long(s.skin_sources.empty()?0:s.skin_sources.size()-1)));
         auto id=s.skin_sources.empty()?0:s.skin_sources[index];
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==id;});
@@ -295,7 +302,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && !skin_parameter(c.parameter)) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter)) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
@@ -332,6 +339,12 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 1) return r.moving;
       if (sector == 6 && r.topology && !r.selected.empty())
         return std::all_of(r.selected.begin(), r.selected.end(), [&](auto id) { return r.topology->vertices().at(id).pinned; });
+    }
+    if(s.menu_page==15) {
+      if(sector==0) return s.sculpt_settings.mask_edit;
+      if(sector==6) return (s.sculpt_settings.symmetry_axes&1)!=0;
+      if(sector==7) return (s.sculpt_settings.symmetry_axes&2)!=0;
+      if(sector==9) return (s.sculpt_settings.symmetry_axes&4)!=0;
     }
     if (s.menu_page == 13) {
       if (sector == 0) return s.weights.enabled;
@@ -385,7 +398,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : labels[i];
+    const std::string label = s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -417,11 +430,11 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 16 && s.menu_page != 17) {
+  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -440,6 +453,13 @@ void SpatialPalette::raster(const EditorState &s) {
   if(s.menu_page==17){auto c=s.cut;
     text(320*unit_,278*unit_,!c?"Start an editable cutting plane":c->committing?"Applying cut...":c->busy?"Updating preview...":"Apply retains the source",fg);
     text(320*unit_,310*unit_,!c?"Shell and cap are editable":c->settings.cap?"Closed cap":"Open trim",fg);
+  }
+  if(s.menu_page==15) {
+    const char *modes[]={"Add protection","Remove protection","Smooth protection"};
+    text(320*unit_,285*unit_,s.sculpt_settings.mask_edit?modes[int(s.sculpt_settings.mask_tool)]:"Geometry brush / mask protected",fg);
+    std::string axes;
+    for(int k=0;k<3;++k) if(s.sculpt_settings.symmetry_axes&(1u<<k)) axes+="XYZ"[k];
+    text(320*unit_,318*unit_,axes.empty()?"No mirrored axes":"Mirror "+axes,fg);
   }
   if(s.menu_page==14) {
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==s.skin_options.reference;});
@@ -501,6 +521,9 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_visible) +
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature += ":sculpt:" + std::to_string(s.sculpt_settings.symmetry_axes) + ":" +
+      std::to_string(s.sculpt_settings.mask_edit) + ":" + std::to_string(s.sculpt_settings.mask_visible) + ":" +
+      std::to_string(int(s.sculpt_settings.mask_tool));
   signature += std::to_string(s.weights.enabled) + std::to_string(s.weights.symmetry) +
       std::to_string(s.weights.linked) + std::to_string(int(s.weights.mode));
   for (auto lock : s.weights.locks) signature += lock ? "1" : "0";

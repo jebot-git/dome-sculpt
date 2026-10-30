@@ -69,6 +69,17 @@ half-space closes as a no-op without allocating output objects or global Undo.
 Native save/open retains both outputs and hidden source through the existing
 group/baked-surface codecs; glTF exports the visible shell/cap material primitives.
 
+## Sculpt protection and symmetry
+
+Cutting a protected source retains its original protection overlay while the
+plane clips the displayed surface. Ephemeral cap vertices use the ordinary
+unmasked material sentinel. Protection is display feedback and is not baked
+into shell paint. Mask controls, bulk Fill/Invert and pressure strokes cannot
+mutate the source while the cut workspace exists. Cancel restores the original
+view; Apply retains the exact source Volume3 mask/control data as hidden assets.
+New mesh outputs have no stale sculpt-protection overlay. Mask storage without
+sculpt geometry is not an eligible geometry source for a cut.
+
 ## Worker and lifetime contracts
 
 Input/GUI controls stage bounded settings. A dedicated cut worker captures the

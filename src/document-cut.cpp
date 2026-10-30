@@ -30,7 +30,8 @@ std::shared_ptr<const MeshSnapshot> preview_snapshot(const MeshSnapshot &base,co
     result->mesh.positions.insert(result->mesh.positions.end(),cap.positions.begin(),cap.positions.end());
     result->mesh.normals.insert(result->mesh.normals.end(),cap.normals.begin(),cap.normals.end());
     for(size_t n=0;n<cap.positions.size();++n){result->mesh.uv.push_back(cap.uv.empty()?std::array<float,2>{}:cap.uv[n]);
-      if(!result->tangents.empty())result->tangents.push_back({1,0,0,1});}
+      if(!result->tangents.empty())result->tangents.push_back({1,0,0,1});
+      if(!result->sculpt_masks.empty())result->sculpt_masks.push_back(-1);}
     for(auto vertex:cap.indices)result->mesh.indices.push_back(uint32_t(offset+vertex));
     result->ranges.push_back({UINT64_MAX,first,cap.indices.size(),preview.settings.cap_material,{}, {},offset});
   }
@@ -41,7 +42,7 @@ void Document::begin_cut(){std::lock_guard lock(model_mutex_);finish_locked();be
 void Document::begin_cut_locked(){
   const auto &o=scene_.active();
   if(state_.cut||state_.retopology||state_.asset_busy||state_.recovery_busy||control_before_||action_active_locked()||
-     !o.visible||o.locked||scene_.objects().size()>254||scene_.groups().size()>=128)
+     !o.visible||o.locked||(!o.mesh_active&&o.volume->voxels().empty())||scene_.objects().size()>254||scene_.groups().size()>=128)
     throw std::logic_error("Finish the current action; show and unlock a source with room for cut outputs");
   cut_settings_.validate();cut_undo_.clear();cut_redo_.clear();cut_base_.reset();cut_bake_source_.reset();
   auto view=std::make_shared<CutView>();view->session=++cut_session_;view->request=++cut_request_;

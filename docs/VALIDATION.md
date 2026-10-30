@@ -1,3 +1,20 @@
+# Cut and sculpt protection integration — verification in progress
+
+This source combines55dafa0 / source2ec8a5a and9a0cfc4 / source20c132d.
+The first fresh Release build completes. Eight refined focused suites pass2.62s
+(artifacts/tests-cut-sculpt-refined.log), including protected-source cut, masks,
+controller, transaction and six-worker shutdown boundaries. Full combined proof
+is pending; earlier milestone counts below remain historical and do not prove
+the current tree. Exact prior records are also archived as
+VALIDATION-55dafa0.md and VALIDATION-9a0cfc4.md.
+
+Diagnostics: the first5-suite run passed4 and failed the new cut scalar oracle.
+A native probe measured0.7499998212..0.7500000596 for a uniform0.75 field; cap
+scalars were exactly-1 and all counts matched. Constant-preserving sampling fixes
+the underlying math rather than loosening the oracle. An intermediate build used
+CowMap::empty, which that wrapper does not expose; the supported size()==0 form
+corrects it. Both failed logs remain. build-cut-sculpt-refined2.log is successful.
+
 # Combined plane-cut and production verification — 2026-10-30
 
 Application source: 2ec8a5a59990f2d64887434560a6402d5a9ec665, branch

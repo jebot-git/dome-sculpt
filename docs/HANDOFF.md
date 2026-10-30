@@ -1,3 +1,22 @@
+# Cut and sculpt protection integration — in progress
+
+Current branch work/cut-sculpt-integration merges feature55dafa0 (source2ec8a5a)
+with main9a0cfc4 (source20c132d). Both histories are preserved. Build/validation
+are underway; the historical counts below are not proof of this combined tree.
+Source includes Volume3/Brush/Sample, Masks15/Skin14/Retopo16/Cut17, reconciled
+shader protection/clipping, cap sentinels and source isolation. Geometry and bake
+source availability exclude mask-only empty fields. Protected-source regression
+covers exact retained mask/controls, cancellation, static paint and Undo. Sampling
+preserves constant mask scalars through a validated uniform shortcut and nested
+interpolation; original exact oracles remain. Eight focused suites pass2.62s.
+
+Exact prior handoffs/validation are archived in corresponding -55dafa0 and
+-9a0cfc4 files. Do not reapply the old merge plan below. Use build-cut-sculpt and
+artifacts/toolkit-authoring/lib for the new coherent build. The full objective in
+REQUIREMENTS.md is incomplete; no agents were spawned or system/session replaced.
+
+Historical feature checkpoint follows until final integration proof is recorded:
+
 # Combined plane-cut and production checkpoint — 2026-10-30
 
 Application source 2ec8a5a59990f2d64887434560a6402d5a9ec665 merges plane checkpoint

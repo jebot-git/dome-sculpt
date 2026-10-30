@@ -67,7 +67,7 @@ Retopology page16 uses cell0 as New patch / Resume patch. Starting or resuming
 closes the menu so pressure can place/move points; Tool mode also resumes the
 canvas. Face/edge/pin/relax commands can keep the page open for chaining, with
 Resume available afterward. Apply/Cancel close the menu; a subsequent joystick
-press reopens the active patch page. Skin14 and reserved Masks15 remain separate.
+press reopens the active patch page. Skin14 and Masks15 remain separate.
 Standalone CLI final save cancels only an unconfirmed patch after accepted work
 drains; stopping embedded XR retains the draft for desktop continuation.
 
@@ -80,3 +80,34 @@ SpatialInput retains command_device alongside its consumed command for that
 purpose. Release-to-rearm and ownership rules remain unchanged. Tracking/focus
 loss rolls back the active parameter adjustment; accepted Apply remains ordered
 through XR shutdown and asset waits. See PLANE-CUTS.md.
+
+# Sculpt masks and symmetry
+
+Desktop Sculpt → Masks and symmetry edits a draft of the active source object's
+mask mode/tool/strength, overlay visibility, mirror axes and local plane origin.
+Numeric plane fields use millimetres; paired sliders support continuous edits.
+Return initially chooses Cancel. Apply unchanged values creates no undo entry;
+Apply changed values creates one guarded transaction. Standard Close/Escape and
+Ctrl+W cancel the draft. Source object locks/visibility remain authoritative;
+mask painting can edit protection on a hidden/locked geometry layer.
+
+Sculpt → Paint protection mask enables pressure painting. Add/Remove/Smooth act
+on protection; Clay/Carve/Smooth/Flatten and keys1–4 explicitly return to geometry
+while retaining the mask. Radius changes preserve the current mode. Protect all,
+Clear and Invert execute on the ordered asset worker. The global default also
+protects geometry added later; layer visibility/strength changes stay independent.
+
+In XR, Root → Objects → Sculpt layers → Masks opens page15. It provides mask
+painting/Resume, mode, strength, Fill/Clear/Invert, XYZ mirrors, planes/view and
+Cancel work. Planes/view has four large ray/stick rows: local X/Y/Z origins and
+Show mask. Native and spatial controls share the same persisted state. Resume
+closes the menu to expose pressure input. Release after an action before pressing
+again; the existing source-lease rearm boundary also applies to mask controls.
+A bulk worker publication rebinds the source and closes the menu; reopen it by
+the same route. Undo restores the complete prior mask in one step.
+
+Darkened surface feedback preserves PBR/MToon coverage and material picking.
+Mirrored brush rings follow object/group-local planes. Focus/tracking loss cancels
+an unfinished protection stroke or unaccepted parameter draft; completed earlier
+edits survive. Skin14, Retopology16 and Recovery remain on their existing routes.
+See SCULPT-MASKS.md for bounded storage, compute and validation details.

@@ -127,6 +127,8 @@ struct SurfaceRenderer::TextureState {
     for(auto t:mesh.tangents)if(!finite(Vec3{t[0],t[1],t[2]})||length(Vec3{t[0],t[1],t[2]})<1e-8f||!std::isfinite(t[3])||std::abs(std::abs(t[3])-1)>1e-5f)throw std::invalid_argument("Invalid canonical tangent frame");
     if(!mesh.selected_weights.empty()&&mesh.selected_weights.size()!=mesh.mesh.positions.size())throw std::runtime_error("Weight visualization size differs from current geometry");
     for(float w:mesh.selected_weights)if(!std::isfinite(w)||(w!=-1&&(w<0||w>1)))throw std::runtime_error("Invalid weight visualization value");
+    if(!mesh.sculpt_masks.empty()&&mesh.sculpt_masks.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Sculpt mask count differs from packed geometry");
+    for(float value:mesh.sculpt_masks)if(!std::isfinite(value)||(value!=-1&&(value<0||value>1)))throw std::invalid_argument("Invalid sculpt mask visualization value");
     std::unordered_set<uint64_t> next_weighted;
     if(!mesh.selected_weights.empty())for(auto &r:mesh.ranges){
       if(r.first>mesh.mesh.indices.size()||r.count>mesh.mesh.indices.size()-r.first)throw std::runtime_error("Weight visualization range is invalid");
@@ -296,7 +298,7 @@ void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=0;cached_.reset
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   auto vertex=mtoon_renderer_vertex();
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position;in vec2 texcoord,texcoord1;in float weight_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;
+in vec3 world,n,canonical_t,canonical_b,cut_position;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -315,20 +317,23 @@ if(abs(determinant)>1e-8*max(length(a)*length(b),1e-20)){
 vec3 T=(x*b.y-y*a.y)/determinant,B=(y*a.x-x*b.x)/determinant;T=unit(T-N*dot(N,T));B=unit(cross(N,T))*(dot(cross(N,T),B)<0.0?-1.0:1.0);
 vec3 encoded=texture(tex3,uv).xyz;vec3 ts=unit(vec3((encoded.xy*2.0-1.0)*normal_scale,encoded.z*2.0-1.0));N=unit(T*ts.x+B*ts.y+N*ts.z);}}
 return gl_FrontFacing?N:-N;}
+// Masking darkens final linear RGB, retaining the material's lighting, alpha,
+// cutout, depth and blend rules. Zero and the ordinary-object sentinel are exact.
+vec3 sculpt_mask_color(vec3 rgb){return mask_value>0?rgb*(1.0-.72*clamp(mask_value,0.0,1.0)):rgb;}
 void main(){if(clip_enabled==1&&dot(clip_plane.xyz,cut_position)<clip_plane.w)discard;if(weight_pass==1){if(weight_value<0)discard;float opacity;
 if(mt_mode==1){bool killed;vec4 source=mt_surface(n,unit(camera-world),killed);if(killed)discard;opacity=source.a;}
 else{opacity=base_color.a;if(slots[0]==1)opacity*=texture(tex0,source_uv(0)).a;
 if(alpha_mode==1)opacity=1;else if(alpha_mode==2){if(opacity<alpha_cutoff)discard;opacity=1;}}
-if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0,0,1),vec3(0,1,1),x):x<2?mix(vec3(0,1,1),vec3(0,1,0),x-1):x<3?mix(vec3(0,1,0),vec3(1,1,0),x-2):mix(vec3(1,1,0),vec3(1,0,0),x-3);color=vec4(ramp,opacity);return;}if(weight_value>=0)discard;if(mt_mode==1){bool killed;vec4 result=mt_surface(n,unit(camera-world),killed);if(killed)discard;color=vec4(result.rgb,result.a);return;}vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
+if(opacity<=0)discard;float x=clamp(weight_value,0,1)*4;vec3 ramp=x<1?mix(vec3(0,0,1),vec3(0,1,1),x):x<2?mix(vec3(0,1,1),vec3(0,1,0),x-1):x<3?mix(vec3(0,1,0),vec3(1,1,0),x-2):mix(vec3(1,1,0),vec3(1,0,0),x-3);color=vec4(ramp,opacity);return;}if(weight_value>=0)discard;if(mt_mode==1){bool killed;vec4 result=mt_surface(n,unit(camera-world),killed);if(killed)discard;color=vec4(sculpt_mask_color(result.rgb),result.a);return;}vec3 shading_normal=unlit==0?surface_normal():vec3(0,0,1);vec4 base=base_color;float metal=metallic,rough=roughness,ao=1.0;vec3 glow=emission;
 if(slots[0]==1)base*=texture(tex0,source_uv(0));
 if(slots[1]==1){vec3 orm=texture(tex1,source_uv(1)).rgb;metal*=orm.b;rough*=orm.g;if(map_mode==1)ao=orm.r;}
 if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
 if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength);if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
-if(unlit==1){color=vec4(base.rgb+glow,base.a);return;}
+if(unlit==1){color=vec4(sculpt_mask_color(base.rgb+glow),base.a);return;}
 vec3 N=shading_normal,V=normalize(camera-world),result;
 if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32*ao,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base.rgb*ramp*edge+vec3(.025);}
 else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb*ao;
-result+=glow;result=result/(result+vec3(1));color=vec4(result,base.a);})GLSL";
+result+=glow;result=result/(result+vec3(1));color=vec4(sculpt_mask_color(result),base.a);})GLSL";
   GLuint vs = shader(GL_VERTEX_SHADER, vertex.c_str()),
          fs = shader(GL_FRAGMENT_SHADER, fragment.c_str());
   program_ = glCreateProgram();
@@ -376,13 +381,14 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       std::array<float, 2> uv,uv1;
       float weight=-1;
       std::array<float,4> tangent;
+      float mask=-1;
     };
     std::vector<Vertex> v;
     v.reserve(mesh->mesh.positions.size());
     for (size_t i = 0; i < mesh->mesh.positions.size(); ++i)
       v.push_back(
           {mesh->mesh.positions[i], mesh->mesh.normals[i],
-           mesh->mesh.uv.empty() ? std::array<float, 2>{} : mesh->mesh.uv[i],textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],mesh->selected_weights.empty()?-1:mesh->selected_weights[i],mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i]});
+           mesh->mesh.uv.empty() ? std::array<float, 2>{} : mesh->mesh.uv[i],textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],mesh->selected_weights.empty()?-1:mesh->selected_weights[i],mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i],mesh->sculpt_masks.empty()?-1:mesh->sculpt_masks[i]});
     glBindVertexArray(vao_);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_);
     glBufferData(GL_ARRAY_BUFFER, v.size() * sizeof(Vertex), v.data(),
@@ -398,6 +404,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glVertexAttribPointer(3,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv1)));glEnableVertexAttribArray(3);
     glVertexAttribPointer(4,1,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,weight)));glEnableVertexAttribArray(4);
     glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,tangent)));glEnableVertexAttribArray(5);
+    glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,mask)));glEnableVertexAttribArray(6);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                  mesh->mesh.indices.size() * sizeof(uint32_t),
@@ -712,12 +719,39 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
           r = std::min(.01f, state.retopology->snap_mm * .00025f) * state.canvas.scale;
         Vec3 color =
             state.tool == Tool::Carve ? Vec3{1, .2f, .2f} : Vec3{.1f, .9f, .5f};
+        auto source = std::find_if(state.objects.begin(), state.objects.end(),
+                                  [&](const auto &object) { return object.id == state.active_object; });
+        bool sculpt = !state.mesh_active && !state.weights.enabled &&
+                      !state.retopology && source != state.objects.end() && source->visible && !source->locked;
+        if (sculpt && state.sculpt_settings.mask_edit)
+          color = state.sculpt_settings.mask_tool == Volume::MaskTool::Subtract ? Vec3{1,.65f,.25f}
+                    : state.sculpt_settings.mask_tool == Volume::MaskTool::Smooth ? Vec3{.8f,.65f,1}
+                    : Vec3{.35f,.6f,1};
+        std::vector<ob::Vec3> centers{p};
+        if (sculpt && state.sculpt_settings.symmetry_axes) {
+          auto frame = ob::compose(state.canvas, state.sculpt_transform);
+          auto local = ob::transform(ob::inverse(frame), p);
+          auto origin = state.sculpt_settings.symmetry_origin;
+          unsigned axes = state.sculpt_settings.symmetry_axes & 7;
+          if (local.x == origin.x) axes &= ~1u;
+          if (local.y == origin.y) axes &= ~2u;
+          if (local.z == origin.z) axes &= ~4u;
+          for (unsigned bits = 1; bits < 8; ++bits) {
+            if (bits & ~axes) continue;
+            auto reflected = local;
+            if (bits & 1) reflected.x = 2 * origin.x - reflected.x;
+            if (bits & 2) reflected.y = 2 * origin.y - reflected.y;
+            if (bits & 4) reflected.z = 2 * origin.z - reflected.z;
+            centers.push_back(ob::transform(frame, reflected));
+          }
+        }
+        for (auto center : centers)
         for (int axis = 0; axis < 3; ++axis)
           for (int k = 0; k < 32; ++k) {
             float a = k * 6.283185307f / 32, b = (k + 1) * 6.283185307f / 32;
             auto point = [&](float t) {
               float x = std::cos(t) * r, y = std::sin(t) * r;
-              return p + (axis == 0   ? ob::Vec3{x, y, 0}
+              return center + (axis == 0   ? ob::Vec3{x, y, 0}
                           : axis == 1 ? ob::Vec3{x, 0, y}
                                       : ob::Vec3{0, x, y});
             };

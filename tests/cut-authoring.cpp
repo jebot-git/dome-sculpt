@@ -53,8 +53,8 @@ int main(int argc,char **argv)try{
       {"closed",inspect_mesh(mesh).closed_manifold()}}.dump()<<'\n';return 0;
   }
   check(spatial_parameter(14,0)==VrParameter::SkinSource&&spatial_parameter(16,9)==VrParameter::RetopoDistance&&
-        spatial_parameter(17,1)==VrParameter::CutOffset&&!spatial_action(15,0)&&!spatial_action(18,0),
-        "Skin, reserved masks, retopology and plane-cut pages retain independent native command routing");
+        spatial_parameter(17,1)==VrParameter::CutOffset&&spatial_action(15,0)==SpatialCommand::SculptMaskResume&&!spatial_action(18,0),
+        "Skin, sculpt masks, retopology and plane-cut pages retain independent native command routing");
   // Two nearby surfaces distinguish exact provenance from a nearest ray.
   Mesh low;low.positions={{0,0,0},{1,0,0},{0,1,0}};low.normals.assign(3,{0,0,1});low.uv={{0,0},{1,0},{0,1}};low.indices={0,1,2};
   BakeSource layers;layers.mesh=low;for(auto p:low.positions){p.z+=.001f;layers.mesh.positions.push_back(p);}
@@ -207,5 +207,54 @@ int main(int argc,char **argv)try{
   left.send(0,0,true);left.send();left.sector(4);
   check(left_doc.wait_cut()&&left_doc.frame().state->cut->preview->plane.normal.z>.99f&&std::abs(left_doc.frame().state->cut->settings.offset_mm-25)<1e-3f,
         "From hand uses the left menu owner rather than the idle tracked right controller");
+  {
+    Volume field(.05f);field.begin_stroke();Brush sphere;sphere.radius=.23f;sphere.blend=0;field.stamp(sphere);field.end_stroke();
+    auto mask_settings=field.sculpt_settings();mask_settings.mask_edit=true;mask_settings.symmetry_axes=5;
+    mask_settings.symmetry_origin={.013f,-.021f,.031f};field.sculpt_settings(mask_settings);field.fill_mask(.75f);
+    Scene protected_source;protected_source.active().volume=std::make_shared<Volume>(field.geometry_snapshot());
+    protected_source.active().material.color={1,1,1,1};auto protected_before=protected_source.encode();
+    Document protected_cut;protected_cut.replace(protected_source.snapshot());protected_cut.begin_cut();
+    check(protected_cut.wait_cut()&&protected_cut.wait_mesh()&&protected_cut.frame().state->error.empty(),
+          "A Volume3 protected symmetric source prepares a clipped preview with a cap");
+    auto surface=protected_cut.frame().surface;bool source_mask=false,cap_mask=false,attributes=true;
+    for(const auto &range:surface->ranges)for(size_t k=range.first;k<range.first+range.count;++k){
+      auto value=surface->sculpt_masks.at(surface->mesh.indices[k]);
+      if(range.object==1){source_mask=true;attributes&=value==.75f;}
+      else if(range.object==UINT64_MAX){cap_mask=true;attributes&=value==-1;}
+    }
+    check(source_mask&&cap_mask&&attributes&&surface->sculpt_masks.size()==surface->mesh.positions.size(),
+          "Original protection feedback stays exact while ephemeral cap vertices use ordinary unmasked material");
+    check(!protected_cut.frame().state->can_configure_sculpt&&!protected_cut.begin_desktop()&&
+          rejects([&]{protected_cut.sculpt_settings(mask_settings);})&&rejects([&]{protected_cut.sculpt_mask_fill(0);})&&
+          rejects([&]{protected_cut.sculpt_mask_invert();}),
+          "Mask controls, bulk work and pressure cannot mutate a live cut source or bypass its draft isolation");
+    protected_cut.end_cut(false);
+    check(protected_cut.copy_scene().encode()==protected_before&&!protected_cut.frame().surface->clipped_object,
+          "Cut cancellation restores the complete protected source with exact Volume3 mask, controls and geometry");
+    protected_cut.begin_cut();check(protected_cut.wait_cut(),"Protected source can start another cut after cancellation");
+    protected_cut.end_cut(true);check(protected_cut.wait_asset()&&protected_cut.wait_mesh()&&protected_cut.frame().state->error.empty(),
+          "Protected source publishes grouped static cut geometry through the ordered worker");
+    auto cut_scene=protected_cut.copy_scene();
+    check(cut_scene.encode()["objects"][0]["volume"]==protected_before["objects"][0]["volume"]&&
+          !cut_scene.object(1).visible&&protected_cut.frame().surface->sculpt_masks.empty(),
+          "Accepted cuts retain all original mask/symmetry data and leave no stale protection overlay on new mesh outputs");
+    auto baked=cut_scene.active().painted->baked();bool white=baked!=nullptr;
+    if(baked)for(size_t k=0;k<baked->coverage.size();++k)if(baked->coverage[k])
+      white&=baked->maps.color.rgba[k*4]==255&&baked->maps.color.rgba[k*4+1]==255&&baked->maps.color.rgba[k*4+2]==255;
+    check(white,"Display-only sculpt protection is not baked into the retained white source material");
+    check(protected_cut.undo()&&protected_cut.copy_scene().encode()==protected_before,
+          "One global cut Undo restores exact protected geometry and controls without losing mask history");
+    Volume empty(.05f);auto empty_settings=empty.sculpt_settings();empty_settings.mask_edit=true;empty.sculpt_settings(empty_settings);
+    empty.begin_stroke();Brush protection;protection.radius=.1f;empty.stamp(protection);empty.end_stroke();
+    check(empty.voxels().empty()&&empty.stored_samples()>0,"Mask-only fixture stores protection without sculpt geometry");
+    Document empty_cut;empty_cut.replace(std::move(empty));
+    check(!empty_cut.frame().state->can_cut&&!empty_cut.frame().state->can_retopologize&&
+          !empty_cut.frame().state->can_voxel_remesh&&rejects([&]{empty_cut.begin_cut();}),
+          "Mask storage alone does not advertise nonexistent geometry for cutting, retopology or voxel conversion");
+    auto bake_scene=fixture();bake_scene.add("Protection only",empty_cut.copy_volume());bake_scene.select(1);
+    Document no_bake_source;no_bake_source.replace(std::move(bake_scene));
+    check(no_bake_source.frame().state->bake_sources.empty()&&!no_bake_source.frame().state->can_bake,
+          "A protected empty volume is not advertised as a usable geometry/paint bake source");
+  }
   std::cout<<checks<<" checks passed\n";
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
