@@ -1322,14 +1322,18 @@ void Document::cancel_spatial_menu() {
 }
 void Document::input_loop() {
   while (!stopping_) {
+    if(input_notice_pending_.load()){std::lock_guard lock(model_mutex_);retry_worker_notices_locked(true);}
     SpatialFrame f;
     bool reset = false;
     uint64_t generation = 0;
     {
       std::unique_lock lock(input_mutex_);
-      input_changed_.wait(lock, [&] { return stopping_ || !inputs_.empty(); });
-      if (stopping_)
-        break;
+      input_changed_.wait(lock, [&] { return stopping_ || !inputs_.empty() || input_notice_pending_.load(); });
+      if (stopping_)break;
+      if(inputs_.empty()) {
+        input_changed_.wait_for(lock,std::chrono::milliseconds(25),[&]{return stopping_||!inputs_.empty();});
+        if(inputs_.empty())continue;
+      }
       generation = inputs_.front().first;
       f = std::move(inputs_.front().second);
       inputs_.pop_front();
@@ -1340,16 +1344,12 @@ void Document::input_loop() {
       std::lock_guard lock(model_mutex_);
       try {
         if (generation == state_.input_epoch) {
-          if (reset && !desktop_)
-            input_.cancel();
-          process_locked(f);
+          // Resume only after this worker has cancelled/reported its failed
+          // control. Recovery is independent of long file/authoring jobs.
+          if(!worker_notices_[0]){if(reset&&!desktop_)input_.cancel();process_locked(f);}
         }
-      } catch (const std::exception &e) {
-        finish_control_locked(false);
-        if (!desktop_)
-          input_.cancel();
-        state_.error = e.what();
-        publish_locked();
+      } catch (...) {
+        input_worker_error_locked(std::current_exception());
       }
     }
     {
@@ -3049,15 +3049,24 @@ void Document::command_locked(SpatialCommand command) {
 }
 void Document::file_loop() {
   for (;;) {
+    if(worker_notices_pending_.load()) {
+      std::lock_guard lock(model_mutex_);retry_worker_notices_locked();
+    }
     std::optional<FileJob> job;
     {
       std::unique_lock lock(file_mutex_);
-      file_changed_.wait(lock,
-                         [&] { return files_stopping_ || !files_.empty(); });
-      if (files_.empty() && files_stopping_)
-        return;
-      job = std::move(files_.front());
-      files_.pop_front();
+      file_changed_.wait(lock,[&]{return files_stopping_||!files_.empty()||worker_notices_pending_.load();});
+      // Exception delivery normally allocates nothing. If a library needs
+      // memory, retain that one promise before accepting more file work.
+      if(worker_completion_pending_.load()) {
+        file_changed_.wait_for(lock,std::chrono::milliseconds(25));continue;
+      }
+      if(files_.empty()&&files_stopping_)return;
+      if(files_.empty()) {
+        file_changed_.wait_for(lock,std::chrono::milliseconds(25),[&]{return files_stopping_||!files_.empty();});
+        if(files_.empty())continue;
+      }
+      job=std::move(files_.front());files_.pop_front();
     }
     try {
       if(job->export_work && job->export_work->cancelled())
@@ -3250,56 +3259,9 @@ void Document::file_loop() {
       }else if(job->export_work)publish_locked(false,false);
       if (job->completion)
         job->completion->set_value();
-    } catch (const std::exception &e) {
-      if(job->discover_import){import_listing_error(*job,e);continue;}
-      std::lock_guard lock(model_mutex_);
-      const bool export_cancelled=job->export_work && job->export_work->cancelled();
-      retire_export_locked(job->export_work);
-      if (job->discover_recovery) {
-        state_.recovery_busy = false;
-        recovery_discovery_error_ = e.what();
-        publish_locked();
-      }
-      if (job->generation == state_.generation) {
-        if (job->open_project || job->prepare_mesh || job->uv_mesh || job->restore_recovery || job->scene_operation)
-          state_.asset_busy = false;
-        if (job->discover_recovery || job->restore_recovery)
-          state_.recovery_busy = false;
-        if (job->uv_mesh && uv_ && uv_accept_pending_ &&
-            uv_session_ == job->uv_session) {
-          uv_accept_pending_ = false;
-          invalidate_uv_locked();
-          if (!job->uv_desktop)
-            input_.resume_control(VrParameter::UvEdit);
-        }
-        if(job->scene_operation) {
-          asset_work_.store({}); restore_weight_view_locked(job->rollback_preview);
-          if(job->cut_session&&job->cut_session==cut_session_.load()&&state_.cut){
-            auto view=std::make_shared<CutView>(*state_.cut);view->committing=false;view->error=e.what();state_.cut=view;
-          }
-          if (job->retopo_session && job->retopo_session == retopo_session_.load() && state_.retopology) {
-            retopo_accepting_ = false;
-            auto view = std::make_shared<RetopoView>(*state_.retopology);
-            view->busy = view->committing = false; view->error = e.what(); state_.retopology = view;
-          }
-        }
-        if(job->open_project || job->prepare_mesh) asset_work_.store({});
-        if(export_cancelled || (job->work && job->work->cancelled.load())){
-          state_.error.clear();state_.message=job->operation_label+" cancelled";
-        }else state_.error = e.what();
-        publish_locked();
-        if(job->work&&job->work->held_weight&&state_.object_grabbing&&!desktop_&&!object_navigation_.grabbing())finish_object_grab_locked(false,true);
-      }else if(job->export_work){
-        if(export_cancelled && state_.message=="Cancelling background work...")
-          state_.message="Export cancelled";
-        publish_locked(false,false);
-      }
-      {
-        std::lock_guard file_lock(file_mutex_);
-        file_changed_.notify_all();
-      }
-      if (job->completion)
-        job->completion->set_exception(std::current_exception());
+    } catch (...) {
+      const auto error=std::current_exception();
+      std::lock_guard lock(model_mutex_);file_worker_error_locked(*job,error);
     }
   }
 }

@@ -1,0 +1,43 @@
+{
+  "base": "63df2c6dedba1d869c17046a7b03da8de9b71b7b",
+  "scope": "actual persistent C++ allocation denial on the selected native worker thread; other threads and C malloc are not denied",
+  "baseline_negative": {
+    "input": -6,
+    "file": -6,
+    "export": -6
+  },
+  "baseline_manifest": {
+    "base": "4cf3032/63df identical source, public+private hpp bytechecked",
+    "flags": [
+      "-O3",
+      "-DNDEBUG",
+      "-std=gnu++20"
+    ],
+    "sha256": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/export-cancellation-27365c9/build/libdome-sculpt-core.a": "989af6eb8cfb3d2148d65e47322c401bad738aa3cdbc8e10217c43a5858cebe0",
+      "/home/blux/de-xr/dome-sculpt/artifacts/export-cancellation-27365c9/build/libdome-sculpt-polygon.a": "8ed3252cba4db96d398e9b58fc20d96af282244fe30ea6d058da3b5b8900fa86",
+      "/home/blux/de-xr/dome-sculpt/artifacts/export-cancellation-27365c9/build/libxatlas.a": "1460977486e18da1b041d139d9998da12ff63b73b4e16692fd102601195392be",
+      "/home/blux/de-xr/dome-sculpt/artifacts/export-cancellation-27365c9/build/libmikktspace.a": "a63910bcf47b65d3386e69903e032528e41d546049503100b80948f605208eaf",
+      "/home/blux/de-xr/dome-sculpt/artifacts/export-cancellation-27365c9/build/libmikktspace-robust.a": "18ea517d49e89721de7a5d0e697ca3addfb1ea251b3ca14dfd8231e7636594d9",
+      "/home/blux/de-xr/dome-sculpt/artifacts/export-cancellation-27365c9/build/libufbx.a": "f554447deb73f0d7882daf8c2f08b4ab7a0012a4e18c163675cf3b3e8517d1fc"
+    }
+  },
+  "baseline_test_source_sha256": "e63d9b0fcc8d22716b466e422db6c80fe5c5ca32f3281ee3b2e0bb19763a35d8",
+  "release": {
+    "ctest_suites": 14,
+    "seconds": 9.9,
+    "worker_modes": 7,
+    "worker_assertions": 51,
+    "log": "artifacts/test-worker-regressions.log"
+  },
+  "sanitize": {
+    "state": "not run at source checkpoint"
+  },
+  "sha256": {
+    "CMakeLists.txt": "939e37cfb803a46581ac9e2b56bd84040d6c2ff72779e19f6f939224903a672d",
+    "include/dome/document.hpp": "00b25fdb96c2595858978534da3a54450aa67fa108f72255416b1903f0321f58",
+    "src/document.cpp": "fec9554900f5cb0b0c1a3e2ac03f9443eadcd5b832e704d87734bd081598c804",
+    "src/document-worker-errors.cpp": "f975faf28206066aef968d58359faf5f94c1e28740c1083ca4baeb5b99bc830c",
+    "tests/worker-publication.cpp": "820cb0e892b12e478e1b9e2baaa03e21049e6f6fd4f1da3cb4bc9e10fcd46344"
+  }
+}
