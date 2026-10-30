@@ -1188,7 +1188,7 @@ void Document::finish_spatial() {
   }
 }
 void Document::process_locked(const SpatialFrame &f) {
-  if(native_stroke_&&native_stroke_->spatial_owner){process_shape_spatial_locked(f);return;}
+  if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
   if (desktop_)
     return;
   if (!f.focused || !f.head_valid || !ob::finite(f.head) ||
@@ -1232,6 +1232,7 @@ void Document::process_locked(const SpatialFrame &f) {
       return;
     }
   }
+  if(process_affine_paint_spatial_locked(f))return;
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
   auto object_canvas = affine_target?state_.canvas:ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;

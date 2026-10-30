@@ -22,7 +22,7 @@ bool same_placement(const Scene &scene,uint64_t id,CanvasTransform legacy,const 
 bool Document::begin_native_stroke(){
   std::lock_guard lock(model_mutex_);return begin_native_locked();
 }
-bool Document::begin_native_locked(uint32_t spatial_owner){
+bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace space){
   auto &o=scene_.active();
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
@@ -32,13 +32,15 @@ bool Document::begin_native_locked(uint32_t spatial_owner){
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision){state_.message="Wait for the current surface before painting";publish_locked();return false;}
   auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
   session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(scene_.has_affine_placement(o.id))session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
-  session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;session->spatial_owner=spatial_owner;
+  session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;session->spatial_owner=spatial_owner;session->space=space;session->menu_page=space==NativeStrokeSpace::Ray?24:3;
+  if(state_.shape_sculpt&&space!=NativeStrokeSpace::Ray)return false;
+  if(space==NativeStrokeSpace::EvaluatedWorldBrush&&!o.mesh_active)return false;
   if(state_.shape_sculpt){if(!o.deformation||!o.deformation->morphs||state_.morph_target>=o.deformation->morphs->targets.size()||state_.object_grabbing)return false;session->shape_target=state_.morph_target;}
   std::lock_guard queue(native_mutex_);
   if(native_jobs_.size()>=8){state_.error="Desktop gesture queue is full; retry after pending cancellation finishes";publish_locked();return false;}
   Transaction transaction(*this);native_jobs_.push_back(session);
   try{
-    input_.cancel();native_stroke_=std::move(session);desktop_=true;state_.error.clear();state_.message="Desktop stroke";state_.native_samples=0;
+    input_.cancel();native_stroke_=std::move(session);desktop_=spatial_owner==0;state_.error.clear();state_.message="Desktop stroke";state_.native_samples=0;
     publish_locked(false,false);transaction.commit();
   }catch(...){native_jobs_.pop_back();throw;}
   native_changed_.notify_all();return true;
@@ -50,6 +52,8 @@ bool Document::sample_native_stroke(NativeStrokeSample sample){
 bool Document::sample_native_locked(NativeStrokeSample sample){
   if(!std::isfinite(sample.material_time)||!finite(sample.origin)||!finite(sample.direction)||length(sample.direction)<1e-8f||!std::isfinite(sample.brush.radius)||sample.brush.radius<=0||sample.brush.radius>5||!std::isfinite(sample.brush.pressure)||sample.brush.pressure<0||sample.brush.pressure>1)throw std::invalid_argument("Invalid native stroke sample");
   if(!native_stroke_)return false;
+  if(sample.space!=native_stroke_->space)throw std::invalid_argument("Native sample coordinate space changed during gesture");
+  if(sample.space==NativeStrokeSpace::EvaluatedWorldBrush&&(!finite(sample.brush.from)||!finite(sample.brush.to)||!finite(sample.brush.normal)||length(sample.brush.normal)<1e-8f))throw std::invalid_argument("Invalid evaluated-world brush capsule");
   bool overflow=false;
   {std::lock_guard queue(native_mutex_);auto &s=*native_stroke_;if(!s.accepting)return false;
     if(s.submitted>=4096)overflow=true;else{s.samples.push_back(std::move(sample));++s.submitted;}}
@@ -96,7 +100,7 @@ void Document::native_loop(){
     if(native_notice_pending_.load()){
       {std::lock_guard lock(model_mutex_);retry_worker_notices_locked(false,true);}
       if(stopping_.load()&&native_notice_pending_.load()){std::lock_guard lock(model_mutex_);worker_notices_[2].reset();signal_worker_notices_locked();}
-    if(native_notice_pending_.load()){
+      if(native_notice_pending_.load()){
         std::unique_lock lock(native_mutex_);native_changed_.wait_for(lock,std::chrono::milliseconds(25),[&]{return stopping_.load()||!native_notice_pending_.load();});
         if(stopping_)continue;
         continue;
@@ -145,6 +149,10 @@ void Document::native_loop(){
           if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
           if(!session->samples.empty()){sample=std::move(session->samples.front());session->samples.pop_front();}else accept=session->accepted.load();}
         if(!sample){if(accept)break;continue;}
+        if(sample->space==NativeStrokeSpace::EvaluatedWorldBrush){
+          if(!evaluation||shape)throw std::logic_error("Evaluated-world contact painting requires an immutable evaluated mesh");
+          o.painted->stamp_evaluated(sample->brush,session->paint,*evaluation,cancelled);
+        }else {
         auto origin=session->affine_world?sample->origin:local(session->transform,sample->origin);auto direction=session->affine_world?sample->direction:rotate(ob::conjugate(session->transform.orientation),sample->direction);
         std::optional<Vec3> hit;Vec3 normal;
         if(query){auto picked=query->raycast(origin,direction,session->affine_world?10:10/session->transform.scale,sample->material_time);if(picked){hit=picked->position;normal=picked->normal;}}
@@ -153,6 +161,7 @@ void Document::native_loop(){
           if(shape){auto world=sample->brush;world.from=session->affine_world?previous.value_or(*hit):point(session->transform,previous.value_or(*hit));world.to=session->affine_world?*hit:point(session->transform,*hit);world.normal=session->affine_world?normal:rotate(session->transform.orientation,normal);shape->stamp(world,cancelled);}
           else if(o.mesh_active){if(evaluation)o.painted->stamp_evaluated(brush,session->paint,*evaluation,cancelled);else o.painted->stamp(brush,session->paint,cancelled);}else o.volume->stamp(brush,budget,cancelled);previous=*hit;
         }else previous.reset();
+        }
         ++processed;
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
         auto now=std::chrono::steady_clock::now();
@@ -192,7 +201,7 @@ void Document::native_loop(){
           native_stroke_.reset();desktop_=false;input_.cancel();++native_epoch_;
           if(changed){scene_=std::move(working);content_=next_content_++;bind_locked();}
           else {std::lock_guard mesh(mesh_mutex_);mesh_.store(session->original_preview);mesh_changed_.notify_all();}
-          if(session->menu_after.load()&&session->spatial_owner&&state_.hands[session->spatial_owner-1].tracked.valid)input_.retain_page(24,session->spatial_owner,11);
+          if(session->menu_after.load()&&session->spatial_owner&&state_.hands[session->spatial_owner-1].tracked.valid)input_.retain_page(session->menu_page,session->spatial_owner,session->menu_page==24?11:0);
           state_.error.clear();state_.message=changed?"Stroke complete":"Stroke unchanged";
           // Recovery cannot observe a candidate before all publication/model
           // allocations succeed. It is enqueued after the commit below.
@@ -200,7 +209,7 @@ void Document::native_loop(){
         } catch(...) {
           if(changed){scene_=std::move(before);undo_.pop_back();redo_.swap(previous_redo);}
           content_=previous_content;next_content_=previous_next;state_=std::move(previous_state);
-          native_stroke_=session;desktop_=true;native_source_scene_=std::move(previous_source);
+          native_stroke_=session;desktop_=session->spatial_owner==0;native_source_scene_=std::move(previous_source);
           bound_volume_=std::move(previous_bound);input_.refresh_volume(volume());last_volume_=previous_volume;last_paint_=previous_paint;
           published_.store(std::move(previous_published));
           {std::lock_guard mesh(mesh_mutex_);pending_mesh_.reset();mesh_.store(session->original_preview);mesh_changed_.notify_all();}

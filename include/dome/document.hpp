@@ -540,6 +540,9 @@ private:
     std::shared_ptr<const MeshSnapshot> original_preview;
     std::optional<size_t> shape_target;
     uint32_t spatial_owner=0;
+    NativeStrokeSpace space=NativeStrokeSpace::Ray;
+    int menu_page=24;
+    std::optional<Vec3> contact_previous;
     std::atomic_bool menu_after{false};
     PaintSettings paint;
     std::deque<NativeStrokeSample> samples;
@@ -559,11 +562,13 @@ private:
   bool native_processing_ = false;
   std::atomic<uint64_t> native_epoch_{0};
   void native_loop();
-  bool begin_native_locked(uint32_t spatial_owner=0);
+  bool begin_native_locked(uint32_t spatial_owner=0,NativeStrokeSpace space=NativeStrokeSpace::Ray);
   bool sample_native_locked(NativeStrokeSample);
   void configure_shape_sculpt_locked(bool);
   void process_shape_spatial_locked(const SpatialFrame &);
   std::array<bool,2> shape_rearmed_{};
+  std::array<bool,2> contact_rearmed_{};
+  bool process_affine_paint_spatial_locked(const SpatialFrame &);
   void end_native_locked(bool);
   void cancel_native_locked();
   void drain_native_shutdown();
