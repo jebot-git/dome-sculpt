@@ -1,0 +1,62 @@
+{
+  "source_commit": "f501c1d24c2190a8a5850bf8a10baff75ac13c7f",
+  "base": "085d353",
+  "scope": "Paused private detached current-corner RGBA plane-cut WIP; native/public guards remain exactly at baseline",
+  "source": {
+    "CMakeLists.txt": "0a6cb53a3ca21857259c85ba831d79abafc70ffdd0d90a05867b62dbf3f9b28e",
+    "include/dome/polygon-color.hpp": "dbf5a8b382970af1578bb58bad0fc8590126055fa6bdebf376c2382f3e2c2638",
+    "include/dome/polygon.hpp": "90f1915d19105c3b1269978e827b99c58f39aa5eae1d587cde1b6b0b5937abfe",
+    "src/cut-color.cpp": "0caeb934c1c54acd5731c38a557e504088b672ec0918bdbfea6695fb330e8983",
+    "src/cut-color.hpp": "7b8782c696d52867ac191d612d649e6edee366a9cf0a66c8024207a862751cc5",
+    "src/polygon-color.cpp": "fae24653a0c1d935d4c17f34f97afb735c21634532d7242667cb6c81bbebac95",
+    "tests/cut-color-fixture.hpp": "a85ed9ee993bdae758e88389f14fda5798934a120145346ae8b0657ba55b7a09",
+    "tests/cut-color.cpp": "2a641cd838188aafa4b859c8ae6865312094d70593dba37d643c7a641d4385a2"
+  },
+  "logs": {
+    "artifacts/configure-cut-release.log": "6aed5da77759e26c94dd6fe126c77301432fcac1ee9e98759cdb4caab0907ee8",
+    "artifacts/build-cut-checkpoint.log": "5131195187cd7ad267f6e788111e035c746c64325969e481665c44802097fc58",
+    "artifacts/build-cut-checkpoint-final.log": "d39a5ac1f7d7d8e23e95dd645c726d52aa5eb8908fbfa14d53d01ce73f6e4c0a",
+    "artifacts/tests-cut-checkpoint-final.log": "61b398bb5d385c30d31b16ce6860d0a19e11dd1cd0fee52ffd637e56b17bf538",
+    "artifacts/tests-cut-color-first.log": "e049f9baa50d03d2ca64a8b5fb47ad6db7ede7a87a22dfdc5f58b4aab7828a2b",
+    "build-cut/Testing/Temporary/LastTest.log": "2a98f49375195be3c52367cb2c68a51074400058df6783a230dc9ae4afba15d5"
+  },
+  "binaries": {
+    "build-cut/dome-sculpt-cut-color-test": "3709a379c514eb8e9439130e56aaa0292bb9a53224337654c98a6780848319ae",
+    "build-cut/dome-sculpt-cut-authoring-test": "0c6a3d64c2df7801acc6a0c96cf1d4f1ee8e07aac319e877de18918a6c160273"
+  },
+  "proof": {
+    "regular_user_release_suites": 2,
+    "seconds": 1.39,
+    "detached_colored_cut_checks": 72,
+    "unchanged_legacy_cut_checks": 68,
+    "colored_cases": [
+      "gradient ordinary placement",
+      "zero-alpha seam ordinary placement",
+      "gradient reflected/sheared placement",
+      "zero-alpha seam reflected/sheared placement"
+    ],
+    "new_persistent_schema": false,
+    "public_native_cut_enabled": false,
+    "source_basis_owner_shared": true,
+    "original_shape_and_affine_capsules_retained": true,
+    "cancellation_and_late_callback_rollback": true,
+    "analytical_geometry_rgba_error_upper_bound_exclusive": 3e-07,
+    "json_scene_encode_decode_roundtrip": true
+  },
+  "remaining": [
+    "Shared explicit work quota plus adversarial/cancel/allocation tests",
+    "Cap/closed geometry and pose/rig/current source shading quality audit",
+    "Independent GLB/software/Arc rendering before removing any refusal",
+    "Actual colored Document/controller/FLTK/OpenXR authoring, oneUndo, source leases and orderedSave/Close/disk restart",
+    "Current-field color/bake adapter remains separate required work"
+  ],
+  "stopped_for": "User-requested latest candidate headset test followed by goal pause; root handles test/goal state",
+  "no_claim": [
+    "Sanitizer",
+    "New GPU or physical headset",
+    "Colored native cut workflow enabled",
+    "System install",
+    "Push",
+    "Full production completion"
+  ]
+}

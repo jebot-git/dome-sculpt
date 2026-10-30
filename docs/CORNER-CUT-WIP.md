@@ -1,7 +1,7 @@
 # Current-corner plane-cut adapter: resumable private WIP
 
 The goal was steered to a headset test followed by a pause. This checkpoint is
-private work based on central085d353. Verified Scene14 checkpoint84601fe remains
+private work based on central `085d353`. Verified Scene14 checkpoint `84601fe` remains
 unchanged. No native cut capability is enabled here: the original public
 `publish_cut`, Document begin-cut and menu-readiness refusals for current-color
 polygons were restored exactly. Do not merge this as a completed cut feature.
@@ -33,8 +33,8 @@ polygons were restored exactly. Do not merge this as a completed cut feature.
 ## Actual completed checks
 
 Fresh coherent regular-user Release core and targets build with the canonical
-EEE bitmap runtime/FLTK. Two native suites pass in1.22s:72 detached current-color
-checks and68 unchanged legacy cut checks. The new fixture exports actual raw
+EEE bitmap runtime/FLTK. Two native suites pass in 1.39s: 72 detached current-color
+checks and 68 unchanged legacy cut checks. The new fixture exports actual raw
 COLOR_0 GLB, imports/converts it to the existing current field, and exercises
 both gradients and zero-alpha seams with ordinary and reflected/sheared
 placement. It checks exact shared source basis, complete origin/shape capsule,
