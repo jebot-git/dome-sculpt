@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
+#include "dome/color-preparation.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-scene-archive.hpp"
 #include "polygon-paint-authority.hpp"
@@ -219,6 +220,20 @@ uint32_t PolygonSceneArchive::add(std::shared_ptr<const PolygonAuthority> value,
               normal_frame_current_authority(*o->material_bindings,
                                              o->paint->mesh(),
                                              o->deformation.get());
+          }
+          const auto projection=o->paint?o->paint->color_projection():nullptr;
+          const auto preparation=o->material_bindings?
+              o->material_bindings->color_preparation:nullptr;
+          if(bool(projection)!=bool(preparation))
+            throw std::invalid_argument("Polygon source color projection and retained preparation differ");
+          if(projection) {
+            if(projection->vertex_rgba!=preparation->projection->vertex_rgba ||
+               projection->maximum_error!=preparation->projection->maximum_error ||
+               projection->quality_cells!=preparation->projection->quality_cells)
+              throw std::invalid_argument("Polygon source color projection is not its recorded prepared field");
+            projection->validate(o->paint->resolution());
+            if(validate_deep)
+              preparation->validate_current(o->paint->mesh(),o->appearance.get());
           }
           if (o->retopology) {
             if (!o->retopology->source)
