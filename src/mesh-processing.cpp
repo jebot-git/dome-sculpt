@@ -63,8 +63,13 @@ struct Geometry {
 bool degenerate(const Mesh &m, size_t t) {
   auto a = m.positions[m.indices[t]], b = m.positions[m.indices[t + 1]],
        c = m.positions[m.indices[t + 2]];
-  auto n = cross(b - a, c - a);
-  return double(dot(n, n)) < 1e-20;
+  // Degeneracy is geometric, independent of metre scale. A fixed squared-area
+  // threshold incorrectly removes valid fine-resolution faces. Match
+  // Mesh::validate with double differences and actual collinearity.
+  const double ab[]={double(b.x)-a.x,double(b.y)-a.y,double(b.z)-a.z};
+  const double ac[]={double(c.x)-a.x,double(c.y)-a.y,double(c.z)-a.z};
+  return ab[1]*ac[2]-ab[2]*ac[1]==0 && ab[2]*ac[0]-ab[0]*ac[2]==0 &&
+         ab[0]*ac[1]-ab[1]*ac[0]==0;
 }
 struct Dsu {
   std::vector<uint32_t> p;
