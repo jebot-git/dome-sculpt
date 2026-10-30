@@ -35,9 +35,19 @@ Volume Volume::from_samples(float voxel, Voxels samples) {
   v.cells_ = std::move(samples);
   return v;
 }
+Volume Volume::from_samples(float voxel,const VoxelView &samples) {
+  Volume v(voxel);
+  if(samples.size()>4'000'000)throw std::length_error("Field sample budget exceeded");
+  auto limit=int64_t(101/voxel);
+  for(auto [p,d]:samples) {
+    if(!std::isfinite(d)||std::abs(d)>v.band()||std::max({std::abs(int64_t(p.x)),std::abs(int64_t(p.y)),std::abs(int64_t(p.z))})>limit)throw std::invalid_argument("Invalid imported field sample");
+    if(d<v.band()){v.cells_.emplace(p,d);v.layers_.front().delta.emplace(p,double(d)-v.band());}
+  }
+  return v;
+}
 float Volume::at(Int3 p) const {
-  auto it = cells_.find(p);
-  return it == cells_.end() ? band() : it->second;
+  auto value=cells_.get(p);
+  return value?*value:band();
 }
 
 namespace {
@@ -68,9 +78,8 @@ double Volume::sum(Int3 p, uint64_t exclude) const {
   double v = band();
   for (auto &l : layers_)
     if (l.id != exclude && l.visible) {
-      auto i = l.delta.find(p);
-      if (i != l.delta.end())
-        v += i->second * l.opacity;
+      auto value=l.delta.get(p);
+      if(value)v+=*value*l.opacity;
     }
   return v;
 }

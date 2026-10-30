@@ -10,7 +10,7 @@ template <class A, class B> bool same_owner(const A &a, const B &b) {
 } // namespace
 struct Volume::GeometryHistory {
   struct Event {
-    std::weak_ptr<const Voxels> parent, source;
+    std::weak_ptr<const VoxelStorage> parent, source;
     GeometryChange change;
   };
   std::vector<std::shared_ptr<const Event>> events;
@@ -81,7 +81,7 @@ Volume::geometry_change(const GeometryOwner &base) const {
   }
   if (!geometry_history_)
     return result;
-  std::weak_ptr<const Voxels> expected = current;
+  std::weak_ptr<const VoxelStorage> expected = current;
   result.kind = GeometryChange::Kind::Local;
   for (auto it = geometry_history_->events.rbegin();
        it != geometry_history_->events.rend(); ++it) {

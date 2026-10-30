@@ -40,8 +40,8 @@ bool Volume::sculpt_settings(SculptSettings settings) {
   push_command(std::move(command)); settings_ = settings; ++revision_; return true;
 }
 float Volume::mask_at(Int3 q) const {
-  auto found = mask_.values.find(q);
-  return found == mask_.values.end() ? mask_.background : found->second;
+  auto value=mask_.values.get(q);
+  return value?*value:mask_.background;
 }
 float Volume::mask_sample(Vec3 p) const {
   if (!finite(p) || std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)}) > 1001)

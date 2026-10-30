@@ -204,8 +204,8 @@ void insert_tile(std::set<Int3> &keys, Int3 key, size_t limit) {
 SurfaceGeometry::SurfaceGeometry(const Volume &v)
     : samples_(v.geometry_owner()), voxel_(v.voxel_size()), band_(v.band()) {}
 float SurfaceGeometry::at(Int3 p) const {
-  auto found = samples_->find(p);
-  return found == samples_->end() ? band_ : found->second;
+  auto value=samples_->get(p);
+  return value?*value:band_;
 }
 float SurfaceGeometry::sample(Vec3 p) const {
   if (!finite(p) ||
@@ -251,8 +251,7 @@ LocalSurfaceCache::Ptr LocalSurfaceCache::build(const Volume &field,
         insert_tile(keys, tile_coordinate(p - offset), limits.tiles);
   }
   const size_t source_bytes =
-      sizeof(Volume::Voxels) + result->source_->voxels().size() * 64 +
-      result->source_->voxels().bucket_count() * sizeof(void *);
+      result->source_->geometry_owner()->retained_bytes();
   if (source_bytes > limits.bytes)
     throw std::length_error(
         "Local surface retained sample-map byte limit exceeded");
@@ -325,7 +324,7 @@ LocalSurfaceCache::update_regions(const Volume &field,
     throw std::length_error("Local surface region limit exceeded");
   // Held immutable source keeps the map alive, so raw map identity cannot be
   // accidentally reused for another allocation (unlike a revision or weak ptr).
-  if (&field.voxels() == &source_->voxels())
+  if (field.geometry_owner() == source_->geometry_owner())
     return shared_from_this();
   if (regions.empty())
     throw std::invalid_argument("Changed geometry requires complete dirty "
@@ -366,8 +365,7 @@ LocalSurfaceCache::update_regions(const Volume &field,
   result->support_halo_ = support_halo_;
   Work work{limits_, {}, std::move(cancel)};
   const size_t source_bytes =
-      sizeof(Volume::Voxels) + result->source_->voxels().size() * 64 +
-      result->source_->voxels().bucket_count() * sizeof(void *);
+      result->source_->geometry_owner()->retained_bytes();
   if (source_bytes > limits_.bytes)
     throw std::length_error(
         "Local surface retained sample-map byte limit exceeded");
