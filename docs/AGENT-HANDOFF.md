@@ -1,40 +1,45 @@
-# Production continuation after local meshing/GPU/plane-cut integration
+# Continue the full production goal after resolution/VRM identity milestone
 
-The original full production goal remains active: read REQUIREMENTS.md and
-HANDOFF-466ebd1.md, then current HANDOFF.md and VALIDATION.md. Combined application
-sourcecf89a81 preserves origin a8af3f8 and local42b2ff3. Tests91ceb04/8b8dc60 do not
-change product code. Do not replace or narrow the objective to this checkpoint.
+Read REQUIREMENTS.md, HANDOFF-466ebd1.md, current HANDOFF.md and VALIDATION.md.
+Application803479d preserves a4af86d+fff726f (merge5985858), nativeResolution/
+Volume4 and the VRM original-bind fix. Tests ee2b57d/19ad5aa are separate from
+product source. The full goal remains active/incomplete. Exact prior handoffs
+are archived with-a4af86d; never overwrite their proof scopes.
 
-Canonical toolkit is DomeD282467e/FLTK1.4.5+22 patches, built locally under
-artifacts/toolkit-282467e with **lib64**. Use explicit FLTK_DIR per ../AGENTS.md.
-Read parent /home/blux/de-xr/DESIGN_CONVENTIONS. No system installation/session
-restart and no physical headset launch are authorized by these automated checks.
+Canonical DomeD282467e FLTK1.4.5+22 patches uses artifacts/toolkit-282467e/lib64.
+Use explicit FLTK_DIR and runtime LD_LIBRARY_PATH, verify actual ldd resolution;
+CMAKE_PREFIX_PATH/RUNPATH alone can select inherited older /opt libraries.
+Parent DESIGN_CONVENTIONS and ../AGENTS.md still apply; native FLTK default,
+BDF/Unicode/appearance/universal menu/Wayland/OpenXR, no Qt/GTK/Pango frontend.
 
-Keep immutable typed SDF ownership, actual dirty-sample ancestry, safe cache
-fallbacks, exact Cancel/Undo, source/pose/material-frame identity, ordered file
-jobs and paint/source preservation. Never infer reusable GPU geometry from a
-revision/raw address/count alone. Cap previews change geometry independently of
-the source token; shader-only clipping retains it. Preserve attributes4(weights),
-6(mask); future frame attributes7/8/9 must share the static layout correctly and
-retain cut_position/clip uniforms. SIX worker handshakes remain mandatory.
+Preserve exact source/owner/generation checks, physical band/Volume4 and flat
+Volume4-vsScene4 discrimination, layer/mask quotas, typed minimalSDF ownership,
+weak ancestry journal, immutable geometry tokens and source paint metadata.
+The source has SIX workers; preserve predicate mutex shutdown and cut leases.
+Masks15/Skin14/Retopo16/Cut17 remain independent; page7/cell7 opens Resolution.
+Do not overwrite Document wholesale when merging private seventh-worker work.
 
-Masks15, Skin14, Retopo16, Cut17 are independent canonical joystick pages.
-Resolution controls are being reconciled privately; avoid wholesale Document
-replacement, lost cut exclusions, altered source availability or lost exact
-uniform mask interpolation. Scene8/Volume2/3 remains this source's format scope.
-Do not silently import private Scene9/Volume4 APIs without coherent consumers.
+Incoming private production tasks (inspect process/log state before waiting or
+restarting; no observation-timeout restarts):
+- paged-production-803479d: current-field/Volume4/cut integration ofa135 storage;
+  local roots/views must not flatten hidden full maps. Preserve exact uniform/
+  affine mask interpolation and all sampling/history/Cancel semantics.
+- desktop-strokes-fff726f: ordered seventh-worker native gestures, evaluated
+  paint mapping, source lease and accepted Save/Close/destructor drain.
+- frame-runtime-prototype: retained rawN/T/canonical frames, Scene9/material2,
+  independent GLB/VRM consumers and optional same-staticVBO frame block. Ordinary
+  base vertex is56bytes; optionalframe40. Preserve UV1, scalar4/6, frame7/8/9,
+  cap source-stream padding and clip_position uniforms. FullCOLOR_0 work follows
+  versionedPBR/MToon rules; partial guards are not final full interoperability.
 
-Active delegated branches (inspect live state before any restart):
-- resolution-cut-authoring-cf89: native/XR resolution, physical band/Volume4,
-  cancellable progress/asset lease, exact history/source preservation, DDA status.
-- paged-sculpt-2c160cf: adaptive16³ pages/persistent shards and paged before-history;
-  exact replay, quotas/fault/lifetime/performance validation pending.
-- frame-runtime-prototype: raw normal frames, UV adoption and independent parsed
-  GLB/VRM consumers; multi-primitive expression remap fix and representability work.
+Root test-only19ad5aa fixes cross-protocol Unicode fixture ordering: X11 typing
+then nativeCtrl+A/C, wait for newCLIPBOARDowner and exact UTF8data, then DBus
+SelectAll/Copy/Cut/Paste. Three burst runs pass. Reuse existing cached uv GUI
+environment, not systemPython without dbus_next; no system dependency install.
+ActualDomeD resolution flow is DOME_SCULPT_RESOLUTION_DOME=1; normal/compact
+native flow uses DOME_SCULPT_RESOLUTION_COMPACT=1 forcompact.
 
-The shared primary has preserved frame/creator WIP. No reset/force-push/reapply or
-staging unrelated paths. Commit/push authorized verified milestones to main,
-retaining remote advances. Keep logs/manifests tied to exact source; archives from
-other environments and older scopes are historical, not new combined proof.
-Full-array assembly/uploads and CPU mutation under the desktop model lock remain
-production bottlenecks; no sustained frame-rate claim follows from these tests.
+No physical HMD launch since user stopped8f4d67d test. Preserve primary frame/
+creator WIP and unrelated repositories; stage explicit owned paths, retain all
+remote/local history, build regular-user Release. Commit/push authorized verified
+milestones to main; no system installation/display-manager/session restart.

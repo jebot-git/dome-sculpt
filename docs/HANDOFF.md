@@ -1,93 +1,104 @@
-# Authenticated local sculpt meshing, GPU buffers and plane cuts — 2026-10-30
+# Native sculpt resolution and VRM expression identity — 2026-10-30
 
-Combined application source `cf89a81c45d36c1ed538a3f24bbab56869d25e2f`
-preserves both `42b2ff3` local-meshing/GPU history and remote `a8af3f8` native
-plane-cut history. Test-only `91ceb04` moves a rendering fixture clear of the
-cut kernel's explicitly unsupported vertex-touching planes. Test-only `8b8dc60`
-adds actual native UTF-8 clipboard acknowledgement before restoring the test X11
-keymap. Product source remains identical to cf89a81. The full production goal in
-[REQUIREMENTS.md](REQUIREMENTS.md) and HANDOFF-466ebd1.md remains active/incomplete.
+Application `803479d7478af8e771cdc3dbb6b2d1ad72728d77` preserves published
+`a4af86d` and the verified resolution/cut union `fff726f` through merge5985858,
+then fixes VRM0 split-mesh expression remapping. Test-onlyee2b57d adds actual
+DomeD Wayland resolution authoring. Test-only19ad5aa orders native Unicode input
+before cross-channel menu commands. All product code remains identical to803479d.
+The original production objective in REQUIREMENTS.md/HANDOFF-466ebd1.md is active
+and incomplete; this is a verified milestone, not completion.
 
 Read ../AGENTS.md, AGENT-HANDOFF.md, VALIDATION.md, TOOLKIT.md,
-AUTHENTICATED-LOCAL-MESHING.md, GPU-BUFFER-REUSE.md, LOCAL-SURFACE-MESHING.md,
-SCULPT-MASKS.md, PLANE-CUTS.md and the existing worker/material/frame notes.
-Exact incoming handoffs/evidence are archived with -a8af3f8; earlier -9a0cfc4,
--55dafa0 and other histories remain retained. Their environments and scopes
-remain separate from this workstation's new results.
+SCULPT-RESOLUTION.md and the existing local-meshing/GPU/cut/material/frame notes.
+Exact prior handoffs and proof are archived with-a4af86d, with earlier histories
+retained. Builds are optimized regular-user releases using current canonical
+DomeD282467e/FLTK1.4.5+22 patches and its explicit lib64 runtime. No installed
+files, active sessions or display manager were replaced/restarted.
 
-## Changes in the combined application
+## Delivered in this source
 
-- Actual changed SDF samples create bounded immutable ancestry events using weak
-  map owners and exact shared ownership. The worker authenticates local tile
-  updates, safely rebuilding for missing/expired/branched history or limits.
-  Its cache retains only typed SDF sample ownership plus voxel/physical band,
-  excluding displacement/mask/history maps. Cancel restores exact old ownership.
-- The Document mesh worker caches per object/generation; mask/control-only edits
-  retain extraction and assembled geometry. Ordered visible source/deformation/
-  transform/material-frame dependencies produce a strong geometry identity.
-  Empty objects, source bindings and canonical corner expansion are accounted for.
-- Static position/normal/UV0/UV1/tangent and index buffers are separate from
-  weight4/protection6 scalar streams. Mask-only changes transfer4 bytes/vertex;
-  material/texture-only changes need no geometry transfer. A second eye/navigation
-  reuses buffers. Scalars still upload on new snapshots; geometric edits still
-  assemble/copy/upload the complete packed mesh. No per-tile GPU claim is made.
-- Cut caps receive their own immutable geometry identity; changed cap geometry
-  cannot inherit source buffers. Cap-free clipping changes uniforms and retains
-  source geometry. Original protection and cap -1 sentinels remain exact. Cancel
-  restores exact source pixels/key; mapped paint never includes display overlays.
-- Exact representable marching intersections and bounded adjacency repair retain
-  legitimate tiny faces; mesh inspection uses double-precision exact collinearity.
-  Unsupported repair/contour cases fail explicitly, preserving original objects.
-- Incoming Cut17, Masks15, Skin14, Retopo16, six-worker shutdown, cut cancellation/
-  retry/ordered saves, uniform mask interpolation and mask-only-empty geometry
-  exclusion remain intact. Scene8 and Volume2/3 compatibility and current sourceUV
-  guards are retained; no private Scene9 or Volume4 authoring was silently adopted.
+- Native FLTK Sculpt→Resolution and XR Sculpt page7/cell7 open the same guarded
+  background operation. World-mm controls preserve unchanged local-float spacing,
+  support normal/large BDF fonts, slider/half/double spacing, quality controls,
+  modal text/history routing and Cancel-default/Return/Escape/Ctrl+W behavior.
+- Resolution resamples independent layers/masks without flattening them. An
+  explicit physical distance band preserves metre-valued layer composition when
+  lattice spacing changes. Nondefault bands persist as Volume4; default-band
+  Volume2/3 bytes/shape remain compatible. FlatVolume4/Scene4 discrimination and
+  nested aggregate quotas are validated before bulk allocations.
+- Detached candidates retain object/group/paint/source identities, hidden/locked
+  layers and future IDs. Bounded topology/component/Euler, bidirectional surface
+  distance, normal and independent layer/protection checks refuse unsupported
+  quality loss. Source data remains exact on cancellation/refusal/allocation
+  failure. Same spacing is a no-op. Publication is one global Undo transaction.
+- Worker progress, expected generation/revision/object leases, accepted cancellation,
+  retries and ordered Save are connected. Masks15/Skin14/Retopo16/Cut17 and the
+  SIX-worker predicate shutdown remain intact. A live cut excludes resolution
+  and native draft bypasses. New geometry owners/bands force correct mesher/VBO
+  invalidation, while unchanged material/mask/control cases retain reuse.
+- Trilinear field picking uses bounded cell DDA and cubic first-root solving,
+  avoiding uncertified signed-distance jumps over thin surfaces. Budget exhaustion
+  reports native status and cancels the stroke rather than escaping to a modal
+  alert. Empty-space acceleration/ready-surface picking remain followup work.
+- VRM0 expression expansion now remaps each emitted mesh from the immutable
+  original bind/index. Native-only target insertion and differing emitted target
+  maps previously reused an already-remapped index. The independent regression
+  fails against the prior matching archive, passes with the fix, and verifies
+  original metadata is unchanged. Full avatar female/male Release fixtures pass.
 
-## Verification
+## Current proof
 
-Fresh optimized CPU FLTK/OpenXR and complete OneAPI FLTK/OpenXR builds use current
-canonical DomeD282467e (22 patches, FLTK1.4.5, lib64). This workstation is an
-Intel i7-12700/GCC16.2; DPC++7.2 targets actual Arc A770. Details and final results
-are in VALIDATION.md; no ADL-N/toolkit-authoring result is relabelled as local proof.
+CPU88/88 native suites pass177.13s; real-loader150 existing+17 resolution XR
+checks pass in273.14s. ArcOneAPI25 selected native suites pass13.35s; its complete
+150+17 synthetic XR checks pass297.61s. Separate actualArc render fixtures pass
+Document22/buffer24/MToon81/masks38/visibility25. Tracking/software GL in loader
+runs and actual hardware rendering/compute are explicitly distinguished.
 
-- CPU80/80 native suites pass484.25s; whole-core C/C++ plus renderer ASan/UBSan/
-  leak-detection24/24 pass345.57s. Actual Document-to-GL22 assertions include masks,
-  textures, material, geometry, transforms, caps, clipping and exact cancellation.
-- Arc17/17 selected native suites pass7.80s; real-loader syntheticXR150/150 pass,
-  plus hardware Document22/buffer24/MToon81/mask38/visibility25 fixtures. The compute
-  oracle retains184 independent endpoints and224 batches/445088 samples, maximum
-  error8.9407e-08, explicit no-GPU rejection and no CPU fallback.
-- CPU real-loader syntheticXR150/150 passes with complete=true/failed=0; the
-  matching Arc report also completes150/150. NativeGUI/compositor125 assertions
-  pass: general53, cut12+compact6, masks17+compact5, skin11, Unicode4, actual
-  DomeD Wayland masks9+general8. Normal/compact cut screenshots were inspected.
-- An initial Unicode GUI run lost a character while its temporary keymap was
-  restored without native-client acknowledgement. An isolated unchanged run
-  passed; the strengthened4-check fixture now waits for exact native clipboard
-  content and passes while retaining all original assertions. No product Unicode
-  behavior or expected bytes were relaxed. Earlier failed logs remain retained.
-- The actual WiVRn headset test was stopped at the user's request. Rudimentary
-  operation is confirmed only for8f4d67d; recovery/report remain under
-  artifacts/xr-milestone-8f4d67d. Do not relaunch a physical HMD without request.
+Whole C/C++ core and matching render consumers with ASan/UBSan/leaks pass15/15
+focused suites121.31s plus13 fast VRM metadata assertions. Prior broader24-suite
+sanitizer evidence for unchanged meshing/render/cut code remains archived under
+a4af86d; it is not relabelled as the new run.
 
-## Continuing work
+Native GUI/compositor151 assertions pass, including new actualDomeD resolution10,
+normal/compact resolution12/4, original menu53/cuts12+6/masks17+5/skin11/Unicode4,
+and actualDomeD mask9/general8. Screenshots of both resolution layouts inspected.
+Three additional fresh Unicode burst runs pass4 assertions each with no inter-key
+sleep. See VALIDATION.md for exact logs, source hashes and failed-attempt scopes.
 
-1. Integrate the separately verified resolution/Volume4 authoring branch with
-   Cut17/six workers after fresh combined GUI/compositor/synthetic/sanitizer proof.
-   The agent is reconciling on cf89; keep its frozen earlier proof scoped.
-2. Validate and integrate adaptive paged field/mask/history storage. The prototype
-   removes whole-map COW and growing stroke-history copies; first exact-state
-   sustained replay is promising, but repeats/allocation faults/SAN remain pending.
-3. Finish raw source/canonical normal-frame runtime, sourceUV and glTF/VRM exports.
-   Independent consumers exposed a genuine multi-primitive VRM expression remap
-   bug now being fixed privately. Keep source identities and explicit refusal for
-   representations not yet proven correct; guard removal is not full completion.
-4. Move expensive desktop mutation off the UI thread, finish bounded assembly/
-   tile GPU uploads, then production-size sustained strokes and hardware pacing.
-5. Preserve the full remaining matrix: projection/stencil/texture sets, advanced
-   bake/retopo/cuts/procedural tools, fitting/weights/shapes, full import/export,
-   controller/stylus/3D-mouse workflows and all required backend/device evidence.
+The original Unicode keymap acknowledgement alone was insufficient: menu D-Bus
+callbacks can overtake queued X11 typing. The updated harness copies through the
+same native key event queue and waits for new clipboard ownership/data before
+D-Bus menu tests; all expected UTF-8 bytes and original history/save assertions
+remain unchanged. This is test protocol ordering, not a product Unicode change.
 
-Primary checkout still contains unrelated private normal-frame/creator files.
-Preserve them, all backup stashes and all local commits. Build regular-user
-Release; no installation or active-session/display-manager restart was performed.
+Only8f4d67d has the user's rudimentary physical WiVRn confirmation. That test was
+ended; recovery/report remain in artifacts/xr-milestone-8f4d67d. No new physical
+HMD launch or complete controller/stylus/3D-mouse/performance claim follows.
+
+## Active production continuation
+
+1. Combine adaptive paged field/mask/history storage. Privatea135f48 passed74
+   Release+74 whole-core sanitizer suites and12,920 fault boundaries;3 repeated
+   trials match25 numeric-state checkpoints. Production477255b now preserves
+   current resolution/cuts/mask precision and is running new fullFLTK/XR/Arc proof.
+   Whole CPU assembly/geometric VBO replacement remain after paging.
+2. Finish native desktop stroke workers. A separate seventh-worker prototype owns
+   detached ordered gestures, exact Cancel/End/history/save/Close drain and evaluated
+   posed/morphed paint→originalUV mapping. Native API fixtures pass; real FLTK,
+   richer deformed paint and sanitizer proof are ongoing. Do not assume its worker
+   count/schema are already in this SIX-worker milestone.
+3. Review/merge source/canonical normal-frame Scene9 runtime/export checkpoint
+   after scoped proof. It preserves existing sourceUV guards and exposes remaining
+   canonical deformation representability/coverage limits. Correct PBR COLOR_0
+   and versioned MToon ignore semantics are next; full colored import/export and
+   actual avatar UV/bake coverage are not complete.
+4. Add conservative occupied-support picking, bounded assembly/GPU tile updates,
+   sustained production-scale strokes/frame pacing and device evidence. Do not
+   raise DDA budgets or silently drop queued path samples to hide missing work.
+5. Preserve every remaining requirement: advanced painting/projection/stencils/
+   texture sets/baking, cuts/retopo/procedural tools, fit/weights/shapes and complete
+   glTF/VRM/frontend/device/accelerator interoperability. Guards or passing builds
+   are not substitutes for implementing the full objective.
+
+Preserve unrelated primary frame/creator WIP, stashes and all commits. No primary
+reset, force-push, blanket staging, system installation or headset restart.
