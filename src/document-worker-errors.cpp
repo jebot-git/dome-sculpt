@@ -54,20 +54,18 @@ void Document::retry_worker_notices_locked(bool input) noexcept {
   for(const size_t slot:{input?size_t(0):size_t(1)}) {
     auto &pending=worker_notices_[slot];if(!pending)continue;
     auto &notice=*pending;
-    if(notice.completion) {
-      try{notice.completion->set_exception(notice.error);notice.completion.reset();}
-      catch(const std::future_error&){notice.completion.reset();} // already satisfied/no-state
-      catch(...){continue;} // preserve the original promise/exception for retry
-    }
+    bool handled=false;
     try {
       const bool same_generation=notice.generation==state_.generation;
       const bool same_publication=notice.publication==published_.load();
-      const bool same_held=notice.input&&same_generation&&state_.object_grabbing&&
+      const bool same_actor=same_generation&&state_.object_grabbing&&
         notice.publication->held_object==state_.held_object&&notice.publication->edit_authority==state_.edit_authority;
+      const bool same_held=notice.input&&same_actor;
       if(notice.input&&same_generation) {
         if(same_held)finish_object_grab_locked(false,true);
         if(same_publication){finish_control_locked(false);if(!desktop_)input_.cancel();}
       }
+      if(notice.held_weight&&same_actor&&!desktop_&&!object_navigation_.grabbing())finish_object_grab_locked(false,true);
       if(notice.discover_import) {
         if(same_generation&&!stopping_.load()&&import_view_&&import_request_.load()==notice.import_request) {
           auto view=std::make_shared<ImportView>(*import_view_);view->busy=false;view->error=worker_message(notice.error);
@@ -91,7 +89,6 @@ void Document::retry_worker_notices_locked(bool input) noexcept {
           if(notice.cancelled){state_.error.clear();state_.message=notice.label.empty()?"Export cancelled":notice.label+" cancelled";}
           else state_.error=worker_message(notice.error);
           publish_locked(false,false);
-          if(notice.held_weight&&state_.object_grabbing&&!desktop_&&!object_navigation_.grabbing())finish_object_grab_locked(false,true);
         }else if(view_changed)publish_locked(false,false);
       }else if(notice.export_job&&same_publication) {
         // Accepted exports outlive document replacement. Retire their status
@@ -99,8 +96,16 @@ void Document::retry_worker_notices_locked(bool input) noexcept {
         if(notice.cancelled&&state_.message=="Cancelling background work...")state_.message="Export cancelled";
         publish_locked(false,false);
       }
-      pending.reset();
+      handled=true;
     }catch(...){/* memory pressure: original record and worker remain live */}
+    // Preserve the normal ready-future/native-status ordering. Under memory
+    // pressure a failed publication must not strand the original exception.
+    if(notice.completion) {
+      try{notice.completion->set_exception(notice.error);notice.completion.reset();}
+      catch(const std::future_error&){notice.completion.reset();} // already satisfied/no-state
+      catch(...){/* preserve this promise and original exception for retry */}
+    }
+    if(handled&&!notice.completion)pending.reset();
   }
   signal_worker_notices_locked();
 }
