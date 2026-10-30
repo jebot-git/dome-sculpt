@@ -3,6 +3,7 @@
 #include "dome/deformation.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/color-preparation.hpp"
 #include <nlohmann/json.hpp>
 namespace dome::detail {
 inline unsigned minimum_scene_version(const DeformationState *d) {
@@ -19,11 +20,13 @@ inline unsigned minimum_scene_version(const CreatorAppearance *a) {return a && a
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
     return 0;
-  // ColorPreparation is merged by its owning actor: include its retained
-  // original_deformation and original_material even after active rig changes.
-  return binding->uv_origin
+  unsigned result=binding->uv_origin
              ? std::max(minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get()))
              : 0u;
+  if(const auto &preparation=binding->color_preparation)
+    result=std::max({result,10u,minimum_scene_version(preparation->original_deformation.get()),
+      minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
+  return result;
 }
 inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
   if (d.is_null() || d.at("skeleton").is_null())

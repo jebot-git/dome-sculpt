@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "dome/source-uv-bake.hpp"
 #include <new>
 #include "document-transaction.hpp"
 namespace dome {
@@ -179,8 +180,7 @@ void Document::process_uv_transfer(FileJob &job) {
       throw std::runtime_error("UV remap changed original triangle/corner identity");
     uv_modified |= old.uv[old.indices[corner]] != target.uv[vertex];
   }
-  if (uv_modified && (source.appearance || source.painted->source_maps()))
-    throw std::runtime_error("Original source UV edits require an explicit all-map bake and tangent-frame update; source images and draft were retained");
+  const bool source_aware=uv_modified&&(source.appearance||source.painted->source_maps()||source.material_bindings||source.painted->color_projection());
   // Metadata-only edits of unchanged authored UVs retain the original explicit
   // source-authored policy (shared/zero-area charts are not silently repaired).
   if (uv_modified || !source.painted->source_maps()) {
@@ -188,7 +188,7 @@ void Document::process_uv_transfer(FileJob &job) {
     if (!error.empty()) throw std::runtime_error(error);
   }
   std::shared_ptr<const DeformationState> deformation;
-  if (source.deformation) {
+  if (!source_aware && source.deformation) {
     source.deformation->validate(old);
     auto remapped = *source.deformation;
     remapped.source = morph_topology_id(target);
@@ -225,7 +225,7 @@ void Document::process_uv_transfer(FileJob &job) {
     deformation = std::make_shared<const DeformationState>(std::move(remapped));
   }
   std::shared_ptr<const CreatorAppearance> appearance;
-  if (source.appearance) {
+  if (!source_aware && source.appearance) {
     if (source.appearance->source_vertices.size() != old.positions.size())
       throw std::runtime_error("Original avatar source vertex provenance is incomplete");
     auto updated = std::make_shared<CreatorAppearance>(*source.appearance);
@@ -235,13 +235,26 @@ void Document::process_uv_transfer(FileJob &job) {
     appearance = std::move(updated);
   }
   bool changed = uv_changed(target, old) || morph_topology_id(target) != morph_topology_id(old);
-  auto painted = changed ? source.painted->reparameterize(target, cancelled) : source.painted;
+  std::shared_ptr<PaintedMesh> painted;
+  auto binding=source.material_bindings;
+  if(source_aware){
+    SourceUvBakeInput input;input.paint=source.painted;input.appearance=source.appearance;
+    input.current_material=source.material_bindings;input.current_deformation=source.deformation;
+    input.target=target;input.source_vertices=*map;
+    if(!source.appearance&&!source.material_bindings)
+      input.native_material=SourceNativeMaterial{source.material.color,source.material.emissive,int(source.material.alpha),source.material.alpha_cutoff,source.material.double_sided};
+    SourceUvBakeOptions options;options.cancelled=cancelled;
+    auto adopted=adopt_source_uv_bake(bake_source_uv(input,options),cancelled);
+    painted=std::move(adopted.paint);deformation=std::move(adopted.deformation);
+    appearance=std::move(adopted.appearance);binding=std::move(adopted.material_bindings);
+  }else painted=changed?source.painted->reparameterize(target,cancelled):source.painted;
   if (cancelled()) throw std::runtime_error("UV transfer cancelled");
   Scene prepared = job.scene;
   auto &candidate = prepared.object(job.object);
   candidate.painted = std::move(painted);
   candidate.deformation = std::move(deformation);
   candidate.appearance = std::move(appearance);
+  candidate.material_bindings=std::move(binding);
   prepared.validate();
   if (cancelled()) throw std::runtime_error("UV transfer cancelled");
   {

@@ -5,6 +5,8 @@
 #include "dome/source-maps.hpp"
 #include "dome/scene.hpp"
 #include "dome/tangents.hpp"
+#include "paint-color-access.hpp"
+#include "color-projection-quality.hpp"
 #include <bit>
 #include <cstring>
 #include <nlohmann/json.hpp>
@@ -27,6 +29,9 @@ void name_valid(const std::string &s) {
 size_t tile_count(const PaintLayer &layer) {
   return std::count_if(layer.tiles.begin(),layer.tiles.end(),[](const auto &tile){return bool(tile);});
 }
+size_t color_tile_count(const PaintLayer &layer) {
+  return std::count_if(layer.pbr_tiles.begin(),layer.pbr_tiles.end(),[](const auto &tile){return bool(tile);});
+}
 uint64_t next_composite_token() {
   static std::atomic<uint64_t> sequence{1};auto value=sequence.load(std::memory_order_relaxed);
   while(value!=UINT64_MAX)if(sequence.compare_exchange_weak(value,value+1,std::memory_order_relaxed))return value;
@@ -40,7 +45,7 @@ struct CompositeFactors {
 };
 struct CompositeRetention {
   struct Source {size_t references=0,bytes=0;};
-  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};size_t derived=0,count=0;std::array<const Image*,5> sources{};const BakedTextures *base=nullptr;};
+  struct Entry {std::shared_ptr<const TextureMaps> maps;uint64_t token=0;CompositeFactors factors{};size_t derived=0,count=0;std::array<const Image*,6> sources{};const BakedTextures *base=nullptr;};
   std::mutex mutex;
   size_t limit=512*1024*1024,bytes=0;
   uint64_t hits=0,builds=0;
@@ -62,11 +67,13 @@ struct CompositeRetention {
     std::lock_guard lock(mutex);if(hit)++hits;else ++builds;
     auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.maps.get()==maps.get();});
     if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
-    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size();
+    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size()+maps->pbr_color.rgba.size();
     entry.base=maps->baked_base.get();
     if(maps->source_maps)for(auto slot:{&maps->source_maps->color,&maps->source_maps->metal_rough,&maps->source_maps->emission,&maps->source_maps->normal,&maps->source_maps->occlusion})
       if(slot->image&&std::find(entry.sources.begin(),entry.sources.begin()+entry.count,slot->image.get())==entry.sources.begin()+entry.count)
         entry.sources[entry.count++]=slot->image.get();
+    if(maps->color_projection && maps->color_projection->vertex_rgba && std::find(entry.sources.begin(),entry.sources.begin()+entry.count,maps->color_projection->vertex_rgba.get())==entry.sources.begin()+entry.count)
+      entry.sources[entry.count++]=maps->color_projection->vertex_rgba.get();
     size_t isolated=entry.derived+(entry.base?entry.base->storage_bytes():0);for(size_t i=0;i<entry.count;++i)isolated+=entry.sources[i]->rgba.size();
     if(isolated>limit)return;
     auto increment=[&]{size_t n=entry.derived;if(entry.base&&!bases.contains(entry.base))n+=entry.base->storage_bytes();for(size_t i=0;i<entry.count;++i)if(!sources.contains(entry.sources[i]))n+=entry.sources[i]->rgba.size();return n;};
@@ -165,6 +172,13 @@ void Image::validate() const {
   if (!width || !height || width > 8192 || height > 8192 ||
       rgba.size() != size_t(width) * height * 4)
     throw std::invalid_argument("Invalid texture image");
+}
+void PaintColorProjection::validate(uint32_t resolution) const {
+  if(version!=1 || !vertex_rgba || !quality_cells || quality_cells>1'000'000'000)throw std::invalid_argument("Invalid prepared vertex-color projection");
+  for(auto error:maximum_error)if(!std::isfinite(error) || error<0 || error>1)throw std::invalid_argument("Invalid vertex-color projection quality bound");
+  vertex_rgba->validate();
+  if(vertex_rgba->width!=resolution || vertex_rgba->height!=resolution)
+    throw std::invalid_argument("Prepared vertex-color atlas differs from the paint surface");
 }
 std::vector<uint8_t> Image::png() const {
   validate();
@@ -390,6 +404,7 @@ void PaintedMesh::add_layer(std::string name) {
   l.id = next_++;
   l.name = std::move(name);
   l.tiles.resize(surface_->tiles.size());
+  if(color_projection_)l.pbr_tiles.resize(surface_->tiles.size());
   active_ = l.id;
   layers_.push_back(std::move(l));
   ++revision_;
@@ -401,6 +416,7 @@ void PaintedMesh::delete_layer() {
   bool visible=removed.visible&&removed.opacity>0&&tile_count(removed);
   uint64_t token=visible?next_composite_token():composite_token_;
   allocated_tiles_ -= tile_count(removed);
+  allocated_color_tiles_ -= color_tile_count(removed);
   std::erase_if(layers_, [&](auto &l) { return l.id == active_; });
   active_ = layers_.back().id;
   composite_token_=token;
@@ -445,18 +461,29 @@ const PaintPixel &PaintedMesh::pixel(uint64_t id, uint32_t x,
   static const PaintPixel empty;
   return tile ? tile->pixels[size_t(y % 32) * 32 + x % 32] : empty;
 }
+std::array<uint8_t,4> PaintedMesh::pbr_pixel(uint64_t id,uint32_t x,uint32_t y) const {
+  if(x>=resolution() || y>=resolution())throw std::out_of_range("PBR paint pixel out of bounds");
+  const auto &l=layer(id);
+  if(!l.pbr_tiles.empty()) {
+    const auto &tile=l.pbr_tiles.at(size_t(y/32)*surface_->columns+x/32);
+    if(tile)return tile->pixels[size_t(y%32)*32+x%32];
+  }
+  const auto &p=pixel(id,x,y);return {p.data[0],p.data[1],p.data[2],p.data[3]};
+}
 void PaintedMesh::begin_stroke() {
   if (editing_)
     throw std::logic_error("A paint stroke is already active");
   if (!active().visible)
     throw std::logic_error("Show the active paint layer before painting");
   before_ = active().tiles;
+  before_colors_ = active().pbr_tiles;
   before_allocated_tiles_ = tile_count(active());
+  before_allocated_color_tiles_ = color_tile_count(active());
   before_composite_token_=composite_token_;
   editing_ = true;
 }
 bool PaintedMesh::pending_changes() const {
-  return editing_ && before_ != layer(active_).tiles;
+  return editing_ && (before_ != layer(active_).tiles || before_colors_ != layer(active_).pbr_tiles);
 }
 void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
   stamp_sampled(b,settings,{});
@@ -480,9 +507,12 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
       axis = b.to - b.from, n = normalized(b.normal);
   float axis2 = dot(axis, axis);
   auto &l = active();
+  if(color_projection_ && l.pbr_tiles.size()!=l.tiles.size())throw std::logic_error("Prepared color layer is incomplete");
   auto token=l.visible&&l.opacity>0?next_composite_token():composite_token_;
   auto prior = l.tiles;
+  auto prior_colors = l.pbr_tiles;
   size_t allocated = allocated_tiles_;
+  size_t allocated_colors = allocated_color_tiles_;
   bool changed = false;
   size_t candidate_checks=0;
   try {
@@ -494,6 +524,8 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
         continue;
       auto copy = l.tiles[tile] ? std::make_shared<PaintTile>(*l.tiles[tile])
                                 : std::make_shared<PaintTile>();
+      std::shared_ptr<PaintColorTile> color_copy;
+      bool color_changed=false;
       bool tile_changed = false;
       uint32_t tx = uint32_t(tile % surface_->columns) * 32,
                ty = uint32_t(tile / surface_->columns) * 32;
@@ -552,9 +584,26 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
                     std::max(next, 1e-12f);
                 p.data[i] = byte(srgb ? linear_to_srgb(result) : result);
               };
-              if (channel == 0)
+              if (channel == 0) {
+                if(color_projection_) {
+                  if(!color_copy) {
+                    color_copy=std::make_shared<PaintColorTile>();
+                    if(l.pbr_tiles[tile])*color_copy=*l.pbr_tiles[tile];
+                    else if(l.tiles[tile])for(size_t i=0;i<color_copy->pixels.size();++i) {
+                      const auto &q=l.tiles[tile]->pixels[i];color_copy->pixels[i]={q.data[0],q.data[1],q.data[2],q.data[3]};
+                    }
+                  }
+                  auto &q=color_copy->pixels[y*32+x];const auto old_color=q;
+                  for(int k=0;k<4;++k) {
+                    float old_value=unit(q[k]);if(k<3)old_value=srgb_to_linear(old_value);
+                    const float result=(selected.color[k]*alpha+old_value*previous*(1-alpha))/std::max(next,1e-12f);
+                    q[k]=byte(k<3?linear_to_srgb(result):result);
+                  }
+                  color_changed|=q!=old_color;
+                }
                 for (int k = 0; k < 4; ++k)
                   mix(k, selected.color[k], k < 3);
+              }
               else if (channel == 1)
                 mix(4, selected.metallic, false);
               else if (channel == 2)
@@ -566,20 +615,25 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
           }
           tile_changed |= p != old;
         }
-      if (tile_changed) {
-        if (!l.tiles[tile] &&
-            ++allocated * sizeof(PaintTile) + (baked_ ? baked_->storage_bytes() : 0) > 128 * 1024 * 1024)
+      if (tile_changed || color_changed) {
+        if(!l.tiles[tile])++allocated;
+        if(color_changed && !l.pbr_tiles[tile])++allocated_colors;
+        if(allocated*sizeof(PaintTile)+allocated_colors*sizeof(PaintColorTile)+
+            (baked_?baked_->storage_bytes():0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0)>128*1024*1024)
           throw std::length_error("Paint storage budget exceeded");
         l.tiles[tile] = std::move(copy);
+        if(color_changed)l.pbr_tiles[tile]=std::move(color_copy);
         changed = true;
       }
     }
     stop();
   } catch (...) {
     l.tiles = std::move(prior);
+    l.pbr_tiles = std::move(prior_colors);
     throw;
   }
   allocated_tiles_ = allocated;
+  allocated_color_tiles_ = allocated_colors;
   if (changed){
     composite_token_=token;
     ++revision_;
@@ -590,18 +644,21 @@ bool PaintedMesh::end_stroke() {
     return false;
   editing_ = false;
   auto &tiles = active().tiles;
-  if (before_ == tiles) {
+  auto &colors=active().pbr_tiles;
+  if (before_ == tiles && before_colors_ == colors) {
     before_.clear();
+    before_colors_.clear();
     return false;
   }
   size_t bytes = 0;
   for (size_t i = 0; i < tiles.size(); ++i)
     if (before_[i] != tiles[i])
       bytes += sizeof(PaintTile) * 2;
+  for(size_t i=0;i<colors.size();++i)if(before_colors_[i]!=colors[i])bytes+=sizeof(PaintColorTile)*2;
   for (auto &s : redo_)
     history_bytes_ -= s.bytes;
   redo_.clear();
-  undo_.push_back({active_, std::move(before_), tiles, bytes,before_allocated_tiles_,tile_count(active())});
+  undo_.push_back({active_, std::move(before_), tiles, bytes,before_allocated_tiles_,tile_count(active()),std::move(before_colors_),colors,before_allocated_color_tiles_,color_tile_count(active())});
   history_bytes_ += bytes;
   while (undo_.size() > 1 &&
          (history_bytes_ > 64 * 1024 * 1024 || undo_.size() > 128)) {
@@ -614,6 +671,8 @@ void PaintedMesh::cancel_stroke() {
   if (editing_) {
     allocated_tiles_ = allocated_tiles_ - tile_count(active()) + before_allocated_tiles_;
     active().tiles = std::move(before_);
+    allocated_color_tiles_=allocated_color_tiles_-color_tile_count(active())+before_allocated_color_tiles_;
+    active().pbr_tiles=std::move(before_colors_);
     editing_ = false;
     composite_token_=before_composite_token_;
     ++revision_;
@@ -631,6 +690,8 @@ bool PaintedMesh::undo() {
   active_ = s.layer;
   allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.before_tiles;
   active().tiles = s.before;
+  allocated_color_tiles_=allocated_color_tiles_-color_tile_count(active())+s.before_color_tiles;
+  active().pbr_tiles=s.color_before;
   redo_.push_back(std::move(s));
   composite_token_=token;
   ++revision_;
@@ -648,6 +709,8 @@ bool PaintedMesh::redo() {
   active_ = s.layer;
   allocated_tiles_ = allocated_tiles_ - tile_count(active()) + s.after_tiles;
   active().tiles = s.after;
+  allocated_color_tiles_=allocated_color_tiles_-color_tile_count(active())+s.after_color_tiles;
+  active().pbr_tiles=s.color_after;
   undo_.push_back(std::move(s));
   composite_token_=token;
   ++revision_;
@@ -659,21 +722,25 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   p->composite_token_=composite_token_;
   p->surface_ = surface_;
   p->source_maps_ = source_maps_;
+  p->color_projection_ = color_projection_;
   p->layers_ = layers_;
   p->baked_ = baked_;
   p->active_ = active_;
   p->next_ = next_;
   p->revision_ = revision_;
   p->allocated_tiles_ = allocated_tiles_;
+  p->allocated_color_tiles_ = allocated_color_tiles_;
   return p;
 }
 void BakedTextures::validate(uint32_t resolution) const {
-  if (maps.source_maps || maps.source_only || maps.baked_base || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
+  if (maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
+  if(size_t(color_interpretation)>1 || (color_interpretation==BakedColorInterpretation::ResolvedPbr)!=!maps.pbr_color.rgba.empty())
+    throw std::invalid_argument("Baked PBR color interpretation is incomplete");
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
-  for (auto image : {&maps.color, &maps.metal_rough, &maps.emission, &maps.normal}) {
-    if (image == &maps.normal && image->rgba.empty() && !image->width && !image->height)
+  for (auto image : {&maps.color, &maps.metal_rough, &maps.emission, &maps.normal, &maps.pbr_color}) {
+    if ((image == &maps.normal || image == &maps.pbr_color) && image->rgba.empty() && !image->width && !image->height)
       continue;
     image->validate();
     if (image->width != resolution || image->height != resolution)
@@ -682,18 +749,21 @@ void BakedTextures::validate(uint32_t resolution) const {
 }
 size_t BakedTextures::storage_bytes() const {
   return maps.color.rgba.size() + maps.metal_rough.rgba.size() +
-         maps.emission.rgba.size() + maps.normal.rgba.size() + coverage.size();
+         maps.emission.rgba.size() + maps.normal.rgba.size() + maps.pbr_color.rgba.size() + coverage.size();
 }
 size_t PaintedMesh::storage_bytes() const {
-  size_t result = baked_ ? baked_->storage_bytes() : 0;
+  size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
   for (const auto &layer : layers_)
     for (const auto &tile : layer.tiles)
       if (tile) result += sizeof(PaintTile);
+  for(const auto &layer:layers_)result+=color_tile_count(layer)*sizeof(PaintColorTile);
   return result;
 }
 void PaintedMesh::install_bake(BakedTextures incoming) {
   if (editing_) throw std::logic_error("Finish the paint stroke before baking");
   incoming.validate(resolution());
+  if(bool(color_projection_)!=(incoming.color_interpretation==BakedColorInterpretation::ResolvedPbr))
+    throw std::invalid_argument("Baked color interpretation must match explicit current color preparation");
   auto token = next_composite_token();
   if (baked_ && !baked_->maps.normal.rgba.empty() && incoming.maps.normal.rgba.empty())
     throw std::invalid_argument("A replacement bake must retain the existing normal channel");
@@ -701,6 +771,8 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
           incoming.storage_bytes() > 128 * 1024 * 1024)
     throw std::length_error("Baked maps exceed paint storage budget");
   if (baked_) {
+    if(baked_->color_interpretation!=incoming.color_interpretation)
+      throw std::invalid_argument("Prepare old baked color authority before combining different interpretations");
     auto merged = *baked_;
     if (merged.maps.normal.rgba.empty() && !incoming.maps.normal.rgba.empty())
       merged.maps.normal = blank_image(resolution(), true);
@@ -709,6 +781,13 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
       if (!a) continue;
       float coverage = a + b * (1 - a);
       auto next = baked_pixel(incoming, i), prior = baked_pixel(*baked_, i);
+      if(incoming.color_interpretation==BakedColorInterpretation::ResolvedPbr)for(int c=0;c<4;++c) {
+        const auto at=i*4+c;
+        float x=unit(incoming.maps.pbr_color.rgba[at]),y=unit(baked_->maps.pbr_color.rgba[at]);
+        if(c<3){x=srgb_to_linear(x);y=srgb_to_linear(y);}
+        const float value=(x*a+y*b*(1-a))/coverage;
+        merged.maps.pbr_color.rgba[at]=byte(c<3?linear_to_srgb(value):value);
+      }
       for (int c = 0; c < 13; ++c) {
         next[c] = (next[c] * a + prior[c] * b * (1 - a)) / coverage;
       }
@@ -748,7 +827,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 }
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {
   material.validate();
-  if(source_maps_ && !baked_){
+  if(source_maps_ && !baked_ && !color_projection_){
     std::lock_guard lock(composite_cache_->mutex);
     if(composite_cache_->preview_token!=composite_token_){
       bool contributing=false;
@@ -772,6 +851,144 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
   }
   return composite(material);
 }
+PaintColorProjectionResult SourceColorPreparationAccess::project(
+    const PaintedMesh &source,std::span<const std::array<float,4>> colors,
+    const ColorPreparationOptions &options) {
+  const auto check=[&]{if(options.cancelled && options.cancelled())throw std::runtime_error("Color projection cancelled");};
+  check();
+  if(source.in_stroke() || colors.size()!=source.mesh().positions.size())
+    throw std::invalid_argument("Color projection requires immutable paint and complete source color identities");
+  for(size_t v=0;v<colors.size();++v){if((v&4095)==0)check();for(float c:colors[v])if(!std::isfinite(c)||c<0||c>1)throw std::invalid_argument("Color projection requires finite unit RGBA");}
+  const auto &diagnostics=source.surface_->diagnostics;
+  if(diagnostics.additional_candidates || !diagnostics.unpaintable_uv_faces.empty())
+    throw std::invalid_argument("Prepare a nonoverlapping writable UV atlas for all colored faces before baking");
+  if(!std::isfinite(options.max_projection_error)||options.max_projection_error<0||options.max_projection_error>1)
+    throw std::invalid_argument("Invalid color projection quality threshold");
+  const uint32_t r=source.resolution();const size_t projection_bytes=size_t(r)*r*4;
+  if(projection_bytes>options.max_working_bytes || projection_bytes>options.max_layer_bytes)
+    throw std::length_error("Color projection exceeds its declared memory budget");
+  auto vertex_image=std::make_shared<Image>(Image{r,r,std::vector<uint8_t>(projection_bytes)});
+  PaintColorProjectionResult result;
+  std::array<float,4> maximum_error{};
+  for(size_t at=0;at<source.surface_->texels.size();++at) {
+    if((at&4095)==0)check();
+    const auto &texel=source.surface_->texels[at];if(!texel.covered)continue;
+    const float bary[]{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]};
+    for(size_t component=0;component<4;++component) {
+      float value=0;for(size_t k=0;k<3;++k)value+=colors[source.mesh().indices[size_t(texel.face)*3+k]][component]*bary[k];
+      vertex_image->rgba[at*4+component]=byte(value);
+    }
+    ++result.projected_texels;
+  }
+  for(size_t at=0;at<source.surface_->texels.size();++at) {
+    if((at&4095)==0)check();
+    if(source.surface_->texels[at].covered)continue;
+    auto owner=source.surface_->padding[at];if(owner>=0)std::copy_n(vertex_image->rgba.begin()+size_t(owner)*4,4,vertex_image->rgba.begin()+at*4);
+  }
+  const auto bound=detail::color_projection_bound(source.mesh(),colors,*vertex_image,options.max_quality_cells,options.cancelled);
+  for(size_t c=0;c<4;++c) {
+    maximum_error[c]=std::min(1.f,std::nextafter(float(bound.maximum_error[c]),INFINITY));
+    if(maximum_error[c]>options.max_projection_error)
+      throw std::invalid_argument("Vertex-color projection exceeds its declared error bound; prepare a higher-resolution atlas with separated color seams");
+  }
+  auto projection=std::make_shared<PaintColorProjection>();projection->vertex_rgba=vertex_image;
+  projection->maximum_error=maximum_error;projection->quality_cells=bound.tested_cells;projection->validate(r);
+  result.projection=std::move(projection);check();return result;
+}
+PaintColorPreparationResult SourceColorPreparationAccess::prepare(
+    const PaintedMesh &source,std::span<const std::array<float,4>> colors,
+    const Material &material,const ColorPreparationOptions &options,SourceColorField source_field,
+    std::shared_ptr<const PaintColorProjection> retained_projection) {
+  const auto check=[&]{if(options.cancelled && options.cancelled())throw std::runtime_error("Color preparation cancelled");};
+  check();material.validate();
+  if(source.in_stroke() || source.color_projection_ || colors.size()!=source.mesh().positions.size())
+    throw std::invalid_argument("Color preparation requires an immutable unprepared source and complete color identities");
+  const auto &diagnostics=source.surface_->diagnostics;
+  if(diagnostics.additional_candidates || !diagnostics.unpaintable_uv_faces.empty())
+    throw std::invalid_argument("Prepare a nonoverlapping writable UV atlas for all colored faces before baking");
+  const uint32_t r=source.resolution();
+  const size_t projection_bytes=size_t(r)*r*4;
+  const size_t layer_bytes=source.allocated_tiles_*sizeof(PaintColorTile);
+  const size_t baked_bytes=source.baked_?source.baked_->maps.color.rgba.size():0;
+  const size_t storage=source.storage_bytes()+projection_bytes+layer_bytes+baked_bytes;
+  if(storage>options.max_layer_bytes)throw std::length_error("Color preparation exceeds painted storage budget");
+  auto dimensions=[&](std::initializer_list<const PaintSourceTexture*> views) {
+    size_t width=r,height=r;for(auto view:views)if(view && view->image){width=std::max(width,size_t(view->image->width));height=std::max(height,size_t(view->image->height));}
+    if(width*height>16*1024*1024)throw std::length_error("Prepared PBR image exceeds pixel budget");
+    return width*height*4;
+  };
+  const PaintSourceMaps empty;const auto &maps=source.source_maps_?*source.source_maps_:empty;
+  const auto color_bytes=dimensions({&maps.color});
+  size_t composite_bytes=color_bytes+dimensions({&maps.metal_rough,&maps.occlusion})+dimensions({&maps.emission});
+  // Conservative preflight includes full color/emission coverage grids, both
+  // before/after composites and the copied old baked payload before allocation.
+  composite_bytes+=color_bytes+dimensions({&maps.emission});
+  if(source.baked_ && !source.baked_->maps.normal.rgba.empty())composite_bytes+=size_t(r)*r*12;
+  const size_t working=2*composite_bytes+color_bytes+projection_bytes+layer_bytes+baked_bytes+(source.baked_?source.baked_->storage_bytes():0);
+  if(working>options.max_working_bytes)throw std::length_error("Color preparation exceeds bounded composite working memory");
+  PaintColorProjectionResult projected;
+  if(retained_projection){retained_projection->validate(r);projected.projection=std::move(retained_projection);projected.projected_texels=source.surface_->diagnostics.covered_texels;}
+  else projected=project(source,colors,options);
+  auto projection=projected.projection;auto vertex_image=projection->vertex_rgba;
+  ColorPreparationReceipt receipt;receipt.resolution=r;receipt.projected_texels=projected.projected_texels;
+  receipt.accepted_projection_error=options.max_projection_error;
+  receipt.source_field=source_field;
+  receipt.quality_material={material.color,material.emissive,int(material.alpha),material.alpha_cutoff,material.double_sided};
+  receipt.projection_error_bound=projection->maximum_error;receipt.tested_quality_cells=projection->quality_cells;
+  auto result=source.snapshot();result->color_projection_=projection;result->allocated_color_tiles_=0;
+  for(auto &layer:result->layers_) {
+    check();layer.pbr_tiles.assign(layer.tiles.size(),{});
+    for(size_t tile=0;tile<layer.tiles.size();++tile)if(layer.tiles[tile]) {
+      check();auto output=std::make_shared<PaintColorTile>();
+      const size_t tx=tile%source.surface_->columns*32,ty=tile/source.surface_->columns*32;
+      for(size_t y=0;y<32;++y)for(size_t x=0;x<32;++x) {
+        const auto &p=layer.tiles[tile]->pixels[y*32+x];const size_t at=(ty+y)*r+tx+x;
+        for(size_t c=0;c<4;++c) {
+          float value=unit(p.data[c]);if(c<3)value=srgb_to_linear(value);
+          value*=unit(vertex_image->rgba[at*4+c]);output->pixels[y*32+x][c]=byte(c<3?linear_to_srgb(value):value);
+        }
+      }
+      layer.pbr_tiles[tile]=std::move(output);++result->allocated_color_tiles_;
+    }
+  }
+  if(source.baked_) {
+    auto baked=std::make_shared<BakedTextures>(*source.baked_);
+    if(baked->color_interpretation!=BakedColorInterpretation::VertexComponent)
+      throw std::invalid_argument("Unprepared target contains an incompatible resolved bake");
+    baked->maps.pbr_color=blank_image(r);
+    for(size_t at=0;at<size_t(r)*r;++at) {
+      if((at&4095)==0)check();
+      for(size_t c=0;c<4;++c) {
+        float value=unit(baked->maps.color.rgba[at*4+c]);if(c<3)value=srgb_to_linear(value);
+        value*=unit(vertex_image->rgba[at*4+c]);baked->maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(value):value);
+      }
+    }
+    baked->color_interpretation=BakedColorInterpretation::ResolvedPbr;baked->validate(r);result->baked_=std::move(baked);
+  }
+  result->composite_token_=next_composite_token();++result->revision_;
+  const auto before=source.preview(material),after=result->composite(material);
+  if(!before->source_only && before->color.rgba!=after->color.rgba)
+    throw std::logic_error("Color preparation changed the common MToon paint authority");
+  auto view=[](const std::shared_ptr<const TextureMaps> &owner,const Image *image) {
+    PaintSourceTexture output;output.image=std::shared_ptr<const Image>(owner,image);output.wrap_s=output.wrap_t=33071;output.min_filter=output.mag_filter=9729;return output;
+  };
+  const auto old_view=before->source_only?before->source_maps->color:view(before,&before->color);
+  const auto new_view=view(after,&after->pbr_color);
+  auto probe=[&](uint32_t face,std::array<float,3> bary) {
+    if(++receipt.probe_samples>options.max_probe_samples)throw std::length_error("Color preparation quality probe budget exceeded");
+    if((receipt.probe_samples&4095)==0)check();
+    std::array<float,2> uv{};std::array<float,4> vertex{};
+    for(size_t k=0;k<3;++k){auto id=source.mesh().indices[size_t(face)*3+k];for(size_t c=0;c<2;++c)uv[c]+=source.mesh().uv[id][c]*bary[k];for(size_t c=0;c<4;++c)vertex[c]+=colors[id][c]*bary[k];}
+    auto a=sample_source_texture(old_view,uv[0],uv[1],true),b=sample_source_texture(new_view,uv[0],uv[1],true);
+    for(size_t c=0;c<4;++c){if(before->source_only)a[c]*=material.color[c];a[c]*=vertex[c];receipt.observed_base_error[c]=std::max(receipt.observed_base_error[c],std::min(1.f,std::abs(a[c]-b[c])));}
+    if(material.alpha==Material::AlphaMode::Mask && (a[3]>=material.alpha_cutoff)!=(b[3]>=material.alpha_cutoff))++receipt.observed_mask_disagreements;
+  };
+  for(const auto &texel:source.surface_->texels)if(texel.covered)probe(texel.face,{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]});
+  for(size_t face=0;face<source.mesh().indices.size()/3;++face) {
+    check();probe(uint32_t(face),{1.f/3,1.f/3,1.f/3});for(size_t corner=0;corner<3;++corner){std::array<float,3> bary{};bary[corner]=1;probe(uint32_t(face),bary);}
+  }
+  receipt.validate();check();return {std::move(result),receipt};
+}
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material) const {
   material.validate();
@@ -789,6 +1006,7 @@ std::shared_ptr<const TextureMaps>
 PaintedMesh::build_composite(const Material &material) const {
   auto maps = std::make_shared<TextureMaps>();
   maps->source_maps=source_maps_;
+  maps->color_projection=color_projection_;
   uint32_t r=resolution();
   const PaintSourceMaps empty;
   const auto &source=source_maps_?*source_maps_:empty;
@@ -800,6 +1018,14 @@ PaintedMesh::build_composite(const Material &material) const {
     image.rgba.resize(size_t(image.width)*image.height*4);
   };
   dimensions(maps->color,{&source.color});
+  PaintSourceTexture projected_vertex_color;
+  if(color_projection_) {
+    color_projection_->validate(r);
+    dimensions(maps->pbr_color,{&source.color});
+    projected_vertex_color.image=color_projection_->vertex_rgba;
+    projected_vertex_color.wrap_s=projected_vertex_color.wrap_t=33071;
+    projected_vertex_color.min_filter=projected_vertex_color.mag_filter=9729;
+  }
   dimensions(maps->metal_rough,{&source.metal_rough,&source.occlusion});
   dimensions(maps->emission,{&source.emission});
   auto make_coverage=[&](Image &coverage,const Image &base,int component) {
@@ -834,6 +1060,11 @@ PaintedMesh::build_composite(const Material &material) const {
         float ao=source.occlusion.image?sample_source_texture(source.occlusion,u,v,false)[0]:1;
         value={1-source.occlusion_strength*(1-ao),material.roughness*sampled[1],material.metallic*sampled[2],1};
       }else{for(int k=0;k<3;++k)value[k]=material.emissive[k]*sampled[k];value[3]=1;}
+      auto pbr_value=value;
+      if(channel==0 && color_projection_) {
+        const auto vertex=sample_source_texture(projected_vertex_color,u,v,false);
+        for(int k=0;k<4;++k)pbr_value[k]*=vertex[k];
+      }
       uint32_t tx=std::min(r-1,uint32_t(u*r)),ty=std::min(r-1,uint32_t(v*r));
       int32_t owner=surface_->padding[size_t(ty)*r+tx];
       uint32_t px=owner>=0?uint32_t(owner)%r:tx,py=owner>=0?uint32_t(owner)/r:ty;
@@ -845,6 +1076,14 @@ PaintedMesh::build_composite(const Material &material) const {
         if (channel == 0) for (int k=0;k<4;++k) value[k] = value[k]*(1-a)+values[k]*a;
         else if (channel == 1) for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[4+k]*a;
         else for (int k=0;k<3;++k) value[k] = value[k]*(1-a)+values[7+k]*a;
+        if(channel==0 && color_projection_) {
+          if(baked_->color_interpretation!=BakedColorInterpretation::ResolvedPbr)throw std::logic_error("Prepared surface contains unresolved baked colors");
+          for(int k=0;k<4;++k) {
+            float baked=unit(baked_->maps.pbr_color.rgba[size_t(owner)*4+k]);
+            if(k<3)baked=srgb_to_linear(baked);
+            pbr_value[k]=pbr_value[k]*(1-a)+baked*a;
+          }
+        }
       }
 
       for(auto &l:layers_)if(l.visible&&l.opacity>0&&owner>=0){
@@ -858,11 +1097,23 @@ PaintedMesh::build_composite(const Material &material) const {
         if(channel==0)for(int k=0;k<4;++k)value[k]=blend(value[k],k,9,k<3);
         else if(channel==1){value[1]=blend(value[1],5,11,false);value[2]=blend(value[2],4,10,false);}
         else for(int k=0;k<3;++k)value[k]=blend(value[k],6+k,12,true);
+        if(channel==0 && color_projection_) {
+          auto painted=pbr_pixel(l.id,px,py);
+          const float a=mask*unit(p.data[9]);
+          for(int k=0;k<4;++k) {
+            float sample=unit(painted[k]);if(k<3)sample=srgb_to_linear(sample);
+            pbr_value[k]=pbr_value[k]*(1-a)+sample*a;
+          }
+        }
       }
       size_t at=(size_t(y)*image.width+x)*4;
       for(int k=0;k<4;++k)image.rgba[at+k]=byte(channel!=1&&k<3?linear_to_srgb(value[k]):value[k]);
       if(channel==0){
         maps->transparent|=value[3]<.999f;
+        if(color_projection_) {
+          for(int k=0;k<4;++k)maps->pbr_color.rgba[at+k]=byte(k<3?linear_to_srgb(pbr_value[k]):pbr_value[k]);
+          maps->pbr_transparent|=pbr_value[3]<.999f;
+        }
         if(maps->color_coverage.width==image.width&&maps->color_coverage.height==image.height)maps->color_coverage.rgba[at]=byte(replacement_coverage);
       } else if(channel==2 && maps->emission_coverage.width==image.width && maps->emission_coverage.height==image.height)
         maps->emission_coverage.rgba[at]=byte(replacement_coverage);
@@ -977,6 +1228,7 @@ PaintedMesh::reparameterize(Mesh target,
     ++result->revision_;
     return result;
   }
+  if(color_projection_)throw std::invalid_argument("Prepared PBR color planes require explicit source-aware UV transfer; original data was retained");
   if(source_maps_)
     throw std::invalid_argument("UV transfer of original source maps requires an explicit bake; original maps were retained");
   auto surface = std::make_shared<SurfaceMap>(std::move(target), resolution());
@@ -1128,11 +1380,10 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
                       {"next_id", next_},
                       {"layers", nlohmann::json::array()}};
   if(surface_->options.policy==PaintUvPolicy::SourceAuthored)j["uv_policy"]="source-authored";
-  if(source_maps_){
-    PaintImageArchive local;
-    j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
-    if(!archive)j["source_images"]=local.encode();
-  }
+  PaintImageArchive local;
+  if(source_maps_)j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
+  if(color_projection_)j["color_projection"]=encode_color_projection(*color_projection_,archive?*archive:local);
+  if(!archive && (source_maps_ || color_projection_))j["source_images"]=local.encode();
   std::vector<uint8_t> positions, normals, uv, indices;
   for (auto p : mesh().positions)
     for (float f : {p.x, p.y, p.z})
@@ -1167,6 +1418,17 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
                            {"visible", l.visible},
                            {"opacity", l.opacity},
                            {"tiles", std::move(tiles)}});
+    if(color_projection_) {
+      if(l.pbr_tiles.size()!=l.tiles.size())throw std::logic_error("Prepared PBR layer grid is incomplete");
+      auto colors=nlohmann::json::array();
+      for(size_t i=0;i<l.pbr_tiles.size();++i)if(l.pbr_tiles[i]) {
+        if(!l.tiles[i])throw std::logic_error("Prepared PBR color tile has no common coverage owner");
+        std::vector<uint8_t> bytes;bytes.reserve(sizeof(PaintColorTile));
+        for(const auto &pixel:l.pbr_tiles[i]->pixels)bytes.insert(bytes.end(),pixel.begin(),pixel.end());
+        colors.push_back({{"index",i},{"data",nlohmann::json::binary(bytes)}});
+      }
+      j["layers"].back()["pbr_color_tiles"]=std::move(colors);
+    } else if(!l.pbr_tiles.empty())throw std::logic_error("PBR color planes have no preparation");
   }
   if (baked_) {
     j["baked"] = {{"version", 1},
@@ -1175,6 +1437,10 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
                     {"emission", nlohmann::json::binary(baked_->maps.emission.rgba)},
                     {"normal", nlohmann::json::binary(baked_->maps.normal.rgba)},
                     {"coverage", nlohmann::json::binary(baked_->coverage)}};
+    if(baked_->color_interpretation==BakedColorInterpretation::ResolvedPbr) {
+      j["baked"]["version"]=2;j["baked"]["color_interpretation"]="resolved-pbr";
+      j["baked"]["pbr_color"]=nlohmann::json::binary(baked_->maps.pbr_color.rgba);
+    }
   }
   return j;
 }
@@ -1224,10 +1490,23 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
     throw std::runtime_error("Invalid paint resolution");
   PaintSurfaceOptions surface_options;
   if(j.contains("uv_policy")){
-    if(j.at("uv_policy")!="source-authored"||!j.contains("source_maps"))throw std::runtime_error("Invalid persisted source UV policy");
+    if(j.at("uv_policy")!="source-authored"||(!j.contains("source_maps")&&!j.contains("color_projection")))throw std::runtime_error("Invalid persisted source UV policy");
     surface_options.policy=PaintUvPolicy::SourceAuthored;
   }
   auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options));
+  std::optional<PaintImageArchive> local_images;
+  const PaintImageArchive *images=archive;
+  if(j.contains("source_maps") || j.contains("color_projection")) {
+    if(archive && j.contains("source_images"))throw std::runtime_error("Ambiguous original texture archive");
+    if(!archive){local_images=PaintImageArchive::decode(j.at("source_images"));images=&*local_images;}
+    if(j.contains("source_maps"))result->source_maps_=decode_source_maps(j.at("source_maps"),*images);
+    if(j.contains("color_projection")) {
+      result->color_projection_=decode_color_projection(j.at("color_projection"),*images);
+      result->color_projection_->validate(result->resolution());
+      if(result->surface_->diagnostics.additional_candidates || !result->surface_->diagnostics.unpaintable_uv_faces.empty())
+        throw std::runtime_error("Prepared color archive does not have a writable atlas");
+    }
+  }
   auto positive = [](const nlohmann::json &v) {
     if ((!v.is_number_unsigned() &&
          (!v.is_number_integer() || v.get<int64_t>() <= 0)) ||
@@ -1278,12 +1557,29 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
           b = bytes[offset++];
       l.tiles[i] = std::move(tile);
     }
+    if(result->color_projection_) {
+      const auto &colors=v.at("pbr_color_tiles");
+      if(!colors.is_array() || colors.size()>l.tiles.size())throw std::runtime_error("Invalid prepared PBR tile count");
+      l.pbr_tiles.resize(l.tiles.size());
+      for(const auto &color:colors) {
+        const auto &index=color.at("index"),&data=color.at("data");
+        if((!index.is_number_unsigned() && (!index.is_number_integer() || index.get<int64_t>()<0)) || index.get<uint64_t>()>=l.tiles.size())throw std::runtime_error("Invalid PBR color tile identity");
+        const auto i=size_t(index.get<uint64_t>());
+        if(!l.tiles[i] || l.pbr_tiles[i] || !data.is_binary() || data.get_binary().size()!=sizeof(PaintColorTile))throw std::runtime_error("Invalid PBR color tile data");
+        allocated+=sizeof(PaintColorTile);
+        if(allocated+result->color_projection_->vertex_rgba->rgba.size()>128*1024*1024)throw std::length_error("Prepared paint storage budget exceeded");
+        auto tile=std::make_shared<PaintColorTile>();size_t offset=0;
+        for(auto &pixel:tile->pixels)for(auto &component:pixel)component=data.get_binary()[offset++];
+        l.pbr_tiles[i]=std::move(tile);++result->allocated_color_tiles_;
+      }
+    } else if(v.contains("pbr_color_tiles"))throw std::runtime_error("PBR color tiles require explicit current color preparation");
     result->layers_.push_back(std::move(l));
   }
   result->layer(result->active_);
   if (j.contains("baked")) {
     const auto &v = j.at("baked");
-    if (v.at("version") != 1) throw std::runtime_error("Unsupported baked texture version");
+    if(!v.at("version").is_number_integer() || (v.at("version")!=1 && v.at("version")!=2))throw std::runtime_error("Unsupported baked texture version");
+    if(v.at("version")==1 && (v.contains("color_interpretation") || v.contains("pbr_color")))throw std::runtime_error("Resolved baked colors require baked payload2");
     uint32_t r = result->resolution();
     auto bytes = [&](const char *key, size_t count, bool optional = false) {
       const auto &value = v.at(key);
@@ -1299,19 +1595,15 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
     auto normal = bytes("normal", size_t(r)*r*4, true);
     if (!normal.empty()) baked.maps.normal = {r, r, std::move(normal)};
     baked.coverage = bytes("coverage", size_t(r)*r);
+    if(v.at("version")==2) {
+      if(v.at("color_interpretation")!="resolved-pbr")throw std::runtime_error("Unknown baked color interpretation");
+      baked.color_interpretation=BakedColorInterpretation::ResolvedPbr;baked.maps.pbr_color={r,r,bytes("pbr_color",size_t(r)*r*4)};
+    }
     result->install_bake(std::move(baked));
   }
   result->allocated_tiles_ = 0;
   for(const auto &layer:result->layers_)result->allocated_tiles_+=tile_count(layer);
-  if(j.contains("source_maps")){
-    if(archive){
-      if(j.contains("source_images"))throw std::runtime_error("Ambiguous original texture archive");
-      result->source_maps_=decode_source_maps(j.at("source_maps"),*archive);
-    }else{
-      auto local=PaintImageArchive::decode(j.at("source_images"));
-      result->source_maps_=decode_source_maps(j.at("source_maps"),local);
-    }
-  }
+  if(result->storage_bytes()>128*1024*1024)throw std::length_error("Persisted paint exceeds total storage budget");
   return result;
 }
 void PaintedMesh::swap_state(PaintedMesh &other) noexcept {

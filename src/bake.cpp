@@ -165,6 +165,10 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
         if(!m.maps->source_maps||m.maps->source_maps->empty())throw std::invalid_argument("Raw bake source needs original texture bindings");
         if(m.maps->color.width||m.maps->metal_rough.width||m.maps->emission.width||m.maps->normal.width)throw std::invalid_argument("Raw bake source cannot also contain derived maps");
       }else{m.maps->color.validate(); m.maps->metal_rough.validate(); m.maps->emission.validate();}
+      if(m.maps->pbr_color.width||m.maps->pbr_color.height||!m.maps->pbr_color.rgba.empty()) {
+        if(m.maps->source_only||!m.maps_are_composited)throw std::invalid_argument("Separate baked source PBR colors require an explicit resolved composite");
+        m.maps->pbr_color.validate();
+      }
       if (!m.maps->normal.rgba.empty() || m.maps->normal.width || m.maps->normal.height)
         m.maps->normal.validate();
     }
@@ -203,6 +207,7 @@ void pad(BakeResult &result,const BakeOptions &o) {
       if (result.coverage[target]) continue; // Never cover a miss or another island.
       for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
         std::copy_n(image->rgba.data()+size_t(at)*4,4,image->rgba.data()+size_t(target)*4);
+      if(o.separate_pbr_color)std::copy_n(result.maps.pbr_color.rgba.data()+size_t(at)*4,4,result.maps.pbr_color.rgba.data()+size_t(target)*4);
       result.coverage[target]=2; ++result.padded; queue.push_back({target,distance+1});
     }
   }
@@ -228,6 +233,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
     *image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
+  if(o.separate_pbr_color)result.maps.pbr_color={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   std::vector<uint32_t> owner(pixels,UINT32_MAX);
   for (size_t triangle=0;triangle<low.indices.size()/3;++triangle) {
     if(o.progress && triangle%64==0)o.progress(.05f+.85f*float(triangle)/float(low.indices.size()/3));
@@ -286,7 +292,13 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
       const auto &m=source.materials[material_id];
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
       auto channels=material(m,high_uv); auto high_normal=normalized(hit->normal);
-      if(!source.colors.empty()){std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];for(int c=0;c<4;++c)channels.color[c]*=tint[c];}
+      auto pbr_color=channels.color;
+      const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
+      if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,high_uv,false,true);
+      if(!source.colors.empty()){
+        std::array<float,4> tint{};for(int i=0;i<3;++i)for(int c=0;c<4;++c)tint[c]+=source.colors[source.mesh.indices[hit->triangle*3+i]][c]*hit->barycentric[i];
+        for(int c=0;c<4;++c){if(!o.separate_pbr_color)channels.color[c]*=tint[c];else if(!resolved_source)pbr_color[c]*=tint[c];}
+      }
       if (normal_image(m)&&m.normal_strength>0) {
         TangentFrame tangent;
         if (source.tangents.empty())
@@ -324,6 +336,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
         result.maps.emission.rgba[at*4+c]=byte(linear_to_srgb(channels.emission[c]));
       }
       result.maps.color.rgba[at*4+3]=byte(channels.color[3]);
+      if(o.separate_pbr_color)for(int c=0;c<4;++c)result.maps.pbr_color.rgba[at*4+c]=byte(c<3?linear_to_srgb(pbr_color[c]):pbr_color[c]);
       result.maps.emission.rgba[at*4+3]=255;
       result.maps.metal_rough.rgba[at*4]=byte(ao); result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
       result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;

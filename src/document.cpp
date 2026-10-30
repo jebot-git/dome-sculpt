@@ -11,6 +11,7 @@
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
 #include "source-colors.hpp"
+#include "prepared-color-state.hpp"
 #include "sculpt-ui-values.hpp"
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
@@ -613,6 +614,7 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::BakeDistances &&
                         state_.controls.parameter != VrParameter::BakeQuality &&
                         state_.controls.parameter != VrParameter::BakeProjection &&
+                        state_.controls.parameter != VrParameter::BakeColors &&
                         !skin_parameter(state_.controls.parameter) &&
                         !sculpt_parameter(state_.controls.parameter) &&
                         !procedural_parameter(state_.controls.parameter));
@@ -1352,7 +1354,7 @@ void Document::mesh_loop() {
                                       : std::vector<uint64_t>{};
       std::unordered_set<uint64_t> frame_objects;
       for (auto &o : objects) {
-        auto colors=detail::source_vertex_colors(o.appearance.get(),o.mesh.positions.size(),cancelled);
+        auto colors=detail::prepared_color_state(o.material_bindings.get(),o.textures.get(),false)?std::vector<std::array<float,4>>{}:detail::source_vertex_colors(o.appearance.get(),o.mesh.positions.size(),cancelled);
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
         const bool canonical=o.textures && !o.textures->normal.rgba.empty();
@@ -1648,7 +1650,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if(skin_parameter(parameter)) return skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
-  if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection)
+  if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection || parameter==VrParameter::BakeColors)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
   if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
     return !state_.asset_busy && !state_.recovery_busy && state_.can_paint_weights;
@@ -1759,11 +1761,12 @@ void Document::finish_control_locked(bool accept) {
     }
     control_before_.reset(); control_changed_ = false; state_.controls = {}; return;
   }
-  if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality || state_.controls.parameter==VrParameter::BakeProjection){
+  if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality || state_.controls.parameter==VrParameter::BakeProjection || state_.controls.parameter==VrParameter::BakeColors){
     auto c=state_.controls;
     if(accept){
       if(c.parameter==VrParameter::BakeSource){auto ids=bake_sources_locked();state_.bake_source=ids.at(size_t(std::lround(c.value[0])));}
       else if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
+      else if(c.parameter==VrParameter::BakeColors){state_.bake_settings.prepare_colors=c.value[0]>=.5f;state_.bake_settings.color_error=c.value[1];}
       else if(c.parameter==VrParameter::BakeProjection){state_.bake_settings.allow_partial=c.value[0]>=.5f;state_.bake_settings.allow_backfaces=c.value[1]>=.5f;}
       else {state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));}
     }
@@ -1946,6 +1949,9 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value={state_.bake_settings.front_mm,state_.bake_settings.back_mm,state_.bake_settings.ao_distance_mm,0};
       for(int k=0;k<3;++k)c.value[k]=std::clamp(c.value[k],c.minimum,c.maximum);
       break;
+    case VrParameter::BakeColors:
+      c.title="Color preparation / maximum error";c.components=2;
+      c.value={state_.bake_settings.prepare_colors?1.f:0.f,state_.bake_settings.color_error,0,0};break;
     case VrParameter::BakeProjection:
       c.title="Projection: partial / backfaces";c.components=2;
       c.value={state_.bake_settings.allow_partial?1.f:0.f,state_.bake_settings.allow_backfaces?1.f:0.f,0,0};break;
@@ -2138,6 +2144,7 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::BakeDistances:
   case VrParameter::BakeQuality:
   case VrParameter::BakeProjection:
+  case VrParameter::BakeColors:
     break; // Staged operation settings do not mutate the scene or history.
   case VrParameter::SkinSource:
   case VrParameter::SkinMode:

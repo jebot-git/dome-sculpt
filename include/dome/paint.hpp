@@ -16,6 +16,15 @@ struct Image {
   std::vector<uint8_t> png() const;
 };
 struct BakedTextures;
+struct PaintColorProjection {
+  // Linear RGBA in the current writable atlas. Original accessor data remains
+  // in the immutable source appearance and preparation receipt.
+  uint32_t version = 1;
+  std::shared_ptr<const Image> vertex_rgba;
+  std::array<float,4> maximum_error{};
+  uint64_t quality_cells=0;
+  void validate(uint32_t resolution) const;
+};
 struct TextureMaps {
   Image color, metal_rough, emission;
   bool transparent = false;
@@ -30,12 +39,19 @@ struct TextureMaps {
   Image baked_normal, baked_coverage;
   // Linear R replacement below/through editable emission, on its own exact grid.
   Image emission_coverage;
+  // Optional prepared PBR result. The ordinary color image remains the typed
+  // MToon correction authority; MToon ignores original vertex colors.
+  Image pbr_color;
+  bool pbr_transparent = false;
+  std::shared_ptr<const PaintColorProjection> color_projection;
 };
+enum class BakedColorInterpretation { VertexComponent, ResolvedPbr };
 struct BakedTextures {
   TextureMaps maps;
   // Linear coverage below editable paint layers: 0 intrinsic material,
   // 255 baked surface. Fractional values retain filtered UV boundary coverage.
   std::vector<uint8_t> coverage;
+  BakedColorInterpretation color_interpretation = BakedColorInterpretation::VertexComponent;
   void validate(uint32_t resolution) const;
   size_t storage_bytes() const;
 };
@@ -66,12 +82,18 @@ struct PaintTile {
   static constexpr uint32_t size = 32;
   std::array<PaintPixel, size * size> pixels;
 };
+struct PaintColorTile {
+  // Sparse optional second color plane. Ordinary PaintPixel/Tile layouts do
+  // not grow; coverage/masks/other channels remain in the common paint tile.
+  std::array<std::array<uint8_t,4>, PaintTile::size * PaintTile::size> pixels{};
+};
 struct PaintLayer {
   uint64_t id = 0;
   std::string name = "Paint";
   bool visible = true;
   float opacity = 1;
   std::vector<std::shared_ptr<const PaintTile>> tiles;
+  std::vector<std::shared_ptr<const PaintColorTile>> pbr_tiles;
 };
 enum class PaintUvPolicy { Strict, SourceAuthored };
 struct PaintSurfaceOptions {
@@ -101,6 +123,8 @@ public:
   uint32_t resolution() const;
   uint64_t revision() const { return revision_; }
   const std::vector<PaintLayer> &layers() const { return layers_; }
+  const std::shared_ptr<const PaintColorProjection> &color_projection() const { return color_projection_; }
+  std::array<uint8_t,4> pbr_pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   uint64_t active_layer() const { return active_; }
   void select_layer(uint64_t);
   void add_layer(std::string name = "Paint");
@@ -142,6 +166,7 @@ private:
   friend class Document;
   void swap_state(PaintedMesh &) noexcept;
   friend struct SourceUvBakeAccess;
+  friend struct SourceColorPreparationAccess;
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
@@ -154,23 +179,29 @@ private:
   uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
+  std::shared_ptr<const PaintColorProjection> color_projection_;
   std::vector<PaintLayer> layers_;
   std::shared_ptr<const BakedTextures> baked_;
   uint64_t active_ = 1, next_ = 2, revision_ = 1;
   bool editing_ = false;
   using Tiles = std::vector<std::shared_ptr<const PaintTile>>;
+  using ColorTiles = std::vector<std::shared_ptr<const PaintColorTile>>;
   struct Stroke {
     uint64_t layer;
     Tiles before, after;
     size_t bytes;
     size_t before_tiles = 0, after_tiles = 0;
+    ColorTiles color_before, color_after;
+    size_t before_color_tiles = 0, after_color_tiles = 0;
   };
   Tiles before_;
+  ColorTiles before_colors_;
   std::deque<Stroke> undo_, redo_;
   size_t history_bytes_ = 0;
   PaintLayer &active();
   const PaintLayer &layer(uint64_t) const;
   size_t allocated_tiles_ = 0, before_allocated_tiles_ = 0;
+  size_t allocated_color_tiles_ = 0, before_allocated_color_tiles_ = 0;
 };
 float srgb_to_linear(float);
 float linear_to_srgb(float);

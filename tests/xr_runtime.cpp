@@ -60,7 +60,8 @@ std::string cut_mode(){auto mode=getenv("DOME_XR_FIXTURE_CUT");return mode?mode:
 unsigned cut_step=0;
 bool cut_preview_ready=false,cut_apply_ready=false;
 std::string mask_mode(){auto mode=getenv("DOME_XR_FIXTURE_SCULPT_MASK");return mode?mode:"";}
-std::string bake_policy_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE_POLICY");return mode?mode:"";}
+bool bake_color_mode(){return getenv("DOME_XR_FIXTURE_BAKE_COLOR")!=nullptr;}
+std::string bake_policy_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE_POLICY");if(!mode)mode=getenv("DOME_XR_FIXTURE_BAKE_COLOR");return mode?mode:"";}
 std::string procedural_mode(){auto mode=getenv("DOME_XR_FIXTURE_PROCEDURAL");return mode?mode:"";}
 std::string resolution_mode(){auto mode=getenv("DOME_XR_FIXTURE_RESOLUTION");return mode?mode:"";}
 unsigned mask_step=0;bool mask_work_ready=false, mask_work_completed=false, mask_released=false;
@@ -850,7 +851,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(frame==9 || frame==10)sector=8;
     if(frame==11 || frame==12)sector=9;
     if(frame==13 || frame==14)sector=6;
-    if(frame==15 || frame==16)sector=11;
+    if(frame==15 || frame==16)sector=bake_color_mode()?9:11;
     if(frame==23 || frame==24)sector=3;
     if(sector>=0){float angle=sector*6.28318530718f/12;out->currentState={std::cos(angle),std::sin(angle)};}
   }
