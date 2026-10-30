@@ -127,6 +127,10 @@ struct MeshSnapshot {
   size_t weight_samples = 0;
   std::shared_ptr<const MaterialSurfaceQuery> picking;
   std::vector<std::array<float,4>> tangents;
+  // Producer-owned immutable packed-geometry identity. It strongly retains
+  // all geometry/layout dependencies; scalar/material-only changes may reuse
+  // it. Empty identities retain conservative per-snapshot uploads.
+  std::shared_ptr<const void> geometry_identity;
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0;
