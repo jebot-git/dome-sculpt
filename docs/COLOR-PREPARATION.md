@@ -1,5 +1,9 @@
 # Explicit source color preparation
 
+The final qualification paragraph below describes the frozen standalone
+`8d8f8d3` checkpoint. Current source/runtime integration and its separate evidence
+are recorded in [COLORED-BAKE-INTEGRATION.md](COLORED-BAKE-INTEGRATION.md).
+
 This work adds a reversible static COLOR_0 preparation policy. It does not claim COLOR_n or TEXCOORD_n morph-channel support. Existing POSITION/NORMAL/TANGENT morph and skin authority stays separate.
 
 ## User action and retained data

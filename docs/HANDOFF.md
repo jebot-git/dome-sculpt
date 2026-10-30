@@ -23,6 +23,23 @@ output. Import affine/source poses, UV1 sampling, native FBX deformation/materia
 COLOR/UV morphs and broader glTF/VRM remain incomplete. The whole production matrix
 also retains its sculpt/paint/remesh/rig/weight/shapekey/device requirements.
 
+## Private combined candidate
+
+The current private work/production-union-7152 combines published7152 with the
+qualified color803/950 and complete polygon e899 lineages. It is not yet
+qualified or published as a union. All six code/build conflicts are resolved:
+shared bitmap/toolkit and JSON interfaces, color/PA paint policy, recursive
+Scene12 authority, shared menu parameters and accepted worker ordering coexist.
+The polygon standalone library also inherits the pinned JSON interface.
+
+Before publication, fix and test retained polygon color-budget accounting and
+color-projection/preparation/current-mesh authority pairing. Color preparations
+must not smuggle unbound PolygonAuthored originals through retained receipts.
+Prepared-color topology changes remain guarded until an actual transferable
+field representation exists. Rebuild every consumer coherently for the merged
+public layouts, then run native/GUI/XR/graphics/serialization/fault qualification.
+Individual branch receipts remain scoped to their own source and binaries.
+
 ## Active delegated work
 
 - merge_contracts integrates full polygon Document/native/XR/Scene12 authority.
