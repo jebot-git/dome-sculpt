@@ -142,6 +142,81 @@ PolygonColorField::packed(const PolygonMesh &mesh,
   }
   return result;
 }
+PolygonColorField transfer_polygon_colors(
+    const PolygonMesh &source, const PolygonColorField &field,
+    const PolygonMesh &target, std::span<const PolygonCornerSource> transfers,
+    const PolygonLimits &limits) {
+  field.validate(source, limits);
+  target.validate(limits);
+  Budget budget{limits};
+  if (transfers.size() > limits.maximum_corners)
+    throw std::length_error("Polygon color transfer count exceeded");
+  std::map<PolygonId, const PolygonCornerSource *> rows;
+  for (const auto &row : transfers) {
+    budget.step();
+    if (!row.corner || row.weights.empty() ||
+        row.weights.size() > limits.maximum_provenance ||
+        !rows.emplace(row.corner, &row).second)
+      throw std::invalid_argument(
+          "Invalid or duplicate polygon color transfer");
+  }
+  PolygonColorField output;
+  output.sources_ = field.sources_;
+  size_t entries = 0;
+  for (const auto &face : target.faces())
+    for (const auto &corner : face.corners) {
+      budget.step();
+      auto found = rows.find(corner.id);
+      if (found == rows.end())
+        throw std::invalid_argument("Missing target polygon color witness");
+      std::map<PolygonId, double> weights;
+      double sum = 0;
+      std::set<PolygonId> witnessed;
+      for (auto [id, amount] : found->second->weights) {
+        budget.step();
+        if (!id || !std::isfinite(amount) || amount < 0 || amount > 1 ||
+            !witnessed.insert(id).second)
+          throw std::invalid_argument(
+              "Invalid source polygon corner transfer weight");
+        const auto &input = lookup(field.corners_, id);
+        sum += amount;
+        for (auto [original, weight] : input.provenance) {
+          budget.step();
+          if (amount > 0)
+            weights[original] += amount * weight;
+          if (weights.size() > limits.maximum_provenance)
+            throw std::length_error(
+                "Polygon color contributor budget exceeded");
+        }
+      }
+      if (std::abs(sum - 1) > 1e-12)
+        throw std::invalid_argument(
+            "Polygon color transfer must be a convex partition");
+      double total = 0;
+      for (auto [id, weight] : weights) {
+        (void)id;
+        total += weight;
+      }
+      if (!(total > 0) || !std::isfinite(total))
+        throw std::invalid_argument("Empty polygon color transfer");
+      PolygonColorSample row;
+      row.corner = corner.id;
+      for (auto [id, weight] : weights)
+        if (weight > 0)
+          row.provenance.emplace_back(id, weight / total);
+      if (row.provenance.size() > 8'000'000 - entries)
+        throw std::length_error("Polygon color provenance storage exceeded");
+      entries += row.provenance.size();
+      output.corners_.push_back(std::move(row));
+      rows.erase(found);
+    }
+  if (!rows.empty())
+    throw std::invalid_argument("Orphan polygon color transfer");
+  std::sort(output.corners_.begin(), output.corners_.end(),
+            [](const auto &a, const auto &b) { return a.corner < b.corner; });
+  output.validate(target, limits);
+  return output;
+}
 PolygonColoredEdit edit_colored_polygon(const PolygonMesh &mesh,
                                         const PolygonColorField &field,
                                         const PolygonEdit &edit,
