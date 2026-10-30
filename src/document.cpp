@@ -1049,11 +1049,14 @@ void Document::prepare_locked(uint32_t resolution) {
   job.edit_authority=state_.edit_authority;
   job.source_identity = o.volume;
   job.resolution = resolution;
+  job.work=std::make_shared<AssetWork>();
+  job.operation_label="Painting mesh preparation";
+  auto work=job.work;
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
     throw std::runtime_error("File and asset work queue is full");
   Transaction transaction(*this);files_.push_back(std::move(job));
-  try{state_.asset_busy=true;state_.error.clear();state_.message="Preparing painting mesh and UVs...";publish_locked(false,false);transaction.commit();}
+  try{state_.asset_busy=true;asset_work_.store(work);state_.error.clear();state_.message="Preparing painting mesh and UVs...";publish_locked(false,false);transaction.commit();}
   catch(...){files_.pop_back();throw;}
   file_changed_.notify_one();
 
@@ -3039,10 +3042,15 @@ void Document::file_loop() {
       }
       if (job->prepare_mesh) {
         auto &source = job->scene.object(job->object);
-        auto mesh =
-            surface_mesh(*source.volume, [&] { return stopping_.load(); });
-        condition_sculpt_normals(mesh,[&] { return stopping_.load(); });
-        unwrap(mesh, job->resolution);
+        auto cancelled = [&] {
+          auto state=published_.load();
+          return stopping_.load() || (job->work && job->work->cancelled.load()) ||
+                 state->generation!=job->generation || state->edit_authority!=job->edit_authority;
+        };
+        auto mesh = surface_mesh(*source.volume, cancelled);
+        condition_sculpt_normals(mesh,cancelled);
+        unwrap(mesh, job->resolution, 4, cancelled);
+        if(cancelled())throw std::runtime_error("Painting mesh preparation cancelled");
         auto painted =
             std::make_shared<PaintedMesh>(std::move(mesh), job->resolution);
         std::lock_guard lock(model_mutex_);
@@ -3050,7 +3058,7 @@ void Document::file_loop() {
           auto it =
               std::find_if(scene_.objects().begin(), scene_.objects().end(),
                            [&](auto &o) { return o.id == job->object; });
-          if (it == scene_.objects().end() ||
+          if (cancelled() || it == scene_.objects().end() ||
               it->volume != job->source_identity ||
               it->volume->revision() != job->source_revision ||
               job->edit_authority!=state_.edit_authority || !object_editable_locked(job->object) ||
@@ -3062,6 +3070,8 @@ void Document::file_loop() {
           auto &o=scene_.object(job->object);o.painted=std::move(painted);o.mesh_active=true;
           state_.asset_busy=false;state_.message="Painting mesh ready";state_.error.clear();
           record_locked({{},transaction.before(),scene_});bind_locked();publish_locked(true,false);transaction.commit();
+          asset_work_.store({});
+          if(job->work)job->work->progress.store(1);
 
         }
         {
@@ -3150,7 +3160,7 @@ void Document::file_loop() {
             view->busy = view->committing = false; view->error = e.what(); state_.retopology = view;
           }
         }
-        if(job->open_project) asset_work_.store({});
+        if(job->open_project || job->prepare_mesh) asset_work_.store({});
         if(job->work && job->work->cancelled.load()){
           state_.error.clear();state_.message=job->operation_label+" cancelled";
         }else state_.error = e.what();

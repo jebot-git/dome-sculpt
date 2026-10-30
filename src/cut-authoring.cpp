@@ -21,9 +21,9 @@ Mesh part(const PlaneCutResult &cut, bool cap, std::vector<uint32_t> *triangles 
   }
   return mesh;
 }
-void atlas(Mesh &mesh,uint32_t resolution){
+void atlas(Mesh &mesh,uint32_t resolution,const std::function<bool()> &cancelled){
   auto before=mesh;
-  unwrap(mesh,resolution);
+  unwrap(mesh,resolution,4,cancelled);
   if(mesh.indices.size()!=before.indices.size())throw std::runtime_error("Cut atlas changed face ordering");
   for(size_t k=0;k<mesh.indices.size();++k)
     if(length(mesh.positions[mesh.indices[k]]-before.positions[before.indices[k]])>1e-7f)
@@ -79,7 +79,7 @@ CutPublishReport publish_cut(Scene &scene,const CutPreview &preview,const BakeSo
   auto shell=part(*preview.result,false,&triangles,&barycentrics);
   auto cap=part(*preview.result,true);
   if(progress)progress(.05f);
-  atlas(shell,resolution);stop(cancelled);
+  atlas(shell,resolution,cancelled);stop(cancelled);
   BakeOptions options;options.resolution=resolution;options.ao_samples=0;options.padding=8;
   options.source_triangles=std::move(triangles);options.source_corner_barycentrics=std::move(barycentrics);
   options.cancelled=cancelled;if(progress)options.progress=[&](float p){progress(.15f+p*.65f);};
@@ -90,7 +90,7 @@ CutPublishReport publish_cut(Scene &scene,const CutPreview &preview,const BakeSo
   auto shell_paint=std::make_shared<PaintedMesh>(std::move(shell),resolution);
   shell_paint->install_bake(std::move(textures));
   std::shared_ptr<PaintedMesh> cap_paint;
-  if(!cap.indices.empty()){atlas(cap,resolution);localize(cap,world);cap_paint=std::make_shared<PaintedMesh>(std::move(cap),resolution);}
+  if(!cap.indices.empty()){atlas(cap,resolution,cancelled);localize(cap,world);cap_paint=std::make_shared<PaintedMesh>(std::move(cap),resolution);}
   stop(cancelled);if(progress)progress(.9f);
   auto next=scene.snapshot();
   auto name=original.name.size()<=252?original.name+" cut":std::string("Cut result");

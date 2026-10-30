@@ -677,7 +677,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
       if (mesh.indices.empty())
         continue;
       if (atlas && !o.mesh_active)
-        unwrap(mesh);
+        unwrap(mesh, 1024, 4, cancelled);
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
            o.mesh_active ? (preview ? o.painted->preview(o.material) : o.painted->composite(o.material)) : nullptr,

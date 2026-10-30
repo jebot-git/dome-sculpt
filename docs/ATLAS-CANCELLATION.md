@@ -17,3 +17,29 @@ the shared predicate cancels from a real xatlas chart callback and the caller
 Scene stays exact. CPU/OneAPI and complete-own-core/support sanitizer checks pass.
 See GLTF-FLAT-NORMALS.md and its scoped receipt; other worker callers still need
 the overload, and no hard vendor-iteration latency bound is claimed.
+
+## Authoring-worker adoption
+
+Scene atlasing, retopology publication and both plane-cut shell/cap atlases now
+forward their existing cancellation predicate to the four-argument overload.
+Painting-mesh preparation registers a transactional AssetWork token, exposes the
+existing native/spatial Cancel action and forwards that token, shutdown and
+edit-authority invalidation through extraction, normal conditioning and atlas
+work. Cancellation clears busy/token state without adding history; successful
+retry retains a single Undo/Redo operation.
+
+The new authoring fixture cancels from actual vendor chart callbacks, including
+separately the cut shell and cap. Its 18 assertions preserve original Scene,
+paint/volume owners and topology, retry every path, and exercise actual Document
+Cancel while its ordered worker is inside chart generation. The same fixture
+fails against the previous call sites, demonstrating the uncovered behavior.
+Six Release suites pass (11.95 seconds), including shared Document, cut,
+retopology, snapshot export and persistent native-stroke allocation regressions.
+Whole-core sanitizer qualification of this followup is recorded separately by
+its integration receipt; the preceding import-safety proof is not relabeled.
+
+Accepted snapshot exports continue draining when the application closes. They
+must not inherit a global shutdown predicate that silently cancels already
+accepted output. Explicit export-job cancellation remains required work, along
+with cooperative vendor iteration latency/performance qualification. The legacy
+three-argument API and its default numerical behavior remain available.

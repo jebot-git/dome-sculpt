@@ -173,7 +173,7 @@ uint64_t publish_retopology(Scene &scene, const RetopoMesh &topology, uint64_t s
   scene.object(source);
   auto triangles = topology.triangulate(cancelled);
   stop(cancelled);
-  unwrap(triangles.mesh, 512);
+  unwrap(triangles.mesh, 512, 4, cancelled);
   stop(cancelled);
   auto painted = std::make_shared<PaintedMesh>(std::move(triangles.mesh), 512);
   auto patch = std::make_shared<const RetopoPatch>(RetopoPatch{source, topology});
