@@ -48,7 +48,9 @@ std::map<std::string, XrPath> paths;
 std::map<XrPath, std::string> names;
 Json report = Json::object();
 int instance_tag, session_tag, action_set_tag;
-unsigned frame = 0, event = 0, restart_phase = 0;
+unsigned frame = 0, physical_frame = 0, event = 0, restart_phase = 0;
+unsigned menu_completion_event = 0;
+bool menu_gate() { return getenv("DOME_XR_FIXTURE_MENU_GATE") != nullptr; }
 bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
@@ -438,6 +440,13 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->session = reinterpret_cast<XrSession>(&session_tag);
     return XR_SUCCESS;
   }
+  if (menu_gate() && frame >= 45 && menu_completion_event < 2) {
+    auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
+    e->type = XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
+    e->session = reinterpret_cast<XrSession>(&session_tag);
+    e->state = menu_completion_event++ == 0 ? XR_SESSION_STATE_STOPPING : XR_SESSION_STATE_EXITING;
+    return XR_SUCCESS;
+  }
   if (getenv("DOME_XR_FIXTURE_RESTART") && frame >= 23 && restart_phase < 8) {
     static constexpr XrSessionState states[] = {
         XR_SESSION_STATE_VISIBLE,  XR_SESSION_STATE_SYNCHRONIZED,
@@ -481,7 +490,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
     e->session = reinterpret_cast<XrSession>(&session_tag);
     e->referenceSpaceType = XR_REFERENCE_SPACE_TYPE_STAGE;
-    e->changeTime = 1000000000 + 38 * 18000000;
+    e->changeTime = 1000000000 + (physical_frame + 3) * 18000000;
     e->poseValid = XR_TRUE;
     e->poseInPreviousSpace = {{0, 0, 0, 1}, {.2f, 0, 0}};
     count("reference_changes");
@@ -491,7 +500,20 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
 }
 FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
   std::this_thread::sleep_for(std::chrono::milliseconds(18));
-  ++frame;
+  ++physical_frame;
+  // Keep delivering released input and real stereo frames until the menu has
+  // actually reached a released swapchain. Advancing straight from click8 to
+  // click10 can process open+close on the input worker between two snapshots.
+  // This is a test-runtime acknowledgement, never an XR application wait.
+  if (!(menu_gate() && frame == 9 && report.value("palette_images", 0) == 0)) ++frame;
+  else count("menu_gate_wait_frames");
+  if (menu_gate()) {
+    report["menu_script_step"] = frame;
+    if (physical_frame > 1200) {
+      report["menu_gate_exhausted"] = true; save();
+      return XR_ERROR_RUNTIME_FAILURE;
+    }
+  }
   if (auto mode=retopo_mode(); !mode.empty()) {
     bool waiting = (retopo_step == 27 && !retopo_source_ready) ||
                    (mode!="unconfirmed" && retopo_step == 60 && !retopo_apply_ready);
@@ -510,7 +532,7 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
     else if(!((mode=="fill" || mode=="undo") && ((mask_step==68 && !mask_work_completed) || (mask_step==79 && !mask_work_ready)))) ++mask_step;
     report["mask_script_step"]=mask_step;
   }
-  p->predictedDisplayTime = 1000000000 + frame * 18000000;
+  p->predictedDisplayTime = 1000000000 + physical_frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
   p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
   count("frames_waited");
@@ -545,6 +567,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
   // stroke; the parent never relies on an arbitrary startup delay.
   if(frame==16) if(auto marker=getenv("DOME_XR_FIXTURE_SIGNAL_READY"))
     std::ofstream(marker)<<frame<<'\n';
+  if(menu_gate() && frame==9)save();
   if(!cut_mode().empty())save(); // Preserve actual progress even if a later stage stalls.
   return XR_SUCCESS;
 }
