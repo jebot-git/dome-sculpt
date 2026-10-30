@@ -529,7 +529,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
   }
   state_.mesh_active = active.mesh_active;
-  state_.can_cut = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
+  state_.can_cut = !(active.polygon && active.polygon->active && active.polygon->colors) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
   state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
@@ -800,6 +800,18 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     if(held)hit->position=vec(ob::transform(delta,obv(hit->position)));
     auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
     return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;
+  }
+  const auto &active=scene_.active();
+  if(!state_.retopology && active.mesh_active && active.polygon && active.polygon->active && active.polygon->colors) {
+    auto mesh=mesh_.load();
+    if(mesh->generation!=state_.generation || mesh->revision!=state_.revision || !mesh->picking)return {};
+    const bool held=state_.object_grabbing && state_.held_object==active.id;
+    auto delta=held?ob::compose(object_world_transform_locked(active.id),ob::inverse(scene_.world_transform(active.id))):CanvasTransform{};
+    auto origin=held?world_to_model(delta,p):p;
+    auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
+    auto hit=mesh->picking->raycast(origin,direction,held?20/delta.scale:20,material_time,active.id);
+    if(!hit)return {};
+    return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->position)))):std::optional<Vec3>(hit->position);
   }
   auto t = object_world_transform_locked(scene_.active().id);
   if (state_.retopology) {
@@ -1584,7 +1596,8 @@ void Document::mesh_loop() {
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
-      if ((job->weight_view || (published_.load()->object_grab_mode&&!published_.load()->object_grabbing)) && !snapshot->mesh.indices.empty())
+      const bool has_polygon_colors=std::any_of(objects.begin(),objects.end(),[](const ObjectSurface &o){return bool(o.polygon_colors);});
+      if ((has_polygon_colors || job->weight_view || (published_.load()->object_grab_mode&&!published_.load()->object_grabbing)) && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors);
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       std::lock_guard lock(mesh_mutex_);

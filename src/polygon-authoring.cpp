@@ -165,10 +165,12 @@ PolygonDrawData display_data(const PolygonMesh &mesh,
   return out;
 }
 } // namespace
-PolygonWorkspace::Snapshot
-PolygonWorkspace::prepare(PolygonMesh mesh, PolygonSelection selected,
-                          const PolygonLimits &limits) const {
+PolygonWorkspace::Snapshot PolygonWorkspace::prepare(
+    PolygonMesh mesh, PolygonSelection selected, const PolygonLimits &limits,
+    std::shared_ptr<const PolygonColorField> colors) const {
   stop(limits);
+  if (colors)
+    colors->validate(mesh, limits);
   auto topology = std::make_shared<const PolygonMesh>(std::move(mesh));
   auto render =
       std::make_shared<const PolygonRender>(topology->triangulate(limits));
@@ -193,6 +195,7 @@ PolygonWorkspace::prepare(PolygonMesh mesh, PolygonSelection selected,
   });
   auto view = std::make_shared<PolygonView>();
   view->topology = std::move(topology);
+  view->colors = std::move(colors);
   view->surface = std::move(render);
   view->selection =
       std::make_shared<const PolygonSelection>(std::move(selected));
@@ -202,8 +205,12 @@ PolygonWorkspace::prepare(PolygonMesh mesh, PolygonSelection selected,
   return {std::move(view), std::move(query)};
 }
 PolygonWorkspace::PolygonWorkspace(PolygonMesh mesh,
-                                   const PolygonLimits &limits) {
-  current_ = prepare(std::move(mesh), {}, limits);
+                                   const PolygonLimits &limits)
+    : PolygonWorkspace(std::move(mesh), {}, limits) {}
+PolygonWorkspace::PolygonWorkspace(
+    PolygonMesh mesh, std::shared_ptr<const PolygonColorField> colors,
+    const PolygonLimits &limits) {
+  current_ = prepare(std::move(mesh), {}, limits, std::move(colors));
   original_ = current_.view->topology;
   high_water_ = original_->next_id();
 }
@@ -350,6 +357,11 @@ void PolygonWorkspace::trim_history() {
     size_t n = m.vertices().size() + m.edges().size();
     for (auto &f : m.faces())
       n += f.corners.size() + 1;
+    if (auto colors = i->view->colors) {
+      n += colors->corners().size();
+      for (const auto &c : colors->corners())
+        n += c.provenance.size();
+    }
     if (n > maximum_history_components_ - components) {
       auto keep = std::distance(undo_.rbegin(), i);
       while (undo_.size() > size_t(keep))
@@ -371,6 +383,18 @@ void PolygonWorkspace::commit(Snapshot next, Snapshot before) {
       throw std::length_error("Polygon edit exceeds its Undo resource budget");
     components += face.corners.size() + 1;
   }
+  if (auto colors = before.view->colors) {
+    const auto add = [&](size_t n) {
+      if (n > maximum_history_components_ -
+                  std::min(components, maximum_history_components_))
+        throw std::length_error(
+            "Polygon corner colors exceed their Undo resource budget");
+      components += n;
+    };
+    add(colors->corners().size());
+    for (const auto &c : colors->corners())
+      add(c.provenance.size());
+  }
   if (components > maximum_history_components_)
     throw std::length_error("Polygon edit exceeds its Undo resource budget");
   next = decorate(std::move(next), true, false, false);
@@ -390,11 +414,21 @@ void PolygonWorkspace::apply(PolygonOperation operation, Vec3 delta,
         "Finish the component move before another operation");
   PolygonEdit edit{operation,  *current_.view->selection, delta, amount, cuts,
                    high_water_};
-  auto result = edit_polygon(*current_.view->topology, edit, limits);
+  PolygonEditResult result;
+  std::shared_ptr<const PolygonColorField> colors;
+  if (current_.view->colors) {
+    auto colored = edit_colored_polygon(*current_.view->topology,
+                                        *current_.view->colors, edit, limits);
+    result = std::move(colored.geometry);
+    if (colored.colors)
+      colors =
+          std::make_shared<const PolygonColorField>(std::move(*colored.colors));
+  } else
+    result = edit_polygon(*current_.view->topology, edit, limits);
   if (!result.replacement)
     return;
   auto next = prepare(std::move(*result.replacement), *current_.view->selection,
-                      limits);
+                      limits, std::move(colors));
   commit(std::move(next), current_);
 }
 void PolygonWorkspace::begin_move() {
@@ -430,10 +464,20 @@ void PolygonWorkspace::end_move(bool accept, const PolygonLimits &limits) {
                      0,
                      1,
                      high_water_};
-    auto result = edit_polygon(*before.view->topology, edit, limits);
+    PolygonEditResult result;
+    std::shared_ptr<const PolygonColorField> colors;
+    if (before.view->colors) {
+      auto colored = edit_colored_polygon(*before.view->topology,
+                                          *before.view->colors, edit, limits);
+      result = std::move(colored.geometry);
+      if (colored.colors)
+        colors = std::make_shared<const PolygonColorField>(
+            std::move(*colored.colors));
+    } else
+      result = edit_polygon(*before.view->topology, edit, limits);
     if (result.replacement) {
       auto next = prepare(std::move(*result.replacement),
-                          *before.view->selection, limits);
+                          *before.view->selection, limits, std::move(colors));
       commit(std::move(next), before);
       gesture_.reset();
       return;

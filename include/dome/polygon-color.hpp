@@ -36,6 +36,7 @@ private:
   inline static const std::vector<PolygonCornerRgba> empty_sources_{};
   std::shared_ptr<const std::vector<PolygonCornerRgba>> sources_;
   std::vector<PolygonColorSample> corners_;
+  friend struct PolygonColorArchiveAccess;
   friend PolygonColoredEdit edit_colored_polygon(const PolygonMesh &,
                                                  const PolygonColorField &,
                                                  const PolygonEdit &,

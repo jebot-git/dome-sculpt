@@ -14,6 +14,8 @@ void validate_polygon_derivative(const PolygonAuthority &authority,
                                  const PaintedMesh *paint, bool mesh_active,
                                  const PolygonLimits &limits) {
   authority.topology.validate(limits);
+  if (authority.colors)
+    authority.colors->validate(authority.topology, limits);
   if (!authority.active)
     return;
   if (authority.topology.faces().empty()) {
@@ -177,8 +179,15 @@ uint32_t PolygonSceneArchive::add(std::shared_ptr<const PolygonAuthority> value,
             sum(entries_, f.corners.size());
         }
         const bool validate_deep = deep && !deeply_validated_.contains(a.get());
-        if (validate_deep)
+        if (validate_deep) {
           a->topology.validate();
+          if (a->colors) a->colors->validate(a->topology);
+        }
+        if (a->colors) {
+          auto before = colors_.entries();
+          colors_.add(a->colors);
+          sum(entries_, colors_.entries() - before);
+        }
         if (auto o = a->origin) {
           insert(origins_, o);
           if (!o->volume || o->volume->in_stroke())
@@ -226,6 +235,8 @@ uint32_t PolygonSceneArchive::add(std::shared_ptr<const PolygonAuthority> value,
           const auto projection=o->paint?o->paint->color_projection():nullptr;
           const auto preparation=o->material_bindings?
               o->material_bindings->color_preparation:nullptr;
+          if(o->polygon && o->polygon->active && o->polygon->colors && (projection || preparation))
+            throw std::invalid_argument("Retained polygon corner colors conflict with prepared color authority");
           if(bool(projection)!=bool(preparation))
             throw std::invalid_argument("Polygon source color projection and retained preparation differ");
           if(projection) {
@@ -271,7 +282,7 @@ PolygonSceneArchive::encode(PaintImageArchive &images,
                             SourceMaterialArchive &materials,SourcePlacementArchive *placements) const {
   const bool affine=std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->placement);});
   if(affine&&!placements)throw std::logic_error("Polygon source placement requires its shared archive");
-  nlohmann::json j = {{"version", affine?2:1},
+  nlohmann::json j = {{"version", !colors_.empty()?3:affine?2:1},
                       {"authorities", nlohmann::json::array()},
                       {"origins", nlohmann::json::array()},
                       {"volumes", nlohmann::json::array()},
@@ -282,6 +293,17 @@ PolygonSceneArchive::encode(PaintImageArchive &images,
          {"active", a->active},
          {"origin", a->origin ? nlohmann::json(find(origins_, a->origin.get()))
                               : nlohmann::json(nullptr)}});
+  if (!colors_.empty()) {
+    auto encoded = colors_.encode();
+    j["color_bases"] = std::move(encoded["color_bases"]);
+    j["color_fields"] = std::move(encoded["color_fields"]);
+    for (size_t i=0;i<authorities_.size();++i) {
+      const auto &field=authorities_[i]->colors;
+      j["authorities"][i]["colors"]=field
+          ? nlohmann::json(find(colors_.fields(),field.get()))
+          : nlohmann::json(nullptr);
+    }
+  }
   for (const auto &o : origins_) {
     auto t = o->world_transform;
     nlohmann::json retopo = nullptr;
@@ -327,18 +349,30 @@ PolygonSceneArchive::encode(PaintImageArchive &images,
 }
 void PolygonSceneArchive::preflight(const nlohmann::json &j,
                                     const nlohmann::json &objects) {
-  if (!j.is_object() || j.size() != 5 || !j.at("version").is_number_integer() ||
-      (j.at("version") != 1 && j.at("version") != 2))
+  if (!j.is_object() || !j.at("version").is_number_integer() ||
+      (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3))
     throw std::invalid_argument("Unsupported polygon source archive");
+  const bool colored = j.at("version") == 3;
+  if (j.size() != (colored ? 7u : 5u))
+    throw std::invalid_argument("Incomplete polygon color source archive");
   for (const auto *key : {"authorities", "origins", "volumes", "paints"})
     if (!j.at(key).is_array() || j.at(key).size() > maximum_nodes)
       throw std::length_error("Polygon snapshot count exceeded");
   const auto &aa = j.at("authorities"), &oo = j.at("origins");
   size_t entries = 0;
+  std::vector<uint8_t> used_colors;
+  if (colored) {
+    PolygonColorArchive::preflight(j.at("color_bases"),j.at("color_fields"),entries);
+    if (j.at("color_fields").empty())
+      throw std::invalid_argument("Empty Scene14 color archive");
+    used_colors.resize(j.at("color_fields").size());
+  }
   for (const auto &a : aa) {
-    if (!a.is_object() || a.size() != 3 || !a.at("active").is_boolean())
+    if (!a.is_object() || a.size() != (colored ? 4u : 3u) || !a.at("active").is_boolean())
       throw std::invalid_argument("Invalid polygon authority record");
     topology_preflight(a.at("topology"), entries);
+    if (colored && !a.at("colors").is_null())
+      used_colors[polygon_archive_index(a.at("colors"),used_colors.size())]=1;
     if (!a.at("origin").is_null())
       polygon_archive_index(a.at("origin"), oo.size());
   }
@@ -348,7 +382,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
         !o.at("name").is_string())
       throw std::invalid_argument("Invalid polygon origin record");
     if(affine) {
-      if(j.at("version")!=2 || o.contains("translation")||o.contains("rotation")||o.contains("scale") || unsigned_id(o.at("placement"))>UINT32_MAX)
+      if(j.at("version")<2 || o.contains("translation")||o.contains("rotation")||o.contains("scale") || unsigned_id(o.at("placement"))>UINT32_MAX)
         throw std::invalid_argument("Invalid exact polygon source placement declaration");
     } else {auto p=o.at("translation").get<std::array<float,3>>();auto q=o.at("rotation").get<std::array<float,4>>();validate_transform({{p[0],p[1],p[2]},{q[0],q[1],q[2],q[3]},o.at("scale").get<float>()});}
     name_valid(o.at("name").get_ref<const std::string &>());
@@ -414,13 +448,16 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
     return std::all_of(v.begin(), v.end(), [](auto n) { return n != 0; });
   };
   if (!all(status) || !all(used_origins) || !all(used_volumes) ||
-      !all(used_paints))
+      !all(used_paints) || !all(used_colors))
     throw std::invalid_argument("Unreachable polygon source archive records");
 }
 PolygonSceneArchive PolygonSceneArchive::decode(
     const nlohmann::json &j, const PaintImageArchive &images,
     const CreatorAssetArchive &models, const SourceMaterialArchive &materials,const SourcePlacementArchive *placements) {
   PolygonSceneArchive out;
+  const bool colored=j.at("version")==3;
+  if (colored)
+    out.colors_=PolygonColorArchive::decode(j.at("color_bases"),j.at("color_fields"));
   for (const auto &v : j.at("volumes"))
     out.volumes_.push_back(std::make_shared<const Volume>(Volume::decode(v)));
   for (const auto &p : j.at("paints"))
@@ -431,6 +468,8 @@ PolygonSceneArchive PolygonSceneArchive::decode(
     auto value = std::make_shared<PolygonAuthority>();
     value->topology = PolygonMesh::decode(a.at("topology"));
     value->active = a.at("active").get<bool>();
+    if (colored && !a.at("colors").is_null())
+      value->colors=out.colors_.at(polygon_archive_index(a.at("colors"),out.colors_.fields().size()));
     authorities.push_back(value);
     out.authorities_.push_back(value);
   }

@@ -6,8 +6,10 @@
 #include "dome/material-visibility.hpp"
 #include "dome/polygon-source.hpp"
 #include "dome/source-maps.hpp"
-#include "polygon-paint.hpp"
 #include "dome/source-placement.hpp"
+#include "polygon-color-source.hpp"
+#include "polygon-paint.hpp"
+#include "source-colors.hpp"
 #include <map>
 namespace dome {
 namespace {
@@ -17,7 +19,8 @@ void check(const std::function<bool()> &cancelled) {
 }
 bool equal(Vec3 a, Vec3 b) { return a.x == b.x && a.y == b.y && a.z == b.z; }
 void transport_policy(const SculptObject &source,
-                      const std::function<bool()> &cancelled) {
+                      const std::function<bool()> &cancelled,
+                      bool current_colors = false) {
   check(cancelled);
   if (!source.mesh_active)
     return;
@@ -48,7 +51,7 @@ void transport_policy(const SculptObject &source,
     for (auto rgba : primitive->colors) {
       check(cancelled);
       for (auto channel : rgba)
-        if (channel != 1)
+        if (channel != 1 && !current_colors)
           throw std::logic_error("Prepare current source COLOR_0 as editable "
                                  "canonical paint before polygon conversion; "
                                  "original vertex colors were retained");
@@ -108,9 +111,9 @@ converted_material(const SculptObject &source,
   binding->validate();
   return binding;
 }
-std::shared_ptr<const PolygonOrigin> capture_origin(const SculptObject &source,
-                                                    CanvasTransform world,
-                                                    std::shared_ptr<const SourcePlacementCapsule> placement={}) {
+std::shared_ptr<const PolygonOrigin>
+capture_origin(const SculptObject &source, CanvasTransform world,
+               std::shared_ptr<const SourcePlacementCapsule> placement = {}) {
   auto origin = std::make_shared<PolygonOrigin>();
   origin->volume =
       std::make_shared<const Volume>(source.volume->geometry_snapshot());
@@ -126,7 +129,7 @@ std::shared_ptr<const PolygonOrigin> capture_origin(const SculptObject &source,
   origin->polygon = source.polygon;
   origin->mesh_active = source.mesh_active;
   origin->world_transform = world;
-  origin->placement=std::move(placement);
+  origin->placement = std::move(placement);
   origin->name = source.name;
   origin->source_object = source.id;
   return origin;
@@ -136,14 +139,16 @@ std::shared_ptr<const PolygonOrigin>
 capture_polygon_origin(const SculptObject &source, CanvasTransform world) {
   return capture_origin(source, world);
 }
-std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const SculptObject &source,CanvasTransform world,
+std::shared_ptr<const PolygonOrigin> capture_polygon_origin(
+    const SculptObject &source, CanvasTransform world,
     std::shared_ptr<const SourcePlacementCapsule> placement) {
-  return capture_origin(source,world,std::move(placement));
+  return capture_origin(source, world, std::move(placement));
 }
-std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const Scene &scene,uint64_t id) {
-  auto placement=capture_source_placement(scene,id);
-  const auto world=placement?CanvasTransform{}:scene.world_transform(id);
-  return capture_origin(scene.object(id),world,std::move(placement));
+std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const Scene &scene,
+                                                            uint64_t id) {
+  auto placement = capture_source_placement(scene, id);
+  const auto world = placement ? CanvasTransform{} : scene.world_transform(id);
+  return capture_origin(scene.object(id), world, std::move(placement));
 }
 struct PolygonConversionAccess {
   static PolygonMesh evaluated(const PolygonMesh &source, const Mesh &rest,
@@ -175,14 +180,53 @@ struct PolygonConversionAccess {
     out.validate(limits);
     return out;
   }
-  static PolygonMesh uv(const PolygonMesh &source,
-      const std::map<PolygonId,std::array<float,2>> &values,const PolygonLimits &limits) {
-    auto result=source;
-    for(auto &face:result.faces_)for(auto &corner:face.corners){
-      check(limits.cancelled);auto value=values.at(corner.id);
-      if(corner.uv!=value){corner.uv=value;corner.generated_uv=false;}
+  static PolygonMesh evaluated_source(const PolygonMesh &source,
+                                      const Mesh &rest, const Mesh &pose,
+                                      std::span<const uint32_t> mapping,
+                                      const PolygonLimits &limits) {
+    auto packed = source.triangulate(limits);
+    if (mapping.size() != packed.mesh.positions.size() ||
+        pose.positions.size() != rest.positions.size())
+      throw std::invalid_argument(
+          "Original polygon pose requires a complete native corner mapping");
+    std::map<PolygonId, Vec3> positions;
+    for (size_t i = 0; i < mapping.size(); ++i) {
+      check(limits.cancelled);
+      auto native = mapping[i];
+      if (native >= rest.positions.size() ||
+          !equal(packed.mesh.positions[i], rest.positions[native]))
+        throw std::invalid_argument("Polygon pose source map changed its exact "
+                                    "original REST positions");
+      auto [it, inserted] =
+          positions.emplace(packed.vertices[i], pose.positions[native]);
+      if (!inserted && !equal(it->second, pose.positions[native]))
+        throw std::invalid_argument(
+            "A shared original polygon vertex deforms inconsistently; original "
+            "source was retained");
     }
-    result.validate(limits);return result;
+    auto out = source;
+    for (auto &vertex : out.vertices_) {
+      check(limits.cancelled);
+      vertex.position = positions.at(vertex.id);
+    }
+    out.validate(limits);
+    return out;
+  }
+  static PolygonMesh uv(const PolygonMesh &source,
+                        const std::map<PolygonId, std::array<float, 2>> &values,
+                        const PolygonLimits &limits) {
+    auto result = source;
+    for (auto &face : result.faces_)
+      for (auto &corner : face.corners) {
+        check(limits.cancelled);
+        auto value = values.at(corner.id);
+        if (corner.uv != value) {
+          corner.uv = value;
+          corner.generated_uv = false;
+        }
+      }
+    result.validate(limits);
+    return result;
   }
   static PolygonMesh atlas(const PolygonMesh &source, uint32_t resolution,
                            const PolygonLimits &limits) {
@@ -257,7 +301,50 @@ prepare_polygon_workspace_topology(const SculptObject &source, bool convert,
                                   nullptr, limits)
       .topology;
 }
+PolygonWorkspaceSource
+prepare_polygon_workspace_source(const SculptObject &source, bool convert,
+                                 const std::function<bool()> &cancelled) {
+  check(cancelled);
+  if (source.polygon && source.polygon->active && source.polygon->colors) {
+    auto topology =
+        prepare_polygon_workspace_topology(source, convert, cancelled);
+    source.polygon->colors->validate(topology,
+                                     PolygonLimits{.cancelled = cancelled});
+    return {std::move(topology), source.polygon->colors};
+  }
+  if (source.mesh_active && source.painted && source.appearance &&
+      !detail::source_vertex_colors(source.appearance.get(),
+                                    source.painted->mesh().positions.size(),
+                                    cancelled)
+           .empty()) {
+    if (!convert)
+      throw std::logic_error(
+          "Convert with retained source before editing original vertex colors");
+    transport_policy(source, cancelled, true);
+    PolygonLimits limits;
+    limits.cancelled = cancelled;
+    auto captured = prepare_polygon_source_colors(*source.painted,
+                                                  source.appearance, limits);
+    auto topology = std::move(captured.geometry.topology);
+    if (source.deformation)
+      topology = PolygonConversionAccess::evaluated_source(
+          topology, source.painted->mesh(),
+          source.deformation->preview(source.painted->mesh()),
+          captured.geometry.source_vertices, limits);
+    return {std::move(topology), std::make_shared<const PolygonColorField>(
+                                     std::move(captured.field))};
+  }
+  return {prepare_polygon_workspace_topology(source, convert, cancelled), {}};
+}
 void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
+                        const SculptObject &original,
+                        CanvasTransform original_world, bool convert,
+                        const std::function<bool()> &cancelled) {
+  adopt_polygon_edit(scene, id, input, {}, original, original_world, convert,
+                     cancelled);
+}
+void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
+                        std::shared_ptr<const PolygonColorField> colors,
                         const SculptObject &original,
                         CanvasTransform original_world, bool convert,
                         const std::function<bool()> &cancelled) {
@@ -283,16 +370,40 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
   if (conversion && !convert)
     throw std::logic_error("Source conversion was not accepted");
   if (conversion)
-    transport_policy(current, cancelled);
+    transport_policy(current, cancelled, bool(colors));
   PolygonLimits limits;
   limits.cancelled = cancelled;
   input.validate(limits);
+  if (current.polygon && current.polygon->active && current.polygon->colors) {
+    if (!colors ||
+        colors->source_owner() != current.polygon->colors->source_owner())
+      throw std::invalid_argument("Polygon edit must preserve its current "
+                                  "immutable corner color basis");
+  } else if (colors && current.mesh_active && current.painted &&
+             current.appearance) {
+    auto captured = prepare_polygon_source_colors(*current.painted,
+                                                  current.appearance, limits);
+    const auto &a = colors->sources(), &b = captured.field.sources();
+    if (a.size() != b.size() || !std::equal(a.begin(), a.end(), b.begin(),
+                                            [](const auto &x, const auto &y) {
+                                              return x.corner == y.corner &&
+                                                     x.value == y.value;
+                                            }))
+      throw std::invalid_argument("Polygon colors do not retain the actual "
+                                  "original corner accessor basis");
+  } else if (colors)
+    throw std::invalid_argument(
+        "Polygon edit has no matching original current color source");
+  if (colors)
+    colors->validate(input, limits);
   auto authority = std::make_shared<PolygonAuthority>();
   authority->topology = input;
+  authority->colors = std::move(colors);
   authority->origin = original.polygon && original.polygon->active &&
                               !conversion && original.polygon->origin
                           ? original.polygon->origin
-                          : capture_origin(original, original_world,capture_source_placement(scene,id));
+                          : capture_origin(original, original_world,
+                                           capture_source_placement(scene, id));
   auto result = scene;
   auto &target = result.object(id);
   if (!input.faces().empty()) {
@@ -319,7 +430,7 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
     // An empty active authority has no paint derivative. Retain the complete
     // latest paint/rig/source in a new bounded origin whose prior authority
     // still retains the first original; never leave a stale Volume fallback.
-    authority->origin = capture_polygon_origin(scene,id);
+    authority->origin = capture_polygon_origin(scene, id);
     target.mesh_active = false;
     target.painted.reset();
     target.deformation.reset();
@@ -332,40 +443,71 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
   check(cancelled);
   scene = std::move(result);
 }
-PolygonUvDerivative prepare_polygon_uv_derivative(const SculptObject &source,
-    const Mesh &target,std::span<const uint32_t> mapping,const std::function<bool()> &cancelled) {
+PolygonUvDerivative
+prepare_polygon_uv_derivative(const SculptObject &source, const Mesh &target,
+                              std::span<const uint32_t> mapping,
+                              const std::function<bool()> &cancelled) {
   check(cancelled);
-  if(!source.polygon||!source.polygon->active||!source.painted||!source.mesh_active)
-    throw std::logic_error("UV update requires the current active polygon derivative");
-  PolygonLimits limits;limits.cancelled=cancelled;
-  validate_polygon_derivative(*source.polygon,source.painted.get(),true,limits);
-  const auto &rest=source.painted->mesh();target.validate();
-  if(target.indices.size()!=rest.indices.size()||target.uv.size()!=target.positions.size()||mapping.size()!=target.positions.size()||target.positions.size()>8'000'000)
-    throw std::invalid_argument("Polygon UV remap changed its source triangle domain");
-  auto packed=source.polygon->topology.triangulate(limits);
-  std::map<PolygonId,std::array<float,2>> uvs;
-  std::map<PolygonId,uint8_t> pins;
-  for(size_t c=0;c<rest.indices.size();++c){
-    check(cancelled);auto before=rest.indices[c],after=target.indices[c];
-    if(after>=mapping.size()||mapping[after]!=before||!equal(rest.positions[before],target.positions[after])||!equal(rest.normals[before],target.normals[after]))
-      throw std::invalid_argument("Polygon UV remap changed source geometry, normals or ordered triangle corners");
-    const auto id=packed.corners[before];auto [it,inserted]=uvs.emplace(id,target.uv[after]);
-    if(!inserted&&it->second!=target.uv[after])throw std::invalid_argument("UV packing split one N-gon corner internally; cut that face explicitly before editing its charts");
-    if(!target.uv_pins.empty()){
-      auto [pin,added]=pins.emplace(id,target.uv_pins[after]);
-      if(!added&&pin->second!=target.uv_pins[after])throw std::invalid_argument("One N-gon corner has conflicting UV pin identities; cut that face explicitly first");
+  if (!source.polygon || !source.polygon->active || !source.painted ||
+      !source.mesh_active)
+    throw std::logic_error(
+        "UV update requires the current active polygon derivative");
+  PolygonLimits limits;
+  limits.cancelled = cancelled;
+  validate_polygon_derivative(*source.polygon, source.painted.get(), true,
+                              limits);
+  const auto &rest = source.painted->mesh();
+  target.validate();
+  if (target.indices.size() != rest.indices.size() ||
+      target.uv.size() != target.positions.size() ||
+      mapping.size() != target.positions.size() ||
+      target.positions.size() > 8'000'000)
+    throw std::invalid_argument(
+        "Polygon UV remap changed its source triangle domain");
+  auto packed = source.polygon->topology.triangulate(limits);
+  std::map<PolygonId, std::array<float, 2>> uvs;
+  std::map<PolygonId, uint8_t> pins;
+  for (size_t c = 0; c < rest.indices.size(); ++c) {
+    check(cancelled);
+    auto before = rest.indices[c], after = target.indices[c];
+    if (after >= mapping.size() || mapping[after] != before ||
+        !equal(rest.positions[before], target.positions[after]) ||
+        !equal(rest.normals[before], target.normals[after]))
+      throw std::invalid_argument("Polygon UV remap changed source geometry, "
+                                  "normals or ordered triangle corners");
+    const auto id = packed.corners[before];
+    auto [it, inserted] = uvs.emplace(id, target.uv[after]);
+    if (!inserted && it->second != target.uv[after])
+      throw std::invalid_argument(
+          "UV packing split one N-gon corner internally; cut that face "
+          "explicitly before editing its charts");
+    if (!target.uv_pins.empty()) {
+      auto [pin, added] = pins.emplace(id, target.uv_pins[after]);
+      if (!added && pin->second != target.uv_pins[after])
+        throw std::invalid_argument(
+            "One N-gon corner has conflicting UV pin identities; cut that face "
+            "explicitly first");
     }
   }
-  auto authority=std::make_shared<PolygonAuthority>(*source.polygon);
-  authority->topology=PolygonConversionAccess::uv(source.polygon->topology,uvs,limits);
-  auto derivative=authority->topology.triangulate(limits);
-  derivative.mesh.normals=rest.normals; // Original canonical/custom normals stay exact.
-  derivative.mesh.uv_seams=target.uv_seams;
-  if(!pins.empty())for(auto corner:derivative.corners)derivative.mesh.uv_pins.push_back(pins.at(corner));
+  auto authority = std::make_shared<PolygonAuthority>(*source.polygon);
+  authority->topology =
+      PolygonConversionAccess::uv(source.polygon->topology, uvs, limits);
+  auto derivative = authority->topology.triangulate(limits);
+  derivative.mesh.normals =
+      rest.normals; // Original canonical/custom normals stay exact.
+  derivative.mesh.uv_seams = target.uv_seams;
+  if (!pins.empty())
+    for (auto corner : derivative.corners)
+      derivative.mesh.uv_pins.push_back(pins.at(corner));
   derivative.mesh.validate();
-  PolygonUvDerivative out;out.authority=std::move(authority);out.mesh=std::move(derivative.mesh);
+  PolygonUvDerivative out;
+  out.authority = std::move(authority);
+  out.mesh = std::move(derivative.mesh);
   out.source_vertices.reserve(out.mesh.positions.size());
-  for(size_t i=0;i<out.mesh.positions.size();++i){check(cancelled);out.source_vertices.push_back(uint32_t(i));}
+  for (size_t i = 0; i < out.mesh.positions.size(); ++i) {
+    check(cancelled);
+    out.source_vertices.push_back(uint32_t(i));
+  }
   return out;
 }
 void restore_polygon_origin(Scene &scene, uint64_t id,

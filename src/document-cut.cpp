@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/polygon-scene.hpp"
 namespace dome {
 namespace {
 bool same(const CutSettings &a,const CutSettings &b){
@@ -52,6 +53,8 @@ std::shared_ptr<const MeshSnapshot> preview_snapshot(const MeshSnapshot &base,co
 void Document::begin_cut(){std::lock_guard lock(model_mutex_);finish_locked();begin_cut_locked();}
 void Document::begin_cut_locked(){
   const auto &o=scene_.active();
+  if(o.polygon && o.polygon->active && o.polygon->colors)
+    throw std::logic_error("Current polygon corner colors need a cut field adapter; use color-aware polygon edge cuts");
   if(state_.cut||state_.retopology||state_.asset_busy||state_.recovery_busy||control_before_||action_active_locked()||
      !object_editable_locked(o.id)||(!o.mesh_active&&o.volume->voxels().empty())||scene_.objects().size()>254||scene_.groups().size()>=128)
     throw std::logic_error("Finish the current action; show and unlock a source with room for cut outputs");

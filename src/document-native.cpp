@@ -4,6 +4,7 @@
 #include "dome/mesh-processing.hpp"
 #include "dome/material-visibility.hpp"
 #include "document-transaction.hpp"
+#include "current-colors.hpp"
 #include <pthread.h>
 namespace dome {
 namespace {
@@ -94,7 +95,15 @@ void Document::native_loop(){
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
         if(o.deformation)evaluation=o.painted->evaluate(geometry,cancelled);
         SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};
-        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled);o.painted->begin_stroke();
+        PolygonColorSurface current_colors;
+        if(o.polygon && o.polygon->active && o.polygon->colors) {
+          current_colors.topology=std::shared_ptr<const PolygonMesh>(o.polygon,&o.polygon->topology);
+          current_colors.field=o.polygon->colors;
+        }
+        auto colors=detail::current_vertex_colors(o.painted->mesh(),
+            current_colors.field?&current_colors:nullptr,o.appearance.get(),
+            o.material_bindings.get(),range.textures.get(),cancelled);
+        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,colors);o.painted->begin_stroke();
       }else o.volume->begin_stroke();
       std::optional<Vec3> previous;size_t processed=0;auto shown=std::chrono::steady_clock::now();
       for(;;){

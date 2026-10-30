@@ -11,6 +11,8 @@ inline void strict_polygon_color_target(SculptObject &target,
                                         CanvasTransform world,
                                         const std::function<bool()> &cancelled,
                                         std::shared_ptr<const SourcePlacementCapsule> placement={}) {
+  if(target.polygon && target.polygon->active && target.polygon->colors)
+    throw std::logic_error("Current polygon corner colors need an explicit prepared-color field adapter before baking");
   if (!target.painted || target.painted->surface_diagnostics().policy !=
                              PaintUvPolicy::PolygonAuthored)
     return;

@@ -145,8 +145,8 @@ int main(int argc, char **argv) try {
     }
   } cleanup{dir};
   for (bool seam : {false, true})
-    for (auto alpha : {Material::AlphaMode::Opaque, Material::AlphaMode::Mask,
-                       Material::AlphaMode::Blend}) {
+    for (auto alpha : {Material::AlphaMode::Automatic, Material::AlphaMode::Opaque,
+                       Material::AlphaMode::Mask, Material::AlphaMode::Blend}) {
       auto surface = polygon_current_fixture::surface(seam);
       auto maps = std::make_shared<TextureMaps>();
       maps->color = {1, 1, {255, 255, 255, 255}};

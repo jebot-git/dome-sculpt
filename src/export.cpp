@@ -127,9 +127,16 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   }
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
+  std::vector<bool> vertex_transparency;
+  vertex_transparency.reserve(objects.size());
   for (const auto &input : objects) {
     stop();
     auto validated_colors=detail::current_vertex_colors(input,cancelled);
+    bool vertex_alpha=false;
+    if(!validated_colors.empty())for(auto v:input.mesh.indices) {
+      checkpoint();vertex_alpha|=validated_colors.at(v)[3]<1;
+    }
+    vertex_transparency.push_back(vertex_alpha);
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
@@ -415,7 +422,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
            {"roughnessFactor", m.roughness}}},
          {"emissiveFactor", m.emissive},
          {"doubleSided", m.double_sided},
-         {"alphaMode", m.color[3] < 1 ? "BLEND" : "OPAQUE"}});
+         {"alphaMode", m.color[3] < 1 || vertex_alpha ? "BLEND" : "OPAQUE"}});
     if(frame) {
       auto &extra=j["meshes"][mesh_index]["primitives"][0]["extras"]["domeSculptNormalTransport"];
       extra={{"version",1},{"skinPolicy","weighted-joint-inverse-transpose-1"},{"frameTargetIds",nlohmann::json::array()}};
@@ -536,8 +543,9 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         material["occlusionTexture"]["strength"]=source.occlusion_strength;
       }
     }
-    if(!maps.source_only && objects[i].material.alpha==Material::AlphaMode::Automatic)
-      material["alphaMode"]=(prepared_color?maps.pbr_transparent:maps.transparent)?"BLEND":"OPAQUE";
+    if(objects[i].material.alpha==Material::AlphaMode::Automatic)
+      material["alphaMode"]=(objects[i].material.color[3]<1 || vertex_transparency[i] ||
+          (prepared_color?maps.pbr_transparent:maps.transparent))?"BLEND":"OPAQUE";
     if(result.objects[i].canonical_normal.image) {
       material["normalTexture"]=source_info(result.objects[i].canonical_normal);
       material["normalTexture"]["scale"]=1;

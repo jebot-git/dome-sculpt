@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/polygon-scene.hpp"
 namespace dome {
 AssetStatus Document::asset_status() const {
   auto work=asset_work_.load();
@@ -25,7 +26,10 @@ void Document::cancel_background_work(){
 }
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
+  const auto &target=scene_.active();
+  if(target.polygon && target.polygon->active && target.polygon->colors)return ids;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id &&
+      !(o.polygon && o.polygon->active && o.polygon->colors) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   return ids;
 }

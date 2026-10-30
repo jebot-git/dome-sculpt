@@ -8,24 +8,20 @@
 namespace dome::detail {
 // All matching happens against ordered REST geometry. Evaluated pose positions
 // are deliberately not an alternative identity for source/corner attributes.
-inline std::vector<PolygonRgba>
-current_vertex_colors(const ObjectSurface &surface,
-                      const std::function<bool()> &cancelled = {}) {
-  const auto &current = surface.polygon_colors;
+inline std::vector<PolygonRgba> current_vertex_colors(
+    const Mesh &mesh, const PolygonColorSurface *current,
+    const CreatorAppearance *appearance, const SourceMaterialBindings *binding,
+    const TextureMaps *textures, const std::function<bool()> &cancelled = {}) {
   if (!current) {
-    if (prepared_color_state(surface.material_bindings.get(),
-                             surface.textures.get(), false))
+    if (prepared_color_state(binding, textures, false))
       return {};
-    return source_vertex_colors(surface.appearance.get(),
-                                surface.mesh.positions.size(), cancelled);
+    return source_vertex_colors(appearance, mesh.positions.size(), cancelled);
   }
-  if ((surface.material_bindings &&
-       surface.material_bindings->color_preparation) ||
-      (surface.textures && surface.textures->color_projection))
+  if ((binding && binding->color_preparation) ||
+      (textures && textures->color_projection))
     throw std::invalid_argument(
         "Current polygon colors conflict with prepared color authority");
-  (void)prepared_color_state(surface.material_bindings.get(),
-                             surface.textures.get(), false);
+  (void)prepared_color_state(binding, textures, false);
   if (!current->topology || !current->field)
     throw std::invalid_argument(
         "Polygon colors require complete immutable geometry authority");
@@ -33,7 +29,7 @@ current_vertex_colors(const ObjectSurface &surface,
   limits.cancelled = cancelled;
   current->field->validate(*current->topology, limits);
   auto derivative = current->topology->triangulate(limits);
-  const auto &a = derivative.mesh, &b = surface.mesh;
+  const auto &a = derivative.mesh, &b = mesh;
   if (a.indices != b.indices || a.positions.size() != b.positions.size() ||
       a.normals.size() != b.normals.size() || a.uv != b.uv)
     throw std::invalid_argument(
@@ -49,6 +45,13 @@ current_vertex_colors(const ObjectSurface &surface,
           "Current polygon color rest geometry changed");
   }
   return current->field->packed(*current->topology, limits);
+}
+inline std::vector<PolygonRgba>
+current_vertex_colors(const ObjectSurface &surface,
+                      const std::function<bool()> &cancelled = {}) {
+  return current_vertex_colors(
+      surface.mesh, surface.polygon_colors.get(), surface.appearance.get(),
+      surface.material_bindings.get(), surface.textures.get(), cancelled);
 }
 // A validated REST stream may be expanded for independent normal/tangent
 // corners. The expanded mesh is not relabelled as a new REST authority.

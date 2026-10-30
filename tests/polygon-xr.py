@@ -14,7 +14,9 @@ def check(value,message):
 with tempfile.TemporaryDirectory(prefix='dome-polygon-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
  env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
- helper=binary.parent/'dome-sculpt-polygon-document-test';fixture=root/'source.dsculpt';subprocess.run([str(helper),'--xr-fixture',str(fixture)],env=env,check=True)
+ colored=os.environ.get('DOME_POLYGON_XR_COLOR')=='1'
+ helper=binary.parent/'dome-sculpt-polygon-document-test';fixture=root/'source.dsculpt';fixture_helper=binary.parent/'dome-sculpt-polygon-color-document-test' if colored else helper;subprocess.run([str(fixture_helper),'--xr-fixture',str(fixture)],env=env,check=True)
+ if colored:env['DOME_XR_FIXTURE_POLYGON_COLOR']='1'
  def inspect(path):
   scene=json.loads(subprocess.check_output([str(helper),'--inspect',str(path)],env=env))
   volumes=[o['volume'] for o in scene['objects']]+scene.get('polygon_sources',{}).get('volumes',[])
@@ -38,14 +40,18 @@ with tempfile.TemporaryDirectory(prefix='dome-polygon-xr-') as directory:
    check(r.get('polygon_source_ready') is True and r.get('polygon_selection_ready') is True,'Polygon '+mode+' waits for the actual prepared workspace and its enabled operation control')
   if mode=='accept':
    accepted=after;obj=after['objects'][0];authority=after['polygon_sources']['authorities'][obj['polygon']]
-   check(after['version']==12 and len(authority['topology']['faces'])==10 and obj['painted']['uv_policy']=='polygon-authored','Actual tracked aim/pressure plus joystick Extrude/Apply stores real N-gons and new side faces')
+   check(after['version']==(14 if colored else 12) and len(authority['topology']['faces'])==(5 if colored else 10) and obj['painted']['uv_policy']=='polygon-authored','Actual tracked aim/pressure plus joystick Extrude/Apply stores real N-gons and new side faces')
    old=dict(original['objects'][0]);new=dict(obj)
-   for key in ('painted','polygon'):old.pop(key,None);new.pop(key,None)
+   for key in (('painted','polygon','appearance','deformation','material_bindings') if colored else ('painted','polygon')):old.pop(key,None);new.pop(key,None)
    check(old==new,'Actual XR topology acceptance preserves exact source sculpt/layers/masks, object/material/transform and identities')
    origin=after['polygon_sources']['origins'][authority['origin']]
-   prior=after['polygon_sources']['authorities'][origin['polygon']]
-   old_authority=original['polygon_sources']['authorities'][original['objects'][0]['polygon']]
-   check(after['polygon_sources']['paints'][origin['painted']]==original['objects'][0]['painted'] and after['polygon_sources']['volumes'][origin['volume']]==original['objects'][0]['volume'] and prior['topology']==old_authority['topology'],'Accepted XR Scene12 retains the complete original paint/sculpt and editable N-gon source capsule')
+   if colored:
+    check(authority['colors'] is not None and after['polygon_sources']['color_fields'] and after['polygon_sources']['color_bases'],'Actual joystick conversion/extrude/Apply stores genuine current corner RGBA authority')
+    check(origin['polygon'] is None and after['polygon_sources']['paints'][origin['painted']]==original['objects'][0]['painted'] and after['polygon_sources']['volumes'][origin['volume']]==original['objects'][0]['volume'] and origin['deformation']==original['objects'][0]['deformation'] and after['source_models']==original['source_models'],'Accepted XR Scene14 keeps the full raw RGBA/model/paint/sculpt and live artist deformation source capsule')
+   else:
+    prior=after['polygon_sources']['authorities'][origin['polygon']]
+    old_authority=original['polygon_sources']['authorities'][original['objects'][0]['polygon']]
+    check(after['polygon_sources']['paints'][origin['painted']]==original['objects'][0]['painted'] and after['polygon_sources']['volumes'][origin['volume']]==original['objects'][0]['volume'] and prior['topology']==old_authority['topology'],'Accepted XR Scene12 retains the complete original paint/sculpt and editable N-gon source capsule')
    check(r.get('polygon_edit_ready') is True and r.get('polygon_pressure_samples',0)>0,'Actual enabled Apply follows completed topology preparation and real pressure selection')
   elif mode.startswith('restore'):
    expected=original if mode=='restore' else accepted if accepted is not None else inspect(output/'accept.dsculpt')

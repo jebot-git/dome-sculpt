@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "mesh-processing.hpp"
+#include "polygon-color.hpp"
 #include "polygon.hpp"
 #include <deque>
 namespace dome {
@@ -18,6 +19,7 @@ struct PolygonView {
   std::shared_ptr<const PolygonRender> surface;
   std::shared_ptr<const PolygonSelection> selection;
   std::shared_ptr<const PolygonDrawData> display;
+  std::shared_ptr<const PolygonColorField> colors;
   Vec3 move_delta{}; // GPU preview only; source triangles/BVH stay immutable.
   uint64_t revision = 1;
   bool changed = false, can_undo = false, can_redo = false;
@@ -29,6 +31,8 @@ struct PolygonView {
 class PolygonWorkspace {
 public:
   explicit PolygonWorkspace(PolygonMesh, const PolygonLimits & = {});
+  PolygonWorkspace(PolygonMesh, std::shared_ptr<const PolygonColorField>,
+                   const PolygonLimits &);
   const PolygonView &view() const { return *current_.view; }
   void mode(PolygonSelectionMode, const PolygonLimits & = {});
   void select(PolygonId, bool additive = false, bool toggle = false,
@@ -60,7 +64,8 @@ private:
   std::optional<Snapshot> gesture_;
   PolygonId high_water_ = 1;
   size_t maximum_history_components_ = 8'000'000;
-  Snapshot prepare(PolygonMesh, PolygonSelection, const PolygonLimits &) const;
+  Snapshot prepare(PolygonMesh, PolygonSelection, const PolygonLimits &,
+                   std::shared_ptr<const PolygonColorField> = {}) const;
   Snapshot decorate(Snapshot, bool can_undo, bool can_redo, bool moving) const;
   void selection(PolygonSelection, const PolygonLimits &);
   void commit(Snapshot, Snapshot before);

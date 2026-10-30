@@ -38,7 +38,7 @@ inline unsigned minimum_scene_version(const PolygonAuthority *p) {
   unsigned result=0;std::set<const PolygonAuthority*> seen;
   while(p) {
     if(seen.size()>=512 || !seen.insert(p).second)throw std::invalid_argument("Invalid retained polygon feature-version graph");
-    result=std::max(result,12u);const auto&o=p->origin;if(!o)break;
+    result=std::max(result,p->colors?14u:12u);const auto&o=p->origin;if(!o)break;
     result=std::max({result,o->placement?13u:0u,minimum_scene_version(o->deformation.get()),
       minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
     p=o->polygon.get();
