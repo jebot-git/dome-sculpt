@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include <fstream>
 #include "ray-corridor.hpp"
 #include <nlohmann/json.hpp>
 #include <condition_variable>
@@ -23,7 +24,7 @@ extern "C" int __real_fsync(int);
 extern "C" int __wrap_fsync(int fd){if(gate.exchange(false)){std::unique_lock lock(mutex);entered=true;changed.notify_all();if(!changed.wait_for(lock,std::chrono::seconds(20),[]{return released;}))return -1;}return __real_fsync(fd);}
 int main(int argc,char **argv){try{
  if(argc==3 && std::string(argv[1])=="--ui-fixture"){Scene s;s.active().volume=std::make_shared<Volume>(sphere());s.save(argv[2]);return 0;}
- if(argc==3 && std::string(argv[1])=="--ray-fixture"){Scene s;auto v=test::dense_ray_corridor();bool exhausted=false;try{v.raycast({0,0,2.2f},{0,0,-1},10);}catch(const std::length_error&){exhausted=true;}if(!exhausted)throw std::runtime_error("Native ray fixture must exhaust real candidate cells");s.active().volume=std::make_shared<Volume>(std::move(v));s.save(argv[2]);return 0;}
+ if(argc==3 && std::string(argv[1])=="--ray-fixture"){Scene s;auto v=test::dense_ray_corridor();bool exhausted=false;try{v.raycast({0,0,2.2f},{0,0,-1},10);}catch(const std::length_error&){exhausted=true;}if(!exhausted)throw std::runtime_error("Native ray fixture must exhaust real candidate cells");auto indices=surface_mesh(v).indices.size();s.active().volume=std::make_shared<Volume>(std::move(v));s.save(argv[2]);std::ofstream(std::string(argv[2])+".indices")<<indices;return 0;}
  if(argc==3 && std::string(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
  Document d;d.replace(sphere());mesh(d);auto baseline=ordered(d.copy_volume());auto state=d.frame().state;
  check(state->can_change_resolution && std::abs(state->sculpt_voxel_mm-40)<1e-5,"Source exposes current world-mm spacing and ready state");

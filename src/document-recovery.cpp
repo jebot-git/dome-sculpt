@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "document-transaction.hpp"
 namespace dome {
 void Document::enable_recovery(std::filesystem::path root) {
   auto service = std::make_unique<RecoveryService>(root);
@@ -20,6 +21,10 @@ void Document::checkpoint_locked() {
       action_active_locked() || pending_locked() || control_before_ ||
       state_.asset_busy) return;
   try {
+    // A preceding successful Open/Save may have committed while allocation of
+    // the best-effort service source update failed. Retry synchronization before
+    // enqueueing a later edit, instead of leaving recovery permanently stale.
+    recovery_->set_source(recovery_source_);
     auto result = recovery_->enqueue(
         {recovery_source_, state_.revision, content_, scene_.snapshot()});
     if (result == RecoveryEnqueue::Accepted || result == RecoveryEnqueue::Coalesced)
@@ -46,10 +51,9 @@ void Document::refresh_recovery_locked() {
   job.generation = state_.generation;
   job.content = content_;
   job.discover_recovery = true;
-  files_.push_back(std::move(job));
-  state_.recovery_busy = true;
-  recovery_content_ = 0; // Permit an explicit retry after persistence failure.
-  publish_locked();
+  Transaction transaction(*this);files_.push_back(std::move(job));
+  try{state_.recovery_busy=true;recovery_content_=0;publish_locked(false,false);transaction.commit();}
+  catch(...){files_.pop_back();throw;}
   file_changed_.notify_one();
 }
 void Document::restore_recovery(size_t index) {
@@ -69,10 +73,9 @@ void Document::restore_recovery_locked(size_t index) {
   job.generation = state_.generation;
   job.content = content_;
   job.restore_recovery = recovery_catalog_[index];
-  files_.push_back(std::move(job));
-  state_.recovery_busy = true;
-  state_.asset_busy = true;
-  publish_locked();
+  Transaction transaction(*this);files_.push_back(std::move(job));
+  try{state_.recovery_busy=true;state_.asset_busy=true;publish_locked(false,false);transaction.commit();}
+  catch(...){files_.pop_back();throw;}
   file_changed_.notify_one();
 }
 } // namespace dome
