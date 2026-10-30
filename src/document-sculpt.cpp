@@ -11,6 +11,22 @@ bool Document::resolution_target_ready_locked() const {
   return sculpt_target_ready_locked() && std::isfinite(scale) && scale>0 &&
       std::isfinite(scale*1000) && scale*.01f>0;
 }
+void Document::apply_procedural_sculpt(ProceduralSculptOptions options,AssetSource expected) {
+  std::lock_guard lock(model_mutex_);queue_procedural_locked(std::move(options),expected);
+}
+void Document::queue_procedural_locked(ProceduralSculptOptions options,AssetSource expected) {
+  options.validate();
+  if(!resolution_target_ready_locked())throw std::logic_error("Select an unlocked visible sculpt source for procedural detail");
+  options.cancelled={};options.progress={};
+  auto work=std::make_shared<AssetWork>();auto changed=std::make_shared<bool>(false);
+  auto report=std::make_shared<std::string>();const auto object=scene_.active().id;
+  queue_scene_operation_locked("Procedural sculpt detail",
+    [options=std::move(options),object,work,changed,report](Scene &scene,const auto &cancelled) mutable {
+      options.cancelled=cancelled;options.progress=[work](float value){work->progress.store(value);};
+      ProceduralSculptReport result;*changed=procedural_sculpt_object(scene,object,options,&result);
+      *report=std::to_string(result.primitives)+" details, "+std::to_string(result.changed_samples)+" changed samples";
+    },expected,report,work,changed);
+}
 void Document::queue_resolution_locked(SculptResolutionOptions options,AssetSource expected) {
   options.validate();
   if(!resolution_target_ready_locked())throw std::logic_error("Select an unlocked visible sculpt source to change resolution");

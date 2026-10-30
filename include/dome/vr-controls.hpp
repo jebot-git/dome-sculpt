@@ -32,8 +32,12 @@ enum class VrParameter {
   SkinSource, SkinMode, SkinDistances, SkinFalloff, SkinInfluences, SkinPrune,
   RetopoDistance,
   CutOffset, CutDirection, CutCapColor,
-  SculptMaskMode, SculptMaskStrength, SculptPlanes, SculptResolution
+  SculptMaskMode, SculptMaskStrength, SculptPlanes, SculptResolution,
+  ProceduralPattern, ProceduralFace, ProceduralGrid, ProceduralCoverage, ProceduralDepth, ProceduralSeed
 };
+inline bool procedural_parameter(VrParameter p) {
+  return p>=VrParameter::ProceduralPattern && p<=VrParameter::ProceduralSeed;
+}
 inline bool skin_parameter(VrParameter parameter) {
   return parameter>=VrParameter::SkinSource && parameter<=VrParameter::SkinPrune;
 }

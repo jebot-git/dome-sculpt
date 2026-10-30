@@ -17,8 +17,9 @@ compositor=Path(os.environ.get("DOME_COMPOSITOR",root.parent/"dome-compositor/ta
 build=Path(os.environ.get("DOME_SCULPT_TEST_BUILD",root/"build"))
 mask_flow=os.environ.get("DOME_SCULPT_MASK_DOME")=="1"
 resolution_flow=os.environ.get("DOME_SCULPT_RESOLUTION_DOME")=="1"
-assert not (mask_flow and resolution_flow),"Select one DomeD workflow"
-out=root/("artifacts/dome-menu-resolution" if resolution_flow else "artifacts/dome-menu-sculpt-mask" if mask_flow else "artifacts/dome-menu");out.mkdir(parents=True,exist_ok=True)
+procedural_flow=os.environ.get("DOME_SCULPT_PROCEDURAL_DOME")=="1"
+assert sum((mask_flow,resolution_flow,procedural_flow))<=1,"Select one DomeD workflow"
+out=root/("artifacts/dome-menu-procedural" if procedural_flow else "artifacts/dome-menu-resolution" if resolution_flow else "artifacts/dome-menu-sculpt-mask" if mask_flow else "artifacts/dome-menu");out.mkdir(parents=True,exist_ok=True)
 icd=Path(os.environ["DOME_TEST_VULKAN_ICD"]) if "DOME_TEST_VULKAN_ICD" in os.environ else next((p for p in [Path("/usr/share/vulkan/icd.d/lvp_icd.json"),Path("/usr/share/vulkan/icd.d/lvp_icd."+platform.machine()+".json")] if p.is_file()),None)
 if icd is None or not icd.is_file():raise RuntimeError("Set DOME_TEST_VULKAN_ICD to the installed software Vulkan ICD manifest")
 
@@ -60,8 +61,8 @@ async def main():
         log=(out/"compositor.log").read_text();wayland=re.search(r"Dome Wayland socket: (\S+)",log)[1]
         arguments=[str(build/"dome-sculpt")]
         fixture=home/"masks.dsculpt"
-        if mask_flow or resolution_flow:
-            helper="dome-sculpt-resolution-document-test" if resolution_flow else "dome-sculpt-mask-document-test"
+        if mask_flow or resolution_flow or procedural_flow:
+            helper="dome-sculpt-procedural-document-test" if procedural_flow else "dome-sculpt-resolution-document-test" if resolution_flow else "dome-sculpt-mask-document-test"
             subprocess.run([str(build/helper),"--ui-fixture",str(fixture)],check=True)
             arguments.append(str(fixture))
         client=start(arguments,"client",{**env,"WAYLAND_DISPLAY":wayland,"FLTK_BACKEND":"wayland"},cwd=tmp)
@@ -126,9 +127,12 @@ async def main():
                 values={k:v.value for k,v in props.items()}
                 if values.get("type")!="separator" and values.get("enabled",True):rows.append(ident)
             await first(index,rows.index(nodes[label][0]))
-        if resolution_flow:
+        if resolution_flow or procedural_flow:
+            editor_label="Procedural detail..." if procedural_flow else "Resolution..."
+            editor_title="Procedural sculpt detail" if procedural_flow else "Sculpt resolution"
+            inspector="dome-sculpt-procedural-document-test" if procedural_flow else "dome-sculpt-resolution-document-test"
             def inspect():
-                result=json.loads(subprocess.check_output([str(build/"dome-sculpt-resolution-document-test"),"--inspect",str(fixture)]))
+                result=json.loads(subprocess.check_output([str(build/inspector),"--inspect",str(fixture)]))
                 for obj in result["objects"]:
                     volume=obj["volume"];volume["samples"].sort()
                     for layer in volume.get("sculpt_layers",[]):layer["delta"].sort()
@@ -145,10 +149,10 @@ async def main():
                 await wait(lambda:fixture.stat().st_mtime_ns!=before)
                 return inspect()
             async def options():
-                await native_command("Sculpt",4,"Resolution...")
-                return await wait(lambda:named("Sculpt resolution"))
+                await native_command("Sculpt",4,editor_label)
+                return await wait(lambda:named(editor_title))
             async def closed():
-                await wait(lambda:named("Sculpt resolution") is None)
+                await wait(lambda:named(editor_title) is None)
             async def tap(dialog,x,y):
                 current=scene();hg=host.get_geometry()
                 def placed(ident):
@@ -162,6 +166,25 @@ async def main():
                 rect=placed(dialog["id"])
                 xtest.fake_input(d,X.MotionNotify,x=int(hg.x+rect["x"]+x(rect)),y=int(hg.y+rect["y"]+y(rect)));d.sync()
                 xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync();await asyncio.sleep(.2)
+            if procedural_flow:
+                original=inspect();dialog=await options();nodes=await layout()
+                (out/"procedural-modal.json").write_text(json.dumps(scene(),indent=2))
+                check(dialog["app_id"]==window["app_id"] and scene()["focused"]==dialog["id"] and not nodes[editor_label][1].get("enabled",True),"DomeD focuses procedural controls and isolates scene commands under the application identity")
+                await key("Return");await closed()
+                check(await save()==original,"Wayland Return activates Cancel and preserves the entire source")
+                dialog=await options();await native_command("File",2,"Close Window");await closed()
+                check(await save()==original and client.poll() is None,"Universal File Close cancels procedural controls without closing application")
+                dialog=await options();await tap(dialog,lambda r:r["w"]/2+80,lambda r:r["h"]-48);await closed()
+                accepted=await save();volume=accepted["objects"][0]["volume"];source_volume=original["objects"][0]["volume"]
+                check(len(volume["sculpt_layers"])==len(source_volume["sculpt_layers"])+1 and volume["samples"]!=source_volume["samples"],"Actual Wayland Apply publishes new procedural solid and separate layer")
+                check(volume["sculpt_layers"][:-1]==source_volume["sculpt_layers"] and volume["voxel_size"]==source_volume["voxel_size"],"Wayland procedural operation preserves every original layer and sampling")
+                await native_command("Edit",3,"Undo")
+                check(await save()==original and not (await layout())["Undo"][1].get("enabled",True),"One DomeD universal Undo restores exact original geometry and history")
+                await native_command("Edit",3,"Redo")
+                check(await save()==accepted,"DomeD universal Redo restores exact generated detail")
+                dialog=await options();await chord("Control_L","w");await closed()
+                check(await save()==accepted and client.poll() is None,"DomeD Ctrl+W cancels another procedural draft and retains authored project")
+                d.close();bus.disconnect();return
             original=inspect();dialog=await options();nodes=await layout()
             (out/"resolution-modal.json").write_text(json.dumps(scene(),indent=2))
             check(dialog["app_id"]==window["app_id"] and scene()["focused"]==dialog["id"] and not nodes["Resolution..."][1].get("enabled",True),

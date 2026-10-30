@@ -25,14 +25,16 @@ void operator delete[](void *p) noexcept { std::free(p); }
 void operator delete(void *p, size_t) noexcept { std::free(p); }
 void operator delete[](void *p, size_t) noexcept { std::free(p); }
 namespace dome {
-void apply_brush(std::span<Sample> samples, const Brush &b) {
+void instrumented_brush(std::span<Sample>, const Brush &) asm("__wrap__ZN4dome11apply_brushESt4spanINS_6SampleELm18446744073709551615EERKNS_5BrushE");
+void instrumented_brush(std::span<Sample> samples, const Brush &b) {
   ++dispatches;
   if (backend_failure) throw std::runtime_error("Instrumented compute failure");
   for (auto &sample : samples) sample.distance = brush_sample(sample,b);
   backend_completed = true;
   if (fail_after_compute >= 0) { allocations_until_failure = fail_after_compute; fail_after_compute = -1; }
 }
-std::string_view compute_backend() { return "INSTRUMENTED"; }
+std::string_view instrumented_backend() asm("__wrap__ZN4dome15compute_backendEv");
+std::string_view instrumented_backend() { return "INSTRUMENTED"; }
 }
 #endif
 using namespace dome;

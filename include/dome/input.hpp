@@ -73,6 +73,7 @@ enum class SpatialCommand {
   RetopoBegin, RetopoMode, RetopoFace, RetopoWire, RetopoDelete, RetopoRelax,
   RetopoPin, RetopoSeam, RetopoApply, RetopoCancel,
   CutBegin, CutHand, CutFlip, CutCap, CutApply, CutCancel,
+  ProceduralApply, ProceduralNextSeed,
   SculptMaskToggle, SculptMaskFill, SculptMaskClear, SculptMaskInvert,
   SculptMirrorX, SculptMirrorY, SculptMirrorZ, SculptMaskResume, SculptMaskVisible
 };

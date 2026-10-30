@@ -13,6 +13,7 @@
 #include "skin-editor.hpp"
 #include "sculpt-editor.hpp"
 #include "resolution-editor.hpp"
+#include "procedural-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
@@ -433,6 +434,7 @@ struct App {
     menu.add("&Sculpt/Masks and symmetry...", 0, command, this);
     menu.add("&Sculpt/Paint protection mask", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Sculpt/Resolution...",0,command,this);
+    menu.add("&Sculpt/Procedural detail...",0,command,this);
     menu.add("&Sculpt/Protect all", 0, command, this);
     menu.add("&Sculpt/Clear protection mask", 0, command, this);
     menu.add("&Sculpt/Invert protection mask", 0, command, this);
@@ -632,6 +634,7 @@ struct App {
                       "&Sculpt/Show protection mask", "&Sculpt/Mirror X", "&Sculpt/Mirror Y", "&Sculpt/Mirror Z"})
       enable(path, !modal && s->can_configure_sculpt);
     enable("&Sculpt/Resolution...",!modal && s->can_change_resolution);
+    enable("&Sculpt/Procedural detail...",!modal && s->can_change_resolution);
     checked("&Sculpt/Paint protection mask", s->sculpt_settings.mask_edit);
     checked("&Sculpt/Show protection mask", s->sculpt_settings.mask_visible);
     checked("&Sculpt/Mirror X", (s->sculpt_settings.symmetry_axes & 1) != 0);
@@ -953,6 +956,11 @@ struct App {
     } else if(label=="Bake surface..."){edit_bake_dialog(canvas.document);
     } else if(label=="Clear baked surface"){canvas.document.clear_bake();
     } else if(label=="Cancel background work"){canvas.document.cancel_asset_work();
+    } else if(label=="Procedural detail...") {
+      auto draft=canvas.document.draft_scene();auto initial=canvas.document.frame().state->procedural_options;
+      initial.depth=std::max(initial.depth,draft.scene.active().volume->voxel_size()*2.5f);
+      auto options=procedural_sculpt_dialog(draft.scene.world_transform(draft.source.object).scale,initial);
+      if(options)canvas.document.apply_procedural_sculpt(std::move(*options),draft.source);
     } else if(label=="Resolution...") {
       auto draft=canvas.document.draft_scene();const auto &source=draft.scene.active();
       SculptResolutionOptions initial;initial.voxel_size=source.volume->voxel_size();

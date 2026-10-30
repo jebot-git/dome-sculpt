@@ -39,7 +39,8 @@ void operator delete[](void *p, size_t) noexcept { std::free(p); }
 namespace dome {
 // Exact selected CPU kernel, with caller-thread allocation faults armed only
 // AFTER backend completion so preparation/publication boundaries are exercised.
-void apply_brush(std::span<Sample> samples, const Brush &b) {
+void instrumented_brush(std::span<Sample>, const Brush &) asm("__wrap__ZN4dome11apply_brushESt4spanINS_6SampleELm18446744073709551615EERKNS_5BrushE");
+void instrumented_brush(std::span<Sample> samples, const Brush &b) {
   for (auto &s : samples)
     s.distance = brush_sample(s, b);
   if (arm_backend) {
@@ -49,7 +50,8 @@ void apply_brush(std::span<Sample> samples, const Brush &b) {
     fail_allocation = fail_after_backend;
   }
 }
-std::string_view compute_backend() {
+std::string_view instrumented_backend() asm("__wrap__ZN4dome15compute_backendEv");
+std::string_view instrumented_backend() {
   return "CPU (shared kernel; allocation instrumentation)";
 }
 } // namespace dome

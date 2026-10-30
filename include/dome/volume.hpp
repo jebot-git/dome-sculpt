@@ -12,6 +12,9 @@
 #include <unordered_map>
 #include <vector>
 namespace dome {
+struct CsgBox;
+struct ProceduralSculptOptions;
+struct ProceduralSculptResult;
 struct SculptResolutionOptions;
 struct SculptResolutionResult;
 class Volume {
@@ -110,6 +113,7 @@ private:
   GeometryHistoryPtr
   prepare_geometry_history(const CowMap<Int3, float, IntHash> &,
                            const GeometryChange &) const;
+  friend ProceduralSculptResult compose_sculpt_boxes(const Volume &, std::span<const CsgBox>, const ProceduralSculptOptions &, std::string);
   friend SculptResolutionResult resample_sculpt(const Volume &, const SculptResolutionOptions &);
   struct MaskState {
     CowMap<Int3, float, IntHash> values;

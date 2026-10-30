@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/sculpt-resolution.hpp"
+#include "../src/ray-index.hpp"
 #include <cstdlib>
 #include <iostream>
 namespace {
@@ -23,7 +24,14 @@ int main()try {
  SculptResolutionOptions options;options.voxel_size=owner->voxel_size();
  fail_after=0;auto no_op=resample_sculpt(*owner,options);fail_after=-1;
  require(!no_op.replacement && !no_op.report.changed,"same resolution unexpectedly allocated or changed the source");
- fail_after=0;auto hit=owner->raycast({.013f,.017f,1},{0,0,-1},2);fail_after=-1;require(bool(hit),"bounded ray allocated or missed known geometry");
+ // The indexed picker intentionally allocates on cold preparation. Propagate
+ // genuine OOM without changing authority, then retain the warmed no-allocation
+ // contract independently from resolution's allocation-free same-voxel path.
+ sculpt_detail::clear_ray_index_cache();bool cold_failed=false;fail_after=0;
+ try{owner->raycast({.013f,.017f,1},{0,0,-1},2);}catch(const std::bad_alloc&){cold_failed=true;}fail_after=-1;
+ require(cold_failed&&owner->voxels()==cells&&owner->mask_values()==mask,"cold picker allocation failure changed original field/protection");
+ auto warm=owner->raycast({.013f,.017f,1},{0,0,-1},2);require(bool(warm),"cold indexed ray missed known geometry");
+ fail_after=0;auto hit=owner->raycast({.013f,.017f,1},{0,0,-1},2);fail_after=-1;require(bool(hit),"warmed bounded ray allocated or missed known geometry");
  options.voxel_size=owner->voxel_size()*.5f;
  Scene successful=source;allocations=0;observe=true;bool changed=resample_sculpt_object(successful,1,options);observe=false;
  require(changed && allocations>100,"allocation baseline failed");size_t total=allocations;
@@ -39,6 +47,6 @@ int main()try {
   require(candidate.active().volume==owner && source.active().volume==owner && owner->voxels()==cells && owner->mask_values()==mask && owner->mask_default()==.37f && owner->sculpt_settings().symmetry_axes==settings.symmetry_axes,"allocation failure changed original source/ownership/protection");
   ++failures;
  }
- std::cout<<"PASS allocation-free no-op/ray and "<<failures<<" transactional allocation boundaries through "<<total<<" measured allocations\n";
+ std::cout<<"PASS allocation-free no-op/warm ray, exact cold-OOM preservation and "<<failures<<" transactional allocation boundaries through "<<total<<" measured allocations\n";
  return 0;
 }catch(const std::exception &e){fail_after=-1;observe=false;std::cerr<<e.what()<<'\n';return 1;}

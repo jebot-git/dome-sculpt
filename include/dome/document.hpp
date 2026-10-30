@@ -9,6 +9,7 @@
 #include "weight-authoring.hpp"
 #include "skin-authoring.hpp"
 #include "sculpt-resolution.hpp"
+#include "procedural-sculpt.hpp"
 #include "retopo-authoring.hpp"
 #include "cut-authoring.hpp"
 #include "native-stroke.hpp"
@@ -84,6 +85,7 @@ struct EditorState {
   Volume::SculptSettings sculpt_settings;
   CanvasTransform sculpt_transform{};
   bool can_configure_sculpt = false, sculpt_mask_visible = false;
+  ProceduralSculptOptions procedural_options;
   bool can_change_resolution = false;
   double sculpt_voxel_mm = 30;
   WeightToolSettings weights;
@@ -249,6 +251,7 @@ public:
   void paint_command(SpatialCommand);
   void sculpt_command(SpatialCommand);
   void sculpt_settings(Volume::SculptSettings, AssetSource expected = {});
+  void apply_procedural_sculpt(ProceduralSculptOptions, AssetSource expected = {});
   void change_sculpt_resolution(SculptResolutionOptions, AssetSource expected = {});
   void sculpt_mask_fill(float, AssetSource expected = {});
   void sculpt_mask_invert(AssetSource expected = {});
@@ -524,6 +527,7 @@ private:
   void cancel_asset_work_locked();
   bool sculpt_target_ready_locked() const;
   bool resolution_target_ready_locked() const;
+  void queue_procedural_locked(ProceduralSculptOptions, AssetSource = {});
   void queue_resolution_locked(SculptResolutionOptions, AssetSource = {});
   void sculpt_settings_locked(Volume::SculptSettings, AssetSource = {});
   void queue_sculpt_mask_locked(std::optional<float>, AssetSource = {});

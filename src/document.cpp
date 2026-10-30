@@ -594,7 +594,8 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::BakeDistances &&
                         state_.controls.parameter != VrParameter::BakeQuality &&
                         !skin_parameter(state_.controls.parameter) &&
-                        !sculpt_parameter(state_.controls.parameter));
+                        !sculpt_parameter(state_.controls.parameter) &&
+                        !procedural_parameter(state_.controls.parameter));
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
   bool weight_action = weight_stroking_;
@@ -1167,7 +1168,8 @@ void Document::process_locked(const SpatialFrame &f) {
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) &&
-        !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork)) finish_locked();
+        !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
+        input_.menu_page()!=18) finish_locked();
     command_locked(*c);
   }
 
@@ -1636,6 +1638,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if(parameter==VrParameter::CutOffset||parameter==VrParameter::CutDirection||parameter==VrParameter::CutCapColor)
     return state_.cut&&cut_bake_source_&&!state_.cut->committing&&!state_.asset_busy;
   if(state_.cut)return false;
+  if (procedural_parameter(parameter)) return resolution_target_ready_locked();
   if (parameter==VrParameter::SculptResolution) return resolution_target_ready_locked();
   if (sculpt_parameter(parameter)) return sculpt_target_ready_locked();
   if (parameter == VrParameter::RetopoDistance)
@@ -1686,6 +1689,20 @@ void Document::finish_control_locked(bool accept) {
     return;
   if(state_.controls.parameter==VrParameter::CutOffset||state_.controls.parameter==VrParameter::CutDirection||state_.controls.parameter==VrParameter::CutCapColor){
     finish_cut_parameter_locked(accept);return;
+  }
+  if(procedural_parameter(state_.controls.parameter)) {
+    const auto c=state_.controls;
+    if(accept) {
+      auto options=state_.procedural_options;
+      if(c.parameter==VrParameter::ProceduralPattern)options.pattern=ProceduralSculptOptions::Pattern(unsigned(std::lround(c.value[0])));
+      else if(c.parameter==VrParameter::ProceduralFace){auto face=unsigned(std::lround(c.value[0]));options.axis=face/2;options.reverse=(face%2)!=0;}
+      else if(c.parameter==VrParameter::ProceduralGrid){options.rows=unsigned(std::lround(c.value[0]));options.columns=unsigned(std::lround(c.value[1]));}
+      else if(c.parameter==VrParameter::ProceduralCoverage){options.density=c.value[0];options.gap=c.value[1]*.9f;options.rounding=c.value[2];}
+      else if(c.parameter==VrParameter::ProceduralDepth)options.depth=std::clamp(float(double(c.value[0])/(double(scene_.world_transform(control_object_).scale)*1000)),.00001f,10.f);
+      else options.seed=uint32_t(std::lround(c.value[0]));
+      options.validate();state_.procedural_options=std::move(options);
+    }
+    control_before_.reset();control_changed_=false;state_.controls={};return;
   }
   if(state_.controls.parameter==VrParameter::SculptResolution) {
     const float mm=state_.controls.value[0];
@@ -1884,6 +1901,23 @@ void Document::control_event_locked(VrControlEvent event) {
       c.minimum=-180;c.maximum=180;c.value={cut_settings_.yaw,cut_settings_.pitch,0,0};break;
     case VrParameter::CutCapColor:
       control_cut_settings_=cut_settings_;c.title="Cut cap RGBA";c.components=4;c.value=cut_settings_.cap_material.color;break;
+    case VrParameter::ProceduralPattern:
+      c.title="Detail: panels / recesses / mixed";c.maximum=2;c.value[0]=unsigned(state_.procedural_options.pattern);break;
+    case VrParameter::ProceduralFace:
+      c.title="Object-local projection face";c.maximum=5;c.value[0]=state_.procedural_options.axis*2+state_.procedural_options.reverse;break;
+    case VrParameter::ProceduralGrid:
+      c.title="Detail grid: rows / columns";c.minimum=1;c.maximum=32;c.components=2;
+      c.value={float(state_.procedural_options.rows),float(state_.procedural_options.columns),0,0};break;
+    case VrParameter::ProceduralCoverage:
+      c.title="Density / gap / rounding";c.components=3;
+      c.value={state_.procedural_options.density,state_.procedural_options.gap/.9f,state_.procedural_options.rounding,0};break;
+    case VrParameter::ProceduralDepth: {
+      const double factor=double(scene_.world_transform(o.id).scale)*1000;
+      c.title="Detail depth (world mm)";c.minimum=float(.00001*factor);c.maximum=float(10*factor);c.logarithmic=true;
+      c.value[0]=float(state_.procedural_options.depth*factor);break;
+    }
+    case VrParameter::ProceduralSeed:
+      c.title="Detail random seed";c.maximum=65535;c.value[0]=float(state_.procedural_options.seed&65535);break;
     case VrParameter::SculptResolution: {
       const double factor=double(scene_.world_transform(o.id).scale)*1000;
       control_resolution_voxel_=volume().voxel_size();
@@ -2104,6 +2138,12 @@ void Document::control_event_locked(VrControlEvent event) {
     else settings.cap_material.color=c.value;
     edit_cut_locked(std::move(settings),false);break;
   }
+  case VrParameter::ProceduralPattern:
+  case VrParameter::ProceduralFace:
+  case VrParameter::ProceduralGrid:
+  case VrParameter::ProceduralCoverage:
+  case VrParameter::ProceduralDepth:
+  case VrParameter::ProceduralSeed:
   case VrParameter::SculptResolution:
   case VrParameter::SculptMaskMode:
   case VrParameter::SculptMaskStrength:
@@ -2232,6 +2272,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command==SpatialCommand::ProceduralApply || command==SpatialCommand::ProceduralNextSeed)return resolution_target_ready_locked();
   if(command==SpatialCommand::CutBegin)return state_.can_cut;
   if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
     if(!state_.cut||control_before_)return false;
@@ -2407,6 +2448,12 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command==SpatialCommand::ProceduralApply || command==SpatialCommand::ProceduralNextSeed) {
+    if(!command_enabled_locked(command))return;
+    if(command==SpatialCommand::ProceduralNextSeed)++state_.procedural_options.seed;
+    else queue_procedural_locked(state_.procedural_options);
+    return;
+  }
   if(command==SpatialCommand::CutBegin){begin_cut_locked();return;}
   if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
     if(!command_enabled_locked(command))return;

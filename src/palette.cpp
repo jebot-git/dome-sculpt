@@ -255,7 +255,13 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::CutDirection)label=row==0?"Yaw ":"Pitch ";
       else if (c.components > 1)
         label = std::string(1, (c.parameter == VrParameter::RigRotation ? "XYZ" : "RGBA")[row]) + " ";
-      if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
+      if(c.parameter==VrParameter::ProceduralPattern)label=value<.5f?"Raised panels":value<1.5f?"Recessed cuts":"Mixed detail";
+      else if(c.parameter==VrParameter::ProceduralFace){const char *faces[]={"+X","-X","+Y","-Y","+Z","-Z"};label=std::string("Local face ")+faces[std::clamp(int(std::lround(value)),0,5)];}
+      else if(c.parameter==VrParameter::ProceduralGrid)label=std::string(row==0?"Rows ":"Columns ")+std::to_string(int(std::lround(value)));
+      else if(c.parameter==VrParameter::ProceduralCoverage)label=std::string(row==0?"Density ":row==1?"Gap ":"Rounding ")+std::to_string(int(std::lround(value*(row==1?90:100))))+"%";
+      else if(c.parameter==VrParameter::ProceduralSeed)label="Seed "+std::to_string(int(std::lround(value)));
+      else if(c.parameter==VrParameter::ProceduralDepth){char text[64];snprintf(text,sizeof(text),"Depth %.4g world mm",double(value));label=text;}
+      else if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
       else if(c.parameter==VrParameter::SculptResolution) {
         char spacing[80];snprintf(spacing,sizeof(spacing),"Spacing %.6g world mm",double(value));label=spacing;
       }
@@ -305,7 +311,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
@@ -437,7 +443,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -453,6 +459,12 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==18) {
+    const auto &o=s.procedural_options;
+    const char *patterns[]={"Raised panels","Recessed cuts","Mixed detail"};
+    text(320*unit_,285*unit_,std::string(patterns[unsigned(o.pattern)])+" / seed "+std::to_string(o.seed),fg);
+    text(320*unit_,318*unit_,s.asset_busy?"Generating / Cancel work":"Apply creates a new sculpt layer",fg);
+  }
   if(s.menu_page==17){auto c=s.cut;
     text(320*unit_,278*unit_,!c?"Start an editable cutting plane":c->committing?"Applying cut...":c->busy?"Updating preview...":"Apply retains the source",fg);
     text(320*unit_,310*unit_,!c?"Shell and cap are editable":c->settings.cap?"Closed cap":"Open trim",fg);
@@ -524,6 +536,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_visible) +
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
   signature += ":sculpt:" + std::to_string(s.sculpt_settings.symmetry_axes) + ":" +
       std::to_string(s.sculpt_settings.mask_edit) + ":" + std::to_string(s.sculpt_settings.mask_visible) + ":" +
       std::to_string(int(s.sculpt_settings.mask_tool));
