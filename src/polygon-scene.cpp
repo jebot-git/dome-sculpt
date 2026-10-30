@@ -232,7 +232,6 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
                                              o->paint->mesh(),
                                              o->deformation.get());
           }
-          source_paint_pairing(o->paint.get(),o->material_bindings.get(),o->appearance.get(),validate_deep);
           const auto projection=o->paint?o->paint->color_projection():nullptr;
           const auto preparation=o->material_bindings?
               o->material_bindings->color_preparation:nullptr;
@@ -249,6 +248,9 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
             if(validate_deep)
               preparation->validate_current(o->paint->mesh(),o->appearance.get());
           }
+          // Preserve the specific color-authority diagnostics before checking
+          // the additional normal/source pairing contract on this same holder.
+          source_paint_pairing(o->paint.get(),o->material_bindings.get(),o->appearance.get(),validate_deep);
           if (o->retopology) {
             if (!o->retopology->source)
               throw std::invalid_argument(
