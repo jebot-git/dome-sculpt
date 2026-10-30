@@ -72,3 +72,16 @@ shading is inside it.
 These are sequencing notes, not reductions of the original goal.
 
 Recovery milestone: native durable service and Document checkpoint/discovery/restore integration are implemented with immutable snapshots and save-boundary cleanup. Desktop/XR controls and transaction tests are under final validation; this does not complete the sculpt or full VR workflow requirements. Native static import, cleanup, BVH and closed-shell voxelization and avatar kernels are in the build; interactive import and rig authoring remain pending.
+
+## Additional user specification — 2026-10-30
+
+The full acceptance details are preserved in
+[ADDITIONAL-REQUIREMENTS-2026-10-30.md](ADDITIONAL-REQUIREMENTS-2026-10-30.md).
+These extend the original matrix; all unfinished original rows stay required.
+
+| Additional requirement | Current status | Required completion evidence |
+| --- | --- | --- |
+| Wings3D-referenced polygonal edit mode | Assigned; current retopology patches do not complete polygon editing | Editable vertex/edge/polygon topology, practical topology tools, persistence, exact history/data handling and FLTK/XR workflows |
+| Individual mesh hiding and held-mesh ghosts | Basic per-object visibility exists; held-object transparent rendering and exclusive editing remain required | Correct translucent view plus mutation/input guards, preserved object visibility/material/locks, controller/desktop holding and cancellation/stale-job checks |
+| VRoid-only humanoid bases | CC0 VRoid baselines exist; removing compiled MakeHuman defaults/creation choices is assigned | Only VRoid base meshes shipped/offered, native creator workflows and independently verified legacy project load/export without the removed mesh data |
+| Standard FBX and OBJ import options | Existing OBJ parser is partial evidence; native FBX and usable shared options are assigned | Format-aware options, units/axes/materials/UV/deformation conversion, original-source provenance, undo/cancel and independent native/GUI/interoperability fixtures |
