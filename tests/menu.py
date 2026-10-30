@@ -21,16 +21,20 @@ bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
 rig_compact = os.environ.get("DOME_MENU_RIG_COMPACT") == "1"
 retopo_compact = os.environ.get("DOME_MENU_RETOPO_COMPACT") == "1"
 retopo_flow = os.environ.get("DOME_MENU_RETOPO") == "1" or retopo_compact
-compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact or retopo_compact
+cut_compact = os.environ.get("DOME_MENU_CUT_COMPACT") == "1"
+cut_flow = os.environ.get("DOME_MENU_CUT") == "1" or cut_compact
+compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact or retopo_compact or cut_compact
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1" or rig_compact
 export_flow = os.environ.get("DOME_MENU_EXPORT") == "1"
 bake_cancel = os.environ.get("DOME_MENU_BAKE_CANCEL") == "1"
 bake_flow = os.environ.get("DOME_MENU_BAKE") == "1" or bake_cancel or bake_compact
-if sum((rig_flow, export_flow, bake_flow, retopo_flow)) > 1:
+if sum((rig_flow, export_flow, bake_flow, retopo_flow, cut_flow)) > 1:
     raise ValueError("Select one menu fixture flow: rig, export or bake")
 out = root / ("artifacts/menu-rig-compact" if rig_compact else "artifacts/menu-export" if export_flow else "artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 if retopo_flow:
     out = root / ("artifacts/menu-retopo-compact" if retopo_compact else "artifacts/menu-retopo")
+if cut_flow:
+    out = root / ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -107,7 +111,11 @@ async def main():
         log = (out / "app.log").open("w")
         arguments = [str(root / "build/dome-sculpt")]
         fixture = Path(home, "rig.dsculpt")
-        if retopo_flow:
+        if cut_flow:
+            fixture = Path(home, "cut.dsculpt")
+            subprocess.run([str(root / "build/dome-sculpt-cut-authoring-test"), "--ui-fixture", str(fixture)], check=True)
+            arguments.append(str(fixture))
+        elif retopo_flow:
             fixture = Path(home, "retopo.dsculpt")
             subprocess.run([str(root / "build/dome-sculpt-retopo-authoring-test"), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
@@ -180,6 +188,86 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if cut_flow:
+            def info():
+                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
+            baseline=info();g=window.get_geometry()
+            def pixels():
+                raw=window.get_image(0,0,g.width,g.height-60,X.ZPixmap,0xFFFFFFFF)
+                return Image.frombytes("RGB",(g.width,g.height-60),raw.data,"raw","BGRX")
+            def tap(w,x,y,button=1):
+                geo=w.get_geometry();xtest.fake_input(d,X.MotionNotify,x=geo.x+int(x),y=geo.y+int(y))
+                xtest.fake_input(d,X.ButtonPress,button);xtest.fake_input(d,X.ButtonRelease,button);d.sync()
+            async def ready(label):
+                for _ in range(300):
+                    nodes,_=await layout()
+                    if nodes[label][1].get("enabled") is True:return nodes
+                    await asyncio.sleep(.1)
+                raise AssertionError("Cut menu did not enable "+label)
+            nodes,_=await layout()
+            check(nodes["Start cut"][1].get("enabled") is True and nodes["Apply cut"][1].get("enabled") is False,
+                  "Native universal menu exports an available cut tool and disabled unopened Apply")
+            original_pixels=pixels() if not cut_compact else None
+            await click("Start cut");nodes=await ready("Apply cut")
+            check(nodes["Cap cut"][1].get("toggle-state")==1 and nodes["Flip kept side"][1].get("toggle-state")==0
+                  and nodes["Save"][1].get("enabled") is False and nodes["Voxel remesh..."][1].get("enabled") is False,
+                  "Live cut check states and source/save isolation reach the universal menu")
+            if cut_compact:
+                await click("Cap color...")
+                w=await wait(lambda:named("Plane cut controls"));w.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+                geo=w.get_geometry()
+                check(w.get_wm_transient_for().id==window.id and geo.width<=600 and geo.height<=320,
+                      "Four RGBA plane controls fit 640x360 with 2x Unifont BDF and native modal ownership")
+                def shot():
+                    raw=w.get_image(0,0,geo.width,geo.height,X.ZPixmap,0xFFFFFFFF)
+                    return Image.frombytes("RGB",(geo.width,geo.height),raw.data,"raw","BGRX")
+                before=shot();before.save(out/"cap-controls-before.png")
+                for _ in range(6):tap(w,geo.width-8,80,5)
+                await asyncio.sleep(.2);after=shot();after.save(out/"cap-controls-after.png")
+                check(before.crop((0,0,geo.width,geo.height-46)).tobytes()!=after.crop((0,0,geo.width,geo.height-46)).tobytes()
+                      and before.crop((0,geo.height-46,geo.width,geo.height)).tobytes()==after.crop((0,geo.height-46,geo.width,geo.height)).tobytes(),
+                      "Large-font cap controls scroll while Cancel and Done stay fixed")
+                await click("Close Window");await wait(lambda:named("Plane cut controls") is None)
+                nodes,_=await layout()
+                check(nodes["Cancel cut"][1].get("enabled") is True and info()["scene_hash"]==baseline["scene_hash"],
+                      "Universal Close cancels cap adjustment and retains the live cut workspace")
+                await click("Cancel cut")
+                check(info()["scene_hash"]==baseline["scene_hash"] and app.poll() is None,
+                      "Compact cut cancellation preserves the native source project")
+                d.close();bus.disconnect();return
+            await wait(lambda:pixels().tobytes()!=original_pixels.tobytes())
+            live=pixels();live.save(out/"cut-live-preview.png")
+            check(info()["scene_hash"]==baseline["scene_hash"],"Actual clipped viewport and cap feedback leave the authoritative scene untouched")
+            await click("Offset...");w=await wait(lambda:named("Plane cut controls"))
+            check(w.get_wm_transient_for().id==window.id,"Plane sliders use the document's native modal ownership")
+            geo=w.get_geometry();tap(w,geo.width*.6,80);await asyncio.sleep(.3)
+            await click("Close Window");await wait(lambda:named("Plane cut controls") is None)
+            await wait(lambda:pixels().tobytes()==live.tobytes())
+            check(info()["scene_hash"]==baseline["scene_hash"],"Universal Close restores the exact plane preview after live slider changes")
+            await click("Offset...");w=await wait(lambda:named("Plane cut controls"));geo=w.get_geometry()
+            tap(w,geo.width*.6,80);tap(w,geo.width*.75,geo.height-16)
+            await wait(lambda:named("Plane cut controls") is None);await ready("Apply cut")
+            nodes,_=await layout();check(nodes["Undo"][1].get("enabled") is True,"Done records a local plane adjustment without applying source geometry")
+            await click("Undo");await wait(lambda:pixels().tobytes()==live.tobytes())
+            await click("Redo");await ready("Apply cut")
+            check(info()["scene_hash"]==baseline["scene_hash"],"Universal plane Undo/Redo remain isolated from native scene history")
+            await click("Cap cut");nodes,_=await layout()
+            check(nodes["Cap cut"][1].get("toggle-state")==0,"The native cap command provides visible checkbox feedback")
+            await click("Undo");await ready("Apply cut")
+            await click("Apply cut");await ready("Save");await click("Save")
+            accepted=info()
+            check(len(accepted["objects"])==3 and accepted["objects"][0]["visible"] is False
+                  and accepted["objects"][0]["payload_hash"]==baseline["objects"][0]["payload_hash"]
+                  and accepted["objects"][1]["baked"] is True,
+                  "Native Apply/Save persist mapped shell and cap objects while retaining the exact painted source")
+            await click("Undo");await click("Save")
+            check(info()["scene_hash"]==baseline["scene_hash"],"One global native Undo restores all pre-cut source data")
+            await click("Redo");await click("Save")
+            check(info()["scene_hash"]==accepted["scene_hash"],"Global native Redo restores cut geometry, material groups and baked paint")
+            await click("Start cut");await ready("Offset...");await click("Cancel cut");await click("Save")
+            check(info()["scene_hash"]==accepted["scene_hash"] and app.poll() is None,
+                  "Cancelling a further cut leaves the authored scene and native application intact")
+            d.close();bus.disconnect();return
         if retopo_flow:
             def info():
                 return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))

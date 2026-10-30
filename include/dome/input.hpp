@@ -70,7 +70,8 @@ enum class SpatialCommand {
   ExportAvatar,
   WeightToggle, WeightMode, WeightSymmetry, WeightLock, WeightLinked,
   RetopoBegin, RetopoMode, RetopoFace, RetopoWire, RetopoDelete, RetopoRelax,
-  RetopoPin, RetopoSeam, RetopoApply, RetopoCancel
+  RetopoPin, RetopoSeam, RetopoApply, RetopoCancel,
+  CutBegin, CutHand, CutFlip, CutCap, CutApply, CutCancel
 };
 const std::array<const char *, 12> &spatial_labels(int page);
 std::optional<SpatialCommand> spatial_action(int page, int index);
@@ -113,6 +114,7 @@ public:
     command_.reset();
     return c;
   }
+  uint32_t command_device() const { return command_device_; }
   void resume_control(VrParameter parameter) {
     parameter_ = parameter;
     page_ = 5;
@@ -143,6 +145,7 @@ public:
   } backend;
   bool painting = false;
   bool retopology = false;
+  bool cutting = false;
   std::function<bool(VrParameter)> parameter_allowed;
   std::function<bool()> control_accept;
   std::vector<VrControlEvent> take_controls() {
@@ -163,7 +166,7 @@ private:
   bool stroke_active() const {
     return backend.active ? backend.active() : volume_->in_stroke();
   }
-  uint32_t device_ = 0, parameter_owner_ = 0;
+  uint32_t device_ = 0, parameter_owner_ = 0, command_device_ = 0;
   struct DeviceState {
     uint64_t sequence = 0;
     double time = -1;

@@ -66,6 +66,23 @@ int main(int argc, char **argv) try {
       ++foreground;
   if (foreground < 10000)
     throw std::runtime_error("PBR surface render is blank");
+  {
+    doc.begin_cut();
+    if(!doc.wait_cut()||!doc.wait_mesh()||!doc.frame().state->error.empty())throw std::runtime_error("Live cut GPU fixture did not prepare");
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);auto cut=capture("cut-surface");
+    size_t left=0,right=0;
+    for(size_t y=0;y<480;++y)for(size_t x=0;x<640;++x){auto i=(y*640+x)*3;
+      if(cut[i]>50&&cut[i]>cut[i+2]){if(x<315)++left;else if(x>325)++right;}}
+    if(left>100||right<3000)throw std::runtime_error("Live plane preview does not clip only the selected source half-space");
+    CursorRenderer cursor;auto state=*doc.frame().state;state.canvas=model;
+    cursor.draw(state,vp);auto gizmo=capture("cut-gizmo");
+    size_t changed=0;for(size_t i=0;i<gizmo.size();++i)changed+=gizmo[i]!=cut[i];
+    if(changed<100)throw std::runtime_error("Cut plane grid and retained-side indicator are invisible");
+    state.menu=true;state.menu_page=15;state.panel.position={0,0,-.45f};state.font_file=face.file;state.font_pixels=face.pixels;
+    renderer.draw(doc.frame().surface,model,vp,{},640,480);palette.draw(state,vp);capture("cut-menu");
+    doc.end_cut(false);
+    if(doc.frame().surface->clipped_object)throw std::runtime_error("Cancel leaves a stale clipped viewport");
+  }
   renderer.draw(doc.frame().surface, model, vp, {}, 640, 480, false, false,
                 true);
   auto light = capture("light");

@@ -171,6 +171,22 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
     if (m.normal_map) m.normal_map->validate();
     if ((m.maps||m.normal_map)&&source.mesh.uv.size()!=source.mesh.positions.size()) throw std::invalid_argument("Textured high mesh requires UV coordinates");
   }
+  if (!o.source_triangles.empty() || !o.source_corner_barycentrics.empty()) {
+    if (o.source_triangles.size()!=low.indices.size()/3 || o.source_corner_barycentrics.size()!=low.indices.size())
+      throw std::invalid_argument("Exact bake provenance count mismatch");
+    for (size_t t=0;t<o.source_triangles.size();++t) {
+      cancel(o);
+      auto source_triangle=o.source_triangles[t];
+      if(source_triangle>=source.mesh.indices.size()/3)throw std::out_of_range("Exact bake provenance source triangle is invalid");
+      for(int k=0;k<3;++k){
+        auto b=o.source_corner_barycentrics[t*3+k];float sum=0;
+        for(auto value:b){if(!std::isfinite(value)||value<-.00001f||value>1.00001f)throw std::invalid_argument("Invalid exact bake barycentrics");sum+=value;}
+        if(std::abs(sum-1)>1e-5f)throw std::invalid_argument("Exact bake barycentrics are not normalized");
+        auto expected=interpolate(source.mesh,source_triangle,b,false),actual=low.positions[low.indices[t*3+k]];
+        if(length(expected-actual)>1e-5f+1e-6f*length(actual))throw std::invalid_argument("Exact bake provenance does not match target geometry");
+      }
+    }
+  }
 }
 void pad(BakeResult &result,const BakeOptions &o) {
   auto n=o.resolution; std::deque<std::pair<uint32_t,uint32_t>> queue;
@@ -252,8 +268,17 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
         Vec3 cage; for (int i=0;i<3;++i) cage+=o.cage_positions[low.indices[triangle*3+i]]*bary[i]; offset=cage-position;
       }
       float front=length(offset); auto direction=front>1e-8f?offset/front:normal;
-      if (++result.rays>o.max_rays) throw std::length_error("Bake ray budget exceeded");
-      auto hit=query.raycast(position+offset,direction*-1,front+o.back_distance);
+      std::optional<SurfaceHit> hit;
+      if(o.source_triangles.empty()){
+        if (++result.rays>o.max_rays) throw std::length_error("Bake ray budget exceeded");
+        hit=query.raycast(position+offset,direction*-1,front+o.back_distance);
+      }else{
+        std::array<float,3> mapped{};
+        for(int k=0;k<3;++k)for(int c=0;c<3;++c)mapped[c]+=bary[k]*o.source_corner_barycentrics[triangle*3+k][c];
+        auto source_triangle=o.source_triangles[triangle];
+        hit=SurfaceHit{source_triangle,interpolate(source.mesh,source_triangle,mapped,false),
+                       interpolate(source.mesh,source_triangle,mapped,true),mapped,0};
+      }
       bool backface=false;
       if (hit) {auto a=source.mesh.positions[source.mesh.indices[hit->triangle*3]],b=source.mesh.positions[source.mesh.indices[hit->triangle*3+1]],c=source.mesh.positions[source.mesh.indices[hit->triangle*3+2]];backface=dot(cross(b-a,c-a),normal)<=0;}
       if (!hit||(!o.allow_backfaces&&backface)) { result.coverage[at]=3; ++result.missed; continue; }

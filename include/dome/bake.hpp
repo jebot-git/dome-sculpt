@@ -33,6 +33,10 @@ struct BakeOptions {
   uint64_t max_texels = 4'194'304, max_rays = 64'000'000, max_raster_samples = 128'000'000;
   std::function<bool()> cancelled;
   std::function<void(float)> progress; // Monotonic detached worker fraction [0,1].
+  // Exact topology provenance bypasses projection rays, with a checked source
+  // triangle and source barycentrics per low corner. Empty retains ray baking.
+  std::vector<uint32_t> source_triangles;
+  std::vector<std::array<float,3>> source_corner_barycentrics;
 };
 struct BakeResult {
   TextureMaps maps; // Composited sRGB base/emission; linear ORM R=AO,G=rough,B=metal.

@@ -51,3 +51,13 @@ retains the surrounding patch workspace. Explicit Apply queues ordered guarded
 asset publication, and later focus loss does not retract that accepted operation.
 The redundant Mesh-tools Undo sector now opens Retopology; root/hardware Undo
 remain available and route to draft history. See RETOPO-AUTHORING.md.
+
+Plane-cut authoring uses page 15, reached from Mesh tools sector 4 (Center remains
+available on the baking page). While cutting, joystick presses open page 15
+directly. Offset, two-row Direction and four-row Cap color use the common
+joystick/ray controls. From hand captures the confirming menu device's current
+grip in document space, rather than preferring an idle right controller.
+SpatialInput retains command_device alongside its consumed command for that
+purpose. Release-to-rearm and ownership rules remain unchanged. Tracking/focus
+loss rolls back the active parameter adjustment; accepted Apply remains ordered
+through XR shutdown and asset waits. See PLANE-CUTS.md.

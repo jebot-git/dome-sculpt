@@ -29,7 +29,8 @@ enum class VrParameter {
   BakeSource, BakeDistances, BakeQuality,
   WeightStrength,
   WeightValue,
-  RetopoDistance
+  RetopoDistance,
+  CutOffset, CutDirection, CutCapColor
 };
 struct VrControlState {
   VrParameter parameter = VrParameter::None;

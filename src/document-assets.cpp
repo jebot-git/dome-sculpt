@@ -5,7 +5,7 @@
 namespace dome {
 SceneDraft Document::draft_scene() const {
   std::lock_guard lock(model_mutex_);
-  if (state_.retopology || state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked())
+  if (state_.cut || state_.retopology || state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked())
     throw std::logic_error("Finish the current action before opening the asset editor");
   return {scene_.snapshot(), {state_.generation, state_.revision, scene_.active().id}};
 }
@@ -19,7 +19,7 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
-                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session) {
+                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session) {
   if (label.empty() || label.size() > 256 || label.find('\0') != std::string::npos || !operation)
     throw std::invalid_argument("Invalid asset operation");
   if ((expected.generation && expected.generation != state_.generation) ||
@@ -30,6 +30,8 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
     throw std::logic_error("Finish the current action before starting asset work");
   if (state_.retopology && (!retopo_session || retopo_session != retopo_session_.load()))
     throw std::logic_error("Apply or cancel retopology before starting asset work");
+  if (state_.cut && (!cut_session || cut_session != cut_session_.load()))
+    throw std::logic_error("Apply or cancel the plane cut before starting asset work");
   publish_locked();
   FileJob job{scene_.snapshot(), {}, state_.revision, state_.generation, content_, false};
   job.object = scene_.active().id;
@@ -40,6 +42,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   job.operation_changed = std::move(changed);
   job.rollback_preview = std::move(rollback_preview);
   job.retopo_session = retopo_session;
+  job.cut_session = cut_session;
   std::lock_guard file_lock(file_mutex_);
   if (files_.size() >= 8) throw std::runtime_error("File and asset work queue is full");
   files_.push_back(std::move(job));
