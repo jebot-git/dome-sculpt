@@ -2,6 +2,7 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "polygon-paint.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/scene.hpp"
 #include "dome/tangents.hpp"
@@ -221,13 +222,13 @@ struct PaintedMesh::SurfaceMap {
       : mesh(std::move(input)), resolution(r), columns(r / 32),options(std::move(opts)),
         texels(size_t(r) * r), tiles(size_t(columns) * columns),
         padding(size_t(r) * r, -1) {
-    if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored)||
+    if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored&&options.policy!=PaintUvPolicy::PolygonAuthored)||
        !options.max_raster_samples||options.max_raster_samples>512*1024*1024||
        options.max_additional_candidates>8*1024*1024||!options.max_candidate_checks||options.max_candidate_checks>512*1024*1024||
        options.max_candidates_per_texel<1||options.max_candidates_per_texel>128)
       throw std::invalid_argument("Invalid paint surface resource bounds");
     diagnostics.policy=options.policy;
-    const bool source=options.policy==PaintUvPolicy::SourceAuthored;
+    const bool source=options.policy!=PaintUvPolicy::Strict;
     mesh.validate();
     if (mesh.uv.size() != mesh.positions.size())
       throw std::invalid_argument("Painting requires persisted UV coordinates");
@@ -666,6 +667,25 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   p->revision_ = revision_;
   p->allocated_tiles_ = allocated_tiles_;
   return p;
+}
+struct PolygonPaintAccess {
+  static std::shared_ptr<PaintedMesh> rebuild(const PaintedMesh &source, Mesh target,
+                                              const PaintSurfaceOptions &options) {
+    if(source.editing_)throw std::logic_error("Finish the paint stroke before rebuilding polygon geometry");
+    if(source.revision_==UINT64_MAX)throw std::overflow_error("Paint geometry identity exhausted");
+    if(options.cancelled&&options.cancelled())throw std::runtime_error("Polygon paint preparation cancelled");
+    auto surface=std::make_shared<PaintedMesh::SurfaceMap>(std::move(target),source.resolution(),options);
+    auto result=source.snapshot();
+    result->surface_=std::move(surface);
+    result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();
+    result->composite_token_=next_composite_token();
+    ++result->revision_;
+    if(options.cancelled&&options.cancelled())throw std::runtime_error("Polygon paint preparation cancelled");
+    return result;
+  }
+};
+std::shared_ptr<PaintedMesh> polygon_paint_geometry(const PaintedMesh &source,Mesh target,const PaintSurfaceOptions &options) {
+  return PolygonPaintAccess::rebuild(source,std::move(target),options);
 }
 void BakedTextures::validate(uint32_t resolution) const {
   if (maps.source_maps || maps.source_only || maps.baked_base || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
@@ -1128,6 +1148,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
                       {"next_id", next_},
                       {"layers", nlohmann::json::array()}};
   if(surface_->options.policy==PaintUvPolicy::SourceAuthored)j["uv_policy"]="source-authored";
+  else if(surface_->options.policy==PaintUvPolicy::PolygonAuthored)j["uv_policy"]="polygon-authored";
   if(source_maps_){
     PaintImageArchive local;
     j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
@@ -1179,6 +1200,9 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
   return j;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive) {
+  return decode(j,archive,false);
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive,bool allow_polygon) {
   auto &m = j.at("mesh");
   auto blob = [&](const char *name, size_t stride,
                   size_t limit) -> const std::vector<uint8_t> & {
@@ -1224,8 +1248,14 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
     throw std::runtime_error("Invalid paint resolution");
   PaintSurfaceOptions surface_options;
   if(j.contains("uv_policy")){
-    if((!j.at("uv_policy").is_string() || j.at("uv_policy").get_ref<const std::string&>()!="source-authored")||!j.contains("source_maps"))throw std::runtime_error("Invalid persisted source UV policy");
-    surface_options.policy=PaintUvPolicy::SourceAuthored;
+    const auto &policy=j.at("uv_policy");
+    if(policy.is_string()&&policy.get_ref<const std::string&>()=="polygon-authored") {
+      if(!allow_polygon)throw std::runtime_error("Polygon-authored UV policy requires authenticated Scene12 authority");
+      surface_options.policy=PaintUvPolicy::PolygonAuthored;
+    } else {
+      if(!policy.is_string()||policy.get_ref<const std::string&>()!="source-authored"||!j.contains("source_maps"))throw std::runtime_error("Invalid persisted source UV policy");
+      surface_options.policy=PaintUvPolicy::SourceAuthored;
+    }
   }
   auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options));
   auto positive = [](const nlohmann::json &v) {
