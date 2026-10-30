@@ -46,8 +46,10 @@ All seven existing authoring/recovery/export/held/native regressions also pass:
 13/14 and exposed a readiness race in the existing document-export assertion:
 the exception future could wake before normal native status publication. Its
 assertion is unchanged; a narrow ordering correction passes eight focused Release
-suites (7.95s), and the complete sanitizer gate is running again. No sanitizer
-completion is claimed at this source checkpoint.
+suites (7.95s), and the complete corrected sanitizer gate passes 14/14 in 63.36s. It instruments
+all own C/C++ core and bundled support, including the final helper replacement;
+system image/runtime libraries are outside instrumentation. The initial failure
+and unchanged oracle remain archived. No GUI, XR or device OOM claim is made.
 
 This is isolated from the affine/Scene13 work and adds no Scene/archive fields,
 new runtime thread, system dependency, installation or display-session changes.
