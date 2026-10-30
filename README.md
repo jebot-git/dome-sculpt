@@ -19,8 +19,10 @@ suite. Exact origins, licenses and source checksums are in
 ## Build
 
 ```sh
+export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib:$PWD/artifacts/toolkit-eee23b7/lib"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-282467e/share/fltk"
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-eee23b7/share/fltk"
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
 build/dome-sculpt
@@ -95,7 +97,10 @@ volume/scene versions, including the standalone baked-v5 checkpoint, remain read
 Ctrl+O reopens it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
 transforms, normals, packed UVs, PBR materials and embedded painted PNG maps.
 Skin/inverse-bind/all-influence and position/normal/tangent morph transport are
-implemented for the documented subset. The native source-retaining GLB/glTF and static
+implemented for the documented subset. Missing glTF normals now derive flat base/key normals and original-frame Mikk
+tangents for the supported UV0 material paths while retaining original absence
+and supplied attributes; see [flat-normal evidence](docs/GLTF-FLAT-NORMALS.md).
+The native source-retaining GLB/glTF and static
 OBJ/FBX core adapters preserve supported geometry, instances, images and material data;
 Scene 11 adds exact authored binds and original-format resource receipts. Unsupported
 transforms, deformations or materials refuse explicitly. Source-preserving and

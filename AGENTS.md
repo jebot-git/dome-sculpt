@@ -6,7 +6,7 @@ work and validation results. Preserve the full objective in
 
 - Runtime: native C++20, FLTK frontends and direct EGL/OpenXR. Python is optional
   test orchestration only. Do not introduce Qt/GTK/Pango/Erlang runtime frontends.
-- Fonts: BDF through the shared Fontconfig/FreeType helpers. Preserve DomeD
+- Fonts: native BDF/PCF through the canonical DomeD Fontconfig/FreeType helpers. Preserve DomeD
   theme, accent, bitmap size/scale, opacity and background conventions.
 - Universal menus: actual commands, context-aware enabled/check/radio states,
   modal text/UV/document history routing, shell-owned application/Window menus,
@@ -25,8 +25,10 @@ work and validation results. Preserve the full objective in
 Build (prepare the current canonical DomeD toolkit as in [docs/TOOLKIT.md](docs/TOOLKIT.md) first):
 
 ```sh
+export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib:$PWD/artifacts/toolkit-eee23b7/lib"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-282467e/share/fltk"
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-eee23b7/share/fltk"
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
 ```

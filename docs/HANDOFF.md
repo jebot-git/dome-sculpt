@@ -1,80 +1,86 @@
-# Holding, shared import and current DomeD milestone
+# Flat-normal authoring and current native bitmap toolkit
 
-The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md stays
-active. Additional user requirements are in ADDITIONAL-REQUIREMENTS-2026-10-30.md.
-This extends the existing native C++20 FLTK/OpenXR application.
+The full production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md remains
+active. The additional polygon/holding/VRoid-only/FBX-OBJ requirements remain in
+ADDITIONAL-REQUIREMENTS-2026-10-30.md. This extends the existing native C++20
+FLTK/OpenXR application; no replacement frontend is introduced.
 
-## Integrated behavior and evidence
+## Current and preceding checkpoints
 
-The current candidate starts from published3a3d7a2, integrates held6207af3 and
-shared import optionse86d012 with semantic mergefea6818, adds atomic admission
-regression9c74319, and fixes current BDF-runtime metrics at69bd085. Read
-HOLDING-IMPORT-INTEGRATION.md and validation/HOLDING-IMPORT-INTEGRATION.json for
-behavior, exact tested sources/runtime/binaries/logs and remaining limits.
-PRODUCTION-INTEGRATION.md retains the preceding milestone's separate evidence.
+Publishedb312b98 contains individual visibility/physical holding/transparent ghosts
+and exclusive edit authority, shared native/XR import options/metre conversion,
+transactional browser/chooser admission and then-current BDF metrics. Its exact
+CPU151/OneAPI152/SAN44/GUI113/DomeD8 and four syntheticXR suites on both builds
+remain scoped to that source/runtime in HOLDING-IMPORT-INTEGRATION.md and receipt.
 
-Final code69bd085 qualifies CPU151/151, Arc OneAPI152/152, selected whole-own
-C/C++ sanitizer44/44, native FLTK113, current DomeD universal-menu8/8 and all
-four real-loader synthetic XR suites on both builds. New exact BDF1x/2x palette
-checks also pass on Arc. Eleven earlier direct Arc holding/model/consumer
-fixtures are separately scoped to parent9c74319, before the font-only followup.
+The current integration adds source-preserving missing-NORMAL GLB/glTF authoring,
+per-key flat/Mikk frames and cancellable import atlas work. Original source
+attributes/bytes remain exact; current split geometry carries explicit mappings.
+Native chooser and real controller-worker paths exercise exact Undo/Redo. Read
+GLTF-FLAT-NORMALS.md and validation/GLTF-FLAT-NORMALS.json for the tested source,
+binaries, logs and precise limits. Eight extra CPU source/VRoid/frame regressions
+and actual Arc compute oracles supplement affected native/graphics/sanitizer tests.
 
-New behavior includes individual native visibility controls, physical holding,
-transparent ghosts and exclusive held editing; shared native/XR import options;
-metre conversion before local bounds; retained original FBX/OBJ source; and
-transactional browser/admission with stale chooser permissions. Existing generic
-transactions, seeded sculpt/bake/paint/UV workflows, projection flags, authored
-binds, source receipts, VRoid-only creation and resolved VRM roles are preserved.
+DomeD advanced to eee23b7 during qualification, then3024fb6 refreshed bitmap
+alias export/catalog behavior; toolkit/runtime source inputs remain unchanged.
+This adds a23rd FLTK patch and native BDF+PCF FreeType/HarfBuzz/Cairo/Pango. The
+canonical helper is copied byte-identically, palette text accepts both decoded
+native formats, and exact PCF coverage/Unicode/bidi/1x2x/pixels/GL proof is added.
+Use TOOLKIT.md for the new **lib** prefixes and cache refresh. Do not label the
+old22-patch lib64 artifact as current or confuse its historical proof with new
+runtime checks. No Pango application frontend is introduced.
 
-Physical confirmation remains limited to the old8f4d67d rudimentary milestone.
-The user ended that test. Synthetic real-loader XR, native/controller fixtures
-and direct graphics evidence do not imply new physical holding/import proof.
-Do not automatically relaunch a physical headset test.
+Only the old8f4d67d rudimentary milestone has physical headset confirmation. The
+user ended that test. Direct GPU/controller/synthetic real-loader tests are
+separate evidence; do not relaunch a physical test automatically. No system
+installation or desktop/display-manager restart occurred.
 
-## Active agents and required work
+## Active delegated work
 
-- merge_contracts: Wings3D-style polygon mode. Private stable-ID kernel/workspace,
-  point/line/face GPU preview and original source N-gon recovery are tested. The
-  Arc point-marker discrepancy is fixed by a dedicated marker shader. Full
-  Document worker, native/XR controls, accepted Apply→Save/Close ordering,
-  persistence and broad workflow qualification remain ongoing. Keep actual
-  polygon editing distinct from the existing retopology patch workspace.
-- merge_docs: Scene12 polygon authority/origin DAG archive and compatibility.
-  Ordinary legacy/source cases pass privately. Exhaustive allocation injection
-  found inherited noexcept JSON comparison/destruction failures. Narrow comparison
-  fixes and pinned upstream allocation-free destruction are being investigated;
-  full source encode/decode fault safety remains unproven. Do not relabel a plain
-  decoder-only passing scope as all-archive OOM safety.
-- merge_palette: general colored-source baking. Actual Document bake→UV edits→
-  save/reopen→repeat bake and independent PBR/MToon/VRM consumers are progressing
-  privately, including genuine newly computed normal frames under existing
-  representability guards. Native UI, sanitizer/Arc and broader curved/deforming
-  cases remain required. Preserve the parked prototype and its byte-verified
-  backups; do not merge an unqualified prototype.
+- merge_palette froze color8d8f8d3 privately: actual new normal/color bake→native
+  UV→restart/repeat; independent PBR/MToon/VRM consumers; native/compact UI and real
+  color-policy XR; sanitizer and Arc proof. Broader curved/mixed-skin original-frame
+  baking remains required. A new isolated union combines b312, rootflat and color,
+  preserves held authority/delayed weights/24pages/projection flags, and consumes
+  the latest bitmap helper/runtime before full qualification. The old prototype,
+  frozen8d and all byte-verified backups stay untouched. General original-frame
+  new-bake interpretation follows a qualified union, rather than claiming a static
+  canonical conversion works for arbitrary deformation.
+- merge_docs froze Scene12 archive0d4776a and JSON6ce11bc privately. The latter
+  retains JSON3.12 ABI/API with pinned upstream allocation-free destruction and
+  narrow inherited comparison fixes:146 native suites,20 selected complete-own-core
+  sanitizers,20506 actual source/encode/decode failures, lifetime/ownership probes
+  and exact old/new Scene5/11/12 CBOR cross-reading. A new flat-enabled core tree
+  adopts only focused dependency/CMake/lifetime changes, fixes all16 scalar
+  comparison noexcept wrappers generically and tests actual flat/textured/skinned
+  prepare_import failures. These findings are not integrated or complete merely
+  because a private checkpoint passes. Keep ordinary/decoder/encoder/direct-import
+  evidence scoped separately and preserve negative logs.
+- merge_contracts owns full polygon Document/native/XR workflow and Scene12
+  PolygonAuthored witness admission; Docs reviews the strict archive guard.
+  Private kernel/workspace/N-gon/GPU foundations pass. Actual controller22,
+  Document70 and narrow PA/UV cases are passing privately, with more codec/GUI/
+  real-loader/whole-core SAN qualification pending. Keep old SourceAuthored guards;
+  unbound/older-schema PA and retained PA without exact REST/index/UV authority
+  must refuse. Full polygon editing is not completed by reserved pages or the
+  existing retopology patch workspace.
 
-Full affine/source-pose import, native FBX skins/blends/materials, glTF normative
-missing normals and broader morph/extension interoperability remain required.
-So do the unfinished painting/remeshing, humanoid/rig/weights/shapekeys,
-plugin-equivalent, device and accelerator rows. CUDA/ROCm compilation is not
-positive NVIDIA/AMD hardware proof. The permanent global heap blackout inside
-the installed Level Zero driver remains separately documented in
-PAGED-VOLUME-ALLOCATION-VALIDATION.md.
+## Required continuation
 
-Reserved spatial pages:18 procedural,19 polygon,20 holding,21 import,22 polygon
-secondary,23 import options. The shared bound is page23. Rebuild all public-header
-ABI consumers coherently after future merges.
+PaintSourceTexture still guards UV1 sampling; full UV1 painting and durable
+provenance remain required. So do affine/source poses, FBX skin/blends/materials,
+COLOR/UV morphs, broader glTF/VRM, production painting/remeshing, humanoid/rig/weights/
+shapekeys and plugin-equivalent workflows. All other atlas workers still need
+cooperative cancellation adoption; the vendor iteration latency is not a hard
+bound. Whole-import JSON OOM safety remains active work. CUDA/ROCm compilation
+is not positive NVIDIA/AMD hardware evidence. Permanent global heap blackout
+inside the installed Intel Level Zero driver remains separately documented in
+PAGED-VOLUME-ALLOCATION-VALIDATION.md, without CPU substitution or guard weakening.
 
-## Workspace and toolkit
-
-Current canonical DomeD6feb62b has unchanged FLTK builder/all22 patches from282467e.
-Keep the optimized artifacts/toolkit-282467e/lib64 artifact; prepend the new
-artifacts/bitmap-runtime-6feb62b/lib native BDF runtime for current validation.
-Both compositor/client live library maps and font policy are verified privately.
-See TOOLKIT.md and the exact qualification receipt. No system installation or
-active desktop/display-manager session restart occurred.
-
-The old primary frame WIP remains preserved as
-stashc46d1d907a9ca0cdb56cda17e54ab20284939fc1 and byte-verified artifacts. Preserve
-all frozen branches/worktrees/backups/local commits. Milestone commits/pushes
-are authorized. Keep the full goal active until every requirement has actual
-implementation and appropriate evidence; this milestone does not complete it.
+Spatial pages18/19/20/21/22/23 stay procedural/polygon/holding/import/polygon/
+import-options, with shared bound23. Preserve all commands, projection flags and
+bake settings. Rebuild every consumer coherently when public layouts change.
+Milestone commits/pushes to main are authorized; no force/reset or unrelated work
+loss. The primary old frame WIP remains stashc46d1d907a9ca0cdb56cda17e54ab20284939fc1
+plus byte-verified artifacts. Keep the complete goal active until every required
+row has actual implementation and appropriate evidence.
