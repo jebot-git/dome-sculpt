@@ -30,10 +30,11 @@ build/dome-sculpt
 
 Prepare the current canonical toolkit as described in [TOOLKIT](docs/TOOLKIT.md).
 
-Requires a C++20 compiler, CMake 3.24+, nlohmann JSON headers, the patched DomeD
+Requires a C++20 compiler, CMake 3.24+, the patched DomeD
 FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, HarfBuzz, ICU, GIO, Fontconfig, libpng, libjpeg, zlib,
 X11/Wayland development libraries and `wayland-scanner`. xatlas is pinned and
-vendored alongside MikkTSpace and the native ufbx FBX/OBJ reader, so configuring does not fetch their sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
+vendored alongside MikkTSpace, the native ufbx FBX/OBJ reader and pinned JSON 3.12
+with upstream lifetime/exception backports, so configuring does not fetch their sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
 build just the native core and tests. `BUILD_TESTING=OFF` excludes test harness
 dependencies, including Python.
 The application's default FLTK backend follows its environment; tests explicitly

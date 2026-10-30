@@ -1,6 +1,8 @@
 # Full objective and completion evidence
 
-The current flat-normal/current-toolkit integration extends publishedb312b98.
+The current import-safety/cancellable-authoring integration extends published 8ad6d30.
+See IMPORT-SAFETY-INTEGRATION.md for exact scope and qualification.
+The preceding flat-normal/current-toolkit integration extends publishedb312b98.
 Exact new scope and evidence are in GLTF-FLAT-NORMALS.md and its validation
 receipt. The preceding holding/import integration extends published3a3d7a2. Exact scope and
 qualification are in HOLDING-IMPORT-INTEGRATION.md and its validation receipt;
