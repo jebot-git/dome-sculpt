@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/mesh.hpp"
+#include "surface-topology.hpp"
 #include <map>
 #include <set>
 namespace dome {
@@ -8,15 +9,15 @@ namespace {
 // incorrectly deletes valid small faces and opens otherwise closed isosurfaces.
 // Evaluate the actual cross product in double precision; only collinear or
 // coincident positions are geometrically degenerate, independent of units.
-std::array<double,3> face_cross(Vec3 a,Vec3 b,Vec3 c) {
-  double x=double(b.x)-a.x,y=double(b.y)-a.y,z=double(b.z)-a.z;
-  double u=double(c.x)-a.x,v=double(c.y)-a.y,w=double(c.z)-a.z;
-  return {y*w-z*v,z*u-x*w,x*v-y*u};
+std::array<double, 3> face_cross(Vec3 a, Vec3 b, Vec3 c) {
+  double x = double(b.x) - a.x, y = double(b.y) - a.y, z = double(b.z) - a.z;
+  double u = double(c.x) - a.x, v = double(c.y) - a.y, w = double(c.z) - a.z;
+  return {y * w - z * v, z * u - x * w, x * v - y * u};
 }
-bool zero_face(const std::array<double,3> &n) {
-  return n[0]==0 && n[1]==0 && n[2]==0;
+bool zero_face(const std::array<double, 3> &n) {
+  return n[0] == 0 && n[1] == 0 && n[2] == 0;
 }
-}
+} // namespace
 void Mesh::validate() const {
   if (positions.empty() || indices.empty() || indices.size() % 3)
     throw std::runtime_error("Mesh has no triangle surface");
@@ -42,7 +43,7 @@ void Mesh::validate() const {
         throw std::runtime_error("Mesh index out of bounds");
     auto a = positions[indices[t]], b = positions[indices[t + 1]],
          c = positions[indices[t + 2]];
-    if (zero_face(face_cross(a,b,c)))
+    if (zero_face(face_cross(a, b, c)))
       throw std::runtime_error("Degenerate mesh triangle");
   }
 }
@@ -63,6 +64,10 @@ Mesh surface_mesh(const Volume &field, const std::function<bool()> &cancelled) {
   }
   using Edge = std::pair<Int3, Int3>;
   std::map<Edge, uint32_t> vertices;
+  // Exact representable-position quotient, with no tolerance or area cutoff.
+  // Distinct near-zero lattice-edge crossings can round to the same float.
+  // Keeping separate IDs then dropping coincident triangles opens the surface.
+  std::map<std::array<float, 3>, uint32_t> exact_positions;
   auto vertex = [&](Int3 a, Int3 b, float da, float db) {
     if (da == 0)
       b = a;
@@ -78,19 +83,30 @@ Mesh surface_mesh(const Volume &field, const std::function<bool()> &cancelled) {
            b.z * field.voxel_size()};
     float t = da == db ? 0 : std::clamp(da / (da - db), 0.f, 1.f);
     Vec3 position = pa + (pb - pa) * t;
+    auto same = exact_positions.find({position.x, position.y, position.z});
+    if (same != exact_positions.end()) {
+      vertices.emplace(edge, same->second);
+      return same->second;
+    }
     uint32_t index = uint32_t(result.positions.size());
+    exact_positions.emplace(
+        std::array<float, 3>{position.x, position.y, position.z}, index);
     vertices.emplace(edge, index);
     result.positions.push_back(position);
     result.normals.push_back(field.gradient(position));
     return index;
   };
+  std::vector<surface_detail::Triangle> collapsed;
   auto triangle = [&](uint32_t a, uint32_t b, uint32_t c, Vec3 outward) {
     if (a == b || b == c || a == c)
       return;
-    auto n=face_cross(result.positions[a],result.positions[b],result.positions[c]);
-    if (zero_face(n))
+    auto n = face_cross(result.positions[a], result.positions[b],
+                        result.positions[c]);
+    if (zero_face(n)) {
+      collapsed.push_back({a, b, c});
       return;
-    if (n[0]*outward.x+n[1]*outward.y+n[2]*outward.z < 0)
+    }
+    if (n[0] * outward.x + n[1] * outward.y + n[2] * outward.z < 0)
       std::swap(b, c);
     result.indices.insert(result.indices.end(), {a, b, c});
   };
@@ -109,7 +125,8 @@ Mesh surface_mesh(const Volume &field, const std::function<bool()> &cancelled) {
       for (auto v : tet) {
         // Winding depends only on relative corner positions. Large grid
         // coordinates must not erase the centroid difference through rounding.
-        Vec3 point{float(p[v].x-cell.x), float(p[v].y-cell.y), float(p[v].z-cell.z)};
+        Vec3 point{float(p[v].x - cell.x), float(p[v].y - cell.y),
+                   float(p[v].z - cell.z)};
         if (d[v] < 0) {
           inside[ni++] = v;
           in += point;
@@ -138,6 +155,7 @@ Mesh surface_mesh(const Volume &field, const std::function<bool()> &cancelled) {
       }
     }
   }
+  surface_detail::complete_collinear_surface(result, collapsed, cancelled);
   // Some exact-zero intersections can become unused after degenerate triangles
   // are discarded. Compact before handing topology to UV/rigging algorithms.
   std::vector<uint32_t> remap(result.positions.size(), UINT32_MAX);

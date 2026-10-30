@@ -369,3 +369,13 @@ if(BUILD_TESTING)
     -Wl,--wrap=fsync)
   add_test(NAME retopo-cancellation-boundaries COMMAND dome-sculpt-retopo-boundaries-test)
 endif()
+
+# Independently testable local extraction foundation; no Doc integration yet.
+add_library(dome-local-surface src/local-surface.cpp)
+target_link_libraries(dome-local-surface PUBLIC dome-sculpt-core)
+target_compile_options(dome-local-surface PRIVATE -Wall -Wextra -Wpedantic)
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-local-surface-test tests/local-surface.cpp tests/local-surface-reference.cpp)
+  target_link_libraries(dome-sculpt-local-surface-test PRIVATE dome-local-surface)
+  add_test(NAME local-surface COMMAND dome-sculpt-local-surface-test)
+endif()
