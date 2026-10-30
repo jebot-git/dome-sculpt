@@ -12,6 +12,7 @@
 #include "weight-editor.hpp"
 #include "skin-editor.hpp"
 #include "sculpt-editor.hpp"
+#include "resolution-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
@@ -127,7 +128,12 @@ struct Canvas : Fl_Gl_Window {
     auto state = document.frame().state;
     if (state->weights.enabled && (!shown_mesh || shown_mesh->generation != state->generation ||
         shown_mesh->revision != state->revision)) { have_stamp = false; return; }
-    auto hit = document.raycast(origin, direction, material_time);
+    std::optional<Vec3> hit;
+    try {hit=document.raycast(origin,direction,material_time);}
+    catch(const std::length_error &error) {
+      document.cancel_desktop();sculpting=have_stamp=false;
+      document.report_error(error.what());invalidate();return;
+    }
     if (!hit) {
       have_stamp = false;
       return;
@@ -397,6 +403,7 @@ struct App {
     menu.add("&Sculpt/&Flatten", '4', command, this, FL_MENU_RADIO);
     menu.add("&Sculpt/Masks and symmetry...", 0, command, this);
     menu.add("&Sculpt/Paint protection mask", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Sculpt/Resolution...",0,command,this);
     menu.add("&Sculpt/Protect all", 0, command, this);
     menu.add("&Sculpt/Clear protection mask", 0, command, this);
     menu.add("&Sculpt/Invert protection mask", 0, command, this);
@@ -588,6 +595,7 @@ struct App {
                       "&Sculpt/Protect all", "&Sculpt/Clear protection mask", "&Sculpt/Invert protection mask",
                       "&Sculpt/Show protection mask", "&Sculpt/Mirror X", "&Sculpt/Mirror Y", "&Sculpt/Mirror Z"})
       enable(path, !modal && s->can_configure_sculpt);
+    enable("&Sculpt/Resolution...",!modal && s->can_change_resolution);
     checked("&Sculpt/Paint protection mask", s->sculpt_settings.mask_edit);
     checked("&Sculpt/Show protection mask", s->sculpt_settings.mask_visible);
     checked("&Sculpt/Mirror X", (s->sculpt_settings.symmetry_axes & 1) != 0);
@@ -747,6 +755,11 @@ struct App {
       text.str("");
       text << "XR active | " << hints;
     }
+    if(info->asset_busy) {
+      const auto work=canvas.document.asset_status();
+      if(work.cancelling)text<<" | Cancelling";
+      else text<<" | "<<int(std::clamp(work.progress,0.f,1.f)*100)<<"%";
+    }
     auto recovery = canvas.document.recovery_status();
     if (!recovery.error.empty()) text << " | Recovery: " << recovery.error;
     else if (!info->recovery_error.empty()) text << " | Recovery: " << info->recovery_error;
@@ -882,6 +895,11 @@ struct App {
     } else if(label=="Bake surface..."){edit_bake_dialog(canvas.document);
     } else if(label=="Clear baked surface"){canvas.document.clear_bake();
     } else if(label=="Cancel background work"){canvas.document.cancel_asset_work();
+    } else if(label=="Resolution...") {
+      auto draft=canvas.document.draft_scene();const auto &source=draft.scene.active();
+      SculptResolutionOptions initial;initial.voxel_size=source.volume->voxel_size();
+      auto options=sculpt_resolution_dialog(initial.voxel_size,draft.scene.world_transform(source.id).scale,initial);
+      if(options)canvas.document.change_sculpt_resolution(std::move(*options),draft.source);
     } else if (label == "Voxel remesh...") {
       edit_voxel_remesh(canvas.document);
     } else if (label == "Object and material...") {

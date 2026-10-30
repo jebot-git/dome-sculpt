@@ -255,6 +255,9 @@ void SpatialPalette::raster(const EditorState &s) {
       else if (c.components > 1)
         label = std::string(1, (c.parameter == VrParameter::RigRotation ? "XYZ" : "RGBA")[row]) + " ";
       if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
+      else if(c.parameter==VrParameter::SculptResolution) {
+        char spacing[80];snprintf(spacing,sizeof(spacing),"Spacing %.6g world mm",double(value));label=spacing;
+      }
       else if(c.parameter==VrParameter::SculptPlanes) {
         if(row==3) label=std::string("Protection view ")+(value>=.5f?"On":"Off");
         else {char size[64];snprintf(size,sizeof(size),"%c %.2f mm", "XYZ"[row],double(sculpt_plane_metres(value))*1000);label=size;}
@@ -300,7 +303,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter)) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),

@@ -15,6 +15,10 @@ struct SculptResolutionOptions {
          maximum_triangles = 600'000;
   size_t maximum_quality_samples = 1'000'000, maximum_projection_tests = 20'000'000;
   std::function<bool()> cancelled;
+  // Worker-only monotone progress in [0,.98]; publication belongs to the caller.
+  // Empty callbacks preserve the allocation-free same-voxel path.
+  std::function<void(float)> progress;
+  void validate() const;
 };
 struct SculptResolutionReport {
   bool changed = false;

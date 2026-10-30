@@ -1,10 +1,12 @@
-# Native sculpt resolution foundation
+# Native sculpt resolution
 
-This private foundation changes a sculpt's object-local sampling resolution
-without flattening displacement layers or replacing original painted assets.
-Native FLTK/XR controls, Document history/worker integration and flat Volume 4
-project opening remain integration work. This is not completion of production
-resolution/local-meshing workflows.
+Native FLTK and XR controls change the current sculpt's object-local sampling
+resolution through a bounded background worker, without flattening displacement
+layers or replacing original painted assets. Source leases, cancellation, one
+undo transaction and native save/restart preserve the original data on refusal.
+This private authoring milestone builds on the tested resolution/archive and
+authenticated local-meshing foundations; its validation and explicit limits
+are tracked below.
 
 ## Physical meaning and persistence
 
@@ -129,9 +131,9 @@ quality rather than accepted as a dramatically expanded thin feature.
 
 Logs in the parent artifacts directory are `tests-resolution-release-frozen.log`,
 `tests-resolution-sanitize.log` and `tests-resolution-oneapi.log`. The private
-`artifacts/resolution-source-freeze.json` records exact source hashes. Native
-FLTK/XR authoring, flat Volume 4 opening, Document history/worker integration and
-physical-device proof remain pending; this is a foundation checkpoint.
+`artifacts/resolution-source-freeze.json` records the foundation source hashes.
+Those results are the original foundation checkpoint, rather than evidence for
+the later native authoring integration below. No physical headset test is claimed.
 
 ## Authenticated-cache and archive integration
 
@@ -161,8 +163,83 @@ archives, scalar-mask rollback and the existing five-worker Document behavior.
 The new integration fixture checks real flat/native save/load, both historical
 Scene 7 forms, malformed/mixed headers and aggregate quota ordering.
 
-This is a core integration base. Native FLTK/XR resolution authoring remains a
-separate follow-up. Earlier standalone sanitizer/Arc evidence above belongs to
-`1a42f18`; combined sanitizer and runtime proof must be recorded separately.
+The combined core also passes fresh whole C/C++ ASan/UBSan/leak checks on the
+same 13 suites in 34.97 seconds. Earlier standalone Arc evidence above belongs
+to `1a42f18`; the authoring follow-up is recorded separately below.
 Evidence: parent artifacts `tests-resolution-auth-release-focused.log` and
 `build-resolution-auth/Testing/Temporary/LastTest.log` in this private worktree.
+
+
+## Native desktop and XR authoring
+
+`Sculpt > Resolution...` edits a detached draft in the canonical DomeD FLTK
+DomeDialog. Target spacing and optional surface/layer quality bounds use world
+millimetres, including the full object/group scale path; the model retains local
+metres. An unchanged world-unit value preserves the original local float bits.
+The continuous slider is logarithmic over the supported local 10µm–1m range;
+Half/Double spacing presets retain that range. Optional normal/protection bounds
+are degrees and percentages. Automatic bounds follow the target spacing.
+Controls use the session BDF appearance, a scrollable compact layout and fixed
+Cancel/Apply actions. Initial Return chooses Cancel, Ctrl+W/Escape and universal
+Close discard the draft. No model geometry or meshing occurs while adjusting it.
+
+XR Sculpt layers page 7 cell 7 opens a large logarithmic world-mm resolution panel.
+Its joystick and ray controls stage the target; explicit confirmation queues
+work, while Cancel, focus loss and leaving the session discard the unconfirmed
+draft. Root Undo stays on its original cell 4; Recovery, Masks15, Skin14 and
+Retopo16 retain their routes. XR uses the same conservative default quality
+bounds as a newly opened native draft; advanced bounds are available natively.
+
+The guarded asset worker validates the source generation/revision/object lease,
+operates on a detached scene and rechecks the lease and cancellation before
+publication. Object locks prohibit resolution changes; locked or hidden geometry
+layers remain independent representation data and are preserved. Same-voxel
+confirmation never queues an asset or changes revision/history, including after
+world-unit conversion; stale same-voxel leases still refuse. Successful results
+publish one undoable scene change and new immutable geometry lineage, retaining
+source painting and archives. Failures, cancellation, queue/generation changes
+and quality refusal retain the old scene. Native Save/restart restores Volume4
+with its original physical band and no transient history.
+
+A worker-only optional progress callback reports monotone completed phases and
+bounded actual work, ending at .98 after quality. The generic asset publisher
+marks 1 only after successful publication. Native status reads the live atomic
+asset progress and offers the existing File/Cancel background work action.
+Empty callbacks retain the allocation-free no-op. Throwing progress consumers
+or late phase cancellation leave the source exact. Desktop bounded DDA exhaustion
+cancels only its current gesture and becomes status, rather than escaping the
+FLTK event callback into an alert; the grid-approximation/budget limits above
+remain explicit.
+
+Authoring verification so far:
+
+- Fresh canonical toolkit282467e Release app/core build; seven focused native
+  suites pass 2.10s, then expanded native Document/group-scale fixture passes .80s.
+  The subsequent full CPU build passes all 85 native CTests in 227.94s.
+- Normal FLTK/DBusMenu 12/12 and compact 4/4, with reviewed BDF screenshots. These
+  cover actual worker application, exact full-scene undo/redo, unchanged Apply,
+  modal keybindings, visible 20mm restart and fine-grid ray-status/Save behavior.
+- Real OpenXR loader 17/17 uses actual software GL stereo swapchains and synthetic
+  poses/actions: accepted 20mm Volume4 and unchanged physical band, complete-scene
+  Cancel/no-op/focus/unconfirmed persistence, and balanced eye image ownership.
+  This is loader/input/rendering proof, not hardware tracking proof.
+- Fresh whole C/C++ core ASan/UBSan/leak validation passes 11 selected suites
+  in 97.35s, with supplementary scene-authoring 1/1 in 3.59s. This covers the
+  changed progress callback, native worker/controller paths, source leases,
+  allocation faults, ray limits and archive/authentication/mask regressions.
+- All87 coherent CPU CTests pass:85 native suites in 227.94s and both loader
+  suites in 190.43s. The unchanged original loader regression passes 140/140
+  checks in 169.89s, and the separate resolution loader passes 17/17 in 20.54s.
+- A fresh ONEAPI selected-target build/device rerun is pending. Earlier
+  accelerator results do not establish GPU resampling; this bounded quality/
+  resampling path remains CPU work.
+
+Current authoring evidence resides in this worktree's `artifacts/validation`,
+`artifacts/resolution-xr-final` and `artifacts/menu-sculpt-resolution-*` directories.
+`artifacts/resolution-authoring-manifest.json` pins the 21 owned source/doc files
+against combined base 2c160cf. Build/runtime logs include `cpu-all-build.log`,
+`cpu-all-native.log`, `cpu-all-xr.log`, `sanitize-build.log`,
+`sanitize-tests.log` and `sanitize-scene.log`. Source/header consumers were
+rebuilt coherently; no archive from another revision was reused. Root later
+integration with upstream cutting controls/six-worker lifecycle needs separate
+coherent validation; this private snapshot retains its tested five-worker base.

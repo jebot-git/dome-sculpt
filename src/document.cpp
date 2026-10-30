@@ -473,6 +473,8 @@ void Document::publish_locked(bool force) {
   state_.sculpt_settings = volume().sculpt_settings();
   state_.sculpt_transform = scene_.world_transform(active.id);
   state_.can_configure_sculpt = sculpt_target_ready_locked();
+  state_.can_change_resolution = resolution_target_ready_locked();
+  state_.sculpt_voxel_mm = double(volume().voxel_size())*state_.sculpt_transform.scale*1000;
   state_.sculpt_mask_visible = !active.mesh_active && active.visible && !state_.retopology &&
       !state_.weights.enabled && state_.sculpt_settings.mask_visible;
   state_.active_sculpt_layer = volume().active_layer();
@@ -551,7 +553,8 @@ void Document::finish_locked() {
     throw std::logic_error("Apply or cancel retopology before changing the document");
   // Starting another command may accept scalar property previews, but must
   // not implicitly execute an action such as creating a remeshed object.
-  finish_control_locked(state_.controls.parameter != VrParameter::VoxelSize &&
+  finish_control_locked(state_.controls.parameter != VrParameter::SculptResolution &&
+                        state_.controls.parameter != VrParameter::VoxelSize &&
                         state_.controls.parameter != VrParameter::RigRotation &&
                         state_.controls.parameter != VrParameter::MorphWeight &&
                         state_.controls.parameter != VrParameter::BakeSource &&
@@ -1475,6 +1478,7 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if (parameter==VrParameter::SculptResolution) return resolution_target_ready_locked();
   if (sculpt_parameter(parameter)) return sculpt_target_ready_locked();
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
@@ -1522,6 +1526,18 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::SculptResolution) {
+    const float mm=state_.controls.value[0];
+    auto before=std::move(control_before_);control_before_.reset();
+    if(accept) {
+      SculptResolutionOptions options;const double factor=double(scene_.world_transform(control_object_).scale)*1000;
+      options.voxel_size=mm==float(double(control_resolution_voxel_)*factor)?control_resolution_voxel_:
+          std::clamp(float(double(mm)/factor),.00001f,1.f);
+      try {queue_resolution_locked(options,control_source_);}
+      catch(...) {control_before_=std::move(before);throw;}
+    }
+    control_changed_=false;state_.controls={};return;
+  }
   if (sculpt_parameter(state_.controls.parameter)) {
     auto settings = volume().sculpt_settings();
     const auto c = state_.controls;
@@ -1699,6 +1715,12 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::SculptResolution: {
+      const double factor=double(scene_.world_transform(o.id).scale)*1000;
+      control_resolution_voxel_=volume().voxel_size();
+      c.title="Sculpt resolution (world mm)";c.minimum=float(double(.00001f)*factor);
+      c.maximum=float(factor);c.value[0]=float(double(control_resolution_voxel_)*factor);c.logarithmic=true;break;
+    }
     case VrParameter::SculptMaskMode:
       c.title="Sculpt mask tool"; c.maximum=2; c.value[0]=int(volume().sculpt_settings().mask_tool); break;
     case VrParameter::SculptMaskStrength:
@@ -1904,6 +1926,7 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::SculptResolution:
   case VrParameter::SculptMaskMode:
   case VrParameter::SculptMaskStrength:
   case VrParameter::SculptPlanes:
@@ -2647,6 +2670,7 @@ void Document::file_loop() {
           if (job->operation_report && !job->operation_report->empty())
             state_.message += " | " + *job->operation_report;
           publish_locked(changed);
+          if(job->work)job->work->progress.store(1);
         }
         {
           std::lock_guard file_lock(file_mutex_);

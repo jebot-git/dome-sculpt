@@ -27,7 +27,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Back",       "Presets",     "Erase",       "Layer order"};
   static const std::array<const char *, 12> sculpt = {
       "Add layer",  "Next layer", "Previous",     "Show layer",
-      "Lock layer", "Strength",   "Delete layer", "Undo",
+      "Lock layer", "Strength",   "Delete layer", "Resolution",
       "Back",       "Redo",       "Recovery",     "Masks / symmetry"};
   static const std::array<const char *, 12> recovery = {
       "Refresh", "Next project", "Previous", "Recover", "Save", "Center",
@@ -90,6 +90,8 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
     return VrParameter::VoxelSize;
   if (page == 10 && sector == 3)
     return VrParameter::UvEdit;
+  if (page == 7 && sector == 7)
+    return VrParameter::SculptResolution;
   if (page == 7 && sector == 5)
     return VrParameter::SculptOpacity;
   if (page == 0) {

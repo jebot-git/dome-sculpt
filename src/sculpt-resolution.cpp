@@ -10,10 +10,15 @@ namespace {
 struct Work {
   const SculptResolutionOptions &options;
   SculptResolutionReport &report;
+  float floor=0,ceiling=.4f,last=-1; size_t phase_work=0;
+  void notify(float value) {
+    if(options.progress && value>last){options.progress(value);last=value;}
+  }
+  void phase(float begin,float end) {floor=begin;ceiling=end;phase_work=report.work;notify(begin);stop();}
   void stop() const {if(options.cancelled && options.cancelled())throw std::runtime_error("Sculpt resolution change cancelled");}
   void visit(size_t count=1) {
     if(count>options.maximum_work-report.work)throw std::length_error("Sculpt resolution work budget exceeded");
-    report.work+=count;if((report.work&511)<count)stop();
+    report.work+=count;if((report.work&511)<count){stop();notify(floor+(ceiling-floor)*float(double(report.work-phase_work)/options.maximum_work));}
   }
 };
 int floor_div(int value,int divisor) {return value>=0?value/divisor:-int((-int64_t(value)+divisor-1)/divisor);}
@@ -142,10 +147,13 @@ void compare_surface(const Volume &field,const Mesh &mesh,const Mesh &target,flo
   }
 }
 void quality(const Volume &source,const Volume &target,Work &work) {
+  work.phase(.55f,.60f);
   const auto source_cells=crossing_cells(source,work),target_cells=crossing_cells(target,work);
   if(!source_cells && !target_cells)return;
   if(!source_cells || !target_cells)throw std::runtime_error("Sculpt resolution removes or invents an existing surface");
-  auto original=surface_mesh(source,work.options.cancelled),candidate=surface_mesh(target,work.options.cancelled);
+  work.phase(.60f,.65f);
+  auto original=surface_mesh(source,work.options.cancelled);work.phase(.65f,.70f);
+  auto candidate=surface_mesh(target,work.options.cancelled);work.phase(.70f,.80f);
   for(const auto *mesh:{&original,&candidate})
     if(mesh->positions.size()>work.options.maximum_vertices || mesh->indices.size()/3>work.options.maximum_triangles)
       throw std::length_error("Sculpt resolution surface mesh budget exceeded");
@@ -165,10 +173,12 @@ void quality(const Volume &source,const Volume &target,Work &work) {
         ", target="+std::to_string(work.report.target.boundary_edges)+"/"+std::to_string(work.report.target.nonmanifold_edges)+"/"+std::to_string(work.report.target.inconsistent_edges)+
         ", target degenerate/duplicate/components/euler="+std::to_string(work.report.target.degenerate_triangles)+"/"+std::to_string(work.report.target.duplicate_triangles)+"/"+std::to_string(work.report.target.components)+"/"+std::to_string(work.report.target_euler)+")");
   float tolerance=work.options.maximum_surface_error>0?work.options.maximum_surface_error:std::max(source.voxel_size(),target.voxel_size())*.5f;
-  compare_surface(source,original,candidate,tolerance,work);
-  compare_surface(target,candidate,original,tolerance,work);
+  work.phase(.80f,.89f);compare_surface(source,original,candidate,tolerance,work);
+  work.phase(.89f,.97f);compare_surface(target,candidate,original,tolerance,work);
 }
-void validate(const SculptResolutionOptions &o) {
+} // namespace
+void SculptResolutionOptions::validate() const {
+  const auto &o=*this;
   if(!std::isfinite(o.voxel_size) || o.voxel_size<.00001f || o.voxel_size>1 ||
       !std::isfinite(o.maximum_surface_error) || o.maximum_surface_error<0 || o.maximum_surface_error>1 ||
       !std::isfinite(o.maximum_layer_error) || o.maximum_layer_error<0 || o.maximum_layer_error>1e6 ||
@@ -180,14 +190,16 @@ void validate(const SculptResolutionOptions &o) {
       !o.maximum_projection_tests || o.maximum_projection_tests>100'000'000)
     throw std::invalid_argument("Invalid sculpt resolution or bounded validation settings");
 }
-} // namespace
 SculptResolutionResult resample_sculpt(const Volume &source,const SculptResolutionOptions &options) {
-  validate(options);SculptResolutionResult result;Work work{options,result.report};work.stop();
+  options.validate();SculptResolutionResult result;Work work{options,result.report};work.stop();
   if(source.in_stroke())throw std::logic_error("Finish the current sculpt stroke before changing resolution");
   if(options.voxel_size==source.voxel_size())return result;
+  work.phase(0,.4f);
   Volume next(options.voxel_size,source.history_limit_);next.band_=source.band();
   next.layers_.clear();next.active_=source.active_;next.next_layer_=source.next_layer_;next.settings_=source.settings_;
+  size_t layer_index=0;
   for(const auto &layer:source.layers_) {
+    work.phase(.4f*float(layer_index)/source.layers_.size(),.4f*float(layer_index+1)/source.layers_.size());++layer_index;
     Volume::Layer output=layer;output.delta=decltype(output.delta){};
     sample_field(layer.delta,source.voxel_size(),next.voxel_size(),options.maximum_samples-result.report.layer_samples,work,[&](Int3 q) {
       auto value=interpolate(layer.delta,q,next.voxel_size(),source.voxel_size(),0,work);
@@ -206,6 +218,7 @@ SculptResolutionResult resample_sculpt(const Volume &source,const SculptResoluti
     if(meaningful && !output.delta.size())throw std::runtime_error("Sculpt resolution removes an existing displacement layer");
     result.report.layer_samples+=output.delta.size();next.layers_.push_back(std::move(output));
   }
+  work.phase(.4f,.5f);
   next.mask_.background=source.mask_.background;
   sample_field(source.mask_.values,source.voxel_size(),next.voxel_size(),options.maximum_samples-result.report.layer_samples,work,[&](Int3 q) {
     float value=float(std::clamp(interpolate(source.mask_.values,q,next.voxel_size(),source.voxel_size(),source.mask_.background,work),0.,1.));
@@ -219,7 +232,8 @@ SculptResolutionResult resample_sculpt(const Volume &source,const SculptResoluti
     if(error>options.maximum_mask_error)throw std::runtime_error("Sculpt resolution loses protection detail beyond the requested bound");
   }
   if(source.mask_.values.size() && !next.mask_.values.size())throw std::runtime_error("Sculpt resolution removes existing protection detail");
-  work.stop();next.recompose();next.geometry_history_.reset();quality(source,next,work);work.stop();
+  work.phase(.5f,.55f);next.recompose();next.geometry_history_.reset();quality(source,next,work);work.stop();
+  work.notify(.98f);work.stop();
   result.report.changed=true;result.replacement=std::move(next);return result;
 }
 bool resample_sculpt_object(Scene &scene,uint64_t object,const SculptResolutionOptions &options,SculptResolutionReport *report) {
