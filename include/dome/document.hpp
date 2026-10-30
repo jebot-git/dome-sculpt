@@ -75,6 +75,9 @@ struct EditorState {
   uint64_t bake_source = 0;
   std::vector<uint64_t> bake_sources;
   ObjectBakeSettings bake_settings;
+  Volume::SculptSettings sculpt_settings;
+  CanvasTransform sculpt_transform{};
+  bool can_configure_sculpt = false, sculpt_mask_visible = false;
   WeightToolSettings weights;
   bool can_paint_weights = false;
   uint64_t weight_gesture = 0;
@@ -117,6 +120,9 @@ struct MeshSnapshot {
   // Empty: ordinary material view. Otherwise one value per packed vertex;
   // -1: ordinary material, [0,1]: unlit selected-joint weight visualization.
   std::vector<float> selected_weights;
+  // Immutable protection overlay: empty ordinary view, otherwise packed vertex
+  // count with -1 for other objects and [0,1] protection on the active sculpt.
+  std::vector<float> sculpt_masks;
   uint64_t weight_gesture = 0;
   size_t weight_samples = 0;
   std::shared_ptr<const MaterialSurfaceQuery> picking;
@@ -202,6 +208,9 @@ public:
   void bind_skin(SkinAuthoringOptions, AssetSource expected = {});
   void paint_command(SpatialCommand);
   void sculpt_command(SpatialCommand);
+  void sculpt_settings(Volume::SculptSettings, AssetSource expected = {});
+  void sculpt_mask_fill(float, AssetSource expected = {});
+  void sculpt_mask_invert(AssetSource expected = {});
   void sculpt_layer_properties(uint64_t object, uint64_t layer, std::string,
                                bool visible, bool locked, float opacity);
   void report_error(std::string);
@@ -334,6 +343,7 @@ private:
     uint64_t weight_gesture = 0;
     std::vector<WeightBrush> weight_samples;
     WeightToolSettings weight_settings;
+    bool sculpt_mask_view = false;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;
@@ -416,6 +426,9 @@ private:
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
   void queue_clear_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
+  bool sculpt_target_ready_locked() const;
+  void sculpt_settings_locked(Volume::SculptSettings, AssetSource = {});
+  void queue_sculpt_mask_locked(std::optional<float>, AssetSource = {});
   bool skin_target_ready_locked() const;
   std::vector<uint64_t> skin_sources_locked(SkinAuthoringMode) const;
   void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {});

@@ -14,7 +14,9 @@ if os.environ.get("DOME_SCULPT_DOME_BUS") != "1":
     os.execvpe("dbus-run-session", ["dbus-run-session", "--", sys.executable, *sys.argv], {**os.environ,"DOME_SCULPT_DOME_BUS":"1"})
 root=Path(os.environ.get("DOME_SCULPT_TEST_ROOT",Path(__file__).resolve().parents[1]))
 compositor=Path(os.environ.get("DOME_COMPOSITOR",root.parent/"dome-compositor/target/release/dome-compositor"))
-out=root/"artifacts/dome-menu";out.mkdir(parents=True,exist_ok=True)
+build=Path(os.environ.get("DOME_SCULPT_TEST_BUILD",root/"build"))
+mask_flow=os.environ.get("DOME_SCULPT_MASK_DOME")=="1"
+out=root/("artifacts/dome-menu-sculpt-mask" if mask_flow else "artifacts/dome-menu");out.mkdir(parents=True,exist_ok=True)
 icd=Path(os.environ["DOME_TEST_VULKAN_ICD"]) if "DOME_TEST_VULKAN_ICD" in os.environ else next((p for p in [Path("/usr/share/vulkan/icd.d/lvp_icd.json"),Path("/usr/share/vulkan/icd.d/lvp_icd."+platform.machine()+".json")] if p.is_file()),None)
 if icd is None or not icd.is_file():raise RuntimeError("Set DOME_TEST_VULKAN_ICD to the installed software Vulkan ICD manifest")
 
@@ -54,7 +56,12 @@ async def main():
         def action(data):urllib.request.urlopen(urllib.request.Request(base+"/api/action",data=json.dumps(data).encode(),headers={"Content-Type":"application/json"}),timeout=2).close()
         await wait(lambda:scene()["source"]=="wayland")
         log=(out/"compositor.log").read_text();wayland=re.search(r"Dome Wayland socket: (\S+)",log)[1]
-        client=start([str(root/"build/dome-sculpt")],"client",{**env,"WAYLAND_DISPLAY":wayland,"FLTK_BACKEND":"wayland"},cwd=tmp)
+        arguments=[str(build/"dome-sculpt")]
+        fixture=home/"masks.dsculpt"
+        if mask_flow:
+            subprocess.run([str(build/"dome-sculpt-mask-document-test"),"--ui-fixture",str(fixture)],check=True)
+            arguments.append(str(fixture))
+        client=start(arguments,"client",{**env,"WAYLAND_DISPLAY":wayland,"FLTK_BACKEND":"wayland"},cwd=tmp)
         def named(title):return next((w for w in scene()["windows"] if title in w["title"]),None)
         window=await wait(lambda:named("Dome Sculpt"))
         check(window["app_id"]=="org.domed.Sculpt","Native Wayland sculpt window publishes the installed Dome Sculpt application identity")
@@ -104,6 +111,11 @@ async def main():
             await key("Return");await asyncio.sleep(.5)
         async def native_command(heading,index,label):
             nodes=await layout()
+            # The canonical exporter may regroup native menu headings. Locate
+            # the current heading instead of assuming its original FLTK order.
+            top=await menu.call_get_layout(0,1,[])
+            headings=[child.value[1].get("label",Variant("s","")).value.replace("_","") for child in top[1][2]]
+            index=2+headings.index(heading) # Shell System and application menus.
             subtree=await menu.call_get_layout(nodes[heading][0],1,[])
             rows=[]
             for child in subtree[1][2]:
@@ -111,6 +123,67 @@ async def main():
                 values={k:v.value for k,v in props.items()}
                 if values.get("type")!="separator" and values.get("enabled",True):rows.append(ident)
             await first(index,rows.index(nodes[label][0]))
+        if mask_flow:
+            def inspect():
+                scene=json.loads(subprocess.check_output([str(build/"dome-sculpt-mask-document-test"),"--inspect",str(fixture)]))
+                for obj in scene["objects"]:
+                    volume=obj["volume"];volume["samples"].sort()
+                    for layer in volume.get("sculpt_layers",[]):layer["delta"].sort()
+                    if "sculpt_mask" in volume:volume["sculpt_mask"]["values"].sort()
+                return scene
+            async def save():
+                for _ in range(300):
+                    nodes=await layout()
+                    if nodes["Save"][1].get("enabled",True):break
+                    await asyncio.sleep(.04)
+                else:raise AssertionError("Mask worker did not enable Save")
+                before=fixture.stat().st_mtime_ns
+                await exported("Save")
+                await wait(lambda:fixture.stat().st_mtime_ns!=before)
+                return inspect()
+            original=inspect()
+            await native_command("Sculpt",4,"Masks and symmetry...")
+            dialog=await wait(lambda:named("Sculpt masks and symmetry"))
+            nodes=await layout()
+            check(dialog["app_id"]==window["app_id"] and scene()["focused"]==dialog["id"],"DomeD focuses native mask controls under the same application identity")
+            check(not nodes["Protect all"][1].get("enabled",True),"Mask modal isolates document worker commands in the universal menu")
+            (out/"dialog-before-fields.json").write_text(json.dumps(scene(),indent=2))
+            hg=host.get_geometry();current=scene()
+            def placed_rect(ident):
+                window=next(w for w in current["windows"] if w["id"]==ident)
+                popup=next((p for p in current["popups"] if p["id"]==ident),None)
+                if popup is None:return window["desktop"]
+                # Native modal windows are spatial popups. Their standalone
+                # desktop slot is unused; shared placement uses parent-local
+                # anchors, clamped to the DomeD output work area (282467e).
+                parent=placed_rect(popup["parent"]);anchor=popup["anchor"]
+                return {"x":max(0,min(parent["x"]+anchor["x"],hg.width-anchor["w"])),
+                        "y":max(36,min(parent["y"]+anchor["y"],hg.height-60-anchor["h"])),
+                        "w":anchor["w"],"h":anchor["h"]}
+            rect=placed_rect(dialog["id"])
+            xtest.fake_input(d,X.MotionNotify,x=int(hg.x+rect["x"]+280),y=int(hg.y+rect["y"]+159));d.sync()
+            xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync();await asyncio.sleep(.2)
+            await exported("Select All");await exported("Copy")
+            nodes=await layout()
+            check(nodes["Cut"][1].get("enabled",False),"Actual Wayland mask numeric fields expose native universal-menu text editing")
+            await native_command("File",2,"Close Window")
+            await wait(lambda:named("Sculpt masks and symmetry") is None)
+            check(await save()==original and client.poll() is None,"Universal File Close cancels mask controls and preserves the exact native project")
+            await native_command("Sculpt",4,"Protect all")
+            filled=await save();volume=filled["objects"][0]["volume"]
+            check(volume["sculpt_mask"]=={"default":1.0,"values":[]},"DomeD keyboard menu navigation publishes real background global protection")
+            check(volume["samples"]==original["objects"][0]["volume"]["samples"],"DomeD mask worker retains the exact sculpt field")
+            await native_command("Edit",3,"Undo")
+            check(await save()==original,"DomeD universal Undo restores the entire mask worker transaction")
+            await native_command("Sculpt",4,"Masks and symmetry...")
+            await wait(lambda:named("Sculpt masks and symmetry"))
+            await chord("Control_L","w")
+            await wait(lambda:named("Sculpt masks and symmetry") is None)
+            check(await save()==original and client.poll() is None,"DomeD Ctrl+W cancels the mask dialog and retains the project")
+            (out/"scene.json").write_text(json.dumps(scene(),indent=2))
+            try:Image.open(out/"render.ppm").transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"mask-wayland.png")
+            except OSError:pass
+            bus.disconnect();d.close();return
         await native_command("Scene",6,"Duplicate object")
         nodes=await layout()
         check(nodes["Delete object"][1].get("enabled") is True,"DomeD Super+F10 and header/row navigation activate the actual exported Duplicate command")

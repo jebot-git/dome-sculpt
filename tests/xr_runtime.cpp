@@ -54,6 +54,8 @@ bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
 std::string skin_mode(){auto mode=getenv("DOME_XR_FIXTURE_SKIN");return mode?mode:"";}
 std::string retopo_mode(){auto mode=getenv("DOME_XR_FIXTURE_RETOPO");return mode?mode:"";}
+std::string mask_mode(){auto mode=getenv("DOME_XR_FIXTURE_SCULPT_MASK");return mode?mode:"";}
+unsigned mask_step=0;bool mask_work_ready=false, mask_work_completed=false, mask_released=false;
 unsigned retopo_step = 0;
 bool retopo_source_ready = false, retopo_apply_ready = false;
 
@@ -356,33 +358,48 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     count(s->eye ? "right_eye_nonblank" : "left_eye_nonblank");
   if (blue > 30)
     count("palette_images");
-  if (!retopo_mode().empty() && (retopo_step == 27 || retopo_step == 60)) {
-    const int sector = retopo_step == 27 ? 0 : 10;
+  if(!mask_mode().empty() && s->eye==0 && mask_step==35) {
+    if(auto path=getenv("DOME_XR_FIXTURE_REPORT")) {
+      std::ofstream capture(std::string(path)+".mask-"+std::to_string(mask_step)+".ppm",std::ios::binary);
+      capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
+      for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)
+        capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+    }
+  }
+  const bool mask_gate=!mask_mode().empty() && (mask_step==68 || mask_step==79);
+  if (mask_gate || (!retopo_mode().empty() && (retopo_step == 27 || retopo_step == 60))) {
+    const int sector = mask_gate || retopo_step == 27 ? 0 : 10;
     float angle = sector * 6.28318530718f / 12;
     float world_x = .6f * 220.f / 640 * std::cos(angle);
-    float world_y = 1.56f + .6f * 220.f / 640 * std::sin(angle);
+    float world_y = 1.56f + .6f / 640 * (220.f * std::sin(angle) + (mask_gate ? 16.f : 0.f));
     float eye_x = (s->eye ? .032f : -.032f) + (frame >= 38 ? -.2f : 0);
-    int cx = int(std::lround(s->width * .5f * (1 + (world_x - eye_x) / (1.01f * std::tan(.6f)))));
-    int cy = int(std::lround(s->height * .5f * (1 + (world_y - 1.6f) / (1.01f * std::tan(.6f)))));
-    int accent = 0, inspected = 0;
-    for (int y = std::max(0,cy-3); y <= std::min(int(s->height)-1,cy+3); ++y)
+    int cx = int(std::lround(s->width * .5f * (1 + (world_x - eye_x) / ((mask_gate?.66f:1.01f) * std::tan(.6f)))));
+    int cy = int(std::lround(s->height * .5f * (1 + (world_y - 1.6f) / ((mask_gate?.66f:1.01f) * std::tan(.6f)))));
+    int accent = 0, transparent=0, inspected = 0;
+    const int half_height=mask_gate?1:3; // Sample the mask cell background above its text.
+    for (int y = std::max(0,cy-half_height); y <= std::min(int(s->height)-1,cy+half_height); ++y)
       for (int x = std::max(0,cx-8); x <= std::min(int(s->width)-1,cx+8); ++x) {
         size_t at = (size_t(y) * s->width + x) * 4;
         ++inspected;
+        transparent+=bytes[at+3]<5;
         if (displayed(bytes[at]) < 150 && displayed(bytes[at+1]) > 130 && displayed(bytes[at+2]) > 220) ++accent;
       }
-    const char *pixels_key = retopo_step == 27 ? "retopo_source_accent_pixels" : "retopo_apply_accent_pixels";
+    const char *pixels_key = mask_gate ? "mask_work_accent_pixels" : retopo_step == 27 ? "retopo_source_accent_pixels" : "retopo_apply_accent_pixels";
     report[pixels_key] = std::max(report.value(pixels_key,0),accent);
-    if (inspected && accent * 2 > inspected) {
-      bool first = retopo_step == 27 ? !retopo_source_ready : !retopo_apply_ready;
+    if(mask_gate && mask_step==68 && inspected && transparent*2>inspected) {
+      mask_work_completed=true;report["mask_work_completed"]=true;
+    }
+    if ((!mask_gate || mask_step==79) && inspected && accent * 2 > inspected) {
+      bool first = mask_gate ? !mask_work_ready : retopo_step == 27 ? !retopo_source_ready : !retopo_apply_ready;
       if (first) if (auto path = getenv("DOME_XR_FIXTURE_REPORT")) {
-        std::ofstream capture(std::string(path) + (retopo_step == 27 ? ".source-ready.ppm" : ".apply-ready.ppm"), std::ios::binary);
+        std::ofstream capture(std::string(path) + (mask_gate ? ".work-ready.ppm" : retopo_step == 27 ? ".source-ready.ppm" : ".apply-ready.ppm"), std::ios::binary);
         capture << "P6\n" << s->width << ' ' << s->height << "\n255\n";
         for (int y = int(s->height)-1; y >= 0; --y) for (unsigned x = 0; x < s->width; ++x)
           for (int channel = 0; channel < 3; ++channel)
             capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+channel])));
       }
-      if (retopo_step == 27) { retopo_source_ready = true; report["retopo_source_ready"] = true; }
+      if (mask_gate) { mask_work_ready=true;report["mask_work_ready"]=true; }
+      else if (retopo_step == 27) { retopo_source_ready = true; report["retopo_source_ready"] = true; }
       else { retopo_apply_ready = true; report["retopo_apply_ready"] = true; }
     }
   }
@@ -428,8 +445,8 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     return XR_SUCCESS;
   }
   auto retopo = retopo_mode();
-  unsigned focus_frame = retopo.empty() ? frame : retopo_step;
-  unsigned focus_at = retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
+  unsigned focus_frame = !mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_step;
+  unsigned focus_at = !mask_mode().empty() ? (mask_mode()=="focus"?40:90) : retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
   if (focus_frame >= focus_at && !lost) {
     lost = true;
     auto e = reinterpret_cast<XrEventDataSessionStateChanged *>(out);
@@ -448,7 +465,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_regains");
     return XR_SUCCESS;
   }
-  if (retopo.empty() && frame >= 35 && !reference_event) {
+  if (retopo.empty() && mask_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -470,6 +487,13 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
                    (mode!="unconfirmed" && retopo_step == 60 && !retopo_apply_ready);
     if (!waiting) ++retopo_step;
     report["retopo_script_step"] = retopo_step;
+  }
+  if(auto mode=mask_mode();!mode.empty()) {
+    // A completed radial action disarms its input lease. The first released
+    // sample rearms; a second released sample selects the next sector.
+    if(mask_step==17 && !mask_released) mask_released=true;
+    else if(!((mode=="fill" || mode=="undo") && ((mask_step==68 && !mask_work_completed) || (mask_step==79 && !mask_work_ready)))) ++mask_step;
+    report["mask_script_step"]=mask_step;
   }
   p->predictedDisplayTime = 1000000000 + frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
@@ -511,7 +535,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && skin_mode()!="focus" && retopo_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
@@ -569,6 +593,14 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->currentState = button && (common || apply);
     out->changedSinceLastSync = button;
   }
+  if(auto mode=mask_mode();!mode.empty()) {
+    auto step=mask_step;
+    bool common=step==8 || step==10 || step==12 || step==14 || step==16 || step==18 || step==22 || step==24 || step==28 || step==30 || step==46 || step==48 || step==50 || step==52 || step==54;
+    bool fill=(mode=="fill" || mode=="undo") && (step==66 || step==70 || step==72 || step==74 || step==76 || step==80);
+    bool undo=mode=="undo" && (step==84 || step==86);
+    out->currentState=button && (common || fill || undo);out->changedSinceLastSync=button;
+    if(button)report["mask_buttons"][std::to_string(step)]=bool(out->currentState);
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
@@ -602,11 +634,15 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
       stroke = mode!="committed" && (step==32 || (mode=="focus" ? (step>=36 && step<=41) || step==48 || step==52
                                                                              : step==36 || step==40));
     }
+    if(auto mode=mask_mode();!mode.empty()) {
+      auto step=mask_step;stroke=step==20 || step==26 || step==32 || step==56 || step==58 || step==62 || (mode=="focus" && step>=36 && step<=41);
+    }
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
       out->currentState = .9f;
       if (!retopo_mode().empty()) count("retopo_pressure_samples");
+      if (!mask_mode().empty()) count("mask_pressure_samples");
       count(a->name == "tip_force" ? "tip_pressure_samples"
                                    : "trigger_pressure_samples");
     }
@@ -717,6 +753,23 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(step==57 || step==58) out->currentState={.5f,.8660254f};
     if(step>=60 && step<=62) out->currentState={.5f,-.8660254f};
   }
+  if(!mask_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
+    auto step=mask_step;out->currentState={0,0};
+    int sector=-1;
+    if(step==9 || step==10 || step==47 || step==48) sector=8;
+    if(step==11 || step==12 || step==13 || step==14 || step==49 || step==50 || step==51 || step==52) sector=11;
+    if(step==15 || step==16) sector=6;
+    if(step==17 || step==18) sector=2;
+    if(step==23 || step==24) sector=1;
+    if(step==29 || step==30 || (step>=68 && step<=69) || (step>=77 && step<=80)) sector=0;
+    if(step==71 || step==72) sector=8;
+    if(step==73 || step==74 || step==75 || step==76) sector=11;
+    if(step==53 || step==54) sector=10;
+    if(step==65 || step==66) sector=3;
+    if(step==85 || step==86) sector=4;
+    if(sector>=0) {float angle=sector*6.28318530718f/12;out->currentState={std::cos(angle),std::sin(angle)};}
+    report["mask_vectors"][std::to_string(step)]={out->currentState.x,out->currentState.y};
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStatePose, XrSession, const XrActionStateGetInfo *,
@@ -736,7 +789,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
-  if (frame == 22 && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty()) {
+  if (frame == 22 && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
@@ -788,6 +841,19 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     else if(step==36 || step==48) { x=.2f; y=-.2f; }
     else if(step==40 || step==52) { x=0; y=.2f; }
     p->pose.position={x,1.48f+y,-.83f};
+  }
+  if(auto mode=mask_mode();!mode.empty() && s->action && right(s->hand)) {
+    auto step=mask_step;p->pose.position={0,1.48f,-.48f};
+    if(step==32) p->pose.position={.11f,1.48f,-.67f};
+    if(mode=="focus" && step>=36 && step<=41) p->pose.position={-.1f,1.60f,-.68f};
+    if(s->action->name=="aim_pose" && (step==20 || step==26 || step==56 || step==58 || step==62)) {
+      float x=100+420*.35f,y=300;
+      if(step==26)x=100;
+      if(step==56){x=100+420*.6f;y=210;}
+      if(step==58){x=100;y=420;}
+      if(step==62){x=mode=="accept"?470:170;y=609;}
+      p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
+    }
   }
   return XR_SUCCESS;
 }

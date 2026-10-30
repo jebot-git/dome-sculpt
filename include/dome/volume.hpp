@@ -4,6 +4,7 @@
 #include "cow-map.hpp"
 #include <deque>
 #include <filesystem>
+#include <functional>
 #include <nlohmann/json_fwd.hpp>
 #include <optional>
 #include <unordered_map>
@@ -12,6 +13,24 @@ namespace dome {
 class Volume {
 public:
   using Voxels = std::unordered_map<Int3, float, IntHash>;
+  enum class MaskTool : int { Add, Subtract, Smooth };
+  struct SculptSettings {
+    unsigned symmetry_axes = 0; // X=1, Y=2, Z=4, object-local planes.
+    Vec3 symmetry_origin{};
+    bool mask_edit = false, mask_visible = true;
+    MaskTool mask_tool = MaskTool::Add;
+    float mask_strength = 1;
+  };
+  const SculptSettings &sculpt_settings() const { return settings_; }
+  bool sculpt_settings(SculptSettings);
+  // Sparse exceptions to a global default. Fill/Invert never enumerate empty
+  // space: a full mask also protects geometry created later in this object.
+  float mask_at(Int3) const;
+  float mask_sample(Vec3) const;
+  float mask_default() const { return mask_.background; }
+  const Voxels &mask_values() const { return mask_.values.read(); }
+  bool fill_mask(float, const std::function<bool()> &cancelled = {});
+  bool invert_mask(const std::function<bool()> &cancelled = {});
   struct Layer {
     uint64_t id = 1;
     std::string name = "Base";
@@ -39,12 +58,13 @@ public:
                               float maximum = 20) const;
   void begin_stroke();
   void stamp(Brush brush, size_t sample_budget = 4'000'000);
+  void stamp(Brush, size_t sample_budget, const std::function<bool()> &cancelled);
   bool end_stroke();
   void cancel_stroke();
   bool undo();
   bool redo();
   bool in_stroke() const { return editing_; }
-  bool pending_changes() const { return !before_.empty(); }
+  bool pending_changes() const { return !before_.empty() || mask_changed_; }
   size_t undo_count() const { return undo_.size(); }
   uint64_t revision() const { return revision_; }
   Volume geometry_snapshot() const;
@@ -55,6 +75,18 @@ public:
   static Volume load(const std::filesystem::path &);
 
 private:
+  struct MaskState {
+    CowMap<Int3, float, IntHash> values;
+    float background = 0;
+  };
+  MaskState mask_;
+  SculptSettings settings_;
+  std::optional<MaskState> mask_start_;
+  std::optional<CowMap<Int3, float, IntHash>> cells_start_;
+  std::optional<CowMap<Int3, double, IntHash>> delta_start_;
+  bool mask_stroke_ = false, mask_changed_ = false;
+  static bool same_settings(const SculptSettings &, const SculptSettings &);
+  static bool same_mask(const MaskState &, const MaskState &);
   struct Edit {
     Int3 key;
     float before, after;
@@ -62,7 +94,11 @@ private:
   };
   struct Command : std::vector<Edit> {
     uint64_t layer = 1;
+    std::optional<MaskState> mask_before, mask_after;
+    std::optional<SculptSettings> settings_before, settings_after;
+    size_t bytes() const;
   };
+  void push_command(Command);
   std::vector<Layer> layers_{Layer{}};
   uint64_t active_ = 1, next_layer_ = 2;
   std::unordered_map<Int3, double, IntHash> before_delta_;

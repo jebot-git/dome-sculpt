@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/volume.hpp"
 #include "io.hpp"
+#include "sculpt-mask.hpp"
+#include "sculpt-symmetry.hpp"
 #include <fcntl.h>
 #include <fstream>
 #include <limits>
@@ -67,7 +69,7 @@ size_t Volume::stored_samples() const {
   size_t n = 0;
   for (auto &l : layers_)
     n += l.delta.size();
-  return n;
+  return n + mask_.values.size();
 }
 double Volume::sum(Int3 p, uint64_t exclude) const {
   double v = band();
@@ -157,6 +159,8 @@ Volume Volume::geometry_snapshot() const {
   result.active_ = active_;
   result.next_layer_ = next_layer_;
   result.revision_ = revision_;
+  result.mask_ = mask_;
+  result.settings_ = settings_;
   return result;
 }
 float Volume::sample(Vec3 p) const {
@@ -202,14 +206,20 @@ std::optional<Vec3> Volume::raycast(Vec3 origin, Vec3 direction,
 void Volume::begin_stroke() {
   if (editing_)
     throw std::logic_error("A stroke is already active");
-  if (!editable_layer())
+  if (!settings_.mask_edit && !editable_layer())
     throw std::logic_error(
         "Active sculpt layer is hidden, locked or has zero opacity");
   editing_ = true;
+  mask_stroke_ = settings_.mask_edit;
+  mask_changed_ = false;
+  if (mask_stroke_) mask_start_ = mask_;
+  else { cells_start_ = cells_; delta_start_ = layer(active_).delta; }
   before_delta_.clear();
   before_.clear();
 }
-void Volume::stamp(Brush b, size_t sample_budget) {
+void Volume::stamp(Brush b, size_t sample_budget) { stamp(b, sample_budget, {}); }
+void Volume::stamp(Brush b, size_t sample_budget, const std::function<bool()> &cancelled) {
+  sculpt_detail::checkpoint(cancelled);
   if (!editing_)
     throw std::logic_error("Begin a stroke before sculpting");
   if (!finite(b.from) || !finite(b.to) || !finite(b.normal) ||
@@ -217,7 +227,7 @@ void Volume::stamp(Brush b, size_t sample_budget) {
       !std::isfinite(b.strength) || b.strength < 0 || b.strength > 1 ||
       !std::isfinite(b.pressure) || b.pressure < 0 || b.pressure > 1 ||
       !std::isfinite(b.blend) || b.blend < 0 || b.blend > b.radius ||
-      int(b.tool) < 0 || int(b.tool) > 3)
+      int(b.tool) < 0 || int(b.tool) > 3 || b.operation != BrushOperation::Sculpt || b.symmetry_axes != 0)
     throw std::invalid_argument("Invalid sculpt brush");
   if (std::max({std::abs(b.from.x), std::abs(b.from.y), std::abs(b.from.z),
                 std::abs(b.to.x), std::abs(b.to.y), std::abs(b.to.z)}) > 100)
@@ -226,68 +236,136 @@ void Volume::stamp(Brush b, size_t sample_budget) {
     return;
   b.band = band();
   b.normal = normalized(b.normal);
+  b.symmetry_axes = settings_.symmetry_axes;
+  b.symmetry_origin = settings_.symmetry_origin;
+  if (mask_stroke_) {
+    b.operation = settings_.mask_tool == MaskTool::Add ? BrushOperation::MaskAdd
+        : settings_.mask_tool == MaskTool::Subtract ? BrushOperation::MaskSubtract
+        : BrushOperation::MaskSmooth;
+    b.strength *= settings_.mask_strength;
+    if (!b.strength) return;
+  }
   float margin = b.radius + b.blend + voxel_;
-  Int3 lo{int(std::floor((std::min(b.from.x, b.to.x) - margin) / voxel_)),
-          int(std::floor((std::min(b.from.y, b.to.y) - margin) / voxel_)),
-          int(std::floor((std::min(b.from.z, b.to.z) - margin) / voxel_))};
-  Int3 hi{int(std::ceil((std::max(b.from.x, b.to.x) + margin) / voxel_)),
-          int(std::ceil((std::max(b.from.y, b.to.y) + margin) / voxel_)),
-          int(std::ceil((std::max(b.from.z, b.to.z) + margin) / voxel_))};
-  uint64_t nx = hi.x - lo.x + 1, ny = hi.y - lo.y + 1, nz = hi.z - lo.z + 1;
-  if (nx > 2'000'000 || ny > 2'000'000 || nz > 2'000'000)
-    throw std::length_error("Brush bounds exceed the interactive voxel budget");
-  uint64_t count = nx * ny * nz;
-  if (count > 2'000'000)
-    throw std::length_error("Brush sweep exceeds the interactive voxel budget; "
-                            "shorten it or increase voxel size");
-  std::vector<Sample> samples;
   std::vector<Int3> keys;
-  samples.reserve(count);
-  keys.reserve(count);
-  for (int z = lo.z; z <= hi.z; ++z)
-    for (int y = lo.y; y <= hi.y; ++y)
-      for (int x = lo.x; x <= hi.x; ++x) {
-        Int3 q{x, y, z};
-        float average = 0;
-        for (Int3 n : {Int3{1, 0, 0},
-                       {-1, 0, 0},
-                       {0, 1, 0},
-                       {0, -1, 0},
-                       {0, 0, 1},
-                       {0, 0, -1}})
-          average += at(q + n) / 6;
-        keys.push_back(q);
-        samples.push_back(
-            {{x * voxel_, y * voxel_, z * voxel_}, at(q), average});
-      }
-  // Compute into detached storage. A failed GPU operation cannot partially edit
-  // the volume.
-  apply_brush(samples, b);
-  for (auto s : samples)
-    if (!std::isfinite(s.distance))
-      throw std::runtime_error(
-          "Compute backend returned a non-finite distance");
-  size_t extra = 0;
-  auto &target = layer(active_).delta;
-  for (size_t i = 0; i < keys.size(); ++i)
-    if (samples[i].distance != at(keys[i]) && !target.contains(keys[i]))
-      extra++;
-  if (stored_samples() + extra > std::min(size_t(4'000'000), sample_budget))
-    throw std::length_error("Sculpt layer storage budget exceeded");
+  std::unordered_map<Int3, bool, IntHash> visited;
+  uint64_t work = 0;
+  const int domain = int(101 / voxel_);
+  for (auto &image : sculpt_detail::images(b)) {
+    if (std::max({std::abs(image.from.x), std::abs(image.from.y), std::abs(image.from.z),
+                  std::abs(image.to.x), std::abs(image.to.y), std::abs(image.to.z)}) > 100)
+      throw std::invalid_argument("Mirrored sculpt position exceeds the workspace bounds");
+    Int3 lo{std::max(-domain, int(std::floor((std::min(image.from.x, image.to.x) - margin) / voxel_))),
+            std::max(-domain, int(std::floor((std::min(image.from.y, image.to.y) - margin) / voxel_))),
+            std::max(-domain, int(std::floor((std::min(image.from.z, image.to.z) - margin) / voxel_)))};
+    Int3 hi{std::min(domain, int(std::ceil((std::max(image.from.x, image.to.x) + margin) / voxel_))),
+            std::min(domain, int(std::ceil((std::max(image.from.y, image.to.y) + margin) / voxel_))),
+            std::min(domain, int(std::ceil((std::max(image.from.z, image.to.z) + margin) / voxel_)))};
+    uint64_t nx = hi.x - lo.x + 1, ny = hi.y - lo.y + 1, nz = hi.z - lo.z + 1;
+    constexpr uint64_t maximum = 2'000'000;
+    if (nx > maximum || ny > maximum / nx || nz > maximum / (nx * ny) ||
+        nx * ny * nz > maximum - work)
+      throw std::length_error("Brush/symmetry support exceeds the interactive voxel budget");
+    work += nx * ny * nz;
+    // Enumerate each mirror's own box, never the possibly enormous empty gap.
+    for (int z = lo.z; z <= hi.z; ++z)
+      for (int y = lo.y; y <= hi.y; ++y)
+        for (int x = lo.x; x <= hi.x; ++x) {
+          if ((keys.size() & 1023) == 0) sculpt_detail::checkpoint(cancelled);
+          Int3 q{x, y, z};
+          if (visited.emplace(q, true).second) keys.push_back(q);
+        }
+  }
+  std::vector<Sample> samples;
+  samples.reserve(keys.size());
   for (size_t i = 0; i < keys.size(); ++i) {
-    float old = at(keys[i]), value = samples[i].distance;
-    if (value == old)
-      continue;
-    before_.try_emplace(keys[i], old);
-    auto &d = layer(active_).delta;
-    auto it = d.find(keys[i]);
-    before_delta_.try_emplace(keys[i], it == d.end() ? 0 : it->second);
-    set(keys[i], value);
+    if ((i & 1023) == 0) sculpt_detail::checkpoint(cancelled);
+    auto q = keys[i]; float average = 0;
+    bool uniform_mask = true;
+    float current_mask = mask_stroke_ ? mask_at(q) : 0;
+    for (Int3 n : {Int3{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}}) {
+      float neighbour = mask_stroke_ ? mask_at(q + n) : at(q + n);
+      average += neighbour / 6;
+      if (mask_stroke_ && neighbour != current_mask) uniform_mask = false;
+    }
+    // A uniform protection default must not acquire sparse float-roundoff
+    // exceptions merely because six equal values were summed for smoothing.
+    if (mask_stroke_ && uniform_mask) average = current_mask;
+    samples.push_back({{q.x * voxel_, q.y * voxel_, q.z * voxel_},
+        mask_stroke_ ? mask_at(q) : at(q), average, mask_stroke_ ? 1.f : 1.f - mask_at(q)});
+  }
+  sculpt_detail::checkpoint(cancelled);
+  // One selected-backend dispatch for all mirrors and mask modes. Protection
+  // scales the kernel delta without altering pressure-dependent radius.
+  apply_brush(samples, b);
+  sculpt_detail::checkpoint(cancelled);
+  for (auto &sample : samples)
+    if (!std::isfinite(sample.distance) ||
+        (mask_stroke_ && (sample.distance < 0 || sample.distance > 1)))
+      throw std::runtime_error("Compute backend returned an invalid sculpt sample");
+  size_t extra = 0, removed = 0;
+  auto &target = layer(active_).delta;
+  for (size_t i = 0; i < keys.size(); ++i) {
+    auto q = keys[i]; float old = mask_stroke_ ? mask_at(q) : at(q);
+    if (samples[i].distance != old) {
+      if (mask_stroke_ && mask_.values.contains(q) && samples[i].distance == mask_.background) ++removed;
+      else if (mask_stroke_ ? !mask_.values.contains(q) : !target.contains(q)) ++extra;
+    }
+  }
+  auto limit = std::min(size_t(4'000'000), sample_budget);
+  if (stored_samples() - removed > limit || extra > limit - (stored_samples() - removed))
+    throw std::length_error("Sculpt layer/mask storage budget exceeded");
+  if (mask_stroke_) {
+    auto staged = mask_;
+    bool changed = false;
+    for (size_t i = 0; i < keys.size(); ++i) {
+      if ((i & 1023) == 0) sculpt_detail::checkpoint(cancelled);
+      float value = samples[i].distance; auto q = keys[i];
+      if (value == mask_at(q)) continue;
+      changed = true;
+      if (value == staged.background) staged.values.erase(q);
+      else staged.values[q] = value;
+    }
+    sculpt_detail::checkpoint(cancelled);
+    if (changed) { mask_ = std::move(staged); mask_changed_ = true; ++revision_; }
+  } else {
+    // Prepare all allocations before publishing any field, displacement or
+    // stroke-history mutation. Cancellation/allocation failure is transactional.
+    auto staged_cells = cells_;
+    auto staged_delta = target;
+    auto staged_before = before_;
+    auto staged_before_delta = before_delta_;
+    bool changed = false;
+    for (size_t i = 0; i < keys.size(); ++i) {
+      if ((i & 1023) == 0) sculpt_detail::checkpoint(cancelled);
+      auto q = keys[i]; float old = at(q), value = samples[i].distance;
+      if (value == old) continue;
+      changed = true;
+      staged_before.try_emplace(q, old);
+      auto found = target.find(q);
+      staged_before_delta.try_emplace(q, found == target.end() ? 0 : found->second);
+      staged_delta[q] = (double(value) - sum(q, active_)) / layer(active_).opacity;
+      if (value >= band()) staged_cells.erase(q); else staged_cells[q] = value;
+    }
+    sculpt_detail::checkpoint(cancelled);
+    if (changed) {
+      cells_ = std::move(staged_cells); target = std::move(staged_delta);
+      before_ = std::move(staged_before); before_delta_ = std::move(staged_before_delta); ++revision_;
+    }
   }
 }
+
 bool Volume::end_stroke() {
   if (!editing_)
     return false;
+  if (mask_stroke_) {
+    bool changed = !same_mask(mask_, *mask_start_);
+    if (changed) {
+      Command command; command.mask_before = *mask_start_; command.mask_after = mask_;
+      push_command(std::move(command));
+    }
+    mask_start_.reset(); mask_changed_ = false; mask_stroke_ = false; editing_ = false;
+    return changed;
+  }
   Command command;
   command.layer = active_;
   command.reserve(before_.size());
@@ -301,72 +379,67 @@ bool Volume::end_stroke() {
     } else
       command.push_back(
           {p, old, at(p), before_delta_.at(p), layer(active_).delta.at(p)});
+  bool changed = !command.empty();
+  if (changed) push_command(std::move(command));
+  if (!changed) { cells_ = std::move(*cells_start_); layer(active_).delta = std::move(*delta_start_); }
+  cells_start_.reset(); delta_start_.reset();
   editing_ = false;
-  before_.clear();
-  before_delta_.clear();
-  if (command.empty())
-    return false;
-  for (auto &c : redo_)
-    history_bytes_ -= c.size() * sizeof(Edit);
-  redo_.clear();
-  history_bytes_ += command.size() * sizeof(Edit);
-  undo_.push_back(std::move(command));
-  while (history_bytes_ > history_limit_ && undo_.size() > 1) {
-    history_bytes_ -= undo_.front().size() * sizeof(Edit);
-    undo_.pop_front();
-  }
-  return true;
+  before_.clear(); before_delta_.clear();
+  return changed;
 }
+
 void Volume::cancel_stroke() {
-  for (auto [p, old] : before_) {
-    auto d = before_delta_.at(p);
-    auto &delta = layer(active_).delta;
-    if (d == 0)
-      delta.erase(p);
-    else
-      delta[p] = d;
-    raw_set(p, old);
+  if (mask_stroke_) {
+    mask_ = std::move(*mask_start_); mask_start_.reset();
+    mask_stroke_ = mask_changed_ = editing_ = false; ++revision_; return;
   }
-  before_delta_.clear();
-  before_.clear();
-  editing_ = false;
+  if (!editing_) return;
+  cells_ = std::move(*cells_start_); layer(active_).delta = std::move(*delta_start_);
+  cells_start_.reset(); delta_start_.reset();
+  before_delta_.clear(); before_.clear(); editing_ = false; ++revision_;
 }
+
 bool Volume::undo() {
   if (editing_)
     throw std::logic_error("End the stroke before undo");
   if (undo_.empty())
     return false;
-  auto c = std::move(undo_.back());
-  undo_.pop_back();
+  const auto &c = undo_.back();
+  auto next_cells = cells_;
+  std::optional<CowMap<Int3,double,IntHash>> next_delta;
+  if (!c.empty()) next_delta = layer(c.layer).delta;
   for (auto e : c) {
-    auto &d = layer(c.layer).delta;
-    if (e.delta_before == 0)
-      d.erase(e.key);
-    else
-      d[e.key] = e.delta_before;
-    raw_set(e.key, e.before);
+    if (e.delta_before == 0) next_delta->erase(e.key); else (*next_delta)[e.key] = e.delta_before;
+    if (e.before >= band()) next_cells.erase(e.key); else next_cells[e.key] = e.before;
   }
-  redo_.push_back(std::move(c));
+  redo_.emplace_back(); // Allocate history destination before publishing state.
+  if (c.mask_before) mask_ = *c.mask_before;
+  if (c.settings_before) settings_ = *c.settings_before;
+  if (next_delta) layer(c.layer).delta = std::move(*next_delta);
+  cells_ = std::move(next_cells); ++revision_;
+  redo_.back() = std::move(undo_.back()); undo_.pop_back();
   return true;
 }
 bool Volume::redo() {
-  if (editing_)
-    throw std::logic_error("End the stroke before redo");
-  if (redo_.empty())
-    return false;
-  auto c = std::move(redo_.back());
-  redo_.pop_back();
+  if (editing_) throw std::logic_error("End the stroke before redo");
+  if (redo_.empty()) return false;
+  const auto &c = redo_.back();
+  auto next_cells = cells_;
+  std::optional<CowMap<Int3,double,IntHash>> next_delta;
+  if (!c.empty()) next_delta = layer(c.layer).delta;
   for (auto e : c) {
-    auto &d = layer(c.layer).delta;
-    if (e.delta_after == 0)
-      d.erase(e.key);
-    else
-      d[e.key] = e.delta_after;
-    raw_set(e.key, e.after);
+    if (e.delta_after == 0) next_delta->erase(e.key); else (*next_delta)[e.key] = e.delta_after;
+    if (e.after >= band()) next_cells.erase(e.key); else next_cells[e.key] = e.after;
   }
-  undo_.push_back(std::move(c));
+  undo_.emplace_back();
+  if (c.mask_after) mask_ = *c.mask_after;
+  if (c.settings_after) settings_ = *c.settings_after;
+  if (next_delta) layer(c.layer).delta = std::move(*next_delta);
+  cells_ = std::move(next_cells); ++revision_;
+  undo_.back() = std::move(redo_.back()); redo_.pop_back();
   return true;
 }
+
 void Volume::save(const std::filesystem::path &path) const {
   auto bytes = nlohmann::json::to_cbor(encode());
   if (bytes.size() > 128 * 1024 * 1024)
@@ -398,6 +471,16 @@ nlohmann::json Volume::encode() const {
                                   {"opacity", l.opacity},
                                   {"delta", std::move(ds)}});
   }
+  if (mask_.background != 0 || mask_.values.size() || !same_settings(settings_, SculptSettings{})) {
+    j["version"] = 3;
+    j["sculpt_mask"] = {{"default",mask_.background},{"values",nlohmann::json::array()}};
+    for (auto &[p,value] : mask_.values) j["sculpt_mask"]["values"].push_back({p.x,p.y,p.z,value});
+    auto &c = settings_;
+    j["sculpt_controls"] = {{"symmetry_axes",c.symmetry_axes},
+      {"symmetry_origin",{c.symmetry_origin.x,c.symmetry_origin.y,c.symmetry_origin.z}},
+      {"mask_edit",c.mask_edit},{"mask_visible",c.mask_visible},
+      {"mask_tool",int(c.mask_tool)},{"mask_strength",c.mask_strength}};
+  }
   return j;
 }
 Volume Volume::load(const std::filesystem::path &path) {
@@ -410,7 +493,7 @@ Volume Volume::load(const std::filesystem::path &path) {
 }
 Volume Volume::decode(const nlohmann::json &j) {
   if (j.at("format") != "dome-sculpt" ||
-      (j.at("version") != 1 && j.at("version") != 2))
+      (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3))
     throw std::runtime_error("Unsupported project format");
   Volume v(j.at("voxel_size").get<float>());
   auto &samples = j.at("samples");
@@ -448,7 +531,7 @@ Volume Volume::decode(const nlohmann::json &j) {
       outside.push_back(p);
   for (auto p : outside)
     v.cells_.erase(p);
-  if (j.at("version") == 2 && !j.contains("sculpt_layers"))
+  if (j.at("version") >= 2 && !j.contains("sculpt_layers"))
     throw std::runtime_error("Missing sculpt layer data");
   if (j.contains("sculpt_layers")) {
     auto &a = j.at("sculpt_layers");
@@ -515,6 +598,49 @@ Volume Volume::decode(const nlohmann::json &j) {
   } else {
     for (auto &[p, d] : v.cells_)
       v.layers_.front().delta[p] = double(d) - v.band();
+  }
+  if (j.at("version") == 3) {
+    auto &mask = j.at("sculpt_mask");
+    v.mask_.background = mask.at("default").get<float>();
+    if (!std::isfinite(v.mask_.background) || v.mask_.background < 0 || v.mask_.background > 1)
+      throw std::runtime_error("Invalid sculpt mask default");
+    auto &values = mask.at("values");
+    if (!values.is_array() || values.size() > 4'000'000 ||
+        values.size() > 4'000'000 - v.stored_samples())
+      throw std::length_error("Sculpt mask/layer storage budget exceeded");
+    for (auto &item : values) {
+      if (!item.is_array() || item.size() != 4) throw std::runtime_error("Invalid sculpt mask entry");
+      Int3 p; int *axes[] = {&p.x,&p.y,&p.z};
+      for (int k = 0; k < 3; ++k) {
+        if (!item[k].is_number_integer() ||
+            (item[k].is_number_unsigned() && item[k].get<uint64_t>() > uint64_t(INT32_MAX)))
+          throw std::runtime_error("Invalid sculpt mask coordinate");
+        auto coordinate = item[k].get<int64_t>(); auto limit = int64_t(101 / v.voxel_);
+        if (coordinate < -limit || coordinate > limit) throw std::runtime_error("Mask coordinate outside workspace");
+        *axes[k] = int(coordinate);
+      }
+      float value = item[3].get<float>();
+      if (!std::isfinite(value) || value < 0 || value > 1 || value == v.mask_.background ||
+          !v.mask_.values.emplace(p,value).second) throw std::runtime_error("Invalid or duplicate sculpt mask value");
+    }
+    auto &controls = j.at("sculpt_controls");
+    if (!controls.at("symmetry_axes").is_number_unsigned() && !controls.at("symmetry_axes").is_number_integer())
+      throw std::runtime_error("Invalid symmetry axes");
+    auto bits = controls.at("symmetry_axes").get<int64_t>();
+    if (bits < 0 || bits > 7) throw std::runtime_error("Invalid symmetry axes");
+    auto origin = controls.at("symmetry_origin").get<std::array<float,3>>();
+    SculptSettings settings; settings.symmetry_axes = unsigned(bits); settings.symmetry_origin = {origin[0],origin[1],origin[2]};
+    settings.mask_edit = controls.at("mask_edit").get<bool>(); settings.mask_visible = controls.at("mask_visible").get<bool>();
+    auto &tool_value = controls.at("mask_tool");
+    if (!tool_value.is_number_integer() ||
+        (tool_value.is_number_unsigned() && tool_value.get<uint64_t>() > 2))
+      throw std::runtime_error("Invalid sculpt mask tool");
+    auto tool = tool_value.get<int64_t>();
+    if (tool < 0 || tool > 2) throw std::runtime_error("Invalid sculpt mask tool");
+    settings.mask_tool = MaskTool(tool); settings.mask_strength = controls.at("mask_strength").get<float>();
+    v.sculpt_settings(settings); v.clear_history();
+  } else if (j.contains("sculpt_mask") || j.contains("sculpt_controls")) {
+    throw std::runtime_error("Sculpt mask/controls require volume version 3");
   }
   return v;
 }

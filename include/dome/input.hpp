@@ -71,8 +71,13 @@ enum class SpatialCommand {
   WeightToggle, WeightMode, WeightSymmetry, WeightLock, WeightLinked,
   BindSkin, SkinUseLocks,
   RetopoBegin, RetopoMode, RetopoFace, RetopoWire, RetopoDelete, RetopoRelax,
-  RetopoPin, RetopoSeam, RetopoApply, RetopoCancel
+  RetopoPin, RetopoSeam, RetopoApply, RetopoCancel,
+  SculptMaskToggle, SculptMaskFill, SculptMaskClear, SculptMaskInvert,
+  SculptMirrorX, SculptMirrorY, SculptMirrorZ, SculptMaskResume, SculptMaskVisible
 };
+inline bool sculpt_mask_command(SpatialCommand c) {
+  return c >= SpatialCommand::SculptMaskToggle && c <= SpatialCommand::SculptMaskVisible;
+}
 const std::array<const char *, 12> &spatial_labels(int page);
 std::optional<SpatialCommand> spatial_action(int page, int index);
 struct SpatialSample {
@@ -143,7 +148,7 @@ public:
     std::function<bool()> end;
   } backend;
   bool painting = false;
-  bool retopology = false;
+  bool retopology = false, sculpt_mask_edit = false;
   std::function<bool(VrParameter)> parameter_allowed;
   std::function<bool()> control_accept;
   std::vector<VrControlEvent> take_controls() {
