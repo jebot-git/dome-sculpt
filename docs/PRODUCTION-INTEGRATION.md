@@ -30,17 +30,17 @@ isolation. Those interactive workflows are separate agent branches, not implemen
 by this integration alone. General colored-source baking and the other uncompleted
 original requirements remain required.
 
-## Qualification so far
+## Qualification
 
 The candidate uses a regular-user optimized Release build against the prepared
 DomeD FLTK 1.4.5+22 toolkit from commit 282467e. The DomeD remote was rechecked and
 still points to 282467e727df78c8e7f2452aa05a7747bac854a6. No active session was
 restarted, no system installation was performed and no new headset test is claimed.
 
-- CPU native suite: 146/146 passed in the final full run.
+- CPU native suite: 146/146 passed in the final full run (202.91 seconds).
 - Whole C/C++ core, xatlas, both Mikk builds and ufbx instrumented with ASan/UBSan:
-  35 selected suites passed with leak detection. This is not all-suite sanitizer
-  qualification.
+  37 selected suites passed with leak detection. This is not all-suite sanitizer
+  qualification. The final focused run took 159.25 seconds.
 - Actual FLTK workflows: 51 checks passed: bake 7+4 compact; static import 8;
   authored-skin import 8; VRoid-only creation 11+13 compact.
 - Synthetic real-loader OpenXR: all four suites pass (150 original, 17 resolution,
@@ -51,16 +51,20 @@ restarted, no system installation was performed and no new headset test is claim
 - Eight direct graphics fixtures pass on Intel Arc A770: retained frames,
   independent glTF/VRM consumers, source colors, buffer reuse, resolved VRM roles
   and independently rendered authored/implicit skin binds.
-- The initial full OneAPI run passes 145 of 147 suites. Two global-allocation fault
-  fixtures are being investigated: first-use runtime allocation counts vary, and
-  persistent allocation blackout reaches an unchecked null allocation in Intel's
-  Level Zero driver. GDB identifies NEO CommandContainer::fillReusableAllocationLists;
-  a single failed allocation instead produces a typed UR out-of-memory error.
-  The native-worker fixture now warms first-use global JIT state before counting
-  comparable workers; 59 actual failures pass on CPU (601 allocations) and OneAPI
-  (702 allocations), with cold ray-index construction and all rollback assertions
-  retained. The paged-device fault model is still being qualified. Do not claim full
-  OneAPI qualification until that work passes.
+- OneAPI final full native suite: 147/147 passed (237.16 seconds) on actual Arc
+  compute. The original run's two fault-fixture failures remain documented. Native
+  workers now warm global first-use JIT state before measuring comparable workers;
+  every measured/faulted ray index remains cold. The paged GPU fixture injects one
+  failed allocation at a time, requires an actual hit and accepts only typed host/
+  device memory errors, while retaining every owner/history/state assertion.
+  CPU persistent-failure policy is unchanged. Separate fresh-thread tests cover
+  the application's cold result/device-record allocations. See
+  [paged allocation evidence](PAGED-VOLUME-ALLOCATION-VALIDATION.md).
+
+The permanent whole-process heap blackout still exposes an unchecked null allocation
+in the installed Intel Level Zero driver. No driver patch or universal process-wide
+OOM recovery is claimed. No CPU fallback, dropped owned allocation site, generic
+exception acceptance or relaxed source/history check was introduced to pass tests.
 
 Retained integration failures include the removed MakeHuman fixture's misspelled
 helper (`spatial_command` instead of the public `spatial_action`), the old blanket

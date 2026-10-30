@@ -19,17 +19,19 @@ suite. Exact origins, licenses and source checksums are in
 ## Build
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR=/opt/fltk-vr/toolkit/share/fltk
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-282467e/share/fltk"
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
 build/dome-sculpt
 ```
 
+Prepare the current canonical toolkit as described in [TOOLKIT](docs/TOOLKIT.md).
+
 Requires a C++20 compiler, CMake 3.24+, nlohmann JSON headers, the patched DomeD
-FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, GIO, Fontconfig, libpng, zlib,
+FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, GIO, Fontconfig, libpng, libjpeg, zlib,
 X11/Wayland development libraries and `wayland-scanner`. xatlas is pinned and
-vendored, so configuring does not fetch its sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
+vendored alongside MikkTSpace and the native ufbx FBX/OBJ reader, so configuring does not fetch their sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
 build just the native core and tests. `BUILD_TESTING=OFF` excludes test harness
 dependencies, including Python.
 The application's default FLTK backend follows its environment; tests explicitly
@@ -61,17 +63,18 @@ Ctrl+Z / Ctrl+Shift+Z undo/redo complete strokes. Lost focus or Escape cancels
 an in-progress stroke. The viewport uses a native GGX metallic-roughness shader
 with editable per-object color, metalness, roughness, emission, opacity and
 culling. The viewport also consumes persistent baked normal and AO maps. The View menu
-switches between PBR and a simple toon preview; full
-MToon properties remain to be added. Layered color, metallic, roughness, emission
+switches between PBR and toon preview. Source PBR/MToon materials, retained
+normal frames and static vertex colors are supported for the documented subset;
+complete material authoring remains in the requirements. Layered color, metallic, roughness, emission
 and mask painting use a stable mesh and persisted UVs; see [painting](docs/PAINTING.md).
 
 The sparse signed-distance field supports swept capsule strokes, pressure,
 soft unions/subtraction, smoothing and flattening. Transactions retain exact
-sample values for undo/redo. The mesher welds shared intersections and discards
-degenerate faces. xatlas generates seams and packed UV charts; it preserves the
+sample values for undo/redo. The mesher welds exact representable intersections and preserves valid small
+faces. xatlas generates seams and packed UV charts; it preserves the
 mapping back to source geometry. The native UV editor supports chart/vertex edits, pins, cuts, relaxation and
-packing with paint transfer; see [UV authoring](docs/UV.md). Advanced seam-based
-re-parameterization and stitching remain unfinished.
+packing, conformal solving and stitching with paint transfer; see
+[UV authoring](docs/UV.md). Remaining production cases stay in the requirements.
 
 Mesh → Voxel remesh... creates a new editable sculpt from the displayed shape.
 Choose world spacing in millimetres with the logarithmic slider, wheel or arrow
@@ -91,11 +94,20 @@ persistent normal/AO/PBR baked maps beneath editable paint layers. Earlier
 volume/scene versions, including the standalone baked-v5 checkpoint, remain readable.
 Ctrl+O reopens it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
 transforms, normals, packed UVs, PBR materials and embedded painted PNG maps.
-Skin/inverse-bind/all-influence and POSITION morph GLB export are implemented,
-with initial untextured static authoring import. Full glTF import and extension
-support remain unfinished. VRM export is deliberately unavailable until the
-humanoid rig, metadata, expressions, material and secondary-motion requirements
-are implemented.
+Skin/inverse-bind/all-influence and position/normal/tangent morph transport are
+implemented for the documented subset. The native source-retaining GLB/glTF and static
+OBJ/FBX core adapters preserve supported geometry, instances, images and material data;
+Scene 11 adds exact authored binds and original-format resource receipts. Unsupported
+transforms, deformations or materials refuse explicitly. Source-preserving and
+painted VRM0 export is available for supported avatars. Complete glTF/VRM features,
+VRM1 and broader interoperability remain unfinished; see [requirements](docs/REQUIREMENTS.md).
+
+Humanoid creation offers only verified CC0 VRoid female/male bases. MakeHuman
+default geometry and creation choices are removed, while existing authored legacy
+projects remain loadable/exportable. New polygon editing, held-mesh ghosts and
+expanded shared import options are separate work in progress. The current
+[integration evidence](docs/PRODUCTION-INTEGRATION.md) records exact test scopes
+and the remaining driver fault limitation.
 
 The Scene menu creates empty sculpts or clay spheres, duplicates and deletes
 objects, changes selection and toggles visibility or edit locks. Ctrl+D duplicates
