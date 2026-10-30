@@ -2,8 +2,8 @@
 
 This milestone implements bounded sculpt protection and object-local symmetry
 with native FLTK and XR authoring controls, exact history/cancellation and GPU
-protection/mirror feedback. Focused synthetic OpenXR workflows pass; the complete
-loader regression run is pending. Resolution changes, sparse local meshing and
+protection/mirror feedback. The complete CPU and actual Arc ONEAPI real-loader
+regression suites pass140/140 checks each. Resolution changes, sparse local meshing and
 sustained production-scale stroke performance remain separate active work.
 
 ## Mask domain and layers
@@ -231,3 +231,11 @@ unavailable-device failure without CPU fallback; the CPU-only allocation
 instrumentation test is excluded from that accelerator scope. Logs:
 `artifacts/tests-sculpt-integrated-sanitize.log` and the corresponding integrated
 ONEAPI build/Arc test logs.
+
+
+Final application source20c132d passes all73 native Release suites in173.67s,
+whole-core C/C++ ASan/UBSan/leaks17/17 in186.49s, actual Arc native12/12 in6.15s,
+and the full140-check real-loader suite on both CPU and Arc compute. The original
+117 cases are retained alongside23 mask cases. See VALIDATION.md for exact logs,
+failed fixture attempts and device/performance scope. No physical-device claim
+or full production-objective completion follows from this milestone.

@@ -1,3 +1,25 @@
+# Current sculpt masks/symmetry —20c132d
+
+The complete ONEAPI FLTK/OpenXR application builds with the pinned DPC++7.2
+SDK and canonical FLTK282467e. Current actual Arc A770 native12/12 pass6.15s;
+the full real-loader syntheticXR140/140 passes with real Arc brush compute and
+software EGL. Numeric proof includes184 independent endpoints,224 CPU-reference
+batches/445088 samples, maxerror8.9407e-08,2000007-sample chunking/concurrent
+queues and explicit missing-GPU failure retaining host inputs. Logs:
+artifacts/tests-sculpt-integrated-oneapi-{native,xr}.log. CPU remains default.
+
+Sample now has24bytes (including protection influence); upload24 +distance-only
+readback4 transports28bytes per sample, compared with48 for full Sample return.
+One bounded eight-way mirror stamp still uses one backend dispatch/readback;
+see SCULPT-MASKS.md for the actual UR trace, mask semantics and source scopes.
+Separate INSTRUMENTED allocation-fault fixtures are deliberately host test code,
+not claimed as Arc execution. Eligible additional workloads and physical/device
+loss/performance coverage remain incomplete. HIP compilation is not AMD execution;
+CUDA SDK/device execution is unavailable. Full production objective stays active.
+
+Earlier evidence below retains its exact source/layout scope. In particular,
+40-to24byte transport described the preceding20byte Sample, not the new layout.
+
 # Compute backend selection and current evidence
 
 CPU, ONEAPI, ROCM and CUDA are explicit CMake choices. ONEAPI configuration
