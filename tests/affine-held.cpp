@@ -39,7 +39,9 @@ int main(int argc,char**argv)try {
  Document d;d.replace(source);d.configure_object_grab(true,true);ready(d);auto original_mesh=d.frame().surface;
  if(mode=="--input-oom") {
    Driver c(d);c.f.hands[0].tracked.squeeze=1;c.send();const auto previous=d.frame().state;input_thread=DocumentTransactionTestAccess::input(d);input_calls=0;input_armed=true;c.f.hands[0].tracked.grip.position.x+=.1f;c.send(false);input_armed=false;
-   check(input_calls>0&&d.copy_scene().encode()==baseline,"persistent controller allocation denial retains exact authoritative source");d.report_error({});c.send();near(current(d),translation(.1)*world,"controller retries from the unchanged pre-failure anchor");d.end_object_grab(false);std::cout<<checks<<" input OOM lifecycle checks passed\n";return 0;
+   check(input_calls>0&&d.copy_scene().encode()==baseline,"persistent controller allocation denial retains exact authoritative source");
+   const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);while(d.frame().state->object_grabbing&&std::chrono::steady_clock::now()<deadline)std::this_thread::sleep_for(std::chrono::milliseconds(2));
+   check(!d.frame().state->object_grabbing,"failed affine controller gesture cancels before retry");d.report_error({});c.f.hands[0].tracked.squeeze=0;c.send();c.f.hands[0].tracked.squeeze=1;c.send();c.f.hands[0].tracked.grip.position.x+=.1f;c.send();near(current(d),translation(.1)*world,"controller re-grips and retries from original source after memory recovery");d.end_object_grab(false);std::cout<<checks<<" input OOM lifecycle checks passed\n";return 0;
  }
  check(d.begin_object_grab(source.active().id),"native affine holding starts");
  CanvasTransform delta{{.2f,-.1f,.15f},{0,0,std::sin(.2f),std::cos(.2f)},1.3f};
