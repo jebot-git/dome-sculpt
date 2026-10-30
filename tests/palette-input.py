@@ -188,14 +188,22 @@ async def main():
                 xtest.fake_input(connection, X.KeyPress, code)
                 xtest.fake_input(connection, X.KeyRelease, code)
                 connection.sync()
-                await asyncio.sleep(.025)
-            # XSync acknowledges the server, not FLTK's input processing. Keep
-            # the map installed until the native clipboard returns every typed
-            # character, so queued Unicode lookups cannot see the restored map.
-            await command("Select All"); await command("Copy")
-            check(await clipboard_text() == value,
+                if os.environ.get("DOME_SCULPT_UNICODE_BURST") != "1":
+                    await asyncio.sleep(.025)
+            # XSync acknowledges the server, not FLTK's input processing. The
+            # D-Bus menu is a separate input channel, so first copy through the
+            # same X11 event queue as typing. A new clipboard owner proves FLTK
+            # processed that copy before we request its UTF-8 selection data.
+            clipboard = connection.intern_atom("CLIPBOARD")
+            assert not connection.get_selection_owner(clipboard), "Private clipboard unexpectedly already owned"
+            key("Control_L", True); key("a"); key("Control_L", False)
+            key("Control_L", True); key("c"); key("Control_L", False)
+            await wait(lambda: connection.get_selection_owner(clipboard), seconds=8)
+            received = await clipboard_text()
+            print("NATIVE_INPUT", repr(received), "EXPECTED", repr(value), flush=True)
+            check(received == value,
                   "Native clipboard acknowledges all Unicode input before test keymap restoration")
-            await command("Cut"); await command("Paste")
+            await command("Select All"); await command("Copy"); await command("Cut"); await command("Paste")
         finally:
             connection.change_keyboard_mapping(first_code, previous)
             connection.sync()
