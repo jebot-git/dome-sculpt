@@ -19,9 +19,15 @@ struct SurfaceTextureLimits {
 // Final RGB transfer only; alpha stays linear. Linear requires a linear target.
 enum class SurfaceOutputEncoding { Srgb, Linear };
 struct SurfaceTextureStats {size_t images=0,samplers=0,bytes=0;uint64_t uploads=0;size_t packed_bytes=0;uint64_t pack_builds=0;};
+struct SurfaceBufferStats {
+  uint64_t geometry_uploads=0,weight_uploads=0,mask_uploads=0;
+  size_t vertex_bytes=0,index_bytes=0,weight_bytes=0,mask_bytes=0;
+};
 class SurfaceRenderer {
   GLuint program_ = 0, vao_ = 0, vertices_ = 0, indices_ = 0;
+  GLuint weights_ = 0, masks_ = 0;
   size_t count_ = 0;
+  SurfaceBufferStats buffers_;
   std::shared_ptr<const MeshSnapshot> cached_;
   struct TextureState;
   std::unique_ptr<TextureState> textures_;
@@ -30,6 +36,7 @@ public:
   SurfaceRenderer();
   explicit SurfaceRenderer(SurfaceTextureLimits);
   SurfaceTextureStats texture_stats() const;
+  SurfaceBufferStats buffer_stats() const { return buffers_; }
   void set_frame_time(double seconds);
   void set_output_encoding(SurfaceOutputEncoding);
   // Deferred draw leaves a linear framebuffer bound for Cursor/Palette overlays.

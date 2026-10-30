@@ -3,6 +3,7 @@
 #include "dome/render.hpp"
 #include "dome/material-visibility.hpp"
 #include <cstddef>
+#include <limits>
 #include "dome/source-maps.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -122,9 +123,9 @@ struct SurfaceRenderer::TextureState {
   static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
   SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size(),samplers.size(),bytes+packed_sources.bytes(),uploads,packed_sources.bytes(),packed_sources.builds()};}
   void clear(bool release){packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();weighted.clear();}
-  void prepare(const MeshSnapshot&mesh){
+  void prepare(const MeshSnapshot&mesh,bool geometry_changed){
     if(!mesh.tangents.empty()&&mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Canonical tangent count differs from packed geometry");
-    for(auto t:mesh.tangents)if(!finite(Vec3{t[0],t[1],t[2]})||length(Vec3{t[0],t[1],t[2]})<1e-8f||!std::isfinite(t[3])||std::abs(std::abs(t[3])-1)>1e-5f)throw std::invalid_argument("Invalid canonical tangent frame");
+    if(geometry_changed)for(auto t:mesh.tangents)if(!finite(Vec3{t[0],t[1],t[2]})||length(Vec3{t[0],t[1],t[2]})<1e-8f||!std::isfinite(t[3])||std::abs(std::abs(t[3])-1)>1e-5f)throw std::invalid_argument("Invalid canonical tangent frame");
     if(!mesh.selected_weights.empty()&&mesh.selected_weights.size()!=mesh.mesh.positions.size())throw std::runtime_error("Weight visualization size differs from current geometry");
     for(float w:mesh.selected_weights)if(!std::isfinite(w)||(w!=-1&&(w<0||w>1)))throw std::runtime_error("Invalid weight visualization value");
     if(!mesh.sculpt_masks.empty()&&mesh.sculpt_masks.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Sculpt mask count differs from packed geometry");
@@ -211,7 +212,7 @@ struct SurfaceRenderer::TextureState {
             slot(13,std::shared_ptr<const Image>(maps,&maps->baked_normal),view,false);slot(15,std::shared_ptr<const Image>(maps,&maps->baked_coverage),view,false);toon.baked_normal=true;
           }
         }
-        if(needs_uv1){
+        if(needs_uv1&&geometry_changed){
           if(!range.appearance || !range.appearance->asset)throw std::runtime_error("Resolved MToon UV1 requires retained primitive provenance");
           const auto &appearance=*range.appearance;const auto &asset=*appearance.asset;
           const ImportedPrimitive *primitive=nullptr;for(const auto &p:asset.primitives)if(p.source_mesh==appearance.source_mesh&&p.source_primitive==appearance.source_primitive){if(primitive)throw std::runtime_error("MToon source primitive identity is ambiguous");primitive=&p;}
@@ -284,7 +285,7 @@ struct SurfaceRenderer::TextureState {
     packed_sources.prepare(source_packs,bytes,wanted.size(),limits);
     std::unordered_map<uint64_t,Binding> ready;
     for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv};}
-    bindings=std::move(ready);toons=std::move(next_toons);uv1=std::move(next_uv1);weighted=std::move(next_weighted);
+    bindings=std::move(ready);toons=std::move(next_toons);if(geometry_changed)uv1=std::move(next_uv1);weighted=std::move(next_weighted);
   }
 };
 SurfaceRenderer::SurfaceRenderer():SurfaceRenderer(SurfaceTextureLimits{}){}
@@ -293,7 +294,7 @@ void SurfaceRenderer::set_output_encoding(SurfaceOutputEncoding encoding){if(tex
 void SurfaceRenderer::set_deferred_resolve(bool value){if(textures_->target.pending())throw std::logic_error("Resolve current view before changing deferred output");textures_->deferred=value;}
 void SurfaceRenderer::resolve(){textures_->target.resolve(textures_->output);}
 void SurfaceRenderer::set_frame_time(double seconds){if(!std::isfinite(seconds)||seconds<0||seconds>std::numeric_limits<float>::max())throw std::invalid_argument("Invalid GPU animation frame time");textures_->frame_time=seconds;}
-void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=0;cached_.reset();textures_->clear(false);textures_->target.clear(false);count_=0;}
+void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_=0;buffers_.vertex_bytes=buffers_.index_bytes=buffers_.weight_bytes=buffers_.mask_bytes=0;cached_.reset();textures_->clear(false);textures_->target.clear(false);count_=0;}
 
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   auto vertex=mtoon_renderer_vertex();
@@ -349,11 +350,15 @@ result+=glow;result=result/(result+vec3(1));color=vec4(sculpt_mask_color(result)
   glGenVertexArrays(1, &vao_);
   glGenBuffers(1, &vertices_);
   glGenBuffers(1, &indices_);
+  glGenBuffers(1, &weights_);
+  glGenBuffers(1, &masks_);
 }
 SurfaceRenderer::~SurfaceRenderer() {
   textures_->target.clear(true);
   textures_->clear(true);
   glDeleteBuffers(1, &indices_);
+  glDeleteBuffers(1, &weights_);
+  glDeleteBuffers(1, &masks_);
   glDeleteBuffers(1, &vertices_);
   glDeleteVertexArrays(1, &vao_);
   glDeleteProgram(program_);
@@ -375,43 +380,70 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glClearColor(background, background, background, transparent ? 0 : 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   if (mesh != cached_) {
-    try{textures_->prepare(*mesh);}catch(...){textures_->clear(true);cached_.reset();count_=0;throw;}
-    struct Vertex {
-      Vec3 p, n;
-      std::array<float, 2> uv,uv1;
-      float weight=-1;
-      std::array<float,4> tangent;
-      float mask=-1;
-    };
-    std::vector<Vertex> v;
-    v.reserve(mesh->mesh.positions.size());
-    for (size_t i = 0; i < mesh->mesh.positions.size(); ++i)
-      v.push_back(
-          {mesh->mesh.positions[i], mesh->mesh.normals[i],
-           mesh->mesh.uv.empty() ? std::array<float, 2>{} : mesh->mesh.uv[i],textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],mesh->selected_weights.empty()?-1:mesh->selected_weights[i],mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i],mesh->sculpt_masks.empty()?-1:mesh->sculpt_masks[i]});
+    const auto &identity=mesh->geometry_identity;
+    bool reuse=identity && cached_ && cached_->geometry_identity &&
+      identity==cached_->geometry_identity &&
+      !identity.owner_before(cached_->geometry_identity) &&
+      !cached_->geometry_identity.owner_before(identity) &&
+      mesh->generation==cached_->generation;
+    const auto count=mesh->mesh.positions.size();
+    if(mesh->mesh.normals.size()!=count || (!mesh->mesh.uv.empty()&&mesh->mesh.uv.size()!=count))
+      throw std::invalid_argument("Packed geometry attribute count mismatch");
+    if(mesh->mesh.indices.size()>size_t(std::numeric_limits<GLsizei>::max()))
+      throw std::length_error("Packed geometry exceeds GPU draw count limit");
+    if(reuse && (count!=cached_->mesh.positions.size() ||
+                 mesh->mesh.indices.size()!=cached_->mesh.indices.size() ||
+                 mesh->tangents.size()!=cached_->tangents.size() ||
+                 mesh->mesh.uv.size()!=cached_->mesh.uv.size()))
+      throw std::invalid_argument("Shared geometry identity has inconsistent packed counts");
+    try{textures_->prepare(*mesh,!reuse);}catch(...){textures_->clear(true);cached_.reset();count_=0;throw;}
     glBindVertexArray(vao_);
-    glBindBuffer(GL_ARRAY_BUFFER, vertices_);
-    glBufferData(GL_ARRAY_BUFFER, v.size() * sizeof(Vertex), v.data(),
-                 GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          reinterpret_cast<void *>(offsetof(Vertex, n)));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          reinterpret_cast<void *>(offsetof(Vertex, uv)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv1)));glEnableVertexAttribArray(3);
-    glVertexAttribPointer(4,1,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,weight)));glEnableVertexAttribArray(4);
-    glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,tangent)));glEnableVertexAttribArray(5);
-    glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,mask)));glEnableVertexAttribArray(6);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 mesh->mesh.indices.size() * sizeof(uint32_t),
-                 mesh->mesh.indices.data(), GL_STATIC_DRAW);
-    count_ = mesh->mesh.indices.size();
-    cached_ = std::move(mesh);
+    if(!reuse) {
+      struct Vertex {
+        Vec3 p,n;
+        std::array<float,2> uv,uv1;
+        std::array<float,4> tangent;
+      };
+      std::vector<Vertex> vertices;
+      vertices.reserve(count);
+      for(size_t i=0;i<count;++i)
+        vertices.push_back({mesh->mesh.positions[i],mesh->mesh.normals[i],
+          mesh->mesh.uv.empty()?std::array<float,2>{}:mesh->mesh.uv[i],
+          textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],
+          mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i]});
+      glBindBuffer(GL_ARRAY_BUFFER,vertices_);
+      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertices.size()*sizeof(Vertex)),vertices.data(),GL_STATIC_DRAW);
+      glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),nullptr);glEnableVertexAttribArray(0);
+      glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,n)));glEnableVertexAttribArray(1);
+      glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv)));glEnableVertexAttribArray(2);
+      glVertexAttribPointer(3,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv1)));glEnableVertexAttribArray(3);
+      glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,tangent)));glEnableVertexAttribArray(5);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices_);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(mesh->mesh.indices.size()*sizeof(uint32_t)),mesh->mesh.indices.data(),GL_STATIC_DRAW);
+      buffers_.vertex_bytes=vertices.size()*sizeof(Vertex);
+      buffers_.index_bytes=mesh->mesh.indices.size()*sizeof(uint32_t);
+      ++buffers_.geometry_uploads;
+    }
+    auto scalar=[&](GLuint buffer,GLuint attribute,const std::vector<float>&values,size_t&bytes,uint64_t&uploads) {
+      if(values.empty()) {
+        glDisableVertexAttribArray(attribute);
+        if(bytes){glBindBuffer(GL_ARRAY_BUFFER,buffer);glBufferData(GL_ARRAY_BUFFER,0,nullptr,GL_DYNAMIC_DRAW);}
+        bytes=0;return;
+      }
+      glBindBuffer(GL_ARRAY_BUFFER,buffer);
+      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(values.size()*sizeof(float)),values.data(),GL_DYNAMIC_DRAW);
+      glVertexAttribPointer(attribute,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);glEnableVertexAttribArray(attribute);
+      bytes=values.size()*sizeof(float);++uploads;
+    };
+    scalar(weights_,4,mesh->selected_weights,buffers_.weight_bytes,buffers_.weight_uploads);
+    scalar(masks_,6,mesh->sculpt_masks,buffers_.mask_bytes,buffers_.mask_uploads);
+    count_=mesh->mesh.indices.size();
+    cached_=std::move(mesh);
   }
+  // Disabled array constants are context state, rather than VAO state. Set
+  // them for every draw, including stereo reuse and interleaved renderers.
+  if(cached_->selected_weights.empty())glVertexAttrib1f(4,-1);
+  if(cached_->sculpt_masks.empty())glVertexAttrib1f(6,-1);
   glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
   glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
@@ -574,7 +606,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUseProgram(0);
   if (glGetError() != GL_NO_ERROR){textures_->clear(true);cached_.reset();count_=0;throw std::runtime_error("Sculpt GPU rendering failed");}
   if(!textures_->deferred)resolve();
-  }catch(...){textures_->target.abort();throw;}
+  }catch(...){cached_.reset();count_=0;textures_->target.abort();throw;}
 }
 
 namespace {

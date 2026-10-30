@@ -1,24 +1,18 @@
-# Active production authoring work
+# Active production work
 
-Read HANDOFF.md first, then REQUIREMENTS.md and HANDOFF-466ebd1.md. The full
-native C++20 FLTK/OpenXR production objective remains active. Passing a milestone
-is not completion. The prior divergent live-weight handoff is preserved in
-AGENT-HANDOFF-3aa47e5.md; it is historical, not current ownership.
+Read HANDOFF.md, REQUIREMENTS.md, HANDOFF-466ebd1.md and parent DESIGN_CONVENTIONS.
+Current application source20c132d implements native desktop/XR masks and symmetry;
+all milestone validation in VALIDATION.md passes. Full production goal remains
+active and incomplete. Preserve all source histories and unrelated WIP.
 
-Query live collaboration state. Current independent work is production sculpt
-masks/symmetry and native controls, plus original/native tangent-frame transport
-through creator deformation, skin/morph preview and glTF/VRM export. All pending
-public-layout changes require a coherent source/header/archive boundary; never
-validate against pre-layout static libraries. Preserve immutable origins,
-source identities, ordered saves and exact no-op/cancel/undo behavior.
+Query collaboration ownership. Local meshing foundation37e38c7 is private;
+authenticated Volume dirty lineage/Document integration is being developed there.
+Normal-frame Scene9/materials2/creator/UV/export work is separate and private.
+Do not remove existing sourceUV/export guards or relabel old derivative pixels.
+Source/version/worker/header changes require fresh coherent consumers. The main
+worktree can contain private creator/helper drafts excluded from tested20c132d.
 
-The original sourceUV normal-frame guards stay until runtime, persistence and
-export preserve authored/generated original frames through the relevant poses.
-Old Scene7 UvDerivative normal pixels must not be relabelled original-frame data.
-Future records need an explicit versioned migration and validated re-bake.
-
-Remote3d19776 Retopo is now integrated with Skin14/Masks15/Retopo16 and combined
-Scene8; complete legacy7 shapes remain supported. The5-worker shutdown,
-cancellation and native persistence tests pass. Read current HANDOFF.md and
-VALIDATION.md for exact completed verification scopes; application source79fe64a is the combined checkpoint. Future normal
-frame provenance must use Scene9/materials2, without relabelling legacy pixels.
+Use explicit canonical FLTK_DIR from HANDOFF.md, optimized regular-user builds,
+immutable render snapshots and background work. Preserve source/generation leases,
+exact cancellation/history and ordered saves. No active session restart. Passing
+this milestone does not complete any still-incomplete REQUIREMENTS row.
