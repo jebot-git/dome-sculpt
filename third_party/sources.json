@@ -520,15 +520,17 @@
     "backport_commit": "d20c4dcd894728cd6a25e8e96533adf85fd17223",
     "backport": "Allocation-free link-reversal destruction, direct iterative path;3.12 typed-null container child compatibility guards; no develop parser/API/data-layout changes",
     "sha256": {
-      "nlohmann/json.hpp": "d271a2726129eefecfaec4b58e42c2a798430b8cca6844cd876d0f0555b7aef2",
+      "nlohmann/json.hpp": "16a23bdf5c376318a0a6f14d601f0b9fd466c085f5922a14859f186ac11cf00e",
       "nlohmann/json_fwd.hpp": "fb6aa70cbece087f37ab4685c182b287c53be54f785f981b9db9d30d2d028b37",
       "LICENSE.MIT": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
       "LICENSE.MIT.backport": "d64d1b4d948aa7751cfb613c02dc246aab7b358d760053e6580f01affe946906",
       "patches/allocation-free-destruction.patch": "f475ea67b72145a9b1f953c710517c5e0b3d7b24001ea739bb8e9a651c30fd8a",
-      "patches/scalar-comparison-exceptions.patch": "ab365e97a5233eeb0237ac7dca5e2296cec2d990c1af55c445185f99c74250b6"
+      "patches/scalar-comparison-exceptions.patch": "ab365e97a5233eeb0237ac7dca5e2296cec2d990c1af55c445185f99c74250b6",
+      "patches/binary-factory-exceptions.patch": "07f380fbcb85fd5e180133e40505d01bf91d24bd4b58e12229cd2ac1984c8fe0"
     },
     "backport_source_sha256": "e0a972ebd29ec61bdbe6856fe7faee1b3b114b8ca5a79f2b9a0873cbc0243434",
-    "scalar_backport": "All16 existing3.12 scalar comparison wrapper exception specifications use upstream d20c4dcd conditional is_nothrow_constructible; dependent lhs/rhs types for friends, unchanged comparison bodies"
+    "scalar_backport": "All16 existing3.12 scalar comparison wrapper exception specifications use upstream d20c4dcd conditional is_nothrow_constructible; dependent lhs/rhs types for friends, unchanged comparison bodies",
+    "binary_factory_adaptation": "Local exception-safety fix: all four binary factories allocate the payload before committing the binary tag; unchanged API, layout, successful values and serialization; independently asserted persistent-denial regression."
   },
   "lapacke": {
     "repository": "https://github.com/Reference-LAPACK/lapack",

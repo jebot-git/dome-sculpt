@@ -1,0 +1,44 @@
+{
+  "scope": "Standalone JSON3.12 binary factory exception-safety; no Scene14 API requirement",
+  "parent_feature_checkpoint": "0c890a8",
+  "assertions": "Forced -UNDEBUG in normal/JSON_DIAGNOSTICS even for optimized Release",
+  "source": {
+    "CMakeLists.txt": "9d4a5dfb0b5a1e3d18d5325ec1024f593e564912d8b4c1d83e184abd1323b054",
+    "tests/json-binary-memory.cpp": "6336a36e73c7fc726b500ae4be3b6c394ad95f6bc2fc97a8257fe7e088d6e113",
+    "third_party/nlohmann/nlohmann/json.hpp": "16a23bdf5c376318a0a6f14d601f0b9fd466c085f5922a14859f186ac11cf00e",
+    "third_party/nlohmann/patches/binary-factory-exceptions.patch": "07f380fbcb85fd5e180133e40505d01bf91d24bd4b58e12229cd2ac1984c8fe0",
+    "third_party/nlohmann/README.md": "682b0826ab1f75e794c173caaec5bc7c8f4cb8c4945a9533e42ef8ecd815541e",
+    "third_party/sources.json": "543a53f3b0042415a4aba649e3f20d74bb639427bbe982704d56e85b3a19984e"
+  },
+  "logs": {
+    "artifacts/tests-scene14-json-binary.log": "8e35e6b1e5e030e3fcb68ff1147f53c600bf6fda23247df43ce3da9d4c1efd33",
+    "artifacts/tests-scene14-json-binary-sanitize.log": "c8bc61419040bdc69b36447677bf5e27e8e22917e5d565d92cefb5e9ff67b829",
+    "artifacts/tests-json-binary-before-negative-final.log": "5731926fe63c8cf989236ebea3d387002438679554581d95d1a5fc465ffb2e9d",
+    "artifacts/debug-scene14-json-binary-assert.log": "94c3c5e0c279caaceed73d98bb1dfc65f4922c119875d60698f510fff766062a"
+  },
+  "proof": {
+    "release_suites": 2,
+    "asan_ubsan_leaks_suites": 2,
+    "per_mode_actual_persistent_denial_boundaries": 6,
+    "factory_overloads": 4,
+    "negative_original_header_signal": "SIGABRT",
+    "exact_retry_bytes_subtype_and_cbor": true,
+    "sequential_patch_byte_exact": true
+  },
+  "initial_actual_scene_negative": {
+    "whole_core_c_cpp_sanitizer_passed": 15,
+    "whole_core_c_cpp_sanitizer_total": 16,
+    "seconds": 236.35,
+    "call_chain": [
+      "Scene::encode",
+      "PaintedMesh::encode",
+      "json::binary(const container&)",
+      "completed result destructor invariant"
+    ]
+  },
+  "limits": [
+    "Whole-scene/core qualification after this fix is separate",
+    "External constructor replacement paths are unchanged",
+    "No universal JSON OOM claim"
+  ]
+}
