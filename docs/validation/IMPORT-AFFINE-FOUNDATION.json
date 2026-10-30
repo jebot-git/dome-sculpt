@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "base": "8ad6d305b198c831b9ad8aca51285524615c2ecb",
+  "scope": "standalone native affine/source-hierarchy foundation; new library plus tests and real sculpt-storage support freshly rebuilt in each configuration; not whole core or actual authoring/render/export adoption",
+  "source_only_guard_unchanged": true,
+  "scene_schema_change": false,
+  "public_scene_layout_change": false,
+  "new_api": [
+    "dome::AffineTransform",
+    "dome::detail::ImportedAffineHierarchy"
+  ],
+  "proof": {
+    "release": {
+      "passed": 2,
+      "total": 2,
+      "seconds": 0.01
+    },
+    "asan_ubsan_leaks": {
+      "passed": 2,
+      "total": 2,
+      "seconds": 0.03
+    },
+    "analytic_math_assertions": 74,
+    "source_hierarchy_assertions": 56,
+    "persistent_cpp_allocation_boundaries": 6,
+    "cancellation_boundaries": 4,
+    "max_depth_fixture": 128,
+    "original_local_float_bits": "exact including signed zero"
+  },
+  "release_flags": "-O3 -DNDEBUG -std=gnu++20",
+  "sanitize_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20",
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "3fd75e4410b485f358be6c2171c822d15fbf7679c545138a771ba0dc9d96a023",
+    "include/dome/affine.hpp": "6d281334bb635072a98d806bb0642ce7b08739c5c8dd438c36e29fbcf7a07a47",
+    "src/affine.cpp": "e6e29a69da85420588b43bee900b0fb0c368bd83f97625b93090c34032d2f620",
+    "src/import-affine.hpp": "99171c0cac9532bc43d115b0177e0064233aab59f7f537b9728360d4b2ab4850",
+    "src/import-affine.cpp": "56acaf5cbcb935d521d62eb5605a5b290dfdaaff5ca9f2110f61d7b6f9816e94",
+    "tests/affine.cpp": "14f971b4a10726dfcd401376086c607b8f03fdefd32a1dd7f900fcec2029ef24",
+    "tests/import-affine.cpp": "8267d5379dee88ed06101388f295989359179fbdbd3c00ea7cc8bc26d5f8e0e8"
+  },
+  "logs_sha256": {
+    "artifacts/test-affine-final.log": "98ee01e4d8ea2850caa25001d687032f0c081c2dad46028d3c9557c53f0ce84b",
+    "artifacts/test-affine-sanitize-final.log": "9b5782a09e7ac072314cc395983a9f46bd232f0388f9cefafbdc46a398b607fa",
+    "artifacts/build-affine-final.log": "a047534df3e1959544bca5b16c8aa768d6d361c59500b01995de0bd9da65478d",
+    "artifacts/build-affine-sanitize-final.log": "a047534df3e1959544bca5b16c8aa768d6d361c59500b01995de0bd9da65478d",
+    "artifacts/configure-affine-final.log": "8068a90e589b37246d09cfed47806ee543d81a06e9e715123c76967f999c6624",
+    "artifacts/configure-affine-sanitize-final.log": "e860b2b881fc33c55117741ddc02687651c711bd28ea30681a1abfc18cdd8fcb"
+  },
+  "binary_sha256": {
+    "build-affine/dome-sculpt-affine-test": "21a1c32ae8005725a964483ea08c1d6ba0ba232ee0bf693e73ab4461176736c9",
+    "build-affine/dome-sculpt-import-affine-test": "2d13cc883291a1c92c5359918d75d281cc95849e88ecca6ba9bf6c7674321c61",
+    "build-affine-sanitize/dome-sculpt-affine-test": "b105359d6e436f595068968af1ed33de9550c769e492b95b2902828631f5a0a9",
+    "build-affine-sanitize/dome-sculpt-import-affine-test": "0c1a94ce9bbb1bbceeb0655fed0a271cbaaf59521e7c4009e548358bff5c54d1"
+  },
+  "pending": [
+    "Scene13 immutable source placement and recursive origin codec",
+    "all native edit/render/pick/brush metric/held/cache/normal and facing consumers",
+    "hierarchy-preserving posed export and independent consumer pixels/accessors",
+    "actual affine import admission and transaction/GUI qualification",
+    "FBX skin and morph conversion and remaining full import scope"
+  ],
+  "primary_semantics": [
+    "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#transformations",
+    "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#joint-hierarchy"
+  ]
+}
