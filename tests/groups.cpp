@@ -61,21 +61,24 @@ int main() try {
   scene.erase_group(a);
   check(scene.groups().empty() && scene.objects().size() == 1 && scene.active().group == 0,
         "Deleting the last group retains a valid empty sculpt document");
+  check(std::string(spatial_labels(9)[2])=="Center part" && spatial_command(9,2)==SpatialCommand::Center,"XR avatar page replaces the removed mesh choice with a useful center action");
   Document document;
+  const auto legacy_before=document.copy_scene().encode();document.paint_command(SpatialCommand::CreateMakeHuman);
+  check(document.copy_scene().encode()==legacy_before && !document.frame().state->asset_busy,"Removed MakeHuman creation command cannot be invoked through legacy controller bindings");
   document.seed();
   document.edit_scene("Create humanoid", [](Scene &scene, const auto &cancelled) {
     CanvasTransform transform{}; transform.position.y = -.85f;
-    append_humanoid(scene, humanoid_baseline_defaults("makehuman-hm08"), "Test avatar", transform, 64, cancelled);
+    append_humanoid(scene, humanoid_baseline_defaults("vroid-beta-female"), "Test avatar", transform, 64, cancelled);
   });
   check(document.wait_asset() && document.frame().state->error.empty(), "Creator appends paintable rigged parts on the guarded worker");
   auto made = document.copy_scene();
-  check(made.groups().size() == 1 && made.objects().size() == 6 && made.active().deformation && made.active().painted,
+  check(made.groups().size() == 1 && made.objects().size() == 20 && made.active().deformation && made.active().painted,
         "Creator parts share one retained recipe and select the rigged body");
   auto roundtrip = Scene::decode(made.encode());
-  check(roundtrip.groups().size() == 1 && roundtrip.active().deformation->morphs->targets.size() == 8,
+  check(roundtrip.groups().size() == 1 && std::any_of(roundtrip.objects().begin(),roundtrip.objects().end(),[](const auto &o){return o.deformation && o.deformation->morphs && !o.deformation->morphs->targets.empty();}),
         "Created topology, weights, face morphs and parameters survive native roundtrip");
   check(document.undo() && document.copy_scene().objects().size() == 1 && document.copy_scene().groups().empty() &&
-        document.redo() && document.copy_scene().objects().size() == 6,
+        document.redo() && document.copy_scene().objects().size() == 20,
         "Entire avatar creation shares one exact global undo/redo transaction");
   check(document.wait_mesh(), "Grouped creator publishes immutable rendered geometry");
   for (const char *baseline : {"vroid-beta-female", "vroid-beta-male"}) {
@@ -112,5 +115,7 @@ int main() try {
   controller.avatars(); controller.sector(7);
   check(tracked.wait_asset() && tracked.copy_scene().groups().empty() && tracked.copy_scene().objects().size()==20,
         "Joystick ungroups an avatar without deleting its parts");
+  Document male_controller;male_controller.seed();Controller male_input(male_controller);male_input.avatars();male_input.sector(1);
+  check(male_controller.wait_asset(std::chrono::seconds(120)) && male_controller.frame().state->error.empty() && male_controller.copy_scene().objects().size()==20 && male_controller.copy_scene().group(male_controller.copy_scene().active().group).humanoid->baseline=="vroid-beta-male","Joystick creates the actual CC0 male through the second offered baseline command");
   return 0;
 } catch (const std::exception &e) { std::cerr << e.what() << '\n'; return 1; }

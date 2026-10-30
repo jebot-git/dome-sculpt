@@ -70,9 +70,9 @@ have fixtures.
 The actual CC0 VRoid female body material (4,360 triangles/five charts) converges
 under default work bounds. Independent mean triangle angle error decreases from
 0.125868 to 0.022915 radians. An audit of all 19 female parts solved 18; the source
-tie reports a nonmanifold edge rather than being silently repaired. The large
-original MakeHuman first chart produces foldovers and correctly rejects; it
-needs additional cuts or another parameterization. This is explicit scope, not
+tie reports a nonmanifold edge rather than being silently repaired. The historical MakeHuman first chart produced foldovers and correctly rejected.
+The current asset-free pinned two-triangle fixture preserves fold rejection;
+folded charts need additional cuts or another parameterization. This is explicit scope, not
 an arbitrary-character or production-atlas completion claim.
 
 ## Native desktop and XR workflow
@@ -147,7 +147,7 @@ validation result or edited as though a ready workspace existed.
 vertices and51,200 triangles allocates31 bytes, rather than geometry/topology
 arrays. Fixtures also cover retained source lifetime, detached-copy isolation,
 worker-thread initialization, cancellation during map construction, malformed
-attributes, failure/budget states and a real CC0 MakeHuman body.
+attributes, failure/budget states and actual CC0 VRoid body topology.
 
 The registered `uv-loader` fixture opens a real native project, then blocks the
 UV worker's first geometry allocation with a deterministic barrier. It verifies

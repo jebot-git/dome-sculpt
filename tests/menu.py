@@ -17,13 +17,14 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
         {**os.environ, "DOME_SCULPT_MENU_BUS": "1"},
     )
 root = Path(__file__).resolve().parents[1]
+creator_flow=os.environ.get("DOME_MENU_CREATOR_ONLY")=="1"
 bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
 rig_compact = os.environ.get("DOME_MENU_RIG_COMPACT") == "1"
 retopo_compact = os.environ.get("DOME_MENU_RETOPO_COMPACT") == "1"
 retopo_flow = os.environ.get("DOME_MENU_RETOPO") == "1" or retopo_compact
 cut_compact = os.environ.get("DOME_MENU_CUT_COMPACT") == "1"
 cut_flow = os.environ.get("DOME_MENU_CUT") == "1" or cut_compact
-compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact or retopo_compact or cut_compact
+compact = os.environ.get("DOME_MENU_CREATOR_COMPACT") == "1" or os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact or retopo_compact or cut_compact
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1" or rig_compact
 export_flow = os.environ.get("DOME_MENU_EXPORT") == "1"
 bake_cancel = os.environ.get("DOME_MENU_BAKE_CANCEL") == "1"
@@ -35,6 +36,8 @@ if retopo_flow:
     out = root / ("artifacts/menu-retopo-compact" if retopo_compact else "artifacts/menu-retopo")
 if cut_flow:
     out = root / ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut")
+if creator_flow:
+    out = root / ("artifacts/menu-vroid-only-compact" if compact else "artifacts/menu-vroid-only")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -111,7 +114,15 @@ async def main():
         log = (out / "app.log").open("w")
         arguments = [str(root / "build/dome-sculpt")]
         fixture = Path(home, "rig.dsculpt")
-        if cut_flow:
+        if creator_flow:
+            fixture=Path(home,"legacy.dsculpt")
+            if os.environ.get("DOME_CREATOR_LEGACY_SOURCE"):
+                import shutil
+                shutil.copyfile(os.environ["DOME_CREATOR_LEGACY_SOURCE"],fixture)
+            else:
+                subprocess.run([str(root/"build/dome-sculpt-humanoid-creator-test"),"--ui-fixture",str(fixture)],check=True)
+            arguments.append(str(fixture))
+        elif cut_flow:
             fixture = Path(home, "cut.dsculpt")
             subprocess.run([str(root / "build/dome-sculpt-cut-authoring-test"), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
@@ -173,7 +184,7 @@ async def main():
 
         async def click(label):
             nodes, _ = await layout()
-            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow or retopo_flow) else None
+            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow or retopo_flow or creator_flow) else None
             await menu.call_event(nodes[label][0], "clicked", Variant("i", 0), 0)
             if saved is not None:
                 await wait(lambda: fixture.stat().st_mtime_ns != saved)
@@ -191,6 +202,36 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if creator_flow:
+            def info():
+                return json.loads(subprocess.check_output([str(root/"build/dome-sculpt"),"--project-info",str(fixture)],env=env))
+            def recipes():
+                return json.loads(subprocess.check_output([str(root/"build/dome-sculpt-humanoid-creator-test"),"--inspect",str(fixture)],env=env))
+            async def ready():
+                for _ in range(1200):
+                    nodes,_=await layout()
+                    if nodes["Save"][1].get("enabled") is True and nodes["Create humanoid..."][1].get("enabled") is True:return
+                    await asyncio.sleep(.1)
+                raise AssertionError("Creator worker did not finish")
+            def tap(w,x,y):
+                g=w.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
+            baseline=info();old_recipes=recipes()
+            check(old_recipes["groups"][0]["baseline"]=="makehuman-hm08","Native dialog test starts from a readable legacy MakeHuman recipe without requiring a bundled mesh")
+            for gender,choice in (("male","Down"),("female","Up")):
+                await click("Create humanoid...");w=await wait(lambda:named("Create humanoid"));w.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=w.get_geometry()
+                check(w.get_wm_transient_for().id==window.id,"VRoid creator remains a native modal owned by the document")
+                row=44 if compact else 28
+                if compact:check(g.width<=600 and g.height<=300,"VRoid creator fits the compact desktop at 2x Unifont size")
+                tap(w,g.width*.75,row*2.5);await asyncio.sleep(.2);key(choice);key("Return");await asyncio.sleep(.2)
+                raw=w.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF);Image.frombytes("RGB",(g.width,g.height),raw.data,"raw","BGRX").save(out/(gender+"-draft.png"))
+                tap(w,g.width*.5+80,g.height-row*1.5+8);await wait(lambda:named("Create humanoid") is None);await ready();await click("Save")
+                accepted=info();state=recipes();(out/(gender+"-accepted.json")).write_text(json.dumps({"info":accepted,"recipes":state},indent=2))
+                check(state["groups"][-1]["baseline"]=="vroid-beta-"+gender and len(accepted["objects"])==len(baseline["objects"])+19,"Actual model-base selection creates only CC0 VRoid female/male primitives")
+                check(accepted["objects"][:len(baseline["objects"])]==baseline["objects"] and state["groups"][:-1]==old_recipes["groups"],"Creating a VRoid keeps every saved legacy object and recipe exact")
+                await click("Undo");await ready();await click("Save");check(info()["scene_hash"]==baseline["scene_hash"] and recipes()==old_recipes,"Native creation undoes to the exact legacy project without implicit conversion")
+                await click("Redo");await ready();await click("Save");check(info()["scene_hash"]==accepted["scene_hash"],"Native VRoid redo restores the complete source-backed result")
+                await click("Undo");await ready();await click("Save")
+            d.close();bus.disconnect();return
         if cut_flow:
             def info():
                 return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
