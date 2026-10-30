@@ -128,6 +128,7 @@ struct EditorState {
       polygon_handoff_generation = 0, polygon_handoff_revision = 0;
   PolygonControls polygon_controls;
   bool can_polygon = false, polygon_requires_conversion = false, polygon_has_source = false;
+  uint32_t pending_exports = 0;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -250,6 +251,7 @@ public:
   void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
   void clear_bake(AssetSource expected = {});
   void cancel_asset_work();
+  void cancel_background_work();
   AssetStatus asset_status() const;
   void begin_voxel_remesh();
   void edit_voxel_size(float world_voxel_mm);
@@ -560,6 +562,21 @@ private:
   mutable std::condition_variable input_changed_;
   std::deque<std::pair<uint64_t, SpatialFrame>> inputs_;
   bool reset_input_ = false, processing_ = false, spatial_accepting_ = true;
+  struct ExportWork {
+    enum class Phase { Working, Cancelled, Committing, Finished };
+    std::atomic<Phase> phase{Phase::Working};
+    bool cancellable() const { return phase.load()==Phase::Working; }
+    bool cancelled() const { return phase.load()==Phase::Cancelled; }
+    bool cancel() {
+      auto expected=Phase::Working;
+      return phase.compare_exchange_strong(expected,Phase::Cancelled);
+    }
+    void begin_commit() {
+      auto expected=Phase::Working;
+      if(!phase.compare_exchange_strong(expected,Phase::Committing))
+        throw std::runtime_error("Export cancelled");
+    }
+  };
   struct FileJob {
     Scene scene;
     std::filesystem::path path;
@@ -597,7 +614,11 @@ private:
     bool discover_import=false;
     uint64_t import_request=0;
     std::shared_ptr<PolygonAccept> polygon_capture;
+    std::shared_ptr<ExportWork> export_work;
   };
+  // One running job plus the bounded eight-entry ordered file queue.
+  // Protected by model_mutex_; explicit Cancel owns the phase transition.
+  std::array<std::shared_ptr<ExportWork>,9> exports_{};
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;
@@ -624,6 +645,8 @@ private:
   void finish_locked();
   void process_locked(const SpatialFrame &);
   void file_locked(bool export_mesh, AssetExportFormat = AssetExportFormat::Glb);
+  void queue_export_locked(FileJob);
+  void retire_export_locked(const std::shared_ptr<ExportWork> &) noexcept;
   void process_uv_transfer(FileJob &);
   void command_locked(SpatialCommand);
   bool command_enabled_locked(SpatialCommand) const;
@@ -644,6 +667,7 @@ private:
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
   void queue_clear_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
+  void cancel_background_work_locked();
   bool sculpt_target_ready_locked() const;
   bool resolution_target_ready_locked() const;
   void queue_procedural_locked(ProceduralSculptOptions, AssetSource = {});

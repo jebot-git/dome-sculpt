@@ -26,6 +26,7 @@ struct VrmExportOptions {
   // Zero preserves original main/shade dimensions. A nonzero value is an
   // explicit resampling choice for compiled paint maps, never a hidden fallback.
   uint32_t paint_resolution = 0;
+  std::function<void()> before_commit;
 };
 struct VrmExportReport {
   size_t meshes = 0, joints = 0, normal_targets_recomputed = 0;

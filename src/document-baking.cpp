@@ -12,8 +12,16 @@ void Document::cancel_asset_work_locked(){
     work->cancelled.store(true);state_.message="Cancelling background work...";
   }
 }
+void Document::cancel_background_work_locked(){
+  cancel_asset_work_locked();
+  for(const auto &work:exports_)if(work && work->cancel())
+    state_.message="Cancelling background work...";
+}
 void Document::cancel_asset_work(){
   std::lock_guard lock(model_mutex_);cancel_asset_work_locked();publish_locked();
+}
+void Document::cancel_background_work(){
+  std::lock_guard lock(model_mutex_);cancel_background_work_locked();publish_locked();
 }
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
@@ -23,7 +31,8 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
 }
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
+  return !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+    !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
 void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,AssetSource expected){

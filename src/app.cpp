@@ -1075,7 +1075,7 @@ struct App {
       edit_rig_dialog(canvas.document);
     } else if(label=="Bake surface..."){edit_bake_dialog(canvas.document);
     } else if(label=="Clear baked surface"){canvas.document.clear_bake();
-    } else if(label=="Cancel background work"){canvas.document.cancel_asset_work();
+    } else if(label=="Cancel background work"){canvas.document.cancel_background_work();
     } else if(label=="Procedural detail...") {
       auto draft=canvas.document.draft_scene();auto initial=canvas.document.frame().state->procedural_options;
       initial.depth=std::max(initial.depth,draft.scene.active().volume->voxel_size()*2.5f);

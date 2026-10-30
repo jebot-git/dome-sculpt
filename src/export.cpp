@@ -46,10 +46,13 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
   GltfExportReport report{objects.size(),document.normal_targets_recomputed,{}};
   if(report.normal_targets_recomputed)report.diagnostics.push_back(
     "Source NORMAL deltas recomputed from edited geometry; original authoring data remains unchanged");
-  stop();detail::write_glb(std::move(document),path);return report;
+  stop();detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;
 }
 detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_objects,
     SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled) {
+  auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
+  size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
+  stop();
   GltfDocument result;
   const auto &objects=input_objects;
   if (objects.empty() || objects.size()>256)
@@ -66,8 +69,10 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   auto &data=result.binary;
   auto floats = [&](auto values) {
     if(values.size()*sizeof(float)>256*1024*1024-std::min(data.size(),size_t(256*1024*1024)))throw std::length_error("glTF geometry resource limit exceeded before appending attributes");
-    for (float f : values)
+    for (float f : values) {
+      checkpoint();
       append(data, std::bit_cast<uint32_t>(f));
+    }
   };
   auto add = [&](size_t offset, size_t bytes, int target, size_t count,
                  int component, const char *type) {
@@ -85,6 +90,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   std::map<uint64_t, int> group_nodes;
   std::map<uint64_t, nlohmann::json> group_records;
   for (const auto &object : objects) {
+    stop();
     uint64_t parent = 0;
     std::set<uint64_t> path;
     for (const auto &g : object.groups) {
@@ -122,6 +128,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
   for (const auto &input : objects) {
+    stop();
     auto validated_colors=detail::current_vertex_colors(input,cancelled);
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
@@ -182,6 +189,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       if(!frame && !tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
         auto canonical=tangent_corners(mesh,cancelled);
         for(size_t corner=0;corner<canonical.size();++corner) {
+          checkpoint();
           auto authored=tangents.at(mesh.indices[corner]);auto target=canonical[corner];
           if(length(Vec3{authored[0]-target[0],authored[1]-target[1],authored[2]-target[2]})>1e-4f || authored[3]*target[3]<0)
             throw std::invalid_argument("Canonical baked normals conflict with retained source tangents; explicit tangent basis conversion is required");
@@ -195,13 +203,16 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     if (o.deformation && o.deformation->skin) {
       const auto &weights = o.deformation->skin->vertices;
       size_t sets = 0;
-      for (const auto &vertex : weights)
+      for (const auto &vertex : weights) {
+        checkpoint();
         sets = std::max(sets, (vertex.size() + 3) / 4);
+      }
       if(!weights.empty() && sets>(256*1024*1024-std::min(data.size(),size_t(256*1024*1024)))/(weights.size()*24))throw std::length_error("Padded skin attribute arrays exceed glTF output resource bound");
       for (size_t set = 0; set < sets; ++set) {
         begin = data.size();
         for (const auto &vertex : weights)
           for (size_t k = 0; k < 4; ++k) {
+            checkpoint();
             size_t influence = set * 4 + k;
             uint16_t joint = influence < vertex.size()
                                  ? uint16_t(vertex[influence].joint)
@@ -214,6 +225,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         begin = data.size();
         for (const auto &vertex : weights)
           for (size_t k = 0; k < 4; ++k) {
+            checkpoint();
             size_t influence = set * 4 + k;
             append(data, std::bit_cast<uint32_t>(influence < vertex.size()
                                                      ? vertex[influence].weight
@@ -224,8 +236,10 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       }
     }
     begin = data.size();
-    for (auto index : mesh.indices)
+    for (auto index : mesh.indices) {
+      checkpoint();
       append(data, index);
+    }
     int indices = add(begin, data.size() - begin, 34963, mesh.indices.size(),
                       5125, "SCALAR");
     int node = int(j["nodes"].size()), material = int(j["materials"].size()),
@@ -532,10 +546,17 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   return result;
 }
 void detail::write_glb(GltfDocument document,const std::filesystem::path &path) {
+  write_glb(std::move(document),path,{},{});
+}
+void detail::write_glb(GltfDocument document,const std::filesystem::path &path,
+    const std::function<bool()> &cancelled,const std::function<void()> &before_commit) {
+  auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
+  stop();
   auto &j=document.json; auto &data=document.binary;
   while(data.size()%4) data.push_back(0);
   j["buffers"] = {{{"byteLength", data.size()}}};
   std::string text = j.dump();
+  stop();
   while (text.size() % 4)
     text.push_back(' ');
   uint64_t length = 12 + 8 + text.size() + 8 + data.size();
@@ -548,10 +569,17 @@ void detail::write_glb(GltfDocument document,const std::filesystem::path &path) 
   append(output, uint32_t(length));
   append(output, uint32_t(text.size()));
   append(output, 0x4e4f534a);
-  output.insert(output.end(), text.begin(), text.end());
+  auto copy=[&](const auto &bytes){
+    for(size_t offset=0;offset<bytes.size();) {
+      stop();auto count=std::min(bytes.size()-offset,size_t(1024*1024));
+      output.insert(output.end(),bytes.begin()+offset,bytes.begin()+offset+count);
+      offset+=count;
+    }
+  };
+  copy(text);
   append(output, uint32_t(data.size()));
   append(output, 0x004e4942);
-  output.insert(output.end(), data.begin(), data.end());
-  atomic_write(path, output);
+  copy(data);
+  atomic_write(path, output,AtomicWriteOptions{cancelled,before_commit});
 }
 } // namespace dome

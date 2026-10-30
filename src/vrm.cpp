@@ -1095,7 +1095,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     report.diagnostics.push_back(
         "Changed morph normals recomputed from edited geometry; exact original "
         "NORMAL deltas remain in the native source archive");
-  detail::write_glb(std::move(document), path);
+  detail::write_glb(std::move(document), path,options.cancelled,options.before_commit);
   return report;
 }
 } // namespace dome

@@ -84,8 +84,14 @@ async def main():
   def pixels():
    g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF);im=Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX');return im.crop((0,28,g.width,max(29,g.height-28)))
   await ready(lambda n:n['Start polygon editing'][1].get('enabled') and (sculpt or n['Use painted mesh'][1].get('toggle-state')==1))
+  if os.environ.get('DOME_POLYGON_ADMISSION')=='1':
+   nodes=await layout()
+   check(all(nodes[name][1].get('enabled',True) for name in ('Bake surface...','Bind or transfer skin...','Start cut','Start patch')),'Eligible target/reference exposes actual universal-menu asset commands')
   check('Start polygon editing' in await layout(),'Polygon tools are part of the existing native universal menu')
   await click('Start polygon editing');await ready(lambda n:n['Apply polygon edit'][1].get('enabled') and n['Faces'][1].get('toggle-state')==1)
+  if os.environ.get('DOME_POLYGON_ADMISSION')=='1':
+   nodes=await layout()
+   check(all(not nodes[name][1].get('enabled',True) for name in ('Bake surface...','Bind or transfer skin...','Start cut','Start patch')),'Active polygon workspace disables conflicting universal-menu asset commands')
   await wait(lambda:any(b>g+8 and g>r+8 for r,g,b in pixels().getdata()));before=pixels();before.save(out/'workspace.png')
   await click('Polygon controls...');dialog=await wait(lambda:named('Polygon edit controls'));g=dialog.get_geometry()
   check(dialog.get_wm_transient_for().id==window.id,'Polygon settings use a document-owned native FLTK modal')
@@ -120,6 +126,9 @@ async def main():
   await click('Save');check(inspect()==original,'Native Undo restores local N-gons while preserving committed scene and paint')
   await click('Redo');await wait(lambda:pixels().tobytes()==extruded.tobytes());await click('Cancel polygon edit');await ready(lambda n:n['Start polygon editing'][1].get('enabled'))
   await click('Save');check(inspect()==original,'Native Cancel discards full draft topology without a global history entry')
+  if os.environ.get('DOME_POLYGON_ADMISSION')=='1':
+   nodes=await layout()
+   check(all(nodes[name][1].get('enabled',True) for name in ('Bake surface...','Bind or transfer skin...','Start cut','Start patch')),'Cancelling the workspace restores actual universal-menu asset commands')
   await click('Start polygon editing');await ready(lambda n:n['Apply polygon edit'][1].get('enabled'));await click('Close Window');await ready(lambda n:n['Start polygon editing'][1].get('enabled'))
   check(named('Dome Sculpt') is not None,'Universal Close cancels the current polygon workspace before closing the window')
   # Apply plus immediate Save must observe the accepted transaction endpoint.
