@@ -154,6 +154,7 @@ struct MeshSnapshot {
   std::vector<Vec3> source_normals, canonical_normals;
   std::vector<std::array<float,4>> source_tangents;
   uint64_t normal_frame_layout_builds=0; // Worker diagnostic, never native state.
+  std::vector<std::array<float,4>> source_colors; // Linear RGBA, identity when absent.
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0;

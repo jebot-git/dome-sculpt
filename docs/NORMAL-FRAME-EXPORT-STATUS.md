@@ -94,16 +94,18 @@ subset receive an actionable refusal and retain the full native source data.
 
 ## Vertex-color proof boundary and required follow-up
 
-This checkpoint preserves source `COLOR_0` accessors through the full corner,
-skin and morph remaps. It does not yet establish colored native-preview parity:
-the native renderer and current independent graphical fixtures do not apply
-source vertex colors. The graphical frame proof therefore covers fixtures
-without active vertex colors. Full native/painted/UV/bake/export color support
-is required follow-up work, including zero RGB/alpha, fractional coverage and
-avoiding double multiplication. The original immutable color attributes remain
-retained; this limitation must not be presented as complete glTF support.
+The original retained-frame checkpoint `414799f` preserved source `COLOR_0`
+accessors through full corner, skin and POSITION/NORMAL/TANGENT morph remaps,
+but its graphical proof covered fixtures without active vertex colors. The
+subsequent [static color implementation](SOURCE-VERTEX-COLORS.md) adds native
+PBR modulation, versioned MToon ignore behavior and independent GLB/VRM
+consumers for raw, painted and adopted-UV static colors under position/direction
+morphs and skinning. This does not add actual COLOR_0 morph targets.
 
-The next implementation must distinguish these primary contracts:
+General colored-target baking, fractional coverage without double modulation,
+and color/UV morph-channel import/export remain required follow-up. Original
+immutable color attributes remain retained; neither checkpoint is complete
+glTF support. The rendering contracts are:
 
 * [glTF core at a55d8458c1e82720413acd3b420fd09e73b8e40b](https://github.com/KhronosGroup/glTF/blob/a55d8458c1e82720413acd3b420fd09e73b8e40b/specification/2.0/Specification.adoc):
   interpolate linear vertex RGBA and multiply the base-color value; decode
