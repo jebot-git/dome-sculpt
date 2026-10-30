@@ -20,4 +20,7 @@ GltfDocument make_gltf(const std::vector<ObjectSurface> &,
                        bool recompute_changed_normals = false,
                        std::function<bool()> cancelled = {});
 void write_glb(GltfDocument, const std::filesystem::path &);
+void write_glb(GltfDocument, const std::filesystem::path &,
+               const std::function<bool()> &cancelled,
+               const std::function<void()> &before_commit);
 } // namespace dome::detail

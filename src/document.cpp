@@ -549,6 +549,11 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
   state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(active.painted->baked());
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
+  state_.pending_exports=0;
+  for(const auto &export_work:exports_)if(export_work) {
+    ++state_.pending_exports;
+    state_.can_cancel_asset|=export_work->cancellable();
+  }
   state_.asset_progress=work.progress;
   state_.can_paint_weights = active.mesh_active && active.painted && object_editable_locked(active.id) &&
       active.deformation && active.deformation->skeleton && active.deformation->skin;
@@ -1706,13 +1711,27 @@ std::future<void> Document::export_asset(const std::filesystem::path &path,
     throw std::logic_error("Select a source avatar group to export");
   FileJob job{scene_.snapshot(), path, state_.revision, state_.generation, content_, true};
   job.object = scene_.active().id; job.export_format = format; job.completion = completion;
+  queue_export_locked(std::move(job));
+  return result;
+}
+void Document::queue_export_locked(FileJob job) {
   std::lock_guard file_lock(file_mutex_);
   if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+  auto slot=std::find(exports_.begin(),exports_.end(),nullptr);
+  if(slot==exports_.end())throw std::runtime_error("Export work queue is full");
+  auto work=std::make_shared<ExportWork>();job.export_work=work;
+  job.operation_label="Export";
+  auto message="Exporting "+job.path.string();
   Transaction transaction(*this);files_.push_back(std::move(job));
-  try{state_.error.clear();state_.message="Exporting "+path.string();publish_locked(false,false);transaction.commit();}
-  catch(...){files_.pop_back();throw;}
+  *slot=work;
+  try{state_.error.clear();state_.message=std::move(message);publish_locked(false,false);transaction.commit();}
+  catch(...){slot->reset();files_.pop_back();throw;}
   file_changed_.notify_one();
-  return result;
+}
+void Document::retire_export_locked(const std::shared_ptr<ExportWork> &work) noexcept {
+  if(!work)return;
+  for(auto &slot:exports_)if(slot==work){slot.reset();break;}
+  work->phase.store(ExportWork::Phase::Finished);
 }
 void Document::file_locked(bool export_mesh, AssetExportFormat format) {
   if (state_.asset_busy)
@@ -1732,6 +1751,7 @@ void Document::file_locked(bool export_mesh, AssetExportFormat format) {
     path.replace_extension(format == AssetExportFormat::Avatar ? ".vrm" : ".glb");
   FileJob job{scene_.snapshot(),path,state_.revision,state_.generation,content_,export_mesh};
   job.recovery_source=recovery_source_;job.create_parent=create_parent;job.export_format=format;job.object=scene_.active().id;
+  if(export_mesh){queue_export_locked(std::move(job));return;}
   std::lock_guard lock(file_mutex_);
   if(files_.size()>=8)throw std::runtime_error("File work queue is full");
   files_.push_back(std::move(job)); // No throwing preparation after handoff.
@@ -2411,6 +2431,9 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command==SpatialCommand::CancelWork)
+    return (state_.asset_busy && asset_status().cancellable) ||
+      std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
   if(polygon_command(command))return polygon_command_enabled_locked(command);
   if(state_.polygon && command!=SpatialCommand::ObjectGrabMode&&command!=SpatialCommand::HoldObject&&command!=SpatialCommand::ReleaseObject&&command!=SpatialCommand::GhostOthers&&command!=SpatialCommand::CancelObjectGrab&&command!=SpatialCommand::CancelWork)return polygon_command_enabled_locked(command);
   if(import_command(command)) {
@@ -2442,7 +2465,6 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     return true;
   }
   if(state_.cut){
-    if(command==SpatialCommand::CancelWork)return state_.asset_busy&&asset_status().cancellable;
     if(state_.cut->committing)return false;
     if(command==SpatialCommand::Undo)return !cut_undo_.empty()||bool(control_before_);
     if(command==SpatialCommand::Redo)return !cut_redo_.empty()&&!control_before_;
@@ -2466,13 +2488,11 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     return true;
   }
   if (state_.retopology) {
-    if (command == SpatialCommand::CancelWork) return state_.asset_busy && asset_status().cancellable;
     if (retopo_accepting_ || !state_.retopology->source) return false;
     if (command == SpatialCommand::Undo) return retopo_stroking_ || state_.retopology->can_undo;
     if (command == SpatialCommand::Redo) return !retopo_stroking_ && state_.retopology->can_redo;
     return false;
   }
-  if(command==SpatialCommand::CancelWork)return state_.asset_busy && asset_status().cancellable;
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
@@ -2677,7 +2697,7 @@ void Document::command_locked(SpatialCommand command) {
     if (command_enabled_locked(command)) queue_retopology_locked(command == SpatialCommand::Undo ? RetopoAction::Undo : RetopoAction::Redo);
     return;
   }
-  if(command==SpatialCommand::CancelWork){cancel_asset_work_locked();return;}
+  if(command==SpatialCommand::CancelWork){cancel_background_work_locked();return;}
   if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
   if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
   if(command==SpatialCommand::BindSkin) {
@@ -3040,6 +3060,8 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if(job->export_work && job->export_work->cancelled())
+        throw std::runtime_error("Export cancelled");
       if(job->discover_import){discover_import_file(*job);continue;}
       if(job->native_capture)capture_native_file(*job);
       if(job->polygon_capture)capture_polygon_file(*job);
@@ -3177,21 +3199,28 @@ void Document::file_loop() {
       }
       std::string export_diagnostics;
       if (job->export_mesh) {
+        // Accepted snapshots drain on close and survive document replacement.
+        // Only the explicit Cancel command changes this per-export token.
+        auto work=job->export_work;
+        auto cancelled=[work]{return work && work->cancelled();};
+        auto before_commit=[work]{if(work)work->begin_commit();};
         if (job->export_format == AssetExportFormat::Avatar) {
           auto group = avatar_group(job->scene, job->object);
           if (!group) throw std::runtime_error("Select a grouped avatar to export");
           for (const auto &object : job->scene.objects())
             if (!in_group(job->scene, object, group)) job->scene.object(object.id).visible = false;
           job->scene.require_exportable_sources();
-          auto report = export_vrm(job->scene.preview_surfaces(), job->path);
+          VrmExportOptions options;options.cancelled=cancelled;options.before_commit=before_commit;
+          auto report = export_vrm(job->scene.preview_surfaces(cancelled), job->path,options);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
         } else {
           job->scene.require_exportable_sources();
-          auto surfaces = job->scene.preview_surfaces();
+          auto surfaces = job->scene.preview_surfaces(cancelled);
           for (auto &surface : surfaces)
-            if (surface.mesh.uv.empty()) unwrap(surface.mesh);
+            if (surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
           GltfExportOptions options; options.recompute_changed_normals = true;
+          options.cancelled=cancelled;options.before_commit=before_commit;
           auto report = export_glb(surfaces, job->path, options);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
@@ -3199,6 +3228,7 @@ void Document::file_loop() {
       } else
         job->scene.save(job->path);
       std::lock_guard lock(model_mutex_);
+      retire_export_locked(job->export_work);
       if(job->generation==state_.generation){
         Transaction transaction(*this);
         bool current_recovery=recovery_&&job->recovery_source.id==recovery_source_.id&&job->recovery_source.generation==recovery_source_.generation;
@@ -3217,12 +3247,14 @@ void Document::file_loop() {
           if(!job->export_mesh&&current_recovery)recovery_->discard(recovery_source_,job->revision);
           checkpoint_locked();
         }catch(...){}
-      }
+      }else if(job->export_work)publish_locked(false,false);
       if (job->completion)
         job->completion->set_value();
     } catch (const std::exception &e) {
       if(job->discover_import){import_listing_error(*job,e);continue;}
       std::lock_guard lock(model_mutex_);
+      const bool export_cancelled=job->export_work && job->export_work->cancelled();
+      retire_export_locked(job->export_work);
       if (job->discover_recovery) {
         state_.recovery_busy = false;
         recovery_discovery_error_ = e.what();
@@ -3252,11 +3284,15 @@ void Document::file_loop() {
           }
         }
         if(job->open_project || job->prepare_mesh) asset_work_.store({});
-        if(job->work && job->work->cancelled.load()){
+        if(export_cancelled || (job->work && job->work->cancelled.load())){
           state_.error.clear();state_.message=job->operation_label+" cancelled";
         }else state_.error = e.what();
         publish_locked();
         if(job->work&&job->work->held_weight&&state_.object_grabbing&&!desktop_&&!object_navigation_.grabbing())finish_object_grab_locked(false,true);
+      }else if(job->export_work){
+        if(export_cancelled && state_.message=="Cancelling background work...")
+          state_.message="Export cancelled";
+        publish_locked(false,false);
       }
       {
         std::lock_guard file_lock(file_mutex_);
