@@ -16,9 +16,22 @@ int main(int argc, char **argv) try {
   std::filesystem::create_directory(home);
   std::filesystem::permissions(home, std::filesystem::perms::owner_all);
   setenv("XDG_RUNTIME_DIR", home.c_str(), 1);
+  setenv("XDG_CACHE_HOME", (home / "cache").c_str(), 1);
   test::FontconfigRuntime fontconfig;
   auto config = bdf_fonts::export_config();
   setenv("FONTCONFIG_FILE", config.c_str(), 1);
+  if (!FcInitReinitialize())
+    throw std::runtime_error("Cannot load private fixture BDF configuration");
+  auto files = FcConfigGetConfigFiles(nullptr);
+  bool private_config = false;
+  if (files) {
+    while (auto file = FcStrListNext(files))
+      private_config |= config == reinterpret_cast<const char *>(file);
+    FcStrListDone(files);
+  }
+  if (!private_config)
+    throw std::runtime_error("Fixture did not load its exported BDF configuration");
+  std::cout << "PASS Exported private BDF configuration is the active Fontconfig configuration\n";
   auto face = bdf_fonts::resolve("Unifont", "Sans-Serif", 16);
   Document doc;
   doc.seed();
