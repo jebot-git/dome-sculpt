@@ -69,7 +69,6 @@ struct Canvas : Fl_Gl_Window {
   std::unique_ptr<SurfaceRenderer> renderer;
   std::unique_ptr<CursorRenderer> cursors;
   std::shared_ptr<const MeshSnapshot> shown_mesh;
-  Mesh mesh;
   Quat rotation{};
   Vec3 pan{};
   Vec3 ball{}, last_stamp{};
@@ -108,7 +107,6 @@ struct Canvas : Fl_Gl_Window {
     auto f = document.frame();
     if (f.surface != shown_mesh) {
       shown_mesh = f.surface;
-      mesh = f.surface->mesh;
       dirty_mesh = false;
     }
   }
@@ -117,6 +115,7 @@ struct Canvas : Fl_Gl_Window {
     return trackball((2 * (x - this->x()) - w()) / size,
                      (h() - 2 * (y - this->y())) / size);
   }
+  bool native_stroke=false, suppress_drag=false;
   void sculpt_at(int x, int y) {
     if (!document.frame().state->stroking) { sculpting = have_stamp = false; return; }
     float aspect = float(w()) / std::max(1, h()),
@@ -126,6 +125,14 @@ struct Canvas : Fl_Gl_Window {
     Vec3 origin = rotation.inverse().rotate(Vec3{0, 0, distance} - pan);
     direction = rotation.inverse().rotate(normalized(direction));
     auto state = document.frame().state;
+    if (native_stroke) {
+      NativeStrokeSample sample;sample.origin=origin;sample.direction=direction;sample.material_time=material_time;
+      sample.brush.radius=radius;sample.brush.tool=tool;
+      sample.brush.strength=!state->sculpt_settings.mask_edit&&tool==Tool::Smooth?.55f:1;
+      sample.brush.blend=std::min(.025f,radius*.25f);
+      if(!document.sample_native_stroke(sample)){sculpting=have_stamp=false;}
+      invalidate();return;
+    }
     if (state->weights.enabled && (!shown_mesh || shown_mesh->generation != state->generation ||
         shown_mesh->revision != state->revision)) { have_stamp = false; return; }
     std::optional<Vec3> hit;
@@ -169,6 +176,7 @@ struct Canvas : Fl_Gl_Window {
         invalidate();return 1;
       }
       if (event == FL_PUSH) {
+        suppress_drag=false;
         take_focus();
         last_x = Fl::event_x();
         last_y = Fl::event_y();
@@ -177,8 +185,10 @@ struct Canvas : Fl_Gl_Window {
             Fl::event_button() == FL_LEFT_MOUSE && Fl::event_state(FL_SHIFT);
         have_stamp = false;
         if (sculpting) {
-          if (!document.begin_desktop()) {
-            sculpting = false;
+          auto state=document.frame().state;
+          native_stroke=!state->weights.enabled&&!state->retopology;
+          if (!(native_stroke?document.begin_native_stroke():document.begin_desktop())) {
+            sculpting = false;suppress_drag=true;
             return 1;
           }
           sculpt_at(last_x, last_y);
@@ -186,6 +196,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_DRAG) {
+        if(suppress_drag)return 1;
         int x = Fl::event_x(), y = Fl::event_y();
         if (sculpting)
           sculpt_at(x, y);
@@ -205,6 +216,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_RELEASE) {
+        suppress_drag=false;
         if (sculpting) {
           document.end_desktop();
           sculpting = false;
@@ -306,6 +318,8 @@ struct App {
   std::atomic_bool stop_xr{false}, xr_running{false};
   uint64_t seen_revision = 0, font_revision = UINT64_MAX;
   std::string seen_error;
+  std::deque<std::string> native_commands;
+  std::optional<std::future<void>> saving;
   ~App() {
     Fl::remove_timeout(tick, this);
     stop_xr = true;
@@ -337,6 +351,17 @@ struct App {
           Fl::get_color(FL_BACKGROUND_COLOR) > 0x80808000,
           Fl::get_color(FL_SELECTION_COLOR) >> 8, chrome_opacity(opacity));
       a.canvas.redraw();
+    }
+    if(a.saving&&a.saving->wait_for(std::chrono::seconds(0))==std::future_status::ready){
+      try{a.saving->get();}catch(const std::exception &error){a.canvas.document.report_error(error.what());}a.saving.reset();
+    }
+    auto native_state=a.canvas.document.frame().state;
+    if(!native_state->native_pending&&!native_state->error.empty()&&!a.native_commands.empty()) {
+      a.native_commands.clear();a.canvas.document.report_error(native_state->error+" | Pending commands cancelled; original project retained");
+    }
+    if(!a.canvas.document.frame().state->native_pending&&!a.saving&&!a.native_commands.empty()) {
+      auto command=std::move(a.native_commands.front());a.native_commands.pop_front();
+      try{a.action(std::move(command));}catch(const std::exception &error){a.canvas.document.report_error(error.what());}
     }
     a.sync_menus();
     a.update_status();
@@ -507,8 +532,7 @@ struct App {
     window.callback(
         [](Fl_Widget *, void *data) {
           auto &app = *static_cast<App *>(data);
-          if (app.discard())
-            app.window.hide();
+          app.action("Close Window");
         },
         this);
     universal = std::make_unique<DesktopMenu>(window, menu);
@@ -548,7 +572,7 @@ struct App {
     enable("&Mesh/Voxel remesh...", !modal && s->can_voxel_remesh);
     enable("&Mesh/Bake surface...",!modal && s->can_bake);
     enable("&Mesh/Clear baked surface",!modal && s->can_clear_bake);
-    enable("&File/Cancel background work",!modal && s->can_cancel_asset);
+    enable("&File/Cancel background work",!modal && (s->can_cancel_asset||s->native_pending));
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Reset &trackball", "&View/Start or stop &XR",
                            "&View/Shading/&PBR", "&View/Shading/&Toon preview"};
@@ -777,6 +801,8 @@ struct App {
       text.str("");
       text << "XR active | " << hints;
     }
+    if(!native_commands.empty())text<<" | Pending "<<native_commands.size()<<": "<<native_commands.front();
+    if(info->native_pending)text<<(info->native_accepting?" | Painting ":" | Finishing stroke ")<<info->native_samples<<" samples";
     if(info->asset_busy) {
       const auto work=canvas.document.asset_status();
       if(work.cancelling)text<<" | Cancelling";
@@ -807,6 +833,16 @@ struct App {
   }
   void action(std::string label) {
     label.erase(std::remove(label.begin(), label.end(), '&'), label.end());
+    if(canvas.document.frame().state->native_pending) {
+      canvas.sculpting=canvas.have_stamp=false;canvas.suppress_drag=true;
+      if(label=="Undo"||label=="Cancel background work"){native_commands.clear();canvas.document.end_native_stroke(false);return;}
+      if(native_commands.size()>=8){canvas.document.report_error("Desktop command queue is full; retry after the stroke finishes");return;}
+      canvas.document.end_native_stroke(true);native_commands.push_back(std::move(label));return;
+    }
+    if(saving&&(label=="Close Window"||label=="Quit"||label=="New"||label=="Open...")) {
+      if(native_commands.size()>=8){canvas.document.report_error("Desktop command queue is full");return;}
+      native_commands.push_back(std::move(label));return;
+    }
     auto modal = Fl::modal();
     if (label == "Cut" || label == "Copy" || label == "Paste" ||
         label == "Select All") {
@@ -878,7 +914,7 @@ struct App {
           return;
         path = chosen;
       }
-      canvas.document.save_async(path);
+      saving.emplace(canvas.document.save_async(path));
     } else if (label == "Close Window" || label == "Quit") {
       if (discard())
         window.hide();

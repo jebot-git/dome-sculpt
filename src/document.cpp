@@ -61,6 +61,7 @@ Document::Document() : input_(volume()) {
     uv_thread_ = std::thread([this] { uv_loop(); });
     retopo_thread_ = std::thread([this] { retopo_loop(); });
     cut_thread_ = std::thread([this] { cut_loop(); });
+    native_thread_ = std::thread([this] { native_loop(); });
   } catch (...) {
     request_worker_stop();
     {
@@ -78,6 +79,7 @@ Document::Document() : input_(volume()) {
       uv_thread_.join();
     if (retopo_thread_.joinable()) retopo_thread_.join();
     if (cut_thread_.joinable()) cut_thread_.join();
+    if (native_thread_.joinable()) native_thread_.join();
     throw;
   }
 }
@@ -91,8 +93,10 @@ void Document::request_worker_stop() {
   { std::lock_guard lock(uv_mutex_); uv_changed_.notify_all(); }
   { std::lock_guard lock(retopo_mutex_); retopo_changed_.notify_all(); }
   { std::lock_guard lock(cut_mutex_); cut_changed_.notify_all(); }
+  { std::lock_guard lock(native_mutex_); native_changed_.notify_all(); }
 }
 Document::~Document() {
+  drain_native_shutdown();
   request_worker_stop();
   input_thread_.join();
   {
@@ -105,6 +109,7 @@ Document::~Document() {
   uv_thread_.join();
   retopo_thread_.join();
   cut_thread_.join();
+  native_thread_.join();
 }
 EditorSnapshot Document::frame() const {
   auto state = published_.load();
@@ -124,12 +129,14 @@ Scene Document::copy_scene() const {
   return scene_.snapshot();
 }
 bool Document::action_active_locked() const {
+  if(native_stroke_)return true;
   if (retopo_stroking_) return true;
   if (weight_stroking_) return true;
   auto &o = scene_.active();
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if(native_stroke_)return true;
   if(state_.cut)return state_.cut->busy||(state_.cut->preview&&state_.cut->preview->changed);
   if (state_.retopology) return state_.retopology->changed || retopo_stroking_ || retopo_pending_ != 0;
   if (weight_stroking_) return !weight_samples_.empty();
@@ -254,14 +261,18 @@ void Document::invalidate_weight_view_locked(bool restore) {
   mesh_changed_.notify_all();
 }
 void Document::record_locked(History entry) {
+  if(next_content_==UINT64_MAX)throw std::overflow_error("Document history identity exhausted");
   entry.from = content_;
-  entry.to = next_content_++;
-  content_ = entry.to;
-  redo_.clear();
+  entry.to = next_content_;
+  // Allocate the history node before changing redo or content identities.
+  // Callers that swap authority before constructing History still need their
+  // own staging/rollback; this does not make those generic callers atomic.
   undo_.push_back(std::move(entry));
-  while (undo_.size() > 128)
-    undo_.pop_front();
+  content_ = next_content_++;
+  redo_.clear();
+  while (undo_.size() > 128)undo_.pop_front();
 }
+
 void Document::record_stroke_locked() {
   History h;
   if (scene_.active().mesh_active)
@@ -409,7 +420,7 @@ void Document::object_properties(uint64_t id, std::string name, bool visible,
   o.material = std::move(material);
   scene_changed_locked(std::move(before));
 }
-void Document::publish_locked(bool force) {
+void Document::publish_locked(bool force,bool checkpoint) {
   auto &active = scene_.active();
   uint64_t paint_revision = active.mesh_active ? active.painted->revision() : 0;
   bool changed = force || last_volume_ != volume().revision() ||
@@ -511,6 +522,10 @@ void Document::publish_locked(bool force) {
       if (l.id == state_.active_layer)
         state_.layer_visible = l.visible;
     }
+  state_.native_pending=bool(native_stroke_);
+  state_.native_gesture=native_stroke_?native_stroke_->epoch:0;
+  state_.native_accepting=native_stroke_&&!native_stroke_->accepted.load();
+  if(!native_stroke_)state_.native_samples=0;
   state_.stroking = action_active_locked();
   state_.weight_gesture = weight_stroking_ ? weight_epoch_.load() : 0;
   state_.weight_samples = weight_stroking_ ? weight_samples_.size() : 0;
@@ -529,7 +544,7 @@ void Document::publish_locked(bool force) {
                              : command ? command_enabled_locked(*command)
                                        : true;
   }
-  checkpoint_locked();
+  if(checkpoint)checkpoint_locked();
   published_.store(std::make_shared<EditorState>(state_));
   { std::lock_guard lock(retopo_mutex_); retopo_changed_.notify_all(); }
   { std::lock_guard lock(cut_mutex_); cut_changed_.notify_all(); }
@@ -544,6 +559,7 @@ void Document::publish_locked(bool force) {
     pending_mesh_.emplace(
         MeshJob{state_.revision, state_.generation, scene_.snapshot(), state_.weights.enabled,
                 state_.weights.linked, uint32_t(state_.rig_joint), 0, {}, {}});
+    native_source_scene_=std::make_shared<const Scene>(pending_mesh_->scene);
     pending_mesh_->sculpt_mask_view = state_.sculpt_mask_visible;
     if (state_.retopology && active.retopology) {
       // Reopening a patch displays its retained reference, including its pose,
@@ -563,6 +579,7 @@ void Document::publish_locked(bool force) {
   }
 }
 void Document::finish_locked() {
+  if(native_stroke_)throw std::logic_error("Wait for the accepted desktop stroke, or cancel it, before changing the document");
   if(state_.cut)throw std::logic_error("Apply or cancel the plane cut before changing the document");
   if (state_.retopology)
     throw std::logic_error("Apply or cancel retopology before changing the document");
@@ -596,6 +613,7 @@ void Document::replace(Scene next, bool clean) {
   replace_locked(std::move(next), clean);
 }
 void Document::replace_locked(Scene next, bool clean) {
+  if(native_stroke_)cancel_native_locked();
   if(state_.cut){finish_control_locked(false);cancel_cut_locked();}
   if (state_.retopology) cancel_retopology_locked();
   if (weight_stroking_) {
@@ -672,6 +690,7 @@ void Document::stamp_desktop(Brush b) {
 }
 void Document::end_desktop() {
   std::lock_guard lock(model_mutex_);
+  if(native_stroke_){end_native_locked(true);publish_locked();return;}
   if (desktop_) {
     if (end_action_locked())
       record_stroke_locked();
@@ -682,6 +701,7 @@ void Document::end_desktop() {
 }
 void Document::cancel_desktop() {
   std::lock_guard lock(model_mutex_);
+  if(native_stroke_){cancel_native_locked();publish_locked();return;}
   if (desktop_) {
     cancel_action_locked();
     desktop_ = false;
@@ -738,6 +758,7 @@ Vec3 Document::gradient(Vec3 p) const {
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
+  if(native_stroke_){cancel_native_locked();publish_locked();return true;}
   if(state_.cut){bool available=!cut_undo_.empty()||bool(control_before_);cut_history_locked(false);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || !state_.retopology->source) return false;
@@ -953,6 +974,8 @@ bool Document::wait_asset(std::chrono::milliseconds timeout) const {
   // An accepted patch may still be draining topology input before it queues
   // the ordered asset job. Waiting only for asset_busy can save too early at
   // an XR shutdown boundary. Unconfirmed workspaces do not block this helper.
+  auto native=published_.load();
+  if(native->native_pending&&!native->native_accepting&&!wait_native_stroke(timeout))return false;
   auto topology = published_.load()->retopology;
   if (topology && topology->committing && !wait_retopology(timeout)) return false;
   auto cut=published_.load()->cut;
@@ -1255,7 +1278,8 @@ void Document::mesh_loop() {
     auto cancelled = [&] {
       auto state = published_.load();
       return stopping_.load() || state->generation != job->generation || state->revision != job->revision ||
-             (job->weight_gesture && weight_epoch_.load() != job->weight_gesture);
+             (job->weight_gesture && weight_epoch_.load() != job->weight_gesture) ||
+             (job->native_gesture && native_epoch_.load()!=job->native_gesture);
     };
     try {
       std::optional<Scene> proposed;
@@ -1318,6 +1342,7 @@ void Document::mesh_loop() {
       snapshot->generation = job->generation;
       snapshot->weight_gesture = job->weight_gesture;
       snapshot->weight_samples = job->weight_samples.size();
+      snapshot->native_gesture=job->native_gesture;snapshot->native_samples=job->native_samples;
       auto weighted = job->weight_view ? weight_objects(job->scene, job->scene.active().id, job->linked_weights)
                                       : std::vector<uint64_t>{};
       std::unordered_set<uint64_t> frame_objects;
@@ -1469,6 +1494,7 @@ bool Document::wait_mesh(std::chrono::milliseconds timeout) const {
     auto m = mesh_.load();
     return m->generation == wanted->generation && m->revision >= wanted->revision &&
            (!wanted->cut || (m->cut_session==wanted->cut->session && m->cut_request>=wanted->cut->request)) &&
+           (!wanted->native_samples || (m->native_gesture==wanted->native_gesture && m->native_samples>=wanted->native_samples)) &&
            (!wanted->weight_samples || (m->weight_gesture == wanted->weight_gesture &&
                                        m->weight_samples >= wanted->weight_samples));
   };
@@ -1516,6 +1542,12 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
   auto result = completion->get_future();
   {
     std::lock_guard lock(model_mutex_);
+    if(native_stroke_) {
+      FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;
+      job.native_capture=native_stroke_;
+      {std::lock_guard file_lock(file_mutex_);if(files_.size()>=8)throw std::runtime_error("File work queue is full");files_.push_back(std::move(job));}
+      end_native_locked(true);state_.message="Finishing desktop stroke before saving";publish_locked();file_changed_.notify_one();return result;
+    }
     finish_locked();
     if (state_.asset_busy || state_.recovery_busy)
       throw std::logic_error("Wait for pending authoring work before saving");
@@ -1523,8 +1555,13 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
     {
       std::lock_guard file_lock(file_mutex_);
       if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
-      files_.push_back({scene_.snapshot(), path, state_.revision,
-                        state_.generation, content_, false, true, completion});
+      FileJob job{};job.path=path;job.revision=state_.revision;job.generation=state_.generation;
+      job.content=content_;job.adopt_path=true;job.completion=completion;job.object=scene_.active().id;
+      // The authoritative cache already shares the frozen mesh-job snapshot.
+      // Clone paint/volume metadata only on the file worker. The initial empty
+      // document has no mesh publication yet and needs its tiny fallback.
+      job.capture_scene=native_source_scene_?native_source_scene_:std::make_shared<const Scene>(scene_.snapshot());
+      files_.push_back(std::move(job));
       files_.back().recovery_source = recovery_source_;
     }
     state_.error.clear(); state_.message = "Saving " + path.string();
@@ -2776,6 +2813,8 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if(job->native_capture)capture_native_file(*job);
+      if(job->capture_scene){job->scene=job->capture_scene->snapshot();job->scene.select(job->object);job->capture_scene.reset();}
       if (job->open_project) {
         auto cancelled = [&] {
           return stopping_.load() || job->work->cancelled.load() ||

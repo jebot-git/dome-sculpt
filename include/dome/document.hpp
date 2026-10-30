@@ -11,6 +11,7 @@
 #include "sculpt-resolution.hpp"
 #include "retopo-authoring.hpp"
 #include "cut-authoring.hpp"
+#include "native-stroke.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -49,6 +50,9 @@ struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0;
 struct EditorState {
   uint64_t revision = 1, generation = 1, input_epoch = 1;
   bool dirty = false, stroking = false, menu = false;
+  bool native_pending = false, native_accepting = false;
+  uint64_t native_gesture = 0;
+  size_t native_samples = 0;
   uint64_t active_object = 1;
   std::vector<ObjectInfo> objects;
   Tool tool = Tool::Clay;
@@ -137,6 +141,8 @@ struct MeshSnapshot {
   std::vector<float> sculpt_masks;
   uint64_t weight_gesture = 0;
   size_t weight_samples = 0;
+  uint64_t native_gesture = 0;
+  size_t native_samples = 0;
   std::shared_ptr<const MaterialSurfaceQuery> picking;
   std::vector<std::array<float,4>> tangents;
   SculptMeshingStats sculpt_meshing;
@@ -165,6 +171,7 @@ struct EditorSnapshot {
 // snapshots. Neither meshing, UV generation nor file I/O executes in the XR
 // frame loop.
 class Document {
+  friend struct DocumentNativeTestAccess;
 public:
   Document();
   ~Document();
@@ -183,6 +190,10 @@ public:
                          CanvasTransform, Material);
   void replace(Volume, bool clean = true);
   void seed();
+  bool begin_native_stroke();
+  bool sample_native_stroke(NativeStrokeSample);
+  void end_native_stroke(bool accept = true);
+  bool wait_native_stroke(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   bool begin_desktop();
   void stamp_desktop(Brush);
   void end_desktop();
@@ -382,6 +393,36 @@ private:
   void queue_uv_locked(std::shared_ptr<const Mesh>);
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
+  struct FileJob;
+  struct NativeStroke {
+    uint64_t epoch = 0;
+    AssetSource source;
+    CanvasTransform transform;
+    std::shared_ptr<const DeformationState> deformation;
+    std::shared_ptr<const Scene> initial;
+    std::shared_ptr<const MeshSnapshot> original_preview;
+    PaintSettings paint;
+    std::deque<NativeStrokeSample> samples;
+    size_t submitted = 0;
+    std::atomic_bool cancelled{false}, accepted{false};
+    bool accepting = true, done = false;
+    std::string error;
+    std::shared_ptr<const Scene> completed;
+    uint64_t revision = 0, content = 0;
+    RecoverySource recovery_source;
+  };
+  std::shared_ptr<NativeStroke> native_stroke_;
+  std::shared_ptr<const Scene> native_source_scene_;
+  mutable std::mutex native_mutex_;
+  mutable std::condition_variable native_changed_;
+  std::deque<std::shared_ptr<NativeStroke>> native_jobs_;
+  bool native_processing_ = false;
+  std::atomic<uint64_t> native_epoch_{0};
+  void native_loop();
+  void end_native_locked(bool);
+  void cancel_native_locked();
+  void drain_native_shutdown();
+  void capture_native_file(FileJob &);
   struct MeshJob {
     uint64_t revision, generation;
     Scene scene;
@@ -392,6 +433,8 @@ private:
     std::vector<WeightBrush> weight_samples;
     WeightToolSettings weight_settings;
     bool sculpt_mask_view = false;
+    uint64_t native_gesture = 0;
+    size_t native_samples = 0;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;
@@ -431,6 +474,8 @@ private:
     std::shared_ptr<const MeshSnapshot> rollback_preview{};
     uint64_t retopo_session = 0;
     uint64_t cut_session = 0;
+    std::shared_ptr<NativeStroke> native_capture{};
+    std::shared_ptr<const Scene> capture_scene{};
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
@@ -438,9 +483,9 @@ private:
   std::deque<FileJob> files_;
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
-  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_, cut_thread_;
+  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_, cut_thread_, native_thread_;
   void request_worker_stop();
-  void publish_locked(bool force_geometry = false);
+  void publish_locked(bool force_geometry = false, bool checkpoint = true);
   void record_locked(History);
   void record_stroke_locked();
   void scene_changed_locked(Scene before);
