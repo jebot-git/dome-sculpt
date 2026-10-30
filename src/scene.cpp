@@ -319,12 +319,39 @@ Scene Scene::decode(const nlohmann::json &j) {
   if(j.at("format")!="dome-sculpt" || !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
-  if(version==1 || (version==2 && j.contains("samples"))) {
+  if(version==1 || ((version==2 || version==3) && j.contains("samples") && !j.contains("objects"))) {
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
   if(version<2 || version>8)throw std::runtime_error("Unsupported scene version");
   const auto &objects=j.at("objects");
   if(!objects.is_array() || objects.empty() || objects.size()>256)throw std::length_error("Invalid scene object count");
+  // Bound the complete serialized sculpt payload before decoding any object.
+  // Masks are independent of displacement layers and must share the Scene quota.
+  size_t sculpt_entries=0;
+  for(const auto &object:objects) {
+    const auto &volume=object.at("volume");
+    const auto &samples=volume.at("samples");
+    if(!samples.is_array()) throw std::runtime_error("Invalid sculpt samples");
+    size_t layers=0;
+    if(volume.contains("sculpt_layers")) {
+      const auto &records=volume.at("sculpt_layers");
+      if(!records.is_array() || records.size()>16) throw std::runtime_error("Invalid sculpt layer count");
+      for(const auto &layer:records) {
+        const auto &delta=layer.at("delta");
+        if(!delta.is_array() || delta.size()>4'000'000-layers) throw std::length_error("Scene sculpt storage limit exceeded");
+        layers+=delta.size();
+      }
+    }
+    size_t entries=std::max(samples.size(),layers);
+    if(entries>4'000'000) throw std::length_error("Scene sculpt storage limit exceeded");
+    if(volume.contains("sculpt_mask")) {
+      const auto &values=volume.at("sculpt_mask").at("values");
+      if(!values.is_array() || values.size()>4'000'000-entries) throw std::length_error("Scene sculpt mask storage limit exceeded");
+      entries+=values.size();
+    }
+    if(entries>4'000'000-sculpt_entries) throw std::length_error("Scene sculpt storage limit exceeded");
+    sculpt_entries+=entries;
+  }
   size_t binding_keys=0,retopology_keys=0;
   for(const auto &object:objects) {
     if(!object.is_object())throw std::runtime_error("Invalid scene object record");
@@ -610,12 +637,15 @@ Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled) const {
   return surfaces_impl(false, true, cancelled);
 }
-std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled) const {
+std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
+  return surfaces_impl(false, true, cancelled, mesher);
+}
+std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
     if (o.visible) {
       auto mesh = o.mesh_active ? o.painted->mesh()
-                                : surface_mesh(*o.volume, cancelled);
+                                : mesher ? mesher(o.id, *o.volume) : surface_mesh(*o.volume, cancelled);
       if (mesh.indices.empty())
         continue;
       if (atlas && !o.mesh_active)

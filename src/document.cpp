@@ -8,6 +8,7 @@
 #include "dome/mesh-processing.hpp"
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
+#include "sculpt-ui-values.hpp"
 #include <unistd.h>
 #include <utility>
 namespace dome {
@@ -467,6 +468,11 @@ void Document::publish_locked(bool force) {
   auto avatar = avatar_group(scene_, active.id);
   state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
       [&](const auto &o) { return o.appearance && o.appearance->vrm_json && in_group(scene_, o, avatar); });
+  state_.sculpt_settings = volume().sculpt_settings();
+  state_.sculpt_transform = scene_.world_transform(active.id);
+  state_.can_configure_sculpt = sculpt_target_ready_locked();
+  state_.sculpt_mask_visible = !active.mesh_active && active.visible && !state_.retopology &&
+      !state_.weights.enabled && state_.sculpt_settings.mask_visible;
   state_.active_sculpt_layer = volume().active_layer();
   state_.sculpt_layers.clear();
   state_.sculpt_editable = volume().editable_layer();
@@ -520,6 +526,7 @@ void Document::publish_locked(bool force) {
     pending_mesh_.emplace(
         MeshJob{state_.revision, state_.generation, scene_.snapshot(), state_.weights.enabled,
                 state_.weights.linked, uint32_t(state_.rig_joint), 0, {}, {}});
+    pending_mesh_->sculpt_mask_view = state_.sculpt_mask_visible;
     if (state_.retopology && active.retopology) {
       // Reopening a patch displays its retained reference, including its pose,
       // without changing authoritative visibility or exporting a preview proxy.
@@ -548,7 +555,8 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::BakeSource &&
                         state_.controls.parameter != VrParameter::BakeDistances &&
                         state_.controls.parameter != VrParameter::BakeQuality &&
-                        !skin_parameter(state_.controls.parameter));
+                        !skin_parameter(state_.controls.parameter) &&
+                        !sculpt_parameter(state_.controls.parameter));
   if (uv_accept_pending_)
     throw std::logic_error("Wait for the accepted UV edit to finish");
   bool weight_action = weight_stroking_;
@@ -617,7 +625,7 @@ bool Document::begin_desktop() {
   if (control_before_ || uv_ || state_.asset_busy || action_active_locked() ||
       input_.menu_open() || !scene_.active().visible ||
       scene_.active().locked ||
-      (!state_.retopology && !scene_.active().mesh_active && !volume().editable_layer()))
+      (!state_.retopology && !scene_.active().mesh_active && !volume().editable_layer() && !volume().sculpt_settings().mask_edit))
     return false;
   if (state_.retopology && (!state_.retopology->source || retopo_accepting_)) return false;
   input_.cancel();
@@ -1053,11 +1061,12 @@ void Document::process_locked(const SpatialFrame &f) {
   input_.edit_allowed =
       !state_.asset_busy && scene_.active().visible &&
       !scene_.active().locked &&
-      (scene_.active().mesh_active || volume().editable_layer()) &&
+      (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   input_.painting = scene_.active().mesh_active;
   input_.retopology = bool(state_.retopology);
+  input_.sculpt_mask_edit = !scene_.active().mesh_active && volume().sculpt_settings().mask_edit;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
     const auto &h = f.hands[i];
@@ -1102,7 +1111,10 @@ void Document::process_locked(const SpatialFrame &f) {
       publish_locked();
       return;
     }
-    if (!state_.retopology) finish_locked();
+    // Mask page commands already end their gesture on menu entry. Retain the
+    // live page so toggles and Fill can be followed by Resume without losing it.
+    if (!state_.retopology && !sculpt_mask_command(*c) &&
+        !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork)) finish_locked();
     command_locked(*c);
   }
 
@@ -1181,6 +1193,12 @@ void Document::input_loop() {
   }
 }
 void Document::mesh_loop() {
+  struct CachedSculpt {
+    std::shared_ptr<const Volume> owner;
+    Mesh mesh;
+  };
+  std::unordered_map<uint64_t, CachedSculpt> sculpt_cache;
+  uint64_t cache_generation = 0;
   while (!stopping_) {
     std::optional<MeshJob> job;
     {
@@ -1206,7 +1224,24 @@ void Document::mesh_loop() {
       }
       // Keep the gesture's posed geometry fixed. Preview only the candidate
       // influences, so every capsule addresses the same displayed surface.
-      auto objects = job->scene.preview_surfaces(cancelled);
+      if (cache_generation != job->generation) { sculpt_cache.clear(); cache_generation = job->generation; }
+      std::erase_if(sculpt_cache, [&](const auto &entry) {
+        return std::none_of(job->scene.objects().begin(), job->scene.objects().end(), [&](const auto &o) {
+          return o.id == entry.first && o.visible && !o.mesh_active;
+        });
+      });
+      auto objects = job->scene.preview_surfaces(cancelled, [&](uint64_t id, const Volume &source) {
+        auto &cache = sculpt_cache[id];
+        // Retain the COW owner: comparing addresses alone would permit allocator
+        // reuse after a real geometry edit. Mask/control changes retain this map.
+        if (!cache.owner || &cache.owner->voxels() != &source.voxels() ||
+            cache.owner->voxel_size() != source.voxel_size()) {
+          auto owner = std::make_shared<const Volume>(source.geometry_snapshot());
+          auto mesh = surface_mesh(source, cancelled);
+          cache = {std::move(owner), std::move(mesh)};
+        }
+        return cache.mesh;
+      });
       auto snapshot = std::make_shared<MeshSnapshot>();
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
@@ -1229,6 +1264,9 @@ void Document::mesh_loop() {
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
           snapshot->tangents.push_back({direction.x,direction.y,direction.z,tangent[3]});
+          if (job->sculpt_mask_view)
+            snapshot->sculpt_masks.push_back(o.id == job->scene.active().id
+                ? job->scene.object(o.id).volume->mask_sample(o.mesh.positions.at(vertex)) : -1.f);
           if (job->weight_view) {
             float value = selected ? 0.f : -1.f;
             const auto &deformation = proposed ? proposed->object(o.id).deformation : o.deformation;
@@ -1402,6 +1440,7 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if (sculpt_parameter(parameter)) return sculpt_target_ready_locked();
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
   if (state_.retopology) return false;
@@ -1448,6 +1487,23 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if (sculpt_parameter(state_.controls.parameter)) {
+    auto settings = volume().sculpt_settings();
+    const auto c = state_.controls;
+    auto before = std::move(control_before_); control_before_.reset();
+    if (accept) {
+      if (c.parameter == VrParameter::SculptMaskMode) settings.mask_tool = Volume::MaskTool(int(std::lround(c.value[0])));
+      else if (c.parameter == VrParameter::SculptMaskStrength) settings.mask_strength = c.value[0];
+      else {
+        float *axes[]={&settings.symmetry_origin.x,&settings.symmetry_origin.y,&settings.symmetry_origin.z};
+        for(int k=0;k<3;++k) if(c.value[k]!=sculpt_plane_slider(*axes[k])) *axes[k]=sculpt_plane_metres(c.value[k]);
+        settings.mask_visible = c.value[3] >= .5f;
+      }
+      try { sculpt_settings_locked(settings, control_source_); }
+      catch (...) { control_before_ = std::move(before); throw; }
+    }
+    control_changed_ = false; state_.controls = {}; return;
+  }
   if(skin_parameter(state_.controls.parameter)) {
     const auto c=state_.controls;
     if(accept) {
@@ -1608,6 +1664,15 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::SculptMaskMode:
+      c.title="Sculpt mask tool"; c.maximum=2; c.value[0]=int(volume().sculpt_settings().mask_tool); break;
+    case VrParameter::SculptMaskStrength:
+      c.title="Sculpt mask strength"; c.value[0]=volume().sculpt_settings().mask_strength; break;
+    case VrParameter::SculptPlanes: {
+      const auto settings=volume().sculpt_settings();
+      c.title="Local mirror planes / protection view"; c.components=4;
+      c.value={sculpt_plane_slider(settings.symmetry_origin.x),sculpt_plane_slider(settings.symmetry_origin.y),sculpt_plane_slider(settings.symmetry_origin.z),settings.mask_visible?1.f:0.f}; break;
+    }
     case VrParameter::SkinSource: {
       auto ids=skin_sources_locked(state_.skin_options.mode);c.title="Skin reference (rest space)";
       c.maximum=float(ids.size()-1);
@@ -1804,6 +1869,9 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::SculptMaskMode:
+  case VrParameter::SculptMaskStrength:
+  case VrParameter::SculptPlanes:
   case VrParameter::RetopoDistance:
     break; // Projection settings take effect only on confirmation.
   case VrParameter::BakeSource:
@@ -1928,6 +1996,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if (sculpt_mask_command(command)) return sculpt_target_ready_locked();
   if (command == SpatialCommand::RetopoBegin)
     return state_.retopology ? state_.retopology->source && !retopo_accepting_ && !state_.asset_busy && !control_before_
                              : state_.can_retopologize;
@@ -2037,7 +2106,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   case SpatialCommand::MakeMesh:
     return o.visible && !o.locked && !o.deformation;
   case SpatialCommand::EditSource:
-    return o.mesh_active;
+    return o.visible && !o.locked && (o.mesh_active || volume().sculpt_settings().mask_edit);
   case SpatialCommand::PaintColor:
   case SpatialCommand::PaintMetal:
   case SpatialCommand::PaintRough:
@@ -2077,14 +2146,28 @@ void Document::sculpt_layer_properties(uint64_t object, uint64_t id,
 void Document::sculpt_command(SpatialCommand command) {
   std::lock_guard lock(model_mutex_);
   finish_locked();
-  if (command < SpatialCommand::SculptAdd ||
-      command > SpatialCommand::SculptOpacity ||
+  if ((!sculpt_mask_command(command) && (command < SpatialCommand::SculptAdd ||
+      command > SpatialCommand::SculptOpacity)) ||
       !command_enabled_locked(command))
     throw std::logic_error("Sculpt layer command unavailable");
   command_locked(command);
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if (sculpt_mask_command(command)) {
+    if (!command_enabled_locked(command)) return;
+    if (command == SpatialCommand::SculptMaskFill || command == SpatialCommand::SculptMaskClear || command == SpatialCommand::SculptMaskInvert) {
+      queue_sculpt_mask_locked(command == SpatialCommand::SculptMaskInvert ? std::optional<float>{} : command == SpatialCommand::SculptMaskFill ? 1.f : 0.f);
+    } else {
+      auto settings=volume().sculpt_settings();
+      if(command==SpatialCommand::SculptMaskResume) settings.mask_edit=true;
+      else if(command==SpatialCommand::SculptMaskToggle) settings.mask_edit=!settings.mask_edit;
+      else if(command==SpatialCommand::SculptMaskVisible) settings.mask_visible=!settings.mask_visible;
+      else settings.symmetry_axes ^= command==SpatialCommand::SculptMirrorX?1u:command==SpatialCommand::SculptMirrorY?2u:4u;
+      sculpt_settings_locked(settings);
+    }
+    return;
+  }
   if (command == SpatialCommand::RetopoBegin) {
     if (!command_enabled_locked(command)) return;
     if (!state_.retopology) begin_retopology_locked();
@@ -2240,6 +2323,9 @@ void Document::command_locked(SpatialCommand command) {
       Scene before = scene_;
       scene_.active().mesh_active = false;
       scene_changed_locked(std::move(before));
+    }
+    if (volume().sculpt_settings().mask_edit && sculpt_target_ready_locked()) {
+      auto settings=volume().sculpt_settings(); settings.mask_edit=false; sculpt_settings_locked(settings);
     }
     const auto &source=scene_.active();
     state_.message=source_is_dormant(source)

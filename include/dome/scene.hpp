@@ -93,9 +93,13 @@ public:
   surfaces(bool atlas = false,
            const std::function<bool()> &cancelled = {}) const;
   std::vector<ObjectSurface> preview_surfaces(const std::function<bool()> &cancelled = {}) const;
+  // Optional immutable source geometry cache for render workers. Material, pose
+  // and source ownership still come from this Scene snapshot.
+  using SculptMesher = std::function<Mesh(uint64_t, const Volume &)>;
+  std::vector<ObjectSurface> preview_surfaces(const std::function<bool()> &, const SculptMesher &) const;
 
 private:
-  std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &) const;
+  std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &, const SculptMesher & = {}) const;
   std::vector<SculptObject> objects_;
   uint64_t active_ = 1, next_ = 2;
   std::vector<SceneGroup> groups_;

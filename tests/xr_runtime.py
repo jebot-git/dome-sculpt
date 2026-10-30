@@ -320,6 +320,8 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
             volume["samples"].sort()
             for layer in volume.get("sculpt_layers", []):
                 layer["delta"].sort()
+            if "sculpt_mask" in volume:
+                volume["sculpt_mask"]["values"].sort()
         return scene
     retopo_original = inspect_scene(retopo_fixture)
     prefix, prefix_path = run("retopo-committed", 14,
@@ -379,6 +381,66 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
                   "Retopology focus fixture crosses actual OpenXR focus loss and regain")
             check(all(abs(p[0]-.35) > .01 or abs(p[1]-.25) > .01 for p in positions),
                   "Focus loss cancels the held point while retaining the earlier draft point for later Face and Apply")
+
+    # Native sculpt protection is authored through menu15, ray sliders and
+    # tracked pressure. Inspect persisted Scene data rather than a test app API.
+    mask_fixture=root / "sculpt-mask-input.dsculpt"
+    mask_helper=binary.parent / "dome-sculpt-mask-document-test"
+    subprocess.run([str(mask_helper),"--ui-fixture",str(mask_fixture)],check=True)
+    mask_original=inspect_scene(mask_fixture)
+    prefix,prefix_path=run("mask-prefix",36,extra=["--open",str(mask_fixture)],
+                           mode={"DOME_XR_FIXTURE_SCULPT_MASK":"prefix"})
+    check(prefix.returncode==0,"Real-loader mask authoring accepts menu15 controls and a tracked protection stroke")
+    mask_prefix=inspect_scene(prefix_path)
+    prefix_volume=mask_prefix["objects"][0]["volume"]
+    prefix_controls=prefix_volume["sculpt_controls"]
+    check(prefix_controls["mask_edit"] and prefix_controls["symmetry_axes"]==1 and
+          abs(prefix_controls["mask_strength"]-.35)<1e-5 and bool(prefix_volume["sculpt_mask"]["values"]),
+          "Actual OpenXR joystick and ray controls set mirror X, mask strength and persistent protection")
+    original_volume=mask_original["objects"][0]["volume"]
+    check(prefix_volume["samples"]==original_volume["samples"] and
+          prefix_volume["sculpt_layers"]==original_volume["sculpt_layers"],
+          "OpenXR protection changes preserve every original sculpt sample and layer delta exactly")
+    origin=original_volume["sculpt_controls"]["symmetry_origin"][0]
+    voxel=prefix_volume["voxel_size"]
+    centers=(.11,2*origin-.11)
+    values=prefix_volume["sculpt_mask"]["values"]
+    check(all(any(abs(row[0]*voxel-center)<voxel*1.1 and abs(row[1]*voxel)<voxel*1.1 and
+                      abs(row[2]*voxel-.18)<voxel*1.1 and row[3]>0 for row in values) for center in centers),
+          "The tracked stroke protects independently expected original and object-local mirrored positions")
+    for mode in ("accept","cancel","focus","fill","undo"):
+        result,path=run("mask-"+mode,100,extra=["--open",str(mask_fixture)],
+                        mode={"DOME_XR_FIXTURE_SCULPT_MASK":mode})
+        check(result.returncode==0,"Real-loader sculpt mask "+mode+" completes and saves native persistent state")
+        after=inspect_scene(path)
+        report=json.loads((output / ("mask-"+mode+".json")).read_text())
+        check(report["frames_waited"]==report["frames_begun"]==report["frames_ended"] and
+              report["acquires"]==report["image_waits"]==report["releases"] and report["swapchains_destroyed"]==2 and
+              report.get("left_eye_nonblank",0)>5 and report.get("right_eye_nonblank",0)>5 and
+              report.get("tracking_losses",0)==0 and report.get("mask_script_step",0)>=87,
+              "Sculpt mask "+mode+" balances stereo ownership and reaches final controls without tracking shortcuts")
+        if mode in ("cancel","focus","undo"):
+            check(after==mask_prefix,"OpenXR mask "+mode+" retains the exact committed prefix including protection and local controls")
+        elif mode=="accept":
+            controls=after["objects"][0]["volume"]["sculpt_controls"]
+            expected_plane=.0001*((1+100/.0001)**.2-1)
+            check(abs(controls["symmetry_origin"][0]-expected_plane)<1e-6 and not controls["mask_visible"],
+                  "OpenXR four-row ray controls commit local plane distance and overlay visibility")
+            changed=after["objects"][0]["volume"].pop("sculpt_controls")
+            original=prefix_volume.pop("sculpt_controls")
+            check(after["objects"][0]["volume"]==prefix_volume,
+                  "Accepting plane/view controls preserves exact geometry and persistent protection")
+            after["objects"][0]["volume"]["sculpt_controls"]=changed
+            prefix_volume["sculpt_controls"]=original
+        else:
+            check(after["objects"][0]["volume"]["sculpt_mask"]=={"default":1.0,"values":[]},
+                  "Real-loader Protect all publishes a bounded global mask through the cancellable native worker")
+        if mode=="focus":
+            check(report.get("focus_losses")==1 and report.get("focus_regains")==1 and report.get("mask_pressure_samples",0)>6,
+                  "Actual OpenXR focus loss cancels held protection while retaining the earlier accepted stroke")
+        if mode in ("fill","undo"):
+            check(report.get("mask_work_completed") is True and report.get("mask_work_ready") is True,
+                  "OpenXR "+mode+" waits for the actual enabled Resume control after background mask work")
 
     paintbase, paintbasepath = run("paint-baseline", 1, extra=["--paint"])
     check(

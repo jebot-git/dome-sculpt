@@ -26,11 +26,11 @@ return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[t
 )GLSL";
 }
 inline std::string mtoon_renderer_vertex(){return std::string("#version 330 core\n")+mtoon_renderer_common()+R"GLSL(
-layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;layout(location=5)in vec4 tangent;
+layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;layout(location=5)in vec4 tangent;layout(location=6)in float sculpt_mask;
 uniform mat4 model,mvp,view_projection;uniform vec3 camera;
-out vec3 world,n,canonical_t,canonical_b;out vec2 texcoord,texcoord1;out float weight_value;
+out vec3 world,n,canonical_t,canonical_b;out vec2 texcoord,texcoord1;out float weight_value,mask_value;
 void main(){vec4 p=model*vec4(position,1);vec3 N=dome_mtoon_unit(mat3(model)*normal),V=dome_mtoon_unit(camera-p.xyz);
-world=p.xyz;n=N;canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(N,canonical_t)*tangent.w;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;gl_Position=mvp*vec4(position,1);
+world=p.xyz;n=N;canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(N,canonical_t)*tangent.w;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;mask_value=sculpt_mask;gl_Position=mvp*vec4(position,1);
 if(mt_mode==1&&mt_outline==1&&selected_weight<0){float mask=mt_scalar(8,mt_read(8,mt_uv(8,uv,uv1,N,V,1)));
 float width=mt_scalar(7,mt_read(7,mt_uv(7,uv,uv1,N,V,mask)));
 if(int(mt[10].x+.5)==1){world+=N*dome_mtoon_outline_world_width(mt,width);gl_Position=view_projection*vec4(world,1);}

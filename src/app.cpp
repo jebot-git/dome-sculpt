@@ -11,6 +11,7 @@
 #include "rig-editor.hpp"
 #include "weight-editor.hpp"
 #include "skin-editor.hpp"
+#include "sculpt-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
@@ -137,7 +138,7 @@ struct Canvas : Fl_Gl_Window {
     brush.radius = radius;
     brush.normal = document.gradient(*hit);
     brush.tool = tool;
-    brush.strength = tool == Tool::Smooth ? .55f : 1;
+    brush.strength = !document.frame().state->sculpt_settings.mask_edit && tool == Tool::Smooth ? .55f : 1;
     brush.blend = std::min(.025f, radius * .25f);
     document.stamp_desktop(brush);
     last_stamp = *hit;
@@ -394,6 +395,15 @@ struct App {
     menu.add("&Sculpt/Ca&rve", '2', command, this, FL_MENU_RADIO);
     menu.add("&Sculpt/&Smooth", '3', command, this, FL_MENU_RADIO);
     menu.add("&Sculpt/&Flatten", '4', command, this, FL_MENU_RADIO);
+    menu.add("&Sculpt/Masks and symmetry...", 0, command, this);
+    menu.add("&Sculpt/Paint protection mask", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Sculpt/Protect all", 0, command, this);
+    menu.add("&Sculpt/Clear protection mask", 0, command, this);
+    menu.add("&Sculpt/Invert protection mask", 0, command, this);
+    menu.add("&Sculpt/Show protection mask", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Sculpt/Mirror X", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Sculpt/Mirror Y", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Sculpt/Mirror Z", 0, command, this, FL_MENU_TOGGLE);
     menu.add("&Sculpt/Smaller brush", '[', command, this);
     menu.add("&Sculpt/Larger brush", ']', command, this);
     menu.add("&Scene/Create &humanoid...", 0, command, this);
@@ -574,6 +584,15 @@ struct App {
     }
     enable("&Scene/&Visible", !modal);
     enable("&Scene/&Locked", !modal);
+    for (auto path : {"&Sculpt/Masks and symmetry...", "&Sculpt/Paint protection mask",
+                      "&Sculpt/Protect all", "&Sculpt/Clear protection mask", "&Sculpt/Invert protection mask",
+                      "&Sculpt/Show protection mask", "&Sculpt/Mirror X", "&Sculpt/Mirror Y", "&Sculpt/Mirror Z"})
+      enable(path, !modal && s->can_configure_sculpt);
+    checked("&Sculpt/Paint protection mask", s->sculpt_settings.mask_edit);
+    checked("&Sculpt/Show protection mask", s->sculpt_settings.mask_visible);
+    checked("&Sculpt/Mirror X", (s->sculpt_settings.symmetry_axes & 1) != 0);
+    checked("&Sculpt/Mirror Y", (s->sculpt_settings.symmetry_axes & 2) != 0);
+    checked("&Sculpt/Mirror Z", (s->sculpt_settings.symmetry_axes & 4) != 0);
     bool sculpt_ready = !modal && !s->asset_busy && !s->mesh_active &&
                         active != s->objects.end() && active->visible &&
                         !active->locked;
@@ -907,6 +926,17 @@ struct App {
       canvas.document.use_source();
     } else if (label == "Brush settings...") {
       edit_paint(canvas.document);
+    } else if (label == "Masks and symmetry...") {
+      auto state=canvas.document.frame().state;
+      auto settings=sculpt_controls_dialog(state->sculpt_settings);
+      if(settings) canvas.document.sculpt_settings(*settings,{state->generation,state->revision,state->active_object});
+    } else if (label == "Paint protection mask" || label == "Protect all" ||
+               label == "Clear protection mask" || label == "Invert protection mask" ||
+               label == "Show protection mask" || label == "Mirror X" || label == "Mirror Y" || label == "Mirror Z") {
+      canvas.document.sculpt_command(label=="Paint protection mask"?SpatialCommand::SculptMaskToggle:
+          label=="Protect all"?SpatialCommand::SculptMaskFill:label=="Clear protection mask"?SpatialCommand::SculptMaskClear:
+          label=="Invert protection mask"?SpatialCommand::SculptMaskInvert:label=="Show protection mask"?SpatialCommand::SculptMaskVisible:
+          label=="Mirror X"?SpatialCommand::SculptMirrorX:label=="Mirror Y"?SpatialCommand::SculptMirrorY:SpatialCommand::SculptMirrorZ);
     } else if (label == "Sculpt layer properties...") {
       edit_sculpt_layer(canvas.document);
     } else if (label == "Add sculpt layer") {
