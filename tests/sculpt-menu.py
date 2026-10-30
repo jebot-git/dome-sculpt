@@ -81,7 +81,9 @@ async def main():
                     pass
             return None
 
-        window = await wait(lambda: named("Dome Sculpt"))
+        # Match the existing menu harness's cold Fontconfig/BDF startup budget.
+        # Interaction and publication waits keep their normal 30-second bound.
+        window = await wait(lambda: named("Dome Sculpt"), seconds=90)
         window.set_input_focus(X.RevertToParent, X.CurrentTime)
         connection.sync()
 
