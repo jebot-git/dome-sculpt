@@ -21,8 +21,10 @@ skin/morph data, images, JSON and raw avatar bytes remain recoverable.
 
 ## Native archive
 
-Scene format 7 is emitted when a resolved holder or dormant deformation is
-present. Older scenes continue to use the existing format. `source_materials` version 1 deduplicates
+Scene format 8 is emitted when a resolved holder, dormant deformation or
+retopology record is present. The reader accepts complete legacy format-7
+material and retopology shapes, including both together; partial declared
+feature records are rejected. Plain and baked-only scenes retain formats 5/6. `source_materials` version 1 deduplicates
 holders, first origins and retained original paint snapshots by identity. Role
 images use the document `PaintImageArchive`; appearances use its original model
 archive. A holder records native factor baseline, explicit animation policy,
@@ -103,7 +105,8 @@ that surface extraction would omit. Callers must restore the original mesh or us
 explicit validated transfer workflow. Restoring mesh mode reactivates the exact
 original data. Valid dormant deformation is checked against its retained rest
 mesh, not applied to generated volume geometry. Newly supported dormant
-deformation requires v7 even with an empty material archive; inactive deformation
+deformation requires format 8 (or a complete legacy material-format 7) even with
+an empty material archive; inactive deformation
 in older v4/v5/v6 input still rejects. Source-mode global Undo and Redo preserve
 the complete mesh/paint/source/rig state in one history boundary.
 

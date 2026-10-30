@@ -2,7 +2,9 @@
 
 These APIs implement geometry and persistence foundations for the Retopo Flow
 and Divine Cut workflow requirements. They are not complete equivalents of
-those products and do not yet create desktop or XR editing controls. Geometry
+those products. [RETOPO-AUTHORING.md](RETOPO-AUTHORING.md) describes the native
+desktop/XR manual patch editor and scene persistence now using RetopoMesh;
+interactive plane-cut controls remain unfinished. Geometry
 jobs belong on workers, with document/source generation checks before publishing
 immutable snapshots. Existing paint must be transferred or rebaked explicitly.
 
@@ -12,7 +14,7 @@ immutable snapshots. Existing paint must be transferred or rebaked explicitly.
 sharing a monotonically allocated 64-bit ID namespace. Copies preserve all live
 IDs and the allocation cursor exactly. Successful deletion does not recycle IDs
 inside that history branch. Full before/after values provide an exact undo basis;
-undo/history integration is the caller's responsibility. There are no process
+undo/history integration is provided by the authoring workspace/document. There are no process
 pointers in its persistent data.
 
 Vertices retain position, UV and pin state; edges retain endpoint IDs and seam
@@ -29,8 +31,9 @@ source distance and atomic cancellation. `relax()` computes synchronous (Jacobi)
 blended uniform Laplacian updates, projects updates back to the source and keeps
 boundary, wire, seam and pinned vertices fixed. Distances, strength and iteration
 counts are bounded; face inversion or failed snapping rejects the whole draft.
-No curvature-aware stroke inference, patch bridging, automatic quad generation,
-edge collapse/extrusion or brush-driven topology UI is claimed.
+No curvature-aware stroke inference, patch bridging, automatic quad generation
+or edge collapse/extrusion is claimed. The manual editor places/selects points
+and moves them through projected gestures.
 
 `triangulate()` chooses valid interior diagonals for concave as well as convex
 quads, returning vertex/face source IDs and per-triangle materials. Source UVs,
@@ -44,8 +47,8 @@ round-trip exactly through the encoder. Decode rejects duplicate/reused IDs,
 missing references, malformed records, invalid topology and nesting beyond 32
 levels before recursive JSON parsing. Input is at most 64 MiB; topology is bounded
 to 100,000 vertices/faces and 300,000 edges, within the 100 metre workspace. The
-format is independent of the main document; integrate it as versioned persistent
-data rather than storing only its triangulated display mesh.
+format is independent of the main document; scene version 7 embeds it as versioned
+persistent data alongside the triangulated display/paint mesh.
 
 ## Half-space cuts and caps
 
@@ -110,9 +113,10 @@ attributes. Output is limited to two million vertices/triangles, contour size to
   integration code under GPL-3.0-or-later. No OpenFX or Seamless3d code is included
   in this component; their separate evaluation remains broader project work.
 
-The central third-party manifest should record the inspected commit/hash and
-actual algorithm use above, without claiming full upstream ports. Add
-`src/retopo.cpp` to the core target and `tests/retopo.cpp` to CTest when integrating.
+The central third-party manifest records the inspected commit/hash and actual
+algorithm use above, without claiming full upstream ports. `src/retopo.cpp` and
+`tests/retopo.cpp` are integrated into the core and CTest; the separate authoring
+workspace/document suite covers native persistence and shared desktop/XR input.
 
 ## Focused verification
 
@@ -124,12 +128,12 @@ resource limits and explicit holes/ambiguity rejection. They do not constitute
 XR interaction testing.
 
 ```sh
-c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude tests/retopo.cpp src/retopo.cpp src/mesh-processing.cpp build/libdome-sculpt-core.a build/libxatlas.a -lpng -lz -pthread -o /tmp/dome-retopo-test
-/tmp/dome-retopo-test
+ctest --test-dir build --output-on-failure -R '^(retopo|retopology-authoring)$'
 ```
 
-Milestone validation passes 45 assertions in the optimized Release test and in
+Historical kernel-only milestone validation passed 45 assertions in the optimized Release test and in
 AddressSanitizer/UndefinedBehaviorSanitizer with leak detection. The sanitizer
 build instruments `retopo.cpp`, `mesh-processing.cpp` and this suite, linked to
 the existing Release core archive; it does not instrument every core unit.
-Logs: `artifacts/retopo.log` and `artifacts/retopo-sanitizers.log`.
+Logs: `artifacts/retopo.log` and `artifacts/retopo-sanitizers.log`. Current
+whole-core and frontend validation is recorded separately in VALIDATION.md.

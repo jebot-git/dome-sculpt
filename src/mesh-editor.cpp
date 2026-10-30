@@ -25,6 +25,36 @@ public:
   }
 };
 } // namespace
+void edit_retopology_distance(Document &doc) {
+  auto view = doc.frame().state->retopology;
+  if (!view || view->committing) return;
+  int row = std::max(32, dx::size + 14), sx, sy, sw, sh;
+  Fl::screen_work_area(sx, sy, sw, sh);
+  int width = std::min(std::max(440, dx::size * 28), sw - 40);
+  int height = std::min(row * 5, sh - 40);
+  DomeDialog window(width, height, "Retopology projection distance");
+  Fl_Scroll scroll(0, 0, width, height - row);
+  scroll.type(Fl_Scroll::VERTICAL);
+  Fl_Group content(0, 0, width - 24, row * 4);
+  content.resizable(nullptr);
+  Fl_Box value(12, 4, width - 36, row * 2);
+  value.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+  VoxelSlider slider(24, row * 2, width - 60, row);
+  slider.type(FL_HOR_NICE_SLIDER); slider.bounds(0, 1); slider.step(.001);
+  slider.value(std::log(view->snap_mm) / std::log(200.f));
+  content.end(); scroll.end();
+  Fl_Button cancel(16, height - row + 4, width / 2 - 24, row - 8, "Cancel"),
+      apply(width / 2 + 8, height - row + 4, width / 2 - 24, row - 8, "Apply");
+  bool accepted = false;
+  cancel.callback([](Fl_Widget *w, void *) { w->window()->hide(); });
+  apply.callback([](Fl_Widget *w, void *data) { *static_cast<bool *>(data) = true; w->window()->hide(); }, &accepted);
+  window.end(); window.set_modal(); dx::style(&window); window.show(); cancel.take_focus();
+  while (window.shown()) {
+    char label[128]; snprintf(label, sizeof(label), "Maximum source distance: %.1f mm\nDrag, wheel or arrow keys", std::pow(200., slider.value()));
+    value.copy_label(label); Fl::wait(.05);
+  }
+  if (accepted) doc.retopology_distance(float(std::pow(200., slider.value())));
+}
 void edit_voxel_remesh(Document &doc) {
   doc.begin_voxel_remesh();
   try {

@@ -69,7 +69,9 @@ enum class SpatialCommand {
   BakeSurface, ClearBake, CancelWork,
   ExportAvatar,
   WeightToggle, WeightMode, WeightSymmetry, WeightLock, WeightLinked,
-  BindSkin, SkinUseLocks
+  BindSkin, SkinUseLocks,
+  RetopoBegin, RetopoMode, RetopoFace, RetopoWire, RetopoDelete, RetopoRelax,
+  RetopoPin, RetopoSeam, RetopoApply, RetopoCancel
 };
 const std::array<const char *, 12> &spatial_labels(int page);
 std::optional<SpatialCommand> spatial_action(int page, int index);
@@ -141,6 +143,7 @@ public:
     std::function<bool()> end;
   } backend;
   bool painting = false;
+  bool retopology = false;
   std::function<bool(VrParameter)> parameter_allowed;
   std::function<bool()> control_accept;
   std::vector<VrControlEvent> take_controls() {

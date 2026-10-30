@@ -274,7 +274,7 @@ void SpatialPalette::raster(const EditorState &s) {
         label += std::to_string(int(std::lround(value))) + " deg";
       else if (c.parameter == VrParameter::BrushRadius)
         label += std::to_string(int(std::lround(value * 1000))) + " mm";
-      else if (c.parameter == VrParameter::VoxelSize) {
+      else if (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::RetopoDistance) {
         char size[48];
         snprintf(size, sizeof(size), "%.2f mm", double(value));
         label += size;
@@ -323,6 +323,13 @@ void SpatialPalette::raster(const EditorState &s) {
   auto current = std::find_if(s.objects.begin(), s.objects.end(),
                               [&](auto &o) { return o.id == s.active_object; });
   auto marked = [&](int sector) -> std::optional<bool> {
+    if (s.menu_page == 16 && s.retopology) {
+      auto &r = *s.retopology;
+      if (sector == 0) return true;
+      if (sector == 1) return r.moving;
+      if (sector == 6 && r.topology && !r.selected.empty())
+        return std::all_of(r.selected.begin(), r.selected.end(), [&](auto id) { return r.topology->vertices().at(id).pinned; });
+    }
     if (s.menu_page == 13) {
       if (sector == 0) return s.weights.enabled;
       if (sector == 6) return s.weights.symmetry;
@@ -375,7 +382,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = labels[i];
+    const std::string label = s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -407,11 +414,11 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14) {
+  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 16) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page == 16 ? "Retopology" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -433,7 +440,12 @@ void SpatialPalette::raster(const EditorState &s) {
     size_t locks=s.skin_use_locks?size_t(std::count(s.weights.locks.begin(),s.weights.locks.end(),uint8_t(1))):0;
     text(320*unit_,318*unit_,std::string(s.skin_options.mode==SkinAuthoringMode::Automatic?"Automatic":"Transfer")+" / "+std::to_string(locks)+" locked",fg);
   }
-  if(s.menu_page==12){
+  if (s.menu_page == 16) {
+    auto r = s.retopology;
+    text(320 * unit_, 278 * unit_, !r ? "Start a source-constrained patch" : r->moving ? "Move existing points" : "Place / select ordered corners", fg);
+    text(320 * unit_, 310 * unit_, !r ? "Source retained on Apply" : r->committing ? "Applying patch..." : r->busy ? "Updating patch..."
+         : std::to_string(r->selected.size()) + " selected / " + std::to_string(r->topology ? r->topology->faces().size() : 0) + " faces", fg);
+  } else if(s.menu_page==12){
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name,fg);
     text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
@@ -504,6 +516,12 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
                std::to_string(s.controls.selected);
   if (s.uv)
     signature += std::to_string(s.uv->revision);
+  if (s.retopology) {
+    const auto &r = *s.retopology;
+    signature += ":retopo:" + std::to_string(r.revision) + ":" +
+        std::to_string(reinterpret_cast<uintptr_t>(r.topology.get())) + ":" +
+        std::to_string(r.moving) + ":" + std::to_string(r.busy) + ":" + std::to_string(r.committing);
+  }
   for (float value : s.controls.value)
     signature += std::to_string(value) + ",";
   for (bool enabled : s.menu_enabled)

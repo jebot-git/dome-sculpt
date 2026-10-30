@@ -62,9 +62,9 @@ int main()try {
   Scene scene;scene.active().painted=second.paint;scene.active().mesh_active=true;scene.active().material_bindings=second.material_bindings;
   scene.set_deformation(scene.active().id,DeformationState(second.paint->mesh()));
   scene.duplicate(scene.active().id);auto encoded=scene.encode();
-  check(encoded["version"]==7 && encoded["source_materials"]["bindings"].size()==1 &&
+  check(encoded["version"]==8 && encoded["source_materials"]["bindings"].size()==1 &&
         encoded["source_materials"]["origins"].size()==1 && encoded["source_materials"]["paints"].size()==1,
-        "Scene v7 deduplicates shared material holders, original-source records and paint payloads");
+        "Scene v8 deduplicates shared material holders, original-source records and paint payloads");
   auto decoded=Scene::decode(encoded);
   check(decoded.encode()==encoded && decoded.object(1).material_bindings==decoded.object(2).material_bindings &&
         decoded.object(1).material_bindings->uv_origin->paint->encode()==original,
@@ -72,11 +72,11 @@ int main()try {
   auto surfaces=decoded.preview_surfaces();check(surfaces.size()==2 && surfaces[0].material_bindings==decoded.object(1).material_bindings,
         "Immutable preview surfaces carry the same explicit material holder without reparsing raw metadata");
   auto path=std::filesystem::temp_directory_path()/("source-uv-adopt-"+std::to_string(getpid())+".dsculpt");
-  decoded.save(path);check(Scene::load(path).encode()==encoded,"Native atomic save and disk reopen retain v7 provenance and editable state");std::filesystem::remove(path);
+  decoded.save(path);check(Scene::load(path).encode()==encoded,"Native atomic save and disk reopen retain v8 provenance and editable state");std::filesystem::remove(path);
   {
     Document document;document.replace(decoded);auto before_mode=document.copy_scene().encode();
     document.paint_command(SpatialCommand::EditSource);auto volume_mode=document.copy_scene().encode();
-    check(source_is_dormant(document.copy_scene().active()) && volume_mode["version"]==7,
+    check(source_is_dormant(document.copy_scene().active()) && volume_mode["version"]==8,
           "Native source-mode command keeps complete immutable material and deformation data dormant");
     check(document.undo() && document.copy_scene().encode()==before_mode,
           "One global Undo restores the exact original mesh, source roles, paint and deformation together");

@@ -51,3 +51,22 @@ signal handlers are restored on exit. Real-loader regressions synchronize the
 signal with a rendered second stroke and compare the saved volume to an
 independently completed first stroke, proving both retained edits and exact
 unfinished-gesture cancellation for SIGINT and SIGTERM.
+
+Native retopology uses the same pressure ownership and focus boundaries, with a
+dedicated topology worker. Joystick navigation reaches page 16 from Mesh tools;
+while editing, a joystick press opens that page directly. Tool mode switches
+Place/Move, and Snap range uses the common logarithmic joystick/ray slider.
+Points project in source-local coordinates with a document-world distance bound.
+Held placement/move cancellation restores its draft baseline; focus/session loss
+retains the surrounding patch workspace. Explicit Apply queues ordered guarded
+asset publication, and later focus loss does not retract that accepted operation.
+The redundant Mesh-tools Undo sector now opens Retopology; root/hardware Undo
+remain available and route to draft history. See RETOPO-AUTHORING.md.
+
+Retopology page16 uses cell0 as New patch / Resume patch. Starting or resuming
+closes the menu so pressure can place/move points; Tool mode also resumes the
+canvas. Face/edge/pin/relax commands can keep the page open for chaining, with
+Resume available afterward. Apply/Cancel close the menu; a subsequent joystick
+press reopens the active patch page. Skin14 and reserved Masks15 remain separate.
+Standalone CLI final save cancels only an unconfirmed patch after accepted work
+drains; stopping embedded XR retains the draft for desktop continuation.

@@ -8,16 +8,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 namespace {
-std::atomic<bool> armed{false}, released{false};
-std::atomic<unsigned> slots{0}, arrived{0}, notifications{0};
-std::atomic<int> checkpoint{0};
-std::array<std::condition_variable *,4> conditions{};
-std::array<pthread_mutex_t *,4> mutexes{};
+std::atomic<bool> armed{false};
+std::array<std::atomic<bool>,5> released{};
+std::atomic<unsigned> slots{0}, arrived{0};
+std::array<std::condition_variable *,5> conditions{};
+std::array<pthread_mutex_t *,5> mutexes{};
 thread_local bool deleting_document=false;
-void reached(int value) {
-  int zero=0;
-  if(checkpoint.compare_exchange_strong(zero,value))checkpoint.notify_all();
-}
+
 }
 extern "C" void __real__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE(std::condition_variable *,std::unique_lock<std::mutex> &);
 extern "C" void __wrap__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE(std::condition_variable *condition,std::unique_lock<std::mutex> &lock) {
@@ -28,7 +25,7 @@ extern "C" void __wrap__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE
       arrived.fetch_add(1);arrived.notify_all();
       // Hold the actual predicate mutex after its false check, immediately
       // before registering with the platform condition variable.
-      while(!released.load())released.wait(false);
+      while(!released[slot].load())released[slot].wait(false);
     }
   }
   __real__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE(condition,lock);
@@ -36,30 +33,31 @@ extern "C" void __wrap__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE
 extern "C" void __real__ZNSt18condition_variable10notify_allEv(std::condition_variable *);
 extern "C" void __wrap__ZNSt18condition_variable10notify_allEv(std::condition_variable *condition) {
   if(deleting_document)
-    for(auto current:conditions)if(current==condition) {
-      if(notifications.fetch_add(1)==2)reached(1);
-      break;
+    for(size_t i=0;i<conditions.size();++i)if(conditions[i]==condition && !released[i].load()) {
+      std::cerr << "Shutdown notified a worker before synchronizing its predicate mutex\n";
+      _exit(3);
     }
   __real__ZNSt18condition_variable10notify_allEv(condition);
 }
 extern "C" int __real_pthread_mutex_lock(pthread_mutex_t *);
 extern "C" int __wrap_pthread_mutex_lock(pthread_mutex_t *mutex) {
   if(deleting_document)
-    for(auto current:mutexes)if(current==mutex){reached(2);break;}
+    for(size_t i=0;i<mutexes.size();++i)if(mutexes[i]==mutex) {
+      released[i]=true;released[i].notify_all();break;
+    }
   return __real_pthread_mutex_lock(mutex);
 }
 int child() {
   armed=true;
   auto document=new dome::Document;
-  for(unsigned value=arrived.load();value<4;value=arrived.load())arrived.wait(value);
-  std::thread destruction([&]{deleting_document=true;delete document;});
-  // Old code notifies three waiters before locking any predicate mutex. Fixed
-  // code attempts the mutex first. Both schedules rendezvous deterministically;
-  // there is no sleep-based attempt to win a race.
-  while(!checkpoint.load())checkpoint.wait(0);
-  std::cerr << "Shutdown handshake: " << (checkpoint.load()==1 ? "notified before predicate mutex" : "predicate mutex acquired before notification") << '\n';
-  armed=false;released=true;released.notify_all();
-  destruction.join();
+  for(unsigned value=arrived.load();value<conditions.size();value=arrived.load())arrived.wait(value);
+  // Release each paused waiter only when shutdown requests that waiter's own
+  // predicate mutex. The writer then blocks until platform wait registration.
+  // This checks every worker, including the dedicated retopology worker.
+  armed=false;deleting_document=true;
+  delete document;
+  deleting_document=false;
+  for(auto &value:released)if(!value.load())return 4;
   return 0;
 }
 int main() {

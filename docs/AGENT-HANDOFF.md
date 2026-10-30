@@ -17,8 +17,8 @@ export preserve authored/generated original frames through the relevant poses.
 Old Scene7 UvDerivative normal pixels must not be relabelled original-frame data.
 Future records need an explicit versioned migration and validated re-bake.
 
-The next integration must preserve remote3d19776 native Retopo alongside this
-checkpoint: retain Skin page14, reserve Masks15 and assign Retopo16. The two
-independent Scene7 payloads need a combined explicit version and legacy readers.
-Do not overwrite either worker/schema/menu history. Retopo adds another worker;
-carry the6df3cf2 safe-shutdown mutex handshakes through its lifecycle too.
+Remote3d19776 Retopo is now integrated with Skin14/Masks15/Retopo16 and combined
+Scene8; complete legacy7 shapes remain supported. The5-worker shutdown,
+cancellation and native persistence tests pass. Read current HANDOFF.md and
+VALIDATION.md for exact verification scopes and pending GUI work. Future normal
+frame provenance must use Scene9/materials2, without relabelling legacy pixels.

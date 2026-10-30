@@ -1,3 +1,32 @@
+# Combined Scene8 / Retopo16 integration
+
+The combined publication source preserves remote3d19776 and local6df3cf2.
+All67 Release native suites pass121.84s (tests-retopo-native-full.log), excluding
+only openxr-client, which was exercised separately through the real loader:
+117/117 checks, complete=true, failed0, exit0 (tests-retopo-real-loader.log and
+publish-final/build-retopo/xr-retopo-full/report.json). The original96 cases are
+retained;21 new cases cover actual menu16 Resume readiness, pressure projection,
+Apply, reference preservation, focus-loss rollback and unconfirmed final save.
+
+Whole-core C/C++ ASan/UBSan/leaks14/14 pass102.12s, including Mikk/xatlas:
+tests-retopo-sanitize.log; build-retopo-sanitize.log. Scene compatibility33
+assertions, codepoint-safe generated names,5-worker deterministic shutdown and
+forced pre/post-asset cancellation boundaries have native regression coverage.
+Retopo GPU buffer reuse/GL state fixtures pass actual Arc and llvmpipe:
+retopo-gpu-{arc,software}.log. No normal-frame guard has been removed.
+
+Combined GUI verification is running. Its initial Retopo fixture exposed that
+project-info payload hashes differed only because Scene8 inserts null optional
+feature fields absent from Scene5. The diagnostic now canonicalizes those two
+null fields; nonnull payloads and all geometry/paint remain hashed. The fixture
+also now waits for the ordered atomic save to finish, as other authoring flows
+do. Initial failure logs remain menu-retopo-integrated*.log. Product editing and
+archive data were unchanged by these diagnostic/test synchronization fixes.
+
+Canonical toolkit/compositor282467e remains latest on remote. No system install,
+physical test relaunch or active desktop/session restart occurred. The full
+production objective remains incomplete. Older source scopes follow.
+
 # Verified authoring checkpoint `6df3cf2`; full production goal remains active
 
 The exact optimized application source `6df3cf2` in artifacts/publish-final passes

@@ -570,9 +570,68 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   }catch(...){textures_->target.abort();throw;}
 }
 
-CursorRenderer::CursorRenderer() {
+namespace {
+struct CursorVertex {Vec3 p,color;};
+// Positions remain in object space. Marker offsets are world-axis unit vectors
+// scaled by one uniform, so navigation/object motion never rebuilds this buffer.
+struct RetopoVertexGpu {Vec3 p,color,marker;};
+struct CursorGlState {
+  GLint program=0,vao=0,buffer=0,depth_function=0;GLboolean depth_mask=GL_TRUE,depth_test=GL_FALSE;
+  CursorGlState(){glGetIntegerv(GL_CURRENT_PROGRAM,&program);glGetIntegerv(GL_VERTEX_ARRAY_BINDING,&vao);glGetIntegerv(GL_ARRAY_BUFFER_BINDING,&buffer);glGetIntegerv(GL_DEPTH_FUNC,&depth_function);glGetBooleanv(GL_DEPTH_WRITEMASK,&depth_mask);depth_test=glIsEnabled(GL_DEPTH_TEST);}
+  ~CursorGlState(){glUseProgram(GLuint(program));glBindVertexArray(GLuint(vao));glBindBuffer(GL_ARRAY_BUFFER,GLuint(buffer));glDepthFunc(GLenum(depth_function));glDepthMask(depth_mask);if(depth_test)glEnable(GL_DEPTH_TEST);else glDisable(GL_DEPTH_TEST);}
+};
+
+}
+struct CursorRenderer::OverlayCache {
+  GLuint vao=0,buffer=0;size_t count=0;uint64_t uploads=0,revision=0;
+  std::shared_ptr<const RetopoMesh> topology;
+  std::vector<TopologyID> selected;
+  void clear(bool release){if(release){if(buffer)glDeleteBuffers(1,&buffer);if(vao)glDeleteVertexArrays(1,&vao);}vao=buffer=0;count=0;topology.reset();selected.clear();revision=0;}
+  ~OverlayCache(){clear(true);}
+  void prepare(const EditorState &state) {
+    if(!state.retopology || !state.retopology->topology){clear(true);return;}
+    const auto &view=*state.retopology;
+    if(topology==view.topology && revision==view.revision && selected==view.selected)return;
+    constexpr size_t max_vertices=100'000,max_edges=300'000,max_bytes=64*1024*1024;
+    if(view.topology->vertices().size()>max_vertices || view.topology->edges().size()>max_edges || view.selected.size()>max_vertices)
+      throw std::length_error("Retopology overlay exceeds native topology limits");
+    const size_t vertices=view.topology->edges().size()*2+view.topology->vertices().size()*6+(view.selected.empty()?0:(view.selected.size()-1)*2);
+    if(vertices>max_bytes/sizeof(RetopoVertexGpu))throw std::length_error("Retopology overlay GPU buffer exceeds64MiB");
+    std::vector<RetopoVertexGpu> lines;lines.reserve(vertices);
+    std::unordered_set<TopologyID> selection(view.selected.begin(),view.selected.end());
+    for(auto id:view.selected)if(!view.topology->vertices().contains(id))throw std::invalid_argument("Retopology selection refers to a missing vertex");
+    auto point=[&](TopologyID id){auto p=view.topology->vertices().at(id).position;if(!finite(p))throw std::invalid_argument("Retopology overlay coordinate is nonfinite");return p;};
+    auto line=[&](Vec3 a,Vec3 b,Vec3 color){lines.push_back({a,color,{}});lines.push_back({b,color,{}});};
+    auto marker=[&](Vec3 point,Vec3 offset,Vec3 color){lines.push_back({point,color,offset*-1});lines.push_back({point,color,offset});};
+    for(const auto &[id,edge]:view.topology->edges()) {
+      (void)id;line(point(edge.a),point(edge.b),selection.contains(edge.a)&&selection.contains(edge.b)?Vec3{1,.8f,.05f}:edge.seam?Vec3{.1f,.8f,1}:Vec3{.1f,1,.3f});
+    }
+    for(const auto &[id,vertex]:view.topology->vertices()) {
+      auto p=point(id);Vec3 color=selection.contains(id)?Vec3{1,.8f,.05f}:vertex.pinned?Vec3{1,.2f,.8f}:Vec3{.1f,1,.3f};
+      marker(p,{1,0,0},color);marker(p,{0,1,0},color);marker(p,{0,0,1},color);
+    }
+    for(size_t i=1;i<view.selected.size();++i)line(point(view.selected[i-1]),point(view.selected[i]),{1,.8f,.05f});
+    if(lines.size()!=vertices)throw std::logic_error("Retopology overlay buffer accounting differs");
+    if(!lines.empty()) {
+      if(!vao)glGenVertexArrays(1,&vao);
+      if(!buffer)glGenBuffers(1,&buffer);
+      glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,buffer);
+      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(lines.size()*sizeof(RetopoVertexGpu)),lines.data(),GL_STATIC_DRAW);
+      if(glGetError()!=GL_NO_ERROR){clear(true);throw std::runtime_error("Retopology overlay GPU upload failed");}
+      glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(RetopoVertexGpu),nullptr);glEnableVertexAttribArray(0);
+      glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(RetopoVertexGpu),reinterpret_cast<void*>(offsetof(RetopoVertexGpu,color)));glEnableVertexAttribArray(1);
+      glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(RetopoVertexGpu),reinterpret_cast<void*>(offsetof(RetopoVertexGpu,marker)));glEnableVertexAttribArray(2);++uploads;
+    } else {if(buffer)glDeleteBuffers(1,&buffer);if(vao)glDeleteVertexArrays(1,&vao);buffer=vao=0;}
+    count=lines.size();topology=view.topology;revision=view.revision;selected=view.selected;
+  }
+};
+RetopoOverlayStats CursorRenderer::retopology_stats() const {return {overlay_->count,overlay_->count*sizeof(RetopoVertexGpu),overlay_->uploads};}
+void CursorRenderer::abandon(){program_=vao_=buffer_=0;overlay_->clear(false);}
+CursorRenderer::CursorRenderer():overlay_(std::make_unique<OverlayCache>()) {
   const char *v = R"(#version 330 core
-layout(location=0)in vec3 position;layout(location=1)in vec3 color;uniform mat4 vp;out vec3 tint;void main(){tint=color;gl_Position=vp*vec4(position,1);})";
+layout(location=0)in vec3 position;layout(location=1)in vec3 color;layout(location=2)in vec3 marker;
+uniform mat4 vp,overlay_model;uniform float depth_bias,marker_radius;uniform int local_overlay;out vec3 tint;
+void main(){tint=color;vec4 p=local_overlay==1?overlay_model*vec4(position,1)+vec4(marker*marker_radius,0):vec4(position,1);gl_Position=vp*p;gl_Position.z-=depth_bias*gl_Position.w;})";
   const char *f = R"(#version 330 core
 in vec3 tint;out vec4 color;uniform int linear_output;vec3 decode(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),greaterThan(c,vec3(.04045)));}void main(){color=vec4(linear_output==1?decode(tint):tint,1);})";
   auto vs = shader(GL_VERTEX_SHADER, v), fs = shader(GL_FRAGMENT_SHADER, f);
@@ -595,10 +654,9 @@ CursorRenderer::~CursorRenderer() {
   glDeleteProgram(program_);
 }
 void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
-  struct Vertex {
-    Vec3 p, color;
-  };
-  std::vector<Vertex> vertices;
+  CursorGlState previous;
+  overlay_->prepare(state);
+  std::vector<CursorVertex> vertices;
   auto line = [&](ob::Vec3 a, ob::Vec3 b, Vec3 color) {
     vertices.push_back({{a.x, a.y, a.z}, color});
     vertices.push_back({{b.x, b.y, b.z}, color});
@@ -633,6 +691,8 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
             state.radius * (h.tracked.trigger > .02f
                                 ? .25f + .75f * std::sqrt(h.tracked.trigger)
                                 : 1.f);
+        if (state.retopology)
+          r = std::min(.01f, state.retopology->snap_mm * .00025f) * state.canvas.scale;
         Vec3 color =
             state.tool == Tool::Carve ? Vec3{1, .2f, .2f} : Vec3{.1f, .9f, .5f};
         for (int axis = 0; axis < 3; ++axis)
@@ -648,29 +708,32 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
           }
       }
     }
-  if (vertices.empty())
-    return;
-  if (state.controls.parameter == VrParameter::None)
-    glEnable(GL_DEPTH_TEST);
-  else
-    glDisable(GL_DEPTH_TEST);
-  glDepthMask(GL_FALSE);
-  glUseProgram(program_);
+  if(vertices.empty() && !overlay_->count)return;
+  glDepthMask(GL_FALSE);glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_,"linear_output"),linear_output_);
-  glUniformMatrix4fv(glGetUniformLocation(program_, "vp"), 1, GL_FALSE,
-                     vp.data());
-  glBindVertexArray(vao_);
-  glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
-               vertices.data(), GL_STREAM_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                        reinterpret_cast<void *>(offsetof(Vertex, color)));
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glDrawArrays(GL_LINES, 0, vertices.size());
-  glBindVertexArray(0);
-  glUseProgram(0);
-  glDepthMask(GL_TRUE);
+  glUniformMatrix4fv(glGetUniformLocation(program_,"vp"),1,GL_FALSE,vp.data());
+  if(overlay_->count) {
+    // Topology is source-occluded even while a control ray ignores depth.
+    glEnable(GL_DEPTH_TEST);glDepthFunc(GL_LEQUAL);
+    auto overlay_model=model_matrix(ob::compose(state.canvas,state.retopology->transform));
+    const float radius=.0025f*state.canvas.scale;
+    for(float v:overlay_model)if(!std::isfinite(v))throw std::invalid_argument("Retopology overlay transform is nonfinite");
+    if(!std::isfinite(radius))throw std::invalid_argument("Retopology marker scale is nonfinite");
+    glUniformMatrix4fv(glGetUniformLocation(program_,"overlay_model"),1,GL_FALSE,overlay_model.data());
+    glUniform1f(glGetUniformLocation(program_,"marker_radius"),radius);glUniform1i(glGetUniformLocation(program_,"local_overlay"),1);
+    glUniform1f(glGetUniformLocation(program_,"depth_bias"),.0001f);
+    glBindVertexArray(overlay_->vao);glDrawArrays(GL_LINES,0,GLsizei(overlay_->count));
+  }
+  if(vertices.empty())return;
+  glDepthFunc(GLenum(previous.depth_function));
+  if(state.controls.parameter==VrParameter::None)glEnable(GL_DEPTH_TEST);else glDisable(GL_DEPTH_TEST);
+  glUniform1i(glGetUniformLocation(program_,"local_overlay"),0);
+  glUniform1f(glGetUniformLocation(program_,"depth_bias"),state.retopology?.0001f:0);
+  glBindVertexArray(vao_);glBindBuffer(GL_ARRAY_BUFFER,buffer_);
+  glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertices.size()*sizeof(CursorVertex)),vertices.data(),GL_STREAM_DRAW);
+  glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(CursorVertex),nullptr);
+  glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(CursorVertex),reinterpret_cast<void*>(offsetof(CursorVertex,color)));
+  glEnableVertexAttribArray(0);glEnableVertexAttribArray(1);
+  glDrawArrays(GL_LINES,0,GLsizei(vertices.size()));
 }
 } // namespace dome

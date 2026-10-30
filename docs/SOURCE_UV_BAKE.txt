@@ -6,7 +6,7 @@ detached worker kernel, not yet a user-facing UV commit or a replacement for the
 existing conservative PaintedMesh::reparameterize guard. It returns a reviewable
 new atlas, unfactored PBR/typed MToon bindings and complete editable sparse layers.
 The native adopt factory returns both paint and immutable resolved bindings; Scene
-version 7 persists them. Document integration must adopt both results, validate
+version 8 persists them, with complete legacy material-version 7 readable. Document integration must adopt both results, validate
 aggregate resources, and create one global history boundary.
 The ordinary UV transfer refusal must not be removed without that integration.
 

@@ -305,6 +305,81 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
             else:
                 check(all(deformation.get(key)==value for key,value in old_deformation.items() if key!="skin"),"OpenXR binds a previously unweighted fitted skeleton while preserving exact pose, morphs and source identities")
 
+    # Real loader/controller retopology: inspect native files through the
+    # existing generic Scene output in the skin helper, not a product test API.
+    retopo_fixture = root / "retopo-input.dsculpt"
+    subprocess.run([str(binary.parent / "dome-sculpt-retopo-authoring-test"),
+                    "--ui-fixture", str(retopo_fixture), "--retain-sculpt"], check=True)
+    def inspect_scene(path):
+        scene = json.loads(subprocess.check_output(
+            [str(skin_helper), "--inspect", str(path)], env=env, text=True))["scene"]
+        # Lattice maps are unordered storage. Compare every key/value exactly,
+        # independent of rehash order across separate native load/save processes.
+        for obj in scene["objects"]:
+            volume = obj["volume"]
+            volume["samples"].sort()
+            for layer in volume.get("sculpt_layers", []):
+                layer["delta"].sort()
+        return scene
+    retopo_original = inspect_scene(retopo_fixture)
+    prefix, prefix_path = run("retopo-committed", 14,
+                              extra=["--open", str(retopo_fixture)],
+                              mode={"DOME_XR_FIXTURE_RETOPO": "committed"})
+    check(prefix.returncode == 0, "Actual OpenXR joystick commits a scene edit before opening retopology")
+    retopo_committed = inspect_scene(prefix_path)
+    source = retopo_committed["objects"][0]
+    check(source["material"]["color"][2] > .7 and
+          source["material"]["color"][0] < .1 and
+          source["volume"] == retopo_original["objects"][0]["volume"] and
+          source["painted"] == retopo_original["objects"][0]["painted"],
+          "Committed OpenXR prefix changes the material while retaining the original sculpt and prepared source")
+    for mode in ("accept", "focus", "unconfirmed"):
+        result, path = run("retopo-" + mode, 110,
+                           extra=["--open", str(retopo_fixture)],
+                           mode={"DOME_XR_FIXTURE_RETOPO": mode})
+        check(result.returncode == 0,
+              "Real-loader retopology " + mode + " drains or cancels its workspace and writes the requested native save")
+        after = inspect_scene(path)
+        report = json.loads((output / ("retopo-" + mode + ".json")).read_text())
+        check(report.get("retopo_source_ready") is True and
+              report.get("retopo_script_step", 0) >= 63 and
+              report.get("tracking_losses", 0) == 0,
+              "Retopology " + mode + " reaches enabled Resume on menu 16 without a tracking-loss shortcut")
+        check(report["frames_waited"] == report["frames_begun"] == report["frames_ended"] and
+              report["acquires"] == report["image_waits"] == report["releases"] and
+              report["swapchains_destroyed"] == 2,
+              "Retopology " + mode + " balances real frame, stereo-image and shutdown ownership")
+        if mode == "unconfirmed":
+            check(after == retopo_committed,
+                  "Standalone --save cancels an unconfirmed retopology draft and preserves the exact earlier committed scene")
+            check(report.get("retopo_pressure_samples", 0) >= 3,
+                  "Unconfirmed retopology shutdown follows actual pressure placement rather than an empty workspace")
+            continue
+        check(report.get("retopo_apply_ready") is True and len(after["objects"]) == 2 and
+              after["objects"][0]["visible"] is False and after["objects"][1]["visible"] is True,
+              "Enabled retopology Face and Apply controls create a visible native patch and retain its hidden reference")
+        before_source = dict(source)
+        retained = dict(after["objects"][0])
+        for item in (before_source, retained):
+            item.pop("visible", None)
+            # The combined scene8 schema explicitly adds null optional slots.
+            item.setdefault("material_bindings", None)
+            item.setdefault("retopology", None)
+        check(retained == before_source,
+              "Actual retopology Apply preserves the exact source sculpt, paint, material, transform and identities")
+        patch = after["objects"][1]["retopology"]
+        topology = json.loads(patch["topology"])
+        positions = sorted(vertex[1] for vertex in topology["vertices"])
+        expected = sorted([[-.2, -.2, 0], [.2, -.2, 0], [0, .2, 0]])
+        check(patch["source"] == source["id"] and len(topology["faces"]) == 1 and
+              len(positions) == 3 and all(abs(a-b) < 1e-5 for p,q in zip(positions, expected) for a,b in zip(p,q)),
+              "Controller pressure projects independently expected triangle corners onto the original reference plane")
+        if mode == "focus":
+            check(report.get("focus_losses") == 1 and report.get("focus_regains") == 1,
+                  "Retopology focus fixture crosses actual OpenXR focus loss and regain")
+            check(all(abs(p[0]-.35) > .01 or abs(p[1]-.25) > .01 for p in positions),
+                  "Focus loss cancels the held point while retaining the earlier draft point for later Face and Apply")
+
     paintbase, paintbasepath = run("paint-baseline", 1, extra=["--paint"])
     check(
         paintbase.returncode == 0,

@@ -50,6 +50,7 @@ public:
   void remove_face(TopologyID);
   void remove_edge(TopologyID);   // Must have no incident face.
   void remove_vertex(TopologyID); // Must have no incident edge/face.
+  void erase_vertices(std::span<const TopologyID>); // Atomic incident removal.
   void move_vertex(TopologyID, Vec3);
   void set_pinned(TopologyID, bool);
   void set_seam(TopologyID, bool);

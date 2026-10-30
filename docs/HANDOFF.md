@@ -5,31 +5,41 @@ DESIGN_CONVENTIONS. Complete the whole native C++20 FLTK/OpenXR sculpt, texture,
 UV, rig/skin/morph and avatar suite; animation and final offline rendering are
 excluded. Do not mark the goal complete at a build or checkpoint.
 
-## Current integration
+## Combined Retopo and authoring integration
 
-Application source `6df3cf2` combines both authoring histories, remote main3aa47e5
-(including33f26a2 live immutable weight preview/material-visible picking), native
-skin bind/transfer, v7 immutable material provenance/sourceUV kernels, painted
-VRM0, lazy UV initialization, graceful standalone signals, Arc SYCL, Unicode
-palette and ordered native project Open/Save. All local and remote commits are
-retained; do not force-push/reset. Historical handoffs/validation remain archived.
+The publication tree integrates remote main3d19776 (fdb132b/251cd3d Retopo)
+with the fully verified authoring source6df3cf2 and metadata500f321. All histories
+are preserved. Skin stays on page14, Masks reserves15, Retopo uses16. The schema
+writer uses Scene8 for immutable materials, dormant deformation or Retopo; both
+complete legacy Scene7 feature shapes remain readable. Partial feature records,
+invalid UTF-8, cyclic references and aggregate resource overruns reject.
 
-The scale-robust mesher retains tiny valid closing faces. Full integration found
-xatlas then collapsed some of their UVs. The new bounded atlas repair preserves
-exact geometry/corner order and requested chart padding, promotes only affected
-faces to padded independent charts, and refuses insufficient capacity atomically.
-Strict painting and watertightness assertions are unchanged; see ATLAS-ROBUSTNESS.md.
+Retopo runs on its own worker with the same predicate-mutex shutdown handshake
+as the other four workers. Native Place/Move commands are idempotent. XR New,
+Resume and Mode close the menu to expose pressure input. Cancel covers both the
+pre-asset drain and cancellable asset phase; standalone shutdown discards a
+remaining unconfirmed draft before final save. Preparing another mesh cannot
+overwrite retained editable topology. Missing references report a useful error.
 
-The private worker argument order is operation, expected, report, work, changed,
-rollback-preview. Skin passes an empty work pointer before its changed token;
-weight gestures supply rollback-preview last. Never mix enum/header layouts or
-pre-change archives from the earlier independent integration.
+The immutable overlay cache retains local topology in GPU buffers. Canvas,
+object and stereo transformations are GPU uniforms; changing view does not
+rebuild or upload topology. Existing material visibility, picking, PBO composition
+and weight previews are retained. Generated/duplicated Unicode names preserve
+UTF-8 code points. The project-info payload digest treats absent and null optional
+Scene8 keys identically; it still hashes all nonnull source payload data.
 
-Canonical DomeD main was rechecked at282467e727df78c8e7f2452aa05a7747bac854a6.
-The Release toolkit22patches and compositor match that source. Use explicit
-artifacts/toolkit-282467e/lib64 at runtime; inherited /opt toolkit paths may be
-older. Build/install as regular user and request sudo only for system files.
-No active session/display-manager restart or system installation occurred here.
+Use fresh build-retopo headers/libraries, never pre-Retopo archives. Its67 native
+Release suites pass121.84s. Full real-loader syntheticXR117/117 passes (including
+all original96 and21 Retopo checks). Whole-core C/C++ ASan/UBSan/leaks14/14
+pass102.12s. Retopo GPU fixtures pass on actual Arc and llvmpipe. Combined native
+GUI/universal-menu/DomeD verification is in progress; inspect live jobs/logs before
+repeating. No physical-device claim is made for this newer source.
+
+Canonical DomeD/FLTK main was rechecked at282467e727df78c8e7f2452aa05a7747bac854a6.
+Use Release toolkit22patches prefix artifacts/toolkit-282467e/lib64 explicitly;
+inherited /opt libraries may be older. Matching standalone compositor is under
+artifacts/domed-282467e-target/release. No active session restart or system
+installation occurred. Build as regular user; sudo only for system files.
 
 ## Physical test boundary
 
@@ -69,13 +79,10 @@ The deterministic shutdown fixture forces the old lost-wakeup schedule and
 fails against old code; all worker notifications now handshake predicate locks.
 No timeout or strict geometry/paint assertion was weakened. See VALIDATION.md.
 
-Remote main subsequently added native desktop/XR retopology in3d19776
-(fdb132b/251cd3d). That newer source is NOT part of the64-suite checkpoint.
-Integrate it next while preserving both histories: Skin already owns page14,
-Masks reserves15, so incoming Retopo must move to16. The divergent Scene v7
-retopo and material archives need explicit combined versioning/compatibility.
-Rebuild all header consumers, include the new worker in safe lifecycle handling,
-and verify the final combined source before claiming publication complete.
+This earlier checkpoint remains separately published at
+checkpoint/authoring-6df3cf2 with metadata500f321; see HANDOFF-500f321.md.
+Remote3d19776's independent pre-merge proof is archived separately. Neither its
+proof nor the64-suite checkpoint substitutes for combined verification above.
 
 ## Live unfinished work
 
@@ -96,7 +103,7 @@ to apply again. Obsolete prototype trees are not authoritative applications.
  morph identities. No public sourceUV Apply guard has been removed.
 
 Live sourceUV user editing stays guarded: v7 UvDerivative pixels cannot be
-relabelled original-frame data. Future Scene v8/materials v2 records need explicit
+relabelled original-frame data. Future Scene v9/materials v2 records need explicit
 provenance, original/native frame identities, current skin/morph evaluation and
 validated re-bake from immutable origins while preserving current edits.
 

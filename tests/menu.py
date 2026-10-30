@@ -19,14 +19,18 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
 root = Path(__file__).resolve().parents[1]
 bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
 rig_compact = os.environ.get("DOME_MENU_RIG_COMPACT") == "1"
-compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact
+retopo_compact = os.environ.get("DOME_MENU_RETOPO_COMPACT") == "1"
+retopo_flow = os.environ.get("DOME_MENU_RETOPO") == "1" or retopo_compact
+compact = os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact or retopo_compact
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1" or rig_compact
 export_flow = os.environ.get("DOME_MENU_EXPORT") == "1"
 bake_cancel = os.environ.get("DOME_MENU_BAKE_CANCEL") == "1"
 bake_flow = os.environ.get("DOME_MENU_BAKE") == "1" or bake_cancel or bake_compact
-if sum((rig_flow, export_flow, bake_flow)) > 1:
+if sum((rig_flow, export_flow, bake_flow, retopo_flow)) > 1:
     raise ValueError("Select one menu fixture flow: rig, export or bake")
 out = root / ("artifacts/menu-rig-compact" if rig_compact else "artifacts/menu-export" if export_flow else "artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
+if retopo_flow:
+    out = root / ("artifacts/menu-retopo-compact" if retopo_compact else "artifacts/menu-retopo")
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -103,7 +107,11 @@ async def main():
         log = (out / "app.log").open("w")
         arguments = [str(root / "build/dome-sculpt")]
         fixture = Path(home, "rig.dsculpt")
-        if rig_flow or export_flow:
+        if retopo_flow:
+            fixture = Path(home, "retopo.dsculpt")
+            subprocess.run([str(root / "build/dome-sculpt-retopo-authoring-test"), "--ui-fixture", str(fixture)], check=True)
+            arguments.append(str(fixture))
+        elif rig_flow or export_flow:
             fixture_tool = "dome-sculpt-document-export-test" if export_flow else "dome-sculpt-rig-edit-test"
             subprocess.run([str(root / "build" / fixture_tool), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
@@ -157,7 +165,7 @@ async def main():
 
         async def click(label):
             nodes, _ = await layout()
-            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow) else None
+            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow or retopo_flow) else None
             await menu.call_event(nodes[label][0], "clicked", Variant("i", 0), 0)
             if saved is not None:
                 await wait(lambda: fixture.stat().st_mtime_ns != saved)
@@ -175,6 +183,87 @@ async def main():
                 d.sync()
 
         await asyncio.sleep(0.6)
+        if retopo_flow:
+            def info():
+                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
+            baseline = info()
+            nodes, _ = await layout()
+            check(nodes["Start patch"][1].get("enabled") is True and nodes["Apply patch"][1].get("enabled") is False,
+                  "Native universal menu exposes source-aware retopology actions")
+            await click("Start patch")
+            async def ready(label):
+                for _ in range(300):
+                    nodes, _ = await layout()
+                    if nodes[label][1].get("enabled") is True:
+                        return nodes
+                    await asyncio.sleep(.1)
+                raise AssertionError("Retopology menu did not enable " + label)
+            await ready("Place points")
+            nodes, _ = await layout()
+            check(nodes["Place points"][1].get("toggle-state") == 1 and nodes["Move points"][1].get("toggle-state") == 0
+                  and nodes["Save"][1].get("enabled") is False and nodes["Voxel remesh..."][1].get("enabled") is False,
+                  "Retopology radio state and source-changing command isolation reach DomeD")
+            await click("Projection distance...")
+            w = await wait(lambda: named("Retopology projection distance"))
+            check(w.get_wm_transient_for().id == window.id,
+                  "Projection distance uses the native document-owned modal")
+            if retopo_compact:
+                g=w.get_geometry()
+                raw=w.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF)
+                Image.frombytes("RGB",(g.width,g.height),raw.data,"raw","BGRX").save(out/"projection-large-bdf.png")
+                check(g.width<=600 and g.height<=320,"Projection slider and fixed actions fit 640x360 at 2x Unifont BDF")
+            await click("Close Window")
+            await wait(lambda: named("Retopology projection distance") is None)
+            nodes,_=await layout()
+            check(nodes["Cancel patch"][1].get("enabled") is True and info()["scene_hash"]==baseline["scene_hash"],
+                  "Universal Close cancels projection settings while preserving the patch workspace and source")
+            if retopo_compact:
+                await click("Cancel patch")
+                check(info()["scene_hash"]==baseline["scene_hash"] and app.poll() is None,
+                      "Compact cancellation preserves the complete native scene")
+                d.close();bus.disconnect();return
+            window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+            g=window.get_geometry()
+            def pixels():
+                raw=window.get_image(0,0,g.width,g.height-60,X.ZPixmap,0xFFFFFFFF)
+                return Image.frombytes("RGB",(g.width,g.height-60),raw.data,"raw","BGRX")
+            def press(x,y):
+                xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y));d.sync()
+                key("Shift_L",True);xtest.fake_input(d,X.ButtonPress,1);d.sync()
+            def release():
+                xtest.fake_input(d,X.ButtonRelease,1);d.sync();key("Shift_L",False)
+            before=pixels()
+            press(g.width*.5,g.height*.5)
+            await wait(lambda:pixels().tobytes()!=before.tobytes())
+            pixels().save(out/"held-point.png")
+            check(info()["scene_hash"]==baseline["scene_hash"],"Held native placement shows real point feedback without editing the scene")
+            key("Escape");release()
+            await wait(lambda:pixels().tobytes()==before.tobytes())
+            check(True,"Escape restores the exact native viewport before the held point")
+            for dx,dy in ((-70,70),(70,70),(70,-70),(-70,-70)):
+                press(g.width*.5+dx,g.height*.5+dy);release();await asyncio.sleep(.25)
+            await ready("Make face");pixels().save(out/"ordered-corners.png")
+            await click("Make face");await ready("Apply patch")
+            check(info()["scene_hash"]==baseline["scene_hash"],"Ordered face remains an unconfirmed draft until Apply")
+            await click("Move points")
+            nodes,_=await layout()
+            check(nodes["Move points"][1].get("toggle-state")==1 and nodes["Place points"][1].get("toggle-state")==0,
+                  "Actual retopology tool switching updates exported radio feedback")
+            await click("Apply patch");await ready("Save");await click("Save")
+            accepted=info()
+            (out / "accepted-scene.json").write_text(json.dumps({"baseline": baseline, "accepted": accepted}, indent=2))
+            check(len(accepted["objects"])==2 and accepted["retopology_vertices"]==4 and accepted["retopology_faces"]==1
+                  and accepted["objects"][0]["payload_hash"]==baseline["objects"][0]["payload_hash"]
+                  and accepted["objects"][0]["visible"] is False,
+                  "Native Apply and Save persist an editable quad and atlas mesh while retaining the exact hidden source")
+            await click("Undo");await click("Save")
+            check(info()["scene_hash"]==baseline["scene_hash"],"Universal Undo restores the complete scene in one transaction")
+            await click("Redo");await click("Save")
+            check(info()["scene_hash"]==accepted["scene_hash"],"Universal Redo restores the complete editable retopology scene")
+            await click("Start patch");await ready("Place points");await click("Cancel patch");await click("Save")
+            check(info()["scene_hash"]==accepted["scene_hash"] and app.poll() is None,
+                  "Reopen and cancellation retain saved topology and leave the native application responsive")
+            d.close();bus.disconnect();return
         if export_flow:
             import hashlib, struct
             original_hash = hashlib.sha256(fixture.read_bytes()).digest()

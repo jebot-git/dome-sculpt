@@ -29,7 +29,8 @@ enum class VrParameter {
   BakeSource, BakeDistances, BakeQuality,
   WeightStrength,
   WeightValue,
-  SkinSource, SkinMode, SkinDistances, SkinFalloff, SkinInfluences, SkinPrune
+  SkinSource, SkinMode, SkinDistances, SkinFalloff, SkinInfluences, SkinPrune,
+  RetopoDistance
 };
 inline bool skin_parameter(VrParameter parameter) {
   return parameter>=VrParameter::SkinSource && parameter<=VrParameter::SkinPrune;

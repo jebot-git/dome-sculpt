@@ -142,10 +142,10 @@ int main() try {
             "Old scene formats accept active rest meshes and reject newly invented dormant deformation semantics");
   }
   auto dormant = loaded;dormant.object(dormant.objects().front().id).mesh_active=false;auto dormant_encoded=dormant.encode();
-  require(dormant_encoded["version"]==7 && Scene::decode(dormant_encoded).encode()==dormant_encoded &&
+  require(dormant_encoded["version"]==8 && Scene::decode(dormant_encoded).encode()==dormant_encoded &&
           dormant_encoded["source_materials"]["bindings"].empty() && dormant_encoded["source_materials"]["origins"].empty() && dormant_encoded["source_materials"]["paints"].empty() &&
           dormant_encoded["source_images"]==loaded.encode()["source_images"] && dormant_encoded["source_models"]==loaded.encode()["source_models"],
-          "Dormant deformation uses version 7 and retains its exact rest mesh through native restart");
+          "Dormant deformation uses version 8 and retains its exact rest mesh through native restart");
   loaded.active().painted = std::make_shared<PaintedMesh>(stale, 64);
   rejects([&] { loaded.validate(); },
           "Scene validation detects reparameterized/replaced source indices");

@@ -43,13 +43,18 @@ public:
             const Mat4 &view_projection, ob::Vec3 camera, int width, int height,
             bool transparent = false, bool toon = false, bool light = false);
 };
+struct RetopoOverlayStats {size_t vertices=0,bytes=0;uint64_t uploads=0;};
 class CursorRenderer {
   GLuint program_ = 0, vao_ = 0, buffer_ = 0;
   bool linear_output_ = false;
+  struct OverlayCache;
+  std::unique_ptr<OverlayCache> overlay_;
 
 public:
   CursorRenderer();
   ~CursorRenderer();
+  void abandon();
+  RetopoOverlayStats retopology_stats() const;
   void set_linear_output(bool value) { linear_output_=value; }
   void draw(const EditorState &, const Mat4 &);
 };
