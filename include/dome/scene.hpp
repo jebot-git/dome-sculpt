@@ -10,6 +10,7 @@ namespace dome {
 struct CreatorAppearance;
 struct SourceMaterialBindings;
 struct RetopoPatch;
+struct PolygonAuthority;
 struct Material {
   std::string name = "Clay";
   std::array<float, 4> color{.58f, .30f, .15f, 1};
@@ -36,6 +37,7 @@ struct SculptObject {
   std::shared_ptr<const CreatorAppearance> appearance{};
   std::shared_ptr<const SourceMaterialBindings> material_bindings{};
   std::shared_ptr<const RetopoPatch> retopology{};
+  std::shared_ptr<const PolygonAuthority> polygon{};
 };
 bool source_is_dormant(const SculptObject &);
 struct ObjectSurface {
