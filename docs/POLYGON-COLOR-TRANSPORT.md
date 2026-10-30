@@ -25,7 +25,9 @@ Fresh Release CPU/UI/XR-enabled app and focused consumers were built against the
 
 The new independent unlit GLB consumer and actual native SurfaceRenderer pass 419 checks on both software GL and Intel Arc A770. All six combinations of raw gradient/seam fields and Opaque/Mask/Blend have exact image agreement (maximum error zero). Exported float RGBA retains nonzero RGB at fully transparent corners. Real skin and morph channels are evaluated independently. World-space alpha picking agrees with GPU coverage; the second eye and twenty held-object GPU transforms perform zero buffer writes, CPU reads or maps. Existing source-color renderer100 also passes on both devices. These are unlit color/alpha transport proofs, not a claim that arbitrary material/normal projection after topology changes is complete.
 
-Whole-core/support C/C++ ASan/UBSan/leak qualification is pending. A fresh unoptimized Debug run has no memory report but exceeds the existing 60-second default-sculpt atlas acceptance wait in `polygon-document`; its receipt is retained. A separate complete-core `-O1 -g1` build (matching the preceding workflow sanitizer configuration) is running with the identical source and unchanged assertions/timeouts. No complete sanitizer pass is claimed yet for this checkpoint.
+A separate fresh complete-core/support/renderer C/C++ `-O1 -g1` ASan/UBSan/leak build passes the same fifteen suites in 192.98 seconds, with every original assertion and worker timeout unchanged. The preliminary unoptimized Debug run is retained honestly as 13/15 in 511.08 seconds: default-sculpt atlas acceptance and the real-avatar flat-frame worker exceeded existing readiness waits; it produced no memory diagnostics. These timing failures were not hidden by changing the tests. The matching optimized sanitizer configuration used by the preceding polygon milestone passes both unchanged scopes.
+
+Exact source, binaries, configuration and logs are pinned in [the validation receipt](validation/POLYGON-COLOR-TRANSPORT.json). No full-suite, new actual FLTK interaction or OpenXR authoring claim is made from this scoped transport checkpoint.
 
 ## Remaining production work
 
