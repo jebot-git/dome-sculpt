@@ -3,6 +3,7 @@
 #include "dome/creator-archive.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/polygon-scene.hpp"
+#include "polygon-color-archive.hpp"
 #include <set>
 namespace dome::detail {
 class SourcePlacementArchive;
@@ -27,6 +28,7 @@ public:
 
 private:
   size_t entries_ = 0;
+  PolygonColorArchive colors_;
   std::set<const PolygonAuthority *> deeply_validated_;
   std::set<const PolygonOrigin *> deeply_validated_origins_;
   bool direct_origins_ = false;

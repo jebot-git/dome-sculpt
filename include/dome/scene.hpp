@@ -8,6 +8,7 @@
 #include "paint.hpp"
 #include <memory>
 namespace dome {
+struct PolygonColorSurface;
 struct CreatorAppearance;
 struct SourceMaterialBindings;
 struct RetopoPatch;
@@ -63,6 +64,7 @@ struct ObjectSurface {
   // Generated volume geometry cannot use dormant source topology/UV metadata.
   // Export must refuse rather than silently discard the retained source data.
   bool source_dormant = false;
+  std::shared_ptr<const PolygonColorSurface> polygon_colors{};
   std::shared_ptr<const NativeAffineEdit> affine_edit{};
 };
 // Scene copies retain object volumes for command history. Use snapshot() for

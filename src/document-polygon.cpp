@@ -593,10 +593,10 @@ void Document::polygon_loop() {
       PolygonLimits limits;
       limits.cancelled = cancelled;
       if (job.initial) {
-        auto topology = prepare_polygon_workspace_topology(
+        auto source = prepare_polygon_workspace_source(
             job.initial->active(), job.convert_source, cancelled);
-        candidate =
-            std::make_unique<PolygonWorkspace>(std::move(topology), limits);
+        candidate = std::make_unique<PolygonWorkspace>(std::move(source.topology),
+            std::move(source.colors), limits);
         next_anchor.reset();
       } else {
         if (!workspace || session != job.session)
@@ -712,7 +712,7 @@ void Document::polygon_loop() {
         if (view->changed) {
           auto initial = token->original;
           adopt_polygon_edit(*prepared, token->source.object, *view->topology,
-                             initial->object(token->source.object),
+                             view->colors, initial->object(token->source.object),
                              initial->world_transform(token->source.object),
                              convert, cancelled);
         }

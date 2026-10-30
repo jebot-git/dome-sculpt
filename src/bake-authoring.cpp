@@ -19,6 +19,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
+  for(const auto *object:{&source,&target})
+    if(object->polygon && object->polygon->active && object->polygon->colors)
+      throw std::logic_error("Current polygon corner colors need an explicit bake field adapter; the original source is unchanged");
   if (source.id == target.id)
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)

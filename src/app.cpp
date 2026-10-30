@@ -75,6 +75,7 @@ struct Canvas : Fl_Gl_Window {
   std::unique_ptr<CursorRenderer> cursors;
   std::unique_ptr<PolygonRenderer> polygons;
   std::shared_ptr<const MeshSnapshot> shown_mesh;
+  unsigned shown_preview_flags=0;
   Quat rotation{};
   Vec3 pan{};
   Vec3 ball{}, last_stamp{};
@@ -335,6 +336,8 @@ struct Canvas : Fl_Gl_Window {
       cursors->draw(overlay, vp);
     }
     renderer->resolve();
+    shown_preview_flags=(f.state->retopology?1u:0u)|(f.state->cut?2u:0u)|
+        ((f.state->polygon||f.state->polygon_handoff)?4u:0u)|(f.state->object_grabbing?8u:0u);
     if (!capture.empty()) {
       std::vector<uint8_t> pixels(size_t(pixel_w()) * pixel_h() * 3);
       glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -381,7 +384,9 @@ struct App {
   static void tick(void *data) {
     auto &a = *static_cast<App *>(data);
     auto f = a.canvas.document.frame();
-    if (f.surface != a.canvas.shown_mesh || f.state->retopology || f.state->cut || f.state->polygon || f.state->polygon_handoff || f.state->object_grabbing || a.seen_object_authority!=f.state->edit_authority)
+    const unsigned preview_flags=(f.state->retopology?1u:0u)|(f.state->cut?2u:0u)|
+        ((f.state->polygon||f.state->polygon_handoff)?4u:0u)|(f.state->object_grabbing?8u:0u);
+    if (f.surface != a.canvas.shown_mesh || preview_flags || preview_flags!=a.canvas.shown_preview_flags || a.seen_object_authority!=f.state->edit_authority)
       a.canvas.redraw();
     a.seen_object_authority=f.state->edit_authority;
     a.dirty = f.state->dirty;

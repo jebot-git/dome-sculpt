@@ -19,6 +19,11 @@ class MaterialSurfaceQuery {
 public:
   MaterialSurfaceQuery(const Mesh &, std::span<const SurfaceRange>,
                        const std::function<bool()> &cancelled = {});
+  // Explicit renderer stream. Empty suppresses raw tint for prepared surfaces;
+  // the original three-argument constructor keeps legacy appearance fallback.
+  MaterialSurfaceQuery(const Mesh &, std::span<const SurfaceRange>,
+                       const std::function<bool()> &cancelled,
+                       std::span<const std::array<float,4>> packed_colors);
   ~MaterialSurfaceQuery();
   MaterialSurfaceQuery(const MaterialSurfaceQuery &) = delete;
   MaterialSurfaceQuery &operator=(const MaterialSurfaceQuery &) = delete;

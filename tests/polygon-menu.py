@@ -10,8 +10,8 @@ from PIL import Image
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if os.environ.get('DOME_POLYGON_BUS')!='1':
  os.execvpe('dbus-run-session',['dbus-run-session','--',sys.executable,*sys.argv],{**os.environ,'DOME_POLYGON_BUS':'1'})
-root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_POLYGON_BUILD',root/'build-polygon-document')).resolve();compact=os.environ.get('DOME_POLYGON_COMPACT')=='1';sculpt=os.environ.get('DOME_POLYGON_SCULPT')=='1'
-out=root/'artifacts'/('polygon-menu-sculpt' if sculpt else 'polygon-menu-compact' if compact else 'polygon-menu');out.mkdir(parents=True,exist_ok=True)
+root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_POLYGON_BUILD',root/'build-polygon-document')).resolve();compact=os.environ.get('DOME_POLYGON_COMPACT')=='1';sculpt=os.environ.get('DOME_POLYGON_SCULPT')=='1';colored=os.environ.get('DOME_POLYGON_COLOR')=='1'
+out=root/'artifacts'/('polygon-menu-color-compact' if colored and compact else 'polygon-menu-color' if colored else 'polygon-menu-sculpt' if sculpt else 'polygon-menu-compact' if compact else 'polygon-menu');out.mkdir(parents=True,exist_ok=True)
 checks=[];processes=[]
 def write_report(complete=False,error=None):
  (out/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks),'complete':complete,'status':'failed' if error else 'passed' if complete else 'running','error':error},indent=2)+'\n')
@@ -37,7 +37,7 @@ async def main():
   for name,suffix in [('XDG_STATE_HOME','state'),('XDG_CONFIG_HOME','config'),('XDG_CACHE_HOME','cache'),('XDG_DATA_HOME','data'),('XDG_RUNTIME_DIR','runtime')]:env[name]=home+'/'+suffix;Path(env[name]).mkdir(mode=0o700)
   if compact:
    path=Path(home,'config/dome/appearance.json');path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps({'font':'Unifont / Sans-Serif','font_size':16,'font_scale':2}))
-  fixture=Path(home,'polygons.dsculpt');subprocess.run([str(build/'dome-sculpt-polygon-document-test'),'--sculpt-fixture' if sculpt else '--ui-fixture',str(fixture)],check=True)
+  fixture=Path(home,'polygons.dsculpt');subprocess.run([str(build/('dome-sculpt-polygon-color-document-test' if colored else 'dome-sculpt-polygon-document-test')),'--sculpt-fixture' if sculpt else '--ui-fixture',str(fixture)],check=True)
   def inspect():return json.loads(subprocess.check_output([str(build/'dome-sculpt-polygon-document-test'),'--inspect',str(fixture)]))
   original=inspect();app=subprocess.Popen([str(build/'dome-sculpt'),str(fixture)],env=env,cwd=home,stdout=(out/'app.log').open('w'),stderr=subprocess.STDOUT);processes.append(app);d=display.Display(screen)
   def named(title):
@@ -83,12 +83,31 @@ async def main():
    d.sync()
   def pixels():
    g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF);im=Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX');return im.crop((0,28,g.width,max(29,g.height-28)))
+  conversion_cancel_checked=False
+  async def begin():
+   nonlocal conversion_cancel_checked
+   await click('Start polygon editing')
+   if not colored:return
+   dialog=await wait(lambda:named('Convert to editable polygons'))
+   if not conversion_cancel_checked:
+    check(dialog.get_wm_transient_for().id==window.id,'Raw color conversion uses the existing document-owned FLTK confirmation')
+    dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();key('Return')
+    await wait(lambda:named('Convert to editable polygons') is None)
+    await ready(lambda n:n['Start polygon editing'][1].get('enabled'))
+    check(inspect()==original and named('Dome Sculpt') is not None,'Return defaults to Cancel and retains exact raw color, rig, morph and paint source')
+    conversion_cancel_checked=True
+    await click('Start polygon editing');dialog=await wait(lambda:named('Convert to editable polygons'))
+   g=dialog.get_geometry();font=32 if compact else 16;row=max(36,font+16)
+   button=min(g.width//2-24,max(140,font*9))
+   xtest.fake_input(d,X.MotionNotify,x=g.x+int(g.width/2+10+button/2),y=g.y+int(g.height-1.5*row+8))
+   xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
+   await wait(lambda:named('Convert to editable polygons') is None)
   await ready(lambda n:n['Start polygon editing'][1].get('enabled') and (sculpt or n['Use painted mesh'][1].get('toggle-state')==1))
   if os.environ.get('DOME_POLYGON_ADMISSION')=='1':
    nodes=await layout()
    check(all(nodes[name][1].get('enabled',True) for name in ('Bake surface...','Bind or transfer skin...','Start cut','Start patch')),'Eligible target/reference exposes actual universal-menu asset commands')
   check('Start polygon editing' in await layout(),'Polygon tools are part of the existing native universal menu')
-  await click('Start polygon editing');await ready(lambda n:n['Apply polygon edit'][1].get('enabled') and n['Faces'][1].get('toggle-state')==1)
+  await begin();await ready(lambda n:n['Apply polygon edit'][1].get('enabled') and n['Faces'][1].get('toggle-state')==1)
   if os.environ.get('DOME_POLYGON_ADMISSION')=='1':
    nodes=await layout()
    check(all(not nodes[name][1].get('enabled',True) for name in ('Bake surface...','Bind or transfer skin...','Start cut','Start patch')),'Active polygon workspace disables conflicting universal-menu asset commands')
@@ -126,17 +145,30 @@ async def main():
   await click('Save');check(inspect()==original,'Native Undo restores local N-gons while preserving committed scene and paint')
   await click('Redo');await wait(lambda:pixels().tobytes()==extruded.tobytes());await click('Cancel polygon edit');await ready(lambda n:n['Start polygon editing'][1].get('enabled'))
   await click('Save');check(inspect()==original,'Native Cancel discards full draft topology without a global history entry')
+  if colored:
+   await wait(lambda:len({(r>>3,g>>3,b>>3) for r,g,b in pixels().getdata()})>100)
+   check(True,'Native Cancel restores actual source colors without another viewport input event')
+   pixels().save(out/'original-source.png')
   if os.environ.get('DOME_POLYGON_ADMISSION')=='1':
    nodes=await layout()
    check(all(nodes[name][1].get('enabled',True) for name in ('Bake surface...','Bind or transfer skin...','Start cut','Start patch')),'Cancelling the workspace restores actual universal-menu asset commands')
-  await click('Start polygon editing');await ready(lambda n:n['Apply polygon edit'][1].get('enabled'));await click('Close Window');await ready(lambda n:n['Start polygon editing'][1].get('enabled'))
+  await begin();await ready(lambda n:n['Apply polygon edit'][1].get('enabled'));await click('Close Window');await ready(lambda n:n['Start polygon editing'][1].get('enabled'))
   check(named('Dome Sculpt') is not None,'Universal Close cancels the current polygon workspace before closing the window')
   # Apply plus immediate Save must observe the accepted transaction endpoint.
-  await click('Start polygon editing');await ready(lambda n:n['Apply polygon edit'][1].get('enabled'));window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();base=pixels()
+  await begin();await ready(lambda n:n['Apply polygon edit'][1].get('enabled'));window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();base=pixels()
   key('Shift_L',True);mouse(cx,cy,True);mouse(cx,cy,False);key('Shift_L',False);await wait(lambda:pixels().tobytes()!=base.tobytes())
   await click('Extrude faces');await ready(lambda n:n['Apply polygon edit'][1].get('enabled'));await click('Apply polygon edit');await click('Save');accepted=inspect()
-  check(accepted!=original and accepted['version']==12,'Native Apply then immediate Save persists authenticated Scene12 polygon authority')
+  check(accepted!=original and accepted['version']==(14 if colored else 12),'Native Apply then immediate Save persists authenticated current polygon authority')
+  if colored:
+   owner=accepted['polygon_sources']['authorities'][accepted['objects'][0]['polygon']]
+   check(owner['colors'] is not None and accepted['polygon_sources']['color_fields'] and accepted['polygon_sources']['color_bases'],'Actual native conversion and topology edits persist the current corner RGBA field')
+   check(accepted['source_models']==original['source_models'],'Native topology conversion retains exact original raw source model and accessor archive')
+   pixels().save(out/'accepted-colors.png')
   await click('Undo');await click('Save');check(inspect()==original,'One native global Undo restores complete original geometry, stable IDs and paint')
+  if colored:
+   await wait(lambda:len({(r>>3,g>>3,b>>3) for r,g,b in pixels().getdata()})>100)
+   check(True,'Native global Undo displays the restored raw-color source after polygon acceptance')
+   pixels().save(out/'undo-source.png')
   await click('Redo');await click('Save');check(inspect()==accepted,'Native global Redo restores the exact accepted polygon endpoint')
   write_report(complete=True);d.close();bus.disconnect()
 try:asyncio.run(main())

@@ -256,6 +256,8 @@ void Scene::validate(bool deep_sources) const {
     retain_paint(o.painted,false);
     const auto projection=o.painted?o.painted->color_projection():nullptr;
     const auto preparation=o.material_bindings?o.material_bindings->color_preparation:nullptr;
+    if(o.polygon && o.polygon->active && o.polygon->colors && (projection || preparation))
+      throw std::invalid_argument("Current polygon corner colors conflict with prepared color authority");
     if(bool(projection)!=bool(preparation))throw std::invalid_argument("Current color projection and retained preparation differ");
     if(projection) {
       if(projection->vertex_rgba!=preparation->projection->vertex_rgba || projection->maximum_error!=preparation->projection->maximum_error || projection->quality_cells!=preparation->projection->quality_cells)
@@ -436,7 +438,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>16 || version==14 || version==15)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>16 || version==15)throw std::runtime_error("Unsupported scene version");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
@@ -466,6 +468,8 @@ Scene Scene::decode(const nlohmann::json &j) {
     if (!j.contains("polygon_sources"))
       throw std::invalid_argument("Incomplete polygon source scene fields");
     if(version<13 && j.at("polygon_sources").at("version")!=1)throw std::invalid_argument("Exact polygon placement requires Scene13");
+    if(version<14 && j.at("polygon_sources").at("version")==3)
+      throw std::invalid_argument("Current polygon corner colors require Scene14");
     detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects);
     const auto &material_records=j.at("source_materials").at("bindings");
     const auto &model_records=j.at("source_models");
@@ -901,6 +905,12 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
            o.mesh_active ? o.material_bindings : nullptr,
            source_is_dormant(o)});
       result.back().affine_edit=o.affine_edit;
+      if(o.polygon && o.polygon->active && o.polygon->colors) {
+        auto current=std::make_shared<PolygonColorSurface>();
+        current->topology=std::shared_ptr<const PolygonMesh>(o.polygon,&o.polygon->topology);
+        current->field=o.polygon->colors;
+        result.back().polygon_colors=std::move(current);
+      }
     }
   return result;
 }

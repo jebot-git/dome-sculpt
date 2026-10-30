@@ -41,7 +41,7 @@ inline unsigned source_feature_version(const PolygonAuthority *root,const Polygo
   authority=[&](auto a,size_t depth){if(!a)return;
     if(depth>32||active_a.contains(a)||done_a.size()+done_o.size()>512)throw std::invalid_argument("Invalid retained object feature-version graph");
     if(done_a.contains(a))return;
-    active_a.insert(a);result=std::max(result,12u);
+    active_a.insert(a);result=std::max(result,a->colors?14u:12u);
     origin(a->origin.get(),depth);active_a.erase(a);done_a.insert(a);
   };
   origin=[&](auto o,size_t depth){if(!o)return;

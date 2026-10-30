@@ -7,6 +7,7 @@
 #include "document-transaction.hpp"
 #include "dome/shapekey-sculpt.hpp"
 #include "shapekey-preview.hpp"
+#include "current-colors.hpp"
 #include <pthread.h>
 namespace dome {
 namespace {
@@ -119,6 +120,7 @@ void Document::native_loop(){
       Scene working=session->initial->snapshot();working.select(session->source.object);auto &o=working.active();
       size_t budget=4'000'000;if(!session->shape_target)for(const auto &other:working.objects())if(other.id!=o.id){auto used=std::max(other.volume->stored_samples(),other.volume->voxels().size());if(used>budget)throw std::length_error("Scene sculpt storage budget exceeded");budget-=used;}
       std::unique_ptr<MaterialSurfaceQuery> query;
+      std::vector<std::array<float,4>> query_colors;
       std::unique_ptr<ShapeSculptDraft> shape;
       std::shared_ptr<const PaintedMesh::Evaluation> evaluation;
       if(session->shape_target){
@@ -140,7 +142,15 @@ void Document::native_loop(){
         if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
         SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};
         range.reflected=reflected;
-        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled);if(!shape)o.painted->begin_stroke();
+        PolygonColorSurface current_colors;
+        if(o.polygon && o.polygon->active && o.polygon->colors) {
+          current_colors.topology=std::shared_ptr<const PolygonMesh>(o.polygon,&o.polygon->topology);
+          current_colors.field=o.polygon->colors;
+        }
+        query_colors=detail::current_vertex_colors(o.painted->mesh(),
+            current_colors.field?&current_colors:nullptr,o.appearance.get(),
+            o.material_bindings.get(),range.textures.get(),cancelled);
+        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);if(!shape)o.painted->begin_stroke();
       }else o.volume->begin_stroke();
       std::optional<Vec3> previous;size_t processed=0;auto shown=std::chrono::steady_clock::now();
       for(;;){
@@ -168,7 +178,7 @@ void Document::native_loop(){
         if(now-shown>=std::chrono::milliseconds(30)){
           auto preview=working.snapshot();
           if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());author_shapekey(preview,o.id,edit,cancelled);detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
-            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);SurfaceRange range{o.id,0,geometry.indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};range.reflected=session->affine_world&&frame.orientation()==AffineOrientation::Reversing;query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&range,1),cancelled);
+            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);SurfaceRange range{o.id,0,geometry.indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};range.reflected=session->affine_world&&frame.orientation()==AffineOrientation::Reversing;query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);
           }
           std::lock_guard lock(model_mutex_);
           if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");

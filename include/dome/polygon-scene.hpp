@@ -5,6 +5,7 @@
 namespace dome {
 struct SourcePlacementCapsule;
 struct PolygonOrigin;
+class PolygonColorField;
 // Stable editable topology, not the triangulated display/paint derivative.
 // An active authority with no faces intentionally displays no surface, even if
 // the retained object Volume still contains an earlier sculpt.
@@ -12,6 +13,8 @@ struct PolygonAuthority {
   PolygonMesh topology;
   bool active = true;
   std::shared_ptr<const PolygonOrigin> origin;
+  // Scene14 current geometry-side linear RGBA, never an appearance alias.
+  std::shared_ptr<const PolygonColorField> colors;
 };
 // Detached immutable authoring snapshot. Ordinary topology edits retain the
 // first origin. An explicit later conversion may retain a prior authority;

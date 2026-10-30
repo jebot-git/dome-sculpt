@@ -12,6 +12,7 @@
 #include "gltf-document.hpp"
 #include "normal-frame-export.hpp"
 #include "prepared-color-state.hpp"
+#include "current-colors.hpp"
 #include <bit>
 #include <map>
 #include <set>
@@ -146,8 +147,16 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   }
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
+  std::vector<bool> vertex_transparency;
+  vertex_transparency.reserve(objects.size());
   for (const auto &input : objects) {
     stop();
+    auto validated_colors=detail::current_vertex_colors(input,cancelled);
+    bool vertex_alpha=false;
+    if(!validated_colors.empty())for(auto v:input.mesh.indices) {
+      checkpoint();vertex_alpha|=validated_colors.at(v)[3]<1;
+    }
+    vertex_transparency.push_back(vertex_alpha);
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
@@ -189,6 +198,11 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       attributes["TEXCOORD_0"] =
           add(begin, data.size() - begin, 34962, mesh.uv.size(), 5126, "VEC2");
     }
+    auto current_colors=frame?detail::remap_current_vertex_colors(validated_colors,frame->rest_vertices,cancelled):std::move(validated_colors);
+    if(!current_colors.empty()) {
+      begin=data.size();for(const auto &color:current_colors)floats(color);
+      attributes["COLOR_0"]=add(begin,data.size()-begin,34962,current_colors.size(),5126,"VEC4");
+    }
     std::vector<Tangent> tangents=frame?frame->tangents:std::vector<Tangent>{};
     if(auto source=frame?frame->source:source_attributes->source()) {
       const auto &a=*o.appearance;
@@ -197,7 +211,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         begin=data.size();for(auto v:a.source_vertices){if(v>=values.size())throw std::invalid_argument("Source attribute vertex index is missing");floats(values[v]);}
         attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
       };
-      attribute(source->uv1,"TEXCOORD_1","VEC2");if(!detail::prepared_color_state(o.material_bindings.get(),o.textures.get()))attribute(source->colors,"COLOR_0","VEC4");
+      attribute(source->uv1,"TEXCOORD_1","VEC2");
       if(!frame)tangents=source_attributes->base_tangents();
       if(!frame && !tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
         auto canonical=tangent_corners(mesh,cancelled);
@@ -428,7 +442,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
            {"roughnessFactor", m.roughness}}},
          {"emissiveFactor", m.emissive},
          {"doubleSided", m.double_sided},
-         {"alphaMode", m.color[3] < 1 ? "BLEND" : "OPAQUE"}});
+         {"alphaMode", m.color[3] < 1 || vertex_alpha ? "BLEND" : "OPAQUE"}});
     if(frame) {
       auto &extra=j["meshes"][mesh_index]["primitives"][0]["extras"]["domeSculptNormalTransport"];
       extra={{"version",1},{"skinPolicy","weighted-joint-inverse-transpose-1"},{"frameTargetIds",nlohmann::json::array()}};
@@ -549,8 +563,9 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         material["occlusionTexture"]["strength"]=source.occlusion_strength;
       }
     }
-    if(!maps.source_only && objects[i].material.alpha==Material::AlphaMode::Automatic)
-      material["alphaMode"]=(prepared_color?maps.pbr_transparent:maps.transparent)?"BLEND":"OPAQUE";
+    if(objects[i].material.alpha==Material::AlphaMode::Automatic)
+      material["alphaMode"]=(objects[i].material.color[3]<1 || vertex_transparency[i] ||
+          (prepared_color?maps.pbr_transparent:maps.transparent))?"BLEND":"OPAQUE";
     if(result.objects[i].canonical_normal.image) {
       material["normalTexture"]=source_info(result.objects[i].canonical_normal);
       material["normalTexture"]["scale"]=1;
