@@ -3,7 +3,8 @@
 namespace dome {
 bool Document::skin_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
+  return !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+    !state_.object_grabbing && !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
 std::vector<uint64_t> Document::skin_sources_locked(SkinAuthoringMode mode) const {

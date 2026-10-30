@@ -529,7 +529,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
   }
   state_.mesh_active = active.mesh_active;
-  state_.can_cut = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
+  state_.can_cut = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
   state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
@@ -540,7 +540,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   }
   state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
   state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
-  state_.can_retopologize = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy &&
+  state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
   state_.bake_sources = bake_sources_locked();
