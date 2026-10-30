@@ -90,8 +90,10 @@ Khronos validates all 34 generated GLB/VRM files with zero errors; its seven
 warnings are the existing legacy VRM extension-name warning. The official 15
 VRM0 schemas validate all seven VRMs with zero errors. Hardware-generated files
 match the validated software files byte-for-byte. A separate whole-core C/C++
-ASan/UBSan build is in progress at the initial checkpoint; no sanitizer pass is
-claimed before its tests finish. Exact local source, binary, output and log
+ASan/UBSan build also passes both new fixture suites (100 color-renderer and 41
+avatar assertions, 2/2 CTests in 101.70 seconds), with leak detection enabled and
+no sanitizer diagnostics. This is focused fixture coverage with the complete
+core instrumented, rather than all registered native tests. Exact local source, binary, output and log
 hashes are recorded in `docs/validation/SOURCE-COLOR-CHECKPOINT.json`.
 
 These are independent consumer proofs, not evidence that all legal glTF

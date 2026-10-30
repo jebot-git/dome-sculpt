@@ -13,8 +13,8 @@
       "sha256": "2a5aff6349325621cb2f2805ebc3d518c65351af7ff154e839db7ab920cfade5"
     },
     "docs/SOURCE-VERTEX-COLORS.md": {
-      "blob": "790d129e2b68f8ba1d9206078b7c3ce4390ecdf6",
-      "sha256": "db5d604f5cd0365fda0a6df9dbb5b3561c7effb1e43ede850bdebfc27634d1b3"
+      "blob": "93ddc84231424d3ead225c98aaa2d91bf1626007",
+      "sha256": "b5b4fe51f5f2d9d046f110f0f484f7428cdca570642660d91d3ce440792e505b"
     },
     "include/dome/document.hpp": {
       "blob": "ccd04dbed6a9343ffc55f1c4e93e165cc4a10c7e",
@@ -186,11 +186,49 @@
     "untracked_noncheckpoint_dependencies": []
   },
   "sanitizers": {
-    "state": "whole-core C and C++ ASan/UBSan/leak build in progress; tests not yet run",
-    "session": 56238,
-    "build": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san",
-    "log": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-san-build.log",
-    "claimed_pass": false
+    "state": "PASS complete C and C++ core instrumented; selected new graphical fixture suites2/2 in101.70s, ASan/UBSan and leak detection enabled, no diagnostics",
+    "claimed_pass": true,
+    "scope": "100 source color renderer assertions and41 actual avatar consumer assertions; not every registered native test",
+    "options": {
+      "ASAN_OPTIONS": "detect_leaks=1",
+      "UBSAN_OPTIONS": "print_stacktrace=1",
+      "LIBGL_ALWAYS_SOFTWARE": "1",
+      "LP_NUM_THREADS": "2"
+    },
+    "binaries": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/dome-sculpt-source-color-render-test",
+        "bytes": 257550584,
+        "sha256": "304ede09649fc5c081b96ad70a5dc17f325f1cfeebd70d48e41ac81e20505808"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/dome-sculpt-source-color-vrm-test",
+        "bytes": 256474368,
+        "sha256": "c8fcfd8f28e93cbf9d68903e38541c4c9c786a05665b978fc34c666d31867897"
+      }
+    ],
+    "libraries": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libdome-sculpt-core.a",
+        "bytes": 571631912,
+        "sha256": "a6d46b4ec5d93b42ec00d51741a2a3cf6796bbf4edf3a52d26b32893ebd8c5df"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libdome-sculpt-render.a",
+        "bytes": 26845178,
+        "sha256": "0d8b33f351235250903776593f37b6b327b47951fa7d24d35ecf3dca459f61e4"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libxatlas.a",
+        "bytes": 11071798,
+        "sha256": "e9c70f6c054a8bb2f940decab2f6730e8dac19b93da9f7df25f3fcc7aeadfadf"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/color-runtime-40ea548/build-san/libmikktspace.a",
+        "bytes": 844470,
+        "sha256": "7b11a4e7d6a9d99a87bb6e03795f2bf08ab3ab8e55e5da43e8bda95372677f28"
+      }
+    ]
   },
   "evidence": [
     {
@@ -297,6 +335,26 @@
       "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-arc-vrm.log",
       "bytes": 5358,
       "sha256": "811a9e21d7ba8ab9b38c761e14679f16467f2b08b7a6088ab582115510348184"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-san-configure.log",
+      "bytes": 1720,
+      "sha256": "594d6631a4ccc609f8f7bc36b4ceba3acd4449f900a08eda9c43ac18e5b78e54"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-san-build.log",
+      "bytes": 6414,
+      "sha256": "fbf8a3c2e7d8f0169c8af88b5cc17f5325242a7dbe564676a8dc0a197985e3ba"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-san.log",
+      "bytes": 370,
+      "sha256": "be0ed53e17b2b5d15ea534bc7d8f35dba75f194fa943c5d73f38cf5651901994"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-color-40-san-details.log",
+      "bytes": 18792,
+      "sha256": "a5847e0c29a05a27cdd62a16cbf86655e87f771329f179ff22bc2cbd0ab32b41"
     }
   ],
   "outputs": [
