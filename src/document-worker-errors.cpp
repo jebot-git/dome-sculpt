@@ -17,7 +17,8 @@ void Document::signal_worker_notices_locked() noexcept {
   // Both consumers use their predicate's mutex, preventing lost wakeups.
   {std::lock_guard lock(file_mutex_);worker_notices_pending_.store(pending);worker_completion_pending_.store(completion);}
   {std::lock_guard lock(input_mutex_);input_notice_pending_.store(input);}
-  file_changed_.notify_all();input_changed_.notify_all();
+  {std::lock_guard lock(native_mutex_);native_notice_pending_.store(bool(worker_notices_[2]));}
+  file_changed_.notify_all();input_changed_.notify_all();native_changed_.notify_all();
 }
 void Document::input_worker_error_locked(std::exception_ptr error) noexcept {
   WorkerNotice notice;notice.error=std::move(error);notice.generation=state_.generation;
@@ -48,10 +49,26 @@ void Document::file_worker_error_locked(FileJob &job,std::exception_ptr error) n
   }
   worker_notices_[1]=std::move(notice);retry_worker_notices_locked();
 }
-void Document::retry_worker_notices_locked(bool input) noexcept {
+void Document::native_worker_error_locked(const std::shared_ptr<NativeStroke>&session,std::exception_ptr error) noexcept {
+  // The detached draft never replaces authority on failure. Preserve the exact
+  // exception without allocating strings, and never cancel a newer gesture.
+  if(native_stroke_==session){
+    native_stroke_.reset();desktop_=false;session->cancelled=true;++native_epoch_;
+    // begin_native_locked cancelled SpatialInput before publication, so there
+    // is no synchronous edit callback left to run during failure cleanup.
+    input_.cancel();state_.native_samples=0;
+    if(session->source.generation==state_.generation&&session->source.revision==state_.revision){
+      std::lock_guard mesh(mesh_mutex_);pending_mesh_.reset();mesh_.store(session->original_preview);mesh_changed_.notify_all();
+    }
+    if(stopping_.load())return;
+    WorkerNotice notice;notice.error=std::move(error);notice.generation=session->source.generation;notice.publication=published_.load();
+    worker_notices_[2]=std::move(notice);retry_worker_notices_locked(false,true);
+  }
+}
+void Document::retry_worker_notices_locked(bool input,bool native) noexcept {
   // Each worker retries its own slot. A long authoring/export job must never
   // delay controller recovery, and idle workers keep their normal indefinite wait.
-  for(const size_t slot:{input?size_t(0):size_t(1)}) {
+  for(const size_t slot:{native?size_t(2):input?size_t(0):size_t(1)}) {
     auto &pending=worker_notices_[slot];if(!pending)continue;
     auto &notice=*pending;
     bool handled=false;

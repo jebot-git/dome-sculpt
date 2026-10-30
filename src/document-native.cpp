@@ -83,7 +83,7 @@ void Document::drain_native_shutdown(){
 void Document::capture_native_file(FileJob &job){
   auto session=job.native_capture;
   {std::unique_lock lock(native_mutex_);native_changed_.wait(lock,[&]{return session->done;});
-    if(!session->error.empty())throw std::runtime_error("Desktop stroke did not complete; save cancelled: "+session->error);
+    if(session->failure)std::rethrow_exception(session->failure);
     job.revision=session->revision;job.generation=session->source.generation;job.content=session->content;job.recovery_source=session->recovery_source;}
   // This immutable completion is the exact accepted endpoint, even if another
   // gesture or object change has already started before the ordered file job.
@@ -92,14 +92,24 @@ void Document::capture_native_file(FileJob &job){
 void Document::native_loop(){
   pthread_setname_np(pthread_self(),"dome-native");
   for(;;){
+    if(stopping_.load()&&native_notice_pending_.load()){std::lock_guard lock(model_mutex_);worker_notices_[2].reset();signal_worker_notices_locked();}
+    if(native_notice_pending_.load()){
+      {std::lock_guard lock(model_mutex_);retry_worker_notices_locked(false,true);}
+      if(stopping_.load()&&native_notice_pending_.load()){std::lock_guard lock(model_mutex_);worker_notices_[2].reset();signal_worker_notices_locked();}
+    if(native_notice_pending_.load()){
+        std::unique_lock lock(native_mutex_);native_changed_.wait_for(lock,std::chrono::milliseconds(25),[&]{return stopping_.load()||!native_notice_pending_.load();});
+        if(stopping_)continue;
+        continue;
+      }
+    }
     std::shared_ptr<NativeStroke> session;
-    {std::unique_lock lock(native_mutex_);native_changed_.wait(lock,[&]{return stopping_||!native_jobs_.empty();});if(stopping_&&native_jobs_.empty())return;session=std::move(native_jobs_.front());native_jobs_.pop_front();native_processing_=true;}
+    {std::unique_lock lock(native_mutex_);native_changed_.wait(lock,[&]{return stopping_||!native_jobs_.empty()||native_notice_pending_.load();});if(stopping_&&native_jobs_.empty())return;if(native_notice_pending_)continue;session=std::move(native_jobs_.front());native_jobs_.pop_front();native_processing_=true;}
     auto cancelled=[&]{
       auto current=published_.load();
       return stopping_.load()||session->cancelled.load()||native_epoch_.load()!=session->epoch||
         current->generation!=session->source.generation||current->revision!=session->source.revision||current->active_object!=session->source.object;
     };
-    std::string error;
+    std::exception_ptr failure;
     try{
       if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
       Scene working=session->initial->snapshot();working.select(session->source.object);auto &o=working.active();
@@ -203,9 +213,8 @@ void Document::native_loop(){
         try{checkpoint_locked();}catch(...){}
 
       }
-    }catch(const std::exception &e){error=e.what();std::lock_guard lock(model_mutex_);if(native_stroke_==session){cancel_native_locked();state_.error=error;publish_locked();}}
-    catch(...){error="Unknown desktop stroke failure";std::lock_guard lock(model_mutex_);if(native_stroke_==session){cancel_native_locked();state_.error=error;publish_locked();}}
-    {std::lock_guard lock(native_mutex_);session->error=std::move(error);session->done=true;native_processing_=false;}
+    }catch(...){failure=std::current_exception();std::lock_guard lock(model_mutex_);native_worker_error_locked(session,failure);}
+    {std::lock_guard lock(native_mutex_);session->failure=std::move(failure);session->done=true;native_processing_=false;}
     native_changed_.notify_all();
   }
 }

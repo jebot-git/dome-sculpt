@@ -546,7 +546,7 @@ private:
     size_t submitted = 0;
     std::atomic_bool cancelled{false}, accepted{false};
     bool accepting = true, done = false;
-    std::string error;
+    std::exception_ptr failure;
     std::shared_ptr<const Scene> completed;
     uint64_t revision = 0, content = 0;
     RecoverySource recovery_source;
@@ -653,13 +653,14 @@ private:
     uint64_t generation=0,import_request=0,cut_session=0,retopo_session=0;
     bool input=false,discover_import=false,discover_recovery=false,cancelled=false,held_weight=false,export_job=false;
   };
-  // Two bounded per-worker error records, no Scene/mesh copies. Failed UI
+  // Three bounded per-worker error records, no Scene/mesh copies. Failed UI
   // publication retries off the UI thread; promises keep original exceptions.
-  std::array<std::optional<WorkerNotice>,2> worker_notices_;
-  std::atomic_bool worker_notices_pending_{false},input_notice_pending_{false},worker_completion_pending_{false};
+  std::array<std::optional<WorkerNotice>,3> worker_notices_;
+  std::atomic_bool worker_notices_pending_{false},input_notice_pending_{false},worker_completion_pending_{false},native_notice_pending_{false};
   void input_worker_error_locked(std::exception_ptr) noexcept;
   void file_worker_error_locked(FileJob &,std::exception_ptr) noexcept;
-  void retry_worker_notices_locked(bool input=false) noexcept;
+  void retry_worker_notices_locked(bool input=false,bool native=false) noexcept;
+  void native_worker_error_locked(const std::shared_ptr<NativeStroke>&,std::exception_ptr) noexcept;
   void signal_worker_notices_locked() noexcept;
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
