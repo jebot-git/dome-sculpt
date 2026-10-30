@@ -4,6 +4,8 @@
 #include "dome/source-maps.hpp"
 #include "humanoid-sha256.hpp"
 #include "vroid-groom.hpp"
+#include "dome/normal-frames.hpp"
+#include "source-frame-shape.hpp"
 #include <fstream>
 #include <mutex>
 #include <nlohmann/json.hpp>
@@ -280,13 +282,16 @@ struct Shaper {
     p = raw(p);
     return {p.x * scale, (p.y - floor) * scale, p.z * scale};
   }
-  Vec3 normal(Vec3 p, Vec3 n) const {
-    if (c.build == 0 && c.shoulder_width == 0 && c.waist_width == 0 &&
+  bool neutral_frame() const {
+    return c.build == 0 && c.shoulder_width == 0 && c.waist_width == 0 &&
         c.leg_length == 0 && c.arm_length == 0 && c.head_width == 0 &&
         c.head_height == 0 && c.anime == 0 && c.eye_size == 0 &&
         c.eye_spacing == 0 && c.nose_size == 0 && c.mouth_width == 0 &&
-        c.jaw_width == 0)
-      return flip(n);
+        c.jaw_width == 0;
+  }
+  std::array<Vec3, 3> differential_axes(Vec3 p) const {
+    if (neutral_frame())
+      return {flip({1, 0, 0}), flip({0, 1, 0}), flip({0, 0, 1})};
     constexpr float step = .0001f;
     Vec3 a = (raw(p + Vec3{step, 0, 0}) - raw(p - Vec3{step, 0, 0})) /
              (2 * step),
@@ -297,6 +302,24 @@ struct Shaper {
     float det = dot(a, cross(b, d));
     if (!std::isfinite(det) || det < .05f)
       fail("style warp has singular/reflected local frame");
+    return {a, b, d};
+  }
+  // Private creation-time hook: future immutable native frame keys must use
+  // this actual shape at each original base/target position, not infer a
+  // nonlinear transform from the final vertices. No archive/layout change.
+  RigMatrix frame_differential(Vec3 p) const {
+    auto axes = differential_axes(p);
+    for (auto &axis : axes) axis = axis * scale;
+    const auto &a = axes[0], &b = axes[1], &d = axes[2];
+    return {a.x, a.y, a.z, 0, b.x, b.y, b.z, 0, d.x, d.y, d.z, 0,
+            0, 0, 0, 1};
+  }
+  Vec3 normal(Vec3 p, Vec3 n) const {
+    if (neutral_frame())
+      return flip(n);
+    auto axes = differential_axes(p);
+    const auto &a = axes[0], &b = axes[1], &d = axes[2];
+    float det = dot(a, cross(b, d));
     return normalized(
         (cross(b, d) * n.x + cross(d, a) * n.y + cross(a, b) * n.z) / det);
   }
@@ -576,6 +599,39 @@ CreatedHumanoid create_vroid(const HumanoidControls &c,
     part.appearance = appearance;
     part.source_maps = source_maps(*source, material);
     part.deformation.validate(part.mesh);
+    // Mint original-attribute authority while this exact nonlinear Shaper is
+    // available. Existing mesh/POSITION target creation remains unchanged.
+    auto frame_set=std::make_shared<NormalFrameSet>();
+    for(size_t target=0;target<p.morph_targets.size();++target) {
+      frame_set->targets.push_back({target+1,uint32_t(target),uint32_t(target),{}});
+      frame_set->current_targets.push_back(target+1);
+    }
+    frame_set->next_target=p.morph_targets.size()+1;
+    auto mint=[&](uint32_t coordinate) {
+      const auto &frame_uv=coordinate==0?p.mesh.uv:p.uv1;
+      auto original_frames=detail::source_tangent_frames(p,frame_uv,cancel);
+      auto native=detail::source_shape_key_frames(p,original_frames,[&](Vec3 point){return shape.frame_differential(point);},cancel);
+      auto frames=std::make_shared<NormalFrames>();frames->origin_vertex_count=uint32_t(part.mesh.positions.size());
+      frames->origin_vertices=part.mesh.indices;frames->source_vertex_count=uint32_t(p.mesh.positions.size());
+      frames->source_corner_count=uint32_t(p.mesh.indices.size());frames->source_vertices=p.mesh.indices;
+      frames->source_corners.resize(p.mesh.indices.size());std::iota(frames->source_corners.begin(),frames->source_corners.end(),0u);
+      frames->generated_tangents=native.generated;if(native.generated)frames->generated_uv=coordinate;
+      frames->normals=std::move(native.normals);frames->tangents=std::move(native.base);
+      auto all_zero=[&](const std::vector<Vec3> &values){for(size_t n=0;n<values.size();++n){if((n&1023)==0)stop(cancel);auto v=values[n];if(v.x!=0 || v.y!=0 || v.z!=0)return false;}return true;};
+      for(size_t target=0;target<p.morph_targets.size();++target) {
+        // Preserve genuinely omitted channels when the complete generated native
+        // key is proven zero. Generated tangents were still evaluated for every
+        // target before this lossless zero-channel compaction.
+        if(p.morph_targets[target].normals.empty() && all_zero(native.normal_targets[target]))native.normal_targets[target].clear();
+        if((native.generated || p.morph_targets[target].tangents.empty()) && all_zero(native.targets[target]))native.targets[target].clear();
+        frames->targets.push_back({target+1,std::move(native.normal_targets[target]),std::move(native.targets[target])});
+      }
+      frames->validate();return frames;
+    };
+    if(material.normal_texcoord<0 || material.normal_texcoord>1)fail("original normal UV coordinate is unsupported");
+    frame_set->mtoon=mint(0); // Legacy MToon0 MainTex ST changes sampling only.
+    frame_set->pbr=(!p.tangents.empty() || material.normal_texcoord==0)?frame_set->mtoon:mint(uint32_t(material.normal_texcoord));
+    frame_set->validate();part.normal_frames=std::move(frame_set);
     if (!primary && lower.find("body") != std::string::npos &&
         lower.find("skin") != std::string::npos) {
       output.primary_part = output.parts.size();

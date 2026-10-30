@@ -22,7 +22,7 @@ Scene combined() {
   source->color.image=std::make_shared<const Image>(Image{1,1,{32,64,128,255}});
   scene.active().painted=PaintedMesh::from_maps(plane(),source,64);scene.active().mesh_active=true;
   auto original=std::make_shared<SourceUvOrigin>();original->paint=scene.active().painted->snapshot();
-  auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=false;binding->uv_origin=original;
+  auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=false;binding->uv_origin=original;binding->sampling_reparameterized=true; // Explicit legacy derived sampling, not a newly captured native frame origin.
   auto material=scene.duplicate(1);scene.object(material).material_bindings=binding;
   scene.set_deformation(material,DeformationState(scene.object(material).painted->mesh()));
   auto retopo=scene.duplicate(material);scene.object(retopo).retopology=std::make_shared<const RetopoPatch>(RetopoPatch{1,patch()});

@@ -5,6 +5,7 @@
 namespace dome {
 inline std::string mtoon_renderer_common(){
   return std::string(mtoon_glsl())+R"GLSL(
+uniform int source_frame,canonical_frame;
 uniform int mt_mode,mt_outline,mt_present[16],mt_coord[16],mt_derived[16],mt_channel[16];
 uniform vec4 mt[12];uniform vec2 mt_offset[16],mt_scale[16];uniform float mt_rotation[16],mt_time;
 uniform vec3 mt_camera_up,mt_camera_forward;uniform float mt_aspect;
@@ -26,11 +27,14 @@ return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[t
 )GLSL";
 }
 inline std::string mtoon_renderer_vertex(){return std::string("#version 330 core\n")+mtoon_renderer_common()+R"GLSL(
-layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;layout(location=5)in vec4 tangent;layout(location=6)in float sculpt_mask;
+layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;layout(location=5)in vec4 tangent;layout(location=6)in float sculpt_mask;layout(location=7)in vec3 retained_normal;layout(location=8)in vec4 retained_tangent;layout(location=9)in vec3 retained_canonical_normal;
 uniform mat4 model,mvp,view_projection;uniform vec3 camera;
-out vec3 world,n,canonical_t,canonical_b,cut_position;out vec2 texcoord,texcoord1;out float weight_value,mask_value;
-void main(){vec4 p=model*vec4(position,1);vec3 N=dome_mtoon_unit(mat3(model)*normal),V=dome_mtoon_unit(camera-p.xyz);
-world=p.xyz;cut_position=position;n=N;canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(N,canonical_t)*tangent.w;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;mask_value=sculpt_mask;gl_Position=mvp*vec4(position,1);
+out vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;out float source_w;out vec2 texcoord,texcoord1;out float weight_value,mask_value;
+void main(){vec4 p=model*vec4(position,1);vec3 geometric=dome_mtoon_unit(mat3(model)*normal),V=dome_mtoon_unit(camera-p.xyz);
+source_n=dome_mtoon_unit(mat3(model)*dome_mtoon_unit(retained_normal));source_t=dome_mtoon_unit(mat3(model)*dome_mtoon_unit(retained_tangent.xyz));source_w=retained_tangent.w;source_b=cross(source_n,source_t)*source_w;
+vec3 N=source_frame==1?source_n:geometric;world=p.xyz;cut_position=position;n=geometric;
+canonical_n=canonical_frame==1?dome_mtoon_unit(mat3(model)*dome_mtoon_unit(retained_canonical_normal)):geometric;
+canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(canonical_n,canonical_t)*tangent.w;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;mask_value=sculpt_mask;gl_Position=mvp*vec4(position,1);
 if(mt_mode==1&&mt_outline==1&&selected_weight<0){float mask=mt_scalar(8,mt_read(8,mt_uv(8,uv,uv1,N,V,1)));
 float width=mt_scalar(7,mt_read(7,mt_uv(7,uv,uv1,N,V,mask)));
 if(int(mt[10].x+.5)==1){world+=N*dome_mtoon_outline_world_width(mt,width);gl_Position=view_projection*vec4(world,1);}
@@ -79,18 +83,30 @@ return coverage>1e-8?sum/coverage:vec3(0,0,1);
 vec2 mt_original_emission_uv(vec2 a,vec2 b,vec3 N,vec3 V,float mask){
 int transform=mt[8].x<.5?0:3;vec2 q=mt_coord[3]==1?b:a;
 return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[transform],false,false,false,mt_time,mask);}
+vec3 mt_source_normal(vec3 encoded){
+vec3 N=dome_mtoon_unit(source_n);bool legacy=mt[8].x<.5;
+if(!legacy&&!gl_FrontFacing)N=-N;
+if(mt[11].x<.5)return N;
+vec3 ts=dome_mtoon_normal_map(encoded,mt[6].z);
+if(legacy)return dome_mtoon_unit(source_t*ts.x+source_b*ts.y+source_n*ts.z);
+vec3 T=dome_mtoon_unit(source_t),B=dome_mtoon_unit(cross(N,T))*(source_w>0?1:-1);
+return dome_mtoon_unit(T*ts.x+B*ts.y+N*ts.z);
+}
 vec4 mt_surface(vec3 geometric,vec3 V,out bool killed){
-vec3 N=dome_mtoon_unit(geometric);float mask=mt_scalar(8,mt_read(8,mt_uv(8,texcoord,texcoord1,N,V,1)));
+vec3 N=dome_mtoon_unit(source_frame==1?source_n:geometric);float mask=mt_scalar(8,mt_read(8,mt_uv(8,texcoord,texcoord1,N,V,1)));
 vec2 normalUV=mt_uv(2,texcoord,texcoord1,N,V,mask),a=dFdx(normalUV),b=dFdy(normalUV);vec3 dx=dFdx(world),dy=dFdy(world);
 float determinant=a.x*b.y-a.y*b.x;vec4 tangent=vec4(1,0,0,1);bool valid=abs(determinant)>1e-8*max(length(a)*length(b),1e-20);
 if(valid){vec3 T=(dx*b.y-dy*a.y)/determinant,B=(dy*a.x-dx*b.x)/determinant;T=dome_mtoon_unit(T-N*dot(N,T));tangent=vec4(T,dot(cross(N,T),B)<0?-1:1);}
 if(mt_baked_normal==0){
-if(valid)N=dome_mtoon_material_normal(mt,N,tangent,mt_read(2,normalUV).rgb,V,gl_FrontFacing,mt_outline==1);
+if(source_frame==1){N=mt_source_normal(mt_read(2,normalUV).rgb);if(mt[8].x<.5)N=dome_mtoon_facing_normal(0,N,V,gl_FrontFacing,mt_outline==1);}
+else if(valid)N=dome_mtoon_material_normal(mt,N,tangent,mt_read(2,normalUV).rgb,V,gl_FrontFacing,mt_outline==1);
 else N=dome_mtoon_facing_normal(int(mt[8].x),N,V,gl_FrontFacing,mt_outline==1);
 }else{
 bool back=mt[8].x>.5&&!gl_FrontFacing;vec3 original=back?-N:N;
-if(valid&&mt[11].x>.5){vec3 T=tangent.xyz,B=cross(original,T)*tangent.w,ts=dome_mtoon_normal_map(mt_read(2,normalUV).rgb,mt[6].z);original=dome_mtoon_unit(T*ts.x+B*ts.y+original*ts.z);}
-float coverage;vec3 detail=mt_baked_detail(coverage);vec3 canonical=dome_mtoon_unit(canonical_t*detail.x+(back?-canonical_b:canonical_b)*detail.y+(back?-geometric:geometric)*detail.z);
+if(source_frame==1)original=mt_source_normal(mt_read(2,normalUV).rgb);
+else if(valid&&mt[11].x>.5){vec3 T=tangent.xyz,B=cross(original,T)*tangent.w,ts=dome_mtoon_normal_map(mt_read(2,normalUV).rgb,mt[6].z);original=dome_mtoon_unit(T*ts.x+B*ts.y+original*ts.z);}
+float coverage;vec3 detail=mt_baked_detail(coverage);vec3 Tc=canonical_t,Bc=canonical_b,Nc=canonical_n;
+vec3 canonical=dome_mtoon_unit(Tc*detail.x+(back?-Bc:Bc)*detail.y+(back?-Nc:Nc)*detail.z);
 N=dome_mtoon_unit(mix(original,canonical,coverage));if(mt[8].x<.5)N=dome_mtoon_facing_normal(0,N,V,gl_FrontFacing,mt_outline==1);
 }
 DomeMToonSamples s;s.base=mt_read(0,mt_uv(0,texcoord,texcoord1,N,V,mask));s.shade=mt_read(1,mt_uv(1,texcoord,texcoord1,N,V,mask)).rgb;

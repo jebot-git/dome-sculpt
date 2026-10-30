@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/material-bindings.hpp"
 #include "dome/scene.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -6,6 +7,7 @@
 #include "dome/tangents.hpp"
 #include "io.hpp"
 #include "gltf-document.hpp"
+#include "normal-frame-export.hpp"
 #include <bit>
 #include <map>
 #include <set>
@@ -43,11 +45,13 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
     "Source NORMAL deltas recomputed from edited geometry; original authoring data remains unchanged");
   stop();detail::write_glb(std::move(document),path);return report;
 }
-detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects,
+detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_objects,
     SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled) {
   GltfDocument result;
-  if (objects.empty())
+  const auto &objects=input_objects;
+  if (objects.empty() || objects.size()>256)
     throw std::invalid_argument("The scene has no visible surface to export");
+
   for(const auto &object:objects)if(object.source_dormant)
     throw std::invalid_argument("Source attributes are dormant for "+object.name+
       "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");
@@ -58,6 +62,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
       {"scenes", {{{"nodes", nlohmann::json::array()}}}}};
   auto &data=result.binary;
   auto floats = [&](auto values) {
+    if(values.size()*sizeof(float)>256*1024*1024-std::min(data.size(),size_t(256*1024*1024)))throw std::length_error("glTF geometry resource limit exceeded before appending attributes");
     for (float f : values)
       append(data, std::bit_cast<uint32_t>(f));
   };
@@ -113,10 +118,15 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
   }
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
-  for (auto &o : objects) {
+  for (const auto &input : objects) {
+    std::optional<NormalFrameExport> prepared;
+    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled);
+    const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
+    if(frame)emission.canonical_normal=frame->canonical_normal;
     auto &mesh = o.mesh;
-    SourceMorphTransport source_attributes(o,source_space,cancelled);
+    std::optional<SourceMorphTransport> source_attributes;
+    if(!frame)source_attributes.emplace(o,source_space,cancelled);
     mesh.validate();
     o.material.validate();
     if (o.deformation)
@@ -148,7 +158,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
       attributes["TEXCOORD_0"] =
           add(begin, data.size() - begin, 34962, mesh.uv.size(), 5126, "VEC2");
     }
-    if(auto source=source_attributes.source()) {
+    std::vector<Tangent> tangents=frame?frame->tangents:std::vector<Tangent>{};
+    if(auto source=frame?frame->source:source_attributes->source()) {
       const auto &a=*o.appearance;
       auto attribute=[&](const auto &values,const char *name,const char *type) {
         if(values.empty())return;
@@ -156,8 +167,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
         attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
       };
       attribute(source->uv1,"TEXCOORD_1","VEC2");attribute(source->colors,"COLOR_0","VEC4");
-      auto tangents=source_attributes.base_tangents();
-      if(!tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
+      if(!frame)tangents=source_attributes->base_tangents();
+      if(!frame && !tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
         auto canonical=tangent_corners(mesh,cancelled);
         for(size_t corner=0;corner<canonical.size();++corner) {
           auto authored=tangents.at(mesh.indices[corner]);auto target=canonical[corner];
@@ -165,16 +176,17 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
             throw std::invalid_argument("Canonical baked normals conflict with retained source tangents; explicit tangent basis conversion is required");
         }
       }
-      if(!tangents.empty()){
-        begin=data.size();for(auto t:tangents)floats(t);
-        attributes["TANGENT"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC4");
-      }
+    }
+    if(!tangents.empty()){
+      begin=data.size();for(auto t:tangents)floats(t);
+      attributes["TANGENT"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC4");
     }
     if (o.deformation && o.deformation->skin) {
       const auto &weights = o.deformation->skin->vertices;
       size_t sets = 0;
       for (const auto &vertex : weights)
         sets = std::max(sets, (vertex.size() + 3) / 4);
+      if(!weights.empty() && sets>(256*1024*1024-std::min(data.size(),size_t(256*1024*1024)))/(weights.size()*24))throw std::length_error("Padded skin attribute arrays exceed glTF output resource bound");
       for (size_t set = 0; set < sets; ++set) {
         begin = data.size();
         for (const auto &vertex : weights)
@@ -245,7 +257,9 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
           j["accessors"][accessor]["min"] = {low.x, low.y, low.z};
           j["accessors"][accessor]["max"] = {high.x, high.y, high.z};
           nlohmann::json channels={{"POSITION",accessor}};
-          auto directions=source_attributes.target(native_target++,recompute_changed_normals);
+          SourceMorphChannels directions;
+          if(frame){directions.normals=frame->normal_targets.at(native_target);directions.tangents=frame->tangent_targets.at(native_target);++native_target;}
+          else directions=source_attributes->target(native_target++,recompute_changed_normals);
           auto direction=[&](const std::vector<Vec3> &values,const char *name){
             if(values.empty())return;
             begin=data.size();
@@ -372,6 +386,11 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
          {"emissiveFactor", m.emissive},
          {"doubleSided", m.double_sided},
          {"alphaMode", m.color[3] < 1 ? "BLEND" : "OPAQUE"}});
+    if(frame) {
+      auto &extra=j["meshes"][mesh_index]["primitives"][0]["extras"]["domeSculptNormalTransport"];
+      extra={{"version",1},{"skinPolicy","weighted-joint-inverse-transpose-1"},{"frameTargetIds",nlohmann::json::array()}};
+      for(auto id:o.material_bindings->normal_frames->current_targets)extra["frameTargetIds"].push_back(std::to_string(id));
+    }
     result.objects.push_back(std::move(emission));
     auto &encoded = j["materials"].back();
     if (m.alpha != Material::AlphaMode::Automatic)
@@ -488,6 +507,10 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &objects
     }
     if(!maps.source_only && objects[i].material.alpha==Material::AlphaMode::Automatic)
       material["alphaMode"]=maps.transparent?"BLEND":"OPAQUE";
+    if(result.objects[i].canonical_normal.image) {
+      material["normalTexture"]=source_info(result.objects[i].canonical_normal);
+      material["normalTexture"]["scale"]=1;
+    }
   }
   return result;
 }

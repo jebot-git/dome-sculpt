@@ -10,6 +10,10 @@ struct SourceTangentFrames {
   std::vector<std::vector<Vec3>> targets;
   std::vector<Vec3> normals;
   std::vector<std::vector<Vec3>> normal_targets;
+  // Original primitive vertex identity for every corner, independent of any
+  // later sampling-atlas vertex welding/splitting.
+  size_t origin_vertex_count = 0;
+  std::vector<uint32_t> origin_vertices;
   bool generated = false;
 };
 // frame_uv is the original normal-frame coordinate basis, selected explicitly
@@ -28,15 +32,16 @@ inline SourceTangentFrames source_tangent_frames(
   if(stride && source.morph_targets.size()+1>max_work/stride)
     throw std::length_error("Source tangent generation corner work limit exceeded");
   // Bound the largest possible immutable result independently of work policy.
-  // Base T4+N3 and each target's T3+N3 need at most 28 and 24 bytes/corner.
+  // Base T4+N3+origin ID and targets T3+N3 need 32 and 24 bytes/corner.
   constexpr size_t bytes_limit=256*1024*1024;
-  if(corners>bytes_limit/28 || (corners && source.morph_targets.size()>(bytes_limit-corners*28)/(corners*24)))
+  if(corners>bytes_limit/32 || (corners && source.morph_targets.size()>(bytes_limit-corners*32)/(corners*24)))
     throw std::length_error("Source tangent result memory limit exceeded");
   auto vectors=[&](const auto &v) {
     if(!v.empty() && v.size()!=vertices)throw std::invalid_argument("Source tangent attribute identity differs from positions");
     for(auto x:v)if(!finite(x))throw std::invalid_argument("Source tangent direction/position is nonfinite");
   };
   SourceTangentFrames result;result.generated=source.tangents.empty();
+  result.origin_vertex_count=vertices;result.origin_vertices=source.mesh.indices;
   result.targets.resize(source.morph_targets.size());
   result.normal_targets.resize(source.morph_targets.size());
   result.normals.reserve(corners);

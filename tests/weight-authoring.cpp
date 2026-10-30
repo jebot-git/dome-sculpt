@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/creation.hpp"
+#include "dome/tangents.hpp"
+#include "dome/material-bindings.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
 using namespace dome;
@@ -87,11 +89,21 @@ int main(int argc, char **argv) try {
   }
   {
     Scene avatar; append_humanoid(avatar,humanoid_baseline_defaults("vroid-beta-female"),"CC0",{},64);
+    auto posed=std::make_shared<DeformationState>(*avatar.active().deformation);
+    if(!posed->pose.empty())posed->pose[0].scale={1.3f,.8f,1.1f};
+    if(posed->morphs && !posed->morphs->targets.empty()) {
+      posed->morph_weights.assign(posed->morphs->targets.size(),0);
+      posed->morph_weights[0]=.35f;
+    }
+    avatar.active().deformation=std::move(posed);
     auto id=avatar.active().id; bake_active(avatar);
     auto rest=avatar.active().painted->mesh(); auto appearance=avatar.active().appearance;
     auto source_vertices=appearance->source_vertices;
     Document combined; combined.replace(std::move(avatar)); combined.weight_settings(settings,1);
-    check(combined.wait_mesh(std::chrono::seconds(60)) && combined.frame().state->error.empty(),
+    const bool avatar_ready=combined.wait_mesh(std::chrono::seconds(60));
+    if(!avatar_ready || !combined.frame().state->error.empty())
+      std::cerr << "Avatar weight/bake worker: " << combined.frame().state->error << '\n';
+    check(avatar_ready && combined.frame().state->error.empty(),
           "Actual CC0 avatar publishes canonical baked normals with linked weight visualization");
     auto surface=combined.frame().surface;
     auto range=std::find_if(surface->ranges.begin(),surface->ranges.end(),[&](const auto &r){return r.object==id;});
@@ -101,13 +113,33 @@ int main(int argc, char **argv) try {
     for(size_t corner=0;corner<rest.indices.size();++corner)
       if(range->appearance->source_vertices[corner]!=source_vertices.at(rest.indices[corner]))
         throw std::runtime_error("Expanded source UV identity differs from original corner");
+    auto authored=combined.copy_scene();const auto &active=authored.object(id);
+    auto evaluated=active.deformation->preview(rest);auto canonical=tangent_corners(evaluated);
+    auto world=authored.world_transform(id);
+    auto close=[](Vec3 a,ob::Vec3 b){return std::abs(a.x-b.x)<1e-5f && std::abs(a.y-b.y)<1e-5f && std::abs(a.z-b.z)<1e-5f;};
+    bool canonical_matches=surface->canonical_normals.size()==surface->mesh.positions.size();
+    for(size_t corner=0;corner<rest.indices.size() && canonical_matches;++corner) {
+      auto vertex=surface->mesh.indices.at(range->first+corner);auto n=evaluated.normals.at(rest.indices[corner]);auto t=canonical[corner];
+      canonical_matches=close(surface->canonical_normals.at(vertex),ob::rotate(world.orientation,{n.x,n.y,n.z})) &&
+        close({surface->tangents.at(vertex)[0],surface->tangents.at(vertex)[1],surface->tangents.at(vertex)[2]},ob::rotate(world.orientation,{t[0],t[1],t[2]})) && surface->tangents.at(vertex)[3]==t[3];
+    }
+    check(canonical_matches && !active.material_bindings->normal_frames->canonical,
+          "Existing avatar bake derives actual posed Mikk normals and tangents without inventing persisted canonical authority");
     check(surface->selected_weights.size()==surface->mesh.positions.size() &&
           surface->tangents.size()==surface->mesh.positions.size() &&
           combined.copy_scene().object(id).appearance->source_vertices==source_vertices &&
           appearance->source_vertices==source_vertices,
           "Every expanded source identity is exact while authored source records stay immutable");
+    auto baked_scene=authored.encode();auto layouts=surface->normal_frame_layout_builds;
+    combined.clear_bake();check(combined.wait_asset() && combined.wait_mesh() && combined.frame().state->error.empty(),
+          "Clearing an existing avatar bake returns to retained source frames");
+    auto cleared_layouts=combined.frame().surface->normal_frame_layout_builds;
+    check(cleared_layouts>layouts && combined.undo() && combined.wait_mesh() && combined.frame().state->error.empty() &&
+          combined.frame().surface->normal_frame_layout_builds>cleared_layouts && combined.copy_scene().encode()==baked_scene,
+          "Bake mode changes invalidate cached frame packing and Undo restores exact baked source data");
     check(combined.begin_desktop(), "Actual-avatar live feedback acquires its immutable source");
-    for (int i = 0; i < 32; ++i) combined.stamp_desktop(stamp(rest.positions.front()));
+    auto point=evaluated.positions.front();auto posed_point=ob::transform(world,{point.x,point.y,point.z});
+    for (int i = 0; i < 32; ++i) combined.stamp_desktop(stamp({posed_point.x,posed_point.y,posed_point.z}));
     combined.replace(original.snapshot());
     check(combined.wait_mesh(std::chrono::seconds(60)) && combined.copy_scene().encode() == source &&
           combined.frame().surface->weight_gesture == 0 && combined.frame().state->error.empty(),

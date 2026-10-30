@@ -35,6 +35,12 @@ std::shared_ptr<const MeshSnapshot> preview_snapshot(const MeshSnapshot &base,co
     result->mesh.normals.insert(result->mesh.normals.end(),cap.normals.begin(),cap.normals.end());
     for(size_t n=0;n<cap.positions.size();++n){result->mesh.uv.push_back(cap.uv.empty()?std::array<float,2>{}:cap.uv[n]);
       if(!result->tangents.empty())result->tangents.push_back({1,0,0,1});
+      // Cap ranges use their own generic material, but shared vertex streams
+      // still have one entry per packed vertex. Padding is not frame authority.
+      if(!result->source_normals.empty())result->source_normals.push_back(cap.normals[n]);
+      if(!result->canonical_normals.empty())result->canonical_normals.push_back(cap.normals[n]);
+      if(!result->source_tangents.empty())result->source_tangents.push_back({1,0,0,1});
+      if(!result->selected_weights.empty())result->selected_weights.push_back(-1);
       if(!result->sculpt_masks.empty())result->sculpt_masks.push_back(-1);}
     for(auto vertex:cap.indices)result->mesh.indices.push_back(uint32_t(offset+vertex));
     result->ranges.push_back({UINT64_MAX,first,cap.indices.size(),preview.settings.cap_material,{}, {},offset});
