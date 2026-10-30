@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 namespace dome {
+struct SculptResolutionOptions;
+struct SculptResolutionResult;
 class Volume {
 public:
   using Voxels = std::unordered_map<Int3, float, IntHash>;
@@ -49,7 +51,7 @@ public:
   size_t stored_samples() const;
   explicit Volume(float voxel = .03f, size_t history_limit = 64 * 1024 * 1024);
   float voxel_size() const { return voxel_; }
-  float band() const { return voxel_ * 4; }
+  float band() const { return band_; }
   const Voxels &voxels() const { return cells_.read(); }
   float at(Int3 p) const;
   float sample(Vec3 p) const;
@@ -75,6 +77,7 @@ public:
   static Volume load(const std::filesystem::path &);
 
 private:
+  friend SculptResolutionResult resample_sculpt(const Volume &, const SculptResolutionOptions &);
   struct MaskState {
     CowMap<Int3, float, IntHash> values;
     float background = 0;
@@ -107,7 +110,7 @@ private:
   void recompose();
   void raw_set(Int3, float);
   void clear_history();
-  float voxel_;
+  float voxel_, band_;
   CowMap<Int3, float, IntHash> cells_;
   Voxels before_;
   std::deque<Command> undo_, redo_;
