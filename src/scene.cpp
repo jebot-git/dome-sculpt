@@ -59,7 +59,7 @@ void validate_transform(CanvasTransform t) {
 }
 bool source_is_dormant(const SculptObject &o) {
   if(o.polygon && o.polygon->active)return false;
-  return !o.mesh_active && bool(o.appearance || o.material_bindings || o.deformation || o.retopology || o.polygon ||
+  return !o.mesh_active && bool(o.appearance || o.material_bindings || o.deformation || o.retopology || o.polygon || o.shape_source ||
     (o.painted && (o.painted->source_maps() || o.painted->baked() || o.painted->has_paint_data())));
 }
 void Scene::require_exportable_sources() const {
@@ -223,6 +223,7 @@ void Scene::validate(bool deep_sources) const {
           "Invalid scene object identity or unfinished stroke");
     name_valid(o.name);
     detail::require_polygon_paint_owner(o.painted.get(),o.polygon.get(),o.mesh_active);
+    if(o.shape_source)polygons.add_origin(o.shape_source,deep_sources);
     if(o.polygon){polygons.add(o.polygon,deep_sources);if(deep_sources)validate_polygon_derivative(*o.polygon,o.painted.get(),o.mesh_active);}
     validate_transform(o.transform);
     if(has_affine_placement(o.id))(void)world_matrix(o.id);
@@ -346,7 +347,7 @@ nlohmann::json Scene::encode() const {
   unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
   if(std::any_of(groups_.begin(),groups_.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);}) ||
       std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.affine_edit);}))feature_version=std::max(feature_version,13u);
-  for(const auto&o:objects_)feature_version=std::max(feature_version,detail::minimum_scene_version(o.polygon.get()));
+  for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get())});
   const bool polygon_fields=feature_version>=12 || std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.polygon);});
   const bool extended=resolved || retopology || feature_version>=8;
   nlohmann::json j = {{"format", "dome-sculpt"},
@@ -359,7 +360,7 @@ nlohmann::json Scene::encode() const {
   SourceMaterialArchive source_materials;
   detail::PolygonSceneArchive polygons;
   detail::SourcePlacementArchive placements;
-  for(const auto &o:objects_)if(o.polygon)polygons.add(o.polygon,false);
+  for(const auto &o:objects_){if(o.polygon)polygons.add(o.polygon,false);if(o.shape_source)polygons.add_origin(o.shape_source,false);}
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
@@ -409,6 +410,7 @@ nlohmann::json Scene::encode() const {
                              : nlohmann::json(nullptr)}});
     if(polygon_fields)j["objects"].back()["polygon"]=o.polygon?nlohmann::json(polygons.add(o.polygon)):nlohmann::json(nullptr);
     if(o.affine_edit)j["objects"].back()["affine_edit"]=placements.add_edit(o.affine_edit);
+    if(feature_version>=16)j["objects"].back()["shape_source"]=o.shape_source?nlohmann::json(polygons.add_origin(o.shape_source)):nlohmann::json(nullptr);
     if(extended) {
       j["objects"].back()["material_bindings"]=o.material_bindings
         ?nlohmann::json(source_materials.add(o.material_bindings)):nlohmann::json(nullptr);
@@ -434,7 +436,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>13)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>16 || version==14 || version==15)throw std::runtime_error("Unsupported scene version");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
@@ -453,6 +455,12 @@ Scene Scene::decode(const nlohmann::json &j) {
     for(const auto &o:objects)if(o.contains("affine_edit"))detail::placement_index(o.at("affine_edit"),state.at("edits").size());
     if(j.contains("polygon_sources"))for(const auto &o:j.at("polygon_sources").at("origins"))if(o.contains("placement"))detail::placement_index(o.at("placement"),state.at("capsules").size());
   }
+  for(const auto &o:objects){
+    if(version>=16){if(!o.contains("shape_source"))throw std::invalid_argument("Incomplete shape source scene fields");}
+    else if(o.contains("shape_source"))throw std::invalid_argument("Shape source requires Scene16");
+  }
+  if(j.contains("polygon_sources") && j.at("polygon_sources").at("version")==4 && version<16)
+    throw std::invalid_argument("Direct shape source archive requires Scene16");
   const bool polygon_fields = version >= 12;
   if (polygon_fields) {
     if (!j.contains("polygon_sources"))
@@ -824,6 +832,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       o.material_bindings=source_materials.at(binding.get<uint32_t>());
     }
     if(polygon_fields && !v.at("polygon").is_null())o.polygon=polygons.at(detail::polygon_archive_index(v.at("polygon"),polygons.authorities().size()));
+    if(version>=16 && !v.at("shape_source").is_null())o.shape_source=polygons.origins().at(detail::polygon_archive_index(v.at("shape_source"),polygons.origins().size()));
     result.objects_.push_back(std::move(o));
   }
   placements.require_reachable();

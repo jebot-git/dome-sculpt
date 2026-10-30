@@ -63,8 +63,8 @@ NativeNormalBakeTarget normal_bake_author_native_target(const Mesh &mesh,
   if(!id||!options.max_work||options.max_work>256*1024*1024||!options.max_bytes||options.max_bytes>128*1024*1024)
     throw std::invalid_argument("Invalid native normal-key authoring policy");
   Budget budget{options};budget.check();mesh.validate();base.validate();
-  if(edited_positions.size()!=mesh.positions.size()||base.normals.size()!=mesh.indices.size()||base.tangents.empty())
-    throw std::invalid_argument("Native normal-key authoring requires exact current corners and a complete base frame");
+  if(edited_positions.size()!=mesh.positions.size()||base.normals.size()!=mesh.indices.size())
+    throw std::invalid_argument("Native normal-key authoring requires exact current corners and a valid base frame");
   const size_t corners=mesh.indices.size(),vertices=mesh.positions.size();
   if(corners>2'000'000||vertices>2'000'000||
      corners>options.max_bytes/(6*sizeof(Vec3)+sizeof(Tangent)+sizeof(uint32_t)+sizeof(std::array<float,2>))||
@@ -75,13 +75,14 @@ NativeNormalBakeTarget normal_bake_author_native_target(const Mesh &mesh,
   auto key_mesh=temporary.evaluate(mesh,std::array<float,1>{1});
   NormalFrames key_base;key_base.normals.reserve(corners);
   for(auto v:mesh.indices)key_base.normals.push_back(key_mesh.normals[v]);
-  auto tangent=generate(key_mesh,key_base,nullptr,nullptr,budget);
+  std::vector<Tangent> tangent;
+  if(!base.tangents.empty())tangent=generate(key_mesh,key_base,nullptr,nullptr,budget);
   NativeNormalBakeTarget out;out.positions=std::move(temporary.targets[0].delta);out.attributes.id=id;
   out.attributes.normals.reserve(corners);out.attributes.tangents.reserve(corners);
   for(size_t c=0;c<corners;++c){if((c&1023)==0)budget.check();
-    if(tangent[c][3]!=base.tangents[c][3])throw std::invalid_argument("Native key changes immutable tangent handedness; split or reauthor the basis");
+    if(!base.tangents.empty() && tangent[c][3]!=base.tangents[c][3])throw std::invalid_argument("Native key changes immutable tangent handedness; split or reauthor the basis");
     out.attributes.normals.push_back(key_base.normals[c]-base.normals[c]);
-    out.attributes.tangents.push_back({tangent[c][0]-base.tangents[c][0],tangent[c][1]-base.tangents[c][1],tangent[c][2]-base.tangents[c][2]});
+    if(!base.tangents.empty())out.attributes.tangents.push_back({tangent[c][0]-base.tangents[c][0],tangent[c][1]-base.tangents[c][1],tangent[c][2]-base.tangents[c][2]});
   }
   budget.check();return out;
 }

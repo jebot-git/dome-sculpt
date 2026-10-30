@@ -10,6 +10,7 @@ class SourcePlacementArchive;
 class PolygonSceneArchive {
 public:
   uint32_t add(std::shared_ptr<const PolygonAuthority>, bool deep = true);
+  uint32_t add_origin(std::shared_ptr<const PolygonOrigin>, bool deep = true);
   const std::shared_ptr<const PolygonAuthority> &at(uint32_t) const;
   const auto &authorities() const { return authorities_; }
   const auto &origins() const { return origins_; }
@@ -27,6 +28,10 @@ public:
 private:
   size_t entries_ = 0;
   std::set<const PolygonAuthority *> deeply_validated_;
+  std::set<const PolygonOrigin *> deeply_validated_origins_;
+  bool direct_origins_ = false;
+  void collect(std::shared_ptr<const PolygonAuthority>,
+               std::shared_ptr<const PolygonOrigin>, bool deep);
   std::vector<std::shared_ptr<const PolygonAuthority>> authorities_;
   std::vector<std::shared_ptr<const PolygonOrigin>> origins_;
   std::vector<std::shared_ptr<const Volume>> volumes_;
