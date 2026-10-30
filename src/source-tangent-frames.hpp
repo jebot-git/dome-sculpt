@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/import.hpp"
 #include "dome/tangents.hpp"
+#include "source-flat-normals.hpp"
 namespace dome::detail {
 struct SourceTangentFrames {
   // Corner identity is intentional: MikkTSpace can split a shared vertex at a
@@ -36,6 +37,35 @@ inline SourceTangentFrames source_tangent_frames(
   constexpr size_t bytes_limit=256*1024*1024;
   if(corners>bytes_limit/32 || (corners && source.morph_targets.size()>(bytes_limit-corners*32)/(corners*24)))
     throw std::length_error("Source tangent result memory limit exceeded");
+  if (!source.normals_authored) {
+    // Preserve the imported primitive exactly. Only this temporary evaluation
+    // domain is split, so generated frames can keep original corner identities.
+    ImportedPrimitive derived;
+    derived.normals_authored = true;
+    derived.mesh = source_flat_mesh(source.mesh, {}, cancelled, max_work);
+    if (frame_uv.size() != vertices)
+      throw std::invalid_argument("Generated flat tangents require the original frame UV basis");
+    derived.mesh.uv.clear();derived.mesh.uv.reserve(corners);
+    for (auto v : source.mesh.indices) derived.mesh.uv.push_back(frame_uv[v]);
+    derived.morph_targets.reserve(source.morph_targets.size());
+    for (const auto &target : source.morph_targets) {
+      stop();
+      auto posed = source_flat_mesh(source.mesh, target.positions, cancelled, max_work);
+      ImportedMorphTarget generated;
+      generated.positions.reserve(corners);generated.normals.reserve(corners);
+      for (size_t c = 0; c < corners; ++c) {
+        if ((c & 1023) == 0) stop();
+        generated.positions.push_back(posed.positions[c] - derived.mesh.positions[c]);
+        generated.normals.push_back(posed.normals[c] - derived.mesh.normals[c]);
+      }
+      // The original tangent payload and its deltas are intentionally absent.
+      derived.morph_targets.push_back(std::move(generated));
+    }
+    auto result = source_tangent_frames(derived, derived.mesh.uv, cancelled, max_work);
+    result.origin_vertex_count = vertices;
+    result.origin_vertices = source.mesh.indices;
+    return result;
+  }
   auto vectors=[&](const auto &v) {
     if(!v.empty() && v.size()!=vertices)throw std::invalid_argument("Source tangent attribute identity differs from positions");
     for(auto x:v)if(!finite(x))throw std::invalid_argument("Source tangent direction/position is nonfinite");

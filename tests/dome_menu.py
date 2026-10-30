@@ -77,7 +77,7 @@ async def main():
         if library_path:
             (out/"runtime-maps.json").write_text(json.dumps({
                 name:[line for line in Path(f"/proc/{process.pid}/maps").read_text().splitlines()
-                      if any(library in line for library in ("libfltk", "libharfbuzz", "libpango"))]
+                      if any(library in line for library in ("libfltk", "libfreetype", "libharfbuzz", "libcairo", "libpango"))]
                 for name,process in (("compositor",host_process),("client",client))
             },indent=2)+"\n")
         check(window["app_id"]=="org.domed.Sculpt","Native Wayland sculpt window publishes the installed Dome Sculpt application identity")

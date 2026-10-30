@@ -1,0 +1,539 @@
+{
+  "recorded_utc": "2026-10-30T17:34:14.670354+00:00",
+  "goal": "ACTIVE; all unfinished original and additional requirements retained",
+  "qualified_code_commit": "bdb0a47737a40636490cabf9fc763dbb34dcdf0a",
+  "parent_published_milestone": "b312b98992f21f43b967efeef7fd16a6a4351b94",
+  "feature_qualification_before_bitmap_refresh": {
+    "qualified_code_commit": "ec537a84a14f161b1556300cbfadd763a26cc295",
+    "scope": "Geometric/import/frame/atlas source and public data layouts unchanged by subsequent bitmap-only toolkit/palette followup; qualified before eee runtime refresh. Current native text, GUI and real-loader XR proof is separately scoped below.",
+    "unchanged_source_sha256": {
+      "src/import-authoring.cpp": "11e73b3b93a2eab5f14e25e466485429702855c3a2942d1f8c2772e42bb09631",
+      "src/source-tangent-frames.hpp": "d836e397355b9d1425d4365a60c6613863cf3b1dadaf261bb44afcdf33874b39",
+      "src/source-flat-normals.hpp": "6092f67dd59afdc69e51c29f60bc078d0ad7dc37ebfc03ab5a776b5bea751dc3",
+      "src/atlas.cpp": "c8914fea1d3b37afe55372c49a7837d9c8021c5c7f37c6e7f8496353a785cf3e",
+      "src/atlas-detail.hpp": "a67bb10bf5592181f4ffbaeea467b88305a08af0aab0850dce4febe6dcbd9a0f",
+      "include/dome/mesh.hpp": "c4d9196f4d6c8a817da71b7849a44196f5f317ad05da59cb5efae1ccb932fd5f",
+      "tests/import-flat-render.cpp": "12abb9b55e1a72516f2b1614ac58480ee2505097ec5bb0e8a5ef4563db0d3c87",
+      "tests/source-flat-faults.cpp": "81c42664d429eee5071ad115d334e14abccab861bf7ed2c25906ed799cbe9bce",
+      "tests/import-authoring.cpp": "88f61f70f11cbee4bdad7948f17c1ad8e84fa49d96efb32d16b80f7bff79a98b",
+      "tests/import-skin.cpp": "94ab18cb2abf00aed87974876bdaf9e20e627a46b9ce7f97284c679d5144267c",
+      "tests/import-options.cpp": "09abb2bc580fbfbdc7dd51b1207c74e04c4e8c1e3a6cd90203d1f55c1edb4d9c",
+      "tests/atlas-cancellation.cpp": "4848cf2a538a4586da5ab6ffe2bc51af1c4ea1419b8536a803bf1cd609a5ac6b"
+    },
+    "CPU_affected": {
+      "passed": 7,
+      "total": 7,
+      "seconds": 9.29,
+      "log": "artifacts/tests-flat-normals-atlas-cpu7.log",
+      "sha256": "75324436620b8f381af84e05eaf5d69bfd4910beafd27073558d5b3360b8adad"
+    },
+    "CPU_additional": {
+      "passed": 8,
+      "total": 8,
+      "seconds": 8.74,
+      "log": "artifacts/tests-flat-normals-regressions8.log",
+      "sha256": "3ff64adf2435aeb8b0d203503024bb62292fdfb0591a49c729ab2ec1fc17c663"
+    },
+    "OneAPI_affected": {
+      "passed": 7,
+      "total": 7,
+      "seconds": 7.49,
+      "log": "artifacts/tests-flat-normals-oneapi7.log",
+      "sha256": "7e7e4120137435abb5b371887f4a2d75d4e545ef82a620a0d91795f5bc14f3ef"
+    },
+    "OneAPI_compute": {
+      "passed": 2,
+      "total": 2,
+      "seconds": 0.9,
+      "log": "artifacts/tests-flat-normals-oneapi-compute.log",
+      "sha256": "a3c5437ab6f2dc05fb9580e81151b697df8ff82814be6c5019b510ddaff1638e"
+    },
+    "SAN_affected": {
+      "passed": 7,
+      "total": 7,
+      "seconds": 91.15,
+      "log": "artifacts/tests-flat-normals-atlas-sanitize7.log",
+      "sha256": "bc230914db3ffa75c22ab3cb0e77e4704387b169e62ef4b2db4e2d07ec3db756",
+      "scope": "All own C/C++ core/render, xatlas, both Mikk builds and ufbx instrumented ASan/UBSan/leaks; seven selected suites, not all native or external libraries."
+    },
+    "controller": {
+      "CPU": {
+        "passed": 39,
+        "log": "artifacts/tests-flat-controller-cpu-fixed.log",
+        "sha256": "a46f0964f66affbc0195de093cdadba43f0222b7880ea1d69cb403c326e24d45"
+      },
+      "OneAPI": {
+        "passed": 39,
+        "log": "artifacts/tests-flat-controller-oneapi.log",
+        "sha256": "f4d9839887175363912fe9b81cc48f534834ada696ba0d65e2f755a2ab928371"
+      },
+      "SAN": {
+        "passed": 39,
+        "log": "artifacts/tests-flat-controller-sanitize.log",
+        "sha256": "ef74b70810a7e0e72f7e57c828ccaeb4b0f965495ae5b69d8066548fee69c895"
+      }
+    },
+    "graphics": {
+      "software": {
+        "passed": 324,
+        "cases": 36,
+        "max_pixel_error": 0,
+        "log": "artifacts/tests-flat-normals-render-software.log",
+        "sha256": "23f169abaadfcfe0a5db0154b16326cbaa27b5fe32ea531add2b58df5bfa81b9",
+        "oracles": "Independent raw POSITION/UV/key geometry -> emitted N/T accessors; independent cgltf/PNG/PBR/normal/morph/skin pixels; nonempty alpha and normal-removal sensitivity."
+      },
+      "Arc": {
+        "passed": 324,
+        "cases": 36,
+        "max_pixel_error": 0,
+        "log": "artifacts/tests-flat-normals-render-arc-final.log",
+        "sha256": "dd331e63f56c82684cb485fe359df3b898fb0fccf553bbe33b153f249ae0ac8e",
+        "oracles": "Independent raw POSITION/UV/key geometry -> emitted N/T accessors; independent cgltf/PNG/PBR/normal/morph/skin pixels; nonempty alpha and normal-removal sensitivity."
+      }
+    },
+    "derived_frame_faults": {
+      "CXX_allocations": 35,
+      "cancellation_boundaries": 18,
+      "log": "artifacts/tests-flat-normals-faults.log",
+      "sha256": "492839f1f9f4708d05c7b5df5f7b2a6ec9b5ab0a70e791ec424eea6a1ad63edd",
+      "scope": "Low-level derived source frame helper only; C malloc and whole-import JSON failure not covered."
+    },
+    "Khronos": {
+      "version": "2.0.0-dev.3.10",
+      "models": 36,
+      "errors": 0,
+      "warnings": 0,
+      "report": "artifacts/flat-import-khronos-report.json",
+      "sha256": "c7b675d7d3cf2dc48422eca8fa126c1352f826ab685c9cd4d93640f97ca4ea4a",
+      "models_sha256": {
+        "0-BLEND-0-0-out.glb": "4bc1f40ad3075dab159181563d6182dfd710cd29dd74a7469d637fb8a56da996",
+        "0-BLEND-0-100-out.glb": "0d48538b67d04cd8dba93d3c13c12e30e77887ec822f651b4cecd96a99ed7f30",
+        "0-BLEND-0-35-out.glb": "5cf88d81ebd7231ea355405c3d3094f7aca6d09041526922ab9e2c97c309892a",
+        "0-BLEND-1-0-out.glb": "4bc1f40ad3075dab159181563d6182dfd710cd29dd74a7469d637fb8a56da996",
+        "0-BLEND-1-100-out.glb": "0d48538b67d04cd8dba93d3c13c12e30e77887ec822f651b4cecd96a99ed7f30",
+        "0-BLEND-1-35-out.glb": "5cf88d81ebd7231ea355405c3d3094f7aca6d09041526922ab9e2c97c309892a",
+        "0-MASK-0-0-out.glb": "8f5e94ed1663f46a53a42062010afb32c4fab6412e1a18e298d9bf7f50568e04",
+        "0-MASK-0-100-out.glb": "f940cfdb35286d087b80200f9ac7eccf37b95514d72146306c60e01f90630ffe",
+        "0-MASK-0-35-out.glb": "6161b0cccc9a6b65463778e414eafa4c29e7092eb1316f857dfdef60b64a1a09",
+        "0-MASK-1-0-out.glb": "8f5e94ed1663f46a53a42062010afb32c4fab6412e1a18e298d9bf7f50568e04",
+        "0-MASK-1-100-out.glb": "f940cfdb35286d087b80200f9ac7eccf37b95514d72146306c60e01f90630ffe",
+        "0-MASK-1-35-out.glb": "6161b0cccc9a6b65463778e414eafa4c29e7092eb1316f857dfdef60b64a1a09",
+        "0-OPAQUE-0-0-out.glb": "b62933a7d51d67305847d20a101ec9f8ef76fc298b494297f94048fdfa91cfc9",
+        "0-OPAQUE-0-100-out.glb": "c6aeafbab331f09660d8904c56ab91326516f779b11be047f8c3964545d5fa9e",
+        "0-OPAQUE-0-35-out.glb": "297641eb76c6a811bb0b487944b939f0ee679064f2c1ff15e96c10280203e9c3",
+        "0-OPAQUE-1-0-out.glb": "b62933a7d51d67305847d20a101ec9f8ef76fc298b494297f94048fdfa91cfc9",
+        "0-OPAQUE-1-100-out.glb": "c6aeafbab331f09660d8904c56ab91326516f779b11be047f8c3964545d5fa9e",
+        "0-OPAQUE-1-35-out.glb": "297641eb76c6a811bb0b487944b939f0ee679064f2c1ff15e96c10280203e9c3",
+        "1-BLEND-0-0-out.glb": "adea1bf3711866b6e6685e557dd91fe8adbf09140810837108deeea46738d363",
+        "1-BLEND-0-100-out.glb": "40a18252274e15c8318d3f8fe0d4251e4c15672a326038dc9f79ec4ce7917e76",
+        "1-BLEND-0-35-out.glb": "194eb03ec94cefc0b982ea5e8dde26a79f873fff4e39f357f7459370a967f4ed",
+        "1-BLEND-1-0-out.glb": "adea1bf3711866b6e6685e557dd91fe8adbf09140810837108deeea46738d363",
+        "1-BLEND-1-100-out.glb": "40a18252274e15c8318d3f8fe0d4251e4c15672a326038dc9f79ec4ce7917e76",
+        "1-BLEND-1-35-out.glb": "194eb03ec94cefc0b982ea5e8dde26a79f873fff4e39f357f7459370a967f4ed",
+        "1-MASK-0-0-out.glb": "a0ec2346c27440b5dfe7c13c12bb545e3b837a71fa130e13f6efcbda9f0b0bfc",
+        "1-MASK-0-100-out.glb": "3c5c3343c7cb054ca20a379932e19beb261167281a340d53c3ff2af822a94dbe",
+        "1-MASK-0-35-out.glb": "1ddb868f31eb14fb77d1d38f8473aa82c5154228fb2d01a675d935c3100c3bc7",
+        "1-MASK-1-0-out.glb": "a0ec2346c27440b5dfe7c13c12bb545e3b837a71fa130e13f6efcbda9f0b0bfc",
+        "1-MASK-1-100-out.glb": "3c5c3343c7cb054ca20a379932e19beb261167281a340d53c3ff2af822a94dbe",
+        "1-MASK-1-35-out.glb": "1ddb868f31eb14fb77d1d38f8473aa82c5154228fb2d01a675d935c3100c3bc7",
+        "1-OPAQUE-0-0-out.glb": "887c44eb4f8e2bb65a80f22bbc28e489ec0d4be19223799d5f3f0a7b3e2964b4",
+        "1-OPAQUE-0-100-out.glb": "02d027fd5809b0d8230e71b4594485ab367e4b7c2207ca2618dfcaea0d8df1e5",
+        "1-OPAQUE-0-35-out.glb": "fe53e0781f1657e93777bc00015e0b82ad2c8701abb54247fc290da2da06ac87",
+        "1-OPAQUE-1-0-out.glb": "887c44eb4f8e2bb65a80f22bbc28e489ec0d4be19223799d5f3f0a7b3e2964b4",
+        "1-OPAQUE-1-100-out.glb": "02d027fd5809b0d8230e71b4594485ab367e4b7c2207ca2618dfcaea0d8df1e5",
+        "1-OPAQUE-1-35-out.glb": "fe53e0781f1657e93777bc00015e0b82ad2c8701abb54247fc290da2da06ac87"
+      }
+    }
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "dc074c0236e48e5dd2d230b7b0e4866b777c341a615b0109198cd06e48a11780",
+    "include/dome/mesh.hpp": "c4d9196f4d6c8a817da71b7849a44196f5f317ad05da59cb5efae1ccb932fd5f",
+    "src/atlas-detail.hpp": "a67bb10bf5592181f4ffbaeea467b88305a08af0aab0850dce4febe6dcbd9a0f",
+    "src/atlas.cpp": "c8914fea1d3b37afe55372c49a7837d9c8021c5c7f37c6e7f8496353a785cf3e",
+    "src/import-authoring.cpp": "11e73b3b93a2eab5f14e25e466485429702855c3a2942d1f8c2772e42bb09631",
+    "src/palette-text.cpp": "da7979974ae64231da302e70ca5dbe4c561f44c3b5304209e6c4bd0f86969762",
+    "src/source-flat-normals.hpp": "6092f67dd59afdc69e51c29f60bc078d0ad7dc37ebfc03ab5a776b5bea751dc3",
+    "src/source-tangent-frames.hpp": "d836e397355b9d1425d4365a60c6613863cf3b1dadaf261bb44afcdf33874b39",
+    "tests/atlas-cancellation.cpp": "4848cf2a538a4586da5ab6ffe2bc51af1c4ea1419b8536a803bf1cd609a5ac6b",
+    "tests/dome_menu.py": "63e87b89dac6476131cd237f8287b36e65c942dc2e82d62b3d34d1079ff02e05",
+    "tests/import-authoring.cpp": "88f61f70f11cbee4bdad7948f17c1ad8e84fa49d96efb32d16b80f7bff79a98b",
+    "tests/import-flat-render.cpp": "12abb9b55e1a72516f2b1614ac58480ee2505097ec5bb0e8a5ef4563db0d3c87",
+    "tests/import-menu.py": "d6ef9b50021eb01732f92b11f8adcc9236462b6c3a47ed35724a4c78fc6a501d",
+    "tests/import-options.cpp": "09abb2bc580fbfbdc7dd51b1207c74e04c4e8c1e3a6cd90203d1f55c1edb4d9c",
+    "tests/import-skin.cpp": "94ab18cb2abf00aed87974876bdaf9e20e627a46b9ce7f97284c679d5144267c",
+    "tests/palette-text.cpp": "95a65ac6d93faadf2ce88e8196a0d96c168bf1adc3391e36ce0317f303b4262b",
+    "tests/source-flat-faults.cpp": "81c42664d429eee5071ad115d334e14abccab861bf7ed2c25906ed799cbe9bce",
+    "tests/source-tangent-frames.cpp": "c1ffc514a940013d4e75087fbd44fc45e53e607cd57c64dcbb1b0e68ad1b247d",
+    "third_party/desktop/bdf_font.hpp": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
+    "third_party/sources.json": "d42a93363baf39ed8fa102448798dbcd5af48532824378fb88224e436d7febc8"
+  },
+  "binary_artifact_sha256": {
+    "build/dome-sculpt": "82ed75dd14d44b9c44f2d9c4e18be34e9cb25daf829eb38eb39700e805e16a78",
+    "build/dome-sculpt-palette-text-test": "40f9eedc0f1d22affc4f2162c2198b924360f82080816b1d8bba7128f65a79f5",
+    "build/dome-sculpt-import-authoring-test": "237daafb019365f59bb0d36dad93635cde32350278c7c0dc965898aea3787030",
+    "build/dome-sculpt-import-skin-test": "55ee63dc74f111d8994fb46bf5895f6101153f7f92de36f4b5e823ec2a8dfa25",
+    "build/dome-sculpt-import-flat-render-test": "b8c3d116d792b597e1d771e2ae1304d8d227b388946b5d048d72d1824edab750",
+    "build/dome-sculpt-source-flat-faults-test": "153213144170b56fbfac3ba6cc8d608667f5421564351df505b5c515e8f72a00",
+    "build/dome-sculpt-atlas-cancellation-test": "1c49db12768445ca156ee95510e8a81c871348d556ca9375b55c7afb0ce95e17",
+    "build/dome-sculpt-import-options-test": "f30185eb3a3d2e909f57005f1e57688b8baf800c7b9b81029bb14f8714d38d5a",
+    "build-oneapi/dome-sculpt": "4f9ab6e5682946b20ea0b3584b614898ea5e230923cc0060e52011c07816142c",
+    "build-oneapi/dome-sculpt-palette-text-test": "1113be6bbcd0ac26f3a03b14701f17d406bf955f4f826260307717f63e28ae0c",
+    "build-oneapi/dome-sculpt-import-authoring-test": "ceca0be545b566e9acf1cca1e41e218c81901e6ef815461b9c4f010ba02caa36",
+    "build-oneapi/dome-sculpt-import-skin-test": "877feb1cc9280f9eb20f31868c34a42b00f0c8623e494ddfd80f38f66f9ec08b",
+    "build-oneapi/dome-sculpt-import-flat-render-test": "509bfd7ba3e5cc6b5e5c2119659ceecc9f6c8a97912175c237493960488cff0b",
+    "build-oneapi/dome-sculpt-source-flat-faults-test": "75d0d7a82ba88b2dbf0c3dc129d0efb29fecf8c41b08042e860f079e8e54a11b",
+    "build-oneapi/dome-sculpt-atlas-cancellation-test": "c8afc66ea5bad83550d6df484a74f9c61569fc94d036cd0137f05b0f524f3ad0",
+    "build-oneapi/dome-sculpt-import-options-test": "ed13426fbebf6392fabbb721a30d99ed921d0fc39f7a14a60f7b78cc8f24fbe9",
+    "build-sanitize/dome-sculpt-palette-text-test": "0ca18d4c81c5af7a9c6af65b821cfbf24c53829270e3bcd8599b1549b13bb93b",
+    "build-sanitize/dome-sculpt-import-authoring-test": "a982c60d1e10b71058ec1e8c2680d18e3088f7022a67f320a070e2c4eebd191d",
+    "build-sanitize/dome-sculpt-import-skin-test": "64b9b3fa31e1b115e3ccc0477cd121691b674077fbd628b090e9e1324f6c4235",
+    "build-sanitize/dome-sculpt-import-flat-render-test": "e1cf0a7bf94aa1d9d019e7da9145744521b881cb68ec44a85f86bcbc28a59d74",
+    "build-sanitize/dome-sculpt-source-flat-faults-test": "6688283547a77a0ce5ca8e99fa5d5c509a0a06fc75fef0d86f7a0e97b1fc8293",
+    "build-sanitize/dome-sculpt-atlas-cancellation-test": "691a06af6867f8525d21394fbdee5cc48275933e1355faab16ac69b73d788a6d",
+    "build-sanitize/dome-sculpt-import-options-test": "4abad4132bfc3d6dae3b0fe2444ea1f195af3be06cc3fdf072f9c7a7a3d5d71f"
+  },
+  "retained_diagnostics": [
+    "Initial new UV1 normal-map test reaches existing explicit TEXCOORD_0 paint-source guard; guard preserved, fullUV1 stillrequired.",
+    "Initial new controller fixture attempted Import while menuclosed; corrected actual root/object/mesh/browser joystick navigation, final39 allthreebackends pass.",
+    "Current GUI batch first lacked3 fixture executables in fresh tree; original6 failed logs retained with initial-missing-helper suffix, all6 rerun after actual helper builds pass."
+  ],
+  "remaining": [
+    "FullUV1 paint-source sampling and durable provenance",
+    "General affine/source-pose import, native FBX skin/blends/materials, broader glTF/VRM and COLOR/UV morphs",
+    "Whole-import JSON allocation safety still separate private work; lowlevel35Cppfailures not a fulltransactionclaim",
+    "Other atlas workers stillneed cancellation adoption; vendoriteration has no hardlatencybound",
+    "Full polygon/current color integration and originalfullproduction/device/backend scope remain active",
+    "No new physical headset, system installation or active-session restart"
+  ],
+  "preceding_bitmap_toolkit_application_qualification": {
+    "qualified_code_commit": "296f86d02523459775ab2cd50b4e7afd8228afc4",
+    "DomeD_commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
+    "FLTK": "1.4.5+23",
+    "prefixes": {
+      "FLTK": "artifacts/toolkit-eee23b7/lib",
+      "bitmap_runtime": "artifacts/bitmap-runtime-eee23b7/lib"
+    },
+    "CPU_XR4": {
+      "passed": 4,
+      "total": 4,
+      "seconds": 283.5,
+      "log": "artifacts/tests-eee23b7-cpu-xr4.log",
+      "sha256": "8d00344a4a4b7902cb39cdff9edc018f0e5ba19734c5519eec0898e9d239674d"
+    },
+    "OneAPI_XR4": {
+      "passed": 4,
+      "total": 4,
+      "seconds": 294.34,
+      "log": "artifacts/tests-eee23b7-oneapi-xr4.log",
+      "sha256": "9be2700e122f86a1ecc37beef41b0a37c5d5e92730fbf60fc3b0afeaf84ae635"
+    },
+    "XR_scope": {
+      "original": 150,
+      "resolution": 17,
+      "procedural": 11,
+      "projection": 11,
+      "graphics": "Real loader and softwareGL eye ownership/images; OneAPI compute selected actual Arc. No dedicated missing-normal end-to-end real-loader scenario or physical headset proof."
+    },
+    "GUI": {
+      "passed": 138,
+      "flows": [
+        {
+          "flow": "bake-compact",
+          "passed": 5,
+          "log": "artifacts/tests-eee23b7-gui-bake-compact.log",
+          "sha256": "0ad2c19cac1b9f08e40d589c268703a84bd9ad03478eddc14a466687dd2c1976"
+        },
+        {
+          "flow": "bake",
+          "passed": 8,
+          "log": "artifacts/tests-eee23b7-gui-bake.log",
+          "sha256": "eafa97e66c28c1d04c3d3de2fabb09602550712b4fe8a151c596add34fe0eb5a"
+        },
+        {
+          "flow": "flat-glb",
+          "passed": 12,
+          "log": "artifacts/tests-eee23b7-gui-flat-glb.log",
+          "sha256": "278ceaf94a4482af2eddfd8721cb0a17ca2654b6c1a14ffa75d7f6e31d51914a"
+        },
+        {
+          "flow": "flat-gltf",
+          "passed": 13,
+          "log": "artifacts/tests-eee23b7-gui-flat-gltf.log",
+          "sha256": "fd9440d30b9f36b6c46af63c7d2fd6a73819c43ac8c79dae93d783b9bb0a634a"
+        },
+        {
+          "flow": "held-compact",
+          "passed": 9,
+          "log": "artifacts/tests-eee23b7-gui-held-compact.log",
+          "sha256": "6394e28218177497a6b96a22dd45971e8e2988de7c3aede0ca293bede7fe199f"
+        },
+        {
+          "flow": "held",
+          "passed": 11,
+          "log": "artifacts/tests-eee23b7-gui-held.log",
+          "sha256": "01320705ec7fcd1779ba4565055c2ebfe4934703461abb1730b3693f298a5bf6"
+        },
+        {
+          "flow": "import-fbx",
+          "passed": 12,
+          "log": "artifacts/tests-eee23b7-gui-import-fbx.log",
+          "sha256": "6f0b5788651b2371467f77e50a61e08662519daf9bfc0bb6e0faf8beeb113df3"
+        },
+        {
+          "flow": "import-glb",
+          "passed": 10,
+          "log": "artifacts/tests-eee23b7-gui-import-glb.log",
+          "sha256": "85c1f0c893b53bf0e4c99f62f60c3250e86ab3240c088fd01573e778bd00c962"
+        },
+        {
+          "flow": "import-gltf",
+          "passed": 12,
+          "log": "artifacts/tests-eee23b7-gui-import-gltf.log",
+          "sha256": "6f0b5788651b2371467f77e50a61e08662519daf9bfc0bb6e0faf8beeb113df3"
+        },
+        {
+          "flow": "import-obj",
+          "passed": 12,
+          "log": "artifacts/tests-eee23b7-gui-import-obj.log",
+          "sha256": "6f0b5788651b2371467f77e50a61e08662519daf9bfc0bb6e0faf8beeb113df3"
+        },
+        {
+          "flow": "skin",
+          "passed": 10,
+          "log": "artifacts/tests-eee23b7-gui-skin.log",
+          "sha256": "85c1f0c893b53bf0e4c99f62f60c3250e86ab3240c088fd01573e778bd00c962"
+        },
+        {
+          "flow": "vroid-compact",
+          "passed": 13,
+          "log": "artifacts/tests-eee23b7-gui-vroid-compact.log",
+          "sha256": "7157cca1f68e1abc66debeec2c7f09a3e91b3b010eafdaf0673cef1a537d8edd"
+        },
+        {
+          "flow": "vroid",
+          "passed": 11,
+          "log": "artifacts/tests-eee23b7-gui-vroid.log",
+          "sha256": "07b58c816f9b3f2efedfebae725f8deceaaa8bcd226bf133a11c6efdcc1479bc"
+        }
+      ],
+      "scope": "Native private-bus/Xvfb chooser/options/Save/Undo/Redo; holding/visibility and compact, GLB/glTF/OBJ/FBX/authored skin, VRoid and compact, bake/projection and compact, new flat GLB/glTF."
+    },
+    "DomeD_Wayland": {
+      "passed": 8,
+      "log": "artifacts/tests-dome-menu-eee23b7.log",
+      "sha256": "bad7fd885d7ac75f4bb6ffc63828e89dd41536f6f48b5dcb7b39dc4a98038b36",
+      "live_mapping_sha256": "0b5d223a56c263388d8f571b64867dae16b9632a813896dc0672d8f53dcbef1e",
+      "live_library_paths": {
+        "compositor": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libcairo.so.2.11804.4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libfreetype.so.6.20.6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_images.so.1.4.5"
+        ],
+        "client": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libcairo.so.2.11804.4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libfreetype.so.6.20.6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libharfbuzz.so.0.61410.0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_gl.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_images.so.1.4.5"
+        ]
+      },
+      "scope": "Native Wayland current compositor/client, actual universal-menu keyboard/dialog/text history/Desktop routing; compositor loads FT/Cairo/FLTK, client additionally HarfBuzz; Pango companion separately checked."
+    },
+    "PCF_palette": {
+      "CPU_software": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-eee23b7.log",
+        "sha256": "39f67390609a88a75f3e9cea0865cf882d97cddab7fb35f2f678d27a413cbd6e"
+      },
+      "CPU_Arc": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-eee23b7-arc.log",
+        "sha256": "713ca13f2f2adc0b1c5c80787cec9d0871b8adf144b6f06f8df77d79a76a74d3"
+      },
+      "OneAPI_software": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-eee23b7-oneapi.log",
+        "sha256": "39f67390609a88a75f3e9cea0865cf882d97cddab7fb35f2f678d27a413cbd6e"
+      },
+      "SAN_software": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-eee23b7-sanitize.log",
+        "sha256": "39f67390609a88a75f3e9cea0865cf882d97cddab7fb35f2f678d27a413cbd6e"
+      }
+    },
+    "canonical_runtime_test": {
+      "report": "artifacts/tests-bitmap-runtime-eee23b7.json",
+      "sha256": "2991f0c2fc96a7cab8072514942f96c07c71ba5d496653cacdebfdb888063c76",
+      "native_adapter_glyphs": 57086,
+      "native_BDF_PCF": true,
+      "Pango_Cairo_exact_pixels": true,
+      "outline_rejection": true,
+      "loader_and_hash_checks": true
+    },
+    "runtime_manifest": {
+      "policy": "native-unicode-bitmap-only",
+      "formats": [
+        "BDF",
+        "PCF"
+      ],
+      "buildtype": "release",
+      "local_cpu": true,
+      "arch": "native",
+      "sources": [
+        {
+          "file": "freetype-2.14.3.tar.xz",
+          "url": "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.xz",
+          "sha256": "36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f",
+          "bytes": 2670220,
+          "name": "freetype",
+          "version": "2.14.3",
+          "directory": "freetype-2.14.3",
+          "patch": "freetype-2.14.3-bitmap.patch",
+          "patch_sha256": "d4bc632b097cc78f3baeafc59d9e2b854359b5125e63f69be3d9c53a3d11be4e",
+          "licenses": [
+            "LICENSE.TXT",
+            "docs/FTL.TXT",
+            "docs/GPLv2.TXT"
+          ]
+        },
+        {
+          "file": "harfbuzz-14.1.0.tar.xz",
+          "url": "https://github.com/harfbuzz/harfbuzz/releases/download/14.1.0/harfbuzz-14.1.0.tar.xz",
+          "sha256": "ee0eb3a1da2c5a28147f12dff55f6c7d60aeeeb29ac7ef334eabe84c8476c105",
+          "name": "harfbuzz",
+          "version": "14.1.0",
+          "directory": "harfbuzz-14.1.0",
+          "patch": "harfbuzz-14.1.0-bitmap.patch",
+          "patch_sha256": "bc141a1d93dedf0a3c9f8f44e9a48fbce268e2d1cdd9c723fa24544962322bf4",
+          "licenses": [
+            "COPYING"
+          ]
+        },
+        {
+          "file": "cairo-1.18.4.tar.xz",
+          "url": "https://cairographics.org/releases/cairo-1.18.4.tar.xz",
+          "sha256": "445ed8208a6e4823de1226a74ca319d3600e83f6369f99b14265006599c32ccb",
+          "bytes": 32578804,
+          "name": "cairo",
+          "version": "1.18.4",
+          "directory": "cairo-1.18.4",
+          "patch": "cairo-1.18.4-bitmap.patch",
+          "patch_sha256": "4aa6c2229c3cf6e99d955b4df0f9dddbc969fd3bdd56e1f779c008fc2c3e3f23",
+          "licenses": [
+            "COPYING",
+            "COPYING-LGPL-2.1",
+            "COPYING-MPL-1.1"
+          ]
+        },
+        {
+          "file": "pango-1.57.1.tar.xz",
+          "url": "https://download.gnome.org/sources/pango/1.57/pango-1.57.1.tar.xz",
+          "sha256": "e65d6d117080dc3aeeb7d8b4b3b518f7383aa2e6cfce23117c623cd624764c2f",
+          "bytes": 2588416,
+          "name": "pango",
+          "version": "1.57.1",
+          "directory": "pango-1.57.1",
+          "patch": "pango-1.57.1-bitmap.patch",
+          "patch_sha256": "8d190e919dc188f435bf05c9c7b363053d36ac8bced8f0242c9bf6c1e38f6ea0",
+          "licenses": [
+            "COPYING"
+          ]
+        }
+      ],
+      "libraries": {
+        "libfreetype.so.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+        "libharfbuzz.so.0": "35fcdcf82f23dc5301513ec8ac75d154d1342ed5e5a24f38930abed3a46c9edc",
+        "libharfbuzz-subset.so.0": "bec1b6aaa8efb1f296600bb29f0fa976e7781fe181237b4b847cd042a99fd748",
+        "libharfbuzz-raster.so.0": "65df1846fe460e96cd68bd4911c54c10d7b03012ed906a52dc5ea4a10c38ff14",
+        "libharfbuzz-vector.so.0": "a2335d97a051dca9db35bd097d72eae752f72450ad0f0d8b234aa3af6a9dfedb",
+        "libharfbuzz-gpu.so.0": "f4c2b18eda9725fb117ebbedac7885f703efdf8ec5719e3702b15c9d338a243d",
+        "libharfbuzz-cairo.so.0": "72a787c0421104d8a1b919b12f2d9c833290c31788890edadc5dda52a3cb9a6c",
+        "libharfbuzz-icu.so.0": "1a83fb4e5e9085dcc3c5c5b521c938b855efd508616573930765037b228ed5d6",
+        "libharfbuzz-gobject.so.0": "26a75ec631ba4d446d722b4975480b8aba02751f76d73b56c62dd989ba0be8fe",
+        "libcairo.so.2": "7d4db5c2c967ad834a6506e1f83eee5959a85a172bee968d1be38fa3c6f5ea32",
+        "libcairo-gobject.so.2": "3e5df98597dd80cbb05e9faddf220fe5b9d940c0ac502b501a4253ba4f707a77",
+        "libcairo-script-interpreter.so.2": "5d9c5146a1d7ac858f4351e2bc29071b6b68d21de2d34d97c8e1738d1797a7fa",
+        "libpango-1.0.so.0": "78bef364dcef44efc44a21fd92584d889a954e975777a2a3e6d1d2d14de3b1d4",
+        "libpangoft2-1.0.so.0": "4b4ae1867fd311c25f4f9750c9fbb3c9d8afa25446bb1658117315de33eacb46",
+        "libpangoxft-1.0.so.0": "acf16e4aa66954213f5e4306bb4556b50367e9061a2fb5a38bd96a446d8b2172",
+        "libpangocairo-1.0.so.0": "3c338cbc91c96b508106cb23c3b1db1e385aa1b08b47ed553d92e8c63db781db"
+      }
+    },
+    "runtime_manifest_sha256": "e2a9b2cedbb04c28dda33a7c90135e41bad9f6bcb20e2045ce04063462096c0e",
+    "compositor_binary_sha256": "d54c05abd1d742c9473f275a670030b1689943242f31d958023b6fb1e6c63732",
+    "canonical_bitmap_helper_sha256": "6fbe6237eb7cbb3efdcb9abe7cb0e98b4ce41610372cc31efb6ab270dea1fbf0",
+    "PCF_fixture": {
+      "url": "https://unifoundry.com/pub/unifont/unifont-17.0.04/font-builds/unifont-17.0.04.pcf.gz",
+      "version": "17.0.04",
+      "compressed_sha256": "db584d40c82519d7cfaf1f1558fde5313fbf1ae81aeeea0a6e6ef632a5e3c496",
+      "native_pcf_sha256": "0a647e97d8cbe9584412233306b8874facc5c77da62fce515e8e92325e945805",
+      "scope": "Private native bitmap runtime/adapter/palette tests only; not installed or bundled"
+    }
+  },
+  "current_bitmap_toolkit_application_qualification": {
+    "qualified_code_commit": "bdb0a47737a40636490cabf9fc763dbb34dcdf0a",
+    "DomeD_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+    "scope": "Canonical bitmap alias catalog/export followup only. Native runtime sources/patches and FLTK23 inputs byte-identical to eee; preceding138GUI and4XRboth remain separately scoped at296. Current alias/glyph/GL/Wayland proof below. No public data layout/import/geometry changes.",
+    "prefixes": {
+      "FLTK": "artifacts/toolkit-eee23b7/lib",
+      "bitmap_runtime": "artifacts/bitmap-runtime-eee23b7/lib"
+    },
+    "identical_runtime_and_FLTK_inputs_to_eee23b7": true,
+    "PCF_palette": {
+      "CPU_software": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-3024fb6-final.log",
+        "sha256": "61afae3d3fc946d4534d7ecd107ac8b2c36b480e26b3737dbac61167bd256d27"
+      },
+      "CPU_Arc": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-3024fb6-arc.log",
+        "sha256": "c7f6b155e29cabcdd0f08432a5e7cd916ee31da4eb51d641bcd4dac171f8160f"
+      },
+      "OneAPI_software": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-3024fb6-oneapi.log",
+        "sha256": "61afae3d3fc946d4534d7ecd107ac8b2c36b480e26b3737dbac61167bd256d27"
+      },
+      "SAN_software": {
+        "passed": true,
+        "log": "artifacts/tests-palette-native-bitmap-3024fb6-sanitize.log",
+        "sha256": "61afae3d3fc946d4534d7ecd107ac8b2c36b480e26b3737dbac61167bd256d27"
+      }
+    },
+    "canonical_runtime_alias_test": {
+      "passed": true,
+      "report": "artifacts/tests-bitmap-runtime-3024fb6.json",
+      "sha256": "2991f0c2fc96a7cab8072514942f96c07c71ba5d496653cacdebfdb888063c76",
+      "adapter_glyphs": 57086,
+      "media_alias_exact_match": true
+    },
+    "DomeD_Wayland": {
+      "passed": 8,
+      "log": "artifacts/tests-dome-menu-3024fb6.log",
+      "sha256": "7c2c1b23d3bcb68ba33e3526ee81c6f61fd359ef05d50c81e8d58c4acbf9dfcc",
+      "live_library_paths": {
+        "compositor": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libcairo.so.2.11804.4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libfreetype.so.6.20.6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_images.so.1.4.5"
+        ],
+        "client": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libcairo.so.2.11804.4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libfreetype.so.6.20.6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libharfbuzz.so.0.61410.0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_gl.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_images.so.1.4.5"
+        ]
+      },
+      "preserved_live_maps": "artifacts/dome-menu/runtime-maps-3024fb6.json",
+      "live_mapping_sha256": "3823b16caddd15943e545b6a9b7a87737dd6d6265837632c905717d3e818b2f6"
+    },
+    "compositor_binary_sha256": "d54c05abd1d742c9473f275a670030b1689943242f31d958023b6fb1e6c63732",
+    "canonical_helper_sha256": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c"
+  }
+}

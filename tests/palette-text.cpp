@@ -49,8 +49,11 @@ size_t ink(const palette_text::Line &line) {
 }
 }
 int main(int argc, char **argv) try {
-  if (argc != 2) return 2;
+  if (argc != 2 && argc != 3) return 2;
   auto directory = std::filesystem::absolute(argv[1]); std::filesystem::create_directories(directory);
+  const auto pcf = argc == 3 ? std::filesystem::absolute(argv[2]) : std::filesystem::path{};
+  std::filesystem::path pcf_bdf;
+  int pcf_pixels=0;
   auto home = directory / ("runtime-" + std::to_string(getpid()));
   std::filesystem::create_directories(home);
   std::filesystem::permissions(home, std::filesystem::perms::owner_all);
@@ -142,11 +145,63 @@ int main(int argc, char **argv) try {
     FT_Face loaded{};
     require(!FT_New_Face(inspection, face.substr(0, metadata).c_str(), 0, &loaded), "Cannot inspect selected fallback");
     auto format = FT_Get_Font_Format(loaded);
-    bool bitmap = format && std::string_view(format) == "BDF" && !FT_IS_SCALABLE(loaded);
+    bool bitmap = format && (std::string_view(format) == "BDF" || std::string_view(format) == "PCF") && !FT_IS_SCALABLE(loaded);
     FT_Done_Face(loaded);
-    require(bitmap, "Spatial Unicode fallback selected a non-BDF face");
+    require(bitmap, "Spatial Unicode fallback selected a non-native-bitmap face");
   }
   FT_Done_FreeType(inspection);
+  if (!pcf.empty()) {
+    bdf_fonts::Face face;
+    require(bdf_fonts::inspect(pcf.string(),face), "Cannot inspect native PCF test strike");
+    pcf_pixels=face.pixels;pcf_bdf=directory/"native-pcf-reference.bdf";
+    std::ofstream(pcf_bdf)<<bdf_fonts::read(pcf.string());
+    palette_text::Font native(pcf.string(),pcf_pixels),reference(pcf_bdf.string(),pcf_pixels);
+    for(const char *sample:{"ABC xyz 123","Žluťoučký kůň / Élodie","中文 日本語 한국어","مرحبا / שלום"}) {
+      auto a=native.layout(sample,1200),b=reference.layout(sample,1200);
+      require(a.text==b.text && a.advance==b.advance && a.glyphs.size()==b.glyphs.size(),"PCF and lossless reference shaping/advances differ");
+      for(size_t g=0;g<a.glyphs.size();++g) {
+        const auto &x=a.glyphs[g],&y=b.glyphs[g];
+        require(x.x==y.x && x.y==y.y && x.bitmap->width==y.bitmap->width && x.bitmap->height==y.bitmap->height &&
+            x.bitmap->left==y.bitmap->left && x.bitmap->top==y.bitmap->top && x.bitmap->alpha==y.bitmap->alpha,
+            "Native PCF glyph placement/pixels differ from the lossless reference");
+      }
+    }
+    require(native.loaded_faces()==1,"Native PCF coverage accidentally used a fallback face");
+    auto large_face=bdf_fonts::scaled(face,2);
+    auto browser_alias=bdf_fonts::qt_alias(face,"browser"),media_alias=bdf_fonts::qt_alias(face,"media");
+    bdf_fonts::register_font(browser_alias.file);bdf_fonts::register_font(media_alias.file);
+    auto catalog=bdf_fonts::discover(true);
+    require(std::none_of(catalog.begin(),catalog.end(),[](const auto &item){return item.family.rfind("Dome Browser Bitmap ",0)==0 ||
+        item.family.rfind("Dome Media BDF ",0)==0 || item.family.rfind("Dome Qt BDF ",0)==0 || item.family.rfind("Dome 2x ",0)==0;}),
+        "Generated bitmap aliases leaked into host font choices");
+    auto exported=bdf_fonts::export_config();auto cfg=FcConfigCreate();
+    auto cache=directory/"native-alias-cache";std::filesystem::create_directories(cache);std::string escaped;
+    for(char c:cache.string()){if(c=='&')escaped+="&amp;";else if(c=='<')escaped+="&lt;";else if(c=='>')escaped+="&gt;";else escaped+=c;}
+    auto cache_config="<fontconfig><cachedir>"+escaped+"</cachedir></fontconfig>";
+    require(cfg && FcConfigParseAndLoadFromMemory(cfg,reinterpret_cast<const FcChar8 *>(cache_config.c_str()),FcTrue) &&
+        FcConfigParseAndLoad(cfg,reinterpret_cast<const FcChar8 *>(exported.c_str()),FcTrue) && FcConfigBuildFonts(cfg),
+        "Cannot load native bitmap alias configuration");
+    auto query=FcPatternCreate();FcPatternAddString(query,FC_FAMILY,reinterpret_cast<const FcChar8 *>(media_alias.family.c_str()));
+    FcPatternAddDouble(query,FC_PIXEL_SIZE,media_alias.pixels);FcConfigSubstitute(cfg,query,FcMatchPattern);FcDefaultSubstitute(query);
+    FcResult match_result;auto match=FcFontMatch(cfg,query,&match_result);FcChar8 *matched_file=nullptr;
+    bool exact_alias=match && FcPatternGetString(match,FC_FILE,0,&matched_file)==FcResultMatch &&
+        std::filesystem::path(reinterpret_cast<const char *>(matched_file))==media_alias.file;
+    if(match)FcPatternDestroy(match);FcPatternDestroy(query);FcConfigDestroy(cfg);
+    require(exact_alias,"Exported native bitmap configuration substitutes a different media font");
+    std::cout<<"PASS native bitmap aliases export exact identity and stay out of host choices\n";
+    palette_text::Font large(large_face.file,pcf_pixels*2);
+    auto a=native.layout("ABC xyz 123",1200),b=large.layout("ABC xyz 123",2400);
+    require(a.advance*2==b.advance && a.glyphs.size()==b.glyphs.size(),"PCF 2x metrics changed");
+    for(size_t g=0;g<a.glyphs.size();++g) {
+      const auto &x=*a.glyphs[g].bitmap,&y=*b.glyphs[g].bitmap;
+      require(b.glyphs[g].x==a.glyphs[g].x*2 && b.glyphs[g].y==a.glyphs[g].y*2 &&
+          y.width==x.width*2 && y.height==x.height*2 && y.left==x.left*2 && y.top==x.top*2,"PCF 2x placement changed");
+      for(int row=0;row<y.height;++row)for(int col=0;col<y.width;++col)
+        require(y.alpha[size_t(row)*y.width+col]==x.alpha[size_t(row/2)*x.width+col/2],"PCF 2x resampled native bitmap pixels");
+    }
+    std::ofstream(directory/"native-pcf-fonts.txt")<<native.source_manifest();
+    std::cout<<"PASS native PCF multilingual/bidi shaping, exact glyph pixels, primary coverage and integer2x\n";
+  }
   NativeGraphics graphics;
   std::cout << "GL " << glGetString(GL_RENDERER) << '\n';
   GLuint fbo, color; glGenFramebuffers(1, &fbo); glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -186,6 +241,12 @@ int main(int argc, char **argv) try {
   require(linear[0] < light[0] && linear[3] == 255, "Linear palette color contract changed");
   state.opacity = 64; palette.set_linear_output(false); auto translucent = capture("skin-opacity-utf8");
   require(translucent[3] == 64, "Palette opacity changed");
+  if(!pcf.empty()) {
+    state.font_file=pcf.string();state.font_pixels=pcf_pixels;state.opacity=255;state.light=false;state.menu_page=14;
+    auto native=capture("skin-pcf-native");state.font_file=pcf_bdf.string();auto reference=capture("skin-pcf-reference");
+    require(native==reference,"Real spatial palette PCF pixels differ from the lossless native reference");
+    std::cout<<"PASS actual GL spatial palette uses pixel-exact native PCF text\n";
+  }
   glDeleteTextures(1, &color); glDeleteFramebuffers(1, &fbo);
   std::filesystem::remove_all(home);
   FcFini(); // Release process-global application-font scans for leak checking.

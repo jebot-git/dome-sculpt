@@ -26,7 +26,7 @@ Vec3 world(Vec3 tangent,Vec3 normal,float hand,Vec3 sample,Vec3 scale) {
 }
 }
 int main() try {
-  ImportedPrimitive p;p.mesh.positions={{0,0,0},{1,0,0},{0,1,0}};p.mesh.normals.assign(3,{0,0,1});p.mesh.indices={0,1,2};
+  ImportedPrimitive p;p.normals_authored=true;p.mesh.positions={{0,0,0},{1,0,0},{0,1,0}};p.mesh.normals.assign(3,{0,0,1});p.mesh.indices={0,1,2};
   constexpr float c=.7071067811865475f;p.mesh.uv={{{0,0}},{{c,c}},{{-c,c}}};
   ImportedMorphTarget target;target.positions={{0,0,0},{0,0,.5f},{0,0,0}};
   auto n=normalized(Vec3{-.5f,0,1});target.normals.assign(3,n-Vec3{0,0,1});
@@ -58,6 +58,39 @@ int main() try {
   auto base_normal_pose=posed;base_normal_pose.normals=p.mesh.normals;
   check(length(xyz(kept_normals.base[0])+kept_normals.targets[0][0]-xyz(analytic(base_normal_pose,p.mesh.uv)))<1e-5f,
         "Absent normal morph keeps the specified base normals when generating target tangents");
+  ImportedPrimitive flat;
+  flat.mesh.positions={{0,0,0},{1,0,0},{0,1,0},{0,0,1}};
+  flat.mesh.normals.assign(4,normalized(Vec3{1,1,1})); // Non-authoritative display fallback.
+  flat.mesh.indices={0,1,2,0,3,1};flat.mesh.uv={{{0,0}},{{1,0}},{{0,1}},{{0,-1}}};
+  flat.tangents.assign(4,{0,0,1,-1}); // Must not be used without base NORMAL.
+  ImportedMorphTarget flat_target;flat_target.positions={{0,0,0},{0,0,0},{0,0,.5f},{0,.5f,0}};
+  flat_target.tangents.assign(4,{123,456,789});flat.morph_targets.push_back(flat_target);
+  const auto saved_positions=flat.mesh.positions,saved_normals=flat.mesh.normals;
+  auto generated_flat=source_tangent_frames(flat,flat.mesh.uv);
+  auto posed_flat=source_flat_mesh(flat.mesh,flat_target.positions);
+  check(generated_flat.generated && generated_flat.origin_vertex_count==4 &&
+      generated_flat.origin_vertices==flat.mesh.indices && generated_flat.normals.size()==6,
+      "Missing base normals generate split flat frames while retaining exact raw vertex/corner identities");
+  check(length(generated_flat.normals[0]-Vec3{0,0,1})<1e-7f &&
+      length(generated_flat.normals[3]-Vec3{0,1,0})<1e-7f &&
+      generated_flat.base[0]!=flat.tangents[0],
+      "Shared creased vertices have distinct face normals and supplied base tangents are ignored");
+  bool target_match=true;
+  for(size_t c=0;c<6;++c) {
+    target_match&=length(generated_flat.normals[c]+generated_flat.normal_targets[0][c]-posed_flat.normals[c])<1e-6f;
+    auto triangle=posed_flat;triangle.indices={uint32_t(c/3*3),uint32_t(c/3*3+1),uint32_t(c/3*3+2)};
+    auto target_frame=analytic(triangle,triangle.uv);
+    target_match&=length(xyz(generated_flat.base[c])+generated_flat.targets[0][c]-xyz(target_frame))<1e-5f;
+  }
+  check(target_match,"Missing NORMAL generates flat normals and Mikk tangents for each POSITION morph key");
+  bool source_exact=flat.mesh.positions.size()==saved_positions.size();
+  for(size_t v=0;v<saved_positions.size();++v)
+    source_exact&=length(flat.mesh.positions[v]-saved_positions[v])==0 && length(flat.mesh.normals[v]-saved_normals[v])==0;
+  check(source_exact && flat.tangents[0]==Tangent{0,0,1,-1} && flat.morph_targets[0].tangents[0].x==123,
+      "Derived flat preparation leaves raw fallback directions, supplied tangents and target payload exact");
+  check(rejects([&]{source_flat_mesh(flat.mesh,{},[]{return true;});}) &&
+      rejects([&]{source_flat_mesh(flat.mesh,{}, {},4);}),
+      "Flat preparation honors cancellation and bounded work before publication");
   Vec3 sample=normalized(Vec3{.6f,.2f,.77f});
   auto old_rest=world(xyz(a),{0,0,1},a[3],sample,{1,1,1});
   auto atlas=p.mesh;atlas.uv={{{0,0}},{{1,0}},{{0,1}}};auto canonical=analytic(atlas,atlas.uv);

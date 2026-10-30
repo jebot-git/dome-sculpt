@@ -46,8 +46,16 @@
   "desktop": {
     "repository": "https://github.com/jebot-git/qimgvr",
     "commit": "42962a7e132212268ff05067881bbf5e1f5fc94c",
-    "used": "DomeD FLTK BDF appearance and universal menu, shared with the Gmsh integration",
-    "license": "MIT"
+    "used": "DomeD FLTK appearance and universal menu shared with Gmsh; the canonical bitmap helper is refreshed from DomeD as recorded below; other qimgvr helper bytes unchanged.",
+    "license": "MIT",
+    "bitmap_helper": {
+      "repository": "https://github.com/jebot-git/DomeD",
+      "commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+      "file": "native/bdf_font.hpp",
+      "sha256": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
+      "license": "MIT and retained bdf2x Unlicense attribution",
+      "used": "Byte-identical canonical native BDF/PCF discovery, lossless adapter, integer enlargement and Fontconfig policy; no local behavior fork."
+    }
   },
   "gmsh": {
     "repository": "https://github.com/jebot-git/gmsh-xr",
@@ -62,7 +70,7 @@
   },
   "source_sha256": {
     "third_party/desktop/appearance.h": "25525e1d43c3036c5fc9ddd99e3c9621e8f9439147412b9bcfc1f2152201f591",
-    "third_party/desktop/bdf_font.hpp": "5738a6826aea224c96c0578d7ba1e34e43f63e86ca6a675c710ced8438bfb154",
+    "third_party/desktop/bdf_font.hpp": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
     "third_party/desktop/desktop-menu.h": "cfbd67120ea23a607e158ef7260409ce4fc5201915e5791096be3b6962f196f5",
     "third_party/desktop/desktop-menu.cpp": "51ab33c3d7a2d8cd76a4cedbfd05d410a7d5d7137b94f89b3e9f9e54562c4cab",
     "third_party/desktop/desktop-menu.cmake": "2520c100f2828747a4b8dfdee2f3faa742faf43c02fa73c6adba8d9ad6ce8ada",
@@ -112,7 +120,7 @@
   },
   "domed_fltk": {
     "repository": "https://github.com/jebot-git/DomeD",
-    "commit": "282467e727df78c8e7f2452aa05a7747bac854a6",
+    "commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
     "version": "1.4.5",
     "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
     "patches_in_application_order": [
@@ -137,7 +145,8 @@
       "native/toolkit-hooks/fltk-1.4.5-file-picker-places.patch",
       "native/toolkit-hooks/fltk-1.4.5-window-suspended.patch",
       "native/toolkit-hooks/fltk-1.4.5-touch-input.patch",
-      "native/toolkit-hooks/fltk-1.4.5-pen-input.patch"
+      "native/toolkit-hooks/fltk-1.4.5-pen-input.patch",
+      "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch"
     ],
     "patch_sha256": {
       "native/toolkit-hooks/fltk-1.4.5-bitmap-fonts.patch": "5a4318d315dae55e7e5d3fff18d3875d16a0a1886a413501d5e97ba51f6d6261",
@@ -161,12 +170,13 @@
       "native/toolkit-hooks/fltk-1.4.5-file-picker-places.patch": "f4d46edf598e20de5abfb9c89a412001093a6fd259e6469e516642e53c935a1a",
       "native/toolkit-hooks/fltk-1.4.5-window-suspended.patch": "aa887b3d11a85e1470535253ff6cbfa7a00f5ad25c54be9acc5ef914f2f720d0",
       "native/toolkit-hooks/fltk-1.4.5-touch-input.patch": "80b54a5f69889f4197f1a3a7dfffaa8a70a493b1192983c0ae21ffaa588ce27a",
-      "native/toolkit-hooks/fltk-1.4.5-pen-input.patch": "f90bab41cb33c949bd4efe2659f6e103d06611fdaeb98b06e8af0dd817f44152"
+      "native/toolkit-hooks/fltk-1.4.5-pen-input.patch": "f90bab41cb33c949bd4efe2659f6e103d06611fdaeb98b06e8af0dd817f44152",
+      "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch": "3dc6e2f311db0661e1b8117afa0b4fbabfe84d356a75c8bace3cd39a5782eec2"
     },
-    "combined_patch_sha256": "9b869ee77efecceba935eade4a86a412302894e68072ab99aca13b06c35b6822",
-    "used": "Release FLTK 1.4.5 with all22 canonical patches, including eaeb8e0 parent-menu preservation on submenu close. Runtime-selected library directory is prepended by the development launcher and OpenXR CTest.",
-    "verified_at_commit": "6feb62b936a9d8d2a2e6a893aebcbda9b724fe23",
-    "builder_sha256_at_verified_commit": "32b30745da3ea203cc1b851fa222d574329fcbd04ee4fd04401f6d417f712170"
+    "combined_patch_sha256": "f44bf778691abd5418756e0f427266ca205a2e45c262d63026799b9222dc92b2",
+    "used": "Canonical Release FLTK1.4.5 with all23 patches, native BDF/PCF selection, -O3/local CPU tuning, libraries in lib. Current application/runtime qualification is scoped separately from the older22-patch milestone.",
+    "verified_at_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+    "builder_sha256_at_verified_commit": "fe7db74e1763dc51c8362332751eefe4559aa25a654a000e4553e6afe91754ae"
   },
   "vrm_specification": {
     "repository": "https://github.com/vrm-c/vrm-specification",
@@ -214,10 +224,10 @@
     "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
   },
   "domed_latest_check": {
-    "commit": "6feb62b936a9d8d2a2e6a893aebcbda9b724fe23",
-    "fltk_inputs_changed_since_282467e": false,
-    "checked_utc": "2026-10-30T15:32:20.673322+00:00",
-    "used": "Latest source/compositor rebuilt Release; unchanged canonical22-patch FLTK artifact retained. Private native-BDF runtime built and checked. Exact application qualification in docs/validation/HOLDING-IMPORT-INTEGRATION.json."
+    "commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+    "fltk_inputs_changed_since_282467e": true,
+    "checked_utc": "2026-10-30T17:22:45.822208+00:00",
+    "used": "Current bitmap alias helper refreshed; FLTK23 builder/patches and all bitmap runtime inputs remain byte-identical toeee23b7. Exact scoped application/compositor proof in GLTF-FLAT-NORMALS receipt."
   },
   "mtoon": {
     "implementation": "src/mtoon.cpp; include/dome/mtoon-shader.hpp",
@@ -298,7 +308,7 @@
       "third_party/wings/wings_dissolve.erl.reference": "9519948c56c41f80810a3a38d9704b8dae2be1c18caa86d0d5007fd2547f4c2b"
     }
   },
-  "domed_bitmap_runtime": {
+  "historical_domed_bitmap_runtime_6feb62b": {
     "repository": "https://github.com/jebot-git/DomeD",
     "commit": "6feb62b936a9d8d2a2e6a893aebcbda9b724fe23",
     "lock": {
@@ -329,5 +339,171 @@
       }
     },
     "used": "Canonical private optimized native Unicode BDF-only HarfBuzz runtime for spatial text and current compositor; Pango build independently tested, not an added application frontend. All runtime libraries private, no system installation."
+  },
+  "domed_bitmap_runtime": {
+    "repository": "https://github.com/jebot-git/DomeD",
+    "commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
+    "lock": {
+      "policy": "native-unicode-bitmap-only",
+      "formats": [
+        "BDF",
+        "PCF"
+      ],
+      "harfbuzz_fork": "https://github.com/jebot-git/harfbuzz.git",
+      "harfbuzz_branch": "domed-bitmap",
+      "harfbuzz_revision": "b71a54f31f03853d655438abbd70ca8a00a73b4c",
+      "sources": [
+        {
+          "file": "freetype-2.14.3.tar.xz",
+          "url": "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.xz",
+          "sha256": "36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f",
+          "bytes": 2670220,
+          "name": "freetype",
+          "version": "2.14.3",
+          "directory": "freetype-2.14.3",
+          "patch": "freetype-2.14.3-bitmap.patch",
+          "patch_sha256": "d4bc632b097cc78f3baeafc59d9e2b854359b5125e63f69be3d9c53a3d11be4e",
+          "licenses": [
+            "LICENSE.TXT",
+            "docs/FTL.TXT",
+            "docs/GPLv2.TXT"
+          ]
+        },
+        {
+          "file": "harfbuzz-14.1.0.tar.xz",
+          "url": "https://github.com/harfbuzz/harfbuzz/releases/download/14.1.0/harfbuzz-14.1.0.tar.xz",
+          "sha256": "ee0eb3a1da2c5a28147f12dff55f6c7d60aeeeb29ac7ef334eabe84c8476c105",
+          "name": "harfbuzz",
+          "version": "14.1.0",
+          "directory": "harfbuzz-14.1.0",
+          "patch": "harfbuzz-14.1.0-bitmap.patch",
+          "patch_sha256": "bc141a1d93dedf0a3c9f8f44e9a48fbce268e2d1cdd9c723fa24544962322bf4",
+          "licenses": [
+            "COPYING"
+          ]
+        },
+        {
+          "file": "cairo-1.18.4.tar.xz",
+          "url": "https://cairographics.org/releases/cairo-1.18.4.tar.xz",
+          "sha256": "445ed8208a6e4823de1226a74ca319d3600e83f6369f99b14265006599c32ccb",
+          "bytes": 32578804,
+          "name": "cairo",
+          "version": "1.18.4",
+          "directory": "cairo-1.18.4",
+          "patch": "cairo-1.18.4-bitmap.patch",
+          "patch_sha256": "4aa6c2229c3cf6e99d955b4df0f9dddbc969fd3bdd56e1f779c008fc2c3e3f23",
+          "licenses": [
+            "COPYING",
+            "COPYING-LGPL-2.1",
+            "COPYING-MPL-1.1"
+          ]
+        },
+        {
+          "file": "pango-1.57.1.tar.xz",
+          "url": "https://download.gnome.org/sources/pango/1.57/pango-1.57.1.tar.xz",
+          "sha256": "e65d6d117080dc3aeeb7d8b4b3b518f7383aa2e6cfce23117c623cd624764c2f",
+          "bytes": 2588416,
+          "name": "pango",
+          "version": "1.57.1",
+          "directory": "pango-1.57.1",
+          "patch": "pango-1.57.1-bitmap.patch",
+          "patch_sha256": "8d190e919dc188f435bf05c9c7b363053d36ac8bced8f0242c9bf6c1e38f6ea0",
+          "licenses": [
+            "COPYING"
+          ]
+        }
+      ]
+    },
+    "manifest": {
+      "policy": "native-unicode-bitmap-only",
+      "formats": [
+        "BDF",
+        "PCF"
+      ],
+      "buildtype": "release",
+      "local_cpu": true,
+      "arch": "native",
+      "sources": [
+        {
+          "file": "freetype-2.14.3.tar.xz",
+          "url": "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.xz",
+          "sha256": "36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f",
+          "bytes": 2670220,
+          "name": "freetype",
+          "version": "2.14.3",
+          "directory": "freetype-2.14.3",
+          "patch": "freetype-2.14.3-bitmap.patch",
+          "patch_sha256": "d4bc632b097cc78f3baeafc59d9e2b854359b5125e63f69be3d9c53a3d11be4e",
+          "licenses": [
+            "LICENSE.TXT",
+            "docs/FTL.TXT",
+            "docs/GPLv2.TXT"
+          ]
+        },
+        {
+          "file": "harfbuzz-14.1.0.tar.xz",
+          "url": "https://github.com/harfbuzz/harfbuzz/releases/download/14.1.0/harfbuzz-14.1.0.tar.xz",
+          "sha256": "ee0eb3a1da2c5a28147f12dff55f6c7d60aeeeb29ac7ef334eabe84c8476c105",
+          "name": "harfbuzz",
+          "version": "14.1.0",
+          "directory": "harfbuzz-14.1.0",
+          "patch": "harfbuzz-14.1.0-bitmap.patch",
+          "patch_sha256": "bc141a1d93dedf0a3c9f8f44e9a48fbce268e2d1cdd9c723fa24544962322bf4",
+          "licenses": [
+            "COPYING"
+          ]
+        },
+        {
+          "file": "cairo-1.18.4.tar.xz",
+          "url": "https://cairographics.org/releases/cairo-1.18.4.tar.xz",
+          "sha256": "445ed8208a6e4823de1226a74ca319d3600e83f6369f99b14265006599c32ccb",
+          "bytes": 32578804,
+          "name": "cairo",
+          "version": "1.18.4",
+          "directory": "cairo-1.18.4",
+          "patch": "cairo-1.18.4-bitmap.patch",
+          "patch_sha256": "4aa6c2229c3cf6e99d955b4df0f9dddbc969fd3bdd56e1f779c008fc2c3e3f23",
+          "licenses": [
+            "COPYING",
+            "COPYING-LGPL-2.1",
+            "COPYING-MPL-1.1"
+          ]
+        },
+        {
+          "file": "pango-1.57.1.tar.xz",
+          "url": "https://download.gnome.org/sources/pango/1.57/pango-1.57.1.tar.xz",
+          "sha256": "e65d6d117080dc3aeeb7d8b4b3b518f7383aa2e6cfce23117c623cd624764c2f",
+          "bytes": 2588416,
+          "name": "pango",
+          "version": "1.57.1",
+          "directory": "pango-1.57.1",
+          "patch": "pango-1.57.1-bitmap.patch",
+          "patch_sha256": "8d190e919dc188f435bf05c9c7b363053d36ac8bced8f0242c9bf6c1e38f6ea0",
+          "licenses": [
+            "COPYING"
+          ]
+        }
+      ],
+      "libraries": {
+        "libfreetype.so.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+        "libharfbuzz.so.0": "35fcdcf82f23dc5301513ec8ac75d154d1342ed5e5a24f38930abed3a46c9edc",
+        "libharfbuzz-subset.so.0": "bec1b6aaa8efb1f296600bb29f0fa976e7781fe181237b4b847cd042a99fd748",
+        "libharfbuzz-raster.so.0": "65df1846fe460e96cd68bd4911c54c10d7b03012ed906a52dc5ea4a10c38ff14",
+        "libharfbuzz-vector.so.0": "a2335d97a051dca9db35bd097d72eae752f72450ad0f0d8b234aa3af6a9dfedb",
+        "libharfbuzz-gpu.so.0": "f4c2b18eda9725fb117ebbedac7885f703efdf8ec5719e3702b15c9d338a243d",
+        "libharfbuzz-cairo.so.0": "72a787c0421104d8a1b919b12f2d9c833290c31788890edadc5dda52a3cb9a6c",
+        "libharfbuzz-icu.so.0": "1a83fb4e5e9085dcc3c5c5b521c938b855efd508616573930765037b228ed5d6",
+        "libharfbuzz-gobject.so.0": "26a75ec631ba4d446d722b4975480b8aba02751f76d73b56c62dd989ba0be8fe",
+        "libcairo.so.2": "7d4db5c2c967ad834a6506e1f83eee5959a85a172bee968d1be38fa3c6f5ea32",
+        "libcairo-gobject.so.2": "3e5df98597dd80cbb05e9faddf220fe5b9d940c0ac502b501a4253ba4f707a77",
+        "libcairo-script-interpreter.so.2": "5d9c5146a1d7ac858f4351e2bc29071b6b68d21de2d34d97c8e1738d1797a7fa",
+        "libpango-1.0.so.0": "78bef364dcef44efc44a21fd92584d889a954e975777a2a3e6d1d2d14de3b1d4",
+        "libpangoft2-1.0.so.0": "4b4ae1867fd311c25f4f9750c9fbb3c9d8afa25446bb1658117315de33eacb46",
+        "libpangoxft-1.0.so.0": "acf16e4aa66954213f5e4306bb4556b50367e9061a2fb5a38bd96a446d8b2172",
+        "libpangocairo-1.0.so.0": "3c338cbc91c96b508106cb23c3b1db1e385aa1b08b47ed553d92e8c63db781db"
+      }
+    },
+    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack; no Pango application frontend, no outlines, no system installation.",
+    "verified_at_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9"
   }
 }

@@ -51,11 +51,13 @@ and remaps every native source/POSITION channel by exact ordered corners;
 coincident coordinates never establish source identity. Original raw GLB and
 material JSON remain immutable and are serialized through the existing archive.
 
-Original NORMAL absence is currently refused explicitly. The preservation parser's
-smoothed display fallback is not glTF's implicit flat-normal authority, and
-provided TANGENT must be ignored in that case. Correct per-triangle base/target
-flat normals and generated tangent keys remain required; do not freeze fallback
-normals as authored. This guard does not change the legacy OBJ path.
+Original NORMAL absence now generates per-triangle base and morph-key normals,
+with supplied tangents/displacements ignored for derived shading. Original raw
+absence and attributes remain unchanged; current split vertices retain exact
+source/corner identities. UV0 normal textures generate original-basis Mikk frames;
+no-normal-texture sources keep genuine N-only frames. See GLTF-FLAT-NORMALS.md for
+independent accessors/graphics/native/controller qualification. UV1 paint-source
+sampling and other unsupported material/transform cases remain required.
 
 Textured original UVs use SourceAuthored painting. The current no-map codec
 cannot authorize SourceAuthored; untextured inputs therefore require Strict

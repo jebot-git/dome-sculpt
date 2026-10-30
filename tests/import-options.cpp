@@ -3,6 +3,8 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/import-source.hpp"
 #include "import-controller-driver.hpp"
+#include "import-authoring-fixtures.hpp"
+#include "dome/material-bindings.hpp"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -98,6 +100,29 @@ int main(int argc,char **argv){try{
   doc.import_asset(root/"unicode.obj",settings);check(doc.wait_asset()&&doc.frame().state->error.empty(),"native Unicode material source imports on the same asset worker");
   auto status=nlohmann::json(doc.frame().state->message).dump();
   check(!status.empty()&&doc.frame().state->message.find("日本語")!=std::string::npos&&doc.undo()&&doc.copy_scene().encode()==baseline,"bounded Unicode import diagnostics retain complete UTF-8 scalars and exact Undo");
+  const auto flat_directory=root/"flat-source";fs::create_directories(flat_directory);
+  auto flat_fixture=import_fixture::Fixture{};
+  auto &flat_primitive=flat_fixture.j["meshes"][0]["primitives"][0];
+  flat_primitive["attributes"].erase("NORMAL");flat_primitive["targets"][0].erase("NORMAL");
+  flat_fixture.j["materials"][0]["normalTexture"]={{"index",0},{"scale",.8f}};
+  flat_fixture.save(flat_directory/"flat.glb");
+  doc.import_action(SpatialCommand::ImportCancel);doc.cancel_spatial_menu();
+  hand.open();hand.sector(8);hand.sector(9);hand.sector(10);
+  ImportSettings flat_settings;flat_settings.paint_resolution=64;
+  doc.open_import_browser(flat_directory);wait([&]{auto v=doc.frame().state->importing;return v&&!v->busy;});
+  doc.configure_import(flat_settings);
+  check(doc.frame().state->menu && doc.frame().state->menu_page==21 &&
+      doc.frame().state->importing->entries.size()==1 && doc.frame().state->importing->settings==flat_settings,
+      "Actual controller navigation opens browser21 with the captured missing-normal glTF source and shared defaults");
+  hand.sector(6);check(doc.wait_asset()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual controller Import applies flat-frame preparation on the shared asset worker");
+  auto flat_scene=doc.copy_scene();const auto &flat_object=flat_scene.objects().back();
+  check(flat_scene.objects().size()==3 && !flat_object.appearance->asset->primitives[0].normals_authored &&
+      flat_object.painted->mesh().positions.size()==6 && flat_object.material_bindings->normal_frames->pbr->generated_tangents,
+      "Controller import preserves original normal absence and publishes genuine corner-split flat/Mikk frame authority");
+  auto flat_encoded=flat_scene.encode();check(doc.undo()&&doc.copy_scene().encode()==baseline &&
+      doc.redo()&&doc.copy_scene().encode()==flat_encoded && doc.undo()&&doc.copy_scene().encode()==baseline,
+      "Controller flat import has exact single-operation Undo/Redo with no partial source adoption");
+  doc.import_action(SpatialCommand::ImportCancel);
   auto limit=root/"limit";fs::create_directories(limit);for(int i=0;i<513;++i)write(limit/(std::to_string(i)+".obj"),triangle);
   refuses([&]{scan_import_directory(limit);},"directory result quota refuses instead of silently omitting eligible assets");
   check(spatial_page_count==24 && spatial_max_page==23 && !spatial_action(spatial_page_count,5) && spatial_action(21,6)==SpatialCommand::ImportApply&&spatial_action(23,0)==SpatialCommand::ImportFormat&&spatial_parameter(23,6)==VrParameter::ImportUnitScale&&

@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "atlas-detail.hpp"
-#include "dome/polygon.hpp"
 #include "xatlas.h"
+#include "import-authoring-fixtures.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <cstring>
 #include <future>
 #include <iostream>
 #include <mutex>
+#include <unistd.h>
 using namespace dome;
 namespace {
 std::atomic<xatlas::ProgressFunc> forward{nullptr};
@@ -40,7 +41,22 @@ bool trampoline(xatlas::ProgressCategory c, int p, void *data) {
 }
 Mesh source() {
   Mesh mesh;
-  auto cube = PolygonMesh::cube().triangulate().mesh;
+  // Keep this atlas fixture independent of the separate polygon editor.
+  Mesh cube;
+  const std::array<std::array<Vec3,4>,6> faces{{
+      {{{-.5f,-.5f,.5f},{.5f,-.5f,.5f},{.5f,.5f,.5f},{-.5f,.5f,.5f}}},
+      {{{.5f,-.5f,-.5f},{-.5f,-.5f,-.5f},{-.5f,.5f,-.5f},{.5f,.5f,-.5f}}},
+      {{{-.5f,-.5f,-.5f},{-.5f,-.5f,.5f},{-.5f,.5f,.5f},{-.5f,.5f,-.5f}}},
+      {{{.5f,-.5f,.5f},{.5f,-.5f,-.5f},{.5f,.5f,-.5f},{.5f,.5f,.5f}}},
+      {{{-.5f,.5f,.5f},{.5f,.5f,.5f},{.5f,.5f,-.5f},{-.5f,.5f,-.5f}}},
+      {{{-.5f,-.5f,-.5f},{.5f,-.5f,-.5f},{.5f,-.5f,.5f},{-.5f,-.5f,.5f}}}}};
+  const std::array<Vec3,6> normals{{{0,0,1},{0,0,-1},{-1,0,0},{1,0,0},{0,1,0},{0,-1,0}}};
+  const std::array<std::array<float,2>,4> uv{{{0,0},{1,0},{1,1},{0,1}}};
+  for(size_t face=0;face<faces.size();++face) {
+    const auto base=uint32_t(cube.positions.size());
+    for(size_t k=0;k<4;++k){cube.positions.push_back(faces[face][k]);cube.normals.push_back(normals[face]);cube.uv.push_back(uv[k]);}
+    for(auto i:{0u,1u,2u,0u,2u,3u})cube.indices.push_back(base+i);
+  }
   for (unsigned object = 0; object < 24; ++object) {
     auto base = uint32_t(mesh.positions.size());
     for (auto p : cube.positions)
@@ -251,6 +267,20 @@ int main() try {
   check(a.get() && b.get(),
         "Concurrent atlas contexts keep cancellation, callback lifetime and "
         "successful output independent");
+  auto fixture=import_fixture::Fixture{};
+  auto &primitive=fixture.j["meshes"][0]["primitives"][0];
+  primitive["attributes"].erase("NORMAL");primitive["attributes"].erase("TEXCOORD_0");
+  primitive["targets"][0].erase("NORMAL");
+  fixture.j["materials"][0]["pbrMetallicRoughness"].erase("baseColorTexture");
+  const auto path=std::filesystem::temp_directory_path()/("dome-flat-atlas-cancel-"+std::to_string(getpid())+".glb");
+  struct Cleanup {std::filesystem::path file;~Cleanup(){std::error_code e;std::filesystem::remove(file,e);}} cleanup{path};
+  fixture.save(path);Scene caller;const auto before_import=caller.encode();
+  ImportAuthoringOptions options;options.paint_resolution=64;bool visited=false,refused=false;
+  options.limits.cancelled=[&]{if(category==int(xatlas::ProgressCategory::ComputeCharts)){visited=true;return true;}return false;};
+  try {prepare_authoring_import(caller,path,options);}
+  catch(const std::runtime_error &e){refused=std::string_view(e.what()).find("cancel")!=std::string_view::npos;}
+  check(visited && refused && caller.encode()==before_import,
+      "Actual missing-normal/missing-UV import propagates cancellation from real xatlas chart work and preserves its complete caller scene");
   std::cout << checks << " cancellable atlas checks passed\n";
   return 0;
 } catch (const std::exception &e) {
