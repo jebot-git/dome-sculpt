@@ -51,6 +51,12 @@ and remaps every native source/POSITION channel by exact ordered corners;
 coincident coordinates never establish source identity. Original raw GLB and
 material JSON remain immutable and are serialized through the existing archive.
 
+Original NORMAL absence is currently refused explicitly. The preservation parser's
+smoothed display fallback is not glTF's implicit flat-normal authority, and
+provided TANGENT must be ignored in that case. Correct per-triangle base/target
+flat normals and generated tangent keys remain required; do not freeze fallback
+normals as authored. This guard does not change the legacy OBJ path.
+
 Textured original UVs use SourceAuthored painting. The current no-map codec
 cannot authorize SourceAuthored; untextured inputs therefore require Strict
 writable UVs or a valid generated atlas. Legal overlapping/repeating untextured

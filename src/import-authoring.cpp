@@ -267,6 +267,10 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     if (node.mesh >= 0) {
       for (auto primitive : asset->meshes.at(size_t(node.mesh)).primitives) {
         const auto &p = asset->primitives.at(primitive);
+        if (!p.normals_authored)
+          throw std::runtime_error(
+              "This model omits normals; generated flat-normal authoring is "
+              "not ready yet. Export authored normals before importing.");
         if (!p.influences.empty())
           throw std::runtime_error(
               "Authored skin/inverse-bind adoption is required before "

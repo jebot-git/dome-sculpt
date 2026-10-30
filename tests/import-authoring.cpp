@@ -295,6 +295,21 @@ int main(int argc, char **argv) try {
   check(Scene::load(no_uv_saved).encode() == atlased.scene.encode(),
         "Untextured generated atlas and all original source/morph mappings "
         "survive actual native restart");
+  auto missing = fixture;
+  missing.j["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");
+  missing.j["meshes"][0]["primitives"][0]["targets"][0].erase("NORMAL");
+  auto missing_path = directory / "missing-normal.glb";
+  missing.save(missing_path);
+  bool missing_refused = false;
+  try {
+    prepare_authoring_import(source, missing_path, options);
+  } catch (const std::runtime_error &e) {
+    missing_refused = std::string(e.what()).find("generated flat-normal") !=
+                      std::string::npos;
+  }
+  check(missing_refused && source.encode() == unchanged,
+        "Absent NORMAL never promotes smoothed display fallback or ignored "
+        "TANGENT into authored flat-normal authority");
   for (int cut : {1, 3, 8, 16, 24}) {
     auto cancelled = options;
     int calls = 0;
