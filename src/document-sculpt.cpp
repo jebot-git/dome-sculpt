@@ -6,6 +6,32 @@ bool Document::sculpt_target_ready_locked() const {
   return !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && !o.mesh_active && o.visible && !o.locked;
 }
+bool Document::resolution_target_ready_locked() const {
+  const auto scale=scene_.world_transform(scene_.active().id).scale;
+  return sculpt_target_ready_locked() && std::isfinite(scale) && scale>0 &&
+      std::isfinite(scale*1000) && scale*.01f>0;
+}
+void Document::queue_resolution_locked(SculptResolutionOptions options,AssetSource expected) {
+  options.validate();
+  if(!resolution_target_ready_locked())throw std::logic_error("Select an unlocked visible sculpt source to change resolution");
+  if((expected.generation && expected.generation!=state_.generation) ||
+     (expected.revision && expected.revision!=state_.revision) ||
+     (expected.object && expected.object!=scene_.active().id))
+    throw std::logic_error("Sculpt target changed; reopen resolution controls");
+  if(options.voxel_size==volume().voxel_size())return;
+  options.cancelled={};options.progress={};
+  auto work=std::make_shared<AssetWork>();auto changed=std::make_shared<bool>(false);
+  auto report=std::make_shared<std::string>();const auto object=scene_.active().id;
+  queue_scene_operation_locked("Change sculpt resolution",
+      [options=std::move(options),work,changed,report,object](Scene &scene,const auto &cancelled) mutable {
+        options.cancelled=cancelled;options.progress=[work](float value){work->progress.store(value);};
+        SculptResolutionReport result;*changed=resample_sculpt_object(scene,object,options,&result);
+        *report=std::to_string(result.layer_samples)+" layer samples, "+std::to_string(result.mask_samples)+" mask samples";
+      },expected,report,work,changed);
+}
+void Document::change_sculpt_resolution(SculptResolutionOptions options,AssetSource expected) {
+  std::lock_guard lock(model_mutex_);queue_resolution_locked(std::move(options),expected);
+}
 void Document::sculpt_settings_locked(Volume::SculptSettings settings, AssetSource expected) {
   if (!sculpt_target_ready_locked()) throw std::logic_error("Sculpt mask and symmetry controls are unavailable");
   if ((expected.generation && expected.generation!=state_.generation) ||

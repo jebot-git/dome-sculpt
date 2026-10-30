@@ -7,6 +7,7 @@
 #include "dome/retopo-authoring.hpp"
 #include "io.hpp"
 #include "text-utf8.hpp"
+#include "volume-archive.hpp"
 #include <fstream>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -316,10 +317,14 @@ nlohmann::json Scene::encode() const {
 }
 Scene Scene::decode(const nlohmann::json &j) {
   Scene result;
-  if(j.at("format")!="dome-sculpt" || !j.at("version").is_number_integer())
+  if(!j.is_object() || j.at("format")!="dome-sculpt" || !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
-  if(version==1 || ((version==2 || version==3) && j.contains("samples") && !j.contains("objects"))) {
+  bool flat_volume=false;
+  for(const char *key:{"samples","voxel_size","distance_band","sculpt_layers","active_sculpt_layer","next_sculpt_layer","sculpt_mask","sculpt_controls"})
+    flat_volume|=j.contains(key);
+  if(flat_volume || version==1) {
+    if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
   if(version<2 || version>8)throw std::runtime_error("Unsupported scene version");
@@ -330,6 +335,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   size_t sculpt_entries=0;
   for(const auto &object:objects) {
     const auto &volume=object.at("volume");
+    (void)archive_detail::volume_header(volume);
     const auto &samples=volume.at("samples");
     if(!samples.is_array()) throw std::runtime_error("Invalid sculpt samples");
     size_t layers=0;

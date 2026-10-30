@@ -236,5 +236,19 @@
         "reason": "Define both zero-bit quicksort seed rotations; upstream shifts a 32-bit unsigned value by 32 when t=0 (UBSan)."
       }
     ]
+  },
+  "sculpt_resolution": {
+    "implementation": "Native original sparse layer/mask resampling, physical-band persistence, bounded topology/distance checks and trilinear cubic ray traversal; no Blender/OpenVDB/Gmsh source linked.",
+    "blender_reference": {
+      "commit": "3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2",
+      "mesh_remesh_voxel.cc": "ebc2c38cb02b4f5bb22992ddd81db771768dcf4d80a4c15315ab58a4658667f0",
+      "object_remesh.cc": "b3f5f3be7853227941e722846e626c0967c2811e781861f54bf052d689ebd0af",
+      "evaluated": "Voxel transform, mesh-to-level-set/volume-to-mesh reconstruction and optional attribute reprojection; unsuitable as a direct substitute for retaining independent native displacement layers."
+    },
+    "gmsh_reference": {
+      "commit": "2ed37a92b4a6862a7ea1ff620ea5e37b8c6070f1",
+      "src/mesh/Field.cpp": "a629363737635b9004a57fd2b90ce3b05fd4a8c6e0a1a8d7ce334b1ecd80336a",
+      "evaluated": "StructuredField object-local grid spacing, trilinear scalar interpolation and explicit outside-value convention. Native sparse support/transaction/quality policy is independent."
+    }
   }
 }

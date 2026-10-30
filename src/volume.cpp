@@ -3,6 +3,8 @@
 #include "io.hpp"
 #include "sculpt-mask.hpp"
 #include "sculpt-symmetry.hpp"
+#include "volume-raycast.hpp"
+#include "volume-archive.hpp"
 #include <fcntl.h>
 #include <fstream>
 #include <limits>
@@ -11,7 +13,7 @@
 #include <unistd.h>
 namespace dome {
 Volume::Volume(float voxel, size_t limit)
-    : voxel_(voxel), history_limit_(limit) {
+    : voxel_(voxel), band_(voxel * 4), history_limit_(limit) {
   if (!std::isfinite(voxel) || voxel < .00001f || voxel > 1)
     throw std::invalid_argument(
         "Voxel size must be between 0.00001 and 1 metres");
@@ -168,6 +170,7 @@ void Volume::erase_layer(uint64_t id) {
 
 Volume Volume::geometry_snapshot() const {
   Volume result(voxel_, history_limit_);
+  result.band_ = band_;
   result.cells_ = cells_;
   result.layers_ = layers_;
   result.active_ = active_;
@@ -199,25 +202,10 @@ Vec3 Volume::gradient(Vec3 p) const {
        sample(p + Vec3{0, voxel_, 0}) - sample(p - Vec3{0, voxel_, 0}),
        sample(p + Vec3{0, 0, voxel_}) - sample(p - Vec3{0, 0, voxel_})});
 }
-std::optional<Vec3> Volume::raycast(Vec3 origin, Vec3 direction,
-                                    float maximum) const {
-  if (!finite(origin) || !finite(direction) || length(direction) < 1e-8f ||
-      std::max({std::abs(origin.x), std::abs(origin.y), std::abs(origin.z)}) +
-              maximum >
-          1000 ||
-      !std::isfinite(maximum) || maximum <= 0 || maximum > 1000)
-    throw std::invalid_argument("Invalid sculpt ray");
-  direction = normalized(direction);
-  float t = 0;
-  for (int step = 0; step < 20000 && t <= maximum; ++step) {
-    Vec3 p = origin + direction * t;
-    float d = sample(p);
-    if (d < voxel_ * .12f)
-      return p;
-    t += std::max(voxel_ * .1f, d * .8f);
-  }
-  return {};
+std::optional<Vec3> Volume::raycast(Vec3 origin,Vec3 direction,float maximum) const {
+  return sculpt_detail::raycast_field(*this,origin,direction,maximum);
 }
+
 void Volume::begin_stroke() {
   if (editing_)
     throw std::logic_error("A stroke is already active");
@@ -627,8 +615,7 @@ nlohmann::json Volume::encode() const {
                                   {"opacity", l.opacity},
                                   {"delta", std::move(ds)}});
   }
-  if (mask_.background != 0 || mask_.values.size() ||
-      !same_settings(settings_, SculptSettings{})) {
+  if (band_ != voxel_ * 4 || mask_.background != 0 || mask_.values.size() || !same_settings(settings_, SculptSettings{})) {
     j["version"] = 3;
     j["sculpt_mask"] = {{"default", mask_.background},
                         {"values", nlohmann::json::array()}};
@@ -644,6 +631,7 @@ nlohmann::json Volume::encode() const {
         {"mask_tool", int(c.mask_tool)},
         {"mask_strength", c.mask_strength}};
   }
+  if (band_ != voxel_ * 4) { j["version"] = 4; j["distance_band"] = band_; }
   return j;
 }
 Volume Volume::load(const std::filesystem::path &path) {
@@ -655,10 +643,10 @@ Volume Volume::load(const std::filesystem::path &path) {
   return decode(j);
 }
 Volume Volume::decode(const nlohmann::json &j) {
-  if (j.at("format") != "dome-sculpt" ||
-      (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3))
-    throw std::runtime_error("Unsupported project format");
-  Volume v(j.at("voxel_size").get<float>());
+  const auto header=archive_detail::volume_header(j);
+  const int version=header.version;
+  Volume v(header.voxel);
+  v.band_=header.band;
   auto &samples = j.at("samples");
   if (!samples.is_array() || samples.size() > 4'000'000)
     throw std::length_error("Invalid project sample count");
@@ -762,7 +750,7 @@ Volume Volume::decode(const nlohmann::json &j) {
     for (auto &[p, d] : v.cells_)
       v.layers_.front().delta[p] = double(d) - v.band();
   }
-  if (j.at("version") == 3) {
+  if (version >= 3) {
     auto &mask = j.at("sculpt_mask");
     v.mask_.background = mask.at("default").get<float>();
     if (!std::isfinite(v.mask_.background) || v.mask_.background < 0 ||
@@ -819,7 +807,7 @@ Volume Volume::decode(const nlohmann::json &j) {
     v.sculpt_settings(settings);
     v.clear_history();
   } else if (j.contains("sculpt_mask") || j.contains("sculpt_controls")) {
-    throw std::runtime_error("Sculpt mask/controls require volume version 3");
+    throw std::runtime_error("Sculpt mask/controls require volume version 3 or later");
   }
   v.geometry_history_.reset();
   return v;
