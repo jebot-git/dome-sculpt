@@ -1,6 +1,6 @@
 # Combined Scene8 / Retopo16 integration
 
-The combined publication source preserves remote3d19776 and local6df3cf2.
+Application source `79fe64a` preserves remote3d19776 and local6df3cf2.
 All67 Release native suites pass121.84s (tests-retopo-native-full.log), excluding
 only openxr-client, which was exercised separately through the real loader:
 117/117 checks, complete=true, failed0, exit0 (tests-retopo-real-loader.log and
@@ -15,13 +15,23 @@ forced pre/post-asset cancellation boundaries have native regression coverage.
 Retopo GPU buffer reuse/GL state fixtures pass actual Arc and llvmpipe:
 retopo-gpu-{arc,software}.log. No normal-frame guard has been removed.
 
-Combined GUI verification is running. Its initial Retopo fixture exposed that
-project-info payload hashes differed only because Scene8 inserts null optional
-feature fields absent from Scene5. The diagnostic now canonicalizes those two
-null fields; nonnull payloads and all geometry/paint remain hashed. The fixture
-also now waits for the ordered atomic save to finish, as other authoring flows
-do. Initial failure logs remain menu-retopo-integrated*.log. Product editing and
-archive data were unchanged by these diagnostic/test synchronization fixes.
+Final combined native GUI checks pass (all exits0/reports failed0):
+- Retopo12/12: menu-retopo-final.log; compact2xBDF6/6: menu-retopo-compact-final.log.
+- General universal menus53/53: menu-retopo-general-final.log.
+- Skin bind/transfer/history11/11: menu-retopo-skin-final.log.
+- Unicode clipboard/history/save3/3: menu-retopo-unicode-final.log.
+- Actual latest DomeD Wayland/universal-menu8/8: menu-retopo-dome-final-staged.log.
+
+The scripts are exact source copies under artifacts/retopo-ui-staging/tests;
+its build symlink targets publish-final/build-retopo, never the older build.
+The first DomeD staging attempt lacked packaging/org.domed.Sculpt.desktop;
+adding a link to the publication packaging fixed the harness. Its failed log
+remains menu-retopo-dome-final.log. Earlier Retopo GUI failures remain
+menu-retopo-integrated*.log: project-info payload hashing differed because
+Scene8 inserts null optional fields absent from Scene5. The diagnostic now
+canonicalizes only those two null fields. The fixture also waits for atomic
+save completion as other authoring flows do. Nonnull source payload, geometry,
+paint, retained identity and exact Undo/Redo assertions remain unchanged.
 
 Canonical toolkit/compositor282467e remains latest on remote. No system install,
 physical test relaunch or active desktop/session restart occurred. The full

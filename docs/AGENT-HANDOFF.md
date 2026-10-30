@@ -20,5 +20,5 @@ Future records need an explicit versioned migration and validated re-bake.
 Remote3d19776 Retopo is now integrated with Skin14/Masks15/Retopo16 and combined
 Scene8; complete legacy7 shapes remain supported. The5-worker shutdown,
 cancellation and native persistence tests pass. Read current HANDOFF.md and
-VALIDATION.md for exact verification scopes and pending GUI work. Future normal
+VALIDATION.md for exact completed verification scopes; application source79fe64a is the combined checkpoint. Future normal
 frame provenance must use Scene9/materials2, without relabelling legacy pixels.

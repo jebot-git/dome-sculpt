@@ -7,7 +7,7 @@ excluded. Do not mark the goal complete at a build or checkpoint.
 
 ## Combined Retopo and authoring integration
 
-The publication tree integrates remote main3d19776 (fdb132b/251cd3d Retopo)
+Application source `79fe64a` integrates remote main3d19776 (fdb132b/251cd3d Retopo)
 with the fully verified authoring source6df3cf2 and metadata500f321. All histories
 are preserved. Skin stays on page14, Masks reserves15, Retopo uses16. The schema
 writer uses Scene8 for immutable materials, dormant deformation or Retopo; both
@@ -31,9 +31,14 @@ Scene8 keys identically; it still hashes all nonnull source payload data.
 Use fresh build-retopo headers/libraries, never pre-Retopo archives. Its67 native
 Release suites pass121.84s. Full real-loader syntheticXR117/117 passes (including
 all original96 and21 Retopo checks). Whole-core C/C++ ASan/UBSan/leaks14/14
-pass102.12s. Retopo GPU fixtures pass on actual Arc and llvmpipe. Combined native
-GUI/universal-menu/DomeD verification is in progress; inspect live jobs/logs before
-repeating. No physical-device claim is made for this newer source.
+pass102.12s. Retopo GPU fixtures pass on actual Arc and llvmpipe. Final combined
+GUI checks pass: Retopo12/12, compact2xBDF6/6, general menu53/53, Skin11/11,
+Unicode3/3 and actual latest DomeD native Wayland8/8. Test scripts were copied
+unchanged into artifacts/retopo-ui-staging with build symlinked to build-retopo,
+so the old6df3cf2 build was not accidentally exercised. All jobs are terminal.
+The staged DomeD harness needed its packaging directory symlink; the initial
+missing-file harness failure remains recorded. No physical-device or new Arc
+compute execution claim is made for this newer source.
 
 Canonical DomeD/FLTK main was rechecked at282467e727df78c8e7f2452aa05a7747bac854a6.
 Use Release toolkit22patches prefix artifacts/toolkit-282467e/lib64 explicitly;
