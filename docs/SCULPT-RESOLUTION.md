@@ -287,3 +287,15 @@ assertions. Evidence lives in this union worktree's `artifacts/validation`:
 combined source hashes, parent/fixture commits and scoped results. No system
 installation, active-session restart or physical headset launch is part of this
 private integration verification.
+
+## Published production integration
+
+Combined application803479d preservesa4af86d andfff726f, adds an independent VRM
+expression identity fix and rebuilds complete CPU/OneAPI FLTK/OpenXR consumers.
+Root proof and exact scope are in VALIDATION.md:88 native, CPU/Arc150+17 synthetic
+XR,15 whole-core sanitizer suites plus13 VRM metadata assertions,151 nativeGUI/
+compositor checks. ActualDomeD10 includes native universal-menu resolution,
+text routing, Half spacing/Apply, Volume4/physicalband save, exact layer metadata,
+Undo/Redo and Ctrl+W. Normal/compact BDF screenshots were visually inspected.
+These results do not complete production locality, occupied-support ray skipping,
+GPU resampling, full-device workflows or the full goal.

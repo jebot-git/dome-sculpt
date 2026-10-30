@@ -1,149 +1,164 @@
-# Authenticated local meshing/GPU/plane-cut verification — 2026-10-30
+# Native resolution and immutable VRM expression remap verification — 2026-10-30
 
-Application source `cf89a81c45d36c1ed538a3f24bbab56869d25e2f` combines source
-`42b2ff3` and remote `a8af3f8` with both histories retained. Test-only `91ceb04`
-changes two cut-fixture offsets; test-only `8b8dc60` adds native Unicode input
-acknowledgement. Product code/headers remain identical to cf89a81. The full
-production goal remains incomplete. Exact incoming proof is archived in
-VALIDATION-a8af3f8.md, with prior scopes retained in their original archives.
+Product source803479d7478af8e771cdc3dbb6b2d1ad72728d77 preserves maina4af86d
+and resolution/cutfff726f via5985858, then fixes the independent VRM0 bind bug.
+Test-onlyee2b57d adds an actualDomeD resolution workflow. Test-only19ad5aa fixes
+cross-protocol Unicode test ordering and adds optional burst input. No product
+code changed after803479d. The full production goal remains incomplete. Prior
+a4 proof is archived exactly in VALIDATION-a4af86d.md; earlier archives remain.
 
-Local logs and ignored binary/source/report manifest:
-`artifacts/local-cut-gpu-final-manifest-8b8dc60.json`. They do not accompany a
-fresh clone. The branch worktree is artifacts/local-cut-gpu-integration; logs
-listed below are in the parent artifacts directory. Native CPU build, full
-OneAPI build and whole-core sanitizer build use separate coherent directories.
+Ignored local manifest:
+artifacts/resolution-production-final-manifest-19ad5aa.json. It pins product/test
+hashes, binary hashes, compilers/options, reports, terminal jobs and logs. Current
+worktree artifacts/resolution-production-a4 has fresh separate coherent Release
+CPU/OneAPI and C/C++ whole-core sanitizer build directories. Logs below live in
+its parent artifacts directory and are not shipped in a fresh clone.
 
-## Toolchain and source identity
+## Builds and toolkit
 
-- Current DomeD HEAD rechecked2026-10-30:
-  282467e727df78c8e7f2452aa05a7747bac854a6. Its canonical22 patches build optimized
-  FLTK1.4.5 at artifacts/toolkit-282467e/**lib64**. CMake uses explicit FLTK_DIR
-  ending share/fltk. Saved ldd reports verify all three FLTK libraries there;
-  no Qt/GTK/Pango frontend library or unresolved dependency is linked.
-- Local CPU Intel i7-12700, GCC16.2.1; Release uses-O3/-DNDEBUG. OneAPI uses the
-  pinned official DPC++7.2 compiler5680988bb38bd45f13081394fba43588c5f5e395 and
-  archive385586a25e75ac727883f0be5e442dec0ee81b3c20f9a29037a79921ad2f1728.
-  Existing separate libumf compatibility/provenance is unchanged. Runtime uses
-  ONEAPI_DEVICE_SELECTOR=level_zero:0 and actual Arc A770; no CPU substitution.
-- Whole-core C/C++ sanitizer archives and renderer/test consumers were rebuilt
-  coherently with-O1/-g1/ASan/UBSan/frame-pointers, leak detection and halt-on-error.
-  UI is disabled for this build; direct native EGL render consumers are included.
-  An initial target-list typo stopped after existing targets; the follow-up
-  completed the correctly named mask/render/native targets before testing.
+Canonical DomeD282467e727df78c8e7f2452aa05a7747bac854a6 was rechecked at remote
+HEAD2026-10-30. Release FLTK1.4.5+22 patches is locally built under
+artifacts/toolkit-282467e, using
+**lib64**. Both app builds use explicit absolute FLTK_DIR ending share/fltk;
+linkage-resolution-production-{cpu,oneapi}.log verifies all3FLTK libraries there
+and no unresolved/Qt/GTK/Pango frontend library. Parent design conventions apply.
+No toolkit/system installation or active-session/display-manager restart occurred.
 
-## CPU Release and synthetic XR
+Local CPU is i7-12700, GCC16.2.1; native Release-O3/-DNDEBUG, four build jobs.
+OneAPI uses the pinned official DPC++7.2 compiler5680988bb38bd45f13081394fba43588c5f5e395,
+archive385586a25e75ac727883f0be5e442dec0ee81b3c20f9a29037a79921ad2f1728 and
+unchanged separate libumf compatibility provenance. Complete FLTK/OpenXR builds
+succeed; no old-header/archive ABI combination was used.
 
-All80 non-XR native suites pass in484.25s (serial run alongside other isolated
-validation). Log tests-local-cut-gpu-native.log and retained-detail.log. This is
-regression-suite wall time, not a stroke/frame performance measurement. It
-includes cut authoring/cancellation, source paint/bake/UV/material/skin/morph/VRM,
-scene/Volume compatibility, exact allocation-failure transactions, six-worker
-shutdown, local extraction/journal ownership, tiny geometry and actual GL checks.
+## Release and XR
 
-CPU real-loader synthetic report build/xr-local-cut-gpu/report.json passes
-150/150, complete=true, status=passed, failed=0; log tests-local-cut-gpu-xr.log.
-It retains all140 earlier checks and10 cut checks. Tracking is synthetic and
-EGL uses llvmpipe, while real GL textures/eye ownership, joystick/ray/pressure,
-focus/rebase/restart, accepted/unconfirmed shutdown, cancellation/source identity
-and native saved geometry are exercised. Original per-client40s limits remain.
-No physical HMD/controller/stylus/device performance claim follows.
+CPU88/88 non-XR suites pass177.13s with-j2. Log tests-resolution-production-native.log.
+This includes new Volume4/band/resolution/quality/allocations/raycast/worker/lease
+checks, all existing source/paint/UV/skin/morph/VRM/cut/geometry regressions and
+software GL fixtures. Full actual CC0female/male VRM variants include the new
+immutable original-bind regression. Suite wall times are not frame/stroke benchmarks.
 
-## Actual Arc OneAPI and rendering
+Both actual-loader tests pass in273.14s: Resolution17/17 in27.17s, main150/150
+in245.97s. Log tests-resolution-production-xr.log and -xr-detail.log. Main report
+build/xr-client/report.json has complete=true,failed=0,status=passed. Resolution
+build/resolution-xr/report.json has17 checks/failed=0; that harness does not define
+complete, so terminalCTest success closes its run. Private HOME/runtime/projects,
+synthetic tracking and real GL swapchains exercise actual native joystick/ray/
+pressure, source saves, physical band, cancellation/focus/history, original140
+checks plus10cut checks and17resolution checks. Original per-client bounds remain.
 
-Fresh complete native FLTK/OpenXR OneAPI build passes17 selected native suites
-in7.80s. Logs tests-local-cut-gpu-oneapi-native.log and -native-detail.log. Exact
-selected suites are recorded in the log, including actual sculpt/controller/
-mask kernels, local surfaces, cuts, file/geometry/shutdown regressions and the
-explicit missing-GPU failure. The compute oracle reports actual Intel Arc A770,
-184 independent endpoints,224 CPU-reference batches/445088 samples, maximum
-error8.9407e-08, bounded2M chunk/concurrency and no silent CPU fallback.
+Eligible compute uses CPU here, and GL transport uses llvmpipe; these are not
+physical headset/controller/stylus,3D-mouse or production-pacing results.
 
-The complete OneAPI real-loader run also passes150/150, complete=true/failed=0:
-build-oneapi/xr-local-cut-gpu/report.json and tests-local-cut-gpu-oneapi-xr.log.
-Its tracking/GL transport is synthetic/software, while eligible brush computation
-executes on Arc. This distinction is preserved in the manifest.
+## Actual Arc OneAPI
 
-Separate direct EGL fixtures require hardware and print actual Mesa Intel Arc
-A770/DG2. They all pass:
+Complete current OneAPI frontend passes25 selected native suites13.35s. Log
+ tests-resolution-production-oneapi-native.log identifies the exact selection:
+root17 plus raycast, resolutionallocation/values/progress/document/controller/
+resampling/authenticated-cache cases. CPU quality/resampling remains CPU work;
+eligible source construction/brush math executes actual Arc, without CPUfallback.
+The existing oracle retains184 independent endpoints,224 reference batches/
+445088 samples, maxerror8.9407e-08, chunk/concurrency and explicit no-GPU rejection.
+A final standalone actualArc run retains its exact device/numeric output in
+tests-resolution-production-oneapi-oracle.log (exit0); no pacing claim follows.
 
-| Fixture | Assertions | Log suffix after tests-local-cut-gpu-oneapi- |
+Both real-loader runs pass297.61s: Resolution17/17 in29.41s and main150/150 in268.19s.
+Logs tests-resolution-production-oneapi-xr.log and -xr-detail.log; corresponding
+build-oneapi/{resolution-xr,xr-client}/report.json reports17/150,failed=0, with main
+complete=true. Compute is actualArcA770/LevelZero; tracking and GL transport are
+synthetic/software. This is not a GPU resampling or physical device claim.
+
+Separate direct EGL fixtures explicitly require hardware and print actual Mesa
+Intel ArcA770/DG2. All pass, with log suffix after tests-resolution-production-oneapi-:
+
+| Fixture | Assertions | Suffix |
 | --- | ---: | --- |
-| Actual Document → GL buffers |22| document-arc.log |
-| Buffer traffic/UV1/cache/error recovery |24| buffers-arc.log |
-| PBR/MToon/linear/outline/clipping |81| mtoon-arc.log |
-| Protection/mirrors/scalar overlay |38| masks-arc.log |
+| Actual Document→GL |22| document-arc.log |
+| Static/scalar VBO/UV1/error recovery |24| buffers-arc.log |
+| PBR/MToon/linear/clip/outline |81| mtoon-arc.log |
+| Mask/symmetry overlay |38| masks-arc.log |
 | Material visibility/picking |25| visibility-arc.log |
 
-The actual Document fixture wraps real glBufferData and checks independent
-pixels. Mask/material/texture-only edits retain geometry, a real local Carve
-invalidates it, object transforms reuse extraction but update world buffers,
-cap geometry gets a unique key, the second eye reuses it, cap-free planes update
-uniforms without geometry uploads and Cancel restores exact pixels/source/key.
-Scalar streams still upload on changed snapshots; geometry edits still upload
-complete arrays. No per-tile GPU, frame-rate or production completion claim.
+Actual glBufferData traffic and pixels prove unchanged mask/material/paint paths
+reuse geometry, genuine field/transform/cap changes refresh it, second eye/clip-only
+reuse and exact cancellation work. Full packed assembly/uploads for geometry
+changes still remain; no tile-GPU/frame-rate/full-production claim follows.
 
-## Whole-core sanitizers
+## Whole-core sanitizers and VRM regression
 
-24/24 pass345.57s with ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 and
-UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1. Logs
-build-local-cut-gpu-sanitize.log, -sanitize-render.log,
-tests-local-cut-gpu-sanitize.log and -sanitize-detail.log. The first build log's
-unknown target is the corrected invocation typo described above, not a passing
-build claim. All archives/tests in the executed set match current headers/core.
+Fresh C/C++ core (including xatlas/Mikk), render and matching consumers compile
+-O1/-g1/-DNDEBUG withASan/UBSan/frame-pointers. ASAN_OPTIONS=detect_leaks=1:halt_on_error=1,
+UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1. All15 focused CTests pass121.31s:
+cutauthoring/cancellation, raycast, resolutionallocation/values/progress/document/
+controller/resampling/authenticated-cache, maskcontroller/document, six-worker
+shutdown, authenticatedlocalmeshing and actualDocument→GL. Native UI is off;
+direct EGL render is enabled. Logs build-resolution-production-sanitize.log,
+tests-resolution-production-sanitize.log and -sanitize-detail.log.
 
-Coverage: cut-authoring/cancellation-boundaries, controller-controls,
-texture-painting, scene-authoring, shared-document, mesh-degeneracy, all five
-mask/controller/document/symmetry/dispatch/transaction tests, sculpt-geometry,
-sculpt-layers, bake, scene-schema-compat, six-worker shutdown, local-surface,
-authenticated-local-surface, actual Document buffers, renderer buffers, mask
-renderer, MToon renderer and visibility/picking. The ordered asset cancellation
-barrier and real allocation-failure/rollback cases remain active.
+Then the fast VRMmetadata program passes all13 assertions under the same whole-core
+sanitizers/leak settings: tests-resolution-production-vrm-metadata-sanitize.log.
+The broad avatar female/male path is separately in the full Release run.
 
-## Native GUI and actual DomeD compositor
+Independent old-code regression: new testcompiled against its matching a4 source
+headers and frozen coherent cf89/a4 Release archive exits1 after the original3
+passing assertions: expression target outside source table. No resolution/Volume4
+headers were mixed into that old archive check. Logs
+build-vrm-original-bind-old-regression.log /tests-vrm-original-bind-old-regression.log.
+With the fix, two emitted meshes use maps{1,2} and{0,1} for originaltarget1,
+producing2,1 while originalmetadata stays exact. Every emitted bind starts from
+immutable source_bind; a prior output cannot mutate the next input index.
 
-All125 assertions pass across private buses/displays/projects; no active session
-was restarted. Normal/compact cut screenshots were inspected. Logs:
+## Native GUI/compositor and Unicode ordering
 
-| Workflow | Assertions | Log suffix after tests-local-cut-gpu- |
+All151 primary assertions pass across private displays/buses/projects. Normal
+and compact resolution screenshots were visually inspected. Optional orchestration
+uses existing cached uv withdbus-next/python-xlib/Pillow, not product dependencies.
+Use explicit canonical lib64 runtime; no system Python package install occurred.
+Actual DomeD tests use frozen canonical282 compositor binary; teardown GVFS/bus
+messages do not change successful terminal statuses or reports.
+
+| Workflow | Assertions | Log suffix after tests-resolution-production- |
 | --- | ---: | --- |
-| General FLTK/universal menu |53| menu-final.log |
-| Native cut workspace |12| cut-menu.log |
-| Compact640×360/2×BDF cut controls |6| cut-compact.log |
-| Mask/symmetry/worker/history |17| mask-menu.log |
-| Compact mask controls |5| mask-compact.log |
-| Native skin/bind/transfer |11| skin-menu.log |
-| Unicode keyboard/clipboard/save/history |4| unicode-acknowledged.log |
-| Actual DomeD Wayland mask menu |9| mask-wayland.log |
-| Actual DomeD Wayland/menu/history |8| wayland.log |
+| FLTK resolution |12| menu-resolution.log |
+| Compact2×BDF resolution |4| menu-resolution-compact-final.log |
+| General menu |53| menu-general.log |
+| Cuts normal/compact |12/6| menu-cut.log /menu-cut-compact.log |
+| Masks normal/compact |17/5| menu-mask.log /menu-mask-compact.log |
+| Native skin |11| menu-skin.log |
+| Exact Unicode/native clipboard/history/save |4| menu-unicode-final.log |
+| Actual DomeD resolution |10| wayland-resolution.log |
+| Actual DomeD masks |9| wayland-mask.log |
+| Actual DomeD general/history/Window |8| wayland-general.log |
 
-Optional Python orchestration uses cached uv environments with dbus-next,
-python-xlib and Pillow; these are not product runtime dependencies. The actual
-DomeD compositor is the local canonical282467e release. GVFS/private-bus teardown
-messages do not replace assertions or process status; both compositor commands
-exit0 and reports pass. General menu behavior retains shell-owned Window actions,
-Ctrl+W modal cancellation, native appearance/BDF and application identity.
+Actual compositor resolution proof uses Super+F10/header/row navigation to native
+controls, modal identity/availability, ReturnCancel, universal textCopy/FileClose,
+Halfspacing/Apply, saved20mmVolume4 with original.16m band/layer metadata, exact
+singleUndo/Redo andCtrl+W cancellation retaining the app/source. Native compact
+controls fit640×360 with2×BDF and reachable scrolling/Cancel/Apply.
 
-An initial system-python invocation lacked optional dbus-next and stopped before
-GUI startup. After using the existing cached environment, an initial Unicode run
-saved one missing injected character. Inspection showed the temporary keymap was
-restored after XSync, which acknowledges only the server. An unchanged isolated
-run passed; the strengthened fixture retains the map until the actual native
-UTF-8 clipboard returns every expected character. It passes4 checks, including
-the original exact model/clipboard/history/save assertions. Earlier failure and
-isolated logs are retained; no product Unicode code or expected bytes were relaxed.
+One initial compact invocation used the wrong test-only environment variable and
+ran normal12checks again; only the later correctly configured4-check compact run
+above is counted. An inherited Unicode fixture failed at exact clipboard equality:
+keymap lifetime alone did not order X11 typing versus menu D-Bus callbacks. The
+new harness copies via the SAME native keyboard queue, waits for new clipboard
+ownership and exactUTF8data, then exercises universalSelectAll/Copy/Cut/Paste.
+It keeps all original expectedbytes/model/history/save assertions. A prior ordered
+normal run and final current normal run pass4; three fresh optional burst runs
+(no inter-key sleep) also pass4 each. Logs menu-unicode-ordered.log,
+menu-unicode-burst-{1,2,3}.log retain the stress scope; the original failure log
+menu-unicode.log is retained. No product Unicode code or expected data was relaxed.
 
-## Earlier performance and physical scope
+## Scope and continuation
 
-Pre-cut42b2ff3 has its own immutable manifest
-artifacts/local-gpu-final-manifest-42b2ff3.json:78 native/CPU140/Arc140/Arc15native,
-Document15/buffer24 and nativeGUI/compositor evidence. Authenticated producer886
-has separate21-suite whole-core sanitizer proof and actual24-edit API-to-ready
-measurements in AUTHENTICATED-LOCAL-MESHING.md. Those timings compare against
-extraction-only oracles, not a baseline Document/GPU frame time, and do not apply
-as production guarantees to this combined source.
+Resolution layer/topology/quality, physicalband and source preservation are bounded
+CPU functionality. Fine rays still need conservative empty/candidate support skip;
+production highresolution/sustained strokes, paged storage/seventh-worker/frame
+integration, COLOR_0 and full required import/export/device/accelerator work remain
+open. New discoveries about history-publication allocation staging are being
+hardened in the private desktop-worker branch; current tests do not prove every
+possible global Document allocation boundary.
 
-Only8f4d67d has the user's rudimentary physical WiVRn confirmation. That test was
-ended and recovery snapshots/report retained. No new physical test, installation,
-session/display-manager restart, AMD/CUDA execution or full production completion
-is claimed. Remaining requirements, private branches and bottlenecks are explicit
-in HANDOFF.md and REQUIREMENTS.md.
+Only old8f4d67d has the user's rudimentary physical WiVRn confirmation; that test
+was ended. No new HMD test/system install/session restart/AMD-CUDAexecution or
+full-goal completion is claimed. Keep the full requirements matrix and all exact
+old proof scopes intact while committing/pushing subsequent verified milestones.
