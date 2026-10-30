@@ -86,10 +86,48 @@ PolygonDrawData display_data(const PolygonMesh &mesh,
           selected_edges.insert(std::minmax(a, b));
         }
     }
+  std::map<PolygonId, Vec3> positions;
+  for (auto &v : mesh.vertices()) {
+    visit();
+    positions.emplace(v.id, v.position);
+  }
+  std::map<PolygonId, Vec3> coefficients;
+  for (auto &face : mesh.faces()) {
+    std::array<double, 3> n{}, k{};
+    auto origin = positions.at(face.corners[0].vertex);
+    for (size_t i = 0; i < face.corners.size(); ++i) {
+      visit();
+      auto a = face.corners[i].vertex,
+           b = face.corners[(i + 1) % face.corners.size()].vertex;
+      auto pa = positions.at(a), pb = positions.at(b);
+      std::array<double, 3> x{double(pa.x) - origin.x, double(pa.y) - origin.y,
+                              double(pa.z) - origin.z},
+          y{double(pb.x) - origin.x, double(pb.y) - origin.y,
+            double(pb.z) - origin.z};
+      n[0] += x[1] * y[2] - x[2] * y[1];
+      n[1] += x[2] * y[0] - x[0] * y[2];
+      n[2] += x[0] * y[1] - x[1] * y[0];
+      for (size_t axis = 0; axis < 3; ++axis)
+        k[axis] += (vertices.contains(a) ? y[axis] : 0) -
+                   (vertices.contains(b) ? x[axis] : 0);
+    }
+    double length = std::hypot(n[0], n[1], n[2]);
+    if (!(length > 0))
+      throw std::invalid_argument("Polygon preview face has no area normal");
+    Vec3 c{float(k[0] / length), float(k[1] / length), float(k[2] / length)};
+    if (!finite(c))
+      throw std::length_error(
+          "Polygon normal preview exceeds its representable scale");
+    for (auto &corner : face.corners) {
+      visit();
+      coefficients.emplace(corner.id, c);
+    }
+  }
   std::map<PolygonId, uint32_t> first;
   for (size_t i = 0; i < surface.vertices.size(); ++i) {
     visit();
     first.emplace(surface.vertices[i], uint32_t(i));
+    out.normal_coefficients.push_back(coefficients.at(surface.corners.at(i)));
     out.move_weights.push_back(vertices.contains(surface.vertices[i]) ? 1.f
                                                                       : 0.f);
   }

@@ -1,10 +1,10 @@
 # Native polygon editing
 
 This is an extension of Dome Sculpt's existing native authoring model. The
-current checkpoint implements the detached polygon kernel; native desktop/XR
-workspace, Scene12 authority, retained-source conversion, held-object guards and
-actual interactive validation remain required. It does not claim a complete
-polygon workflow from a command-line kernel test.
+current checkpoint implements the detached N-gon kernel, immutable component
+workspace and direct OpenGL preview. Native desktop/XR controls, Scene12
+authority, retained-source conversion and actual interactive validation remain
+required. This is an implementation checkpoint, not a completed polygon UI.
 
 ## Authority and operations
 
@@ -112,8 +112,8 @@ complete topology command is prepared before its local history node is accepted.
 Continuous Move publishes only total displacement and the worker-prepared vertex
 mask; CPU triangles, normals, UVs and BVH keep the same owners during motion.
 Accepted End validates and reconstructs final authoritative geometry once.
-An invalid/rejected End retains explicit Cancel ownership. This is GPU-ready
-preview data; an actual GPU renderer and frontend routing are still pending.
+An invalid/rejected End retains explicit Cancel ownership. The direct GPU
+renderer consumes these immutable snapshots; frontend routing remains pending.
 
 The workspace owns no Document/model authority and does not perform Scene
 publication on its own. The central held-object API from `9f188b5` is integrated
@@ -121,8 +121,10 @@ on private merge `aa5b026` (with VRoid baseline `47e49217`); a fresh core and th
 polygon/holding native tests pass3/3 in0.37s. Existing stored lock/material flags
 remain independent of held isolation. Future Document integration must route
 component admission and publication through the central editable predicate and
-edit-authority epoch, cancel on authority changes and block object-grab motion
-while a changed/unaccepted component draft exists.
+edit-authority epoch and cancel on authority changes. Simultaneous physical
+holding/editing additionally requires object-local rays, the GPU effective world
+transform and a proved same-object transform rebase. Pinned-only editing must
+remain an explicit limitation until that integration is implemented.
 
 The exact workspace implementation passes29 native checks and3,229 individually
 injected allocation boundaries (1,925 topology-command;1,304 accepted Move-End),
@@ -134,3 +136,35 @@ actual BVH selection, immutable preview owners, one local gesture transition,
 source persistence, canceled and rejected gestures, empty-mesh Undo and ID
 retirement across branching. No actual FLTK, XR, GPU or Scene12 source-conversion
 completion is claimed by these workspace tests.
+
+## Direct GPU preview checkpoint
+
+`PolygonRenderer` keeps immutable geometry and selection stores in VRAM. Each
+continuous move changes total displacement uniforms only: no geometry/scalar
+upload, mapping or readback occurs in either eye. Worker-prepared coefficients
+update each N-gon area normal analytically as
+`N(delta) = N(0) + cross(delta, coefficient)`. Accepted End reconstructs CPU
+authority once; Cancel and local Undo retain the exact old immutable owners.
+Geometry and selection buffer replacements are staged, and an actual injected
+GL allocation error leaves the old stores drawable and retryable.
+
+Triangles/wires and vertex markers use separate shader programs. A shared
+fragment shader branching on both triangle lighting and `gl_PointCoord` lost
+all selected markers on the tested Intel Arc path, while software rendering
+passed. Dedicated marker shading passes the original strict actual-pixel
+oracle without buffer reads, synchronization barriers, flushes or special
+hardware tolerances. This identifies a reliable rendering arrangement; it does
+not claim a diagnosed upstream driver defect.
+
+The fresh `1f47279`-based coherent Release core passes all five polygon suites:
+52 kernel checks, 3,132 kernel allocation boundaries, 29 workspace checks,
+3,326 workspace allocation boundaries (1,984 command; 1,342 accepted End), and
+25 actual GPU checks. The graphical suite passes on software OpenGL and Intel
+Arc A770. It checks independent cube coverage, stereo reuse, continuous movement,
+Cancel/Undo, real GL failure/retry, invalid attributes, actual red vertex pixels,
+partial-vertex lighting and exact preview-to-accepted pixels, linear output,
+alpha and surrounding GL state. Final screenshots are retained in
+`artifacts/polygon-gpu-captures-{software,arc}` and were visually inspected.
+The same five suites pass with complete own C/C++ core, support libraries and
+renderer instrumented by ASan/UBSan and leak detection in14.12s, with no reports.
+These are direct renderer/model proofs, not FLTK/XR workflow proofs.

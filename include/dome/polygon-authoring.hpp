@@ -6,6 +6,9 @@
 namespace dome {
 struct PolygonDrawData {
   std::vector<float> move_weights;
+  // For each packed corner, N(delta) = N(0) + cross(delta, coefficient).
+  // Prepared once per selection; the shader updates N-gon normals per motion.
+  std::vector<Vec3> normal_coefficients;
   std::vector<uint32_t> wire_indices, selected_edges, selected_points;
   Vec3 selection_center{};
   bool has_selection = false;

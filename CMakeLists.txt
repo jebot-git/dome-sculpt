@@ -217,8 +217,18 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR)
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(NATIVEGL REQUIRED IMPORTED_TARGET egl gl freetype2 fontconfig harfbuzz icu-i18n icu-uc)
   add_library(dome-sculpt-render src/render.cpp src/palette.cpp src/palette-text.cpp third_party/openbrush/graphics.cpp)
+  target_sources(dome-sculpt-render PRIVATE src/polygon-render.cpp)
   target_link_libraries(dome-sculpt-render PUBLIC dome-sculpt-core PkgConfig::NATIVEGL)
   if(BUILD_TESTING)
+    add_executable(dome-sculpt-polygon-render-test tests/polygon-render.cpp)
+    target_link_libraries(dome-sculpt-polygon-render-test PRIVATE dome-sculpt-render)
+    target_link_options(dome-sculpt-polygon-render-test PRIVATE
+      -Wl,--wrap=glBufferData -Wl,--wrap=glBufferSubData
+      -Wl,--wrap=glGetBufferSubData -Wl,--wrap=glMapBuffer -Wl,--wrap=glMapBufferRange
+      -Wl,--wrap=glReadPixels -Wl,--wrap=glGenBuffers -Wl,--wrap=glDeleteBuffers
+      -Wl,--wrap=glGenVertexArrays -Wl,--wrap=glDeleteVertexArrays)
+    add_test(NAME polygon-render COMMAND dome-sculpt-polygon-render-test)
+    set_tests_properties(polygon-render PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
     pkg_check_modules(RENDERFONTS REQUIRED IMPORTED_TARGET fontconfig zlib)
     add_executable(dome-sculpt-appearance-test tests/appearance.cpp src/session-appearance.cpp)
     target_include_directories(dome-sculpt-appearance-test PRIVATE third_party/desktop)
