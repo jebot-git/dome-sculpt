@@ -1224,7 +1224,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
     throw std::runtime_error("Invalid paint resolution");
   PaintSurfaceOptions surface_options;
   if(j.contains("uv_policy")){
-    if(j.at("uv_policy")!="source-authored"||!j.contains("source_maps"))throw std::runtime_error("Invalid persisted source UV policy");
+    if((!j.at("uv_policy").is_string() || j.at("uv_policy").get_ref<const std::string&>()!="source-authored")||!j.contains("source_maps"))throw std::runtime_error("Invalid persisted source UV policy");
     surface_options.policy=PaintUvPolicy::SourceAuthored;
   }
   auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options));

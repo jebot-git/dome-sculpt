@@ -10,7 +10,7 @@ struct VolumeHeader {
 // Header-only validation precedes any lattice/paint allocation, both for flat
 // Volume files and every nested Volume in Scene aggregate storage preflight.
 inline VolumeHeader volume_header(const nlohmann::json &j) {
-  if (!j.is_object() || j.at("format") != "dome-sculpt" ||
+  if (!j.is_object() || (!j.at("format").is_string() || j.at("format").get_ref<const std::string &>() != "dome-sculpt") ||
       !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported project format");
   auto version = j.at("version").get<int64_t>();

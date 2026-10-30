@@ -242,9 +242,10 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     output.origins_.push_back(std::move(origin));
   }
   for(const auto &value:input.at("bindings")) {
-    if(value.at("normal_frame")!="uv-derivative" && (!extended || value.at("normal_frame")!="original-attributes"))throw std::runtime_error("Unsupported derived material normal frame");
+    const auto &frame=value.at("normal_frame");
+    if(!frame.is_string() || (frame.get_ref<const std::string&>()!="uv-derivative" && (!extended || frame.get_ref<const std::string&>()!="original-attributes")))throw std::runtime_error("Unsupported derived material normal frame");
     auto binding=std::make_shared<SourceMaterialBindings>();
-    if(value.at("normal_frame")=="original-attributes")binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
+    if(frame.get_ref<const std::string&>()=="original-attributes")binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
     if(extended && !value.at("frames").is_null())binding->normal_frames=frames.at(uint32_t(index(value.at("frames"),frames.sets().size())));
     binding->has_mtoon=!value.at("material").is_null();
     if(binding->has_mtoon)binding->material=MToonMaterial::decode(value.at("material"));

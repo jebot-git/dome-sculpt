@@ -55,7 +55,7 @@ add_library(dome-sculpt-core src/volume.cpp src/volume-raycast.cpp src/sculpt-ma
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-transaction.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/document-cut.cpp)
-target_sources(dome-sculpt-core PRIVATE src/polygon-authoring.cpp src/polygon-source.cpp)
+target_sources(dome-sculpt-core PRIVATE src/polygon-authoring.cpp src/polygon-source.cpp src/polygon-scene.cpp)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)
 target_compile_definitions(dome-sculpt-core PRIVATE
   DOME_SCULPT_SOURCE_ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid"
@@ -750,4 +750,16 @@ if(BUILD_TESTING)
  target_link_libraries(dome-sculpt-object-hold-edit-test PRIVATE dome-sculpt-core)
  add_test(NAME object-hold-edit COMMAND dome-sculpt-object-hold-edit-test)
  set_tests_properties(object-hold-edit PROPERTIES TIMEOUT 120)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-polygon-scene-test tests/polygon-scene.cpp)
+  target_link_libraries(dome-sculpt-polygon-scene-test PRIVATE dome-sculpt-core)
+  add_test(NAME polygon-scene-archive COMMAND dome-sculpt-polygon-scene-test)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-polygon-scene-faults-test tests/polygon-scene-faults.cpp)
+  target_link_libraries(dome-sculpt-polygon-scene-faults-test PRIVATE dome-sculpt-core)
+  add_test(NAME polygon-scene-faults COMMAND dome-sculpt-polygon-scene-faults-test)
 endif()
