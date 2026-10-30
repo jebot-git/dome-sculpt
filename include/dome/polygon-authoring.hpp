@@ -37,7 +37,8 @@ public:
   void clear_selection(const PolygonLimits & = {});
   bool select_ray(Vec3 origin, Vec3 direction, float maximum_distance,
                   float component_radius, bool additive = false,
-                  bool toggle = false, const PolygonLimits & = {});
+                  bool toggle = false, const PolygonLimits & = {},
+                  bool preserve_selected_group = false);
   void apply(PolygonOperation, Vec3 delta = {}, float amount = 0,
              unsigned cuts = 1, const PolygonLimits & = {});
   void begin_move();

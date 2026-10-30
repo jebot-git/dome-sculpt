@@ -34,6 +34,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
     throw std::logic_error("The asset editor source changed; reopen the editor");
   if (state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked())
     throw std::logic_error("Finish the current action before starting asset work");
+  if(state_.polygon)throw std::logic_error("Apply or cancel polygon editing before starting asset work");
   if (state_.retopology && (!retopo_session || retopo_session != retopo_session_.load()))
     throw std::logic_error("Apply or cancel retopology before starting asset work");
   if (state_.cut && (!cut_session || cut_session != cut_session_.load()))

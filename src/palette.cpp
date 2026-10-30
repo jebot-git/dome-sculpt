@@ -263,6 +263,9 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::ProceduralSeed)label="Seed "+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::ProceduralDepth){char text[64];snprintf(text,sizeof(text),"Depth %.4g world mm",double(value));label=text;}
       else if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
+      else if(c.parameter==VrParameter::PolygonConversion)label=value>=1.5f?"Restore retained original source":value>=.5f?(s.polygon_requires_conversion?"Convert visible shape / retain source":"Edit current native polygons"):"Cancel (default)";
+      else if(c.parameter==VrParameter::PolygonDistance){char size[64];snprintf(size,sizeof(size),"Distance %.6g world mm",double(value));label=size;}
+      else if(c.parameter==VrParameter::PolygonCuts)label="Cuts "+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::ImportUnitScale){char unit[80];snprintf(unit,sizeof(unit),"%.7g metres per input unit",double(value));label=unit;}
       else if(c.parameter==VrParameter::SculptResolution) {
         char spacing[80];snprintf(spacing,sizeof(spacing),"Spacing %.6g world mm",double(value));label=spacing;
@@ -388,6 +391,11 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 10)
         return s.paint.erase;
     }
+    if(s.menu_page==19){
+      if(sector==4)return s.polygon_controls.move_mode;
+      if(sector==5)return s.polygon_controls.additive;
+      if(sector>=1&&sector<=3)return s.polygon&&s.polygon->selection&&int(s.polygon->selection->mode)==sector-1;
+    }
     if (s.menu_page == 7 && sector == 3)
       return s.sculpt_layer_visible;
     if (s.menu_page == 7 && sector == 4)
@@ -412,7 +420,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    const std::string label = s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -444,11 +452,11 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page != 21 && s.menu_page != 23) {
+  if (s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -464,6 +472,11 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==19||s.menu_page==22){
+    auto p=s.polygon;
+    text(320*unit_,280*unit_,!p?(s.polygon_requires_conversion?"Explicit conversion; original retained":"Start native N-gon editing"):p->committing?"Applying topology + captured pose...":p->busy?"Updating components...":std::to_string(p->selection?p->selection->ids.size():0)+" selected / "+std::to_string(p->topology?p->topology->faces().size():0)+" faces",fg);
+    text(320*unit_,312*unit_,!p?"Cancel is the conversion default":s.polygon_controls.move_mode?"Aim + trigger moves selected components":"Aim + trigger selects visible components",fg);
+  }
   if(s.menu_page==18) {
     const auto &o=s.procedural_options;
     const char *patterns[]={"Raised panels","Recessed cuts","Mixed detail"};
@@ -555,6 +568,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_visible) +
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature+=":polygon:"+std::to_string(s.polygon_requires_conversion)+":"+std::to_string(s.polygon_has_source)+":"+std::to_string(s.polygon_controls.move_mode)+":"+std::to_string(s.polygon_controls.additive)+":"+std::to_string(s.polygon_controls.distance_mm)+":"+std::to_string(s.polygon_controls.cuts);
+  if(s.polygon)signature+=":"+std::to_string(s.polygon->revision)+":"+std::to_string(s.polygon->busy)+":"+std::to_string(s.polygon->committing)+s.polygon->error;
   signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
   if(s.importing)signature+=":import:"+std::to_string(s.importing->request)+":"+std::to_string(s.importing->selected)+":"+std::to_string(s.importing->busy)+s.importing->directory.string()+s.importing->error+
     std::to_string(int(s.importing->settings.choices.format))+std::to_string(s.importing->settings.choices.materials)+std::to_string(std::bit_cast<uint64_t>(s.importing->settings.choices.custom_metres_per_unit))+std::to_string(int(s.importing->settings.choices.units))+std::to_string(int(s.importing->settings.choices.axes))+std::to_string(int(s.importing->settings.choices.normals))+std::to_string(s.importing->settings.paint_resolution);

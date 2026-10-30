@@ -12,6 +12,7 @@
 #include "sculpt-resolution.hpp"
 #include "procedural-sculpt.hpp"
 #include "retopo-authoring.hpp"
+#include "polygon-controls.hpp"
 #include "cut-authoring.hpp"
 #include "native-stroke.hpp"
 #include <atomic>
@@ -122,6 +123,11 @@ struct EditorState {
   int opacity = 255;
   bool object_grab_mode=false, isolate_held=false, object_grabbing=false;
   uint64_t held_object=0, edit_authority=1;
+  std::shared_ptr<const PolygonView> polygon, polygon_handoff;
+  uint64_t polygon_object = 0, polygon_handoff_object = 0,
+      polygon_handoff_generation = 0, polygon_handoff_revision = 0;
+  PolygonControls polygon_controls;
+  bool can_polygon = false, polygon_requires_conversion = false, polygon_has_source = false;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -253,6 +259,13 @@ public:
   void begin_uv();
   void edit_uv(UvAction, float x = 0, float y = 0);
   void end_uv(bool accept);
+  void begin_polygon(bool convert_source = false, AssetSource expected = {});
+  void edit_polygon(PolygonAction);
+  void configure_polygon(PolygonControls);
+  void polygon_pointer(Vec3 origin, Vec3 direction, PolygonAction, bool additive = false);
+  void end_polygon(bool accept);
+  void restore_polygon_source(AssetSource expected = {});
+  bool wait_polygon(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void begin_retopology();
   void edit_retopology(RetopoAction);
   void end_retopology(bool accept);
@@ -400,6 +413,58 @@ private:
   void cut_from_hand_locked();
   void cut_loop();
   float control_resolution_voxel_ = .03f;
+  AssetSource polygon_source_{};
+  std::shared_ptr<const Scene> polygon_initial_;
+  std::atomic<uint64_t> polygon_session_{0};
+  bool polygon_stroking_ = false;
+  uint32_t polygon_owner_ = 0;
+  std::atomic_bool polygon_accepting_{false};
+  std::atomic<size_t> polygon_pending_{0};
+  struct PolygonAccept {
+    mutable std::mutex mutex;
+    std::condition_variable changed;
+    bool done = false, success = false, held_pose = false;
+    std::shared_ptr<const Scene> before, completed, original;
+    std::shared_ptr<AssetWork> work;
+    AssetSource source;
+    uint64_t content = 0, revision = 0, isolation_target = 0;
+    RecoverySource recovery_source;
+    CanvasTransform pose{};
+    std::array<bool,2> grips{};
+    std::exception_ptr error;
+  };
+  std::shared_ptr<PolygonAccept> polygon_accept_;
+  bool polygon_closing_ = false, polygon_predicate_locked_ = false;
+  std::array<bool,2> polygon_grip_latch_{};
+  struct PolygonJob {
+    uint64_t session = 0;
+    std::shared_ptr<const Scene> initial;
+    std::shared_ptr<PolygonAccept> acceptance;
+    std::optional<PolygonAction> action;
+    Vec3 origin{}, direction{};
+    float radius = .015f, amount = .01f, maximum = 100;
+    unsigned cuts = 1;
+    bool accept = false, convert_source = false, additive = false;
+  };
+  mutable std::mutex polygon_mutex_;
+  mutable std::condition_variable polygon_changed_;
+  std::deque<PolygonJob> polygon_jobs_;
+  void begin_polygon_locked(bool convert_source);
+  void end_polygon_locked(bool accept);
+  void cancel_polygon_locked(bool cancel_acceptance = true);
+  void complete_polygon_accept(const std::shared_ptr<PolygonAccept> &, bool success,
+      std::shared_ptr<const Scene> = {}, uint64_t content = 0, uint64_t revision = 0, std::exception_ptr = {});
+  void drain_polygon_shutdown();
+  bool held_polygon_pending_locked() const;
+  void queue_polygon_locked(PolygonJob, bool coalescible = false);
+  void polygon_pointer_locked(Vec3, Vec3, PolygonAction, bool xr, bool additive = false, uint32_t owner = 0);
+  bool polygon_source_matches_locked() const;
+  void rebase_polygon_transform_locked();
+  void restore_polygon_source_locked(AssetSource);
+  void polygon_loop();
+  void process_polygon_pointer_locked(const SpatialFrame &);
+  bool polygon_command_enabled_locked(SpatialCommand) const;
+  void polygon_command_locked(SpatialCommand);
   float retopo_snap_mm_ = 50, control_retopo_mm_ = 50;
   AssetSource retopo_source_{};
   std::atomic<uint64_t> retopo_session_{0};
@@ -445,6 +510,7 @@ private:
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
   struct FileJob;
+  void capture_polygon_file(FileJob &);
   struct NativeStroke {
     uint64_t epoch = 0;
     AssetSource source;
@@ -530,6 +596,7 @@ private:
     uint64_t edit_authority=0,isolation_target=0;
     bool discover_import=false;
     uint64_t import_request=0;
+    std::shared_ptr<PolygonAccept> polygon_capture;
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
@@ -537,7 +604,7 @@ private:
   std::deque<FileJob> files_;
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
-  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_, cut_thread_, native_thread_;
+  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_, cut_thread_, native_thread_, polygon_thread_;
   void discover_import_file(const FileJob &);
   void import_listing_error(const FileJob &,const std::exception &);
   void request_worker_stop();

@@ -2,6 +2,7 @@
 #include "dome/retopo-authoring.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-scene-archive.hpp"
+#include "polygon-paint-authority.hpp"
 #include "text-utf8.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
@@ -185,6 +186,7 @@ uint32_t PolygonSceneArchive::add(std::shared_ptr<const PolygonAuthority> value,
           o->material.validate();
           validate_transform(o->world_transform);
           insert(volumes_, o->volume);
+          require_polygon_paint_owner(o->paint.get(),o->polygon.get(),o->mesh_active);
           if (o->paint) {
             if (o->paint->in_stroke())
               throw std::invalid_argument(
@@ -328,6 +330,13 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       polygon_archive_index(o.at("painted"), j.at("paints").size());
     if (!o.at("polygon").is_null())
       polygon_archive_index(o.at("polygon"), aa.size());
+    if(!o.at("painted").is_null()&&polygon_paint_policy(j.at("paints")[polygon_archive_index(o.at("painted"),j.at("paints").size())])){
+      if(o.at("mesh_active")!=true||o.at("polygon").is_null())
+        throw std::invalid_argument("Retained polygon-authored paint requires its own active authority");
+      auto authority=polygon_archive_index(o.at("polygon"),aa.size());
+      if(aa[authority].at("active")!=true||aa[authority].at("topology").at("faces").empty())
+        throw std::invalid_argument("Retained polygon-authored paint has inactive authority");
+    }
     if (o.at("painted").is_null() &&
         (o.at("mesh_active") == true || !o.at("deformation").is_null() ||
          !o.at("appearance").is_null() ||
@@ -387,7 +396,7 @@ PolygonSceneArchive PolygonSceneArchive::decode(
   for (const auto &v : j.at("volumes"))
     out.volumes_.push_back(std::make_shared<const Volume>(Volume::decode(v)));
   for (const auto &p : j.at("paints"))
-    out.paints_.push_back(PaintedMesh::decode(p, &images));
+    out.paints_.push_back(PaintedMesh::decode(p, &images, true));
   std::vector<std::shared_ptr<PolygonAuthority>> authorities;
   std::vector<std::shared_ptr<PolygonOrigin>> origins;
   for (const auto &a : j.at("authorities")) {

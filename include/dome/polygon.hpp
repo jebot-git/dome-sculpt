@@ -91,6 +91,7 @@ private:
   PolygonId next_ = 1;
   friend struct PolygonKernel;
   friend struct PolygonSourceAccess;
+  friend struct PolygonConversionAccess;
   friend PolygonEditResult
   edit_polygon(const PolygonMesh &, const PolygonEdit &, const PolygonLimits &);
 };

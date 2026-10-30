@@ -33,7 +33,7 @@ enum class VrParameter {
   RetopoDistance,
   CutOffset, CutDirection, CutCapColor,
   SculptMaskMode, SculptMaskStrength, SculptPlanes, SculptResolution,
-  ProceduralPattern, ProceduralFace, ProceduralGrid, ProceduralCoverage, ProceduralDepth, ProceduralSeed, BakeProjection, ImportUnitScale
+  ProceduralPattern, ProceduralFace, ProceduralGrid, ProceduralCoverage, ProceduralDepth, ProceduralSeed, BakeProjection, ImportUnitScale, PolygonDistance, PolygonCuts, PolygonConversion
 };
 inline bool procedural_parameter(VrParameter p) {
   return p>=VrParameter::ProceduralPattern && p<=VrParameter::ProceduralSeed;

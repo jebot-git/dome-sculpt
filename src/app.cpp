@@ -20,6 +20,8 @@
 #include "bake-editor.hpp"
 #include "ui-conventions.hpp"
 #include "uv-editor.hpp"
+#include "polygon-editor.hpp"
+#include "polygon-view-render.hpp"
 #ifdef DOME_HAS_XR
 #include "dome/xr.hpp"
 #endif
@@ -70,6 +72,7 @@ struct Canvas : Fl_Gl_Window {
   Document document;
   std::unique_ptr<SurfaceRenderer> renderer;
   std::unique_ptr<CursorRenderer> cursors;
+  std::unique_ptr<PolygonRenderer> polygons;
   std::shared_ptr<const MeshSnapshot> shown_mesh;
   Quat rotation{};
   Vec3 pan{};
@@ -91,6 +94,7 @@ struct Canvas : Fl_Gl_Window {
     if (renderer) {
       make_current();
       cursors.reset();
+      polygons.reset();
       renderer.reset();
     }
   }
@@ -117,7 +121,14 @@ struct Canvas : Fl_Gl_Window {
     return trackball((2 * (x - this->x()) - w()) / size,
                      (h() - 2 * (y - this->y())) / size);
   }
-  bool native_stroke=false, suppress_drag=false, object_drag=false;
+  bool native_stroke=false, suppress_drag=false, object_drag=false,polygon_drag=false;
+  void polygon_at(int x,int y,PolygonAction action) {
+    float aspect=float(w())/std::max(1,h()),tangent=std::tan(22.5f*3.14159265f/180);
+    Vec3 direction{(2.f*(x-this->x())/w()-1)*aspect*tangent,(1-2.f*(y-this->y())/h())*tangent,-1};
+    auto origin=rotation.inverse().rotate(Vec3{0,0,distance}-pan);
+    direction=rotation.inverse().rotate(normalized(direction));
+    document.polygon_pointer(origin,direction,action,Fl::event_state(FL_CTRL));invalidate();
+  }
   CanvasTransform drag_local{},drag_parent{};
   void sculpt_at(int x, int y) {
     if (!document.frame().state->stroking) { sculpting = have_stamp = false; return; }
@@ -171,6 +182,10 @@ struct Canvas : Fl_Gl_Window {
         document.cancel_spatial_menu();
         return 1;
       }
+      if(event==FL_KEYDOWN&&Fl::event_key()==FL_Escape&&document.frame().state->polygon){
+        if(polygon_drag){polygon_at(Fl::event_x(),Fl::event_y(),PolygonAction::CancelDrag);polygon_drag=false;suppress_drag=true;}
+        else document.end_polygon(false);invalidate();return 1;
+      }
       if (event == FL_KEYDOWN && Fl::event_key() == FL_Escape && !sculpting &&
           document.frame().state->retopology) {
         document.end_retopology(false); invalidate(); return 1;
@@ -188,6 +203,12 @@ struct Canvas : Fl_Gl_Window {
         sculpting =
             Fl::event_button() == FL_LEFT_MOUSE && Fl::event_state(FL_SHIFT);
         have_stamp = false;
+        if(sculpting&&document.frame().state->polygon){
+          sculpting=false;auto state=document.frame().state;
+          if(!state->polygon->surface||state->polygon->busy||state->polygon->committing){suppress_drag=true;return 1;}
+          polygon_drag=state->polygon_controls.move_mode;
+          polygon_at(last_x,last_y,polygon_drag?PolygonAction::BeginDrag:PolygonAction::Pick);return 1;
+        }
         if(!sculpting && Fl::event_button()==FL_LEFT_MOUSE && document.frame().state->object_grab_mode){
           float aspect=float(w())/std::max(1,h()),tangent=std::tan(22.5f*3.14159265f/180);
           Vec3 direction{(2.f*(last_x-this->x())/w()-1)*aspect*tangent,(1-2.f*(last_y-this->y())/h())*tangent,-1};
@@ -211,7 +232,8 @@ struct Canvas : Fl_Gl_Window {
       if (event == FL_DRAG) {
         if(suppress_drag)return 1;
         int x = Fl::event_x(), y = Fl::event_y();
-        if(object_drag){
+        if(polygon_drag){polygon_at(x,y,PolygonAction::Drag);}
+        else if(object_drag){
           if(!document.frame().state->object_grabbing){object_drag=false;suppress_drag=true;return 1;}
           auto delta=rotation.inverse().rotate(Vec3{(x-last_x)*distance*.0015f,-(y-last_y)*distance*.0015f,0});
           auto local=ob::rotate(ob::conjugate(drag_parent.orientation),{delta.x,delta.y,delta.z})*(1.f/drag_parent.scale);
@@ -235,6 +257,7 @@ struct Canvas : Fl_Gl_Window {
       }
       if (event == FL_RELEASE) {
         suppress_drag=false;
+        if(polygon_drag){polygon_at(Fl::event_x(),Fl::event_y(),PolygonAction::EndDrag);polygon_drag=false;return 1;}
         if(object_drag){document.end_object_grab(true);object_drag=false;invalidate();return 1;}
         if (sculpting) {
           document.end_desktop();
@@ -245,6 +268,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_UNFOCUS) {
+        if(polygon_drag){polygon_at(Fl::event_x(),Fl::event_y(),PolygonAction::CancelDrag);polygon_drag=false;}
         if(object_drag){document.end_object_grab(false);object_drag=false;invalidate();}
         if (sculpting) {
           document.cancel_desktop();
@@ -267,6 +291,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
     } catch (const std::exception &e) {
+      if(polygon_drag){try{polygon_at(Fl::event_x(),Fl::event_y(),PolygonAction::CancelDrag);}catch(...){}polygon_drag=false;}
       if(object_drag){try{document.end_object_grab(false);}catch(...){}object_drag=false;}
       if (sculpting)
         document.cancel_desktop();
@@ -283,9 +308,10 @@ struct Canvas : Fl_Gl_Window {
       renderer->abandon();
       renderer.reset();
       if (cursors) { cursors->abandon(); cursors.reset(); }
+      if(polygons){polygons->abandon();polygons.reset();}
     }
-    if (!renderer)
-      renderer = std::make_unique<SurfaceRenderer>();
+    if (!renderer){renderer = std::make_unique<SurfaceRenderer>();renderer->set_deferred_resolve(true);}
+    if(!polygons)polygons=std::make_unique<PolygonRenderer>();
     CanvasTransform model{{pan.x, pan.y, pan.z},
                           {rotation.x, rotation.y, rotation.z, rotation.w},
                           1};
@@ -297,13 +323,16 @@ struct Canvas : Fl_Gl_Window {
     auto f = document.frame();
     material_time = render_frame_time();
     renderer->set_frame_time(material_time);
+    auto polygon_preview=detail::polygon_preview(f);
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
-                   f.state->toon, f.state->light,f.state->objects);
+                   f.state->toon, f.state->light,f.state->objects,polygon_preview.object);
+    detail::draw_polygon_preview(*polygons,polygon_preview,model,vp,f.state->accent);
     if (f.state->retopology || f.state->cut) {
-      if (!cursors) cursors = std::make_unique<CursorRenderer>();
+      if (!cursors){cursors = std::make_unique<CursorRenderer>();cursors->set_linear_output(true);}
       auto overlay = *f.state; overlay.canvas = model; overlay.hands = {};
       cursors->draw(overlay, vp);
     }
+    renderer->resolve();
     if (!capture.empty()) {
       std::vector<uint8_t> pixels(size_t(pixel_w()) * pixel_h() * 3);
       glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -350,7 +379,7 @@ struct App {
   static void tick(void *data) {
     auto &a = *static_cast<App *>(data);
     auto f = a.canvas.document.frame();
-    if (f.surface != a.canvas.shown_mesh || f.state->retopology || f.state->cut || f.state->object_grabbing || a.seen_object_authority!=f.state->edit_authority)
+    if (f.surface != a.canvas.shown_mesh || f.state->retopology || f.state->cut || f.state->polygon || f.state->polygon_handoff || f.state->object_grabbing || a.seen_object_authority!=f.state->edit_authority)
       a.canvas.redraw();
     a.seen_object_authority=f.state->edit_authority;
     a.dirty = f.state->dirty;
@@ -378,10 +407,10 @@ struct App {
       try{a.saving->get();}catch(const std::exception &error){a.canvas.document.report_error(error.what());}a.saving.reset();
     }
     auto native_state=a.canvas.document.frame().state;
-    if(!native_state->native_pending&&!native_state->error.empty()&&!a.native_commands.empty()) {
+    if(!native_state->native_pending&&!(native_state->polygon&&native_state->polygon->committing)&&!native_state->error.empty()&&!a.native_commands.empty()) {
       a.native_commands.clear();a.canvas.document.report_error(native_state->error+" | Pending commands cancelled; original project retained");
     }
-    if(!a.canvas.document.frame().state->native_pending&&!a.saving&&!a.native_commands.empty()) {
+    if(!native_state->native_pending&&!(native_state->polygon&&native_state->polygon->committing)&&!a.saving&&!a.native_commands.empty()) {
       auto command=std::move(a.native_commands.front());a.native_commands.pop_front();
       try{a.action(std::move(command));}catch(const std::exception &error){a.canvas.document.report_error(error.what());}
     }
@@ -489,6 +518,27 @@ struct App {
     menu.add("&Mesh/Clear baked surface",0,command,this);
     menu.add("&File/Cancel background work",0,command,this);
     menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
+    menu.add("&Mesh/Polygon edit/Start polygon editing", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Vertices", 0, command, this, FL_MENU_RADIO);
+    menu.add("&Mesh/Polygon edit/Edges", 0, command, this, FL_MENU_RADIO);
+    menu.add("&Mesh/Polygon edit/Faces", 0, command, this, FL_MENU_RADIO);
+    menu.add("&Mesh/Polygon edit/Move components", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Mesh/Polygon edit/Add to selection", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Mesh/Polygon edit/Select all components", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Clear component selection", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Extrude faces", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Inset faces", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Bridge loops", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Dissolve edges", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Weld vertices", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Subdivide edges", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Connect vertices", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Delete faces", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Flip faces", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Polygon controls...", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Apply polygon edit", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Cancel polygon edit", 0, command, this);
+    menu.add("&Mesh/Polygon edit/Restore polygon source", 0, command, this);
     menu.add("&Mesh/Retopology/Start patch", 0, command, this);
     menu.add("&Mesh/Retopology/Place points", 0, command, this, FL_MENU_RADIO | FL_MENU_VALUE);
     menu.add("&Mesh/Retopology/Move points", 0, command, this, FL_MENU_RADIO);
@@ -742,7 +792,7 @@ struct App {
       for(auto path:{"&Scene/Delete object","&Scene/Duplicate object","&Scene/Object and material...","&Mesh/Generate &UV atlas","&Paint/Add layer","&Paint/Delete layer","&Paint/Next layer","&Paint/Layer visible","&Paint/Layer opacity...","&Paint/Use painted mesh","&Paint/Edit source volume","&Paint/Prepare painting mesh"})enable(path,false);
     }
     if(s->isolate_held&&s->held_object)enable("&File/Import &mesh...",false);
-    if (s->retopology || s->cut) {
+    if (s->retopology || s->cut || s->polygon) {
       for (int i = 0; i < menu.size(); ++i) {
         auto label = menu.menu()[i].label();
         if (!label || (menu.mode(i) & FL_SUBMENU)) continue;
@@ -752,6 +802,22 @@ struct App {
             text != "Reset trackball" && text != "Start or stop XR" && text != "Cancel background work")
           modes[i] |= FL_MENU_INACTIVE;
       }
+    }
+    auto polygon=s->polygon;
+    bool polygon_editing=!modal&&polygon&&polygon->surface&&!polygon->busy&&!polygon->committing&&!s->asset_busy;
+    enable("&Mesh/Polygon edit/Start polygon editing",!modal&&!polygon&&s->can_polygon);
+    for(auto label:{"Vertices","Edges","Faces","Move components","Add to selection","Select all components","Clear component selection","Extrude faces","Inset faces","Bridge loops","Dissolve edges","Weld vertices","Subdivide edges","Connect vertices","Delete faces","Flip faces","Polygon controls...","Apply polygon edit"})
+      enable((std::string("&Mesh/Polygon edit/")+label).c_str(),polygon_editing);
+    enable("&Mesh/Polygon edit/Cancel polygon edit",!modal&&bool(polygon));
+    enable("&Mesh/Polygon edit/Restore polygon source",!modal&&!polygon&&!s->asset_busy&&!s->object_grabbing&&s->polygon_has_source&&active!=s->objects.end()&&active->editable);
+    checked("&Mesh/Polygon edit/Move components",s->polygon_controls.move_mode);
+    checked("&Mesh/Polygon edit/Add to selection",s->polygon_controls.additive);
+    for(auto [name,mode]:{std::pair{"Vertices",PolygonSelectionMode::Vertex},std::pair{"Edges",PolygonSelectionMode::Edge},std::pair{"Faces",PolygonSelectionMode::Face}})
+      checked((std::string("&Mesh/Polygon edit/")+name).c_str(),polygon&&polygon->selection&&polygon->selection->mode==mode);
+    if(polygon&&!modal){
+      enable("&File/&Save",true);enable("&File/Save &As...",true);enable("&File/Close &Window",true);
+      enable("&Edit/&Undo",!polygon->committing&&(polygon->can_undo||polygon->moving));
+      enable("&Edit/&Redo",!polygon->committing&&polygon->can_redo);
     }
     enable("&Mesh/Retopology/Start patch", !modal && s->can_retopologize);
     auto retopo = s->retopology;
@@ -819,6 +885,11 @@ struct App {
       if (info->weight_samples) text << (current_frame.surface->weight_samples >= info->weight_samples
           ? " | Live preview; release to apply" : " | Updating preview; release to apply");
     }
+    if(info->polygon){
+      const auto &p=*info->polygon;text<<"Polygon: "<<(p.selection&&p.selection->mode==PolygonSelectionMode::Vertex?"Vertices":p.selection&&p.selection->mode==PolygonSelectionMode::Edge?"Edges":"Faces")
+       <<" | "<<(p.selection?p.selection->ids.size():0)<<" selected | "<<(info->polygon_controls.move_mode?"Shift-drag moves":"Shift-click selects")
+       <<(p.committing?" | Applying":p.busy?" | Updating":" | Mesh > Polygon edit: operations / Apply / Cancel");
+    }
     if (info->retopology) {
       auto &r = *info->retopology;
       text.str("");
@@ -872,6 +943,11 @@ struct App {
   }
   void action(std::string label) {
     label.erase(std::remove(label.begin(), label.end(), '&'), label.end());
+    if(auto polygon=canvas.document.frame().state->polygon;polygon&&polygon->committing&&
+      (label=="Close Window"||label=="Quit"||label=="New"||label=="Open...")) {
+      if(native_commands.size()>=8){canvas.document.report_error("Desktop command queue is full");return;}
+      native_commands.push_back(std::move(label));return;
+    }
     if(canvas.document.frame().state->native_pending) {
       canvas.sculpting=canvas.have_stamp=false;canvas.suppress_drag=true;
       if(label=="Undo"||label=="Cancel background work"){native_commands.clear();canvas.document.end_native_stroke(false);return;}
@@ -886,6 +962,9 @@ struct App {
     if (label == "Cut" || label == "Copy" || label == "Paste" ||
         label == "Select All") {
       auto input = dynamic_cast<Fl_Input_ *>(Fl::focus());
+      if(label=="Select All"&&canvas.document.frame().state->polygon&&(!input||input->window()!=modal)){
+        canvas.document.edit_polygon(PolygonAction::SelectAll);canvas.invalidate();return;
+      }
       if (!input || !input->active_r() || !input->visible_r() ||
           input->window() != (modal ? modal : &window))
         return;
@@ -919,6 +998,7 @@ struct App {
       }
       return;
     }
+    if(label=="Close Window"&&canvas.document.frame().state->polygon){canvas.document.end_polygon(false);canvas.invalidate();return;}
     if (canvas.sculpting) {
       canvas.document.end_desktop();
       canvas.sculpting = false;
@@ -1035,6 +1115,24 @@ struct App {
           label == "Locked" ? !o.locked : o.locked, o.transform, o.material);
     } else if (label == "UV editor...") {
       edit_uv(canvas.document);
+    } else if(label=="Start polygon editing"){
+      auto state=canvas.document.frame().state;
+      AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
+      const bool convert=state->polygon_requires_conversion;
+      if(!convert||polygon_conversion_dialog())canvas.document.begin_polygon(convert,source);
+    } else if(label=="Apply polygon edit"||label=="Cancel polygon edit"){
+      canvas.document.end_polygon(label=="Apply polygon edit");
+    } else if(label=="Restore polygon source"){
+      canvas.document.restore_polygon_source();
+    } else if(label=="Polygon controls..."){
+      if(auto settings=polygon_controls_dialog(canvas.document.frame().state->polygon_controls))canvas.document.configure_polygon(*settings);
+    } else if(label=="Move components"||label=="Add to selection"){
+      auto settings=canvas.document.frame().state->polygon_controls;
+      if(label=="Move components")settings.move_mode=!settings.move_mode;else settings.additive=!settings.additive;
+      canvas.document.configure_polygon(settings);
+    } else if(label=="Vertices"||label=="Edges"||label=="Faces"||label=="Select all components"||label=="Clear component selection"||label=="Extrude faces"||label=="Inset faces"||label=="Bridge loops"||label=="Dissolve edges"||label=="Weld vertices"||label=="Subdivide edges"||label=="Connect vertices"||label=="Delete faces"||label=="Flip faces"){
+      auto action=label=="Vertices"?PolygonAction::Vertices:label=="Edges"?PolygonAction::Edges:label=="Faces"?PolygonAction::Faces:label=="Select all components"?PolygonAction::SelectAll:label=="Clear component selection"?PolygonAction::Clear:label=="Extrude faces"?PolygonAction::Extrude:label=="Inset faces"?PolygonAction::Inset:label=="Bridge loops"?PolygonAction::Bridge:label=="Dissolve edges"?PolygonAction::Dissolve:label=="Weld vertices"?PolygonAction::Weld:label=="Subdivide edges"?PolygonAction::CutEdges:label=="Connect vertices"?PolygonAction::ConnectVertices:label=="Delete faces"?PolygonAction::DeleteFaces:PolygonAction::FlipFaces;
+      canvas.document.edit_polygon(action);
     } else if (label == "Start patch") {
       canvas.document.begin_retopology();
     } else if(label=="Start cut"){
@@ -1235,6 +1333,7 @@ int main(int argc, char **argv) try {
         document.end_retopology(false);
       if (auto view = document.frame().state->cut; view && !view->committing)
         document.end_cut(false);
+      if(auto view=document.frame().state->polygon;view&&!view->committing)document.end_polygon(false);
       document.save(save);
     }
     return 0;

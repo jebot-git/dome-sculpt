@@ -76,6 +76,7 @@ void SourceMaterialBindings::validate(bool deep) const {
      (material.parameters.scroll!=std::array<float,2>{} || material.parameters.rotation_speed!=0))
     throw std::invalid_argument("An explicitly frozen material cannot retain active UV animation");
   if(uv_origin) {
+    if(uv_origin->paint&&uv_origin->paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)throw std::invalid_argument("Source UV origin paint requires explicit strict conversion; polygon authority cannot be inferred");
     if(!uv_origin->paint || uv_origin->paint->in_stroke())
       throw std::invalid_argument("Derived UV material has no finished immutable source");
     roles_valid(uv_origin->material,uv_origin->roles);

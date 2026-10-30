@@ -13,10 +13,10 @@ namespace dome {struct DocumentNativeTestAccess {
 namespace {
 std::atomic<bool> native_armed{false};std::condition_variable *native_condition=nullptr;
 std::atomic<bool> armed{false};
-std::array<std::atomic<bool>,7> released{};
+std::array<std::atomic<bool>,8> released{};
 std::atomic<unsigned> slots{0}, arrived{0};
-std::array<std::condition_variable *,7> conditions{};
-std::array<pthread_mutex_t *,7> mutexes{};
+std::array<std::condition_variable *,8> conditions{};
+std::array<pthread_mutex_t *,8> mutexes{};
 thread_local bool deleting_document=false;
 
 }
@@ -89,5 +89,5 @@ int main() {
     if(!finished){kill(process,SIGKILL);waitpid(process,&status,0);std::cerr<<"FAIL Worker lost predicate notification\n";return 1;}
     if(!WIFEXITED(status)||WEXITSTATUS(status)!=0){std::cerr<<"Worker protocol child failed (active="<<active<<")\n";return 1;}
   }
-  std::cout<<"PASS All seven worker shutdown predicates and active native gesture cancellation synchronize before notification\n";return 0;
+  std::cout<<"PASS All eight worker shutdown predicates and active native gesture cancellation synchronize before notification\n";return 0;
 }

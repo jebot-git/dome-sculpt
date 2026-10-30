@@ -270,7 +270,8 @@ void PolygonWorkspace::clear_selection(const PolygonLimits &limits) {
 }
 bool PolygonWorkspace::select_ray(Vec3 origin, Vec3 direction, float maximum,
                                   float radius, bool additive, bool toggle,
-                                  const PolygonLimits &limits) {
+                                  const PolygonLimits &limits,
+                                  bool preserve_selected_group) {
   if (gesture_)
     throw std::logic_error("Finish the component move before picking");
   if (!finite(origin) || !finite(direction) || !std::isfinite(maximum) ||
@@ -287,8 +288,16 @@ bool PolygonWorkspace::select_ray(Vec3 origin, Vec3 direction, float maximum,
     return false;
   const auto &mesh = *current_.view->topology;
   auto fid = current_.view->surface->triangle_faces.at(hit->triangle);
+  auto pick = [&](PolygonId id) {
+    const auto &selection = *current_.view->selection;
+    if (preserve_selected_group &&
+        std::find(selection.ids.begin(), selection.ids.end(), id) !=
+            selection.ids.end())
+      return;
+    select(id, additive, toggle, limits);
+  };
   if (current_.view->selection->mode == PolygonSelectionMode::Face) {
-    select(fid, additive, toggle, limits);
+    pick(fid);
     return true;
   }
   const auto &face = *std::find_if(mesh.faces().begin(), mesh.faces().end(),
@@ -331,7 +340,7 @@ bool PolygonWorkspace::select_ray(Vec3 origin, Vec3 direction, float maximum,
   if (!best)
     return false;
   stop(limits);
-  select(best, additive, toggle, limits);
+  pick(best);
   return true;
 }
 void PolygonWorkspace::trim_history() {

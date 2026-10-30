@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/polygon-scene.hpp"
 namespace dome {
 bool Document::sculpt_target_ready_locked() const {
   const auto &o=scene_.active();
   return !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
-      !control_before_ && !action_active_locked() && !o.mesh_active && object_editable_locked(o.id);
+      !control_before_ && !action_active_locked() && !(o.polygon&&o.polygon->active) && !o.mesh_active && object_editable_locked(o.id);
 }
 bool Document::resolution_target_ready_locked() const {
   const auto scale=scene_.world_transform(scene_.active().id).scale;

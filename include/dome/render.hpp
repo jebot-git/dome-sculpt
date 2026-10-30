@@ -49,7 +49,7 @@ public:
   void draw(std::shared_ptr<const MeshSnapshot>, CanvasTransform,
             const Mat4 &view_projection, ob::Vec3 camera, int width, int height,
             bool transparent = false, bool toon = false, bool light = false,
-            std::span<const ObjectInfo> display = {});
+            std::span<const ObjectInfo> display = {}, uint64_t replaced_object = 0);
 };
 struct RetopoOverlayStats {size_t vertices=0,bytes=0;uint64_t uploads=0;};
 class CursorRenderer {

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
 #include "dome/import-source.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -203,6 +204,7 @@ void Scene::validate(bool deep_sources) const {
       throw std::invalid_argument(
           "Invalid scene object identity or unfinished stroke");
     name_valid(o.name);
+    detail::require_polygon_paint_owner(o.painted.get(),o.polygon.get(),o.mesh_active);
     if(o.polygon){polygons.add(o.polygon,deep_sources);if(deep_sources)validate_polygon_derivative(*o.polygon,o.painted.get(),o.mesh_active);}
     validate_transform(o.transform);
     validate_transform(world_transform(o.id));
@@ -435,6 +437,19 @@ Scene Scene::decode(const nlohmann::json &j) {
       if (o.contains("polygon"))
         throw std::invalid_argument("Polygon authority fields require Scene12");
   }
+  // Admit policy context before allocating any decoded SurfaceMap. A table
+  // association is only structural permission; final deep validation proves
+  // each owner's exact current/retained polygon REST/index/UV derivative.
+  for(const auto &o:objects)if(o.contains("painted")&&detail::polygon_paint_policy(o.at("painted"))){
+    if(!polygon_fields||!o.contains("polygon")||o.at("polygon").is_null()||o.at("mesh_active")!=true)
+      throw std::invalid_argument("Polygon-authored paint requires authenticated Scene12 polygon authority");
+    auto index=detail::polygon_archive_index(o.at("polygon"),j.at("polygon_sources").at("authorities").size());
+    if(j.at("polygon_sources").at("authorities")[index].at("active")!=true||j.at("polygon_sources").at("authorities")[index].at("topology").at("faces").empty())
+      throw std::invalid_argument("Polygon-authored paint has an inactive current authority");
+  }
+  if(j.contains("source_materials")&&j.at("source_materials").is_object()&&j.at("source_materials").contains("paints"))
+    for(const auto &paint:j.at("source_materials").at("paints"))if(detail::polygon_paint_policy(paint))
+      throw std::invalid_argument("Source UV origins cannot claim polygon paint authority; explicitly convert their UV source first");
   // Bound the complete serialized sculpt payload before decoding any object.
   // Masks are independent of displacement layers and must share the Scene
   // quota.
@@ -685,7 +700,7 @@ Scene Scene::decode(const nlohmann::json &j) {
           throw std::length_error("Scene paint-map budget exceeded");
         if (v.at("painted").contains("baked") && j.at("version") < 6 && !legacy_baked5)
           throw std::runtime_error("Baked textures require scene version 6");
-        o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr);
+        o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr, polygon_fields && !v.at("polygon").is_null() && o.mesh_active);
         paint_bytes += o.painted->storage_bytes();
         if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
       }

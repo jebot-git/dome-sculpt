@@ -36,7 +36,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Female CC0", "Male CC0", "Center part", "Next part", "Previous part", "Rig and shapes",
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
-      "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
+      "Prepare paint", "Voxel remesh", "Polygon edit", "UV editor",
       "Plane cut", "Paint tools", "Baking", "Materials",
       "Back", "Holding", "Import", "Retopology"};
   static const std::array<const char *, 12> rig = {
@@ -60,7 +60,9 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *,12> holding={"Object grab mode","Hold selected","Release held","Ghost others","Visibility","Previous","Next","Center","Back","Move left","Move right","Cancel motion"};
   static const std::array<const char*,12> importing={"Browse / refresh","Previous file","Next file","Open folder","Parent folder","Options","Import","Cancel","Back","Undo","Redo","Save"};
   static const std::array<const char*,12> import_options={"Format","Units","Axes","Normals","Paint size","Materials","Custom unit","Defaults","Back","Refresh folder","Import","Cancel"};
-  return page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
+  static const std::array<const char*,12> polygon={"Start / resume","Vertices","Edges","Faces","Move / select","Add / toggle","Distance","Extrude","Back","Topology","Apply","Cancel"};
+  static const std::array<const char*,12> polygon_topology={"All / none","Inset faces","Bridge loops","Dissolve edges","Weld vertices","Cut edges","Cuts","Connect vertices","Back","Delete faces","Flip faces","Cancel"};
+  return page == 22 ? polygon_topology : page == 19 ? polygon : page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
          : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
@@ -75,6 +77,8 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if(page==19&&sector==6)return VrParameter::PolygonDistance;
+  if(page==22&&sector==6)return VrParameter::PolygonCuts;
   if(page==12&&sector==11)return VrParameter::BakeProjection;
   if(page==18 && sector>=0 && sector<6) {
     static const VrParameter params[]={VrParameter::ProceduralPattern,VrParameter::ProceduralFace,VrParameter::ProceduralGrid,VrParameter::ProceduralCoverage,VrParameter::ProceduralDepth,VrParameter::ProceduralSeed};
@@ -147,6 +151,14 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if(page==19){
+    static const SpatialCommand commands[]={SpatialCommand::PolygonBegin,SpatialCommand::PolygonVertices,SpatialCommand::PolygonEdges,SpatialCommand::PolygonFaces,SpatialCommand::PolygonMoveMode,SpatialCommand::PolygonAdditive,SpatialCommand::Undo,SpatialCommand::PolygonExtrude,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::PolygonApply,SpatialCommand::PolygonCancel};
+    return index==6||index==8||index==9?std::nullopt:std::optional<SpatialCommand>(commands[index]);
+  }
+  if(page==22){
+    static const SpatialCommand commands[]={SpatialCommand::PolygonSelectAll,SpatialCommand::PolygonInset,SpatialCommand::PolygonBridge,SpatialCommand::PolygonDissolve,SpatialCommand::PolygonWeld,SpatialCommand::PolygonCutEdges,SpatialCommand::Undo,SpatialCommand::PolygonConnect,SpatialCommand::Undo,SpatialCommand::PolygonDelete,SpatialCommand::PolygonFlip,SpatialCommand::PolygonCancel};
+    return index==6||index==8?std::nullopt:std::optional<SpatialCommand>(commands[index]);
+  }
   if(page==18) {
     if(index<6 || index==8)return {};
     static const SpatialCommand commands[]={SpatialCommand::ProceduralApply,SpatialCommand::ProceduralNextSeed,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::CancelWork};
@@ -222,7 +234,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
         SpatialCommand::Undo, SpatialCommand::Center, SpatialCommand::Undo,
         SpatialCommand::Undo, SpatialCommand::Undo, SpatialCommand::Undo,
         SpatialCommand::Left, SpatialCommand::Right, SpatialCommand::Undo};
-    return (index >= 4 && index <= 11) ? std::nullopt
+    return (index==2 || (index >= 4 && index <= 11)) ? std::nullopt
                                     : std::optional<SpatialCommand>(mesh[index]);
   }
   if (page == 8) {
@@ -490,8 +502,14 @@ void SpatialInput::update(const SpatialSample &s) {
   if (!d.armed) {
     d.pressed = s.trigger;
     d.joystick = s.joystick_press;
-    if (!s.trigger && !s.joystick_press)
+    if (!s.trigger && !s.joystick_press) {
       d.armed = true;
+      // A command can open a guarded parameter panel. The same observed
+      // all-released sample rearms its owner and its panel; otherwise the
+      // next real pressure press is silently consumed a second time.
+      if(menu_&&parameter_!=VrParameter::None&&device_==s.id&&
+         std::abs(s.stick_x)<.25f&&std::abs(s.stick_y)<.25f)control_armed_=true;
+    }
     return;
   }
   bool menu_press = s.joystick_press && !d.joystick;
@@ -594,10 +612,10 @@ void SpatialInput::update(const SpatialSample &s) {
       end_stroke();
     if (!menu_) {
       menu_ = true;
-      page_ = cutting ? 17 : retopology ? 16 : 0;
+      page_ = polygon_editing ? 19 : cutting ? 17 : retopology ? 16 : 0;
       menu_anchor_ = s.tip;
       device_ = s.id;
-      selected_ = cutting ? 1 : retopology ? 1 : int(tool_);
+      selected_ = polygon_editing ? 0 : cutting ? 1 : retopology ? 1 : int(tool_);
     } else if (page_ == 0 && (selected_ == 8 || selected_ == 9)) {
       page_ = selected_ == 8 ? 1 : 2;
       selected_ = 0;
@@ -630,6 +648,8 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 1 && selected_ == 9) {
       page_ = 10;
       selected_ = 0;
+    } else if(page_==10&&selected_==2){page_=19;selected_=0;
+    } else if(page_==19&&selected_==9){page_=22;selected_=0;
     } else if(page_==10&&selected_==9){page_=20;selected_=0;
     } else if (page_ == 10 && selected_ == 10) {
       page_=21;selected_=0;command_=SpatialCommand::ImportBrowse;command_device_=s.id;
@@ -666,7 +686,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
@@ -695,11 +715,14 @@ void SpatialInput::update(const SpatialSample &s) {
         command_ = action;
       }
       command_device_ = s.id;
+      if(command_&&*command_==SpatialCommand::PolygonBegin){parent_page_=page_;parent_sector_=selected_;parameter_owner_=s.id;}
       const bool resume_retopology = page_ == 16 && command_ &&
           (*command_ == SpatialCommand::RetopoBegin || *command_ == SpatialCommand::RetopoMode ||
            *command_ == SpatialCommand::RetopoApply || *command_ == SpatialCommand::RetopoCancel);
       const bool resume_mask = page_ == 15 && command_ && *command_ == SpatialCommand::SculptMaskResume;
-      if((page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23) || resume_retopology || resume_mask){menu_ = false;device_ = 0;}
+      const bool resume_polygon=(page_==19||page_==22)&&command_&&
+        (*command_==SpatialCommand::PolygonBegin||*command_==SpatialCommand::PolygonMoveMode||*command_==SpatialCommand::PolygonApply||*command_==SpatialCommand::PolygonCancel);
+      if((page_!=19 && page_!=22 && page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23) || resume_retopology || resume_mask || resume_polygon){menu_ = false;device_ = 0;}
       d.armed = false;
     }
     d.pressed = s.trigger;

@@ -71,6 +71,15 @@ int main() try {
   w.select(6, true);
   check(w.view().selection->ids.size() == 2,
         "Additive component selection preserves earlier selected vertices");
+  auto group_selection = w.view().selection;
+  check(w.select_ray({.49f, .49f, 3}, {0, 0, -1}, 10, .03f, false, false, {},
+                     true) &&
+            w.view().selection == group_selection &&
+            w.view().selection->ids.size() == 2,
+        "Dragging an already-selected visible component retains the exact "
+        "multi-selection and GPU selection owner");
+  check(w.select_ray({.49f,.49f,3},{0,0,-1},10,.03f,true,true,{},true)&&w.view().selection==group_selection,
+        "Beginning a move preserves the exact selected group even while additive/toggle selection mode remains enabled");
   w.select(6, true, true);
   check(w.view().selection->ids == std::vector<PolygonId>{7},
         "Toggle selection removes only the specified component");
