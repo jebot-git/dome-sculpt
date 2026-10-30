@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "affine-surface.hpp"
+#include "document-held-affine.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/material-visibility.hpp"
@@ -15,8 +16,8 @@ Vec3 point(CanvasTransform t,Vec3 p){auto q=ob::transform(t,{p.x,p.y,p.z});retur
 Vec3 rotate(ob::Quat q,Vec3 p){auto v=ob::rotate(q,{p.x,p.y,p.z});return {v.x,v.y,v.z};}
 bool same(CanvasTransform a,CanvasTransform b){return a.position.x==b.position.x&&a.position.y==b.position.y&&a.position.z==b.position.z&&a.scale==b.scale&&a.orientation.x==b.orientation.x&&a.orientation.y==b.orientation.y&&a.orientation.z==b.orientation.z&&a.orientation.w==b.orientation.w;}
 bool same_placement(const Scene &scene,uint64_t id,CanvasTransform legacy,const std::optional<AffineTransform>&affine) {
-  if(bool(affine)!=scene.has_affine_placement(id))return false;
-  return affine?scene.world_matrix(id).matrix()==affine->matrix():same(scene.world_transform(id),legacy);
+  if(affine)return scene.world_matrix(id).matrix()==affine->matrix();
+  return !scene.has_affine_placement(id)&&same(scene.world_transform(id),legacy);
 }
 }
 bool Document::begin_native_stroke(){
@@ -26,13 +27,14 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   auto &o=scene_.active();
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
-  if(scene_.has_affine_placement(o.id)&&state_.object_grabbing)return false;
+  if(scene_.has_affine_placement(o.id)&&state_.object_grabbing&&(space!=NativeStrokeSpace::EvaluatedWorldBrush||!held_affine_||held_affine_->base_edit!=o.affine_edit))return false;
   if(scene_.has_affine_placement(o.id)&&!o.mesh_active){state_.message="Affine sculpt strokes require the full field metric path";publish_locked();return false;}
   auto preview=mesh_.load();
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision){state_.message="Wait for the current surface before painting";publish_locked();return false;}
   auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
-  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(scene_.has_affine_placement(o.id))session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
+  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(scene_.has_affine_placement(o.id)||space==NativeStrokeSpace::EvaluatedWorldBrush)session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
   session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;session->spatial_owner=spatial_owner;session->space=space;session->menu_page=space==NativeStrokeSpace::Ray?24:3;
+  if(state_.object_grabbing&&space==NativeStrokeSpace::EvaluatedWorldBrush)session->held_basis=held_affine_;
   if(state_.shape_sculpt&&space!=NativeStrokeSpace::Ray)return false;
   if(space==NativeStrokeSpace::EvaluatedWorldBrush&&!o.mesh_active)return false;
   if(state_.shape_sculpt){if(!o.deformation||!o.deformation->morphs||state_.morph_target>=o.deformation->morphs->targets.size()||state_.object_grabbing)return false;session->shape_target=state_.morph_target;}
@@ -111,7 +113,7 @@ void Document::native_loop(){
     auto cancelled=[&]{
       auto current=published_.load();
       return stopping_.load()||session->cancelled.load()||native_epoch_.load()!=session->epoch||
-        current->generation!=session->source.generation||current->revision!=session->source.revision||current->active_object!=session->source.object;
+        current->generation!=session->source.generation||current->revision!=session->source.revision||current->active_object!=session->source.object||current->edit_authority!=session->source.edit_authority;
     };
     std::exception_ptr failure;
     try{
@@ -181,10 +183,18 @@ void Document::native_loop(){
       bool changed;
       if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());changed=author_shapekey(working,o.id,edit,cancelled).changed;}
       else changed=o.mesh_active?o.painted->end_stroke():o.volume->end_stroke();
-      auto immutable=std::make_shared<const Scene>(working.snapshot());
       std::deque<History> previous_redo;
       {std::lock_guard lock(model_mutex_);
         if(cancelled()||native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");
+        const bool release_held=session->release_held.load();
+        if(release_held){
+          if(!state_.object_grabbing||state_.held_object!=o.id||!held_affine_||!session->held_basis||held_affine_->base_edit!=session->held_basis->base_edit)throw std::runtime_error("Held contact source placement changed");
+          if(state_.edit_authority==UINT64_MAX)throw std::overflow_error("Object editing authority exhausted");
+          working.active().transform=held_preview_transform_;working.active().affine_edit=held_affine_->preview_edit;
+          changed=changed||working.active().affine_edit!=scene_.active().affine_edit;
+        }
+        auto immutable=std::make_shared<const Scene>(working.snapshot());
+        const auto previous_held=held_affine_;const auto previous_navigation=object_navigation_;
         // Stage every history/state allocation while authority is untouched.
         // The old redo deque is swapped only after its replacement node exists.
         Scene before=scene_;EditorState previous_state=state_;
@@ -199,6 +209,7 @@ void Document::native_loop(){
         }
         try {
           native_stroke_.reset();desktop_=false;input_.cancel();++native_epoch_;
+          if(release_held){state_.object_grabbing=false;state_.held_object=0;++state_.edit_authority;held_affine_.reset();object_navigation_.reset();}
           if(changed){scene_=std::move(working);content_=next_content_++;bind_locked();}
           else {std::lock_guard mesh(mesh_mutex_);mesh_.store(session->original_preview);mesh_changed_.notify_all();}
           if(session->menu_after.load()&&session->spatial_owner&&state_.hands[session->spatial_owner-1].tracked.valid)input_.retain_page(session->menu_page,session->spatial_owner,session->menu_page==24?11:0);
@@ -209,7 +220,7 @@ void Document::native_loop(){
         } catch(...) {
           if(changed){scene_=std::move(before);undo_.pop_back();redo_.swap(previous_redo);}
           content_=previous_content;next_content_=previous_next;state_=std::move(previous_state);
-          native_stroke_=session;desktop_=session->spatial_owner==0;native_source_scene_=std::move(previous_source);
+          native_stroke_=session;desktop_=session->spatial_owner==0;held_affine_=previous_held;object_navigation_=previous_navigation;native_source_scene_=std::move(previous_source);
           bound_volume_=std::move(previous_bound);input_.refresh_volume(volume());last_volume_=previous_volume;last_paint_=previous_paint;
           published_.store(std::move(previous_published));
           {std::lock_guard mesh(mesh_mutex_);pending_mesh_.reset();mesh_.store(session->original_preview);mesh_changed_.notify_all();}

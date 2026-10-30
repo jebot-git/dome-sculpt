@@ -37,5 +37,23 @@ int main(int argc,char**argv)try{
   h.send();h.send(.8f);h.f.focused=false;h.send(.8f);settled(d);check(d.copy_scene().encode()==current,"Focus loss cancels unaccepted contact draft without partial paint");
   h.f.focused=true;h.send();h.send(.8f);h.send(.8f,true);settled(d);check(d.frame().state->menu&&d.frame().state->menu_page==3,"Joystick accepts contact endpoint and opens existing Paint page after commit");
  }
+ {
+  auto scene=source(true);scene.active().affine_edit.reset();Document d;d.replace(scene);settled(d);d.configure(Tool::Clay,.2f);auto before=d.copy_scene().encode();Hand h(d);h.point({1.1f,.15f,.12f});h.send();h.send(1);h.send();settled(d);auto paint=d.copy_scene().active().painted;
+  check(paint->pixel(1,32,32).data[9]>200&&paint->pixel(1,48,32).data[9]>0&&paint->pixel(1,32,48).data[9]==0,"Posed ordinary similarity meshes also use evaluated-world metric rather than synchronous rest paint");
+  check(d.undo()&&d.copy_scene().encode()==before,"Ordinary posed contact retains exact original source and Undo");
+ }
+ {
+  auto scene=source(false);Document d;d.replace(scene);settled(d);d.configure(Tool::Clay,.2f);d.configure_object_grab(true,true);settled(d);const auto before=d.copy_scene().encode();const auto world=scene.world_matrix(scene.active().id);
+  Hand h(d);h.f.hands[0].tracked.valid=true;h.f.hands[0].tracked.grip.position={0,1.4f,-.3f};h.point({.7f,-.2f,.3f});h.send();h.f.hands[0].tracked.squeeze=1;h.send();
+  check(d.frame().state->object_grabbing,"Actual first-hand squeeze holds affine object while second hand is paint tool");
+  h.send(1);check(d.frame().state->native_pending,"Contact painting can begin on physically held affine source");
+  const auto canvas=d.frame().state->canvas;auto movement=ob::rotate(canvas.orientation,{.2f*canvas.scale,0,0});h.f.hands[0].tracked.grip.position=h.f.hands[0].tracked.grip.position+movement;h.f.hands[1].tracked.grip.position=h.f.hands[1].tracked.grip.position+movement;h.send(1);
+  check(d.copy_scene().encode()==before,"Simultaneous physical motion and paint remain detached until ordered release");
+  h.f.hands[0].tracked.squeeze=0;h.send(1);auto path=home/"held-endpoint.dsculpt";auto saved=d.save_async(path);saved.get();settled(d);auto result=d.copy_scene();auto expected=world.matrix();expected[12]+=.2;
+  for(size_t i=0;i<16;++i)check(std::abs(result.world_matrix(result.active().id).matrix()[i]-expected[i])<2e-6,"Physical held release preserves full affine placement without shear approximation");
+  check(!d.frame().state->object_grabbing&&result.active().painted->pixel(1,32,32).data[9]>200,"Released endpoint contains both accepted centered paint and committed physical motion");
+  check(Scene::load(path).encode()==result.encode(),"Immediately queued Save retains combined held/paint endpoint");
+  check(d.undo()&&d.copy_scene().encode()==before,"Overlapping held movement and contact paint commit as one exact Undo");
+ }
  std::cout<<checks<<" actual affine controller contact/pose/metric/ordered-save checks passed\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
