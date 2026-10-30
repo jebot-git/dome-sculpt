@@ -14,6 +14,7 @@ void Document::configure_import(ImportSettings settings) {
 }
 void Document::browse_import_locked(const std::filesystem::path &path) {
   if(stopping_.load())throw std::logic_error("Document is stopping");
+  if(control_before_ || state_.cut || state_.retopology)throw std::logic_error("Finish the current editor before browsing models");
   auto view=std::make_shared<ImportView>();view->directory=path;view->settings=import_view_?import_view_->settings:import_settings_;
   view->busy=true;
   FileJob job{};job.path=path;job.generation=state_.generation;job.discover_import=true;
