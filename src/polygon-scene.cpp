@@ -3,6 +3,7 @@
 #include "dome/color-preparation.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-scene-archive.hpp"
+#include "source-placement-archive.hpp"
 #include "polygon-paint-authority.hpp"
 #include "text-utf8.hpp"
 #include <map>
@@ -185,7 +186,8 @@ uint32_t PolygonSceneArchive::add(std::shared_ptr<const PolygonAuthority> value,
                 "Polygon source requires a finalized retained Volume");
           name_valid(o->name);
           o->material.validate();
-          validate_transform(o->world_transform);
+          if(o->placement)o->placement->validate();
+          else validate_transform(o->world_transform);
           insert(volumes_, o->volume);
           require_polygon_paint_owner(o->paint.get(),o->polygon.get(),o->mesh_active);
           if (o->paint) {
@@ -266,8 +268,10 @@ PolygonSceneArchive::at(uint32_t i) const {
 nlohmann::json
 PolygonSceneArchive::encode(PaintImageArchive &images,
                             CreatorAssetArchive &models,
-                            SourceMaterialArchive &materials) const {
-  nlohmann::json j = {{"version", 1},
+                            SourceMaterialArchive &materials,SourcePlacementArchive *placements) const {
+  const bool affine=std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->placement);});
+  if(affine&&!placements)throw std::logic_error("Polygon source placement requires its shared archive");
+  nlohmann::json j = {{"version", affine?2:1},
                       {"authorities", nlohmann::json::array()},
                       {"origins", nlohmann::json::array()},
                       {"volumes", nlohmann::json::array()},
@@ -310,6 +314,10 @@ PolygonSceneArchive::encode(PaintImageArchive &images,
          {"scale", t.scale},
          {"name", o->name},
          {"source_object", o->source_object}});
+    if(o->placement) {
+      auto &record=j["origins"].back();record.erase("translation");record.erase("rotation");record.erase("scale");
+      record["placement"]=placements->add_capsule(o->placement);
+    }
   }
   for (const auto &v : volumes_)
     j["volumes"].push_back(v->encode());
@@ -320,7 +328,7 @@ PolygonSceneArchive::encode(PaintImageArchive &images,
 void PolygonSceneArchive::preflight(const nlohmann::json &j,
                                     const nlohmann::json &objects) {
   if (!j.is_object() || j.size() != 5 || !j.at("version").is_number_integer() ||
-      j.at("version") != 1)
+      (j.at("version") != 1 && j.at("version") != 2))
     throw std::invalid_argument("Unsupported polygon source archive");
   for (const auto *key : {"authorities", "origins", "volumes", "paints"})
     if (!j.at(key).is_array() || j.at(key).size() > maximum_nodes)
@@ -335,9 +343,14 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       polygon_archive_index(a.at("origin"), oo.size());
   }
   for (const auto &o : oo) {
-    if (!o.is_object() || o.size() != 14 || !o.at("mesh_active").is_boolean() ||
+    const bool affine=o.contains("placement");
+    if (!o.is_object() || o.size() != (affine?12u:14u) || !o.at("mesh_active").is_boolean() ||
         !o.at("name").is_string())
       throw std::invalid_argument("Invalid polygon origin record");
+    if(affine) {
+      if(j.at("version")!=2 || o.contains("translation")||o.contains("rotation")||o.contains("scale") || unsigned_id(o.at("placement"))>UINT32_MAX)
+        throw std::invalid_argument("Invalid exact polygon source placement declaration");
+    } else {auto p=o.at("translation").get<std::array<float,3>>();auto q=o.at("rotation").get<std::array<float,4>>();validate_transform({{p[0],p[1],p[2]},{q[0],q[1],q[2],q[3]},o.at("scale").get<float>()});}
     name_valid(o.at("name").get_ref<const std::string &>());
     unsigned_id(o.at("source_object"));
     polygon_archive_index(o.at("volume"), j.at("volumes").size());
@@ -406,7 +419,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
 }
 PolygonSceneArchive PolygonSceneArchive::decode(
     const nlohmann::json &j, const PaintImageArchive &images,
-    const CreatorAssetArchive &models, const SourceMaterialArchive &materials) {
+    const CreatorAssetArchive &models, const SourceMaterialArchive &materials,const SourcePlacementArchive *placements) {
   PolygonSceneArchive out;
   for (const auto &v : j.at("volumes"))
     out.volumes_.push_back(std::make_shared<const Volume>(Volume::decode(v)));
@@ -432,12 +445,15 @@ PolygonSceneArchive PolygonSceneArchive::decode(
     value->mesh_active = o.at("mesh_active").get<bool>();
     value->name = o.at("name").get<std::string>();
     value->source_object = unsigned_id(o.at("source_object"));
-    auto p = o.at("translation").get<std::array<float, 3>>();
-    auto q = o.at("rotation").get<std::array<float, 4>>();
-    value->world_transform = {{p[0], p[1], p[2]},
-                              {q[0], q[1], q[2], q[3]},
-                              o.at("scale").get<float>()};
-    validate_transform(value->world_transform);
+    if(o.contains("placement")) {
+      if(!placements)throw std::invalid_argument("Polygon source placement archive is missing");
+      value->placement=placements->capsule(uint32_t(unsigned_id(o.at("placement"))));
+    } else {
+      auto p = o.at("translation").get<std::array<float, 3>>();
+      auto q = o.at("rotation").get<std::array<float, 4>>();
+      value->world_transform = {{p[0], p[1], p[2]}, {q[0], q[1], q[2], q[3]},o.at("scale").get<float>()};
+      validate_transform(value->world_transform);
+    }
     if (!o.at("deformation").is_null())
       value->deformation = std::make_shared<const DeformationState>(
           DeformationState::decode(o.at("deformation"), value->paint->mesh()));

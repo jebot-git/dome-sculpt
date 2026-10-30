@@ -3,6 +3,7 @@
 #include "polygon.hpp"
 #include "scene.hpp"
 namespace dome {
+struct SourcePlacementCapsule;
 struct PolygonOrigin;
 // Stable editable topology, not the triangulated display/paint derivative.
 // An active authority with no faces intentionally displays no surface, even if
@@ -29,6 +30,9 @@ struct PolygonOrigin {
   std::string name;
   // Provenance only; zero and deleted source IDs remain valid and restorable.
   uint64_t source_object = 0;
+  // Scene13 exact placement authority; world_transform remains legacy-only
+  // provenance. IDs in the capsule are snapshots, not live hierarchy links.
+  std::shared_ptr<const SourcePlacementCapsule> placement{};
 };
 // Compare the active painted REST derivative only. Posed preview positions and
 // unrelated source attributes must not replace the editable topology authority.

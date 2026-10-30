@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "base": "d3d7661",
+  "parents": [
+    "7152f5ecc61a85a09c1d8aad924f20d57c1680fb",
+    "55ceba83ce802ac19460fae1ff66f5aa37c59948"
+  ],
+  "scope": "standalone new affine-interaction adapter plus previous foundation; no actual Scene/consumer adoption",
+  "assertions": {
+    "affine_math": 74,
+    "source_hierarchy": 56,
+    "interaction": 667
+  },
+  "results": {
+    "release": "3/3 0.01s",
+    "asan_ubsan_leaks": "3/3 0.04s"
+  },
+  "valid_sample_cpp_allocation_attempts": 0,
+  "sample_iterations": 128,
+  "source_sha256": {
+    "CMakeLists.txt": "9e172a876fd03be286f65f0147b772af11d03369d23684709aa64d6cf53b66c8",
+    "src/affine-interaction.hpp": "a4aae3a76ac640a6676ea2d426b59e29b3ccc4888f7083ac7c27fc997a7bee40",
+    "src/affine-interaction.cpp": "cd25c166b7b6bf066420b400950a1c9bd9c176f9d29c1ad128715c5cae4ac1e6",
+    "tests/affine-interaction.cpp": "4eb4b7b410a23bf6f1ce250ef13150366bca5e7d0abdaa188d706283a36f581c"
+  },
+  "logs_sha256": {
+    "configure-affine-migration.log": "bf0423e1e3571ecc5e1b7f0562f508208c4d4f2b14fb387f48735c03ae8e85ba",
+    "build-affine-interaction-final.log": "0876429996f90a0453cdb3829b6863493b298764f85bf4a4fd163882b4027827",
+    "test-affine-interaction-final.log": "42a34f8bbd8b5fa74db920e7ed82f7b8d673fe23bc2f43f9a37ec0d6621788fe",
+    "configure-affine-interaction-sanitize.log": "91c4fd1111a2fca37632eeb070b8fba828427ea85edc8b485dded20c6aed17ca",
+    "build-affine-interaction-sanitize.log": "35d89cfecf233ed35fc5b453ec8c61338af2472194f1af10b9c245a912602a03",
+    "test-affine-interaction-sanitize.log": "a07cfe2a35b1b31f7934b5c4146ecf13615e57cbbbd78099804370fdb0fe3a0a"
+  },
+  "source_fields_or_archive_changed": false,
+  "import_guard_removed": false,
+  "pending": "Scene13 placement+consumer integration, actual evaluated paint/pose/GL/interop/GUI proof; no SDF metric adoption"
+}

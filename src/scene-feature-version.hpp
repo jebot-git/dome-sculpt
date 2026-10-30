@@ -4,12 +4,14 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/color-preparation.hpp"
+#include "dome/polygon-scene.hpp"
+#include <set>
 #include <nlohmann/json.hpp>
 namespace dome { struct PolygonAuthority; }
 namespace dome::detail {
 // Scene12 is the first format owning complete polygon source histories. Its
 // bounded graph may retain all older frame/color/bind/source receipt features.
-inline unsigned minimum_scene_version(const PolygonAuthority *p) {return p?12u:0u;}
+inline unsigned minimum_scene_version(const PolygonAuthority *p);
 inline unsigned minimum_scene_version(const DeformationState *d) {
   if (!d || !d->skeleton)
     return 0;
@@ -30,6 +32,17 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if(const auto &preparation=binding->color_preparation)
     result=std::max({result,10u,minimum_scene_version(preparation->original_deformation.get()),
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
+  return result;
+}
+inline unsigned minimum_scene_version(const PolygonAuthority *p) {
+  unsigned result=0;std::set<const PolygonAuthority*> seen;
+  while(p) {
+    if(seen.size()>=512 || !seen.insert(p).second)throw std::invalid_argument("Invalid retained polygon feature-version graph");
+    result=std::max(result,12u);const auto&o=p->origin;if(!o)break;
+    result=std::max({result,o->placement?13u:0u,minimum_scene_version(o->deformation.get()),
+      minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
+    p=o->polygon.get();
+  }
   return result;
 }
 inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {

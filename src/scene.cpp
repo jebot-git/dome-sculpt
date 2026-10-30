@@ -2,6 +2,8 @@
 #include "dome/scene.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
+#include "dome/source-placement.hpp"
+#include "source-placement-archive.hpp"
 #include "dome/import-source.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-maps.hpp"
@@ -159,9 +161,10 @@ void Scene::validate(bool deep_sources) const {
     name_valid(g.name);
     validate_transform(g.transform);
     if (g.humanoid) g.humanoid->validate();
-    CanvasTransform world{};
-    for (auto &parent : group_path(g.id)) world = ob::compose(world, parent.transform);
-    validate_transform(world);
+    auto path=group_path(g.id);
+    const bool affine=std::any_of(path.begin(),path.end(),[](const auto&p){return bool(p.source_placement)||bool(p.affine_edit);});
+    if(affine){AffineTransform world;for(const auto &parent:path)world=world*group_local_matrix(parent);}
+    else {CanvasTransform world{};for(const auto &parent:path)world=ob::compose(world,parent.transform);validate_transform(world);}
   }
   std::set<uint64_t> ids;
   PaintImageArchive source_images;
@@ -173,6 +176,19 @@ void Scene::validate(bool deep_sources) const {
   SourceMaterialArchive source_materials;
   detail::PolygonSceneArchive polygons;
   std::set<const PaintedMesh *> retained_paint;
+  std::set<const CreatorSourceModel *> retained_models;
+  auto retain_model=[&](const std::shared_ptr<const CreatorSourceModel> &model) {
+    if(!model || !model->original_bytes || !model->asset || !model->decoded_images)
+      throw std::invalid_argument("Missing original placement source model");
+    if(!retained_models.insert(model.get()).second)return;
+    if(model->source_receipt)model->source_receipt->validate();
+    const size_t stored=model->original_bytes->size()+(model->source_receipt?model->source_receipt->stored_bytes():0);
+    if(stored>64*1024*1024)throw std::length_error("Original placement source exceeds native asset budget");
+    if(originals.insert(model->original_bytes.get()).second)source_bytes+=stored;
+    if(originals.size()>16 || source_bytes>128*1024*1024)throw std::length_error("Original placement sources exceed native model budget");
+    if(deep_sources)source_models.add_model(*model,source_images);
+    else for(const auto &image:*model->decoded_images)source_images.add(image);
+  };
   auto retain_appearance = [&](const CreatorAppearance &a, size_t vertices) {
     if(a.source_vertices.size()!=vertices)throw std::invalid_argument("Creator source does not match its retained mesh");
     remap_vertices+=a.source_vertices.size();
@@ -199,6 +215,7 @@ void Scene::validate(bool deep_sources) const {
     if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
     if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
   };
+  for(const auto &g:groups_)if(g.source_placement)retain_model(g.source_placement->model);
   for (auto &o : objects_) {
     if (!o.id || o.id >= next_ || !ids.insert(o.id).second || !o.volume ||
         o.volume->in_stroke())
@@ -208,7 +225,8 @@ void Scene::validate(bool deep_sources) const {
     detail::require_polygon_paint_owner(o.painted.get(),o.polygon.get(),o.mesh_active);
     if(o.polygon){polygons.add(o.polygon,deep_sources);if(deep_sources)validate_polygon_derivative(*o.polygon,o.painted.get(),o.mesh_active);}
     validate_transform(o.transform);
-    validate_transform(world_transform(o.id));
+    if(has_affine_placement(o.id))(void)world_matrix(o.id);
+    else validate_transform(world_transform(o.id));
     o.material.validate();
     if(o.retopology) {
       const auto &patch=*o.retopology;
@@ -267,6 +285,10 @@ void Scene::validate(bool deep_sources) const {
     origin_vertices+=p->mesh().positions.size();
   }
   for (const auto &origin : polygons.origins()) {
+    if(origin->placement) {
+      origin->placement->validate();
+      for(const auto &g:origin->placement->groups)if(g.source_placement)retain_model(g.source_placement->model);
+    }
     if (origin->deformation) {
       deformation_entries += origin->deformation->resource_entries();
       if (deformation_entries > 8'000'000)
@@ -322,8 +344,10 @@ nlohmann::json Scene::encode() const {
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
   const bool framed=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){if(!o.material_bindings)return false;const auto &b=*o.material_bindings;return bool(b.normal_frames) || (b.uv_origin && (b.uv_origin->deformation || !b.uv_origin->creator_kind.empty() || !b.sampling_reparameterized));});
   unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
-  const bool polygon_fields=std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.polygon);});
+  if(std::any_of(groups_.begin(),groups_.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);}) ||
+      std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.affine_edit);}))feature_version=std::max(feature_version,13u);
   for(const auto&o:objects_)feature_version=std::max(feature_version,detail::minimum_scene_version(o.polygon.get()));
+  const bool polygon_fields=feature_version>=12 || std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.polygon);});
   const bool extended=resolved || retopology || feature_version>=8;
   nlohmann::json j = {{"format", "dome-sculpt"},
                       {"version", std::max(feature_version,unsigned(framed ? 9 : extended ? 8 : baked ? 6 : 5))},
@@ -334,6 +358,8 @@ nlohmann::json Scene::encode() const {
   CreatorAssetArchive source_models;
   SourceMaterialArchive source_materials;
   detail::PolygonSceneArchive polygons;
+  detail::SourcePlacementArchive placements;
+  for(const auto &o:objects_)if(o.polygon)polygons.add(o.polygon,false);
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
@@ -342,6 +368,8 @@ nlohmann::json Scene::encode() const {
       {"translation", {t.position.x,t.position.y,t.position.z}},
       {"rotation", {t.orientation.x,t.orientation.y,t.orientation.z,t.orientation.w}},
       {"scale", t.scale}, {"humanoid", g.humanoid ? g.humanoid->encode() : nlohmann::json(nullptr)}});
+    if(g.source_placement)j["groups"].back()["source_placement"]=placements.add_node(g.source_placement);
+    if(g.affine_edit)j["groups"].back()["affine_edit"]=placements.add_edit(g.affine_edit);
   }
   size_t retopo_bytes=0;
   for (auto &o : objects_) {
@@ -380,14 +408,16 @@ nlohmann::json Scene::encode() const {
                              ? o.deformation->encode(o.painted->mesh())
                              : nlohmann::json(nullptr)}});
     if(polygon_fields)j["objects"].back()["polygon"]=o.polygon?nlohmann::json(polygons.add(o.polygon)):nlohmann::json(nullptr);
+    if(o.affine_edit)j["objects"].back()["affine_edit"]=placements.add_edit(o.affine_edit);
     if(extended) {
       j["objects"].back()["material_bindings"]=o.material_bindings
         ?nlohmann::json(source_materials.add(o.material_bindings)):nlohmann::json(nullptr);
       j["objects"].back()["retopology"]=std::move(patch);
     }
   }
-  if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials);
+  if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements);
   if(extended)j["source_materials"]=source_materials.encode(source_images,source_models);
+  if(!placements.empty())j["affine_state"]=placements.encode(source_images,source_models);
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
   return j;
@@ -404,14 +434,30 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>12)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>13)throw std::runtime_error("Unsupported scene version");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
+  bool affine_refs=j.contains("affine_state");
+  if(j.contains("groups"))for(const auto &g:j.at("groups"))affine_refs|=g.contains("source_placement")||g.contains("affine_edit");
+  for(const auto &o:objects)affine_refs|=o.contains("affine_edit");
+  if(j.contains("polygon_sources"))for(const auto &o:j.at("polygon_sources").at("origins"))affine_refs|=o.contains("placement");
+  if(affine_refs && version<13)throw std::invalid_argument("Exact affine placement requires Scene13");
+  if(affine_refs && !j.contains("affine_state"))throw std::invalid_argument("Missing exact source-placement archive");
+  if(j.contains("affine_state")) {
+    const auto &state=j.at("affine_state");detail::SourcePlacementArchive::preflight(state,j.at("source_models").size());
+    if(j.contains("groups"))for(const auto &g:j.at("groups")) {
+      if(g.contains("source_placement"))detail::placement_index(g.at("source_placement"),state.at("nodes").size());
+      if(g.contains("affine_edit"))detail::placement_index(g.at("affine_edit"),state.at("edits").size());
+    }
+    for(const auto &o:objects)if(o.contains("affine_edit"))detail::placement_index(o.at("affine_edit"),state.at("edits").size());
+    if(j.contains("polygon_sources"))for(const auto &o:j.at("polygon_sources").at("origins"))if(o.contains("placement"))detail::placement_index(o.at("placement"),state.at("capsules").size());
+  }
   const bool polygon_fields = version >= 12;
   if (polygon_fields) {
     if (!j.contains("polygon_sources"))
       throw std::invalid_argument("Incomplete polygon source scene fields");
+    if(version<13 && j.at("polygon_sources").at("version")!=1)throw std::invalid_argument("Exact polygon placement requires Scene13");
     detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects);
     const auto &material_records=j.at("source_materials").at("bindings");
     const auto &model_records=j.at("source_models");
@@ -650,8 +696,10 @@ Scene Scene::decode(const nlohmann::json &j) {
   }
   SourceMaterialArchive source_materials;
   if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models);
+  detail::SourcePlacementArchive placements;
+  if(j.contains("affine_state"))placements=detail::SourcePlacementArchive::decode(j.at("affine_state"),source_models);
   detail::PolygonSceneArchive polygons;
-  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials);
+  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -673,6 +721,8 @@ Scene Scene::decode(const nlohmann::json &j) {
       g.transform = {{p[0],p[1],p[2]}, {q[0],q[1],q[2],q[3]}, v.at("scale").get<float>()};
       if (!v.at("humanoid").is_null())
         g.humanoid = std::make_shared<const HumanoidControls>(HumanoidControls::decode(v.at("humanoid")));
+      if(v.contains("source_placement"))g.source_placement=placements.node(detail::placement_index(v.at("source_placement"),j.at("affine_state").at("nodes").size()));
+      if(v.contains("affine_edit"))g.affine_edit=placements.edit(detail::placement_index(v.at("affine_edit"),j.at("affine_state").at("edits").size()));
       result.groups_.push_back(std::move(g));
     }
   }
@@ -690,6 +740,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     o.transform = {{p[0], p[1], p[2]},
                    {q[0], q[1], q[2], q[3]},
                    v.at("scale").get<float>()};
+    if(v.contains("affine_edit"))o.affine_edit=placements.edit(detail::placement_index(v.at("affine_edit"),j.at("affine_state").at("edits").size()));
     auto &m = v.at("material");
     o.material = {m.at("name").get<std::string>(),
                   m.at("color").get<std::array<float, 4>>(),
@@ -775,6 +826,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(polygon_fields && !v.at("polygon").is_null())o.polygon=polygons.at(detail::polygon_archive_index(v.at("polygon"),polygons.authorities().size()));
     result.objects_.push_back(std::move(o));
   }
+  placements.require_reachable();
   result.validate();
   return result;
 }
@@ -839,6 +891,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
            o.mesh_active ? o.appearance : nullptr,
            o.mesh_active ? o.material_bindings : nullptr,
            source_is_dormant(o)});
+      result.back().affine_edit=o.affine_edit;
     }
   return result;
 }

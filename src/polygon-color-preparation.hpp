@@ -9,7 +9,8 @@ namespace dome::detail {
 // own direct Scene12 origin/authority. This does not unwrap overlapping UVs.
 inline void strict_polygon_color_target(SculptObject &target,
                                         CanvasTransform world,
-                                        const std::function<bool()> &cancelled) {
+                                        const std::function<bool()> &cancelled,
+                                        std::shared_ptr<const SourcePlacementCapsule> placement={}) {
   if (!target.painted || target.painted->surface_diagnostics().policy !=
                              PaintUvPolicy::PolygonAuthored)
     return;
@@ -27,7 +28,7 @@ inline void strict_polygon_color_target(SculptObject &target,
   } catch (const std::invalid_argument &e) {
     throw std::invalid_argument(std::string("Unwrap polygon UVs into a unique writable atlas before preparing source colors: ") + e.what());
   }
-  auto origin = capture_polygon_origin(target, world);
+  auto origin = capture_polygon_origin(target, world,std::move(placement));
   auto authority = std::make_shared<PolygonAuthority>(*target.polygon);
   authority->origin = std::move(origin);
   if (cancelled && cancelled())
