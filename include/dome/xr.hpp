@@ -4,6 +4,7 @@
 #include "controller-profiles.h"
 #include "graphics.h"
 #include "palette.hpp"
+#include "polygon-render.hpp"
 #define XR_USE_PLATFORM_EGL
 #define XR_USE_GRAPHICS_API_OPENGL
 #include <openxr/openxr.h>
@@ -34,6 +35,7 @@ class XrSculpt {
   bool running = false, quit = false, overlayMode = true;
   SurfaceOutputEncoding output_encoding_ = SurfaceOutputEncoding::Linear;
   std::unique_ptr<SurfaceRenderer> renderer;
+  std::unique_ptr<PolygonRenderer> polygons;
   std::unique_ptr<SpatialPalette> palette;
   std::unique_ptr<CursorRenderer> cursors;
   bool stylusHands[2]{};

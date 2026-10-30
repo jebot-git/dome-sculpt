@@ -28,7 +28,7 @@ class Document::Transaction {
   bool native_end_=false;
   std::deque<History> *undo_source_=nullptr,*undo_destination_=nullptr;
   std::optional<UvWorkspace> removed_uv_;
-  bool replaced_=false,recorded_=false,committed_=false,rebind_=false,finish_uv_=false,finish_retopo_=false,finish_cut_=false,advance_import_=false;
+  bool replaced_=false,recorded_=false,committed_=false,rebind_=false,finish_uv_=false,finish_retopo_=false,finish_cut_=false,advance_import_=false,finish_polygon_=false,cancel_polygon_=false;
 public:
   explicit Transaction(Document &);
   Transaction(const Transaction &)=delete;
@@ -64,6 +64,12 @@ public:
   }
   void finish_retopo(){d_.state_.retopology.reset();finish_retopo_=true;}
   void finish_cut(){d_.state_.cut.reset();finish_cut_=true;}
+  void cancel_polygon(){d_.state_.polygon.reset();d_.state_.polygon_object=0;cancel_polygon_=true;}
+  void finish_polygon(bool handoff) {
+    if(handoff){d_.state_.polygon_handoff=d_.state_.polygon;d_.state_.polygon_handoff_object=d_.state_.polygon_object;
+      d_.state_.polygon_handoff_generation=d_.state_.generation;d_.state_.polygon_handoff_revision=UINT64_MAX;}
+    d_.state_.polygon.reset();d_.state_.polygon_object=0;finish_polygon_=true;
+  }
   // Private view reset may precede publication, but a scanner must not observe
   // irreversible cancellation until publication succeeds (including OOM).
   uint64_t advance_import_request(){

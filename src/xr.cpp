@@ -2,6 +2,7 @@
 // Session lifecycle adapted from OpenBrush Native (Apache-2.0); see
 // third_party/openbrush/NOTICE.
 #include "dome/xr.hpp"
+#include "polygon-view-render.hpp"
 #include "dome/frame-clock.hpp"
 #include <algorithm>
 #include <cstring>
@@ -59,6 +60,7 @@ XrSculpt::XrSculpt(Document &value, std::atomic_bool *stopping, bool overlay)
     setup(overlay);
     document.begin_spatial();
     renderer = std::make_unique<SurfaceRenderer>();
+    polygons = std::make_unique<PolygonRenderer>();
     renderer->set_output_encoding(output_encoding_);
     renderer->set_deferred_resolve(true);
     palette = std::make_unique<SpatialPalette>();
@@ -568,10 +570,12 @@ void XrSculpt::run(unsigned frameLimit) {
               view_matrix({p.position.x, p.position.y, p.position.z},
                           {p.orientation.x, p.orientation.y, p.orientation.z,
                            p.orientation.w}));
+          auto polygon_preview=detail::polygon_preview(content);
           renderer->draw(content.surface, content.state->canvas, vp,
                          {p.position.x, p.position.y, p.position.z}, e.width,
                          e.height, overlayMode, content.state->toon,
-                         content.state->light,content.state->objects);
+                         content.state->light,content.state->objects,polygon_preview.object);
+          detail::draw_polygon_preview(*polygons,polygon_preview,content.state->canvas,vp,content.state->accent);
           if (content.state->controls.parameter == VrParameter::None)
             cursors->draw(*content.state, vp);
           palette->draw(*content.state, vp);

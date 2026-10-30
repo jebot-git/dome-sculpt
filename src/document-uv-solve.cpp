@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "polygon-conversion.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-uv-bake.hpp"
 #include <new>
@@ -157,8 +158,17 @@ void Document::process_uv_transfer(FileJob &job) {
   auto cancelled = [&] { return stopping_.load() || uv_request_.load() != request; };
   const auto &source = job.scene.object(job.object);
   const auto &old = source.painted->mesh();
-  const auto &target = *job.uv_mesh;
-  const auto &map = job.uv_source_vertices;
+  auto target_owner=job.uv_mesh;
+  auto map=job.uv_source_vertices;
+  std::shared_ptr<const PolygonAuthority> polygon=source.polygon;
+  if(source.polygon&&source.polygon->active){
+    if(!map)throw std::runtime_error("Polygon UV source correspondence is missing");
+    auto derivative=prepare_polygon_uv_derivative(source,*target_owner,*map,cancelled);
+    polygon=std::move(derivative.authority);
+    target_owner=std::make_shared<const Mesh>(std::move(derivative.mesh));
+    map=std::make_shared<const std::vector<uint32_t>>(std::move(derivative.source_vertices));
+  }
+  const auto &target = *target_owner;
   if (!map || map->size() != target.positions.size() ||
       old.indices.size() != target.indices.size())
     throw std::runtime_error("UV source vertex/corner identity is missing; reopen the UV editor");
@@ -252,6 +262,7 @@ void Document::process_uv_transfer(FileJob &job) {
   Scene prepared = job.scene;
   auto &candidate = prepared.object(job.object);
   candidate.painted = std::move(painted);
+  candidate.polygon = std::move(polygon);
   candidate.deformation = std::move(deformation);
   candidate.appearance = std::move(appearance);
   candidate.material_bindings=std::move(binding);

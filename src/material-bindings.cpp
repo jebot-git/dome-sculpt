@@ -78,6 +78,7 @@ void SourceMaterialBindings::validate(bool deep) const {
      (material.parameters.scroll!=std::array<float,2>{} || material.parameters.rotation_speed!=0))
     throw std::invalid_argument("An explicitly frozen material cannot retain active UV animation");
   if(uv_origin) {
+    if(uv_origin->paint&&uv_origin->paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)throw std::invalid_argument("Source UV origin paint requires explicit strict conversion; polygon authority cannot be inferred");
     if(!uv_origin->paint || uv_origin->paint->in_stroke())
       throw std::invalid_argument("Derived UV material has no finished immutable source");
     roles_valid(uv_origin->material,uv_origin->roles);
@@ -296,9 +297,10 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;
   if(prepared)preparations.resize(input.at("color_preparations").size());
   for(const auto &value:input.at("bindings")) {
-    if(value.at("normal_frame")!="uv-derivative" && (!extended || value.at("normal_frame")!="original-attributes"))throw std::runtime_error("Unsupported derived material normal frame");
+    const auto &frame=value.at("normal_frame");
+    if(!frame.is_string() || (frame.get_ref<const std::string&>()!="uv-derivative" && (!extended || frame.get_ref<const std::string&>()!="original-attributes")))throw std::runtime_error("Unsupported derived material normal frame");
     auto binding=std::make_shared<SourceMaterialBindings>();
-    if(value.at("normal_frame")=="original-attributes")binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
+    if(frame.get_ref<const std::string&>()=="original-attributes")binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
     if(extended && !value.at("frames").is_null())binding->normal_frames=frames.at(uint32_t(index(value.at("frames"),frames.sets().size())));
     binding->has_mtoon=!value.at("material").is_null();
     if(binding->has_mtoon)binding->material=MToonMaterial::decode(value.at("material"));

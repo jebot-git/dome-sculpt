@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "document-authority.hpp"
+#include "polygon-conversion.hpp"
+#include "document-polygon-authority.hpp"
 #include "document-authority-transition.hpp"
 #include "dome/tangents.hpp"
 #include "dome/creation.hpp"
@@ -68,6 +70,7 @@ Document::Document() : input_(volume()) {
     retopo_thread_ = std::thread([this] { retopo_loop(); });
     cut_thread_ = std::thread([this] { cut_loop(); });
     native_thread_ = std::thread([this] { native_loop(); });
+    polygon_thread_ = std::thread([this] { polygon_loop(); });
   } catch (...) {
     request_worker_stop();
     {
@@ -86,6 +89,7 @@ Document::Document() : input_(volume()) {
     if (retopo_thread_.joinable()) retopo_thread_.join();
     if (cut_thread_.joinable()) cut_thread_.join();
     if (native_thread_.joinable()) native_thread_.join();
+    if (polygon_thread_.joinable()) polygon_thread_.join();
     throw;
   }
 }
@@ -100,8 +104,10 @@ void Document::request_worker_stop() {
   { std::lock_guard lock(retopo_mutex_); retopo_changed_.notify_all(); }
   { std::lock_guard lock(cut_mutex_); cut_changed_.notify_all(); }
   { std::lock_guard lock(native_mutex_); native_changed_.notify_all(); }
+  { std::lock_guard lock(polygon_mutex_); polygon_changed_.notify_all(); }
 }
 Document::~Document() {
+  drain_polygon_shutdown();
   drain_native_shutdown();
   request_worker_stop();
   input_thread_.join();
@@ -116,6 +122,7 @@ Document::~Document() {
   retopo_thread_.join();
   cut_thread_.join();
   native_thread_.join();
+  polygon_thread_.join();
 }
 EditorSnapshot Document::frame() const {
   auto state = published_.load();
@@ -136,12 +143,14 @@ Scene Document::copy_scene() const {
 }
 bool Document::action_active_locked() const {
   if(native_stroke_)return true;
+  if (polygon_stroking_) return true;
   if (retopo_stroking_) return true;
   if (weight_stroking_) return true;
   auto &o = scene_.active();
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if(state_.polygon)return state_.polygon->changed||polygon_stroking_||polygon_pending_.load()!=0;
   if(state_.object_grabbing)return true;
   if(native_stroke_)return true;
   if(state_.cut)return state_.cut->busy||(state_.cut->preview&&state_.cut->preview->changed);
@@ -152,6 +161,8 @@ bool Document::pending_locked() const {
                        : volume().pending_changes();
 }
 void Document::begin_action_locked() {
+  if(state_.polygon)throw std::logic_error("Use polygon selection and move controls while polygon editing is open");
+  if(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active)throw std::logic_error("The empty polygon object has no sculptable surface; reopen polygon tools or restore its source");
   require_object_editable_locked(scene_.active().id);
   state_.message.clear();
   if (state_.retopology) {
@@ -212,6 +223,7 @@ void Document::stamp_action_locked(const Brush &b) {
   }
 }
 bool Document::end_action_locked() {
+  if(polygon_stroking_){PolygonJob job;job.action=PolygonAction::EndDrag;queue_polygon_locked(std::move(job));polygon_stroking_=false;return false;}
   if (retopo_stroking_) {
     queue_retopology_locked(RetopoAction::EndGesture);
     retopo_stroking_ = retopo_sampled_ = false; return false;
@@ -243,6 +255,7 @@ bool Document::end_action_locked() {
                                      : volume().end_stroke();
 }
 void Document::cancel_action_locked() {
+  if(polygon_stroking_){PolygonJob job;job.action=PolygonAction::CancelDrag;queue_polygon_locked(std::move(job));polygon_stroking_=false;return;}
   if (retopo_stroking_) {
     queue_retopology_locked(RetopoAction::CancelGesture);
     retopo_stroking_ = retopo_sampled_ = false; return;
@@ -328,7 +341,9 @@ void Document::scene_changed_locked(Scene before) {
   // state. A failure even in the Transaction constructor retains the source.
   Scene candidate=std::move(scene_);scene_=std::move(before);
   Transaction transaction(*this);
+  if(state_.polygon)transaction.cancel_polygon();
   scene_=std::move(candidate);
+  detail::require_trusted_polygon_transition(transaction.before(),scene_);
   scene_.validate(false);
   record_locked({{},transaction.before(),scene_});
   bind_locked();publish_locked(true,false);transaction.commit();
@@ -453,6 +468,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
   const auto previous_control_source=control_source_;
   try {
   auto &active = scene_.active();
+  const bool cancel_polygon_publication=state_.polygon &&
+    (polygon_source_.generation!=state_.generation || polygon_source_.object!=active.id || polygon_source_.edit_authority!=state_.edit_authority);
+  if(cancel_polygon_publication){state_.polygon.reset();state_.polygon_object=0;
+    if(polygon_accept_&&asset_work_.load()==polygon_accept_->work)state_.asset_busy=false;}
   uint64_t paint_revision = active.mesh_active ? active.painted->revision() : 0;
   bool changed = force || last_volume_ != volume().revision() ||
                  last_paint_ != paint_revision;
@@ -461,6 +480,13 @@ void Document::publish_locked(bool force,bool checkpoint) {
     last_paint_ = paint_revision;
     ++state_.revision;
   }
+  if(state_.polygon_handoff&&state_.polygon_handoff_revision==UINT64_MAX)state_.polygon_handoff_revision=state_.revision;
+  if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
+    state_.polygon_handoff.reset();state_.polygon_handoff_object=0;
+  }
+  state_.can_polygon=!state_.asset_busy&&!state_.recovery_busy&&!uv_&&!state_.retopology&&!state_.cut&&!import_view_&&object_editable_locked(active.id);
+  state_.polygon_requires_conversion=polygon_conversion_required(active);
+  state_.polygon_has_source=active.polygon&&bool(active.polygon->origin);
   state_.project_path = path_;
   state_.importing = import_view_;
   state_.active_object = scene_.active().id;
@@ -616,6 +642,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
   mesh_changed_.notify_one();uv_changed_.notify_all();
   {std::lock_guard lock(retopo_mutex_);retopo_changed_.notify_all();}
   {std::lock_guard lock(cut_mutex_);cut_changed_.notify_all();}
+  if(cancel_polygon_publication)cancel_polygon_locked();
+  if(polygon_predicate_locked_)polygon_changed_.notify_all();
+  else {std::lock_guard lock(polygon_mutex_);polygon_changed_.notify_all();}
   }catch(...){
     state_=std::move(previous_state);last_volume_=previous_volume;last_paint_=previous_paint;
     rig_object_=previous_rig;control_changed_=previous_control_changed;control_source_=previous_control_source;
@@ -625,6 +654,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
 }
 
 void Document::finish_locked() {
+  if(state_.polygon)throw std::logic_error("Apply or cancel polygon editing before changing the document");
   if(state_.object_grabbing)finish_object_grab_locked(true,false);
   if(native_stroke_)throw std::logic_error("Wait for the accepted desktop stroke, or cancel it, before changing the document");
   if(state_.cut)throw std::logic_error("Apply or cancel the plane cut before changing the document");
@@ -632,7 +662,10 @@ void Document::finish_locked() {
     throw std::logic_error("Apply or cancel retopology before changing the document");
   // Starting another command may accept scalar property previews, but must
   // not implicitly execute an action such as creating a remeshed object.
-  finish_control_locked(state_.controls.parameter != VrParameter::ImportUnitScale &&
+  finish_control_locked(state_.controls.parameter != VrParameter::PolygonConversion &&
+                        state_.controls.parameter != VrParameter::PolygonDistance &&
+                        state_.controls.parameter != VrParameter::PolygonCuts &&
+                        state_.controls.parameter != VrParameter::ImportUnitScale &&
                         state_.controls.parameter != VrParameter::SculptResolution &&
                         state_.controls.parameter != VrParameter::VoxelSize &&
                         state_.controls.parameter != VrParameter::RigRotation &&
@@ -749,6 +782,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) const {
   if (!std::isfinite(material_time)) throw std::invalid_argument("Invalid material pick time");
   std::lock_guard lock(model_mutex_);
+  if(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active)return {};
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation != state_.generation || mesh->revision != state_.revision || !mesh->picking) return {};
@@ -797,6 +831,7 @@ Vec3 Document::gradient(Vec3 p) const {
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
+  if(state_.polygon){if(polygon_accepting_||!state_.polygon->surface)return false;bool available=state_.polygon->can_undo||polygon_stroking_;PolygonJob job;job.action=polygon_stroking_?PolygonAction::CancelDrag:PolygonAction::Undo;queue_polygon_locked(std::move(job));polygon_stroking_=false;return available;}
   if(native_stroke_){cancel_native_locked();publish_locked();return true;}
   if(state_.cut){bool available=!cut_undo_.empty()||bool(control_before_);cut_history_locked(false);publish_locked();return available;}
   if (state_.retopology) {
@@ -825,6 +860,7 @@ bool Document::undo() {
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
+  if(state_.polygon){if(polygon_accepting_||polygon_stroking_||!state_.polygon->surface)return false;bool available=state_.polygon->can_redo;PolygonJob job;job.action=PolygonAction::Redo;queue_polygon_locked(std::move(job));return available;}
   if(state_.cut){bool available=!cut_redo_.empty()&&!control_before_;cut_history_locked(true);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || retopo_stroking_ || !state_.retopology->source) return false;
@@ -1018,6 +1054,8 @@ bool Document::wait_asset(std::chrono::milliseconds timeout) const {
   // an XR shutdown boundary. Unconfirmed workspaces do not block this helper.
   auto native=published_.load();
   if(native->native_pending&&!native->native_accepting&&!wait_native_stroke(timeout))return false;
+  auto polygon=published_.load()->polygon;
+  if(polygon&&polygon->committing&&!wait_polygon(std::max(std::chrono::milliseconds(0),std::chrono::duration_cast<std::chrono::milliseconds>(deadline-std::chrono::steady_clock::now()))))return false;
   auto topology = published_.load()->retopology;
   if (topology && topology->committing && !wait_retopology(timeout)) return false;
   auto cut=published_.load()->cut;
@@ -1032,6 +1070,7 @@ void Document::prepare_locked(uint32_t resolution) {
   if (state_.asset_busy)
     throw std::logic_error("A painting mesh is already being prepared");
   auto &o = scene_.active();
+  if(o.polygon&&o.polygon->active)throw std::logic_error("Use the polygon or UV editor for this native polygon mesh; restore its source before rebuilding sculpt geometry");
   if (o.painted && o.painted->has_paint_data())
     throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
   if (o.retopology)
@@ -1110,7 +1149,7 @@ void Document::finish_spatial() {
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
-    if(state_.object_grabbing){if(held_weight_pending_locked()){held_preview_transform_=held_start_transform_;object_navigation_.reset();}else finish_object_grab_locked(false,true);}
+    if(state_.object_grabbing){if(held_polygon_pending_locked()){object_navigation_.reset();}else if(held_weight_pending_locked()){held_preview_transform_=held_start_transform_;object_navigation_.reset();}else finish_object_grab_locked(false,true);}
     if (accepted_uv) input_.take_controls();
     navigation_.reset();
     publish_locked();
@@ -1121,6 +1160,9 @@ void Document::process_locked(const SpatialFrame &f) {
     return;
   if (!f.focused || !f.head_valid || !ob::finite(f.head) ||
       !std::isfinite(f.time) || f.time < 0) {
+    if(held_polygon_pending_locked()){
+      input_.cancel();object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
+    }
     if(state_.object_grabbing&&held_weight_pending_locked()){
       input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
     }
@@ -1168,6 +1210,8 @@ void Document::process_locked(const SpatialFrame &f) {
   input_.painting = scene_.active().mesh_active;
   input_.retopology = bool(state_.retopology);
   input_.cutting = bool(state_.cut);
+  input_.polygon_editing=bool(state_.polygon);
+  if(state_.polygon||(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active))input_.edit_allowed=false;
   input_.sculpt_mask_edit = !scene_.active().mesh_active && volume().sculpt_settings().mask_edit;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
@@ -1197,6 +1241,7 @@ void Document::process_locked(const SpatialFrame &f) {
     }
     input_.update(s);
   }
+  if(state_.polygon&&!menu_was)process_polygon_pointer_locked(f);
   for (auto event : input_.take_controls())
     control_event_locked(event);
   if (control_before_ && !uv_accept_pending_ && !input_.menu_open())
@@ -1220,7 +1265,7 @@ void Document::process_locked(const SpatialFrame &f) {
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
-        input_.menu_page()!=18 && input_.menu_page()!=20) finish_locked();
+        input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
     import_published=import_command(*c)&&published_.load()!=command_publication;
@@ -1228,7 +1273,8 @@ void Document::process_locked(const SpatialFrame &f) {
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
-    if(state_.cut){cut_history_locked(false);
+    if(state_.polygon){polygon_command_locked(SpatialCommand::Undo);
+    } else if(state_.cut){cut_history_locked(false);
     } else if (state_.retopology) {
       if (!retopo_accepting_ && state_.retopology->source) {
         if (retopo_stroking_) { cancel_action_locked(); input_.cancel(); }
@@ -1244,7 +1290,8 @@ void Document::process_locked(const SpatialFrame &f) {
     }
   }
   if (f.hands[0].redo || f.hands[1].redo) {
-    if(state_.cut){cut_history_locked(true);
+    if(state_.polygon){polygon_command_locked(SpatialCommand::Redo);
+    } else if(state_.cut){cut_history_locked(true);
     } else if (state_.retopology) {
       if (!retopo_accepting_ && !retopo_stroking_ && state_.retopology->source) queue_retopology_locked(RetopoAction::Redo);
     } else if (uv_) {
@@ -1390,7 +1437,7 @@ void Document::mesh_loop() {
         geometry_detail::Dependency dep;dep.object=o.id;dep.world=job->scene.world_transform(o.id);
         if(o.mesh_active)dep.paint=o.painted->mesh_owner();
         else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
-        dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;
+        dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;dep.polygon=o.polygon;
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
         dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
         dependencies->objects.push_back(std::move(dep));
@@ -1606,6 +1653,12 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
   auto result = completion->get_future();
   {
     std::lock_guard lock(model_mutex_);
+    if(polygon_accepting_.load()&&polygon_accept_) {
+      FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;
+      job.polygon_capture=polygon_accept_;job.generation=polygon_accept_->source.generation;
+      std::lock_guard file_lock(file_mutex_);if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+      files_.push_back(std::move(job));file_changed_.notify_one();return result;
+    }
     if(native_stroke_) {
       FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;job.native_capture=native_stroke_;
       Transaction transaction(*this);std::lock_guard file_lock(file_mutex_);
@@ -1615,7 +1668,7 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
       catch(...){files_.pop_back();throw;}
       file_changed_.notify_one();return result;
     }
-    finish_locked();
+    if(!state_.polygon)finish_locked();
     if (state_.asset_busy || state_.recovery_busy)
       throw std::logic_error("Wait for pending authoring work before saving");
     if(last_volume_!=volume().revision()||last_paint_!=(scene_.active().mesh_active?scene_.active().painted->revision():0))publish_locked();
@@ -1692,6 +1745,9 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(parameter==VrParameter::PolygonConversion)return !state_.polygon&&state_.can_polygon&&(polygon_conversion_required(scene_.active())||state_.polygon_has_source);
+  if(parameter==VrParameter::PolygonDistance||parameter==VrParameter::PolygonCuts)return state_.polygon&&state_.polygon->surface&&!polygon_accepting_&&!polygon_stroking_&&!state_.asset_busy;
+  if(state_.polygon)return false;
   if(parameter==VrParameter::ImportUnitScale)return import_view_&&!import_view_->busy&&!state_.asset_busy&&!state_.recovery_busy&&!action_active_locked()&&!state_.cut&&!state_.retopology;
   if(!object_editable_locked(scene_.active().id) && parameter!=VrParameter::BrushRadius && parameter!=VrParameter::Flow)return false;
   if(parameter==VrParameter::CutOffset||parameter==VrParameter::CutDirection||parameter==VrParameter::CutCapColor)
@@ -1746,6 +1802,20 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::PolygonConversion){
+    const auto controls=state_.controls;const auto source=control_source_;
+    const unsigned choice=accept?unsigned(std::lround(controls.value[0])):0;
+    auto before=std::move(control_before_);control_before_.reset();state_.controls={};control_changed_=false;
+    try{
+      if(choice==2)restore_polygon_source_locked(source);
+      else if(choice==1)begin_polygon_locked(polygon_conversion_required(scene_.active()));
+    }catch(...){control_before_=std::move(before);state_.controls=controls;input_.resume_control(VrParameter::PolygonConversion);throw;}
+    return;
+  }
+  if(state_.controls.parameter==VrParameter::PolygonDistance||state_.controls.parameter==VrParameter::PolygonCuts){
+    if(accept){if(state_.controls.parameter==VrParameter::PolygonDistance)state_.polygon_controls.distance_mm=state_.controls.value[0];else state_.polygon_controls.cuts=unsigned(std::lround(state_.controls.value[0]));}
+    control_before_.reset();control_changed_=false;state_.controls={};return;
+  }
   if(state_.controls.parameter==VrParameter::ImportUnitScale){
     if(accept&&import_view_){auto next=std::make_shared<ImportView>(*import_view_);
       if(control_changed_)next->settings.choices.custom_metres_per_unit=state_.controls.value[0];
@@ -1939,6 +2009,12 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::PolygonConversion:
+      c.title=state_.polygon_has_source?"Edit current shape or restore retained source":"Convert visible shape; retain original source?";c.minimum=0;c.maximum=state_.polygon_has_source&&!state_.object_grabbing?2:1;c.value[0]=0;break;
+    case VrParameter::PolygonDistance:
+      c.title="Polygon operation distance (world mm)";c.minimum=.001f;c.maximum=1e6f;c.logarithmic=true;c.value[0]=state_.polygon_controls.distance_mm;break;
+    case VrParameter::PolygonCuts:
+      c.title="Polygon edge subdivision cuts";c.minimum=1;c.maximum=64;c.value[0]=state_.polygon_controls.cuts;break;
     case VrParameter::ImportUnitScale:
       c.title="Input metres per unit";c.minimum=1e-12f;c.maximum=1e12f;c.logarithmic=true;
       c.value[0]=std::clamp(float(import_view_->settings.choices.custom_metres_per_unit),c.minimum,c.maximum);break;
@@ -2193,6 +2269,10 @@ void Document::control_event_locked(VrControlEvent event) {
     else settings.cap_material.color=c.value;
     edit_cut_locked(std::move(settings),false);break;
   }
+  case VrParameter::PolygonDistance:
+  case VrParameter::PolygonCuts:
+  case VrParameter::PolygonConversion:
+    break;
   case VrParameter::ImportUnitScale:
     control_changed_=true;break;
   case VrParameter::ProceduralPattern:
@@ -2331,6 +2411,8 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(polygon_command(command))return polygon_command_enabled_locked(command);
+  if(state_.polygon && command!=SpatialCommand::ObjectGrabMode&&command!=SpatialCommand::HoldObject&&command!=SpatialCommand::ReleaseObject&&command!=SpatialCommand::GhostOthers&&command!=SpatialCommand::CancelObjectGrab&&command!=SpatialCommand::CancelWork)return polygon_command_enabled_locked(command);
   if(import_command(command)) {
     if(command==SpatialCommand::ImportApply && (state_.object_grabbing || (state_.isolate_held && state_.held_object)))return false;
     return import_command_enabled_locked(command);
@@ -2526,6 +2608,7 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(polygon_command(command)||(state_.polygon&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo))){polygon_command_locked(command);return;}
   if(import_command(command)){if(command_enabled_locked(command))import_command_locked(command);return;}
   if(command>=SpatialCommand::ObjectGrabMode&&command<=SpatialCommand::CancelObjectGrab){
     if(!command_enabled_locked(command))return;
@@ -2959,6 +3042,7 @@ void Document::file_loop() {
     try {
       if(job->discover_import){discover_import_file(*job);continue;}
       if(job->native_capture)capture_native_file(*job);
+      if(job->polygon_capture)capture_polygon_file(*job);
       if(job->capture_scene){job->scene=job->capture_scene->snapshot();job->scene.select(job->object);job->capture_scene.reset();}
       if (job->open_project) {
         auto cancelled = [&] {

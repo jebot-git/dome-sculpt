@@ -19,6 +19,8 @@ void Document::Transaction::commit(bool checkpoint) noexcept {
     if(finish_uv_){d_.invalidate_uv_locked();++d_.uv_session_;}
     if(finish_retopo_)d_.cancel_retopology_locked();
     if(finish_cut_)d_.cancel_cut_locked();
+    if(finish_polygon_)d_.cancel_polygon_locked(false);
+    else if(cancel_polygon_)d_.cancel_polygon_locked();
     // Persistence observes only the fully published endpoint. It cannot turn a
     // successful user commit into an exception or enqueue a rejected candidate.
     if(checkpoint)try{d_.checkpoint_locked();}catch(...){}

@@ -34,7 +34,8 @@ bool Document::invalidate_object_authority_locked() {
   if(state_.retopology)cancel_retopology_locked();
   if(state_.cut)cancel_cut_locked();
   invalidate_uv_locked();
-  cancel_asset_work_locked();
+  // Accepted polygon cancellation follows successful permission publication.
+  if(!polygon_accepting_)cancel_asset_work_locked();
   state_.object_grabbing=false;object_navigation_.reset();navigation_.reset();
   ++state_.edit_authority;return false;
 }
@@ -58,19 +59,22 @@ void Document::hold_object(uint64_t id){
   AuthorityTransition transition(*this);const bool changed=invalidate_object_authority_locked();state_.held_object=id;scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;publish_locked(changed,false);transition.commit();
 }
 void Document::release_held_object(bool accept){
-  std::lock_guard lock(model_mutex_);if(state_.object_grabbing){finish_object_grab_locked(accept,true);return;}
+  std::lock_guard lock(model_mutex_);if(state_.object_grabbing){finish_object_grab_locked(held_polygon_pending_locked()?false:accept,true);return;}
   AuthorityTransition transition(*this);const bool changed=invalidate_object_authority_locked();state_.held_object=0;publish_locked(changed,false);transition.commit();
 }
 bool Document::begin_object_grab(uint64_t id){std::lock_guard lock(model_mutex_);const bool began=begin_object_grab_locked(id);if(began)desktop_=true;return began;}
 bool Document::begin_object_grab_locked(uint64_t id){
   if(!state_.object_grab_mode||state_.asset_busy||state_.recovery_busy)return false;
   const auto &object=scene_.object(id);if(!object.visible||object.locked)return false;
-  AuthorityTransition transition(*this);const bool changed=invalidate_object_authority_locked();scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;
+  const bool polygon_motion=state_.polygon && !polygon_accepting_ && id==polygon_source_.object && polygon_source_matches_locked();
+  if(state_.polygon&&!polygon_motion)return false;
+  AuthorityTransition transition(*this);const bool changed=polygon_motion?false:invalidate_object_authority_locked();scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;
   state_.held_object=id;held_preview_transform_=held_start_transform_=scene_.object(id).transform;state_.object_grabbing=true;publish_locked(changed,false);transition.commit();return true;
 }
 void Document::move_held_object(CanvasTransform local){std::lock_guard lock(model_mutex_);move_held_object_locked(local);}
 void Document::move_held_object_locked(CanvasTransform local){
   validate_transform(local);
+  if(held_polygon_pending_locked())throw std::logic_error("Wait for the accepted polygon edit before moving its captured pose");
   if(!state_.object_grabbing || !state_.held_object)throw std::logic_error("Begin an object grab first");
   require_object_editable_locked(state_.held_object);
   if(equal_transform(held_preview_transform_,local))return;
@@ -79,9 +83,11 @@ void Document::move_held_object_locked(CanvasTransform local){
 }
 void Document::update_object_grab_locked(const SpatialFrame &frame){
   std::array<TrackedHand,2> hands{frame.hands[0].tracked,frame.hands[1].tracked};
+  for(size_t i=0;i<2;++i)if(!hands[i].valid||hands[i].squeeze<=.55f)polygon_grip_latch_[i]=false;
+  if(held_polygon_pending_locked())return;
   if(state_.object_grabbing&&!object_navigation_.grabbing()&&held_weight_pending_locked())return;
   if(!state_.object_grabbing){
-    int owner=-1;for(int i=0;i<2;++i)if(hands[i].valid&&hands[i].squeeze>.55f&&(!state_.hands[i].tracked.valid||state_.hands[i].tracked.squeeze<=.55f)){owner=i;break;}
+    int owner=-1;for(int i=0;i<2;++i)if(!polygon_grip_latch_[i]&&hands[i].valid&&hands[i].squeeze>.55f&&(!state_.hands[i].tracked.valid||state_.hands[i].tracked.squeeze<=.55f)){owner=i;break;}
     if(owner<0)return;
     uint64_t target=scene_.active().id;
     if(hands[owner].aimValid){
@@ -103,12 +109,13 @@ void Document::update_object_grab_locked(const SpatialFrame &frame){
     move_held_object_locked(local);
   }
   if(!object_navigation_.grabbing()){
-    finish_object_grab_locked(true,true);
+    finish_object_grab_locked(true,!state_.polygon);
   }
 }
 void Document::finish_object_grab_locked(bool accept,bool release){
   if(!state_.object_grabbing)return;
-  if(action_active_locked()){if(accept){if(end_action_locked())record_stroke_locked();}else cancel_action_locked();}
+  if(release&&held_polygon_pending_locked())accept=false;
+  if(action_active_locked()&&!polygon_accepting_){if(accept){if(end_action_locked())record_stroke_locked();}else cancel_action_locked();}
   if(accept&&held_weight_pending_locked()){object_navigation_.reset();desktop_=false;state_.message="Finishing held weight edit...";publish_locked(false,false);return;}
   if(!accept&&held_weight_pending_locked())cancel_asset_work_locked();
   const auto id=state_.held_object;auto &object=scene_.object(id);const bool changed=!equal_transform(held_preview_transform_,held_start_transform_);
@@ -117,7 +124,9 @@ void Document::finish_object_grab_locked(bool accept,bool release){
   if(changed&&accept){auto before=scene_.snapshot();object.transform=held_preview_transform_;record_locked({{},std::move(before),scene_});}
   state_.object_grabbing=false;desktop_=false;object_navigation_.reset();if(release){state_.held_object=0;++state_.edit_authority;input_.cancel();}
   const bool need_picking=release&&state_.object_grab_mode&&!mesh_.load()->picking;
-  publish_locked((changed&&accept)||need_picking,false);transaction.commit();authority.commit();
+  publish_locked((changed&&accept)||need_picking,false);
+  if(state_.polygon&&!release)rebase_polygon_transform_locked();
+  transaction.commit();authority.commit();
 }
 void Document::end_object_grab(bool accept){release_held_object(accept);}
 void Document::object_visibility(uint64_t id,bool visible,AssetSource expected){

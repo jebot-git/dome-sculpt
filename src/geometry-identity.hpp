@@ -14,6 +14,7 @@ struct Dependency {
   std::shared_ptr<const DeformationState> deformation;
   std::shared_ptr<const CreatorAppearance> appearance;
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
+  std::shared_ptr<const PolygonAuthority> polygon;
   CanvasTransform world;
   bool canonical = false;
 };
@@ -48,6 +49,7 @@ struct Identity {
           !same_owner(a.deformation, b.deformation) ||
           !same_owner(a.appearance, b.appearance) ||
           !same_owner(a.material_bindings, b.material_bindings) ||
+          !same_owner(a.polygon, b.polygon) ||
           a.canonical != b.canonical || !same(a.world, b.world))
         return false;
     }

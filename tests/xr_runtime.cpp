@@ -64,6 +64,9 @@ bool bake_color_mode(){return getenv("DOME_XR_FIXTURE_BAKE_COLOR")!=nullptr;}
 std::string bake_policy_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE_POLICY");if(!mode)mode=getenv("DOME_XR_FIXTURE_BAKE_COLOR");return mode?mode:"";}
 std::string procedural_mode(){auto mode=getenv("DOME_XR_FIXTURE_PROCEDURAL");return mode?mode:"";}
 std::string resolution_mode(){auto mode=getenv("DOME_XR_FIXTURE_RESOLUTION");return mode?mode:"";}
+std::string polygon_mode(){auto mode=getenv("DOME_XR_FIXTURE_POLYGON");return mode?mode:"";}
+unsigned polygon_step=0;bool polygon_initial_ready=false,polygon_source_ready=false,polygon_selection_ready=false,polygon_edit_ready=false,polygon_motion_base_ready=false,polygon_motion_visible=false;
+std::vector<uint8_t> polygon_motion_before;
 unsigned mask_step=0;bool mask_work_ready=false, mask_work_completed=false, mask_released=false;
 unsigned retopo_step = 0;
 bool retopo_source_ready = false, retopo_apply_ready = false;
@@ -375,6 +378,41 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
+  if(!polygon_mode().empty()&&(polygon_step==15||polygon_step==19||polygon_step==25||polygon_step==27)){
+    const int sector=(polygon_step==25||polygon_step==27)?(polygon_mode()=="focus"?4:polygon_mode()=="noop"?10:7):0;
+    const float a=sector*6.28318530718f/12;
+    const float wx=.6f*220.f/640*std::cos(a),wy=1.56f+.6f/640*(220.f*std::sin(a)+16.f);
+    const float eye=(s->eye?.032f:-.032f);
+    const int cx=int(std::lround(s->width*.5f*(1+(wx-eye)/(.66f*std::tan(.6f)))));
+    const int cy=int(std::lround(s->height*.5f*(1+(wy-1.6f)/(.66f*std::tan(.6f)))));
+    int accent=0,total=0;
+    for(int y=std::max(0,cy-1);y<=std::min(int(s->height)-1,cy+1);++y)for(int x=std::max(0,cx-8);x<=std::min(int(s->width)-1,cx+8);++x){
+      size_t at=(size_t(y)*s->width+x)*4;++total;if(displayed(bytes[at])<150&&displayed(bytes[at+1])>130&&displayed(bytes[at+2])>220)++accent;
+    }
+    auto key=polygon_step==15?"polygon_initial_ready":polygon_step==19?"polygon_source_ready":polygon_step==25?"polygon_selection_ready":"polygon_edit_ready";
+    report[std::string(key)+"_accent"]=std::max(report.value(std::string(key)+"_accent",0),accent);
+    if(polygon_mode()=="focus"&&polygon_step==27){
+      if(s->eye==0&&total&&accent==0){polygon_motion_before=bytes;polygon_motion_base_ready=true;report["polygon_motion_base_ready"]=true;}
+    }else if(total&&accent*2>total){
+      bool &ready=polygon_step==15?polygon_initial_ready:polygon_step==19?polygon_source_ready:polygon_step==25?polygon_selection_ready:polygon_edit_ready;
+      if(!ready&&s->eye==0)if(auto path=getenv("DOME_XR_FIXTURE_REPORT")){
+        std::ofstream capture(std::string(path)+"."+key+".ppm",std::ios::binary);capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
+        for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+      }
+      ready=true;report[key]=true;
+    }
+  }
+  if(polygon_mode()=="focus"&&polygon_step==29&&s->eye==0&&!polygon_motion_before.empty()){
+    // Count only real surface coverage/shading, excluding grip/aim/ring and
+    // selection colors so a changing cursor cannot acknowledge geometry.
+    auto body=[&](const auto &image,size_t i){int r=displayed(image[i]),g=displayed(image[i+1]),b=displayed(image[i+2]);return image[i+3]>250&&b<220&&b>g+3&&g>r+3;};
+    size_t changed=0;for(size_t i=0;i<bytes.size();i+=4){bool a=body(bytes,i),b=body(polygon_motion_before,i);
+      if((a||b)&&(a||bytes[i+3]<5)&&(b||polygon_motion_before[i+3]<5)&&
+        std::abs(int(bytes[i])-polygon_motion_before[i])+std::abs(int(bytes[i+1])-polygon_motion_before[i+1])+std::abs(int(bytes[i+2])-polygon_motion_before[i+2])>12)++changed;
+    }
+    report["polygon_motion_changed_pixels"]=std::max(report.value("polygon_motion_changed_pixels",size_t(0)),changed);
+    if(changed>100){polygon_motion_visible=true;report["polygon_motion_visible"]=true;}
+  }
   const bool cut_wait=!cut_mode().empty() && (cut_step==20 || (cut_mode()=="accept" && cut_step==30));
   const bool mask_gate=!mask_mode().empty() && (mask_step==68 || mask_step==79);
   if (cut_wait || mask_gate || (!retopo_mode().empty() && (retopo_step == 27 || retopo_step == 60))) {
@@ -450,6 +488,10 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->state = menu_completion_event++ == 0 ? XR_SESSION_STATE_STOPPING : XR_SESSION_STATE_EXITING;
     return XR_SUCCESS;
   }
+  if(!polygon_mode().empty()&&polygon_step>=36&&menu_completion_event<2){
+    auto e=reinterpret_cast<XrEventDataSessionStateChanged*>(out);e->type=XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED;
+    e->session=reinterpret_cast<XrSession>(&session_tag);e->state=menu_completion_event++==0?XR_SESSION_STATE_STOPPING:XR_SESSION_STATE_EXITING;return XR_SUCCESS;
+  }
   if (getenv("DOME_XR_FIXTURE_RESTART") && frame >= 23 && restart_phase < 8) {
     static constexpr XrSessionState states[] = {
         XR_SESSION_STATE_VISIBLE,  XR_SESSION_STATE_SYNCHRONIZED,
@@ -466,10 +508,11 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     return XR_SUCCESS;
   }
   auto retopo = retopo_mode();
-  unsigned focus_frame = !cut_mode().empty()?cut_step:!mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_step;
+  unsigned focus_frame = !polygon_mode().empty()?polygon_step:!cut_mode().empty()?cut_step:!mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_step;
   unsigned focus_at = !cut_mode().empty()?90:!mask_mode().empty() ? (mask_mode()=="focus"?40:90) : retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
   if(!bake_policy_mode().empty())focus_at=bake_policy_mode()=="focus"?20:90;
   if(!procedural_mode().empty())focus_at=procedural_mode()=="focus"?20:90;
+  if(!polygon_mode().empty())focus_at=polygon_mode()=="focus"?30:90;
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
   if (focus_frame >= focus_at && !lost) {
     lost = true;
@@ -489,7 +532,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_regains");
     return XR_SUCCESS;
   }
-  if (bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
+  if (polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -537,6 +580,15 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
     else if(!((mode=="fill" || mode=="undo") && ((mask_step==68 && !mask_work_completed) || (mask_step==79 && !mask_work_ready)))) ++mask_step;
     report["mask_script_step"]=mask_step;
   }
+  if(auto mode=polygon_mode();!mode.empty()){
+    const bool restore=mode.starts_with("restore");
+    const bool waiting=(polygon_step==15&&!polygon_initial_ready)||(!restore&&polygon_step==19&&!polygon_source_ready)||(!restore&&polygon_step==25&&!polygon_selection_ready)||
+      (mode=="focus"&&((polygon_step==27&&!polygon_motion_base_ready)||(polygon_step==29&&!polygon_motion_visible)))||
+      ((mode=="accept"||mode=="cancel"||mode=="unconfirmed")&&polygon_step==27&&!polygon_edit_ready);
+    if(!waiting)++polygon_step;else count("polygon_gate_wait_frames");
+    report["polygon_script_step"]=polygon_step;
+    if(physical_frame>1200){report["polygon_gate_exhausted"]=true;save();return XR_ERROR_RUNTIME_FAILURE;}
+  }
   p->predictedDisplayTime = 1000000000 + physical_frame * 18000000;
   p->predictedDisplayPeriod = 18000000;
   p->shouldRender = frame % 7 ? XR_TRUE : XR_FALSE;
@@ -562,7 +614,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
       if (v.subImage.imageRect.extent.width != 320 ||
           v.subImage.imageRect.extent.height != 320 ||
           std::abs(v.pose.position.x - ((eye ? .032f : -.032f) +
-                                        (frame >= 38 ? -.2f : 0))) > .0001f)
+                                        (frame >= 38 && polygon_mode().empty() ? -.2f : 0))) > .0001f)
         return XR_ERROR_POSE_INVALID;
     }
     count("stereo_submissions");
@@ -573,20 +625,20 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
   if(frame==16) if(auto marker=getenv("DOME_XR_FIXTURE_SIGNAL_READY"))
     std::ofstream(marker)<<frame<<'\n';
   if(menu_gate() && frame==9)save();
-  if(!cut_mode().empty())save(); // Preserve actual progress even if a later stage stalls.
+  if(!cut_mode().empty()||!polygon_mode().empty())save(); // Preserve actual progress even if a later stage stalls.
   return XR_SUCCESS;
 }
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
     return XR_ERROR_SIZE_INSUFFICIENT;
   for (int i = 0; i < 2; ++i) {
     p[i].pose = {{0, 0, 0, 1},
-                 {(i ? .032f : -.032f) + (frame >= 38 ? -.2f : 0), 1.6f, 0}};
+                 {(i ? .032f : -.032f) + (frame >= 38 && polygon_mode().empty() ? -.2f : 0), 1.6f, 0}};
     p[i].fov = {-.6f, .6f, .6f, -.6f};
   }
   return XR_SUCCESS;
@@ -663,6 +715,12 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->currentState=button && (frame==8 || frame==10 || frame==12 || frame==14);
     out->changedSinceLastSync=button;
   }
+  if(auto mode=polygon_mode();!mode.empty()){
+    auto step=polygon_step;const bool restore=mode.starts_with("restore");
+    bool press=step==8||step==10||step==12||step==14||step==16;
+    if(!restore)press|=step==18||step==20||step==24||step==26||((mode=="accept"||mode=="cancel")&&step==30);
+    out->currentState=button&&press;out->changedSinceLastSync=button;
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
@@ -703,11 +761,17 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if(auto mode=resolution_mode();!mode.empty())stroke=(mode!="noop" && frame==18) || ((mode=="accept" || mode=="cancel" || mode=="noop") && frame==22);
     if(auto mode=procedural_mode();!mode.empty())stroke=mode!="accept" && (frame==18 || (mode=="cancel" && frame==22));
     if(auto mode=bake_policy_mode();!mode.empty())stroke=frame==18 || (mode!="focus"&&frame==20);
+    if(auto mode=polygon_mode();!mode.empty()){
+      const bool restore=mode.starts_with("restore");
+      stroke=restore?((mode!="restore-default"&&polygon_step==18)||polygon_step==22):
+        mode=="noop"?false:polygon_step==22||(mode=="focus"&&polygon_step>=28&&polygon_step<=32);
+    }
     bool correct =
         a->name == (ink() && frame >= 13 ? "tip_force" : "paint_pressure");
     if (stroke && correct) {
       out->currentState = .9f;
       if (!retopo_mode().empty()) count("retopo_pressure_samples");
+      if(!polygon_mode().empty())count("polygon_pressure_samples");
       if (!cut_mode().empty()) count("cut_slider_samples");
       if (!mask_mode().empty()) count("mask_pressure_samples");
       count(a->name == "tip_force" ? "tip_pressure_samples"
@@ -870,6 +934,16 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(frame==13 || frame==14)sector=7;
     if(sector>=0){float angle=sector*6.28318530718f/12;out->currentState={std::cos(angle),std::sin(angle)};}
   }
+  if(auto mode=polygon_mode();!mode.empty()&&right(p->subactionPath)&&a->name=="right_stick"){
+    int sector=-1;auto step=polygon_step;
+    if(step==9||step==10)sector=8;
+    if(step==11||step==12)sector=9;
+    if(step==13||step==14)sector=2;
+    if(step==15||step==16||step==19||step==20)sector=0;
+    if(step>=25&&step<=27)sector=mode=="focus"?4:mode=="noop"?10:7;
+    if(step>=28&&step<=30)sector=mode=="cancel"?11:10;
+    out->currentState={0,0};if(sector>=0){float a=sector*6.28318530718f/12;out->currentState={std::cos(a),std::sin(a)};}
+  }
   return XR_SUCCESS;
 }
 FN(GetActionStatePose, XrSession, const XrActionStateGetInfo *,
@@ -889,13 +963,13 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
-  if (frame == 22 && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
+  if (frame == 22 && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
   p->pose.orientation = {0, 0, 0, 1};
   if (s->reference == XR_REFERENCE_SPACE_TYPE_VIEW && !s->action)
-    p->pose.position = {frame >= 38 ? -.2f : 0, 1.6f, 0};
+    p->pose.position = {frame >= 38 && polygon_mode().empty() ? -.2f : 0, 1.6f, 0};
   else
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
@@ -979,6 +1053,17 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
       float x=100+420*float(std::log(.02/.00001)/std::log(100000.)),y=300;
       if(frame==22){x=mode=="cancel"?170:470;y=609;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
+    }
+  }
+  if(!polygon_mode().empty()&&s->action&&!right(s->hand))p->pose.position={-.3f,1.48f,-.48f};
+  if(auto mode=polygon_mode();!mode.empty()&&s->action&&right(s->hand)){
+    p->pose.position={0,1.48f,-.48f};
+    if(s->action->name=="aim_pose"){
+      p->pose.position={mode=="focus"&&polygon_step>=29?.1f:0.f,1.48f,-.1f};
+      if(mode.starts_with("restore")&&(polygon_step==18||polygon_step==22)){
+        float x=polygon_step==18?520:mode=="restore-cancel"?170:470,y=polygon_step==18?300:609;
+        p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
+      }
     }
   }
   return XR_SUCCESS;

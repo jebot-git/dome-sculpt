@@ -95,7 +95,7 @@ struct PaintLayer {
   std::vector<std::shared_ptr<const PaintTile>> tiles;
   std::vector<std::shared_ptr<const PaintColorTile>> pbr_tiles;
 };
-enum class PaintUvPolicy { Strict, SourceAuthored };
+enum class PaintUvPolicy { Strict, SourceAuthored, PolygonAuthored };
 struct PaintSurfaceOptions {
   PaintUvPolicy policy = PaintUvPolicy::Strict;
   size_t max_raster_samples = 128 * 1024 * 1024;
@@ -161,12 +161,15 @@ public:
   Vec3 normal(Vec3) const;
   nlohmann::json encode(PaintImageArchive * = nullptr) const;
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive * = nullptr);
+  // Internal Scene12 decoding must subsequently authenticate the exact polygon derivative.
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *, bool allow_polygon);
 
 private:
   friend class Document;
   void swap_state(PaintedMesh &) noexcept;
   friend struct SourceUvBakeAccess;
   friend struct SourceColorPreparationAccess;
+  friend struct PolygonPaintAccess;
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   struct PaintSample { PaintSettings settings; float opacity = 1; };

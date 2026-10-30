@@ -430,7 +430,7 @@ SurfaceRenderer::~SurfaceRenderer() {
 void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                            CanvasTransform model, const Mat4 &vp,
                            ob::Vec3 camera, int width, int height,
-                           bool transparent, bool toon, bool light, std::span<const ObjectInfo> display) {
+                           bool transparent, bool toon, bool light, std::span<const ObjectInfo> display, uint64_t replaced_object) {
   if(!mesh)throw std::invalid_argument("Missing sculpt mesh snapshot");
   try{
   textures_->target.begin(width,height,textures_->output);
@@ -706,6 +706,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     auto queue=[&](const SurfaceRange&r){if(is_ghost(r.object))return 3500;auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get(),r.object)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return queue(*a)<queue(*b);});
     for(auto r:ordered){
+      if(replaced_object&&r->object==replaced_object)continue;
       auto object_model=model;
       auto current=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==r->object;});
       if(current!=display.end()&&!current->visible)continue;
@@ -869,7 +870,12 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
           line(to - y * .6f, to + y * .6f, accent);
         }
       }
-      if (!state.menu && !state.cut) {
+      if(state.polygon&&!state.menu&&h.tracked.aimValid){
+        auto from=h.tracked.aim.position;
+        auto to=from+ob::rotate(h.tracked.aim.orientation,{0,0,-.6f});
+        line(from,to,{float((state.accent>>16)&255)/255,float((state.accent>>8)&255)/255,float(state.accent&255)/255});
+      }
+      if (!state.menu && !state.cut && !state.polygon) {
         float r =
             state.radius * (h.tracked.trigger > .02f
                                 ? .25f + .75f * std::sqrt(h.tracked.trigger)

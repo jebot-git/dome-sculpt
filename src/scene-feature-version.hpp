@@ -5,7 +5,11 @@
 #include "dome/material-bindings.hpp"
 #include "dome/color-preparation.hpp"
 #include <nlohmann/json.hpp>
+namespace dome { struct PolygonAuthority; }
 namespace dome::detail {
+// Scene12 is the first format owning complete polygon source histories. Its
+// bounded graph may retain all older frame/color/bind/source receipt features.
+inline unsigned minimum_scene_version(const PolygonAuthority *p) {return p?12u:0u;}
 inline unsigned minimum_scene_version(const DeformationState *d) {
   if (!d || !d->skeleton)
     return 0;

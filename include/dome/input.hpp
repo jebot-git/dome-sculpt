@@ -82,8 +82,13 @@ enum class SpatialCommand {
   ObjectGrabMode, HoldObject, ReleaseObject, GhostOthers, CancelObjectGrab,
   ImportBrowse, ImportPrevious, ImportNext, ImportOpen, ImportParent,
   ImportUnits, ImportAxes, ImportNormals, ImportFormat, ImportMaterials, ImportDefaults,
-  ImportResolution, ImportApply, ImportCancel
+  ImportResolution, ImportApply, ImportCancel,
+  PolygonBegin, PolygonVertices, PolygonEdges, PolygonFaces, PolygonMoveMode,
+  PolygonAdditive, PolygonSelectAll, PolygonClear, PolygonExtrude, PolygonInset,
+  PolygonBridge, PolygonDissolve, PolygonWeld, PolygonCutEdges, PolygonConnect,
+  PolygonDelete, PolygonFlip, PolygonApply, PolygonCancel
 };
+inline bool polygon_command(SpatialCommand c){return c>=SpatialCommand::PolygonBegin&&c<=SpatialCommand::PolygonCancel;}
 inline bool import_command(SpatialCommand c) {return c>=SpatialCommand::ImportBrowse && c<=SpatialCommand::ImportCancel;}
 inline bool sculpt_mask_command(SpatialCommand c) {
   return c >= SpatialCommand::SculptMaskToggle && c <= SpatialCommand::SculptMaskVisible;
@@ -162,6 +167,7 @@ public:
   bool painting = false;
   bool retopology = false;
   bool cutting = false;
+  bool polygon_editing = false;
   bool sculpt_mask_edit = false;
   std::function<bool(VrParameter)> parameter_allowed;
   std::function<bool()> control_accept;
