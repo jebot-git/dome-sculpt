@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=24;
+inline constexpr int spatial_page_count=25;
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -86,8 +86,10 @@ enum class SpatialCommand {
   PolygonBegin, PolygonVertices, PolygonEdges, PolygonFaces, PolygonMoveMode,
   PolygonAdditive, PolygonSelectAll, PolygonClear, PolygonExtrude, PolygonInset,
   PolygonBridge, PolygonDissolve, PolygonWeld, PolygonCutEdges, PolygonConnect,
-  PolygonDelete, PolygonFlip, PolygonApply, PolygonCancel
+  PolygonDelete, PolygonFlip, PolygonApply, PolygonCancel,
+  ShapeNew, ShapeCapture, ShapeDuplicate, ShapeMirror
 };
+inline bool shape_command(SpatialCommand c){return c>=SpatialCommand::ShapeNew&&c<=SpatialCommand::ShapeMirror;}
 inline bool polygon_command(SpatialCommand c){return c>=SpatialCommand::PolygonBegin&&c<=SpatialCommand::PolygonCancel;}
 inline bool import_command(SpatialCommand c) {return c>=SpatialCommand::ImportBrowse && c<=SpatialCommand::ImportCancel;}
 inline bool sculpt_mask_command(SpatialCommand c) {
@@ -112,8 +114,9 @@ struct SpatialSample {
 class SpatialInput {
 public:
   explicit SpatialInput(Volume &v) : volume_(&v) {}
-  void bind(Volume &v) {
-    cancel();
+  void bind(Volume &v, bool preserve_menu = false) {
+    if (!preserve_menu || !menu_ || parameter_ != VrParameter::None || stroke_active())
+      cancel();
     volume_ = &v;
   }
   void update(const SpatialSample &);

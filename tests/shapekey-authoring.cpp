@@ -67,5 +67,6 @@ void avatar(const std::filesystem::path &prefix){
 }
 int main(int argc,char**argv)try{
  if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){fixture().save(argv[2]);return 0;}
+ if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
  if(argc!=2)return 2;standalone(argv[1]);avatar(argv[1]);std::cout<<"PASS "<<checks<<" shapekey authoring checks\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

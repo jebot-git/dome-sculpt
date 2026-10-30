@@ -9,6 +9,7 @@
 #include "object-editor.hpp"
 #include "creator-editor.hpp"
 #include "rig-editor.hpp"
+#include "shapekey-editor.hpp"
 #include "weight-editor.hpp"
 #include "skin-editor.hpp"
 #include "sculpt-editor.hpp"
@@ -513,6 +514,13 @@ struct App {
     menu.add("&Scene/Skin weights...", 0, command, this);
     menu.add("&Scene/Bind or transfer skin...", 0, command, this);
     menu.add("&Scene/Rig and shapekeys...", 0, command, this);
+    menu.add("&Scene/Shapekeys/New shapekey...",0,command,this);
+    menu.add("&Scene/Shapekeys/Capture shape mix...",0,command,this);
+    menu.add("&Scene/Shapekeys/Duplicate shapekey...",0,command,this);
+    menu.add("&Scene/Shapekeys/Mirror shapekey...",0,command,this);
+    menu.add("&Scene/Shapekeys/Rename shapekey...",0,command,this);
+    menu.add("&Scene/Shapekeys/Restore before shape authoring...",0,command,this);
+
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
     menu.add("&Mesh/Bake surface...",0,command,this);
     menu.add("&Mesh/Clear baked surface",0,command,this);
@@ -699,6 +707,10 @@ struct App {
     enable("&Scene/Rig and shapekeys...", !modal && !s->asset_busy &&
            s->mesh_active && bool(s->deformation) && active != s->objects.end() &&
            active->editable);
+
+    for(const auto *name:{"&Scene/Shapekeys/New shapekey...","&Scene/Shapekeys/Capture shape mix..."})enable(name,!modal&&s->can_author_shapes);
+    for(const auto *name:{"&Scene/Shapekeys/Duplicate shapekey...","&Scene/Shapekeys/Mirror shapekey...","&Scene/Shapekeys/Rename shapekey..."})enable(name,!modal&&s->can_select_shape);
+    enable("&Scene/Shapekeys/Restore before shape authoring...",!modal&&s->can_restore_shapes);
     if (active != s->objects.end()) {
       checked("&Scene/&Visible", active->visible);
       checked("&Scene/&Locked", active->locked);
@@ -1071,6 +1083,11 @@ struct App {
       edit_skin_dialog(canvas.document);
     } else if (label == "Skin weights...") {
       edit_weights_dialog(canvas.document);
+
+    } else if(label=="New shapekey..."||label=="Capture shape mix..."||label=="Duplicate shapekey..."||label=="Mirror shapekey..."||label=="Rename shapekey..."){
+      edit_shapekey_dialog(canvas.document,label=="Capture shape mix..."?ShapeKeyAction::CaptureMix:label=="Duplicate shapekey..."?ShapeKeyAction::Duplicate:label=="Mirror shapekey..."?ShapeKeyAction::Mirror:label=="Rename shapekey..."?ShapeKeyAction::Rename:ShapeKeyAction::Create);
+    } else if(label=="Restore before shape authoring..."){
+      if(fl_choice("Restore the complete mesh state from before shapekey authoring, including paint, rig and material?","Cancel","Restore",nullptr)==1){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Restore;canvas.document.author_shape(std::move(edit));}
     } else if (label == "Rig and shapekeys...") {
       edit_rig_dialog(canvas.document);
     } else if(label=="Bake surface..."){edit_bake_dialog(canvas.document);

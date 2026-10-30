@@ -15,6 +15,7 @@
 #include "polygon-controls.hpp"
 #include "cut-authoring.hpp"
 #include "native-stroke.hpp"
+#include "shapekey-authoring.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -51,6 +52,7 @@ struct AssetWork {
   std::atomic_bool cancelled{false};
   std::atomic<float> progress{0};
   bool held_weight=false; // Immutable job kind; set before queue publication.
+  std::atomic<uint32_t> morph_target{UINT32_MAX};
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
 struct EditorState {
@@ -129,6 +131,7 @@ struct EditorState {
   PolygonControls polygon_controls;
   bool can_polygon = false, polygon_requires_conversion = false, polygon_has_source = false;
   uint32_t pending_exports = 0;
+  bool can_author_shapes=false,can_restore_shapes=false,can_select_shape=false;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -252,6 +255,7 @@ public:
   void clear_bake(AssetSource expected = {});
   void cancel_asset_work();
   void cancel_background_work();
+  void author_shape(ShapeKeyEdit,AssetSource expected={});
   AssetStatus asset_status() const;
   void begin_voxel_remesh();
   void edit_voxel_size(float world_voxel_mm);
@@ -634,7 +638,7 @@ private:
   void record_stroke_locked();
   void scene_changed_locked(Scene before);
   bool undo_locked(bool redo);
-  void bind_locked();
+  void bind_locked(bool preserve_menu = false);
   bool action_active_locked() const;
   bool pending_locked() const;
   void begin_action_locked();
@@ -668,6 +672,8 @@ private:
   void queue_clear_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
   void cancel_background_work_locked();
+  bool shape_target_ready_locked() const;
+  void queue_shape_locked(ShapeKeyEdit,AssetSource expected={});
   bool sculpt_target_ready_locked() const;
   bool resolution_target_ready_locked() const;
   void queue_procedural_locked(ProceduralSculptOptions, AssetSource = {});

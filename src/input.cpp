@@ -37,7 +37,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Polygon edit", "UV editor",
-      "Plane cut", "Paint tools", "Baking", "Materials",
+      "Plane cut", "Paint tools", "Baking", "Shapekeys",
       "Back", "Holding", "Import", "Retopology"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
@@ -62,7 +62,8 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char*,12> import_options={"Format","Units","Axes","Normals","Paint size","Materials","Custom unit","Defaults","Back","Refresh folder","Import","Cancel"};
   static const std::array<const char*,12> polygon={"Start / resume","Vertices","Edges","Faces","Move / select","Add / toggle","Distance","Extrude","Back","Topology","Apply","Cancel"};
   static const std::array<const char*,12> polygon_topology={"All / none","Inset faces","Bridge loops","Dissolve edges","Weld vertices","Cut edges","Cuts","Connect vertices","Back","Delete faces","Flip faces","Cancel"};
-  return page == 22 ? polygon_topology : page == 19 ? polygon : page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
+  static const std::array<const char*,12> shapes={"New neutral","Capture mix","Duplicate","Mirror","Shape weight","Previous shape","Next shape","Restore original","Back","Undo","Redo","Export avatar"};
+  return page == 24 ? shapes : page == 22 ? polygon_topology : page == 19 ? polygon : page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
          : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
@@ -77,6 +78,8 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if(page==24&&sector==4)return VrParameter::MorphWeight;
+  if(page==24&&sector==7)return VrParameter::ShapeRestore;
   if(page==12&&sector==9)return VrParameter::BakeColors;
   if(page==19&&sector==6)return VrParameter::PolygonDistance;
   if(page==22&&sector==6)return VrParameter::PolygonCuts;
@@ -152,6 +155,10 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if(page==24){
+    static const std::array<SpatialCommand,12> shapes={SpatialCommand::ShapeNew,SpatialCommand::ShapeCapture,SpatialCommand::ShapeDuplicate,SpatialCommand::ShapeMirror,SpatialCommand::Undo,SpatialCommand::RigPreviousMorph,SpatialCommand::RigNextMorph,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::ExportAvatar};
+    return index==8?std::nullopt:std::optional<SpatialCommand>(shapes[index]);
+  }
   if(page==19){
     static const SpatialCommand commands[]={SpatialCommand::PolygonBegin,SpatialCommand::PolygonVertices,SpatialCommand::PolygonEdges,SpatialCommand::PolygonFaces,SpatialCommand::PolygonMoveMode,SpatialCommand::PolygonAdditive,SpatialCommand::Undo,SpatialCommand::PolygonExtrude,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::PolygonApply,SpatialCommand::PolygonCancel};
     return index==6||index==8||index==9?std::nullopt:std::optional<SpatialCommand>(commands[index]);
@@ -662,7 +669,7 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if(page_==10&&selected_==4){
       page_=17;selected_=0;
     } else if (page_ == 10 && (selected_ == 5 || selected_ == 6 || selected_ == 7)) {
-      page_ = selected_ == 5 ? 3 : selected_ == 6 ? 12 : 2;
+      page_ = selected_ == 5 ? 3 : selected_ == 6 ? 12 : 24;
       selected_ = 0;
     } else if (page_ == 3 && selected_ == 11) {
       page_ = 6;
@@ -688,7 +695,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1

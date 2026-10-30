@@ -53,7 +53,11 @@ NormalFrameTarget authored_attributes(const Mesh &rest,const NormalFrames &artis
   }else{
    auto old_edge=old_positions[rest.indices[(c/3)*3+1]]-old_positions[rest.indices[(c/3)*3]];
    auto new_edge=new_positions[rest.indices[(c/3)*3+1]]-new_positions[rest.indices[(c/3)*3]];
-   t0=normalized(old_edge-n0*dot(old_edge,n0));t1=normalized(new_edge-n1*dot(new_edge,n1));
+   auto project=[](Vec3 edge,Vec3 n){return edge-n*dot(edge,n);};
+   t0=project(old_edge,n0);t1=project(new_edge,n1);
+   if(length(t0)<1e-10f||length(t1)<1e-10f){auto a=rest.indices[(c/3)*3],b=rest.indices[(c/3)*3+2];t0=project(old_positions[b]-old_positions[a],n0);t1=project(new_positions[b]-new_positions[a],n1);}
+   if(length(t0)<1e-10f||length(t1)<1e-10f)throw std::invalid_argument("Shapekey edit collapses a geometric frame; reduce the adjustment");
+   t0=normalized(t0);t1=normalized(t1);
   }
   auto b0=cross(n0,t0)*handedness,b1=cross(n1,t1)*handedness;
   auto transport=[&](Vec3 v){return t1*dot(v,t0)+b1*dot(v,b0)+n1*dot(v,n0);};

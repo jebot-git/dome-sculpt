@@ -323,8 +323,8 @@ void Document::record_stroke_locked() {
       ++it;
   }
 }
-void Document::bind_locked() {
-  input_.bind(volume());
+void Document::bind_locked(bool preserve_menu) {
+  input_.bind(volume(),preserve_menu);
   bound_volume_ = scene_.active().volume;
   last_volume_ = volume().revision();
   last_paint_ =
@@ -529,6 +529,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
   }
   state_.mesh_active = active.mesh_active;
+  state_.can_author_shapes=shape_target_ready_locked();
+  state_.can_restore_shapes=state_.can_author_shapes&&bool(active.shape_source);
+  state_.can_select_shape=state_.can_author_shapes&&active.deformation&&active.deformation->morphs&&!active.deformation->morphs->targets.empty();
   state_.can_cut = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
@@ -667,7 +670,8 @@ void Document::finish_locked() {
     throw std::logic_error("Apply or cancel retopology before changing the document");
   // Starting another command may accept scalar property previews, but must
   // not implicitly execute an action such as creating a remeshed object.
-  finish_control_locked(state_.controls.parameter != VrParameter::PolygonConversion &&
+  finish_control_locked(state_.controls.parameter != VrParameter::ShapeRestore &&
+                        state_.controls.parameter != VrParameter::PolygonConversion &&
                         state_.controls.parameter != VrParameter::PolygonDistance &&
                         state_.controls.parameter != VrParameter::PolygonCuts &&
                         state_.controls.parameter != VrParameter::ImportUnitScale &&
@@ -1270,11 +1274,11 @@ void Document::process_locked(const SpatialFrame &f) {
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
-        input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
+        input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
     import_published=import_command(*c)&&published_.load()!=command_publication;
-    if(command_page==20){input_.retain_page(20,command_owner,command_sector);publish_locked(false,false);}
+    if(command_page==20||command_page==24){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
@@ -1765,6 +1769,7 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(parameter==VrParameter::ShapeRestore)return state_.can_restore_shapes;
   if(parameter==VrParameter::PolygonConversion)return !state_.polygon&&state_.can_polygon&&(polygon_conversion_required(scene_.active())||state_.polygon_has_source);
   if(parameter==VrParameter::PolygonDistance||parameter==VrParameter::PolygonCuts)return state_.polygon&&state_.polygon->surface&&!polygon_accepting_&&!polygon_stroking_&&!state_.asset_busy;
   if(state_.polygon)return false;
@@ -1822,6 +1827,13 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::ShapeRestore){
+    auto controls=state_.controls;auto source=control_source_;bool restore=accept&&controls.value[0]>=.5f;
+    auto before=std::move(control_before_);control_before_.reset();state_.controls={};control_changed_=false;
+    try{if(restore){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Restore;queue_shape_locked(std::move(edit),source);}}
+    catch(...){control_before_=std::move(before);state_.controls=controls;input_.resume_control(VrParameter::ShapeRestore);throw;}
+    return;
+  }
   if(state_.controls.parameter==VrParameter::PolygonConversion){
     const auto controls=state_.controls;const auto source=control_source_;
     const unsigned choice=accept?unsigned(std::lround(controls.value[0])):0;
@@ -2029,6 +2041,8 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::ShapeRestore:
+      c.title="Restore original mesh, paint and rig?";c.minimum=0;c.maximum=1;c.value[0]=0;break;
     case VrParameter::PolygonConversion:
       c.title=state_.polygon_has_source?"Edit current shape or restore retained source":"Convert visible shape; retain original source?";c.minimum=0;c.maximum=state_.polygon_has_source&&!state_.object_grabbing?2:1;c.value[0]=0;break;
     case VrParameter::PolygonDistance:
@@ -2292,6 +2306,7 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::PolygonDistance:
   case VrParameter::PolygonCuts:
   case VrParameter::PolygonConversion:
+  case VrParameter::ShapeRestore:
     break;
   case VrParameter::ImportUnitScale:
     control_changed_=true;break;
@@ -2434,6 +2449,8 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::CancelWork)
     return (state_.asset_busy && asset_status().cancellable) ||
       std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
+  if(shape_command(command))return shape_target_ready_locked()&&
+    ((command==SpatialCommand::ShapeNew||command==SpatialCommand::ShapeCapture)||state_.can_select_shape);
   if(polygon_command(command))return polygon_command_enabled_locked(command);
   if(state_.polygon && command!=SpatialCommand::ObjectGrabMode&&command!=SpatialCommand::HoldObject&&command!=SpatialCommand::ReleaseObject&&command!=SpatialCommand::GhostOthers&&command!=SpatialCommand::CancelObjectGrab&&command!=SpatialCommand::CancelWork)return polygon_command_enabled_locked(command);
   if(import_command(command)) {
@@ -2628,6 +2645,12 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(shape_command(command)){
+    if(!command_enabled_locked(command))return;ShapeKeyEdit edit;edit.target=state_.morph_target;
+    edit.action=command==SpatialCommand::ShapeNew?ShapeKeyAction::Create:command==SpatialCommand::ShapeCapture?ShapeKeyAction::CaptureMix:command==SpatialCommand::ShapeDuplicate?ShapeKeyAction::Duplicate:ShapeKeyAction::Mirror;
+    queue_shape_locked(std::move(edit));return;
+  }
+
   if(polygon_command(command)||(state_.polygon&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo))){polygon_command_locked(command);return;}
   if(import_command(command)){if(command_enabled_locked(command))import_command_locked(command);return;}
   if(command>=SpatialCommand::ObjectGrabMode&&command<=SpatialCommand::CancelObjectGrab){
@@ -3106,7 +3129,13 @@ void Document::file_loop() {
           if(job->retopo_session&&job->retopo_session==retopo_session_.load())transaction.finish_retopo();
           if(job->cut_session&&job->cut_session==cut_session_.load())transaction.finish_cut();
           bool changed=!job->operation_changed||*job->operation_changed;
-          if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
+          // Preserve a still-open tools page and its observed button latches.
+          // Clearing devices here would consume the next real selection as a
+          // first sample. Closed/focus-lost menus retain ordinary cancellation.
+          const bool keep_shapes=job->work&&job->work->morph_target.load()!=UINT32_MAX&&
+            input_.menu_open()&&input_.menu_page()==24;
+          if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked(keep_shapes);}
+          if(job->work&&job->work->morph_target.load()!=UINT32_MAX)state_.morph_target=job->work->morph_target.load();
           state_.error.clear();state_.message=job->operation_label+" complete";
           if(job->operation_report&&!job->operation_report->empty())state_.message+=" | "+*job->operation_report;
           publish_locked(changed,false);transaction.commit();asset_work_.store({});
