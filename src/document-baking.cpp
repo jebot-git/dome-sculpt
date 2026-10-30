@@ -12,8 +12,16 @@ void Document::cancel_asset_work_locked(){
     work->cancelled.store(true);state_.message="Cancelling background work...";
   }
 }
+void Document::cancel_background_work_locked(){
+  cancel_asset_work_locked();
+  for(const auto &work:exports_)if(work && work->cancel())
+    state_.message="Cancelling background work...";
+}
 void Document::cancel_asset_work(){
   std::lock_guard lock(model_mutex_);cancel_asset_work_locked();publish_locked();
+}
+void Document::cancel_background_work(){
+  std::lock_guard lock(model_mutex_);cancel_background_work_locked();publish_locked();
 }
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;

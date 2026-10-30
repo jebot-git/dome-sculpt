@@ -1005,7 +1005,7 @@
       },
       "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
       "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
-      "scope": "Own core/render/polygon plus bundled xatlas/both MikkTSpace/ufbx C/C++; system/private graphics/font libraries uninstrumented; UIoff/XRon; CPU/softwareGL; no suppressions"
+      "scope": "Own core/render/polygon plus bundled xatlas/both MikkTSpace/ufbx C/C++; system/private graphics/font libraries uninstrumented; UI/XR configured on; selected build contains no instrumented desktop frontend target; CPU/softwareGL; no suppressions"
     }
   },
   "GUI": {

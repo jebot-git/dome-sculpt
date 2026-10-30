@@ -97,6 +97,9 @@ persistent normal/AO/PBR baked maps beneath editable paint layers. Earlier
 volume/scene versions, including the standalone baked-v5 checkpoint, remain readable.
 Ctrl+O reopens it. Ctrl+E exports all visible objects as `.glb`, with separate mesh nodes,
 transforms, normals, packed UVs, PBR materials and embedded painted PNG maps.
+File → Cancel background work cancels queued/running exports while preserving
+existing output and ordered project saves. Accepted exports drain on close;
+see [export cancellation](docs/EXPORT-CANCELLATION.md).
 Skin/inverse-bind/all-influence and position/normal/tangent morph transport are
 implemented for the documented subset. Missing glTF normals now derive flat base/key normals and original-frame Mikk
 tangents for the supported UV0 material paths while retaining original absence
