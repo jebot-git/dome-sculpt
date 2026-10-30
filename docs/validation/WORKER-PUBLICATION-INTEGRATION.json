@@ -1,0 +1,70 @@
+{
+  "product_sources": [
+    "b395ff38f905aebab59bb7f91f04ae612706b79c",
+    "5ffbfea"
+  ],
+  "primary_product_commits": [
+    "283d701",
+    "2b89aeb"
+  ],
+  "agent_receipt_commit": "468b653",
+  "scope": "input/file worker error publication and promises only; no Scene/archive change",
+  "primary_release": {
+    "suites": 14,
+    "seconds": 22.11,
+    "log": "artifacts/tests-primary-worker-ordered.log",
+    "gui_export_cancel_retry_checks": 7,
+    "gui_log": "artifacts/tests-primary-worker-export-menu.log",
+    "captures_visually_inspected": true
+  },
+  "sanitize": {
+    "suites": 14,
+    "seconds": 63.36,
+    "scope": "fresh own-core/support C/C++ ASan/UBSan/leaks; no instrumented system libraries or FLTK frontend; exact corrected source",
+    "receipt": "WORKER-PUBLICATION-CHECKPOINT.json",
+    "retained_negative": "initial13/14 ordering failure fixed without changing the document-export oracle"
+  },
+  "stage": {
+    "local_main": "d12aedd",
+    "product_source": "b395ff3+5ffbfea; primary283d701+2b89aeb",
+    "stage": "artifacts/stage-worker-d12aedd-prefix",
+    "configured_prefix": "/usr/local",
+    "files": {
+      "usr/local/bin/dome-sculpt": "fd33c6fea308cade71bc0c95a549390ceaf5ffd2ba49f728513154deac05e84e",
+      "usr/local/share/applications/org.domed.Sculpt.desktop": "663a71189cebf541043c766bdd127698fc4766ab544a7ad49d9a2a96ccdd4cd7",
+      "usr/local/share/dome-sculpt/assets/humanoid/CC0-1.0.txt": "f6089cba01cb570a24712b41ab8a586ccd3cc5ef53dc266ca50b95c288956d2c",
+      "usr/local/share/dome-sculpt/assets/humanoid/README.md": "47a94423aa974164f8efd00a95037d56dc61d712d81162ff4eff157f2012a15b",
+      "usr/local/share/dome-sculpt/assets/humanoid/WORKFLOW-REFERENCES.json": "8c09d1fcfbb17b9ec7a2da45a6585279bf344d470d00c4695197601edf2600a2",
+      "usr/local/share/dome-sculpt/assets/humanoid/vroid/README.md": "d0fadea3799e5edfbec78cbc7487fff1b31993b975a2aa1631bf10eb220a376a",
+      "usr/local/share/dome-sculpt/assets/humanoid/vroid/SOURCES.json": "57a5cb278890abd5d0a6e5b14f5815bc35c736dc4fa22069dc2e2dc59d72b906",
+      "usr/local/share/dome-sculpt/assets/humanoid/vroid/base-female.vrm": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b",
+      "usr/local/share/dome-sculpt/assets/humanoid/vroid/base-male.vrm": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c",
+      "usr/local/share/licenses/dome-sculpt/MTOON-LICENSE.txt": "c9c7d56f1f4ce2828df8840f2de9603dc24af29a1617addc71eb418567ad1db1",
+      "usr/local/share/licenses/dome-sculpt/nlohmann_json/LICENSE.MIT": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
+      "usr/local/share/licenses/dome-sculpt/nlohmann_json/LICENSE.MIT.backport": "d64d1b4d948aa7751cfb613c02dc246aab7b358d760053e6580f01affe946906"
+    },
+    "coherent_optimized_release_frontend_and_selected_core_consumers": true,
+    "release_suites": 14,
+    "release_seconds": 22.11,
+    "only_verified_cc0_vroid_models": true,
+    "test_interposer_installed": false,
+    "latest_DomeD_remote_verified": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+    "startup_private_runtime_linkage_verified": true,
+    "system_installation": false,
+    "session_restart": false
+  },
+  "source_sha256": {
+    "src/document-worker-errors.cpp": "bb632d98c7a191caa530464bff39317dd5708bd577aba5243e42d97218b2fd88",
+    "src/document.cpp": "fec9554900f5cb0b0c1a3e2ac03f9443eadcd5b832e704d87734bd081598c804",
+    "include/dome/document.hpp": "00b25fdb96c2595858978534da3a54450aa67fa108f72255416b1903f0321f58",
+    "tests/worker-publication.cpp": "820cb0e892b12e478e1b9e2baaa03e21049e6f6fd4f1da3cb4bc9e10fcd46344"
+  },
+  "remaining": [
+    "Native gesture/mesh/UV/retopology catch-path allocation recovery",
+    "Private affine13/color14/normal15/shapekey16 integration",
+    "Complete production/device/accelerator requirements"
+  ],
+  "physical_hmd_test": false,
+  "system_installation": false,
+  "session_restart": false
+}
