@@ -20,7 +20,9 @@ held motion is cancelled on recovery only while its generation, object and edit
 authority still match the failed publication; authoritative source/history stay
 unchanged. Old notices cannot cancel a newer actor or overwrite a replacement
 document. Retopo/cut/import view repair is deferred where it needs allocation.
-Original exceptions complete file promises before UI publication; an allocation
+Normal error publication completes before its future becomes ready. If that
+publication cannot allocate, the original exception still reaches the promise
+immediately and the bounded notice retries UI status later. An allocation
 failure during delivery retains that promise and applies backpressure before
 more file work. Accepted snapshots and export tokens keep their original drain,
 generation and atomic-writer semantics. Late export failure retires counters
@@ -40,9 +42,16 @@ old-generation error. Denial is persistent on the named C++ worker thread for
 60ms, including error reporting and unwinding. Reported denied-allocation counts
 are retry attempts, not exhaustive unique-site counts or an OS-wide OOM test.
 All seven existing authoring/recovery/export/held/native regressions also pass:
-14 selected CTest suites total in 9.90s. Fully instrumented own C/C++ core/support
-ASan/UBSan/leak proof is the next gate; it is not claimed complete here.
+14 selected CTest suites total in 9.90s. The first fully instrumented run passed
+13/14 and exposed a readiness race in the existing document-export assertion:
+the exception future could wake before normal native status publication. Its
+assertion is unchanged; a narrow ordering correction passes eight focused Release
+suites (7.95s), and the complete sanitizer gate is running again. No sanitizer
+completion is claimed at this source checkpoint.
 
 This is isolated from the affine/Scene13 work and adds no Scene/archive fields,
 new runtime thread, system dependency, installation or display-session changes.
 Private Document layout changes require coherent rebuilding by consumers.
+
+Native gesture, mesh, UV, retopo and other worker catch-publication paths are
+outside this narrow input/file qualification and remain in the OOM audit scope.
