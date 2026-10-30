@@ -14,6 +14,7 @@
 #include "geometry-identity.hpp"
 #include <unistd.h>
 #include <utility>
+#include <numeric>
 #include <unordered_map>
 #include <unordered_set>
 namespace dome {
@@ -1233,6 +1234,7 @@ void Document::mesh_loop() {
     std::weak_ptr<const NormalFrameSet> frames;
     std::shared_ptr<const detail::NormalFrameLayout> layout;
     size_t bytes=0;
+    bool dynamic_canonical=false;
   };
   std::unordered_map<uint64_t,FrameLayoutCache> frame_layouts;
   size_t frame_layout_bytes=0;uint64_t frame_layout_builds=0;
@@ -1320,6 +1322,10 @@ void Document::mesh_loop() {
       std::unordered_set<uint64_t> frame_objects;
       for (auto &o : objects) {
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
+        const bool canonical=o.textures && !o.textures->normal.rgba.empty();
+        // Existing bakes without captured canonical authority use the historical
+        // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
+        const bool dynamic_canonical=retained && canonical && !retained->canonical;
         std::shared_ptr<const detail::NormalFrameLayout> retained_layout;
         std::optional<detail::PosedNormalFrames> retained_pose;
         const size_t source_role=o.material_bindings && o.material_bindings->has_mtoon?1:0;
@@ -1328,32 +1334,45 @@ void Document::mesh_loop() {
           if(!(source_role?retained->mtoon:retained->pbr))throw std::invalid_argument("Selected material has no retained source normal frame");
           frame_objects.insert(o.id);auto mesh_owner=job->scene.object(o.id).painted->mesh_owner();
           auto old=frame_layouts.find(o.id);
-          if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained)retained_layout=old->second.layout;
+          if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained && old->second.dynamic_canonical==dynamic_canonical)retained_layout=old->second.layout;
           else {
-            retained_layout=std::make_shared<const detail::NormalFrameLayout>(detail::normal_frame_layout(o.mesh,*retained,cancelled));
+            if(dynamic_canonical) {
+              auto layout=std::make_shared<detail::NormalFrameLayout>();
+              layout->vertices=o.mesh.indices;
+              layout->corners.resize(o.mesh.indices.size());
+              std::iota(layout->corners.begin(),layout->corners.end(),0u);
+              layout->indices=layout->corners;
+              retained_layout=std::move(layout);
+            } else retained_layout=std::make_shared<const detail::NormalFrameLayout>(detail::normal_frame_layout(o.mesh,*retained,cancelled));
             size_t bytes=(retained_layout->vertices.size()+retained_layout->corners.size()+retained_layout->indices.size())*sizeof(uint32_t);
             if(bytes>frame_layout_limit)throw std::length_error("Immutable normal frame layout exceeds cache budget");
             if(old!=frame_layouts.end()){frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
             while(!frame_layouts.empty() && (frame_layouts.size()>=256 || bytes>frame_layout_limit-frame_layout_bytes)){auto expired=frame_layouts.begin();frame_layout_bytes-=expired->second.bytes;frame_layouts.erase(expired);}
-            frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,retained_layout,bytes});frame_layout_bytes+=bytes;++frame_layout_builds;
+            frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,retained_layout,bytes,dynamic_canonical});frame_layout_bytes+=bytes;++frame_layout_builds;
           }
-          bool needs_canonical=o.textures && !o.textures->normal.rgba.empty();
-          retained_pose=detail::normal_frame_preview(*retained,*retained_layout,o.deformation.get(),cancelled,(1u<<source_role)|(needs_canonical?4u:0u));
+          retained_pose=detail::normal_frame_preview(*retained,*retained_layout,o.deformation.get(),cancelled,(1u<<source_role)|(canonical?4u:0u));
           if(snapshot->source_normals.empty()) {
             snapshot->source_normals=snapshot->mesh.normals;snapshot->canonical_normals=snapshot->mesh.normals;
             snapshot->source_tangents.assign(snapshot->mesh.positions.size(),{1,0,0,1});
           }
         }
         if (o.deformation) o.mesh = o.preview_mesh();
+        if(dynamic_canonical) {
+          retained_pose->tangents[2]=tangent_corners(o.mesh,cancelled);
+          retained_pose->normals[2].reserve(retained_layout->vertices.size());
+          for(size_t v=0;v<retained_layout->vertices.size();++v) {
+            if((v&1023)==0 && cancelled())throw std::runtime_error("Stale canonical bake preview");
+            retained_pose->normals[2].push_back(o.mesh.normals.at(retained_layout->vertices[v]));
+          }
+        }
         if (cancelled()) throw std::runtime_error("Stale surface preview");
         auto world = o.world_transform();
         size_t offset = snapshot->mesh.positions.size(), first = snapshot->mesh.indices.size();
-        bool canonical = o.textures && !o.textures->normal.rgba.empty();
         const size_t packed_vertices=retained_layout?retained_layout->vertices.size():canonical?o.mesh.indices.size():o.mesh.positions.size();
         if(offset>2'000'000 || packed_vertices>2'000'000-offset || first>6'000'000 || o.mesh.indices.size()>6'000'000-first)throw std::length_error("Packed surface preview exceeds native renderer geometry limits");
         bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
-        if(retained && canonical && (!retained->canonical || retained_pose->tangents[2].empty()))
-          throw std::invalid_argument("Baked normal detail requires an explicit retained canonical frame");
+        if(retained && canonical && retained_pose->tangents[2].empty())
+          throw std::invalid_argument("Baked normal detail requires a complete canonical preview basis");
         auto frames = canonical && !retained ? tangent_corners(o.mesh, cancelled)
                                             : std::vector<Tangent>{};
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
