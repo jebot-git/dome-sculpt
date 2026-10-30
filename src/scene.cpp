@@ -11,6 +11,8 @@
 #include "io.hpp"
 #include "text-utf8.hpp"
 #include "volume-archive.hpp"
+#include "polygon-scene-archive.hpp"
+#include "polygon-scene-budget.hpp"
 #include <fstream>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -52,7 +54,8 @@ void validate_transform(CanvasTransform t) {
     throw std::invalid_argument("Invalid object transform");
 }
 bool source_is_dormant(const SculptObject &o) {
-  return !o.mesh_active && bool(o.appearance || o.material_bindings || o.deformation || o.retopology ||
+  if(o.polygon && o.polygon->active)return false;
+  return !o.mesh_active && bool(o.appearance || o.material_bindings || o.deformation || o.retopology || o.polygon ||
     (o.painted && (o.painted->source_maps() || o.painted->baked() || o.painted->has_paint_data())));
 }
 void Scene::require_exportable_sources() const {
@@ -166,6 +169,7 @@ void Scene::validate(bool deep_sources) const {
   size_t count = 0, texels = 0, deformation_entries = 0, paint_bytes = 0, origin_vertices = 0, topology_entries = 0;
   std::map<uint64_t,uint64_t> retopology_sources;
   SourceMaterialArchive source_materials;
+  detail::PolygonSceneArchive polygons;
   std::set<const PaintedMesh *> retained_paint;
   auto retain_appearance = [&](const CreatorAppearance &a, size_t vertices) {
     if(a.source_vertices.size()!=vertices)throw std::invalid_argument("Creator source does not match its retained mesh");
@@ -199,6 +203,7 @@ void Scene::validate(bool deep_sources) const {
       throw std::invalid_argument(
           "Invalid scene object identity or unfinished stroke");
     name_valid(o.name);
+    if(o.polygon){polygons.add(o.polygon,deep_sources);if(deep_sources)validate_polygon_derivative(*o.polygon,o.painted.get(),o.mesh_active);}
     validate_transform(o.transform);
     validate_transform(world_transform(o.id));
     o.material.validate();
@@ -232,16 +237,54 @@ void Scene::validate(bool deep_sources) const {
       source_materials.add(o.material_bindings,deep_sources);
       if(deep_sources && o.material_bindings->normal_frames)detail::normal_frame_current_authority(*o.material_bindings,o.painted->mesh(),o.deformation.get());
     }
-    count += std::max(o.volume->voxels().size(), o.volume->stored_samples());
+    const auto mask_samples=o.volume->mask_values().size();
+    count += std::max(o.volume->voxels().size(), o.volume->stored_samples()-mask_samples)+mask_samples;
     if (count > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
   }
+  for (const auto &v : polygons.volumes()) {
+    const auto mask_samples=v->mask_values().size();
+    const size_t n = std::max(v->voxels().size(), v->stored_samples()-mask_samples)+mask_samples;
+    if (n > 4'000'000 - count)
+      throw std::length_error("Scene retained polygon sculpt budget exceeded");
+    count += n;
+  }
+  for (const auto &p : polygons.paints()) {
+    retain_paint(p, true);
+    if(p->mesh().positions.size()>8'000'000-origin_vertices)throw std::length_error("Retained polygon source geometry exceeds scene budget");
+    origin_vertices+=p->mesh().positions.size();
+  }
+  for (const auto &origin : polygons.origins()) {
+    if (origin->deformation) {
+      deformation_entries += origin->deformation->resource_entries();
+      if (deformation_entries > 8'000'000)
+        throw std::length_error(
+            "Scene retained polygon deformation budget exceeded");
+    }
+    if (origin->appearance)
+      retain_appearance(*origin->appearance,
+                        origin->paint->mesh().positions.size());
+    if (origin->material_bindings)
+      source_materials.add(origin->material_bindings, deep_sources);
+    if (origin->retopology) {
+      const auto &t = origin->retopology->topology;
+      topology_entries +=
+          t.vertices().size() + t.edges().size() + t.faces().size();
+      if (topology_entries > 1'000'000)
+        throw std::length_error(
+            "Scene retained polygon retopology budget exceeded");
+    }
+  }
   NormalFrameArchive normal_frames;
-  for(const auto &binding:source_materials.bindings())if(binding->normal_frames)normal_frames.add(binding->normal_frames,deep_sources);
+  for (const auto &binding : source_materials.bindings())
+    if (binding->normal_frames)
+      normal_frames.add(binding->normal_frames, deep_sources);
   normal_frames.storage_bytes();
-  for(const auto &binding:source_materials.bindings())
-    for(const auto &view:binding->roles)if(view.image)source_images.add(view.image);
-  for(const auto &origin:source_materials.origins()) {
+  for (const auto &binding : source_materials.bindings())
+    for (const auto &view : binding->roles)
+      if (view.image)
+        source_images.add(view.image);
+  for (const auto &origin : source_materials.origins()) {
     retain_paint(origin->paint,true);origin_vertices+=origin->paint->mesh().positions.size();
     if(origin_vertices>8'000'000)throw std::length_error("Retained original UV geometry exceeds scene budget");
     if(origin->deformation){deformation_entries+=origin->deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes retained original frame authority");}
@@ -258,6 +301,8 @@ nlohmann::json Scene::encode() const {
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
   const bool framed=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){if(!o.material_bindings)return false;const auto &b=*o.material_bindings;return bool(b.normal_frames) || (b.uv_origin && (b.uv_origin->deformation || !b.uv_origin->creator_kind.empty() || !b.sampling_reparameterized));});
   unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
+  const bool polygon_fields=std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.polygon);});
+  for(const auto&o:objects_)feature_version=std::max(feature_version,detail::minimum_scene_version(o.polygon.get()));
   const bool extended=resolved || retopology || feature_version>=8;
   nlohmann::json j = {{"format", "dome-sculpt"},
                       {"version", std::max(feature_version,unsigned(framed ? 9 : extended ? 8 : baked ? 6 : 5))},
@@ -267,6 +312,7 @@ nlohmann::json Scene::encode() const {
   PaintImageArchive source_images;
   CreatorAssetArchive source_models;
   SourceMaterialArchive source_materials;
+  detail::PolygonSceneArchive polygons;
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
@@ -312,12 +358,14 @@ nlohmann::json Scene::encode() const {
          {"deformation", o.deformation
                              ? o.deformation->encode(o.painted->mesh())
                              : nlohmann::json(nullptr)}});
+    if(polygon_fields)j["objects"].back()["polygon"]=o.polygon?nlohmann::json(polygons.add(o.polygon)):nlohmann::json(nullptr);
     if(extended) {
       j["objects"].back()["material_bindings"]=o.material_bindings
         ?nlohmann::json(source_materials.add(o.material_bindings)):nlohmann::json(nullptr);
       j["objects"].back()["retopology"]=std::move(patch);
     }
   }
+  if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials);
   if(extended)j["source_materials"]=source_materials.encode(source_images,source_models);
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
@@ -325,7 +373,7 @@ nlohmann::json Scene::encode() const {
 }
 Scene Scene::decode(const nlohmann::json &j) {
   Scene result;
-  if(!j.is_object() || j.at("format")!="dome-sculpt" || !j.at("version").is_number_integer())
+  if(!j.is_object() || (!j.at("format").is_string() || j.at("format").get_ref<const std::string&>()!="dome-sculpt") || !j.at("version").is_number_integer())
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   bool flat_volume=false;
@@ -335,21 +383,73 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>11)throw std::runtime_error("Unsupported scene version");
-  const auto &objects=j.at("objects");
-  if(!objects.is_array() || objects.empty() || objects.size()>256)throw std::length_error("Invalid scene object count");
+  if(version<2 || version>12)throw std::runtime_error("Unsupported scene version");
+  const auto &objects = j.at("objects");
+  if (!objects.is_array() || objects.empty() || objects.size() > 256)
+    throw std::length_error("Invalid scene object count");
+  const bool polygon_fields = version >= 12;
+  if (polygon_fields) {
+    if (!j.contains("polygon_sources"))
+      throw std::invalid_argument("Incomplete polygon source scene fields");
+    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects);
+    const auto &material_records=j.at("source_materials").at("bindings");
+    const auto &model_records=j.at("source_models");
+    if(!material_records.is_array() || material_records.size()>256 || !model_records.is_array() || model_records.size()>16)
+      throw std::length_error("Invalid Scene12 shared source archive count");
+    auto references=[&](const nlohmann::json &o) {
+      if(!o.at("material_bindings").is_null())detail::polygon_archive_index(o.at("material_bindings"),material_records.size());
+      if(!o.at("appearance").is_null())detail::polygon_archive_index(o.at("appearance").at("asset"),model_records.size());
+    };
+    for(const auto &o:objects)references(o);
+    for(const auto &o:j.at("polygon_sources").at("origins"))references(o);
+    detail::PolygonSceneBudget budget;
+    for (const auto &o : objects) {
+      budget.volume(o.at("volume"));
+      budget.paint(o.at("painted"));
+      budget.deformation(o.at("deformation"), unsigned(version));
+      budget.appearance(o.at("appearance"));
+      budget.retopology(o.at("retopology"));
+    }
+    const auto &poly = j.at("polygon_sources");
+    for (const auto &v : poly.at("volumes"))
+      budget.volume(v);
+    for (const auto &p : poly.at("paints"))
+      budget.paint(p,true);
+    for (const auto &o : poly.at("origins")) {
+      budget.deformation(o.at("deformation"), unsigned(version));
+      budget.appearance(o.at("appearance"));
+      budget.retopology(o.at("retopology"));
+    }
+    const auto &materials = j.at("source_materials");
+    for (const auto &p : materials.at("paints"))
+      budget.paint(p,true);
+    for (const auto &o : materials.at("origins")) {
+      if (o.contains("deformation"))
+        budget.deformation(o.at("deformation"), unsigned(version));
+      budget.appearance(o.at("appearance"));
+    }
+  } else {
+    if (j.contains("polygon_sources"))
+      throw std::invalid_argument("Polygon authority requires Scene12");
+    for (const auto &o : objects)
+      if (o.contains("polygon"))
+        throw std::invalid_argument("Polygon authority fields require Scene12");
+  }
   // Bound the complete serialized sculpt payload before decoding any object.
-  // Masks are independent of displacement layers and must share the Scene quota.
-  size_t sculpt_entries=0;
-  for(const auto &object:objects) {
-    const auto &volume=object.at("volume");
+  // Masks are independent of displacement layers and must share the Scene
+  // quota.
+  size_t sculpt_entries = 0;
+  for (const auto &object : objects) {
+    const auto &volume = object.at("volume");
     (void)archive_detail::volume_header(volume);
-    const auto &samples=volume.at("samples");
-    if(!samples.is_array()) throw std::runtime_error("Invalid sculpt samples");
-    size_t layers=0;
-    if(volume.contains("sculpt_layers")) {
-      const auto &records=volume.at("sculpt_layers");
-      if(!records.is_array() || records.size()>16) throw std::runtime_error("Invalid sculpt layer count");
+    const auto &samples = volume.at("samples");
+    if (!samples.is_array())
+      throw std::runtime_error("Invalid sculpt samples");
+    size_t layers = 0;
+    if (volume.contains("sculpt_layers")) {
+      const auto &records = volume.at("sculpt_layers");
+      if (!records.is_array() || records.size() > 16)
+        throw std::runtime_error("Invalid sculpt layer count");
       for(const auto &layer:records) {
         const auto &delta=layer.at("delta");
         if(!delta.is_array() || delta.size()>4'000'000-layers) throw std::length_error("Scene sculpt storage limit exceeded");
@@ -505,6 +605,8 @@ Scene Scene::decode(const nlohmann::json &j) {
   }
   SourceMaterialArchive source_materials;
   if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models);
+  detail::PolygonSceneArchive polygons;
+  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -620,6 +722,7 @@ Scene Scene::decode(const nlohmann::json &j) {
          binding.get<uint64_t>()>UINT32_MAX)throw std::runtime_error("Invalid resolved material identity");
       o.material_bindings=source_materials.at(binding.get<uint32_t>());
     }
+    if(polygon_fields && !v.at("polygon").is_null())o.polygon=polygons.at(detail::polygon_archive_index(v.at("polygon"),polygons.authorities().size()));
     result.objects_.push_back(std::move(o));
   }
   result.validate();
@@ -672,6 +775,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
     if (o.visible) {
+      if(o.polygon && o.polygon->active && o.polygon->topology.faces().empty())continue;
       auto mesh = o.mesh_active ? o.painted->mesh()
                                 : mesher ? mesher(o.id, *o.volume) : surface_mesh(*o.volume, cancelled);
       if (mesh.indices.empty())
