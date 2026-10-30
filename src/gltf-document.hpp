@@ -7,7 +7,7 @@ namespace dome::detail {
 struct GltfObjectIdentity {
   int node = -1, mesh = -1, material = -1;
   std::vector<uint32_t> joints;
-  PaintSourceTexture canonical_normal;
+  PaintSourceTexture canonical_normal,prepared_normal;
 };
 struct GltfDocument {
   nlohmann::json json;

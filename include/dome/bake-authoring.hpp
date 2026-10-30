@@ -8,12 +8,16 @@ struct ObjectBakeSettings {
   bool allow_partial = false, allow_backfaces = false;
   bool prepare_colors = false;
   float color_error = .04f;
+  bool prepare_normals=false;
+  float normal_error=.02f;
 };
 struct ObjectBakeReport {
   uint64_t projected = 0, padded = 0, rays = 0, missed = 0, preserved_misses = 0;
   bool color_prepared = false;
   bool canonical_captured = false;
   std::array<float,4> color_error_bound{};
+  bool normal_prepared=false;
+  double normal_initial_error=0;
 };
 // Bake the displayed source into the active target's rest UVs beneath its
 // existing editable paint layers. Hidden sources are valid; all source data

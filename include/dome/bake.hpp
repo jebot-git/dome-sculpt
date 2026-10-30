@@ -40,6 +40,11 @@ struct BakeOptions {
   // Produce independent common/material-component and resolved PBR color in
   // one projection pass. False preserves the legacy vertex-color bake output.
   bool separate_pbr_color=false;
+  // Explicit new attribute model only. Receives the actual same projection-hit
+  // object-space normal before any canonical RGB8 encoding. Return final PBR
+  // and versioned-MToon RGBA8 exactly once; no float/byte recoding can invalidate
+  // the callback's quantization receipt. Callers retain the declared model.
+  std::function<std::array<std::array<uint8_t,4>,2>(uint32_t,std::array<float,3>,Vec3)> encode_target_normal;
 };
 struct BakeResult {
   TextureMaps maps; // Composited sRGB base/emission; linear ORM R=AO,G=rough,B=metal.

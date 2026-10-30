@@ -4,6 +4,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/color-preparation.hpp"
+#include "dome/normal-preparation.hpp"
 #include "dome/polygon-scene.hpp"
 #include <set>
 #include <nlohmann/json.hpp>
@@ -32,6 +33,9 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
              : 0u;
   if(const auto &preparation=binding->color_preparation)
     result=std::max({result,10u,minimum_scene_version(preparation->original_deformation.get()),
+      minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
+  if(const auto &preparation=binding->normal_preparation)
+    result=std::max({result,15u,minimum_scene_version(preparation->original_deformation.get()),
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
   return result;
 }

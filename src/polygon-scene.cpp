@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
 #include "dome/color-preparation.hpp"
+#include "source-paint-pairing.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-scene-archive.hpp"
 #include "source-placement-archive.hpp"
@@ -231,6 +232,7 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
                                              o->paint->mesh(),
                                              o->deformation.get());
           }
+          source_paint_pairing(o->paint.get(),o->material_bindings.get(),o->appearance.get(),validate_deep);
           const auto projection=o->paint?o->paint->color_projection():nullptr;
           const auto preparation=o->material_bindings?
               o->material_bindings->color_preparation:nullptr;

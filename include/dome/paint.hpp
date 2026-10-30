@@ -25,6 +25,14 @@ struct PaintColorProjection {
   uint64_t quality_cells=0;
   void validate(uint32_t resolution) const;
 };
+// Intrinsic normal encodings in the explicit prepared attribute model. These
+// are unit-strength tangent vectors, not historical canonical/world blends.
+// PBR and versioned MToon can evaluate the same attributes differently.
+struct PaintNormalProjection {
+  uint32_t version=1;
+  std::shared_ptr<const Image> pbr,mtoon;
+  void validate(uint32_t resolution) const;
+};
 struct TextureMaps {
   Image color, metal_rough, emission;
   bool transparent = false;
@@ -44,14 +52,18 @@ struct TextureMaps {
   Image pbr_color;
   bool pbr_transparent = false;
   std::shared_ptr<const PaintColorProjection> color_projection;
+  Image mtoon_normal;
+  std::shared_ptr<const PaintNormalProjection> normal_projection;
 };
 enum class BakedColorInterpretation { VertexComponent, ResolvedPbr };
+enum class BakedNormalInterpretation { CanonicalMikk, PreparedAttributes };
 struct BakedTextures {
   TextureMaps maps;
   // Linear coverage below editable paint layers: 0 intrinsic material,
   // 255 baked surface. Fractional values retain filtered UV boundary coverage.
   std::vector<uint8_t> coverage;
   BakedColorInterpretation color_interpretation = BakedColorInterpretation::VertexComponent;
+  BakedNormalInterpretation normal_interpretation = BakedNormalInterpretation::CanonicalMikk;
   void validate(uint32_t resolution) const;
   size_t storage_bytes() const;
 };
@@ -124,6 +136,7 @@ public:
   uint64_t revision() const { return revision_; }
   const std::vector<PaintLayer> &layers() const { return layers_; }
   const std::shared_ptr<const PaintColorProjection> &color_projection() const { return color_projection_; }
+  const std::shared_ptr<const PaintNormalProjection> &normal_projection() const { return normal_projection_; }
   std::array<uint8_t,4> pbr_pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   uint64_t active_layer() const { return active_; }
   void select_layer(uint64_t);
@@ -170,6 +183,7 @@ private:
   friend struct SourceUvBakeAccess;
   friend struct SourceColorPreparationAccess;
   friend struct PolygonPaintAccess;
+  friend struct SourceNormalPreparationAccess;
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
@@ -183,6 +197,7 @@ private:
   std::shared_ptr<const SurfaceMap> surface_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::shared_ptr<const PaintColorProjection> color_projection_;
+  std::shared_ptr<const PaintNormalProjection> normal_projection_;
   std::vector<PaintLayer> layers_;
   std::shared_ptr<const BakedTextures> baked_;
   uint64_t active_ = 1, next_ = 2, revision_ = 1;

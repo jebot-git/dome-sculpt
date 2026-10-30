@@ -967,13 +967,13 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
           detail::vrm_native_factor(toon.parameters.emission.y,reference.emission[1],o.material.emissive[1]),
           detail::vrm_native_factor(toon.parameters.emission.z,reference.emission[2],o.material.emissive[2])};
     } else {
-      if(!o.textures->normal.rgba.empty() && !emitted.canonical_normal.image)fail("typed baked normal export needs explicit canonical tangent conversion");
+      if(!o.textures->normal.rgba.empty() && !emitted.canonical_normal.image && !emitted.prepared_normal.image)fail("typed baked normal export needs explicit canonical tangent conversion");
       auto compiled=detail::vrm_painted_material(o,std::move(toon),std::move(roles),reference,options.paint_resolution,options.cancelled);
       toon=std::move(compiled.material);roles=std::move(compiled.roles);rewritten=std::move(compiled.rewritten_properties);
     }
-    if(emitted.canonical_normal.image) {
-      roles[size_t(MToonSlot::Normal)]=emitted.canonical_normal;
-      toon.parameters.normal_enabled=true;toon.parameters.normal_scale=1;
+    if(emitted.canonical_normal.image||emitted.prepared_normal.image) {
+      roles[size_t(MToonSlot::Normal)]=emitted.prepared_normal.image?emitted.prepared_normal:emitted.canonical_normal;
+      if(!emitted.prepared_normal.image){toon.parameters.normal_enabled=true;toon.parameters.normal_scale=1;}
       for(const char *name:{"_BumpScale","_MainTex_ST","_MainTex_ST_S","_MainTex_ST_T","_UvAnimScrollX","_UvAnimScrollY","_UvAnimRotation"})rewritten.insert(name);
     }
     if(o.material_bindings && o.material_bindings->sampling_reparameterized) {

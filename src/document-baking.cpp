@@ -49,6 +49,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     *report=std::to_string(result.projected)+" projected, "+std::to_string(result.missed)+" missed ("+std::to_string(result.preserved_misses)+" kept from prior bake)";
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
+    if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; normal attributes prepared (initial quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
   },expected,report,work);
   state_.bake_source=source;state_.bake_settings=settings;publish_locked();
 }

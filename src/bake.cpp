@@ -208,6 +208,7 @@ void pad(BakeResult &result,const BakeOptions &o) {
       for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
         std::copy_n(image->rgba.data()+size_t(at)*4,4,image->rgba.data()+size_t(target)*4);
       if(o.separate_pbr_color)std::copy_n(result.maps.pbr_color.rgba.data()+size_t(at)*4,4,result.maps.pbr_color.rgba.data()+size_t(target)*4);
+      if(o.encode_target_normal)std::copy_n(result.maps.mtoon_normal.rgba.data()+size_t(at)*4,4,result.maps.mtoon_normal.rgba.data()+size_t(target)*4);
       result.coverage[target]=2; ++result.padded; queue.push_back({target,distance+1});
     }
   }
@@ -230,6 +231,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
   }
   size_t pixels=size_t(o.resolution)*o.resolution;
   BakeResult result; result.coverage.resize(pixels);
+  if(o.encode_target_normal)result.maps.mtoon_normal={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
   if (!o.writable.empty()) for (size_t i=0;i<pixels;++i) if (!o.writable[i]) result.coverage[i]=4;
   for (auto *image:{&result.maps.color,&result.maps.metal_rough,&result.maps.emission,&result.normal,&result.ambient_occlusion})
     *image={o.resolution,o.resolution,std::vector<uint8_t>(pixels*4)};
@@ -328,7 +330,14 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
             {float(x/size),float(y/size),float(z/size)});
         }
       }
-      Vec3 mapped=frame.to_tangent(high_normal);
+      Vec3 mapped;
+      if(o.encode_target_normal){
+        const auto encoded=o.encode_target_normal(uint32_t(triangle),bary,high_normal);
+        if(encoded[0][3]!=255||encoded[1][3]!=255)throw std::invalid_argument("Explicit target normal encoder returned malformed normal data alpha");
+        std::copy_n(encoded[0].begin(),4,result.normal.rgba.data()+at*4);
+        std::copy_n(encoded[1].begin(),4,result.maps.mtoon_normal.rgba.data()+at*4);
+        if(o.normal_y_down){result.normal.rgba[at*4+1]=255-result.normal.rgba[at*4+1];result.maps.mtoon_normal.rgba[at*4+1]=255-result.maps.mtoon_normal.rgba[at*4+1];}
+      }else mapped=frame.to_tangent(high_normal);
       if (o.normal_y_down) mapped.y=-mapped.y;
       float ao=ambient(query,hit->position,normalized(hit->normal),o,result)*channels.ao;
       for (int c=0;c<3;++c) {
@@ -340,8 +349,8 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
       result.maps.emission.rgba[at*4+3]=255;
       result.maps.metal_rough.rgba[at*4]=byte(ao); result.maps.metal_rough.rgba[at*4+1]=byte(channels.roughness);
       result.maps.metal_rough.rgba[at*4+2]=byte(channels.metallic); result.maps.metal_rough.rgba[at*4+3]=255;
-      result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
-      result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;
+      if(!o.encode_target_normal){result.normal.rgba[at*4]=byte(mapped.x*.5f+.5f);result.normal.rgba[at*4+1]=byte(mapped.y*.5f+.5f);
+        result.normal.rgba[at*4+2]=byte(mapped.z*.5f+.5f);result.normal.rgba[at*4+3]=255;}
       for (int c=0;c<3;++c) result.ambient_occlusion.rgba[at*4+c]=byte(ao);
       result.ambient_occlusion.rgba[at*4+3]=255;
       result.maps.transparent|=channels.color[3]<.9999f;

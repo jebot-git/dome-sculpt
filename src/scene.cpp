@@ -10,6 +10,8 @@
 #include "dome/creator-archive.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/color-preparation.hpp"
+#include "dome/normal-preparation.hpp"
+#include "normal-projection-identity.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/retopo-authoring.hpp"
 #include "io.hpp"
@@ -211,6 +213,7 @@ void Scene::validate(bool deep_sources) const {
       for(const auto *slot:{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion})
         if(slot->image)source_images.add(slot->image);
     }
+    if(const auto &projection=paint->normal_projection()){projection->validate(paint->resolution());source_images.add(projection->pbr);source_images.add(projection->mtoon);}
     texels+=size_t(paint->resolution())*paint->resolution();paint_bytes+=paint->storage_bytes();
     if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
     if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
@@ -258,6 +261,13 @@ void Scene::validate(bool deep_sources) const {
     const auto preparation=o.material_bindings?o.material_bindings->color_preparation:nullptr;
     if(o.polygon && o.polygon->active && o.polygon->colors && (projection || preparation))
       throw std::invalid_argument("Current polygon corner colors conflict with prepared color authority");
+    const auto normal_projection=o.painted?o.painted->normal_projection():nullptr;
+    const auto normal_preparation=o.material_bindings?o.material_bindings->normal_preparation:nullptr;
+    if(bool(normal_projection)!=bool(normal_preparation))throw std::invalid_argument("Current normal projection and retained interpretation differ");
+    if(normal_projection){
+      if(!detail::normal_projection_identity(*normal_projection,*normal_preparation->projection))throw std::invalid_argument("Prepared normal planes are not their recorded current intrinsic field");
+      if(deep_sources)normal_preparation->validate_current(o.painted->mesh(),o.appearance.get());
+    }
     if(bool(projection)!=bool(preparation))throw std::invalid_argument("Current color projection and retained preparation differ");
     if(projection) {
       if(projection->vertex_rgba!=preparation->projection->vertex_rgba || projection->maximum_error!=preparation->projection->maximum_error || projection->quality_cells!=preparation->projection->quality_cells)
@@ -335,6 +345,15 @@ void Scene::validate(bool deep_sources) const {
     retain_paint(p.original_paint,true);if(fresh_paint)origin_vertices+=p.original_paint->mesh().positions.size();
     if(origin_vertices>8'000'000)throw std::length_error("Color preparation original geometry exceeds scene budget");
     if(p.original_deformation){deformation_entries+=p.original_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes preconversion color authority");}
+    if(p.original_appearance)retain_appearance(*p.original_appearance,p.original_paint->mesh().positions.size());
+  }
+  std::set<const SourceNormalPreparation*> normal_preparations;
+  for(const auto &binding:source_materials.bindings())if(binding->normal_preparation&&normal_preparations.insert(binding->normal_preparation.get()).second){
+    const auto &p=*binding->normal_preparation;p.validate(deep_sources);
+    for(const auto &projection:{p.projection,p.initial_projection}){source_images.add(projection->pbr);source_images.add(projection->mtoon);}
+    const bool fresh=!retained_paint.contains(p.original_paint.get());retain_paint(p.original_paint,true);if(fresh)origin_vertices+=p.original_paint->mesh().positions.size();
+    if(origin_vertices>8'000'000)throw std::length_error("Normal preparation original geometry exceeds scene budget");
+    if(p.original_deformation){deformation_entries+=p.original_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes pre-normal-preparation authority");}
     if(p.original_appearance)retain_appearance(*p.original_appearance,p.original_paint->mesh().positions.size());
   }
   retopology_acyclic(retopology_sources);
@@ -438,7 +457,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>16 || version==15)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>16)throw std::runtime_error("Unsupported scene version");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
@@ -621,16 +640,22 @@ Scene Scene::decode(const nlohmann::json &j) {
         storage+=bytes.get_binary().size();
       }
       if(paint.contains("color_projection") && version<10)throw std::runtime_error("Prepared color projection requires scene10");
-      if(paint.contains("baked") && paint.at("baked").at("version")!=1) {
-        if(version<10 || paint.at("baked").at("version")!=2 || !paint.at("baked").at("pbr_color").is_binary())throw std::runtime_error("Resolved baked PBR requires scene10");
-        storage+=paint.at("baked").at("pbr_color").get_binary().size();
+      if(paint.contains("normal_projection")&&version<15)throw std::invalid_argument("Prepared normal projection requires Scene15");
+      if(paint.contains("baked")&&paint.at("baked").at("version")!=1){
+        const auto &baked=paint.at("baked");const auto bv=baked.at("version").get<int>();
+        if(bv==2||(bv==3&&(baked.contains("pbr_color")||baked.contains("color_interpretation")))){
+          if(version<10||!baked.at("pbr_color").is_binary())throw std::runtime_error("Resolved baked PBR requires scene10");
+          storage+=baked.at("pbr_color").get_binary().size();
+        }
+        if(bv==3){if(version<15||!baked.at("mtoon_normal").is_binary())throw std::invalid_argument("Prepared baked normals require Scene15");storage+=baked.at("mtoon_normal").get_binary().size();}
+        else if(bv!=2)throw std::invalid_argument("Unsupported retained baked payload");
       }
       if(pixels>16*1024*1024 || storage>256*1024*1024)
         throw std::length_error("Scene retained painting allocations exceed budget");
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3)) ||
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);
@@ -697,6 +722,9 @@ Scene Scene::decode(const nlohmann::json &j) {
   if(material_fields)for(const auto&origin:j.at("source_materials").at("origins"))if(origin.contains("deformation")&&detail::minimum_deformation_scene_version(origin.at("deformation"))>version)throw std::runtime_error("Retained explicit inverse binds require scene version eleven");
   if(material_fields&&j.at("source_materials").contains("color_preparations"))for(const auto &preparation:j.at("source_materials").at("color_preparations"))
     if(detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::runtime_error("Preconversion explicit inverse binds require scene version eleven");
+  if(version==15&&(!material_fields||j.at("source_materials").at("version")!=4))throw std::invalid_argument("Scene15 requires its explicit normal preparation feature");
+  if(material_fields&&j.at("source_materials").contains("normal_preparations"))for(const auto &preparation:j.at("source_materials").at("normal_preparations"))
+    if(version<15||detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::invalid_argument("Pre-normal-preparation source features exceed scene version");
   size_t preflight_deformation=material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0;
   if(version>=4)for(const auto &o:objects)if(!o.at("deformation").is_null()) {
     const auto &d=o.at("deformation");
