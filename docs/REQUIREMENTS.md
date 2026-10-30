@@ -1,5 +1,11 @@
 # Full objective and completion evidence
 
+This feature ledger describes plane-cut integration source 2ec8a5a against
+production base2c89e8d. Final fetch found newer main 9a0cfc4 / source 20c132d with
+sculpt masks/symmetry and Volume v3; that source is not integrated here yet.
+Reconcile its implementation and requirement evidence before treating those
+features as absent or replacing them. See HANDOFF.md for the next integration.
+
 The goal is the complete native FLTK VR production workflow requested by the
 user. An executable, a successful build, or the initial tests do not complete
 this objective. Every row below must have matching implementation and evidence

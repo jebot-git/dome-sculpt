@@ -1,151 +1,139 @@
-# Plane-cut and production integration — in progress
+# Combined plane-cut and production checkpoint — 2026-10-30
 
-This branch merges plane-cut checkpoint de3f433 / source5b0f9f5 with production
-main2c89e8d / source79fe64a, preserving both histories. Integration build and
-verification are in progress; the older evidence below does not validate the
-combined tree. Current branch: work/plane-cut-integration.
+Application source 2ec8a5a59990f2d64887434560a6402d5a9ec665 merges plane checkpoint
+de3f433 / source 5b0f9f5 with production main 2c89e8d / source 79fe64a, preserving
+both histories. Branch: work/plane-cut-integration. This integration is verified.
+Final fetch discovered newer main 9a0cfc4 / source 20c132d (sculpt masks/symmetry);
+that newer milestone is not merged here. Publish this feature checkpoint without
+overwriting main, and reconcile it first when work resumes. The full objective in
+[REQUIREMENTS.md](REQUIREMENTS.md) remains incomplete. No agents were spawned.
 
-Plane cut uses XR page17; Skin14, reserved Masks15 and Retopo16 retain their
-production routing. The cut worker uses the predicate-mutex shutdown handshake,
-and the deterministic shutdown fixture now includes all six workers. Standalone
-XR final save also discards an unconfirmed cut after accepted assets drain.
-The original/native normal-frame guards and combined Scene8 codecs are retained.
+Read [../AGENTS.md](../AGENTS.md), [AGENT-HANDOFF.md](AGENT-HANDOFF.md),
+[VALIDATION.md](VALIDATION.md), [PLANE-CUTS.md](PLANE-CUTS.md) and the material,
+normal-frame, worker and skin authoring notes. Prior main/feature handoffs and
+validation are preserved byte-for-byte in corresponding -2c89e8d and -de3f433
+files. Preserve older creator/integration history as well.
 
-Earlier handoffs and validation are preserved in HANDOFF-2c89e8d.md,
-VALIDATION-2c89e8d.md, AGENT-HANDOFF-2c89e8d.md and corresponding -de3f433 files.
-See PLANE-CUTS.md for the active-object cut implementation and its production gaps.
-The full REQUIREMENTS.md objective remains incomplete. No agents were spawned.
-Actual local toolkit prefix is artifacts/toolkit-authoring, with lib (not lib64).
-Use the build override in AGENTS.md; do not link stale pre-integration archives.
+## Implemented integration
 
-The following is historical production-main context, retained until integration
-verification is recorded:
+- Native active-object plane workspace, mapped PBR transfer, independent editable
+  cap/shell and exact hidden-source retention now coexist with Scene v8, immutable
+  material origins, source UV/skin/Unicode work and GPU-cached retopology overlays.
+  Complete legacy v7 decoding and source normal-frame guards are retained.
+- XR pages are distinct: Skin page 14, reserved Masks page 15, Retopo page 16, Cut page 17. Shared input
+  dispatch, enabled/check state, BDF palette labels, two-row direction/four-row
+  RGBA controls and confirming controller ownership are reconciled. Existing
+  Retopo New/Resume/Mode pressure-access behavior is retained. Default desktop
+  dragging stays trackball navigation; native cut dialogs use wheels/sliders,
+  scrolling content, fixed actions and Cancel/default/Close conventions.
+- All six workers use the predicate-mutex shutdown handshake, including the new
+  cut worker. Dedicated geometry work stays off input/GUI/render threads, with
+  immutable snapshots, session/source identity guards and stale-work rejection.
+- Cancel cut during accepted publication now requests asset-owner cancellation.
+  It retains the draft and preview until acknowledgement, allowing correction
+  or retry without partial source/history changes. Desktop and joystick paths
+  share the behavior. Accepted work drains before standalone final save; remaining
+  unconfirmed cut/retopo drafts are then discarded explicitly.
+- New deterministic cut cancellation/retry and six-worker shutdown coverage
+  complements the retained original cut/skin/retopo tests. Real-loader cut replay
+  uses actual rendered availability, joystick/ray controls and independently
+  inspected native geometry, not a product-side authoring shortcut.
 
-# Dome Sculpt production objective remains active
+## Verification
 
-Read AGENTS.md, REQUIREMENTS.md, HANDOFF-466ebd1.md and the parent
-DESIGN_CONVENTIONS. Complete the whole native C++20 FLTK/OpenXR sculpt, texture,
-UV, rig/skin/morph and avatar suite; animation and final offline rendering are
-excluded. Do not mark the goal complete at a build or checkpoint.
+All 69 non-XR Release CTests pass, zero failures, in 461.56s. Logs:
+artifacts/tests-cut-integration-native.log, -native-detail.log and the preserved
+full individual output -native-output.log. The registered OpenXR harness is
+verified separately below; there are 70 registered suites in this configuration.
 
-## Combined Retopo and authoring integration
+The full real-loader XR harness passes 127/127 checks, failed=0, complete=true,
+status=passed. It retains 117 existing checks and adds 10 cut workflow checks.
+Log: artifacts/tests-cut-integration-xr.log. Report:
+build-cut-integration/xr-client/report.json, also copied to
+artifacts/report-cut-integration-xr.json. All client subprocesses and the harness
+exit 0. The registered harness command was invoked directly during non-XR CTest,
+with the same explicit toolkit environment and unchanged 40-second client limit.
 
-Application source `79fe64a` integrates remote main3d19776 (fdb132b/251cd3d Retopo)
-with the fully verified authoring source6df3cf2 and metadata500f321. All histories
-are preserved. Skin stays on page14, Masks reserves15, Retopo uses16. The schema
-writer uses Scene8 for immutable materials, dormant deformation or Retopo; both
-complete legacy Scene7 feature shapes remain readable. Partial feature records,
-invalid UTF-8, cyclic references and aggregate resource overruns reject.
+Nine whole-core C/C++ ASan/UBSan/leak suites pass in 91.44s. All 103 native GUI
+checks pass: cut 12 + compact 6, retopo 12 + compact 6, general 53, skin 11 and Unicode 3.
+The cut-authoring suite has 56 assertions. VALIDATION.md records exact revision
+scopes, logs, rendered captures, diagnostics and limits. Older main's physical,
+Arc compute and actual Wayland-host proof remains historical; it does not prove
+those devices/backends on this source. Current Intel ADL-N graphics additionally
+passes the 81-check MToon suite and full spatial renderer, separately from XR
+tracking/compute. No system install or session restart.
 
-Retopo runs on its own worker with the same predicate-mutex shutdown handshake
-as the other four workers. Native Place/Move commands are idempotent. XR New,
-Resume and Mode close the menu to expose pressure input. Cancel covers both the
-pre-asset drain and cancellable asset phase; standalone shutdown discards a
-remaining unconfirmed draft before final save. Preparing another mesh cannot
-overwrite retained editable topology. Missing references report a useful error.
+## Build and continuation environment
 
-The immutable overlay cache retains local topology in GPU buffers. Canvas,
-object and stereo transformations are GPU uniforms; changing view does not
-rebuild or upload topology. Existing material visibility, picking, PBO composition
-and weight previews are retained. Generated/duplicated Unicode names preserve
-UTF-8 code points. The project-info payload digest treats absent and null optional
-Scene8 keys identically; it still hashes all nonnull source payload data.
+The tested application is in build-cut-integration. The older build/ belongs to
+the pre-merge feature stage; do not accidentally validate its executable. GUI
+scripts were copied unchanged to artifacts/cut-integration-ui/tests with build
+symlinked to build-cut-integration. The combined core/headers were rebuilt in
+build-sanitize with UI/XR OFF and whole-core C/C++ instrumentation.
 
-Use fresh build-retopo headers/libraries, never pre-Retopo archives. Its67 native
-Release suites pass121.84s. Full real-loader syntheticXR117/117 passes (including
-all original96 and21 Retopo checks). Whole-core C/C++ ASan/UBSan/leaks14/14
-pass102.12s. Retopo GPU fixtures pass on actual Arc and llvmpipe. Final combined
-GUI checks pass: Retopo12/12, compact2xBDF6/6, general menu53/53, Skin11/11,
-Unicode3/3 and actual latest DomeD native Wayland8/8. Test scripts were copied
-unchanged into artifacts/retopo-ui-staging with build symlinked to build-retopo,
-so the old6df3cf2 build was not accidentally exercised. All jobs are terminal.
-The staged DomeD harness needed its packaging directory symlink; the initial
-missing-file harness failure remains recorded. No physical-device or new Arc
-compute execution claim is made for this newer source.
+The unchanged canonical toolkit is DomeD 282467e / 22 patches, local prefix
+artifacts/toolkit-authoring, library directory lib. All 30 manifest hashes and
+canonical qimgvr BDF helper match. Newer main's lib64 prefix is not present in
+this environment. The parent DESIGN_CONVENTIONS file is absent here; use the
+committed menu audit, toolkit references and canonical helpers without claiming
+fresh parent-file inspection. Preserve unrelated de-xr repositories.
 
-Canonical DomeD/FLTK main was rechecked at282467e727df78c8e7f2452aa05a7747bac854a6.
-Use Release toolkit22patches prefix artifacts/toolkit-282467e/lib64 explicitly;
-inherited /opt libraries may be older. Matching standalone compositor is under
-artifacts/domed-282467e-target/release. No active session restart or system
-installation occurred. Build as regular user; sudo only for system files.
+```sh
+cmake -S . -B build-cut-integration -DCMAKE_BUILD_TYPE=Release \
+  -DDOME_COMPUTE_BACKEND=CPU \
+  -DFLTK_DIR="$PWD/artifacts/toolkit-authoring/share/fltk"
+cmake --build build-cut-integration --parallel 2
+LIBGL_ALWAYS_SOFTWARE=1 LP_NUM_THREADS=2 LD_LIBRARY_PATH="$PWD/artifacts/toolkit-authoring/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+  ctest --test-dir build-cut-integration --output-on-failure -j2
+./build-cut-integration/run-dome-sculpt
+```
 
-## Physical test boundary
+Keep native C++20/FLTK/EGL/OpenXR and canonical bitmap BDF Fontconfig/FreeType
+behavior. No Python runtime, Qt/GTK/Pango frontend or system/session replacement
+was introduced. Optional GUI orchestration uses uv/dbus-next/python-xlib/pillow,
+private HOME/bus/Xvfb and the existing startup/interaction deadlines. All stage
+build/test/app handles are terminal; the final process inventory found none
+remaining. Artifacts
+and builds are ignored local evidence, absent from a fresh clone. Inspect actual
+live handles/processes before restarting work or validation after an observation
+timeout. The isolated cold-software-loader diagnostics are recorded in VALIDATION.
 
-The user confirmed rudimentary operation of exact8f4d67d on the real WiVRn HMD
-and both controllers, then requested ending it. Only the test process stopped;
-recovery snapshots and physical-test-report.json are retained under
-artifacts/xr-milestone-8f4d67d. DomeD remained running. This proves basic operation,
-not complete workflow/stylus/reconnect/performance validation or later sources.
-Subsequent SIGINT/SIGTERM handling is verified with the real-loader synthetic
-runtime: completed edits save, unfinished gestures cancel, and XR resources exit.
+## Next production work
 
-## Verified checkpoint and next integration
+First fetch and inspect newer main 9a0cfc4 / source 20c132d and its HANDOFF,
+VALIDATION and SCULPT-MASKS notes. Preserve both histories. Masks now uses page15;
+Cut page 17, Retopo page 16 and Skin page 14 remain distinct. Reconcile the new Volume v3/Brush/Sample
+layouts and quotas, Document mask/mirror controls, mesh snapshots/cache fields,
+shader attributes/varyings, cut-cap scalar attributes and the loader fixtures.
+Rebuild all consumers coherently, including any selected compute backend; never
+link the new public layouts with this checkpoint's older core. Keep cut's sixth
+worker shutdown handshake and accepted cancellation/save barriers. Retain source
+mask/control data exactly when hiding the original, and update the combined
+requirements ledger without treating incoming masks/symmetry work as absent.
+The new upstream's Arc/ONEAPI and host results are scoped to20c132d, not this
+feature or its future merge. No force-push or unverified merge was performed.
 
-The authoritative combined application checkpoint is source `6df3cf2`, built in
-artifacts/publish-final, branch work/production-integrated. All64 Release suites
-pass208.57s, including complete real-loader syntheticXR155.07s. Final native
-menus53/53, Skin bind/transfer/history11/11, Unicode input/clipboard/history3/3
-and actual latest DomeD Wayland/universal-menu8/8 pass with zero failures.
+After that reconciliation, repeated cuts across a generated shell/cap group are the next cut gap. Current
+commands affect only the active object: closed-cap mode rejects the open shell,
+and open trim does not cut its sibling cap. Extend coherent multi-part/material
+source, preview and one-transaction publication rather than inferring group
+semantics from a name. General Booleans, stronger contour predicates, source
+compaction/GPU preview caching, durable recipes, bake quality controls, new
+skin/morph and complete material/extension transfer and draft recovery remain.
+Static output currently uses 512-pixel PBR atlases; retained original assets keep
+all source paint/rig/morph/archive data. This is not a complete Divine Cut suite.
 
-Whole-core C/C++ ASan/UBSan/leak coverage:15 authoring/export suites pass165.53s;
-then the final shutdown/file/recovery/GLB/atlas6-suite pass91.27s covers the latest
-worker and atlas corrections. Atlas17 focused checks also pass in Release and
-whole-core sanitizer overrides, including exact faces and actual low-resolution
-bake capacity; the unchanged bake fixture's39 assertions pass.
+Preserve every unfinished REQUIREMENTS row: production sculpt masks/symmetry/
+resolution/local meshing and sustained VR; projection/stencils/texture sets and
+baking; advanced retopo/procedural/plugin workflows; interactive rig/landmarks/
+fingers/automatic weights and morph authoring; complete avatar/MToon/glTF/VRM
+fidelity and independent consumers; physical controllers/stylus/3D mouse/headsets,
+reconnect/session-loss/performance and eligible OneAPI/ROCm/CUDA workloads.
+Do not reimplement integrated main's skin/UV/material/Unicode work as absent.
+Original/native frame work must preserve versioned provenance and the existing
+live SourceUV guard; legacy UvDerivative pixels cannot simply be relabelled.
 
-All16 generated avatar variants pass the15 hash-checked pinned official VRM0
-schemas and Khronos with zero errors; each retains20 legacy/tangent warnings.
-Actual Arc material/picking25/25 and Unicode palette rendering also pass.
-The complete ONEAPI frontend built from this source passes96/96 syntheticXR
-with actual Arc brush compute; software EGL isolates loader/input behavior.
-Native Arc compute5suites7.10s plus shared-document6.38s are separate evidence.
-
-Earlier full integration failures remain in logs:60suite58/60 exposed UV slivers
-and recovery epoch cleanup;63suite61/63 exposed avoidable power-of-two band
-capacity refusal and an intermittent shutdown hang. Both have real fixes.
-The deterministic shutdown fixture forces the old lost-wakeup schedule and
-fails against old code; all worker notifications now handshake predicate locks.
-No timeout or strict geometry/paint assertion was weakened. See VALIDATION.md.
-
-This earlier checkpoint remains separately published at
-checkpoint/authoring-6df3cf2 with metadata500f321; see HANDOFF-500f321.md.
-Remote3d19776's independent pre-merge proof is archived separately. Neither its
-proof nor the64-suite checkpoint substitutes for combined verification above.
-
-## Live unfinished work
-
-The primary main tree may contain later agent work not in the publication build.
-Query collaboration ownership and git state before merging or staging. Preserve
-all such work. The old lazyUV/sourceUV/skin stash is an applied backup, not work
-to apply again. Obsolete prototype trees are not authoritative applications.
-
-- Production masks/symmetry: durable sparse COW masks, constrained brush arithmetic
- and single-dispatch symmetry are being developed privately with new Sample,
- Brush and Volume layouts. Desktop/XR authoring, flatVolume3 decoding, full scene
- quota accounting and matching CPU/SYCL/HIP/CUDA evidence must follow. Do not
- link this new header layout with the older published core.
-- Original/native frames: private corner-layout, explicit-matrix skin and Shape
- Jacobian helpers exist; runtime/archive/export integration remains unfinished.
- Creator Shape evaluates base/target keys individually before linear morphs.
- Preserve current editable skin/pose while validating relevant original rest and
- morph identities. No public sourceUV Apply guard has been removed.
-
-Live sourceUV user editing stays guarded: v7 UvDerivative pixels cannot be
-relabelled original-frame data. Future Scene v9/materials v2 records need explicit
-provenance, original/native frame identities, current skin/morph evaluation and
-validated re-bake from immutable origins while preserving current edits.
-
-## Full remaining scope
-
-Every incomplete REQUIREMENTS row remains required: production sculpt
-masks/symmetry/resolution/local meshing and sustained VR; layered projection,
-stencils/texture sets and production baking; complete retopo/cut/procedural/plugin
-workflows; interactive rig/landmarks/fingers/automatic weights and editable morphs;
-robust anime/toon humanoid authoring; full selected glTF/VRM1/constraints/expressions
-and independent graphical consumers; physical headset/controllers/stylus/3D mouse,
-session loss/reconnect, performance, and all eligible compute workloads.
-
-CUDA toolchain/hardware remains unavailable; HIP7.1 compiles gfx1030 but no AMD
-GPU/ROCK device is present. Compile-only or software graphics evidence cannot
-stand in for accelerator execution. CPU remains the default backend. See
-COMPUTE-VALIDATION.md and the exact reports in VALIDATION.md.
+Fetch/status/collaboration inspection must precede new overlapping work. Public
+repository: https://github.com/jebot-git/dome-sculpt at
+/home/blux/de-xr/dome-sculpt. The parent is not a repository. Preserve remote
+history and unrelated projects; never force-push a checkpoint over newer work.
