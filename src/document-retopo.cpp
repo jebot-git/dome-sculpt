@@ -9,7 +9,7 @@ void Document::begin_retopology() {
 void Document::begin_retopology_locked() {
   auto &o = scene_.active();
   if (state_.retopology || state_.asset_busy || state_.recovery_busy || control_before_ ||
-      action_active_locked() || !o.visible || o.locked || scene_.objects().size() >= 256)
+      action_active_locked() || !object_editable_locked(o.id) || scene_.objects().size() >= 256)
     throw std::logic_error("Finish the current action; show and unlock a source with room for a new patch");
   if (o.retopology) {
     const auto source = o.retopology->source;
@@ -17,7 +17,7 @@ void Document::begin_retopology_locked() {
                      [source](const auto &object) { return object.id == source; }))
       throw std::logic_error("Retopology reference deleted or unavailable; restore or choose a source");
   }
-  retopo_source_ = {state_.generation, state_.revision, o.id};
+  retopo_source_ = {state_.generation, state_.revision, o.id,state_.edit_authority};
   retopo_stroking_ = retopo_sampled_ = retopo_accepting_ = false;
   state_.weights.enabled = false;
   auto view = std::make_shared<RetopoView>();

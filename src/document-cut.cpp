@@ -53,13 +53,13 @@ void Document::begin_cut(){std::lock_guard lock(model_mutex_);finish_locked();be
 void Document::begin_cut_locked(){
   const auto &o=scene_.active();
   if(state_.cut||state_.retopology||state_.asset_busy||state_.recovery_busy||control_before_||action_active_locked()||
-     !o.visible||o.locked||(!o.mesh_active&&o.volume->voxels().empty())||scene_.objects().size()>254||scene_.groups().size()>=128)
+     !object_editable_locked(o.id)||(!o.mesh_active&&o.volume->voxels().empty())||scene_.objects().size()>254||scene_.groups().size()>=128)
     throw std::logic_error("Finish the current action; show and unlock a source with room for cut outputs");
   cut_settings_.validate();cut_undo_.clear();cut_redo_.clear();cut_base_.reset();cut_bake_source_.reset();
   auto view=std::make_shared<CutView>();view->session=++cut_session_;view->request=++cut_request_;
   view->settings=cut_settings_;state_.cut=view;state_.weights.enabled=false;state_.error.clear();state_.message.clear();
   publish_locked(true);
-  cut_source_={state_.generation,state_.revision,o.id};
+  cut_source_={state_.generation,state_.revision,o.id,state_.edit_authority};
   {std::lock_guard lock(cut_mutex_);cut_job_=CutJob{view->session,view->request,cut_source_,cut_settings_};}
   cut_changed_.notify_one();
 }

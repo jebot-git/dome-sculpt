@@ -143,7 +143,7 @@ void Document::process_uv_transfer(FileJob &job) {
   uint64_t request;
   {
     std::lock_guard lock(model_mutex_);
-    if (job.generation != state_.generation || job.content != content_ ||
+    if (job.edit_authority!=state_.edit_authority || !object_editable_locked(job.object) || job.generation != state_.generation || job.content != content_ ||
         !uv_ || uv_session_ != job.uv_session || !uv_accept_pending_ ||
         scene_.active().id != job.object)
       throw std::runtime_error("The UV session changed before paint transfer");
@@ -246,7 +246,7 @@ void Document::process_uv_transfer(FileJob &job) {
   if (cancelled()) throw std::runtime_error("UV transfer cancelled");
   {
     std::lock_guard lock(model_mutex_);
-    if (cancelled() || job.generation != state_.generation || job.content != content_ ||
+    if (cancelled() || job.edit_authority!=state_.edit_authority || !object_editable_locked(job.object) || job.generation != state_.generation || job.content != content_ ||
         !uv_ || uv_session_ != job.uv_session || !uv_accept_pending_ ||
         scene_.active().id != job.object)
       throw std::runtime_error("The UV session changed during paint transfer");

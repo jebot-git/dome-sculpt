@@ -116,7 +116,8 @@ struct Canvas : Fl_Gl_Window {
     return trackball((2 * (x - this->x()) - w()) / size,
                      (h() - 2 * (y - this->y())) / size);
   }
-  bool native_stroke=false, suppress_drag=false;
+  bool native_stroke=false, suppress_drag=false, object_drag=false;
+  CanvasTransform drag_local{},drag_parent{};
   void sculpt_at(int x, int y) {
     if (!document.frame().state->stroking) { sculpting = have_stamp = false; return; }
     float aspect = float(w()) / std::max(1, h()),
@@ -163,6 +164,7 @@ struct Canvas : Fl_Gl_Window {
     try {
       if (event == FL_FOCUS)
         return 1;
+      if(event==FL_KEYDOWN&&Fl::event_key()==FL_Escape&&object_drag){document.end_object_grab(false);object_drag=false;suppress_drag=true;invalidate();return 1;}
       if (event == FL_KEYDOWN && Fl::event_key() == FL_Escape &&
           document.frame().state->menu) {
         document.cancel_spatial_menu();
@@ -185,6 +187,15 @@ struct Canvas : Fl_Gl_Window {
         sculpting =
             Fl::event_button() == FL_LEFT_MOUSE && Fl::event_state(FL_SHIFT);
         have_stamp = false;
+        if(!sculpting && Fl::event_button()==FL_LEFT_MOUSE && document.frame().state->object_grab_mode){
+          float aspect=float(w())/std::max(1,h()),tangent=std::tan(22.5f*3.14159265f/180);
+          Vec3 direction{(2.f*(last_x-this->x())/w()-1)*aspect*tangent,(1-2.f*(last_y-this->y())/h())*tangent,-1};
+          auto origin=rotation.inverse().rotate(Vec3{0,0,distance}-pan);direction=rotation.inverse().rotate(normalized(direction));
+          auto picked=document.pick_object(origin,direction,material_time);
+          if(picked && document.begin_object_grab(*picked)){object_drag=true;auto scene=document.copy_scene();drag_local=scene.object(*picked).transform;drag_parent=ob::compose(scene.world_transform(*picked),ob::inverse(drag_local));}
+          else suppress_drag=true;
+          return 1;
+        }
         if (sculpting) {
           auto state=document.frame().state;
           native_stroke=!state->weights.enabled&&!state->retopology;
@@ -199,7 +210,12 @@ struct Canvas : Fl_Gl_Window {
       if (event == FL_DRAG) {
         if(suppress_drag)return 1;
         int x = Fl::event_x(), y = Fl::event_y();
-        if (sculpting)
+        if(object_drag){
+          if(!document.frame().state->object_grabbing){object_drag=false;suppress_drag=true;return 1;}
+          auto delta=rotation.inverse().rotate(Vec3{(x-last_x)*distance*.0015f,-(y-last_y)*distance*.0015f,0});
+          auto local=ob::rotate(ob::conjugate(drag_parent.orientation),{delta.x,delta.y,delta.z})*(1.f/drag_parent.scale);
+          drag_local.position=drag_local.position+local;document.move_held_object(drag_local);invalidate();
+        }else if (sculpting)
           sculpt_at(x, y);
         else if (Fl::event_state(FL_BUTTON1)) {
           auto next = project_ball(x, y);
@@ -218,6 +234,7 @@ struct Canvas : Fl_Gl_Window {
       }
       if (event == FL_RELEASE) {
         suppress_drag=false;
+        if(object_drag){document.end_object_grab(true);object_drag=false;invalidate();return 1;}
         if (sculpting) {
           document.end_desktop();
           sculpting = false;
@@ -227,6 +244,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_UNFOCUS) {
+        if(object_drag){document.end_object_grab(false);object_drag=false;invalidate();}
         if (sculpting) {
           document.cancel_desktop();
           sculpting = false;
@@ -248,6 +266,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
     } catch (const std::exception &e) {
+      if(object_drag){try{document.end_object_grab(false);}catch(...){}object_drag=false;}
       if (sculpting)
         document.cancel_desktop();
       sculpting = false;
@@ -278,7 +297,7 @@ struct Canvas : Fl_Gl_Window {
     material_time = render_frame_time();
     renderer->set_frame_time(material_time);
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
-                   f.state->toon, f.state->light);
+                   f.state->toon, f.state->light,f.state->objects);
     if (f.state->retopology || f.state->cut) {
       if (!cursors) cursors = std::make_unique<CursorRenderer>();
       auto overlay = *f.state; overlay.canvas = model; overlay.hands = {};
@@ -317,7 +336,7 @@ struct App {
   std::filesystem::path project;
   std::thread xr_worker;
   std::atomic_bool stop_xr{false}, xr_running{false};
-  uint64_t seen_revision = 0, font_revision = UINT64_MAX;
+  uint64_t seen_revision = 0, font_revision = UINT64_MAX,seen_object_authority=0;
   std::string seen_error;
   std::deque<std::string> native_commands;
   std::optional<std::future<void>> saving;
@@ -330,8 +349,9 @@ struct App {
   static void tick(void *data) {
     auto &a = *static_cast<App *>(data);
     auto f = a.canvas.document.frame();
-    if (f.surface != a.canvas.shown_mesh || f.state->retopology || f.state->cut)
+    if (f.surface != a.canvas.shown_mesh || f.state->retopology || f.state->cut || f.state->object_grabbing || a.seen_object_authority!=f.state->edit_authority)
       a.canvas.redraw();
+    a.seen_object_authority=f.state->edit_authority;
     a.dirty = f.state->dirty;
     a.canvas.tool = f.state->tool;
     a.canvas.radius = f.state->radius;
@@ -454,6 +474,11 @@ struct App {
     menu.add("&Scene/&Visible", 0, command, this,
              FL_MENU_TOGGLE | FL_MENU_VALUE);
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Scene/Object grab mode",0,command,this,FL_MENU_TOGGLE);
+    menu.add("&Scene/Hold selected object",0,command,this);
+    menu.add("&Scene/Release held object",0,command,this);
+    menu.add("&Scene/Ghost other objects",0,command,this,FL_MENU_TOGGLE);
+    menu.add("&Scene/Objects visibility...",0,command,this);
     menu.add("&Scene/Object and material...", FL_ALT + FL_Enter, command, this);
     menu.add("&Scene/Skin weights...", 0, command, this);
     menu.add("&Scene/Bind or transfer skin...", 0, command, this);
@@ -622,13 +647,19 @@ struct App {
     enable("&Scene/Bind or transfer skin...", !modal && s->can_configure_skin);
     enable("&Scene/Rig and shapekeys...", !modal && !s->asset_busy &&
            s->mesh_active && bool(s->deformation) && active != s->objects.end() &&
-           active->visible && !active->locked);
+           active->editable);
     if (active != s->objects.end()) {
       checked("&Scene/&Visible", active->visible);
       checked("&Scene/&Locked", active->locked);
     }
+    checked("&Scene/Object grab mode",s->object_grab_mode);checked("&Scene/Ghost other objects",s->isolate_held);
+    enable("&Scene/Object grab mode",!modal);enable("&Scene/Ghost other objects",!modal);
+    enable("&Scene/Hold selected object",!modal&&active!=s->objects.end()&&active->visible&&!active->locked);
+    enable("&Scene/Release held object",!modal&&s->held_object);enable("&Scene/Objects visibility...",!modal);
+    enable("&Scene/Object and material...",!modal&&!s->asset_busy&&!s->object_grabbing&&active!=s->objects.end()&&active->editable);
+    if(s->isolate_held&&s->held_object){for(auto path:{"&Scene/New sphere","&Scene/New empty sculpt","&Scene/Duplicate object","&Scene/Create &humanoid..."})enable(path,false);}
     enable("&Scene/&Visible", !modal);
-    enable("&Scene/&Locked", !modal);
+    enable("&Scene/&Locked", !modal&&(!s->isolate_held||!s->held_object||s->held_object==s->active_object));
     for (auto path : {"&Sculpt/Masks and symmetry...", "&Sculpt/Paint protection mask",
                       "&Sculpt/Protect all", "&Sculpt/Clear protection mask", "&Sculpt/Invert protection mask",
                       "&Sculpt/Show protection mask", "&Sculpt/Mirror X", "&Sculpt/Mirror Y", "&Sculpt/Mirror Z"})
@@ -694,18 +725,22 @@ struct App {
                                     s->paint_layers.size() > 1);
     enable("&Mesh/UV editor...", !modal && !s->asset_busy && s->mesh_active &&
                                      active != s->objects.end() &&
-                                     active->visible && !active->locked);
+                                     active->editable);
     enable("&Paint/Prepare painting mesh",
            !modal && !s->asset_busy && active != s->objects.end() &&
-               active->visible && !active->locked);
+               active->editable);
     enable("&Mesh/Generate &UV atlas", !modal && !s->asset_busy &&
                                            active != s->objects.end() &&
-                                           active->visible && !active->locked);
+                                           active->editable);
     enable("&Paint/Use painted mesh",
            !modal && !s->asset_busy && active != s->objects.end() &&
-               (active->has_mesh || (active->visible && !active->locked)));
+               (active->has_mesh || (active->editable)));
     enable("&Paint/Edit source volume",
            !modal && s->mesh_active && !s->asset_busy);
+    if(active!=s->objects.end()&&!active->editable){
+      for(auto path:{"&Scene/Delete object","&Scene/Duplicate object","&Scene/Object and material...","&Mesh/Generate &UV atlas","&Paint/Add layer","&Paint/Delete layer","&Paint/Next layer","&Paint/Layer visible","&Paint/Layer opacity...","&Paint/Use painted mesh","&Paint/Edit source volume","&Paint/Prepare painting mesh"})enable(path,false);
+    }
+    if(s->isolate_held&&s->held_object)enable("&File/Import &mesh...",false);
     if (s->retopology || s->cut) {
       for (int i = 0; i < menu.size(); ++i) {
         auto label = menu.menu()[i].label();
@@ -968,7 +1003,14 @@ struct App {
       if(options)canvas.document.change_sculpt_resolution(std::move(*options),draft.source);
     } else if (label == "Voxel remesh...") {
       edit_voxel_remesh(canvas.document);
-    } else if (label == "Object and material...") {
+    } else if(label=="Object grab mode"){
+      auto s=canvas.document.frame().state;canvas.document.configure_object_grab(!s->object_grab_mode,s->isolate_held);
+    } else if(label=="Ghost other objects"){
+      auto s=canvas.document.frame().state;canvas.document.configure_object_grab(s->object_grab_mode,!s->isolate_held);
+    } else if(label=="Hold selected object")canvas.document.hold_object(canvas.document.frame().state->active_object);
+    else if(label=="Release held object")canvas.document.release_held_object();
+    else if(label=="Objects visibility...")edit_visibility(canvas.document);
+    else if (label == "Object and material...") {
       edit_object(canvas.document);
     } else if (label == "Next object" || label == "Previous object") {
       auto state = canvas.document.frame().state;
@@ -979,7 +1021,8 @@ struct App {
           count = int(state->objects.size());
       int next = (index + count + (label == "Next object" ? 1 : -1)) % count;
       canvas.document.select_object(state->objects[next].id);
-    } else if (label == "Visible" || label == "Locked") {
+    } else if(label=="Visible"){auto state=canvas.document.frame().state;auto object=std::find_if(state->objects.begin(),state->objects.end(),[&](const auto&o){return o.id==state->active_object;});if(object!=state->objects.end())canvas.document.object_visibility(object->id,!object->visible);
+    } else if (label == "Locked") {
       auto scene = canvas.document.copy_scene();
       auto &o = scene.active();
       canvas.document.object_properties(

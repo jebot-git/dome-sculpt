@@ -42,10 +42,13 @@ struct ObjectInfo {
   CanvasTransform transform;
   Material material;
   bool mesh_active = false, has_mesh = false;
+  bool editable = true, ghost = false;
+  CanvasTransform world_transform{};bool world_transform_valid=false;
 };
 struct AssetWork {
   std::atomic_bool cancelled{false};
   std::atomic<float> progress{0};
+  bool held_weight=false; // Immutable job kind; set before queue publication.
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
 struct EditorState {
@@ -115,6 +118,8 @@ struct EditorState {
   std::vector<std::string> paint_layers;
   uint32_t accent = 0x6babff;
   int opacity = 255;
+  bool object_grab_mode=false, isolate_held=false, object_grabbing=false;
+  uint64_t held_object=0, edit_authority=1;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -125,6 +130,7 @@ struct SurfaceRange {
   size_t first_vertex = 0;
   std::shared_ptr<const SourceMaterialBindings> material_bindings{};
   bool source_frame = false, canonical_frame = false, source_normal_only = false; // Private prototype.
+  CanvasTransform object_world{};bool world_frame_valid=false;
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;
@@ -159,7 +165,7 @@ struct MeshSnapshot {
   std::vector<std::array<float,4>> source_colors; // Linear RGBA, identity when absent.
 };
 struct AssetSource {
-  uint64_t generation = 0, revision = 0, object = 0;
+  uint64_t generation = 0, revision = 0, object = 0, edit_authority = 0;
 };
 struct SceneDraft {
   Scene scene;
@@ -191,7 +197,16 @@ public:
   void delete_object();
   void select_object(uint64_t);
   void object_properties(uint64_t, std::string, bool visible, bool locked,
-                         CanvasTransform, Material);
+                         CanvasTransform, Material, AssetSource expected = {});
+  bool object_editable(uint64_t) const;
+  void configure_object_grab(bool mode, bool isolate);
+  void hold_object(uint64_t);
+  void release_held_object(bool accept = true);
+  void object_visibility(uint64_t, bool, AssetSource expected = {});
+  bool begin_object_grab(uint64_t);
+  void move_held_object(CanvasTransform local);
+  void end_object_grab(bool accept = true);
+  std::optional<uint64_t> pick_object(Vec3,Vec3,double material_time=0) const;
   void replace(Volume, bool clean = true);
   void seed();
   bool begin_native_stroke();
@@ -296,11 +311,24 @@ private:
     uint64_t from = 0, to = 0;
     std::shared_ptr<PaintedMesh> paint{};
   };
+  class AuthorityTransition;
   class Transaction;
   Transaction *transaction_ = nullptr;
   std::deque<History> undo_, redo_;
   SpatialInput input_;
-  CanvasNavigation navigation_;
+  CanvasNavigation navigation_, object_navigation_;
+  CanvasTransform held_start_transform_{},held_preview_transform_{};
+  CanvasTransform object_world_transform_locked(uint64_t) const;
+  bool object_editable_locked(uint64_t) const;
+  bool invalidate_object_authority_locked();
+  void finish_object_grab_locked(bool accept, bool release);
+  bool begin_object_grab_locked(uint64_t);
+  bool held_weight_pending_locked() const;
+  void configure_object_grab_locked(bool,bool);
+  void move_held_object_locked(CanvasTransform);
+  void update_object_grab_locked(const SpatialFrame &);
+  void require_object_editable_locked(uint64_t) const;
+  void require_authority_locked(AssetSource) const;
   EditorState state_;
   bool desktop_ = false, anchored_ = false;
   uint64_t last_volume_ = 0, last_paint_ = 0, content_ = 1, saved_content_ = 1,
@@ -483,6 +511,7 @@ private:
     uint64_t cut_session = 0;
     std::shared_ptr<NativeStroke> native_capture{};
     std::shared_ptr<const Scene> capture_scene{};
+    uint64_t edit_authority=0,isolation_target=0;
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;

@@ -571,7 +571,7 @@ void XrSculpt::run(unsigned frameLimit) {
           renderer->draw(content.surface, content.state->canvas, vp,
                          {p.position.x, p.position.y, p.position.z}, e.width,
                          e.height, overlayMode, content.state->toon,
-                         content.state->light);
+                         content.state->light,content.state->objects);
           if (content.state->controls.parameter == VrParameter::None)
             cursors->draw(*content.state, vp);
           palette->draw(*content.state, vp);
