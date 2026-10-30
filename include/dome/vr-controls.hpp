@@ -32,7 +32,7 @@ enum class VrParameter {
   SkinSource, SkinMode, SkinDistances, SkinFalloff, SkinInfluences, SkinPrune,
   RetopoDistance,
   CutOffset, CutDirection, CutCapColor,
-  SculptMaskMode, SculptMaskStrength, SculptPlanes
+  SculptMaskMode, SculptMaskStrength, SculptPlanes, SculptResolution
 };
 inline bool skin_parameter(VrParameter parameter) {
   return parameter>=VrParameter::SkinSource && parameter<=VrParameter::SkinPrune;

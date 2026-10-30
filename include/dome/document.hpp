@@ -8,6 +8,7 @@
 #include "uv.hpp"
 #include "weight-authoring.hpp"
 #include "skin-authoring.hpp"
+#include "sculpt-resolution.hpp"
 #include "retopo-authoring.hpp"
 #include "cut-authoring.hpp"
 #include <atomic>
@@ -79,6 +80,8 @@ struct EditorState {
   Volume::SculptSettings sculpt_settings;
   CanvasTransform sculpt_transform{};
   bool can_configure_sculpt = false, sculpt_mask_visible = false;
+  bool can_change_resolution = false;
+  double sculpt_voxel_mm = 30;
   WeightToolSettings weights;
   bool can_paint_weights = false;
   uint64_t weight_gesture = 0;
@@ -230,6 +233,7 @@ public:
   void paint_command(SpatialCommand);
   void sculpt_command(SpatialCommand);
   void sculpt_settings(Volume::SculptSettings, AssetSource expected = {});
+  void change_sculpt_resolution(SculptResolutionOptions, AssetSource expected = {});
   void sculpt_mask_fill(float, AssetSource expected = {});
   void sculpt_mask_invert(AssetSource expected = {});
   void sculpt_layer_properties(uint64_t object, uint64_t layer, std::string,
@@ -329,6 +333,7 @@ private:
   void finish_cut_parameter_locked(bool accept);
   void cut_from_hand_locked();
   void cut_loop();
+  float control_resolution_voxel_ = .03f;
   float retopo_snap_mm_ = 50, control_retopo_mm_ = 50;
   AssetSource retopo_source_{};
   std::atomic<uint64_t> retopo_session_{0};
@@ -468,6 +473,8 @@ private:
   void queue_clear_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
   bool sculpt_target_ready_locked() const;
+  bool resolution_target_ready_locked() const;
+  void queue_resolution_locked(SculptResolutionOptions, AssetSource = {});
   void sculpt_settings_locked(Volume::SculptSettings, AssetSource = {});
   void queue_sculpt_mask_locked(std::optional<float>, AssetSource = {});
   bool skin_target_ready_locked() const;
