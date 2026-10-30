@@ -66,13 +66,16 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         if mode:
             e.update(mode)
         target = root / (name + ".dsculpt")
+        gated_menu = name in ("controller", "stylus", "controller-srgb")
+        if gated_menu:
+            e["DOME_XR_FIXTURE_MENU_GATE"] = "1"
+        frame_limit = [] if gated_menu else ["--frames", str(frames)]
         with (output / (name + ".log")).open("w") as log:
             p = subprocess.run(
                 [
                     str(binary),
                     "--xr",
-                    "--frames",
-                    str(frames),
+                    *frame_limit,
                     "--save",
                     str(target),
                     *extra,
@@ -156,8 +159,10 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
             report["frames_waited"]
             == report["frames_begun"]
             == report["frames_ended"]
-            == 45,
-            name + " balances native OpenXR frame calls",
+            and 45 <= report["frames_waited"] <= 1200
+            and report.get("menu_script_step") == 45
+            and not report.get("menu_gate_exhausted", False),
+            name + " balances native OpenXR frame calls through the acknowledged 45-step script",
         )
         check(
             report["acquires"] == report["image_waits"] == report["releases"]
