@@ -1,10 +1,18 @@
-# Polygon editing and source-color bake integration
+# Cancellable exports and polygon/color authoring
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains active. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Current integration
+
+Product source `4cf3032` adds explicit queued/running GLB and VRM cancellation
+through File / Cancel background work and actual controller Cancel work. Its
+atomic commit arbitration preserves old output, ordered Save, document
+replacement and accepted-export close/drain semantics. Internal asset
+cancellation remains separate. Fresh Release14, whole-core/support SAN14 and
+actual FLTK chooser/Cancel/retry7 pass. Read EXPORT-CANCELLATION.md and its receipt
+for exact source/binary scope; do not relabel the preceding full-suite runs.
 
 Product source `27365c9` combines published `7152f5e`, the complete polygon
 lineage through `e8994a1`, qualified color preparation `8031163`/`950f56b`, native
@@ -26,8 +34,8 @@ Import affine/source poses, UV1 sampling, native FBX deformation/materials,
 COLOR/UV morphs, prepared-color topology transport and broader glTF/VRM remain
 incomplete. The complete matrix retains sculpt/paint/remesh, humanoid/rig/weight/
 shapekey/device requirements. Accepted snapshot exports retain close/drain
-semantics; explicit export-job cancellation remains required. Do not wire
-shutdown cancellation into accepted output.
+semantics alongside explicit cancellation. Do not wire shutdown or ordinary
+internal authoring cancellation into accepted output.
 
 ## Active delegated work
 
