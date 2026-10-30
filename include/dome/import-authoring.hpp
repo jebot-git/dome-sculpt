@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "import.hpp"
+#include "import-options.hpp"
 #include "scene.hpp"
 namespace dome {
 struct ImportAuthoringOptions {
   uint32_t paint_resolution = 512;
   ImportLimits limits;
+  ImportOptions choices;
 };
 struct ImportedAuthoring {
   Scene scene;
