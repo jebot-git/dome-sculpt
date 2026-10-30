@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "document-authority.hpp"
 #include "dome/tangents.hpp"
 #include "dome/creation.hpp"
 #include "dome/rig-edit.hpp"
@@ -138,6 +139,7 @@ bool Document::action_active_locked() const {
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if(state_.object_grabbing)return true;
   if(native_stroke_)return true;
   if(state_.cut)return state_.cut->busy||(state_.cut->preview&&state_.cut->preview->changed);
   if (state_.retopology) return state_.retopology->changed || retopo_stroking_ || retopo_pending_ != 0;
@@ -147,6 +149,7 @@ bool Document::pending_locked() const {
                        : volume().pending_changes();
 }
 void Document::begin_action_locked() {
+  require_object_editable_locked(scene_.active().id);
   state_.message.clear();
   if (state_.retopology) {
     queue_retopology_locked(RetopoAction::BeginGesture);
@@ -173,6 +176,7 @@ void Document::begin_action_locked() {
     volume().begin_stroke();
 }
 void Document::stamp_action_locked(const Brush &b) {
+  require_object_editable_locked(scene_.active().id);
   if (retopo_stroking_) {
     if (b.pressure > 0) {
       queue_retopology_locked(RetopoAction::Sample, b.to, retopo_sampled_);
@@ -215,6 +219,7 @@ bool Document::end_action_locked() {
     auto samples = std::move(weight_samples_); weight_samples_.clear();
     if (samples.empty()) { restore_weight_view_locked(base); return false; }
     auto settings = weight_stroke_settings_;
+    if(state_.isolate_held&&state_.held_object)settings.linked=false;
     auto object = weight_source_.object;
     auto report = std::make_shared<std::string>(); auto changed = std::make_shared<bool>(false);
     try {
@@ -324,6 +329,7 @@ void Document::scene_changed_locked(Scene before) {
   bind_locked();publish_locked(true,false);transaction.commit();
 }
 bool Document::undo_locked(bool redo) {
+  if(state_.held_object){invalidate_object_authority_locked();state_.held_object=0;}
   auto &source=redo?redo_:undo_,&dest=redo?undo_:redo_;
   if(source.empty())return false;
   Transaction transaction(*this);const auto &h=source.back();
@@ -364,6 +370,7 @@ void Document::replace(Volume next, bool clean) {
 }
 uint64_t Document::add_object(bool sphere) {
   std::lock_guard lock(model_mutex_);
+  if(state_.isolate_held && state_.held_object)throw std::logic_error("Release held-object isolation before creating another object");
   finish_locked();
   Scene before = scene_;
   Volume next(volume().voxel_size());
@@ -384,6 +391,8 @@ uint64_t Document::add_object(bool sphere) {
 }
 void Document::duplicate_object() {
   std::lock_guard lock(model_mutex_);
+  require_object_editable_locked(scene_.active().id);
+  if(state_.isolate_held&&state_.held_object)throw std::logic_error("Release held-object isolation before duplicating an object");
   finish_locked();
   Scene before = scene_;
   auto id = scene_.duplicate(scene_.active().id);
@@ -393,6 +402,8 @@ void Document::duplicate_object() {
 }
 void Document::delete_object() {
   std::lock_guard lock(model_mutex_);
+  require_object_editable_locked(scene_.active().id);
+  if(state_.held_object==scene_.active().id){invalidate_object_authority_locked();state_.held_object=0;}
   finish_locked();
   Scene before = scene_;
   scene_.erase(scene_.active().id);
@@ -400,6 +411,7 @@ void Document::delete_object() {
 }
 void Document::select_object(uint64_t id) {
   std::lock_guard lock(model_mutex_);
+  if(state_.object_grabbing&&id!=state_.held_object)throw std::logic_error("Release the moving object before changing selection");
   finish_locked();
   scene_.select(id);
   bind_locked();
@@ -407,10 +419,16 @@ void Document::select_object(uint64_t id) {
 }
 void Document::object_properties(uint64_t id, std::string name, bool visible,
                                  bool locked, CanvasTransform transform,
-                                 Material material) {
+                                 Material material,AssetSource expected) {
   material.validate();
   validate_transform(transform);
   std::lock_guard lock(model_mutex_);
+  require_authority_locked(expected);
+  const auto &old=scene_.object(id);
+  const bool visibility_only=old.name==name && old.locked==locked && detail::same_transform(old.transform,transform) && detail::same_material(old.material,material);
+  const bool lock_only=old.name==name && old.visible==visible && detail::same_transform(old.transform,transform) && detail::same_material(old.material,material) && (!state_.isolate_held || !state_.held_object || id==state_.held_object);
+  if(!visibility_only && !lock_only)require_object_editable_locked(id);
+  if(state_.held_object==id && (!visible || locked)){invalidate_object_authority_locked();state_.held_object=0;}
   finish_locked();
   Scene before = scene_;
   auto &o = scene_.object(id);
@@ -441,14 +459,15 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.objects.clear();
   for (auto &o : scene_.objects())
     state_.objects.push_back({o.id, o.name, o.visible, o.locked, o.transform,
-                              o.material, o.mesh_active, bool(o.painted)});
+                              o.material, o.mesh_active, bool(o.painted),object_editable_locked(o.id),
+                              o.visible && state_.isolate_held && state_.held_object && o.id!=state_.held_object,object_world_transform_locked(o.id),true});
   if (uv_)
     control_changed_ = uv_changed(
         *uv_->view().mesh, scene_.object(control_object_).painted->mesh());
   auto uv_job=prepare_uv_schedule_locked();
   const bool reset_uv=uv_&&!uv_accept_pending_&&!uv_solving_&&!uv_->view().validating&&!uv_scheduled_.expired();
   if(uv_job&&uv_job->workspace){
-    control_source_={state_.generation,state_.revision,control_object_};uv_solving_=true;state_.message="Preparing UV charts...";
+    control_source_={state_.generation,state_.revision,control_object_,state_.edit_authority};uv_solving_=true;state_.message="Preparing UV charts...";
   }
   if (uv_) {
     auto view = std::make_shared<UvView>(uv_->view());
@@ -477,7 +496,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   }
   state_.mesh_active = active.mesh_active;
   state_.can_cut = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
-      !action_active_locked() && active.visible && !active.locked && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
+      !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
   state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
   if(std::find(state_.skin_sources.begin(),state_.skin_sources.end(),state_.skin_options.reference)==state_.skin_sources.end()) {
@@ -488,7 +507,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
   state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
   state_.can_retopologize = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy &&
-      !control_before_ && !action_active_locked() && active.visible && !active.locked &&
+      !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
   state_.bake_sources = bake_sources_locked();
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
@@ -497,7 +516,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_clear_bake=bake_target_ready_locked() && bool(active.painted->baked());
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
   state_.asset_progress=work.progress;
-  state_.can_paint_weights = active.mesh_active && active.painted && active.visible && !active.locked &&
+  state_.can_paint_weights = active.mesh_active && active.painted && object_editable_locked(active.id) &&
       active.deformation && active.deformation->skeleton && active.deformation->skin;
   if (!state_.can_paint_weights) state_.weights.enabled = false;
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
@@ -598,6 +617,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
 }
 
 void Document::finish_locked() {
+  if(state_.object_grabbing)finish_object_grab_locked(true,false);
   if(native_stroke_)throw std::logic_error("Wait for the accepted desktop stroke, or cancel it, before changing the document");
   if(state_.cut)throw std::logic_error("Apply or cancel the plane cut before changing the document");
   if (state_.retopology)
@@ -633,6 +653,7 @@ void Document::replace(Scene next, bool clean) {
   replace_locked(std::move(next), clean);
 }
 void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopted_path,std::string message) {
+  invalidate_object_authority_locked();state_.held_object=0;
   if(native_stroke_)cancel_native_locked();
   if(state_.cut){finish_control_locked(false);cancel_cut_locked();}
   if(state_.retopology)cancel_retopology_locked();
@@ -664,7 +685,7 @@ bool Document::begin_desktop() {
   if(state_.cut)return false;
   if (control_before_ || uv_ || state_.asset_busy || action_active_locked() ||
       input_.menu_open() || !scene_.active().visible ||
-      scene_.active().locked ||
+      !object_editable_locked(scene_.active().id) ||
       (!state_.retopology && !scene_.active().mesh_active && !volume().editable_layer() && !volume().sculpt_settings().mask_edit))
     return false;
   if (state_.retopology && (!state_.retopology->source || retopo_accepting_)) return false;
@@ -678,7 +699,7 @@ void Document::stamp_desktop(Brush b) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_)
     throw std::logic_error("Desktop does not own the active stroke");
-  auto t = scene_.world_transform(scene_.active().id);
+  auto t = object_world_transform_locked(scene_.active().id);
   b.from = world_to_model(t, b.from);
   b.to = world_to_model(t, b.to);
   b.radius /= t.scale;
@@ -723,7 +744,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
     return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;
   }
-  auto t = scene_.world_transform(scene_.active().id);
+  auto t = object_world_transform_locked(scene_.active().id);
   if (state_.retopology) {
     if (!state_.retopology->source || retopo_accepting_) return {};
     auto direction = vec(ob::rotate(ob::conjugate(t.orientation), obv(d)));
@@ -731,7 +752,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto hit = state_.retopology->source->raycast(world_to_model(t, p), direction, 20 / t.scale, options);
     return hit ? std::optional<Vec3>(vec(ob::transform(t, obv(hit->position)))) : std::nullopt;
   }
-  if (!scene_.active().visible || scene_.active().locked)
+  if (!object_editable_locked(scene_.active().id))
     return {};
   auto direction = vec(ob::rotate(ob::conjugate(t.orientation), obv(d)));
   auto hit =
@@ -749,7 +770,7 @@ Vec3 Document::gradient(Vec3 p) const {
     if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking)
       return mesh->picking->closest(p).normal;
   }
-  auto t = scene_.world_transform(scene_.active().id);
+  auto t = object_world_transform_locked(scene_.active().id);
   return vec(
       ob::rotate(t.orientation,
                  obv(scene_.active().mesh_active
@@ -867,6 +888,7 @@ void Document::paint_settings(PaintSettings settings) {
 }
 void Document::weight_settings(WeightToolSettings settings, std::optional<uint32_t> joint, AssetSource expected) {
   std::lock_guard lock(model_mutex_);
+  require_authority_locked(expected);
   finish_locked();
   if ((expected.generation && expected.generation != state_.generation) ||
       (expected.revision && expected.revision != state_.revision) ||
@@ -948,7 +970,7 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   job.uv_mesh = std::move(mesh);
   job.uv_source_vertices = uv_->view().source_vertices;
   job.paint_identity = o.painted;
-  job.object = o.id;
+  job.object = o.id;job.edit_authority=state_.edit_authority;
   job.source_revision = o.painted->revision();
   job.uv_session = uv_session_;
   job.uv_desktop = desktop_;
@@ -1000,14 +1022,15 @@ void Document::prepare_locked(uint32_t resolution) {
     throw std::logic_error("Explicitly remove or transfer rig data before replacing its rest mesh");
   if (o.appearance || o.material_bindings)
     throw std::logic_error("The prepared mesh retains original materials; create a separate sculpt target and reproject or bake before replacing it");
-  if (o.locked || !o.visible)
+  if (!object_editable_locked(o.id))
     throw std::logic_error(
         "Show and unlock the object before preparing a painting mesh");
   FileJob job{scene_.snapshot(), {},       state_.revision,
               state_.generation, content_, false};
   job.prepare_mesh = true;
-  job.object = o.id;
+  job.object = o.id;job.edit_authority=state_.edit_authority;
   job.source_revision = o.volume->revision();
+  job.edit_authority=state_.edit_authority;
   job.source_identity = o.volume;
   job.resolution = resolution;
   std::lock_guard lock(file_mutex_);
@@ -1080,6 +1103,7 @@ void Document::process_locked(const SpatialFrame &f) {
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
     if (accepted_uv) input_.take_controls();
+    invalidate_object_authority_locked();state_.held_object=0;
     navigation_.reset();
     state_.hands = {};
     publish_locked();
@@ -1092,7 +1116,8 @@ void Document::process_locked(const SpatialFrame &f) {
     anchored_ = true;
   }
   std::array<TrackedHand, 2> hands{f.hands[0].tracked, f.hands[1].tracked};
-  if (!input_.menu_open()) {
+  if(state_.object_grab_mode && !input_.menu_open())update_object_grab_locked(f);
+  if (!state_.object_grab_mode && !input_.menu_open()) {
     if (auto transform = navigation_.update(hands, state_.canvas)) {
       if (action_active_locked())
         if (end_action_locked())
@@ -1107,12 +1132,12 @@ void Document::process_locked(const SpatialFrame &f) {
       return;
     }
   }
-  auto object_canvas = ob::compose(state_.canvas, scene_.world_transform(scene_.active().id));
+  auto object_canvas = ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
-      !state_.asset_busy && scene_.active().visible &&
-      !scene_.active().locked &&
+      !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
+      (!state_.object_grabbing || !state_.weights.enabled) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   if(state_.cut)input_.edit_allowed=false;
@@ -1169,7 +1194,7 @@ void Document::process_locked(const SpatialFrame &f) {
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
-        input_.menu_page()!=18) finish_locked();
+        input_.menu_page()!=18 && input_.menu_page()!=20) finish_locked();
     command_locked(*c);
   }
 
@@ -1470,7 +1495,7 @@ void Document::mesh_loop() {
           for (size_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(uint32_t(vertex), {1,0,0,1});
           for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
-        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty())});
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,true});
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
@@ -1634,6 +1659,7 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(!object_editable_locked(scene_.active().id) && parameter!=VrParameter::BrushRadius && parameter!=VrParameter::Flow)return false;
   if(parameter==VrParameter::CutOffset||parameter==VrParameter::CutDirection||parameter==VrParameter::CutCapColor)
     return state_.cut&&cut_bake_source_&&!state_.cut->committing&&!state_.asset_busy;
   if(state_.cut)return false;
@@ -1850,7 +1876,7 @@ void Document::control_event_locked(VrControlEvent event) {
     control_weights_ = state_.weights;
     control_radius_ = state_.radius;
     control_object_ = scene_.active().id;
-    control_source_ = {state_.generation, state_.revision, control_object_};
+    control_source_ = {state_.generation, state_.revision, control_object_,state_.edit_authority};
     control_changed_ = false;
     auto &o = scene_.active();
     auto &c = state_.controls;
@@ -2250,6 +2276,15 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(state_.isolate_held && state_.held_object){
+    if(command==SpatialCommand::NewSphere||command==SpatialCommand::NewEmpty||command==SpatialCommand::Duplicate||command==SpatialCommand::CreateFemale||command==SpatialCommand::CreateMale||command==SpatialCommand::DeleteGroup||command==SpatialCommand::Ungroup||command==SpatialCommand::RetopoBegin)return false;
+    if(!object_editable_locked(scene_.active().id))switch(command){
+      case SpatialCommand::Next:case SpatialCommand::Previous:case SpatialCommand::Visibility:
+      case SpatialCommand::Undo:case SpatialCommand::Redo:case SpatialCommand::Save:case SpatialCommand::Export:
+      case SpatialCommand::ExportAvatar:case SpatialCommand::CancelWork:case SpatialCommand::Center:break;
+      default:return false;
+    }
+  }
   if(command==SpatialCommand::ProceduralApply || command==SpatialCommand::ProceduralNextSeed)return resolution_target_ready_locked();
   if(command==SpatialCommand::CutBegin)return state_.can_cut;
   if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
@@ -2309,9 +2344,10 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
         ? VrParameter::MorphWeight : VrParameter::RigRotation;
     return !control_before_ && !action_active_locked() && parameter_enabled_locked(parameter);
   }
+  if(command==SpatialCommand::CreateMakeHuman)return false;
   if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
     if (state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked()) return false;
-    if (command <= SpatialCommand::CreateMakeHuman) return scene_.objects().size() <= 237 && scene_.groups().size() < 128;
+    if (command == SpatialCommand::CreateFemale || command == SpatialCommand::CreateMale) return scene_.objects().size() <= 237 && scene_.groups().size() < 128;
     auto group = scene_.active().group;
     if (!group) return false;
     for (auto &o : scene_.objects())
@@ -2407,7 +2443,7 @@ void Document::sculpt_layer_properties(uint64_t object, uint64_t id,
   std::lock_guard lock(model_mutex_);
   finish_locked();
   auto &o = scene_.object(object);
-  if (state_.asset_busy || o.mesh_active || o.locked || !o.visible)
+  if (state_.asset_busy || o.mesh_active || !object_editable_locked(o.id))
     throw std::logic_error("Sculpt layer properties unavailable");
   auto next = std::make_shared<Volume>(o.volume->geometry_snapshot());
   next->layer_properties(id, std::move(name), visible, locked, opacity);
@@ -2427,6 +2463,7 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(state_.isolate_held&&state_.held_object&&!command_enabled_locked(command))return;
   if(command==SpatialCommand::ProceduralApply || command==SpatialCommand::ProceduralNextSeed) {
     if(!command_enabled_locked(command))return;
     if(command==SpatialCommand::ProceduralNextSeed)++state_.procedural_options.seed;
@@ -2534,9 +2571,8 @@ void Document::command_locked(SpatialCommand command) {
   }
   if (command >= SpatialCommand::CreateFemale && command <= SpatialCommand::Ungroup) {
     if (!command_enabled_locked(command)) return;
-    if (command <= SpatialCommand::CreateMakeHuman) {
-      std::string baseline = command == SpatialCommand::CreateFemale ? "vroid-beta-female"
-          : command == SpatialCommand::CreateMale ? "vroid-beta-male" : "makehuman-hm08";
+    if (command == SpatialCommand::CreateFemale || command == SpatialCommand::CreateMale) {
+      std::string baseline = command == SpatialCommand::CreateFemale ? "vroid-beta-female" : "vroid-beta-male";
       queue_scene_operation_locked("Create humanoid", [baseline](Scene &scene, const auto &cancelled) {
         auto controls = humanoid_baseline_defaults(baseline);
         CanvasTransform transform{}; transform.position.y = -controls.height * .5f;
@@ -2777,6 +2813,7 @@ void Document::command_locked(SpatialCommand command) {
     return;
   }
   case SpatialCommand::Visibility:
+    if(state_.held_object==o.id){invalidate_object_authority_locked();state_.held_object=0;}
     o.visible = !o.visible;
     break;
   case SpatialCommand::Lock:
@@ -2863,20 +2900,22 @@ void Document::file_loop() {
         continue;
       }
       if (job->scene_operation) {
+        auto isolated_before=job->isolation_target?std::optional<Scene>(job->scene.snapshot()):std::nullopt;
         auto cancelled = [&] {
           auto state = published_.load();
           return stopping_.load() || (job->work && job->work->cancelled.load()) || state->generation != job->generation ||
-                 state->revision != job->revision || state->active_object != job->object;
+                 state->revision != job->revision || state->active_object != job->object || state->edit_authority!=job->edit_authority;
         };
         job->scene_operation(job->scene, cancelled);
         if (cancelled()) throw std::runtime_error("Scene changed during " + job->operation_label);
+        if(isolated_before)detail::require_isolated_scene(*isolated_before,job->scene,job->isolation_target);
         auto prepared = job->scene.snapshot();
         prepared.validate();
         std::lock_guard lock(model_mutex_);
         if (job->generation == state_.generation) {
           if(job->work && job->work->cancelled.load())throw std::runtime_error("Asset operation cancelled");
           if (job->content != content_ || job->revision != state_.revision ||
-              job->object != scene_.active().id || action_active_locked() || control_before_)
+              job->object != scene_.active().id || state_.edit_authority!=job->edit_authority || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
           Transaction transaction(*this);
           state_.asset_busy=false;
@@ -2944,6 +2983,7 @@ void Document::file_loop() {
           if (it == scene_.objects().end() ||
               it->volume != job->source_identity ||
               it->volume->revision() != job->source_revision ||
+              job->edit_authority!=state_.edit_authority || !object_editable_locked(job->object) ||
               action_active_locked())
             throw std::runtime_error(
                 "The source changed while its painting mesh was being "

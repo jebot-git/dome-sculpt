@@ -69,8 +69,9 @@ struct CreatedHumanoid {
   size_t primary_part = 0;
   void validate() const;
 };
-// Native generator using embedded, explicitly CC0 MakeHuman geometry/targets/
-// rigging data. Additional eyes and groom geometry are original implementation.
+// Native creation uses the verified CC0 VRoid female/male source models.
+// Legacy MakeHuman controls remain decodable for existing saved projects; no
+// MakeHuman base geometry is bundled or generated.
 CreatedHumanoid
 create_humanoid(const HumanoidControls & = {},
                 const std::function<bool()> &cancelled = {},

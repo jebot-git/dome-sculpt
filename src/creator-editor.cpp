@@ -17,7 +17,7 @@ void create_humanoid_dialog(Document &document) {
   std::string initial_name = "Humanoid";
   auto selected_group = draft.scene.active().group;
   for (auto &g : draft.scene.group_path(selected_group))
-    if (g.humanoid) { controls = *g.humanoid; initial_name = g.name + " copy"; }
+    if (g.humanoid && g.humanoid->baseline != "makehuman-hm08") { controls = *g.humanoid; initial_name = g.name + " copy"; }
   int row = std::max(28, dx::size + 12), width = std::max(600, dx::size * 38);
   int sx, sy, sw, sh; Fl::screen_work_area(sx, sy, sw, sh);
   width = std::min(width, sw - 40);
@@ -29,9 +29,9 @@ void create_humanoid_dialog(Document &document) {
   int y = row;
   Fl_Input name(label, y, width - label - 40, row - 4, "Name");
   name.value(initial_name.c_str()); y += row;
-  Fl_Choice baseline(label, y, width - label - 40, row - 4, "Model base");
-  baseline.add("VRoid beta female (CC0)"); baseline.add("VRoid beta male (CC0)"); baseline.add("MakeHuman (CC0)");
-  baseline.value(controls.baseline == "vroid-beta-male" ? 1 : controls.baseline == "makehuman-hm08" ? 2 : 0);
+  Fl_Choice baseline(label, y, width - label - 40, row - 4, "VRoid base");
+  baseline.add("Female (CC0)"); baseline.add("Male (CC0)");
+  baseline.value(controls.baseline == "vroid-beta-male" ? 1 : 0);
   y += row;
   Fl_Choice profile(label, y, width - label - 40, row - 4, "Style preset");
   profile.add("Neutral"); profile.add("Toon"); profile.add("Anime"); profile.value(0);
@@ -82,13 +82,13 @@ void create_humanoid_dialog(Document &document) {
   profile.callback([](Fl_Widget *w, void *data) {
     auto &c = *static_cast<Context *>(data);
     auto preset = static_cast<Fl_Choice *>(w)->value();
-    const char *ids[] = {"vroid-beta-female", "vroid-beta-male", "makehuman-hm08"};
+    const char *ids[] = {"vroid-beta-female", "vroid-beta-male"};
     *c.controls = humanoid_preset(HumanoidPreset(preset), ids[c.baseline->value()]);
     for (auto &binding : *c.bindings) binding.input->value(*binding.value);
   }, &context);
   baseline.callback([](Fl_Widget *w, void *data) {
     auto &c = *static_cast<Context *>(data);
-    const char *ids[] = {"vroid-beta-female", "vroid-beta-male", "makehuman-hm08"};
+    const char *ids[] = {"vroid-beta-female", "vroid-beta-male"};
     *c.controls = humanoid_baseline_defaults(ids[static_cast<Fl_Choice *>(w)->value()]);
     for (auto &binding : *c.bindings) binding.input->value(*binding.value);
   }, &context);

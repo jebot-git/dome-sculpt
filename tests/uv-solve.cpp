@@ -95,9 +95,8 @@ int main()try{
   auto many_result=conformal_uv(many,many_options);
   require(many_result.charts.size()==500,
           "Hundreds of disconnected charts solve within linear storage/work bounds");
-  auto human=create_humanoid(humanoid_baseline_defaults("makehuman-hm08"));
-  UvSolveOptions organic;organic.seed_faces={0};organic.maximum_work=500'000'000;organic.maximum_iterations=5000;
-  rejects([&]{conformal_uv(human.parts[0].mesh,organic);},"folds", "Complex original MakeHuman chart rejects foldovers instead of publishing a broken atlas");
+  auto folded=rectangle();folded.uv_pins.assign(4,1);folded.uv[3]=folded.uv[0];
+  rejects([&]{conformal_uv(folded);},"folds","Independent pinned two-triangle chart rejects folded winding without a bundled reference mesh");
   auto avatar=create_humanoid();
   const auto &body=avatar.parts.at(10).mesh;
   auto authored=conformal_uv(body);

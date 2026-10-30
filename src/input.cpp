@@ -33,7 +33,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Refresh", "Next project", "Previous", "Recover", "Save", "Center",
       "Undo", "Redo", "Back", "Export glTF", "Objects", "Materials"};
   static const std::array<const char *, 12> avatars = {
-      "Female CC0", "Male CC0", "MakeHuman", "Next part", "Previous part", "Rig and shapes",
+      "Female CC0", "Male CC0", "Center part", "Next part", "Previous part", "Rig and shapes",
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
@@ -194,7 +194,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   }
   if (page == 9) {
     static const std::array<SpatialCommand,12> avatars = {
-      SpatialCommand::CreateFemale, SpatialCommand::CreateMale, SpatialCommand::CreateMakeHuman,
+      SpatialCommand::CreateFemale, SpatialCommand::CreateMale, SpatialCommand::Center,
       SpatialCommand::Next, SpatialCommand::Previous, SpatialCommand::Center,
       SpatialCommand::DeleteGroup, SpatialCommand::Ungroup, SpatialCommand::Undo,
       SpatialCommand::Undo, SpatialCommand::Redo, SpatialCommand::Save};

@@ -1,11 +1,17 @@
+# VRoid-only creator update
+
+New humanoids use only verified CC0 VRoid beta female/male bases. The desktop choice and XR avatar page no longer offer MakeHuman. Embedded MakeHuman mesh data and its converter are removed; historical license/hash records live in docs/references/makehuman. Existing saved MakeHuman geometry/paint/rig/morphs and schema1/2 recipe metadata remain readable and exportable without automatic replacement. Calling its removed generator fails before publishing any Scene change. Opening the creator from a legacy group starts a new VRoid female draft with Keep existing objects checked.
+
+The following details document the retained VRoid implementation; mentions of MakeHuman creation describe historical compatibility only.
+
 # Actual CC0 VRoid beta creator baseline
 
 New humanoid creation selects `vroid-beta-female` by default; the catalog also
-supports `vroid-beta-male` and the explicit `makehuman-hm08` fallback. These IDs
+supports `vroid-beta-male`. The legacy `makehuman-hm08` ID remains metadata only. These IDs
 are stored in HumanoidControls schema 2 as `baseline`. Historical schema 1
 records decode as MakeHuman with their exact saved field values. The baseline
 factory supplies neutral VRoid shape offsets and white material tints, while
-restoring historical MakeHuman defaults for the fallback. Already-anime source
+retaining historical MakeHuman parameter values solely for saved-project compatibility. Already-anime source
 models are not blindly enlarged or recolored using the earlier MH defaults.
 
 The actual source files, author grants and exact hashes are in

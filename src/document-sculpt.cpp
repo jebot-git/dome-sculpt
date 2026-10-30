@@ -4,7 +4,7 @@ namespace dome {
 bool Document::sculpt_target_ready_locked() const {
   const auto &o=scene_.active();
   return !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
-      !control_before_ && !action_active_locked() && !o.mesh_active && o.visible && !o.locked;
+      !control_before_ && !action_active_locked() && !o.mesh_active && object_editable_locked(o.id);
 }
 bool Document::resolution_target_ready_locked() const {
   const auto scale=scene_.world_transform(scene_.active().id).scale;
@@ -49,6 +49,7 @@ void Document::change_sculpt_resolution(SculptResolutionOptions options,AssetSou
   std::lock_guard lock(model_mutex_);queue_resolution_locked(std::move(options),expected);
 }
 void Document::sculpt_settings_locked(Volume::SculptSettings settings, AssetSource expected) {
+  require_authority_locked(expected);
   if (!sculpt_target_ready_locked()) throw std::logic_error("Sculpt mask and symmetry controls are unavailable");
   if ((expected.generation && expected.generation!=state_.generation) ||
       (expected.revision && expected.revision!=state_.revision) ||

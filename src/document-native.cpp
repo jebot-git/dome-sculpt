@@ -13,11 +13,11 @@ bool same(CanvasTransform a,CanvasTransform b){return a.position.x==b.position.x
 bool Document::begin_native_stroke(){
   std::lock_guard lock(model_mutex_);auto &o=scene_.active();
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
-  if(desktop_||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!o.visible||o.locked||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
+  if(desktop_||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
   auto preview=mesh_.load();
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision){state_.message="Wait for the current surface before painting";publish_locked();return false;}
   auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
-  session->source={state_.generation,state_.revision,o.id};session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
+  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
   session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;
   std::lock_guard queue(native_mutex_);
   if(native_jobs_.size()>=8){state_.error="Desktop gesture queue is full; retry after pending cancellation finishes";publish_locked();return false;}
