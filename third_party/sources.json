@@ -164,7 +164,9 @@
       "native/toolkit-hooks/fltk-1.4.5-pen-input.patch": "f90bab41cb33c949bd4efe2659f6e103d06611fdaeb98b06e8af0dd817f44152"
     },
     "combined_patch_sha256": "9b869ee77efecceba935eade4a86a412302894e68072ab99aca13b06c35b6822",
-    "used": "Release FLTK 1.4.5 with all22 canonical patches, including eaeb8e0 parent-menu preservation on submenu close. Runtime-selected library directory is prepended by the development launcher and OpenXR CTest."
+    "used": "Release FLTK 1.4.5 with all22 canonical patches, including eaeb8e0 parent-menu preservation on submenu close. Runtime-selected library directory is prepended by the development launcher and OpenXR CTest.",
+    "verified_at_commit": "6feb62b936a9d8d2a2e6a893aebcbda9b724fe23",
+    "builder_sha256_at_verified_commit": "32b30745da3ea203cc1b851fa222d574329fcbd04ee4fd04401f6d417f712170"
   },
   "vrm_specification": {
     "repository": "https://github.com/vrm-c/vrm-specification",
@@ -212,10 +214,10 @@
     "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
   },
   "domed_latest_check": {
-    "commit": "282467e727df78c8e7f2452aa05a7747bac854a6",
-    "fltk_patch_changes_since_742d009": true,
-    "used": "RemoteHEAD rechecked before this publication; unchanged282467e. Canonical optimized FLTK1.4.5+22 patches and frozen compositor with current native/Wayland validation are recorded in TOOLKIT.md and VALIDATION.md.",
-    "checked_utc": "2026-10-30T05:37:33.375266+00:00"
+    "commit": "6feb62b936a9d8d2a2e6a893aebcbda9b724fe23",
+    "fltk_inputs_changed_since_282467e": false,
+    "checked_utc": "2026-10-30T15:32:20.673322+00:00",
+    "used": "Latest source/compositor rebuilt Release; unchanged canonical22-patch FLTK artifact retained. Private native-BDF runtime built and checked. Exact application qualification in docs/validation/HOLDING-IMPORT-INTEGRATION.json."
   },
   "mtoon": {
     "implementation": "src/mtoon.cpp; include/dome/mtoon-shader.hpp",
@@ -279,5 +281,37 @@
       "ufbx.h": "f787be529af577efc04f3e3e735844a08556718dbb613d1211c2b313d72895dc",
       "LICENSE": "0dd48ebadf52273c736256325c8f078c03c8bb4facee22a4122de0ad3f615391"
     }
+  },
+  "domed_bitmap_runtime": {
+    "repository": "https://github.com/jebot-git/DomeD",
+    "commit": "6feb62b936a9d8d2a2e6a893aebcbda9b724fe23",
+    "lock": {
+      "upstream": "https://github.com/harfbuzz/harfbuzz.git",
+      "tag": "12.3.2",
+      "upstream_revision": "b42511e071162fe76102f613a6ccc009726c99af",
+      "fork": "https://github.com/jebot-git/harfbuzz.git",
+      "branch": "domed-bdf",
+      "fork_revision": "39144f4a5da0cd0c2ffd9e61649faba4d6d6a2eb",
+      "patch_sha256": "df88e621deb0d0f027a69dc1fff9eed31387dc75a30d2af71dc4c70077bc79e1",
+      "font_policy": "native-unicode-bdf-only"
+    },
+    "pango_version": "1.57.0",
+    "manifest": {
+      "harfbuzz_revision": "39144f4a5da0cd0c2ffd9e61649faba4d6d6a2eb",
+      "harfbuzz_upstream_revision": "b42511e071162fe76102f613a6ccc009726c99af",
+      "harfbuzz_fork": "https://github.com/jebot-git/harfbuzz.git",
+      "harfbuzz_patch_sha256": "df88e621deb0d0f027a69dc1fff9eed31387dc75a30d2af71dc4c70077bc79e1",
+      "pango_source_sha256": "890640c841dae77d3ae3d8fe8953784b930fa241b17423e6120c7bfdf8b891e7",
+      "pango_patch_sha256": "fd785788fc41acebd879315f40191deb269247876aec80f115b0e896b43e06a7",
+      "policy": "native-unicode-bdf-only",
+      "buildtype": "release",
+      "libraries": {
+        "libharfbuzz.so.0": "e5a4a423941a0f7adeadf2af45750e5c7cd6fcb80331d062799cc20f172949a1",
+        "libpango-1.0.so.0": "bb7b9ad92e9fe281700a446260c30a677f0f990188bf91fa1739852f753e82fb",
+        "libpangoft2-1.0.so.0": "0144826771cda5132f55477fb377bff00e329ceb22d8f16e321da732f1b2a4b9",
+        "libpangocairo-1.0.so.0": "54095d69d7abe12a9dd1a067887a2a3f85f64526b42131b9a183235e26b0216d"
+      }
+    },
+    "used": "Canonical private optimized native Unicode BDF-only HarfBuzz runtime for spatial text and current compositor; Pango build independently tested, not an added application frontend. All runtime libraries private, no system installation."
   }
 }

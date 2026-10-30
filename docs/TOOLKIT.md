@@ -1,15 +1,52 @@
 # Current DomeD toolkit and conventions
 
-The current combined local-meshing/GPU/plane-cut integration uses canonical DomeD
-`282467e727df78c8e7f2452aa05a7747bac854a6`, rechecked against remote HEAD on
-2026-10-30. This workstation rebuilt its22 patches as optimized FLTK1.4.5 under
-`artifacts/toolkit-282467e`; its libraries are in **lib64**. Configure with
-`-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/share/fltk` and
-prepend that prefix's lib64 to LD_LIBRARY_PATH. Explicit `ldd` confirms all three
-FLTK libraries resolve there. See AGENTS.md and VALIDATION.md. Older prefixes,
-including toolkit-authoring/lib from a separate environment, are historical
-evidence below and must not override this current selection. No active session
-or installed toolkit was replaced or restarted.
+Current canonical DomeD is `6feb62b936a9d8d2a2e6a893aebcbda9b724fe23`, checked
+against remote main on 2026-10-30. Its FLTK builder and all22 patches are unchanged
+from `282467e727df78c8e7f2452aa05a7747bac854a6`; every patch hash is verified.
+Use the existing optimized FLTK1.4.5+22 prefix `artifacts/toolkit-282467e`, whose
+libraries are in **lib64**. The old revision in that artifact name identifies
+its unchanged FLTK inputs, rather than the current compositor revision.
+Configure using:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOME_COMPUTE_BACKEND=CPU \
+  -DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/share/fltk
+```
+
+DomeD6feb adds the native Unicode BDF-only HarfBuzz/Pango runtime and stricter
+font export checks. The canonical `scripts/prepare-bitmap-runtime.py` built its
+pinned Release runtime privately into `artifacts/bitmap-runtime-6feb62b`;
+**that runtime uses lib, not lib64**. Its manifest, upstream/fork revisions,
+patches and built-library hashes are recorded in third_party/sources.json.
+Native BDF blob/FreeType metrics, 1x/2x, LTR/RTL, Pango exact pixels, outline/
+malformed rejection, Rust font-export and actual private-library checks pass.
+No Pango frontend is introduced into Dome Sculpt.
+
+For current application/runtime validation, prepend both private directories:
+
+```sh
+export LD_LIBRARY_PATH=/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-6feb62b/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64
+./build/dome-sculpt
+```
+
+The Release compositor was rebuilt at6feb into
+`artifacts/domed-6feb62b-target/release/dome-compositor`, preserving the old282
+binary. For private native Wayland tests, set `DOME_COMPOSITOR` to that binary
+and `DOME_TEST_LIBRARY_PATH` to the two directories above. The harness otherwise
+clears inherited library overrides, and with the explicit path records live
+compositor/client mappings in `artifacts/dome-menu/runtime-maps.json`. Those
+processes load the prepared FLTK and BDF-only HarfBuzz; they do not load Pango.
+The matching canonical Pango runtime is separately validated by its native test.
+See HOLDING-IMPORT-INTEGRATION.md and its machine-readable qualification receipt.
+
+Build as the regular user. No system runtime was installed and no active desktop,
+compositor or display-manager session was replaced/restarted. Stage and verify
+matching artifacts before any later authorized system installation.
+
+## Historical toolkit evidence
+
+The following records describe earlier checks and artifact layouts; they do not
+supersede the current revision and explicit runtime selection above.
 
 Current source checked 2026-10-29 against DomeD main
 `282467e727df78c8e7f2452aa05a7747bac854a6`. Earlier builds used
