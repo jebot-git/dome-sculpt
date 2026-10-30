@@ -1,0 +1,95 @@
+{
+  "source_commit": "48e9dff5f094190052cdedf0012f205779158434",
+  "base": "df3d3b220ac50c08ec5141090d01b87ca70c19ec",
+  "scope": "Read-only current corner RGBA transport to mesh worker/OpenGL/picking/GLB; guards retained; no Scene14 persistence or authoring acceptance",
+  "source": {
+    "CMakeLists.txt": "cfe5155d8258816e367e5938750ac1831a9f71461fef23bb430b1fda204b28ef",
+    "include/dome/material-visibility.hpp": "2377cf66b89090f110d2c96f99033d070b34291d0718c45e3f29428937033e4e",
+    "include/dome/polygon-color.hpp": "bcd0ee633837ca5b23f6d08da4899e572c637f6f64c02c6866060ba61b8abfd8",
+    "include/dome/scene.hpp": "23f1613fe5a1732193e558bb65493ad0ed162e960e98791a12736d44c19e525c",
+    "src/current-colors.hpp": "4e6f9f986587a19ad0764166773248052095b501c794f16122e458e69bfb7bd9",
+    "src/document.cpp": "0fbfc33220797be647063382a17dd1ec610d835ec5fb0a4b6bd4f69e6b084ce9",
+    "src/export.cpp": "a0a555d7a778fb8a3cee883b1cf94e924150fcb558c76246885009c0559d5322",
+    "src/material-visibility.cpp": "9d1e117436bd05360c553c6e989e6bd849fddf6f0ac61cf0ce2499383996c145",
+    "src/normal-frame-export.hpp": "ec97aef306b776d12a142828f8cfd63e948805e35b0fd818be2b65416e2c0dea",
+    "src/polygon-color.cpp": "7fc440a8a2272b46fbbb967d1bbf10e1536ebdf6506e2d6dea236159a38c5887",
+    "tests/polygon-color-consumer.hpp": "7685c2824e25ea5bdb36d1e377847234d05f31141f7cbc3b8632d3698e33186c",
+    "tests/polygon-color-current-fixture.hpp": "53c69d8a97e12c1b1c16f9d6e8ea3db8cb7376ed20385ed18bd33e4a0acf83a6",
+    "tests/polygon-color-current.cpp": "3f0434947bb1b0cdb6e1f5807efc19c1e1eedcee79827a113eb1924da54dee9e",
+    "tests/polygon-color-render.cpp": "140a5ff43a4255d40c1131322f762b8917409e4ba0ea6b4103aa4ee5defa4334",
+    "tests/polygon-color.cpp": "8a86ea6e128356380a441d9325a116d812ab7374e1835cdcc45806b39f8e9472"
+  },
+  "logs": {
+    "artifacts/tests-consumer-release15-final.log": "332d8718cfedd5839e924a0848b34e2597020eb980196a3cfaa24b3b831b783b",
+    "artifacts/tests-consumer-frozen-arc.log": "1789ab145ff0ce154e352eeccece404f9a32e17c42be9f830be4834d2ea2f0ab",
+    "artifacts/tests-consumer-legacy-frozen-arc.log": "ee485d2e39b8f48714087baede45d158a2bb4680a60bb3e26a32ae763f5ae65d",
+    "artifacts/tests-consumer-sanitize15.log": "905270ade53d31e4ef4edcefd59c9a4cfa540ab084b2fe3c144b0bdf2d90ceff",
+    "artifacts/tests-consumer-sanitize-opt15.log": "4bc8a55c369e588ae3988de962709da828262aa8a875b38b95384676e9842244",
+    "artifacts/build-consumer-final.log": "6d7788ed02de66fb6f3b92d05b03cc52a3e2c61026b62f6cda204f84680954bc",
+    "artifacts/configure-consumer-sanitize-opt.log": "bb20ae5ef62f941236384a154a442ee82deb689ec319d47d86f27ddfbb6ba013",
+    "artifacts/build-consumer-sanitize-opt.log": "b17339932e0b10ca9e983b30619a349ec0e4e3304e8c465f76b5866b1422062e",
+    "build-consumer/Testing/Temporary/LastTest.log": "f6f28c063bb54e962eb1abefed3c0450129b39af3d169a27b4fcbe3f989a050a",
+    "build-consumer-sanitize-opt/Testing/Temporary/LastTest.log": "2924fcabb18969ea47b9f312c6995ffc9619f019a07de32824afe116038f728d"
+  },
+  "binaries": {
+    "build-consumer/dome-sculpt": "621ac152fbbfa278d21c69f2dca1f03eea70d55fc4a8c57e7849aa365f6368d6",
+    "build-consumer/dome-sculpt-polygon-color-current-test": "a9ba302b689ffb4463fbda87abf280e25309b78019aaa5c1fb788b0a5cb5de8c",
+    "build-consumer/dome-sculpt-polygon-color-render-test": "6f5a2936cba90ae9ea15aeeeaa929eb7f18751de49979bc3fe45bb372a0e2b43",
+    "build-consumer/dome-sculpt-source-color-render-test": "92e267af87ec85a626585ebf5ff49d8c332b69d195bd692dedfbe791d871be20",
+    "build-consumer-sanitize-opt/dome-sculpt-polygon-color-current-test": "392e3da8f55ea5fbd6e284f2d51d00f8b0ce9fef1b86fa5c55dcc7b314bc34ba",
+    "build-consumer-sanitize-opt/dome-sculpt-polygon-color-render-test": "ab0f865453afc35b9e706de36933d4102a9bf0f6351f1980d933c6601dadf530",
+    "build-consumer-sanitize-opt/dome-sculpt-polygon-document-test": "32654416e9064f7bbef748a87f792159a31425c218f2acbd433aee6c14a7c661"
+  },
+  "configuration": {
+    "canonical_toolkit": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/share/fltk",
+    "bitmap_runtime": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib",
+    "regular_user": true,
+    "release": "Release CPU UI=ON XR=ON",
+    "whole_core_c_cpp_sanitizer": "Release C/C++ -O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer; ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+    "source_basis_sharing": "Immutable shared source_owner; no source-basis vector copy per topology edit"
+  },
+  "proof": {
+    "release_suites": 15,
+    "release_seconds": 35.14,
+    "whole_core_c_cpp_sanitizer_leaks_suites": 15,
+    "sanitizer_seconds": 192.98,
+    "actual_gpu": "Mesa Intel Arc A770 DG2",
+    "actual_gpu_current_checks": 419,
+    "actual_gpu_legacy_source_checks": 100,
+    "software_current_checks": 419,
+    "independent_rgba_image_cases": 6,
+    "maximum_rgba_image_error": 0,
+    "current_color_native_checks": 24,
+    "rgba_analytic_checks": 105,
+    "rgba_cancellations": 1340,
+    "actual_raw_source_checks": 9,
+    "raw_source_cancellations": 471,
+    "persistent_color_allocation_boundaries": 4596,
+    "original_kernel_checks": 52,
+    "original_allocation_boundaries": 3132,
+    "legacy_document_checks": 103,
+    "legacy_controller_checks": 31,
+    "legacy_paint_authority_checks": 18,
+    "cpu_readback_or_maps_during_draw": 0,
+    "second_eye_buffer_writes": 0,
+    "held_motion_frames_without_transfer": 20
+  },
+  "preliminary_debug_negative": {
+    "passed": 13,
+    "total": 15,
+    "seconds": 511.08,
+    "failures": [
+      "polygon-document default sculpt accepted atlas worker readiness at unchanged60s",
+      "normal-frame-vrm-consumer actual flat avatar worker readiness"
+    ],
+    "memory_reports": false,
+    "policy": "No assertion or timeout changes; optimized complete-core sanitizer rerun passes unchanged tests"
+  },
+  "remaining": [
+    "Scene14 archive/current-authority/native Document/history/save-reopen route",
+    "Actual current-color native FLTK/controller/OpenXR authoring journey",
+    "Prepared color and normal topology adapters remain refused",
+    "Nonconstant dissolve/changed source triangle-basis equivalence remains refused",
+    "No physical headset launch, installation or push"
+  ]
+}
