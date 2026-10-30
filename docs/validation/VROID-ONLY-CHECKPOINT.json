@@ -1,0 +1,419 @@
+{
+  "format": 1,
+  "base_commit": "83723fe0e2709bd65a09f64ad98ba99dd08259b2",
+  "scope": "CC0 VRoid-only new creation; old MakeHuman native project compatibility retained; no public layout/Scene codec changes",
+  "sources": [
+    {
+      "path": "THIRD-PARTY.md",
+      "bytes": 3632,
+      "sha256": "6039f938005777ff8e6f8273879091cac7a022c4de13f855de7ab8bc4da45048"
+    },
+    {
+      "path": "assets/humanoid/ASSET-NOTICES.txt",
+      "removed": true,
+      "old_bytes": 19111,
+      "old_sha256": "ca886b136d1995bcd2d9c38ed1ec95b9894be0a3ed08038cee2715f7ef43915c"
+    },
+    {
+      "path": "assets/humanoid/MAKEHUMAN-LICENSE.txt",
+      "removed": true,
+      "old_bytes": 3598,
+      "old_sha256": "edd99571ca62698f78c943fd4fffb159a413c315fa0d4819d3cec5cadaf8b4f1"
+    },
+    {
+      "path": "assets/humanoid/README.md",
+      "bytes": 907,
+      "sha256": "47a94423aa974164f8efd00a95037d56dc61d712d81162ff4eff157f2012a15b"
+    },
+    {
+      "path": "assets/humanoid/SOURCES.json",
+      "removed": true,
+      "old_bytes": 6381,
+      "old_sha256": "ee6180f3abd5ec2c8e3b33ff4ad39e39de9ba015601f58eaef920cdeedfd97cb"
+    },
+    {
+      "path": "docs/HUMANOID-CREATOR.md",
+      "bytes": 7704,
+      "sha256": "cae318d888f4b40e9f3b2f7ccfaac23686c758f5a34dfe6b7af84817290105f5"
+    },
+    {
+      "path": "docs/REQUIREMENTS.md",
+      "bytes": 19591,
+      "sha256": "f0243b2728a5222dc9476ce85cf79c29567c3a23f7cfd5e4f025258c25c3871a"
+    },
+    {
+      "path": "docs/UV-SOLVE.md",
+      "bytes": 12041,
+      "sha256": "ff6f461fee03ea07932b86f2cba263eea19f15b8392b7a3f8e5e34ab5792ed2b"
+    },
+    {
+      "path": "docs/VROID-CREATOR.md",
+      "bytes": 12834,
+      "sha256": "9d40d4192125436525cad3cf7a7b8de28b6e6858f26ad7399fbea6d4300db19f"
+    },
+    {
+      "path": "include/dome/humanoid-creator.hpp",
+      "bytes": 3344,
+      "sha256": "25f583bb6f5c5216a024824cc388f8c632e4bca9a63ed2749def05a2f781ad32"
+    },
+    {
+      "path": "include/dome/input.hpp",
+      "bytes": 5668,
+      "sha256": "24d9b1b9134ad15f17e9aa5b85898c5d8c15c8ba91fb6a412812d39145a4ba81"
+    },
+    {
+      "path": "src/creator-editor.cpp",
+      "bytes": 5804,
+      "sha256": "8348e961ec610e8805e3a6e024f980bb2c462340a14ba0b52ac4a8d8c9289f03"
+    },
+    {
+      "path": "src/document.cpp",
+      "bytes": 141407,
+      "sha256": "6b3fdcdb2e5fc52598fdde67fec0058b7919970f570dd4f699bea37b6d804041"
+    },
+    {
+      "path": "src/humanoid-base.inc",
+      "removed": true,
+      "old_bytes": 3291552,
+      "old_sha256": "d4a28f46dcaaa2b291fc3782628f7fd1b4d57c6bbac59b80399f8d654c7a0cf8"
+    },
+    {
+      "path": "src/humanoid-creator.cpp",
+      "bytes": 7188,
+      "sha256": "a8ede371c2426caf69231464ffcc9692d9d050235f820bb72c93b727863a2d1b"
+    },
+    {
+      "path": "src/input.cpp",
+      "bytes": 33032,
+      "sha256": "a2b0b3253014afb86bc7c5b6adbb57429761189b835f9b8e6e1273b3844bae7e"
+    },
+    {
+      "path": "src/vroid-creator.cpp",
+      "bytes": 30096,
+      "sha256": "28ed4c0c242f594996e579eeebfc17e299882a7a27534f5adc74603d62edc7e2"
+    },
+    {
+      "path": "tests/groups.cpp",
+      "bytes": 8252,
+      "sha256": "29b608c62f32ad42800349e06e1b6512bd427452732418f7972abcde140e3946"
+    },
+    {
+      "path": "tests/humanoid-creator.cpp",
+      "bytes": 4581,
+      "sha256": "b4f486bb8b7629705443b0858162bfd274a997ec6b234323e82d515f9159cf2e"
+    },
+    {
+      "path": "tests/menu.py",
+      "bytes": 65088,
+      "sha256": "2f71433b9e97a85eadd6f92db40d2382a5a06298ce6517bcb22920017f01ffa9"
+    },
+    {
+      "path": "tests/uv-initialize.cpp",
+      "bytes": 7262,
+      "sha256": "98e771f566b90697d7f70ffcaf831479263445fb809ea2806bd5c54339cd16ff"
+    },
+    {
+      "path": "tests/uv-solve.cpp",
+      "bytes": 12792,
+      "sha256": "c9300703cb70207b7c3e459d4acc264a76b8a77008d8444f2c4c247b7539b121"
+    },
+    {
+      "path": "tests/vroid-groom.cpp",
+      "bytes": 12391,
+      "sha256": "b3b858b2f71a2f857a27c50b6b4501413f88ac799e1c0ddcc1d9f7c82f6a6705"
+    },
+    {
+      "path": "third_party/sources.json",
+      "bytes": 19187,
+      "sha256": "acd3e2bf014db3cfd0d2d2b1bc83a7e7d6099c3c1f9e310f1102f9423b57cce2"
+    },
+    {
+      "path": "tools/prepare-humanoid-assets.py",
+      "removed": true,
+      "old_bytes": 7642,
+      "old_sha256": "78e12e5276cbb48624bea806fa17ac61411931a8738ca1f85eb1b9e0139d04f1"
+    },
+    {
+      "path": "docs/VROID-ONLY-BASES.md",
+      "bytes": 4057,
+      "sha256": "e99d7dae54ff5355aa873b867a726dd325260c13e993b3087a56aa6ce28ea152"
+    },
+    {
+      "path": "docs/references/makehuman/ASSET-NOTICES.txt",
+      "bytes": 19111,
+      "sha256": "ca886b136d1995bcd2d9c38ed1ec95b9894be0a3ed08038cee2715f7ef43915c"
+    },
+    {
+      "path": "docs/references/makehuman/MAKEHUMAN-LICENSE.txt",
+      "bytes": 3598,
+      "sha256": "edd99571ca62698f78c943fd4fffb159a413c315fa0d4819d3cec5cadaf8b4f1"
+    },
+    {
+      "path": "docs/references/makehuman/README.md",
+      "bytes": 737,
+      "sha256": "914edfd8c099a162698eaf598d421ae358528c56b3f8be77f9cbc2a229e5ad6a"
+    },
+    {
+      "path": "docs/references/makehuman/SOURCES.json",
+      "bytes": 6381,
+      "sha256": "ee6180f3abd5ec2c8e3b33ff4ad39e39de9ba015601f58eaef920cdeedfd97cb"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-configure.log",
+      "bytes": 1864,
+      "sha256": "c42d9badb65545c1fa6138948a8a42477de54c7a3002ff2ff131820196cd315a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-build-final.log",
+      "bytes": 1993,
+      "sha256": "7732617f133656a5c687f913ef74cfb630a2195f7da8584b4df285759c84042c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-ui-rebuild.log",
+      "bytes": 322,
+      "sha256": "b7ea5709b9fa05eca68db81cf3bdf0b8cacde168c74132d5962afed163f37182"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-native-final.log",
+      "bytes": 731,
+      "sha256": "502635545a199055f420fe6b686708c20e6a87c18f02763459a1ddfac2a32657"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-native-menu.log",
+      "bytes": 832,
+      "sha256": "07b58c816f9b3f2efedfebae725f8deceaaa8bcd226bf133a11c6efdcc1479bc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-native-menu-compact.log",
+      "bytes": 958,
+      "sha256": "7157cca1f68e1abc66debeec2c7f09a3e91b3b010eafdaf0673cef1a537d8edd"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-stage.log",
+      "bytes": 2036,
+      "sha256": "da340d90720f3f6c5dcc40ec9d5f6153632b13bf9d17cfd6c1d58dbde77bb707"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-stage-check.log",
+      "bytes": 261,
+      "sha256": "f9b3d52265700a82599cec694759a297a947d0dabc3c37923053ee8d50e434f9"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-legacy-makehuman.dsculpt",
+      "bytes": 3402387,
+      "sha256": "1ca7a547e01942c70054dade36da151286c09431952827e3c1b9ff29a5925b16"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-legacy-reopened.dsculpt",
+      "bytes": 3402387,
+      "sha256": "1ca7a547e01942c70054dade36da151286c09431952827e3c1b9ff29a5925b16"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-legacy-makehuman.glb",
+      "bytes": 3569260,
+      "sha256": "6d2e3dc3c30da0bcdce3c7be97e19b0f133ba9f0de66a116c7b3869e7a4ab3ed"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-legacy-reopened.glb",
+      "bytes": 3569260,
+      "sha256": "6d2e3dc3c30da0bcdce3c7be97e19b0f133ba9f0de66a116c7b3869e7a4ab3ed"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-legacy-khronos-report.json",
+      "bytes": 1422,
+      "sha256": "83b13d2d36879ed4af43785481efe3cd8020dd3a84319e190d8b943f19a14adc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-legacy-maker.cpp",
+      "bytes": 613,
+      "sha256": "280e23832f2c094586c371d27652e8df096ece1eef0234ade7c139348a8e5847"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-legacy-maker",
+      "bytes": 5125672,
+      "sha256": "a43b41f96fca96da89e24bad9d07f119349a719b41ed067b4cf42920a063ac1c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/dome-sculpt",
+      "bytes": 6043736,
+      "sha256": "106d293143eb1c9e2846d790e82ced2a0678134934347cedda43bbb381594cee"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/dome-sculpt-humanoid-creator-test",
+      "bytes": 3278216,
+      "sha256": "4601b7cd50f85e52f5863428ed95fbac14ec23c91157e5baae4a3d32319464d0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/dome-sculpt-groups-test",
+      "bytes": 5099400,
+      "sha256": "3296025e322fc43664518a6b961d8f6867f4faefeedc50501d0c22063c33d80a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/dome-sculpt-vroid-creator-test",
+      "bytes": 3292560,
+      "sha256": "67a568d2f79a283f8f6833ee3b81124a4002d41a414caadd733575b73a97b4c9"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/dome-sculpt-vroid-groom-test",
+      "bytes": 3323032,
+      "sha256": "15b7f1f580630ed1264090f25efc6af33e34936894fc7d5bfb5388971bcdc425"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/dome-sculpt-uv-solve-test",
+      "bytes": 3019696,
+      "sha256": "fdc6a54eebd91091f0e84f09760e4f8652087ad6fad40e00a095a1f514ae35a6"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/dome-sculpt-uv-initialize-test",
+      "bytes": 3127432,
+      "sha256": "54feb0d5750b8cdc81a415ab1bc83b0ffc81301573403aea25a56b65bec7bf6c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/libdome-sculpt-core.a",
+      "bytes": 13813838,
+      "sha256": "a063372b24ae83ef2506555786f8450d72f59e8cab7f5f43deb3832c4185a5e7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/libdome-sculpt-render.a",
+      "bytes": 572274,
+      "sha256": "e53fd55c1af1896b700a55297a3d520ab96c70a9b1f47b81635418a74fa1dcf8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/build/libdome-sculpt-xr.a",
+      "bytes": 105932,
+      "sha256": "1088b3626ea6cf4d4bd0478fdce04ae4c4b0cf723cd1358c13aa87bc4aa08e6e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only/app.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only/female-accepted.json",
+      "bytes": 7658,
+      "sha256": "7dee5f4e6730fb4515ac75858396bb7cc47815b71ef1bdc7b916971daea2ad55"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only/female-draft.png",
+      "bytes": 12478,
+      "sha256": "826f38ee4bbc8941c4c7fab5f3c8b3a62ef5b92abffb42f9e0ab8ad13bf69b67"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only/male-accepted.json",
+      "bytes": 7653,
+      "sha256": "52d179ba8f08c8836d1e2c601a476e95589d829c4eeee33847f911acee27536c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only/male-draft.png",
+      "bytes": 12455,
+      "sha256": "7b3096ace5af0b6cad187abdc5dbdde88ed65c9410e82215e9cbfa9e84a3e24d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only/report.json",
+      "bytes": 1385,
+      "sha256": "b8efe607f14437720a285f43b79b76d34e0a9b0a2c61e20c4c2a7207b29b9f0d"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only/xvfb.log",
+      "bytes": 468,
+      "sha256": "ce9e61fee3ccfc8bbabe2fb0634f46fce6e9c0696671619329830838251852be"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only-compact/app.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only-compact/female-accepted.json",
+      "bytes": 7658,
+      "sha256": "7dee5f4e6730fb4515ac75858396bb7cc47815b71ef1bdc7b916971daea2ad55"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only-compact/female-draft.png",
+      "bytes": 4965,
+      "sha256": "8c4711754cb6c4228654426bdd49ed582f6d6434ad700d96f95532f1c4ff6b0f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only-compact/male-accepted.json",
+      "bytes": 7653,
+      "sha256": "52d179ba8f08c8836d1e2c601a476e95589d829c4eeee33847f911acee27536c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only-compact/male-draft.png",
+      "bytes": 4898,
+      "sha256": "dba74ae045c2525c4ffcf9e662671b1803c5dfd2d5e0959d1c8ef3bd34ef6648"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only-compact/report.json",
+      "bytes": 1605,
+      "sha256": "55d17ae1f048b6c40abbbcf8936ed48d69be7678f632591e69431bfe0a8ac7fd"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/menu-vroid-only-compact/xvfb.log",
+      "bytes": 600,
+      "sha256": "a5f98393121ec9dcdb57ec0e8a495e2ec8130133e8eb1a8313e6d79bb31c4b9c"
+    }
+  ],
+  "staged_assets": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/vroid-only-stage/usr/local/share/dome-sculpt/assets/humanoid/CC0-1.0.txt",
+      "bytes": 6962,
+      "sha256": "f6089cba01cb570a24712b41ab8a586ccd3cc5ef53dc266ca50b95c288956d2c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/vroid-only-stage/usr/local/share/dome-sculpt/assets/humanoid/README.md",
+      "bytes": 907,
+      "sha256": "47a94423aa974164f8efd00a95037d56dc61d712d81162ff4eff157f2012a15b"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/vroid-only-stage/usr/local/share/dome-sculpt/assets/humanoid/WORKFLOW-REFERENCES.json",
+      "bytes": 796,
+      "sha256": "8c09d1fcfbb17b9ec7a2da45a6585279bf344d470d00c4695197601edf2600a2"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/vroid-only-stage/usr/local/share/dome-sculpt/assets/humanoid/vroid/README.md",
+      "bytes": 1878,
+      "sha256": "d0fadea3799e5edfbec78cbc7487fff1b31993b975a2aa1631bf10eb220a376a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/vroid-only-stage/usr/local/share/dome-sculpt/assets/humanoid/vroid/SOURCES.json",
+      "bytes": 3867,
+      "sha256": "57a5cb278890abd5d0a6e5b14f5815bc35c736dc4fa22069dc2e2dc59d72b906"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/vroid-only-stage/usr/local/share/dome-sculpt/assets/humanoid/vroid/base-female.vrm",
+      "bytes": 16323872,
+      "sha256": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vroid-only-837/artifacts/vroid-only-stage/usr/local/share/dome-sculpt/assets/humanoid/vroid/base-male.vrm",
+      "bytes": 17914788,
+      "sha256": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c"
+    }
+  ],
+  "fresh_compiler_depfiles_without_removed_mesh": 95,
+  "tests": {
+    "native_suites_passed": 6,
+    "native_seconds": 19.14,
+    "ordinary_native_GUI_checks": 11,
+    "compact_2x_native_GUI_checks": 13,
+    "real_legacy_project_parts": 5,
+    "real_legacy_joints": 163,
+    "legacy_glb_identical_sha256": "6d2e3dc3c30da0bcdce3c7be97e19b0f133ba9f0de66a116c7b3869e7a4ab3ed",
+    "legacy_Khronos_errors": 0,
+    "legacy_Khronos_warnings": 0
+  },
+  "toolkit": {
+    "DomeD_commit": "282467e",
+    "FLTK": "1.4.5+22",
+    "UI_runtime_library_path": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64"
+  },
+  "not_claimed": [
+    "System installation or push",
+    "Live headset/hardware XR test",
+    "New sanitizer qualification",
+    "Completion of parked colored-bake or COLOR/UV morph work"
+  ]
+}

@@ -110,11 +110,11 @@ int main()try{
     require(retained.expired()&&owned.view().topology,
             "Initialized workspace safely releases alias after producing independent immutable geometry");
   }
-  auto human=create_humanoid(humanoid_baseline_defaults("makehuman-hm08"));
-  auto authored=std::make_shared<const Mesh>(human.parts[0].mesh);UvWorkspace real(authored,256);
+  auto human=create_humanoid(humanoid_baseline_defaults("vroid-beta-female"));
+  auto authored=std::make_shared<const Mesh>(human.parts[10].mesh);UvWorkspace real(authored,256);
   real.initialize();
   require(real.view().topology&&real.view().source_vertices->size()==authored->positions.size()&&
           !uv_changed(*authored,*real.view().mesh),
-          "Actual CC0 MakeHuman body initializes complete authored topology without changing UVs");
+          "Actual CC0 VRoid body initializes complete authored topology without changing UVs");
   return 0;
 }catch(const std::exception &failure){count_allocations=false;std::cerr<<"FAIL "<<failure.what()<<'\n';return 1;}

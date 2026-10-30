@@ -250,10 +250,8 @@ int main() try {
   require(
       true,
       "Extreme bounded groom controls retain nondegenerate strict-UV geometry");
-  auto mh = create_humanoid(humanoid_baseline_defaults("makehuman-hm08"));
-  require(morph_topology_id(mh.parts.back().mesh) == 14369968804387486394ull,
-          "Shared original groom extraction preserves historical MH geometry "
-          "exactly");
+  bool removed=false;try{create_humanoid(humanoid_baseline_defaults("makehuman-hm08"));}catch(const std::invalid_argument&){removed=true;}
+  require(removed,"Removed MakeHuman default geometry cannot be reintroduced through the shared groom path");
   if (const char *directory = std::getenv("DOME_VROID_GROOM_FIXTURE")) {
     std::filesystem::create_directories(directory);
     const std::array names{"medium", "long", "fringe", "posed", "male"};

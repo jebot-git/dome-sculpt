@@ -64,7 +64,7 @@ enum class SpatialCommand {
   SculptDelete,
   SculptOpacity,
   RecoveryRefresh, RecoveryNext, RecoveryPrevious, RecoveryRestore,
-  CreateFemale, CreateMale, CreateMakeHuman, DeleteGroup, Ungroup,
+  CreateFemale, CreateMale, CreateMakeHuman, DeleteGroup, Ungroup, // CreateMakeHuman is reserved/disabled for compatibility.
   RigNextJoint, RigPreviousJoint, RigNextMorph, RigPreviousMorph, RigResetPose,
   BakeSurface, ClearBake, CancelWork,
   ExportAvatar,
