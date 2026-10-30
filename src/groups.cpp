@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "dome/source-placement.hpp"
 #include <set>
 namespace dome {
 SceneGroup &Scene::group(uint64_t id) {
@@ -25,15 +26,36 @@ std::vector<SceneGroup> Scene::group_path(uint64_t id) const {
   return path;
 }
 CanvasTransform ObjectSurface::world_transform() const {
+  if(affine_edit || std::any_of(groups.begin(),groups.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);}))
+    throw std::logic_error("This surface has exact affine placement; use world_matrix");
   CanvasTransform world{};
   for (const auto &g : groups) world = ob::compose(world, g.transform);
   return ob::compose(world, transform);
 }
 CanvasTransform Scene::world_transform(uint64_t id) const {
   auto &o = object(id);
+  if(has_affine_placement(id))throw std::logic_error("This object has exact affine placement; use world_matrix");
   CanvasTransform world{};
   for (const auto &g : group_path(o.group)) world = ob::compose(world, g.transform);
   return ob::compose(world, o.transform);
+}
+AffineTransform ObjectSurface::world_matrix() const {
+  AffineTransform world;
+  for(const auto &g:groups)world=world*group_local_matrix(g);
+  auto local=affine_similarity(transform);
+  if(affine_edit)local=affine_edit->matrix()*local;
+  return world*local;
+}
+AffineTransform Scene::parent_matrix(uint64_t id) const {
+  AffineTransform world;
+  for(const auto &g:group_path(object(id).group))world=world*group_local_matrix(g);
+  return world;
+}
+AffineTransform Scene::world_matrix(uint64_t id) const {
+  return parent_matrix(id)*object_local_matrix(object(id));
+}
+bool Scene::has_affine_placement(uint64_t id) const {
+  return dome::has_affine_placement(object(id),group_path(object(id).group));
 }
 uint64_t Scene::add_group(std::string name, CanvasTransform transform,
                           uint64_t parent, std::shared_ptr<const HumanoidControls> recipe) {
@@ -47,9 +69,14 @@ uint64_t Scene::add_group(std::string name, CanvasTransform transform,
     recipe->validate();
     recipe = std::make_shared<const HumanoidControls>(*recipe);
   }
-  CanvasTransform world{};
-  for (const auto &g : group_path(parent)) world = ob::compose(world, g.transform);
-  validate_transform(ob::compose(world, transform));
+  auto path=group_path(parent);
+  if(std::any_of(path.begin(),path.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);})) {
+    AffineTransform world;for(const auto &g:path)world=world*group_local_matrix(g);
+    (void)(world*affine_similarity(transform));
+  } else {
+    CanvasTransform world{};for(const auto &g:path)world=ob::compose(world,g.transform);
+    validate_transform(ob::compose(world,transform));
+  }
   uint64_t id = next_group_++;
   groups_.push_back({id, parent, std::move(name), transform, std::move(recipe)});
   return id;
@@ -70,11 +97,17 @@ void Scene::erase_group(uint64_t id, bool erase_objects) {
       active_ = objects_.front().id;
   } else {
     // Compute every world transform while the entire old hierarchy still exists.
-    std::vector<std::pair<uint64_t, CanvasTransform>> flat;
+    struct Flat {uint64_t id;CanvasTransform transform;std::shared_ptr<const NativeAffineEdit> edit;};
+    std::vector<Flat> flat;
     for (auto &o : objects_)
-      if (removed.contains(o.group)) flat.emplace_back(o.id, world_transform(o.id));
-    for (auto &[object_id, transform] : flat) {
-      auto &o = object(object_id); o.transform = transform; o.group = 0;
+      if (removed.contains(o.group)) {
+        if(has_affine_placement(o.id)) {
+          auto edit=std::make_shared<const NativeAffineEdit>(world_matrix(o.id)*affine_similarity(o.transform).inverse());
+          flat.push_back({o.id,o.transform,std::move(edit)});
+        } else flat.push_back({o.id,world_transform(o.id),{}});
+      }
+    for (auto &f : flat) {
+      auto &o = object(f.id); o.transform=f.transform;o.affine_edit=std::move(f.edit);o.group=0;
     }
   }
   std::erase_if(groups_, [&](auto &g) { return removed.contains(g.id); });

@@ -6,6 +6,9 @@ namespace dome {
 // preparation. Every direct origin retains its own complete prior authority.
 std::shared_ptr<const PolygonOrigin>
 capture_polygon_origin(const SculptObject &, CanvasTransform);
+std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const Scene &,uint64_t);
+std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const SculptObject &,CanvasTransform,
+    std::shared_ptr<const SourcePlacementCapsule>);
 bool polygon_conversion_required(const SculptObject &);
 PolygonMesh
 prepare_polygon_workspace_topology(const SculptObject &, bool convert_source,

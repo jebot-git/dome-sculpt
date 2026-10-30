@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "affine.hpp"
 #include "deformation.hpp"
 #include "mesh.hpp"
 #include "groups.hpp"
@@ -39,6 +40,7 @@ struct SculptObject {
   std::shared_ptr<const SourceMaterialBindings> material_bindings{};
   std::shared_ptr<const RetopoPatch> retopology{};
   std::shared_ptr<const PolygonAuthority> polygon{};
+  std::shared_ptr<const NativeAffineEdit> affine_edit{};
 };
 bool source_is_dormant(const SculptObject &);
 struct ObjectSurface {
@@ -53,12 +55,14 @@ struct ObjectSurface {
   Mesh preview_mesh() const;
   std::vector<SceneGroup> groups{}; // Root-to-leaf path, local object TRS retained.
   CanvasTransform world_transform() const;
+  AffineTransform world_matrix() const;
   std::shared_ptr<const CreatorAppearance> appearance{};
   std::shared_ptr<const SourceMaterialBindings> material_bindings{};
   // Generated volume geometry cannot use dormant source topology/UV metadata.
   // Export must refuse rather than silently discard the retained source data.
   bool source_dormant = false;
   std::shared_ptr<const PolygonColorSurface> polygon_colors{};
+  std::shared_ptr<const NativeAffineEdit> affine_edit{};
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.
@@ -79,6 +83,9 @@ public:
   void erase_group(uint64_t, bool erase_objects = true);
   std::vector<SceneGroup> group_path(uint64_t) const;
   CanvasTransform world_transform(uint64_t object) const;
+  AffineTransform parent_matrix(uint64_t object) const;
+  AffineTransform world_matrix(uint64_t object) const;
+  bool has_affine_placement(uint64_t object) const;
   uint64_t add(std::string name, Volume, CanvasTransform = {});
   uint64_t duplicate(uint64_t);
   void erase(uint64_t);

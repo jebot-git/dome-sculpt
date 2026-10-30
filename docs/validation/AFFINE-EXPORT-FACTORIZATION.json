@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "base": "5dcc67eff377e1ba3d6c0f219ef976c145a43e41",
+  "scope": "native affine library and test fresh Release/instrumented; system LAPACK/BLAS uninstrumented; actual Scene13/export wiring pending",
+  "assertions_per_build": 4721,
+  "valid_cpp_allocation_attempts": 0,
+  "warmed_denial_calls": 128,
+  "seeded_compositions": 256,
+  "driver_negative_modes": 7,
+  "cancellation_sites": 2,
+  "lapacke_pkg_version": "3.12.0",
+  "lapack_runtime": "3.12.0",
+  "dependency": "already installed lp64 lapack-3.12.0-11.fc44.x86_64",
+  "source_sha256": {
+    "CMakeLists.txt": "9deac92aa40a6368947c68e683e99e50497c8f87b165714e08ba6b2dfb4fab65",
+    "src/affine-factor.cpp": "e722dd10b5c53e2f96778eb02cec153a92aa3df2e7106fbbee2cfffb774cc788",
+    "src/affine-factor.hpp": "1328785bcaf936d863a37685580f9aeedf1b008908563107fa83b51e54ceb079",
+    "tests/affine-factor.cpp": "f6499605f7ed3da07b861518b4490a4eb35d4ff6b6b68a28f4874db76142ac61",
+    "third_party/sources.json": "8c8ab89649a25bd4e0e6eca8215849aae4bfface3539bf78f33cab01882d3241",
+    "THIRD-PARTY.md": "c18276a4865d1616b0b2393b2909b85feaef8966cfab97bd5ebbb2d361d567b6"
+  },
+  "proof_sha256": {
+    "configure-affine-factor.log": "ab2e8b8128a9e60f27c0ffb4bff91c1c92bba91eb876100d93075d7333e9eec7",
+    "build-affine-factor-final.log": "93c5cbc83d324bcb13048b99a89713dd7e762c845179131702fa0f8ff9962c9f",
+    "test-affine-factor-final.log": "d4040eb2c6658a90a4b14a5bdace1d026303e29ac34aed66979544a23e401f47",
+    "configure-affine-factor-sanitize.log": "4dd06032fefb89497e075dd945fa5cfc3dd04b815eb0fc6244cda69a85c44e64",
+    "build-affine-factor-sanitize.log": "809464c9550c9d07bcaf7b638eab7c49b56182870e24f09f6c8a48087eec55cf",
+    "test-affine-factor-sanitize.log": "52760dbd3cb0c476b0333d6468994a0654a9b55f26eeed3c99de32ce7f555e7d"
+  },
+  "binary_sha256": {
+    "build-affine/dome-sculpt-affine-factor-test": "68373fb14d433b4948f041447ac849de66077c2712c351c2ba5f68d63cb9cf7f",
+    "build-affine-sanitize/dome-sculpt-affine-factor-test": "07508dcdc09aefeb2a78af4318aa6bdee8567b4475e56993e2a81bf3055c3980"
+  },
+  "source_and_scene_fields_changed": false,
+  "acceptance_guards_removed": false
+}

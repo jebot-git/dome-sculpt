@@ -5,6 +5,7 @@
 #include "dome/polygon-scene.hpp"
 #include <set>
 namespace dome::detail {
+class SourcePlacementArchive;
 // Bounded immutable graph archive. Source IDs are data, never object lookups.
 class PolygonSceneArchive {
 public:
@@ -15,12 +16,13 @@ public:
   const auto &volumes() const { return volumes_; }
   const auto &paints() const { return paints_; }
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
-                        SourceMaterialArchive &) const;
+                        SourceMaterialArchive &, SourcePlacementArchive * = nullptr) const;
   static void preflight(const nlohmann::json &, const nlohmann::json &objects);
   static PolygonSceneArchive decode(const nlohmann::json &,
                                     const PaintImageArchive &,
                                     const CreatorAssetArchive &,
-                                    const SourceMaterialArchive &);
+                                    const SourceMaterialArchive &,
+                                    const SourcePlacementArchive * = nullptr);
 
 private:
   size_t entries_ = 0;

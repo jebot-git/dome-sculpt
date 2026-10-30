@@ -5,6 +5,7 @@
 #include "source-colors.hpp"
 #include "bake-canonical-frame.hpp"
 #include "polygon-color-preparation.hpp"
+#include "dome/source-placement.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -45,7 +46,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::logic_error("Enable PBR color preparation to bake colored source or target data without losing or multiplying its vertex colors");
   bool converted=false;
   if(settings.prepare_colors&&!target_prepared){
-    detail::strict_polygon_color_target(target,scene.world_transform(target.id),cancelled);
+    auto placement=capture_source_placement(scene,target.id);
+    const auto world=placement?CanvasTransform{}:scene.world_transform(target.id);
+    detail::strict_polygon_color_target(target,world,cancelled,std::move(placement));
     ColorPreparationOptions options;options.resolve_identity=true;options.max_projection_error=settings.color_error;options.cancelled=cancelled;
     auto prepared=prepare_source_colors({target.painted,target.appearance,target.material_bindings,target.deformation,target.material},options);
     target.painted=std::move(prepared.paint);target.material_bindings=std::move(prepared.material_bindings);converted=prepared.converted;
