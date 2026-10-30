@@ -1,0 +1,56 @@
+{
+  "source": "c638fee",
+  "base": "c1a47cd",
+  "status": "private coherent Release+whole-core sanitizer application checkpoint",
+  "release": {
+    "initial_suites": 8,
+    "initial_seconds": 4.61,
+    "final_changed_fixture_suites": 4,
+    "final_changed_seconds": 0.07,
+    "controller_contact_assertions": 57,
+    "native_denial_assertions": {
+      "normal": 15,
+      "replacement": 15,
+      "physical_held_release": 21
+    },
+    "denied_attempts_per_case": 3,
+    "native_denial_scope": "persistent C++new denial on actual native worker, not exhaustive global allocation sites"
+  },
+  "sanitize": {
+    "status": "passed",
+    "suites": 9,
+    "failed": 0,
+    "seconds": 14.52,
+    "source": "c638fee",
+    "scope": "Fresh own C/C++ core/support+selected fixtures, UI enabled/XR disabled; system/image/LAPACK/driver code uninstrumented",
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "logs": {
+      "artifacts/configure-held-contact-sanitize.log": "c5410760d0a5e1c98ed5ccc1aeddf94fdc11216bf3de50e80ae4e03261d4c085",
+      "artifacts/build-held-contact-sanitize.log": "11f7c885ccecf376e6ce468cf6c5ada3d8d1dd6b83ed3f02a8df0ec8a48f3d0a",
+      "artifacts/test-held-contact-sanitize.log": "4e2d300d49435e9845c85fe417fb0512ae793c9f9cef3034bce4ff0c9d63e839"
+    }
+  },
+  "remaining": [
+    "real-loader stereo/contact proof prepared separately",
+    "actual contact graphics and hardware proof",
+    "general affine import/source hierarchy admission",
+    "affine field/metric authoring and prepared normal interpretation outside this checkpoint"
+  ],
+  "source_sha256": {
+    "include/dome/document.hpp": "d537e0c3e92d58c0710350664b343fdfaa08361965addd02a879eb08c0dc4595",
+    "src/document-contact.cpp": "d64fb80e9eb190b4a36db0c6a5617ad25afc6e677e59d944605cd3a4772687a9",
+    "src/document-native.cpp": "2ee6b18be5521a0e2a71980b09d51d8c0b7ab25690fdefd575470bb9c11dddaa",
+    "src/document-interaction.cpp": "bad4a74a891b4540780030966f46e0b3ea8e617e28a5d47bf75dce6a1ceb1fe5",
+    "src/document-worker-errors.cpp": "fee91d53a971d159812baf33e0eaec3044ea3c726ac7338696483fe613bc3406",
+    "src/document.cpp": "60752e320f678e8f91e18686cfa8473ad9e6448bbba1a173631b6e226a1b9ae8",
+    "tests/affine-contact.cpp": "4e49d20c15da319139087b0669e67d68ad889c15b5756f15ff264f96f1975d5a",
+    "tests/native-worker-publication.cpp": "88e98e93e1bbf20dd7ac16888cdfa5a7ef2542fc5f140f8134a88556d09cbbf8",
+    "CMakeLists.txt": "36a878bbd60ece2f6754594d5e4835b2b28979898c40b114862b0896b76bd4c5"
+  },
+  "logs": {
+    "artifacts/test-held-contact-release.log": "8e9b200d5d32a4852bdea68a36aea018fcefd1a38528008ac377529657792e14",
+    "artifacts/test-held-contact-followup.log": "b1a2e8693397c14bee92ef99fbe20ae22789f910ad0ea9d82d4fbaf5d7199ff2"
+  }
+}
