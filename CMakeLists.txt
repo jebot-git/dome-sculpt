@@ -997,6 +997,8 @@ endif()
 
 target_sources(dome-sculpt-core PRIVATE src/shapekey-sculpt.cpp)
 if(BUILD_TESTING)
+  add_executable(dome-sculpt-shapekey-grid-fixture tests/shapekey-grid-fixture.cpp)
+  target_link_libraries(dome-sculpt-shapekey-grid-fixture PRIVATE dome-sculpt-core)
   add_executable(dome-sculpt-shapekey-sculpt-test tests/shapekey-sculpt.cpp)
   target_include_directories(dome-sculpt-shapekey-sculpt-test PRIVATE src third_party/cgltf)
   target_link_libraries(dome-sculpt-shapekey-sculpt-test PRIVATE dome-sculpt-core)

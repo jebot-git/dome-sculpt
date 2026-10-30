@@ -1,0 +1,44 @@
+{
+  "product_source": "cc36463c2e50a8be419b27aa6a10aa651a6df80d",
+  "suites": 11,
+  "seconds": 83.75,
+  "log": "artifacts/tests-shapekey-strokes-sanitize.log",
+  "scope": "fresh own C/C++ core and listed native support, selected native tests; UI OFF / XR configured ON",
+  "instrumented_frontend_renderer_loader": false,
+  "flags": {
+    "dome-sculpt-core": [
+      "C_FLAGS = -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "CXX_FLAGS = -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -Wall -Wextra -Wpedantic"
+    ],
+    "dome-sculpt-polygon": [
+      "CXX_FLAGS = -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20 -Wall -Wextra -Wpedantic"
+    ],
+    "xatlas": [
+      "CXX_FLAGS = -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -std=gnu++20"
+    ],
+    "ufbx": [
+      "C_FLAGS = -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+    ],
+    "mikktspace": [
+      "C_FLAGS = -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+    ],
+    "mikktspace-robust": [
+      "C_FLAGS = -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+    ]
+  },
+  "artifact_sha256": {
+    "libdome-sculpt-core.a": "436b4be8abbf12957ecf4b84d0166eb564fc88e0b3073808fe4fbbe76c96be82",
+    "libdome-sculpt-polygon.a": "2a245eb331b5d065b9b98778aa8f6d3a2f80201f673a868302f91c967e58a22a",
+    "libxatlas.a": "2668e983a5665b9085c533ea3a452ecdca36d68253e52e49360893adefa44694",
+    "libufbx.a": "eee536fb047d9a4382c087b60e3d3106adedbe7ce30e3e2939c24627ef0f2d82",
+    "libmikktspace.a": "e0b5245b2d413a9dc224a3732465840f0426c52da78486d21d63840bf501c442",
+    "libmikktspace-robust.a": "1e864fc679466e3dd1eab3ea4fef108a011d29c5b629eab175dab72829c29805",
+    "dome-sculpt-shapekey-strokes-test": "bef5b8c70023a05034519e3c7569625d025934ea8f86831493918597c314efd7",
+    "dome-sculpt-shapekey-sculpt-test": "65fa52bc9636d5a86b8603ab9e5c97d128ae79cd964182775ce22cd8b8c25de4",
+    "dome-sculpt-shapekey-faults-test": "cea50d27721ee5b834e1e57f935b85583a0f0f92dbb2305972fdcd2b3384ccfb"
+  },
+  "native_worker_catch_OOM": "separate agent branch; not claimed by this gate",
+  "all_binary_material_denial_paths": "not claimed; separate JSON factory/promotion source fixes remain outside exact cc source",
+  "physical_device": false,
+  "system_installation": false
+}
