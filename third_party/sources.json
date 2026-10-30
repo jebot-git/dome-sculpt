@@ -89,8 +89,9 @@
     "third_party/wings/auv_placement.erl.reference": "5655cdac8b2d7368ca5e0a0100ed59857e5f4883c0f0701e7efbe46903f74264",
     "third_party/wings/license.terms": "0bd697a5f57b02fe3b70f68da29d256ac027a43c371f153e9de19ce6b67f19d7",
     "third_party/mikktspace/mikktspace.h": "17fc433894f24c73753d548086cc4d8c5c0379f4a6edfb98b5da243e4f0bc3d0",
-    "third_party/mikktspace/mikktspace.c": "8c6710b29f4e783ae2c2091b6eabb9ade8f1dc74b847686aab404fd502155c6b",
-    "third_party/mikktspace/0001-defined-seed-rotate.patch": "c5349269bf6fbb6c7a257f870872912676712ad5b6f499559406a40e09f60e5c"
+    "third_party/mikktspace/mikktspace.c": "ce57892bc90a4974b0eedd582a5ed75a54c2b1cad681c278158c49faa877b62f",
+    "third_party/mikktspace/0001-defined-seed-rotate.patch": "c5349269bf6fbb6c7a257f870872912676712ad5b6f499559406a40e09f60e5c",
+    "third_party/mikktspace/0002-retry-acute-corner-angles.patch": "0e24c04da792355ff5a513fe064bc3c062f6b2b36a40b7144ce7ce5bb78fa799"
   },
   "cgltf": {
     "repository": "https://github.com/jkuhlmann/cgltf",
@@ -225,7 +226,7 @@
     "repository": "https://github.com/mmikk/MikkTSpace",
     "commit": "3e895b49d05ea07e4c2133156cfa94369e19e409",
     "license": "Zlib (notices retained in both source files)",
-    "used": "Canonical native per-corner tangent frames for baking, baked-map UV transfer, preview and glTF consumer consistency; upstream header unchanged; C implementation carries the marked zero-bit seed-rotation correction recorded here.",
+    "used": "Canonical native per-corner tangent frames for baking, baked-map UV transfer, preview and glTF consumer consistency; upstream header unchanged; C implementation carries the marked zero-bit seed-rotation correction recorded here. A separately named conditional retry recovers acute-angle precision only after the normal upstream generation returned invalid frames; ordinary valid results remain bit-identical.",
     "upstream_sha256": {
       "mikktspace.c": "de87e74107df766ce68108801262bd8d53899414236b59810509a8fc2a51e288",
       "mikktspace.h": "17fc433894f24c73753d548086cc4d8c5c0379f4a6edfb98b5da243e4f0bc3d0"
@@ -235,6 +236,11 @@
         "file": "third_party/mikktspace/0001-defined-seed-rotate.patch",
         "sha256": "c5349269bf6fbb6c7a257f870872912676712ad5b6f499559406a40e09f60e5c",
         "reason": "Define both zero-bit quicksort seed rotations; upstream shifts a 32-bit unsigned value by 32 when t=0 (UBSan)."
+      },
+      {
+        "file": "third_party/mikktspace/0002-retry-acute-corner-angles.patch",
+        "sha256": "0e24c04da792355ff5a513fe064bc3c062f6b2b36a40b7144ce7ce5bb78fa799",
+        "reason": "Conditional double atan2(cross,dot) recovery only where an acute projected corner angle rounded to zero; default upstream symbols retain their original algorithm."
       }
     ]
   },

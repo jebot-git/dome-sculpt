@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/mesh.hpp"
 #include "atlas-detail.hpp"
+#include "uv-overlap.hpp"
 #include "xatlas.h"
 #include <memory>
 namespace dome {
@@ -115,7 +116,20 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
     }
     return std::abs(paint_uv_area(uv[0],uv[1],uv[2]))<safe_area;
   };
+  auto separate_overlaps=[&](float scale,float offset) {
+    std::vector<std::array<float,2>> transformed;
+    std::span<const std::array<float,2>> coordinates=output.uv;
+    if(scale!=1||offset!=0){transformed=output.uv;for(auto &uv:transformed)uv[0]=offset+uv[0]*scale;coordinates=transformed;}
+    auto area=[&](uint32_t f){auto a=coordinates[output.indices[f*3]],b=coordinates[output.indices[f*3+1]],c=coordinates[output.indices[f*3+2]];
+      return std::abs((double(b[0])-a[0])*(double(c[1])-a[1])-(double(b[1])-a[1])*(double(c[0])-a[0]));};
+    detail::visit_uv_overlaps(output,coordinates,[&](uint32_t f){return separate[f]!=0;},[&](uint32_t a,uint32_t b){
+      // Promote one colliding face at a time, preferring the smallest footprint.
+      // No vertex is moved in its old chart, so adjacent faces cannot fold.
+      auto chosen=area(a)<area(b)?a:b;if(!separate[chosen]){separate[chosen]=1;++separated;}return true;
+    });
+  };
   for(size_t face=0;face<faces;++face)if(invalid(face,1)){separate[face]=1;++separated;}
+  separate_overlaps(1,0);
   if(separated) {
     const size_t initial=separated;
     // The later affine U compression must not shrink existing chart padding.
@@ -129,6 +143,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
     // vertex references across the repack.
     generated=&atlas->meshes[0];output=read_output();std::fill(separate.begin(),separate.end(),0);separated=0;
     for(size_t face=0;face<faces;++face)if(invalid(face,1)){separate[face]=1;++separated;}
+  separate_overlaps(1,0);
   }
   uint32_t band=0, columns=0;
   const uint32_t gutter=padding+1, side=4, cell=side+2*gutter;
@@ -157,6 +172,7 @@ AtlasInfo detail::unwrap_atlas(Mesh &mesh, uint32_t resolution, uint32_t padding
       band=columns*cell;u_offset=float(double(gutter)/atlas->width);u_scale=float(double(atlas->width-band-2*gutter)/atlas->width);
       const size_t previous=separated;
       for(size_t face=0;face<faces;++face)if(!separate[face] && invalid(face,u_scale,u_offset)){separate[face]=1;++separated;}
+      separate_overlaps(u_scale,u_offset);
       if(separated==previous || separated<=size_t(columns)*rows){stable=true;break;}
     }
     if(!stable)throw std::length_error("Atlas small-face promotion exceeded its bounded packing passes");

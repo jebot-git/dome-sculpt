@@ -4,6 +4,7 @@
 // Original permissive notice: third_party/wings/license.terms.
 #include "dome/uv.hpp"
 #include "dome/uv-solve.hpp"
+#include "uv-overlap.hpp"
 #include <bit>
 #include <map>
 #include <numeric>
@@ -39,43 +40,7 @@ struct Dsu {
       p[std::max(a, b)] = std::min(a, b);
   }
 };
-bool overlap(const Mesh &m, uint32_t f, uint32_t g) {
-  using D = std::array<double, 2>;
-  auto point = [&](uint32_t face, int k) {
-    auto p = m.uv[m.indices[face * 3 + k]];
-    return D{p[0], p[1]};
-  };
-  auto cross = [](D a, D b, D c) {
-    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-  };
-  std::vector<D> poly{point(f, 0), point(f, 1), point(f, 2)};
-  D b[] = {point(g, 0), point(g, 1), point(g, 2)};
-  double tolerance =
-      std::max(1e-16, std::min(std::abs(cross(poly[0], poly[1], poly[2])),
-                               std::abs(cross(b[0], b[1], b[2]))) *
-                          1e-9);
-  double sign = cross(b[0], b[1], b[2]) > 0 ? 1 : -1;
-  for (int k = 0; k < 3 && !poly.empty(); ++k) {
-    std::vector<D> out;
-    for (size_t i = 0; i < poly.size(); ++i) {
-      auto a = poly[i], c = poly[(i + 1) % poly.size()];
-      double da = sign * cross(b[k], b[(k + 1) % 3], a),
-             dc = sign * cross(b[k], b[(k + 1) % 3], c);
-      if (da >= 0)
-        out.push_back(a);
-      if ((da < 0) != (dc < 0)) {
-        double t = da / (da - dc);
-        out.push_back({a[0] + (c[0] - a[0]) * t, a[1] + (c[1] - a[1]) * t});
-      }
-    }
-    poly = std::move(out);
-  }
-  double sum = 0;
-  for (size_t i = 0; i < poly.size(); ++i)
-    sum += poly[i][0] * poly[(i + 1) % poly.size()][1] -
-           poly[i][1] * poly[(i + 1) % poly.size()][0];
-  return std::abs(sum) > tolerance;
-}
+
 } // namespace
 UvTopology::UvTopology(const Mesh &m)
     : UvTopology(m, {}, SIZE_MAX) {}
@@ -160,36 +125,13 @@ std::string validate_uv(const Mesh &m, const std::function<bool()> &cancelled) {
   for (auto p : m.uv)
     if (p[0] < 0 || p[0] > 1 || p[1] < 0 || p[1] > 1)
       return "UVs must stay inside the texture tile";
-  constexpr int grid = 64;
-  std::vector<std::vector<uint32_t>> buckets(grid * grid);
-  for (uint32_t f = 0; f < m.indices.size() / 3; ++f) {
-    if (cancelled && cancelled())
-      throw std::runtime_error("UV validation cancelled");
-    P p[3];
-    for (int k = 0; k < 3; ++k)
-      p[k] = m.uv[m.indices[f * 3 + k]];
-    if (std::abs(area(p[0], p[1], p[2])) < 1e-12)
-      return "A UV triangle is collapsed";
-    int x0 = std::clamp(int(std::min({p[0][0], p[1][0], p[2][0]}) * grid), 0,
-                        grid - 1),
-        x1 = std::clamp(int(std::max({p[0][0], p[1][0], p[2][0]}) * grid), 0,
-                        grid - 1);
-    int y0 = std::clamp(int(std::min({p[0][1], p[1][1], p[2][1]}) * grid), 0,
-                        grid - 1),
-        y1 = std::clamp(int(std::max({p[0][1], p[1][1], p[2][1]}) * grid), 0,
-                        grid - 1);
-    std::set<uint32_t> visited;
-    for (int y = y0; y <= y1; ++y)
-      for (int x = x0; x <= x1; ++x) {
-        if (cancelled && cancelled())
-          throw std::runtime_error("UV validation cancelled");
-        auto &bucket = buckets[y * grid + x];
-        for (auto g : bucket)
-          if (visited.insert(g).second && overlap(m, f, g))
-            return "UV triangles overlap; move or repack the islands";
-        bucket.push_back(f);
-      }
+  for(size_t f=0;f<m.indices.size()/3;++f) {
+    if(cancelled&&cancelled())throw std::runtime_error("UV validation cancelled");
+    P p[3];for(int k=0;k<3;++k)p[k]=m.uv[m.indices[f*3+k]];
+    if(std::abs(area(p[0],p[1],p[2]))<1e-12)return "A UV triangle is collapsed";
   }
+  if(!detail::visit_uv_overlaps(m,m.uv,[](uint32_t){return false;},[](uint32_t,uint32_t){return false;},cancelled))
+    return "UV triangles overlap; move or repack the islands";
   return {};
 }
 UvWorkspace::UvWorkspace(std::shared_ptr<const Mesh> source, uint32_t resolution)
