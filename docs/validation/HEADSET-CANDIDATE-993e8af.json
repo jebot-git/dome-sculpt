@@ -1,0 +1,71 @@
+{
+  "recorded_utc": "2026-10-30T22:53:38.872139+00:00",
+  "source": "993e8af7ebc247e3239df3a1acd27fc47fb8e999",
+  "branch": "work/production-authoring-c1",
+  "worktree": "artifacts/production-authoring-c1",
+  "binary_sha256": "ead71b45608b54f29161df957d38ada2e546de6883c5c92def0a8f2ca2641002",
+  "designation": "viable candidate for further implementation",
+  "user_result": "pass",
+  "user_statement": "Test passes, record as viable candidate for further implementation, keep paused",
+  "goal_status": "paused",
+  "production_complete": false,
+  "combined_sources_published": false,
+  "regressions": [
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/tests-production-authoring-final.xml",
+      "sha256": "6011db81a8b00a523efc6433024de8cf868ec9cefb0c7281f9e90e7335368cb6",
+      "passed": 247,
+      "failed": 0,
+      "seconds": 383.34,
+      "scope": "coherent optimized Release all configured CPU suites"
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/tests-production-authoring-sanitize-final.xml",
+      "sha256": "8d97033cd5e5e12cb6c64a761e046ec244676c0c8d5331f9d62cde568a94869c",
+      "passed": 24,
+      "failed": 0,
+      "seconds": 41.83,
+      "scope": "selected own core/render/support; no instrumented frontend or physical headset claim"
+    }
+  ],
+  "headset": {
+    "runtime": "/usr/local/share/openxr/1/openxr_wivrn_pro.json",
+    "runtime_library": "/usr/local/lib64/wivrn/libopenxr_wivrn.so",
+    "gpu": "Intel Arc A770",
+    "pci": "0000:03:00.0",
+    "reference_space": "STAGE",
+    "controller_profile": "/interaction_profiles/facebook/touch_controller_pro",
+    "frames": 129756,
+    "stereo_submissions": 129755,
+    "palette_frames": 64072,
+    "tracked_left": 129755,
+    "tracked_right": 129717,
+    "scope": "user-reported passing candidate test; no per-requirement production acceptance inferred"
+  },
+  "end": {
+    "user_requested": true,
+    "method": "SIGTERM via pidfd to recorded candidate only",
+    "terminal": true,
+    "utc": "2026-10-30T22:53:02.921710+00:00"
+  },
+  "session": {
+    "directory": "/home/blux/.local/state/dome-sculpt/headset-tests/20261030-232856-993e8af",
+    "save": "/home/blux/.local/state/dome-sculpt/headset-tests/20261030-232856-993e8af/Sculpt.dsculpt",
+    "save_bytes": 130990125,
+    "save_sha256": "f0d7599d89be30ad31cc4fa921a1897cd5c6bb9ada35336043513abfe66b6c42",
+    "save_reopened": false,
+    "application_log_sha256": "25e551004ef8ac2c7b68d1eee2757a0e1f6c1569104b41a5902833988afd200b",
+    "launch_receipt_sha256": "795013428a2cf4abaf8ecbce6f2367905871774b1e217e27ddf50d4e5acd764f"
+  },
+  "system_installation": false,
+  "session_restart": false,
+  "resume_checkpoints": {
+    "held_contact": "257f36871233bbeb9b28e44055f3a7f3984175a3; merged candidate",
+    "normal_scene15": "f758970a43da83bf43f63404dc754a5581aadcb5; merged candidate",
+    "color_scene14": "84601fe3acc39fbcc6ed757c373959446dadc62e; merged candidate",
+    "authored_shape_consumers": "0c6de7e28341a20dc0aacb3ec29f2c2c27565ab0; proof only; private",
+    "prepared_normal_shape_handoff": "7a66e71693a8f3292eac86c872d8ecd0f1d5e72b; adapter unfinished",
+    "import_source_chain": "0b65130542e0d80009d71bd2278f2ba511830ca9; WIP unqualified render quality; private",
+    "corner_cut": "91aa08cea8981206ed13a88b3d1a5339ffbfbc13; WIP native guards retained; private"
+  }
+}
