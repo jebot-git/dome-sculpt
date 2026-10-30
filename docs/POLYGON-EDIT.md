@@ -195,3 +195,16 @@ Release passes in0.05s. These are synthetic exact-witness consumer tests; the
 combined current native-adapter path, Scene12 retained-origin codec, paint/rig
 conversion, FLTK controls and actual XR workflow still require integration and
 validation. The helper alone does not authorize loss of source attributes.
+
+The subsequent fresh `97b28e3` holding/import union passes all eight polygon
+suites in1.26s Release and15.32s with complete own C/C++ core/support/render
+ASan/UBSan/leak instrumentation. The additional actual native adapter consumer
+passes6 checks: folded adjacent OBJ quads, authored hard/UV seams,1000mm metric
+coordinates, exact raw source/committed Scene, and deterministic Scene11 restart.
+This found and fixed a genuine mesh-instance lookup error: PreserveGltf's
+mesh-local primitive has `source_node=-1`, while the appearance identifies its
+instance node. Lookup now verifies exact mesh/primitive identity and that the
+instance node references that mesh. Missing identities refuse explicitly. This
+is import/model integration evidence; Document polygon controls and Scene12
+adoption are still pending. Earlier rendering hardware evidence remains scoped
+to the frozen `eab141d` binary rather than this subsequent union.

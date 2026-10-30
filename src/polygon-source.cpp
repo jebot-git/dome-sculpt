@@ -77,12 +77,21 @@ prepare_polygon_topology(const Mesh &rest, const CreatorAppearance *appearance,
       budget.visit();
       if (candidate.source_mesh == appearance->source_mesh &&
           candidate.source_primitive == appearance->source_primitive &&
-          candidate.source_node == appearance->source_node) {
+          (candidate.source_node == appearance->source_node ||
+           (candidate.source_node < 0 && candidate.mesh_local &&
+            appearance->source_node >= 0 &&
+            size_t(appearance->source_node) < appearance->asset->nodes.size() &&
+            appearance->asset->nodes[appearance->source_node].mesh ==
+                appearance->source_mesh))) {
         if (primitive)
           throw std::invalid_argument("Ambiguous original polygon primitive");
         primitive = &candidate;
       }
     }
+  if (appearance && appearance->asset && appearance->source_mesh >= 0 &&
+      appearance->source_primitive >= 0 && !primitive)
+    throw std::invalid_argument(
+        "Original polygon primitive identity is unavailable");
   polygon_source_detail::Metadata extras;
   if (primitive && !primitive->extras_json.empty()) {
     if (primitive->extras_json.size() > 64 * 1024 * 1024)
