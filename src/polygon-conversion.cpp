@@ -7,6 +7,7 @@
 #include "dome/polygon-source.hpp"
 #include "dome/source-maps.hpp"
 #include "polygon-paint.hpp"
+#include "dome/source-placement.hpp"
 #include <map>
 namespace dome {
 namespace {
@@ -108,7 +109,8 @@ converted_material(const SculptObject &source,
   return binding;
 }
 std::shared_ptr<const PolygonOrigin> capture_origin(const SculptObject &source,
-                                                    CanvasTransform world) {
+                                                    CanvasTransform world,
+                                                    std::shared_ptr<const SourcePlacementCapsule> placement={}) {
   auto origin = std::make_shared<PolygonOrigin>();
   origin->volume =
       std::make_shared<const Volume>(source.volume->geometry_snapshot());
@@ -124,6 +126,7 @@ std::shared_ptr<const PolygonOrigin> capture_origin(const SculptObject &source,
   origin->polygon = source.polygon;
   origin->mesh_active = source.mesh_active;
   origin->world_transform = world;
+  origin->placement=std::move(placement);
   origin->name = source.name;
   origin->source_object = source.id;
   return origin;
@@ -132,6 +135,15 @@ std::shared_ptr<const PolygonOrigin> capture_origin(const SculptObject &source,
 std::shared_ptr<const PolygonOrigin>
 capture_polygon_origin(const SculptObject &source, CanvasTransform world) {
   return capture_origin(source, world);
+}
+std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const SculptObject &source,CanvasTransform world,
+    std::shared_ptr<const SourcePlacementCapsule> placement) {
+  return capture_origin(source,world,std::move(placement));
+}
+std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const Scene &scene,uint64_t id) {
+  auto placement=capture_source_placement(scene,id);
+  const auto world=placement?CanvasTransform{}:scene.world_transform(id);
+  return capture_origin(scene.object(id),world,std::move(placement));
 }
 struct PolygonConversionAccess {
   static PolygonMesh evaluated(const PolygonMesh &source, const Mesh &rest,
@@ -259,6 +271,7 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
       current.appearance != original.appearance ||
       current.material_bindings != original.material_bindings ||
       current.polygon != original.polygon ||
+      current.affine_edit != original.affine_edit ||
       bool(current.painted) != bool(original.painted) ||
       (current.painted &&
        (current.painted->mesh_owner() != original.painted->mesh_owner() ||
@@ -279,7 +292,7 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
   authority->origin = original.polygon && original.polygon->active &&
                               !conversion && original.polygon->origin
                           ? original.polygon->origin
-                          : capture_origin(original, original_world);
+                          : capture_origin(original, original_world,capture_source_placement(scene,id));
   auto result = scene;
   auto &target = result.object(id);
   if (!input.faces().empty()) {
@@ -306,7 +319,7 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
     // An empty active authority has no paint derivative. Retain the complete
     // latest paint/rig/source in a new bounded origin whose prior authority
     // still retains the first original; never leave a stale Volume fallback.
-    authority->origin = capture_origin(current, scene.world_transform(id));
+    authority->origin = capture_polygon_origin(scene,id);
     target.mesh_active = false;
     target.painted.reset();
     target.deformation.reset();
