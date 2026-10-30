@@ -10,6 +10,7 @@
 #include "render-mtoon.hpp"
 #include "render-target.hpp"
 #include "render-source-pack.hpp"
+#include "render-buffer-size.hpp"
 #include <chrono>
 #include <unordered_set>
 namespace dome {
@@ -56,6 +57,12 @@ Mat4 projection(float l, float r, float b, float t, float n, float f) {
           0};
 }
 namespace {
+void check_surface_buffer(const char *operation) {
+  const GLenum error = glGetError();
+  if (error == GL_NO_ERROR) return;
+  while (glGetError() != GL_NO_ERROR) {}
+  throw std::runtime_error(std::string(operation)+" (GL error "+std::to_string(error)+")");
+}
 GLuint shader(GLenum kind, const char *text) {
   GLuint s = glCreateShader(kind);
   glShaderSource(s, 1, &text, nullptr);
@@ -126,7 +133,6 @@ struct SurfaceRenderer::TextureState {
   void prepare(const MeshSnapshot&mesh,bool geometry_changed){
     if(geometry_changed && (!mesh.mesh.positions.empty() || !mesh.mesh.indices.empty()))mesh.mesh.validate();
     const auto count=mesh.mesh.positions.size();
-    if(count>2'000'000 || mesh.mesh.indices.size()>6'000'000)throw std::length_error("Frame renderer geometry exceeds native bounds");
     auto normals_valid=[&](const std::vector<Vec3> &values){
       if(!values.empty() && values.size()!=count)throw std::invalid_argument("Retained normal frame size differs from geometry");
       if(geometry_changed)for(auto v:values){float n=length(v);if(!finite(v)||!std::isfinite(n)||n<1e-8f)throw std::invalid_argument("Retained normal frame direction is invalid");}
@@ -450,9 +456,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       };
       struct FrameVertex {Vec3 source_n,canonical_n;std::array<float,4> source_t;};
       const bool has_frames=!mesh->source_normals.empty() || !mesh->canonical_normals.empty() || !mesh->source_tangents.empty();
-      const size_t vertex_bytes=count*sizeof(Vertex),frame_bytes=has_frames?count*sizeof(FrameVertex):0;
-      const size_t index_bytes=mesh->mesh.indices.size()*sizeof(uint32_t),scalar_bytes=(mesh->selected_weights.size()+mesh->sculpt_masks.size())*sizeof(float);
-      if(vertex_bytes+frame_bytes+index_bytes+scalar_bytes>256*1024*1024)throw std::length_error("Surface geometry and scalar buffers exceed256MiB GPU budget");
+      const size_t vertex_bytes=render_detail::buffer_bytes(count,sizeof(Vertex));
+      const size_t frame_bytes=has_frames?render_detail::buffer_bytes(count,sizeof(FrameVertex)):0;
+      const size_t geometry_bytes=render_detail::buffer_sum(vertex_bytes,frame_bytes);
+      const size_t index_bytes=render_detail::buffer_bytes(mesh->mesh.indices.size(),sizeof(uint32_t));
       std::vector<Vertex> vertices;
       vertices.reserve(count);
       for(size_t i=0;i<count;++i)
@@ -469,10 +476,12 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
           mesh->source_normals.empty()?mesh->mesh.normals[i]:mesh->source_normals[i],
           mesh->canonical_normals.empty()?mesh->mesh.normals[i]:mesh->canonical_normals[i],
           mesh->source_tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->source_tangents[i]});
-        glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes+frame_bytes),nullptr,GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(geometry_bytes),nullptr,GL_STATIC_DRAW);
+        check_surface_buffer("Surface geometry buffer allocation failed");
         if(vertex_bytes)glBufferSubData(GL_ARRAY_BUFFER,0,GLsizeiptr(vertex_bytes),vertices.data());
         if(frame_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(vertex_bytes),GLsizeiptr(frame_bytes),frames.data());
       } else glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes),vertices.data(),GL_STATIC_DRAW);
+      check_surface_buffer("Surface vertex buffer upload failed");
       glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),nullptr);glEnableVertexAttribArray(0);
       glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,n)));glEnableVertexAttribArray(1);
       glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv)));glEnableVertexAttribArray(2);
@@ -484,21 +493,24 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         glVertexAttribPointer(9,3,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,canonical_n)));glEnableVertexAttribArray(9);
       } else for(GLuint attribute:{7,8,9})glDisableVertexAttribArray(attribute);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices_);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(mesh->mesh.indices.size()*sizeof(uint32_t)),mesh->mesh.indices.data(),GL_STATIC_DRAW);
-      buffers_.vertex_bytes=vertex_bytes+frame_bytes;
-      buffers_.index_bytes=mesh->mesh.indices.size()*sizeof(uint32_t);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(index_bytes),mesh->mesh.indices.data(),GL_STATIC_DRAW);
+      check_surface_buffer("Surface index buffer upload failed");
+      buffers_.vertex_bytes=geometry_bytes;
+      buffers_.index_bytes=index_bytes;
       ++buffers_.geometry_uploads;
     }
     auto scalar=[&](GLuint buffer,GLuint attribute,const std::vector<float>&values,size_t&bytes,uint64_t&uploads) {
       if(values.empty()) {
         glDisableVertexAttribArray(attribute);
-        if(bytes){glBindBuffer(GL_ARRAY_BUFFER,buffer);glBufferData(GL_ARRAY_BUFFER,0,nullptr,GL_DYNAMIC_DRAW);}
+        if(bytes){glBindBuffer(GL_ARRAY_BUFFER,buffer);glBufferData(GL_ARRAY_BUFFER,0,nullptr,GL_DYNAMIC_DRAW);check_surface_buffer("Surface scalar buffer release failed");}
         bytes=0;return;
       }
       glBindBuffer(GL_ARRAY_BUFFER,buffer);
-      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(values.size()*sizeof(float)),values.data(),GL_DYNAMIC_DRAW);
+      const size_t scalar_bytes=render_detail::buffer_bytes(values.size(),sizeof(float));
+      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(scalar_bytes),values.data(),GL_DYNAMIC_DRAW);
+      check_surface_buffer("Surface scalar buffer upload failed");
       glVertexAttribPointer(attribute,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);glEnableVertexAttribArray(attribute);
-      bytes=values.size()*sizeof(float);++uploads;
+      bytes=scalar_bytes;++uploads;
     };
     scalar(weights_,4,mesh->selected_weights,buffers_.weight_bytes,buffers_.weight_uploads);
     scalar(masks_,6,mesh->sculpt_masks,buffers_.mask_bytes,buffers_.mask_uploads);

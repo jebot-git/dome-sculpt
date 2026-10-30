@@ -17,6 +17,7 @@
 #include <numeric>
 #include <unordered_map>
 #include <unordered_set>
+#include <limits>
 namespace dome {
 namespace {
 ob::Vec3 obv(Vec3 p) { return {p.x, p.y, p.z}; }
@@ -1369,7 +1370,10 @@ void Document::mesh_loop() {
         auto world = o.world_transform();
         size_t offset = snapshot->mesh.positions.size(), first = snapshot->mesh.indices.size();
         const size_t packed_vertices=retained_layout?retained_layout->vertices.size():canonical?o.mesh.indices.size():o.mesh.positions.size();
-        if(offset>2'000'000 || packed_vertices>2'000'000-offset || first>6'000'000 || o.mesh.indices.size()>6'000'000-first)throw std::length_error("Packed surface preview exceeds native renderer geometry limits");
+        if(packed_vertices>std::numeric_limits<size_t>::max()-offset ||
+           (packed_vertices && offset+packed_vertices-1>std::numeric_limits<uint32_t>::max()) ||
+           o.mesh.indices.size()>std::numeric_limits<size_t>::max()-first)
+          throw std::length_error("Packed surface preview exceeds index or container address range");
         bool selected = std::find(weighted.begin(), weighted.end(), o.id) != weighted.end();
         if(retained && canonical && retained_pose->tangents[2].empty())
           throw std::invalid_argument("Baked normal detail requires a complete canonical preview basis");
@@ -1432,7 +1436,7 @@ void Document::mesh_loop() {
           }
           if (expanded) appearance = std::move(expanded);
         } else {
-          for (uint32_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(vertex, {1,0,0,1});
+          for (size_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(uint32_t(vertex), {1,0,0,1});
           for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty())});
