@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "volume-raycast.hpp"
+#include "ray-index.hpp"
 #include <algorithm>
 #include <array>
 #include <limits>
@@ -43,12 +44,14 @@ std::optional<double> first_crossing(const std::array<double,4> &c) {
   return {};
 }
 }
-std::optional<Vec3> raycast_field(const Volume &field,Vec3 origin,Vec3 direction,float maximum) {
+std::optional<Vec3> raycast_field(const Volume &field,Vec3 origin,Vec3 direction,float maximum,const std::function<bool()> &cancelled) {
   float magnitude=length(direction);
   if(!finite(origin) || !finite(direction) || !std::isfinite(magnitude) || magnitude<1e-8f ||
       !std::isfinite(maximum) || maximum<=0 || maximum>1000 ||
       std::max({std::abs(origin.x),std::abs(origin.y),std::abs(origin.z)})+maximum>1000)
     throw std::invalid_argument("Invalid sculpt ray");
+  RayQueryScope query_scope;
+  if(cancelled&&cancelled())throw std::runtime_error("Sculpt ray cancelled");
   if(field.voxels().empty())return {};
   direction=direction/magnitude;
   const double voxel=field.voxel_size();
@@ -56,19 +59,26 @@ std::optional<Vec3> raycast_field(const Volume &field,Vec3 origin,Vec3 direction
   // positive tolerance. A narrow physical band must never make background a hit.
   const double threshold=std::min(voxel*.12,double(field.band())*.1);
   const double start[]={origin.x,origin.y,origin.z},ray[]={direction.x,direction.y,direction.z};
-  int cell[3],step[3];double boundary[3],delta[3];
-  for(int k=0;k<3;++k) {
-    double lattice=start[k]/voxel;cell[k]=int(std::floor(lattice));
+  const auto intervals=ray_intervals(field,start,ray,maximum,threshold,cancelled);
+  unsigned visited=0;
+  constexpr unsigned maximum_cells=20'000;
+  for(auto interval:intervals) {
+   int cell[3],step[3];double boundary[3],delta[3];
+   double begin=interval.begin;
+   for(int k=0;k<3;++k) {
+    double lattice=(start[k]+ray[k]*begin)/voxel;cell[k]=int(std::floor(lattice));
     step[k]=ray[k]>0?1:ray[k]<0?-1:0;
     if(step[k]<0 && lattice==cell[k])--cell[k];
-    if(!step[k]) {boundary[k]=delta[k]=INFINITY;continue;}
+    if(!step[k]){boundary[k]=delta[k]=INFINITY;continue;}
     boundary[k]=((double(cell[k])+(step[k]>0?1:0))*voxel-start[k])/ray[k];
     delta[k]=voxel/std::abs(ray[k]);
-  }
-  double begin=0;
-  constexpr unsigned maximum_cells=20'000;
-  for(unsigned visited=0;visited<maximum_cells;++visited) {
-    double end=std::min({double(maximum),boundary[0],boundary[1],boundary[2]});
+    while(boundary[k]<begin){cell[k]+=step[k];boundary[k]=((double(cell[k])+(step[k]>0?1:0))*voxel-start[k])/ray[k];}
+   }
+   for(;;) {
+    if(visited++>=maximum_cells)throw std::length_error("Sculpt ray exceeds the bounded grid traversal budget at this resolution");
+    if((visited&255)==0 && cancelled&&cancelled())throw std::runtime_error("Sculpt ray cancelled");
+    ray_cell_visited();
+    double end=std::min({interval.end,boundary[0],boundary[1],boundary[2]});
     if(end<begin)throw std::runtime_error("Sculpt ray grid traversal lost numeric ordering");
     std::array<double,8> distances{};double minimum=INFINITY;
     for(int z=0;z<2;++z)for(int y=0;y<2;++y)for(int x=0;x<2;++x) {
@@ -96,10 +106,12 @@ std::optional<Vec3> raycast_field(const Volume &field,Vec3 origin,Vec3 direction
         return Vec3{float(start[0]+ray[0]*t),float(start[1]+ray[1]*t),float(start[2]+ray[2]*t)};
       }
     }
-    if(end>=maximum)return {};
+    if(end>=interval.end)break;
     for(int k=0;k<3;++k)if(boundary[k]<=end){cell[k]+=step[k];boundary[k]+=delta[k];}
     begin=end;
   }
-  throw std::length_error("Sculpt ray exceeds the bounded grid traversal budget at this resolution");
+  }
+  return {};
 }
+std::optional<Vec3> raycast_field(const Volume &field,Vec3 origin,Vec3 direction,float maximum) {return raycast_field(field,origin,direction,maximum,{});}
 } // namespace dome::sculpt_detail

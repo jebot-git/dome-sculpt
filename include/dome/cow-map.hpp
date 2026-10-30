@@ -239,6 +239,32 @@ public:
     size_t size() const { return count_; }
     bool empty() const { return count_ == 0; }
     size_t retained_bytes() const { return sizeof(Storage) + 64 + bytes_; }
+    // Read-only page summaries for immutable geometry acceleration. No field
+    // flattening or page mutation; each individual reduction visits <=4096 values.
+    std::optional<Value> page_minimum(Key key) const {
+      const auto &s=shards_[bucket(key)];if(!s)return {};
+      auto found=s->pages.find(key);if(found==s->pages.end())return {};
+      Value result=std::numeric_limits<Value>::infinity();
+      const auto &page=*found->second;
+      for(auto i=page.next(0);i<4096;i=page.next(unsigned(i)+1)) {
+        auto value=*page.get(i);
+        if(!std::isfinite(value))return -std::numeric_limits<Value>::infinity();
+        result=std::min(result,value);
+      }
+      return result;
+    }
+    template<class F> void visit_pages(F &&visit) const {
+      for(const auto &s:shards_)if(s)for(const auto &[key,page]:s->pages)
+        visit(key,*page_minimum(key));
+    }
+    size_t ray_retained_bytes() const {
+      size_t pages=0,shards=0;
+      for(const auto&s:shards_)if(s){++shards;pages+=s->pages.size();}
+      // Conservative control-block/vector/node allowance in addition to the
+      // existing logical payload summary; computation is O(64), not O(samples).
+      return retained_bytes()+128+shards*128+pages*256;
+    }
+    size_t page_count() const {size_t n=0;for(const auto&s:shards_)if(s)n+=s->pages.size();return n;}
     std::shared_ptr<const void> page_owner(Key k) const {
       auto c = chunk(k);
       auto &s = shards_[bucket(c)];

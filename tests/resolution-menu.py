@@ -213,21 +213,33 @@ async def main():
         await command("Redo");check(canonical(await saved())==accepted,"Resolution redo restores exact worker result")
         editor=await open_options();image(editor).save(OUT / "resolution-current20.png");key("Escape");await close_options()
         check(canonical(await saved())==accepted,"Reopened resolution reflects persisted result and Escape discards draft")
-        # A very fine, nonempty source intentionally exceeds the bounded DDA
-        # ray budget from the desktop camera. This must be ordinary status,
+        # A dense low-corner corridor intentionally exceeds the bounded DDA
+        # candidate budget, even with empty-space skipping. This is ordinary status,
         # with its just-started gesture cancelled, rather than a modal alert.
         app.terminate();app.wait(timeout=8)
         subprocess.run([str(BUILD/"dome-sculpt-resolution-document-test"),"--ray-fixture",str(fixture)],check=True,env=env)
         ray_original=canonical(inspect())
-        app=subprocess.Popen([str(BUILD/"dome-sculpt"),str(fixture)],cwd=task_home,env=env,stdout=log,stderr=log);processes.append(app)
+        acknowledgement=Path(task_home,"ray-status-ack")
+        observer=BUILD/"dome-sculpt-status-observer.so"
+        assert observer.is_file(), "Build the test-only dome-sculpt-status-observer target"
+        ray_env={**env,"DOME_SCULPT_STATUS_ACK":str(acknowledgement),"LD_PRELOAD":str(observer)}
+        app=subprocess.Popen([str(BUILD/"dome-sculpt"),str(fixture)],cwd=task_home,env=ray_env,stdout=log,stderr=log);processes.append(app)
         window=await wait(lambda:named("Dome Sculpt"));window.set_input_focus(X.RevertToParent,X.CurrentTime);connection.sync()
         service=await wait(lambda:property_value("_KDE_NET_WM_APPMENU_SERVICE_NAME"));path=await wait(lambda:property_value("_KDE_NET_WM_APPMENU_OBJECT_PATH"))
         proxy=bus.get_proxy_object(service,path,await bus.introspect(service,path));menu=proxy.get_interface("com.canonical.dbusmenu")
         await enabled("Resolution...")
-        geometry=window.get_geometry();key("Shift_L",True);tap(window,geometry.width//2,geometry.height//2);key("Shift_L",False)
+        # Exported universal menu has zero local height; the canvas excludes
+        # the fixed28px status row. Its exact centre produces the proven axial ray.
+        geometry=window.get_geometry();ray_before=image(window)
+        geometry=window.get_geometry();key("Shift_L",True);tap(window,geometry.width//2,(geometry.height-28)//2);key("Shift_L",False)
+        expected_error="Sculpt ray exceeds the bounded grid traversal budget at this resolution"
+        await wait(lambda:acknowledgement.is_file() and expected_error in acknowledgement.read_text())
+        check(expected_error in acknowledgement.read_text(),"Actual native status publishes the precise candidate-cell exhaustion error")
         await asyncio.sleep(.25)
         check(len([w for w in connection.screen().root.query_tree().children if w.get_wm_name()])==1 and app.poll() is None,"Desktop ray budget exhaustion reports status without escaping to a modal alert")
-        image(window).save(OUT/"ray-budget-status.png")
+        ray_after=image(window);ray_after.save(OUT/"ray-budget-status.png")
+        status=(0,geometry.height-28,geometry.width,geometry.height)
+        check(ray_before.crop(status).tobytes()!=ray_after.crop(status).tobytes(),"Real candidate traversal exhaustion changes the native status line")
         check(canonical(await saved())==ray_original,"Ray budget cancellation preserves exact source and leaves native Save usable")
         connection.close()
     bus.disconnect()

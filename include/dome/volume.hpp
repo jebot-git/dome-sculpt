@@ -79,6 +79,8 @@ public:
   Vec3 gradient(Vec3 p) const;
   std::optional<Vec3> raycast(Vec3 origin, Vec3 direction,
                               float maximum = 20) const;
+  std::optional<Vec3> raycast(Vec3, Vec3, float maximum,
+                            const std::function<bool()> &cancelled) const;
   void begin_stroke();
   void stamp(Brush brush, size_t sample_budget = 4'000'000);
   void stamp(Brush, size_t sample_budget,

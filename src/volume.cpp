@@ -214,6 +214,9 @@ Vec3 Volume::gradient(Vec3 p) const {
 std::optional<Vec3> Volume::raycast(Vec3 origin,Vec3 direction,float maximum) const {
   return sculpt_detail::raycast_field(*this,origin,direction,maximum);
 }
+std::optional<Vec3> Volume::raycast(Vec3 origin,Vec3 direction,float maximum,const std::function<bool()> &cancelled) const {
+  return sculpt_detail::raycast_field(*this,origin,direction,maximum,cancelled);
+}
 
 void Volume::begin_stroke() {
   if (editing_)
