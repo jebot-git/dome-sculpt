@@ -24,7 +24,7 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
   return !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
-    !state_.object_grabbing && !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
+    !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
 void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
