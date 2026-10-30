@@ -290,7 +290,7 @@ void SpatialPalette::raster(const EditorState &s) {
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==id;});
         label=found==s.objects.end()?"No source":found->name+(found->visible?"":" [hidden]");
       }
-      else if(c.parameter==VrParameter::BakeColors){if(row==0)label=std::string("Prepare source colors: ")+(value>=.5f?"Yes":"No");else{char text[64];snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));label=text;}}
+      else if(c.parameter==VrParameter::BakeColors){if(row==0||row==2)label=std::string(row==0?"Prepare source colors: ":"Prepare normal attributes: ")+(value>=.5f?"Yes":"No");else{char text[96];if(row==1)snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));else snprintf(text,sizeof(text),"Maximum normal error %.2f deg",double(value)*.25*57.29577951308232);label=text;}}
       else if(c.parameter==VrParameter::BakeProjection)label=std::string(row==0?"Partial projection: ":"Backfaces: ")+(value>=.5f?"Allow":"Refuse");
       else if(c.parameter==VrParameter::BakeQuality)label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
       else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(value));label+=size;}

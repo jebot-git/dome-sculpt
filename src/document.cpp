@@ -1463,7 +1463,7 @@ void Document::mesh_loop() {
         auto colors=detail::prepared_color_state(o.material_bindings.get(),o.textures.get(),false)?std::vector<std::array<float,4>>{}:detail::source_vertex_colors(o.appearance.get(),o.mesh.positions.size(),cancelled);
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
-        const bool canonical=o.textures && !o.textures->normal.rgba.empty();
+        const bool canonical=o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
         // Existing bakes without captured canonical authority use the historical
         // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
         const bool dynamic_canonical=retained && canonical && !retained->canonical;
@@ -1918,7 +1918,7 @@ void Document::finish_control_locked(bool accept) {
     if(accept){
       if(c.parameter==VrParameter::BakeSource){auto ids=bake_sources_locked();state_.bake_source=ids.at(size_t(std::lround(c.value[0])));}
       else if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
-      else if(c.parameter==VrParameter::BakeColors){state_.bake_settings.prepare_colors=c.value[0]>=.5f;state_.bake_settings.color_error=c.value[1];}
+      else if(c.parameter==VrParameter::BakeColors){state_.bake_settings.prepare_colors=c.value[0]>=.5f;state_.bake_settings.color_error=c.value[1];state_.bake_settings.prepare_normals=c.value[2]>=.5f;state_.bake_settings.normal_error=c.value[3]*.25f;}
       else if(c.parameter==VrParameter::BakeProjection){state_.bake_settings.allow_partial=c.value[0]>=.5f;state_.bake_settings.allow_backfaces=c.value[1]>=.5f;}
       else {state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));}
     }
@@ -2111,8 +2111,8 @@ void Document::control_event_locked(VrControlEvent event) {
       for(int k=0;k<3;++k)c.value[k]=std::clamp(c.value[k],c.minimum,c.maximum);
       break;
     case VrParameter::BakeColors:
-      c.title="Color preparation / maximum error";c.components=2;
-      c.value={state_.bake_settings.prepare_colors?1.f:0.f,state_.bake_settings.color_error,0,0};break;
+      c.title="Color / normal preparation and maximum errors";c.components=4;
+      c.value={state_.bake_settings.prepare_colors?1.f:0.f,state_.bake_settings.color_error,state_.bake_settings.prepare_normals?1.f:0.f,state_.bake_settings.normal_error*4};break;
     case VrParameter::BakeProjection:
       c.title="Projection: partial / backfaces";c.components=2;
       c.value={state_.bake_settings.allow_partial?1.f:0.f,state_.bake_settings.allow_backfaces?1.f:0.f,0,0};break;

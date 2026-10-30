@@ -90,6 +90,10 @@ struct PolygonSceneBudget {
       add(paint_bytes, pbr.get_binary().size(), 256 * 1024 * 1024,
           "Scene retained baked PBR storage exceeded");
     }
+    if(p.contains("baked")&&p.at("baked").contains("mtoon_normal")){
+      const auto &bytes=p.at("baked").at("mtoon_normal");if(!bytes.is_binary())throw std::invalid_argument("Invalid retained prepared MToon normal buffer");
+      add(paint_bytes,bytes.get_binary().size(),256*1024*1024,"Scene retained normal bake storage exceeded");
+    }
   }
   void deformation(const nlohmann::json &d, unsigned version) {
     if (d.is_null())

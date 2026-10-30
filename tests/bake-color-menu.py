@@ -23,7 +23,8 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILD = Path(os.environ.get("DOME_SCULPT_TEST_BUILD",str(ROOT / "build")))
 COMPACT = os.environ.get("DOME_SCULPT_BAKE_COLOR_COMPACT") == "1"
 POLYGON = os.environ.get("DOME_SCULPT_BAKE_COLOR_POLYGON") == "1"
-OUT = ROOT / ("artifacts/menu-bake-color-" + ("polygon-" if POLYGON else "") + ("compact" if COMPACT else "workflow"))
+NORMAL = os.environ.get("DOME_SCULPT_BAKE_NORMAL") == "1"
+OUT = ROOT / ("artifacts/menu-bake-color-" + ("normal-" if NORMAL else "polygon-" if POLYGON else "") + ("compact" if COMPACT else "workflow"))
 OUT.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -67,7 +68,7 @@ async def main():
             config.parent.mkdir(parents=True,exist_ok=True)
             config.write_text(json.dumps({"font":"Unifont / Sans-Serif","font_size":16,"font_scale":2}))
         fixture = Path(task_home, "procedural.dsculpt")
-        helper = "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
+        helper = "dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
         subprocess.run([str(BUILD / helper), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
@@ -162,7 +163,7 @@ async def main():
             raise TimeoutError("Native command remained busy: " + label)
 
         def inspect():
-            return json.loads(subprocess.check_output([str(BUILD / "dome-sculpt-colored-bake-workflow-test"), "--inspect", str(fixture)], env=env))
+            return json.loads(subprocess.check_output([str(BUILD / ("dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-colored-bake-workflow-test")), "--inspect", str(fixture)], env=env))
 
         def enter(widget, y, text):
             geometry = widget.get_geometry()
@@ -196,6 +197,40 @@ async def main():
         original=canonical(inspect());editor=await open_options();nodes=await layout()
         check(editor.get_wm_transient_for().id==window.id and editor.get_wm_class()==window.get_wm_class() and not nodes["Bake surface..."][1].get("enabled"),"Color preparation options preserve native modal ownership and universal-menu isolation")
         image(editor).save(OUT/"color-options.png")
+        if NORMAL:
+            if COMPACT:
+                geometry=editor.get_geometry()
+                check(geometry.width<=600 and geometry.height<=320,"Double-size portable-normal options fit the compact desktop")
+                before=image(editor)
+                for _ in range(60):
+                    xtest.fake_input(connection,X.MotionNotify,x=geometry.x+12,y=geometry.y+70)
+                    xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5)
+                connection.sync();after=await settled_scroll(editor,before);after.save(OUT/"normal-options-bottom.png")
+                check(before.tobytes()!=after.tobytes(),"Compact scrolling reaches the new normal preparation controls with pinned actions")
+                key("Control_L",True);key("w");key("Control_L",False);await close_options()
+                check(canonical(inspect())==original,"Compact cancellation preserves exact native source, deformation and paint")
+                editor=await open_options()
+                for _ in range(13):key("Tab")
+                await asyncio.sleep(.2);image(editor).save(OUT/"normal-keyboard-focus.png")
+                key("space");key("Tab");key("Tab");key("space")
+            else:
+                key("Return");await close_options()
+                check(canonical(inspect())==original,"Default Return cancels portable normal choices without source mutation")
+                editor=await open_options();g=editor.get_geometry();tap(editor,40,450)
+                xtest.fake_input(connection,X.MotionNotify,x=g.x+300,y=g.y+486)
+                xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5);connection.sync()
+                await asyncio.sleep(.1);image(editor).save(OUT/"normal-opt-in.png")
+                tap(editor,g.width*.75,g.height-48)
+            await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"normal-bake-complete.png")
+            await command("Close Window");await close_options();await command("Save");accepted=canonical(inspect())
+            paint=accepted["objects"][0]["painted"]
+            check(accepted["version"]==15 and paint["baked"]["normal_interpretation"]=="prepared-attributes-v1" and "mtoon_normal" in paint["baked"],"Actual FLTK normal opt-in persists explicit Scene15 and paired native normal planes")
+            check(accepted["isolated_objects"][1:]==original["isolated_objects"][1:] and paint["layers"]==original["objects"][0]["painted"]["layers"],"Actual native normal preparation retains complete source objects and editable layers")
+            receipt=accepted["source_materials"]["normal_preparations"][0]["receipt"]
+            check(abs(receipt["accepted_angular_error"]-(.02 if COMPACT else .01975))<1e-6,"Visible degree-valued normal quality control persists its exact angular policy without offscreen wheel edits")
+            await command("Undo");await command("Save");check(canonical(inspect())==original,"One universal Undo restores exact pre-normal-conversion state")
+            await command("Redo");await command("Save");check(canonical(inspect())==accepted,"One universal Redo restores the complete explicit normal model and bake")
+            connection.close();bus.disconnect();return
         if COMPACT:
             geometry=editor.get_geometry();check(geometry.width<=600 and geometry.height<=320,"Double-size color preparation options fit640x360")
             before=image(editor)
@@ -207,9 +242,9 @@ async def main():
             key("Control_L",True);key("w");key("Control_L",False);await close_options()
             check(app.poll() is None and canonical(inspect())==original,"Compact Ctrl+W cancels color options and preserves all original data")
             editor=await open_options()
-            for _ in range(11):key("Tab")
+            for _ in range(12):key("Tab")
             await asyncio.sleep(.2);image(editor).save(OUT/"color-option-keyboard-focus.png")
-            key("space");key("Tab");key("Tab");key("space")
+            key("space");key("Tab");key("Tab");key("Tab");key("space")
             await wait(lambda:"complete" in str(editor.get_wm_name() or ""))
             geometry=editor.get_geometry();quality_before=image(editor)
             for _ in range(60):

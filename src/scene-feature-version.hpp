@@ -4,12 +4,13 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/color-preparation.hpp"
+#include "dome/normal-preparation.hpp"
+#include "dome/polygon-scene.hpp"
 #include <nlohmann/json.hpp>
 namespace dome { struct PolygonAuthority; }
 namespace dome::detail {
 // Scene12 is the first format owning complete polygon source histories. Its
 // bounded graph may retain all older frame/color/bind/source receipt features.
-inline unsigned minimum_scene_version(const PolygonAuthority *p) {return p?12u:0u;}
 inline unsigned minimum_scene_version(const DeformationState *d) {
   if (!d || !d->skeleton)
     return 0;
@@ -30,6 +31,16 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if(const auto &preparation=binding->color_preparation)
     result=std::max({result,10u,minimum_scene_version(preparation->original_deformation.get()),
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
+  if(const auto &preparation=binding->normal_preparation)
+    result=std::max({result,15u,minimum_scene_version(preparation->original_deformation.get()),
+      minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
+  return result;
+}
+inline unsigned minimum_scene_version(const PolygonAuthority *p) {
+  unsigned result=p?12u:0u;size_t depth=0;
+  while(p&&p->origin){if(++depth>256)throw std::invalid_argument("Polygon feature graph exceeds its bounded depth");const auto &origin=*p->origin;
+    result=std::max({result,minimum_scene_version(origin.deformation.get()),minimum_scene_version(origin.appearance.get()),minimum_scene_version(origin.material_bindings.get())});p=origin.polygon.get();
+  }
   return result;
 }
 inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {

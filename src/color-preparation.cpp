@@ -6,6 +6,7 @@
 #include "paint-color-access.hpp"
 #include "source-colors.hpp"
 #include "color-projection-quality.hpp"
+#include "source-paint-pairing.hpp"
 #include <mutex>
 namespace dome {
 namespace {
@@ -97,6 +98,7 @@ void SourceColorPreparation::validate(bool deep) const {
   // Cheap publications must enforce retained policy authority too. A current
   // object's unrelated PolygonAuthority cannot authenticate this before-binding.
   if(original_material)original_material->validate(deep);
+  detail::source_paint_pairing(original_paint.get(),original_material.get(),original_appearance.get(),deep);
   if(original_appearance && original_appearance->source_vertices.size()!=original_paint->mesh().positions.size())
     throw std::invalid_argument("Color preparation original appearance mapping differs");
   if(deep) {

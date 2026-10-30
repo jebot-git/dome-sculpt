@@ -60,8 +60,9 @@ std::string cut_mode(){auto mode=getenv("DOME_XR_FIXTURE_CUT");return mode?mode:
 unsigned cut_step=0;
 bool cut_preview_ready=false,cut_apply_ready=false;
 std::string mask_mode(){auto mode=getenv("DOME_XR_FIXTURE_SCULPT_MASK");return mode?mode:"";}
-bool bake_color_mode(){return getenv("DOME_XR_FIXTURE_BAKE_COLOR")!=nullptr;}
-std::string bake_policy_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE_POLICY");if(!mode)mode=getenv("DOME_XR_FIXTURE_BAKE_COLOR");return mode?mode:"";}
+bool bake_normal_mode(){return getenv("DOME_XR_FIXTURE_BAKE_NORMAL")!=nullptr;}
+bool bake_color_mode(){return getenv("DOME_XR_FIXTURE_BAKE_COLOR")!=nullptr||bake_normal_mode();}
+std::string bake_policy_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE_POLICY");if(!mode)mode=getenv("DOME_XR_FIXTURE_BAKE_COLOR");if(!mode)mode=getenv("DOME_XR_FIXTURE_BAKE_NORMAL");return mode?mode:"";}
 std::string procedural_mode(){auto mode=getenv("DOME_XR_FIXTURE_PROCEDURAL");return mode?mode:"";}
 std::string resolution_mode(){auto mode=getenv("DOME_XR_FIXTURE_RESOLUTION");return mode?mode:"";}
 std::string polygon_mode(){auto mode=getenv("DOME_XR_FIXTURE_POLYGON");return mode?mode:"";}
@@ -704,7 +705,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     if(button)report["mask_buttons"][std::to_string(step)]=bool(out->currentState);
   }
   if(auto mode=bake_policy_mode();!mode.empty()) {
-    out->currentState=button && (frame==8 || frame==10 || frame==12 || frame==14 || frame==16 || (mode!="focus" && frame==24));
+    out->currentState=button && (frame==8 || frame==10 || frame==12 || frame==14 || frame==16 || (mode!="focus" && (!bake_normal_mode()||mode=="accept") && frame==24));
     out->changedSinceLastSync=button;
   }
   if(!procedural_mode().empty()) {
@@ -1035,7 +1036,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if(auto mode=bake_policy_mode();!mode.empty() && s->action && right(s->hand)) {
     p->pose.position={0,1.48f,-.48f};
     if(s->action->name=="aim_pose" && (frame==18 || frame==20)) {
-      float x=520,y=240;if(frame==20){x=mode=="cancel"?170:470;y=609;}
+      float x=520,y=bake_normal_mode()?350:bake_color_mode()?210:240;if(frame==20){x=mode=="cancel"?170:470;y=609;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
   }

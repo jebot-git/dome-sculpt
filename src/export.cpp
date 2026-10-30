@@ -134,7 +134,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled);
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
-    if(frame)emission.canonical_normal=frame->canonical_normal;
+    if(frame){emission.canonical_normal=frame->canonical_normal;emission.prepared_normal=frame->prepared_normal;}
     auto &mesh = o.mesh;
     std::optional<SourceMorphTransport> source_attributes;
     if(!frame)source_attributes.emplace(o,source_space,cancelled);
@@ -497,10 +497,11 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     secondary_uv_available=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_1");
     const auto &maps=*objects[i].textures;
     const bool prepared_color=detail::prepared_color_state(objects[i].material_bindings.get(),&maps);
+    detail::prepared_normal_state(objects[i].material_bindings.get(),&maps);
     auto &material=j["materials"][i]; auto &pbr=material["pbrMetallicRoughness"];
     if(maps.source_only) {
       auto present=[](const Image &image){return image.width || image.height || !image.rgba.empty();};
-      if(!maps.source_maps || present(maps.color) || present(maps.metal_rough) || present(maps.emission) || present(maps.normal) || present(maps.color_coverage) || maps.baked_base || present(maps.baked_normal) || present(maps.baked_coverage) || present(maps.emission_coverage))
+      if(!maps.source_maps || present(maps.color) || present(maps.metal_rough) || present(maps.emission) || present(maps.normal) || present(maps.color_coverage) || maps.baked_base || present(maps.baked_normal) || present(maps.baked_coverage) || present(maps.emission_coverage)||present(maps.mtoon_normal)||maps.normal_projection)
         throw std::invalid_argument("Source-only textures require original bindings without derived images");
       const auto &source=*maps.source_maps; source.validate();
       if(source.color.image) pbr["baseColorTexture"]=source_info(source.color);

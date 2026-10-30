@@ -8,6 +8,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "render-mtoon.hpp"
+#include "normal-preparation-state.hpp"
 #include "render-target.hpp"
 #include "render-source-pack.hpp"
 #include "render-buffer-size.hpp"
@@ -183,7 +184,7 @@ struct SurfaceRenderer::TextureState {
         auto present=[](const Image &image){return image.width||image.height||!image.rgba.empty();};
         if(!maps->source_maps || maps->source_maps->empty() || maps->baked_base ||
            present(maps->color)||present(maps->metal_rough)||present(maps->emission)||present(maps->normal)||
-           present(maps->color_coverage)||present(maps->emission_coverage)||present(maps->baked_normal)||present(maps->baked_coverage))
+           present(maps->color_coverage)||present(maps->emission_coverage)||present(maps->baked_normal)||present(maps->baked_coverage)||present(maps->mtoon_normal)||maps->normal_projection)
           throw std::invalid_argument("Raw source preview marker contains derived material payload");
         maps->source_maps->validate();
       }
@@ -194,6 +195,7 @@ struct SurfaceRenderer::TextureState {
         wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true};
       };
       const bool prepared_color=detail::prepared_color_state(range.material_bindings.get(),maps.get(),geometry_changed);
+      const bool prepared_normal=detail::prepared_normal_state(range.material_bindings.get(),maps.get(),geometry_changed);
       std::optional<MToonMaterial> typed;
       if(range.material_bindings) {
         range.material_bindings->validate(geometry_changed);
@@ -227,7 +229,10 @@ struct SurfaceRenderer::TextureState {
           if(role!=int(MToonSlot::Matcap))needs_uv1|=mtoon_coordinate(t)==1;
           const auto &view=toon.roles[role];slot(destination,view.image,view,t.encoding==MToonEncoding::Srgb);
         };
-        for(int role=0;role<11;++role)original(role,role);
+        for(int role=0;role<11;++role)if(!prepared_normal||role!=int(MToonSlot::Normal))original(role,role);
+        if(prepared_normal){PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;view.min_filter=view.mag_filter=GL_LINEAR;
+          slot(2,std::shared_ptr<const Image>(maps,&maps->mtoon_normal),view,false);
+        }
         if(toon.derived){
           maps->color_coverage.validate();maps->emission_coverage.validate();
           PaintSourceMaps empty;const auto &source_maps=maps->source_maps?*maps->source_maps:empty;
@@ -246,7 +251,7 @@ struct SurfaceRenderer::TextureState {
             Key key{view.image.get(),toon.packed_srgb[packed]};auto sample=sampler(view);
             auto &desired=wanted[key];desired.owner=view.image;desired.mips|=mipmapped(sample);wanted_samplers.insert(sample);
           }
-          if(!maps->normal.rgba.empty()){
+          if(!prepared_normal&&!maps->normal.rgba.empty()){
             if(!maps->baked_base||maps->baked_normal.rgba.empty()||maps->baked_coverage.rgba.empty()||mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Typed baked normals require original canonical data, coverage and worker tangent corners");
             PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;
             slot(13,std::shared_ptr<const Image>(maps,&maps->baked_normal),view,false);slot(15,std::shared_ptr<const Image>(maps,&maps->baked_coverage),view,false);toon.baked_normal=true;
@@ -277,7 +282,7 @@ struct SurfaceRenderer::TextureState {
         if(prepared_color){color=view;color.min_filter=color.mag_filter=GL_LINEAR;}
         slot(0,std::shared_ptr<const Image>(maps,prepared_color?&maps->pbr_color:&maps->color),color,true);slot(1,std::shared_ptr<const Image>(maps,&maps->metal_rough),view,false);slot(2,std::shared_ptr<const Image>(maps,&maps->emission),emission,true);
         if(!maps->normal.rgba.empty()){
-          if(mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Normal-mapped snapshots require worker-generated tangent corners");
+          if(!prepared_normal&&mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Normal-mapped snapshots require worker-generated tangent corners");
           slot(3,std::shared_ptr<const Image>(maps,&maps->normal),view,false);
         }else if(maps->source_maps)slot(3,maps->source_maps->normal.image,maps->source_maps->normal,false);
       }
@@ -580,6 +585,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     Material material = original;
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
+    glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&maps->normal_projection);
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),0);glUniform1i(glGetUniformLocation(program_,"mt_outline"),0);
     if (maps&&!maps->source_only) {
       material.color={1,1,1,1};material.metallic=material.roughness=1;material.emissive={1,1,1};
@@ -600,9 +606,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       const auto &view=binding[5];glUniform1i(glGetUniformLocation(program_,"original_normal_present"),view.image!=0);
       glUniform3f(glGetUniformLocation(program_,"original_normal_x"),view.uv[0],view.uv[1],view.uv[4]);glUniform3f(glGetUniformLocation(program_,"original_normal_y"),view.uv[2],view.uv[3],view.uv[5]);}
     glUniform1i(glGetUniformLocation(program_,"map_mode"),maps?(maps->source_only?2:1):0);
-    glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!maps->normal.rgba.empty());
+    glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!maps->normal_projection&&!maps->normal.rgba.empty());
     for(int n=0;n<16;++n){auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);}
-    glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps?maps->source_maps->normal_scale:1);
+    glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps&&!maps->normal_projection?maps->source_maps->normal_scale:1);
     glUniform1f(glGetUniformLocation(program_,"ao_strength"),maps&&maps->source_maps?maps->source_maps->occlusion_strength:1);
     glUniform1i(glGetUniformLocation(program_, "toon"), toon || material.toon);
     glUniform1i(glGetUniformLocation(program_, "unlit"), material.unlit);
@@ -680,6 +686,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       pbrx[3]=uv[0];pbrx[4]=uv[1];pbrx[5]=uv[4];pbry[3]=uv[2];pbry[4]=uv[3];pbry[5]=uv[5];
     }
     glUniform1i(glGetUniformLocation(program_,"source_frame"),r.source_frame);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),r.canonical_frame);
+    glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),0);
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),1);glUniform1i(glGetUniformLocation(program_,"mt_outline"),outline);glUniform1i(glGetUniformLocation(program_,"mt_baked_normal"),t.baked_normal);glUniform4fv(glGetUniformLocation(program_,"mt[0]"),12,u[0].data());
     glUniform1iv(glGetUniformLocation(program_,"mt_present[0]"),16,present.data());glUniform1iv(glGetUniformLocation(program_,"mt_coord[0]"),16,coordinates.data());glUniform1iv(glGetUniformLocation(program_,"mt_derived[0]"),16,derived.data());glUniform1iv(glGetUniformLocation(program_,"mt_channel[0]"),16,channels.data());
     glUniform2fv(glGetUniformLocation(program_,"mt_offset[0]"),16,offsets.data());glUniform2fv(glGetUniformLocation(program_,"mt_scale[0]"),16,scales.data());glUniform1fv(glGetUniformLocation(program_,"mt_rotation[0]"),16,rotations.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_x[0]"),2,pbrx.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_y[0]"),2,pbry.data());

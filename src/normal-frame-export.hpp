@@ -3,6 +3,7 @@
 #include "normal-frame-runtime.hpp"
 #include "source-morph.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "normal-preparation-state.hpp"
 #include <algorithm>
 namespace dome::detail {
 struct NormalFrameExport {
@@ -10,7 +11,7 @@ struct NormalFrameExport {
   std::vector<Tangent> tangents;
   std::vector<std::vector<Vec3>> normal_targets,tangent_targets;
   const ImportedPrimitive *source=nullptr;
-  PaintSourceTexture canonical_normal;
+  PaintSourceTexture canonical_normal,prepared_normal;
 };
 inline bool normal_frame_attribute_equal(const NormalFrames &a,const NormalFrames &b,bool compare_tangent,
     const std::function<bool()> &cancelled={}) {
@@ -86,15 +87,16 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const std::function<bool()> &cancelled={}) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
+  const bool prepared=prepared_normal_state(&binding,input.textures.get(),false);
   const bool legacy=space==SourceMorphSpace::Original;const auto selected=legacy?set.mtoon:set.pbr;auto tangent_source=selected;
   if(!selected)throw std::invalid_argument("Selected export material has no retained normal frame");
-  const bool pbr_normal=input.textures && input.textures->source_maps && input.textures->source_maps->normal.image && input.textures->source_maps->normal_scale!=0;
-  if(pbr_normal && input.textures->source_maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0})throw std::invalid_argument("Normal texture transform needs a proven PBR consumer frame convention before export");
+  const bool pbr_normal=prepared||(input.textures && input.textures->source_maps && input.textures->source_maps->normal.image && input.textures->source_maps->normal_scale!=0);
+  if(!prepared && pbr_normal && input.textures->source_maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0})throw std::invalid_argument("Normal texture transform needs a proven PBR consumer frame convention before export");
   const bool mtoon_normal=binding.has_mtoon && binding.material.parameters.normal_enabled && binding.material.parameters.normal_scale!=0 && binding.material.textures[size_t(MToonSlot::Normal)].index>=0;
   if(legacy && (!binding.has_mtoon || binding.material.version()!=MToonVersion::V0))throw std::invalid_argument("Original frame VRM0 export requires an explicit legacy MToon0 material");
   if((legacy?mtoon_normal:pbr_normal) && selected->tangents.empty())throw std::invalid_argument("Normal mapped export has no retained authoritative tangents");
   PaintSourceTexture canonical_normal;
-  if(input.textures && (!input.textures->baked_normal.rgba.empty() || !input.textures->normal.rgba.empty()))canonical_normal=normal_frame_canonical_export(input,*selected,legacy,cancelled);
+  if(!prepared && input.textures && (!input.textures->baked_normal.rgba.empty() || !input.textures->normal.rgba.empty()))canonical_normal=normal_frame_canonical_export(input,*selected,legacy,cancelled);
   Quat to_native{};if(legacy){if(!input.appearance || !input.appearance->source_basis_quaternion)throw std::invalid_argument("Original frame export has no coordinate basis authority");to_native=input.appearance->source_basis_quaternion->unit();}
   if(!legacy)normal_frame_current_authority(binding,input.mesh,input.deformation.get(),cancelled);
   else {
@@ -112,6 +114,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     }
   }
   auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;out.canonical_normal=std::move(canonical_normal);
+  if(prepared){out.prepared_normal.image=std::shared_ptr<const Image>(input.textures,legacy?&input.textures->mtoon_normal:&input.textures->normal);out.prepared_normal.wrap_s=out.prepared_normal.wrap_t=33071;out.prepared_normal.min_filter=out.prepared_normal.mag_filter=9729;}
   out.surface={input.id,input.name,input.transform,input.material,{},input.textures,input.deformation,input.groups,input.appearance,input.material_bindings,input.source_dormant};auto &mesh=out.surface.mesh;
   Quat from_native=legacy?to_native.inverse():Quat{};
   std::vector<size_t> targets;for(auto id:set.current_targets){auto t=std::find_if(selected->targets.begin(),selected->targets.end(),[&](const auto &t){return t.id==id;});if(t==selected->targets.end())throw std::invalid_argument("Export target normal identity is missing");targets.push_back(size_t(t-selected->targets.begin()));}
