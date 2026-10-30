@@ -1,0 +1,44 @@
+{
+  "parent": "24a1548",
+  "release": {
+    "native_assertions": 47,
+    "scoped_ctest_suites": 8,
+    "software_graphics_assertions": 13,
+    "arc_a770_graphics_assertions": 13,
+    "native_fltk_assertions": 6,
+    "toolkit": "eee23b7"
+  },
+  "sanitize": {
+    "state": "running",
+    "build": "build-affine-sanitize",
+    "session": 97917,
+    "scoped_suites": 6,
+    "log": "artifacts/test-affine-sanitize.log"
+  },
+  "logs": "artifacts/affine-application-proof",
+  "no_claim": [
+    "general affine import admission",
+    "held/XR editing",
+    "affine SDF/remesh/bake/bind/cut/retopo/polygon",
+    "new affine VRM consumer",
+    "full FBX skin/morph/PBR UV1"
+  ],
+  "sha256": {
+    "CMakeLists.txt": "be4217f8db692f9a2f13491782fbad3087d54645281b65616bbd0d5d0ba09a43",
+    "include/dome/document.hpp": "62ecbbe286a06a68b32797b04f62f443e189a365f67db598862c5be5a9511052",
+    "include/dome/material-visibility.hpp": "d3da2fcc94ca40071dd4880aa734f91e54f45a28f9417ea7f4c4154ed57f12da",
+    "src/document-authority.hpp": "767d167e3f292dc1b3b5cfc38b52a4c939bbe6201ff01cdd2a81bf2443984b92",
+    "src/document-baking.cpp": "897a7d9657380322bcb0b79b5cf97dffd2185d8e85e2bf1d471efc4e066a03f5",
+    "src/document-interaction.cpp": "7998bd34b98f411f71a5ffd970007b177c751779ba119e9fd483160ff6f0ca48",
+    "src/document-native.cpp": "b9c1c71c18c7bb0f251826dfc1b2dc35b1f9f7cf42396df55999f166cf3e06fb",
+    "src/document-sculpt.cpp": "3da92d46bbc882a42a908c61acd4cda1de79e8ee103b8c335bc88402b5e8e013",
+    "src/document-skin.cpp": "f298d0a923ca5e1d3b6a96672b0648ef997a1e10d57f53aca0d62b6a8595632e",
+    "src/document.cpp": "a49c0e6f9a87b6fb8e16c7c033689e5a503a8b96e72ee5dc290fe69a757e9c15",
+    "src/geometry-identity.hpp": "7701dde318a8abfe19a3ac2e26a61b2babad89b8642bcdf809d12d797e54e2b2",
+    "src/material-visibility.cpp": "d754437f4d6aa2f7fcc3aa2982d132db5168be552b31b73fc4ac77a40ed4fdb0",
+    "src/affine-surface.hpp": "f72667a8f0a1c4107aac20300b3676c11869ac15150626461ab4b600f1040e98",
+    "tests/affine-document-render.cpp": "82148eb0e01eaa10faba905ace77ba6bef5dfc169f9ae791ec8f9d928bf39258",
+    "tests/affine-document.cpp": "671c11b295de50c0780ae1a159be3a4ff5b2899795b2f1bace1fc9b8f6a9c063",
+    "tests/affine-native-menu.py": "307a744dafb9d049e1ad77acf945c1d52dbb55e3ebd77b374f2268ca5fcad033"
+  }
+}

@@ -16,6 +16,7 @@ struct Dependency {
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
   std::shared_ptr<const PolygonAuthority> polygon;
   CanvasTransform world;
+  std::optional<AffineTransform> affine_world;
   bool canonical = false;
 };
 template <class T>
@@ -50,7 +51,8 @@ struct Identity {
           !same_owner(a.appearance, b.appearance) ||
           !same_owner(a.material_bindings, b.material_bindings) ||
           !same_owner(a.polygon, b.polygon) ||
-          a.canonical != b.canonical || !same(a.world, b.world))
+          a.canonical != b.canonical || !same(a.world, b.world) ||
+          bool(a.affine_world)!=bool(b.affine_world) || (a.affine_world && a.affine_world->matrix()!=b.affine_world->matrix()))
         return false;
     }
     return true;

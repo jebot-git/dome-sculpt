@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "affine-surface.hpp"
 #include "document-authority.hpp"
 #include "polygon-conversion.hpp"
 #include "document-polygon-authority.hpp"
@@ -484,17 +485,21 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
     state_.polygon_handoff.reset();state_.polygon_handoff_object=0;
   }
-  state_.can_polygon=!state_.asset_busy&&!state_.recovery_busy&&!uv_&&!state_.retopology&&!state_.cut&&!import_view_&&object_editable_locked(active.id);
+  state_.can_polygon=!scene_.has_affine_placement(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!uv_&&!state_.retopology&&!state_.cut&&!import_view_&&object_editable_locked(active.id);
   state_.polygon_requires_conversion=polygon_conversion_required(active);
   state_.polygon_has_source=active.polygon&&bool(active.polygon->origin);
   state_.project_path = path_;
   state_.importing = import_view_;
   state_.active_object = scene_.active().id;
   state_.objects.clear();
-  for (auto &o : scene_.objects())
+  for (auto &o : scene_.objects()) {
+    const bool affine=scene_.has_affine_placement(o.id);
     state_.objects.push_back({o.id, o.name, o.visible, o.locked, o.transform,
                               o.material, o.mesh_active, bool(o.painted),object_editable_locked(o.id),
-                              o.visible && state_.isolate_held && state_.held_object && o.id!=state_.held_object,object_world_transform_locked(o.id),true});
+                              o.visible && state_.isolate_held && state_.held_object && o.id!=state_.held_object,
+                              affine?CanvasTransform{}:object_world_transform_locked(o.id),!affine});
+    if(affine)state_.objects.back().affine_world=scene_.world_matrix(o.id);
+  }
   if (uv_)
     control_changed_ = uv_changed(
         *uv_->view().mesh, scene_.object(control_object_).painted->mesh());
@@ -555,7 +560,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.can_cancel_asset|=export_work->cancellable();
   }
   state_.asset_progress=work.progress;
-  state_.can_paint_weights = active.mesh_active && active.painted && object_editable_locked(active.id) &&
+  state_.can_paint_weights = !scene_.has_affine_placement(active.id) && active.mesh_active && active.painted && object_editable_locked(active.id) &&
       active.deformation && active.deformation->skeleton && active.deformation->skin;
   if (!state_.can_paint_weights) state_.weights.enabled = false;
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
@@ -563,7 +568,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
       [&](const auto &o) { return o.appearance && o.appearance->vrm_json && in_group(scene_, o, avatar); });
   state_.sculpt_settings = volume().sculpt_settings();
-  state_.sculpt_transform = scene_.world_transform(active.id);
+  state_.sculpt_transform = scene_.has_affine_placement(active.id)?CanvasTransform{}:scene_.world_transform(active.id);
   state_.can_configure_sculpt = sculpt_target_ready_locked();
   state_.can_change_resolution = resolution_target_ready_locked();
   state_.sculpt_voxel_mm = double(volume().voxel_size())*state_.sculpt_transform.scale*1000;
@@ -788,6 +793,12 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
   if (!std::isfinite(material_time)) throw std::invalid_argument("Invalid material pick time");
   std::lock_guard lock(model_mutex_);
   if(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active)return {};
+  if(scene_.has_affine_placement(scene_.active().id)) {
+    auto snapshot=mesh_.load();
+    if(!object_editable_locked(scene_.active().id)||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)return {};
+    auto hit=snapshot->picking->raycast(p,d,10,material_time,scene_.active().id);
+    return hit?std::optional<Vec3>(hit->position):std::nullopt;
+  }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation != state_.generation || mesh->revision != state_.revision || !mesh->picking) return {};
@@ -822,6 +833,12 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
 }
 Vec3 Document::gradient(Vec3 p) const {
   std::lock_guard lock(model_mutex_);
+  if(scene_.has_affine_placement(scene_.active().id)) {
+    auto snapshot=mesh_.load();
+    if(snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)
+      throw std::logic_error("Wait for the current affine surface before querying its normal");
+    return snapshot->picking->closest(p,scene_.active().id).normal;
+  }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking)
@@ -1439,7 +1456,9 @@ void Document::mesh_loop() {
       dependencies->generation=job->generation;
       dependencies->objects.reserve(job->scene.objects().size());
       for(const auto &o:job->scene.objects())if(o.visible) {
-        geometry_detail::Dependency dep;dep.object=o.id;dep.world=job->scene.world_transform(o.id);
+        geometry_detail::Dependency dep;dep.object=o.id;
+        if(job->scene.has_affine_placement(o.id))dep.affine_world=job->scene.world_matrix(o.id);
+        else dep.world=job->scene.world_transform(o.id);
         if(o.mesh_active)dep.paint=o.painted->mesh_owner();
         else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
         dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;dep.polygon=o.polygon;
@@ -1507,7 +1526,10 @@ void Document::mesh_loop() {
           }
         }
         if (cancelled()) throw std::runtime_error("Stale surface preview");
-        auto world = o.world_transform();
+        const bool affine=bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto &g){return g.source_placement||g.affine_edit;});
+        const auto frame=affine?std::optional<detail::AffineInteractionFrame>(detail::placement_frame(o)):std::nullopt;
+        const bool reflected=frame&&frame->orientation()==AffineOrientation::Reversing;
+        auto world = affine?CanvasTransform{}:o.world_transform();
         size_t offset = snapshot->mesh.positions.size(), first = snapshot->mesh.indices.size();
         const size_t packed_vertices=retained_layout?retained_layout->vertices.size():canonical?o.mesh.indices.size():o.mesh.positions.size();
         if(packed_vertices>std::numeric_limits<size_t>::max()-offset ||
@@ -1521,11 +1543,11 @@ void Document::mesh_loop() {
                                             : std::vector<Tangent>{};
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
           if(!colors.empty() || !snapshot->source_colors.empty())snapshot->source_colors.push_back(colors.empty()?std::array<float,4>{1,1,1,1}:colors.at(vertex));
-          snapshot->mesh.positions.push_back(vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
-          snapshot->mesh.normals.push_back(vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
+          snapshot->mesh.positions.push_back(frame?detail::placed_position(*frame,o.mesh.positions.at(vertex)):vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
+          snapshot->mesh.normals.push_back(frame?detail::placed_normal(*frame,o.mesh.normals.at(vertex)):vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
-          snapshot->tangents.push_back({direction.x,direction.y,direction.z,tangent[3]});
+          snapshot->tangents.push_back(frame?detail::placed_tangent(*frame,tangent):Tangent{direction.x,direction.y,direction.z,tangent[3]});
           if(retained || !snapshot->source_normals.empty()) {
             auto source=o.mesh.normals.at(vertex),canonical_normal=source;
             std::array<float,4> source_tangent{1,0,0,1};
@@ -1534,10 +1556,10 @@ void Document::mesh_loop() {
               if(!retained_pose->normals[2].empty())canonical_normal=retained_pose->normals[2].at(frame_vertex);
               if(!retained_pose->tangents[source_role].empty())source_tangent=retained_pose->tangents[source_role].at(frame_vertex);
             }
-            snapshot->source_normals.push_back(vec(ob::rotate(world.orientation,obv(source))));
-            snapshot->canonical_normals.push_back(vec(ob::rotate(world.orientation,obv(canonical_normal))));
+            snapshot->source_normals.push_back(frame?detail::placed_normal(*frame,source):vec(ob::rotate(world.orientation,obv(source))));
+            snapshot->canonical_normals.push_back(frame?detail::placed_normal(*frame,canonical_normal):vec(ob::rotate(world.orientation,obv(canonical_normal))));
             auto t=vec(ob::rotate(world.orientation,obv({source_tangent[0],source_tangent[1],source_tangent[2]})));
-            snapshot->source_tangents.push_back({t.x,t.y,t.z,source_tangent[3]});
+            snapshot->source_tangents.push_back(frame?detail::placed_tangent(*frame,source_tangent):Tangent{t.x,t.y,t.z,source_tangent[3]});
           }
           if (job->sculpt_mask_view)
             snapshot->sculpt_masks.push_back(o.id == job->scene.active().id
@@ -1580,11 +1602,16 @@ void Document::mesh_loop() {
           for (size_t vertex = 0; vertex < o.mesh.positions.size(); ++vertex) append(uint32_t(vertex), {1,0,0,1});
           for (auto vertex : o.mesh.indices) snapshot->mesh.indices.push_back(uint32_t(offset + vertex));
         }
-        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,true});
+        // Packed vertices are already in world coordinates. Compensate the
+        // reflected orientation once so GPU and material-aware ray front faces
+        // agree with the original local primitive. Rest indices stay untouched.
+        if(reflected)for(size_t c=first;c<snapshot->mesh.indices.size();c+=3)std::swap(snapshot->mesh.indices[c+1],snapshot->mesh.indices[c+2]);
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
+        if(frame)snapshot->ranges.back().affine_world=frame->world();
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
-      if ((job->weight_view || (published_.load()->object_grab_mode&&!published_.load()->object_grabbing)) && !snapshot->mesh.indices.empty())
+      if ((job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || (published_.load()->object_grab_mode&&!published_.load()->object_grabbing)) && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled);
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       std::lock_guard lock(mesh_mutex_);
@@ -1797,7 +1824,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   }
   if (parameter == VrParameter::VoxelSize) {
     const auto &o = scene_.active();
-    return !state_.asset_busy && !state_.recovery_busy && o.visible && !o.locked &&
+    return !scene_.has_affine_placement(o.id) && !state_.asset_busy && !state_.recovery_busy && o.visible && !o.locked &&
            scene_.objects().size() < 256 &&
            (o.mesh_active ? bool(o.painted) : !o.volume->voxels().empty());
   }

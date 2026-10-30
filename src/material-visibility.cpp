@@ -145,7 +145,7 @@ struct Visibility {
                Vec3 direction, double seconds) const {
     size_t first = size_t(triangle) * 3;
     auto a = m.positions[m.indices[first]], b = m.positions[m.indices[first+1]], c = m.positions[m.indices[first+2]];
-    bool front = dot(cross(b-a,c-a), direction) < 0;
+    bool front = (dot(cross(b-a,c-a), direction) < 0) != range.reflected;
     if ((cull == MToonCull::Back && !front) || (cull == MToonCull::Front && front)) return false;
     if (alpha == Material::AlphaMode::Opaque) return true;
     auto primary = uv(m, triangle, bary, false);
@@ -198,6 +198,15 @@ MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh, std::span<const Sur
     : impl_(std::make_unique<Impl>(mesh, ranges, cancelled)) {}
 MaterialSurfaceQuery::~MaterialSurfaceQuery() = default;
 SurfaceHit MaterialSurfaceQuery::closest(Vec3 point) const { return impl_->query.closest(point); }
+SurfaceHit MaterialSurfaceQuery::closest(Vec3 point,uint64_t only_object) const {
+  SurfaceQueryOptions options;options.max_triangle_tests=65536;
+  options.triangle_filter=[&](uint32_t triangle) {
+    const size_t corner=size_t(triangle)*3;
+    for(const auto &surface:impl_->surfaces)if(surface.range.object==only_object&&corner>=surface.range.first&&corner-surface.range.first<surface.range.count)return true;
+    return false;
+  };
+  return impl_->query.closest(point,options);
+}
 std::optional<SurfaceHit> MaterialSurfaceQuery::raycast(Vec3 origin, Vec3 direction,
                                                        float maximum, double seconds,uint64_t only_object) const {
   if (!std::isfinite(seconds)) throw std::invalid_argument("Invalid visibility animation time");

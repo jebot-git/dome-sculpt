@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "affine-surface.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/material-visibility.hpp"
@@ -10,15 +11,20 @@ namespace {
 Vec3 local(CanvasTransform t,Vec3 p){auto q=ob::transform(ob::inverse(t),{p.x,p.y,p.z});return {q.x,q.y,q.z};}
 Vec3 rotate(ob::Quat q,Vec3 p){auto v=ob::rotate(q,{p.x,p.y,p.z});return {v.x,v.y,v.z};}
 bool same(CanvasTransform a,CanvasTransform b){return a.position.x==b.position.x&&a.position.y==b.position.y&&a.position.z==b.position.z&&a.scale==b.scale&&a.orientation.x==b.orientation.x&&a.orientation.y==b.orientation.y&&a.orientation.z==b.orientation.z&&a.orientation.w==b.orientation.w;}
+bool same_placement(const Scene &scene,uint64_t id,CanvasTransform legacy,const std::optional<AffineTransform>&affine) {
+  if(bool(affine)!=scene.has_affine_placement(id))return false;
+  return affine?scene.world_matrix(id).matrix()==affine->matrix():same(scene.world_transform(id),legacy);
+}
 }
 bool Document::begin_native_stroke(){
   std::lock_guard lock(model_mutex_);auto &o=scene_.active();
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
+  if(scene_.has_affine_placement(o.id)&&!o.mesh_active){state_.message="Affine sculpt strokes require the full field metric path";publish_locked();return false;}
   auto preview=mesh_.load();
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision){state_.message="Wait for the current surface before painting";publish_locked();return false;}
   auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
-  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
+  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(scene_.has_affine_placement(o.id))session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
   session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;
   std::lock_guard queue(native_mutex_);
   if(native_jobs_.size()>=8){state_.error="Desktop gesture queue is full; retry after pending cancellation finishes";publish_locked();return false;}
@@ -90,10 +96,17 @@ void Document::native_loop(){
       std::unique_ptr<MaterialSurfaceQuery> query;
       std::shared_ptr<const PaintedMesh::Evaluation> evaluation;
       if(o.mesh_active){
-        std::shared_ptr<const Mesh> geometry=o.deformation?std::make_shared<const Mesh>(o.deformation->preview(o.painted->mesh())):std::shared_ptr<const Mesh>(o.painted,&o.painted->mesh());
+        std::shared_ptr<const Mesh> geometry;
+        bool reflected=false;
+        if(session->affine_world) {
+          auto placed=std::make_shared<Mesh>(o.deformation?o.deformation->preview(o.painted->mesh()):o.painted->mesh());
+          auto frame=detail::placement_frame(working,o.id);detail::place_mesh(*placed,frame,cancelled);
+          reflected=frame.orientation()==AffineOrientation::Reversing;geometry=std::move(placed);
+        } else geometry=o.deformation?std::make_shared<const Mesh>(o.deformation->preview(o.painted->mesh())):std::shared_ptr<const Mesh>(o.painted,&o.painted->mesh());
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
-        if(o.deformation)evaluation=o.painted->evaluate(geometry,cancelled);
+        if(o.deformation||session->affine_world)evaluation=o.painted->evaluate(geometry,cancelled);
         SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};
+        range.reflected=reflected;
         query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled);o.painted->begin_stroke();
       }else o.volume->begin_stroke();
       std::optional<Vec3> previous;size_t processed=0;auto shown=std::chrono::steady_clock::now();
@@ -103,11 +116,11 @@ void Document::native_loop(){
           if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
           if(!session->samples.empty()){sample=std::move(session->samples.front());session->samples.pop_front();}else accept=session->accepted.load();}
         if(!sample){if(accept)break;continue;}
-        auto origin=local(session->transform,sample->origin);auto direction=rotate(ob::conjugate(session->transform.orientation),sample->direction);
+        auto origin=session->affine_world?sample->origin:local(session->transform,sample->origin);auto direction=session->affine_world?sample->direction:rotate(ob::conjugate(session->transform.orientation),sample->direction);
         std::optional<Vec3> hit;Vec3 normal;
-        if(query){auto picked=query->raycast(origin,direction,10/session->transform.scale,sample->material_time);if(picked){hit=picked->position;normal=picked->normal;}}
+        if(query){auto picked=query->raycast(origin,direction,session->affine_world?10:10/session->transform.scale,sample->material_time);if(picked){hit=picked->position;normal=picked->normal;}}
         else {hit=o.volume->raycast(origin,direction,10/session->transform.scale,cancelled);if(hit)normal=o.volume->gradient(*hit);}
-        if(hit){auto brush=sample->brush;brush.from=previous.value_or(*hit);brush.to=*hit;brush.normal=normal;brush.radius/=session->transform.scale;brush.blend/=session->transform.scale;
+        if(hit){auto brush=sample->brush;brush.from=previous.value_or(*hit);brush.to=*hit;brush.normal=normal;if(!session->affine_world){brush.radius/=session->transform.scale;brush.blend/=session->transform.scale;}
           if(o.mesh_active){if(evaluation)o.painted->stamp_evaluated(brush,session->paint,*evaluation,cancelled);else o.painted->stamp(brush,session->paint,cancelled);}else o.volume->stamp(brush,budget,cancelled);previous=*hit;
         }else previous.reset();
         ++processed;
@@ -116,7 +129,7 @@ void Document::native_loop(){
         if(now-shown>=std::chrono::milliseconds(30)){
           auto preview=working.snapshot();
           std::lock_guard lock(model_mutex_);
-          if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same(scene_.world_transform(session->source.object),session->transform))throw std::runtime_error("Desktop source or pose changed");
+          if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");
           state_.native_samples=processed;publish_locked();
           {std::lock_guard mesh(mesh_mutex_);pending_mesh_.emplace(MeshJob{state_.revision,state_.generation,std::move(preview),false,true,0,0,{}, {}});pending_mesh_->sculpt_mask_view=state_.sculpt_mask_visible;pending_mesh_->native_gesture=session->epoch;pending_mesh_->native_samples=processed;}
           mesh_changed_.notify_all();shown=now;
@@ -127,7 +140,7 @@ void Document::native_loop(){
       auto immutable=std::make_shared<const Scene>(working.snapshot());
       std::deque<History> previous_redo;
       {std::lock_guard lock(model_mutex_);
-        if(cancelled()||native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same(scene_.world_transform(session->source.object),session->transform))throw std::runtime_error("Desktop source or pose changed");
+        if(cancelled()||native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");
         // Stage every history/state allocation while authority is untouched.
         // The old redo deque is swapped only after its replacement node exists.
         Scene before=scene_;EditorState previous_state=state_;

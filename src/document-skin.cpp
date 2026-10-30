@@ -3,7 +3,7 @@
 namespace dome {
 bool Document::skin_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+  return !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
     !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
@@ -11,7 +11,7 @@ std::vector<uint64_t> Document::skin_sources_locked(SkinAuthoringMode mode) cons
   std::vector<uint64_t> ids;
   for(const auto &o:scene_.objects())
     if((mode!=SkinAuthoringMode::Transfer || o.id!=scene_.active().id) &&
-       o.mesh_active && o.painted && !o.painted->mesh().indices.empty() &&
+       !scene_.has_affine_placement(o.id) && o.mesh_active && o.painted && !o.painted->mesh().indices.empty() &&
        o.deformation && o.deformation->skeleton && (mode!=SkinAuthoringMode::Transfer || o.deformation->skin)) ids.push_back(o.id);
   return ids;
 }

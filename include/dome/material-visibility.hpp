@@ -23,6 +23,7 @@ public:
   MaterialSurfaceQuery(const MaterialSurfaceQuery &) = delete;
   MaterialSurfaceQuery &operator=(const MaterialSurfaceQuery &) = delete;
   SurfaceHit closest(Vec3) const;
+  SurfaceHit closest(Vec3,uint64_t only_object) const;
   // The closest visible face may be an unselected occluder. Base-level source
   // samplers, alpha/cutoff/cull, authored UV1 and MToon animation are retained.
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction,

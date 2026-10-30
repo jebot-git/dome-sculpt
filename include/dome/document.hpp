@@ -46,6 +46,7 @@ struct ObjectInfo {
   bool mesh_active = false, has_mesh = false;
   bool editable = true, ghost = false;
   CanvasTransform world_transform{};bool world_transform_valid=false;
+  std::optional<AffineTransform> affine_world;
 };
 struct AssetWork {
   std::atomic_bool cancelled{false};
@@ -140,6 +141,8 @@ struct SurfaceRange {
   std::shared_ptr<const SourceMaterialBindings> material_bindings{};
   bool source_frame = false, canonical_frame = false, source_normal_only = false; // Private prototype.
   CanvasTransform object_world{};bool world_frame_valid=false;
+  std::optional<AffineTransform> affine_world;
+  bool reflected = false; // CPU query geometry retains original corner order.
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;
@@ -517,6 +520,7 @@ private:
     uint64_t epoch = 0;
     AssetSource source;
     CanvasTransform transform;
+    std::optional<AffineTransform> affine_world;
     std::shared_ptr<const DeformationState> deformation;
     std::shared_ptr<const Scene> initial;
     std::shared_ptr<const MeshSnapshot> original_preview;

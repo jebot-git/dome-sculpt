@@ -4,10 +4,11 @@
 namespace dome {
 bool Document::sculpt_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
+  return !scene_.has_affine_placement(o.id) && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && !(o.polygon&&o.polygon->active) && !o.mesh_active && object_editable_locked(o.id);
 }
 bool Document::resolution_target_ready_locked() const {
+  if(!sculpt_target_ready_locked())return false;
   const auto scale=scene_.world_transform(scene_.active().id).scale;
   return sculpt_target_ready_locked() && std::isfinite(scale) && scale>0 &&
       std::isfinite(scale*1000) && scale*.01f>0;

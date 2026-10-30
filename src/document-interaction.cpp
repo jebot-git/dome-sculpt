@@ -66,6 +66,7 @@ bool Document::begin_object_grab(uint64_t id){std::lock_guard lock(model_mutex_)
 bool Document::begin_object_grab_locked(uint64_t id){
   if(!state_.object_grab_mode||state_.asset_busy||state_.recovery_busy)return false;
   const auto &object=scene_.object(id);if(!object.visible||object.locked)return false;
+  if(scene_.has_affine_placement(id))throw std::logic_error("Affine object holding requires the complete world-delta controller path");
   const bool polygon_motion=state_.polygon && !polygon_accepting_ && id==polygon_source_.object && polygon_source_matches_locked();
   if(state_.polygon&&!polygon_motion)return false;
   AuthorityTransition transition(*this);const bool changed=polygon_motion?false:invalidate_object_authority_locked();scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;
