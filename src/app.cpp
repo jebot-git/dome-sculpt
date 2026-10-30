@@ -451,7 +451,12 @@ struct App {
   App() {
     window.end();
     window.resizable(canvas);
-    window.size_range(640, 480);
+    int work_x=0,work_y=0,work_w=0,work_h=0;
+    Fl::screen_work_area(work_x,work_y,work_w,work_h);
+    const int initial_w=std::min(window.w(),std::max(1,work_w-40));
+    const int initial_h=std::min(window.h(),std::max(1,work_h-40));
+    window.size_range(std::min(640,initial_w),std::min(480,initial_h));
+    window.size(initial_w,initial_h);
     window.xclass("org.domed.Sculpt");
     status.align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
     menu.add("&File/&New", FL_CTRL + 'n', command, this);

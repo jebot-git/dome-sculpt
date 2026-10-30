@@ -1,0 +1,37 @@
+{
+  "core_source": "cc36463c2e50a8be419b27aa6a10aa651a6df80d",
+  "proof_scope": "Release app.cpp-only overlay plus test-only native grid fixture against exact frozen coherent core/render/XR/frontend support; headers unchanged",
+  "gui": {
+    "shape-menu": {
+      "assertions": 15,
+      "screenshot_size": [
+        1100,
+        760
+      ],
+      "report_sha256": "437828e994faa2046dbfed749ebb10569ebefd2f600629c619fb235fa57521e6",
+      "before_sha256": "9de9d03de6aa77e5db4462ed354230d5869ea1ae0e35f67a8bf1d2c8473f9837",
+      "after_sha256": "a33784f9deedb156c5a37dee4f9e64e699a77ffac8c3cf62eefcf0dd0c3f46e2"
+    },
+    "shape-menu-compact": {
+      "assertions": 17,
+      "screenshot_size": [
+        600,
+        280
+      ],
+      "report_sha256": "14b7e3959ac9066f4a6dd62b2bbab9c01f03cc95fcfab8b9f6050be7fc47b319",
+      "before_sha256": "6ec92596c986756f4c4c0a3ad0da8a660baecf08f1c6d4bd1efc5fd648e256a1",
+      "after_sha256": "bb2c9162c743dbaa613d9b651c154656298ef72ef863f6b2de7aee780d0db8f8"
+    }
+  },
+  "inspected_captures": true,
+  "native_scope": "frozen cc36463 Release4/4 2.39s;15draft +29strokes +46tools +23kernel",
+  "app_cpp_sha256": "a1fba41a88b6cda13f683184581a2ab99d4c57bbcc46f4ff438a01b46b19f555",
+  "native_binary_sha256": "6ef913718aa03203216dbbd6f68d0abe0f7f2b821c68f40eaffe3a8c546a9040",
+  "frozen_core_sha256": "2741dabc87108ff22c84a4e4828b3c118543d06f9fe0467d7e12b911912ed1f2",
+  "frozen_render_sha256": "ea187c832a59ae18417351da5afafafd2ccf9cf135d9ae44f966c77a01ea0434",
+  "fixture_sha256": "548c9e531ab79a17ec45e8296cf63c1726176a7fd073259de44be4aa81d6bcd3",
+  "physical_HMD": false,
+  "actual_Wayland": false,
+  "system_installation": false,
+  "new_native_worker_OOM_recovery": "separate merge_docs branch, not qualified by this gate"
+}

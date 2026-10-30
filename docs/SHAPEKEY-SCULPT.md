@@ -45,3 +45,31 @@ The coherent Release FLTK/OpenXR frontend builds with the new controls. Actual
 FLTK workflows, graphical consumers, OpenXR loader, allocation-denial
 and whole-source sanitizer qualification of this new branch remain pending.
 The preceding fb29fde sanitizer9/9 result does not qualify these changes.
+
+## Actual desktop gestures and compact workarea
+
+A test-only native 17x17 grid fixture supports visible edge deformation with a
+real Shift/left drag. On Undo of target creation, transient selection clamps to
+the remaining target; Redo does not invent the previous selection. The GUI
+fixture therefore explicitly creates/selects a fresh target before testing its
+stroke rather than guessing the transient index after history navigation.
+
+Actual private-display/bus FLTK tests pass 15 normal and 17 compact assertions:
+selected-key displacement, all other keys/paint exact, saved weights unchanged,
+visible geometry/shading, source-aware global Undo/Redo and finishing the editing
+preview. The initial central stroke genuinely changed thousands of pixels by
+only 2..4 RGB levels; the final fixture makes an actual visible-edge stroke and
+retains the stronger >12-level / >50-pixel acknowledgment. Failure logs remain.
+Normal and compact captures were inspected.
+
+The initial main window previously exceeded a 640x360 workarea. Startup and
+minimum size now clamp to FLTK's actual workarea, preserving the ordinary
+1100x800 viewport on larger screens. Compact captures now cover the complete
+600x320 main window (the artifact crops the bottom 40 pixels of status).
+
+This gate used an optimized app.cpp-only overlay against the frozen cc36463
+coherent core/render/XR/other frontend libraries and unchanged headers. Its
+native grid fixture links the same exact core/support. It is not a fresh whole
+frontend sanitizer qualification or a real Wayland/HMD test. Standard reproduction
+after a coherent build is DOME_SHAPE_STROKES=1 DOME_SCULPT_TEST_BUILD=build running
+tests/shapekey-menu.py, with DOME_SHAPE_COMPACT=1 for the compact variant.

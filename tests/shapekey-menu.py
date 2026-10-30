@@ -6,10 +6,10 @@ from dbus_next.aio import MessageBus
 from dbus_next import Variant
 from Xlib import X,XK,display,error
 from Xlib.ext import xtest
-from PIL import Image
+from PIL import Image,ImageChops
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if os.environ.get('DOME_SHAPE_BUS')!='1':os.execvpe('dbus-run-session',['dbus-run-session','--',sys.executable,*sys.argv],{**os.environ,'DOME_SHAPE_BUS':'1'})
-root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',root/'build')).resolve();compact=os.environ.get('DOME_SHAPE_COMPACT')=='1'
+root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',root/'build')).resolve();compact=os.environ.get('DOME_SHAPE_COMPACT')=='1';strokes=os.environ.get('DOME_SHAPE_STROKES')=='1'
 out=root/'artifacts'/('shape-menu-compact' if compact else 'shape-menu');out.mkdir(parents=True,exist_ok=True);checks=[];processes=[]
 def report(done=False):(out/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks),'complete':done},indent=2)+'\n')
 def check(ok,message):checks.append({'passed':bool(ok),'check':message});report();print(('PASS ' if ok else 'FAIL ')+message,flush=True);assert ok,message
@@ -30,7 +30,7 @@ async def main():
   for k,s in [('XDG_CONFIG_HOME','config'),('XDG_STATE_HOME','state'),('XDG_DATA_HOME','data'),('XDG_CACHE_HOME','cache'),('XDG_RUNTIME_DIR','runtime')]:env[k]=home+'/'+s;Path(env[k]).mkdir(mode=0o700)
   if compact:
    p=Path(home,'config/dome/appearance.json');p.parent.mkdir(parents=True);p.write_text(json.dumps({'font':'Unifont / Sans-Serif','font_size':16,'font_scale':2}))
-  project=Path(home,'shapes.dsculpt');helper=str(build/'dome-sculpt-shapekey-authoring-test');subprocess.run([helper,'--ui-fixture',str(project)],env=env,check=True)
+  project=Path(home,'shapes.dsculpt');helper=str(build/'dome-sculpt-shapekey-authoring-test');subprocess.run([str(build/'dome-sculpt-shapekey-grid-fixture'),str(project)] if strokes else [helper,'--ui-fixture',str(project)],env=env,check=True)
   def inspect():return json.loads(subprocess.check_output([helper,'--inspect',str(project)],env=env))
   original=inspect();log=(out/'app.log').open('w');app=subprocess.Popen([str(build/'dome-sculpt'),str(project)],env=env,cwd=home,stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
   def named(title):
@@ -84,6 +84,24 @@ async def main():
   await command('Redo');await command('Save');check(inspect()==duplicated,'One universal Redo restores the exact accepted shape endpoint')
   await command('Mirror shapekey...');dialog=await wait(lambda:named('Mirror shapekey'));await command('Close Window');await wait(lambda:named('Mirror shapekey') is None);await command('Save')
   check(inspect()==duplicated and app.poll() is None,'Universal Close cancels native mirror controls without changing source or history')
+  if strokes:
+   await command('New shapekey...');dialog=await wait(lambda:named('New shapekey'));g=dialog.get_geometry();tap(dialog,g.width*.75,g.height-(46 if compact else 32)*2+24);await wait(lambda:named('New shapekey') is None);await ready('Duplicate shapekey...');await command('Save');duplicated=inspect();selected=len(duplicated['objects'][0]['deformation']['morphs']['targets'])-1
+   check(selected==2,'Actual native creation selects a fresh target for the subsequent freehand stroke')
+   await command('Sculpt selected shapekey');await command('Save');check(inspect()==duplicated,'Actual native sculpt-mode toggle preserves saved mix and complete project data')
+   await asyncio.sleep(.15);g=window.get_geometry();before=pixels(window).crop((0,0,g.width,g.height-40));before.save(out/'target-before.png')
+   bounds=ImageChops.difference(before,Image.new('RGB',before.size,before.getpixel((0,0)))).getbbox();assert bounds,'Native surface not visible';stroke_x=bounds[2]-3;stroke_y=(bounds[1]+bounds[3])//2-30
+   shift=d.keysym_to_keycode(XK.string_to_keysym('Shift_L'));xtest.fake_input(d,X.KeyPress,shift);xtest.fake_input(d,X.MotionNotify,x=g.x+stroke_x,y=g.y+stroke_y);xtest.fake_input(d,X.ButtonPress,1);d.sync()
+   await ready('New shapekey...',False)
+   xtest.fake_input(d,X.MotionNotify,x=g.x+stroke_x,y=g.y+stroke_y+60);xtest.fake_input(d,X.ButtonRelease,1);xtest.fake_input(d,X.KeyRelease,shift);d.sync()
+   await ready('New shapekey...');await command('Save');sculpted=inspect();obj=sculpted['objects'][0];old=duplicated['objects'][0]
+   check(obj['deformation']['morphs']['targets'][selected]!=old['deformation']['morphs']['targets'][selected] and obj['deformation']['morphs']['targets'][:selected]==old['deformation']['morphs']['targets'][:selected] and obj['painted']==old['painted'],'Actual Shift/left target stroke changes the selected key while keeping other keys and paint exact')
+   check(obj['deformation']['morph_weights']==old['deformation']['morph_weights'],'Actual selected-key preview retains the saved mixed weights')
+   await asyncio.sleep(.15);after=pixels(window).crop((0,0,g.width,g.height-40));after.save(out/'target-after.png')
+   changed=sum(max(abs(a[i]-b[i]) for i in range(3))>12 for a,b in zip(before.getdata(),after.getdata()))
+   check(changed>50,'Actual native canvas displays changed selected-key geometry and shading')
+   await command('Undo');await command('Save');check(inspect()==duplicated,'Universal Undo restores the complete pre-stroke shape source and target state')
+   await command('Redo');await command('Save');check(inspect()==sculpted,'Universal Redo restores exact sculpted geometry and frame attributes')
+   await command('Sculpt selected shapekey');await command('Save');check(inspect()==sculpted,'Finishing native target sculpt restores mixed preview without editing saved data')
   report(True);d.close();bus.disconnect()
 try:asyncio.run(main())
 finally:
