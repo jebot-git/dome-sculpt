@@ -126,6 +126,29 @@ async def main():
             raw = widget.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
             return Image.frombytes("RGB", (geometry.width, geometry.height), raw.data, "raw", "BGRX")
 
+        async def clipboard_text():
+            reader = connection.screen().root.create_window(0, 0, 1, 1, 0, X.CopyFromParent)
+            target = connection.intern_atom("UTF8_STRING")
+            property_atom = connection.intern_atom("DOME_SCULPT_UNICODE_TEST")
+            try:
+                reader.convert_selection(connection.intern_atom("CLIPBOARD"), target,
+                                         property_atom, X.CurrentTime)
+                connection.flush()
+                deadline = time.monotonic() + 8
+                while time.monotonic() < deadline:
+                    while connection.pending_events():
+                        event = connection.next_event()
+                        if event.type == X.SelectionNotify and event.requestor.id == reader.id:
+                            if event.property == X.NONE:
+                                raise AssertionError("Native clipboard refused UTF-8 input")
+                            data = reader.get_full_property(property_atom, target)
+                            return bytes(data.value).decode("utf-8")
+                    await asyncio.sleep(.01)
+                raise TimeoutError("Native UTF-8 clipboard did not acknowledge input")
+            finally:
+                reader.destroy()
+                connection.flush()
+
         async def enabled(label):
             for _ in range(400):
                 nodes = await layout()
@@ -166,10 +189,16 @@ async def main():
                 xtest.fake_input(connection, X.KeyRelease, code)
                 connection.sync()
                 await asyncio.sleep(.025)
+            # XSync acknowledges the server, not FLTK's input processing. Keep
+            # the map installed until the native clipboard returns every typed
+            # character, so queued Unicode lookups cannot see the restored map.
+            await command("Select All"); await command("Copy")
+            check(await clipboard_text() == value,
+                  "Native clipboard acknowledges all Unicode input before test keymap restoration")
+            await command("Cut"); await command("Paste")
         finally:
             connection.change_keyboard_mapping(first_code, previous)
             connection.sync()
-        await command("Select All"); await command("Copy"); await command("Cut"); await command("Paste")
         image(editor).save(OUT / "utf8-input-clipboard.png")
         tap(editor, geometry.width / 2 + 80, geometry.height - 40)
         await wait(lambda: named("Object and material") is None)
