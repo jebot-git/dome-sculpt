@@ -28,6 +28,14 @@ std::unique_ptr<Document> setup(){auto d=std::make_unique<Document>();d->replace
 void gesture(Document &d){require(d.begin_native_stroke(),"Start native allocation fixture");NativeStrokeSample s;s.origin={0,0,1};s.direction={0,0,-1};s.brush.tool=Tool::Carve;s.brush.radius=.08f;s.brush.blend=0;require(d.sample_native_stroke(s)||hit.load(),"Submit native allocation fixture");d.end_native_stroke();require(d.wait_native_stroke(),"Native allocation worker drains");}
 }
 int main()try{
+ // Device runtimes perform process-global JIT/plugin setup only on the first
+ // native worker. Warm that uninstrumented path before counting comparable
+ // worker transactions. setup() still clears the ray index for EVERY measured
+ // and faulted worker; actual injection and exact rollback remain mandatory.
+ if(compute_backend()!="CPU") {
+   auto warm=setup();gesture(*warm);
+   require(warm->frame().state->error.empty(),"GPU native warm-up succeeds");
+ }
  auto measured=setup();calls=0;failure=0;tracking=true;gesture(*measured);tracking=false;size_t count=calls.load();require(count>32,"Measured worker allocation coverage");require(measured->frame().state->error.empty(),"Measured transaction succeeds");measured.reset();
  std::set<size_t> boundaries;for(size_t n=1;n<count;n*=2)boundaries.insert(n);for(size_t n=count>48?count-48:1;n<=count;++n)boundaries.insert(n);
  for(auto boundary:boundaries){auto d=setup();auto original=ordered(d->copy_volume());auto tokens=DocumentNativeTestAccess::tokens(*d);auto revision=d->frame().state->revision;calls=0;failure=boundary;hit=false;tracking=true;gesture(*d);tracking=false;failure=0;

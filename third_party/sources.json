@@ -267,5 +267,17 @@
     "source": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.4.1.json",
     "used": "Optional user-local development compiler/runtime, not vendored application code or a driver. Full optimized native FLTK/OpenXR build, requiredC++20,compute86/sm86 and explicit nonempty missing-GPU failure verified. Actual NVIDIA numerical/device execution remains required.",
     "license": "Each NVIDIA component license is retained under the staged toolkit licenses directory. No toolkit binaries are committed."
+  },
+  "ufbx": {
+    "repository": "https://github.com/ufbx/ufbx",
+    "commit": "26a482ae66871d7de36eb722aa060bce95bce274",
+    "version": "0.23.1",
+    "license": "MIT (selected alternative A; complete upstream dual-license notice retained)",
+    "used": "Unmodified native C FBX/OBJ reader with confined immutable source resource capture, bounded allocators and cancellation; no proprietary FBX SDK or runtime frontend. Current adapter supports static geometry/material/corner/instances with explicit guards for unsupported skin/blend/affine cases.",
+    "upstream_sha256": {
+      "ufbx.c": "4a956c26a708e40d82ecb0aeaee54da709d5ba7c144c9642174970059bda7e1d",
+      "ufbx.h": "f787be529af577efc04f3e3e735844a08556718dbb613d1211c2b313d72895dc",
+      "LICENSE": "0dd48ebadf52273c736256325c8f078c03c8bb4facee22a4122de0ad3f615391"
+    }
   }
 }

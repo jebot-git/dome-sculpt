@@ -29,7 +29,12 @@ The original notices and licenses on reused source files remain in force.
 - cgltf 1.15: MIT notice at the bottom of `third_party/cgltf/cgltf.h`.
   Compiled by the native static glTF/GLB importer and used by independent export validation.
 
-libpng is linked from the system for native PNG encoding; it is not vendored.
+- ufbx 0.23.1: MIT (selected alternative A). The unmodified native C reader,
+  header and complete upstream license notice are in `third_party/ufbx`. Source
+  identity and hashes are in `third_party/sources.json`; no FBX SDK is linked.
+
+libpng and libjpeg are linked from the system for native image decoding/encoding;
+they are not vendored.
 
 Exact repositories, commits, roles and SHA-256 hashes are recorded in
 `third_party/sources.json`. Seamless3d, OpenFX and MeshLab are currently
