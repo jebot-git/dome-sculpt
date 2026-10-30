@@ -132,6 +132,8 @@ struct EditorState {
   bool can_polygon = false, polygon_requires_conversion = false, polygon_has_source = false;
   uint32_t pending_exports = 0;
   bool can_author_shapes=false,can_restore_shapes=false,can_select_shape=false;
+  bool shape_sculpt=false;
+  uint64_t shape_sculpt_object=0;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -222,6 +224,7 @@ public:
   void replace(Volume, bool clean = true);
   void seed();
   bool begin_native_stroke();
+  void configure_shape_sculpt(bool enabled);
   bool sample_native_stroke(NativeStrokeSample);
   void end_native_stroke(bool accept = true);
   bool wait_native_stroke(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
@@ -524,6 +527,9 @@ private:
     std::shared_ptr<const DeformationState> deformation;
     std::shared_ptr<const Scene> initial;
     std::shared_ptr<const MeshSnapshot> original_preview;
+    std::optional<size_t> shape_target;
+    uint32_t spatial_owner=0;
+    std::atomic_bool menu_after{false};
     PaintSettings paint;
     std::deque<NativeStrokeSample> samples;
     size_t submitted = 0;
@@ -542,6 +548,11 @@ private:
   bool native_processing_ = false;
   std::atomic<uint64_t> native_epoch_{0};
   void native_loop();
+  bool begin_native_locked(uint32_t spatial_owner=0);
+  bool sample_native_locked(NativeStrokeSample);
+  void configure_shape_sculpt_locked(bool);
+  void process_shape_spatial_locked(const SpatialFrame &);
+  std::array<bool,2> shape_rearmed_{};
   void end_native_locked(bool);
   void cancel_native_locked();
   void drain_native_shutdown();

@@ -62,7 +62,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char*,12> import_options={"Format","Units","Axes","Normals","Paint size","Materials","Custom unit","Defaults","Back","Refresh folder","Import","Cancel"};
   static const std::array<const char*,12> polygon={"Start / resume","Vertices","Edges","Faces","Move / select","Add / toggle","Distance","Extrude","Back","Topology","Apply","Cancel"};
   static const std::array<const char*,12> polygon_topology={"All / none","Inset faces","Bridge loops","Dissolve edges","Weld vertices","Cut edges","Cuts","Connect vertices","Back","Delete faces","Flip faces","Cancel"};
-  static const std::array<const char*,12> shapes={"New neutral","Capture mix","Duplicate","Mirror","Shape weight","Previous shape","Next shape","Restore original","Back","Undo","Redo","Export avatar"};
+  static const std::array<const char*,12> shapes={"New neutral","Capture mix","Duplicate","Mirror","Shape weight","Previous shape","Next shape","Restore original","Back","Undo","Redo","Edit / finish target"};
   return page == 24 ? shapes : page == 22 ? polygon_topology : page == 19 ? polygon : page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
          : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
@@ -156,7 +156,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
       spatial_parameter(page, index))
     return {};
   if(page==24){
-    static const std::array<SpatialCommand,12> shapes={SpatialCommand::ShapeNew,SpatialCommand::ShapeCapture,SpatialCommand::ShapeDuplicate,SpatialCommand::ShapeMirror,SpatialCommand::Undo,SpatialCommand::RigPreviousMorph,SpatialCommand::RigNextMorph,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::ExportAvatar};
+    static const std::array<SpatialCommand,12> shapes={SpatialCommand::ShapeNew,SpatialCommand::ShapeCapture,SpatialCommand::ShapeDuplicate,SpatialCommand::ShapeMirror,SpatialCommand::Undo,SpatialCommand::RigPreviousMorph,SpatialCommand::RigNextMorph,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::ShapeSculpt};
     return index==8?std::nullopt:std::optional<SpatialCommand>(shapes[index]);
   }
   if(page==19){

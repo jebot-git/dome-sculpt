@@ -477,7 +477,7 @@ void SpatialPalette::raster(const EditorState &s) {
   if(s.menu_page==24){
     const auto *keys=s.deformation&&s.deformation->morphs?&*s.deformation->morphs:nullptr;
     text(320*unit_,280*unit_,keys&&!keys->targets.empty()?keys->targets.at(std::min(s.morph_target,keys->targets.size()-1)).name:"Create a shape target",fg);
-    text(320*unit_,312*unit_,s.asset_busy?"Authoring / Cancel work":std::to_string(keys?keys->targets.size():0)+" targets; original retained",fg);
+    text(320*unit_,312*unit_,s.asset_busy?"Authoring / Cancel work":s.shape_sculpt?"Sculpt target; pose and other keys retained":std::to_string(keys?keys->targets.size():0)+" targets; original retained",fg);
   }
   if(s.menu_page==19||s.menu_page==22){
     auto p=s.polygon;
