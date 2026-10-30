@@ -49,8 +49,8 @@ FBX From File consumes authored unit/axis metadata; OBJ accepts explicit units
 and Y-up/Z-up. FBX also accepts explicit unit/axis overrides through a separately
 recorded outer conversion, preserving its raw metadata. Legacy shaders receive a stated ufbx PBR approximation. Missing
 OBJ/FBX normals receive an explicitly diagnosed flat canonical normal; raw
-absence remains retained. This does not remove the normative missing-NORMAL
-glTF guard. PNG/JPEG texture bytes remain encoded in source/canonical storage;
+absence remains retained. Missing-NORMAL glTF authoring is now supported for the
+documented UV0 material subset; see GLTF-FLAT-NORMALS.md. PNG/JPEG texture bytes remain encoded in source/canonical storage;
 native bounded decoders produce RGBA with role-specific sRGB/linear meaning
 left to materials. JPEG warnings/truncation and excessive progressive scans (over64) fail across a C error boundary,
 which never longjmps through C++ destructors.

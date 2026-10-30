@@ -168,6 +168,27 @@ int main(int argc, char **argv) try {
     }
     require(native.loaded_faces()==1,"Native PCF coverage accidentally used a fallback face");
     auto large_face=bdf_fonts::scaled(face,2);
+    auto browser_alias=bdf_fonts::qt_alias(face,"browser"),media_alias=bdf_fonts::qt_alias(face,"media");
+    bdf_fonts::register_font(browser_alias.file);bdf_fonts::register_font(media_alias.file);
+    auto catalog=bdf_fonts::discover(true);
+    require(std::none_of(catalog.begin(),catalog.end(),[](const auto &item){return item.family.rfind("Dome Browser Bitmap ",0)==0 ||
+        item.family.rfind("Dome Media BDF ",0)==0 || item.family.rfind("Dome Qt BDF ",0)==0 || item.family.rfind("Dome 2x ",0)==0;}),
+        "Generated bitmap aliases leaked into host font choices");
+    auto exported=bdf_fonts::export_config();auto cfg=FcConfigCreate();
+    auto cache=directory/"native-alias-cache";std::filesystem::create_directories(cache);std::string escaped;
+    for(char c:cache.string()){if(c=='&')escaped+="&amp;";else if(c=='<')escaped+="&lt;";else if(c=='>')escaped+="&gt;";else escaped+=c;}
+    auto cache_config="<fontconfig><cachedir>"+escaped+"</cachedir></fontconfig>";
+    require(cfg && FcConfigParseAndLoadFromMemory(cfg,reinterpret_cast<const FcChar8 *>(cache_config.c_str()),FcTrue) &&
+        FcConfigParseAndLoad(cfg,reinterpret_cast<const FcChar8 *>(exported.c_str()),FcTrue) && FcConfigBuildFonts(cfg),
+        "Cannot load native bitmap alias configuration");
+    auto query=FcPatternCreate();FcPatternAddString(query,FC_FAMILY,reinterpret_cast<const FcChar8 *>(media_alias.family.c_str()));
+    FcPatternAddDouble(query,FC_PIXEL_SIZE,media_alias.pixels);FcConfigSubstitute(cfg,query,FcMatchPattern);FcDefaultSubstitute(query);
+    FcResult match_result;auto match=FcFontMatch(cfg,query,&match_result);FcChar8 *matched_file=nullptr;
+    bool exact_alias=match && FcPatternGetString(match,FC_FILE,0,&matched_file)==FcResultMatch &&
+        std::filesystem::path(reinterpret_cast<const char *>(matched_file))==media_alias.file;
+    if(match)FcPatternDestroy(match);FcPatternDestroy(query);FcConfigDestroy(cfg);
+    require(exact_alias,"Exported native bitmap configuration substitutes a different media font");
+    std::cout<<"PASS native bitmap aliases export exact identity and stay out of host choices\n";
     palette_text::Font large(large_face.file,pcf_pixels*2);
     auto a=native.layout("ABC xyz 123",1200),b=large.layout("ABC xyz 123",2400);
     require(a.advance*2==b.advance && a.glyphs.size()==b.glyphs.size(),"PCF 2x metrics changed");

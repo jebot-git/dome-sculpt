@@ -50,9 +50,9 @@
     "license": "MIT",
     "bitmap_helper": {
       "repository": "https://github.com/jebot-git/DomeD",
-      "commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
+      "commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
       "file": "native/bdf_font.hpp",
-      "sha256": "6fbe6237eb7cbb3efdcb9abe7cb0e98b4ce41610372cc31efb6ab270dea1fbf0",
+      "sha256": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
       "license": "MIT and retained bdf2x Unlicense attribution",
       "used": "Byte-identical canonical native BDF/PCF discovery, lossless adapter, integer enlargement and Fontconfig policy; no local behavior fork."
     }
@@ -70,7 +70,7 @@
   },
   "source_sha256": {
     "third_party/desktop/appearance.h": "25525e1d43c3036c5fc9ddd99e3c9621e8f9439147412b9bcfc1f2152201f591",
-    "third_party/desktop/bdf_font.hpp": "6fbe6237eb7cbb3efdcb9abe7cb0e98b4ce41610372cc31efb6ab270dea1fbf0",
+    "third_party/desktop/bdf_font.hpp": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
     "third_party/desktop/desktop-menu.h": "cfbd67120ea23a607e158ef7260409ce4fc5201915e5791096be3b6962f196f5",
     "third_party/desktop/desktop-menu.cpp": "51ab33c3d7a2d8cd76a4cedbfd05d410a7d5d7137b94f89b3e9f9e54562c4cab",
     "third_party/desktop/desktop-menu.cmake": "2520c100f2828747a4b8dfdee2f3faa742faf43c02fa73c6adba8d9ad6ce8ada",
@@ -175,7 +175,7 @@
     },
     "combined_patch_sha256": "f44bf778691abd5418756e0f427266ca205a2e45c262d63026799b9222dc92b2",
     "used": "Canonical Release FLTK1.4.5 with all23 patches, native BDF/PCF selection, -O3/local CPU tuning, libraries in lib. Current application/runtime qualification is scoped separately from the older22-patch milestone.",
-    "verified_at_commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
+    "verified_at_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
     "builder_sha256_at_verified_commit": "fe7db74e1763dc51c8362332751eefe4559aa25a654a000e4553e6afe91754ae"
   },
   "vrm_specification": {
@@ -224,10 +224,10 @@
     "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
   },
   "domed_latest_check": {
-    "commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
+    "commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
     "fltk_inputs_changed_since_282467e": true,
-    "checked_utc": "2026-10-30T16:56:30.004404+00:00",
-    "used": "Current source/toolkit23/bitmap-runtime refreshed privately; exact compositor/application qualification tracked in the next checkpoint receipt."
+    "checked_utc": "2026-10-30T17:22:45.822208+00:00",
+    "used": "Current bitmap alias helper refreshed; FLTK23 builder/patches and all bitmap runtime inputs remain byte-identical toeee23b7. Exact scoped application/compositor proof in GLTF-FLAT-NORMALS receipt."
   },
   "mtoon": {
     "implementation": "src/mtoon.cpp; include/dome/mtoon-shader.hpp",
@@ -487,6 +487,7 @@
         "libpangocairo-1.0.so.0": "3c338cbc91c96b508106cb23c3b1db1e385aa1b08b47ed553d92e8c63db781db"
       }
     },
-    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack; no Pango application frontend, no outlines, no system installation."
+    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack; no Pango application frontend, no outlines, no system installation.",
+    "verified_at_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9"
   }
 }

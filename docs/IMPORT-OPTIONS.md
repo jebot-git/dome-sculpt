@@ -60,9 +60,9 @@ diagnostics clip at complete UTF-8 scalars. Existing archive/source/frame/skin
 semantics are retained.
 
 Validation logs and exact source hashes are recorded in the private checkpoint
-manifest. This work does not claim full glTF/FBX support: normative absent-NORMAL
-flat generation/ignored authored TANGENT, full affine and linked source-node pose
-transport, FBX skin/blend conversion, source PBR UV1 sampling, UV/COLOR morphs,
+manifest. Missing-NORMAL base/key generation and ignored tangent semantics are
+now implemented for the documented native UV0 material subset; see
+GLTF-FLAT-NORMALS.md. Full affine and linked source-node pose transport, FBX skin/blend conversion, source PBR UV1 sampling, UV/COLOR morphs,
 VRM bind conversion and the other cases in IMPORT-FORMATS remain required.
 No headset, system installation, external push or live-session change is part
 of this private qualification.

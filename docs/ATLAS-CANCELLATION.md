@@ -9,3 +9,11 @@ Cancellation is cooperative. A single vendor chart iteration can run between pro
 Fresh CPU Release checks passed both suites in 15.25 seconds: 12 cancellation checks and the existing 17 atlas robustness checks. Fresh complete application core/support C and C++ ASan/UBSan with leak checking passed the same two suites in 66.88 seconds. Tests observe actual chart generation, packing and output progress through a test-only linker wrapper, exercise cancellation before work/mid-chart/mid-pack/late output, typed and non-standard predicate exceptions, task-join safety, exact retry, and two concurrent contexts with independent outcomes. The original three-argument and empty-overload meshes and atlas diagnostics compare exactly.
 
 Evidence: `artifacts/tests-atlas-cancel-release.log`, `artifacts/tests-atlas-cancel-sanitize.log`, and the atlas cancellation source manifest. No hardware execution or full editor workflow is claimed by this CPU atlas checkpoint.
+
+The flat-normal import integration replaces the original fixture's polygon-cube
+dependency with an explicit native six-face cube. Its13 checks retain every
+cancellation oracle and add actual missing-normal/missing-UV authoring import:
+the shared predicate cancels from a real xatlas chart callback and the caller
+Scene stays exact. CPU/OneAPI and complete-own-core/support sanitizer checks pass.
+See GLTF-FLAT-NORMALS.md and its scoped receipt; other worker callers still need
+the overload, and no hard vendor-iteration latency bound is claimed.

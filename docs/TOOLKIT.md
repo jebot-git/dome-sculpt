@@ -1,47 +1,71 @@
 # Current DomeD toolkit and conventions
 
-Current canonical DomeD is `6feb62b936a9d8d2a2e6a893aebcbda9b724fe23`, checked
-against remote main on 2026-10-30. Its FLTK builder and all22 patches are unchanged
-from `282467e727df78c8e7f2452aa05a7747bac854a6`; every patch hash is verified.
-Use the existing optimized FLTK1.4.5+22 prefix `artifacts/toolkit-282467e`, whose
-libraries are in **lib64**. The old revision in that artifact name identifies
-its unchanged FLTK inputs, rather than the current compositor revision.
-Configure using:
+Current canonical DomeD is `3024fb61a9eaa94fea0d581f862526307b5544a9`, checked
+against remote main on2026-10-30. Its toolkit/runtime inputs are byte-identical
+to eee23b7, which added native PCF and a23rd FLTK patch. The current helper also
+exports media aliases correctly and excludes generated aliases from host choices. The earlier22-patch artifacts and6feb runtime are retained
+as historical evidence; they no longer identify the latest toolkit inputs.
+
+The canonical Release builder prepared `artifacts/toolkit-eee23b7` with all23
+patches and local CPU optimization. This prefix uses **lib**, not lib64.
+The new canonical native bitmap stack is in `artifacts/bitmap-runtime-eee23b7`,
+also **lib**: FreeType2.14.3, HarfBuzz14.1.0, Cairo1.18.4 and Pango1.57.1. Exact
+archives, patches, fork revision, licenses and built-library hashes are recorded
+in third_party/sources.json and its installed runtime manifest.
+
+Native decoded nonscalable BDF and PCF are accepted; outlines remain disabled.
+The vendored `third_party/desktop/bdf_font.hpp` is byte-identical to DomeD's
+`native/bdf_font.hpp` at this revision. Other qimgvr appearance/universal-menu
+helpers retain their pinned bytes. No unrelated qimgvr working files are imported.
+The application remains FLTK; Pango is not an added application frontend.
+
+Configure/launch against the current local artifacts from the repository root:
 
 ```sh
+export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib:$PWD/artifacts/toolkit-eee23b7/lib"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOME_COMPUTE_BACKEND=CPU \
-  -DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/share/fltk
-```
-
-DomeD6feb adds the native Unicode BDF-only HarfBuzz/Pango runtime and stricter
-font export checks. The canonical `scripts/prepare-bitmap-runtime.py` built its
-pinned Release runtime privately into `artifacts/bitmap-runtime-6feb62b`;
-**that runtime uses lib, not lib64**. Its manifest, upstream/fork revisions,
-patches and built-library hashes are recorded in third_party/sources.json.
-Native BDF blob/FreeType metrics, 1x/2x, LTR/RTL, Pango exact pixels, outline/
-malformed rejection, Rust font-export and actual private-library checks pass.
-No Pango frontend is introduced into Dome Sculpt.
-
-For current application/runtime validation, prepend both private directories:
-
-```sh
-export LD_LIBRARY_PATH=/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-6feb62b/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64
+  -DFLTK_DIR="$PWD/artifacts/toolkit-eee23b7/share/fltk"
+cmake --build build --parallel 3
 ./build/dome-sculpt
 ```
 
-The Release compositor was rebuilt at6feb into
-`artifacts/domed-6feb62b-target/release/dome-compositor`, preserving the old282
-binary. For private native Wayland tests, set `DOME_COMPOSITOR` to that binary
-and `DOME_TEST_LIBRARY_PATH` to the two directories above. The harness otherwise
-clears inherited library overrides, and with the explicit path records live
-compositor/client mappings in `artifacts/dome-menu/runtime-maps.json`. Those
-processes load the prepared FLTK and BDF-only HarfBuzz; they do not load Pango.
-The matching canonical Pango runtime is separately validated by its native test.
-See HOLDING-IMPORT-INTEGRATION.md and its machine-readable qualification receipt.
+For an existing build directory, clear `*NATIVEGL*` and `*RENDERFONTS*` cache
+entries when switching runtimes. The pkg-config font packages precede GL so
+FindPkgConfig resolves private FreeType/HarfBuzz before GL's system library
+directory; headers and same-SONAME libraries must match. Verify actual `ldd` and
+live mappings, rather than only the configured prefix. An inherited library path
+can override ELF RUNPATH.
 
-Build as the regular user. No system runtime was installed and no active desktop,
-compositor or display-manager session was replaced/restarted. Stage and verify
-matching artifacts before any later authorized system installation.
+To prepare fresh artifacts, run the canonical DomeD
+`scripts/prepare-bitmap-runtime.py` and then `scripts/prepare-fltk-experiment.py`
+with explicit private prefixes/dependency directories. Point PKG_CONFIG_PATH,
+LD_LIBRARY_PATH and CMAKE_PREFIX_PATH at the new bitmap prefix while building
+FLTK; this workstation's FLTK cache confirms it used that FreeType's headers and
+library. Both scripts build Release as the regular user. Existing source/build
+artifacts are retained, including old compositor binaries.
+
+The current private compositor is
+`artifacts/domed-3024fb6-target/release/dome-compositor`. Set DOME_COMPOSITOR to
+that file and DOME_TEST_LIBRARY_PATH to the two library directories above for
+`tests/dome_menu.py`. The harness clears inherited overrides by default, permits
+only explicitly selected private directories and records the live compositor/
+client FLTK, FreeType, HarfBuzz and Cairo mappings. Runtime/checker tests also
+validate the Pango companion libraries independently.
+
+Native PCF shaping, Unicode/bidi metrics,1x/2x, exact Pango/Cairo pixels and
+outline rejection are tested by the canonical runtime suite. Its lossless PCF
+adapter checks57086 Unicode glyphs. The application palette's optional third
+argument selects a native PCF fixture and verifies native glyph/placement/pixels,
+integer2x and actual GL output against the lossless reference. The private
+Unifont17.0.04 fixture URL/hashes are in artifacts/font-fixtures-eee23b7/SOURCES.json;
+it is neither bundled nor installed. Exact current application qualification and
+limits are recorded in GLTF-FLAT-NORMALS.md and its validation receipt.
+
+No system runtime was installed and no active desktop, compositor or display-
+manager session was replaced/restarted. Stage and verify matching artifacts
+before any later authorized system installation. No physical headset test is
+implied by the private compositor or synthetic OpenXR checks.
 
 ## Historical toolkit evidence
 
