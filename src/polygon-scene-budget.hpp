@@ -58,6 +58,13 @@ struct PolygonSceneBudget {
         throw std::invalid_argument("Invalid polygon paint tile count");
       add(paint_bytes, t.size() * sizeof(PaintTile), 256 * 1024 * 1024,
           "Scene retained paint storage exceeded");
+      if (l.contains("pbr_color_tiles")) {
+        const auto &pbr = l.at("pbr_color_tiles");
+        if (!pbr.is_array() || pbr.size() > 4096)
+          throw std::invalid_argument("Invalid polygon PBR color tile count");
+        add(paint_bytes, pbr.size() * sizeof(PaintColorTile),
+            256 * 1024 * 1024, "Scene retained PBR paint storage exceeded");
+      }
     }
     const auto &mesh = p.at("mesh");
     if(retained && mesh.at("positions").is_binary())
@@ -76,6 +83,13 @@ struct PolygonSceneBudget {
         add(paint_bytes, b.get_binary().size(), 256 * 1024 * 1024,
             "Scene retained baked storage exceeded");
       }
+    if (p.contains("baked") && p.at("baked").contains("pbr_color")) {
+      const auto &pbr = p.at("baked").at("pbr_color");
+      if (!pbr.is_binary())
+        throw std::invalid_argument("Invalid retained baked PBR buffer");
+      add(paint_bytes, pbr.get_binary().size(), 256 * 1024 * 1024,
+          "Scene retained baked PBR storage exceeded");
+    }
   }
   void deformation(const nlohmann::json &d, unsigned version) {
     if (d.is_null())

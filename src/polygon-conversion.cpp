@@ -129,6 +129,10 @@ std::shared_ptr<const PolygonOrigin> capture_origin(const SculptObject &source,
   return origin;
 }
 } // namespace
+std::shared_ptr<const PolygonOrigin>
+capture_polygon_origin(const SculptObject &source, CanvasTransform world) {
+  return capture_origin(source, world);
+}
 struct PolygonConversionAccess {
   static PolygonMesh evaluated(const PolygonMesh &source, const Mesh &rest,
                                const Mesh &pose, const PolygonLimits &limits) {

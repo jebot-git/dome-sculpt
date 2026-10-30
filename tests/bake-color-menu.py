@@ -22,7 +22,8 @@ if os.environ.get("DOME_SCULPT_BAKE_COLOR_BUS") != "1":
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = Path(os.environ.get("DOME_SCULPT_TEST_BUILD",str(ROOT / "build")))
 COMPACT = os.environ.get("DOME_SCULPT_BAKE_COLOR_COMPACT") == "1"
-OUT = ROOT / ("artifacts/menu-bake-color-compact" if COMPACT else "artifacts/menu-bake-color-workflow")
+POLYGON = os.environ.get("DOME_SCULPT_BAKE_COLOR_POLYGON") == "1"
+OUT = ROOT / ("artifacts/menu-bake-color-" + ("polygon-" if POLYGON else "") + ("compact" if COMPACT else "workflow"))
 OUT.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -66,7 +67,8 @@ async def main():
             config.parent.mkdir(parents=True,exist_ok=True)
             config.write_text(json.dumps({"font":"Unifont / Sans-Serif","font_size":16,"font_scale":2}))
         fixture = Path(task_home, "procedural.dsculpt")
-        subprocess.run([str(BUILD / "dome-sculpt-colored-bake-workflow-test"), "--ui-fixture", str(fixture)], check=True)
+        helper = "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
+        subprocess.run([str(BUILD / helper), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
         processes.append(app)

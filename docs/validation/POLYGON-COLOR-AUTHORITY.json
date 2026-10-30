@@ -1,0 +1,251 @@
+{
+  "status": "qualified private source checkpoint; final complete integration/frontend/device qualification remains separate",
+  "base": "84d9fe6261c394d2257b3d416a5fd211a0acc061",
+  "branch": "work/color-polygon-authority-84d9",
+  "tree": "artifacts/color-polygon-authority-84d9",
+  "changes": [
+    "Refuse PA in color preparation original_paint and beforeBinding policy, including cheap publications; SourceUV bake/adoption cannot mint unbound PA provenance.",
+    "Native opt-in proves unchanged PA mesh/UV Strict, retains exact PA/direct authority in PolygonOrigin, then performs color preparation and real bake atomically.",
+    "PolygonOrigin current paint/preparation/image/mesh/appearance pairing.",
+    "Retained independent PBR tile and baked-plane aggregate accounting before allocations.",
+    "Single complete origin capture implementation reused through private capture_polygon_origin wrapper."
+  ],
+  "layout_and_format": "No public header/layout change or new archive version; existing Scene12/color3 and direct PA witness preserved.",
+  "validation": {
+    "CPU_new_native_checks": 40,
+    "CPU_existing_regression_suites": [
+      {
+        "test": "color-preparation",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-color-preparation-test"
+        ]
+      },
+      {
+        "test": "color-projection-quality",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-color-projection-quality-test"
+        ]
+      },
+      {
+        "test": "colored-bake-workflow",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-colored-bake-workflow-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/outputs/colored-native"
+        ]
+      },
+      {
+        "test": "source-uv-bake",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-source-uv-bake-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-union-7152/assets/humanoid/vroid/base-female.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/production-union-7152/assets/humanoid/vroid/base-male.vrm"
+        ]
+      },
+      {
+        "test": "source-uv-adopt",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-source-uv-adopt-test"
+        ]
+      },
+      {
+        "test": "bake-projection-policy",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-bake-projection-policy-test"
+        ]
+      },
+      {
+        "test": "polygon-paint-policy",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-paint-policy-test"
+        ]
+      },
+      {
+        "test": "polygon-paint-authority",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-paint-authority-test"
+        ]
+      },
+      {
+        "test": "polygon-uv",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-uv-test"
+        ]
+      },
+      {
+        "test": "polygon-scene-archive",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-scene-test"
+        ]
+      },
+      {
+        "test": "polygon-source",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-source-test"
+        ]
+      },
+      {
+        "test": "polygon-authoring",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-authoring-test"
+        ]
+      },
+      {
+        "test": "polygon-import-source",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-import-source-test"
+        ]
+      },
+      {
+        "test": "polygon-document",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-polygon-document-test"
+        ]
+      },
+      {
+        "test": "object-isolation",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-object-isolation-test"
+        ]
+      },
+      {
+        "test": "object-hold-edit",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-object-hold-edit-test"
+        ]
+      },
+      {
+        "test": "import-authoring",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-import-authoring-test"
+        ]
+      },
+      {
+        "test": "scene-schema-compat",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-scene-compat-test"
+        ]
+      },
+      {
+        "test": "normal-frame-archive",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-normal-frame-archive-test"
+        ]
+      },
+      {
+        "test": "uv-workflow",
+        "exit": 0,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/color-polygon-authority-84d9/build-overlay/regressions/dome-sculpt-uv-workflow-test"
+        ]
+      }
+    ],
+    "whole_own_code_ASAN_UBSAN_leaks_checks": 40,
+    "suppressions": [],
+    "sanitizer_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer (C and C++)",
+    "sanitizer_link_member_exclusion": {
+      "base_source": "84d9fe6261c394d2257b3d416a5fd211a0acc061",
+      "excluded_old_core_members": [
+        "bake-authoring.cpp.o",
+        "color-preparation.cpp.o",
+        "polygon-scene.cpp.o",
+        "source-uv-bake.cpp.o",
+        "scene.cpp.o",
+        "polygon-conversion.cpp.o"
+      ],
+      "linkmap_sha256": "e41b5679961fc4a6b26005294c20d880123e0a5b19cffe46f97b556bf9cbc09f",
+      "all_old_owned_members_excluded": true,
+      "frozen_archive_manifest_sha256": "86070670925cd0181ef4252bd4e9226a8c3926db4d289b6892c6825e3bb0f2d6"
+    },
+    "Khronos": {
+      "models": 2,
+      "errors": 0,
+      "warnings_each": [
+        "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE"
+      ],
+      "ignored_issues": [],
+      "severity_overrides": []
+    }
+  },
+  "scope": [
+    "CPU and sanitizer overlay builds use source-matching immutable84 archives, all public headers unchanged, changed six TUs linked first. No shared tree writes.",
+    "Native Document/controller/file/UV/GLB paths executed; no new actual FLTK GUI, hardware GL or OneAPI result claimed. Optional genuine polygon GUI fixture mode supplied for final coherent integration.",
+    "Explicit unchanged-mesh Strict bridge is not arbitrary topology color interpolation/transport, UV unwrapping, affine migration or broader portable original-frame normal conversion.",
+    "Existing actual GLBs require runtime-generated tangent space; no universal normal-portability claim.",
+    "No push, install, display/session restart or physical headset execution."
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "40dc22119e48d1d19e8c5cca7a010bbf96be86681feb21f42ffb4b61111d50ae",
+    "src/bake-authoring.cpp": "54b1ba2db5637f9d9131339157944537439af022e24cc7f34d7eebd0c646c221",
+    "src/color-preparation.cpp": "ba899260c3ebc5c00cfa654df4d5aaca3e77a049657b4d99142d80f453255388",
+    "src/polygon-color-preparation.hpp": "8df56e00a430972c4d9c8999aa73c4af0a519284bd18f081ba4008446d254b50",
+    "src/polygon-conversion.cpp": "676c34fd4c5db1b0a7fd72d32755aab0be6fa5e427c45351e92ac7ede7c8ffae",
+    "src/polygon-conversion.hpp": "3ea93928007022e2aa743198d43f3b46f1e94ccd4189a6adf557ef64ab532b74",
+    "src/polygon-scene-budget.hpp": "e618b39a01173f3ea0c13cc4ebba0ae0f3acddbf99177c227bdc2d91273daa62",
+    "src/polygon-scene.cpp": "67d3616e0ed782a64541c44c9251064f47e9ebb4e08abafeca99844a6e69274f",
+    "src/source-uv-bake.cpp": "d59801aa0b5a433b57be83f37415a7b3596542e8c2bc5d6b2fe755d07398a6c3",
+    "tests/color-polygon-authority.cpp": "1d448db0d6900bcacb149af0eba7764a45bd66e9957626e1aced51d06ba2bcfb",
+    "tests/bake-color-menu.py": "11b541de76f945e83075dff1ec347835db7620cb7761e453fc9c3a4d833c0b2e",
+    "docs/POLYGON-COLOR-AUTHORITY.md": "b09ce8e834671e97e3cfc8f3ecd75e7c82ea20543a6aac9d7c2e4f8b5c34fdd5"
+  },
+  "CPU_baseline_archives_sha256": {
+    "libmikktspace.a": "15f24d7fcff9240dc44806c64f66ce749c6210dd7e312772ddc50923b02e4375",
+    "libxatlas.a": "b4e12071f75d48249c13885fbbad34eae34f001aea2dcde7231b693887c2a552",
+    "libmikktspace-robust.a": "c141fe5e7d1c03f3eebe7a9889e5aad32cd399a0124ee2bcfc198d40e2ad6281",
+    "libdome-sculpt-polygon.a": "89ad3fd00121f33798bbf77d56f6848258f020843ee7083b3e2fd5c93766e633",
+    "libufbx.a": "38aeb2dc513d0f55cc730a88cb7e6ddf4df3f4f803f342e70ca46db2186d0f0d",
+    "libdome-sculpt-core.a": "82c0a8611b2584698bb5fa11aff9fd0a8cf19a7a9b0fb0ea49bf053466b6c582",
+    "libdome-sculpt-render.a": "f27dbf6d3ff0f05481035406d2f17698680b00a2c9eb0e07ee92122a3d0f4d12",
+    "libdome-sculpt-xr.a": "b3468ef43b26b08f4816bbf884e5f6377924320e8c0d7220486a05f043ee2462"
+  },
+  "sanitizer_frozen_archive_manifest": {
+    "source": "84d9fe6261c394d2257b3d416a5fd211a0acc061",
+    "C_and_CXX_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "files": {
+      "libdome-sculpt-core.a": "6dd1b1fab1bb0c403e13e013735bd281d86589198273d0a4c639c50594e0df4e",
+      "libdome-sculpt-polygon.a": "5bfc6012878e943d6c3665e0a12f2f4214bb509c9f605ca6101e951a7c413264",
+      "libxatlas.a": "c356b34dfda8ce439e0ba51fa137e87f8d19dc0c48bda928061cf2702740e298",
+      "libmikktspace.a": "0d54f1e879977097e47f77d9124d33425d2619d7e5774f4399bc8856483abd1e",
+      "libmikktspace-robust.a": "02dfbeeb298f1eb62f2e39b89e3e937801a926edc35cf841bec0bcb594d0d59b",
+      "libufbx.a": "3cbef64ce10f74b4d1a953bf48888a3257d3ec6657bae9c476636139f1e3b5ec"
+    }
+  },
+  "current_binary_sha256": {
+    "build-overlay/dome-sculpt-color-polygon-authority-test": "d9b66472b5ae0489dd241a3e272983bb5835b49c6f9938ca0650269fa3e31848",
+    "build-sanitize-overlay/dome-sculpt-color-polygon-authority-test": "0c8161921a0355a5d07c17813b7cc39ed2d957b12992275821d8520235b4f0a1"
+  },
+  "external_artifact_sha256": {
+    "color-polygon-84-overlay-build.log": "eb8732ba295a4a3b6d828ee27a7336fa0059a48ff878206482288ec0aa02e3a7",
+    "color-polygon-84-final-overlay-build.log": "539cd09480441966290e69d4ceed2ad0de534cb59868e6aeb42a0795e1400410",
+    "color-polygon-84-final-test-build.log": "320135ebd22447562e7cc3ef1a7c5d96e6f883e27b012a30026200f85cfeb18d",
+    "color-polygon-84-final-native.log": "27c93f3e82c9917fdb0e554d478cdf13e8f6c8a87223aeedf91026f8ca6a0801",
+    "color-polygon-84-regressions.log": "dfd5f40491ad7173d56449e35b5bf58ab0552416fb609f55e49b6272b9762887",
+    "color-polygon-84-regressions.json": "9e823112f0a557379def390dfea39b7edb2d33addb7e22ca92e26c6256ada95a",
+    "color-polygon-84-sanitize-build.log": "cb976543b20ad7add2805db3969f9a2ee5a9fc5a65c7078b5479e368f76eb08c",
+    "color-polygon-84-sanitize-native.log": "27c93f3e82c9917fdb0e554d478cdf13e8f6c8a87223aeedf91026f8ca6a0801",
+    "color-polygon-84-khronos.log": "f2fb74f27acaecd4fe73d47e66b2f0f2de737070c81e4b4237212d8c0238997e"
+  },
+  "new_fixture_outputs_sha256": {
+    "build-overlay/journey-held.glb": "171e1d9eca2b50a31d89383dc9680739c729986cac9b65c6c25d44741d276367",
+    "build-overlay/journey.glb": "d6682f9a5eec8c1f8a198e7a059b8d26069517465f77f0628d1f3a335f9c70ce"
+  },
+  "validator_receipt_sha256": "877aa165c1587082ce58410b19bbafb015f484b61aa15acca8ecc314ae0f8a47"
+}

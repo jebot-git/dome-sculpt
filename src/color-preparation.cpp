@@ -82,6 +82,8 @@ void SourceColorPreparation::validate(bool deep) const {
   receipt.validate();
   if(!projection || !initial_projection || !original_paint || original_paint->in_stroke() || original_paint->color_projection())
     throw std::invalid_argument("Color preparation requires an immutable unprepared original");
+  if(original_paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)
+    throw std::invalid_argument("Color preparation original paint requires explicit strict conversion; polygon authority cannot be inferred");
   projection->validate(receipt.resolution);
   for(float value:projection->maximum_error)if(value>receipt.accepted_projection_error)
     throw std::invalid_argument("Current color projection exceeds the accepted tolerance");
@@ -92,11 +94,13 @@ void SourceColorPreparation::validate(bool deep) const {
     throw std::invalid_argument("Color preparation original resolution differs");
   if(original_material && original_material->color_preparation)
     throw std::invalid_argument("Color preparation origins cannot recursively contain preparations");
+  // Cheap publications must enforce retained policy authority too. A current
+  // object's unrelated PolygonAuthority cannot authenticate this before-binding.
+  if(original_material)original_material->validate(deep);
   if(original_appearance && original_appearance->source_vertices.size()!=original_paint->mesh().positions.size())
     throw std::invalid_argument("Color preparation original appearance mapping differs");
   if(deep) {
     if(original_deformation)original_deformation->validate(original_paint->mesh());
-    if(original_material)original_material->validate();
     const auto encoded=receipt.encode();
     {
       std::lock_guard lock(proof_mutex);
@@ -141,6 +145,8 @@ ColorPreparationResult prepare_source_colors(const ColorPreparationInput &input,
     throw std::invalid_argument("Invalid color preparation work or quality limits");
   if(input.material_bindings)input.material_bindings->validate();
   if(input.paint->color_projection()) {
+    if(input.paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)
+      throw std::invalid_argument("Prepared polygon paint requires explicit strict conversion with its owning authority");
     if(!input.material_bindings || !input.material_bindings->color_preparation ||
        input.material_bindings->color_preparation->projection->vertex_rgba!=input.paint->color_projection()->vertex_rgba)
       throw std::invalid_argument("Current projected colors have no matching preparation provenance");
@@ -152,6 +158,8 @@ ColorPreparationResult prepare_source_colors(const ColorPreparationInput &input,
   const auto field=colors.empty()?SourceColorField::Identity:SourceColorField::OriginalAccessor;
   if(!options.resolve_identity && (colors.empty() || std::all_of(colors.begin(),colors.end(),[](auto c){return c==std::array<float,4>{1,1,1,1};})))
     return {input.paint->snapshot(),input.material_bindings,false};
+  if(input.paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)
+    throw std::invalid_argument("Color preparation requires explicit strict conversion of polygon-authored paint; original paint was retained");
   if(colors.empty())colors.assign(input.paint->mesh().positions.size(),{1,1,1,1});
   if(const auto &maps=input.paint->source_maps())for(const auto *view:{&maps->color,&maps->metal_rough,&maps->normal,&maps->emission,&maps->occlusion})
     if(view->texcoord!=0)throw std::invalid_argument("Resolve original PBR UV1 through source-aware sampling before color preparation");
