@@ -529,5 +529,21 @@
     },
     "backport_source_sha256": "e0a972ebd29ec61bdbe6856fe7faee1b3b114b8ca5a79f2b9a0873cbc0243434",
     "scalar_backport": "All16 existing3.12 scalar comparison wrapper exception specifications use upstream d20c4dcd conditional is_nothrow_constructible; dependent lhs/rhs types for friends, unchanged comparison bodies"
+  },
+  "lapacke": {
+    "repository": "https://github.com/Reference-LAPACK/lapack",
+    "version": "3.12.0",
+    "tag": "v3.12.0",
+    "tag_object": "42e3715938acaa3ea403c1bc2858b0225ac9ba71",
+    "commit": "04b044e020a3560ccfa9988c8a80a1fb7083fc2e",
+    "used": "Linked system LAPACKE_dgesvj_work, fixed column-major3x3/6-double workspace; documented30-sweep nonconvergence bound, independent reconstruction/orthogonality/float-node checks. Export preparation only; unedited original local chains bypass factorization. No source or binary is vendored.",
+    "license": "BSD-3-Clause",
+    "reference_sha256": {
+      "SRC/dgesvj.f": "4c0fd9fccfb13b1596f84e31cd44d08cc0b8142e5b73d6269e53c9e39132bd14",
+      "LAPACKE/src/lapacke_dgesvj_work.c": "6d70d51bb8448093184de47198578123d93bf28a3e046000bfd34c2f91e2480d",
+      "LICENSE": "978539245c405775bf347b1256c36df4daf8b69a64b099e94b1d53742201621e"
+    },
+    "tested_system_package": "lapack-3.12.0-11.fc44.x86_64; lapack-devel-3.12.0-11.fc44.x86_64",
+    "pkg_config": "lapacke>=3.12.0"
   }
 }

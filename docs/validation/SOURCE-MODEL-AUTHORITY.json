@@ -38,5 +38,25 @@
   "pending": [
     "fresh whole-core consumers after actual Scene13 placement fields",
     "actual affine Scene adoption/render/edit/pick/export interoperability"
-  ]
+  ],
+  "whole_instrumented_support_followup": {
+    "result": "pass4680 assertions/466add1083decode/3cancel",
+    "scope": "same instrumented changed source/test +frozen coherent exact84 whole-C/C++ core/support; no old creator-archive.o extraction; not fresh whole-project build",
+    "archive_manifest": {
+      "source": "84d9fe6261c394d2257b3d416a5fd211a0acc061",
+      "C_and_CXX_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "files": {
+        "libdome-sculpt-core.a": "6dd1b1fab1bb0c403e13e013735bd281d86589198273d0a4c639c50594e0df4e",
+        "libdome-sculpt-polygon.a": "5bfc6012878e943d6c3665e0a12f2f4214bb509c9f605ca6101e951a7c413264",
+        "libxatlas.a": "c356b34dfda8ce439e0ba51fa137e87f8d19dc0c48bda928061cf2702740e298",
+        "libmikktspace.a": "0d54f1e879977097e47f77d9124d33425d2619d7e5774f4399bc8856483abd1e",
+        "libmikktspace-robust.a": "02dfbeeb298f1eb62f2e39b89e3e937801a926edc35cf841bec0bcb594d0d59b",
+        "libufbx.a": "3cbef64ce10f74b4d1a953bf48888a3257d3ec6657bae9c476636139f1e3b5ec"
+      }
+    },
+    "logs_sha256": {
+      "build-source-model-whole-support-sanitize.log": "cca80d1072d7b9c2e21811f64a8cc9fc77c778a67b337a1992663bad9386fc8d",
+      "test-source-model-whole-support-sanitize.log": "fb53ef70f2eb11d6fd58cbdf0b341fa3fa6b7969c3d9add2edd94ba858876610"
+    }
+  }
 }

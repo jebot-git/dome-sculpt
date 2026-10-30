@@ -35,3 +35,10 @@ The sanitizer run instruments the changed complete source/test; support archives
 remain Release. This is explicitly not a fresh whole-core sanitizer build. No
 Scene/group/object layout or archive version changes are introduced by this
 checkpoint; actual Scene 13 placement adoption and its fresh consumers follow.
+
+A subsequent run links the same instrumented replacement source/test to the
+parent's frozen exact 84 whole-C/C++ ASan/UBSan core and bundled support archives.
+It passes the same 4680 assertions and 1549 persistent allocation sites. The
+original changed-source/Release-support result remains retained separately.
+This reuses a coherent instrumented checkpoint; it is not a new whole-project
+build. Archive manifests and the old-member exclusion map are retained.

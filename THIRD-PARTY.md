@@ -64,3 +64,10 @@ restricted VRoid presets and proprietary application code are not included.
   scalar comparison exception contracts are backported; unrelated parser/API
   changes are excluded. Original/later notices, exact patch series and hashes
   are retained. All consumers must be rebuilt together.
+
+- LAPACKE/LAPACK 3.12.0: BSD-3-Clause system library, not vendored. The native
+  affine export adapter calls fixed-size `LAPACKE_dgesvj_work` with caller-owned
+  workspace and the documented bounded Jacobi iteration/status contract. Primary
+  revision, exact references and tested packages are in `sources.json`. The BLAS/
+  LAPACK implementation stays a system dependency; no backend/session setting
+  is changed, and factorization is kept off per-frame rendering.
