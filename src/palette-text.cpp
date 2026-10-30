@@ -80,8 +80,8 @@ struct Font::Impl {
     if (FT_New_Face(library, file.c_str(), index, &f->ft))
       throw std::runtime_error("Cannot load spatial menu font");
     auto format = FT_Get_Font_Format(f->ft);
-    if (primary && (!format || std::string(format) != "BDF" || !f->ft->num_fixed_sizes))
-      throw std::runtime_error("Spatial menus need the selected DomeD BDF font");
+    if (!format || std::string(format) != "BDF" || FT_IS_SCALABLE(f->ft) || !f->ft->num_fixed_sizes)
+      throw std::runtime_error("Spatial menus need native DomeD BDF fonts");
     FT_Select_Charmap(f->ft, FT_ENCODING_UNICODE);
     if (f->ft->num_fixed_sizes) {
       int strike = 0;
@@ -100,6 +100,13 @@ struct Font::Impl {
     } else if (FT_Set_Pixel_Sizes(f->ft, 0, pixels))
       throw std::runtime_error("Cannot size fallback font");
     f->hb = hb_ft_font_create_referenced(f->ft);
+    // Layout consumes 26.6 pixel positions. The native BDF-only HarfBuzz
+    // constructor starts in font units, while upstream hb-ft initializes this
+    // scale implicitly. Set it explicitly for both runtimes; bitmap sampling
+    // and the separate whole-pixel fallback scale stay unchanged.
+    const int ppem = f->ft->size->metrics.y_ppem;
+    hb_font_set_scale(f->hb, ppem * 64, ppem * 64);
+    hb_font_set_ppem(f->hb, ppem, ppem);
     hb_ft_font_set_load_flags(f->hb, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
     faces.push_back(std::move(f)); return faces.size() - 1;
   }
@@ -124,6 +131,8 @@ struct Font::Impl {
     FcPatternAddString(pattern, FC_FAMILY, reinterpret_cast<const FcChar8 *>("Unifont"));
     FcPatternAddString(pattern, FC_FAMILY, reinterpret_cast<const FcChar8 *>("monospace"));
     FcPatternAddInteger(pattern, FC_SPACING, FC_MONO);
+    FcPatternAddBool(pattern, FC_SCALABLE, FcFalse);
+    FcPatternAddString(pattern, FC_FONTFORMAT, reinterpret_cast<const FcChar8 *>("BDF"));
     FcPatternAddDouble(pattern, FC_PIXEL_SIZE, pixels);
     FcPatternAddCharSet(pattern, FC_CHARSET, chars); FcCharSetDestroy(chars);
     FcConfigSubstitute(nullptr, pattern, FcMatchPattern); FcDefaultSubstitute(pattern);

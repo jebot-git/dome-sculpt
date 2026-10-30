@@ -29,7 +29,7 @@ build/dome-sculpt
 Prepare the current canonical toolkit as described in [TOOLKIT](docs/TOOLKIT.md).
 
 Requires a C++20 compiler, CMake 3.24+, nlohmann JSON headers, the patched DomeD
-FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, GIO, Fontconfig, libpng, libjpeg, zlib,
+FLTK 1.4.5, OpenGL/GLU, EGL, OpenXR, FreeType, HarfBuzz, ICU, GIO, Fontconfig, libpng, libjpeg, zlib,
 X11/Wayland development libraries and `wayland-scanner`. xatlas is pinned and
 vendored alongside MikkTSpace and the native ufbx FBX/OBJ reader, so configuring does not fetch their sources. Set both `DOME_BUILD_UI=OFF` and `DOME_BUILD_XR=OFF` to
 build just the native core and tests. `BUILD_TESTING=OFF` excludes test harness
@@ -104,9 +104,10 @@ VRM1 and broader interoperability remain unfinished; see [requirements](docs/REQ
 
 Humanoid creation offers only verified CC0 VRoid female/male bases. MakeHuman
 default geometry and creation choices are removed, while existing authored legacy
-projects remain loadable/exportable. New polygon editing, held-mesh ghosts and
-expanded shared import options are separate work in progress. The current
-[integration evidence](docs/PRODUCTION-INTEGRATION.md) records exact test scopes
+projects remain loadable/exportable. Individual visibility, physical holding,
+transparent ghosts with exclusive editing, and shared native/XR import options
+are integrated. Full polygon editing remains work in progress. The current
+[integration evidence](docs/HOLDING-IMPORT-INTEGRATION.md) records exact test scopes
 and the remaining driver fault limitation.
 
 The Scene menu creates empty sculpts or clay spheres, duplicates and deletes

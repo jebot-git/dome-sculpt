@@ -53,6 +53,12 @@ async def main():
         (apps/"org.domed.Sculpt.desktop").write_text((root/"packaging/org.domed.Sculpt.desktop").read_text())
         env={**os.environ,"HOME":tmp,"DISPLAY":screen,"XDG_CONFIG_HOME":str(home/"config"),"XDG_DATA_HOME":str(home/"data"),"XDG_CACHE_HOME":str(home/"cache"),"XDG_RUNTIME_DIR":tmp,"XDG_CURRENT_DESKTOP":"Dome","XDG_SESSION_TYPE":"wayland","VK_DRIVER_FILES":str(icd),"LIBGL_ALWAYS_SOFTWARE":"1","LIBGL_KOPPER_DISABLE":"true","DOME_RENDER_CAPTURE":str(out/"render.ppm"),"DOME_LOGIN_SESSION":"0","DOME_PREVIEW_PORT":str(port),"DOME_RENDERER":"vulkan","DOME_START_XR":"0","RUST_LOG":"warn"}
         for key in ["WAYLAND_DISPLAY","WAYLAND_SOCKET","FLTK_BACKEND","QT_QPA_PLATFORM","LD_LIBRARY_PATH"]:env.pop(key,None)
+        # Keep inherited overrides isolated, but permit an explicitly selected
+        # private toolkit/font runtime when qualifying a new DomeD revision.
+        if library_path:=os.environ.get("DOME_TEST_LIBRARY_PATH"):
+            directories=library_path.split(os.pathsep)
+            assert all(Path(p).is_absolute() and Path(p).is_dir() for p in directories),"DOME_TEST_LIBRARY_PATH needs existing absolute directories"
+            env["LD_LIBRARY_PATH"]=library_path
         host_process=start([str(compositor),"--backend","nested"],"compositor",env)
         base=f"http://127.0.0.1:{port}"
         def scene():return json.load(urllib.request.urlopen(base+"/api/state",timeout=2))["scene"]
@@ -68,6 +74,12 @@ async def main():
         client=start(arguments,"client",{**env,"WAYLAND_DISPLAY":wayland,"FLTK_BACKEND":"wayland"},cwd=tmp)
         def named(title):return next((w for w in scene()["windows"] if title in w["title"]),None)
         window=await wait(lambda:named("Dome Sculpt"))
+        if library_path:
+            (out/"runtime-maps.json").write_text(json.dumps({
+                name:[line for line in Path(f"/proc/{process.pid}/maps").read_text().splitlines()
+                      if any(library in line for library in ("libfltk", "libharfbuzz", "libpango"))]
+                for name,process in (("compositor",host_process),("client",client))
+            },indent=2)+"\n")
         check(window["app_id"]=="org.domed.Sculpt","Native Wayland sculpt window publishes the installed Dome Sculpt application identity")
         d=display.Display(screen)
         host=await wait(lambda:next((w for w in d.screen().root.query_tree().children if "Dome" in str(w.get_wm_name() or "")),None))

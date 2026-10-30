@@ -1,0 +1,322 @@
+{
+  "recorded_utc": "2026-10-30T15:44:18.362079+00:00",
+  "goal": "ACTIVE; every unfinished original and additional requirement remains required",
+  "qualified_code_commit": "69bd0859d61c7778db8aa899e13f19c78fc5a720",
+  "integration": "published3a +held6207 +importoptionse86; semantic mergefea; admission9c; BDFpixel runtime69",
+  "results": {
+    "CPU_native": {
+      "passed": 151,
+      "total": 151,
+      "seconds": 337.63,
+      "log": "artifacts/tests-final-69bd085-cpu-native.log",
+      "sha256": "27db3c930eed5fd358c068c066de84348f32d5a1aeb802f492915ed697ea01d9"
+    },
+    "OneAPI_native": {
+      "passed": 152,
+      "total": 152,
+      "seconds": 355.04,
+      "log": "artifacts/tests-final-69bd085-oneapi-native.log",
+      "sha256": "188ebcbef7072b8e4d6dc4cc350f46eff905029a88d107ed72d3d6e9b10ae5bd",
+      "device": "Intel Arc A770",
+      "selector": "level_zero:0",
+      "graphics": "software GL; actual OneAPI compute"
+    },
+    "CPU_synthetic_OpenXR": {
+      "passed": 4,
+      "total": 4,
+      "seconds": 286.55,
+      "log": "artifacts/tests-final-69bd085-cpu-xr.log",
+      "sha256": "fd5c2f38a9bc9f36d8d27551606babf96f3ca5d06a13d79d1eceea6d6822c0f4"
+    },
+    "OneAPI_synthetic_OpenXR": {
+      "passed": 4,
+      "total": 4,
+      "seconds": 289.27,
+      "log": "artifacts/tests-final-69bd085-oneapi-xr.log",
+      "sha256": "5b971de0c92aaeaed5957358e442266a5ebefbe1e83d9fedfc82d3fcd901cd72"
+    },
+    "SAN_focused": {
+      "passed": 44,
+      "total": 44,
+      "seconds": 178.24,
+      "log": "artifacts/tests-final-69bd085-sanitize44.log",
+      "sha256": "943d815e044429f86e535dd81c301a4a7a1e85ae594a41d79756e6ffdc98dc2c",
+      "scope": "44 selected suites, all own C/C++ core and render plus xatlas/both Mikk/ufbx support instrumented ASan/UBSan/leaks; not all native suites or external libraries"
+    },
+    "native_BDF_regression": {
+      "passed": 2,
+      "total": 2,
+      "seconds": 1.21,
+      "log": "artifacts/tests-font-regression-native-bdf.log",
+      "sha256": "641376afa11f5b807fdd2aa914a989bdc559908695a9418aaed4e68a7534b1a8"
+    },
+    "stock_HarfBuzz_regression": {
+      "passed": 2,
+      "total": 2,
+      "seconds": 1.36,
+      "log": "artifacts/tests-font-regression-stock.log",
+      "sha256": "56c9e3b9cee50db152b8e71d3f279eb143bead1d318a847827dfcb14b7ab60c8"
+    },
+    "native_BDF_font_SAN": {
+      "passed": 2,
+      "total": 2,
+      "seconds": 3.87,
+      "log": "artifacts/tests-final-69bd085-font-sanitize.log",
+      "sha256": "e6f4b86ac2a156f87502dab39ee85d0065cfc2de5192a4ce2578f74f1a9e7699"
+    },
+    "native_GUI": {
+      "passed": 113,
+      "flows": [
+        {
+          "flow": "bake-compact",
+          "passed": 5,
+          "log": "artifacts/tests-final-69bd085-gui-bake-compact.log",
+          "sha256": "0ad2c19cac1b9f08e40d589c268703a84bd9ad03478eddc14a466687dd2c1976"
+        },
+        {
+          "flow": "bake",
+          "passed": 8,
+          "log": "artifacts/tests-final-69bd085-gui-bake.log",
+          "sha256": "eafa97e66c28c1d04c3d3de2fabb09602550712b4fe8a151c596add34fe0eb5a"
+        },
+        {
+          "flow": "held-compact",
+          "passed": 9,
+          "log": "artifacts/tests-final-69bd085-gui-held-compact.log",
+          "sha256": "6394e28218177497a6b96a22dd45971e8e2988de7c3aede0ca293bede7fe199f"
+        },
+        {
+          "flow": "held",
+          "passed": 11,
+          "log": "artifacts/tests-final-69bd085-gui-held.log",
+          "sha256": "01320705ec7fcd1779ba4565055c2ebfe4934703461abb1730b3693f298a5bf6"
+        },
+        {
+          "flow": "import-fbx",
+          "passed": 12,
+          "log": "artifacts/tests-final-69bd085-gui-import-fbx.log",
+          "sha256": "6f0b5788651b2371467f77e50a61e08662519daf9bfc0bb6e0faf8beeb113df3"
+        },
+        {
+          "flow": "import-glb",
+          "passed": 10,
+          "log": "artifacts/tests-final-69bd085-gui-import-glb.log",
+          "sha256": "85c1f0c893b53bf0e4c99f62f60c3250e86ab3240c088fd01573e778bd00c962"
+        },
+        {
+          "flow": "import-gltf",
+          "passed": 12,
+          "log": "artifacts/tests-final-69bd085-gui-import-gltf.log",
+          "sha256": "6f0b5788651b2371467f77e50a61e08662519daf9bfc0bb6e0faf8beeb113df3"
+        },
+        {
+          "flow": "import-obj",
+          "passed": 12,
+          "log": "artifacts/tests-final-69bd085-gui-import-obj.log",
+          "sha256": "6f0b5788651b2371467f77e50a61e08662519daf9bfc0bb6e0faf8beeb113df3"
+        },
+        {
+          "flow": "skin",
+          "passed": 10,
+          "log": "artifacts/tests-final-69bd085-gui-skin.log",
+          "sha256": "85c1f0c893b53bf0e4c99f62f60c3250e86ab3240c088fd01573e778bd00c962"
+        },
+        {
+          "flow": "vroid-compact",
+          "passed": 13,
+          "log": "artifacts/tests-final-69bd085-gui-vroid-compact.log",
+          "sha256": "7157cca1f68e1abc66debeec2c7f09a3e91b3b010eafdaf0673cef1a537d8edd"
+        },
+        {
+          "flow": "vroid",
+          "passed": 11,
+          "log": "artifacts/tests-final-69bd085-gui-vroid.log",
+          "sha256": "07b58c816f9b3f2efedfebae725f8deceaaa8bcd226bf133a11c6efdcc1479bc"
+        }
+      ],
+      "visual_review": [
+        "menu-import-fbx/options-after-keys.png",
+        "held-menu/ghost.png"
+      ],
+      "compact_scope": "actual geometry, menu and state assertions; not all compact paths save screenshots"
+    },
+    "DomeD_Wayland_menu": {
+      "passed": 8,
+      "log": "artifacts/tests-final-69bd085-dome-menu.log",
+      "sha256": "cc1d27af94a6415b6e6ef284ad3ba0df74386ebcc4bd5cfd6d1fd3fc91f470e0",
+      "live_process_mapping_sha256": "7971f4883a9cb5467ab9b4fe39b856dcba0df31c6dc51feb0d9629cd2d5d0f7e",
+      "live_loaded_libraries": {
+        "compositor": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-6feb62b/lib/libharfbuzz.so.0.61232.0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64/libfltk.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64/libfltk_images.so.1.4.5"
+        ],
+        "client": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-6feb62b/lib/libharfbuzz.so.0.61232.0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64/libfltk.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64/libfltk_gl.so.1.4.5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-282467e/lib64/libfltk_images.so.1.4.5"
+        ]
+      }
+    },
+    "current_palette_Arc": {
+      "passed": true,
+      "qualified_code_commit": "69bd0859d61c7778db8aa899e13f19c78fc5a720",
+      "device": "Mesa Intel Arc A770",
+      "log": "artifacts/tests-final-69bd085-palette-arc.log",
+      "sha256": "a6fd67fe86a8aa1af36d4e47385aede7d6494ea9ac59e9cfbdf3f2c3f054b0fa"
+    },
+    "prior_9c_hardware_GL": {
+      "suites": 11,
+      "qualified_code_commit": "9c743199eed977a5a6e65780c43cef51fe6a54a6",
+      "scope": "Held transforms/MToon/retained frames/independent GLB VRM/color/skin/import consumers. Those functions are unchanged by the font-only69bd085 followup. Separate current palette hardware proof is above.",
+      "logs": [
+        {
+          "log": "artifacts/tests-combined-arc-document-render-buffers.log",
+          "sha256": "e003450a71f916370f351d61a8d7964e10e22fa56afe90868915b47cd2b4a492"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-import-authoring-render.log",
+          "sha256": "9060aa9dbada392036c87b1f17a813a408deeee934784fa18871145132ba5c36"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-import-skin-render.log",
+          "sha256": "d3556817acdbd0be7c63e1c8ad721d55356ae0663d75e73efd410102743d72f8"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-mtoon-render.log",
+          "sha256": "7f817b87553325b06872e77ebbcd7a62c258cdbade3f0295f628993eb164c504"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-normal-frame-consumer.log",
+          "sha256": "7b4e8b79ab3837506d9806de4cea2bcb2f36cfa3d8fefbb818815b2a5d6d8f05"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-normal-frame-render.log",
+          "sha256": "c1f4b5aa3aaeff79e3feb345798acdd350cc4899262ccb702ddf1511cebd2e3e"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-normal-frame-vrm-consumer.log",
+          "sha256": "badb0f9ad958ae9003c12d97815041207a3cfe6632c0bf7a1e832fc2e1adbe32"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-object-isolation-render.log",
+          "sha256": "a9bf76ba2e3273dfb3fa5aecfdefd09347069700e06ebd94b6397a2c493b54f4"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-source-color-render.log",
+          "sha256": "ee485d2e39b8f48714087baede45d158a2bb4680a60bb3e26a32ae763f5ae65d"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-source-color-vrm.log",
+          "sha256": "811a9e21d7ba8ab9b38c761e14679f16467f2b08b7a6088ab582115510348184"
+        },
+        {
+          "log": "artifacts/tests-combined-arc-vrm-role-consumer.log",
+          "sha256": "84120a9fd21ae3b2823865a3149015a7e1a871b03631f50d5bfb464f049d5933"
+        }
+      ]
+    }
+  },
+  "OpenXR_scope": {
+    "original": 150,
+    "resolution": 17,
+    "procedural": 11,
+    "projection": 11,
+    "rendering": "synthetic real-loader softwareGL eye images with chosen compute backend; no direct new holding/import end-to-end real-loader scenario",
+    "physical": "No new physical headset proof; only old8f4d67d rudimentary milestone confirmed, user ended test"
+  },
+  "toolkit": {
+    "DomeD_commit": "6feb62b936a9d8d2a2e6a893aebcbda9b724fe23",
+    "FLTK": "1.4.5+22, builder/patches byte-identical to282467e",
+    "FLTK_prefix": "artifacts/toolkit-282467e/lib64",
+    "BDF_runtime_prefix": "artifacts/bitmap-runtime-6feb62b/lib",
+    "BDF_runtime_manifest": {
+      "harfbuzz_revision": "39144f4a5da0cd0c2ffd9e61649faba4d6d6a2eb",
+      "harfbuzz_upstream_revision": "b42511e071162fe76102f613a6ccc009726c99af",
+      "harfbuzz_fork": "https://github.com/jebot-git/harfbuzz.git",
+      "harfbuzz_patch_sha256": "df88e621deb0d0f027a69dc1fff9eed31387dc75a30d2af71dc4c70077bc79e1",
+      "pango_source_sha256": "890640c841dae77d3ae3d8fe8953784b930fa241b17423e6120c7bfdf8b891e7",
+      "pango_patch_sha256": "fd785788fc41acebd879315f40191deb269247876aec80f115b0e896b43e06a7",
+      "policy": "native-unicode-bdf-only",
+      "buildtype": "release",
+      "libraries": {
+        "libharfbuzz.so.0": "e5a4a423941a0f7adeadf2af45750e5c7cd6fcb80331d062799cc20f172949a1",
+        "libpango-1.0.so.0": "bb7b9ad92e9fe281700a446260c30a677f0f990188bf91fa1739852f753e82fb",
+        "libpangoft2-1.0.so.0": "0144826771cda5132f55477fb377bff00e329ceb22d8f16e321da732f1b2a4b9",
+        "libpangocairo-1.0.so.0": "54095d69d7abe12a9dd1a067887a2a3f85f64526b42131b9a183235e26b0216d"
+      }
+    },
+    "font_tests_log": "artifacts/tests-bitmap-runtime-6feb62b.log",
+    "font_tests_log_sha256": "6e707ce2b2489e752d43be326c5dc5ca6725e681e5dda174089570915067ba31",
+    "compositor_binary_sha256": "d54c05abd1d742c9473f275a670030b1689943242f31d958023b6fb1e6c63732"
+  },
+  "binaries": {
+    "build/dome-sculpt": "fa0e966a6c2647368001703b8cda76df5cb5c8806cefdc12c21f22f98a5ca6ca",
+    "build-oneapi/dome-sculpt": "389e980ef0f2134c9aba6c84d74d062a76963a7218ae731c6b67ff16e899761a",
+    "build-sanitize/dome-sculpt": "897886d8ab4c51aaafd96669adb604f532a44c8e83a3c8ab8773ce2827e0ccf5"
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "aa672b515b05ec45efcc07a4e589235e68857a7fcc877397ba070499ffdd8d18",
+    "include/dome/document.hpp": "9677a7800bfe4c617525dbf300c365e06085c4b05efd3228670188f090316ce6",
+    "include/dome/import-browser.hpp": "140f8deb4155b2fecac1b8ce959ecb4fc9c2065bf71784dbad9fbfb77ce8ff2a",
+    "include/dome/input.hpp": "7dd8fcca55fb7d22571ec2ba6af7112c3614c95147113f89cc3d3f9cd9f3445c",
+    "include/dome/material-visibility.hpp": "f67cd018930115f3c8bf945822331f58fc75e89ea4e3eb89303747017fd0826f",
+    "include/dome/render.hpp": "5745f96fa9fda5f46958e60605df41fdb88d9139731b9a4286e6cd762431f35a",
+    "include/dome/vr-controls.hpp": "36fd1f991401b748cf14eaf8ac074c53bd0bb1b94b06c6c8f14f4290be3ad562",
+    "src/app.cpp": "2b7bc0caaa270388654b1763a046abbc1a3ca89c88db0cdcc398388af7693f20",
+    "src/document-assets.cpp": "f3350d2d09d83f37dd2e9c36b4f7ef63e688c6abb105b8becef4a610b73ef03d",
+    "src/document-authority-transition.hpp": "98190b875434e5a4b1f57d35f87774afd7e335cf1f9a1de95407799608c2ee05",
+    "src/document-authority.hpp": "78187cede6c8e4d500f8f2980b16d4d648fdd241666fec5e61354e6644bd8f12",
+    "src/document-baking.cpp": "356e854d3f55f5dc88dda469dc8891a8f2cb85ccce4721a25007246a47c69ae4",
+    "src/document-cut.cpp": "8f96aaab33cad2aa724907f7b7ccce681c00207ea8a6f02a1ebd21272c5f1353",
+    "src/document-import.cpp": "0d3c861ff816cd623a026125e8ae82ee10fd57c93dea0bf58f668409490014f9",
+    "src/document-interaction.cpp": "8092a13a1804685bc1c76aa45184d3a5aa41b7131014eba9d4fb075707dbcab2",
+    "src/document-native.cpp": "b8080a586951c53d4c25b548521b41f664f35af8fb73c5c94de8af993077e4a2",
+    "src/document-retopo.cpp": "5cae51d11b4fceb3111f5f7103539b29cc266b16ac8f2256abc43ae54a542a1c",
+    "src/document-sculpt.cpp": "a2dda2cd24940ea27cd3bdaf13b2094fc4cb235c46e3330abb5b85a98bcce7d6",
+    "src/document-skin.cpp": "dd3e217fa047c9d8d7e935b6a8e9e940459ecd557a17cb3ab8924be8bd39bc6d",
+    "src/document-transaction.cpp": "d07338985a969cc4eb63ead8ebc36a0c3541a4416d4633a44245835655036c48",
+    "src/document-transaction.hpp": "7773c97100f05e77ec1a5c2f57ed64dbd3d29f5045aaddd1d6134462a0ff4d68",
+    "src/document-uv-solve.cpp": "d43c758c0a9fcd17532bdf5c0ce4cbc0acfa28b42dca92ac8f3ac6f74c9be0a5",
+    "src/document.cpp": "0422bd4a104b874c6918ea17f27743030d3ec71c41555fa013cbd0a98a087736",
+    "src/import-browser.cpp": "efa54bba0177fffa7f158a2f1160b74b787f45d1e1b3c73a0021b96f85734ca1",
+    "src/import-editor.cpp": "f3397d8a1a582fafca34b61612fbe0dbc54079a7f85b8ce28a9be78f370afc4b",
+    "src/import-editor.hpp": "35b8bd49cbc01f1e1c8992596b8867dda9974e4e861c7e41f2f1998e6886436d",
+    "src/import-native.cpp": "d910e71c034597f9ebfb144038d8fb83395bd235f2c6737c63579f1ad95cbb1d",
+    "src/input.cpp": "ad137a3788040093c85763447de555b85a4f275f1a38c80e130177c0a90bafc0",
+    "src/material-visibility.cpp": "02b18123289818bdb7b8baad186877f74300e9805bb98485baf111e340b78a74",
+    "src/object-editor.cpp": "c597e3617238392b430802fdea0994811e064747724b09b1a0cabdcf77d9787c",
+    "src/object-editor.hpp": "ddfe9860be2ec8e4425544da66181f2e547229c209dad8939266c4f0860374b3",
+    "src/palette-text.cpp": "8327700e3f08353ec5e6fdbf7d33649d77e2d3500b0ce0d7c47cf8e0f298e3cb",
+    "src/palette.cpp": "ebf65e9169ed9a7b25dbb5dd0cf84fccab8b4b1792be86ff51d95f78cfd95702",
+    "src/render.cpp": "6716555947a8af57f750e34dbff0995e10a5ba74fc3b32494b14f11974edf7fb",
+    "src/xr.cpp": "9156dd20f66f0cfe41153b2df7112a1aca3e6ccc3158da4fbeca4e8c9ed42e74",
+    "tests/dome_menu.py": "5aff1201beb2db44aa4a091ca7a79f9388cbcc66e58deb1e59c672ef956d0f3f",
+    "tests/fixtures/import-twins.fbx": "a3f9babaf6e1279391c908348fe4ec4d1e55b8977d86ab76b56e436381e73ebf",
+    "tests/fixtures/import-twins.obj": "c04d934982042cc44da7ede419eba851fcd231308eee77fc05db55955457969b",
+    "tests/held-object-menu.py": "6b66b5ec811f882bb0fd143d10db59b7676b5af3e20dc02fab06e1edf16e2c18",
+    "tests/import-admission.cpp": "0d772d8bea4f7ef411015109eba980e54fb3b073dc6bf7b52b7482ec92a33fbf",
+    "tests/import-authoring-render.cpp": "97de0bd113120858af1455815bf9912917cc51f035410c947f462c5cd9df860f",
+    "tests/import-controller-driver.hpp": "19a893451ecc59f9fe85211772781c3f98ac157b14a4773cacd1465e148f30d6",
+    "tests/import-menu.py": "2c81f8553b11210b6a412f09e64c872c6159d0397bc69d107d756c776dcab48d",
+    "tests/import-options.cpp": "e1bd2af3ca427347b0f00d097c304a986eedbfba06dc7cbd242371ae3d1f6b57",
+    "tests/import-source.cpp": "db78da7aacd213d9906940e94d05553bea021afe132af6f82d6402cda84f2ac1",
+    "tests/object-hold-edit.cpp": "fcd12552a2826c6df2946e9e7c2747814ee0a2077b340aebedcd561715025f7e",
+    "tests/object-isolation-render.cpp": "b71846d14f561885e912005e100808588ee2216d797b605c54f77ef35dd64f93",
+    "tests/object-isolation.cpp": "ccdd797eaa3e1a714392662926642b4ae563cdde57ecaf096e60e09a9d534947",
+    "tests/palette-text.cpp": "3f6937f716ca62cc9685582b1683535993b88ebca7a0458b13fb701ae7c7b827",
+    "tests/source-color-consumer.hpp": "2521877a9cb494f9519c2b6f1431b42777174456fcc07cc57ebb39f373e0ff6a"
+  },
+  "retained_failure": {
+    "log": "artifacts/tests-combined-6feb-unicode.log",
+    "issue": "Pre69 implicit hb-ft scale failed Primary BDF advances changed with new BDF runtime. Fixed explicit pixel scale with exact bitmap regression; original log retained."
+  },
+  "limitations": [
+    "Full polygon workflow and Scene12 archives remain private; JSON source/encoder OOM diagnosis not completed by this milestone",
+    "General colored/curved/deforming baking remains private work",
+    "Full affine/source pose, native FBX skin/blends/materials, normative missing-normal adoption and broader glTF/VRM features still required",
+    "Permanent whole-process heap blackout inside installed Intel Level Zero driver remains an external limitation; no CPU substitution or relaxed owned-state assertions",
+    "No system installation, active-session restart or physical headset launch"
+  ]
+}

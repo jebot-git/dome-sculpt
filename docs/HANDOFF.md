@@ -1,73 +1,80 @@
-# Integrated native authoring milestone
+# Holding, shared import and current DomeD milestone
 
-The full production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md remains
+The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md stays
 active. Additional user requirements are in ADDITIONAL-REQUIREMENTS-2026-10-30.md.
 This extends the existing native C++20 FLTK/OpenXR application.
 
-## Integrated behavior and proof
+## Integrated behavior and evidence
 
-This candidate combines source-preserving procedural sculpt/bake/paint/UV authoring,
-generic Document transactions, static source colors, conservative paged picking,
-resolved VRM roles, VRoid-only humanoid creation, Scene11 authored glTF binds and
-original source receipts, and the native static FBX/OBJ capture adapter. See
-PRODUCTION-INTEGRATION.md and validation/PRODUCTION-INTEGRATION.json for exact
-sources, binaries, logs and limits. The earlier workflow handoff is preserved in
-HANDOFF-bc9cfc1.md; the full original requirements remain authoritative.
+The current candidate starts from published3a3d7a2, integrates held6207af3 and
+shared import optionse86d012 with semantic mergefea6818, adds atomic admission
+regression9c74319, and fixes current BDF-runtime metrics at69bd085. Read
+HOLDING-IMPORT-INTEGRATION.md and validation/HOLDING-IMPORT-INTEGRATION.json for
+behavior, exact tested sources/runtime/binaries/logs and remaining limits.
+PRODUCTION-INTEGRATION.md retains the preceding milestone's separate evidence.
 
-Optimized CPU native146/146 and actual Arc OneAPI native147/147 suites pass.
-Whole C/C++ core/support sanitizer37/37, actual FLTK51 checks, eight direct Arc
-hardware graphics fixtures and all four real-loader synthetic OpenXR suites on
-both builds pass. Synthetic XR is150 original +17 resolution +11 procedural +11
-projection checks; eye rendering there uses software GL and compute uses the
-selected backend. No newer physical-headset result is implied: only the old8f4d67d
-rudimentary milestone was physically confirmed and the user ended that test.
+Final code69bd085 qualifies CPU151/151, Arc OneAPI152/152, selected whole-own
+C/C++ sanitizer44/44, native FLTK113, current DomeD universal-menu8/8 and all
+four real-loader synthetic XR suites on both builds. New exact BDF1x/2x palette
+checks also pass on Arc. Eleven earlier direct Arc holding/model/consumer
+fixtures are separately scoped to parent9c74319, before the font-only followup.
 
-The default meshes/creator choices now contain only verified CC0 VRoid female/male.
-MakeHuman compiled defaults/converter are removed; existing authored legacy scenes
-retain load/export. Broad FBX/OBJ options are not completed by the static adapter.
-Large-mm normalization, full affine/skin/morph/material cases and unsupported glTF
-features remain required. General colored-source baking is still incomplete.
+New behavior includes individual native visibility controls, physical holding,
+transparent ghosts and exclusive held editing; shared native/XR import options;
+metre conversion before local bounds; retained original FBX/OBJ source; and
+transactional browser/admission with stale chooser permissions. Existing generic
+transactions, seeded sculpt/bake/paint/UV workflows, projection flags, authored
+binds, source receipts, VRoid-only creation and resolved VRM roles are preserved.
 
-CPU allocation fault tests retain persistent denial. GPU tests use actual one-shot
-faults and typed memory errors while preserving every exact state assertion; two
-cold owned staging sites are separately covered. Permanent heap blackout crashes
-inside the installed Intel Level Zero driver and remains an explicit external
-limitation. See PAGED-VOLUME-ALLOCATION-VALIDATION.md; no runtime or driver fix is
-implied by the corrected fixture.
+Physical confirmation remains limited to the old8f4d67d rudimentary milestone.
+The user ended that test. Synthetic real-loader XR, native/controller fixtures
+and direct graphics evidence do not imply new physical holding/import proof.
+Do not automatically relaunch a physical headset test.
 
-## Active agents and next work
+## Active agents and required work
 
-- merge_contracts: full Wings3D-style polygon authoring; stable-ID N-gon kernel and
-  immutable workspace are frozen private checkpoints. Full Scene12/Document/native
-  and XR workflow is in progress. Actual polygon point rendering still needs its
-  Arc discrepancy fixed. Shared source-format receipts and native N-gon provenance
-  must remain; do not substitute the existing retopology patch workflow.
-- merge_palette: mesh visibility, physical holding, ghost rendering and exclusive
-  edit authority. Native/controller, simultaneous held paint/sculpt/weights and
-  GPU traffic checks are qualified privately; final whole-core sanitizer and
-  checkpoint are pending. After holding, resume the parked general colored-source
-  bake work with its retained hashes/backups, not an unqualified prototype merge.
-- merge_docs: shared native/XR Import21/options23 controls; final native unit/format
-  choices and large millimetre-coordinate normalization are being qualified.
-  Full affine/source poses, native-format skin/morphs and normative missing-normal
-  glTF adoption remain required after that checkpoint.
+- merge_contracts: Wings3D-style polygon mode. Private stable-ID kernel/workspace,
+  point/line/face GPU preview and original source N-gon recovery are tested. The
+  Arc point-marker discrepancy is fixed by a dedicated marker shader. Full
+  Document worker, native/XR controls, accepted Apply→Save/Close ordering,
+  persistence and broad workflow qualification remain ongoing. Keep actual
+  polygon editing distinct from the existing retopology patch workspace.
+- merge_docs: Scene12 polygon authority/origin DAG archive and compatibility.
+  Ordinary legacy/source cases pass privately. Exhaustive allocation injection
+  found inherited noexcept JSON comparison/destruction failures. Narrow comparison
+  fixes and pinned upstream allocation-free destruction are being investigated;
+  full source encode/decode fault safety remains unproven. Do not relabel a plain
+  decoder-only passing scope as all-archive OOM safety.
+- merge_palette: general colored-source baking. Actual Document bake→UV edits→
+  save/reopen→repeat bake and independent PBR/MToon/VRM consumers are progressing
+  privately, including genuine newly computed normal frames under existing
+  representability guards. Native UI, sanitizer/Arc and broader curved/deforming
+  cases remain required. Preserve the parked prototype and its byte-verified
+  backups; do not merge an unqualified prototype.
+
+Full affine/source-pose import, native FBX skins/blends/materials, glTF normative
+missing normals and broader morph/extension interoperability remain required.
+So do the unfinished painting/remeshing, humanoid/rig/weights/shapekeys,
+plugin-equivalent, device and accelerator rows. CUDA/ROCm compilation is not
+positive NVIDIA/AMD hardware proof. The permanent global heap blackout inside
+the installed Level Zero driver remains separately documented in
+PAGED-VOLUME-ALLOCATION-VALIDATION.md.
 
 Reserved spatial pages:18 procedural,19 polygon,20 holding,21 import,22 polygon
-secondary,23 import options. Preserve all command capabilities and unify admission
-bounds through page23. Agent branches must merge into a fresh integration and
-rebuild every public-header ABI consumer before qualification/publication.
+secondary,23 import options. The shared bound is page23. Rebuild all public-header
+ABI consumers coherently after future merges.
 
 ## Workspace and toolkit
 
-Canonical DomeD remote/source remains282467e727df78c8e7f2452aa05a7747bac854a6.
-Use the prepared FLTK1.4.5+22 prefix artifacts/toolkit-282467e, whose libraries are
-in lib64; verify actual linkage. Build Release as the regular user. Follow TOOLKIT.md
-for preparing/staging the matching runtime before a system installation. No system
-installation or session restart occurred for this milestone. Do not automatically
-launch a physical-headset test after the user ended it.
+Current canonical DomeD6feb62b has unchanged FLTK builder/all22 patches from282467e.
+Keep the optimized artifacts/toolkit-282467e/lib64 artifact; prepend the new
+artifacts/bitmap-runtime-6feb62b/lib native BDF runtime for current validation.
+Both compositor/client live library maps and font policy are verified privately.
+See TOOLKIT.md and the exact qualification receipt. No system installation or
+active desktop/display-manager session restart occurred.
 
-The primary worktree's old frame WIP remains safely preserved as stashc46d1d907a9ca0cdb56cda17e54ab20284939fc1
-and byte-verified artifacts; do not drop/reapply it blindly. Preserve all frozen
-agent branches, backups and local commits. Milestone commits/pushes are authorized.
-The complete goal stays active until every requirement has actual implementation
-and appropriate evidence; this passing integration is not completion.
+The old primary frame WIP remains preserved as
+stashc46d1d907a9ca0cdb56cda17e54ab20284939fc1 and byte-verified artifacts. Preserve
+all frozen branches/worktrees/backups/local commits. Milestone commits/pushes
+are authorized. Keep the full goal active until every requirement has actual
+implementation and appropriate evidence; this milestone does not complete it.

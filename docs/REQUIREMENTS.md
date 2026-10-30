@@ -1,12 +1,11 @@
 # Full objective and completion evidence
 
-Published8e206fc retains product233e586 and its exact combined proof. The
-procedural candidate additionally combines static source COLOR_0 d3e5e61 and
-paged picking6c64c5d with the native seeded-detail workflow described in
-PROCEDURAL-SCULPT.md. New candidate proof is scoped separately below and in its
-validation receipt. Generic transaction/cancellable native picking integration,
-full import and colored baking remain ongoing. Every remaining requirement
-stays required.
+The current holding/import integration extends published3a3d7a2. Exact scope and
+qualification are in HOLDING-IMPORT-INTEGRATION.md and its validation receipt;
+PRODUCTION-INTEGRATION.md preserves the preceding checkpoint. Individual hiding,
+physical holding/ghost authority and shared desktop/XR import options are now
+integrated. Full polygon editing and general colored/deforming baking remain
+private work. Every unfinished original and additional row stays required.
 
 The goal is the complete native FLTK VR production workflow requested by the
 user. An executable, a successful build, or the initial tests do not complete
@@ -83,7 +82,7 @@ These extend the original matrix; all unfinished original rows stay required.
 
 | Additional requirement | Current status | Required completion evidence |
 | --- | --- | --- |
-| Wings3D-referenced polygonal edit mode | Assigned; current retopology patches do not complete polygon editing | Editable vertex/edge/polygon topology, practical topology tools, persistence, exact history/data handling and FLTK/XR workflows |
-| Individual mesh hiding and held-mesh ghosts | Basic per-object visibility exists; held-object transparent rendering and exclusive editing remain required | Correct translucent view plus mutation/input guards, preserved object visibility/material/locks, controller/desktop holding and cancellation/stale-job checks |
+| Wings3D-referenced polygonal edit mode | Private kernel/workspace/GPU/source-N-gon checkpoints pass; full Document/native/XR/Scene12 workflow is still being integrated. Current retopology patches do not complete polygon editing | Editable vertex/edge/polygon topology, practical topology tools, persistence, exact history/data handling and FLTK/XR workflows |
+| Individual mesh hiding and held-mesh ghosts | Native visibility list, physical desktop/XR holding, GPU ghost transforms and exclusive edit authority integrated. Native/controller, actual FLTK and direct Arc fixtures pass; new full real-loader authoring scenario and physical workflow qualification remain required | Correct translucent view plus mutation/input guards, preserved object visibility/material/locks, controller/desktop holding and cancellation/stale-job checks |
 | VRoid-only humanoid bases | Only verified CC0 VRoid female/male bases are offered/shipped; compiled MakeHuman geometry/converter removed and legacy command disabled. Existing authored legacy projects retain load/export; native creator/compact GUI and legacy preservation fixtures pass in the integration candidate | Only VRoid base meshes shipped/offered, native creator workflows and independently verified legacy project load/export without the removed mesh data |
-| Standard FBX and OBJ import options | Native ufbx static OBJ/FBX conversion and immutable original/resource capture are integrated with Scene11; supported textured OBJ worker transactions preserve exact source/pixels/history. Shared FLTK/XR options, large-mm normalization, full affine/skin/morph/material cases remain separate work | Format-aware options, units/axes/materials/UV/deformation conversion, original-source provenance, undo/cancel and independent native/GUI/interoperability fixtures |
+| Standard FBX and OBJ import options | Native ufbx static OBJ/FBX conversion and immutable original/resource capture are integrated with Scene11; supported textured OBJ worker transactions preserve exact source/pixels/history. Shared FLTK/XR options, large-mm metre conversion and atomic browser/chooser admission now integrated and tested. Full affine/skin/morph/material cases remain required | Format-aware options, units/axes/materials/UV/deformation conversion, original-source provenance, undo/cancel and independent native/GUI/interoperability fixtures |

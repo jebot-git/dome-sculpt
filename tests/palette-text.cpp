@@ -5,6 +5,10 @@
 #include "graphics.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_FONT_FORMATS_H
 #include <unicode/ustring.h>
 #include <unistd.h>
 using namespace dome;
@@ -66,6 +70,19 @@ int main(int argc, char **argv) try {
     require(a.x == b.x && a.bitmap->alpha == b.bitmap->alpha && a.bitmap->top == b.bitmap->top,
         "Primary BDF raster changed");
   }
+  palette_text::Font doubled(bdf_fonts::resolve("Unifont", "Sans-Serif", 16, 2).file, 32);
+  auto large = doubled.layout("ABC xyz 123", 1200);
+  require(large.advance == ascii.advance * 2 && large.glyphs.size() == ascii.glyphs.size(),
+      "Double-size BDF advances do not match bitmap pixels");
+  for (size_t n = 0; n < ascii.glyphs.size(); ++n) {
+    auto &a = *ascii.glyphs[n].bitmap; auto &b = *large.glyphs[n].bitmap;
+    require(large.glyphs[n].x == ascii.glyphs[n].x * 2 && b.width == a.width * 2 &&
+        b.height == a.height * 2 && b.left == a.left * 2 && b.top == a.top * 2,
+        "Double-size BDF placement changed");
+    for (int y = 0; y < b.height; ++y) for (int x = 0; x < b.width; ++x)
+      require(b.alpha[size_t(y) * b.width + x] == a.alpha[size_t(y / 2) * a.width + x / 2],
+          "Double-size BDF lost exact whole-pixel sampling");
+  }
   for (const auto &text : {std::string("Žluťoučký kůň / Élodie"), std::string("中文 日本語 한국어"), std::string("مرحبا / שלום")}) {
     auto line = font.layout(text, 600);
     std::cout << "Unicode " << text << " advance=" << line.advance << " ink=" << ink(line) << std::endl;
@@ -116,6 +133,20 @@ int main(int argc, char **argv) try {
     require(valid_utf8(line.text) && line.advance <= 300, "Malformed byte corpus corrupted bounded layout");
   }
   std::ofstream(directory / "fallback-fonts.txt") << font.source_manifest();
+  FT_Library inspection{};
+  require(!FT_Init_FreeType(&inspection), "Cannot inspect fallback fonts");
+  std::istringstream manifest(font.source_manifest());
+  for (std::string face; std::getline(manifest, face);) {
+    auto metadata = face.rfind(" index=");
+    require(metadata != std::string::npos, "Missing fallback font identity");
+    FT_Face loaded{};
+    require(!FT_New_Face(inspection, face.substr(0, metadata).c_str(), 0, &loaded), "Cannot inspect selected fallback");
+    auto format = FT_Get_Font_Format(loaded);
+    bool bitmap = format && std::string_view(format) == "BDF" && !FT_IS_SCALABLE(loaded);
+    FT_Done_Face(loaded);
+    require(bitmap, "Spatial Unicode fallback selected a non-BDF face");
+  }
+  FT_Done_FreeType(inspection);
   NativeGraphics graphics;
   std::cout << "GL " << glGetString(GL_RENDERER) << '\n';
   GLuint fbo, color; glGenFramebuffers(1, &fbo); glBindFramebuffer(GL_FRAMEBUFFER, fbo);
