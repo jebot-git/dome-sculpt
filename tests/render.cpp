@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bdf_font.hpp"
+#include "fontconfig-runtime.hpp"
 #include "dome/palette.hpp"
 #include "dome/bake.hpp"
 #include "graphics.h"
@@ -15,6 +16,7 @@ int main(int argc, char **argv) try {
   std::filesystem::create_directory(home);
   std::filesystem::permissions(home, std::filesystem::perms::owner_all);
   setenv("XDG_RUNTIME_DIR", home.c_str(), 1);
+  test::FontconfigRuntime fontconfig;
   auto config = bdf_fonts::export_config();
   setenv("FONTCONFIG_FILE", config.c_str(), 1);
   auto face = bdf_fonts::resolve("Unifont", "Sans-Serif", 16);

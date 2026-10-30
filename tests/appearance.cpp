@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/session-appearance.hpp"
+#include "fontconfig-runtime.hpp"
 #include <ft2build.h>
 #include <nlohmann/json.hpp>
 #include FT_FREETYPE_H
@@ -22,6 +23,7 @@ int main() try {
   setenv("XDG_CONFIG_HOME", root.c_str(), 1);
   setenv("XDG_CACHE_HOME", (root / "cache").c_str(), 1);
   setenv("XDG_DATA_HOME", (root / "data").c_str(), 1);
+  test::FontconfigRuntime fontconfig;
   auto write = [&](nlohmann::json j) {
     auto tmp = root / "style.tmp";
     {
