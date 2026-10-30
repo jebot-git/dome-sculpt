@@ -2,7 +2,10 @@
 #include "dome/material-bindings.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/paint.hpp"
+#include "dome/deformation.hpp"
+#include "dome/humanoid-creator.hpp"
 #include <algorithm>
+#include <set>
 namespace dome {
 namespace {
 constexpr size_t role_count=size_t(MToonSlot::Count);
@@ -61,11 +64,12 @@ void SourceNativeMaterial::validate() const {
      alpha<0 || alpha>3 || !unit(alpha_cutoff))
     throw std::invalid_argument("Invalid native factor baseline for resolved material");
 }
-void SourceMaterialBindings::validate() const {
-  if(normal_frame!=SourceMaterialNormalFrame::UvDerivative || size_t(animation_policy)>1 ||
+void SourceMaterialBindings::validate(bool deep) const {
+  if(size_t(normal_frame)>1 || size_t(animation_policy)>1 ||
      !std::isfinite(freeze_seconds) || freeze_seconds<0 || freeze_seconds>1e9 ||
      (animation_frozen && animation_policy!=SourceUvAnimationPolicy::FreezeAtTime))
     throw std::invalid_argument("Invalid derived material frame or animation provenance");
+  if(sampling_reparameterized && !uv_origin)throw std::invalid_argument("Reparameterized sampling requires retained original provenance");
   native_reference.validate();
   roles_valid(has_mtoon?std::optional<MToonMaterial>(material):std::nullopt,roles);
   if(animation_frozen && has_mtoon &&
@@ -75,16 +79,49 @@ void SourceMaterialBindings::validate() const {
     if(!uv_origin->paint || uv_origin->paint->in_stroke())
       throw std::invalid_argument("Derived UV material has no finished immutable source");
     roles_valid(uv_origin->material,uv_origin->roles);
+    if(uv_origin->deformation && deep)uv_origin->deformation->validate(uv_origin->paint->mesh());
+    if(uv_origin->creator_kind.empty()) {
+      if(uv_origin->creator_version || !uv_origin->creator_parameters.empty())throw std::invalid_argument("Partial creator frame provenance");
+    } else {
+      if(uv_origin->creator_kind!="vroid-shape" || uv_origin->creator_version!=1 || uv_origin->creator_parameters.size()>64*1024)throw std::invalid_argument("Unknown creator frame provenance");
+      if(deep)HumanoidControls::decode(nlohmann::json::parse(uv_origin->creator_parameters)).validate();
+    }
     if(uv_origin->appearance && uv_origin->appearance->source_vertices.size()!=uv_origin->paint->mesh().positions.size())
       throw std::invalid_argument("Original UV material source remap differs from its retained paint mesh");
   }
+  if(normal_frame==SourceMaterialNormalFrame::OriginalAttributes && !normal_frames)throw std::invalid_argument("Original attributes require explicit normal frames");
+  if(normal_frames) {
+    if(normal_frame!=SourceMaterialNormalFrame::OriginalAttributes)throw std::invalid_argument("Original frame payload cannot reinterpret legacy converted normal pixels");
+    normal_frames->validate(deep);
+    if(!uv_origin || !uv_origin->paint)throw std::invalid_argument("Normal frames require retained native rest authority");
+    const auto &mesh=uv_origin->paint->mesh();
+    for(const auto &f:{normal_frames->pbr,normal_frames->mtoon,normal_frames->canonical})if(f) {
+      if(f->origin_vertex_count!=mesh.positions.size() || f->normals.size()!=mesh.indices.size())throw std::invalid_argument("Normal frame origin geometry differs");
+      if(deep && f->origin_vertices!=mesh.indices)throw std::invalid_argument("Normal frames must retain exact ordered origin corners");
+      if(!f->source_vertices.empty()) {
+        if(!uv_origin->appearance || !uv_origin->appearance->asset)throw std::invalid_argument("Original source corner frames require retained primitive authority");
+        if(deep) {
+          const auto &a=*uv_origin->appearance;const ImportedPrimitive *primitive=nullptr;
+          for(const auto &p:a.asset->primitives)if(p.source_mesh==a.source_mesh && p.source_primitive==a.source_primitive){if(primitive)throw std::invalid_argument("Normal frame source primitive is ambiguous");primitive=&p;}
+          if(!primitive || primitive->mesh.positions.size()!=f->source_vertex_count || primitive->mesh.indices.size()!=f->source_corner_count)throw std::invalid_argument("Normal frame source domain differs");
+          for(size_t c=0;c<f->source_vertices.size();++c)if(f->source_vertices[c]!=a.source_vertices.at(mesh.indices[c]) || primitive->mesh.indices.at(f->source_corners[c])!=f->source_vertices[c])throw std::invalid_argument("Normal frame source corner provenance differs");
+        }
+      }
+    }
+    std::set<uint32_t> source_targets;
+    for(const auto &t:normal_frames->targets) {
+      if(t.origin_slot && (!uv_origin->deformation || !uv_origin->deformation->morphs || *t.origin_slot>=uv_origin->deformation->morphs->targets.size()))throw std::invalid_argument("Normal frame origin target is unavailable");
+      if(t.source_target && !source_targets.insert(*t.source_target).second)throw std::invalid_argument("Ambiguous original source morph identity");
+      if(t.source_target && (!uv_origin->appearance || !t.origin_slot || *t.origin_slot>=uv_origin->appearance->source_morph_targets.size() || uv_origin->appearance->source_morph_targets[*t.origin_slot]!=*t.source_target))throw std::invalid_argument("Normal frame source target provenance differs");
+    }
+  }
 }
-uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings> value) {
+uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings> value,bool deep) {
   if(!value) throw std::invalid_argument("Missing resolved material holder");
   auto found=std::find(bindings_.begin(),bindings_.end(),value);
   if(found!=bindings_.end())return uint32_t(found-bindings_.begin());
   if(bindings_.size()>=256)throw std::length_error("Resolved material archive count exceeds budget");
-  value->validate();
+  value->validate(deep);
   if(value->uv_origin && std::find(origins_.begin(),origins_.end(),value->uv_origin)==origins_.end()) {
     if(origins_.size()>=256)throw std::length_error("Original UV source archive count exceeds budget");
     origins_.push_back(value->uv_origin);
@@ -95,7 +132,9 @@ const std::shared_ptr<const SourceMaterialBindings> &SourceMaterialArchive::at(u
   return bindings_.at(id);
 }
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models) const {
-  nlohmann::json output={{"version",1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
+  const bool extended=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->normal_frames) || (b->uv_origin && !b->sampling_reparameterized);}) || std::any_of(origins_.begin(),origins_.end(),[](const auto &o){return bool(o->deformation)||!o->creator_kind.empty();});
+  NormalFrameArchive frames;
+  nlohmann::json output={{"version",extended?2:1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
   std::vector<std::shared_ptr<const PaintedMesh>> paints;
   size_t metadata=0;
   for(const auto &origin:origins_) {
@@ -108,27 +147,59 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
       {"appearance",origin->appearance?encode_creator_appearance(*origin->appearance,models,images):nlohmann::json(nullptr)},
       {"material",origin->material?origin->material->encode():nlohmann::json(nullptr)},
       {"roles",encode_roles(origin->roles,images)}});
+    if(extended){output["origins"].back()["deformation"]=origin->deformation?origin->deformation->encode(origin->paint->mesh()):nlohmann::json(nullptr);
+      output["origins"].back()["creator"]=origin->creator_kind.empty()?nlohmann::json(nullptr):nlohmann::json{{"kind",origin->creator_kind},{"version",origin->creator_version},{"parameters",origin->creator_parameters}};}
   }
   for(const auto &binding:bindings_) {
     binding->validate();metadata+=metadata_bytes(binding->has_mtoon?std::optional<MToonMaterial>(binding->material):std::nullopt);
     if(metadata>16*1024*1024)throw std::length_error("Scene resolved material metadata exceeds budget");
     auto origin=std::find(origins_.begin(),origins_.end(),binding->uv_origin);
     output["bindings"].push_back({{"material",binding->has_mtoon?binding->material.encode():nlohmann::json(nullptr)},
-      {"roles",encode_roles(binding->roles,images)}, {"normal_frame","uv-derivative"},
+      {"roles",encode_roles(binding->roles,images)}, {"normal_frame",binding->normal_frame==SourceMaterialNormalFrame::UvDerivative?"uv-derivative":"original-attributes"},
       {"animation_policy",int(binding->animation_policy)}, {"freeze_seconds",binding->freeze_seconds},
       {"animation_frozen",binding->animation_frozen},
       {"native_reference",{{"color",binding->native_reference.color},{"emission",binding->native_reference.emission},
         {"alpha",binding->native_reference.alpha},{"alpha_cutoff",binding->native_reference.alpha_cutoff},
         {"double_sided",binding->native_reference.double_sided}}},
       {"origin",binding->uv_origin?nlohmann::json(size_t(origin-origins_.begin())):nlohmann::json(nullptr)}});
+    if(extended){output["bindings"].back()["frames"]=binding->normal_frames?nlohmann::json(frames.add(binding->normal_frames)):nlohmann::json(nullptr);output["bindings"].back()["sampling_reparameterized"]=binding->sampling_reparameterized;}
   }
+  if(extended)output["normal_frames"]=frames.encode();
   return output;
+}
+size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
+  size_t entries=0;
+  if(input.at("version")==1)return 0;
+  if(input.at("version")!=2 || !input.at("origins").is_array() || input.at("origins").size()>256)
+    throw std::runtime_error("Invalid original deformation archive");
+  auto add=[&](size_t n){if(n>8'000'000-entries)throw std::length_error("Original deformation archive exceeds scene budget");entries+=n;};
+  for(const auto &origin:input.at("origins"))if(!origin.at("deformation").is_null()) {
+    const auto &d=origin.at("deformation");
+    if(!d.at("pose").is_array() || d.at("pose").size()>256 || !d.at("morph_weights").is_array() || d.at("morph_weights").size()>128)
+      throw std::runtime_error("Invalid original deformation preview dimensions");
+    add(d.at("pose").size());add(d.at("morph_weights").size());
+    if(!d.at("skin").is_null()) {
+      const auto &vertices=d.at("skin").at("vertices");
+      if(!vertices.is_array() || vertices.size()>2'000'000)throw std::runtime_error("Invalid original skin count");
+      for(const auto &v:vertices){if(!v.is_array() || v.size()>32)throw std::runtime_error("Invalid original skin influences");add(v.size());}
+    }
+    if(!d.at("morphs").is_null()) {
+      const auto &targets=d.at("morphs").at("targets");
+      if(!targets.is_array() || targets.size()>128)throw std::runtime_error("Invalid original morph count");
+      for(const auto &t:targets){const auto &v=t.at("delta");if(!v.is_array() || v.size()>2'000'000)throw std::runtime_error("Invalid original morph positions");add(v.size());}
+    }
+  }
+  return entries;
 }
 SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
                                                    const CreatorAssetArchive &models) {
-  if(input.at("version")!=1 || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
+  if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
      !input.at("bindings").is_array() || input.at("bindings").size()>256)
     throw std::runtime_error("Invalid resolved material archive");
+  const bool extended=input.at("version")==2;
+  if(!extended){if(input.contains("normal_frames"))throw std::runtime_error("Normal frames require material archive2");for(const auto &o:input.at("origins"))if(o.contains("deformation")||o.contains("creator"))throw std::runtime_error("Native frame origin requires material archive2");for(const auto &b:input.at("bindings"))if(b.contains("frames") || b.contains("sampling_reparameterized"))throw std::runtime_error("Normal frame references require material archive2");}
+  deformation_entries(input);
+  NormalFrameArchive frames;if(extended)frames=NormalFrameArchive::decode(input.at("normal_frames"));
   // Preflight all implicit SurfaceMap allocations before constructing any.
   size_t texels=0,vertices=0,tile_bytes=0,metadata=0;
   for(const auto &paint:input.at("paints")) {
@@ -165,11 +236,16 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     if(!value.at("material").is_null())origin->material=MToonMaterial::decode(value.at("material"));
     metadata+=metadata_bytes(origin->material);
     if(metadata>16*1024*1024)throw std::length_error("Scene resolved material metadata exceeds budget");
-    origin->roles=decode_roles(value.at("roles"),images);output.origins_.push_back(std::move(origin));
+    origin->roles=decode_roles(value.at("roles"),images);
+    if(extended){if(!value.at("deformation").is_null())origin->deformation=std::make_shared<const DeformationState>(DeformationState::decode(value.at("deformation"),origin->paint->mesh()));
+      if(!value.at("creator").is_null()){const auto &c=value.at("creator");origin->creator_kind=c.at("kind").get<std::string>();if(!c.is_object() || c.size()!=3 || !c.at("version").is_number_integer() || c.at("version")!=1)throw std::runtime_error("Unsupported creator frame version");origin->creator_version=1;origin->creator_parameters=c.at("parameters").get<std::string>();}}
+    output.origins_.push_back(std::move(origin));
   }
   for(const auto &value:input.at("bindings")) {
-    if(value.at("normal_frame")!="uv-derivative")throw std::runtime_error("Unsupported derived material normal frame");
+    if(value.at("normal_frame")!="uv-derivative" && (!extended || value.at("normal_frame")!="original-attributes"))throw std::runtime_error("Unsupported derived material normal frame");
     auto binding=std::make_shared<SourceMaterialBindings>();
+    if(value.at("normal_frame")=="original-attributes")binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
+    if(extended && !value.at("frames").is_null())binding->normal_frames=frames.at(uint32_t(index(value.at("frames"),frames.sets().size())));
     binding->has_mtoon=!value.at("material").is_null();
     if(binding->has_mtoon)binding->material=MToonMaterial::decode(value.at("material"));
     metadata+=metadata_bytes(binding->has_mtoon?std::optional<MToonMaterial>(binding->material):std::nullopt);
@@ -187,6 +263,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     binding->native_reference.alpha_cutoff=native.at("alpha_cutoff").get<float>();
     binding->native_reference.double_sided=native.at("double_sided").get<bool>();
     if(!value.at("origin").is_null())binding->uv_origin=output.origins_.at(index(value.at("origin"),output.origins_.size()));
+    binding->sampling_reparameterized=extended?value.at("sampling_reparameterized").get<bool>():bool(binding->uv_origin);
     binding->validate();output.bindings_.push_back(std::move(binding));
   }
   return output;

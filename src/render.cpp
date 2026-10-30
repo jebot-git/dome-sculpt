@@ -124,6 +124,24 @@ struct SurfaceRenderer::TextureState {
   SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size(),samplers.size(),bytes+packed_sources.bytes(),uploads,packed_sources.bytes(),packed_sources.builds()};}
   void clear(bool release){packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();weighted.clear();}
   void prepare(const MeshSnapshot&mesh,bool geometry_changed){
+    if(geometry_changed && (!mesh.mesh.positions.empty() || !mesh.mesh.indices.empty()))mesh.mesh.validate();
+    const auto count=mesh.mesh.positions.size();
+    if(count>2'000'000 || mesh.mesh.indices.size()>6'000'000)throw std::length_error("Frame renderer geometry exceeds native bounds");
+    auto normals_valid=[&](const std::vector<Vec3> &values){
+      if(!values.empty() && values.size()!=count)throw std::invalid_argument("Retained normal frame size differs from geometry");
+      if(geometry_changed)for(auto v:values){float n=length(v);if(!finite(v)||!std::isfinite(n)||n<1e-8f)throw std::invalid_argument("Retained normal frame direction is invalid");}
+    };
+    normals_valid(mesh.source_normals);normals_valid(mesh.canonical_normals);
+    if(!mesh.source_tangents.empty() && mesh.source_tangents.size()!=count)throw std::invalid_argument("Retained tangent frame size differs from geometry");
+    if(geometry_changed)for(auto t:mesh.source_tangents){float n=length(Vec3{t[0],t[1],t[2]});if(!finite(Vec3{t[0],t[1],t[2]})||!std::isfinite(n)||n<1e-8f||(t[3]!=-1&&t[3]!=1))throw std::invalid_argument("Retained tangent frame is invalid");}
+    for(const auto &range:mesh.ranges) {
+      if(range.material_bindings && range.material_bindings->normal_frames && !range.source_frame)throw std::invalid_argument("Retained material frames require complete worker frame publication");
+      if(range.source_frame && (mesh.source_normals.size()!=count || (!range.source_normal_only && mesh.source_tangents.size()!=count)))throw std::invalid_argument("Source frame arrays are unavailable");
+      if(range.canonical_frame && (mesh.canonical_normals.size()!=count || mesh.tangents.size()!=count))throw std::invalid_argument("Canonical frame arrays are unavailable");
+      if(range.first>mesh.mesh.indices.size() || range.count>mesh.mesh.indices.size()-range.first || range.count%3)throw std::invalid_argument("Frame range is invalid");
+      if(geometry_changed && range.source_frame && !range.source_normal_only)for(size_t c=range.first;c<range.first+range.count;c+=3){auto w=mesh.source_tangents.at(mesh.mesh.indices[c])[3];for(size_t k=1;k<3;++k)if(mesh.source_tangents.at(mesh.mesh.indices[c+k])[3]!=w)throw std::invalid_argument("Source tangent W differs within a triangle");}
+    }
+
     if(!mesh.tangents.empty()&&mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Canonical tangent count differs from packed geometry");
     if(geometry_changed)for(auto t:mesh.tangents)if(!finite(Vec3{t[0],t[1],t[2]})||length(Vec3{t[0],t[1],t[2]})<1e-8f||!std::isfinite(t[3])||std::abs(std::abs(t[3])-1)>1e-5f)throw std::invalid_argument("Invalid canonical tangent frame");
     if(!mesh.selected_weights.empty()&&mesh.selected_weights.size()!=mesh.mesh.positions.size())throw std::runtime_error("Weight visualization size differs from current geometry");
@@ -159,11 +177,14 @@ struct SurfaceRenderer::TextureState {
       };
       std::optional<MToonMaterial> typed;
       if(range.material_bindings) {
-        range.material_bindings->validate();
+        range.material_bindings->validate(geometry_changed);
         if(range.material_bindings->has_mtoon)typed=range.material_bindings->material;
       } else if(auto previous=toons.find(range.object);previous!=toons.end() &&
                 previous->second.appearance==range.appearance && !previous->second.source)typed=previous->second.material;
       else typed=retained_mtoon(range.appearance.get());
+      if(range.source_normal_only && ((typed && typed->parameters.normal_enabled && typed->parameters.normal_scale!=0 && typed->textures[size_t(MToonSlot::Normal)].index>=0) ||
+          (!typed && maps && maps->source_maps && maps->source_maps->normal.image && maps->source_maps->normal_scale!=0)))
+        throw std::invalid_argument("Normal-mapped source material requires retained tangent authority");
       if(typed){
         Toon toon;toon.appearance=range.appearance;toon.source=range.material_bindings;toon.material=*typed;
         toon.derived=maps&&!maps->source_only;
@@ -240,6 +261,12 @@ struct SurfaceRenderer::TextureState {
           slot(3,std::shared_ptr<const Image>(maps,&maps->normal),view,false);
         }else if(maps->source_maps)slot(3,maps->source_maps->normal.image,maps->source_maps->normal,false);
       }
+      if(!typed && range.source_frame && range.canonical_frame && maps && maps->baked_base && !maps->baked_normal.rgba.empty()) {
+        PaintSourceTexture view;view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=GL_LINEAR;
+        slot(3,std::shared_ptr<const Image>(maps,&maps->baked_normal),view,false);
+        slot(6,std::shared_ptr<const Image>(maps,&maps->baked_coverage),view,false);
+        if(maps->source_maps)slot(5,maps->source_maps->normal.image,maps->source_maps->normal,false);
+      }
     }
     if(wanted.size()>limits.max_images||wanted_samplers.size()>limits.max_samplers)throw std::length_error("GPU source texture count budget exceeded");
     size_t bytes=0;GLint maximum=0;glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maximum);
@@ -299,7 +326,7 @@ void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   auto vertex=mtoon_renderer_vertex();
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;
+in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -311,8 +338,22 @@ return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
 vec3 output_srgb(vec3 c){return mix(1.055*pow(max(c,vec3(0)),vec3(1.0/2.4))-.055,12.92*c,lessThanEqual(c,vec3(.0031308)));}
 vec2 source_uv(int slot){return vec2(dot(uv_x[slot],vec3(texcoord,1)),dot(uv_y[slot],vec3(texcoord,1)));}
 vec3 unit(vec3 v){float m=max(max(abs(v.x),abs(v.y)),abs(v.z));return m>1e-20?normalize(v/m):vec3(0,0,1);}
+vec3 source_baked_detail(out float coverage){
+ivec2 size=textureSize(tex3,0);vec2 p=texcoord*vec2(size)-.5;ivec2 base=ivec2(floor(p));vec2 f=fract(p);vec3 sum=vec3(0);coverage=0;
+for(int y=0;y<2;++y)for(int x=0;x<2;++x){ivec2 q=clamp(base+ivec2(x,y),ivec2(0),size-1);float w=(x==1?f.x:1-f.x)*(y==1?f.y:1-f.y)*texelFetch(tex6,q,0).r;coverage+=w;sum+=(texelFetch(tex3,q,0).rgb*2-1)*w;}
+return coverage>1e-8?sum/coverage:vec3(0,0,1);}
 vec3 surface_normal(){
-vec3 N=unit(n);if(slots[3]==1&&baked_normal==1){vec3 detail=texture(tex3,texcoord).xyz*2.0-1.0;N=unit(canonical_t*detail.x+canonical_b*detail.y+n*detail.z);}
+vec3 N=unit(source_frame==1?source_n:n);
+if(source_baked_frame==1){vec3 original=N;
+if(original_normal_present==1){vec2 q=vec2(dot(original_normal_x,vec3(texcoord,1)),dot(original_normal_y,vec3(texcoord,1)));vec3 encoded=texture(tex5,q).rgb;
+vec3 ts=unit(vec3((encoded.xy*2-1)*normal_scale,encoded.z*2-1));original=unit(unit(source_t)*ts.x+unit(source_b)*ts.y+N*ts.z);}
+float coverage;vec3 detail=source_baked_detail(coverage);vec3 canonical=unit(canonical_t*detail.x+canonical_b*detail.y+canonical_n*detail.z);
+N=unit(mix(original,canonical,coverage));return gl_FrontFacing?N:-N;}
+if(slots[3]==1&&baked_normal==1){vec3 detail=texture(tex3,texcoord).xyz*2.0-1.0;
+vec3 T=canonical_t,B=canonical_b,CN=canonical_n;
+N=unit(T*detail.x+B*detail.y+CN*detail.z);}
+else if(slots[3]==1&&source_frame==1){vec3 T=unit(source_t),B=unit(source_b);
+vec3 encoded=texture(tex3,source_uv(3)).xyz;vec3 ts=unit(vec3((encoded.xy*2.0-1.0)*normal_scale,encoded.z*2.0-1.0));N=unit(T*ts.x+B*ts.y+N*ts.z);}
 else if(slots[3]==1){vec2 uv=source_uv(3),a=dFdx(uv),b=dFdy(uv);vec3 x=dFdx(world),y=dFdy(world);float determinant=a.x*b.y-a.y*b.x;
 if(abs(determinant)>1e-8*max(length(a)*length(b),1e-20)){
 vec3 T=(x*b.y-y*a.y)/determinant,B=(y*a.x-x*b.x)/determinant;T=unit(T-N*dot(N,T));B=unit(cross(N,T))*(dot(cross(N,T),B)<0.0?-1.0:1.0);
@@ -394,7 +435,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     if(reuse && (count!=cached_->mesh.positions.size() ||
                  mesh->mesh.indices.size()!=cached_->mesh.indices.size() ||
                  mesh->tangents.size()!=cached_->tangents.size() ||
-                 mesh->mesh.uv.size()!=cached_->mesh.uv.size()))
+                 mesh->mesh.uv.size()!=cached_->mesh.uv.size() ||
+                 mesh->source_normals.size()!=cached_->source_normals.size() ||
+                 mesh->canonical_normals.size()!=cached_->canonical_normals.size() ||
+                 mesh->source_tangents.size()!=cached_->source_tangents.size()))
       throw std::invalid_argument("Shared geometry identity has inconsistent packed counts");
     try{textures_->prepare(*mesh,!reuse);}catch(...){textures_->clear(true);cached_.reset();count_=0;throw;}
     glBindVertexArray(vao_);
@@ -404,6 +448,11 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         std::array<float,2> uv,uv1;
         std::array<float,4> tangent;
       };
+      struct FrameVertex {Vec3 source_n,canonical_n;std::array<float,4> source_t;};
+      const bool has_frames=!mesh->source_normals.empty() || !mesh->canonical_normals.empty() || !mesh->source_tangents.empty();
+      const size_t vertex_bytes=count*sizeof(Vertex),frame_bytes=has_frames?count*sizeof(FrameVertex):0;
+      const size_t index_bytes=mesh->mesh.indices.size()*sizeof(uint32_t),scalar_bytes=(mesh->selected_weights.size()+mesh->sculpt_masks.size())*sizeof(float);
+      if(vertex_bytes+frame_bytes+index_bytes+scalar_bytes>256*1024*1024)throw std::length_error("Surface geometry and scalar buffers exceed256MiB GPU budget");
       std::vector<Vertex> vertices;
       vertices.reserve(count);
       for(size_t i=0;i<count;++i)
@@ -412,15 +461,31 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
           textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],
           mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i]});
       glBindBuffer(GL_ARRAY_BUFFER,vertices_);
-      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertices.size()*sizeof(Vertex)),vertices.data(),GL_STATIC_DRAW);
+      if(has_frames) {
+        // Optional direction block shares the static geometry lifetime without
+        // increasing ordinary sculpt vertices or concatenating host buffers.
+        std::vector<FrameVertex> frames;frames.reserve(count);
+        for(size_t i=0;i<count;++i)frames.push_back({
+          mesh->source_normals.empty()?mesh->mesh.normals[i]:mesh->source_normals[i],
+          mesh->canonical_normals.empty()?mesh->mesh.normals[i]:mesh->canonical_normals[i],
+          mesh->source_tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->source_tangents[i]});
+        glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes+frame_bytes),nullptr,GL_STATIC_DRAW);
+        if(vertex_bytes)glBufferSubData(GL_ARRAY_BUFFER,0,GLsizeiptr(vertex_bytes),vertices.data());
+        if(frame_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(vertex_bytes),GLsizeiptr(frame_bytes),frames.data());
+      } else glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes),vertices.data(),GL_STATIC_DRAW);
       glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),nullptr);glEnableVertexAttribArray(0);
       glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,n)));glEnableVertexAttribArray(1);
       glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv)));glEnableVertexAttribArray(2);
       glVertexAttribPointer(3,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv1)));glEnableVertexAttribArray(3);
       glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,tangent)));glEnableVertexAttribArray(5);
+      if(has_frames) {
+        glVertexAttribPointer(7,3,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,source_n)));glEnableVertexAttribArray(7);
+        glVertexAttribPointer(8,4,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,source_t)));glEnableVertexAttribArray(8);
+        glVertexAttribPointer(9,3,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,canonical_n)));glEnableVertexAttribArray(9);
+      } else for(GLuint attribute:{7,8,9})glDisableVertexAttribArray(attribute);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices_);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(mesh->mesh.indices.size()*sizeof(uint32_t)),mesh->mesh.indices.data(),GL_STATIC_DRAW);
-      buffers_.vertex_bytes=vertices.size()*sizeof(Vertex);
+      buffers_.vertex_bytes=vertex_bytes+frame_bytes;
       buffers_.index_bytes=mesh->mesh.indices.size()*sizeof(uint32_t);
       ++buffers_.geometry_uploads;
     }
@@ -444,6 +509,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   // them for every draw, including stereo reuse and interleaved renderers.
   if(cached_->selected_weights.empty())glVertexAttrib1f(4,-1);
   if(cached_->sculpt_masks.empty())glVertexAttrib1f(6,-1);
+  if(cached_->source_normals.empty() && cached_->canonical_normals.empty() && cached_->source_tangents.empty()) {
+    glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
+  }
   glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
   glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
@@ -470,9 +538,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     return m.color[3] < 1 || (maps && maps->transparent);
   };
   auto draw_range = [&](const Material &original, size_t first, size_t count,
-                        uint64_t id, const TextureMaps *maps) {
+                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false) {
     Material material = original;
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+    glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),0);glUniform1i(glGetUniformLocation(program_,"mt_outline"),0);
     if (maps&&!maps->source_only) {
       material.color={1,1,1,1};material.metallic=material.roughness=1;material.emissive={1,1,1};
@@ -485,6 +554,13 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     }
     glUniform1iv(glGetUniformLocation(program_,"slots[0]"),5,present.data());
     glUniform3fv(glGetUniformLocation(program_,"uv_x[0]"),5,ux.data());glUniform3fv(glGetUniformLocation(program_,"uv_y[0]"),5,uy.data());
+    const bool source_bake=use_source && use_canonical && maps && maps->baked_base && !maps->baked_normal.rgba.empty();
+    glUniform1i(glGetUniformLocation(program_,"source_baked_frame"),source_bake);
+    glUniform1i(glGetUniformLocation(program_,"original_normal_present"),0);
+    if(source_bake){const auto &binding=textures_->bindings.at(id);
+      for(int n:{5,6}){glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,binding[n].image);glBindSampler(n,binding[n].sampler);}
+      const auto &view=binding[5];glUniform1i(glGetUniformLocation(program_,"original_normal_present"),view.image!=0);
+      glUniform3f(glGetUniformLocation(program_,"original_normal_x"),view.uv[0],view.uv[1],view.uv[4]);glUniform3f(glGetUniformLocation(program_,"original_normal_y"),view.uv[2],view.uv[3],view.uv[5]);}
     glUniform1i(glGetUniformLocation(program_,"map_mode"),maps?(maps->source_only?2:1):0);
     glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!maps->normal.rgba.empty());
     for(int n=0;n<16;++n){auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);}
@@ -564,6 +640,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       const auto &uv=t.packed_views[2].uv_transform;
       pbrx[3]=uv[0];pbrx[4]=uv[1];pbrx[5]=uv[4];pbry[3]=uv[2];pbry[4]=uv[3];pbry[5]=uv[5];
     }
+    glUniform1i(glGetUniformLocation(program_,"source_frame"),r.source_frame);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),r.canonical_frame);
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),1);glUniform1i(glGetUniformLocation(program_,"mt_outline"),outline);glUniform1i(glGetUniformLocation(program_,"mt_baked_normal"),t.baked_normal);glUniform4fv(glGetUniformLocation(program_,"mt[0]"),12,u[0].data());
     glUniform1iv(glGetUniformLocation(program_,"mt_present[0]"),16,present.data());glUniform1iv(glGetUniformLocation(program_,"mt_coord[0]"),16,coordinates.data());glUniform1iv(glGetUniformLocation(program_,"mt_derived[0]"),16,derived.data());glUniform1iv(glGetUniformLocation(program_,"mt_channel[0]"),16,channels.data());
     glUniform2fv(glGetUniformLocation(program_,"mt_offset[0]"),16,offsets.data());glUniform2fv(glGetUniformLocation(program_,"mt_scale[0]"),16,scales.data());glUniform1fv(glGetUniformLocation(program_,"mt_rotation[0]"),16,rotations.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_x[0]"),2,pbrx.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_y[0]"),2,pbry.data());
@@ -592,7 +669,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       bool weighted=textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(r->object);
-      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get());
+      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame);
       else{
         draw_toon(*r,typed->second,false);
         if(!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)

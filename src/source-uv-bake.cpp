@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/source-uv-bake.hpp"
 #include "dome/tangents.hpp"
+#include "normal-frame-runtime.hpp"
 #include <algorithm>
 #include <deque>
 #include <limits>
@@ -70,9 +71,13 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  validate(i,o);SourceUvBakeResult result;Budget budget{o,result};budget.cancel();
  result.target=i.target;result.source_vertices=i.source_vertices;
  result.animation_policy=o.animation;result.freeze_seconds=o.freeze_seconds;
- result.original_paint=i.paint;result.original_appearance=i.appearance;result.active_layer=i.paint->active_layer();
+ result.original_paint=i.paint;result.original_appearance=i.appearance;result.original_material=i.current_material;result.active_layer=i.paint->active_layer();
  if(i.current_material) {
   i.current_material->validate();
+  if(i.current_material->normal_frames) {
+   detail::normal_frame_current_authority(*i.current_material,i.paint->mesh(),i.current_deformation.get(),o.cancelled);
+   result.normal_frames=i.current_material->normal_frames;
+  }
   if(i.current_material->has_mtoon)result.mtoon=i.current_material->material;
   result.native_reference=i.current_material->native_reference;
  } else {
@@ -85,7 +90,13 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   }
  }
  const auto &old=i.paint->mesh();std::vector<std::array<float,2>> uv1;
- auto old_bake=i.paint->baked();if(old_bake){old_bake->validate(i.paint->resolution());result.baked_bytes=old_bake->storage_bytes();if(result.baked_bytes>o.max_layer_bytes)throw std::length_error("Source UV baked/editable storage budget exceeded");result.image_bytes=result.baked_bytes-old_bake->coverage.size();if(result.image_bytes>o.max_output_bytes)throw std::length_error("Source UV baked image budget exceeded");}
+ if(i.current_deformation)result.deformation=detail::normal_frame_remap_deformation(i.current_deformation,old,i.target,i.source_vertices,o.cancelled);
+ if(i.appearance){auto appearance=std::make_shared<CreatorAppearance>(*i.appearance);appearance->source_vertices.clear();appearance->source_vertices.reserve(i.source_vertices.size());for(auto v:i.source_vertices)appearance->source_vertices.push_back(i.appearance->source_vertices.at(v));result.appearance=std::move(appearance);}
+ auto old_bake=i.paint->baked();if(old_bake && !old_bake->maps.normal.rgba.empty() && result.normal_frames && (!result.normal_frames->canonical || result.normal_frames->canonical->tangents.empty()))throw std::invalid_argument("Raw baked normal transfer requires retained canonical tangent authority");if(old_bake){old_bake->validate(i.paint->resolution());result.baked_bytes=old_bake->storage_bytes();if(result.baked_bytes>o.max_layer_bytes)throw std::length_error("Source UV baked/editable storage budget exceeded");result.image_bytes=result.baked_bytes-old_bake->coverage.size();if(result.image_bytes>o.max_output_bytes)throw std::length_error("Source UV baked image budget exceeded");}
+ if(i.current_deformation && (i.current_deformation->skin || i.current_deformation->morphs) && !result.normal_frames &&
+    ((i.paint->source_maps() && i.paint->source_maps()->normal.image) || (old_bake && !old_bake->maps.normal.rgba.empty()) ||
+     (result.mtoon && result.mtoon->parameters.normal_enabled && result.mtoon->textures[size_t(MToonSlot::Normal)].index>=0)))
+  throw std::invalid_argument("Deformed normal transfer requires retained original attribute frames; derivative conversion is rest-only");
  bool animated=result.mtoon&&(result.mtoon->parameters.scroll!=std::array<float,2>{}||result.mtoon->parameters.rotation_speed!=0);
  if(animated&&o.animation==SourceUvAnimationPolicy::RejectAnimated)throw std::invalid_argument("Animated source UVs require explicit FreezeAtTime bake policy");
  bool sampling_animation=animated&&o.animation==SourceUvAnimationPolicy::FreezeAtTime;
@@ -121,28 +132,28 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   result.image_bytes+=bytes;completed.push_back({p,image});auto out=p.view;out.image=std::move(image);out.texcoord=0;out.uv_transform={1,0,0,1,0,0};out.wrap_s=out.wrap_t=33071;return out;
  };
  auto maps=std::make_shared<PaintSourceMaps>();if(auto source=i.paint->source_maps()){
-  *maps=*source;PaintSourceTexture *dest[]={&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion};int role=0;for(auto slot:dest){Plan p;p.view=*slot;p.srgb=role==0||role==2;p.normal=role==3;p.transform=slot->uv_transform;*slot=bake(p);++role;}
+  *maps=*source;PaintSourceTexture *dest[]={&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion};int role=0;for(auto slot:dest){Plan p;p.view=*slot;p.srgb=role==0||role==2;p.normal=role==3 && !result.normal_frames;p.transform=slot->uv_transform;*slot=bake(p);++role;}
  }
- if(result.mtoon){auto original=*result.mtoon;for(size_t role=0;role<size_t(MToonSlot::Count);++role){Plan p;p.view=original_role(int(role));if(!p.view.image)continue;p.role=int(role);auto &t=original.textures[role];p.coord=role==size_t(MToonSlot::Matcap)?0:coordinate(t);p.srgb=t.encoding==MToonEncoding::Srgb;p.normal=role==size_t(MToonSlot::Normal);p.check_backface=p.normal&&original.version()==MToonVersion::V1&&original.parameters.normal_enabled&&original.parameters.normal_scale!=0&&(original.parameters.cull!=MToonCull::Back||(original.parameters.outline!=MToonOutline::None&&original.parameters.outline_width>0));
+ if(result.mtoon){auto original=*result.mtoon;for(size_t role=0;role<size_t(MToonSlot::Count);++role){Plan p;p.view=original_role(int(role));if(!p.view.image)continue;p.role=int(role);auto &t=original.textures[role];p.coord=role==size_t(MToonSlot::Matcap)?0:coordinate(t);p.srgb=t.encoding==MToonEncoding::Srgb;p.normal=role==size_t(MToonSlot::Normal) && !result.normal_frames;p.check_backface=p.normal&&original.version()==MToonVersion::V1&&original.parameters.normal_enabled&&original.parameters.normal_scale!=0&&(original.parameters.cull!=MToonCull::Back||(original.parameters.outline!=MToonOutline::None&&original.parameters.outline_width>0));
    if(role==size_t(MToonSlot::Matcap)){result.mtoon_roles[role]=p.view;result.view_dependent[role]=true;continue;}
    auto q0=mtoon_uv(original,MToonSlot(role),{0,0},0,1),qx=mtoon_uv(original,MToonSlot(role),{1,0},0,1),qy=mtoon_uv(original,MToonSlot(role),{0,1},0,1);p.transform={qx[0]-q0[0],qy[0]-q0[0],qx[1]-q0[1],qy[1]-q0[1],q0[0],q0[1]};p.animated=sampling_animation&&role!=size_t(MToonSlot::UvMask)&&!(original.version()==MToonVersion::V0&&role==size_t(MToonSlot::OutlineWidth));result.mtoon_roles[role]=bake(p);
   }
   for(size_t role=0;role<size_t(MToonSlot::Count);++role)if(!result.view_dependent[role]){auto &t=result.mtoon->textures[role];t.texcoord=0;t.transform_texcoord=-1;t.offset={};t.scale={1,1};t.rotation=0;}
   if(result.animation_frozen){result.mtoon->parameters.scroll={};result.mtoon->parameters.rotation_speed=0;}
  }
- result.maps=maps;current.reset();size_t tangent_bytes=old_bake&&!old_bake->maps.normal.rgba.empty()?old.indices.size()*sizeof(Tangent)*2:0;if(tangent_bytes>o.max_working_bytes||size_t(i.paint->resolution())*i.paint->resolution()*(sizeof(Hit)*2+sizeof(int32_t)*2)>o.max_working_bytes-tangent_bytes)throw std::length_error("Source UV layer transfer working memory budget exceeded");auto dest=raster(i.target,i.paint->resolution(),false,false,budget);auto source=raster(old,i.paint->resolution(),true,true,budget);uint32_t r=i.paint->resolution(),cols=r/32;result.layers=i.paint->layers();for(auto &layer:result.layers)layer.tiles.assign(size_t(cols)*cols,{});
+ result.maps=maps;current.reset();size_t tangent_bytes=old_bake&&!old_bake->maps.normal.rgba.empty()&&!result.normal_frames?old.indices.size()*sizeof(Tangent)*2:0;if(tangent_bytes>o.max_working_bytes||size_t(i.paint->resolution())*i.paint->resolution()*(sizeof(Hit)*2+sizeof(int32_t)*2)>o.max_working_bytes-tangent_bytes)throw std::length_error("Source UV layer transfer working memory budget exceeded");auto dest=raster(i.target,i.paint->resolution(),false,false,budget);auto source=raster(old,i.paint->resolution(),true,true,budget);uint32_t r=i.paint->resolution(),cols=r/32;result.layers=i.paint->layers();for(auto &layer:result.layers)layer.tiles.assign(size_t(cols)*cols,{});
  std::shared_ptr<BakedTextures> transferred;std::vector<Tangent> old_frames,new_frames;
- if(old_bake){transferred=std::make_shared<BakedTextures>();auto blank=[&](bool normal=false){Image m{r,r,std::vector<uint8_t>(size_t(r)*r*4)};if(normal)for(size_t n=0;n<m.rgba.size();n+=4){m.rgba[n]=m.rgba[n+1]=128;m.rgba[n+2]=m.rgba[n+3]=255;}return m;};transferred->maps.color=blank();transferred->maps.metal_rough=blank();transferred->maps.emission=blank();transferred->coverage.assign(size_t(r)*r,0);if(!old_bake->maps.normal.rgba.empty()){transferred->maps.normal=blank(true);old_frames=tangent_corners(old,o.cancelled);new_frames=tangent_corners(i.target,o.cancelled);}}
+ if(old_bake){transferred=std::make_shared<BakedTextures>();auto blank=[&](bool normal=false){Image m{r,r,std::vector<uint8_t>(size_t(r)*r*4)};if(normal)for(size_t n=0;n<m.rgba.size();n+=4){m.rgba[n]=m.rgba[n+1]=128;m.rgba[n+2]=m.rgba[n+3]=255;}return m;};transferred->maps.color=blank();transferred->maps.metal_rough=blank();transferred->maps.emission=blank();transferred->coverage.assign(size_t(r)*r,0);if(!old_bake->maps.normal.rgba.empty()){transferred->maps.normal=blank(true);if(!result.normal_frames){old_frames=tangent_corners(old,o.cancelled);new_frames=tangent_corners(i.target,o.cancelled);}}}
  std::vector<std::vector<std::shared_ptr<PaintTile>>> tiles(result.layers.size(),std::vector<std::shared_ptr<PaintTile>>(size_t(cols)*cols));
  for(uint32_t y=0;y<r;++y){budget.cancel();for(uint32_t x=0;x<r;++x){auto &h=dest.hits[size_t(y)*r+x];if(h.face==UINT32_MAX)continue;auto q=uv(old,nullptr,h);float px=q[0]*r-.5f,py=q[1]*r-.5f;int bx=int(std::floor(px)),by=int(std::floor(py));float fx=px-bx,fy=py-by;std::array<size_t,4> owners;std::array<float,4>w;for(int k=0;k<4;++k){int sx=std::clamp(bx+(k&1),0,int(r)-1),sy=std::clamp(by+(k>>1),0,int(r)-1);size_t at=size_t(sy)*r+sx;owners[k]=source.padding[at]>=0?size_t(source.padding[at]):at;w[k]=((k&1)?fx:1-fx)*((k>>1)?fy:1-fy);}
-   if(transferred){budget.work();std::array<float,13> values{};float coverage=0;for(int k=0;k<4;++k){float a=old_bake->coverage[owners[k]]/255.f*w[k];if(a==0)continue;coverage+=a;size_t pos=owners[k]*4;for(int c=0;c<4;++c){float v=old_bake->maps.color.rgba[pos+c]/255.f;values[c]+=(c<3?srgb_to_linear(v):v)*a;}for(int c=0;c<3;++c){values[4+c]+=old_bake->maps.metal_rough.rgba[pos+c]/255.f*a;values[7+c]+=srgb_to_linear(old_bake->maps.emission.rgba[pos+c]/255.f)*a;if(!old_frames.empty())values[10+c]+=(old_bake->maps.normal.rgba[pos+c]/255.f*2-1)*a;}}
-    if(coverage>1e-8f){for(auto &v:values)v/=coverage;if(!old_frames.empty()){auto of=tangent_frame(old,old_frames,h.face,h.bary),nf=tangent_frame(i.target,new_frames,h.face,h.bary);auto n=nf.to_tangent(of.to_world({values[10],values[11],values[12]}));values[10]=n.x;values[11]=n.y;values[12]=n.z;}size_t at=size_t(y)*r+x;transferred->coverage[at]=byte(coverage);for(int c=0;c<4;++c)transferred->maps.color.rgba[at*4+c]=byte(c<3?linear_to_srgb(values[c]):values[c]);for(int c=0;c<3;++c){transferred->maps.metal_rough.rgba[at*4+c]=byte(values[4+c]);transferred->maps.emission.rgba[at*4+c]=byte(linear_to_srgb(values[7+c]));if(!old_frames.empty())transferred->maps.normal.rgba[at*4+c]=byte(values[10+c]*.5f+.5f);}transferred->maps.metal_rough.rgba[at*4+3]=transferred->maps.emission.rgba[at*4+3]=255;}}
+   if(transferred){budget.work();std::array<float,13> values{};float coverage=0;for(int k=0;k<4;++k){float a=old_bake->coverage[owners[k]]/255.f*w[k];if(a==0)continue;coverage+=a;size_t pos=owners[k]*4;for(int c=0;c<4;++c){float v=old_bake->maps.color.rgba[pos+c]/255.f;values[c]+=(c<3?srgb_to_linear(v):v)*a;}for(int c=0;c<3;++c){values[4+c]+=old_bake->maps.metal_rough.rgba[pos+c]/255.f*a;values[7+c]+=srgb_to_linear(old_bake->maps.emission.rgba[pos+c]/255.f)*a;if(!old_bake->maps.normal.rgba.empty())values[10+c]+=(old_bake->maps.normal.rgba[pos+c]/255.f*2-1)*a;}}
+    if(coverage>1e-8f){for(auto &v:values)v/=coverage;if(!old_frames.empty()){auto of=tangent_frame(old,old_frames,h.face,h.bary),nf=tangent_frame(i.target,new_frames,h.face,h.bary);auto n=nf.to_tangent(of.to_world({values[10],values[11],values[12]}));values[10]=n.x;values[11]=n.y;values[12]=n.z;}size_t at=size_t(y)*r+x;transferred->coverage[at]=byte(coverage);for(int c=0;c<4;++c)transferred->maps.color.rgba[at*4+c]=byte(c<3?linear_to_srgb(values[c]):values[c]);for(int c=0;c<3;++c){transferred->maps.metal_rough.rgba[at*4+c]=byte(values[4+c]);transferred->maps.emission.rgba[at*4+c]=byte(linear_to_srgb(values[7+c]));if(!old_bake->maps.normal.rgba.empty())transferred->maps.normal.rgba[at*4+c]=byte(values[10+c]*.5f+.5f);}transferred->maps.metal_rough.rgba[at*4+3]=transferred->maps.emission.rgba[at*4+3]=255;}}
    for(size_t l=0;l<result.layers.size();++l){budget.work();std::array<PaintPixel,4> samples;for(int k=0;k<4;++k)samples[k]=i.paint->pixel(result.layers[l].id,uint32_t(owners[k]%r),uint32_t(owners[k]/r));PaintPixel value;for(int group=0;group<4;++group){int first=group==0?0:group==1?4:group==2?5:6,count=group==0?4:group==3?3:1;float coverage=0;for(int k=0;k<4;++k)coverage+=w[k]*samples[k].data[9+group]/255.f;value.data[9+group]=byte(coverage);if(coverage>1e-8f)for(int c=0;c<count;++c){bool srgb=(group==0&&c<3)||group==3;float sum=0;for(int k=0;k<4;++k){float v=samples[k].data[first+c]/255.f;if(srgb)v=srgb_to_linear(v);sum+=w[k]*samples[k].data[9+group]/255.f*v;}sum/=coverage;value.data[first+c]=byte(srgb?linear_to_srgb(sum):sum);}}
     float mask=0;for(int k=0;k<4;++k)mask+=w[k]*samples[k].data[13]/255.f;value.data[13]=byte(mask);if(value==PaintPixel{})continue;size_t at=size_t(y/32)*cols+x/32;if(!tiles[l][at]){if(sizeof(PaintTile)>o.max_layer_bytes-result.baked_bytes-result.layer_bytes)throw std::length_error("Source UV paint tile budget exceeded");result.layer_bytes+=sizeof(PaintTile);tiles[l][at]=std::make_shared<PaintTile>();result.layers[l].tiles[at]=tiles[l][at];}tiles[l][at]->pixels[size_t(y%32)*32+x%32]=value;
    }
   }}
  if(transferred){transferred->validate(r);result.baked=std::move(transferred);}
- budget.cancel();result.diagnostics.push_back("Original images/material IDs/raw avatar retained; derived RGBA8 textures resampled without material-factor flattening");result.diagnostics.push_back("Normal conversion matches current UV-derivative preview frames; original authored tangent4 remains retained");return result;
+ budget.cancel();result.diagnostics.push_back("Original images/material IDs/raw avatar retained; derived RGBA8 textures resampled without material-factor flattening");result.diagnostics.push_back(result.normal_frames?"Raw source/canonical normal vectors retain original attribute frames through the sampling-atlas change":"Normal conversion matches current UV-derivative preview frames; original authored tangent4 remains retained");return result;
 }
 struct SourceUvBakeAccess {
  static std::shared_ptr<PaintedMesh> adopt(const SourceUvBakeResult &result,
@@ -194,13 +205,17 @@ SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
  input.target=result.target;input.source_vertices=result.source_vertices;
  SourceUvBakeOptions options;options.cancelled=cancelled;validate(input,options);
  if(!result.uv_origin)throw std::invalid_argument("Source UV adoption lacks first-source provenance");
+ if(result.normal_frames!=(result.original_material?result.original_material->normal_frames:nullptr))throw std::invalid_argument("Source UV adoption cannot discard or replace original frame authority");
  auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=result.mtoon.has_value();
  if(result.mtoon)binding->material=*result.mtoon;
- binding->roles=result.mtoon_roles;binding->uv_origin=result.uv_origin;
+ binding->roles=result.mtoon_roles;binding->uv_origin=result.uv_origin;binding->sampling_reparameterized=true;
  binding->native_reference=result.native_reference;
+ if(result.normal_frames){binding->normal_frames=result.normal_frames;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;}
  binding->animation_policy=result.animation_policy;binding->freeze_seconds=result.freeze_seconds;
  binding->animation_frozen=result.animation_frozen;binding->validate();
  auto paint=SourceUvBakeAccess::adopt(result,cancelled);
- return {std::move(paint),std::move(binding)};
+ if(result.normal_frames)detail::normal_frame_current_authority(*binding,paint->mesh(),result.deformation.get(),cancelled);
+ if(result.deformation)result.deformation->validate(paint->mesh());
+ return {std::move(paint),std::move(binding),result.deformation,result.appearance};
 }
 } // namespace dome

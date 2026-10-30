@@ -118,6 +118,7 @@ struct SurfaceRange {
   std::shared_ptr<const CreatorAppearance> appearance{};
   size_t first_vertex = 0;
   std::shared_ptr<const SourceMaterialBindings> material_bindings{};
+  bool source_frame = false, canonical_frame = false, source_normal_only = false; // Private prototype.
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;
@@ -144,6 +145,9 @@ struct MeshSnapshot {
   std::shared_ptr<const void> geometry_identity;
   uint64_t cut_session = 0, cut_request = 0, clipped_object = 0;
   CutPlane clip_plane;
+  std::vector<Vec3> source_normals, canonical_normals;
+  std::vector<std::array<float,4>> source_tangents;
+  uint64_t normal_frame_layout_builds=0; // Worker diagnostic, never native state.
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0;

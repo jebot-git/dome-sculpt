@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/material-bindings.hpp"
+#include "normal-frame-runtime.hpp"
 #include "dome/vrm.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/mtoon.hpp"
@@ -391,6 +393,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   stop(options);
   if (input_objects.empty())
     fail("no avatar surfaces");
+
   for(const auto &object:input_objects)if(object.source_dormant)
     fail("source attributes are dormant for "+object.name+
       "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");
@@ -482,6 +485,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   for (auto &o : objects) {
     stop(options);
     o.mesh.validate();
+    if(o.material_bindings && o.material_bindings->normal_frames)detail::normal_frame_current_authority(*o.material_bindings,o.mesh,o.deformation.get(),options.cancelled);
     if (o.deformation)
       o.deformation->validate(o.mesh);
     if (!o.appearance || !o.appearance->source_basis_quaternion)
@@ -857,20 +861,34 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
         a.source_material < 0 ||
         primitive->material != uint32_t(a.source_material + 1))
       fail("source accessor/material mapping changed");
+    auto &target_map = identities.morph_targets[emitted.mesh];
+    target_map.assign(primitive->morph_targets.size(), -1);
+    if(o.material_bindings && o.material_bindings->normal_frames) {
+      const auto &frames=*o.material_bindings->normal_frames;
+      const size_t count=o.deformation->morphs?o.deformation->morphs->targets.size():0;
+      if(frames.current_targets.size()!=count)fail("current native target/frame identity map is stale");
+      for(size_t target=0;target<count;++target) {
+        auto id=frames.current_targets[target];auto item=std::find_if(frames.targets.begin(),frames.targets.end(),[&](const auto &t){return t.id==id;});
+        if(item==frames.targets.end())fail("native target frame identity is missing");
+        if(!item->source_target)continue; // Authored native-only target remains emitted.
+        auto source_id=*item->source_target;
+        if(source_id>=primitive->morph_targets.size() || target_map[source_id]>=0)fail("source target frame identity is ambiguous or outside the original table");
+        target_map[source_id]=int(target);
+      }
+    } else {
     if (primitive->morph_targets.size() !=
         (o.deformation->morphs ? o.deformation->morphs->targets.size() : 0))
       fail("source morph count changed; expression remapping requires explicit "
            "identities");
     if (a.source_morph_targets.size() != primitive->morph_targets.size())
       fail("missing exact source morph identity map");
-    auto &target_map = identities.morph_targets[emitted.mesh];
-    target_map.assign(primitive->morph_targets.size(), -1);
     for (size_t target = 0; target < a.source_morph_targets.size(); ++target) {
       auto source_id = a.source_morph_targets[target];
       if (source_id >= primitive->morph_targets.size() ||
           target_map[source_id] >= 0)
         fail("source morph identity map is not unique and in range");
       target_map[source_id] = int(target);
+    }
     }
     auto source_material =
         original.at("materials").at(size_t(a.source_material));
@@ -916,7 +934,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       if(!o.material_bindings->has_mtoon || o.material_bindings->material.version()!=MToonVersion::V0)
         fail("current source material is not a version-preserving MToon0 binding");
       toon=o.material_bindings->material;roles=o.material_bindings->roles;reference=o.material_bindings->native_reference;
-      if(o.material_bindings->uv_origin && toon.parameters.normal_enabled && roles[size_t(MToonSlot::Normal)].image)
+      if(o.material_bindings->sampling_reparameterized && !o.material_bindings->normal_frames && toon.parameters.normal_enabled && roles[size_t(MToonSlot::Normal)].image)
         fail("derived UV normal roles require retained original frame/tangent transport before VRM export");
     } else {
       if(!a.decoded_images || a.decoded_images->size()!=asset.images.size())fail("source role images are unavailable");
@@ -946,11 +964,16 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
           detail::vrm_native_factor(toon.parameters.emission.y,reference.emission[1],o.material.emissive[1]),
           detail::vrm_native_factor(toon.parameters.emission.z,reference.emission[2],o.material.emissive[2])};
     } else {
-      if(!o.textures->normal.rgba.empty())fail("typed baked normal export needs explicit canonical tangent conversion");
+      if(!o.textures->normal.rgba.empty() && !emitted.canonical_normal.image)fail("typed baked normal export needs explicit canonical tangent conversion");
       auto compiled=detail::vrm_painted_material(o,std::move(toon),std::move(roles),reference,options.paint_resolution,options.cancelled);
       toon=std::move(compiled.material);roles=std::move(compiled.roles);rewritten=std::move(compiled.rewritten_properties);
     }
-    if(o.material_bindings && o.material_bindings->uv_origin) {
+    if(emitted.canonical_normal.image) {
+      roles[size_t(MToonSlot::Normal)]=emitted.canonical_normal;
+      toon.parameters.normal_enabled=true;toon.parameters.normal_scale=1;
+      for(const char *name:{"_BumpScale","_MainTex_ST","_MainTex_ST_S","_MainTex_ST_T","_UvAnimScrollX","_UvAnimScrollY","_UvAnimRotation"})rewritten.insert(name);
+    }
+    if(o.material_bindings && o.material_bindings->sampling_reparameterized) {
       // Source UV baking changes the coordinate domain of these properties.
       // A later material-value transform cannot silently use the old domain.
       for(const char *name:{"_MainTex_ST","_MainTex_ST_S","_MainTex_ST_T","_UvAnimScrollX","_UvAnimScrollY","_UvAnimRotation"})rewritten.insert(name);

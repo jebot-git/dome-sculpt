@@ -2,14 +2,16 @@
 #pragma once
 #include "mtoon.hpp"
 #include "source-maps.hpp"
+#include "normal-frames.hpp"
 #include <optional>
 namespace dome {
 class PaintedMesh;
 class CreatorAssetArchive;
 struct CreatorAppearance;
+struct DeformationState;
 enum class SourceUvAnimationPolicy { RejectAnimated, FreezeAtTime };
 // Canonical Mikk normals belong to PaintedMesh::baked(), not this role table.
-enum class SourceMaterialNormalFrame { UvDerivative };
+enum class SourceMaterialNormalFrame { UvDerivative, OriginalAttributes };
 struct SourceNativeMaterial {
   // Native inspector factors at the start of this explicit material binding.
   // These are a comparison baseline, not factors baked into role pixels.
@@ -25,6 +27,9 @@ struct SourceUvOrigin {
   std::shared_ptr<const CreatorAppearance> appearance;
   std::optional<MToonMaterial> material;
   std::array<PaintSourceTexture, size_t(MToonSlot::Count)> roles;
+  std::shared_ptr<const DeformationState> deformation;
+  std::string creator_kind,creator_parameters;
+  uint32_t creator_version=0;
 };
 struct SourceMaterialBindings {
   // A generic PBR UV bake uses this holder only for immutable source provenance.
@@ -41,18 +46,21 @@ struct SourceMaterialBindings {
   // First original source, propagated unchanged through repeated UV edits.
   // PaintedMesh has no material holder, so this ownership cannot recurse.
   std::shared_ptr<const SourceUvOrigin> uv_origin;
-  void validate() const;
+  std::shared_ptr<const NormalFrameSet> normal_frames;
+  bool sampling_reparameterized=false;
+  void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;
 // One bounded native archive deduplicates immutable holders and first-source
 // origins by identity; all role/source images use the document image archive.
 class SourceMaterialArchive {
 public:
-  uint32_t add(std::shared_ptr<const SourceMaterialBindings>);
+  uint32_t add(std::shared_ptr<const SourceMaterialBindings>,bool deep=true);
   const std::shared_ptr<const SourceMaterialBindings> &at(uint32_t) const;
   const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings() const { return bindings_; }
   const std::vector<std::shared_ptr<const SourceUvOrigin>> &origins() const { return origins_; }
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &) const;
+  static size_t deformation_entries(const nlohmann::json &);
   static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &);
 private:
   std::vector<std::shared_ptr<const SourceMaterialBindings>> bindings_;
