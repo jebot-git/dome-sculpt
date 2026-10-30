@@ -37,7 +37,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Edit source", "UV editor",
-      "Center object", "Paint tools", "Baking", "Materials",
+      "Plane cut", "Paint tools", "Baking", "Materials",
       "Back", "Move left", "Move right", "Retopology"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
@@ -52,10 +52,11 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *,12> retopo = {
       "New patch", "Tool mode", "Make face", "Connect edge", "Delete points", "Relax",
       "Pin points", "Seam edge", "Back", "Snap range", "Apply patch", "Cancel patch"};
+  static const std::array<const char *,12> cut={"Start cut","Offset","Direction","Cap color","From hand","Flip side","Cap","Apply cut","Back","Undo","Redo","Cancel cut"};
   static const std::array<const char *,12> masks = {
     "Paint mask", "Mask mode", "Strength", "Protect all", "Clear mask", "Invert mask",
     "Mirror X", "Mirror Y", "Back", "Mirror Z", "Planes / view", "Cancel work"};
-  return page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
+  return page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
          : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
@@ -70,6 +71,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if(page==17&&sector>=1&&sector<=3)return sector==1?VrParameter::CutOffset:sector==2?VrParameter::CutDirection:VrParameter::CutCapColor;
   if (page == 15) {
     if (sector == 1) return VrParameter::SculptMaskMode;
     if (sector == 2) return VrParameter::SculptMaskStrength;
@@ -130,9 +132,16 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
-  if (index < 0 || index >= 12 || page < 0 || page > 16 || page == 5 ||
+  if (index < 0 || index >= 12 || page < 0 || page > 17 || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if(page==17){
+    static const std::array<SpatialCommand,12> cut={SpatialCommand::CutBegin,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Undo,
+      SpatialCommand::CutHand,SpatialCommand::CutFlip,SpatialCommand::CutCap,SpatialCommand::CutApply,SpatialCommand::Undo,
+      SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::CutCancel};
+    if(index<0||index>11||(index>=1&&index<=3)||index==8)return {};
+    return cut[index];
+  }
   if(page==15) {
     static const std::array<SpatialCommand,12> actions={SpatialCommand::SculptMaskResume,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::SculptMaskFill,SpatialCommand::SculptMaskClear,SpatialCommand::SculptMaskInvert,SpatialCommand::SculptMirrorX,SpatialCommand::SculptMirrorY,SpatialCommand::Undo,SpatialCommand::SculptMirrorZ,SpatialCommand::Undo,SpatialCommand::CancelWork};
     return index==8?std::nullopt:std::optional<SpatialCommand>(actions[index]);
@@ -185,7 +194,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
         SpatialCommand::Undo, SpatialCommand::Center, SpatialCommand::Undo,
         SpatialCommand::Undo, SpatialCommand::Undo, SpatialCommand::Undo,
         SpatialCommand::Left, SpatialCommand::Right, SpatialCommand::Undo};
-    return (index >= 5 && index <= 8) || index == 11 ? std::nullopt
+    return (index >= 4 && index <= 8) || index == 11 ? std::nullopt
                                     : std::optional<SpatialCommand>(mesh[index]);
   }
   if (page == 8) {
@@ -272,6 +281,7 @@ void SpatialInput::cancel() {
   uv_stick_active_ = uv_gesture_open_ = false;
   uv_pointer_ = 0;
   command_.reset();
+  command_device_ = 0;
   devices_.clear();
 }
 void SpatialInput::uv_gesture_begin() {
@@ -384,9 +394,9 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
   }
   bool color = parameter_ == VrParameter::InkColor ||
                parameter_ == VrParameter::InkEmission ||
-               parameter_ == VrParameter::BaseColor;
-  bool multi = color || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::SculptPlanes;
-  int components = parameter_==VrParameter::BakeQuality?2:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
+               parameter_ == VrParameter::BaseColor || parameter_ == VrParameter::CutCapColor;
+  bool multi = color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
+  int components = (parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
   if (s.trigger && s.panel_hit) {
     int row = 0;
     float y = .46875f;
@@ -521,9 +531,9 @@ void SpatialInput::update(const SpatialSample &s) {
     }
     bool color = parameter_ == VrParameter::InkColor ||
                  parameter_ == VrParameter::InkEmission ||
-                 parameter_ == VrParameter::BaseColor;
-    bool multi = color || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::SculptPlanes;
-    int components = parameter_==VrParameter::BakeQuality?2:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
+                 parameter_ == VrParameter::BaseColor || parameter_ == VrParameter::CutCapColor;
+    bool multi = color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
+    int components = (parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
     if (multi) {
       if (std::abs(s.stick_y) < .3f)
         y_latch_ = 0;
@@ -553,10 +563,10 @@ void SpatialInput::update(const SpatialSample &s) {
       end_stroke();
     if (!menu_) {
       menu_ = true;
-      page_ = retopology ? 16 : 0;
+      page_ = cutting ? 17 : retopology ? 16 : 0;
       menu_anchor_ = s.tip;
       device_ = s.id;
-      selected_ = retopology ? 1 : int(tool_);
+      selected_ = cutting ? 1 : retopology ? 1 : int(tool_);
     } else if (page_ == 0 && (selected_ == 8 || selected_ == 9)) {
       page_ = selected_ == 8 ? 1 : 2;
       selected_ = 0;
@@ -589,6 +599,8 @@ void SpatialInput::update(const SpatialSample &s) {
       selected_ = 0;
     } else if (page_ == 10 && selected_ == 11) {
       page_ = 16; selected_ = 0;
+    } else if(page_==10&&selected_==4){
+      page_=17;selected_=0;
     } else if (page_ == 10 && (selected_ == 5 || selected_ == 6 || selected_ == 7)) {
       page_ = selected_ == 5 ? 3 : selected_ == 6 ? 12 : 2;
       selected_ = 0;
@@ -616,7 +628,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_ == 16 ? 10 : page_ == 15 ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = (page_ == 16 || page_ == 17) ? 10 : page_ == 15 ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
@@ -644,6 +656,7 @@ void SpatialInput::update(const SpatialSample &s) {
         }
         command_ = action;
       }
+      command_device_ = s.id;
       const bool resume_retopology = page_ == 16 && command_ &&
           (*command_ == SpatialCommand::RetopoBegin || *command_ == SpatialCommand::RetopoMode ||
            *command_ == SpatialCommand::RetopoApply || *command_ == SpatialCommand::RetopoCancel);

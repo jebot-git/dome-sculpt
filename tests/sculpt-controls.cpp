@@ -73,6 +73,24 @@ int main(int argc,char **argv) try {
 #endif
     std::cout<<"EXPECTED_KERNEL_LAUNCHES=1\n";return 0;
   }
+  {
+    Volume constant(.05f);constant.fill_mask(.75f);
+    check(constant.mask_sample({.013f,.017f,.023f})==.75f&&constant.mask_sample({-.013f,.117f,-.223f})==.75f,
+          "Uniform global protection samples retain exact scalar bits at fractional lattice positions");
+    check(rejects([&]{constant.mask_sample({2000,0,0});}),
+          "Uniform-mask sampling still rejects positions outside its finite workspace");
+    auto encoded=constant.encode();encoded["sculpt_mask"]["default"]=0.f;
+    for(int z=0;z<2;++z)for(int y=0;y<2;++y)for(int x=0;x<2;++x)
+      encoded["sculpt_mask"]["values"].push_back({x,y,z,.75f});
+    auto cell=Volume::decode(encoded);
+    check(cell.mask_sample({.013f,.017f,.023f})==.75f,
+          "A constant sparse neighbourhood preserves exact protection without relying on a uniform-map shortcut");
+    for(auto &corner:encoded["sculpt_mask"]["values"])
+      corner[3]=.1f+.1f*corner[0].get<int>()+.2f*corner[1].get<int>()+.3f*corner[2].get<int>();
+    auto gradient=Volume::decode(encoded);
+    near(gradient.mask_sample({.013f,.017f,.023f}),.332f,
+         "Sparse protection interpolation reproduces an independently known affine field");
+  }
   Brush b;b.radius=.2f;b.strength=.8f;b.pressure=.6f;b.blend=0;
   // Independent analytic endpoints: protection changes delta, not the radius.
   for (int tool=0;tool<4;++tool) {

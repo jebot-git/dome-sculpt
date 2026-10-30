@@ -25,6 +25,57 @@ public:
   }
 };
 } // namespace
+void edit_cut_parameters(Document &doc,VrParameter parameter){
+  doc.begin_cut_parameter(parameter);
+  try{
+    auto controls=doc.frame().state->controls;
+    int row=std::max(32,dx::size+14),sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);
+    int width=std::min(std::max(520,dx::size*34),sw-40);
+    fl_font(dx::font,dx::size);int text_width=width-40,text_height=0;
+    fl_measure(controls.title.c_str(),text_width,text_height,0);int header=std::max(row,text_height+16);
+    const char *hint_text="Drag, wheel or arrow keys.\nDone keeps the plane; Apply cut creates the mesh.";
+    text_width=width-36;text_height=0;fl_measure(hint_text,text_width,text_height,0);
+    int hint_height=std::max(row*2,text_height+16);
+    int body=header+row*controls.components*2+hint_height+row*3,height=std::min(body+row,sh-40);
+    DomeDialog window(width,height,"Plane cut controls");
+    Fl_Scroll scroll(0,0,width,height-row);scroll.type(Fl_Scroll::VERTICAL);
+    Fl_Group content(0,0,width-24,body);content.resizable(nullptr);
+    Fl_Box title(12,4,width-36,header-4,controls.title.c_str());title.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
+    struct Callback{Document *doc;int component;};std::vector<Callback> callbacks;callbacks.reserve(controls.components);
+    std::vector<std::unique_ptr<Fl_Box>> labels;std::vector<std::unique_ptr<VoxelSlider>> sliders;
+    for(int n=0;n<controls.components;++n){
+      labels.push_back(std::make_unique<Fl_Box>(12,header+row*n*2,width-36,row));
+      auto slider=std::make_unique<VoxelSlider>(24,header+row*(n*2+1),width-60,row);
+      slider->type(FL_HOR_NICE_SLIDER);slider->bounds(0,1);slider->step(.001);
+      slider->value((controls.value[n]-controls.minimum)/(controls.maximum-controls.minimum));
+      callbacks.push_back({&doc,n});slider->callback([](Fl_Widget *w,void *data){auto &c=*static_cast<Callback *>(data);
+        try{c.doc->edit_cut_parameter(c.component,float(static_cast<Fl_Slider *>(w)->value()));}catch(const std::exception &e){c.doc->report_error(e.what());}
+      },&callbacks.back());sliders.push_back(std::move(slider));
+    }
+    Fl_Box hint(12,header+row*controls.components*2,width-36,hint_height,hint_text);
+    hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
+    Fl_Box status(12,header+row*controls.components*2+hint_height,width-36,row*3);
+    status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
+    content.end();scroll.end();
+    Fl_Button cancel(16,height-row+4,width/2-24,row-8,"Cancel"),done(width/2+8,height-row+4,width/2-24,row-8,"Done");
+    cancel.callback([](Fl_Widget *w,void *){w->window()->hide();});
+    done.callback([](Fl_Widget *w,void *data){auto &doc=*static_cast<Document *>(data);
+      try{doc.end_cut_parameter(true);w->window()->hide();}catch(const std::exception &e){doc.report_error(e.what());}
+    },&doc);
+    window.end();window.set_modal();dx::style(&window);window.show();cancel.take_focus();
+    while(window.shown()){
+      auto frame=doc.frame().state;if(frame->controls.parameter!=parameter){window.hide();break;}
+      for(int n=0;n<controls.components;++n){char label[80];
+        if(parameter==VrParameter::CutOffset)snprintf(label,sizeof(label),"Offset: %.2f mm",double(frame->controls.value[n]));
+        else if(parameter==VrParameter::CutDirection)snprintf(label,sizeof(label),"%s: %.1f degrees",n?"Pitch":"Yaw",double(frame->controls.value[n]));
+        else snprintf(label,sizeof(label),"%c: %.0f%%","RGBA"[n],double(frame->controls.value[n]*100));
+        labels[n]->copy_label(label);}
+      status.copy_label(frame->error.c_str());
+      Fl::wait(.05);
+    }
+    if(doc.frame().state->controls.parameter==parameter)doc.end_cut_parameter(false);
+  }catch(...){if(doc.frame().state->controls.parameter==parameter)doc.end_cut_parameter(false);throw;}
+}
 void edit_retopology_distance(Document &doc) {
   auto view = doc.frame().state->retopology;
   if (!view || view->committing) return;

@@ -72,6 +72,7 @@ enum class SpatialCommand {
   BindSkin, SkinUseLocks,
   RetopoBegin, RetopoMode, RetopoFace, RetopoWire, RetopoDelete, RetopoRelax,
   RetopoPin, RetopoSeam, RetopoApply, RetopoCancel,
+  CutBegin, CutHand, CutFlip, CutCap, CutApply, CutCancel,
   SculptMaskToggle, SculptMaskFill, SculptMaskClear, SculptMaskInvert,
   SculptMirrorX, SculptMirrorY, SculptMirrorZ, SculptMaskResume, SculptMaskVisible
 };
@@ -119,6 +120,7 @@ public:
     command_.reset();
     return c;
   }
+  uint32_t command_device() const { return command_device_; }
   void resume_control(VrParameter parameter) {
     parameter_ = parameter;
     page_ = 5;
@@ -148,7 +150,9 @@ public:
     std::function<bool()> end;
   } backend;
   bool painting = false;
-  bool retopology = false, sculpt_mask_edit = false;
+  bool retopology = false;
+  bool cutting = false;
+  bool sculpt_mask_edit = false;
   std::function<bool(VrParameter)> parameter_allowed;
   std::function<bool()> control_accept;
   std::vector<VrControlEvent> take_controls() {
@@ -169,7 +173,7 @@ private:
   bool stroke_active() const {
     return backend.active ? backend.active() : volume_->in_stroke();
   }
-  uint32_t device_ = 0, parameter_owner_ = 0;
+  uint32_t device_ = 0, parameter_owner_ = 0, command_device_ = 0;
   struct DeviceState {
     uint64_t sequence = 0;
     double time = -1;

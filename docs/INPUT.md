@@ -71,6 +71,16 @@ press reopens the active patch page. Skin14 and Masks15 remain separate.
 Standalone CLI final save cancels only an unconfirmed patch after accepted work
 drains; stopping embedded XR retains the draft for desktop continuation.
 
+Plane-cut authoring uses page 17, reached from Mesh tools sector 4 (Center remains
+available on the baking page). While cutting, joystick presses open page 17
+directly. Offset, two-row Direction and four-row Cap color use the common
+joystick/ray controls. From hand captures the confirming menu device's current
+grip in document space, rather than preferring an idle right controller.
+SpatialInput retains command_device alongside its consumed command for that
+purpose. Release-to-rearm and ownership rules remain unchanged. Tracking/focus
+loss rolls back the active parameter adjustment; accepted Apply remains ordered
+through XR shutdown and asset waits. See PLANE-CUTS.md.
+
 # Sculpt masks and symmetry
 
 Desktop Sculpt → Masks and symmetry edits a draft of the active source object's

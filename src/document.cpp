@@ -55,6 +55,7 @@ Document::Document() : input_(volume()) {
     file_thread_ = std::thread([this] { file_loop(); });
     uv_thread_ = std::thread([this] { uv_loop(); });
     retopo_thread_ = std::thread([this] { retopo_loop(); });
+    cut_thread_ = std::thread([this] { cut_loop(); });
   } catch (...) {
     request_worker_stop();
     {
@@ -71,6 +72,7 @@ Document::Document() : input_(volume()) {
     if (uv_thread_.joinable())
       uv_thread_.join();
     if (retopo_thread_.joinable()) retopo_thread_.join();
+    if (cut_thread_.joinable()) cut_thread_.join();
     throw;
   }
 }
@@ -83,6 +85,7 @@ void Document::request_worker_stop() {
   { std::lock_guard lock(input_mutex_); input_changed_.notify_all(); }
   { std::lock_guard lock(uv_mutex_); uv_changed_.notify_all(); }
   { std::lock_guard lock(retopo_mutex_); retopo_changed_.notify_all(); }
+  { std::lock_guard lock(cut_mutex_); cut_changed_.notify_all(); }
 }
 Document::~Document() {
   request_worker_stop();
@@ -96,6 +99,7 @@ Document::~Document() {
   file_thread_.join();
   uv_thread_.join();
   retopo_thread_.join();
+  cut_thread_.join();
 }
 EditorSnapshot Document::frame() const {
   auto state = published_.load();
@@ -121,6 +125,7 @@ bool Document::action_active_locked() const {
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if(state_.cut)return state_.cut->busy||(state_.cut->preview&&state_.cut->preview->changed);
   if (state_.retopology) return state_.retopology->changed || retopo_stroking_ || retopo_pending_ != 0;
   if (weight_stroking_) return !weight_samples_.empty();
   auto &o = scene_.active();
@@ -445,6 +450,9 @@ void Document::publish_locked(bool force) {
       state_.morph_target = std::min(state_.morph_target, d.morphs->targets.size() - 1);
   }
   state_.mesh_active = active.mesh_active;
+  state_.can_cut = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
+      !action_active_locked() && active.visible && !active.locked && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
+      (active.mesh_active||!active.volume->voxels().empty());
   state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
   if(std::find(state_.skin_sources.begin(),state_.skin_sources.end(),state_.skin_options.reference)==state_.skin_sources.end()) {
     auto self=std::find(state_.skin_sources.begin(),state_.skin_sources.end(),active.id);
@@ -453,9 +461,9 @@ void Document::publish_locked(bool force) {
   }
   state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
   state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
-  state_.can_retopologize = !state_.retopology && !state_.asset_busy && !state_.recovery_busy &&
+  state_.can_retopologize = !state_.cut && !state_.retopology && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && active.visible && !active.locked &&
-      scene_.objects().size() < 256 && (active.mesh_active || active.volume->stored_samples() != 0);
+      scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
   state_.bake_sources = bake_sources_locked();
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
@@ -517,6 +525,7 @@ void Document::publish_locked(bool force) {
   checkpoint_locked();
   published_.store(std::make_shared<EditorState>(state_));
   { std::lock_guard lock(retopo_mutex_); retopo_changed_.notify_all(); }
+  { std::lock_guard lock(cut_mutex_); cut_changed_.notify_all(); }
   {
     std::lock_guard lock(uv_mutex_);
     uv_changed_.notify_all();
@@ -547,6 +556,7 @@ void Document::publish_locked(bool force) {
   }
 }
 void Document::finish_locked() {
+  if(state_.cut)throw std::logic_error("Apply or cancel the plane cut before changing the document");
   if (state_.retopology)
     throw std::logic_error("Apply or cancel retopology before changing the document");
   // Starting another command may accept scalar property previews, but must
@@ -578,6 +588,7 @@ void Document::replace(Scene next, bool clean) {
   replace_locked(std::move(next), clean);
 }
 void Document::replace_locked(Scene next, bool clean) {
+  if(state_.cut){finish_control_locked(false);cancel_cut_locked();}
   if (state_.retopology) cancel_retopology_locked();
   if (weight_stroking_) {
     cancel_action_locked(); desktop_ = false; input_.cancel();
@@ -624,6 +635,7 @@ void Document::seed() {
 }
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
+  if(state_.cut)return false;
   if (control_before_ || uv_ || state_.asset_busy || action_active_locked() ||
       input_.menu_open() || !scene_.active().visible ||
       scene_.active().locked ||
@@ -718,6 +730,7 @@ Vec3 Document::gradient(Vec3 p) const {
 }
 bool Document::undo() {
   std::lock_guard lock(model_mutex_);
+  if(state_.cut){bool available=!cut_undo_.empty()||bool(control_before_);cut_history_locked(false);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || !state_.retopology->source) return false;
     bool available = state_.retopology->can_undo || retopo_stroking_;
@@ -745,6 +758,7 @@ bool Document::undo() {
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
+  if(state_.cut){bool available=!cut_redo_.empty()&&!control_before_;cut_history_locked(true);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || retopo_stroking_ || !state_.retopology->source) return false;
     bool available = state_.retopology->can_redo;
@@ -933,6 +947,8 @@ bool Document::wait_asset(std::chrono::milliseconds timeout) const {
   // an XR shutdown boundary. Unconfirmed workspaces do not block this helper.
   auto topology = published_.load()->retopology;
   if (topology && topology->committing && !wait_retopology(timeout)) return false;
+  auto cut=published_.load()->cut;
+  if(cut&&cut->committing&&!wait_cut(std::max(std::chrono::milliseconds(0),std::chrono::duration_cast<std::chrono::milliseconds>(deadline-std::chrono::steady_clock::now()))))return false;
   std::unique_lock lock(file_mutex_);
   return file_changed_.wait_until(lock, deadline,
                                 [&] { return !published_.load()->asset_busy; });
@@ -1066,8 +1082,10 @@ void Document::process_locked(const SpatialFrame &f) {
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
+  if(state_.cut)input_.edit_allowed=false;
   input_.painting = scene_.active().mesh_active;
   input_.retopology = bool(state_.retopology);
+  input_.cutting = bool(state_.cut);
   input_.sculpt_mask_edit = !scene_.active().mesh_active && volume().sculpt_settings().mask_edit;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
@@ -1113,15 +1131,17 @@ void Document::process_locked(const SpatialFrame &f) {
       publish_locked();
       return;
     }
+    state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !sculpt_mask_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork)) finish_locked();
     command_locked(*c);
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
-    if (state_.retopology) {
+    if(state_.cut){cut_history_locked(false);
+    } else if (state_.retopology) {
       if (!retopo_accepting_ && state_.retopology->source) {
         if (retopo_stroking_) { cancel_action_locked(); input_.cancel(); }
         else queue_retopology_locked(RetopoAction::Undo);
@@ -1136,7 +1156,8 @@ void Document::process_locked(const SpatialFrame &f) {
     }
   }
   if (f.hands[0].redo || f.hands[1].redo) {
-    if (state_.retopology) {
+    if(state_.cut){cut_history_locked(true);
+    } else if (state_.retopology) {
       if (!retopo_accepting_ && !retopo_stroking_ && state_.retopology->source) queue_retopology_locked(RetopoAction::Redo);
     } else if (uv_) {
       if (!uv_accept_pending_ && !uv_solving_) apply_uv_action_locked(UvAction::Redo);
@@ -1355,11 +1376,15 @@ bool Document::wait_mesh(std::chrono::milliseconds timeout) const {
   auto ready = [&] {
     auto m = mesh_.load();
     return m->generation == wanted->generation && m->revision >= wanted->revision &&
+           (!wanted->cut || (m->cut_session==wanted->cut->session && m->cut_request>=wanted->cut->request)) &&
            (!wanted->weight_samples || (m->weight_gesture == wanted->weight_gesture &&
                                        m->weight_samples >= wanted->weight_samples));
   };
   return mesh_changed_.wait_for(lock, timeout, [&] {
-    return ready() || stopping_.load() || published_.load()->generation != wanted->generation ||
+    auto current=published_.load();
+    return ready() || stopping_.load() || current->generation != wanted->generation ||
+           (wanted->cut && (!current->cut || current->cut->session!=wanted->cut->session ||
+             (!current->cut->busy && !current->cut->error.empty()))) ||
            (wanted->weight_samples && weight_epoch_.load() != wanted->weight_gesture);
   }) && ready();
 }
@@ -1475,6 +1500,9 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(parameter==VrParameter::CutOffset||parameter==VrParameter::CutDirection||parameter==VrParameter::CutCapColor)
+    return state_.cut&&cut_bake_source_&&!state_.cut->committing&&!state_.asset_busy;
+  if(state_.cut)return false;
   if (sculpt_parameter(parameter)) return sculpt_target_ready_locked();
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
@@ -1499,7 +1527,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
     const auto &o = scene_.active();
     return !state_.asset_busy && !state_.recovery_busy && o.visible && !o.locked &&
            scene_.objects().size() < 256 &&
-           (o.mesh_active ? bool(o.painted) : o.volume->stored_samples() != 0);
+           (o.mesh_active ? bool(o.painted) : !o.volume->voxels().empty());
   }
   if (parameter == VrParameter::SculptOpacity)
     return !state_.asset_busy && !scene_.active().mesh_active &&
@@ -1522,6 +1550,9 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::CutOffset||state_.controls.parameter==VrParameter::CutDirection||state_.controls.parameter==VrParameter::CutCapColor){
+    finish_cut_parameter_locked(accept);return;
+  }
   if (sculpt_parameter(state_.controls.parameter)) {
     auto settings = volume().sculpt_settings();
     const auto c = state_.controls;
@@ -1699,6 +1730,14 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::CutOffset:
+      control_cut_settings_=cut_settings_;c.title="Cut offset (document mm)";
+      c.minimum=-state_.cut->offset_limit_mm;c.maximum=state_.cut->offset_limit_mm;c.value[0]=cut_settings_.offset_mm;break;
+    case VrParameter::CutDirection:
+      control_cut_settings_=cut_settings_;c.title="Cut yaw / pitch (degrees)";c.components=2;
+      c.minimum=-180;c.maximum=180;c.value={cut_settings_.yaw,cut_settings_.pitch,0,0};break;
+    case VrParameter::CutCapColor:
+      control_cut_settings_=cut_settings_;c.title="Cut cap RGBA";c.components=4;c.value=cut_settings_.cap_material.color;break;
     case VrParameter::SculptMaskMode:
       c.title="Sculpt mask tool"; c.maximum=2; c.value[0]=int(volume().sculpt_settings().mask_tool); break;
     case VrParameter::SculptMaskStrength:
@@ -1904,6 +1943,15 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   bool scene_changed = false;
   switch (c.parameter) {
+  case VrParameter::CutOffset:
+  case VrParameter::CutDirection:
+  case VrParameter::CutCapColor: {
+    auto settings=cut_settings_;
+    if(c.parameter==VrParameter::CutOffset)settings.offset_mm=value;
+    else if(c.parameter==VrParameter::CutDirection){settings.yaw=c.value[0];settings.pitch=c.value[1];}
+    else settings.cap_material.color=c.value;
+    edit_cut_locked(std::move(settings),false);break;
+  }
   case VrParameter::SculptMaskMode:
   case VrParameter::SculptMaskStrength:
   case VrParameter::SculptPlanes:
@@ -2031,6 +2079,23 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command==SpatialCommand::CutBegin)return state_.can_cut;
+  if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
+    if(!state_.cut||control_before_)return false;
+    auto &v=*state_.cut;
+    if(command==SpatialCommand::CutCancel)return !v.committing||(state_.asset_busy&&asset_status().cancellable);
+    if(v.committing||state_.asset_busy)return false;
+    if(!cut_bake_source_)return false;
+    if(command==SpatialCommand::CutApply)return !v.busy&&v.preview&&v.preview_request==v.request&&v.preview->changed;
+    return true;
+  }
+  if(state_.cut){
+    if(command==SpatialCommand::CancelWork)return state_.asset_busy&&asset_status().cancellable;
+    if(state_.cut->committing)return false;
+    if(command==SpatialCommand::Undo)return !cut_undo_.empty()||bool(control_before_);
+    if(command==SpatialCommand::Redo)return !cut_redo_.empty()&&!control_before_;
+    return false;
+  }
   if (sculpt_mask_command(command)) return sculpt_target_ready_locked();
   if (command == SpatialCommand::RetopoBegin)
     return state_.retopology ? state_.retopology->source && !retopo_accepting_ && !state_.asset_busy && !control_before_
@@ -2189,6 +2254,15 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command==SpatialCommand::CutBegin){begin_cut_locked();return;}
+  if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
+    if(!command_enabled_locked(command))return;
+    if(command==SpatialCommand::CutHand)cut_from_hand_locked();
+    else if(command==SpatialCommand::CutApply||command==SpatialCommand::CutCancel)end_cut_locked(command==SpatialCommand::CutApply);
+    else{auto settings=cut_settings_;if(command==SpatialCommand::CutFlip)settings.flipped=!settings.flipped;else settings.cap=!settings.cap;edit_cut_locked(settings);}
+    return;
+  }
+  if(state_.cut&&(command==SpatialCommand::Undo||command==SpatialCommand::Redo)){cut_history_locked(command==SpatialCommand::Redo);return;}
   if (sculpt_mask_command(command)) {
     if (!command_enabled_locked(command)) return;
     if (command == SpatialCommand::SculptMaskFill || command == SpatialCommand::SculptMaskClear || command == SpatialCommand::SculptMaskInvert) {
@@ -2635,6 +2709,7 @@ void Document::file_loop() {
           state_.asset_busy = false;
           asset_work_.store({});
           if (job->retopo_session && job->retopo_session == retopo_session_.load()) cancel_retopology_locked();
+          if (job->cut_session && job->cut_session==cut_session_.load())cancel_cut_locked();
           bool changed = !job->operation_changed || *job->operation_changed;
           if (changed) {
             Scene before = scene_;
@@ -2802,6 +2877,9 @@ void Document::file_loop() {
         }
         if(job->scene_operation) {
           asset_work_.store({}); restore_weight_view_locked(job->rollback_preview);
+          if(job->cut_session&&job->cut_session==cut_session_.load()&&state_.cut){
+            auto view=std::make_shared<CutView>(*state_.cut);view->committing=false;view->error=e.what();state_.cut=view;
+          }
           if (job->retopo_session && job->retopo_session == retopo_session_.load() && state_.retopology) {
             retopo_accepting_ = false;
             auto view = std::make_shared<RetopoView>(*state_.retopology);

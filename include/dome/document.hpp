@@ -9,6 +9,7 @@
 #include "weight-authoring.hpp"
 #include "skin-authoring.hpp"
 #include "retopo-authoring.hpp"
+#include "cut-authoring.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <future>
@@ -92,6 +93,8 @@ struct EditorState {
   std::shared_ptr<const UvView> uv;
   std::shared_ptr<const RetopoView> retopology;
   bool can_retopologize = false;
+  bool can_cut = false;
+  std::shared_ptr<const CutView> cut;
   uint64_t active_sculpt_layer = 0;
   std::vector<std::string> sculpt_layers;
   std::string sculpt_layer_name;
@@ -136,6 +139,8 @@ struct MeshSnapshot {
   // Opaque, strongly owned packed-geometry dependency identity. Empty snapshots
   // retain conservative legacy upload behavior. Scalars/materials are separate.
   std::shared_ptr<const void> geometry_identity;
+  uint64_t cut_session = 0, cut_request = 0, clipped_object = 0;
+  CutPlane clip_plane;
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0;
@@ -208,6 +213,13 @@ public:
   void end_retopology(bool accept);
   void retopology_distance(float mm);
   bool wait_retopology(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
+  void begin_cut();
+  void edit_cut(CutSettings);
+  void end_cut(bool accept);
+  void begin_cut_parameter(VrParameter);
+  void edit_cut_parameter(int component, float normalized);
+  void end_cut_parameter(bool accept);
+  bool wait_cut(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   bool wait_uv(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void use_source();
   void cancel_spatial_menu();
@@ -299,6 +311,24 @@ private:
   void restore_weight_view_locked(const std::shared_ptr<const MeshSnapshot> &);
   void invalidate_weight_view_locked(bool restore);
   float control_voxel_mm_ = 30;
+  CutSettings cut_settings_, control_cut_settings_;
+  std::vector<CutSettings> cut_undo_, cut_redo_;
+  AssetSource cut_source_{};
+  std::shared_ptr<const MeshSnapshot> cut_base_;
+  std::shared_ptr<const BakeSource> cut_bake_source_;
+  std::atomic<uint64_t> cut_session_{0}, cut_request_{0};
+  struct CutJob { uint64_t session=0, request=0; AssetSource expected; CutSettings settings; };
+  std::optional<CutJob> cut_job_;
+  mutable std::mutex cut_mutex_;
+  mutable std::condition_variable cut_changed_;
+  void begin_cut_locked();
+  void edit_cut_locked(CutSettings, bool remember = true);
+  void end_cut_locked(bool);
+  void cancel_cut_locked();
+  void cut_history_locked(bool redo);
+  void finish_cut_parameter_locked(bool accept);
+  void cut_from_hand_locked();
+  void cut_loop();
   float retopo_snap_mm_ = 50, control_retopo_mm_ = 50;
   AssetSource retopo_source_{};
   std::atomic<uint64_t> retopo_session_{0};
@@ -391,6 +421,7 @@ private:
     AssetExportFormat export_format = AssetExportFormat::Glb;
     std::shared_ptr<const MeshSnapshot> rollback_preview{};
     uint64_t retopo_session = 0;
+    uint64_t cut_session = 0;
   };
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
@@ -398,7 +429,7 @@ private:
   std::deque<FileJob> files_;
   bool files_stopping_ = false;
   std::atomic_bool stopping_{false};
-  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_;
+  std::thread mesh_thread_, input_thread_, file_thread_, uv_thread_, retopo_thread_, cut_thread_;
   void request_worker_stop();
   void publish_locked(bool force_geometry = false);
   void record_locked(History);
@@ -429,7 +460,8 @@ private:
                              std::shared_ptr<std::string>);
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
-                                    std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0);
+                                    std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
+                                    uint64_t cut_session = 0);
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});

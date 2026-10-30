@@ -18,7 +18,7 @@ void Document::cancel_asset_work(){
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id &&
-      (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : o.volume->stored_samples()!=0))ids.push_back(o.id);
+      (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   return ids;
 }
 bool Document::bake_target_ready_locked() const {

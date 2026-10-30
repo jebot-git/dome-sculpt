@@ -382,6 +382,45 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
             check(all(abs(p[0]-.35) > .01 or abs(p[1]-.25) > .01 for p in positions),
                   "Focus loss cancels the held point while retaining the earlier draft point for later Face and Apply")
 
+    # Cut waits are driven by the actually enabled Apply sector in GL images,
+    # not a product-side shortcut or a fixed geometry-worker sleep.
+    cut_helper = binary.parent / "dome-sculpt-cut-authoring-test"
+    cut_fixture = root / "cut-input.dsculpt"
+    subprocess.run([str(cut_helper), "--ui-fixture", str(cut_fixture)], check=True)
+    def inspect_cut(path):
+        return json.loads(subprocess.check_output([str(cut_helper), "--inspect", str(path)], env=env, text=True))
+    cut_original = inspect_cut(cut_fixture)
+    for mode in ("accept", "unconfirmed"):
+        result, path = run("cut-"+mode, 80, extra=["--open", str(cut_fixture)],
+                           mode={"DOME_XR_FIXTURE_CUT": mode})
+        check(result.returncode == 0, "Actual OpenXR plane cut "+mode+" exits and saves through the native standalone path")
+        report = json.loads((output / ("cut-"+mode+".json")).read_text())
+        check(report.get("cut_preview_ready") is True and report.get("cut_slider_samples", 0) > 0 and
+              report.get("cut_script_step", 0) >= 33 and report.get("tracking_losses", 0) == 0,
+              "Plane cut "+mode+" reaches an enabled page17 preview and adjusts its real ray slider without losing tracking")
+        check(report["frames_waited"] == report["frames_begun"] == report["frames_ended"] and
+              report["acquires"] == report["image_waits"] == report["releases"] and report["swapchains_destroyed"] == 2,
+              "Plane cut "+mode+" balances stereo image, frame and shutdown ownership")
+        after = inspect_cut(path)
+        if mode == "unconfirmed":
+            check(after == cut_original,
+                  "Standalone save cancels an unconfirmed live cut adjustment and preserves the exact original scene")
+            continue
+        objects = after["scene"]["objects"]
+        check(report.get("cut_apply_ready") is True and len(objects) == 3 and not objects[0]["visible"] and
+              all(obj["visible"] for obj in objects[1:]) and objects[1]["group"] == objects[2]["group"] != 0,
+              "Controller-only plane Apply publishes separate shell and cap in one persistent group")
+        retained = dict(objects[0]); before = dict(cut_original["scene"]["objects"][0])
+        for item in (retained, before):
+            item.pop("visible", None)
+            item.setdefault("material_bindings", None)
+            item.setdefault("retopology", None)
+        check(retained == before,
+              "Actual OpenXR cut retains the exact original paint, geometry, source identities and material")
+        expected_offset = .2 * (3 ** .5) * .2
+        check(after["closed"] and abs(after["x_min"]-expected_offset) < 1e-5 and abs(after["x_max"]-.2) < 1e-5,
+              "Saved cut geometry is closed and matches the independently expected 60-percent ray-slider half-space")
+
     # Native sculpt protection is authored through menu15, ray sliders and
     # tracked pressure. Inspect persisted Scene data rather than a test app API.
     mask_fixture=root / "sculpt-mask-input.dsculpt"

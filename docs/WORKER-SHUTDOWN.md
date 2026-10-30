@@ -15,7 +15,7 @@ still occurs after input joins so accepted ordered file jobs can drain. Async
 Open completion similarly synchronizes its file-worker wake notification.
 
 The native `worker-shutdown` fixture wraps the actual condition-variable wait,
-notify and mutex-lock calls. All four document workers pause while holding their
+notify and mutex-lock calls. All six document workers pause while holding their
 predicate mutex immediately before platform wait registration. Old code reaches
 three notifications first; fixed code reaches a predicate-mutex request first.
 The fixture releases the workers only after that rendezvous. It uses a bounded

@@ -3,7 +3,7 @@
 namespace dome {
 bool Document::sculpt_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
+  return !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && !o.mesh_active && o.visible && !o.locked;
 }
 void Document::sculpt_settings_locked(Volume::SculptSettings settings, AssetSource expected) {

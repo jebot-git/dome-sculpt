@@ -31,6 +31,15 @@ See RETOPO-AUTHORING.md and the DOME_MENU_RETOPO / DOME_MENU_RETOPO_COMPACT flow
 in tests/menu.py. Existing general-menu evidence below remains historical;
 VALIDATION.md records the current source's actual runs.
 
+Mesh → Plane cut adds source-aware Start, offset/direction/cap-color controls,
+checked Cap/Flip commands and explicit Apply/Cancel. Live plane edits route Undo
+to draft settings; output publication is one global transaction. Its FLTK
+dialogs use measured BDF text, scrollable content, fixed Cancel/Done actions and
+Cancel focus. Close cancels the current parameter adjustment while retaining
+the workspace. Scene/save commands remain isolated until Apply/Cancel. Native
+flows are DOME_MENU_CUT and DOME_MENU_CUT_COMPACT in tests/menu.py; see
+PLANE-CUTS.md and VALIDATION.md for behavior and exact tested scope.
+
 The default application identity is `org.domed.Sculpt`, including native choosers
 and alerts. A matching desktop entry is installed with the application. FLTK's
 transient relationships allow dialogs to inherit their parent's universal menu.

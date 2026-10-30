@@ -1,93 +1,125 @@
-# Dome Sculpt production objective remains active
+# Combined sculpt protection and plane cuts — 2026-10-30
 
-Read AGENTS.md, REQUIREMENTS.md, HANDOFF-466ebd1.md and parent DESIGN_CONVENTIONS.
-Complete the full native C++20 FLTK/OpenXR sculpt, texture, UV, rig/skin/morph and
-avatar suite. Animation and offline final rendering are excluded. A checkpoint
-is not goal completion.
+Application source `4755e62665c55ea6f70aa4cfda04b6c657f951d5` merges feature
+`55dafa0` / source `2ec8a5a` with main `9a0cfc4` / source `20c132d`, preserving
+both histories. Test-only commit `3e602ae` adds the canonical cold-BDF startup
+allowance to the mask GUI harness. All 182 product source hashes remain identical
+to the application source; see artifacts/cut-sculpt-product-freeze.json.
+Branch: work/cut-sculpt-integration. The full production objective in
+[REQUIREMENTS.md](REQUIREMENTS.md) remains incomplete. No agents were spawned.
 
-## Current source and verified milestone
+Read [../AGENTS.md](../AGENTS.md), [AGENT-HANDOFF.md](AGENT-HANDOFF.md),
+[VALIDATION.md](VALIDATION.md), [SCULPT-MASKS.md](SCULPT-MASKS.md),
+[PLANE-CUTS.md](PLANE-CUTS.md) and the material/normal-frame/worker notes.
+Exact prior handoffs and validation are archived in corresponding -55dafa0 and
+-9a0cfc4 files. Keep all older creator/integration history as well.
 
-Application source `20c132d` adds persistent object-level sculpt protection and
-object-local XYZ symmetry to combined Retopo/authoring source2c89e8d. Native FLTK
-and XR page15 expose mask Add/Remove/Smooth, strength, global Fill/Clear/Invert,
-mirror origins and overlay visibility. All four geometry tools honor protection.
-Mask data is independent of displacement layers, retained across explicit tool
-changes, and constrained by object locks/visibility. See SCULPT-MASKS.md and INPUT.md.
+## Implemented
 
-Mask/control-only edits retain the immutable COW geometry owner and reuse the
-worker's extracted source mesh. Protection scalars and mirrored brush feedback
-are published through immutable snapshots; PBR/MToon alpha and picking remain
-unchanged. Strong source/generation checks, exact cancellation/history, ordered
-worker publication and allocation-free stroke rollback remain enforced.
+- Native desktop/XR masks and object-local symmetry now coexist with plane cuts,
+  Scene v8, source materials/UVs, skin, Unicode and cached retopology overlays.
+  Masks page 15, Skin page 14, Retopo page 16 and Cut page 17 have independent commands, slider rows,
+  labels, availability and confirming-controller ownership. Default desktop
+  dragging remains trackball navigation. Runtime remains native FLTK/EGL/OpenXR.
+- Cut previews retain exact original protection feedback; ephemeral cap vertices
+  append the ordinary unmasked sentinel. Mask settings, bulk Fill/Invert and
+  pressure cannot mutate an active cut source. Cancel/Apply/global Undo retain
+  original Volume v3 protection/mirror settings. Static shell paint does not bake
+  the display-only protection overlay, and new outputs have no stale overlay.
+- Protection sampling now preserves constant scalars exactly using a validated
+  uniform-field shortcut and nested difference-form interpolation. Sparse-cell
+  constants and an independent affine field are tested. The original exact
+  protected-cut assertion was retained rather than relaxed after exposing drift.
+- Geometry availability and bake-source choices use actual sculpt samples,
+  excluding mask-only empty volumes while retaining their useful authoring data.
+  Cut cancellation/retry, one global publication transaction, accepted final-save
+  draining and the six-worker predicate-mutex shutdown handshake are preserved.
+- Volume/Brush/Sample consumers were rebuilt coherently. Nested Volume v3 and
+  combined Scene v8/legacy codecs, quotas, immutable origins and live SourceUV
+  normal-frame guards remain intact. No Scene v9 frame provenance was invented.
 
-Nondefault mask/control data uses nested Volume3; default Volumes retain2.
-Flat Volume3 opens natively; Scene5–8 compatibility and aggregate quotas are
-preserved. Immutable material/Retopo features still use Scene8. Skin14 and
-Retopo16 remain separate from Masks15. Future original normal-frame provenance
-requires Scene9/materials2; never relabel legacy derivative pixels.
+## Verification
 
-The frozen optimized candidate is artifacts/verify-sculpt-ui-79fe/build.
-Despite its historical directory name, every179 product source hash matches
-20c132d (artifacts/sculpt-product-freeze-manifest.json). It excludes unrelated
-primary frame/creator drafts. Do not mix earlier headers/static libraries with
-the new Volume/Brush/Sample layouts. Fresh public clones of20c132d have the same
-product source; the primary worktree may contain later unrelated WIP.
+All 76 registered Release suites pass across two runs: 75 non-XR suites in
+625.60s, then openxr-client in 372.17s. Its complete real-loader synthetic report
+passes 150/150, failed=0, complete=true, exit 0. It retains the upstream 140 cases
+and the 10 cut checks, exercising actual GL availability, joystick/ray/pressure,
+source/geometry persistence, cancellation, focus and shutdown behavior. The
+isolated final run retains the original 40-second per-client timeout.
 
-Verification is complete for this milestone:73/73 native Release173.67s;
-CPU real-loader XR140/140; actual Arc ONEAPI frontend XR140/140; whole-core C/C++
-ASan/UBSan/leaks17/17 in186.49s; actual Arc native12/12 in6.15s. Native menus53/53,
-Skin11/11, Unicode3/3, mask controls17/17 plus compact2xBDF5/5, actual DomeD
-Wayland mask9/9 and existing8/8 pass. Mask/mirror GPU38/38 and existing material
-75+25 assertions pass on Arc and llvmpipe. Logs and exact scopes: VALIDATION.md.
-All milestone validation handles are terminal. No physical-device claim follows
-from these synthetic results.
+Whole-core C/C++ ASan/UBSan/leaks: 23/23 pass in 320.94s. All 125 native GUI
+checks pass: masks 17+compact 5, cut 12+compact 6, retopo 12+compact 6, general 53, skin 11
+and Unicode 3. Actual Intel ADL-N OpenGL additionally passes MToon 81, mask/mirror 38
+and the full spatial renderer. These are graphics and synthetic tracking proofs;
+no physical XR/input or new compute execution follows from them. The cut suite
+has 68 assertions, including protected-source interoperation and empty-mask-source
+eligibility. See VALIDATION.md for exact scopes, logs and initial diagnostics.
 
-## Toolkit, physical test and installation boundary
+The first concurrent XR attempt reached 102 successful checks and 56 completed
+cut frames before its client wall-clock limit. Its complete failure trace is
+preserved. The final full isolated replay passes without a timeout/oracle change.
+A misconfigured initial GUI compact flag and 30-second cold startup failures are
+also retained; only the startup wait was aligned with the existing 90-second BDF
+allowance. Interaction/publication checks remain unchanged.
 
-Canonical DomeD/FLTK282467e727df78c8e7f2452aa05a7747bac854a6 was rechecked on remote.
-Use explicit FLTK_DIR=artifacts/toolkit-282467e/share/fltk and runtime lib64;
-CMAKE_PREFIX_PATH alone can retain an older cached /opt toolkit. The matching
-standalone compositor is artifacts/domed-282467e-target/release/dome-compositor.
-Build optimized releases as regular user. No system install or active-session
-restart occurred. No physical headset test was relaunched.
+## Build and continuation
 
-The user confirmed rudimentary WiVRn HMD/both-controller operation only for
-8f4d67d, then requested ending that test. Recovery snapshots/report are retained
-under artifacts/xr-milestone-8f4d67d; DomeD continued running. This does not prove
-later sources, complete workflows, spatial stylus, reconnect or sustained latency.
+Use build-cut-sculpt for this source. Older build/ and build-cut-integration
+executables belong to previous stages. GUI scripts were copied unchanged into
+artifacts/cut-sculpt-ui/tests, with build symlinked to build-cut-sculpt. The
+combined core and selected executables were rebuilt in build-sanitize with
+UI/XR OFF and C/C++ instrumentation, including Mikk/xatlas.
 
-## Independent work and next integration
+The unchanged canonical toolkit is DomeD 282467e / 22 patches, local prefix
+artifacts/toolkit-authoring, runtime directory lib. All 30 manifest hashes and
+the canonical qimgvr BDF helper match. Upstream's lib64 prefix is absent here.
+The parent DESIGN_CONVENTIONS file is absent in this environment; use the
+committed audits/references and canonical helpers without claiming a fresh
+parent-file inspection. Preserve unrelated de-xr repositories.
 
-Query collaboration ownership before editing/staging. Preserve all private
-frame/creator WIP and old applied backup stashes; do not reapply those stashes.
+```sh
+cmake -S . -B build-cut-sculpt -DCMAKE_BUILD_TYPE=Release \
+  -DDOME_COMPUTE_BACKEND=CPU \
+  -DFLTK_DIR="$PWD/artifacts/toolkit-authoring/share/fltk"
+cmake --build build-cut-sculpt --parallel 2
+LIBGL_ALWAYS_SOFTWARE=1 LP_NUM_THREADS=2 LD_LIBRARY_PATH="$PWD/artifacts/toolkit-authoring/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+  ctest --test-dir build-cut-sculpt --output-on-failure -j2
+./build-cut-sculpt/run-dome-sculpt
+```
 
-- Local meshing foundation37e38c7 is committed privately on
-  work/local-surface-foundation-2c89e8d in artifacts/local-surface-2c89e8d.
-  Its75 Release/sanitizer checks and6 regression suites pass. Exact-position
-  welding/collinear subdivision/directed orientation repairs an inherited tiny
-  hole without moving vertices. Independent timing shows faster local extraction;
-  full assembly and dirty-producer/upload costs remain distinct. It is not in
-  main. The next private phase authenticates Volume dirty lineage and integrates
-  Document cache updates. Incremental GPU assembly/uploads remain required.
-- Original/native normal frames are private in artifacts/frame-runtime-prototype.
-  Versioned Scene9/materials2 provenance, actual creator Shape/native morph/skin
-  transport and frame-aware UV fixtures are under development. Export and live
-  UV Apply guards remain until complete consumer/interop proof. Primary helper
-  and creator drafts are not part of20c132d.
+All stage build/test/app handles were terminal and the final process inventory
+found none remaining. Artifacts/build directories are ignored local evidence,
+absent in a fresh clone. No system installation or active-session restart was
+performed. No fresh physical XR, external Khronos or compute-backend execution
+is claimed. Local SDK discovery found no icpx/sycl-ls/hipcc/nvcc; older Arc/ONEAPI,
+HIP compilation and actual Wayland-host results stay scoped to their archived
+sources. No Python runtime or Qt/GTK/Pango frontend was introduced.
 
-## Full remaining scope
+## Next work and full objective
 
-Every incomplete REQUIREMENTS row remains required: resolution/local storage and
-meshing, sustained production sculpting, projection/stencils/texture sets and
-advanced baking; complete retopo/cut/procedural/plugin workflows; interactive
-bone/landmark/finger fitting, robust automatic weights and editable shapekeys;
-robust anime/toon authoring; original normal frames and full selected glTF/VRM1,
-constraints/expressions/physics and independent graphical consumers; physical
-controllers/headset/stylus/3D mouse, instance loss/reconnect and performance;
-all eligible compute workloads and hardware verification for each backend.
+Proceed to repeated group/multi-material cuts. Current commands affect only the
+active object: capped mode rejects its open shell and open trim leaves sibling
+caps untouched. Extend coherent source membership/material provenance, preview,
+and one-transaction publication; do not infer group semantics from names.
+General Booleans, stronger contours, source compaction/GPU preview caching,
+durable recipes, quality controls, full new material/skin/morph transfer and
+unconfirmed-draft recovery remain unfinished. Outputs currently use static
+512-pixel PBR atlases while originals retain their complete source payload.
 
-CPU remains default. Arc ONEAPI is real hardware execution; missing GPU fails
-explicitly. HIP7.1 compiles gfx1030 but AMD hardware/ROCK is absent; CUDA SDK/GPU
-are unavailable. Compile-only and software rendering are not execution proof.
-Earlier checkpoints and their scopes are archived in HANDOFF-2c89e8d.md,
-HANDOFF-500f321.md and corresponding validation records.
+Every incomplete REQUIREMENTS row remains required: production resolution/local
+storage/meshing and sustained VR; projection/stencils/texture sets and advanced
+baking; retopo bridging/extrusion and procedural/plugin workflows; interactive
+rig/landmarks/fingers/robust automatic weights and morph authoring; complete
+avatar/MToon/glTF/VRM and independent consumer fidelity; physical controllers,
+stylus/3D mouse/headsets, reconnect/session loss/performance, and eligible
+OneAPI/ROCm/CUDA workloads. This checkpoint is not goal completion.
+
+Private local-mesh and original-frame/creator prototypes referenced by upstream
+are not incorporated here. Do not reapply old stashes or remove SourceUV/export
+guards. Legacy UvDerivative pixels cannot be relabelled original-frame data;
+future versioned frame work needs runtime/persistence/export and consumer proof.
+
+Fetch and inspect status/remotes/collaboration before overlapping work. Public
+repository: https://github.com/jebot-git/dome-sculpt at
+/home/blux/de-xr/dome-sculpt. The parent is not a repository. Preserve all source
+histories and unrelated projects; never force-push over newer remote work.

@@ -4,7 +4,8 @@ These APIs implement geometry and persistence foundations for the Retopo Flow
 and Divine Cut workflow requirements. They are not complete equivalents of
 those products. [RETOPO-AUTHORING.md](RETOPO-AUTHORING.md) describes the native
 desktop/XR manual patch editor and scene persistence now using RetopoMesh;
-interactive plane-cut controls remain unfinished. Geometry
+the manual plane-cut workflow is in [PLANE-CUTS.md](PLANE-CUTS.md). General
+Boolean and production contour workflows remain unfinished. Geometry
 jobs belong on workers, with document/source generation checks before publishing
 immutable snapshots. Existing paint must be transferred or rebaked explicitly.
 

@@ -158,6 +158,10 @@ struct Canvas : Fl_Gl_Window {
           document.frame().state->retopology) {
         document.end_retopology(false); invalidate(); return 1;
       }
+      if(event==FL_KEYDOWN&&Fl::event_key()==FL_Escape&&document.frame().state->cut){
+        if(document.frame().state->cut->committing)document.cancel_asset_work();else document.end_cut(false);
+        invalidate();return 1;
+      }
       if (event == FL_PUSH) {
         take_focus();
         last_x = Fl::event_x();
@@ -256,7 +260,7 @@ struct Canvas : Fl_Gl_Window {
     renderer->set_frame_time(material_time);
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
                    f.state->toon, f.state->light);
-    if (f.state->retopology) {
+    if (f.state->retopology || f.state->cut) {
       if (!cursors) cursors = std::make_unique<CursorRenderer>();
       auto overlay = *f.state; overlay.canvas = model; overlay.hands = {};
       cursors->draw(overlay, vp);
@@ -305,7 +309,7 @@ struct App {
   static void tick(void *data) {
     auto &a = *static_cast<App *>(data);
     auto f = a.canvas.document.frame();
-    if (f.surface != a.canvas.shown_mesh || f.state->retopology)
+    if (f.surface != a.canvas.shown_mesh || f.state->retopology || f.state->cut)
       a.canvas.redraw();
     a.dirty = f.state->dirty;
     a.canvas.tool = f.state->tool;
@@ -439,6 +443,14 @@ struct App {
     menu.add("&Mesh/Retopology/Projection distance...", 0, command, this);
     menu.add("&Mesh/Retopology/Apply patch", 0, command, this);
     menu.add("&Mesh/Retopology/Cancel patch", 0, command, this);
+    menu.add("&Mesh/Plane cut/Start cut",0,command,this);
+    menu.add("&Mesh/Plane cut/Offset...",0,command,this);
+    menu.add("&Mesh/Plane cut/Direction...",0,command,this);
+    menu.add("&Mesh/Plane cut/Cap color...",0,command,this);
+    menu.add("&Mesh/Plane cut/Flip kept side",0,command,this,FL_MENU_TOGGLE);
+    menu.add("&Mesh/Plane cut/Cap cut",0,command,this,FL_MENU_TOGGLE|FL_MENU_VALUE);
+    menu.add("&Mesh/Plane cut/Apply cut",0,command,this);
+    menu.add("&Mesh/Plane cut/Cancel cut",0,command,this);
     menu.add("&Paint/Prepare painting mesh", FL_CTRL | FL_SHIFT | 'p', command,
              this);
     menu.add("&Paint/Use painted mesh", 'p', command, this, FL_MENU_RADIO);
@@ -659,7 +671,7 @@ struct App {
                (active->has_mesh || (active->visible && !active->locked)));
     enable("&Paint/Edit source volume",
            !modal && s->mesh_active && !s->asset_busy);
-    if (s->retopology) {
+    if (s->retopology || s->cut) {
       for (int i = 0; i < menu.size(); ++i) {
         auto label = menu.menu()[i].label();
         if (!label || (menu.mode(i) & FL_SUBMENU)) continue;
@@ -686,6 +698,14 @@ struct App {
     enable("&Mesh/Retopology/Cancel patch", !modal && retopo && (!s->asset_busy || s->can_cancel_asset));
     checked("&Mesh/Retopology/Place points", !retopo || !retopo->moving);
     checked("&Mesh/Retopology/Move points", retopo && retopo->moving);
+    enable("&Mesh/Plane cut/Start cut",!modal&&s->can_cut);
+    auto cut=s->cut;bool cutting=!modal&&cut&&!cut->committing&&!s->asset_busy;
+    for(auto label:{"Offset...","Direction...","Cap color...","Flip kept side","Cap cut"})
+      enable((std::string("&Mesh/Plane cut/")+label).c_str(),cutting&&cut->ready);
+    enable("&Mesh/Plane cut/Cancel cut",!modal&&cut&&(!cut->committing||s->can_cancel_asset));
+    enable("&Mesh/Plane cut/Apply cut",cutting&&!cut->busy&&cut->preview&&cut->preview_request==cut->request&&cut->preview->changed);
+    checked("&Mesh/Plane cut/Cap cut",!cut||cut->settings.cap);
+    checked("&Mesh/Plane cut/Flip kept side",cut&&cut->settings.flipped);
     for (int i = 0; i < menu.size(); ++i)
       if (menu.mode(i) != modes[i])
         menu.mode(i, modes[i]);
@@ -736,6 +756,8 @@ struct App {
       if (r.topology) text << " | " << r.topology->faces().size() << " faces";
       text << (r.committing ? " | Applying" : r.busy ? " | Updating" : " | Mesh > Retopology: face / apply / cancel");
     }
+    if(info->cut){auto &c=*info->cut;text.str("");text<<"Plane cut | "<<c.settings.offset_mm<<" mm | "
+      <<(c.settings.cap?"Cap":"Open trim")<<(c.committing?" | Applying":c.busy?" | Updating preview":" | Mesh > Plane cut: Apply / Cancel");}
     if (!info->error.empty()) {
       text.str("");
       text << info->error;
@@ -905,6 +927,16 @@ struct App {
       edit_uv(canvas.document);
     } else if (label == "Start patch") {
       canvas.document.begin_retopology();
+    } else if(label=="Start cut"){
+      canvas.document.begin_cut();
+    } else if(label=="Apply cut"||label=="Cancel cut"){
+      canvas.document.end_cut(label=="Apply cut");
+    } else if(label=="Offset..."||label=="Direction..."||label=="Cap color..."){
+      edit_cut_parameters(canvas.document,label=="Offset..."?VrParameter::CutOffset:label=="Direction..."?VrParameter::CutDirection:VrParameter::CutCapColor);
+    } else if(label=="Flip kept side"||label=="Cap cut"){
+      auto settings=canvas.document.frame().state->cut->settings;
+      if(label=="Flip kept side")settings.flipped=!settings.flipped;else settings.cap=!settings.cap;
+      canvas.document.edit_cut(settings);
     } else if (label == "Apply patch" || label == "Cancel patch") {
       canvas.document.end_retopology(label == "Apply patch");
     } else if (label == "Place points" || label == "Move points") {
@@ -1091,6 +1123,8 @@ int main(int argc, char **argv) try {
       // Accepted work has drained above; discard only the remaining draft.
       if (auto view = document.frame().state->retopology; view && !view->committing)
         document.end_retopology(false);
+      if (auto view = document.frame().state->cut; view && !view->committing)
+        document.end_cut(false);
       document.save(save);
     }
     return 0;

@@ -46,13 +46,21 @@ float Volume::mask_at(Int3 q) const {
 float Volume::mask_sample(Vec3 p) const {
   if (!finite(p) || std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)}) > 1001)
     throw std::invalid_argument("Invalid sculpt mask sample position");
+  if (mask_.values.size() == 0) return mask_.background;
   p = p / voxel_;
   Int3 q{int(std::floor(p.x)), int(std::floor(p.y)), int(std::floor(p.z))};
   Vec3 f = p - Vec3{float(q.x),float(q.y),float(q.z)};
-  float result = 0;
-  for (int z = 0; z < 2; ++z) for (int y = 0; y < 2; ++y) for (int x = 0; x < 2; ++x)
-    result += mask_at(q + Int3{x,y,z}) * (x ? f.x : 1-f.x) * (y ? f.y : 1-f.y) * (z ? f.z : 1-f.z);
-  return std::clamp(result,0.f,1.f);
+  // Difference-form interpolation preserves a constant neighbourhood exactly,
+  // including partial protection. A weighted sum can drift even for Fill().
+  auto mix=[](float a,float b,float t){return a+(b-a)*t;};
+  float planes[2];
+  for (int z = 0; z < 2; ++z) {
+    float rows[2];
+    for (int y = 0; y < 2; ++y)
+      rows[y]=mix(mask_at(q+Int3{0,y,z}),mask_at(q+Int3{1,y,z}),f.x);
+    planes[z]=mix(rows[0],rows[1],f.y);
+  }
+  return std::clamp(mix(planes[0],planes[1],f.z),0.f,1.f);
 }
 bool Volume::fill_mask(float value, const std::function<bool()> &cancelled) {
   if (editing_) throw std::logic_error("Finish sculpt stroke before filling mask");

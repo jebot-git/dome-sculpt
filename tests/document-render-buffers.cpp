@@ -62,6 +62,32 @@ int main(int argc,char **argv)try {
   auto restored=ready();
   check(restored->geometry_identity==original_key&&render(restored)==baseline&&index_calls==0,
         "Document Undo restores exact pixels without reuploading geometry");
+  document.begin_cut();
+  if(!document.wait_cut())throw std::runtime_error("Cut preview worker timeout");
+  auto capped=ready();auto capped_pixels=render(capped);
+  check(capped->geometry_identity&&capped->geometry_identity!=original_key&&capped->mesh.positions.size()>original->mesh.positions.size()&&index_calls==1,
+        "Real cut caps have their own immutable geometry identity and upload appended geometry");
+  check(capped->sculpt_masks.size()==capped->mesh.positions.size()&&std::all_of(capped->sculpt_masks.begin()+original->mesh.positions.size(),capped->sculpt_masks.end(),[](float value){return value==-1;}),
+        "Ephemeral cut caps retain original protection and append unmasked scalar values");
+  render(capped);check(vertex_bytes==0&&index_calls==0,"The second cut-preview eye reuses the same packed geometry and scalar buffers");
+  auto cut_settings=document.frame().state->cut->settings;cut_settings.yaw=90;cut_settings.offset_mm=50;document.edit_cut(cut_settings);
+  if(!document.wait_cut())throw std::runtime_error("Changed cut preview worker timeout");
+  auto changed_cap=ready();auto changed_cap_pixels=render(changed_cap);
+  check(changed_cap->geometry_identity!=capped->geometry_identity&&index_calls==1&&changed_cap_pixels!=capped_pixels,
+        "Changing a capped plane refreshes actual geometry and rendered coverage even when source identity is unchanged");
+  cut_settings.cap=false;document.edit_cut(cut_settings);
+  if(!document.wait_cut())throw std::runtime_error("Uncapped cut preview worker timeout");
+  auto uncapped=ready();auto uncapped_pixels=render(uncapped);
+  check(uncapped->geometry_identity==original_key&&uncapped->mesh.positions.size()==original->mesh.positions.size(),
+        "A shader-only cut retains the authenticated original geometry identity");
+  cut_settings.offset_mm=150;document.edit_cut(cut_settings);
+  if(!document.wait_cut())throw std::runtime_error("Moved uncapped plane worker timeout");
+  auto moved_plane=ready();auto moved_plane_pixels=render(moved_plane);
+  check(moved_plane->geometry_identity==original_key&&index_calls==0&&moved_plane_pixels!=uncapped_pixels,
+        "Moving an uncapped plane changes clipping pixels without reuploading source geometry");
+  document.end_cut(false);auto after_cut_cancel=ready();auto cancelled_pixels=render(after_cut_cancel);
+  check(after_cut_cancel->geometry_identity==original_key&&index_calls==0&&cancelled_pixels==baseline&&original->mesh.positions.size()<capped->mesh.positions.size(),
+        "Cancelling a cut restores exact source pixels and geometry without mutating the retained source snapshot");
   settings=document.frame().state->sculpt_settings;settings.mask_visible=false;settings.mask_edit=false;document.sculpt_settings(settings);render(ready());
   auto info=document.frame().state->objects.front();auto material=info.material;material.color={1,0,0,1};
   document.object_properties(info.id,info.name,true,false,info.transform,material);

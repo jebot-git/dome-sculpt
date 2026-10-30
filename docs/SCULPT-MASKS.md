@@ -1,10 +1,29 @@
 # Sculpt protection and object-local symmetry
 
-This milestone implements bounded sculpt protection and object-local symmetry
-with native FLTK and XR authoring controls, exact history/cancellation and GPU
-protection/mirror feedback. The complete CPU and actual Arc ONEAPI real-loader
-regression suites pass140/140 checks each. Resolution changes, sparse local meshing and
-sustained production-scale stroke performance remain separate active work.
+Upstream source 20c132d implements bounded sculpt protection and object-local
+symmetry with native FLTK/XR controls, exact history/cancellation and GPU feedback.
+Its CPU and actual Arc ONEAPI 140-check reports are historical evidence for that
+source. Current combined source 4755e62 adds cut interoperation and exact constant
+sampling; its own verification scopes are in VALIDATION.md. Do not transfer the
+old device/backend proof to the newer source. Resolution changes, sparse local
+meshing and sustained production-scale strokes remain separate active work.
+
+## Cut integration and constant sampling
+
+The combined cut/sculpt stage retains source protection/control data through cut
+Cancel, Apply and global Undo. Original source overlay scalars stay intact;
+ephemeral cap vertices use the ordinary unmasked sentinel, and the display
+overlay is never baked into shell paint. Cut workspaces block mask mutation.
+Geometry availability uses actual SDF samples rather than total mask storage;
+a mask-only empty volume cannot be cut, retopologized, voxelized or offered as a
+bake source.
+
+Protection sampling uses nested difference-form interpolation. Uniform global
+fields bypass lattice lookup after position validation, and constant sparse
+neighbourhoods retain exact scalar bits. Independent fractional-position and
+affine-field regressions preserve the original exact-value expectations. Earlier
+upstream proof below remains scoped to its recorded source; current combined
+verification is recorded in VALIDATION.md.
 
 ## Mask domain and layers
 
@@ -233,7 +252,7 @@ instrumentation test is excluded from that accelerator scope. Logs:
 ONEAPI build/Arc test logs.
 
 
-Final application source20c132d passes all73 native Release suites in173.67s,
+Final application source 20c132d passes all73 native Release suites in173.67s,
 whole-core C/C++ ASan/UBSan/leaks17/17 in186.49s, actual Arc native12/12 in6.15s,
 and the full140-check real-loader suite on both CPU and Arc compute. The original
 117 cases are retained alongside23 mask cases. See VALIDATION.md for exact logs,

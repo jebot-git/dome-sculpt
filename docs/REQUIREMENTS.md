@@ -1,5 +1,10 @@
 # Full objective and completion evidence
 
+Application source 4755e62 combines plane-cut source 2ec8a5a and sculpt protection /
+symmetry source 20c132d, preserving both histories. Combined verification is recorded
+in VALIDATION.md, including exact protection/cut interoperation and geometry-only
+source availability. Every remaining row stays required. See HANDOFF.md.
+
 The goal is the complete native FLTK VR production workflow requested by the
 user. An executable, a successful build, or the initial tests do not complete
 this objective. Every row below must have matching implementation and evidence
@@ -38,7 +43,7 @@ shading is inside it.
 | Robust automatic weights | Bounded surface-graph binding, disconnected-component diagnostics, world-space BVH transfer, influence locks/limits/pruning and native/XR bind/transfer transactions implemented and tested. Production volume-aware solving, thin-limb/complex fitting and broad deformation coverage remain incomplete | Surface/volume-aware weighting with disconnected parts, thin limbs, topology stress tests and deformation fixtures |
 | CATS basic functionality | Native unused-bone compaction and viseme/morph identities, scene persistence and application extras in GLB; interactive preparation and VRM workflow pending | Avatar cleanup, bone/material consolidation, pose conventions, shape/viseme tools and export preparation |
 | Auto-Rig Pro basic functionality | Explicit landmark humanoid fitting and semantic mapping kernels with persistent deformation metadata; interactive fit/bind workflow pending | Native humanoid auto-fit, editable rig controls and reliable automatic binding; no proprietary code dependency |
-| Divine Cut basic functionality | Native capped plane-trim kernel with attribute/source mappings and explicit unsupported-contour failures; interactive Boolean/VR workflow pending | Interactive cuts, boolean/trim operations, cap/material handling and undo in VR |
+| Divine Cut basic functionality | Native desktop/XR active-object plane workspace with live retained-material clipping/cap preview, joystick/slider/hand placement, local/global history, independent cap material, mapped PBR paint transfer and guarded source-retaining shell/cap publication; group-wide repeated cuts and general Boolean/production workflow remain pending | Interactive cuts, group/multi-material repeated cuts, robust booleans/contours, cap/material handling and undo in VR |
 | Retopo Flow basic functionality | Native desktop/controller manual patch workflow: stable-ID points/edges/triangle/quad faces, projected place/select/move, pins/seams, relax/snap/delete, draft/global undo and guarded source-retaining atlas publication with scene-v8 editable persistence and strict complete legacy-v7 compatibility; advanced and production authoring remains partial | Surface-constrained retopology drawing/patches, bridging/extrusion and topology editing in VR, with production fixtures/performance and real device verification |
 | Random Flow basic functionality | Not implemented | Seeded procedural panel/cut/extrusion/detail tools with usable parameters and undo |
 | Shapekeys | Native topology-identified morph/mirror kernels, immutable scene-v4 morph/pose state and POSITION morph GLB export; native desktop/controller target-weight controls implemented; target creation/editing/mirroring UI, other morph attributes and VRM expressions pending | Editable/mirrored morph targets, stable topology rules, preview, persistence and glTF/VRM expressions |

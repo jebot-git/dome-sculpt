@@ -299,7 +299,7 @@ void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   auto vertex=mtoon_renderer_vertex();
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;
+in vec3 world,n,canonical_t,canonical_b,cut_position;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -321,7 +321,7 @@ return gl_FrontFacing?N:-N;}
 // Masking darkens final linear RGB, retaining the material's lighting, alpha,
 // cutout, depth and blend rules. Zero and the ordinary-object sentinel are exact.
 vec3 sculpt_mask_color(vec3 rgb){return mask_value>0?rgb*(1.0-.72*clamp(mask_value,0.0,1.0)):rgb;}
-void main(){if(weight_pass==1){if(weight_value<0)discard;float opacity;
+void main(){if(clip_enabled==1&&dot(clip_plane.xyz,cut_position)<clip_plane.w)discard;if(weight_pass==1){if(weight_value<0)discard;float opacity;
 if(mt_mode==1){bool killed;vec4 source=mt_surface(n,unit(camera-world),killed);if(killed)discard;opacity=source.a;}
 else{opacity=base_color.a;if(slots[0]==1)opacity*=texture(tex0,source_uv(0)).a;
 if(alpha_mode==1)opacity=1;else if(alpha_mode==2){if(opacity<alpha_cutoff)discard;opacity=1;}}
@@ -447,6 +447,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
   glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
+  glUniform1i(glGetUniformLocation(program_,"clip_enabled"),0);
+  auto plane=cached_->clip_plane;
+  glUniform4f(glGetUniformLocation(program_,"clip_plane"),plane.normal.x,plane.normal.y,plane.normal.z,plane.offset);
   auto m = model_matrix(model), mvp = multiply(vp, m);
   glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE,
                      m.data());
@@ -585,6 +588,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     auto queue=[&](const SurfaceRange&r){auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get())?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return queue(*a)<queue(*b);});
     for(auto r:ordered){
+      glUniform1i(glGetUniformLocation(program_,"clip_enabled"),cached_->clipped_object&&r->object==cached_->clipped_object);
       bool weighted=textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(r->object);
@@ -700,6 +704,19 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
     vertices.push_back({{a.x, a.y, a.z}, color});
     vertices.push_back({{b.x, b.y, b.z}, color});
   };
+  if(state.cut && state.cut->ready){
+    auto &view=*state.cut;
+    auto plane=view.preview?view.preview->plane:cut_plane(view.settings,view.center);
+    auto normal=plane.normal,center=view.center+normal*(plane.offset-dot(normal,view.center));
+    auto u=normalized(cross(std::abs(normal.y)<.9f?Vec3{0,1,0}:Vec3{1,0,0},normal));
+    auto v=cross(normal,u);float extent=view.radius*.8f;
+    auto point=[&](Vec3 p){return ob::transform(state.canvas,{p.x,p.y,p.z});};
+    Vec3 tint=view.error.empty()?Vec3{.1f,.8f,1}:Vec3{1,.2f,.1f};
+    for(int k=-2;k<=2;++k){float offset=extent*k*.5f;
+      line(point(center+u*offset-v*extent),point(center+u*offset+v*extent),tint);
+      line(point(center+v*offset-u*extent),point(center+v*offset+u*extent),tint);}
+    line(point(center),point(center+normal*std::min(.2f,view.radius*.5f)),{.1f,1,.3f});
+  }
   for (auto &h : state.hands)
     if (h.tracked.valid) {
       auto p = h.tracked.grip.position;
@@ -725,7 +742,7 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
           line(to - y * .6f, to + y * .6f, accent);
         }
       }
-      if (!state.menu) {
+      if (!state.menu && !state.cut) {
         float r =
             state.radius * (h.tracked.trigger > .02f
                                 ? .25f + .75f * std::sqrt(h.tracked.trigger)
@@ -794,7 +811,7 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
   glDepthFunc(GLenum(previous.depth_function));
   if(state.controls.parameter==VrParameter::None)glEnable(GL_DEPTH_TEST);else glDisable(GL_DEPTH_TEST);
   glUniform1i(glGetUniformLocation(program_,"local_overlay"),0);
-  glUniform1f(glGetUniformLocation(program_,"depth_bias"),state.retopology?.0001f:0);
+  glUniform1f(glGetUniformLocation(program_,"depth_bias"),(state.retopology||state.cut)?.0001f:0);
   glBindVertexArray(vao_);glBindBuffer(GL_ARRAY_BUFFER,buffer_);
   glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertices.size()*sizeof(CursorVertex)),vertices.data(),GL_STREAM_DRAW);
   glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(CursorVertex),nullptr);

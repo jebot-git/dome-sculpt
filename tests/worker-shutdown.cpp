@@ -9,10 +9,10 @@
 #include <unistd.h>
 namespace {
 std::atomic<bool> armed{false};
-std::array<std::atomic<bool>,5> released{};
+std::array<std::atomic<bool>,6> released{};
 std::atomic<unsigned> slots{0}, arrived{0};
-std::array<std::condition_variable *,5> conditions{};
-std::array<pthread_mutex_t *,5> mutexes{};
+std::array<std::condition_variable *,6> conditions{};
+std::array<pthread_mutex_t *,6> mutexes{};
 thread_local bool deleting_document=false;
 
 }
@@ -53,7 +53,7 @@ int child() {
   for(unsigned value=arrived.load();value<conditions.size();value=arrived.load())arrived.wait(value);
   // Release each paused waiter only when shutdown requests that waiter's own
   // predicate mutex. The writer then blocks until platform wait registration.
-  // This checks every worker, including the dedicated retopology worker.
+  // This checks every worker, including the dedicated retopology and cut workers.
   armed=false;deleting_document=true;
   delete document;
   deleting_document=false;
