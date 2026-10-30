@@ -26,6 +26,6 @@ public:
   // The closest visible face may be an unselected occluder. Base-level source
   // samplers, alpha/cutoff/cull, authored UV1 and MToon animation are retained.
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction,
-                                    float maximum = 100, double seconds = 0) const;
+                                    float maximum = 100, double seconds = 0,uint64_t only_object = 0) const;
 };
 } // namespace dome

@@ -5,6 +5,9 @@
 #include <functional>
 #include <optional>
 namespace dome {
+// Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
+inline constexpr int spatial_page_count=24;
+inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
   Undo,
@@ -75,8 +78,13 @@ enum class SpatialCommand {
   CutBegin, CutHand, CutFlip, CutCap, CutApply, CutCancel,
   ProceduralApply, ProceduralNextSeed,
   SculptMaskToggle, SculptMaskFill, SculptMaskClear, SculptMaskInvert,
-  SculptMirrorX, SculptMirrorY, SculptMirrorZ, SculptMaskResume, SculptMaskVisible
+  SculptMirrorX, SculptMirrorY, SculptMirrorZ, SculptMaskResume, SculptMaskVisible,
+  ObjectGrabMode, HoldObject, ReleaseObject, GhostOthers, CancelObjectGrab,
+  ImportBrowse, ImportPrevious, ImportNext, ImportOpen, ImportParent,
+  ImportUnits, ImportAxes, ImportNormals, ImportFormat, ImportMaterials, ImportDefaults,
+  ImportResolution, ImportApply, ImportCancel
 };
+inline bool import_command(SpatialCommand c) {return c>=SpatialCommand::ImportBrowse && c<=SpatialCommand::ImportCancel;}
 inline bool sculpt_mask_command(SpatialCommand c) {
   return c >= SpatialCommand::SculptMaskToggle && c <= SpatialCommand::SculptMaskVisible;
 }
@@ -112,6 +120,7 @@ public:
   Tool menu_selection() const { return Tool(std::min(selected_, 3)); }
   int menu_index() const { return selected_; }
   int menu_page() const { return page_; }
+  void retain_page(int page,uint32_t owner,int selected){menu_=true;page_=page;device_=owner;selected_=selected;parameter_=VrParameter::None;}
   void select_tool(Tool tool) {
     tool_ = tool;
     selected_ = int(tool);
