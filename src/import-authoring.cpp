@@ -307,7 +307,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
                                    : detail::source_flat_mesh(p.mesh, {}, options.limits.cancelled);
       const bool generated_uv = mesh.uv.empty();
       if (generated_uv)
-        unwrap(mesh, options.paint_resolution);
+        unwrap(mesh, options.paint_resolution, 4, options.limits.cancelled);
       // The atlas retains exact ordered corners, not just coincident positions.
       if (mesh.indices.size() != p.mesh.indices.size())
         throw std::runtime_error("Imported atlas changed source corner count");
