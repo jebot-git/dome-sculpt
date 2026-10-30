@@ -82,7 +82,7 @@ Mesh DeformationState::preview(const Mesh &rest) const {
   Mesh result = rest;
   if (morphs && !morph_weights.empty())
     result = morphs->evaluate(rest, morph_weights);
-  if (skeleton && skin && !pose.empty())
+  if (skeleton && skin && (!pose.empty() || skeleton->inverse_bind_override))
     result = deform_mesh(result, *skin, *skeleton, pose);
   return result;
 }

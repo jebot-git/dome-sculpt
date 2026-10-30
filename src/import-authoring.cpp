@@ -3,6 +3,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/projection.hpp"
+#include "import-skin.hpp"
 #include "source-tangent-frames.hpp"
 #include "text-utf8.hpp"
 #include <fstream>
@@ -271,10 +272,6 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
           throw std::runtime_error(
               "This model omits normals; generated flat-normal authoring is "
               "not ready yet. Export authored normals before importing.");
-        if (!p.influences.empty())
-          throw std::runtime_error(
-              "Authored skin/inverse-bind adoption is required before "
-              "importing this source; source was not changed");
         if (p.material == 0)
           throw std::runtime_error(
               "Implicit default-material provenance adoption is required "
@@ -407,6 +404,19 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         }
         deformation.morph_weights =
             node.weights.empty() ? source_mesh.weights : node.weights;
+        deformation.validate(object.painted->mesh());
+        object.deformation =
+            std::make_shared<const DeformationState>(std::move(deformation));
+      }
+      if (node.skin >= 0 && !p.influences.empty()) {
+        auto rig = detail::imported_rig(*asset, n, options.limits.cancelled);
+        DeformationState deformation =
+            object.deformation ? *object.deformation
+                               : DeformationState(object.painted->mesh());
+        deformation.skeleton = rig.skeleton;
+        deformation.skin =
+            detail::imported_weights(p, rig, remap, options.limits.cancelled);
+        appearance->source_joint_nodes = rig.source_nodes;
         deformation.validate(object.painted->mesh());
         object.deformation =
             std::make_shared<const DeformationState>(std::move(deformation));
