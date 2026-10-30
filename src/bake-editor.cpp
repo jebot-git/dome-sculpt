@@ -20,9 +20,14 @@ public:
   int format(char *buffer)override{return snprintf(buffer,32,fractional?"%.3f":logarithmic?"%.2f":"%.0f",physical());}
   int handle(int event)override{
     if(event==FL_MOUSEWHEEL){
+      // Nested groups can offer wheel events to an offscreen child. Leave
+      // those to the containing scroll view instead of changing hidden values.
+      if(!Fl::event_inside(this))return 0;
+      for(auto *p=parent();p;p=p->parent())
+        if(dynamic_cast<Fl_Scroll*>(p)&&!Fl::event_inside(p))return 0;
       int d=Fl::event_dy()?Fl::event_dy():Fl::event_dx();
       double old=value();
-      physical(logarithmic?physical()*std::exp(-d*.025):clamp(value()-d));
+      physical(logarithmic?physical()*std::exp(-d*.025):clamp(value()-d*step()));
       if(value()!=old){set_changed();do_callback();}return 1;
     }
     return Fl_Value_Slider::handle(event);

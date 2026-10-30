@@ -139,6 +139,18 @@ async def main():
             raw = widget.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
             return Image.frombytes("RGB", (geometry.width, geometry.height), raw.data, "raw", "BGRX")
 
+        async def settled_scroll(widget,before):
+            geometry=widget.get_geometry()
+            original=before.crop((0,0,geometry.width,geometry.height-100)).tobytes()
+            last=None;stable=0;deadline=time.monotonic()+10
+            while time.monotonic()<deadline:
+                current=image(widget);pixels=current.crop((0,0,geometry.width,geometry.height-100)).tobytes()
+                stable=stable+1 if pixels==last and pixels!=original else 0
+                if stable>=3:return current
+                last=pixels
+                await asyncio.sleep(.08)
+            raise TimeoutError("Native scrolling did not present a changed, settled content frame")
+
         async def enabled(label):
             for _ in range(400):
                 nodes = await layout()
@@ -186,9 +198,9 @@ async def main():
             geometry=editor.get_geometry();check(geometry.width<=600 and geometry.height<=320,"Double-size color preparation options fit640x360")
             before=image(editor)
             for _ in range(60):
-                xtest.fake_input(connection,X.MotionNotify,x=geometry.x+geometry.width-10,y=geometry.y+70)
+                xtest.fake_input(connection,X.MotionNotify,x=geometry.x+12,y=geometry.y+70)
                 xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5)
-            connection.sync();await asyncio.sleep(.25);after=image(editor);after.save(OUT/"color-options-bottom.png")
+            connection.sync();after=await settled_scroll(editor,before);after.save(OUT/"color-options-bottom.png")
             check(before.crop((0,0,geometry.width,geometry.height-100)).tobytes()!=after.crop((0,0,geometry.width,geometry.height-100)).tobytes(),"Compact scrolling reaches color preparation and quality without moving action buttons")
             key("Control_L",True);key("w");key("Control_L",False);await close_options()
             check(app.poll() is None and canonical(inspect())==original,"Compact Ctrl+W cancels color options and preserves all original data")
@@ -199,13 +211,14 @@ async def main():
             await wait(lambda:"complete" in str(editor.get_wm_name() or ""))
             geometry=editor.get_geometry();quality_before=image(editor)
             for _ in range(60):
-                xtest.fake_input(connection,X.MotionNotify,x=geometry.x+geometry.width-10,y=geometry.y+70)
+                xtest.fake_input(connection,X.MotionNotify,x=geometry.x+12,y=geometry.y+70)
                 xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5)
-            connection.sync();await asyncio.sleep(.2);quality_after=image(editor);quality_after.save(OUT/"color-quality-complete.png")
+            connection.sync();quality_after=await settled_scroll(editor,quality_before);quality_after.save(OUT/"color-quality-complete.png")
             check(quality_before.crop((0,0,geometry.width,geometry.height-100)).tobytes()!=quality_after.crop((0,0,geometry.width,geometry.height-100)).tobytes(),"Completed compact quality report remains reachable by actual scrolling after keyboard-focused baking")
             check(geometry.width<=600 and geometry.height<=320,"Completed double-size color quality report remains in a bounded scrolling dialog with pinned actions")
             key("Control_L",True);key("w");key("Control_L",False);await close_options();await command("Save");accepted=canonical(inspect())
             check(accepted["objects"][0]["painted"]["baked"]["color_interpretation"]=="resolved-pbr" and accepted["isolated_objects"][1:]==original["isolated_objects"][1:],"Compact keyboard controls actually prepare and bake colors while preserving complete source data")
+            check(abs(accepted["source_materials"]["color_preparations"][0]["receipt"]["accepted_projection_error"]-.04)<1e-6,"Scrolling the compact dialog never changes the hidden color tolerance")
             await command("Undo");await command("Save");check(canonical(inspect())==original,"Compact accepted preparation and normal bake undo exactly through the universal menu")
             connection.close();bus.disconnect();return
         key("Return");await close_options();check(canonical(inspect())==original,"Default Return cancels color options without preparing or baking")
@@ -214,6 +227,9 @@ async def main():
         await command("Close Window");await close_options();await command("Save")
         check(canonical(inspect())==original,"Default native bake refuses source colors until explicit preparation and preserves exact target and source")
         editor=await open_options();g=editor.get_geometry();tap(editor,40,378)
+        xtest.fake_input(connection,X.MotionNotify,x=g.x+300,y=g.y+414)
+        xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5);connection.sync()
+        await asyncio.sleep(.1)
         image(editor).save(OUT/"explicit-prepare-colors.png")
         tap(editor,g.width*.75,g.height-48);await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"prepared-color-bake-complete.png")
         await command("Close Window");await close_options();await command("Save");accepted=canonical(inspect())
@@ -222,6 +238,7 @@ async def main():
         common_layers=lambda value:[{key:data for key,data in layer.items() if key!="pbr_color_tiles"} for layer in value]
         check(accepted["isolated_objects"][1:]==original["isolated_objects"][1:] and common_layers(paint["layers"])==common_layers(original["objects"][0]["painted"]["layers"]),"Actual FLTK preparation preserves complete independently archived sources and all original editable paint channels")
         check(accepted!=original and accepted["version"]>=10,"Prepared color state persists its explicit versioned receipt and retained origin")
+        check(abs(accepted["source_materials"]["color_preparations"][0]["receipt"]["accepted_projection_error"]-.039)<1e-6,"Wheel over the visible tolerance field changes only its configured .001 step")
         await command("Undo");await command("Save");check(canonical(inspect())==original,"One universal Undo restores exact preconversion source and target")
         await command("Redo");await command("Save");check(canonical(inspect())==accepted,"One universal Redo restores accepted color preparation and actual baked normal state")
         connection.close()
