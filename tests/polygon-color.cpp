@@ -58,6 +58,9 @@ PolygonColoredEdit apply(const PolygonMesh &m, const PolygonColorField &f,
   if (!result.colors || !result.geometry.replacement)
     throw std::runtime_error("Expected colored edit");
   result.colors->validate(*result.geometry.replacement);
+  check(result.colors->source_owner() == f.source_owner(),
+        "Each edit shares the immutable original RGBA basis instead of copying "
+        "it into history");
   return result;
 }
 } // namespace

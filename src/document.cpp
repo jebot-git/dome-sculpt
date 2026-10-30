@@ -14,7 +14,7 @@
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
-#include "source-colors.hpp"
+#include "current-colors.hpp"
 #include "prepared-color-state.hpp"
 #include "sculpt-ui-values.hpp"
 #include "dome/local-surface.hpp"
@@ -1455,7 +1455,7 @@ void Document::mesh_loop() {
                                       : std::vector<uint64_t>{};
       std::unordered_set<uint64_t> frame_objects;
       for (auto &o : objects) {
-        auto colors=detail::prepared_color_state(o.material_bindings.get(),o.textures.get(),false)?std::vector<std::array<float,4>>{}:detail::source_vertex_colors(o.appearance.get(),o.mesh.positions.size(),cancelled);
+        auto colors=detail::current_vertex_colors(o,cancelled);
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
         const bool canonical=o.textures && !o.textures->normal.rgba.empty();
@@ -1580,7 +1580,7 @@ void Document::mesh_loop() {
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
       if ((job->weight_view || (published_.load()->object_grab_mode&&!published_.load()->object_grabbing)) && !snapshot->mesh.indices.empty())
-        snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled);
+        snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors);
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       std::lock_guard lock(mesh_mutex_);
       if (!cancelled()) {

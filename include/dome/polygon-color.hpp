@@ -24,16 +24,28 @@ public:
   PolygonRgba sample(PolygonId, const PolygonLimits & = {}) const;
   std::vector<PolygonRgba> packed(const PolygonMesh &,
                                   const PolygonLimits & = {}) const;
-  const std::vector<PolygonCornerRgba> &sources() const { return sources_; }
+  const std::vector<PolygonCornerRgba> &sources() const {
+    return sources_ ? *sources_ : empty_sources_;
+  }
   const std::vector<PolygonColorSample> &corners() const { return corners_; }
+  std::shared_ptr<const std::vector<PolygonCornerRgba>> source_owner() const {
+    return sources_;
+  }
 
 private:
-  std::vector<PolygonCornerRgba> sources_;
+  inline static const std::vector<PolygonCornerRgba> empty_sources_{};
+  std::shared_ptr<const std::vector<PolygonCornerRgba>> sources_;
   std::vector<PolygonColorSample> corners_;
   friend PolygonColoredEdit edit_colored_polygon(const PolygonMesh &,
                                                  const PolygonColorField &,
                                                  const PolygonEdit &,
                                                  const PolygonLimits &);
+};
+// Transient geometry-owned current color data. Both immutable inputs must match
+// the exact ordered REST derivative before a renderer/exporter can consume it.
+struct PolygonColorSurface {
+  std::shared_ptr<const PolygonMesh> topology;
+  std::shared_ptr<const PolygonColorField> field;
 };
 struct PolygonColoredEdit {
   PolygonEditResult geometry;

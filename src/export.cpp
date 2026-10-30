@@ -10,6 +10,7 @@
 #include "gltf-document.hpp"
 #include "normal-frame-export.hpp"
 #include "prepared-color-state.hpp"
+#include "current-colors.hpp"
 #include <bit>
 #include <map>
 #include <set>
@@ -121,6 +122,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
   for (const auto &input : objects) {
+    auto validated_colors=detail::current_vertex_colors(input,cancelled);
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
@@ -162,6 +164,11 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       attributes["TEXCOORD_0"] =
           add(begin, data.size() - begin, 34962, mesh.uv.size(), 5126, "VEC2");
     }
+    auto current_colors=frame?detail::remap_current_vertex_colors(validated_colors,frame->rest_vertices,cancelled):std::move(validated_colors);
+    if(!current_colors.empty()) {
+      begin=data.size();for(const auto &color:current_colors)floats(color);
+      attributes["COLOR_0"]=add(begin,data.size()-begin,34962,current_colors.size(),5126,"VEC4");
+    }
     std::vector<Tangent> tangents=frame?frame->tangents:std::vector<Tangent>{};
     if(auto source=frame?frame->source:source_attributes->source()) {
       const auto &a=*o.appearance;
@@ -170,7 +177,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         begin=data.size();for(auto v:a.source_vertices){if(v>=values.size())throw std::invalid_argument("Source attribute vertex index is missing");floats(values[v]);}
         attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
       };
-      attribute(source->uv1,"TEXCOORD_1","VEC2");if(!detail::prepared_color_state(o.material_bindings.get(),o.textures.get()))attribute(source->colors,"COLOR_0","VEC4");
+      attribute(source->uv1,"TEXCOORD_1","VEC2");
       if(!frame)tangents=source_attributes->base_tangents();
       if(!frame && !tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
         auto canonical=tangent_corners(mesh,cancelled);

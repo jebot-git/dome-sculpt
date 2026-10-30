@@ -54,9 +54,11 @@ PolygonColorField::from_corners(const PolygonMesh &mesh,
   PolygonColorField result;
   if (values.size() > limits.maximum_corners)
     throw std::length_error("Polygon color sample budget exceeded");
-  result.sources_.assign(values.begin(), values.end());
-  std::sort(result.sources_.begin(), result.sources_.end(),
+  auto sources = std::make_shared<std::vector<PolygonCornerRgba>>(
+      values.begin(), values.end());
+  std::sort(sources->begin(), sources->end(),
             [](const auto &a, const auto &b) { return a.corner < b.corner; });
+  result.sources_ = std::move(sources);
   for (const auto &face : mesh.faces())
     for (const auto &corner : face.corners) {
       budget.step();
@@ -64,7 +66,7 @@ PolygonColorField::from_corners(const PolygonMesh &mesh,
     }
   std::sort(result.corners_.begin(), result.corners_.end(),
             [](const auto &a, const auto &b) { return a.corner < b.corner; });
-  if (result.sources_.size() != result.corners_.size())
+  if (result.sources().size() != result.corners_.size())
     throw std::invalid_argument(
         "Initial polygon color source must cover each exact corner once");
   result.validate(mesh, limits);
@@ -73,11 +75,11 @@ PolygonColorField::from_corners(const PolygonMesh &mesh,
 void PolygonColorField::validate(const PolygonMesh &mesh,
                                  const PolygonLimits &limits) const {
   Budget budget{limits};
-  if (sources_.size() > limits.maximum_corners ||
+  if (sources().size() > limits.maximum_corners ||
       corners_.size() > limits.maximum_corners)
     throw std::length_error("Polygon color sample budget exceeded");
   PolygonId previous = 0;
-  for (const auto &source : sources_) {
+  for (const auto &source : sources()) {
     budget.step();
     if (!ordered(previous, source.corner))
       throw std::invalid_argument(
@@ -103,7 +105,7 @@ void PolygonColorField::validate(const PolygonMesh &mesh,
       budget.step();
       if (!ordered(old, id) || !std::isfinite(weight) || weight <= 0)
         throw std::invalid_argument("Invalid polygon color source weight");
-      lookup(sources_, id);
+      lookup(sources(), id);
       sum += weight;
     }
     if (std::abs(sum - 1) > 1e-12)
@@ -124,7 +126,7 @@ PolygonRgba PolygonColorField::sample(PolygonId corner,
                                       const PolygonLimits &limits) const {
   Budget budget{limits};
   budget.step();
-  return sample_value(lookup(corners_, corner), sources_, budget);
+  return sample_value(lookup(corners_, corner), sources(), budget);
 }
 std::vector<PolygonRgba>
 PolygonColorField::packed(const PolygonMesh &mesh,
@@ -136,7 +138,7 @@ PolygonColorField::packed(const PolygonMesh &mesh,
   result.reserve(render.corners.size());
   for (auto corner : render.corners) {
     budget.step();
-    result.push_back(sample_value(lookup(corners_, corner), sources_, budget));
+    result.push_back(sample_value(lookup(corners_, corner), sources(), budget));
   }
   return result;
 }
@@ -169,7 +171,7 @@ PolygonColoredEdit edit_colored_polygon(const PolygonMesh &mesh,
         if (incident)
           for (const auto &c : face.corners) {
             auto value = sample_value(lookup(field.corners_, c.id),
-                                      field.sources_, budget);
+                                      field.sources(), budget);
             if (color && *color != value)
               throw std::logic_error("Dissolve requires a proven color-field "
                                      "equivalence for this nonconstant region");

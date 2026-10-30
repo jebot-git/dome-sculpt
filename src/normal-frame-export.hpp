@@ -7,6 +7,10 @@
 namespace dome::detail {
 struct NormalFrameExport {
   ObjectSurface surface;
+  // Exact original REST vertex for every expanded emitted vertex. Attribute
+  // consumers validate against input authority before following this map.
+  std::vector<uint32_t> rest_vertices;
+  std::shared_ptr<const PolygonColorSurface> input_polygon_colors;
   std::vector<Tangent> tangents;
   std::vector<std::vector<Vec3>> normal_targets,tangent_targets;
   const ImportedPrimitive *source=nullptr;
@@ -111,7 +115,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
       if(pbr_t && !mtoon_t)tangent_source=set.pbr;
     }
   }
-  auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;out.canonical_normal=std::move(canonical_normal);
+  auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;out.canonical_normal=std::move(canonical_normal);out.rest_vertices=layout.vertices;out.input_polygon_colors=input.polygon_colors;
   out.surface={input.id,input.name,input.transform,input.material,{},input.textures,input.deformation,input.groups,input.appearance,input.material_bindings,input.source_dormant};auto &mesh=out.surface.mesh;
   Quat from_native=legacy?to_native.inverse():Quat{};
   std::vector<size_t> targets;for(auto id:set.current_targets){auto t=std::find_if(selected->targets.begin(),selected->targets.end(),[&](const auto &t){return t.id==id;});if(t==selected->targets.end())throw std::invalid_argument("Export target normal identity is missing");targets.push_back(size_t(t-selected->targets.begin()));}

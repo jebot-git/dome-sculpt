@@ -41,7 +41,8 @@ struct Visibility {
   PaintSourceTexture color, mask, coverage, pbr;
   const ImportedPrimitive *primitive = nullptr;
   std::vector<std::array<float,4>> vertex_colors;
-  explicit Visibility(const SurfaceRange &r, const Mesh &mesh) : range(r) {
+  explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
+                      std::span<const std::array<float,4>> packed_colors, bool explicit_colors) : range(r) {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
@@ -63,7 +64,17 @@ struct Visibility {
     } else toon = retained_mtoon(r.appearance.get());
     if (!toon) {
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
-      if(r.appearance && !prepared)vertex_colors=detail::source_vertex_colors(r.appearance.get(),r.appearance->source_vertices.size());
+      if(explicit_colors) {
+        if(!packed_colors.empty()) {
+          size_t end=r.first_vertex;
+          for(size_t c=r.first;c<r.first+r.count;++c){auto v=mesh.indices.at(c);if(v<r.first_vertex)throw std::invalid_argument("Packed visibility color offset is outside its range");end=std::max(end,size_t(v)+1);}
+          if(end>packed_colors.size())throw std::invalid_argument("Packed visibility color range is incomplete");
+          auto slice=packed_colors.subspan(r.first_vertex,end-r.first_vertex);
+          if(prepared){for(const auto &color:slice)if(color!=std::array<float,4>{1,1,1,1})throw std::invalid_argument("Prepared visibility cannot carry a second vertex tint");}
+          else vertex_colors.assign(slice.begin(),slice.end());
+        } else if(!prepared&&r.appearance&&!detail::source_vertex_colors(r.appearance.get(),r.appearance->source_vertices.size()).empty())
+          throw std::invalid_argument("Packed visibility omitted its authored vertex colors");
+      } else if(r.appearance && !prepared)vertex_colors=detail::source_vertex_colors(r.appearance.get(),r.appearance->source_vertices.size());
       if(!vertex_colors.empty()) {
         if(r.first_vertex>mesh.positions.size() || vertex_colors.size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility vertex-color domain is outside packed geometry");
         for(size_t c=r.first;c<r.first+r.count;++c){const auto v=mesh.indices.at(c);if(v<r.first_vertex || v-r.first_vertex>=vertex_colors.size())throw std::invalid_argument("Visibility vertex-color identity is outside its packed range");}
@@ -180,22 +191,28 @@ struct Visibility {
 struct MaterialSurfaceQuery::Impl {
   SurfaceQuery query;
   std::vector<Visibility> surfaces;
-  Impl(const Mesh &mesh, std::span<const SurfaceRange> ranges, const std::function<bool()> &cancelled)
+  Impl(const Mesh &mesh, std::span<const SurfaceRange> ranges, const std::function<bool()> &cancelled,
+       std::span<const std::array<float,4>> colors,bool explicit_colors)
       : query(mesh, cancelled) {
+    if(!colors.empty()&&colors.size()!=mesh.positions.size())throw std::invalid_argument("Packed visibility color vertex count differs from geometry");
+    for(size_t i=0;i<colors.size();++i){if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Visibility color validation cancelled");for(float c:colors[i])if(!std::isfinite(c)||c<0||c>1)throw std::invalid_argument("Packed visibility requires finite linear unit RGBA");}
     size_t end = 0;
     for (const auto &range : ranges) {
       if (cancelled && cancelled()) throw std::runtime_error("Visibility build cancelled");
       if (range.first != end || range.count % 3 || range.count > mesh.indices.size() - end)
         throw std::invalid_argument("Visibility requires contiguous triangle-aligned surface ranges");
       end += range.count;
-      surfaces.emplace_back(range, mesh);
+      surfaces.emplace_back(range, mesh,colors,explicit_colors);
     }
     if (end != mesh.indices.size()) throw std::invalid_argument("Visibility surface ranges are incomplete");
   }
 };
 MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh, std::span<const SurfaceRange> ranges,
                                            const std::function<bool()> &cancelled)
-    : impl_(std::make_unique<Impl>(mesh, ranges, cancelled)) {}
+    : impl_(std::make_unique<Impl>(mesh, ranges, cancelled,std::span<const std::array<float,4>>{},false)) {}
+MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const SurfaceRange> ranges,
+ const std::function<bool()> &cancelled,std::span<const std::array<float,4>> colors)
+    : impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true)) {}
 MaterialSurfaceQuery::~MaterialSurfaceQuery() = default;
 SurfaceHit MaterialSurfaceQuery::closest(Vec3 point) const { return impl_->query.closest(point); }
 std::optional<SurfaceHit> MaterialSurfaceQuery::raycast(Vec3 origin, Vec3 direction,
