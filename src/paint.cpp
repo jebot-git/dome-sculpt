@@ -1310,4 +1310,24 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
   }
   return result;
 }
+void PaintedMesh::swap_state(PaintedMesh &other) noexcept {
+  using std::swap;
+  static_assert(noexcept(swap(composite_cache_,other.composite_cache_)));swap(composite_cache_,other.composite_cache_);
+  static_assert(noexcept(swap(composite_token_,other.composite_token_)));swap(composite_token_,other.composite_token_);
+  static_assert(noexcept(swap(before_composite_token_,other.before_composite_token_)));swap(before_composite_token_,other.before_composite_token_);
+  static_assert(noexcept(swap(surface_,other.surface_)));swap(surface_,other.surface_);
+  static_assert(noexcept(swap(source_maps_,other.source_maps_)));swap(source_maps_,other.source_maps_);
+  static_assert(noexcept(swap(layers_,other.layers_)));swap(layers_,other.layers_);
+  static_assert(noexcept(swap(baked_,other.baked_)));swap(baked_,other.baked_);
+  static_assert(noexcept(swap(active_,other.active_)));swap(active_,other.active_);
+  static_assert(noexcept(swap(next_,other.next_)));swap(next_,other.next_);
+  static_assert(noexcept(swap(revision_,other.revision_)));swap(revision_,other.revision_);
+  static_assert(noexcept(swap(editing_,other.editing_)));swap(editing_,other.editing_);
+  static_assert(noexcept(swap(before_,other.before_)));swap(before_,other.before_);
+  static_assert(noexcept(swap(undo_,other.undo_)));swap(undo_,other.undo_);
+  static_assert(noexcept(swap(redo_,other.redo_)));swap(redo_,other.redo_);
+  static_assert(noexcept(swap(history_bytes_,other.history_bytes_)));swap(history_bytes_,other.history_bytes_);
+  static_assert(noexcept(swap(allocated_tiles_,other.allocated_tiles_)));swap(allocated_tiles_,other.allocated_tiles_);
+  static_assert(noexcept(swap(before_allocated_tiles_,other.before_allocated_tiles_)));swap(before_allocated_tiles_,other.before_allocated_tiles_);
+}
 } // namespace dome

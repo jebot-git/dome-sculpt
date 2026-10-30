@@ -83,31 +83,26 @@ uint64_t Scene::add(std::string name, Volume v, CanvasTransform t) {
   if (objects_.size() >= 256 || next_ == UINT64_MAX)
     throw std::length_error("Scene object limit reached");
   SculptObject o;
-  o.id = next_++;
+  o.id = next_;
   o.name = std::move(name);
   o.transform = t;
   o.volume = std::make_shared<Volume>(std::move(v));
   objects_.push_back(std::move(o));
   active_ = objects_.back().id;
+  ++next_;
   return active_;
 }
 uint64_t Scene::duplicate(uint64_t id) {
-  auto source = object(id);
-  name_valid(source.name);
-  auto name = text::utf8_prefix(source.name, 240) + " copy";
-  auto added = add(name, source.volume->geometry_snapshot(), source.transform);
-  auto &o = object(added);
-  o.material = source.material;
-  o.visible = source.visible;
-  o.mesh_active = source.mesh_active;
-  if (source.painted)
-    o.painted = source.painted->snapshot();
-  o.deformation = source.deformation;
-  o.group = source.group;
-  o.appearance = source.appearance;
-  o.material_bindings = source.material_bindings;
-  o.retopology = source.retopology;
-  return added;
+  auto source=object(id);
+  name_valid(source.name);validate_transform(source.transform);
+  source.locked=false; // A duplicate starts editable, matching add().
+  if(objects_.size()>=256||next_==UINT64_MAX)throw std::length_error("Scene object limit reached");
+  source.name=text::utf8_prefix(source.name,240)+" copy";
+  source.volume=std::make_shared<Volume>(source.volume->geometry_snapshot());
+  if(source.painted)source.painted=source.painted->snapshot();
+  source.id=next_;
+  objects_.push_back(std::move(source));
+  active_=next_++;return active_;
 }
 Mesh ObjectSurface::preview_mesh() const {
   return deformation ? deformation->preview(mesh) : mesh;

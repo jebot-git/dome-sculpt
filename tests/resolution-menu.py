@@ -222,18 +222,32 @@ async def main():
         acknowledgement=Path(task_home,"ray-status-ack")
         observer=BUILD/"dome-sculpt-status-observer.so"
         assert observer.is_file(), "Build the test-only dome-sculpt-status-observer target"
-        ray_env={**env,"DOME_SCULPT_STATUS_ACK":str(acknowledgement),"LD_PRELOAD":str(observer)}
+        draw_ready=Path(task_home,"ray-draw-ready")
+        index_count=Path(str(fixture)+".indices").read_text().strip()
+        assert int(index_count)>0, "Dense ray fixture has actual indexed surface geometry"
+        ray_env={**env,"DOME_SCULPT_STATUS_ACK":str(acknowledgement),"LD_PRELOAD":str(observer),
+                 "DOME_SCULPT_DRAW_ACK":str(draw_ready),"DOME_SCULPT_DRAW_COUNT":index_count}
         app=subprocess.Popen([str(BUILD/"dome-sculpt"),str(fixture)],cwd=task_home,env=ray_env,stdout=log,stderr=log);processes.append(app)
         window=await wait(lambda:named("Dome Sculpt"));window.set_input_focus(X.RevertToParent,X.CurrentTime);connection.sync()
         service=await wait(lambda:property_value("_KDE_NET_WM_APPMENU_SERVICE_NAME"));path=await wait(lambda:property_value("_KDE_NET_WM_APPMENU_OBJECT_PATH"))
         proxy=bus.get_proxy_object(service,path,await bus.introspect(service,path));menu=proxy.get_interface("com.canonical.dbusmenu")
         await enabled("Resolution...")
+        await wait(lambda:draw_ready.is_file() and draw_ready.read_text()==index_count,seconds=60)
+        check(draw_ready.read_text()==index_count,"Actual native indexed draw acknowledges the loaded asynchronous surface before the ray gesture")
         # Exported universal menu has zero local height; the canvas excludes
         # the fixed28px status row. Its exact centre produces the proven axial ray.
         geometry=window.get_geometry();ray_before=image(window)
         geometry=window.get_geometry();key("Shift_L",True);tap(window,geometry.width//2,(geometry.height-28)//2);key("Shift_L",False)
         expected_error="Sculpt ray exceeds the bounded grid traversal budget at this resolution"
-        await wait(lambda:acknowledgement.is_file() and expected_error in acknowledgement.read_text())
+        try:
+            await wait(lambda:acknowledgement.is_file() and expected_error in acknowledgement.read_text())
+        except TimeoutError:
+            latest=Path(str(acknowledgement)+".latest")
+            if latest.exists():
+                (OUT/"ray-budget-last-status.txt").write_text(latest.read_text())
+                print("Actual last native status: "+latest.read_text(),flush=True)
+            image(window).save(OUT/"ray-budget-failed.png")
+            raise
         check(expected_error in acknowledgement.read_text(),"Actual native status publishes the precise candidate-cell exhaustion error")
         await asyncio.sleep(.25)
         check(len([w for w in connection.screen().root.query_tree().children if w.get_wm_name()])==1 and app.poll() is None,"Desktop ray budget exhaustion reports status without escaping to a modal alert")

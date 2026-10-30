@@ -13,6 +13,7 @@
 #include "sculpt-ui-values.hpp"
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
+#include "document-transaction.hpp"
 #include <unistd.h>
 #include <utility>
 #include <numeric>
@@ -262,6 +263,7 @@ void Document::invalidate_weight_view_locked(bool restore) {
   mesh_changed_.notify_all();
 }
 void Document::record_locked(History entry) {
+  if(transaction_){transaction_->record(std::move(entry));return;}
   if(next_content_==UINT64_MAX)throw std::overflow_error("Document history identity exhausted");
   entry.from = content_;
   entry.to = next_content_;
@@ -305,57 +307,55 @@ void Document::bind_locked() {
   last_paint_ =
       scene_.active().mesh_active ? scene_.active().painted->revision() : 0;
   ++state_.input_epoch;
+  if(transaction_){transaction_->rebind();return;}
   std::lock_guard lock(input_mutex_);
   inputs_.clear();
   reset_input_ = false;
   input_changed_.notify_all();
 }
 void Document::scene_changed_locked(Scene before) {
-  try {
-    // Structural commands change only native properties/ownership of already
-    // validated source assets. Bulk source JSON checks stay on asset/file workers.
-    scene_.validate(false);
-  } catch (...) {
-    scene_ = std::move(before);
-    bind_locked();
-    publish_locked();
-    throw;
-  }
-  record_locked({{}, std::move(before), scene_});
-  bind_locked();
-  publish_locked(true);
+  // Put authority back before constructing any allocating rollback/history
+  // state. A failure even in the Transaction constructor retains the source.
+  Scene candidate=std::move(scene_);scene_=std::move(before);
+  Transaction transaction(*this);
+  scene_=std::move(candidate);
+  scene_.validate(false);
+  record_locked({{},transaction.before(),scene_});
+  bind_locked();publish_locked(true,false);transaction.commit();
 }
 bool Document::undo_locked(bool redo) {
-  auto &source = redo ? redo_ : undo_, &dest = redo ? undo_ : redo_;
-  if (source.empty())
-    return false;
-  auto &h = source.back();
-  if (h.paint) {
-    if (!(redo ? h.paint->redo() : h.paint->undo()))
-      return false;
-    for (auto &o : scene_.objects())
-      if (o.painted == h.paint) {
-        scene_.select(o.id);
-        scene_.active().mesh_active = true;
-        break;
-      }
-  } else if (h.sculpt) {
-    if (!(redo ? h.sculpt->redo() : h.sculpt->undo()))
-      return false;
-    for (auto &o : scene_.objects())
-      if (o.volume == h.sculpt) {
-        scene_.select(o.id);
-        scene_.active().mesh_active = false;
-        break;
-      }
-  } else
-    scene_ = redo ? *h.after : *h.before;
-  content_ = redo ? h.to : h.from;
-  dest.push_back(std::move(h));
-  source.pop_back();
-  bind_locked();
-  publish_locked(true);
-  return true;
+  auto &source=redo?redo_:undo_,&dest=redo?undo_:redo_;
+  if(source.empty())return false;
+  Transaction transaction(*this);const auto &h=source.back();
+  std::shared_ptr<Volume> sculpt;
+  std::shared_ptr<PaintedMesh> paint;
+  if(h.paint){
+    paint=std::make_shared<PaintedMesh>(*h.paint);
+    if(!(redo?paint->redo():paint->undo()))return false;
+    bool found=false;
+    for(const auto &o:scene_.objects())if(o.painted==h.paint){auto &target=scene_.object(o.id);target.painted=paint;target.mesh_active=true;scene_.select(o.id);found=true;}
+    if(!found)throw std::logic_error("Paint history target is unavailable");
+  }else if(h.sculpt){
+    sculpt=std::make_shared<Volume>(*h.sculpt);
+    if(!(redo?sculpt->redo():sculpt->undo()))return false;
+    bool found=false;
+    for(const auto &o:scene_.objects())if(o.volume==h.sculpt){auto &target=scene_.object(o.id);target.volume=sculpt;target.mesh_active=false;scene_.select(o.id);found=true;}
+    if(!found)throw std::logic_error("Sculpt history target is unavailable");
+  }else scene_=redo?*h.after:*h.before;
+  transaction.move_history(source,dest);
+  content_=redo?h.to:h.from;bind_locked();publish_locked(true,false);
+  // Preserve the target identities referenced by all older history commands.
+  // No throwing work remains, and meshing owns its detached immutable copy.
+  if(paint){
+    h.paint->swap_state(*paint);
+    for(const auto &o:scene_.objects())if(o.painted==paint)scene_.object(o.id).painted=h.paint;
+  }
+  if(sculpt){
+    h.sculpt->swap_state(*sculpt);
+    for(const auto &o:scene_.objects())if(o.volume==sculpt)scene_.object(o.id).volume=h.sculpt;
+    input_.refresh_volume(volume());bound_volume_=scene_.active().volume;
+  }
+  transaction.commit();return true;
 }
 void Document::replace(Volume next, bool clean) {
   Scene scene;
@@ -422,6 +422,11 @@ void Document::object_properties(uint64_t id, std::string name, bool visible,
   scene_changed_locked(std::move(before));
 }
 void Document::publish_locked(bool force,bool checkpoint) {
+  auto previous_state=state_;
+  const auto previous_volume=last_volume_,previous_paint=last_paint_,previous_rig=rig_object_;
+  const auto previous_control_changed=control_changed_,previous_solving=uv_solving_;
+  const auto previous_control_source=control_source_;
+  try {
   auto &active = scene_.active();
   uint64_t paint_revision = active.mesh_active ? active.painted->revision() : 0;
   bool changed = force || last_volume_ != volume().revision() ||
@@ -440,7 +445,11 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if (uv_)
     control_changed_ = uv_changed(
         *uv_->view().mesh, scene_.object(control_object_).painted->mesh());
-  schedule_uv_locked();
+  auto uv_job=prepare_uv_schedule_locked();
+  const bool reset_uv=uv_&&!uv_accept_pending_&&!uv_solving_&&!uv_->view().validating&&!uv_scheduled_.expired();
+  if(uv_job&&uv_job->workspace){
+    control_source_={state_.generation,state_.revision,control_object_};uv_solving_=true;state_.message="Preparing UV charts...";
+  }
   if (uv_) {
     auto view = std::make_shared<UvView>(uv_->view());
     view->committing = uv_accept_pending_;
@@ -525,7 +534,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     }
   state_.native_pending=bool(native_stroke_);
   state_.native_gesture=native_stroke_?native_stroke_->epoch:0;
-  state_.native_accepting=native_stroke_&&!native_stroke_->accepted.load();
+  state_.native_accepting=native_stroke_&&!native_stroke_->accepted.load()&&!(transaction_&&transaction_->native_ending());
   if(!native_stroke_)state_.native_samples=0;
   state_.stroking = action_active_locked();
   state_.weight_gesture = weight_stroking_ ? weight_epoch_.load() : 0;
@@ -545,40 +554,49 @@ void Document::publish_locked(bool force,bool checkpoint) {
                              : command ? command_enabled_locked(*command)
                                        : true;
   }
-  if(checkpoint)checkpoint_locked();
-  published_.store(std::make_shared<EditorState>(state_));
-  { std::lock_guard lock(retopo_mutex_); retopo_changed_.notify_all(); }
-  { std::lock_guard lock(cut_mutex_); cut_changed_.notify_all(); }
-  {
-    std::lock_guard lock(uv_mutex_);
-    uv_changed_.notify_all();
-  }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
       (weight_scheduled_epoch_ != state_.weight_gesture || weight_scheduled_samples_ != weight_samples_.size());
-  if (changed || weight_preview) {
-    std::lock_guard mesh_lock(mesh_mutex_);
-    pending_mesh_.emplace(
-        MeshJob{state_.revision, state_.generation, scene_.snapshot(), state_.weights.enabled,
-                state_.weights.linked, uint32_t(state_.rig_joint), 0, {}, {}});
-    native_source_scene_=std::make_shared<const Scene>(pending_mesh_->scene);
-    pending_mesh_->sculpt_mask_view = state_.sculpt_mask_visible;
-    if (state_.retopology && active.retopology) {
-      // Reopening a patch displays its retained reference, including its pose,
-      // without changing authoritative visibility or exporting a preview proxy.
-      auto &preview = pending_mesh_->scene;
-      preview.object(active.id).visible = false;
-      preview.object(active.retopology->source).visible = true;
+  std::optional<MeshJob> mesh_job;
+  std::shared_ptr<const Scene> source;
+  if(changed||weight_preview){
+    mesh_job.emplace(MeshJob{state_.revision,state_.generation,scene_.snapshot(),state_.weights.enabled,
+        state_.weights.linked,uint32_t(state_.rig_joint),0,{}, {}});
+    source=std::make_shared<const Scene>(mesh_job->scene);
+    mesh_job->sculpt_mask_view=state_.sculpt_mask_visible;
+    if(state_.retopology&&active.retopology){
+      mesh_job->scene.object(active.id).visible=false;
+      mesh_job->scene.object(active.retopology->source).visible=true;
     }
-    if (weight_stroking_ && !weight_samples_.empty()) {
-      pending_mesh_->weight_gesture = state_.weight_gesture;
-      pending_mesh_->weight_samples = weight_samples_;
-      pending_mesh_->weight_settings = weight_stroke_settings_;
-      weight_scheduled_epoch_ = state_.weight_gesture;
-      weight_scheduled_samples_ = weight_samples_.size();
+    if(weight_stroking_&&!weight_samples_.empty()){
+      mesh_job->weight_gesture=state_.weight_gesture;mesh_job->weight_samples=weight_samples_;
+      mesh_job->weight_settings=weight_stroke_settings_;
     }
-    mesh_changed_.notify_one();
   }
+  auto publication=std::make_shared<EditorState>(state_);
+  // No allocation or source validation after the first externally visible
+  // store. Workers cannot take either candidate until its state is published.
+  {
+    std::scoped_lock lock(mesh_mutex_,uv_mutex_);
+    if(mesh_job){
+      pending_mesh_=std::move(mesh_job);native_source_scene_=std::move(source);
+      if(weight_preview){weight_scheduled_epoch_=state_.weight_gesture;weight_scheduled_samples_=weight_samples_.size();}
+    }
+    if(uv_job){uv_job->request=++uv_request_;uv_scheduled_=uv_job->mesh;uv_validation_=std::move(uv_job);}
+    else if(reset_uv){++uv_request_;uv_scheduled_.reset();uv_validation_.reset();}
+    if(transaction_)transaction_->release_native();
+    published_.store(std::move(publication));
+  }
+  mesh_changed_.notify_one();uv_changed_.notify_all();
+  {std::lock_guard lock(retopo_mutex_);retopo_changed_.notify_all();}
+  {std::lock_guard lock(cut_mutex_);cut_changed_.notify_all();}
+  }catch(...){
+    state_=std::move(previous_state);last_volume_=previous_volume;last_paint_=previous_paint;
+    rig_object_=previous_rig;control_changed_=previous_control_changed;control_source_=previous_control_source;
+    uv_solving_=previous_solving;throw;
+  }
+  if(checkpoint&&!transaction_)try{checkpoint_locked();}catch(...){}
 }
+
 void Document::finish_locked() {
   if(native_stroke_)throw std::logic_error("Wait for the accepted desktop stroke, or cancel it, before changing the document");
   if(state_.cut)throw std::logic_error("Apply or cancel the plane cut before changing the document");
@@ -613,42 +631,22 @@ void Document::replace(Scene next, bool clean) {
   std::lock_guard lock(model_mutex_);
   replace_locked(std::move(next), clean);
 }
-void Document::replace_locked(Scene next, bool clean) {
+void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopted_path,std::string message) {
   if(native_stroke_)cancel_native_locked();
   if(state_.cut){finish_control_locked(false);cancel_cut_locked();}
-  if (state_.retopology) cancel_retopology_locked();
-  if (weight_stroking_) {
-    cancel_action_locked(); desktop_ = false; input_.cancel();
-  }
-  finish_control_locked(false);
-  finish_locked();
-  scene_ = std::move(next);
-  bind_locked();
-  undo_.clear();
-  redo_.clear();
-  path_.clear();
+  if(state_.retopology)cancel_retopology_locked();
+  if(weight_stroking_){cancel_action_locked();desktop_=false;input_.cancel();}
+  finish_control_locked(false);finish_locked();
+  Transaction transaction(*this);
+  if(next_content_==UINT64_MAX)throw std::overflow_error("Document history identity exhausted");
+  scene_=std::move(next);bind_locked();transaction.clear_history();path_=std::move(adopted_path);
   ++state_.generation;
-  if (recovery_) {
-    recovery_source_ = {new_recovery_id(), state_.generation, {}};
-    recovery_->set_source(recovery_source_);
-    recovery_content_ = 0;
-  }
-  ++state_.input_epoch;
-  {
-    std::lock_guard queue_lock(input_mutex_);
-    inputs_.clear();
-    reset_input_ = true;
-  }
-  input_changed_.notify_all();
-  state_.error.clear();
-  anchored_ = false;
-  state_.asset_busy = false;
-  asset_work_.store({});
-  state_.recovery_busy = false;
-  content_ = next_content_++;
-  if (clean)
-    saved_content_ = content_;
-  publish_locked(true);
+  if(recovery_){recovery_source_={new_recovery_id(),state_.generation,path_};recovery_content_=0;}
+  ++state_.input_epoch;state_.error.clear();state_.message=std::move(message);anchored_=false;
+  state_.asset_busy=false;state_.recovery_busy=false;content_=next_content_++;
+  if(clean)saved_content_=content_;
+  publish_locked(true,false);transaction.commit(false);asset_work_.store({});
+  if(recovery_)try{recovery_->set_source(recovery_source_);checkpoint_locked();}catch(...){}
 }
 void Document::seed() {
   Volume next(.03f);
@@ -782,9 +780,8 @@ bool Document::undo() {
   if (state_.asset_busy)
     return false;
   finish_locked();
-  bool changed = undo_locked(false);
-  publish_locked();
-  return changed;
+  if(undo_locked(false))return true;
+  publish_locked();return false;
 }
 bool Document::redo() {
   std::lock_guard lock(model_mutex_);
@@ -806,9 +803,8 @@ bool Document::redo() {
   if (state_.asset_busy)
     return false;
   finish_locked();
-  bool changed = undo_locked(true);
-  publish_locked();
-  return changed;
+  if(undo_locked(true))return true;
+  publish_locked();return false;
 }
 void Document::configure(Tool tool, float radius) {
   if (int(tool) < 0 || int(tool) > 3 || !std::isfinite(radius) ||
@@ -896,8 +892,9 @@ void Document::paint_command(SpatialCommand command) {
   bool normal_paint = command == SpatialCommand::MakeMesh || command == SpatialCommand::EditSource ||
       (command >= SpatialCommand::PaintColor && command <= SpatialCommand::LayerOpacity);
   bool weight_view = normal_paint && std::exchange(state_.weights.enabled, false);
+  auto publication=published_.load();
   command_locked(command);
-  publish_locked(weight_view);
+  if(published_.load()==publication)publish_locked(weight_view);
 }
 void Document::begin_uv() {
   std::lock_guard lock(model_mutex_);
@@ -937,10 +934,11 @@ void Document::end_uv(bool accept) {
   std::lock_guard lock(model_mutex_);
   if (accept && uv_ && !uv_->view().valid && !uv_->view().validating)
     throw std::runtime_error(uv_->view().error);
+  auto publication=published_.load();
   finish_control_locked(accept);
   if (!uv_accept_pending_)
     desktop_ = false;
-  publish_locked();
+  if(published_.load()==publication)publish_locked();
 }
 void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   auto &o = scene_.active();
@@ -956,11 +954,14 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
     throw std::runtime_error("File and asset work queue is full");
-  files_.push_back(std::move(job));
-  state_.asset_busy = true;
-  state_.message = "Transferring paint to edited UVs...";
-  state_.error.clear();
-  file_changed_.notify_one();
+  Transaction transaction(*this);files_.push_back(std::move(job));
+  try{
+    uv_accept_pending_=true;state_.asset_busy=true;state_.message="Transferring paint to edited UVs...";state_.error.clear();
+    if(!desktop_)input_.resume_control(VrParameter::UvEdit);
+    publish_locked(false,false);transaction.commit();
+  }catch(...){files_.pop_back();throw;}
+  invalidate_uv_locked();file_changed_.notify_one();
+
 }
 void Document::use_source() { paint_command(SpatialCommand::EditSource); }
 void Document::use_mesh() { paint_command(SpatialCommand::PaintColor); }
@@ -968,7 +969,6 @@ void Document::prepare_mesh(uint32_t resolution) {
   std::lock_guard lock(model_mutex_);
   finish_locked();
   prepare_locked(resolution);
-  publish_locked();
 }
 bool Document::wait_asset(std::chrono::milliseconds timeout) const {
   auto deadline = std::chrono::steady_clock::now() + timeout;
@@ -1012,11 +1012,11 @@ void Document::prepare_locked(uint32_t resolution) {
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
     throw std::runtime_error("File and asset work queue is full");
-  files_.push_back(std::move(job));
-  state_.asset_busy = true;
-  state_.error.clear();
-  state_.message = "Preparing painting mesh and UVs...";
+  Transaction transaction(*this);files_.push_back(std::move(job));
+  try{state_.asset_busy=true;state_.error.clear();state_.message="Preparing painting mesh and UVs...";publish_locked(false,false);transaction.commit();}
+  catch(...){files_.pop_back();throw;}
   file_changed_.notify_one();
+
 }
 void Document::begin_spatial() {
   rebase_space({});
@@ -1530,14 +1530,14 @@ std::future<void> Document::open_async(const std::filesystem::path &path) {
   job.path = path; job.revision = state_.revision; job.generation = state_.generation;
   job.content = content_; job.open_project = true; job.completion = completion;
   job.work = work; job.operation_label = "Open project";
-  {
-    std::lock_guard file_lock(file_mutex_);
-    if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
-    files_.push_back(std::move(job));
-  }
-  asset_work_.store(std::move(work));
-  state_.asset_busy = true; state_.error.clear(); state_.message = "Opening " + path.string();
-  publish_locked(); file_changed_.notify_one();
+  std::lock_guard file_lock(file_mutex_);
+  if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+  Transaction transaction(*this);files_.push_back(std::move(job));
+  try{
+    asset_work_.store(std::move(work));state_.asset_busy=true;state_.error.clear();state_.message="Opening "+path.string();
+    publish_locked(false,false);transaction.commit();
+  }catch(...){files_.pop_back();throw;}
+  file_changed_.notify_one();
   return result;
 }
 std::future<void> Document::save_async(const std::filesystem::path &path) {
@@ -1547,17 +1547,20 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
   {
     std::lock_guard lock(model_mutex_);
     if(native_stroke_) {
-      FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;
-      job.native_capture=native_stroke_;
-      {std::lock_guard file_lock(file_mutex_);if(files_.size()>=8)throw std::runtime_error("File work queue is full");files_.push_back(std::move(job));}
-      end_native_locked(true);state_.message="Finishing desktop stroke before saving";publish_locked();file_changed_.notify_one();return result;
+      FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;job.native_capture=native_stroke_;
+      Transaction transaction(*this);std::lock_guard file_lock(file_mutex_);
+      if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+      files_.push_back(std::move(job));
+      try{transaction.stage_native_end();state_.message="Finishing desktop stroke before saving";publish_locked(false,false);transaction.commit();}
+      catch(...){files_.pop_back();throw;}
+      file_changed_.notify_one();return result;
     }
     finish_locked();
     if (state_.asset_busy || state_.recovery_busy)
       throw std::logic_error("Wait for pending authoring work before saving");
-    publish_locked();
-    {
-      std::lock_guard file_lock(file_mutex_);
+    if(last_volume_!=volume().revision()||last_paint_!=(scene_.active().mesh_active?scene_.active().painted->revision():0))publish_locked();
+    Transaction transaction(*this);
+    std::lock_guard file_lock(file_mutex_);
       if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
       FileJob job{};job.path=path;job.revision=state_.revision;job.generation=state_.generation;
       job.content=content_;job.adopt_path=true;job.completion=completion;job.object=scene_.active().id;
@@ -1565,11 +1568,12 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
       // Clone paint/volume metadata only on the file worker. The initial empty
       // document has no mesh publication yet and needs its tiny fallback.
       job.capture_scene=native_source_scene_?native_source_scene_:std::make_shared<const Scene>(scene_.snapshot());
+      job.recovery_source=recovery_source_;
       files_.push_back(std::move(job));
-      files_.back().recovery_source = recovery_source_;
-    }
+    try{
     state_.error.clear(); state_.message = "Saving " + path.string();
-    publish_locked();
+    publish_locked(false,false);transaction.commit();
+    }catch(...){files_.pop_back();throw;}
   }
   file_changed_.notify_one();
   return result;
@@ -1589,13 +1593,11 @@ std::future<void> Document::export_asset(const std::filesystem::path &path,
     throw std::logic_error("Select a source avatar group to export");
   FileJob job{scene_.snapshot(), path, state_.revision, state_.generation, content_, true};
   job.object = scene_.active().id; job.export_format = format; job.completion = completion;
-  {
-    std::lock_guard file_lock(file_mutex_);
-    if (files_.size() >= 8) throw std::runtime_error("File work queue is full");
-    files_.push_back(std::move(job));
-  }
-  state_.error.clear(); state_.message = "Exporting " + path.string();
-  publish_locked();
+  std::lock_guard file_lock(file_mutex_);
+  if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+  Transaction transaction(*this);files_.push_back(std::move(job));
+  try{state_.error.clear();state_.message="Exporting "+path.string();publish_locked(false,false);transaction.commit();}
+  catch(...){files_.pop_back();throw;}
   file_changed_.notify_one();
   return result;
 }
@@ -1615,16 +1617,13 @@ void Document::file_locked(bool export_mesh, AssetExportFormat format) {
   }
   if (export_mesh)
     path.replace_extension(format == AssetExportFormat::Avatar ? ".vrm" : ".glb");
+  FileJob job{scene_.snapshot(),path,state_.revision,state_.generation,content_,export_mesh};
+  job.recovery_source=recovery_source_;job.create_parent=create_parent;job.export_format=format;job.object=scene_.active().id;
   std::lock_guard lock(file_mutex_);
-  if (files_.size() >= 8)
-    throw std::runtime_error("File work queue is full");
-  files_.push_back({scene_.snapshot(), path, state_.revision, state_.generation,
-                    content_, export_mesh});
-  files_.back().recovery_source = recovery_source_;
-  files_.back().create_parent = create_parent;
-  files_.back().export_format = format;
-  files_.back().object = scene_.active().id;
+  if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+  files_.push_back(std::move(job)); // No throwing preparation after handoff.
   file_changed_.notify_one();
+
 }
 void Document::request_save(bool export_mesh) {
   std::lock_guard lock(model_mutex_);
@@ -1807,44 +1806,23 @@ void Document::finish_control_locked(bool accept) {
       if (changed) {
         uv_->edit(UvAction::EndGesture);
         queue_uv_locked(draft);
-        uv_accept_pending_ = true;
-        invalidate_uv_locked();
-        if (!desktop_)
-          input_.resume_control(VrParameter::UvEdit);
         return;
       }
     }
-    invalidate_uv_locked();
-    ++uv_session_;
-    uv_accept_pending_ = false;
-    uv_.reset();
-    state_.uv.reset();
-    control_before_.reset();
-    control_changed_ = false;
-    state_.controls = {};
-    return;
+    Transaction transaction(*this);transaction.finish_uv();
+    publish_locked(false,false);transaction.commit();return;
   }
+  Transaction transaction(*this);
   bool sculpt_control = state_.controls.parameter == VrParameter::SculptOpacity;
   bool changed = control_changed_;
-  if (accept && changed)
-    record_locked({{}, *control_before_, scene_});
-  else
-    scene_ = *control_before_;
-  if (!accept) {
-    state_.paint = control_settings_;
-    state_.weights = control_weights_;
-    state_.radius = control_radius_;
-  }
-  control_before_.reset();
-  control_changed_ = false;
-  state_.controls = {};
-  if (sculpt_control) {
-    input_.refresh_volume(volume());
-    bound_volume_ = scene_.active().volume;
-  }
-  if (changed)
-    publish_locked(true);
+  if (accept && changed) record_locked({{},*control_before_,scene_});
+  else scene_=*control_before_;
+  if(!accept){state_.paint=control_settings_;state_.weights=control_weights_;state_.radius=control_radius_;}
+  control_before_.reset();control_changed_=false;state_.controls={};
+  if(sculpt_control){input_.refresh_volume(volume());bound_volume_=scene_.active().volume;}
+  publish_locked(changed,false);transaction.commit();
 }
+
 void Document::control_event_locked(VrControlEvent event) {
   if (event.type == VrControlEventType::Begin) {
     finish_control_locked(false);
@@ -2344,9 +2322,9 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   }
   switch (command) {
   case SpatialCommand::Undo:
-    return !undo_.empty() || pending_locked() || control_changed_;
+    return (transaction_?transaction_->history_size(false):undo_.size()) || pending_locked() || control_changed_;
   case SpatialCommand::Redo:
-    return !redo_.empty() && !pending_locked() && !control_changed_;
+    return (transaction_?transaction_->history_size(true):redo_.size()) && !pending_locked() && !control_changed_;
   case SpatialCommand::Delete:
     return scene_.objects().size() > 1;
   case SpatialCommand::Next:
@@ -2403,8 +2381,9 @@ void Document::sculpt_command(SpatialCommand command) {
       command > SpatialCommand::SculptOpacity)) ||
       !command_enabled_locked(command))
     throw std::logic_error("Sculpt layer command unavailable");
+  auto publication=published_.load();
   command_locked(command);
-  publish_locked();
+  if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
   if(command==SpatialCommand::CutBegin){begin_cut_locked();return;}
@@ -2828,14 +2807,7 @@ void Document::file_loop() {
         std::lock_guard lock(model_mutex_);
         if (cancelled() || content_ != job->content || action_active_locked() || control_before_)
           throw std::runtime_error("Project loading cancelled or document changed");
-        replace_locked(std::move(next), true);
-        path_ = job->path;
-        if (recovery_) {
-          recovery_source_.source_path = path_;
-          recovery_->set_source(recovery_source_);
-        }
-        state_.message = "Opened " + path_.string();
-        publish_locked();
+        replace_locked(std::move(next),true,job->path,"Opened "+job->path.string());
         job->completion->set_value();
         {
           std::lock_guard file_lock(file_mutex_);
@@ -2859,24 +2831,16 @@ void Document::file_loop() {
           if (job->content != content_ || job->revision != state_.revision ||
               job->object != scene_.active().id || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
-          // Keep the lease until every rejection check has completed. Otherwise
-          // a new job could start between this rejection and the catch handler.
-          state_.asset_busy = false;
-          asset_work_.store({});
-          if (job->retopo_session && job->retopo_session == retopo_session_.load()) cancel_retopology_locked();
-          if (job->cut_session && job->cut_session==cut_session_.load())cancel_cut_locked();
-          bool changed = !job->operation_changed || *job->operation_changed;
-          if (changed) {
-            Scene before = scene_;
-            scene_ = std::move(prepared);
-            record_locked({{}, std::move(before), scene_});
-            bind_locked();
-          } else restore_weight_view_locked(job->rollback_preview);
-          state_.error.clear();
-          state_.message = job->operation_label + " complete";
-          if (job->operation_report && !job->operation_report->empty())
-            state_.message += " | " + *job->operation_report;
-          publish_locked(changed);
+          Transaction transaction(*this);
+          state_.asset_busy=false;
+          if(job->retopo_session&&job->retopo_session==retopo_session_.load())transaction.finish_retopo();
+          if(job->cut_session&&job->cut_session==cut_session_.load())transaction.finish_cut();
+          bool changed=!job->operation_changed||*job->operation_changed;
+          if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
+          state_.error.clear();state_.message=job->operation_label+" complete";
+          if(job->operation_report&&!job->operation_report->empty())state_.message+=" | "+*job->operation_report;
+          publish_locked(changed,false);transaction.commit();asset_work_.store({});
+          if(!changed)restore_weight_view_locked(job->rollback_preview);
           if(job->work)job->work->progress.store(1);
         }
         {
@@ -2906,10 +2870,7 @@ void Document::file_loop() {
           std::lock_guard lock(model_mutex_);
           if (job->generation != state_.generation || job->content != content_)
             throw std::runtime_error("Document changed while recovery was loading");
-          replace_locked(std::move(recovered), false);
-          state_.message = "Recovered as an unsaved project; save to a new path";
-          state_.recovery_busy = false;
-          publish_locked();
+          replace_locked(std::move(recovered),false,{},"Recovered as an unsaved project; save to a new path");
         }
         {
           std::lock_guard file_lock(file_mutex_);
@@ -2933,7 +2894,6 @@ void Document::file_loop() {
           auto it =
               std::find_if(scene_.objects().begin(), scene_.objects().end(),
                            [&](auto &o) { return o.id == job->object; });
-          state_.asset_busy = false;
           if (it == scene_.objects().end() ||
               it->volume != job->source_identity ||
               it->volume->revision() != job->source_revision ||
@@ -2941,13 +2901,11 @@ void Document::file_loop() {
             throw std::runtime_error(
                 "The source changed while its painting mesh was being "
                 "prepared; retry on the current object");
-          Scene before = scene_;
-          auto &o = scene_.object(job->object);
-          o.painted = std::move(painted);
-          o.mesh_active = true;
-          state_.message = "Painting mesh ready";
-          state_.error.clear();
-          scene_changed_locked(std::move(before));
+          Transaction transaction(*this);
+          auto &o=scene_.object(job->object);o.painted=std::move(painted);o.mesh_active=true;
+          state_.asset_busy=false;state_.message="Painting mesh ready";state_.error.clear();
+          record_locked({{},transaction.before(),scene_});bind_locked();publish_locked(true,false);transaction.commit();
+
         }
         {
           std::lock_guard file_lock(file_mutex_);
@@ -2983,31 +2941,24 @@ void Document::file_loop() {
       } else
         job->scene.save(job->path);
       std::lock_guard lock(model_mutex_);
-      if (job->generation == state_.generation) {
-        if (!job->export_mesh) {
-          saved_content_ = job->content;
-          bool current_recovery = recovery_ && job->recovery_source.id == recovery_source_.id &&
-                                  job->recovery_source.generation == recovery_source_.generation;
-          if (job->adopt_path) {
-            path_ = job->path;
-            if (recovery_ && recovery_source_.source_path != path_) {
-              recovery_source_.source_path = path_;
-              recovery_->set_source(recovery_source_);
-              // A path change invalidates older queued recovery work. A
-              // newer live edit still needs a checkpoint after this Save.
-              recovery_content_ = 0;
-            }
+      if(job->generation==state_.generation){
+        Transaction transaction(*this);
+        bool current_recovery=recovery_&&job->recovery_source.id==recovery_source_.id&&job->recovery_source.generation==recovery_source_.generation;
+        bool source_changed=false;
+        if(!job->export_mesh){
+          saved_content_=job->content;
+          if(job->adopt_path){
+            path_=job->path;
+            if(recovery_&&recovery_source_.source_path!=path_){recovery_source_.source_path=path_;recovery_content_=0;source_changed=true;}
           }
-          // Updating the source path changes the recovery epoch and clears
-          // queued work. Schedule cleanup afterwards against the new epoch.
-          if (current_recovery)
-            recovery_->discard(recovery_source_, job->revision);
         }
-        state_.error.clear();
-        state_.message =
-            std::string(job->export_mesh ? "Exported " : "Saved ") +
-            job->path.string() + export_diagnostics;
-        publish_locked();
+        state_.error.clear();state_.message=std::string(job->export_mesh?"Exported ":"Saved ")+job->path.string()+export_diagnostics;
+        publish_locked(false,false);transaction.commit(false);
+        if(recovery_)try{
+          if(source_changed)recovery_->set_source(recovery_source_);
+          if(!job->export_mesh&&current_recovery)recovery_->discard(recovery_source_,job->revision);
+          checkpoint_locked();
+        }catch(...){}
       }
       if (job->completion)
         job->completion->set_value();
@@ -3026,7 +2977,6 @@ void Document::file_loop() {
         if (job->uv_mesh && uv_ && uv_accept_pending_ &&
             uv_session_ == job->uv_session) {
           uv_accept_pending_ = false;
-          uv_->validated(job->uv_mesh, e.what());
           invalidate_uv_locked();
           if (!job->uv_desktop)
             input_.resume_control(VrParameter::UvEdit);
