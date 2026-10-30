@@ -320,6 +320,34 @@ struct PaintedMesh::SurfaceMap {
     options.cancelled={};
   }
 };
+struct PaintedMesh::Evaluation {
+  std::shared_ptr<const SurfaceMap> source;
+  std::shared_ptr<const Mesh> geometry;
+  std::vector<SurfaceMap::Bounds> bounds;
+  std::pair<Vec3,Vec3> sample(const SurfaceMap::Texel &t)const {
+    const auto &m=*geometry;auto at=size_t(t.face)*3;float w[]={t.bary[0],t.bary[1],1-t.bary[0]-t.bary[1]};
+    Vec3 p{},n{};for(int k=0;k<3;++k){auto v=m.indices.at(at+k);p=p+m.positions.at(v)*w[k];n=n+m.normals.at(v)*w[k];}
+    return {p,normalized(n)};
+  }
+};
+std::shared_ptr<const PaintedMesh::Evaluation> PaintedMesh::evaluate(std::shared_ptr<const Mesh> mesh,const std::function<bool()> &cancelled)const {
+  if(!mesh)throw std::invalid_argument("Missing evaluated paint surface");
+  mesh->validate();const auto &rest=surface_->mesh;
+  if(mesh->indices!=rest.indices||mesh->positions.size()!=rest.positions.size()||mesh->normals.size()!=rest.normals.size()||mesh->uv!=rest.uv||mesh->uv_pins!=rest.uv_pins||mesh->uv_seams!=rest.uv_seams)
+    throw std::invalid_argument("Evaluated painting requires the exact original triangle and UV identities");
+  auto result=std::make_shared<Evaluation>();result->source=surface_;result->geometry=std::move(mesh);result->bounds.resize(surface_->tiles.size());
+  for(size_t i=0;i<surface_->texels.size();++i){
+    if((i&255)==0&&cancelled&&cancelled())throw std::runtime_error("Evaluated paint preparation cancelled");
+    auto tile=(i/resolution()/32)*surface_->columns+(i%resolution()/32);
+    auto include=[&](const SurfaceMap::Texel &t){if(!t.covered)return;auto p=result->sample(t).first;auto &b=result->bounds.at(tile);b.lo=low(b.lo,p);b.hi=high(b.hi,p);};
+    include(surface_->texels[i]);if(auto linked=surface_->linked.find(uint32_t(i));linked!=surface_->linked.end())for(auto at=linked->second.first;at!=UINT32_MAX;at=surface_->extra[at].next)include(surface_->extra[at].texel);
+  }
+  return result;
+}
+void PaintedMesh::stamp_evaluated(const Brush &b,const PaintSettings &settings,const Evaluation &evaluation,const std::function<bool()> &cancelled){
+  if(evaluation.source!=surface_)throw std::invalid_argument("Evaluated painting source changed");
+  stamp_sampled(b,settings,{},cancelled,&evaluation);
+}
 PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r):PaintedMesh(std::move(mesh),r,{}){}
 PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options) {
   if (r < 64 || r > 2048 || (r & (r - 1)))
@@ -433,7 +461,9 @@ bool PaintedMesh::pending_changes() const {
 void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
   stamp_sampled(b,settings,{});
 }
-void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,const PaintSampler &sampler) {
+void PaintedMesh::stamp(const Brush &b,const PaintSettings &settings,const std::function<bool()> &cancelled) {stamp_sampled(b,settings,{},cancelled);}
+void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,const PaintSampler &sampler,const std::function<bool()> &cancelled,const Evaluation *evaluation) {
+  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Paint stroke cancelled");};stop();
   settings.validate();
   if (!editing_)
     throw std::logic_error("Begin the paint stroke first");
@@ -457,7 +487,8 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
   size_t candidate_checks=0;
   try {
     for (size_t tile = 0; tile < l.tiles.size(); ++tile) {
-      auto bounds = surface_->tiles[tile];
+      stop();
+      auto bounds = evaluation?evaluation->bounds[tile]:surface_->tiles[tile];
       if (bounds.hi.x < lo.x || bounds.hi.y < lo.y || bounds.hi.z < lo.z ||
           bounds.lo.x > hi.x || bounds.lo.y > hi.y || bounds.lo.z > hi.z)
         continue;
@@ -474,10 +505,13 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
           uint32_t selected_face=UINT32_MAX;auto selected=settings;
           auto consider=[&](const SurfaceMap::Texel &candidate){
             if(!candidate.covered)return;
+            if((candidate_checks&255)==0)stop();
             if(++candidate_checks>surface_->options.max_candidate_checks)throw std::length_error("Paint candidate work budget exceeded");
-            if(settings.front_only&&dot(candidate.normal,n)<=.05f)return;
-            float u=axis2>1e-20f?std::clamp(dot(candidate.position-b.from,axis)/axis2,0.f,1.f):0;
-            float d=length(candidate.position-(b.from+axis*u));
+            auto evaluated=evaluation?evaluation->sample(candidate):std::pair{candidate.position,candidate.normal};
+            auto position=evaluated.first,normal=evaluated.second;
+            if(settings.front_only&&dot(normal,n)<=.05f)return;
+            float u=axis2>1e-20f?std::clamp(dot(position-b.from,axis)/axis2,0.f,1.f):0;
+            float d=length(position-(b.from+axis*u));
             if(d>=radius||d>distance+1e-7f||(std::abs(d-distance)<=1e-7f&&candidate.face>=selected_face))return;
             auto value=settings;float opacity=1;
             if(sampler){auto sample=sampler(candidate.position,candidate.normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
@@ -540,6 +574,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
         changed = true;
       }
     }
+    stop();
   } catch (...) {
     l.tiles = std::move(prior);
     throw;

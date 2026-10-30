@@ -106,8 +106,12 @@ public:
   void delete_layer();
   void layer_properties(std::string, bool visible, float opacity);
   void move_layer(int direction);
+  struct Evaluation;
+  std::shared_ptr<const Evaluation> evaluate(std::shared_ptr<const Mesh>, const std::function<bool()> &cancelled = {}) const;
+  void stamp_evaluated(const Brush &, const PaintSettings &, const Evaluation &, const std::function<bool()> &cancelled = {});
   void begin_stroke();
   void stamp(const Brush &, const PaintSettings &);
+  void stamp(const Brush &, const PaintSettings &, const std::function<bool()> &cancelled);
   void stamp_projection(const Brush &, const PaintSettings &, const PaintProjection &);
   bool end_stroke();
   void cancel_stroke();
@@ -139,7 +143,7 @@ private:
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
-  void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &);
+  void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &, const std::function<bool()> &cancelled = {}, const Evaluation * = nullptr);
   struct SurfaceMap;
   struct CompositeCache;
   std::shared_ptr<const TextureMaps> build_composite(const Material &) const;
