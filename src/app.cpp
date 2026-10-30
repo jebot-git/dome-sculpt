@@ -13,6 +13,7 @@
 #include "skin-editor.hpp"
 #include "sculpt-editor.hpp"
 #include "resolution-editor.hpp"
+#include "import-editor.hpp"
 #include "paint-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
@@ -895,8 +896,11 @@ struct App {
         dirty = false;
       }
     } else if (label == "Import mesh...") {
-      auto path = fl_file_chooser("Import static mesh", "*.{obj,gltf,glb}", nullptr);
-      if (path) canvas.document.import_asset(path);
+      auto selected = fl_file_chooser("Import model", "*.{obj,fbx,gltf,glb,vrm}", nullptr);
+      if(selected){std::filesystem::path path(selected);
+        if(auto options=import_options_dialog(path,canvas.document.import_settings()))
+          canvas.document.import_asset(path,*options);
+      }
     } else if (label == "Open...") {
       if (!discard())
         return;

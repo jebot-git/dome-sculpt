@@ -26,6 +26,7 @@ int main(int argc, char **argv) try {
     for (int k = 0; k < 4; ++k)
       b.push_back(uint8_t(x >> (8 * k)));
   };
+  for (const auto *format : {".glb", ".gltf"})
   for (const auto *alpha : {"OPAQUE", "MASK", "BLEND"})
     for (float weight : {0.f, .65f}) {
       auto json = source;
@@ -46,10 +47,14 @@ int main(int argc, char **argv) try {
       word(bytes, 0x004e4942);
       bytes.insert(bytes.end(), binary.begin(), binary.end());
       auto path = directory /
-                  (std::string(alpha) + "-" + std::to_string(weight) + ".glb");
+                  (std::string(alpha) + "-" + std::to_string(weight) + format);
       {
         std::ofstream file(path, std::ios::binary);
-        file.write(reinterpret_cast<const char *>(bytes.data()), bytes.size());
+        if(std::string_view(format)==".gltf"){
+          auto resource=path.filename().string()+".bin";json["buffers"][0]["uri"]=resource;
+          file<<json.dump();std::ofstream data(directory/resource,std::ios::binary);
+          data.write(reinterpret_cast<const char*>(binary.data()),binary.size());
+        }else file.write(reinterpret_cast<const char *>(bytes.data()), bytes.size());
       }
       ImportAuthoringOptions options;
       options.paint_resolution = 64;
@@ -66,10 +71,10 @@ int main(int argc, char **argv) try {
       auto expected = read();
       int error = delta(actual, expected);
       std::cout << "PIXEL " << alpha << " morph=" << weight
-                << " maxError=" << error << std::endl;
+                << " format="<<format<< " maxError=" << error << std::endl;
       check(error <= 2, "Imported original PBR/normal/linearRGBA/alpha with "
                         "POSITION-NORMAL-TANGENT morphs matches independently "
-                        "parsed original GLB pixels");
+                        "parsed original GLB/glTF resource pixels");
     }
   std::cout << checks << " imported source pixel checks passed" << std::endl;
 } catch (const std::exception &e) {

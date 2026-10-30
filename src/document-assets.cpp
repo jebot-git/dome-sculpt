@@ -3,6 +3,7 @@
 #include "dome/import.hpp"
 #include "dome/import-authoring.hpp"
 #include "dome/mesh-authoring.hpp"
+#include "text-utf8.hpp"
 namespace dome {
 SceneDraft Document::draft_scene() const {
   std::lock_guard lock(model_mutex_);
@@ -65,16 +66,25 @@ void Document::queue_voxel_sculpt_locked(float world_voxel_mm, AssetSource expec
     create_voxel_sculpt(scene, world_voxel_mm, cancelled);
   }, expected, {});
 }
-void Document::import_asset(const std::filesystem::path &path, uint32_t resolution) {
-  if (resolution < 64 || resolution > 2048 || (resolution & (resolution - 1)))
-    throw std::invalid_argument("Invalid paint resolution");
+void Document::import_asset(const std::filesystem::path &path,uint32_t resolution) {
+  ImportSettings settings;settings.paint_resolution=resolution;import_asset(path,settings);
+}
+void Document::import_asset(const std::filesystem::path &path,const ImportSettings &settings) {
+  settings.validate();std::lock_guard lock(model_mutex_);import_asset_locked(path,settings);
+}
+void Document::import_asset_locked(const std::filesystem::path &path,const ImportSettings &settings) {
+  settings.validate();
   auto report = std::make_shared<std::string>();
-  queue_scene_operation("Import mesh", [path, resolution, report](Scene &scene, const auto &cancelled) {
-    ImportAuthoringOptions options;options.paint_resolution=resolution;options.limits.cancelled=cancelled;
+  auto view=import_view_?std::make_shared<ImportView>(*import_view_):nullptr;
+  if(view)view->settings=settings;
+  queue_scene_operation_locked("Import mesh", [path, settings, report](Scene &scene, const auto &cancelled) {
+    ImportAuthoringOptions options;options.paint_resolution=settings.paint_resolution;options.choices=settings.choices;options.limits.cancelled=cancelled;
     auto prepared=prepare_authoring_import(scene,path,std::move(options));
-    for(size_t i=0;i<std::min<size_t>(prepared.diagnostics.size(),8);++i){if(!report->empty())*report+="; ";*report+=prepared.diagnostics[i].substr(0,200);}
+    for(size_t i=0;i<std::min<size_t>(prepared.diagnostics.size(),8);++i){if(!report->empty())*report+="; ";*report+=text::utf8_prefix(prepared.diagnostics[i],200);}
     if(prepared.diagnostics.size()>8)*report+="; additional import diagnostics omitted";
     scene=std::move(prepared.scene);
   }, {}, report);
+  import_settings_=settings;
+  if(view){import_view_=std::move(view);publish_locked(false,false);}
 }
 } // namespace dome

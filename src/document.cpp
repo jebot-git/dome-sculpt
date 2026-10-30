@@ -432,6 +432,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     ++state_.revision;
   }
   state_.project_path = path_;
+  state_.importing = import_view_;
   state_.active_object = scene_.active().id;
   state_.objects.clear();
   for (auto &o : scene_.objects())
@@ -586,7 +587,8 @@ void Document::finish_locked() {
     throw std::logic_error("Apply or cancel retopology before changing the document");
   // Starting another command may accept scalar property previews, but must
   // not implicitly execute an action such as creating a remeshed object.
-  finish_control_locked(state_.controls.parameter != VrParameter::SculptResolution &&
+  finish_control_locked(state_.controls.parameter != VrParameter::ImportUnitScale &&
+                        state_.controls.parameter != VrParameter::SculptResolution &&
                         state_.controls.parameter != VrParameter::VoxelSize &&
                         state_.controls.parameter != VrParameter::RigRotation &&
                         state_.controls.parameter != VrParameter::MorphWeight &&
@@ -628,6 +630,7 @@ void Document::replace_locked(Scene next, bool clean) {
   redo_.clear();
   path_.clear();
   ++state_.generation;
+  ++import_request_;import_view_.reset();
   if (recovery_) {
     recovery_source_ = {new_recovery_id(), state_.generation, {}};
     recovery_->set_source(recovery_source_);
@@ -1166,7 +1169,7 @@ void Document::process_locked(const SpatialFrame &f) {
     state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork)) finish_locked();
     command_locked(*c);
   }
@@ -1633,6 +1636,7 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(parameter==VrParameter::ImportUnitScale)return import_view_&&!import_view_->busy&&!state_.asset_busy&&!state_.recovery_busy&&!action_active_locked()&&!state_.cut&&!state_.retopology;
   if(parameter==VrParameter::CutOffset||parameter==VrParameter::CutDirection||parameter==VrParameter::CutCapColor)
     return state_.cut&&cut_bake_source_&&!state_.cut->committing&&!state_.asset_busy;
   if(state_.cut)return false;
@@ -1684,6 +1688,12 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::ImportUnitScale){
+    if(accept&&import_view_){auto next=std::make_shared<ImportView>(*import_view_);
+      if(control_changed_)next->settings.choices.custom_metres_per_unit=state_.controls.value[0];
+      next->settings.choices.units=ImportUnits::Custom;next->settings.validate();import_view_=std::move(next);}
+    control_before_.reset();control_changed_=false;state_.controls={};return;
+  }
   if(state_.controls.parameter==VrParameter::CutOffset||state_.controls.parameter==VrParameter::CutDirection||state_.controls.parameter==VrParameter::CutCapColor){
     finish_cut_parameter_locked(accept);return;
   }
@@ -1876,6 +1886,9 @@ void Document::control_event_locked(VrControlEvent event) {
       return;
     }
     switch (event.parameter) {
+    case VrParameter::ImportUnitScale:
+      c.title="Input metres per unit";c.minimum=1e-12f;c.maximum=1e12f;c.logarithmic=true;
+      c.value[0]=std::clamp(float(import_view_->settings.choices.custom_metres_per_unit),c.minimum,c.maximum);break;
     case VrParameter::CutOffset:
       control_cut_settings_=cut_settings_;c.title="Cut offset (document mm)";
       c.minimum=-state_.cut->offset_limit_mm;c.maximum=state_.cut->offset_limit_mm;c.value[0]=cut_settings_.offset_mm;break;
@@ -2104,6 +2117,8 @@ void Document::control_event_locked(VrControlEvent event) {
     else settings.cap_material.color=c.value;
     edit_cut_locked(std::move(settings),false);break;
   }
+  case VrParameter::ImportUnitScale:
+    control_changed_=true;break;
   case VrParameter::SculptResolution:
   case VrParameter::SculptMaskMode:
   case VrParameter::SculptMaskStrength:
@@ -2232,6 +2247,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(import_command(command))return import_command_enabled_locked(command);
   if(command==SpatialCommand::CutBegin)return state_.can_cut;
   if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
     if(!state_.cut||control_before_)return false;
@@ -2407,6 +2423,7 @@ void Document::sculpt_command(SpatialCommand command) {
   publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(import_command(command)){import_command_locked(command);return;}
   if(command==SpatialCommand::CutBegin){begin_cut_locked();return;}
   if(command>=SpatialCommand::CutHand&&command<=SpatialCommand::CutCancel){
     if(!command_enabled_locked(command))return;
@@ -2817,6 +2834,7 @@ void Document::file_loop() {
       files_.pop_front();
     }
     try {
+      if(job->discover_import){discover_import_file(*job);continue;}
       if(job->native_capture)capture_native_file(*job);
       if(job->capture_scene){job->scene=job->capture_scene->snapshot();job->scene.select(job->object);job->capture_scene.reset();}
       if (job->open_project) {
@@ -3012,6 +3030,7 @@ void Document::file_loop() {
       if (job->completion)
         job->completion->set_value();
     } catch (const std::exception &e) {
+      if(job->discover_import){import_listing_error(*job,e);continue;}
       std::lock_guard lock(model_mutex_);
       if (job->discover_recovery) {
         state_.recovery_busy = false;

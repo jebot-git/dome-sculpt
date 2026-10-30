@@ -52,10 +52,11 @@ OBJ/FBX normals receive an explicitly diagnosed flat canonical normal; raw
 absence remains retained. This does not remove the normative missing-NORMAL
 glTF guard. PNG/JPEG texture bytes remain encoded in source/canonical storage;
 native bounded decoders produce RGBA with role-specific sRGB/linear meaning
-left to materials. JPEG warnings/truncation fail across a C error boundary,
+left to materials. JPEG warnings/truncation and excessive progressive scans (over64) fail across a C error boundary,
 which never longjmps through C++ destructors.
 
-Required work still includes real shared FLTK/XR import options, explicit
+The shared FLTK/XR options continuation is described in IMPORT-OPTIONS.md.
+Required work still includes explicit
 glTF flat/smooth overrides and FBX authored skin/blend-shape conversion,
 extended/packed/transformed material roles, general affine node authoring,
 source-linked rig graph, generated-flat glTF policy, PBR UV1 sampling, COLOR/UV
@@ -72,6 +73,7 @@ all declared mtllib files are captured into a memory-only parser input, with
 ambiguous repeated material names refused. Cases include real detached
 OBJ/ASCII FBX/glTF authoring with Scene11 save/restart, independent low-level
 canonical parse, units/hierarchy/instances/MTL, JPEG errors/quotas, confined paths,
-exact resource retention and source replacement. Sanitizer qualification and
-native/graphics/options consumer tests are subsequent; this paragraph does not
-claim them yet.
+exact resource retention and source replacement. Fresh C/C++ whole-core ASan/UBSan/leaks subsequently passed the three focused
+source/import/skin suites and the45-check optional binary fixture on ac1b7a8.
+The options/unit/N-gon continuation has separate proof in IMPORT-OPTIONS.md and
+its checkpoint manifest.

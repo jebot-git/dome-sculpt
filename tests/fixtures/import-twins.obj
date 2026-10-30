@@ -1,0 +1,8 @@
+# Original de-xr native import test geometry
+v 0 0 0
+v 1000 0 0
+v 0 1000 0
+o One
+f 1 2 3
+o Two
+f 1 2 3
