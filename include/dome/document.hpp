@@ -18,6 +18,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <future>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <span>
@@ -629,6 +630,22 @@ private:
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.
   std::array<std::shared_ptr<ExportWork>,9> exports_{};
+  struct WorkerNotice {
+    std::exception_ptr error;
+    std::shared_ptr<const EditorState> publication;
+    std::shared_ptr<std::promise<void>> completion;
+    std::string label;
+    uint64_t generation=0,import_request=0,cut_session=0,retopo_session=0;
+    bool input=false,discover_import=false,discover_recovery=false,cancelled=false,held_weight=false,export_job=false;
+  };
+  // Two bounded per-worker error records, no Scene/mesh copies. Failed UI
+  // publication retries off the UI thread; promises keep original exceptions.
+  std::array<std::optional<WorkerNotice>,2> worker_notices_;
+  std::atomic_bool worker_notices_pending_{false},input_notice_pending_{false},worker_completion_pending_{false};
+  void input_worker_error_locked(std::exception_ptr) noexcept;
+  void file_worker_error_locked(FileJob &,std::exception_ptr) noexcept;
+  void retry_worker_notices_locked(bool input=false) noexcept;
+  void signal_worker_notices_locked() noexcept;
   std::atomic<std::shared_ptr<AssetWork>> asset_work_;
   mutable std::mutex file_mutex_;
   mutable std::condition_variable file_changed_;
