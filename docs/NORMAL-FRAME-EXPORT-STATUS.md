@@ -1,8 +1,8 @@
-# Private retained-frame export progress
+# Retained-frame export implementation and remaining work
 
-This prototype is partial progress toward complete deforming glTF/VRM authoring.
-It is not published, does not enable the live Source UV Apply control, and does
-not reinterpret the published Scene8/material-archive1 derivative normal data.
+This milestone is partial progress toward complete deforming glTF/VRM authoring.
+It does not enable the live Source UV Apply control or reinterpret the legacy
+Scene8/material-archive1 derivative normal data.
 Its optional retained-frame data is explicitly Scene9/material-archive2.
 
 The native worker retains independent original PBR, original MToon and native

@@ -213,7 +213,8 @@
   "domed_latest_check": {
     "commit": "282467e727df78c8e7f2452aa05a7747bac854a6",
     "fltk_patch_changes_since_742d009": true,
-    "used": "Canonical remote main rechecked during merge; clean source worktree. Updated Release FLTK and compositor builds and matching GUI/Wayland verification are recorded separately in TOOLKIT.md and VALIDATION.md."
+    "used": "RemoteHEAD rechecked before this publication; unchanged282467e. Canonical optimized FLTK1.4.5+22 patches and frozen compositor with current native/Wayland validation are recorded in TOOLKIT.md and VALIDATION.md.",
+    "checked_utc": "2026-10-30T05:37:33.375266+00:00"
   },
   "mtoon": {
     "implementation": "src/mtoon.cpp; include/dome/mtoon-shader.hpp",
@@ -250,5 +251,15 @@
       "src/mesh/Field.cpp": "a629363737635b9004a57fd2b90ce3b05fd4a8c6e0a1a8d7ce334b1ecd80336a",
       "evaluated": "StructuredField object-local grid spacing, trilinear scalar interpolation and explicit outside-value convention. Native sparse support/transaction/quality policy is independent."
     }
+  },
+  "cuda_optional_toolchain": {
+    "release": "13.4.1",
+    "compiler": "NVCC13.4.59",
+    "host": "GCC16.2.1",
+    "manifest": "docs/validation/CUDA-13.4.1-TOOLCHAIN.json",
+    "manifest_sha256": "f388a20d203fa4e10c69841367a1db845bd3e9de7510231a2cd6612319fca642",
+    "source": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.4.1.json",
+    "used": "Optional user-local development compiler/runtime, not vendored application code or a driver. Full optimized native FLTK/OpenXR build, requiredC++20,compute86/sm86 and explicit nonempty missing-GPU failure verified. Actual NVIDIA numerical/device execution remains required.",
+    "license": "Each NVIDIA component license is retained under the staged toolkit licenses directory. No toolkit binaries are committed."
   }
 }
