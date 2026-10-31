@@ -1,10 +1,21 @@
 # Worker recovery, cancellable exports and polygon/color authoring
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
-remains active. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
+remains incomplete and is **paused at the user's request**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Current integration
+
+The user passed the physical headset test of combined candidate
+`993e8af7ebc247e3239df3a1acd27fc47fb8e999` on 2026-10-30 and designated it a
+viable candidate for further implementation. The test ended gracefully and its
+project was saved. The optimized candidate passed all247 configured Release
+suites and24 selected sanitizer suites before launch. Its sources remain on
+the private local `work/production-authoring-c1` branch; public main has not
+adopted those combined product changes. Read HEADSET-CANDIDATE-993e8af.md and
+validation/HEADSET-CANDIDATE-993e8af.json before resuming. All agents are idle;
+do not resume development until the user requests it. The notes below describe
+the published baseline and historical component work, not the final candidate.
 
 Product sources21e140e +c166f3b (primary0a19281 +5916801) repair pinned JSON
 binary factories and nine null-to-container promotions that could terminate
@@ -59,7 +70,7 @@ shapekey/device requirements. Accepted snapshot exports retain close/drain
 semantics alongside explicit cancellation. Do not wire shutdown or ordinary
 internal authoring cancellation into accepted output.
 
-## Active delegated work
+## Historical delegated work before the combined candidate
 
 - merge_contracts: full Scene12 polygon workflow is integrated. Private frozen
   consumer14ca381 is qualified; private Scene14 product0c890a8 implements durable
@@ -87,9 +98,10 @@ Scene13/14/15/16 are coordinated private feature minima, not published archive
 support. Preserve recursive source-feature checks, all retained-source edges,
 aggregate budgets and existing normal/color authority when combining them.
 
-Only the old8f4d67d rudimentary milestone has physical headset confirmation. The
-user ended that test. Synthetic/runtime/GPU fixtures are separate evidence; no
-new HMD launch, system installation or active-session restart occurred. DomeD
+Both old8f4d67d and candidate993e8af have user-confirmed physical headset tests.
+Candidate993e8af is viable for continued implementation; this does not complete
+the production requirements. Synthetic/runtime/GPU fixtures remain separate
+evidence. No system installation or active-session restart occurred. DomeD
 main was rechecked at3024fb6; current FLTK1.4.5+23/native BDF/PCF inputs remain in
 TOOLKIT.md. Native/Wayland tests explicitly use the private **lib** prefixes.
 
