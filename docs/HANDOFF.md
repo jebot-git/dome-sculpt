@@ -1,4 +1,4 @@
-# Worker recovery, cancellable exports and polygon/color authoring
+# Controller selection on the viable authoring candidate
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **paused at the user's request**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
@@ -6,16 +6,37 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Current integration
 
+The focused selection request is implemented by `3cb4517` and `f3f9199` on
+the user-passed candidate. The first XR menu page has a Selection toggle;
+either controller can touch or point and trigger to select, and either grip
+modifies membership. Selected objects remain solid; unselected visible objects
+remain at 18% opacity. The XR hierarchy synchronizes groups, active/multiselected
+objects, collapse, paging and visibility undo. All controller events retain
+release/focus guards and editing authority. Closed hierarchies are not rebuilt;
+group memberships use bounded traversal. Read XR-OBJECT-SELECTION.md and
+validation/XR-OBJECT-SELECTION.json.
+
+The coherent optimized Release passes all 250 configured CPU suites in 269.88s.
+Nine selected own-core/render/support ASan/UBSan/leak suites pass in 1.21s;
+native selection has 182 checks including 140 allocation-failure prefixes.
+Actual native FLTK/DBusMenu workflows pass 12 normal + 12 compact checks.
+Actual OpenXR loader/GL fixtures pass 11 software + 11 Arc checks, and seven
+Arc renderer checks verify uniform-only selection/ghost presentation without
+geometry readbacks. Tracking in these fixtures is synthetic. This selection
+change has not received a new physical headset test. No system installation or
+session restart occurred. The broader production goal remains paused; all
+agents are idle. Resume development only when the user requests it.
+
 The user passed the physical headset test of combined candidate
 `993e8af7ebc247e3239df3a1acd27fc47fb8e999` on 2026-10-30 and designated it a
 viable candidate for further implementation. The test ended gracefully and its
 project was saved. The optimized candidate passed all247 configured Release
-suites and24 selected sanitizer suites before launch. Its sources remain on
-the private local `work/production-authoring-c1` branch; public main has not
-adopted those combined product changes. Read HEADSET-CANDIDATE-993e8af.md and
-validation/HEADSET-CANDIDATE-993e8af.json before resuming. All agents are idle;
-do not resume development until the user requests it. The notes below describe
-the published baseline and historical component work, not the final candidate.
+suites and24 selected sanitizer suites before launch. Preserve the local
+`work/production-authoring-c1` branch, binary and saved session as the physical
+baseline. This milestone publishes its combined sources with the qualified
+selection extension. Read HEADSET-CANDIDATE-993e8af.md and its validation receipt
+for the earlier test's exact scope. The component notes below are historical;
+their narrower proofs do not replace the current integration receipt.
 
 Product sources21e140e +c166f3b (primary0a19281 +5916801) repair pinned JSON
 binary factories and nine null-to-container promotions that could terminate
@@ -94,9 +115,10 @@ internal authoring cancellation into accepted output.
   connects the ordered native worker to desktop/controller strokes; it remains
   private and needs its own GUI/graphical/sanitizer and joint-integration proof.
 
-Scene13/14/15/16 are coordinated private feature minima, not published archive
-support. Preserve recursive source-feature checks, all retained-source edges,
-aggregate budgets and existing normal/color authority when combining them.
+Scene13/14/15/16 are combined in the published candidate lineage. Preserve
+recursive source-feature checks, all retained-source edges, aggregate budgets
+and normal/color authority. The unfinished import, prepared-normal/shape and
+current-color cut/bake adapters remain separate private work with guards intact.
 
 Both old8f4d67d and candidate993e8af have user-confirmed physical headset tests.
 Candidate993e8af is viable for continued implementation; this does not complete

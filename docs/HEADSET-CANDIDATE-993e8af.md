@@ -8,8 +8,10 @@ The tested source is `993e8af7ebc247e3239df3a1acd27fc47fb8e999`, branch
 `work/production-authoring-c1`, local worktree
 `artifacts/production-authoring-c1`. Its tracked files were clean at launch and
 when recording the result. Preserve this branch and its optimized binary.
-The combined product changes have not been merged into public main; publishing
-this receipt does not publish or install that candidate.
+At the time this test was recorded in `b075982`, the combined sources remained
+private. The later XR selection milestone publishes a descendant; see
+XR-OBJECT-SELECTION.md. This original binary and physical test remain the
+baseline, and no system installation is implied.
 
 The coherent optimized Release build passed all247 configured CPU regression
 suites in383.34s. The selected own-core/render/support ASan/UBSan suites passed
