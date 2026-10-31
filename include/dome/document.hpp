@@ -5,6 +5,7 @@
 #include "navigation.hpp"
 #include "recovery.hpp"
 #include "scene.hpp"
+#include "object-selection.hpp"
 #include "bake-authoring.hpp"
 #include "uv.hpp"
 #include "weight-authoring.hpp"
@@ -49,6 +50,8 @@ struct ObjectInfo {
   bool editable = true, ghost = false;
   CanvasTransform world_transform{};bool world_transform_valid=false;
   std::optional<AffineTransform> affine_world;
+  bool selected=false, active=false, hovered=false;
+  uint32_t selection_accent=0x6babff;
 };
 struct AssetWork {
   std::atomic_bool cancelled{false};
@@ -127,6 +130,16 @@ struct EditorState {
   int opacity = 255;
   bool object_grab_mode=false, isolate_held=false, object_grabbing=false;
   uint64_t held_object=0, edit_authority=1;
+  bool selection_mode=false, selection_focus=false, hierarchy_open=false, can_select_objects=false;
+  std::vector<uint64_t> selected_objects, collapsed_groups;
+  std::vector<ObjectHierarchyRow> hierarchy;
+  size_t hierarchy_offset=0;
+  CanvasTransform hierarchy_panel{};
+  bool hierarchy_anchored=false;
+  std::array<uint64_t,2> selection_hover{};
+  std::array<Vec3,2> selection_hit{}; // Canvas coordinates; immutable input result.
+  std::array<int,2> hierarchy_hover{-1,-1};
+  std::array<bool,2> selection_pressed{true,true}, selection_release{true,true};
   std::shared_ptr<const PolygonView> polygon, polygon_handoff;
   uint64_t polygon_object = 0, polygon_handoff_object = 0,
       polygon_handoff_generation = 0, polygon_handoff_revision = 0;
@@ -214,6 +227,12 @@ public:
   void duplicate_object();
   void delete_object();
   void select_object(uint64_t);
+  void configure_selection(bool);
+  void select_objects(std::span<const uint64_t>, ObjectSelection=ObjectSelection::Replace,
+                      AssetSource expected={});
+  void select_group(uint64_t, ObjectSelection=ObjectSelection::Replace, AssetSource expected={});
+  void show_object_hierarchy(bool);
+  void focus_selection(bool);
   void object_properties(uint64_t, std::string, bool visible, bool locked,
                          CanvasTransform, Material, AssetSource expected = {});
   bool object_editable(uint64_t) const;
@@ -694,6 +713,12 @@ private:
   void prepare_locked(uint32_t);
   void finish_locked();
   void process_locked(const SpatialFrame &);
+  bool selection_ready_locked() const;
+  void configure_selection_locked(bool);
+  void select_objects_locked(std::span<const uint64_t>,ObjectSelection,AssetSource={});
+  void select_group_locked(uint64_t,ObjectSelection,AssetSource={});
+  bool process_object_selection_locked(const SpatialFrame &);
+  void selection_hierarchy_locked();
   void file_locked(bool export_mesh, AssetExportFormat = AssetExportFormat::Glb);
   void queue_export_locked(FileJob);
   void retire_export_locked(const std::shared_ptr<ExportWork> &) noexcept;

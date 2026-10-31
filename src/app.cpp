@@ -516,6 +516,9 @@ struct App {
     menu.add("&Scene/&Visible", 0, command, this,
              FL_MENU_TOGGLE | FL_MENU_VALUE);
     menu.add("&Scene/&Locked", 0, command, this, FL_MENU_TOGGLE);
+    menu.add("&Scene/VR selection mode",0,command,this,FL_MENU_TOGGLE);
+    menu.add("&Scene/XR object hierarchy",0,command,this,FL_MENU_TOGGLE);
+    menu.add("&Scene/Focus selected objects",0,command,this,FL_MENU_TOGGLE);
     menu.add("&Scene/Object grab mode",0,command,this,FL_MENU_TOGGLE);
     menu.add("&Scene/Hold selected object",0,command,this);
     menu.add("&Scene/Release held object",0,command,this);
@@ -728,6 +731,9 @@ struct App {
       checked("&Scene/&Visible", active->visible);
       checked("&Scene/&Locked", active->locked);
     }
+    checked("&Scene/VR selection mode",s->selection_mode);checked("&Scene/XR object hierarchy",s->hierarchy_open);checked("&Scene/Focus selected objects",s->selection_focus);
+    enable("&Scene/VR selection mode",s->can_select_objects);
+    enable("&Scene/Focus selected objects",s->can_select_objects);
     checked("&Scene/Object grab mode",s->object_grab_mode);checked("&Scene/Ghost other objects",s->isolate_held);
     enable("&Scene/Object grab mode",!modal);enable("&Scene/Ghost other objects",!modal);
     enable("&Scene/Hold selected object",!modal&&active!=s->objects.end()&&active->visible&&!active->locked);
@@ -1120,6 +1126,9 @@ struct App {
       if(options)canvas.document.change_sculpt_resolution(std::move(*options),draft.source);
     } else if (label == "Voxel remesh...") {
       edit_voxel_remesh(canvas.document);
+    } else if(label=="VR selection mode"){canvas.document.configure_selection(!canvas.document.frame().state->selection_mode);
+    } else if(label=="XR object hierarchy"){canvas.document.show_object_hierarchy(!canvas.document.frame().state->hierarchy_open);
+    } else if(label=="Focus selected objects"){canvas.document.focus_selection(!canvas.document.frame().state->selection_focus);
     } else if(label=="Object grab mode"){
       auto s=canvas.document.frame().state;canvas.document.configure_object_grab(!s->object_grab_mode,s->isolate_held);
     } else if(label=="Ghost other objects"){

@@ -107,6 +107,42 @@ void SpatialPalette::raster(const EditorState &s) {
     }
   };
   rect(0, 0, width_, height_, bg);
+  auto button=[&](float left,float top,float width,float height,const std::string &label,bool selected=false,bool disabled=false){
+    rect(int(left*width_),int(top*height_),int(width*width_),int(height*height_),selected?accent:(s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)}));
+    text(int((left+width*.5f)*width_),int((top+height*.5f)*height_)+pixels_/3,label,disabled?Color{140,140,140,255}:fg,int(width*width_)-12*unit_);
+  };
+  if(!s.menu&&s.hierarchy_open){
+    button(.02f,.02f,.30f,.08f,s.selection_mode?"Selection ON":"Selection OFF",s.selection_mode,!s.can_select_objects);
+    button(.34f,.02f,.48f,.08f,s.selection_focus?"Unselected: ghosts":"All objects solid",s.selection_focus,!s.can_select_objects);
+    button(.85f,.02f,.13f,.08f,"Close");
+    button(.02f,.12f,.47f,.08f,"Select visible");button(.51f,.12f,.47f,.08f,"Deselect all");
+    text(320*unit_,145*unit_,"Scene hierarchy / "+std::to_string(s.selected_objects.size())+" selected",fg);
+    for(size_t slot=0;slot<object_outliner::page_rows;++slot){
+      size_t index=s.hierarchy_offset+slot;if(index>=s.hierarchy.size())break;
+      const auto &row=s.hierarchy[index];float top=object_outliner::first+slot*object_outliner::row_height;
+      bool hover=s.hierarchy_hover[0]==int(index)||s.hierarchy_hover[1]==int(index);
+      Color fill=row.selected?accent:row.partial?Color{75,94,116,uint8_t(s.opacity)}:bg;
+      if(hover&&!row.selected)fill=s.light?Color{185,198,215,uint8_t(s.opacity)}:Color{66,79,96,uint8_t(s.opacity)};
+      rect(12*unit_,int(top*height_),616*unit_,int(object_outliner::row_height*height_)-2*unit_,fill);
+      int baseline=int((top+object_outliner::row_height*.5f)*height_)+pixels_/3;
+      if(row.group)text(42*unit_,baseline,row.expanded?"v":">",fg,32*unit_);
+      const int left=(row.group?65:42)*unit_+std::min(row.depth,12u)*18*unit_;
+      int room=std::max(20*unit_,520*unit_-left);
+      std::string name=(row.active&&row.selected?"* ":row.group?"[+] ":" ")+row.name;
+      text(left+room/2,baseline,name,fg,room);
+      if(!row.group){
+        if(row.locked)text(541*unit_,baseline,"L",fg,20*unit_);
+        text(600*unit_,baseline,row.visible?"[o]":"[-]",fg,48*unit_);
+      }
+    }
+    button(.02f,.84f,.47f,.08f,"Previous");button(.51f,.84f,.47f,.08f,"Next");
+    text(320*unit_,615*unit_,"Trigger selects / grip + trigger toggles",fg);
+    return;
+  }
+  if(s.menu_page==0&&s.controls.parameter==VrParameter::None){
+    button(.02f,.02f,.30f,.08f,s.selection_mode?"Selection ON":"Selection OFF",s.selection_mode,!s.can_select_objects);
+    button(.68f,.02f,.30f,.08f,"Hierarchy",s.hierarchy_open);
+  }
   if (s.controls.parameter == VrParameter::UvEdit && s.uv) {
     auto &v = *s.uv;
     auto &m = *v.mesh;
@@ -371,6 +407,7 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 7) return !s.weights.locks.empty() && s.weights.locks.at(s.rig_joint);
       if (sector == 9) return s.weights.linked;
     }
+    if(s.menu_page==0&&sector==11)return s.selection_mode;
     if (s.menu_page == 0 && sector < 4)
       return int(s.tool) == sector;
     if (s.menu_page == 1 && current != s.objects.end()) {
@@ -559,7 +596,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320 * unit_, 610 * unit_, s.message, fg);
 }
 void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
-  if (!s.menu)
+  if (!s.menu&&!s.hierarchy_open)
     return;
   std::string signature =
       s.font_file + std::to_string(s.font_pixels) +
@@ -575,6 +612,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_visible) +
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature+=":selection:"+std::to_string(s.can_select_objects)+":"+std::to_string(s.selection_mode)+":"+std::to_string(s.selection_focus)+":"+std::to_string(s.menu)+":"+std::to_string(s.hierarchy_open)+":"+std::to_string(s.hierarchy_offset)+":"+std::to_string(s.hierarchy_hover[0])+":"+std::to_string(s.hierarchy_hover[1]);
+  for(const auto &row:s.hierarchy)signature+=":"+std::to_string(row.id)+":"+std::to_string(row.group)+":"+std::to_string(row.depth)+":"+std::to_string(row.expanded)+":"+std::to_string(row.selected)+":"+std::to_string(row.partial)+":"+std::to_string(row.active)+":"+std::to_string(row.visible)+":"+std::to_string(row.locked)+":"+std::to_string(row.name.size())+":"+row.name;
   signature+=":polygon:"+std::to_string(s.polygon_requires_conversion)+":"+std::to_string(s.polygon_has_source)+":"+std::to_string(s.polygon_controls.move_mode)+":"+std::to_string(s.polygon_controls.additive)+":"+std::to_string(s.polygon_controls.distance_mm)+":"+std::to_string(s.polygon_controls.cuts);
   if(s.polygon)signature+=":"+std::to_string(s.polygon->revision)+":"+std::to_string(s.polygon->busy)+":"+std::to_string(s.polygon->committing)+s.polygon->error;
   signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
@@ -636,7 +675,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
                       GL_ONE_MINUS_SRC_ALPHA);
   glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_, "linearOutput"), linear_output_);
-  auto m = multiply(vp, model_matrix(s.panel));
+  auto m = multiply(vp, model_matrix(!s.menu&&s.hierarchy_open?s.hierarchy_panel:s.panel));
   glUniformMatrix4fv(glGetUniformLocation(program_, "matrix"), 1, GL_FALSE,
                      m.data());
   glUniform1i(glGetUniformLocation(program_, "image"), 0);

@@ -181,6 +181,24 @@ Vec3 closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
   double denom = 1 / (va + vb + vc);
   return a + ab * float(vb * denom) + ac * float(vc * denom);
 }
+std::array<float,3> closest_coordinates(Vec3 position,Vec3 a,Vec3 b,Vec3 c){
+  auto ab = b - a, ac = c - a, ap = position - a;
+  auto dp = [](Vec3 x, Vec3 y) {
+    return double(x.x) * y.x + double(x.y) * y.y + double(x.z) * y.z;
+  };
+  double aa = dp(ab, ab), cc = dp(ac, ac), xy = dp(ab, ac),
+         denom = aa * cc - xy * xy;
+  if (denom <= 0)
+    throw std::runtime_error("Ill-conditioned closest triangle");
+  double v = (cc * dp(ap, ab) - xy * dp(ap, ac)) / denom,
+         w = (aa * dp(ap, ac) - xy * dp(ap, ab)) / denom;
+  std::array<float, 3> bary = {float(std::max(0., 1 - v - w)),
+                               float(std::max(0., v)), float(std::max(0., w))};
+  float sum = bary[0] + bary[1] + bary[2];
+  for (auto &f : bary)
+    f /= sum;
+  return bary;
+}
 struct Bvh {
   const Mesh &m;
   std::vector<uint32_t> order;
@@ -274,6 +292,7 @@ struct Bvh {
         auto d = p - q;
         double distance = dot(d, d);
         if (distance < best) {
+          if(options.closest_filter&&!options.closest_filter(t,closest_coordinates(q,point(t,0),point(t,1),point(t,2))))continue;
           best = distance;
           triangle = t;
           position = q;
@@ -402,36 +421,29 @@ SurfaceQuery &SurfaceQuery::operator=(SurfaceQuery &&) noexcept = default;
 SurfaceHit SurfaceQuery::closest(Vec3 p) const { return closest(p, {}); }
 SurfaceHit SurfaceQuery::closest(Vec3 p,
                                  const SurfaceQueryOptions &options) const {
+  auto result=nearest(p,options);
+  if(!result)throw std::runtime_error("No eligible source surface triangle");
+  return *result;
+}
+std::optional<SurfaceHit> SurfaceQuery::nearest(Vec3 p,const SurfaceQueryOptions &options) const {
   cancel(options.cancelled);
   if (!options.max_triangle_tests || options.max_triangle_tests > 2'000'000)
     throw std::invalid_argument("Invalid closest surface query budget");
   if (!impl_ || !finite(p) ||
       std::max({std::abs(p.x), std::abs(p.y), std::abs(p.z)}) > 1000)
     throw std::invalid_argument("Invalid closest-surface query");
+  if(std::isnan(options.closest_maximum)||options.closest_maximum<=0)throw std::invalid_argument("Invalid closest surface range");
   uint32_t triangle = UINT32_MAX;
   Vec3 position;
   size_t visited = 0;
-  double d2 = impl_->tree.closest_hit(p, 0, INFINITY, triangle, position,
+  const double maximum=std::nextafter(double(options.closest_maximum*options.closest_maximum),INFINITY);
+  double d2 = impl_->tree.closest_hit(p, 0, maximum, triangle, position,
                                       options, visited);
   if (triangle == UINT32_MAX)
-    throw std::runtime_error("No eligible source surface triangle");
+    return {};
   auto a = impl_->tree.point(triangle, 0), b = impl_->tree.point(triangle, 1),
        c = impl_->tree.point(triangle, 2);
-  auto ab = b - a, ac = c - a, ap = position - a;
-  auto dp = [](Vec3 x, Vec3 y) {
-    return double(x.x) * y.x + double(x.y) * y.y + double(x.z) * y.z;
-  };
-  double aa = dp(ab, ab), cc = dp(ac, ac), xy = dp(ab, ac),
-         denom = aa * cc - xy * xy;
-  if (denom <= 0)
-    throw std::runtime_error("Ill-conditioned closest triangle");
-  double v = (cc * dp(ap, ab) - xy * dp(ap, ac)) / denom,
-         w = (aa * dp(ap, ac) - xy * dp(ap, ab)) / denom;
-  std::array<float, 3> bary = {float(std::max(0., 1 - v - w)),
-                               float(std::max(0., v)), float(std::max(0., w))};
-  float sum = bary[0] + bary[1] + bary[2];
-  for (auto &f : bary)
-    f /= sum;
+  auto bary=closest_coordinates(position,a,b,c);
   cancel(options.cancelled);
   return impl_->hit(triangle, position, bary, float(std::sqrt(d2)));
 }

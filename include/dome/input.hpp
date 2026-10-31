@@ -87,7 +87,8 @@ enum class SpatialCommand {
   PolygonAdditive, PolygonSelectAll, PolygonClear, PolygonExtrude, PolygonInset,
   PolygonBridge, PolygonDissolve, PolygonWeld, PolygonCutEdges, PolygonConnect,
   PolygonDelete, PolygonFlip, PolygonApply, PolygonCancel,
-  ShapeNew, ShapeCapture, ShapeDuplicate, ShapeMirror, ShapeSculpt
+  ShapeNew, ShapeCapture, ShapeDuplicate, ShapeMirror, ShapeSculpt,
+  SelectionMode, ObjectHierarchy, SelectionFocus
 };
 inline bool shape_command(SpatialCommand c){return c>=SpatialCommand::ShapeNew&&c<=SpatialCommand::ShapeSculpt;}
 inline bool polygon_command(SpatialCommand c){return c>=SpatialCommand::PolygonBegin&&c<=SpatialCommand::PolygonCancel;}

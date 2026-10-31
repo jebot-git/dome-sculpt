@@ -22,11 +22,12 @@ AffineTransform Document::object_world_matrix_locked(uint64_t id) const {
 bool Document::object_editable_locked(uint64_t id) const {
   auto found=std::find_if(scene_.objects().begin(),scene_.objects().end(),[&](const auto &o){return o.id==id;});
   return found!=scene_.objects().end() && found->visible && !found->locked &&
-    (!state_.isolate_held || !state_.held_object || state_.held_object==id);
+    (!state_.isolate_held || !state_.held_object || state_.held_object==id) &&
+    (!state_.selection_focus || std::find(state_.selected_objects.begin(),state_.selected_objects.end(),id)!=state_.selected_objects.end());
 }
 bool Document::object_editable(uint64_t id) const {std::lock_guard lock(model_mutex_);return object_editable_locked(id);}
 void Document::require_object_editable_locked(uint64_t id) const {
-  if(!object_editable_locked(id))throw std::logic_error("This object is read-only; release held-object isolation or select the editable held object");
+  if(!object_editable_locked(id))throw std::logic_error("This object is read-only; select it or release held-object isolation");
 }
 void Document::require_authority_locked(AssetSource source) const {
   if(source.edit_authority && source.edit_authority!=state_.edit_authority)throw std::logic_error("Object editing authority changed; reopen the editor");
@@ -53,6 +54,7 @@ void Document::configure_object_grab_locked(bool mode,bool isolate){
   const bool keep_motion=state_.object_grabbing&&!picking_change;const auto pose=held_preview_transform_,start=held_start_transform_;const auto nav=object_navigation_;const bool desktop=desktop_;const auto affine=held_affine_;
   AuthorityTransition transition(*this);const bool changed=invalidate_object_authority_locked();
   state_.object_grab_mode=mode;state_.isolate_held=isolate;
+  if(mode)state_.selection_mode=false;
   if(keep_motion){state_.object_grabbing=true;held_preview_transform_=pose;held_start_transform_=start;object_navigation_=nav;desktop_=desktop;held_affine_=affine;}
   if(!mode)state_.held_object=0;
   publish_locked(changed||picking_change,false);transition.commit();
@@ -61,7 +63,7 @@ void Document::hold_object(uint64_t id){
   std::lock_guard lock(model_mutex_);
   if(state_.held_object==id)return;
   const auto &object=scene_.object(id);if(!object.visible||object.locked)throw std::logic_error("Hold a visible unlocked object");
-  AuthorityTransition transition(*this);const bool changed=invalidate_object_authority_locked();state_.held_object=id;scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;publish_locked(changed,false);transition.commit();
+  AuthorityTransition transition(*this);const bool changed=invalidate_object_authority_locked();state_.held_object=id;if(state_.selection_focus)state_.selected_objects={id};scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;publish_locked(changed,false);transition.commit();
 }
 void Document::release_held_object(bool accept){
   std::lock_guard lock(model_mutex_);if(state_.object_grabbing){finish_object_grab_locked(held_polygon_pending_locked()?false:accept,true);return;}
@@ -74,6 +76,7 @@ bool Document::begin_object_grab_locked(uint64_t id){
   const bool polygon_motion=state_.polygon && !polygon_accepting_ && id==polygon_source_.object && polygon_source_matches_locked();
   if(state_.polygon&&!polygon_motion)return false;
   AuthorityTransition transition(*this);const bool changed=polygon_motion?false:invalidate_object_authority_locked();scene_.select(id);input_.bind(volume());bound_volume_=scene_.active().volume;last_volume_=volume().revision();last_paint_=scene_.active().mesh_active?scene_.active().painted->revision():0;
+  if(state_.selection_focus)state_.selected_objects={id};
   state_.held_object=id;held_preview_transform_=held_start_transform_=scene_.object(id).transform;state_.object_grabbing=true;
   held_affine_=scene_.has_affine_placement(id)?std::make_shared<const HeldAffine>(scene_,id):nullptr;
   publish_locked(changed,false);transition.commit();return true;

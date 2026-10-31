@@ -51,6 +51,7 @@ int instance_tag, session_tag, action_set_tag;
 unsigned frame = 0, physical_frame = 0, event = 0, restart_phase = 0;
 unsigned menu_completion_event = 0;
 std::string affine_contact_mode(){auto p=getenv("DOME_XR_FIXTURE_AFFINE_CONTACT");return p?p:"";}
+bool selection_fixture(){return getenv("DOME_XR_FIXTURE_SELECTION")!=nullptr;}
 bool menu_gate() { return getenv("DOME_XR_FIXTURE_MENU_GATE") != nullptr; }
 bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
@@ -370,6 +371,21 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         : 1.055f * std::pow(linear, 1 / 2.4f) - .055f;
     return int(std::lround(encoded * 255));
   };
+  if(selection_fixture()&&(frame==24||frame==29||frame==40)){
+    unsigned red=0,green=0,ghost=0,solid=0;
+    for(size_t k=0;k<bytes.size();k+=4){
+      if(bytes[k+3]>240)++solid;
+      if(bytes[k+3]>240&&bytes[k]>150&&bytes[k+1]<100)++red;
+      if(bytes[k+3]>240&&bytes[k+1]>150&&bytes[k]<100)++green;
+      if(bytes[k+3]>20&&bytes[k+3]<80)++ghost;
+    }
+    report["selection_images"][std::to_string(frame)][std::to_string(s->eye)]={{"red_solid",red},{"green_solid",green},{"ghost",ghost},{"opaque",solid}};
+    if(s->eye==0)if(auto path=getenv("DOME_XR_FIXTURE_REPORT")){
+      std::ofstream capture(std::string(path)+".selection-"+std::to_string(frame)+".ppm",std::ios::binary);
+      capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
+      for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+    }
+  }
   int opaque = 0, blue = 0;
   for (size_t i = 0; i < bytes.size(); i += 4) {
     if (bytes[i + 3] > 0)
@@ -534,6 +550,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!procedural_mode().empty())focus_at=procedural_mode()=="focus"?20:90;
   if(!polygon_mode().empty())focus_at=polygon_mode()=="focus"?30:90;
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
+  if(selection_fixture())focus_at=90;
   if(!affine_contact_mode().empty())focus_at=affine_contact_mode()=="focus"?12:90;
   if (focus_frame >= focus_at && !lost) {
     lost = true;
@@ -553,7 +570,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_regains");
     return XR_SUCCESS;
   }
-  if (polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
+  if (!selection_fixture() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -635,7 +652,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
       if (v.subImage.imageRect.extent.width != 320 ||
           v.subImage.imageRect.extent.height != 320 ||
           std::abs(v.pose.position.x - ((eye ? .032f : -.032f) +
-                                        (frame >= 38 && polygon_mode().empty() ? -.2f : 0))) > .0001f)
+                                        (frame >= 38 && polygon_mode().empty() && !selection_fixture() ? -.2f : 0))) > .0001f)
         return XR_ERROR_POSE_INVALID;
     }
     count("stereo_submissions");
@@ -652,14 +669,14 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && affine_contact_mode().empty() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && !selection_fixture() && affine_contact_mode().empty() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
     return XR_ERROR_SIZE_INSUFFICIENT;
   for (int i = 0; i < 2; ++i) {
     p[i].pose = {{0, 0, 0, 1},
-                 {(i ? .032f : -.032f) + (frame >= 38 && polygon_mode().empty() ? -.2f : 0), 1.6f, 0}};
+                 {(i ? .032f : -.032f) + (frame >= 38 && polygon_mode().empty() && !selection_fixture() ? -.2f : 0), 1.6f, 0}};
     p[i].fov = {-.6f, .6f, .6f, -.6f};
   }
   return XR_SUCCESS;
@@ -673,6 +690,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
   auto a = reinterpret_cast<Action *>(p->action);
   bool button = right(p->subactionPath) && a->name == "recenter";
   out->isActive = XR_TRUE;
+  if(selection_fixture()){out->currentState=button&&(frame==8||frame==12||frame==32);out->changedSinceLastSync=button;return XR_SUCCESS;}
   if(!affine_contact_mode().empty()){out->currentState=XR_FALSE;out->changedSinceLastSync=XR_FALSE;return XR_SUCCESS;}
   out->currentState =
       button &&
@@ -752,6 +770,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
                 (a->name == "tip_force" && ink());
   out->isActive = active;
   out->currentState = 0;
+  if(selection_fixture()){if(right(p->subactionPath)){if(a->name=="paint_pressure"&&(frame==18||frame==22||frame==26||frame==36))out->currentState=.9f;if(a->name=="canvas_grab"&&frame>=25&&frame<=27)out->currentState=1;}return XR_SUCCESS;}
   if (right(p->subactionPath)) {
     bool stroke =
         (frame >= 2 && frame <= 5) ||
@@ -808,6 +827,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
    XrActionStateVector2f *out) {
   auto a = reinterpret_cast<Action *>(p->action);
   out->isActive = XR_TRUE;
+  if(selection_fixture()){out->currentState=right(p->subactionPath)&&frame>=9&&frame<=12?XrVector2f{.8660254f,-.5f}:XrVector2f{0,0};return XR_SUCCESS;}
   if(!affine_contact_mode().empty()){out->currentState={0,0};return XR_SUCCESS;}
   out->currentState = right(p->subactionPath) && a->name == "right_stick" &&
                               frame >= 9 && frame <= 10
@@ -988,6 +1008,15 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  if(selection_fixture()){
+    p->pose.orientation={0,0,0,1};
+    if(!s->action)p->pose.position={0,1.6f,0};
+    else if(!right(s->hand))p->pose.position={-.8f,1.4f,-.4f};
+    else if(frame>=16&&frame<=19)p->pose.position={.602f,1.844f,-.7f};
+    else if(frame>=34)p->pose.position={.34f,1.824f,-.61f};
+    else p->pose.position={frame>=25?.16f:-.16f,1.48f,-.83f};
+    return XR_SUCCESS;
+  }
   if (frame == 22 && affine_contact_mode().empty() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
@@ -995,7 +1024,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   p->pose.orientation = {0, 0, 0, 1};
   if(!affine_contact_mode().empty()){p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.85f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if (s->reference == XR_REFERENCE_SPACE_TYPE_VIEW && !s->action)
-    p->pose.position = {frame >= 38 && polygon_mode().empty() ? -.2f : 0, 1.6f, 0};
+    p->pose.position = {frame >= 38 && polygon_mode().empty() && !selection_fixture() ? -.2f : 0, 1.6f, 0};
   else
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),

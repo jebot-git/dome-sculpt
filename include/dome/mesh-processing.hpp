@@ -2,6 +2,8 @@
 #pragma once
 #include "mesh.hpp"
 #include <memory>
+#include <limits>
+#include <stdexcept>
 namespace dome {
 struct TopologyReport {
   size_t vertices = 0, triangles = 0, geometric_vertices = 0,
@@ -36,6 +38,9 @@ struct SurfaceQueryOptions {
   std::function<bool()> cancelled;
   size_t max_triangle_tests = 2'000'000;
   std::function<bool(uint32_t, const std::array<float, 3> &)> ray_filter;
+  // Optional material/attribute filter for bounded direct-contact queries.
+  std::function<bool(uint32_t, const std::array<float, 3> &)> closest_filter;
+  float closest_maximum=std::numeric_limits<float>::infinity();
 };
 struct SurfaceHit {
   uint32_t triangle = 0;
@@ -61,6 +66,8 @@ public:
   SurfaceHit closest(Vec3) const;
   // Throws if no eligible triangle exists, cancelled, or budget is exhausted.
   SurfaceHit closest(Vec3, const SurfaceQueryOptions &) const;
+  // Bounded/filtered nearest query: empty is an ordinary, allocation-free miss.
+  std::optional<SurfaceHit> nearest(Vec3, const SurfaceQueryOptions &) const;
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction,
                                     float maximum = 100) const;
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction, float maximum,

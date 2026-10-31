@@ -153,11 +153,11 @@ struct Visibility {
     return result;
   }
   bool visible(const Mesh &m, uint32_t triangle, const std::array<float,3> &bary,
-               Vec3 direction, double seconds) const {
+               Vec3 direction, double seconds,bool culling=true) const {
     size_t first = size_t(triangle) * 3;
     auto a = m.positions[m.indices[first]], b = m.positions[m.indices[first+1]], c = m.positions[m.indices[first+2]];
     bool front = (dot(cross(b-a,c-a), direction) < 0) != range.reflected;
-    if ((cull == MToonCull::Back && !front) || (cull == MToonCull::Front && front)) return false;
+    if (culling&&((cull == MToonCull::Back && !front) || (cull == MToonCull::Front && front))) return false;
     if (alpha == Material::AlphaMode::Opaque) return true;
     auto primary = uv(m, triangle, bary, false);
     auto sample = [](const PaintSourceTexture &v, std::array<float,2> q, size_t channel = 3) {
@@ -215,6 +215,21 @@ MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const Surf
     : impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true)) {}
 MaterialSurfaceQuery::~MaterialSurfaceQuery() = default;
 SurfaceHit MaterialSurfaceQuery::closest(Vec3 point) const { return impl_->query.closest(point); }
+std::optional<SurfaceHit> MaterialSurfaceQuery::nearby(Vec3 point,float maximum,double seconds) const {
+  if(!std::isfinite(maximum)||maximum<=0||!std::isfinite(seconds))throw std::invalid_argument("Invalid direct selection query");
+  SurfaceQueryOptions options;options.max_triangle_tests=65536;options.closest_maximum=maximum;
+  options.closest_filter=[&](uint32_t triangle,const std::array<float,3> &bary){
+    const size_t corner=size_t(triangle)*3;
+    auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t value,const Visibility &surface){return value<surface.range.first;});
+    if(found==impl_->surfaces.begin())return false;
+    --found;
+    // A controller can touch either side or enter a surface slightly. Keep
+    // alpha/UV/MToon animation, but don't impose camera backface culling.
+    return corner<found->range.first+found->range.count&&found->visible(impl_->query.mesh(),triangle,bary,{},seconds,false);
+  };
+  return impl_->query.nearest(point,options);
+
+}
 SurfaceHit MaterialSurfaceQuery::closest(Vec3 point,uint64_t only_object) const {
   SurfaceQueryOptions options;options.max_triangle_tests=65536;
   options.triangle_filter=[&](uint32_t triangle) {

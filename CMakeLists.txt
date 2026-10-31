@@ -66,6 +66,7 @@ add_library(dome-sculpt-core src/volume.cpp src/volume-raycast.cpp src/sculpt-ma
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/document-cut.cpp src/document-worker-errors.cpp)
+target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-placement.cpp src/source-placement-archive.cpp)
 target_sources(dome-sculpt-core PRIVATE src/polygon-authoring.cpp src/polygon-source.cpp src/polygon-color-source.cpp src/polygon-color-archive.cpp src/polygon-scene.cpp src/polygon-conversion.cpp src/document-polygon.cpp)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)
@@ -907,6 +908,10 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
 endif()
 
 if(BUILD_TESTING)
+  add_executable(dome-sculpt-object-selection-test tests/object-selection.cpp)
+  target_link_libraries(dome-sculpt-object-selection-test PRIVATE dome-sculpt-core)
+  add_test(NAME object-selection COMMAND dome-sculpt-object-selection-test)
+  set_tests_properties(object-selection PROPERTIES TIMEOUT 120)
   add_executable(dome-sculpt-object-isolation-test tests/object-isolation.cpp)
   target_link_libraries(dome-sculpt-object-isolation-test PRIVATE dome-sculpt-core)
   add_test(NAME object-isolation COMMAND dome-sculpt-object-isolation-test)
@@ -914,6 +919,11 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
+ add_executable(dome-sculpt-object-selection-render-test tests/object-selection-render.cpp)
+ target_link_libraries(dome-sculpt-object-selection-render-test PRIVATE dome-sculpt-render)
+ target_link_options(dome-sculpt-object-selection-render-test PRIVATE -Wl,--wrap=glBufferData -Wl,--wrap=glBufferSubData -Wl,--wrap=glReadPixels -Wl,--wrap=glMapBufferRange)
+ add_test(NAME object-selection-render COMMAND dome-sculpt-object-selection-render-test)
+ set_tests_properties(object-selection-render PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 120)
  add_executable(dome-sculpt-object-isolation-render-test tests/object-isolation-render.cpp)
  target_link_libraries(dome-sculpt-object-isolation-render-test PRIVATE dome-sculpt-render)
  target_link_options(dome-sculpt-object-isolation-render-test PRIVATE -Wl,--wrap=glBufferData -Wl,--wrap=glBufferSubData -Wl,--wrap=glReadPixels -Wl,--wrap=glMapBufferRange)
@@ -1108,4 +1118,12 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND 
     $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
     $<TARGET_FILE:dome-sculpt-affine-contact-test> ${CMAKE_CURRENT_BINARY_DIR}/affine-contact-xr)
   set_tests_properties(affine-contact-openxr PROPERTIES TIMEOUT 150)
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-object-selection-test)
+  add_test(NAME object-selection-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/object-selection-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-object-selection-test> ${CMAKE_CURRENT_BINARY_DIR}/object-selection-xr)
+  set_tests_properties(object-selection-openxr PROPERTIES TIMEOUT 120)
 endif()

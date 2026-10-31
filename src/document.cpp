@@ -347,6 +347,7 @@ void Document::scene_changed_locked(Scene before) {
   scene_=std::move(candidate);
   detail::require_trusted_polygon_transition(transaction.before(),scene_);
   scene_.validate(false);
+  if(state_.selection_focus&&scene_.active().id!=transaction.before().active().id)state_.selected_objects={scene_.active().id};
   record_locked({{},transaction.before(),scene_});
   bind_locked();publish_locked(true,false);transaction.commit();
 }
@@ -371,6 +372,7 @@ bool Document::undo_locked(bool redo) {
     for(const auto &o:scene_.objects())if(o.volume==h.sculpt){auto &target=scene_.object(o.id);target.volume=sculpt;target.mesh_active=false;scene_.select(o.id);found=true;}
     if(!found)throw std::logic_error("Sculpt history target is unavailable");
   }else scene_=redo?*h.after:*h.before;
+  if(state_.selection_focus&&scene_.active().id!=transaction.before().active().id)state_.selected_objects={scene_.active().id};
   transaction.move_history(source,dest);
   content_=redo?h.to:h.from;bind_locked();publish_locked(true,false);
   // Preserve the target identities referenced by all older history commands.
@@ -434,6 +436,7 @@ void Document::delete_object() {
 }
 void Document::select_object(uint64_t id) {
   std::lock_guard lock(model_mutex_);
+  if(state_.selection_focus){select_objects_locked(std::span<const uint64_t>(&id,1),ObjectSelection::Replace);return;}
   if(state_.object_grabbing&&id!=state_.held_object)throw std::logic_error("Release the moving object before changing selection");
   finish_locked();
   scene_.select(id);
@@ -470,6 +473,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   const auto previous_control_source=control_source_;
   try {
   auto &active = scene_.active();
+  if(state_.selection_focus&&active.id!=state_.active_object&&std::find(state_.selected_objects.begin(),state_.selected_objects.end(),active.id)==state_.selected_objects.end())state_.selected_objects={active.id};
   const bool cancel_polygon_publication=state_.polygon &&
     (polygon_source_.generation!=state_.generation || polygon_source_.object!=active.id || polygon_source_.edit_authority!=state_.edit_authority);
   if(cancel_polygon_publication){state_.polygon.reset();state_.polygon_object=0;
@@ -496,14 +500,20 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.project_path = path_;
   state_.importing = import_view_;
   state_.active_object = scene_.active().id;
+  state_.can_select_objects=selection_ready_locked();
+  selection_hierarchy_locked();
   state_.objects.clear();
   for (auto &o : scene_.objects()) {
     const bool affine=scene_.has_affine_placement(o.id);
     state_.objects.push_back({o.id, o.name, o.visible, o.locked, o.transform,
                               o.material, o.mesh_active, bool(o.painted),object_editable_locked(o.id),
-                              o.visible && state_.isolate_held && state_.held_object && o.id!=state_.held_object,
+                              o.visible && ((state_.isolate_held && state_.held_object && o.id!=state_.held_object) || (state_.selection_focus && std::find(state_.selected_objects.begin(),state_.selected_objects.end(),o.id)==state_.selected_objects.end())),
                               affine?CanvasTransform{}:object_world_transform_locked(o.id),!affine});
-    if(affine)state_.objects.back().affine_world=object_world_matrix_locked(o.id);
+    auto &display=state_.objects.back();
+    display.selected=std::find(state_.selected_objects.begin(),state_.selected_objects.end(),o.id)!=state_.selected_objects.end();
+    display.active=display.selected&&o.id==state_.active_object;display.selection_accent=state_.accent;
+    display.hovered=state_.selection_mode&&(state_.selection_hover[0]==o.id||state_.selection_hover[1]==o.id);
+    if(affine)display.affine_world=object_world_matrix_locked(o.id);
   }
   if (uv_)
     control_changed_ = uv_changed(
@@ -725,7 +735,11 @@ void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopte
   finish_control_locked(false);finish_locked();
   Transaction transaction(*this);
   if(next_content_==UINT64_MAX)throw std::overflow_error("Document history identity exhausted");
-  scene_=std::move(next);bind_locked();transaction.clear_history();path_=std::move(adopted_path);
+  scene_=std::move(next);
+  state_.selection_mode=state_.selection_focus=state_.hierarchy_open=state_.hierarchy_anchored=false;
+  state_.selected_objects.clear();state_.collapsed_groups.clear();state_.selection_hover={};
+  state_.selection_pressed={true,true};state_.selection_release={true,true};
+  bind_locked();transaction.clear_history();path_=std::move(adopted_path);
   ++state_.generation;
   transaction.invalidate_import();
   if(recovery_){recovery_source_={new_recovery_id(),state_.generation,path_};recovery_content_=0;}
@@ -1175,8 +1189,9 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
     auto inverse = ob::inverse(*old_from_new);
     state_.canvas = ob::compose(inverse, state_.canvas);
     state_.panel = ob::compose(inverse, state_.panel);
-  } else
-    anchored_ = false;
+    state_.hierarchy_panel=ob::compose(inverse,state_.hierarchy_panel);
+  } else {anchored_ = false;state_.hierarchy_anchored=false;}
+  state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
   publish_locked();
 }
 void Document::finish_spatial() {
@@ -1199,7 +1214,12 @@ void Document::finish_spatial() {
     publish_locked();
   }
 }
-void Document::process_locked(const SpatialFrame &f) {
+void Document::process_locked(const SpatialFrame &incoming) {
+  SpatialFrame f=incoming;
+  for(size_t i=0;i<2;++i)if(state_.selection_release[i]){
+    if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
+    else f.hands[i].tracked.trigger=0;
+  }
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
   if (desktop_)
     return;
@@ -1217,7 +1237,8 @@ void Document::process_locked(const SpatialFrame &f) {
     if (accepted_uv) input_.take_controls();
     if(state_.held_object||state_.object_grabbing){invalidate_object_authority_locked();state_.held_object=0;}
     navigation_.reset();
-    state_.hands = {};
+    state_.hands = {};state_.selection_hover={};state_.hierarchy_hover={-1,-1};
+    state_.selection_pressed={true,true};state_.selection_release={true,true};
     publish_locked();
     return;
   }
@@ -1227,9 +1248,15 @@ void Document::process_locked(const SpatialFrame &f) {
     state_.canvas.orientation = {};
     anchored_ = true;
   }
+  if(process_object_selection_locked(f)){
+    // The hierarchy owns trigger events, but the shared menu still receives
+    // neutral releases so a thumbstick/menu button can reopen it immediately.
+    for(size_t i=0;i<2;++i){SpatialSample release;release.id=i+1;release.sequence=f.sequence;release.time=f.time;release.focused=f.focused;release.tracked=f.hands[i].tracked.valid;input_.update(release);}
+    state_.hands=f.hands;publish_locked(false,false);return;
+  }
   std::array<TrackedHand, 2> hands{f.hands[0].tracked, f.hands[1].tracked};
-  if(state_.object_grab_mode && !input_.menu_open())update_object_grab_locked(f);
-  if (!state_.object_grab_mode && !input_.menu_open()) {
+  if(!state_.selection_mode&&state_.object_grab_mode && !input_.menu_open())update_object_grab_locked(f);
+  if (!state_.selection_mode && !state_.object_grab_mode && !input_.menu_open()) {
     if (auto transform = navigation_.update(hands, state_.canvas)) {
       if (action_active_locked())
         if (end_action_locked())
@@ -1244,7 +1271,7 @@ void Document::process_locked(const SpatialFrame &f) {
       return;
     }
   }
-  if(process_affine_paint_spatial_locked(f))return;
+  if(!state_.selection_mode&&process_affine_paint_spatial_locked(f))return;
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
   auto object_canvas = affine_target?state_.canvas:ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
@@ -1252,7 +1279,7 @@ void Document::process_locked(const SpatialFrame &f) {
       !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
-  if(state_.shape_sculpt)input_.edit_allowed=false;
+  if(state_.shape_sculpt||state_.selection_mode)input_.edit_allowed=false;
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   if(state_.cut)input_.edit_allowed=false;
   input_.painting = scene_.active().mesh_active&&!state_.shape_sculpt;
@@ -1275,6 +1302,7 @@ void Document::process_locked(const SpatialFrame &f) {
         vec(ob::rotate(ob::conjugate(object_canvas.orientation),
                        ob::rotate(h.tracked.grip.orientation, {0, 0, 1})));
     s.pressure = std::clamp(h.tracked.trigger, 0.f, 1.f);
+    if(state_.selection_mode)s.pressure=0;
     s.trigger = s.pressure > .02f;
     s.joystick_press = h.joystick;
     s.stick_x = h.x;
@@ -1349,7 +1377,7 @@ void Document::process_locked(const SpatialFrame &f) {
       undo_locked(true);
     }
   }
-  if(state_.shape_sculpt)process_shape_spatial_locked(f);
+  if(!state_.selection_mode&&state_.shape_sculpt)process_shape_spatial_locked(f);
   state_.hands = f.hands;
   // Import admission already published the current hands/menu. A second
   // fallible publication must not report failure after accepting its file job.
@@ -1639,7 +1667,7 @@ void Document::mesh_loop() {
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
       const bool has_polygon_colors=std::any_of(objects.begin(),objects.end(),[](const ObjectSurface &o){return bool(o.polygon_colors);});
-      if ((has_polygon_colors || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || (published_.load()->object_grab_mode&&!published_.load()->object_grabbing)) && !snapshot->mesh.indices.empty())
+      if ((has_polygon_colors || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors);
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       std::lock_guard lock(mesh_mutex_);
@@ -2501,6 +2529,8 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::CancelWork)
     return (state_.asset_busy && asset_status().cancellable) ||
       std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
+  if(command==SpatialCommand::SelectionMode||command==SpatialCommand::SelectionFocus)return selection_ready_locked();
+  if(command==SpatialCommand::ObjectHierarchy)return true;
   if(shape_command(command))return shape_target_ready_locked()&&
     ((command==SpatialCommand::ShapeNew||command==SpatialCommand::ShapeCapture)||state_.can_select_shape);
   if(polygon_command(command))return polygon_command_enabled_locked(command);
@@ -2697,6 +2727,9 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command==SpatialCommand::SelectionMode){if(selection_ready_locked())configure_selection_locked(!state_.selection_mode);return;}
+  if(command==SpatialCommand::ObjectHierarchy){state_.hierarchy_open=!state_.hierarchy_open;state_.hierarchy_anchored=false;input_.cancel();publish_locked(false,false);return;}
+  if(command==SpatialCommand::SelectionFocus){if(selection_ready_locked()){Transaction transaction(*this);invalidate_object_authority_locked();state_.selection_focus=!state_.selection_focus;publish_locked(false,false);transaction.commit(false);}return;}
   if(shape_command(command)){
     if(!command_enabled_locked(command))return;
     if(command==SpatialCommand::ShapeSculpt){configure_shape_sculpt_locked(!state_.shape_sculpt);return;}

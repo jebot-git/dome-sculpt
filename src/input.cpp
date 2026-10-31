@@ -5,7 +5,7 @@ namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> root = {
       "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",       "Redo",
-      "Save", "Export glTF", "Objects", "Materials", "Brush size", "Flow"};
+      "Save", "Export glTF", "Objects", "Materials", "Brush size", "Selection"};
   static const std::array<const char *, 12> objects = {
       "New sphere", "New empty",  "Duplicate",  "Next",
       "Previous",   "Visibility", "Lock",       "Delete",
@@ -117,8 +117,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   if (page == 0) {
     if (sector == 10)
       return VrParameter::BrushRadius;
-    if (sector == 11)
-      return VrParameter::Flow;
+
   }
   if (page == 2) {
     switch (sector) {
@@ -275,7 +274,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
       SpatialCommand::Undo, SpatialCommand::Undo,   SpatialCommand::Undo,
       SpatialCommand::Undo, SpatialCommand::Undo,   SpatialCommand::Redo,
       SpatialCommand::Save, SpatialCommand::Export, SpatialCommand::Undo,
-      SpatialCommand::Undo, SpatialCommand::Larger, SpatialCommand::Smaller};
+      SpatialCommand::Undo, SpatialCommand::Larger, SpatialCommand::SelectionMode};
   static const std::array<SpatialCommand, 12> objects = {
       SpatialCommand::NewSphere, SpatialCommand::NewEmpty,
       SpatialCommand::Duplicate, SpatialCommand::Next,
