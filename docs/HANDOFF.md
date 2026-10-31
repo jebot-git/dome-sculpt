@@ -22,9 +22,13 @@ native selection has 182 checks including 140 allocation-failure prefixes.
 Actual native FLTK/DBusMenu workflows pass 12 normal + 12 compact checks.
 Actual OpenXR loader/GL fixtures pass 11 software + 11 Arc checks, and seven
 Arc renderer checks verify uniform-only selection/ghost presentation without
-geometry readbacks. Tracking in these fixtures is synthetic. This selection
-change has not received a new physical headset test. No system installation or
-session restart occurred. The broader production goal remains paused; all
+geometry readbacks. Tracking in these fixtures is synthetic. On 2026-10-31,
+the user completed the physical WiVRn/Arc test of `f3f9199` and marked the
+interface acceptable. The test ended gracefully and its 20-object session was
+saved and successfully reloaded; the original baseline session is unchanged.
+See validation/XR-SELECTION-HEADSET.json. This is interface acceptance, not
+full-production completion. No system installation or session restart occurred.
+The broader production goal remains paused; all
 agents are idle. Resume development only when the user requests it.
 
 The user passed the physical headset test of combined candidate

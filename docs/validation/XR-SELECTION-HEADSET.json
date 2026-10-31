@@ -1,0 +1,48 @@
+{
+  "recorded_utc": "2026-10-31T18:02:38.731769+00:00",
+  "product_source": "f3f9199d691b0ae005a1dabc13e5c50855115bdc",
+  "tested_publication": "9719281bba3ec5ad0df91d3784364fb72eb69955",
+  "binary_sha256": "31b3d8654775143c8dc10e6ddb6d682085e9cecb2eb3a8b2595fb4590b0897bf",
+  "assessment": "acceptable user interface",
+  "user_statement": "End test, mark as acceptable user interface",
+  "scope": "User-reported physical XR interface acceptance; no requirement-by-requirement or full-production completion inferred",
+  "goal_status": "paused",
+  "full_production_complete": false,
+  "runtime": "/usr/local/share/openxr/1/openxr_wivrn_pro.json",
+  "runtime_library": "/usr/local/lib64/wivrn/libopenxr_wivrn.so",
+  "gpu": "Intel Arc A770",
+  "gpu_pci": "0000:03:00.0",
+  "reference_space": "STAGE",
+  "controller_profile": "/interaction_profiles/facebook/touch_controller_pro",
+  "synthetic_tracking": false,
+  "started_utc": "2026-10-31T17:49:42.318445+00:00",
+  "ended_utc": "2026-10-31T18:01:29.170562+00:00",
+  "end": {
+    "user_requested": true,
+    "method": "SIGTERM via pidfd to recorded candidate only",
+    "terminal": true
+  },
+  "frames": {
+    "frames": 63358,
+    "stereo_submissions": 63357,
+    "palette_frames": 33171,
+    "tracked_left": 63357,
+    "tracked_right": 63357
+  },
+  "session": {
+    "directory": "/home/blux/.local/state/dome-sculpt/headset-tests/20261031-184942-selection-f3f9199",
+    "save": "/home/blux/.local/state/dome-sculpt/headset-tests/20261031-184942-selection-f3f9199/Sculpt.dsculpt",
+    "bytes": 131211669,
+    "sha256": "994f1b8b748bbfa958680f43675fac1780fc8f4ae2ccd8f365d1bad9c9fa6e13",
+    "read_only_reload_verified": true,
+    "object_count": 20,
+    "active_object": 23,
+    "scene_hash": 17449546715828890451,
+    "original_session": "/home/blux/.local/state/dome-sculpt/headset-tests/20261030-232856-993e8af/Sculpt.dsculpt",
+    "original_session_unchanged": true,
+    "application_log_sha256": "ac279032f7f81cfdb47cc8eb5a29823818ca499c41c041621ed86a4a7727ff06",
+    "launch_receipt_sha256": "5e844ea7492e348ee2422f01c96243566dfc4fc2193b830dd6acf8814b3ca01d"
+  },
+  "system_installation": false,
+  "session_restart": false
+}

@@ -137,9 +137,13 @@
     "menu_correction": "Controller releases reach shared menu; hierarchy gate checks actual opaque stereo pixels rather than mere capture existence"
   },
   "physical_headset": {
-    "new_selection_workflow_confirmed": false,
+    "user_interface_acceptable": true,
+    "user_assessment": "acceptable user interface",
+    "receipt": "docs/validation/XR-SELECTION-HEADSET.json",
     "baseline_993e8af_user_pass_preserved": true,
-    "new_test_launched": false
+    "test_source": "f3f9199d691b0ae005a1dabc13e5c50855115bdc",
+    "new_test_launched": true,
+    "scope": "Physical interface acceptance only; full production remains incomplete"
   },
   "goal_status": "paused",
   "full_production_complete": false,
