@@ -15,13 +15,32 @@ bool descendant(const Scene &scene,const SculptObject &o,uint64_t group){
 std::vector<ObjectHierarchyRow> object_hierarchy(const Scene &scene,std::span<const uint64_t> selected,std::span<const uint64_t> collapsed){
   std::vector<ObjectHierarchyRow> rows;
   if(scene.objects().size()>256||scene.groups().size()>128)throw std::length_error("Selection hierarchy exceeds scene limits");
+  const auto &groups=scene.groups();
+  std::array<std::pair<uint64_t,size_t>,128> index{};
+  struct Count{size_t total=0,marked=0;bool visible=false;};
+  std::array<Count,128> counts{};
+  for(size_t i=0;i<groups.size();++i)index[i]={groups[i].id,i};
+  std::sort(index.begin(),index.begin()+groups.size());
+  for(size_t i=0;i<groups.size();++i)if(!index[i].first||(i&&index[i].first==index[i-1].first))throw std::invalid_argument("Invalid selection group identity");
+  auto locate=[&](uint64_t id){
+    auto end=index.begin()+groups.size();
+    auto found=std::lower_bound(index.begin(),end,id,[](auto pair,uint64_t key){return pair.first<key;});
+    if(found==end||found->first!=id)throw std::invalid_argument("Missing selection group parent");
+    return found->second;
+  };
+  // Visit each object's ancestry once, rather than traversing it again for
+  // every folder on every input publication. Scratch storage is bounded.
+  for(const auto &g:groups){auto id=g.id;size_t depth=0;while(id){if(++depth>128)throw std::length_error("Selection hierarchy is too deep or cyclic");id=groups[locate(id)].parent;}}
+  for(const auto &o:scene.objects()){
+    auto id=o.group;bool marked=contains(selected,o.id);
+    while(id){auto at=locate(id);auto &count=counts[at];++count.total;count.marked+=marked;count.visible|=o.visible;id=groups[at].parent;}
+  }
+  rows.reserve(groups.size()+scene.objects().size());
   auto append=[&](auto &&self,uint64_t parent,unsigned depth)->void{
     if(depth>128)throw std::length_error("Selection hierarchy is too deep");
-    for(const auto &g:scene.groups())if(g.parent==parent){
-      size_t total=0,marked=0;bool visible=false;
-      for(const auto &o:scene.objects())if(descendant(scene,o,g.id)){++total;marked+=contains(selected,o.id);visible|=o.visible;}
-      bool open=!contains(collapsed,g.id);
-      rows.push_back({g.id,depth,g.name,true,open,total&&marked==total,marked>0&&marked<total,false,visible,false});
+    for(size_t i=0;i<groups.size();++i)if(groups[i].parent==parent){
+      const auto &g=groups[i];const auto &count=counts[i];bool open=!contains(collapsed,g.id);
+      rows.push_back({g.id,depth,g.name,true,open,count.total&&count.marked==count.total,count.marked>0&&count.marked<count.total,false,count.visible,false});
       if(open)self(self,g.id,depth+1);
     }
     for(const auto &o:scene.objects())if(o.group==parent)
@@ -35,6 +54,7 @@ bool Document::selection_ready_locked() const {
 void Document::selection_hierarchy_locked(){
   std::erase_if(state_.selected_objects,[&](uint64_t id){return std::none_of(scene_.objects().begin(),scene_.objects().end(),[&](const auto&o){return o.id==id;});});
   std::erase_if(state_.collapsed_groups,[&](uint64_t id){return std::none_of(scene_.groups().begin(),scene_.groups().end(),[&](const auto&g){return g.id==id;});});
+  if(!state_.hierarchy_open){state_.hierarchy.clear();return;}
   state_.hierarchy=object_hierarchy(scene_,state_.selected_objects,state_.collapsed_groups);
   const auto last=state_.hierarchy.empty()?0:((state_.hierarchy.size()-1)/object_outliner::page_rows)*object_outliner::page_rows;
   state_.hierarchy_offset=std::min(state_.hierarchy_offset,last);
@@ -99,7 +119,7 @@ void Document::select_group_locked(uint64_t group,ObjectSelection operation,Asse
 }
 void Document::show_object_hierarchy(bool open){
   std::lock_guard lock(model_mutex_);Transaction transaction(*this);
-  state_.hierarchy_open=open;if(open){state_.hierarchy_anchored=false;if(selection_ready_locked())input_.cancel();}
+  state_.hierarchy_open=open;if(open){state_.hierarchy_anchored=false;if(selection_ready_locked())input_.cancel();}else state_.hierarchy_hover={-1,-1};
   publish_locked(false,false);transaction.commit(false);
 }
 void Document::focus_selection(bool on){

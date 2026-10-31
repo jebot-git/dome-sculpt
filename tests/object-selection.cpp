@@ -42,6 +42,10 @@ struct Controller {
 int main(int argc,char **argv)try{
  if(argc==3&&std::string(argv[1])=="--fixture"){fixture().save(argv[2]);return 0;}
  if(argc==3&&std::string(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
+ {Scene deep;uint64_t parent=0;for(int i=0;i<32;++i)parent=deep.add_group("Nested "+std::to_string(i),{},parent);
+ deep.active().group=parent;std::vector<uint64_t> ids{deep.active().id};for(int i=1;i<128;++i){auto id=deep.add("Part "+std::to_string(i),Volume{});deep.object(id).group=parent;ids.push_back(id);}
+ auto rows=object_hierarchy(deep,ids,{});check(rows.size()==160&&rows.front().selected&&rows.back().depth==32,"Deep hierarchy computes all collection memberships with bounded ancestry traversal");
+ uint64_t root=deep.groups().front().id;rows=object_hierarchy(deep,ids,std::span<const uint64_t>(&root,1));check(rows.size()==1&&rows.front().selected,"Collapsed deep hierarchy retains full descendant selection");}
  Document d;d.replace(fixture());check(d.wait_mesh(),"Complete initial immutable scene prepared");
  auto original=d.copy_scene();auto a=original.objects()[0].id,b=original.objects()[1].id,c=original.objects()[2].id,hidden=original.objects()[3].id;
  check(!d.frame().state->selection_mode&&!d.frame().surface->picking,"Ordinary editing allocates no selection BVH");
