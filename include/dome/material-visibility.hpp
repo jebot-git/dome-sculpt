@@ -34,5 +34,8 @@ public:
   // samplers, alpha/cutoff/cull, authored UV1 and MToon animation are retained.
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction,
                                     float maximum = 100, double seconds = 0,uint64_t only_object = 0) const;
+  // Excluded objects are a captured visibility/edit policy, never an alpha override.
+  std::optional<SurfaceHit> raycast_excluding(Vec3 origin, Vec3 direction, float maximum,
+                                    double seconds, std::span<const uint64_t> excluded) const;
 };
 } // namespace dome

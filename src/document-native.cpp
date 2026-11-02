@@ -26,15 +26,25 @@ bool Document::begin_native_stroke(){
 }
 bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace space){
   auto &o=scene_.active();
+  if(o.mesh_active&&!state_.shape_sculpt&&state_.projection&&state_.projection->loading)return false;
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
   if(scene_.has_affine_placement(o.id)&&state_.object_grabbing&&(space!=NativeStrokeSpace::EvaluatedWorldBrush||!held_affine_||held_affine_->base_edit!=o.affine_edit))return false;
   if(scene_.has_affine_placement(o.id)&&!o.mesh_active){state_.message="Affine sculpt strokes require the full field metric path";publish_locked();return false;}
   auto preview=mesh_.load();
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision){state_.message="Wait for the current surface before painting";publish_locked();return false;}
+  const bool projected=o.mesh_active&&!state_.shape_sculpt&&state_.projection&&state_.projection->settings.enabled&&state_.projection->image;
+  if(projected&&(!o.mesh_active||state_.shape_sculpt||state_.projection->placing))return false;
   auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
-  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(scene_.has_affine_placement(o.id)||space==NativeStrokeSpace::EvaluatedWorldBrush)session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
+  if(projected){
+    session->projection=state_.projection;
+    session->projection_excluded.push_back(o.id);
+    for(const auto &other:state_.objects)if(!other.visible||other.ghost)
+      session->projection_excluded.push_back(other.id);
+  }
+  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(projected||scene_.has_affine_placement(o.id)||space==NativeStrokeSpace::EvaluatedWorldBrush)session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
   session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;session->spatial_owner=spatial_owner;session->space=space;session->menu_page=space==NativeStrokeSpace::Ray?24:3;
+  if(projected)session->menu_page=25;
   if(state_.object_grabbing&&space==NativeStrokeSpace::EvaluatedWorldBrush)session->held_basis=held_affine_;
   if(state_.shape_sculpt&&space!=NativeStrokeSpace::Ray)return false;
   if(space==NativeStrokeSpace::EvaluatedWorldBrush&&!o.mesh_active)return false;
@@ -57,9 +67,15 @@ bool Document::sample_native_locked(NativeStrokeSample sample){
   if(!native_stroke_)return false;
   if(sample.space!=native_stroke_->space)throw std::invalid_argument("Native sample coordinate space changed during gesture");
   if(sample.space==NativeStrokeSpace::EvaluatedWorldBrush&&(!finite(sample.brush.from)||!finite(sample.brush.to)||!finite(sample.brush.normal)||length(sample.brush.normal)<1e-8f))throw std::invalid_argument("Invalid evaluated-world brush capsule");
+  CanvasTransform world_from_reference{};
+  if(native_stroke_->held_basis){
+    if(!held_affine_||held_affine_->base_edit!=native_stroke_->held_basis->base_edit)
+      throw std::logic_error("Held paint reference changed during the stroke");
+    world_from_reference=ob::compose(held_affine_->preview_pivot,ob::inverse(held_affine_->base_pivot));
+  }
   bool overflow=false;
   {std::lock_guard queue(native_mutex_);auto &s=*native_stroke_;if(!s.accepting)return false;
-    if(s.submitted>=4096)overflow=true;else{s.samples.push_back(std::move(sample));++s.submitted;}}
+    if(s.submitted>=4096)overflow=true;else{s.samples.push_back({std::move(sample),world_from_reference});++s.submitted;}}
   if(overflow){cancel_native_locked();state_.error="Desktop stroke cancelled: 4096-sample gesture budget reached; no partial stroke was retained";publish_locked();return false;}
   native_changed_.notify_all();return true;
 }
@@ -154,16 +170,61 @@ void Document::native_loop(){
             o.material_bindings.get(),range.textures.get(),cancelled);
         query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);if(!shape)o.painted->begin_stroke();
       }else o.volume->begin_stroke();
+      std::shared_ptr<const MaterialSurfaceQuery> scene_query;
+      std::optional<PaintProjection> world_projector;
+      if(session->projection){
+        auto options=session->projection->settings.image;options.visibility=false;options.cancelled=cancelled;
+        world_projector=PaintProjection::from_shared_image(session->projection->image->pixels,
+            session->projection->settings.camera,Mesh{},std::move(options));
+        if(!evaluation||!query)throw std::logic_error("Projection requires evaluated native geometry");
+        if(session->projection->settings.image.visibility&&session->projection->settings.occlusion==ProjectionOcclusion::VisibleScene&&
+           std::any_of(session->original_preview->ranges.begin(),session->original_preview->ranges.end(),[&](const auto &range){return range.count&&std::find(session->projection_excluded.begin(),session->projection_excluded.end(),range.object)==session->projection_excluded.end();})){
+          scene_query=session->original_preview->picking;
+          if(!scene_query)scene_query=std::make_shared<MaterialSurfaceQuery>(session->original_preview->mesh,
+              session->original_preview->ranges,cancelled,session->original_preview->source_colors);
+        }
+      }
       std::optional<Vec3> previous;size_t processed=0;auto shown=std::chrono::steady_clock::now();
       for(;;){
-        std::optional<NativeStrokeSample> sample;bool accept=false;
+        std::optional<NativeStrokeSample> sample;CanvasTransform world_from_reference{};bool accept=false;
         {std::unique_lock lock(native_mutex_);native_changed_.wait(lock,[&]{return cancelled()||!session->samples.empty()||!session->accepting;});
           if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
-          if(!session->samples.empty()){sample=std::move(session->samples.front());session->samples.pop_front();}else accept=session->accepted.load();}
+          if(!session->samples.empty()){sample=std::move(session->samples.front().input);world_from_reference=session->samples.front().world_from_reference;session->samples.pop_front();}else accept=session->accepted.load();}
         if(!sample){if(accept)break;continue;}
+        auto paint=[&](const Brush &brush){
+          if(!world_projector){
+            if(evaluation)o.painted->stamp_evaluated(brush,session->paint,*evaluation,cancelled);
+            else o.painted->stamp(brush,session->paint,cancelled);
+            return;
+          }
+          auto camera=session->projection->settings.camera;
+          camera.pose=ob::compose(ob::inverse(world_from_reference),camera.pose);
+          auto projector=world_projector->with_camera(camera);
+          const auto &settings=session->projection->settings;
+          const float target_epsilon=settings.image.visibility_epsilon/world_from_reference.scale;
+          uint64_t samples=0;
+          o.painted->stamp_sampled(brush,session->paint,[&](Vec3 p,Vec3 n)->std::optional<PaintedMesh::PaintSample>{
+            if(++samples>projector.max_samples_per_stamp())throw std::length_error("Projection stamp sample budget exceeded");
+            auto projected=projector.sample(p,n,session->paint);if(!projected)return {};
+            if(settings.image.visibility){
+              const auto ray=projector.camera_ray(p);
+              auto hit=query->raycast(ray.origin,ray.direction,ray.distance+target_epsilon,sample->material_time);
+              // Transparent target texels remain paintable. Only a nearer,
+              // material-visible target face can occlude this candidate.
+              if(hit&&hit->distance+target_epsilon<ray.distance)return {};
+              if(scene_query){
+                const auto world=point(world_from_reference,p);const auto scene_ray=world_projector->camera_ray(world);
+                auto occluder=scene_query->raycast_excluding(scene_ray.origin,scene_ray.direction,
+                    scene_ray.distance+settings.image.visibility_epsilon,sample->material_time,session->projection_excluded);
+                if(occluder&&occluder->distance+settings.image.visibility_epsilon<scene_ray.distance)return {};
+              }
+            }
+            return PaintedMesh::PaintSample{projected->settings,projected->opacity};
+          },cancelled,evaluation.get());
+        };
         if(sample->space==NativeStrokeSpace::EvaluatedWorldBrush){
           if(!evaluation||shape)throw std::logic_error("Evaluated-world contact painting requires an immutable evaluated mesh");
-          o.painted->stamp_evaluated(sample->brush,session->paint,*evaluation,cancelled);
+          paint(sample->brush);
         }else {
         auto origin=session->affine_world?sample->origin:local(session->transform,sample->origin);auto direction=session->affine_world?sample->direction:rotate(ob::conjugate(session->transform.orientation),sample->direction);
         std::optional<Vec3> hit;Vec3 normal;
@@ -171,7 +232,7 @@ void Document::native_loop(){
         else {hit=o.volume->raycast(origin,direction,10/session->transform.scale,cancelled);if(hit)normal=o.volume->gradient(*hit);}
         if(hit){auto brush=sample->brush;brush.from=previous.value_or(*hit);brush.to=*hit;brush.normal=normal;if(!session->affine_world){brush.radius/=session->transform.scale;brush.blend/=session->transform.scale;}
           if(shape){auto world=sample->brush;world.from=session->affine_world?previous.value_or(*hit):point(session->transform,previous.value_or(*hit));world.to=session->affine_world?*hit:point(session->transform,*hit);world.normal=session->affine_world?normal:rotate(session->transform.orientation,normal);shape->stamp(world,cancelled);}
-          else if(o.mesh_active){if(evaluation)o.painted->stamp_evaluated(brush,session->paint,*evaluation,cancelled);else o.painted->stamp(brush,session->paint,cancelled);}else o.volume->stamp(brush,budget,cancelled);previous=*hit;
+          else if(o.mesh_active){paint(brush);}else o.volume->stamp(brush,budget,cancelled);previous=*hit;
         }else previous.reset();
         }
         ++processed;

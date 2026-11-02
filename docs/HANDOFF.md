@@ -14,6 +14,30 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Private image projection/stencil workflow component — 2026-11-02
+
+The isolated work/projection-paint-b197e37 component extends Scene20 with native
+PNG worker loading, FLTK/XR controls, GPU projector/stencil guide and evaluated
+world-space painting, including nested groups, pose/skin/morph, reflected/sheared
+and physically held transforms. It preserves original sources, exact one
+Undo/Cancel and accepted Save/restart. Image/tool state is ephemeral; no Scene
+schema is added. Read IMAGE-PROJECTION.md and validation/IMAGE-PROJECTION.json
+before integration; the full objective and deferred drawer phase remain active.
+
+The qualified graphics subset has 11 independent software/A770 checks, including
+zero second-eye and pose-only uploads, sRGB/linear and transparent-fringe
+sensitivity. Its initial exact A770 device-brand string false rejection is
+retained. Later busy Cancel changes are separately qualified: page25 exposes
+Cancel during PNG/browser work and the existing shared Cancel work command
+admits image loads. Controller neutral/held-trigger and stale-lease checks are
+explicit. All final counts and source scopes are in the component receipt.
+
+The bounded painter remains CPU based. No physical headset/device session,
+install, display-manager restart, suppression or toolkit fork occurred. The
+forthcoming authored/PBR preview branch must preserve per-range material policy
+in both target and scene projection visibility queries; do not mix old headers
+or label its private policy as already integrated.
+
 ## Qualified current-colour target authoring integration — 2026-11-02
 
 Public merge8cfb53f is runtime/header/asset/third_party/CMake/test byte-identical
