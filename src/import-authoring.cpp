@@ -102,6 +102,8 @@ maps(const ImportedAsset &asset, const ImportedMaterial &m,
   auto view = [&](PaintSourceTexture &out, int index, int coordinate) {
     if (index < 0)
       return;
+    if (coordinate != 0)
+      throw std::invalid_argument("Native authoring import maps currently require TEXCOORD_0; prepare source coordinates before editing");
     const auto &t = asset.textures.at(size_t(index));
     out.image = images.at(size_t(t.image));
     out.wrap_s = t.wrap_s;
