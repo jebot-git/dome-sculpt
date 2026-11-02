@@ -1,0 +1,130 @@
+{
+  "recorded_utc": "2026-11-02T06:09:34.569982+00:00",
+  "status": "qualified selected combined default-material/sampler regression scope",
+  "source": "5ec250b",
+  "source_tree": "172d5e2da908e6ab90eddefab110973ace5e9de2",
+  "worktree": "artifacts/default-sampler-5ec250b",
+  "implementation_changed_for_qualification": false,
+  "component_differences": [
+    "all four Scene17 runtime source hashes equal a40eea0 receipt",
+    "sampler CMake target appended",
+    "shared POSITION morph zero bounds now float0.f: numerical semantics unchanged, raw fixture JSON bytes changed"
+  ],
+  "Release": {
+    "fresh_coherent_own_core_renderer_support": true,
+    "frontend_built": true,
+    "build_type": "Release",
+    "backend": "CPU",
+    "ui": true,
+    "xr": true,
+    "compiler_jobs": 1,
+    "nice": 15,
+    "selected_suites": 15,
+    "failed": 0,
+    "seconds": 9.03,
+    "scope_names": [
+      "import-default-material",
+      "import-default-document",
+      "import-default-render",
+      "import-source-chain-document",
+      "import-skin-render",
+      "import-skin-affine-render",
+      "import-skin-export-render",
+      "import-authoring",
+      "import-skin",
+      "creator-archive",
+      "scene-schema-compat",
+      "gltf-interoperability",
+      "paint-export-samplers",
+      "source-color-render",
+      "affine-export"
+    ]
+  },
+  "sanitize": {
+    "fresh_own_C_and_CXX_core_renderer_support": true,
+    "ui": true,
+    "xr": false,
+    "backend": "CPU",
+    "C_and_CXX_Release_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "selected_suites": 15,
+    "failed": 0,
+    "seconds": 40.98,
+    "external_uninstrumented": [
+      "Mesa",
+      "FLTK",
+      "image/system libraries",
+      "LAPACK"
+    ]
+  },
+  "hardware": {
+    "selector": "DRI_PRIME=pci-0000_03_00_0",
+    "GL_VENDOR": "Intel",
+    "GL_RENDERER": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "default_assertions": 66,
+    "sampler_assertions": 145,
+    "default_image_comparisons": 24,
+    "sampler_image_comparisons": 24,
+    "all_max_error": 0,
+    "unchanged_tolerance": 2,
+    "isolated_HOME_state_config_cache": true
+  },
+  "Khronos": {
+    "version": "2.0.0-dev.3.10",
+    "module": "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator",
+    "raw_and_exported_GLB_files": 60,
+    "errors": 0,
+    "warnings": 44,
+    "warning_codes": {
+      "NODE_SKINNED_MESH_NON_ROOT": 16,
+      "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 8,
+      "MATERIAL_ALPHA_CUTOFF_INVALID_MODE": 8,
+      "MESH_PRIMITIVE_TANGENT_WITHOUT_NORMAL": 6,
+      "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE": 6
+    },
+    "issue_filter": false
+  },
+  "source_sha256": {
+    "src/creator-archive.cpp": "827665d58f8aae10efbcfe929ef3cd9a10feab0f7513d0a115d0fdeb01d4c810",
+    "src/import-authoring.cpp": "a460bd3cfb8a77da819dfe02a871cb4bffe7a4373b67a831c594ad708a800049",
+    "src/scene-feature-version.hpp": "afd6c29fa8ed5f4f386b216dd756f78f79eae5e8f444f7bd5e7f57080fcc4b4c",
+    "src/scene.cpp": "3fd692d122f0b0c141350bd66417dc1974294c1ba7f7a75a89de8a2f21db1364",
+    "src/export.cpp": "f884cbbd56827fc333ad956ee436ce43c2a9e2c700b78880fbca1bc86c90c266",
+    "tests/import-authoring-fixtures.hpp": "8a8e60a9e71cc65bfd5ce823af1b5707f578820a508310081c7f0241b18f1f31",
+    "tests/import-default.cpp": "f3bc96f5bb67845bd4f94d7087cef91f909e46d1abfdd3fd68a966c7a8d4720f",
+    "tests/import-default-render.cpp": "74034ef7997fc64a4b7b94697cb003ebf685e05f5ce4c690d76e2d0958516701",
+    "tests/paint-export-samplers.cpp": "a54de4bb8002f8af4a35a74e9d5aca66e90f610444250257665e4a88266f03d1",
+    "tests/source-color-consumer.hpp": "aa26f1208af7b3e2455db33cd017187c211143f739c800584621fb06e7518bcd",
+    "tests/affine-export.cpp": "5b0f06f31d277f4d858fe2d589cb49c9b37db2f0327c5574db8c94f168caf5d9",
+    "CMakeLists.txt": "208a8f2507006403b23cc24ceab21ba908a75e1255cefc8d255948bf37145af6"
+  },
+  "evidence_sha256": {
+    "artifacts/configure-release.log": "406aa763acaf78112c8fc245ed3e1c38cce4514f5785ab01a9e50c8bf8a6acee",
+    "artifacts/build-release.log": "ab50c37ad4c914e6cfd5258f7580e3b12278561cf61a6c42263c6014a4d0b96d",
+    "artifacts/test-release.log": "c0c42719257679bcc9a6e966c6a476db4828514d2f414af43585a13e15c0268c",
+    "artifacts/test-release-detail.log": "91740390b01889962da974619c1a4477814ee79f9cb242aceb5ae519338c972c",
+    "artifacts/configure-sanitize.log": "d3760e57891e86a35221c26c118db115f361d31c532bcc97610992cdc7e2db3b",
+    "artifacts/build-sanitize.log": "0e3858fe4ee445d0a05775e7e148bb101d45bf7e37b915eac10fed54b3ec91dd",
+    "artifacts/test-sanitize.log": "297b5a22ddd75830b0af1eced9a8cfaeceaf7bd3d9487adfbfd6080e588ea8b6",
+    "artifacts/test-sanitize-detail.log": "882c9cb401899837028c3d7830892af1a930e5c6aa08902ff1393f0b51b218b6",
+    "artifacts/test-arc-default.log": "25f3a8ec9f9660450ec6992c13f264b57b13f05c974a7a0b28eb57fe89565a14",
+    "artifacts/test-arc-samplers.log": "95ecf35fe7f815e3eeae884c41de6491091751572d4834401dfda4972803eadb",
+    "artifacts/validate-union.cjs": "2b054a19c54635e64043aed5eca2ff9fdb050e7b46490f35b2b3163affb5af9f",
+    "artifacts/khronos-union.json": "10a8daa526b4018a8e7afc780c32ad90c7772987b2a8f1208f3e3401c63c34d6",
+    "artifacts/test-khronos-union.log": "82b2a3fba96fa066a52049b1728986c1551d60ac901faf513722c359a54113da"
+  },
+  "scope_excludes": [
+    "all configured suites",
+    "fresh nativeGUI run",
+    "new OpenXR loader or physical headset run",
+    "owned-UV1/native atlas import admission",
+    "unmapped overlapping UV authoring",
+    "general VRM/fullFBX deformation completion"
+  ],
+  "full_production_complete": false,
+  "system_installation": false,
+  "session_restart": false,
+  "pushed_by_this_agent": false
+}

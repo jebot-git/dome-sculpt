@@ -119,6 +119,15 @@ validation/XATLAS-CONSTRUCTION.json and XATLAS-SHUTDOWN.md.
 
 ## Current integration
 
+Combined source `5ec250b` passes a fresh optimized CPU/FLTK/OpenXR build and
+15 selected Release suites, plus a fresh own-core/render/support sanitizer
+build with the same 15 suites. Actual Arc default66 and painted-sampler145
+assertions pass; all 48 image comparisons have error 0 at tolerance 2.
+Pinned Khronos validates 60 original/emitted GLB files with 0 errors and
+44 retained warnings. See DEFAULT-SAMPLER-INTEGRATION.md and its receipt for
+source hashes, exact scopes and expected component fixture-byte differences.
+This does not claim all-suite, new GUI/XR/HMD or full-production completion.
+
 Private Scene17 implementation `a40eea0` admits witnessed absent glTF materials
 without treating an unused authored material 0 as their source. Identity 0/-1,
 empty original material JSON and the exact raw/source/paint/frame/history state
