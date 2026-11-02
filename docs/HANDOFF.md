@@ -1,23 +1,30 @@
 # Controller selection on the viable authoring candidate
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
-remains incomplete and is **paused at the user's request (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
+remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
-## Current pause and interface acceptance — 2026-11-02
+## Current resumed work — 2026-11-02
 
-The latest user instruction is “End test, mark as acceptable user interface.”
+The user reactivated the full objective after the interface acceptance and pause
+recorded below. The accepted physical UI remains the baseline. Root is qualifying
+the painted PBR color/emission export sampler fix, then integrating guarded UV1
+and explicit editable-atlas import. Separate agents resume authenticated implicit
+default material support, normal-UV reprojection and typed held-cut publication.
+No new physical headset launch or installation is implied by this resumption.
+
+## Historical pause and interface acceptance — 2026-11-02
+
+The preceding user instruction was “End test, mark as acceptable user interface.”
 The accepted controller-selection interface remains the physical headset baseline
 recorded in validation/XR-SELECTION-HEADSET.json. That test is already terminal;
 process inspection confirmed no Dome Sculpt headset application is running.
 The saved20-object session and accepted binary remain preserved. Interface
 acceptance does not establish completion of the broader production objective.
 
-Keep the goal paused. No new implementation, qualification runs, headset launches
-or installations should start until the user resumes it. Prior resumed-work and
-integration sections below are historical checkpoints, not current authorization
-to continue. Preserve all public commits, isolated worktrees, uncommitted work and
-completed or interrupted proof logs for resumption.
+That pause has been superseded by the user's latest explicit goal activation.
+Preserve all public commits, isolated worktrees, uncommitted work and completed or
+interrupted proof logs while continuing the full objective.
 
 ## Resumed production work — 2026-11-02
 
