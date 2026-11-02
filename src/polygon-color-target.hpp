@@ -29,9 +29,9 @@ inline std::vector<PolygonRgba> polygon_target_colors(
 inline void polygon_color_owner(const PolygonAuthority *authority,
     const SourceColorPreparation *preparation,bool deep){
   const bool current=authority&&authority->active&&authority->colors;
-  const bool projected=preparation&&preparation->polygon_colors;
+  const bool projected=preparation&&preparation->current_descriptor();
   if(projected){
-    const auto &source=*preparation->polygon_colors;
+    const auto &source=*preparation->current_descriptor();
     if(!current||!source.topology||!source.field||source.field!=authority->colors||
        source.field.owner_before(authority->colors)||authority->colors.owner_before(source.field))
       throw std::invalid_argument("Prepared corner colors require their own active geometry field");
@@ -50,8 +50,8 @@ inline bool corner_bake_target_supported(const SculptObject &object) noexcept {
   const auto recipe=binding?binding->color_preparation:nullptr;
   const auto projection=object.painted->color_projection();
   if(bool(recipe)!=bool(projection))return false;
-  if(recipe&&(!recipe->projection||!recipe->polygon_colors||!recipe->polygon_colors->topology||
-      recipe->polygon_colors->field!=object.polygon->colors||
+  if(recipe&&(!recipe->projection||!recipe->current_descriptor()||!recipe->current_descriptor()->topology||
+      recipe->current_descriptor()->field!=object.polygon->colors||
       recipe->receipt.source_field!=SourceColorField::PolygonCorners||
       recipe->projection->vertex_rgba!=projection->vertex_rgba))return false;
   if(const auto maps=object.painted->source_maps())for(const auto *slot:{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion})

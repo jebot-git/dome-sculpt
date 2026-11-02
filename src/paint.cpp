@@ -1066,6 +1066,24 @@ PaintColorProjectionResult SourceColorPreparationAccess::project(
   projection->maximum_error=maximum_error;projection->quality_cells=bound.tested_cells;projection->validate(r);
   result.projection=std::move(projection);check();return result;
 }
+PaintColorProjectionResult SourceColorPreparationAccess::project_uv(
+    const PaintedMesh &before,const Mesh &target,
+    std::span<const std::array<float,4>> colors,
+    const ColorPreparationOptions &options,uint64_t max_raster_samples) {
+  if(!max_raster_samples||max_raster_samples>512'000'000)
+    throw std::invalid_argument("Invalid current-colour UV raster budget");
+  const size_t pixels=size_t(before.resolution())*before.resolution();
+  const size_t geometry=target.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+target.indices.size()*4+target.uv_pins.size()+target.uv_seams.size();
+  const size_t working=pixels*(sizeof(PaintedMesh::SurfaceMap::Texel)+sizeof(int32_t)+4)+geometry+
+      pixels/(PaintTile::size*PaintTile::size)*sizeof(PaintedMesh::SurfaceMap::Bounds);
+  if(working>options.max_working_bytes)
+    throw std::length_error("Current-colour UV projection exceeds its declared raster working budget");
+  PaintSurfaceOptions surface;surface.cancelled=options.cancelled;surface.max_raster_samples=max_raster_samples;
+  auto atlas=std::make_shared<PaintedMesh::SurfaceMap>(target,before.resolution(),surface);
+  auto canvas=before.snapshot();canvas->surface_=std::move(atlas);
+  auto result=project(*canvas,colors,options);result.raster_samples=canvas->surface_->diagnostics.raster_samples;
+  return result;
+}
 PaintColorPreparationResult SourceColorPreparationAccess::prepare(
     const PaintedMesh &source,std::span<const std::array<float,4>> colors,
     const Material &material,const ColorPreparationOptions &options,SourceColorField source_field,
