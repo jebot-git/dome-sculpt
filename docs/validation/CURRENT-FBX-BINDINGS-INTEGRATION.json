@@ -1,0 +1,155 @@
+{
+  "recorded_utc": "2026-11-02T20:07:10.683308+00:00",
+  "publication_merge": "870aa6c7c912d5f8eae1110b23ed890b496256d2",
+  "qualified_runtime_test_source": "8a897873d94654f4c53f0754188daf53f8c1b425",
+  "qualified_metadata": "069ed9cdadea9127790b75e3a6203e34fda0612b",
+  "exact_runtime_header_assets_thirdparty_CMake_test_equality": true,
+  "source_manifest": {
+    "file": "artifacts/current-fbx-public-source-870aa6c.json",
+    "sha256": "c9a900843b8f0c7056fbfc7d3e9fe2c921eef171b957b49f625324d4a7d0c097",
+    "files": 746
+  },
+  "component_receipt": {
+    "file": "docs/validation/CURRENT-FBX-BINDINGS-WIP.json",
+    "sha256": "a8da69c15d3d9f3b37a32127e2ead08df54ffe816fc978ca10bde91c61e6f7bc",
+    "checked_hashes": 123,
+    "missing": 0,
+    "mismatches": 0
+  },
+  "bounded_current_integration_qualified": true,
+  "full_goal_complete": false,
+  "public_ABI_or_Scene_change": false,
+  "native_adapter": "ufbx-0.23.1-native-4 for new captures; old saved canonical captures not rewritten",
+  "previous_public_runtime_checkpoint": "974ef42; combined authoring unchanged except native importer semantic patch",
+  "fresh_coherent_builds": {
+    "initial_Release_core_render": {
+      "source": "bad7009",
+      "session": 9990,
+      "exit": 0
+    },
+    "initial_whole_owned_C_CXX_core_support_render_frontend": {
+      "source": "bad7009",
+      "session": 80065,
+      "exit": 0
+    },
+    "test_only_refinement": {
+      "source": "8a89787",
+      "Release_session": 40156,
+      "Release_exit": 0,
+      "own_SAN_session": 71723,
+      "own_SAN_exit": 0,
+      "production_archives_and_SAN_App_unchanged": true
+    },
+    "current_Release_frontend_selected": {
+      "session": 50123,
+      "exit": 0
+    }
+  },
+  "optimized_alltargets": {
+    "CPU_optimized_alltargets": {
+      "session": 90629,
+      "state": "terminal",
+      "log": "artifacts/build-current-fbx-all-release.log",
+      "terminal_exit": 0
+    },
+    "OneAPI_optimized_alltargets": {
+      "session": 14599,
+      "state": "terminal",
+      "log": "artifacts/build-current-fbx-oneapi.log",
+      "terminal_exit": 0
+    }
+  },
+  "registered_cases": {
+    "CPU": 398,
+    "OneAPI": 399
+  },
+  "Release_native16": {
+    "tests": 16,
+    "failures": 0,
+    "seconds": 8.35
+  },
+  "own_C_CXX_SAN_native16": {
+    "tests": 16,
+    "failures": 0,
+    "seconds": 18.45,
+    "leaks_enabled": true,
+    "system_dependencies_instrumented": false
+  },
+  "new_FBX_named_UV_graphics": {
+    "checks": 37,
+    "actual_native_explicit_atlas": true,
+    "raw_source_role_resolution_independent": true,
+    "wrong_UV_and_wrong_tangent_sensitive": true,
+    "actual_current_CorePBR_and_authored_restore": true,
+    "Save_restart_and_actual_GLB_export": true,
+    "software_max_pixel_error": 1,
+    "Arc_max_pixel_error": 1,
+    "unchanged_bound": 4,
+    "Arc_PCI": "0000:03:00.0",
+    "Arc_strict_device_and_source_binary_freeze": true
+  },
+  "genuine_FBX_unit_axis_matrix": {
+    "genuine_inputs": 5,
+    "unit_choices": 5,
+    "axis_choices": 3,
+    "rows": 75,
+    "assertions": 37097,
+    "independent_raw_unit_evaluated_corners": 5130,
+    "actual_native_Save_restart_GLTF_consumer": true,
+    "scope": "Default source skin/morph poses; edited poses remain separately scoped9073-case oracle"
+  },
+  "current_actual_native_GUI": {
+    "Release_skin": 14,
+    "Release_morph": 14,
+    "own_SAN_skin": 14,
+    "own_SAN_morph": 14,
+    "all_normal_close_terminal_exit": 0,
+    "scope": "Genuine Maya skin/Blender morph inputs with actual Millimetre option; not new named-UV chooser fixture"
+  },
+  "current_actual_OneAPI": {
+    "tests": 15,
+    "failures": 0,
+    "seconds": 13.87,
+    "selector": "level_zero:0",
+    "current_sycl_ls": "ArcA770index0,UHD770index1",
+    "GL_renderer": "software; actual Arc GL is separately scoped37",
+    "analytic_endpoints": 184,
+    "CPU_reference_batches": 224,
+    "samples": 445088,
+    "maximum_error": 8.9407e-08,
+    "explicit_missing_GPU_no_host_mutation": true,
+    "session": 45603,
+    "terminal_exit": 0,
+    "source": "8a897873d94654f4c53f0754188daf53f8c1b425"
+  },
+  "KHR": {
+    "files": 93,
+    "errors": 0,
+    "unfiltered_warnings": 57,
+    "maxIssues": 0,
+    "scope": "75options +14deformation +2software namedUV +2Arc namedUV"
+  },
+  "initial_negative_preserved": {
+    "tests": 2,
+    "numerical_UV_pass": 1,
+    "graphics_SegFault": 1,
+    "cause": "Independent consumer assumed p.indices; actual canonical FBX GLB is legally nonindexed",
+    "exact_diagnostic_test_helper_SAN_probe": true,
+    "fix_test_only": "8a89787: sequential triangle indices when accessor absent; indexed and nonindexed cases now pass"
+  },
+  "full398_or399_regression_run_claimed": false,
+  "previous_full395_split_preserved": "392/395 initial +corrected5R/5SAN/full150loader, documented BASIC-AUTHORING-INTEGRATION; not rerun here",
+  "unchanged_parent_proofs": "Existing projection/rig/PBR native/compact/Wayland/loader/Arc scopes remain separately pinned to their exact source; no borrowed new all-routes claim",
+  "remaining": [
+    "Every unfinished REQUIREMENTS row remains required",
+    "Raw UV1+ native painting requires explicit editable atlas; new Source26 work not admitted",
+    "Full FBX/GLTF/VRM material/normal/deformation/meta/constraint semantics",
+    "Scene21/24/25/26 private authoring work",
+    "GPU eligible work/device/performance proof and new physical production acceptance",
+    "Controller-mounted interactive drawers after basic targets"
+  ],
+  "latest_DomeD_remote_main": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "no_install": true,
+  "no_new_physical_test": true,
+  "no_active_session_restart": true
+}

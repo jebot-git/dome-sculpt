@@ -210,8 +210,8 @@ named-UV visual oracle. Fourteen current emitted GLBs have0KHRerrors/12warnings.
 Read FBX-NAMED-UV-WIP.md and its qualification receipt. Native direct multi-UV,
 UV2+, broader FBX and combined-main admission remain required.
 
-Current FBX integration runtime/test source8a89787, qualified metadata069ed9c,
-is now the exact source of the main merge; only documentation conflicts needed
+Public merge870aa6c has runtime/header/assets/third-party/CMake/tests byte-exact
+to current FBX qualified069ed9c (runtime/test source8a89787); only documentation conflicts needed
 resolution. Read CURRENT-FBX-BINDINGS-INTEGRATION.md and its receipt for public
 merge identity and byte equality. Import cpp is byte-identical to b603e0b and
 combined with the public132caef authoring application. No public ABI/Scene changes.
@@ -256,9 +256,15 @@ Release5/5+whole-ownedSAN5/5; material9 shared-pool codec sourcea52f62c/final977
 has Release4/4(4.12s)+whole-ownSAN4/4(58.78s),44 paired assertions. New Scene24
 root/shared/before-state-only capsule/CBOR Save/reopen/Restore source915ee5a/
 finald568c71 has55checks, R4/4+separate schema1/1 and full-ownSAN5/5(336.93s).
-Actual surface/paint12/query/shader consumers source1dbc1f5 are now building
-separately; export remains guarded and no consumer pixel/native admission is
-claimed yet. Range winding authority is explicitly coordinated with Palette.
+Actual surface/paint12/query/shader consumers source600fe76 have complete Release
+core/render plus3/3(81.56s), graphical289/54posed-alpha images(67.77s): old real
+partial-Bake .7-scale/90-turn failure now has software before/current max0 and
+independent ORIGINAL-basis GLB max1, unchanged2/3 limits. ActualPCI03A770289 also
+passes: both54image groups max0, exact source/core/render/binary manifests.
+Hardware lease released. Whole-ownSAN15551 still compiles frozen600; export24
+remains guarded and no current-project emitted-export/native admission is claimed.
+Range winding authority is explicitly coordinated with Palette; export continuation
+is a separate94d6583 child, preserving all proof trees.
 Docs' private Scene25 bbb1792 is qualified for its exact native rest-fitting
 subset; initial original-node graph1672 proof predates a small DFS refinement
 and must be rerun on final modules. Current plan184 checks cover per-skin closure,
