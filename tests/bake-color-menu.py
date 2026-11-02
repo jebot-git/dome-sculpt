@@ -24,7 +24,8 @@ BUILD = Path(os.environ.get("DOME_SCULPT_TEST_BUILD",str(ROOT / "build")))
 COMPACT = os.environ.get("DOME_SCULPT_BAKE_COLOR_COMPACT") == "1"
 POLYGON = os.environ.get("DOME_SCULPT_BAKE_COLOR_POLYGON") == "1"
 NORMAL = os.environ.get("DOME_SCULPT_BAKE_NORMAL") == "1"
-OUT = ROOT / ("artifacts/menu-bake-color-" + ("normal-" if NORMAL else "polygon-" if POLYGON else "") + ("compact" if COMPACT else "workflow"))
+CURRENT = os.environ.get("DOME_SCULPT_BAKE_COLOR_CURRENT") == "1"
+OUT = ROOT / ("artifacts/menu-bake-color-" + ("current-" if CURRENT else "normal-" if NORMAL else "polygon-" if POLYGON else "") + ("compact" if COMPACT else "workflow"))
 OUT.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -68,7 +69,7 @@ async def main():
             config.parent.mkdir(parents=True,exist_ok=True)
             config.write_text(json.dumps({"font":"Unifont / Sans-Serif","font_size":16,"font_scale":2}))
         fixture = Path(task_home, "procedural.dsculpt")
-        helper = "dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
+        helper = "dome-sculpt-current-color-bake-test" if CURRENT else "dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
         subprocess.run([str(BUILD / helper), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
@@ -163,7 +164,7 @@ async def main():
             raise TimeoutError("Native command remained busy: " + label)
 
         def inspect():
-            return json.loads(subprocess.check_output([str(BUILD / ("dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-colored-bake-workflow-test")), "--inspect", str(fixture)], env=env))
+            return json.loads(subprocess.check_output([str(BUILD / ("dome-sculpt-current-color-bake-test" if CURRENT else "dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-colored-bake-workflow-test")), "--inspect", str(fixture)], env=env))
 
         def enter(widget, y, text):
             geometry = widget.get_geometry()
@@ -194,7 +195,9 @@ async def main():
                 if "sculpt_mask" in volume:volume["sculpt_mask"]["values"].sort()
             return scene
 
-        original=canonical(inspect());editor=await open_options();nodes=await layout()
+        original=canonical(inspect());target_index=next(i for i,o in enumerate(original["objects"]) if o["id"]==original["active"])
+        def sources(scene):return [value for i,value in enumerate(scene["isolated_objects"]) if i!=target_index]
+        editor=await open_options();nodes=await layout()
         check(editor.get_wm_transient_for().id==window.id and editor.get_wm_class()==window.get_wm_class() and not nodes["Bake surface..."][1].get("enabled"),"Color preparation options preserve native modal ownership and universal-menu isolation")
         image(editor).save(OUT/"color-options.png")
         if NORMAL:
@@ -223,9 +226,9 @@ async def main():
                 tap(editor,g.width*.75,g.height-48)
             await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"normal-bake-complete.png")
             await command("Close Window");await close_options();await command("Save");accepted=canonical(inspect())
-            paint=accepted["objects"][0]["painted"]
+            paint=accepted["objects"][target_index]["painted"]
             check(accepted["version"]==15 and paint["baked"]["normal_interpretation"]=="prepared-attributes-v1" and "mtoon_normal" in paint["baked"],"Actual FLTK normal opt-in persists explicit Scene15 and paired native normal planes")
-            check(accepted["isolated_objects"][1:]==original["isolated_objects"][1:] and paint["layers"]==original["objects"][0]["painted"]["layers"],"Actual native normal preparation retains complete source objects and editable layers")
+            check(sources(accepted)==sources(original) and paint["layers"]==original["objects"][target_index]["painted"]["layers"],"Actual native normal preparation retains complete source objects and editable layers")
             receipt=accepted["source_materials"]["normal_preparations"][0]["receipt"]
             check(abs(receipt["accepted_angular_error"]-(.02 if COMPACT else .01975))<1e-6,"Visible degree-valued normal quality control persists its exact angular policy without offscreen wheel edits")
             await command("Undo");await command("Save");check(canonical(inspect())==original,"One universal Undo restores exact pre-normal-conversion state")
@@ -254,7 +257,7 @@ async def main():
             check(quality_before.crop((0,0,geometry.width,geometry.height-100)).tobytes()!=quality_after.crop((0,0,geometry.width,geometry.height-100)).tobytes(),"Completed compact quality report remains reachable by actual scrolling after keyboard-focused baking")
             check(geometry.width<=600 and geometry.height<=320,"Completed double-size color quality report remains in a bounded scrolling dialog with pinned actions")
             key("Control_L",True);key("w");key("Control_L",False);await close_options();await command("Save");accepted=canonical(inspect())
-            check(accepted["objects"][0]["painted"]["baked"]["color_interpretation"]=="resolved-pbr" and accepted["isolated_objects"][1:]==original["isolated_objects"][1:],"Compact keyboard controls actually prepare and bake colors while preserving complete source data")
+            check(accepted["objects"][target_index]["painted"]["baked"]["color_interpretation"]=="resolved-pbr" and sources(accepted)==sources(original),"Compact keyboard controls actually prepare and bake colors while preserving complete source data")
             check(abs(accepted["source_materials"]["color_preparations"][0]["receipt"]["accepted_projection_error"]-.04)<1e-6,"Scrolling the compact dialog never changes the hidden color tolerance")
             await command("Undo");await command("Save");check(canonical(inspect())==original,"Compact accepted preparation and normal bake undo exactly through the universal menu")
             connection.close();bus.disconnect();return
@@ -270,10 +273,10 @@ async def main():
         image(editor).save(OUT/"explicit-prepare-colors.png")
         tap(editor,g.width*.75,g.height-48);await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"prepared-color-bake-complete.png")
         await command("Close Window");await close_options();await command("Save");accepted=canonical(inspect())
-        paint=accepted["objects"][0]["painted"]
+        paint=accepted["objects"][target_index]["painted"]
         check(paint["baked"]["color_interpretation"]=="resolved-pbr" and "pbr_color" in paint["baked"],"Actual FLTK opt-in installs separately declared resolved PBR and common color planes")
         common_layers=lambda value:[{key:data for key,data in layer.items() if key!="pbr_color_tiles"} for layer in value]
-        check(accepted["isolated_objects"][1:]==original["isolated_objects"][1:] and common_layers(paint["layers"])==common_layers(original["objects"][0]["painted"]["layers"]),"Actual FLTK preparation preserves complete independently archived sources and all original editable paint channels")
+        check(sources(accepted)==sources(original) and common_layers(paint["layers"])==common_layers(original["objects"][target_index]["painted"]["layers"]),"Actual FLTK preparation preserves complete independently archived sources and all original editable paint channels")
         check(accepted!=original and accepted["version"]>=10,"Prepared color state persists its explicit versioned receipt and retained origin")
         check(abs(accepted["source_materials"]["color_preparations"][0]["receipt"]["accepted_projection_error"]-.039)<1e-6,"Wheel over the visible tolerance field changes only its configured .001 step")
         await command("Undo");await command("Save");check(canonical(inspect())==original,"One universal Undo restores exact preconversion source and target")

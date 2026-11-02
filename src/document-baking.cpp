@@ -36,7 +36,7 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
 }
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+  return !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
     !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }

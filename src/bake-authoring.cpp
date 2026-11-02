@@ -169,8 +169,12 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   next.active().polygon=target.polygon;
   next.validate();
   check();
-  scene = std::move(next);
+  // A user progress callback can throw or request cancellation. No fallible
+  // callback/validation may escape after the detached scene becomes authority.
   if(progress)progress(1);
+  check();
+  static_assert(std::is_nothrow_move_assignable_v<Scene>);
+  scene = std::move(next);
   return report;
 }
 } // namespace dome
