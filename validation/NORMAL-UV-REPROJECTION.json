@@ -1,0 +1,191 @@
+{
+  "base": "716f89f34ac8b57a43e68c326a675efa5c0509bf",
+  "scope": "Scene19 source-retaining intrinsic normal UV reprojection/adoption/codec and existing native/controller workflow; partial production goal",
+  "dependencies": {
+    "prepared_normal_keys": "355b382cc5447c2883ada7c8cead67e649e61947",
+    "actual_vroid_prepared_keys": "c7ca74d8d680ff9374f01af39c6b4dab52387ce9",
+    "detached_projection_foundation": "cddb2aabca430f5730e7242888a46125255b552a",
+    "uv1_affine_foundation": "2e7d4a0e2360eb1f42047b51d84c061e3b978652",
+    "default17_sampler": "5ec250b",
+    "generic_uv_cancel_equivalent_hunks": "f63108f6c1e00dc54893877f79984d3aaf1a2906"
+  },
+  "integration": "Merge complete lineage, preserving root newer cut/import/sourceUV work; do not cherry-pick only the final diff without its prepared-normal/key/projection dependencies. Rebuild all SourceNormalPreparation and SourceUvBakeOptions/Result consumers coherently.",
+  "source_sha256": {
+    "CMakeLists.txt": "59d539faf1b23d1b2d51f9abd7d685c9975c6fcf003b7fbf665fcb6ab94f80d2",
+    "include/dome/normal-preparation.hpp": "95f6d9135fcdc5cfb0ba38737ea69a542c39b0ee20f3c3c12e01a6a7428499f2",
+    "include/dome/source-uv-bake.hpp": "6593be3983ccdfa94beaf9304d2717da5316bd7efcf967491233e33b20af0771",
+    "src/document.cpp": "5c33d4fb07d0b4f00e354f10489a0b9f3e8a409034b61819faf12f91611d9b78",
+    "src/document-uv-solve.cpp": "1dee5037b1460a7159e031a5462934d86d0d7bc8242673d665d282a777aab7f4",
+    "src/document-worker-errors.cpp": "ba52df3396a88c8e7682d7cb6f5fae4230fa34fe4042174d6e8f9f8fe48640cd",
+    "src/material-bindings.cpp": "6f25670ea4f6250afe911161c1c973484d318127c10f8f63bf6df114a37ef556",
+    "src/normal-preparation.cpp": "2951a1b6684d213e10eee8c004dd661a8c6319133c10ca071b03ed0c97b8ab29",
+    "src/normal-uv-reprojection.cpp": "4715c43d83b097dd5bb91c45f57561a1002973002305f2c7fd9936bc97254678",
+    "src/paint-normal-access.hpp": "03866b40d9c16f450b40eaf7a6522f9805cc18a9bbfce4982872471a5969c652",
+    "src/paint.cpp": "01aa5b848feaa6f951080fc5bdb8dd18ffc3342b004a1b8b03986a0992967fcb",
+    "src/scene-feature-version.hpp": "9aef0fb3fb93f90b357d22449b0865f6db03f23f5d7580be7935f61335218424",
+    "src/scene.cpp": "59af0b1e1c1f08da6875ff2767126d25b71e403228cdbc8bd0c027a9bb4d6878",
+    "src/source-uv-bake.cpp": "43719c78433b4964bd0797bea5d8f49a6b789aaabb726148034b9db21f45fe87",
+    "tests/normal-preparation.cpp": "e7db108c17e63ce2daa6552d7f3276be5976c317d3d71a07c54b87d4d312081b",
+    "tests/normal-uv-adoption.cpp": "3ae88b5c27a4c6f2826f3b802c2e525432145c8dce554862853456832ecad528",
+    "tests/normal-uv-document.cpp": "8b63f61b605f22d5f48b8e948def8e1c120b24971dd4a0a6a575db83f972dfa1",
+    "tests/normal-uv-gui-fixture.cpp": "b7d721e146228bad487f4f02066173fd6eedfc6339e85832f237ef9fe4047e35",
+    "tests/normal-uv-render.cpp": "511d120add16956221a5d54d856d0911c1afd5f75ad61c34db67255c5b260b07",
+    "tests/uv-worker-cancellation.cpp": "7b51e995c5e5cb88d89033cba9fd6bf3de60c0a6ec1d212ced41272baf2afed9",
+    "tests/uv-menu.py": "2f00c9f4bbaf83ddebab7cf8c9198479896bced2ad94c964124295db7e738f0a",
+    "docs/NORMAL-UV-REPROJECTION.md": "097a3dad5c2c1a656f0d299458cd414cf01db17b4136bc4fc73c6fbb746f2b41"
+  },
+  "abi": {
+    "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "sizeof": {
+      "SourceNormalPreparation": 176,
+      "NormalUvReprojectionReceipt": 64,
+      "SourceNormalUvLayout": 120,
+      "SourceNormalUvReprojection": 160,
+      "SourceUvBakeOptions": 128,
+      "SourceUvBakeResult": 1976
+    },
+    "scene": 19,
+    "material_archive": 5,
+    "normal_preparation_entry": 2,
+    "uv_receipt": 1,
+    "older_semantics": "Normal entry1/archive4 are unchanged; no historical canonical/derivative payload relabeling"
+  },
+  "release": {
+    "suites": 7,
+    "seconds": 1.9,
+    "native_adoption_checks": 21,
+    "native_controller_checks": 23,
+    "binary_sha256": {
+      "dome-sculpt-normal-uv-projection-test": "f98b4ae9b2bd267299c7bcdedb458df6ce39ee31284a65ad953ed5d0deb5c057",
+      "dome-sculpt-normal-uv-adoption-test": "06f4d7f551d38d17b1250b455d9f79486edfc9205b261c832e3500635d3d7e58",
+      "dome-sculpt-normal-uv-document-test": "bf747d379ae6d0ef1c86d7164b608e617b316a30b16e1b25eb5b639fb439fb93",
+      "dome-sculpt-normal-uv-render-test": "d504124c2df67d4a615360e114d2f53f8eb14e5ecf54a9ab64c18d018caeed5d",
+      "dome-sculpt-uv-worker-cancellation-test": "12b9cb663b6a0ea938c5aeb0a750cca83635ea4113831357254358e6b7d5e981",
+      "dome-sculpt-normal-preparation-test": "d0f07de40adbaec6665ed0e6dfb2478c93a7a363eae0670685fa73fd635bcbb9",
+      "dome-sculpt-prepared-normal-shapes-test": "614f6d2deecf5246d20d446aaa2d96614f1be14c47494b57c77251fefd7a39a6"
+    }
+  },
+  "sanitizer": {
+    "suites": 8,
+    "seconds": 29.06,
+    "fresh_whole_core_support_renderer": true,
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "overlay": false,
+    "archive_sha256": {
+      "libdome-sculpt-affine.a": "4c962cb540ac9d66223a2cb5f82488d674f64c914e7d1145c5f321404616ba9e",
+      "libdome-sculpt-core.a": "a49866028f341542797d5b2a30f525fbb5cc222ea8264e954e265915f0e6050e",
+      "libdome-sculpt-polygon.a": "9e4df675b23b7c763f29aa4cd921a583e10f6d77231d3c104d42b2688c85a89c",
+      "libdome-sculpt-render.a": "729c1c407ca992f2c3658f60933b67762e51f7d3225a149601796e8799052f9a",
+      "libmikktspace-robust.a": "2ce3505049c6b296f872cc2c56415ddde8735f38e6e8ec4a3718294c62a95f34",
+      "libmikktspace.a": "2744bf34fab88d2edb45093b6cefa5eb6f1cc5ae56c736bc488f41bf0c78f805",
+      "libufbx.a": "a75349c851e8162749665e7cf1c73ceb57ba5da1bef8fbe483f81d0fe0458371",
+      "libxatlas.a": "34fd04288f1ff7e18a30a62f8a75d13a58463e32b3ef9512b7d04b29bded9616"
+    },
+    "binary_sha256": {
+      "dome-sculpt-normal-uv-projection-test": "c91e63162c1ef993b0350d874d40d9d27c674e5b1705cb725b5ee6aafda4c788",
+      "dome-sculpt-normal-uv-adoption-test": "758dc85a67660b9cde7ce29006021f41c4385d44ae410a279a7ab3b24656c0a8",
+      "dome-sculpt-normal-uv-document-test": "30bccccb1e676a01491fe774b2319b23478955538b2bec96707fcdf9590a0e68",
+      "dome-sculpt-normal-uv-render-test": "91c089e1781312a29587b045f04fa350b200d7d805a15f6d1c89cd75ebfbbdc6",
+      "dome-sculpt-uv-worker-cancellation-test": "b7abfcba4ffaa7cfa8931fee23d9b365162d72d93a95fd2ec9a29461721fd98a",
+      "dome-sculpt-normal-preparation-test": "fac1e28e0deefeb4d62c46cd16f186e7bb6216ca2bff2797b0636e39aa26049a",
+      "dome-sculpt-prepared-normal-shapes-test": "357ae256219fea24b8f59007a7e059d1462c64a1104bd5a04211ab5f5356cac0"
+    }
+  },
+  "graphics": {
+    "software_and_actual_arc_checks": 46,
+    "role_pose_comparisons": 27,
+    "poses": 3,
+    "morph_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "max_byte_error_pbr": 0,
+    "max_byte_error_legacy_mtoon": 1,
+    "additional_normal_sensitivities": 2,
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "renderer": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+  },
+  "native_fltk": {
+    "checks": 13,
+    "report": "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-5ec/artifacts/menu-normal-uv-frozen-workflow/report.json",
+    "sha256": "78976b4a97fa867b3a7e63bc88dc00eaf115a3ceb3342fd39836b9ec328593d0",
+    "app_sha256": "247998d7b3f8a44f34416d58108fad3d96df31344c16204c4d4d4276b14d801c",
+    "fixture_sha256": "673e813dcd74717100939b7bc16c8b42142a274b78af616029af46601b99299b",
+    "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib",
+    "toolkit": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+    "DomeD_verified_inputs": "d271cf65c612a462fcfa6739416b06c6565be070 unchanged from3024",
+    "env": {
+      "DOME_UV_BUILD": "build-cpu",
+      "DOME_UV_HELPER": "dome-sculpt-normal-uv-gui-fixture",
+      "DOME_UV_EXPECT_VERSION": "19",
+      "DOME_UV_SEAM_V": ".5"
+    }
+  },
+  "files": {
+    "khronos_version": "2.0.0-dev.3.10",
+    "count": 18,
+    "errors": 0,
+    "warnings": 27,
+    "warning_codes": {
+      "NODE_SKINNED_MESH_NON_ROOT": 18,
+      "INVALID_EXTENSION_NAME_FORMAT": 9
+    },
+    "official_vrm0_files": 9,
+    "official_schema_files": 15,
+    "official_schema_pin": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "khronos_report_sha256": "239fc7207431a1350f0ee6c55938c12071edb45ab03abf43bcde69bc1800615a",
+    "vrm_report_sha256": "9b090249b1bf7e596b30bbeb75f6f6c066f661f4dedfcf6036eb7c0cb61df86e",
+    "sha256": {
+      "frozen-arc-consumer-pbr-p0-w0.glb": "68105328404a3b7040e18d7c53fd306a14182f046f7a06f379a1092ce827114c",
+      "frozen-arc-consumer-pbr-p0-w100.glb": "1ce8e863a42e8de1bef9216b297d68087bdda955403e0d0e839a01d75df95b1c",
+      "frozen-arc-consumer-pbr-p0-w35.glb": "e1b13dcdae4362ac61a0f1a0050f45a0a57bd6739897f780d73abacbf1b2099c",
+      "frozen-arc-consumer-pbr-p1-w0.glb": "0f66d5072a827c30dc1b42d57d5c5ce5338a98855f017d31a1b7725d8088a98a",
+      "frozen-arc-consumer-pbr-p1-w100.glb": "1803d73256e17793caab133324f94f7dc568e632770adf6b48279ff6ca657918",
+      "frozen-arc-consumer-pbr-p1-w35.glb": "709cb531240d382595df764f9f026a2283fdeae6e513f7558938f2f608770c20",
+      "frozen-arc-consumer-pbr-p2-w0.glb": "596bd4d399482aadda64080abe2ebdb76f4aa16eecd3bfc2f535acb5390356c6",
+      "frozen-arc-consumer-pbr-p2-w100.glb": "f00b51ed282ffc3b8b95e7a760f38f5315e8939e48807a1b9c9ba2acf6672327",
+      "frozen-arc-consumer-pbr-p2-w35.glb": "3616fc9fdb0920dbfbef6b6163185423a726ec17026a0c39569b359369064849",
+      "frozen-arc-consumer-typed-p0-w0.vrm": "0eb747f622f4ee0215430e67f6c86612a17f4a19c2b88e431f8bf897c63a0a3e",
+      "frozen-arc-consumer-typed-p0-w100.vrm": "25567ed75d9bc454dd9fba51b660af0afd71d7ecc281318f64a19ab5053806c9",
+      "frozen-arc-consumer-typed-p0-w35.vrm": "81ebfc468cad58bd520994614d002e23637b1128bfac2caf696017430e24c3e3",
+      "frozen-arc-consumer-typed-p1-w0.vrm": "3660ae572982202b45f44ff6c47111fc3fd70b71f127499f13965051a963a624",
+      "frozen-arc-consumer-typed-p1-w100.vrm": "5231ca3f243d65a528272fa616f53062f381e7789c2716b3df68404cdc051aca",
+      "frozen-arc-consumer-typed-p1-w35.vrm": "c9113103e2a5eb31d447dfc76ae5d42bc8b3673d446e769c68bfb256e44a35ab",
+      "frozen-arc-consumer-typed-p2-w0.vrm": "419d315ac96d9e13f130aa616386fb907b053fbf3424c3ee3112fc671694aae3",
+      "frozen-arc-consumer-typed-p2-w100.vrm": "76b9cf6fc5980bab71c79648b3374193b8f09634065453b8f891cd6852d47836",
+      "frozen-arc-consumer-typed-p2-w35.vrm": "7e2559925510abfc548dcf6efc790e4d53c72ab678aa42ffce8c8671c539daf3"
+    }
+  },
+  "logs_sha256": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-release-build.log": "1c3c57b7d16c34e34ba78849fd0f0fc73b6d3142892b6f5b08472d5e379d33e5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-release-tests.log": "853aea3d2468da7edabf375453f5ee103b3d4363c332e476f1143c10715d5888",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-sanitize-build.log": "3570d41e35a894a25647335d6ee4489d8d5dec06e3b3d9fd9b83ac7b3d9efc3e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-sanitize-tests.log": "80b95d5af6dc6bddfcb3a17f4f33964ca628b9add1d8864ff6b11b0027008d44",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-arc-consumer.log": "1761b434511ad484ba0177c98af171b06616a7b40e46a73d239378db2782c323",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-native-gui.log": "5ab7b7440d01cf4dbbed2fc587a5a20770f9c95fe8e147c44d0f243388444c3f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-adoption.log": "f6a0699e8e144796a5a76117de7e284a3345a7cb701b11031dd892f7b0c8306b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-frozen-document.log": "862a341e37c2aad42a067be5a7482b6254d6083b369e711a2121d2ed64d9a46c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-native-linkage.log": "20395da7da276c97fbd97d3ecb321eaf3d30bf3150b4df1f1384760a7067d174",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-sanitize-configure.log": "a7f6f8d0be319e176bdb583accf7cae3777bc8e35f367d290b7da44c756a9980",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-sanitize-build.log": "fe80f8ec55331e02258158e2e04db1dea512fc13e30a6610ea323d020b369bcc",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-sanitize-render-configure.log": "b383c9a286424017e186076d75d382832798f9a5449e2d21dee1323c7949e66f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-scene19-sanitize-render-build.log": "e10ad91392283a20f6178f18cbcb36fddbfa6dc602078dc985dcadf71a643899"
+  },
+  "preserved_failed_proofs": {
+    "normal-uv-scene19-sanitize-tests.log": "Obsolete blanket UV refusal expected; replaced with genuine supported adoption and original forged-UV negatives retained.",
+    "normal-uv-scene19-software-consumer.log": "Toon band saturated, so independent normal sensitivity correctly failed; fixture uses responsive declared shading.",
+    "normal-uv-scene19-native-gui.log": "Conformal square was already solved; nonconformal fixture required for genuine Unwrap change.",
+    "normal-uv-scene19-native-skew-gui.log": "Generic fixture seam coordinates selected a boundary; final internal seam point preserves meaningful Seam/Stitch oracle.",
+    "normal-uv-scene19-sanitize-build.log": "Initial seven-target request ended after successfully built six because normal-frame-UV is UI-conditional; coherent UI/render configuration then builds and qualifies all eight suites."
+  },
+  "remaining": [
+    "Post-UV shapekey reauthoring source-retaining adapter",
+    "Prepared-normal bake source frame adapter",
+    "Broader UV1/sampler/current-frame representability and actual avatar atlas authoring",
+    "Intrinsic sample receipt is not all-pose/pre-resampling or baked-detail quality guarantee",
+    "No physical headset launch, system installation or full production completion claim"
+  ]
+}

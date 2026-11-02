@@ -884,6 +884,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
       }++result.source_constraints;
     }
   }
+  result.raster_samples=raster_work;
   if(!result.sampled_texels||result.observed_sample_error>options.max_angular_error)throw std::invalid_argument("Prepared normal UV quantization/source constraints exceed the declared sample quality bound");
   auto projection=std::make_shared<PaintNormalProjection>();projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);result.projection=std::move(projection);stop();return result;
 }

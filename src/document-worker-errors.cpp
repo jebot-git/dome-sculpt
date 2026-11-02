@@ -45,7 +45,7 @@ void Document::file_worker_error_locked(FileJob &job,std::exception_ptr error) n
       restore_weight_view_locked(job.rollback_preview);
       if(job.retopo_session&&job.retopo_session==retopo_session_.load())retopo_accepting_=false;
     }
-    if((job.open_project||job.prepare_mesh)&&asset_work_.load()==job.work)asset_work_.store({});
+    if((job.open_project||job.prepare_mesh||job.uv_mesh)&&asset_work_.load()==job.work)asset_work_.store({});
   }
   worker_notices_[1]=std::move(notice);retry_worker_notices_locked();
 }

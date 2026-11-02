@@ -155,7 +155,7 @@ void Document::process_uv_transfer(FileJob &job) {
       throw std::runtime_error("The source mesh changed before UV transfer");
     request = uv_request_.load();
   }
-  auto cancelled = [&] { return stopping_.load() || uv_request_.load() != request; };
+  auto cancelled = [&] { return stopping_.load() || uv_request_.load() != request || (job.work&&job.work->cancelled.load()); };
   const auto &source = job.scene.object(job.object);
   const auto &old = source.painted->mesh();
   auto target_owner=job.uv_mesh;
@@ -282,7 +282,7 @@ void Document::process_uv_transfer(FileJob &job) {
     transaction.finish_uv();
     if(job.uv_desktop)desktop_=false;
     if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
-    state_.asset_busy=false;state_.message="UVs, paint and deformation identities updated";state_.error.clear();
+    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message="UVs, paint and deformation identities updated";state_.error.clear();
     publish_locked(changed,false);transaction.commit();
 
   }

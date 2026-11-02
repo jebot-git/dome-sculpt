@@ -20,7 +20,9 @@ if os.environ.get("DOME_UV_MENU_BUS") != "1":
     os.execvpe("dbus-run-session", ["dbus-run-session", "--", sys.executable, *sys.argv],
               {**os.environ, "DOME_UV_MENU_BUS": "1"})
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "artifacts/menu-uv-workflow"
+BUILD = ROOT / os.environ.get("DOME_UV_BUILD", "build")
+HELPER = BUILD / os.environ.get("DOME_UV_HELPER", "dome-sculpt-uv-workflow-test")
+OUT = ROOT / os.environ.get("DOME_UV_MENU_OUT", "artifacts/menu-uv-workflow")
 OUT.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -60,9 +62,9 @@ async def main():
             env[key] = task_home + "/" + suffix
             Path(env[key]).mkdir(mode=0o700)
         fixture = Path(task_home, "uv.dsculpt")
-        subprocess.run([str(ROOT / "build/dome-sculpt-uv-workflow-test"), "--ui-fixture", str(fixture)], check=True)
+        subprocess.run([str(HELPER), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
-        app = subprocess.Popen([str(ROOT / "build/dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
+        app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
         processes.append(app)
         connection = display.Display(screen)
 
@@ -119,7 +121,7 @@ async def main():
                 connection.sync()
 
         def info():
-            return json.loads(subprocess.check_output([str(ROOT / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
+            return json.loads(subprocess.check_output([str(BUILD / "dome-sculpt"), "--project-info", str(fixture)], env=env))
 
         def image(widget):
             geometry = widget.get_geometry()
@@ -135,6 +137,9 @@ async def main():
             raise TimeoutError("Native command remained busy: " + label)
 
         baseline = info()
+        baseline_source = None
+        if os.environ.get("DOME_UV_EXPECT_VERSION"):
+            baseline_source = json.loads(subprocess.check_output([str(HELPER), "--inspect", str(fixture)], env=env))
         nodes = await layout()
         check(nodes["UV editor..."][1].get("enabled") is True, "Universal menu enables UV editing for a real rigged mesh")
         await command("UV editor...")
@@ -163,6 +168,15 @@ async def main():
         await command("Save")
         accepted = info()
         check(accepted["scene_hash"] != baseline["scene_hash"] and accepted["paint_layers"] == baseline["paint_layers"], "Native Apply saves changed UVs while retaining editable paint layers and valid rig data")
+        if baseline_source is not None:
+            source = json.loads(subprocess.check_output([str(HELPER), "--inspect", str(fixture)], env=env))
+            current = source["source_materials"]
+            previous = baseline_source["source_materials"]
+            check(source["version"] == int(os.environ["DOME_UV_EXPECT_VERSION"]) and
+                  current["version"] == 5 and
+                  len(current["normal_preparations"]) > len(previous["normal_preparations"]) and
+                  current["normal_frames"] == previous["normal_frames"],
+                  "Actual native UV Apply/save adds an owning normal sampling receipt while preserving every original frame/key attribute")
         await command("Undo")
         await command("Save")
         check(info()["scene_hash"] == baseline["scene_hash"], "Universal global Undo restores the complete rigged pre-UV native project")
@@ -180,13 +194,15 @@ async def main():
         side = min(geometry.width, canvas_height) - 40
         left = (geometry.width - side) / 2
         top = 3 * 32 + (canvas_height - side) / 2
-        tap(editor, left + .45 * side, top + .275 * side)
+        seam_u = float(os.environ.get("DOME_UV_SEAM_U", ".45"))
+        seam_v = float(os.environ.get("DOME_UV_SEAM_V", ".275"))
+        tap(editor, left + seam_u * side, top + seam_v * side)
         tap(editor, geometry.width * 4.5 / 6, 48)
         await asyncio.sleep(.3)
         cut_canvas = image(editor).crop((0, 100, geometry.width, geometry.height - 70))
         image(editor).save(OUT / "seam-split.png")
         check(cut_canvas.tobytes() != source_canvas.tobytes(), "Native Seam marks the explicitly picked edge and updates split-chart presentation")
-        tap(editor, left + .45 * side, top + .275 * side)
+        tap(editor, left + seam_u * side, top + seam_v * side)
         tap(editor, geometry.width * 1.5 / 6, 80)
         await asyncio.sleep(.3)
         image(editor).save(OUT / "stitched.png")
