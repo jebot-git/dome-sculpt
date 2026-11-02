@@ -508,6 +508,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     last_paint_ = paint_revision;
     ++state_.revision;
   }
+  if(state_.rig_fit&&!rig_fit_source_matches_locked())state_.rig_fit.reset();
   if(state_.polygon_handoff&&state_.polygon_handoff_revision==UINT64_MAX)state_.polygon_handoff_revision=state_.revision;
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
     state_.polygon_handoff.reset();state_.polygon_handoff_object=0;
@@ -1243,6 +1244,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
+  if(process_rig_fit_spatial_locked(f))return;
   if(process_projection_spatial_locked(f))return;
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
   if (desktop_)
@@ -1303,7 +1305,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
-  if(state_.shape_sculpt||state_.selection_mode)input_.edit_allowed=false;
+  if(state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   if(state_.cut)input_.edit_allowed=false;
   input_.painting = scene_.active().mesh_active&&!state_.shape_sculpt;
@@ -1367,12 +1369,12 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !rig_fit_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
         input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=(import_command(*c)||projection_command(*c))&&published_.load()!=command_publication;
+    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c))&&published_.load()!=command_publication;
     if((command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
@@ -2586,6 +2588,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(rig_fit_command(command))return rig_fit_command_enabled_locked(command);
   if(projection_command(command))return projection_command_enabled_locked(command);
   if(command==SpatialCommand::Save&&state_.asset_busy)return state_.can_save_after_asset;
   if(command==SpatialCommand::CancelWork)
@@ -2790,6 +2793,7 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(rig_fit_command(command)){rig_fit_command_locked(command);return;}
   if(projection_command(command)){projection_command_locked(command);return;}
   if(command==SpatialCommand::SelectionMode){if(selection_ready_locked())configure_selection_locked(!state_.selection_mode);return;}
   if(command==SpatialCommand::ObjectHierarchy){state_.hierarchy_open=!state_.hierarchy_open;state_.hierarchy_anchored=false;input_.cancel();publish_locked(false,false);return;}

@@ -26,6 +26,7 @@ bool Document::begin_native_stroke(){
 }
 bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace space){
   auto &o=scene_.active();
+  if(state_.rig_fit)return false;
   if(o.mesh_active&&!state_.shape_sculpt&&state_.projection&&state_.projection->loading)return false;
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;

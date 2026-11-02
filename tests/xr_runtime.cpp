@@ -50,6 +50,9 @@ Json report = Json::object();
 int instance_tag, session_tag, action_set_tag;
 unsigned frame = 0, physical_frame = 0, event = 0, restart_phase = 0;
 unsigned menu_completion_event = 0;
+std::string rig_fit_mode(){auto p=getenv("DOME_XR_FIXTURE_RIG_FIT");return p?p:"";}
+bool rig_fit_click(){return frame==8||frame==14||frame==20||frame==26||frame==32||frame==38||frame==58;}
+int rig_fit_sector(){if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 10;if(frame>=24&&frame<=26)return 5;if(frame>=30&&frame<=32)return 7;if(frame>=36&&frame<=38)return 2;if(frame>=56&&frame<=58)return 10;return -1;}
 std::string projection_mode(){auto p=getenv("DOME_XR_FIXTURE_PROJECTION");return p?p:"";}
 bool projection_click(){return frame==8||frame==14||frame==20||frame==26||frame==32||frame==38||frame==50||frame==62||frame==68;}
 int projection_sector(){if(frame>=12&&frame<=14)return 9;if(frame>=18&&frame<=20)return 3;if(frame>=24&&frame<=26)return 11;if(frame>=30&&frame<=32)return 9;if(frame>=36&&frame<=38)return 0;if(frame>=48&&frame<=50)return 3;if(frame>=60&&frame<=62)return 8;if(frame>=66&&frame<=68)return 2;return -1;}
@@ -572,6 +575,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
   if(selection_fixture())focus_at=90;
   if(!import_atlas_mode().empty())focus_at=1000;
+  if(!rig_fit_mode().empty())focus_at=rig_fit_mode()=="focus"?47:1000;
   if(!projection_mode().empty())focus_at=projection_mode()=="focus"?78:1000;
   if(!affine_contact_mode().empty())focus_at=affine_contact_mode()=="focus"?12:90;
   if (focus_frame >= focus_at && !lost) {
@@ -592,7 +596,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_regains");
     return XR_SUCCESS;
   }
-  if ((import_atlas_mode().empty()&&projection_mode().empty()) && !selection_fixture() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
+  if ((import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -674,7 +678,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
       if (v.subImage.imageRect.extent.width != 320 ||
           v.subImage.imageRect.extent.height != 320 ||
           std::abs(v.pose.position.x - ((eye ? .032f : -.032f) +
-                                        (frame >= 38 && (import_atlas_mode().empty()&&projection_mode().empty()) && polygon_mode().empty() && !selection_fixture() ? -.2f : 0))) > .0001f)
+                                        (frame >= 38 && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && polygon_mode().empty() && !selection_fixture() ? -.2f : 0))) > .0001f)
         return XR_ERROR_POSE_INVALID;
     }
     count("stereo_submissions");
@@ -691,14 +695,14 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && (import_atlas_mode().empty()&&projection_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && polygon_mode().empty() && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
     return XR_ERROR_SIZE_INSUFFICIENT;
   for (int i = 0; i < 2; ++i) {
     p[i].pose = {{0, 0, 0, 1},
-                 {(i ? .032f : -.032f) + (frame >= 38 && (import_atlas_mode().empty()&&projection_mode().empty()) && polygon_mode().empty() && !selection_fixture() ? -.2f : 0), 1.6f, 0}};
+                 {(i ? .032f : -.032f) + (frame >= 38 && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && polygon_mode().empty() && !selection_fixture() ? -.2f : 0), 1.6f, 0}};
     p[i].fov = {-.6f, .6f, .6f, -.6f};
   }
   return XR_SUCCESS;
@@ -712,6 +716,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
   auto a = reinterpret_cast<Action *>(p->action);
   bool button = right(p->subactionPath) && a->name == "recenter";
   out->isActive = XR_TRUE;
+  if(!rig_fit_mode().empty()){out->currentState=button&&rig_fit_click();out->changedSinceLastSync=button;return XR_SUCCESS;}
   if(!projection_mode().empty()){out->currentState=button&&projection_click();out->changedSinceLastSync=button;return XR_SUCCESS;}
   if(!import_atlas_mode().empty()){out->currentState=button&&import_atlas_click();out->changedSinceLastSync=button;return XR_SUCCESS;}
   if(selection_fixture()){out->currentState=button&&(frame==8||frame==12||frame==32);out->changedSinceLastSync=button;return XR_SUCCESS;}
@@ -795,6 +800,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
                 (a->name == "tip_force" && ink());
   out->isActive = active;
   out->currentState = 0;
+  if(!rig_fit_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&frame>=44&&frame<=48)out->currentState=.8f;return XR_SUCCESS;}
   if(!projection_mode().empty()){if(right(p->subactionPath)&&a->name=="paint_pressure"&&frame>=76&&frame<=82)out->currentState=1;return XR_SUCCESS;}
   if(!import_atlas_mode().empty())return XR_SUCCESS;
   if(selection_fixture()){if(right(p->subactionPath)){if(a->name=="paint_pressure"&&(frame==18||frame==22||frame==26||frame==36))out->currentState=.9f;if(a->name=="canvas_grab"&&frame>=25&&frame<=27)out->currentState=1;}return XR_SUCCESS;}
@@ -854,6 +860,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
    XrActionStateVector2f *out) {
   auto a = reinterpret_cast<Action *>(p->action);
   out->isActive = XR_TRUE;
+  if(!rig_fit_mode().empty()){int sector=rig_fit_sector();float angle=sector*3.14159265358979323846f/6;out->currentState=right(p->subactionPath)&&a->name=="right_stick"&&sector>=0?XrVector2f{std::cos(angle),std::sin(angle)}:XrVector2f{0,0};return XR_SUCCESS;}
   if(!projection_mode().empty()){int sector=projection_sector();float angle=sector*3.14159265358979323846f/6;out->currentState=right(p->subactionPath)&&a->name=="right_stick"&&sector>=0?XrVector2f{std::cos(angle),std::sin(angle)}:XrVector2f{0,0};return XR_SUCCESS;}
   if(!import_atlas_mode().empty()){
     int sector=import_atlas_sector();float angle=sector*3.14159265358979323846f/6;
@@ -1050,6 +1057,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   auto s = reinterpret_cast<Space *>(handle);
   p->locationFlags = XR_SPACE_LOCATION_POSITION_VALID_BIT |
                      XR_SPACE_LOCATION_ORIENTATION_VALID_BIT;
+  if(!rig_fit_mode().empty()){p->pose.orientation={0,0,0,1};p->pose.position=s->action?(right(s->hand)&&frame>=44?XrVector3f{.01f,2.48f,-.85f}:XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.5f}):XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if(!projection_mode().empty()){p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,frame>=72?-.85f:-.5f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if(!import_atlas_mode().empty()){p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.5f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if(selection_fixture()){
@@ -1068,7 +1076,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   p->pose.orientation = {0, 0, 0, 1};
   if(!affine_contact_mode().empty()){p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.85f}:XrVector3f{0,1.6f,0};return XR_SUCCESS;}
   if (s->reference == XR_REFERENCE_SPACE_TYPE_VIEW && !s->action)
-    p->pose.position = {frame >= 38 && (import_atlas_mode().empty()&&projection_mode().empty()) && polygon_mode().empty() && !selection_fixture() ? -.2f : 0, 1.6f, 0};
+    p->pose.position = {frame >= 38 && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && polygon_mode().empty() && !selection_fixture() ? -.2f : 0, 1.6f, 0};
   else
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
