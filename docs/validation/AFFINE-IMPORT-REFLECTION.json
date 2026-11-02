@@ -1,0 +1,48 @@
+{
+  "base": "8d46dfb",
+  "saved_work": "0b65130542e0d80009d71bd2278f2ba511830ca9",
+  "merge": "12b1953",
+  "status": "private reflected-frame/import subset; full production goal active",
+  "release": {
+    "suites": 9,
+    "seconds": 8.43,
+    "failed": 0,
+    "source_chain_checks": 821,
+    "independent_frame_witnesses": 13,
+    "affine_image_comparisons": 12,
+    "affine_max_error": 0,
+    "baseline_image_comparisons": 12,
+    "baseline_max_error": 0,
+    "unchanged_pixel_tolerance": 2
+  },
+  "arc": {
+    "selector": "DRI_PRIME=pci-0000_03_00_0",
+    "vendor": "Intel",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "baseline_assertions": 24,
+    "affine_assertions": 24,
+    "all_max_error": 0
+  },
+  "toolkit": "canonicaleee lib +bitmap-runtimeeee lib; d271 inputs verified unchanged by root",
+  "old_negatives": "Original54 and18 logs remain in artifacts/import-source-chain-085d353; not relabeled",
+  "scope_limits": [
+    "No product renderer/direction edits in this reference correction",
+    "native affine import transaction/GUI/controller and fresh sanitizer still pending",
+    "default-material Scene17 and UV1 Scene18 remain required",
+    "no physical HMD/install/session restart"
+  ],
+  "sha256": {
+    "CMakeLists.txt": "3bc5fcb5527566a1b8602ae8c8fb4ac2dcca81b31daf2189640c22b5023d409c",
+    "tests/source-color-consumer.hpp": "3a8bd6c0c30dfdc53e5d4dfd11650200e55bebd0c5ed5732d0839507dc9da2c9",
+    "tests/consumer-handedness.hpp": "b3c38b223f6d4348f92c3f9672eff0689b751610403310935775fcaa819b007f",
+    "tests/consumer-handedness.cpp": "86ff4a1acb14a92543501adb22cc3d73d8a77e84b6ef296bd188307564552c24",
+    "tests/import-skin-render.cpp": "2b1a09aeb557bc6f438ec1daf21d5a98458a4b40a3512c017c97b51457fd3c4c"
+  },
+  "logs": {
+    "artifacts/configure-affine-release.log": "87c8b745070a0bae762ccb3732aca0d44600f2144520abbc4a4efaa2260e3bbe",
+    "artifacts/build-affine-release.log": "97e5ab621278bb287b64ea2d4b0d627234301a5a1872b8a06e76ce7e79d4a50e",
+    "artifacts/test-affine-release.log": "b4981beed4b9186e9a5f1997930489da1c29ca256ac0f8c0bc6c365c07458116",
+    "artifacts/test-skin-baseline-arc.log": "af7b8b67497530f62bf5c210ae95c1b380c32f7e178158cc317e1572b30caa2e",
+    "artifacts/test-skin-affine-arc.log": "af7b8b67497530f62bf5c210ae95c1b380c32f7e178158cc317e1572b30caa2e"
+  }
+}

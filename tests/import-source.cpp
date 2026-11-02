@@ -90,7 +90,7 @@ int main(int argc,char **argv){try{
   std::string metres_obj="o metre\nv 0 0 0\nv 1000 0 0\nv 0 1000 0\nf 1 2 3\n";write(root/"metres.obj",metres_obj);
   auto metre_scene=prepare_authoring_import(Scene{},root/"metres.obj",millimetre_options);
   const auto &metre_object=metre_scene.scene.object(metre_scene.objects[0]);auto local=metre_object.painted->mesh().positions[1];
-  auto world=metre_scene.scene.world_transform(metre_object.id);auto physical=ob::transform(world,{local.x,local.y,local.z});
+  auto world=metre_scene.scene.world_matrix(metre_object.id);auto coordinate=world.point({local.x,local.y,local.z});Vec3 physical{float(coordinate[0]),float(coordinate[1]),float(coordinate[2])};
   check(std::abs(physical.x-1)<1e-6 && local.x==1 && metre_object.appearance->source_receipt->options.units==ImportUnits::Millimetres,
       "1000mm OBJ adopts metre-local geometry without false 100m raw-coordinate refusal");
   write(root/"quad.obj","o quad\nv 0 0 0\nv 1 0 0\nv 1 1 0\nv 0 1 0\nf 1 2 3 4\n");
@@ -190,7 +190,7 @@ Connections: {
   replace_once(authored_cm,"FrontAxisSign\", \"int\", \"Integer\", \"\",1","FrontAxisSign\", \"int\", \"Integer\", \"\",-1");
   write(root/"authored-cm-zup.fbx",authored_cm);auto physical_scene=prepare_authoring_import(Scene{},root/"authored-cm-zup.fbx",{64,{},{}});
   const auto &physical_object=physical_scene.scene.object(physical_scene.objects[0]);const auto &physical_mesh=physical_object.painted->mesh();
-  auto point0=physical_mesh.positions[physical_mesh.indices[2]];auto physical_world=ob::transform(physical_scene.scene.world_transform(physical_object.id),{point0.x,point0.y,point0.z});
+  auto point0=physical_mesh.positions[physical_mesh.indices[2]];auto coordinate_world=physical_scene.scene.world_matrix(physical_object.id).point({point0.x,point0.y,point0.z});Vec3 physical_world{float(coordinate_world[0]),float(coordinate_world[1]),float(coordinate_world[2])};
   check(std::abs(physical_world.z+2)<1e-5&&std::abs(physical_world.y)<1e-5&&physical_object.appearance->source_receipt->options.units==ImportUnits::FromFile,
       "authored FBX centimetres and Z-up convert to metre-local native coordinates without overrides");
   // Standard native JPEG decode, bounded output and strict truncated-input error.

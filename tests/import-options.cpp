@@ -75,10 +75,10 @@ int main(int argc,char **argv){try{
   hand.sector(6);check(doc.wait_asset()&&doc.wait_mesh(),"actual controller Import applies on ordered background asset worker");
   auto imported=doc.copy_scene();check(imported.objects().size()==2&&doc.frame().state->error.empty(),"native OBJ options publish complete editable object");
   const auto &object=imported.objects().back();
-  const auto &position=object.painted->mesh().positions[1];auto physical=ob::transform(imported.world_transform(object.id),{position.x,position.y,position.z});
+  const auto &position=object.painted->mesh().positions[1];auto coordinates=imported.world_matrix(object.id).point({position.x,position.y,position.z});Vec3 physical{float(coordinates[0]),float(coordinates[1]),float(coordinates[2])};
   check(std::abs(physical.x-.02)<1e-7&&object.painted->resolution()==128&&object.appearance->source_receipt->options==accepted_options.choices,
       "applied custom units and paint size match retained exact options receipt");
-  auto accepted=imported.encode();check(Scene::decode(accepted).encode()==accepted,"controller chosen options survive source-preserving Scene11 restart");
+  auto accepted=imported.encode();check(Scene::decode(accepted).encode()==accepted,"controller chosen options survive source-preserving hierarchy/receipt restart");
   check(doc.undo()&&doc.copy_scene().encode()==baseline&&!doc.frame().state->can_undo,"one Undo restores exact scene before controller import");
   check(doc.redo()&&doc.copy_scene().encode()==accepted,"one Redo restores exact imported source and options");
   auto view_before_cancel=doc.frame().state->importing;doc.import_action(SpatialCommand::ImportUnits);doc.import_action(SpatialCommand::ImportCancel);

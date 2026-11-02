@@ -14,7 +14,10 @@ ROOT=Path(__file__).resolve().parents[1]
 BUILD=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',ROOT/'build'))
 MODE=os.environ.get('DOME_IMPORT_FORMAT','glb').lower()
 FLAT=os.environ.get('DOME_IMPORT_FLAT')=='1'
+AFFINE=os.environ.get('DOME_IMPORT_AFFINE_SOURCE')=='1'
 OUT=ROOT/('artifacts/menu-import-flat-'+MODE if FLAT else 'artifacts/menu-import-'+MODE if MODE!='glb' else 'artifacts/menu-import-skin' if os.environ.get('DOME_IMPORT_HELPER') else 'artifacts/menu-import-authoring');OUT.mkdir(parents=True,exist_ok=True)
+if AFFINE:
+    OUT=ROOT/('artifacts/menu-import-affine-'+MODE+('-skin' if os.environ.get('DOME_IMPORT_HELPER') else ''));OUT.mkdir(parents=True,exist_ok=True)
 checks=[];processes=[]
 def check(value,message):
     checks.append({'passed':bool(value),'check':message});(OUT/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks)},indent=2)+'\n')
@@ -121,6 +124,9 @@ async def main():
         nodes=await ready(True);check(nodes['Undo'][1].get('enabled',False),'Explicit native options Import submits the source-retaining model on a background worker as one history operation')
         await command('Save');accepted=inspect();check(len(accepted['objects'])==3 and len(accepted['groups'])==int(os.environ.get('DOME_IMPORT_GROUPS','5' if MODE=='fbx' else '4')) and sum(o['mesh_active'] for o in accepted['objects'])==2,'Actual native import and Save preserve all objects and editable node hierarchy')
         check(accepted['version']==int(os.environ.get('DOME_IMPORT_VERSION','11' if MODE!='glb' else '9')) and accepted['source_models'] and accepted['source_materials']['bindings'],'Native Save includes canonical source, frame, image, material and deformation archives')
+        if AFFINE:
+            raw=bytes(accepted['source_models'][0]['original_glb']['bytes'])
+            check(raw==asset.read_bytes() and accepted.get('affine_state',{}).get('nodes') and all(g.get('source_placement') is not None for g in accepted['groups'][1:]),'Real native import retains exact affine source bytes and every original node authority')
         if FLAT:
             raw=bytes(accepted['source_models'][0]['original_glb']['bytes']);count=struct.unpack_from('<I',raw,12)[0];source=json.loads(raw[20:20+count])
             frames=accepted['source_materials']['normal_frames']['frames']
