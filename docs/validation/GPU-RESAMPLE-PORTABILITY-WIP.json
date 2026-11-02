@@ -29,6 +29,22 @@
     "build-sanitize/artifacts-portable-sanitize.xml": "1f81cfd6d74b406006d081c5f2f662cd9128d8b258f79a36b61a531faf97ff1e",
     "build-oneapi/artifacts-portable-oneapi.xml": "74368534b86a0c416e520d3d8adfc36fb36cb344cc7aa0cadc7240bf9c481ded",
     "artifacts/before-device.json": "efc920e68a3dcc0bdea79e8ca9c662504271a1100f22fcf61699751b57639e07",
-    "artifacts/after-device.json": "efc920e68a3dcc0bdea79e8ca9c662504271a1100f22fcf61699751b57639e07"
+    "artifacts/after-device.json": "efc920e68a3dcc0bdea79e8ca9c662504271a1100f22fcf61699751b57639e07",
+    "artifacts/resample-missing-probe.cpp": "18ca99e38788a2c9bcc3c756c18691f2bb33f0ec9ea86492e4a157623dd37360",
+    "artifacts/link-cuda-missing.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/cuda-missing.log": "8a53aa5b9cb52f2d2c5ebdac6128b0969439cc5e6abe8881e133036def0ccfd5",
+    "artifacts/resample-cuda-missing": "8321511e5b134978e9a8af433add1528561c7d140cdc0a294156a151569ac5f1",
+    "artifacts/link-hip-missing.log": "ef074792136a468b554fa8e24356ccff6916847330c015bf5601f11ecb6fa528",
+    "artifacts/hip-missing.log": "ef6e5a9405d41d2de46065f78e9f4a4e3da752947e8f5641e48c9eae4866ada8",
+    "artifacts/link-hip-missing-fixed.log": "2ca2fd513a6cf54eb56525485dfa65c9007202d80258ccb89c9809cfbfc2a6c8",
+    "artifacts/link-hip-missing-runtime.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/hip-missing-runtime.log": "9c6eacd26363aa089dff043e8c65c6922d75e279f651eaef2697a341a24e2612",
+    "artifacts/resample-hip-missing": "641899736940aa1ea8742d8c283521e1ed4a67257d6305720930990dce286cdf"
+  },
+  "missing_device_probes": {
+    "CUDA": "linked actual backend object+cudart; insufficient driver; source cells unchanged",
+    "ROCM": "linked actual backend object+amdhip64; no device; source cells unchanged",
+    "scope": "minimal native module probes, not full application",
+    "initial_hip_manual_link_failures_preserved": true
   }
 }

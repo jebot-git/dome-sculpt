@@ -29,3 +29,11 @@ unmodified. Whole-resolution worker integration and quality/history/Save,
 full CUDA/HIP linking and positive vendor hardware remain separate requirements.
 The child inherits unfinished actual-worker code; no main runtime admission,
 installation, headset launch or active-session restart is implied.
+
+Separate minimal native probes now link each actual backend object with its
+vendor runtime. CUDA reports insufficient driver and HIP reports no ROCm-capable
+device; both nonempty sparse dispatches refuse explicitly with every source
+cell byte unchanged. This is missing-device evidence, not positive hardware.
+The first manual HIP link invocation incorrectly treated the object as source;
+a second omitted its runtime. Preserved diagnostics are separate from the final
+successful explicit-language/runtime link and do not indicate a product defect.
