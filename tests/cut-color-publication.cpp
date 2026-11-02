@@ -33,6 +33,7 @@ extern "C" void error_wrap(Document*,void*,std::exception_ptr) asm("__wrap__ZN4d
 extern "C" void error_wrap(Document *d,void *job,std::exception_ptr error){error_real(d,job,std::move(error));tracking=false;}
 namespace dome {struct DocumentTransactionTestAccess {
  static auto tokens(const Document &d){std::lock_guard lock(d.model_mutex_);return std::tuple{d.content_,d.next_content_,d.saved_content_,d.undo_.size(),d.redo_.size(),d.state_.revision,d.state_.generation,d.recovery_content_};}
+ static auto permissions(const Document &d){std::lock_guard lock(d.model_mutex_);return std::tuple{d.state_.held_object,d.state_.edit_authority,d.state_.isolate_held,d.state_.selected_objects};}
  static auto source(const Document &d){std::lock_guard lock(d.model_mutex_);return d.native_source_scene_;}
  static auto lease(const Document &d){std::lock_guard lock(d.model_mutex_);return std::tuple{d.cut_source_.generation,d.cut_source_.revision,d.cut_source_.object,d.cut_source_.edit_authority,d.cut_base_,d.cut_bake_source_};}
  static auto work(const Document &d){return d.asset_work_.load();}
@@ -79,28 +80,32 @@ CutPublishReport prepare_or_replay(Scene &s,const CutPreview &p,const BakeSource
  }
  return prepared.report;
 }
-std::unique_ptr<Document> setup(){auto d=std::make_unique<Document>();static const Scene base=[] {auto scene=cut_color_fixture::scene(true,true);cut_color_fixture::pose(scene);return scene;}();d->replace(base.snapshot());current_document=d.get();for(auto name:{"Retained artist A","Retained artist B"}){auto o=d->copy_scene().active();d->object_properties(o.id,name,o.visible,o.locked,o.transform,o.material);}require(d->undo(),"Create pre-existing redo");require(d->wait_mesh(),"Source with retained history packs");d->begin_cut();require(d->wait_cut()&&d->frame().state->error.empty(),"Actual posed source/preview ready");return d;}
+std::unique_ptr<Document> setup(){auto d=std::make_unique<Document>();static const Scene base=[] {auto scene=cut_color_fixture::scene(true,true);cut_color_fixture::pose(scene);return scene;}();d->replace(base.snapshot());current_document=d.get();for(auto name:{"Retained artist A","Retained artist B"}){auto o=d->copy_scene().active();d->object_properties(o.id,name,o.visible,o.locked,o.transform,o.material);}require(d->undo(),"Create pre-existing redo");require(d->wait_mesh(),"Source with retained history packs");if(std::getenv("DOME_CUT_PUBLICATION_HELD")){d->configure_object_grab(true,true);d->hold_object(d->frame().state->active_object);}d->begin_cut();require(d->wait_cut()&&d->frame().state->error.empty(),"Actual posed source/preview ready");return d;}
 std::future<void> accept_save(Document &d,const std::filesystem::path &path){gate.arm();d.end_cut(true);gate.wait();return d.save_async(path);}
 }
 int main(int argc,char **argv)try{
  require(argc==2||argc==4||argc==5,"Choose publication fixture directory and optional exact fault range/shard");std::filesystem::path directory=argv[1];std::filesystem::create_directories(directory);set_paint_composite_cache_budget(0);
  auto measured=setup();Release cleanup;auto file=directory/"measured.dsculpt";auto saving=accept_save(*measured,file);calls=0;boundary=SIZE_MAX;hit=false;enabled=true;gate.release();saving.get();require(measured->wait_asset()&&measured->frame().state->error.empty(),"Measured publication succeeds");enabled=false;auto count=calls.load();require(count>100,"Real pre-swap/authority/publication allocation boundaries observed");auto expected=measured->copy_scene().encode();cache_unchanged();measured.reset();std::cout<<count<<" actual cut publication boundaries after witnessed immutable preparation replay\n";
- size_t first=1,last=count;
- if(argc==4){first=std::stoull(argv[2]);last=std::min(count,size_t(std::stoull(argv[3])));}
+ size_t first=1,last=count,edges=0;
+ if(argc==4&&std::string_view(argv[2])=="--edges"){edges=std::stoull(argv[3]);require(edges&&edges<=count/2,"Bounded first/last publication edge scope");}
+ else if(argc==4){first=std::stoull(argv[2]);last=std::min(count,size_t(std::stoull(argv[3])));}
  if(argc==5){require(std::string_view(argv[2])=="--shard","Choose explicit shard mode");size_t shard=std::stoull(argv[3]),total=std::stoull(argv[4]);require(total&&total<=256&&shard<total&&count<=SIZE_MAX/total,"Bounded publication shard index");first=count*shard/total+1;last=count*(shard+1)/total;}
  require(first&&first<=last&&last<=count,"Valid actual publication allocation range");
  for(size_t at=first;at<=last;++at){
-  auto d=setup();Release release;auto original=d->copy_scene().encode();auto path=directory/"retained.dsculpt";d->copy_scene().save(path);auto tokens=DocumentTransactionTestAccess::tokens(*d);auto source=DocumentTransactionTestAccess::source(*d);auto mesh=d->frame().surface;auto preview=d->frame().state->cut->preview;auto lease=DocumentTransactionTestAccess::lease(*d);
+  if(edges&&at>edges&&at<=count-edges)continue;
+  auto d=setup();Release release;auto original=d->copy_scene().encode();auto path=directory/"retained.dsculpt";d->copy_scene().save(path);auto tokens=DocumentTransactionTestAccess::tokens(*d);auto permissions=DocumentTransactionTestAccess::permissions(*d);auto source=DocumentTransactionTestAccess::source(*d);auto mesh=d->frame().surface;auto preview=d->frame().state->cut->preview;auto lease=DocumentTransactionTestAccess::lease(*d);
   auto future=accept_save(*d,path);auto work=DocumentTransactionTestAccess::work(*d);calls=0;boundary=at;hit=false;enabled=true;gate.release();bool failed=false;try{future.get();}catch(const std::bad_alloc&){failed=true;}enabled=false;
   require(d->wait_asset(),"Failed cut/file worker drains");cache_unchanged();require(hit&&failed,"Each real pre-commit allocation fails and dependent Save preserves the original exception");
   require(d->copy_scene().encode()==original&&Scene::load(path).encode()==original,"Failed publication preserves complete source Scene and old Save bytes");
   require(DocumentTransactionTestAccess::tokens(*d)==tokens&&DocumentTransactionTestAccess::source(*d)==source&&d->frame().surface==mesh,"Failed publication retains undo/redo/content/nextContent/revision/generation/cache/mesh authority");
   require(d->frame().state->cut&&d->frame().state->cut->preview==preview&&!d->frame().state->cut->committing&&DocumentTransactionTestAccess::lease(*d)==lease,"Failed cut retains exact original draft/preview/source lease for retry");
+  require(DocumentTransactionTestAccess::permissions(*d)==permissions,"Failed held publication retains exact held/selection/isolation/epoch permission authority");
   require(work->cut_done&&work->cut_failure&&!work->cut_completed,"Accepted snapshot failure bookkeeping remains exact under persistent allocation denial");
   d->end_cut(true);require(d->wait_asset()&&d->frame().state->error.empty()&&!d->frame().state->cut&&d->copy_scene().encode()==expected,"Actual failed cut retries its exact prepared result");
-  require(d->undo()&&d->copy_scene().encode()==original&&d->redo()&&d->copy_scene().encode()==expected,"Retried cut has exactly one undoable source-retaining history transition");cache_unchanged();
+  auto held=d->frame().state->held_object;
+  require(d->undo()&&d->copy_scene().encode()==original&&(!held||d->frame().state->held_object==d->frame().state->active_object)&&d->redo()&&d->copy_scene().encode()==expected&&d->frame().state->held_object==held,"Retried cut has exactly one undoable source-retaining history transition and exact corresponding hold endpoints");cache_unchanged();
   if((at&63)==0)std::cout<<"Reached publication allocation "<<at<<std::endl;
  }
  require(prepared.output->encode()==prepared.output_value,"Final full encoded prepared snapshot remains byte-for-byte exact");
- std::cout<<"PASS publication allocation range "<<first<<".."<<last<<" of "<<count<<" actual cut pre-commit allocations preserve source/history/leases, original exception, old output and retry\n";return 0;
+ std::cout<<(edges?"Selected first/last allocation edges, ":"Exhaustive allocation range, ")<<"PASS publication allocation range "<<first<<".."<<last<<" of "<<count<<" actual cut pre-commit allocations preserve source/history/leases, original exception, old output and retry\n";return 0;
 }catch(const std::exception &e){enabled=false;gate.release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -18,14 +18,21 @@ with tempfile.TemporaryDirectory(prefix="projects-",dir=out) as temporary:
     subprocess.run([str(binary.parent/"dome-sculpt-cut-color-test"),"--ui-fixture",str(fixture)],env=env,check=True)
     def inspect(path):return json.loads(subprocess.check_output([str(binary.parent/"dome-sculpt-cut-authoring-test"),"--inspect",str(path)],env=env,text=True))
     original=inspect(fixture)
-    for mode in ("accept","unconfirmed"):
-        target=out/(mode+".dsculpt");report=out/(mode+".json")
-        with (out/(mode+".log")).open("w") as log:
-            result=subprocess.run([str(binary),"--xr","--frames","80","--save",str(target),"--open",str(fixture)],env={**env,"DOME_XR_FIXTURE_REPORT":str(report),"DOME_XR_FIXTURE_CUT":mode},stdout=log,stderr=subprocess.STDOUT,timeout=60)
+    cases=("accept","unconfirmed","held")
+    if selected:=os.getenv("DOME_CUT_XR_CASE"):
+        assert selected in cases
+        cases=(selected,)
+    for case in cases:
+        mode="accept" if case=="held" else case
+        target=out/(case+".dsculpt");report=out/(case+".json")
+        with (out/(case+".log")).open("w") as log:
+            result=subprocess.run([str(binary),"--xr","--frames","80","--save",str(target),"--open",str(fixture)],env={**env,"DOME_XR_FIXTURE_REPORT":str(report),"DOME_XR_FIXTURE_CUT":mode,**({"DOME_XR_FIXTURE_CUT_HELD":"1"} if case=="held" else {})},stdout=log,stderr=subprocess.STDOUT,timeout=60)
         check(result.returncode==0,"Real-loader current-color "+mode+" exits through the actual standalone save path")
         activity=json.loads(report.read_text())
         check(activity.get("cut_preview_ready") is True and activity.get("cut_slider_samples",0)>0 and activity.get("cut_script_step",0)>=33 and activity.get("tracking_losses",0)==0,"Actual page17 joystick/large ray slider author a colored cut with valid tracking")
         check(activity["frames_waited"]==activity["frames_begun"]==activity["frames_ended"] and activity["acquires"]==activity["image_waits"]==activity["releases"] and activity["swapchains_destroyed"]==2,"Both real GL eyes and OpenXR shutdown ownership remain balanced")
+        if case=="held":
+            check(activity.get("cut_held_prefix") is True and activity.get("cut_raw_step",0)>=47,"Actual joystick Holding page enables grab mode, pins the source and enables ghost isolation before Cut")
         saved=inspect(target)
         if mode=="unconfirmed":
             check(saved==original,"Unconfirmed colored cut is cancelled exactly before standalone save")

@@ -27,6 +27,10 @@ int main(int argc, char **argv) try {
     cut_color_fixture::scene().save(argv[2]);
     return 0;
   }
+  if (argc == 3 && std::string_view(argv[1]) == "--ui-fixture-posed") {
+    auto scene=cut_color_fixture::scene();cut_color_fixture::pose(scene);
+    scene.save(argv[2]);return 0;
+  }
   for (bool affine : {false, true})
     for (bool seam : {false, true}) {
       auto scene = cut_color_fixture::scene(seam, affine);

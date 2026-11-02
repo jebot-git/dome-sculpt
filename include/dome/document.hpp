@@ -377,6 +377,8 @@ private:
     std::optional<Scene> before, after;
     uint64_t from = 0, to = 0;
     std::shared_ptr<PaintedMesh> paint{};
+    // Only a sealed structural cut may move the corresponding held endpoint.
+    uint64_t held_before=0, held_after=0;
   };
   class AuthorityTransition;
   class Transaction;
@@ -642,6 +644,11 @@ private:
         throw std::runtime_error("Export cancelled");
     }
   };
+  struct CutHandoff {
+    uint64_t source=0, shell=0, cap=0, group=0, held_source=0;
+    std::shared_ptr<const Scene> sealed;
+  };
+  void validate_cut_handoff(const Scene &, const Scene &, const CutHandoff &) const;
   struct FileJob {
     Scene scene;
     std::filesystem::path path;
@@ -681,6 +688,7 @@ private:
     std::shared_ptr<PolygonAccept> polygon_capture;
     std::shared_ptr<ExportWork> export_work;
     std::shared_ptr<AssetWork> cut_capture;
+    std::shared_ptr<CutHandoff> cut_handoff;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.
@@ -750,7 +758,7 @@ private:
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
-                                    uint64_t cut_session = 0);
+                                    uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});

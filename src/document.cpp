@@ -355,10 +355,12 @@ void Document::scene_changed_locked(Scene before) {
 }
 bool Document::undo_locked(bool redo) {
   AuthorityTransition authority(*this);
-  if(state_.held_object){invalidate_object_authority_locked();state_.held_object=0;}
   auto &source=redo?redo_:undo_,&dest=redo?undo_:redo_;
   if(source.empty())return false;
-  Transaction transaction(*this);const auto &h=source.back();
+  const auto &h=source.back();
+  const bool cut_held=h.held_before&&h.held_after&&state_.held_object==(redo?h.held_before:h.held_after);
+  if(state_.held_object){invalidate_object_authority_locked();state_.held_object=0;}
+  Transaction transaction(*this);
   std::shared_ptr<Volume> sculpt;
   std::shared_ptr<PaintedMesh> paint;
   if(h.paint){
@@ -374,6 +376,7 @@ bool Document::undo_locked(bool redo) {
     for(const auto &o:scene_.objects())if(o.volume==h.sculpt){auto &target=scene_.object(o.id);target.volume=sculpt;target.mesh_active=false;scene_.select(o.id);found=true;}
     if(!found)throw std::logic_error("Sculpt history target is unavailable");
   }else scene_=redo?*h.after:*h.before;
+  if(cut_held){state_.held_object=redo?h.held_after:h.held_before;state_.selected_objects={state_.held_object};}
   if(state_.selection_focus&&scene_.active().id!=transaction.before().active().id)state_.selected_objects={scene_.active().id};
   transaction.move_history(source,dest);
   content_=redo?h.to:h.from;bind_locked();publish_locked(true,false);
@@ -554,7 +557,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_author_shapes=shape_target_ready_locked();
   state_.can_restore_shapes=state_.can_author_shapes&&bool(active.shape_source);
   state_.can_select_shape=state_.can_author_shapes&&active.deformation&&active.deformation->morphs&&!active.deformation->morphs->targets.empty();
-  state_.can_cut = detail::cut_color_supported(active) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
+  state_.can_cut = !state_.shape_sculpt && detail::cut_color_supported(active) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
   state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
@@ -3234,7 +3237,13 @@ void Document::file_loop() {
         };
         job->scene_operation(job->scene, cancelled);
         if (cancelled()) throw std::runtime_error("Scene changed during " + job->operation_label);
-        if(isolated_before)detail::require_isolated_scene(*isolated_before,job->scene,job->isolation_target);
+        if(job->cut_handoff){
+          if(!job->cut_session)throw std::logic_error("Cut structural permit has no accepted session");
+          // Source preparation/validation stays on the worker, outside the UI lock.
+          // The existing job scene before mutation is retained only under isolation.
+          if(isolated_before)validate_cut_handoff(*isolated_before,job->scene,*job->cut_handoff);
+          else if(!job->cut_handoff->sealed)throw std::logic_error("Cut structural permit is unsealed");
+        }else if(isolated_before)detail::require_isolated_scene(*isolated_before,job->scene,job->isolation_target);
         auto prepared = job->scene.snapshot();
         prepared.validate();
         std::shared_ptr<CutAcceptedSnapshot> cut_result;
@@ -3261,7 +3270,17 @@ void Document::file_loop() {
           // first sample. Closed/focus-lost menus retain ordinary cancellation.
           const bool keep_shapes=job->work&&job->work->morph_target.load()!=UINT32_MAX&&
             input_.menu_open()&&input_.menu_page()==24;
-          if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked(keep_shapes);}
+          if(changed){
+            History history{{},transaction.before(),prepared};
+            if(job->cut_handoff&&job->cut_handoff->held_source){
+              const auto &permit=*job->cut_handoff;
+              if(state_.held_object!=permit.held_source||state_.edit_authority==UINT64_MAX)
+                throw std::logic_error("Held cut authority changed before publication");
+              history.held_before=permit.held_source;history.held_after=permit.shell;
+              state_.held_object=permit.shell;state_.selected_objects={permit.shell};++state_.edit_authority;
+            }
+            scene_=std::move(prepared);record_locked(std::move(history));bind_locked(keep_shapes);
+          }
           if(job->work&&job->work->morph_target.load()!=UINT32_MAX)state_.morph_target=job->work->morph_target.load();
           state_.error.clear();state_.message=job->operation_label+" complete";
           if(job->operation_report&&!job->operation_report->empty())state_.message+=" | "+*job->operation_report;

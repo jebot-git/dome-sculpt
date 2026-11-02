@@ -60,6 +60,8 @@ std::string skin_mode(){auto mode=getenv("DOME_XR_FIXTURE_SKIN");return mode?mod
 std::string retopo_mode(){auto mode=getenv("DOME_XR_FIXTURE_RETOPO");return mode?mode:"";}
 std::string cut_mode(){auto mode=getenv("DOME_XR_FIXTURE_CUT");return mode?mode:"";}
 unsigned cut_step=0;
+bool cut_held(){return getenv("DOME_XR_FIXTURE_CUT_HELD")!=nullptr;}
+unsigned cut_stage(){return !cut_held()?cut_step:cut_step<28?0:cut_step-14;}
 bool cut_preview_ready=false,cut_apply_ready=false;
 std::string mask_mode(){auto mode=getenv("DOME_XR_FIXTURE_SCULPT_MASK");return mode?mode:"";}
 bool bake_normal_mode(){return getenv("DOME_XR_FIXTURE_BAKE_NORMAL")!=nullptr;}
@@ -449,10 +451,10 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
     report["polygon_motion_changed_pixels"]=std::max(report.value("polygon_motion_changed_pixels",size_t(0)),changed);
     if(changed>100){polygon_motion_visible=true;report["polygon_motion_visible"]=true;}
   }
-  const bool cut_wait=!cut_mode().empty() && (cut_step==20 || (cut_mode()=="accept" && cut_step==30));
+  const bool cut_wait=!cut_mode().empty() && (cut_stage()==20 || (cut_mode()=="accept" && cut_stage()==30));
   const bool mask_gate=!mask_mode().empty() && (mask_step==68 || mask_step==79);
   if (cut_wait || mask_gate || (!retopo_mode().empty() && (retopo_step == 27 || retopo_step == 60))) {
-    const bool initial=cut_wait?cut_step==20:retopo_step==27;
+    const bool initial=cut_wait?cut_stage()==20:retopo_step==27;
     const int sector = cut_wait?7:mask_gate || initial?0:10;
     float angle = sector * 6.28318530718f / 12;
     float world_x = (cut_wait?.045f:0.f) + .6f * 220.f / 640 * std::cos(angle);
@@ -607,9 +609,9 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
     report["retopo_script_step"] = retopo_step;
   }
   if(auto mode=cut_mode();!mode.empty()){
-    bool waiting=(cut_step==20&&!cut_preview_ready)||(mode=="accept"&&cut_step==30&&!cut_apply_ready);
+    bool waiting=(cut_stage()==20&&!cut_preview_ready)||(mode=="accept"&&cut_stage()==30&&!cut_apply_ready);
     if(!waiting)++cut_step;
-    report["cut_script_step"]=cut_step;
+    report["cut_script_step"]=cut_stage();report["cut_raw_step"]=cut_step;report["cut_held_prefix"]=cut_held();
   }
   if(auto mode=mask_mode();!mode.empty()) {
     // A completed radial action disarms its input lease. The first released
@@ -730,8 +732,9 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->changedSinceLastSync = button;
   }
   if(auto mode=cut_mode();!mode.empty()){
-    auto step=cut_step;
-    out->currentState=button&&(step==8||step==10||step==12||step==14||step==16||step==18||step==22||
+    auto step=cut_stage();
+    const bool setup=cut_held()&&cut_step<28&&(cut_step==8||cut_step==10||cut_step==12||cut_step==14||cut_step==16||cut_step==19||cut_step==22||cut_step==25);
+    out->currentState=button&&(setup||step==8||step==10||step==12||step==14||step==16||step==18||step==22||
                                (mode=="accept"&&(step==26||step==32)));
     out->changedSinceLastSync=button;
   }
@@ -795,7 +798,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
       stroke = mode!="committed" && (step==32 || (mode=="focus" ? (step>=36 && step<=41) || step==48 || step==52
                                                                              : step==36 || step==40));
     }
-    if(!cut_mode().empty())stroke=cut_step==24;
+    if(!cut_mode().empty())stroke=cut_stage()==24;
     if(auto mode=mask_mode();!mode.empty()) {
       auto step=mask_step;stroke=step==20 || step==26 || step==32 || step==56 || step==58 || step==62 || (mode=="focus" && step>=36 && step<=41);
     }
@@ -930,7 +933,17 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(step>=60 && step<=62) out->currentState={.5f,-.8660254f};
   }
   if(!cut_mode().empty()&&right(p->subactionPath)&&a->name=="right_stick"){
-    auto step=cut_step;out->currentState={0,0};
+    auto step=cut_stage();out->currentState={0,0};
+    if(cut_held()&&cut_step<28){
+      int sector=-1;
+      if(cut_step==9||cut_step==10||cut_step==24||cut_step==25)sector=8;
+      if(cut_step==11||cut_step==12||cut_step==13||cut_step==14)sector=9;
+      if(cut_step==15||cut_step==16)sector=0;
+      if(cut_step==18||cut_step==19)sector=1;
+      if(cut_step==21||cut_step==22)sector=3;
+      if(cut_step==27)sector=4;
+      if(sector>=0){const float angle=sector*6.283185307f/12;out->currentState={std::cos(angle),std::sin(angle)};}
+    }
     if(step==9||step==10)out->currentState={-.5f,-.8660254f};
     if(step==11||step==12)out->currentState={0,-1};
     if(step==13||step==14)out->currentState={-.5f,.8660254f};
@@ -1029,6 +1042,9 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     p->pose.position = {(right(s->hand) ? float((frame % 5) * .015f) : -.3f) +
                             (frame >= 38 ? -.2f : 0),
                         1.48f, -.48f};
+  // Cut controls use an independently specified world-space ray. Keep their
+  // menu anchor fixed when the Holding preamble shifts the frame timeline.
+  if(!cut_mode().empty()&&s->action&&right(s->hand))p->pose.position={.045f,1.48f,-.48f};
   if (getenv("DOME_XR_FIXTURE_RESTART") && s->action && right(s->hand) &&
       frame >= 24 && frame <= 26)
     p->pose.position = {-.22f, 1.48f, -.48f};
@@ -1062,7 +1078,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     float t=mode=="fitted"?0.f:1.f;
     p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
   }
-  if(!cut_mode().empty()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&cut_step==24){
+  if(!cut_mode().empty()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&cut_stage()==24){
     p->pose.position={.045f+((100+420*.6f)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
   }
   if (auto mode=retopo_mode(); !mode.empty() && s->action && right(s->hand)) {

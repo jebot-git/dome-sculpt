@@ -22,7 +22,7 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
-                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session) {
+                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff) {
   require_authority_locked(expected);
   if(state_.object_grabbing && !(work&&work->held_weight))throw std::logic_error("Release object motion before starting asset work");
   if(state_.isolate_held && state_.held_object)require_object_editable_locked(scene_.active().id);
@@ -49,6 +49,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   job.rollback_preview = std::move(rollback_preview);
   job.retopo_session = retopo_session;
   job.cut_session = cut_session;
+  job.cut_handoff = std::move(cut_handoff);
   std::lock_guard file_lock(file_mutex_);
   if (files_.size() >= 8) throw std::runtime_error("File and asset work queue is full");
   Transaction transaction(*this);

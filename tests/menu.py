@@ -24,6 +24,8 @@ retopo_compact = os.environ.get("DOME_MENU_RETOPO_COMPACT") == "1"
 retopo_flow = os.environ.get("DOME_MENU_RETOPO") == "1" or retopo_compact
 cut_compact = os.environ.get("DOME_MENU_CUT_COMPACT") == "1"
 colored_cut = os.environ.get("DOME_MENU_COLORED_CUT") == "1"
+key_cut = os.environ.get("DOME_MENU_CUT_KEY_SCULPT") == "1"
+held_cut = os.environ.get("DOME_MENU_CUT_HELD") == "1"
 cut_flow = os.environ.get("DOME_MENU_CUT") == "1" or cut_compact or colored_cut
 compact = os.environ.get("DOME_MENU_CREATOR_COMPACT") == "1" or os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact or retopo_compact or cut_compact
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1" or rig_compact
@@ -36,7 +38,7 @@ out = root / ("artifacts/menu-rig-compact" if rig_compact else "artifacts/menu-e
 if retopo_flow:
     out = root / ("artifacts/menu-retopo-compact" if retopo_compact else "artifacts/menu-retopo")
 if cut_flow:
-    out = root / (("artifacts/menu-colored-cut-compact" if cut_compact else "artifacts/menu-colored-cut") if colored_cut else ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut"))
+    out = root / (("artifacts/menu-colored-held-cut-compact" if held_cut and cut_compact else "artifacts/menu-colored-held-cut" if held_cut else "artifacts/menu-colored-key-cut" if key_cut else "artifacts/menu-colored-cut-compact" if cut_compact else "artifacts/menu-colored-cut") if colored_cut else ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut"))
 if creator_flow:
     out = root / ("artifacts/menu-vroid-only-compact" if compact else "artifacts/menu-vroid-only")
 out.mkdir(parents=True, exist_ok=True)
@@ -125,7 +127,7 @@ async def main():
             arguments.append(str(fixture))
         elif cut_flow:
             fixture = Path(home, "cut.dsculpt")
-            subprocess.run([str(root / ("build/dome-sculpt-cut-color-test" if colored_cut else "build/dome-sculpt-cut-authoring-test")), "--ui-fixture", str(fixture)], check=True)
+            subprocess.run([str(root / ("build/dome-sculpt-cut-color-test" if colored_cut else "build/dome-sculpt-cut-authoring-test")), "--ui-fixture-posed" if key_cut else "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
         elif retopo_flow:
             fixture = Path(home, "retopo.dsculpt")
@@ -252,6 +254,17 @@ async def main():
             nodes=await ready("Start cut")
             check(nodes["Start cut"][1].get("enabled") is True and nodes["Apply cut"][1].get("enabled") is False,
                   "Native universal menu exports an available cut tool and disabled unopened Apply")
+            if key_cut:
+                await click("Sculpt selected shapekey");nodes,_=await layout()
+                check(nodes["Sculpt selected shapekey"][1].get("toggle-state")==1 and nodes["Start cut"][1].get("enabled") is False and info()["scene_hash"]==baseline["scene_hash"],
+                      "Actual universal menu disables Cut during selected-key preview and preserves authoritative saved shape weights")
+                await click("Sculpt selected shapekey");nodes=await ready("Start cut")
+                check(nodes["Sculpt selected shapekey"][1].get("toggle-state")==0 and info()["scene_hash"]==baseline["scene_hash"],
+                      "Finishing key mode restores actual Cut capability without rewriting saved pose or source")
+            if held_cut:
+                await click("Object grab mode");await click("Ghost other objects");await click("Hold selected object");nodes=await ready("Start cut")
+                check(nodes["Object grab mode"][1].get("toggle-state")==1 and nodes["Ghost other objects"][1].get("toggle-state")==1 and nodes["Release held object"][1].get("enabled") is True,
+                      "Actual universal-menu holding and ghost isolation retain enabled guarded Cut")
             original_pixels=pixels() if not cut_compact else None
             await click("Start cut");nodes=await ready("Apply cut")
             check(nodes["Cap cut"][1].get("toggle-state")==1 and nodes["Flip kept side"][1].get("toggle-state")==0
@@ -305,6 +318,10 @@ async def main():
                   and accepted["objects"][0]["payload_hash"]==baseline["objects"][0]["payload_hash"]
                   and accepted["objects"][1]["baked"] is True,
                   "Native Apply/Save persist mapped shell and cap objects while retaining the exact painted source")
+            if held_cut:
+                nodes=await ready("Start cut")
+                check(nodes["Ghost other objects"][1].get("toggle-state")==1 and nodes["Release held object"][1].get("enabled") is True,
+                      "Native cut publication hands holding to the editable shell without disabling isolation")
             if colored_cut:
                 full=json.loads(subprocess.check_output([str(root/"build/dome-sculpt-cut-authoring-test"),"--inspect",str(fixture)],env=env))["scene"]
                 archive=full["polygon_sources"];objects=full["objects"]
@@ -316,6 +333,8 @@ async def main():
             check(info()["scene_hash"]==baseline["scene_hash"],"One global native Undo restores all pre-cut source data")
             await click("Redo");await click("Save")
             check(info()["scene_hash"]==accepted["scene_hash"],"Global native Redo restores cut geometry, material groups and baked paint")
+            if held_cut:
+                nodes=await ready("Start cut");check(nodes["Release held object"][1].get("enabled") is True,"Native Undo/Redo preserve the corresponding held cut endpoint")
             await click("Start cut");await ready("Offset...");await click("Cancel cut");await click("Save")
             check(info()["scene_hash"]==accepted["scene_hash"] and app.poll() is None,
                   "Cancelling a further cut leaves the authored scene and native application intact")

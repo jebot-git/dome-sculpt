@@ -111,5 +111,45 @@ int main(int argc,char **argv)try{
   bool entered=false;{std::unique_lock lock(shutdown_mutex);entered=shutdown_changed.wait_for(lock,std::chrono::seconds(10),[]{return shutdown_entered;});}
   gate.release();teardown.join();earlier.get();saving.get();check(entered&&Scene::load(path).objects().size()==3,"Destruction observes the actual pending-cut predicate wait and drains accepted cut plus ordered Save before stopping workers");
  }
+ {
+  auto original=cut_color_fixture::scene();cut_color_fixture::pose(original);Document d;d.replace(original);check(d.wait_mesh(),"Saved pose prepares before selected-key mode test");auto encoded=d.copy_scene().encode();
+  d.configure_shape_sculpt(true);check(d.wait_mesh()&&d.frame().state->shape_sculpt&&!d.frame().state->can_cut,"Selected-key editing disables cut readiness instead of advertising a saved-weight fallback");
+  bool refused=false;try{d.begin_cut();}catch(const std::logic_error&){refused=true;}
+  check(refused&&d.copy_scene().encode()==encoded&&!d.frame().state->cut&&d.frame().state->shape_sculpt,"Direct Cut API refuses selected-key mode without modifying source, pose, history or mode");
+  d.configure_shape_sculpt(false);check(d.wait_mesh()&&d.frame().state->can_cut&&d.copy_scene().encode()==encoded,"Finishing key mode restores cut readiness and exact saved pose");
+  d.edit_scene("Explicit authoritative shape weight one",[](Scene &scene,const auto &){auto pose=*scene.active().deformation;pose.morph_weights={1};scene.set_deformation(scene.active().id,std::move(pose));});
+  check(d.wait_asset()&&d.wait_mesh()&&d.frame().state->can_cut,"Explicit authoritative weight one is a supported actual cut pose");auto weighted=d.copy_scene().encode();
+  d.begin_cut();ready(d);d.end_cut(true);check(d.wait_asset()&&!d.frame().state->cut&&d.frame().state->error.empty()&&d.copy_scene().active().polygon->origin->deformation->morph_weights==std::vector<float>{1}&&d.undo()&&d.copy_scene().encode()==weighted,"Cut uses explicit saved weight one and retains its exact source in one undoable transaction");
+ }
+ // A private cut permit, not generic scene editing, owns structural handoff.
+ for(bool controller:{false,true})for(bool cap:{false,true}){
+  auto original=cut_color_fixture::scene(true,true);auto source=original.active().id;
+  auto group=original.add_group("Protected group");auto other=original.add("Read-only neighbor",Volume{});
+  original.object(other).group=group;original.object(other).locked=true;original.select(source);auto encoded=original.encode();
+  Document d;Release release;d.replace(original);d.configure_object_grab(true,true);d.hold_object(source);
+  check(d.wait_mesh()&&d.frame().state->can_cut&&d.object_editable(source)&&!d.object_editable(other),"Held isolated source advertises the real supported cut path");
+  d.edit_scene("Untrusted structural edit",[](Scene &scene,const auto &){scene.add("Unauthorized child",Volume{});});
+  check(d.wait_asset()&&!d.frame().state->error.empty()&&d.copy_scene().encode()==encoded&&d.frame().state->held_object==source,"Generic isolated edit_scene still refuses structural additions without a typed cut permit");
+  d.begin_cut();ready(d);auto settings=d.frame().state->cut->settings;settings.offset_mm=31;settings.cap=cap;d.edit_cut(settings);ready(d);d.end_cut(false);
+  check(d.copy_scene().encode()==encoded&&d.frame().state->held_object==source&&!d.frame().state->can_undo,"Cancelling held cut preserves exact source, IDs, hold and history");
+  d.begin_cut();ready(d);settings=d.frame().state->cut->settings;settings.offset_mm=31;settings.cap=cap;d.edit_cut(settings);ready(d);
+  if(controller){Controller hand(d);hand.open();check(d.frame().state->menu_page==17&&d.frame().state->menu_enabled[7],"Held controller workspace exposes enabled guarded Apply");hand.sector(7);}else d.end_cut(true);
+  auto path=directory/("held-"+std::to_string(controller)+"-"+std::to_string(cap)+".dsculpt");d.save_async(path).get();
+  check(d.wait_asset()&&d.wait_mesh()&&d.frame().state->error.empty()&&!d.frame().state->cut,"Held structural cut and immediate Save publish through accepted worker ordering");
+  auto after=d.copy_scene();auto shell=after.active().id;auto accepted=after.encode();auto state=d.frame().state;
+  check(state->held_object==shell&&state->selected_objects==std::vector<uint64_t>{shell}&&d.object_editable(shell)&&state->isolate_held,"Validated shell becomes the sole held, selected editable output");
+  bool ghosts=true;for(const auto &o:state->objects)if(o.id!=shell){ghosts&=!o.editable;if(o.visible)ghosts&=o.ghost;}
+  check(ghosts&&after.object(other).locked&&after.object(other).group==group&&Scene::load(path).encode()==accepted,"Authenticated caps and all existing neighbors remain read-only ghosts, with exact restartable scene");
+  check(d.undo()&&d.copy_scene().encode()==encoded&&d.frame().state->held_object==source&&d.object_editable(source)&&!d.frame().state->can_undo,"One Undo restores exact source IDs, placement, capsules and corresponding held endpoint");
+  check(d.redo()&&d.copy_scene().encode()==accepted&&d.frame().state->held_object==shell&&d.object_editable(shell),"Redo restores exact cut and transfers only the matching held endpoint");
+  d.release_held_object();check(d.undo()&&!d.frame().state->held_object&&d.copy_scene().encode()==encoded,"Explicit unhold remains unheld through cut history rather than reviving an old permission");
+ }
+ for(bool unhold:{false,true}){
+  auto original=cut_color_fixture::scene(true,true);auto encoded=original.encode();Document d;Release release;d.replace(original);d.configure_object_grab(true,true);d.hold_object(original.active().id);
+  gate.arm();auto before=d.save_async(directory/"held-cancel-before.dsculpt");gate.wait();d.begin_cut();ready(d);d.end_cut(true);auto dependent=d.save_async(directory/"held-cancel-after.dsculpt");
+  if(unhold)d.release_held_object();else d.end_cut(false);gate.release();before.get();bool failed=false;try{dependent.get();}catch(const std::exception&){failed=true;}
+  check(d.wait_asset()&&failed&&d.copy_scene().encode()==encoded&&!d.frame().state->can_undo&&d.frame().state->held_object==(unhold?0:original.active().id),"Accepted held-cut cancellation or explicit-unhold race preserves original scene/history and fails dependent Save");
+ }
+
  std::cout<<checks<<" native/controller colored cut checks\n";return 0;
 }catch(const std::exception &e){gate.release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
