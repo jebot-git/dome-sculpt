@@ -25,6 +25,7 @@ int main(int argc, char **argv) try {
       source.j["nodes"][3]["scale"]={1.2f,.9f,1.1f};
       source.j["nodes"][4]["scale"]={.7f,1.3f,.8f};
     }
+    if(std::getenv("DOME_IMPORT_DEFAULT_SOURCE")){source.j["meshes"][0]["primitives"][0].erase("material");source.j.erase("materials");source.j.erase("extensionsUsed");}
     source.save(argv[2]);
     return 0;
   }

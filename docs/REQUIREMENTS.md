@@ -19,6 +19,14 @@ AFFINE-IMPORT-INTEGRATION.md. Default/no-material identity, native UV1 import,
 broader glTF/VRM/FBX features and remaining affine metric authoring are still
 required; the existing unsupported-case guards do not satisfy those goals.
 
+Private Scene17 milestone `a40eea0` adds authenticated implicit/default glTF
+material provenance on published78a1034. Native import/view/paint/history and
+worker export, recursive retained-source persistence, actual native menus and
+independent software/Arc consumers pass for its qualified subset; all24 raw
+and emitted fixtures pass Khronos with0errors. See GLTF-IMPLICIT-MATERIAL.md.
+This does not complete UV1/unmapped overlapping-UV authoring, broader glTF/VRM
+or FBX coverage; their guards and full-production requirements remain.
+
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in
 validation/JSON-ALLOCATION-INTEGRATION.json. That older receipt alone does not qualify later combined features or complete
