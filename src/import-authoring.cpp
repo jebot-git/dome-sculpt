@@ -255,6 +255,16 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       ordered.size() + 1 > 128 - input.groups().size())
     throw std::length_error(
         "Imported hierarchy exceeds native object/group limits");
+  // Each prepared object retains its original paint domain as well as the
+  // editable atlas. Check the import's minimum Scene paint budget before any
+  // image decoding or xatlas worker allocation, then validate the cumulative
+  // result after each fully prepared primitive (including existing owners).
+  if(options.prepare_texture_atlas){
+    constexpr size_t scene_texels=16*1024*1024;
+    const size_t domains=2*size_t(options.paint_resolution)*options.paint_resolution;
+    if(objects>scene_texels/domains)
+      throw std::length_error("Editable atlas import exceeds Scene paint-map budget");
+  }
   auto images = std::make_shared<std::vector<std::shared_ptr<const Image>>>();
   size_t pixels = 0;
   for (const auto &encoded : asset->images) {
@@ -439,6 +449,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         object.deformation=std::move(adopted.deformation);object.material_bindings=std::move(adopted.material_bindings);
         output.diagnostics.push_back("Prepared editable texture atlas at "+std::to_string(options.paint_resolution)+" pixels; original coordinates, images and source retained");
       }
+      if(options.prepare_texture_atlas)output.scene.validate(false);
       output.objects.push_back(id);
     }
   }

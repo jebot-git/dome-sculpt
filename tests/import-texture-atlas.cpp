@@ -51,6 +51,12 @@ int main(int argc,char **argv)try{
   size_t mapped=0;for(size_t material=0;material<parsed->materials_count;++material){const auto &m=parsed->materials[material];if(m.normal_texture.texture){++mapped;check(m.normal_texture.texcoord==0&&m.pbr_metallic_roughness.base_color_texture.texcoord==0,"Prepared import export samples the actual current atlas rather than restored raw UV1");}}
   check(mapped==2,"Both retained imported instances export their independent editable material bindings");
  }
+ {
+  auto many=source();for(int n=0;n<7;++n){auto index=many.j["nodes"].size();many.j["nodes"].push_back(many.j["nodes"][1]);many.j["nodes"][0]["children"].push_back(index);}
+  auto path=directory/"atlas-over-budget.glb";many.save(path);auto choices=options;choices.prepare_texture_atlas=true;choices.paint_resolution=1024;
+  bool bounded=false;try{(void)prepare_authoring_import(original,path,choices);}catch(const std::length_error &e){bounded=std::string_view(e.what()).find("Editable atlas import exceeds Scene paint-map budget")!=std::string_view::npos;}
+  check(bounded&&original.encode()==baseline,"Multi-instance atlas preparation rejects its aggregate retained/current pixel budget before heavy work and preserves the caller");
+ }
  check(spatial_action(23,9)==SpatialCommand::ImportTextureAtlas&&spatial_parameter(23,6)==VrParameter::ImportUnitScale&&!spatial_action(23,8),"XR editable-atlas choice preserves custom-unit control and standard Back navigation");
  auto controlled=directory/"controller";std::filesystem::create_directories(controlled);source().save(controlled/"artist.glb");Document controller;controller.replace(original);ImportSettings settings;settings.paint_resolution=64;controller.configure_import(settings);controller.open_import_browser(controlled);
  auto wait_listing=[&]{const auto end=std::chrono::steady_clock::now()+std::chrono::seconds(10);while(std::chrono::steady_clock::now()<end){auto listing=controller.frame().state->importing;if(listing&&!listing->busy)return;std::this_thread::sleep_for(std::chrono::milliseconds(1));}throw std::runtime_error("Controller import listing did not settle");};wait_listing();ImportDriver hand(controller);hand.open();hand.sector(8);hand.sector(9);hand.sector(10);wait_listing();hand.sector(5);
