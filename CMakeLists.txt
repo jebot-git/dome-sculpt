@@ -7,7 +7,7 @@ set_property(CACHE DOME_COMPUTE_BACKEND PROPERTY STRINGS CPU CUDA ROCM ONEAPI)
 option(DOME_BUILD_UI "Build the native FLTK application" ON)
 option(DOME_BUILD_XR "Build native OpenXR sculpting" ON)
 if(DOME_COMPUTE_BACKEND STREQUAL "CPU")
-  set(compute_source src/backend_cpu.cpp)
+  set(compute_source src/backend_cpu.cpp src/sparse-resample-cpu.cpp)
 elseif(DOME_COMPUTE_BACKEND STREQUAL "CUDA")
   enable_language(CUDA)
   set(CMAKE_CUDA_STANDARD 20)
@@ -32,6 +32,12 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
 else()
   message(FATAL_ERROR "Unknown DOME_COMPUTE_BACKEND=${DOME_COMPUTE_BACKEND}")
 endif()
+
+# Sparse interpolation has a separate nearest-even binary64 contract. Keep
+# multiply/add boundaries identical to the integer GPU implementation even
+# when the caller enables native CPU/FMA optimization. Brush math is separate.
+set_property(SOURCE src/sculpt-resolution.cpp src/sparse-resample-cpu.cpp
+  APPEND PROPERTY COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-ffp-contract=off>")
 
 include(GNUInstallDirs)
 find_package(Threads REQUIRED)
@@ -1862,3 +1868,15 @@ endif()
 
 install(FILES third_party/softfloat/COPYING.txt
   DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/dome-sculpt/softfloat)
+
+if(BUILD_TESTING)
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag("-march=native" DOME_HAS_NATIVE_ARCH)
+  if(DOME_HAS_NATIVE_ARCH AND NOT CMAKE_CROSSCOMPILING)
+    add_executable(dome-sculpt-resample-native-contract-test
+      tests/resample-native-contract.cpp src/sparse-resample-cpu.cpp)
+    target_include_directories(dome-sculpt-resample-native-contract-test PRIVATE src third_party)
+    target_compile_options(dome-sculpt-resample-native-contract-test PRIVATE -O3 -march=native)
+    add_test(NAME resample-native-contract COMMAND dome-sculpt-resample-native-contract-test)
+  endif()
+endif()

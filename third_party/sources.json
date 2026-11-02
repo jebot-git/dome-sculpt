@@ -584,6 +584,6 @@
     "path": "third_party/softfloat",
     "manifest": "third_party/softfloat/SOURCES.json",
     "generator": "tools/generate-softfloat-f64.py",
-    "scope": "Private prototype, integer-only nearest-even binary64 numeric results for GPU resolution work. Floating environment flags not exposed; not yet wired into sculpt resampling."
+    "scope": "Integer-only nearest-even binary64 numeric results for selected-backend forward sculpt layer/mask resampling. Floating environment flags are not exposed; reconstruction and geometry quality remain host work."
   }
 }
