@@ -18,9 +18,12 @@
   },
   "before_after_source_binary_count": 1142,
   "sanitize": {
-    "state": "whole owned core/support build live",
-    "exec_handle": 29465,
-    "test_result": null
+    "state": "terminal0",
+    "passed": 5,
+    "total": 5,
+    "summed_test_seconds": 35.8210784,
+    "scope": "fresh whole owned C/C++core/support; ASan/UBSan/leaks; no frontend/GPU-driver instrumentation",
+    "unchanged_source_binary_count": 1144
   },
   "cuda_initial": "device compile failure on constexpr host tables; separate portable child2d17cb1 fixes, not combined",
   "sha256": {
@@ -56,6 +59,18 @@
     "build/dome-sculpt-resample-backend-test": "7176152dfd5e4e9487c6fb87dff9c8321b46cd52d3e465936834c0adb716c0af",
     "build-oneapi/dome-sculpt-resample-backend-test": "ffdcf9c0f2dbdea04db344ee379fa460134635d1c0dd3e0f3039a55b5eca2bf9",
     "build/libdome-sculpt-core.a": "b7b95b2d3ff0186ff4542b9da7b71ee76c682cb45ff557257ed71acb2b593503",
-    "build-oneapi/libdome-sculpt-core.a": "e32dc114f8d9e4efa2417c799354ddf15c4f3f1c77ce8d1b651276a7f5fe69ab"
+    "build-oneapi/libdome-sculpt-core.a": "e32dc114f8d9e4efa2417c799354ddf15c4f3f1c77ce8d1b651276a7f5fe69ab",
+    "artifacts/configure-sanitize.log": "ff733878d5655cd000e9152023e63adc3ba8c08ac6674619b3cadd2ac246c3bb",
+    "artifacts/build-sanitize.log": "1aac47b7e7eb377518bb30b5c54ffdb8c1fae4391acfb021a5566b8cefd7e487",
+    "artifacts/tests-sanitize.log": "22fcc9e299cc09ff408385eb7245c36e7f2599feb29857bafeb9609b4b046844",
+    "build-sanitize/artifacts-worker-sanitize.xml": "3a5aafab733131a693fbc86f604f287c29a337610007267ed181a0cf9462a793",
+    "artifacts/before-sanitize.json": "319273fbef6e246872f0521590f757a4e7559ccf810e5a81cf3ec05ed7045eec",
+    "artifacts/after-sanitize.json": "319273fbef6e246872f0521590f757a4e7559ccf810e5a81cf3ec05ed7045eec",
+    "build-sanitize/libdome-sculpt-core.a": "9cb4afeee107650b92dbd1d78053819fc5c6f8656aea23fef00af1415d56ce18",
+    "build-sanitize/dome-sculpt-resample-backend-test": "fef21846653f33f7209822dac9c0134c7292c6f4352f3e95dfb7c77def536d86",
+    "build-sanitize/dome-sculpt-resolution-test": "02c79193dabf3246ee0469e1e74a91ccd173db3125fbc09e5df42309be0fc925",
+    "build-sanitize/dome-sculpt-resolution-document-test": "ce3a21fd7ba295723abad32a1b5c355279c3972a9072f1d2270d45f62cd743e0",
+    "build-sanitize/dome-sculpt-resolution-controller-test": "1fc9629959cca3371a354d1647a5d7214e3101ace66ff9654fb82962a7532447",
+    "build-sanitize/dome-sculpt-resolution-progress-test": "55b5e888f36e0ca9b71c7704125a6299603cb36f0d26ccbaf5b1508559501636"
   }
 }
