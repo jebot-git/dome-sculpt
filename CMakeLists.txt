@@ -327,7 +327,8 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm
     ${CMAKE_CURRENT_BINARY_DIR}/vrm-rigid-source-export)
-  set_tests_properties(vrm-rigid-source-export PROPERTIES TIMEOUT 240)
+  # The full source/metadata/ordered-corner oracle is slower under sanitizers.
+  set_tests_properties(vrm-rigid-source-export PROPERTIES TIMEOUT 600)
   add_executable(dome-sculpt-vrm-source-export-test tests/vrm-source-export.cpp)
   target_link_libraries(dome-sculpt-vrm-source-export-test PRIVATE dome-sculpt-core)
   target_include_directories(dome-sculpt-vrm-source-export-test PRIVATE third_party/cgltf)
