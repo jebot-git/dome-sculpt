@@ -14,7 +14,50 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
-## Qualified authoring adapter checkpoint — 2026-11-02
+## Qualified rigid source avatar integration — 2026-11-02
+
+Public merge9ccddef is runtime/header/asset/third_party/CMake/test byte-identical to
+qualified4f79dbb. Productd5de43b combines17b0ff7 rigid/source avatars with the
+previous Scene19 authoring application. Harness-onlyb8000cd increases one native
+oracle's timeout240→600; no runtime/layout/archive fields change. Read
+RIGID-AUTHORING-INTEGRATION.md and its receipt before using the exact proof scopes.
+
+Fresh optimized alltargets completed after an external143 interruption and
+verified incremental resume. SelectedRelease67/67 pass438.93s. Owned C/C++core/
+support/render SANnative45/46 initially has only a240.21s timeout; samebinary
+424,070checks directly pass214.11s, then corrected registered1/1 passes255.37s.
+SeparateSANgraphics6/6 andfault6/6 pass1012.74/1364.03s. Preserve all initial logs;
+do not claim one46/46run or a newfull321suite. Arc404, active-unskinned22-part
+nativeFLTKexport7, latestprivateDomeDWayland8 and emitted105KHR0errors/1130warnings,
+official71VRM0×15pinned schemas0errors pass. No fresh physical test or install.
+
+Next combined Scene20 tree remains private/frozen7566a8f. Optimized alltargets6519
+and ownedSAN38-target build49536 are terminal0. FullRelease368job6312 remains
+live; nativeSAN52job99713 initially51passes+one240.25s rigid-oracle timeout; the
+samebinary direct600-budget47552 passes424,070checks254.51s. SANgraphics7/7job90584
+passes1358.67s. Joint test-only2e8699f separately passes70O3Release/ownedSAN/Arc
+checks on exactreadonly756: actual22-part normalUV/key/linked-pose plus independent
+current-field source+target Bake, oneScene20 Save/reopen/aliases,112materialroles/
+samplers and independentVRM/GLB pixels. No actual product repair was needed.
+This partial combined qualification does not yet publishScene20 orScene21/23.
+
+Contracts'65 extendedSAN44 is still finite/live (knownprecommit6/7 budgettimeouts
+will be rerun in exact finer ranges afterterminal); all51598Release boundaries
+remain preserved. New current-corner-uv-2e8699f starts real rawPAUV transfer with
+a fresh changed-ABI core, then prepared colourUV Scene23/material8/entry3 and typed
+orderedApply remain required. Palette's normal-sampling-context-7566a8f composes
+Scene21/material7/normalentry3 pools and paired closures; no renderer/UI/export
+admission claimed. Source21/22/23 remain private,22 reserved for corner-origin keys.
+
+Docs' native3Dmouse isolated57 native tests,25 FLTK and10 Wayland fixtures pass;
+final graceful-exit sanitizer work found an inherited baseline Fontconfig ownership
+leak and is addressing a separately reproduced narrow process lifetime fix.
+After freezing that checkpoint, Docs will implement the missing BASIC native
+image-projection/stencil Document/FLTK/XR workflow atop the existing C++ kernel.
+Controller drawers remain queued after basic targets as the user specified.
+Preserve every running proof/source tree and the accepted physical session.
+
+## Previous qualified authoring adapter checkpoint — 2026-11-02
 
 Product8d68dc7 extends the Scene19 baseline with retained post-UV prepared-key
 authoring, authenticated current-corner source Bake, original-space skinned VRM0

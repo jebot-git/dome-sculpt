@@ -51,7 +51,7 @@
   "installation": false,
   "production_complete": false,
   "hashes": {
-    "docs/RIGID-AUTHORING-INTEGRATION.md": "2f246d8fbc69cff1338e960f1fc30ccb41b067498e0fafb2cd9fe0fa608ad514",
+    "docs/RIGID-AUTHORING-INTEGRATION.md": "7634537dc09c18b5fdec99b446d9da6b4538cfd429ae573c2ee9766a4102f1a0",
     "CMakeLists.txt": "2beeefc03ce6a4e578959a2c01edb825d0cfa752fe8bef12e3d8937b3d79863b",
     "include/dome/rig-edit.hpp": "89cc3a8896b4d2a56839bf136d0dffe5c4964c4966659c8cca2bf968015d0273",
     "src/rig-edit.cpp": "d36e8c1197db8e2c42f7dda59e4a39479f2f5daea949cb252a5a423506461ccc",
@@ -94,5 +94,16 @@
     "artifacts/rigid-active-ui-fixture.json": "a180a26970fc5148b3bb833afa26172092f5714c6f2eeb7d6b0e660a9fb4fe12",
     "artifacts/menu-rigid-union-vrm/report.json": "b74169723ce4639784d44f8dfff594505cf09ec60a54a50393fb64a3585a8aed",
     "artifacts/dome-menu/report.json": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af"
+  },
+  "public_runtime_merge": "9ccddef2b588b4e7f113144473f51002c226d8cc",
+  "public_merge_runtime_equals": "4f79dbb0fe955d090de3059b65a1a048e78d431b",
+  "hash_roots": {
+    "build/": "qualification_tree",
+    "build-sanitize/": "qualification_tree",
+    "artifacts/": "qualification_tree",
+    "src/": "published repository; runtime equal to qualification",
+    "include/": "published repository; runtime equal to qualification",
+    "tests/": "published repository; equal to qualification",
+    "docs/": "published repository"
   }
 }

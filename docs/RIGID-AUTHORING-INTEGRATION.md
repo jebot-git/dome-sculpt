@@ -3,7 +3,8 @@
 This integration extends the qualified Scene19 authoring application with the
 mixed rigid/source VRM0 component17b0ff7. Productd5de43b combines actual post-UV
 prepared-key authoring, current-corner source Bake and original-space VRM0 export
-with real unskinned accessories and durable linked-pose attachments. No public
+with real unskinned accessories and durable linked-pose attachments. Public merge `9ccddef` has identical runtime/header/asset/third_party/CMake/test
+bytes to qualified4f79dbb. No public
 field/layout or archive version changes are introduced. Source-rest/reparent
 migration, divergent skinned placements, VRM1/physics and the complete production
 objective remain required. Private Scene20/21/23 work is excluded here.
