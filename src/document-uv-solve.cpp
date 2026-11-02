@@ -268,6 +268,12 @@ void Document::process_uv_transfer(FileJob &job) {
   candidate.material_bindings=std::move(binding);
   prepared.validate();
   if (cancelled()) throw std::runtime_error("UV transfer cancelled");
+  std::shared_ptr<AssetAcceptedSnapshot> accepted;
+  if(job.work&&job.work->accepted_scene){
+    accepted=std::make_shared<AssetAcceptedSnapshot>();
+    accepted->scene=std::make_shared<const Scene>((changed?prepared:job.scene).snapshot());
+    accepted->generation=job.generation;accepted->object=job.object;
+  }
   {
     std::lock_guard lock(model_mutex_);
     if (cancelled() || job.edit_authority!=state_.edit_authority || !object_editable_locked(job.object) || job.generation != state_.generation || job.content != content_ ||
@@ -278,13 +284,18 @@ void Document::process_uv_transfer(FileJob &job) {
     if (current.painted != job.paint_identity ||
         current.painted->revision() != job.source_revision)
       throw std::runtime_error("The source mesh changed during UV transfer");
+    if(accepted)accepted->recovery=recovery_source_;
     Transaction transaction(*this);
     transaction.finish_uv();
     if(job.uv_desktop)desktop_=false;
     if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
     state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message="UVs, paint and deformation identities updated";state_.error.clear();
     publish_locked(changed,false);transaction.commit();
-
+    if(accepted){
+      accepted->revision=state_.revision;accepted->content=content_;
+      job.work->completed=std::move(accepted);
+      {std::lock_guard file_lock(file_mutex_);job.work->done.store(true);}
+    }
   }
   std::lock_guard lock(file_mutex_);
   file_changed_.notify_all();

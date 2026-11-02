@@ -4,6 +4,8 @@
 #include "dome/document.hpp"
 #include "dome/frame-clock.hpp"
 #include "desktop-framing.hpp"
+#include "spacenav-options.hpp"
+#include "native-fontconfig.hpp"
 #include "dome/mesh.hpp"
 #include "dome/render.hpp"
 #include "dome/session-appearance.hpp"
@@ -90,20 +92,42 @@ struct Canvas : Fl_Gl_Window {
   bool sculpting = false, have_stamp = false, dirty_mesh = true;
   int last_x = 0, last_y = 0;
   std::string capture;
-  std::function<void()> changed;
+  std::function<void()> changed,view_boundary;
+  bool view_focused=false,mouse_navigation=false;
   Canvas(int x, int y, int w, int h) : Fl_Gl_Window(x, y, w, h) {
     mode(FL_RGB | FL_DOUBLE | FL_DEPTH | FL_OPENGL3);
     end();
     document.enable_recovery();
     document.refresh_recovery();
   }
-  ~Canvas() {
-    if (renderer) {
-      make_current();
-      cursors.reset();
-      polygons.reset();
-      renderer.reset();
+  static void finish_capture(void *data) {
+    auto &canvas=*static_cast<Canvas*>(data);
+    if(auto window=canvas.window())window->hide();
+  }
+  void release_graphics() {
+    if (!renderer && !polygons && !cursors) return;
+    // A parent hide recursively calls this subwindow's virtual hide() before
+    // FLTK destroys its GL context/native Wayland surface. Never recreate a
+    // context from the destructor of an already hidden native window.
+    if (shown() && context() && context_valid()) make_current();
+    else {
+      // Reuse the renderer's existing context-loss contract: do not delete
+      // stale GL names against a different or already destroyed context.
+      if(renderer)renderer->abandon();
+      if(cursors)cursors->abandon();
+      if(polygons)polygons->abandon();
     }
+    cursors.reset();
+    polygons.reset();
+    renderer.reset();
+  }
+  void hide() override {
+    release_graphics();
+    Fl_Gl_Window::hide();
+  }
+  ~Canvas() {
+    Fl::remove_timeout(finish_capture,this);
+    release_graphics();
   }
   void seed() {
     document.seed();
@@ -121,6 +145,7 @@ struct Canvas : Fl_Gl_Window {
     auto result=detail::desktop_framing(f,rotation,float(w())/std::max(1,h()),selected);
     if(!result)return false;
     pan=result->pan;orbit_pivot=result->pivot;distance=result->distance;zoom_limit=std::max(20.f,distance*4);
+    if(view_boundary)view_boundary();
     framed_generation=f.state->generation;redraw();return true;
   }
   void frame_view(bool selected){frame_view(selected,document.frame());}
@@ -199,8 +224,9 @@ struct Canvas : Fl_Gl_Window {
   }
   int handle(int event) override {
     try {
-      if (event == FL_FOCUS)
-        return 1;
+      if (event == FL_FOCUS) {
+        view_focused=true;if(view_boundary)view_boundary();return 1;
+      }
       if(event==FL_KEYDOWN&&Fl::event_key()==FL_Escape&&object_drag){document.end_object_grab(false);object_drag=false;suppress_drag=true;invalidate();return 1;}
       if (event == FL_KEYDOWN && Fl::event_key() == FL_Escape &&
           document.frame().state->menu) {
@@ -220,8 +246,9 @@ struct Canvas : Fl_Gl_Window {
         invalidate();return 1;
       }
       if (event == FL_PUSH) {
+        mouse_navigation=true;if(view_boundary)view_boundary();
         suppress_drag=false;
-        take_focus();
+        take_focus();view_focused=Fl::focus()==this;
         last_x = Fl::event_x();
         last_y = Fl::event_y();
         ball = project_ball(last_x, last_y);
@@ -283,6 +310,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_RELEASE) {
+        mouse_navigation=Fl::event_state(FL_BUTTONS)!=0;
         suppress_drag=false;
         if(polygon_drag){polygon_at(Fl::event_x(),Fl::event_y(),PolygonAction::EndDrag);polygon_drag=false;return 1;}
         if(object_drag){document.end_object_grab(true);object_drag=false;invalidate();return 1;}
@@ -295,6 +323,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_UNFOCUS) {
+        view_focused=false;mouse_navigation=false;if(view_boundary)view_boundary();
         if(polygon_drag){polygon_at(Fl::event_x(),Fl::event_y(),PolygonAction::CancelDrag);polygon_drag=false;}
         if(object_drag){document.end_object_grab(false);object_drag=false;invalidate();}
         if (sculpting) {
@@ -306,6 +335,7 @@ struct Canvas : Fl_Gl_Window {
         return 1;
       }
       if (event == FL_MOUSEWHEEL) {
+        if(view_boundary)view_boundary();
         distance =
             std::clamp(distance * std::exp(.1f * Fl::event_dy()), .01f, zoom_limit);
         redraw();
@@ -376,11 +406,12 @@ struct Canvas : Fl_Gl_Window {
                   pixel_w() * 3);
       out.close();
       if (!out) {
-        std::cerr << "Cannot write capture\n";
-        std::exit(1);
+        throw std::runtime_error("Cannot write capture");
       }
       capture.clear();
-      Fl::add_timeout(.1, [](void *) { std::exit(0); });
+      // Return through main so native workers, GL and process font ownership
+      // are released, just as on an ordinary successful window close.
+      Fl::add_timeout(.1,finish_capture,this);
     }
   }
 };
@@ -399,11 +430,38 @@ struct App {
   std::string seen_error;
   std::deque<std::string> native_commands;
   std::optional<std::future<void>> saving;
+  desktop::SpaceNavigator spacenav;
+  uint64_t spacenav_generation=UINT64_MAX,spacenav_authority=UINT64_MAX;
   ~App() {
     Fl::remove_timeout(tick, this);
+    Fl::remove_timeout(space_tick,this);canvas.view_boundary={};
     stop_xr = true;
     if (xr_worker.joinable())
       xr_worker.join();
+  }
+  static void space_tick(void *data) {
+    auto &a=*static_cast<App*>(data);const double now=desktop::spacenav_now();
+    try {
+      const auto state=a.canvas.document.frame().state;
+      if(a.spacenav_generation!=state->generation||a.spacenav_authority!=state->edit_authority) {
+        a.spacenav.fence(now);a.spacenav_generation=state->generation;a.spacenav_authority=state->edit_authority;
+      }
+      const bool owns=a.window.shown()&&a.window.visible_r()&&a.canvas.view_focused&&
+        Fl::focus()==&a.canvas&&!Fl::modal()&&!Fl::grab()&&!a.canvas.mouse_navigation&&
+        !Fl::event_state(FL_BUTTONS)&&
+        !a.canvas.sculpting&&!a.canvas.object_drag&&!a.canvas.polygon_drag&&
+        !state->stroking&&!state->native_pending&&!state->object_grabbing&&!state->menu&&
+        state->controls.parameter==VrParameter::None;
+      desktop::SpaceView view{a.canvas.rotation,a.canvas.pan,a.canvas.orbit_pivot,a.canvas.distance,a.canvas.zoom_limit};
+      auto update=a.spacenav.tick(view,owns,now);
+      if(update.action!=desktop::SpaceUpdate::Action::None)
+        a.canvas.frame_view(update.action==desktop::SpaceUpdate::Action::FrameSelection);
+      else if(update.moved) {
+        a.canvas.rotation=view.rotation;a.canvas.pan=view.pan;a.canvas.distance=view.distance;
+        a.canvas.redraw();
+      }
+    } catch(...) {a.spacenav.fence(now);}
+    Fl::repeat_timeout(.008,space_tick,data);
   }
   static void tick(void *data) {
     auto &a = *static_cast<App *>(data);
@@ -510,6 +568,8 @@ struct App {
     menu.add("&View/Frame &all", FL_Home, command, this);
     menu.add("&View/Frame &selection", FL_SHIFT | 'f', command, this);
     menu.add("&View/Reset &trackball", 'f', command, this);
+    menu.add("&View/3D mouse navigation",0,command,this,FL_MENU_TOGGLE|FL_MENU_VALUE);
+    menu.add("&View/3D mouse options...",0,command,this);
     menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
     menu.add("&View/Shading/&PBR", 0, command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
@@ -664,6 +724,8 @@ struct App {
         this);
     universal = std::make_unique<DesktopMenu>(window, menu);
     update_status();
+    canvas.view_boundary=[this]{spacenav.fence(desktop::spacenav_now());};
+    Fl::add_timeout(.008,space_tick,this);
     Fl::add_timeout(.03, tick, this);
   }
   bool discard() {
@@ -702,7 +764,8 @@ struct App {
     enable("&File/Cancel background work",!modal && (s->can_cancel_asset||s->native_pending));
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Frame &all", "&View/Frame &selection", "&View/Reset &trackball", "&View/Start or stop &XR",
-                           "&View/Shading/&PBR", "&View/Shading/&Toon preview"};
+                           "&View/Shading/&PBR", "&View/Shading/&Toon preview",
+                           "&View/3D mouse navigation","&View/3D mouse options..."};
     for (auto path : views)
       enable(path, !modal);
     const bool can_frame=!modal&&!s->stroking&&!s->native_pending&&!s->object_grabbing;
@@ -821,6 +884,7 @@ struct App {
       checked(channels[i], int(s->paint.channel) == i);
       enable(channels[i], !modal && !s->asset_busy);
     }
+    checked("&View/3D mouse navigation",spacenav.settings().enabled);
     checked("&View/Shading/&PBR", !s->toon);
     checked("&View/Shading/&Toon preview", s->toon);
     const char *layer_actions[] = {
@@ -859,7 +923,7 @@ struct App {
         std::string text = label;
         text.erase(std::remove(text.begin(), text.end(), '&'), text.end());
         if (text != "Undo" && text != "Redo" && text != "Close Window" &&
-            text != "Frame all" && text != "Frame selection" && text != "Reset trackball" && text != "Start or stop XR" && text != "Cancel background work")
+            text != "Frame all" && text != "Frame selection" && text != "Reset trackball" && text != "3D mouse navigation" && text != "3D mouse options..." && text != "Start or stop XR" && text != "Cancel background work")
           modes[i] |= FL_MENU_INACTIVE;
       }
     }
@@ -1321,12 +1385,18 @@ struct App {
     } else if (label == "Toon preview") {
       canvas.document.shading(true);
       canvas.redraw();
+    } else if(label=="3D mouse navigation") {
+      auto settings=spacenav.settings();settings.enabled=!settings.enabled;
+      spacenav.settings(settings,desktop::spacenav_now());
+    } else if(label=="3D mouse options...") {
+      desktop::spacenav_options(spacenav);
     } else if(label=="Frame all"||label=="Frame selection"){
       canvas.frame_view(label=="Frame selection");
     } else if (label == "Reset trackball") {
       canvas.rotation = {};
       canvas.pan = {};canvas.orbit_pivot={};
       canvas.distance = 2.2f;canvas.zoom_limit=20.f;
+      if(canvas.view_boundary)canvas.view_boundary();
       canvas.redraw();
     }
     if (label == "Clay" || label == "Carve" || label == "Smooth" ||
@@ -1368,6 +1438,7 @@ int main(int argc, char **argv) try {
     return 0;
   }
   if (argc >= 2 && std::string(argv[1]) == "--xr") {
+    desktop::NativeFontconfigRuntime fontconfig;
     StandaloneXrSignals termination;
     Document document;
     document.seed();
@@ -1516,6 +1587,7 @@ int main(int argc, char **argv) try {
               << '\n';
     return 0;
   }
+  desktop::NativeFontconfigRuntime fontconfig;
   Fl_Window::default_xclass("org.domed.Sculpt");
   dx::init();
   App app;

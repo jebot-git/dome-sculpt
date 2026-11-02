@@ -71,3 +71,5 @@ restricted VRoid presets and proprietary application code are not included.
   revision, exact references and tested packages are in `sources.json`. The BLAS/
   LAPACK implementation stays a system dependency; no backend/session setting
   is changed, and factorization is kept off per-frame rendering.
+
+FreeSpacenav legacy Unix input protocol conventions are reviewed from pinned libspnav (BSD-3-Clause); the independent C++ client has no libspnav runtime dependency. Notice: third_party/spacenav/NOTICE. Spacenavd source is inspected for producer cadence only. Exact commits and source hashes are in third_party/sources.json.

@@ -1,0 +1,155 @@
+{
+  "recorded_utc": "2026-11-02T13:07:37.838751+00:00",
+  "component": "Native desktop spacenav input and native process/context ownership",
+  "base_commit": "8d68dc71eb8231cfe9ab4e71b72e4e8de518a0ca",
+  "branch": "work/desktop-spacenav-8d68dc7",
+  "scope": {
+    "implementation": "Native C++20 receive-only AF_UNIX spacenav; continuous6-axis camera; universal View settings; ownership/neutral/release/reconnect/stream fences; actual frame commands; process-owned Fontconfig and pre-hide Canvas GL teardown",
+    "no_public_scene_or_document_layout_change": true,
+    "no_scene_archive_change": true,
+    "physical_device_validated": false,
+    "actual_physical_device_spacenavd_validated": false,
+    "GPU_hardware_claim": false,
+    "no_system_installation_or_active_session_restart": true,
+    "no_new_HMD_test": true
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "a9ef7e380b13bdd6ffe34019866fc756d5f29f0c5d4beea7f67db75e7b6f86f9",
+    "src/app.cpp": "56cd37823dbeb90a861f2b5d9572b618744090b5cc9b534c878400abf4c7d0eb",
+    "src/native-fontconfig.hpp": "8adc7bf287f331d7b9a42b91327568f8904491b0775664c4a80d2ce105c6d882",
+    "src/spacenav-unix.hpp": "d7dd602825b6d4636fda132f2af2468e2b34448df1d416d63e28a1dc26c6fc7e",
+    "src/spacenav-unix.cpp": "406535abed45591ca62629de8ec97d48bdfb590e72679487b76499e09bbbecca",
+    "src/spacenav-view.hpp": "d6df297587426865b4f18d022d4d00e205bc6af0bad92b8241bec8547cbd2f22",
+    "src/spacenav.hpp": "9a00f75d8aaf110b27fd87879413dd06bee05ef9f46529fd780e64603b64f035",
+    "src/spacenav.cpp": "af5df148aaf34405c76c07f90cb4b17eb0f5e3d88062467f07e3d363541e5201",
+    "src/spacenav-options.hpp": "8bbb0120b06b1fb2c189e3c66d89813134236ec18d377113b0a4b3d61e7e1d2d",
+    "src/spacenav-options.cpp": "3c2f502fb502f3a640386a66c41c7bdb969667970529d9d8d2d823fa1be8a7b2",
+    "tests/spacenav.cpp": "ef7b923b5a3f0f0bf96d9eaeb6f4ec6a590146971ee4496782c103b85edad884",
+    "tests/spacenav-menu.py": "d29ee1be55a8317f69309b53e28561227318b6104c5126bdab0e4ad7f1b51fd9",
+    "tests/spacenav-wayland.py": "cb2a156f61d1512a0dca8cd30caa52c39f603eb321221c46b20e791aec8a2bdb",
+    "tests/native-fontconfig-exit.py": "cf1915e3b0f4947d116fc8fd725fe1d031ee597aad840a3136269560518e78aa",
+    "tests/desktop-context-lifetime.cpp": "663ca6a428dfd8d6154c177f44612afc9264fd8aed6f9833dc14ba855ca419a9",
+    "THIRD-PARTY.md": "be02243f4e77efa258113fe8ac5d7fb7ae5e9951d238e089d8453015d847c9b6",
+    "third_party/sources.json": "426ded8754c095aedbcbe3f9de7b031519e380486dc42b78b00655263ee1963e",
+    "third_party/spacenav/NOTICE": "8f3107bdbff0795016f7291ae60a9d978286652f7fa1aec74ede8919ff046e1b"
+  },
+  "environment": {
+    "regular_user": true,
+    "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "compute_backend": "CPU",
+    "FLTK_prefix": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7",
+    "bitmap_prefix": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7",
+    "canonical_DomeD": "d271cf65c612a462fcfa6739416b06c6565be070",
+    "private_compositor": "/home/blux/de-xr/dome-sculpt/artifacts/domed-d271cf6-target/release/dome-compositor",
+    "sanitizer_flags_C_and_CXX": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "sanitizer_options": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+    "runtime": "LP_NUM_THREADS=2; software Mesa for native fixture graphics; no Arc reservation/use",
+    "whole_core_and_support_rebuilt": true,
+    "whole_suite_sanitizer_pass_claim": false
+  },
+  "validation": {
+    "Release": {
+      "tests": [
+        "desktop-spacenav",
+        "desktop-framing",
+        "native-fontconfig-desktop-exit",
+        "native-fontconfig-xr-exit"
+      ],
+      "passed": 4,
+      "failed": 0,
+      "seconds": 25.49
+    },
+    "sanitizer": {
+      "tests": [
+        "desktop-spacenav",
+        "desktop-framing",
+        "native-fontconfig-desktop-exit"
+      ],
+      "passed": 3,
+      "failed": 0,
+      "seconds": 28.47,
+      "scope": "Fresh fully instrumented own C/C++ core/support/render/XR/application; selected desktop/native checks only, XR LSan gate remains failing separately"
+    },
+    "native_protocol_camera_checks": 57,
+    "framing_checks": 27,
+    "actual_App_context_lifetime_checks": 14,
+    "native_X11_GUI": {
+      "release_checks": 26,
+      "ASan_UBSan_leak_checks": 26,
+      "graceful_app_exit": 0,
+      "sanitizer_stderr_bytes": 0
+    },
+    "native_Wayland_DomeD_GUI": {
+      "Release_checks": 11,
+      "graceful_app_exit": 0,
+      "sanitizer_functional_checks_before_exit": 10,
+      "sanitizer_exit_gate": "fails inherited shared EGL allocation report; retained separately"
+    },
+    "data_and_history": "Exact Scene save invariance for navigation/options/buttons; actual paint after composed camera motion plus one Undo/Redo; no geometry extraction/readback in production input pulse"
+  },
+  "negative_evidence": {
+    "legacy_missing_release": "Original held latch blocked fresh neutral; exact pre-fix source reconstructed against captured hash",
+    "queued_stale_button": "First fix still re-latched drained pre-focus button; exact intermediate source reconstructed against captured hash",
+    "multibutton": "Right release with left held incorrectly admitted nav; real native fixture fails before held-mask gate",
+    "Fontconfig": "Original8d App without spacenav reproduces11,977B/275 on graceful exit; same old App with balanced process owner exits0, empty LSan log",
+    "Wayland_Canvas": "Old8d balanced App crashes at canonical Fl_Wayland_Gl_Window_Driver::make_current_before null fl_wl_xid after parent hide; App pre-hide teardown fixes crash",
+    "fixture_correction": "Initial lifecycle fixture incorrectly waited for lazy retopo/cut-only cursors in ordinary view; corrected to actual initialized wrappers and independent live-context check, with no product change for that expectation"
+  },
+  "remaining": {
+    "physical_workflow": "Real3Dmouse + actual physical-device spacenavd acceptance remains required",
+    "Wayland_EGL": "5,856B/31 allocations from libEGL_mesa dri2_add_config/dri2_initialize_wayland through canonical FLTK global EGLDisplay; no Fontconfig leak remains; no toolkit fork/application global-display termination/suppression",
+    "standalone_XR": "112B/two56B allocations map to libgallium-26.2.5.so offsets0xff8d32/0xff8d49; old8d balanced16 and current64 frames both reproduce same112B; diagnostic eglReleaseThread succeeds but does not remove it; simpler EGL triangle does not reproduce, so driver-associated scope is not generalized",
+    "next_basic_task": "Document/native FLTK/XR image-projection/stencil painting integration, existing kernel is insufficient",
+    "deferred_full_goal_phase": "Controller-mounted spatial drawers after basic targets"
+  },
+  "binary_sha256": {
+    "build-spacenav-release/dome-sculpt": "a2c20a26c3ca214f0204b926932faa5e15a3f5028c39d5a221f4ecf2598baf74",
+    "build-spacenav-sanitize/dome-sculpt": "2515d3b704b4ba67750d6929cd0746ac7bc5b9d8a9c7330230c535b11ed045e1",
+    "build-spacenav-release/dome-sculpt-spacenav-test": "e1fc833590597adf4a0b1dc5660162599405ccea1310dfbdef7365c6e3ad7707",
+    "build-spacenav-sanitize/dome-sculpt-spacenav-test": "35e73189fbc33904aa4c37a9475c8c1c2bc5a0d0390426c225d4e099472ec4ee",
+    "build-spacenav-release/dome-sculpt-desktop-context-lifetime-test": "502def85634302952f0125b3207da2a74d9e22a1b132e14a3552126582ac5549",
+    "build-spacenav-sanitize/dome-sculpt-desktop-context-lifetime-test": "c22a4f0755de5bd2e6033c1b6f9617e133fae42a125ffcfd9108ad8b31d969d4"
+  },
+  "evidence_sha256": {
+    "artifacts/spacenav-final-57.log": "6d4662eab9967fc8ab263465d0213e74894a492f1db17738354c410306826962",
+    "artifacts/spacenav-frozen-release.log": "a71e53f4910a73d7f9a5033957692fb7100ca00dd663e4e604df809bb18b89eb",
+    "artifacts/spacenav-frozen-sanitize.log": "cfcc36000b511d6c5ddfc608960d7c1d748ff2c52bb1e4266625c95e0e76b3ae",
+    "artifacts/spacenav-frozen-menu-release.log": "1b2686e32a93509c543a3dc81a5b5bb61b09953877344dd08181942380b7146e",
+    "artifacts/spacenav-frozen-menu-sanitize.log": "1b2686e32a93509c543a3dc81a5b5bb61b09953877344dd08181942380b7146e",
+    "artifacts/spacenav-frozen-wayland-release.log": "4b66888ecba623f90006bca22343f5bd5a8afcf51345a578af5371ed724dac1d",
+    "artifacts/menu-spacenav-frozen-release/report.json": "c25db11337eaa9e5ef1c82f2c9ffdb4a641b53dc3010454d4a076169bf050e86",
+    "artifacts/menu-spacenav-frozen-sanitize/report.json": "c25db11337eaa9e5ef1c82f2c9ffdb4a641b53dc3010454d4a076169bf050e86",
+    "artifacts/wayland-spacenav-frozen-release/report.json": "410065f033ce6e7ff3e976bfb6275a14dc1e7a98c55841f3f9ea9af41a971fa5",
+    "artifacts/menu-spacenav-frozen-sanitize/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-spacenav-release/native-fontconfig-desktop-exit/context-lifetime.log": "0f1dd1e81c58b8f4c7f702049e55f1f5888ed6bba186b31244afd8b6f23c0d87",
+    "build-spacenav-sanitize/native-fontconfig-desktop-exit/context-lifetime.log": "0f1dd1e81c58b8f4c7f702049e55f1f5888ed6bba186b31244afd8b6f23c0d87",
+    "build-spacenav-release/native-fontconfig-xr-exit/report.json": "a6a7a1975a148b1edf2de1cc120ee8ef4a9edd27adabb4fb3c8190084aff1f09",
+    "artifacts/spacenav-multibutton-release-build.log": "af363d08643937a76acb598b056c494367380479d77bfc2e4a66272bc1ca817d",
+    "artifacts/spacenav-multibutton-sanitize-build.log": "437e453860303828d7fe1204415f90fa0dc979d6e84172d39ec55bae52bf1807",
+    "artifacts/spacenav-sanitize-build.log": "f4c971784654af869d8ed270e89db1d234abe538a6efcfe85fbc9ecc26786783",
+    "artifacts/spacenav-sanitize-canonical-configure.log": "b79849235dca4eaf1203e723c683694bad0303bd9207b51560bb6cbfab607dab",
+    "artifacts/spacenav-legacy-negative.log": "61c6316ad5253e084466efdf2d92704b3323dc16cd2f2fe95417cc46485c9418",
+    "artifacts/spacenav-drained-button-negative.log": "8059fd03c01aedc0eac4faba26db55f560cff6538335b43eb27d43daae656795",
+    "artifacts/spacenav-negative-source-reconstruction.json": "dc27efaf1a66556b27afd63f442125a44f0e6a341ef70560c26712166e21a149",
+    "artifacts/spacenav-multibutton-negative.log": "5b48b9b6aee755d4aac227de8130ecad2ec8eb7b0e1aa29f07eb7a207a19202f",
+    "artifacts/app-before-multibutton.cpp": "6bd826656dbdb2fa35399144fee576fd12e4419f62df00541f180643611cc78a",
+    "artifacts/spacenav-font-baseline.log": "c9f510e8264777696c56d0cb36262798b787fb95bc10c76f7cf2d342e429992f",
+    "artifacts/menu-before-spacenav-sanitize/app.log": "6745b427f93708cb9b6aede0271df8844648039db987bca5f704479c2cc96d9c",
+    "artifacts/app-before-spacenav.map": "7f2f3a7b8b407c0545970d381f11bf2a9762994841a8767d72b8c2b0733404c1",
+    "artifacts/app-before-spacenav.cpp": "bc411dca37a55b0ec84f2d4ec60514930c5fbfbb51603666541a518926f7c2a6",
+    "artifacts/spacenav-font-balanced.log": "f45878f6234e20a90d4a67eefd5ce5d972d63e63147362756185f36ed0b607bb",
+    "artifacts/menu-before-spacenav-balanced/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/app-before-spacenav-balanced.map": "0106110576d5d91b373faa3a22d281b3274ac0cd8cbab939e22837fb039e0da3",
+    "artifacts/wayland-old8d-balanced-exit-v2.log": "e2bae28d212f710129f85bdd6b6390b6ce6548cca80f75f2757273507422a98e",
+    "artifacts/wayland-old8d-balanced-exit-v2/client.log": "3d27003e0cbe34695b06e56bb1afe119cab44e335f8518fa137d9f0a316027f0",
+    "artifacts/spacenav-gl-cleanup-wayland-sanitize.log": "ad2e3e8e393ee32d1262c268fd341703833b5c2cecdf7a7028709621a6f91640",
+    "artifacts/wayland-spacenav-gl-cleanup-sanitize/client.log": "762b12a6dc0731ccb6f0ac0f8d87020ddf63ce4cfba0da9bd9570b9272316561",
+    "artifacts/compare-xr-lifetime.log": "73328b4a142f0993dd3c45b6344fcc8161e0a9391060afa01112a1c33ffa5eb0",
+    "artifacts/xr-lifetime-old8d-balanced/app.log": "d358bd771f334e43d44ab92b4da2608fead05ec6b9fdca59deaded3dd68c1c2c",
+    "artifacts/xr-lifetime-current64/app.log": "51e04c56f8ecd9ce5515675305ab05812a28335e774ff0ed966718ed3378499a",
+    "artifacts/xr-egl-map-probe-realasan/symbolized-modules.json": "808ad8a6e245f374c8d33ea719a8a79feb7fbdd7b09128ffb044e0ef10c30183",
+    "artifacts/xr-egl-map-probe-realasan/maps.txt": "5f884a41ebb57444936e18cd080cc8870d80d0b3272d7d7f10ea8e0cf75185b8",
+    "artifacts/xr-egl-release-probe-realasan/app.log": "488451cb1cd9e5e31b4b34fb8a528fa907bf2043d18c309e635c0b95bd90e29e",
+    "artifacts/egl-teardown-probe.c": "173073c8b9e394ff51a1efc81e4a2369616a64e4687e49654f1632739825f577"
+  }
+}
