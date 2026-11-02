@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define DOME_NORMAL_DOMAIN_RENDER_NO_MAIN
+#include "normal-domain-render.cpp"
+#undef DOME_NORMAL_DOMAIN_RENDER_NO_MAIN
+#include "paint-normal-access.hpp"
+int main(int argc,char **argv)try{
+ if(argc<2)return 2;const std::filesystem::path prefix=argv[1];std::filesystem::create_directories(prefix.parent_path());NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<3||std::string_view(argv[2])!="--hardware"||(device.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Normal transition consumer uses the explicitly requested device");Fbo fbo;fbo.bind();SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
+ for(bool typed:{false,true}){
+  const auto initial=prepared(typed);const auto exact=initial.encode();auto retained=retained_transfer(initial,.95f,false,prefix.string()+(typed?"-typed":"-pbr")+".dsculpt");const auto authority=retained.active().painted->baked()->normal_authority;check(bool(authority),"Genuine normal Bake retains its independent captured normal event before transitions");
+  auto rgba=retained.snapshot();auto paint=rgba.active().painted->snapshot();auto replacement=*paint->baked();replacement.maps.normal={};replacement.maps.mtoon_normal={};replacement.normal_authority.reset();std::fill(replacement.coverage.begin(),replacement.coverage.end(),255);for(size_t p=0;p<replacement.maps.color.rgba.size();p+=4){replacement.maps.color.rgba[p]=210;replacement.maps.color.rgba[p+1]=120;replacement.maps.color.rgba[p+2]=80;replacement.maps.color.rgba[p+3]=255;}paint->install_bake(std::move(replacement),BakedNormalWrite::PreserveRetained);rgba.active().painted=paint;rgba.validate();check(paint->baked()->normal_authority==authority&&paint->baked()->normal_authority->coverage==authority->coverage,"RGBA-only Bake expands colour coverage without changing the captured normal event or coverage");
+  auto clear=rgba.snapshot();clear.active().painted=clear.active().painted->snapshot();clear.active().painted->clear_bake();clear.validate();check(SourceNormalPreparationAccess::resolved(*clear.active().painted)->pbr==clear.active().painted->normal_projection()->pbr,"Clear explicitly returns to intrinsic retained normal sampling authority");
+  for(int stage=0;stage<2;++stage){const auto &base=stage?clear:rgba;const auto restarted=Scene::decode(base.encode());check(restarted.encode()==base.encode(),"Complete Scene restart preserves the selected intrinsic/resolved transition");
+   for(int pose=0;pose<3;++pose)for(float weight:{0.f,.35f,1.f}){auto current=restarted;posed(current,pose,weight);Document doc;doc.replace(current);settled(doc);doc.shading(false);settled(doc);const auto path=prefix.string()+(typed?"-typed":"-pbr")+(stage?"-clear":"-rgba")+"-p"+std::to_string(pose)+"-w"+std::to_string(int(weight*100))+".glb";doc.export_asset(path,AssetExportFormat::Glb).get();prepared_normal_consumer::Model parsed(path);const auto actual=draw(renderer,doc.frame().surface);fbo.bind();independent.render(parsed.data);const auto error=delta(actual,read());std::cout<<"NORMAL_TRANSITION_GLB typed="<<typed<<" stage="<<stage<<" pose="<<pose<<" morph="<<weight<<" error="<<error<<'\n';check(error<=4,"Independent CorePBR GLB pixels match real native Clear/RGBA-only normal transitions through mixed pose and morph");}
+  }
+  check(initial.encode()==exact,"Transition export and restart preserve complete immutable original source and frame identity");
+ }
+ std::cout<<"PASS "<<checks<<" normal transition GLB checks\n";return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
