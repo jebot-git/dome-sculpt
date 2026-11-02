@@ -210,30 +210,37 @@ named-UV visual oracle. Fourteen current emitted GLBs have0KHRerrors/12warnings.
 Read FBX-NAMED-UV-WIP.md and its qualification receipt. Native direct multi-UV,
 UV2+, broader FBX and combined-main admission remain required.
 
-Current-source integration is now frozen8a89787, metadata423dd56, in
-artifacts/fbx-bindings-current-132caef. Import cpp is byte-identical to b603e0b,
-combined with public132caef; only test/helper additions follow the semantic fix.
-New actual named-UV source/native512atlas/CorePBR/Save/restart/export37 checks
-pass software AND strictPCI03A770 with maxpixelerror1 (unchanged4-bound), exact
-source/binary manifests. New75genuine5inputs×5units×3axes cases pass37097 checks/
-5130 independent raw-unit evaluated skin/morph corners, native Save/restart and
-independent GLB evaluation. These are default poses; prior edited poses remain
-separately scoped. Current registered16/16 pass8.35s Release and16/16 pass18.45s
-whole-owned C/C++SAN/leaks. Native Maya-skin14+Blender-morph14 pass in BOTH flags,
-all four Apps normal-close. Current93positiveGLBs have0KHRerrors/57warnings.
+Current FBX integration runtime/test source8a89787, qualified metadata069ed9c,
+is now the exact source of the main merge; only documentation conflicts needed
+resolution. Read CURRENT-FBX-BINDINGS-INTEGRATION.md and its receipt for public
+merge identity and byte equality. Import cpp is byte-identical to b603e0b and
+combined with the public132caef authoring application. No public ABI/Scene changes.
 
-Initial graphics SegFault is a test-helper bug: canonical FBX is valid nonindexed
-GLB while prepared-normal-consumer dereferenced indices. Exact helper-SAN null78,
-old binary and failed JUnit/log remain; test-only sequential-corner fallback
-fixes it and preserves indexed cases. Coherent initial support archives/SANApp
-stay hash-exact through that test-only refinement. No runtime/header/Scene change
-beyond qualified adapter4. Read CURRENT-FBX-BINDINGS-WIP.md/.json.
-CPU alltargets90629 and pinnedDPC++OneAPI alltargets14599 are LIVE; source/header/
-test inputs remain frozen. Logs artifacts/build-current-fbx-{all-release,oneapi}.log
-in that tree. Do not restart on observation timeout. Next finish both builds,
-current-source actual OneAPI device/missing-device gates, final main source
-merge/equality and receipt. No new GPU job is active; shortArc37 lease released.
-This is not yet a new combined-main runtime qualification or full-FBX completion.
+Actual named-UV source/native512atlas/CorePBR/Save/restart/export37 checks pass
+software AND strictPCI03A770 with maxpixelerror1 against unchanged4-bound; exact
+source/binary manifests. New75genuine5inputs×5units×3axes cases pass37097 checks/
+5130 independently evaluated raw-unit skin/morph corners, native Save/restart
+and parsed GLB evaluation. These are default poses; prior edited-pose proof is
+separate. Current16/16 pass8.35s Release and16/16 pass18.45s whole-own C/C++SAN/
+leaks. Actual native Maya-skin14+Blender-morph14 pass in BOTH flags, all normal
+App/GL/font teardown. Current93positiveGLBs have0KHRerrors/57unfilteredwarnings.
+
+Both optimized alltarget builds are terminal0: CPU90629 registers398 tests,
+pinnedDPC++7.2 OneAPI14599 registers399. Actual current-source OneAPI15/15 pass
+13.87s:184analytic endpoints,224reference batches/445088samples,max8.9407e-08;
+explicit missingGPU refuses with host samples unchanged. Current sycl-ls confirms
+level_zero:0A770/:1UHD; GL stayed software for compute scope, separate from Arc37.
+No full398/399suite claim. The earlier public395 split result stays preserved.
+
+Initial graphics SegFault was a test-helper assumption that canonical FBX must
+have an index accessor. Valid nonindexed triangles now synthesize sequential
+corners. Exact helper-SAN null78, old binary and failed JUnit/log remain.
+Production archives/SANApp stay hash-exact through that test-only refinement.
+All123 component evidence hashes were rechecked before main publication.
+Native raw multi-UV/UV2+, broader FBX/normal/material/deformation semantics and
+all remaining full-goal rows stay required. No GPU jobs remain active; all leases
+released. Latest DomeD d271cf6 was rechecked against remote main, unrelated dirt
+preserved. No installation, physical launch or active-session restart occurred.
 
 Palette continues unadmitted normal21 export using actual PBR preview and an
 export-local independent coordinate stream; original-beforeUV typed colour/
@@ -247,15 +254,20 @@ existing-rig worker work are progressing; imported source-node/VRM guards remain
 Current private agent checkpoints: Contracts' actual paint-domain authority has
 Release5/5+whole-ownedSAN5/5; material9 shared-pool codec sourcea52f62c/final977952b
 has Release4/4(4.12s)+whole-ownSAN4/4(58.78s),44 paired assertions. New Scene24
-root/shared/before-state-only capsule/CBOR Save/reopen/Restore has55checks and
-R4/4; surface/paint12/query/export consumers still refuse, native/UI/render
-admission remains unfinished.
+root/shared/before-state-only capsule/CBOR Save/reopen/Restore source915ee5a/
+finald568c71 has55checks, R4/4+separate schema1/1 and full-ownSAN5/5(336.93s).
+Actual surface/paint12/query/shader consumers source1dbc1f5 are now building
+separately; export remains guarded and no consumer pixel/native admission is
+claimed yet. Range winding authority is explicitly coordinated with Palette.
 Docs' private Scene25 bbb1792 is qualified for its exact native rest-fitting
 subset; initial original-node graph1672 proof predates a small DFS refinement
 and must be rerun on final modules. Current plan184 checks cover per-skin closure,
 cross-skin parents, own poses/IBMs, rigid compensation and Scene25 restart;
-actual Scene/Document source-rest adapters are drafted/unqualified, dispatcher
-and typedVRM guards remain. Palette's private
+actual Scene/source public dispatch1804 checks pass. Document/controller proof
+exposed a real neutral rigid Restore float-residual affine_edit defect; its old
+SAN is kept frozen/live, with an explicit neutral-endpoint identity proof planned
+instead of generic epsilon suppression. Distinct-pose and typedVRM work remain;
+no completed current-Document admission claim. Palette's private
 Scene26 sourceUV2+ foundation has software55role/pick/normal/traffic checks and
 actual native54import/explicit-atlas/Save/history/paint/cancel/GLB checks; generated
 TUV2 provenance, full fresh ABI/SAN/hardware proof and full admission remain.

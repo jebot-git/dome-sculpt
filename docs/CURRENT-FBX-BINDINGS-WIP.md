@@ -1,4 +1,4 @@
-# Current authoring / named FBX UV bindings
+# Qualified current authoring / named FBX UV bindings
 
 Frozen8a89787 in artifacts/fbx-bindings-current-132caef merges qualified adapter4
 823fe61 with public132caef. Runtime import-native.cpp is byte-identical to
@@ -36,10 +36,13 @@ all four Apps closing normally. These genuine UI fixtures choose Millimetres;
 they are not a named-UV chooser proof. Current93positive emitted GLBs pass
 pinned Khronos/maxIssues0 with0errors/57unfilteredwarnings.
 
-CPU alltargets90629 and pinned DPC++7.2 OneAPI alltargets14599 remain LIVE; logs
-are artifacts/build-current-fbx-{all-release,oneapi}.log. Inspect exact handles
-before restarting or editing. Source/header/test inputs remain frozen. Next
-finish both builds, current actual OneAPI gates and exact main merge/equality
-receipt. This is not yet a combined-main qualification. Read
+CPU alltargets90629 and pinned DPC++7.2 OneAPI alltargets14599 are terminal0;
+CPU registers398 cases and OneAPI399 (extra explicitmissingGPU). Current-source
+actual Arc OneAPI15/15 pass13.87s:184analytic endpoints,224CPU-reference batches/
+445088samples,maxerror8.9407e-08. ExplicitmissingGPU refuses with host samples
+unchanged. Current sycl-ls confirms level_zero:0A770/:1UHD; GL stayed software
+for this compute scope, separate from actualArc37 above. No full398/399-suite
+claim. All recorded96prior hashes were rechecked intact. Source/header/test
+inputs remain frozen for final main merge/equality and exact receipt. Read
 validation/CURRENT-FBX-BINDINGS-WIP.json for exact scopes/hashes. No physical
 test, installation or active-session restart occurred.

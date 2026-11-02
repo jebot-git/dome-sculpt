@@ -1,0 +1,142 @@
+{
+  "recorded_utc": "2026-11-02T17:32:44.305648+00:00",
+  "bounded_component_qualified": true,
+  "full_FBX_requirement_complete": false,
+  "qualified_for_main_alone": false,
+  "qualification_tree": "artifacts/fbx-authoring-3a55c84",
+  "runtime": "880ec05 (cherry-pick of3a55c84 onto public7a4443e)",
+  "tracked_native_fixture_commit": "d95e29e0e98cb8f4502c1bc366884e065703c120",
+  "fresh_builds": {
+    "Release": {
+      "terminal_exit": 0,
+      "session": 39404,
+      "flags": "-O3 -DNDEBUG"
+    },
+    "own_C_CXX_SAN": {
+      "terminal_exit": 0,
+      "session": 2697,
+      "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "includes": "own core/support/render/frontend/selected fixtures; system dependencies not instrumented"
+    }
+  },
+  "native_Release2": {
+    "file": "build/artifacts-fbx-authoring-native-release.xml",
+    "tests": 2,
+    "failures": 0,
+    "sha256": "5e37213cd65d515b00bfd9c3710f0864d3da826f141a69c4573ec80f0d2c7e89",
+    "seconds": 0.17
+  },
+  "selected_Release11": {
+    "file": "build/artifacts-fbx-authoring-selected-release.xml",
+    "tests": 11,
+    "failures": 0,
+    "sha256": "ad7f995ebb3b86976362eb7445cf4eb53f7f9a52b16464348757d3ac3b895624"
+  },
+  "selected_SAN11": {
+    "file": "build-sanitize/artifacts-fbx-authoring-selected-sanitize.xml",
+    "tests": 11,
+    "failures": 0,
+    "sha256": "11e1c5108c05eed635abfa34bbb2322ce413a2231751b3b68abb3cec87b6b90f",
+    "seconds": 9.39
+  },
+  "new_native_checks": 9073,
+  "real_worker_checks": 51,
+  "reference_world_vertices": 1152,
+  "independent_cases": "5 default +9 edited bone translation/rotation/anisotropic-scale poses; exact ordered triangle-corner GLB consumer, same fixed2e-5+1e-6*magnitude bound",
+  "native_Fltk": {
+    "skin-release-final": {
+      "checks": 14,
+      "failed": 0,
+      "file": "artifacts/menu-fbx-skin-release-final/report.json",
+      "sha256": "3a57ed9a889e682cea2e8fe6bc560066cd89dcc7f23b98cbb80a7f9e72114b82"
+    },
+    "morph-release-final": {
+      "checks": 14,
+      "failed": 0,
+      "file": "artifacts/menu-fbx-morph-release-final/report.json",
+      "sha256": "b3b7aa5882795347bf23e585e031e92605dc14c8f61a6cd4d57bef548d918d22"
+    },
+    "skin-sanitize-final": {
+      "checks": 14,
+      "failed": 0,
+      "file": "artifacts/menu-fbx-skin-sanitize-final/report.json",
+      "sha256": "3a57ed9a889e682cea2e8fe6bc560066cd89dcc7f23b98cbb80a7f9e72114b82"
+    },
+    "morph-sanitize-final": {
+      "checks": 14,
+      "failed": 0,
+      "file": "artifacts/menu-fbx-morph-sanitize-final/report.json",
+      "sha256": "b3b7aa5882795347bf23e585e031e92605dc14c8f61a6cd4d57bef548d918d22"
+    }
+  },
+  "frontend_semantics": "actual chooser/Cancel/defaultCancel, millimetre input option, real skeleton/skin or weighted morph, original bytes separate canonicalGLB, oneUndo/Redo, Save, normal App/GL/font Close; private Xvfb",
+  "KHR": {
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "files": 14,
+    "errors": 0,
+    "unfiltered_warnings": 12
+  },
+  "initial_negatives_preserved": [
+    "Exploratory GLB consumer assumed vertex-index correspondence; corrected to exact ordered triangle corners across legitimate seam reindex, no tolerance change",
+    "Old generic GUI5-Shift-Tab driver selected Input axes Z-up instead of Input units; actual observed units control +persisted receipt verifies millimetres",
+    "One SAN GUI fixture mislabeled skin-sanitize as morph; final exact script branches on skin prefix, allfour unique output reports pass"
+  ],
+  "limits": [
+    "DQ/multiple-deformer/full-material/named-UV/target-normal-generation adapters remain incomplete",
+    "Independent unit/axis/combined deformation and full attribute-quality oracles remain required; default numerical poses and actual native millimetre GUI are separate scopes",
+    "No whole395 suite or newFBXArc/physicalXR/compositor claim",
+    "Source21/24/25 not admitted by this component"
+  ],
+  "physical_headset": false,
+  "installed": false,
+  "goal_complete": false,
+  "hashes": {
+    "src/import-native.cpp": "c4458a88e4903a5abb4c2012d897b919f35276d8a8d27908311d0d4ef1d5ccee",
+    "src/import-glb-builder.hpp": "481749a854d3cbca09ec6c1de60782e4f43d8449bd04407a5a9b3577a688fac8",
+    "CMakeLists.txt": "d5227262c531b037ba9b022afbf493cd655398fdfb5c72520f175aedf731a349",
+    "third_party/sources.json": "dd5579423e3f9ec2e74bb8572acf00a326164c9cb607103415f576f7c2ce36d1",
+    "tests/fbx-deformation.cpp": "24d5489471782183bc6335e0c5597ad44f428d078dae88a50f086e0411eab11b",
+    "tests/fbx-import-document.cpp": "1b5f528f49fa5141bd6e677bd58bd7197b0cd6d62287f12965c5d4f848007a92",
+    "tests/fbx-import-menu.py": "6f1244253e23b32b39264898d9f7f994f4aad31a368abb6306005f5bf88d2440",
+    "tests/data/ufbx-deformers/SOURCES.json": "d7b3b1e14ad60f720f6f33275197ebf15cfba9373e0bddab731690f3ea2baee4",
+    "tests/data/ufbx-deformers/LICENSE": "0dd48ebadf52273c736256325c8f078c03c8bb4facee22a4122de0ad3f615391",
+    "build/dome-sculpt": "2428274acedea8201f2cf41a0005e22876d49b70017c29b78e3e9e7925b449b3",
+    "build-sanitize/dome-sculpt": "ccf73cc70619af08a9901674c74ff050f16ec34a7c798cfc706fd31fe2f92860",
+    "build/libdome-sculpt-core.a": "f918705f4cff767b824956a8fd4a82459586e55788290692075cfa8c54ea4fb8",
+    "build-sanitize/libdome-sculpt-core.a": "1e721d4d035ac21c2f455942c89a51142e23ac339d808674a312ea3285db8b8b",
+    "build/libdome-sculpt-render.a": "938e4b43793c5b9222c76984dacd646e119cf0f33565955bf5a29f186f4757ee",
+    "build-sanitize/libdome-sculpt-render.a": "83f29c14cf9c4c0bd0c74c430e610eeebd5c7531f801d3d93a7754975d16e85b",
+    "build/dome-sculpt-fbx-deformation-test": "1eaec90f8d56b6b0ee19edb32937784e0b2b3a7192ae6b336e4d4c22c6471c12",
+    "build-sanitize/dome-sculpt-fbx-deformation-test": "e67ad1ee4e97489f40363ca041aeacad452af40141da30046237a3d1030eb1a8",
+    "build/dome-sculpt-fbx-import-document-test": "3d424288e76d68352e6335421fb48383c2221284f7974d7290ede809daabfa72",
+    "build-sanitize/dome-sculpt-fbx-import-document-test": "d78fed3a7ed4a05671f35ece0ffdf779674f9e44dc8b666fa1deef582a8ef3b5",
+    "build/dome-sculpt-import-authoring-test": "4753cab82ef9b7307f7ffb45e7847859fd96a3c7d04c071adf9be62468852678",
+    "build-sanitize/dome-sculpt-import-authoring-test": "0a17d9d2a018bc2ffec056aa0e608643c1ea8c7f08066a8def8531713d9cde52",
+    "artifacts/tests-fbx-authoring-native-release.log": "c2b5250780f9035ea11b99ad2fe15bfef7783918b0e46c446115f744bd09ceb2",
+    "artifacts/tests-fbx-authoring-selected-release.log": "138cf8e4f095ce887b5ddc415b3a281768e799abb351e3252f952b41e3e7835a",
+    "artifacts/tests-fbx-authoring-selected-sanitize.log": "7eeedd8d889e97cecf8c3fb2e48a93ae556f3bd057ed1f2e93eee0af93834e49",
+    "artifacts/tests-fbx-authoring-khronos.log": "4219c8ef2454018daf3b0542c39e25b8d9420b6db1eba2b633a493ca7538bf31",
+    "artifacts/fbx-authoring-khronos.json": "12ed5ee328ba4a51c7bbce3168ef9668d1a82c363455e68d70722ae5276d481a",
+    "artifacts/validate-fbx-glb.cjs": "92b50d9eb84ab2f0a23f978bc8d7aea067475cd626cd192d2605bfeb3c171f31",
+    "artifacts/build-fbx-authoring-release.log": "06b6da3673364351e997f92717abe5fd78b246792cbd01fa5910c60859c5adf8",
+    "artifacts/build-fbx-authoring-sanitize.log": "d53560f56889b7bba2c8466e9e4b27d88c43901e216e41f14ddeb62e0efbec85",
+    "artifacts/build-fbx-ui-helper.log": "e64a5a9c78ed897a8f1a879930791580e5be58dba436d7d6714efc8e5da0bca8",
+    "artifacts/build-fbx-ui-helper-sanitize.log": "245e0f8716896368a98fb513f0e954803e3886765e2d490d4c85f5ce8b2a1daf",
+    "artifacts/tests-fbx-consumer-probe-before-corner-correspondence.log": "df1edff9e9d87f27d345ad76b6a9a7101a907637cf4435dcc26a1bd01d0539cc",
+    "artifacts/tests-fbx-menu-skin-before-unit-control-fix.log": "85ad767c1a5710a6305158e844c83039d2c5abe0fa5e5574c306c0736ee0775c",
+    "artifacts/tests-fbx-menu-skin-sanitize.log": "cc66d797305b24a02ae267af830914e3112471717b7b7ff209d8227364d366ee",
+    "artifacts/tests-fbx-menu-skin-release-final.log": "320eadec726064857d6c719aa8b1af9ca623062b49c30a86feb77ed6fd0e5ff0",
+    "artifacts/menu-fbx-skin-release-final/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/menu-fbx-skin-release-final/accepted.json": "3f1cdeaea8c3fede665273a4661af91d2852daa08d1b43b6ccc04d162f9aa0be",
+    "artifacts/tests-fbx-menu-morph-release-final.log": "e60f667a9b27d9a480979496613a12d143c4bbedc73df1c6397016ed60fed2a4",
+    "artifacts/menu-fbx-morph-release-final/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/menu-fbx-morph-release-final/accepted.json": "bca59e1e776a914a77dabb534c19156c11f021db940e34ced6838c08624a7f58",
+    "artifacts/tests-fbx-menu-skin-sanitize-final.log": "320eadec726064857d6c719aa8b1af9ca623062b49c30a86feb77ed6fd0e5ff0",
+    "artifacts/menu-fbx-skin-sanitize-final/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/menu-fbx-skin-sanitize-final/accepted.json": "3f1cdeaea8c3fede665273a4661af91d2852daa08d1b43b6ccc04d162f9aa0be",
+    "artifacts/tests-fbx-menu-morph-sanitize-final.log": "e60f667a9b27d9a480979496613a12d143c4bbedc73df1c6397016ed60fed2a4",
+    "artifacts/menu-fbx-morph-sanitize-final/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/menu-fbx-morph-sanitize-final/accepted.json": "bca59e1e776a914a77dabb534c19156c11f021db940e34ced6838c08624a7f58"
+  }
+}

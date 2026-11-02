@@ -85,8 +85,11 @@ them with fresh core/frontend builds,5/5 Release+5/5 SAN and150 actual-loader
 assertions. Read BASIC-AUTHORING-INTEGRATION.md for exact split results. No
 Scene21+ data or controller trays are admitted. Full FBX/material/attribute/
 unit-axis semantics, existing-rig/source rest fitting and remaining painting/
-texture-set work stay required. The separately qualified per-mesh named-UV FBX
-binding823fe61 remains private pending integration. The full goal stays active.
+texture-set work stay required. Per-mesh named-UV FBX binding is now integrated with current authoring after
+16/16 Release+16/16 ownedSAN, actualArc37/maxpixelerror1,75genuine unit/axis
+combinations and93KHR0error checks; both alltarget builds and current-source
+OneAPI15 pass. Read CURRENT-FBX-BINDINGS-INTEGRATION.md for exact scopes and
+preserved initial consumer failure. This does not complete broader FBX semantics. The full goal stays active.
 
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in

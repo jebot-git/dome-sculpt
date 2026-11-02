@@ -1,5 +1,10 @@
 # Native FBX skin and morph conversion — private prototype
 
+The subsequent bounded component now has fresh native, owned sanitizer,
+independent export and actual FLTK qualification. Read
+FBX-DEFORMATION-QUALIFICATION.md and its receipt for the new exact scopes.
+This earlier prototype history is retained; full FBX support remains incomplete.
+
 This branch extends the existing native ufbx importer; it is not a replacement
 frontend and is not yet qualified for main. The public authoring application and
 the complete FBX requirement remain separate from these initial results.

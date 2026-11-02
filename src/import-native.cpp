@@ -3,6 +3,7 @@
 #include "import-glb-builder.hpp"
 #include "import-obj-libraries.hpp"
 #include "text-utf8.hpp"
+#include <array>
 #include <exception>
 #include <map>
 #include <ufbx.h>
@@ -52,6 +53,7 @@ struct Converter {
   ufbx_scene &source;
   std::vector<std::string> diagnostics;
   std::map<std::pair<const ufbx_texture*,std::string>,uint32_t> textures;
+  std::map<std::pair<uint32_t,std::array<int,4>>,uint32_t> material_variants;
   std::map<std::string,std::string> material_directories;
   std::map<uint32_t,std::vector<uint32_t>> joint_helpers;
   size_t vertices=0,triangles=0,triangulation_work=0;
@@ -96,8 +98,6 @@ struct Converter {
     if(auto found=textures.find({&t,directory});found!=textures.end())return found->second;
     if(t.type!=UFBX_TEXTURE_FILE || t.has_uv_transform)
       throw std::runtime_error("Layered/procedural/transformed FBX/OBJ texture requires an explicit native material adapter");
-    if(!string(t.uv_set).empty() && string(t.uv_set)!="default" && string(t.uv_set)!="UVMap")
-      throw std::runtime_error("Named native texture UV set requires explicit per-primitive source-UV binding");
     auto encoded=texture_bytes(t,directory);
     std::string mime;
     constexpr uint8_t png[]={137,80,78,71,13,10,26,10};
@@ -159,6 +159,53 @@ struct Converter {
       if(!m->features.pbr.enabled)diagnostics.push_back("Material '"+string(m->name)+"': legacy shading converted to ufbx PBR approximation; exact original retained.");
     }
     if(!options.materials)diagnostics.push_back("Materials explicitly disabled; raw original materials and images remain retained.");
+  }
+  uint32_t texture_uv(const ufbx_texture &texture,const ufbx_mesh &mesh) {
+    const auto name=string(texture.uv_set);
+    if(!mesh.vertex_uv.exists)
+      throw std::runtime_error("Native textured primitive has no UV coordinates");
+    // OBJ has one unnamed coordinate stream. FBX names are actual identities,
+    // including UVMap: it is not necessarily the first set on every mesh.
+    if(name.empty()||(capture.source().format==ImportSourceFormat::Obj&&
+        (name=="default"||name=="UVMap")))return 0;
+    std::optional<uint32_t> selected;
+    for(size_t i=0;i<mesh.uv_sets.count;++i) {
+      builder.stop();
+      if(string(mesh.uv_sets[i].name)!=name)continue;
+      if(selected)throw std::runtime_error("Native texture UV set name is ambiguous on its primitive");
+      if(i>1||!mesh.uv_sets[i].vertex_uv.exists)
+        throw std::runtime_error("Native texture UV set exceeds supported coordinate streams");
+      selected=uint32_t(i);
+    }
+    if(!selected)throw std::runtime_error("Native texture UV set is missing from its primitive");
+    return *selected;
+  }
+  uint32_t material_for(const ufbx_material &source_material,const ufbx_mesh &mesh) {
+    const auto base=source_material.typed_id+1;
+    if(!options.materials)return base;
+    const auto &p=source_material.pbr;
+    const std::array<const ufbx_material_map*,4> maps={&p.base_color,&p.emission_color,&p.normal_map,&p.ambient_occlusion};
+    const std::array<const char*,4> roles={"baseColorTexture","emissiveTexture","normalTexture","occlusionTexture"};
+    std::array<int,4> coordinates{-1,-1,-1,-1};bool variant=false;
+    for(size_t i=0;i<maps.size();++i)if(maps[i]->texture_enabled&&maps[i]->texture) {
+      coordinates[i]=int(texture_uv(*maps[i]->texture,mesh));
+      variant|=coordinates[i]!=0;
+    }
+    if(!variant)return base;
+    const auto key=std::pair{base,coordinates};
+    if(auto found=material_variants.find(key);found!=material_variants.end())return found->second;
+    auto &materials=builder.json["materials"];
+    if(materials.size()>=256)throw std::length_error("Native per-primitive material UV bindings exceed256 materials");
+    auto material=materials.at(base);auto bindings=nlohmann::json::array();
+    for(size_t i=0;i<maps.size();++i)if(coordinates[i]>=0) {
+      auto &info=i==0?material["pbrMetallicRoughness"][roles[i]]:material[roles[i]];
+      info["texCoord"]=coordinates[i];
+      bindings.push_back({{"role",roles[i]},{"source_texture",maps[i]->texture->element_id},
+        {"source_uv_set",string(maps[i]->texture->uv_set)},{"texcoord",coordinates[i]}});
+    }
+    material["extras"]["dome_source_ufbx_uv_bindings"]=std::move(bindings);
+    const auto index=uint32_t(materials.size());materials.push_back(std::move(material));
+    material_variants.emplace(key,index);return index;
   }
   struct SkinData {
     uint32_t index=0;
@@ -302,7 +349,12 @@ struct Converter {
       triangles+=count;
       uint32_t slot=m.face_material.count?m.face_material[f]:0;
       if(node.materials.count && slot>=node.materials.count)throw std::runtime_error("Native face material slot is outside instance binding");
-      uint32_t material=node.materials.count?node.materials[slot]->typed_id+1:0;
+      uint32_t material=node.materials.count?material_for(*node.materials[slot],m):0;
+      const auto &material_json=builder.json["materials"].at(material);
+      const uint32_t normal_uv=material_json.contains("normalTexture")?
+        material_json["normalTexture"].value("texCoord",0u):0u;
+      const auto &tangent=normal_uv==0?m.vertex_tangent:m.uv_sets[normal_uv].vertex_tangent;
+      const auto &bitangent=normal_uv==0?m.vertex_bitangent:m.uv_sets[normal_uv].vertex_bitangent;
       auto &a=parts[material];const size_t first_vertex=a.source_vertex.size();
       for(size_t t=0;t<count;++t) {
         if((t&4095)==0)builder.stop();
@@ -319,11 +371,11 @@ struct Converter {
           if(m.vertex_uv.exists){auto uv=ufbx_get_vertex_vec2(&m.vertex_uv,corner);a.uv.insert(a.uv.end(),{real(uv.x),real(uv.y)});}
           if(m.uv_sets.count>1){auto uv=ufbx_get_vertex_vec2(&m.uv_sets[1].vertex_uv,corner);a.uv1.insert(a.uv1.end(),{real(uv.x),real(uv.y)});}
           if(m.vertex_color.exists){auto c=ufbx_get_vertex_vec4(&m.vertex_color,corner);a.color.insert(a.color.end(),{real(c.x),real(c.y),real(c.z),real(c.w)});}
-          if(m.vertex_tangent.exists && options.normals==ImportNormals::Preserve && m.vertex_normal.exists) {
-            if(!m.vertex_bitangent.exists)throw std::runtime_error("Native authored tangent has no bitangent handedness authority");
-            auto tangent=ufbx_get_vertex_vec3(&m.vertex_tangent,corner),b=ufbx_get_vertex_vec3(&m.vertex_bitangent,corner);
-            auto sign=dot3(cross3(n,tangent),b)<0?-1.f:1.f;
-            a.tangent.insert(a.tangent.end(),{real(tangent.x),real(tangent.y),real(tangent.z),sign});
+          if(tangent.exists && options.normals==ImportNormals::Preserve && m.vertex_normal.exists) {
+            if(!bitangent.exists)throw std::runtime_error("Native authored tangent has no bitangent handedness authority");
+            auto t=ufbx_get_vertex_vec3(&tangent,corner),b=ufbx_get_vertex_vec3(&bitangent,corner);
+            auto sign=dot3(cross3(n,t),b)<0?-1.f:1.f;
+            a.tangent.insert(a.tangent.end(),{real(t.x),real(t.y),real(t.z),sign});
           }
           a.source_vertex.push_back(m.vertex_indices[corner]);a.source_corner.push_back(corner);
         }
@@ -415,7 +467,7 @@ struct Converter {
         {"rotation",root_rotation},{"extras",{{"dome_import_conversion",true}}}});
     }
     j["scenes"]=nlohmann::json::array({{{"nodes",{root}}}});j["scene"]=0;
-    j["extras"]={{"dome_source_adapter","ufbx-0.23.1-native-3"},{"dome_canonical_position_units","metres"},{"dome_source_geometry_unit_scale",source.metadata.geometry_scale},{"dome_source_unit_override_scale",coordinate_scale}};
+    j["extras"]={{"dome_source_adapter","ufbx-0.23.1-native-4"},{"dome_canonical_position_units","metres"},{"dome_source_geometry_unit_scale",source.metadata.geometry_scale},{"dome_source_unit_override_scale",coordinate_scale}};
     return builder.finish();
   }
 };
@@ -469,6 +521,6 @@ CapturedImportSource capture_native_source(const std::filesystem::path &path,Imp
   // before the detached authoring Scene can adopt any object.
   auto validation=limits;if(converter.deformers_converted)validation.mode=ImportMode::PreserveGltf;
   (void)import_glb(*result,validation);
-  return capture.finish(result,"ufbx v0.23.1 26a482ae native adapter 3",std::move(converter.diagnostics));
+  return capture.finish(result,"ufbx v0.23.1 26a482ae native adapter 4",std::move(converter.diagnostics));
 }
 } // namespace dome
