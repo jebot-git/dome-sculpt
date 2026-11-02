@@ -25,7 +25,7 @@ whole-resolution speed. Tiny cases are slower; initial queue/JIT costs remain
 visible. Read GPU-SPARSE-RESAMPLE-WIP.md/.json. No before/after manifest was
 captured for that run; sealing-time hashes are scoped honestly.
 
-Separate actual-worker sourcec0fa331 /metadatae16ba06 now has fresh coherent
+Separate actual-worker sourcec0fa331 /metadatad3e5261 now has fresh coherent
 production core/support CPU6/6 and actualA770 OneAPI5/5. Actual native layered/
 masked output is byte-identical1,152,784bytes across CPU/GPU; a link wrapper
 proves production dispatch and later-failure atomic refusal. Document history,
@@ -33,8 +33,8 @@ Save/reopen, controller and progress checks pass. All1,142 captured source/
 binary hashes match. The small whole-job measurement77.11msCPU/213.28msOneAPI
 is slower on GPU, including initial queue/kernel overhead and concurrent user
 activity; dense interpolation benefit does not establish whole-job acceleration.
-Whole-owned C/C++core/support SAN build29465 remains live; no SAN pass or new
-frontend qualification yet. Read GPU-RESOLUTION-WORKER-WIP.md/.json.
+Fresh whole-owned C/C++core/support ASan+UBSan/leaks5/5 passes35.83s, all1,144
+source/binary hashes unchanged. No new frontend qualification is implied. Read GPU-RESOLUTION-WORKER-WIP.md/.json.
 
 Initial CUDA compile fails on host constexpr reciprocal-array device access.
 Portable source2d17cb1 /metadata932b344 fixes the generator: CUDA sm86 and HIP
@@ -46,8 +46,8 @@ GPU-RESAMPLE-PORTABILITY-WIP.md/.json. No positive AMD/NVIDIA device claim.
 
 New sourcef01e04f adds detached-grid lifetime, actual missing-device Scene
 publication and repeated whole-job probes. Fresh canonical FLTK/OpenXR CPU
-build99131 and OneAPI75547 are live in the portable child; no test/build pass
-is inferred. All source/header/test inputs stay frozen during their work.
+build99131, OneAPI75547 and fresh whole-owned native SAN53391 are live in
+the portable child; no test/build pass is inferred. All source/header/test inputs stay frozen during their work.
 Current public runtime remains870aa6c; no GPU resolution runtime admission.
 
 Agents report paint24 preview600fe76 fully qualified software/Arc/SAN;

@@ -37,8 +37,10 @@ user's VRChat/build activity is present. It is not a controlled sustained-speed
 result and does not establish whole-job acceleration. The dense interpolation
 component's separate improvement must not be substituted for this measurement.
 
-The fresh whole-owned C/C++core/support sanitizer build is still live under
-exec handle29465; no sanitizer result is claimed here yet. Initial CUDA backend
+Fresh whole-owned C/C++core/support ASan+UBSan/leaks5/5 passes in35.83s,
+including all five corresponding registered worker/controller/data/session
+suites. All1,144 captured source/binary hashes remain unchanged. This does not
+instrument a frontend or a GPU driver. Initial CUDA backend
 compile fails on dynamically indexed host reciprocal tables. Portable child
 2d17cb1 fixes that with independent CUDA/HIP compilation and exact host/device
 numeric proof; it has not yet been combined with this worker qualification.
