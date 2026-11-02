@@ -22,9 +22,20 @@ finished6 pass plus the actual joint94 timeout600.13s, total1173.21s. The real D
 fixture passed7 checks in560.26s. Original logs/timeouts are retained, including
 prior d56f215 sanitizer5/6 with joint94 timeout. No7/7 sanitizer claim is made.
 
-A further cheap-path audit found SourceNormalPreparation::validate(false)
-accidentally uses the one-argument projection validation, which scans retained
-normal geometry. Deep-flag forwarding and explicit geometry-call/forgery and
-same-call proof-upgrade probes remain the next narrow followup. Colour sampling
+The followup forwards the actual deep flag in SourceNormalPreparation to both
+projection validators. The new exact wrapper probe reports0 geometry/2 metadata
+calls on cheap publication, retains deep geometry validation, rejects a real
+forged coordinate only at required deep admission, and still rejects malformed
+image dimensions cheaply. Within ONE actual root binding validation it first
+validates a separate genuine bad-origin candidate cheaply, then deeply; the
+completed cheap ledger proof is correctly upgraded and the ordered-origin forgery
+is refused. Exceptional upgrade permits exact original-Scene retry. The frozen
+old implementation fails the same geometry counter oracle.
+
+After that narrow source change, six registered scopes passed6/6 Release1.13s
+and6/6 fully owned C/C++ASan/UBSan/leaks11.13s, including8 new geometry/proof-upgrade
+checks and the original colour/normal kernel/native/transitions scopes. These do
+not include a completed whole joint94 sanitizer run; its earlier timeout remains
+explicit above. No public layout or codec changed. Colour sampling
 visual quality is still incomplete, independently recorded in
 NORMAL-COLOR-UV-COMPOSITION.md; this ledger does not fix that failure.
