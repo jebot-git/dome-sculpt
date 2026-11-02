@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/normal-sampling.hpp"
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
 #include "shapekey-preview.hpp"
@@ -1554,6 +1555,16 @@ void Document::mesh_loop() {
       std::unordered_set<uint64_t> frame_objects;
       for (auto &o : objects) {
         auto colors=detail::current_vertex_colors(o,cancelled);
+        const auto normal_domain=o.textures&&o.textures->normal_projection?o.textures->normal_projection->sampling_domain:nullptr;
+        if(normal_domain){
+          normal_domain->validate(cancelled);
+          if(normal_domain->coordinates.size()!=o.mesh.positions.size()||normal_domain->indices!=o.mesh.indices)
+            throw std::invalid_argument("Retained normal worker correspondence differs from current REST geometry");
+          if(snapshot->normal_coordinates.empty()){
+            snapshot->normal_coordinates.reserve(snapshot->mesh.positions.size());
+            for(auto uv:snapshot->mesh.uv)snapshot->normal_coordinates.push_back({uv[0],uv[1],uv[0],uv[1]});
+          }
+        }
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
         const bool canonical=o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
@@ -1621,6 +1632,11 @@ void Document::mesh_loop() {
         }
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
           if(packed_uv1)packed_uv1->push_back(o.textures->source_maps->uv1->at(vertex));
+          if(normal_domain||!snapshot->normal_coordinates.empty()){
+            const auto uv=normal_domain?normal_domain->coordinates.at(vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex);
+            const auto toon=normal_domain&&!normal_domain->mtoon_coordinates.empty()?normal_domain->mtoon_coordinates.at(vertex):uv;
+            snapshot->normal_coordinates.push_back({uv[0],uv[1],toon[0],toon[1]});
+          }
           if(!colors.empty() || !snapshot->source_colors.empty())snapshot->source_colors.push_back(colors.empty()?std::array<float,4>{1,1,1,1}:colors.at(vertex));
           snapshot->mesh.positions.push_back(frame?detail::placed_position(*frame,o.mesh.positions.at(vertex)):vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
           snapshot->mesh.normals.push_back(frame?detail::placed_normal(*frame,o.mesh.normals.at(vertex)):vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));

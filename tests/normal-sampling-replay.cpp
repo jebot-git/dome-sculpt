@@ -52,6 +52,8 @@ int main()try{
   proof.receipt.indices=input.target.indices.size();proof.receipt.correspondence_bytes=layout->storage_bytes()+leaf->storage_bytes();
   proof.validate(true);proof.validate_current(input.target,nullptr);
   check(true,"Owning detached field replay authenticates source planes, ordered correspondence and current normal metadata");
+  auto bounded=proof;bounded.receipt.max_working_bytes=4096;
+  check(refuses([&]{bounded.validate(true);}),"Forged small normal scratch receipt cannot hide concurrently live replay planes");
   check(NormalSamplingReceipt::decode(proof.receipt.encode()).encode()==proof.receipt.encode(),
         "Exact-domain receipt roundtrip does not relabel raster quality counters");
   auto changed=proof;auto wrong=std::make_shared<NormalSamplingDomain>(*leaf);
@@ -96,8 +98,11 @@ int main()try{
   const auto &restarted_paint=*restarted.active().painted;
   check(restarted_paint.baked()->normal_authority==restarted_paint.normal_projection()->sampling_domain->detail&&
         restarted.encode()==saved,"Complete Scene restart preserves event/domain alias and the owning source graph");
-  check(refuses([&]{object.painted->preview(object.material);}),
-        "Unqualified atlas-only consumers refuse an owning retained field instead of sampling the wrong domain");
+  const auto domain_preview=object.painted->preview(object.material);
+  check(domain_preview->normal.rgba==resolved->pbr->rgba&&domain_preview->mtoon_normal.rgba==resolved->mtoon->rgba&&domain_preview->normal_projection==object.painted->normal_projection(),
+        "Explicit domain preview retains the historical pre-filter resolved planes without another atlas resample");
+  check(refuses([&]{bake_source_uv({object.painted,object.appearance,object.material_bindings,std::nullopt,object.deformation,object.painted->mesh(),input.source_vertices});}),
+        "Legacy raster method refuses an exact retained field rather than reinterpreting its atlas coordinates");
   auto joint=current_color_target_fixture::fixture();auto &color_object=joint.active();
   auto strict=polygon_paint_geometry(*color_object.painted,color_object.painted->mesh(),{});
   auto descriptor=std::make_shared<PolygonColorSurface>();descriptor->topology=std::make_shared<const PolygonMesh>(color_object.polygon->topology);descriptor->field=color_object.polygon->colors;

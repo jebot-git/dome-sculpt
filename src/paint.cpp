@@ -874,6 +874,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
     const Mesh &target,std::span<const uint32_t> source_vertices,const NormalPreparationOptions &options) {
   auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Prepared normal UV reprojection cancelled");};stop();
   if(source.editing_||!source.normal_projection_)throw std::invalid_argument("Normal UV reprojection requires finished intrinsic normal planes");
+  if(source.normal_projection_->version!=1)throw std::invalid_argument("Retained normal fields require their source-owning correspondence adapter, not raster reinterpretation");
   if(!std::isfinite(options.max_angular_error)||options.max_angular_error<0||options.max_angular_error>.25||!options.max_samples||options.max_samples>64'000'000||!options.max_working_bytes||options.max_working_bytes>512*1024*1024)
     throw std::invalid_argument("Invalid prepared normal UV reprojection bounds");
   const auto &before=source.mesh();target.validate();
@@ -1074,8 +1075,6 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 }
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {
   material.validate();
-  if(normal_projection_&&normal_projection_->version==2)
-    throw std::invalid_argument("Retained normal sampling is archived but requires a qualified domain-aware preview/export consumer");
   if(baked_&&baked_->normal_authority&&(!normal_projection_||normal_projection_->version!=2))
     throw std::invalid_argument("Retained normal identity requires its own source sampling interpretation");
   if(source_maps_ && !baked_ && !color_projection_ && !normal_projection_){
@@ -1300,7 +1299,8 @@ PaintedMesh::build_composite(const Material &material) const {
   maps->baked_base=baked_;
   if(normal_projection_) {
     normal_projection_->validate(r);
-    maps->normal=*normal_projection_->pbr;maps->mtoon_normal=*normal_projection_->mtoon;
+    auto field=normal_projection_->version==2?SourceNormalPreparationAccess::resolved(*this):normal_projection_;
+    maps->normal=*field->pbr;maps->mtoon_normal=*field->mtoon;
   } else if (baked_ && !baked_->maps.normal.rgba.empty()) {
     maps->normal=blank_image(r,true);maps->baked_normal=blank_image(r,true);
     maps->baked_coverage=blank_image(r);for(size_t at=3;at<maps->baked_coverage.rgba.size();at+=4)maps->baked_coverage.rgba[at]=255;
@@ -1376,7 +1376,7 @@ PaintedMesh::build_composite(const Material &material) const {
         maps->emission_coverage.rgba[at]=byte(replacement_coverage);
     }
   }
-  if(normal_projection_ && baked_ && !baked_->maps.normal.rgba.empty()) {
+  if(normal_projection_ && normal_projection_->version==1 && baked_ && !baked_->maps.normal.rgba.empty()) {
     if(baked_->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes)
       throw std::logic_error("Prepared normal model cannot reinterpret historical canonical pixels");
     for(size_t at=0;at<size_t(r)*r;++at){
@@ -1391,7 +1391,7 @@ PaintedMesh::build_composite(const Material &material) const {
         pair.first->rgba[a]=byte(value.x*.5f+.5f);pair.first->rgba[a+1]=byte(value.y*.5f+.5f);pair.first->rgba[a+2]=byte(value.z*.5f+.5f);pair.first->rgba[a+3]=255;
       }
     }
-  } else if (baked_ && !maps->normal.rgba.empty()) {
+  } else if (!normal_projection_ && baked_ && !maps->normal.rgba.empty()) {
     // Protected/fractional coverage keeps original source normal detail. Convert
     // that affine-UV derivative frame into the canonical baked tangent basis.
     std::vector<Tangent> corners;

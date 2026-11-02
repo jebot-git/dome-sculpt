@@ -109,10 +109,14 @@ std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(const SourceU
      !input.current_material->normal_preparation)
     throw std::invalid_argument("Exact normal UV retention requires its own prepared source");
   const auto r=input.paint->resolution();const size_t pixels=size_t(r)*r;
-  const size_t coordinates=input.target.positions.size()*sizeof(std::array<float,2>)*2+
-    input.target.indices.size()*sizeof(uint32_t);
-  if(coordinates>options.max_working_bytes||pixels>(options.max_working_bytes-coordinates)/32)
-    throw std::length_error("Exact normal domain construction exceeds its declared scratch budget");
+  // Bound the simultaneously live correspondence/layout, replay target mesh,
+  // retained resolved/detail output and both independent replay scratch planes.
+  // This new interpretation is deliberately conservative; legacy v1 budgets
+  // and quality counters retain their original meaning.
+  const size_t geometry=input.target.positions.size()*60+input.target.indices.size()*12+
+    2*(input.target.uv_pins.size()+input.target.uv_seams.size());
+  if(geometry>options.max_working_bytes||pixels>(options.max_working_bytes-geometry)/81)
+    throw std::length_error("Exact normal domain construction/replay exceeds its cumulative scratch budget");
   auto proof=std::make_shared<SourceNormalSampling>();
   proof->before_paint=input.paint;proof->before_material=input.current_material;
   proof->before_appearance=input.appearance;proof->before_deformation=input.current_deformation;
@@ -155,6 +159,13 @@ void SourceNormalSampling::validate(bool deep,const std::function<bool()> &cance
   const auto &domain=*projection->sampling_domain;
   const auto &previous=*before_paint->normal_projection();
   projection->validate(receipt.resolution,deep);layout->storage_bytes();
+  const size_t replay_mesh=layout->uv.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+
+    layout->indices.size()*4+layout->pins.size()+layout->seams.size();
+  const size_t owned=layout->storage_bytes()+domain.storage_bytes();
+  const size_t pixels=size_t(receipt.resolution)*receipt.resolution;
+  if(owned>receipt.max_working_bytes||replay_mesh>receipt.max_working_bytes-owned||
+     pixels>(receipt.max_working_bytes-owned-replay_mesh)/80)
+    throw std::length_error("Retained normal source/replay planes exceed their cumulative scratch receipt");
   if(before_paint->resolution()!=receipt.resolution||receipt.vertices!=layout->source_vertices.size()||
      receipt.indices!=layout->indices.size()||domain.indices!=layout->indices||
      domain.coordinates.size()!=layout->source_vertices.size()||

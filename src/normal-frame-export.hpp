@@ -91,6 +91,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const std::function<bool()> &cancelled={}) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
+  if(input.textures&&input.textures->normal_projection&&input.textures->normal_projection->version==2)throw std::invalid_argument("Retained normal domains require an explicitly compiled format-specific sampling export; original source retained");
   const bool prepared=prepared_normal_state(&binding,input.textures.get(),false);
   const bool legacy=space==SourceMorphSpace::Original;const auto selected=legacy?set.mtoon:set.pbr;auto tangent_source=selected;
   if(!selected)throw std::invalid_argument("Selected export material has no retained normal frame");

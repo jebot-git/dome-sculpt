@@ -66,6 +66,7 @@ void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&(!i.paint||!i.paint->normal_projection()))
    throw std::invalid_argument("Retained normal sampling requires an owning prepared source");
  if(i.paint&&i.paint->normal_projection()){
+  if(i.paint->normal_projection()->version==2&&o.normal_sampling!=SourceNormalUvMethod::RetainSource)throw std::invalid_argument("Retained normal UV fields require exact correspondence, not legacy raster reinterpretation");
   if(!i.current_material||!i.current_material->normal_preparation)throw std::invalid_argument("Prepared normal UV source requires its own material interpretation");
   i.current_material->validate();const auto &p=*i.current_material->normal_preparation;p.validate_current(i.paint->mesh(),i.appearance.get(),o.cancelled);
   if(!detail::normal_projection_identity(*i.paint->normal_projection(),*p.projection))throw std::invalid_argument("Prepared normal UV source differs from its owning intrinsic field");
