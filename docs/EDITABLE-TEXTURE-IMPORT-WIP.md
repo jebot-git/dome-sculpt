@@ -45,3 +45,14 @@ source files, descriptors and successful retry. The diagnostic PackCharts lines
 from some denied xatlas setup phases are retained. This is not a C-allocator or
 OS-wide exhaustion proof. Fresh full regression/SAN/loader qualification of the
 combined source remains pending.
+
+Final component qualification on f62fcf8 passes all267 Release suites256.72s,
+both complete10,333-allocation/337-cancellation whole-owned sanitizer routes,
+and all11 selected sanitizer suites across the original10-pass/oneNotRun run
+and the repaired helper's1/1 CTest rerun. The missing target, failure log,
+unchanged archive hashes and final repair remain explicit. Actual Arc135,
+FLTK12, new real-loader synthetic-XR19, registered original/newXR2/2 and
+Khronos36files/0errors/20fixturewarnings pass. Exact sources and attempt/log
+hashes are in validation/EDITABLE-ATLAS-IMPORT.json. This qualifies the component;
+the combined product with held cuts and the separately identified generic
+UV-worker CancelWork repair still needs coherent integration qualification.
