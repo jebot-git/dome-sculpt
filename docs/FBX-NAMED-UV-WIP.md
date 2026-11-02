@@ -33,3 +33,23 @@ coverage remain required. Genuine upstream three-set reference files are pinned
 separately as research inputs, not represented as passing two-set imports.
 This implementation extends the existing native frontend; the full production
 goal remains active and no installation or physical test occurred.
+
+## Fresh coherent qualification of the bounded binding fix
+
+Frozenb603e0b now has fresh optimized Release57227 and whole-owned C/C++
+core/support/render/frontend SAN11485 builds, both terminal0. Registered8/8
+pass4.42s Release and8/8 pass8.51s SAN, including the actual new per-mesh UV/
+tangent/material-variant oracle and native explicit-atlas Save/restart, plus
+9073 deformation/1152 independent world vertices,51 real worker assertions and
+related skin/affine/export pixel regressions. The exact strengthened fixture's
+old-code negative remains preserved.
+
+Actual FLTK Maya-skin14 and Blender-morph14 checks pass in BOTH Release and
+ownedSAN, using the same current converter; all four Apps close normally with
+complete teardown. These are genuine deformation inputs, not a new graphical
+named-UV fixture. Fourteen current emitted deformation GLBs pass pinned Khronos
+2.0.0-dev.3.10/maxIssues0 with0errors/12unfilteredwarnings. Read
+validation/FBX-NAMED-UV-QUALIFICATION.json for source/binary/evidence hashes and
+limits. This qualifies the bounded binding correction; direct multi-coordinate
+editing/UV2+, broader FBX semantics and combined-main admission remain required.
+No new physical test, installation or session restart occurred.
