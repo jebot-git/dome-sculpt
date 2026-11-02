@@ -1173,3 +1173,11 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND 
     $<TARGET_FILE:dome-sculpt-object-selection-test> ${CMAKE_CURRENT_BINARY_DIR}/object-selection-xr)
   set_tests_properties(object-selection-openxr PROPERTIES TIMEOUT 120)
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-uv-worker-cancellation-test tests/uv-worker-cancellation.cpp)
+  target_link_libraries(dome-sculpt-uv-worker-cancellation-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-uv-worker-cancellation-test PRIVATE -Wl,--wrap=_ZN4dome14bake_source_uvERKNS_17SourceUvBakeInputERKNS_19SourceUvBakeOptionsE)
+  add_test(NAME uv-worker-cancellation COMMAND dome-sculpt-uv-worker-cancellation-test ${CMAKE_CURRENT_BINARY_DIR}/uv-worker-cancellation/retry.dsculpt)
+  set_tests_properties(uv-worker-cancellation PROPERTIES TIMEOUT 120)
+endif()
