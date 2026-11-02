@@ -11,6 +11,9 @@ struct NormalFrameExport {
   // Exact original REST vertex for every expanded emitted vertex. Attribute
   // consumers validate against input authority before following this map.
   std::vector<uint32_t> rest_vertices;
+  // Native core-PBR only: exact retained sampling coordinates, remapped by the
+  // same full frame layout as every geometric and deformation attribute.
+  std::vector<std::array<float,2>> normal_coordinates;
   std::shared_ptr<const PolygonColorSurface> input_polygon_colors;
   std::vector<Tangent> tangents;
   std::vector<std::vector<Vec3>> normal_targets,tangent_targets;
@@ -88,10 +91,15 @@ inline PaintSourceTexture normal_frame_canonical_export(const ObjectSurface &inp
   return view;
 }
 inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMorphSpace space,
-    const std::function<bool()> &cancelled={}) {
+    const std::function<bool()> &cancelled={},bool retain_pbr_sampling=false) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
-  if(input.textures&&input.textures->normal_projection&&input.textures->normal_projection->version==2)throw std::invalid_argument("Retained normal domains require an explicitly compiled format-specific sampling export; original source retained");
+  const bool retained=input.textures&&input.textures->normal_projection&&input.textures->normal_projection->version==2;
+  if(retained&&(!retain_pbr_sampling||space!=SourceMorphSpace::Native))throw std::invalid_argument("Retained normal domains require an explicitly compiled format-specific sampling export; original source retained");
+  if(retained){
+    prepared_normal_state(&binding,input.textures.get(),true);
+    binding.normal_preparation->sampling_domain->validate_current(input.mesh,input.appearance.get(),cancelled);
+  }
   const bool prepared=prepared_normal_state(&binding,input.textures.get(),false);
   const bool legacy=space==SourceMorphSpace::Original;const auto selected=legacy?set.mtoon:set.pbr;auto tangent_source=selected;
   if(!selected)throw std::invalid_argument("Selected export material has no retained normal frame");
@@ -120,6 +128,11 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   }
   auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;out.canonical_normal=std::move(canonical_normal);out.rest_vertices=layout.vertices;out.input_polygon_colors=input.polygon_colors;
   if(prepared){out.prepared_normal.image=std::shared_ptr<const Image>(input.textures,legacy?&input.textures->mtoon_normal:&input.textures->normal);out.prepared_normal.wrap_s=out.prepared_normal.wrap_t=33071;out.prepared_normal.min_filter=out.prepared_normal.mag_filter=9729;}
+  if(retained){
+    const auto &projection=*input.textures->normal_projection;
+    out.prepared_normal.image=input.textures->baked_base&&!input.textures->baked_base->maps.normal.rgba.empty()
+      ?projection.sampling_domain->resolved_pbr:projection.pbr;
+  }
   out.surface={input.id,input.name,input.transform,input.material,{},input.textures,input.deformation,input.groups,input.appearance,input.material_bindings,input.source_dormant};out.surface.affine_edit=input.affine_edit;auto &mesh=out.surface.mesh;
   Quat from_native=legacy?to_native.inverse():Quat{};
   std::vector<size_t> targets;for(auto id:set.current_targets){auto t=std::find_if(selected->targets.begin(),selected->targets.end(),[&](const auto &t){return t.id==id;});if(t==selected->targets.end())throw std::invalid_argument("Export target normal identity is missing");targets.push_back(size_t(t-selected->targets.begin()));}
@@ -127,6 +140,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   for(size_t v=0;v<layout.vertices.size();++v) {
     if((v&1023)==0 && cancelled && cancelled())throw std::runtime_error("Normal frame export cancelled");
     auto vertex=layout.vertices[v],corner=layout.corners[v];
+    if(retained)out.normal_coordinates.push_back(input.textures->normal_projection->sampling_domain->coordinates.at(vertex));
     mesh.positions.push_back(input.mesh.positions.at(vertex));mesh.normals.push_back(from_native.rotate(selected->normals.at(corner)));
     if(!input.mesh.uv.empty())mesh.uv.push_back(input.mesh.uv.at(vertex));
     if(!input.mesh.uv_pins.empty())mesh.uv_pins.push_back(input.mesh.uv_pins.at(vertex));

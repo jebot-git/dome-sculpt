@@ -36,11 +36,14 @@ void check_images(const Scene &original,const Scene &changed,bool typed,const st
     check(covered>1000&&error<=4,"Retained normal sampling matches independent original-domain file pixels through mixed skin and morphs");
     auto invalid=std::make_shared<MeshSnapshot>(*surface);invalid->geometry_identity.reset();invalid->normal_coordinates[invalid->mesh.indices.front()][0]+=.01f;
     check(rejects([&]{draw(renderer,invalid);}),"GPU publication rejects an unauthenticated changed normal correspondence");
-    check(rejects([&]{current.export_asset(prefix.string()+"-uncompiled.glb",AssetExportFormat::Glb).get();}),
-          "Uncompiled format export retains the source rather than silently sampling the writable atlas");
+    current.shading(false);settled(current);const auto compiled_path=prefix.string()+"-compiled-p"+std::to_string(pose)+"-w"+std::to_string(int(weight*100))+".glb";
+    current.export_asset(compiled_path,AssetExportFormat::Glb).get();prepared_normal_consumer::Model compiled(compiled_path);
+    const auto core=draw(renderer,current.frame().surface);fbo.bind();independent.render(compiled.data);
+    check(delta(core,read())<=4,"Genuine compiled core-PBR normal coordinates match the real user-visible PBR mode");
   }
 }
 }
+#ifndef DOME_NORMAL_DOMAIN_RENDER_NO_MAIN
 int main(int argc,char **argv)try{
   if(argc<2)return 2;const std::filesystem::path prefix=argv[1];std::filesystem::create_directories(prefix.parent_path());
   NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';
@@ -54,3 +57,4 @@ int main(int argc,char **argv)try{
   }
   std::cout<<"PASS "<<checks<<" retained normal graphical checks\n";return 0;
 }catch(const std::exception &error){std::cerr<<"FAIL "<<error.what()<<'\n';return 1;}
+#endif

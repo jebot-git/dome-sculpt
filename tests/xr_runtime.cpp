@@ -61,6 +61,7 @@ int import_atlas_sector(){
  if((frame>=56&&frame<=58)||(frame>=64&&frame<=66)||(frame>=72&&frame<=74))return 4;
  if(frame>=80&&frame<=82)return 8;if(import_atlas_mode()=="accept"&&frame>=88&&frame<=90)return 6;return -1;
 }
+bool pbr_preview_fixture(){return getenv("DOME_XR_FIXTURE_PBR_VIEW")!=nullptr;}
 bool selection_fixture(){return getenv("DOME_XR_FIXTURE_SELECTION")!=nullptr;}
 bool menu_gate() { return getenv("DOME_XR_FIXTURE_MENU_GATE") != nullptr; }
 bool lost = false, regained = false, reference_event = false;
@@ -383,6 +384,14 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
         : 1.055f * std::pow(linear, 1 / 2.4f) - .055f;
     return int(std::lround(encoded * 255));
   };
+  if(pbr_preview_fixture()&&(frame==6||frame==18||frame==34)){
+    size_t solid=0;for(size_t at=3;at<bytes.size();at+=4)solid+=bytes[at]>240;
+    report["pbr_preview_images"][std::to_string(frame)][std::to_string(s->eye)]={{"opaque",solid}};
+    if(auto path=getenv("DOME_XR_FIXTURE_REPORT")){
+      std::ofstream capture(std::string(path)+".pbr-"+std::to_string(frame)+"-"+std::to_string(s->eye)+".ppm",std::ios::binary);capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
+      for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+    }
+  }
   if(!import_atlas_mode().empty()&&(frame==54||frame==78||frame==110)){
     report["import_atlas_images"][std::to_string(frame)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t value){return value!=0;});
     if(s->eye==0)if(auto path=getenv("DOME_XR_FIXTURE_REPORT")){
@@ -570,7 +579,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!polygon_mode().empty())focus_at=polygon_mode()=="focus"?30:90;
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
   if(!corner_uv_mode().empty()){focus_frame=frame;focus_at=corner_uv_mode()=="focus"?24:90;}
-  if(selection_fixture())focus_at=90;
+  if(selection_fixture()||pbr_preview_fixture())focus_at=90;
   if(!import_atlas_mode().empty())focus_at=1000;
   if(!affine_contact_mode().empty())focus_at=affine_contact_mode()=="focus"?12:90;
   if (focus_frame >= focus_at && !lost) {
@@ -591,7 +600,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_regains");
     return XR_SUCCESS;
   }
-  if (import_atlas_mode().empty() && !selection_fixture() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
+  if (import_atlas_mode().empty() && !pbr_preview_fixture() && !selection_fixture() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -716,6 +725,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->changedSinceLastSync=button;return XR_SUCCESS;
   }
   if(!import_atlas_mode().empty()){out->currentState=button&&import_atlas_click();out->changedSinceLastSync=button;return XR_SUCCESS;}
+  if(pbr_preview_fixture()){out->currentState=button&&(frame==8||frame==16||frame==22||frame==30);out->changedSinceLastSync=button;return XR_SUCCESS;}
   if(selection_fixture()){out->currentState=button&&(frame==8||frame==12||frame==32);out->changedSinceLastSync=button;return XR_SUCCESS;}
   if(!affine_contact_mode().empty()){out->currentState=XR_FALSE;out->changedSinceLastSync=XR_FALSE;return XR_SUCCESS;}
   out->currentState =
@@ -804,6 +814,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     bool stroke =
         (frame >= 2 && frame <= 5) ||
         (!getenv("DOME_XR_FIXTURE_SCENE") && frame >= 13 && frame <= 18);
+    if(pbr_preview_fixture())stroke=frame==12||frame==26;
     if (getenv("DOME_XR_FIXTURE_PAINT"))
       stroke = (frame >= 2 && frame <= 5) || (frame == 20);
     if (getenv("DOME_XR_FIXTURE_CONTROLS"))
@@ -869,6 +880,7 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
       if(frame>=18&&frame<=22)out->currentState={-1,0};
     }return XR_SUCCESS;
   }
+  if(pbr_preview_fixture()){out->currentState=right(p->subactionPath)&&a->name=="right_stick"?(frame==15||frame==16?XrVector2f{.8660254f,.5f}:frame==29||frame==30?XrVector2f{1,0}:XrVector2f{0,0}):XrVector2f{0,0};return XR_SUCCESS;}
   if(selection_fixture()){out->currentState=right(p->subactionPath)&&frame>=9&&frame<=12?XrVector2f{.8660254f,-.5f}:XrVector2f{0,0};return XR_SUCCESS;}
   if(!affine_contact_mode().empty()){out->currentState={0,0};return XR_SUCCESS;}
   out->currentState = right(p->subactionPath) && a->name == "right_stick" &&
@@ -1072,7 +1084,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     else p->pose.position={frame>=25?.16f:-.16f,1.48f,-.83f};
     return XR_SUCCESS;
   }
-  if (frame == 22 && !getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN") && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
+  if (frame == 22 && !pbr_preview_fixture() && !getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN") && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
@@ -1093,6 +1105,10 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if (getenv("DOME_XR_FIXTURE_RESTART") && s->action && right(s->hand) &&
       frame >= 24 && frame <= 26)
     p->pose.position = {-.22f, 1.48f, -.48f};
+  if(pbr_preview_fixture()&&s->action)p->pose.position={right(s->hand)?.045f:-.3f,1.48f,-.3f};
+  if(pbr_preview_fixture()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&(frame==12||frame==26)){
+    p->pose.position={.045f,1.56f+(.5f-.06f)*.6f,-.3f};
+  }
   if (getenv("DOME_XR_FIXTURE_CONTROLS") && s->action &&
       s->action->name == "aim_pose" && right(s->hand) && frame == 19) {
     p->pose.position = {.045f + (((100 + 420 * .75f) / 640) - .5f) * .6f,

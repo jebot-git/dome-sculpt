@@ -1,0 +1,86 @@
+{
+  "status": "Qualified private current-state core-PBR compiler; not production Source21 admission or full interoperability completion",
+  "base": "dc64acb976a4655c37a925386ba693d11b6b5236",
+  "source_files": {
+    "CMakeLists.txt": "af0fdd876bf99b03b4d98d142caa1166c73c6a7a3cbfffad08c775ccea886bd2",
+    "src/export.cpp": "f8b79ae2647137170e3ae02fffa64d9671c1f8caa396128af9bfa6e4b2ffb4ea",
+    "src/normal-frame-export.hpp": "c40cba937e80c4e965e50515041696080d5fc372c058160852ba7dd61baa5e82",
+    "tests/normal-domain-glb.cpp": "4a9c48f0d42a8316aeaf25cd0963011838613247bd17a5e8354731b77dab7c5b",
+    "tests/normal-domain-render.cpp": "cdd6423322be379326bcf429fb97ce26c2fcd70010d8a97aee91e35f4e07f103",
+    "tests/normal-uv-render.cpp": "00f5955e2bcf9698e9a3bcd3d6603f5a50b2f1b4aca6f105f7cc6a4a3af4440a",
+    "tests/colored-vrm-bake-fixture.hpp": "8e8941f399d56293cc89fd389817fc831bf34684dd5550376b50369a8fb11eb3",
+    "tests/prepared-normal-consumer.hpp": "2daf49f135565452042d06f074beed5e372c0bbf8af1b53e149b1ad905df8f69"
+  },
+  "binaries": {
+    "build-export/dome-sculpt-normal-domain-glb-test": "999f027c00c61ca44a391bfd027b327e97a9686eaf9ef20d28e30745fe621352",
+    "build-export/dome-sculpt-normal-domain-render-test": "dfb57a1d179618a86cc5680f36458976eb38c5a9d811e12e3bbffd6d3681458a",
+    "build-export/dome-sculpt-normal-domain-transitions-test": "ae2cb5d5a74d6bd3a5356e630db28121e08093abadc276cad030473257cb0814",
+    "build-sanitize/dome-sculpt-normal-domain-glb-test": "c5c51fae08bc3e3f10392fe64f7eca291246895afc6d0070939edd05aebd9c36",
+    "build-sanitize/dome-sculpt-normal-domain-render-test": "b2ffd38e4068e1dd35b31e48ab9ead212313aa20821eb69d7ef52c69ba26b6aa",
+    "build-sanitize/dome-sculpt-normal-domain-transitions-test": "671652fd4d9de2f9c0cc82bc96a3cb2c3d13e8e3c184e764269e1fe0d78bdb72"
+  },
+  "release": {
+    "suites": 3,
+    "seconds": 5.53
+  },
+  "owned_fresh_core_support_renderer_sanitizers": {
+    "suites": 3,
+    "seconds": 95.48,
+    "flags": "O1 g1 ASan UBSan leak detection, fresh C and C++ dependencies"
+  },
+  "independent_current_core_pbr": {
+    "checks": 99,
+    "images": 27,
+    "software_max_error": 0,
+    "arc_max_error": 1,
+    "poses": 3,
+    "morph_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "variants": [
+      "generic",
+      "typed original accessor",
+      "typed original accessor plus genuine source UV1"
+    ]
+  },
+  "arc": {
+    "device": "Intel Arc A770",
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "seconds": 3.534107521001715,
+    "source_binary_before_after_equal": true
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 54,
+    "errors": 0,
+    "warnings": 54,
+    "maxIssues": 0,
+    "warnings_filtered": false,
+    "warning": "NODE_SKINNED_MESH_NON_ROOT"
+  },
+  "negative_required_work": {
+    "original_before_uv_color_alpha_error": 68,
+    "without_normal_error": 89,
+    "native_third_uv_reimport": "Unsupported texture coordinate set/transform",
+    "legacy_vrm_export": "guarded pending format-specific compiler",
+    "actual_avatar_retained_domain_glb": "next qualification, not borrowed from preview tests",
+    "paint24_composition": "not integrated",
+    "reflected_affine": "not qualified by this fixture"
+  },
+  "cancellation": "Actual before_commit throw preserves old output and exact owning Scene for each variant",
+  "evidence_sha256": {
+    "normal-domain-export-release-tests.log": "1ff1d06891e1810e94c6e20fde7fa0aa3dd70b394bd6d46b1cd17fc9400109ad",
+    "normal-domain-export-sanitize-tests.log": "ce69e9f242f8f618f7b382799d182265a39fd35aae982babbe4a846d94d37ea9",
+    "normal-domain-export-current3.log": "8bc6aadd7b56439a08b274170a1c3c92d15865395cc50ca32b5f852c134e2241",
+    "normal-domain-export-fidelity-negative.log": "62761c0b39a22b91917ec9d686b387575962529799c960cdc91be0aba038b3ae",
+    "normal-domain-export-reimport-negative.log": "cf589baf14e8d5d731bba2e74ee791a99379fbe0e2694362efe4a5a15567a2ce",
+    "normal-domain-export-khronos.json": "8990a110f2b8f0a70fb9da49bbf1cae43bb2f02dbcd13e0448e91a377794a12f",
+    "normal-domain-export-arc/before.json": "5a219464d74943950fcc519d331d31fa13d3db505d21ee5a2279562cb3f084d1",
+    "normal-domain-export-arc/after.json": "5a219464d74943950fcc519d331d31fa13d3db505d21ee5a2279562cb3f084d1",
+    "normal-domain-export-arc/result.json": "a0beca7294a970607870f2bede71687a88fde30d9a316b16f3d775f75906db53",
+    "normal-domain-export-arc/graphics.log": "8d20678e84cd9485880b8ab25ff6e1a8ee8708a6e8d23d2948f48476bcb7b0d0",
+    "normal-domain-export-final-manifest.json": "a7ee83714066661341d6cd650b3ef6ea0630852ae46053e93deac95d8dd080c8"
+  }
+}

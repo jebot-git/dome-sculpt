@@ -3,6 +3,8 @@
 #include "dome/uv.hpp"
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
+  static const std::array<const char *,12> preview={"Authored","Core PBR","Toon preview","","","","","","Back","","",""};
+  if(page==26)return preview;
   static const std::array<const char *, 12> root = {
       "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",       "Redo",
       "Save", "Export glTF", "Objects", "Materials", "Brush size", "Selection"};
@@ -151,6 +153,12 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
+  if(page==26){
+    if(index==0)return SpatialCommand::PreviewAuthored;
+    if(index==1)return SpatialCommand::PreviewPbr;
+    if(index==2)return SpatialCommand::PreviewToon;
+    return {};
+  }
   if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
       spatial_parameter(page, index))
     return {};

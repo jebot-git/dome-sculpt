@@ -90,8 +90,8 @@ struct Visibility {
     }
     if(r.material_bindings) {
       r.material_bindings->validate();
-      if(r.material_bindings->has_mtoon)toon=r.material_bindings->material;
-    } else toon = retained_mtoon(r.appearance.get());
+      if(r.material_bindings->has_mtoon&&!r.pbr_view)toon=r.material_bindings->material;
+    } else if(!r.pbr_view)toon = retained_mtoon(r.appearance.get());
     if (!toon) {
       color.validate(owned_uv1?2:1);
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}

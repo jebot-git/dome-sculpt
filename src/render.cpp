@@ -246,10 +246,10 @@ struct SurfaceRenderer::TextureState {
       std::optional<MToonMaterial> typed;
       if(range.material_bindings) {
         range.material_bindings->validate(geometry_changed);
-        if(range.material_bindings->has_mtoon)typed=range.material_bindings->material;
-      } else if(auto previous=toons.find(range.object);previous!=toons.end() &&
+        if(range.material_bindings->has_mtoon&&!range.pbr_view)typed=range.material_bindings->material;
+      } else if(auto previous=toons.find(range.object);!range.pbr_view&&previous!=toons.end() &&
                 previous->second.appearance==range.appearance && !previous->second.source)typed=previous->second.material;
-      else typed=retained_mtoon(range.appearance.get());
+      else if(!range.pbr_view)typed=retained_mtoon(range.appearance.get());
       if(range.source_normal_only && ((typed && typed->parameters.normal_enabled && typed->parameters.normal_scale!=0 && typed->textures[size_t(MToonSlot::Normal)].index>=0) ||
           (!typed && maps && maps->source_maps && maps->source_maps->normal.image && maps->source_maps->normal_scale!=0)))
         throw std::invalid_argument("Normal-mapped source material requires retained tangent authority");
@@ -656,7 +656,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   };
   bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,
-                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool paint_domain=false) {
+                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false) {
     Material material = original;
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
@@ -688,7 +688,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     for(int n=0;n<16;++n){auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);}
     glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps&&!maps->normal_projection?maps->source_maps->normal_scale:1);
     glUniform1f(glGetUniformLocation(program_,"ao_strength"),maps&&maps->source_maps?maps->source_maps->occlusion_strength:1);
-    glUniform1i(glGetUniformLocation(program_, "toon"), toon || material.toon);
+    glUniform1i(glGetUniformLocation(program_, "toon"), !force_pbr&&(toon || material.toon));
     glUniform1i(glGetUniformLocation(program_, "unlit"), material.unlit);
     glUniform1i(glGetUniformLocation(program_, "alpha_mode"), int(material.alpha));
     glUniform1f(glGetUniformLocation(program_, "alpha_cutoff"), material.alpha_cutoff);
@@ -785,7 +785,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
 
   if (cached_->ranges.empty()) {
     glUniform1i(glGetUniformLocation(program_,"weight_pass"),!cached_->selected_weights.empty());
-    draw_range(Material{}, 0, count_, 0, nullptr);
+    draw_range(Material{}, 0, count_, 0, nullptr,false,false,cached_->pbr_view);
   }
   else {
     std::vector<const SurfaceRange*> ordered;for(auto &r:cached_->ranges)ordered.push_back(&r);
@@ -827,7 +827,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       bool weighted=!ghost_pass && textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(r->object);
-      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,bool(r->paint_sampling_attachment));
+      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view,bool(r->paint_sampling_attachment));
       else{
         draw_toon(*r,typed->second,false);
         if(!ghost_pass&&!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)
