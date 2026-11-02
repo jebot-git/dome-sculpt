@@ -14,6 +14,28 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Private native existing-rig checkpoint — Scene25, 2026-11-02
+
+The child of c18a010 in artifacts/rig-rest-scene25-c18a010 adds actual shared
+FLTK/XR original-bone head/parent/length controls, native/grouped rest/reparent
+and per-part current-pose/bind transport, immutable first rig_source Restore,
+conditional Deformation2 exact pose-local matrices and polygon source archive6.
+All nineteen real neutral CC0 VRoid creator parts retain paint/material/morph/
+source and their own skin products. Source generation/revision/edit authority,
+locked/isolated linked targets, Cancel/retry, oneUndo and orderedSave are covered.
+Read RIG-REST-AUTHORING.md and validation/RIG-REST-SCENE25.json. Final Release7,
+whole-own asserted SAN9, normal/compact/SAN GUI8each, d271Wayland9, loaderXR11,
+strict actualA770guide9 and pinned Khronos0errors are recorded independently.
+
+This is private, not a full source-rig or VRM completion claim. Imported source
+node/multi-skin/rigid REST transport and metadata refitting remain guarded; do
+not pick a first skin's pose or discard authored IBMs. Cross-placement exact
+binding and direct bone rotation/role controls also remain required. Preserve
+all source/paint/normal/PBR before-state edges during future Scene21/23/24
+semantic union: standalone25 explicitly accepts existing2–20 plus25 only.
+Fresh all-header consumers are mandatory for JointTransform/scene/view layouts.
+No physical headset, installation or external push occurred in this component.
+
 ## Private native humanoid fitting workflow — 2026-11-02
 
 A new isolated component on49projection+portableadcb implements real native

@@ -470,7 +470,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     q = (inverse * q * basis).unit();
     t.orientation = {q.x, q.y, q.z, q.w};
   };
+  auto convert_exact=[&](const RigMatrix &m){return (AffineTransform(inverse.matrix())*AffineTransform(m)*AffineTransform(basis.matrix())).float_matrix();};
   auto convert_joint = [&](JointTransform &t) {
+    if(t.full_local_matrix)t.full_local_matrix=convert_exact(*t.full_local_matrix);
     t.translation = inverse.rotate(t.translation);
     t.rotation = (inverse * t.rotation * basis).unit();
     // Nonuniform scale can be conjugated without shear only for signed-axis
@@ -521,9 +523,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       fail("source part lacks deformation");
     }
     auto d = std::make_shared<DeformationState>(*o.deformation);
-    if (d->skeleton)
-      for (auto &bone : d->skeleton->bones)
-        convert_joint(bone.rest);
+    if (d->skeleton){
+      for (auto &bone : d->skeleton->bones){convert_joint(bone.rest);if(bone.rest_matrix)bone.rest_matrix=convert_exact(*bone.rest_matrix);}
+      if(d->skeleton->space_matrix)d->skeleton->space_matrix=convert_exact(*d->skeleton->space_matrix);
+      if(d->skeleton->inverse_bind_override)for(auto &m:*d->skeleton->inverse_bind_override)m=convert_exact(m);
+    }
     for (auto &pose : d->pose)
       convert_joint(pose);
     d->source = morph_topology_id(o.mesh);

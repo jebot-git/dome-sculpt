@@ -126,6 +126,7 @@ capture_origin(const SculptObject &source, CanvasTransform world,
         std::make_shared<const CreatorAppearance>(*source.appearance);
   origin->material_bindings = source.material_bindings;
   origin->shape_source = source.shape_source;
+  origin->rig_source = source.rig_source;
   origin->retopology = source.retopology;
   origin->polygon = source.polygon;
   origin->mesh_active = source.mesh_active;
@@ -528,6 +529,7 @@ void restore_polygon_origin(Scene &scene, uint64_t id,
   target.appearance = origin.appearance;
   target.material_bindings = origin.material_bindings;
   target.shape_source = origin.shape_source;
+  target.rig_source = origin.rig_source;
   target.retopology = origin.retopology;
   target.polygon = origin.polygon;
   // Keep current object identity, placement/group and user name. Original

@@ -1,5 +1,7 @@
 # Native humanoid rig fitting
 
+A later private [Scene25 existing-rig component](RIG-REST-AUTHORING.md) now adds actual native/grouped existing-bone head, parent and length authoring, first-source Restore and exact pose/bind persistence. This document retains the initial unskinned milestone scope; full imported original-node/VRM rest transport remains required.
+
 This private component connects explicit humanoid landmarks to actual native
 FLTK/OpenXR authoring. It extends the existing application and retains the full
 production goal. This checkpoint fits an **unskinned painting mesh**; fitting,

@@ -37,6 +37,7 @@ struct PolygonOrigin {
   // provenance. IDs in the capsule are snapshots, not live hierarchy links.
   std::shared_ptr<const SourcePlacementCapsule> placement{};
   std::shared_ptr<const PolygonOrigin> shape_source{};
+  std::shared_ptr<const PolygonOrigin> rig_source{};
 };
 // Compare the active painted REST derivative only. Posed preview positions and
 // unrelated source attributes must not replace the editable topology authority.

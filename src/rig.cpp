@@ -2,6 +2,7 @@
 // Locked-weight normalization semantics adapt Blender BKE_defvert_normalize_ex;
 // see docs/RIGGING.md for pinned source, copyright, license and deviations.
 #include "dome/rig.hpp"
+#include "dome/affine.hpp"
 #include <bit>
 #include <limits>
 #include <map>
@@ -276,6 +277,7 @@ void Skeleton::validate() const {
   std::set<std::string> names;
   for (size_t i = 0; i < bones.size(); i++) {
     auto &b = bones[i];
+    if(b.rest.full_local_matrix)throw std::invalid_argument("Exact pose-local matrix is forbidden in Bone.rest");
     name_valid(b.name);
     if (!names.insert(b.name).second || b.parent < -1 ||
         b.parent >= int(bones.size()) || b.parent == int(i) ||
@@ -293,6 +295,12 @@ std::vector<RigMatrix> Skeleton::local_matrices(std::span<const JointTransform> 
   validate();if(!local.empty()&&local.size()!=bones.size())throw std::invalid_argument("Pose joint count mismatch");
   std::vector<RigMatrix> out;out.reserve(bones.size());for(size_t i=0;i<bones.size();++i){
     auto m = matrix(local.empty() ? bones[i].rest : local[i]);
+    if(!local.empty()&&local[i].full_local_matrix){
+      const auto &exact=*local[i].full_local_matrix;
+      for(float v:exact)if(!std::isfinite(v)||std::abs(v)>1e12f)throw std::invalid_argument("Exact pose-local matrix is nonfinite or excessive");
+      if(exact[3]!=0||exact[7]!=0||exact[11]!=0||exact[15]!=1)throw std::invalid_argument("Exact pose-local matrix must be affine");
+      (void)AffineTransform(exact).inverse();out.push_back(exact);continue;
+    }
     if(bones[i].rest_matrix){const auto &rest=bones[i].rest;
       auto same=[&](const JointTransform&t){return t.translation.x==rest.translation.x&&t.translation.y==rest.translation.y&&t.translation.z==rest.translation.z&&t.rotation.w==rest.rotation.w&&t.rotation.x==rest.rotation.x&&t.rotation.y==rest.rotation.y&&t.rotation.z==rest.rotation.z&&t.scale.x==rest.scale.x&&t.scale.y==rest.scale.y&&t.scale.z==rest.scale.z;};
       m=local.empty()||same(local[i])?*bones[i].rest_matrix:multiply(m,multiply(inverse(matrix(rest)),*bones[i].rest_matrix));
@@ -374,6 +382,7 @@ Skeleton Skeleton::decode(const nlohmann::json &j) {
   if(j.at("version")==1&&j.contains("inverse_bind_override"))throw std::runtime_error("Explicit inverse binds require skeleton version two");
   Skeleton s;
   for (auto &v : j.at("bones")) {
+    if(v.contains("full_local_matrix"))throw std::runtime_error("Pose-local matrix cannot be decoded as Bone.rest");
     Bone b;
     b.name = v.at("name");
     auto &parent = v.at("parent");
@@ -399,6 +408,13 @@ Skeleton Skeleton::decode(const nlohmann::json &j) {
   if(j.at("version")==2&&j.contains("space_matrix")&&!j.at("space_matrix").is_null()){const auto&m=j.at("space_matrix");if(!m.is_array()||m.size()!=16)throw std::runtime_error("Invalid imported root-space dimensions");for(const auto&f:m)if(!f.is_number())throw std::runtime_error("Invalid imported root-space component");s.space_matrix=m.get<RigMatrix>();}
   s.validate();
   return s;
+}
+JointTransform adjust_joint_pose(JointTransform pose,Quat rotation,Vec3 translation){
+ (void)matrix(pose);JointTransform delta;delta.rotation=rotation;auto r=matrix(delta);delta.rotation={};delta.translation=translation;auto t=matrix(delta);
+ if(pose.full_local_matrix){
+  pose.full_local_matrix=(AffineTransform(t)*AffineTransform(*pose.full_local_matrix)*AffineTransform(r)).float_matrix();
+ }else{pose.rotation=(pose.rotation*rotation).unit();pose.translation+=translation;(void)matrix(pose);}
+ return pose;
 }
 VertexWeights normalize_weights(VertexWeights input, size_t bones,
                                 std::span<const uint8_t> locks,

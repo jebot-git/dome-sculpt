@@ -20,10 +20,11 @@ void Document::fit_humanoid_rig(HumanLandmarks landmarks,RigFitOptions options,A
 namespace {
 Vec3 local_point(const AffineTransform &m,Vec3 p){auto q=m.inverse().point({p.x,p.y,p.z});return {float(q[0]),float(q[1]),float(q[2])};}
 void validate_view(const RigFitView &view){
- if(view.parameter>=rig_fit_parameter_count||view.role>=human_roles().size()||!std::isfinite(view.step)||view.step<.00001f||view.step>10)throw std::invalid_argument("Invalid selected landmark or world step");
+ if(view.parameter>=rig_fit_options_count(view)||view.role>=rig_fit_selection_count(view)||!std::isfinite(view.step)||view.step<.00001f||view.step>10)throw std::invalid_argument("Invalid selected landmark or world step");
  HumanLandmarks::decode(view.landmarks.encode());
  for(auto axis:{view.landmarks.left,view.landmarks.up,view.landmarks.front})if(std::abs(length(axis)-1)>1e-4f)throw std::invalid_argument("Body frame axes must be unit directions");
  if(length(cross(view.landmarks.left,view.landmarks.up)-view.landmarks.front)>1e-4f)throw std::invalid_argument("Body frame must be right-handed and orthonormal");
+ if(view.rest_source){auto proposed=*view.rest_source->skeleton;rig_fit_rest_edits(view);for(size_t j=0;j<proposed.bones.size();++j){if(!finite(view.bone_heads[j])||!std::isfinite(view.bone_lengths[j])||view.bone_lengths[j]<=0||view.bone_lengths[j]>10000)throw std::invalid_argument("Invalid bone head or world length");proposed.bones[j].parent=view.bone_parents[j];}proposed.validate();}
  view.options.validate();
 }
 }
@@ -37,6 +38,7 @@ void Document::begin_rig_fit_locked(){
  if(stopping_.load()||state_.asset_busy||state_.recovery_busy||state_.object_grabbing||state_.polygon||state_.cut||state_.retopology||uv_||native_stroke_||desktop_||action_active_locked()||control_before_||!object_editable_locked(o.id)||!o.mesh_active||!o.painted)
   throw std::logic_error("Select an idle editable painting mesh before placing humanoid landmarks");
  auto next=std::make_shared<RigFitView>();next->generation=state_.generation;next->revision=state_.revision;next->object=o.id;next->edit_authority=state_.edit_authority;next->world=scene_.world_matrix(o.id);
+ if(o.deformation&&o.deformation->skeleton){next->rest_source=o.deformation;next->linked_objects=rig_rest_linked_objects(scene_,o.id);const auto heads=o.deformation->skeleton->segments();for(size_t j=0;j<heads.size();++j){next->bone_heads.push_back(heads[j][0]);next->bone_parents.push_back(o.deformation->skeleton->bones[j].parent);auto a=next->world.point({heads[j][0].x,heads[j][0].y,heads[j][0].z}),b=next->world.point({heads[j][1].x,heads[j][1].y,heads[j][1].z});next->bone_lengths.push_back(length(Vec3{float(a[0]),float(a[1]),float(a[2])}-Vec3{float(b[0]),float(b[1]),float(b[2])}));}}
  if(o.deformation&&o.deformation->landmarks)next->landmarks=*o.deformation->landmarks;
  else if(o.deformation&&o.deformation->skeleton&&o.deformation->humanoid){auto segments=o.deformation->skeleton->segments();for(auto &[role,joint]:o.deformation->humanoid->joints)next->landmarks.points.emplace(role,segments.at(joint)[0]);}
  Transaction transaction(*this);state_.rig_fit=std::move(next);state_.weights.enabled=false;state_.shape_sculpt=false;state_.message="Place and review every required humanoid landmark";publish_locked(false,false);transaction.commit(false);
@@ -45,6 +47,8 @@ void Document::configure_rig_fit(RigFitView view){
  validate_view(view);std::lock_guard lock(model_mutex_);
  if(!rig_fit_source_matches_locked()||state_.asset_busy||native_stroke_||desktop_||state_.object_grabbing||state_.rig_fit->placing)throw std::logic_error("The fitting source changed or is busy; reopen humanoid fitting");
  const auto &old=*state_.rig_fit;
+ if(view.linked_objects!=old.linked_objects)throw std::logic_error("Captured linked target identities cannot be replaced");
+ if(view.rest_source!=old.rest_source)throw std::logic_error("Fitting source skeleton authority cannot be replaced");
  if(view.generation!=old.generation||view.revision!=old.revision||view.object!=old.object||view.edit_authority!=old.edit_authority)throw std::logic_error("This landmark editor belongs to a previous source; reopen fitting");
  view.generation=old.generation;view.revision=old.revision;view.object=old.object;view.edit_authority=old.edit_authority;view.world=old.world;view.placing=view.armed=view.pressed=false;view.before_placement.reset();
  auto next=std::make_shared<const RigFitView>(std::move(view));Transaction transaction(*this);state_.rig_fit=std::move(next);publish_locked(false,false);transaction.commit(false);
@@ -53,8 +57,13 @@ void Document::accept_rig_fit(){std::lock_guard lock(model_mutex_);accept_rig_fi
 void Document::accept_rig_fit_locked(){
  if(!rig_fit_source_matches_locked()||state_.rig_fit->placing)throw std::logic_error("Finish landmark placement on the current fitting source");
  const auto view=state_.rig_fit;
- if(scene_.active().deformation&&scene_.active().deformation->skeleton)throw std::logic_error("Existing rigs need source-preserving rest fitting; replacement is not accepted");
  const auto report=std::make_shared<std::string>();const AssetSource expected{view->generation,view->revision,view->object,view->edit_authority};
+ if(view->rest_source){
+  const auto edits=rig_fit_rest_edits(*view);const auto linked=view->linked_rest;
+  if(linked)for(auto id:view->linked_objects){if(scene_.object(id).locked||(state_.isolate_held&&state_.held_object&&state_.held_object!=id)||(state_.selection_focus&&std::find(state_.selected_objects.begin(),state_.selected_objects.end(),id)==state_.selected_objects.end()))throw std::logic_error("A linked rig part is read-only; release isolation or select all affected parts");}
+
+  queue_scene_operation_locked(view->restore_source?"Restore original rig":"Fit existing rig",[view,edits,linked,report](Scene &scene,const auto &cancelled){RigRestOptions options;options.linked=linked;options.linked_objects=view->linked_objects;if(view->restore_source)restore_rig_source(scene,view->object,options,cancelled);else author_rig_rest(scene,view->object,edits,options,cancelled);*report=view->restore_source?"Original rig restored":"Existing rig fitted; skin pose and first source retained";},expected,report);return;
+ }
  queue_scene_operation_locked("Fit humanoid rig",[view,report](Scene &scene,const auto &cancelled){auto result=author_humanoid_fit(scene,view->object,view->landmarks,view->options,cancelled);*report="Humanoid rig fitted: "+std::to_string(result.bones)+" bones";},expected,report);
 }
 void Document::cancel_rig_fit(AssetSource expected){std::lock_guard lock(model_mutex_);if(!state_.rig_fit)return;
@@ -65,7 +74,8 @@ bool Document::rig_fit_command_enabled_locked(SpatialCommand c) const {
  if(!rig_fit_source_matches_locked()||state_.asset_busy||state_.object_grabbing)return false;
  if(state_.rig_fit->placing)return c==SpatialCommand::RigFitPlace;
  if(state_.rig_fit->settings&&c>=SpatialCommand::RigFitYDown&&c<=SpatialCommand::RigFitZUp)return false;
- if(c==SpatialCommand::RigFitApply)return !scene_.active().deformation||!scene_.active().deformation->skeleton;
+ if(c==SpatialCommand::RigFitRemove&&state_.rig_fit->rest_source)return false;
+ if(c==SpatialCommand::RigFitApply)return true;
  return true;
 }
 void Document::rig_fit_action(SpatialCommand c){if(!rig_fit_command(c))throw std::invalid_argument("Expected humanoid fitting command");std::lock_guard lock(model_mutex_);rig_fit_command_locked(c);}
@@ -75,17 +85,17 @@ void Document::rig_fit_command_locked(SpatialCommand c){
  if(c==SpatialCommand::RigFitApply){accept_rig_fit_locked();return;}
  Transaction transaction(*this);
  if(c==SpatialCommand::RigFitCancel){state_.rig_fit.reset();contact_rearmed_={};input_.cancel();}
- else {auto next=std::make_shared<RigFitView>(*state_.rig_fit);const auto &name=human_roles().at(next->role).name;
-  if(c==SpatialCommand::RigFitPrevious||c==SpatialCommand::RigFitNext){if(next->settings)next->parameter=(next->parameter+rig_fit_parameter_count+(c==SpatialCommand::RigFitNext?1:-1))%rig_fit_parameter_count;else next->role=(next->role+human_roles().size()+(c==SpatialCommand::RigFitNext?1:-1))%human_roles().size();}
+ else {auto next=std::make_shared<RigFitView>(*state_.rig_fit);const auto name=rig_fit_selection_label(*next);
+  if(c==SpatialCommand::RigFitPrevious||c==SpatialCommand::RigFitNext){if(next->settings)next->parameter=(next->parameter+rig_fit_options_count(*next)+(c==SpatialCommand::RigFitNext?1:-1))%rig_fit_options_count(*next);else next->role=(next->role+rig_fit_selection_count(*next)+(c==SpatialCommand::RigFitNext?1:-1))%rig_fit_selection_count(*next);}
   else if(c==SpatialCommand::RigFitOptions)next->settings=!next->settings;
   else if(next->settings&&(c==SpatialCommand::RigFitXDown||c==SpatialCommand::RigFitXUp))adjust_rig_fit_parameter(*next,c==SpatialCommand::RigFitXUp?1:-1);
   else if(c==SpatialCommand::RigFitRemove){if(human_roles()[next->role].required)state_.message="Required landmark removed; place it again before applying";next->landmarks.points.erase(name);}
   else if(c==SpatialCommand::RigFitPlace){
    if(next->settings)next->settings=false;
    else if(next->placing){next->placing=false;next->before_placement.reset();}
-   else {auto at=next->landmarks.points.find(name);next->before_placement=at==next->landmarks.points.end()?std::optional<Vec3>{}:std::optional<Vec3>{at->second};next->placing=true;next->armed=next->pressed=false;next->owner=input_.command_device()?input_.command_device():1;input_.cancel();contact_rearmed_={};}
-  }else {auto at=next->landmarks.points.find(name);if(at==next->landmarks.points.end())throw std::logic_error("Place this landmark first");Vec3 delta{};const int axis=(int(c)-int(SpatialCommand::RigFitXDown))/2;const float sign=(int(c)-int(SpatialCommand::RigFitXDown))%2?1:-1;if(axis<0||axis>2)throw std::logic_error("Unknown landmark adjustment");if(axis==0)delta.x=sign*next->step;else if(axis==1)delta.y=sign*next->step;else delta.z=sign*next->step;
-   auto v=next->world.inverse().direction({delta.x,delta.y,delta.z});at->second+=Vec3{float(v[0]),float(v[1]),float(v[2])};}
+   else {next->before_placement=rig_fit_selection_point(*next);next->placing=true;next->armed=next->pressed=false;next->owner=input_.command_device()?input_.command_device():1;input_.cancel();contact_rearmed_={};}
+  }else {auto point=rig_fit_selection_point(*next);if(!point)throw std::logic_error("Place this landmark first");Vec3 delta{};const int axis=(int(c)-int(SpatialCommand::RigFitXDown))/2;const float sign=(int(c)-int(SpatialCommand::RigFitXDown))%2?1:-1;if(axis<0||axis>2)throw std::logic_error("Unknown landmark adjustment");if(axis==0)delta.x=sign*next->step;else if(axis==1)delta.y=sign*next->step;else delta.z=sign*next->step;
+   auto v=next->world.inverse().direction({delta.x,delta.y,delta.z});rig_fit_selection_point(*next,*point+Vec3{float(v[0]),float(v[1]),float(v[2])});}
   validate_view(*next);state_.rig_fit=std::move(next);
  }
  publish_locked(false,false);transaction.commit(false);
@@ -95,9 +105,9 @@ bool Document::process_rig_fit_spatial_locked(const SpatialFrame &f){
  auto next=std::make_shared<RigFitView>(*state_.rig_fit);const size_t hand=next->owner?next->owner-1:0;const auto &h=f.hands.at(hand);
  const bool valid=rig_fit_source_matches_locked()&&f.focused&&f.head_valid&&ob::finite(f.head)&&std::isfinite(f.time)&&f.time>=0&&h.tracked.valid&&ob::finite(h.tracked.grip)&&std::isfinite(h.tracked.trigger);
  bool finish=false,cancel=!valid||h.joystick;
- const auto &name=human_roles().at(next->role).name;
- if(valid&&!cancel){if(h.tracked.trigger<=.02f){if(next->pressed)finish=true;else next->armed=true;}else if(next->armed){next->pressed=true;auto p=ob::transform(ob::inverse(state_.canvas),h.tracked.grip.position);next->landmarks.points[name]=local_point(next->world,{p.x,p.y,p.z});}}
- if(cancel||finish){if(cancel){if(next->before_placement)next->landmarks.points[name]=*next->before_placement;else next->landmarks.points.erase(name);}next->placing=false;next->before_placement.reset();contact_rearmed_={};state_.selection_release={true,true};if(valid){input_.retain_page(rig_fit_page,uint32_t(hand+1),2);state_.panel={h.tracked.grip.position,f.head.orientation,1};state_.panel.position=state_.panel.position+ob::rotate(f.head.orientation,{0,.08f,-.18f});}else input_.cancel();}
+ const auto name=rig_fit_selection_label(*next);
+ if(valid&&!cancel){if(h.tracked.trigger<=.02f){if(next->pressed)finish=true;else next->armed=true;}else if(next->armed){next->pressed=true;auto p=ob::transform(ob::inverse(state_.canvas),h.tracked.grip.position);rig_fit_selection_point(*next,local_point(next->world,{p.x,p.y,p.z}));}}
+ if(cancel||finish){if(cancel){rig_fit_selection_point(*next,next->before_placement);}next->placing=false;next->before_placement.reset();contact_rearmed_={};state_.selection_release={true,true};if(valid){input_.retain_page(rig_fit_page,uint32_t(hand+1),2);state_.panel={h.tracked.grip.position,f.head.orientation,1};state_.panel.position=state_.panel.position+ob::rotate(f.head.orientation,{0,.08f,-.18f});}else input_.cancel();}
  Transaction transaction(*this);state_.rig_fit=std::move(next);state_.hands=valid?f.hands:std::array<SpatialHand,2>{};publish_locked(false,false);transaction.commit(false);return true;
 }
 } // namespace dome

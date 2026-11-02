@@ -203,6 +203,7 @@ void Document::process_uv_transfer(FileJob &job) {
     auto remapped = *source.deformation;
     remapped.source = morph_topology_id(target);
     size_t entries = remapped.pose.size() + remapped.morph_weights.size();
+    for(const auto &joint:remapped.pose)if(joint.full_local_matrix)entries+=16;
     if (remapped.skin) {
       SkinWeights skin;
       skin.vertices.reserve(map->size());

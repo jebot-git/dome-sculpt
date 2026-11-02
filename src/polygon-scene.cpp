@@ -261,6 +261,7 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
 
     if(o->polygon){authority(o->polygon,depth+1);if(validate_deep)validate_polygon_derivative(*o->polygon,o->paint.get(),o->mesh_active);}
     if(o->shape_source)origin(o->shape_source,depth+1);
+    if(o->rig_source)origin(o->rig_source,depth+1);
     if(deep)deeply_validated_origins_.insert(o.get());
     active_o.erase(o.get());done_o.insert(o.get());
   };
@@ -282,13 +283,15 @@ nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAsse
   PolygonColorArchive colors=shared_colors?*shared_colors:colors_;
   for(const auto &field:colors_.fields())colors.add(field);
   const bool affine=std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->placement);});
-  const bool shapes=shared_colors || direct_origins_ || std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->shape_source);});
+  const bool rigs=direct_rig_origins_ || std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->rig_source);});
+  const bool shapes=rigs || shared_colors || direct_origins_ || std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->shape_source);});
   if(affine&&!placements)throw std::logic_error("Polygon source placement requires its shared archive");
-  nlohmann::json j = {{"version", shared_colors?5:shapes?4:!colors_.empty()?3:affine?2:1},
+  nlohmann::json j = {{"version", rigs?6:shared_colors?5:shapes?4:!colors_.empty()?3:affine?2:1},
                       {"authorities", nlohmann::json::array()},
                       {"origins", nlohmann::json::array()},
                       {"volumes", nlohmann::json::array()},
                       {"paints", nlohmann::json::array()}};
+  if(rigs)j["shared_colors"]=bool(shared_colors);
   for (const auto &a : authorities_)
     j["authorities"].push_back(
         {{"topology", a->topology.encode()},
@@ -339,6 +342,7 @@ nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAsse
          {"name", o->name},
          {"source_object", o->source_object}});
     if(shapes)j["origins"].back()["shape_source"]=o->shape_source?nlohmann::json(find(origins_,o->shape_source.get())):nlohmann::json(nullptr);
+    if(rigs)j["origins"].back()["rig_source"]=o->rig_source?nlohmann::json(find(origins_,o->rig_source.get())):nlohmann::json(nullptr);
     if(o->placement) {
       auto &record=j["origins"].back();record.erase("translation");record.erase("rotation");record.erase("scale");
       record["placement"]=placements->add_capsule(o->placement);
@@ -357,12 +361,14 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
 }
 void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials) {
   if (!j.is_object() || !j.at("version").is_number_integer() ||
-      (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5))
+      (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6))
     throw std::invalid_argument("Unsupported polygon source archive");
-  const bool shared=j.at("version")==5;
+  const bool rigs=j.at("version")==6;
+  if(rigs&&(!j.contains("shared_colors")||!j.at("shared_colors").is_boolean()))throw std::invalid_argument("Rig source archive requires explicit color context");
+  const bool shared=j.at("version")==5 || (rigs&&j.at("shared_colors").get<bool>());
   if(shared&&(!materials||materials->at("version")!=6))throw std::invalid_argument("Shared corner color projection requires material archive6");
-  const bool colored = j.at("version") == 3 || shared || (j.at("version")==4 && (j.contains("color_bases")||j.contains("color_fields")));
-  if (j.size() != (colored ? 7u : 5u))
+  const bool colored = j.at("version") == 3 || shared || ((j.at("version")==4||rigs) && (j.contains("color_bases")||j.contains("color_fields")));
+  if (j.size() != (colored ? 7u : 5u)+(rigs?1u:0u))
     throw std::invalid_argument("Incomplete polygon color source archive");
   for (const auto *key : {"authorities", "origins", "volumes", "paints"})
     if (!j.at(key).is_array() || j.at(key).size() > maximum_nodes)
@@ -430,7 +436,9 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     const bool affine=o.contains("placement"),shapes=j.at("version")>=4;
     if(shapes){if(!o.contains("shape_source"))throw std::invalid_argument("Incomplete object source history");if(!o.at("shape_source").is_null())polygon_archive_index(o.at("shape_source"),oo.size());}
     else if(o.contains("shape_source"))throw std::invalid_argument("Shape source requires archive version four");
-    if (!o.is_object() || o.size() != (affine?12u:14u)+(shapes?1u:0u) || !o.at("mesh_active").is_boolean() ||
+    if(rigs){if(!o.contains("rig_source"))throw std::invalid_argument("Incomplete rig source history");if(!o.at("rig_source").is_null())polygon_archive_index(o.at("rig_source"),oo.size());}
+    else if(o.contains("rig_source"))throw std::invalid_argument("Rig source requires archive version six");
+    if (!o.is_object() || o.size() != (affine?12u:14u)+(shapes?1u:0u)+(rigs?1u:0u) || !o.at("mesh_active").is_boolean() ||
         !o.at("name").is_string())
       throw std::invalid_argument("Invalid polygon origin record");
     if(affine) {
@@ -480,6 +488,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     size_t child=0;
     if(!o.at("polygon").is_null())child=authority(polygon_archive_index(o.at("polygon"),aa.size()),depth+1);
     if(o.contains("shape_source")&&!o.at("shape_source").is_null())child=std::max(child,origin(polygon_archive_index(o.at("shape_source"),oo.size()),depth+1));
+    if(o.contains("rig_source")&&!o.at("rig_source").is_null())child=std::max(child,origin(polygon_archive_index(o.at("rig_source"),oo.size()),depth+1));
     status_o[i]=2;return height_o[i]=child+1;
   };
   for(const auto &o:objects){
@@ -488,6 +497,10 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     if(o.contains("shape_source")&&!o.at("shape_source").is_null()){
       if(j.at("version")<4)throw std::invalid_argument("Direct shape source requires archive version four");
       origin(polygon_archive_index(o.at("shape_source"),oo.size()),1);
+    }
+    if(o.contains("rig_source")&&!o.at("rig_source").is_null()){
+      if(!rigs)throw std::invalid_argument("Direct rig source requires archive version six");
+      origin(polygon_archive_index(o.at("rig_source"),oo.size()),1);
     }
   }
   auto all = [](const auto &v) {
@@ -503,8 +516,8 @@ PolygonSceneArchive PolygonSceneArchive::decode(
   return decode(j,images,models,materials,placements,nullptr);
 }
 PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const PaintImageArchive &images,const CreatorAssetArchive &models,const SourceMaterialArchive &materials,const SourcePlacementArchive *placements,const PolygonColorArchive *shared_colors) {
-  PolygonSceneArchive out;out.direct_origins_=j.at("version")>=4;
-  if(j.at("version")==5&&!shared_colors)throw std::invalid_argument("Shared current corner archive requires Scene20");
+  PolygonSceneArchive out;out.direct_origins_=j.at("version")>=4;out.direct_rig_origins_=j.at("version")==6;
+  if((j.at("version")==5||(j.at("version")==6&&j.at("shared_colors").get<bool>()))&&!shared_colors)throw std::invalid_argument("Shared current corner archive requires Scene20");
   const bool colored=j.at("version")==3 || j.contains("color_fields");
   if(shared_colors)out.colors_=*shared_colors;
   else if(colored)out.colors_=PolygonColorArchive::decode(j.at("color_bases"),j.at("color_fields"));
@@ -565,6 +578,7 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
   }
   for(size_t i=0;i<origins.size();++i){const auto &record=j.at("origins")[i];
     if(record.contains("shape_source")&&!record.at("shape_source").is_null())origins[i]->shape_source=out.origins_[polygon_archive_index(record.at("shape_source"),out.origins_.size())];
+    if(record.contains("rig_source")&&!record.at("rig_source").is_null())origins[i]->rig_source=out.origins_[polygon_archive_index(record.at("rig_source"),out.origins_.size())];
   }
   for (size_t i = 0; i < authorities.size(); ++i)
     if (!j.at("authorities")[i].at("origin").is_null())

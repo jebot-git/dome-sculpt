@@ -20,6 +20,7 @@ DeformationState::DeformationState(const Mesh &mesh)
     : source(morph_topology_id(mesh)) {}
 size_t DeformationState::resource_entries() const {
   size_t count = pose.size() + morph_weights.size();
+  for(const auto &t:pose)if(t.full_local_matrix)count+=16;
   if (morphs) {
     if (morphs->targets.size() > 128)
       fail("Deformation morph target limit exceeded");
@@ -88,15 +89,18 @@ Mesh DeformationState::preview(const Mesh &rest) const {
 }
 nlohmann::json DeformationState::encode(const Mesh &rest) const {
   validate(rest);
-  auto json = nlohmann::json{{"version", 1},
+  const bool exact_pose=std::any_of(pose.begin(),pose.end(),[](const auto &t){return bool(t.full_local_matrix);});
+  auto json = nlohmann::json{{"version", exact_pose?2:1},
                              {"source", source},
                              {"pose", nlohmann::json::array()},
                              {"morph_weights", morph_weights}};
-  for (const auto &t : pose)
+  for (const auto &t : pose){
     json["pose"].push_back(
         {{"translation", {t.translation.x, t.translation.y, t.translation.z}},
          {"rotation", {t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z}},
          {"scale", {t.scale.x, t.scale.y, t.scale.z}}});
+    if(t.full_local_matrix)json["pose"].back()["full_local_matrix"]=*t.full_local_matrix;
+  }
   json["skeleton"] = skeleton ? skeleton->encode() : nlohmann::json(nullptr);
   json["skin"] = skin ? skin->encode() : nlohmann::json(nullptr);
   json["morphs"] = morphs ? morphs->encode() : nlohmann::json(nullptr);
@@ -108,7 +112,7 @@ nlohmann::json DeformationState::encode(const Mesh &rest) const {
 }
 DeformationState DeformationState::decode(const nlohmann::json &j,
                                           const Mesh &rest) {
-  if (!j.is_object() || j.at("version") != 1 ||
+  if (!j.is_object() || !j.at("version").is_number_integer() || (j.at("version") != 1 && j.at("version") != 2) ||
       (!j.at("source").is_number_unsigned() &&
        (!j.at("source").is_number_integer() ||
         j.at("source").get<int64_t>() < 0)))
@@ -123,6 +127,14 @@ DeformationState DeformationState::decode(const nlohmann::json &j,
     fail("Deformation preview resource limits exceeded");
   // Aggregate dimensions before allocating authoring arrays.
   size_t entries = pose.size() + values.size();
+  bool has_exact_pose=false;
+  for(const auto &t:pose)if(t.contains("full_local_matrix")){
+    if(j.at("version")==1)fail("Exact pose-local matrix requires deformation version two");
+    const auto &matrix=t.at("full_local_matrix");if(!matrix.is_array()||matrix.size()!=16)fail("Invalid exact pose-local matrix dimensions");
+    for(const auto &v:matrix)if(!v.is_number())fail("Invalid exact pose-local matrix component");
+    entries+=16;has_exact_pose=true;
+  }
+  if(j.at("version")==2&&!has_exact_pose)fail("Deformation version two requires exact pose-local authority");
   const auto &skin = j.at("skin"), &morphs = j.at("morphs");
   if (!skin.is_null()) {
     const auto &vertices = skin.at("vertices");
@@ -179,6 +191,7 @@ DeformationState DeformationState::decode(const nlohmann::json &j,
     auto s = v.at("scale").get<std::array<float, 3>>();
     result.pose.push_back(
         {{p[0], p[1], p[2]}, {q[0], q[1], q[2], q[3]}, {s[0], s[1], s[2]}});
+    if(v.contains("full_local_matrix"))result.pose.back().full_local_matrix=v.at("full_local_matrix").get<RigMatrix>();
   }
   result.morph_weights = values.get<std::vector<float>>();
   result.validate(rest);

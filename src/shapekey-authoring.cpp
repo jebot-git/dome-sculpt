@@ -85,7 +85,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   const auto &origin=*source.shape_source;Scene next=scene;auto &o=next.object(object);
   o.volume=std::make_shared<Volume>(origin.volume->geometry_snapshot());o.painted=origin.paint?origin.paint->snapshot():nullptr;
   o.mesh_active=origin.mesh_active;o.material=origin.material;o.deformation=origin.deformation;o.appearance=origin.appearance;
-  o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;
+  o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;o.rig_source=origin.rig_source;
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
  const auto &rest=source.painted->mesh();rest.validate();
