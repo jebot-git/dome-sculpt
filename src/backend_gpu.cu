@@ -2,6 +2,7 @@
 #include "brush_kernel.hpp"
 #include "csg-kernel.hpp"
 #include "sparse-resample-backend.hpp"
+#include "gpu-brush-transfer.hpp"
 #include <stdexcept>
 #include <vector>
 #if defined(__HIPCC__)
@@ -33,10 +34,10 @@ template <class E> void checked(E result) {
   if (result != DS_SUCCESS)
     throw std::runtime_error(DS_ERROR_TEXT(result));
 }
-__global__ void sculpt(Sample *samples, size_t count, Brush b) {
+__global__ void sculpt(const Sample *samples,float *distances,size_t count,Brush b) {
   size_t i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i < count)
-    samples[i].distance = brush_sample(samples[i], b);
+    distances[i] = brush_sample(samples[i], b);
 }
 __global__ void compose_boxes(const Sample *samples,float *distances,size_t count,
                               const CsgBox *boxes,size_t box_count,float band) {
@@ -54,26 +55,22 @@ template<class T> struct Buffer {
   ~Buffer(){if(data)(void)DS_FREE(data);}
   Buffer(const Buffer &)=delete;
 };
-struct Device {
-  Sample *samples = nullptr;
-  ~Device() {
-    if (samples)
-      (void)DS_FREE(samples);
+struct BrushApi {
+  void allocate(void **pointer,size_t bytes){checked(DS_ALLOC(pointer,bytes));}
+  void release(void *pointer)noexcept{(void)DS_FREE(pointer);}
+  void upload(void *target,const void *source,size_t bytes){checked(DS_COPY(target,source,bytes,DS_TO_DEVICE));}
+  void readback(void *target,const void *source,size_t bytes){checked(DS_COPY(target,source,bytes,DS_TO_HOST));}
+  void launch(const Sample *input,float *output,size_t count,Brush brush){
+    sculpt<<<(count+255)/256,256>>>(input,output,count,brush);
+    checked(DS_LAST_ERROR());
   }
+  void wait(){checked(DS_SYNC());}
+  void drain()noexcept{(void)DS_SYNC();}
 };
 } // namespace
 void apply_brush(std::span<Sample> samples, const Brush &b) {
-  if (samples.empty())
-    return;
-  Device device;
-  size_t bytes = samples.size_bytes();
-  checked(DS_ALLOC(reinterpret_cast<void **>(&device.samples), bytes));
-  checked(DS_COPY(device.samples, samples.data(), bytes, DS_TO_DEVICE));
-  sculpt<<<(samples.size() + 255) / 256, 256>>>(device.samples, samples.size(),
-                                                b);
-  checked(DS_LAST_ERROR());
-  checked(DS_SYNC());
-  checked(DS_COPY(samples.data(), device.samples, bytes, DS_TO_HOST));
+  BrushApi api;
+  gpu_brush::apply(samples,b,api);
 }
 std::string_view compute_backend() {
 #if defined(__HIPCC__)

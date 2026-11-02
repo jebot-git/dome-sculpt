@@ -1,0 +1,14 @@
+{
+  "base": "fb75ea5",
+  "status": "private; Release shim130 pass; SDK/SAN pending",
+  "source_sha256": {
+    "src/backend_gpu.cu": "03ba4f1f7f756b35b2bed84b350aab73bc3a7bba2c49c7d40d0a162b9fb36609",
+    "src/gpu-brush-transfer.hpp": "bee802f32b568dcb3e979faa5256c370848eb63ea7031377a5b4482cefb3925a",
+    "tests/gpu-brush-transfer.cpp": "e716d8626f4b9b8fbb7092d0f7e8b6ff76a727d19162db8633a40fb31a78d15a",
+    "tests/gpu-brush-missing.cpp": "cb8c3f7b977180a19f034e3f116a3075cdef205a1968ec6a403448051220b51a",
+    "CMakeLists.txt": "5d642dd869f23b3c2b902dce9755a2e7dc68e93bd20a23fb4cb53c07f4deb9c0"
+  },
+  "scope": "Production CUDA/HIP host transaction; API shims explicitly not GPU numerical proof",
+  "public_ABI_schema_changes": false,
+  "positive_NVIDIA_AMD_hardware": false
+}
