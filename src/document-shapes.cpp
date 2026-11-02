@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "document-transaction.hpp"
+#include "shapekey-source-uv.hpp"
 namespace dome {
 void Document::configure_shape_sculpt(bool enabled){std::lock_guard lock(model_mutex_);configure_shape_sculpt_locked(enabled);}
 void Document::configure_shape_sculpt_locked(bool enabled){
  if(state_.shape_sculpt==enabled)return;
+ if(enabled&&detail::source_uv_geometry_keys_require_atlas(scene_.active()))throw std::logic_error(detail::source_uv_key_notice);
  if(!shape_target_ready_locked()||(enabled&&(!scene_.active().deformation||!scene_.active().deformation->morphs||scene_.active().deformation->morphs->targets.empty())))
   throw std::logic_error("Finish current editing and select a mesh with a shapekey");
  Transaction transaction(*this);input_.cancel();state_.shape_sculpt=enabled;state_.shape_sculpt_object=enabled?scene_.active().id:0;
@@ -19,6 +21,7 @@ bool Document::shape_target_ready_locked() const {
 }
 void Document::queue_shape_locked(ShapeKeyEdit edit,AssetSource expected){
  if(!shape_target_ready_locked())throw std::logic_error("Finish current editing or object motion, then choose an editable mesh");
+ if((edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Mirror)&&detail::source_uv_geometry_keys_require_atlas(scene_.active()))throw std::logic_error(detail::source_uv_key_notice);
  auto object=scene_.active().id;auto work=std::make_shared<AssetWork>();auto changed=std::make_shared<bool>(false);
  queue_scene_operation_locked("Author shapekey",[object,edit=std::move(edit),work,changed](Scene &scene,const auto &cancelled){
   auto result=author_shapekey(scene,object,edit,cancelled);*changed=result.changed;work->morph_target.store(uint32_t(result.target));

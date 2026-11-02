@@ -9,6 +9,7 @@
 #include "text-utf8.hpp"
 #include "dome/tangents.hpp"
 #include "shapekey-normal-preparation.hpp"
+#include "shapekey-source-uv.hpp"
 #include <map>
 namespace dome {
 namespace {
@@ -95,6 +96,8 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  bool existing=edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
  if(existing&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");
  if(edit.action==ShapeKeyAction::Replace && edit.positions.size()!=rest.positions.size())throw std::invalid_argument("Shapekey edits must preserve the complete REST vertex domain");
+ if((edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Mirror)&&detail::source_uv_geometry_keys_require_atlas(source))
+  throw std::invalid_argument(detail::source_uv_key_notice);
  if(edit.action==ShapeKeyAction::Replace){std::vector<Vec3> old;old.reserve(rest.positions.size());for(size_t v=0;v<rest.positions.size();++v)old.push_back(rest.positions[v]+deform->morphs->targets[edit.target].delta[v]);if(equal(old,edit.positions))return {edit.target,false};}
  if(edit.action==ShapeKeyAction::Rename && edit.name==deform->morphs->targets[edit.target].name)return {edit.target,false};
  const bool replace=edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
