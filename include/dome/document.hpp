@@ -53,9 +53,9 @@ struct ObjectInfo {
   bool selected=false, active=false, hovered=false;
   uint32_t selection_accent=0x6babff;
 };
-// Exact accepted cut endpoint, built on the file worker before authority
+// Exact accepted asset endpoint, built on the file worker before authority
 // publication. It never aliases the later mutable document scene.
-struct CutAcceptedSnapshot {
+struct AssetAcceptedSnapshot {
   std::shared_ptr<const Scene> scene;
   uint64_t revision=0,generation=0,content=0,object=0;
   RecoverySource recovery;
@@ -64,12 +64,14 @@ struct AssetWork {
   std::atomic_bool cancelled{false};
   std::atomic<float> progress{0};
   bool held_weight=false; // Immutable job kind; set before queue publication.
+  bool accepted_scene=false; // Scene result can be captured by a following Save.
+  std::atomic_bool save_requested{false};
   std::atomic<uint32_t> morph_target{UINT32_MAX};
-  // Written/read only by the ordered file worker. Shutdown observes cut_done,
+  // Written/read only by the ordered file worker. Shutdown observes done,
   // published with file_mutex_, even if diagnostic allocation fails.
-  std::shared_ptr<const CutAcceptedSnapshot> cut_completed;
-  std::exception_ptr cut_failure;
-  std::atomic_bool cut_done{false};
+  std::shared_ptr<const AssetAcceptedSnapshot> completed;
+  std::exception_ptr failure;
+  std::atomic_bool done{false};
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
 struct EditorState {
@@ -95,6 +97,7 @@ struct EditorState {
   std::string font_file;
   int font_pixels = 16;
   bool light = false, toon = false;
+  bool can_save_after_asset = false;
   bool mesh_active = false, asset_busy = false, can_undo = false,
        can_redo = false;
   std::shared_ptr<const DeformationState> deformation;
@@ -464,7 +467,7 @@ private:
   void finish_cut_parameter_locked(bool accept);
   void cut_from_hand_locked();
   void cut_loop();
-  void drain_cut_shutdown() noexcept;
+  void drain_asset_shutdown() noexcept;
   float control_resolution_voxel_ = .03f;
   AssetSource polygon_source_{};
   std::shared_ptr<const Scene> polygon_initial_;
@@ -688,7 +691,7 @@ private:
     uint64_t import_request=0;
     std::shared_ptr<PolygonAccept> polygon_capture;
     std::shared_ptr<ExportWork> export_work;
-    std::shared_ptr<AssetWork> cut_capture;
+    std::shared_ptr<AssetWork> asset_capture;
     std::shared_ptr<CutHandoff> cut_handoff;
   };
   // One running job plus the bounded eight-entry ordered file queue.
