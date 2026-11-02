@@ -152,3 +152,24 @@ These extend the original matrix; all unfinished original rows stay required.
 | Individual mesh hiding and held-mesh ghosts | Native visibility, physical holding, GPU ghost transforms and exclusive edit authority are integrated. Direct touch/ray multiselection and an XR hierarchy retain18% unselected opacity;250 Release/nine selected sanitizer suites,24 native menu and separate Arc/loader checks pass. The user accepted the physical selection interface on2026-10-31; full holding/authoring production workflows and device evidence remain required | Correct translucent view plus mutation/input guards, preserved object visibility/material/locks, controller/desktop holding and cancellation/stale-job checks |
 | VRoid-only humanoid bases | Only verified CC0 VRoid female/male bases are offered/shipped; compiled MakeHuman geometry/converter removed and legacy command disabled. Existing authored legacy projects retain load/export; native creator/compact GUI and legacy preservation fixtures pass in the integration candidate | Only VRoid base meshes shipped/offered, native creator workflows and independently verified legacy project load/export without the removed mesh data |
 | Standard FBX and OBJ import options | Native ufbx static OBJ/FBX conversion and immutable original/resource capture are integrated with Scene11; supported textured OBJ worker transactions preserve exact source/pixels/history. Shared FLTK/XR options, large-mm metre conversion and atomic browser/chooser admission now integrated and tested. Full affine/skin/morph/material cases remain required | Format-aware options, units/axes/materials/UV/deformation conversion, original-source provenance, undo/cancel and independent native/GUI/interoperability fixtures |
+
+## Additional user specification — 2026-11-02: controller spatial drawers
+
+After the basic goal targets are met, implement spatial **drawers** for tools,
+functions and selections as interactive trays mounted on the controllers.
+Streamline XR interaction so frequent operations can be accessed directly,
+without repeatedly navigating multiple levels of menus. This is an additional
+required phase of the existing native C++20 FLTK/OpenXR application.
+
+The basic functional targets remain the first priority. The accepted selection
+interface and current joystick menus remain the baseline while foundation work
+continues; they do not by themselves satisfy the drawer requirement. This addition
+does not reduce any unfinished original requirement or mark basic targets met.
+
+| Additional requirement | Current status | Required completion evidence |
+| --- | --- | --- |
+| Controller-mounted spatial tool/function/selection drawers | Required; queued after basic targets, not implemented or qualified | Interactive spatial trays on the controllers; discoverable opening/closing and direct tool, function and selection interactions; fewer nested-menu steps in representative XR workflows; visible active/selected state; no unintended scene stroke when entering/leaving a tray; preserved cancellation, focus/tracking-loss handling and edit authority; native/controller and physical-headset usability evidence |
+
+The trays must use the existing shared document commands and respect DomeD
+appearance, bitmap text, universal-menu and keybinding conventions where viable.
+Specific tray layouts and controller bindings remain design work for that phase.

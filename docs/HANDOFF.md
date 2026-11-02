@@ -4,6 +4,16 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Additional queued phase — controller spatial drawers, 2026-11-02
+
+The user additionally requires controller-mounted spatial drawers: interactive
+trays for tools, functions and selections, with streamlined direct XR interaction
+that avoids repeated multi-level menu navigation. Implement this after the basic
+goal targets are met; foundation work remains first priority. REQUIREMENTS.md
+records the added acceptance row. Existing accepted selection/joystick menus are
+the baseline, not proof that drawers exist. The full goal stays active and no
+new physical test is authorized by this specification alone.
+
 ## Qualified authoring adapter checkpoint — 2026-11-02
 
 Product8d68dc7 extends the Scene19 baseline with retained post-UV prepared-key
