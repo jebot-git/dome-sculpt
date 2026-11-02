@@ -1,0 +1,40 @@
+{
+  "recorded_utc": "2026-11-02T03:50:32.323374+00:00",
+  "product_source": "e02a86a",
+  "private_equivalent": "baf6501d3405e1dc42ded60f225da8975a92b177",
+  "change": "Unwind initialized worker prefix and placement context/scheduler/thread storage if native thread construction throws",
+  "sources": {
+    "third_party/xatlas/xatlas.cpp": "fe96ae0d8c362ea4fe2502d8a82f5fbbb839a3822521903b26487afa15a1b824",
+    "tests/xatlas-allocation.cpp": "5b2bcb8cba653ef380e6b798f857de41edfc30d9de3331c47076f810d29d0ba4",
+    "tests/xatlas-shutdown.cpp": "748fdb92241f1ba7bd2eec321d0d8bf301b2d1e4a1945d76ada692e997d14039"
+  },
+  "negative": "Original453a532 dependency leaves a native worker after persistent second thread-state allocation failure",
+  "public_Release": {
+    "suites": 2,
+    "repeat_until_fail": 30,
+    "failed": 0,
+    "seconds": 1.8,
+    "actual_thread_state_boundaries_on_reference_host": 19
+  },
+  "independent_sanitizer": {
+    "suites": 2,
+    "repetitions": 5,
+    "failed": 0,
+    "seconds": 3.03,
+    "scope": "Fresh xatlas C++ and both regressions, ASan/UBSan/leaks; no full application claim"
+  },
+  "evidence": {
+    "artifacts/tests-xatlas-construction-public.xml": "4ac4a139b5bf381ca6404ffda61e414d9e7abf0283b4e673440c19b63dd142e5",
+    "artifacts/xatlas-allocation-453a532/artifacts-negative-constructor-final.log": "961443bdf976c902d2fc207134d1484e2bad67cca94d3ece6b5f0859cb3b5935",
+    "artifacts/xatlas-allocation-453a532/artifacts-tests-repeat.log": "bcf31d83468d66db389cb687acf8193b67fdfce8e2e85c20f03f568dfaffcf6e",
+    "artifacts/xatlas-allocation-453a532/artifacts-tests-san-final.log": "9a3770163895b2538d2687f94678e7f4ddb172253ccee2c2f436965dd5df7c45"
+  },
+  "limitations": [
+    "Intercepts persistent C++ thread-state operator new; not C allocation callbacks or OS-wide resource exhaustion.",
+    "The formerly hung cut allocation boundary7288 now passes in its private tree; full56629-boundary sweep remains running.",
+    "Private cut adapter publication, history and full allocation qualification remain separate."
+  ],
+  "full_production_complete": false,
+  "system_installation": false,
+  "session_restart": false
+}
