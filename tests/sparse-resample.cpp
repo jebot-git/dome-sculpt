@@ -33,6 +33,17 @@ std::vector<uint64_t> reference(const Reference &map, std::span<const Point> que
   }
   return result;
 }
+uint64_t native_hash(const Grid &grid, Point q, float source, float target, double background) {
+  const double p[]{double(q.x) * target / source, double(q.y) * target / source, double(q.z) * target / source};
+  const Point lo{int32_t(std::floor(p[0])), int32_t(std::floor(p[1])), int32_t(std::floor(p[2]))};
+  const double f[]{p[0] - lo.x, p[1] - lo.y, p[2] - lo.z};
+  double result = background;
+  for (int z=0;z<2;++z) for (int y=0;y<2;++y) for(int x=0;x<2;++x) {
+    if (const auto *cell=find(grid.cells().data(),grid.mask(),{lo.x+x,lo.y+y,lo.z+z}))
+      result += (std::bit_cast<double>(cell->value)-background)*(x?f[0]:1-f[0])*(y?f[1]:1-f[1])*(z?f[2]:1-f[2]);
+  }
+  return std::bit_cast<uint64_t>(result);
+}
 void compare(std::span<const uint64_t> actual, std::span<const uint64_t> expected) {
   require(actual.size() == expected.size(), "Sparse result size changed");
   for (size_t i = 0; i < actual.size(); ++i) if (actual[i] != expected[i]) {
@@ -115,6 +126,12 @@ size_t exercise(std::vector<Entry> entries, std::vector<Point> queries, float so
   const auto admitted = Clock::now();
   validate_queries(queries, p);
   const auto validation_ms = ms(admitted);
+  const auto fast_begin = Clock::now();
+  std::vector<uint64_t> fast;
+  fast.reserve(queries.size());
+  for (auto q:queries) fast.push_back(native_hash(grid,q,source,target,background));
+  const auto native_hash_ms = ms(fast_begin);
+  compare(fast,expected);
   if (encoded_host) {
     std::vector<uint64_t> actual;
     for (auto q : queries) actual.push_back(sample(grid.cells().data(), grid.mask(), q, p));
@@ -128,7 +145,7 @@ size_t exercise(std::vector<Entry> entries, std::vector<Point> queries, float so
     std::cout << "SPARSE_JOB entries=" << entries.size() << " queries=" << queries.size()
               << " field_bytes=" << grid.cells().size() * sizeof(Cell)
               << " query_bytes=" << queries.size() * sizeof(Point) << " readback_bytes=" << actual.size() * 8
-              << " native_cpu_ms=" << reference_ms << " host_pack_ms=" << packing_ms
+              << " native_cpu_ms=" << reference_ms << " native_hash_ms=" << native_hash_ms << " host_pack_ms=" << packing_ms
               << " query_validation_ms=" << validation_ms << '\n';
     for (size_t i = 0; i < times.size(); ++i)
       std::cout << "SPARSE_GPU iteration=" << i << " upload_kernel_readback_ms=" << times[i]
