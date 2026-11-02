@@ -82,12 +82,17 @@ void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(bool(i.paint->normal_projection())!=bool(i.current_material&&i.current_material->normal_preparation))throw std::invalid_argument("Source UV normal paint and its own material interpretation differ");
  if(i.polygon_authority){
   const bool prepared=bool(i.current_material&&i.current_material->color_preparation);
-  if(!i.polygon_authority->active||!i.polygon_authority->colors||i.appearance||i.paint->normal_projection()||(!prepared&&(i.current_material||i.paint->color_projection()||!i.native_material)))
+  if(!i.polygon_authority->active||!i.polygon_authority->colors||i.appearance||(!prepared&&(i.current_material||i.paint->color_projection()||i.paint->normal_projection()||!i.native_material)))
    throw std::invalid_argument("Corner UV transfer requires its own active field and explicit supported material authority");
   if(prepared){
     detail::require_corner_uv_domain(*i.paint);
-    if(!i.target_polygon||!i.target_polygon->active||i.target_polygon->colors!=i.polygon_authority->colors||i.current_material->has_mtoon||i.current_material->normal_preparation)
+    if(!i.target_polygon||!i.target_polygon->active||i.target_polygon->colors!=i.polygon_authority->colors||i.current_material->has_mtoon)
       throw std::invalid_argument("Prepared corner UV transfer requires its own exact target field/topology");
+    // Both fields must be owned independently. A colour receipt never proves
+    // a normal transfer; keep its exact source domain instead of deriving new
+    // canonical axes from a deformed writable atlas.
+    if(i.paint->normal_projection()&&o.normal_sampling!=SourceNormalUvMethod::RetainSource)
+      throw std::invalid_argument("Prepared corner UV normals require the explicit Keep-detail sampling method");
     detail::polygon_color_owner(i.polygon_authority.get(),i.current_material->color_preparation.get(),true);
     PolygonColorSurface target{std::make_shared<const PolygonMesh>(i.target_polygon->topology),i.target_polygon->colors};
     detail::polygon_target_colors(i.target,target,o.cancelled);
