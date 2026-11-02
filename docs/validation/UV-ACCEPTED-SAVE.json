@@ -1,0 +1,11 @@
+{
+  "scope": "narrow UV special-job accepted Scene bridge",
+  "dependency": "62d47474651f1bf739db0c0b171c06d746e1e076",
+  "native_assertions": 31,
+  "release_suites": 2,
+  "sanitizer": "pending",
+  "abi_changes": false,
+  "kernel_changes": false,
+  "gpu": false,
+  "log_sha256": "02c1b1752ac88020ee762fbb255a0e2ac09de2bf887323ab4fb72e94ec6ee4e5"
+}
