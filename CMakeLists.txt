@@ -1859,3 +1859,6 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-resample-backend-test PRIVATE -Wl,--wrap=_ZN4dome18SparseFieldSampler6sampleESt4spanIKNS_15sparse_resample5PointELm18446744073709551615EERKSt8functionIFbvEE)
   add_test(NAME resample-backend COMMAND dome-sculpt-resample-backend-test)
 endif()
+
+install(FILES third_party/softfloat/COPYING.txt
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/dome-sculpt/softfloat)

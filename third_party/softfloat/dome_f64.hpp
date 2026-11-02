@@ -91,14 +91,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 
-inline constexpr uint16_t softfloat_approxRecip_1k0s[16] = {
-    0xFFC4, 0xF0BE, 0xE363, 0xD76F, 0xCCAD, 0xC2F0, 0xBA16, 0xB201,
-    0xAA97, 0xA3C6, 0x9D7A, 0x97A6, 0x923C, 0x8D32, 0x887E, 0x8417
-};
-inline constexpr uint16_t softfloat_approxRecip_1k1s[16] = {
-    0xF0F1, 0xD62C, 0xBFA1, 0xAC77, 0x9C0A, 0x8DDB, 0x8185, 0x76BA,
-    0x6D3B, 0x64D4, 0x5D5C, 0x56B1, 0x50B6, 0x4B55, 0x4679, 0x4211
-};
+DOME_SF_FN uint16_t softfloat_approxRecip_1k0s(unsigned index) { switch(index) {
+case 0: return 0xFFC4;
+case 1: return 0xF0BE;
+case 2: return 0xE363;
+case 3: return 0xD76F;
+case 4: return 0xCCAD;
+case 5: return 0xC2F0;
+case 6: return 0xBA16;
+case 7: return 0xB201;
+case 8: return 0xAA97;
+case 9: return 0xA3C6;
+case 10: return 0x9D7A;
+case 11: return 0x97A6;
+case 12: return 0x923C;
+case 13: return 0x8D32;
+case 14: return 0x887E;
+case 15: return 0x8417;
+default: return 0;
+} }
+DOME_SF_FN uint16_t softfloat_approxRecip_1k1s(unsigned index) { switch(index) {
+case 0: return 0xF0F1;
+case 1: return 0xD62C;
+case 2: return 0xBFA1;
+case 3: return 0xAC77;
+case 4: return 0x9C0A;
+case 5: return 0x8DDB;
+case 6: return 0x8185;
+case 7: return 0x76BA;
+case 8: return 0x6D3B;
+case 9: return 0x64D4;
+case 10: return 0x5D5C;
+case 11: return 0x56B1;
+case 12: return 0x50B6;
+case 13: return 0x4B55;
+case 14: return 0x4679;
+case 15: return 0x4211;
+default: return 0;
+} }
 
 
 
@@ -1191,8 +1221,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef softfloat_approxRecip32_1
 
-extern const uint16_t softfloat_approxRecip_1k0s[16];
-extern const uint16_t softfloat_approxRecip_1k1s[16];
+
+
 
 DOME_SF_FN uint32_t softfloat_approxRecip32_1( uint32_t a )
 {
@@ -1204,8 +1234,8 @@ DOME_SF_FN uint32_t softfloat_approxRecip32_1( uint32_t a )
 
     index = a>>27 & 0xF;
     eps = (uint16_t) (a>>11);
-    r0 = softfloat_approxRecip_1k0s[index]
-             - ((softfloat_approxRecip_1k1s[index] * (uint_fast32_t) eps)>>20);
+    r0 = softfloat_approxRecip_1k0s(index)
+             - ((softfloat_approxRecip_1k1s(index) * (uint_fast32_t) eps)>>20);
     sigma0 = ~(uint_fast32_t) ((r0 * (uint_fast64_t) a)>>7);
     r = ((uint_fast32_t) r0<<16) + ((r0 * (uint_fast64_t) sigma0)>>24);
     sqrSigma0 = ((uint_fast64_t) sigma0 * sigma0)>>32;

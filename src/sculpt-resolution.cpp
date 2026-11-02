@@ -79,7 +79,8 @@ template<class Map,class Emit> void sample_field(const Map &input,float source,f
       work.stop();if(!sampler)sampler=std::make_unique<SparseFieldSampler>(grid,p,queries.size());
       const auto values=sampler->sample(queries,work.options.cancelled);work.stop();
       for(size_t i=0;i<queries.size();++i) {
-        if((i&255)==0)work.stop();const auto q=queries[i];
+        if((i&255)==0)work.stop();
+        const auto q=queries[i];
         if(emit(Int3{q.x,q.y,q.z},std::bit_cast<double>(values[i])))
           if(++emitted>remaining)throw std::length_error("Sculpt resolution layer/mask storage budget exceeded");
       }

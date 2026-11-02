@@ -25,9 +25,25 @@ for name in record['source_files']:
     text = text.replace('softfloat_exceptionFlags |= softfloat_flag_inexact;',
                         '/* Numeric-only API: floating exception flags are not exposed. */')
     if name == 's_approxRecip_1Ks.c':
-        text = text.replace('const uint16_t', 'inline constexpr uint16_t')
+        # CUDA/HIP device code cannot dynamically index a host constexpr array.
+        # Emit the same pinned constants as host/device switch accessors, letting
+        # each compiler place its own lookup representation in device storage.
+        def table_function(match):
+            values = [v.strip() for v in match.group(2).split(',') if v.strip()]
+            if len(values) != 16:
+                raise RuntimeError('Unexpected reciprocal table size')
+            cases = ''.join(f'case {i}: return {v};\n' for i, v in enumerate(values))
+            return ('DOME_SF_FN uint16_t ' + match.group(1) +
+                    '(unsigned index) { switch(index) {\n' + cases +
+                    'default: return 0;\n} }')
+        text, count = re.subn(r'const uint16_t (\w+)\[16\]\s*=\s*\{([^}]+)\};',
+                              table_function, text, flags=re.S)
+        if count != 2:
+            raise RuntimeError('Missing pinned reciprocal tables')
         tables.append(text)
         continue
+    text = re.sub(r'extern const uint16_t softfloat_approxRecip_1k[01]s\[16\];', '', text)
+    text = re.sub(r'(softfloat_approxRecip_1k[01]s)\[index\]', r'\1(index)', text)
     plain = re.sub(r'/\*.*?\*/', '', text, flags=re.S)
     match = re.search(r'((?:struct\s+)?\w+)\s+(\w+)\s*\(([^;{}]*)\)\s*\{', plain)
     if not match:
