@@ -1,5 +1,5 @@
 {
-  "recorded_utc": "2026-11-02T19:47:08.980144+00:00",
+  "recorded_utc": "2026-11-02T19:59:14.417197+00:00",
   "frozen_runtime_test_source": "8a897873d94654f4c53f0754188daf53f8c1b425",
   "base_main": "132caef95172bba91b10ddc0f86044433af57ce8",
   "qualification_tree": "artifacts/fbx-bindings-current-132caef",
@@ -94,23 +94,10 @@
     "exact_diagnostic_test_helper_SAN_probe": true,
     "fix_test_only": "8a89787: sequential triangle indices when accessor absent; indexed and nonindexed cases now pass"
   },
-  "live_builds": {
-    "CPU_optimized_alltargets": {
-      "session": 90629,
-      "state": "live",
-      "log": "artifacts/build-current-fbx-all-release.log"
-    },
-    "OneAPI_optimized_alltargets": {
-      "session": 14599,
-      "state": "live",
-      "log": "artifacts/build-current-fbx-oneapi.log"
-    }
-  },
   "remaining": [
-    "Both alltarget builds terminal results and correct test manifests",
-    "Current-source actual OneAPI numerical/missing-device gates after build; coordinate GPU lease",
-    "Final preserved-main-doc merge/source equality and exact receipt before main publication",
-    "Native raw multi-UV/UV2+ and broad FBX/normal/material/deformation semantics remain required; Source26 work separate"
+    "Final preserved-main-doc merge, source equality and exact integration receipt before main publication",
+    "Full FBX/material/normal/deformation semantics, native raw multi-UV/UV2+ remain required; Source26 work separate",
+    "All remaining full-goal rows and post-basic controller drawers remain active"
   ],
   "no_install": true,
   "no_physical_test": true,
@@ -211,6 +198,68 @@
     "build/libmikktspace-robust.a": "0208cf183b27f5770b270df2a5c6333a44369c185e80294e7b4f906e428602fa",
     "build/libmikktspace.a": "fcde4abee93a1da981fab81bca246ed49358e628b2a27018adb164d74990f0e1",
     "build/libufbx.a": "24166d6cd5e2a477417f0b75bacfc43d30e4bc96eb4ed3773dbd33041e762c54",
-    "build/libxatlas.a": "0e0584e8dea14758446d447a781e3dc1c9718c639621d50e8e8086d32b257448"
+    "build/libxatlas.a": "0e0584e8dea14758446d447a781e3dc1c9718c639621d50e8e8086d32b257448",
+    "artifacts/build-current-fbx-all-release.log": "6a8ffe0e99477da79b176822edb426f40a99608b8be03cb9f6755e2d268618b2",
+    "artifacts/build-current-fbx-oneapi.log": "643938ea4050c16aa9a64305446da5b6b45c5fa51fddea1ab66003fc2d8a9f04",
+    "artifacts/configure-current-fbx-release.log": "fc56ac4591c8ad900e64350c433a4a322ec1d99a609f3f8a97d834e546dbf2cd",
+    "artifacts/configure-current-fbx-sanitize.log": "a083cb81b096bb6b5b51e8af9282cd1aec56690bfbac020e796ddba7a8ff6732",
+    "artifacts/configure-current-fbx-oneapi.log": "d8797a914c07adbda5baf6a24044ec56bd93aea9a22a03ce98349a917a3d798d",
+    "artifacts/current-oneapi-devices.log": "bd680e08c4d6536621ebe2d70a293ba730ddc06202b515e8d4b27f1339bc1fab",
+    "artifacts/tests-current-fbx-oneapi15.log": "d572832d9bc2fac93d1f36d795121b7bd11e5b32ee3a3f204432f07a43818b94",
+    "artifacts/current-fbx-oneapi15-console.log": "d572832d9bc2fac93d1f36d795121b7bd11e5b32ee3a3f204432f07a43818b94",
+    "build-oneapi/artifacts-current-fbx-oneapi15.xml": "6b683e0d175c8efb2c7ad1c95c4ecff6e2335a80fd033efb70a3337717ab6928",
+    "artifacts/ctest-current-fbx-release-manifest.json": "b5e06e2802b1494972107821aae5db1d98a111c4f3f18850e397d3d1a6263302",
+    "artifacts/ctest-current-fbx-oneapi-manifest.json": "87fc54e4b25e20031e1827b69538dc14e62bab3da7afd1d520408e3124154131",
+    "build-oneapi/libdome-sculpt-affine.a": "658236203aed283bdd19609c1af8e0f35d9419017dbf553c27bcaacdcf78a193",
+    "build-oneapi/libxatlas.a": "49858fdf10666f4d2bd24441883f198e27233cbc1a331d33a9d46e00f5fbc371",
+    "build-oneapi/libufbx.a": "468a3680e0fcec5f9f5c3d2cf5da49012605f88849b14786ec7854607c3a3168",
+    "build-oneapi/libmikktspace.a": "b9593a9564c66cea8c7ef8bba07b9975ddf3a75be7e56ded4fb2a4435869e953",
+    "build-oneapi/libmikktspace-robust.a": "271656cb99fea886ff884ad0a42263d7893b37660e2ddf1dab5ac322adbb7c14",
+    "build-oneapi/libdome-sculpt-polygon.a": "279c5957725094a1f8944936479431612da20f9b776978adc1cb8eea61696bcb",
+    "build-oneapi/libdome-sculpt-core.a": "8f4741d7ec9cb50b478ad0377362dda54ec1aee177bf9622da189e42e258c021",
+    "build-oneapi/libdome-sculpt-render.a": "d74e828ad7128f6ad57cf066f16c2d4c64afaf2076075ac5d06054657195d08e",
+    "build-oneapi/libdome-sculpt-spacenav.a": "42f45c814ba9ad221352ea43afc6d55378d1510f72f37971397621a87f507871",
+    "build-oneapi/libdome-sculpt-xr.a": "4efb289319abe527097658499be1fcf54e4ab733ca5d08e9fbed24611573a01d",
+    "build-oneapi/dome-sculpt": "71214962bcfae823669814f377f9bb12cae268fc47034502d19ebd0ceda8a28e",
+    "build-oneapi/dome-sculpt-compute-backend-test": "4b53eba0a0927f493ec5fc6fff54938ece18263639df2c0d7ce13712c5859a93",
+    "build-oneapi/libdome-sculpt-test-runtime.so": "2432ac5cb098948d24bbc9ce579f9830b2181d87cdb23c15b2d90005becd87d6",
+    "build-oneapi/dome-sculpt-fbx-named-uv-render-test": "ee524829476769390a2acbbd79918b917a27bbd8c09a73150e72e703b50cc5c7",
+    "build-oneapi/dome-sculpt-fbx-options-deformation-test": "ad7829976354409e67e148248b1f143d9a020ede6f0a92e7db1f54c4786fa172",
+    "build-oneapi/CMakeCache.txt": "429be93c67426782f4bfb0cb905175c575b1e5b5077cb2c8356bc7f3a14501f7"
+  },
+  "bounded_current_component_qualified": true,
+  "completed_alltarget_builds": {
+    "CPU_optimized_alltargets": {
+      "session": 90629,
+      "state": "terminal",
+      "log": "artifacts/build-current-fbx-all-release.log",
+      "terminal_exit": 0
+    },
+    "OneAPI_optimized_alltargets": {
+      "session": 14599,
+      "state": "terminal",
+      "log": "artifacts/build-current-fbx-oneapi.log",
+      "terminal_exit": 0
+    }
+  },
+  "registered_cases": {
+    "CPU": 398,
+    "OneAPI": 399
+  },
+  "OneAPI_current_native15": {
+    "tests": 15,
+    "failures": 0,
+    "seconds": 13.87,
+    "selector": "level_zero:0",
+    "current_sycl_ls": "ArcA770index0,UHD770index1",
+    "GL_renderer": "software; actual Arc GL is separately scoped37",
+    "analytic_endpoints": 184,
+    "CPU_reference_batches": 224,
+    "samples": 445088,
+    "maximum_error": 8.9407e-08,
+    "explicit_missing_GPU_no_host_mutation": true,
+    "session": 45603,
+    "terminal_exit": 0,
+    "source": "8a897873d94654f4c53f0754188daf53f8c1b425"
   }
 }
