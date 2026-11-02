@@ -1339,7 +1339,10 @@ void Document::process_locked(const SpatialFrame &incoming) {
   input_.sculpt_mask_edit = !scene_.active().mesh_active && volume().sculpt_settings().mask_edit;
   if(state_.selection_mode)input_.edit_allowed=false;
   const auto displayed=mesh_.load();
-  if(displayed->pbr_view!=state_.pbr_view||displayed->view_epoch!=state_.view_epoch){
+  // Material-role publication gates mesh sampling. Direct voxel sculpt/mask
+  // input remains valid while its first or updated display mesh is extracting.
+  if(scene_.active().mesh_active&&
+      (displayed->pbr_view!=state_.pbr_view||displayed->view_epoch!=state_.view_epoch)){
     input_.edit_allowed=false;
     // A press begun against the previous policy cannot become a stroke when
     // its replacement arrives. Modal controls still own their own events.

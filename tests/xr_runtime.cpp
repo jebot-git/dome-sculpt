@@ -735,7 +735,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
       button &&
       (frame == 8 || frame == 10 ||
        (getenv("DOME_XR_FIXTURE_PAINT") &&
-        (frame == 12 || frame == 14 || frame == 16 || frame == 18)) ||
+        (frame == 12 || frame == 14 || frame == 16 || frame == 18 || frame == 20)) ||
        (getenv("DOME_XR_FIXTURE_CONTROLS") && (frame == 12 || frame == 21)) ||
        (getenv("DOME_XR_FIXTURE_UV") && frame == 12) ||
        (getenv("DOME_XR_FIXTURE_LAYERS") && (frame == 12 || frame == 14)) ||
@@ -820,7 +820,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
         (!getenv("DOME_XR_FIXTURE_SCENE") && frame >= 13 && frame <= 18);
     if(pbr_preview_fixture())stroke=frame==12||frame==26;
     if (getenv("DOME_XR_FIXTURE_PAINT"))
-      stroke = (frame >= 2 && frame <= 5) || (frame == 20);
+      stroke = (frame >= 2 && frame <= 5) || (frame == 22);
     if (getenv("DOME_XR_FIXTURE_CONTROLS"))
       stroke = frame == 19;
     if (getenv("DOME_XR_FIXTURE_UV"))
@@ -912,7 +912,11 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
       out->currentState = {.8660254f, -.5f};
     if (frame == 15 || frame == 16)
       out->currentState = {0, -1};
+    // Paint controls now expose projection first; its presets cell reaches
+    // the original colour palette. Exercise both real submenu transitions.
     if (frame == 17 || frame == 18)
+      out->currentState = {0, -1};
+    if (frame == 19 || frame == 20)
       out->currentState = {.5f, .8660254f};
   }
   if (getenv("DOME_XR_FIXTURE_CONTROLS") && right(p->subactionPath) &&
