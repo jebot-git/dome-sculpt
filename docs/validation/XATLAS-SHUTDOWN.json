@@ -1,0 +1,34 @@
+{
+  "recorded_utc": "2026-11-02T03:40:06.954658+00:00",
+  "product_source": "7c24a06",
+  "private_equivalent": "453a53232f343e72fcf19d2db8b24b1aad96ef09",
+  "change": "Publish shutdown wakeup under the worker condition-variable predicate mutex",
+  "sources": {
+    "third_party/xatlas/xatlas.cpp": "1aadd5aa754016f30e0b34a35e7735939e9965929a40fb3cc8c6a1a621806506",
+    "tests/xatlas-shutdown.cpp": "748fdb92241f1ba7bd2eec321d0d8bf301b2d1e4a1945d76ada692e997d14039"
+  },
+  "negative": "Original dependency deterministically exits3 before waiter registration; retained log proves notification without predicate mutex",
+  "regression": {
+    "forks": 32,
+    "public_Release_passed": 1,
+    "failed": 0,
+    "seconds": 0.04,
+    "sanitizer_passed": 1,
+    "sanitizer_seconds": 0.38,
+    "sanitizer_scope": "Fresh xatlas C++ dependency and regression; ASan/UBSan/leaks, no full application claim"
+  },
+  "evidence": {
+    "artifacts/tests-xatlas-shutdown-public.xml": "31ffb8d562424b2ef1553e4a711636f44b8582fb0010cae610db0758e0f136b9",
+    "artifacts/xatlas-shutdown-0df613e/artifacts-negative.log": "f655f7b3a61431df669c27288b5f41fdee3f773bb57c9d14677d39eaad063601",
+    "artifacts/xatlas-shutdown-0df613e/artifacts-tests-fixed.log": "dbd9bd2b2156190227b66e4dbdb8fc484d60ca76ca84bfe54f6c9c73c8c298ae",
+    "artifacts/xatlas-shutdown-0df613e/artifacts-tests-san.log": "9077aa9ffab61f6b7e4daf944f4de807ae5e2075aaf2be2495c0557d87930ea1"
+  },
+  "limitations": [
+    "This closes one proven lost-wakeup path, not all allocation/shutdown failures.",
+    "The separate current-color-cut persistent allocation sweep still hangs and remains under investigation.",
+    "Geometry/numerical output is not changed by this synchronization fix."
+  ],
+  "full_production_complete": false,
+  "system_installation": false,
+  "session_restart": false
+}

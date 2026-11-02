@@ -50,7 +50,7 @@
     "license": "MIT",
     "bitmap_helper": {
       "repository": "https://github.com/jebot-git/DomeD",
-      "commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+      "commit": "d271cf65c612a462fcfa6739416b06c6565be070",
       "file": "native/bdf_font.hpp",
       "sha256": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
       "license": "MIT and retained bdf2x Unlicense attribution",
@@ -176,7 +176,7 @@
     },
     "combined_patch_sha256": "f44bf778691abd5418756e0f427266ca205a2e45c262d63026799b9222dc92b2",
     "used": "Canonical Release FLTK1.4.5 with all23 patches, native BDF/PCF selection, -O3/local CPU tuning, libraries in lib. Current application/runtime qualification is scoped separately from the older22-patch milestone.",
-    "verified_at_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+    "verified_at_commit": "d271cf65c612a462fcfa6739416b06c6565be070",
     "builder_sha256_at_verified_commit": "fe7db74e1763dc51c8362332751eefe4559aa25a654a000e4553e6afe91754ae"
   },
   "vrm_specification": {
@@ -505,7 +505,7 @@
       }
     },
     "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack; no Pango application frontend, no outlines, no system installation.",
-    "verified_at_commit": "3024fb61a9eaa94fea0d581f862526307b5544a9"
+    "verified_at_commit": "d271cf65c612a462fcfa6739416b06c6565be070"
   },
   "nlohmann_json": {
     "repository": "https://github.com/nlohmann/json",

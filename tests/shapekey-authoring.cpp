@@ -5,6 +5,7 @@
 #include "dome/polygon-scene.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-conversion.hpp"
+#include "polygon-scene-archive.hpp"
 #include "cgltf.h"
 #include <iostream>
 #include <fstream>
@@ -20,6 +21,12 @@ Scene fixture(){
 }
 const NormalFrameTarget &key(const NormalFrames &f,uint64_t id){for(const auto&t:f.targets)if(t.id==id)return t;throw std::runtime_error("Missing key");}
 void standalone(const std::filesystem::path &prefix){
+ detail::PolygonSceneArchive empty;PaintImageArchive images;CreatorAssetArchive models;SourceMaterialArchive materials;
+ auto archive=empty.encode(images,models,materials);auto fields=nlohmann::json::array({{{"polygon",nullptr},{"shape_source",nullptr}}});
+ detail::PolygonSceneArchive::preflight(archive,fields);
+ check(archive.at("version")==1,"Null direct-source fields accept the historical empty polygon archive");
+ fields[0]["shape_source"]=0;
+ check(refuses([&]{detail::PolygonSceneArchive::preflight(archive,fields);}),"A real direct-source reference still requires archive version four");
  auto s=fixture();auto before=s.encode();ShapeKeyEdit edit;edit.name="Smile";auto result=author_shapekey(s,s.active().id,edit);
  check(result.changed&&result.target==0&&s.active().shape_source&&s.active().deformation->morphs->targets.size()==1,"Create adds a real editable key and complete independent before-state source");
  auto encoded=s.encode();check(encoded.at("version")==16&&encoded.at("polygon_sources").at("version")==4&&encoded.at("polygon_sources").at("authorities").empty(),"Scene16 stores a direct native source without fabricated polygon authority");

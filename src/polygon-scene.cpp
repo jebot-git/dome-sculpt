@@ -433,9 +433,9 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
   for(const auto &o:objects){
     if(!o.contains("polygon"))throw std::invalid_argument("Incomplete polygon scene fields");
     if(!o.at("polygon").is_null())authority(polygon_archive_index(o.at("polygon"),aa.size()),1);
-    if(o.contains("shape_source")){
+    if(o.contains("shape_source")&&!o.at("shape_source").is_null()){
       if(j.at("version")!=4)throw std::invalid_argument("Direct shape source requires archive version four");
-      if(!o.at("shape_source").is_null())origin(polygon_archive_index(o.at("shape_source"),oo.size()),1);
+      origin(polygon_archive_index(o.at("shape_source"),oo.size()),1);
     }
   }
   auto all = [](const auto &v) {
