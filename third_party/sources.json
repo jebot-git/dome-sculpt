@@ -575,5 +575,15 @@
         "src/cfgfile.c": "45e82064af56304e374cfe028a5a862a42216a385f068fb0f3d63abcbe935d69"
       }
     }
+  },
+  "softfloat_binary64": {
+    "upstream": "https://github.com/ucb-bar/berkeley-softfloat-3",
+    "release": "3e",
+    "commit": "0a5ad290c6b287f6605bb99a35ad0842c1e61aa5",
+    "license": "BSD-3-Clause",
+    "path": "third_party/softfloat",
+    "manifest": "third_party/softfloat/SOURCES.json",
+    "generator": "tools/generate-softfloat-f64.py",
+    "scope": "Private prototype, integer-only nearest-even binary64 numeric results for GPU resolution work. Floating environment flags not exposed; not yet wired into sculpt resampling."
   }
 }
