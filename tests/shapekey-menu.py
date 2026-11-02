@@ -10,7 +10,7 @@ from PIL import Image,ImageChops
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if os.environ.get('DOME_SHAPE_BUS')!='1':os.execvpe('dbus-run-session',['dbus-run-session','--',sys.executable,*sys.argv],{**os.environ,'DOME_SHAPE_BUS':'1'})
 root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',root/'build')).resolve();compact=os.environ.get('DOME_SHAPE_COMPACT')=='1';strokes=os.environ.get('DOME_SHAPE_STROKES')=='1';prepared=os.environ.get('DOME_SHAPE_PREPARED')=='1'
-out=root/'artifacts'/(('prepared-' if prepared else '')+('shape-menu-compact' if compact else 'shape-menu'));out.mkdir(parents=True,exist_ok=True);checks=[];processes=[]
+out=root/'artifacts'/os.environ.get('DOME_SHAPE_MENU_OUT',(('prepared-' if prepared else '')+('shape-menu-compact' if compact else 'shape-menu')));out.mkdir(parents=True,exist_ok=True);checks=[];processes=[]
 def report(done=False):(out/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks),'complete':done},indent=2)+'\n')
 def check(ok,message):checks.append({'passed':bool(ok),'check':message});report();print(('PASS ' if ok else 'FAIL ')+message,flush=True);assert ok,message
 async def wait(fn,seconds=45):
@@ -30,7 +30,7 @@ async def main():
   for k,s in [('XDG_CONFIG_HOME','config'),('XDG_STATE_HOME','state'),('XDG_DATA_HOME','data'),('XDG_CACHE_HOME','cache'),('XDG_RUNTIME_DIR','runtime')]:env[k]=home+'/'+s;Path(env[k]).mkdir(mode=0o700)
   if compact:
    p=Path(home,'config/dome/appearance.json');p.parent.mkdir(parents=True);p.write_text(json.dumps({'font':'Unifont / Sans-Serif','font_size':16,'font_scale':2}))
-  project=Path(home,'shapes.dsculpt');helper=str(build/('dome-sculpt-prepared-normal-shapes-test' if prepared else 'dome-sculpt-shapekey-authoring-test'));subprocess.run([str(build/'dome-sculpt-shapekey-grid-fixture'),str(project)] if strokes else [helper,'--ui-fixture',str(project)],env=env,check=True)
+  project=Path(home,'shapes.dsculpt');helper=str(build/os.environ.get('DOME_SHAPE_HELPER',('dome-sculpt-prepared-normal-shapes-test' if prepared else 'dome-sculpt-shapekey-authoring-test')));subprocess.run([str(build/'dome-sculpt-shapekey-grid-fixture'),str(project)] if strokes and not os.environ.get('DOME_SHAPE_HELPER') else [helper,'--ui-fixture',str(project)],env=env,check=True)
   def inspect():return json.loads(subprocess.check_output([helper,'--inspect',str(project)],env=env))
   original=inspect();initial_targets=len(original['objects'][0]['deformation']['morphs']['targets']) if original['objects'][0].get('deformation',{}).get('morphs') else 0;log=(out/'app.log').open('w');app=subprocess.Popen([str(build/'dome-sculpt'),str(project)],env=env,cwd=home,stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
   def named(title):
@@ -77,7 +77,7 @@ async def main():
    d.sync();await wait(lambda:pixels(dialog).tobytes()!=before.tobytes());pixels(dialog).save(out/'new-shape-bottom.png')
    check(pixels(dialog).crop((0,g.height-85,g.width,g.height)).tobytes()==before.crop((0,g.height-85,g.width,g.height)).tobytes(),'Compact shape content scrolls while Cancel and Apply stay fixed')
   tap(dialog,g.width*.75,g.height-(46 if compact else 32)*2+24);await wait(lambda:named('New shapekey') is None);await ready('Duplicate shapekey...');await command('Save');created=inspect()
-  check(len(created['objects'][0]['deformation']['morphs']['targets'])==initial_targets+1 and created['version']==16,'Actual native Apply authors a persisted target and independent before-state capsule')
+  check(len(created['objects'][0]['deformation']['morphs']['targets'])==initial_targets+1 and created['version']==int(os.environ.get('DOME_SHAPE_EXPECT_VERSION','16')),'Actual native Apply authors a persisted target and independent before-state capsule')
   await command('Duplicate shapekey...');dialog=await wait(lambda:named('Duplicate shapekey'));g=dialog.get_geometry();tap(dialog,g.width*.75,g.height-(46 if compact else 32)*2+24);await wait(lambda:named('Duplicate shapekey') is None);await ready('New shapekey...');await command('Save');duplicated=inspect()
   check(len(duplicated['objects'][0]['deformation']['morphs']['targets'])==initial_targets+2,'Native duplicate uses the real background key and normal-frame authoring operation')
   await command('Undo');await command('Save');check(inspect()==created,'One universal Undo restores the complete earlier source and target set')
