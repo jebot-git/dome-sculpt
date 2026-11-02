@@ -1,0 +1,35 @@
+{
+  "source_commit": "53ff88b",
+  "scope": "Editable SurfaceMap/grid only; no Scene24 codec/native/GPU/export claim",
+  "source": {
+    "include/dome/paint-sampling.hpp": "567cd6b87b292ba9203f5deeef36d314fa4a3eee1473fb43beff47de220fbb15",
+    "include/dome/paint.hpp": "daa4c0e80db4bf974aac9af888bd8f78322c62f1027bebdd28896b6095f10be3",
+    "src/paint-sampling.cpp": "514cba2b2d3b9bda034682556a3cbdf2f9f866c143fec7c793e7c873ffff1e3a",
+    "src/paint.cpp": "7bc3a0befb9196492aa698b9226c4477900c20456c3919d91539fba8fbacec12",
+    "src/scene.cpp": "8ae59825f538831268ca3397c4b47635d2cec4f5bd05200c18ed4721d0939d1a",
+    "src/paint-sampling-access.hpp": "a10b61810061f1166b36b72458fd4ad75c203f14b097ee9bad9c3c187ba5b8d1",
+    "tests/paint-sampling.cpp": "a133505c9e5f4db3386eea84d175e842030553f7773be30130751b72c4768c9a",
+    "tests/paint-sampling-grid.cpp": "d51b5373d9458249bc6aaecc0cf6bc12a52a90a8785c0b0551b452fe0245685e",
+    "CMakeLists.txt": "d3b14c2a7a2c2b9bc2b0a553c71e02ad42f4a652842e9e709632b9685e3670aa"
+  },
+  "release": {
+    "passed": 3,
+    "seconds": 2.75,
+    "log_sha256": "cd69bc7d7fbf8d07fce9b50bc805122e584a807d433c4bf1aa5ab2dcf55ebc07"
+  },
+  "own_core_c_cxx_sanitizers": {
+    "passed": 3,
+    "seconds": 26.17,
+    "flags": "O1 g1 ASAN UBSAN fno-omit-frame-pointer fno-pie/no-pie; leaks enabled",
+    "log_sha256": "3b542658bcd3d369d663e60907b53f3e39cf4b0e91a39c6f3a34cf654d028c38"
+  },
+  "assertions": {
+    "geometry": 62,
+    "grid": 84,
+    "persistent_grid_allocation_boundaries": 32
+  },
+  "archives": {
+    "build/libdome-sculpt-core.a": "b5459023f34d377a1ba7d4b19e336492996064c05cf41e0e8c1278f748433972",
+    "build-ownsan/libdome-sculpt-core.a": "58a1040192ba7fa6a69d76cc11f8a6c19b0f54e8e2ad5f8eb9644317314e4f58"
+  }
+}
