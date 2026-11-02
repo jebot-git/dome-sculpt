@@ -1,0 +1,113 @@
+{
+  "private_checkpoint": true,
+  "parent": "a54cc76",
+  "verified_domed": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "scope": "Authenticated current-corner RGBA source Bake into an ordinary target; no new public layout/archive",
+  "source_sha256": {
+    "CMakeLists.txt": "7e62a26945a6d5290785fc42d8053827fabcab47d3200c0397cdf59cf5b85e81",
+    "src/bake-authoring.cpp": "4ef4776b007babf1302d2000905a09b62a5a37d4024b16c21841f547d3636e45",
+    "src/document-baking.cpp": "d74fabb65d94f501c6379d1111ec798b01577705ca2eae7f13b6a0cb8ed71d3a",
+    "tests/bake-color-menu.py": "6698b85dfcf62f6c2ae727916e3effa9c904fc124247133fe28e74f5e152bb4f",
+    "tests/bake-color-xr.py": "827b1749292c23cbb2750b4201a43733d958a77f6c57c62024a47680b39db5e4",
+    "tests/current-color-bake.cpp": "1c58da9ab8cd545b4c609cfc8f4333261c8baf370d3d31cf0365fb4b3037e97b",
+    "tests/current-color-bake-fixture.hpp": "7494f690e4781d420e6db452af0f289c5ec5123495aedaf8d3bbe0fa39a766b3",
+    "tests/current-color-bake-faults.cpp": "52a517d89ee6f32ded34eadb804e8c1b3eb038d769b110e22641405f234926c1",
+    "tests/current-color-bake-render.cpp": "dd1ea132819dd50a7e270ad14accf5cbabe54638a59d3fa9d3eb87ef6abf02b1",
+    "docs/CURRENT-COLOR-SOURCE-BAKE.md": "c0bd60116a9a670a943c8a74731c8ba9ef531e56ca9a9167ee4f47a2ef2c44f4",
+    "docs/CURRENT-COLOR-SOURCE-BAKE-WIP.md": "d7c6f94d0251f23c8c17088c25f4e1af71cec4892ab9aa6471f13564e9365daf"
+  },
+  "evidence_sha256": {
+    "artifacts/tests-source-bake-final-release.log": "250f6fae75652ec5e3eb8ff9874d676f25199b0db794c69e4e1e5aee12c47107",
+    "artifacts/tests-source-bake-final-sharded-release.log": "15ba79997dad646c9a25eb26502a8d4a7848bcf2093c72e855f7bbda78668544",
+    "artifacts/tests-source-bake-final-sharded-release-assertions.log": "968bfdfaf9b99b5c8b18b77743e37b8aacbec8dc73747d6cfd38ac2bc8bf037e",
+    "artifacts/tests-source-bake-final-sharded-san.log": "da5f24075a9dcac490e131f338d3017ccecfb176df511bdcd6cc230175a52eef",
+    "artifacts/tests-source-bake-final-sharded-san-assertions.log": "70763a29c12731a0d597dcbb98c78776bc5731448fb9983f3af1cd2c8ba68f30",
+    "artifacts/tests-source-bake-final-san.log": "1157922d423d42164d6e39c1e33ac2e8b87e5a21b688e07445f5cd4b5aff20b1",
+    "artifacts/tests-source-bake-final-menu.log": "16dafc6b5df2e4632ff39547de9d5c22fa45c8c267b6723a8886bdf20ff59c12",
+    "artifacts/tests-source-bake-final-compact.log": "620191729067883d65cad4f7f0f21b5d3e06eab551464e13fcb9c88f0d25ba09",
+    "artifacts/tests-source-bake-final-legacy-menu.log": "16dafc6b5df2e4632ff39547de9d5c22fa45c8c267b6723a8886bdf20ff59c12",
+    "artifacts/tests-source-bake-final-xr.log": "62d20453f34419fff1632c6fc2fe23c4928dec5ee1ec99a2c1e10349707d0891",
+    "artifacts/tests-source-bake-final-arc.log": "888c182c2d0e6039b1eec4ec8c569d98be2d605856c683031df80d2594ed5716"
+  },
+  "binary_sha256": {
+    "build/dome-sculpt": "95252a3acb73adac266f17762b7d058915734532fb0f439008ca9bc8d0f7895c",
+    "build/dome-sculpt-current-color-bake-test": "523c4d34235151508557c5c47c583e2863cfb71e191cbfca5309c80c8543e590",
+    "build/dome-sculpt-current-color-bake-render-test": "673bdd6e89fd9dd3dec907a0643046e2350a53e8e3c2b9bf59dc8b964d5adfa2",
+    "build/dome-sculpt-current-color-bake-faults-test": "ae9d462a35831f30b7f84f87f684749a92e107862d5a18fe571490b92f8a622a",
+    "build/libdome-sculpt-core.a": "5bcce4f3827c4a26b138d8241b135ded08e501822f0341db9796fcc97c180709",
+    "build/libdome-sculpt-test-runtime.so": "e0a5be823a6fe840001c75c30f4724fbb56e6306d8c480596bb1908c1e57607c",
+    "build-san/dome-sculpt-current-color-bake-test": "d67f04c7ff1594656d22902503d6a7d2f4e50b0689664460a161db30bb17038e",
+    "build-san/dome-sculpt-current-color-bake-render-test": "18aaac47b4d7537c11ecb6d203f13216567e8368e654c22eaefc30fef317bf09",
+    "build-san/dome-sculpt-current-color-bake-faults-test": "4c1c34dd07c6abacce311177a165ebf2bbc1a7e664d4b6ac91376cdfd22e2d1b",
+    "build-san/libdome-sculpt-core.a": "663807f7df65f055bf79d1f9c8e88b6a09041c183192092f8d8c00e4f6c3a0da"
+  },
+  "completed": {
+    "native_direct": 49,
+    "independent_renderer_export": {
+      "cases": 16,
+      "checks": 133,
+      "source_image_maxerror": 1,
+      "independent_glb_maxerror": 0,
+      "actual_arc_a770": true,
+      "software_gl": true,
+      "compute": "CPU"
+    },
+    "release_selected_suites": {
+      "initial_native_renderer_legacy": 5,
+      "final_sharded_source_fault": 7,
+      "distinct_names": 10
+    },
+    "whole_core_support_render_sanitizers": {
+      "suites": 10,
+      "seconds": 794.36,
+      "asan": true,
+      "ubsan": true,
+      "leaks": true,
+      "external_system_libraries_instrumented": false
+    },
+    "persistent_owned_new_faults": {
+      "packed": 858,
+      "precommit": 4393,
+      "precommit_ranges": [
+        [
+          1,
+          1098
+        ],
+        [
+          1099,
+          2196
+        ],
+        [
+          2197,
+          3294
+        ],
+        [
+          3295,
+          4393
+        ]
+      ],
+      "actual_complete_helper_retry_per_boundary": true,
+      "complete_preparation_sweep": false
+    },
+    "fltk_current": 9,
+    "fltk_compact": 9,
+    "fltk_legacy_regression": 9,
+    "real_loader_openxr": 11,
+    "physical_hmd": false
+  },
+  "initial_budget_failure": {
+    "fixture": "unsharded precommit",
+    "timeout_seconds": 600,
+    "completed_boundary_at_least": 2144,
+    "product_failure": false,
+    "resolution": "Four disjoint measured shards; all complete"
+  },
+  "limitations": [
+    "Current-field target preparation remains guarded; Scene20 implementation separate and unfinished",
+    "Prepared source color/normal, unsupported artist frames, typed MToon and active UV1 roles remain guarded",
+    "Selected-key sculpt mode requires finishing before Bake",
+    "Two explicit actual allocation phase sweeps, not a complete preparation/publication/all-driver fault proof",
+    "Source Save/reopen tested after accepted worker completion; no new generic immediate queued Save claim",
+    "No all-native, full OneAPI, physical headset, installation or session restart claim"
+  ]
+}
