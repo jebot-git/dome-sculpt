@@ -31,13 +31,14 @@ void make_fixture(const char *path){
 }
 void volume(const char *input,const char *output){
  std::ifstream file(input);nlohmann::json j;file>>j;const auto source=Volume::decode(j);const auto before=ordered(source);const auto owner=source.geometry_owner();
+ const auto previous_dispatches=dispatches;
  SculptResolutionOptions options;options.voxel_size=source.voxel_size();
- auto noop=resample_sculpt(source,options);check(!noop.replacement&&!dispatches,"Same-voxel no-op does not dispatch");
+ auto noop=resample_sculpt(source,options);check(!noop.replacement&&dispatches==previous_dispatches,"Same-voxel no-op does not dispatch");
  options.voxel_size=.02f;const auto start=std::chrono::steady_clock::now();auto result=resample_sculpt(source,options);
  const auto elapsed=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
  check(result.replacement.has_value()&&result.report.source.closed_manifold()&&result.report.target.closed_manifold(),"Actual resampling passes unchanged quality and topology checks");
  check(ordered(source)==before&&source.geometry_owner()==owner,"Actual resampling preserves exact input and owner");
- if(compute_backend()=="CPU")check(dispatches==0,"CPU path retains original map interpolation");else check(dispatches>=3&&queries_sent>0,"Every nonempty layer/mask uses the selected backend");
+ if(compute_backend()=="CPU")check(dispatches==previous_dispatches,"CPU path retains original map interpolation");else check(dispatches-previous_dispatches>=3&&queries_sent>0,"Every nonempty layer/mask uses the selected backend");
  const auto good=ordered(*result.replacement);std::ofstream(output)<<good.dump();
  Scene scene;scene.active().volume=std::make_shared<Volume>(source.geometry_snapshot());const auto retained=scene.active().volume;
  if(compute_backend()!="CPU"){
@@ -48,6 +49,13 @@ void volume(const char *input,const char *output){
  options.cancelled=[] {return true;};check(refuses([&]{resample_sculpt_object(scene,scene.active().id,options);})&&scene.active().volume==retained,"Cancellation cannot publish a candidate");
  std::cout<<"VOLUME backend="<<compute_backend()<<" total_ms="<<elapsed<<" dispatches="<<dispatches<<" queries="<<queries_sent<<" layer_samples="<<result.report.layer_samples<<" mask_samples="<<result.report.mask_samples<<" work="<<result.report.work<<'\n';
 }
+void missing_volume(const char *input){
+ std::ifstream file(input);nlohmann::json j;file>>j;Scene scene;
+ scene.active().volume=std::make_shared<Volume>(Volume::decode(j));const auto owner=scene.active().volume;const auto before=ordered(*owner);
+ SculptResolutionOptions options;options.voxel_size=.02f;
+ check(refuses([&]{resample_sculpt_object(scene,scene.active().id,options);}),"Actual resolution refuses absent selected GPU");
+ check(scene.active().volume==owner&&ordered(*owner)==before,"Missing GPU preserves exact original layers, masks and owner");
+}
 void session(){
  Field field;std::vector<Entry> entries;
  for(int z=-5;z<=5;++z)for(int y=-5;y<=5;++y)for(int x=-5;x<=5;++x){double value=double(x*31+y*7-z*11)/137.;field.emplace(Int3{x,y,z},value);entries.push_back({{x,y,z},value});}
@@ -55,6 +63,8 @@ void session(){
  Grid grid(entries);const auto p=parameters(.037f,.023f,.37);SparseFieldSampler sampler(grid,p,257);
  for(int iteration=0;iteration<3;++iteration){auto actual=sampler.sample(queries);check(actual.size()==queries.size(),"Session returns complete output");for(size_t i=0;i<actual.size();++i)check(actual[i]==reference(field,queries[i],.037f,.023f,.37),"Native backend result differs from independent map formula");std::reverse(queries.begin(),queries.end());}
  check(sampler.sample({}).empty(),"Empty query retains valid session");
+ auto detached=[&]{Grid temporary(entries);return std::make_unique<SparseFieldSampler>(temporary,p,127);}();
+ auto detached_result=detached->sample(queries);for(size_t i=0;i<queries.size();++i)check(detached_result[i]==reference(field,queries[i],.037f,.023f,.37),"Device session outlives original host grid without borrowed cells");
  auto invalid=queries;invalid.front().x=INT32_MAX;check(refuses([&]{sampler.sample(invalid);}),"Invalid scaled coordinate refused");check(sampler.sample(queries).size()==queries.size(),"Admission refusal does not poison an unused queue");
  size_t cancel_calls=0;const size_t validation_calls=(queries.size()+255)/256+1;
  check(refuses([&]{sampler.sample(queries,[&]{return ++cancel_calls>validation_calls+2;});}),"Cancellation after completed query chunk refuses full result");
@@ -69,6 +79,8 @@ std::vector<uint64_t> wrapped_sample(SparseFieldSampler *sampler,std::span<const
 int main(int argc,char **argv){try{
  if(argc==3&&std::string_view(argv[1])=="--make")make_fixture(argv[2]);
  else if(argc==4&&std::string_view(argv[1])=="--volume")volume(argv[2],argv[3]);
+ else if(argc==4&&std::string_view(argv[1])=="--repeat-volume")for(int i=0;i<3;++i)volume(argv[2],argv[3]);
+ else if(argc==3&&std::string_view(argv[1])=="--missing-volume")missing_volume(argv[2]);
  else if(argc==2&&std::string_view(argv[1])=="--missing"){Grid grid(std::vector<Entry>{{{0,0,0},1}});check(refuses([&]{SparseFieldSampler sampler(grid,parameters(.04f,.02f,0));sampler.sample(std::vector<Point>{{0,0,0}});}),"Missing GPU fails explicitly");}
  else session();
  std::cout<<"PASS "<<checks<<" native resample backend checks on "<<compute_backend()<<'\n';return 0;
