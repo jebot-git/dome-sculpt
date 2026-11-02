@@ -1,0 +1,85 @@
+{
+  "recorded_utc": "2026-11-02T04:07:27.882557+00:00",
+  "status": "private guarded source-coordinate pipeline; incomplete production integration",
+  "product_source": "8a2362e38fdc93aa4b1ae2424536960485d3f6da",
+  "pipeline_source": "0977721",
+  "source_sha256": {
+    "CMakeLists.txt": "777a59684073be1345405961030809447ef6127864bccf9a1aff450ba21f3fee",
+    "include/dome/source-maps.hpp": "a3ddaed6a9137a02aa50f9b92632a24be04e3fd2e56a3575d3340cd4f0f4c84e",
+    "src/document.cpp": "42eb3e0911b80ec87ca252ba673edfb3d29560064d4673ed202a4bbb54c94e40",
+    "src/export.cpp": "ddaf8911afccf866393f0d4010c88cae8cfe3e875e9f0c68eca02ba951c9f144",
+    "src/geometry-identity.hpp": "b85886f2f1e06f4d1d117a7bbd9ba4930db528e21ee58a61a3413bb751551929",
+    "src/material-visibility.cpp": "8e29e5811c96de1d27f51bd0e7268b27d824274f2960df0ee967ef579e82d115",
+    "src/paint.cpp": "b24fd6ec16821c63611eafab87abf0e871d4ea184b7e05ac10895a28d6fb3f71",
+    "src/render.cpp": "ac52435779bd7dba7694354bdb41be46e280abce1b8b8626084fc7b86d2fc3f0",
+    "src/scene-feature-version.hpp": "997e723f8cf4345c0d3461959106b091a52b5ad65c344e641ef18fda66634f73",
+    "src/scene.cpp": "7b72e118f2ec875d3d8dfcea5b1b37ecb369e0ce4a12ad5febb06e2f9ea319cf",
+    "src/source-maps.cpp": "b22d755d1532a11af90fc2b6eb2651433ba1b963b4865ddc57454c8ca47bea92",
+    "src/source-uv-bake.cpp": "6c644090c024f714f4d17c7c0b9ebfef062a20551901bec4c8d70895da466105",
+    "src/import-authoring.cpp": "f6de464b2d682e05587da90d3d1f041b7e80113cb4c1f015d098484ac8fb2fc9",
+    "tests/source-uv1.cpp": "4ae1036820ad725d028d44d665b53a1b679aefe8c917f72682018a2affc522f9",
+    "tests/source-uv1-render.cpp": "c19c9cb31d0da21fcba6cd68f11bfa3db7edc7cb64855c9e849562ec62f1ff62"
+  },
+  "all_targets_build": "Optimized Release CPU backend; UI and XR enabled; canonical EEE toolkit inputs verified unchanged at DomeD d271",
+  "initial_full_Release": {
+    "report": "artifacts/tests-source-uv1-full.xml",
+    "sha256": "ac92d79316ab2d8d3221930234cb76e1701838976a6d080e5566363a7d2c8759",
+    "tests": 252,
+    "failures": 1,
+    "seconds": 1164.0
+  },
+  "initial_failure": "251/252 pass; import-authoring expected the existing require TEXCOORD_0 refusal. UV1 still refused but paired-domain validation changed the message. A narrow native importer guard restores explicit existing policy, unchanged assertion.",
+  "guard_repair_Release": {
+    "report": "artifacts/tests-source-uv1-import-guard.xml",
+    "sha256": "095c5bacd42edd39844e5dbf21b9f34e1414c48a5c7d2b81a33eba3c85fa31fe",
+    "tests": 4,
+    "failures": 0,
+    "seconds": 2.0
+  },
+  "initial_sanitizer": {
+    "report": "artifacts/tests-source-uv1-sanitize.xml",
+    "sha256": "d9c26395ce2d147264db44bc01a8aad738f0de4761beade909ce512e140dcd70",
+    "tests": 7,
+    "failures": 0,
+    "seconds": 72.0
+  },
+  "guard_repair_sanitizer": {
+    "report": "artifacts/tests-source-uv1-import-guard-sanitize.xml",
+    "sha256": "d451ad090d4e166e53d45525718f5fc491bf1e8a808d8e2ee8836219b28bcfcc",
+    "tests": 2,
+    "failures": 0,
+    "seconds": 0.0
+  },
+  "sanitizer_scope": "Fresh own C/C++ core/support and selected fixtures ASan/UBSan/leaks; UI/XR OFF; no instrumented renderer/frontend/runtime claim",
+  "native_UV1_workflow": "Actual Document UV draft Cancel, Apply, Save after worker, restart and one Undo/Redo; exact original source-coordinate owner retained",
+  "gui": {
+    "source": "0977721",
+    "FLTK_UV_checks": 12,
+    "DomeD_d271_Wayland_checks": 8,
+    "scope": "Existing actual rigged UV workflow and universal-menu regression; source-specific UV1 preparation proved separately at native Document level",
+    "UV_report_sha256": "bbe628692e82d9dda650638a9e47a53cf8e7d0ea58bd84815601fb9da07f289d",
+    "Dome_report_sha256": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af"
+  },
+  "Arc": {
+    "source": "0977721",
+    "checks": 13,
+    "PBR_roles": 5,
+    "all_image_max_error": 0,
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "selector": "DRI_PRIME=pci-0000_03_00_0",
+    "log": "artifacts/test-source-uv1-final-Arc.log",
+    "log_sha256": "2130919e953172ba94f58539785056df6fb889c96dc7206cec3e3547bb7ef179"
+  },
+  "GLB": "Independent cgltf validates actual TEXCOORD_1 bytes and per-role coordinate references",
+  "uncompleted": [
+    "Fresh combined integration with published affine import/xatlas fixes.",
+    "Generic native UV1 import/painting before explicit atlas preparation, especially independent UV1 under overlapping UV0.",
+    "Prepared normal/key/topology UV1 consumers; no guard lifted.",
+    "Actual UV1 GUI/controller/OpenXR workflow and broader deformation/export image coverage.",
+    "Full REQUIREMENTS.md production scope remains active."
+  ],
+  "system_installation": false,
+  "physical_headset_test": false,
+  "session_restart": false,
+  "production_complete": false
+}

@@ -1514,7 +1514,7 @@ void Document::mesh_loop() {
         geometry_detail::Dependency dep;dep.object=o.id;
         if(job->scene.has_affine_placement(o.id))dep.affine_world=job->scene.world_matrix(o.id);
         else dep.world=job->scene.world_transform(o.id);
-        if(o.mesh_active)dep.paint=o.painted->mesh_owner();
+        if(o.mesh_active){dep.paint=o.painted->mesh_owner();if(o.painted->source_maps())dep.source_uv1=o.painted->source_maps()->uv1;}
         else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
         dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;dep.polygon=o.polygon;
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
@@ -1596,7 +1596,12 @@ void Document::mesh_loop() {
           throw std::invalid_argument("Baked normal detail requires a complete canonical preview basis");
         auto frames = canonical && !retained ? tangent_corners(o.mesh, cancelled)
                                             : std::vector<Tangent>{};
+        std::shared_ptr<std::vector<std::array<float,2>>> packed_uv1;
+        if(o.textures&&o.textures->source_maps&&o.textures->source_maps->uv1){
+          o.textures->source_maps->validate_surface(o.mesh);packed_uv1=std::make_shared<std::vector<std::array<float,2>>>();packed_uv1->reserve(packed_vertices);
+        }
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
+          if(packed_uv1)packed_uv1->push_back(o.textures->source_maps->uv1->at(vertex));
           if(!colors.empty() || !snapshot->source_colors.empty())snapshot->source_colors.push_back(colors.empty()?std::array<float,4>{1,1,1,1}:colors.at(vertex));
           snapshot->mesh.positions.push_back(frame?detail::placed_position(*frame,o.mesh.positions.at(vertex)):vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
           snapshot->mesh.normals.push_back(frame?detail::placed_normal(*frame,o.mesh.normals.at(vertex)):vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
@@ -1661,7 +1666,9 @@ void Document::mesh_loop() {
         // reflected orientation once so GPU and material-aware ray front faces
         // agree with the original local primitive. Rest indices stay untouched.
         if(reflected)for(size_t c=first;c<snapshot->mesh.indices.size();c+=3)std::swap(snapshot->mesh.indices[c+1],snapshot->mesh.indices[c+2]);
-        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, o.textures, std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
+        auto textures=o.textures;
+        if(packed_uv1){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);maps->uv1=std::move(packed_uv1);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);textures=std::move(packed);}
+        snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
         if(frame)snapshot->ranges.back().affine_world=frame->world();
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;

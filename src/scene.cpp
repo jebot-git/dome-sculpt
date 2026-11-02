@@ -209,7 +209,7 @@ void Scene::validate(bool deep_sources) const {
     if(!paint || (origin && !retained_paint.insert(paint.get()).second))return;
     if(paint->in_stroke())throw std::invalid_argument("Retained UV paint source has an unfinished stroke");
     if(const auto &maps=paint->source_maps()) {
-      maps->validate();
+      maps->validate_surface(paint->mesh());
       for(const auto *slot:{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion})
         if(slot->image)source_images.add(slot->image);
     }
@@ -365,7 +365,7 @@ nlohmann::json Scene::encode() const {
   bool resolved=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.material_bindings) || (!o.mesh_active && bool(o.deformation));});
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
   const bool framed=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){if(!o.material_bindings)return false;const auto &b=*o.material_bindings;return bool(b.normal_frames) || (b.uv_origin && (b.uv_origin->deformation || !b.uv_origin->creator_kind.empty() || !b.sampling_reparameterized));});
-  unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
+  unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
   if(std::any_of(groups_.begin(),groups_.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);}) ||
       std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.affine_edit);}))feature_version=std::max(feature_version,13u);
   for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get())});
@@ -457,7 +457,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>16)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>18)throw std::runtime_error("Unsupported scene version");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
@@ -868,6 +868,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     result.objects_.push_back(std::move(o));
   }
   placements.require_reachable();
+  for(const auto &o:result.objects_)if(std::max({detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get())})>unsigned(version))throw std::invalid_argument("Source sampling requires its actual scene feature version");
   result.validate();
   return result;
 }

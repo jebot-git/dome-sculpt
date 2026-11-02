@@ -165,6 +165,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     GltfObjectIdentity emission;
     if(frame){emission.canonical_normal=frame->canonical_normal;emission.prepared_normal=frame->prepared_normal;}
     auto &mesh = o.mesh;
+    const auto source_uv1=input.textures&&input.textures->source_maps?input.textures->source_maps->uv1:nullptr;
+    if(source_uv1)input.textures->source_maps->validate_surface(input.mesh);
     std::optional<SourceMorphTransport> source_attributes;
     if(!frame)source_attributes.emplace(o,source_space,cancelled);
     mesh.validate();
@@ -211,7 +213,13 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         begin=data.size();for(auto v:a.source_vertices){if(v>=values.size())throw std::invalid_argument("Source attribute vertex index is missing");floats(values[v]);}
         attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
       };
-      attribute(source->uv1,"TEXCOORD_1","VEC2");
+      if(!source_uv1)attribute(source->uv1,"TEXCOORD_1","VEC2");
+      else if(!source->uv1.empty()){
+        if(a.source_vertices.size()!=mesh.positions.size())throw std::invalid_argument("Export UV1 appearance domain differs from emitted vertices");
+        for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();auto native=frame?frame->rest_vertices.at(vertex):vertex;
+          if(source_uv1->at(native)!=source->uv1.at(a.source_vertices[vertex]))throw std::invalid_argument("Export PBR and retained source UV1 domains differ");
+        }
+      }
       if(!frame)tangents=source_attributes->base_tangents();
       if(!frame && !tangents.empty() && o.textures && !o.textures->normal.rgba.empty()) {
         auto canonical=tangent_corners(mesh,cancelled);
@@ -222,6 +230,11 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
             throw std::invalid_argument("Canonical baked normals conflict with retained source tangents; explicit tangent basis conversion is required");
         }
       }
+    }
+    if(source_uv1){
+      begin=data.size();
+      for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();floats(source_uv1->at(frame?frame->rest_vertices.at(vertex):vertex));}
+      attributes["TEXCOORD_1"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");
     }
     if(!tangents.empty()){
       begin=data.size();for(auto t:tangents)floats(t);
@@ -518,7 +531,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   };
   bool secondary_uv_available=false;
   auto source_info = [&](const PaintSourceTexture &slot) {
-    slot.validate();
+    slot.validate(secondary_uv_available?2:1);
     if(slot.texcoord!=0 && !(slot.texcoord==1 && secondary_uv_available)) throw std::invalid_argument("Export surface has no requested source UV set");
     nlohmann::json info={{"index",texture(*slot.image,slot)}};
     if(slot.texcoord) info["texCoord"]=slot.texcoord;
