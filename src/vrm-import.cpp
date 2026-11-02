@@ -231,8 +231,10 @@ VrmImportMetadata vrm_import_metadata(const nlohmann::json &j,
     const auto &typed = out.materials.at(primitive.material);
     if (!typed)
       continue;
-    for (const auto &role : typed->textures) {
-      if (role.index < 0)
+    for (size_t slot = 0; slot < typed->textures.size(); ++slot) {
+      const auto &role = typed->textures[slot];
+      // MatCap samples a view-space normal, not either mesh UV accessor.
+      if (role.index < 0 || slot == size_t(MToonSlot::Matcap))
         continue;
       const int coordinate = typed->version() == MToonVersion::V0 ? 0
                              : role.transform_texcoord >= 0

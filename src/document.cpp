@@ -37,6 +37,19 @@ uint64_t avatar_group(const Scene &scene, uint64_t object) {
   auto path = scene.group_path(group);
   for (auto it = path.rbegin(); it != path.rend(); ++it)
     if (it->humanoid) return it->id;
+  const auto &appearance = scene.object(object).appearance;
+  if (appearance && appearance->vrm_json)
+    for (auto it = path.rbegin(); it != path.rend(); ++it) {
+      if (!it->source_placement || !it->source_placement->model ||
+          it->source_placement->model->asset != appearance->asset ||
+          it->source_placement->model->original_bytes !=
+              appearance->original_bytes)
+        continue;
+      const auto instance = it->source_placement->source_instance;
+      if (std::any_of(path.begin(), path.end(),
+                      [&](const auto &g) { return g.id == instance; }))
+        return instance;
+    }
   return group;
 }
 bool in_group(const Scene &scene, const SculptObject &object, uint64_t group) {

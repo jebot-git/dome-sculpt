@@ -6,6 +6,12 @@ counts, changed morph-normal recomputation and diagnostics. It reuses the GLB
 writer's exact emitted identities; no temporary glTF file or external converter is
 used. Cancellation, bounded resources and validation precede the atomic write.
 
+The additional private original-space imported-avatar route is documented in
+[VRM-SOURCE-GRAPH-EXPORT.md](VRM-SOURCE-GRAPH-EXPORT.md). It retains a shared source
+node graph, distinct authored skin inverse binds and current poses for the
+qualified VRM0 subset. The conventional creator rig policy below remains separate;
+the new route does not claim general VRM1, static-accessory or rest-rig editing.
+
 The first supported source version is **VRM0**, including the two verified CC0
 VRoid beta baselines. This is not complete VRM1 support or a claim of complete
 VRM interoperability. VRM1, node constraints, animation tracks, unknown source
