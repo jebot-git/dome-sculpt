@@ -1,0 +1,174 @@
+{
+  "component": "Mixed real source skins, genuine rigid parts and durable source-node attachments",
+  "status": "Private qualified component; full production goal incomplete; root owns integration/publication",
+  "parent": "a7992111cadaba9d8a1f7c2deb839d845246c6a6",
+  "public_fields_or_schema_changes": false,
+  "implementation": [
+    "Original model/instance/node IDs, never bone-name inference",
+    "Source-joint pose remap across distinct skin bind spaces with rest/reference and current-pose agreement",
+    "Atomic rigid F1*inverse(F0) world delta in existing NativeAffineEdit; no per-frame/UI JSON/geometry work",
+    "Rigid residual transform below original emitted source node; validated affine factor chains, no dummy skin",
+    "Complete node/mesh/primitive instance witnesses with bounded count+membership and cancellation",
+    "Existing material/morph/metadata/source leases and exact worker/controller history/cancel/Save retained"
+  ],
+  "proof": {
+    "release": {
+      "suites": 5,
+      "passed": 5,
+      "seconds": 177.34,
+      "native_checks": 424070,
+      "source_world_tolerance_metres": 2e-06,
+      "authoring_checks": 22,
+      "controller_worker_checks": 23,
+      "suites_named": [
+        "vrm-rigid-authoring",
+        "vrm-rigid-source-worker",
+        "vrm-rigid-source-export",
+        "vrm-rigid-source-export-render",
+        "rig-editing"
+      ]
+    },
+    "sanitize": {
+      "suites": 5,
+      "passed": 5,
+      "seconds": 456.52,
+      "per_suite_seconds": [
+        38.05,
+        37.5,
+        214.79,
+        150.27,
+        15.89
+      ],
+      "scope": "Fresh own C/C++ core, affine/polygon/xatlas/ufbx/bothMikk support and renderer O1/g1/ASan/UBSan/leaks; current final two refined C++ sources rebuilt in that coherent tree before this final5-suite run; no borrowed old archives",
+      "C_and_CXX_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "graphics": {
+      "checks": 49,
+      "images": 12,
+      "pixel_tolerance": 2,
+      "software_maxima": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "arc_maxima": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "selector": "DRI_PRIME=pci-0000_03_00_0; LIBGL_ALWAYS_SOFTWARE unset",
+      "GL_VENDOR": "Intel",
+      "GL_RENDERER": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "scope": "Actual female/male19-part geometries plus3 rigid parts, ordinary/reflected skinned mesh node/sheared original source, rest/current pose+morph and rigid per-part affine edits; main/shade independently implemented material subset",
+      "device_released": true,
+      "final_guard_output_18_hashes_identical_to_captured_hardware": true
+    },
+    "gui": {
+      "checks": 7,
+      "failed": 0,
+      "scope": "Actual final-core relinked native FLTK chooser/universal menu in Xvfb/privateHOME/DBus, with a rigid source part selected and complete22-part output; no new physical headset or compositor session test",
+      "DOME_VRM_EXPECT_MESHES": 22,
+      "test": "tests/vrm-source-export-menu.py",
+      "root_union_note": "Root is separately tightening chooser Return into explicit OK-click/close stages in its combined candidate; preserve those future harness hunks, do not relabel this component proof as combined proof"
+    },
+    "validators": {
+      "emitted_files": 18,
+      "Khronos_version": "2.0.0-dev.3.10",
+      "Khronos_errors": 0,
+      "Khronos_warnings": 360,
+      "truncated": false,
+      "issue_filters": false,
+      "official_VRM0_schema_commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+      "official_errors": 0
+    }
+  },
+  "evolving_proof_scopes": {
+    "initial_fresh_SAN": "artifacts/test-sanitize.log:4/4 in327.65s before count/membership and shared-reference guard refinements; not final-source proof",
+    "final_guards_release_first": "artifacts/test-final-guards.log:4/5 passed117.35s; authoring fixture omitted required Object Grab mode, corrected test setup and final5/5 repeated",
+    "controller_first": "artifacts/test-rigid-consumers.log:joystick Next joint closes menu, fixture now reopens actual menu each step",
+    "history_first": "artifacts/test-rigid-worker4.log:import Redo correctly restored pre-selection /active; test now checks exact real snapshots at each independent UI/history transition"
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "938ff393eb4864ddf0b4011b9a55f177c5502935e2e1c0905370b06de0fb8b18",
+    "include/dome/rig-edit.hpp": "89cc3a8896b4d2a56839bf136d0dffe5c4964c4966659c8cca2bf968015d0273",
+    "src/rig-edit.cpp": "d36e8c1197db8e2c42f7dda59e4a39479f2f5daea949cb252a5a423506461ccc",
+    "src/vrm-source-graph.cpp": "e0a9632d7bf2273128f34a0093e7c21753db12b9952380ddfa850788868d0497",
+    "src/vrm.cpp": "1547c0e556eddd0e5be289c512657983e5bc3178ff2048d3ac1c3c698b9e0943",
+    "tests/vrm-source-export-menu.py": "686638d490d2cfae9c9e16043554a1a84090974eecd416afce238a9cfa996aea",
+    "tests/vrm-source-export-ui.cpp": "4014284c47a3c4098393e950363a835a992c678d08db6ea65c6c0625fa97c6ff",
+    "src/source-rigid-pose.cpp": "8e91259855519a30dc5f4e50fde5a80df8ae39980783faee2e6a0f622042be3a",
+    "src/source-rigid-pose.hpp": "8982409196fb82ff4a694d7c57c001a049196ce74b58e0a92967a2668096e703",
+    "tests/vrm-rigid-authoring.cpp": "c99269fbb0748e1b0cc75ced58cb9caa927d4112deed92887823a8e6b881b233",
+    "tests/vrm-rigid-fixtures.hpp": "7f565351ff6055be700adec4eed12026caabf262324bc5e750dd4a7d905ffab4",
+    "tests/vrm-rigid-source-export-render.cpp": "b61327e35e9fe1635bd7f0a578118404b3b07f948c2d7dee880f743712048ca7",
+    "tests/vrm-rigid-source-export.cpp": "2fda952fa9ddc862b2ed518f77c4026de3e07167fbac0d841878d13fafdb9398",
+    "tests/vrm-rigid-source-worker.cpp": "62de10709a97d6dabd29d38740daa582ee164b8b71aa27b08806f7c777a576a0"
+  },
+  "evidence_sha256": {
+    "artifacts/test-release-ready.log": "8055dc64ce6de174980ca9c1954a956720d9671f1f38142a0f8a2aea9b18e1e3",
+    "artifacts/final-release-details.log": "d6450169aed6cdfa7466d95cd9544210d3f55c80323bb8377bbd58e92be4f662",
+    "artifacts/test-final-sanitize.log": "dcd6bd3c2ef28904b5a36dcd66d7b1e70bb3a0098987ded7b9186daf305f9f0f",
+    "artifacts/final-sanitize-details.log": "5214b2b8ecd84d4224401d9b36c0164d50a820a2694c320afd99c348e8936041",
+    "artifacts/rigid-arc.log": "fa6ddc6eba1f652cd7f151b4483c8ecb94be95578d0f670d00817bc9071d592b",
+    "artifacts/gui-rigid-final.log": "e6b990814d1b777200588562412b3a8283a7e6fe3fefba0ab78ade672bb1b3d0",
+    "artifacts/rigid-khronos.json": "2569f6eca3e668cb15a4ebcbb7c40ef9a4b8350a6c25b44b1b2ad75476b3391e",
+    "artifacts/rigid-schemas.json": "9538be35373ce0cd214ba81066dfec9415811bf224dba8d4b0c3e3443c71312d",
+    "artifacts/software-output-hashes.json": "9df7d8abf2657a47420527e44a7585cc884aff5e849070da8476c21260308c2d",
+    "artifacts/hardware-output-hashes.json": "bd308d553f4c7e5492d5aaebb1533577dd2ce78745669e57eccb93f326dc6651"
+  },
+  "input_CC0_sha256": {
+    "assets/humanoid/vroid/base-female.vrm": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b",
+    "assets/humanoid/vroid/base-male.vrm": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c"
+  },
+  "output_sha256": {
+    "build-release/vrm-rigid-source-export/1-rigid-0.vrm": "0facd7e0a0747b9f097fd8d2c19fa663162f86910e1dbb673413f3cd76e60d02",
+    "build-release/vrm-rigid-source-export/1-rigid-1.vrm": "1491c7c18a0b3952ba4f24def67c6dbbc2de70c602b6313f2cdff0c869a108c0",
+    "build-release/vrm-rigid-source-export/1-rigid-2.vrm": "5959dc619efbf3fa96086ba466eca28d65978d25b3a93fd336beb3f9caa07bc9",
+    "build-release/vrm-rigid-source-export/2-rigid-0.vrm": "575c7136a9194b3bd757d89e99eb6a47e1f287d5184936c219de2c74fd08ddb0",
+    "build-release/vrm-rigid-source-export/2-rigid-1.vrm": "b382592389085e490896e625a772dfa7a66493bfa384412b146baa82e68f76e4",
+    "build-release/vrm-rigid-source-export/2-rigid-2.vrm": "c25a2b46dc7042f64e747022f285b57751a9fa6a837c8dfef87a27366fcf713a",
+    "build-release/vrm-rigid-source-export-render/output-1-0-0.000000.vrm": "2b7e0a94a7447c8cb9f5b04b3d5b4852bb0b657e1951f35435191f0c98b2c905",
+    "build-release/vrm-rigid-source-export-render/output-1-0-0.650000.vrm": "dfb8dc12d2ed703b9794bc30414ca7d893392be4978f010bcfec49e975424453",
+    "build-release/vrm-rigid-source-export-render/output-1-1-0.000000.vrm": "03e21e2a4b2cc0c2d77dbeacb19c235c070a24a652952612a270642bf6e460d6",
+    "build-release/vrm-rigid-source-export-render/output-1-1-0.650000.vrm": "a488ce8c03ec4c2e41ab3996f30201ae29c1b1ef10cc83ef09b10b6a2e1e4893",
+    "build-release/vrm-rigid-source-export-render/output-1-2-0.000000.vrm": "bb3354ca6534d127e9b2814b6cf3140d21c697f1a6bbdcbf0310de1a3f610e2b",
+    "build-release/vrm-rigid-source-export-render/output-1-2-0.650000.vrm": "0e7a51cf094db92bfae3e51ee02b22ff11a0b47c110d557f50b5a98be83cad03",
+    "build-release/vrm-rigid-source-export-render/output-2-0-0.000000.vrm": "8ff2719521c401275db0faa4ae647d5635c7df7bb75ad2e887acea53aa5f0e41",
+    "build-release/vrm-rigid-source-export-render/output-2-0-0.650000.vrm": "0faa3bef371d952de9e27aef50b3083727062badded5e6aa09d97f5789ad4185",
+    "build-release/vrm-rigid-source-export-render/output-2-1-0.000000.vrm": "aae70b7388435ecc91829caba1958022fb750ab9753db2db569666fd08e11cac",
+    "build-release/vrm-rigid-source-export-render/output-2-1-0.650000.vrm": "ee3e2080b89868f413ac8c4994a96907b0a4e6a3835309161c232f6642d39d8a",
+    "build-release/vrm-rigid-source-export-render/output-2-2-0.000000.vrm": "1dd15b3f60031708f51e8d9e1ff3c1c99a4311d83802c71e6f543865bfb4f118",
+    "build-release/vrm-rigid-source-export-render/output-2-2-0.650000.vrm": "10c9b7d06a18b42cd48abad5f17f887e9e388b99efc745e4990d6ea268dc7820"
+  },
+  "remaining": [
+    "Source-rest/parent migration and source-less bones; original-source rig conditions remain required",
+    "Divergent skinned per-part placement semantics and new/generated part policies",
+    "VRM1 export, static-only avatars and full expression/first-person/look-at/constraints/physics evaluation",
+    "Broader rich-import/export persistent-allocation-denial proof",
+    "Root union with newer Scene19/Scene20 and viewport/authoring components"
+  ],
+  "no_actions": [
+    "No main edits or push",
+    "No install, display/session restart or physical headset/device test"
+  ]
+}

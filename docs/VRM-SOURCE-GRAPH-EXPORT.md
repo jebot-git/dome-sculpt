@@ -1,5 +1,9 @@
 # Original-space imported VRM0 export checkpoint
 
+The subsequent [mixed rigid-part component](VRM-RIGID-SOURCE.md) extends this
+checkpoint with genuine unskinned parts, durable attachments and their native
+pick/paint/held workflows. The original checkpoint scope below remains historical.
+
 This private component extends the existing native exporter. The full production
 goal remains active and incomplete. It introduces no public field, archive version,
 runtime converter, or new frontend. Root owns integration and publication.

@@ -13,8 +13,9 @@ struct RigEdit {
   std::optional<JointAdjustment> joint;
   std::optional<MorphWeightEdit> morph;
   bool reset_pose = false;
-  // Explicit group operation: only parts with the exact same native rest rig
-  // and joint order participate. No semantic/name-based remapping is inferred.
+  // Explicit group operation. Conventional parts require the same native rest
+  // rig/order; imported source parts remap authenticated original node IDs across
+  // distinct skin bind spaces. Names never reconstruct correspondence.
   bool linked_pose = true;
 };
 // Detached worker operation. Validate every affected part before publishing any

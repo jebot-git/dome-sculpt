@@ -2,6 +2,7 @@
 #include "dome/rig-edit.hpp"
 #include "dome/humanoid-creator.hpp"
 #include <nlohmann/json.hpp>
+#include "source-rigid-pose.hpp"
 namespace dome {
 namespace {
 void check_cancel(const std::function<bool()> &cancelled) {
@@ -45,7 +46,8 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
                      !std::isfinite(edit.morph->weight) || std::abs(edit.morph->weight) > 1))
     throw std::invalid_argument("Invalid shapekey target or weight");
   auto group = rig_group(scene, source);
-  auto signature = pose_edit ? old.skeleton->encode() : nlohmann::json{};
+  auto imported = detail::source_rig_instance(scene, source);
+  auto signature = pose_edit && !imported ? old.skeleton->encode() : nlohmann::json{};
   auto pose = edit.reset_pose ? std::vector<JointTransform>{} : old.pose;
   if (edit.joint) {
     if (pose.empty())
@@ -62,19 +64,73 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
     check_cancel(cancelled);
     bool selected = o.id == object;
     if (!selected) {
-      if (!pose_edit || !edit.linked_pose || !group || rig_group(scene, o) != group ||
-          !o.deformation || !o.deformation->skeleton || !o.deformation->skin ||
-          o.deformation->skeleton->encode() != signature) continue;
-      if (source.appearance && o.appearance &&
-          source.appearance->source_joint_nodes != o.appearance->source_joint_nodes)
-        throw std::invalid_argument("Grouped parts have different authored joint identities");
+      if (!pose_edit || !edit.linked_pose) continue;
+      if (imported) {
+        auto other = detail::source_rig_instance(scene, o);
+        if (!other || other->model != imported->model ||
+            other->source_instance != imported->source_instance) continue;
+        if (!o.deformation || !o.deformation->skeleton || !o.deformation->skin) {
+          // A locked rigid descendant is protected even though it has no skin.
+          if (o.locked && edit.joint) {
+            auto joint = source.appearance->source_joint_nodes.at(edit.joint->joint);
+            for (const auto &g : scene.group_path(o.group))
+              if (g.source_placement && g.source_placement->model == imported->model &&
+                  g.source_placement->source_node == joint)
+                throw std::invalid_argument("A rigid source-rig descendant is locked");
+          }
+          continue;
+        }
+      } else {
+        if (!group || rig_group(scene, o) != group || !o.deformation ||
+            !o.deformation->skeleton || !o.deformation->skin ||
+            o.deformation->skeleton->encode() != signature) continue;
+        if (source.appearance && o.appearance &&
+            source.appearance->source_joint_nodes != o.appearance->source_joint_nodes)
+          throw std::invalid_argument("Grouped parts have different authored joint identities");
+      }
     }
     // Hidden parts still share the rig and must follow it; locked parts must
     // reject the whole linked operation rather than silently remaining behind.
     if (o.locked || !o.mesh_active || !o.painted)
       throw std::invalid_argument("A linked rig part is locked or has no rest mesh");
     auto next = std::make_shared<DeformationState>(*o.deformation);
-    if (pose_edit) next->pose = pose;
+    if (pose_edit) {
+      if (imported && !selected) {
+        const auto &from = source.appearance->source_joint_nodes;
+        const auto &to = o.appearance->source_joint_nodes;
+        if (to.size() != next->skeleton->bones.size())
+          throw std::invalid_argument("Linked source-rig joint identity table is stale");
+        const auto before_local = old.skeleton->local_matrices(old.pose);
+        const auto other_local = next->skeleton->local_matrices(next->pose);
+        auto remapped = next->pose;
+        if (remapped.empty())
+          for (const auto &bone : next->skeleton->bones) remapped.push_back(bone.rest);
+        for (size_t slot = 0; slot < to.size(); ++slot) {
+          auto at = std::find(from.begin(), from.end(), to[slot]);
+          if (at == from.end())
+            throw std::invalid_argument("Linked source-rig lacks a joint identity");
+          auto original = size_t(at-from.begin());
+          if (before_local.at(original) != other_local.at(slot)) {
+            const auto &baseline = imported->model->asset->nodes.at(to[slot]).local;
+            if (before_local.at(original) == baseline || other_local.at(slot) == baseline)
+              throw std::invalid_argument("Linked source rig has an unsynchronised authored pose; resolve the source views explicitly");
+            throw std::invalid_argument("Linked source rig has conflicting authored poses across skin views");
+          }
+          const auto &before = old.skeleton->bones.at(original);
+          const auto &after = next->skeleton->bones.at(slot);
+          auto reference=[](const JointTransform &t) {
+            return std::array<float,10>{t.translation.x,t.translation.y,t.translation.z,
+              t.rotation.w,t.rotation.x,t.rotation.y,t.rotation.z,
+              t.scale.x,t.scale.y,t.scale.z};
+          };
+          if (before.rest_matrix != after.rest_matrix || !before.rest_matrix ||
+              reference(before.rest) != reference(after.rest))
+            throw std::invalid_argument("Linked source-rig rest axes differ");
+          remapped[slot] = pose.empty() ? after.rest : pose.at(original);
+        }
+        next->pose = edit.reset_pose ? std::vector<JointTransform>{} : std::move(remapped);
+      } else next->pose = pose;
+    }
     if (selected && edit.morph) {
       if (next->morph_weights.empty()) next->morph_weights.resize(next->morphs->targets.size());
       next->morph_weights.at(edit.morph->target) = edit.morph->weight;
@@ -85,6 +141,31 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
   check_cancel(cancelled);
   Scene result = scene;
   for (auto &[id, next] : changes) result.object(id).deformation = std::move(next);
+  if (pose_edit && edit.linked_pose && imported) {
+    for (const auto &o : scene.objects()) {
+      check_cancel(cancelled);
+      if (o.deformation && o.deformation->skin) continue;
+      auto other = detail::source_rig_instance(scene, o);
+      if (!other || other->model != imported->model ||
+          other->source_instance != imported->source_instance) continue;
+      auto frame = [&](const Scene &state) {
+        AffineTransform value;
+        for (const auto &g : detail::source_rigid_groups(
+                 state,state.object(o.id),state.group_path(o.group),cancelled))
+          value = value * group_local_matrix(g);
+        return value;
+      };
+      const auto before = frame(scene), after = frame(result);
+      if (before.matrix() == after.matrix()) continue;
+      if (o.locked)
+        throw std::invalid_argument("A rigid source-rig descendant is locked");
+      const auto world = after * before.inverse() * scene.world_matrix(o.id);
+      auto &next = result.object(o.id);
+      next.affine_edit = std::make_shared<const NativeAffineEdit>(
+          result.parent_matrix(o.id).inverse() * world *
+          affine_similarity(next.transform).inverse());
+    }
+  }
   result.validate(false);
   check_cancel(cancelled);
   scene = std::move(result);
