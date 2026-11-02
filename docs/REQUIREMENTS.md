@@ -65,8 +65,16 @@ All51598 unique component allocation boundaries pass Release and ownedSAN via
 42/44 original plus4 timeout-only samebinary finer ranges. Emitted170 Khronos
 files have0errors/1194unfilteredwarnings; official71VRM0×15schemas have0errors.
 Read SCENE20-AUTHORING-INTEGRATION.md for the exact scopes and initial negatives.
-Private Scene21/22/23 and ordered generic Save work are excluded. All unfinished
-original rows and the post-basic controller drawers remain required.
+Private Scene21/22/23 and ordered generic Save work are excluded from that
+Scene20 checkpoint. The subsequent IO/navigation integration adds common
+accepted-authoring/UV Save and native six-axis navigation without a new Scene
+schema. Fresh Release full373/375 plus corrected3/3, ownedSAN14/14 plus
+corrected3/3 and desktop1/1, actualFLTK26Release+26SAN, Wayland11 and actual
+Save/Close7Release+7SAN pass. Frozen common-Save component completes all9795
+post-Bake publication denials in Release and ownedSAN with full-helper retries.
+Read AUTHORING-IO-SPACENAV-INTEGRATION.md for preserved initial negatives and
+exact scopes. Physical input acceptance and inherited Wayland/XR lifetime reports
+remain open. All unfinished original rows and post-basic drawers remain required.
 
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in
@@ -118,7 +126,7 @@ shading is inside it.
 | VR controllers | Live native action mapping implemented; synthetic controller edits, ordered focus/shutdown boundaries, native stop/resume, tracking loss and reference-space changes tested | Live pose/action/haptic mapping; reconnect/focus/session-loss and frame timing verification |
 | Spatial stylus | Native MX Ink calibrated-tip/middle-force/tip-force bindings implemented and exercised through the synthetic runtime; physical verification pending | Actual stylus OpenXR/driver bindings, tip calibration, pressure/buttons and physical stylus verification |
 | Joystick-spawned/driven menus | BDF root/object/material/paint pages plus large ray-drag sliders, continuous thumbstick/fine-wheel adjustments, RGBA rows and transaction/cancellation tests | Render and navigate every required workflow menu using live joystick actions |
-| Default trackball/3D mouse input | Trackball orbit/pan/zoom verified in FLTK | Complete intended 3D-mouse device workflow and confirm physical trackball behavior; plain-mouse emulation is optional |
+| Default trackball/3D mouse input | Native spacenav Unix six-axis camera navigation, View controls, ownership/release fences and real socket/FLTK/Wayland fixtures; see DESKTOP-SPACENAV.md | Physical 3D-mouse/spacenavd and physical trackball acceptance remain required. Shared-backend Wayland EGL and standalone XR allocation reports remain open; plain-mouse emulation is optional |
 | Substance-like texturing | Partial: sparse COW paint layers, color/metal/rough/emission/mask channels, pressure capsules across UV seams, compositing, exact history, persistent normal/AO/PBR baked base, native FLTK/XR paint controls, stable editable UVs and embedded PNG exports tested | Native layered channels, brush/stencil/projection painting, masks, texture sets, bake workflow and editable persistence |
 | Skinning/weight painting | Native constrained normalization/prune/mirror/transfer, durable skin/morph state, live immutable desktop/XR pressure preview, influence locks/limits, symmetry, posed material-aware picking and transactional history implemented. Native/XR automatic bind and transfer controls are connected; production automatic-weight/fitting coverage remains incomplete | Native weight painting, constrained normalization, lock/prune, symmetry and reliable transfer |
 | Mesh baking | Native normal/AO/PBR baker, Mikk frames, persistent baked base, explicit dual PBR/common source-color preparation with retained quality receipts, witnessed same-mesh polygon Strict preparation, guarded original-source affine transfer and UV reorientation; desktop/XR source/bounds/quality/Bake/Clear controls, cancellation/progress and exact Undo integrated and tested. Immutable v7 source material bindings and SourceUV bake/adoption kernels are implemented; normal-only intrinsic sourceUV editing is now integrated through Scene19; broader original-frame cases remain guarded. Custom cages, durable recipes, multi-source masks, supersampling and production deformation/consumer workflows remain incomplete | Normal/AO and required material-channel baking, cage/ray control, seam padding and error handling on real meshes |

@@ -38,35 +38,31 @@ four exact samebinary finer ranges cover all2372 affected boundaries. Initial
 future budget-only policy gives just those two original shards1200 rather than
 600 seconds, without source/oracle/range changes.
 
-Private common authoring Save product62d4747 is frozen in
-artifacts/ordered-authoring-save-5c94862, review/docs checkpointed9fb4f on remote
-work/ordered-authoring-save-5c94862. Fresh complete optimized alltargets12577 and
-owned C/C++core/support/renderer/frontend sanitizer compilation18621 are terminal0.
-Native30SAN/.59s and related12registeredSAN/373.98s pass; initial relatedRelease
-14/15 has one obsolete pending-Save-refusal oracle. Test-only20fe1ad corrects it
-with all90 actual caller denials plus real same-controller Bake+acceptedSave
-retries, Release/SAN pass. Test-only426b878 adds actual spatial Save+immediate
-Close:32native lifecycle assertions pass Release/ownedSAN. Actual native App/
-universal-menu/Ctrl+W consumer7 passes. These are distinct scopes, not a new
-all-green15-suite or fully qualified product claim.
+## Qualified accepted-authoring IO and desktop navigation — 2026-11-02
 
-All9795 real post-Bake accepted-endpoint/publication allocation denials and full
-helper retries pass Release. The unchanged ownedSAN9795 sweep is still finite/
-live exec68235; preserve it and its artifacts/tests-authoring-save-faults-sanitize.log,
-no restart or source/header/archive mutation. No cached preparation is substituted.
-The review receipt is docs/validation/ORDERED-AUTHORING-SAVE-WIP.json in that tree.
-The portable UV completion bridgeb265706/a2912eb separately passes Release2/2 +
-fresh ownedSAN2/2(.99s),31UV assertions plus commonSave regression; it introduces
-no normal21 domain fields. Its new snapshot/worker completion is shared by UV23.
+Frozen runtime0c6002b combines public Scene20, native3Dmouse/lifetime5e6de1d,
+commonSave62d4747 and portableUVSaveb265706; test-only0e623e7 corrects the
+obsolete pending-import Save exclusion and adds spatial Save/immediate Close.
+Read AUTHORING-IO-SPACENAV-INTEGRATION.md and its receipt for exact source,
+binary, build, test and component hashes. No new Scene21/22/23/24/25 fields.
 
-Next combined source0c6002b is clean/frozen in artifacts/spacenav-scene20-b197e37:
-publicb197e37 +qualified3Dmouse/lifecycle5e6de1d +commonSave62 +calleroracle20 +
-portableUVbridgeb265/a291. Fresh complete Release19552 and ownedSAN97041 builds
-are live. The sole source-list conflict kept the existing rigid source file and
-added the new spacenav library; the UV CMake conflict kept only its portable test,
-without importing any normal21 tests/fields. No Scene21/22/23 is admitted. Qualify
-this actual combined candidate before main publication, then carry test-only
-spatial426 additions without claiming unrun aggregate tests.
+Fresh optimized alltargets and owned C/C++core/support/render/frontend builds
+pass. Full Release375 initially has373passes/two obsolete import Save-refusal
+assertions (4616.37s); corrected registered import2 plus strengthened authoring
+Save32 assertions pass3/3 Release/.13s and3/3 ownedSAN/.99s. Preserve the initial
+failures; this is not one375/375greenrun. Separate selected ownedSAN14/14 pass
+77.54s and font/GL desktop exit1/1 covers three paths plus14Canvas assertions.
+Actual production FLTK navigation26Release+26SAN, latestprivateDomeDWayland11,
+and native App acceptedSave→Ctrl+W→independentreader7Release+7SAN pass.
+
+Both Release and ownedSAN complete all9795 actual post-Bake endpoint/publication
+allocation denials in frozen62 component, with full-helper retries and exact
+source/history/content/file preservation. This is not a combined9795 rerun.
+Accepted Saves own immutable committed endpoints, propagate original failures,
+and drain on Close; UV and shared spatial Save use the common mechanism.
+Physical3Dmouse and headset production acceptance remain required. Inherited
+Wayland shared-EGL and standaloneXR Mesa allocation reports remain unresolved;
+no toolkit fork/suppression, new system install or session restart occurred.
 
 Contracts' raw current-corner UV witness/transfer57c1c42 (runtimeaec07c2) has36 native plus19/19
 Release/SAN suites,13758 real whole-helper denials; prepared Scene23 and actual
@@ -515,3 +511,25 @@ mismatch; root is isolating it in `artifacts/paint-export-samplers-78a1034` befo
 final UV1 pipeline publication. The editable-atlas import prototype is separate
 at `artifacts/uv1-editable-import-2e7d4a0`; native/controller/FLTK and worker GLB
 resource checks pass, while visual export/quality qualification is unfinished.
+
+## Private native desktop 3D-mouse component
+
+The work/desktop-spacenav-8d68dc7 component extends the existing FLTK App with
+nonblocking native spacenav Unix input, six-axis elapsed-time camera navigation,
+View toggle/options, frame buttons, and focus/modal/gesture/reconnect fences.
+It changes no Document/Scene layouts or authoring archives. Real socket and
+native UI fixtures cover camera motion, option Apply/Cancel, exact saved data,
+post-navigation paint/Undo/Redo and clean window closure. See
+DESKTOP-SPACENAV.md and validation/DESKTOP-SPACENAV.json for exact final scope.
+Physical device/daemon acceptance remains required.
+
+The same qualification fixes inherited process Fontconfig ownership and
+Canvas GL release before native Wayland hide. Desktop X11 scoped sanitizer
+checks are clean; standalone XR 112-byte and native Wayland 5,856-byte
+shared-backend allocation reports remain explicitly open. Canonical toolkit
+helpers are unchanged; no suppressions, system installation or HMD test.
+This private leaf is not a replacement for the production handoff or completion
+of the full goal. The next delegated basic task is native image projection /
+stencil painting through shared Document/desktop/XR workflows; its existing
+kernel alone is insufficient. Deferred controller drawers remain additional
+work after basic targets.
