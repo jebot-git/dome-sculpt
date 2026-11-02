@@ -24,6 +24,15 @@ Private worktrees start from accepted main8d46dfb. Geometry, source frames,
 paint, permissions, Undo/Cancel and ordered Save remain required. Coordinate
 Arc execution; preserve the accepted binaries and all prior evidence.
 
+## Null shape-history compatibility
+
+Source `0df613e` permits a null optional shapekey-history field with the
+historical empty polygon archive. Actual direct histories retain the version4
+requirement, bounded graph validation and malformed-reference checks. Two new
+preflight witnesses and the existing shapekey-authoring suite pass in the private
+UV1 integration context; see validation/NULL-SHAPE-HISTORY.json. This does not
+qualify that larger private UV1 branch for publication.
+
 ## Current integration
 
 The focused selection request is implemented by `3cb4517` and `f3f9199` on

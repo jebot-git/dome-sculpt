@@ -1,0 +1,22 @@
+{
+  "recorded_utc": "2026-11-02T03:36:28.204473+00:00",
+  "product_source": "0df613e",
+  "private_equivalent": "35a3b4b",
+  "scope": "Null optional direct shape history accepts historical polygon archives. Actual direct references still require v4 and existing wrong-version/index/cycle/orphan checks remain.",
+  "source_sha256": {
+    "src/polygon-scene.cpp": "a2c6e03c71521da36a7bce232453ad036387a527de88479d47f965318183ca20",
+    "tests/shapekey-authoring.cpp": "0b9e0ba987ec4665cdc8c9cf8a3efe7204154acaba63aae260a5b844ef7f2ee5"
+  },
+  "qualification": {
+    "tree": "artifacts/source-uv1-8d46dfb",
+    "context": "Private UV1 integration tree; not a complete public-main regression claim",
+    "regression": "Existing shapekey-authoring suite with two narrow preflight witnesses",
+    "passed": 1,
+    "failed": 0,
+    "seconds": 1.58,
+    "additional": "Six focused private source suites later pass5.83s; subsequent seven-suite source/renderer/export run9.52s. Their larger private source context remains separate."
+  },
+  "full_production_complete": false,
+  "system_installation": false,
+  "session_restart": false
+}
