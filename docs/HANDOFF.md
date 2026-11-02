@@ -1,29 +1,37 @@
-# Private generic VRM import checkpoint
-
-The complete production goal remains active and incomplete. This private
-checkpoint extends existing native import; root owns integration/publication.
-Generic external VRM0 and the implemented VRM1 source/material subset now use
-the normal file worker, shared FLTK options and controller import browser,
-without bundled-avatar hash substitution or a silent MToon-to-PBR fallback.
-Actual female/male models retain all 19 parts, exact original bytes/IDs,
-original node chains, authored skin/morph/humanoid state and native restart.
-
-See GENERIC-VRM-IMPORT.md and validation/GENERIC-VRM-IMPORT.json for exact scope:
-Release4/SAN4, native90,680 checks, independent Arc31/six images max0,
-FLTK11 and synthetic frames through the production controller path pass.
-Official VRM schemas17 pass; raw VRM0 preserves its inherited advisory-skeleton
-Khronos error, while the independent VRM1 source has zero errors. Physics,
-full expressions/constraints, KHR sampling extensions and original-space
-VRM0/VRM1 re-export remain required. The writer guards remain in place.
-No physical test, system installation or active session changes occurred.
-
 # Dome Sculpt production handoff
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
-## Current production checkpoint — 2026-11-02
+## Current desktop framing checkpoint — 2026-11-02
+
+Product3c491bf adds native Frame all(Home), Frame selection(Shift+F), stable orbit
+pivot and successful-import/source-model auto-fit, retaining F reset. Bounds
+follow exact live world transforms, worker polygon GPU-move previews/handoffs
+and retopology draft points. Native27, instrumented inline-helper27, actual
+FLTK framing/orbit/paint/Save/Undo12, latest d271 native Wayland8 and separate
+synthetic-loader selection11/polygon41 checks pass. Read DESKTOP-FRAMING.md and
+validation/DESKTOP-FRAMING.json; no new whole-suite/whole-core-SAN or physical
+headset claim is inferred. Earlier VRM11/atlas12 import proofs and the complete
+avatar screenshot are separately scoped.
+
+Root private artifacts/authoring-adapters-04d at7e36278 merges qualified
+b0cdeb5 post-UV keys, b186b9e current-color source Bake, a799211 source-space
+VRM0 export and this framing code. It is unqualified; its fresh build is HELD
+until the isolated BakeAdmission fix is ready. The existing Bake path has a
+second fallible publication after job acceptance; merge_contracts is staging its
+POD controls in the existing Transaction on a separate04d child. No rootqueue
+edit overlaps that fix. Do not publish the new Bake union before qualification.
+
+Agents continue: Contracts target20/material6/polygon5; Palette retained intrinsic
+normal-domain Scene21/material7/normalentry3 (actual integer-UV avatar key proof
+dd2314 is test-only; arbitrary .95 scale remains a real quality refusal); Docs
+mixed rigid/source-pose VRM export in a separate a799 child. Scene22 is reserved
+for independent corner-origin key/geometry expansion. These reservations are
+not implementation/completion claims. Preserve all frozen component/proof trees.
+
+## Previous combined production checkpoint — 2026-11-02
 
 Combined source3520ba9 preserves public27aa478 and adds generic external VRM0/1
 import, MatCap-only coordinate correction, typed-only UV1 atlas/paint history and
@@ -48,9 +56,8 @@ full-run source9081677. Record298/298 plus new1/1, not one single299-suite run.
 No physical headset launch, system install or active-session restart occurred.
 
 Immediate follow-ups:
-- Root: screenshot review found the desktop initially crops imported avatars.
-  Add useful Frame all/selection and orbit framing, preserving native picking,
-  existing reset behavior, immutable snapshots and DomeD menus/key conventions.
+- Root: desktop framing is qualified above; next qualify the authoring-adapter
+  union after transactional Bake admission is repaired.
 - merge_contracts: frozen source Bake b186b9e has actual native49, Release and
   full-owned SAN fault coverage858+4393, software/Arc133, FLTK and loader proof.
   It is not yet integrated here. Target20 is isolated at
@@ -58,8 +65,9 @@ Immediate follow-ups:
   polygon5 shared field ownership and15 checks; target Bake remains unfinished.
 - merge_palette: post-UV key productceb9893 is separate, with coherent Release10/
   SAN10, Arc52, dense native/controller strokes29 and native/compact FLTK proof.
-  Its final persistent-allocation sanitizer job remains live at last report;
-  poll that exact handle before changing sources or integrating.
+  Final b0cdeb5 is clean/frozen: all13,555 reached allocation boundaries pass in
+  Release and owned sanitizers. Later actual-avatar dd2314 is test-only and
+  qualifies integer UV moves, not arbitrary scale; Scene21 is new separate work.
 - merge_docs: source-space generic VRM re-export is separate. Ordinary/reflected
   skinned-mesh nodes and positive sheared original chains pass independent
   images; this is not blanket reflected humanoid/physics support. Bone/role
