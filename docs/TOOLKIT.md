@@ -1,8 +1,10 @@
 # Current DomeD toolkit and conventions
 
-Current canonical DomeD is `3024fb61a9eaa94fea0d581f862526307b5544a9`, checked
-against remote main on2026-10-30. Its toolkit/runtime inputs are byte-identical
-to eee23b7, which added native PCF and a23rd FLTK patch. The current helper also
+Current canonical DomeD is `d271cf65c612a462fcfa6739416b06c6565be070`, checked
+against remote main on 2026-11-02. All 23 FLTK patches, four bitmap patches,
+16 installed runtime libraries, builder and canonical font helper were verified
+against their recorded hashes. Inputs remain byte-identical to3024fb6 and
+eee23b7, which added native PCF and a23rd FLTK patch. The current helper also
 exports media aliases correctly and excludes generated aliases from host choices. The earlier22-patch artifacts and6feb runtime are retained
 as historical evidence; they no longer identify the latest toolkit inputs.
 
@@ -45,8 +47,10 @@ FLTK; this workstation's FLTK cache confirms it used that FreeType's headers and
 library. Both scripts build Release as the regular user. Existing source/build
 artifacts are retained, including old compositor binaries.
 
-The current private compositor is
-`artifacts/domed-3024fb6-target/release/dome-compositor`. Set DOME_COMPOSITOR to
+The previously qualified private compositor is
+`artifacts/domed-3024fb6-target/release/dome-compositor`. A clean latest d271cf6
+Release compositor build is tracked separately in validation/TOOLKIT-d271cf6.json.
+Set DOME_COMPOSITOR to
 that file and DOME_TEST_LIBRARY_PATH to the two library directories above for
 `tests/dome_menu.py`. The harness clears inherited overrides by default, permits
 only explicitly selected private directories and records the live compositor/
@@ -166,3 +170,9 @@ artifacts/toolkit-deps/sysroot, supplying that dependency without installation.
 All 22 patch hashes and their ordered digest match third_party/sources.json.
 The successful build log is artifacts/build-toolkit-authoring-with-sysroot.log.
 See VALIDATION.md for results from the combined application source.
+
+The private optimized `d271cf6` compositor and accepted selection client now pass
+eight actual native Wayland/universal-menu checks. Runtime mappings confirm the
+canonical FLTK and bitmap libraries. This isolated software-Vulkan qualification
+did not install system files or restart the desktop. See
+`validation/TOOLKIT-d271cf6.json` for binary and evidence hashes.

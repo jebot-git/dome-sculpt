@@ -1,8 +1,28 @@
 # Controller selection on the viable authoring candidate
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
-remains incomplete and is **paused at the user's request**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
+remains incomplete and is **active again at the user's request (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
+
+## Resumed production work — 2026-11-02
+
+The user resumed the original full goal. Preserve accepted selection source
+`f3f9199`, publication8d46dfb and the physical-test session. Latest DomeD is
+`d271cf6`; canonical toolkit inputs match the existing optimized EEE prefixes,
+verified in validation/TOOLKIT-d271cf6.json. The current compositor passed a private optimized build and eight actual native
+Wayland/universal-menu checks without touching the active desktop or unrelated
+DomeD work.
+
+- merge_palette: prepared-normal/shapekey native adapter from7a66e71.
+- merge_contracts: current-corner color cut transport from91aa08c, then bake
+  integration where qualified; native guards remain until actual support.
+- merge_docs: general affine import from0b65130, including independent reflected-frame evidence and native workflow
+  qualification before admission.
+- Root: source UV1 paint/material sampling and integration qualification.
+
+Private worktrees start from accepted main8d46dfb. Geometry, source frames,
+paint, permissions, Undo/Cancel and ordered Save remain required. Coordinate
+Arc execution; preserve the accepted binaries and all prior evidence.
 
 ## Current integration
 
@@ -28,8 +48,8 @@ interface acceptable. The test ended gracefully and its 20-object session was
 saved and successfully reloaded; the original baseline session is unchanged.
 See validation/XR-SELECTION-HEADSET.json. This is interface acceptance, not
 full-production completion. No system installation or session restart occurred.
-The broader production goal remains paused; all
-agents are idle. Resume development only when the user requests it.
+That test completed while the goal was paused. The user has since resumed it;
+the current work assignments above supersede the historical paused status.
 
 The user passed the physical headset test of combined candidate
 `993e8af7ebc247e3239df3a1acd27fc47fb8e999` on 2026-10-30 and designated it a
