@@ -49,9 +49,9 @@ import_fixture::Fixture source(bool legacy){
 }
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;std::filesystem::path directory=argv[1];std::filesystem::create_directories(directory);
- for(bool legacy:{false,true}){
+ for(bool legacy:{false,true})for(bool atlas:{false,true}){
   auto fixture=source(legacy);auto path=directory/(legacy?"matcap-v0.vrm":"matcap-v1.vrm");fixture.save(path);
-  Scene before;const auto original=before.encode();ImportAuthoringOptions options;options.paint_resolution=64;
+  Scene before;const auto original=before.encode();ImportAuthoringOptions options;options.paint_resolution=64;options.prepare_texture_atlas=atlas;
   auto imported=prepare_authoring_import(before,path,options);
   check(imported.objects.size()==2&&before.encode()==original,"View-dependent MatCap-only avatar imports both instances without inventing a source UV stream");
   for(auto id:imported.objects){const auto &object=imported.scene.object(id);const auto &asset=*object.appearance->asset;
@@ -61,6 +61,7 @@ int main(int argc,char **argv)try{
    check(origin.material&&origin.roles[size_t(MToonSlot::Matcap)].image==object.material_bindings->roles[size_t(MToonSlot::Matcap)].image,"First UV origin retains the same view-dependent image and material descriptor");
    check(!object.painted->mesh().uv.empty()&&object.painted->surface_diagnostics().unpaintable_uv_faces.empty(),"Generated paint atlas remains writable without relabeling view-space MatCap as mesh-UV sampling");
   }
+  if(atlas)for(auto id:imported.objects)check(imported.scene.object(id).material_bindings->sampling_reparameterized,"Explicit editable-atlas preparation keeps view-dependent MatCap roles through its owning resampling route");
   auto encoded=imported.scene.encode();auto saved=directory/(legacy?"matcap-v0.dsculpt":"matcap-v1.dsculpt");imported.scene.save(saved);
   check(Scene::decode(encoded).encode()==encoded&&Scene::load(saved).encode()==encoded,"Native restart preserves both view-dependent roles and original missing coordinate authority");
   auto sampled=fixture;
