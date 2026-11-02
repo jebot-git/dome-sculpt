@@ -62,3 +62,9 @@ implementation owns only the preparation section above `Scene prepared=job.scene
 factor component payloads for that section rather than rewriting its publication
 tail. Root generic Save source and palette bridge remain unqualified dependencies
 until their final receipts arrive.
+
+The narrow palette bridge `b265706` is now carried as `03863d1`, with only its
+UV-save CMake block retained. Its normal21 parent lineage was not merged.
+Current prepared ABI sources remain unlinked/non-admitted, and no jobs are live
+in this tree. Raw `57c1c42`, target completion `1a30217`, joint `2e8699f` and dual
+`8496dec` are complete separate scopes; all their owned jobs are terminal.
