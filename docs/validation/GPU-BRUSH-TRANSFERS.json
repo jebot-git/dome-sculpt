@@ -1,0 +1,112 @@
+{
+  "base": "fb75ea5",
+  "runtime_source": "53a26f0",
+  "status": "qualified private host transfer component; no positive vendor hardware",
+  "date": "2026-11-03",
+  "public_ABI_schema_changes": false,
+  "contract": {
+    "chunk_samples": 2000000,
+    "device_input_bytes_max": 48000000,
+    "device_scalar_bytes_max": 8000000,
+    "upload_bytes_per_sample": 24,
+    "readback_bytes_per_sample": 4,
+    "publish": "all-result host staging then only distance writes after every successful chunk",
+    "error_cleanup": "drain best-effort before device/result storage unwind",
+    "shared_math_unchanged": true,
+    "CPU_fallback": false
+  },
+  "tests": {
+    "Release_shims": {
+      "checks": 130,
+      "seconds": 18.72,
+      "session": 38771,
+      "exit": 0
+    },
+    "O1_ASan_UBSan_leak_shims": {
+      "checks": 130,
+      "seconds": 20.18,
+      "session": 55695,
+      "exit": 0,
+      "scope": "entire production host template + API shims, not whole core/native app instrumentation",
+      "reports": 0
+    },
+    "kernel_in_shims": "synthetic sentinel only; no CUDA/HIP numerical proof",
+    "faults": "input/output allocation including nonnull error return, upload/launch/wait, readback chunks1/2/3 with partial+deferred host write, host result badalloc, exact stage/chunk and exception, retry",
+    "CUDA_actual_runtime": {
+      "suites": "1/1",
+      "seconds": 0.03,
+      "status": 35,
+      "description": "insufficient driver, devices0",
+      "spans": [
+        1,
+        257,
+        2000007
+      ],
+      "preservation": "all host bytes exact; empty no-op; no CPU backend linked"
+    },
+    "HIP_actual_runtime": {
+      "suites": "1/1",
+      "seconds": 0.05,
+      "status": 100,
+      "description": "no ROCm-capable device, devices0",
+      "spans": [
+        1,
+        257,
+        2000007
+      ],
+      "preservation": "all host bytes exact; empty no-op; no CPU backend linked"
+    }
+  },
+  "builds": {
+    "CUDA": "fresh O3 entire backend module+minimal probe+native FLTK/OpenXR/core/support app, session66911 exit0;NVCC13.4.59 compute86/sm86",
+    "HIP": "fresh O3 entire backend module+minimal probe+native FLTK/OpenXR/core/support app, session39269 exit0;HIPclang gfx1030, explicitPIC=ON",
+    "toolkit": "explicit toolkit-eee23b7 FLTK_DIR and canonical bitmap/runtime environment",
+    "PIC": "explicitON in both configurations; root owns separate ROCm default/honor-override fix",
+    "retained_warning": "NVCC inherited unused packReturn label in pinned SoftFloat; no suppression"
+  },
+  "frozen_source_notes": "SDK inputs53a unchanged throughout module/native builds. After both builds terminal, test-only exact fault.chunk assertion was added and R/SAN shims rerun. No runtime or SDK probe source changed. Hashes below captured at sealing; no before/after binary manifest was recorded for these SDK runs.",
+  "source_sha256": {
+    "CMakeLists.txt": "5d642dd869f23b3c2b902dce9755a2e7dc68e93bd20a23fb4cb53c07f4deb9c0",
+    "src/backend_gpu.cu": "03ba4f1f7f756b35b2bed84b350aab73bc3a7bba2c49c7d40d0a162b9fb36609",
+    "src/gpu-brush-transfer.hpp": "bee802f32b568dcb3e979faa5256c370848eb63ea7031377a5b4482cefb3925a",
+    "src/brush_kernel.hpp": "fe941ceaec5232bed6f5fe71d3fdd38b43b3e1efca372f90d9929ba2557c33aa",
+    "include/dome/brush.hpp": "60b61ab21cae66c2a5fdf560c610c1b9a0ba600953d44baa90a97ef8dfc4aac1",
+    "tests/gpu-brush-transfer.cpp": "54cf5f0af6220044842e207e0a795e5aaeb2a28711e2687b0c0643e44fcd6b55",
+    "tests/gpu-brush-missing.cpp": "cb8c3f7b977180a19f034e3f116a3075cdef205a1968ec6a403448051220b51a"
+  },
+  "binary_sha256": {
+    "build/dome-sculpt-gpu-brush-transfer-test": "30940cb5093e010b40329eb4e7d7e878199a957d656c4354773f6b5d30266623",
+    "build-sanitize/dome-sculpt-gpu-brush-transfer-test": "d39252409726cb10d543b87bfbb28aae0f2ea3683a5c8d8e981b13f4494e06f7",
+    "build-cuda/dome-sculpt-gpu-brush-missing-test": "592c96b0a1e7575280d5329afe2b4a6ca3b65c77c3c29cf7461872056c7eb32d",
+    "build-hip/dome-sculpt-gpu-brush-missing-test": "ee5f01ced500dcc8ee9ce9fb00d5b800a68b2ef5406ff036b13d8a667130b298",
+    "build-cuda/dome-sculpt": "d03f709d892253e0b9b14db8d77087c060d4b6f794b99835deb0c5a7fb99f2ca",
+    "build-hip/dome-sculpt": "80b9986cc9194da07b31553557a1b70501b1cfb8b6f0ddb11e351dcba74fe049",
+    "build-cuda/libdome-sculpt-core.a": "780242f57a26fbd982bd723f0d6a13cde1361495da54ab142e2e19ab0fe7ca65",
+    "build-hip/libdome-sculpt-core.a": "b8e6f05e750a5583b2d92296608277b1d1ba1629cbdeed01867cee47a6039802"
+  },
+  "log_sha256": {
+    "artifacts/configure-cuda.log": "faf934117573d58b24803c112c4391cb4dbc7ef6a9c13ded30c7105324255ba6",
+    "artifacts/build-cuda-module.log": "acb16a6855c83200bd57a2de6d1d056efdbd5b5bc67bed68ae5eff86d2cdeda6",
+    "artifacts/tests-cuda-missing.log": "29aedfd0493d90dcf0f768446dcc2bf3b886b3f35230c27ca475e81627e63be1",
+    "artifacts/build-cuda-native.log": "4f5eaa4ee6862e1bc92a77084a7d7e3c66c78763878d10f30e5272fb3bcfe7f1",
+    "artifacts/configure-hip.log": "89ad01b261f8d859c5ef16cd90a35fa328ce570d0906e33558d78df805e52f67",
+    "artifacts/build-hip-module.log": "d257c69838aeef22a70e902f05643419e6e53261a358c332d37d718f9d764199",
+    "artifacts/tests-hip-missing.log": "c8506561b4d677f0b0f9d79b101da061d87200d2bfc44a99a7eb3fdb79589844",
+    "artifacts/build-hip-native.log": "e146ab3d5476e26c5ecb89afa85f864c70495e8c9892c7a551d10e22d064e061",
+    "artifacts/tests-shim-final.log": "5927a4b57e3071a24f9e21762e1faeb0742df3cac2d992e0c4fc17f778497d80",
+    "artifacts/tests-shim-sanitize.log": "8b7ad2575e9073a983a8de7014caaaffd8d701a5db9f5f6782493156c509e064",
+    "artifacts/tests-shim-exact-chunk.log": "bf6bfcb70c4d878b250913d3bfea930aa508f50a3dbbff060d7c3270434f1a65",
+    "artifacts/tests-shim-exact-chunk-sanitize.log": "78d9ba0da9f2da10fe47b88e98c0eb4bd5074adce6e0c23284de4034e21ca538",
+    "artifacts/cuda-version.txt": "7104ec89a16d4e6e2df59d253c88aeeb98d53bf0e72506e2307b1d86797eb754",
+    "artifacts/hip-clang-version.txt": "072589c4c5c82c55cf78c319efbdd38ccf33997361dea3c7ef02c6c33cfd3375",
+    "artifacts/cuda-native-ldd.txt": "905f805c1c382eb327a365e8f241585df7ca966764a99f52a07e5aeb92c5c027",
+    "artifacts/hip-native-ldd.txt": "33d96e8e04289889830188078337324bd561200e09aace69b1ac44b272010205"
+  },
+  "remaining": [
+    "Positive NVIDIA/AMD numerical/reference/hardware runs",
+    "Real vendor partial-readback/device-loss and recovery behaviour",
+    "Sustained transfer/latency/memory/performance measurements; tiny two-allocation cost not measured",
+    "Whole accelerator/production goal and additional eligible workloads remain incomplete"
+  ],
+  "physical_HMD_install_session_restart": false
+}
