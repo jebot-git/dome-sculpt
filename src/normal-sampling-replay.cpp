@@ -129,7 +129,38 @@ NormalSamplingReceipt NormalSamplingReceipt::decode(const nlohmann::json &j) {
   result.max_working_bytes=count(j.at("max_working_bytes"),512*1024*1024);
   result.validate();return result;
 }
+struct SourceNormalSampling::MetadataSeal {
+  const SourceNormalSampling *node;
+  NormalSamplingReceipt receipt;
+  std::shared_ptr<const SourceNormalUvLayout> layout;
+  std::shared_ptr<const PaintNormalProjection> projection;
+  std::shared_ptr<const PaintedMesh> paint;
+  std::shared_ptr<const CreatorAppearance> appearance;
+  std::shared_ptr<const DeformationState> deformation;
+  std::shared_ptr<const SourceMaterialBindings> before,sampling;
+  std::shared_ptr<const PaintSamplingDomain> domain;
+  explicit MetadataSeal(const SourceNormalSampling &p):node(&p),receipt(p.receipt),layout(p.layout),projection(p.projection),paint(p.before_paint),appearance(p.before_appearance),deformation(p.before_deformation),before(p.before_material),sampling(p.sampling_material),domain(p.metadata_sampling_domain){}
+  template<class T> static bool owner(const std::shared_ptr<const T> &a,const std::shared_ptr<const T> &b)noexcept{return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
+  bool matches(const SourceNormalSampling &p)const noexcept {
+    const auto &r=p.receipt;
+    return node==&p&&!p.current_sampling_reference&&domain&&
+      r.version==receipt.version&&r.resolution==receipt.resolution&&r.vertices==receipt.vertices&&r.indices==receipt.indices&&r.correspondence_bytes==receipt.correspondence_bytes&&r.max_working_bytes==receipt.max_working_bytes&&
+      owner(layout,p.layout)&&owner(projection,p.projection)&&owner(paint,p.before_paint)&&owner(appearance,p.before_appearance)&&owner(deformation,p.before_deformation)&&owner(before,p.before_material)&&owner(sampling,p.sampling_material)&&owner(domain,p.metadata_sampling_domain);
+  }
+};
+bool SourceNormalSampling::has_sealed_metadata()const noexcept{return metadata_seal_&&metadata_seal_->matches(*this);}
 namespace detail {
+struct NormalMetadataSealAccess {
+ static void mint(SourceNormalSampling &p){p.metadata_seal_=std::make_shared<const SourceNormalSampling::MetadataSeal>(p);}
+};
+void authenticate_normal_sampling_metadata(std::shared_ptr<SourceNormalSampling> p,const std::function<bool()> &cancelled){
+ if(!p)throw std::invalid_argument("Missing independent normal metadata source");
+ p->validate(true,cancelled);stop(cancelled);
+ // Current Scene24 colour admission is untyped. Typed sampler state keeps the
+ // historical deep path until a complete bounded immutable scalar seal exists.
+ if(p->metadata_sampling_domain&&!p->current_sampling_reference)NormalMetadataSealAccess::mint(*p);
+ stop(cancelled);
+}
 std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(const SourceUvBakeInput &input,
     const SourceUvBakeResult &result,const SourceUvBakeOptions &options) {
   return retain_normal_sampling(input,result,options,{});
@@ -183,12 +214,14 @@ std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(const SourceU
   proof->receipt.resolution=r;proof->receipt.vertices=input.target.positions.size();proof->receipt.indices=input.target.indices.size();
   proof->receipt.correspondence_bytes=layout->storage_bytes()+domain->storage_bytes()+(proof->metadata_sampling_domain?proof->metadata_sampling_domain->storage_bytes():0);
   proof->receipt.max_working_bytes=options.max_working_bytes;
-  proof->validate(true,options.cancelled);proof->validate_current(input.target,result.appearance.get(),options.cancelled);
+  authenticate_normal_sampling_metadata(proof,options.cancelled);proof->validate_current(input.target,result.appearance.get(),options.cancelled);
   return proof;
 }
 } // namespace detail
 void SourceNormalSampling::validate(bool deep,const std::function<bool()> &cancelled) const {
   stop(cancelled);receipt.validate();
+  if(metadata_seal_&&!has_sealed_metadata())throw std::invalid_argument("Normal metadata seal differs from its exact immutable source owners or receipt");
+  if(!deep&&metadata_sampling_domain&&!current_sampling_reference&&!has_sealed_metadata())throw std::invalid_argument("Normal metadata requires its independent factory replay seal");
   if(!layout||!projection||projection->version!=2||!projection->sampling_domain||
      !before_paint||before_paint->in_stroke()||!before_paint->normal_projection()||
      !before_material||!before_material->normal_preparation||!sampling_material||

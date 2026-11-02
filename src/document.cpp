@@ -20,6 +20,7 @@
 #include "normal-frame-runtime.hpp"
 #include "export-corner-coordinates.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/normal-preview.hpp"
 #include "current-colors.hpp"
 #include "prepared-color-state.hpp"
 #include "sculpt-ui-values.hpp"
@@ -1784,6 +1785,7 @@ void Document::mesh_loop() {
         if(packed_uv1){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);maps->uv1=std::move(packed_uv1);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
         snapshot->ranges.back().paint_sampling_attachment=paint_attachment;
+        if(o.normal_preview_proof&&o.normal_preview_proof->matches(o.material_bindings,snapshot->ranges.back().textures))snapshot->ranges.back().normal_preview_proof=o.normal_preview_proof;
         snapshot->ranges.back().paint_winding_reversed=reflected;
         snapshot->ranges.back().pbr_view=job->pbr_view;
         if(frame)snapshot->ranges.back().affine_world=frame->world();

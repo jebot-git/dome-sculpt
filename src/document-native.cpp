@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/normal-preview.hpp"
 #include "affine-surface.hpp"
 #include "document-held-affine.hpp"
 #include "dome/polygon-scene.hpp"
@@ -150,6 +151,7 @@ void Document::native_loop(){
         range.reflected=reflected;
         if(o.painted->paint_sampling_domain()) {
           range.paint_sampling_attachment=o.painted->paint_sampling_attachment();
+          range.normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
           PaintSamplingLimits limits;limits.cancelled=cancelled;
           query_paint=o.painted->paint_sampling_domain()->corner_coordinates(o.painted->mesh(),limits);
         }

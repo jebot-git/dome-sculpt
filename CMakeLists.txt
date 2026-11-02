@@ -64,7 +64,7 @@ target_include_directories(dome-sculpt-json INTERFACE ${CMAKE_CURRENT_SOURCE_DIR
 target_link_libraries(dome-sculpt-polygon PUBLIC dome-sculpt-json)
 install(FILES third_party/nlohmann/LICENSE.MIT third_party/nlohmann/LICENSE.MIT.backport
   DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/dome-sculpt/nlohmann_json)
-add_library(dome-sculpt-core src/volume.cpp src/volume-raycast.cpp src/sculpt-mask.cpp src/sculpt-resolution.cpp src/procedural-sculpt.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/tangents.cpp src/bake-authoring.cpp src/document-baking.cpp src/document-shapes.cpp src/creator-archive.cpp src/paint.cpp src/paint-sampling.cpp src/paint-sampling-archive.cpp src/projection.cpp src/source-maps.cpp src/color-preparation.cpp src/color-paint-sampling.cpp src/color-uv-reprojection.cpp src/normal-sampling.cpp src/normal-sampling-replay.cpp src/normal-sampling-surface.cpp src/material-bindings.cpp src/normal-frames.cpp src/normal-bake-frames.cpp src/normal-preparation.cpp src/normal-uv-reprojection.cpp src/shapekey-authoring.cpp src/shapekey-normal-preparation.cpp src/source-uv-bake.cpp src/polygon-color-uv.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/source-morph.cpp src/vrm.cpp src/input.cpp src/document.cpp src/document-interaction.cpp src/document-uv-solve.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/vroid-groom.cpp src/deformation.cpp src/rig-edit.cpp src/weight-edit.cpp src/weight-authoring.cpp src/material-visibility.cpp src/skin-authoring.cpp src/document-skin.cpp src/uv-solve.cpp src/import.cpp src/import-authoring.cpp src/vrm-import.cpp src/vrm-source-graph.cpp src/source-rigid-pose.cpp src/import-options.cpp src/import-browser.cpp src/document-import.cpp src/import-image.cpp src/import-jpeg.c src/import-source.cpp src/import-native.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
+add_library(dome-sculpt-core src/volume.cpp src/volume-raycast.cpp src/sculpt-mask.cpp src/sculpt-resolution.cpp src/procedural-sculpt.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/tangents.cpp src/bake-authoring.cpp src/document-baking.cpp src/document-shapes.cpp src/creator-archive.cpp src/paint.cpp src/paint-sampling.cpp src/paint-sampling-archive.cpp src/projection.cpp src/source-maps.cpp src/color-preparation.cpp src/color-paint-sampling.cpp src/color-uv-reprojection.cpp src/normal-sampling.cpp src/normal-sampling-replay.cpp src/normal-preview.cpp src/normal-sampling-surface.cpp src/material-bindings.cpp src/normal-frames.cpp src/normal-bake-frames.cpp src/normal-preparation.cpp src/normal-uv-reprojection.cpp src/shapekey-authoring.cpp src/shapekey-normal-preparation.cpp src/source-uv-bake.cpp src/polygon-color-uv.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/source-morph.cpp src/vrm.cpp src/input.cpp src/document.cpp src/document-interaction.cpp src/document-uv-solve.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/vroid-groom.cpp src/deformation.cpp src/rig-edit.cpp src/weight-edit.cpp src/weight-authoring.cpp src/material-visibility.cpp src/skin-authoring.cpp src/document-skin.cpp src/uv-solve.cpp src/import.cpp src/import-authoring.cpp src/vrm-import.cpp src/vrm-source-graph.cpp src/source-rigid-pose.cpp src/import-options.cpp src/import-browser.cpp src/document-import.cpp src/import-image.cpp src/import-jpeg.c src/import-source.cpp src/import-native.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/cut-color.cpp src/document-cut.cpp src/document-worker-errors.cpp)
@@ -1852,7 +1852,9 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   target_include_directories(dome-sculpt-paint-sampling-render-test PRIVATE src third_party/cgltf third_party/desktop)
   target_link_libraries(dome-sculpt-paint-sampling-render-test PRIVATE dome-sculpt-render)
   add_test(NAME paint-sampling-render COMMAND dome-sculpt-paint-sampling-render-test ${CMAKE_CURRENT_BINARY_DIR}/paint-sampling/graphics)
-  set_tests_properties(paint-sampling-render PROPERTIES TIMEOUT 1200)
+  # The previous complete owned SAN run reached 45/54 images at 1200 s;
+  # preserve every image/export oracle and allow the measured full workload.
+  set_tests_properties(paint-sampling-render PROPERTIES TIMEOUT 2400)
 endif()
 
 if(BUILD_TESTING)
@@ -1862,4 +1864,13 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-paint-sampling-document-test PRIVATE -Wl,--wrap=_ZN4dome26retain_source_corner_paintESt10shared_ptrIKNS_11PaintedMeshEES0_IKNS_22SourceMaterialBindingsEES0_IKNS_16DeformationStateEES0_IKNS_19PolygonColorSurfaceEERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE)
   add_test(NAME paint-sampling-document COMMAND dome-sculpt-paint-sampling-document-test ${CMAKE_CURRENT_BINARY_DIR}/paint-sampling/document)
   set_tests_properties(paint-sampling-document PROPERTIES TIMEOUT 900)
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-normal-preview-seal-test tests/normal-preview-seal.cpp)
+  target_include_directories(dome-sculpt-normal-preview-seal-test PRIVATE src third_party/cgltf third_party/desktop)
+  target_link_libraries(dome-sculpt-normal-preview-seal-test PRIVATE dome-sculpt-render)
+  target_link_options(dome-sculpt-normal-preview-seal-test PRIVATE -Wl,--wrap=_ZNK4dome22SourceMaterialBindings8validateEb -Wl,--wrap=_ZNK4dome20NormalSamplingDomain8validateEbRKSt8functionIFbvEE)
+  add_test(NAME normal-preview-seal COMMAND dome-sculpt-normal-preview-seal-test ${CMAKE_CURRENT_BINARY_DIR}/normal-preview-seal)
+  set_tests_properties(normal-preview-seal PROPERTIES TIMEOUT 900 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()

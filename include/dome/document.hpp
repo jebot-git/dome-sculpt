@@ -183,6 +183,7 @@ struct SurfaceRange {
   bool reflected = false; // CPU query geometry retains original corner order.
   std::shared_ptr<const PaintSamplingAttachment> paint_sampling_attachment{};
   bool paint_winding_reversed=false; // Actual packed index flip, not cull mode.
+  std::shared_ptr<const NormalPreviewProof> normal_preview_proof{};
   bool pbr_view = false;
 };
 struct SculptMeshingStats {

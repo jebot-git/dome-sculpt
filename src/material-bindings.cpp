@@ -5,6 +5,7 @@
 #include "paint-sampling-access.hpp"
 #include "paint-archive-shape.hpp"
 #include "dome/normal-preparation.hpp"
+#include "normal-sampling-access.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/paint.hpp"
@@ -661,6 +662,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
           if(v.at("appearance")!=record.at("appearance")||v.at("deformation")!=record.at("deformation"))
             throw std::invalid_argument("Retained normal original serialized authority differs from its immutable source");
           p->original_appearance=prior->original_appearance;p->original_deformation=prior->original_deformation;
+          if(proof->metadata_sampling_domain)detail::authenticate_normal_sampling_metadata(proof);
           p->sampling_domain=std::move(proof);
         }
         p->validate();normal_preparations[id]=std::move(p);

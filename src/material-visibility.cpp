@@ -6,6 +6,7 @@
 #include "dome/material-bindings.hpp"
 #include "source-colors.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/normal-preview.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "prepared-color-state.hpp"
 namespace dome {
@@ -78,7 +79,11 @@ struct Visibility {
       if(r.first_vertex>mesh.positions.size()||owned_uv1->size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility UV1 domain exceeds packed geometry");
       for(size_t c=r.first;c<r.first+r.count;++c){auto v=mesh.indices.at(c);if(v<r.first_vertex||v-r.first_vertex>=owned_uv1->size())throw std::invalid_argument("Visibility UV1 packed index is invalid");}
     }
-    const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get());
+    if(r.normal_preview_proof&&!r.normal_preview_proof->matches(r.material_bindings,maps))throw std::invalid_argument("Visibility normal preview lost its own immutable owners");
+    const bool sealed=r.paint_sampling_attachment&&r.normal_preview_proof&&r.normal_preview_proof->matches(r.material_bindings,maps)&&r.normal_preview_proof->metadata_domain()==r.paint_sampling_attachment->domain()&&
+      !r.normal_preview_proof->metadata_domain().owner_before(r.paint_sampling_attachment->domain())&&!r.paint_sampling_attachment->domain().owner_before(r.normal_preview_proof->metadata_domain());
+    if(r.normal_preview_proof&&r.paint_sampling_attachment&&!sealed)throw std::invalid_argument("Visibility normal and paint metadata have different owning coordinate domains");
+    const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get(),!sealed);
     if (maps) {
       if (maps->source_only) {
         auto present=[](const Image &i){return i.width || i.height || !i.rgba.empty();};
@@ -91,7 +96,7 @@ struct Visibility {
       else { color = derived_view(maps, maps->color); factor = 1; }
     }
     if(r.material_bindings) {
-      r.material_bindings->validate();
+      r.material_bindings->validate(!sealed);
       if(r.material_bindings->has_mtoon&&!r.pbr_view)toon=r.material_bindings->material;
     } else if(!r.pbr_view)toon = retained_mtoon(r.appearance.get());
     if (!toon) {

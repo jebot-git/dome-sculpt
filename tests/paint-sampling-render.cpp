@@ -25,6 +25,7 @@ Scene retain_writable(const Scene &scene) {
  auto output=scene.snapshot();auto &out=output.active();out.painted=joint;out.material_bindings=binding;out.polygon=derivative.authority;out.deformation=detail::normal_frame_remap_deformation(object.deformation,object.painted->mesh(),derivative.mesh,derivative.source_vertices,{});output.validate();return output;
 }
 }
+#ifndef DOME_PAINT_SAMPLING_RENDER_NO_MAIN
 int main(int argc,char **argv)try {
  if(argc<2)return 2;const std::filesystem::path prefix=argv[1];std::filesystem::create_directories(prefix);
  NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<std::endl;
@@ -73,3 +74,5 @@ int main(int argc,char **argv)try {
  check(rejects([&]{MaterialSurfaceQuery omitted(raw,std::span<const SurfaceRange>(&raw_range,1),{},colors);}),"Legacy picker overload refuses an omitted paint domain rather than assuming authored UV0");
  std::cout<<"PASS "<<checks<<" retained writable-domain graphical checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
+
+#endif

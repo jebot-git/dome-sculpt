@@ -3,6 +3,7 @@
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
 #include "dome/normal-sampling.hpp"
+#include "dome/normal-preview.hpp"
 #include "dome/paint-sampling.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
@@ -1057,6 +1058,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
       result.back().affine_edit=o.affine_edit;
       if(o.mesh_active&&o.painted->paint_sampling_domain()){
         result.back().paint_sampling_attachment=o.painted->paint_sampling_attachment();
+        result.back().normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
         const auto domain=o.painted->paint_sampling_domain();const auto &basis=*domain->basis();
         auto &uv=result.back().paint_corner_coordinates;uv.reserve(domain->source_corners().size());size_t c=0;
         // The factory seal already proves this exact REST mesh. Read the private

@@ -9,6 +9,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/normal-preview.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "render-mtoon.hpp"
@@ -243,11 +244,16 @@ struct SurfaceRenderer::TextureState {
         auto &desired=wanted[key];desired.owner=std::move(image);desired.mips|=mipmapped(sample);
         wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true,view.texcoord};
       };
-      const bool prepared_color=detail::prepared_color_state(range.material_bindings.get(),maps.get(),geometry_changed);
-      const bool prepared_normal=detail::prepared_normal_state(range.material_bindings.get(),maps.get(),geometry_changed);
+      if(range.normal_preview_proof&&!range.normal_preview_proof->matches(range.material_bindings,maps))throw std::invalid_argument("Normal GPU preview lost its exact independently authenticated owners");
+      const bool sealed=range.paint_sampling_attachment&&range.normal_preview_proof&&range.normal_preview_proof->matches(range.material_bindings,maps)&&
+        range.normal_preview_proof->metadata_domain()==range.paint_sampling_attachment->domain()&&!range.normal_preview_proof->metadata_domain().owner_before(range.paint_sampling_attachment->domain())&&!range.paint_sampling_attachment->domain().owner_before(range.normal_preview_proof->metadata_domain());
+      if(range.normal_preview_proof&&range.paint_sampling_attachment&&!sealed)throw std::invalid_argument("Normal and paint preview metadata use different owning coordinate domains");
+      const bool deep_material=geometry_changed&&!sealed;
+      const bool prepared_color=detail::prepared_color_state(range.material_bindings.get(),maps.get(),deep_material);
+      const bool prepared_normal=detail::prepared_normal_state(range.material_bindings.get(),maps.get(),deep_material);
       std::optional<MToonMaterial> typed;
       if(range.material_bindings) {
-        range.material_bindings->validate(geometry_changed);
+        range.material_bindings->validate(deep_material);
         if(range.material_bindings->has_mtoon&&!range.pbr_view)typed=range.material_bindings->material;
       } else if(auto previous=toons.find(range.object);!range.pbr_view&&previous!=toons.end() &&
                 previous->second.appearance==range.appearance && !previous->second.source)typed=previous->second.material;
