@@ -1,0 +1,54 @@
+{
+  "scope": "private actual Scene24 current-project GLB paint-grid compiler; no native UV authoring/controller claim",
+  "parents": [
+    "600fe76",
+    "575c952190bc86c7bef213a81b9535528e2f0f64"
+  ],
+  "fresh_build": "artifacts/build-paint-export.log,all requested targets0",
+  "release": [
+    {
+      "log": "artifacts/tests-paint-export-software.log",
+      "result": "3/3,124.72s",
+      "graphical_assertions": 414,
+      "graphical_seconds": 103.96,
+      "images": 54,
+      "before_current_max": 0,
+      "original_glb_max": 1,
+      "new_current_glb_max": 1,
+      "unchanged_tolerances": [
+        2,
+        3
+      ]
+    },
+    {
+      "log": "artifacts/tests-normal-export-regression.log",
+      "result": "1/1,3.78s"
+    }
+  ],
+  "sources": {
+    "CMakeLists.txt": "cf1e412c720da901c514cdf2bdc0d131eb17674dfa0326a63e6651b4433ac04c",
+    "include/dome/document.hpp": "51cfa8fdcd650fa8a6a29a94360d17f7344439c1c11db6ceb34a737e20c03bb6",
+    "include/dome/scene.hpp": "d02c80b92fbd2178217deee47a9a1881a992c7165d7b63ab9202f2228bdd43d2",
+    "src/document.cpp": "6fe1308efe78e8baf5f1debc79ca6e7e19beafcb0f8c6cb105d16c51dfb0fbd9",
+    "src/document-native.cpp": "0ae20840303b4e401b9cec1b8545bed8736bf44932410b841a29df4a62b364c4",
+    "src/render.cpp": "b2e80050dd3aec47fefd24470f7c207b2ce29a092cf1ae737fb559da14740590",
+    "src/render-mtoon.hpp": "ae99d35a9f714564b4d58ac9a204c7649dd36573b81f52ef6d2a288c3e125ad5",
+    "src/scene.cpp": "ddd212c300684c1e3bfe3cede99805642893c86ffa9e8148fd2d823684910361",
+    "src/export.cpp": "74dbc626aa92c427137707658f89030d1853b226ccbd4b19ba381eac9b743a14",
+    "src/normal-frame-export.hpp": "3c50569a6131b86df9da8bbb05271ae45e96e94adb99af5ff8b762c9d67f75e4",
+    "src/export-corner-coordinates.hpp": "e46de474a01ed263e6c696996973cf77ce6f49cf7499147ff00d76675b2adc6d",
+    "src/material-visibility.cpp": "5f89a646c5bc4514d3de139a877b07f0430658f6aab5c4ca693d0962809ea0a6",
+    "tests/paint-sampling-render.cpp": "cecb1218efc9c303e68088acbec9051a0ec943375745713e094294be25fcc4e0",
+    "tests/prepared-normal-consumer.hpp": "93208c2463a55b024cfdc95a5a0d2793c6fe3e7e5afd2d4ff9d7c75dd6848649"
+  },
+  "binaries": {
+    "build/dome-sculpt-paint-sampling-render-test": "6f197dc53954ee9d9da12bf3183c477ce05fac0d30bb344674a955cc9168941a",
+    "build/dome-sculpt-color-paint-sampling-test": "4693c1c6b31f207f53258d833c55d52597e1c32e475535be217e44fa3247e388",
+    "build/dome-sculpt-normal-domain-glb-test": "4b3c6d7e38e1928368bbc2c31c3b01f0f888c38d2c17fd320533d084acb90a6d",
+    "build/dome-sculpt-pbr-preview-test": "79166191f0e058d78d933e027d5647a498368a1518703cf049fdbea36e032cb0",
+    "build/libdome-sculpt-core.a": "576f1f30d8aa7acc46874b8802ceb4da1932f34c4ee4908f29a78738c517fe2a",
+    "build/libdome-sculpt-render.a": "536eb0c790263084217f2365503f36fca3ea87850a07d07ad1fe658e4c820cbb"
+  },
+  "sanitizer": "pending",
+  "hardware": "pending"
+}

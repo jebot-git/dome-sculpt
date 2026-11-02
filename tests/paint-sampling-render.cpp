@@ -7,6 +7,8 @@
 #include "normal-sampling-access.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/material-visibility.hpp"
+#include "affine-surface.hpp"
 namespace {
 Scene retain_writable(const Scene &scene) {
  const auto &object=scene.active();UvWorkspace uv(object.painted->mesh(),256);const auto &m=object.painted->mesh();size_t face=0;while(face<m.indices.size()/3&&m.normals[m.indices[face*3]].z<.9f)++face;
@@ -43,10 +45,31 @@ int main(int argc,char **argv)try {
     joint::capture(prefix/(std::to_string(number)+"-before.png"),pixels);joint::capture(prefix/(std::to_string(number)+"-current.png"),result);
     auto bad=std::make_shared<MeshSnapshot>(*surface);bad->geometry_identity.reset();bad->paint_coordinates[bad->mesh.indices.front()][0]+=.01f;check(rejects([&]{draw(renderer,bad);}),"Renderer refuses changed paint corner sampling rather than borrowing normal authority");
     bad=std::make_shared<MeshSnapshot>(*surface);bad->geometry_identity.reset();bad->paint_coordinates.clear();check(rejects([&]{draw(renderer,bad);}),"Renderer refuses omitted paint stream");
+    bad=std::make_shared<MeshSnapshot>(*surface);bad->geometry_identity.reset();for(auto &r:bad->ranges)r.paint_sampling_attachment.reset();check(rejects([&]{draw(renderer,bad);}),"Renderer refuses an omitted owning attachment even when coordinate bytes remain");
+    auto detached=Scene::decode(after.encode());auto borrowed=detached.active().painted->paint_sampling_attachment();bad=std::make_shared<MeshSnapshot>(*surface);bad->geometry_identity.reset();for(auto &r:bad->ranges)if(r.paint_sampling_attachment)r.paint_sampling_attachment=borrowed;check(rejects([&]{draw(renderer,bad);}),"An equal-valued separately owned domain cannot borrow this range's actual material proof");
    }
    auto path=prefix/(std::to_string(number)+"-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+".glb");b.export_asset(path).get();prepared_normal_consumer::Model model(path);fbo.bind();independent.render(model.data,nullptr);auto reference=read();auto external=delta(result,reference);std::cout<<"PAINT_ORIGINAL_GLB max="<<external<<std::endl;check(external<=3,"Independent original-basis GLB consumer agrees with current writable-domain pixels");
+   auto output=prefix/(std::to_string(number)+"-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+"-current.glb");a.export_asset(output).get();prepared_normal_consumer::Model emitted(output);fbo.bind();independent.render(emitted.data,nullptr);auto compiled=read();auto compiled_error=delta(result,compiled);std::cout<<"PAINT_CURRENT_GLB max="<<compiled_error<<std::endl;check(compiled_error<=3,"Independent newly emitted current-project GLB agrees with native colour/normal/paint-domain pixels");
+   auto primitives=emitted.data->meshes[0].primitives;const auto &primitive=primitives[0];const auto uv0=prepared_normal_consumer::attr(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_texcoord,0);
+   const auto &rest=after.active().painted->mesh();bool uv_exact=primitive.indices->count==rest.indices.size();
+   for(size_t c=0;uv_exact&&c<rest.indices.size();++c){float coordinate[2]{};uv_exact=cgltf_accessor_read_float(uv0,cgltf_accessor_read_index(primitive.indices,c),coordinate,2)&&std::array<float,2>{coordinate[0],coordinate[1]}==rest.uv[rest.indices[c]];}
+   check(uv_exact&&primitive.material->pbr_metallic_roughness.base_color_texture.texcoord>0,"New GLB preserves actual authored UV0 corner order and genuinely binds the separate writable colour coordinate accessor");
+
   }
   ++number;
  }
+ auto original=joint::prepare(true,Material::AlphaMode::Mask);auto changed=retain_writable(original);
+ auto matrix=AffineTransform{}.matrix();matrix[0]=-1;matrix[4]=.15;matrix[8]=.08;auto edit=std::make_shared<const NativeAffineEdit>(AffineTransform(matrix));original.active().affine_edit=edit;changed.active().affine_edit=edit;posed(original,1,.35f);posed(changed,1,.35f);
+ Document before_reflected,after_reflected;before_reflected.replace(original);after_reflected.replace(changed);settled(before_reflected);settled(after_reflected);auto snapshot=after_reflected.frame().surface;
+ auto range=std::find_if(snapshot->ranges.begin(),snapshot->ranges.end(),[&](const auto &r){return r.object==changed.active().id;});check(range!=snapshot->ranges.end()&&range->paint_winding_reversed,"Packed reflected range records its actual EBO flip independently of source/cull orientation");
+ auto initial=draw(renderer,before_reflected.frame().surface),reflected=draw(renderer,snapshot);check(delta(initial,reflected)<=2,"Exact corner paint/normal correspondence survives actual reflected sheared world placement");
+ auto bad=std::make_shared<MeshSnapshot>(*snapshot);bad->geometry_identity.reset();for(auto &r:bad->ranges)if(r.paint_sampling_attachment)r.paint_winding_reversed=false;check(rejects([&]{draw(renderer,bad);}),"Missing explicit EBO winding authority cannot silently reinterpret logical paint corners");
+ auto surfaces=changed.preview_surfaces();auto object=std::find_if(surfaces.begin(),surfaces.end(),[&](const auto &o){return o.id==changed.active().id;});auto raw=object->preview_mesh();auto placement=detail::placement_frame(*object);detail::place_mesh(raw,placement,{});
+ SurfaceRange raw_range{object->id,0,raw.indices.size(),object->material,object->textures,object->appearance,0,object->material_bindings};raw_range.reflected=true;raw_range.paint_sampling_attachment=object->paint_sampling_attachment;
+ auto colors=detail::current_vertex_colors(*object,{});MaterialSurfaceQuery raw_query(raw,std::span<const SurfaceRange>(&raw_range,1),{},colors,PaintCornerCoordinates{object->paint_corner_coordinates});
+ MaterialSurfaceQuery packed_query(snapshot->mesh,snapshot->ranges,{},snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates});
+ size_t visible=0,misses=0;bool same=true;for(int y=0;y<24;++y)for(int x=0;x<24;++x){Vec3 origin{(x+.5f)/12-1,(y+.5f)/12-1,2};auto a=raw_query.raycast(origin,{0,0,-1},100,0,object->id),b=packed_query.raycast(origin,{0,0,-1},100,0,object->id);same&=bool(a)==bool(b);if(a&&b){++visible;same&=length(a->position-b->position)<1e-5f;}else ++misses;}
+ check(same&&visible>0&&misses>0,"Raw logical-corner and packed-vertex material alpha picking agree under posed reflected/sheared geometry");
+ check(rejects([&]{MaterialSurfaceQuery omitted(raw,std::span<const SurfaceRange>(&raw_range,1),{},colors);}),"Legacy picker overload refuses an omitted paint domain rather than assuming authored UV0");
  std::cout<<"PASS "<<checks<<" retained writable-domain graphical checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}

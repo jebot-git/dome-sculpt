@@ -188,6 +188,8 @@ struct SurfaceRenderer::TextureState {
     std::unordered_map<uint64_t,Toon> next_toons;std::vector<std::array<float,2>> next_uv1;
     for(auto &range:mesh.ranges){
       auto maps=range.textures;auto &plan=planned[range.object];
+      const auto paint_node=range.material_bindings&&range.material_bindings->color_preparation?range.material_bindings->color_preparation->paint_sampling:nullptr;
+      if(bool(paint_node)!=bool(range.paint_sampling_attachment))throw std::invalid_argument("Paint GPU range omitted or fabricated its own sampling attachment");
       if(range.paint_sampling_attachment) {
         if(!maps||maps->source_only||!range.material_bindings||range.material_bindings->has_mtoon)
           throw std::invalid_argument("Paint sampling requires its own derived untyped material");

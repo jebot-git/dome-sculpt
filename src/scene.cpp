@@ -1035,7 +1035,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
   for (auto &o : objects_)
     if (o.visible) {
       if(o.mesh_active&&o.painted&&o.painted->paint_sampling_domain()){
-        if(!preview)throw std::invalid_argument("Retained writable paint requires its actual export coordinate adapter");
+        if(atlas)throw std::invalid_argument("Retained writable paint needs its explicit compact/current-layout compilation adapter");
         if(!o.painted->valid_paint_sampling_attachment())throw std::invalid_argument("Retained paint lost its exact REST geometry attachment");
         if(!o.material_bindings||o.material_bindings->has_mtoon)throw std::invalid_argument("Retained paint requires its own supported current-field material");
         o.material_bindings->validate(false);detail::source_paint_pairing(o.painted.get(),o.material_bindings.get(),o.appearance.get(),false);

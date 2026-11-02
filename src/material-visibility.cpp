@@ -50,6 +50,8 @@ struct Visibility {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
+    const auto paint_node=r.material_bindings&&r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
+    if(bool(paint_node)!=bool(r.paint_sampling_attachment))throw std::invalid_argument("Visibility paint range omitted or fabricated its own sampling attachment");
     if(r.paint_sampling_attachment) {
       if(!maps||maps->source_only||!r.material_bindings||r.material_bindings->has_mtoon)
         throw std::invalid_argument("Visibility paint domain requires its paired derived material");

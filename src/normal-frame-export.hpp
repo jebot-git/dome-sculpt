@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "normal-frame-runtime.hpp"
+#include "export-corner-coordinates.hpp"
+#include "dome/color-paint-sampling.hpp"
 #include "source-morph.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "normal-preparation-state.hpp"
@@ -14,6 +16,7 @@ struct NormalFrameExport {
   // Native core-PBR only: exact retained sampling coordinates, remapped by the
   // same full frame layout as every geometric and deformation attribute.
   std::vector<std::array<float,2>> normal_coordinates;
+  std::vector<std::array<float,2>> paint_coordinates;
   std::shared_ptr<const PolygonColorSurface> input_polygon_colors;
   std::vector<Tangent> tangents;
   std::vector<std::vector<Vec3>> normal_targets,tangent_targets;
@@ -126,7 +129,21 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
       if(pbr_t && !mtoon_t)tangent_source=set.pbr;
     }
   }
-  auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;out.canonical_normal=std::move(canonical_normal);out.rest_vertices=layout.vertices;out.input_polygon_colors=input.polygon_colors;
+  auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;
+  if(input.paint_sampling_attachment||!input.paint_corner_coordinates.empty()) {
+    const auto node=binding.color_preparation?binding.color_preparation->paint_sampling:nullptr;
+    const auto expected=node?node->geometry_attachment():nullptr;
+    if(legacy||binding.has_mtoon||!retained||!expected||expected!=input.paint_sampling_attachment||
+        expected.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(expected))
+      throw std::invalid_argument("Paint sampling export requires its own supported native colour/normal attachment");
+    node->validate_current(input.mesh,cancelled);
+    PaintSamplingLimits limits;limits.cancelled=cancelled;
+    auto corners=expected->domain()->corner_coordinates(input.mesh,limits);
+    if(corners!=input.paint_corner_coordinates)throw std::invalid_argument("Paint export corner stream differs from its own REST/domain proof");
+    auto split=split_frame_corner_coordinates(input.mesh,layout,corners,cancelled);
+    layout=std::move(split.frames);out.paint_coordinates=std::move(split.coordinates);
+  }
+  out.canonical_normal=std::move(canonical_normal);out.rest_vertices=layout.vertices;out.input_polygon_colors=input.polygon_colors;
   if(prepared){out.prepared_normal.image=std::shared_ptr<const Image>(input.textures,legacy?&input.textures->mtoon_normal:&input.textures->normal);out.prepared_normal.wrap_s=out.prepared_normal.wrap_t=33071;out.prepared_normal.min_filter=out.prepared_normal.mag_filter=9729;}
   if(retained){
     const auto &projection=*input.textures->normal_projection;
