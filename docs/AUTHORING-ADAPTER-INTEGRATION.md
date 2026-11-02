@@ -6,7 +6,10 @@ full original production objective remains active and incomplete. Product source
 post-UV prepared-key authoring, current-corner RGBA source baking, source-space
 VRM0 export, desktop framing and atomic direct-caller Bake admission. Later
 9e6cb1b changes tests only; runtime/header/asset/third-party bytes are identical.
-Scene19/material archive5 remain current. The private Scene20/21/22 work is not
+All recorded relative build/artifact hashes refer to the frozen qualification
+tree `artifacts/authoring-adapters-04d` in the repository workspace. Public merge
+`0833f73` has identical runtime/header/asset/third_party/CMake/test bytes to
+qualified6826892; it adds no new runtime behavior. Scene19/material archive5 remain current. The private Scene20/21/22 work is not
 included in this checkpoint.
 
 ## Resulting authoring behavior

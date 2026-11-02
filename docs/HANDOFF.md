@@ -43,7 +43,7 @@ ABI-open and unadmitted; Scene22 is reserved for independent corner-origin keys.
 Preserve frozen component/proof trees, source commits and every running handle.
 No physical launch, system installation or active desktop restart occurred.
 
-## Current desktop framing checkpoint — 2026-11-02
+## Previous desktop framing checkpoint — 2026-11-02
 
 Product3c491bf adds native Frame all(Home), Frame selection(Shift+F), stable orbit
 pivot and successful-import/source-model auto-fit, retaining F reset. Bounds
@@ -55,13 +55,13 @@ validation/DESKTOP-FRAMING.json; no new whole-suite/whole-core-SAN or physical
 headset claim is inferred. Earlier VRM11/atlas12 import proofs and the complete
 avatar screenshot are separately scoped.
 
-Root private artifacts/authoring-adapters-04d at8d68dc7 now combines qualified
-b0cdeb5 post-UV keys, b186b9e current-color source Bake, a799211 source-space
-VRM0 export, framing3c491bf, atomic Bake admission80e21a6 and test-only actual
-avatar integer-UV proofdd2314. Fresh coherent optimized all-target Release
-build54024 and own C/C++core/support/render sanitizer build37641 are running;
-this combined tree is NOT qualified or published. Poll exact live handles;
-never restart from a stale log. No Scene20/21/22 prototype is included.
+The combined8d authoring source described above has now qualified; its optimized
+build54024 and owned sanitizer build37641 are terminal0. Its initial Release317
+and corrected registered1/1 scopes remain separate. The frozen binary, source,
+receipts and initial negative logs are preserved. Public merge0833f73 has exactly
+the same runtime/header/asset/third_party/CMake/test bytes as qualified6826892;
+this merge introduces no new runtime behavior. Current private work is listed
+in the qualified checkpoint above; Scene20/21/22 are excluded from this release.
 
 BakeAdmission80e21a6 removes a second fallible publication after queue acceptance.
 Its old04d negative fails at caller allocation91/110 with an accepted queued job;
@@ -71,7 +71,7 @@ with no new Document/FileJob fields or generic callback. Generic input-thread
 publication echo faults remain separately scoped. Preserve the frozen04d
 archive/header tree and all old/fixed proof logs.
 
-Agents continue: Contracts target20/material6/polygon5; Palette retained intrinsic
+At that framing checkpoint agents continued: Contracts target20/material6/polygon5; Palette retained intrinsic
 normal-domain Scene21/material7/normalentry3 (actual integer-UV avatar key proof
 dd2314 is test-only; arbitrary .95 scale remains a real quality refusal); Docs
 mixed rigid/source-pose VRM export in a separate a799 child. Scene22 is reserved
@@ -102,7 +102,7 @@ The published merge changes no product source/header/asset/runtime bytes from
 full-run source9081677. Record298/298 plus new1/1, not one single299-suite run.
 No physical headset launch, system install or active-session restart occurred.
 
-Immediate follow-ups:
+Historical follow-ups at that checkpoint:
 - Root: desktop framing is qualified above; next qualify the authoring-adapter
   union after transactional Bake admission is repaired.
 - merge_contracts: frozen source Bake b186b9e has actual native49, Release and

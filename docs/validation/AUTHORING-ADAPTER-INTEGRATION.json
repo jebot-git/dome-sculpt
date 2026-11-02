@@ -57,7 +57,7 @@
   "system_installation": false,
   "production_complete": false,
   "hashes": {
-    "docs/AUTHORING-ADAPTER-INTEGRATION.md": "03f7834c633da1bba68548499f30528b94362740b38793f8a54306ca95ac8a1c",
+    "docs/AUTHORING-ADAPTER-INTEGRATION.md": "cc8c634873e69e4f8457f085b1274ac1c8c9631bec2254df428527b25c162afc",
     "tests/polygon-color-document.cpp": "5407816a553dafc5f475df6221a94e6e2efe908a226fe6f3c707db536e9d5a6b",
     "tests/vrm-source-export-menu.py": "0c262a287b5fa1635ee94bd29d6af9ec7d4786fb50cdb4088e5c7679d510fb2c",
     "src/shapekey-normal-preparation.cpp": "c08c0ae81e979b31dc84ca60ad2cf7c17dab542f68cdca0d7d0264bdaf757e01",
@@ -104,5 +104,17 @@
     "artifacts/tests-adapter-union-corrected-sanitize.xml": "afe3a3a5ef2b0e20bcd939229fd3aabf25993cf003d2b4f5da7e8217e8f97f63",
     "artifacts/tests-adapter-union-corrected-sanitize.log": "8477a1d740f68e6bc7f546e2e6c06bb35d8835fbdd1cefd50e846445f018adc3"
   },
-  "latest_DomeD_remote": "d271cf65c612a462fcfa6739416b06c6565be070"
+  "latest_DomeD_remote": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "qualification_tree": "artifacts/authoring-adapters-04d",
+  "qualification_tree_absolute": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-adapters-04d",
+  "public_runtime_merge": "0833f73dae80007ac4f8759347f4a97931522348",
+  "public_merge_runtime_source_equals": "6826892d91e6095b09ebc9e99061db750af3a5ae",
+  "public_merge_equality_paths": [
+    "src",
+    "include",
+    "assets",
+    "third_party",
+    "CMakeLists.txt",
+    "tests"
+  ]
 }
