@@ -1,0 +1,93 @@
+{
+  "recorded_utc": "2026-11-02T13:31:12.955518+00:00",
+  "product": "62d47474651f1bf739db0c0b171c06d746e1e076",
+  "private": true,
+  "qualified_for_main": false,
+  "qualification_tree": "artifacts/ordered-authoring-save-5c94862",
+  "Release_alltargets": "terminal0 exec12577",
+  "owned_SAN_build": "terminal0 exec18621; complete owned C/C++ core/support/renderer/frontend compiled; system dependencies not instrumented",
+  "native_SAN30": {
+    "passed": true,
+    "seconds": 0.59
+  },
+  "related_SAN12": {
+    "passed": true,
+    "seconds": 373.98
+  },
+  "related_Release15_initial": {
+    "passed": 14,
+    "obsolete_guard_failure": 1,
+    "preserved": true
+  },
+  "corrected_test_component": "20fe1ad; samecontroller caller90denials+actualretries including acceptedSave, Release/SAN pass",
+  "spatial_test_component": "426b878;32native lifecycle assertions Release/ownedSAN pass",
+  "actual_native_Fltk_UI": {
+    "checks": 7,
+    "failed": 0,
+    "backend": "privateXvfb/X11; actualApp/Canvas source; productionruntime unchanged"
+  },
+  "post_bake_publication_faults": {
+    "measured": 9795,
+    "Release_complete": true,
+    "actual_full_helper_retry_each": true,
+    "cached_preparation": false,
+    "SAN_state": "live",
+    "SAN_session": 68235,
+    "SAN_log": "artifacts/tests-authoring-save-faults-sanitize.log"
+  },
+  "next_combined": {
+    "product": "0c6002bdb5d3ff832125ab777867f5679d063e2d",
+    "tree": "artifacts/spacenav-scene20-b197e37",
+    "Release_build_live": 19552,
+    "owned_SAN_build_live": 97041,
+    "normal_sampling21_and_colourUV23": false
+  },
+  "physical_headset": false,
+  "installation": false,
+  "session_restart": false,
+  "goal_complete": false,
+  "controller_drawers": "required after basics; not implemented",
+  "hashes": {
+    "src/document.cpp": "8a57f9580950bc8ceab018530a5abb940e99db9623247a993cdb90ae1cce0f33",
+    "src/document-assets.cpp": "b5945e6f3fd99bc9c9f7fa48e88d87c43c6229952be6b690c0607030f9f102b8",
+    "src/document-worker-errors.cpp": "29294754f347d37164546354817d3555cf2f1633accdfbf61499404159242082",
+    "src/document-cut.cpp": "ccffde750f18724c241e0283a782c1f68364ff52f39cefc2e2505c4e2a37267a",
+    "src/app.cpp": "1410fd7541d6ac84f7d46215719b3ef53b30617e9e6759228f1249da72736c1e",
+    "include/dome/document.hpp": "96fd0be67f1d32512f5c15e5f1b3fd375a93b6ab8fdb30373378215c77c59b7e",
+    "tests/authoring-save.cpp": "1178eaae3b8099b6e8a1baaad9f6d7cb39387ce0fe099ddf22e379be939d22cc",
+    "build/dome-sculpt": "c7046eb9c05de51fca02391825bcbfc0a3df6a7a4b493105f7b22a5412dbdb05",
+    "build/libdome-sculpt-core.a": "40bc573896c6a8241962edfdd1791ef40b60b967a29385d17089c0cf5c944df7",
+    "build-sanitize/libdome-sculpt-core.a": "909df5866f3f14c6ec23e0b3582e632985445a83a934d197017439c16c00c553",
+    "artifacts/authoring-save-faults.cpp": "ea4626b104cadbc08105665371d136898cd1c17d5e6706789d3c2142641226d1",
+    "artifacts/build-authoring-save-faults.py": "c8dfcd722024f7ec5e75e9de94f228124a9b36effb24089d91397b3dc6dec896",
+    "artifacts/authoring-save-faults-release/fixture": "8b65109b8acc93fcc8fcaf9432c7dbe99b4e0cb62f29dc42d75836092a72238f",
+    "artifacts/authoring-save-faults-sanitize/fixture": "267ed43b4318f06865d519b0c2d4e9a7e1f8d2bcdc3ba4eb9186964e1c90fc91",
+    "artifacts/tests-authoring-save-faults-release.log": "63bcc991de0a2c36df65b17180b82e46f7875d2756985a3e8854aea84e4a86fb",
+    "artifacts/authoring-save-ui.cpp": "f575d58bc3c6f9f1088db0fd78f66201e9e91033d84763ac869cd98b435657b1",
+    "artifacts/compile-authoring-save-ui.py": "eb506b00753cbfde59ba86fb74ca7e9fad6c856e8918a42f038cb5f2e11baed6",
+    "artifacts/authoring-save-menu.py": "37ffe2bc9474de1077be902ec13f8b50d70384c8a4cd14fc5932bcfe18116734",
+    "artifacts/authoring-save-ui/fixture": "cb4c4a9199057c581e7489767c91ca56f5630a5ad7f9fe685b79dff1b392cbf0",
+    "artifacts/authoring-save-ui/report.json": "6bb13ae52fd9bcc24b9a9083ac65926f48f16e266480988991c7643933c40c14",
+    "artifacts/tests-authoring-save-native-sanitize.xml": "29b38be07e507155ae8f249fb76379e7b7a5c223f8596d45ddfdd9bd8d6dc9bc",
+    "artifacts/tests-authoring-save-related-sanitize.xml": "6af9e2ed5a8671ab1d7e1540ea472500713280bbb65b6daac810d26b8eb6d30d",
+    "artifacts/tests-authoring-save-related-release.xml": "d74b817b9c570464c4c1b1e86b18fb47c8ed56980d023e967d9351ba3c0c81d6",
+    "artifacts/old-authoring-save-negative/run.log": "cec44f723bf8d981b66299324395bab51f6e86aacd96cbeefd0e9f0fe1687d85"
+  },
+  "test_component_hashes": {
+    "tests/bake-admission.cpp": "6f4698fe635c4996539a7ace1f096032d5c0e10531c04275307b6d858747837d",
+    "tests/authoring-save.cpp": "7859a9d06eea840fa5e63cd4e696993345334f789243428077eb90895e0fddbb",
+    "artifacts/tests-caller-release.log": "68fe89b6df18f5dcfddd4e080b4fb23e0e017e7a4f33cdb617047fdd9f3cad25",
+    "artifacts/tests-caller-sanitize.log": "68fe89b6df18f5dcfddd4e080b4fb23e0e017e7a4f33cdb617047fdd9f3cad25",
+    "artifacts/tests-spatial-release.log": "d252af056d7898093e97621a344b626e6780af1b4bf2a029a0e82fe51dfd2b5a",
+    "artifacts/tests-spatial-sanitize.log": "d252af056d7898093e97621a344b626e6780af1b4bf2a029a0e82fe51dfd2b5a"
+  },
+  "hash_roots": {
+    "src/": "qualification_tree product62",
+    "include/": "qualification_tree product62",
+    "tests/": "qualification_tree product62",
+    "build/": "qualification_tree",
+    "build-sanitize/": "qualification_tree",
+    "artifacts/": "qualification_tree",
+    "test_component_hashes": "artifacts/authoring-save-caller-62d4747, frozen426b878"
+  }
+}
