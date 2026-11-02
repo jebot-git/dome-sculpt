@@ -1,0 +1,63 @@
+{
+  "scope": "Prepared-normal native shapekey authoring qualification, private CPU/software checkpoint; no hardware/actual-loader/real-VRoid prepared claim",
+  "base": "83fc6319d7a5e0a4fb2eb1e82319170e8e78859b",
+  "core_checkpoint": "0b08ba498195790fc53e81272d0706d2b5e5ba77",
+  "toolkit_verified_DomeD": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "source_sha256": {
+    "CMakeLists.txt": "6c9cd8d9a90c500aa8a6e03702925b0b228a1c50cd072740f4310756e70bcec0",
+    "src/shapekey-normal-preparation.cpp": "8682d9d2269e93f84a1899098f38e49f9c8218808ff4f1fd94bfbd5bc3d65e72",
+    "src/shapekey-authoring.cpp": "bd983b861cd19a5d35c1b3ab5cc62f62f7a34e860e23a9b9177ddd8668b991a9",
+    "tests/prepared-normal-shapes.cpp": "1b3c36f6e8de3339d13e39ee6f5a0db13e35e9ef8983cd73ba8d6bc7a61f7591",
+    "tests/prepared-normal-shape-render.cpp": "f71916b93e0a6cb84098baa92e0a8a8ad4e0c763ff2c8d8b07b5fdd1b605da18",
+    "tests/prepared-normal-shape-strokes.cpp": "9533bd67d7def32bf5935e9d299262ad485badd78fbab986748374dd283f404b",
+    "tests/prepared-normal-shapes-faults.cpp": "a3275158d8b4082696d5adcfcc899a79b420224468270fad9126de5df5ec0b30",
+    "tests/shapekey-menu.py": "35a7d29535975546dd98f9a7a7730199004d805fcdf247b74d86b7a80dc5ab0c"
+  },
+  "checks": {
+    "Release_suites": 4,
+    "Release_seconds": 4.25,
+    "whole_source_ASan_UBSan_leak_suites": 4,
+    "sanitizer_seconds": 47.11,
+    "new_core_assertions": 43,
+    "native_controller_stroke_assertions": 29,
+    "software_graphical_assertions": 51,
+    "software_graphical_max_byte_error": 0,
+    "persistent_denial_boundaries": 2937,
+    "native_FLTK": 9,
+    "compact_FLTK": 11,
+    "Khronos_models": 27,
+    "Khronos_errors": 0,
+    "Khronos_warnings": 9,
+    "Khronos_warning_code": "INVALID_EXTENSION_NAME_FORMAT",
+    "official_VRM0_models": 9,
+    "official_schema_files": 15,
+    "official_schema_commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "official_schema_errors": 0
+  },
+  "logs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qualified-native.log": "015f589e1ed9f3db3e3d855723192b323d8eadbcdd9d7e1d568b83a2e51e58a5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-sanitize.log": "9ae0eccf3cb9ba959d70d067f31c4ae9e1637d2364364a131280b98fc5934965",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-render-software.log": "0ff70e3c52ef1ebe22415cf04dae1e1fbe334139e789f14ca8206017a2505db4",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-faults.log": "4f18166759272f8f7c3d90a88c9c954fea2cfb1205a96108d5814216e9e0b1de",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-gui.log": "4637cab55ab2edcf73063ae513df2523bb089a6d85db027a9da6ed4dc4416396",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-gui-compact.log": "0f92399a4176f13500dc7f905401b0ae6864b30966a2ea2a2cc8e7564a60b371",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-validator.json": "8373fc0bbd272983d7a52275dba0966ad074f80bf2275f04cb2f3501254f0902",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-vrm-schema.json": "c967bbc798d9dcd09c755e6e2f9cd82437e7a6f88bbcd79fdaf561fa00571c1e"
+  },
+  "binaries": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/dome-sculpt-prepared-normal-shapes-test": "adde6226602d65260a7966e62a4c8abe659b73599b32db575cba3c04b4f9be0b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/dome-sculpt-prepared-normal-shape-render-test": "23ebc087ac3877fca085d526455a749935ed4f79c47226b62166cb5bb10fcaf3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/dome-sculpt-prepared-normal-shape-strokes-test": "075483b7407eec8f59bc6a6800a511d25568adb92f61ac8ff2dccc189931528b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/dome-sculpt-prepared-normal-shapes-faults-test": "a1d7530fb7cf5dbe3fc47dc1ae8d677d1c10858b2494c75286633d5e024d5547",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/dome-sculpt-prepared-normal-shapes-test": "46bade7e3925a383cc65a611d356153c48e724b5116cfd3e7341b3e85e225ca6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/dome-sculpt-prepared-normal-shape-render-test": "ada2bb6117ce647a5b38701c4dbb879f691c72a45d297e6b042ac7daf26df17e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/dome-sculpt-prepared-normal-shape-strokes-test": "d05f13bca846e918ec93bda5c13cd02c3a30613f969e79cd71dd87149d708b3c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/dome-sculpt-prepared-normal-shapes-faults-test": "70bb054a1aa20e61cc7d4118c55c8f1cbe800d577603e5d7c20cd11e4af31e8f"
+  },
+  "remaining": [
+    "Actual A770 current-source qualification queued; parent-controlled device reservation",
+    "Actual nineteen-part female/male CC0 VRoid prepared adapter remains unqualified; previous0c6de actual-asset proof was unprepared",
+    "Actual synthetic OpenXR loader/raster admission for this adapter remains unqualified; current controller evidence is actual Document input/gesture worker",
+    "Prepared-normal source/UV adapters and arbitrary affine/current polygon-color preparation remain required; guards unchanged"
+  ]
+}

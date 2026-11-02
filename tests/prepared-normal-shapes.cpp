@@ -37,6 +37,8 @@ struct Hand{
 };
 }
 int main(int argc,char **argv)try{
+ if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){prepared_shape_fixture::model(true).save(argv[2]);return 0;}
+ if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
  if(argc!=2)return 2;const std::filesystem::path prefix=argv[1];std::filesystem::create_directories(prefix.parent_path());auto scene=prepared_shape_fixture::model();const auto original=scene.encode();const auto paint=scene.active().painted;const auto pixels=paint->encode();const auto material=original.at("objects").at(0).at("material");
  const auto first_recipe=scene.active().material_bindings->normal_preparation;const auto old_raw_source=scene.active().shape_source;const auto initial_count=scene.active().deformation->morphs->targets.size();const auto old_rig=rig(*scene.active().deformation,paint->mesh());
  Document doc;doc.replace(scene);ready(doc);ShapeKeyEdit edit;edit.name="Prepared new";doc.author_shape(edit);ready(doc);auto authored=doc.copy_scene();
