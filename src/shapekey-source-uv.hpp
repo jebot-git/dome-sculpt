@@ -11,11 +11,18 @@ inline constexpr const char *source_uv_key_notice =
 // Existing attribute copies/blends need no geometric frame, and original maps
 // retained only in before-state capsules are not current sampling authority.
 inline bool source_uv_geometry_keys_require_atlas(const SculptObject &object) noexcept {
- if(!object.painted||!object.painted->source_maps())return false;
- const auto &normal=object.painted->source_maps()->normal;
- if(!normal.image||normal.texcoord<2)return false;
+ if(!object.painted)return false;
  const auto &binding=object.material_bindings;
- return !(binding&&binding->normal_preparation&&object.painted->normal_projection()&&
-   object.painted->normal_projection()==binding->normal_preparation->projection);
+ // An authenticated prepared route reauthors its own declared target basis;
+ // raw maps in that recipe's before-state are not the current normal sampler.
+ if(binding&&binding->normal_preparation&&object.painted->normal_projection()&&
+    object.painted->normal_projection()==binding->normal_preparation->projection)return false;
+ if(const auto &maps=object.painted->source_maps();maps&&maps->normal.image&&maps->normal.texcoord>=2)return true;
+ if(binding&&binding->has_mtoon){
+  const auto role=size_t(MToonSlot::Normal);const auto &slot=binding->material.textures[role];
+  const auto coordinate=slot.transform_texcoord>=0?uint32_t(slot.transform_texcoord):slot.texcoord;
+  if(slot.index>=0&&binding->roles[role].image&&(coordinate>=2||binding->roles[role].texcoord>=2))return true;
+ }
+ return false;
 }
 }
