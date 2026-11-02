@@ -144,13 +144,13 @@ async def main():
             raw = widget.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
             return Image.frombytes("RGB", (geometry.width, geometry.height), raw.data, "raw", "BGRX")
 
-        async def settled_scroll(widget,before):
+        async def settled_scroll(widget,before,require_change=True):
             geometry=widget.get_geometry()
             original=before.crop((0,0,geometry.width,geometry.height-100)).tobytes()
             last=None;stable=0;deadline=time.monotonic()+10
             while time.monotonic()<deadline:
                 current=image(widget);pixels=current.crop((0,0,geometry.width,geometry.height-100)).tobytes()
-                stable=stable+1 if pixels==last and pixels!=original else 0
+                stable=stable+1 if pixels==last and (pixels!=original or not require_change) else 0
                 if stable>=3:return current
                 last=pixels
                 await asyncio.sleep(.08)
@@ -251,10 +251,14 @@ async def main():
             key("space");key("Tab");key("Tab");key("Tab");key("space")
             await wait(lambda:"complete" in str(editor.get_wm_name() or ""))
             geometry=editor.get_geometry();quality_before=image(editor)
-            for _ in range(60):
+            for _ in range(200):
                 xtest.fake_input(connection,X.MotionNotify,x=geometry.x+12,y=geometry.y+70)
                 xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5)
             connection.sync();quality_after=await settled_scroll(editor,quality_before);quality_after.save(OUT/"color-quality-complete.png")
+            for _ in range(20):
+                xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5)
+            connection.sync();quality_end=await settled_scroll(editor,quality_after,False)
+            check(quality_end.tobytes()==quality_after.tobytes(),"Completed compact report reaches its actual scroll end with complete numeric quality and fixed actions")
             check(quality_before.crop((0,0,geometry.width,geometry.height-100)).tobytes()!=quality_after.crop((0,0,geometry.width,geometry.height-100)).tobytes(),"Completed compact quality report remains reachable by actual scrolling after keyboard-focused baking")
             check(geometry.width<=600 and geometry.height<=320,"Completed double-size color quality report remains in a bounded scrolling dialog with pinned actions")
             key("Control_L",True);key("w");key("Control_L",False);await close_options();await command("Save");accepted=canonical(inspect())
