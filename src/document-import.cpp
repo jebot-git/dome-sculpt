@@ -90,6 +90,7 @@ void Document::import_command_locked(SpatialCommand c) {
   else if(c==SpatialCommand::ImportUnits)next->settings.choices.units=ImportUnits((int(next->settings.choices.units)+1)%5);
   else if(c==SpatialCommand::ImportFormat)next->settings.choices.format=ImportSourceFormat((int(next->settings.choices.format)+1)%5);
   else if(c==SpatialCommand::ImportMaterials)next->settings.choices.materials=!next->settings.choices.materials;
+  else if(c==SpatialCommand::ImportTextureAtlas)next->settings.prepare_texture_atlas=!next->settings.prepare_texture_atlas;
   else if(c==SpatialCommand::ImportDefaults)next->settings={};
   else if(c==SpatialCommand::ImportAxes)next->settings.choices.axes=ImportAxes((int(next->settings.choices.axes)+1)%3);
   else if(c==SpatialCommand::ImportNormals)next->settings.choices.normals=ImportNormals((int(next->settings.choices.normals)+1)%3);

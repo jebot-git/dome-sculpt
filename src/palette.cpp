@@ -533,7 +533,7 @@ void SpatialPalette::raster(const EditorState &s) {
       const auto &o=v->settings.choices;char custom[80]{};if(o.units==ImportUnits::Custom)snprintf(custom,sizeof(custom)," %.7g",o.custom_metres_per_unit);
       text(320*unit_,270*unit_,std::string(import_format_label(o.format))+(o.materials?" / Materials on":" / Materials off"),fg);
       text(320*unit_,295*unit_,std::string(import_units_label(o.units))+custom+" / "+import_axes_label(o.axes),fg);
-      text(320*unit_,320*unit_,std::string(import_normals_label(o.normals))+" / Paint "+std::to_string(v->settings.paint_resolution),fg);
+      text(320*unit_,320*unit_,std::string(import_normals_label(o.normals))+" / Paint "+std::to_string(v->settings.paint_resolution)+(v->settings.prepare_texture_atlas?" / Atlas on":" / Atlas off"),fg);
     }else{
       text(320*unit_,270*unit_,!v?"Browse for GLB, glTF, OBJ or FBX":v->busy?"Reading folder...":v->entries.empty()?(v->error.empty()?"No models or folders":v->error):
         std::to_string(v->selected+1)+"/"+std::to_string(v->entries.size())+(v->entries[v->selected].directory?" Folder: ":" Model: ")+v->entries[v->selected].name,fg);

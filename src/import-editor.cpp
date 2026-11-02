@@ -29,14 +29,15 @@ std::optional<ImportSettings> import_options_dialog(const std::filesystem::path 
   auto normals=choice("Normals","Preserve|Generate flat|Generate smooth",int(settings.choices.normals));
   int resolution=0;for(auto n=settings.paint_resolution;n>64;n>>=1)++resolution;
   auto paint=choice("Paint resolution","64|128|256|512|1024|2048",resolution);
+  Fl_Check_Button atlas(20,y,width-56,row,"Prepare editable texture atlas");atlas.value(settings.prepare_texture_atlas);y+=row;
   Fl_Check_Button materials(20,y,width-56,row,"Import materials and textures");materials.value(settings.choices.materials);y+=row;
-  const char *retained="Original source files are retained. Hierarchy, instances, skins and morphs are preserved.";
+  const char *retained="Original files, coordinates and textures are retained. Preparing an editable atlas resamples textures at the selected paint resolution.";
   Fl_Box info(20,y,width-56,row*2,retained);info.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   const char *meaning="From file reads FBX units and axes. Unitless OBJ assumes metres. Explicit normal generation replaces source shading normals.";
   Fl_Box help(20,y,width-56,row*3,meaning);help.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*3;
   content.size(width-24,y);content.end();scroll.end();
   struct Draft {
-    Fl_Choice *format,*units,*axes,*normals,*paint;Fl_Value_Input *custom;Fl_Check_Button *materials;
+    Fl_Choice *format,*units,*axes,*normals,*paint;Fl_Value_Input *custom;Fl_Check_Button *materials,*atlas;
     Fl_Window *window;ImportSettings result;bool native=false,accepted=false;
     void update(){
       bool active=format->value()==3||format->value()==4||(format->value()==0&&native);
@@ -44,7 +45,7 @@ std::optional<ImportSettings> import_options_dialog(const std::filesystem::path 
       if(active)materials->activate();else {materials->value(1);materials->deactivate();}
       if(active&&units->value()==int(ImportUnits::Custom))custom->activate();else custom->deactivate();
     }
-  } draft{format,units,axes,normals,paint,&custom,&materials,&window,settings};
+  } draft{format,units,axes,normals,paint,&custom,&materials,&atlas,&window,settings};
   auto extension=path.extension().string();for(auto &c:extension)c=char(std::tolower(static_cast<unsigned char>(c)));
   draft.native=extension==".obj"||extension==".fbx";
   format->callback([](Fl_Widget*,void*v){static_cast<Draft*>(v)->update();},&draft);
@@ -56,7 +57,7 @@ std::optional<ImportSettings> import_options_dialog(const std::filesystem::path 
     d.result.choices.format=ImportSourceFormat(d.format->value());d.result.choices.units=ImportUnits(d.units->value());
     d.result.choices.axes=ImportAxes(d.axes->value());d.result.choices.normals=ImportNormals(d.normals->value());
     d.result.choices.custom_metres_per_unit=d.custom->value();d.result.choices.materials=d.materials->value();
-    d.result.paint_resolution=64u<<d.paint->value();d.result.validate();d.accepted=true;d.window->hide();
+    d.result.prepare_texture_atlas=d.atlas->value();d.result.paint_resolution=64u<<d.paint->value();d.result.validate();d.accepted=true;d.window->hide();
   }catch(const std::exception&e){fl_alert("%s",e.what());}},&draft);
   window.end();window.set_modal();dx::style(&window);window.show();cancel.take_focus();
   while(window.shown())Fl::wait();

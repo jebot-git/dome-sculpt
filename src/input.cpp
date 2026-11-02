@@ -59,7 +59,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *,12> procedural={"Pattern","Face","Grid","Coverage / shape","Depth","Seed","Apply detail","Next seed","Back","Undo","Redo","Cancel work"};
   static const std::array<const char *,12> holding={"Object grab mode","Hold selected","Release held","Ghost others","Visibility","Previous","Next","Center","Back","Move left","Move right","Cancel motion"};
   static const std::array<const char*,12> importing={"Browse / refresh","Previous file","Next file","Open folder","Parent folder","Options","Import","Cancel","Back","Undo","Redo","Save"};
-  static const std::array<const char*,12> import_options={"Format","Units","Axes","Normals","Paint size","Materials","Custom unit","Defaults","Back","Refresh folder","Import","Cancel"};
+  static const std::array<const char*,12> import_options={"Format","Units","Axes","Normals","Paint size","Materials","Custom unit","Defaults","Back","Editable atlas","Import","Cancel"};
   static const std::array<const char*,12> polygon={"Start / resume","Vertices","Edges","Faces","Move / select","Add / toggle","Distance","Extrude","Back","Topology","Apply","Cancel"};
   static const std::array<const char*,12> polygon_topology={"All / none","Inset faces","Bridge loops","Dissolve edges","Weld vertices","Cut edges","Cuts","Connect vertices","Back","Delete faces","Flip faces","Cancel"};
   static const std::array<const char*,12> shapes={"New neutral","Capture mix","Duplicate","Mirror","Shape weight","Previous shape","Next shape","Restore original","Back","Undo","Redo","Edit / finish target"};
@@ -178,7 +178,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   }
   if(page==23){
     static const std::array<SpatialCommand,12> actions={SpatialCommand::ImportFormat,SpatialCommand::ImportUnits,SpatialCommand::ImportAxes,SpatialCommand::ImportNormals,
-      SpatialCommand::ImportResolution,SpatialCommand::ImportMaterials,SpatialCommand::Undo,SpatialCommand::ImportDefaults,SpatialCommand::Undo,SpatialCommand::ImportBrowse,SpatialCommand::ImportApply,SpatialCommand::ImportCancel};
+      SpatialCommand::ImportResolution,SpatialCommand::ImportMaterials,SpatialCommand::Undo,SpatialCommand::ImportDefaults,SpatialCommand::Undo,SpatialCommand::ImportTextureAtlas,SpatialCommand::ImportApply,SpatialCommand::ImportCancel};
     return index==6||index==8?std::nullopt:std::optional<SpatialCommand>(actions[index]);
   }
   if(page==17){

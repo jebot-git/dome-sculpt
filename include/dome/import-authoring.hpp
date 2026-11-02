@@ -8,6 +8,7 @@ struct ImportAuthoringOptions {
   uint32_t paint_resolution = 512;
   ImportLimits limits;
   ImportOptions choices;
+  bool prepare_texture_atlas = false;
 };
 struct ImportedAuthoring {
   Scene scene;

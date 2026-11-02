@@ -10,6 +10,8 @@ namespace dome {
 struct ImportSettings {
   ImportOptions choices;
   uint32_t paint_resolution=512;
+  // Explicit authoring resampling; original resource options remain unchanged.
+  bool prepare_texture_atlas=false;
   void validate() const;
   bool operator==(const ImportSettings &) const = default;
 };
