@@ -103,6 +103,18 @@ int main(int argc,char **argv)try{
   Document placed;placed.replace(scene);ready(placed);load(placed);placed.projection_action(SpatialCommand::ProjectionPlace);const auto before=placed.copy_scene().encode();check(placed.frame().state->projection->placing&&!placed.frame().state->can_preview&&rejects([&]{placed.shading(false);})&&!placed.frame().state->pbr_view,"Physical projector placement owns its gesture and blocks preview changes atomically");placed.projection_action(SpatialCommand::ProjectionPlace);check(!placed.frame().state->projection->placing&&placed.frame().state->can_preview&&placed.copy_scene().encode()==before,"Finishing placement restores material preview availability without source mutation");
  }
  {
+  Document fitting;fitting.replace(scene);ready(fitting);fitting.begin_rig_fit();
+  const auto draft=fitting.frame().state->rig_fit;const auto source=fitting.copy_scene().encode();const auto revision=fitting.frame().state->revision;
+  fitting.shading(false);ready(fitting);
+  check(fitting.frame().state->rig_fit==draft&&fitting.frame().state->revision==revision&&fitting.frame().state->pbr_view,"Idle rig-fitting draft retains its exact source lease across a real PBR view change");
+  fitting.rig_fit_action(SpatialCommand::RigFitPlace);
+  check(fitting.frame().state->rig_fit->placing&&!fitting.frame().state->can_preview&&rejects([&]{fitting.authored_shading();})&&fitting.frame().state->pbr_view,"Physical landmark placement owns its gesture and rejects preview changes atomically");
+  fitting.rig_fit_action(SpatialCommand::RigFitPlace);
+  check(!fitting.frame().state->rig_fit->placing&&fitting.frame().state->can_preview,"Ending actual landmark placement restores preview availability");
+  fitting.cancel_rig_fit();fitting.authored_shading();ready(fitting);
+  check(!fitting.frame().state->rig_fit&&fitting.copy_scene().encode()==source&&!fitting.frame().state->can_undo,"Rig-fit cancellation and authored preview restoration preserve the complete source without hidden history");
+ }
+ {
   Document raced;raced.replace(scene);ready(raced);auto gate=std::make_shared<AssetGate>();AssetRelease release{gate};mesh_gate=gate;
   raced.shading(false);gate->wait();raced.authored_shading();
   check(!raced.wait_mesh(std::chrono::milliseconds(10)),"A previous mesh endpoint cannot satisfy a newer view request while the real worker is gated");

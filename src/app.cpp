@@ -12,6 +12,7 @@
 #include "object-editor.hpp"
 #include "creator-editor.hpp"
 #include "rig-editor.hpp"
+#include "rig-fit-editor.hpp"
 #include "shapekey-editor.hpp"
 #include "weight-editor.hpp"
 #include "skin-editor.hpp"
@@ -393,7 +394,7 @@ struct Canvas : Fl_Gl_Window {
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
                    f.state->toon, f.state->light,f.state->objects,polygon_preview.object);
     detail::draw_polygon_preview(*polygons,polygon_preview,model,vp,f.state->accent);
-    if (f.state->retopology || f.state->cut || (f.state->projection&&f.state->projection->settings.preview)) {
+    if (f.state->retopology || f.state->cut || f.state->rig_fit || (f.state->projection&&f.state->projection->settings.preview)) {
       if (!cursors){cursors = std::make_unique<CursorRenderer>();cursors->set_linear_output(true);}
       auto overlay = *f.state; overlay.canvas = model; overlay.hands = {};
       cursors->draw(overlay, vp);
@@ -685,6 +686,7 @@ struct App {
     menu.add("&Paint/Use painted mesh", 'p', command, this, FL_MENU_RADIO);
     menu.add("&Paint/Edit source volume", FL_SHIFT | 'p', command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&Paint/Humanoid rig fitting...",0,command,this);
     menu.add("&Paint/Image projection/Load projection image...",0,command,this);
     menu.add("&Paint/Image projection/Image projection options...",0,command,this);
     menu.add("&Paint/Image projection/Use projection image",0,command,this,FL_MENU_TOGGLE);
@@ -1160,7 +1162,8 @@ struct App {
       canvas.document.end_desktop();
       canvas.sculpting = false;
     }
-    if(label=="Load projection image..."){
+    if(label=="Humanoid rig fitting..."){edit_humanoid_fit_dialog(canvas.document);
+    }else if(label=="Load projection image..."){
       const auto state=canvas.document.frame().state;const AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
       auto selected=projection_image_dialog();
       if(selected)canvas.document.load_projection_image(*selected,canvas.projection_camera(),source);

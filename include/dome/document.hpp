@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "rig-fit-tool.hpp"
 #include "input.hpp"
 #include "import-browser.hpp"
 #include "navigation.hpp"
@@ -170,6 +171,7 @@ struct EditorState {
   bool pbr_view = false;
   bool can_preview = true;
   uint64_t view_epoch = 1;
+  std::shared_ptr<const RigFitView> rig_fit;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -351,6 +353,12 @@ public:
   void paint_settings(PaintSettings);
   void weight_settings(WeightToolSettings, std::optional<uint32_t> joint = {}, AssetSource expected = {});
   void bind_skin(SkinAuthoringOptions, AssetSource expected = {});
+  void fit_humanoid_rig(HumanLandmarks, RigFitOptions = {}, AssetSource expected = {});
+  void begin_rig_fit();
+  void configure_rig_fit(RigFitView);
+  void accept_rig_fit();
+  void cancel_rig_fit(AssetSource expected = {});
+  void rig_fit_action(SpatialCommand);
   void paint_command(SpatialCommand);
   void sculpt_command(SpatialCommand);
   void sculpt_settings(Volume::SculptSettings, AssetSource expected = {});
@@ -829,6 +837,12 @@ private:
   void queue_resolution_locked(SculptResolutionOptions, AssetSource = {});
   void sculpt_settings_locked(Volume::SculptSettings, AssetSource = {});
   void queue_sculpt_mask_locked(std::optional<float>, AssetSource = {});
+  bool rig_fit_source_matches_locked() const;
+  bool rig_fit_command_enabled_locked(SpatialCommand) const;
+  void rig_fit_command_locked(SpatialCommand);
+  void begin_rig_fit_locked();
+  void accept_rig_fit_locked();
+  bool process_rig_fit_spatial_locked(const SpatialFrame &);
   bool skin_target_ready_locked() const;
   std::vector<uint64_t> skin_sources_locked(SkinAuthoringMode) const;
   void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {});

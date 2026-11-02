@@ -14,6 +14,17 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Private native humanoid fitting workflow — 2026-11-02
+
+A new isolated component on49projection+portableadcb implements real native
+FLTK/XR landmark/finger/body-frame controls, exact world/group/affine presentation,
+worker skeleton fitting and binding for unskinned painting meshes, material/raw
+source/morph retention and oneUndo/Cancel/orderedSave. Read RIG-FITTING.md and
+validation/RIG-FITTING.json. Full source/grouped VRoid rest-fitting/reparent/bind
+transport remains required and guarded; Scene25 is reserved for its exact posed
+local matrices and acyclic first rig-source provenance. No Scene schema is added
+by the current unskinned workflow. This is not completion of the production goal.
+
 ## Private image projection/stencil workflow component — 2026-11-02
 
 The isolated work/projection-paint-b197e37 component extends Scene20 with native
