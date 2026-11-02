@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "base": "dd2314be71f5f51c9f4e637d91533393f8573cd3",
+  "product_base": "b0cdeb561ec4938ac9ab960bdfee80345fa83470",
+  "scope": "Detached sampling correspondence and structural pool foundation; no existing public object layout/Scene/Paint admission change",
+  "sources": {
+    "CMakeLists.txt": "464816db4418d4b92ecbf89192fb19340ebdf8b04fc6cf5a19b96942dae4ea5c",
+    "include/dome/normal-sampling.hpp": "2bf18f3efcb141a8f8bd4f08db4b5e2a9378133ea598f6b9173d2da5e6880f59",
+    "src/normal-sampling.cpp": "a22168da0ef2cac20d39b9692983c013303f799c03973ec448263cc725c36615",
+    "src/normal-sampling-domain.hpp": "077d17ce8d84bb914a6c22d384f2203ab17f7c795587a54d6b9aa1292fd4cd63",
+    "tests/normal-sampling-domain.cpp": "95335f28774c3d7bf1b5973d5b5db63da7d62b7a1c8e4c0f6c610e9b883e7b1f",
+    "docs/NORMAL-SAMPLING-DOMAIN-DESIGN.md": "07e5e4800252e4004a1f9e61de5551eb7f8eb09894152dac345536b92b79704f"
+  },
+  "proof": {
+    "release": 22,
+    "changed_cpp_test_and_module_plus_whole_b0_core_asan_ubsan_leaks": 22,
+    "independent_bilinear_samples": 360,
+    "native_worker_or_shader_domain_admission": false,
+    "codec_source_authority_granted": false,
+    "gpu": false
+  },
+  "logs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-sampling-domain-codec-final22.log": "419efd800c62c500ba9072315733f759aba36d1d52dbe020acdbba7f05a5d212",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-sampling-domain-codec-final22-sanitize.log": "419efd800c62c500ba9072315733f759aba36d1d52dbe020acdbba7f05a5d212",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-sampling-domain-cmake.log": "18e84dc08cda3a61c3a7eb10135c975911cea85acba9ff16125a1b048fcb2b08"
+  },
+  "binaries": {
+    "artifacts/probe/fixture": "641bd775db1d88e617d6d171a6b36a95c68fe50148e92221c3b6251c0acb96b9",
+    "artifacts/sanitize-probe/fixture": "eae01b809b3b5bf79176ca8544166aa0d48beae9af27ff16147613a57fb1a313"
+  },
+  "frozen_dependencies_receipt": "validation/POST-UV-AVATAR.json",
+  "remaining": [
+    "Owning domain replay recipe and paired standalone archive",
+    "Current REST/material/paint/strength/sampler pairing and complete retained graph quotas",
+    "Projectionv2+Scene21/material7/normalentry3 codecs/context propagation",
+    "Actual worker/staticGPU stream/renderer exact Scale and generalUV pipeline",
+    "Explicit detail/Clear/new/partial/repeated bake transitions",
+    "Format-specific GLB/VRM quality compilation/independent dynamic pixels",
+    "Scene22 genuine independent corner-domain key authoring"
+  ]
+}
