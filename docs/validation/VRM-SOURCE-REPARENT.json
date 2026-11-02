@@ -1,0 +1,333 @@
+{
+  "checkpoint": "Private original-node reparent +weighted-joint rigid native subgroup VRM0 continuation",
+  "date": "2026-11-03",
+  "base": "c031ba2ebca291828e41500ea002d6fa8e8dca14",
+  "status": "qualified narrow component, full goal active; no main or Source24/25/26 union claim",
+  "source_hashes": {
+    "CMakeLists.txt": "b502a3f67fd6a87a8af33e64bbbb6603498a7a6dbaea47a1ff22d27c895097c0",
+    "src/vrm-source-graph.cpp": "1ffc3bba6ec7b5b63431139c40d1dcabb214d5165e02e14f6eaf84cb2cc6eadf",
+    "tests/vrm-rest-consumer-fixtures.hpp": "5a8ada2837f57b4dabd7d725ba5307c660e1fbb65ccd19a57c37565ce4e0cf28",
+    "tests/vrm-rigid-rest-fixtures.hpp": "12672c3d9703cf61f320b43ff5c8633f1c7ba2aef5a688a8b5170095e99147ef",
+    "tests/vrm-rest-reparent-source.cpp": "9a833c0a36a97ef7189d1462953ee6b4b2bc2c2569a14197d34f40905d391e98",
+    "tests/vrm-rest-reparent-worker.cpp": "065cd21f33dc3ba77286848cce7955ff7b9359103fc25f11bc748ace2bef90b2",
+    "tests/vrm-rest-reparent-render.cpp": "6bc9d0467210f6f080cfba72c8a9d118b6089e46a41201cd225dda62e4bd3676"
+  },
+  "headers": {
+    "all_public_and_private_type_headers_match_c031ba2": true,
+    "count": 189,
+    "aggregate_sha256": "5eb50b544d6b72cb3a72d7482c5858f46acb9e2cb48ef113306709fabd2484d0"
+  },
+  "build_scope": "Only private graph implementation and new fixtures rebuilt before exact immutable c031 exporter/metadata/helper and qualified219 native objects +matching own core/support/renderer. SAN assertions enabled, O1/g1 ASan/UBSan/leaks on all own changed/native/core/support/renderer. Same-ABI overlays; no fresh whole-branch build/full regression. Three CMake targets configure separately.",
+  "release_and_sanitize": [
+    {
+      "suite": "source",
+      "configuration": "release",
+      "checks": 81,
+      "exit": 0,
+      "seconds": 59.15430910199939,
+      "binary_sha256": "cd55864011ee19a1043385a926a8f6beab4b3639fab211b7dddd0f8559e3c1be",
+      "receipt": "artifacts/reparent-source-release/receipt.json",
+      "old_vrm_archive_units_excluded": true
+    },
+    {
+      "suite": "source",
+      "configuration": "sanitize",
+      "checks": 81,
+      "exit": 0,
+      "seconds": 184.8130127159966,
+      "binary_sha256": "f65e78b0b4f91222dbfafc7d47bcdff712856028799498be2f4e437adaf65ff3",
+      "receipt": "artifacts/reparent-source-sanitize/receipt.json",
+      "old_vrm_archive_units_excluded": true
+    },
+    {
+      "suite": "worker",
+      "configuration": "release",
+      "checks": 19,
+      "exit": 0,
+      "seconds": 13.706431237995275,
+      "binary_sha256": "9762c6ba4bddca89d8edb3f33cf05b592a07248e82244c7f69e8c5c993711e83",
+      "receipt": "artifacts/reparent-worker-release/receipt.json",
+      "old_vrm_archive_units_excluded": true
+    },
+    {
+      "suite": "worker",
+      "configuration": "sanitize",
+      "checks": 19,
+      "exit": 0,
+      "seconds": 89.62107027100865,
+      "binary_sha256": "644ca3b76da922289f7d263b7034db380031650436e14087a52bd9025b134d6a",
+      "receipt": "artifacts/reparent-worker-sanitize/receipt.json",
+      "old_vrm_archive_units_excluded": true
+    },
+    {
+      "suite": "render",
+      "configuration": "release",
+      "checks": 18,
+      "exit": 0,
+      "seconds": 25.102201782996417,
+      "binary_sha256": "cb43cc714f862739fd8dc29aa931dee92d8ff2fda6ded87e0f5ad887b7ac02ac",
+      "receipt": "artifacts/reparent-render-release/receipt.json",
+      "old_vrm_archive_units_excluded": true
+    },
+    {
+      "suite": "render",
+      "configuration": "sanitize",
+      "checks": 18,
+      "exit": 0,
+      "seconds": 59.9049318650068,
+      "binary_sha256": "ac629349e02fada7d69e05e4cccb983c3415e5daf608631ce077add6f14cc1fd",
+      "receipt": "artifacts/reparent-render-sanitize/receipt.json",
+      "old_vrm_archive_units_excluded": true
+    }
+  ],
+  "device": {
+    "receipt": "artifacts/reparent-render-arc/receipt.json",
+    "checks": 18,
+    "images": 4,
+    "maximum_image_error": 0,
+    "unchanged_tolerance": 2,
+    "device": [
+      "GL_VENDOR Intel",
+      "GL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    ],
+    "environment": {
+      "DRI_PRIME": "pci-0000_03_00_0",
+      "LIBGL_ALWAYS_SOFTWARE": "unset",
+      "LP_NUM_THREADS": "2"
+    },
+    "all_linked_inputs_before_after_equal": true,
+    "input_hash_count": 26,
+    "exit": 0,
+    "seconds": 24.149676222004928
+  },
+  "actual_source": {
+    "model": "Actual CC0 female VRoid geometry/textures in deterministic material profile",
+    "skins": 19,
+    "rigid_parts": 4,
+    "ordered_corners_per_output": 44436,
+    "outputs": 6,
+    "current_IBM_float_bits_exact": true,
+    "independent_world_tolerance_metres": 2e-05,
+    "world_results": [
+      "ordinary-rest.vrm corners=44436 world_max=2.74764e-07",
+      "ordinary-posed.vrm corners=44436 world_max=2.74764e-07",
+      "ordinary-restart.vrm corners=44436 world_max=2.74764e-07",
+      "metric-rest.vrm corners=44436 world_max=2.85173e-07",
+      "metric-posed.vrm corners=44436 world_max=2.85173e-07",
+      "metric-restart.vrm corners=44436 world_max=2.85173e-07"
+    ],
+    "source_parent": "Actual authored neck-child spacer in a real source skin table",
+    "joint_rigid": "Actual weighted head node also owns an unskinned mesh",
+    "placements": [
+      "ordinary",
+      "reflected/sheared native root +rotated/scaled native rigid subgroup"
+    ]
+  },
+  "schemas": {
+    "outputs": 10,
+    "khronos_version": "2.0.0-dev.3.10",
+    "errors": 0,
+    "warnings": 200,
+    "official_VRM0_errors": 0
+  },
+  "retained_negative": {
+    "base": "c031ba2ebca291828e41500ea002d6fa8e8dca14",
+    "exit": 1,
+    "source_snapshot": "artifacts/reparent-before-tail-admission/tests",
+    "diagnostic": "source-node path contains an unrelated placement",
+    "receipt": "artifacts/reparent-before-tail-admission/receipt.json",
+    "binary_sha256": "50d3670972f39c7932ba0f1374dc03b0fcd9ad85f7b4d1c5fcf289f90b36a1f0"
+  },
+  "remaining": [
+    "Shared original-node current pose only; distinct per-part pose reconciliation still required",
+    "Wider rest/role/axis and native-length metadata, general sphere/capsule/radius and spring reauthoring still required",
+    "No physics/eye/look-at/runtime-retarget equivalence inferred from matrix or image proof",
+    "Generated/unbound rigs and VRM1/constraints remain required",
+    "Male reparent, new FLTK/Wayland/physical device, allocation sweep and performance are not newly qualified",
+    "Source24/25/26 semantic union and root fresh coherent builds remain separate"
+  ],
+  "linked_own_objects_and_archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-source-release/test.o": {
+      "sha256": "774181cf85ffd426da10b37a4cb98b3bc7026ecbe901c5d599429d8dba2f159a",
+      "bytes": 836152
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/vrm-rest-metadata-release-final/vrm.o": {
+      "sha256": "b7a3b9cef1c016b83ec2e02b77dd5dcd6623702c697f7c04a7448a04f7c1574a",
+      "bytes": 792744
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-source-release/vrm-source-graph.o": {
+      "sha256": "fac295a3df8aaebcaf36b97beafdf9bd0c5e2d28cf8aaea5f4b7cd4d9b367119",
+      "bytes": 266232
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/vrm-rest-metadata-release-final/vrm-rest-metadata.o": {
+      "sha256": "13aba6519ab007c07fff7b990368be2089ead19a239e9855ac6f9e07185c073b",
+      "bytes": 160448
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/rigid-bind-release/source-rest-graph.o": {
+      "sha256": "bf204463f261151c1e3d64ff8a4500d592b01635e28d48e9828837138ba871d5",
+      "bytes": 116688
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/rigid-bind-release/source-rest-scene.o": {
+      "sha256": "5cef40dd3910a45534f9c39867a7d59620f94ce9b8546a6232a0bf72a9c62fb3",
+      "bytes": 150056
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-rest-bbb1792/artifacts/overlay-final-release/source-rest-plan.o": {
+      "sha256": "097f16011c1d2327bf9077978ce1d1c1661ef1d334895a6e519328f947410eb7",
+      "bytes": 109240
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-rest-bbb1792/artifacts/overlay-final-release/rig-rest-scene.o": {
+      "sha256": "09758457a2d9ca46270df9e2812fcbb9d4ca4ed7c072f1035cb68026b117ed34",
+      "bytes": 129864
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-rest-bbb1792/artifacts/overlay-final-release/rig-edit.o": {
+      "sha256": "1cc1a4b51b23ebe81e17e36127416ef849d0bc0f54a40b0b2c1056999f0f8acf",
+      "bytes": 101192
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-core.a": {
+      "sha256": "724347320b43887373d0fd82f8136de5db2f09f055b02c897a957b5582988a0c",
+      "bytes": 21486644
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-affine.a": {
+      "sha256": "f3922c28dcdbfbd36ece04eb468ec69ac33cca256a854cbc99de563a3faa9a74",
+      "bytes": 109806
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-polygon.a": {
+      "sha256": "27e251ca7ee1714a14b3526df459cf50bfd88aeacb82477204aafeee7da899bb",
+      "bytes": 454768
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libxatlas.a": {
+      "sha256": "e6c3da94d7b0c981b024734ea350455a5a6c73deed0114e6e567a94e37fb0067",
+      "bytes": 304734
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libmikktspace.a": {
+      "sha256": "676061ae4db3efb1dcc2e871caaaf4474441d07f2bd4b585824f1d5ab1c92c94",
+      "bytes": 30118
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libmikktspace-robust.a": {
+      "sha256": "79795bc3c388afd6542a15871c2e37489e5e1e506e7eba563e353b8eaf53c924",
+      "bytes": 30512
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libufbx.a": {
+      "sha256": "dd3a1189dc2567e95ca0c9874d6e1576fa4292659c9e9cab6797f27c36f23f4b",
+      "bytes": 705554
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-source-sanitize/test.o": {
+      "sha256": "31fd5d3a0dc9a35e74823c4c8f3f9c711d3529431900bf0473d64b4c2213e33b",
+      "bytes": 17224752
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/vrm-rest-metadata-sanitize-final/vrm.o": {
+      "sha256": "4b118e612e263d5290311886f6541f617f4ab0dda8bc28da16cb6d45863134e4",
+      "bytes": 18597376
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-source-sanitize/vrm-source-graph.o": {
+      "sha256": "5c6d4b8c886ebc8add22d1ea775895456b1840400cbf93deec4cd40fbba4c6f6",
+      "bytes": 7617240
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/vrm-rest-metadata-sanitize-final/vrm-rest-metadata.o": {
+      "sha256": "a2fb705ba1d1009e5c57208f561f8e1700bff5da80c8cee97906861eec6cafed",
+      "bytes": 3322768
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/rigid-bind-sanitize/source-rest-graph.o": {
+      "sha256": "31ad4c02aa8b1412f11e10e4496c044544a46d6bd35632f3eee1031b523282ec",
+      "bytes": 2983536
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-vrm-rest-2f06246/artifacts/rigid-bind-sanitize/source-rest-scene.o": {
+      "sha256": "1521e0057b2c45353705ec72c1a479ae60df3363c5cb2220a6a6078ecf4e0b69",
+      "bytes": 4618024
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-rest-bbb1792/artifacts/overlay-final-sanitize/source-rest-plan.o": {
+      "sha256": "52c44b73fe1bef4bfb54d7f7f09c410c7fa99f6a71bfba792312a2e534d60813",
+      "bytes": 4231240
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-rest-bbb1792/artifacts/overlay-final-sanitize/rig-rest-scene.o": {
+      "sha256": "7597f40a152cdb896966bcd3fbc2a97f68edf3e02b24197b2472456d72840956",
+      "bytes": 4211736
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-source-rest-bbb1792/artifacts/overlay-final-sanitize/rig-edit.o": {
+      "sha256": "abbe1a7a786ed5b761a9aa7065461d7a0f66883e2fdf53cea1e8d52186387c47",
+      "bytes": 3504712
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-core.a": {
+      "sha256": "7980d1ba71ab85f0fcaed7a29c795c271ca277f23af2b3f6ee9c7e173c507108",
+      "bytes": 547021182
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-affine.a": {
+      "sha256": "a5644a3347cd412e20aa7fd4d1a89948c6a99788aadb0d777f96affcdae2f8c2",
+      "bytes": 910984
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-polygon.a": {
+      "sha256": "860aad844dc1b09c671021d61660e2ceb548fc9e17fb4f2990a5c6a7a79a4ef0",
+      "bytes": 14117880
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libxatlas.a": {
+      "sha256": "ea0db6f30b122136307ca4978a4dcd9aa27f8ad565ea827f16a4c59400a507fb",
+      "bytes": 7626076
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libmikktspace.a": {
+      "sha256": "a86fe38a6ed1d093159466ae3889c05d79e47d60359df2d859a6c9e1c365d718",
+      "bytes": 596774
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libmikktspace-robust.a": {
+      "sha256": "a47eefb5b4fa4cec17f8b1100634e85ba279d7bad3d0b6495306715c47012975",
+      "bytes": 597312
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libufbx.a": {
+      "sha256": "c380be470d69d0e06a10b6f45345f121da97620e81d36b2f32b8566456e48fb2",
+      "bytes": 10554356
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-worker-release/test.o": {
+      "sha256": "7b7624141fbf18770ce59e6dc453fe8f41f4b90be564898b2944a81a60ebbc9b",
+      "bytes": 575648
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-worker-sanitize/test.o": {
+      "sha256": "9a7a332b1731d8ff60aeb0f070feb6c6235c24e486f5048d0addd128c1b2e467",
+      "bytes": 11022576
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-render-release/test.o": {
+      "sha256": "273cd5ba9c47045b6cbb183d472ca04e5310bbb10f2654e923bd8571ad43f6d5",
+      "bytes": 858384
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-render.a": {
+      "sha256": "41d8af6a36c3513406dfa0d629ad5db94f79d07d299817d5d3a35be3cd075deb",
+      "bytes": 710664
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm-source-reparent-c031ba2/artifacts/reparent-render-sanitize/test.o": {
+      "sha256": "e496d83c7299989f7e0e86e7d1a577099e164981b54d013165c9572d6380abec",
+      "bytes": 19173944
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-render.a": {
+      "sha256": "acea0e1fc4df628b9e15e5c4c0e872b58ceeaf18321c4c3d4fc4091546a1dacf",
+      "bytes": 16464948
+    }
+  },
+  "evidence": {
+    "artifacts/reparent-source-release/receipt.json": "0770ce2d8c61e1c7fc005367aef7a04a8f2ebac250475c1107626890d274aaee",
+    "artifacts/reparent-source-release/test.map": "099a81300baf4d180e68895b0e076a932f5b60805f2981cc6fffa70dd616f32b",
+    "artifacts/reparent-source-release/test.log": "d4f87c95d7f11839dc96a55c7a2e9380fd2e060ee805854f71cb9ca64c7cd7b6",
+    "artifacts/reparent-source-sanitize/receipt.json": "b28f9e2a7a07d3131d66b26a169b3290600844219fe7dff45555be7b9a7092b0",
+    "artifacts/reparent-source-sanitize/test.map": "f451ec3655fe8064ff007de8d8b392836d430bab8d5406fe4af2a2ea29228b39",
+    "artifacts/reparent-source-sanitize/test.log": "d4f87c95d7f11839dc96a55c7a2e9380fd2e060ee805854f71cb9ca64c7cd7b6",
+    "artifacts/reparent-worker-release/receipt.json": "d414314ee4494e2d743050610753b2f9e8367024ee174330c43485110a5b17ab",
+    "artifacts/reparent-worker-release/test.map": "2e18cbfbe351821c1bb029e4a9d36147e17a59336ee41f92ac0c879f563a4f25",
+    "artifacts/reparent-worker-release/test.log": "317f21ac28c3558198b37451601e090c42204105ac8b1fd60fd6d4efffe3981b",
+    "artifacts/reparent-worker-sanitize/receipt.json": "de6dac7d357f1d6435a107356a563a21f057530efdb8ce0f168ddb796e635657",
+    "artifacts/reparent-worker-sanitize/test.map": "ed0615d70575eccc356a548404e88d68c5537605ad3abcd4cf4a18487c8408c6",
+    "artifacts/reparent-worker-sanitize/test.log": "317f21ac28c3558198b37451601e090c42204105ac8b1fd60fd6d4efffe3981b",
+    "artifacts/reparent-render-release/receipt.json": "9d2d4ddfebbda921359149822168c54be4d6e033e6b733ee41b40606dfeb95a0",
+    "artifacts/reparent-render-release/test.map": "133c43dc65e010e1d9d716297b81bf238fec2db79e5b80ca19c3130cb598179a",
+    "artifacts/reparent-render-release/test.log": "c3522f64017059f20998647187dab7cbb1526fd848d400dee0e8da4e54c71d92",
+    "artifacts/reparent-render-sanitize/receipt.json": "fd7f815ebd307b3d38cf06273e6f3ec870638f2ab206623a554c73163e9fee34",
+    "artifacts/reparent-render-sanitize/test.map": "d0cf296292ba97c6521195df308cf2ba8dd7cb257760cbec05423316505ee7e5",
+    "artifacts/reparent-render-sanitize/test.log": "c3522f64017059f20998647187dab7cbb1526fd848d400dee0e8da4e54c71d92",
+    "artifacts/reparent-render-arc/receipt.json": "ba2e04333cd929b6ecead3db771135597a9959233338a4abbaae895e6538fcab",
+    "artifacts/reparent-render-arc/test.log": "19d68a8c4d93204edd05cfa6a7f6f227a90c161cc2ff0152da19955b706b5fe5",
+    "artifacts/reparent-khronos.json": "16e40fb38e0e532372630fc8df7f26ba1e25857f1eccd7b6bfd6e4530ba5047a",
+    "artifacts/reparent-official-schema.json": "92abfc768a6bedc122485b9a60e3df88919cf02d6c952e4f79b250a107eb3c66",
+    "artifacts/cmake-reparent-registration.log": "38eb697ab7cb65732b34f715b35527d238a0b28237e22af72a76522183207c8c",
+    "artifacts/reparent-before-tail-admission/receipt.json": "fbcdb61104694b0edc5d64dfe4f42a7f0ab7c3e856ad52ebf84d259aa6a61cf7",
+    "artifacts/reparent-before-tail-admission/test.log": "befd9c5c8dc86570cc00378290b0b303785d1cd1ac0bc08e681414a8b8a02417",
+    "artifacts/reparent-before-tail-admission/test.map": "8078b64daa22e14a641da7bd3c15838b25d898695393140560c2b3336be33ae7",
+    "artifacts/reparent-before-tail-admission/tests/vrm-rest-consumer-fixtures.hpp": "5a8ada2837f57b4dabd7d725ba5307c660e1fbb65ccd19a57c37565ce4e0cf28",
+    "artifacts/reparent-before-tail-admission/tests/vrm-rest-reparent-source.cpp": "ef6a793b26236ed2177c627c1d5baac8878c91ced759d5994e0ea3ac66e5787b"
+  }
+}

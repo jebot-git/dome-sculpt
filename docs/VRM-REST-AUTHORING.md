@@ -86,3 +86,8 @@ and spring reauthoring, eye/look-at behavior, actual dynamic physics, generated
 or unbound source rigs, nonlinear creator refitting and VRM1/constraints.
 Source21/23/24/26 compatibility requires a real semantic union; a larger outer
 Scene number must never imply support for an unknown before-state feature.
+
+The later [genuine-source reparent continuation](VRM-SOURCE-REPARENT.md)
+qualifies an actual new source parent, weighted-joint rigid mesh, reflected/
+sheared root and native rigid subgroup without changing this checkpoint's
+source, output or evidence. Its limits and independent proof are separate.

@@ -111,13 +111,27 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
                 placement->source_instance == graph.instance &&
                 prefix_key(prefix) == prefix_key(graph.prefix),
             "parts do not share one original source instance/native placement");
+    const bool skinned = o.deformation && o.deformation->skin;
     int previous = -1;
+    bool rigid_native_tail = false;
     for (auto at = root + 1; at != o.groups.end(); ++at) {
+      if(!at->source_placement){
+        // A rigid object's native subgroups are artist placement after its
+        // authenticated original endpoint. The emitter retains their full
+        // world delta in the rigid mesh attachment. They are not new original
+        // source nodes, and cannot replace/interleave that source chain.
+        require(!skinned && previous==a.source_node,
+                "native subgroup must follow the exact rigid source endpoint");
+        rigid_native_tail=true;
+        continue;
+      }
+      require(!rigid_native_tail,
+              "source placement cannot follow a native rigid subgroup");
       require(at->source_placement &&
                   at->source_placement->model == graph.model &&
                   at->source_placement->source_instance == graph.instance,
               "source-node path contains an unrelated placement");
-      if (o.deformation && o.deformation->skin)
+      if (skinned)
         require(identity(at->transform) && !at->affine_edit,
                 "edited source-node placement needs coherent rig/metadata transport");
       auto n = at->source_placement->source_node;
@@ -125,7 +139,8 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
               "source-node ancestry no longer matches the original path");
       previous = int(n);
     }
-    const bool skinned = o.deformation && o.deformation->skin;
+    require(previous==a.source_node,
+            "source-node path does not reach the actual mesh endpoint");
     require(skinned == (a.asset->nodes.at(size_t(a.source_node)).skin >= 0),
             "native/source skin ownership changed");
     if (!skinned) {

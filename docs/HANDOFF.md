@@ -16,6 +16,15 @@ new physical test is authorized by this specification alone.
 
 ## Private native existing-rig checkpoint — Scene25, 2026-11-02
 
+The private genuine-source reparent continuation (2026-11-03) now covers a
+weighted head joint that also owns a true rigid mesh, a genuine new source
+parent, reflected/sheared placement and independent rigid native subgroups.
+Read VRM-SOURCE-REPARENT.md and validation/VRM-SOURCE-REPARENT.json. Its only
+runtime change admits authenticated rigid tail groups after their exact source
+endpoint; skin/foreign/interleaved paths remain refused. Native worker/history,
+current per-skin IBM/corner, typed metadata and independent software/A770 image
+proof are recorded separately from c031ba2 and from current public main.
+
 Subsequent private native source-node checkpoints2f06246 and2192365 retain
 actual multi-skin/rigid original-node fitting and bind-following rigid frames.
 The typed VRM0 continuation now exports its tested fitted/posed/restart subset
