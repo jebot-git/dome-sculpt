@@ -17,7 +17,7 @@ full expressions/constraints, KHR sampling extensions and original-space
 VRM0/VRM1 re-export remain required. The writer guards remain in place.
 No physical test, system installation or active session changes occurred.
 
-# Controller selection on the viable authoring candidate
+# Dome Sculpt production handoff
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
@@ -25,42 +25,50 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Current production checkpoint — 2026-11-02
 
-Published product0057749 and qualificatione54be87 extend public899fa6b with
-source UV1 ownership, explicit editable texture atlas import, untextured
-unused-UV atlas generation and generic UV-worker cancellation. The same import
-choice is available in native FLTK and controller menus. Exact original bytes,
-corner identities, frame/skin/morph data, restoration, ordered Save and history
-remain retained. See ATLAS-CUT-IMPORT-INTEGRATION.md and its validation receipt;
-all source component commits and their full receipts are preserved.
+Combined source3520ba9 preserves public27aa478 and adds generic external VRM0/1
+import, MatCap-only coordinate correction, typed-only UV1 atlas/paint history and
+retained normalUV/artist-key lineagebb17c7f. Read NORMAL-VRM-ATLAS-INTEGRATION.md
+and validation/NORMAL-VRM-ATLAS-INTEGRATION.json before continuing. All component
+commits and full source receipts remain preserved.
 
-The ec71855 combined full Release run passed282/283; its shapekey menu failure
-led to an actual published-epoch input race repair, rather than a weaker test.
-Transaction cleanup now retains current-epoch queued controller samples and the
-pending current overflow reset. Released retained-menu rearm samples provide
-immediate hover feedback without activation. All15 deterministic native checks,
-36 selected Release,31 owned-core/support sanitizer and four actual-loader
-synthetic-XR suites pass. Both input regressions pass20 repetitions each. Native
-FLTK atlas import passes12 checks after the fix. Earlier Arc537, Wayland8 and
-SAN13 evidence remains separately scoped; the old full run is not relabeled.
-No new physical headset test, system install or session restart occurred.
+The coherent optimized UI/OpenXR build passes298/298 Release suites in1057.82s,
+including the complete772.82s cut allocation sweep. Fresh owned C/C++core/support/
+renderer ASAN+UBSAN/leaks pass15 selected suites in119.72s. Five actual A770
+consumer batches pass542 assertions. Native FLTK VRM11+normalUV13+atlas12 and
+latest private d271cf6 Wayland/universal-menu8 pass. All104 generated GLB/VRM
+files pass unfiltered/unlimited Khronos with0errors/439warnings;27 VRM0 files
+pass15 hash-verified official schemas. Latest DomeD remote was rechecked
+unchanged; canonical optimized FLTK23/bitmap4 inputs and prefixes remain current.
 
-Root's private artifacts/vrm-atlas-ec at3042a86 combines the generic VRM0/1
-import componentd72aa18, MatCap-only coordinate correctiona350832, an expanded explicit
-atlas fixture and retained normalUV/artist-key lineagebb17c7f. A fresh
-coherent optimized Release UI/OpenXR build is running; this combined tree is
-not yet qualified or published. Scene19/material5 changes private model layouts;
-never link its consumers to archives from another source/header tree.
+A new pure test registration separately passes1/1 actual-loader synthetic-XR
+suite with20 assertions: actual joystick browser/options/atlas import of the
+real19-part VRoid model, full88groups/exact original bytes and Cancel/Save.
+The published merge changes no product source/header/asset/runtime bytes from
+full-run source9081677. Record298/298 plus new1/1, not one single299-suite run.
+No physical headset launch, system install or active-session restart occurred.
 
-Agents continue actual source/current-field mesh baking, generic VRM original
-node/skin export and prepared shapekey authoring after repeated UV receipts.
-Current-field target baking has Scene20 reserved; Scene19 normal reprojection
-and the later key adapter are distinct. Preserve each frozen tree and all proof
-logs, including failures. The full REQUIREMENTS.md matrix remains required.
+Immediate follow-ups:
+- Root: screenshot review found the desktop initially crops imported avatars.
+  Add useful Frame all/selection and orbit framing, preserving native picking,
+  existing reset behavior, immutable snapshots and DomeD menus/key conventions.
+- merge_contracts: frozen source Bake b186b9e has actual native49, Release and
+  full-owned SAN fault coverage858+4393, software/Arc133, FLTK and loader proof.
+  It is not yet integrated here. Target20 is isolated at
+  artifacts/current-color-target-bake-3042a86 (a0e37e8 foundation), with material6/
+  polygon5 shared field ownership and15 checks; target Bake remains unfinished.
+- merge_palette: post-UV key productceb9893 is separate, with coherent Release10/
+  SAN10, Arc52, dense native/controller strokes29 and native/compact FLTK proof.
+  Its final persistent-allocation sanitizer job remains live at last report;
+  poll that exact handle before changing sources or integrating.
+- merge_docs: source-space generic VRM re-export is separate. Ordinary/reflected
+  skinned-mesh nodes and positive sheared original chains pass independent
+  images; this is not blanket reflected humanoid/physics support. Bone/role
+  metadata, final independent/schema/cancellation/SAN proof remain under work.
 
-The accepted physical UI baseline f3f9199 and saved20-object test session remain
-preserved. The user's request to end that test and accept its interface is
-recorded in validation/XR-SELECTION-HEADSET.json. The full production objective
-is active under the subsequent goal continuation; acceptance does not complete it.
+The full REQUIREMENTS.md matrix remains required. Preserve all frozen trees,
+local commits, unrelated changes and stashc46d1d907a9ca0cdb56cda17e54ab20284939fc1.
+The accepted physical UI sourcef3f9199 and saved20-object headset session remain
+unchanged. Test acceptance does not complete production; the goal remains active.
 
 ## Historical pause and interface acceptance — 2026-11-02
 

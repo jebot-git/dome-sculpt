@@ -1,0 +1,214 @@
+{
+  "recorded_utc": "2026-11-02T08:49:35.614973+00:00",
+  "integration_source": "3520ba9175febe05391bcba8d33371f5d5cce6a8",
+  "compiled_product": "3042a8691fabaaec471a040a13e68d6a0cfba178",
+  "full_run_source": "908167797abfb84ceba58a833ca15bf58cd8713d",
+  "later_changes": "41fb1f6 adds only a Python XR fixture and its registration;3520ba9 preserves public27aa478 history/docs. Product source, headers, assets and synthetic runtime bytes are unchanged from9081677.",
+  "source_input_trees": {
+    "src": "4a15c9eaca797fdc983bb09c55396afa2baafda8",
+    "include": "9b022e55735e4c25deea2e83189ed3a162976329",
+    "third_party": "f5abb76c37cf2216712bea7cbc1ca973347df5e4",
+    "assets": "86d714898dc244d755ce12ced294256fa585e0d3"
+  },
+  "complete_production": false,
+  "status": "qualified combined VRM import/normalUV/prepared-key/atlas milestone; full production objective remains active",
+  "scope": [
+    "Actual external VRM0 and implemented VRM1 import, exact original model/node/material/frame/skin/morph retention; no bundled model hash substitution",
+    "MatCap-only VRM0/1 has no mesh-UV requirement; mesh-sampled roles still require their declared source coordinates",
+    "Typed-only VRM1 shade UV1 can prepare a writable atlas without PBR source maps or original UV0; independent bilinear oracle maxlinear0.00195503 <=2/255, native paint/ordered accepted Save/import-and-paint history",
+    "Prepared original artist-key authoring and authenticated normal-only UV reprojection/adoption with Scene19/material archive5, bounded owning receipt and original source restoration",
+    "Public27aa478 sourceUV1/explicit atlas/cancellation/currentRGBAcut/typed holding/input publication remain included"
+  ],
+  "components": [
+    "GENERIC-VRM-IMPORT.json",
+    "NORMAL-UV-REPROJECTION.json",
+    "PREPARED-NORMAL-SHAPEKEYS-QUALIFICATION.json",
+    "PREPARED-NORMAL-VROID.json",
+    "ATLAS-CUT-IMPORT-INTEGRATION.json"
+  ],
+  "release": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-union-release-all.xml",
+    "sha256": "4241f8fc5cb8345d6ba7a569a4383dbb359564c219274eb115644721e7254f7c",
+    "tests": 298,
+    "failures": 0,
+    "seconds": "1057",
+    "scope": "All298 configured CPU/renderer/actual-loader synthetic-XR suites on coherent optimized Release UI/OpenXR/all-target build; full cut allocation772.82s included"
+  },
+  "sanitizers": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-union-sanitize-selected.xml",
+    "sha256": "4256ebe46b6850d1ec6bf3ffe681c47959508ca613d1909723e4f743487686ce",
+    "tests": 15,
+    "failures": 0,
+    "seconds": "119",
+    "scope": "15 selected suites; fresh owned C/C++core/support/renderer ASAN+UBSAN/leaks. No instrumented frontend or all-sanitizer-suite claim."
+  },
+  "registered_real_avatar_xr": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-registered-vrm-loader.xml",
+    "sha256": "229da57320ce16d0ddb42337481818c06c0766244092181cd5f4775838eb2ae6",
+    "tests": 1,
+    "failures": 0,
+    "seconds": "40",
+    "scope": "Separate newly registered fixture after full298:1/1 suite,20 assertions; actual OpenXR loader, synthetic joystick and stereo GL swapchains, real19-part VRoid import/88groups/64pxatlas/exact source bytes/Cancel/ordered final Save",
+    "report": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build/import-vrm-xr/report.json",
+      "sha256": "e4fb6d4a4b53a6e306453378f2694b7a77e67f7220ce759ef11bca8a0f5676b1",
+      "checks": 20,
+      "failed": 0
+    }
+  },
+  "native_fltk": {
+    "vrm_import": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/menu-import-vrm/report.json",
+      "sha256": "5bf11e95c680fa1be12298296a2a592ee267bfe51790b64c8519e7171723bb05",
+      "checks": 11,
+      "failed": 0
+    },
+    "normal_uv": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/menu-normal-uv-union/report.json",
+      "sha256": "78976b4a97fa867b3a7e63bc88dc00eaf115a3ceb3342fd39836b9ec328593d0",
+      "checks": 13,
+      "failed": 0
+    },
+    "atlas_import": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/menu-import-texture-atlas/report.json",
+      "sha256": "8f417a69eafa08b6aea7eaee23e350512be5c0a9b0fae72d23eccd43b3d8371e",
+      "checks": 12,
+      "failed": 0
+    }
+  },
+  "wayland": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/dome-menu/report.json",
+    "sha256": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af",
+    "checks": 8,
+    "failed": 0,
+    "compositor_source": "d271cf65c612a462fcfa6739416b06c6565be070",
+    "scope": "Actual private nested compositor/native FLTK client/universal menu/modal text edit and close; software Vulkan, no active session restart"
+  },
+  "arc": {
+    "pci": "0000:03:00.0",
+    "device": "Intel Arc A770",
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "checks": 542,
+    "sequential": true,
+    "terminal": true,
+    "logs": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-union-arc-normal-uv.log",
+        "sha256": "1761b434511ad484ba0177c98af171b06616a7b40e46a73d239378db2782c323",
+        "checks": 46
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-union-arc-generic-vrm.log",
+        "sha256": "0584f38b28d92fce8e248fce202aed34c7c6ee12aafecb0ee96ed6b4e25c1270",
+        "checks": 31
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-union-arc-atlas.log",
+        "sha256": "aa833823b734a9a151fb8ee06ab4541df7b6b40089bec7d2c4a225efc05e3bdf",
+        "checks": 135
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-union-arc-cut.log",
+        "sha256": "05c91c590af500060984187db6a347892004bc018613d15f3eae587654caea10",
+        "checks": 257
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/tests-union-arc-prepared-vroid.log",
+        "sha256": "60608d48cac16fee6a77a56d83a4c73caa6267a2013ba1d4d4aac77f7ebd0917",
+        "checks": 73
+      }
+    ],
+    "results": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/union-arc-results.json",
+      "sha256": "4d51e827d68a3df4bc4aa3db8ae36a410923b0b9bfb35df2b89ba21a5a4744b3"
+    }
+  },
+  "files": {
+    "khronos": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/union-khronos-unfiltered.json",
+      "sha256": "55cfe01156912ff21800a99b0747d63bc2ececad3c6301e49f24e1c31c8fb971",
+      "validator": "2.0.0-dev.3.10",
+      "files": 104,
+      "errors": 0,
+      "warnings": 439,
+      "maxIssues": 0,
+      "filtering": false
+    },
+    "official_vrm0": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/union-vrm0-schema.json",
+      "sha256": "f7f423b96b7b12886116b4fc90e4c013302ae0e0bacd4eb73b6c8ac4bd4c3988",
+      "files": 27,
+      "errors": 0,
+      "schema_pin": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+      "verified_git_blob_hashes": 15,
+      "jsonschema": "4.26.0",
+      "runtime": "uv --offline; cached optional test tool only"
+    }
+  },
+  "binaries": {
+    "app": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build/dome-sculpt",
+      "sha256": "318ee386309d2937b2d0ddc97207c241cd648b2a922ab08282163b7b6e1bbc5d"
+    },
+    "core": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build/libdome-sculpt-core.a",
+      "sha256": "17260fbf5d0e7483b2a4e3c63267da54a7d9ae2cf7ec5264761e7a7dc3241436"
+    },
+    "renderer": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build/libdome-sculpt-render.a",
+      "sha256": "75cc52dfab2066ecee47ec017e48274c42222b5fdf3e079d6e8309b0acf19bf8"
+    },
+    "synthetic_runtime": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build/libdome-sculpt-test-runtime.so",
+      "sha256": "a86e34e91624d980a997dd449fdf7a49887f29e4c111cbc7e47bec4f90c5bb82"
+    },
+    "sanitized_core": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build-sanitize/libdome-sculpt-core.a",
+      "sha256": "b0c4ce10a9bb45949ef470d8b018d35047339f6d785d873bb398eec9f04540ef"
+    },
+    "sanitized_renderer": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build-sanitize/libdome-sculpt-render.a",
+      "sha256": "a9df74ee7354ccffa1d181d80f4046628407b53a491429a3608e41a360d62221"
+    }
+  },
+  "build_attempts": {
+    "initial_all_Release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/build-union-release.log",
+      "sha256": "9367983fc64f2c3ac14bf6df7ca737b83d99d343e3e2170c58bf6f84cd70de43"
+    },
+    "initial_SAN": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/build-union-sanitize.log",
+      "sha256": "6b063188d135142276d12abd927f099f6da6da2d9cc311033308cd6759f5bdaf",
+      "exit": 2,
+      "reason": "Nonexistent vrm-import-v1 target requested after valid core/native targets; no product failure. Native test covers both versions."
+    },
+    "SAN_repaired_target_list": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/build-union-sanitize-rest.log",
+      "sha256": "823403d47b187887d2159ce96f3494e7c406b620cdbc775e9a4fba30576de941",
+      "exit": 0
+    },
+    "typed_only_registered_Release_target": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/build-typed-uv1-release.log",
+      "sha256": "8f0941e156a30cc64d6cc804ec095c28fee6586815020e4bc3e266bef1a8fdfb"
+    },
+    "typed_only_registered_SAN_target": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/artifacts/build-typed-uv1-sanitize.log",
+      "sha256": "064a95ed2da0fc34372f13005df85b831569d31b1dd6bfb9606e3e400d5a7c19"
+    }
+  },
+  "toolkit": "Canonical optimized EEE FLTK23/bitmap4 patches and lib prefixes; latest DomeD d271cf6 remote rechecked unchanged before publication",
+  "system_installation": false,
+  "physical_headset_test": false,
+  "session_restart": false,
+  "preserved_test_attempts": {
+    "typed_only_fixture_initial": "Separate probe tried Save while unaccepted import authoring was busy; correct existing guard refused. Final13-check fixture waits for import acceptance, then verifies immediately ordered Save after actual native paint. Original log retained under vrm-typed-uv1-3042/artifacts/typed-only-uv1-initial-pending-save.log.",
+    "initial_schema_invocation": "System python3 lacked optional jsonschema; reused cached uv offline environment; no system dependency installation."
+  },
+  "remaining": [
+    "Generic source-space VRM export/current-pose shared-node/skin/expression/metadata adapters remain separate private work; reflected humanoid-root/physics is not broadly qualified",
+    "Prepared key authoring after repeated UV receipts is separate private qualified-component work, not this published product",
+    "Current-field source baking b186b9e is separately frozen; target Scene20 projection still under implementation",
+    "Screenshot review shows initial desktop view crops imported avatar: add usable Frame all/selection and orbit framing controls; existing F reset only restores origin",
+    "All remaining REQUIREMENTS.md rows, sustained device workflows and accelerator workload coverage remain required"
+  ]
+}
