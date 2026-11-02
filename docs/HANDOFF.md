@@ -40,6 +40,9 @@ future budget-only policy gives just those two original shards1200 rather than
 
 ## Qualified accepted-authoring IO and desktop navigation — 2026-11-02
 
+Public merge`f8c38921e19d0091b83ee40368c1519ec28ab256` is runtime/header/asset/third_party/CMake/test
+byte-identical to qualified`7504ffe`.
+
 Frozen runtime0c6002b combines public Scene20, native3Dmouse/lifetime5e6de1d,
 commonSave62d4747 and portableUVSaveb265706; test-only0e623e7 corrects the
 obsolete pending-import Save exclusion and adds spatial Save/immediate Close.
