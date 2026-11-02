@@ -268,6 +268,13 @@ if(BUILD_TESTING)
   target_include_directories(dome-sculpt-cut-color-test PRIVATE src)
   target_link_libraries(dome-sculpt-cut-color-test PRIVATE dome-sculpt-core)
   add_test(NAME colored-plane-cut COMMAND dome-sculpt-cut-color-test)
+  add_executable(dome-sculpt-xatlas-shutdown-test tests/xatlas-shutdown.cpp)
+  target_link_libraries(dome-sculpt-xatlas-shutdown-test PRIVATE xatlas Threads::Threads)
+  target_link_options(dome-sculpt-xatlas-shutdown-test PRIVATE
+    -Wl,--wrap=_ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE
+    -Wl,--wrap=_ZNSt18condition_variable10notify_oneEv -Wl,--wrap=pthread_mutex_lock)
+  add_test(NAME xatlas-shutdown-handshake COMMAND dome-sculpt-xatlas-shutdown-test)
+  set_tests_properties(xatlas-shutdown-handshake PROPERTIES TIMEOUT 30)
   add_executable(dome-sculpt-cut-authoring-test tests/cut-authoring.cpp)
   target_link_libraries(dome-sculpt-cut-authoring-test PRIVATE dome-sculpt-core)
   add_test(NAME cut-authoring COMMAND dome-sculpt-cut-authoring-test)
