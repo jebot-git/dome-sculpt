@@ -12,7 +12,8 @@ Product7566a8f combines the rigid/source application with frozen65b0ae9 and repa
 an obsolete target-exclusion expectation. Test-only5c94862 adds the qualified
 dual/joint fixtures and gives the large rigid export oracle600 rather than240
 seconds. Runtime/header/asset/third_party bytes remain identical to7566a8f.
-No new Source21/22/23 sampling or UV-colour adapters are admitted here.
+No new Source21/22/23 sampling or UV-colour adapters are admitted here. Public merge8cfb53f
+has runtime/header/asset/third_party/CMake/test bytes identical to qualified277474f.
 
 The fresh optimized all-target FLTK/OpenXR build passed. The full368-suite Release
 run passed in2827.37s. Two subsequently added registered workflow suites pass

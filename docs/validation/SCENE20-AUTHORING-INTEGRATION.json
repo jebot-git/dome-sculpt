@@ -190,7 +190,7 @@
     "build-sanitize/CMakeFiles/mikktspace.dir/flags.make": "0909bc44bd7bee364837cf27d96d76f643736b0f42a792d935e5d36b57a4a0d4",
     "build-sanitize/CMakeFiles/xatlas.dir/flags.make": "e9f9f394f8d7eda827d6421ce196b40a30d158bd7ce6e6f00e40895a52ace1c5",
     "CMakeLists.txt": "08ec26087076838c879914b440ce41b9866c873b583e8ff9240adb9e3be0b2a1",
-    "docs/SCENE20-AUTHORING-INTEGRATION.md": "b96b1cd331997d03d0c70de9795f34ee0296e8d72a93da5cf07a65c75274705b",
+    "docs/SCENE20-AUTHORING-INTEGRATION.md": "cb032aae005d2fbfa472b0ca054d5a50e7eba438edc8758413523b8c3be9916f",
     "docs/validation/CURRENT-COLOR-TARGET-SAN.json": "77dd605b9d8ebfa6011bdff82bc18c297d850ee0eb18ec17803ea40fbcfeffaa",
     "tests/target-precommit-budget.py": "7bf7957b93f027d61dc528888b3cf4ae6eab0deb00fef24bd7595054fa8bbcb8"
   },
@@ -219,5 +219,7 @@
     "artifacts/": "qualification_tree",
     "CMakeLists.txt": "published source equals qualification except documented test budgets",
     "docs/": "published source"
-  }
+  },
+  "public_runtime_merge": "8cfb53f9616061f0bba5f2672743d344398ff104",
+  "public_merge_runtime_equals": "277474f; exact runtime/header/asset/third_party/CMake/test equality verified by git diff"
 }

@@ -16,7 +16,8 @@ new physical test is authorized by this specification alone.
 
 ## Qualified current-colour target authoring integration — 2026-11-02
 
-Scene20/material6/polygon5 now combines actual current-corner RGBA target
+Public merge8cfb53f is runtime/header/asset/third_party/CMake/test byte-identical
+to qualified277474f. Scene20/material6/polygon5 now combines actual current-corner RGBA target
 preparation/Bake with retained normalUV/artist keys, source Bake and mixed
 rigid/source VRM0 authoring. Runtime7566a8f has fresh optimized alltargets and a
 full368/368 Release pass2827.37s, plus separately added2/2 fixtures35.43s. Read
@@ -45,7 +46,7 @@ completion lets a following Save capture the committed endpoint, propagate exact
 failures and drain accepted Save on Close. This is unqualified/private; no new
 completion adapter is admitted until its actual lifecycle and frontend proofs pass.
 
-Contracts' raw current-corner UV witness/transfer aec07c2 has36 native plus19/19
+Contracts' raw current-corner UV witness/transfer57c1c42 (runtimeaec07c2) has36 native plus19/19
 Release/SAN suites,13758 real whole-helper denials; prepared Scene23 and actual
 UV/controller completion remain private/unfinished. Palette native retained
 normal-sampling91c412c passes software and actualArc166 checks, including both
