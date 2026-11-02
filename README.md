@@ -62,6 +62,8 @@ Reconstruction and topology/surface quality remain on CPU. The Arc path has
 native menu, synthetic OpenXR, exact persistence and sanitizer evidence; CUDA/HIP
 resampler kernels compile, with positive vendor hardware still unverified.
 See [resolution backend evidence and limits](docs/GPU-RESOLUTION-BACKEND.md).
+Current CUDA/ROCm native application build and unavailable-device scopes are in
+[the compiler checkpoint](docs/CURRENT-CUDA-ROCM-NATIVE.md).
 
 
 ## Current native workflow

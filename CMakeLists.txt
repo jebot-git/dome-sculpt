@@ -14,6 +14,12 @@ elseif(DOME_COMPUTE_BACKEND STREQUAL "CUDA")
   set(CMAKE_CUDA_STANDARD_REQUIRED ON)
   set(compute_source src/backend_gpu.cu)
 elseif(DOME_COMPUTE_BACKEND STREQUAL "ROCM")
+  # The HIP Clang link driver may default to PIE while the host C/C++ compiler
+  # defaults to absolute code. Keep all project objects linkable across that
+  # mixed-driver boundary, while respecting an explicit caller setting.
+  if(NOT DEFINED CMAKE_POSITION_INDEPENDENT_CODE)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  endif()
   enable_language(HIP)
   set(CMAKE_HIP_STANDARD 20)
   set_source_files_properties(src/backend_gpu.cu PROPERTIES LANGUAGE HIP)

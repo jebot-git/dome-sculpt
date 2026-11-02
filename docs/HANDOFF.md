@@ -14,6 +14,28 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Current native CUDA/ROCm builds — 2026-11-03
+
+ROCm default-PIC source3fc5035 /metadata0e28b5f fixes a real mixed-driver native
+link failure: GCC C/C++ objects were absolute but HIP Clang links PIE. Fresh
+native FLTK/OpenXR apps and selected new resolution targets now compile/link
+CUDA13.4.59/sm86 and HIP7.1.52802/gfx1030 with canonical toolkit/bitmap inputs.
+Explicit unavailable-device session/Scene checks retain exact caller/owner state;
+CUDA registered missing+nativeCPUcontract2/2, HIP nativeCPUcontract1/1 pass.
+Captured1148CUDA/1153HIP source/app/archive/test hashes unchanged. Actual HIP app
+is ELF DYN; appobjects-fPIE/staticlibs-fPIC. Caller PIC override remains honored,
+and CPU/OneAPI/CUDA defaults are unchanged. Read CURRENT-CUDA-ROCM-NATIVE.md/.json
+for precise target lists, preserved failed link and hashes. This is not alltarget/
+alltest or positive AMD/NVIDIA execution; numerical/performance/loss requirements
+for unavailable vendor devices remain open.
+
+Contracts now owns a separate CUDA/HIP brush scalar-only transfer/atomicity child
+(source53a26f0, fresh native apps complete, final exact fault-chunk tests running).
+It preserves brush math while staging all scalar results; test-only vendor API
+shims are host-control-flow proof, not GPU arithmetic. No such product change is
+admitted by this compiler fix. Source24/25/26 authoring continuations remain
+private; their integration/adapter and full-production gates stay required.
+
 ## Qualified forward GPU resolution integration — 2026-11-02
 
 Integration merge3ed95ad93558c6f05133bee8cd47957d36302b55 is runtime/header/test/

@@ -1,0 +1,76 @@
+{
+  "source_commit": "3fc50353f52a382d046d2cdf79fc9e1e00c3b312",
+  "scope": "fresh native applications and selected compile targets; missing-device/host CPU contract execution only",
+  "cuda": {
+    "source": "ade92df",
+    "metadata": "41deb41",
+    "compiler": "13.4.59",
+    "architecture": "sm86",
+    "target_list": [
+      "dome-sculpt",
+      "dome-sculpt-resample-backend-test",
+      "dome-sculpt-resolution-test",
+      "dome-sculpt-resample-native-contract-test",
+      "dome-sculpt-compute-backend-test"
+    ],
+    "registered_tests": "compute-missing-gpu +resample-native-contract2/2",
+    "direct_tests": "missing session1 +missing Scene2",
+    "before_after_entries": 1148
+  },
+  "rocm": {
+    "source": "3fc5035",
+    "compiler": "HIP7.1.52802/Clang20 +GCC16.2.1 host",
+    "architecture": "gfx1030",
+    "target_list": [
+      "dome-sculpt",
+      "dome-sculpt-resample-backend-test",
+      "dome-sculpt-resolution-test",
+      "dome-sculpt-resample-native-contract-test"
+    ],
+    "registered_tests": "resample-native-contract1/1",
+    "direct_tests": "missing session1 +missing Scene2",
+    "before_after_entries": 1153,
+    "initial_failure": "absolute GCC objects linked as PIE by Clang, preserved",
+    "fix": "default CMAKE_POSITION_INDEPENDENT_CODE ON only forROCM; explicit caller override retained"
+  },
+  "local_sha256": {
+    "CMakeLists.txt": "f6ec3bcf023e23cc9e6b5c2aac91ef60ee2c78fb06f680f3467df42c8a762fec",
+    "artifacts/configure-native-rocm.log": "bdc694c6f8abf73188395d7f77d35ed4e3e18a4777fe1bb3b4e25d3a235d24dc",
+    "artifacts/build-native-rocm.log": "7d0ca02de04613c4bc00f556638a4c4fbc0a96e35c3f5d9ef8070d7695c0135f",
+    "artifacts/tests-native-rocm.log": "bdf0f4b8ae9a9d19e5415ba6ea447065c3a4e8052bdb623ec48a493389fa8160",
+    "artifacts/native-rocm-missing-session.log": "a6c40edeb1afc8e1f5132415b9ba9aca4ac0e2cbe925e291140f822f37d49bb2",
+    "artifacts/native-rocm-missing-volume.log": "7bf6e81881d9066ae624f2d47fb51ec789ff403ec21a04c15b3c3c6ec510e981",
+    "artifacts/native-rocm-before.json": "ea3914ad9f3f919fddd0c65a8af31bf9b983103448045185e413d028df52be16",
+    "artifacts/native-rocm-after.json": "ea3914ad9f3f919fddd0c65a8af31bf9b983103448045185e413d028df52be16",
+    "artifacts/native-rocm-elf-header.log": "fa3f9f6f178c5ea7bdb0c770c1496f24411c4f1c0593338961d8482f0815a5cb",
+    "build-native-rocm/CMakeFiles/dome-sculpt.dir/flags.make": "d3ab970998bf46e7f2ec004508cd0876ca338c14fd5fc818d005832c7f4dd481",
+    "build-native-rocm/CMakeFiles/dome-sculpt-core.dir/flags.make": "b5de1d3093c165436c4fa587b4afc723ac1c65f716b633f272b5102c771eee20",
+    "build-native-rocm/CMakeFiles/dome-sculpt.dir/link.txt": "df06187d40bda9fec72a53f57a36288a11e8260ca1a3c848257424fcf31199ae",
+    "build-native-rocm/artifacts-native-rocm.xml": "930e358e3ef10f66441a6e31e164eee6d291414a20a99bbc4fb0789a7c292ca0",
+    "build-native-rocm/dome-sculpt": "f0ed1ad1495c8864d831246395dc3b03df054fd8eb99eeaa84385a5744d03e41",
+    "build-native-rocm/libdome-sculpt-core.a": "988d095da50906db1654da9366bed5b46c55c2c2a17ac625530ff6b74ced1646"
+  },
+  "parent_component": "/home/blux/de-xr/dome-sculpt/artifacts/resample-contract-f01e04f",
+  "parent_sha256": {
+    "artifacts/configure-native-cuda.log": "c35cb1093adf984c6c3dee3c9902eda86924452a9f12f372c44b6494befadebb",
+    "artifacts/build-native-cuda.log": "f61a6e18ab660bff3b49952df80241d47d06925d8291afd8221c9568d0a030a6",
+    "artifacts/build-native-cuda-compute-test.log": "ea44982902dd51b1ce1f97eb3f45686e268b35bdc5a70be6fbb3641de6969658",
+    "artifacts/tests-native-cuda.log": "e35ad710dbbe15ca14b0a523b252949072ce6b5c18ec6eab6feb0855584e68ab",
+    "artifacts/native-cuda-missing-session.log": "fc2058d121e5a4050a0a769c42aed61efc449fc53d90625cd2653df5b04c5241",
+    "artifacts/native-cuda-missing-volume.log": "bba786df09d4935b15d5d305931edadf4e4ae9849b00696fb2baad3dcf628513",
+    "artifacts/native-cuda-before.json": "02276072a2f3c34e2ecf434d8025a85f1d327144ad5a8c92996d49ee50bd9460",
+    "artifacts/native-cuda-after.json": "02276072a2f3c34e2ecf434d8025a85f1d327144ad5a8c92996d49ee50bd9460",
+    "build-native-cuda/artifacts-native-cuda.xml": "bb10badca68cc1f83c53582e05900a8a1739e8e608af1fc7a7d6b2275d9e421b",
+    "build-native-cuda/dome-sculpt": "87f7e7a13095197c27948cf2de69d6aa5d0f5bd0a4c59b1ed6cc3eaeb5c08cb2",
+    "build-native-cuda/libdome-sculpt-core.a": "e0715a12b4b819e55f0e590f8de6f4634ab823de6238be954e18b6b04be593cf",
+    "artifacts/configure-native-rocm.log": "cc6834c913e10897b9934becc750f7a7db8d287ec40510a6034c69f1e1c32a2c",
+    "artifacts/build-native-rocm.log": "2eb7c828243dd82d936a2f52edb0535e3eba8e2954086de37430aab61c6bf4e3",
+    "build-native-rocm/CMakeFiles/dome-sculpt.dir/flags.make": "a7e96b6be21238ce9994b18bcb71b0721fa701a76630a10ec4fa0c2c7d09a097",
+    "build-native-rocm/CMakeFiles/dome-sculpt.dir/link.txt": "df06187d40bda9fec72a53f57a36288a11e8260ca1a3c848257424fcf31199ae"
+  },
+  "positive_hardware": {
+    "NVIDIA": false,
+    "AMD": false
+  },
+  "no_system_install": true
+}
