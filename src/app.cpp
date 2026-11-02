@@ -12,6 +12,7 @@
 #include "object-editor.hpp"
 #include "creator-editor.hpp"
 #include "rig-editor.hpp"
+#include "rig-fit-editor.hpp"
 #include "shapekey-editor.hpp"
 #include "weight-editor.hpp"
 #include "skin-editor.hpp"
@@ -20,6 +21,7 @@
 #include "procedural-editor.hpp"
 #include "import-editor.hpp"
 #include "paint-editor.hpp"
+#include "projection-editor.hpp"
 #include "mesh-editor.hpp"
 #include "bake-editor.hpp"
 #include "ui-conventions.hpp"
@@ -172,6 +174,14 @@ struct Canvas : Fl_Gl_Window {
                      (h() - 2 * (y - this->y())) / size);
   }
   bool native_stroke=false, suppress_drag=false, object_drag=false,polygon_drag=false,drag_affine=false;
+  ProjectionCamera projection_camera() const {
+    ProjectionCamera camera;camera.mode=ProjectionMode::Perspective;
+    const auto inverse=rotation.inverse();const auto origin=inverse.rotate(Vec3{0,0,distance}-pan);
+    camera.pose.position={origin.x,origin.y,origin.z};camera.pose.orientation={inverse.x,inverse.y,inverse.z,inverse.w};
+    camera.vertical_fov=.7853981634f;camera.aspect=float(w())/std::max(1,h());
+    camera.near_depth=std::clamp(distance*.001f,.00001f,.01f);camera.far_depth=100;
+    return camera;
+  }
   void polygon_at(int x,int y,PolygonAction action) {
     float aspect=float(w())/std::max(1,h()),tangent=std::tan(22.5f*3.14159265f/180);
     Vec3 direction{(2.f*(x-this->x())/w()-1)*aspect*tangent,(1-2.f*(y-this->y())/h())*tangent,-1};
@@ -384,7 +394,7 @@ struct Canvas : Fl_Gl_Window {
     renderer->draw(f.surface, model, vp, eye, pixel_w(), pixel_h(), false,
                    f.state->toon, f.state->light,f.state->objects,polygon_preview.object);
     detail::draw_polygon_preview(*polygons,polygon_preview,model,vp,f.state->accent);
-    if (f.state->retopology || f.state->cut) {
+    if (f.state->retopology || f.state->cut || f.state->rig_fit || (f.state->projection&&f.state->projection->settings.preview)) {
       if (!cursors){cursors = std::make_unique<CursorRenderer>();cursors->set_linear_output(true);}
       auto overlay = *f.state; overlay.canvas = model; overlay.hands = {};
       cursors->draw(overlay, vp);
@@ -571,8 +581,9 @@ struct App {
     menu.add("&View/3D mouse navigation",0,command,this,FL_MENU_TOGGLE|FL_MENU_VALUE);
     menu.add("&View/3D mouse options...",0,command,this);
     menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
-    menu.add("&View/Shading/&PBR", 0, command, this,
+    menu.add("&View/Shading/&Authored material", 0, command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&View/Shading/&PBR", 0, command, this, FL_MENU_RADIO);
     menu.add("&View/Shading/&Toon preview", 0, command, this, FL_MENU_RADIO);
     menu.add("&Sculpt/&Clay", '1', command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
@@ -675,6 +686,12 @@ struct App {
     menu.add("&Paint/Use painted mesh", 'p', command, this, FL_MENU_RADIO);
     menu.add("&Paint/Edit source volume", FL_SHIFT | 'p', command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&Paint/Humanoid rig fitting...",0,command,this);
+    menu.add("&Paint/Image projection/Load projection image...",0,command,this);
+    menu.add("&Paint/Image projection/Image projection options...",0,command,this);
+    menu.add("&Paint/Image projection/Use projection image",0,command,this,FL_MENU_TOGGLE);
+    menu.add("&Paint/Image projection/Projection from view",0,command,this);
+    menu.add("&Paint/Image projection/Cancel image load",0,command,this);
     menu.add("&Paint/Brush settings...", FL_ALT | 'p', command, this);
     menu.add("&Paint/Add layer", FL_CTRL | 'l', command, this);
     menu.add("&Paint/Next layer", 0, command, this);
@@ -764,10 +781,12 @@ struct App {
     enable("&File/Cancel background work",!modal && (s->can_cancel_asset||s->native_pending));
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Frame &all", "&View/Frame &selection", "&View/Reset &trackball", "&View/Start or stop &XR",
-                           "&View/Shading/&PBR", "&View/Shading/&Toon preview",
+                           "&View/Shading/&Authored material", "&View/Shading/&PBR", "&View/Shading/&Toon preview",
                            "&View/3D mouse navigation","&View/3D mouse options..."};
     for (auto path : views)
       enable(path, !modal);
+    for(auto path:{"&View/Shading/&Authored material","&View/Shading/&PBR","&View/Shading/&Toon preview"})
+      enable(path,!modal&&s->can_preview);
     const bool can_frame=!modal&&!s->stroking&&!s->native_pending&&!s->object_grabbing;
     enable("&View/Frame &all",can_frame&&detail::desktop_frameable(frame,false));
     enable("&View/Frame &selection",can_frame&&detail::desktop_frameable(frame,true));
@@ -823,6 +842,9 @@ struct App {
       checked("&Scene/&Visible", active->visible);
       checked("&Scene/&Locked", active->locked);
     }
+    checked("&Paint/Image projection/Use projection image",s->projection&&s->projection->settings.enabled);
+    enable("&Paint/Image projection/Use projection image",s->projection&&s->projection->image&&!s->native_pending&&!s->stroking&&!s->shape_sculpt&&s->mesh_active);
+    enable("&Paint/Image projection/Cancel image load",s->projection&&(s->projection->loading||s->projection->browsing));
     checked("&Scene/VR selection mode",s->selection_mode);checked("&Scene/XR object hierarchy",s->hierarchy_open);checked("&Scene/Focus selected objects",s->selection_focus);
     enable("&Scene/VR selection mode",s->can_select_objects);
     enable("&Scene/Focus selected objects",s->can_select_objects);
@@ -885,7 +907,8 @@ struct App {
       enable(channels[i], !modal && !s->asset_busy);
     }
     checked("&View/3D mouse navigation",spacenav.settings().enabled);
-    checked("&View/Shading/&PBR", !s->toon);
+    checked("&View/Shading/&Authored material", !s->toon&&!s->pbr_view);
+    checked("&View/Shading/&PBR", s->pbr_view);
     checked("&View/Shading/&Toon preview", s->toon);
     const char *layer_actions[] = {
         "&Paint/Add layer", "&Paint/Next layer", "&Paint/Layer visible",
@@ -1038,6 +1061,14 @@ struct App {
       text.str("");
       text << "XR active | " << hints;
     }
+    if(info->projection){
+      const auto &projection=*info->projection;
+      if(info->error.empty()&&(!projection.error.empty()||projection.loading||projection.browsing)){
+        text.str("");text<<(!projection.error.empty()?"Image: "+projection.error:projection.loading?(info->message=="Cancelling image load..."?info->message:"Loading projection image..."):"Reading image folder...");
+      }else if(projection.image&&projection.settings.enabled&&info->mesh_active&&!info->shape_sculpt&&!info->weights.enabled){
+        const auto current=text.str();text.str("");text<<"Image "<<projection.image->name<<" | "<<current;
+      }
+    }
     if(!native_commands.empty())text<<" | Pending "<<native_commands.size()<<": "<<native_commands.front();
     if(info->native_pending)text<<(info->native_accepting?" | Painting ":" | Finishing stroke ")<<info->native_samples<<" samples";
     if(info->asset_busy) {
@@ -1131,7 +1162,19 @@ struct App {
       canvas.document.end_desktop();
       canvas.sculpting = false;
     }
-    if (label == "Refresh recovery") {
+    if(label=="Humanoid rig fitting..."){edit_humanoid_fit_dialog(canvas.document);
+    }else if(label=="Load projection image..."){
+      const auto state=canvas.document.frame().state;const AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
+      auto selected=projection_image_dialog();
+      if(selected)canvas.document.load_projection_image(*selected,canvas.projection_camera(),source);
+    }else if(label=="Image projection options..."){
+      auto state=canvas.document.frame().state;
+      auto result=projection_dialog(canvas.document.projection_settings(),canvas.projection_camera(),state->projection&&state->projection->image?state->projection->image->name:"No image loaded");
+      if(result)canvas.document.configure_projection(std::move(*result),{state->generation,state->revision,state->active_object,state->edit_authority});
+    }else if(label=="Use projection image"){canvas.document.projection_action(SpatialCommand::ProjectionToggle);
+    }else if(label=="Projection from view"){auto settings=canvas.document.projection_settings();settings.camera=canvas.projection_camera();canvas.document.configure_projection(settings);
+    }else if(label=="Cancel image load"){canvas.document.cancel_projection_load();
+    }else if (label == "Refresh recovery") {
       canvas.document.refresh_recovery();
     } else if (label == "Recover project...") {
       if (recover_project(canvas.document)) project.clear();
@@ -1379,6 +1422,9 @@ struct App {
       if (chosen) canvas.document.export_asset(chosen, AssetExportFormat::Avatar);
     } else if (label == "Start or stop XR") {
       toggle_xr();
+    } else if (label == "Authored material") {
+      canvas.document.authored_shading();
+      canvas.redraw();
     } else if (label == "PBR") {
       canvas.document.shading(false);
       canvas.redraw();

@@ -14,6 +14,41 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Private native humanoid fitting workflow — 2026-11-02
+
+A new isolated component on49projection+portableadcb implements real native
+FLTK/XR landmark/finger/body-frame controls, exact world/group/affine presentation,
+worker skeleton fitting and binding for unskinned painting meshes, material/raw
+source/morph retention and oneUndo/Cancel/orderedSave. Read RIG-FITTING.md and
+validation/RIG-FITTING.json. Full source/grouped VRoid rest-fitting/reparent/bind
+transport remains required and guarded; Scene25 is reserved for its exact posed
+local matrices and acyclic first rig-source provenance. No Scene schema is added
+by the current unskinned workflow. This is not completion of the production goal.
+
+## Private image projection/stencil workflow component — 2026-11-02
+
+The isolated work/projection-paint-b197e37 component extends Scene20 with native
+PNG worker loading, FLTK/XR controls, GPU projector/stencil guide and evaluated
+world-space painting, including nested groups, pose/skin/morph, reflected/sheared
+and physically held transforms. It preserves original sources, exact one
+Undo/Cancel and accepted Save/restart. Image/tool state is ephemeral; no Scene
+schema is added. Read IMAGE-PROJECTION.md and validation/IMAGE-PROJECTION.json
+before integration; the full objective and deferred drawer phase remain active.
+
+The qualified graphics subset has 11 independent software/A770 checks, including
+zero second-eye and pose-only uploads, sRGB/linear and transparent-fringe
+sensitivity. Its initial exact A770 device-brand string false rejection is
+retained. Later busy Cancel changes are separately qualified: page25 exposes
+Cancel during PNG/browser work and the existing shared Cancel work command
+admits image loads. Controller neutral/held-trigger and stale-lease checks are
+explicit. All final counts and source scopes are in the component receipt.
+
+The bounded painter remains CPU based. No physical headset/device session,
+install, display-manager restart, suppression or toolkit fork occurred. The
+forthcoming authored/PBR preview branch must preserve per-range material policy
+in both target and scene projection visibility queries; do not mix old headers
+or label its private policy as already integrated.
+
 ## Qualified current-colour target authoring integration — 2026-11-02
 
 Public merge8cfb53f is runtime/header/asset/third_party/CMake/test byte-identical
@@ -79,18 +114,21 @@ Docs' frozen5e6de1d native3Dmouse checkpoint has57native/27framing,26 actual FLT
 Release+26SAN and11Wayland checks; latest desktopSAN and14Canvas-lifecycle
 assertions pass. Inherited Wayland
 shared-EGL and XR112-byte driver lifetime reports remain explicitly separate;
-no canonical-toolkit fork/suppression is authorized. Native image-projection/stencil Document/FLTK/XR continuation is now active in
-projection-paint-b197e37; reserved spatial page25/count26 and ephemeral immutable
-image/camera/stroke state, no new Scene schema. Preserve monotone file-load/source
-leases and worker-only world/evaluated visibility/projection. Carry the portable
-commonSave/UV bridge and owned desktop lifetime fixes before its next source freeze.
+no canonical-toolkit fork/suppression is authorized. Native image-projection/
+stencil Document/FLTK/XR now belongs to the composed checkpoint below, preserving
+monotone file/source leases, worker-only evaluated/world sampling, accepted Save
+and owned desktop-lifetime fixes without a new Scene schema.
 Controller drawers stay queued after basics. No new physical test, installation
 or desktop restart occurred; the accepted saved XR session remains preserved.
 
-## Active composed basic authoring candidate — 2026-11-02
+## Qualified composed authoring checkpoint — 2026-11-02
 
-Root's new frozen runtime/test source25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c is
-in artifacts/basic-authoring-source20-7a4443e, review branch of the same name.
+Current runtime/test inputs are byte-identical to qualifiedcc3bf97, final
+metadata413ac65 in artifacts/basic-authoring-regressions-25fe208. This adds
+production input repair9684486 and test-only recovery retimecc3bf97 to frozen
+25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c in
+artifacts/basic-authoring-source20-7a4443e. Read BASIC-AUTHORING-INTEGRATION.md
+and its receipt for exact split scopes and source equality.
 Metadata-only11e2a55 imports the final paint-counter receipt;6ca11f3 records
 BASIC-AUTHORING-UNION-WIP.md. Source combines public7a4443e, image projection/
 modal repair649befe, portable real PBR preview618000b, initial unskinned rig
@@ -99,7 +137,7 @@ No Scene21/22/23/24/25 data is admitted. Mixed fitting/preview gesture guards
 and four new assertions preserve idle fitting leases but fence placement.
 All source/header/test inputs remain frozen during qualification.
 
-All three fresh configurations/builds are terminal0: CPU Release alltargets94973,
+Initial25fe has three fresh builds terminal0: CPU Release alltargets94973,
 owned C/C++core/support/render/frontend+selected fixtures26164 and pinned DPC++7.2
 OneAPI alltargets74603. CPU registers395, OneAPI396 (extra missingGPU gate).
 Combined ownSAN21/21 pass85.49s including123 PBR/mixed-fitting assertions; the
@@ -116,25 +154,26 @@ syntheticXR projection10+PBR10+rig11 pass in separate outputs. Current34 emitted
 GLBs pass pinned Khronos with0errors/354unfilteredwarnings; no all-future-output
 or physical-headset claim. Initial absent GUI build paths remain preserved.
 
-Full CPU Release395 is live exec38150, artifacts/tests-basic-authoring-full-release.log
-in that tree; JUnit will be build/artifacts-basic-authoring-full-release.xml.
-Read BASIC-AUTHORING-UNION-WIP.md and its main-tracked hash receipt for exact
-scopes. Inspect exact handles/logs before changing/restarting jobs; observation
-timeout is not terminal. All source/header/test inputs stay frozen while it
-runs. Three observed failures are recorded: obsolete import page-count assertion,
-a real material-view fence incorrectly blocking direct voxel masking before its
-first display mesh, and the loader paint fixture following an old palette route.
-The exact strengthened mask fixture reproduces the old failure with the real
-preview worker gated. Separate9684486 in basic-authoring-regressions-25fe208
-scopes the fence to mesh sampling and updates both fixtures. Fresh coherent
-Release71240 is terminal0; five targeted regressions pass0.75s, including the
-first-mesh mask and existing PBR stale/held-pressure negatives. OwnSAN71315
-build remains live. Initial full-loader retry has59passing checks then stops on
-an omitted test-helper executable; its terminal8/log/output are preserved and
-coherent helper build75542 is live before retry. No overall395-green or corrected
-loader/SAN-pass claim is made. Next finish/diagnose395, qualify the correction
-and preserve final source equality before publication. No physical launch, install or session
-restart. Latest canonical EEE prefixes/DomeD d271cf6 and unrelated dirt preserved.
+Initial full CPU Release39538150 is terminal8:392pass/3fail in4541.67s.
+Its frozen log/JUnit retain the obsolete page-count assertion, actual voxel
+mask-before-first-mesh input bug and old loader palette route. Production9684486
+scopes material epoch fencing to mesh sampling; its exact strengthened mask
+fixture first fails against the old archive with the real preview worker gated.
+Corrected fresh coherent optimized core/support/render/frontend and own C/C++SAN
+builds pass; targeted5/5 pass0.75s Release and5/5 pass3.67s SAN, retaining existing
+mesh stale/held-pressure guards. Native/core/frontend inputs and binaries stay
+unchanged through the final test-only runtime retimecc3bf97.
+
+Initial full-loader22752 has59checks then a missing test helper; coherent helper
+build75542 passes. Second48146 has138passes/Bluefailure because its retimed press
+hit the generic deliberate tracking-loss frame22. Test-onlycc3bf97 moves that
+press after recovered neutral input to24, preserving dropout and Blue oracle;
+isolated paint has48blue texels (>20). Final30315 passes1/1/150assertions in
+159.41s. Both initial negatives remain preserved. These split results are not
+one395/395greenrun; no fresh whole-OneAPI/current-Document or new physical claim.
+Read BASIC-AUTHORING-REGRESSION-FIX.md/.json and the original union receipt.
+No installation or session restart. Latest canonical EEE prefixes/DomeD d271cf6,
+unrelated dirt, saved accepted XR session and all private trees stay preserved.
 
 Root649 projection/modal composition has fresh Release23/23(57.39s), owned
 SAN20/20(44.90s), nativeFLTK11normal+11compact+11SAN, latestprivateWayland9 and

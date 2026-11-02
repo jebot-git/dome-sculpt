@@ -288,7 +288,7 @@ void Document::cancel_action_locked() {
     volume().cancel_stroke();
 }
 void Document::restore_weight_view_locked(const std::shared_ptr<const MeshSnapshot> &base) {
-  if (!base || base->generation != state_.generation || base->revision != state_.revision) return;
+  if (!base || base->generation != state_.generation || base->revision != state_.revision || base->view_epoch!=state_.view_epoch) return;
   std::lock_guard lock(mesh_mutex_);
   mesh_.store(base);
   mesh_changed_.notify_all();
@@ -298,7 +298,7 @@ void Document::invalidate_weight_view_locked(bool restore) {
   ++weight_epoch_;
   if (pending_mesh_ && pending_mesh_->weight_gesture) pending_mesh_.reset();
   if (restore && weight_base_ && weight_base_->generation == state_.generation &&
-      weight_base_->revision == state_.revision) mesh_.store(weight_base_);
+      weight_base_->revision == state_.revision && weight_base_->view_epoch==state_.view_epoch) mesh_.store(weight_base_);
   weight_base_.reset();
   mesh_changed_.notify_all();
 }
@@ -508,6 +508,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     last_paint_ = paint_revision;
     ++state_.revision;
   }
+  if(state_.rig_fit&&!rig_fit_source_matches_locked())state_.rig_fit.reset();
   if(state_.polygon_handoff&&state_.polygon_handoff_revision==UINT64_MAX)state_.polygon_handoff_revision=state_.revision;
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
     state_.polygon_handoff.reset();state_.polygon_handoff_object=0;
@@ -590,6 +591,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
   state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(active.painted->baked());
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
+  state_.can_cancel_asset|=projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load();
   const auto asset=asset_work_.load();
   state_.can_save_after_asset=state_.asset_busy&&asset&&asset->accepted_scene&&!asset->cancelled.load();
   state_.pending_exports=0;
@@ -648,23 +650,29 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.menu_page = input_.menu_page();
   state_.can_undo = command_enabled_locked(SpatialCommand::Undo);
   state_.can_redo = command_enabled_locked(SpatialCommand::Redo);
+  state_.can_preview=command_enabled_locked(SpatialCommand::PreviewPbr);
   for (int i = 0; i < 12; ++i) {
     auto command = spatial_action(state_.menu_page, i);
     auto parameter = spatial_parameter(state_.menu_page, i);
     state_.menu_enabled[i] = parameter ? parameter_enabled_locked(*parameter)
                              : command ? command_enabled_locked(*command)
                                        : true;
+    if(state_.menu_page==26&&i>2&&i!=8)state_.menu_enabled[i]=false;
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
       (weight_scheduled_epoch_ != state_.weight_gesture || weight_scheduled_samples_ != weight_samples_.size());
   std::optional<MeshJob> mesh_job;
   std::shared_ptr<const Scene> source;
-  if(changed||weight_preview){
+  const auto previous_view=published_.load();
+  const bool view_changed=!previous_view||previous_view->view_epoch!=state_.view_epoch;
+  if(changed||weight_preview||view_changed){
     mesh_job.emplace(MeshJob{state_.revision,state_.generation,scene_.snapshot(),state_.weights.enabled,
         state_.weights.linked,uint32_t(state_.rig_joint),0,{}, {}});
     source=std::make_shared<const Scene>(mesh_job->scene);
     if(state_.shape_sculpt)detail::shape_sculpt_preview(mesh_job->scene,active.id,state_.morph_target);
     mesh_job->sculpt_mask_view=state_.sculpt_mask_visible;
+    mesh_job->pbr_view=state_.pbr_view;
+    mesh_job->view_epoch=state_.view_epoch;
     if(state_.retopology&&active.retopology){
       mesh_job->scene.object(active.id).visible=false;
       mesh_job->scene.object(active.retopology->source).visible=true;
@@ -762,6 +770,7 @@ void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopte
   bind_locked();transaction.clear_history();path_=std::move(adopted_path);
   ++state_.generation;
   transaction.invalidate_import();
+  transaction.invalidate_projection();
   if(recovery_){recovery_source_={new_recovery_id(),state_.generation,path_};recovery_content_=0;}
   ++state_.input_epoch;state_.error.clear();state_.message=std::move(message);anchored_=false;
   state_.asset_busy=false;state_.recovery_busy=false;content_=next_content_++;
@@ -1006,9 +1015,26 @@ void Document::report_error(std::string error) {
 }
 void Document::shading(bool toon) {
   std::lock_guard lock(model_mutex_);
+  command_locked(toon?SpatialCommand::PreviewToon:SpatialCommand::PreviewPbr);
+}
+void Document::authored_shading() {
+  std::lock_guard lock(model_mutex_);
+  command_locked(SpatialCommand::PreviewAuthored);
+}
+void Document::shading_locked(bool pbr,bool toon) {
+  if(state_.pbr_view==pbr&&state_.toon==toon&&!state_.weights.enabled)return;
+  if(action_active_locked()||state_.object_grabbing||navigation_.grabbing()||control_before_||(state_.projection&&state_.projection->placing)||(state_.rig_fit&&state_.rig_fit->placing))
+    throw std::logic_error("Release the active gesture and close its tool before changing the material preview");
+  Transaction transaction(*this);
+  input_.cancel();++state_.input_epoch;transaction.rebind();
+  state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
+  state_.pbr_view=pbr;
+  ++state_.view_epoch;
   state_.toon = toon;
-  bool weight_view = std::exchange(state_.weights.enabled, false);
-  publish_locked(weight_view);
+  state_.weights.enabled=false;
+  state_.error.clear();state_.message=pbr?"Core PBR material preview":toon?"Toon preview":"Authored material preview";
+  publish_locked(false,false);
+  transaction.commit(false);
 }
 void Document::paint_settings(PaintSettings settings) {
   settings.validate();
@@ -1241,6 +1267,8 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
+  if(process_rig_fit_spatial_locked(f))return;
+  if(process_projection_spatial_locked(f))return;
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
   if (desktop_)
     return;
@@ -1300,7 +1328,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
-  if(state_.shape_sculpt||state_.selection_mode)input_.edit_allowed=false;
+  if(state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   if(state_.cut)input_.edit_allowed=false;
   input_.painting = scene_.active().mesh_active&&!state_.shape_sculpt;
@@ -1309,6 +1337,17 @@ void Document::process_locked(const SpatialFrame &incoming) {
   input_.polygon_editing=bool(state_.polygon);
   if(state_.polygon||(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active))input_.edit_allowed=false;
   input_.sculpt_mask_edit = !scene_.active().mesh_active && volume().sculpt_settings().mask_edit;
+  if(state_.selection_mode)input_.edit_allowed=false;
+  const auto displayed=mesh_.load();
+  // Material-role publication gates mesh sampling. Direct voxel sculpt/mask
+  // input remains valid while its first or updated display mesh is extracting.
+  if(scene_.active().mesh_active&&
+      (displayed->pbr_view!=state_.pbr_view||displayed->view_epoch!=state_.view_epoch)){
+    input_.edit_allowed=false;
+    // A press begun against the previous policy cannot become a stroke when
+    // its replacement arrives. Modal controls still own their own events.
+    if(!input_.menu_open())for(size_t i=0;i<2;++i)if(f.hands[i].tracked.trigger>.02f)state_.selection_release[i]=true;
+  }
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
     const auto &h = f.hands[i];
@@ -1323,7 +1362,10 @@ void Document::process_locked(const SpatialFrame &incoming) {
         vec(ob::rotate(ob::conjugate(object_canvas.orientation),
                        ob::rotate(h.tracked.grip.orientation, {0, 0, 1})));
     s.pressure = std::clamp(h.tracked.trigger, 0.f, 1.f);
-    if(state_.selection_mode)s.pressure=0;
+    const bool owned_control=control_before_&&!state_.asset_busy&&!uv_accept_pending_&&
+      control_object_==scene_.active().id&&control_source_.generation==state_.generation&&
+      control_source_.edit_authority==state_.edit_authority&&input_.owns_control(state_.controls.parameter);
+    if(state_.selection_mode&&!owned_control)s.pressure=0;
     s.trigger = s.pressure > .02f;
     s.joystick_press = h.joystick;
     s.stick_x = h.x;
@@ -1360,13 +1402,13 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
         input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=import_command(*c)&&published_.load()!=command_publication;
-    if(command_page==20||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c))&&published_.load()!=command_publication;
+    if((command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
@@ -1400,7 +1442,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
   }
   if(!state_.selection_mode&&state_.shape_sculpt)process_shape_spatial_locked(f);
   state_.hands = f.hands;
-  // Import admission already published the current hands/menu. A second
+  // Detached import/image admission already published the current hands/menu. A second
   // fallible publication must not report failure after accepting its file job.
   // Independent history buttons in this same frame still need normal handling.
   if(!import_published || f.hands[0].undo || f.hands[1].undo || f.hands[0].redo || f.hands[1].redo)
@@ -1483,7 +1525,7 @@ void Document::mesh_loop() {
     }
     auto cancelled = [&] {
       auto state = published_.load();
-      return stopping_.load() || state->generation != job->generation || state->revision != job->revision ||
+      return stopping_.load() || state->generation != job->generation || state->revision != job->revision || state->pbr_view!=job->pbr_view || state->view_epoch!=job->view_epoch ||
              (job->weight_gesture && weight_epoch_.load() != job->weight_gesture) ||
              (job->native_gesture && native_epoch_.load()!=job->native_gesture);
     };
@@ -1538,6 +1580,8 @@ void Document::mesh_loop() {
         if(o.mesh_active){dep.paint=o.painted->mesh_owner();if(o.painted->source_maps())dep.source_uv1=o.painted->source_maps()->uv1;}
         else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
         dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;dep.polygon=o.polygon;
+        if(auto frames=o.material_bindings?o.material_bindings->normal_frames:nullptr)
+          dep.frame_role=!job->pbr_view&&o.material_bindings->has_mtoon&&!geometry_detail::same_owner(frames->pbr,frames->mtoon)?1:0;
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
         dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
         dependencies->objects.push_back(std::move(dep));
@@ -1548,6 +1592,8 @@ void Document::mesh_loop() {
       snapshot->sculpt_meshing=meshing;
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
+      snapshot->pbr_view=job->pbr_view;
+      snapshot->view_epoch=job->view_epoch;
       snapshot->weight_gesture = job->weight_gesture;
       snapshot->weight_samples = job->weight_samples.size();
       snapshot->native_gesture=job->native_gesture;snapshot->native_samples=job->native_samples;
@@ -1564,7 +1610,7 @@ void Document::mesh_loop() {
         const bool dynamic_canonical=retained && canonical && !retained->canonical;
         std::shared_ptr<const detail::NormalFrameLayout> retained_layout;
         std::optional<detail::PosedNormalFrames> retained_pose;
-        const size_t source_role=o.material_bindings && o.material_bindings->has_mtoon?1:0;
+        const size_t source_role=o.material_bindings&&o.material_bindings->has_mtoon&&!job->pbr_view&&(!retained||!geometry_detail::same_owner(retained->pbr,retained->mtoon))?1:0;
         if(retained) {
           detail::normal_frame_current_authority(*o.material_bindings,o.mesh,o.deformation.get(),cancelled);
           if(!(source_role?retained->mtoon:retained->pbr))throw std::invalid_argument("Selected material has no retained source normal frame");
@@ -1690,6 +1736,7 @@ void Document::mesh_loop() {
         auto textures=o.textures;
         if(packed_uv1){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);maps->uv1=std::move(packed_uv1);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
+        snapshot->ranges.back().pbr_view=job->pbr_view;
         if(frame)snapshot->ranges.back().affine_world=frame->world();
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
@@ -1719,7 +1766,7 @@ bool Document::wait_mesh(std::chrono::milliseconds timeout) const {
   std::unique_lock lock(mesh_mutex_);
   auto ready = [&] {
     auto m = mesh_.load();
-    return m->generation == wanted->generation && m->revision >= wanted->revision &&
+    return m->generation == wanted->generation && m->revision >= wanted->revision && m->pbr_view==wanted->pbr_view && m->view_epoch==wanted->view_epoch &&
            (!wanted->cut || (m->cut_session==wanted->cut->session && m->cut_request>=wanted->cut->request)) &&
            (!wanted->native_samples || (m->native_gesture==wanted->native_gesture && m->native_samples>=wanted->native_samples)) &&
            (!wanted->weight_samples || (m->weight_gesture == wanted->weight_gesture &&
@@ -1727,7 +1774,7 @@ bool Document::wait_mesh(std::chrono::milliseconds timeout) const {
   };
   return mesh_changed_.wait_for(lock, timeout, [&] {
     auto current=published_.load();
-    return ready() || stopping_.load() || current->generation != wanted->generation ||
+    return ready() || stopping_.load() || current->generation != wanted->generation || current->pbr_view!=wanted->pbr_view || current->view_epoch!=wanted->view_epoch ||
            (wanted->cut && (!current->cut || current->cut->session!=wanted->cut->session ||
              (!current->cut->busy && !current->cut->error.empty()))) ||
            (wanted->weight_samples && weight_epoch_.load() != wanted->weight_gesture);
@@ -2579,9 +2626,13 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(rig_fit_command(command))return rig_fit_command_enabled_locked(command);
+  if(projection_command(command))return projection_command_enabled_locked(command);
+  if(preview_command(command))return !action_active_locked()&&!state_.object_grabbing&&!navigation_.grabbing()&&!control_before_&&(!state_.projection||!state_.projection->placing)&&(!state_.rig_fit||!state_.rig_fit->placing);
   if(command==SpatialCommand::Save&&state_.asset_busy)return state_.can_save_after_asset;
   if(command==SpatialCommand::CancelWork)
     return (state_.asset_busy && asset_status().cancellable) ||
+      (projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load()) ||
       std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
   if(command==SpatialCommand::SelectionMode||command==SpatialCommand::SelectionFocus)return selection_ready_locked();
   if(command==SpatialCommand::ObjectHierarchy)return true;
@@ -2781,6 +2832,9 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(rig_fit_command(command)){rig_fit_command_locked(command);return;}
+  if(projection_command(command)){projection_command_locked(command);return;}
+  if(preview_command(command)){shading_locked(command==SpatialCommand::PreviewPbr,command==SpatialCommand::PreviewToon);return;}
   if(command==SpatialCommand::SelectionMode){if(selection_ready_locked())configure_selection_locked(!state_.selection_mode);return;}
   if(command==SpatialCommand::ObjectHierarchy){state_.hierarchy_open=!state_.hierarchy_open;state_.hierarchy_anchored=false;input_.cancel();publish_locked(false,false);return;}
   if(command==SpatialCommand::SelectionFocus){if(selection_ready_locked()){Transaction transaction(*this);invalidate_object_authority_locked();state_.selection_focus=!state_.selection_focus;publish_locked(false,false);transaction.commit(false);}return;}
@@ -3213,13 +3267,16 @@ void Document::command_locked(SpatialCommand command) {
 }
 void Document::file_loop() {
   for (;;) {
+    if(projection_notice_pending_.load()){
+      std::lock_guard lock(model_mutex_);retry_projection_failure_locked();
+    }
     if(worker_notices_pending_.load()) {
       std::lock_guard lock(model_mutex_);retry_worker_notices_locked();
     }
     std::optional<FileJob> job;
     {
       std::unique_lock lock(file_mutex_);
-      file_changed_.wait(lock,[&]{return files_stopping_||!files_.empty()||worker_notices_pending_.load();});
+      file_changed_.wait(lock,[&]{return files_stopping_||!files_.empty()||worker_notices_pending_.load()||projection_notice_pending_.load();});
       // Exception delivery normally allocates nothing. If a library needs
       // memory, retain that one promise before accepting more file work.
       if(worker_completion_pending_.load()) {
@@ -3232,9 +3289,15 @@ void Document::file_loop() {
       }
       job=std::move(files_.front());files_.pop_front();
     }
+    struct ProjectionDone {
+      std::shared_ptr<ProjectionLoad> task;
+      std::mutex &mutex;std::condition_variable &changed;std::atomic_bool &notice;
+      ~ProjectionDone(){if(task){{std::lock_guard lock(mutex);task->done.store(true);if(task->failure)notice=true;}changed.notify_all();}}
+    } projection_done{job->projection_load,file_mutex_,file_changed_,projection_notice_pending_};
     try {
       if(job->export_work && job->export_work->cancelled())
         throw std::runtime_error("Export cancelled");
+      if(job->projection_load){projection_file(*job);continue;}
       if(job->discover_import){discover_import_file(*job);continue;}
       if(job->asset_capture) {
         auto token=std::move(job->asset_capture);

@@ -207,10 +207,10 @@ struct SurfaceRenderer::TextureState {
       std::optional<MToonMaterial> typed;
       if(range.material_bindings) {
         range.material_bindings->validate(geometry_changed);
-        if(range.material_bindings->has_mtoon)typed=range.material_bindings->material;
-      } else if(auto previous=toons.find(range.object);previous!=toons.end() &&
+        if(range.material_bindings->has_mtoon&&!range.pbr_view)typed=range.material_bindings->material;
+      } else if(auto previous=toons.find(range.object);!range.pbr_view&&previous!=toons.end() &&
                 previous->second.appearance==range.appearance && !previous->second.source)typed=previous->second.material;
-      else typed=retained_mtoon(range.appearance.get());
+      else if(!range.pbr_view)typed=retained_mtoon(range.appearance.get());
       if(range.source_normal_only && ((typed && typed->parameters.normal_enabled && typed->parameters.normal_scale!=0 && typed->textures[size_t(MToonSlot::Normal)].index>=0) ||
           (!typed && maps && maps->source_maps && maps->source_maps->normal.image && maps->source_maps->normal_scale!=0)))
         throw std::invalid_argument("Normal-mapped source material requires retained tangent authority");
@@ -593,7 +593,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   };
   bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,
-                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false) {
+                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false) {
     Material material = original;
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
@@ -623,7 +623,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     for(int n=0;n<16;++n){auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);}
     glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps&&!maps->normal_projection?maps->source_maps->normal_scale:1);
     glUniform1f(glGetUniformLocation(program_,"ao_strength"),maps&&maps->source_maps?maps->source_maps->occlusion_strength:1);
-    glUniform1i(glGetUniformLocation(program_, "toon"), toon || material.toon);
+    glUniform1i(glGetUniformLocation(program_, "toon"), !force_pbr&&(toon || material.toon));
     glUniform1i(glGetUniformLocation(program_, "unlit"), material.unlit);
     glUniform1i(glGetUniformLocation(program_, "alpha_mode"), int(material.alpha));
     glUniform1f(glGetUniformLocation(program_, "alpha_cutoff"), material.alpha_cutoff);
@@ -718,7 +718,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
 
   if (cached_->ranges.empty()) {
     glUniform1i(glGetUniformLocation(program_,"weight_pass"),!cached_->selected_weights.empty());
-    draw_range(Material{}, 0, count_, 0, nullptr);
+    draw_range(Material{}, 0, count_, 0, nullptr,false,false,cached_->pbr_view);
   }
   else {
     std::vector<const SurfaceRange*> ordered;for(auto &r:cached_->ranges)ordered.push_back(&r);
@@ -760,7 +760,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       bool weighted=!ghost_pass && textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(r->object);
-      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame);
+      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view);
       else{
         draw_toon(*r,typed->second,false);
         if(!ghost_pass&&!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)
@@ -794,7 +794,58 @@ struct CursorGlState {
 };
 
 }
+
+namespace {
+// Constant six-vertex projector plane. Camera/UV changes are uniforms; image
+// upload is keyed by its immutable owner, independent of scene geometry.
+struct ProjectionPreviewGpu {
+  GLuint program=0,vao=0,buffer=0,texture=0;
+  std::shared_ptr<const Image> image;
+  void clear(bool release){if(release){if(texture)glDeleteTextures(1,&texture);if(buffer)glDeleteBuffers(1,&buffer);if(vao)glDeleteVertexArrays(1,&vao);if(program)glDeleteProgram(program);}program=vao=buffer=texture=0;image.reset();}
+  ~ProjectionPreviewGpu(){clear(true);}
+  void draw(const EditorState &state,const Mat4 &vp,bool linear){
+    if(!state.projection||!state.projection->image||!state.projection->settings.preview){if(texture){glDeleteTextures(1,&texture);texture=0;}image.reset();return;}
+    const auto &tool=*state.projection;const auto &settings=tool.settings;
+    GLint old_active=0,old_texture=0,old_sampler=0,old_src=0,old_dst=0,old_src_a=0,old_dst_a=0;
+    glGetIntegerv(GL_ACTIVE_TEXTURE,&old_active);glActiveTexture(GL_TEXTURE0);glGetIntegerv(GL_TEXTURE_BINDING_2D,&old_texture);glGetIntegerv(GL_SAMPLER_BINDING,&old_sampler);
+    const bool blend=glIsEnabled(GL_BLEND),cull=glIsEnabled(GL_CULL_FACE);glGetIntegerv(GL_BLEND_SRC_RGB,&old_src);glGetIntegerv(GL_BLEND_DST_RGB,&old_dst);glGetIntegerv(GL_BLEND_SRC_ALPHA,&old_src_a);glGetIntegerv(GL_BLEND_DST_ALPHA,&old_dst_a);
+    struct Restore {GLint active,texture,sampler,src,dst,srca,dsta;bool blend,cull;~Restore(){glBlendFuncSeparate(src,dst,srca,dsta);if(blend)glEnable(GL_BLEND);else glDisable(GL_BLEND);if(cull)glEnable(GL_CULL_FACE);else glDisable(GL_CULL_FACE);glBindTexture(GL_TEXTURE_2D,GLuint(texture));glBindSampler(0,GLuint(sampler));glActiveTexture(GLenum(active));}}restore{old_active,old_texture,old_sampler,old_src,old_dst,old_src_a,old_dst_a,blend,cull};
+    if(!program){
+      GLuint vs=0,fs=0;try{
+        vs=shader(GL_VERTEX_SHADER,R"(#version 330 core
+layout(location=0)in vec3 coordinate;uniform mat4 matrix;uniform vec3 extent;out vec2 uv;
+void main(){uv=coordinate.xy;gl_Position=matrix*vec4((coordinate.x-.5)*extent.x,(.5-coordinate.y)*extent.y,-coordinate.z*extent.z,1);})");
+        fs=shader(GL_FRAGMENT_SHADER,R"(#version 330 core
+in vec2 uv;uniform sampler2D picture;uniform mat3 image_uv;uniform float opacity;uniform int srgb,linear_output,stencil,scalar,wire,coverage_alpha;out vec4 color;
+vec3 decode(vec3 v){return mix(v/12.92,pow((v+.055)/1.055,vec3(2.4)),greaterThan(v,vec3(.04045)));}
+vec3 encode(vec3 v){return mix(v*12.92,1.055*pow(max(v,vec3(0)),vec3(1./2.4))-.055,greaterThan(v,vec3(.0031308)));}
+vec4 sampleImage(vec2 uv){ivec2 size=textureSize(picture,0);vec2 q=uv*vec2(size)-.5;ivec2 base=ivec2(floor(q));vec2 f=fract(q);vec4 result=vec4(0);for(int y=0;y<2;++y)for(int x=0;x<2;++x){vec4 c=texelFetch(picture,clamp(base+ivec2(x,y),ivec2(0),size-1),0);if(srgb==1)c.rgb=decode(c.rgb);if(coverage_alpha==1)c.rgb*=c.a;result+=c*(x==0?1-f.x:f.x)*(y==0?1-f.y:f.y);}if(coverage_alpha==1)result.rgb=result.a>1e-8?result.rgb/result.a:vec3(0);return clamp(result,0,1);}
+void main(){if(wire==1){vec3 c=vec3(.2,.8,1);color=vec4(linear_output==1?decode(c):c,1);return;}vec2 p=(image_uv*vec3(uv,1)).xy;if(any(lessThan(p,vec2(0)))||any(greaterThan(p,vec2(1))))discard;vec4 v=sampleImage(p);if(stencil==1){float x=scalar==1?v.r:scalar==2?v.g:scalar==3?v.b:scalar==4?v.a:dot(v.rgb,vec3(.2126,.7152,.0722));v.rgb=vec3(x);}if(linear_output==0)v.rgb=encode(v.rgb);color=vec4(v.rgb,v.a*opacity);})");
+        program=glCreateProgram();glAttachShader(program,vs);glAttachShader(program,fs);glLinkProgram(program);GLint linked=0;glGetProgramiv(program,GL_LINK_STATUS,&linked);if(!linked)throw std::runtime_error("Projector preview shader failed");glDeleteShader(vs);vs=0;glDeleteShader(fs);fs=0;
+        const float quad[]={
+          0,0,1, 1,0,1, 0,1,1, 0,1,1, 1,0,1, 1,1,1,
+          0,0,1, 1,0,1, 1,0,1, 1,1,1, 1,1,1, 0,1,1, 0,1,1, 0,0,1,
+          .5f,.5f,0, 0,0,1, .5f,.5f,0, 1,0,1, .5f,.5f,0, 1,1,1, .5f,.5f,0, 0,1,1};glGenVertexArrays(1,&vao);glGenBuffers(1,&buffer);glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,buffer);glBufferData(GL_ARRAY_BUFFER,sizeof(quad),quad,GL_STATIC_DRAW);glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),nullptr);glEnableVertexAttribArray(0);
+      }catch(...){if(vs)glDeleteShader(vs);if(fs)glDeleteShader(fs);clear(true);throw;}
+    }
+    if(image!=tool.image->pixels){
+      const auto &pixels=*tool.image->pixels;pixels.validate();GLint maximum=0;glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maximum);if(pixels.width>uint32_t(maximum)||pixels.height>uint32_t(maximum))throw std::length_error("Projector image exceeds GPU texture size");
+      if(!texture)glGenTextures(1,&texture);glBindTexture(GL_TEXTURE_2D,texture);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GLsizei(pixels.width),GLsizei(pixels.height),0,GL_RGBA,GL_UNSIGNED_BYTE,pixels.rgba.data());glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+      if(glGetError()!=GL_NO_ERROR){glDeleteTextures(1,&texture);texture=0;image.reset();throw std::runtime_error("Projector preview image upload failed");}image=tool.image->pixels;
+    }
+    auto camera=settings.camera;const float depth=settings.preview_depth;
+    float height=camera.mode==ProjectionMode::Perspective?2*std::tan(camera.vertical_fov*.5f)*depth:camera.height;
+    float width=camera.mode==ProjectionMode::Perspective?height*camera.aspect:camera.width;
+    auto matrix=model_matrix(ob::compose(state.canvas,camera.pose));
+    const auto mvp=multiply(vp,matrix);auto &m=settings.image.uv_transform;const float uv[]={m[0],m[2],0,m[1],m[3],0,m[4],m[5],1};
+    glUseProgram(program);glUniformMatrix4fv(glGetUniformLocation(program,"matrix"),1,GL_FALSE,mvp.data());glUniformMatrix3fv(glGetUniformLocation(program,"image_uv"),1,GL_FALSE,uv);glUniform3f(glGetUniformLocation(program,"extent"),width,height,depth);glUniform1i(glGetUniformLocation(program,"wire"),0);glUniform1i(glGetUniformLocation(program,"picture"),0);
+    glUniform1i(glGetUniformLocation(program,"linear_output"),linear);glUniform1i(glGetUniformLocation(program,"srgb"),settings.image.color_space==ProjectionColorSpace::SRGB||(settings.image.color_space==ProjectionColorSpace::Automatic&&settings.image.usage==ProjectionUsage::Color&&(state.paint.channel==PaintChannel::Color||state.paint.channel==PaintChannel::Emission)));glUniform1i(glGetUniformLocation(program,"coverage_alpha"),settings.image.alpha==ProjectionAlpha::Coverage);glUniform1i(glGetUniformLocation(program,"stencil"),settings.image.usage==ProjectionUsage::Stencil);glUniform1i(glGetUniformLocation(program,"scalar"),int(settings.image.scalar));glUniform1f(glGetUniformLocation(program,"opacity"),settings.image.opacity*.45f);
+    glBindTexture(GL_TEXTURE_2D,texture);glBindSampler(0,0);glBindVertexArray(vao);glEnable(GL_BLEND);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDisable(GL_CULL_FACE);glEnable(GL_DEPTH_TEST);glDepthFunc(GL_LEQUAL);glDepthMask(GL_FALSE);glDrawArrays(GL_TRIANGLES,0,6);glUniform1i(glGetUniformLocation(program,"wire"),1);glDrawArrays(GL_LINES,6,camera.mode==ProjectionMode::Perspective?16:8);
+  }
+};
+}
 struct CursorRenderer::OverlayCache {
+  ProjectionPreviewGpu projection;
   GLuint vao=0,buffer=0;size_t count=0;uint64_t uploads=0,revision=0;
   std::shared_ptr<const RetopoMesh> topology;
   std::vector<TopologyID> selected;
@@ -838,7 +889,7 @@ struct CursorRenderer::OverlayCache {
   }
 };
 RetopoOverlayStats CursorRenderer::retopology_stats() const {return {overlay_->count,overlay_->count*sizeof(RetopoVertexGpu),overlay_->uploads};}
-void CursorRenderer::abandon(){program_=vao_=buffer_=0;overlay_->clear(false);}
+void CursorRenderer::abandon(){program_=vao_=buffer_=0;overlay_->projection.clear(false);overlay_->clear(false);}
 CursorRenderer::CursorRenderer():overlay_(std::make_unique<OverlayCache>()) {
   const char *v = R"(#version 330 core
 layout(location=0)in vec3 position;layout(location=1)in vec3 color;layout(location=2)in vec3 marker;
@@ -868,11 +919,22 @@ CursorRenderer::~CursorRenderer() {
 void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
   CursorGlState previous;
   overlay_->prepare(state);
+  overlay_->projection.draw(state,vp,linear_output_);
   std::vector<CursorVertex> vertices;
   auto line = [&](ob::Vec3 a, ob::Vec3 b, Vec3 color) {
     vertices.push_back({{a.x, a.y, a.z}, color});
     vertices.push_back({{b.x, b.y, b.z}, color});
   };
+  if(state.rig_fit){
+    const auto &view=*state.rig_fit;const auto &selected=human_roles().at(view.role).name;
+    auto point=[&](Vec3 p){auto w=view.world.point({p.x,p.y,p.z});return ob::transform(state.canvas,{float(w[0]),float(w[1]),float(w[2])});};
+    const float radius=std::clamp(view.step*.3f,.002f,.02f)*state.canvas.scale;
+    for(const auto &[name,p]:view.landmarks.points){const auto center=point(p);const auto color=name==selected?Vec3{1,.8f,.05f}:Vec3{.1f,1,.4f};
+      for(auto axis:{ob::Vec3{radius,0,0},ob::Vec3{0,radius,0},ob::Vec3{0,0,radius}})line(center-axis,center+axis,color);
+      auto role=std::find_if(human_roles().begin(),human_roles().end(),[&](const auto &r){return r.name==name;});
+      if(role!=human_roles().end()){auto parent=role->parent;while(!parent.empty()&&!view.landmarks.points.contains(parent)){auto pr=std::find_if(human_roles().begin(),human_roles().end(),[&](const auto&r){return r.name==parent;});if(pr==human_roles().end())break;parent=pr->parent;}if(view.landmarks.points.contains(parent))line(point(view.landmarks.points.at(parent)),center,color);}
+    }
+  }
   if(state.cut && state.cut->ready){
     auto &view=*state.cut;
     auto plane=view.preview?view.preview->plane:cut_plane(view.settings,view.center);

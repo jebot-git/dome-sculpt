@@ -11,6 +11,8 @@ struct ProjectionImageLimits {
 };
 Image decode_projection_png(std::span<const uint8_t>, const ProjectionImageLimits & = {});
 Image load_projection_png(const std::filesystem::path &, const ProjectionImageLimits & = {});
+Image load_projection_png(const std::filesystem::path &, const ProjectionImageLimits &,
+                          const std::function<bool()> &cancelled);
 enum class ProjectionMode { Orthographic, Perspective };
 enum class ProjectionUsage { Color, Stencil };
 enum class ProjectionColorSpace { Automatic, SRGB, Linear };
@@ -38,6 +40,9 @@ struct ProjectionOptions {
   uint64_t max_samples_per_stamp = 1'000'000;
   std::function<bool()> cancelled;
 };
+// Pure bounded parameter validation; no image decode, geometry/BVH or callbacks.
+void validate_projection_parameters(const ProjectionCamera &, const ProjectionOptions &);
+struct ProjectionRay { Vec3 origin, direction; float distance = 0; };
 struct ProjectedPaint {
   PaintSettings settings;
   float opacity = 0; // Multiplies brush pressure/strength/flow exactly once.
@@ -49,6 +54,11 @@ class PaintProjection {
 public:
   PaintProjection(Image, ProjectionCamera, const Mesh &visibility_surface,
                   ProjectionOptions = {});
+  // Worker-owned immutable pixels can be shared by successive posed visibility
+  // queries without copying a large decoded image for every native gesture.
+  static PaintProjection from_shared_image(std::shared_ptr<const Image>,
+                  ProjectionCamera, const Mesh &visibility_surface,
+                  ProjectionOptions = {});
   std::optional<ProjectedPaint> sample(Vec3 position, Vec3 normal,
                                       const PaintSettings &) const;
   // Cheap immutable pose/settings changes reuse image pixels and an existing
@@ -57,8 +67,10 @@ public:
   PaintProjection with_camera(ProjectionCamera) const;
   PaintProjection with_camera(ProjectionCamera, ProjectionOptions) const;
   uint64_t max_samples_per_stamp() const;
+  ProjectionRay camera_ray(Vec3 position) const;
 private:
   struct Impl;
+  explicit PaintProjection(std::shared_ptr<const Impl>);
   std::shared_ptr<const Impl> impl_;
 };
 } // namespace dome

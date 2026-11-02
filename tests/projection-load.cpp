@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/document.hpp"
+#include "import-controller-driver.hpp"
+#include <nlohmann/json.hpp>
+#include <atomic>
+#include <cstring>
+#include <cstdarg>
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <new>
+#include <cstdlib>
+#include <unistd.h>
+using namespace dome;
+namespace {std::atomic_bool armed=false,entered=false,released=true,deny_main=false;const std::thread::id main_id=std::this_thread::get_id();std::atomic_int captured=-1;std::string image_path;std::atomic_bool browser_armed=false,browser_entered=false,browser_released=true;size_t checks=0;void check(bool b,const char*m){if(!b){deny_main=false;released=true;browser_released=true;throw std::runtime_error(m);}++checks;std::cout<<"PASS "<<m<<'\n';}}
+void *operator new(size_t n){if(deny_main.load()&&std::this_thread::get_id()==main_id)throw std::bad_alloc();if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
+void operator delete(void *p)noexcept{std::free(p);}void operator delete(void *p,size_t)noexcept{std::free(p);}
+extern "C" int __real_open(const char*,int,...);
+extern "C" int __wrap_open(const char *path,int flags,...){int fd;if((flags&O_CREAT)||(flags&O_TMPFILE)==O_TMPFILE){va_list args;va_start(args,flags);const int mode=va_arg(args,int);va_end(args);fd=__real_open(path,flags,mode);}else fd=__real_open(path,flags);if(armed&&path&&std::strcmp(path,image_path.c_str())==0)captured=fd;return fd;}
+extern "C" ssize_t __real_read(int,void*,size_t);
+extern "C" ssize_t __wrap_read(int fd,void *bytes,size_t count){if(fd==captured&&armed.exchange(false)){entered=true;while(!released.load())std::this_thread::yield();}return __real_read(fd,bytes,count);}
+extern "C" std::vector<ProjectionEntry> real_scan(const std::filesystem::path&,const std::function<bool()>&) asm("__real__ZN4dome25scan_projection_directoryERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE");
+extern "C" std::vector<ProjectionEntry> wrap_scan(const std::filesystem::path&,const std::function<bool()>&) asm("__wrap__ZN4dome25scan_projection_directoryERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE");
+extern "C" std::vector<ProjectionEntry> wrap_scan(const std::filesystem::path &p,const std::function<bool()> &stop){if(browser_armed.exchange(false)){browser_entered=true;while(!browser_released.load())std::this_thread::yield();}return real_scan(p,stop);}
+namespace {
+Scene source(){Mesh m;m.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{.5f,.5f,0},{-.5f,.5f,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};Scene s;s.active().painted=std::make_shared<PaintedMesh>(m,64);s.active().mesh_active=true;return s;}
+void arm(){entered=false;released=false;captured=-1;armed=true;}
+void await(){auto end=std::chrono::steady_clock::now()+std::chrono::seconds(5);while(!entered&&std::chrono::steady_clock::now()<end)std::this_thread::yield();check(entered,"Actual bounded file read reached worker-only gate");}
+}
+int main()try{
+ struct Release{~Release(){released=true;browser_released=true;}};
+ auto root=std::filesystem::temp_directory_path()/("dome-projection-load-"+std::to_string(getpid()));std::filesystem::create_directories(root);setenv("HOME",root.c_str(),1);setenv("XDG_STATE_HOME",root.c_str(),1);setenv("XDG_CONFIG_HOME",root.c_str(),1);struct Cleanup{std::filesystem::path p;~Cleanup(){std::error_code ec;std::filesystem::remove_all(p,ec);}}cleanup{root};
+ image_path=(root/"red.png").string();auto png=Image{1,1,{255,0,0,255}}.png();{std::ofstream out(image_path,std::ios::binary);out.write(reinterpret_cast<const char*>(png.data()),png.size());}
+ Document d;Release release;d.replace(source());check(d.wait_mesh(),"Initial native source ready");d.load_projection_image(image_path);check(d.wait_projection_image(),"Initial retained image ready");auto owner=d.frame().state->projection->image;const auto before=d.copy_scene().encode();
+ arm();d.load_projection_image(image_path);await();check(!d.begin_native_stroke(),"Incoming image publication fences painting instead of switching images mid-gesture");auto start=std::chrono::steady_clock::now();d.cancel_projection_load();check(std::chrono::steady_clock::now()-start<std::chrono::milliseconds(100),"Cancel returns without waiting for detached file read");check(d.frame().state->projection->image==owner&&!d.frame().state->projection->loading&&d.copy_scene().encode()==before,"Cancelled read immediately restores old immutable image and exact Scene");auto saved=d.save_async(root/"cancel.dsculpt");check(saved.wait_for(std::chrono::milliseconds(10))!=std::future_status::ready,"Ordinary Save is accepted while detached image read owns file worker");released=true;saved.get();check(Scene::load(root/"cancel.dsculpt").encode()==before,"Following Save uses real Scene endpoint, never an image-task Scene result");
+ arm();d.load_projection_image(image_path);await();d.replace(source());check(!d.frame().state->projection->loading&&!d.frame().state->projection->settings.enabled,"New generation cancels image request and disables stale projection tool");released=true;check(d.wait_mesh(),"Replacement surface ready");d.load_projection_image(image_path);check(d.wait_projection_image()&&d.frame().state->projection->image,"New-generation retry survives old cancellation/error completion");
+ auto state=d.frame().state;AssetSource old{state->generation,state->revision+1,state->active_object,state->edit_authority};bool rejected=false;try{d.load_projection_image(image_path,{},old);}catch(const std::logic_error&){rejected=true;}check(rejected&&d.frame().state==state,"Stale chooser revision refuses before changing view or queuing image work");
+ auto settings=d.projection_settings();rejected=false;try{d.configure_projection(settings,old);}catch(const std::logic_error&){rejected=true;}check(rejected&&d.frame().state==state,"Stale options source refuses atomically");
+
+ const auto controller_before=d.copy_scene().encode();ImportDriver driver(d);driver.open();driver.sector(9);driver.sector(3);driver.sector(11);driver.sector(9);check(d.frame().state->menu_page==25,"Actual joystick opens projection tools for pending-work cancellation");
+ arm();d.load_projection_image(image_path);await();check(d.frame().state->menu_enabled[7]&&projection_tool_label(d.frame().state->projection.get(),7)=="Cancel image load","Pending image exposes actual enabled Cancel cell");driver.sector(7);check(!d.frame().state->projection->loading&&d.frame().state->menu_page==25&&d.copy_scene().encode()==controller_before,"Actual controller Cancel clears image task and preserves Scene/menu/source");released=true;
+ browser_armed=true;browser_entered=false;browser_released=false;d.browse_projection_images(root);{auto end=std::chrono::steady_clock::now()+std::chrono::seconds(5);while(!browser_entered&&std::chrono::steady_clock::now()<end)std::this_thread::yield();check(browser_entered,"Real browser worker reaches its detached entry gate");}
+ check(d.frame().state->menu_enabled[7]&&projection_tool_label(d.frame().state->projection.get(),7)=="Cancel browsing","Pending directory scan exposes actual enabled Cancel cell");driver.sector(7);check(!d.frame().state->projection->browsing&&d.copy_scene().encode()==controller_before,"Actual joystick cancels pending browser without changing Scene/history");browser_released=true;d.load_projection_image(image_path);check(d.wait_projection_image(),"Image retry survives old cancelled browser completion");
+ arm();d.load_projection_image(image_path);await();driver.sector(8);driver.sector(8);driver.sector(8);driver.sector(8);driver.sector(9);driver.sector(6);check(d.frame().state->menu_page==12&&d.frame().state->menu_enabled[5],"Existing shared Cancel work page admits pending detached image load");driver.sector(5);check(!d.frame().state->can_cancel_asset,"Actual global controller Cancel requests image cancellation");released=true;check(d.wait_projection_image()&&!d.frame().state->projection->loading,"Global cancellation clears image spinner after worker completion");
+ check(!d.frame().state->menu,"Existing global cancellation retains its ordinary menu-close convention");driver.open();driver.sector(9);driver.sector(3);driver.sector(11);driver.sector(9);check(d.frame().state->menu_page==25,"Controller returns to image tools after shared cancellation");driver.frame.hands[1].tracked.grip=ob::compose(d.frame().state->canvas,CanvasTransform{});driver.send(0,0,false,1);d.cancel_spatial_menu();driver.send(0,0,false,1);check(!d.frame().state->native_pending&&d.copy_scene().encode()==controller_before,"Held trigger cannot jump from cancelled tool/menu into image painting");driver.send();driver.send(0,0,false,1);check(d.frame().state->native_pending,"Fresh neutral and pressure re-arm projected contact after cancellation");d.end_native_stroke(false);check(d.wait_native_stroke()&&d.copy_scene().encode()==controller_before,"Cancelling the re-armed contact retains exact original source");
+
+ driver.send();arm();d.load_projection_image(image_path);await();const auto retained=d.frame().state->projection->image;bool allocation_refused=false;deny_main=true;try{d.cancel_projection_load();}catch(const std::bad_alloc&){allocation_refused=true;}deny_main=false;check(allocation_refused,"Actual UI allocation denial reaches Cancel view update boundary");released=true;check(d.wait_projection_image()&&d.frame().state->projection->image==retained&&!d.frame().state->projection->loading,"Worker cancellation remains delivered even when its immediate UI publication cannot allocate");check(d.copy_scene().encode()==controller_before,"Allocation-denied cancellation preserves exact Scene/history and original image owner");
+ std::cout<<checks<<" actual detached projection load/cancel/source checks passed\n";return 0;
+}catch(const std::exception&e){deny_main=false;released=true;browser_released=true;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

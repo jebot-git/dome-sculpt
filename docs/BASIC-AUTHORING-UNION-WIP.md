@@ -32,14 +32,14 @@ Appended CMake blocks were corrected to retain their own condition nesting
 before successful configuration. The projected painter's evaluated/world metric
 sampling fix and all three paint-counter swaps remain present.
 
-## Live qualification
+## Qualification scopes
 
 All three fresh configurations and builds pass with canonical EEE toolkit/bitmap
 prefixes. CPU registers395 cases; OneAPI396 includes its extra no-GPU gate.
 Runtime/source/header/test inputs remain frozen:
 
 - Optimized CPU Release alltargets94973: terminal0. Actual full395 regression
-  exec38150 is live; do not restart on an observation timeout.
+  exec38150 finished terminal8:392/395 pass4541.67s; the three failures below are preserved.
 - Owned C/C++ ASan+UBSan core/support/render/frontend+selected fixtures26164:
   terminal0. Selected21/21 pass85.49s, including123 PBR/mixed-rig assertions.
   Separately registered actual-avatar1/1 passes172.54s (111checks/18images).
@@ -62,7 +62,7 @@ suite. Pinned Khronos validates34 current emitted GLBs with0errors/354unfiltered
 warnings (20Arc PBR/avatar +14FBX/pose), not all future full-suite outputs.
 
 Read validation/BASIC-AUTHORING-UNION-WIP.json for exact scopes/hashes. Full395
-regression remains live and must be diagnosed/completed before publication.
+regression is terminal with392passes/3failures; corrected scopes remain separate.
 
 Build logs, configurations and the395-case manifest are under this tree's
 `artifacts/`. The focused sanitizer JUnit is under `build-sanitize/`.
@@ -77,16 +77,16 @@ SAN/FLTK/Wayland/loader/Arc evidence; actual paint-history Release2/SAN2; and
 FBX standalone native/consumer/worker/GUI evidence on its coherent parent.
 These counts cannot be added into a fictitious combined all-green run.
 
-After build/gate completion, run the actual full Release suite and composed
-FLTK/compact/sanitizer/Wayland/loader workflows, independent format/device and
-selected OneAPI runtime/CPU-reference checks. Preserve every initial failure
-and diagnose real scope changes. Publish only with accurate integration
+The original full Release, composed frontend/format/device and selected
+OneAPI gates above are complete in their stated scopes. Finish the isolated
+correction and its full-loader check. Preserve every initial failure and
+diagnose real scope changes. Publish only with accurate integration
 receipts and main source equality. The full production objective stays active;
 controller-mounted drawers remain required after the basic targets are met.
 
 ## Observed full-run failures and isolated correction
 
-The original395 run remains live38150 with three observed failures: an obsolete
+The original395 run finished38150 terminal8 with392passes/3failures in4541.67s: an obsolete
 shared-page count in import-options-controller, the actual voxel mask input
 blocked by the new material-view fence before first display publication, and
 the synthetic XR painting fixture following the pre-projection palette route.
@@ -98,5 +98,13 @@ and adds a deterministic barrier around the actual first preview worker. That
 exact strengthened mask fixture fails against the old frozen archive at the
 expected before-publication pressure assertion. It also updates shared page
 actions and the actual-loader fixture route without weakening its blue-pixel
-oracle. Fresh coherent Release71240 and own C/C++SAN71315 builds are live;
-no correction pass or overall395-green claim is made yet.
+oracle. Fresh coherent Release71240 and own C/C++SAN71315 builds are terminal0;
+corrected targeted5/5 pass0.75s Release and5/5 pass3.67s SAN. No overall395-green
+claim is made. Initial full-loader retry22752 has59checks then a missing helper;
+coherent helper build75542 is terminal0. Second48146 reaches139checks with only
+the Blue assertion failing: the retimed pressure landed on deliberately invalid
+tracking frame22. Test-onlycc3bf97 moves it after a neutral recovered frame24,
+retaining both dropout and Blue oracle; isolated actual-loader paint now has
+48blue texels (>20required). Complete final loader30315 passes1/1 in159.41s with all150assertions.
+Qualified correction metadata413ac65 preserves all earlier failures; final
+main merge/source equality and exact integration receipt remain before publication.

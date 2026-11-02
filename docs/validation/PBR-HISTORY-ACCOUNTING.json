@@ -1,0 +1,47 @@
+{
+  "code": "78736d6",
+  "base": "7a4443e814fe07150a6ebf06e808060d1603eb55",
+  "production_change": "three existing fields added to noexcept PaintedMesh::swap_state; no API/layout/schema change",
+  "pre_fix": {
+    "result": "first actual Document Undo: public PBR0 versus real cap4",
+    "log": "artifacts/tests-old-counter-negative.log",
+    "binary_hash_record": "artifacts/old-counter-negative-sha256.txt"
+  },
+  "release": {
+    "ctest": "2/2",
+    "seconds": 0.3,
+    "new_checks": 78,
+    "log": "artifacts/tests-fixed-release-ctest.log"
+  },
+  "sanitizer": {
+    "ctest": "2/2",
+    "seconds": 2.42,
+    "new_checks": 78,
+    "flags": "C and C++ -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "environment": "ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+    "log": "artifacts/tests-fixed-san.log"
+  },
+  "files": {
+    "src/paint.cpp": "fe772047249fb8e81fd0899a8d8ef3cd9999b36ae9864a01c1984cf248851f4d",
+    "tests/pbr-history-accounting.cpp": "e24e0d181d7a9df590c92e19ece99ceefbaab333c79397c3df9c4b2b744c4209",
+    "CMakeLists.txt": "5ca01129200b7f6a2fa74b60bac92ddc705e69bcd7485d5fe71b3dd9d9429a3f",
+    "build/dome-sculpt-pbr-history-accounting-test": "6601dd77c50827249e91c15fd77a29d6394737389a809a6c7d0817b55e5ec34b",
+    "build-san/dome-sculpt-pbr-history-accounting-test": "5351560b8fc50487a407b6ff412880b3cd0932a7307f0bb0f9d1f6e82923224a",
+    "artifacts/libdome-sculpt-core-before-swap.a": "28f98b8c0f2e93b3007805de9b0cb69b9d8f54724ada9f2a0a42f27186789ce8",
+    "build/libdome-sculpt-core.a": "d9638c27684d7b760d3300b725bd86602aa9da3073e45b785c754b21ebc0b774",
+    "build-san/libdome-sculpt-core.a": "bd59d196b6930f0388a2b0c84955113247885a99ca6700ed64a4d04efd52bb04"
+  },
+  "evidence": {
+    "artifacts/tests-old-counter-negative.log": "f80c7a658b519e3efd82938ce47637653ca72628566784b96efb68ac4e491e36",
+    "artifacts/tests-fixed-release-ctest.log": "1bb1256625a8debccd41c8722b23b96453afafb1736998da3efae26565cea9d0",
+    "artifacts/tests-fixed-san.log": "8d233c4b863852b0a9f6060ec1caf1d551ca4a8a3bb3a8a872484467c25613fa",
+    "artifacts/old-counter-negative-sha256.txt": "165a760bda2b67da57b55d58fce7de76ca115d6ed66c62e32f1bdbd0c8c270e3"
+  },
+  "not_claimed": [
+    "GUI",
+    "GPU",
+    "physical headset",
+    "system installation",
+    "full goal completion"
+  ]
+}

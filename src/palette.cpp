@@ -141,6 +141,7 @@ void SpatialPalette::raster(const EditorState &s) {
   }
   if(s.menu_page==0&&s.controls.parameter==VrParameter::None){
     button(.02f,.02f,.30f,.08f,s.selection_mode?"Selection ON":"Selection OFF",s.selection_mode,!s.can_select_objects);
+    button(.35f,.02f,.30f,.08f,"View");
     button(.68f,.02f,.30f,.08f,"Hierarchy",s.hierarchy_open);
   }
   if (s.controls.parameter == VrParameter::UvEdit && s.uv) {
@@ -408,6 +409,7 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 9) return s.weights.linked;
     }
     if(s.menu_page==0&&sector==11)return s.selection_mode;
+    if(s.menu_page==26){if(sector==0)return !s.pbr_view&&!s.toon;if(sector==1)return s.pbr_view;if(sector==2)return s.toon;}
     if (s.menu_page == 0 && sector < 4)
       return int(s.tool) == sector;
     if (s.menu_page == 1 && current != s.objects.end()) {
@@ -459,7 +461,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    const std::string label = s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -495,7 +497,13 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
-  const char *page = s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  if(s.menu_page==27&&s.rig_fit){
+    const auto &view=*s.rig_fit;const auto &role=human_roles().at(view.role);
+    text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_role_label(view.role),fg);
+    const auto found=view.landmarks.points.find(role.name);
+    text(320*unit_,320*unit_,found==view.landmarks.points.end()?"Not placed":std::to_string(view.landmarks.points.size())+" landmarks placed",fg);
+  }
+  const char *page = s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -526,6 +534,14 @@ void SpatialPalette::raster(const EditorState &s) {
     const char *patterns[]={"Raised panels","Recessed cuts","Mixed detail"};
     text(320*unit_,285*unit_,std::string(patterns[unsigned(o.pattern)])+" / seed "+std::to_string(o.seed),fg);
     text(320*unit_,318*unit_,s.asset_busy?"Generating / Cancel work":"Apply creates a new sculpt layer",fg);
+  }
+  if(s.menu_page==25){
+    const auto v=s.projection;
+    text(320*unit_,300*unit_,v&&v->image?v->image->name:"Load a PNG image",fg,220*unit_);
+    if(v){
+      std::string detail=v->loading?"Loading image...":v->browsing?"Reading folder...":!v->error.empty()?v->error:v->placing?"Release, then hold trigger to place":v->panel==ProjectionPanel::Browser?(v->entries.empty()?"No PNG images":v->entries.at(v->selected).name):projection_parameter_text(v->settings,v->parameter);
+      text(320*unit_,335*unit_,detail,fg,225*unit_);
+    }
   }
   if(s.menu_page==21||s.menu_page==23){
     auto v=s.importing;
@@ -617,6 +633,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   signature+=":polygon:"+std::to_string(s.polygon_requires_conversion)+":"+std::to_string(s.polygon_has_source)+":"+std::to_string(s.polygon_controls.move_mode)+":"+std::to_string(s.polygon_controls.additive)+":"+std::to_string(s.polygon_controls.distance_mm)+":"+std::to_string(s.polygon_controls.cuts);
   if(s.polygon)signature+=":"+std::to_string(s.polygon->revision)+":"+std::to_string(s.polygon->busy)+":"+std::to_string(s.polygon->committing)+s.polygon->error;
   signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
+  if(s.projection){signature+=":projection:"+std::to_string(s.projection->request)+":"+std::to_string(s.projection->selected)+":"+std::to_string(s.projection->parameter)+":"+std::to_string(int(s.projection->panel))+std::to_string(s.projection->settings.enabled)+std::to_string(s.projection->settings.preview)+std::to_string(int(s.projection->settings.image.usage))+std::to_string(s.projection->loading)+std::to_string(s.projection->browsing)+s.projection->error+projection_parameter_text(s.projection->settings,s.projection->parameter);if(s.projection->image)signature+=s.projection->image->name;}
   if(s.importing)signature+=":import:"+std::to_string(s.importing->request)+":"+std::to_string(s.importing->selected)+":"+std::to_string(s.importing->busy)+s.importing->directory.string()+s.importing->error+
     std::to_string(int(s.importing->settings.choices.format))+std::to_string(s.importing->settings.choices.materials)+std::to_string(std::bit_cast<uint64_t>(s.importing->settings.choices.custom_metres_per_unit))+std::to_string(int(s.importing->settings.choices.units))+std::to_string(int(s.importing->settings.choices.axes))+std::to_string(int(s.importing->settings.choices.normals))+std::to_string(s.importing->settings.paint_resolution);
   signature += ":sculpt:" + std::to_string(s.sculpt_settings.symmetry_axes) + ":" +

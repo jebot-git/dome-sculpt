@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "date": "2026-11-02",
+  "parent": "b2657067e804107252f3251e7eca14fd2d3effe8",
+  "scope": "Narrow owned modal trigger pressure with selection active; no data layout changes. Not physical headset acceptance.",
+  "release": {
+    "suites": [
+      "modal-selection-controls",
+      "object-selection",
+      "controller-controls"
+    ],
+    "passed": 3,
+    "seconds": 3.55,
+    "modal_assertions": 40
+  },
+  "sanitizers": {
+    "suites": 3,
+    "seconds": 38.35,
+    "scope": "Fresh owned C/C++ core and support O1/g1 ASan, UBSan, leaks; UI/XR disabled",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1"
+  },
+  "negative": {
+    "parent_core": "b265706",
+    "artifact": "artifacts/modal-selection-old-negative3",
+    "exit": 1,
+    "passed": "Actual modal radius parameter opens with selection active",
+    "failed": "Selection-on modal ray pressure changes its owned control instead of being suppressed"
+  },
+  "loader": {
+    "scope": "Composed UI child normal-sampling-ui-b265706; identical two product repair hunks, separate Keep-detail authoring additions",
+    "assertions": 11,
+    "tracking": "Synthetic actual OpenXR loader/stereo GL, llvmpipe; no HMD",
+    "log": "artifacts/modal-selection-openxr.log",
+    "binary_sha256": "52737755bc2b8a3905262e03a8b48771665d48f7e24e1aa57fcae1ba598a0131"
+  },
+  "source_hash_count": 357,
+  "source_frozen": true,
+  "hashes": {
+    "include/dome/input.hpp": "12382545dff5a8bed98d1e06776ed054a41b94037fc645c46711f2457eb241aa",
+    "src/document.cpp": "c1a1d65d8e214493e5712c3277e8121e6435cf6e58f04dfe0fd01b8cdbe6c18e",
+    "tests/modal-selection-controls.cpp": "44783b656b2bb5e314c0ad8ed9d4c21d32098bc382f56efb83e564bc393d4d42",
+    "CMakeLists.txt": "322fa8df94f7cb195682233da4acfebacd33407e7174530db8c2109bdbcf6791",
+    "build-modal/dome-sculpt-modal-selection-controls-test": "f19bad3ff2a6aa1b83afc52bfb999233a484916ec3e3b6d69c17091591e2392c",
+    "build-sanitize/dome-sculpt-modal-selection-controls-test": "be6d0302c4c3cbf8ae80bf8d19ce94110b21bbc5c00974a7bda6bc014bb0f400",
+    "build-sanitize/libdome-sculpt-core.a": "59ce1ea5fa23f58cbb937f61fda73da91f685362f0df50ef806419ed474603a8"
+  },
+  "not_claimed": [
+    "Physical UI reacceptance",
+    "Whole repository regression suite",
+    "Retained normal export/compiler or full Scene21 authoring completion"
+  ]
+}

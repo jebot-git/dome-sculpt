@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=25;
+inline constexpr int spatial_page_count=28; //25 projection;26 preview;27 rig fitting.
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -88,8 +88,17 @@ enum class SpatialCommand {
   PolygonBridge, PolygonDissolve, PolygonWeld, PolygonCutEdges, PolygonConnect,
   PolygonDelete, PolygonFlip, PolygonApply, PolygonCancel,
   ShapeNew, ShapeCapture, ShapeDuplicate, ShapeMirror, ShapeSculpt,
-  SelectionMode, ObjectHierarchy, SelectionFocus, ImportTextureAtlas
+  SelectionMode, ObjectHierarchy, SelectionFocus, ImportTextureAtlas,
+  ProjectionBrowse, ProjectionPrevious, ProjectionNext, ProjectionOpen, ProjectionParent,
+  ProjectionToggle, ProjectionUsage, ProjectionPlace, ProjectionDecrease, ProjectionIncrease,
+  PreviewAuthored=1024, PreviewPbr, PreviewToon,
+  RigFitBegin=2048, RigFitPrevious, RigFitNext, RigFitPlace, RigFitRemove,
+  RigFitXDown, RigFitXUp, RigFitYDown, RigFitYUp, RigFitZDown, RigFitZUp,
+  RigFitApply, RigFitCancel, RigFitOptions
 };
+inline bool rig_fit_command(SpatialCommand c){return c>=SpatialCommand::RigFitBegin&&c<=SpatialCommand::RigFitOptions;}
+inline bool projection_command(SpatialCommand c){return c>=SpatialCommand::ProjectionBrowse&&c<=SpatialCommand::ProjectionIncrease;}
+inline bool preview_command(SpatialCommand c){return c>=SpatialCommand::PreviewAuthored&&c<=SpatialCommand::PreviewToon;}
 inline bool shape_command(SpatialCommand c){return c>=SpatialCommand::ShapeNew&&c<=SpatialCommand::ShapeSculpt;}
 inline bool polygon_command(SpatialCommand c){return c>=SpatialCommand::PolygonBegin&&c<=SpatialCommand::PolygonCancel;}
 inline bool import_command(SpatialCommand c) {return (c>=SpatialCommand::ImportBrowse && c<=SpatialCommand::ImportCancel)||c==SpatialCommand::ImportTextureAtlas;}
@@ -124,6 +133,8 @@ public:
   void refresh_volume(Volume &v) { volume_ = &v; }
   void cancel();
   bool menu_open() const { return menu_; }
+  uint32_t menu_device() const { return device_; }
+  bool owns_control(VrParameter parameter) const { return menu_&&parameter!=VrParameter::None&&parameter_==parameter; }
   Vec3 menu_anchor() const { return menu_anchor_; }
   Tool tool() const { return tool_; }
   Tool menu_selection() const { return Tool(std::min(selected_, 3)); }

@@ -3,6 +3,8 @@
 #include "dome/uv.hpp"
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
+  static const std::array<const char *,12> preview={"Authored","Core PBR","Toon preview","","","","","","Back","","",""};
+  if(page==26)return preview;
   static const std::array<const char *, 12> root = {
       "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",       "Redo",
       "Save", "Export glTF", "Objects", "Materials", "Brush size", "Selection"};
@@ -24,7 +26,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> controls = {
       "Color",      "Metal value", "Rough value", "Emission",
       "Mask value", "Flow",        "Layer alpha", "Brush size",
-      "Back",       "Presets",     "Erase",       "Layer order"};
+      "Back",       "Image projection",     "Erase",       "Layer order"};
   static const std::array<const char *, 12> sculpt = {
       "Add layer",  "Next layer", "Previous",     "Show layer",
       "Lock layer", "Strength",   "Delete layer", "Resolution",
@@ -41,7 +43,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Back", "Holding", "Import", "Retopology"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
-      "Next shape", "Previous shape", "Reset pose", "Undo",
+      "Next shape", "Previous shape", "Reset pose", "Humanoid fitting",
       "Back", "Redo", "Weights", "Export avatar"};
   static const std::array<const char *, 12> weights = {
       "Paint weights", "Next joint", "Previous joint", "Mode",
@@ -63,7 +65,9 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char*,12> polygon={"Start / resume","Vertices","Edges","Faces","Move / select","Add / toggle","Distance","Extrude","Back","Topology","Apply","Cancel"};
   static const std::array<const char*,12> polygon_topology={"All / none","Inset faces","Bridge loops","Dissolve edges","Weld vertices","Cut edges","Cuts","Connect vertices","Back","Delete faces","Flip faces","Cancel"};
   static const std::array<const char*,12> shapes={"New neutral","Capture mix","Duplicate","Mirror","Shape weight","Previous shape","Next shape","Restore original","Back","Undo","Redo","Edit / finish target"};
-  return page == 24 ? shapes : page == 22 ? polygon_topology : page == 19 ? polygon : page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
+  static const std::array<const char*,12> projection={"Browse images","Previous","Next","Options","Preview","Use image","Color / stencil","Place projector","Back","Color presets","Decrease","Increase"};
+  static const std::array<const char*,12> fitting={"Previous landmark","Next landmark","Place landmark","Remove landmark","X -","X +","Y -","Y +","Z -","Z +","Fit and bind","Cancel fitting"};
+  return page == 27 ? fitting : page == 25 ? projection : page == 24 ? shapes : page == 22 ? polygon_topology : page == 19 ? polygon : page == 23 ? import_options : page == 21 ? importing : page == 20 ? holding : page == 18 ? procedural : page == 17 ? cut : page == 16 ? retopo : page == 15 ? masks : page == 14 ? skin
          : page == 13 ? weights : page == 12 ? baking
          : page == 11 ? rig
          : page == 10 ? mesh
@@ -151,9 +155,20 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
+  if(page==26){
+    if(index==0)return SpatialCommand::PreviewAuthored;
+    if(index==1)return SpatialCommand::PreviewPbr;
+    if(index==2)return SpatialCommand::PreviewToon;
+    return {};
+  }
   if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if(page==27){static const SpatialCommand commands[]={SpatialCommand::RigFitPrevious,SpatialCommand::RigFitNext,SpatialCommand::RigFitPlace,SpatialCommand::RigFitOptions,SpatialCommand::RigFitXDown,SpatialCommand::RigFitXUp,SpatialCommand::RigFitYDown,SpatialCommand::RigFitYUp,SpatialCommand::RigFitZDown,SpatialCommand::RigFitZUp,SpatialCommand::RigFitApply,SpatialCommand::RigFitCancel};return commands[index];}
+  if(page==25){
+    static const SpatialCommand commands[]={SpatialCommand::ProjectionBrowse,SpatialCommand::ProjectionPrevious,SpatialCommand::ProjectionNext,SpatialCommand::ProjectionOpen,SpatialCommand::ProjectionParent,SpatialCommand::ProjectionToggle,SpatialCommand::ProjectionUsage,SpatialCommand::ProjectionPlace,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::ProjectionDecrease,SpatialCommand::ProjectionIncrease};
+    return index==8||index==9?std::nullopt:std::optional<SpatialCommand>(commands[index]);
+  }
   if(page==24){
     static const std::array<SpatialCommand,12> shapes={SpatialCommand::ShapeNew,SpatialCommand::ShapeCapture,SpatialCommand::ShapeDuplicate,SpatialCommand::ShapeMirror,SpatialCommand::Undo,SpatialCommand::RigPreviousMorph,SpatialCommand::RigNextMorph,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::ShapeSculpt};
     return index==8?std::nullopt:std::optional<SpatialCommand>(shapes[index]);
@@ -223,7 +238,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
     static const std::array<SpatialCommand, 12> rig = {
       SpatialCommand::Undo, SpatialCommand::RigNextJoint, SpatialCommand::RigPreviousJoint,
       SpatialCommand::Undo, SpatialCommand::RigNextMorph, SpatialCommand::RigPreviousMorph,
-      SpatialCommand::RigResetPose, SpatialCommand::Undo, SpatialCommand::Undo,
+      SpatialCommand::RigResetPose, SpatialCommand::RigFitBegin, SpatialCommand::Undo,
       SpatialCommand::Redo, SpatialCommand::Save, SpatialCommand::ExportAvatar};
     return index == 8 || index == 10 ? std::nullopt : std::optional<SpatialCommand>(rig[index]);
   }
@@ -650,6 +665,7 @@ void SpatialInput::update(const SpatialSample &s) {
       selected_ = 0;
     } else if(page_==13 && selected_==11) {
       page_=14;selected_=0;
+    } else if(page_==11&&selected_==7){command_=SpatialCommand::RigFitBegin;command_device_=s.id;page_=27;selected_=0;
     } else if (page_ == 11 && selected_ == 10) {
       page_ = 13; selected_ = 0;
     } else if (page_ == 9 && selected_ == 5) {
@@ -681,8 +697,9 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 3 && selected_ == 11) {
       page_ = 6;
       selected_ = 0;
+    } else if(page_==25&&selected_==9){page_=4;selected_=0;
     } else if (page_ == 6 && selected_ == 9) {
-      page_ = 4;
+      page_ = 25;
       selected_ = 0;
     } else if (auto parameter = spatial_parameter(page_, selected_)) {
       if (parameter_allowed && !parameter_allowed(*parameter)) {
@@ -701,8 +718,8 @@ void SpatialInput::update(const SpatialSample &s) {
       component_ = y_latch_ = 0;
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
-    } else if (page_ != 0 && selected_ == 8) {
-      page_ = page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+    } else if (page_ != 0 && page_ != 27 && selected_ == 8) {
+      page_ = page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
@@ -738,7 +755,7 @@ void SpatialInput::update(const SpatialSample &s) {
       const bool resume_mask = page_ == 15 && command_ && *command_ == SpatialCommand::SculptMaskResume;
       const bool resume_polygon=(page_==19||page_==22)&&command_&&
         (*command_==SpatialCommand::PolygonBegin||*command_==SpatialCommand::PolygonMoveMode||*command_==SpatialCommand::PolygonApply||*command_==SpatialCommand::PolygonCancel);
-      if((page_!=19 && page_!=22 && page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23) || resume_retopology || resume_mask || resume_polygon){menu_ = false;device_ = 0;}
+      if((page_!=19 && page_!=22 && page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23 && page_!=25 && page_!=27) || resume_retopology || resume_mask || resume_polygon){menu_ = false;device_ = 0;}
       d.armed = false;
     }
     d.pressed = s.trigger;

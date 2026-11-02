@@ -26,6 +26,7 @@ void Document::input_worker_error_locked(std::exception_ptr error) noexcept {
   worker_notices_[0]=std::move(notice);retry_worker_notices_locked(true);
 }
 void Document::file_worker_error_locked(FileJob &job,std::exception_ptr error) noexcept {
+  if(job.projection_load){job.projection_load->failure=std::move(error);return;}
   if(job.work&&job.work->accepted_scene&&!job.work->done.load()) {
     // Preserve the original exception and release accepted-operation shutdown even
     // under permanent diagnostic-allocation denial. No stale Scene fallback.
@@ -75,6 +76,22 @@ void Document::native_worker_error_locked(const std::shared_ptr<NativeStroke>&se
     WorkerNotice notice;notice.error=std::move(error);notice.generation=session->source.generation;notice.publication=published_.load();
     worker_notices_[2]=std::move(notice);retry_worker_notices_locked(false,true);
   }
+}
+void Document::retry_projection_failure_locked() noexcept {
+  bool handled=false;
+  try {
+    const auto task=projection_load_;
+    if(!task||!task->done.load()||!task->failure||task->request!=projection_request_.load()||
+       task->source.generation!=state_.generation||stopping_.load())handled=true;
+    else {
+      auto view=state_.projection?std::make_shared<ProjectionView>(*state_.projection):std::make_shared<ProjectionView>();
+      view->loading=view->browsing=false;view->error=task->cancelled.load()?std::string{}:worker_message(task->failure);
+      auto previous=state_.projection;state_.projection=std::move(view);
+      try{publish_locked(false,false);}catch(...){state_.projection=std::move(previous);throw;}
+      projection_load_.reset();handled=true;
+    }
+  }catch(...){/* Retain this one tool error until publication memory returns. */}
+  if(handled){{std::lock_guard lock(file_mutex_);projection_notice_pending_=false;}file_changed_.notify_all();}
 }
 void Document::retry_worker_notices_locked(bool input,bool native) noexcept {
   // Each worker retries its own slot. A long authoring/export job must never

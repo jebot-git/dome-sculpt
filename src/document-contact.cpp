@@ -4,7 +4,7 @@
 namespace dome {
 bool Document::process_affine_paint_spatial_locked(const SpatialFrame &f){
  const bool active=native_stroke_&&native_stroke_->space==NativeStrokeSpace::EvaluatedWorldBrush;
- if(!active&&((!scene_.has_affine_placement(scene_.active().id)&&!scene_.active().deformation)||!scene_.active().mesh_active||state_.shape_sculpt))return false;
+ if(!active&&((!scene_.has_affine_placement(scene_.active().id)&&!scene_.active().deformation&&!(state_.projection&&state_.projection->settings.enabled))||!scene_.active().mesh_active||state_.shape_sculpt))return false;
  const bool valid=f.focused&&f.head_valid&&ob::finite(f.head)&&std::isfinite(f.time)&&f.time>=0;
  auto sample=[&](size_t i){
   const auto &h=f.hands[i].tracked;auto p=ob::transform(ob::inverse(state_.canvas),h.grip.position);

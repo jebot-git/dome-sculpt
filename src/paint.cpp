@@ -550,7 +550,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
             float d=length(position-(b.from+axis*u));
             if(d>=radius||d>distance+1e-7f||(std::abs(d-distance)<=1e-7f&&candidate.face>=selected_face))return;
             auto value=settings;float opacity=1;
-            if(sampler){auto sample=sampler(candidate.position,candidate.normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
+            if(sampler){auto sample=sampler(position,normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
             if(opacity<=0)return;
             distance=d;selected_face=candidate.face;selected=value;projection_opacity=opacity;
           };
@@ -1843,10 +1843,13 @@ void PaintedMesh::swap_state(PaintedMesh &other) noexcept {
   static_assert(noexcept(swap(revision_,other.revision_)));swap(revision_,other.revision_);
   static_assert(noexcept(swap(editing_,other.editing_)));swap(editing_,other.editing_);
   static_assert(noexcept(swap(before_,other.before_)));swap(before_,other.before_);
+  static_assert(noexcept(swap(before_colors_,other.before_colors_)));swap(before_colors_,other.before_colors_);
   static_assert(noexcept(swap(undo_,other.undo_)));swap(undo_,other.undo_);
   static_assert(noexcept(swap(redo_,other.redo_)));swap(redo_,other.redo_);
   static_assert(noexcept(swap(history_bytes_,other.history_bytes_)));swap(history_bytes_,other.history_bytes_);
   static_assert(noexcept(swap(allocated_tiles_,other.allocated_tiles_)));swap(allocated_tiles_,other.allocated_tiles_);
+  static_assert(noexcept(swap(allocated_color_tiles_,other.allocated_color_tiles_)));swap(allocated_color_tiles_,other.allocated_color_tiles_);
   static_assert(noexcept(swap(before_allocated_tiles_,other.before_allocated_tiles_)));swap(before_allocated_tiles_,other.before_allocated_tiles_);
+  static_assert(noexcept(swap(before_allocated_color_tiles_,other.before_allocated_color_tiles_)));swap(before_allocated_color_tiles_,other.before_allocated_color_tiles_);
 }
 } // namespace dome

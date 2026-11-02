@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "base": "649befe2aa1689e0ea90738393a44fc311cc7055",
+  "scope": "Portable Source20 projection/PBR preview. No Source21/24/25 source/schema admission. Fresh union whole-core sanitizer still root-owned.",
+  "source_sha256": {
+    "CMakeLists.txt": "2679100cadc38aa6e36e99167ad915803bd48e5ef3b3ed4fd31870cd2bd12d6c",
+    "include/dome/document.hpp": "24af62ba82cd1a8c3ef973c8c91f55d6f15bf6e3bdca67f70a4f77097d1ec317",
+    "include/dome/input.hpp": "82d310e202528166be562a25bb369ec13f9d0070731665b50e85df6c8c4f6f4b",
+    "src/app.cpp": "304413ae301f9c7abb36442bcf1106219825e90fbee1418000db7d746bbfbbf6",
+    "src/document-native.cpp": "13c3f64f3dc3f066c0d529a8a7c7704a9543309e68552bf2813eefb0598e6eb3",
+    "src/document.cpp": "dd524f7b0ff8a83eef818d85868cf417f778c25b779e93264bd429bfac12bebf",
+    "src/geometry-identity.hpp": "4f56b35088bfcdb45f56a7b505959d6de8119efe25846bc8e18f5cc7bd042f86",
+    "src/input.cpp": "abf137e534158c2345b3b1dfd0e9341a9af5549b85ea782d12e7ffd479776144",
+    "src/material-visibility.cpp": "83a18471fef6c10efcc49bf19113cfc3630dbd10ddfcd4ec634635e3e3b813f8",
+    "src/object-selection.cpp": "299b69359f477fa62ea81e8bf9720d0159d23cf67aa94ec7c2f2ee3869186df5",
+    "src/palette.cpp": "4dac055a3b2ea71976598ed138c162b0d1064e311a4f40aa787625eaabd1ae19",
+    "src/render.cpp": "350ec7b1066e4324d5fcf5dd4651341657a4cde87c7e8d059c1c9fb8d6c2c002",
+    "tests/pbr-preview-menu.py": "7cebfcdd212c3680137af22e819cedbf109de82945dc8080a5015961a8568f87",
+    "tests/pbr-preview-xr.py": "ca932139995a28ff17905f9491a53cce6ea908da199a8621e3929a6dc97fe0a0",
+    "tests/pbr-preview.cpp": "c8fdd5c6a81da0193268de57f40f30cadddc9b0cb0ec13aa9477de20f6cb8d81",
+    "tests/xr_runtime.cpp": "7e3c5102e7b2b76ad9a65cd85ab42ff6120d4ceb66aec6facacb267638519cfc"
+  },
+  "coherent_release": {
+    "fresh_core_support_renderer_native_xr": true,
+    "suites": 8,
+    "seconds": 140.51,
+    "new_generic_assertions": 116,
+    "persistent_preview_allocation_denials": 44,
+    "avatar_assertions": 111,
+    "avatar_images": 18,
+    "avatar_max_byte_error": 0,
+    "actual_loader_view": 10,
+    "existing_selection_loader": 11,
+    "projection_target_and_occluder_roles": "Actual native strokes; both reused cache and fallback query; captured range role",
+    "projection_placing_gesture_guard": true
+  },
+  "separate_projection_loader": {
+    "suites": 1,
+    "assertions": 10,
+    "seconds": 20.31
+  },
+  "native_fltk": {
+    "normal": 13,
+    "compact": 13,
+    "bitmap_size": 16,
+    "scale": 2,
+    "screen": "640x360",
+    "actual_viewport_acknowledgement": true
+  },
+  "hardware": {
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "strict_tokens": [
+      "Intel",
+      "Arc",
+      "A770"
+    ],
+    "generic_assertions": 116,
+    "avatar_assertions": 111,
+    "avatar_images": 18,
+    "avatar_max_byte_error": 0,
+    "actual_uhd_refusal": true,
+    "source_binary_freeze_exact": true,
+    "commands": [
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-projection-649befe/build-preview/dome-sculpt-pbr-preview-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-portable-arc/generic.glb",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "returncode": 0,
+        "expected": 0,
+        "seconds": 0.18158202299673576
+      },
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-projection-649befe/build-preview/dome-sculpt-pbr-preview-test",
+          "--avatars",
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-portable-arc/avatar",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "returncode": 0,
+        "expected": 0,
+        "seconds": 64.99907473499479
+      },
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-projection-649befe/build-preview/dome-sculpt-pbr-preview-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-portable-arc/uhd-refused.glb",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_00_02_0",
+        "returncode": 1,
+        "expected": 1,
+        "seconds": 0.026229409995721653
+      }
+    ],
+    "binaries_sha256": {
+      "build-preview/dome-sculpt-pbr-preview-test": "8cd9b7e551402a98ee72d8463b22e171741eb87705581a8600d548897156023c",
+      "build-preview/dome-sculpt": "63b174d75415efbedbe5cb256a4658ff6bef55766b244a6143d1aa7a69334859",
+      "build-preview/libdome-sculpt-test-runtime.so": "2d6a511b523e64c3246fa6f5c2b6a19b98c552b39dfa2e9503efde2802b5cb97"
+    }
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 20,
+    "errors": 0,
+    "warnings": 342,
+    "maxIssues": 0,
+    "filtered": false
+  },
+  "sanitizer_scope": "dc64acb historical Source21 owned-library3+1 proof is preserved separately; NOT claimed as portable649 qualification. Root will rebuild coherent final union.",
+  "logs_sha256": {
+    "pbr-preview-portable-release-build.log": "47323a0a5a75183a29748d305e6bf2326ab34f4fa34307b46e8e90e97464186d",
+    "pbr-preview-portable-release-tests.log": "387f18536db0eefeb2a305ee14d57fd4d008c55b05de7d3a3fdec9fa1a6c04f4",
+    "pbr-preview-portable-generic.log": "d467c4e21b8b2078b5e42dcdfab876bc96363efefa7cfa2d4c47c06d82ec7af6",
+    "pbr-preview-portable-menu.log": "e9cad0365acb3f4bf61c5a2facea82090d4ac5de28cf761d34f729324c0124b5",
+    "pbr-preview-portable-menu-compact.log": "e9cad0365acb3f4bf61c5a2facea82090d4ac5de28cf761d34f729324c0124b5",
+    "pbr-preview-portable-projection-xr.log": "fb61b56db18e490b1a82ec4ba0da13dc724c804e5f3d5f1ba5c8f648c0c5303d",
+    "pbr-preview-portable-khronos.json": "913665d0548deb8dd42860fe374a6d08346001af99f0cff09161cd4865eeafe4"
+  },
+  "remaining": [
+    "Full normal21 field/schema/export pipeline private",
+    "Independent writable paint domain24 required for source-colour/alpha UV preservation",
+    "Rig placing guard composition at c18 union",
+    "Post-basic controller drawers required",
+    "No install/HMD/session restart"
+  ]
+}
