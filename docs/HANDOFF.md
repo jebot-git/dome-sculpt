@@ -87,6 +87,44 @@ commonSave/UV bridge and owned desktop lifetime fixes before its next source fre
 Controller drawers stay queued after basics. No new physical test, installation
 or desktop restart occurred; the accepted saved XR session remains preserved.
 
+## Active basic-work branches after the IO milestone
+
+Root's next composed candidate is frozen`649befe` in
+`artifacts/projection-io-79009e2`: published main79009e2 +exact Docs image
+projection49c06b7 +portable modal-selection repairadcb068. Only the latter's
+CMake end-of-file conflict required resolution, retaining both test blocks.
+Fresh complete optimized Release build exec4238 and owned C/C++ sanitizer
+core/support/render/frontend plus selected fixtures exec82088 are live. Do not
+mutate this runtime/headers/tests or infer component proofs qualify this union.
+No test process should be restarted on an observation timeout. Next verify the
+composed native/controller/GUI/Wayland/actual-loader workflows and current
+immutable render ownership. No Scene21+ persistent fields are in this union.
+
+Root's exploratory native FBX skin/morph adapter3 is committed/pushed`3a55c84`
+on work/native-fbx-deformers-badcace, tree artifacts/native-fbx-deformers-badcace.
+Its five genuine pinned ufbx inputs pass actual native authoring import,342
+independent default evaluated world vertices and exact Save/restart; maximum
+position error1.54678e-7. Real DQ and authored transparency remain guarded.
+The missing Blender shape offset-weight failure and inactive Lambert failure
+are preserved. This is an optimized new adapter/probe object linked to exact
+unchanged Scene20 import/Scene ABI archives, not a new whole-project/SAN/UI or
+full FBX qualification. Read its FBX-DEFORMATION-WIP.md/.json before admission.
+
+Palette's native normal21 UI and independent colour/normal UV scopes remain
+private; current real PBR View26 commands use an ephemeral view_epoch rather
+than changing Scene revision/content/history or retiring accepted asset Saves.
+Its actual software avatar oracle has110 checks/18 independent GLB images at
+maxerror0; coherent sanitizer/frontend/device qualification is still pending.
+Contracts owns conditional Scene24/material9 independent paint sampling,
+starting from immutable detached geometry-only corner basis and a private
+O(1) association certificate. Strong partial-Bake UV sharp-boundary failures
+remain real; do not widen tolerance or borrow normal-domain authority.
+Docs owns actual landmark rig fitting (native/FLTK/controller/real-loader and
+independent import/export subset) and reserved conditional Scene25 exact
+pose-local matrices/acyclic original rig_source capsules. Full grouped/source
+rest/reparent/VRM transport is required, not satisfied by the initial fitter.
+Keep all proof scopes separate and all incomplete requirements active.
+
 ## Qualified rigid source avatar integration — 2026-11-02
 
 Public merge9ccddef is runtime/header/asset/third_party/CMake/test byte-identical to
