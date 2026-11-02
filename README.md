@@ -64,6 +64,8 @@ resampler kernels compile, with positive vendor hardware still unverified.
 See [resolution backend evidence and limits](docs/GPU-RESOLUTION-BACKEND.md).
 Current CUDA/ROCm native application build and unavailable-device scopes are in
 [the compiler checkpoint](docs/CURRENT-CUDA-ROCM-NATIVE.md).
+CUDA/HIP brush transfers now use bounded scalar-only readback and staged
+publication; [failure tests and hardware limits](docs/GPU-BRUSH-TRANSFERS.md).
 
 
 ## Current native workflow

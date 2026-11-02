@@ -14,6 +14,28 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Qualified CUDA/HIP brush transfer integration — 2026-11-03
+
+Mergea3c52b08625c401b64ce5c2e12552df3cc3ae36c combines main4fbc PIC defaults with
+qualified runtime53a26f0 /finaldabd865 from artifacts/gpu-brush-transfer-fb75ea5.
+All source/header/test/asset/tool/packaging bytes match the component except the
+independent6-line ROCm PIC default. Actual merged CUDA-default and HIP-autoPIC
+backend/probe builds+real missing-device1/1 each pass. Shared brush math/public
+Sample/Brush remain unchanged; device storage caps2M inputs+scalar output,
+24B upload/4B readback. All host results remain detached until every chunk
+succeeds, then only distances publish. Partial readback/launch/wait failures
+best-effort drain before result/device storage unwinds. No CPU fallback.
+
+Production host helper/vendorAPI SHIMS130 Release+130O1ASan/UBSan/leaks pass;
+synthetic shim kernels are NOT GPU numerical proof or wholecoreSAN. Actual
+CUDA/HIP modules and fresh full native apps compile/link with explicitPIC=ON;
+real SDK probes refuse nonempty1/257/2000007 sample spans with every byte exact
+(status35CUDA/status100HIP).31 sealing-time component hashes verified intact;
+no component before/after binary manifest was captured, no such claim made.
+Read GPU-BRUSH-TRANSFERS.md and GPU-BRUSH-INTEGRATION.md/receipts. Positive
+NVIDIA/AMD numerics, real device-loss/partial-readback recovery and sustained
+latency remain required. No system installation or active-session restart.
+
 ## Current native CUDA/ROCm builds — 2026-11-03
 
 ROCm default-PIC source3fc5035 /metadata0e28b5f fixes a real mixed-driver native

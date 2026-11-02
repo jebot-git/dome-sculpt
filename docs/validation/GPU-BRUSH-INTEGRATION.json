@@ -1,0 +1,33 @@
+{
+  "integration_merge": "a3c52b08625c401b64ce5c2e12552df3cc3ae36c",
+  "qualified_runtime": "53a26f0",
+  "component_final": "dabd8655e02b29680b1b65c0d5480f5be12e43d0",
+  "component": "artifacts/gpu-brush-transfer-fb75ea5",
+  "source_equality": "all runtime/header/test/assets/tool/packaging match dabd865; CMake only independent6-lineROCM PIC default",
+  "component_artifacts_rechecked": 31,
+  "merged_checks": {
+    "CUDA_default": "backend+actualruntimeprobe1/1",
+    "HIP_defaultPIC": "backend+actualruntimeprobe1/1"
+  },
+  "sha256": {
+    "CMakeLists.txt": "c5564ba54c0cd018cb0a8c3f93cb99bc9a165085093fa7a7d3b291b9492a958d",
+    "src/backend_gpu.cu": "03ba4f1f7f756b35b2bed84b350aab73bc3a7bba2c49c7d40d0a162b9fb36609",
+    "src/gpu-brush-transfer.hpp": "bee802f32b568dcb3e979faa5256c370848eb63ea7031377a5b4482cefb3925a",
+    "src/brush_kernel.hpp": "fe941ceaec5232bed6f5fe71d3fdd38b43b3e1efca372f90d9929ba2557c33aa",
+    "include/dome/brush.hpp": "60b61ab21cae66c2a5fdf560c610c1b9a0ba600953d44baa90a97ef8dfc4aac1",
+    "tests/gpu-brush-transfer.cpp": "54cf5f0af6220044842e207e0a795e5aaeb2a28711e2687b0c0643e44fcd6b55",
+    "tests/gpu-brush-missing.cpp": "cb8c3f7b977180a19f034e3f116a3075cdef205a1968ec6a403448051220b51a",
+    "artifacts/configure-cuda.log": "c970ba86c5887ad818c49d89c3166d5a2ca8bc9eaf5cd3f1e56cc9527cf125c9",
+    "artifacts/build-cuda.log": "b7ef86befe6fc72684004afcd5cc509f66b153065576d31939c9863c582e85d8",
+    "artifacts/tests-cuda.log": "dcfc456993e938abda66d8cdd62c3c9a47ce1162e339a0ca0241120c6eb61eca",
+    "artifacts/configure-rocm.log": "b3d434b2c116eb24f91ed74d40b6727964231664e62b53703fcf3511aa1c019e",
+    "artifacts/build-rocm.log": "41a1657dccd373e0f3b5b06714e63b19b89b5e11f2b900b812457d1babb92485",
+    "artifacts/tests-rocm.log": "c81f142107d117e0a1c20005f1093cd3592361d12f441d3b73a01aa9d4e27809",
+    "build-cuda/artifacts-brush-cuda.xml": "ac981919b833c77534e498189c362abd8d4bb0d489d95c048535ca165f026473",
+    "build-rocm/artifacts-brush-rocm.xml": "231a74c4f24259caf4efd5df07a7731959b098192ea3b12030060ea03fab97c7",
+    "build-cuda/dome-sculpt-gpu-brush-missing-test": "6e7d773b5c5ff30753cc2a8e00d3762974d295226debedd849db0b805f4646cc",
+    "build-rocm/dome-sculpt-gpu-brush-missing-test": "138b14933e216e160ba3a47d5793c98d4315a6b29946fce53cc58b59c8bd5ae3"
+  },
+  "scope": "shared host-helper shim evidence and actual missing-device SDK/native compile; no positive GPU numerical/loss/performance claim",
+  "no_system_install": true
+}
