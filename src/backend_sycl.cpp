@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "brush_kernel.hpp"
 #include "csg-kernel.hpp"
+#include "sparse-resample-backend.hpp"
 #include <sycl/sycl.hpp>
 #include <memory>
 #include <vector>
@@ -76,6 +77,46 @@ void apply_brush(std::span<Sample> samples, const Brush &b) {
   for(size_t i=0;i<samples.size();++i)samples[i].distance=result[i];
 }
 std::string_view compute_backend() { return "ONEAPI"; }
+struct SparseFieldSampler::Impl {
+  sycl::queue queue{sycl::gpu_selector_v,[](sycl::exception_list errors){for(auto error:errors)std::rethrow_exception(error);},sycl::property_list{sycl::property::queue::in_order{}}};
+  std::unique_ptr<sparse_resample::Cell,UsmDeleter> cells{nullptr,{&queue}};
+  std::unique_ptr<sparse_resample::Point,UsmDeleter> points{nullptr,{&queue}};
+  std::unique_ptr<uint64_t,UsmDeleter> values{nullptr,{&queue}};
+  sparse_resample::Parameters parameters;
+  uint32_t mask;size_t capacity;bool failed=false;
+  Impl(const sparse_resample::Grid &grid,sparse_resample::Parameters p,size_t count):parameters(p),mask(grid.mask()),capacity(count) {
+    cells.reset(sycl::malloc_device<sparse_resample::Cell>(grid.cells().size(),queue));
+    points.reset(sycl::malloc_device<sparse_resample::Point>(capacity,queue));
+    values.reset(sycl::malloc_device<uint64_t>(capacity,queue));
+    if(!cells||!points||!values)throw std::bad_alloc();
+    try{queue.memcpy(cells.get(),grid.cells().data(),grid.cells().size_bytes());queue.wait_and_throw();}
+    catch(...){try{queue.wait_and_throw();}catch(...){}throw;}
+  }
+  ~Impl(){try{queue.wait_and_throw();}catch(...){}}
+};
+SparseFieldSampler::SparseFieldSampler(const sparse_resample::Grid &grid,sparse_resample::Parameters p,size_t capacity) {
+  if(!capacity||capacity>65536)throw std::invalid_argument("Invalid sparse resampling chunk capacity");
+  sparse_resample::validate_queries({},p);impl_=std::make_unique<Impl>(grid,p,capacity);
+}
+SparseFieldSampler::~SparseFieldSampler()=default;
+std::vector<uint64_t> SparseFieldSampler::sample(std::span<const sparse_resample::Point> queries,const std::function<bool()> &cancelled) {
+  auto &state=*impl_;if(state.failed)throw std::runtime_error("Sparse resampling GPU session has failed");
+  sparse_resample::validate_queries(queries,state.parameters,[&]{sparse_resample_checkpoint(cancelled);});
+  std::vector<uint64_t> result(queries.size());
+  try {
+    const auto *cells=state.cells.get();auto *points=state.points.get();auto *values=state.values.get();
+    const auto mask=state.mask;const auto p=state.parameters;
+    for(size_t first=0;first<queries.size();) {
+      sparse_resample_checkpoint(cancelled);const auto count=std::min(state.capacity,queries.size()-first);
+      state.queue.memcpy(points,queries.data()+first,count*sizeof(sparse_resample::Point));
+      state.queue.parallel_for(sycl::range<1>{count},[=](sycl::id<1> id){values[id]=sparse_resample::sample(cells,mask,points[id],p);});
+      state.queue.memcpy(result.data()+first,values,count*sizeof(uint64_t));state.queue.wait_and_throw();first+=count;
+    }
+    sparse_resample_checkpoint(cancelled);
+  }catch(...){state.failed=true;try{state.queue.wait_and_throw();}catch(...){}throw;}
+  return result;
+}
+
 void apply_csg(std::span<Sample> samples,std::span<const CsgBox> boxes,float band,
                const std::function<bool()> &cancelled) {
   if(samples.empty() || boxes.empty())return;

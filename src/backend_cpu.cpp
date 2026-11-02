@@ -20,4 +20,5 @@ void apply_csg(std::span<Sample> samples,std::span<const CsgBox> boxes,float ban
   for(size_t i=0;i<samples.size();++i)samples[i].distance=result[i];
 }
 std::string_view compute_backend() { return "CPU"; }
+
 } // namespace dome

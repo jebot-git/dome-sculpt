@@ -56,6 +56,14 @@ HIP has compile-only evidence on this host; CUDA and AMD hardware execution
 remain unverified. Requested GPU backends fail rather than silently changing
 to CPU. See [compute validation and scope](docs/COMPUTE-VALIDATION.md).
 
+Resolution changes now dispatch forward layer and mask interpolation to the
+selected GPU, preserving binary64 values through bounded field/query transfers.
+Reconstruction and topology/surface quality remain on CPU. The Arc path has
+native menu, synthetic OpenXR, exact persistence and sanitizer evidence; CUDA/HIP
+resampler kernels compile, with positive vendor hardware still unverified.
+See [resolution backend evidence and limits](docs/GPU-RESOLUTION-BACKEND.md).
+
+
 ## Current native workflow
 
 The initial document contains a clay sphere with 30 mm voxel spacing. Ordinary

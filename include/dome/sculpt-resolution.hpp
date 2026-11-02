@@ -34,7 +34,7 @@ struct SculptResolutionResult {
   std::optional<Volume> replacement;
   SculptResolutionReport report;
 };
-// Detached, bounded CPU foundation. Each layer's independent displacement and
+// Detached, bounded resampling. Each layer's independent displacement and
 // protection field is resampled in physical units; layer IDs/properties and
 // settings are retained. A persistent physical band avoids changing the layer
 // neutral field when voxel spacing changes. Rejects uncertifiable sampled
