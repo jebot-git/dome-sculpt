@@ -69,7 +69,7 @@ std::vector<uint64_t> device_sample(const Grid &grid, std::span<const Point> que
     }
   } memory{queue};
   const auto allocation_begin = Clock::now();
-  memory.cells = sycl::malloc_device<Cell>(grid.cells.size(), queue);
+  memory.cells = sycl::malloc_device<Cell>(grid.cells().size(), queue);
   memory.points = sycl::malloc_device<Point>(std::min(chunk, queries.size()), queue);
   memory.values = sycl::malloc_device<uint64_t>(std::min(chunk, queries.size()), queue);
   if (!memory.cells || !memory.points || !memory.values) throw std::bad_alloc();
@@ -78,13 +78,13 @@ std::vector<uint64_t> device_sample(const Grid &grid, std::span<const Point> que
   const auto *cells = memory.cells;
   auto *points = memory.points;
   auto *values = memory.values;
-  const auto mask = grid.mask;
+  const auto mask = grid.mask();
   std::vector<uint64_t> result(queries.size());
   for (int iteration = 0; iteration < 4; ++iteration) {
     const auto started = Clock::now();
     // Every measured operation includes the full immutable field upload. This
     // prototype does not claim a persistent cross-operation device cache.
-    queue.memcpy(memory.cells, grid.cells.data(), grid.cells.size() * sizeof(Cell));
+    queue.memcpy(memory.cells, grid.cells().data(), grid.cells().size() * sizeof(Cell));
     for (size_t first = 0; first < queries.size(); first += chunk) {
       const auto count = std::min(chunk, queries.size() - first);
       queue.memcpy(points, queries.data() + first, count * sizeof(Point));
@@ -117,7 +117,7 @@ size_t exercise(std::vector<Entry> entries, std::vector<Point> queries, float so
   const auto validation_ms = ms(admitted);
   if (encoded_host) {
     std::vector<uint64_t> actual;
-    for (auto q : queries) actual.push_back(sample(grid.cells.data(), grid.mask, q, p));
+    for (auto q : queries) actual.push_back(sample(grid.cells().data(), grid.mask(), q, p));
     compare(actual, expected);
   }
 #ifdef DOME_TEST_SYCL
@@ -126,7 +126,7 @@ size_t exercise(std::vector<Entry> entries, std::vector<Point> queries, float so
     const auto actual = device_sample(grid, queries, p, arc, times, expected);
     compare(actual, expected);
     std::cout << "SPARSE_JOB entries=" << entries.size() << " queries=" << queries.size()
-              << " field_bytes=" << grid.cells.size() * sizeof(Cell)
+              << " field_bytes=" << grid.cells().size() * sizeof(Cell)
               << " query_bytes=" << queries.size() * sizeof(Point) << " readback_bytes=" << actual.size() * 8
               << " native_cpu_ms=" << reference_ms << " host_pack_ms=" << packing_ms
               << " query_validation_ms=" << validation_ms << '\n';

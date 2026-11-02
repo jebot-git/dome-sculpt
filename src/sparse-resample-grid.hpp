@@ -11,29 +11,32 @@
 namespace dome::sparse_resample {
 inline constexpr size_t maximum_entries = 4'000'000, maximum_queries = 16'000'000;
 struct Entry { Point point; double value; };
-struct Grid {
-  std::vector<Cell> cells;
-  uint32_t mask = 0;
+class Grid {
+  std::vector<Cell> cells_;
+  uint32_t mask_ = 0;
+public:
+  std::span<const Cell> cells() const { return cells_; }
+  uint32_t mask() const { return mask_; }
   explicit Grid(std::span<const Entry> entries, const std::function<void()> &checkpoint = {}) {
     if (entries.size() > maximum_entries) throw std::length_error("Sparse resampling source budget exceeded");
     size_t capacity = 2;
     while (capacity < entries.size() * 2) capacity *= 2;
-    cells.resize(capacity);
-    mask = uint32_t(capacity - 1);
+    cells_.resize(capacity);
+    mask_ = uint32_t(capacity - 1);
     size_t work = 0;
     for (const auto &entry : entries) {
       if (!std::isfinite(entry.value) || std::abs(entry.value) > 1e6)
         throw std::invalid_argument("Sparse resampling source value is invalid");
-      uint32_t slot = hash(entry.point) & mask, probe = 0;
+      uint32_t slot = hash(entry.point) & mask_, probe = 0;
       for (; probe < maximum_probe; ++probe) {
         if ((++work & 255) == 0 && checkpoint) checkpoint();
-        auto &cell = cells[slot];
+        auto &cell = cells_[slot];
         if (!cell.occupied) {
           cell = {entry.point, 1, std::bit_cast<uint64_t>(entry.value)};
           break;
         }
         if (same(cell.point, entry.point)) throw std::invalid_argument("Sparse resampling source key is duplicated");
-        slot = (slot + 1) & mask;
+        slot = (slot + 1) & mask_;
       }
       if (probe == maximum_probe) throw std::length_error("Sparse resampling source probe budget exceeded");
     }
