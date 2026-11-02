@@ -210,6 +210,31 @@ named-UV visual oracle. Fourteen current emitted GLBs have0KHRerrors/12warnings.
 Read FBX-NAMED-UV-WIP.md and its qualification receipt. Native direct multi-UV,
 UV2+, broader FBX and combined-main admission remain required.
 
+Current-source integration is now frozen8a89787, metadata423dd56, in
+artifacts/fbx-bindings-current-132caef. Import cpp is byte-identical to b603e0b,
+combined with public132caef; only test/helper additions follow the semantic fix.
+New actual named-UV source/native512atlas/CorePBR/Save/restart/export37 checks
+pass software AND strictPCI03A770 with maxpixelerror1 (unchanged4-bound), exact
+source/binary manifests. New75genuine5inputs×5units×3axes cases pass37097 checks/
+5130 independent raw-unit evaluated skin/morph corners, native Save/restart and
+independent GLB evaluation. These are default poses; prior edited poses remain
+separately scoped. Current registered16/16 pass8.35s Release and16/16 pass18.45s
+whole-owned C/C++SAN/leaks. Native Maya-skin14+Blender-morph14 pass in BOTH flags,
+all four Apps normal-close. Current93positiveGLBs have0KHRerrors/57warnings.
+
+Initial graphics SegFault is a test-helper bug: canonical FBX is valid nonindexed
+GLB while prepared-normal-consumer dereferenced indices. Exact helper-SAN null78,
+old binary and failed JUnit/log remain; test-only sequential-corner fallback
+fixes it and preserves indexed cases. Coherent initial support archives/SANApp
+stay hash-exact through that test-only refinement. No runtime/header/Scene change
+beyond qualified adapter4. Read CURRENT-FBX-BINDINGS-WIP.md/.json.
+CPU alltargets90629 and pinnedDPC++OneAPI alltargets14599 are LIVE; source/header/
+test inputs remain frozen. Logs artifacts/build-current-fbx-{all-release,oneapi}.log
+in that tree. Do not restart on observation timeout. Next finish both builds,
+current-source actual OneAPI device/missing-device gates, final main source
+merge/equality and receipt. No new GPU job is active; shortArc37 lease released.
+This is not yet a new combined-main runtime qualification or full-FBX completion.
+
 Palette continues unadmitted normal21 export using actual PBR preview and an
 export-local independent coordinate stream; original-beforeUV typed colour/
 alpha sharp-boundary failures remain real pending Contracts' Scene24 independent
@@ -220,12 +245,17 @@ Docs owns full Scene25 exact pose-local matrices, first rig_source capsules and
 actual linked/source rig-rest transport. Native subset/codec/export proofs and
 existing-rig worker work are progressing; imported source-node/VRM guards remain.
 Current private agent checkpoints: Contracts' actual paint-domain authority has
-Release5/5+whole-ownedSAN5/5; material9 shared-pool codec a52f62c has Release4/4
-and ownSAN82990 live. Scene24 root/consumer/native admission remains unfinished.
+Release5/5+whole-ownedSAN5/5; material9 shared-pool codec sourcea52f62c/final977952b
+has Release4/4(4.12s)+whole-ownSAN4/4(58.78s),44 paired assertions. New Scene24
+root/shared/before-state-only capsule/CBOR Save/reopen/Restore has55checks and
+R4/4; surface/paint12/query/export consumers still refuse, native/UI/render
+admission remains unfinished.
 Docs' private Scene25 bbb1792 is qualified for its exact native rest-fitting
-subset; new original-node graph code has1672 checks across the actual19-part
-CC0 avatar plus3rigid accessories, with real multiple skins/reordered slots/
-poses, but source-REST/native wiring and typedVRM guards remain. Palette's private
+subset; initial original-node graph1672 proof predates a small DFS refinement
+and must be rerun on final modules. Current plan184 checks cover per-skin closure,
+cross-skin parents, own poses/IBMs, rigid compensation and Scene25 restart;
+actual Scene/Document source-rest adapters are drafted/unqualified, dispatcher
+and typedVRM guards remain. Palette's private
 Scene26 sourceUV2+ foundation has software55role/pick/normal/traffic checks and
 actual native54import/explicit-atlas/Save/history/paint/cancel/GLB checks; generated
 TUV2 provenance, full fresh ABI/SAN/hardware proof and full admission remain.
