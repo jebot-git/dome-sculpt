@@ -512,6 +512,14 @@ void SpatialInput::update(const SpatialSample &s) {
     d.joystick = s.joystick_press;
     if (!s.trigger && !s.joystick_press) {
       d.armed = true;
+      // Released input may immediately update a retained radial highlight.
+      // It still cannot activate a command or a guarded parameter gesture.
+      if(menu_&&parameter_==VrParameter::None&&device_==s.id&&
+         s.stick_x*s.stick_x+s.stick_y*s.stick_y>.25f){
+        constexpr float pi=3.14159265358979323846f;
+        float angle=std::atan2(s.stick_y,s.stick_x);
+        selected_=int(std::floor((angle+pi/12+2*pi)/(pi/6)))%12;
+      }
       // A command can open a guarded parameter panel. The same observed
       // all-released sample rearms its owner and its panel; otherwise the
       // next real pressure press is silently consumed a second time.
