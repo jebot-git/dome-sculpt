@@ -83,9 +83,9 @@
     "do_not_restart_on_observation_timeout": true
   },
   "remaining_for_qualification": [
-    "Full395 terminal result",
-    "Composed compact/nativeSAN/Wayland/loader/interface/format scopes",
-    "No new physical or all-backend production claim"
+    "Full395 terminal result/diagnosis",
+    "Any additional checks justified by full-run failures",
+    "Final preserved-main-doc merge/source equality and integration receipt before main publication"
   ],
   "no_physical_test": true,
   "no_install": true,
@@ -121,6 +121,93 @@
     "build-sanitize/artifacts-basic-authoring-native-sanitize.xml": "f1c2142c6d973af2e721a6ff1ef17b9df4b22752d77fed960705ee4699845d74",
     "build-sanitize/dome-sculpt": "91200c80e24a9b7f623072425daa50997215ec86bf7296df6bed38fb8529b1ff",
     "build/CMakeCache.txt": "1fae769f05a58b552708dac28e797edd3a38a61a91bcf714f83e6638330882aa",
-    "build/dome-sculpt": "318d5bf98b4a3e89b86b94120e4ef5ec09e9bb6f51a44779c66a1a2694851522"
-  }
+    "build/dome-sculpt": "318d5bf98b4a3e89b86b94120e4ef5ec09e9bb6f51a44779c66a1a2694851522",
+    "artifacts/menu-projection-compact/report.json": "d954660dee36a1561d06d8069a3d425c7700adb013ca2bd810827d95df4d236c",
+    "artifacts/menu-projection-compact/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/pbr-preview-menu-compact/report.json": "94e5e86d4cbfee35dcab2950c523d70d974a03b99a83eea7306864c1dd1d394a",
+    "artifacts/rig-fit-menu-compact/report.json": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d",
+    "artifacts/rig-fit-menu-compact/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/menu-projection-sanitize/report.json": "d954660dee36a1561d06d8069a3d425c7700adb013ca2bd810827d95df4d236c",
+    "artifacts/menu-projection-sanitize/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/rig-fit-menu-sanitize/report.json": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d",
+    "artifacts/rig-fit-menu-sanitize/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/pbr-preview-menu-sanitize-normal-close/report.json": "bf66414a4c3a849b9d0fa3140b47ed4def163650541c88b91f9bdd2d4449ff89",
+    "artifacts/wayland-basic-projection/report.json": "5ddab1ec1ba80525087dbe3867730cf7e6ed9fbb7f31552023575e08f8e2b4d6",
+    "artifacts/wayland-basic-projection/client.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/wayland-basic-rig/report.json": "b95639eb58472ab6af3448c1ef3f8dd567f1cb20b47dd3f8a71847c03c872f82",
+    "artifacts/wayland-basic-rig/client.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/loader-basic-projection/report.json": "2049bbb91d276893d2702aa2685cdf29f34956fffcfb8aeaab95d74f760092b9",
+    "artifacts/loader-basic-pbr/report.json": "6c200ee77db94fbbae11c20d95f19398bf824d4ef24e6da3d37ca50754182082",
+    "artifacts/loader-basic-rig/report.json": "99982a27cf95997faa8c1513abd9eb0579af52328fdecbe7497fcedc184d7730",
+    "artifacts/basic-authoring-current-khronos.json": "40449ca2896390072806cd83e488b4f1a727c38d2c4a9019bb92726e36f9375b",
+    "artifacts/basic-authoring-current-glbs.json": "8972992b3dc1e66628309cc174234d5e6c361f94af8b5fa8b7df5cf269ba5bcb",
+    "artifacts/validate-basic-current.cjs": "4aac71edc405a46ecc54e434d8bde50ee0e1ffa1f927434790150d3642b7b740",
+    "artifacts/pbr-preview-normal-close.py": "08453d7a2dc507143a94b503d36a7367d4ad02ba6bf7204bf8840b3b73e2bc99"
+  },
+  "additional_composed_frontends": {
+    "projection_compact": {
+      "checks": 11,
+      "report": "artifacts/menu-projection-compact/report.json",
+      "sha256": "d954660dee36a1561d06d8069a3d425c7700adb013ca2bd810827d95df4d236c"
+    },
+    "PBR_compact": {
+      "checks": 13,
+      "report": "artifacts/pbr-preview-menu-compact/report.json",
+      "sha256": "94e5e86d4cbfee35dcab2950c523d70d974a03b99a83eea7306864c1dd1d394a"
+    },
+    "rig_compact": {
+      "checks": 8,
+      "report": "artifacts/rig-fit-menu-compact/report.json",
+      "sha256": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d"
+    },
+    "projection_SAN": {
+      "checks": 11,
+      "report": "artifacts/menu-projection-sanitize/report.json",
+      "sha256": "d954660dee36a1561d06d8069a3d425c7700adb013ca2bd810827d95df4d236c"
+    },
+    "rig_SAN": {
+      "checks": 8,
+      "report": "artifacts/rig-fit-menu-sanitize/report.json",
+      "sha256": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d"
+    },
+    "PBR_normal_close_SAN": {
+      "checks": 15,
+      "report": "artifacts/pbr-preview-menu-sanitize-normal-close/report.json",
+      "sha256": "bf66414a4c3a849b9d0fa3140b47ed4def163650541c88b91f9bdd2d4449ff89"
+    },
+    "projection_Wayland": {
+      "checks": 9,
+      "report": "artifacts/wayland-basic-projection/report.json",
+      "sha256": "5ddab1ec1ba80525087dbe3867730cf7e6ed9fbb7f31552023575e08f8e2b4d6"
+    },
+    "rig_Wayland": {
+      "checks": 9,
+      "report": "artifacts/wayland-basic-rig/report.json",
+      "sha256": "b95639eb58472ab6af3448c1ef3f8dd567f1cb20b47dd3f8a71847c03c872f82"
+    },
+    "projection_loader": {
+      "checks": 10,
+      "report": "artifacts/loader-basic-projection/report.json",
+      "sha256": "2049bbb91d276893d2702aa2685cdf29f34956fffcfb8aeaab95d74f760092b9"
+    },
+    "PBR_loader": {
+      "checks": 10,
+      "report": "artifacts/loader-basic-pbr/report.json",
+      "sha256": "6c200ee77db94fbbae11c20d95f19398bf824d4ef24e6da3d37ca50754182082"
+    },
+    "rig_loader": {
+      "checks": 11,
+      "report": "artifacts/loader-basic-rig/report.json",
+      "sha256": "99982a27cf95997faa8c1513abd9eb0579af52328fdecbe7497fcedc184d7730"
+    }
+  },
+  "PBR_normal_close_SAN": "artifact test-only copy adds actual Close Window before restart and on final close, both actual App exit0; no production/test-source changes",
+  "independent_current_KHR": {
+    "files": 34,
+    "errors": 0,
+    "unfiltered_warnings": 354,
+    "maxIssues": 0,
+    "inputs": "20completed Arc PBR/current avatar GLBs +14 completed actual FBX/pose GLBs; not every output of stilllivefull395"
+  },
+  "updated_utc": "2026-11-02T18:40:40.661594+00:00"
 }
