@@ -335,7 +335,10 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       // explicit atlas choice may generate writable coordinates before paint
       // construction; the immutable captured primitive still owns the original
       // UVs and ordered-corner remap. Never use this path for textured inputs.
-      const bool no_texture_roles=m.color_texture<0&&m.metal_rough_texture<0&&
+      const auto *raw_material=p.material?&json.at("materials").at(p.material-1):nullptr;
+      const bool typed_mtoon=raw_material&&raw_material->contains("extensions")&&
+          raw_material->at("extensions").contains("VRMC_materials_mtoon");
+      const bool no_texture_roles=!typed_mtoon&&m.color_texture<0&&m.metal_rough_texture<0&&
           m.normal_texture<0&&m.emissive_texture<0&&m.occlusion_texture<0;
       const bool generated_uv = mesh.uv.empty() ||
           (options.prepare_texture_atlas&&no_texture_roles);

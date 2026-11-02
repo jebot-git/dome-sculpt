@@ -43,5 +43,14 @@ int main(int argc,char **argv)try{
   auto saved=directory/(label+".dsculpt");document.save_async(saved).get();
   check(Scene::load(saved).encode()==accepted&&document.undo()&&document.copy_scene().encode()==before&&document.redo()&&document.copy_scene().encode()==accepted,"Native ordered Save/reopen and one exact Undo/Redo retain generated and original coordinates");
  }
+ {
+  import_fixture::Fixture typed;while(typed.bin.size()%4)typed.bin.push_back(0);
+  auto uv=typed.values({0,0,0,0,0,0,0,0},2,"VEC2");typed.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"]=uv;
+  auto &material=typed.j["materials"][0];material["pbrMetallicRoughness"].erase("baseColorTexture");
+  material["extensions"]["VRMC_materials_mtoon"]={{"specVersion","1.0"},{"shadeMultiplyTexture",{{"index",0},{"texCoord",1}}}};typed.j["extensionsUsed"].push_back("VRMC_materials_mtoon");
+  auto path=directory/"typed-unused-pbr.glb";typed.save(path);Scene source;auto before=source.encode();ImportAuthoringOptions choices;choices.paint_resolution=64;choices.prepare_texture_atlas=true;
+  bool refused=false;try{(void)prepare_authoring_import(source,path,choices);}catch(const std::exception&){refused=true;}
+  check(refused&&source.encode()==before,"Absence of PBR roles never authorizes discarding coordinates sampled by a typed MToon role before its adapter is available");
+ }
  std::cout<<"Unmapped atlas checks "<<checks<<'\n';return 0;
 }catch(const std::exception &error){std::cerr<<"FAIL "<<error.what()<<'\n';return 1;}
