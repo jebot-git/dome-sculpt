@@ -63,7 +63,7 @@ template<class Api>void suite(){
  }
  const size_t count=2*limit+7;auto baseline=values(count);
  for(auto fault:std::array<Fault,11>{{{Stage::AllocateInput,1},{Stage::AllocateOutput,1},{Stage::Upload,1},{Stage::Launch,1},{Stage::Wait,1},{Stage::Readback,1},{Stage::Upload,2},{Stage::Launch,2},{Stage::Wait,2},{Stage::Readback,2},{Stage::Readback,3}}}){
-  auto sample=baseline;Api api(sample,baseline,b,fault);bool refused=false;try{gpu_brush::apply(sample,b,api);}catch(const VendorError&e){refused=e.stage==fault.stage;}
+  auto sample=baseline;Api api(sample,baseline,b,fault);bool refused=false;try{gpu_brush::apply(sample,b,api);}catch(const VendorError&e){refused=e.stage==fault.stage&&e.chunk==((fault.stage==Stage::AllocateInput||fault.stage==Stage::AllocateOutput)?0:fault.chunk);}
   check(refused&&exact(sample,baseline)&&api.protocol,"Failed/partial later-chunk transfer changed original host bytes or lost exact error");check(api.stats.releases==api.stats.allocations,"Failed allocation/dispatch leaks a partially allocated buffer");
   const bool allocated=fault.stage==Stage::AllocateInput||fault.stage==Stage::AllocateOutput;check(api.stats.drains==size_t(!allocated),"Failed in-flight work was not drained before staging/buffers unwind");if(fault.stage==Stage::Readback)check(api.stats.deferred==1,"Partial host readback did not complete into still-live detached staging during drain");
   Api retry(sample,baseline,b);gpu_brush::apply(sample,b,retry);auto expected=baseline;for(auto&s:expected)s.distance+=.125f;check(exact(sample,expected)&&retry.protocol,"Fresh same-input retry did not retain exact output after failed transaction");
