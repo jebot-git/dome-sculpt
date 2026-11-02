@@ -4,7 +4,99 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
-## Current desktop framing checkpoint — 2026-11-02
+## Additional queued phase — controller spatial drawers, 2026-11-02
+
+The user additionally requires controller-mounted spatial drawers: interactive
+trays for tools, functions and selections, with streamlined direct XR interaction
+that avoids repeated multi-level menu navigation. Implement this after the basic
+goal targets are met; foundation work remains first priority. REQUIREMENTS.md
+records the added acceptance row. Existing accepted selection/joystick menus are
+the baseline, not proof that drawers exist. The full goal stays active and no
+new physical test is authorized by this specification alone.
+
+## Qualified rigid source avatar integration — 2026-11-02
+
+Public merge9ccddef is runtime/header/asset/third_party/CMake/test byte-identical to
+qualified4f79dbb. Productd5de43b combines17b0ff7 rigid/source avatars with the
+previous Scene19 authoring application. Harness-onlyb8000cd increases one native
+oracle's timeout240→600; no runtime/layout/archive fields change. Read
+RIGID-AUTHORING-INTEGRATION.md and its receipt before using the exact proof scopes.
+
+Fresh optimized alltargets completed after an external143 interruption and
+verified incremental resume. SelectedRelease67/67 pass438.93s. Owned C/C++core/
+support/render SANnative45/46 initially has only a240.21s timeout; samebinary
+424,070checks directly pass214.11s, then corrected registered1/1 passes255.37s.
+SeparateSANgraphics6/6 andfault6/6 pass1012.74/1364.03s. Preserve all initial logs;
+do not claim one46/46run or a newfull321suite. Arc404, active-unskinned22-part
+nativeFLTKexport7, latestprivateDomeDWayland8 and emitted105KHR0errors/1130warnings,
+official71VRM0×15pinned schemas0errors pass. No fresh physical test or install.
+
+Next combined Scene20 tree remains private/frozen7566a8f. Optimized alltargets6519
+and ownedSAN38-target build49536 are terminal0. FullRelease368job6312 remains
+live; nativeSAN52job99713 initially51passes+one240.25s rigid-oracle timeout; the
+samebinary direct600-budget47552 passes424,070checks254.51s. SANgraphics7/7job90584
+passes1358.67s. Joint test-only2e8699f separately passes70O3Release/ownedSAN/Arc
+checks on exactreadonly756: actual22-part normalUV/key/linked-pose plus independent
+current-field source+target Bake, oneScene20 Save/reopen/aliases,112materialroles/
+samplers and independentVRM/GLB pixels. No actual product repair was needed.
+This partial combined qualification does not yet publishScene20 orScene21/23.
+
+Contracts'65 extendedSAN44 is still finite/live (knownprecommit6/7 budgettimeouts
+will be rerun in exact finer ranges afterterminal); all51598Release boundaries
+remain preserved. New current-corner-uv-2e8699f starts real rawPAUV transfer with
+a fresh changed-ABI core, then prepared colourUV Scene23/material8/entry3 and typed
+orderedApply remain required. Palette's normal-sampling-context-7566a8f composes
+Scene21/material7/normalentry3 pools and paired closures; no renderer/UI/export
+admission claimed. Source21/22/23 remain private,22 reserved for corner-origin keys.
+
+Docs' native3Dmouse isolated57 native tests,25 FLTK and10 Wayland fixtures pass;
+final graceful-exit sanitizer work found an inherited baseline Fontconfig ownership
+leak and is addressing a separately reproduced narrow process lifetime fix.
+After freezing that checkpoint, Docs will implement the missing BASIC native
+image-projection/stencil Document/FLTK/XR workflow atop the existing C++ kernel.
+Controller drawers remain queued after basic targets as the user specified.
+Preserve every running proof/source tree and the accepted physical session.
+
+## Previous qualified authoring adapter checkpoint — 2026-11-02
+
+Product8d68dc7 extends the Scene19 baseline with retained post-UV prepared-key
+authoring, authenticated current-corner source Bake, original-space skinned VRM0
+export, stable desktop framing and atomic direct-caller Bake admission. Test-only
+9e6cb1b repairs the obsolete source-picker exclusion expectation and drives real
+native export chooser controls. No runtime/header/asset/third_party bytes differ
+from the coherent full-run product. Read AUTHORING-ADAPTER-INTEGRATION.md and
+validation/AUTHORING-ADAPTER-INTEGRATION.json for exact source/binary/hash scopes.
+
+Optimized alltargets build passed. Full Release317 finished2086.97s:316passes and
+one old expected exclusion, then corrected registered1/1Release+1/1ownedSAN
+(61native assertions). Preserve initialfailure; do not claim one317/317greenrun.
+Fresh owned C/C++core/support/render SANnative40+graphics5+fault6 all pass (with
+the corrected1 separately). Actual Arc355, native FLTK/Wayland81, current-source
+actual-loader syntheticXR11, emitted87 Khronos0errors/770unfilteredwarnings and
+53official VRM0×15hash-pinned schemas0errors also pass. No new HMD/install claim.
+Latest committed DomeD rechecked unchangedd271cf6; canonical EEE prefixes current.
+
+All858 source packing+4393precommit persistent failures and13,555reached of13,556
+measured post-UV key failures pass owned sanitizers and full-helper retry. One
+cache-dependent key boundary is unreached; no generic input-thread OOM guarantee
+is inferred from directcaller Bake admission. Fractional actual-avatar UV scale
+still has a real quality refusal; only repeated integer-texel avatar UV/key
+workflows are qualified. Every incomplete REQUIREMENTS.md row remains required.
+
+Further isolated work (not this checkpoint): root rigid-authoring-union-9e6cb1b
+atd5de43b combines separately qualified17b0ff7, fresh Release87127/SAN79530 builds
+live. Root color-rigid-union-d5de43b at7566a8f adds component65b0ae9 Scene20/material6/
+polygon5, fresh Release6519/SAN49536 builds live. Both are unqualified/unpublished.
+Contracts' isolated joint-authoring-7566a8f tests oneScene20 normalUV/keys/rigid/color
+coexistence; dual current-source+target test-only8496dec has185software/SAN/Arc
+checks. Parent65 extendedSAN44 job28449 is stilllive (Release44=51,598 actual
+failures and functionalRelease11/SAN11/Arc357 complete). Docs owns native3Dmouse
+worktree desktop-spacenav-8d68dc7. Palette Scene21/material7/normalentry3 remains
+ABI-open and unadmitted; Scene22 is reserved for independent corner-origin keys.
+Preserve frozen component/proof trees, source commits and every running handle.
+No physical launch, system installation or active desktop restart occurred.
+
+## Previous desktop framing checkpoint — 2026-11-02
 
 Product3c491bf adds native Frame all(Home), Frame selection(Shift+F), stable orbit
 pivot and successful-import/source-model auto-fit, retaining F reset. Bounds
@@ -16,15 +108,23 @@ validation/DESKTOP-FRAMING.json; no new whole-suite/whole-core-SAN or physical
 headset claim is inferred. Earlier VRM11/atlas12 import proofs and the complete
 avatar screenshot are separately scoped.
 
-Root private artifacts/authoring-adapters-04d at7e36278 merges qualified
-b0cdeb5 post-UV keys, b186b9e current-color source Bake, a799211 source-space
-VRM0 export and this framing code. It is unqualified; its fresh build is HELD
-until the isolated BakeAdmission fix is ready. The existing Bake path has a
-second fallible publication after job acceptance; merge_contracts is staging its
-POD controls in the existing Transaction on a separate04d child. No rootqueue
-edit overlaps that fix. Do not publish the new Bake union before qualification.
+The combined8d authoring source described above has now qualified; its optimized
+build54024 and owned sanitizer build37641 are terminal0. Its initial Release317
+and corrected registered1/1 scopes remain separate. The frozen binary, source,
+receipts and initial negative logs are preserved. Public merge0833f73 has exactly
+the same runtime/header/asset/third_party/CMake/test bytes as qualified6826892;
+this merge introduces no new runtime behavior. Current private work is listed
+in the qualified checkpoint above; Scene20/21/22 are excluded from this release.
 
-Agents continue: Contracts target20/material6/polygon5; Palette retained intrinsic
+BakeAdmission80e21a6 removes a second fallible publication after queue acceptance.
+Its old04d negative fails at caller allocation91/110 with an accepted queued job;
+the fixed direct caller passes all90 actual denials and same-controller retries,
+Release3/SAN3. It stages only POD Bake controls inside the existing Transaction,
+with no new Document/FileJob fields or generic callback. Generic input-thread
+publication echo faults remain separately scoped. Preserve the frozen04d
+archive/header tree and all old/fixed proof logs.
+
+At that framing checkpoint agents continued: Contracts target20/material6/polygon5; Palette retained intrinsic
 normal-domain Scene21/material7/normalentry3 (actual integer-UV avatar key proof
 dd2314 is test-only; arbitrary .95 scale remains a real quality refusal); Docs
 mixed rigid/source-pose VRM export in a separate a799 child. Scene22 is reserved
@@ -55,7 +155,7 @@ The published merge changes no product source/header/asset/runtime bytes from
 full-run source9081677. Record298/298 plus new1/1, not one single299-suite run.
 No physical headset launch, system install or active-session restart occurred.
 
-Immediate follow-ups:
+Historical follow-ups at that checkpoint:
 - Root: desktop framing is qualified above; next qualify the authoring-adapter
   union after transactional Bake admission is repaired.
 - merge_contracts: frozen source Bake b186b9e has actual native49, Release and

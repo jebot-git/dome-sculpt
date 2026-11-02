@@ -1,13 +1,15 @@
 # Controller selection and XR scene hierarchy
 
 This is a focused extension of the user-passed `993e8af` candidate. The broader
-production goal remains paused. The previous candidate and its saved physical
-headset session are preserved.
+production goal was paused during its physical qualification and has since
+resumed; HANDOFF.md records the current status. The previous candidate and its
+saved physical headset session are preserved.
 
 The user assessed this interface as **acceptable** after the physical headset
 test on 2026-10-31. The test ended gracefully and the edited session was saved
 and reloaded successfully. See `validation/XR-SELECTION-HEADSET.json` for the
-exact source, runtime and session record. The production goal remains paused.
+exact source, runtime and session record. Interface acceptance does not complete
+the full production objective.
 
 Open the controller menu and choose **Selection** on its first page. The same
 page has a directly clickable **Selection ON/OFF** button and **Hierarchy**
