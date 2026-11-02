@@ -73,3 +73,21 @@ proof at `9b823f5`; this checkpoint does not relabel selected faults as exhausti
 Evidence is under this private tree's `artifacts/tests-held-cut-*`,
 `tests-menu-held-cut-first.log`, and `tests-menu-key-cut-first.log`. No physical
 headset, system installation, restart, push or whole-goal completion is claimed.
+
+## Qualified public-baseline union
+
+Product `55af68a` merges the frozen held checkpoint with qualified public
+`824f6cd`. Both core, C/C++ support, renderer and affected native/UI/XR consumers
+were freshly compiled with coherent headers and archives. The only conflict was
+the independent GLB consumer: witnessed default-material fallback, strict VRM
+identity and node handedness are retained alongside explicit opt-in derivative
+tangents for legal GLBs without TANGENT. No product file required conflict
+replacement.
+
+Release 30 native/fault/transaction suites and three default/sampler/render
+suites pass; 31 own-core/support/renderer sanitizer suites and 32 selected held
+publication fault boundaries pass. Actual FLTK held16/key15/compact7 and actual
+OpenXR-loader21 checks pass. The explicit Arc A770 rerun passes all 257 cut
+render/export checks and 145 inherited painted-sampler consumer checks. See
+`validation/HELD-CUT-824F6CD-UNION.json` for exact scope and evidence hashes.
+This remains scoped qualification, not an all-native/OneAPI/full-goal claim.
