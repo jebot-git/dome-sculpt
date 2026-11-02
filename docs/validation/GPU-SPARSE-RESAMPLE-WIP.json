@@ -1,0 +1,67 @@
+{
+  "source_commit": "5ed40574eff3ae388eedf6854bca479954f0a7b4",
+  "scope": "standalone sparse interpolation prototype, not production worker",
+  "device": "Intel Arc A770; fp64=false; level_zero:0",
+  "results": {
+    "release": {
+      "passed": 1,
+      "total": 1,
+      "exact_host_words": 4380
+    },
+    "sanitize": {
+      "passed": 1,
+      "total": 1,
+      "scope": "entire header-only component/test, not production core"
+    },
+    "oneapi": {
+      "passed": 2,
+      "total": 2,
+      "exact_words_per_iteration": 889116,
+      "iterations": 4
+    }
+  },
+  "dense_timing_ms": {
+    "native_map_cpu": 92.8687,
+    "native_packed_hash_cpu": 77.2239,
+    "pack": 5.96899,
+    "validate": 1.10843,
+    "queue_allocation_warm": 0.378137,
+    "gpu_upload_kernel_readback": [
+      7.8026,
+      8.48868,
+      6.9438,
+      7.35199
+    ],
+    "pack_validate_inclusive": [
+      14.88,
+      15.5661,
+      14.0212,
+      14.4294
+    ]
+  },
+  "manifest_scope": "sealing-time preserved artifacts only; no before-after comparison captured",
+  "sha256": {
+    "CMakeLists.txt": "24fcf00830118ae443456c79c372e71bd55ee2c132dbfa43210389b3b4a209a8",
+    "src/sparse-resample-grid.hpp": "81d5a05581c9258ae35e95c68ce23fb3f3092a4a900cdc7a3dbaf41fb501612d",
+    "src/sparse-resample-kernel.hpp": "f216a96b82d81878be3bc1378f0da2ac7d31cf84d71f071a81e9a2b8d1959245",
+    "tests/sparse-resample.cpp": "db26cbc37ed276389ca768ed1ab20eac0fa675816a6a1c8459d1b2b6436a938d",
+    "third_party/softfloat/dome_f64.hpp": "13bd007ccad3bddae634fbba8cd4fbef08596498bf6b830caca01acf3b5b1fef",
+    "artifacts/tests-sparse-fair-release.log": "6dc65d7aeabd3b0761cf633df61c2c17f1d9f35ebabafe8db6dcb6a4e9a94b3e",
+    "artifacts/tests-sparse-fair-sanitize.log": "b71ad3d2868ba8e07692a828c019efa0a23a6fa0c7a4bfc9650e9fb4e31f508a",
+    "artifacts/tests-sparse-fair-oneapi.log": "b3120e419422841d474d77f1a3c1c50983e88282f47cc4ebab75d23bddfd8ea9",
+    "build/artifacts-sparse-fair-release.xml": "a58a5e1db736dd87ba7bd1cd0392ff136b5c7c92d81fd17b1b3d3b4c01fcd98e",
+    "build-sanitize/artifacts-sparse-fair-sanitize.xml": "f5db396ba81fb71684fb2d1ca035bdc3d9317ce15cdceff82064077211298c4a",
+    "build-oneapi/artifacts-sparse-fair-oneapi.xml": "8fc8e9c7413729b2e2973f93b7ab64779916982cfd8921dfc6d7f2b7042a398b",
+    "build/dome-sculpt-sparse-resample-test": "6842c198ec286168782801a20910e3d5fd546394bd7100d413b798159c766610",
+    "build-sanitize/dome-sculpt-sparse-resample-test": "967c0d79247948e4bbc62e03bdadbf9f75a9c57b1e64d954a343a069b1ac28be",
+    "build-oneapi/dome-sculpt-sparse-resample-test": "3e954fa4182146cf16c1cc0cad0b185c704e7a6b38d2ad3155cd53307a79be5f",
+    "build-sanitize/build.ninja": "10a279b4e6ad8082f309aebb53c16943fe3995425d1d4c40b874069e146040fe"
+  },
+  "remaining": [
+    "actual Volume/layer/mask worker integration",
+    "quality, cancellation, history, Save, missing-device proof",
+    "whole-job timing",
+    "CUDA/HIP device compilation",
+    "positive AMD/NVIDIA hardware"
+  ]
+}
