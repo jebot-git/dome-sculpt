@@ -18,7 +18,14 @@ void check(bool b, const char *s) {
 
 int main(int argc, char **argv) try {
   if (argc == 3 && std::string(argv[1]) == "--ui-fixture") {
-    skinned(true).save(argv[2]);
+    auto source=skinned(true);
+    if(std::getenv("DOME_IMPORT_AFFINE_SOURCE")){
+      source.j["nodes"][0]["scale"]={-1.7f,.8f,1.1f};
+      source.j["nodes"][1]["rotation"]={0,0,std::sin(.31f),std::cos(.31f)};
+      source.j["nodes"][3]["scale"]={1.2f,.9f,1.1f};
+      source.j["nodes"][4]["scale"]={.7f,1.3f,.8f};
+    }
+    source.save(argv[2]);
     return 0;
   }
   if (argc == 3 && std::string(argv[1]) == "--empty-project") {

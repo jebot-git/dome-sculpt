@@ -1,0 +1,29 @@
+{
+  "base": "8d46dfb",
+  "reference_milestone": "07bc9ba",
+  "status": "private native/controller/FLTK workflow qualification; sanitizer pending",
+  "native_controller_assertions": 26,
+  "gui": {
+    "static_affine": 11,
+    "authored_skin_affine": 11,
+    "scope": "real FLTK universal-menu/options on private Xvfb/bus; canonicaleee lib and bitmap-runtimeeee lib"
+  },
+  "source_limits": [
+    "Scene13 graph/pose/IBM implemented subset",
+    "Scene17 implicit-default and Scene18 UV1 remain guarded",
+    "no physical HMD/install/push"
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "4eb2588df11a5e9d19fa4263953c8835e559d3791209432f4bf4d12c2f8e617b",
+    "tests/import-source-chain-document.cpp": "04b405e6b758e536302a27f997db62aa8cd6e1c937816034af1a27262901e480",
+    "tests/import-menu.py": "29956468f27ac204e892cb53438e0e96bd1475eaf0f1a7d308a7c97bf6dee03a",
+    "tests/import-skin.cpp": "7eb280251d0bd18b2120d4539952577c2347a4861525092223ef87b2e751c439"
+  },
+  "logs": {
+    "artifacts/build-native-admission2.log": "91cd5d183a4acfbd8ea16978d524875aa18ad9a9071fb4a829e5f6b20e7ea487",
+    "artifacts/test-native-admission2.log": "77423a22d829981fd374793142b7910013c85ba653bd98d7cfd695846721d6c6",
+    "artifacts/build-affine-frontend.log": "181646be39610a3b81fdd6358303f8a6f0aebfa8bf5228251b1a933b57207325",
+    "artifacts/test-affine-menu.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247",
+    "artifacts/test-affine-skin-menu.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247"
+  }
+}
