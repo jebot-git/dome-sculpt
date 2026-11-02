@@ -101,6 +101,15 @@ full backend/production rows remain incomplete. Read GPU-RESOLUTION-INTEGRATION.
 for the scoped gates, preserved manifest-script error and remaining work. No
 Scene21+ format, new physical acceptance or system installation is implied.
 
+
+The subsequent CUDA/HIP transfer checkpoint caps device brush chunks at2M,
+reads back only4-byte distances and stages every result before caller mutation.
+Shared brush arithmetic/public layouts are unchanged. The exact host helper's
+130 Release+130 sanitizer shim checks and real missing-device/native-build
+scopes are separate from unavailable positive NVIDIA/AMD numerical/device-loss
+proof. Read GPU-BRUSH-INTEGRATION.md. This does not complete backend or full
+production rows.
+
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in
 validation/JSON-ALLOCATION-INTEGRATION.json. That older receipt alone does not qualify later combined features or complete
