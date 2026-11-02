@@ -5,6 +5,7 @@
 #include "normal-frames.hpp"
 #include <optional>
 namespace dome {
+namespace detail { class PolygonColorArchive; }
 class PaintedMesh;
 class CreatorAssetArchive;
 struct CreatorAppearance;
@@ -64,8 +65,10 @@ public:
   const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings() const { return bindings_; }
   const std::vector<std::shared_ptr<const SourceUvOrigin>> &origins() const { return origins_; }
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &) const;
+  nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,detail::PolygonColorArchive *) const;
   static size_t deformation_entries(const nlohmann::json &);
   static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &);
+  static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &,const detail::PolygonColorArchive *);
 private:
   std::vector<std::shared_ptr<const SourceMaterialBindings>> bindings_;
   std::vector<std::shared_ptr<const SourceUvOrigin>> origins_;

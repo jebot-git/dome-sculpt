@@ -1104,6 +1104,7 @@ PaintColorPreparationResult SourceColorPreparationAccess::prepare(
   ColorPreparationReceipt receipt;receipt.resolution=r;receipt.projected_texels=projected.projected_texels;
   receipt.accepted_projection_error=options.max_projection_error;
   receipt.source_field=source_field;
+  receipt.version=source_field==SourceColorField::PolygonCorners?2:1;
   receipt.quality_material={material.color,material.emissive,int(material.alpha),material.alpha_cutoff,material.double_sided};
   receipt.projection_error_bound=projection->maximum_error;receipt.tested_quality_cells=projection->quality_cells;
   auto result=source.snapshot();result->color_projection_=projection;result->allocated_color_tiles_=0;
