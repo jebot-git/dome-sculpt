@@ -500,6 +500,7 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR)
         add_test(NAME procedural-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/procedural-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/procedural-xr)
         add_test(NAME resolution-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/resolution-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/resolution-xr)
         add_test(NAME openxr-client COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/xr_runtime.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/xr-client)
+        add_test(NAME import-atlas-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/import-atlas-xr.py $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-import-texture-atlas-test> ${CMAKE_CURRENT_BINARY_DIR}/import-atlas-xr)
       endif()
     endif()
   endif()
@@ -527,7 +528,7 @@ endif()
 # A login session can inherit older same-SONAME FLTK libraries. Exercise the
 # toolkit selected at configure time, not the login session's installation.
 if(BUILD_TESTING AND TARGET dome-sculpt AND DOME_BUILD_XR)
-  set_tests_properties(openxr-client resolution-openxr procedural-openxr bake-policy-openxr polygon-openxr polygon-color-openxr PROPERTIES ENVIRONMENT_MODIFICATION
+  set_tests_properties(import-atlas-openxr openxr-client resolution-openxr procedural-openxr bake-policy-openxr polygon-openxr polygon-color-openxr PROPERTIES ENVIRONMENT_MODIFICATION
     "LD_LIBRARY_PATH=path_list_prepend:$<TARGET_FILE_DIR:fltk::fltk-shared>")
 endif()
 if(TARGET dome-sculpt)
