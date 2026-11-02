@@ -209,6 +209,9 @@ struct MeshSnapshot {
   std::vector<std::array<float,4>> source_tangents;
   uint64_t normal_frame_layout_builds=0; // Worker diagnostic, never native state.
   std::vector<std::array<float,4>> source_colors; // Linear RGBA, identity when absent.
+  // Scene21 static source sampling: xy PBR, zw MToon. Empty for ordinary
+  // geometry; packed through the exact retained-frame corner expansion.
+  std::vector<std::array<float,4>> normal_coordinates;
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0, edit_authority = 0;
@@ -559,6 +562,8 @@ private:
   std::atomic<uint64_t> uv_request_{0};
   std::optional<UvValidationJob> prepare_uv_schedule_locked();
   void invalidate_uv_locked();
+  bool uv_retention_requested_locked() const;
+  bool uv_retention_changes_locked() const;
   void uv_loop();
   void queue_uv_operation_locked(UvAction);
   void apply_uv_action_locked(UvAction, float = 0, float = 0);
@@ -693,6 +698,7 @@ private:
     std::shared_ptr<ExportWork> export_work;
     std::shared_ptr<AssetWork> asset_capture;
     std::shared_ptr<CutHandoff> cut_handoff;
+    bool uv_keep_normals=false;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.

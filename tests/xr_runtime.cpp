@@ -16,6 +16,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <string_view>
 #include <nlohmann/json.hpp>
 #include <openxr/openxr.h>
 #include <openxr/openxr_loader_negotiation.h>
@@ -809,6 +810,8 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
       stroke = frame == 19;
     if (getenv("DOME_XR_FIXTURE_UV"))
       stroke = frame == 14 || frame == 20;
+    if (const auto mode=getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN"))
+      stroke = frame==15 || frame==18 || (std::string_view(mode)!="focus" && frame==26);
     if (getenv("DOME_XR_FIXTURE_LAYERS"))
       stroke = frame >= 18 && frame <= 20;
     if (getenv("DOME_XR_FIXTURE_RESTART"))
@@ -920,6 +923,8 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
       out->currentState = {-.8660254f, -.5f};
     if (frame >= 15 && frame <= 18)
       out->currentState = {-1, 0};
+    if(getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN"))
+      out->currentState=frame>=20&&frame<=23?XrVector2f{-1,0}:frame>=15?XrVector2f{0,0}:out->currentState;
   }
   if (getenv("DOME_XR_FIXTURE_LAYERS") && right(p->subactionPath) &&
       a->name == "right_stick") {
@@ -1067,7 +1072,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     else p->pose.position={frame>=25?.16f:-.16f,1.48f,-.83f};
     return XR_SUCCESS;
   }
-  if (frame == 22 && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
+  if (frame == 22 && !getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN") && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && s->action && voxel_mode() != "focus" && bake_mode().empty() && skin_mode().empty() && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty()) {
     p->locationFlags = 0;
     count("tracking_losses");
   }
@@ -1099,6 +1104,12 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     float x = frame == 14 ? 178 : 470, y = frame == 14 ? 85 : 609;
     p->pose.position = {.045f + (x / 640 - .5f) * .6f,
                         1.56f + (.5f - y / 640) * .6f, -.3f};
+  }
+  if (const auto mode=getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN");mode && s->action &&
+      s->action->name=="aim_pose" && right(s->hand) && (frame==15||frame==18||frame==26)) {
+    const float x=frame==15?55:frame==18?178:std::string_view(mode)=="cancel"?170:470;
+    const float y=frame==15?270:frame==18?85:609;
+    p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
   }
   if (auto mode = voxel_mode(); !mode.empty() && s->action &&
       s->action->name == "aim_pose" && right(s->hand) &&

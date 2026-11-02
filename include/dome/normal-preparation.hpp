@@ -2,6 +2,7 @@
 #pragma once
 #include "color-preparation.hpp"
 namespace dome {
+class NormalSamplingArchive;
 // A named consumer contract, separate from attribute transport. This does not
 // assert that every glTF/Unity renderer uses identical normalization order.
 enum class PreparedPbrNormalEvaluation { SampleRenderer2026 = 1 };
@@ -21,6 +22,7 @@ struct NormalPreparationReceipt {
   static NormalPreparationReceipt decode(const nlohmann::json &);
 };
 struct SourceNormalUvReprojection;
+struct SourceNormalSampling;
 struct SourceNormalPreparation {
   NormalPreparationReceipt receipt;
   std::shared_ptr<const PaintNormalProjection> projection,initial_projection;
@@ -32,6 +34,10 @@ struct SourceNormalPreparation {
   // Scene19/normal recipe2 only: current atlas planes are authenticated by an
   // owning before-state and an exact ordered-corner sampling layout.
   std::shared_ptr<const SourceNormalUvReprojection> uv_reprojection;
+  // Scene21/recipe3. Exact source sampling correspondence is independent of
+  // the writable atlas. This is mutually exclusive with the latest raster UV
+  // operation; older recipes remain in the immutable before-graph.
+  std::shared_ptr<const SourceNormalSampling> sampling_domain;
   void validate(bool deep=true) const;
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> &cancelled={}) const;
@@ -66,6 +72,32 @@ struct SourceNormalUvReprojection {
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
   void validate_current(const Mesh &,const CreatorAppearance *,const std::function<bool()> &cancelled={}) const;
 };
+struct NormalSamplingReceipt {
+  uint32_t version = 1, resolution = 0;
+  uint64_t vertices = 0, indices = 0, correspondence_bytes = 0;
+  uint64_t max_working_bytes = 256 * 1024 * 1024;
+  void validate() const;
+  nlohmann::json encode() const;
+  static NormalSamplingReceipt decode(const nlohmann::json &);
+};
+struct SourceNormalSampling {
+  NormalSamplingReceipt receipt;
+  std::shared_ptr<const SourceNormalUvLayout> layout;
+  std::shared_ptr<const PaintNormalProjection> projection;
+  std::shared_ptr<const PaintedMesh> before_paint;
+  std::shared_ptr<const CreatorAppearance> before_appearance;
+  std::shared_ptr<const DeformationState> before_deformation;
+  std::shared_ptr<const SourceMaterialBindings> before_material;
+  // Captured versioned sampler source; repeated atlas operations retain this
+  // exact ancestor rather than resetting its normal sampling semantics.
+  std::shared_ptr<const SourceMaterialBindings> sampling_material;
+  std::optional<MToonMaterial> current_sampling_reference;
+  void validate(bool deep = true,const std::function<bool()> &cancelled = {}) const;
+  void validate_current(const Mesh &,const CreatorAppearance *,
+                        const std::function<bool()> &cancelled = {}) const;
+  void validate_paint(const PaintedMesh &,const SourceMaterialBindings &,bool deep = true,
+                      const std::function<bool()> &cancelled = {}) const;
+};
 struct NormalPreparationOptions {
   double max_angular_error=.02;
   uint64_t max_samples=64'000'000;
@@ -81,4 +113,6 @@ NormalPreparationResult prepare_source_normals(const ColorPreparationInput &,
                                                const NormalPreparationOptions & = {});
 nlohmann::json encode_normal_projection(const PaintNormalProjection &,PaintImageArchive &);
 std::shared_ptr<const PaintNormalProjection> decode_normal_projection(const nlohmann::json &,const PaintImageArchive &);
+nlohmann::json encode_normal_projection(const PaintNormalProjection &,PaintImageArchive &,NormalSamplingArchive *);
+std::shared_ptr<const PaintNormalProjection> decode_normal_projection(const nlohmann::json &,const PaintImageArchive &,const NormalSamplingArchive *);
 } // namespace dome

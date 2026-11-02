@@ -1,0 +1,45 @@
+{
+  "scope": "private native-domain rendering; authoring admission/export compiler unqualified",
+  "parent": "660691f5b8e19a0cb91df69000158551e195265b",
+  "generic_assertions": 97,
+  "actual_avatar_assertions": 69,
+  "images": 36,
+  "actual_avatar_max_error": 0,
+  "pixel_bound": 4,
+  "negative_bump_off": [
+    7,
+    20
+  ],
+  "negative_wrong_atlas_uv": [
+    25,
+    19
+  ],
+  "gpu_audit": {
+    "source_mismatches": [],
+    "sources": 632,
+    "binaries": 4,
+    "logs": {
+      "generic": {
+        "sha256": "e325d69c1b37a4aa555d04a9a7c8ed36319123437e092699cbea00a9621d1b3b",
+        "device": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "result": "PASS 97 retained normal graphical checks"
+      },
+      "avatar": {
+        "sha256": "73af4fcdfb5be6ebc29bc25fd6b516cd8f029767acace78bfed20cda795b0568",
+        "device": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "result": "PASS 69 actual retained-domain avatar checks"
+      }
+    }
+  },
+  "new_format_export": false,
+  "ui_admission": false,
+  "runtime_sanitizer": false,
+  "required_followups": [
+    "paired persistent allocation denials",
+    "runtime whole owned sanitizers",
+    "explicit Keep normal detail native/controller policy",
+    "Clear/RGBA/rebake transitions and exact history",
+    "format-specific standard normal sampling compilation",
+    "Scene22 independent corner/key authoring"
+  ]
+}

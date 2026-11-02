@@ -23,6 +23,7 @@ public:
                         SourceMaterialArchive &, SourcePlacementArchive * = nullptr) const;
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
                         SourceMaterialArchive &, SourcePlacementArchive *,PolygonColorArchive *) const;
+  nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &, SourceMaterialArchive &, SourcePlacementArchive *, PolygonColorArchive *, NormalSamplingArchive *) const;
   static void preflight(const nlohmann::json &, const nlohmann::json &objects);
   static void preflight(const nlohmann::json &, const nlohmann::json &objects,const nlohmann::json *materials);
   static PolygonSceneArchive decode(const nlohmann::json &,
@@ -35,6 +36,7 @@ public:
                                     const CreatorAssetArchive &,
                                     const SourceMaterialArchive &,
                                     const SourcePlacementArchive *,const PolygonColorArchive *);
+  static PolygonSceneArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &, const SourceMaterialArchive &, const SourcePlacementArchive *, const PolygonColorArchive *, const NormalSamplingArchive *);
 
 private:
   size_t entries_ = 0;
