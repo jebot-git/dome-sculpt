@@ -11,6 +11,7 @@ int main(int argc, char **argv) try {
   std::filesystem::create_directories(directory);
   NativeGraphics context;
   std::cout << "GPU " << glGetString(GL_RENDERER) << std::endl;
+  std::cout << "GL_VENDOR " << glGetString(GL_VENDOR) << std::endl;
   Fbo fbo;
   fbo.bind();
   SurfaceRenderer native;
