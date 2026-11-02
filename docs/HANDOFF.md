@@ -14,6 +14,40 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Current private continuation checkpoints — 2026-11-02
+
+Public main85bec2e was rechecked clean and equal to remote before continuing.
+Sparse interpolation source5ed4057 /metadata520e3db is now frozen/pushed, with
+Release1/1, whole-header/test SAN1/1 and actualA770 OneAPI2/2:4,380host exact
+words and889,116GPU results×4transactions. Dense packedCPU77.22ms versus
+GPU14.02–15.57ms including packing/validation is a component measurement, not
+whole-resolution speed. Tiny cases are slower; initial queue/JIT costs remain
+visible. Read GPU-SPARSE-RESAMPLE-WIP.md/.json. No before/after manifest was
+captured for that run; sealing-time hashes are scoped honestly.
+
+Separate actual-worker childc0fa331 adds selected-backend field sessions,
+bounded query batches, one source upload per field, native CPU preservation and
+an independent-reference/dispatch/failure-publication fixture. Fresh CPU,
+OneAPI and ownedSAN builds are in progress; no actual-worker test pass is
+claimed. Initial CUDA backend compile fails on host constexpr reciprocal-array
+access. Separate child2d17cb1 emits equivalent device-callable constant accessors;
+CUDA sm86 and HIP gfx1030 backend-TU compile and standalone hostR2/SAN2 pass.
+Device and actual-worker qualification remain pending, with frozen trees kept
+separate. No positive NVIDIA/AMD hardware claim or main runtime admission.
+
+Agents report paint24 preview600fe76 fully qualified software/Arc/SAN;
+export44380ef R/Arc passes, SAN3/4 plus a1200s graphics timeout remains distinct.
+Native KeepPaint09989a5 passes63native/controller,10normal+10compactFLTK and
+20loader checks; new independent normal seal targets a measured86ms deep replay
+and is unqualified. Source-rest2f06246 is frozen/pushed with native/GUI/SAN and
+independent geometry/export proof; typed VRM/rest/reparent child remains guarded.
+ExtraUV26 contiguous412a565 is frozen/pushed with R8/SAN8/Arc385 and valid
+gap-free GLBs; default readonly raw-import admission child is still being tested.
+These private components require semantic union, fresh coherent builds and
+complete workflow qualification before main integration. Full requirements and
+post-basic controller drawers remain required. No installation, new physical
+launch or active desktop/session restart occurred.
+
 ## Private GPU sculpt-resolution precision prototype — 2026-11-02
 
 Root source63fb384 /metadata392c8dc in artifacts/sculpt-resample-gpu-f973732
