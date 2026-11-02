@@ -28,6 +28,7 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   auto &o=scene_.active();
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
+  if(!state_.shape_sculpt && reject_texture_paint_locked())return false;
   if(scene_.has_affine_placement(o.id)&&state_.object_grabbing&&(space!=NativeStrokeSpace::EvaluatedWorldBrush||!held_affine_||held_affine_->base_edit!=o.affine_edit))return false;
   if(scene_.has_affine_placement(o.id)&&!o.mesh_active){state_.message="Affine sculpt strokes require the full field metric path";publish_locked();return false;}
   auto preview=mesh_.load();

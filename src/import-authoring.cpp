@@ -120,13 +120,11 @@ Material native_material(const ImportedMaterial &m) {
 std::shared_ptr<const PaintSourceMaps>
 maps(const ImportedAsset &asset, const ImportedMaterial &m,
      const std::vector<std::shared_ptr<const Image>> &images,
-     const ImportedPrimitive &primitive, std::span<const uint32_t> vertices, bool prepare) {
+     const ImportedPrimitive &primitive, std::span<const uint32_t> vertices) {
   auto result = std::make_shared<PaintSourceMaps>();
   auto view = [&](PaintSourceTexture &out, int index, int coordinate) {
     if (index < 0)
       return;
-    if (coordinate != 0 && !prepare)
-      throw std::invalid_argument("Native authoring import maps currently require TEXCOORD_0; enable Prepare editable texture atlas for other coordinate sets");
     const auto &t = asset.textures.at(size_t(index));
     out.image = images.at(size_t(t.image));
     out.wrap_s = t.wrap_s;
@@ -423,7 +421,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       PaintSurfaceOptions paint_options;
       paint_options.policy = PaintUvPolicy::SourceAuthored;
       paint_options.cancelled = options.limits.cancelled;
-      auto source_maps = maps(*asset, m, *images, p, remap, options.prepare_texture_atlas);
+      auto source_maps = maps(*asset, m, *images, p, remap);
       // The legacy codec authorizes SourceAuthored only with raw source maps.
       // Plain original UV authority is a Scene11 feature; do not emit a record
       // the current reader would refuse, or silently alter overlapping raw UVs.
@@ -561,6 +559,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     }
   }
   output.scene.validate();
+  if(!options.prepare_texture_atlas && std::any_of(output.objects.begin(),output.objects.end(),[&](uint64_t id){const auto &o=output.scene.object(id);return o.painted && o.painted->source_maps() && o.painted->source_maps()->uses_alternate_uv();}))
+    output.diagnostics.insert(output.diagnostics.begin(),"Original source coordinates retained; prepare an editable texture atlas before painting");
   if (vrm.version != detail::VrmImportVersion::None)
     output.diagnostics.push_back(
         "VRM source version, humanoid/node/material/morph identities, "

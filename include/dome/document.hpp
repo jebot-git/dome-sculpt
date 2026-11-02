@@ -415,6 +415,7 @@ private:
   void move_held_object_locked(CanvasTransform);
   void update_object_grab_locked(const SpatialFrame &);
   void require_object_editable_locked(uint64_t) const;
+  bool reject_texture_paint_locked();
   void require_authority_locked(AssetSource) const;
   EditorState state_;
   bool desktop_ = false, anchored_ = false;

@@ -18,6 +18,7 @@
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
+#include "paint-source-admission.hpp"
 #include "current-colors.hpp"
 #include "prepared-color-state.hpp"
 #include "sculpt-ui-values.hpp"
@@ -178,6 +179,14 @@ bool Document::pending_locked() const {
   return o.mesh_active ? o.painted->pending_changes()
                        : volume().pending_changes();
 }
+bool Document::reject_texture_paint_locked() {
+  const auto &o=scene_.active();
+  if(!o.mesh_active || !o.painted || !detail::paint_requires_editable_atlas(*o.painted))return false;
+  Transaction transaction(*this);
+  state_.message=detail::editable_texture_atlas_notice;
+  state_.error.clear();publish_locked(false,false);transaction.commit(false);
+  return true;
+}
 void Document::begin_action_locked() {
   if(state_.polygon)throw std::logic_error("Use polygon selection and move controls while polygon editing is open");
   if(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active)throw std::logic_error("The empty polygon object has no sculptable surface; reopen polygon tools or restore its source");
@@ -203,6 +212,7 @@ void Document::begin_action_locked() {
     weight_joint_ = uint32_t(state_.rig_joint);
     return;
   }
+  if(reject_texture_paint_locked())throw std::logic_error(detail::editable_texture_atlas_notice);
   if (scene_.active().mesh_active)
     scene_.active().painted->begin_stroke();
   else
@@ -800,6 +810,7 @@ bool Document::begin_desktop() {
       (!state_.retopology && !scene_.active().mesh_active && !volume().editable_layer() && !volume().sculpt_settings().mask_edit))
     return false;
   if (state_.retopology && (!state_.retopology->source || retopo_accepting_)) return false;
+  if(!state_.weights.enabled && !state_.retopology && reject_texture_paint_locked())return false;
   input_.cancel();
   begin_action_locked();
   desktop_ = true;

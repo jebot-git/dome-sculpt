@@ -17,6 +17,7 @@ FLAT=os.environ.get('DOME_IMPORT_FLAT')=='1'
 AFFINE=os.environ.get('DOME_IMPORT_AFFINE_SOURCE')=='1'
 ATLAS=os.environ.get('DOME_IMPORT_ATLAS')=='1'
 DEFAULT=os.environ.get('DOME_IMPORT_DEFAULT_SOURCE')=='1'
+EXTRA=os.environ.get('DOME_IMPORT_EXTRA_UV')=='1'
 OUT=ROOT/('artifacts/menu-import-flat-'+MODE if FLAT else 'artifacts/menu-import-'+MODE if MODE!='glb' else 'artifacts/menu-import-skin' if os.environ.get('DOME_IMPORT_HELPER') else 'artifacts/menu-import-authoring');OUT.mkdir(parents=True,exist_ok=True)
 if AFFINE:
     OUT=ROOT/('artifacts/menu-import-affine-'+MODE+('-skin' if os.environ.get('DOME_IMPORT_HELPER') else ''));OUT.mkdir(parents=True,exist_ok=True)
@@ -24,6 +25,8 @@ if ATLAS:
     OUT=ROOT/'artifacts/menu-import-texture-atlas';OUT.mkdir(parents=True,exist_ok=True)
 if DEFAULT:
     OUT=ROOT/('artifacts/menu-import-default-'+MODE+('-skin' if os.environ.get('DOME_IMPORT_HELPER') else ''));OUT.mkdir(parents=True,exist_ok=True)
+if EXTRA:
+    OUT=ROOT/('artifacts/menu-import-extra-uv-'+('atlas' if ATLAS else 'raw'));OUT.mkdir(parents=True,exist_ok=True)
 checks=[];processes=[]
 def check(value,message):
     checks.append({'passed':bool(value),'check':message});(OUT/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks)},indent=2)+'\n')
@@ -112,6 +115,12 @@ async def main():
         if ATLAS:
             check(g.height==504,'Atlas GUI fixture uses the observed native bitmap-font layout')
             xtest.fake_input(d,X.MotionNotify,x=g.x+40,y=g.y+322);xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
+            def atlas_mark_drawn():
+                pixels=options.get_image(23,315,16,16,X.ZPixmap,0xFFFFFFFF)
+                image=Image.frombytes('RGB',(16,16),pixels.data,'raw','BGRX')
+                return sum(max(pixel)>=160 for pixel in image.get_flattened_data())>=6
+            await wait(atlas_mark_drawn)
+            check(atlas_mark_drawn(),'The actual native checked atlas marker is rasterized before capturing options or accepting Import')
         if MODE in ('obj','fbx'):
             key('Shift_L',True)
             for _ in range(5):key('Tab')
@@ -133,10 +142,21 @@ async def main():
         nodes=await ready(True);check(nodes['Undo'][1].get('enabled',False),'Explicit native options Import submits the source-retaining model on a background worker as one history operation')
         await command('Save');accepted=inspect();check(len(accepted['objects'])==int(os.environ.get('DOME_IMPORT_OBJECTS','3')) and len(accepted['groups'])==int(os.environ.get('DOME_IMPORT_GROUPS','5' if MODE=='fbx' else '4')) and sum(o['mesh_active'] for o in accepted['objects'])==int(os.environ.get('DOME_IMPORT_MESHES','2')),'Actual native import and Save preserve all objects and editable node hierarchy')
         check(accepted['version']==int(os.environ.get('DOME_IMPORT_VERSION','11' if MODE!='glb' else '9')) and accepted['source_models'] and accepted['source_materials']['bindings'],'Native Save includes canonical source, frame, image, material and deformation archives')
-        if ATLAS:
+        if ATLAS and not EXTRA:
             active=[o for o in accepted['objects'] if o['mesh_active']]
             retained_paints=accepted['source_materials']['paints']
             check(all('source_uv1' not in o['painted'].get('source_maps',{}) for o in active) and any('source_uv1' in p.get('source_maps',{}) for p in retained_paints),'Actual native checkbox prepares current textures and persists the original UV1 coordinate domains')
+        if EXTRA:
+            active=[o for o in accepted['objects'] if o['mesh_active']]
+            def original_uv2(p):
+                maps=p.get('source_maps',{})
+                return maps.get('version')==2 and maps['payload']['normal']['texcoord']==2 and any(row['set']==2 for row in maps['extra_uv_sets'])
+            if ATLAS:
+                check(all(not o['painted'].get('source_maps',{}).get('extra_uv_sets') for o in active) and any(original_uv2(p) for p in accepted['source_materials']['paints']),'Real atlas checkbox publishes editable UV0 and retains exact original normal UV2 ownership')
+            else:
+                check(all(original_uv2(o['painted']) for o in active),'Real default native import retains raw normal UV2 without preparing or relabeling its source domain')
+            raw_source=bytes(accepted['source_models'][0]['original_glb']['bytes'])
+            check(raw_source==asset.read_bytes(),'Native extra-UV Save retains the complete exact input asset')
         if AFFINE:
             raw=bytes(accepted['source_models'][0]['original_glb']['bytes'])
             check(raw==asset.read_bytes() and accepted.get('affine_state',{}).get('nodes') and all(g.get('source_placement') is not None for g in accepted['groups'][1:]),'Real native import retains exact affine source bytes and every original node authority')

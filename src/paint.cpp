@@ -2,6 +2,7 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "paint-source-admission.hpp"
 #include "source-uv-archive.hpp"
 #include "polygon-paint.hpp"
 #include "dome/source-maps.hpp"
@@ -477,6 +478,7 @@ std::array<uint8_t,4> PaintedMesh::pbr_pixel(uint64_t id,uint32_t x,uint32_t y) 
   const auto &p=pixel(id,x,y);return {p.data[0],p.data[1],p.data[2],p.data[3]};
 }
 void PaintedMesh::begin_stroke() {
+  detail::require_editable_texture_atlas(*this);
   if (editing_)
     throw std::logic_error("A paint stroke is already active");
   if (!active().visible)

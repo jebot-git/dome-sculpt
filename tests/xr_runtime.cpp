@@ -53,7 +53,7 @@ unsigned frame = 0, physical_frame = 0, event = 0, restart_phase = 0;
 unsigned menu_completion_event = 0;
 std::string affine_contact_mode(){auto p=getenv("DOME_XR_FIXTURE_AFFINE_CONTACT");return p?p:"";}
 std::string import_atlas_mode(){auto value=getenv("DOME_XR_FIXTURE_IMPORT_ATLAS");return value?value:"";}
-bool import_atlas_click(){return frame==8||frame==14||frame==20||frame==26||frame==42||frame==50||frame==58||frame==66||frame==74||frame==82||(import_atlas_mode()=="accept"&&frame==90);}
+bool import_atlas_click(){if(frame==50&&getenv("DOME_XR_FIXTURE_IMPORT_EXTRA_RAW"))return false;return frame==8||frame==14||frame==20||frame==26||frame==42||frame==50||frame==58||frame==66||frame==74||frame==82||(import_atlas_mode()=="accept"&&frame==90);}
 int import_atlas_sector(){
  if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 9;if(frame>=24&&frame<=26)return 10;
  if(frame>=40&&frame<=42)return 5;if(frame>=48&&frame<=50)return 9;
