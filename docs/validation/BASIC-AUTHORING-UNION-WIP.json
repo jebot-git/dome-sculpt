@@ -99,8 +99,6 @@
     "junit": "build/artifacts-basic-authoring-full-release.xml"
   },
   "remaining_for_qualification": [
-    "Final corrected full-loader result/diagnosis",
-    "Any checks justified by corrected-loader findings",
     "Final preserved-main-doc merge/source equality and exact split-result integration receipt before runtime publication"
   ],
   "no_physical_test": true,
@@ -228,13 +226,13 @@
     "maxIssues": 0,
     "inputs": "20completed Arc PBR/current avatar GLBs +14 completed actual FBX/pose GLBs; not every output of stilllivefull395"
   },
-  "updated_utc": "2026-11-02T19:04:45.989838+00:00",
+  "updated_utc": "2026-11-02T19:09:43.468694+00:00",
   "correction_child": {
     "tree": "artifacts/basic-authoring-regressions-25fe208",
     "source": "9684486 production +test-only cc3bf97 tracking-recovery retime",
     "fresh_Release_build": 71240,
     "fresh_owned_SAN_build": 71315,
-    "state": "partial corrected scopes pass; full loader final30315 live",
+    "state": "bounded correction qualified; final main source equality/receipt pending",
     "deterministic_old_mask_negative": true,
     "fresh_Release_build_terminal_exit": 0,
     "fresh_owned_SAN_build_terminal_exit": 0,
@@ -265,6 +263,14 @@
       "blue_texels": 48,
       "required_gt": 20
     },
-    "final_loader_session": 30315
+    "final_loader_session": 30315,
+    "final_loader": {
+      "session": 30315,
+      "terminal_exit": 0,
+      "registered_tests": 1,
+      "assertions": 150,
+      "seconds": 159.41
+    },
+    "qualified_metadata": "413ac65"
   }
 }

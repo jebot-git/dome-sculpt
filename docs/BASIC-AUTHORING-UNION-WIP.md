@@ -105,5 +105,6 @@ coherent helper build75542 is terminal0. Second48146 reaches139checks with only
 the Blue assertion failing: the retimed pressure landed on deliberately invalid
 tracking frame22. Test-onlycc3bf97 moves it after a neutral recovered frame24,
 retaining both dropout and Blue oracle; isolated actual-loader paint now has
-48blue texels (>20required). Complete final loader30315 is live; inspect it
-before any restart and preserve all earlier failures.
+48blue texels (>20required). Complete final loader30315 passes1/1 in159.41s with all150assertions.
+Qualified correction metadata413ac65 preserves all earlier failures; final
+main merge/source equality and exact integration receipt remain before publication.
