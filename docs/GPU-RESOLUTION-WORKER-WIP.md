@@ -37,7 +37,7 @@ user's VRChat/build activity is present. It is not a controlled sustained-speed
 result and does not establish whole-job acceleration. The dense interpolation
 component's separate improvement must not be substituted for this measurement.
 
-Fresh whole-owned C/C++core/support ASan+UBSan/leaks5/5 passes in34.39s,
+Fresh whole-owned C/C++core/support ASan+UBSan/leaks5/5 passes in35.83s,
 including all five corresponding registered worker/controller/data/session
 suites. All1,144 captured source/binary hashes remain unchanged. This does not
 instrument a frontend or a GPU driver. Initial CUDA backend
