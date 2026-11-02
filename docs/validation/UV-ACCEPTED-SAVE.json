@@ -3,7 +3,12 @@
   "dependency": "62d47474651f1bf739db0c0b171c06d746e1e076",
   "native_assertions": 31,
   "release_suites": 2,
-  "sanitizer": "pending",
+  "sanitizer": {
+    "suites": 2,
+    "c_cxx": "O1 -g1 ASan+UBSan/leaks",
+    "log_sha256": "a7133f1eeaacf398a7a31b4177c588a622d96f673b63db8777668e1252ffa878",
+    "core_sha256": "7e9b956c636aafd628e224e91adb5a8f23a53ff97c3f003bac14920a47ba7331"
+  },
   "abi_changes": false,
   "kernel_changes": false,
   "gpu": false,
