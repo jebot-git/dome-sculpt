@@ -1091,12 +1091,13 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   job.source_revision = o.painted->revision();
   job.uv_session = uv_session_;
   job.uv_desktop = desktop_;
+  job.work=std::make_shared<AssetWork>();job.operation_label="UV paint transfer";auto work=job.work;
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
     throw std::runtime_error("File and asset work queue is full");
   Transaction transaction(*this);files_.push_back(std::move(job));
   try{
-    uv_accept_pending_=true;state_.asset_busy=true;state_.message="Transferring paint to edited UVs...";state_.error.clear();
+    uv_accept_pending_=true;state_.asset_busy=true;asset_work_.store(work);state_.message="Transferring paint to edited UVs...";state_.error.clear();
     if(!desktop_)input_.resume_control(VrParameter::UvEdit);
     publish_locked(false,false);transaction.commit();
   }catch(...){files_.pop_back();throw;}

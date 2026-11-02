@@ -1,0 +1,66 @@
+{
+  "base": "824f6cdb6657f6b6a9f240782935e7d46195efcd",
+  "scope": "Accepted generic/source-aware UV worker AssetWork admission, user cancellation and matching-token retirement; no public layout or archive change",
+  "source_sha256": {
+    "CMakeLists.txt": "7bc8c15d928ec9254c0258c5bfedda6078e5c18fcb4c7979f14a5d388ca75f1e",
+    "src/document.cpp": "e35e9a3f228ccb609a9814380580b124e945fac8788ee7a48cc884106f85c311",
+    "src/document-uv-solve.cpp": "1dee5037b1460a7159e031a5462934d86d0d7bc8242673d665d282a777aab7f4",
+    "src/document-worker-errors.cpp": "ba52df3396a88c8e7682d7cb6f5fae4230fa34fe4042174d6e8f9f8fe48640cd",
+    "tests/uv-worker-cancellation.cpp": "7b51e995c5e5cb88d89033cba9fd6bf3de60c0a6ec1d212ced41272baf2afed9",
+    "docs/UV-WORKER-CANCELLATION.md": "be85465cc62d912c840276953c0f668224e0846acf964aba47d4de7e370667ea"
+  },
+  "old_product_negative": {
+    "base": "824f6cd",
+    "exit_code": 1,
+    "fixture_sha256": "8d66126b78a6ab19d113b900dfc1ed6dd9cf6ed1de49cff792aea7944cfbfa67",
+    "binary_sha256": "db42c2af696aab6f8b39a07475371966f09c86570c3489dfc6c0e972d5e993e0",
+    "log_sha256": "3a3094f05c359e3b0529783d031946d5120e3ec5006bd59878dcdb315ee18c8e",
+    "fixture_copy": "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-old-proof-fixture.cpp",
+    "fixture_copy_sha256": "8d66126b78a6ab19d113b900dfc1ed6dd9cf6ed1de49cff792aea7944cfbfa67",
+    "failure": "Actual Cancel during a gated accepted transfer still publishes changed scene on unmodified824f6cd",
+    "fixture_scope": "Original eleven checks, before the four same-generation admission witnesses were appended"
+  },
+  "release": {
+    "build": "build-baseline",
+    "optimization": "-O3 -DNDEBUG",
+    "suites": 14,
+    "seconds": 8.96,
+    "new_fixture_checks": 15,
+    "binary_sha256": "e4f6291b7cfc0986d2c1eda38a23e4047a983d9dca2c6e9983380a5dd10b4a09"
+  },
+  "sanitizer": {
+    "build": "build-sanitize",
+    "fresh_whole_core_and_support": true,
+    "c_and_cxx_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "suites": 14,
+    "seconds": 46.03,
+    "fixture_recompiled_after_final_source_edit": true,
+    "binary_sha256": "8a92fa7436f07f5f4e1e7cf112101e45a917192577a3262b0b31d5c388fd471c",
+    "archive_sha256": {
+      "libdome-sculpt-affine.a": "f791221387beeed9ab2c9556581e85f4959e074ecb70df8549205fdd7a6a94ec",
+      "libdome-sculpt-core.a": "3abb2313033f375cbaaf52028a51974cba38ae2e82877321cbd03003ee875704",
+      "libdome-sculpt-polygon.a": "af11a54dcf93af72f5277455d5bf6db45771170273ce62f4b739c10094d292cf",
+      "libmikktspace-robust.a": "ce5e2ff9f6a8eba8c69b0d2857fc34cfc618b0f97cf1cd437820705f27456512",
+      "libmikktspace.a": "c041d111f8278a58ece48850df0c9dc7549387645218efeeae0c5267e904e030",
+      "libufbx.a": "a9b8280ee126e51c5e9900a59dcf35b7b077efa33eb24713fd4c13320afb29ab",
+      "libxatlas.a": "364e9ac57bd579b466826008e3dd597fd106b15fe2ab8ae6c2a35ee861fde87f"
+    }
+  },
+  "log_sha256": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-old-code.log": "3a3094f05c359e3b0529783d031946d5120e3ec5006bd59878dcdb315ee18c8e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-final-release-tests.log": "5e4c7b36d7a4407b9980fa16ea1e7c1c73ef6bf5dc265a314f81a89010cb18b4",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-final-release-direct.log": "8b7f5e3680c940061ccb1538025343d5ed9a8485a54ce34c914b48dc4433dc54",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-sanitize-configure.log": "3c10ecb38689fd15c23d8ca9ae95913f759bad02162a132e295d309c46c71d78",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-sanitize-build.log": "cb4a06b3f9bb8ca928f75cd5652e18d8a012ab3b43fc1aa7ddf2cea957bdab8d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-sanitize-final-fixture-build.log": "83cc34ac945dc028da4983ccaf494f46fa175253d92e939aabca1a6de3245d87",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv-worker-cancel-824-sanitize-tests.log": "233d894301e11943370c44e4f49da4a15a564a51639753901a81eb3b71743a01"
+  },
+  "limits": [
+    "No new GUI, hardware GPU or physical headset proof",
+    "No Scene19 normal-UV or prepared-normal-shapekey qualification",
+    "No general allocation-failure qualification; existing admission/publication transactions retained",
+    "Same-generation newer asset race is blocked by tested admission while old UV work remains busy; generic failure cleanup not broadened"
+  ]
+}
