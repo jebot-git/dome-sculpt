@@ -26,3 +26,35 @@ detection passed in 0.38 seconds. This is scoped dependency synchronization proo
 not a full application, geometry-numerics, universal heap-exhaustion or cut
 workflow qualification. The separate cut preparation allocation sweep remains
 part of its own milestone.
+
+## Native thread construction failures
+
+A follow-up trace of the real cut fault at owned allocation 7288 showed a
+second issue after the predicate synchronization fix. `TaskScheduler` uses raw
+`Array<Worker>` storage: if a later `std::thread` construction threw, the already
+started worker prefix was not joined before that storage unwound. The context
+and placement storage also lacked cleanup. An orphan could subsequently wait
+on reused worker storage and interfere with another atlas's shutdown.
+
+The local constructor patch joins every initialized worker before unwinding,
+handles a constructed `Worker` whose thread never started, and frees failed
+thread/scheduler placement storage and the enclosing context. There are no new
+public fields or APIs and no chart/packing arithmetic changes.
+
+`xatlas-construction-allocation` observes the actual first worker entering wait
+before persistently denying the next thread-state allocation. The unchanged
+453a532 dependency, linked intentionally to the final fixture, fails at boundary
+2 with “Failed Atlas construction left a live native worker”. The test requires
+all actual native worker tasks to disappear, then performs an exact successful
+retry after each failure. A bounded wait accommodates kernel `/proc` task-entry
+removal after `pthread_join`; successful cleanup requires the actual task count,
+never elapsed time. The old leaked worker remains present until the failure
+bound.
+
+On this 20-thread machine all 19 measured native thread-state allocation
+boundaries fail, unwind, join, and retry correctly. Both standalone dependency
+suites passed 30 consecutive optimized repetitions in 3.75 seconds and five
+fresh xatlas/fixture ASan/UBSan/leak repetitions in 3.03 seconds. These probes
+intercept C++ thread-state `operator new`, not xatlas's C allocation callbacks or
+OS-wide resource failures. Full cut allocation/publication qualification remains
+a separate requirement; the dependency probes alone do not establish it.
