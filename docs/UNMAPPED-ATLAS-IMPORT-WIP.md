@@ -26,3 +26,11 @@ The f62 parent has267 Release suite passes, separate XR19/FLTK12/Arc135 and
 Khronos36-file evidence; those passes are not relabeled as this new product.
 Full native/renderer/sanitizer integration remains required. No installation,
 headset launch or active-session changes were made.
+
+A subsequent fresh coherent optimized whole-core/support build passes three
+selected native suites in0.21s. A separate fresh own C/C++ core/support
+ASan/UBSan/leak build passes the same three in1.91s. UI/XR are disabled in both
+configurations; no renderer, frontend or device qualification is inferred. Exact
+source/log hashes and remaining typed-MToon integration caveat are in
+validation/UNMAPPED-ATLAS-IMPORT.json. This private component is ready for
+combined native import integration, not full production completion.

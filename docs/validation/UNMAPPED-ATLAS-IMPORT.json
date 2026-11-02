@@ -1,0 +1,66 @@
+{
+  "recorded_utc": "2026-11-02T06:52:46.158084+00:00",
+  "product": "ae5fc14",
+  "base": "f62fcf8",
+  "scope": "Explicit atlas generation before Strict paint construction for untextured inputs with unused degenerate UVs. Original raw asset coordinates remain unchanged.",
+  "status": "qualified private native component; combined public integration pending",
+  "public_layout_changed": false,
+  "matrix": [
+    "authored and implicit materials",
+    "authored and generated-flat normal authority",
+    "two original instances",
+    "valid degenerate UV source and original parser/Strict refusal",
+    "exact raw original bytes/source coordinates/remapped corners",
+    "actual Document import and paint workers",
+    "immediately queued ordered Save, restart and separate exact paint/import Undo/Redo"
+  ],
+  "native_checks": 56,
+  "Release": {
+    "suites": 3,
+    "seconds": 0.20733269999999998,
+    "names": [
+      "import-unmapped-atlas",
+      "import-texture-atlas",
+      "source-uv1"
+    ]
+  },
+  "sanitizer": {
+    "suites": 3,
+    "seconds": 1.9071879999999999,
+    "names": [
+      "import-unmapped-atlas",
+      "import-texture-atlas",
+      "source-uv1"
+    ]
+  },
+  "sanitizer_scope": "Fresh whole owned C/C++ core and support withASanUBSan/leaks; UI/XR OFF, no renderer/frontend/device claim. External system/image/LAPACK uninstrumented.",
+  "isolated_owner_overlay": {
+    "owner": "src/import-authoring.cpp",
+    "old_owner_excluded_from_linker_map": true,
+    "matching_borrowed_base": "Exact f62 Release core/support archives and matching headers; separate from subsequent coherent qualification.",
+    "negative": "artifacts/negative-valid.log",
+    "positive": "artifacts/fixed-valid.log"
+  },
+  "retained_first_attempt": "An initial new accessor was misaligned after PNG data; first negative/fixed logs are not the real parser/Strict UV negative. Valid fixture aligns bytes and checks exact UV refusal diagnostic.",
+  "integration_requirement": "Typed MToon sources may sample non-PBR roles. Generic VRM adapter must include those roles in the no-sampled-texture predicate before reusing this early-atlas route.",
+  "source_sha256": {
+    "src/import-authoring.cpp": "a743c4aac29040acbc191e8b6a72f58f114664ced3848287517c7f04788fb342",
+    "tests/import-unmapped-atlas.cpp": "ca4fd36e0e194a2b831a1a5174da821d37c065582b27713ba2e34fad4eb3693a",
+    "CMakeLists.txt": "def6352268151266c1d2a13f896d60c634cae9c561028a3c393ddf25d183a37e"
+  },
+  "artifacts_sha256": {
+    "artifacts/build-release.log": "f0ac95d2f20938e7ff27c9915e243c6e880907ba3efa053a3855d1809b4bf208",
+    "artifacts/tests-release.log": "c5f2f123f909ef3f0e4f6b433f240b81368e458101163d66cd3281b0dc807bdb",
+    "artifacts/tests-release.xml": "237d47ee1b0574525295d6b05b613f19fc0d7d69cf957c8eb87fdebf0f5bf826",
+    "artifacts/build-sanitize.log": "1a9552d50aa376ecdf12e51f10d652e84a6192d2b55ccbf815b9a9fd1cd7eb43",
+    "artifacts/tests-sanitize.log": "a72ce2096fab3bfc9f37cc2cc2e715863c150601a7d98ffeeb3e683b91d570d8",
+    "artifacts/tests-sanitize.xml": "b478448b40888221d51ec149c9def3c69f4d4515b89ff1e875abb658a25fcfe9",
+    "artifacts/negative-valid.log": "b1f47b0cf1fcf76c91f291fbeb53117bdf7d48b7acc49367572211a869a98621",
+    "artifacts/negative-valid.map": "0233cb9a51b40b4e76524248795914115197019be8e390cf0b38e5691d9ca689",
+    "artifacts/fixed-valid.log": "991a453c39f665f62e20956ee393c1db00f4af86eebf6e387be1bb6cd0753f2d",
+    "artifacts/fixed-valid.map": "01ed90ad582248f11953d7a9af1f437669126631926faef138d5aab6e5f208fb"
+  },
+  "system_installation": false,
+  "physical_headset_test": false,
+  "full_production_complete": false
+}
