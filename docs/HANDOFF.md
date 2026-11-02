@@ -24,6 +24,37 @@ Private worktrees start from accepted main8d46dfb. Geometry, source frames,
 paint, permissions, Undo/Cancel and ordered Save remain required. Coordinate
 Arc execution; preserve the accepted binaries and all prior evidence.
 
+## Active integration checkpoint — 2026-11-02
+
+Public product `0d2ffbb` integrates the qualified affine source-chain adapter
+and both xatlas lifetime fixes, with original commits preserved. The merged
+source tree matched the qualified affine tree exactly before publication.
+The full production objective remains active and incomplete.
+
+Root's guarded UV1 checkpoint `d3310d7` is preserved and pushed on
+`work/source-uv1-8d46dfb`. Its original full run passed251/252; the import test
+still refused unsupported UV1 but expected the previous UV0-policy message.
+An explicit importer policy restores that unchanged assertion. The repair passes
+four focused Release and two focused sanitizer suites. The pipeline's earlier
+seven whole-core/support sanitizer suites,13 actual Arc checks,12 native FLTK
+UV checks and eight actual d271 Wayland/menu checks retain their exact scopes
+in its SOURCE-UV1-PIPELINE.json. Generic native UV1 import/painting remains guarded.
+
+A NEW clean integration tree `artifacts/uv1-affine-integration-0d2ffbb`, branch
+`work/uv1-affine-integration-0d2ffbb`, source `2e7d4a0`, combines that checkpoint
+with published affine/dependency sources. Fresh coherent Release and sanitizer
+builds are currently running; combined regression qualification is pending.
+The frozen UV1 component tree, accepted physical UI binary and saved20-object
+headset session remain preserved.
+
+The prepared-normal/shapekey adapter is qualified privately at `355b382` for its
+scoped fixtures; actual bundled nineteen-part avatar qualification is underway.
+Current-color cut preparation passes all56,629 measured persistent owned-new
+failure boundaries with exact rollback and retry; native publication/immediate
+Save work remains separate in a new isolated tree. Authenticated implicit-default
+material identity (Scene17) remains under development. No new physical headset
+launch, system installation or active-session restart occurred.
+
 ## Null shape-history compatibility
 
 Source `0df613e` permits a null optional shapekey-history field with the
