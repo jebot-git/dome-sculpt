@@ -18,7 +18,14 @@ void check(bool b, const char *s) {
 
 int main(int argc, char **argv) try {
   if (argc == 3 && std::string(argv[1]) == "--ui-fixture") {
-    skinned(true).save(argv[2]);
+    auto source=skinned(true);
+    if(std::getenv("DOME_IMPORT_AFFINE_SOURCE")){
+      source.j["nodes"][0]["scale"]={-1.7f,.8f,1.1f};
+      source.j["nodes"][1]["rotation"]={0,0,std::sin(.31f),std::cos(.31f)};
+      source.j["nodes"][3]["scale"]={1.2f,.9f,1.1f};
+      source.j["nodes"][4]["scale"]={.7f,1.3f,.8f};
+    }
+    source.save(argv[2]);
     return 0;
   }
   if (argc == 3 && std::string(argv[1]) == "--empty-project") {
@@ -58,7 +65,7 @@ int main(int argc, char **argv) try {
       const auto &p = asset.primitives[0];
       const auto &skin = asset.skins[0];
       auto local = o.deformation->preview(o.painted->mesh());
-      auto world = prepared.scene.world_transform(id);
+      auto world = prepared.scene.world_matrix(id);
       for (size_t v = 0; v < local.positions.size(); ++v) {
         auto source = o.appearance->source_vertices[v];
         auto P =
@@ -75,10 +82,8 @@ int main(int argc, char **argv) try {
               expected += transformed(asset.nodes[skin.joints[slot]].world, q) *
                           set.weights[source][k];
             }
-        auto actual =
-            ob::transform(world, {local.positions[v].x, local.positions[v].y,
-                                  local.positions[v].z});
-        if (length(expected - Vec3{actual.x, actual.y, actual.z}) > 2e-6f)
+        auto actual=world.point({local.positions[v].x,local.positions[v].y,local.positions[v].z});
+        if (length(expected - Vec3{float(actual[0]),float(actual[1]),float(actual[2])}) > 2e-6f)
           throw std::runtime_error(
               "Imported skin uses wrong mesh-node transform, joint identity, "
               "IBM or morph order");

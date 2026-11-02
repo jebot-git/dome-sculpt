@@ -4,6 +4,7 @@
 // is used. Fixture lighting constants match the editor so pixel comparisons
 // isolate attribute transport and the versioned TBN evaluation.
 #include "cgltf.h"
+#include "consumer-handedness.hpp"
 #include <png.h>
 #include <fstream>
 #include <map>
@@ -59,13 +60,18 @@ in vec2 uv;out vec4 color;uniform sampler2D scene;void main(){vec4 c=texture(sce
   for(size_t node_index=0;node_index<data->nodes_count;++node_index){auto &node=data->nodes[node_index];if(!node.mesh)continue;
    if(node.skin && !rigs.contains(node.skin)){std::pair<std::vector<Matrix>,std::vector<NormalMatrix>> rig;for(size_t j=0;j<node.skin->joints_count;++j){Matrix world{},bind{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};cgltf_node_transform_world(node.skin->joints[j],world.data());if(node.skin->inverse_bind_matrices && !cgltf_accessor_read_float(node.skin->inverse_bind_matrices,j,bind.data(),16))throw std::runtime_error("Consumer IBM missing");auto m=multiply(world,bind);rig.first.push_back(m);rig.second.push_back(normal_matrix(m));}rigs.emplace(node.skin,std::move(rig));}
    Matrix node_world{};cgltf_node_transform_world(&node,node_world.data());auto node_normal=normal_matrix(node_world);
+   // glTF2 mesh instantiation defines front-face winding by the determinant
+   // of the node global, including skinned instances. Keep this independent
+   // from production's transient index expansion.
+   const float node_hand=consumer_frame::handedness(node_world);
+   glFrontFace(node_hand<0?GL_CW:GL_CCW);
    for(size_t primitive_index=0;primitive_index<node.mesh->primitives_count;++primitive_index){auto &p=node.mesh->primitives[primitive_index];auto positions=attr(p.attributes,p.attributes_count,cgltf_attribute_type_position),normals=attr(p.attributes,p.attributes_count,cgltf_attribute_type_normal),tangents=attr(p.attributes,p.attributes_count,cgltf_attribute_type_tangent),uvs=attr(p.attributes,p.attributes_count,cgltf_attribute_type_texcoord);if(!positions||!normals||!tangents||!uvs||!p.material)throw std::runtime_error("Consumer required attributes missing");
     auto colors=attr(p.attributes,p.attributes_count,cgltf_attribute_type_color);struct Vertex {Vec3 p,n;std::array<float,4>t;std::array<float,2>uv;std::array<float,4>color;};std::vector<Vertex> values;values.reserve(positions->count);
     for(size_t v=0;v<positions->count;++v){auto P=vec(positions,v),N=vec(normals,v),T=vec(tangents,v);float tangent[4]{};cgltf_accessor_read_float(tangents,v,tangent,4);
      for(size_t target=0;target<p.targets_count;++target){float w=node.weights_count?(target<node.weights_count?node.weights[target]:0):(target<node.mesh->weights_count?node.mesh->weights[target]:0);if(w==0)continue;const auto &m=p.targets[target];if(auto a=attr(m.attributes,m.attributes_count,cgltf_attribute_type_position))P+=vec(a,v)*w;if(auto a=attr(m.attributes,m.attributes_count,cgltf_attribute_type_normal))N+=vec(a,v)*w;if(auto a=attr(m.attributes,m.attributes_count,cgltf_attribute_type_tangent))T+=vec(a,v)*w;}
      if(node.skin){Vec3 wp{},wn{},wt{};auto &rig=rigs.at(node.skin);for(int set=0;;++set){auto joints=attr(p.attributes,p.attributes_count,cgltf_attribute_type_joints,set),weights=attr(p.attributes,p.attributes_count,cgltf_attribute_type_weights,set);if(!joints)break;float ji[4]{},w[4]{};if(!weights||!cgltf_accessor_read_float(joints,v,ji,4)||!cgltf_accessor_read_float(weights,v,w,4))throw std::runtime_error("Consumer influences missing");for(size_t k=0;k<4;++k)if(w[k]!=0){auto slot=size_t(ji[k]);wp+=point(rig.first.at(slot),P)*w[k];wn+=direction(rig.second.at(slot),N)*w[k];wt+=direction(rig.first.at(slot),T)*w[k];}}P=wp;N=wn;T=wt;}
      else{P=point(node_world,P);N=direction(node_normal,N);T=direction(node_world,T);}
-     P=source_to_native.rotate(P);N=source_to_native.rotate(N);T=source_to_native.rotate(T);float uv[2]{};cgltf_accessor_read_float(uvs,v,uv,2);float c[4]{1,1,1,1};if(colors && !cgltf_accessor_read_float(colors,v,c,4))throw std::runtime_error("Consumer source COLOR_0 missing");values.push_back({P,N,{T.x,T.y,T.z,tangent[3]},{uv[0],uv[1]},{c[0],c[1],c[2],c[3]}});
+     P=source_to_native.rotate(P);N=source_to_native.rotate(N);T=source_to_native.rotate(T);float uv[2]{};cgltf_accessor_read_float(uvs,v,uv,2);float c[4]{1,1,1,1};if(colors && !cgltf_accessor_read_float(colors,v,c,4))throw std::runtime_error("Consumer source COLOR_0 missing");values.push_back({P,N,{T.x,T.y,T.z,tangent[3]*node_hand},{uv[0],uv[1]},{c[0],c[1],c[2],c[3]}});
     }
     for(const auto &v:values)world_positions[size_t(node.mesh-data->meshes)].push_back(v.p);
     const cgltf_texture *normal_texture=nullptr,*base_texture=nullptr,*shade_texture=nullptr,*orm_texture=nullptr,*emission_texture=nullptr;float normal_scale=1,base_alpha=1;Vec3 base{},shade{},emission{};float shift=0,toony=0;
