@@ -6,6 +6,31 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Current resumed work — 2026-11-02
 
+Public default-material/sampler milestone824f6cd is now extended by the qualified
+current-corner-color and pinned-held plane-cut implementation through386be29.
+A cut transfers held/selected authority to its shell, preserves protected ghosts
+and original source, and orders immediate Save/close after its exact accepted
+result. Direct cut Apply admission now stages every fallible allocation in the
+existing queue transaction; all181 persistent allocation boundaries pass in
+Release and whole-owned core/support sanitizers. Parent native/GUI/OpenXR/Arc
+and publication-fault scopes remain distinct; see CUT-ADMISSION.md,
+HELD-CUT-HANDOFF.md and their receipts. Moving-grip pose+cut history and
+current-field target baking remain required. This does not complete the goal.
+
+Root's private f62fcf8 editable-atlas/UV1 component passes267 Release suites,
+actual native FLTK12, real-loader synthetic-XR19, Arc135 and Khronos36-file
+validation with0errors. Its two complete10,333-allocation/337-cancellation
+sanitizer sweeps pass; an initially omitted default-document helper is repaired
+and passes its CTest rerun. New registered XR fixture e0b5589 passes both original
+XR regression and atlas import. Independent unused/untextured-UV atlas component
+ba359d1 passes56 native checks and coherent Release3/SAN3. These private
+components await combined integration with the independently identified generic
+UV-worker cancellation fix; no new headset launch or installation occurred.
+
+Separate agents continue the narrow UV CancelWork repair and Scene19 normal-UV
+receipt/adoption, current-color source baking, and generic source-preserving
+VRM0/1 import. Physical interface acceptance and all original requirements remain.
+
 The user reactivated the full objective after the interface acceptance and pause
 recorded below. The accepted physical UI remains the baseline. Root is qualifying
 the painted PBR color/emission export sampler fix, then integrating guarded UV1
