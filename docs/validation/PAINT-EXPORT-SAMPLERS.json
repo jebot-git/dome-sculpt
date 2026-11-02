@@ -1,0 +1,84 @@
+{
+  "recorded_utc": "2026-11-02T05:50:15.378730+00:00",
+  "base": "78a1034",
+  "product_checkpoint": "358dd50",
+  "scope": "Current painted PBR base-color and emission sampler consistency during actual Document GLB export. Full production remains incomplete; no generic UV1 import admission.",
+  "source_sha256": {
+    "src/export.cpp": "f884cbbd56827fc333ad956ee436ce43c2a9e2c700b78880fbca1bc86c90c266",
+    "tests/paint-export-samplers.cpp": "a54de4bb8002f8af4a35a74e9d5aca66e90f610444250257665e4a88266f03d1",
+    "tests/import-authoring-fixtures.hpp": "8a8e60a9e71cc65bfd5ce823af1b5707f578820a508310081c7f0241b18f1f31",
+    "CMakeLists.txt": "25e01640dba1db1f59dfc000fd973ac873a55d125fb000d09fb5c9decc8a55de"
+  },
+  "negative": {
+    "public": "78a1034",
+    "fixture": "Earlier nonemissive121-check UV0 fixture with valid POSITION morph bounds; fails first actual painted GLB sampler metadata assertion. Older pixel-only witness reacheserror3 at tolerance2.",
+    "archive_policy": "Matching public headers and exact qualified original archives; no borrowed ABI changes."
+  },
+  "isolated_overlay": {
+    "checks": 121,
+    "image_comparisons": 24,
+    "max_error": 0,
+    "policy": "Whole owned export.cpp O3 object; old archive member absent from saved linker map. Earlier nonemissive fixture; separate from final coherent proof."
+  },
+  "final": {
+    "release": {
+      "tests": 3,
+      "failures": 0,
+      "seconds": 12.691923,
+      "names": [
+        "gltf-interoperability",
+        "paint-export-samplers",
+        "source-color-render"
+      ]
+    },
+    "sanitizer": {
+      "tests": 3,
+      "failures": 0,
+      "seconds": 23.319447,
+      "names": [
+        "gltf-interoperability",
+        "paint-export-samplers",
+        "source-color-render"
+      ]
+    }
+  },
+  "hardware": {
+    "pci": "0000:03:00.0",
+    "selector": "DRI_PRIME=pci-0000_03_00_0",
+    "vendor": "Intel",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "checks": 145,
+    "image_comparisons": 24,
+    "max_error": 0,
+    "tolerance": 2,
+    "software_forcing": false
+  },
+  "matrix": [
+    "original UV0 native imports, two retained instances",
+    "authored and generated-flat normal/morph directions",
+    "POSITION/NORMAL/TANGENT morphs at weights0 and0.65",
+    "OPAQUE/MASK/BLEND",
+    "actual native paint stroke and background worker GLB export",
+    "independently parsed cgltf/PNG/GLSL consumer",
+    "visible coverage and visible painted changes",
+    "nearest/mipmap color and emission filters, mirror/clamp emission wraps"
+  ],
+  "sanitizer_scope": "Fresh whole owned C/C++ core, renderer and support plus fixtures with ASan/UBSan/leaks; UI configured ON for renderer, XR OFF. External FLTK/Mesa/image/LAPACK libraries not instrumented; no full app frontend/runtime/HMD claim.",
+  "artifacts_sha256": {
+    "artifacts/negative-valid-public.log": "6617771bb6accf7e4ca99427db19ea9e3e48c68d5e2e393e82a4e8ce5d35d1ff",
+    "artifacts/negative-valid-public.map": "dbe9e00aa6419b92f09dd6326ddc35c0d0f8cbe5fd9390a81333a7c1459fcaa8",
+    "artifacts/fixed-overlay.log": "03a74cce1058c2461c6d0dd37bfda07ce901f12d740e453198c1c86bf1165e45",
+    "artifacts/fixed-overlay.map": "b87fe594a2ed02e2acfe82aff25ee2bc7bfc3ea712e9e5cf0e3a539069b77219",
+    "artifacts/build-release.log": "07c598bed6f676bce089fa53368a02ad27c85608babe723308f5f9ea21c278a8",
+    "artifacts/build-sanitize.log": "21d8b24498c322aeef77278b91477247157421efb7466dc62387f53f93d34368",
+    "artifacts/build-release-emission.log": "245ecc049c4d0a1b72ea17526fab7cd37d45ef87bf5f7a6aeea488258210ca28",
+    "artifacts/build-sanitize-emission.log": "b7dd454c69eee819db1f6ea5be914d9d061d202381414645f9eea2706aabbe66",
+    "artifacts/tests-release-final.log": "a62b4b59a50fe963fcdf4f213cc988fb2cecbd66fc125075ca0f8f34b7ce728b",
+    "build/artifacts/tests-release-final.xml": "7b5ffc3f0bd7ab7a14da35e8672b0264d8d66c96c504da9e22d6a97f64fcbf6b",
+    "artifacts/tests-sanitize-final.log": "3ea29ef047972a8350693c964b2f9bb650d96790cb2e33ee69fb57fd78fabf11",
+    "build-sanitize/artifacts/tests-sanitize-final.xml": "0faca8056733f6a624fbd88a04a28142ff3625ce2bf9ff7d2c76841ce2be039f",
+    "artifacts/tests-arc-final.log": "95ecf35fe7f815e3eeae884c41de6491091751572d4834401dfda4972803eadb"
+  },
+  "system_installation": false,
+  "physical_headset_test": false
+}
