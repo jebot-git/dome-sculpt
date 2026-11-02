@@ -489,3 +489,25 @@ mismatch; root is isolating it in `artifacts/paint-export-samplers-78a1034` befo
 final UV1 pipeline publication. The editable-atlas import prototype is separate
 at `artifacts/uv1-editable-import-2e7d4a0`; native/controller/FLTK and worker GLB
 resource checks pass, while visual export/quality qualification is unfinished.
+
+## Private native desktop 3D-mouse component
+
+The work/desktop-spacenav-8d68dc7 component extends the existing FLTK App with
+nonblocking native spacenav Unix input, six-axis elapsed-time camera navigation,
+View toggle/options, frame buttons, and focus/modal/gesture/reconnect fences.
+It changes no Document/Scene layouts or authoring archives. Real socket and
+native UI fixtures cover camera motion, option Apply/Cancel, exact saved data,
+post-navigation paint/Undo/Redo and clean window closure. See
+DESKTOP-SPACENAV.md and validation/DESKTOP-SPACENAV.json for exact final scope.
+Physical device/daemon acceptance remains required.
+
+The same qualification fixes inherited process Fontconfig ownership and
+Canvas GL release before native Wayland hide. Desktop X11 scoped sanitizer
+checks are clean; standalone XR 112-byte and native Wayland 5,856-byte
+shared-backend allocation reports remain explicitly open. Canonical toolkit
+helpers are unchanged; no suppressions, system installation or HMD test.
+This private leaf is not a replacement for the production handoff or completion
+of the full goal. The next delegated basic task is native image projection /
+stencil painting through shared Document/desktop/XR workflows; its existing
+kernel alone is insufficient. Deferred controller drawers remain additional
+work after basic targets.
