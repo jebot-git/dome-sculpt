@@ -516,8 +516,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     convert_trs(o.transform);
     for (auto &g : o.groups)
       convert_trs(g.transform);
-    if (!o.deformation)
+    if (!o.deformation) {
+      if (source_graph) continue; // A real rigid source part has no dummy skin.
       fail("source part lacks deformation");
+    }
     auto d = std::make_shared<DeformationState>(*o.deformation);
     if (d->skeleton)
       for (auto &bone : d->skeleton->bones)
@@ -799,23 +801,25 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     stop(options);
     const auto &o = objects[i];
     const auto &emitted = document.objects.at(i);
+    const bool rigid = source_graph && (!o.deformation || !o.deformation->skin);
     if (o.groups.empty() || (!source_graph && o.groups.back().id != group) ||
-        !o.deformation || !o.deformation->skeleton || !o.deformation->skin ||
-        !o.deformation->humanoid)
+        (!rigid && (!o.deformation || !o.deformation->skeleton ||
+                    !o.deformation->skin || !o.deformation->humanoid)))
       fail("every avatar part requires the same grouped humanoid rig");
-    if (avatar_joints.empty())
+    if (avatar_joints.empty() && !rigid)
       avatar_joints.assign(emitted.joints.begin(), emitted.joints.end());
-    if (std::vector<int>(emitted.joints.begin(), emitted.joints.end()) !=
+    if (!rigid && std::vector<int>(emitted.joints.begin(), emitted.joints.end()) !=
         avatar_joints)
       fail("avatar parts do not share one actual emitted rig/pose/transform");
     if (!o.appearance)
       fail("generated parts need an explicit VRM material/source policy; "
            "export them separately as glTF");
     const auto &a = *o.appearance;
-    if (a.source_joint_nodes.size() != emitted.joints.size() ||
-        a.source_joint_nodes.empty() || a.source_joint_nodes.size() > 256)
+    if (!rigid && (a.source_joint_nodes.size() != emitted.joints.size() ||
+        a.source_joint_nodes.empty() || a.source_joint_nodes.size() > 256))
       fail("missing exact source joint map; reopen/recreate source instead of "
            "inferring names");
+    if (!rigid) {
     std::set<uint32_t> unique;
     const auto &s = *o.deformation->skeleton;
     // Imported space_matrix is inverse(mesh world), while VRM metadata
@@ -864,6 +868,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
         fail("source joint has multiple emitted identities");
       mapped_node = int(emitted.joints[joint]);
     }
+    }
     if (a.source_mesh < 0 || size_t(a.source_mesh) >= asset.meshes.size() ||
         a.source_primitive < 0 || a.source_node < 0 ||
         size_t(a.source_node) >= asset.nodes.size() ||
@@ -891,7 +896,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     target_map.assign(primitive->morph_targets.size(), -1);
     if(o.material_bindings && o.material_bindings->normal_frames) {
       const auto &frames=*o.material_bindings->normal_frames;
-      const size_t count=o.deformation->morphs?o.deformation->morphs->targets.size():0;
+      const size_t count=o.deformation && o.deformation->morphs?o.deformation->morphs->targets.size():0;
       if(frames.current_targets.size()!=count)fail("current native target/frame identity map is stale");
       for(size_t target=0;target<count;++target) {
         auto id=frames.current_targets[target];auto item=std::find_if(frames.targets.begin(),frames.targets.end(),[&](const auto &t){return t.id==id;});
@@ -903,7 +908,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       }
     } else {
     if (primitive->morph_targets.size() !=
-        (o.deformation->morphs ? o.deformation->morphs->targets.size() : 0))
+        (o.deformation && o.deformation->morphs ? o.deformation->morphs->targets.size() : 0))
       fail("source morph count changed; expression remapping requires explicit "
            "identities");
     if (a.source_morph_targets.size() != primitive->morph_targets.size())
@@ -1021,7 +1026,25 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     j["meshes"][emitted.mesh]["primitives"][0]["material"]=material;
     check_budget();
   }
-  if (primitives.size() != asset.primitives.size())
+  if (source_graph) {
+    size_t expected = 0;
+    for (size_t node = 0; node < asset.nodes.size(); ++node) {
+      stop(options);
+      const auto mesh = asset.nodes[node].mesh;
+      if (mesh < 0) continue;
+      for (auto primitive : asset.meshes.at(size_t(mesh)).primitives) {
+        stop(options);
+        const auto &p = asset.primitives.at(primitive);
+        // The original graph may contain many unused/instanced nodes. Refuse
+        // at the first missing witness, without allocating an expanded set.
+        if (++expected > primitives.size() ||
+            !primitives.contains({int(node),p.source_mesh,p.source_primitive}))
+          fail("source avatar is incomplete; missing original mesh instances cannot be silently dropped");
+      }
+    }
+    if (expected != primitives.size())
+      fail("source avatar is incomplete; original mesh instance identity changed");
+  } else if (primitives.size() != asset.primitives.size())
     fail("source avatar is incomplete; missing source primitives cannot be "
          "silently dropped");
   // Material-value expressions may legally refer to an unused source material.
