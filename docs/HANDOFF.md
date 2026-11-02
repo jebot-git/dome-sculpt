@@ -1,8 +1,23 @@
 # Controller selection on the viable authoring candidate
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
-remains incomplete and is **active again at the user's request (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
+remains incomplete and is **paused at the user's request (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
+
+## Current pause and interface acceptance — 2026-11-02
+
+The latest user instruction is “End test, mark as acceptable user interface.”
+The accepted controller-selection interface remains the physical headset baseline
+recorded in validation/XR-SELECTION-HEADSET.json. That test is already terminal;
+process inspection confirmed no Dome Sculpt headset application is running.
+The saved20-object session and accepted binary remain preserved. Interface
+acceptance does not establish completion of the broader production objective.
+
+Keep the goal paused. No new implementation, qualification runs, headset launches
+or installations should start until the user resumes it. Prior resumed-work and
+integration sections below are historical checkpoints, not current authorization
+to continue. Preserve all public commits, isolated worktrees, uncommitted work and
+completed or interrupted proof logs for resumption.
 
 ## Resumed production work — 2026-11-02
 
