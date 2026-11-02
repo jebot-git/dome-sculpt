@@ -44,6 +44,14 @@ void CornerPaintSamplingReceipt::validate() const {
     throw std::invalid_argument("Invalid exact retained corner-field receipt");
   for(float e:maximum_corner_error)if(e!=0)throw std::invalid_argument("Retained writable grid cannot authorize changed corner RGBA");
 }
+nlohmann::json CornerPaintSamplingReceipt::encode() const {
+  validate();return {{"version",version},{"resolution",resolution},{"triangles",triangles},{"tested_corners",tested_corners},{"maximum_corner_error",maximum_corner_error}};
+}
+CornerPaintSamplingReceipt CornerPaintSamplingReceipt::decode(const nlohmann::json &j){
+  auto count=[](const auto &v,uint64_t max){if((!v.is_number_unsigned()&&(!v.is_number_integer()||v.template get<int64_t>()<0))||v.template get<uint64_t>()>max)throw std::invalid_argument("Retained corner receipt integer exceeds range");return v.template get<uint64_t>();};
+  if(!j.is_object()||j.size()!=5||count(j.at("version"),1)!=1)throw std::invalid_argument("Unsupported retained corner paint receipt");
+  CornerPaintSamplingReceipt r;r.resolution=uint32_t(count(j.at("resolution"),2048));r.triangles=count(j.at("triangles"),2'000'000);r.tested_corners=count(j.at("tested_corners"),6'000'000);r.maximum_corner_error=j.at("maximum_corner_error").get<std::array<float,4>>();r.validate();return r;
+}
 bool SourceColorPaintSampling::matches_current(const PaintedMesh &paint) const noexcept {
   return attachment_&&paint.valid_paint_sampling_attachment()&&attachment_->matches(paint.mesh_owner(),paint.paint_sampling_domain());
 }
@@ -82,7 +90,8 @@ struct ColorPaintSamplingAccess {
  static RetainedCornerPaint retain(std::shared_ptr<const PaintedMesh> before,
     std::shared_ptr<const SourceMaterialBindings> material,std::shared_ptr<const DeformationState> deformation,
     std::shared_ptr<const PolygonColorSurface> descriptor,const Mesh &target,
-    std::span<const uint32_t> remap,const PaintSamplingLimits &limits){
+    std::span<const uint32_t> remap,const PaintSamplingLimits &limits,
+    std::shared_ptr<const PaintSamplingDomain> pooled={}){
   stop(limits.cancelled);
   if(!before||before->in_stroke()||!material||!material->color_preparation||!descriptor||
      material->has_mtoon||material->color_preparation->receipt.source_field!=SourceColorField::PolygonCorners||
@@ -95,6 +104,17 @@ struct ColorPaintSamplingAccess {
   // Capture/validate geometry limits before allocating the layout/field scratch.
   std::vector<uint32_t> corners(target.indices.size());std::iota(corners.begin(),corners.end(),0u);
   auto domain=retain_paint_sampling(before->mesh(),before->paint_sampling_domain(),target,corners,limits);
+  if(pooled){
+    pooled->validate_current(target,limits);
+    const auto &a=*domain->basis(),&b=*pooled->basis();
+    if(a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.indices!=b.indices||a.uv!=b.uv||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams||
+       domain->source_corners().size()!=pooled->source_corners().size()||!std::equal(domain->source_corners().begin(),domain->source_corners().end(),pooled->source_corners().begin()))
+      throw std::invalid_argument("Pooled paint sampling domain differs from its exact owning source replay");
+    for(size_t v=0;v<a.positions.size();++v){if((v&1023)==0)stop(limits.cancelled);if(!same(a.positions[v],b.positions[v])||!same(a.normals[v],b.normals[v]))throw std::invalid_argument("Pooled paint basis borrowed different REST geometry");}
+    if(const auto previous=before->paint_sampling_domain();previous&&(pooled->basis()!=previous->basis()||pooled->basis().owner_before(previous->basis())||previous->basis().owner_before(pooled->basis())))
+      throw std::invalid_argument("Repeated pooled paint domain lost its exact original basis owner");
+    domain=std::move(pooled);
+  }
   material->validate();detail::source_paint_pairing(before.get(),material.get(),nullptr,true);
   auto layout=std::make_shared<SourceColorUvLayout>();layout->source_vertices.assign(remap.begin(),remap.end());
   layout->indices=target.indices;layout->uv=target.uv;layout->pins=target.uv_pins;layout->seams=target.uv_seams;
@@ -119,5 +139,11 @@ RetainedCornerPaint retain_source_corner_paint(std::shared_ptr<const PaintedMesh
     std::shared_ptr<const PolygonColorSurface> descriptor,const Mesh &target,
     std::span<const uint32_t> remap,const PaintSamplingLimits &limits){
  return ColorPaintSamplingAccess::retain(std::move(before),std::move(material),std::move(deformation),std::move(descriptor),target,remap,limits);
+}
+RetainedCornerPaint retain_source_corner_paint(std::shared_ptr<const PaintedMesh> before,
+    std::shared_ptr<const SourceMaterialBindings> material,std::shared_ptr<const DeformationState> deformation,
+    std::shared_ptr<const PolygonColorSurface> descriptor,const Mesh &target,
+    std::span<const uint32_t> remap,std::shared_ptr<const PaintSamplingDomain> pooled,const PaintSamplingLimits &limits){
+ return ColorPaintSamplingAccess::retain(std::move(before),std::move(material),std::move(deformation),std::move(descriptor),target,remap,limits,std::move(pooled));
 }
 } // namespace dome

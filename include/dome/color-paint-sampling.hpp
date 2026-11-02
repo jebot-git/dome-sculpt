@@ -8,11 +8,14 @@ struct CornerPaintSamplingReceipt {
   uint64_t triangles=0,tested_corners=0;
   std::array<float,4> maximum_corner_error{};
   void validate() const;
+  nlohmann::json encode() const;
+  static CornerPaintSamplingReceipt decode(const nlohmann::json &);
 };
 // An independently authenticated current CORNER field attached to the one
 // retained writable grid. It never grants normal/role/source authority.
 class SourceColorPaintSampling {
 public:
+  const std::shared_ptr<const PaintSamplingAttachment> &geometry_attachment() const noexcept{return attachment_;}
   const CornerPaintSamplingReceipt &receipt() const noexcept{return receipt_;}
   const std::shared_ptr<const PaintSamplingDomain> &domain() const noexcept{return domain_;}
   const std::shared_ptr<const SourceColorUvLayout> &layout() const noexcept{return layout_;}
@@ -49,4 +52,11 @@ RetainedCornerPaint retain_source_corner_paint(
     std::shared_ptr<const PaintedMesh>,std::shared_ptr<const SourceMaterialBindings>,
     std::shared_ptr<const DeformationState>,std::shared_ptr<const PolygonColorSurface>,
     const Mesh &,std::span<const uint32_t>,const PaintSamplingLimits & = {});
+// Owning decoder replay supplies the shared structural pool domain; exact
+// source/basis/corner proof still runs before that owner may be attached.
+RetainedCornerPaint retain_source_corner_paint(
+    std::shared_ptr<const PaintedMesh>,std::shared_ptr<const SourceMaterialBindings>,
+    std::shared_ptr<const DeformationState>,std::shared_ptr<const PolygonColorSurface>,
+    const Mesh &,std::span<const uint32_t>,std::shared_ptr<const PaintSamplingDomain>,
+    const PaintSamplingLimits & = {});
 } // namespace dome

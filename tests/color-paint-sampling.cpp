@@ -9,6 +9,8 @@
 #include "normal-sampling-access.hpp"
 #include "source-paint-pairing.hpp"
 #include "dome/normal-sampling.hpp"
+#include "dome/creator-archive.hpp"
+#include "polygon-color-archive.hpp"
 #include <type_traits>
 static_assert(!std::is_default_constructible_v<SourceColorPaintSampling>);
 namespace {
@@ -43,6 +45,35 @@ int main()try{
  auto before_rebind=decoded->composite(Material{});auto rebound=rebind_paint_sampling_geometry(*decoded,result.paint->paint_sampling_attachment());
  check(result.sampling->matches_current(*rebound)&&rebound->composite(Material{})==before_rebind&&rebound->baked()==decoded->baked()&&rebound->layers().size()==decoded->layers().size(),"Worker rebind proves complete REST/domain then shares canonical immutable map while preserving decoded paint/cache owners");
  detail::source_paint_pairing(rebound.get(),binding.get(),nullptr,true);check(true,"Rebound current colour and normal independently authenticate against their own full before-state");
+ SourceMaterialArchive legacy_materials;legacy_materials.add(object.material_bindings);PaintImageArchive legacy_images_a,legacy_images_b;CreatorAssetArchive legacy_models_a,legacy_models_b;detail::PolygonColorArchive legacy_colours_a,legacy_colours_b;NormalSamplingArchive legacy_normals_a,legacy_normals_b;PaintSamplingArchive unused_paint;
+ auto legacy_a=legacy_materials.encode(legacy_images_a,legacy_models_a,&legacy_colours_a,&legacy_normals_a);auto legacy_b=legacy_materials.encode(legacy_images_b,legacy_models_b,&legacy_colours_b,&legacy_normals_b,&unused_paint);
+ check(legacy_a==legacy_b&&unused_paint.size()==0,"Unused Paint context leaves existing material/normal/colour archive bytes unchanged");
+ PaintImageArchive material_images;CreatorAssetArchive models;detail::PolygonColorArchive colour_fields;NormalSamplingArchive material_normals;PaintSamplingArchive material_paint;
+ SourceMaterialArchive materials;auto material_id=materials.add(binding);auto material_data=materials.encode(material_images,models,&colour_fields,&material_normals,&material_paint);auto current_data=joint->encode(&material_images,&material_normals,&material_paint);
+ check(material_data.at("version")==9,"Actual retained normal+current-corner material writes its required distinct material9");
+ auto normal_data=material_normals.encode(material_images);auto colour_data=colour_fields.encode();auto paint_data=material_paint.encode();
+ auto read_images=PaintImageArchive::decode(material_images.encode());auto read_models=CreatorAssetArchive::decode(models.encode(),read_images);auto read_colours=detail::PolygonColorArchive::decode(colour_data.at("color_bases"),colour_data.at("color_fields"));auto read_normals=NormalSamplingArchive::decode(normal_data,read_images);auto read_paint=PaintSamplingArchive::decode(paint_data);
+ check(refuses([&]{SourceMaterialArchive::decode(material_data,read_images,read_models,&read_colours,&read_normals);}),"Old owning material overload cannot silently parse material9 without its real Paint pool");
+ auto read_materials=SourceMaterialArchive::decode(material_data,read_images,read_models,&read_colours,&read_normals,&read_paint);auto read_binding=read_materials.at(material_id);auto read_current=PaintedMesh::decode(current_data,&read_images,false,&read_normals,&read_paint);
+ auto reattached=rebind_paint_sampling_geometry(*read_current,read_binding->color_preparation->paint_sampling->geometry_attachment());read_binding->validate();detail::source_paint_pairing(reattached.get(),read_binding.get(),nullptr,true);
+ check(read_binding->normal_preparation->sampling_domain->metadata_sampling_domain==reattached->paint_sampling_domain()&&read_binding->color_preparation->paint_sampling->domain()==reattached->paint_sampling_domain(),"Material9 restart composes independent normal/colour proof with one exact shared geometry-domain owner");
+ check(read_binding->color_preparation->paint_sampling->before_paint()==read_binding->normal_preparation->sampling_domain->before_paint&&read_binding->color_preparation->paint_sampling->before_material()==read_binding->normal_preparation->sampling_domain->before_material,"Material9 preserves actual shared beforePaint/binding aliases across independent recipes");
+ read_normals.require_reachable();read_paint.require_reachable();std::set<const PolygonColorField*> used_fields;
+ for(const auto &b:read_materials.bindings())if(b->color_preparation){const auto &c=*b->color_preparation;if(c.polygon_colors)used_fields.insert(c.polygon_colors->field.get());if(c.uv_reprojection)used_fields.insert(c.uv_reprojection->polygon_colors->field.get());if(c.paint_sampling){used_fields.insert(c.paint_sampling->current_descriptor()->field.get());used_fields.insert(c.paint_sampling->sampling_descriptor()->field.get());}}
+ bool all_fields=true;for(const auto &f:read_colours.fields())all_fields&=used_fields.contains(f.get());check(all_fields,"All actual field/normal/paint-domain records remain reachable through the paired owning graph");
+ auto forged_material=material_data;forged_material["version"]=8;check(refuses([&]{SourceMaterialArchive::decode(forged_material,read_images,read_models,&read_colours,&read_normals,&read_paint);}),"Older material version cannot borrow retained writable paint metadata");
+ for(unsigned mode=0;mode<6;++mode){auto bad=material_data;auto &records=bad["color_preparations"];size_t at=0;while(!records[at].contains("paint_sampling"))++at;auto &node=records[at]["paint_sampling"];
+   if(mode==0)node["before_binding"]=material_id;
+   if(mode==1)node["domain"]=UINT64_MAX;
+   if(mode==2)node["receipt"]["tested_corners"]=1;
+   if(mode==3)node["layout"]["source_vertices"].get_binary()[0]=255;
+   if(mode==4)records[at]["projection"]["error_bound"][0]=.5;
+   if(mode==5)node["polygon_colors"]["topology"]["vertices"][0][1]=.25;
+   check(refuses([&]{SourceMaterialArchive::decode(bad,read_images,read_models,&read_colours,&read_normals,&read_paint);}),"Malformed before/source/domain/receipt/geometry/current-projection records cannot borrow the owning Paint24 material graph");
+ }
+ auto orphan_data=paint_data;orphan_data["domains"].push_back(orphan_data["domains"][0]);auto orphan_paint=PaintSamplingArchive::decode(orphan_data);auto orphan_materials=SourceMaterialArchive::decode(material_data,read_images,read_models,&read_colours,&read_normals,&orphan_paint);auto orphan_current=PaintedMesh::decode(current_data,&read_images,false,&read_normals,&orphan_paint);
+ check(refuses([&]{orphan_paint.require_reachable();}),"Material9 and actual current Paint cannot authorize an unused equal-valued geometry domain");
+ auto too_many=material_data;while(too_many["color_preparations"].size()<257)too_many["color_preparations"].push_back(too_many["color_preparations"][0]);check(refuses([&]{SourceMaterialArchive::decode(too_many,read_images,read_models,&read_colours,&read_normals,&read_paint);}),"Material9 preparation quota rejects bulk source reconstruction beyond bounded node count");
  auto wrong_normal=*normal;wrong_normal.metadata_sampling_domain.reset();check(refuses([&]{wrong_normal.validate();}),"Normal receipt2 cannot silently omit its own metadata basis");
  auto wrong_detail=std::make_shared<NormalDetailAuthority>(*normal->projection->sampling_domain->detail);wrong_detail->coverage[0]^=1;auto wrong_normal_domain=std::make_shared<NormalSamplingDomain>(*normal->projection->sampling_domain);wrong_normal_domain->detail=wrong_detail;auto wrong_projection=std::make_shared<PaintNormalProjection>(*normal->projection);wrong_projection->sampling_domain=wrong_normal_domain;wrong_normal=*normal;wrong_normal.projection=wrong_projection;
  check(refuses([&]{wrong_normal.validate();}),"Normal metadata cannot borrow old capture planes or unrelated colour coverage in place of actual authenticated before-paint bytes");
