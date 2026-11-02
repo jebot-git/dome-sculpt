@@ -16,7 +16,8 @@ new physical test is authorized by this specification alone.
 
 ## Private native existing-rig checkpoint — Scene25, 2026-11-02
 
-The child of c18a010 in artifacts/rig-rest-scene25-c18a010 adds actual shared
+Product checkpoint b665a14723e2 (child of c18a010) in
+artifacts/rig-rest-scene25-c18a010 adds actual shared
 FLTK/XR original-bone head/parent/length controls, native/grouped rest/reparent
 and per-part current-pose/bind transport, immutable first rig_source Restore,
 conditional Deformation2 exact pose-local matrices and polygon source archive6.
