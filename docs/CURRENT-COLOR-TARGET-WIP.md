@@ -1,51 +1,58 @@
-# Current-corner target preparation — private foundation
+# Current-corner target Bake — private qualification in progress
 
-This branch starts from committed `3042a86`, including the combined Scene19
-normal UV authority and controller rebind fix. It adds a geometry-only immutable
-`PolygonColorSurface` descriptor to color preparation. Receipt version2 uses the
-explicit `PolygonCorners` kind; Identity and original-accessor versions retain
-their old meaning. Material archive6 and polygon archive5 share one bounded
-corner-field pool under Scene20, so an active authority and its projection regain
-the same field/basis owners after decoding. Retained source roots, affine
-capsules and normal-UV before-state recursion remain separate and intact.
+This isolated branch starts from committed `3042a86`, retaining Scene19 normal UV
+authority and the controller rebind fix. It now implements actual current-corner
+RGBA target preparation and Bake through the existing native worker and dialog.
+It is still private and not a completed qualification or full-production claim.
 
-A fresh coherent regular-user Release core compiles. Fifteen native checks pass
-for real preparation/analytic quality, exact input retention, same UV/editable
-layers, exact restart, shared owner identity, old-version/unreferenced-field
-refusal, cheap replacement-owner refusal, wrong REST/UV rejection and actual
-cancellation. These checks are a foundation proof only. No sanitizer, graphics,
-FLTK/controller or full regression qualification is claimed at this checkpoint.
+The geometry-only immutable `PolygonColorSurface` descriptor records exact
+ordered REST topology and current corner field. Receipt2 uses `PolygonCorners`;
+Identity and original-accessor meanings stay unchanged. Scene20 material6 and
+polygon5 share one bounded field/basis archive pool, preserving exact owners on
+restart. Source roots, affine capsules and normal-UV before-state recursion remain
+intact. New records cannot be silently admitted by earlier versions. Field,
+geometry, paint and material reachability/quotas are checked before SurfaceMaps.
 
-The current-field target Bake guard is deliberately still present. Next work
-connects the same-mesh strict conversion and guarded native worker, validates the
-actual rendering/picking/export route, preserves one Undo/Cancel/Save and adds
-persistent-failure/adversarial tests. UV/topology/artist-frame transfer remains
-refused until its own real current-field remap is implemented. No fake creator
-appearance or retained-Origin inference is used as current color authority.
+The source field/basis, prior PA Origin and shape capsules survive one native
+Undo/Redo, Save/reopen, repeat Bake and Restore. Forty-eight native checks cover
+those operations plus empty-authority/retained-only feature restoration, wrong
+owner/UV/history, orphan records and material quota. Seventeen more actual worker
+and controller checks cover mid-preparation Cancel, stale generation, accepted
+focus loss, shutdown predicate, other-hand painting while physically held, release
+placement, Save/reopen and export. No fake creator identity, borrowed Origin or
+relabelled Identity field substitutes for current corner authority.
 
-## Subsequent actual workflow checkpoint
+Final actual FLTK9, compact9 and real-loader OpenXR11 checks pass. A separate
+compact harness correction reaches the actual scroll end and retains all nine
+checks plus a tenth end-position acknowledgement; no native UI change was needed.
+The independent software and actual Intel Arc A770 consumers each pass357 checks
+over32 alpha/seam/prior-paint/skin/morph cases.
+Actual256-resolution native imports show original-to-prepared image maxerror1;
+prepared and baked GLB comparisons are exact. Default64 has independent
+barycentric/bilinear probes against its declared linear projection bound and exact
+native/export pixels. A strict .001 bound on64 refuses. A universal two-encoded-
+level approximation claim for64 is false (the provisional image oracle measured8)
+and is not made here.
 
-The private implementation now connects the strict same-mesh bridge and actual
-native Bake worker. Source field/basis, PA Origin and shape capsules survive one
-Undo/Redo, Save/reopen, repeat Bake and native Restore. Forty-eight native checks
-pass, including empty authority/retained-only Scene20 feature restoration,
-malformed owner/UV/history, orphan records and material-node quota. Shared material
-reachability is preflighted before constructing paint SurfaceMaps.
+The independently qualified direct Bake admission fix `80e21a6` is incorporated
+as `c9cff1c`; its private metadata staging has no second fallible publication.
+Fresh coherent final functional Release11/11 passes in46.17s. All44 measured
+persistent-failure Release shards pass in632.90s:4290 packed-field boundaries,
+9488 precommit boundaries,20669 full Scene20 encoding boundaries and17151 full
+Scene20 decoding boundaries, for51598 actual persistent denials. Every denied
+boundary checks exact immutable source/paint/field/capsule owners and a real full
+operation retry; no cached preparation replaces the actual helper.
 
-Actual FLTK9, compact9 and synthetic OpenXR11 checks pass on interim workflow
-binaries. The independent software consumer passes357 checks over32 combinations
-of alpha mode, seams, prior paint and skin/morph pose: actual256-resolution native
-imports have original-to-prepared image maxerror1; both prepared and baked GLB
-matrices are exact. Default64 is independently sampled against its declared
-linear projection bound and its exported/native pixels match exactly. A strict
-.001 bound on the default64 input refuses rather than silently accepting lower
-quality. A universal two-encoded-level approximation claim for64 is false (the
-initial provisional image oracle measured8), and is not made here.
+Fresh own-core/C/C++ support/render ASan/UBSan/leak functional11/11 passes in508.43s,
+including both independent graphical consumers. External system dependencies are
+not claimed instrumented. The separate extended sanitizer44-shard allocation
+sweep remains live and unchanged. Its completion is a remaining qualification
+gate; the completed Release denial sweep is not represented as sanitizer proof.
+No full OneAPI/all-native suite claim is made for this private target branch.
 
-These are still separate incremental proof scopes, not final qualification. No
-fresh target sanitizer/OOM or hardware batch has completed yet. The inherited
-Bake caller has a post-acceptance fallible publication gap; it is being fixed and
-qualified in a separate public04-based branch before integration back here.
 Current-field UV/topology/prepared-normal/artist/UV1 transfers remain explicitly
-guarded. The target shader consumes the prepared field once; no fake creator
-appearance or borrowed original accessor is introduced.
+guarded until real remap/frame adapters exist. Empty-authority deletion/restoration
+is supported by retaining its complete latest source. Pending generic Bake Save
+remains explicitly refused; Save after completed acceptance is tested. The full
+Dome Sculpt goal remains active; this branch does not install software, launch a
+physical headset or restart a session.
