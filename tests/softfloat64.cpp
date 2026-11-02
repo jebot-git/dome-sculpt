@@ -77,13 +77,14 @@ size_t host() {
 void device(bool arc) {
   constexpr size_t count = 250000;
   uint64_t state = UINT64_C(0xDADBDEF123456789);
-  std::vector<uint64_t> input(count * 2), expected(count * 4), output(count * 4);
+  std::vector<uint64_t> input(count * 2), expected(count * 5), output(count * 5);
   for (auto &value : input) do { value = random_word(state); }
     while (!std::isfinite(std::bit_cast<double>(value)));
   const auto cpu_begin = std::chrono::steady_clock::now();
   for (size_t i = 0; i < count; ++i) {
     const auto row = reference(input[i * 2], input[i * 2 + 1]);
-    std::copy(row.begin(), row.end(), expected.begin() + i * 4);
+    std::copy(row.begin(), row.end(), expected.begin() + i * 5);
+    expected[i * 5 + 4] = std::bit_cast<uint64_t>(double(std::bit_cast<int32_t>(uint32_t(input[i * 2]))));
   }
   std::cout << "NATIVE_CPU_ARITHMETIC_MS " << std::chrono::duration<double, std::milli>(
       std::chrono::steady_clock::now() - cpu_begin).count() << '\n';
@@ -112,10 +113,11 @@ void device(bool arc) {
     queue.parallel_for(sycl::range<1>{count}, [=](sycl::id<1> id) {
       const auto i = size_t(id);
       const float64_t a{in[i * 2]}, b{in[i * 2 + 1]};
-      out[i * 4] = f64_add(a, b).v;
-      out[i * 4 + 1] = f64_sub(a, b).v;
-      out[i * 4 + 2] = f64_mul(a, b).v;
-      out[i * 4 + 3] = f64_div(a, b).v;
+      out[i * 5] = f64_add(a, b).v;
+      out[i * 5 + 1] = f64_sub(a, b).v;
+      out[i * 5 + 2] = f64_mul(a, b).v;
+      out[i * 5 + 3] = f64_div(a, b).v;
+      out[i * 5 + 4] = i32_to_f64(int32_t(uint32_t(in[i * 2]))).v;
     });
     queue.memcpy(output.data(), out, output.size() * sizeof(uint64_t));
     queue.wait_and_throw();
@@ -123,7 +125,7 @@ void device(bool arc) {
               << std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - begin).count() << '\n';
     compare(output, expected, size_t(iteration));
   }
-  std::cout << "PASS 1000000 exact encoded results per iteration across four GPU transactions\n";
+  std::cout << "PASS 1250000 exact encoded arithmetic/integer results per iteration across four GPU transactions\n";
 }
 #endif
 }
