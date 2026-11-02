@@ -1312,6 +1312,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
   input_.polygon_editing=bool(state_.polygon);
   if(state_.polygon||(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active))input_.edit_allowed=false;
   input_.sculpt_mask_edit = !scene_.active().mesh_active && volume().sculpt_settings().mask_edit;
+  if(state_.selection_mode)input_.edit_allowed=false;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
     const auto &h = f.hands[i];
@@ -1326,7 +1327,10 @@ void Document::process_locked(const SpatialFrame &incoming) {
         vec(ob::rotate(ob::conjugate(object_canvas.orientation),
                        ob::rotate(h.tracked.grip.orientation, {0, 0, 1})));
     s.pressure = std::clamp(h.tracked.trigger, 0.f, 1.f);
-    if(state_.selection_mode)s.pressure=0;
+    const bool owned_control=control_before_&&!state_.asset_busy&&!uv_accept_pending_&&
+      control_object_==scene_.active().id&&control_source_.generation==state_.generation&&
+      control_source_.edit_authority==state_.edit_authority&&input_.owns_control(state_.controls.parameter);
+    if(state_.selection_mode&&!owned_control)s.pressure=0;
     s.trigger = s.pressure > .02f;
     s.joystick_press = h.joystick;
     s.stick_x = h.x;
