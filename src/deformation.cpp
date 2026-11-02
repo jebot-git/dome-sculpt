@@ -121,6 +121,8 @@ DeformationState DeformationState::decode(const nlohmann::json &j,
   if (!pose.is_array() || pose.size() > 256 || !values.is_array() ||
       values.size() > 128)
     fail("Deformation preview resource limits exceeded");
+  for(const auto &value:pose)if(value.is_object()&&value.contains("full_local_matrix"))
+    fail("Exact pose-local matrices require the Source25 deformation adapter");
   // Aggregate dimensions before allocating authoring arrays.
   size_t entries = pose.size() + values.size();
   const auto &skin = j.at("skin"), &morphs = j.at("morphs");

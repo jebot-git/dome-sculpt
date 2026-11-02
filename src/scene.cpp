@@ -570,6 +570,15 @@ Scene Scene::decode(const nlohmann::json &j) {
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
+  auto unsupported_rig_source=[](const nlohmann::json &record){
+    if(record.contains("rig_source")&&!record.at("rig_source").is_null())
+      throw std::invalid_argument("Source25 rig capsules require the actual source-rest adapter");
+  };
+  for(const auto &record:objects)unsupported_rig_source(record);
+  if(j.contains("polygon_sources")){
+    const auto &origins=j.at("polygon_sources").at("origins");
+    if(origins.is_array())for(const auto &record:origins)unsupported_rig_source(record);
+  }
   // Admit newly meaningful implicit-default identity before decoding any
   // retained appearance/remap, including dormant and before-state owners.
   auto appearance_feature=[&](const nlohmann::json &a){if(detail::minimum_appearance_scene_version(a)>version)throw std::invalid_argument("Implicit default material authority requires Scene17");};
