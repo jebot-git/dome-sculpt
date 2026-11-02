@@ -1,0 +1,97 @@
+{
+  "scope": "Test-only actual bundled CC0 female/male prepared-normal shapekey qualification; product byte-unchanged from d4f040e/qualified355",
+  "base": "355b382cc5447c2883ada7c8cead67e649e61947",
+  "product": "d4f040eff2b12a15192249381ec595a98417091a",
+  "qualified_product_checkpoint": "355b382cc5447c2883ada7c8cead67e649e61947",
+  "source_sha256": {
+    "CMakeLists.txt": "103fdf6cd4095b222b1cb2f5ceff011dc7af1c86c6406326ca945b277c5a57ca",
+    "tests/prepared-normal-consumer.hpp": "1138ea8e6c9dbaff9a207fdd16be38c6de9669692736d8ee5daabf2d57a0d9fa",
+    "tests/prepared-normal-vroid.cpp": "966adb1c9d1f528257ac100dd35318213fa7b1c78bfa2ccb43862a8373ccc471",
+    "tests/prepared-normal-vroid-render.cpp": "43ca11033633645f085191f1d17b258e71432e7d824e3000d4f455682808966c"
+  },
+  "checks": {
+    "actual_baselines": [
+      "vroid-beta-female",
+      "vroid-beta-male"
+    ],
+    "parts_per_avatar": 19,
+    "prepared_part": "Face_00_SKIN",
+    "female_faces": 1064,
+    "male_faces": 1072,
+    "female_existing_artist_targets": 56,
+    "male_existing_artist_targets": 54,
+    "Release_software_assertions": 73,
+    "A770_assertions": 73,
+    "whole_source_instrumented_archive_overlay_ASan_UBSan_leaks_assertions": 73,
+    "default_camera_helper_ASan_UBSan_leaks_assertions": 51,
+    "poses": 3,
+    "weights": [
+      0,
+      0.35,
+      1
+    ],
+    "actual_VRM_outputs": 18,
+    "pixel_max_byte_error_all_software_and_hardware_cases": 0,
+    "Khronos_errors": 0,
+    "Khronos_warnings": 18,
+    "Khronos_warning_code": "INVALID_EXTENSION_NAME_FORMAT",
+    "official_VRM0_schema_files": 15,
+    "official_VRM0_schema_commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "official_VRM0_errors": 0
+  },
+  "instrumentation": {
+    "C_CXX": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "runtime": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1",
+    "kind": "New test TU and inline independent GLSL consumer instrumented; linked exact frozen355/d4f whole-source core/render/support/vendor instrumented archives; no production object overrides and no public-layout changes",
+    "dependency_file": "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-d4f/artifacts/frozen-proof/prepared-normal-vroid-render-san.d"
+  },
+  "logs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-probe.log": "c28dff0673f2fa295cddf348693582e8ffeb695f4b052bc4bd1c9ccf202b4137",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-render-software.log": "83c8088aa13b12a18dda12a45c54e082b5e0e354faa1fb86fedab33682558b35",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-render-arc.log": "60608d48cac16fee6a77a56d83a4c73caa6267a2013ba1d4d4aac77f7ebd0917",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-render-sanitize.log": "83c8088aa13b12a18dda12a45c54e082b5e0e354faa1fb86fedab33682558b35",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-helper-sanitize.log": "0ff70e3c52ef1ebe22415cf04dae1e1fbe334139e789f14ca8206017a2505db4",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-obsolete-negative.log": "6e768ae7412e858194cbbb687bd87d2ba53ca354a4fdf78678eac7448939ede6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-cmake-configure.log": "b7061ada3fb52532653c1d93f2a9efb5c63a5c4f907247e4a6e266a888aae1c2",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-validator.json": "7cb74544373f685212f113ff7f1e70088bd57d223883ddb36511a43f08d736f8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-vrm-schema.json": "7ec3172caa23203cf3f09dced49139da798ac6205bc1e33e25105c55a125d965"
+  },
+  "binaries": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-d4f/artifacts/frozen-proof/prepared-normal-vroid": "780454af6161560ecf39817b52a5501b068c86bf7b6ff1c5da025014f00352e9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-d4f/artifacts/frozen-proof/prepared-normal-vroid-render": "a68c2d4db67c6bd3e84566503db0cd864d5ddf3fcd812f91e99f5858f0290355",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-d4f/artifacts/frozen-proof/prepared-normal-vroid-render-san": "7f979b19f76f5f9e421bb71543fd6d44401fdddec4de569f479ddacc6390ad8f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-d4f/artifacts/frozen-proof/prepared-normal-helper-regression-san": "880a1530a511f3cd7bcbda8822d7809881a00e03f361d5d564bb331c0dbc368a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-vroid-d4f/artifacts/frozen-proof/prepared-normal-vroid-render-san.d": "19b8f51fbb13080035042e4482250c5f2b52cdd311db53fee0e0c7661182b150"
+  },
+  "archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libdome-sculpt-core.a": "6a34652076b4fa8b8410ad82c8d805d58989ca8dd0506759376e79350a43e6f7",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libdome-sculpt-render.a": "5b924900abb9fd6043a5304bbf583be07f37a8f976c90383b0837eba7bf4e1c5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libdome-sculpt-affine.a": "53fe4116d492375a1ac2b027b1c4bc8bc54cf6c027ffeff03a063934a9e1930c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libdome-sculpt-polygon.a": "868a7aef82fc8b41811f24608e8a313255c9a5441d9b6863d5061f35caea6a85",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libxatlas.a": "5899e06fa5b402b06c1d9d3bcc91f68ba7b8a92642926186f4ad699f47112e1e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libmikktspace.a": "51c813a21a33781a4408dccfc45efd38a52952f8ba0f296532783071c2946cc8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libmikktspace-robust.a": "6e93ae3fb7d88684274b6eb776bf5beac1ebcd16aa708071e2225840ca7f031d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-cpu/libufbx.a": "3fdd7b8f1f9b9084ad232f1ddc39c49b6bda4b3ed4372f5e53a098d30d9e6f97",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libdome-sculpt-core.a": "2d91a70b5067f699b7cf3a28bc99aad0df3b73b5edc89da2d52721511562844c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libdome-sculpt-render.a": "69a20a20d39955836800fb6e642f77d3d3873e0bc3517bfde306112e77034c10",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libdome-sculpt-affine.a": "0268768f75411ec49b3523a8f7564fdea643619e69d7a784cd12d18e9d31c217",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libdome-sculpt-polygon.a": "1a83991740f851c5bb81c23634f041adef4312b5f1821c425b8e3590d94181db",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libxatlas.a": "1e4f47bed50b643d4ff82e251efb7c6dc153a43a3ff0691a468675244ad858f8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libmikktspace.a": "e81b67a44ab5cf91b2ff79c61db4a3e25d61a4bf95164ff81d83db48877f7579",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libmikktspace-robust.a": "fa02259eb71af8a1e9ceba1309f0a0d3f203a2c751bbd89f119c9e1250769f92",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-qual-0b08/build-sanitize/libufbx.a": "963fbe07e161fcec03c1edb6bbfbad109f4e469a724cab6c6050aab9a409c890"
+  },
+  "assets": {
+    "assets/humanoid/vroid/README.md": "d0fadea3799e5edfbec78cbc7487fff1b31993b975a2aa1631bf10eb220a376a",
+    "assets/humanoid/vroid/SOURCES.json": "57a5cb278890abd5d0a6e5b14f5815bc35c736dc4fa22069dc2e2dc59d72b906",
+    "assets/humanoid/vroid/base-female.vrm": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b",
+    "assets/humanoid/vroid/base-male.vrm": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c"
+  },
+  "limitations": [
+    "Fixtures intentionally override current typed lighting/materials to isolate N/T transport; original CC0 source archives/appearance and paint remain retained",
+    "Only real FaceSkin parts are normally prepared/reauthored; nineteen-part rest of each avatar remains genuine source content",
+    "This proves prepared normal model authoring, not UV reprojection, source-as-bake-source normals, arbitrary affine preparation, historical normal conversion, actual COLOR/TEXCOORD morph adoption or physical/loader controller admission",
+    "Actual control/UI proof is qualified355 on native/genuineN-only fixtures; current actual-avatar evidence is native Document/Save/reopen plus independent graphical output",
+    "New named +Z camera test parameter defaults to previous +Zdepth convention; existing51 helper cases requalified with full-source instrumented archives"
+  ]
+}
