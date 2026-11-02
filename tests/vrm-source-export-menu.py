@@ -100,7 +100,7 @@ async def main():
   await wait(lambda:named('Export selected avatar') is None)
   await wait(lambda:target.exists());await ready('Cancel background work',False)
   subprocess.run([helper,'--validate-glb',str(target)],check=True,env={k:v for k,v in env.items() if k!='LD_PRELOAD'})
-  check(inspect()==original and app.poll() is None,'Retry through the actual native chooser produces an independently parsed nineteen-part VRM0 and preserves the project')
+  check(inspect()==original and app.poll() is None,'Retry through the actual native chooser produces an independently parsed complete source VRM0 and preserves the project')
   capture('export-complete.png');report(True);d.close();bus.disconnect()
 try:asyncio.run(main())
 finally:

@@ -30,13 +30,15 @@ int main(int argc, char **argv) try {
     if (cgltf_parse_file(&options, argv[2], &data) != cgltf_result_success)
       return 1;
     std::unique_ptr<cgltf_data, decltype(&cgltf_free)> owned(data, cgltf_free);
+    const auto expected = std::getenv("DOME_VRM_EXPECT_MESHES");
+    const auto meshes = expected ? std::stoul(expected) : 19;
     if (cgltf_load_buffers(&options, data, argv[2]) != cgltf_result_success ||
-        cgltf_validate(data) != cgltf_result_success || data->meshes_count != 19)
+        cgltf_validate(data) != cgltf_result_success || data->meshes_count != meshes)
       return 1;
     auto json = nlohmann::json::parse(data->json, data->json + data->json_size);
     if (!json.at("extensions").contains("VRM"))
       return 1;
-    std::cout << "Valid source-preserving VRM0 nineteen-part output\n";
+    std::cout << "Valid source-preserving VRM0 " << meshes << "-part output\n";
     return 0;
   }
   return 2;

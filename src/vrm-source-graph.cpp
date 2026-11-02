@@ -49,6 +49,7 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
                                 const std::function<bool()> &cancelled) {
   VrmSourceGraph graph;
   std::vector<bool> current;
+  const ObjectSurface *rig_source = nullptr;
   std::map<std::string, uint32_t> baseline_roles;
   std::map<std::string, std::optional<uint32_t>> edits;
   for (const auto &o : objects) {
@@ -56,9 +57,9 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
     require(o.appearance && o.appearance->asset && o.appearance->original_bytes,
             "every source part needs immutable original identity");
     const auto &a = *o.appearance;
-    require(identity(o.transform) && !o.affine_edit,
-            "per-part placement needs an explicit coherent avatar-space "
-            "conversion");
+    if (o.deformation && o.deformation->skin)
+      require(identity(o.transform) && !o.affine_edit,
+              "skinned per-part placement needs an explicit coherent avatar-space conversion");
     std::shared_ptr<const SourceNodePlacement> placement;
     for (const auto &g : o.groups)
       if (g.source_placement)
@@ -104,16 +105,26 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
                   at->source_placement->model == graph.model &&
                   at->source_placement->source_instance == graph.instance,
               "source-node path contains an unrelated placement");
-      require(
-          identity(at->transform) && !at->affine_edit,
-          "edited source-node placement needs coherent rig/metadata transport");
+      if (o.deformation && o.deformation->skin)
+        require(identity(at->transform) && !at->affine_edit,
+                "edited source-node placement needs coherent rig/metadata transport");
       auto n = at->source_placement->source_node;
       require(a.asset->nodes.at(n).parent == previous,
               "source-node ancestry no longer matches the original path");
       previous = int(n);
     }
-    require(o.deformation && o.deformation->skeleton && o.deformation->skin,
-            "source part needs authored native skin authority");
+    const bool skinned = o.deformation && o.deformation->skin;
+    require(skinned == (a.asset->nodes.at(size_t(a.source_node)).skin >= 0),
+            "native/source skin ownership changed");
+    if (!skinned) {
+      require(a.source_joint_nodes.empty() &&
+                  (!o.deformation || (!o.deformation->skeleton && !o.deformation->humanoid)),
+              "rigid source part must not invent skeleton/joint authority");
+      continue;
+    }
+    require(o.deformation->skeleton.has_value(),
+            "source part needs authored native skeleton authority");
+    if (!rig_source) rig_source = &o;
     const auto &d = *o.deformation;
     const auto &s = *d.skeleton;
     require(
@@ -177,7 +188,8 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
       }
     }
   }
-  require(bool(graph.model), "no original source graph");
+  require(bool(graph.model) && rig_source,
+          "original-space VRM needs at least one authenticated humanoid skin");
   auto resolved = baseline_roles;
   for (const auto &[role, value] : edits) {
     if (value)
@@ -186,7 +198,7 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
       resolved.erase(role);
   }
   HumanoidMapping mapping;
-  const auto &first = *objects.front().appearance;
+  const auto &first = *rig_source->appearance;
   for (const auto &[role, source] : resolved) {
     auto at = std::find(first.source_joint_nodes.begin(),
                         first.source_joint_nodes.end(), source);
@@ -195,7 +207,7 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
     mapping.joints.emplace(role,
                            uint32_t(at - first.source_joint_nodes.begin()));
   }
-  mapping.validate(*objects.front().deformation->skeleton, true);
+  mapping.validate(*rig_source->deformation->skeleton, true);
   Json bones = Json::array();
   std::set<std::string> emitted;
   for (const auto &bone : graph.humanoid.at("humanBones")) {
@@ -255,6 +267,10 @@ std::vector<int> emit_vrm_source_graph(
       root = matrix(root, g.source_placement->local(), g.name + " original");
   }
   root = attach(root, {{"name", "Original VRM shared source graph"}});
+  AffineTransform prefix_world;
+  for (const auto &g : graph.prefix)
+    prefix_world = prefix_world * group_local_matrix(g);
+  std::vector<AffineTransform> source_world(asset.nodes.size());
   std::vector<int> nodes(asset.nodes.size(), -1);
   std::vector<uint8_t> state(nodes.size());
   auto visit = [&](auto &&self, size_t source, size_t depth) -> int {
@@ -268,6 +284,10 @@ std::vector<int> emit_vrm_source_graph(
         asset.nodes[source].parent < 0
             ? root
             : self(self, size_t(asset.nodes[source].parent), depth + 1);
+    source_world[source] =
+        (asset.nodes[source].parent < 0 ? prefix_world :
+         source_world.at(size_t(asset.nodes[source].parent))) *
+        AffineTransform(graph.current_local[source]);
     require(gltf_trs_matrix(asset.nodes[source].local),
             "original local node is not a representable glTF TRS matrix");
     if (graph.current_local[source] == asset.nodes[source].local) {
@@ -317,8 +337,20 @@ std::vector<int> emit_vrm_source_graph(
       j["nodes"][old].erase("children");
     if (j["nodes"][old].contains("extras"))
       j["nodes"][old]["extras"].erase("domeSculptHumanoid");
-    j["nodes"][nodes.at(size_t(a.source_node))]["children"].push_back(
-        emitted.node);
+    int target = nodes.at(size_t(a.source_node));
+    if (!objects[i].deformation || !objects[i].deformation->skin) {
+      require(!j["nodes"][emitted.node].contains("skin") && emitted.joints.empty(),
+              "rigid source surface unexpectedly acquired a skin");
+      const auto local = source_world.at(size_t(a.source_node)).inverse() *
+                         objects[i].world_matrix();
+      if (local.matrix() != AffineTransform{}.matrix())
+        target = matrix(target, local, objects[i].name + " native rigid placement");
+      for (const char *key : {"translation","rotation","scale","matrix"})
+        j["nodes"][emitted.node].erase(key);
+      j["nodes"][target]["children"].push_back(emitted.node);
+      continue;
+    }
+    j["nodes"][target]["children"].push_back(emitted.node);
     auto skin = j["nodes"][emitted.node].at("skin").get<size_t>();
     auto &output = j["skins"].at(skin);
     output["joints"] = Json::array();
