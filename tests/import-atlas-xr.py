@@ -39,7 +39,7 @@ try:
    check(len(objects)==2,mode+': actual joystick Import publishes both original instances')
    check(all(obj['painted']['resolution']==64 and 'source_uv1' not in obj['painted'].get('source_maps',{}) for obj in objects),mode+': joystick paint-size controls and atlas toggle reach actual editable UV0 maps')
    retained=after['source_materials']['origins']
-   check(after['version']==18 and sum('source_uv1' in owner['paint'].get('source_maps',{}) for owner in retained)==2,mode+': saved Scene18 retains both exact original UV1 domains')
+   check(after['version']==18 and sum('source_uv1' in after['source_materials']['paints'][owner['paint']].get('source_maps',{}) for owner in retained)==2,mode+': saved Scene18 retains both exact original UV1 domains')
    check(len(after['source_models'])==1,mode+': both instances share one retained immutable original model')
   else:
    check(after==original,mode+': leaving without joystick Import preserves the complete original Scene')
