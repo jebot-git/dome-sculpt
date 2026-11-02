@@ -16,6 +16,17 @@ new physical test is authorized by this specification alone.
 
 ## Private native existing-rig checkpoint — Scene25, 2026-11-02
 
+Subsequent private native source-node checkpoints2f06246 and2192365 retain
+actual multi-skin/rigid original-node fitting and bind-following rigid frames.
+The typed VRM0 continuation now exports its tested fitted/posed/restart subset
+through the actual native worker, with independent per-corner/current-IBM,
+first-person/spring topology, software/A770 image and schema proof. Read
+VRM-REST-AUTHORING.md and validation/VRM-REST-AUTHORING.json. It adds no public
+schema. Arbitrary spring/collider-radius transport, native-length export
+receipts, distinct current poses, fuller role/axis UI, VRM1 and physics remain
+required. These private component proofs are separate from current public main
+and from any future Source24/25/26 semantic union.
+
 Product checkpoint b665a14723e2 (child of c18a010) in
 artifacts/rig-rest-scene25-c18a010 adds actual shared
 FLTK/XR original-bone head/parent/length controls, native/grouped rest/reparent

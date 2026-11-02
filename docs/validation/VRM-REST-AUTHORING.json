@@ -1,0 +1,315 @@
+{
+  "checkpoint": "Private typed VRM0 source REST continuation",
+  "base": "21923650c7e58013db10e04083f1eda62e8cd064",
+  "status": "qualified scoped component; full goal active; not main integration",
+  "source_hashes": {
+    "CMakeLists.txt": "7482042098b986eca3dd7c92cbdf7b7028e50dc1f82c8ae9fe77997274df17fa",
+    "src/vrm.cpp": "d9194a31d8b2bd9969f7c615c9bb97a79a2b6dba9e863122377e1974c007b8a0",
+    "src/vrm-source-graph.cpp": "19503a47908622ed0e54bad48a18aeb7608aa90fd60923c902bb48dee12074f5",
+    "src/vrm-source-graph.hpp": "3ecc32267f9cd23f1208a311915d9f41445438e6e2270bfc565033b57180655e",
+    "src/vrm-rest-metadata.cpp": "857f153f9942b897a9741b25ff769b3997c95c0c42e73a1c9c8e5760f53e07e2",
+    "src/vrm-rest-metadata.hpp": "0e65ccb065e1d1b9d3c5d409bc8cb276d5c513063bb5c71b441b8fdd47291ef8",
+    "tests/vrm-rest-metadata.cpp": "8211ebf04bca6ef7beb261b8c9c1083adb1aa4f3dab7cc51b97acd75c155036f",
+    "tests/vrm-rest-source-export.cpp": "7a64d00dea6ef47c2a79acdcb8862a176ce4a6a82e797d1c713c7a6b37ff86c2",
+    "tests/vrm-rest-source-worker.cpp": "a2e31e03395a899b429bed3e006d3dab65cb4ac645d344042f9b357cf1c32e35",
+    "tests/vrm-rest-source-render.cpp": "1dfcb08811cbf17b5dbcf80ef6494bb958f4a5c34e9a06de027cf08d05ecf824",
+    "tests/vrm-rest-length-guard.cpp": "e261e1d64acc06485caa9a45920ecbac92c88e237cedad3e28fd5d3e6d1fd713"
+  },
+  "public_headers": {
+    "count": 80,
+    "all_byte_identical_to_bbb1792": true,
+    "aggregate_sha256": "ee41adfa0e4c01b142e09edd7805055777da09c91a350a89ad20cd91f16f96fc"
+  },
+  "build_scope": "Changed vrm.cpp and vrm-source-graph.cpp plus new metadata helper and tests rebuilt coherently before immutable matching Source25 core/support. SAN own C/C++ core/support/renderer and replacements instrumented O1/g1 ASan+UBSan with assertions and leak detection. Same-ABI overlay, not fresh whole-branch CMake build/full regression. Five registrations configured separately.",
+  "release_and_sanitize": [
+    {
+      "configuration": "release",
+      "suite": "metadata",
+      "checks": 66,
+      "exit": 0,
+      "seconds": 0.027189442989765666,
+      "receipt": "artifacts/vrm-rest-metadata-release-final/receipt.json",
+      "receipt_sha256": "484a7b612fa637fca2294a740ea88115aa3d90a69aa70ad22c353d83362823f6",
+      "binary_sha256": "a5e1b286f7ca13bfe84a95cd80e7e2c895a94eba2344711129d5402439d6edae",
+      "linkmap_sha256": "d3840ba1c92a11057cabf82cc21275c6e3a1ddd6777e30ae9fce9f1925c37afd",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "release",
+      "suite": "export",
+      "checks": 50,
+      "exit": 0,
+      "seconds": 72.20649977200083,
+      "receipt": "artifacts/vrm-rest-export-release-final/receipt.json",
+      "receipt_sha256": "c026c542472294fd5d35c6cad57219cdf46cb561938a6416e6a0db4c5ee8166f",
+      "binary_sha256": "223957f3f2c3530df634d38846fc5d206ab13c40bc49bef507dd9b7019a8ec4c",
+      "linkmap_sha256": "944caf9f432c306da9f56476f3dbd95bcdf64f494a06e1c32a4b5992ab91b3aa",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "release",
+      "suite": "worker",
+      "checks": 18,
+      "exit": 0,
+      "seconds": 10.227181861002464,
+      "receipt": "artifacts/vrm-rest-worker-release-final/receipt.json",
+      "receipt_sha256": "5b716473263b4c4e44fd060ed890842f5a3781a2d5168ad3b21e89d01fac9886",
+      "binary_sha256": "bd584815d1bdacff93031e4b558285b2a007af04fc57426b57c71a41da6130be",
+      "linkmap_sha256": "6cf83a01f5a2ebdb24039198afd14f87533a69d76777c64992d121ba159a5f35",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "release",
+      "suite": "render",
+      "checks": 50,
+      "exit": 0,
+      "seconds": 55.91085290900082,
+      "receipt": "artifacts/vrm-rest-render-release-final/receipt.json",
+      "receipt_sha256": "82e9854f57e730dc37b8a713699bdda7304623692e6a4f885faf951c1ad14d1c",
+      "binary_sha256": "b970fbce19c16b2df544a9551654aad5b257e3a2974e201da66959d0369c807b",
+      "linkmap_sha256": "cf14288294d6309909dc86ffaffc8b2e81eaf4b32840b5b1f1fc253c7a38ae82",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "release",
+      "suite": "length",
+      "checks": 3,
+      "exit": 0,
+      "seconds": 22.346074517001398,
+      "receipt": "artifacts/vrm-rest-length-release/receipt.json",
+      "receipt_sha256": "4acf99b11b4c3459eb454f6d3006ec0842baa2edef9ea50eb842676ba0ac2ac4",
+      "binary_sha256": "c1f8c4183225f2998641a8527529ffb41914069e36dc9fe40655d2bbd7269a2c",
+      "linkmap_sha256": "e46a765fa6fe3f828f0b33b1ec37a6f3391165d3130c6250ade817cabacc71c0",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "metadata",
+      "checks": 66,
+      "exit": 0,
+      "seconds": 0.05143608899379615,
+      "receipt": "artifacts/vrm-rest-metadata-sanitize-final/receipt.json",
+      "receipt_sha256": "9657f6dc752bb09079882de0e66260f7e64b6a68cc839f080a0d46f64c47860f",
+      "binary_sha256": "209b97de153f336978a51f60e9b9b6ac48ae1bfc34a2d2d7279738c76ff6b12d",
+      "linkmap_sha256": "1e20a4b8696ba2c6e69b56c7a3573163dec6ed9edf3a86081ed084c3ba7c8915",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "export",
+      "checks": 50,
+      "exit": 0,
+      "seconds": 192.70285217299534,
+      "receipt": "artifacts/vrm-rest-export-sanitize-final/receipt.json",
+      "receipt_sha256": "8d1744c3711f48097d24562ed3e06e5245b7edb1ff11690b50131758a973c0c8",
+      "binary_sha256": "e4e4af9e138ed58ce7773fd5f7322e8a66845e481bbe60720d07f90a3a6a0b06",
+      "linkmap_sha256": "54c1f2306098544b2a51e0d37d9ee48e6fce350a9a127621d995013f7f64d1e4",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "worker",
+      "checks": 18,
+      "exit": 0,
+      "seconds": 92.47948504998931,
+      "receipt": "artifacts/vrm-rest-worker-sanitize-final/receipt.json",
+      "receipt_sha256": "40b1b3440747434d32ecc7e33eb8a21da8e0eb8569c27cbb32c475b060f59b82",
+      "binary_sha256": "6eab9c82dc272b3387caeba444d52188531cf598b33cc357b97d9121d13bf5e8",
+      "linkmap_sha256": "c1b428adc440b4373594decdf72063959ab3907e57b5b2a531e498bdc94aff87",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "render",
+      "checks": 50,
+      "exit": 0,
+      "seconds": 272.27539887798775,
+      "receipt": "artifacts/vrm-rest-render-sanitize-final/receipt.json",
+      "receipt_sha256": "86be8cea0f4a05c2853695491c170577c40e9ee4b0a6cb57452d40c39cb05b38",
+      "binary_sha256": "3ef5e52d50f2f3537f73a1b60ca6cebccaf933d4ead08c7f10366ff6d0728bc7",
+      "linkmap_sha256": "7eb69de55e46eaeaf3cd6532161251e4e7059f53e9c0695b6e8ff1b02227c4a6",
+      "old_vrm_translation_units_excluded": true
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "length",
+      "checks": 3,
+      "exit": 0,
+      "seconds": 76.95851287400001,
+      "receipt": "artifacts/vrm-rest-length-sanitize/receipt.json",
+      "receipt_sha256": "ac4fdd56ad1238b8a58de6b6641aec64dcfacafc9928916535cb3c6e1b9df9c9",
+      "binary_sha256": "043119edededc8d987a8e136fed6e151715c3e07c116ae12ed3d720233496d0c",
+      "linkmap_sha256": "44e135d51ed60c374cdc6fb050cede1207b6337ed9f596da3ef962f197089543",
+      "old_vrm_translation_units_excluded": true
+    }
+  ],
+  "device": {
+    "receipt": "artifacts/vrm-rest-render-arc-final/receipt.json",
+    "checks": 50,
+    "images": 12,
+    "maximum_image_error": 0,
+    "tolerance_unchanged": 2,
+    "device": [
+      "GL_VENDOR Intel",
+      "GL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+    ],
+    "environment": {
+      "DRI_PRIME": "pci-0000_03_00_0",
+      "LIBGL_ALWAYS_SOFTWARE": "unset",
+      "LP_NUM_THREADS": "2"
+    },
+    "strict_hardware": true,
+    "source_binary_unchanged": true,
+    "exit": 0,
+    "seconds": 90.73685622100311
+  },
+  "actual_geometry": {
+    "female_ordered_corners_per_output": 44430,
+    "male_ordered_corners_per_output": 45546,
+    "outputs_per_model": 3,
+    "female_max_world_error_metres": 2.74764e-07,
+    "male_max_world_error_metres": 2.89331e-07,
+    "world_error_tolerance_metres": 2e-05,
+    "skins_per_model": 19,
+    "rigid_parts_per_model": 3,
+    "current_IBM_float_bits_exact": true,
+    "profile": "Actual CC0 geometry/textures through existing deterministic MToon material fixtures, not all raw material/lighting cases"
+  },
+  "schemas": {
+    "khronos_version": "2.0.0-dev.3.10",
+    "outputs": 6,
+    "errors": 0,
+    "warnings": 120,
+    "official_VRM0_errors": 0,
+    "first_pass_and_final_output_bytes_identical": true
+  },
+  "negative_controls": {
+    "native_length_old_exporter": {
+      "exit": 1,
+      "receipt": "artifacts/vrm-rest-length-release-old/receipt.json",
+      "failure": "Exact old exporter silently omitted native-only length; current explicit diagnostic preserves project/old output"
+    },
+    "signed_zero_identity_multiplication": {
+      "exit": 1,
+      "expected_negative": true,
+      "receipt": "artifacts/vrm-rest-signed-zero-control/receipt.json",
+      "failure": "Removing only identity fast path changes -0 IBM bits to+0"
+    },
+    "wrong_original_head_IBM": "Independent software/SAN/A770 image oracle fails tolerance2 after replacing current head IBM with original raw IBM"
+  },
+  "limits": [
+    "Shared authenticated current source-node pose only; no first-skin substitution",
+    "Collider correction supports exact translation-only bind authority; wider sphere/capsule radius/linear/shear transport remains required",
+    "Spring topology/rest/helper and custom-limit-axis cases remain guarded pending real reauthoring adapter",
+    "Native-only bone length export/import receipt remains required; native persistence is retained",
+    "Wider rest/reparent/role/axis and distinct-pose policies, generated/unbound rigs, eye/look-at/dynamic physics and VRM1/constraints remain required",
+    "No new FLTK/Wayland/physical headset, allocation sweep or performance claim",
+    "Source24/25/26 semantic union and fresh coherent root builds remain required"
+  ],
+  "immutable_support_archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-core.a": {
+      "sha256": "724347320b43887373d0fd82f8136de5db2f09f055b02c897a957b5582988a0c",
+      "bytes": 21486644
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-affine.a": {
+      "sha256": "f3922c28dcdbfbd36ece04eb468ec69ac33cca256a854cbc99de563a3faa9a74",
+      "bytes": 109806
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-polygon.a": {
+      "sha256": "27e251ca7ee1714a14b3526df459cf50bfd88aeacb82477204aafeee7da899bb",
+      "bytes": 454768
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libxatlas.a": {
+      "sha256": "e6c3da94d7b0c981b024734ea350455a5a6c73deed0114e6e567a94e37fb0067",
+      "bytes": 304734
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libmikktspace.a": {
+      "sha256": "676061ae4db3efb1dcc2e871caaaf4474441d07f2bd4b585824f1d5ab1c92c94",
+      "bytes": 30118
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libmikktspace-robust.a": {
+      "sha256": "79795bc3c388afd6542a15871c2e37489e5e1e506e7eba563e353b8eaf53c924",
+      "bytes": 30512
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libufbx.a": {
+      "sha256": "dd3a1189dc2567e95ca0c9874d6e1576fa4292659c9e9cab6797f27c36f23f4b",
+      "bytes": 705554
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-release/libdome-sculpt-render.a": {
+      "sha256": "41d8af6a36c3513406dfa0d629ad5db94f79d07d299817d5d3a35be3cd075deb",
+      "bytes": 710664
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-core.a": {
+      "sha256": "7980d1ba71ab85f0fcaed7a29c795c271ca277f23af2b3f6ee9c7e173c507108",
+      "bytes": 547021182
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-affine.a": {
+      "sha256": "a5644a3347cd412e20aa7fd4d1a89948c6a99788aadb0d777f96affcdae2f8c2",
+      "bytes": 910984
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-polygon.a": {
+      "sha256": "860aad844dc1b09c671021d61660e2ceb548fc9e17fb4f2990a5c6a7a79a4ef0",
+      "bytes": 14117880
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libxatlas.a": {
+      "sha256": "ea0db6f30b122136307ca4978a4dcd9aa27f8ad565ea827f16a4c59400a507fb",
+      "bytes": 7626076
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libmikktspace.a": {
+      "sha256": "a86fe38a6ed1d093159466ae3889c05d79e47d60359df2d859a6c9e1c365d718",
+      "bytes": 596774
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libmikktspace-robust.a": {
+      "sha256": "a47eefb5b4fa4cec17f8b1100634e85ba279d7bad3d0b6495306715c47012975",
+      "bytes": 597312
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libufbx.a": {
+      "sha256": "c380be470d69d0e06a10b6f45345f121da97620e81d36b2f32b8566456e48fb2",
+      "bytes": 10554356
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/rig-rest-scene25-c18a010/build-rig-rest-sanitize/libdome-sculpt-render.a": {
+      "sha256": "acea0e1fc4df628b9e15e5c4c0e872b58ceeaf18321c4c3d4fc4091546a1dacf",
+      "bytes": 16464948
+    }
+  },
+  "evidence": {
+    "artifacts/vrm-rest-metadata-release-final/receipt.json": "484a7b612fa637fca2294a740ea88115aa3d90a69aa70ad22c353d83362823f6",
+    "artifacts/vrm-rest-metadata-release-final/test.map": "d3840ba1c92a11057cabf82cc21275c6e3a1ddd6777e30ae9fce9f1925c37afd",
+    "artifacts/vrm-rest-metadata-release-final/test.log": "b70982b1a3b6d86890c6f8257f998b4757910d3db72efb0cdf0132664b03181d",
+    "artifacts/vrm-rest-export-release-final/receipt.json": "c026c542472294fd5d35c6cad57219cdf46cb561938a6416e6a0db4c5ee8166f",
+    "artifacts/vrm-rest-export-release-final/test.map": "944caf9f432c306da9f56476f3dbd95bcdf64f494a06e1c32a4b5992ab91b3aa",
+    "artifacts/vrm-rest-export-release-final/test.log": "e8c7b4ad3d9a8dfbb86decab3af7bc359f3a44ba4e0f23ea8c251d4bf86969af",
+    "artifacts/vrm-rest-worker-release-final/receipt.json": "5b716473263b4c4e44fd060ed890842f5a3781a2d5168ad3b21e89d01fac9886",
+    "artifacts/vrm-rest-worker-release-final/test.map": "6cf83a01f5a2ebdb24039198afd14f87533a69d76777c64992d121ba159a5f35",
+    "artifacts/vrm-rest-worker-release-final/test.log": "5b0200252646d5a8bce41c0d68ae8a45e0e111481c5563b689b658e7edb8c3c0",
+    "artifacts/vrm-rest-render-release-final/receipt.json": "82e9854f57e730dc37b8a713699bdda7304623692e6a4f885faf951c1ad14d1c",
+    "artifacts/vrm-rest-render-release-final/test.map": "cf14288294d6309909dc86ffaffc8b2e81eaf4b32840b5b1f1fc253c7a38ae82",
+    "artifacts/vrm-rest-render-release-final/test.log": "70f84e256a7601aa340738232226123ff73fbeb5b5635e6323748a452838893a",
+    "artifacts/vrm-rest-length-release/receipt.json": "4acf99b11b4c3459eb454f6d3006ec0842baa2edef9ea50eb842676ba0ac2ac4",
+    "artifacts/vrm-rest-length-release/test.map": "e46a765fa6fe3f828f0b33b1ec37a6f3391165d3130c6250ade817cabacc71c0",
+    "artifacts/vrm-rest-length-release/test.log": "21faab0151490e8d0aecda0928ab3a12b883289a064f7ff47fd0dbafcd3849b6",
+    "artifacts/vrm-rest-metadata-sanitize-final/receipt.json": "9657f6dc752bb09079882de0e66260f7e64b6a68cc839f080a0d46f64c47860f",
+    "artifacts/vrm-rest-metadata-sanitize-final/test.map": "1e20a4b8696ba2c6e69b56c7a3573163dec6ed9edf3a86081ed084c3ba7c8915",
+    "artifacts/vrm-rest-metadata-sanitize-final/test.log": "b70982b1a3b6d86890c6f8257f998b4757910d3db72efb0cdf0132664b03181d",
+    "artifacts/vrm-rest-export-sanitize-final/receipt.json": "8d1744c3711f48097d24562ed3e06e5245b7edb1ff11690b50131758a973c0c8",
+    "artifacts/vrm-rest-export-sanitize-final/test.map": "54c1f2306098544b2a51e0d37d9ee48e6fce350a9a127621d995013f7f64d1e4",
+    "artifacts/vrm-rest-export-sanitize-final/test.log": "e8c7b4ad3d9a8dfbb86decab3af7bc359f3a44ba4e0f23ea8c251d4bf86969af",
+    "artifacts/vrm-rest-worker-sanitize-final/receipt.json": "40b1b3440747434d32ecc7e33eb8a21da8e0eb8569c27cbb32c475b060f59b82",
+    "artifacts/vrm-rest-worker-sanitize-final/test.map": "c1b428adc440b4373594decdf72063959ab3907e57b5b2a531e498bdc94aff87",
+    "artifacts/vrm-rest-worker-sanitize-final/test.log": "5b0200252646d5a8bce41c0d68ae8a45e0e111481c5563b689b658e7edb8c3c0",
+    "artifacts/vrm-rest-render-sanitize-final/receipt.json": "86be8cea0f4a05c2853695491c170577c40e9ee4b0a6cb57452d40c39cb05b38",
+    "artifacts/vrm-rest-render-sanitize-final/test.map": "7eb69de55e46eaeaf3cd6532161251e4e7059f53e9c0695b6e8ff1b02227c4a6",
+    "artifacts/vrm-rest-render-sanitize-final/test.log": "70f84e256a7601aa340738232226123ff73fbeb5b5635e6323748a452838893a",
+    "artifacts/vrm-rest-length-sanitize/receipt.json": "ac4fdd56ad1238b8a58de6b6641aec64dcfacafc9928916535cb3c6e1b9df9c9",
+    "artifacts/vrm-rest-length-sanitize/test.map": "44e135d51ed60c374cdc6fb050cede1207b6337ed9f596da3ef962f197089543",
+    "artifacts/vrm-rest-length-sanitize/test.log": "21faab0151490e8d0aecda0928ab3a12b883289a064f7ff47fd0dbafcd3849b6",
+    "artifacts/vrm-rest-render-arc-final/receipt.json": "6d3b4b6ee780e3130de0a502235c2c37826699a7bab4834627fcc784e51c1aa9",
+    "artifacts/vrm-rest-render-arc-final/test.log": "831e6323ce213b0e524c0c030ba1318ef6326717c3ece407d743b64ee63ffd1a",
+    "artifacts/vrm-rest-length-release-old/receipt.json": "a6e76e73a61c2f3603bc63747742a52a426854d8f51e0a879dbe445c960e56d0",
+    "artifacts/vrm-rest-signed-zero-control/receipt.json": "7ddcbe4735d11d6899d9d4d342b3392b8b0ca52cda5d6e16b8eb027424971f9a",
+    "artifacts/vrm-rest-khronos.json": "7179f974518d09c7728e4b50770f802d5372dc6d1b3f4bde5e7ee516efac2ca3",
+    "artifacts/vrm-rest-official-schema.json": "649d91bcc341bc626ddbbb1779cddb6cb7de61da8526ec6a077bf637e8b5abda",
+    "artifacts/vrm-rest-final-schema-byte-equality.json": "f8217dd225f12c5987316e227be5bec3b0359796e782161c196dae205e05598e",
+    "artifacts/cmake-vrm-rest-registration-render-final.log": "25e537cb13cdd50749ce7b4f404c478b9c53f05523445b767166ab6892fbb94f"
+  }
+}

@@ -428,9 +428,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       !original.at("extensions").contains("VRM"))
     fail("only original VRM0 is supported by this source-preserving path");
   if (original_space) {
-    source_graph = detail::vrm_source_graph(input_objects, original, options.cancelled);
+    source_graph = detail::vrm_source_graph(input_objects, original, options.cancelled,options.max_output_bytes);
     group = source_graph->instance;
     original["extensions"]["VRM"]["humanoid"] = source_graph->humanoid;
+    if(source_graph->rest_metadata)original["extensions"]["VRM"]["firstPerson"]=source_graph->rest_metadata->first_person;
   }
   for (auto &extension : original.value("extensionsUsed", Json::array()))
     if (extension != "VRM" && extension != "KHR_materials_unlit" &&
@@ -470,7 +471,13 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     q = (inverse * q * basis).unit();
     t.orientation = {q.x, q.y, q.z, q.w};
   };
-  auto convert_exact=[&](const RigMatrix &m){return (AffineTransform(inverse.matrix())*AffineTransform(m)*AffineTransform(basis.matrix())).float_matrix();};
+  auto convert_exact=[&](const RigMatrix &m){
+    // Original-node source admission already uses its authored basis. Even
+    // identity matrix multiplication can erase signed-zero IBM bits; retain
+    // the exact native per-skin matrix when no coordinate conversion exists.
+    if(basis.x==0&&basis.y==0&&basis.z==0&&std::abs(basis.w)==1)return m;
+    return (AffineTransform(inverse.matrix())*AffineTransform(m)*AffineTransform(basis.matrix())).float_matrix();
+  };
   auto convert_joint = [&](JointTransform &t) {
     if(t.full_local_matrix)t.full_local_matrix=convert_exact(*t.full_local_matrix);
     t.translation = inverse.rotate(t.translation);
@@ -604,10 +611,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   auto document = detail::make_gltf(objects, detail::SourceMorphSpace::Original,
                                     true, options.cancelled);
   report.normal_targets_recomputed = document.normal_targets_recomputed;
-  std::vector<int> source_nodes;
+  std::vector<int> source_nodes,metadata_nodes;
   if (source_graph)
     source_nodes = detail::emit_vrm_source_graph(
-        document, objects, *source_graph, options.cancelled);
+        document, objects, *source_graph, options.cancelled,&metadata_nodes);
   auto &j = document.json;
   auto &binary = document.binary;
   auto check_budget = [&] {
@@ -812,7 +819,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       fail("every avatar part requires the same grouped humanoid rig");
     if (avatar_joints.empty() && !rigid)
       avatar_joints.assign(emitted.joints.begin(), emitted.joints.end());
-    if (!rigid && std::vector<int>(emitted.joints.begin(), emitted.joints.end()) !=
+    if (!rigid && !source_graph && std::vector<int>(emitted.joints.begin(), emitted.joints.end()) !=
         avatar_joints)
       fail("avatar parts do not share one actual emitted rig/pose/transform");
     if (!o.appearance)
@@ -838,9 +845,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       int parent = s.bones[joint].parent;
       int expected =
           parent < 0 ? -1 : int(a.source_joint_nodes.at(size_t(parent)));
-      if (asset.nodes[source].parent != expected)
+      if ((source_graph?source_graph->parents.at(source):asset.nodes[source].parent) != expected)
         fail("source joint ancestry differs from native mapping");
-      const auto &source_world = asset.nodes[source].world;
+      const auto &source_world = source_graph?source_graph->rest_world.at(source):asset.nodes[source].world;
       Vec3 expected_world =
           Vec3{source_world[12], source_world[13], source_world[14]} *
               fit_scale +
@@ -1068,6 +1075,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   }
   j["materials"]=std::move(output_materials);
   auto vrm = metadata.remap(identities);
+  if(source_graph&&source_graph->rest_metadata){const auto &transport=*source_graph->rest_metadata;auto &spring=vrm["secondaryAnimation"];for(size_t i=0;i<transport.colliders.size();++i)if(transport.colliders[i])spring["colliderGroups"][i]["node"]=metadata_nodes.at(transport.colliders[i]->source);for(size_t i=0;i<transport.centers.size();++i)if(transport.centers[i])spring["boneGroups"][i]["center"]=metadata_nodes.at(transport.centers[i]->source);}
+
   auto scale_vector = [&](Json &v) {
     for (const char *axis : {"x", "y", "z"})
       if (v.contains(axis))

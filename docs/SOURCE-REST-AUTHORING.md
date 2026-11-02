@@ -116,3 +116,9 @@ implements true rigid meshes on mapped joints and canonical reparent following,
 with a reflected native root and native child-subgroup coverage. It retains the
 same Scene25 representation. The original checkpoint receipts above remain
 unchanged; the continuation has its own exact qualification scope.
+
+The later [typed VRM0 continuation](VRM-REST-AUTHORING.md) adds the tested
+fitted/posed source export subset with true-head offset transport, exact current
+per-part IBMs, preserved spring child order and translation-only collider
+attachments. It has independent native/controller, image and schema proof;
+general spring/radius/axis/length authoring remains required as documented there.
