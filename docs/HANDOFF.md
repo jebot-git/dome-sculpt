@@ -14,7 +14,65 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
-## Current private continuation checkpoints — 2026-11-02
+## Qualified forward GPU resolution integration — 2026-11-02
+
+Integration merge3ed95ad93558c6f05133bee8cd47957d36302b55 is runtime/header/test/
+asset/thirdparty/tool/CMake/packaging byte-identical to qualifiedade92df, metadata
+41deb41 in artifacts/resample-contract-f01e04f. This adds selected-backend forward
+layer/mask interpolation, exact integer binary64 on actual A770(noFP64), bounded
+field/query sessions and explicit interpolation/resolution contraction control.
+No Scene/Volume format or public layout change. Read GPU-RESOLUTION-BACKEND.md
+and GPU-RESOLUTION-INTEGRATION.md plus receipts; all1218 recorded component/
+manifest artifacts were rechecked intact and generated header reproduces exactly.
+
+Fresh optimized native CPU/OneAPI app and selected targets compile; CPU7/7,
+actualArcOneAPI6/6 and fresh whole-owned C/C++core/support/render/frontend SAN
+selected6/6 pass. Original SAN6/6 had a malformed post-manifest from script
+escaping; corrected samebinary6/6 passes20.33s with1149 hashes unchanged. Preserve
+both and do not claim12-suite green. Actual default-volume output matches
+1152784bytes exactly across three CPU/GPU jobs. MissingGPU and later injected
+failure preserve original owner/data. Native15+compact4 and actualArcGL+compute
+loader17 pass; allfive reports assert A770. Captured1152 source/application/
+archive/test hashes unchanged, actual GUI loader paths recorded. No physical
+headset/Wayland or SAN-GUI-teardown claim. Current CUDA/HIP backend TUs compile;
+linked minimal missing-device probes preserve all source cells. Positive vendor
+hardware and current full CUDA/HIP app compilation remain open.
+
+FMA negative is real oneULP under native CPU optimization; new native-target
+production sampler44,217words passes R+SAN, and source properties independently
+pin resolution/CPU sampler contraction while leaving brush flags unchanged.
+Small full-job coldGPU130ms/warm65–67ms vsCPU69–72ms is not a general performance
+claim. Reverse reconstruction/quality, other eligible GPU work, device-loss/
+sustained performance and every remaining full-production row stay required.
+Private CPU staging verifies executable text/rodata,7assetfiles and SoftFloat
+license; no system install or active-session restart. c46d1d9 stash and unrelated
+DomeD dirt, including newly observed notification-audio files, remain untouched.
+
+## Current private authoring continuations — 2026-11-02
+
+Palette58c2409 Source26/raw readonly/preparation milestone is frozen/pushed:
+R7/SAN7, native57, FLTK26, loader40, actualArc288 and101KHR0errors/71warnings.
+Private source24-26-main-58c2409 semantic union with current main and Contracts'
+3a55/d0 is unqualified; fresh source3 fixture/build23181 still in progress.
+Do not widen FBX adapter4 beyond0/1 or direct raw painting guards. Actual mixed
+projection/paint/UV/history/Save/export fixture and recursive feature closure
+are required before integration; Source25 compatibility is separately analyzed.
+Contracts strengthened3a55 normal/paint seal has R2+R6, GUI20, loader20 andArc437
+with761 hashes unchanged. Test-onlyd0 same-address legally mutable tamper34 passes
+R/SAN. Full ownedSAN59678/older8858 SAN29943 still live; earlier443 timeout stays
+preserved. Direct detached helper active-UV1/extra guard is a new union gate.
+Docs2192365 bind-following source rigid/reparent milestone is frozen/pushed,
+R5/SAN5 plus actual native/controller/independent-corner proofs. TypedVRM child
+has current6-output geometry/IBM/metadata proof but remains unqualified overall;
+collider scale authority needs a stricter final adapter, with file-worker/image
+checks still running. None of Source24/25/26 data is admitted by this GPU merge.
+Controller drawers remain queued after basic targets. Full goal stays active.
+
+## Historical private continuation checkpoints — 2026-11-02
+
+The following GPU checkpoints are retained history, superseded by the qualified
+integration above; their old live/CPU-only statements describe their own stage.
+
 
 Public main85bec2e was rechecked clean and equal to remote before continuing.
 Sparse interpolation source5ed4057 /metadata520e3db is now frozen/pushed, with
@@ -63,7 +121,7 @@ complete workflow qualification before main integration. Full requirements and
 post-basic controller drawers remain required. No installation, new physical
 launch or active desktop/session restart occurred.
 
-## Private GPU sculpt-resolution precision prototype — 2026-11-02
+## Historical private GPU sculpt-resolution precision prototype — 2026-11-02
 
 Root source63fb384 /metadata392c8dc in artifacts/sculpt-resample-gpu-f973732
 is a separate numerical prototype. Production resample_sculpt remains its
