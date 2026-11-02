@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "document-transaction.hpp"
+#include <algorithm>
 namespace dome {
 Document::Transaction::Transaction(Document &d):d_(d),before_(d.scene_),state_(d.state_),input_(d.input_),
     control_before_(d.control_before_),bound_(d.bound_volume_),source_(d.native_source_scene_),
@@ -15,7 +16,20 @@ void Document::Transaction::commit(bool checkpoint) noexcept {
     if(advance_import_)d_.import_request_.store(import_request_+1);
     if(undo_source_)undo_source_->pop_back();
     if(recorded_)while(d_.undo_.size()>128)d_.undo_.pop_front();
-    if(rebind_){std::lock_guard lock(d_.input_mutex_);d_.inputs_.clear();d_.reset_input_=false;d_.input_changed_.notify_all();}
+    if(rebind_){
+      std::lock_guard lock(d_.input_mutex_);
+      // publish_locked already exposed this epoch. Producers may have queued
+      // its next real controller samples while waiting for the model lock.
+      // Retire only obsolete authority; never erase input for that endpoint.
+      static_assert(std::is_nothrow_move_assignable_v<decltype(d_.inputs_)::value_type>);
+      const auto epoch=d_.state_.input_epoch;
+      // An unconsumed overflow reset belongs to the queue's first sample.
+      // Keep an empty-queue reset conservatively after allocation failure.
+      const bool keep_reset=d_.reset_input_&&
+          (d_.inputs_.empty()||d_.inputs_.front().first==epoch);
+      std::erase_if(d_.inputs_,[epoch](const auto &sample){return sample.first!=epoch;});
+      d_.reset_input_=keep_reset;d_.input_changed_.notify_all();
+    }
     if(finish_uv_){d_.invalidate_uv_locked();++d_.uv_session_;}
     if(finish_retopo_)d_.cancel_retopology_locked();
     if(finish_cut_)d_.cancel_cut_locked();
