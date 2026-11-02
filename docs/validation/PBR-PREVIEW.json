@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "scope": "Ephemeral actual authored/core-PBR preview; private Source21 parent; portable child still required",
+  "base": "38558821988bde32cf03c2fc48770908989281c3",
+  "source_sha256": {
+    "CMakeLists.txt": "a08649c22731eaa0f39d49c36563b7fcaea52c8319d36ae0d7d42db76fa3499c",
+    "include/dome/document.hpp": "570a8834ba3e20dc903e9a685af784fee58653fd1ac2fcb3b41c498f0a689944",
+    "include/dome/input.hpp": "d9b0b23d2c894430747e5682ad8ac7a4bcda4b694977b682250cf1f4326e830a",
+    "src/app.cpp": "7213c8e04756093475a585c7804a9fbe102a61fd3779526f2a3d577cfb369af8",
+    "src/document-native.cpp": "8558fd5e5727cbe6f4cb82fa55bf1f6a88fceb9ddade881e451c02e553c3f529",
+    "src/document.cpp": "6017bb4d00f519d8f6a39666c889e472f46ea20ffbbeb1151353160366010874",
+    "src/geometry-identity.hpp": "4f56b35088bfcdb45f56a7b505959d6de8119efe25846bc8e18f5cc7bd042f86",
+    "src/input.cpp": "96701ed00043f5a9916bd76676af70eb9112599132dce6260af21fd188ef664f",
+    "src/material-visibility.cpp": "270f9fecc3c58d23e289a943748e35fc07b2a79ba0fd878586ca37de76aa8d1a",
+    "src/object-selection.cpp": "299b69359f477fa62ea81e8bf9720d0159d23cf67aa94ec7c2f2ee3869186df5",
+    "src/palette.cpp": "a01e0a21f4f7983fd16be5f492fb0f26e738af63b3bddf3f5f1c1b39a65a9320",
+    "src/render.cpp": "18a45fd2dc48e78d4823392cdd07f4f8c9511066f354ae218fd0f8011db5bd5e",
+    "tests/xr_runtime.cpp": "c7a75037182f1b84bff1191ba21554d54c75591e24c8e1e8ebc3ebd0a212a55a",
+    "tests/pbr-preview.cpp": "c2c0446d71a77643aeb139aebf5e8a114475aa94385d7f58952ad57897047278",
+    "tests/pbr-preview-menu.py": "7cebfcdd212c3680137af22e819cedbf109de82945dc8080a5015961a8568f87",
+    "tests/pbr-preview-xr.py": "ca932139995a28ff17905f9491a53cce6ea908da199a8621e3929a6dc97fe0a0"
+  },
+  "toolkit": {
+    "domed": "d271cf65c612a462fcfa6739416b06c6565be070",
+    "runtime": "bitmap-runtime-eee23b7/lib",
+    "fltk": "toolkit-eee23b7/lib"
+  },
+  "release": {
+    "generic_assertions": 92,
+    "persistent_preview_denials": 44,
+    "avatar_assertions": 111,
+    "avatar_images": 18,
+    "avatar_max_error": 0,
+    "focused_suites": 3,
+    "focused_seconds": 15.84,
+    "controller_suites": 1,
+    "unchanged_mtoon_regression_suites": 1,
+    "unchanged_mtoon_regression_seconds": 35.89
+  },
+  "sanitizers": {
+    "fresh_owned_core_support_renderer": true,
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "leaks": true,
+    "suites": 3,
+    "seconds": 171.6,
+    "separate_controller_suites": 1,
+    "separate_controller_seconds": 29.55,
+    "avatar_max_error": 1,
+    "suppressions": []
+  },
+  "native_gui": {
+    "normal": 13,
+    "compact": 13,
+    "actual_viewport_acknowledgement": true,
+    "compact_screen": "640x360",
+    "bitmap_size": 16,
+    "scale": 2
+  },
+  "actual_loader_synthetic_tracking": {
+    "new_view_checks": 10,
+    "existing_selection_checks": 11,
+    "restored_alpha_exact_both_eyes": true,
+    "physical_headset": false
+  },
+  "hardware": {
+    "device": "PCI0000:03:00.0 Intel Arc A770",
+    "generic": 92,
+    "avatar": 111,
+    "avatar_images": 18,
+    "avatar_max_error": 0,
+    "actual_uhd_negative": true,
+    "software_negative": true,
+    "source_binary_freeze_exact": true,
+    "commands": [
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-3855882/build-preview/dome-sculpt-pbr-preview-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-final-arc/generic.glb",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "returncode": 0,
+        "expected": 0,
+        "seconds": 0.2084912739956053
+      },
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-3855882/build-preview/dome-sculpt-pbr-preview-test",
+          "--avatars",
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-final-arc/avatar",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "returncode": 0,
+        "expected": 0,
+        "seconds": 74.56446567100647
+      },
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-3855882/build-preview/dome-sculpt-pbr-preview-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/pbr-preview-final-arc/uhd-refused.glb",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_00_02_0",
+        "returncode": 1,
+        "expected": 1,
+        "seconds": 0.02926369999477174
+      }
+    ],
+    "binaries": {
+      "build-preview/dome-sculpt-pbr-preview-test": "45fa5f0432af7857f51811f9d94795824a3a309133bca0594fd3cad1cef038cf",
+      "build-preview/dome-sculpt": "1a63cee38dce42e51376d79385907d44b1e28721d0fca2b39209c3e1afa12567",
+      "build-preview/libdome-sculpt-test-runtime.so": "7bf54ae49cfc54f8e50d4e393a94052703f87804b6c02be474fcd9769db29075"
+    }
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 20,
+    "errors": 0,
+    "warnings": 342,
+    "filtered": false,
+    "maxIssues": 0
+  },
+  "logs_sha256": {
+    "pbr-preview-release-build4.log": "2147ab808d46a65506f24d5a79f493880fc649b9acc85cf6a577fd28a71f232d",
+    "pbr-preview-release-build8.log": "e369070525e4b8a58d92f0c08576bb21004cd26c9e9e1547c62fc6ec7247aed7",
+    "pbr-preview-release-build9.log": "625a7e8272d86aaa8841fc10386363850a44e28fe403a25e64c2195818a23600",
+    "pbr-preview-release-focused.log": "f35d1712636b527ca6177cd5cc28bffcb0d58b4578c85691e47f16e74f743872",
+    "pbr-preview-release-controls.log": "139349c2665c13564681739f8fe2c7e395f665753e459b5976711de4b169c909",
+    "pbr-preview-sanitize-build.log": "13aca0df209fa87b12fe522178685cb890422d0c0d9e9da244d7a78244706aa2",
+    "pbr-preview-sanitize-test-rebuild.log": "efda5c723f94bca2a5c898fc4df0f00fffd82959d0a400e884e977fdb499f21c",
+    "pbr-preview-sanitize-tests2.log": "d0e4aa52affcb7288ce45c7b16920466497f38548398ce80468acc9066c6c83d",
+    "pbr-preview-sanitize-controls.log": "091bad14468f273ba193e1b3d958d2f26e06df4d0695bd9cffb275535a54d2c8",
+    "pbr-preview-menu2.log": "e9cad0365acb3f4bf61c5a2facea82090d4ac5de28cf761d34f729324c0124b5",
+    "pbr-preview-menu-compact.log": "e9cad0365acb3f4bf61c5a2facea82090d4ac5de28cf761d34f729324c0124b5",
+    "pbr-preview-xr2.log": "fa59b844c31c45382096454a03f9a2a44369fed59820b06769ad4177a60f00fb",
+    "pbr-preview-khronos.json": "205249be09256d7c536a9ede6d4f1307299d2169db2206dfd520ad66508fb3c8",
+    "pbr-preview-baseline-tests.log": "1b0502e53c5037744d6b10e8b0d4565a620bfa5e2667653caf8ceb157a70569f"
+  },
+  "limitations": [
+    "Retained-normal domain export compiler unadmitted",
+    "Filtered partial-Bake source-colour/alpha UV preservation still required",
+    "No physical HMD/system install/session restart",
+    "Portable projection/current-public child still required"
+  ]
+}

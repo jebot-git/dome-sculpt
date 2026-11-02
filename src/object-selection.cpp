@@ -146,6 +146,10 @@ bool Document::process_object_selection_locked(const SpatialFrame &f){
     if(panel&&((menu&&input_.menu_page()==0)||(!menu&&state_.hierarchy_open))){
       const float u=panel->u,v=panel->v;
       if(menu){
+        if(v>=.02f&&v<.10f&&u>=.35f&&u<=.65f){
+          captured=true;
+          if(pressed){Transaction transaction(*this);state_.selection_release[i]=true;input_.retain_page(26,input_.menu_device(),0);publish_locked(false,false);transaction.commit(false);}
+        }
         if(v>=.02f&&v<.10f&&(u<.32f||u>.68f)){
           captured=true;if(pressed)state_.selection_release[i]=true;
           if(pressed&&selection_ready_locked()){
