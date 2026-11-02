@@ -3,6 +3,7 @@
 #include "dome/paint.hpp"
 #include <nlohmann/json.hpp>
 #include <set>
+#include <bit>
 namespace dome {
 namespace {
 auto slots(const PaintSourceMaps &m) { return std::array{&m.color,&m.metal_rough,&m.emission,&m.normal,&m.occlusion}; }
@@ -23,16 +24,25 @@ int address(int p,int n,int mode){
   p%=n;return p<0?p+n:p;
 }
 }
-void PaintSourceTexture::validate() const {
+void PaintSourceTexture::validate(unsigned coordinate_count) const {
+  if(coordinate_count<1||coordinate_count>2)throw std::invalid_argument("Invalid original texture coordinate authority");
   if(!image)return;
   image->validate();
   if(!wrap_valid(wrap_s)||!wrap_valid(wrap_t)||
      (mag_filter!=0&&mag_filter!=9728&&mag_filter!=9729)||
      (min_filter!=0&&min_filter!=9728&&min_filter!=9729&&(min_filter<9984||min_filter>9987)))
     throw std::invalid_argument("Unsupported original texture sampler");
-  if(texcoord!=0)throw std::invalid_argument("Original paint maps currently require TEXCOORD_0");
+  if(texcoord<0||unsigned(texcoord)>=coordinate_count)throw std::invalid_argument("Original texture coordinate set requires explicit surface authority");
   for(float v:uv_transform)if(!std::isfinite(v)||std::abs(v)>10000)
     throw std::invalid_argument("Invalid original texture UV transform");
+}
+bool PaintSourceMaps::uses_uv1() const noexcept {
+  for(auto slot:slots(*this))if(slot->image&&slot->texcoord==1)return true;
+  return false;
+}
+void PaintSourceMaps::validate_surface(const Mesh &mesh) const {
+  validate();
+  if(uv1&&uv1->size()!=mesh.positions.size())throw std::invalid_argument("Source UV1 vertex domain differs from the mesh");
 }
 bool PaintSourceMaps::empty() const noexcept {
   for(auto s:slots(*this))if(s->image)return false;
@@ -46,7 +56,12 @@ size_t PaintSourceMaps::unique_pixels() const {
 }
 void PaintSourceMaps::validate(const PaintImageLimits &l) const {
   limits_valid(l);PaintImageArchive images(l);
-  for(auto s:slots(*this)){s->validate();if(s->image)images.add(s->image);}
+  if(uses_uv1()!=bool(uv1))throw std::invalid_argument("Source UV1 views require a paired coordinate owner");
+  if(uv1){
+    if(uv1->empty()||uv1->size()>2'000'000)throw std::length_error("Source UV1 coordinate budget exceeded");
+    for(const auto &q:*uv1)for(float v:q)if(!std::isfinite(v)||std::abs(v)>10000)throw std::invalid_argument("Invalid original UV1 coordinate");
+  }
+  for(auto s:slots(*this)){s->validate(uv1?2:1);if(s->image)images.add(s->image);}
   if(!std::isfinite(normal_scale)||normal_scale<0||
      !std::isfinite(occlusion_strength)||occlusion_strength<0||occlusion_strength>1)
     throw std::invalid_argument("Invalid original normal or occlusion strength");
@@ -92,6 +107,11 @@ nlohmann::json encode_source_maps(const PaintSourceMaps&m,PaintImageArchive&a){
   m.validate();auto j=nlohmann::json::object();const char *names[]={"color","metal_rough","emission","normal","occlusion"};size_t k=0;
   for(auto s:slots(m)){auto name=names[k++];if(s->image)j[name]={{"image",a.add(s->image)},{"wrap_s",s->wrap_s},{"wrap_t",s->wrap_t},
     {"min_filter",s->min_filter},{"mag_filter",s->mag_filter},{"texcoord",s->texcoord},{"uv_transform",s->uv_transform}};}
+  if(m.uv1){
+    std::vector<uint8_t> bytes;bytes.reserve(m.uv1->size()*8);
+    for(const auto &q:*m.uv1)for(float value:q){auto bits=std::bit_cast<uint32_t>(value);for(unsigned shift=0;shift<32;shift+=8)bytes.push_back(uint8_t(bits>>shift));}
+    j["source_uv1"]={{"version",1},{"vertices",m.uv1->size()},{"data",nlohmann::json::binary(std::move(bytes))}};
+  }
   j["normal_scale"]=m.normal_scale;j["occlusion_strength"]=m.occlusion_strength;return j;
 }
 std::shared_ptr<const PaintSourceMaps> decode_source_maps(const nlohmann::json &j,const PaintImageArchive&a){
@@ -109,7 +129,15 @@ std::shared_ptr<const PaintSourceMaps> decode_source_maps(const nlohmann::json &
     s->image=a.at(id.get<uint32_t>());s->wrap_s=integer("wrap_s");s->wrap_t=integer("wrap_t");
     s->min_filter=integer("min_filter");s->mag_filter=integer("mag_filter");s->texcoord=integer("texcoord");
     s->uv_transform=v.at("uv_transform").get<std::array<float,6>>();
-  }m->normal_scale=j.at("normal_scale").get<float>();m->occlusion_strength=j.at("occlusion_strength").get<float>();m->validate();return m;
+  }
+  if(j.contains("source_uv1")){
+    const auto &v=j.at("source_uv1");const auto &count=v.at("vertices"),&data=v.at("data");
+    if(!v.is_object()||v.size()!=3||!v.at("version").is_number_integer()||v.at("version")!=1||!count.is_number_integer()||count.get<int64_t>()<1||count.get<uint64_t>()>2'000'000||!data.is_binary()||data.get_binary().size()!=count.get<uint64_t>()*8)throw std::invalid_argument("Invalid persisted source UV1 domain");
+    auto coordinates=std::make_shared<std::vector<std::array<float,2>>>();coordinates->resize(count.get<size_t>());const auto &bytes=data.get_binary();size_t at=0;
+    for(auto &q:*coordinates)for(float &value:q){uint32_t word=0;for(unsigned shift=0;shift<32;shift+=8)word|=uint32_t(bytes[at++])<<shift;value=std::bit_cast<float>(word);}
+    m->uv1=std::move(coordinates);
+  }
+  m->normal_scale=j.at("normal_scale").get<float>();m->occlusion_strength=j.at("occlusion_strength").get<float>();m->validate();return m;
 }
 std::array<float,4> sample_source_texture(const PaintSourceTexture&t,float u,float v,bool srgb){
   if(!t.image)return {1,1,1,1};
@@ -125,18 +153,39 @@ std::array<float,4> sample_source_texture(const PaintSourceTexture&t,float u,flo
     for(int c=0;c<4;++c){float value=im.rgba[at+c]/255.f;if(srgb&&c<3)value=srgb_to_linear(value);result[c]+=weight*value;}
   }return result;
 }
+std::span<const std::array<float,2>> source_texture_coordinates(const Mesh &mesh,const PaintSourceMaps &maps,int coordinate){
+  if(coordinate==0){if(mesh.uv.size()!=mesh.positions.size())throw std::invalid_argument("Source UV0 vertex domain is unavailable");return mesh.uv;}
+  if(coordinate!=1||!maps.uv1||maps.uv1->size()!=mesh.positions.size())throw std::invalid_argument("Source UV1 requires its exact mesh vertex domain");
+  return *maps.uv1;
+}
+std::array<float,2> source_texture_uv(const Mesh &mesh,const PaintSourceMaps &maps,int coordinate,size_t triangle,std::array<float,3> bary){
+  auto uv=source_texture_coordinates(mesh,maps,coordinate);std::array<float,2> result{};
+  if(triangle>=mesh.indices.size()/3)throw std::out_of_range("Source UV triangle is invalid");
+  float sum=0;for(float v:bary){if(!std::isfinite(v))throw std::invalid_argument("Nonfinite source UV barycentric coordinate");sum+=v;}
+  if(std::abs(sum-1)>1e-4f)throw std::invalid_argument("Source UV barycentric coordinates are not normalized");
+  for(size_t c=0;c<3;++c){auto id=mesh.indices[triangle*3+c];if(id>=uv.size())throw std::out_of_range("Source UV vertex identity is invalid");for(size_t k=0;k<2;++k)result[k]+=uv[id][k]*bary[c];}
+  return result;
+}
+std::array<float,4> sample_surface_texture(const Mesh &mesh,const PaintSourceMaps &maps,const PaintSourceTexture &view,size_t triangle,std::array<float,3> bary,bool srgb){
+  if(!view.image)return {1,1,1,1};
+  view.validate(maps.uv1?2:1);auto uv=source_texture_uv(mesh,maps,view.texcoord,triangle,bary);
+  // Coordinates are now explicitly resolved; the image/filter sampler receives
+  // that chosen pair, not a relabeled geometry stream.
+  auto resolved=view;resolved.texcoord=0;return sample_source_texture(resolved,uv[0],uv[1],srgb);
+}
 Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t triangle,
                            std::array<float,3> bary,float strength) {
   if(!std::isfinite(strength)||strength<0||strength>4)throw std::invalid_argument("Invalid source normal strength");
-  std::array<uint32_t,3> ids{};Vec3 n{};std::array<float,2> uv{};
+  std::array<uint32_t,3> ids{};Vec3 n{};
   for(size_t c=0;c<3;++c){
     ids[c]=mesh.indices.at(triangle*3+c);
     n+=normalized(mesh.normals.at(ids[c]))*bary[c];
-    auto t=mesh.uv.at(ids[c]);uv[0]+=t[0]*bary[c];uv[1]+=t[1]*bary[c];
+
   }
   n=normalized(n);
   if(!maps.normal.image||maps.normal_scale==0||strength==0)return n;
-  auto uv0=mesh.uv[ids[0]],uv1=mesh.uv[ids[1]],uv2=mesh.uv[ids[2]];
+  auto coordinates=source_texture_coordinates(mesh,maps,maps.normal.texcoord);
+  auto uv0=coordinates[ids[0]],uv1=coordinates[ids[1]],uv2=coordinates[ids[2]];
   const auto &a=maps.normal.uv_transform;
   double u1=double(uv1[0])-uv0[0],v1=double(uv1[1])-uv0[1],
          u2=double(uv2[0])-uv0[0],v2=double(uv2[1])-uv0[1];
@@ -153,7 +202,7 @@ Vec3 source_texture_normal(const Mesh &mesh,const PaintSourceMaps &maps,size_t t
        raw_b=direction(e2.x*x1-e1.x*x2,e2.y*x1-e1.y*x2,e2.z*x1-e1.z*x2);
   t=t-n*dot(n,t);if(length(t)<1e-8f)return n;t=normalized(t);
   auto b=cross(n,t)*(dot(cross(n,t),raw_b)<0?-1.f:1.f);
-  auto encoded=sample_source_texture(maps.normal,uv[0],uv[1],false);
+  auto encoded=sample_surface_texture(mesh,maps,maps.normal,triangle,bary,false);
   double factor=double(maps.normal_scale)*strength;
   double dx=(encoded[0]*2-1)*factor,dy=(encoded[1]*2-1)*factor,dz=encoded[2]*2-1;
   double magnitude=std::hypot(dx,dy,dz);if(magnitude<1e-20)return n;
