@@ -1,0 +1,171 @@
+{
+  "component": "Original-space imported VRM0 graph and per-skin inverse-bind export",
+  "status": "Private ready component; full production VRM goal remains incomplete; root owns integration/publication",
+  "base": "a863366fe6a97263e6e72a59c9614c9d68b0c699",
+  "import_checkpoint": "d72aa18c6b47f12e17c268cc64d920329f5bcc5d",
+  "public_api_or_archive_change": false,
+  "environment": {
+    "build": "regular user optimized Release CPU, UI ON XR OFF",
+    "toolkit": "canonical EEE prefixes; d271 toolkit inputs verified unchanged",
+    "hardware_selector": "DRI_PRIME=pci-0000_03_00_0; LIBGL_ALWAYS_SOFTWARE unset",
+    "GL_VENDOR": "Intel",
+    "GL_RENDERER": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+  },
+  "proof": {
+    "release": {
+      "suites": 3,
+      "passed": 3,
+      "seconds": 92.98,
+      "native_checks": 108546,
+      "world_corner_tolerance_metres": 2e-06
+    },
+    "fresh_sanitize": {
+      "suites": 3,
+      "passed": 3,
+      "seconds": 211.35,
+      "scope": "Fresh whole own C/C++ core, renderer and support; O1/g1/ASan/UBSan/leaks UI ON XR OFF; original worker before test-only joystick extension"
+    },
+    "final_joystick_worker": {
+      "checks": 14,
+      "release_suites": 1,
+      "release_seconds": 6.97,
+      "sanitize_suites": 1,
+      "sanitize_seconds": 22.45,
+      "scope": "Final test-only worker changes recompiled against exact fresh instrumented archives; no product edits"
+    },
+    "native_gui": {
+      "checks": 7,
+      "failed": 0,
+      "scope": "Actual FLTK chooser/universal-menu Xvfb+privateHOME+DBus; no physical headset or compositor test; tracked helper built and script rerun"
+    },
+    "compatibility": {
+      "suites": 5,
+      "passed": 5,
+      "seconds": 38.93,
+      "names": [
+        "input-rebind-publication",
+        "generic-vrm-import-render",
+        "vrm-painted",
+        "normal-frame-vrm-consumer",
+        "vrm-role-consumer"
+      ]
+    },
+    "independent_graphics": {
+      "checks": 37,
+      "images": 12,
+      "pixel_tolerance": 2,
+      "software_maxima": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "arc_maxima": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "fixtures": "female/male actual geometry x ordinary/reflected skinned mesh node/sheared source hierarchy x rest/current pose+morph; main/shade shader subset",
+      "all18_source_and_output_file_hashes_equal": true
+    },
+    "khronos": {
+      "version": "2.0.0-dev.3.10",
+      "files": 17,
+      "errors": 0,
+      "warnings": 340,
+      "truncated": false,
+      "filtered": false
+    },
+    "official_vrm0_schemas": {
+      "commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+      "files": 17,
+      "errors": 0
+    }
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "4f36bc6414b1e7f695559e6ecbce2299e2661bf82dc436551af68438423a4169",
+    "src/document.cpp": "97e3343346915a93dd33b837dcfac2018a00dbb99dcf3a05395a67033eed1274",
+    "src/import-skin.hpp": "5df6c6faa0f39d62506bd38d21e01f7cccd24a51b4a2303a700c08c3f9c1ae6e",
+    "src/vrm-import.cpp": "7978e8f0dd53299d13c302297c45bd9538197c9bd2ddde178e0faa81fd158b57",
+    "src/vrm.cpp": "72b5df33fb006956726a8a6c36af676f30e747a9b7ed301e00dc3c2077686e54",
+    "src/vrm-source-graph.cpp": "7282073ca1e3a334873c05997467c2f01c24e64ae68b531a0736c4738595aa53",
+    "src/vrm-source-graph.hpp": "444840ca96375e13f0b94742997e6ffcb9cc5518b84d7f62915ed48a497be2da",
+    "tests/vrm-import-render.cpp": "634e86af98b34bbb2226f0634b55668f3c524dcb662fdd2f32ea5bc9893468b5",
+    "tests/vrm-role-consumer.hpp": "c28b6f3e396b0d9e05bf29e645c7bdae14e343b2295bb2d4f84b1c66f8d381f3",
+    "tests/vrm-source-export-menu.py": "1549af6bba5af8be8710d4f62898732d2a01abf1b7c64d77424706da71e9b638",
+    "tests/vrm-source-export-render.cpp": "2aa4a721983b54dc2659fe5bc8a315c3765afda76a4e15334ad905b741a7110a",
+    "tests/vrm-source-export-ui.cpp": "1e8db49ce6ab71512c3cebcc90e1731c8c19359d6a93538407fb7ad9b723a9c0",
+    "tests/vrm-source-export-worker.cpp": "221344b18c0a595054e7fc70751d09a6e9753d17d8e15efea34bc65990e3f062",
+    "tests/vrm-source-export.cpp": "b8527feb68864d819e073d908035c6101734ece002f0c945319c3240bfb2c6ce",
+    "tests/vrm-source-fixtures.hpp": "7fda49255b0d3911397e09e9a30fc3304680246ad6e8f0d9adab2e838a6b3f05"
+  },
+  "evidence_sha256": {
+    "artifacts/test-metadata-positive.log": "9c90e3874e53c3e1d329ff5a16b2045ae354498d52c55d5817ea7b42695371de",
+    "artifacts/test-sanitize.log": "b31cef423c98fd50b4720b979f7af8be9954cea7eb57f696d1371f1b83eeafc0",
+    "artifacts/test-worker-controller.log": "04ea68acfb651cdd2e775c870935232276988a9cbd6c4d51e525bc04bc893474",
+    "artifacts/test-worker-controller-sanitize.log": "4cd3b389d7c945d21f94a6013c63c65fb816361140efba2dbfbb80619e291bf8",
+    "artifacts/test-export-regressions.log": "c50a69cf1a498be0888d1ead7c4dac7a8170772cebd9a4045ce55094dfc699cc",
+    "artifacts/gui-source-export-tracked.log": "d891102cf27705bf5bea8800e3850931ac73480082a1aace4a996b32d6e2f3a6",
+    "artifacts/export-arc.log": "5b3ab2bf2d5c7140db52c9b62f72b66cf727d3d1e6de301c754a44f9a08a1d8e",
+    "artifacts/emitted-khronos.json": "87257996488085b53685fca4a4bc1e9e0c2655d1ff127511a6548748d7de0a21",
+    "artifacts/export-schemas.json": "cc2a028b8f4156f1cce7a5d0f2df8903468b3e92aa1553b8183f8ffc036b256d",
+    "artifacts/export-software-file-hashes.json": "2f9a1ed8d4125d803e24210a2f1c04cf252239833fc260ea6d526831a107403a",
+    "artifacts/export-hardware-file-hashes.json": "53af2b76de64e3a9b0206a14d0f617f242d2afd2720ca829e11a29bd98f5c322"
+  },
+  "output_sha256": {
+    "build-release/vrm-source-export/1-0.000000.vrm": "7333bfdb68c320e0d111c26282120b0dcd2ef830f149ba994470741b9a083076",
+    "build-release/vrm-source-export/1-0.350000.vrm": "133c0292d75e5da5fd9a14d54d57ffc6b2c3f258cd2c1094b6604716b38a9665",
+    "build-release/vrm-source-export/2-0.000000.vrm": "e5380d123b7ae99a53f19699f2cd68a16294990fe9e716f7183aa63529beb3b3",
+    "build-release/vrm-source-export/2-0.350000.vrm": "15172ff3cf6369ec110b8e5747db4559eac7b39ea0337abad8c00a32d83be431",
+    "build-release/vrm-source-export/edited-metadata.vrm": "2e62ea9fc709318ac6b742a7b96f66c885cdd98f4d03ea67f3c221cd2d2f1a72",
+    "build-release/vrm-source-export-render/output-1-0-0.000000.vrm": "640d6ffd5fc2f3e08d4cd9221befa6e0e7b1fec4c69130bd47ea7de8081146d5",
+    "build-release/vrm-source-export-render/output-1-0-0.650000.vrm": "fe08fe7462cf8b71076b56b60cf839b3f566b4f7fd301942a35eaf957091734e",
+    "build-release/vrm-source-export-render/output-1-1-0.000000.vrm": "ad71547c65bf200e68e4aaa7b3858e9ee580d77d460eeddb61c5db3a0f92c45f",
+    "build-release/vrm-source-export-render/output-1-1-0.650000.vrm": "8e68f0b0b73c482ba8e461bf8e1d5008eb04fcc4dddc3294dfbee239ffb89987",
+    "build-release/vrm-source-export-render/output-1-2-0.000000.vrm": "7c655b79fb17120b6206a2f6756945676988481e4153ca404873d2da19720de9",
+    "build-release/vrm-source-export-render/output-1-2-0.650000.vrm": "b0447c1ffe9d91cd1ba0495606598e766203b3254eed6b493873caa2f40c9177",
+    "build-release/vrm-source-export-render/output-2-0-0.000000.vrm": "45d34b4a4ae6baa2dfe3d908cd1a1ea895dd7f1d12d5466420709873e577fd7b",
+    "build-release/vrm-source-export-render/output-2-0-0.650000.vrm": "7f494bfba3d58289f8ec9ce76d3849c76c4bd7acbbb936d85ddf56bafa7389f4",
+    "build-release/vrm-source-export-render/output-2-1-0.000000.vrm": "9ba397419d7e773e3ce617566d50af2675fb3e05c643e18db5837301e9d41e85",
+    "build-release/vrm-source-export-render/output-2-1-0.650000.vrm": "d92d4e11509f7466d609e011bd4ada8089a402e32f2ecf368033c3efbe0c38c3",
+    "build-release/vrm-source-export-render/output-2-2-0.000000.vrm": "34a19d468cc65f354336c4d17b832477034a9ea3d121e863937b34bc61bdcc7b",
+    "build-release/vrm-source-export-render/output-2-2-0.650000.vrm": "52d5fdaf3ac229a50ae1859fabef64e8d672ebedec3466b3a184e3dd2ed7b84a"
+  },
+  "negative_evidence": {
+    "khronos_empty_children": "artifacts/export-khronos-prototype.json retains first68 EMPTY_ENTITY errors; corrected obsolete-parent children property, no issue filter",
+    "metadata_role": "artifacts/test-metadata-role-negative.log: coalesced mapping was not installed into local VRM metadata; corrected local copy, immutable raw bytes untouched",
+    "rest_space": "artifacts/test-graphics-restspace-negative.log: inverse mesh-world native skeleton compared against model-space metadata; corrected explicit evaluation space",
+    "raw_sources": "Deliberate raw input VRM0 variants retain inherited advisory skin.skeleton validation error; emitted files use a valid common-root hint, source bytes unchanged",
+    "jaw_fixture": "artifacts/test-metadata-no-jaw-fixture-negative.log retains invalid first assumption; external fixture now contains genuine authored extra joint+IBM"
+  },
+  "remaining": [
+    "VRM1 export/versioned expressions, look-at, constraints and physics",
+    "Static/unskinned source parts without dummy skins",
+    "Independent per-part edits, source-less bones, nonlinear rest fitting and coherent edited metadata",
+    "Full KHR texture/sampler extension and MToon shader coverage",
+    "Persistent allocation-denial proof for rich original-space export and generic import",
+    "Root integration with newer Scene19/source UV1/material consumers; no broad rebase during proof"
+  ],
+  "no_actions": [
+    "No main edit or push",
+    "No system install or session restart",
+    "No physical headset test"
+  ]
+}
