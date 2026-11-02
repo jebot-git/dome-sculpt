@@ -100,7 +100,7 @@ int main(int argc,char **argv)try{
   require(DocumentTransactionTestAccess::tokens(*d)==tokens&&DocumentTransactionTestAccess::source(*d)==source&&d->frame().surface==mesh,"Failed publication retains undo/redo/content/nextContent/revision/generation/cache/mesh authority");
   require(d->frame().state->cut&&d->frame().state->cut->preview==preview&&!d->frame().state->cut->committing&&DocumentTransactionTestAccess::lease(*d)==lease,"Failed cut retains exact original draft/preview/source lease for retry");
   require(DocumentTransactionTestAccess::permissions(*d)==permissions,"Failed held publication retains exact held/selection/isolation/epoch permission authority");
-  require(work->cut_done&&work->cut_failure&&!work->cut_completed,"Accepted snapshot failure bookkeeping remains exact under persistent allocation denial");
+  require(work->done&&work->failure&&!work->completed,"Accepted snapshot failure bookkeeping remains exact under persistent allocation denial");
   d->end_cut(true);require(d->wait_asset()&&d->frame().state->error.empty()&&!d->frame().state->cut&&d->copy_scene().encode()==expected,"Actual failed cut retries its exact prepared result");
   auto held=d->frame().state->held_object;
   require(d->undo()&&d->copy_scene().encode()==original&&(!held||d->frame().state->held_object==d->frame().state->active_object)&&d->redo()&&d->copy_scene().encode()==expected&&d->frame().state->held_object==held,"Retried cut has exactly one undoable source-retaining history transition and exact corresponding hold endpoints");cache_unchanged();
