@@ -126,9 +126,13 @@ a real material-view fence incorrectly blocking direct voxel masking before its
 first display mesh, and the loader paint fixture following an old palette route.
 The exact strengthened mask fixture reproduces the old failure with the real
 preview worker gated. Separate9684486 in basic-authoring-regressions-25fe208
-scopes the fence to mesh sampling and updates both fixtures; fresh coherent
-Release71240/ownedSAN71315 builds remain live. This is not yet a passing corrected
-run or a test-only failure claim. Next finish/diagnose395, qualify the correction
+scopes the fence to mesh sampling and updates both fixtures. Fresh coherent
+Release71240 is terminal0; five targeted regressions pass0.75s, including the
+first-mesh mask and existing PBR stale/held-pressure negatives. OwnSAN71315
+build remains live. Initial full-loader retry has59passing checks then stops on
+an omitted test-helper executable; its terminal8/log/output are preserved and
+coherent helper build75542 is live before retry. No overall395-green or corrected
+loader/SAN-pass claim is made. Next finish/diagnose395, qualify the correction
 and preserve final source equality before publication. No physical launch, install or session
 restart. Latest canonical EEE prefixes/DomeD d271cf6 and unrelated dirt preserved.
 
@@ -153,6 +157,19 @@ GLBs have0KHRerrors/12unfilteredwarnings. ActualFLTK skin14+morph14 in BOTH
 Release and ownSAN close normally. Read FBX-DEFORMATION-QUALIFICATION.md/.json
 in that component; this is not a complete FBX/attribute/unit-axis/device claim.
 Earlier wrong vertex-index, wrong GUI unit-control and label negatives remain.
+
+A separate bounded binding fix b603e0b, qualified metadata823fe61, is in
+artifacts/fbx-named-uv-26bf0aa. Texture UV names now resolve per actual mesh:
+shared original materials can bind UVMap at different indices, with matching
+normal tangents, canonical material variants and original resources retained.
+New captures use adapter4; no Scene/public ABI change. Exact final fixture's
+old-code negative is preserved. Fresh Release8/8(4.42s) and owned C/C++SAN8/8
+(8.51s) include six independent named-UV/tangent corners and actual native
+explicit-atlas Save/restart. Related actual FLTK skin14+morph14 pass in BOTH
+builds with normal teardown; these use genuine deformation inputs, not a new
+named-UV visual oracle. Fourteen current emitted GLBs have0KHRerrors/12warnings.
+Read FBX-NAMED-UV-WIP.md and its qualification receipt. Native direct multi-UV,
+UV2+, broader FBX and combined-main admission remain required.
 
 Palette continues unadmitted normal21 export using actual PBR preview and an
 export-local independent coordinate stream; original-beforeUV typed colour/
