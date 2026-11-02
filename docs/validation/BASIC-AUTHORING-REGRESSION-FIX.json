@@ -1,0 +1,111 @@
+{
+  "recorded_utc": "2026-11-02T18:59:42.782182+00:00",
+  "frozen_runtime_test_source": "9684486142cf5599dce4034f1975ca982214c75c",
+  "qualification_tree": "artifacts/basic-authoring-regressions-25fe208",
+  "parent_runtime_test_source": "25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c",
+  "goal_complete": false,
+  "combined_candidate_qualified": false,
+  "fresh_builds": {
+    "optimized_Release": {
+      "session": 71240,
+      "terminal_exit": 0
+    },
+    "owned_C_CXX_core_support_renderer_frontend_SAN": {
+      "session": 71315,
+      "terminal_exit": 0,
+      "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+      "system_dependencies_instrumented": false
+    },
+    "coherent_Release_loader_helpers": {
+      "session": 75542,
+      "terminal_exit": 0
+    }
+  },
+  "registered_Release5": {
+    "tests": 5,
+    "failures": 0,
+    "seconds": 0.75
+  },
+  "registered_owned_SAN5": {
+    "tests": 5,
+    "failures": 0,
+    "seconds": 3.67,
+    "leaks_enabled": true
+  },
+  "deterministic_product_regression": {
+    "old_exact_fixture_negative": true,
+    "real_first_mesh_worker_barrier": true,
+    "old_failure": "tracked mask pressure commits protection before first display publication",
+    "fixed_scope": "Material-view epoch fence applies only to mesh sampling; direct voxel input does not sample the display mesh",
+    "existing_mesh_stale_endpoint_and_held_pressure_negative_preserved": true
+  },
+  "other_fixture_corrections": [
+    "spatial pagecount28/max27 plus actual projection/PBR/rig actions",
+    "loader traverses Controls\u2192Projection\u2192ColourPresets, retaining Blue-pixel oracle"
+  ],
+  "full_loader_initial": {
+    "session": 22752,
+    "terminal_exit": 8,
+    "passing_checks": 59,
+    "reason": "Targeted build omitted bake-controls helper; FileNotFoundError; no product/source change for helper correction",
+    "preserved_output": "artifacts/xr-client-missing-helper"
+  },
+  "full_loader_retry": {
+    "session": 48146,
+    "state": "live",
+    "log": "artifacts/tests-regressions-openxr-release-retry.log",
+    "future_junit": "build/artifacts-regressions-openxr-release-retry.xml"
+  },
+  "original_full395": {
+    "tree": "artifacts/basic-authoring-source20-7a4443e",
+    "session": 38150,
+    "state": "live",
+    "observed_failures": 3,
+    "scope": "Untouched frozen25fe; not a corrected395 pass"
+  },
+  "no_physical_test": true,
+  "no_install": true,
+  "no_session_restart": true,
+  "hashes": {
+    "CMakeLists.txt": "1d9aafc3416c669bf3dc7ef9251f2caa07b957f0a75cdda8a456f010e01819af",
+    "src/document.cpp": "0897ba935be6928d391552e4618613142d1dd8a84a741adcf3111936946d8a6f",
+    "tests/import-options.cpp": "0dcbf534e488db91992f349150c5f3fbcaad91b7a250caa30808645a385a3593",
+    "tests/sculpt-controller.cpp": "357a121478510c22bee5608511e12e596631947bfcfc29bd90d64240fedad070",
+    "tests/xr_runtime.cpp": "c56ee67ca3b0d4941042d365b49fcccd495926466ab06b93dc87756b57aeae60",
+    "artifacts/old-negative-mask.log": "179c7ae3a81dd0ac4dc87a09d729a1d67d9cdfb71df9177c1186ce5b2b803d5f",
+    "artifacts/old-negative-mask-inputs.json": "1d31db973d594d7a99db8782c520caad7dfae87e80966ed68dd7777e178195a3",
+    "artifacts/tests-regressions-release.log": "c9cc697fb617bd2141f88d543cde9d4b2f91a9202a313c853db83b971502fa69",
+    "artifacts/tests-regressions-sanitize.log": "5f3f7dfce1b831bc910f5aef25d2d3667146d5325487e765862a97e800b8c567",
+    "artifacts/tests-regressions-openxr-release.log": "1de5adc6ed9b872e776d0554c32e8c0483f70c2fca172ad6334e4e8e24c5fa79",
+    "artifacts/xr-client-missing-helper-location.json": "812da40c95a4c9217095b1c7dd87b6e2dd5fd2adeb53eafea04ff9bf67b8df6a",
+    "artifacts/xr-client-missing-helper/report.json": "cf93e34d5337560b0e64e2b44f8a760523c9ce6485b48e8186192ccdea06ef4d",
+    "artifacts/build-regressions-release.log": "18ef81a1de07ca5bc25a7a6f8b26af34364444eebd19d42d5d529907d2227bf5",
+    "artifacts/build-regressions-sanitize.log": "9098c0526c95ee98f51803808529edbb8a2db74746b9c1b227b4bd077c054e98",
+    "artifacts/build-regressions-loader-helpers-release.log": "d7f7d8f802362a1ad61d7caa8e7fcc5bb2bc6ca66f5fe3b86616e6c3ad30efb6",
+    "artifacts/configure-regressions-release.log": "25d699c6cb8fe061966f9f6f7d8b6b3b6a7439c51fe7373a01faac4f7ef97580",
+    "artifacts/configure-regressions-sanitize.log": "c5e97de15a1003a2a7f0e874d4006360a3961cd8ea5a37a4d93bac90bf66f8bb",
+    "build/dome-sculpt": "cd43a49b7f0fa579b8a73104430f23c3a534aacca50d6c5a845405c18b6930a9",
+    "build/libdome-sculpt-core.a": "0ec5501804c29528a9eb58378c9ec0bd06820f4f7555f07c6c391ecca22f1622",
+    "build/libdome-sculpt-render.a": "29ae04568cd7bf3bcc5a349fea5961e84ed6caff96e3cb2441ba54d5ca6ca446",
+    "build/libufbx.a": "281368c9ce3eda43592ab3f8f06ccb714e536a205ec3a2e643cb51138c4569b7",
+    "build/CMakeCache.txt": "929a4d67b92aeb48a703ffb4c27077e16561055eea4bde32782f801149885a30",
+    "build/dome-sculpt-mask-controller-test": "77b5de7d6f3c9f1d90112a5992cd60fdf541c09be0051ac844bbfdaba22481d9",
+    "build/dome-sculpt-import-options-test": "01a114aa603a50526bd2da9281f27c3ffff40c1c02427e3a4fdeb6254e77f302",
+    "build/dome-sculpt-native-strokes-test": "8ff39bb6961928b57336a565aaf3ffc748d4045a3f290ed3286c2bf2229d3f88",
+    "build/dome-sculpt-mask-document-test": "fb78d3a2e23cb02933e8173c29a4c5c696f3e63c4c8d8fac1893a539a818e410",
+    "build/dome-sculpt-pbr-preview-test": "c0414ba0d185017bb784a00d4a9a4b2c4dc8f5473c2af7d33d6b336ed6ef8f66",
+    "build-sanitize/dome-sculpt": "e32cbefc9a885d8d50e18b572830dde9f739961a931cd64d6fb485eb25100538",
+    "build-sanitize/libdome-sculpt-core.a": "bfa5d1683414194b2e026df18860e5251b37cdc3ca34a6e94041ac54693e2b3a",
+    "build-sanitize/libdome-sculpt-render.a": "f00c4948e696ef482916d7be6f5c3066864b8667c759be258085b907e5e82295",
+    "build-sanitize/libufbx.a": "133a7a36fcbdbe74410f695efcf31ff78bfe6c249d895018f1cbe5f29eaca307",
+    "build-sanitize/CMakeCache.txt": "9b3f1ea37ac5de71c1bdb48ae18ce80e8ce6c27ab319928f29625650465becb1",
+    "build-sanitize/dome-sculpt-mask-controller-test": "51e363e3a94ab64a29857d728335910053564a70a0fefa30235c8233c25c0d70",
+    "build-sanitize/dome-sculpt-import-options-test": "0e16dfa9a0c0033e550d709b6c0c3ad054dc7dff9b37d5e21edeb4a80c7410ff",
+    "build-sanitize/dome-sculpt-native-strokes-test": "1cd9fbcef56a83754b86ed471351680abb696e32e1a48c7bbe21937a31eb5ee2",
+    "build-sanitize/dome-sculpt-mask-document-test": "9e879b1417665408efcc71adf7a8a5f2a5017bf74961f3208cd68607e8c1bc3c",
+    "build-sanitize/dome-sculpt-pbr-preview-test": "84da2821ec239e8f262725e553ec56e6456ce13bd70f799c8298bb2909533a4e",
+    "build/artifacts-regressions-release.xml": "f8d35681319175c08c4c7cab87843a74b1b7e73ded82eea1f845ad7eb0947667",
+    "build-sanitize/artifacts-regressions-sanitize.xml": "72dbb550d06654b22dde178180822276dfc7523b52cdfcfaf793ddf2f54f4eee",
+    "build/artifacts-regressions-openxr-release.xml": "03e11965ca51344307e70ec33b014c473f94818e827233be1d17039e15e94ee8"
+  }
+}
