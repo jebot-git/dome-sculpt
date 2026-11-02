@@ -2,12 +2,14 @@
 #pragma once
 #include "scene-feature-version.hpp"
 #include "volume-archive.hpp"
+#include "paint-archive-shape.hpp"
 #include <nlohmann/json.hpp>
 namespace dome::detail {
 // A Scene12 aggregate preflight runs before any Volume, SurfaceMap, mesh, skin
 // or retained source object is decoded. Every serialized payload is charged;
 // sharing is represented by bounded table references, not an assumed alias.
 struct PolygonSceneBudget {
+  bool owning_paint_domain=false;
   size_t samples = 0, pixels = 0, paint_bytes = 0, deformations = 0, remaps = 0,
          retopo_entries = 0, retopo_bytes = 0, retained_vertices = 0;
   static void add(size_t &n, size_t amount, size_t maximum,
@@ -37,9 +39,10 @@ struct PolygonSceneBudget {
     add(samples, n, 4'000'000,
         "Scene retained polygon sculpt storage exceeds budget");
   }
-  void paint(const nlohmann::json &p, bool retained=false) {
-    if (p.is_null())
+  void paint(const nlohmann::json &input, bool retained=false) {
+    if (input.is_null())
       return;
+    const auto &p=paint_archive_payload(input,owning_paint_domain);
     const auto &r = p.at("resolution");
     if (!r.is_number_unsigned() &&
         (!r.is_number_integer() || r.get<int64_t>() < 0))

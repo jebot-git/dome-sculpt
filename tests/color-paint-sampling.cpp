@@ -10,6 +10,9 @@
 #include "source-paint-pairing.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/creator-archive.hpp"
+#include "polygon-conversion.hpp"
+#include "dome/shapekey-authoring.hpp"
+#include <unistd.h>
 #include "polygon-color-archive.hpp"
 #include <type_traits>
 static_assert(!std::is_default_constructible_v<SourceColorPaintSampling>);
@@ -19,7 +22,7 @@ std::vector<uint8_t> planes(const PaintedMesh &paint){
  for(auto p:{&maps->color,&maps->pbr_color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->mtoon_normal,&maps->color_coverage,&maps->emission_coverage})bytes.insert(bytes.end(),p->rgba.begin(),p->rgba.end());return bytes;
 }
 }
-int main()try{
+int main(int argc,char **argv)try{
  auto scene=prepared(false);const auto &object=scene.active();auto encoded=scene.encode();
  UvWorkspace workspace(object.painted->mesh(),object.painted->resolution());auto p=front(object.painted->mesh());workspace.edit(UvAction::Pick,p[0],p[1]);workspace.edit(UvAction::Scale,.7f);workspace.edit(UvAction::Rotate,1.57079632679f);auto view=workspace.view();check(view.valid,"Actual chart fractional-scale and90degree turn validates");
  auto derivative=prepare_polygon_uv_derivative(object,*view.mesh,*view.source_vertices,{});auto descriptor=std::make_shared<const PolygonColorSurface>(PolygonColorSurface{std::make_shared<const PolygonMesh>(derivative.authority->topology),derivative.authority->colors});
@@ -74,6 +77,17 @@ int main()try{
  auto orphan_data=paint_data;orphan_data["domains"].push_back(orphan_data["domains"][0]);auto orphan_paint=PaintSamplingArchive::decode(orphan_data);auto orphan_materials=SourceMaterialArchive::decode(material_data,read_images,read_models,&read_colours,&read_normals,&orphan_paint);auto orphan_current=PaintedMesh::decode(current_data,&read_images,false,&read_normals,&orphan_paint);
  check(refuses([&]{orphan_paint.require_reachable();}),"Material9 and actual current Paint cannot authorize an unused equal-valued geometry domain");
  auto too_many=material_data;while(too_many["color_preparations"].size()<257)too_many["color_preparations"].push_back(too_many["color_preparations"][0]);check(refuses([&]{SourceMaterialArchive::decode(too_many,read_images,read_models,&read_colours,&read_normals,&read_paint);}),"Material9 preparation quota rejects bulk source reconstruction beyond bounded node count");
+ auto current_scene=scene.snapshot();auto &current_object=current_scene.active();current_object.painted=joint;current_object.material_bindings=binding;current_object.polygon=derivative.authority;current_object.deformation=detail::normal_frame_remap_deformation(object.deformation,object.painted->mesh(),derivative.mesh,derivative.source_vertices,{});
+ current_scene.validate();current_scene.validate(false);auto scene_data=current_scene.encode();
+ check(scene_data.at("version")==24&&scene_data.at("source_materials").at("version")==9&&scene_data.contains("paint_sampling")&&scene_data.at("polygon_sources").at("version")==5,"Real current paired Scene owns conditional24/material9 with independent pool1 and unchanged polygon5");
+ auto scene_restart=Scene::decode(scene_data);check(scene_restart.encode()==scene_data,"Actual Scene24 roundtrip preserves authored current UV, writable basis, source/shape/affine graph and every channel");
+ check(scene_restart.active().material_bindings->color_preparation->paint_sampling->matches_current(*scene_restart.active().painted)&&scene_restart.active().painted->paint_sampling_domain()==scene_restart.active().material_bindings->normal_preparation->sampling_domain->metadata_sampling_domain,"Scene24 reconstructs the exact immutable current mesh and independent normal/colour associations");
+ check(refuses([&]{scene_restart.preview_surfaces();}),"Actual graphics/export path refuses until real paint coordinate consumers are connected instead of silently using authored UV0");
+ for(unsigned mode=0;mode<4;++mode){auto bad=scene_data;if(mode==0)bad["version"]=23;if(mode==1)bad.erase("paint_sampling");if(mode==2)bad["source_materials"]["version"]=8;if(mode==3)bad["paint_sampling"]["domains"].push_back(bad["paint_sampling"]["domains"][0]);check(refuses([&]{Scene::decode(bad);}),"Older/unbound/orphan Scene contexts cannot borrow a retained writable-paint domain");}
+ auto retained=current_scene.snapshot();auto origin=capture_polygon_origin(retained,retained.active().id);auto &empty=retained.active();empty.shape_source=origin;empty.painted.reset();empty.polygon.reset();empty.material_bindings.reset();empty.deformation.reset();empty.appearance.reset();empty.mesh_active=false;retained.validate();auto retained_data=retained.encode();
+ check(retained_data.at("version")==24&&Scene::decode(retained_data).encode()==retained_data,"Before-state-only direct source capsule keeps actual Scene24 requirement, paired domain and shared colour/normal graph");
+ auto restore_case=scene.snapshot();restore_case.active().shape_source=origin;ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;auto restored_source=author_shapekey(restore_case,restore_case.active().id,restore);check(restored_source.changed&&restore_case.encode()==scene_data,"Actual direct-source Restore recovers the complete current writable basis and independently paired colour/normal state");
+ auto temporary=argc>1?std::filesystem::path(argv[1]):std::filesystem::temp_directory_path()/("dome-sculpt-private-paint24-"+std::to_string(getpid())+".dsculpt");current_scene.save(temporary);auto reopened=Scene::load(temporary);check(reopened.encode()==scene_data,"Native bounded CBOR Save/reopen preserves the actual same shared Scene24 owning closure");std::filesystem::remove(temporary);
  auto wrong_normal=*normal;wrong_normal.metadata_sampling_domain.reset();check(refuses([&]{wrong_normal.validate();}),"Normal receipt2 cannot silently omit its own metadata basis");
  auto wrong_detail=std::make_shared<NormalDetailAuthority>(*normal->projection->sampling_domain->detail);wrong_detail->coverage[0]^=1;auto wrong_normal_domain=std::make_shared<NormalSamplingDomain>(*normal->projection->sampling_domain);wrong_normal_domain->detail=wrong_detail;auto wrong_projection=std::make_shared<PaintNormalProjection>(*normal->projection);wrong_projection->sampling_domain=wrong_normal_domain;wrong_normal=*normal;wrong_normal.projection=wrong_projection;
  check(refuses([&]{wrong_normal.validate();}),"Normal metadata cannot borrow old capture planes or unrelated colour coverage in place of actual authenticated before-paint bytes");

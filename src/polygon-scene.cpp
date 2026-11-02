@@ -5,6 +5,8 @@
 #include "polygon-color-target.hpp"
 #include "normal-frame-runtime.hpp"
 #include "polygon-scene-archive.hpp"
+#include "dome/color-paint-sampling.hpp"
+#include "paint-sampling-access.hpp"
 #include "source-placement-archive.hpp"
 #include "polygon-paint-authority.hpp"
 #include "text-utf8.hpp"
@@ -282,6 +284,9 @@ nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAsse
   return encode(images,models,materials,placements,shared_colors,nullptr);
 }
 nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,SourceMaterialArchive &materials,SourcePlacementArchive *placements,PolygonColorArchive *shared_colors,NormalSamplingArchive *domains) const {
+  return encode(images,models,materials,placements,shared_colors,domains,nullptr);
+}
+nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,SourceMaterialArchive &materials,SourcePlacementArchive *placements,PolygonColorArchive *shared_colors,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
   PolygonColorArchive colors=shared_colors?*shared_colors:colors_;
   for(const auto &field:colors_.fields())colors.add(field);
   const bool affine=std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->placement);});
@@ -350,7 +355,7 @@ nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAsse
   for (const auto &v : volumes_)
     j["volumes"].push_back(v->encode());
   for (const auto &p : paints_)
-    j["paints"].push_back(p->encode(&images,domains));
+    j["paints"].push_back(p->encode(&images,domains,paint_domains));
   if(shared_colors)*shared_colors=std::move(colors);
   return j;
 }
@@ -363,7 +368,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
       (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5))
     throw std::invalid_argument("Unsupported polygon source archive");
   const bool shared=j.at("version")==5;
-  if(shared&&(!materials||(materials->at("version")!=6&&materials->at("version")!=7&&materials->at("version")!=8)))throw std::invalid_argument("Shared corner color projection requires material archive6");
+  if(shared&&(!materials||(materials->at("version")!=6&&materials->at("version")!=7&&materials->at("version")!=8&&materials->at("version")!=9)))throw std::invalid_argument("Shared corner color projection requires material archive6");
   const bool colored = j.at("version") == 3 || shared || (j.at("version")==4 && (j.contains("color_bases")||j.contains("color_fields")));
   if (j.size() != (colored ? 7u : 5u))
     throw std::invalid_argument("Incomplete polygon color source archive");
@@ -398,6 +403,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
         auto p=polygon_archive_index(binding.at("color_preparation"),preparations.size());used_preparation[p]=1;
         paint(preparations[p].at("paint"));predecessor(preparations[p].at("before_binding"));
         if(preparations[p].contains("uv_reprojection")){const auto &uv=preparations[p].at("uv_reprojection");paint(uv.at("paint"));predecessor(uv.at("before_binding"));}
+        if(preparations[p].contains("paint_sampling")){const auto &uv=preparations[p].at("paint_sampling");paint(uv.at("paint"));predecessor(uv.at("before_binding"));}
       }
       if(!binding.at("normal_preparation").is_null()){
         auto p=polygon_archive_index(binding.at("normal_preparation"),normals.size());used_normal[p]=1;
@@ -414,16 +420,21 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     for(size_t i=0;i<bindings.size();++i){size_t height=1;walk_binding(i,[&](const auto &,size_t prior){height=std::max(height,heights[prior]+1);});if(height>64)throw std::length_error("Corner preparation material history depth exceeded");heights[i]=height;}
     bool found=false;
     for(const auto &p:preparations)if(p.contains("polygon_colors")){
-      if((p.at("version")!=2&&p.at("version")!=3)||p.at("receipt").at("version")!=2||p.at("receipt").at("source_field")!=2)throw std::invalid_argument("Corner preparation lost its versioned field declaration");
+      if((p.at("version")!=2&&p.at("version")!=3&&p.at("version")!=4)||p.at("receipt").at("version")!=2||p.at("receipt").at("source_field")!=2)throw std::invalid_argument("Corner preparation lost its versioned field declaration");
       const auto &source=p.at("polygon_colors");
       if(!source.is_object()||source.size()!=2)throw std::invalid_argument("Invalid current-corner projection source record");
       topology_preflight(source.at("topology"),entries);
       used_colors[polygon_archive_index(source.at("field"),used_colors.size())]=1;found=true;
       if(p.contains("uv_reprojection")){
-        if(materials->at("version")!=8||p.at("version")!=3)throw std::invalid_argument("Colour UV descriptor requires material8/entry3");
+        if((materials->at("version")!=8&&materials->at("version")!=9)||(p.at("version")!=3&&p.at("version")!=4))throw std::invalid_argument("Colour UV descriptor requires material8/entry3");
         const auto &current=p.at("uv_reprojection").at("polygon_colors");if(!current.is_object()||current.size()!=2)throw std::invalid_argument("Invalid current colour UV descriptor");
         topology_preflight(current.at("topology"),entries);used_colors[polygon_archive_index(current.at("field"),used_colors.size())]=1;
       }
+    }
+    for(const auto &p:preparations)if(p.contains("paint_sampling")){
+      if(materials->at("version")!=9||p.at("version")!=4)throw std::invalid_argument("Retained corner descriptor requires material9/entry4");
+      const auto &current=p.at("paint_sampling").at("polygon_colors");if(!current.is_object()||current.size()!=2)throw std::invalid_argument("Invalid retained current colour descriptor");
+      topology_preflight(current.at("topology"),entries);used_colors[polygon_archive_index(current.at("field"),used_colors.size())]=1;
     }
     if(!found&&materials->at("version")==6)throw std::invalid_argument("Shared corner archive has no preparation authority");
   }
@@ -516,6 +527,9 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
   return decode(j,images,models,materials,placements,shared_colors,nullptr);
 }
 PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const PaintImageArchive &images,const CreatorAssetArchive &models,const SourceMaterialArchive &materials,const SourcePlacementArchive *placements,const PolygonColorArchive *shared_colors,const NormalSamplingArchive *domains) {
+  return decode(j,images,models,materials,placements,shared_colors,domains,nullptr);
+}
+PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const PaintImageArchive &images,const CreatorAssetArchive &models,const SourceMaterialArchive &materials,const SourcePlacementArchive *placements,const PolygonColorArchive *shared_colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
   PolygonSceneArchive out;out.direct_origins_=j.at("version")>=4;
   if(j.at("version")==5&&!shared_colors)throw std::invalid_argument("Shared current corner archive requires Scene20");
   const bool colored=j.at("version")==3 || j.contains("color_fields");
@@ -524,7 +538,8 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
   for (const auto &v : j.at("volumes"))
     out.volumes_.push_back(std::make_shared<const Volume>(Volume::decode(v)));
   for (const auto &p : j.at("paints"))
-    out.paints_.push_back(PaintedMesh::decode(p, &images, true,domains));
+    out.paints_.push_back(PaintedMesh::decode(p, &images, true,domains,paint_domains));
+  std::vector<std::shared_ptr<const PaintSamplingAttachment>> bound_paints(out.paints_.size());
   std::vector<std::shared_ptr<PolygonAuthority>> authorities;
   std::vector<std::shared_ptr<PolygonOrigin>> origins;
   for (const auto &a : j.at("authorities")) {
@@ -564,6 +579,15 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
     if (!o.at("material_bindings").is_null())
       value->material_bindings = materials.at(polygon_archive_index(
           o.at("material_bindings"), materials.bindings().size()));
+    if(value->paint&&value->paint->paint_sampling_domain()){
+      const auto colors=value->material_bindings?value->material_bindings->color_preparation:nullptr;
+      if(!colors||!colors->paint_sampling)throw std::invalid_argument("Retained polygon paint lacks its own sampling material");
+      const auto id=polygon_archive_index(o.at("painted"),out.paints_.size());
+      const auto &attachment=colors->paint_sampling->geometry_attachment();
+      if(bound_paints[id]&&bound_paints[id]!=attachment)throw std::invalid_argument("One polygon paint record cannot acquire conflicting immutable material owners");
+      if(!bound_paints[id]){out.paints_[id]=rebind_paint_sampling_geometry(*value->paint,attachment);bound_paints[id]=attachment;}
+      value->paint=out.paints_[id];
+    }
     if (!o.at("retopology").is_null()) {
       const auto &r = o.at("retopology");
       value->retopology = std::make_shared<const RetopoPatch>(RetopoPatch{
