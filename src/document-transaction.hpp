@@ -23,6 +23,9 @@ class Document::Transaction {
   std::shared_ptr<const ImportView> import_view_;
   AssetSource import_source_;
   uint64_t import_request_=0;
+  std::shared_ptr<ProjectionLoad> projection_load_;
+  uint64_t projection_request_=0;
+  bool advance_projection_=false;
   std::shared_ptr<AssetWork> work_;
   std::shared_ptr<NativeStroke> native_;
   std::shared_ptr<const HeldAffine> held_affine_;
@@ -80,6 +83,18 @@ public:
     advance_import_=true;return import_request_+1;
   }
   void invalidate_import(){advance_import_request();d_.import_view_.reset();d_.import_source_={};}
+  uint64_t advance_projection_request(){
+    if(projection_request_==UINT64_MAX)throw std::overflow_error("Projection request identity exhausted");
+    advance_projection_=true;return projection_request_+1;
+  }
+  void invalidate_projection(){
+    const auto request=advance_projection_request();d_.projection_load_.reset();
+    if(d_.state_.projection){
+      auto view=std::make_shared<ProjectionView>(*d_.state_.projection);
+      view->request=request;view->loading=view->browsing=view->placing=false;
+      view->settings.enabled=view->settings.preview=false;view->error.clear();d_.state_.projection=std::move(view);
+    }
+  }
   void commit(bool checkpoint=true) noexcept;
   ~Transaction() noexcept;
 };

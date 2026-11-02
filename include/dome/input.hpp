@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=25;
+inline constexpr int spatial_page_count=26;
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -88,8 +88,11 @@ enum class SpatialCommand {
   PolygonBridge, PolygonDissolve, PolygonWeld, PolygonCutEdges, PolygonConnect,
   PolygonDelete, PolygonFlip, PolygonApply, PolygonCancel,
   ShapeNew, ShapeCapture, ShapeDuplicate, ShapeMirror, ShapeSculpt,
-  SelectionMode, ObjectHierarchy, SelectionFocus, ImportTextureAtlas
+  SelectionMode, ObjectHierarchy, SelectionFocus, ImportTextureAtlas,
+  ProjectionBrowse, ProjectionPrevious, ProjectionNext, ProjectionOpen, ProjectionParent,
+  ProjectionToggle, ProjectionUsage, ProjectionPlace, ProjectionDecrease, ProjectionIncrease
 };
+inline bool projection_command(SpatialCommand c){return c>=SpatialCommand::ProjectionBrowse&&c<=SpatialCommand::ProjectionIncrease;}
 inline bool shape_command(SpatialCommand c){return c>=SpatialCommand::ShapeNew&&c<=SpatialCommand::ShapeSculpt;}
 inline bool polygon_command(SpatialCommand c){return c>=SpatialCommand::PolygonBegin&&c<=SpatialCommand::PolygonCancel;}
 inline bool import_command(SpatialCommand c) {return (c>=SpatialCommand::ImportBrowse && c<=SpatialCommand::ImportCancel)||c==SpatialCommand::ImportTextureAtlas;}

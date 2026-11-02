@@ -58,7 +58,12 @@ Image decode_projection_png(std::span<const uint8_t> bytes,const ProjectionImage
   image.validate();return image;
 }
 Image load_projection_png(const std::filesystem::path &path,const ProjectionImageLimits &limits) {
-  limits_valid(limits);
+  return load_projection_png(path,limits,{});
+}
+Image load_projection_png(const std::filesystem::path &path,const ProjectionImageLimits &limits,
+                          const std::function<bool()> &cancelled) {
+  auto check=[&]{if(cancelled&&cancelled())throw std::runtime_error("Projection image loading cancelled");};
+  check();limits_valid(limits);
   int fd=open(path.c_str(),O_RDONLY|O_CLOEXEC|O_NONBLOCK);
   if(fd<0)throw std::runtime_error("Cannot open projection image");
   struct Close{int fd;~Close(){close(fd);}}closer{fd};
@@ -66,7 +71,7 @@ Image load_projection_png(const std::filesystem::path &path,const ProjectionImag
     throw std::runtime_error("Projection image must be a bounded regular PNG file");
   std::vector<uint8_t> bytes(size_t(st.st_size));size_t done=0;
   while(done<bytes.size()){
-    auto n=read(fd,bytes.data()+done,bytes.size()-done);
+    check();auto n=read(fd,bytes.data()+done,std::min<size_t>(65536,bytes.size()-done));
     if(n<0&&errno==EINTR)continue;
     if(n<=0)throw std::runtime_error("Projection image changed or could not be read");
     done+=size_t(n);
@@ -74,8 +79,25 @@ Image load_projection_png(const std::filesystem::path &path,const ProjectionImag
   uint8_t extra;ssize_t count;
   do{count=read(fd,&extra,1);}while(count<0&&errno==EINTR);
   if(count!=0)throw std::runtime_error("Projection image changed while loading");
-  return decode_projection_png(bytes,limits);
+  check();auto image=decode_projection_png(bytes,limits);check();return image;
 }
+void validate_projection_parameters(const ProjectionCamera &camera,const ProjectionOptions &options) {
+  validate_transform(camera.pose);
+  if(int(camera.mode)<0||int(camera.mode)>1||int(options.usage)<0||int(options.usage)>1||
+     int(options.color_space)<0||int(options.color_space)>2||int(options.scalar)<0||int(options.scalar)>4||
+     int(options.alpha)<0||int(options.alpha)>1||
+     !std::isfinite(camera.width)||camera.width<=0||camera.width>100||
+     !std::isfinite(camera.height)||camera.height<=0||camera.height>100||
+     !std::isfinite(camera.aspect)||camera.aspect<.01f||camera.aspect>100||
+     !std::isfinite(camera.vertical_fov)||camera.vertical_fov<.01f||camera.vertical_fov>3.0543262f||
+     !std::isfinite(camera.near_depth)||camera.near_depth<0||!std::isfinite(camera.far_depth)||camera.far_depth<=camera.near_depth||camera.far_depth>100||
+     !unit(options.opacity)||!unit(options.minimum_facing)||!std::isfinite(options.visibility_epsilon)||options.visibility_epsilon<=0||options.visibility_epsilon>1||
+     !options.max_samples_per_stamp||options.max_samples_per_stamp>4'194'304)
+    throw std::invalid_argument("Invalid image projection camera or bounds");
+  for(float v:options.uv_transform)if(!std::isfinite(v)||std::abs(v)>100)throw std::invalid_argument("Invalid stencil UV transform");
+  auto&m=options.uv_transform;double scale=std::hypot(double(m[0]),double(m[1]))*std::hypot(double(m[2]),double(m[3]));if(!scale||std::abs(double(m[0])*m[3]-double(m[1])*m[2])<=scale*1e-12)throw std::invalid_argument("Singular stencil UV transform");
+}
+
 struct PaintProjection::Impl {
   std::shared_ptr<const Image> image;
   ProjectionCamera camera;
@@ -93,20 +115,8 @@ struct PaintProjection::Impl {
     cancel(options);
   }
   void configure(){
-    cancel(options);image->validate();validate_transform(camera.pose);
-    if(int(camera.mode)<0||int(camera.mode)>1||int(options.usage)<0||int(options.usage)>1||
-       int(options.color_space)<0||int(options.color_space)>2||int(options.scalar)<0||int(options.scalar)>4||
-       int(options.alpha)<0||int(options.alpha)>1||
-       !std::isfinite(camera.width)||camera.width<=0||camera.width>100||
-       !std::isfinite(camera.height)||camera.height<=0||camera.height>100||
-       !std::isfinite(camera.aspect)||camera.aspect<.01f||camera.aspect>100||
-       !std::isfinite(camera.vertical_fov)||camera.vertical_fov<.01f||camera.vertical_fov>3.0543262f||
-       !std::isfinite(camera.near_depth)||camera.near_depth<0||!std::isfinite(camera.far_depth)||camera.far_depth<=camera.near_depth||camera.far_depth>100||
-       !unit(options.opacity)||!unit(options.minimum_facing)||!std::isfinite(options.visibility_epsilon)||options.visibility_epsilon<=0||options.visibility_epsilon>1||
-       !options.max_samples_per_stamp||options.max_samples_per_stamp>4'194'304)
-      throw std::invalid_argument("Invalid image projection camera or bounds");
-    for(float v:options.uv_transform)if(!std::isfinite(v)||std::abs(v)>100)throw std::invalid_argument("Invalid stencil UV transform");
-    auto&m=options.uv_transform;double scale=std::hypot(double(m[0]),double(m[1]))*std::hypot(double(m[2]),double(m[3]));if(!scale||std::abs(double(m[0])*m[3]-double(m[1])*m[2])<=scale*1e-12)throw std::invalid_argument("Singular stencil UV transform");
+    cancel(options);image->validate();
+    validate_projection_parameters(camera,options);
     origin=convert(camera.pose.position);right=convert(ob::rotate(camera.pose.orientation,{1,0,0}));
     up=convert(ob::rotate(camera.pose.orientation,{0,1,0}));back=convert(ob::rotate(camera.pose.orientation,{0,0,1}));
     half_height=std::tan(camera.vertical_fov*.5f);
@@ -127,6 +137,16 @@ PaintProjection PaintProjection::with_camera(ProjectionCamera camera,ProjectionO
   auto result=*this;result.impl_=std::move(updated);return result;
 }
 uint64_t PaintProjection::max_samples_per_stamp()const{return impl_->options.max_samples_per_stamp;}
+ProjectionRay PaintProjection::camera_ray(Vec3 position) const {
+  const auto &p=*impl_;cancel(p.options);
+  if(!finite(position))throw std::invalid_argument("Invalid projection ray point");
+  const auto delta=position-p.origin;
+  auto origin=p.camera.mode==ProjectionMode::Perspective?p.origin:
+      p.origin+p.right*dot(delta,p.right)+p.up*dot(delta,p.up)-p.back*(p.camera.near_depth*p.camera.pose.scale);
+  const auto direction=position-origin;const float distance=length(direction);
+  return {origin,distance>1e-8f?direction/distance:p.back*-1,distance};
+}
+
 std::optional<ProjectedPaint> PaintProjection::sample(Vec3 position,Vec3 normal,const PaintSettings &brush)const{
   const auto &p=*impl_;const auto &o=p.options;cancel(o);brush.validate();
   if(!o.opacity)return {};
@@ -138,14 +158,12 @@ std::optional<ProjectedPaint> PaintProjection::sample(Vec3 position,Vec3 normal,
   float u=.5f+local.x/(2*half_width),v=.5f-local.y/(2*half_height);
   auto &m=o.uv_transform;float transformed_u=m[0]*u+m[1]*v+m[4],transformed_v=m[2]*u+m[3]*v+m[5];
   if(!std::isfinite(transformed_u)||!std::isfinite(transformed_v)||transformed_u<0||transformed_u>1||transformed_v<0||transformed_v>1)return {};
-  auto ray_origin=p.camera.mode==ProjectionMode::Perspective?p.origin:
-      p.origin+p.right*(local.x*p.camera.pose.scale)+p.up*(local.y*p.camera.pose.scale)-p.back*(p.camera.near_depth*p.camera.pose.scale);
-  auto direction=position-ray_origin;float distance=length(direction);
+  const auto ray=camera_ray(position);
   auto toward_camera=p.camera.mode==ProjectionMode::Perspective?normalized(p.origin-position):p.back;
   if(o.front_only&&dot(normalized(normal),toward_camera)<=o.minimum_facing)return {};
   if(o.visibility&&p.query){
-    auto hit=p.query->raycast(ray_origin,distance>1e-8f?direction:p.back*-1,distance+o.visibility_epsilon);
-    if(!hit||std::abs(hit->distance-distance)>o.visibility_epsilon)return {};
+    auto hit=p.query->raycast(ray.origin,ray.direction,ray.distance+o.visibility_epsilon);
+    if(!hit||std::abs(hit->distance-ray.distance)>o.visibility_epsilon)return {};
   }
   bool srgb=o.color_space==ProjectionColorSpace::SRGB||
       (o.color_space==ProjectionColorSpace::Automatic&&o.usage==ProjectionUsage::Color&&(brush.channel==PaintChannel::Color||brush.channel==PaintChannel::Emission));

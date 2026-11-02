@@ -550,7 +550,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
             float d=length(position-(b.from+axis*u));
             if(d>=radius||d>distance+1e-7f||(std::abs(d-distance)<=1e-7f&&candidate.face>=selected_face))return;
             auto value=settings;float opacity=1;
-            if(sampler){auto sample=sampler(candidate.position,candidate.normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
+            if(sampler){auto sample=sampler(position,normal);if(!sample)return;value=sample->settings;opacity=sample->opacity;}
             if(opacity<=0)return;
             distance=d;selected_face=candidate.face;selected=value;projection_opacity=opacity;
           };

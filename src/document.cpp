@@ -590,6 +590,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
   state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(active.painted->baked());
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
+  state_.can_cancel_asset|=projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load();
   const auto asset=asset_work_.load();
   state_.can_save_after_asset=state_.asset_busy&&asset&&asset->accepted_scene&&!asset->cancelled.load();
   state_.pending_exports=0;
@@ -762,6 +763,7 @@ void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopte
   bind_locked();transaction.clear_history();path_=std::move(adopted_path);
   ++state_.generation;
   transaction.invalidate_import();
+  transaction.invalidate_projection();
   if(recovery_){recovery_source_={new_recovery_id(),state_.generation,path_};recovery_content_=0;}
   ++state_.input_epoch;state_.error.clear();state_.message=std::move(message);anchored_=false;
   state_.asset_busy=false;state_.recovery_busy=false;content_=next_content_++;
@@ -1241,6 +1243,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
+  if(process_projection_spatial_locked(f))return;
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
   if (desktop_)
     return;
@@ -1360,13 +1363,13 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
         input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=import_command(*c)&&published_.load()!=command_publication;
-    if(command_page==20||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    import_published=(import_command(*c)||projection_command(*c))&&published_.load()!=command_publication;
+    if((command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
@@ -1400,7 +1403,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
   }
   if(!state_.selection_mode&&state_.shape_sculpt)process_shape_spatial_locked(f);
   state_.hands = f.hands;
-  // Import admission already published the current hands/menu. A second
+  // Detached import/image admission already published the current hands/menu. A second
   // fallible publication must not report failure after accepting its file job.
   // Independent history buttons in this same frame still need normal handling.
   if(!import_published || f.hands[0].undo || f.hands[1].undo || f.hands[0].redo || f.hands[1].redo)
@@ -2579,9 +2582,11 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(projection_command(command))return projection_command_enabled_locked(command);
   if(command==SpatialCommand::Save&&state_.asset_busy)return state_.can_save_after_asset;
   if(command==SpatialCommand::CancelWork)
     return (state_.asset_busy && asset_status().cancellable) ||
+      (projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load()) ||
       std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
   if(command==SpatialCommand::SelectionMode||command==SpatialCommand::SelectionFocus)return selection_ready_locked();
   if(command==SpatialCommand::ObjectHierarchy)return true;
@@ -2781,6 +2786,7 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(projection_command(command)){projection_command_locked(command);return;}
   if(command==SpatialCommand::SelectionMode){if(selection_ready_locked())configure_selection_locked(!state_.selection_mode);return;}
   if(command==SpatialCommand::ObjectHierarchy){state_.hierarchy_open=!state_.hierarchy_open;state_.hierarchy_anchored=false;input_.cancel();publish_locked(false,false);return;}
   if(command==SpatialCommand::SelectionFocus){if(selection_ready_locked()){Transaction transaction(*this);invalidate_object_authority_locked();state_.selection_focus=!state_.selection_focus;publish_locked(false,false);transaction.commit(false);}return;}
@@ -3213,13 +3219,16 @@ void Document::command_locked(SpatialCommand command) {
 }
 void Document::file_loop() {
   for (;;) {
+    if(projection_notice_pending_.load()){
+      std::lock_guard lock(model_mutex_);retry_projection_failure_locked();
+    }
     if(worker_notices_pending_.load()) {
       std::lock_guard lock(model_mutex_);retry_worker_notices_locked();
     }
     std::optional<FileJob> job;
     {
       std::unique_lock lock(file_mutex_);
-      file_changed_.wait(lock,[&]{return files_stopping_||!files_.empty()||worker_notices_pending_.load();});
+      file_changed_.wait(lock,[&]{return files_stopping_||!files_.empty()||worker_notices_pending_.load()||projection_notice_pending_.load();});
       // Exception delivery normally allocates nothing. If a library needs
       // memory, retain that one promise before accepting more file work.
       if(worker_completion_pending_.load()) {
@@ -3232,9 +3241,15 @@ void Document::file_loop() {
       }
       job=std::move(files_.front());files_.pop_front();
     }
+    struct ProjectionDone {
+      std::shared_ptr<ProjectionLoad> task;
+      std::mutex &mutex;std::condition_variable &changed;std::atomic_bool &notice;
+      ~ProjectionDone(){if(task){{std::lock_guard lock(mutex);task->done.store(true);if(task->failure)notice=true;}changed.notify_all();}}
+    } projection_done{job->projection_load,file_mutex_,file_changed_,projection_notice_pending_};
     try {
       if(job->export_work && job->export_work->cancelled())
         throw std::runtime_error("Export cancelled");
+      if(job->projection_load){projection_file(*job);continue;}
       if(job->discover_import){discover_import_file(*job);continue;}
       if(job->asset_capture) {
         auto token=std::move(job->asset_capture);

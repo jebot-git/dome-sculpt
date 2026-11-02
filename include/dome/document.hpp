@@ -16,6 +16,7 @@
 #include "polygon-controls.hpp"
 #include "cut-authoring.hpp"
 #include "native-stroke.hpp"
+#include "projection-tool.hpp"
 #include "shapekey-authoring.hpp"
 #include <atomic>
 #include <condition_variable>
@@ -164,6 +165,7 @@ struct EditorState {
   bool can_author_shapes=false,can_restore_shapes=false,can_select_shape=false;
   bool shape_sculpt=false;
   uint64_t shape_sculpt_object=0;
+  std::shared_ptr<const ProjectionView> projection;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -288,6 +290,13 @@ public:
   void edit_scene(std::string label, SceneOperation, AssetSource expected = {});
   void import_asset(const std::filesystem::path &, uint32_t resolution = 512);
   AssetSource begin_import() const; // Capture before opening native options.
+  ProjectionToolSettings projection_settings() const;
+  void configure_projection(ProjectionToolSettings, AssetSource expected={});
+  void load_projection_image(const std::filesystem::path &, std::optional<ProjectionCamera> = {}, AssetSource expected={});
+  void browse_projection_images(std::filesystem::path = {});
+  void cancel_projection_load();
+  void projection_action(SpatialCommand);
+  bool wait_projection_image(std::chrono::milliseconds timeout=std::chrono::seconds(30)) const;
   void import_asset(const std::filesystem::path &, const ImportSettings &, AssetSource expected = {});
   ImportSettings import_settings() const;
   void configure_import(ImportSettings);
@@ -566,6 +575,27 @@ private:
   std::atomic<std::shared_ptr<const EditorState>> published_;
   std::atomic<std::shared_ptr<const MeshSnapshot>> mesh_;
   struct FileJob;
+  struct ProjectionLoad {
+    enum class Kind {Image,Directory};
+    Kind kind=Kind::Image;
+    uint64_t request=0;
+    AssetSource source;
+    std::filesystem::path path;
+    ProjectionToolSettings settings;
+    std::atomic_bool cancelled{false},done{false};
+    std::exception_ptr failure;
+  };
+  std::shared_ptr<ProjectionLoad> projection_load_;
+  std::atomic<uint64_t> projection_request_{0};
+  std::atomic_bool projection_notice_pending_{false};
+  void retry_projection_failure_locked() noexcept;
+  bool projection_command_enabled_locked(SpatialCommand) const;
+  void projection_command_locked(SpatialCommand);
+  bool process_projection_spatial_locked(const SpatialFrame &);
+  void load_projection_locked(const std::filesystem::path &, std::optional<ProjectionCamera>, AssetSource);
+  void browse_projection_locked(const std::filesystem::path &);
+  void cancel_projection_load_locked();
+  void projection_file(const FileJob &);
   void capture_polygon_file(FileJob &);
   struct NativeStroke {
     uint64_t epoch = 0;
@@ -584,7 +614,11 @@ private:
     std::atomic_bool release_held{false};
     std::atomic_bool menu_after{false};
     PaintSettings paint;
-    std::deque<NativeStrokeSample> samples;
+    // Projection image/options and scene visibility are immutable for the gesture.
+    std::shared_ptr<const ProjectionView> projection;
+    std::vector<uint64_t> projection_excluded;
+    struct QueuedSample { NativeStrokeSample input; CanvasTransform world_from_reference{}; };
+    std::deque<QueuedSample> samples;
     size_t submitted = 0;
     std::atomic_bool cancelled{false}, accepted{false};
     bool accepting = true, done = false;
@@ -693,6 +727,7 @@ private:
     std::shared_ptr<ExportWork> export_work;
     std::shared_ptr<AssetWork> asset_capture;
     std::shared_ptr<CutHandoff> cut_handoff;
+    std::shared_ptr<ProjectionLoad> projection_load;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.

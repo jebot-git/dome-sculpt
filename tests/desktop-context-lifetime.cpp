@@ -4,6 +4,8 @@
 #include "../src/app.cpp"
 #undef main
 #include <chrono>
+#include <fstream>
+#include <unistd.h>
 int main() try {
   desktop::NativeFontconfigRuntime fontconfig;
   dx::init();
@@ -18,12 +20,19 @@ int main() try {
   {
     App app;
     const auto original=app.canvas.document.copy_scene().encode();
+    const auto path=std::filesystem::temp_directory_path()/("dome-context-projection-"+std::to_string(getpid())+".png");
+    struct Remove {std::filesystem::path p;~Remove(){std::error_code ec;std::filesystem::remove(p,ec);}} remove{path};
+    auto png=Image{1,1,{255,0,0,255}}.png();{std::ofstream file(path,std::ios::binary);file.write(reinterpret_cast<const char*>(png.data()),png.size());}
+    app.canvas.document.load_projection_image(path);
+    check(app.canvas.document.wait_projection_image()&&app.canvas.document.frame().state->projection->image,
+          "Native image worker owns immutable projector pixels across actual context cycles");
     for(unsigned cycle=0;cycle<3;++cycle) {
       app.window.show();app.canvas.redraw();
       auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(30);
       while((!app.canvas.renderer||!app.canvas.polygons)&&std::chrono::steady_clock::now()<deadline)Fl::wait(.01);
       check(app.canvas.shown()&&app.canvas.context()&&app.canvas.renderer&&app.canvas.polygons,
             "Native show creates the actual Canvas GL renderers with a valid context");
+      check(bool(app.canvas.cursors),"Actual native draw created the GPU image projector before hide/show teardown");
       app.canvas.make_current();
       const auto renderer_name=glGetString(GL_RENDERER);
       check(renderer_name&&glGetError()==GL_NO_ERROR,"The actual native context is current and has a live OpenGL renderer");
