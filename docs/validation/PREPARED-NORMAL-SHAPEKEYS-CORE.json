@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "parent": "8d46dfbd610e6534a2d3ffd6413de2ce7cc8ea21",
+  "scope": "Private core implementation and CPU/native/controller authoring only; no current GPU/GUI/XR/SAN claim",
+  "source": {
+    "CMakeLists.txt": "df3d3f0bcf313c379b196c1258501cf65220d09e65b584e9023108d703fc6912",
+    "docs/PREPARED-NORMAL-SHAPEKEYS.md": "ff1f88fb761a1b8859df14b685595391af5183d2c84880ef3845a08afc723f8e",
+    "src/shapekey-authoring.cpp": "bd983b861cd19a5d35c1b3ab5cc62f62f7a34e860e23a9b9177ddd8668b991a9",
+    "src/shapekey-normal-preparation.cpp": "8682d9d2269e93f84a1899098f38e49f9c8218808ff4f1fd94bfbd5bc3d65e72",
+    "src/shapekey-normal-preparation.hpp": "10bba16ac3089162e7118517ab06a6fdbfa3b5d868fb4b65361fda3f11f53079",
+    "tests/prepared-normal-shapes-fixtures.hpp": "81375b4781c8556815f33f25559d1dba11c34729b63dac5438571d575c11251c",
+    "tests/prepared-normal-shapes.cpp": "596a93c9d9e788f43d598af2b3b9b349932be05050ebcb652f6b7a5e829ca5a4"
+  },
+  "logs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-core-tests.log": "2fe67087b5c5adf79cc972adc3034d790c6d0e9678a22c48e57ed7b5dd756012",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-8d46dfb/build-cpu/Testing/Temporary/LastTest.log": "cc90875513113afcd4b89f02470c12fb87fad4080869c2a067e07d87e869dea2"
+  },
+  "artifacts": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-8d46dfb/build-cpu/libdome-sculpt-core.a": "afdd5b9d1838cd4750a910903788174e54bb75b69d7aec51cdb9017170cc3a3e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-8d46dfb/build-cpu/dome-sculpt-prepared-normal-shapes-test": "addbd93da0eec340310c51e2e340cd4565f9fe414302bd5e0ac88445e439f134"
+  },
+  "finished": {
+    "cpu_suites": 5,
+    "new_prepared_authoring_checks": 43,
+    "existing_authoring_checks": 23,
+    "existing_native_controller_checks": 46,
+    "existing_stroke_checks": 29,
+    "existing_normal_preparation_checks": 36
+  },
+  "not_claimed": [
+    "new independent graphical consumers",
+    "new sanitizer/allocation-failure coverage",
+    "new actual GUI/compact or loader XR",
+    "hardware device qualification",
+    "full source-normal/UV1/topology/affine/COLOR-TEXCOORD morph completion"
+  ]
+}

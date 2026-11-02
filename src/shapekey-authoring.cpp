@@ -8,6 +8,7 @@
 #include "polygon-paint.hpp"
 #include "text-utf8.hpp"
 #include "dome/tangents.hpp"
+#include "shapekey-normal-preparation.hpp"
 #include <map>
 namespace dome {
 namespace {
@@ -100,6 +101,8 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
  std::string name=edit.action==ShapeKeyAction::Replace?deform->morphs->targets[slot].name:key_name(*deform->morphs,edit.name);
+ if(source.material_bindings&&source.material_bindings->normal_preparation)
+  return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
  Scene next=scene;auto &o=next.object(object);
  if(!o.shape_source)o.shape_source=capture_polygon_origin(scene,object);
  if(edit.action==ShapeKeyAction::Rename){
