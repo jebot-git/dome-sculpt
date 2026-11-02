@@ -39,6 +39,9 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
     throw std::logic_error("Apply or cancel retopology before starting asset work");
   if (state_.cut && (!cut_session || cut_session != cut_session_.load()))
     throw std::logic_error("Apply or cancel the plane cut before starting asset work");
+  if(cut_handoff && (!cut_session || state_.cut!=cut_handoff->draft || !cut_handoff->accepting ||
+      cut_handoff->accepting->session!=cut_session || !cut_handoff->accepting->committing))
+    throw std::logic_error("Cut Apply admission lost its exact ready draft");
   FileJob job{scene_.snapshot(), {}, state_.revision, state_.generation, content_, false};
   job.object = scene_.active().id;job.edit_authority=state_.edit_authority;job.isolation_target=state_.isolate_held?state_.held_object:0;
   job.scene_operation = std::move(operation);
@@ -57,6 +60,10 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   try {
   asset_work_.store(files_.back().work);
   state_.asset_busy = true;
+  if(files_.back().cut_handoff){
+    state_.cut=files_.back().cut_handoff->accepting;
+    input_.cancel();
+  }
   state_.error.clear();
   state_.message = files_.back().operation_label + "...";
   publish_locked(false,false);transaction.commit();

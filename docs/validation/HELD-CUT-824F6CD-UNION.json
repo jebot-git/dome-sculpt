@@ -1,0 +1,65 @@
+{
+  "private_checkpoint": true,
+  "product_commit": "55af68a7d7bd5a53a56bcdb5ab9ddbb1e55a55f1",
+  "parents": [
+    "824f6cd",
+    "fa4487a"
+  ],
+  "source_frozen_during_qualification": true,
+  "conflict_resolution": "Independent source-color consumer retains public default-material fallback and VRM material requirement, node-global handedness, plus explicit opt-in legal missing-TANGENT derivative handling. No product conflicts.",
+  "completed": {
+    "release_native_suites": 30,
+    "release_default_sampler_render_suites": 3,
+    "san_native_support_renderer_suites": 31,
+    "san_held_publication_faults": {
+      "injected": 32,
+      "measured": 10089,
+      "scope": "first16,last16 real post-helper publication boundaries, witnessed immutable preparation replay"
+    },
+    "fltk_dbusmenu": {
+      "held": 16,
+      "key_mode": 15,
+      "compact_held": 7
+    },
+    "openxr": {
+      "checks": 21,
+      "synthetic_tracking": true,
+      "software_gl": true
+    },
+    "actual_arc": {
+      "device": "Intel Arc A770 PCI0000:03:00.0",
+      "cut_cases": 32,
+      "cut_checks": 257,
+      "paint_export_sampler_checks": 145
+    }
+  },
+  "evidence_sha256": {
+    "artifacts/build-union-release.log": "2d289997c76eb7b01e7c1fbdda9b1d31ea7ce62b8a4cdaa4c68122e9cb885281",
+    "artifacts/build-union-san.log": "1cc92f6904d8313428943a4a250a6de15e890f2e7b37713eb6a4df87a386ce97",
+    "artifacts/tests-union-release-native.log": "7048def10a3b26f6594de3448b6a17f59aa16fc88f03739d61acdee2ff128995",
+    "artifacts/tests-union-graphics-sampler.log": "bdacd725f70c08cd54da5c1349cd9e935ddd0c0087bccad070ba1286754e7396",
+    "artifacts/tests-union-san-native.log": "bb579e2d2e8c96ebb25890aaa82cff86e498912ca1d879fdde714d7c6c2ae4bb",
+    "artifacts/tests-union-san-held-publication.log": "b924d28ff6d2ce9eb22392a3b06e7b834264c42d0edd6320e4fc544830a07b81",
+    "artifacts/tests-union-held-xr.log": "514720740902372c9bbf98c38797aaa8b030af83d804bb3002c9777c36757023",
+    "artifacts/tests-union-menu-held.log": "50f01a29869723d615d9259aed8266c6d41702e53e03ab0dd223716329017cfc",
+    "artifacts/tests-union-menu-key.log": "caadcb6bc774ce7d379f616aa51ed613f46edffcdac21a67c3010df3b7b37931",
+    "artifacts/tests-union-menu-held-compact.log": "93d3189317bc0957c7fd5f710e0ad0e5f8e1f7a389def7dee11eebc6280fdbce",
+    "artifacts/tests-union-arc-cut.log": "05c91c590af500060984187db6a347892004bc018613d15f3eae587654caea10",
+    "artifacts/tests-union-arc-samplers.log": "95ecf35fe7f815e3eeae884c41de6491091751572d4834401dfda4972803eadb"
+  },
+  "remaining": [
+    "moving grip plus cut in one pose/geometry transaction",
+    "current-color source Bake adapter qualification",
+    "current-field target preparation/Bake adapter",
+    "unsupported UV1/prepared color/normal/artist-frame/MToon cut roles remain guarded"
+  ],
+  "not_claimed": [
+    "full all-target native test suite",
+    "OneAPI compute build for this union",
+    "new exhaustive prep/publication allocation sweep",
+    "physical HMD",
+    "system install/restart",
+    "publication/push",
+    "whole-goal completion"
+  ]
+}

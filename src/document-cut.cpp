@@ -148,7 +148,12 @@ void Document::cancel_cut_locked(){
     cut_base_.reset();mesh_changed_.notify_all();}
   {std::lock_guard lock(cut_mutex_);cut_job_.reset();cut_changed_.notify_all();}
 }
-void Document::end_cut(bool accept){std::lock_guard lock(model_mutex_);end_cut_locked(accept);publish_locked();}
+void Document::end_cut(bool accept){
+  std::lock_guard lock(model_mutex_);end_cut_locked(accept);
+  // The accepted queue transaction already publishes its exact endpoint. A
+  // second fallible publication must not report failure after admission.
+  if(!accept||!state_.cut||!state_.cut->committing)publish_locked();
+}
 void Document::end_cut_locked(bool accept){
   if(!state_.cut)return;
   if(state_.cut->committing){
@@ -161,18 +166,18 @@ void Document::end_cut_locked(bool accept){
   if(!preview||state_.cut->preview_request!=state_.cut->request)throw std::logic_error("Choose a valid cutting plane before Apply");
   if(!preview->changed){cancel_cut_locked();input_.cancel();return;}
   auto source=cut_bake_source_;if(!source)throw std::logic_error("Cut source is unavailable");
-  auto view=std::make_shared<CutView>(*state_.cut);view->committing=true;state_.cut=view;
+  auto view=std::make_shared<CutView>(*state_.cut);view->committing=true;
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
   auto handoff=std::make_shared<CutHandoff>();handoff->source=scene_.active().id;
+  handoff->draft=state_.cut;handoff->accepting=view;
   if(state_.held_object==handoff->source)handoff->held_source=handoff->source;
-  try{queue_scene_operation_locked("Apply plane cut",[preview,source,report,work,handoff](Scene &scene,const auto &cancelled){
+  queue_scene_operation_locked("Apply plane cut",[preview,source,report,work,handoff](Scene &scene,const auto &cancelled){
     auto result=publish_cut(scene,*preview,*source,512,cancelled,[work](float p){work->progress.store(p);});
     if(!result.changed||!result.shell)throw std::logic_error("Accepted cut did not create its shell");
     handoff->shell=result.shell;handoff->cap=result.cap;handoff->group=scene.object(result.shell).group;
     handoff->sealed=std::make_shared<const Scene>(scene.snapshot());
     *report=std::to_string(result.projected)+" mapped texels; source retained";
-  },cut_source_,report,work,{}, {},0,view->session,handoff);}catch(...){view->committing=false;state_.cut=view;throw;}
-  input_.cancel();
+  },cut_source_,report,work,{}, {},0,view->session,handoff);
 }
 void Document::begin_cut_parameter(VrParameter parameter){
   std::lock_guard lock(model_mutex_);control_event_locked({VrControlEventType::Begin,parameter});desktop_=true;publish_locked();

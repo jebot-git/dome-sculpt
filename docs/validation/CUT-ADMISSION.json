@@ -1,0 +1,68 @@
+{
+  "private_checkpoint": true,
+  "parent": "09b6d38",
+  "verified_domed": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "source_sha256": {
+    "CMakeLists.txt": "548718cbcd535e2dbe0030b7416574930693424b99a9943e5c0b145289b8d11c",
+    "include/dome/document.hpp": "d86dd9fc879e3465a9fceda040f0bbe3e47b9c0e7c16e068e168c2042feb908f",
+    "src/document-assets.cpp": "8776ce1229c3c31072947abea05c5873e258f967158e63962027b6b964c9a4d0",
+    "src/document-cut.cpp": "d0e1e2c1dfcfefc77e1ae40ade409509bebeb20be6b274db328a228dff7540e2",
+    "tests/cut-color-admission.cpp": "7f80404fe2129660120762ebd0b1dd4b57d0a3bedb3359be3a909c6e1b59f57b",
+    "docs/CUT-ADMISSION.md": "1f150e78db8be30b4bdb21e6f3eed6dee14b9c875d8edaf47a654e9af665ba6c"
+  },
+  "evidence_sha256": {
+    "artifacts/build-admission-release.log": "db234c51a41f90450926b44b155524fefa0e3a9dc4da83d5e0adfe0ccdb0e3e7",
+    "artifacts/build-admission-san.log": "6b5963a6fe6a13bc22414edde4d058d979b569e52517867eb76485b1f771c7fc",
+    "artifacts/tests-admission-release-final.log": "58857c9ec42e604899d0043ae270d77d2d81cb66ab8a9b0760f5bcb8f6cc7f32",
+    "artifacts/tests-admission-san-full.log": "58857c9ec42e604899d0043ae270d77d2d81cb66ab8a9b0760f5bcb8f6cc7f32",
+    "artifacts/tests-admission-old-negative.log": "518b5df129eb8638f4761b864b40e318b5ff8e1ab27cfb1df7f42a9392c3146a",
+    "artifacts/tests-admission-native-regression.log": "bd6e44703dbafa86003cda8dc4b26d8492ba6dbde7b0a4cd6a062f63a7ede195",
+    "artifacts/tests-admission-san-native.log": "35b82449bca1b45c04c362a292e3b6d27988beffc5646db32e12d0cb9de73898",
+    "artifacts/tests-admission-san-post-helper.log": "b924d28ff6d2ce9eb22392a3b06e7b834264c42d0edd6320e4fc544830a07b81",
+    "artifacts/tests-admission-menu-held.log": "50f01a29869723d615d9259aed8266c6d41702e53e03ab0dd223716329017cfc",
+    "artifacts/tests-admission-xr.log": "514720740902372c9bbf98c38797aaa8b030af83d804bb3002c9777c36757023"
+  },
+  "completed": {
+    "direct_changed_apply_admission": {
+      "release": 181,
+      "san": 181,
+      "all_measured_prefixes_denied": true,
+      "persistent_normal_operator_new_on_caller_thread": true,
+      "actual_helper_retry_per_boundary": true,
+      "actual_controller_input_retry_per_boundary": true
+    },
+    "old_negative": {
+      "old_product": "55af68a",
+      "matching_old_headers_and_archives": true,
+      "boundary": 2,
+      "expected_exit": 1,
+      "invariant": "exact internal ready draft/source/input/work lease"
+    },
+    "native_controller_checks": 157,
+    "san_native_controller_checks": 157,
+    "san_selected_post_helper_publication_faults": 32,
+    "fltk_dbusmenu_checks": 16,
+    "openxr_loader_checks": 21,
+    "physical_hmd": false
+  },
+  "binary_sha256": {
+    "build/libdome-sculpt-core.a": "7da824b347fc13f0f512c49a394b838a8952fc0eadcb4d615ad34803dc20aee3",
+    "build-san/libdome-sculpt-core.a": "64cb0e25f2091e598e6f9cebbaf6af96b25271de53c1c4c506889d905c729649",
+    "build/dome-sculpt-cut-color-admission-test": "096c1393ae1a71bf38552d77baff637885be0b5a029e478e8d1c1f76e570ffe6",
+    "build-san/dome-sculpt-cut-color-admission-test": "0ed547c0dd543446dfd2db4c34a940f78608a07976db1bd8dfd54172a3c41884",
+    "build/dome-sculpt": "a997bb165b74264cfc6ae1d704ec0e45d7daff1e76ecb1946dfc1d3e5dea00eb",
+    "build/libdome-sculpt-test-runtime.so": "e0a5be823a6fe840001c75c30f4724fbb56e6306d8c480596bb1908c1e57607c"
+  },
+  "preserved_frozen_checkpoints": [
+    "9b823f5",
+    "fa4487a",
+    "09b6d38"
+  ],
+  "limitations": [
+    "Direct changed-Apply admission scope; not a new all-native/OneAPI qualification",
+    "No new recovery-on or universal transaction OOM claim",
+    "Pinned holding supported; moving-grip pose plus cut one history remains",
+    "Current-color source Bake qualification active separately; target-field preparation remains guarded",
+    "No push, installation, physical headset or session restart"
+  ]
+}
