@@ -7,6 +7,8 @@
 #include <optional>
 namespace dome {
 struct SourceNormalUvReprojection;
+struct SourceColorPreparation;
+struct PolygonAuthority;
 struct SourceNormalSampling;
 enum class SourceNormalUvMethod { Rasterize, RetainSource };
 struct SourceUvBakeOptions {
@@ -36,6 +38,11 @@ struct SourceUvBakeInput {
   // Destination vertex -> original PaintedMesh vertex. Every ordered corner
   // must map exactly; topology/geometry/order changes are not nearest-projected.
   std::vector<uint32_t> source_vertices;
+  // Transient own-Scene witness for raw current-corner paint. A PA surface is
+  // never admitted from counts or from an unrelated retained Origin alone.
+  std::shared_ptr<const PolygonAuthority> polygon_authority;
+  // Required for prepared corner colour transfer: the exact new own topology.
+  std::shared_ptr<const PolygonAuthority> target_polygon;
 };
 struct SourceUvBakeResult {
   Mesh target;
@@ -68,6 +75,9 @@ struct SourceUvBakeResult {
   std::vector<std::string> diagnostics;
   std::shared_ptr<const DeformationState> original_deformation;
   std::shared_ptr<const SourceNormalUvReprojection> normal_reprojection;
+  std::shared_ptr<const PolygonAuthority> original_polygon;
+  std::shared_ptr<const PolygonAuthority> target_polygon;
+  std::shared_ptr<const SourceColorPreparation> color_reprojection;
   std::shared_ptr<const SourceNormalSampling> normal_sampling;
 };
 // Pure bounded native worker operation. No file access, GL, source mutation,

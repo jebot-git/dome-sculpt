@@ -4,6 +4,7 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/color-preparation.hpp"
+#include "dome/color-paint-sampling.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/source-maps.hpp"
@@ -42,7 +43,7 @@ inline unsigned minimum_appearance_scene_version(const nlohmann::json &a){
   if(!material.is_number_integer()||(material.is_number_unsigned()?material.get<uint64_t>()>INT32_MAX:material.get<int64_t>()<0||material.get<int64_t>()>INT32_MAX))throw std::runtime_error("Invalid retained appearance material identity");
   return material.get<int64_t>()==0?17u:0u;
 }
-inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
+inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->paint_sampling_domain()?24u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
 
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
@@ -53,7 +54,16 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if(binding->normal_frames)for(const auto &frame:{binding->normal_frames->pbr,binding->normal_frames->mtoon,binding->normal_frames->canonical})if(frame&&frame->generated_uv&&*frame->generated_uv>=2)result=std::max(result,26u);
   if(const auto &preparation=binding->color_preparation)
     result=std::max({result,preparation->polygon_colors?20u:10u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
-      minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
+      minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get()),
+      preparation->uv_reprojection?23u:0u,
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_material.get()):0u,
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_paint.get()):0u,
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_deformation.get()):0u,
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_appearance.get()):0u});
+  if(binding->color_preparation&&binding->color_preparation->paint_sampling){
+    const auto &u=*binding->color_preparation->paint_sampling;
+    result=std::max({result,24u,minimum_scene_version(u.before_material().get()),minimum_scene_version(u.before_paint().get()),minimum_scene_version(u.before_deformation().get()),minimum_scene_version(u.before_appearance().get())});
+  }
   if(const auto &preparation=binding->normal_preparation)
     result=std::max({result,preparation->uv_reprojection?19u:15u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get()),
@@ -63,7 +73,7 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
       preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_appearance.get()):0u});
   if(binding->normal_preparation&&binding->normal_preparation->sampling_domain){
     const auto &u=*binding->normal_preparation->sampling_domain;
-    result=std::max({result,21u,minimum_scene_version(u.before_material.get()),minimum_scene_version(u.sampling_material.get()),
+    result=std::max({result,u.metadata_sampling_domain?24u:21u,minimum_scene_version(u.before_material.get()),minimum_scene_version(u.sampling_material.get()),
       minimum_scene_version(u.before_paint.get()),minimum_scene_version(u.before_deformation.get()),minimum_scene_version(u.before_appearance.get())});
   }
   return result;

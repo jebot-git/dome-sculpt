@@ -5,6 +5,9 @@
 #include "dome/source-maps.hpp"
 #include "dome/material-bindings.hpp"
 #include "source-colors.hpp"
+#include "dome/paint-sampling.hpp"
+#include "dome/normal-preview.hpp"
+#include "dome/color-paint-sampling.hpp"
 #include "prepared-color-state.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
@@ -43,11 +46,35 @@ struct Visibility {
   std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv1;
   std::map<uint32_t,std::shared_ptr<const std::vector<std::array<float,2>>>> owned_extra_uv;
   std::vector<std::array<float,4>> vertex_colors;
+  std::vector<std::array<float,2>> paint_corners;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
-                      std::span<const std::array<float,4>> packed_colors, bool explicit_colors) : range(r) {
+                      std::span<const std::array<float,4>> packed_colors, bool explicit_colors, std::span<const std::array<float,2>> coordinates, bool per_vertex) : range(r) {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
+    const auto paint_node=r.material_bindings&&r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
+    if(bool(paint_node)!=bool(r.paint_sampling_attachment))throw std::invalid_argument("Visibility paint range omitted or fabricated its own sampling attachment");
+    if(r.paint_sampling_attachment) {
+      if(!maps||maps->source_only||!r.material_bindings||r.material_bindings->has_mtoon)
+        throw std::invalid_argument("Visibility paint domain requires its paired derived material");
+      const auto node=r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
+      const auto expected=node?node->geometry_attachment():nullptr;
+      if(!expected||expected!=r.paint_sampling_attachment||expected.owner_before(r.paint_sampling_attachment)||r.paint_sampling_attachment.owner_before(expected))
+        throw std::invalid_argument("Visibility paint range differs from its own immutable material attachment");
+      const auto &domain=*r.paint_sampling_attachment->domain();
+      if(domain.source_corners().size()!=r.count||coordinates.empty())
+        throw std::invalid_argument("Visibility paint corner coordinates are incomplete");
+      paint_corners.reserve(r.count);
+      for(size_t c=0;c<r.count;++c) {
+        auto logical=c;
+        if(r.paint_winding_reversed&&c%3)logical=c/3*3+3-c%3;
+        auto source=domain.source_corners()[logical];
+        auto expected=domain.basis()->uv.at(domain.basis()->indices.at(source));
+        auto actual=coordinates[per_vertex?mesh.indices.at(r.first+c):r.first+c];
+        if(actual!=expected)throw std::invalid_argument("Visibility paint coordinates differ from their owning corner domain");
+        paint_corners.push_back(actual);
+      }
+    }
     if(maps&&maps->source_maps&&maps->source_maps->uv1){
       maps->source_maps->validate();owned_uv1=maps->source_maps->uv1;
       if(r.first_vertex>mesh.positions.size()||owned_uv1->size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility UV1 domain exceeds packed geometry");
@@ -57,7 +84,11 @@ struct Visibility {
       maps->source_maps->validate();owned_extra_uv=maps->source_maps->extra_uv_sets;
       for(const auto &[set,values]:owned_extra_uv){if(r.first_vertex>mesh.positions.size()||values->size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility additional UV domain exceeds packed geometry");for(size_t c=r.first;c<r.first+r.count;++c){auto vertex=mesh.indices.at(c);if(vertex<r.first_vertex||vertex-r.first_vertex>=values->size())throw std::invalid_argument("Visibility additional UV packed index is invalid");}}
     }
-    const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get());
+    if(r.normal_preview_proof&&!r.normal_preview_proof->matches(r.material_bindings,maps))throw std::invalid_argument("Visibility normal preview lost its own immutable owners");
+    const bool sealed=r.paint_sampling_attachment&&r.normal_preview_proof&&r.normal_preview_proof->matches(r.material_bindings,maps)&&r.normal_preview_proof->metadata_domain()==r.paint_sampling_attachment->domain()&&
+      !r.normal_preview_proof->metadata_domain().owner_before(r.paint_sampling_attachment->domain())&&!r.paint_sampling_attachment->domain().owner_before(r.normal_preview_proof->metadata_domain());
+    if(r.normal_preview_proof&&r.paint_sampling_attachment&&!sealed)throw std::invalid_argument("Visibility normal and paint metadata have different owning coordinate domains");
+    const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get(),!sealed);
     if (maps) {
       if (maps->source_only) {
         auto present=[](const Image &i){return i.width || i.height || !i.rgba.empty();};
@@ -70,7 +101,7 @@ struct Visibility {
       else { color = derived_view(maps, maps->color); factor = 1; }
     }
     if(r.material_bindings) {
-      r.material_bindings->validate();
+      r.material_bindings->validate(!sealed);
       if(r.material_bindings->has_mtoon&&!r.pbr_view)toon=r.material_bindings->material;
     } else if(!r.pbr_view)toon = retained_mtoon(r.appearance.get());
     if (!toon) {
@@ -196,7 +227,12 @@ struct Visibility {
         if(replacement!=0)opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) * (1-replacement);
       }
     } else {
-      opacity = factor * sample(color, color.texcoord!=0?uv(m,triangle,bary,color.texcoord):primary);
+      auto sampling=primary;
+      if(!paint_corners.empty()) {
+        sampling={};const auto local=size_t(triangle)*3-range.first;
+        for(size_t c=0;c<3;++c)for(size_t k=0;k<2;++k)sampling[k]+=bary[c]*paint_corners.at(local+c)[k];
+      }
+      opacity = factor * sample(color, color.texcoord!=0?uv(m,triangle,bary,color.texcoord):sampling);
       if(!vertex_colors.empty()){float a=0;for(size_t k=0;k<3;++k)a+=bary[k]*vertex_colors.at(m.indices[first+k]-range.first_vertex)[3];opacity*=a;}
     }
     opacity = std::clamp(opacity, 0.f, 1.f);
@@ -208,17 +244,19 @@ struct MaterialSurfaceQuery::Impl {
   SurfaceQuery query;
   std::vector<Visibility> surfaces;
   Impl(const Mesh &mesh, std::span<const SurfaceRange> ranges, const std::function<bool()> &cancelled,
-       std::span<const std::array<float,4>> colors,bool explicit_colors)
+       std::span<const std::array<float,4>> colors,bool explicit_colors, std::span<const std::array<float,2>> paint={},bool per_vertex=false)
       : query(mesh, cancelled) {
     if(!colors.empty()&&colors.size()!=mesh.positions.size())throw std::invalid_argument("Packed visibility color vertex count differs from geometry");
     for(size_t i=0;i<colors.size();++i){if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Visibility color validation cancelled");for(float c:colors[i])if(!std::isfinite(c)||c<0||c>1)throw std::invalid_argument("Packed visibility requires finite linear unit RGBA");}
+    if(!paint.empty()&&paint.size()!=(per_vertex?mesh.positions.size():mesh.indices.size()))throw std::invalid_argument("Visibility paint coordinate alignment differs from geometry");
+    for(size_t c=0;c<paint.size();++c){if((c&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Visibility paint validation cancelled");for(float v:paint[c])if(!std::isfinite(v))throw std::invalid_argument("Visibility paint coordinates are nonfinite");}
     size_t end = 0;
     for (const auto &range : ranges) {
       if (cancelled && cancelled()) throw std::runtime_error("Visibility build cancelled");
       if (range.first != end || range.count % 3 || range.count > mesh.indices.size() - end)
         throw std::invalid_argument("Visibility requires contiguous triangle-aligned surface ranges");
       end += range.count;
-      surfaces.emplace_back(range, mesh,colors,explicit_colors);
+      surfaces.emplace_back(range, mesh,colors,explicit_colors,paint,per_vertex);
     }
     if (end != mesh.indices.size()) throw std::invalid_argument("Visibility surface ranges are incomplete");
   }
@@ -229,6 +267,12 @@ MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh, std::span<const Sur
 MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const SurfaceRange> ranges,
  const std::function<bool()> &cancelled,std::span<const std::array<float,4>> colors)
     : impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true)) {}
+MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const SurfaceRange> ranges,
+ const std::function<bool()> &cancelled,std::span<const std::array<float,4>> colors,PaintCornerCoordinates paint)
+    :impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true,paint.values,false)){}
+MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const SurfaceRange> ranges,
+ const std::function<bool()> &cancelled,std::span<const std::array<float,4>> colors,PaintVertexCoordinates paint)
+    :impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true,paint.values,true)){}
 MaterialSurfaceQuery::~MaterialSurfaceQuery() = default;
 SurfaceHit MaterialSurfaceQuery::closest(Vec3 point) const { return impl_->query.closest(point); }
 std::optional<SurfaceHit> MaterialSurfaceQuery::nearby(Vec3 point,float maximum,double seconds) const {

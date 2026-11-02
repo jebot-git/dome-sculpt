@@ -1,0 +1,27 @@
+{
+  "source_commit": "b8f110c",
+  "scope": "Detached immutable exact current-corner field/sampling proof only; Scene24 material9/native/render/export adoption remain required",
+  "source_sha256": {
+    "CMakeLists.txt": "8bc6d50c51c63e626e3bcf3f2b3b2bf413a82b33a96c126261a4c5a905069150",
+    "include/dome/color-paint-sampling.hpp": "64edf7f57bfbe07be1c482bc7486b1f72e109d52597cf149e530198a08bb6a42",
+    "src/color-paint-sampling.cpp": "d0eaf3111e4e4d5f9266503e6cb202a665f920df8e406b9da410a51be54cc5bd",
+    "tests/color-paint-sampling.cpp": "af10b597f6324cb98ae50bfec62061c3878c659f9d7b012ad8d297a006cec47c"
+  },
+  "release": {
+    "passed": 3,
+    "seconds": 1.62,
+    "log_sha256": "4780c8d7e5ba5b1c6899ada729ed69ab763f5d21b234c1268fbb0f1b7edc0772"
+  },
+  "own_core_c_cxx_support_sanitizers": {
+    "passed": 3,
+    "seconds": 22.97,
+    "flags": "O1 g1 ASAN UBSAN fno-omit-frame-pointer fno-pie/no-pie; leaks enabled",
+    "log_sha256": "ab94a73132876fc800ab5ef6a9251d658ccfdd2dfeb8c2fd10f2f383ec9714dc"
+  },
+  "factory_assertions": 21,
+  "fixture": "Actual native paired normal/current-corner Bake, varying normal data, real selected chart .7scale+90degree turn; complete original Scene unchanged",
+  "core_archives": {
+    "build/libdome-sculpt-core.a": "22b9204959232886d8921ac877157799ac0d2e57362c2168c407fbba8bf358cf",
+    "build-ownsan/libdome-sculpt-core.a": "b170559c9cf5134754707145c9fde0c9100e5f376b8be0615e37a87be50be238"
+  }
+}

@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-bindings.hpp"
 #include "dome/color-preparation.hpp"
+#include "dome/color-paint-sampling.hpp"
+#include "paint-sampling-access.hpp"
+#include "paint-archive-shape.hpp"
 #include "dome/normal-preparation.hpp"
+#include "normal-sampling-access.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/paint.hpp"
@@ -15,13 +19,41 @@ namespace {
 constexpr size_t role_count=size_t(MToonSlot::Count);
 thread_local std::array<const SourceMaterialBindings*,64> material_validation_path{};
 thread_local size_t material_validation_depth=0;
+struct MaterialValidationProof { const SourceMaterialBindings *binding=nullptr;bool deep=false,complete=false; };
+thread_local std::array<MaterialValidationProof,256> material_validation_proofs{};
+thread_local size_t material_validation_proof_count=0;
 struct MaterialValidationScope {
-  MaterialValidationScope(const SourceMaterialBindings *binding){
+  const SourceMaterialBindings *binding;
+  bool proved=false;
+  MaterialValidationScope(const SourceMaterialBindings *value,bool deep):binding(value){
+    // This ledger lives only for one synchronous top-level validation. The
+    // caller owns the immutable graph throughout; no raw-pointer proof or
+    // omitted mutation check survives the call, including exceptional unwind.
+    if(!material_validation_depth)material_validation_proof_count=0;
     if(material_validation_depth==material_validation_path.size()||std::find(material_validation_path.begin(),material_validation_path.begin()+material_validation_depth,binding)!=material_validation_path.begin()+material_validation_depth)
       throw std::invalid_argument("Material preparation origin graph is cyclic or exceeds its depth budget");
+    const auto end=material_validation_proofs.begin()+material_validation_proof_count;
+    const auto found=std::find_if(material_validation_proofs.begin(),end,[&](const auto &proof){return proof.binding==binding;});
+    proved=found!=end&&found->complete&&(!deep||found->deep);
+    if(found==end&&material_validation_proof_count==material_validation_proofs.size())
+      throw std::length_error("Material validation exceeds its unique owning-node budget");
+    if(found==end)material_validation_proofs[material_validation_proof_count++]={binding,false,false};
     material_validation_path[material_validation_depth++]=binding;
   }
-  ~MaterialValidationScope(){material_validation_path[--material_validation_depth]=nullptr;}
+  void complete(bool deep) noexcept {
+    const auto end=material_validation_proofs.begin()+material_validation_proof_count;
+    const auto found=std::find_if(material_validation_proofs.begin(),end,[&](const auto &proof){return proof.binding==binding;});
+    // Admission reserved this entry before descending, so child completion
+    // cannot exhaust space needed by an ancestor's noexcept completion.
+    found->deep=found->deep||deep;found->complete=true;
+  }
+  ~MaterialValidationScope(){
+    material_validation_path[--material_validation_depth]=nullptr;
+    if(!material_validation_depth){
+      std::fill_n(material_validation_proofs.begin(),material_validation_proof_count,MaterialValidationProof{});
+      material_validation_proof_count=0;
+    }
+  }
 };
 void roles_valid(const std::optional<MToonMaterial> &material,
                  const std::array<PaintSourceTexture,role_count> &roles) {
@@ -79,7 +111,8 @@ void SourceNativeMaterial::validate() const {
     throw std::invalid_argument("Invalid native factor baseline for resolved material");
 }
 void SourceMaterialBindings::validate(bool deep) const {
-  MaterialValidationScope validation(this);
+  MaterialValidationScope validation(this,deep);
+  if(validation.proved)return;
   if(size_t(normal_frame)>1 || size_t(animation_policy)>1 ||
      !std::isfinite(freeze_seconds) || freeze_seconds<0 || freeze_seconds>1e9 ||
      (animation_frozen && animation_policy!=SourceUvAnimationPolicy::FreezeAtTime))
@@ -145,6 +178,7 @@ void SourceMaterialBindings::validate(bool deep) const {
       if(t.source_target && (!uv_origin->appearance || !t.origin_slot || *t.origin_slot>=uv_origin->appearance->source_morph_targets.size() || uv_origin->appearance->source_morph_targets[*t.origin_slot]!=*t.source_target))throw std::invalid_argument("Normal frame source target provenance differs");
     }
   }
+  validation.complete(deep);
 }
 uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings> value,bool deep) {
   if(!value) throw std::invalid_argument("Missing resolved material holder");
@@ -154,6 +188,10 @@ uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings
   value->validate(deep);
   if(value->color_preparation && value->color_preparation->original_material)
     add(value->color_preparation->original_material,deep);
+  if(value->color_preparation&&value->color_preparation->uv_reprojection)
+    add(value->color_preparation->uv_reprojection->before_material,deep);
+  if(value->color_preparation&&value->color_preparation->paint_sampling)
+    add(value->color_preparation->paint_sampling->before_material(),deep);
   if(value->normal_preparation&&value->normal_preparation->original_material)
     add(value->normal_preparation->original_material,deep);
   if(value->normal_preparation&&value->normal_preparation->uv_reprojection)
@@ -180,8 +218,16 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 }
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,
     detail::PolygonColorArchive *colors,NormalSamplingArchive *domains) const {
+  return encode(images,models,colors,domains,nullptr);
+}
+nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,
+    detail::PolygonColorArchive *colors,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
   const bool corners=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->color_preparation&&b->color_preparation->polygon_colors;});
   if(corners&&!colors)throw std::invalid_argument("Current corner color preparation requires its shared Scene20 archive");
+  const bool paint_sampling=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return (b->color_preparation&&b->color_preparation->paint_sampling)||(b->normal_preparation&&b->normal_preparation->sampling_domain&&b->normal_preparation->sampling_domain->metadata_sampling_domain);});
+  if(paint_sampling&&!paint_domains)
+    throw std::invalid_argument("Retained writable paint requires its complete material9/Scene24 context");
+  const bool color_uv=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->color_preparation&&b->color_preparation->uv_reprojection;});
   const bool prepared=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->color_preparation);});
   const bool normal_prepared=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->normal_preparation);});
   const bool normal_uv=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->normal_preparation&&b->normal_preparation->uv_reprojection;});
@@ -189,15 +235,15 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
   if(sampling&&!domains)throw std::invalid_argument("Retained normal interpretation requires its shared owning archive");
   const bool extended=prepared || normal_prepared || std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->normal_frames) || (b->uv_origin && !b->sampling_reparameterized);}) || std::any_of(origins_.begin(),origins_.end(),[](const auto &o){return bool(o->deformation)||!o->creator_kind.empty();});
   NormalFrameArchive frames;
-  nlohmann::json output={{"version",sampling?7:corners?6:normal_uv?5:normal_prepared?4:prepared?3:extended?2:1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
+  nlohmann::json output={{"version",paint_sampling?9:color_uv?8:sampling?7:corners?6:normal_uv?5:normal_prepared?4:prepared?3:extended?2:1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
   std::vector<std::shared_ptr<const PaintedMesh>> paints;
   auto paint_id=[&](const std::shared_ptr<const PaintedMesh> &paint){
     auto found=std::find(paints.begin(),paints.end(),paint);
     if(found!=paints.end())return size_t(found-paints.begin());
     if(paints.size()>=256)throw std::length_error("Retained paint archive count exceeds budget");
-    const auto id=paints.size();paints.push_back(paint);output["paints"].push_back(paint->encode(&images,domains));return id;
+    const auto id=paints.size();paints.push_back(paint);output["paints"].push_back(paint->encode(&images,domains,paint_domains));return id;
   };
-  std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;
+  std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;size_t color_uv_layout_bytes=0;
   if(prepared||normal_prepared) {
     output["color_preparations"]=nlohmann::json::array();
     for(const auto &binding:bindings_)if(binding->color_preparation && std::find(preparations.begin(),preparations.end(),binding->color_preparation)==preparations.end()) {
@@ -213,6 +259,29 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
       if(p.polygon_colors){
         auto &entry=output["color_preparations"].back();entry["version"]=2;
         entry["polygon_colors"]={{"topology",p.polygon_colors->topology->encode()},{"field",colors->add(p.polygon_colors->field)}};
+      }
+      if(p.uv_reprojection){const auto &u=*p.uv_reprojection;
+        const auto bytes=u.layout->storage_bytes();if(bytes>128*1024*1024-color_uv_layout_bytes)throw std::length_error("Colour UV layouts exceed archive budget");color_uv_layout_bytes+=bytes;
+        const auto previous=std::find(bindings_.begin(),bindings_.end(),u.before_material);
+        if(previous==bindings_.end())throw std::logic_error("Missing colour UV prepared predecessor");
+        auto &entry=output["color_preparations"].back();entry["version"]=3;
+        entry["uv_reprojection"]={{"version",1},{"receipt",u.receipt.encode()},{"layout",u.layout->encode()},
+          {"paint",paint_id(u.before_paint)},{"appearance",u.before_appearance?encode_creator_appearance(*u.before_appearance,models,images):nlohmann::json(nullptr)},
+          {"deformation",u.before_deformation?u.before_deformation->encode(u.before_paint->mesh()):nlohmann::json(nullptr)},
+          {"before_binding",size_t(previous-bindings_.begin())},
+          {"polygon_colors",{{"topology",u.polygon_colors->topology->encode()},{"field",colors->add(u.polygon_colors->field)}}}};
+      }
+      if(p.paint_sampling){const auto &u=*p.paint_sampling;
+        const auto bytes=u.layout()->storage_bytes();if(bytes>128*1024*1024-color_uv_layout_bytes)throw std::length_error("Retained paint layouts exceed archive budget");color_uv_layout_bytes+=bytes;
+        const auto previous=std::find(bindings_.begin(),bindings_.end(),u.before_material());
+        if(previous==bindings_.end())throw std::logic_error("Missing retained corner paint predecessor");
+        auto &entry=output["color_preparations"].back();entry["version"]=4;
+        entry["paint_sampling"]={{"version",1},{"receipt",u.receipt().encode()},{"layout",u.layout()->encode()},
+          {"domain",paint_domains->add(u.domain())},{"paint",paint_id(u.before_paint())},
+          {"appearance",u.before_appearance()?encode_creator_appearance(*u.before_appearance(),models,images):nlohmann::json(nullptr)},
+          {"deformation",u.before_deformation()?u.before_deformation()->encode(u.before_paint()->mesh()):nlohmann::json(nullptr)},
+          {"before_binding",size_t(previous-bindings_.begin())},
+          {"polygon_colors",{{"topology",u.current_descriptor()->topology->encode()},{"field",colors->add(u.current_descriptor()->field)}}}};
       }
     }
   }
@@ -252,6 +321,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
           {"deformation",u.before_deformation?u.before_deformation->encode(u.before_paint->mesh()):nlohmann::json(nullptr)},
           {"before_binding",size_t(before-bindings_.begin())},{"sampling_binding",size_t(sampler-bindings_.begin())},
           {"current_sampling_reference",u.current_sampling_reference?u.current_sampling_reference->encode():nlohmann::json(nullptr)}};
+        if(u.metadata_sampling_domain){entry["version"]=4;entry["sampling_domain"]["version"]=2;entry["sampling_domain"]["metadata_sampling_domain"]=paint_domains->add(u.metadata_sampling_domain);}
       }
     }
   }
@@ -293,7 +363,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
   size_t entries=0;
   if(input.at("version")==1)return 0;
-  if((input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5 && input.at("version")!=6 && input.at("version")!=7) || !input.at("origins").is_array() || input.at("origins").size()>256)
+  if((input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5 && input.at("version")!=6 && input.at("version")!=7 && input.at("version")!=8 && input.at("version")!=9) || !input.at("origins").is_array() || input.at("origins").size()>256)
     throw std::runtime_error("Invalid original deformation archive");
   auto add=[&](size_t n){if(n>8'000'000-entries)throw std::length_error("Original deformation archive exceeds scene budget");entries+=n;};
   auto count=[&](const nlohmann::json &d) {
@@ -313,20 +383,33 @@ size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
     }
   };
   for(const auto &origin:input.at("origins"))count(origin.at("deformation"));
-  if(input.at("version")==3||input.at("version")==4||input.at("version")==5||input.at("version")==6||input.at("version")==7) {
+  if(input.at("version")==3||input.at("version")==4||input.at("version")==5||input.at("version")==6||input.at("version")==7||input.at("version")==8||input.at("version")==9) {
     const auto &preparations=input.at("color_preparations");
     if(!preparations.is_array() || (input.at("version")==3&&preparations.empty()) || preparations.size()>256)throw std::runtime_error("Invalid color preparation archive");
-    for(const auto &p:preparations)count(p.at("deformation"));
+    size_t color_uv_bytes=0;bool found_color_uv=false;
+    for(const auto &p:preparations){count(p.at("deformation"));if(p.contains("uv_reprojection")){
+      if((input.at("version")!=8&&input.at("version")!=9)||(p.at("version")!=3&&p.at("version")!=4)||!p.contains("polygon_colors"))throw std::invalid_argument("Colour UV replay requires material8/entry3");
+      const auto &u=p.at("uv_reprojection");if(!u.is_object()||u.size()!=8||u.at("version")!=1)throw std::invalid_argument("Unsupported colour UV record");
+      ColorUvReprojectionReceipt::decode(u.at("receipt"));const auto bytes=SourceColorUvLayout::encoded_storage_bytes(u.at("layout"));
+      if(bytes>128*1024*1024-color_uv_bytes)throw std::length_error("Colour UV layouts exceed archive budget");color_uv_bytes+=bytes;count(u.at("deformation"));found_color_uv=true;
+    }}
+    for(const auto &p:preparations)if(p.contains("paint_sampling")){
+      if(input.at("version")!=9||p.at("version")!=4||!p.contains("polygon_colors"))throw std::invalid_argument("Retained paint colour requires material9/entry4");
+      const auto &u=p.at("paint_sampling");if(!u.is_object()||u.size()!=9||u.at("version")!=1)throw std::invalid_argument("Unsupported retained paint colour source record");
+      CornerPaintSamplingReceipt::decode(u.at("receipt"));const auto bytes=SourceColorUvLayout::encoded_storage_bytes(u.at("layout"));
+      if(bytes>128*1024*1024-color_uv_bytes)throw std::length_error("Retained paint layouts exceed material budget");color_uv_bytes+=bytes;count(u.at("deformation"));
+    }
+    if(input.at("version")==8&&!found_color_uv)throw std::invalid_argument("Material8 requires actual colour UV authority");
   }
-  if(input.at("version")==4||input.at("version")==5||input.at("version")==6||input.at("version")==7){const auto &preparations=input.at("normal_preparations");
-    if(!preparations.is_array()||(input.at("version")!=6&&preparations.empty())||preparations.size()>256)throw std::invalid_argument("Invalid normal preparation archive");
+  if(input.at("version")==4||input.at("version")==5||input.at("version")==6||input.at("version")==7||input.at("version")==8||input.at("version")==9){const auto &preparations=input.at("normal_preparations");
+    if(!preparations.is_array()||(input.at("version")!=6&&input.at("version")!=8&&input.at("version")!=9&&preparations.empty())||preparations.size()>256)throw std::invalid_argument("Invalid normal preparation archive");
     size_t uv_bytes=0;bool found_uv=false,found_sampling=false;
     for(const auto &p:preparations){count(p.at("deformation"));if(p.contains("uv_reprojection")){if(input.at("version")<5||p.at("version")!=2)throw std::invalid_argument("Normal UV projections require material archive5/entry2");const auto &u=p.at("uv_reprojection");if(!u.is_object()||u.size()!=8||u.at("version")!=1)throw std::invalid_argument("Unsupported normal UV projection record");const auto bytes=SourceNormalUvLayout::encoded_storage_bytes(u.at("layout"));if(bytes>128*1024*1024-uv_bytes)throw std::length_error("Normal UV layout archive exceeds its global budget");uv_bytes+=bytes;count(u.at("deformation"));found_uv=true;}}
     for(const auto &p:preparations)if(p.contains("sampling_domain")){
-      if(input.at("version")!=7||p.at("version")!=3||p.contains("uv_reprojection"))
+      if((input.at("version")!=7&&input.at("version")!=8&&input.at("version")!=9)||(p.at("version")!=3&&p.at("version")!=4)||p.contains("uv_reprojection"))
         throw std::invalid_argument("Retained normal domains require archive7/entry3");
       const auto &u=p.at("sampling_domain");
-      if(!u.is_object()||u.size()!=10||u.at("version")!=1)
+      if(!u.is_object()||u.size()!=(p.at("version")==4?11u:10u)||u.at("version")!=(p.at("version")==4?2:1)||(p.at("version")==4&&input.at("version")!=9))
         throw std::invalid_argument("Unsupported retained normal source record");
       const auto bytes=SourceNormalUvLayout::encoded_storage_bytes(u.at("layout"));
       if(bytes>128*1024*1024-uv_bytes)throw std::length_error("Normal source layouts exceed their shared archive budget");
@@ -347,13 +430,19 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
 }
 SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
     const CreatorAssetArchive &models,const detail::PolygonColorArchive *colors,const NormalSamplingArchive *domains) {
-  if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5 && input.at("version")!=6 && input.at("version")!=7) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
+  return decode(input,images,models,colors,domains,nullptr);
+}
+SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
+    const CreatorAssetArchive &models,const detail::PolygonColorArchive *colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
+  if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5 && input.at("version")!=6 && input.at("version")!=8 && input.at("version")!=7 && input.at("version")!=9) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
      !input.at("bindings").is_array() || input.at("bindings").size()>256)
     throw std::runtime_error("Invalid resolved material archive");
+  if(input.at("version")==9&&!paint_domains)throw std::invalid_argument("Material9 requires its actual paired Paint sampling pool");
   const bool corners=input.at("version")>=6;
-  const bool sampling=input.at("version")==7;
-  if(input.at("version")==6&&!colors)throw std::invalid_argument("Current corner color preparation requires Scene20 geometry authority");
-  if(sampling&&!domains)throw std::invalid_argument("Retained normal preparation requires its owning Scene21 field pool");
+  const bool sampling=input.at("version")>=7;
+  if((input.at("version")==6||input.at("version")==8||input.at("version")==9)&&!colors)throw std::invalid_argument("Current corner color preparation requires Scene20 geometry authority");
+  if(input.at("version")==7&&!domains)throw std::invalid_argument("Retained normal preparation requires its owning Scene21 field pool");
+  if(!domains&&input.contains("normal_preparations"))for(const auto &p:input.at("normal_preparations"))if(p.contains("sampling_domain"))throw std::invalid_argument("Retained normal recipe needs its actual shared context");
   const bool normal_uv=input.at("version")>=5;
   const bool normal_prepared=input.at("version")==4||normal_uv;
   const bool prepared=input.at("version")==3||normal_prepared;
@@ -373,10 +462,30 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   }
   if(!extended){if(input.contains("normal_frames"))throw std::runtime_error("Normal frames require material archive2");for(const auto &o:input.at("origins"))if(o.contains("deformation")||o.contains("creator"))throw std::runtime_error("Native frame origin requires material archive2");for(const auto &b:input.at("bindings"))if(b.contains("frames") || b.contains("sampling_reparameterized"))throw std::runtime_error("Normal frame references require material archive2");}
   deformation_entries(input);
+  if(input.at("version")==9){
+    // All new graph references and topology dimensions are checked before any
+    // SurfaceMap/normal-frame bulk reconstruction. No count-only authority.
+    size_t topology_work=0;
+    auto charge=[&](size_t n){if(n>8'000'000-topology_work)throw std::length_error("Retained paint topology exceeds aggregate material budget");topology_work+=n;};
+    auto topology=[&](const nlohmann::json &record){
+      if(!record.is_object()||record.size()!=2)throw std::invalid_argument("Invalid current-corner descriptor shape");
+      const auto &t=record.at("topology");if(!t.is_object()||t.size()!=5||t.at("version")!=1||!t.at("vertices").is_array()||!t.at("edges").is_array()||!t.at("faces").is_array()||t.at("vertices").size()>500'000||t.at("faces").size()>500'000||t.at("edges").size()>2'000'000)throw std::invalid_argument("Retained paint topology shape exceeds bounds");
+      charge(t.at("vertices").size());charge(t.at("edges").size());charge(t.at("faces").size());
+      for(const auto &v:t.at("vertices")){if(!v.is_array()||v.size()!=5||!v[4].is_array()||v[4].size()>128)throw std::invalid_argument("Invalid retained paint vertex source provenance");charge(v[4].size());}
+      for(const auto &f:t.at("faces")){if(!f.is_object()||f.size()!=3||!f.at("corners").is_array()||f.at("corners").size()<3||f.at("corners").size()>256)throw std::invalid_argument("Invalid retained paint face-corner dimensions");charge(f.at("corners").size());}
+      if(!colors)throw std::invalid_argument("Retained paint requires actual shared current corner fields");index(record.at("field"),colors->fields().size());
+    };
+    const auto &preps=input.at("color_preparations"),&normals=input.at("normal_preparations");
+    for(const auto &p:preps){if(p.contains("polygon_colors"))topology(p.at("polygon_colors"));if(p.contains("uv_reprojection"))topology(p.at("uv_reprojection").at("polygon_colors"));if(p.contains("paint_sampling")){const auto &u=p.at("paint_sampling");topology(u.at("polygon_colors"));index(u.at("paint"),input.at("paints").size());index(u.at("before_binding"),input.at("bindings").size());paint_domains->at(uint32_t(index(u.at("domain"),paint_domains->size())));}}
+    for(size_t i=0;i<input.at("bindings").size();++i){const auto &b=input.at("bindings")[i];if(!b.at("color_preparation").is_null()){const auto &p=preps.at(index(b.at("color_preparation"),preps.size()));if(p.contains("paint_sampling"))index(p.at("paint_sampling").at("before_binding"),i);}
+      if(!b.at("normal_preparation").is_null()){const auto &p=normals.at(index(b.at("normal_preparation"),normals.size()));if(p.contains("sampling_domain")){const auto &u=p.at("sampling_domain");index(u.at("before_binding"),i);index(u.at("sampling_binding"),i);index(u.at("paint"),input.at("paints").size());if(p.at("version")==4)paint_domains->at(uint32_t(index(u.at("metadata_sampling_domain"),paint_domains->size())));}}}
+  }
   NormalFrameArchive frames;if(extended)frames=NormalFrameArchive::decode(input.at("normal_frames"));
   // Preflight all implicit SurfaceMap allocations before constructing any.
   size_t texels=0,vertices=0,tile_bytes=0,metadata=0;
-  for(const auto &paint:input.at("paints")) {
+  for(const auto &record:input.at("paints")) {
+    const auto &paint=detail::paint_archive_payload(record,input.at("version")==9);
+    if(record.contains("version"))paint_domains->at(uint32_t(index(record.at("domain"),paint_domains->size())));
     const auto &resolution=paint.at("resolution");
     if(!resolution.is_number_unsigned() && (!resolution.is_number_integer() || resolution.get<int64_t>()<64))
       throw std::runtime_error("Invalid original UV paint resolution");
@@ -414,7 +523,17 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   }
   SourceMaterialArchive output;
   std::vector<std::shared_ptr<const PaintedMesh>> paints;
-  for(const auto &paint:input.at("paints"))paints.push_back(PaintedMesh::decode(paint,&images,false,domains));
+  for(const auto &paint:input.at("paints"))paints.push_back(PaintedMesh::decode(paint,&images,false,domains,paint_domains));
+  std::vector<std::shared_ptr<const PaintSamplingAttachment>> bound_paints(paints.size());
+  auto bind_paint=[&](size_t id,const std::shared_ptr<const SourceMaterialBindings> &before){
+    if(!paints[id]->paint_sampling_domain())return paints[id];
+    const auto color=before?before->color_preparation:nullptr;
+    if(!color||!color->paint_sampling)throw std::invalid_argument("Retained beforePaint lacks its own complete material witness");
+    const auto &attachment=color->paint_sampling->geometry_attachment();
+    if(bound_paints[id]&&bound_paints[id]!=attachment)throw std::invalid_argument("One retained paint record cannot acquire conflicting geometry/material owners");
+    if(!bound_paints[id]){paints[id]=rebind_paint_sampling_geometry(*paints[id],attachment);bound_paints[id]=attachment;}
+    return paints[id];
+  };
   for(const auto &value:input.at("origins")) {
     auto origin=std::make_shared<SourceUvOrigin>();
     origin->paint=paints.at(index(value.at("paint"),paints.size()));
@@ -427,7 +546,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
       if(!value.at("creator").is_null()){const auto &c=value.at("creator");origin->creator_kind=c.at("kind").get<std::string>();if(!c.is_object() || c.size()!=3 || !c.at("version").is_number_integer() || c.at("version")!=1)throw std::runtime_error("Unsupported creator frame version");origin->creator_version=1;origin->creator_parameters=c.at("parameters").get<std::string>();}}
     output.origins_.push_back(std::move(origin));
   }
-  std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;
+  std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;size_t color_uv_layout_bytes=0;
   if(prepared)preparations.resize(input.at("color_preparations").size());
   std::vector<std::shared_ptr<const SourceNormalPreparation>> normal_preparations;
   if(normal_prepared)normal_preparations.resize(input.at("normal_preparations").size());
@@ -459,8 +578,8 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
       const auto id=index(value.at("color_preparation"),preparations.size());
       if(!preparations[id]) {
         const auto &v=input.at("color_preparations").at(id);
-        const bool current=v.contains("polygon_colors");
-        if(!v.is_object() || v.size()!=(current?9u:8u) || !v.at("version").is_number_integer() || v.at("version")!=(current?2:1) || (current&&!corners))throw std::runtime_error("Unsupported retained color preparation");
+        const bool current=v.contains("polygon_colors"),uv=v.contains("uv_reprojection"),retained=v.contains("paint_sampling");
+        if(!v.is_object() || v.size()!=(retained?(uv?11u:10u):uv?10u:current?9u:8u) || !v.at("version").is_number_integer() || v.at("version")!=(retained?4:uv?3:current?2:1) || (current&&!corners) || (uv&&(!current||(input.at("version")!=8&&input.at("version")!=9))) || (retained&&(!current||input.at("version")!=9)))throw std::runtime_error("Unsupported retained color preparation");
         auto p=std::make_shared<SourceColorPreparation>();
         p->projection=decode_color_projection(v.at("projection"),images);p->initial_projection=decode_color_projection(v.at("initial_projection"),images);
         p->receipt=ColorPreparationReceipt::decode(v.at("receipt"));p->original_paint=paints.at(index(v.at("paint"),paints.size()));
@@ -468,6 +587,40 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
         if(!v.at("appearance").is_null())p->original_appearance=decode_creator_appearance(v.at("appearance"),models);
         if(!v.at("deformation").is_null())p->original_deformation=std::make_shared<const DeformationState>(DeformationState::decode(v.at("deformation"),p->original_paint->mesh()));
         if(!v.at("before_binding").is_null())p->original_material=output.bindings_.at(index(v.at("before_binding"),output.bindings_.size()));
+        if(uv&&!retained){const auto &u=v.at("uv_reprojection");auto node=std::make_shared<SourceColorUvReprojection>();
+          node->receipt=ColorUvReprojectionReceipt::decode(u.at("receipt"));node->layout=SourceColorUvLayout::decode(u.at("layout"));node->projection=p->projection;
+          node->before_paint=paints.at(index(u.at("paint"),paints.size()));node->before_material=output.bindings_.at(index(u.at("before_binding"),output.bindings_.size()));
+          if(!u.at("appearance").is_null())node->before_appearance=decode_creator_appearance(u.at("appearance"),models);
+          if(!u.at("deformation").is_null())node->before_deformation=std::make_shared<const DeformationState>(DeformationState::decode(u.at("deformation"),node->before_paint->mesh()));
+          const auto &source=u.at("polygon_colors");if(!source.is_object()||source.size()!=2)throw std::invalid_argument("Invalid current colour UV descriptor");
+          auto descriptor=std::make_shared<PolygonColorSurface>();descriptor->topology=std::make_shared<const PolygonMesh>(PolygonMesh::decode(source.at("topology")));descriptor->field=colors->at(uint32_t(index(source.at("field"),colors->fields().size())));node->polygon_colors=std::move(descriptor);
+          const auto prior=node->before_material->color_preparation;if(!prior)throw std::invalid_argument("Colour UV predecessor lost its own preparation");
+          const auto previous=std::find(preparations.begin(),preparations.end(),prior);if(previous==preparations.end())throw std::invalid_argument("Colour UV predecessor is not an earlier archived recipe");
+          const auto &record=input.at("color_preparations").at(size_t(previous-preparations.begin()));
+          for(const char *key:{"initial_projection","receipt","paint","appearance","deformation","before_binding","polygon_colors"})
+            if(v.at(key)!=record.at(key))throw std::invalid_argument("Colour UV initial serialized authority differs from its immutable predecessor");
+          p->initial_projection=prior->initial_projection;p->receipt=prior->receipt;p->original_paint=prior->original_paint;p->original_appearance=prior->original_appearance;
+          p->original_deformation=prior->original_deformation;p->original_material=prior->original_material;p->polygon_colors=prior->polygon_colors;p->uv_reprojection=std::move(node);
+        }
+        if(retained){const auto &u=v.at("paint_sampling");
+          const auto before=output.bindings_.at(index(u.at("before_binding"),output.bindings_.size()));const auto prior=before->color_preparation;
+          if(!prior)throw std::invalid_argument("Retained paint predecessor lacks its own colour preparation");
+          auto previous=std::find(preparations.begin(),preparations.end(),prior);if(previous==preparations.end())throw std::invalid_argument("Retained colour predecessor is not an earlier recipe");
+          const auto &record=input.at("color_preparations").at(size_t(previous-preparations.begin()));
+          for(const char *key:{"projection","initial_projection","receipt","paint","appearance","deformation","before_binding","polygon_colors"})
+            if(v.at(key)!=record.at(key))throw std::invalid_argument("Retained colour changed its immutable predecessor authority");
+          if(v.contains("uv_reprojection")!=record.contains("uv_reprojection")||(v.contains("uv_reprojection")&&v.at("uv_reprojection")!=record.at("uv_reprojection")))throw std::invalid_argument("Retained paint changed old UV provenance");
+          const auto paint_id=index(u.at("paint"),paints.size());auto paint=bind_paint(paint_id,before);
+          if(!u.at("appearance").is_null())throw std::invalid_argument("Current corner retained paint cannot borrow raw source appearance");
+          auto layout=SourceColorUvLayout::decode(u.at("layout"));std::shared_ptr<const DeformationState> deform;
+          if(!u.at("deformation").is_null())deform=std::make_shared<const DeformationState>(DeformationState::decode(u.at("deformation"),paint->mesh()));
+          const auto &d=u.at("polygon_colors");if(!d.is_object()||d.size()!=2)throw std::invalid_argument("Invalid retained current colour descriptor");
+          auto descriptor=std::make_shared<const PolygonColorSurface>(PolygonColorSurface{std::make_shared<const PolygonMesh>(PolygonMesh::decode(d.at("topology"))),colors->at(uint32_t(index(d.at("field"),colors->fields().size())))});
+          const auto domain=paint_domains->at(uint32_t(index(u.at("domain"),paint_domains->size())));auto target=layout->target_mesh(paint->mesh());
+          auto replay=retain_source_corner_paint(paint,before,deform,std::move(descriptor),target,layout->source_vertices,domain);
+          if(replay.sampling->receipt().encode()!=u.at("receipt"))throw std::invalid_argument("Retained colour receipt differs from actual owning replay");
+          p=std::make_shared<SourceColorPreparation>(*replay.colors);
+        }
         p->validate();preparations[id]=std::move(p);
       }
       binding->color_preparation=preparations[id];
@@ -478,7 +631,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
         const auto &v=input.at("normal_preparations").at(id);
         const bool uv=v.contains("uv_reprojection"),domain=v.contains("sampling_domain");
         if((uv&&domain)||!v.is_object()||v.size()!=((uv||domain)?10:9)||!v.at("version").is_number_integer()||
-           v.at("version")!=(domain?3:uv?2:1)||(uv&&!normal_uv)||(domain&&!sampling))
+           v.at("version")!=(domain?(v.at("version")==4?4:3):uv?2:1)||(uv&&!normal_uv)||(domain&&!sampling))
           throw std::invalid_argument("Unsupported retained normal preparation");
         auto p=std::make_shared<SourceNormalPreparation>();p->receipt=NormalPreparationReceipt::decode(v.at("receipt"));
         p->projection=decode_normal_projection(v.at("projection"),images,domains);p->initial_projection=decode_normal_projection(v.at("initial_projection"),images,domains);
@@ -489,11 +642,13 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
         if(uv){const auto &u=v.at("uv_reprojection");auto projection=std::make_shared<SourceNormalUvReprojection>();projection->receipt=NormalUvReprojectionReceipt::decode(u.at("receipt"));projection->layout=SourceNormalUvLayout::decode(u.at("layout"));projection->projection=decode_normal_projection(u.at("projection"),images,domains);projection->before_paint=paints.at(index(u.at("paint"),paints.size()));projection->before_material=output.bindings_.at(index(u.at("before_binding"),output.bindings_.size()));if(!u.at("appearance").is_null())projection->before_appearance=decode_creator_appearance(u.at("appearance"),models);if(!u.at("deformation").is_null())projection->before_deformation=std::make_shared<const DeformationState>(DeformationState::decode(u.at("deformation"),projection->before_paint->mesh()));
           const auto prior=projection->before_material->normal_preparation;if(!prior)throw std::invalid_argument("Normal UV prior binding lost its own normal interpretation");const auto found=std::find(normal_preparations.begin(),normal_preparations.end(),prior);if(found==normal_preparations.end())throw std::invalid_argument("Normal UV prior recipe is not an earlier archived authority");const auto &record=input.at("normal_preparations").at(size_t(found-normal_preparations.begin()));if(v.at("appearance")!=record.at("appearance")||v.at("deformation")!=record.at("deformation"))throw std::invalid_argument("Normal UV original serialized authority differs from its immutable prior recipe");p->original_appearance=prior->original_appearance;p->original_deformation=prior->original_deformation;p->uv_reprojection=std::move(projection);}
         if(domain){const auto &u=v.at("sampling_domain");
-          auto proof=std::make_shared<SourceNormalSampling>();proof->receipt=NormalSamplingReceipt::decode(u.at("receipt"));
+          auto proof=std::make_shared<SourceNormalSampling>();if(v.at("version")==4){if(input.at("version")!=9||!paint_domains)throw std::invalid_argument("Normal metadata entry4 requires owning material9");proof->metadata_sampling_domain=paint_domains->at(uint32_t(index(u.at("metadata_sampling_domain"),paint_domains->size())));}
+          proof->receipt=NormalSamplingReceipt::decode(u.at("receipt"));
           proof->layout=SourceNormalUvLayout::decode(u.at("layout"));proof->projection=decode_normal_projection(u.at("projection"),images,domains);
-          proof->before_paint=paints.at(index(u.at("paint"),paints.size()));
+          const auto prior_paint_id=index(u.at("paint"),paints.size());proof->before_paint=paints.at(prior_paint_id);
           proof->before_material=output.bindings_.at(index(u.at("before_binding"),output.bindings_.size()));
           proof->sampling_material=output.bindings_.at(index(u.at("sampling_binding"),output.bindings_.size()));
+          proof->before_paint=bind_paint(prior_paint_id,proof->before_material);
           if(!u.at("appearance").is_null())proof->before_appearance=decode_creator_appearance(u.at("appearance"),models);
           if(!u.at("deformation").is_null())proof->before_deformation=std::make_shared<const DeformationState>(DeformationState::decode(u.at("deformation"),proof->before_paint->mesh()));
           if(!u.at("current_sampling_reference").is_null())proof->current_sampling_reference=MToonMaterial::decode(u.at("current_sampling_reference"));
@@ -507,6 +662,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
           if(v.at("appearance")!=record.at("appearance")||v.at("deformation")!=record.at("deformation"))
             throw std::invalid_argument("Retained normal original serialized authority differs from its immutable source");
           p->original_appearance=prior->original_appearance;p->original_deformation=prior->original_deformation;
+          if(proof->metadata_sampling_domain)detail::authenticate_normal_sampling_metadata(proof);
           p->sampling_domain=std::move(proof);
         }
         p->validate();normal_preparations[id]=std::move(p);
@@ -515,9 +671,10 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     }
     binding->validate();output.bindings_.push_back(std::move(binding));
   }
+  if(input.at("version")==9&&!std::any_of(preparations.begin(),preparations.end(),[](const auto &p){return p&&p->paint_sampling;}))throw std::invalid_argument("Material9 requires actual retained current-colour paint authority");
   if(std::any_of(preparations.begin(),preparations.end(),[](const auto &p){return !p;}))throw std::runtime_error("Unreferenced color preparation record");
   if(input.at("version")==6&&!std::any_of(preparations.begin(),preparations.end(),[](const auto &p){return p&&p->polygon_colors;}))throw std::invalid_argument("Material archive6 requires current corner color authority");
-  if(sampling&&!std::any_of(normal_preparations.begin(),normal_preparations.end(),[](const auto &p){return p&&p->sampling_domain;}))
+  if(input.at("version")==7&&!std::any_of(normal_preparations.begin(),normal_preparations.end(),[](const auto &p){return p&&p->sampling_domain;}))
     throw std::invalid_argument("Material archive7 requires its actual retained normal feature");
   if(std::any_of(normal_preparations.begin(),normal_preparations.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced normal preparation record");
   return output;

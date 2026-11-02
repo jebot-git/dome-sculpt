@@ -46,6 +46,8 @@ struct SculptObject {
   std::shared_ptr<const PolygonOrigin> shape_source{};
 };
 bool source_is_dormant(const SculptObject &);
+class PaintSamplingAttachment;
+class NormalPreviewProof;
 struct ObjectSurface {
   uint64_t id = 0;
   std::string name;
@@ -66,6 +68,10 @@ struct ObjectSurface {
   bool source_dormant = false;
   std::shared_ptr<const PolygonColorSurface> polygon_colors{};
   std::shared_ptr<const NativeAffineEdit> affine_edit{};
+  std::shared_ptr<const PaintSamplingAttachment> paint_sampling_attachment{};
+  // Exact logical REST TRIANGLE CORNERS, never an ambiguous vertex stream.
+  std::vector<std::array<float,2>> paint_corner_coordinates;
+  std::shared_ptr<const NormalPreviewProof> normal_preview_proof{};
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.

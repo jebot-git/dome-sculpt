@@ -1,0 +1,39 @@
+{
+  "parent": "09989a5",
+  "scope": "Independent runtime normal metadata/preview seal; Source24 remains private",
+  "source_files": {
+    "CMakeLists.txt": "66ac08bc279bf12d8287317b0e089d45003a882522d622ae616b43e22ee9207d",
+    "docs/NORMAL-PREVIEW-SEAL.md": "9a866a1949cc1bd6a461e56dd7994f04135cbda4679536b2173f52a2155db52a",
+    "include/dome/document.hpp": "40a32d57debc2062021e32891d90eded3c77fe5bb5fbe37377f281fa38ecf603",
+    "include/dome/normal-preparation.hpp": "334c1713aef1803c99d37608540e6610e85a69009e90bdcfd47950fc407e4eae",
+    "include/dome/normal-preview.hpp": "7d9a62279687ca780a45cf1496af4413350d6d571e6dd8e840dc6b9d0d7da3d6",
+    "include/dome/scene.hpp": "43bc6ec71cabec628030f5db9f14eea02d82c7387b4f2e32629337dd81db992f",
+    "src/document-native.cpp": "556d727f8e6a366269e3f83f3f1474e08def65170aed515b55a52cadf0ef13e7",
+    "src/document.cpp": "955d3ada98de82225f66d12b233d46420e064642179c69be78907115227c0510",
+    "src/material-bindings.cpp": "540354e711db0396af3e9287c9f671fae9fa79840447b41901b6bd47cb70f335",
+    "src/material-visibility.cpp": "ea6e59cacf9d2264a4d44e48e7053af08add648a5b752477615a9d2ec663f422",
+    "src/normal-preparation-state.hpp": "04e9ae53a247d11a2414d692d4dbf7de96e5a1494eb099e02104eb5ac2b00ef2",
+    "src/normal-preview.cpp": "b4952174ed97543363de13bb32936ff6bbe50a89efc72cfc5b90945c99951c62",
+    "src/normal-sampling-access.hpp": "de0c72384f05232549fc03da18363d129b5e4c37e544ff9a8c21ba3b3fdc17b2",
+    "src/normal-sampling-replay.cpp": "28a2912540c8c4fc745b4d5fa7c90e0ecd955bd1ffdca1480287594d58baaead",
+    "src/render.cpp": "81b93df5967acda79aa3afc70be6e347ec08c2f096e2b2f14d1704b1154ff5b6",
+    "src/scene.cpp": "d486a131ab93ac6012131f6126678fc369fee9260b0a41babc345eea2915ee48",
+    "tests/normal-preview-seal.cpp": "555062a84782d8d95a42c3d73396317a383db4e483741fad599cfa03a852b02e",
+    "tests/paint-sampling-render.cpp": "3e2f5de4d58b3851925d7d3b34b1ca5d96e9dbdb6cca74129f843247c82b42b0"
+  },
+  "finished": {
+    "native": "3/3 in49.61s",
+    "software_seal": "23 checks; legacy305.525ms/sealed0.654723ms"
+  },
+  "pending": [
+    "complete414 software regression",
+    "complete owned C/C++ SAN",
+    "bounded actualA770 seal+414",
+    "fresh native UI/real-loader followup"
+  ],
+  "retained_failed_runs": [
+    "14321 fixture cache baseline",
+    "62190 premature old binary",
+    "44380ef graphic SAN1200 timeout45/54"
+  ]
+}

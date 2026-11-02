@@ -3,6 +3,12 @@
 #include "polygon-conversion.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/source-uv-bake.hpp"
+#include "dome/color-paint-sampling.hpp"
+#include "dome/normal-sampling.hpp"
+#include "dome/normal-preparation.hpp"
+#include "normal-sampling-access.hpp"
+#include "normal-frame-runtime.hpp"
+#include "paint-sampling-access.hpp"
 #include <new>
 #include "document-transaction.hpp"
 namespace dome {
@@ -17,14 +23,26 @@ bool Document::uv_retention_requested_locked() const {
   // option in the existing transactional control snapshot, never in Scene.
   return state_.controls.parameter==VrParameter::UvEdit&&state_.controls.value[3]>.5f;
 }
+bool Document::uv_paint_retention_requested_locked() const {
+  return state_.controls.parameter==VrParameter::UvEdit&&state_.controls.value[3]>1.5f;
+}
+bool Document::uv_paint_retention_available_locked() const {
+  if(!control_before_||!control_object_)return false;
+  const auto &o=scene_.object(control_object_);const auto b=o.material_bindings;
+  return o.mesh_active&&o.painted&&!o.appearance&&b&&!b->has_mtoon&&b->normal_preparation&&b->color_preparation&&
+    o.painted->normal_projection()&&o.painted->color_projection()&&o.polygon&&o.polygon->active&&o.polygon->colors&&
+    b->color_preparation->receipt.source_field==SourceColorField::PolygonCorners&&
+    b->color_preparation->current_descriptor()&&b->color_preparation->current_descriptor()->field==o.polygon->colors&&
+    (!o.painted->source_maps()||!o.painted->source_maps()->uv1);
+}
 bool Document::uv_retention_changes_locked() const {
   if(!uv_retention_requested_locked()||!control_before_)return false;
   const auto &o=scene_.object(control_object_);
-  return o.painted&&o.painted->normal_projection()&&o.painted->normal_projection()->version==1;
+  return o.painted&&((uv_paint_retention_requested_locked()&&!o.painted->paint_sampling_domain())||(o.painted->normal_projection()&&o.painted->normal_projection()->version==1));
 }
 void Document::edit_uv(UvAction action, float x, float y) {
   std::lock_guard lock(model_mutex_);
-  if(action==UvAction::RetainNormals){
+  if(action==UvAction::RetainNormals||action==UvAction::RetainPaint){
     Transaction transaction(*this);apply_uv_action_locked(action,x,y);publish_locked(false,false);transaction.commit(false);return;
   }
   try { apply_uv_action_locked(action, x, y); }
@@ -36,7 +54,16 @@ void Document::apply_uv_action_locked(UvAction action, float x, float y) {
   if (uv_accept_pending_) throw std::logic_error("Wait for the accepted UV edit to finish");
   if (uv_solving_) throw std::logic_error("Wait for UV processing, or cancel the UV editor");
   try {
-    if(action==UvAction::RetainNormals){
+    if(action==UvAction::RetainPaint) {
+      const auto &o=scene_.object(control_object_);
+      if(!uv_paint_retention_available_locked())throw std::logic_error("Keep paint detail requires this mesh's own supported prepared corner colours and normal detail");
+      if(o.painted->paint_sampling_domain())throw std::logic_error("This project uses retained paint coordinates; restore its source before choosing a different transfer");
+      if(!uv_->view().topology||uv_->view().validating)throw std::logic_error("Wait for UV validation before changing paint detail");
+      state_.controls.value[3]=uv_paint_retention_requested_locked()?(o.painted->normal_projection()->version==2?1.f:0.f):2.f;
+      state_.message=uv_paint_retention_requested_locked()?"Paint and normal detail keep their existing coordinates. The UV layout remains editable.":"Paint detail will be transferred into the edited UV layout";
+    }
+    else if(action==UvAction::RetainNormals){
+      if(uv_paint_retention_requested_locked())throw std::logic_error("Turn off Keep paint detail before changing normal sampling");
       const auto &o=scene_.object(control_object_);
       if(!o.painted||!o.painted->normal_projection()||!o.material_bindings||!o.material_bindings->normal_preparation)
         throw std::logic_error("Prepare normal detail in the Bake controls first");
@@ -219,7 +246,8 @@ void Document::process_uv_transfer(FileJob &job) {
       throw std::runtime_error("UV remap changed original triangle/corner identity");
     uv_modified |= old.uv[old.indices[corner]] != target.uv[vertex];
   }
-  const bool source_aware=(uv_modified||job.uv_keep_normals)&&(source.appearance||source.painted->source_maps()||source.material_bindings||source.painted->color_projection());
+  const bool own_corners=source.polygon&&source.polygon->active&&source.polygon->colors;
+  const bool source_aware=(uv_modified||job.uv_keep_normals||job.uv_keep_paint)&&(own_corners||source.appearance||source.painted->source_maps()||source.material_bindings||source.painted->color_projection());
   // Metadata-only edits of unchanged authored UVs retain the original explicit
   // source-authored policy (shared/zero-area charts are not silently repaired).
   if (uv_modified || !source.painted->source_maps()) {
@@ -274,13 +302,33 @@ void Document::process_uv_transfer(FileJob &job) {
     appearance = std::move(updated);
   }
   bool changed = uv_changed(target, old) || morph_topology_id(target) != morph_topology_id(old) ||
-    (job.uv_keep_normals&&source.painted->normal_projection()&&source.painted->normal_projection()->version==1);
+    (job.uv_keep_normals&&source.painted->normal_projection()&&source.painted->normal_projection()->version==1)||
+    (job.uv_keep_paint&&!source.painted->paint_sampling_domain());
   std::shared_ptr<PaintedMesh> painted;
   auto binding=source.material_bindings;
-  if(source_aware){
+  if(job.uv_keep_paint) {
+    if(!job.uv_keep_normals)throw std::invalid_argument("Retained paint lost its independent normal sampling choice");
+    if(!own_corners||!polygon||!source.material_bindings||!source.material_bindings->normal_preparation||
+        !source.material_bindings->color_preparation||source.appearance||source.material_bindings->has_mtoon||
+        !source.painted->normal_projection()||!source.painted->color_projection())
+      throw std::invalid_argument("Keep paint detail lost its complete supported current source");
+    auto descriptor=std::make_shared<const PolygonColorSurface>(PolygonColorSurface{std::shared_ptr<const PolygonMesh>(polygon,&polygon->topology),polygon->colors});
+    PaintSamplingLimits limits;limits.cancelled=cancelled;
+    auto retained=retain_source_corner_paint(source.painted,source.material_bindings,source.deformation,descriptor,target,*map,limits);
+    SourceUvBakeInput input;input.paint=source.painted;input.current_material=source.material_bindings;input.current_deformation=source.deformation;input.target=target;input.source_vertices=*map;
+    SourceUvBakeResult normal_result;SourceUvBakeOptions options;options.cancelled=cancelled;options.normal_sampling=SourceNormalUvMethod::RetainSource;
+    auto normal=detail::retain_normal_sampling(input,normal_result,options,retained.paint->paint_sampling_domain());
+    painted=adopt_retained_paint_normal(*retained.paint,*normal,limits);
+    auto composed=std::make_shared<SourceMaterialBindings>(*source.material_bindings);composed->color_preparation=std::move(retained.colors);
+    auto normal_preparation=std::make_shared<SourceNormalPreparation>(*composed->normal_preparation);normal_preparation->projection=normal->projection;normal_preparation->sampling_domain=normal;normal_preparation->uv_reprojection.reset();composed->normal_preparation=std::move(normal_preparation);
+    binding=std::move(composed);deformation=detail::normal_frame_remap_deformation(source.deformation,old,target,*map,cancelled);appearance=source.appearance;
+  }else if(source_aware){
     SourceUvBakeInput input;input.paint=source.painted;input.appearance=source.appearance;
     input.current_material=source.material_bindings;input.current_deformation=source.deformation;
     input.target=target;input.source_vertices=*map;
+    if(own_corners){input.polygon_authority=source.polygon;
+      if(source.material_bindings&&source.material_bindings->color_preparation)input.target_polygon=polygon;
+    }
     if(!source.appearance&&!source.material_bindings)
       input.native_material=SourceNativeMaterial{source.material.color,source.material.emissive,int(source.material.alpha),source.material.alpha_cutoff,source.material.double_sided};
     SourceUvBakeOptions options;options.cancelled=cancelled;
@@ -289,6 +337,11 @@ void Document::process_uv_transfer(FileJob &job) {
     painted=std::move(adopted.paint);deformation=std::move(adopted.deformation);
     appearance=std::move(adopted.appearance);binding=std::move(adopted.material_bindings);
   }else painted=changed?source.painted->reparameterize(target,cancelled):source.painted;
+  if((uv_modified||job.uv_keep_paint)&&own_corners){
+    auto retained=std::make_shared<PolygonAuthority>(*polygon);
+    retained->origin=capture_polygon_origin(job.scene,job.object);
+    polygon=std::move(retained);
+  }
   if (cancelled()) throw std::runtime_error("UV transfer cancelled");
   Scene prepared = job.scene;
   auto &candidate = prepared.object(job.object);
@@ -323,7 +376,7 @@ void Document::process_uv_transfer(FileJob &job) {
     transaction.finish_uv();
     if(job.uv_desktop)desktop_=false;
     if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
-    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
+    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=job.uv_keep_paint?"UV layout updated. Paint and normal detail retained; save the native project to keep editable sources.":job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
     publish_locked(changed,false);transaction.commit();
     if(accepted){
       accepted->revision=state_.revision;accepted->content=content_;

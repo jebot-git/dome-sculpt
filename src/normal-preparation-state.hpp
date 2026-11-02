@@ -9,7 +9,7 @@ inline bool prepared_normal_state(const SourceMaterialBindings *binding,const Te
   const auto projection=maps?maps->normal_projection:nullptr;
   if(bool(recipe)!=bool(projection))throw std::invalid_argument("Normal preview/export lost its owning prepared interpretation");
   if(!projection)return false;
-  recipe->validate(deep);projection->validate(recipe->receipt.resolution);
+  recipe->validate(deep);const bool sealed=!deep&&recipe->sampling_domain&&recipe->sampling_domain->has_sealed_metadata();projection->validate(recipe->receipt.resolution,!sealed);
   if(!normal_projection_identity(*projection,*recipe->projection)||maps->source_only||maps->normal.rgba.empty()||maps->mtoon_normal.rgba.empty()||!maps->baked_normal.rgba.empty()||!maps->baked_coverage.rgba.empty())
     throw std::invalid_argument("Prepared normal preview/export has contradictory current planes or historical coverage semantics");
   maps->normal.validate();maps->mtoon_normal.validate();

@@ -9,6 +9,7 @@ namespace detail { class PolygonColorArchive; }
 class PaintedMesh;
 class CreatorAssetArchive;
 class NormalSamplingArchive;
+class PaintSamplingArchive;
 struct CreatorAppearance;
 struct DeformationState;
 struct SourceColorPreparation;
@@ -68,10 +69,12 @@ public:
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &) const;
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,detail::PolygonColorArchive *) const;
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,detail::PolygonColorArchive *,NormalSamplingArchive *) const;
+  nlohmann::json encode(PaintImageArchive &,CreatorAssetArchive &,detail::PolygonColorArchive *,NormalSamplingArchive *,PaintSamplingArchive *) const;
   static size_t deformation_entries(const nlohmann::json &);
   static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &);
   static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &,const detail::PolygonColorArchive *);
   static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &,const detail::PolygonColorArchive *,const NormalSamplingArchive *);
+  static SourceMaterialArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const detail::PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *);
 private:
   std::vector<std::shared_ptr<const SourceMaterialBindings>> bindings_;
   std::vector<std::shared_ptr<const SourceUvOrigin>> origins_;

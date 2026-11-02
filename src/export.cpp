@@ -55,6 +55,13 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
+  for(const auto &object:input_objects)if((object.paint_sampling_attachment||!object.paint_corner_coordinates.empty())&&
+      (source_space!=SourceMorphSpace::Native||!object.material_bindings||!object.material_bindings->normal_frames))
+    throw std::invalid_argument("Retained paint export requires its complete native normal/colour coordinate compiler");
+  for(const auto &object:input_objects) {
+    const auto node=object.material_bindings&&object.material_bindings->color_preparation?object.material_bindings->color_preparation->paint_sampling:nullptr;
+    if(bool(node)!=bool(object.paint_sampling_attachment))throw std::invalid_argument("Current paint export omitted or fabricated its own sampling attachment");
+  }
   GltfDocument result;
   const auto &objects=input_objects;
   if (objects.empty() || objects.size()>256)
@@ -151,9 +158,10 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   vertex_transparency.reserve(objects.size());
   // Compiled coordinate bindings are not native PaintSourceTexture authority.
   std::vector<unsigned> retained_normal_sets;retained_normal_sets.reserve(objects.size());
+  std::vector<unsigned> retained_paint_sets;retained_paint_sets.reserve(objects.size());
   for (const auto &input : objects) {
     stop();
-    retained_normal_sets.push_back(0);
+    retained_normal_sets.push_back(0);retained_paint_sets.push_back(0);
     auto validated_colors=detail::current_vertex_colors(input,cancelled);
     bool vertex_alpha=false;
     if(!validated_colors.empty())for(auto v:input.mesh.indices) {
@@ -221,7 +229,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       };
       if(!source_uv1){
         attribute(source->uv1,"TEXCOORD_1","VEC2");
-        if(frame&&!frame->normal_coordinates.empty()&&!source->uv1.empty())
+        if(frame&&(!frame->normal_coordinates.empty()||!frame->paint_coordinates.empty())&&!source->uv1.empty())
           for(auto v:a.source_vertices)emitted_uv1.push_back(source->uv1.at(v));
       }
       else if(!source->uv1.empty()){
@@ -253,7 +261,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     }
     if(source_uv1){
       begin=data.size();
-      for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();auto uv=source_uv1->at(frame?frame->rest_vertices.at(vertex):vertex);floats(uv);if(frame&&!frame->normal_coordinates.empty())emitted_uv1.push_back(uv);}
+      for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();auto uv=source_uv1->at(frame?frame->rest_vertices.at(vertex):vertex);floats(uv);if(frame&&(!frame->normal_coordinates.empty()||!frame->paint_coordinates.empty()))emitted_uv1.push_back(uv);}
       attributes["TEXCOORD_1"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");
     }
     if(source_maps)for(const auto &[set,coordinates]:source_maps->extra_uv_sets){
@@ -276,6 +284,21 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       // The source image/sampler remains a valid native view. Only the glTF
       // compiler owns the separate emitted accessor/texture-info association.
       emission.prepared_normal.texcoord=0;
+    }
+    if(frame&&!frame->paint_coordinates.empty()) {
+      const auto &coordinates=frame->paint_coordinates;
+      if(coordinates.size()!=mesh.positions.size())throw std::invalid_argument("Paint export vertex correspondence differs");
+      unsigned coordinate=0;
+      if(coordinates==mesh.uv)coordinate=0;
+      else if(attributes.contains("TEXCOORD_1")&&coordinates==emitted_uv1)coordinate=1;
+      else if(!frame->normal_coordinates.empty()&&coordinates==frame->normal_coordinates)coordinate=retained_normal_sets.back();
+      else {
+        coordinate=1;while(coordinate<8&&attributes.contains("TEXCOORD_"+std::to_string(coordinate)))++coordinate;
+        if(coordinate==8)throw std::length_error("Paint export has no free glTF coordinate domain");
+        begin=data.size();for(auto uv:coordinates){checkpoint();floats(uv);}
+        attributes["TEXCOORD_"+std::to_string(coordinate)]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");
+      }
+      retained_paint_sets.back()=coordinate;
     }
     bool uv_gap=false;
     for(unsigned coordinate=0;coordinate<8;++coordinate) {
@@ -630,6 +653,12 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       if(!maps.normal.rgba.empty()&&!(maps.normal_projection&&maps.normal_projection->version==2)) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
       material["emissiveTexture"]={{"index",texture(maps.emission,emission_sampler)}};
       material["emissiveFactor"]={1,1,1};
+      if(objects[i].paint_sampling_attachment) {
+        const auto coordinate=retained_paint_sets.at(i);
+        const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
+        if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))throw std::logic_error("Compiled paint coordinate accessor is missing");
+        if(coordinate)for(auto *info:{&pbr["baseColorTexture"],&pbr["metallicRoughnessTexture"],&material["occlusionTexture"],&material["emissiveTexture"]})(*info)["texCoord"]=coordinate;
+      }
     }
     if(maps.source_maps) {
       const auto &source=*maps.source_maps; source.validate();

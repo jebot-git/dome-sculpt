@@ -97,7 +97,7 @@ void SourceNormalPreparation::validate(bool deep) const {
   detail::source_paint_pairing(original_paint.get(),original_material.get(),original_appearance.get(),deep);
   if(original_paint->resolution()!=receipt.resolution)throw std::invalid_argument("Normal preparation original resolution differs");
   if(original_paint->baked()&&!original_paint->baked()->maps.normal.rgba.empty())throw std::invalid_argument("Historical normal payload cannot be silently reinterpreted");
-  projection->validate(receipt.resolution);initial_projection->validate(receipt.resolution);target_frames->validate(false);
+  projection->validate(receipt.resolution,deep);initial_projection->validate(receipt.resolution,deep);target_frames->validate(false);
   if(initial_projection->version!=1 || (sampling_domain?projection->version!=2:projection->version!=1) || (sampling_domain&&uv_reprojection))
     throw std::invalid_argument("Retained normal sampling requires its complete owning domain replay");
   if(sampling_domain){

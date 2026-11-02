@@ -1,0 +1,60 @@
+{
+  "private_checkpoint": true,
+  "base": "65b0ae9",
+  "production_changes": false,
+  "scope": "Simultaneous independently owned current-corner source and current-corner target through actual native worker Bake, history, Save/reopen, Restore and independent GLB rendering",
+  "local_sha256": {
+    "CMakeLists.txt": "28183aa4ce4e95eb115085c47034152f0c8b6bf85d3af45757251ecbec4c510a",
+    "tests/current-color-dual.cpp": "b8cef5c0970af3cd7daf6ef09400ecd212368cd3d8f36113aa951674908fdfb1",
+    "docs/CURRENT-COLOR-DUAL-BAKE.md": "90ab9c817653bcd08ee9d0ce1dfbcba9bccdc66eeaddfbc1ccd6eedfc63a616f",
+    "artifacts/compile-dual.json": "41aedcc6f808d64268c32ce53d1adbc28ea00ca7122a26fcceb6229a58deea41",
+    "artifacts/compile-dual-san.json": "d229ff4ecbc33eb4e4b698d4831734b8022c9c18bd52e980d469db9911e840c1",
+    "artifacts/tests-dual-software.log": "4de9573563f027497663e84b57a2788e2c03c1f1dd552cc84f3d34cfbe14ff5d",
+    "artifacts/tests-dual-san.log": "4de9573563f027497663e84b57a2788e2c03c1f1dd552cc84f3d34cfbe14ff5d",
+    "artifacts/tests-dual-arc.log": "c3f640a5b6d0b579fa6595e258f0e87520a0f291c2af92b858d7e777d6028d1e",
+    "artifacts/current-color-dual-test": "96ad1be71c529249c6924a96d6255832e2f5fd226e0b9ea532a776d085976b0c",
+    "artifacts/current-color-dual-san-test": "f1fa8373d8530e8989917459bdc11472de9584601f8242aee713cdf094109590"
+  },
+  "read_only_frozen_archives_sha256": {
+    "build/libdome-sculpt-render.a": "a3fd8d64e6d45bd02810a69b4759cd2d8eef8b7e52c44f74535c9a999e52b477",
+    "build/libdome-sculpt-core.a": "29f9ee80172a42becc9371cf30f058da129063bbdad2654557dcbdf90fec2bd1",
+    "build/libdome-sculpt-affine.a": "ca9a1d65bad0884e3153afd47efd1015feb3e310b6977629a3f99bd7c17675c1",
+    "build/libdome-sculpt-polygon.a": "d1de67825474beafd0b4453b899fda03d1cc108ff5f85ff5d32b691e982efba1",
+    "build/libxatlas.a": "ac9b42eed70081ea69bce39372ea32fd7b1caaf52ca364bd5abdc679a5cb7495",
+    "build/libmikktspace.a": "c578139c56ecbfc108a47558bd09d41abf9491fba86452f3ca5a70a62c240e96",
+    "build/libmikktspace-robust.a": "68d309e58ff074929013f2070e1390b6efc584060e720973b09cf8ea98d9def8",
+    "build/libufbx.a": "b8a2d97407a03119003b8c2f7b78ae6ee1b190d1b25131dc31f3609581f42e84",
+    "build-san/libdome-sculpt-render.a": "de111819a3eb9b85f6ae389207002c92bbd6a551a70bca0bc1eb1a0d8d655863",
+    "build-san/libdome-sculpt-core.a": "e4eed6265e0aefb471edf85f43ce60eec4133e0a697fcdac6d0088d53f77ec78",
+    "build-san/libdome-sculpt-affine.a": "89cc7fa11ab922594b664d9f47c5c89ab073280f5c69e4d5173862ec6760cff5",
+    "build-san/libdome-sculpt-polygon.a": "074da72acb48025c7b0a0a15ac74a3e69b1f7d3b36783c1cbcd64e8701c0b657",
+    "build-san/libxatlas.a": "0d5e7560075ec88b6ff04d585d3e2c1d595ad030c9c0ee660ba4085c616255d2",
+    "build-san/libmikktspace.a": "206487106d766b578526983ca25a79b30d935b7dc97aa5242f73892b6bb38bca",
+    "build-san/libmikktspace-robust.a": "014a0530d1806f83218e8dd6993c5be2aae3859a6ad62e389d38f6cc12f4052a",
+    "build-san/libufbx.a": "f34b009d3bc36aa7bce937aeb8f850d390459ce7b92f99314cc9dc60015cfa06"
+  },
+  "completed": {
+    "cases": 16,
+    "checks_each": 185,
+    "software_gl": true,
+    "actual_arc_a770": true,
+    "hardware_selector": "pci-0000_03_00_0",
+    "source_image_maxerror": 1,
+    "independent_glb_maxerror": 0,
+    "owned_instrumented_core_support_render_consumer": true,
+    "asan": true,
+    "ubsan": true,
+    "leaks": true,
+    "external_system_libraries_instrumented": false,
+    "actual_native_import_resolution": 256,
+    "compute": "CPU",
+    "physical_hmd": false
+  },
+  "limitations": [
+    "Reuses coherent exact frozen65 archives read-only; no new whole-project rebuild claim",
+    "Parent extended51,598-denial sanitizer44 scope remains independent and still live",
+    "No new all-native/full OneAPI or latest-main integration claim",
+    "Conservative target20 domains and UV/topology/prepared-normal/artist/UV1 guards remain",
+    "Pending generic Bake Save still refused; Save tested after accepted completion"
+  ]
+}

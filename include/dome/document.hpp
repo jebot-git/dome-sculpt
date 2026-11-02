@@ -181,6 +181,9 @@ struct SurfaceRange {
   CanvasTransform object_world{};bool world_frame_valid=false;
   std::optional<AffineTransform> affine_world;
   bool reflected = false; // CPU query geometry retains original corner order.
+  std::shared_ptr<const PaintSamplingAttachment> paint_sampling_attachment{};
+  bool paint_winding_reversed=false; // Actual packed index flip, not cull mode.
+  std::shared_ptr<const NormalPreviewProof> normal_preview_proof{};
   bool pbr_view = false;
 };
 struct SculptMeshingStats {
@@ -217,6 +220,7 @@ struct MeshSnapshot {
   // Scene21 static source sampling: xy PBR, zw MToon. Empty for ordinary
   // geometry; packed through the exact retained-frame corner expansion.
   std::vector<std::array<float,4>> normal_coordinates;
+  std::vector<std::array<float,2>> paint_coordinates; // Explicit packed vertices.
   bool pbr_view = false;
   uint64_t view_epoch = 0;
 };
@@ -572,6 +576,8 @@ private:
   std::optional<UvValidationJob> prepare_uv_schedule_locked();
   void invalidate_uv_locked();
   bool uv_retention_requested_locked() const;
+  bool uv_paint_retention_requested_locked() const;
+  bool uv_paint_retention_available_locked() const;
   bool uv_retention_changes_locked() const;
   void uv_loop();
   void queue_uv_operation_locked(UvAction);
@@ -712,6 +718,7 @@ private:
     std::shared_ptr<AssetWork> asset_capture;
     std::shared_ptr<CutHandoff> cut_handoff;
     bool uv_keep_normals=false;
+    bool uv_keep_paint=false;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.

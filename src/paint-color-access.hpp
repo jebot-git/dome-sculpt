@@ -10,6 +10,7 @@ struct PaintColorPreparationResult {
 struct PaintColorProjectionResult {
   std::shared_ptr<const PaintColorProjection> projection;
   uint64_t projected_texels=0;
+  uint64_t raster_samples=0;
 };
 struct SourceColorPreparationAccess {
   // Rebuild only the static raw color field in an adopted writable UV domain.
@@ -17,6 +18,9 @@ struct SourceColorPreparationAccess {
   static PaintColorProjectionResult project(
       const PaintedMesh &,std::span<const std::array<float,4>>,
       const ColorPreparationOptions &);
+  static PaintColorProjectionResult project_uv(
+      const PaintedMesh &,const Mesh &,std::span<const std::array<float,4>>,
+      const ColorPreparationOptions &,uint64_t max_raster_samples);
   static PaintColorPreparationResult prepare(
       const PaintedMesh &,std::span<const std::array<float,4>>,
       const Material &,const ColorPreparationOptions &,
