@@ -24,6 +24,37 @@ Private worktrees start from accepted main8d46dfb. Geometry, source frames,
 paint, permissions, Undo/Cancel and ordered Save remain required. Coordinate
 Arc execution; preserve the accepted binaries and all prior evidence.
 
+## Active integration checkpoint — 2026-11-02
+
+Public product `0d2ffbb` integrates the qualified affine source-chain adapter
+and both xatlas lifetime fixes, with original commits preserved. The merged
+source tree matched the qualified affine tree exactly before publication.
+The full production objective remains active and incomplete.
+
+Root's guarded UV1 checkpoint `d3310d7` is preserved and pushed on
+`work/source-uv1-8d46dfb`. Its original full run passed251/252; the import test
+still refused unsupported UV1 but expected the previous UV0-policy message.
+An explicit importer policy restores that unchanged assertion. The repair passes
+four focused Release and two focused sanitizer suites. The pipeline's earlier
+seven whole-core/support sanitizer suites,13 actual Arc checks,12 native FLTK
+UV checks and eight actual d271 Wayland/menu checks retain their exact scopes
+in its SOURCE-UV1-PIPELINE.json. Generic native UV1 import/painting remains guarded.
+
+A NEW clean integration tree `artifacts/uv1-affine-integration-0d2ffbb`, branch
+`work/uv1-affine-integration-0d2ffbb`, source `2e7d4a0`, combines that checkpoint
+with published affine/dependency sources. Fresh coherent Release and sanitizer
+builds are currently running; combined regression qualification is pending.
+The frozen UV1 component tree, accepted physical UI binary and saved20-object
+headset session remain preserved.
+
+The prepared-normal/shapekey adapter is qualified privately at `355b382` for its
+scoped fixtures; actual bundled nineteen-part avatar qualification is underway.
+Current-color cut preparation passes all56,629 measured persistent owned-new
+failure boundaries with exact rollback and retry; native publication/immediate
+Save work remains separate in a new isolated tree. Authenticated implicit-default
+material identity (Scene17) remains under development. No new physical headset
+launch, system installation or active-session restart occurred.
+
 ## Null shape-history compatibility
 
 Source `0df613e` permits a null optional shapekey-history field with the
@@ -56,6 +87,30 @@ claim C-allocator/OS-wide exhaustion or full cut publication robustness. See
 validation/XATLAS-CONSTRUCTION.json and XATLAS-SHUTDOWN.md.
 
 ## Current integration
+
+Private skinned-export fix `c6324dd` preserves the original object/group parent
+for ordinary and shared-rig surfaces instead of making them identity roots.
+The real authored-material reflected/single-sided worker-export negative was
+native error0/export255. Final software and Arc192 assertions now pass with
+all32 image errors0 and all original mesh-node world-matrix errors0; tolerance2
+is unchanged. Selected fresh Release9 and fully instrumented own-core/render/
+support SAN9 pass. The actual CC0 VRM suite also passes on the same product.
+See SKINNED-SURFACE-HIERARCHY.md and its receipt, including the strengthened
+legacy GLB world-basis assertions and retained first-run failures. This branch
+does not lift the separate default-material or UV1 guards.
+
+Private affine-import integration `b943927` combines current public `6b64e22`
+with the qualified source-chain admission through `3fda297`, preserving the
+accepted selection UI. Exact source-node graphs, reflected/nonuniform chains,
+current skin poses and authored/implicit inverse binds reach native pick/paint,
+Cancel, one Undo and ordered Save; sheared bind-space exports as valid TRS
+nodes. Fresh canonical Release17, actual FLTK static/skin import22 and actual
+Arc baseline/affine48 assertions pass, with all24 image comparisons error0 at
+unchanged tolerance2. See AFFINE-IMPORT-INTEGRATION.md and its receipt for exact
+scope, prior sanitizer boundaries and retained negative evidence. Default
+material identity, native UV1 import, wider VRM/FBX and remaining affine
+authoring stay required; this private checkpoint is not a publication or
+production-completion claim.
 
 The focused selection request is implemented by `3cb4517` and `f3f9199` on
 the user-passed candidate. The first XR menu page has a Selection toggle;

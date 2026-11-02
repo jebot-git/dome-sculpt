@@ -358,9 +358,20 @@ int main() try {
   auto &skin = raw->skins[0];
   auto &primitive = raw->meshes[0].primitives[0];
   require(
-      raw->nodes[1].skin == &skin && raw->nodes[1].parent == nullptr &&
+      raw->nodes[1].skin == &skin && raw->nodes[1].parent == &raw->nodes[0] &&
           skin.joints[0]->parent == &raw->nodes[0],
-      "Object TRS affects joints and skinned surface remains an identity root");
+      "Object TRS parents joints and preserves the skinned surface global transform");
+  auto transform = [](const float *m, dome::Vec3 p) {
+    return dome::Vec3{m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12],
+                      m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13],
+                      m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14]};
+  };
+  float surface_world[16];cgltf_node_transform_world(&raw->nodes[1],surface_world);
+  for(const auto point:std::array<dome::Vec3,4>{{{0,0,0},{1,0,0},{0,1,0},{0,0,1}}}) {
+    const auto expected=ob::transform(objects[0].transform,{point.x,point.y,point.z});
+    require(dome::length(transform(surface_world,point)-dome::Vec3{expected.x,expected.y,expected.z})<3e-6f,
+            "Independent mesh-node world basis retains complete native object placement");
+  }
   auto j0 = cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 0),
        j1 = cgltf_find_accessor(&primitive, cgltf_attribute_type_joints, 1);
   auto w0 = cgltf_find_accessor(&primitive, cgltf_attribute_type_weights, 0),
@@ -402,11 +413,6 @@ int main() try {
               std::abs(delta_value[2] - .04f) < 1e-6f,
           "GLB positions remain rest coordinates while targets contain only "
           "displacements");
-  auto transform = [](const float *m, dome::Vec3 p) {
-    return dome::Vec3{m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12],
-                      m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13],
-                      m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14]};
-  };
   auto preview = rig.preview(mesh);
   dome::Vec3 position{base_value[0] + delta_value[0] * .6f,
                       base_value[1] + delta_value[1] * .6f,
@@ -491,8 +497,8 @@ int main() try {
     std::filesystem::copy_file(
         path, std::string(fixture) + ".humanoid.glb",
         std::filesystem::copy_options::overwrite_existing);
-  // Nested creator groups must affect joint world matrices once, while a
-  // skinned surface stays an identity scene root per glTF skin semantics.
+  // Nested creator groups affect joint world matrices once. Keep the mesh's
+  // original global transform for determinant-based winding/frame semantics.
   objects[0].deformation = std::make_shared<const dome::DeformationState>(rig);
   dome::CanvasTransform group_transform{};
   group_transform.position = {1,2,-.5f}; group_transform.scale = 1.3f;
@@ -513,10 +519,19 @@ int main() try {
   require(raw->nodes_count == 9 && raw->nodes[1].parent == &raw->nodes[0] &&
           grouped_skin.skeleton->parent == &raw->nodes[1],
           "Native group parents are actual glTF hierarchy nodes");
-  bool root_surface = false;
+  bool found_surface = false;const auto native_world = objects[0].world_transform();
   for (size_t i = 0; i < raw->nodes_count; ++i)
-    if (raw->nodes[i].skin) root_surface = raw->nodes[i].parent == nullptr;
-  require(root_surface, "Grouped skinned surface retains identity root placement");
+    if (raw->nodes[i].skin) {
+      found_surface=true;require(raw->nodes[i].parent==grouped_skin.skeleton,
+          "Grouped skin preserves its actual object parent");
+      float world[16];cgltf_node_transform_world(raw->nodes+i,world);
+      for(const auto point:std::array<dome::Vec3,4>{{{0,0,0},{1,0,0},{0,1,0},{0,0,1}}}) {
+        const auto expected=ob::transform(native_world,{point.x,point.y,point.z});
+        require(dome::length(transform(world,point)-dome::Vec3{expected.x,expected.y,expected.z})<3e-6f,
+            "Independent grouped mesh-node world basis retains complete native placement");
+      }
+    }
+  require(found_surface, "Grouped skinned surface remains in the exported hierarchy");
   dome::Vec3 grouped_weighted{};
   for (size_t i = 0; i < 5; ++i) {
     float inverse_bind[16], world[16];
@@ -525,7 +540,6 @@ int main() try {
     cgltf_node_transform_world(grouped_skin.joints[i], world);
     grouped_weighted += transform(world, transform(inverse_bind, position)) * .2f;
   }
-  auto native_world = objects[0].world_transform();
   auto grouped_position = preview.positions[0];
   auto expected_grouped = ob::transform(native_world, {grouped_position.x,grouped_position.y,grouped_position.z});
   require(dome::length(grouped_weighted - dome::Vec3{expected_grouped.x,expected_grouped.y,expected_grouped.z}) < 3e-5f,
@@ -546,7 +560,14 @@ int main() try {
           cgltf_validate(raw)==cgltf_result_success && raw->skins_count==1,
           "Creator primitives share one skin and actual bone hierarchy");
   size_t shared_meshes=0; for(size_t i=0;i<raw->nodes_count;++i)
-    if(raw->nodes[i].skin==&raw->skins[0]) ++shared_meshes;
+    if(raw->nodes[i].skin==&raw->skins[0]) {
+      ++shared_meshes;float world[16];cgltf_node_transform_world(raw->nodes+i,world);
+      for(const auto point:std::array<dome::Vec3,4>{{{0,0,0},{1,0,0},{0,1,0},{0,0,1}}}) {
+        const auto expected=ob::transform(native_world,{point.x,point.y,point.z});
+        require(dome::length(transform(world,point)-dome::Vec3{expected.x,expected.y,expected.z})<3e-6f,
+            "Every shared-rig surface retains complete object/group world placement");
+      }
+    }
   require(shared_meshes==2 && raw->skins[0].joints_count==5,
           "Both independent meshes bind the identical five joint nodes");
   sibling.transform.position.x+=.1f; dome::export_glb({objects[0],sibling},path);

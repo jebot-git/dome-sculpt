@@ -38,6 +38,10 @@ int main(int argc, char **argv) try {
       fixture.j["materials"][0]["normalTexture"]={{"index",0},{"scale",.8f}};
       fixture.j["materials"][0].erase("extensions");
     }
+    if(std::getenv("DOME_IMPORT_AFFINE_SOURCE")){
+      fixture.j["nodes"][0]["scale"]={-1.7f,.8f,1.1f};
+      fixture.j["nodes"][1]["rotation"]={0,0,std::sin(.31f),std::cos(.31f)};
+    }
     fixture.save(argv[2]);
     return 0;
   }
@@ -85,9 +89,8 @@ int main(int argc, char **argv) try {
     Vec3 expected{m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12],
                   m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13],
                   m[2] * p.x + m[6] * p.y + m[10] * p.z + m[14]};
-    auto actual =
-        ob::transform(prepared.scene.world_transform(id), {p.x, p.y, p.z});
-    if (length(expected - Vec3{actual.x, actual.y, actual.z}) > 1e-6f)
+    auto actual=prepared.scene.world_matrix(id).point({p.x,p.y,p.z});
+    if (length(expected - Vec3{float(actual[0]),float(actual[1]),float(actual[2])}) > 1e-6f)
       throw std::runtime_error("Native imported hierarchy does not match "
                                "independent original world matrix");
   }

@@ -9,6 +9,16 @@ validation/XR-OBJECT-SELECTION.json; physical UI acceptance is separately scoped
 in validation/XR-SELECTION-HEADSET.json. This does not complete production or
 qualify unsupported import, color cut/bake, normal/key or source-UV adapters.
 
+Private affine-import milestone `b943927` qualifies exact original-node chain
+admission, the tested reflected/nonuniform/current-pose and authored/implicit
+bind subset, evaluated-world native pick/paint/history, valid GLB bind-space
+factoring and actual FLTK/controller workflows on public `6b64e22`. Its fresh
+Release17, native-menu22 and Arc48 assertions are scoped separately from the
+earlier implementation and dependency sanitizer receipts. See
+AFFINE-IMPORT-INTEGRATION.md. Default/no-material identity, native UV1 import,
+broader glTF/VRM/FBX features and remaining affine metric authoring are still
+required; the existing unsupported-case guards do not satisfy those goals.
+
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in
 validation/JSON-ALLOCATION-INTEGRATION.json. That older receipt alone does not qualify later combined features or complete

@@ -1,0 +1,145 @@
+{
+  "recorded_utc": "2026-11-02T04:36:44.821953+00:00",
+  "status": "qualified private narrow skinned surface export hierarchy fix",
+  "base": "0d2ffbb",
+  "product_source": "c6324ddf464b09df514e580faa299366cf9830b0",
+  "public_base_tree_equals_3f191ac": true,
+  "public_base_tree": "9f02bc9d7bfd5b8d4a09be83611f5603d645702d",
+  "product_change": "Keep surface child under actual object/group chain for both ordinary and shared rigs; remove obsolete identity-root detachment/restoration. No IBM/index/vertex/morph edits.",
+  "negative": {
+    "actual_frontdoor": "Document::export_asset",
+    "old_link_support_tree": "artifacts/affine-integration-2b04dbb/build-affine-release",
+    "matching_headers": true,
+    "old_core_sha256": "8aa6918eef7cf4929c69ba6836d5ff543146cf6e202b2868f8896ddbe1ef6928",
+    "old_render_sha256": "a38e769e88af8cbb111d7d5f218631e3663918d9e00c876f9ce832724090ee34",
+    "linkmap": "artifacts/skin-export-negative-native.map",
+    "fixture_source": "artifacts/negative-native-fixture.cpp",
+    "positive_cases_before_failure": 8,
+    "first_reflected_single_sided_native_error": 0,
+    "first_reflected_single_sided_export_error": 255,
+    "outer_exit": 1,
+    "unrelated_preliminary": "Scene::surfaces eager64px composite resampling gave29; diagnostic retained, not causal actual-worker evidence."
+  },
+  "Release": {
+    "fresh_optimized_own_core_renderer_support": true,
+    "backend": "CPU",
+    "ui": true,
+    "xr": true,
+    "final_selected_suites": 9,
+    "failed": 0,
+    "seconds": 4.58,
+    "additional_same_product_actual_CC0_VRM_suite": {
+      "suites": 1,
+      "passed": 1,
+      "seconds": 103.62,
+      "context": "earlier ten-suite batch: only obsolete identity-root structural assertion failed; product unchanged afterward"
+    }
+  },
+  "sanitize": {
+    "fresh_own_C_and_CXX_core_renderer_support": true,
+    "ui": true,
+    "xr": false,
+    "backend": "CPU",
+    "C_and_CXX_Release_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "selected_suites": 9,
+    "failed": 0,
+    "seconds": 17.86,
+    "external_libraries_uninstrumented": [
+      "Mesa",
+      "FLTK",
+      "image/system libraries",
+      "LAPACK"
+    ],
+    "final_fixture_cpp_mtime_local": "2026-11-02 05:31:15.802004110 +0100",
+    "san_fixture_object_mtime_local": "2026-11-02 05:31:39.807220673 +0100",
+    "final_fixture_hash_manifest": "artifacts/final-fixture-bytes.sha256"
+  },
+  "independent_graphics": {
+    "assertions": 192,
+    "source_instance_count": 2,
+    "native_shared_duplicate_count": 1,
+    "actual_rig_count": 2,
+    "native_source_image_pairs": 16,
+    "worker_export_source_image_pairs": 16,
+    "pixel_max_error": 0,
+    "unchanged_pixel_tolerance": 2,
+    "complete_original_world_matrix_max_error": 0,
+    "matrix_float_tolerance": 3e-06,
+    "coverage": [
+      "positive/negative determinant",
+      "nonuniform and sheared source chain",
+      "single/double sided authored material",
+      "implicit/authored inverse binds",
+      "normal map",
+      "POSITION/NORMAL/TANGENT morphs",
+      "actual file worker",
+      "ordinary/shared-rig surface ancestry"
+    ],
+    "hardware_selector": "DRI_PRIME=pci-0000_03_00_0",
+    "GL_VENDOR": "Intel",
+    "GL_RENDERER": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+  },
+  "preserved_attempts": [
+    {
+      "outer_exit": 2,
+      "log": "artifacts/build-release.log",
+      "reason": "misspelled final target export-cancel-test; corrected to export-cancellation-test, no C++ failure"
+    },
+    {
+      "outer_exit": 8,
+      "log": "artifacts/test-release.log",
+      "passed": 9,
+      "failed": 1,
+      "reason": "old test required obsolete identity-root detail; replaced with stronger complete parent/world-basis checks while retaining joint/IBM posed oracle"
+    },
+    {
+      "outer_exit": 2,
+      "log": "artifacts/build-gltf-followup.log",
+      "reason": "new check referenced existing transform lambda before its declaration; moved unchanged helper before first use, final matching builds passed"
+    }
+  ],
+  "source_sha256": {
+    "src/export.cpp": "745daeab1881b9cf7bb4ca509684bee24b742676bc05e2fee6b6b2a67b60a572",
+    "CMakeLists.txt": "63e2c0534b11ace89eff52d0be22fc9880e55c114d397bcfaca1e4f5939e9c7b",
+    "tests/import-skin-export-render.cpp": "466f60ef215ffd6a9268dd4c394e76cb43f6dc8138d5380905319d7c1788b1e7",
+    "tests/gltf.cpp": "b264aef8f4730002ef4df227b080a72c3bfba5d229d178996c1672f9f664bbd0"
+  },
+  "evidence_sha256": {
+    "artifacts/build-negative.log": "60dab585623bf43407cb7443eeb1e23a389c5d2630c838d58cabfa4be19cfcb7",
+    "artifacts/test-negative.log": "a0275fa750ccc6d77eebd83173d7dcd0f8e732f7912e2dc9a204efb6c8043b96",
+    "artifacts/import-skin-export-render-negative-composite.cpp": "66c7a78b75107e8740d197d48d96809845cff46e34cac1d29244c7012f06bae2",
+    "artifacts/build-negative-native.log": "bfbce11bc5a0bfdda2b19eb59846cf18b55e45da23e5dd075f261389051220b3",
+    "artifacts/test-negative-native.log": "67e376df59aef851ccb505da96eade1e1452fb358a09d0599467dc8cdfe48626",
+    "artifacts/skin-export-negative-native.map": "b418efc843a07c9ced6755cf141a7e815c4c839941850e53a99c5241a81ecd33",
+    "artifacts/negative-native-fixture.cpp": "b65deabaefacc5cdd7f3b1772b74529fe6cb9620571d394a9e80215b6abbe06c",
+    "artifacts/configure-release.log": "de1a886a93417e5d1f289ce6e5891d7e802ec230a2071da50f65aaa3eb96da81",
+    "artifacts/build-release.log": "3c0d71a858fb8c07796fef4533a01a3d1d07e36effe0d224e964e40725b532fc",
+    "artifacts/build-release-final.log": "89c353d85055b82778e89de1858a11f783886883863998fcc23e117fbaec468e",
+    "artifacts/test-release.log": "3d40b1342ca59912997c4537f4d688e8e8967e95847c7e3eacc158211ec761ef",
+    "artifacts/build-gltf-followup.log": "5b42fdea7fb4062bf09bf6223a96d566e56d02b9ab4644cb14bfe43049b7c128",
+    "artifacts/build-release-followup2.log": "060f2b0ef5ec182861177d3bae2e4b27f4737343b2849a4bc8f0d75362b4648c",
+    "artifacts/test-release-final.log": "e6e07856b6e08d44079e937c833676d5a9269b2a65dd2e5c96b4e594fe9fe44b",
+    "artifacts/test-release-final-detail.log": "f34b5d84ac2a12a76b51bd4479f528b4debe1d8b45695cbb9336b42947790da8",
+    "artifacts/test-positive-first.log": "e90999640dd46f1107715c7e4d92e18cafb0c179966dd455e3fe688db8dea440",
+    "artifacts/test-arc.log": "aed4243834ab24359791dc4898ae82197b8585a1450cf0b8f9164b548a1e2594",
+    "artifacts/test-arc-final.log": "d391cf5a261e94bf22a4a6b5916deed5fcf746a7e3715051f59f3fa4a17e7c31",
+    "artifacts/configure-sanitize.log": "5b9024162b315145948e772ddaabc560ee9f8f34673f839e6d77effc668d8f3e",
+    "artifacts/build-sanitize.log": "a8aa1e499e79a8da5e222e155a451b5c17996a2dc4a1bf33903da84892357832",
+    "artifacts/test-sanitize.log": "9fd3c7ce4f9e23efc4c8ed36b5057e053429bb79bdb6b7ce9c66236669ef4004",
+    "artifacts/test-sanitize-detail.log": "5eacd13988853467612ec5183a38489641c6d761dc8cb4a271d70e7777a2b4be",
+    "artifacts/final-fixture-bytes.sha256": "ba7686906988b145aac3a3dbc5bbc3989c3d497a9833553ce24036a65586bf95"
+  },
+  "scope_excludes": [
+    "Scene17 implicit default material admission",
+    "Scene18 UV1 changes",
+    "broader full glTF/VRM completion",
+    "physical HMD test",
+    "system install",
+    "session restart"
+  ],
+  "primary_reference": "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#instantiation",
+  "full_production_complete": false
+}

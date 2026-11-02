@@ -11,6 +11,7 @@ int main(int argc, char **argv) try {
   std::filesystem::create_directories(directory);
   NativeGraphics context;
   std::cout << "GPU " << glGetString(GL_RENDERER) << std::endl;
+  std::cout << "GL_VENDOR " << glGetString(GL_VENDOR) << std::endl;
   Fbo fbo;
   fbo.bind();
   SurfaceRenderer native;
@@ -19,6 +20,12 @@ int main(int argc, char **argv) try {
     for (const auto *alpha : {"OPAQUE", "MASK", "BLEND"})
       for (float weight : {0.f, .65f}) {
         auto fixture = import_fixture::skinned(authored);
+        if(std::getenv("DOME_IMPORT_AFFINE_SOURCE")){
+          fixture.j["nodes"][0]["scale"]={-1.7f,.8f,1.1f};
+          fixture.j["nodes"][1]["rotation"]={0,0,std::sin(.31f),std::cos(.31f)};
+          fixture.j["nodes"][3]["scale"]={1.2f,.9f,1.1f};
+          fixture.j["nodes"][4]["scale"]={.7f,1.3f,.8f};
+        }
         auto &material = fixture.j["materials"][0];
         material.erase("extensions");
         material["alphaMode"] = alpha;
