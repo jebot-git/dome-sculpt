@@ -2,7 +2,8 @@
 #include "dome/bake-authoring.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/color-preparation.hpp"
-#include "source-colors.hpp"
+#include "current-colors.hpp"
+#include "cut-color.hpp"
 #include "bake-canonical-frame.hpp"
 #include "polygon-color-preparation.hpp"
 #include "dome/source-placement.hpp"
@@ -21,9 +22,13 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
-  for(const auto *object:{&source,&target})
-    if(object->polygon && object->polygon->active && object->polygon->colors)
-      throw std::logic_error("Current polygon corner colors need an explicit bake field adapter; the original source is unchanged");
+  const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
+  if(target.polygon&&target.polygon->active&&target.polygon->colors)
+    throw std::logic_error("Current target corner colors need an explicit prepared-color field adapter; the original source is unchanged");
+  // This source route uses the same authenticated ordinary shading domain as
+  // plane cutting. Other original/prepared roles still require their adapters.
+  if(current_source&&!detail::cut_color_supported(source))
+    throw std::logic_error("This corner-color source has shading roles that source baking cannot yet preserve");
   if (source.id == target.id)
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
@@ -45,7 +50,16 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
           length(preview.normals[i]-rest.normals[i]) > 1e-5f)
         throw std::logic_error("Return the target to its rest pose and zero morphs before baking");
   }
-  auto source_colors=source.mesh_active?detail::source_vertex_colors(source.appearance.get(),source.painted->mesh().positions.size(),cancelled):std::vector<std::array<float,4>>{};
+  std::optional<PolygonColorSurface> current;
+  if(current_source){
+    current.emplace();current->topology=std::shared_ptr<const PolygonMesh>(source.polygon,&source.polygon->topology);
+    current->field=source.polygon->colors;
+  }
+  // Authenticate ordered REST geometry before evaluation. Skin/morph changes
+  // positions/normals later, never the source field's corner identity or RGBA.
+  auto source_maps=source.mesh_active?source.painted->preview(source.material):std::shared_ptr<const TextureMaps>{};
+  auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
+      source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   auto target_colors=detail::source_vertex_colors(target.appearance.get(),target.painted->mesh().positions.size(),cancelled);
   auto nonidentity=[](const auto &colors){return std::any_of(colors.begin(),colors.end(),[](auto c){return c!=std::array<float,4>{1,1,1,1};});};
   const bool source_prepared=source.mesh_active&&source.painted->color_projection();
@@ -74,7 +88,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if (source.mesh_active) {
     high.mesh = source.deformation ? source.deformation->preview(source.painted->mesh())
                                    : source.painted->mesh();
-    high.materials[0].maps = source.painted->preview(source.material);
+    high.materials[0].maps = std::move(source_maps);
     if(!source_prepared)high.colors=std::move(source_colors);
   } else
     high.mesh = surface_mesh(*source.volume, cancelled);

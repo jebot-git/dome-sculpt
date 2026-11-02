@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "cut-color.hpp"
 #include "dome/document.hpp"
 #include "dome/polygon-scene.hpp"
 namespace dome {
@@ -29,7 +30,7 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
   const auto &target=scene_.active();
   if(target.polygon && target.polygon->active && target.polygon->colors)return ids;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
-      !(o.polygon && o.polygon->active && o.polygon->colors) &&
+      detail::cut_color_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   return ids;
 }
