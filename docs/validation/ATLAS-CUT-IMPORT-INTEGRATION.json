@@ -1,0 +1,133 @@
+{
+  "recorded_utc": "2026-11-02T08:12:55.887078+00:00",
+  "product_source": "0057749d71e6fcca5f30187b3ed74d464cc08646",
+  "base_public_main": "899fa6b21c949afbcba708380db67af7df52b96e",
+  "integration_before_input_fix": "ec71855107a5d9fa3188d98b8ea6c067497b4365",
+  "scope": "UV1 source ownership, explicit editable texture atlas import, untextured unused-UV atlas generation, generic UV worker cancellation, existing typed held/current-RGBA cuts, and published-epoch controller rebind repair. No generic VRM or Scene19 normal UV union qualification claimed.",
+  "complete_production": false,
+  "physical_headset_test": false,
+  "system_installation": false,
+  "qualified_component_receipts": [
+    "EDITABLE-ATLAS-IMPORT.json",
+    "UNMAPPED-ATLAS-IMPORT.json",
+    "UV-WORKER-CANCELLATION.json",
+    "CUT-ADMISSION.json"
+  ],
+  "input_repair": {
+    "native_checks": 15,
+    "old_transaction_source": "ec71855:src/document-transaction.cpp",
+    "negative": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/input-old-transaction-negative.log",
+      "sha256": "55d7e2882e8f791ab2dee7523d3e6ce5ae3087515e39e255f599dedf573151b2"
+    },
+    "negative_binary": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/input-old-transaction-negative",
+      "sha256": "067140df2b076061a7357cbb126f89313b4e24ae13f2e70316fafbfed16ca42f"
+    },
+    "negative_link_map": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/input-old-transaction-negative.map",
+      "sha256": "ec3aa01722d8a04b200affc8e68fd4ccc7c8714e712d55c3492b9b25efeb4c05"
+    },
+    "negative_scope": "Original complete Transaction translation unit compiled against matching unchanged headers; original archive member removed; current safe-hover implementation and exact current fixture retained. Exit1 at the unchanged new-epoch menu-selection assertion.",
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/build/artifacts/tests-input-qualified-release.xml",
+      "sha256": "74bb6d6c302aa9eaf828ef644080ccb2681b73831ef888380200b93675da10c2",
+      "tests": 36,
+      "failures": 0,
+      "seconds": "52",
+      "scope": "36 selected input/controller/history/cut admission/UV cancellation suites; all target binaries relinked against fixed core"
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/build-sanitize/artifacts/tests-input-qualified-sanitize.xml",
+      "sha256": "4b71ec97b8c20cf42431ad3ca478937d71fc1825819cb3a0003924a18532bc36",
+      "tests": 31,
+      "failures": 0,
+      "seconds": "45",
+      "scope": "31 selected input/controller/transaction/shapekey suites; owned C/C++ core/support compiled ASAN+UBSAN/leaks, no instrumented frontend claim"
+    },
+    "openxr": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/build/artifacts/tests-input-qualified-xr.xml",
+      "sha256": "630a5aa3854266642b4d1049e1e29c5ee3d90eb56dbd0ef68729543ac7b5921b",
+      "tests": 4,
+      "failures": 0,
+      "seconds": "217",
+      "scope": "Four actual OpenXR loader fixture suites with synthetic tracking and software rendering; no physical HMD"
+    },
+    "repeat": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-input-qualified-repeat.log",
+      "sha256": "d4aaf8dd61f50d8b8f016ea2fedec496608cc112e886e830bab3447b04c6f32c",
+      "each_suite_repetitions": 20,
+      "suites": [
+        "input-rebind-publication",
+        "shapekey-document"
+      ]
+    },
+    "fltk": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-input-qualified-atlas-menu.log",
+      "sha256": "be83ad1ef5f775f494dfa75834803f6ce2f97645fb40f0e41a9785db076ea320",
+      "checks": 12,
+      "scope": "Actual private native FLTK chooser/options/Apply/ordered Save/Undo/Redo; software renderer, Xvfb and private bus"
+    },
+    "binary": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/build/dome-sculpt",
+      "sha256": "0612e69f93f597428fbe271b713291aec791cdfd028794216ee10aa9cf350542"
+    },
+    "core": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/build/libdome-sculpt-core.a",
+      "sha256": "f07662d0ca1fce833aa147da6507f409ca4437fb700528db8a1937e3c8f5208b"
+    },
+    "sanitized_core": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/build-sanitize/libdome-sculpt-core.a",
+      "sha256": "7c7543553a62228448ad583f943cec213a35c756ba12e2ff3ee000bf8d7e2f2f"
+    },
+    "headers_changed": false,
+    "guards": "Released radial hover updates highlight only; no activation or parameter-control event; pending current queue-overflow cancellation remains set. Exact original shapekey selection assertion unchanged."
+  },
+  "earlier_union_proofs": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-release-all.xml",
+      "sha256": "84bd37a0fbfa3b0d947c5e68fd312c1a5ed4c530269e3c8b2b0e2efa9f275d91",
+      "tests": 283,
+      "failures": 1,
+      "seconds": "959",
+      "scope": "Historical ec71855 full283 run:282 passed,1 failed shapekey-document; original report retained and NOT relabeled as a clean full-suite run"
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-sanitize-union.xml",
+      "sha256": "0ccf7d3f8524e1d50234087ba589e0da6a2513117c84c7dd5830ca57654aee07",
+      "tests": 13,
+      "failures": 0,
+      "seconds": "311",
+      "scope": "ec71855 selected13 whole-owned core/render/support sanitizers before input repair"
+    },
+    "arc": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-arc-atlas.log",
+        "sha256": "aa833823b734a9a151fb8ee06ab4541df7b6b40089bec7d2c4a225efc05e3bdf",
+        "checks": 135
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-arc-cut.log",
+        "sha256": "05c91c590af500060984187db6a347892004bc018613d15f3eae587654caea10",
+        "checks": 257
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-arc-samplers.log",
+        "sha256": "95ecf35fe7f815e3eeae884c41de6491091751572d4834401dfda4972803eadb",
+        "checks": 145
+      }
+    ],
+    "wayland": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atlas-cut-cancel-899/artifacts/tests-d271-wayland-menu.log",
+      "sha256": "6034e375d2afe864cd33f439bb362da14e5670dffe278a1f6749f09cd522a414",
+      "checks": 8,
+      "compositor_source": "d271cf65c612a462fcfa6739416b06c6565be070",
+      "scope": "Earlier ec71855 actual private Wayland/universal menu; session not restarted"
+    }
+  },
+  "limitations": [
+    "Explicit atlas preparation resamples source maps. Prior actual source comparison allows declared2px raw-edge footprint and visible mean error<=2; it does not prove whole-image identity.",
+    "Generic VRM import, MatCap-only VRM, Scene19 normal UV and prepared shapekeys are a separate unqualified combined tree3042a86.",
+    "Current-field target baking, complete post-UV key authoring, broad interchange and all remaining production requirements remain required."
+  ]
+}
