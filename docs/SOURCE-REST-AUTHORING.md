@@ -103,10 +103,16 @@ produce distinct skin closures, a GUI fixture that inspected the unrelated initi
 these logs is replaced by a later pass.
 
 The full required workflow still includes distinct per-part pose resolution,
-source-authored unbound/generated-skin ownership, rigid meshes that are themselves
-actual mapped joint nodes, the complete source-node parent
+source-authored unbound/generated-skin ownership, the complete source-node parent
 picker, bone-role/rotation controls and independently rendered/GUI/device proofs.
 Original-space VRM export still refuses changed REST/parents: first-person,
 look-at, humanoid limit and spring/collider metadata need genuine bone-local
 transport. Nonuniform/skewed sphere or capsule radii must not be guessed. These
 remaining routes are required work, not completion by permanent guards.
+
+
+The subsequent [rigid bind-frame continuation](SOURCE-RIGID-BIND-FRAMES.md)
+implements true rigid meshes on mapped joints and canonical reparent following,
+with a reflected native root and native child-subgroup coverage. It retains the
+same Scene25 representation. The original checkpoint receipts above remain
+unchanged; the continuation has its own exact qualification scope.

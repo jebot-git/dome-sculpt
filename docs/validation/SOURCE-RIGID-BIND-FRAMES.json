@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "base": "2f0624607f54e7ace7ec39c02f7e2492025a0380",
+  "scope": "Native implicit rigid source binds for actual joint meshes and authored reparent; same-ABI sourceGraph/Scene replacements, immutable2f other3overrides and ownbbb C/C++support. No public/schema change.",
+  "source_sha256": {
+    "CMakeLists.txt": "b8ee5ea5148ff5705f7409b8b19125b78f14747ce7af17d44fc972bdb2bd1c05",
+    "src/source-rest-graph.cpp": "9e65e03a9e835e507b641377da1fa1bc879a8615e236068fdf731b8413666622",
+    "src/source-rest-graph.hpp": "d4faee7101a95b45f3673fab386d73049ed292ce4cf647153f06b8f9258c08d4",
+    "src/source-rest-scene.cpp": "8128a9fcf24b7b1c36a4ea50409b2c73ecad9a9b50bc004c41d78202f5daa5a1",
+    "tests/source-rest-export-graph.cpp": "b90a86dc68b50cb247c54520f335ababbca7eae4d8aaec54d6ee51cce5482550",
+    "tests/source-rigid-bind-rest.cpp": "3f0e9ded5470ad45ddb7990f5c556b96c3f3d8c2e4661ae09a3d7e6368475037"
+  },
+  "qualification": [
+    {
+      "configuration": "release",
+      "suite": "source-rest-graph",
+      "exit": 0,
+      "seconds": 1.3686313229991356,
+      "binary_sha256": "0605fe943da8935d986b09a9ba8ff838c373e38439e2d4418aba46691b6fef00",
+      "log": "artifacts/rigid-bind-release/source-rest-graph.log"
+    },
+    {
+      "configuration": "release",
+      "suite": "source-rest-scene",
+      "exit": 0,
+      "seconds": 5.535220959005528,
+      "binary_sha256": "45116d6c0bc954587137c6acfabec38814ea379b586ab9845ea403d9986ae5c5",
+      "log": "artifacts/rigid-bind-release/source-rest-scene.log"
+    },
+    {
+      "configuration": "release",
+      "suite": "source-rest-document",
+      "exit": 0,
+      "seconds": 8.615631560998736,
+      "binary_sha256": "7623e4382e343be1c50c9ace5b648a5e8b38823c53c78122118fbde760f3fc76",
+      "log": "artifacts/rigid-bind-release/source-rest-document.log"
+    },
+    {
+      "configuration": "release",
+      "suite": "source-rest-export",
+      "exit": 0,
+      "seconds": 26.650589881988708,
+      "binary_sha256": "6826764c386dd80a3050f044e5a40bd3030744ef866c7aded579d03e86055e5e",
+      "log": "artifacts/rigid-bind-release/source-rest-export.log"
+    },
+    {
+      "configuration": "release",
+      "suite": "source-rigid-bind-rest",
+      "assertions": 34,
+      "exit": 0,
+      "seconds": 6.7879391239985125,
+      "binary_sha256": "624a03b8e672665dcc15dac57203e1106c21ba6075ec9b1baca36c9cc2ec3b16",
+      "log": "artifacts/rigid-bind-matrix-release/test.log"
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "source-rest-graph",
+      "exit": 0,
+      "seconds": 10.859790671005612,
+      "binary_sha256": "b5eede1d1ad129a6f01ddb5cb649b422ff88e340b01bf1a55036f21c900b471d",
+      "log": "artifacts/rigid-bind-sanitize/source-rest-graph.log"
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "source-rest-scene",
+      "exit": 0,
+      "seconds": 49.0939479709923,
+      "binary_sha256": "263b93d55bdf57c024b025a330e8f7659590f906c28a16fad117a9b7a707b7c4",
+      "log": "artifacts/rigid-bind-sanitize/source-rest-scene.log"
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "source-rest-document",
+      "exit": 0,
+      "seconds": 92.50215288600884,
+      "binary_sha256": "3da394e3747485bdd69264be917fc9dc99ed8a78dc36588825a3147c7d4ab2bc",
+      "log": "artifacts/rigid-bind-sanitize/source-rest-document.log"
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "source-rest-export",
+      "exit": 0,
+      "seconds": 87.94736231399293,
+      "binary_sha256": "b611bd575da801e578e43b308da3bb2bf3457bc536834d74abacaac7d04b7d8a",
+      "log": "artifacts/rigid-bind-sanitize/source-rest-export.log"
+    },
+    {
+      "configuration": "sanitize",
+      "suite": "source-rigid-bind-rest",
+      "assertions": 34,
+      "exit": 0,
+      "seconds": 61.90656384300382,
+      "binary_sha256": "aca6173e389da1ff2647279c6cde5997d254674a8509323fc009844dcaf0aa35",
+      "log": "artifacts/rigid-bind-matrix-sanitize/test.log"
+    }
+  ],
+  "seconds": {
+    "release": 48.95801284899062,
+    "sanitize": 302.3098176850035
+  },
+  "additional_export_normalization": {
+    "Release": 110,
+    "SAN": 110,
+    "strong_owned_rest_meshes": true,
+    "budget": "explicit caller charged Mesh object/vector bytes, overflow checked; other bounded metadata and immutable owners separate; no fixed ordinary vertex cap"
+  },
+  "new_bind_assertions": 34,
+  "baseline_assertions": {
+    "source_graph": 1672,
+    "source_scene": 1806,
+    "native_Document_controller": 63,
+    "independent_cgltf": 10
+  },
+  "old_runtime_negative": {
+    "commit": "2f0624607f54e7ace7ec39c02f7e2492025a0380",
+    "exit": 1,
+    "reason": "REST fitting cannot preserve the original rigid attachment within the explicit WORLD bound",
+    "same_fixture": true
+  },
+  "excluded_unqualified_work": [
+    "src/vrm.cpp",
+    "src/vrm-source-graph.cpp",
+    "src/vrm-source-graph.hpp"
+  ],
+  "unclaimed": [
+    "new UI/graphics/Arc or physical device proof",
+    "new allocation-denial sweep",
+    "fresh whole-branch CMake build or whole regression",
+    "typed VRM rest metadata/source graph export (final guards remain)"
+  ],
+  "evidence_sha256": {
+    "artifacts/rigid-bind-release/receipt.json": "3a365e0b4d39604e635bcfbc8d2b93f84aa57865d65ea4841f6e4f8437f7486c",
+    "artifacts/rigid-bind-matrix-release/receipt.json": "d2d120aac4692f895101964c21aa5ee6c10e30f42441f27a4a27e584ab4afa00",
+    "artifacts/rigid-bind-matrix-release/link.map": "cf0861c5675bb53a37e85dbcf5140e6a40cb8bf1db81ed1196e878441bb48baf",
+    "artifacts/rigid-bind-release/source-rest-graph.log": "6772d9de13c91da875412658df514375a0ef63d69409d5006836fff72bd04acb",
+    "artifacts/rigid-bind-release/source-rest-scene.log": "5753e1a3b6d81ef5b2d8027eb1bc530ade21a07a40d82516ac8889e41ee58eb5",
+    "artifacts/rigid-bind-release/source-rest-document.log": "fdb4ec6937ae563f9b724b38a2d9a66a632faaf124dd385851685deec15e17f3",
+    "artifacts/rigid-bind-release/source-rest-export.log": "727923a99243c1c4e8b7ef91dbcf3852e03890a7ff7c2b0cfe2a60757da01eda",
+    "artifacts/rigid-bind-matrix-release/test.log": "47f971df42372036ad3eeeb38c2a74aa55447e66fc77eaf978cc0effd6818b5d",
+    "artifacts/rigid-bind-sanitize/receipt.json": "1b20d624be4cca51d0a0c92cb57b259b5263d153773d5d89af2977b0eaed1dfc",
+    "artifacts/rigid-bind-matrix-sanitize/receipt.json": "f58495a6aa8be5f8131bb38025264147d704a7163eddffef8793b5f9087a9bf7",
+    "artifacts/rigid-bind-matrix-sanitize/link.map": "2803714d283d3b690afa897eba886e04e28c68fdd649606c6c5bfe3ef88e7445",
+    "artifacts/rigid-bind-sanitize/source-rest-graph.log": "6772d9de13c91da875412658df514375a0ef63d69409d5006836fff72bd04acb",
+    "artifacts/rigid-bind-sanitize/source-rest-scene.log": "5753e1a3b6d81ef5b2d8027eb1bc530ade21a07a40d82516ac8889e41ee58eb5",
+    "artifacts/rigid-bind-sanitize/source-rest-document.log": "fdb4ec6937ae563f9b724b38a2d9a66a632faaf124dd385851685deec15e17f3",
+    "artifacts/rigid-bind-sanitize/source-rest-export.log": "727923a99243c1c4e8b7ef91dbcf3852e03890a7ff7c2b0cfe2a60757da01eda",
+    "artifacts/rigid-bind-matrix-sanitize/test.log": "47f971df42372036ad3eeeb38c2a74aa55447e66fc77eaf978cc0effd6818b5d",
+    "artifacts/source-rest-export-graph-sanitize-receipt.json": "65ec70655d481293f91e501507cbaafca79e32a98518b254470e49d2939eeefc",
+    "artifacts/source-rest-export-graph-test.log": "101d896bf95cc429190a73ac092ee21a98e4dbd3e5a9b8b2ab58998b1632b552",
+    "artifacts/source-rest-export-graph-sanitize-test.log": "101d896bf95cc429190a73ac092ee21a98e4dbd3e5a9b8b2ab58998b1632b552",
+    "artifacts/source-rest-export-graph.map": "973bdb0f451e767da7b8a86ab670d04d63fa63e783a1bc15e837726084d76db9",
+    "artifacts/source-rest-export-graph-sanitize.map": "a6bb8ea7a35047d219835925fe5c5c6a81fe61ce61f154a1d1c7f7aa6b747229",
+    "artifacts/source-rigid-bind-old2f.map": "308475d276bbb72c68ff8d4f6a0140eeba311cfa2d756bb68cae7d608d80339c",
+    "artifacts/source-rigid-bind-old2f-negative.log": "b4259f656b8f50249d7c1884de5899eac945c09dcd48d5d069c02eadc3f60d8f",
+    "artifacts/qualify-rigid-bind.py": "5253100d3094a451810dbd248e4712770859994ad74e86844b1fa1ff6eed6321",
+    "artifacts/final-rigid-bind-matrix.py": "7dc18c165cb332e8fec6e0a04366f89ce15f168c31be288ea3492bd3a8de5d62",
+    "artifacts/rigid-bind-release/exports/source-rest-fitted.glb": "0ae306be61ebdfad06295fba2ecd1d5368750aa596beca65a6dc3390dcde75d6",
+    "artifacts/rigid-bind-release/exports/source-rest-posed.glb": "667cd56fcfac1f1848f24c2c9d6a6751a2b16ddcff12f917f7445f093842ce5b",
+    "artifacts/rigid-bind-release/exports/source-rest-restored.glb": "1dc413a72e98655824507a997fc55aeb49b06ade7570dfde9f0634616acf15d2"
+  }
+}

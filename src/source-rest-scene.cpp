@@ -13,7 +13,18 @@ void admission(const Scene &scene,const SourceRestGraph &graph,uint64_t selected
 }
 void update_landmarks(DeformationState &deformation){if(deformation.landmarks&&deformation.humanoid){const auto segments=deformation.skeleton->segments();for(auto &[role,point]:deformation.landmarks->points){auto at=deformation.humanoid->joints.find(role);if(at!=deformation.humanoid->joints.end())point=segments.at(at->second)[0];}}}
 AffineTransform frame(const Scene &scene,const SourceRestGraph &graph,const SourceRestPose &pose,uint64_t object,const std::function<bool()> &cancelled){
- AffineTransform value;for(const auto &group:source_rest_groups(graph,pose,scene.group_path(scene.object(object).group),cancelled))value=value*group_local_matrix(group);return value;
+ const auto part=std::find_if(graph.parts.begin(),graph.parts.end(),[&](const auto &part){return part.object==object;});require(part!=graph.parts.end(),"Rigid attachment lost its actual original part identity");
+ AffineTransform value;std::optional<AffineTransform> source_node;
+ for(const auto &group:scene.group_path(scene.object(object).group)){stop(cancelled);value=value*group_local_matrix(group);const auto &placement=group.source_placement;if(placement&&placement->model==graph.model&&placement->source_instance==graph.instance&&placement->source_node==part->mesh_node)source_node=value;}
+ require(source_node.has_value(),"Rigid attachment lost its native source-node placement endpoint");const auto node=part->mesh_node;
+ // The rigid implicit bind obeys exactly the same equation as skin binds.
+ // P * inverse(R_current) * R_original is invariant under pure REST fitting,
+ // including a mesh on the edited joint itself and an authored reparent.
+ // Extra native subgroups below the source node remain relative artist offsets
+ // in the actual object world, rather than being folded into the pose prefix.
+ if(pose.world.at(node)==graph.rest_world.at(node))return *source_node;
+ const auto original=AffineTransform(graph.model->asset->nodes.at(node).world);
+ return *source_node*original.inverse()*AffineTransform(pose.world.at(node))*AffineTransform(graph.rest_world.at(node)).inverse()*original;
 }
 void rigid_delta(const Scene &before,Scene &after,const SourceRestGraph &graph,const SourceRestPose &old_pose,const SourceRestGraph &next_graph,const SourceRestPose &new_pose,const std::function<bool()> &cancelled,double maximum_world_error=.00002){
  const bool neutral=old_pose.local==graph.rest_local&&new_pose.local==next_graph.rest_local;

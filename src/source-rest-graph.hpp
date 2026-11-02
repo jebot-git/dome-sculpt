@@ -51,6 +51,11 @@ SourceRestPose source_rest_pose(const SourceRestGraph &,
 std::vector<SceneGroup> source_rest_groups(const SourceRestGraph &,
  const SourceRestPose &,std::vector<SceneGroup>,
  const std::function<bool()> &cancelled={});
+// Export worker adapter: normalizes the same authority from immutable REST
+// ObjectSurfaces, retaining owned mesh snapshots for detached metadata work.
+SourceRestGraph capture_source_rest_graph(std::span<const ObjectSurface>,uint64_t,
+ size_t max_snapshot_bytes,
+ const std::function<bool()> &cancelled={});
 SourceRestGraph capture_source_rest_graph(const Scene &,uint64_t,
  const std::function<bool()> &cancelled={});
 } // namespace dome::detail

@@ -1799,7 +1799,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
 endif()
 
 if(BUILD_TESTING)
- foreach(suite IN ITEMS source-rest-graph source-rest-plan source-rest-scene source-rest-document)
+ foreach(suite IN ITEMS source-rest-graph source-rest-plan source-rest-scene source-rest-document source-rest-export-graph source-rigid-bind-rest)
   add_executable(dome-sculpt-${suite}-test tests/${suite}.cpp)
   target_include_directories(dome-sculpt-${suite}-test PRIVATE src)
   target_link_libraries(dome-sculpt-${suite}-test PRIVATE dome-sculpt-core)
