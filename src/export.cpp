@@ -550,12 +550,26 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       PaintSourceTexture sampler; sampler.wrap_s=sampler.wrap_t=33071;
       sampler.min_filter=sampler.mag_filter=9729;
       pbr["baseColorFactor"]={1,1,1,1}; pbr["metallicFactor"]=1; pbr["roughnessFactor"]=1;
-      pbr["baseColorTexture"]={{"index",texture(prepared_color?maps.pbr_color:maps.color,sampler)}};
+      // Match the current viewport's effective sampling of already-composited
+      // color/emission. Original transforms are baked into these UV0 images;
+      // wrapping and filtering remain per-role, except prepared PBR color.
+      auto derived_sampler=[&](const PaintSourceTexture &source){
+        auto view=source;view.texcoord=0;view.uv_transform={1,0,0,1,0,0};
+        if(!view.min_filter)view.min_filter=9729;
+        if(!view.mag_filter)view.mag_filter=9729;
+        return view;
+      };
+      auto color_sampler=sampler,emission_sampler=sampler;
+      if(maps.source_maps){
+        if(!prepared_color&&maps.source_maps->color.image)color_sampler=derived_sampler(maps.source_maps->color);
+        if(maps.source_maps->emission.image)emission_sampler=derived_sampler(maps.source_maps->emission);
+      }
+      pbr["baseColorTexture"]={{"index",texture(prepared_color?maps.pbr_color:maps.color,color_sampler)}};
       int orm=texture(maps.metal_rough,sampler);
       pbr["metallicRoughnessTexture"]={{"index",orm}};
       material["occlusionTexture"]={{"index",orm}};
       if(!maps.normal.rgba.empty()) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
-      material["emissiveTexture"]={{"index",texture(maps.emission,sampler)}};
+      material["emissiveTexture"]={{"index",texture(maps.emission,emission_sampler)}};
       material["emissiveFactor"]={1,1,1};
     }
     if(maps.source_maps) {
