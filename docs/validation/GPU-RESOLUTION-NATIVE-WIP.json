@@ -1,0 +1,83 @@
+{
+  "source_commit": "f01e04f8e89bbd9b3430377b8950c96174636fd2",
+  "scope": "native application builds and scoped real application/loader/device gates; not final portable/main admission",
+  "tests": {
+    "release_cpu": "6/6;4.87s",
+    "oneapi_actual_A770": "5/5;7.72s",
+    "actual_loader_software": 17,
+    "actual_loader_Arc_GL_plus_compute": 17,
+    "actual_native_menu": 15,
+    "compact_native_menu": 4,
+    "missing_gpu_scene": 2
+  },
+  "native_source_binary_before_after": 1149,
+  "volume_exact_bytes": 1152784,
+  "volume_sha256": "82c9547e97f0cc57a756d43343c3211ea8b2533434b86b633606ff53cfb1235b",
+  "timing_ms": {
+    "CPU": [
+      79.2424,
+      107.033,
+      77.9557
+    ],
+    "ONEAPI": [
+      147.286,
+      71.5284,
+      72.8034
+    ],
+    "scope": "concurrent user/build activity; no general speedup claim"
+  },
+  "final_native_SAN": {
+    "state": "live",
+    "handle": 53391
+  },
+  "remaining": "FMA contraction policy ade92df plus final coherent native/SAN/accelerator proof, main integration, rest of full production objective",
+  "sha256": {
+    "artifacts/configure-native.log": "f4bbb03093d043d769f762f8a939cad653d8911cb7f3860a252490da779b8666",
+    "artifacts/build-native.log": "88ca67042684f4d06dfc845c54b905dbfdd3ba0c0b93501b3a179ab1361e3eaa",
+    "artifacts/configure-native-oneapi.log": "e663e93eaa7809ab99ae92a9dc1ea11b80b52178ee74c5907667127490e27109",
+    "artifacts/build-native-oneapi.log": "417fb520603f085be51140ab4008b36a39b82c1ca5235d9e8d1316b6d8f62aa0",
+    "artifacts/build-native-oneapi-helpers.log": "157acf0d496a61c646167ca6a7b0af1e5bc2cb2ccd0696f95649a6bc5ecf89da",
+    "artifacts/tests-native-release.log": "dc768fc3fae7e4b1bedd87034e8a8ab79467efc03bd4eddc34e8f15359674d24",
+    "artifacts/tests-native-oneapi.log": "60d0253b916d2961dbed1e0ac84035842d57d773f7ccb1c61f36140f10435525",
+    "build-native/artifacts-native-release.xml": "dd545228b63cf14491a0425a30d68de33b20e4edb339fe4d098a90b38e7dade6",
+    "build-native-oneapi/artifacts-native-oneapi.xml": "b66b341edd783b93ffba370701cf17efee4ffeba0254d8c92027ebad0cd5f3bb",
+    "artifacts/native-before-oneapi.json": "35834c8926e9600eff36dac1f389f053afe618dece0857d4a83bc7c4ee01d773",
+    "artifacts/native-after-oneapi.json": "35834c8926e9600eff36dac1f389f053afe618dece0857d4a83bc7c4ee01d773",
+    "artifacts/native-after-arc.json": "35834c8926e9600eff36dac1f389f053afe618dece0857d4a83bc7c4ee01d773",
+    "artifacts/native-sycl-ls.log": "82a54aa1ec32d62f28516a22406f2012dd5c7226f1c97dc4b3053d476e3197bb",
+    "artifacts/native-repeat-cpu.log": "8186ec9b0f125092013343eafb1c1cad331f64ad7dd142b3786bfd64821eedd5",
+    "artifacts/native-repeat-oneapi.log": "de40377232ec3dcde845945fccc88709268a836d052e06a4d8a0f2346376c31f",
+    "artifacts/native-missing-volume.log": "ecc0375dc16ad5150e7e4d49a5bb1118de25061aa271c70aa13f5d7310249502",
+    "artifacts/native-cpu-source.json": "568ebf79458c8892cfc67893e02511a64bd256de8c92277f78ad6be0effca8bc",
+    "artifacts/native-cpu-result.json": "82c9547e97f0cc57a756d43343c3211ea8b2533434b86b633606ff53cfb1235b",
+    "artifacts/native-oneapi-result.json": "82c9547e97f0cc57a756d43343c3211ea8b2533434b86b633606ff53cfb1235b",
+    "artifacts/tests-native-resolution-xr.log": "2db28746865e84290ffa254bfae79751c82dd7a0adc0f30a859ba9d4cfb0a241",
+    "artifacts/tests-native-resolution-xr-arc.log": "6c8684b5516771e67aeaaedd8c9a935b6b4b4a0ad17b4192dd8b5030faffa077",
+    "artifacts/tests-native-resolution-menu.log": "a5e858a21743bcd872dd33bcaadf9306f569d8630c8281a13e00691b77a97587",
+    "artifacts/tests-native-resolution-menu-compact.log": "2394abc285bf2d53fdb94f585402ef1daff35a1d40808e63ed0f542e0c543064",
+    "artifacts/menu-sculpt-resolution-workflow/report.json": "f3a44be5f2d75e5a50c37fac22344d85f9774b22b4019f3c955645ec663af2a1",
+    "artifacts/menu-sculpt-resolution-compact/report.json": "5a1c1ad678deb3f247662b235d4f14d5a231f4c509d6775698d25b3a7b1145eb",
+    "artifacts/menu-sculpt-resolution-workflow/resolution-options.png": "f4c686982f925776af72912bef1c59fa622bb51747b058fa922f98f9ab093f00",
+    "artifacts/menu-sculpt-resolution-compact/resolution-options.png": "2eecd7f13d5da9108c2a62325f80f1613c777e0c84147d004df60a0746de63ff",
+    "artifacts/native-oneapi-ldd.log": "77c025872251967486933dee39df6565161afe756948d6e1bba082df35da850a",
+    "artifacts/native-oneapi-ldd-ambient.log": "a3084586d88b8b0836a09bf03a8ad60e2238e7d18857b5d3a93e4d1b5a0f2c91",
+    "artifacts/native-contract-probe.log": "f0b30deab8053466f0faca6e268bb7fb70b571220f6581a0c0d4ca612739f364",
+    "artifacts/build-native-contract-probe.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/native-contract-off-probe.log": "b8e231081df63fa9feb9693a709bc575f0783f5da3bc11ce303410267d234414",
+    "artifacts/build-native-contract-off-probe.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-native-oneapi/libdome-sculpt-test-runtime.so": "2432ac5cb098948d24bbc9ce579f9830b2181d87cdb23c15b2d90005becd87d6",
+    "build-native-oneapi/dome-sculpt-status-observer.so": "a4b18cb0b768e4468a3fe66fe79ab44f7c1a022e165af750bbc227ad986ecbb1",
+    "artifacts/resolution-xr-arc/accept.json": "a697185eba57dad57f2bb67d061915f83774491eba1457213222f0c5aebe8a43",
+    "artifacts/resolution-xr-arc/report.json": "b55b1b61584212457452d9278f5aa393e6718e0d57c209bfd0dba9086880bf05",
+    "artifacts/resolution-xr-arc/cancel.json": "a0251e514edad79358605c162b99fd16fbc9269e414283b0eb1f5a58c24aa391",
+    "artifacts/resolution-xr-arc/noop.json": "e00a7dd08b4a319168f8111b7965410bf547adce07728503aee8c2c6f16445da",
+    "artifacts/resolution-xr-arc/focus.json": "ab45d73deaf775792e760c91c9170cada65ce61390658584bc052a323ec42c07",
+    "artifacts/resolution-xr-arc/unconfirmed.json": "e00a7dd08b4a319168f8111b7965410bf547adce07728503aee8c2c6f16445da",
+    "build-native-oneapi/resolution-xr/accept.json": "8ff9f6ce9ede1e2f20a3d2da88c0097ed1d9825aa7c9fefc9c4db50b8dcf3e6c",
+    "build-native-oneapi/resolution-xr/report.json": "b55b1b61584212457452d9278f5aa393e6718e0d57c209bfd0dba9086880bf05",
+    "build-native-oneapi/resolution-xr/cancel.json": "7d42fa1c9e8c7eb866d9517b59024af6a44804be2bb2e46c4dc53f4144dfbdb5",
+    "build-native-oneapi/resolution-xr/noop.json": "2b19ff80f30a10cb082db260c831d5600f74cbca3ec62fee11ce6be1aa58540c",
+    "build-native-oneapi/resolution-xr/focus.json": "b5022876c08a678b570f35f2d60ddb3a499c89b212892639767f6fe3d8a7f07e",
+    "build-native-oneapi/resolution-xr/unconfirmed.json": "2b19ff80f30a10cb082db260c831d5600f74cbca3ec62fee11ce6be1aa58540c"
+  }
+}
