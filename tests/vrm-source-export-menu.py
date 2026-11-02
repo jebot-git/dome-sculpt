@@ -11,7 +11,7 @@ signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if os.environ.get('DOME_EXPORT_MENU_BUS')!='1':
  os.execvpe('dbus-run-session',['dbus-run-session','--',sys.executable,*sys.argv],{**os.environ,'DOME_EXPORT_MENU_BUS':'1'})
 root=Path(__file__).resolve().parents[1];build=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',root/'build')).resolve()
-out=root/'artifacts/menu-vrm-source-export';out.mkdir(parents=True,exist_ok=True)
+out=root/'artifacts'/os.environ.get('DOME_VRM_EXPORT_MENU_OUT','menu-vrm-source-export');out.mkdir(parents=True,exist_ok=True)
 checks=[];processes=[]
 def report(complete=False):
  (out/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not x['passed'] for x in checks),'complete':complete},indent=2)+'\n')
@@ -23,6 +23,7 @@ async def wait(predicate,seconds=90):
   result=predicate()
   if result:return result
   await asyncio.sleep(.04)
+ if 'diagnostics' in globals():globals()['diagnostics']()
  raise TimeoutError('Native export did not reach expected state')
 async def main():
  bus=await MessageBus().connect();await bus.request_name('com.canonical.AppMenu.Registrar')
@@ -32,11 +33,21 @@ async def main():
   env={**os.environ,'HOME':home,'DISPLAY':screen,'FLTK_BACKEND':'x11','XDG_CURRENT_DESKTOP':'Dome','LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','XMODIFIERS':'@im=none'}
   for name in ('WAYLAND_DISPLAY','WAYLAND_SOCKET'):env.pop(name,None)
   for name,suffix in [('XDG_STATE_HOME','state'),('XDG_CONFIG_HOME','config'),('XDG_CACHE_HOME','cache'),('XDG_DATA_HOME','data'),('XDG_RUNTIME_DIR','runtime')]:env[name]=home+'/'+suffix;Path(env[name]).mkdir(mode=0o700)
+  env['DOME_VRM_UI_SOURCE']=str(Path(os.environ.get('DOME_VRM_UI_SOURCE',root/'assets/humanoid/vroid/base-female.vrm')).resolve())
+  assert Path(env['DOME_VRM_UI_SOURCE']).is_file(),'Set DOME_VRM_UI_SOURCE to an existing VRM input'
   helper=os.environ.get('DOME_VRM_EXPORT_HELPER',str(build/'dome-sculpt-vrm-source-export-ui-test'));project=Path(home,'native.dsculpt');target=Path(home,'Avatar.vrm');gate=Path(home,'gate');gate.mkdir()
   subprocess.run([helper,'--ui-fixture',str(project)],check=True,env=env)
   def inspect():return json.loads(subprocess.check_output([helper,'--inspect',str(project)],env=env))
   original=inspect();env.update(LD_PRELOAD=str(build/'libdome-sculpt-export-cancel-gate.so'),DOME_TEST_EXPORT_GATE_DIR=str(gate),DOME_TEST_EXPORT_OUTPUT=str(target))
   log=(out/'app.log').open('w');app=subprocess.Popen([str(build/'dome-sculpt'),str(project)],env=env,cwd=home,stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
+  def diagnostics():
+   state={'app_exit':app.poll(),'files':[str(p.relative_to(home)) for p in Path(home).rglob('*') if p.is_file()],'windows':[]}
+   for w in d.screen().root.query_tree().children:
+    try:state['windows'].append({'title':str(w.get_wm_name()),'id':w.id,'mapped':w.get_attributes().map_state})
+    except error.BadWindow:pass
+   (out/'timeout-state.json').write_text(json.dumps(state,indent=2)+'\n')
+   g=d.screen().root.get_geometry();raw=d.screen().root.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(out/'timeout-screen.png')
+  globals()['diagnostics']=diagnostics
   def named(title):
    for w in d.screen().root.query_tree().children:
     try:
@@ -65,6 +76,9 @@ async def main():
    await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0)
   def key(name):
    code=d.keysym_to_keycode(XK.string_to_keysym(name));xtest.fake_input(d,X.KeyPress,code);xtest.fake_input(d,X.KeyRelease,code);d.sync()
+  def accept_chooser(chooser):
+   # Canonical native FLTK chooser's visible OK button, adjacent to Cancel.
+   g=chooser.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+g.width-119,y=g.y+g.height-22);xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
   def capture(name):
    g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(out/name)
   await ready('Cancel background work',False)
@@ -73,7 +87,8 @@ async def main():
   check(chooser.get_wm_transient_for().id==window.id and chooser.get_wm_class()[1]==window.get_wm_class()[1],'Actual export chooser retains document ownership and DomeD application identity')
   await command('Close Window');await wait(lambda:named('Export selected avatar') is None)
   check(not target.exists() and inspect()==original,'Universal Close cancels the native export chooser before submitting any output')
-  await command('Export selected avatar (.vrm)...');chooser=await wait(lambda:named('Export selected avatar'));chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();key('Return')
+  await command('Export selected avatar (.vrm)...');chooser=await wait(lambda:named('Export selected avatar'));chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();accept_chooser(chooser)
+  await wait(lambda:named('Export selected avatar') is None)
   await wait(lambda:(gate/'entered').exists());nodes=await ready('Cancel background work',True);capture('export-running.png')
   check(not target.exists() and nodes['Duplicate object'][1].get('enabled') and nodes['Save'][1].get('enabled'),'A real export pauses after temporary fsync while native authoring and ordered Save remain available')
   await command('Duplicate object');await ready('Undo',True);await command('Undo');await ready('Redo',True)
@@ -81,7 +96,8 @@ async def main():
   (gate/'release').touch();await wait(lambda:project.stat().st_mtime_ns!=stamp)
   check(not target.exists() and not list(Path(home).glob('Avatar.vrm.tmp-*')),'Actual universal Cancel stops replacement and removes the incomplete export temporary')
   check(inspect()==original and (await layout())['Redo'][1].get('enabled') and app.poll() is None,'The following Save completes with exact original scene and preserved authoring Redo')
-  await command('Export selected avatar (.vrm)...');chooser=await wait(lambda:named('Export selected avatar'));chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();key('Return')
+  await command('Export selected avatar (.vrm)...');chooser=await wait(lambda:named('Export selected avatar'));chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();accept_chooser(chooser)
+  await wait(lambda:named('Export selected avatar') is None)
   await wait(lambda:target.exists());await ready('Cancel background work',False)
   subprocess.run([helper,'--validate-glb',str(target)],check=True,env={k:v for k,v in env.items() if k!='LD_PRELOAD'})
   check(inspect()==original and app.poll() is None,'Retry through the actual native chooser produces an independently parsed nineteen-part VRM0 and preserves the project')
