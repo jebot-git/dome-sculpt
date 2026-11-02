@@ -22,7 +22,7 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
-                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff) {
+                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission) {
   require_authority_locked(expected);
   if(state_.object_grabbing && !(work&&work->held_weight))throw std::logic_error("Release object motion before starting asset work");
   if(state_.isolate_held && state_.held_object)require_object_editable_locked(scene_.active().id);
@@ -60,6 +60,11 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   try {
   asset_work_.store(files_.back().work);
   state_.asset_busy = true;
+  if(bake_admission){
+    static_assert(std::is_nothrow_copy_assignable_v<ObjectBakeSettings>);
+    state_.bake_source=bake_admission->source;
+    state_.bake_settings=bake_admission->settings;
+  }
   if(files_.back().cut_handoff){
     state_.cut=files_.back().cut_handoff->accepting;
     input_.cancel();

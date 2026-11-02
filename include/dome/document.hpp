@@ -756,10 +756,14 @@ private:
   void file_loop();
   void queue_scene_operation(std::string, SceneOperation, AssetSource,
                              std::shared_ptr<std::string>);
+  // Configuration belongs to the same accepted publication as its Bake job.
+  // POD metadata only; no callback or permission to alter arbitrary scene data.
+  struct BakeAdmission { uint64_t source=0; ObjectBakeSettings settings; };
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
-                                    uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {});
+                                    uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {},
+                                    std::optional<BakeAdmission> = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
