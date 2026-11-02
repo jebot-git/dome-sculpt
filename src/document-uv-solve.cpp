@@ -12,8 +12,21 @@ bool heavy_uv(UvAction action) {
          action == UvAction::Relax || action == UvAction::Pack || action == UvAction::Seam;
 }
 }
+bool Document::uv_retention_requested_locked() const {
+  // The UV workspace has no numeric fourth component. Keep this draft-only
+  // option in the existing transactional control snapshot, never in Scene.
+  return state_.controls.parameter==VrParameter::UvEdit&&state_.controls.value[3]>.5f;
+}
+bool Document::uv_retention_changes_locked() const {
+  if(!uv_retention_requested_locked()||!control_before_)return false;
+  const auto &o=scene_.object(control_object_);
+  return o.painted&&o.painted->normal_projection()&&o.painted->normal_projection()->version==1;
+}
 void Document::edit_uv(UvAction action, float x, float y) {
   std::lock_guard lock(model_mutex_);
+  if(action==UvAction::RetainNormals){
+    Transaction transaction(*this);apply_uv_action_locked(action,x,y);publish_locked(false,false);transaction.commit(false);return;
+  }
   try { apply_uv_action_locked(action, x, y); }
   catch (...) { publish_locked(); throw; }
   publish_locked();
@@ -23,7 +36,20 @@ void Document::apply_uv_action_locked(UvAction action, float x, float y) {
   if (uv_accept_pending_) throw std::logic_error("Wait for the accepted UV edit to finish");
   if (uv_solving_) throw std::logic_error("Wait for UV processing, or cancel the UV editor");
   try {
-    if (heavy_uv(action)) queue_uv_operation_locked(action);
+    if(action==UvAction::RetainNormals){
+      const auto &o=scene_.object(control_object_);
+      if(!o.painted||!o.painted->normal_projection()||!o.material_bindings||!o.material_bindings->normal_preparation)
+        throw std::logic_error("Prepare normal detail in the Bake controls first");
+      if(o.painted->normal_projection()->version==2)
+        throw std::logic_error("This mesh already keeps its original normal detail; restore an earlier source to resample it");
+      if(!uv_->view().topology||uv_->view().validating)
+        throw std::logic_error("Wait for UV validation before changing normal detail");
+      state_.controls.value[3]=uv_retention_requested_locked()?0.f:1.f;
+      state_.message=uv_retention_requested_locked()
+        ?"Original normal detail will be kept. Save the native project; glTF/VRM export still needs a sampling conversion."
+        :"Normal detail will be resampled into the edited UVs";
+    }
+    else if (heavy_uv(action)) queue_uv_operation_locked(action);
     else uv_->edit(action, x, y);
     state_.error.clear();
   } catch (const std::exception &error) {
@@ -150,8 +176,11 @@ void Document::process_uv_transfer(FileJob &job) {
         scene_.active().id != job.object)
       throw std::runtime_error("The UV session changed before paint transfer");
     const auto &current = scene_.object(job.object);
+    const auto &leased=job.scene.object(job.object);
     if (current.painted != job.paint_identity ||
-        current.painted->revision() != job.source_revision)
+        current.painted->revision() != job.source_revision || current.polygon!=leased.polygon ||
+        current.material_bindings!=leased.material_bindings || current.deformation!=leased.deformation ||
+        current.appearance!=leased.appearance || current.shape_source!=leased.shape_source)
       throw std::runtime_error("The source mesh changed before UV transfer");
     request = uv_request_.load();
   }
@@ -190,7 +219,7 @@ void Document::process_uv_transfer(FileJob &job) {
       throw std::runtime_error("UV remap changed original triangle/corner identity");
     uv_modified |= old.uv[old.indices[corner]] != target.uv[vertex];
   }
-  const bool source_aware=uv_modified&&(source.appearance||source.painted->source_maps()||source.material_bindings||source.painted->color_projection());
+  const bool source_aware=(uv_modified||job.uv_keep_normals)&&(source.appearance||source.painted->source_maps()||source.material_bindings||source.painted->color_projection());
   // Metadata-only edits of unchanged authored UVs retain the original explicit
   // source-authored policy (shared/zero-area charts are not silently repaired).
   if (uv_modified || !source.painted->source_maps()) {
@@ -244,7 +273,8 @@ void Document::process_uv_transfer(FileJob &job) {
       updated->source_vertices.push_back(source.appearance->source_vertices.at(original));
     appearance = std::move(updated);
   }
-  bool changed = uv_changed(target, old) || morph_topology_id(target) != morph_topology_id(old);
+  bool changed = uv_changed(target, old) || morph_topology_id(target) != morph_topology_id(old) ||
+    (job.uv_keep_normals&&source.painted->normal_projection()&&source.painted->normal_projection()->version==1);
   std::shared_ptr<PaintedMesh> painted;
   auto binding=source.material_bindings;
   if(source_aware){
@@ -254,6 +284,7 @@ void Document::process_uv_transfer(FileJob &job) {
     if(!source.appearance&&!source.material_bindings)
       input.native_material=SourceNativeMaterial{source.material.color,source.material.emissive,int(source.material.alpha),source.material.alpha_cutoff,source.material.double_sided};
     SourceUvBakeOptions options;options.cancelled=cancelled;
+    options.normal_sampling=job.uv_keep_normals?SourceNormalUvMethod::RetainSource:SourceNormalUvMethod::Rasterize;
     auto adopted=adopt_source_uv_bake(bake_source_uv(input,options),cancelled);
     painted=std::move(adopted.paint);deformation=std::move(adopted.deformation);
     appearance=std::move(adopted.appearance);binding=std::move(adopted.material_bindings);
@@ -281,15 +312,18 @@ void Document::process_uv_transfer(FileJob &job) {
         scene_.active().id != job.object)
       throw std::runtime_error("The UV session changed during paint transfer");
     const auto &current = scene_.object(job.object);
+    const auto &leased=job.scene.object(job.object);
     if (current.painted != job.paint_identity ||
-        current.painted->revision() != job.source_revision)
+        current.painted->revision() != job.source_revision || current.polygon!=leased.polygon ||
+        current.material_bindings!=leased.material_bindings || current.deformation!=leased.deformation ||
+        current.appearance!=leased.appearance || current.shape_source!=leased.shape_source)
       throw std::runtime_error("The source mesh changed during UV transfer");
     if(accepted)accepted->recovery=recovery_source_;
     Transaction transaction(*this);
     transaction.finish_uv();
     if(job.uv_desktop)desktop_=false;
     if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
-    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message="UVs, paint and deformation identities updated";state_.error.clear();
+    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
     publish_locked(changed,false);transaction.commit();
     if(accepted){
       accepted->revision=state_.revision;accepted->content=content_;

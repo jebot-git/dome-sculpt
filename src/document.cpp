@@ -536,7 +536,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   }
   if (uv_)
     control_changed_ = uv_changed(
-        *uv_->view().mesh, scene_.object(control_object_).painted->mesh());
+        *uv_->view().mesh, scene_.object(control_object_).painted->mesh())||uv_retention_changes_locked();
   auto uv_job=prepare_uv_schedule_locked();
   const bool reset_uv=uv_&&!uv_accept_pending_&&!uv_solving_&&!uv_->view().validating&&!uv_scheduled_.expired();
   if(uv_job&&uv_job->workspace){
@@ -544,6 +544,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
   }
   if (uv_) {
     auto view = std::make_shared<UvView>(uv_->view());
+    const auto &source=scene_.object(control_object_);
+    view->normal_sampling_available=source.painted&&source.painted->normal_projection()&&source.material_bindings&&source.material_bindings->normal_preparation;
+    view->normal_sampling_required=view->normal_sampling_available&&source.painted->normal_projection()->version==2;
+    view->retain_normal_sampling=uv_retention_requested_locked();
     view->committing = uv_accept_pending_;
     view->solving = uv_solving_;
     if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
@@ -1107,6 +1111,7 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   job.source_revision = o.painted->revision();
   job.uv_session = uv_session_;
   job.uv_desktop = desktop_;
+  job.uv_keep_normals=uv_retention_requested_locked();
   job.work=std::make_shared<AssetWork>();job.work->accepted_scene=true;job.operation_label="UV paint transfer";auto work=job.work;
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
@@ -1310,6 +1315,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
   input_.polygon_editing=bool(state_.polygon);
   if(state_.polygon||(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active))input_.edit_allowed=false;
   input_.sculpt_mask_edit = !scene_.active().mesh_active && volume().sculpt_settings().mask_edit;
+  if(state_.selection_mode)input_.edit_allowed=false;
   bool menu_was = input_.menu_open();
   for (int i = 0; i < 2; ++i) {
     const auto &h = f.hands[i];
@@ -1324,7 +1330,10 @@ void Document::process_locked(const SpatialFrame &incoming) {
         vec(ob::rotate(ob::conjugate(object_canvas.orientation),
                        ob::rotate(h.tracked.grip.orientation, {0, 0, 1})));
     s.pressure = std::clamp(h.tracked.trigger, 0.f, 1.f);
-    if(state_.selection_mode)s.pressure=0;
+    const bool owned_control=control_before_&&!state_.asset_busy&&!uv_accept_pending_&&
+      control_object_==scene_.active().id&&control_source_.generation==state_.generation&&
+      control_source_.edit_authority==state_.edit_authority&&input_.owns_control(state_.controls.parameter);
+    if(state_.selection_mode&&!owned_control)s.pressure=0;
     s.trigger = s.pressure > .02f;
     s.joystick_press = h.joystick;
     s.stick_x = h.x;
@@ -2138,7 +2147,7 @@ void Document::finish_control_locked(bool accept) {
     if (accept) {
       auto draft = uv_->view().mesh;
       auto &old = scene_.active().painted->mesh();
-      bool changed = uv_changed(*draft, old);
+      bool changed = uv_changed(*draft, old)||uv_retention_changes_locked();
       if (changed) {
         uv_->edit(UvAction::EndGesture);
         queue_uv_locked(draft);
@@ -2180,6 +2189,7 @@ void Document::control_event_locked(VrControlEvent event) {
         ++uv_session_;
         uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
                     o.painted->resolution());
+        c.value[3]=o.painted->normal_projection()&&o.painted->normal_projection()->version==2?1.f:0.f;
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();
@@ -2401,7 +2411,7 @@ void Document::control_event_locked(VrControlEvent event) {
         apply_uv_action_locked(UvAction::Move, event.value, event.second);
       else if (event.type == VrControlEventType::UvCommand &&
                event.component >= 0 &&
-               event.component <= int(UvAction::Stitch))
+               event.component <= int(UvAction::RetainNormals))
         apply_uv_action_locked(UvAction(event.component), event.value, event.second);
       state_.error.clear();
     } catch (const std::exception &e) {

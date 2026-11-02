@@ -29,6 +29,7 @@ struct UvView {
   bool validating = false, committing = false, solving = false;
   std::array<float, 2> cursor{};
   std::string error;
+  bool retain_normal_sampling=false,normal_sampling_available=false,normal_sampling_required=false;
 };
 enum class UvAction {
   Pick,
@@ -48,7 +49,8 @@ enum class UvAction {
   EndGesture,
   CancelGesture,
   Conformal,
-  Stitch
+  Stitch,
+  RetainNormals
 };
 struct UvInitializationLimits {
   size_t maximum_vertices = 200'000, maximum_triangles = 400'000;
