@@ -34,15 +34,27 @@ sampling fix and all three paint-counter swaps remain present.
 
 ## Live qualification
 
-All three fresh configurations pass with canonical EEE toolkit/bitmap prefixes.
-CTest registers395 cases. Runtime/source/header/test inputs are frozen:
+All three fresh configurations and builds pass with canonical EEE toolkit/bitmap
+prefixes. CPU registers395 cases; OneAPI396 includes its extra no-GPU gate.
+Runtime/source/header/test inputs remain frozen:
 
-- Optimized CPU Release alltargets: exec94973, live.
-- Owned C/C++ ASan+UBSan core/support/render/frontend and selected fixtures:
-  exec26164 terminal0. Selected native/render/GUI-lifetime gate exec75541 live.
-- Optimized OneAPI alltargets: exec74603, live. Uses the existing pinned
-  user-owned DPC++7.2 compiler and its separately documented local libumf
-  compatibility copy. This is not yet a current hardware execution result.
+- Optimized CPU Release alltargets94973: terminal0. Actual full395 regression
+  exec38150 is live; do not restart on an observation timeout.
+- Owned C/C++ ASan+UBSan core/support/render/frontend+selected fixtures26164:
+  terminal0. Selected21/21 pass85.49s, including123 PBR/mixed-rig assertions.
+  Separately registered actual-avatar1/1 passes172.54s (111checks/18images).
+- Optimized OneAPI alltargets74603: terminal0. Actual A770 level_zero:0 selected
+  compute/native9/9 pass13.87s;184analytic endpoints,224CPU-reference batches/
+  445088samples,maxerror8.9407e-08 and explicit no-GPU refusal. GL stayed software
+  for this compute scope. The SDK's documented local libumf copy is unchanged.
+- Strict PCI03 A770 renderer254 checks pass:123PBR+111actual-avatar+11projection+
+  9rig-guide. Source/binary manifests before/after are byte-identical.
+- Actual native FLTK normal-size PBR13, projection11 and rig-fitting8 pass.
+  Two initial GUI runners used absent default build directories; logs retained,
+  corrected explicit paths only. No new all-routes sanitizer-GUI claim.
+
+Read validation/BASIC-AUTHORING-UNION-WIP.json for exact scopes/hashes. Full
+regression and composed compact/Wayland/loader/interface gates remain required.
 
 Build logs, configurations and the395-case manifest are under this tree's
 `artifacts/`. The focused sanitizer JUnit is under `build-sanitize/`.
