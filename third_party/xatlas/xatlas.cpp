@@ -3139,20 +3139,44 @@ public:
 			m_groups[i].ref = 0;
 			m_groups[i].userData = nullptr;
 		}
-		m_workers.resize(std::thread::hardware_concurrency() <= 1 ? 1 : std::thread::hardware_concurrency() - 1);
-		for (uint32_t i = 0; i < m_workers.size(); i++) {
-			new (&m_workers[i]) Worker();
-			m_workers[i].wakeup = false;
-			m_workers[i].thread = XA_NEW_ARGS(MemTag::Default, std::thread, workerThread, this, &m_workers[i], i + 1);
+		uint32_t initializedWorkers = 0;
+		try {
+			m_workers.resize(std::thread::hardware_concurrency() <= 1 ? 1 : std::thread::hardware_concurrency() - 1);
+			for (uint32_t i = 0; i < m_workers.size(); i++) {
+				new (&m_workers[i]) Worker();
+				++initializedWorkers;
+				m_workers[i].wakeup = false;
+				// A thread's C++ state allocation/start can throw. Placement
+				// storage is not automatically released by a failed constructor.
+				auto storage = XA_ALLOC(MemTag::Default, std::thread);
+				try {
+					m_workers[i].thread = new (storage) std::thread(workerThread, this, &m_workers[i], i + 1);
+				} catch (...) {
+					XA_FREE(storage);
+					throw;
+				}
+			}
+		} catch (...) {
+			// Array<Worker> owns raw storage, not the lifetime of Worker or
+			// std::thread. Join the constructed prefix before it can unwind.
+			stopWorkers(initializedWorkers);
+			destroyGroups();
+			throw;
 		}
 	}
 
 	~TaskScheduler()
 	{
+		stopWorkers(m_workers.size());
+		destroyGroups();
+	}
+
+private:
+	void stopWorkers(uint32_t count)
+	{
 		m_shutdown = true;
-		for (uint32_t i = 0; i < m_workers.size(); i++) {
+		for (uint32_t i = 0; i < count; i++) {
 			Worker &worker = m_workers[i];
-			XA_DEBUG_ASSERT(worker.thread);
 			// The predicate and notification must synchronize with the actual
 			// waiter mutex. Atomic wakeup alone can lose the final notification
 			// between a false predicate check and platform wait registration.
@@ -3161,17 +3185,24 @@ public:
 				worker.wakeup = true;
 			}
 			worker.cv.notify_one();
-			if (worker.thread->joinable())
-				worker.thread->join();
-			worker.thread->~thread();
-			XA_FREE(worker.thread);
+			if (worker.thread) {
+				if (worker.thread->joinable())
+					worker.thread->join();
+				worker.thread->~thread();
+				XA_FREE(worker.thread);
+			}
 			worker.~Worker();
 		}
+	}
+
+	void destroyGroups()
+	{
 		for (uint32_t i = 0; i < m_maxGroups; i++)
 			m_groups[i].~TaskGroup();
 		XA_FREE(m_groups);
 	}
 
+public:
 	uint32_t threadCount() const
 	{
 		return max(1u, std::thread::hardware_concurrency()); // Including the main thread.
@@ -8901,7 +8932,15 @@ Atlas *Create()
 {
 	Context *ctx = XA_NEW(internal::MemTag::Default, Context);
 	memset(&ctx->atlas, 0, sizeof(Atlas));
-	ctx->taskScheduler = XA_NEW(internal::MemTag::Default, internal::TaskScheduler);
+	auto storage = XA_ALLOC(internal::MemTag::Default, internal::TaskScheduler);
+	try {
+		ctx->taskScheduler = new (storage) internal::TaskScheduler();
+	} catch (...) {
+		XA_FREE(storage);
+		ctx->~Context();
+		XA_FREE(ctx);
+		throw;
+	}
 	return &ctx->atlas;
 }
 

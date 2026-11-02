@@ -67,7 +67,7 @@
     "commit": "f700c7790aaa030e794b52ba7791a05c085faf0c",
     "used": "Native chart generation and atlas packing",
     "license": "MIT",
-    "local_patches": "TaskScheduler shutdown synchronizes wakeup publication with the worker predicate mutex; see docs/XATLAS-SHUTDOWN.md"
+    "local_patches": "TaskScheduler shutdown predicate synchronization and exception-safe native worker/context construction; see docs/XATLAS-SHUTDOWN.md"
   },
   "source_sha256": {
     "third_party/desktop/appearance.h": "25525e1d43c3036c5fc9ddd99e3c9621e8f9439147412b9bcfc1f2152201f591",
@@ -76,7 +76,7 @@
     "third_party/desktop/desktop-menu.cpp": "51ab33c3d7a2d8cd76a4cedbfd05d410a7d5d7137b94f89b3e9f9e54562c4cab",
     "third_party/desktop/desktop-menu.cmake": "2520c100f2828747a4b8dfdee2f3faa742faf43c02fa73c6adba8d9ad6ce8ada",
     "third_party/desktop/appmenu.xml": "7d0251ee00d3d4bc7ee41e3cd1161beaf68a0c18c4f56f48ff1907a475846022",
-    "third_party/xatlas/xatlas.cpp": "1aadd5aa754016f30e0b34a35e7735939e9965929a40fb3cc8c6a1a621806506",
+    "third_party/xatlas/xatlas.cpp": "fe96ae0d8c362ea4fe2502d8a82f5fbbb839a3822521903b26487afa15a1b824",
     "third_party/xatlas/xatlas.h": "e7675335ad8ab1c1cc9060ad153cf6b8ba2ee914282044eb5f02c49590218fbd",
     "third_party/xatlas/LICENSE": "2c16d5b1c2808277fe975b4f70f0fd9afc9b3bcf04e6c676665a82cb2d5579e3",
     "third_party/blender/BKE_blender_version.h": "aa1d349a0717adbe8fc2f238fb35328a3e932c19bd7258d3a31e946438395c7e",
