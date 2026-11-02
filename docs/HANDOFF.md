@@ -38,10 +38,22 @@ qualify that larger private UV1 branch for publication.
 Source `7c24a06` synchronizes a worker shutdown wakeup with its condition-variable
 predicate mutex. The original fails the deterministic intercepted-wait witness;
 32 forked handshakes pass in a fresh public Release and a separately instrumented
-xatlas/regression build. This repairs one demonstrated race. A separate persistent
-cut-allocation sweep still hangs and remains under investigation; this milestone
-does not claim full OOM/shutdown robustness or enable the private cut adapter.
+xatlas/regression build. This repairs one demonstrated race. At that checkpoint, a separate persistent
+cut-allocation sweep still hung; the constructor follow-up below repairs its
+identified worker leak. Neither milestone claims full OOM/shutdown robustness
+or enables the private cut adapter.
 See XATLAS-SHUTDOWN.md and validation/XATLAS-SHUTDOWN.json.
+
+## xatlas partial construction cleanup
+
+Source `e02a86a` joins the initialized native worker prefix and releases placement
+storage when later thread construction throws. The original fails at the second
+real thread-state allocation; all19 measured boundaries now unwind and retry.
+The two dependency suites pass30 optimized repetitions on public main and five
+independently instrumented repetitions. The formerly hung private cut boundary
+7288 now passes; its full56629-boundary sweep is still running. This does not
+claim C-allocator/OS-wide exhaustion or full cut publication robustness. See
+validation/XATLAS-CONSTRUCTION.json and XATLAS-SHUTDOWN.md.
 
 ## Current integration
 
