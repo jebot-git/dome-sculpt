@@ -266,15 +266,19 @@ int main(int argc, char **argv) try {
   guarded.object(plain).mesh_active = true;
   guarded.select(alpha.active().id);
   d.replace(guarded);
-  check(d.wait_mesh() && d.frame().state->can_cut && !d.frame().state->can_bake,
-        "Native/menu readiness enables authenticated current-field cut while "
-        "unadapted current-field Bake remains guarded");
+  check(d.wait_mesh() && d.frame().state->can_cut && d.frame().state->can_bake,
+        "Native/menu readiness offers authenticated current-field cut and "
+        "the explicit current-target Bake adapter");
   auto guarded_before = d.copy_scene().encode();
   d.begin_cut();check(d.wait_cut(), "Current-field cut source prepares or reports bounded contour refusal");d.end_cut(false);
-  bool bake_refused = false;
-  try {d.bake_from_object(plain);}catch(const std::logic_error &){bake_refused=true;}
-  check(bake_refused && d.copy_scene().encode()==guarded_before,
-        "Cancel of current-field cut and unsupported Bake retain exact current field/source/history");
+  d.bake_from_object(plain);
+  check(d.wait_asset() && d.wait_mesh() &&
+            d.frame().state->error.find("Enable PBR color preparation") !=
+                std::string::npos &&
+            d.copy_scene().encode() == guarded_before &&
+            !d.frame().state->can_undo,
+        "Cut Cancel and unprepared current-target Bake refusal preserve the "
+        "exact field, source and authoring history");
   guarded.select(plain);
   const auto plain_before = guarded.encode();
   bool low_bake_refused = false;

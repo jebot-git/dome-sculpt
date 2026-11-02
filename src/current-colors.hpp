@@ -5,6 +5,7 @@
 #include "dome/scene.hpp"
 #include "prepared-color-state.hpp"
 #include "source-colors.hpp"
+#include "polygon-color-target.hpp"
 namespace dome::detail {
 // All matching happens against ordered REST geometry. Evaluated pose positions
 // are deliberately not an alternative identity for source/corner attributes.
@@ -17,11 +18,19 @@ inline std::vector<PolygonRgba> current_vertex_colors(
       return {};
     return source_vertex_colors(appearance, mesh.positions.size(), cancelled);
   }
-  if ((binding && binding->color_preparation) ||
-      (textures && textures->color_projection))
-    throw std::invalid_argument(
-        "Current polygon colors conflict with prepared color authority");
-  (void)prepared_color_state(binding, textures, false);
+  if(prepared_color_state(binding,textures,false)){
+    const auto &recipe=*binding->color_preparation;
+    if(!recipe.polygon_colors||!current->topology||!current->field||
+       current->field!=recipe.polygon_colors->field||
+       current->field.owner_before(recipe.polygon_colors->field)||recipe.polygon_colors->field.owner_before(current->field)||
+       current->topology->encode()!=recipe.polygon_colors->topology->encode())
+      throw std::invalid_argument("Prepared corner pixels lost their exact current geometry/field authority");
+    (void)polygon_target_colors(mesh,*current,cancelled);
+    recipe.validate_current(mesh,appearance,cancelled);
+    // Resolved PBR maps already contain this authenticated field. An empty
+    // stream intentionally suppresses duplicate raw vertex modulation.
+    return {};
+  }
   if (!current->topology || !current->field)
     throw std::invalid_argument(
         "Polygon colors require complete immutable geometry authority");

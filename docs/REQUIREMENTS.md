@@ -56,6 +56,18 @@ RIGID-AUTHORING-INTEGRATION.md for scoped commands, preserved timeout/interrupti
 and remaining source-rig/VRM1/physics limitations. Private Scene20/21/23 work and
 post-basic controller drawers are not implemented by this checkpoint.
 
+The subsequent Scene20/material6/polygon5 integration adds actual current-field
+target preparation/Bake, separate source/target authorities and one combined
+avatar/normalUV/key/rigid/colour project workflow. Full Release368/368 plus
+separate added2/2, initial ownedSAN51/52 (one timeout) plus corrected/added3/3,
+separate graphics7/7, Arc761, FLTK/Wayland51 and synthetic-loader11 checks pass.
+All51598 unique component allocation boundaries pass Release and ownedSAN via
+42/44 original plus4 timeout-only samebinary finer ranges. Emitted170 Khronos
+files have0errors/1194unfilteredwarnings; official71VRM0×15schemas have0errors.
+Read SCENE20-AUTHORING-INTEGRATION.md for the exact scopes and initial negatives.
+Private Scene21/22/23 and ordered generic Save work are excluded. All unfinished
+original rows and the post-basic controller drawers remain required.
+
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in
 validation/JSON-ALLOCATION-INTEGRATION.json. That older receipt alone does not qualify later combined features or complete

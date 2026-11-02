@@ -6,6 +6,7 @@ signal.pthread_sigmask(signal.SIG_SETMASK, [])
 binary,runtime,output=map(lambda p:Path(p).resolve(),sys.argv[1:]);output.mkdir(parents=True,exist_ok=True)
 normal=os.environ.get("DOME_SCULPT_BAKE_NORMAL")=="1"
 current=os.environ.get("DOME_SCULPT_BAKE_COLOR_CURRENT")=="1"
+target_current=os.environ.get("DOME_SCULPT_BAKE_COLOR_TARGET")=="1"
 checks=[]
 def check(ok,label):
     checks.append({'passed':bool(ok),'check':label});print(('PASS ' if ok else 'FAIL ')+label,flush=True)
@@ -14,7 +15,7 @@ def check(ok,label):
 with tempfile.TemporaryDirectory(prefix='dome-bake-color-xr-') as directory:
     root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}))
     env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','HOME':directory,'XDG_RUNTIME_DIR':directory,'XDG_CONFIG_HOME':directory+'/config','XDG_STATE_HOME':directory+'/state'}
-    helper=binary.parent/('dome-sculpt-current-color-bake-test' if current else 'dome-sculpt-normal-preparation-test' if normal else 'dome-sculpt-colored-bake-workflow-test');fixture=root/'source.dsculpt';subprocess.run([str(helper),'--ui-fixture',str(fixture)],check=True,env=env)
+    helper=binary.parent/('dome-sculpt-current-color-target-test' if target_current else 'dome-sculpt-current-color-bake-test' if current else 'dome-sculpt-normal-preparation-test' if normal else 'dome-sculpt-colored-bake-workflow-test');fixture=root/'source.dsculpt';subprocess.run([str(helper),'--ui-fixture',str(fixture)],check=True,env=env)
     def inspect(path):
         scene=json.loads(subprocess.check_output([str(helper),'--inspect',str(path)],env=env))
         for obj in scene['objects']:

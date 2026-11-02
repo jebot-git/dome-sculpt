@@ -11,7 +11,7 @@
 #include <unistd.h>
 namespace cut_color_fixture {
 using namespace dome;
-inline Scene scene(bool seam = false, bool affine = false) {
+inline Scene scene(bool seam = false, bool affine = false,uint32_t resolution=64) {
   auto description = PolygonMesh::cube(.4f).encode();
   const std::array<std::array<float, 2>, 4> square{
       {{.08f, .08f}, {.92f, .08f}, {.92f, .92f}, {.08f, .92f}}};
@@ -50,7 +50,7 @@ inline Scene scene(bool seam = false, bool affine = false) {
               ("dome-cut-color-source-" + std::to_string(getpid()) + ".glb");
   export_glb({surface}, path);
   ImportAuthoringOptions options;
-  options.paint_resolution = 64;
+  options.paint_resolution = resolution;
   auto imported = prepare_authoring_import(Scene{}, path, options);
   std::error_code error;
   std::filesystem::remove(path, error);
