@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=26;
+inline constexpr int spatial_page_count=27; //25 projection;26 material preview.
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -90,9 +90,11 @@ enum class SpatialCommand {
   ShapeNew, ShapeCapture, ShapeDuplicate, ShapeMirror, ShapeSculpt,
   SelectionMode, ObjectHierarchy, SelectionFocus, ImportTextureAtlas,
   ProjectionBrowse, ProjectionPrevious, ProjectionNext, ProjectionOpen, ProjectionParent,
-  ProjectionToggle, ProjectionUsage, ProjectionPlace, ProjectionDecrease, ProjectionIncrease
+  ProjectionToggle, ProjectionUsage, ProjectionPlace, ProjectionDecrease, ProjectionIncrease,
+  PreviewAuthored=1024, PreviewPbr, PreviewToon
 };
 inline bool projection_command(SpatialCommand c){return c>=SpatialCommand::ProjectionBrowse&&c<=SpatialCommand::ProjectionIncrease;}
+inline bool preview_command(SpatialCommand c){return c>=SpatialCommand::PreviewAuthored&&c<=SpatialCommand::PreviewToon;}
 inline bool shape_command(SpatialCommand c){return c>=SpatialCommand::ShapeNew&&c<=SpatialCommand::ShapeSculpt;}
 inline bool polygon_command(SpatialCommand c){return c>=SpatialCommand::PolygonBegin&&c<=SpatialCommand::PolygonCancel;}
 inline bool import_command(SpatialCommand c) {return (c>=SpatialCommand::ImportBrowse && c<=SpatialCommand::ImportCancel)||c==SpatialCommand::ImportTextureAtlas;}
@@ -127,6 +129,7 @@ public:
   void refresh_volume(Volume &v) { volume_ = &v; }
   void cancel();
   bool menu_open() const { return menu_; }
+  uint32_t menu_device() const { return device_; }
   bool owns_control(VrParameter parameter) const { return menu_&&parameter!=VrParameter::None&&parameter_==parameter; }
   Vec3 menu_anchor() const { return menu_anchor_; }
   Tool tool() const { return tool_; }

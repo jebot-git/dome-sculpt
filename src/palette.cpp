@@ -141,6 +141,7 @@ void SpatialPalette::raster(const EditorState &s) {
   }
   if(s.menu_page==0&&s.controls.parameter==VrParameter::None){
     button(.02f,.02f,.30f,.08f,s.selection_mode?"Selection ON":"Selection OFF",s.selection_mode,!s.can_select_objects);
+    button(.35f,.02f,.30f,.08f,"View");
     button(.68f,.02f,.30f,.08f,"Hierarchy",s.hierarchy_open);
   }
   if (s.controls.parameter == VrParameter::UvEdit && s.uv) {
@@ -408,6 +409,7 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 9) return s.weights.linked;
     }
     if(s.menu_page==0&&sector==11)return s.selection_mode;
+    if(s.menu_page==26){if(sector==0)return !s.pbr_view&&!s.toon;if(sector==1)return s.pbr_view;if(sector==2)return s.toon;}
     if (s.menu_page == 0 && sector < 4)
       return int(s.tool) == sector;
     if (s.menu_page == 1 && current != s.objects.end()) {

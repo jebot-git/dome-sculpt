@@ -580,8 +580,9 @@ struct App {
     menu.add("&View/3D mouse navigation",0,command,this,FL_MENU_TOGGLE|FL_MENU_VALUE);
     menu.add("&View/3D mouse options...",0,command,this);
     menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
-    menu.add("&View/Shading/&PBR", 0, command, this,
+    menu.add("&View/Shading/&Authored material", 0, command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
+    menu.add("&View/Shading/&PBR", 0, command, this, FL_MENU_RADIO);
     menu.add("&View/Shading/&Toon preview", 0, command, this, FL_MENU_RADIO);
     menu.add("&Sculpt/&Clay", '1', command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
@@ -778,10 +779,12 @@ struct App {
     enable("&File/Cancel background work",!modal && (s->can_cancel_asset||s->native_pending));
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Frame &all", "&View/Frame &selection", "&View/Reset &trackball", "&View/Start or stop &XR",
-                           "&View/Shading/&PBR", "&View/Shading/&Toon preview",
+                           "&View/Shading/&Authored material", "&View/Shading/&PBR", "&View/Shading/&Toon preview",
                            "&View/3D mouse navigation","&View/3D mouse options..."};
     for (auto path : views)
       enable(path, !modal);
+    for(auto path:{"&View/Shading/&Authored material","&View/Shading/&PBR","&View/Shading/&Toon preview"})
+      enable(path,!modal&&s->can_preview);
     const bool can_frame=!modal&&!s->stroking&&!s->native_pending&&!s->object_grabbing;
     enable("&View/Frame &all",can_frame&&detail::desktop_frameable(frame,false));
     enable("&View/Frame &selection",can_frame&&detail::desktop_frameable(frame,true));
@@ -902,7 +905,8 @@ struct App {
       enable(channels[i], !modal && !s->asset_busy);
     }
     checked("&View/3D mouse navigation",spacenav.settings().enabled);
-    checked("&View/Shading/&PBR", !s->toon);
+    checked("&View/Shading/&Authored material", !s->toon&&!s->pbr_view);
+    checked("&View/Shading/&PBR", s->pbr_view);
     checked("&View/Shading/&Toon preview", s->toon);
     const char *layer_actions[] = {
         "&Paint/Add layer", "&Paint/Next layer", "&Paint/Layer visible",
@@ -1415,6 +1419,9 @@ struct App {
       if (chosen) canvas.document.export_asset(chosen, AssetExportFormat::Avatar);
     } else if (label == "Start or stop XR") {
       toggle_xr();
+    } else if (label == "Authored material") {
+      canvas.document.authored_shading();
+      canvas.redraw();
     } else if (label == "PBR") {
       canvas.document.shading(false);
       canvas.redraw();

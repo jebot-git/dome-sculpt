@@ -166,6 +166,10 @@ struct EditorState {
   bool shape_sculpt=false;
   uint64_t shape_sculpt_object=0;
   std::shared_ptr<const ProjectionView> projection;
+  // Ephemeral preview policy. Authored materials remain the default.
+  bool pbr_view = false;
+  bool can_preview = true;
+  uint64_t view_epoch = 1;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -179,6 +183,7 @@ struct SurfaceRange {
   CanvasTransform object_world{};bool world_frame_valid=false;
   std::optional<AffineTransform> affine_world;
   bool reflected = false; // CPU query geometry retains original corner order.
+  bool pbr_view = false;
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;
@@ -211,6 +216,8 @@ struct MeshSnapshot {
   std::vector<std::array<float,4>> source_tangents;
   uint64_t normal_frame_layout_builds=0; // Worker diagnostic, never native state.
   std::vector<std::array<float,4>> source_colors; // Linear RGBA, identity when absent.
+  bool pbr_view = false;
+  uint64_t view_epoch = 0;
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0, edit_authority = 0;
@@ -283,6 +290,7 @@ public:
   void appearance(std::string file, int pixels, bool light, uint32_t accent,
                   int opacity);
   void shading(bool toon);
+  void authored_shading();
   void prepare_mesh(uint32_t resolution = 512);
   // Native asset operations run on the ordered worker against a detached scene.
   // No callback may retain mutable aliases or access UI/Document/model state.
@@ -626,6 +634,8 @@ private:
     std::shared_ptr<const Scene> completed;
     uint64_t revision = 0, content = 0;
     RecoverySource recovery_source;
+    bool pbr_view = false;
+    uint64_t view_epoch = 0;
   };
   std::shared_ptr<NativeStroke> native_stroke_;
   std::shared_ptr<const Scene> native_source_scene_;
@@ -658,6 +668,8 @@ private:
     bool sculpt_mask_view = false;
     uint64_t native_gesture = 0;
     size_t native_samples = 0;
+    bool pbr_view = false;
+    uint64_t view_epoch = 0;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;
@@ -774,6 +786,7 @@ private:
   void prepare_locked(uint32_t);
   void finish_locked();
   void process_locked(const SpatialFrame &);
+  void shading_locked(bool pbr, bool toon);
   bool selection_ready_locked() const;
   void configure_selection_locked(bool);
   void select_objects_locked(std::span<const uint64_t>,ObjectSelection,AssetSource={});

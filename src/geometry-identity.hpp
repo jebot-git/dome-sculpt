@@ -19,6 +19,7 @@ struct Dependency {
   CanvasTransform world;
   std::optional<AffineTransform> affine_world;
   bool canonical = false;
+  uint8_t frame_role = 0;
 };
 template <class T>
 bool same_owner(const std::shared_ptr<const T> &a,
@@ -52,7 +53,7 @@ struct Identity {
           !same_owner(a.appearance, b.appearance) ||
           !same_owner(a.material_bindings, b.material_bindings) ||
           !same_owner(a.polygon, b.polygon) ||
-          a.canonical != b.canonical || !same(a.world, b.world) ||
+          a.canonical != b.canonical || a.frame_role != b.frame_role || !same(a.world, b.world) ||
           bool(a.affine_world)!=bool(b.affine_world) || (a.affine_world && a.affine_world->matrix()!=b.affine_world->matrix()))
         return false;
     }

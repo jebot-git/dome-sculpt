@@ -32,7 +32,7 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   if(scene_.has_affine_placement(o.id)&&state_.object_grabbing&&(space!=NativeStrokeSpace::EvaluatedWorldBrush||!held_affine_||held_affine_->base_edit!=o.affine_edit))return false;
   if(scene_.has_affine_placement(o.id)&&!o.mesh_active){state_.message="Affine sculpt strokes require the full field metric path";publish_locked();return false;}
   auto preview=mesh_.load();
-  if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision){state_.message="Wait for the current surface before painting";publish_locked();return false;}
+  if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision||preview->pbr_view!=state_.pbr_view||preview->view_epoch!=state_.view_epoch){state_.message="Wait for the current surface before painting";publish_locked();return false;}
   const bool projected=o.mesh_active&&!state_.shape_sculpt&&state_.projection&&state_.projection->settings.enabled&&state_.projection->image;
   if(projected&&(!o.mesh_active||state_.shape_sculpt||state_.projection->placing))return false;
   auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
@@ -45,6 +45,8 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(projected||scene_.has_affine_placement(o.id)||space==NativeStrokeSpace::EvaluatedWorldBrush)session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
   session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;session->spatial_owner=spatial_owner;session->space=space;session->menu_page=space==NativeStrokeSpace::Ray?24:3;
   if(projected)session->menu_page=25;
+  session->pbr_view=state_.pbr_view;
+  session->view_epoch=state_.view_epoch;
   if(state_.object_grabbing&&space==NativeStrokeSpace::EvaluatedWorldBrush)session->held_basis=held_affine_;
   if(state_.shape_sculpt&&space!=NativeStrokeSpace::Ray)return false;
   if(space==NativeStrokeSpace::EvaluatedWorldBrush&&!o.mesh_active)return false;
@@ -130,7 +132,7 @@ void Document::native_loop(){
     auto cancelled=[&]{
       auto current=published_.load();
       return stopping_.load()||session->cancelled.load()||native_epoch_.load()!=session->epoch||
-        current->generation!=session->source.generation||current->revision!=session->source.revision||current->active_object!=session->source.object||current->edit_authority!=session->source.edit_authority;
+        current->generation!=session->source.generation||current->revision!=session->source.revision||current->active_object!=session->source.object||current->edit_authority!=session->source.edit_authority||current->pbr_view!=session->pbr_view||current->view_epoch!=session->view_epoch;
     };
     std::exception_ptr failure;
     try{
@@ -160,6 +162,7 @@ void Document::native_loop(){
         if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
         SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};
         range.reflected=reflected;
+        range.pbr_view=session->pbr_view;
         PolygonColorSurface current_colors;
         if(o.polygon && o.polygon->active && o.polygon->colors) {
           current_colors.topology=std::shared_ptr<const PolygonMesh>(o.polygon,&o.polygon->topology);
@@ -241,12 +244,12 @@ void Document::native_loop(){
         if(now-shown>=std::chrono::milliseconds(30)){
           auto preview=working.snapshot();
           if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());author_shapekey(preview,o.id,edit,cancelled);detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
-            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);SurfaceRange range{o.id,0,geometry.indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};range.reflected=session->affine_world&&frame.orientation()==AffineOrientation::Reversing;query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);
+            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);SurfaceRange range{o.id,0,geometry.indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};range.reflected=session->affine_world&&frame.orientation()==AffineOrientation::Reversing;range.pbr_view=session->pbr_view;query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);
           }
           std::lock_guard lock(model_mutex_);
           if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");
           state_.native_samples=processed;publish_locked();
-          {std::lock_guard mesh(mesh_mutex_);pending_mesh_.emplace(MeshJob{state_.revision,state_.generation,std::move(preview),false,true,0,0,{}, {}});pending_mesh_->sculpt_mask_view=state_.sculpt_mask_visible;pending_mesh_->native_gesture=session->epoch;pending_mesh_->native_samples=processed;}
+          {std::lock_guard mesh(mesh_mutex_);pending_mesh_.emplace(MeshJob{state_.revision,state_.generation,std::move(preview),false,true,0,0,{}, {}});pending_mesh_->sculpt_mask_view=state_.sculpt_mask_visible;pending_mesh_->native_gesture=session->epoch;pending_mesh_->native_samples=processed;pending_mesh_->pbr_view=session->pbr_view;pending_mesh_->view_epoch=session->view_epoch;}
           mesh_changed_.notify_all();shown=now;
         }
       }
