@@ -3,6 +3,7 @@
 #include "desktop-menu.h"
 #include "dome/document.hpp"
 #include "dome/frame-clock.hpp"
+#include "desktop-framing.hpp"
 #include "dome/mesh.hpp"
 #include "dome/render.hpp"
 #include "dome/session-appearance.hpp"
@@ -77,7 +78,11 @@ struct Canvas : Fl_Gl_Window {
   std::shared_ptr<const MeshSnapshot> shown_mesh;
   unsigned shown_preview_flags=0;
   Quat rotation{};
-  Vec3 pan{};
+  Vec3 pan{}, orbit_pivot{};
+  float zoom_limit=20.f;
+  uint64_t framed_generation=0,frame_import_generation=0;
+  size_t frame_import_objects=0;
+  bool frame_import_pending=false;
   Vec3 ball{}, last_stamp{};
   float distance = 2.2f, radius = .12f;
   double material_time = 0;
@@ -111,11 +116,29 @@ struct Canvas : Fl_Gl_Window {
     if (changed)
       changed();
   }
+  bool frame_view(bool selected,const EditorSnapshot &f) {
+    if(f.state->stroking||f.state->native_pending||f.state->object_grabbing)return false;
+    auto result=detail::desktop_framing(f,rotation,float(w())/std::max(1,h()),selected);
+    if(!result)return false;
+    pan=result->pan;orbit_pivot=result->pivot;distance=result->distance;zoom_limit=std::max(20.f,distance*4);
+    framed_generation=f.state->generation;redraw();return true;
+  }
+  void frame_view(bool selected){frame_view(selected,document.frame());}
   void update_mesh() {
     auto f = document.frame();
     if (f.surface != shown_mesh) {
       shown_mesh = f.surface;
       dirty_mesh = false;
+    }
+    if(frame_import_pending&&f.state->generation!=frame_import_generation)frame_import_pending=false;
+    const bool settled=!f.state->asset_busy&&!f.state->native_pending&&!f.state->stroking&&!f.state->object_grabbing&&f.surface&&
+        f.surface->revision==f.state->revision&&f.surface->generation==f.state->generation;
+    if(settled){
+      const bool imported=frame_import_pending&&f.state->objects.size()>frame_import_objects;
+      const bool first_source=framed_generation!=f.state->generation&&
+          std::any_of(f.surface->ranges.begin(),f.surface->ranges.end(),[](const auto &r){return bool(r.appearance);});
+      if(imported||first_source)frame_view(false,f);
+      if(frame_import_pending)frame_import_pending=false;
     }
   }
   Vec3 project_ball(int x, int y) {
@@ -245,7 +268,8 @@ struct Canvas : Fl_Gl_Window {
           sculpt_at(x, y);
         else if (Fl::event_state(FL_BUTTON1)) {
           auto next = project_ball(x, y);
-          rotation = (arcball(ball, next) * rotation).unit();
+          auto next_rotation=(arcball(ball,next)*rotation).unit();
+          pan=detail::orbit_pan(pan,orbit_pivot,rotation,next_rotation);rotation=next_rotation;
           ball = next;
           redraw();
         } else {
@@ -283,7 +307,7 @@ struct Canvas : Fl_Gl_Window {
       }
       if (event == FL_MOUSEWHEEL) {
         distance =
-            std::clamp(distance * std::exp(.1f * Fl::event_dy()), .15f, 20.f);
+            std::clamp(distance * std::exp(.1f * Fl::event_dy()), .01f, zoom_limit);
         redraw();
         return 1;
       }
@@ -322,7 +346,7 @@ struct Canvas : Fl_Gl_Window {
     float up = .3926990817f, right = std::atan(std::tan(up) * float(pixel_w()) /
                                                std::max(1, pixel_h()));
     auto vp =
-        multiply(projection(-right, right, -up, up), view_matrix(eye, {}));
+        multiply(projection(-right,right,-up,up,std::clamp(distance*.001f,.00001f,.01f),std::max(100.f,distance*4)),view_matrix(eye,{}));
     auto f = document.frame();
     material_time = render_frame_time();
     renderer->set_frame_time(material_time);
@@ -483,6 +507,8 @@ struct App {
     menu.add("&Edit/&Copy", FL_CTRL + 'c', command, this);
     menu.add("&Edit/&Paste", FL_CTRL + 'v', command, this);
     menu.add("&Edit/Select &All", FL_CTRL + 'a', command, this);
+    menu.add("&View/Frame &all", FL_Home, command, this);
+    menu.add("&View/Frame &selection", FL_SHIFT | 'f', command, this);
     menu.add("&View/Reset &trackball", 'f', command, this);
     menu.add("&View/Start or stop &XR", FL_F + 6, command, this);
     menu.add("&View/Shading/&PBR", 0, command, this,
@@ -645,7 +671,7 @@ struct App {
     return !dirty || confirm_discard(window);
   }
   void sync_menus() {
-    auto s = canvas.document.frame().state;
+    auto frame=canvas.document.frame();auto s=frame.state;
     bool modal = Fl::modal() && Fl::modal() != &window;
     std::vector<int> modes;
     for (int i = 0; i < menu.size(); ++i) {
@@ -675,10 +701,13 @@ struct App {
     enable("&Mesh/Clear baked surface",!modal && s->can_clear_bake);
     enable("&File/Cancel background work",!modal && (s->can_cancel_asset||s->native_pending));
     enable("&File/Close &Window", true);
-    const char *views[] = {"&View/Reset &trackball", "&View/Start or stop &XR",
+    const char *views[] = {"&View/Frame &all", "&View/Frame &selection", "&View/Reset &trackball", "&View/Start or stop &XR",
                            "&View/Shading/&PBR", "&View/Shading/&Toon preview"};
     for (auto path : views)
       enable(path, !modal);
+    const bool can_frame=!modal&&!s->stroking&&!s->native_pending&&!s->object_grabbing;
+    enable("&View/Frame &all",can_frame&&detail::desktop_frameable(frame,false));
+    enable("&View/Frame &selection",can_frame&&detail::desktop_frameable(frame,true));
     const char *document_actions[] = {"&File/&New",
                                       "&File/&Open...",
                                       "&File/&Save",
@@ -830,7 +859,7 @@ struct App {
         std::string text = label;
         text.erase(std::remove(text.begin(), text.end(), '&'), text.end());
         if (text != "Undo" && text != "Redo" && text != "Close Window" &&
-            text != "Reset trackball" && text != "Start or stop XR" && text != "Cancel background work")
+            text != "Frame all" && text != "Frame selection" && text != "Reset trackball" && text != "Start or stop XR" && text != "Cancel background work")
           modes[i] |= FL_MENU_INACTIVE;
       }
     }
@@ -1052,8 +1081,11 @@ struct App {
       auto source=canvas.document.begin_import();
       auto selected = fl_file_chooser("Import model", "*.{obj,fbx,gltf,glb,vrm}", nullptr);
       if(selected){std::filesystem::path path(selected);
-        if(auto options=import_options_dialog(path,canvas.document.import_settings()))
+        if(auto options=import_options_dialog(path,canvas.document.import_settings())){
+          const auto objects=canvas.document.frame().state->objects.size();
           canvas.document.import_asset(path,*options,source);
+          canvas.frame_import_pending=true;canvas.frame_import_generation=source.generation;canvas.frame_import_objects=objects;
+        }
       }
     } else if (label == "Open...") {
       if (!discard())
@@ -1289,10 +1321,12 @@ struct App {
     } else if (label == "Toon preview") {
       canvas.document.shading(true);
       canvas.redraw();
+    } else if(label=="Frame all"||label=="Frame selection"){
+      canvas.frame_view(label=="Frame selection");
     } else if (label == "Reset trackball") {
       canvas.rotation = {};
-      canvas.pan = {};
-      canvas.distance = 2.2f;
+      canvas.pan = {};canvas.orbit_pivot={};
+      canvas.distance = 2.2f;canvas.zoom_limit=20.f;
       canvas.redraw();
     }
     if (label == "Clay" || label == "Carve" || label == "Smooth" ||
