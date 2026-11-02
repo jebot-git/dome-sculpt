@@ -88,6 +88,17 @@ validation/XATLAS-CONSTRUCTION.json and XATLAS-SHUTDOWN.md.
 
 ## Current integration
 
+Private skinned-export fix `c6324dd` preserves the original object/group parent
+for ordinary and shared-rig surfaces instead of making them identity roots.
+The real authored-material reflected/single-sided worker-export negative was
+native error0/export255. Final software and Arc192 assertions now pass with
+all32 image errors0 and all original mesh-node world-matrix errors0; tolerance2
+is unchanged. Selected fresh Release9 and fully instrumented own-core/render/
+support SAN9 pass. The actual CC0 VRM suite also passes on the same product.
+See SKINNED-SURFACE-HIERARCHY.md and its receipt, including the strengthened
+legacy GLB world-basis assertions and retained first-run failures. This branch
+does not lift the separate default-material or UV1 guards.
+
 Private affine-import integration `b943927` combines current public `6b64e22`
 with the qualified source-chain admission through `3fda297`, preserving the
 accepted selection UI. Exact source-node graphs, reflected/nonuniform chains,
