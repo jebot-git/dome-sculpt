@@ -956,6 +956,12 @@ if(BUILD_TESTING)
   add_test(NAME fbx-import-document COMMAND dome-sculpt-fbx-import-document-test
     ${CMAKE_CURRENT_BINARY_DIR}/fbx-import-document)
   set_tests_properties(fbx-import-document PROPERTIES TIMEOUT 180)
+  add_executable(dome-sculpt-fbx-named-uv-test tests/fbx-named-uv.cpp)
+  target_link_libraries(dome-sculpt-fbx-named-uv-test PRIVATE dome-sculpt-core ufbx)
+  add_test(NAME fbx-named-uv COMMAND dome-sculpt-fbx-named-uv-test
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/import-named-uv.fbx
+    ${CMAKE_CURRENT_BINARY_DIR}/fbx-named-uv)
+  set_tests_properties(fbx-named-uv PROPERTIES TIMEOUT 180)
   add_executable(dome-sculpt-authoring-save-test tests/authoring-save.cpp)
   target_link_libraries(dome-sculpt-authoring-save-test PRIVATE dome-sculpt-core)
   target_include_directories(dome-sculpt-authoring-save-test PRIVATE src)
