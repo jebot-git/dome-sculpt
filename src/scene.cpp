@@ -2,6 +2,7 @@
 #include "dome/scene.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
+#include "polygon-color-target.hpp"
 #include "dome/source-placement.hpp"
 #include "source-placement-archive.hpp"
 #include "dome/import-source.hpp"
@@ -259,8 +260,7 @@ void Scene::validate(bool deep_sources) const {
     retain_paint(o.painted,false);
     const auto projection=o.painted?o.painted->color_projection():nullptr;
     const auto preparation=o.material_bindings?o.material_bindings->color_preparation:nullptr;
-    if(o.polygon && o.polygon->active && o.polygon->colors && (projection || preparation))
-      throw std::invalid_argument("Current polygon corner colors conflict with prepared color authority");
+    detail::polygon_color_owner(o.polygon.get(),preparation.get(),deep_sources);
     const auto normal_projection=o.painted?o.painted->normal_projection():nullptr;
     const auto normal_preparation=o.material_bindings?o.material_bindings->normal_preparation:nullptr;
     if(bool(normal_projection)!=bool(normal_preparation))throw std::invalid_argument("Current normal projection and retained interpretation differ");
@@ -338,9 +338,18 @@ void Scene::validate(bool deep_sources) const {
     for(const auto &view:origin->roles)if(view.image)source_images.add(view.image);
   }
   std::set<const SourceColorPreparation *> preparations;
+  std::set<const PolygonColorSurface*> color_sources;
+  size_t polygon_entries=polygons.component_entries();auto polygon_colors=polygons.color_archive();
+  auto add_polygon=[&](size_t n){if(n>8'000'000-polygon_entries)throw std::length_error("Scene current color geometry/provenance exceeds polygon budget");polygon_entries+=n;};
   for(const auto &binding:source_materials.bindings())if(binding->color_preparation && preparations.insert(binding->color_preparation.get()).second) {
     const auto &p=*binding->color_preparation;p.validate(deep_sources);
     source_images.add(p.projection->vertex_rgba);source_images.add(p.initial_projection->vertex_rgba);
+    if(p.polygon_colors&&color_sources.insert(p.polygon_colors.get()).second){
+      const auto &topology=*p.polygon_colors->topology;
+      add_polygon(topology.vertices().size());add_polygon(topology.edges().size());add_polygon(topology.faces().size());
+      for(const auto &v:topology.vertices())add_polygon(v.provenance.size());for(const auto &f:topology.faces())add_polygon(f.corners.size());
+      auto before=polygon_colors.entries();polygon_colors.add(p.polygon_colors->field);add_polygon(polygon_colors.entries()-before);
+    }
     const bool fresh_paint=!retained_paint.contains(p.original_paint.get());
     retain_paint(p.original_paint,true);if(fresh_paint)origin_vertices+=p.original_paint->mesh().positions.size();
     if(origin_vertices>8'000'000)throw std::length_error("Color preparation original geometry exceeds scene budget");
@@ -440,8 +449,11 @@ nlohmann::json Scene::encode() const {
       j["objects"].back()["retopology"]=std::move(patch);
     }
   }
-  if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements);
-  if(extended)j["source_materials"]=source_materials.encode(source_images,source_models);
+  detail::PolygonColorArchive color_archive;
+  const bool corner_prepared=feature_version>=20;
+  if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements,corner_prepared?&color_archive:nullptr);
+  if(extended)j["source_materials"]=source_materials.encode(source_images,source_models,corner_prepared?&color_archive:nullptr);
+  if(corner_prepared){auto records=color_archive.encode();j["polygon_sources"]["color_bases"]=std::move(records["color_bases"]);j["polygon_sources"]["color_fields"]=std::move(records["color_fields"]);}
   if(!placements.empty())j["affine_state"]=placements.encode(source_images,source_models);
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
@@ -459,7 +471,9 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>19)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>20)throw std::runtime_error("Unsupported scene version");
+  if(version==20&&(!j.contains("source_materials")||j.at("source_materials").at("version")!=6||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene20 requires explicit current corner preparation authority");
+  if(version<20&&((j.contains("source_materials")&&j.at("source_materials").at("version")==6)||(j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==5)))throw std::invalid_argument("Current corner preparation requires Scene20");
   if(version==19&&(!j.contains("source_materials")||!j.at("source_materials").contains("version")||j.at("source_materials").at("version")!=5))throw std::invalid_argument("Scene19 requires material archive5 normal UV authority");
   if(version<19&&j.contains("source_materials")&&j.at("source_materials").contains("version")&&j.at("source_materials").at("version")==5)throw std::invalid_argument("Normal UV projection requires Scene19");
   const auto &objects = j.at("objects");
@@ -506,7 +520,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(version<13 && j.at("polygon_sources").at("version")!=1)throw std::invalid_argument("Exact polygon placement requires Scene13");
     if(version<14 && j.at("polygon_sources").at("version")==3)
       throw std::invalid_argument("Current polygon corner colors require Scene14");
-    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects);
+    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects,version>=20?&j.at("source_materials"):nullptr);
     const auto &material_records=j.at("source_materials").at("bindings");
     const auto &model_records=j.at("source_models");
     if(!material_records.is_array() || material_records.size()>256 || !model_records.is_array() || model_records.size()>16)
@@ -674,7 +688,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5)) ||
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5) && (version<20 || materials.at("version")!=6)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);
@@ -753,12 +767,14 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(!d.at("morphs").is_null())for(const auto &t:d.at("morphs").at("targets"))preflight_deformation+=t.at("delta").size();
     if(preflight_deformation>8'000'000)throw std::length_error("Scene original and current deformation allocations exceed budget");
   }
+  detail::PolygonColorArchive color_archive;
+  if(version>=20)color_archive=detail::PolygonColorArchive::decode(j.at("polygon_sources").at("color_bases"),j.at("polygon_sources").at("color_fields"));
   SourceMaterialArchive source_materials;
-  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models);
+  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,version>=20?&color_archive:nullptr);
   detail::SourcePlacementArchive placements;
   if(j.contains("affine_state"))placements=detail::SourcePlacementArchive::decode(j.at("affine_state"),source_models);
   detail::PolygonSceneArchive polygons;
-  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements);
+  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,version>=20?&color_archive:nullptr);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));

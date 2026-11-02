@@ -2,6 +2,7 @@
 #include "cut-color.hpp"
 #include "dome/document.hpp"
 #include "dome/polygon-scene.hpp"
+#include "polygon-color-target.hpp"
 namespace dome {
 AssetStatus Document::asset_status() const {
   auto work=asset_work_.load();
@@ -28,7 +29,7 @@ void Document::cancel_background_work(){
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   const auto &target=scene_.active();
-  if(target.polygon && target.polygon->active && target.polygon->colors)return ids;
+  if(!detail::corner_bake_target_supported(target))return ids;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
       detail::cut_color_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
@@ -36,7 +37,7 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
 }
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+  return detail::corner_bake_target_supported(o) && !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
     !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }

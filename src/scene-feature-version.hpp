@@ -41,7 +41,7 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;
   if(const auto &preparation=binding->color_preparation)
-    result=std::max({result,10u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
+    result=std::max({result,preparation->polygon_colors?20u:10u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
   if(const auto &preparation=binding->normal_preparation)
     result=std::max({result,preparation->uv_reprojection?19u:15u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),

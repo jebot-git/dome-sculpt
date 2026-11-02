@@ -17,14 +17,24 @@ public:
   const auto &origins() const { return origins_; }
   const auto &volumes() const { return volumes_; }
   const auto &paints() const { return paints_; }
+  size_t component_entries() const { return entries_; }
+  const PolygonColorArchive &color_archive() const { return colors_; }
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
                         SourceMaterialArchive &, SourcePlacementArchive * = nullptr) const;
+  nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
+                        SourceMaterialArchive &, SourcePlacementArchive *,PolygonColorArchive *) const;
   static void preflight(const nlohmann::json &, const nlohmann::json &objects);
+  static void preflight(const nlohmann::json &, const nlohmann::json &objects,const nlohmann::json *materials);
   static PolygonSceneArchive decode(const nlohmann::json &,
                                     const PaintImageArchive &,
                                     const CreatorAssetArchive &,
                                     const SourceMaterialArchive &,
                                     const SourcePlacementArchive * = nullptr);
+  static PolygonSceneArchive decode(const nlohmann::json &,
+                                    const PaintImageArchive &,
+                                    const CreatorAssetArchive &,
+                                    const SourceMaterialArchive &,
+                                    const SourcePlacementArchive *,const PolygonColorArchive *);
 
 private:
   size_t entries_ = 0;

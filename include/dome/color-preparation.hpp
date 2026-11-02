@@ -3,7 +3,8 @@
 #include "material-bindings.hpp"
 #include "scene.hpp"
 namespace dome {
-enum class SourceColorField { OriginalAccessor, Identity };
+enum class SourceColorField { OriginalAccessor, Identity, PolygonCorners };
+struct PolygonColorSurface;
 struct ColorPreparationOptions {
   uint64_t max_quality_cells=128'000'000, max_probe_samples=64'000'000;
   size_t max_working_bytes=256*1024*1024, max_layer_bytes=128*1024*1024;
@@ -42,6 +43,9 @@ struct SourceColorPreparation {
   std::shared_ptr<const DeformationState> original_deformation;
   // Must not itself contain a color preparation: bounded acyclic ownership.
   std::shared_ptr<const SourceMaterialBindings> original_material;
+  // Geometry-only current CORNER authority. This is not an Origin/material
+  // edge: its immutable topology and field can be authenticated independently.
+  std::shared_ptr<const PolygonColorSurface> polygon_colors;
   void validate(bool deep=true) const;
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> &cancelled={}) const;
@@ -54,6 +58,7 @@ struct ColorPreparationInput {
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
   std::shared_ptr<const DeformationState> deformation;
   Material material;
+  std::shared_ptr<const PolygonColorSurface> polygon_colors;
 };
 struct ColorPreparationResult {
   std::shared_ptr<PaintedMesh> paint;

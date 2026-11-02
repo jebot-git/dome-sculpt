@@ -23,8 +23,11 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   auto target = scene.active();
   auto source = scene.object(source_id);
   const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
-  if(target.polygon&&target.polygon->active&&target.polygon->colors)
-    throw std::logic_error("Current target corner colors need an explicit prepared-color field adapter; the original source is unchanged");
+  const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
+  if(!detail::corner_bake_target_supported(target))
+    throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
+  if(current_target&&settings.prepare_normals)
+    throw std::logic_error("Normal attribute preparation needs a separate current-corner frame adapter; the original target is unchanged");
   // This source route uses the same authenticated ordinary shading domain as
   // plane cutting. Other original/prepared roles still require their adapters.
   if(current_source&&!detail::cut_color_supported(source))
@@ -60,7 +63,16 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   auto source_maps=source.mesh_active?source.painted->preview(source.material):std::shared_ptr<const TextureMaps>{};
   auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
-  auto target_colors=detail::source_vertex_colors(target.appearance.get(),target.painted->mesh().positions.size(),cancelled);
+  std::shared_ptr<const PolygonColorSurface> target_current;
+  if(current_target){
+    auto descriptor=std::make_shared<PolygonColorSurface>();
+    descriptor->topology=std::make_shared<const PolygonMesh>(target.polygon->topology);
+    descriptor->field=target.polygon->colors;target_current=std::move(descriptor);
+  }
+  auto target_maps=current_target?target.painted->preview(target.material):std::shared_ptr<const TextureMaps>{};
+  auto target_colors=current_target?detail::current_vertex_colors(target.painted->mesh(),target_current.get(),
+      target.appearance.get(),target.material_bindings.get(),target_maps.get(),cancelled)
+      :detail::source_vertex_colors(target.appearance.get(),target.painted->mesh().positions.size(),cancelled);
   auto nonidentity=[](const auto &colors){return std::any_of(colors.begin(),colors.end(),[](auto c){return c!=std::array<float,4>{1,1,1,1};});};
   const bool source_prepared=source.mesh_active&&source.painted->color_projection();
   const bool target_prepared=bool(target.painted->color_projection());
@@ -71,9 +83,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(settings.prepare_colors&&!target_prepared){
     auto placement=capture_source_placement(scene,target.id);
     const auto world=placement?CanvasTransform{}:scene.world_transform(target.id);
-    detail::strict_polygon_color_target(target,world,cancelled,std::move(placement));
+    detail::strict_polygon_color_target(target,world,cancelled,std::move(placement),current_target);
     ColorPreparationOptions options;options.resolve_identity=true;options.max_projection_error=settings.color_error;options.cancelled=cancelled;
-    auto prepared=prepare_source_colors({target.painted,target.appearance,target.material_bindings,target.deformation,target.material},options);
+    auto prepared=prepare_source_colors({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,target_current},options);
     target.painted=std::move(prepared.paint);target.material_bindings=std::move(prepared.material_bindings);converted=prepared.converted;
   }
   bool normal_converted=false;
