@@ -9,6 +9,7 @@
 #include "source-colors.hpp"
 #include "polygon-color-target.hpp"
 #include "uv-canonical-transport.hpp"
+#include "corner-uv-domain.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/polygon-color.hpp"
 #include <algorithm>
@@ -79,6 +80,7 @@ void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
   if(!i.polygon_authority->active||!i.polygon_authority->colors||i.appearance||i.paint->normal_projection()||(!prepared&&(i.current_material||i.paint->color_projection()||!i.native_material)))
    throw std::invalid_argument("Corner UV transfer requires its own active field and explicit supported material authority");
   if(prepared){
+    detail::require_corner_uv_domain(*i.paint);
     if(!i.target_polygon||!i.target_polygon->active||i.target_polygon->colors!=i.polygon_authority->colors||i.current_material->has_mtoon||i.current_material->normal_preparation)
       throw std::invalid_argument("Prepared corner UV transfer requires its own exact target field/topology");
     detail::polygon_color_owner(i.polygon_authority.get(),i.current_material->color_preparation.get(),true);

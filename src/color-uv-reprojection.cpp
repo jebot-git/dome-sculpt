@@ -5,6 +5,7 @@
 #include "polygon-color-target.hpp"
 #include "source-paint-pairing.hpp"
 #include "uv-canonical-transport.hpp"
+#include "corner-uv-domain.hpp"
 #include <bit>
 #include <algorithm>
 namespace dome {namespace {
@@ -49,6 +50,7 @@ void SourceColorUvReprojection::validate(bool deep,const std::function<bool()> &
  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Current-colour UV source validation cancelled");};stop();receipt.validate();
  if(!layout||!projection||!polygon_colors||!polygon_colors->topology||!polygon_colors->field||!before_paint||before_paint->in_stroke()||before_paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored||!before_paint->color_projection()||!before_material||!before_material->color_preparation||before_appearance||before_paint->normal_projection()||before_material->normal_preparation)
   throw std::invalid_argument("Current-colour UV requires its own complete strictly prepared before-state; unrelated PA/creator/normal authority cannot substitute");
+ detail::require_corner_uv_domain(*before_paint);
  const auto &prior=*before_material->color_preparation;const auto &old_descriptor=prior.current_descriptor();
  if(prior.receipt.source_field!=SourceColorField::PolygonCorners||!old_descriptor||!old_descriptor->topology||!old_descriptor->field||old_descriptor->field!=polygon_colors->field||old_descriptor->field.owner_before(polygon_colors->field)||polygon_colors->field.owner_before(old_descriptor->field))
   throw std::invalid_argument("UV-only editing must retain the actual independently owned current corner field");
@@ -90,6 +92,7 @@ std::shared_ptr<const SourceColorPreparation> reproject_source_corner_colors(
  if(options.cancelled&&options.cancelled())throw std::runtime_error("Current colour UV cancelled");
  if(!paint||!material||!material->color_preparation||!descriptor)
   throw std::invalid_argument("Current colour UV needs its own complete before-state");
+ detail::require_corner_uv_domain(*paint);
  material->validate();material->color_preparation->validate_current(paint->mesh(),nullptr,options.cancelled);
  auto node=std::make_shared<SourceColorUvReprojection>();
  auto layout=std::make_shared<SourceColorUvLayout>();layout->source_vertices.assign(remap.begin(),remap.end());

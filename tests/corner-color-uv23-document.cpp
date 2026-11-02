@@ -16,8 +16,8 @@ struct Gate {
  bool pause(){std::unique_lock lock(mutex);if(!armed)return false;armed=false;entered=true;changed.notify_all();changed.wait(lock,[&]{return released;});return fail;}
  void wait(){std::unique_lock lock(mutex);if(!changed.wait_for(lock,std::chrono::seconds(30),[&]{return entered;}))throw std::runtime_error("UV file worker did not reach actual transfer gate");}
  void release(){std::lock_guard lock(mutex);released=true;changed.notify_all();}
-} gate;
-struct Release {~Release(){gate.release();}};
+} gate,save_gate;
+struct Release {~Release(){gate.release();save_gate.release();}};
 void ready(Document &doc){if(!doc.wait_asset(std::chrono::seconds(30))||!doc.wait_mesh(std::chrono::seconds(30))||!doc.frame().state->error.empty())throw std::runtime_error("UV endpoint: "+doc.frame().state->error);}
 void accept(Document &doc,bool fail=false){doc.begin_uv();check(doc.wait_uv(),"Actual UV draft initializes before accepted endpoint capture");const auto &mesh=doc.frame().state->uv->mesh;size_t face=0;while(face<mesh->indices.size()/3&&mesh->normals[mesh->indices[face*3]].z<.9f)++face;
  std::array<float,2> cursor{};for(size_t k=0;k<3;++k){auto q=mesh->uv[mesh->indices[face*3+k]];for(size_t d=0;d<2;++d)cursor[d]+=q[d]/3;}doc.edit_uv(UvAction::Pick,cursor[0],cursor[1]);if(!doc.wait_uv())throw std::runtime_error("Current UV Pick timeout");doc.edit_uv(UvAction::Move,1.f/64,0);check(doc.wait_uv()&&doc.frame().state->uv->valid,"Actual source-aware UV draft validates");gate.arm(fail);doc.end_uv(true);gate.wait();check(doc.frame().state->asset_busy&&doc.frame().state->can_save_after_asset,"Accepted UV publishes the shared exact endpoint Save capability");}
@@ -27,6 +27,8 @@ template<class F>bool refused(F operation){try{operation();}catch(const std::exc
 }
 extern "C" SourceUvBakeResult __real__ZN4dome14bake_source_uvERKNS_17SourceUvBakeInputERKNS_19SourceUvBakeOptionsE(const SourceUvBakeInput&,const SourceUvBakeOptions&);
 extern "C" SourceUvBakeResult __wrap__ZN4dome14bake_source_uvERKNS_17SourceUvBakeInputERKNS_19SourceUvBakeOptionsE(const SourceUvBakeInput &input,const SourceUvBakeOptions &options){const bool failure=gate.pause();auto result=__real__ZN4dome14bake_source_uvERKNS_17SourceUvBakeInputERKNS_19SourceUvBakeOptionsE(input,options);if(failure)throw ExactUvFailure();return result;}
+extern "C" void __real__ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE(const Scene*,const std::filesystem::path&);
+extern "C" void __wrap__ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE(const Scene *scene,const std::filesystem::path &path){save_gate.pause();__real__ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE(scene,path);}
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;const std::filesystem::path directory=argv[1];std::filesystem::create_directories(directory);auto initial=current_color_target_fixture::fixture(true);const auto other=initial.objects().back().id;
  Document baked;baked.replace(initial);ObjectBakeSettings settings;settings.prepare_colors=true;settings.ao_samples=0;baked.bake_from_object(other,settings);ready(baked);
@@ -37,6 +39,15 @@ int main(int argc,char **argv)try{
   check(refused([&]{doc.edit_uv(UvAction::Move,.1f,0);}),"An accepted UV job cannot race a changed draft");gate.release();complete(saved);ready(doc);const auto accepted=doc.copy_scene().encode();
   check(accepted.at("version")==23&&accepted!=original&&Scene::load(path).encode()==accepted,"Queued Save stores the actual accepted UV model rather than the prior scene");
   check(doc.undo()&&doc.copy_scene().encode()==original&&doc.redo()&&doc.copy_scene().encode()==accepted,"Accepted UV plus queued Save retains exactly one Undo/Redo boundary");
+ }
+ {
+  Document doc;Release release;doc.replace(source);ready(doc);accept(doc);auto path=directory/"captured-after-undo.dsculpt";auto saved=doc.save_async(path);
+  save_gate.arm();gate.release();save_gate.wait();ready(doc);const auto accepted=doc.copy_scene().encode();
+  check(doc.undo()&&doc.copy_scene().encode()==original,"Undo may restore the original model while its previously accepted UV Save owns the exact endpoint");
+  check(saved.wait_for(std::chrono::milliseconds(20))!=std::future_status::ready,"The actual file writer is gated after capturing the accepted UV snapshot");
+  save_gate.release();complete(saved);
+  check(Scene::load(path).encode()==accepted&&doc.copy_scene().encode()==original,"Previously queued Save writes the captured Scene23 result after Undo without adopting the current older scene");
+  check(doc.redo()&&doc.copy_scene().encode()==accepted,"Late dependent Save leaves the exact accepted UV redo history intact");
  }
  {
   Document doc;Release release;doc.replace(source);ready(doc);auto path=directory/"cancelled.dsculpt";source.save(path);const auto old=bytes(path);accept(doc);auto saved=doc.save_async(path);doc.cancel_background_work();gate.release();
@@ -78,4 +89,4 @@ int main(int argc,char **argv)try{
   check(Scene::load(path).encode()!=original,"Close persisted the accepted source-aware UV result, not the previous model");
  }
  check(source.encode()==original,"Every completion, failure, cancellation and close preserves the immutable original source");std::cout<<"PASS "<<checks<<" prepared current-corner native UV endpoint/Save checks\n";return 0;
-}catch(const std::exception &error){gate.release();std::cerr<<"FAIL "<<error.what()<<'\n';return 1;}
+}catch(const std::exception &error){gate.release();save_gate.release();std::cerr<<"FAIL "<<error.what()<<'\n';return 1;}
