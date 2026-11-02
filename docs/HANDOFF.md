@@ -6,6 +6,13 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Resumed production work — 2026-11-02
 
+The user has resumed the goal after the interface-acceptance pause recorded in
+public `625e062`. The accepted physical UI baseline remains preserved; this
+resumption does not authorize another headset launch or a system installation.
+The Scene17 implementation and qualification below were completed before that
+pause. Its documentation and hashes have now been reviewed for the private
+ready checkpoint; integration and publication remain root-owned.
+
 The user resumed the original full goal. Preserve accepted selection source
 `f3f9199`, publication8d46dfb and the physical-test session. Latest DomeD is
 `d271cf6`; canonical toolkit inputs match the existing optimized EEE prefixes,
@@ -16,8 +23,8 @@ DomeD work.
 - merge_palette: prepared-normal/shapekey native adapter from7a66e71.
 - merge_contracts: current-corner color cut transport from91aa08c, then bake
   integration where qualified; native guards remain until actual support.
-- merge_docs: general affine import from0b65130, including independent reflected-frame evidence and native workflow
-  qualification before admission.
+- merge_docs: affine admission and reflected skinned export are published;
+  qualified Scene17 default-material provenance is ready for integration.
 - Root: source UV1 paint/material sampling and integration qualification.
 
 Private worktrees start from accepted main8d46dfb. Geometry, source frames,
@@ -40,10 +47,11 @@ seven whole-core/support sanitizer suites,13 actual Arc checks,12 native FLTK
 UV checks and eight actual d271 Wayland/menu checks retain their exact scopes
 in its SOURCE-UV1-PIPELINE.json. Generic native UV1 import/painting remains guarded.
 
-A NEW clean integration tree `artifacts/uv1-affine-integration-0d2ffbb`, branch
+A historical integration tree `artifacts/uv1-affine-integration-0d2ffbb`, branch
 `work/uv1-affine-integration-0d2ffbb`, source `2e7d4a0`, combines that checkpoint
-with published affine/dependency sources. Fresh coherent Release and sanitizer
-builds are currently running; combined regression qualification is pending.
+with published affine/dependency sources. Its original in-progress state is
+retained here as baseline history, not a current process report. Later UV1 and
+sampler qualification and publication are maintained by root.
 The frozen UV1 component tree, accepted physical UI binary and saved20-object
 headset session remain preserved.
 
@@ -52,7 +60,8 @@ scoped fixtures; actual bundled nineteen-part avatar qualification is underway.
 Current-color cut preparation passes all56,629 measured persistent owned-new
 failure boundaries with exact rollback and retry; native publication/immediate
 Save work remains separate in a new isolated tree. Authenticated implicit-default
-material identity (Scene17) remains under development. No new physical headset
+material identity (Scene17) is qualified privately at `a40eea0` as described
+below. No new physical headset
 launch, system installation or active-session restart occurred.
 
 ## Null shape-history compatibility
@@ -87,6 +96,18 @@ claim C-allocator/OS-wide exhaustion or full cut publication robustness. See
 validation/XATLAS-CONSTRUCTION.json and XATLAS-SHUTDOWN.md.
 
 ## Current integration
+
+Private Scene17 implementation `a40eea0` admits witnessed absent glTF materials
+without treating an unused authored material 0 as their source. Identity 0/-1,
+empty original material JSON and the exact raw/source/paint/frame/history state
+persist; recursive minimum-version checks include dormant before-states and
+bounded archive tables. Final Release 12, own-core/render/support SAN 12,
+actual FLTK 24, native/controller 27 and Arc 66 checks pass. All 24 source/export
+image comparisons have error 0; all 24 raw/output files pass pinned Khronos with
+0 errors and 24 known skinned-transform warnings. See GLTF-IMPLICIT-MATERIAL.md
+and its receipt for exact scope and retained invalid-fixture negatives. This
+private branch contains no owned-UV1 data or new atlas/import policy; the full
+goal and remaining UV/VRM/FBX requirements remain active.
 
 Private skinned-export fix `c6324dd` preserves the original object/group parent
 for ordinary and shared-rig surfaces instead of making them identity roots.

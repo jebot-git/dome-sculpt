@@ -1,0 +1,175 @@
+{
+  "recorded_utc": "2026-11-02T05:18:32.832336+00:00",
+  "status": "qualified private implicit glTF material import/source archive subset",
+  "product_source": "a40eea044c1bdf34bc1323140947b8bff1699a3c",
+  "base": "78a1034029b66396dec2d948ced85f7d1ca6c9ee",
+  "new_scene_feature_minimum": 17,
+  "identity": {
+    "native_default_slot": 0,
+    "original_material_absence": -1,
+    "original_material_json": "empty string",
+    "raw_witness": "captured matching primitive has NO material property; unrelated authored material0 is not selected",
+    "authored_empty_material_zero": "identity1/0 and raw{} preserved; historicalScene9 when no newer feature"
+  },
+  "production_layout_changed": false,
+  "before_state_scan": [
+    "current/dormant appearance",
+    "UV origin",
+    "color preparation original appearance/binding",
+    "normal preparation original appearance/binding",
+    "polygon origin",
+    "direct shape source"
+  ],
+  "preflight_bounds": {
+    "object_count": 256,
+    "material_table_count": 256,
+    "polygon_history_table_count": 512
+  },
+  "finished": {
+    "native_witness_archive_checks": 548,
+    "actual_native_controller_history_paint_save_checks": 27,
+    "source_default_pixel_assertions": 66,
+    "raw_native_image_comparisons": 12,
+    "raw_worker_export_image_comparisons": 12,
+    "all_pixel_max_error": 0,
+    "unchanged_pixel_tolerance": 2,
+    "wrong_authored_zero_sensitivity_cases": 6,
+    "maximum_wrong_zero_error": 255,
+    "gui_static_checks": 12,
+    "gui_authored_skin_checks": 12
+  },
+  "Release": {
+    "build": "regular-user optimized Release CPU, UIon/XRon, canonicaltoolkiteee andbitmapruntimeeee verified unchangedford271",
+    "final_suites": 12,
+    "failed": 0,
+    "seconds": 2.26
+  },
+  "sanitize": {
+    "fresh_own_C_and_CXX_core_renderer_support": true,
+    "final_fixture_consumers_rebuilt_after_metadata_corrections": true,
+    "build": "Release UIon/XRoff CPU",
+    "C_and_CXX_Release_flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "final_suites": 12,
+    "failed": 0,
+    "seconds": 18.99,
+    "external_uninstrumented": [
+      "Mesa",
+      "FLTK",
+      "image/system libraries",
+      "LAPACK"
+    ]
+  },
+  "hardware": {
+    "selector": "DRI_PRIME=pci-0000_03_00_0",
+    "GL_VENDOR": "Intel",
+    "GL_RENDERER": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "assertions": 66,
+    "comparison_count": 24,
+    "all_max_error": 0
+  },
+  "official_validator": {
+    "version": "2.0.0-dev.3.10",
+    "files": 24,
+    "errors": 0,
+    "warnings": 24,
+    "warning_codes": {
+      "NODE_SKINNED_MESH_NON_ROOT": 16,
+      "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 8
+    },
+    "module": "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator",
+    "scope": "all12 raw GLB fixtures and all12 actual file-worker GLB outputs",
+    "report": "artifacts/default-gltf-validator-arc-valid.json"
+  },
+  "preserved_findings": [
+    {
+      "log": "artifacts/test-default-consumers.log",
+      "result": "initial8/9, reflected skinned export255; independently isolated and fixed in published78a1034 before this final proof"
+    },
+    {
+      "result": "initial source fixtures erased extension declaration for an unused authored unlit material; corrected metadata before first sanitizer fixture compile"
+    },
+    {
+      "log": "artifacts/test-default-gltf-validator.log",
+      "result": "first official run12 raw-input POSITION morph bounds errors, outputs0; corrected exact existing .01f/.04f delta bounds in shared test fixture, no vertex/image/property-value changes"
+    },
+    {
+      "result": "early regex omitted scene-schema-compat; separately verified then included in final12suite runs"
+    }
+  ],
+  "source_sha256": {
+    "src/creator-archive.cpp": "827665d58f8aae10efbcfe929ef3cd9a10feab0f7513d0a115d0fdeb01d4c810",
+    "src/import-authoring.cpp": "a460bd3cfb8a77da819dfe02a871cb4bffe7a4373b67a831c594ad708a800049",
+    "src/scene-feature-version.hpp": "afd6c29fa8ed5f4f386b216dd756f78f79eae5e8f444f7bd5e7f57080fcc4b4c",
+    "src/scene.cpp": "3fd692d122f0b0c141350bd66417dc1974294c1ba7f7a75a89de8a2f21db1364",
+    "CMakeLists.txt": "0a723f362deabdc44e35f18cd3eacf7071a00c1d5a049fb008056a3b06cf221b",
+    "tests/import-authoring-fixtures.hpp": "5bd068f9c77df13d9e97db5eeadfc0041bc575bf886f1b3ac30bd29721d1d1e6",
+    "tests/import-default.cpp": "f3bc96f5bb67845bd4f94d7087cef91f909e46d1abfdd3fd68a966c7a8d4720f",
+    "tests/import-default-render.cpp": "74034ef7997fc64a4b7b94697cb003ebf685e05f5ce4c690d76e2d0958516701",
+    "tests/source-color-consumer.hpp": "aa26f1208af7b3e2455db33cd017187c211143f739c800584621fb06e7518bcd",
+    "tests/import-source-chain-document.cpp": "74a2e22b26acdfd807913fe89df412f7aa2720b4bb544dfdb2d0d0c44f195af2",
+    "tests/import-authoring.cpp": "1c8954c738ce7c2244eac10cad81c6ba2825adb9f60e0dc64d1bfc15d4934eea",
+    "tests/import-skin.cpp": "e0febb6d0d9346f18a464ef5e5068722a393164dea5e900de9986ad7304c60eb",
+    "tests/import-menu.py": "edca55504fe04ecd4e270ac9f31274fa63c5cd5963111c907897ca6f1cf761b1"
+  },
+  "evidence_sha256": {
+    "artifacts/configure-default-release.log": "f71eda356df23659801c7ed383e8dcc1fd53d39fc625c9d26638f96d16b608f3",
+    "artifacts/build-default-release.log": "b413c5b671c01601557bb19ba2a51970dc31ea77343a099bc041b0813da745f4",
+    "artifacts/test-default-release.log": "5cf869cb429baece0f30af81aad6ab7706e4edf2f1290765057cdb228c01e48e",
+    "artifacts/build-default-consumers.log": "0acc20865075a8d3c30d874c1cc815489a246f64bab6dc0496c85485c8dccd72",
+    "artifacts/test-default-consumers.log": "9fd512da6f8141d890d704bd9e8df848a183b176aeaafc1580be95af7ae57cb9",
+    "artifacts/configure-default-postfix.log": "b1d3e2adc650db1b332368177571668905630d4f767ec82cb0894493d86fc134",
+    "artifacts/build-default-postfix.log": "59be5bb0052a9b2dd6247c6ca617f7691a394b90880e6e6e2ea5eb95390a5027",
+    "artifacts/test-default-postfix.log": "403efe77c4af01305394b1b43629d8f888a86d95106fd750dbd1a180d0eccb63",
+    "artifacts/test-default-postfix-detail.log": "3d78284a4987c1368797b00cc94c6c248aaeaa7182e75784e4c2533868ba24ab",
+    "artifacts/test-default-scene-compat.log": "feddda7823d06a69c4f06b0bee5a6c68ab662e8eb70c9045e15ec2f935e608d3",
+    "artifacts/configure-default-sanitize.log": "9daec66dafa7d39998be313fa79c1d5746ccd4a333121786bf8032b9d879e53b",
+    "artifacts/build-default-sanitize.log": "07046ee67f847734946e91d58e2ba865959b1a2d66e4d94adbaa6a5f0c185390",
+    "artifacts/test-default-sanitize.log": "25c77f24b5fc20fadb2f4d85d3cccacabb42362c181729dfcea25a3ac4e4e270",
+    "artifacts/test-default-sanitize-detail.log": "27733c93ee9af82ef2b0e36522bfe945e02b8bbd6f0cf82344e8cd592bc64856",
+    "artifacts/test-default-menu.log": "ccd1f14c2f2e813a2885b1bd8b9e0cfdd67084e26ea265cf4c7de948d27ab909",
+    "artifacts/test-default-skin-menu.log": "ccd1f14c2f2e813a2885b1bd8b9e0cfdd67084e26ea265cf4c7de948d27ab909",
+    "artifacts/test-default-arc.log": "25f3a8ec9f9660450ec6992c13f264b57b13f05c974a7a0b28eb57fe89565a14",
+    "artifacts/build-default-fixture-final.log": "0d5697eaa739c6e6b944760e675da202caa0af32d6c8cf36f8792433bc15ab53",
+    "artifacts/test-default-fixture-final.log": "51791d9a2fcf926186f70dfdc5ac69d9bd6d96cd07eefb0219d15a11ad85e497",
+    "artifacts/test-default-arc-final.log": "25f3a8ec9f9660450ec6992c13f264b57b13f05c974a7a0b28eb57fe89565a14",
+    "artifacts/default-gltf-validator.json": "6937a17cf21a663ca7b2eef756844a4249b9cb2f3657dc7c5e961211bab777f1",
+    "artifacts/test-default-gltf-validator.log": "84d27e67665919003f56e0db77466b70f4d5e0b3decb5265241cc657abd5b058",
+    "artifacts/build-default-valid-bounds-release.log": "b5d056ee070c4896fac1a9d221d0d5125f07a175f1307184f0d62577f1f5f951",
+    "artifacts/test-default-valid-bounds-release.log": "0c2bf680add8535ac5dc919293697fe2aca326a8b06c443c0acdfd3c0072aca1",
+    "artifacts/test-default-valid-bounds-release-detail.log": "a5942cfa06834dc2f0cc105284c33716e49572cf8106e9c71e26f7e80f09afe4",
+    "artifacts/build-default-valid-bounds-sanitize.log": "5dc8e0f14d21c272fae71cfde1e96b0764699dfa2a49aa0f95e1255bc1c8b399",
+    "artifacts/test-default-valid-bounds-sanitize.log": "052f8f732ad72055d5540da440fd7ecb5e3c379e8879ad39b499d573574dc702",
+    "artifacts/test-default-valid-bounds-sanitize-detail.log": "ba86b5a039016161b425eb7c422fc6926f3647ca71a1f7dae4b9f9e4bf5233a9",
+    "artifacts/test-default-menu-valid.log": "ccd1f14c2f2e813a2885b1bd8b9e0cfdd67084e26ea265cf4c7de948d27ab909",
+    "artifacts/test-default-skin-menu-valid.log": "ccd1f14c2f2e813a2885b1bd8b9e0cfdd67084e26ea265cf4c7de948d27ab909",
+    "artifacts/default-gltf-validator-valid.json": "1efa58fbb0d4d47a76dd50e945326cdf2f26dc7bd78918ea0151c5d180d48901",
+    "artifacts/test-default-gltf-validator-valid.log": "6cfb7c09458216a84c9e7bb7d4d84c5c9ad56f383e05d27813aeb4aa913b3db6",
+    "artifacts/test-default-arc-valid.log": "25f3a8ec9f9660450ec6992c13f264b57b13f05c974a7a0b28eb57fe89565a14",
+    "artifacts/default-gltf-validator-arc-valid.json": "1efa58fbb0d4d47a76dd50e945326cdf2f26dc7bd78918ea0151c5d180d48901",
+    "artifacts/test-default-gltf-validator-arc-valid.log": "6cfb7c09458216a84c9e7bb7d4d84c5c9ad56f383e05d27813aeb4aa913b3db6",
+    "artifacts/default-final-source-bytes2.sha256": "cd4d7de9f9ff2e79345bf5784631192e68cf98d4830e2ae70be56365b2f24fc7"
+  },
+  "scope_excludes": [
+    "owned-UV1 Scene18/native import and sampling adapters",
+    "plain unmapped overlapping original UV authoring",
+    "broader glTF extensions/full VRM/FBX deformation completion",
+    "physical headset",
+    "system installation",
+    "session restart"
+  ],
+  "primary_sources": [
+    "https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#default-material",
+    "https://github.com/KhronosGroup/glTF/blob/main/specification/2.0/schema/material.pbrMetallicRoughness.schema.json"
+  ],
+  "full_production_complete": false,
+  "pushed_by_this_agent": false,
+  "documentation_review": {
+    "reviewed_utc": "2026-11-02T05:48:20.479008+00:00",
+    "state": "User resumed after interface acceptance; private ready milestone, root owns integration and publication.",
+    "existing_source_and_evidence_hashes_rechecked": true,
+    "new_test_runs_for_this_review": false
+  }
+}
