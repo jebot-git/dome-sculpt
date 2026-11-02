@@ -1,0 +1,126 @@
+{
+  "recorded_utc": "2026-11-02T18:02:48.642684+00:00",
+  "runtime_test_source": "25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c",
+  "qualification_tree": "artifacts/basic-authoring-source20-7a4443e",
+  "combined_qualified": false,
+  "goal_complete": false,
+  "new_Scene21_24_25": false,
+  "fresh_builds": {
+    "CPU_Release_alltargets": {
+      "session": 94973,
+      "terminal_exit": 0
+    },
+    "owned_C_CXX_SAN_consumers": {
+      "session": 26164,
+      "terminal_exit": 0
+    },
+    "OneAPI_alltargets": {
+      "session": 74603,
+      "terminal_exit": 0,
+      "SDK": "pinned user-owned DPC++7.2, documented compat libumf"
+    }
+  },
+  "registered_cases": {
+    "CPU": 395,
+    "ONEAPI": 396
+  },
+  "owned_SAN_initial21": {
+    "file": "build-sanitize/artifacts-basic-authoring-native-sanitize.xml",
+    "tests": 21,
+    "failures": 0,
+    "sha256": "f1c2142c6d973af2e721a6ff1ef17b9df4b22752d77fed960705ee4699845d74",
+    "seconds": 85.49,
+    "PBR_mixed_rig_assertions": 123
+  },
+  "owned_SAN_avatar_separate": {
+    "file": "build-sanitize/artifacts-basic-authoring-avatar-sanitize.xml",
+    "tests": 1,
+    "failures": 0,
+    "sha256": "6f427a22563b8024cf076c24da29a32142176f411dc19a3b55bbdcfcbc330f81",
+    "seconds": 172.54,
+    "actual_avatar_checks": 111,
+    "independent_images": 18
+  },
+  "OneAPI_compute_native9": {
+    "file": "build-oneapi/artifacts-basic-authoring-compute-oneapi.xml",
+    "tests": 9,
+    "failures": 0,
+    "sha256": "29715cf1c0cd25c78a7033587e6b7600e41bbcca9f955b8ca4fbacc0e7c50349",
+    "seconds": 13.87,
+    "device": "actual Intel Arc A770 level_zero:0; sycl-ls confirms UHD index1",
+    "GL_renderer": "software for this compute scope",
+    "analytic_endpoints": 184,
+    "CPU_reference_batches": 224,
+    "samples": 445088,
+    "max_error": 8.9407e-08,
+    "missing_GPU_explicit_refusal": true
+  },
+  "actual_A770_renderer": {
+    "checks": 254,
+    "scopes": {
+      "PBR": 123,
+      "actual_avatar": 111,
+      "projection": 11,
+      "rig_guide": 9
+    },
+    "independent_avatar_images": 18,
+    "exact_source_binary_freeze": true,
+    "result": "artifacts/basic-authoring-arc/result.json"
+  },
+  "actual_native_Fltk_Release": {
+    "PBR": 13,
+    "projection": 11,
+    "rig_fitting": 8,
+    "all_terminal_exit": 0,
+    "PBR_driver_teardown": "fixture cleanup; no new sanitizer-GUI-teardown claim"
+  },
+  "initial_GUI_harness_failures": "Two runners defaulted to absent build-preview/build-rig-fit-release; explicit current build paths fix harness only, original logs preserved",
+  "full_CPU_Release": {
+    "session": 38150,
+    "state": "live",
+    "log": "artifacts/tests-basic-authoring-full-release.log",
+    "future_junit": "build/artifacts-basic-authoring-full-release.xml",
+    "do_not_restart_on_observation_timeout": true
+  },
+  "remaining_for_qualification": [
+    "Full395 terminal result",
+    "Composed compact/nativeSAN/Wayland/loader/interface/format scopes",
+    "No new physical or all-backend production claim"
+  ],
+  "no_physical_test": true,
+  "no_install": true,
+  "no_session_restart": true,
+  "hashes": {
+    "artifacts/basic-authoring-arc/after.json": "4eaf0c28d26e449e4122a6e78b2ce7f68a7586c69c85ca6ff6f3ce0d0165b762",
+    "artifacts/basic-authoring-arc/avatar.log": "59f0179a0d21df2ffad0a0eaec6a2077422149c05fc00534e621550dc972d0f4",
+    "artifacts/basic-authoring-arc/before.json": "4eaf0c28d26e449e4122a6e78b2ce7f68a7586c69c85ca6ff6f3ce0d0165b762",
+    "artifacts/basic-authoring-arc/pbr.log": "f3cd81c0070392dad974c34409170e96f0d53c7a74f7cc046457df239e8dc806",
+    "artifacts/basic-authoring-arc/projection.log": "842ae496f5a610337d4dadb5a10b56fc706f99c99aecc4fc0b748383524f2796",
+    "artifacts/basic-authoring-arc/result.json": "b30abaf8d9d4f8a1ea13014e8eec3604e4df618bc45ca56294e9c1640a65eda0",
+    "artifacts/basic-authoring-arc/rig-guide.log": "7bbf254851eb81e64e8895220378818f59c54d6c7de93c45d41094f30ce9422d",
+    "artifacts/basic-authoring-sycl-devices.log": "bd680e08c4d6536621ebe2d70a293ba730ddc06202b515e8d4b27f1339bc1fab",
+    "artifacts/build-basic-authoring-oneapi.log": "69cb7d7ba24b0a168be17f2d5e644d3489f84e1713a0f942f069cbe217aae805",
+    "artifacts/build-basic-authoring-release.log": "c2cfd92d6c61a974d4af4ab1b82d690b85ef57ac745090f95f936c44bdb0bd53",
+    "artifacts/build-basic-authoring-sanitize.log": "aeac39bcfad02e0240180f0f893e62f8f7ca48080eb2902eda32bb75b8263a62",
+    "artifacts/ctest-basic-authoring-oneapi-manifest.json": "6d4d582d54ef01e6cf4336988b7fcf37a10424b23ef17246361891736e859ee8",
+    "artifacts/ctest-basic-authoring-release-manifest.json": "a3ae900e4b3963a1cd1b1cf4a19bac9d0f4a140c754f039b8351e941c78e4024",
+    "artifacts/tests-basic-authoring-avatar-sanitize.log": "da71aeffc05d323d92e96f672b7a453ade7b00da76cba53032f24590dafbd32a",
+    "artifacts/tests-basic-authoring-compute-oneapi.log": "8fda27f5d351942edce6c8144b8b46ceb895ba3dde147e6136278b1511230298",
+    "artifacts/tests-basic-authoring-native-sanitize.log": "d3821fcd1616e18d9e535c2183c1be5f1407dfb9c7dca225fd7a476145b50a06",
+    "artifacts/tests-basic-authoring-pbr-menu-before-build-path.log": "601663c59dab7fb8e6681c8cfe9b83add9159117733c571702a27a6dcd49b739",
+    "artifacts/tests-basic-authoring-pbr-menu.log": "e9cad0365acb3f4bf61c5a2facea82090d4ac5de28cf761d34f729324c0124b5",
+    "artifacts/tests-basic-authoring-projection-menu.log": "d6513687a9ef8690741301ab3c03c4a6cd7f6cd479e487487bd0521d88928563",
+    "artifacts/tests-basic-authoring-rig-menu-before-build-path.log": "008a9bec6e5199d5d0e8479253830cfbb26a5e3e693a4a097d932b0539f6b3ca",
+    "artifacts/tests-basic-authoring-rig-menu.log": "b6fb8aa9505d67a401302decfef056b5c7f7d1387f16467e924c47ed456c3c14",
+    "artifacts/validate-basic-authoring-arc.py": "03403c8aec70eeccbfa065b4bb6911b5d64c981f5eac9aa475b41ef0453a7a9a",
+    "build-oneapi/CMakeCache.txt": "c78ce13f72bb462e29d368b1590af9c7d6ed8d43f8878736d53beb272de706fa",
+    "build-oneapi/artifacts-basic-authoring-compute-oneapi.xml": "29715cf1c0cd25c78a7033587e6b7600e41bbcca9f955b8ca4fbacc0e7c50349",
+    "build-oneapi/dome-sculpt": "768bd170f6f374894bf75d724731b116b3ade5f04114b4418e56fe7a0c251d47",
+    "build-sanitize/CMakeCache.txt": "5b84d57fc75aa51f9ad515d2fc453f5b922fac073dd532efe08f823345343e79",
+    "build-sanitize/artifacts-basic-authoring-avatar-sanitize.xml": "6f427a22563b8024cf076c24da29a32142176f411dc19a3b55bbdcfcbc330f81",
+    "build-sanitize/artifacts-basic-authoring-native-sanitize.xml": "f1c2142c6d973af2e721a6ff1ef17b9df4b22752d77fed960705ee4699845d74",
+    "build-sanitize/dome-sculpt": "91200c80e24a9b7f623072425daa50997215ec86bf7296df6bed38fb8529b1ff",
+    "build/CMakeCache.txt": "1fae769f05a58b552708dac28e797edd3a38a61a91bcf714f83e6638330882aa",
+    "build/dome-sculpt": "318d5bf98b4a3e89b86b94120e4ef5ec09e9bb6f51a44779c66a1a2694851522"
+  }
+}

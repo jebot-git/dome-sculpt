@@ -78,8 +78,9 @@ remain open. All unfinished original rows and post-basic drawers remain required
 
 The next private basic-authoring union25fe208 combines projection/stencils,
 actual PBR view, initial landmark fitting, PBR history counter repair and bounded
-native FBX skin/morph import on the public Scene20 application. Fresh395-case
-Release/OneAPI builds and owned sanitizer integration are in progress. Separately
+native FBX skin/morph import on the public Scene20 application. Fresh CPU/OneAPI builds complete; selected owned sanitizer21 plus separate
+avatar1, actual A770 renderer254 and OneAPI compute/native9 pass. The full395-case
+CPU regression is still in progress. Separately
 qualified FBX parent26bf0aa has new real worker/consumer/nativeGUI proof, but full
 FBX/material/attribute/unit-axis semantics remain required. Private Source21/24/25
 and controller trays are not delivered by this union. Preserve exact parent and

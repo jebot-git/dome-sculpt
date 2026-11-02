@@ -99,15 +99,27 @@ No Scene21/22/23/24/25 data is admitted. Mixed fitting/preview gesture guards
 and four new assertions preserve idle fitting leases but fence placement.
 All source/header/test inputs remain frozen during qualification.
 
-All three fresh configurations pass and register395 cases. Optimized Release
-alltargets exec94973 and pinned DPC++7.2 OneAPI alltargets exec74603 are live.
-Owned C/C++core/support/render/frontend+selected fixtures exec26164 terminal0;
-new selected native/render/lifetime SAN gate exec75541 is live. No current
-full395/395 or new OneAPI runtime result is claimed. Inspect exact handles and
-logs before changing/restarting jobs; observation timeout is not terminal.
-The canonical EEE toolkit/bitmap prefixes and latest DomeD d271cf6 were rechecked;
-unrelated DomeD dirt remains untouched. Full composed Release/GUI/Wayland/loader/
-format/device/compute qualification precedes any runtime main publication.
+All three fresh configurations/builds are terminal0: CPU Release alltargets94973,
+owned C/C++core/support/render/frontend+selected fixtures26164 and pinned DPC++7.2
+OneAPI alltargets74603. CPU registers395, OneAPI396 (extra missingGPU gate).
+Combined ownSAN21/21 pass85.49s including123 PBR/mixed-fitting assertions; the
+separately added actual-avatar1/1 pass172.54s (111checks/18images). Actual Arc
+OneAPI compute/native9/9 pass13.87s:184analytic endpoints,224CPU-reference batches/
+445088samples,maxerror8.9407e-08 and explicit noGPU refusal. Compute GL stayed
+software; sycl-ls separately confirms level_zero:0A770 /:1UHD. StrictPCI03renderer
+254 checks pass123PBR+111avatar+11projection+9rigguide, exact input/binary freeze.
+Actual native FLTK normal-size PBR13/projection11/rig8 pass. Initial absent
+GUI default build paths were fixture-only negatives, preserved with corrected
+explicit paths. No combined compact/Wayland/loader/all-routes-SAN claim yet.
+
+Full CPU Release395 is live exec38150, artifacts/tests-basic-authoring-full-release.log
+in that tree; JUnit will be build/artifacts-basic-authoring-full-release.xml.
+Read BASIC-AUTHORING-UNION-WIP.md and its main-tracked hash receipt for exact
+scopes. Inspect exact handles/logs before changing/restarting jobs; observation
+timeout is not terminal. All source/header/test inputs stay frozen while it
+runs. Next complete composed compact/nativeSAN/Wayland/loader/format gates and
+final source equality before publication. No physical launch, install or session
+restart. Latest canonical EEE prefixes/DomeD d271cf6 and unrelated dirt preserved.
 
 Root649 projection/modal composition has fresh Release23/23(57.39s), owned
 SAN20/20(44.90s), nativeFLTK11normal+11compact+11SAN, latestprivateWayland9 and
