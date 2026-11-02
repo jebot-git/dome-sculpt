@@ -1,0 +1,28 @@
+{
+  "source_commit": "a52f62c1edcebe539dc6bcfa5639f6e922dca318",
+  "scope": "Material9 colour4/normal4 codec with paired pool-aware replay only; Scene24 native/consumer/quality pipeline still required",
+  "source_sha256": {
+    "include/dome/color-paint-sampling.hpp": "d13b0bbcf3b5f90f2beddd84d173417b8a9270afa17494a811de7b891f51ed0d",
+    "include/dome/material-bindings.hpp": "bb6ccc4b745739bccf0f79dac702c6f15c3ffd5fb596164c48417540ba948e27",
+    "src/color-paint-sampling.cpp": "b276c6c06f74f402df9d423c40d14e3dc0ced9dd1da7b9275ab30ab9fba727dc",
+    "src/material-bindings.cpp": "3e4abaf68c704a1354065bc8199ba1ac0c0d9c39f57b2fb24cbd88ad7a1fcac9",
+    "src/paint-archive-shape.hpp": "89ccbc3da4704f2d37ecc688e32ad1000dda92aa7b69eb16844eb65d20826249",
+    "tests/color-paint-sampling.cpp": "4f71e68920735eff94ff227f8929cb562fc2d619b16f233cba72af141ea84db9"
+  },
+  "release": {
+    "passed": 4,
+    "seconds": 4.12,
+    "log_sha256": "7fef15e932d03205d41b8385807f50948f57019c6301a341fb97d27c63cbe09e"
+  },
+  "own_core_c_cxx_support_sanitizers": {
+    "passed": 4,
+    "seconds": 58.78,
+    "flags": "O1 g1 ASAN UBSAN fno-omit-frame-pointer fno-pie/no-pie; leaks enabled",
+    "log_sha256": "3765fb61f44ebf79c911a039e4b9cb6fba9cafcb9fcd20dc7607c6b14e1ed4c3"
+  },
+  "paired_material_assertions": 44,
+  "core_archives": {
+    "build/libdome-sculpt-core.a": "bcca68f2e6dab1fa109c47082eff80847952ac09e3e8d2b9134d46b902213e43",
+    "build-ownsan/libdome-sculpt-core.a": "340f41d7e59c60a2a8c45c6addd0c2fd665599a0b775ad71cd6feec39c17f445"
+  }
+}

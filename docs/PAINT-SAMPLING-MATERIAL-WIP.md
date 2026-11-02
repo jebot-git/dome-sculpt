@@ -27,8 +27,8 @@ factory/material tests, structural Paint2, existing normal-domain and cheap/deep
 geometry validation. Tests include real native paired Bake and .7scale/90degree
 UV, version/context refusal, exact shared aliases, unchanged unused-context
 bytes, wrong before/source/domain/projection/receipt/geometry records, orphan
-domain and preparation quotas. Sanitizer qualification of this exact material9
-source is pending. The old structural Paint2 and authority stages remain frozen
+domain and preparation quotas. Wholly owned C/C++ O1 ASan/UBSan/leak qualification of exact sourcea52f62c
+passes4/4 in58.78s. The expanded paired factory/material test has44 assertions. The old structural Paint2 and authority stages remain frozen
 separately with their own sanitizer scopes.
 
 This is not a Scene24 native/render/export claim. Scene root contexts, complete
