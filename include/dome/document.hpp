@@ -647,6 +647,7 @@ private:
   struct CutHandoff {
     uint64_t source=0, shell=0, cap=0, group=0, held_source=0;
     std::shared_ptr<const Scene> sealed;
+    std::shared_ptr<const CutView> draft, accepting;
   };
   void validate_cut_handoff(const Scene &, const Scene &, const CutHandoff &) const;
   struct FileJob {
