@@ -108,17 +108,28 @@ OneAPI compute/native9/9 pass13.87s:184analytic endpoints,224CPU-reference batch
 445088samples,maxerror8.9407e-08 and explicit noGPU refusal. Compute GL stayed
 software; sycl-ls separately confirms level_zero:0A770 /:1UHD. StrictPCI03renderer
 254 checks pass123PBR+111avatar+11projection+9rigguide, exact input/binary freeze.
-Actual native FLTK normal-size PBR13/projection11/rig8 pass. Initial absent
-GUI default build paths were fixture-only negatives, preserved with corrected
-explicit paths. No combined compact/Wayland/loader/all-routes-SAN claim yet.
+Actual native FLTK normal-size PBR13/projection11/rig8 and compact PBR13/
+projection11/rig8 pass. Instrumented native projection11/rig8 and actual PBR15
+normal-close checks pass; the PBR test-only artifact driver closes both native
+Apps normally. Latest private DomeDWayland projection9+rig9 and actual-loader
+syntheticXR projection10+PBR10+rig11 pass in separate outputs. Current34 emitted
+GLBs pass pinned Khronos with0errors/354unfilteredwarnings; no all-future-output
+or physical-headset claim. Initial absent GUI build paths remain preserved.
 
 Full CPU Release395 is live exec38150, artifacts/tests-basic-authoring-full-release.log
 in that tree; JUnit will be build/artifacts-basic-authoring-full-release.xml.
 Read BASIC-AUTHORING-UNION-WIP.md and its main-tracked hash receipt for exact
 scopes. Inspect exact handles/logs before changing/restarting jobs; observation
 timeout is not terminal. All source/header/test inputs stay frozen while it
-runs. Next complete composed compact/nativeSAN/Wayland/loader/format gates and
-final source equality before publication. No physical launch, install or session
+runs. Three observed failures are recorded: obsolete import page-count assertion,
+a real material-view fence incorrectly blocking direct voxel masking before its
+first display mesh, and the loader paint fixture following an old palette route.
+The exact strengthened mask fixture reproduces the old failure with the real
+preview worker gated. Separate9684486 in basic-authoring-regressions-25fe208
+scopes the fence to mesh sampling and updates both fixtures; fresh coherent
+Release71240/ownedSAN71315 builds remain live. This is not yet a passing corrected
+run or a test-only failure claim. Next finish/diagnose395, qualify the correction
+and preserve final source equality before publication. No physical launch, install or session
 restart. Latest canonical EEE prefixes/DomeD d271cf6 and unrelated dirt preserved.
 
 Root649 projection/modal composition has fresh Release23/23(57.39s), owned

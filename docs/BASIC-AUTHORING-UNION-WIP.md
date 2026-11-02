@@ -53,8 +53,16 @@ Runtime/source/header/test inputs remain frozen:
   Two initial GUI runners used absent default build directories; logs retained,
   corrected explicit paths only. No new all-routes sanitizer-GUI claim.
 
-Read validation/BASIC-AUTHORING-UNION-WIP.json for exact scopes/hashes. Full
-regression and composed compact/Wayland/loader/interface gates remain required.
+Composed compact FLTK11projection+13PBR+8rig pass. Actual instrumented native
+frontends11projection+8rig+15PBR normal-close checks pass; the last is a test-only
+artifact copy performing real Close Window before restart and at final exit.
+Latest private DomeD Wayland9projection+9rig pass; actual-loader/syntheticXR
+10projection+10PBR+11rig pass in separate output directories from the live full
+suite. Pinned Khronos validates34 current emitted GLBs with0errors/354unfiltered
+warnings (20Arc PBR/avatar +14FBX/pose), not all future full-suite outputs.
+
+Read validation/BASIC-AUTHORING-UNION-WIP.json for exact scopes/hashes. Full395
+regression remains live and must be diagnosed/completed before publication.
 
 Build logs, configurations and the395-case manifest are under this tree's
 `artifacts/`. The focused sanitizer JUnit is under `build-sanitize/`.
@@ -75,3 +83,20 @@ selected OneAPI runtime/CPU-reference checks. Preserve every initial failure
 and diagnose real scope changes. Publish only with accurate integration
 receipts and main source equality. The full production objective stays active;
 controller-mounted drawers remain required after the basic targets are met.
+
+## Observed full-run failures and isolated correction
+
+The original395 run remains live38150 with three observed failures: an obsolete
+shared-page count in import-options-controller, the actual voxel mask input
+blocked by the new material-view fence before first display publication, and
+the synthetic XR painting fixture following the pre-projection palette route.
+These are not all test-only failures. Frozen25fe inputs remain untouched.
+
+Separate9684486 in artifacts/basic-authoring-regressions-25fe208 scopes the
+material epoch fence to mesh sampling, retains stale/held mesh-paint protection,
+and adds a deterministic barrier around the actual first preview worker. That
+exact strengthened mask fixture fails against the old frozen archive at the
+expected before-publication pressure assertion. It also updates shared page
+actions and the actual-loader fixture route without weakening its blue-pixel
+oracle. Fresh coherent Release71240 and own C/C++SAN71315 builds are live;
+no correction pass or overall395-green claim is made yet.
