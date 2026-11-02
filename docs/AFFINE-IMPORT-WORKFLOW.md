@@ -24,7 +24,9 @@ universal Undo/Redo. Tests use private Xvfb/bus, canonicaleee lib+bitmap runtime
 latest DomeD d271 inputs were verified unchanged. Product Wayland defaults and
 active sessions are untouched. Software and actual A770 source comparisons and
 13 independent reflection witnesses are recorded separately in
-AFFINE-IMPORT-REFLECTION.md. Whole-current-core sanitizer qualification follows.
+AFFINE-IMPORT-REFLECTION.md. Fresh complete own C/C++ core/renderer/support ASan/UBSan/leak qualification
+passes10 selected suites in8.53s. System/image/LAPACK/Mesa libraries remain
+uninstrumented. Exact source, flags and log hashes are in the receipt.
 
 This remains a scoped milestone. Default/no-material identity is still guarded
 pending witnessed Scene17 support, and UV1 source sampling remains guarded for

@@ -1,7 +1,7 @@
 {
   "base": "8d46dfb",
   "reference_milestone": "07bc9ba",
-  "status": "private native/controller/FLTK workflow qualification; sanitizer pending",
+  "status": "private affine subset qualified with native/controller/GUI/current whole-core sanitizer",
   "native_controller_assertions": 26,
   "gui": {
     "static_affine": 11,
@@ -25,5 +25,20 @@
     "artifacts/build-affine-frontend.log": "181646be39610a3b81fdd6358303f8a6f0aebfa8bf5228251b1a933b57207325",
     "artifacts/test-affine-menu.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247",
     "artifacts/test-affine-skin-menu.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247"
+  },
+  "product_source": "d295bff",
+  "sanitize": {
+    "suites": 10,
+    "failed": 0,
+    "seconds": 8.53,
+    "scope": "fresh own C/C++ core,renderer,support and selected fixtures; system,image,LAPACK and Mesa libraries uninstrumented",
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "logs": {
+      "artifacts/configure-affine-sanitize.log": "f47b46dcb9caa46f4741b9874ac98ee9c5b6908f897a85fdf92298d184657f5b",
+      "artifacts/build-affine-sanitize.log": "125ecef52c60c80b1355b1167751d790f1c747f3afa93e8bf4bebf5c01c01f54",
+      "artifacts/test-affine-sanitize.log": "2557bc2d3029e8c443dbe9e11a86316cf2705a6397553f3f5f3b5a4a416547ec"
+    }
   }
 }
