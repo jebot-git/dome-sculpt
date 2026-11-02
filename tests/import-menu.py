@@ -131,7 +131,7 @@ async def main():
         else:key('Return')
         await wait(lambda:named('Import options') is None)
         nodes=await ready(True);check(nodes['Undo'][1].get('enabled',False),'Explicit native options Import submits the source-retaining model on a background worker as one history operation')
-        await command('Save');accepted=inspect();check(len(accepted['objects'])==3 and len(accepted['groups'])==int(os.environ.get('DOME_IMPORT_GROUPS','5' if MODE=='fbx' else '4')) and sum(o['mesh_active'] for o in accepted['objects'])==2,'Actual native import and Save preserve all objects and editable node hierarchy')
+        await command('Save');accepted=inspect();check(len(accepted['objects'])==int(os.environ.get('DOME_IMPORT_OBJECTS','3')) and len(accepted['groups'])==int(os.environ.get('DOME_IMPORT_GROUPS','5' if MODE=='fbx' else '4')) and sum(o['mesh_active'] for o in accepted['objects'])==int(os.environ.get('DOME_IMPORT_MESHES','2')),'Actual native import and Save preserve all objects and editable node hierarchy')
         check(accepted['version']==int(os.environ.get('DOME_IMPORT_VERSION','11' if MODE!='glb' else '9')) and accepted['source_models'] and accepted['source_materials']['bindings'],'Native Save includes canonical source, frame, image, material and deformation archives')
         if ATLAS:
             active=[o for o in accepted['objects'] if o['mesh_active']]
@@ -140,6 +140,10 @@ async def main():
         if AFFINE:
             raw=bytes(accepted['source_models'][0]['original_glb']['bytes'])
             check(raw==asset.read_bytes() and accepted.get('affine_state',{}).get('nodes') and all(g.get('source_placement') is not None for g in accepted['groups'][1:]),'Real native import retains exact affine source bytes and every original node authority')
+        if MODE=='vrm':
+            raw=bytes(accepted['source_models'][0]['original_glb']['bytes']);count=struct.unpack_from('<I',raw,12)[0];source=json.loads(raw[20:20+count])
+            appearances=[o['appearance'] for o in accepted['objects'] if o.get('appearance') is not None]
+            check(raw==asset.read_bytes() and source['extensions']['VRM']['specVersion']=='0.0' and len(appearances)==19 and all(a['source_material']>=0 and a['source_node']>=0 for a in appearances) and all(b['material'] is not None for b in accepted['source_materials']['bindings']),'Real native VRM chooser preserves exact original bytes and typed material/version identities on all nineteen parts')
         if DEFAULT:
             raw=bytes(accepted['source_models'][0]['original_glb']['bytes']);count=struct.unpack_from('<I',raw,12)[0];source=json.loads(raw[20:20+count])
             appearances=[o['appearance'] for o in accepted['objects'] if o.get('appearance') is not None]
@@ -149,7 +153,7 @@ async def main():
             frames=accepted['source_materials']['normal_frames']['frames']
             check('NORMAL' not in source['meshes'][0]['primitives'][0]['attributes'] and frames and all(f['generated'] and f['generated_uv']==0 for f in frames),'Real native flat-normal import retains raw absence and saves generated original-frame Mikk authority')
             if MODE=='glb':check(raw==asset.read_bytes(),'Native flat import saves the exact original GLB without inserting generated attributes into it')
-        if MODE!='glb':
+        if MODE not in ('glb','vrm'):
             receipt=accepted['source_models'][0]['original_source']
             check(receipt['format']=={'gltf':2,'obj':3,'fbx':4}[MODE] and bytes(receipt['root']['bytes']['bytes'])==asset.read_bytes(),'Native Save keeps original format bytes separately from canonical GLB')
             check(receipt['options']['units']==(3 if MODE in ('obj','fbx') else 0),'Real native unit choice reaches the background importer and persisted receipt')

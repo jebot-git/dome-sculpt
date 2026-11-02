@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/import-authoring.hpp"
 #include "dome/humanoid-creator.hpp"
-#include "dome/import-source.hpp"
-#include "dome/import-native.hpp"
 #include "dome/import-image.hpp"
+#include "dome/import-native.hpp"
+#include "dome/import-source.hpp"
 #include "dome/material-bindings.hpp"
-#include "dome/source-placement.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "dome/projection.hpp"
+#include "dome/source-placement.hpp"
 #include "import-skin.hpp"
 #include "source-tangent-frames.hpp"
 #include "text-utf8.hpp"
+#include "vrm-import.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <numeric>
@@ -19,6 +20,28 @@ namespace {
 void stop(const ImportAuthoringOptions &o) {
   if (o.limits.cancelled && o.limits.cancelled())
     throw std::runtime_error("Authoring import cancelled");
+}
+Mesh used_source_mesh(const Mesh &source,
+                      const std::function<bool()> &cancelled) {
+  std::vector<uint32_t> remap(source.positions.size(), UINT32_MAX);
+  Mesh mesh;
+  for (size_t c = 0; c < source.indices.size(); ++c) {
+    if ((c & 4095) == 0 && cancelled && cancelled())
+      throw std::runtime_error("Source vertex compaction cancelled");
+    auto original = source.indices[c];
+    auto &native = remap.at(original);
+    if (native == UINT32_MAX) {
+      native = uint32_t(mesh.positions.size());
+      mesh.positions.push_back(source.positions[original]);
+      if (!source.normals.empty())
+        mesh.normals.push_back(source.normals[original]);
+      if (!source.uv.empty())
+        mesh.uv.push_back(source.uv[original]);
+    }
+    mesh.indices.push_back(native);
+  }
+  mesh.validate();
+  return mesh;
 }
 std::string name(std::string value, std::string_view fallback) {
   if (value.empty())
@@ -206,10 +229,31 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   auto bytes=captured.canonical_glb;
   options.limits.mode = ImportMode::PreserveGltf;
   options.limits.external_resources = false;
+  const auto json_size = word(*bytes, 12);
+  if (json_size > 16 * 1024 * 1024)
+    throw std::length_error(
+        "Authoring source JSON exceeds native source archive bounds");
+  size_t metadata_visits = 0;
+  const auto json = nlohmann::json::parse(
+      bytes->begin() + 20, bytes->begin() + 20 + json_size,
+      [&](int depth, nlohmann::json::parse_event_t, const nlohmann::json &) {
+        if (depth > 64 ||
+            ++metadata_visits > options.limits.max_metadata_visits)
+          throw std::length_error(
+              "Authoring source JSON exceeds metadata bounds");
+        if ((metadata_visits & 4095) == 0)
+          stop(options);
+        return true;
+      });
+  const auto vrm_version = detail::vrm_import_version(json);
+  options.limits.allow_vrm_metadata =
+      vrm_version != detail::VrmImportVersion::None;
+  if (vrm_version == detail::VrmImportVersion::V0)
+    options.limits.allow_legacy_vrm_skin_hint = true;
   auto asset =
       std::make_shared<const ImportedAsset>(import_glb(*bytes, options.limits));
-  const auto json = nlohmann::json::parse(
-      bytes->begin() + 20, bytes->begin() + 20 + word(*bytes, 12));
+  const auto vrm =
+      detail::vrm_import_metadata(json, *asset, options.limits.cancelled);
   output.diagnostics = captured.diagnostics;
   output.diagnostics.insert(output.diagnostics.end(),asset->warnings.begin(),asset->warnings.end());
   if (asset->nodes.empty())
@@ -237,7 +281,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   for (auto n : roots)
     walk(walk, n);
   size_t objects = 0;
-  bool affine_graph=false;
+  bool affine_graph = vrm.version != detail::VrmImportVersion::None;
   std::vector<CanvasTransform> native_locals(asset->nodes.size());
   for (auto n : ordered) {
     const auto &node = asset->nodes[n];
@@ -280,6 +324,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   if(affine_graph){
     model=std::make_shared<CreatorSourceModel>();
     model->original_bytes=bytes;model->asset=asset;model->decoded_images=images;
+    model->vrm_json = vrm.vrm0_json;
     if(captured.original->root.bytes!=bytes || captured.original->format!=ImportSourceFormat::Glb ||
         captured.original->options!=ImportOptions{})model->source_receipt=captured.original;
   }
@@ -315,6 +360,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         appearance->source_receipt=captured.original;
       appearance->asset = asset;
       appearance->decoded_images = images;
+      appearance->vrm_json = vrm.vrm0_json;
       appearance->material = int(p.material);
       appearance->source_material = int(p.material) - 1;
       appearance->source_mesh = p.source_mesh;
@@ -324,21 +370,23 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       std::iota(appearance->source_vertices.begin(),
                 appearance->source_vertices.end(), 0);
       if(p.material)appearance->material_json=json.at("materials").at(p.material-1).dump();
+      if (vrm.version != detail::VrmImportVersion::None)
+        appearance->mtoon_json = vrm.material_properties.at(p.material);
       appearance->source_basis_quaternion = Quat{};
-      if (json.contains("extensions") && json.at("extensions").contains("VRM"))
-        throw std::runtime_error(
-            "Generic glTF import must not substitute PBR for retained VRM "
-            "material semantics; use the VRM authoring adapter");
-      Mesh mesh = p.normals_authored ? p.mesh
-                                   : detail::source_flat_mesh(p.mesh, {}, options.limits.cancelled);
-      // With no sampled texture roles, UVs are unused source metadata. The
-      // explicit atlas choice may generate writable coordinates before paint
-      // construction; the immutable captured primitive still owns the original
-      // UVs and ordered-corner remap. Never use this path for textured inputs.
+      Mesh mesh = p.normals_authored
+          ? used_source_mesh(p.mesh, options.limits.cancelled)
+          : detail::source_flat_mesh(p.mesh, {}, options.limits.cancelled);
+      // Count every sampled typed role; MatCap is view-dependent. Unused
+      // original UV metadata can be atlased only by the explicit user choice.
       const auto *raw_material=p.material?&json.at("materials").at(p.material-1):nullptr;
-      const bool typed_mtoon=raw_material&&raw_material->contains("extensions")&&
+      const auto *typed=vrm.version!=detail::VrmImportVersion::None&&vrm.materials.at(p.material)
+          ? &*vrm.materials.at(p.material):nullptr;
+      bool sampled_toon=false;
+      if(typed)for(size_t role=0;role<typed->textures.size();++role)
+        if(role!=size_t(MToonSlot::Matcap)&&typed->textures[role].index>=0)sampled_toon=true;
+      const bool unresolved_toon=!typed&&raw_material&&raw_material->contains("extensions")&&
           raw_material->at("extensions").contains("VRMC_materials_mtoon");
-      const bool no_texture_roles=!typed_mtoon&&m.color_texture<0&&m.metal_rough_texture<0&&
+      const bool no_texture_roles=!unresolved_toon&&!sampled_toon&&m.color_texture<0&&m.metal_rough_texture<0&&
           m.normal_texture<0&&m.emissive_texture<0&&m.occlusion_texture<0;
       const bool generated_uv = mesh.uv.empty() ||
           (options.prepare_texture_atlas&&no_texture_roles);
@@ -409,7 +457,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
             std::make_shared<const DeformationState>(std::move(deformation));
       }
       if (node.skin >= 0 && !p.influences.empty()) {
-        auto rig = detail::imported_rig(*asset, n, options.limits.cancelled);
+        auto rig = detail::imported_rig(*asset, n, options.limits.cancelled,
+                                        vrm.rig_nodes);
         DeformationState deformation =
             object.deformation ? *object.deformation
                                : DeformationState(object.painted->mesh());
@@ -417,15 +466,53 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         deformation.skin =
             detail::imported_weights(p, rig, remap, options.limits.cancelled);
         appearance->source_joint_nodes = rig.source_nodes;
+        if (vrm.version != detail::VrmImportVersion::None)
+          deformation.humanoid = detail::vrm_import_humanoid(vrm, rig);
         deformation.validate(object.painted->mesh());
         object.deformation =
             std::make_shared<const DeformationState>(std::move(deformation));
+      }
+      if (vrm.version != detail::VrmImportVersion::None && object.deformation &&
+          object.deformation->morphs) {
+        auto deformation =
+            std::make_shared<DeformationState>(*object.deformation);
+        deformation->expressions = detail::vrm_import_visemes(
+            vrm, p.source_mesh, int(n), *deformation->morphs);
+        deformation->validate(object.painted->mesh());
+        object.deformation = std::move(deformation);
       }
       auto binding = std::make_shared<SourceMaterialBindings>();
       binding->has_mtoon = false;
       binding->normal_frame = SourceMaterialNormalFrame::OriginalAttributes;
       binding->normal_frames =
           frames(p, m, object.painted->mesh(), options.limits.cancelled);
+      if (vrm.version != detail::VrmImportVersion::None &&
+          vrm.materials.at(p.material)) {
+        binding->has_mtoon = true;
+        binding->material = *vrm.materials[p.material];
+        binding->roles =
+            detail::vrm_import_roles(binding->material, *asset, *images);
+        auto resolved =
+            std::make_shared<NormalFrameSet>(*binding->normal_frames);
+        auto normal = m;
+        const auto &role =
+            binding->material.textures[size_t(MToonSlot::Normal)];
+        normal.normal_texture =
+            binding->material.parameters.normal_enabled ? role.index : -1;
+        normal.normal_texcoord =
+            binding->material.version() == MToonVersion::V0 ? 0
+            : role.transform_texcoord >= 0 ? role.transform_texcoord
+                                           : int(role.texcoord);
+        resolved->mtoon =
+            (m.normal_texture >= 0) == (normal.normal_texture >= 0) &&
+                    m.normal_texcoord == normal.normal_texcoord
+                ? resolved->pbr
+                : frames(p, normal, object.painted->mesh(),
+                         options.limits.cancelled)
+                      ->pbr;
+        binding->normal_frames = std::move(resolved);
+        object.material.toon = true;
+      }
       binding->native_reference.color = object.material.color;
       binding->native_reference.emission = object.material.emissive;
       binding->native_reference.alpha = int(object.material.alpha);
@@ -435,6 +522,10 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       origin->paint = object.painted->snapshot();
       origin->appearance = appearance;
       origin->deformation = object.deformation;
+      if (binding->has_mtoon) {
+        origin->material = binding->material;
+        origin->roles = binding->roles;
+      }
       binding->uv_origin = origin;
       binding->validate();
       object.material_bindings = binding;
@@ -464,6 +555,12 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     }
   }
   output.scene.validate();
+  if (vrm.version != detail::VrmImportVersion::None)
+    output.diagnostics.push_back(
+        "VRM source version, humanoid/node/material/morph identities, "
+        "expressions and physics metadata retained; native vowel preview is a "
+        "subset and general original-space VRM re-export/physics authoring "
+        "remain required.");
   stop(options);
   return output;
 }

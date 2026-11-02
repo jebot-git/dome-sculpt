@@ -1,0 +1,154 @@
+{
+  "status": "Private qualified partial generic VRM authoring-import checkpoint; full production goal active/incomplete",
+  "base": "824f6cdb6657f6b6a9f240782935e7d46195efcd",
+  "implementation": {
+    "native": "C++20 existing authoring/file/input/render workers",
+    "public_api": "ImportLimits.allow_vrm_metadata=false; version authenticated PreserveGltf only",
+    "layout_archive": "No ImportedMaterial/CreatorAppearance/material/Scene schema change",
+    "source_vertices": {
+      "female": 9851,
+      "male": 9878,
+      "parts_each": 19
+    },
+    "snapshot": "single captured source bytes drive parser, metadata, images and archive; no bundled hash substitution"
+  },
+  "release": {
+    "build": "build-release",
+    "mode": "CPU Release O3; canonical FLTK UI ON, XR OFF",
+    "suites": [
+      "import-default-material",
+      "generic-vrm-import",
+      "generic-vrm-import-render",
+      "import-authoring"
+    ],
+    "passed": 4,
+    "seconds": 19.58,
+    "native_checks": 90680,
+    "graphics_checks": 31,
+    "log": "artifacts/test-release-final.log"
+  },
+  "sanitizers": {
+    "build": "build-sanitize",
+    "instrumented": "All own C/C++ core/render/affine/polygon/ufbx/xatlas/both Mikk/support compiled with ASan+UBSan, followed by final source-only incremental relink; no old core ABI",
+    "external": "System LAPACKE/BLAS, FLTK, Mesa/font/image/runtime libraries are not rebuilt with instrumentation",
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "env": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 LIBGL_ALWAYS_SOFTWARE=1 LP_NUM_THREADS=2",
+    "passed": 4,
+    "seconds": 105.53,
+    "logs": [
+      "artifacts/build-sanitize.log",
+      "artifacts/test-sanitize.log",
+      "artifacts/build-sanitize-final.log",
+      "artifacts/test-sanitize-final.log"
+    ],
+    "initial_stageA": {
+      "passed": 4,
+      "seconds": 105.36,
+      "source_hashes": "artifacts/stageA-source-hashes.json"
+    }
+  },
+  "hardware": {
+    "selector": "DRI_PRIME=pci-0000_03_00_0; LIBGL_ALWAYS_SOFTWARE unset",
+    "vendor": "Intel",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "passed": 31,
+    "images": 6,
+    "pixel_tolerance": 2,
+    "max_errors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "position_tolerance_metres": 2e-06,
+    "position_max_metres": 3.87506e-07,
+    "geometry_scope": "actual female/male CC0 geometry/images/skins/morphs under explicitly authored external main/shade-only material/placement fixtures; not every original shading/outline property",
+    "negative": "independent PBR substitution changes visible pixels >16",
+    "log": "artifacts/render-arc-source-final.log"
+  },
+  "frontend": {
+    "kind": "actual canonical FLTK application/private Xvfb+DBus universal menu/native chooser/options/Save/UndoRedo",
+    "passed": 11,
+    "log": "artifacts/gui-vrm-source-final.log",
+    "report": "artifacts/menu-import-vrm/report.json",
+    "environment": {
+      "DOME_IMPORT_FORMAT": "vrm",
+      "DOME_IMPORT_HELPER": "dome-sculpt-vrm-import-test",
+      "DOME_IMPORT_OBJECTS": 20,
+      "DOME_IMPORT_MESHES": 19,
+      "DOME_IMPORT_GROUPS": 88,
+      "DOME_IMPORT_VERSION": 13
+    },
+    "controller": "synthetic SpatialFrame inputs through production input worker/browser/Apply; no physical HMD or XR loader test"
+  },
+  "schema": {
+    "vrm_commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "gltf_schema_commit": "59ecbdba704206bb656965ab4e202881806066f1",
+    "official_metadata_material_invocations": 17,
+    "official_errors": 0,
+    "official_report": "artifacts/vrm-schema-report.json",
+    "sources": "artifacts/vrm1-schema/SOURCES.json",
+    "khronos_version": "2.0.0-dev.3.10",
+    "khronos_report": "artifacts/vrm-khronos-full.json",
+    "no_filtering": true,
+    "truncated": false,
+    "raw_external_vrm0": {
+      "errors": 1,
+      "warnings": 2460,
+      "inherited_error": "SKIN_SKELETON_INVALID /skins/0/skeleton; exact original bundled-female advisory hint retained by explicit legacy compatibility path"
+    },
+    "raw_independent_vrm1": {
+      "errors": 0,
+      "warnings": 2476
+    },
+    "raw_source_hashes": {
+      "artifacts/vrm-sources/version1.vrm": "62e9624faa8fe27dc1ae96260dbc967bb52150b4e04ad3ebfa2003054d3c2f78",
+      "artifacts/vrm-sources/external.vrm": "ef32d5ceb7cbdcebf293ee77a21b9a0d08854d79f969b3a10dd7ca2218c14728"
+    }
+  },
+  "negative_evidence": {
+    "pose_oracle": "artifacts/render-position-negative.log: consumer omitted newly authored weights because both originals have no default arrays; 0.00111418m error, corrected test owns explicit current arrays; unchanged tolerances",
+    "origin": "artifacts/origin-negative.log: first original UV provenance lacked typed descriptor; fixed with material+roles retention and direct per-role regression",
+    "renderer_label": "artifacts/render-arc-final.log captured correct A770 but literal Arc A770 did not match Arc(tm) A770; explicit Intel+A770 test corrected",
+    "gui_count": "artifacts/gui-vrm.log expected89 groups; independent raw87 nodes+one importer root =88, expectation corrected",
+    "khronos": "initial artifacts/vrm-khronos.json max1000 truncation retained; final max500000 report complete and legacy error unsuppressed"
+  },
+  "remaining": [
+    "general original-space VRM0 re-export and VRM1 export/shared joint graph with distinct authored binds",
+    "full binary/material/expression/first-person/look-at/physics/constraint evaluation and authoring",
+    "KHR texture transforms and emissive strength; remaining UV1/explicit-atlas integration",
+    "general reflected humanoid ancestor policy and unsupported legacy shader adapters",
+    "persistent allocation-denial proof on rich generic VRM import beyond current ordinary exception/cancellation tests",
+    "VRM1 independent graphics/frontend cases beyond current native typed/material/source restart and official-schema proof"
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "ef88877eee00f9280ea7e0964417f6289eb7e38a587877bef363a9fa333a1a07",
+    "include/dome/import.hpp": "78b3f8b266163992c184299efc4672170137264f8e5a67e0ed9bcabe3b5bebe6",
+    "src/creator-archive.cpp": "698631ebeb31c20a65823c630d942154ba9f05c728a3d0b5f54ec2d38182dad8",
+    "src/import-authoring.cpp": "056430533d2352f9c9d789098227afefe814e1efa5c3a9fc80ee245704e1e4ff",
+    "src/import-skin.hpp": "cd5bdfd7782b60a7bd8d9408d5a30ffe704dd5e12d4ac6f3021c801c9a9d742a",
+    "src/import.cpp": "680e51856218d675160441de61cffaf7cb904bf06338051be72e4414fc4b69f2",
+    "src/vrm-import.cpp": "dfd8d2879971eca6b87074e19b05f3b7164abd2f86bb08f47239ec9c8f165d1c",
+    "src/vrm-import.hpp": "8a060a8b7ea591ee335ed4f0d24911ad781a160704ac3a19b3a47f00d9be7400",
+    "tests/vrm-import.cpp": "9c1bb778bd9e8deb537b9c5358fd8bb12afb6b0701888d447ee303dd3e07eab2",
+    "tests/vrm-import-render.cpp": "32c47b37f230576d1a42f8aef3638ec3688bee14ce3fbf1ab82a3ba021a56393",
+    "tests/import-menu.py": "6e4be79eabe440e919981b8f816dbb7ecf4fe981388120d5a283df4bc8dcaacd",
+    "docs/HANDOFF.md": "75b7f0c122e6b06bcb201215f0f471d24f0cfeff3a22baedf01cb6125f53bcee",
+    "docs/REQUIREMENTS.md": "8e65d567241ff43d3724224652a6cee4e093fb925ab7b2cd1c6f5b75137a7bdd",
+    "docs/GENERIC-VRM-IMPORT.md": "377e4b46186b07ba54d5beac960e8f78c4b04d4b78fcb64c685282c5c6a45633"
+  },
+  "proof_sha256": {
+    "artifacts/test-release-final.log": "e8667e6f37c4f9fc4d5047d87d2c26db78e0677d99b527292c2fa6c9c3b85580",
+    "artifacts/test-sanitize-final.log": "a8bec07660b3765009e4b8dfbc4048673712d2e521d07ea830385fabcf99293b",
+    "artifacts/render-arc-source-final.log": "0584f38b28d92fce8e248fce202aed34c7c6ee12aafecb0ee96ed6b4e25c1270",
+    "artifacts/gui-vrm-source-final.log": "3bda173209a5c5ac94a15ea2a544e55903eb445d3686de4bd9aaf4be93ddce93",
+    "artifacts/vrm-schema-report.json": "f37e84168631fbbd7a944720f40c34b4ab3a560152490b373fd069c23eba9973",
+    "artifacts/vrm-khronos-full.json": "3d4e8c27b8827268a224ff3ddf3ccfde2e830917c78b1c0f91dee7c7f573f45e",
+    "artifacts/stageA-source-hashes.json": "aa6c7e8e5505cafca0993160d8d85b9997662d8a1a50294c07e0692b88ab60b9",
+    "artifacts/validate-vrm-import.cjs": "4a9b2bdba915d9bbff7d10ba630405f225a510cd098fbde1c251cba16ea47d6c",
+    "artifacts/validate-vrm-schemas.py": "2a28d93499cc5929945c9fe05b4c8ed6643d35b31778960aae8fd89bd0a0611c",
+    "artifacts/vrm1-schema/SOURCES.json": "12af775895f9f8c938e45a62f5906ca3bc563c4f8864844da345c6ceae10c07c"
+  }
+}

@@ -19,6 +19,9 @@ struct ImportLimits {
   // Explicit VRM0 compatibility: retain non-ancestor skeleton hints as
   // advisory.
   bool allow_legacy_vrm_skin_hint = false;
+  // Version-authenticated VRM1 metadata/MToon required extensions. Preserving
+  // import only; all other required extensions still need explicit adapters.
+  bool allow_vrm_metadata = false;
 };
 struct ImportedImage {
   std::string name, mime_type, source_uri;

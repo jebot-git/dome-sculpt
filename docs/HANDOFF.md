@@ -1,3 +1,22 @@
+# Private generic VRM import checkpoint
+
+The complete production goal remains active and incomplete. This private
+checkpoint extends existing native import; root owns integration/publication.
+Generic external VRM0 and the implemented VRM1 source/material subset now use
+the normal file worker, shared FLTK options and controller import browser,
+without bundled-avatar hash substitution or a silent MToon-to-PBR fallback.
+Actual female/male models retain all 19 parts, exact original bytes/IDs,
+original node chains, authored skin/morph/humanoid state and native restart.
+
+See GENERIC-VRM-IMPORT.md and validation/GENERIC-VRM-IMPORT.json for exact scope:
+Release4/SAN4, native90,680 checks, independent Arc31/six images max0,
+FLTK11 and synthetic frames through the production controller path pass.
+Official VRM schemas17 pass; raw VRM0 preserves its inherited advisory-skeleton
+Khronos error, while the independent VRM1 source has zero errors. Physics,
+full expressions/constraints, KHR sampling extensions and original-space
+VRM0/VRM1 re-export remain required. The writer guards remain in place.
+No physical test, system installation or active session changes occurred.
+
 # Controller selection on the viable authoring candidate
 
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md

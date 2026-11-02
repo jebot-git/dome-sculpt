@@ -65,7 +65,8 @@ struct ImportedRig {
   std::vector<uint32_t> source_nodes, slots;
 };
 inline ImportedRig imported_rig(const ImportedAsset &asset, uint32_t mesh_node,
-                                const std::function<bool()> &cancelled) {
+                                const std::function<bool()> &cancelled,
+                                std::span<const uint32_t> extra_nodes = {}) {
   auto stop = [&] {
     if (cancelled && cancelled())
       throw std::runtime_error("Imported rig adoption cancelled");
@@ -76,7 +77,10 @@ inline ImportedRig imported_rig(const ImportedAsset &asset, uint32_t mesh_node,
     throw std::invalid_argument("Imported skin instance has no skin identity");
   const auto &skin = asset.skins.at(size_t(node.skin));
   std::set<uint32_t> nodes, joints(skin.joints.begin(), skin.joints.end());
-  for (auto n : skin.joints)
+  std::vector<uint32_t> closure_roots(skin.joints.begin(), skin.joints.end());
+  closure_roots.insert(closure_roots.end(), extra_nodes.begin(),
+                       extra_nodes.end());
+  for (auto n : closure_roots)
     for (int p = int(n); p >= 0; p = asset.nodes.at(size_t(p)).parent) {
       stop();
       nodes.insert(uint32_t(p));
