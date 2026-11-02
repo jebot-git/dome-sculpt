@@ -15,13 +15,41 @@ namespace {
 constexpr size_t role_count=size_t(MToonSlot::Count);
 thread_local std::array<const SourceMaterialBindings*,64> material_validation_path{};
 thread_local size_t material_validation_depth=0;
+struct MaterialValidationProof { const SourceMaterialBindings *binding=nullptr;bool deep=false,complete=false; };
+thread_local std::array<MaterialValidationProof,256> material_validation_proofs{};
+thread_local size_t material_validation_proof_count=0;
 struct MaterialValidationScope {
-  MaterialValidationScope(const SourceMaterialBindings *binding){
+  const SourceMaterialBindings *binding;
+  bool proved=false;
+  MaterialValidationScope(const SourceMaterialBindings *value,bool deep):binding(value){
+    // This ledger lives only for one synchronous top-level validation. The
+    // caller owns the immutable graph throughout; no raw-pointer proof or
+    // omitted mutation check survives the call, including exceptional unwind.
+    if(!material_validation_depth)material_validation_proof_count=0;
     if(material_validation_depth==material_validation_path.size()||std::find(material_validation_path.begin(),material_validation_path.begin()+material_validation_depth,binding)!=material_validation_path.begin()+material_validation_depth)
       throw std::invalid_argument("Material preparation origin graph is cyclic or exceeds its depth budget");
+    const auto end=material_validation_proofs.begin()+material_validation_proof_count;
+    const auto found=std::find_if(material_validation_proofs.begin(),end,[&](const auto &proof){return proof.binding==binding;});
+    proved=found!=end&&found->complete&&(!deep||found->deep);
+    if(found==end&&material_validation_proof_count==material_validation_proofs.size())
+      throw std::length_error("Material validation exceeds its unique owning-node budget");
+    if(found==end)material_validation_proofs[material_validation_proof_count++]={binding,false,false};
     material_validation_path[material_validation_depth++]=binding;
   }
-  ~MaterialValidationScope(){material_validation_path[--material_validation_depth]=nullptr;}
+  void complete(bool deep) noexcept {
+    const auto end=material_validation_proofs.begin()+material_validation_proof_count;
+    const auto found=std::find_if(material_validation_proofs.begin(),end,[&](const auto &proof){return proof.binding==binding;});
+    // Admission reserved this entry before descending, so child completion
+    // cannot exhaust space needed by an ancestor's noexcept completion.
+    found->deep=found->deep||deep;found->complete=true;
+  }
+  ~MaterialValidationScope(){
+    material_validation_path[--material_validation_depth]=nullptr;
+    if(!material_validation_depth){
+      std::fill_n(material_validation_proofs.begin(),material_validation_proof_count,MaterialValidationProof{});
+      material_validation_proof_count=0;
+    }
+  }
 };
 void roles_valid(const std::optional<MToonMaterial> &material,
                  const std::array<PaintSourceTexture,role_count> &roles) {
@@ -79,7 +107,8 @@ void SourceNativeMaterial::validate() const {
     throw std::invalid_argument("Invalid native factor baseline for resolved material");
 }
 void SourceMaterialBindings::validate(bool deep) const {
-  MaterialValidationScope validation(this);
+  MaterialValidationScope validation(this,deep);
+  if(validation.proved)return;
   if(size_t(normal_frame)>1 || size_t(animation_policy)>1 ||
      !std::isfinite(freeze_seconds) || freeze_seconds<0 || freeze_seconds>1e9 ||
      (animation_frozen && animation_policy!=SourceUvAnimationPolicy::FreezeAtTime))
@@ -145,6 +174,7 @@ void SourceMaterialBindings::validate(bool deep) const {
       if(t.source_target && (!uv_origin->appearance || !t.origin_slot || *t.origin_slot>=uv_origin->appearance->source_morph_targets.size() || uv_origin->appearance->source_morph_targets[*t.origin_slot]!=*t.source_target))throw std::invalid_argument("Normal frame source target provenance differs");
     }
   }
+  validation.complete(deep);
 }
 uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings> value,bool deep) {
   if(!value) throw std::invalid_argument("Missing resolved material holder");
