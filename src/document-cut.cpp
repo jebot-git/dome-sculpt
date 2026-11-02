@@ -88,14 +88,15 @@ void Document::validate_cut_handoff(const Scene &before,const Scene &after,const
       throw std::logic_error("Cut handoff output is not an editable generated surface");}
   detail::require_isolated_scene(*permit.sealed,after,0);
 }
-void Document::drain_cut_shutdown() noexcept {
+void Document::drain_asset_shutdown() noexcept {
   try {
     std::shared_ptr<AssetWork> token;
     {std::lock_guard lock(model_mutex_);
-      if(state_.cut&&state_.cut->committing)token=asset_work_.load();}
+      auto work=asset_work_.load();
+      if(work&&((state_.cut&&state_.cut->committing)||work->save_requested.load()))token=std::move(work);}
     if(!token)return;
     std::unique_lock lock(file_mutex_);
-    file_changed_.wait(lock,[&]{return token->cut_done.load();});
+    file_changed_.wait(lock,[&]{return token->done.load();});
   }catch(...) { /* Native synchronization failure cannot escape destruction. */ }
 }
 void Document::begin_cut(){std::lock_guard lock(model_mutex_);finish_locked();begin_cut_locked();}

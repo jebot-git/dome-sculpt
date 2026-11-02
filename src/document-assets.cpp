@@ -48,6 +48,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   job.operation_label = std::move(label);
   job.operation_report = std::move(report);
   job.work = work ? std::move(work) : std::make_shared<AssetWork>();
+  job.work->accepted_scene = true;
   job.operation_changed = std::move(changed);
   job.rollback_preview = std::move(rollback_preview);
   job.retopo_session = retopo_session;

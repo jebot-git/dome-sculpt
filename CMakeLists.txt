@@ -891,6 +891,14 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-project-files-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-project-files-test PRIVATE -Wl,--wrap=fsync)
   add_test(NAME project-files COMMAND dome-sculpt-project-files-test)
+  add_executable(dome-sculpt-authoring-save-test tests/authoring-save.cpp)
+  target_link_libraries(dome-sculpt-authoring-save-test PRIVATE dome-sculpt-core)
+  target_include_directories(dome-sculpt-authoring-save-test PRIVATE src)
+  target_link_options(dome-sculpt-authoring-save-test PRIVATE
+    -Wl,--wrap=fsync -Wl,--wrap=_ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE
+    -Wl,--wrap=_ZN4dome11bake_objectERNS_5SceneEmNS_18ObjectBakeSettingsERKSt8functionIFbvEERKS3_IFvfEE)
+  add_test(NAME authoring-save COMMAND dome-sculpt-authoring-save-test ${CMAKE_CURRENT_BINARY_DIR}/authoring-save)
+  set_tests_properties(authoring-save PROPERTIES TIMEOUT 180)
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
