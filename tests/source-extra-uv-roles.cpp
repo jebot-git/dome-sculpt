@@ -7,7 +7,7 @@
 namespace {
 import_fixture::Fixture role_fixture(int role,int coordinate){
  import_fixture::Fixture f;while(f.bin.size()%4)f.bin.push_back(0);
- const int accessor=f.values({0,0,0,1,1,1,1,0},2,"VEC2");f.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_"+std::to_string(coordinate)]=accessor;
+ const int accessor=f.values({0,0,0,1,1,1,1,0},2,"VEC2");for(int set=2;set<=coordinate;++set)f.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_"+std::to_string(set)]=set==coordinate?accessor:f.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].get<int>();
  f.j["nodes"][0]["translation"]={0,0,0};f.j["nodes"][0]["rotation"]={0,0,0,1};f.j["nodes"][0]["scale"]={3,3,3};f.j["nodes"][1]["translation"]={-.14f,0,0};f.j["nodes"][2]["translation"]={.14f,0,0};
  auto &m=f.j["materials"][0];m.erase("extensions");m["alphaMode"]="OPAQUE";auto &pbr=m["pbrMetallicRoughness"];pbr.erase("baseColorTexture");pbr["baseColorFactor"]={.65f,.75f,.85f,1};pbr["metallicFactor"]=.7f;pbr["roughnessFactor"]=.6f;
  Image pixels{32,32,{}};for(int y=0;y<32;++y)for(int x=0;x<32;++x){if(role==3)pixels.rgba.insert(pixels.rgba.end(),{uint8_t(128+55*std::sin(x*.17f)),uint8_t(128+45*std::cos(y*.13f)),235,255});else pixels.rgba.insert(pixels.rgba.end(),{uint8_t(x*8),uint8_t(y*8),uint8_t(248-x*5),uint8_t(x<16?0:255)});}

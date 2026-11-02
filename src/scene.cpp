@@ -3,6 +3,7 @@
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
 #include "source-extra-uv-authority.hpp"
+#include "creator-source-uv-archive.hpp"
 #include "dome/normal-sampling.hpp"
 #include "polygon-color-target.hpp"
 #include "dome/source-placement.hpp"
@@ -504,6 +505,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
   if(version<2 || (version>21&&version!=26))throw std::runtime_error("Unsupported scene version");
+  if(version<26 && j.contains("source_models"))detail::preflight_creator_source_coordinates(j.at("source_models"),unsigned(version));
   if(version==21&&(!j.contains("normal_sampling")||!j.contains("source_materials")||j.at("source_materials").at("version")!=7))
     throw std::invalid_argument("Scene21 requires its owning retained normal sampling archive");
   if(version<21&&(j.contains("normal_sampling")||(j.contains("source_materials")&&j.at("source_materials").at("version")==7)))

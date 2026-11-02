@@ -277,6 +277,11 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       // compiler owns the separate emitted accessor/texture-info association.
       emission.prepared_normal.texcoord=0;
     }
+    bool uv_gap=false;
+    for(unsigned coordinate=0;coordinate<8;++coordinate) {
+      if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))uv_gap=true;
+      else if(uv_gap)throw std::invalid_argument("glTF export requires genuine contiguous TEXCOORD arrays; missing source sets cannot be invented or relabeled");
+    }
     if(!tangents.empty()){
       begin=data.size();for(auto t:tangents)floats(t);
       attributes["TANGENT"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC4");

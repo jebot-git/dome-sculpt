@@ -12,9 +12,14 @@ inline constexpr size_t extra_source_uv_budget=112*1024*1024;
 inline size_t extra_source_uv_storage(const ImportedAsset &asset,
     const std::function<bool()> &cancelled={}) {
   size_t bytes=0,work=0;
+  if(asset.primitives.size()>65536)throw std::length_error("Original primitive table exceeds native bounds");
   for(const auto &p:asset.primitives) {
     if(p.extra_uv_sets.size()>6)throw std::length_error("Original additional UV set count exceeds bounds");
+    if(!p.extra_uv_sets.empty() && (p.mesh.uv.size()!=p.mesh.positions.size() || p.uv1.size()!=p.mesh.positions.size()))
+      throw std::invalid_argument("Original indexed texture coordinates must include UV0 and UV1");
+    uint32_t expected=2;
     for(const auto &[set,values]:p.extra_uv_sets) {
+      if(set!=expected++)throw std::invalid_argument("Original indexed texture coordinate attributes must be contiguous");
       if(set<2 || set>7 || values.empty() || values.size()!=p.mesh.positions.size() || values.size()>2'000'000)
         throw std::invalid_argument("Original additional UV array differs from its source vertex domain");
       const size_t stored=values.size()*sizeof(values.front())+sizeof(std::pair<const uint32_t,std::vector<std::array<float,2>>>)+4*sizeof(void*);

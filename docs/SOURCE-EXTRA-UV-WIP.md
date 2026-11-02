@@ -1,4 +1,7 @@
-# Additional original texture coordinates (private Scene26)
+# Additional original texture coordinates (frozen initial foundation)
+
+The next private child qualification is recorded in SOURCE-EXTRA-UV.md. This
+note preserves the original f615 scope and its genuine format failures.
 
 This branch is an unfinished implementation based on private export-corner
 checkpoint575c952. It has not been merged into public main. Public source26

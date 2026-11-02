@@ -1238,6 +1238,13 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
           throw std::runtime_error(
               "Unsupported vertex attribute; import would lose data");
       }
+      // glTF indexed attribute names cannot have gaps. Keep genuine source
+      // identities; absent arrays are never invented from another UV set.
+      if(!prim.uv1.empty() && prim.mesh.uv.empty())throw std::invalid_argument("glTF texture coordinate attributes must be contiguous from TEXCOORD_0");
+      if(!prim.extra_uv_sets.empty()) {
+        if(prim.mesh.uv.empty() || prim.uv1.empty())throw std::invalid_argument("glTF texture coordinate attributes must be contiguous from TEXCOORD_0");
+        uint32_t expected=2;for(const auto &[set,values]:prim.extra_uv_sets)if(set!=expected++)throw std::invalid_argument("glTF texture coordinate attributes must be contiguous from TEXCOORD_0");
+      }
       if (preserve)
         deformation(p, *mesh, prim, b, o, out);
       if (prim.material >= out.materials.size())

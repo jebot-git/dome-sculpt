@@ -3,6 +3,7 @@
 #include "dome/import-source.hpp"
 #include "dome/import-image.hpp"
 #include "source-extra-uv-authority.hpp"
+#include "creator-source-uv-archive.hpp"
 #include "cgltf.h"
 #include <bit>
 #include <nlohmann/json.hpp>
@@ -267,6 +268,21 @@ struct CreatorAssetArchive::Entry {
   std::vector<uint32_t> image_ids;
   size_t extra_uv_bytes=0;
 };
+void detail::preflight_creator_source_coordinates(const nlohmann::json &models,unsigned scene_version,
+                                                  const CreatorArchiveLimits &limits) {
+  limits_valid(limits);
+  if(!models.is_array() || models.size()>limits.max_assets)throw std::length_error("Invalid creator original source archive count");
+  size_t total=0,extra=0;
+  for(const auto &record:models) {
+    stop(limits);const auto &raw=record.at("original_glb");
+    if(!raw.is_binary() || raw.get_binary().size()>limits.max_total_bytes-total)throw std::length_error("Original model metadata preflight exceeds archive budget");
+    total+=raw.get_binary().size();const auto json=source_json(raw.get_binary(),limits);
+    const auto bytes=model_extra_uv_preflight(json);
+    if(bytes && scene_version<26)throw std::invalid_argument("Original additional UV coordinates require Scene26");
+    if(bytes>detail::extra_source_uv_budget-extra)throw std::length_error("Original additional UV accessors exceed aggregate archive budget");
+    extra+=bytes;
+  }
+}
 CreatorAssetArchive::CreatorAssetArchive(CreatorArchiveLimits l):limits_(std::move(l)){limits_valid(limits_);}
 uint32_t CreatorAssetArchive::add(const CreatorAppearance &a,PaintImageArchive &images){
   return add_source(CreatorSourceModel(a),&a,images);
