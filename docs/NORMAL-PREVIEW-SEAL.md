@@ -42,7 +42,8 @@ The existing ordered corner stream/winding authentication remains mandatory.
 Missing proofs keep the old deep route; mismatched proofs fail. Reusing the
 Painter cache preserves image owners across pose-only geometry updates.
 
-Qualification is in progress. Fresh coherent Release core/support/render,
+The initial `8858f42` qualification below is historical. Final strengthened
+runtime `3a55fa3` qualification is recorded after it. Fresh coherent Release core/support/render,
 native frontend and six selected fixture targets compiled. Three native
 regressions passed in 49.61 s: normal validation geometry, Scene24 colour/paint
 sampling and actual Document/controller authoring. The corrected software
@@ -64,8 +65,8 @@ The focused fixture counts deep material and
 normal geometry validations on the render thread, compares sealed and legacy
 images/timing, exercises copied/changed owner negatives, Save/reload reminting,
 actual pose refresh, texture owner reuse and independent current-project GLB
-pixels. Final results and source/binary hashes must be recorded before this
-private checkpoint is offered for integration.
+pixels. Final results and source/binary hashes are recorded in
+`validation/NORMAL-PREVIEW-SEAL-FINAL.json`; main integration remains separate.
 
 The complete 414-check image/export regression now has a measured 2400 s
 registered budget. The previous source `44380ef` instrumented run timed out
@@ -77,7 +78,7 @@ from scalar/owner rejection. It creates an actual mutable `make_shared<T>`
 sampler, populates its public fields from the genuine prepared fixture, and
 runs the real independent replay factory to mint a fresh seal. The test keeps
 that legal mutable alias and a similarly mutable recipe while publishing const
-views to the preview factory. It temporarily mutates each receipt/owner at the
+views to the preview factory. It varies receipt fields and owner associations at the
 same address, requires both seal/preview rejection, restores the exact fields,
 then verifies retry and the unchanged original Scene. It never writes through
 a cast to an object allocated as `const T` and does not mutate immutable
@@ -85,3 +86,45 @@ geometry/vector contents. Its 34 Release checks passed against the exact
 completed `3a55fa3` headers/core/support/render; the separately compiled owned
 C/C++ core/support/render O1 ASan+UBSan/leak overlay also passed all 34,
 with no report. There is no additional product or ABI change.
+
+## Final strengthened component qualification
+
+Runtime `3a55fa3` has finished all owned finite gates. Release ran focused
+2/2 (seal23/current5) in 12.04 s and six regressions in 172.04 s, including
+414 complete image/export checks. The whole owned C/C++ core/support/render
+O1 ASan+UBSan/leak run passed **8/8 in 2141.26 s**, including full414 at
+1284.29 s, native63 at 348.84 s, seal23 at 131.84 s and current-layout5 at
+84.98 s. There was no report. The earlier `8858f42` parent separately passed
+7/7 in 2010.81 s; its missing factory-current association remains fixed only
+in the strengthened runtime, not retroactively in that source.
+
+Actual PCI03 Intel Arc A770 passed seal23 plus full414. Every one of the 54
+native, 54 original-basis GLB and 54 newly emitted current-project GLB image
+groups had maximum error **0**, with the original limits 2/3 unchanged. The
+new geometry draw measured 228.177 ms legacy versus 1.69056 ms sealed on
+this fixture; software measured 344.427 versus 0.561166 ms. These are fixture
+measurements, not full-scene or physical headset frame-rate promises. First
+geometry, stereo/no-op and actual pose had zero deep material/normal geometry
+replay calls; pose retained image owners/uploads. Legacy fallback and all
+forged-owner/ordered-stream negatives remain. All 761 captured source/header/
+test/CMake/core/render/frontend/runtime hashes stayed unchanged; 128 output
+hashes are retained.
+
+The same frozen frontend/helper/runtime passed actual FLTK/X11 normal10 plus
+compact10, and 20 actual-loader checks with synthetic controller tracking and
+software stereo images. Canonical staged toolkit/bitmap runtime paths were
+explicitly supplied and verified with the same environment. Normal and compact
+captures were inspected. No new actual DomeD Wayland or physical HMD claim
+is made. The legally mutable same-address unit overlay separately passed34
+in both Release and wholly owned instrumented core/support/render.
+
+This is a qualified active-UV0, untyped component. Palette's separate new
+current-main/Source26 union must add and prove the detached factory's active
+UV1/extra-coordinate refusal; frontend eligibility alone is insufficient.
+Source25/rest, Source26 consumers and the latest root changes require coherent
+semantic union and fresh composed checks. Typed/artist/conflicting weld/
+corner-normal22/UV1+ transfers remain required guarded work. Opt-in Keep paint
+does not complete default-lossless eligibility, compact/current-layout
+compilation, exhaustive native admission allocation evidence, conformal
+unwrap/stitch or actual native post-UV stroke/export workflow. The full goal
+remains active.
