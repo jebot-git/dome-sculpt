@@ -38,13 +38,35 @@ four exact samebinary finer ranges cover all2372 affected boundaries. Initial
 future budget-only policy gives just those two original shards1200 rather than
 600 seconds, without source/oracle/range changes.
 
-The common basic authoring Save continuation is now isolated frozen62d4747 in
-artifacts/ordered-authoring-save-5c94862; fresh complete changed-ABI Release12577
-and ownedSAN18621 builds remain live. Exact oldheader/archive negative reproduces
-Save refusal during pending authoring. New AssetAcceptedSnapshot/AssetWork
-completion lets a following Save capture the committed endpoint, propagate exact
-failures and drain accepted Save on Close. This is unqualified/private; no new
-completion adapter is admitted until its actual lifecycle and frontend proofs pass.
+Private common authoring Save product62d4747 is frozen in
+artifacts/ordered-authoring-save-5c94862, review/docs checkpointed9fb4f on remote
+work/ordered-authoring-save-5c94862. Fresh complete optimized alltargets12577 and
+owned C/C++core/support/renderer/frontend sanitizer compilation18621 are terminal0.
+Native30SAN/.59s and related12registeredSAN/373.98s pass; initial relatedRelease
+14/15 has one obsolete pending-Save-refusal oracle. Test-only20fe1ad corrects it
+with all90 actual caller denials plus real same-controller Bake+acceptedSave
+retries, Release/SAN pass. Test-only426b878 adds actual spatial Save+immediate
+Close:32native lifecycle assertions pass Release/ownedSAN. Actual native App/
+universal-menu/Ctrl+W consumer7 passes. These are distinct scopes, not a new
+all-green15-suite or fully qualified product claim.
+
+All9795 real post-Bake accepted-endpoint/publication allocation denials and full
+helper retries pass Release. The unchanged ownedSAN9795 sweep is still finite/
+live exec68235; preserve it and its artifacts/tests-authoring-save-faults-sanitize.log,
+no restart or source/header/archive mutation. No cached preparation is substituted.
+The review receipt is docs/validation/ORDERED-AUTHORING-SAVE-WIP.json in that tree.
+The portable UV completion bridgeb265706/a2912eb separately passes Release2/2 +
+fresh ownedSAN2/2(.99s),31UV assertions plus commonSave regression; it introduces
+no normal21 domain fields. Its new snapshot/worker completion is shared by UV23.
+
+Next combined source0c6002b is clean/frozen in artifacts/spacenav-scene20-b197e37:
+publicb197e37 +qualified3Dmouse/lifecycle5e6de1d +commonSave62 +calleroracle20 +
+portableUVbridgeb265/a291. Fresh complete Release19552 and ownedSAN97041 builds
+are live. The sole source-list conflict kept the existing rigid source file and
+added the new spacenav library; the UV CMake conflict kept only its portable test,
+without importing any normal21 tests/fields. No Scene21/22/23 is admitted. Qualify
+this actual combined candidate before main publication, then carry test-only
+spatial426 additions without claiming unrun aggregate tests.
 
 Contracts' raw current-corner UV witness/transfer57c1c42 (runtimeaec07c2) has36 native plus19/19
 Release/SAN suites,13758 real whole-helper denials; prepared Scene23 and actual
@@ -54,11 +76,15 @@ full19-part VRoid avatars after fractional UV edits with sensitive normal/UV
 negatives; new-format export, UI admission and full runtimeSAN remain required.
 Scene21/22/23 are excluded from this Scene20 milestone.
 
-Docs' native3Dmouse checkpoint has57 native,25 actual FLTK and11 Wayland checks;
-latest desktopSAN and14 Canvas-lifecycle assertions pass. Inherited Wayland
+Docs' frozen5e6de1d native3Dmouse checkpoint has57native/27framing,26 actual FLTK
+Release+26SAN and11Wayland checks; latest desktopSAN and14Canvas-lifecycle
+assertions pass. Inherited Wayland
 shared-EGL and XR112-byte driver lifetime reports remain explicitly separate;
-no canonical-toolkit fork/suppression is authorized. After its freeze, native
-image-projection/stencil Document/FLTK/XR workflow remains the next basic task.
+no canonical-toolkit fork/suppression is authorized. Native image-projection/stencil Document/FLTK/XR continuation is now active in
+projection-paint-b197e37; reserved spatial page25/count26 and ephemeral immutable
+image/camera/stroke state, no new Scene schema. Preserve monotone file-load/source
+leases and worker-only world/evaluated visibility/projection. Carry the portable
+commonSave/UV bridge and owned desktop lifetime fixes before its next source freeze.
 Controller drawers stay queued after basics. No new physical test, installation
 or desktop restart occurred; the accepted saved XR session remains preserved.
 
