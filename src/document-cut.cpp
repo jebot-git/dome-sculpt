@@ -57,6 +57,16 @@ std::shared_ptr<const MeshSnapshot> preview_snapshot(const MeshSnapshot &base,co
   return result;
 }
 }
+void Document::drain_cut_shutdown() noexcept {
+  try {
+    std::shared_ptr<AssetWork> token;
+    {std::lock_guard lock(model_mutex_);
+      if(state_.cut&&state_.cut->committing)token=asset_work_.load();}
+    if(!token)return;
+    std::unique_lock lock(file_mutex_);
+    file_changed_.wait(lock,[&]{return token->cut_done.load();});
+  }catch(...) { /* Native synchronization failure cannot escape destruction. */ }
+}
 void Document::begin_cut(){std::lock_guard lock(model_mutex_);finish_locked();begin_cut_locked();}
 void Document::begin_cut_locked(){
   const auto &o=scene_.active();

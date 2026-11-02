@@ -23,7 +23,8 @@ rig_compact = os.environ.get("DOME_MENU_RIG_COMPACT") == "1"
 retopo_compact = os.environ.get("DOME_MENU_RETOPO_COMPACT") == "1"
 retopo_flow = os.environ.get("DOME_MENU_RETOPO") == "1" or retopo_compact
 cut_compact = os.environ.get("DOME_MENU_CUT_COMPACT") == "1"
-cut_flow = os.environ.get("DOME_MENU_CUT") == "1" or cut_compact
+colored_cut = os.environ.get("DOME_MENU_COLORED_CUT") == "1"
+cut_flow = os.environ.get("DOME_MENU_CUT") == "1" or cut_compact or colored_cut
 compact = os.environ.get("DOME_MENU_CREATOR_COMPACT") == "1" or os.environ.get("DOME_MENU_VOXEL_COMPACT") == "1" or bake_compact or rig_compact or retopo_compact or cut_compact
 rig_flow = os.environ.get("DOME_MENU_RIG") == "1" or rig_compact
 export_flow = os.environ.get("DOME_MENU_EXPORT") == "1"
@@ -35,7 +36,7 @@ out = root / ("artifacts/menu-rig-compact" if rig_compact else "artifacts/menu-e
 if retopo_flow:
     out = root / ("artifacts/menu-retopo-compact" if retopo_compact else "artifacts/menu-retopo")
 if cut_flow:
-    out = root / ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut")
+    out = root / (("artifacts/menu-colored-cut-compact" if cut_compact else "artifacts/menu-colored-cut") if colored_cut else ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut"))
 if creator_flow:
     out = root / ("artifacts/menu-vroid-only-compact" if compact else "artifacts/menu-vroid-only")
 out.mkdir(parents=True, exist_ok=True)
@@ -124,7 +125,7 @@ async def main():
             arguments.append(str(fixture))
         elif cut_flow:
             fixture = Path(home, "cut.dsculpt")
-            subprocess.run([str(root / "build/dome-sculpt-cut-authoring-test"), "--ui-fixture", str(fixture)], check=True)
+            subprocess.run([str(root / ("build/dome-sculpt-cut-color-test" if colored_cut else "build/dome-sculpt-cut-authoring-test")), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
         elif retopo_flow:
             fixture = Path(home, "retopo.dsculpt")
@@ -184,7 +185,7 @@ async def main():
 
         async def click(label):
             nodes, _ = await layout()
-            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow or retopo_flow or creator_flow) else None
+            saved = fixture.stat().st_mtime_ns if label == "Save" and (rig_flow or bake_flow or export_flow or retopo_flow or creator_flow or cut_flow) else None
             await menu.call_event(nodes[label][0], "clicked", Variant("i", 0), 0)
             if saved is not None:
                 await wait(lambda: fixture.stat().st_mtime_ns != saved)
@@ -248,7 +249,7 @@ async def main():
                     if nodes[label][1].get("enabled") is True:return nodes
                     await asyncio.sleep(.1)
                 raise AssertionError("Cut menu did not enable "+label)
-            nodes,_=await layout()
+            nodes=await ready("Start cut")
             check(nodes["Start cut"][1].get("enabled") is True and nodes["Apply cut"][1].get("enabled") is False,
                   "Native universal menu exports an available cut tool and disabled unopened Apply")
             original_pixels=pixels() if not cut_compact else None
@@ -304,6 +305,13 @@ async def main():
                   and accepted["objects"][0]["payload_hash"]==baseline["objects"][0]["payload_hash"]
                   and accepted["objects"][1]["baked"] is True,
                   "Native Apply/Save persist mapped shell and cap objects while retaining the exact painted source")
+            if colored_cut:
+                full=json.loads(subprocess.check_output([str(root/"build/dome-sculpt-cut-authoring-test"),"--inspect",str(fixture)],env=env))["scene"]
+                archive=full["polygon_sources"];objects=full["objects"]
+                source=archive["authorities"][objects[0]["polygon"]];shell=archive["authorities"][objects[1]["polygon"]];cap=archive["authorities"][objects[2]["polygon"]]
+                fields=archive["color_fields"]
+                check(shell["colors"] is not None and cap["colors"] is None and fields[shell["colors"]]["basis"]==fields[source["colors"]]["basis"] and shell["origin"]==cap["origin"],
+                      "Actual FLTK cut saves shared original RGBA basis, complete common source capsule and independent cap material")
             await click("Undo");await click("Save")
             check(info()["scene_hash"]==baseline["scene_hash"],"One global native Undo restores all pre-cut source data")
             await click("Redo");await click("Save")

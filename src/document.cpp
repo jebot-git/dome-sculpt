@@ -112,6 +112,7 @@ void Document::request_worker_stop() {
 Document::~Document() {
   drain_polygon_shutdown();
   drain_native_shutdown();
+  drain_cut_shutdown();
   request_worker_stop();
   input_thread_.join();
   {
@@ -1742,6 +1743,17 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
   auto result = completion->get_future();
   {
     std::lock_guard lock(model_mutex_);
+    if(state_.cut&&state_.cut->committing&&state_.asset_busy) {
+      auto token=asset_work_.load();
+      if(!token)throw std::logic_error("The accepted cut has no completion owner");
+      FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;
+      job.cut_capture=std::move(token);job.generation=state_.generation;
+      std::lock_guard file_lock(file_mutex_);
+      if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+      // The cut job is already ahead of us on this same ordered worker.
+      // No worker may wait for work queued behind itself.
+      files_.push_back(std::move(job));file_changed_.notify_one();return result;
+    }
     if(polygon_accepting_.load()&&polygon_accept_) {
       FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;
       job.polygon_capture=polygon_accept_;job.generation=polygon_accept_->source.generation;
@@ -3183,6 +3195,16 @@ void Document::file_loop() {
       if(job->export_work && job->export_work->cancelled())
         throw std::runtime_error("Export cancelled");
       if(job->discover_import){discover_import_file(*job);continue;}
+      if(job->cut_capture) {
+        auto token=std::move(job->cut_capture);
+        if(token->cut_failure)std::rethrow_exception(token->cut_failure);
+        const auto result=token->cut_completed;
+        if(!result||!result->scene)
+          throw std::runtime_error("Accepted cut did not publish; dependent Save cancelled");
+        job->generation=result->generation;job->revision=result->revision;
+        job->content=result->content;job->object=result->object;
+        job->recovery_source=result->recovery;job->capture_scene=result->scene;
+      }
       if(job->native_capture)capture_native_file(*job);
       if(job->polygon_capture)capture_polygon_file(*job);
       if(job->capture_scene){job->scene=job->capture_scene->snapshot();job->scene.select(job->object);job->capture_scene.reset();}
@@ -3215,12 +3237,20 @@ void Document::file_loop() {
         if(isolated_before)detail::require_isolated_scene(*isolated_before,job->scene,job->isolation_target);
         auto prepared = job->scene.snapshot();
         prepared.validate();
+        std::shared_ptr<CutAcceptedSnapshot> cut_result;
+        if(job->cut_session&&job->work) {
+          cut_result=std::make_shared<CutAcceptedSnapshot>();
+          cut_result->scene=std::make_shared<const Scene>(prepared.snapshot());
+          cut_result->generation=job->generation;
+          cut_result->object=prepared.active().id;
+        }
         std::lock_guard lock(model_mutex_);
         if (job->generation == state_.generation) {
           if(job->work && job->work->cancelled.load())throw std::runtime_error("Asset operation cancelled");
           if (job->content != content_ || job->revision != state_.revision ||
               job->object != scene_.active().id || state_.edit_authority!=job->edit_authority || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
+          if(cut_result)cut_result->recovery=recovery_source_;
           Transaction transaction(*this);
           state_.asset_busy=false;
           if(job->retopo_session&&job->retopo_session==retopo_session_.load())transaction.finish_retopo();
@@ -3236,12 +3266,17 @@ void Document::file_loop() {
           state_.error.clear();state_.message=job->operation_label+" complete";
           if(job->operation_report&&!job->operation_report->empty())state_.message+=" | "+*job->operation_report;
           publish_locked(changed,false);transaction.commit();asset_work_.store({});
+          if(cut_result) {
+            cut_result->revision=state_.revision;cut_result->content=content_;
+            job->work->cut_completed=std::move(cut_result);
+          }
           if(!changed)restore_weight_view_locked(job->rollback_preview);
           if(job->work)job->work->progress.store(1);
           if(job->work&&job->work->held_weight&&state_.object_grabbing&&!desktop_&&!object_navigation_.grabbing())finish_object_grab_locked(true,true);
         }
         {
           std::lock_guard file_lock(file_mutex_);
+          if(job->cut_session&&job->work)job->work->cut_done.store(true);
           file_changed_.notify_all();
         }
         continue;

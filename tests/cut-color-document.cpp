@@ -2,15 +2,24 @@
 #include "cut-color-fixture.hpp"
 #include "dome/document.hpp"
 #include <iostream>
+#include <sys/stat.h>
 using namespace dome;
+namespace dome { struct DocumentNativeTestAccess {
+ static std::condition_variable *files(Document &d){return &d.file_changed_;}
+}; }
 namespace {
+std::condition_variable *shutdown_condition=nullptr;
+thread_local bool destroying=false;
+std::mutex shutdown_mutex;std::condition_variable shutdown_changed;bool shutdown_entered=false;
+
 size_t checks=0;
 void check(bool yes,const char *why){if(!yes)throw std::runtime_error(why);++checks;std::cout<<"PASS "<<why<<std::endl;}
 struct Gate {
-  std::mutex mutex;std::condition_variable changed;bool armed=false,entered=false;
-  void arm(){std::lock_guard lock(mutex);armed=true;entered=false;}
-  void stop(){std::unique_lock lock(mutex);if(!armed)return;entered=true;changed.notify_all();changed.wait(lock,[&]{return !armed;});}
-  void wait(){std::unique_lock lock(mutex);if(!changed.wait_for(lock,std::chrono::seconds(10),[&]{return entered;}))throw std::runtime_error("Save barrier not entered");}
+  std::mutex mutex;std::condition_variable changed;bool armed=false;size_t entered=0,released=0;
+  void arm(){std::lock_guard lock(mutex);armed=true;entered=released=0;}
+  void stop(){std::unique_lock lock(mutex);if(!armed)return;auto ticket=++entered;changed.notify_all();changed.wait(lock,[&]{return !armed||released>=ticket;});}
+  void wait(size_t ticket=1){std::unique_lock lock(mutex);if(!changed.wait_for(lock,std::chrono::seconds(10),[&]{return entered>=ticket;}))throw std::runtime_error("Save barrier not entered");}
+  void advance(){std::lock_guard lock(mutex);++released;changed.notify_all();}
   void release(){std::lock_guard lock(mutex);armed=false;changed.notify_all();}
 } gate;
 struct Release{~Release(){gate.release();}};
@@ -33,7 +42,12 @@ void outputs(Document &d,const Scene &source){
 }
 }
 extern "C" int __real_fsync(int);
-extern "C" int __wrap_fsync(int fd){gate.stop();return __real_fsync(fd);}
+extern "C" int __wrap_fsync(int fd){struct stat status{};if(!fstat(fd,&status)&&S_ISREG(status.st_mode))gate.stop();return __real_fsync(fd);}
+extern "C" void __real__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE(std::condition_variable *,std::unique_lock<std::mutex> &);
+extern "C" void __wrap__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE(std::condition_variable *condition,std::unique_lock<std::mutex> &lock) {
+ if(destroying&&condition==shutdown_condition){std::lock_guard ready(shutdown_mutex);shutdown_entered=true;shutdown_changed.notify_all();}
+ __real__ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE(condition,lock);
+}
 int main(int argc,char **argv)try{
  std::filesystem::path directory=argc>1?argv[1]:std::filesystem::temp_directory_path()/"dome-colored-cut-doc";std::filesystem::create_directories(directory);
  for(bool affine:{false,true})for(bool pose:{false,true}){
@@ -72,6 +86,30 @@ int main(int argc,char **argv)try{
   auto original=cut_color_fixture::scene();auto encoded=original.encode();Document d;d.replace(original);d.begin_cut();ready(d);auto settings=d.frame().state->cut->settings;settings.offset_mm=-1000;d.edit_cut(settings);ready(d);d.end_cut(true);
   check(!d.frame().state->cut&&d.copy_scene().encode()==encoded&&!d.frame().state->can_undo,"Exact no-op colored cut closes without output IDs or history");
   d.begin_cut();d.replace(original);check(d.wait_cut()&&!d.frame().state->cut&&d.copy_scene().encode()==encoded,"A newer document generation rejects stale source/preview publication");
+ }
+ // Save owns the accepted cut endpoint even when a later Undo happens before
+ // its disk fsync completes. Both regular-file barriers are observed, not timed.
+ {
+  auto original=cut_color_fixture::scene(true);auto encoded=original.encode();Document d;Release release;d.replace(original);
+  gate.arm();auto earlier=d.save_async(directory/"endpoint-before.dsculpt");gate.wait();d.begin_cut();ready(d);d.end_cut(true);auto path=directory/"endpoint-after.dsculpt";auto saving=d.save_async(path);
+  gate.advance();earlier.get();gate.wait(2);auto accepted=d.copy_scene().encode();check(d.undo()&&d.copy_scene().encode()==encoded,"Undo after accepted publication restores original while its captured Save is writing");
+  gate.release();saving.get();check(Scene::load(path).encode()==accepted&&d.copy_scene().encode()==encoded&&d.frame().state->dirty,"Pending Save writes its exact accepted cut endpoint without marking a later Undo clean");
+ }
+ for(bool replace:{false,true}){
+  auto original=cut_color_fixture::scene(true);auto encoded=original.encode();Document d;Release release;d.replace(original);auto path=directory/(replace?"stale-cut-save.dsculpt":"cancelled-cut-save.dsculpt");original.save(path);
+  gate.arm();auto earlier=d.save_async(directory/"failure-before.dsculpt");gate.wait();d.begin_cut();ready(d);d.end_cut(true);auto saving=d.save_async(path);
+  if(replace)d.replace(original);else d.end_cut(false);
+  gate.release();earlier.get();bool failed=false;try{saving.get();}catch(const std::exception&){failed=true;}
+  check(failed&&Scene::load(path).encode()==encoded&&d.copy_scene().encode()==encoded,"Cancelled or newer-generation cut fails dependent Save without writing any stale scene or changing original authority");
+  if(d.frame().state->cut)d.end_cut(false);
+ }
+ {
+  auto original=cut_color_fixture::scene(true);std::future<void> saving;
+  auto d=std::make_unique<Document>();Release release;d->replace(original);gate.arm();auto earlier=d->save_async(directory/"teardown-before.dsculpt");gate.wait();d->begin_cut();ready(*d);d->end_cut(true);auto path=directory/"teardown-accepted.dsculpt";saving=d->save_async(path);
+  shutdown_condition=DocumentNativeTestAccess::files(*d);shutdown_entered=false;
+  std::thread teardown([&]{destroying=true;d.reset();destroying=false;});
+  bool entered=false;{std::unique_lock lock(shutdown_mutex);entered=shutdown_changed.wait_for(lock,std::chrono::seconds(10),[]{return shutdown_entered;});}
+  gate.release();teardown.join();earlier.get();saving.get();check(entered&&Scene::load(path).objects().size()==3,"Destruction observes the actual pending-cut predicate wait and drains accepted cut plus ordered Save before stopping workers");
  }
  std::cout<<checks<<" native/controller colored cut checks\n";return 0;
 }catch(const std::exception &e){gate.release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

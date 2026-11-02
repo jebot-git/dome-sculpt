@@ -414,10 +414,10 @@ struct App {
       try{a.saving->get();}catch(const std::exception &error){a.canvas.document.report_error(error.what());}a.saving.reset();
     }
     auto native_state=a.canvas.document.frame().state;
-    if(!native_state->native_pending&&!(native_state->polygon&&native_state->polygon->committing)&&!native_state->error.empty()&&!a.native_commands.empty()) {
+    if(!native_state->native_pending&&!(native_state->polygon&&native_state->polygon->committing)&&!(native_state->cut&&native_state->cut->committing)&&!native_state->error.empty()&&!a.native_commands.empty()) {
       a.native_commands.clear();a.canvas.document.report_error(native_state->error+" | Pending commands cancelled; original project retained");
     }
-    if(!native_state->native_pending&&!(native_state->polygon&&native_state->polygon->committing)&&!a.saving&&!a.native_commands.empty()) {
+    if(!native_state->native_pending&&!(native_state->polygon&&native_state->polygon->committing)&&!(native_state->cut&&native_state->cut->committing)&&!a.saving&&!a.native_commands.empty()) {
       auto command=std::move(a.native_commands.front());a.native_commands.pop_front();
       try{a.action(std::move(command));}catch(const std::exception &error){a.canvas.document.report_error(error.what());}
     }
@@ -850,6 +850,9 @@ struct App {
       enable("&Edit/&Undo",!polygon->committing&&(polygon->can_undo||polygon->moving));
       enable("&Edit/&Redo",!polygon->committing&&polygon->can_redo);
     }
+    if(s->cut&&s->cut->committing&&!modal) {
+      enable("&File/&Save",true);enable("&File/Save &As...",true);
+    }
     enable("&Mesh/Retopology/Start patch", !modal && s->can_retopologize);
     auto retopo = s->retopology;
     bool editing = !modal && retopo && retopo->source && !retopo->committing && !s->asset_busy;
@@ -974,7 +977,8 @@ struct App {
   }
   void action(std::string label) {
     label.erase(std::remove(label.begin(), label.end(), '&'), label.end());
-    if(auto polygon=canvas.document.frame().state->polygon;polygon&&polygon->committing&&
+    const auto pending=canvas.document.frame().state;
+    if(((pending->polygon&&pending->polygon->committing)||(pending->cut&&pending->cut->committing))&&
       (label=="Close Window"||label=="Quit"||label=="New"||label=="Open...")) {
       if(native_commands.size()>=8){canvas.document.report_error("Desktop command queue is full");return;}
       native_commands.push_back(std::move(label));return;

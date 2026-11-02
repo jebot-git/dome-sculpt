@@ -53,11 +53,23 @@ struct ObjectInfo {
   bool selected=false, active=false, hovered=false;
   uint32_t selection_accent=0x6babff;
 };
+// Exact accepted cut endpoint, built on the file worker before authority
+// publication. It never aliases the later mutable document scene.
+struct CutAcceptedSnapshot {
+  std::shared_ptr<const Scene> scene;
+  uint64_t revision=0,generation=0,content=0,object=0;
+  RecoverySource recovery;
+};
 struct AssetWork {
   std::atomic_bool cancelled{false};
   std::atomic<float> progress{0};
   bool held_weight=false; // Immutable job kind; set before queue publication.
   std::atomic<uint32_t> morph_target{UINT32_MAX};
+  // Written/read only by the ordered file worker. Shutdown observes cut_done,
+  // published with file_mutex_, even if diagnostic allocation fails.
+  std::shared_ptr<const CutAcceptedSnapshot> cut_completed;
+  std::exception_ptr cut_failure;
+  std::atomic_bool cut_done{false};
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
 struct EditorState {
@@ -450,6 +462,7 @@ private:
   void finish_cut_parameter_locked(bool accept);
   void cut_from_hand_locked();
   void cut_loop();
+  void drain_cut_shutdown() noexcept;
   float control_resolution_voxel_ = .03f;
   AssetSource polygon_source_{};
   std::shared_ptr<const Scene> polygon_initial_;
@@ -667,6 +680,7 @@ private:
     uint64_t import_request=0;
     std::shared_ptr<PolygonAccept> polygon_capture;
     std::shared_ptr<ExportWork> export_work;
+    std::shared_ptr<AssetWork> cut_capture;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.

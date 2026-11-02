@@ -264,10 +264,23 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-retopo-authoring-test tests/retopo-authoring.cpp)
   target_link_libraries(dome-sculpt-retopo-authoring-test PRIVATE dome-sculpt-core)
   add_test(NAME retopology-authoring COMMAND dome-sculpt-retopo-authoring-test)
+  add_executable(dome-sculpt-cut-color-publication-test tests/cut-color-publication.cpp)
+  target_include_directories(dome-sculpt-cut-color-publication-test PRIVATE src)
+  target_link_libraries(dome-sculpt-cut-color-publication-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-cut-color-publication-test PRIVATE
+    -Wl,--wrap=_ZN4dome11publish_cutERNS_5SceneERKNS_10CutPreviewERKNS_10BakeSourceEjRKSt8functionIFbvEERKS8_IFvfEE
+    -Wl,--wrap=_ZN4dome8Document11Transaction6commitEb
+    -Wl,--wrap=_ZN4dome8Document24file_worker_error_lockedERNS0_7FileJobENSt15__exception_ptr13exception_ptrE)
+  # Exhaustive rich-source publication faults are independent ranges. Keep
+  # each process's full measured count and exact source/owner/history oracles.
+  foreach(shard RANGE 0 4)
+    add_test(NAME colored-cut-publication-${shard} COMMAND dome-sculpt-cut-color-publication-test ${CMAKE_CURRENT_BINARY_DIR}/colored-cut-publication/${shard} --shard ${shard} 5)
+    set_tests_properties(colored-cut-publication-${shard} PROPERTIES TIMEOUT 1200)
+  endforeach()
   add_executable(dome-sculpt-cut-color-document-test tests/cut-color-document.cpp)
   target_include_directories(dome-sculpt-cut-color-document-test PRIVATE src)
   target_link_libraries(dome-sculpt-cut-color-document-test PRIVATE dome-sculpt-core)
-  target_link_options(dome-sculpt-cut-color-document-test PRIVATE -Wl,--wrap=fsync)
+  target_link_options(dome-sculpt-cut-color-document-test PRIVATE -Wl,--wrap=fsync -Wl,--wrap=_ZNSt18condition_variable4waitERSt11unique_lockISt5mutexE)
   add_test(NAME colored-cut-document COMMAND dome-sculpt-cut-color-document-test ${CMAKE_CURRENT_BINARY_DIR}/colored-cut-document)
   set_tests_properties(colored-cut-document PROPERTIES TIMEOUT 180)
   add_executable(dome-sculpt-cut-color-boundaries-test tests/cut-color-boundaries.cpp)
