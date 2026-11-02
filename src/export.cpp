@@ -331,8 +331,10 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       }
       if (d.skeleton) {
         const auto &s = *d.skeleton;
-        // Object TRS parents joints. A skinned surface becomes an identity
-        // scene root because glTF ignores skinned-node ancestor transforms.
+        // Keep the skinned surface under its exact object/group chain. glTF
+        // computes skinned positions from the joints, but the mesh-node global
+        // determinant still determines winding and tangent handedness. Moving
+        // it to an identity scene root loses reflected front-face authority.
         // Rest inverse-bind matrices exclude the object transform.
         int mesh_node = int(j["nodes"].size());
         emission.node=mesh_node;
@@ -358,8 +360,6 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         if (!rig_key.empty() && shared_rigs.contains(rig_key)) {
           // All parts retain separate geometry/morphs but share one actual rig.
           const auto &shared=shared_rigs.at(rig_key);
-          j["nodes"][node].erase("children");
-          j["scenes"][0]["nodes"].push_back(mesh_node);
           j["nodes"][mesh_node]["skin"]=shared.skin;
           for(size_t k=0;k<s.bones.size();++k) emission.joints.push_back(uint32_t(shared.first_joint+k));
         } else {
@@ -378,10 +378,10 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
                {"scale", {t.scale.x, t.scale.y, t.scale.z}}});
           if(b.rest_matrix){if(!detail::gltf_trs_matrix(local_matrices[index]))throw std::invalid_argument("Exact joint affine requires hierarchy-preserving glTF transport; a sheared node matrix is not valid glTF");j["nodes"].back().erase("translation");j["nodes"].back().erase("rotation");j["nodes"].back().erase("scale");j["nodes"].back()["matrix"]=local_matrices[index];}
         }
-        int rig_parent=node,rig_root=-1;
+        int rig_parent=node;
         if(s.space_matrix){
           if(detail::gltf_trs_matrix(*s.space_matrix)){
-            rig_parent=rig_root=attach(node,{{"name",o.name+" bind space"},{"matrix",*s.space_matrix}});
+            rig_parent=attach(node,{{"name",o.name+" bind space"},{"matrix",*s.space_matrix}});
           }else{
             // inverse(original mesh world) can contain shear even when every
             // authored local is valid TRS. Retain it as a bounded verified TRS
@@ -389,7 +389,6 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
             const auto factors=factor_edit_for_gltf(AffineTransform(*s.space_matrix),cancelled);
             for(const auto &factor:factors.nodes){
               rig_parent=attach(rig_parent,{{"name",o.name+" bind space factor"},{"matrix",factor.float_matrix()}});
-              if(rig_root<0)rig_root=rig_parent;
             }
           }
         }
@@ -400,13 +399,6 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           j["nodes"][parent]["children"].push_back(first_joint + int(index));
         }
         if (d.skin) {
-          j["nodes"][node]["children"] = nlohmann::json::array();
-          j["scenes"][0]["nodes"].push_back(mesh_node);
-          // Restore rig roots after detaching the skinned surface.
-          if(s.space_matrix)j["nodes"][node]["children"].push_back(rig_root);
-          else for (size_t index = 0; index < s.bones.size(); ++index)
-            if (s.bones[index].parent < 0)
-              j["nodes"][node]["children"].push_back(first_joint + int(index));
           begin = data.size();
           for (const auto &matrix : s.inverse_bind())
             floats(matrix);
