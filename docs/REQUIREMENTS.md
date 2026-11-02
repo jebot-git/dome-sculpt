@@ -65,8 +65,16 @@ All51598 unique component allocation boundaries pass Release and ownedSAN via
 42/44 original plus4 timeout-only samebinary finer ranges. Emitted170 Khronos
 files have0errors/1194unfilteredwarnings; official71VRM0×15schemas have0errors.
 Read SCENE20-AUTHORING-INTEGRATION.md for the exact scopes and initial negatives.
-Private Scene21/22/23 and ordered generic Save work are excluded. All unfinished
-original rows and the post-basic controller drawers remain required.
+Private Scene21/22/23 and ordered generic Save work are excluded from that
+Scene20 checkpoint. The subsequent IO/navigation integration adds common
+accepted-authoring/UV Save and native six-axis navigation without a new Scene
+schema. Fresh Release full373/375 plus corrected3/3, ownedSAN14/14 plus
+corrected3/3 and desktop1/1, actualFLTK26Release+26SAN, Wayland11 and actual
+Save/Close7Release+7SAN pass. Frozen common-Save component completes all9795
+post-Bake publication denials in Release and ownedSAN with full-helper retries.
+Read AUTHORING-IO-SPACENAV-INTEGRATION.md for preserved initial negatives and
+exact scopes. Physical input acceptance and inherited Wayland/XR lifetime reports
+remain open. All unfinished original rows and post-basic drawers remain required.
 
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in

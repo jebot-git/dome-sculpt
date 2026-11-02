@@ -38,13 +38,31 @@ four exact samebinary finer ranges cover all2372 affected boundaries. Initial
 future budget-only policy gives just those two original shards1200 rather than
 600 seconds, without source/oracle/range changes.
 
-The common basic authoring Save continuation is now isolated frozen62d4747 in
-artifacts/ordered-authoring-save-5c94862; fresh complete changed-ABI Release12577
-and ownedSAN18621 builds remain live. Exact oldheader/archive negative reproduces
-Save refusal during pending authoring. New AssetAcceptedSnapshot/AssetWork
-completion lets a following Save capture the committed endpoint, propagate exact
-failures and drain accepted Save on Close. This is unqualified/private; no new
-completion adapter is admitted until its actual lifecycle and frontend proofs pass.
+## Qualified accepted-authoring IO and desktop navigation — 2026-11-02
+
+Frozen runtime0c6002b combines public Scene20, native3Dmouse/lifetime5e6de1d,
+commonSave62d4747 and portableUVSaveb265706; test-only0e623e7 corrects the
+obsolete pending-import Save exclusion and adds spatial Save/immediate Close.
+Read AUTHORING-IO-SPACENAV-INTEGRATION.md and its receipt for exact source,
+binary, build, test and component hashes. No new Scene21/22/23/24/25 fields.
+
+Fresh optimized alltargets and owned C/C++core/support/render/frontend builds
+pass. Full Release375 initially has373passes/two obsolete import Save-refusal
+assertions (4616.37s); corrected registered import2 plus strengthened authoring
+Save32 assertions pass3/3 Release/.13s and3/3 ownedSAN/.99s. Preserve the initial
+failures; this is not one375/375greenrun. Separate selected ownedSAN14/14 pass
+77.54s and font/GL desktop exit1/1 covers three paths plus14Canvas assertions.
+Actual production FLTK navigation26Release+26SAN, latestprivateDomeDWayland11,
+and native App acceptedSave→Ctrl+W→independentreader7Release+7SAN pass.
+
+Both Release and ownedSAN complete all9795 actual post-Bake endpoint/publication
+allocation denials in frozen62 component, with full-helper retries and exact
+source/history/content/file preservation. This is not a combined9795 rerun.
+Accepted Saves own immutable committed endpoints, propagate original failures,
+and drain on Close; UV and shared spatial Save use the common mechanism.
+Physical3Dmouse and headset production acceptance remain required. Inherited
+Wayland shared-EGL and standaloneXR Mesa allocation reports remain unresolved;
+no toolkit fork/suppression, new system install or session restart occurred.
 
 Contracts' raw current-corner UV witness/transfer57c1c42 (runtimeaec07c2) has36 native plus19/19
 Release/SAN suites,13758 real whole-helper denials; prepared Scene23 and actual
@@ -54,11 +72,15 @@ full19-part VRoid avatars after fractional UV edits with sensitive normal/UV
 negatives; new-format export, UI admission and full runtimeSAN remain required.
 Scene21/22/23 are excluded from this Scene20 milestone.
 
-Docs' native3Dmouse checkpoint has57 native,25 actual FLTK and11 Wayland checks;
-latest desktopSAN and14 Canvas-lifecycle assertions pass. Inherited Wayland
+Docs' frozen5e6de1d native3Dmouse checkpoint has57native/27framing,26 actual FLTK
+Release+26SAN and11Wayland checks; latest desktopSAN and14Canvas-lifecycle
+assertions pass. Inherited Wayland
 shared-EGL and XR112-byte driver lifetime reports remain explicitly separate;
-no canonical-toolkit fork/suppression is authorized. After its freeze, native
-image-projection/stencil Document/FLTK/XR workflow remains the next basic task.
+no canonical-toolkit fork/suppression is authorized. Native image-projection/stencil Document/FLTK/XR continuation is now active in
+projection-paint-b197e37; reserved spatial page25/count26 and ephemeral immutable
+image/camera/stroke state, no new Scene schema. Preserve monotone file-load/source
+leases and worker-only world/evaluated visibility/projection. Carry the portable
+commonSave/UV bridge and owned desktop lifetime fixes before its next source freeze.
 Controller drawers stay queued after basics. No new physical test, installation
 or desktop restart occurred; the accepted saved XR session remains preserved.
 

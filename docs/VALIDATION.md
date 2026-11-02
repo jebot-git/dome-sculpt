@@ -1,3 +1,8 @@
+Latest accepted-authoring IO/desktop-navigation qualification is in
+[AUTHORING-IO-SPACENAV-INTEGRATION.md](AUTHORING-IO-SPACENAV-INTEGRATION.md)
+and its hash-pinned receipt. Initial full373/375 and corrected3/3 are separate;
+no single375/375 or all-backends leak-clean claim is made.
+
 # Combined native gestures and retained frames — 2026-10-30
 
 Product `233e586` combines published paging `2a83eca` with retained frames,
