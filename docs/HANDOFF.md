@@ -87,43 +87,61 @@ commonSave/UV bridge and owned desktop lifetime fixes before its next source fre
 Controller drawers stay queued after basics. No new physical test, installation
 or desktop restart occurred; the accepted saved XR session remains preserved.
 
-## Active basic-work branches after the IO milestone
+## Active composed basic authoring candidate — 2026-11-02
 
-Root's next composed candidate is frozen`649befe` in
-`artifacts/projection-io-79009e2`: published main79009e2 +exact Docs image
-projection49c06b7 +portable modal-selection repairadcb068. Only the latter's
-CMake end-of-file conflict required resolution, retaining both test blocks.
-Fresh complete optimized Release build exec4238 and owned C/C++ sanitizer
-core/support/render/frontend plus selected fixtures exec82088 are live. Do not
-mutate this runtime/headers/tests or infer component proofs qualify this union.
-No test process should be restarted on an observation timeout. Next verify the
-composed native/controller/GUI/Wayland/actual-loader workflows and current
-immutable render ownership. No Scene21+ persistent fields are in this union.
+Root's new frozen runtime/test source25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c is
+in artifacts/basic-authoring-source20-7a4443e, review branch of the same name.
+Metadata-only11e2a55 imports the final paint-counter receipt;6ca11f3 records
+BASIC-AUTHORING-UNION-WIP.md. Source combines public7a4443e, image projection/
+modal repair649befe, portable real PBR preview618000b, initial unskinned rig
+fittingc18a010, paint counter78736d6 and native FBX adapter/fixturesd95e29e.
+No Scene21/22/23/24/25 data is admitted. Mixed fitting/preview gesture guards
+and four new assertions preserve idle fitting leases but fence placement.
+All source/header/test inputs remain frozen during qualification.
 
-Root's exploratory native FBX skin/morph adapter3 is committed/pushed`3a55c84`
-on work/native-fbx-deformers-badcace, tree artifacts/native-fbx-deformers-badcace.
-Its five genuine pinned ufbx inputs pass actual native authoring import,342
-independent default evaluated world vertices and exact Save/restart; maximum
-position error1.54678e-7. Real DQ and authored transparency remain guarded.
-The missing Blender shape offset-weight failure and inactive Lambert failure
-are preserved. This is an optimized new adapter/probe object linked to exact
-unchanged Scene20 import/Scene ABI archives, not a new whole-project/SAN/UI or
-full FBX qualification. Read its FBX-DEFORMATION-WIP.md/.json before admission.
+All three fresh configurations pass and register395 cases. Optimized Release
+alltargets exec94973 and pinned DPC++7.2 OneAPI alltargets exec74603 are live.
+Owned C/C++core/support/render/frontend+selected fixtures exec26164 terminal0;
+new selected native/render/lifetime SAN gate exec75541 is live. No current
+full395/395 or new OneAPI runtime result is claimed. Inspect exact handles and
+logs before changing/restarting jobs; observation timeout is not terminal.
+The canonical EEE toolkit/bitmap prefixes and latest DomeD d271cf6 were rechecked;
+unrelated DomeD dirt remains untouched. Full composed Release/GUI/Wayland/loader/
+format/device/compute qualification precedes any runtime main publication.
 
-Palette's native normal21 UI and independent colour/normal UV scopes remain
-private; current real PBR View26 commands use an ephemeral view_epoch rather
-than changing Scene revision/content/history or retiring accepted asset Saves.
-Its actual software avatar oracle has110 checks/18 independent GLB images at
-maxerror0; coherent sanitizer/frontend/device qualification is still pending.
-Contracts owns conditional Scene24/material9 independent paint sampling,
-starting from immutable detached geometry-only corner basis and a private
-O(1) association certificate. Strong partial-Bake UV sharp-boundary failures
-remain real; do not widen tolerance or borrow normal-domain authority.
-Docs owns actual landmark rig fitting (native/FLTK/controller/real-loader and
-independent import/export subset) and reserved conditional Scene25 exact
-pose-local matrices/acyclic original rig_source capsules. Full grouped/source
-rest/reparent/VRM transport is required, not satisfied by the initial fitter.
-Keep all proof scopes separate and all incomplete requirements active.
+Root649 projection/modal composition has fresh Release23/23(57.39s), owned
+SAN20/20(44.90s), nativeFLTK11normal+11compact+11SAN, latestprivateWayland9 and
+strictA77011 checks, allterminal0. These remain separately scoped to649.
+Portable PBR618000b independently has Release8/8 plus separate projection-loader
+1/1, GUI13+13, Arc116+111/18images0; its full portable ownSAN is now part of the
+new union, not borrowed from older dc64. Initial fittingc18a010 retains its exact
+native/SAN/FLTK/Wayland/loader/Arc/import/export proof. Actual paint counter787's
+three noexcept swaps fix a reproduced firstUndo visible0/privatecap4 mismatch;
+Release2/2 and whole-ownedSAN2/2 pass, with78 actual history/cancel/scratch/
+Save/reopen assertions and the old failure preserved. Final receipt3d74da8.
+
+Native FBX bounded component is frozen d95e29e, final docs/GUI checkpoint26bf0aa,
+in artifacts/fbx-authoring-3a55c84 (review branch pushed). Fresh whole-owned core/
+support/render/frontend Release and SAN build; native2/2 plus selected11/11
+Release and11/11SAN pass. Actual9073 consumer/deformation assertions compare1152
+source-world vertices across5default+9edited poses;51 real worker read-barrier
+checks cover queuedSave, Cancel, replacement, retry and exact history.14emitted
+GLBs have0KHRerrors/12unfilteredwarnings. ActualFLTK skin14+morph14 in BOTH
+Release and ownSAN close normally. Read FBX-DEFORMATION-QUALIFICATION.md/.json
+in that component; this is not a complete FBX/attribute/unit-axis/device claim.
+Earlier wrong vertex-index, wrong GUI unit-control and label negatives remain.
+
+Palette continues unadmitted normal21 export using actual PBR preview and an
+export-local independent coordinate stream; original-beforeUV typed colour/
+alpha sharp-boundary failures remain real pending Contracts' Scene24 independent
+paint domain. Do not widen bounds or borrow normal authority. Contracts owns
+Source24 geometry-only immutable corner basis/SurfaceMap/codec/consumer work;
+normal cheap/deep forwarding0fc00db is only for its private normal21 lineage.
+Docs owns full Scene25 exact pose-local matrices, first rig_source capsules and
+actual linked/source rig-rest transport. Native subset/codec/export proofs and
+existing-rig worker work are progressing; imported source-node/VRM guards remain.
+Every unfinished requirement stays active, including post-basic controller trays.
+No new physical launch, system install or active-session restart occurred.
 
 ## Qualified rigid source avatar integration — 2026-11-02
 

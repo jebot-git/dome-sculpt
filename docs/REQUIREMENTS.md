@@ -76,6 +76,15 @@ Read AUTHORING-IO-SPACENAV-INTEGRATION.md for preserved initial negatives and
 exact scopes. Physical input acceptance and inherited Wayland/XR lifetime reports
 remain open. All unfinished original rows and post-basic drawers remain required.
 
+The next private basic-authoring union25fe208 combines projection/stencils,
+actual PBR view, initial landmark fitting, PBR history counter repair and bounded
+native FBX skin/morph import on the public Scene20 application. Fresh395-case
+Release/OneAPI builds and owned sanitizer integration are in progress. Separately
+qualified FBX parent26bf0aa has new real worker/consumer/nativeGUI proof, but full
+FBX/material/attribute/unit-axis semantics remain required. Private Source21/24/25
+and controller trays are not delivered by this union. Preserve exact parent and
+combined evidence scopes in HANDOFF.md; no full-production completion is claimed.
+
 Pinned JSON binary/container allocation repairs have coherent primary Release
 207-suite and standalone forced-assert sanitizer4 proof in
 validation/JSON-ALLOCATION-INTEGRATION.json. That older receipt alone does not qualify later combined features or complete
