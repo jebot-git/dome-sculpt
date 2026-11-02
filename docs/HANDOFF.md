@@ -57,6 +57,19 @@ validation/XATLAS-CONSTRUCTION.json and XATLAS-SHUTDOWN.md.
 
 ## Current integration
 
+Private affine-import integration `b943927` combines current public `6b64e22`
+with the qualified source-chain admission through `3fda297`, preserving the
+accepted selection UI. Exact source-node graphs, reflected/nonuniform chains,
+current skin poses and authored/implicit inverse binds reach native pick/paint,
+Cancel, one Undo and ordered Save; sheared bind-space exports as valid TRS
+nodes. Fresh canonical Release17, actual FLTK static/skin import22 and actual
+Arc baseline/affine48 assertions pass, with all24 image comparisons error0 at
+unchanged tolerance2. See AFFINE-IMPORT-INTEGRATION.md and its receipt for exact
+scope, prior sanitizer boundaries and retained negative evidence. Default
+material identity, native UV1 import, wider VRM/FBX and remaining affine
+authoring stay required; this private checkpoint is not a publication or
+production-completion claim.
+
 The focused selection request is implemented by `3cb4517` and `f3f9199` on
 the user-passed candidate. The first XR menu page has a Selection toggle;
 either controller can touch or point and trigger to select, and either grip

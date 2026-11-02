@@ -1,0 +1,111 @@
+{
+  "recorded_utc": "2026-11-02T04:00:33.666740+00:00",
+  "status": "qualified private affine import subset on current public baseline",
+  "source": "b943927d10e1faab8d602bec88a5ae3eb41a97bd",
+  "public_parent": "6b64e22",
+  "affine_parent": "3fda297febf72dbf9d3eff874e040fc72bf19ab4",
+  "accepted_selection_preserved": true,
+  "product_diff_paths_from_public": [
+    "src/import-authoring.cpp",
+    "src/export.cpp"
+  ],
+  "release": {
+    "ui": true,
+    "xr": true,
+    "backend": "CPU",
+    "build_type": "Release",
+    "suites": 17,
+    "failed": 0,
+    "seconds": 95.85,
+    "source_chain_checks": 821,
+    "native_controller_checks": 26,
+    "handedness_witnesses": 13,
+    "scope": "selected source-chain/pose/bind/import/controller/document/software render/GLB/actual CC0 VRM/xatlas suites"
+  },
+  "gui": {
+    "static_affine": 11,
+    "authored_skin_affine": 11,
+    "scope": "actual FLTK/DBusMenu private Xvfb/bus, chooser/options/Save/restart/UndoRedo, canonical eee toolkit and bitmap runtime verified unchanged for d271"
+  },
+  "hardware": {
+    "selector": "DRI_PRIME=pci-0000_03_00_0",
+    "vendor": "Intel",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "baseline_assertions": 24,
+    "affine_assertions": 24,
+    "baseline_images": 12,
+    "affine_images": 12,
+    "max_error": 0,
+    "unchanged_tolerance": 2
+  },
+  "sanitizer_scopes": {
+    "affine_implementation": "d295bff: ten fresh own C/C++ core/renderer/support ASan/UBSan/leak suites, 8.53s; see AFFINE-IMPORT-WORKFLOW.json",
+    "new_dependency": "e02a86a equivalent baf6501: separately qualified xatlas plus both regressions; see XATLAS-CONSTRUCTION.json",
+    "new_whole_current_core_run": false
+  },
+  "attempts": [
+    {
+      "source": "c5aa59e",
+      "outer_exit": 0,
+      "suites": 14,
+      "seconds": 89.58,
+      "gui": 22,
+      "note": "Initial regex omitted correctly named gltf-interoperability, covered explicitly in final run."
+    },
+    {
+      "source": "b943927",
+      "outer_exit": 2,
+      "log": "artifacts/build-affine-final.log",
+      "note": "Make loaded stale new-target list before regeneration; no C++ or runtime assertion failure; explicit configure followed."
+    },
+    {
+      "source": "b943927",
+      "outer_exit": 0,
+      "suites": 17,
+      "gui": 22,
+      "hardware_outer_exit": 0
+    }
+  ],
+  "source_sha256": {
+    "src/import-authoring.cpp": "500aa71c9c28bb4ec27e73adff9a561054d69542cef8ea42f02fbc6e03ff875c",
+    "src/export.cpp": "45ea7333c08fa01e5fda09b357d91b6684c5e434a00d46e164100d454b8819fd",
+    "tests/source-color-consumer.hpp": "3a8bd6c0c30dfdc53e5d4dfd11650200e55bebd0c5ed5732d0839507dc9da2c9",
+    "tests/consumer-handedness.hpp": "b3c38b223f6d4348f92c3f9672eff0689b751610403310935775fcaa819b007f",
+    "tests/consumer-handedness.cpp": "86ff4a1acb14a92543501adb22cc3d73d8a77e84b6ef296bd188307564552c24",
+    "tests/import-source-chain.cpp": "7011f7ffaad3f8a469cc2555165ba9e7a7b5e0daab3a3b64bf1b986b0cbdc4f1",
+    "tests/import-source-chain-document.cpp": "04b405e6b758e536302a27f997db62aa8cd6e1c937816034af1a27262901e480",
+    "tests/import-skin-render.cpp": "2b1a09aeb557bc6f438ec1daf21d5a98458a4b40a3512c017c97b51457fd3c4c",
+    "tests/import-menu.py": "29956468f27ac204e892cb53438e0e96bd1475eaf0f1a7d308a7c97bf6dee03a",
+    "CMakeLists.txt": "44ee327d82aac6baaf7221e1a175e68f133bf55d8fa5499c49969bacb5174fc9",
+    "third_party/xatlas/xatlas.cpp": "fe96ae0d8c362ea4fe2502d8a82f5fbbb839a3822521903b26487afa15a1b824"
+  },
+  "logs_sha256": {
+    "artifacts/configure-affine-union.log": "e40e0b66bc9e44c1a905c98ff56fc4a11b25e60794f60492ffb2c75a4584590d",
+    "artifacts/build-affine-union.log": "dc98ba2bd61c1ac763a1720e812989444ccce516a33afccf165b07b6884cf88d",
+    "artifacts/test-affine-union.log": "350c4ced8063726782a9fd43d18dd191720ab28e1c8e8e094410d6633f133dcd",
+    "artifacts/test-affine-menu-union.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247",
+    "artifacts/test-affine-skin-menu-union.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247",
+    "artifacts/build-affine-final.log": "0f61bbceb61626fce62630f65c5f83945fc322a4077be03f57a4cef57494af1c",
+    "artifacts/configure-affine-final.log": "4bbdf2d41cbab69b259f2058ebd67fa31b05f9f8bf49e922b998b2a652aa092a",
+    "artifacts/build-affine-final2.log": "4e546897de2197b95863e762f3b6c70d4d49c3b4933accd9637e4e69ef8b7ff6",
+    "artifacts/test-affine-final.log": "1d6be66793040c5bd5c42c59b3035da1f395474f214ee04ecd979859b0d874bf",
+    "artifacts/test-affine-final-detail.log": "8512b4a6f44dcc775234286471fc34c69dcbe8d4875f336613e50949200edfb4",
+    "artifacts/test-affine-menu-final.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247",
+    "artifacts/test-affine-skin-menu-final.log": "fadc503cb5f947ad76e0557134726d7e82836e86f3e48e6e3ccaacf08a070247",
+    "artifacts/test-affine-baseline-final-arc.log": "af7b8b67497530f62bf5c210ae95c1b380c32f7e178158cc317e1572b30caa2e",
+    "artifacts/test-affine-source-final-arc.log": "af7b8b67497530f62bf5c210ae95c1b380c32f7e178158cc317e1572b30caa2e"
+  },
+  "uncompleted": [
+    "Scene17 authenticated implicit/default-material identity",
+    "coordinated Scene18 native UV1 import/paint admission",
+    "broader glTF extensions and full VRM/source-pose import",
+    "FBX deformation/material coverage",
+    "remaining affine metric-authoring routes"
+  ],
+  "preserved_negative_evidence": "Original 54/18 graphical failures remain in import-source-chain-085d353; tolerance unchanged, independent transformed parametric-plane handedness witnesses added.",
+  "full_production_complete": false,
+  "pushed": false,
+  "system_installation": false,
+  "physical_headset_test": false,
+  "session_restart": false
+}
