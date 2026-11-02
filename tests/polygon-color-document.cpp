@@ -287,9 +287,22 @@ int main(int argc, char **argv) try {
         "Low-level baking cannot silently ignore a current-color source "
         "accessor");
   d.replace(guarded);
-  check(d.wait_mesh() && !d.frame().state->can_bake,
-        "Current corner-field sources are excluded from native bake picker "
-        "until a real adapter exists");
+  check(d.wait_mesh(), "Current-source Bake picker snapshot is ready");
+  const auto bake_picker = d.frame().state;
+  check(bake_picker->can_bake &&
+            std::find(bake_picker->bake_sources.begin(),
+                      bake_picker->bake_sources.end(), alpha.active().id) !=
+                bake_picker->bake_sources.end(),
+        "Authenticated current corner-field source is offered for an ordinary "
+        "target by the real native bake picker");
+  d.bake_from_object(alpha.active().id);
+  check(d.wait_asset() && d.wait_mesh() &&
+            d.frame().state->error.find("Enable PBR color preparation") !=
+                std::string::npos &&
+            d.copy_scene().encode() == plain_before &&
+            !d.frame().state->can_undo,
+        "Actual worker still requires explicit current-source color preparation "
+        "and preserves both objects and history on refusal");
   std::cout << checks << " actual native current-color authoring checks\n";
   return 0;
 } catch (const std::exception &e) {

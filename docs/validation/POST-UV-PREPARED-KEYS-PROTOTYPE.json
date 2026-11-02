@@ -1,0 +1,42 @@
+{
+  "base": "bb17c7f25d186992504f91da1266b00ac55b7995",
+  "scope": "PRIVATE prototype whole changed TU/test overlay only; not fresh whole-source qualification",
+  "source_sha256": {
+    "CMakeLists.txt": "c88baefad00be774f1042642e2f23aeace42a3f87f94a49110cbcc1b9fef039d",
+    "src/shapekey-normal-preparation.cpp": "c08c0ae81e979b31dc84ca60ad2cf7c17dab542f68cdca0d7d0264bdaf757e01",
+    "tests/prepared-keys-after-uv.cpp": "f23e91d82e027ee76b23ae8c8c76389641b9040258bd9248aee1a0bafed075a9",
+    "tests/prepared-keys-after-uv-render.cpp": "0131ccfe38f96b9d0a01799f5fb09c5df46f615780fb755d3d47b74d22e986cc",
+    "tests/normal-uv-render.cpp": "99e616ccce719e6a9ebc447982895373bf7f1fa7bcad200fa2a7a464ab1e6cf1",
+    "docs/POST-UV-PREPARED-KEYS.md": "022bc3a108f199058a98bf0094d573db001bacd01d6d32531f1dbd57e37cff3b"
+  },
+  "frozen_archives": {
+    "libmikktspace-robust.a": "d9d6877dfca64fd90f1065f376071edccd8931e3a52eb84e95ef15f70e28fb36",
+    "libdome-sculpt-affine.a": "5e01304b5ee56e767e9cd8f09262916942e85e7ac780595cc1a0316ebf2ec429",
+    "libxatlas.a": "e2dfaf877f8643b79b9f9faab316cac9360afba772cb6a7a6c2f641b25f720cc",
+    "libmikktspace.a": "8f3068182bb7b9a3510940ebfa98bdea0f76bb3819ba2e89286c35e862517dff",
+    "libufbx.a": "d7052c56d54bfe8c4719b6b4adbd9c668ca3ba80b6f785aa52e48ff38fc0bc20",
+    "libdome-sculpt-polygon.a": "03a307fbb7ce10b04576b65b45ba0ef5ebc05fa2b9a1dfb9cf8463b925cbcefa",
+    "libdome-sculpt-render.a": "874d008360eed9db73d2cd481e23b454a952c9383ac5e19f6a44109593c40892",
+    "libdome-sculpt-core.a": "b0463b6ccec67aed04ea208bb8727f4839e529c84241777b879216229a8a5d9b"
+  },
+  "native_checks": 33,
+  "software_graphical_checks": 52,
+  "public_layout_change": false,
+  "schema_change": false,
+  "old_member_excluded": true,
+  "log_sha256": {
+    "prepared-keys-after-uv-all-actions-overlay.log": "77f07fc1b132da8009eb59c5b577d3e2b1496a2abde756dc089f44983148daa0",
+    "prepared-keys-after-uv-software-overlay.log": "1f7054de0dfc27052fbbf983a7c4843ab3018a161d4a01dfbf5edb837448fcb7"
+  },
+  "prototype_binary_sha256": {
+    "fixture": "be83b83f4799df2352344f9d01b5df6ab80e522b483204425ba7edcf593d6ebb",
+    "render-fixture": "e1a2d9821af6bd464cde070d60b19445f567c2d7eb7abdc23d082c191cc1c930"
+  },
+  "required_next": [
+    "root0057749 worker input rebind fix",
+    "fresh coherent whole-source Release and ASan/UBSan/leaks",
+    "hardware and native/controller UI",
+    "actual avatars and persistent allocation failures",
+    "source-retaining native corner-domain conversion for contradictory seam edits"
+  ]
+}

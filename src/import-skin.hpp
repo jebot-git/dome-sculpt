@@ -60,6 +60,13 @@ inline JointTransform imported_node_reference(const ImportedNode &node) {
   q = q.unit();
   return {{m[12], m[13], m[14]}, q, {sx, sy, sz}};
 }
+inline std::string imported_bone_name(const ImportedNode &node,
+                                      uint32_t source) {
+  if (!text::valid_utf8(node.name) || node.name.find('\0') != std::string::npos)
+    throw std::runtime_error("Imported bone name is not valid UTF-8");
+  return text::utf8_prefix(node.name.empty() ? "Source node" : node.name, 210) +
+         " [" + std::to_string(source) + "]";
+}
 struct ImportedRig {
   Skeleton skeleton;
   std::vector<uint32_t> source_nodes, slots;
@@ -97,10 +104,7 @@ inline ImportedRig imported_rig(const ImportedAsset &asset, uint32_t mesh_node,
     stop();
     const auto &n = asset.nodes.at(source);
     Bone b;
-    if (!text::valid_utf8(n.name) || n.name.find('\0') != std::string::npos)
-      throw std::runtime_error("Imported bone name is not valid UTF-8");
-    b.name = text::utf8_prefix(n.name.empty() ? "Source node" : n.name, 210) +
-             " [" + std::to_string(source) + "]";
+    b.name = imported_bone_name(n, source);
     b.parent = n.parent < 0 ? -1 : int(indices.at(uint32_t(n.parent)));
     b.rest = imported_node_reference(n);
     b.rest_matrix = n.local;

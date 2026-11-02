@@ -158,6 +158,7 @@ void consumers(const Scene &scene, bool typed, const std::filesystem::path &pref
 }
 } // namespace
 
+#ifndef DOME_NORMAL_UV_RENDER_NO_MAIN
 int main(int argc, char **argv) try {
   if (argc < 2) return 2;
   const std::filesystem::path prefix = argv[1];
@@ -191,3 +192,4 @@ int main(int argc, char **argv) try {
   std::cerr << "FAIL " << error.what() << '\n';
   return 1;
 }
+#endif

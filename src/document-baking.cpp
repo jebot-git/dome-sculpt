@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "cut-color.hpp"
 #include "dome/document.hpp"
 #include "dome/polygon-scene.hpp"
 namespace dome {
@@ -29,13 +30,13 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
   const auto &target=scene_.active();
   if(target.polygon && target.polygon->active && target.polygon->colors)return ids;
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
-      !(o.polygon && o.polygon->active && o.polygon->colors) &&
+      detail::cut_color_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   return ids;
 }
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
-  return !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
+  return !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&
     !state_.asset_busy && !state_.recovery_busy && !action_active_locked() &&
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
@@ -50,8 +51,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
     if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; normal attributes prepared (initial quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
-  },expected,report,work);
-  state_.bake_source=source;state_.bake_settings=settings;publish_locked();
+  },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings});
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
   std::lock_guard lock(model_mutex_);queue_bake_locked(source,settings,expected);

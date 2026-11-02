@@ -4,6 +4,45 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Qualified authoring adapter checkpoint — 2026-11-02
+
+Product8d68dc7 extends the Scene19 baseline with retained post-UV prepared-key
+authoring, authenticated current-corner source Bake, original-space skinned VRM0
+export, stable desktop framing and atomic direct-caller Bake admission. Test-only
+9e6cb1b repairs the obsolete source-picker exclusion expectation and drives real
+native export chooser controls. No runtime/header/asset/third_party bytes differ
+from the coherent full-run product. Read AUTHORING-ADAPTER-INTEGRATION.md and
+validation/AUTHORING-ADAPTER-INTEGRATION.json for exact source/binary/hash scopes.
+
+Optimized alltargets build passed. Full Release317 finished2086.97s:316passes and
+one old expected exclusion, then corrected registered1/1Release+1/1ownedSAN
+(61native assertions). Preserve initialfailure; do not claim one317/317greenrun.
+Fresh owned C/C++core/support/render SANnative40+graphics5+fault6 all pass (with
+the corrected1 separately). Actual Arc355, native FLTK/Wayland81, current-source
+actual-loader syntheticXR11, emitted87 Khronos0errors/770unfilteredwarnings and
+53official VRM0×15hash-pinned schemas0errors also pass. No new HMD/install claim.
+Latest committed DomeD rechecked unchangedd271cf6; canonical EEE prefixes current.
+
+All858 source packing+4393precommit persistent failures and13,555reached of13,556
+measured post-UV key failures pass owned sanitizers and full-helper retry. One
+cache-dependent key boundary is unreached; no generic input-thread OOM guarantee
+is inferred from directcaller Bake admission. Fractional actual-avatar UV scale
+still has a real quality refusal; only repeated integer-texel avatar UV/key
+workflows are qualified. Every incomplete REQUIREMENTS.md row remains required.
+
+Further isolated work (not this checkpoint): root rigid-authoring-union-9e6cb1b
+atd5de43b combines separately qualified17b0ff7, fresh Release87127/SAN79530 builds
+live. Root color-rigid-union-d5de43b at7566a8f adds component65b0ae9 Scene20/material6/
+polygon5, fresh Release6519/SAN49536 builds live. Both are unqualified/unpublished.
+Contracts' isolated joint-authoring-7566a8f tests oneScene20 normalUV/keys/rigid/color
+coexistence; dual current-source+target test-only8496dec has185software/SAN/Arc
+checks. Parent65 extendedSAN44 job28449 is stilllive (Release44=51,598 actual
+failures and functionalRelease11/SAN11/Arc357 complete). Docs owns native3Dmouse
+worktree desktop-spacenav-8d68dc7. Palette Scene21/material7/normalentry3 remains
+ABI-open and unadmitted; Scene22 is reserved for independent corner-origin keys.
+Preserve frozen component/proof trees, source commits and every running handle.
+No physical launch, system installation or active desktop restart occurred.
+
 ## Current desktop framing checkpoint — 2026-11-02
 
 Product3c491bf adds native Frame all(Home), Frame selection(Shift+F), stable orbit

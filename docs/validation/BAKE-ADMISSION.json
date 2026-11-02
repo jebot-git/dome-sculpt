@@ -1,0 +1,62 @@
+{
+  "private_checkpoint": true,
+  "parent": "04d3f4a",
+  "scope": "Direct Bake caller admission atomic configuration/publication/queue",
+  "source_sha256": {
+    "CMakeLists.txt": "d4a31f364a2a7b9743641a286d92975fafe9cec7c8fc48f55146c874fc49f063",
+    "include/dome/document.hpp": "c9b97487350798ecf5b60c8b91ad0c9b58b7b11b85dd6300cdef7a08f202e30f",
+    "src/document-assets.cpp": "6a8e2b8c1ea8b4190367d2d4b3e7a050d8a8200d7d170e37d82e3ea5a5d13979",
+    "src/document-baking.cpp": "77c3df86bebfbdbd98c3af7a1258bee29504e0d1771798d41a6dfad4d45ed3fb",
+    "tests/bake-admission.cpp": "6c08ca9622febd5fd3d42dfd0c85864da5c7a245123eb3de90bb13ee3c885b17",
+    "docs/BAKE-ADMISSION.md": "f6df0796cb945dce9b2437c09486e51c62cafc638dca43f4b3b0f7250bdf4a38"
+  },
+  "evidence_sha256": {
+    "artifacts/build-bake-admission-old-negative.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/tests-bake-admission-old-negative.log": "ff6250248caaebd806ecb43046025c44484f83ddbe93ad57e05f34e055876e10",
+    "artifacts/tests-bake-admission-release.log": "00c8267e80257af59e61250f58a4adeeb1e741bcbb878bb763eeba8fa551f119",
+    "artifacts/tests-bake-admission-release-assertions.log": "add3836a6b019a70778216f378696224fdd892dee6e6ec7350e9b427f65b36d8",
+    "artifacts/tests-bake-admission-san.log": "80a3802e5ac1b83072b21922c0af5db61e7029b3942011e8084eb9259fcb1714",
+    "artifacts/tests-bake-admission-san-assertions.log": "34b8eb69ea084f4bdeaf6a43428301822f3dd6919d49e9c01442cdd9c5813ece"
+  },
+  "binary_sha256": {
+    "artifacts/bake-admission-old04-test": "8c7a3e12b451f20a17f13fbc8b67f1535121508080c1e7da90ff837a13ddf901",
+    "build/libdome-sculpt-core.a": "c5ba331fc2a7b94eaa96edc45fa90128d53a21a34a5c9d33a9e0f885cf8a408d",
+    "build/dome-sculpt-bake-admission-test": "619a181287ade12b9fe34b5542ebc68ba003c4772070da342ec2a042950d94fb",
+    "build-san/libdome-sculpt-core.a": "6d430aa4e04efe5e8f1bcdcbc4a7f7fb54ff9486cc5539a92ac7b3f47f6a2d47",
+    "build-san/dome-sculpt-bake-admission-test": "a4c2dee0dbbb663ee5e30340049b4fe991bb3697df661ebff59691589f7a02f1"
+  },
+  "release": {
+    "selected_suites": 3,
+    "seconds": 3.85,
+    "measured_persistent_caller_new_failures": 90,
+    "all_boundaries_hit": true,
+    "actual_full_helper_retry": true,
+    "actual_same_controller_lease_retry": true
+  },
+  "sanitizers": {
+    "selected_suites": 3,
+    "seconds": 39.16,
+    "asan": true,
+    "ubsan": true,
+    "leaks": true,
+    "complete_own_core_and_c_cpp_support": true,
+    "external_system_libraries_instrumented": false,
+    "all90_caller_failures": true
+  },
+  "old_negative": {
+    "source": "04d3f4a",
+    "read_only_path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec",
+    "matching_frozen_headers_and_archives": true,
+    "measured_boundaries": 110,
+    "failure_boundary": 91,
+    "queued_jobs_after_bad_alloc": 1,
+    "expected_exit": 1
+  },
+  "limits": [
+    "No target20 changes mixed into this fix",
+    "No Document or FileJob data fields; private queue signature requires coherent affected consumers",
+    "Direct caller thread failure scope; no input-thread OOM guarantee",
+    "Pending generic Bake Save remains explicitly refused; no new generic ordered Save claim",
+    "No hardware, physical HMD, installation or session restart"
+  ]
+}

@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "scene-feature-version.hpp"
-#include "dome/material-bindings.hpp"
-#include "normal-frame-runtime.hpp"
 #include "dome/vrm.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/mtoon.hpp"
 #include "gltf-document.hpp"
+#include "normal-frame-runtime.hpp"
+#include "scene-feature-version.hpp"
 #include "vrm-painted.hpp"
+#include "vrm-source-graph.hpp"
 #include <bit>
 #include <set>
 namespace dome {
@@ -398,8 +399,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   for(const auto &object:input_objects)if(object.source_dormant)
     fail("source attributes are dormant for "+object.name+
       "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");
-  for(const auto&o:input_objects)if(detail::minimum_scene_version(o.deformation.get())>=11)
-    fail("Imported affine/inverse-bind state requires proven original-space VRM transport; export GLB or restore the original rig meanwhile");
+  const bool original_space = std::any_of(
+      input_objects.begin(), input_objects.end(), [](const auto &object) {
+        return detail::minimum_scene_version(object.deformation.get()) >= 11;
+      });
+  std::optional<detail::VrmSourceGraph> source_graph;
   auto objects = input_objects;
   const CreatorAppearance *origin = nullptr;
   uint64_t group = 0;
@@ -423,6 +427,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   if (!original.contains("extensions") ||
       !original.at("extensions").contains("VRM"))
     fail("only original VRM0 is supported by this source-preserving path");
+  if (original_space) {
+    source_graph = detail::vrm_source_graph(input_objects, original, options.cancelled);
+    group = source_graph->instance;
+    original["extensions"]["VRM"]["humanoid"] = source_graph->humanoid;
+  }
   for (auto &extension : original.value("extensionsUsed", Json::array()))
     if (extension != "VRM" && extension != "KHR_materials_unlit" &&
         extension != "KHR_texture_transform")
@@ -589,6 +598,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   auto document = detail::make_gltf(objects, detail::SourceMorphSpace::Original,
                                     true, options.cancelled);
   report.normal_targets_recomputed = document.normal_targets_recomputed;
+  std::vector<int> source_nodes;
+  if (source_graph)
+    source_nodes = detail::emit_vrm_source_graph(
+        document, objects, *source_graph, options.cancelled);
   auto &j = document.json;
   auto &binary = document.binary;
   auto check_budget = [&] {
@@ -604,7 +617,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       used.push_back(name);
   };
   Vrm0IdentityMap identities;
-  identities.nodes.assign(asset.nodes.size(), -1);
+  identities.nodes = source_nodes.empty()
+                         ? std::vector<int>(asset.nodes.size(), -1)
+                         : source_nodes;
   identities.meshes.resize(asset.meshes.size());
   identities.textures.assign(asset.textures.size(), -1);
   std::vector<int> original_images;
@@ -645,7 +660,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     j["textures"].push_back(
         {{"source", original_images[t.image]}, {"sampler", sampler}});
   }
-  std::set<std::pair<int, int>> primitives;
+  std::set<std::tuple<int, int, int>> primitives;
   std::vector<int> avatar_joints;
   Json output_properties = Json::array();
   Json output_materials = Json::array();
@@ -784,8 +799,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     stop(options);
     const auto &o = objects[i];
     const auto &emitted = document.objects.at(i);
-    if (o.groups.empty() || o.groups.back().id != group || !o.deformation ||
-        !o.deformation->skeleton || !o.deformation->skin ||
+    if (o.groups.empty() || (!source_graph && o.groups.back().id != group) ||
+        !o.deformation || !o.deformation->skeleton || !o.deformation->skin ||
         !o.deformation->humanoid)
       fail("every avatar part requires the same grouped humanoid rig");
     if (avatar_joints.empty())
@@ -803,7 +818,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
            "inferring names");
     std::set<uint32_t> unique;
     const auto &s = *o.deformation->skeleton;
-    auto fitted_world = s.world();
+    // Imported space_matrix is inverse(mesh world), while VRM metadata
+    // references the original MODEL-space rest hierarchy, not mesh-local joints.
+    auto rest_skeleton = s;
+    if (source_graph) rest_skeleton.space_matrix.reset();
+    auto fitted_world = rest_skeleton.world();
     for (size_t joint = 0; joint < a.source_joint_nodes.size(); ++joint) {
       auto source = a.source_joint_nodes[joint];
       if (source >= asset.nodes.size() || !unique.insert(source).second)
@@ -832,11 +851,12 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
                            rest.rotation.x * original_rotation.x +
                            rest.rotation.y * original_rotation.y +
                            rest.rotation.z * original_rotation.z;
-      if (original_node.has_matrix ||
-          std::abs(std::abs(rotation_dot) - 1) > 1e-5f ||
-          length(rest.scale - Vec3{original_node.scale[0],
-                                   original_node.scale[1],
-                                   original_node.scale[2]}) > 1e-5f)
+      if (!source_graph &&
+          (original_node.has_matrix ||
+           std::abs(std::abs(rotation_dot) - 1) > 1e-5f ||
+           length(rest.scale - Vec3{original_node.scale[0],
+                                    original_node.scale[1],
+                                    original_node.scale[2]}) > 1e-5f))
         fail("edited rest axes/scales require explicit bone-local metadata "
              "rebasing");
       int &mapped_node = identities.nodes[source];
@@ -849,7 +869,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
         size_t(a.source_node) >= asset.nodes.size() ||
         asset.nodes[a.source_node].mesh != a.source_mesh)
       fail("invalid source mesh/node identity");
-    if (!primitives.insert({a.source_mesh, a.source_primitive}).second)
+    if (!primitives
+             .insert({source_graph ? a.source_node : -1, a.source_mesh,
+                      a.source_primitive})
+             .second)
       fail("duplicate source primitive creates ambiguous avatar identity");
     identities.meshes[a.source_mesh].push_back(emitted.mesh);
     const ImportedPrimitive *primitive = nullptr;

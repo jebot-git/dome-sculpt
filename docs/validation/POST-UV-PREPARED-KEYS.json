@@ -1,0 +1,198 @@
+{
+  "base": "ceb98938cd6fc805c3b606e0651a9b17736581bd",
+  "prototype": "39770c0",
+  "normal_uv_base": "bb17c7f25d186992504f91da1266b00ac55b7995",
+  "input_rebind_fix": "0057749d71e6fcca5f30187b3ed74d464cc08646",
+  "input_fix_applied": "ceb9893",
+  "public_layout_change": false,
+  "new_schema_version": false,
+  "inherited_schema": {
+    "Scene": 19,
+    "material_archive": 5,
+    "normal_preparation_entry": 2
+  },
+  "scope": "Source-retaining prepared key actions after valid normal UV reprojection; scoped native/generated/authored fixture qualification, full production goal incomplete",
+  "source_sha256": {
+    "CMakeLists.txt": "51b80d5c79e93f9d2109b7cb2ec3f39079548e3f13da75411734b28d8fd075bc",
+    "src/shapekey-normal-preparation.cpp": "c08c0ae81e979b31dc84ca60ad2cf7c17dab542f68cdca0d7d0264bdaf757e01",
+    "src/document-transaction.cpp": "ffc7f5d79f10a69e9ea570552e74073f26e3dd535fc970e44c465d5836c9c749",
+    "src/input.cpp": "e7e69e4dcfd594a2a4f1cd7e708a664481c33262572f0d10395c92d7cfeb1ea4",
+    "tests/prepared-keys-after-uv.cpp": "f23e91d82e027ee76b23ae8c8c76389641b9040258bd9248aee1a0bafed075a9",
+    "tests/prepared-keys-after-uv-render.cpp": "0131ccfe38f96b9d0a01799f5fb09c5df46f615780fb755d3d47b74d22e986cc",
+    "tests/normal-uv-render.cpp": "99e616ccce719e6a9ebc447982895373bf7f1fa7bcad200fa2a7a464ab1e6cf1",
+    "tests/post-uv-key-strokes.cpp": "a9197b07e32aa66cd5d49fe775ab03a41eb3e9e8178567106350102710c33bf7",
+    "tests/post-uv-keys-fixtures.hpp": "0359d7e199206daf0722a917230ec95454ff54d32665fccaf95d9ad6146ac171",
+    "tests/post-uv-keys-gui-fixture.cpp": "033d34b8f6dd805eea22aa811522840e7fa41f8b576e49ed469e38e4f0c3a774",
+    "tests/post-uv-key-faults.cpp": "b479758cdb840501c1f2fd2689df3c6a86d0deeabebf675d945a6229a9fe23a6",
+    "tests/shapekey-menu.py": "31e4f159d670e1f03a6caad186481344ea1962d46dd48276f4b57bb4e04515f3",
+    "tests/input-rebind-publication.cpp": "39bf825241f878bd055ada6b005dc172cf6235423ccf8f33aa9111fcdd32677b",
+    "docs/POST-UV-PREPARED-KEYS.md": "7c3ba1dfb3262f70dbad2f5d22f72608237b2770f0c7f0e3e765eebc1a4c734f"
+  },
+  "public_header_sha256": {
+    "include/dome/normal-preparation.hpp": "95f6d9135fcdc5cfb0ba38737ea69a542c39b0ee20f3c3c12e01a6a7428499f2",
+    "include/dome/source-uv-bake.hpp": "6593be3983ccdfa94beaf9304d2717da5316bd7efcf967491233e33b20af0771",
+    "include/dome/normal-frames.hpp": "1c9b22240da185c11fc5babce936a9127dc67eec028e6a9a09ebb730ab87edb9",
+    "include/dome/shapekey-authoring.hpp": "ca8c19fd6033f0441501795d80ab87054924f87cfd97163a31184ed32c3728e6"
+  },
+  "release": {
+    "fresh_core_support_renderer_ui_xr": true,
+    "selected_ctest_suites": 10,
+    "seconds": 7.43,
+    "additional_native_controller_stroke_suite": 1,
+    "stroke_seconds": 0.33,
+    "native_key_checks": 33,
+    "native_controller_stroke_checks": 29,
+    "ordinary_new_faults": {
+      "refusals": 13555,
+      "complete_cache_outcomes": 0,
+      "reached": 13555,
+      "measured": 13556,
+      "unreached_cache_dependent": 1
+    },
+    "binary_sha256": {
+      "dome-sculpt-prepared-keys-after-uv-test": "4d30eb01137c1a05956a46d49da6e680da5405063d63af100a3eea0035d1e1dd",
+      "dome-sculpt-prepared-keys-after-uv-render-test": "a8b374f72f052ba01c1fe4fa65609bba2bce77a3de199acd9ffe5c409a26ead2",
+      "dome-sculpt-post-uv-key-strokes-test": "55923ee7e0b309b00c96c42a50734f5f7db4566ab4d8e79dab38210052908f59",
+      "dome-sculpt-post-uv-key-faults-test": "9e321a7757471b0bb4e0f1419338c59da62ba5d43b53b6f442ec54af9bb0aa30"
+    }
+  },
+  "sanitizer": {
+    "fresh_whole_c_cxx_core_support_renderer": true,
+    "overlay": false,
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1",
+    "selected_ctest_suites": 10,
+    "seconds": 104.38,
+    "additional_native_controller_stroke_suite": 1,
+    "stroke_seconds": 2.97,
+    "ordinary_new_faults": {
+      "refusals": 13555,
+      "complete_cache_outcomes": 0,
+      "reached": 13555,
+      "measured": 13556,
+      "unreached_cache_dependent": 1
+    },
+    "archive_sha256": {
+      "libdome-sculpt-affine.a": "8fd9226e2658cb48e4cf222a42ff82d27287a590029af46cab53fa40f7fcc13b",
+      "libdome-sculpt-core.a": "e23637d579d1f2a98a9482fea875841f79835f014e62d9727e10bdf7cd1ee2a1",
+      "libdome-sculpt-polygon.a": "5a41b9f4fe860018be460fa9e53376dc730c99e4a1e8db8e6655eb797d6786ed",
+      "libdome-sculpt-render.a": "92e1629e424bc378efaa3b871cd2abfc7c6d14248368886930a674eddf184705",
+      "libmikktspace-robust.a": "5580aa77a46a9f09eeefb9c6a8ebe6de331ad17be821ee7fb365799c412e8f2f",
+      "libmikktspace.a": "728b52746c0039286edfd99832f58c3bb2223266b4da226661a89fac77030b5e",
+      "libufbx.a": "79374ea17970170bf48b55462bd143356941138ef2e5150ca4ce33e98386ca7f",
+      "libxatlas.a": "c7b92e2cdcdeffca5aa57f6f5cf2f00107d861e49743bc3b0fd0a48494ddd216"
+    },
+    "binary_sha256": {
+      "dome-sculpt-prepared-keys-after-uv-test": "5c6a001389ceca4e3be24cd8c1c60c19aab397adfd9de0db03f43739fb7e398d",
+      "dome-sculpt-prepared-keys-after-uv-render-test": "3e78be4eb806a745f3fac2bb264d2c70f16022ff85e7845413c7207a7e811ac4",
+      "dome-sculpt-post-uv-key-strokes-test": "3527aae0ec6f04ed93fdc4752086f489d8707623be1e633c56bf5244b80a3ef3",
+      "dome-sculpt-post-uv-key-faults-test": "87e439f867331402710495cac7cc8e3f9b4352beb65484d49ec487929920f40b"
+    }
+  },
+  "graphics": {
+    "checks": 52,
+    "actual_renderer": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "pose_role_comparisons": 27,
+    "poses": 3,
+    "morph_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "pbr_max_byte_error": 0,
+    "legacy_mtoon_max_byte_error": 1,
+    "independent_attribute_oracles": [
+      "triangle cross-product area-weighted target normals",
+      "original frame UV derivative tangents at two exclusive corners"
+    ],
+    "input_models": "curved native mesh and authored four-vertex mixed-skin VRM0 fixture with19bone metadata; not actual bundled avatar UV authoring"
+  },
+  "native_fltk": {
+    "reports": {
+      "post-uv-key-menu": {
+        "checks": 17,
+        "report_sha256": "eed8872288261f883109f7fd6ebb66f53466142c9de93726b7cc9a70b2064ce4"
+      },
+      "post-uv-key-menu-compact": {
+        "checks": 19,
+        "report_sha256": "630f28a5592d78c5ae462e2e7f5e87092d110b59af688dcbb1a98b2c7077188e"
+      }
+    },
+    "app_sha256": "46fb4c84b05c9911d5906b8dea04e62c45a8674bf5d3423a649fc880bd89caf0",
+    "helper_sha256": "9680adc46008bc349fb12b7e74b8210cdc9cda5dd17383b1262e11fd7ab6beaa",
+    "runtime": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib",
+    "toolkit": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+    "DomeD_inputs": "d271cf65c612a462fcfa6739416b06c6565be070 unchanged canonical inputs",
+    "environment": {
+      "DOME_SHAPE_HELPER": "dome-sculpt-post-uv-keys-gui-fixture",
+      "DOME_SHAPE_EXPECT_VERSION": "19",
+      "DOME_SHAPE_PREPARED": "1",
+      "DOME_SHAPE_STROKES": "1",
+      "compact": "DOME_SHAPE_COMPACT=1"
+    }
+  },
+  "formats": {
+    "files": 18,
+    "khronos_version": "2.0.0-dev.3.10",
+    "errors": 0,
+    "warnings": 27,
+    "warning_codes": {
+      "NODE_SKINNED_MESH_NON_ROOT": 18,
+      "INVALID_EXTENSION_NAME_FORMAT": 9
+    },
+    "official_vrm0_files": 9,
+    "official_schema_files": 15,
+    "official_schema_pin": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "khronos_report_sha256": "3a1487f13d0643cc9f9a7c39a50005a1b26f4198968b19e5f5cda2547d4d76a4",
+    "official_report_sha256": "f51025d93b2f96388cc5b512d3d24d9b1c04567263c275a6987bfa959bfeb974",
+    "output_sha256": {
+      "arc-consumer-pbr-p0-w0.glb": "0752323fac2d17cb2612af5cd7812fa81a552581291775a6fb0ff9744e69a4eb",
+      "arc-consumer-pbr-p0-w100.glb": "ace496427e153830350d500f1866f69c4ffaa7a8ab8b39ead69dddceff501195",
+      "arc-consumer-pbr-p0-w35.glb": "5f08229ce5803977df47c4ebf0886cde5c777ef9a7c7f7171df37669ad52b1da",
+      "arc-consumer-pbr-p1-w0.glb": "1b7d8ae4abb374b48ddcb909ee08d0493a45bca9312eac17399268855a7ad864",
+      "arc-consumer-pbr-p1-w100.glb": "b050308103b19f7a47d2cf6b4791e63dbf12a81e5debf1ed501e1342fa0e63c9",
+      "arc-consumer-pbr-p1-w35.glb": "49e43db95a12496b29c41a0c9b67cc13da67a47df33277a713c4b67d41380c1f",
+      "arc-consumer-pbr-p2-w0.glb": "9a068da875b05d1219955721de33bb4576fa4bfd0aa97829de34924814ec3849",
+      "arc-consumer-pbr-p2-w100.glb": "ccaa8e85fdc7651f100c22d636bd4684826493cd94f16c86978b900480f7fa2e",
+      "arc-consumer-pbr-p2-w35.glb": "2c6391cfb9a6365c5b5946b72532b0914795029f3484fbf4c1b8d839f0713fcf",
+      "arc-consumer-typed-p0-w0.vrm": "5811157b1acaf63fbb550b35296d28d4adf9961caa7a3a6003467d96da16c1b8",
+      "arc-consumer-typed-p0-w100.vrm": "1eec5de69e231bb9f7348d168c23382f06bf2860a3827150ad7e2d6bf799e463",
+      "arc-consumer-typed-p0-w35.vrm": "d6d96ac39a345a3ce64d0a6251201d1698b25b907221d3581ead40779f896e6f",
+      "arc-consumer-typed-p1-w0.vrm": "8c5688201da80b90cf545490a4e747c1a4980e209650689376533dc3f7ba30f4",
+      "arc-consumer-typed-p1-w100.vrm": "31be83732af8d119da0284a4ac318d9e490fc25d67f9bb427b5a3dfaa19be271",
+      "arc-consumer-typed-p1-w35.vrm": "f7704c7417a65a231be84b658a88419ce651224cde04a424a24d3c4b85acb4e3",
+      "arc-consumer-typed-p2-w0.vrm": "f9e586337be8da8aa214c675feb46c370e1af238d3ac022d8c41fe99b032fab0",
+      "arc-consumer-typed-p2-w100.vrm": "dc1a57a35ddee25c743482a7f1b460302f165e0a16ecbfe288635b4cc842e651",
+      "arc-consumer-typed-p2-w35.vrm": "41203b1d44015811fbfffd1819537d40ee36514ad0b0bdc9f8e0ff389ab91a1e"
+    }
+  },
+  "logs_sha256": {
+    "post-uv-keys-coherent-release-configure.log": "8c349fa2ee9aabeb01a604d42554c98424e17ee7ba6a277ff8b638453dbbced3",
+    "post-uv-keys-coherent-release-build.log": "9df7d4ac4f57f7acf9e5f8eae1b6a3f4029fa171a0000693a4ea1b266502b654",
+    "post-uv-keys-coherent-release-tests.log": "dd531db1a45bc5e0b4cca64e02d1045d7d9234130c95f9883785218ce296b9bb",
+    "post-uv-keys-coherent-sanitize-configure.log": "696d4cf35b58bc1aad0f8f11636bcbca13831ce5c9f9ada952c4d753a0121c04",
+    "post-uv-keys-coherent-sanitize-build.log": "eb506dc30e441bad5fd4d0d362c6d60500b33dc5bef5909f0423bfedf4f0b696",
+    "post-uv-keys-coherent-sanitize-tests.log": "4f31274a4ea10e1095f1edce90235f4a42a9ed6ea3d0ce65a25a0e5a8abd3c59",
+    "post-uv-keys-coherent-arc.log": "1c7f4e615bc685b08b11143b01ad3b23f27ddb8645a203e52796585fa09fe73b",
+    "post-uv-key-strokes-release-path.log": "2dcb9e5d0759f21d86f3f0864d930b29199f2dbfb8740f8fd0774b6b0fad1a4a",
+    "post-uv-key-strokes-sanitize-path.log": "3dfa42e64d1b2c54aaf77ea936e73dabc1e6c38365e299f7f9fa52e8f531818f",
+    "post-uv-key-qualified-strokes.log": "cd015c4a84ed2a44853551807405860303dc3c75956ab8d7edfca821f56dfa75",
+    "post-uv-key-native-menu.log": "3297ebebb66de844be3e08fd34e3ca7e4155338090c573b69dc2a0fa6a8405db",
+    "post-uv-key-native-compact-menu.log": "1f2eca5a5b1967df4dc9ad7c152b9e8b4986c1ff9ed797b3bce2acf444c289fd",
+    "post-uv-key-faults-release.log": "c38078c627412779531adad7446487caddf29a52290584a9d0d7a551acc38b2c",
+    "post-uv-key-faults-sanitize.log": "c38078c627412779531adad7446487caddf29a52290584a9d0d7a551acc38b2c"
+  },
+  "preserved_fixture_failures": {
+    "post-uv-key-strokes-release-build.log": "new test needed explicit full pinned JSON header, no product issue",
+    "post-uv-key-strokes-release-final.log": "new nested output directory needed creation before immediate Save, no product issue"
+  },
+  "remaining": [
+    "Genuine bundled CC0 avatar UV/key workflows",
+    "Source-retaining native corner-domain conversion for independent seam edits (current exact refusal)",
+    "Prepared-normal source baking and broader UV1/frame/sampler conversions",
+    "COLOR/TEXCOORD morph channels and other full REQUIREMENTS.md work",
+    "No physical HMD/system install/full production completion claim"
+  ]
+}
