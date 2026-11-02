@@ -31,6 +31,15 @@ int main()try{
  Quat turn{std::cos(.3f),0,std::sin(.3f),0};auto affine=detail::desktop_framing(f,turn,.6f,true);check(bool(affine),"Reflected/sheared live original-node placement can be framed without TRS approximation");fits(*affine,turn,.6f,live);
  Quat next{std::cos(.7f),std::sin(.7f),0,0};auto pan=affine->pan+Vec3{.2f,-.1f,.3f};auto updated=detail::orbit_pan(pan,affine->pivot,turn,next);check(close(turn.rotate(affine->pivot)+pan,next.rotate(affine->pivot)+updated),"Trackball orbit preserves the framed center even after a manual pan");
  mesh->generation=6;check(!detail::desktop_framing(f,{},1,false),"A replaced document cannot frame geometry from an obsolete generation");mesh->generation=7;check(!detail::desktop_framing(f,{},0,false),"An invalid viewport cannot produce a new camera");
+ state->objects[0].world_transform_valid=true;state->objects[0].world_transform={};state->objects[0].affine_world.reset();mesh->ranges[0].affine_world.reset();state->objects[1].visible=false;
+ PolygonWorkspace workspace(PolygonMesh::cube());auto polygon=std::make_shared<PolygonView>(workspace.view());auto display=std::make_shared<PolygonDrawData>(*polygon->display);display->move_weights.assign(polygon->surface->mesh.positions.size(),1);polygon->display=display;polygon->move_delta={30,5,0};state->polygon=polygon;state->polygon_object=1;
+ auto draft=detail::desktop_framing(f,{},1,true);check(draft&&close(draft->pivot,{30,5,0}),"Frame selection follows worker-built polygon geometry plus live GPU vertex displacement instead of the replaced mesh");
+ std::vector<Vec3> draft_points;for(auto point:polygon->surface->mesh.positions)draft_points.push_back(point+Vec3{30,5,0});fits(*draft,{},1,draft_points);
+ state->polygon.reset();state->polygon_handoff=polygon;state->polygon_handoff_object=1;state->polygon_handoff_generation=mesh->generation;state->polygon_handoff_revision=mesh->revision+1;
+ auto handed=detail::desktop_framing(f,{},1,true);check(handed&&close(handed->pivot,draft->pivot),"Accepted polygon handoff remains framed while ordinary mesh publication is pending");
+ state->polygon_handoff_revision=mesh->revision;auto published=detail::desktop_framing(f,{},1,true);check(published&&close(published->pivot,selected->pivot),"Matching publication retires the polygon handoff under the same rule as the renderer");state->polygon_handoff.reset();
+ auto topology=std::make_shared<RetopoMesh>();topology->add_vertex({{40,8,0}});auto retopo=std::make_shared<RetopoView>();retopo->topology=topology;retopo->transform.position={2,3,0};state->retopology=retopo;
+ auto patch=detail::desktop_framing(f,{},1,true);check(patch&&patch->pivot.x>selected->pivot.x&&patch->pivot.y>selected->pivot.y,"Live retopology points outside the original mesh also contribute their transformed bounds");state->retopology.reset();
  state->objects[0].visible=state->objects[1].visible=false;check(!detail::desktop_framing(f,{},1,false),"An empty visible scene preserves existing camera state");
  std::cout<<checks<<" desktop framing checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
