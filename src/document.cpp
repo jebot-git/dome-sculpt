@@ -550,6 +550,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
     view->normal_sampling_available=source.painted&&source.painted->normal_projection()&&source.material_bindings&&source.material_bindings->normal_preparation;
     view->normal_sampling_required=view->normal_sampling_available&&source.painted->normal_projection()->version==2;
     view->retain_normal_sampling=uv_retention_requested_locked();
+    view->paint_sampling_available=uv_paint_retention_available_locked();
+    view->paint_sampling_required=bool(source.painted&&source.painted->paint_sampling_domain());
+    view->retain_paint_sampling=uv_paint_retention_requested_locked();
     view->committing = uv_accept_pending_;
     view->solving = uv_solving_;
     if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
@@ -1137,6 +1140,7 @@ void Document::queue_uv_locked(std::shared_ptr<const Mesh> mesh) {
   job.uv_session = uv_session_;
   job.uv_desktop = desktop_;
   job.uv_keep_normals=uv_retention_requested_locked();
+  job.uv_keep_paint=uv_paint_retention_requested_locked();
   job.work=std::make_shared<AssetWork>();job.work->accepted_scene=true;job.operation_label="UV paint transfer";auto work=job.work;
   std::lock_guard lock(file_mutex_);
   if (files_.size() >= 8)
@@ -2256,7 +2260,7 @@ void Document::control_event_locked(VrControlEvent event) {
         ++uv_session_;
         uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
                     o.painted->resolution());
-        c.value[3]=o.painted->normal_projection()&&o.painted->normal_projection()->version==2?1.f:0.f;
+        c.value[3]=o.painted->paint_sampling_domain()?2.f:o.painted->normal_projection()&&o.painted->normal_projection()->version==2?1.f:0.f;
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();
@@ -2478,7 +2482,7 @@ void Document::control_event_locked(VrControlEvent event) {
         apply_uv_action_locked(UvAction::Move, event.value, event.second);
       else if (event.type == VrControlEventType::UvCommand &&
                event.component >= 0 &&
-               event.component <= int(UvAction::RetainNormals))
+               event.component <= int(UvAction::RetainPaint))
         apply_uv_action_locked(UvAction(event.component), event.value, event.second);
       state_.error.clear();
     } catch (const std::exception &e) {

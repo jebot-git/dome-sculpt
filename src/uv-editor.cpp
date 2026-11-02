@@ -193,6 +193,8 @@ void edit_uv(Document &doc) {
       status.copy_label(
           v->solving ? state->message.c_str()
           : !state->error.empty() ? state->error.c_str()
+          : v->retain_paint_sampling
+              ? "UV layout changes; paint and normal detail keep their existing coordinates."
           : v->retain_normal_sampling
               ? "Original normal detail is kept. Save the native project; glTF/VRM export still needs a sampling conversion."
           : v->valid
@@ -208,10 +210,12 @@ void edit_uv(Document &doc) {
           else
             button->activate();
         if(buttons.size()>14){
-          buttons[14]->value(v->retain_normal_sampling);
-          if(!v->normal_sampling_available||v->normal_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[14]->deactivate();
+          buttons[14]->value(v->retain_normal_sampling&&!v->retain_paint_sampling);
+          if(v->retain_paint_sampling||!v->normal_sampling_available||v->normal_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[14]->deactivate();
           else buttons[14]->activate();
         }
+        if(buttons.size()>15){buttons[15]->value(v->retain_paint_sampling);
+          if(!v->paint_sampling_available||v->paint_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[15]->deactivate();else buttons[15]->activate();}
         if (v->can_undo && !v->committing && !v->solving)
           buttons[4]->activate();
         else
@@ -242,14 +246,15 @@ void edit_uv(Document &doc) {
                             {"Next", UvAction::Next, 0},
                             {"Unwrap", UvAction::Conformal, 0},
                             {"Stitch", UvAction::Stitch, 0},
-                            {"Keep normal detail",UvAction::RetainNormals,0}};
+                            {"Keep normal detail",UvAction::RetainNormals,0},
+                            {"Keep paint detail",UvAction::RetainPaint,0}};
     Fl_Button cancel(width / 2 - 180, height - row + 4, 160, row - 8, "Cancel"),
         apply(width / 2 + 20, height - row + 4, 160, row - 8, "Apply");
     for (size_t i = 0; i < std::size(items); ++i) {
-      int col = i % 6, y = (i / 6) * row;
-      auto b = new Fl_Button(col * width / 6 + 4, y + 4, (i==14?2:1)*width / 6 - 8, row - 8,
+      int col = i==15?4:i%6, y = (i / 6) * row;
+      auto b = new Fl_Button(col * width / 6 + 4, y + 4, (i>=14?2:1)*width / 6 - 8, row - 8,
                              items[i].label);
-      if(i==14)b->type(FL_TOGGLE_BUTTON);
+      if(i>=14)b->type(FL_TOGGLE_BUTTON);
       buttons.push_back(b);
       auto c = std::make_unique<Command>(Command{
           &doc, &canvas, &status, &apply, items[i].action, items[i].value});

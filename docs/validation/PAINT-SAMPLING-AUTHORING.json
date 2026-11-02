@@ -1,0 +1,222 @@
+{
+  "scope": "private explicit native/controller prepared paint+normal UV retention on shared worker; not default/lossless/compact-layout completion",
+  "base": "44380ef +qualified575 lineage",
+  "native": {
+    "log": "artifacts/tests-paint-authoring-native.log",
+    "result": "2/2,17.48s; new63 plus unchanged normal-domain-document"
+  },
+  "gui": {
+    "normal": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Actual native Keep paint detail toggle changes its visible state and actionable status"
+        },
+        {
+          "passed": true,
+          "check": "Keep-detail controls retain native modal parent and universal application identity"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Ctrl+W cancels the choice and preserves all original normal, current-corner RGBA, paint, pose and key sources"
+        },
+        {
+          "passed": true,
+          "check": "Actual native Keep paint plus Scale and Apply saves its independent normal/colour/writable-grid closure"
+        },
+        {
+          "passed": true,
+          "check": "Native retained-paint UV changes preserve every original and current key-frame attribute"
+        },
+        {
+          "passed": true,
+          "check": "Universal Undo restores the exact complete pre-conversion native project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Redo restores exact retained-domain paint, source and detail ownership"
+        },
+        {
+          "passed": true,
+          "check": "Restarted retained domain keeps its required toggle visibly selected and disabled"
+        },
+        {
+          "passed": true,
+          "check": "Reopening and cancelling required retained mode preserves every saved owner exactly"
+        },
+        {
+          "passed": true,
+          "check": "Native retained-paint workflow leaves the application and desktop session running"
+        }
+      ],
+      "failed": 0
+    },
+    "compact": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Actual native Keep paint detail toggle changes its visible state and actionable status"
+        },
+        {
+          "passed": true,
+          "check": "Keep-detail controls retain native modal parent and universal application identity"
+        },
+        {
+          "passed": true,
+          "check": "Native FLTK Ctrl+W cancels the choice and preserves all original normal, current-corner RGBA, paint, pose and key sources"
+        },
+        {
+          "passed": true,
+          "check": "Actual native Keep paint plus Scale and Apply saves its independent normal/colour/writable-grid closure"
+        },
+        {
+          "passed": true,
+          "check": "Native retained-paint UV changes preserve every original and current key-frame attribute"
+        },
+        {
+          "passed": true,
+          "check": "Universal Undo restores the exact complete pre-conversion native project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Redo restores exact retained-domain paint, source and detail ownership"
+        },
+        {
+          "passed": true,
+          "check": "Restarted retained domain keeps its required toggle visibly selected and disabled"
+        },
+        {
+          "passed": true,
+          "check": "Reopening and cancelling required retained mode preserves every saved owner exactly"
+        },
+        {
+          "passed": true,
+          "check": "Native retained-paint workflow leaves the application and desktop session running"
+        }
+      ],
+      "failed": 0
+    },
+    "logs": [
+      "artifacts/tests-paint-native-menu.log",
+      "artifacts/tests-paint-native-menu-compact.log"
+    ],
+    "platform": "isolated actual FLTK/DBusMenu Xvfb; not DomeD Wayland",
+    "save_ack": "actual atomic file replacement",
+    "screenshots_visually_inspected": [
+      "artifacts/paint-sampling-menu-compact/selected.png"
+    ]
+  },
+  "openxr": {
+    "log": "artifacts/tests-paint-xr.log",
+    "report": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "accept: actual loader client closes normally and drains the ordered native Save"
+        },
+        {
+          "passed": true,
+          "check": "accept: requested software device rendered actual OpenXR swapchains"
+        },
+        {
+          "passed": true,
+          "check": "accept: stereo image acquire, wait and release ownership remains balanced"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual stereo images contain the shared interactive UV palette"
+        },
+        {
+          "passed": true,
+          "check": "accept: original native project bytes remain untouched"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual controller Keep paint ray, Scale axes and Confirm install independent paint/colour/normal ownership"
+        },
+        {
+          "passed": true,
+          "check": "accept: all original and current normal/key frame attributes survive controller authoring"
+        },
+        {
+          "passed": true,
+          "check": "accept: the real accepted UV workspace changed its chart rather than saving a no-op"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual loader client closes normally and drains the ordered native Save"
+        },
+        {
+          "passed": true,
+          "check": "cancel: requested software device rendered actual OpenXR swapchains"
+        },
+        {
+          "passed": true,
+          "check": "cancel: stereo image acquire, wait and release ownership remains balanced"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual stereo images contain the shared interactive UV palette"
+        },
+        {
+          "passed": true,
+          "check": "cancel: original native project bytes remain untouched"
+        },
+        {
+          "passed": true,
+          "check": "cancel: controller Cancel or actual session focus loss discards the complete draft and Keep-detail choice"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual loader client closes normally and drains the ordered native Save"
+        },
+        {
+          "passed": true,
+          "check": "focus: requested software device rendered actual OpenXR swapchains"
+        },
+        {
+          "passed": true,
+          "check": "focus: stereo image acquire, wait and release ownership remains balanced"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual stereo images contain the shared interactive UV palette"
+        },
+        {
+          "passed": true,
+          "check": "focus: original native project bytes remain untouched"
+        },
+        {
+          "passed": true,
+          "check": "focus: controller Cancel or actual session focus loss discards the complete draft and Keep-detail choice"
+        }
+      ],
+      "failed": 0,
+      "synthetic_tracking": true
+    },
+    "result": "20checks,Accept/Cancel/Focus,actual loader+synthetic controllers/softwareGL; no HMD"
+  },
+  "sources": {
+    "CMakeLists.txt": "f7171005b4a44fe8c4621b8b06e156805b584179c67e09fefb57e607b29fa400",
+    "include/dome/document.hpp": "45d78eb1de6f1f785e1945e8513b8b6eda3abc2517fb86957a1c3010cfd22cca",
+    "include/dome/uv.hpp": "b56838939e46211b48d15fd2f90baaa0bdf30717a2794234345f04f74db1a0fa",
+    "src/document-uv-solve.cpp": "273b2a590a64eca774859e6fe9be43ee55048d985b59db1851c427770faf43d3",
+    "src/document.cpp": "9ccc42adcd24d7dfa9679f0c16ff8d2e34c459932025bb07f56ac991f817019d",
+    "src/input.cpp": "2083e318d504a4ec1d5abf5b72e799cd58fb2e717ea57e385e8179c42f1d7edf",
+    "src/palette.cpp": "aa916ebe82c85866a2b53e32baa7ceae60af1277f71e983a175e041d43dfbd0b",
+    "src/uv-editor.cpp": "dc03704d9e4d173c07d2a6893a10d940058e239806a336de5925a3c1d39c7d94",
+    "tests/paint-sampling-document.cpp": "c8a9d5b57e402e17cf4323216ea34d96ba51f30ce4875275ec338db8f479924d",
+    "tests/paint-sampling-menu.py": "89492da27117299a70d612adcb51f2fa95d121ac10e46bd73929e308cbd735de",
+    "tests/paint-sampling-xr.py": "37085a5a7b5e73dd34c09f1892add6935e018efa44a9d320f51fc0ac3be6f9fe",
+    "tests/xr_runtime.cpp": "007459299064b7926e236b97af4be2d9f035309139530d2ed9412d5a9452a6d6"
+  },
+  "binaries": {
+    "build/dome-sculpt": "3a4fd1bda137d580dbed019c4d84c884c1135d7e67d627046da6389eeeaf51b2",
+    "build/libdome-sculpt-core.a": "59c2869ee42bdd234b5d8f4a690e37f1bd495a5abc98a93ee1be71722955cd69",
+    "build/libdome-sculpt-render.a": "37ac70b34b19f3a70f92945f785b844ff5bcc2eb2681c4ba9e2b4e2cb80e5116",
+    "build/dome-sculpt-paint-sampling-document-test": "4d2ff59162a664f31ebb7e27b4b556f771b673a44e390eb8af66d8285b226dac",
+    "build/libdome-sculpt-test-runtime.so": "5c2b12d01dbed43bb8708f410e9709dc998fc4d50bca0acbd4e397f2ae060e28"
+  },
+  "whole_source_san": "pending after final product fixes",
+  "allocation_sweep": "pending"
+}

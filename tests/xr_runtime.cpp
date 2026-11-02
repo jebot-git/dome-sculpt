@@ -1124,7 +1124,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if (const auto mode=getenv("DOME_XR_FIXTURE_NORMAL_DOMAIN");mode && s->action &&
       s->action->name=="aim_pose" && right(s->hand) && (frame==15||frame==18||frame==26)) {
     const float x=frame==15?55:frame==18?178:std::string_view(mode)=="cancel"?170:470;
-    const float y=frame==15?270:frame==18?85:609;
+    const float y=frame==15?(getenv("DOME_XR_FIXTURE_PAINT_DOMAIN")?322:270):frame==18?85:609;
     p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
   }
   if (auto mode = voxel_mode(); !mode.empty() && s->action &&
