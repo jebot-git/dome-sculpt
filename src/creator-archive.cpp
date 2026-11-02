@@ -302,6 +302,9 @@ CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const Pa
     options.max_file_bytes=std::min(options.max_file_bytes,l.max_asset_bytes);
     options.cancelled=[a=l.cancelled,b=options.cancelled]{return (a&&a())||(b&&b());};
     options.allow_legacy_vrm_skin_hint=entry->json.contains("extensions")&&entry->json.at("extensions").contains("VRM");
+    options.allow_vrm_metadata =
+        entry->json.contains("extensions") &&
+        entry->json.at("extensions").contains("VRMC_vrm");
     model->asset=std::make_shared<const ImportedAsset>(import_glb(*model->original_bytes,options,ImportMode::PreserveGltf));
     auto decoded=std::make_shared<std::vector<std::shared_ptr<const Image>>>();
     for(auto &id:value.at("images")){auto index=integer(id,UINT32_MAX);entry->image_ids.push_back(index);decoded->push_back(images.at(index));}

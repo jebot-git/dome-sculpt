@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/import.hpp"
+#include "dome/mtoon.hpp"
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
 #include <cctype>
@@ -758,9 +759,55 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
     throw std::runtime_error("Cannot parse glTF/GLB");
   std::unique_ptr<cgltf_data, decltype(&cgltf_free)> data(raw, cgltf_free);
   auto &d = *data;
-  if (d.extensions_required_count)
-    throw std::runtime_error(
-        "Required glTF extensions need an explicit supported import path");
+  if (d.extensions_required_count) {
+    if (!o.allow_vrm_metadata || o.mode != ImportMode::PreserveGltf)
+      throw std::runtime_error(
+          "Required glTF extensions need an explicit supported import path");
+    // A permission flag alone does not establish an adapter. Authenticate the
+    // immutable captured JSON and every typed MToon material before admitting
+    // these two exact required tags; unknown requirements remain an error.
+    if (d.json_size > 16 * 1024 * 1024 || d.json_size > SIZE_MAX / 6)
+      throw std::length_error("VRM required metadata exceeds source bounds");
+    b.take(d.json_size * 6);
+    size_t visits = 0;
+    auto source = nlohmann::json::parse(
+        d.json, d.json + d.json_size,
+        [&](int depth, nlohmann::json::parse_event_t, const nlohmann::json &) {
+          if (depth > 64 || ++visits > o.max_metadata_visits)
+            throw std::length_error(
+                "VRM required metadata exceeds visit bounds");
+          if ((visits & 4095) == 0)
+            stop(o);
+          return true;
+        });
+    const auto &extensions = source.at("extensions");
+    if (!extensions.is_object() || extensions.contains("VRM") ||
+        !extensions.contains("VRMC_vrm") ||
+        !extensions.at("VRMC_vrm").at("specVersion").is_string() ||
+        extensions.at("VRMC_vrm")
+                .at("specVersion")
+                .get_ref<const std::string &>() != "1.0")
+      throw std::invalid_argument(
+          "Required VRM metadata requires exact VRM1.0 source authority");
+    bool typed = false;
+    if (source.contains("materials"))
+      for (const auto &material : source.at("materials")) {
+        stop(o);
+        if (material.contains("extensions") &&
+            material.at("extensions").contains("VRMC_materials_mtoon")) {
+          (void)MToonMaterial::from_vrm1(material, d.textures_count);
+          typed = true;
+        }
+      }
+    for (size_t i = 0; i < d.extensions_required_count; ++i) {
+      const std::string_view required = d.extensions_required[i];
+      if (required != "VRMC_vrm" &&
+          !(required == "VRMC_materials_mtoon" && typed))
+        throw std::runtime_error(
+            "Required glTF extension has no authenticated VRM adapter: " +
+            std::string(required));
+    }
+  }
   if (d.nodes_count > 100000 || d.meshes_count > 65536 ||
       d.skins_count > 65536 || d.scenes_count > 65536 ||
       d.animations_count > 65536 || d.materials_count > 65536 ||

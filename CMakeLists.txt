@@ -62,7 +62,7 @@ target_include_directories(dome-sculpt-json INTERFACE ${CMAKE_CURRENT_SOURCE_DIR
 target_link_libraries(dome-sculpt-polygon PUBLIC dome-sculpt-json)
 install(FILES third_party/nlohmann/LICENSE.MIT third_party/nlohmann/LICENSE.MIT.backport
   DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/dome-sculpt/nlohmann_json)
-add_library(dome-sculpt-core src/volume.cpp src/volume-raycast.cpp src/sculpt-mask.cpp src/sculpt-resolution.cpp src/procedural-sculpt.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/tangents.cpp src/bake-authoring.cpp src/document-baking.cpp src/document-shapes.cpp src/creator-archive.cpp src/paint.cpp src/projection.cpp src/source-maps.cpp src/color-preparation.cpp src/material-bindings.cpp src/normal-frames.cpp src/normal-bake-frames.cpp src/normal-preparation.cpp src/shapekey-authoring.cpp src/source-uv-bake.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/source-morph.cpp src/vrm.cpp src/input.cpp src/document.cpp src/document-interaction.cpp src/document-uv-solve.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/vroid-groom.cpp src/deformation.cpp src/rig-edit.cpp src/weight-edit.cpp src/weight-authoring.cpp src/material-visibility.cpp src/skin-authoring.cpp src/document-skin.cpp src/uv-solve.cpp src/import.cpp src/import-authoring.cpp src/import-options.cpp src/import-browser.cpp src/document-import.cpp src/import-image.cpp src/import-jpeg.c src/import-source.cpp src/import-native.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
+add_library(dome-sculpt-core src/volume.cpp src/volume-raycast.cpp src/sculpt-mask.cpp src/sculpt-resolution.cpp src/procedural-sculpt.cpp src/scene.cpp src/groups.cpp src/creation.cpp src/mesh-authoring.cpp src/tangents.cpp src/bake-authoring.cpp src/document-baking.cpp src/document-shapes.cpp src/creator-archive.cpp src/paint.cpp src/projection.cpp src/source-maps.cpp src/color-preparation.cpp src/material-bindings.cpp src/normal-frames.cpp src/normal-bake-frames.cpp src/normal-preparation.cpp src/shapekey-authoring.cpp src/source-uv-bake.cpp src/mesh.cpp src/atlas.cpp src/uv.cpp src/export.cpp src/source-morph.cpp src/vrm.cpp src/input.cpp src/document.cpp src/document-interaction.cpp src/document-uv-solve.cpp src/document-recovery.cpp src/document-assets.cpp src/recovery.cpp src/rig.cpp src/avatar.cpp src/humanoid-creator.cpp src/vroid-creator.cpp src/vroid-groom.cpp src/deformation.cpp src/rig-edit.cpp src/weight-edit.cpp src/weight-authoring.cpp src/material-visibility.cpp src/skin-authoring.cpp src/document-skin.cpp src/uv-solve.cpp src/import.cpp src/import-authoring.cpp src/vrm-import.cpp src/import-options.cpp src/import-browser.cpp src/document-import.cpp src/import-image.cpp src/import-jpeg.c src/import-source.cpp src/import-native.cpp src/mesh-processing.cpp src/retopo.cpp src/remesh.cpp src/bake.cpp src/mtoon.cpp third_party/openbrush/navigation.cpp third_party/openbrush/controller-profiles.cpp ${compute_source})
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/document-cut.cpp src/document-worker-errors.cpp)
@@ -269,6 +269,15 @@ if(BUILD_TESTING)
   target_include_directories(dome-sculpt-import-default-test PRIVATE src)
   target_link_libraries(dome-sculpt-import-default-test PRIVATE dome-sculpt-core)
   add_test(NAME import-default-material COMMAND dome-sculpt-import-default-test)
+  add_executable(dome-sculpt-vrm-import-test tests/vrm-import.cpp)
+  target_link_libraries(dome-sculpt-vrm-import-test PRIVATE dome-sculpt-core)
+  target_compile_definitions(dome-sculpt-vrm-import-test PRIVATE
+    DOME_VRM_TEST_SOURCE="${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm")
+  target_link_options(dome-sculpt-vrm-import-test PRIVATE -Wl,--wrap=read)
+  add_test(NAME generic-vrm-import COMMAND dome-sculpt-vrm-import-test
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
+  set_tests_properties(generic-vrm-import PROPERTIES TIMEOUT 180)
   add_test(NAME import-default-document COMMAND dome-sculpt-import-source-chain-document-test)
   set_tests_properties(import-default-document PROPERTIES
     ENVIRONMENT "DOME_IMPORT_DEFAULT_SOURCE=1" TIMEOUT 45)
@@ -428,6 +437,14 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR)
     target_include_directories(dome-sculpt-appearance-test PRIVATE third_party/desktop)
     target_link_libraries(dome-sculpt-appearance-test PRIVATE dome-sculpt-core PkgConfig::RENDERFONTS PkgConfig::NATIVEGL)
     add_test(NAME session-appearance COMMAND dome-sculpt-appearance-test)
+    add_executable(dome-sculpt-vrm-import-render-test tests/vrm-import-render.cpp)
+    target_include_directories(dome-sculpt-vrm-import-render-test PRIVATE third_party/cgltf)
+    target_link_libraries(dome-sculpt-vrm-import-render-test PRIVATE dome-sculpt-render)
+    add_test(NAME generic-vrm-import-render COMMAND dome-sculpt-vrm-import-render-test
+      ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm
+      ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-male.vrm)
+    set_tests_properties(generic-vrm-import-render PROPERTIES
+      ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 90)
     add_executable(dome-sculpt-import-skin-render-test tests/import-skin-render.cpp)
     target_include_directories(dome-sculpt-import-skin-render-test PRIVATE third_party/cgltf)
     target_link_libraries(dome-sculpt-import-skin-render-test PRIVATE dome-sculpt-render)
