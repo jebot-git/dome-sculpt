@@ -55,6 +55,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
+  for(const auto &object:input_objects)if(object.paint_sampling_attachment||!object.paint_corner_coordinates.empty())
+    throw std::invalid_argument("Retained writable paint export requires its actual owning coordinate compiler");
   GltfDocument result;
   const auto &objects=input_objects;
   if (objects.empty() || objects.size()>256)

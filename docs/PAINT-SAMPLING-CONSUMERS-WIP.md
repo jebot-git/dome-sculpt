@@ -1,0 +1,13 @@
+# Scene24 paint sampling consumer work
+
+This isolated consumer candidate is not yet qualified. It extends frozen Scene24 codec source915ee5a. The first complete Release build is running; no graphical success, export compiler, GUI/controller or whole-source sanitizer result is claimed here.
+
+ObjectSurface carries the sealed immutable paint attachment and explicitly ordered logical REST triangle-corner coordinates. The Document worker refines the existing complete normal-frame vertex key by exact paint-coordinate bits, preserving source, skin/morph and normal identities. Snapshot paint_coordinates is explicitly per packed vertex; the range paint_winding_reversed flag records an actual EBO corner1/2 swap, independently of reflected front-face culling. It is written for every reflected packed range, including legacy objects. Raw posed/world queries retain logical triangle order and leave that flag false.
+
+MaterialSurfaceQuery preserves existing three/four argument wrappers and adds named corner/vertex coordinate tags. The renderer reserves attribute12 for independent paint coordinates, checks thirteen available attributes only for the new feature, authenticates ordered corners on new geometry, and keeps authoredUV0 and retained normal sampling distinct. Legacy vertices and upload bytes are unchanged when unused. Unsupported typed material and current-domain export paths remain explicitly guarded.
+
+The new graphical fixture uses the genuine half-width/partial Bake case that failed the old same-grid resampling approach: separate seam variants, Opaque/Mask/Blend, three poses and morph weights0/.35/1 after a fractional.7 island scale and90-degree rotation. It retains the strict before/current2 and independent original-GLB3 pixel bounds. It is not a proof of current-domain export, and no result is claimed until executed.
+
+The exact private helper src/export-corner-coordinates.hpp and its30-check fixture were copied from qualified peer checkpoint575c952190bc86c7bef213a81b9535528e2f0f64. It is a layout refinement helper, not geometry/source authority. Its upstream standalone Release/SAN and allocation evidence does not qualify this new consumer integration.
+
+Required follow-up includes range/material attachment association negatives, explicit winding and welded-corner picking tests, actual Scene24 GLB coordinate compilation preserving all existing source sets, all-channel postUV editing, guarded Document UV acceptance/orderedSave/Cancel/Undo, native/controller/GUI/XR and fresh complete ABI sanitizer proof. Compact current-layout texture compilation remains separate required work; an extra emitted coordinate set alone does not satisfy it.

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/paint-sampling.hpp"
 #include "affine-surface.hpp"
 #include "document-held-affine.hpp"
 #include "dome/polygon-scene.hpp"
@@ -123,6 +124,7 @@ void Document::native_loop(){
       size_t budget=4'000'000;if(!session->shape_target)for(const auto &other:working.objects())if(other.id!=o.id){auto used=std::max(other.volume->stored_samples(),other.volume->voxels().size());if(used>budget)throw std::length_error("Scene sculpt storage budget exceeded");budget-=used;}
       std::unique_ptr<MaterialSurfaceQuery> query;
       std::vector<std::array<float,4>> query_colors;
+      std::vector<std::array<float,2>> query_paint;
       std::unique_ptr<ShapeSculptDraft> shape;
       std::shared_ptr<const PaintedMesh::Evaluation> evaluation;
       if(session->shape_target){
@@ -144,6 +146,11 @@ void Document::native_loop(){
         if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
         SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};
         range.reflected=reflected;
+        if(o.painted->paint_sampling_domain()) {
+          range.paint_sampling_attachment=o.painted->paint_sampling_attachment();
+          PaintSamplingLimits limits;limits.cancelled=cancelled;
+          query_paint=o.painted->paint_sampling_domain()->corner_coordinates(o.painted->mesh(),limits);
+        }
         PolygonColorSurface current_colors;
         if(o.polygon && o.polygon->active && o.polygon->colors) {
           current_colors.topology=std::shared_ptr<const PolygonMesh>(o.polygon,&o.polygon->topology);
@@ -152,7 +159,7 @@ void Document::native_loop(){
         query_colors=detail::current_vertex_colors(o.painted->mesh(),
             current_colors.field?&current_colors:nullptr,o.appearance.get(),
             o.material_bindings.get(),range.textures.get(),cancelled);
-        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);if(!shape)o.painted->begin_stroke();
+        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors,PaintCornerCoordinates{query_paint});if(!shape)o.painted->begin_stroke();
       }else o.volume->begin_stroke();
       std::optional<Vec3> previous;size_t processed=0;auto shown=std::chrono::steady_clock::now();
       for(;;){

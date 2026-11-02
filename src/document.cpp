@@ -18,6 +18,8 @@
 #include "dome/material-visibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
+#include "export-corner-coordinates.hpp"
+#include "dome/paint-sampling.hpp"
 #include "current-colors.hpp"
 #include "prepared-color-state.hpp"
 #include "sculpt-ui-values.hpp"
@@ -1472,6 +1474,8 @@ void Document::mesh_loop() {
   struct FrameLayoutCache {
     std::weak_ptr<const Mesh> mesh;
     std::weak_ptr<const NormalFrameSet> frames;
+    std::weak_ptr<const PaintSamplingAttachment> paint;
+    std::shared_ptr<const std::vector<std::array<float,2>>> paint_coordinates;
     std::shared_ptr<const detail::NormalFrameLayout> layout;
     size_t bytes=0;
     bool dynamic_canonical=false;
@@ -1545,7 +1549,7 @@ void Document::mesh_loop() {
         geometry_detail::Dependency dep;dep.object=o.id;
         if(job->scene.has_affine_placement(o.id))dep.affine_world=job->scene.world_matrix(o.id);
         else dep.world=job->scene.world_transform(o.id);
-        if(o.mesh_active){dep.paint=o.painted->mesh_owner();if(o.painted->source_maps())dep.source_uv1=o.painted->source_maps()->uv1;}
+        if(o.mesh_active){dep.paint=o.painted->mesh_owner();dep.paint_sampling_attachment=o.painted->paint_sampling_attachment();if(o.painted->source_maps())dep.source_uv1=o.painted->source_maps()->uv1;}
         else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
         dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;dep.polygon=o.polygon;
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
@@ -1566,6 +1570,9 @@ void Document::mesh_loop() {
       std::unordered_set<uint64_t> frame_objects;
       for (auto &o : objects) {
         auto colors=detail::current_vertex_colors(o,cancelled);
+        const auto paint_attachment=o.paint_sampling_attachment;
+        if(paint_attachment&&snapshot->paint_coordinates.empty())snapshot->paint_coordinates=snapshot->mesh.uv;
+        std::shared_ptr<const std::vector<std::array<float,2>>> paint_coordinates;
         const auto normal_domain=o.textures&&o.textures->normal_projection?o.textures->normal_projection->sampling_domain:nullptr;
         if(normal_domain){
           normal_domain->validate(cancelled);
@@ -1588,24 +1595,46 @@ void Document::mesh_loop() {
         if(retained) {
           detail::normal_frame_current_authority(*o.material_bindings,o.mesh,o.deformation.get(),cancelled);
           if(!(source_role?retained->mtoon:retained->pbr))throw std::invalid_argument("Selected material has no retained source normal frame");
+        }
+        if(retained||paint_attachment) {
           frame_objects.insert(o.id);auto mesh_owner=job->scene.object(o.id).painted->mesh_owner();
           auto old=frame_layouts.find(o.id);
-          if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained && old->second.dynamic_canonical==dynamic_canonical)retained_layout=old->second.layout;
-          else {
-            if(dynamic_canonical) {
+          if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained && old->second.paint.lock()==paint_attachment && old->second.dynamic_canonical==dynamic_canonical) {
+            retained_layout=old->second.layout;paint_coordinates=old->second.paint_coordinates;
+          } else {
+            if(dynamic_canonical||(!retained&&canonical)) {
               auto layout=std::make_shared<detail::NormalFrameLayout>();
               layout->vertices=o.mesh.indices;
               layout->corners.resize(o.mesh.indices.size());
               std::iota(layout->corners.begin(),layout->corners.end(),0u);
               layout->indices=layout->corners;
               retained_layout=std::move(layout);
-            } else retained_layout=std::make_shared<const detail::NormalFrameLayout>(detail::normal_frame_layout(o.mesh,*retained,cancelled));
-            size_t bytes=(retained_layout->vertices.size()+retained_layout->corners.size()+retained_layout->indices.size())*sizeof(uint32_t);
-            if(bytes>frame_layout_limit)throw std::length_error("Immutable normal frame layout exceeds cache budget");
+            } else if(retained) retained_layout=std::make_shared<const detail::NormalFrameLayout>(detail::normal_frame_layout(o.mesh,*retained,cancelled));
+            else {
+              auto layout=std::make_shared<detail::NormalFrameLayout>();
+              std::vector<uint32_t> map(o.mesh.positions.size(),UINT32_MAX);
+              layout->indices.reserve(o.mesh.indices.size());
+              for(size_t c=0;c<o.mesh.indices.size();++c) {
+                if((c&1023)==0&&cancelled())throw std::runtime_error("Stale paint coordinate layout");
+                auto v=o.mesh.indices[c];auto &packed=map.at(v);
+                if(packed==UINT32_MAX){packed=uint32_t(layout->vertices.size());layout->vertices.push_back(v);layout->corners.push_back(uint32_t(c));}
+                layout->indices.push_back(packed);
+              }
+              retained_layout=std::move(layout);
+            }
+            if(paint_attachment) {
+              auto split=detail::split_frame_corner_coordinates(o.mesh,*retained_layout,o.paint_corner_coordinates,cancelled);
+              retained_layout=std::make_shared<const detail::NormalFrameLayout>(std::move(split.frames));
+              paint_coordinates=std::make_shared<const std::vector<std::array<float,2>>>(std::move(split.coordinates));
+            }
+            size_t bytes=(retained_layout->vertices.size()+retained_layout->corners.size()+retained_layout->indices.size())*sizeof(uint32_t)+(paint_coordinates?paint_coordinates->size()*sizeof(std::array<float,2>):0);
+            if(bytes>frame_layout_limit)throw std::length_error("Immutable surface layout exceeds cache budget");
             if(old!=frame_layouts.end()){frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
             while(!frame_layouts.empty() && (frame_layouts.size()>=256 || bytes>frame_layout_limit-frame_layout_bytes)){auto expired=frame_layouts.begin();frame_layout_bytes-=expired->second.bytes;frame_layouts.erase(expired);}
-            frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,retained_layout,bytes,dynamic_canonical});frame_layout_bytes+=bytes;++frame_layout_builds;
+            frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,paint_attachment,paint_coordinates,retained_layout,bytes,dynamic_canonical});frame_layout_bytes+=bytes;++frame_layout_builds;
           }
+        }
+        if(retained) {
           retained_pose=detail::normal_frame_preview(*retained,*retained_layout,o.deformation.get(),cancelled,(1u<<source_role)|(canonical?4u:0u));
           if(snapshot->source_normals.empty()) {
             snapshot->source_normals=snapshot->mesh.normals;snapshot->canonical_normals=snapshot->mesh.normals;
@@ -1642,6 +1671,7 @@ void Document::mesh_loop() {
           o.textures->source_maps->validate_surface(o.mesh);packed_uv1=std::make_shared<std::vector<std::array<float,2>>>();packed_uv1->reserve(packed_vertices);
         }
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
+          if(paint_attachment||!snapshot->paint_coordinates.empty())snapshot->paint_coordinates.push_back(paint_attachment?paint_coordinates->at(frame_vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex));
           if(packed_uv1)packed_uv1->push_back(o.textures->source_maps->uv1->at(vertex));
           if(normal_domain||!snapshot->normal_coordinates.empty()){
             const auto uv=normal_domain?normal_domain->coordinates.at(vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex);
@@ -1679,11 +1709,11 @@ void Document::mesh_loop() {
           }
         };
         std::shared_ptr<const CreatorAppearance> appearance = o.appearance;
-        if(retained) {
+        if(retained_layout) {
           std::shared_ptr<CreatorAppearance> expanded;
           if(o.appearance){expanded=std::make_shared<CreatorAppearance>(*o.appearance);expanded->source_vertices.clear();expanded->source_vertices.reserve(retained_layout->vertices.size());}
           for(size_t v=0;v<retained_layout->vertices.size();++v) {
-            auto vertex=retained_layout->vertices[v];auto tangent=canonical?retained_pose->tangents[2].at(v):Tangent{1,0,0,1};
+            auto vertex=retained_layout->vertices[v];auto tangent=canonical?(retained?retained_pose->tangents[2].at(v):frames.at(retained_layout->corners[v])):Tangent{1,0,0,1};
             append(vertex,tangent,v);if(expanded)expanded->source_vertices.push_back(o.appearance->source_vertices.at(vertex));
           }
           for(auto v:retained_layout->indices)snapshot->mesh.indices.push_back(uint32_t(offset+v));
@@ -1715,13 +1745,15 @@ void Document::mesh_loop() {
         auto textures=o.textures;
         if(packed_uv1){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);maps->uv1=std::move(packed_uv1);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
+        snapshot->ranges.back().paint_sampling_attachment=paint_attachment;
+        snapshot->ranges.back().paint_winding_reversed=reflected;
         if(frame)snapshot->ranges.back().affine_world=frame->world();
       }
-      for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || it->second.frames.expired()){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
+      for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || (it->second.frames.expired()&&it->second.paint.expired())){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
       const bool has_polygon_colors=std::any_of(objects.begin(),objects.end(),[](const ObjectSurface &o){return bool(o.polygon_colors);});
-      if ((has_polygon_colors || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
-        snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors);
+      if ((has_polygon_colors || !snapshot->paint_coordinates.empty() || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
+        snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates});
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       std::lock_guard lock(mesh_mutex_);
       if (!cancelled()) {

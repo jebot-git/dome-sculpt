@@ -1034,7 +1034,12 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
     if (o.visible) {
-      if(o.mesh_active&&o.painted&&o.painted->paint_sampling_domain())throw std::invalid_argument("Retained writable paint requires its actual render/export coordinate adapter");
+      if(o.mesh_active&&o.painted&&o.painted->paint_sampling_domain()){
+        if(!preview)throw std::invalid_argument("Retained writable paint requires its actual export coordinate adapter");
+        if(!o.painted->valid_paint_sampling_attachment())throw std::invalid_argument("Retained paint lost its exact REST geometry attachment");
+        if(!o.material_bindings||o.material_bindings->has_mtoon)throw std::invalid_argument("Retained paint requires its own supported current-field material");
+        o.material_bindings->validate(false);detail::source_paint_pairing(o.painted.get(),o.material_bindings.get(),o.appearance.get(),false);
+      }
       if(o.polygon && o.polygon->active && o.polygon->topology.faces().empty())continue;
       auto mesh = o.mesh_active ? o.painted->mesh()
                                 : mesher ? mesher(o.id, *o.volume) : surface_mesh(*o.volume, cancelled);
@@ -1050,6 +1055,14 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
            o.mesh_active ? o.material_bindings : nullptr,
            source_is_dormant(o)});
       result.back().affine_edit=o.affine_edit;
+      if(o.mesh_active&&o.painted->paint_sampling_domain()){
+        result.back().paint_sampling_attachment=o.painted->paint_sampling_attachment();
+        const auto domain=o.painted->paint_sampling_domain();const auto &basis=*domain->basis();
+        auto &uv=result.back().paint_corner_coordinates;uv.reserve(domain->source_corners().size());size_t c=0;
+        // The factory seal already proves this exact REST mesh. Read the private
+        // immutable correspondence; no repeated mesh/plane replay on publishers.
+        for(auto corner:domain->source_corners()){if((c++&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Retained paint coordinate packing cancelled");uv.push_back(basis.uv.at(basis.indices.at(corner)));}
+      }
       if(o.polygon && o.polygon->active && o.polygon->colors) {
         auto current=std::make_shared<PolygonColorSurface>();
         current->topology=std::shared_ptr<const PolygonMesh>(o.polygon,&o.polygon->topology);
