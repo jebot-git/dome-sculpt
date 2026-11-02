@@ -1843,10 +1843,13 @@ void PaintedMesh::swap_state(PaintedMesh &other) noexcept {
   static_assert(noexcept(swap(revision_,other.revision_)));swap(revision_,other.revision_);
   static_assert(noexcept(swap(editing_,other.editing_)));swap(editing_,other.editing_);
   static_assert(noexcept(swap(before_,other.before_)));swap(before_,other.before_);
+  static_assert(noexcept(swap(before_colors_,other.before_colors_)));swap(before_colors_,other.before_colors_);
   static_assert(noexcept(swap(undo_,other.undo_)));swap(undo_,other.undo_);
   static_assert(noexcept(swap(redo_,other.redo_)));swap(redo_,other.redo_);
   static_assert(noexcept(swap(history_bytes_,other.history_bytes_)));swap(history_bytes_,other.history_bytes_);
   static_assert(noexcept(swap(allocated_tiles_,other.allocated_tiles_)));swap(allocated_tiles_,other.allocated_tiles_);
+  static_assert(noexcept(swap(allocated_color_tiles_,other.allocated_color_tiles_)));swap(allocated_color_tiles_,other.allocated_color_tiles_);
   static_assert(noexcept(swap(before_allocated_tiles_,other.before_allocated_tiles_)));swap(before_allocated_tiles_,other.before_allocated_tiles_);
+  static_assert(noexcept(swap(before_allocated_color_tiles_,other.before_allocated_color_tiles_)));swap(before_allocated_color_tiles_,other.before_allocated_color_tiles_);
 }
 } // namespace dome
