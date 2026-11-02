@@ -16,13 +16,21 @@ validation/DESKTOP-FRAMING.json; no new whole-suite/whole-core-SAN or physical
 headset claim is inferred. Earlier VRM11/atlas12 import proofs and the complete
 avatar screenshot are separately scoped.
 
-Root private artifacts/authoring-adapters-04d at7e36278 merges qualified
+Root private artifacts/authoring-adapters-04d at8d68dc7 now combines qualified
 b0cdeb5 post-UV keys, b186b9e current-color source Bake, a799211 source-space
-VRM0 export and this framing code. It is unqualified; its fresh build is HELD
-until the isolated BakeAdmission fix is ready. The existing Bake path has a
-second fallible publication after job acceptance; merge_contracts is staging its
-POD controls in the existing Transaction on a separate04d child. No rootqueue
-edit overlaps that fix. Do not publish the new Bake union before qualification.
+VRM0 export, framing3c491bf, atomic Bake admission80e21a6 and test-only actual
+avatar integer-UV proofdd2314. Fresh coherent optimized all-target Release
+build54024 and own C/C++core/support/render sanitizer build37641 are running;
+this combined tree is NOT qualified or published. Poll exact live handles;
+never restart from a stale log. No Scene20/21/22 prototype is included.
+
+BakeAdmission80e21a6 removes a second fallible publication after queue acceptance.
+Its old04d negative fails at caller allocation91/110 with an accepted queued job;
+the fixed direct caller passes all90 actual denials and same-controller retries,
+Release3/SAN3. It stages only POD Bake controls inside the existing Transaction,
+with no new Document/FileJob fields or generic callback. Generic input-thread
+publication echo faults remain separately scoped. Preserve the frozen04d
+archive/header tree and all old/fixed proof logs.
 
 Agents continue: Contracts target20/material6/polygon5; Palette retained intrinsic
 normal-domain Scene21/material7/normalentry3 (actual integer-UV avatar key proof
