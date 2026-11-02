@@ -820,7 +820,10 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
         (!getenv("DOME_XR_FIXTURE_SCENE") && frame >= 13 && frame <= 18);
     if(pbr_preview_fixture())stroke=frame==12||frame==26;
     if (getenv("DOME_XR_FIXTURE_PAINT"))
-      stroke = (frame >= 2 && frame <= 5) || (frame == 22);
+      // Frame22 deliberately drops controller tracking in the generic runtime.
+      // Paint after the recovered neutral frame so the real release guard stays
+      // exercised instead of discarding the only blue pressure sample.
+      stroke = (frame >= 2 && frame <= 5) || (frame == 24);
     if (getenv("DOME_XR_FIXTURE_CONTROLS"))
       stroke = frame == 19;
     if (getenv("DOME_XR_FIXTURE_UV"))
