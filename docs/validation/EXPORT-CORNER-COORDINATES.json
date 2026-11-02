@@ -1,0 +1,44 @@
+{
+  "base": "a50eafc7410eba727b262270759df8abdffed618",
+  "status": "Private detached layout foundation; not wired to export or paint authority admission",
+  "sources": {
+    "src/export-corner-coordinates.hpp": "e46de474a01ed263e6c696996973cf77ce6f49cf7499147ff00d76675b2adc6d",
+    "tests/export-corner-coordinates.cpp": "110d4a7efac75923b85bd9bfbcf7f26f4f8086cfec62539cf60ca4b65f5c5cb6",
+    "CMakeLists.txt": "f82dcc5ca60def6e79f6605fba85077e6038bbbbcc56e91d57defc9571a7c9a4"
+  },
+  "tests": {
+    "release_checks": 30,
+    "asan_ubsan_leak_checks": 30,
+    "persistent_allocation_boundaries": 10,
+    "scope": "Both new fixture TUs O3 and O1 ASan/UBSan/leaks against exact unchanged f822 full-owned C/C++ core/support/render archives. New private helper is inline in the newly instrumented test TU; no new public ABI.",
+    "proofs": [
+      "Contradictory per-corner paint coordinates split rather than average",
+      "Exact REST vertex map preserves authored UV0 and original UV1",
+      "Distinct secondary-role target N/T signatures remain split",
+      "Independent anisotropic skin/morph N/T formulas",
+      "Malformed dimensions/ranges/nonfinite/representative negatives",
+      "Work and retained-frame vertex quota negatives",
+      "Early/final cancellation and deterministic persistent-allocation retry"
+    ]
+  },
+  "not_implemented": [
+    "Actual Paint24 owning witness/currentDescriptor validation",
+    "Exporter/render/pick adapter and corner-preserving attribute compilation",
+    "Source24 persistence/recipe composition",
+    "Native more-than-two source UV ownership/reimport"
+  ],
+  "evidence": {
+    "release.log": "da98d5b27a2ee8bacca0c2ed9dc405a025f83db9c146c8d4c6c8e8f3a3d3be9b",
+    "sanitize.log": "da98d5b27a2ee8bacca0c2ed9dc405a025f83db9c146c8d4c6c8e8f3a3d3be9b",
+    "configure.log": "7e8ab1a7ee7793ecd0d586e0e2d1a056f043930bbc884089a17fb70df4fdf404",
+    "registration.log": "bc57824e09d73c9bccc4fd53190f18be55c59fd4b52a89bebdffa9ae8c1318d7",
+    "export-corner-coordinates-build-export-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "export-corner-coordinates-build-sanitize-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "export-corner-coordinates-build-export-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "export-corner-coordinates-build-sanitize-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "binaries": {
+    "export-corner-coordinates-build-export-test": "4b06a86b43f6bc201f3c5e58c038d7e24285d5eb1a3ad6a49ebf7073513e7a74",
+    "export-corner-coordinates-build-sanitize-test": "d57fae5f6dfd8d9c7e0e43ec457ccd81e02355948aef00ecd96c34a7dee45159"
+  }
+}
