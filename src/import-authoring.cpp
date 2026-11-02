@@ -146,6 +146,12 @@ maps(const ImportedAsset &asset, const ImportedMaterial &m,
     for(auto vertex:vertices)domain->push_back(primitive.uv1.at(vertex));
     result->uv1=std::move(domain);
   }
+  for(const auto *view:{&result->color,&result->metal_rough,&result->normal,&result->emission,&result->occlusion})if(view->image&&view->texcoord>=2){
+    const auto set=uint32_t(view->texcoord);if(result->extra_uv_sets.contains(set))continue;
+    const auto &source=primitive.extra_uv_sets.at(set);
+    if(source.size()!=primitive.mesh.positions.size())throw std::invalid_argument("Imported texture requires missing additional UV coordinates");
+    auto domain=std::make_shared<std::vector<std::array<float,2>>>();domain->reserve(vertices.size());for(auto vertex:vertices)domain->push_back(source.at(vertex));result->extra_uv_sets.emplace(set,std::move(domain));
+  }
   result->normal_scale = m.normal_scale;
   result->occlusion_strength = m.occlusion_strength;
   result->validate();
@@ -165,7 +171,7 @@ frames(const ImportedPrimitive &p, const ImportedMaterial &m,
   std::iota(f->source_corners.begin(), f->source_corners.end(), 0);
   const bool tangent = (p.normals_authored && !p.tangents.empty()) || m.normal_texture >= 0;
   if (tangent) {
-    const auto &uv = m.normal_texcoord == 1 ? p.uv1 : p.mesh.uv;
+    const auto &uv = m.normal_texcoord==0 ? p.mesh.uv : m.normal_texcoord==1 ? p.uv1 : p.extra_uv_sets.at(uint32_t(m.normal_texcoord));
     auto original = detail::source_tangent_frames(p, uv, cancelled);
     f->normals = std::move(original.normals);
     f->tangents = std::move(original.base);

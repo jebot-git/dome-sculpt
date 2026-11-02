@@ -2,6 +2,7 @@
 #pragma once
 #include "scene-feature-version.hpp"
 #include "volume-archive.hpp"
+#include "source-uv-archive.hpp"
 #include <nlohmann/json.hpp>
 namespace dome::detail {
 // A Scene12 aggregate preflight runs before any Volume, SurfaceMap, mesh, skin
@@ -37,9 +38,10 @@ struct PolygonSceneBudget {
     add(samples, n, 4'000'000,
         "Scene retained polygon sculpt storage exceeds budget");
   }
-  void paint(const nlohmann::json &p, bool retained=false) {
+  void paint(const nlohmann::json &p, bool retained=false,unsigned version=std::numeric_limits<unsigned>::max()) {
     if (p.is_null())
       return;
+    if(p.contains("source_maps"))add(paint_bytes,source_uv_archive_measure(p.at("source_maps"),version).bytes,256*1024*1024,"Scene retained source UV storage exceeded");
     const auto &r = p.at("resolution");
     if (!r.is_number_unsigned() &&
         (!r.is_number_integer() || r.get<int64_t>() < 0))

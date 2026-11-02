@@ -114,6 +114,8 @@ struct SurfaceRenderer::TextureState {
   std::unordered_map<uint64_t,Toon> toons;
   MToonSourcePacks packed_sources;
   std::vector<std::array<float,2>> uv1;
+  std::array<std::vector<std::array<float,4>>,3> extra_uv;
+  std::unordered_map<uint64_t,std::shared_ptr<const PaintSourceMaps>> source_maps;
   std::unordered_set<uint64_t> weighted;
   std::unordered_set<uint64_t> vertex_alpha;
   std::optional<double> frame_time;
@@ -134,7 +136,7 @@ struct SurfaceRenderer::TextureState {
   static Sampler sampler(const PaintSourceTexture&s){return {s.wrap_s,s.wrap_t,s.min_filter?s.min_filter:GL_LINEAR,s.mag_filter?s.mag_filter:GL_LINEAR};}
   static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
   SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size(),samplers.size(),bytes+packed_sources.bytes(),uploads,packed_sources.bytes(),packed_sources.builds()};}
-  void clear(bool release){packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();weighted.clear();vertex_alpha.clear();}
+  void clear(bool release){packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();for(auto &values:extra_uv)values.clear();source_maps.clear();weighted.clear();vertex_alpha.clear();}
   void prepare(const MeshSnapshot&mesh,bool geometry_changed){
     if(geometry_changed && (!mesh.mesh.positions.empty() || !mesh.mesh.indices.empty()))mesh.mesh.validate();
     const auto count=mesh.mesh.positions.size();
@@ -180,8 +182,25 @@ struct SurfaceRenderer::TextureState {
     std::unordered_set<Sampler,SamplerHash> wanted_samplers;
     std::unordered_map<uint64_t,std::array<PlanSlot,16>> planned;
     std::unordered_map<uint64_t,Toon> next_toons;std::vector<std::array<float,2>> next_uv1;
+    std::array<std::vector<std::array<float,4>>,3> next_extra_uv;
+    std::unordered_map<uint64_t,std::shared_ptr<const PaintSourceMaps>> next_source_maps;
     for(auto &range:mesh.ranges){
       auto maps=range.textures;auto &plan=planned[range.object];
+      if(maps&&maps->source_maps){
+        const auto &owner=maps->source_maps;auto before=source_maps.find(range.object);
+        if(geometry_changed||before==source_maps.end()||before->second!=owner)owner->validate();
+        // The trusted geometry token owns the REST coordinate dependencies.
+        // Worker-expanded arrays may have fresh allocation owners while their
+        // authenticated REST inputs and packed layout remain unchanged.
+        next_source_maps.emplace(range.object,owner);
+        if(geometry_changed)for(const auto &[set,values]:owner->extra_uv_sets){
+          if(range.first_vertex>count||values->size()>count-range.first_vertex)throw std::invalid_argument("Extra source UV domain exceeds packed geometry");
+          for(size_t c=range.first;c<range.first+range.count;++c)if(mesh.mesh.indices.at(c)<range.first_vertex||mesh.mesh.indices.at(c)-range.first_vertex>=values->size())throw std::invalid_argument("Extra source UV index is outside its packed owner");
+          auto &packed=next_extra_uv[(set-2)/2];if(packed.empty())packed.resize(count);
+          const size_t component=((set-2)%2)*2;for(size_t v=0;v<values->size();++v){packed[range.first_vertex+v][component]=values->at(v)[0];packed[range.first_vertex+v][component+1]=values->at(v)[1];}
+        }
+      }
+
       if(maps&&maps->normal_projection&&maps->normal_projection->version==2){
         const auto &domain=*maps->normal_projection->sampling_domain;
         if(mesh.normal_coordinates.size()!=count||range.count!=domain.indices.size())
@@ -199,7 +218,6 @@ struct SurfaceRenderer::TextureState {
       }
       const auto source_uv1=maps&&maps->source_maps?maps->source_maps->uv1:nullptr;
       if(source_uv1&&geometry_changed){
-        maps->source_maps->validate();
         if(range.first_vertex>count||source_uv1->size()>count-range.first_vertex)throw std::invalid_argument("Source UV1 domain exceeds packed geometry");
         for(size_t c=range.first;c<range.first+range.count;++c)if(mesh.mesh.indices.at(c)<range.first_vertex||mesh.mesh.indices.at(c)-range.first_vertex>=source_uv1->size())throw std::invalid_argument("Source UV1 index is outside its packed domain");
         if(next_uv1.empty())next_uv1.resize(count);std::copy(source_uv1->begin(),source_uv1->end(),next_uv1.begin()+range.first_vertex);
@@ -210,11 +228,10 @@ struct SurfaceRenderer::TextureState {
            present(maps->color)||present(maps->metal_rough)||present(maps->emission)||present(maps->normal)||
            present(maps->color_coverage)||present(maps->emission_coverage)||present(maps->baked_normal)||present(maps->baked_coverage)||present(maps->mtoon_normal)||maps->normal_projection)
           throw std::invalid_argument("Raw source preview marker contains derived material payload");
-        maps->source_maps->validate();
       }
       auto slot=[&](int index,std::shared_ptr<const Image> image,const PaintSourceTexture&view,bool srgb){
         if(!image)return;
-        view.validate(source_uv1?2:1);image->validate();Key key{image.get(),srgb};auto sample=sampler(view);
+        view.validate(maps&&maps->source_maps?maps->source_maps->coordinate_count():source_uv1?2:1);image->validate();Key key{image.get(),srgb};auto sample=sampler(view);
         auto &desired=wanted[key];desired.owner=std::move(image);desired.mips|=mipmapped(sample);
         wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true,view.texcoord};
       };
@@ -368,7 +385,7 @@ struct SurfaceRenderer::TextureState {
     packed_sources.prepare(source_packs,bytes,wanted.size(),limits);
     std::unordered_map<uint64_t,Binding> ready;
     for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv,plan[n].coordinate};}
-    bindings=std::move(ready);toons=std::move(next_toons);if(geometry_changed)uv1=std::move(next_uv1);weighted=std::move(next_weighted);
+    bindings=std::move(ready);toons=std::move(next_toons);if(geometry_changed){uv1=std::move(next_uv1);extra_uv=std::move(next_extra_uv);}source_maps=std::move(next_source_maps);weighted=std::move(next_weighted);
   }
 };
 SurfaceRenderer::SurfaceRenderer():SurfaceRenderer(SurfaceTextureLimits{}){}
@@ -381,10 +398,11 @@ void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_
 
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   GLint attributes=0;glGetIntegerv(GL_MAX_VERTEX_ATTRIBS,&attributes);
-  if(attributes<12)throw std::runtime_error("Retained normal sampling requires twelve vertex attribute slots");
+  if(attributes<16)throw std::runtime_error("Source UV rendering requires sixteen vertex attribute slots");
+  GLint varying=0;glGetIntegerv(GL_MAX_VARYING_COMPONENTS,&varying);if(varying<54)throw std::runtime_error("Source UV rendering exceeds available varying components");
   auto vertex=mtoon_renderer_vertex();
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color,normal_coordinates;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
+in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color,normal_coordinates,source_uv23,source_uv45,source_uv67;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -394,7 +412,8 @@ float d=a2/(PI*pow(NH*NH*(a2-1.0)+1.0,2.0));float k=pow(rough+1.0,2.0)/8.0;
 float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F0=mix(vec3(.04),base,metallic);vec3 F=F0+(1.0-F0)*pow(1.0-VH,5.0);
 return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
 vec3 output_srgb(vec3 c){return mix(1.055*pow(max(c,vec3(0)),vec3(1.0/2.4))-.055,12.92*c,lessThanEqual(c,vec3(.0031308)));}
-vec2 source_uv(int slot){if(slot==3&&retained_normal_domain==1)return normal_coordinates.xy;vec2 q=source_coordinates[slot]==1?texcoord1:texcoord;return vec2(dot(uv_x[slot],vec3(q,1)),dot(uv_y[slot],vec3(q,1)));}
+vec2 source_coordinate(int set){if(set==1)return texcoord1;if(set==2)return source_uv23.xy;if(set==3)return source_uv23.zw;if(set==4)return source_uv45.xy;if(set==5)return source_uv45.zw;if(set==6)return source_uv67.xy;if(set==7)return source_uv67.zw;return texcoord;}
+vec2 source_uv(int slot){if(slot==3&&retained_normal_domain==1)return normal_coordinates.xy;vec2 q=source_coordinate(source_coordinates[slot]);return vec2(dot(uv_x[slot],vec3(q,1)),dot(uv_y[slot],vec3(q,1)));}
 vec3 unit(vec3 v){float m=max(max(abs(v.x),abs(v.y)),abs(v.z));return m>1e-20?normalize(v/m):vec3(0,0,1);}
 vec3 source_baked_detail(out float coverage){
 ivec2 size=textureSize(tex3,0);vec2 p=texcoord*vec2(size)-.5;ivec2 base=ivec2(floor(p));vec2 f=fract(p);vec3 sum=vec3(0);coverage=0;
@@ -403,7 +422,7 @@ return coverage>1e-8?sum/coverage:vec3(0,0,1);}
 vec3 surface_normal(){
 vec3 N=unit(source_frame==1?source_n:n);
 if(source_baked_frame==1){vec3 original=N;
-if(original_normal_present==1){vec2 input_uv=original_normal_coordinate==1?texcoord1:texcoord;vec2 q=vec2(dot(original_normal_x,vec3(input_uv,1)),dot(original_normal_y,vec3(input_uv,1)));vec3 encoded=texture(tex5,q).rgb;
+if(original_normal_present==1){vec2 input_uv=source_coordinate(original_normal_coordinate);vec2 q=vec2(dot(original_normal_x,vec3(input_uv,1)),dot(original_normal_y,vec3(input_uv,1)));vec3 encoded=texture(tex5,q).rgb;
 vec3 ts=unit(vec3((encoded.xy*2-1)*normal_scale,encoded.z*2-1));original=unit(unit(source_t)*ts.x+unit(source_b)*ts.y+N*ts.z);}
 float coverage;vec3 detail=source_baked_detail(coverage);vec3 canonical=unit(canonical_t*detail.x+canonical_b*detail.y+canonical_n*detail.z);
 N=unit(mix(original,canonical,coverage));return gl_FrontFacing?N:-N;}
@@ -520,7 +539,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       const size_t normal_offset=render_detail::buffer_sum(color_offset,color_bytes);
       if(!mesh->normal_coordinates.empty()&&mesh->normal_coordinates.size()!=count)throw std::invalid_argument("Retained normal coordinate vertex count differs");
       const size_t normal_bytes=render_detail::buffer_bytes(mesh->normal_coordinates.size(),sizeof(std::array<float,4>));
-      const size_t geometry_bytes=render_detail::buffer_sum(normal_offset,normal_bytes);
+      std::array<size_t,3> extra_offsets{},extra_bytes{};size_t geometry_bytes=render_detail::buffer_sum(normal_offset,normal_bytes);
+      for(size_t block=0;block<3;++block){const auto &values=textures_->extra_uv[block];if(!values.empty()&&values.size()!=count)throw std::invalid_argument("Extra source UV packed count differs");extra_offsets[block]=geometry_bytes;extra_bytes[block]=render_detail::buffer_bytes(values.size(),sizeof(std::array<float,4>));geometry_bytes=render_detail::buffer_sum(geometry_bytes,extra_bytes[block]);}
       const size_t index_bytes=render_detail::buffer_bytes(mesh->mesh.indices.size(),sizeof(uint32_t));
       std::vector<Vertex> vertices;
       vertices.reserve(count);
@@ -530,7 +550,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
           textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],
           mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i]});
       glBindBuffer(GL_ARRAY_BUFFER,vertices_);
-      if(has_frames || color_bytes || normal_bytes) {
+      if(has_frames || color_bytes || normal_bytes || std::any_of(extra_bytes.begin(),extra_bytes.end(),[](auto n){return n!=0;})) {
         // Optional direction block shares the static geometry lifetime without
         // increasing ordinary sculpt vertices or concatenating host buffers.
         std::vector<FrameVertex> frames;if(has_frames)frames.reserve(count);
@@ -544,6 +564,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         if(frame_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(vertex_bytes),GLsizeiptr(frame_bytes),frames.data());
         if(color_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(color_offset),GLsizeiptr(color_bytes),mesh->source_colors.data());
         if(normal_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(normal_offset),GLsizeiptr(normal_bytes),mesh->normal_coordinates.data());
+        for(size_t block=0;block<3;++block)if(extra_bytes[block])glBufferSubData(GL_ARRAY_BUFFER,GLintptr(extra_offsets[block]),GLsizeiptr(extra_bytes[block]),textures_->extra_uv[block].data());
       } else glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes),vertices.data(),GL_STATIC_DRAW);
       check_surface_buffer("Surface vertex buffer upload failed");
       glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),nullptr);glEnableVertexAttribArray(0);
@@ -560,6 +581,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       else glDisableVertexAttribArray(10);
       if(normal_bytes){glVertexAttribPointer(11,4,GL_FLOAT,GL_FALSE,sizeof(std::array<float,4>),reinterpret_cast<void*>(normal_offset));glEnableVertexAttribArray(11);}
       else glDisableVertexAttribArray(11);
+      for(size_t block=0;block<3;++block){if(extra_bytes[block]){glVertexAttribPointer(GLuint(13+block),4,GL_FLOAT,GL_FALSE,sizeof(std::array<float,4>),reinterpret_cast<void*>(extra_offsets[block]));glEnableVertexAttribArray(GLuint(13+block));}else glDisableVertexAttribArray(GLuint(13+block));}
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices_);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(index_bytes),mesh->mesh.indices.data(),GL_STATIC_DRAW);
       check_surface_buffer("Surface index buffer upload failed");

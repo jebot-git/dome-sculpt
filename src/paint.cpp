@@ -2,6 +2,7 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "source-uv-archive.hpp"
 #include "polygon-paint.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/normal-sampling.hpp"
@@ -972,6 +973,7 @@ size_t BakedTextures::storage_bytes() const {
 size_t PaintedMesh::storage_bytes() const {
   size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
   if(source_maps_&&source_maps_->uv1)result+=source_maps_->uv1->size()*sizeof(std::array<float,2>);
+  if(source_maps_)for(const auto &[set,uv]:source_maps_->extra_uv_sets)result+=uv->size()*sizeof(std::array<float,2>);
   if(normal_projection_)result+=normal_projection_->pbr->rgba.size()+normal_projection_->mtoon->rgba.size();
   for (const auto &layer : layers_)
     for (const auto &tile : layer.tiles)
@@ -1255,7 +1257,7 @@ PaintedMesh::composite(const Material &material) const {
 }
 std::shared_ptr<const TextureMaps>
 PaintedMesh::build_composite(const Material &material) const {
-  if(source_maps_&&source_maps_->uses_uv1())throw std::invalid_argument("UV1 source compositing requires explicit source-coordinate preparation");
+  if(source_maps_&&source_maps_->uses_alternate_uv())throw std::invalid_argument(source_maps_->extra_uv_sets.empty()?"UV1 source compositing requires explicit source-coordinate preparation":"Extra source UV compositing requires explicit source-coordinate preparation");
   auto maps = std::make_shared<TextureMaps>();
   maps->source_maps=source_maps_;
   maps->color_projection=color_projection_;
@@ -1494,7 +1496,7 @@ PaintedMesh::reparameterize(Mesh target,
   }
   auto result = snapshot();
   if (same) {
-    if(source_maps_&&source_maps_->uv1&&(target.indices!=mesh().indices||target.positions.size()!=mesh().positions.size()))throw std::invalid_argument("Source UV1 vertex remapping requires explicit source-coordinate preparation");
+    if(source_maps_&&source_maps_->uses_alternate_uv()&&(target.indices!=mesh().indices||target.positions.size()!=mesh().positions.size()))throw std::invalid_argument("Source UV1 vertex remapping requires explicit source-coordinate preparation");
     auto surface = std::make_shared<SurfaceMap>(*surface_);
     surface->mesh = std::move(target);
     result->surface_ = std::move(surface);
@@ -1745,6 +1747,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive,
     bool allow_polygon,const NormalSamplingArchive *domains) {
+  if(j.contains("source_maps"))detail::source_uv_archive_measure(j.at("source_maps"));
   const bool retained_projection=j.contains("normal_projection")&&
     j.at("normal_projection").is_object()&&j.at("normal_projection").contains("domain");
   const bool retained_bake=j.contains("baked")&&j.at("baked").is_object()&&

@@ -28,13 +28,14 @@ return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[t
 }
 inline std::string mtoon_renderer_vertex(){return std::string("#version 330 core\n")+mtoon_renderer_common()+R"GLSL(
 layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;layout(location=5)in vec4 tangent;layout(location=6)in float sculpt_mask;layout(location=7)in vec3 retained_normal;layout(location=8)in vec4 retained_tangent;layout(location=9)in vec3 retained_canonical_normal;
+layout(location=13)in vec4 extra_uv23;layout(location=14)in vec4 extra_uv45;layout(location=15)in vec4 extra_uv67;out vec4 source_uv23,source_uv45,source_uv67;
 layout(location=10)in vec4 retained_color;layout(location=11)in vec4 retained_normal_coordinates;out vec4 normal_coordinates;out vec4 source_color;
 uniform mat4 model,mvp,view_projection;uniform vec3 camera;uniform mat3 normal_model;uniform int affine_motion;uniform float model_hand;
 out vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;out float source_w;out vec2 texcoord,texcoord1;out float weight_value,mask_value;
 void main(){mat3 normal_transform=affine_motion==1?normal_model:mat3(model);vec4 p=model*vec4(position,1);vec3 geometric=dome_mtoon_unit(normal_transform*normal),V=dome_mtoon_unit(camera-p.xyz);
 source_n=dome_mtoon_unit(normal_transform*dome_mtoon_unit(retained_normal));source_t=dome_mtoon_unit(mat3(model)*dome_mtoon_unit(retained_tangent.xyz));source_w=retained_tangent.w*model_hand;source_b=cross(source_n,source_t)*source_w;
 if(prepared_pbr_frame==1)source_b=dome_mtoon_unit(source_b);
-vec3 N=source_frame==1?source_n:geometric;world=p.xyz;cut_position=position;n=geometric;source_color=retained_color;normal_coordinates=retained_normal_coordinates;
+vec3 N=source_frame==1?source_n:geometric;world=p.xyz;cut_position=position;n=geometric;source_color=retained_color;normal_coordinates=retained_normal_coordinates;source_uv23=extra_uv23;source_uv45=extra_uv45;source_uv67=extra_uv67;
 canonical_n=canonical_frame==1?dome_mtoon_unit(normal_transform*dome_mtoon_unit(retained_canonical_normal)):geometric;
 canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(canonical_n,canonical_t)*tangent.w*model_hand;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;mask_value=sculpt_mask;gl_Position=mvp*vec4(position,1);
 if(mt_mode==1&&mt_outline==1&&selected_weight<0){float mask=mt_scalar(8,mt_read(8,mt_uv(8,uv,uv1,N,V,1)));

@@ -2,6 +2,7 @@
 #pragma once
 #include "mesh.hpp"
 #include <filesystem>
+#include <map>
 #include <span>
 #include <string>
 namespace dome {
@@ -104,6 +105,9 @@ struct ImportedPrimitive {
                                      0, 0, 1, 0, 0, 0, 0, 1};
   std::vector<std::array<float, 4>> colors, tangents;
   std::vector<std::array<float, 2>> uv1;
+  // Exact additional authored glTF attribute identities; UV0/1 remain above.
+  // Native resource policy admits TEXCOORD_2 through TEXCOORD_7.
+  std::map<uint32_t,std::vector<std::array<float,2>>> extra_uv_sets;
 };
 struct ImportedAsset {
   ImportMode mode = ImportMode::StaticScene;

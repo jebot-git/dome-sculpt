@@ -1575,7 +1575,7 @@ void Document::mesh_loop() {
         geometry_detail::Dependency dep;dep.object=o.id;
         if(job->scene.has_affine_placement(o.id))dep.affine_world=job->scene.world_matrix(o.id);
         else dep.world=job->scene.world_transform(o.id);
-        if(o.mesh_active){dep.paint=o.painted->mesh_owner();if(o.painted->source_maps())dep.source_uv1=o.painted->source_maps()->uv1;}
+        if(o.mesh_active){dep.paint=o.painted->mesh_owner();if(o.painted->source_maps()){dep.source_uv1=o.painted->source_maps()->uv1;dep.source_extra_uv=o.painted->source_maps()->extra_uv_sets;}}
         else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
         dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;dep.polygon=o.polygon;
         if(auto frames=o.material_bindings?o.material_bindings->normal_frames:nullptr)
@@ -1672,11 +1672,14 @@ void Document::mesh_loop() {
         auto frames = canonical && !retained ? tangent_corners(o.mesh, cancelled)
                                             : std::vector<Tangent>{};
         std::shared_ptr<std::vector<std::array<float,2>>> packed_uv1;
+        std::map<uint32_t,std::shared_ptr<std::vector<std::array<float,2>>>> packed_extra_uv;
+        if(o.textures&&o.textures->source_maps&&!o.textures->source_maps->extra_uv_sets.empty()){o.textures->source_maps->validate_surface(o.mesh);for(const auto &[set,owner]:o.textures->source_maps->extra_uv_sets){auto values=std::make_shared<std::vector<std::array<float,2>>>();values->reserve(packed_vertices);packed_extra_uv.emplace(set,std::move(values));}}
         if(o.textures&&o.textures->source_maps&&o.textures->source_maps->uv1){
           o.textures->source_maps->validate_surface(o.mesh);packed_uv1=std::make_shared<std::vector<std::array<float,2>>>();packed_uv1->reserve(packed_vertices);
         }
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
           if(packed_uv1)packed_uv1->push_back(o.textures->source_maps->uv1->at(vertex));
+          for(auto &[set,values]:packed_extra_uv)values->push_back(o.textures->source_maps->extra_uv_sets.at(set)->at(vertex));
           if(normal_domain||!snapshot->normal_coordinates.empty()){
             const auto uv=normal_domain?normal_domain->coordinates.at(vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex);
             const auto toon=normal_domain&&!normal_domain->mtoon_coordinates.empty()?normal_domain->mtoon_coordinates.at(vertex):uv;
@@ -1747,7 +1750,7 @@ void Document::mesh_loop() {
         // agree with the original local primitive. Rest indices stay untouched.
         if(reflected)for(size_t c=first;c<snapshot->mesh.indices.size();c+=3)std::swap(snapshot->mesh.indices[c+1],snapshot->mesh.indices[c+2]);
         auto textures=o.textures;
-        if(packed_uv1){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);maps->uv1=std::move(packed_uv1);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);textures=std::move(packed);}
+        if(packed_uv1||!packed_extra_uv.empty()){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);if(packed_uv1)maps->uv1=std::move(packed_uv1);for(auto &[set,values]:packed_extra_uv)maps->extra_uv_sets[set]=std::move(values);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
         snapshot->ranges.back().pbr_view=job->pbr_view;
         if(frame)snapshot->ranges.back().affine_world=frame->world();

@@ -41,6 +41,7 @@ struct Visibility {
   PaintSourceTexture color, mask, coverage, pbr;
   const ImportedPrimitive *primitive = nullptr;
   std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv1;
+  std::map<uint32_t,std::shared_ptr<const std::vector<std::array<float,2>>>> owned_extra_uv;
   std::vector<std::array<float,4>> vertex_colors;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
                       std::span<const std::array<float,4>> packed_colors, bool explicit_colors) : range(r) {
@@ -51,6 +52,10 @@ struct Visibility {
       maps->source_maps->validate();owned_uv1=maps->source_maps->uv1;
       if(r.first_vertex>mesh.positions.size()||owned_uv1->size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility UV1 domain exceeds packed geometry");
       for(size_t c=r.first;c<r.first+r.count;++c){auto v=mesh.indices.at(c);if(v<r.first_vertex||v-r.first_vertex>=owned_uv1->size())throw std::invalid_argument("Visibility UV1 packed index is invalid");}
+    }
+    if(maps&&maps->source_maps&&!maps->source_maps->extra_uv_sets.empty()){
+      maps->source_maps->validate();owned_extra_uv=maps->source_maps->extra_uv_sets;
+      for(const auto &[set,values]:owned_extra_uv){if(r.first_vertex>mesh.positions.size()||values->size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility additional UV domain exceeds packed geometry");for(size_t c=r.first;c<r.first+r.count;++c){auto vertex=mesh.indices.at(c);if(vertex<r.first_vertex||vertex-r.first_vertex>=values->size())throw std::invalid_argument("Visibility additional UV packed index is invalid");}}
     }
     const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get());
     if (maps) {
@@ -69,7 +74,7 @@ struct Visibility {
       if(r.material_bindings->has_mtoon&&!r.pbr_view)toon=r.material_bindings->material;
     } else if(!r.pbr_view)toon = retained_mtoon(r.appearance.get());
     if (!toon) {
-      color.validate(owned_uv1?2:1);
+      color.validate(maps&&maps->source_maps?maps->source_maps->coordinate_count():owned_uv1?2:1);
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
       if(explicit_colors) {
         if(!packed_colors.empty()) {
@@ -145,12 +150,14 @@ struct Visibility {
     }
   }
   std::array<float,2> uv(const Mesh &m, uint32_t triangle,
-                         const std::array<float,3> &bary, bool secondary) const {
+                         const std::array<float,3> &bary, int coordinate) const {
     std::array<float,2> result{};
     for (size_t c = 0; c < 3; ++c) {
       auto id = m.indices.at(size_t(triangle) * 3 + c);
       std::array<float,2> q{};
-      if (secondary) {
+      if(coordinate>=2){
+        auto values=owned_extra_uv.find(uint32_t(coordinate));if(values==owned_extra_uv.end()||id<range.first_vertex)throw std::runtime_error("Visibility additional UV has no exact coordinate owner");q=values->second->at(id-range.first_vertex);
+      }else if (coordinate==1) {
         if(id<range.first_vertex)throw std::runtime_error("Visibility UV1 packed range is invalid");
         if(owned_uv1)q=owned_uv1->at(id-range.first_vertex);else{
           if(!primitive)throw std::runtime_error("Visibility UV1 has no coordinate authority");
@@ -189,7 +196,7 @@ struct Visibility {
         if(replacement!=0)opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) * (1-replacement);
       }
     } else {
-      opacity = factor * sample(color, color.texcoord==1?uv(m,triangle,bary,true):primary);
+      opacity = factor * sample(color, color.texcoord!=0?uv(m,triangle,bary,color.texcoord):primary);
       if(!vertex_colors.empty()){float a=0;for(size_t k=0;k<3;++k)a+=bary[k]*vertex_colors.at(m.indices[first+k]-range.first_vertex)[3];opacity*=a;}
     }
     opacity = std::clamp(opacity, 0.f, 1.f);

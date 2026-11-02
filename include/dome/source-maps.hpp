@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <memory>
+#include <map>
 #include <vector>
 #include <span>
 #include <nlohmann/json_fwd.hpp>
@@ -31,7 +32,12 @@ struct PaintSourceMaps {
   // Immutable TEXCOORD_1 in the exact current mesh vertex domain. Presence
   // requires an actual UV1 image view; original asset UVs remain independent.
   std::shared_ptr<const std::vector<std::array<float,2>>> uv1;
+  // Immutable additional coordinates in the same exact current REST vertex
+  // domain. Logical source-set IDs are preserved; GPU locations are separate.
+  std::map<uint32_t,std::shared_ptr<const std::vector<std::array<float,2>>>> extra_uv_sets;
   bool uses_uv1() const noexcept;
+  bool uses_alternate_uv() const noexcept;
+  unsigned coordinate_count() const noexcept;
   void validate_surface(const Mesh &) const;
   void validate(const PaintImageLimits & = {}) const;
   size_t unique_pixels() const;

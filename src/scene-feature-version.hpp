@@ -7,6 +7,7 @@
 #include "dome/normal-preparation.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/source-placement.hpp"
 #include <set>
 #include <nlohmann/json.hpp>
 namespace dome { struct PolygonAuthority; }
@@ -25,14 +26,23 @@ inline unsigned minimum_scene_version(const DeformationState *d) {
              ? 11u
              : 0u;
 }
-inline unsigned minimum_scene_version(const CreatorAppearance *a) {return !a?0u:a->material==0?17u:a->source_receipt?11u:0u;}
+inline unsigned minimum_scene_version(const ImportedAsset *a) {
+  return a && std::any_of(a->primitives.begin(),a->primitives.end(),[](const auto &p){return !p.extra_uv_sets.empty();})?26u:0u;
+}
+inline unsigned minimum_scene_version(const CreatorAppearance *a) {return !a?0u:std::max(minimum_scene_version(a->asset.get()),a->material==0?17u:a->source_receipt?11u:0u);}
+inline unsigned minimum_scene_version(const CreatorSourceModel *a) {return a?minimum_scene_version(a->asset.get()):0u;}
+inline unsigned minimum_scene_version(const SourcePlacementCapsule *p) {
+  unsigned version=p?13u:0u;
+  if(p)for(const auto &g:p->groups)if(g.source_placement)version=std::max(version,minimum_scene_version(g.source_placement->model.get()));
+  return version;
+}
 inline unsigned minimum_appearance_scene_version(const nlohmann::json &a){
   if(a.is_null())return 0;
   const auto &material=a.at("material");
   if(!material.is_number_integer()||(material.is_number_unsigned()?material.get<uint64_t>()>INT32_MAX:material.get<int64_t>()<0||material.get<int64_t>()>INT32_MAX))throw std::runtime_error("Invalid retained appearance material identity");
   return material.get<int64_t>()==0?17u:0u;
 }
-inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
+inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
 
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
@@ -40,6 +50,7 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   unsigned result=binding->uv_origin
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;
+  if(binding->normal_frames)for(const auto &frame:{binding->normal_frames->pbr,binding->normal_frames->mtoon,binding->normal_frames->canonical})if(frame&&frame->generated_uv&&*frame->generated_uv>=2)result=std::max(result,26u);
   if(const auto &preparation=binding->color_preparation)
     result=std::max({result,preparation->polygon_colors?20u:10u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
@@ -70,7 +81,7 @@ inline unsigned source_feature_version(const PolygonAuthority *root,const Polygo
     if(depth>32||active_o.contains(o)||done_a.size()+done_o.size()>512)throw std::invalid_argument("Invalid retained object feature-version graph");
     if(done_o.contains(o))return;
     active_o.insert(o);
-    result=std::max({result,o->placement?13u:0u,o->shape_source?16u:0u,minimum_scene_version(o->paint.get()),minimum_scene_version(o->deformation.get()),minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
+    result=std::max({result,minimum_scene_version(o->placement.get()),o->shape_source?16u:0u,minimum_scene_version(o->paint.get()),minimum_scene_version(o->deformation.get()),minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
     authority(o->polygon.get(),depth+1);origin(o->shape_source.get(),depth+1);active_o.erase(o);done_o.insert(o);
   };
   if(root)authority(root,1);else if(source){result=16;origin(source,1);}return result;

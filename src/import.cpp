@@ -979,7 +979,7 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
   auto texture = [&](const cgltf_texture_view &v) {
     if (!v.texture)
       return -1;
-    if (v.texcoord < 0 || v.texcoord > 1 || v.has_transform)
+    if (v.texcoord < 0 || v.texcoord > 7 || v.has_transform)
       throw std::runtime_error("Unsupported texture coordinate set/transform");
     return int(v.texture - d.textures);
   };
@@ -1197,9 +1197,10 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
                          attr.type == cgltf_attribute_type_weights))
           continue;
         if (attr.type == cgltf_attribute_type_texcoord &&
-            (attr.index == 0 || attr.index == 1)) {
+            (attr.index >= 0 && attr.index <= 7)) {
           auto uv = floats(attr.data, cgltf_type_vec2, count, b);
-          auto &dest = attr.index ? prim.uv1 : prim.mesh.uv;
+          if(attr.index>=2)b.take(sizeof(std::pair<const uint32_t,std::vector<std::array<float,2>>>)+4*sizeof(void*));
+          auto &dest = attr.index==0 ? prim.mesh.uv : attr.index==1 ? prim.uv1 : prim.extra_uv_sets[uint32_t(attr.index)];
           for (size_t k = 0; k < count; k++)
             dest.push_back({uv[k * 2], uv[k * 2 + 1]});
         } else if (attr.type == cgltf_attribute_type_color && attr.index == 0) {
@@ -1248,7 +1249,7 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
             {mat.normal_texture, mat.normal_texcoord},
             {mat.occlusion_texture, mat.occlusion_texcoord},
             {mat.emissive_texture, mat.emissive_texcoord}})
-        if (texture >= 0 && (set ? prim.uv1.empty() : prim.mesh.uv.empty()))
+        if (texture >= 0 && (set==0 ? prim.mesh.uv.empty() : set==1 ? prim.uv1.empty() : !prim.extra_uv_sets.contains(uint32_t(set))))
           throw std::runtime_error(
               "Textured primitive is missing the referenced UV set");
       for (auto color : prim.colors)

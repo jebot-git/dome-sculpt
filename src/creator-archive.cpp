@@ -2,6 +2,7 @@
 #include "dome/creator-archive.hpp"
 #include "dome/import-source.hpp"
 #include "dome/import-image.hpp"
+#include "source-extra-uv-authority.hpp"
 #include "cgltf.h"
 #include <bit>
 #include <nlohmann/json.hpp>
@@ -155,6 +156,53 @@ void validate_model_nodes(const CreatorSourceModel &source,const nlohmann::json 
   }
   stop(limits);
 }
+// New typed arrays must agree with the immutable canonical accessors, even when
+// no material samples them. Reuse the bounded parser once per distinct model;
+// archive aliases do not import or charge the same source again.
+void validate_model_extra_uv(const CreatorSourceModel &source,const nlohmann::json &json,
+                            const CreatorArchiveLimits &limits) {
+  bool extra=detail::extra_source_uv_storage(*source.asset,limits.cancelled)!=0;
+  if(json.contains("meshes"))for(const auto &mesh:json.at("meshes"))for(const auto &primitive:mesh.at("primitives"))
+    for(const auto &[key,value]:primitive.at("attributes").items())
+      if(key.starts_with("TEXCOORD_") && key!="TEXCOORD_0" && key!="TEXCOORD_1")extra=true;
+  if(!extra)return;
+  ImportLimits options=limits.import_limits;options.mode=ImportMode::PreserveGltf;options.external_resources=false;
+  options.max_file_bytes=std::min(options.max_file_bytes,limits.max_asset_bytes);
+  options.cancelled=[a=limits.cancelled,b=options.cancelled]{return (a&&a())||(b&&b());};
+  options.allow_legacy_vrm_skin_hint=json.contains("extensions")&&json.at("extensions").contains("VRM");
+  options.allow_vrm_metadata=json.contains("extensions")&&json.at("extensions").contains("VRMC_vrm");
+  const auto parsed=import_glb(*source.original_bytes,options,ImportMode::PreserveGltf);
+  if(parsed.primitives.size()!=source.asset->primitives.size())throw std::invalid_argument("Original additional UV primitive table differs from canonical source");
+  for(size_t i=0;i<parsed.primitives.size();++i) {
+    stop(limits);const auto &raw=parsed.primitives[i],&current=source.asset->primitives[i];
+    if(raw.source_mesh!=current.source_mesh || raw.source_primitive!=current.source_primitive || raw.extra_uv_sets.size()!=current.extra_uv_sets.size())
+      throw std::invalid_argument("Original additional UV identities differ from canonical source");
+    for(const auto &[set,values]:raw.extra_uv_sets) {
+      const auto found=current.extra_uv_sets.find(set);
+      if(found==current.extra_uv_sets.end() || values.size()!=found->second.size())throw std::invalid_argument("Original additional UV dimensions differ from canonical accessor");
+      for(size_t v=0;v<values.size();++v) {
+        if((v&1023)==0)stop(limits);
+        if(std::bit_cast<std::array<uint32_t,2>>(values[v])!=std::bit_cast<std::array<uint32_t,2>>(found->second[v]))
+          throw std::invalid_argument("Original additional UV values differ from canonical accessor");
+      }
+    }
+  }
+}
+size_t model_extra_uv_preflight(const nlohmann::json &json) {
+  size_t bytes=0;
+  if(json.contains("meshes"))for(const auto &mesh:json.at("meshes"))for(const auto &primitive:mesh.at("primitives")) {
+    size_t sets=0;
+    for(const auto &[key,value]:primitive.at("attributes").items())if(key.starts_with("TEXCOORD_") && key!="TEXCOORD_0" && key!="TEXCOORD_1") {
+      if(key.size()!=10 || key.back()<'2' || key.back()>'7' || ++sets>6)throw std::invalid_argument("Original additional UV set identity exceeds native bounds");
+      const auto id=integer(value,UINT32_MAX);const auto &a=json.at("accessors").at(id);const auto count=integer(a.at("count"),2'000'000);
+      if(!count)throw std::invalid_argument("Original additional UV accessor is empty");
+      const size_t stored=size_t(count)*sizeof(std::array<float,2>)+sizeof(std::pair<const uint32_t,std::vector<std::array<float,2>>>)+4*sizeof(void*);
+      if(stored>detail::extra_source_uv_budget-bytes)throw std::length_error("Original additional UV accessors exceed storage budget");
+      bytes+=stored;
+    }
+  }
+  return bytes;
+}
 const ImportedPrimitive &mapped_primitive(const CreatorAppearance&a){
   if(!a.asset||!a.original_bytes||!a.decoded_images||a.asset->mode!=ImportMode::PreserveGltf)
     throw std::invalid_argument("Creator appearance lacks immutable preserved source data");
@@ -217,6 +265,7 @@ struct CreatorAssetArchive::Entry {
   std::shared_ptr<const CreatorSourceModel> source;
   nlohmann::json json;
   std::vector<uint32_t> image_ids;
+  size_t extra_uv_bytes=0;
 };
 CreatorAssetArchive::CreatorAssetArchive(CreatorArchiveLimits l):limits_(std::move(l)){limits_valid(limits_);}
 uint32_t CreatorAssetArchive::add(const CreatorAppearance &a,PaintImageArchive &images){
@@ -251,7 +300,12 @@ uint32_t CreatorAssetArchive::add_source(const CreatorSourceModel &a,const Creat
   if(entries_.size()>=limits_.max_assets||stored>limits_.max_total_bytes-bytes_)
     throw std::length_error("Creator original source archive budget exceeded");
   auto entry=std::make_shared<Entry>();entry->json=source_json(*a.original_bytes,limits_);
+  model_extra_uv_preflight(entry->json);
+  entry->extra_uv_bytes=detail::extra_source_uv_storage(*a.asset,limits_.cancelled);
+  size_t extra_bytes=entry->extra_uv_bytes;
+  for(const auto &old:entries_){if(old->extra_uv_bytes>detail::extra_source_uv_budget-extra_bytes)throw std::length_error("Original additional UV archives exceed aggregate storage budget");extra_bytes+=old->extra_uv_bytes;}
   validate_model_nodes(a,entry->json,limits_);
+  validate_model_extra_uv(a,entry->json,limits_);
   if(appearance)validate_mapping(*appearance,entry->json,limits_);
   validate_images(*a.asset,*a.decoded_images);
   const auto source_vrm=vrm_string(entry->json);
@@ -275,12 +329,15 @@ CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const Pa
   CreatorAssetArchive result(l);
   if(!j.is_array()||j.size()>l.max_assets)throw std::length_error("Invalid creator original source archive count");
   // Validate all outer budgets/references before copying/importing any source.
-  size_t total=0;
+  size_t total=0,extra_total=0;
   for(auto &value:j){
     auto &raw=value.at("original_glb"),&ids=value.at("images");
     if(!raw.is_binary()||raw.get_binary().size()>l.max_asset_bytes||raw.get_binary().size()>l.max_total_bytes-total||!ids.is_array()||ids.size()>256)
       throw std::length_error("Invalid creator original source archive payload");
     auto json=source_json(raw.get_binary(),l);
+    const auto extra=model_extra_uv_preflight(json);
+    if(extra>detail::extra_source_uv_budget-extra_total)throw std::length_error("Original additional UV accessors exceed aggregate archive budget");
+    extra_total+=extra;
     size_t count=json.contains("images")?json.at("images").size():0;
     if(count!=ids.size())throw std::runtime_error("Creator decoded image count differs from embedded source");
     size_t stored=raw.get_binary().size();
@@ -306,6 +363,9 @@ CreatorAssetArchive CreatorAssetArchive::decode(const nlohmann::json &j,const Pa
         entry->json.contains("extensions") &&
         entry->json.at("extensions").contains("VRMC_vrm");
     model->asset=std::make_shared<const ImportedAsset>(import_glb(*model->original_bytes,options,ImportMode::PreserveGltf));
+    entry->extra_uv_bytes=detail::extra_source_uv_storage(*model->asset,l.cancelled);
+    size_t extra_bytes=entry->extra_uv_bytes;
+    for(const auto &old:result.entries_){if(old->extra_uv_bytes>detail::extra_source_uv_budget-extra_bytes)throw std::length_error("Original additional UV archives exceed aggregate storage budget");extra_bytes+=old->extra_uv_bytes;}
     auto decoded=std::make_shared<std::vector<std::shared_ptr<const Image>>>();
     for(auto &id:value.at("images")){auto index=integer(id,UINT32_MAX);entry->image_ids.push_back(index);decoded->push_back(images.at(index));}
     validate_images(*model->asset,*decoded);model->decoded_images=std::move(decoded);model->vrm_json=vrm_string(entry->json);
