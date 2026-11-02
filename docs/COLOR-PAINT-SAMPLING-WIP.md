@@ -18,7 +18,9 @@ bad source remaps, work limits and early/middle/final cancellation refuse while
 the original complete Scene remains restartable. Fresh coherent Release3/3 in
 1.62s also includes structural Paint2 archive and cheap/deep geometry validation.
 
-Sanitizer qualification of this exact factory source is pending. This is not yet
+Wholly owned C/C++ O1 ASan/UBSan/leak qualification of exact sourceb8f110c
+passes3/3 in22.97s, including the structural Paint2 archive and cheap/deep
+normal-geometry validation. This is not yet
 a Scene24/material9 adoption: the independent normal metadata witness, paired
 current material/field closure, archive context and actual native/render/pick/
 export consumers remain required. Context-free serialization and Scene exposure
