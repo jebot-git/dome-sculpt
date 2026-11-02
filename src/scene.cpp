@@ -457,10 +457,23 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>16)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>17)throw std::runtime_error("Unsupported scene version");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
+  // Admit newly meaningful implicit-default identity before decoding any
+  // retained appearance/remap, including dormant and before-state owners.
+  auto appearance_feature=[&](const nlohmann::json &a){if(detail::minimum_appearance_scene_version(a)>version)throw std::invalid_argument("Implicit default material authority requires Scene17");};
+  auto appearance_table=[&](const nlohmann::json &table,size_t maximum){
+    if(!table.is_array()||table.size()>maximum)throw std::length_error("Retained appearance table exceeds its archive bound");
+    for(const auto &owner:table)appearance_feature(owner.at("appearance"));
+  };
+  for(const auto &o:objects)if(o.contains("appearance"))appearance_feature(o.at("appearance"));
+  if(j.contains("polygon_sources"))appearance_table(j.at("polygon_sources").at("origins"),512);
+  if(j.contains("source_materials")){
+    const auto &materials=j.at("source_materials");
+    for(const char *table:{"origins","color_preparations","normal_preparations"})if(materials.contains(table))appearance_table(materials.at(table),256);
+  }
   bool affine_refs=j.contains("affine_state");
   if(j.contains("groups"))for(const auto &g:j.at("groups"))affine_refs|=g.contains("source_placement")||g.contains("affine_edit");
   for(const auto &o:objects)affine_refs|=o.contains("affine_edit");

@@ -42,6 +42,7 @@ int main(int argc, char **argv) try {
       fixture.j["nodes"][0]["scale"]={-1.7f,.8f,1.1f};
       fixture.j["nodes"][1]["rotation"]={0,0,std::sin(.31f),std::cos(.31f)};
     }
+    if(std::getenv("DOME_IMPORT_DEFAULT_SOURCE")){fixture.j["meshes"][0]["primitives"][0].erase("material");fixture.j.erase("materials");fixture.j.erase("extensionsUsed");}
     fixture.save(argv[2]);
     return 0;
   }
