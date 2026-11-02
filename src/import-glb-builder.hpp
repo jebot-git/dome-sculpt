@@ -19,13 +19,22 @@ struct ImportGlbBuilder {
     size_t at=binary.size();binary.insert(binary.end(),value.begin(),value.end());return at;
   }
   uint32_t floats(std::span<const float> value,uint32_t width,bool bounds=false) {
-    stop();if(!width || value.size()%width)throw std::invalid_argument("Invalid native adapter attribute width");
+    stop();if((width!=1&&width!=2&&width!=3&&width!=4&&width!=16) || value.size()%width)throw std::invalid_argument("Invalid native adapter attribute width");
+    if(value.size()>limits.max_file_bytes/4)throw std::length_error("Native adapter attribute byte budget exceeded");
     std::vector<uint8_t> data;data.reserve(value.size()*4);
     std::vector<float> low(width,std::numeric_limits<float>::infinity()),high(width,-std::numeric_limits<float>::infinity());
     for(size_t i=0;i<value.size();++i){if((i&4095)==0)stop();float v=value[i];if(!std::isfinite(v))throw std::runtime_error("Native source attribute is not finite");word(data,std::bit_cast<uint32_t>(v));low[i%width]=std::min(low[i%width],v);high[i%width]=std::max(high[i%width],v);}
     auto view=json["bufferViews"].size();json["bufferViews"].push_back({{"buffer",0},{"byteOffset",bytes(data)},{"byteLength",data.size()}});
-    auto id=json["accessors"].size();nlohmann::json a={{"bufferView",view},{"componentType",5126},{"count",value.size()/width},{"type",width==2?"VEC2":width==3?"VEC3":"VEC4"}};
+    auto id=json["accessors"].size();nlohmann::json a={{"bufferView",view},{"componentType",5126},{"count",value.size()/width},{"type",width==1?"SCALAR":width==2?"VEC2":width==3?"VEC3":width==16?"MAT4":"VEC4"}};
     if(bounds){a["min"]=low;a["max"]=high;}json["accessors"].push_back(std::move(a));return uint32_t(id);
+  }
+  uint32_t joints(std::span<const uint16_t> value) {
+    stop();if(value.empty()||value.size()%4)throw std::invalid_argument("Invalid native joint attribute width");
+    if(value.size()>limits.max_file_bytes/2)throw std::length_error("Native joint attribute byte budget exceeded");
+    std::vector<uint8_t> data;data.reserve(value.size()*2);
+    for(size_t i=0;i<value.size();++i){if((i&4095)==0)stop();data.push_back(uint8_t(value[i]));data.push_back(uint8_t(value[i]>>8));}
+    auto view=json["bufferViews"].size();json["bufferViews"].push_back({{"buffer",0},{"byteOffset",bytes(data)},{"byteLength",data.size()}});
+    auto id=json["accessors"].size();json["accessors"].push_back({{"bufferView",view},{"componentType",5123},{"count",value.size()/4},{"type","VEC4"}});return uint32_t(id);
   }
   std::shared_ptr<const std::vector<uint8_t>> finish() {
     stop();json["buffers"]=nlohmann::json::array({{{"byteLength",binary.size()}}});
