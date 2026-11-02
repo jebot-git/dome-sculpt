@@ -1,0 +1,261 @@
+{
+  "schema": 1,
+  "component": "Native image projection and stencil painting",
+  "status": "Private qualified component; full production goal remains active",
+  "base_commit": "b51a08e447b5e0b20dbe44dbdb33e51edb2ee238",
+  "worktree": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37",
+  "date": "2026-11-02",
+  "scene_schema_change": false,
+  "implementation": {
+    "new_runtime_dependencies": [],
+    "image": "Bounded PNG, immutable decoded owner, detached existing file worker",
+    "painting": "Existing CPU tile painter with evaluated WORLD sampling; no GPU paint engine claim",
+    "guide": "GPU image plane/frustum, immutable texture/static VBO, uniforms for placement and interpretation",
+    "frames": [
+      "native mesh",
+      "nested groups",
+      "skin and morph current pose",
+      "reflected/sheared Scene13 placement",
+      "per-sample held world delta"
+    ],
+    "visibility": "Actual material alpha/cull/texture/time; target-only or visible scene; hidden/editor ghosts excluded without rewriting alpha",
+    "persistence": "Actual paint layers; session-only tool state; exact one Undo/Cancel/ordered Save/restart",
+    "commands": {
+      "projection_first": 155,
+      "projection_last": 164,
+      "page": 25,
+      "page_count": 26
+    },
+    "abi": "Projection EditorState/Document/FileJob/NativeStroke additions require coherent consumers; no archive schema"
+  },
+  "build": {
+    "regular_user": true,
+    "release": "-O3 -DNDEBUG, CPU, UI/XR enabled",
+    "sanitizer": "Fresh complete own C/C++ core/support/renderer/frontend, -O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer; assertions enabled; system/toolkit/driver not instrumented",
+    "sanitizer_environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "toolkit": "Canonical d271 inputs unchanged; toolkit-eee23b7/lib and bitmap-runtime-eee23b7/lib",
+    "compositor": "artifacts/domed-d271cf6-target/release/dome-compositor; isolated native Wayland"
+  },
+  "validation": {
+    "release_selected": {
+      "passed": 11,
+      "seconds": 18.99,
+      "includes": "9 native/softwareGL suites plus projection and legacy affine-contact real-loader synthetic OpenXR"
+    },
+    "sanitizer_selected": {
+      "passed": 9,
+      "seconds": 2.98,
+      "leaks": true,
+      "scope": "Complete owned C/C++ core/support/renderer native and softwareGL; no sanitizer synthetic XR claim"
+    },
+    "checks": {
+      "projection_native": 92,
+      "projection_controller": 16,
+      "projection_held": 34,
+      "projection_load": 35,
+      "persistent_worker_allocation_boundaries": 23,
+      "persistent_main_admission_boundaries": 36,
+      "gpu_preview": 11,
+      "projection_synthetic_loader": 10,
+      "legacy_affine_synthetic_loader": 10
+    },
+    "refined_final_load_fence": {
+      "reason": "Paint admission asserted while menu CLOSED to exclude a vacuous menu fence",
+      "runtime_changes": false,
+      "release_passed": 1,
+      "release_seconds": 0.02,
+      "sanitize_passed": 1,
+      "sanitize_seconds": 0.11,
+      "checks": 35
+    },
+    "held_independent_gradient": {
+      "expected": [
+        93,
+        242
+      ],
+      "actual": [
+        93,
+        242
+      ],
+      "wrong_reference_rejected": [
+        188,
+        188
+      ]
+    },
+    "hardware": {
+      "selector": "DRI_PRIME=pci-0000_03_00_0",
+      "vendor": "Intel",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "checks": 11,
+      "max_pixel_tolerances_unchanged": true,
+      "exact_final_source_and_binary_keys": [
+        "src/render.cpp",
+        "include/dome/document.hpp",
+        "tests/projection-render.cpp",
+        "build-projection-release/dome-sculpt-projection-render-test"
+      ],
+      "second_eye_uploads": 0,
+      "pose_only_uploads": 0,
+      "initial_negative": "Renderer identity-only fixture false rejection because brand is Arc(tm), not contiguous Arc A770; strict Intel/Arc/A770 tokens retain software/UHD rejection; no pixel/tolerance change"
+    },
+    "final_gui_cases": [
+      {
+        "case": "release-native",
+        "returncode": 0,
+        "seconds": 15.849215505004395,
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-release-native.log",
+        "output": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-release-native"
+      },
+      {
+        "case": "release-compact",
+        "returncode": 0,
+        "seconds": 16.198373771010665,
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-release-compact.log",
+        "output": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-release-compact"
+      },
+      {
+        "case": "sanitize-native",
+        "returncode": 0,
+        "seconds": 24.76110225399316,
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-sanitize-native.log",
+        "output": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-sanitize-native"
+      },
+      {
+        "case": "release-wayland",
+        "returncode": 0,
+        "seconds": 16.344945040007588,
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-release-wayland.log",
+        "output": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-release-wayland"
+      },
+      {
+        "case": "sanitize-context",
+        "returncode": 0,
+        "seconds": 25.662454982011695,
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-sanitize-context.log",
+        "output": "/home/blux/de-xr/dome-sculpt/artifacts/projection-paint-b197e37/artifacts/projection-final-sanitize-context"
+      }
+    ],
+    "gui_checks": {
+      "release_native": 11,
+      "release_compact_640x360_enlarged_fonts": 11,
+      "sanitize_native_leak_clean": 11,
+      "actual_native_d271_wayland": 9,
+      "sanitize_desktop_lifecycle": 3,
+      "included_canvas_context_assertions": 18
+    }
+  },
+  "limitations": [
+    "No physical HMD/controller/stylus test or session restart/install",
+    "Selected coherent component and relevant regression tests; not a full all-target production suite",
+    "CPU painter and per-gesture material query build remain; not GPU painting or incremental GPU geometry",
+    "Inherited canonical/shared-backend Wayland5856B/31 and standalone-XR112B/two56B LSan scopes remain open from lifecycle component; no suppression or toolkit fork",
+    "Authored/PBR preview is separate future union: preserve captured range policy for target and scene visibility, mode fences, page26/count27 and noncolliding command1024+",
+    "UDIMs, multiple texture sets, broader acceleration and remaining REQUIREMENTS remain required"
+  ],
+  "negative_evidence_notes": [
+    "Initial evaluated footprint exposed REST sampler argument bug; fixed sampler(position,normal)",
+    "Initial ordinary scene query omitted picking; worker fallback now constructs material query",
+    "Initial second-eye dynamic frustum upload replaced with actual static GPU guide geometry",
+    "Initial compact chooser overflow corrected native screen clamp; exact canvas/model targeting corrects false whole-window midpoint input",
+    "First Wayland popup coordinate miss corrected harness actual popup anchor; no product policy weakened"
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "447dfa676b4f23ecf9dfdb9f8d7cb331acdde59d0f7c00138dd6655b7c1bb234",
+    "include/dome/document.hpp": "db3be13d2ce69ae1df57ae9e96824d5404a4d853b440ec3836564d5d15032e06",
+    "include/dome/input.hpp": "983e58203fc9d6da7865fdd2eab05e93a2aa7a1691caeabe8089587a24a6fe3c",
+    "include/dome/material-visibility.hpp": "a9b09283c05d7b30e393618931d1ca7cdcb3c6844fff523e31e9b3023d367129",
+    "include/dome/projection-tool.hpp": "3c65893d140c23b71e22ff96980c8e4b8992e9f349692dbb9c8f3f7b504df37a",
+    "include/dome/projection.hpp": "7cf949f0576fb2c4b445c8750c8dfd36515fc15b86b0ca9174cc9f4a5524d578",
+    "src/app.cpp": "6b84f6cc7318b0c7b233d08328556950f8c1869ae77fe2060257ce296bda8d93",
+    "src/document-baking.cpp": "31b224f53b4490ef77d13fd4751851ce799705ca492b12f46326446ff6f31a7a",
+    "src/document-contact.cpp": "5aa27b86602940a6083ec3f2e24d9a0f4e71f491e733c5e903e5999f7ab78832",
+    "src/document-native.cpp": "53f0a3ec7a479cb49c021ee71d649bd8a2cb21f6ff7bb05c6581b8c23a8f55e2",
+    "src/document-projection.cpp": "9c0e0acca15a052e0a537081f3f7dcb30881d45d0c6e6ea2c48be6a7f3892348",
+    "src/document-transaction.cpp": "f0267d5fe253c693c57e1e2792aadf775aa684880a55b7d7f20f154e9ec08bd4",
+    "src/document-transaction.hpp": "4058dfa803d339fa0af3cee8bc9a9d615231311be59dfe8fcbaab77afa714973",
+    "src/document-worker-errors.cpp": "210920e3bead019f37560dc01bdeeecb420ae9f08bcb169aa7cff8bc54ba5e21",
+    "src/document.cpp": "5baab27cdef2dfc9ec7c7fe430cee62f5626bbf16672596e006989b01a62129b",
+    "src/input.cpp": "d300be57f6f7ff5d8276fbb817e2ea6195a4ba71c181472dcc40b15965ada395",
+    "src/material-visibility.cpp": "2937aa39fb813fbc4b30b609a4f943ce5bcef6e118c03533c2b24c337d1c14f3",
+    "src/paint.cpp": "bc1bd92a964078056dd9262f977c8eac242c2f31a46e1590a0713ea4612e5303",
+    "src/palette.cpp": "369ce4aa1c62a93defd3c1bc6d7c0bae4ae733ec126cff0a651f1727caf57ddb",
+    "src/projection-editor.cpp": "d221400aea827e84bd58ea3244e4392519b91f110244d07ea28f1d0e4d8d46fd",
+    "src/projection-editor.hpp": "7ae91c38772e0d946ca7851a7f817f31420132441492ecdd759f4de3ce98fcb2",
+    "src/projection-tool.cpp": "d68f780686da3f7e86c138660a54b03f4e17c4d0ae0e53b53371f2be53b91221",
+    "src/projection.cpp": "522231db2be4bd9b414f50c16c4a28a184ca5a459b0c937ce54ba334e83365a6",
+    "src/render.cpp": "590b6f704970fb1ec982da6c35c6937f8339430c12dcc9bcb32ec0d4a6645881",
+    "tests/desktop-context-lifetime.cpp": "e6d2d5e70eabfa4166bd694a0fbb0030ed7815bc588b32e973c85e2408e915d4",
+    "tests/projection-allocation.cpp": "81fdd9161bdc1ed778f626349227238725997cb954f225414e9c93e3f8a3c798",
+    "tests/projection-controller.cpp": "a70ff97f778824ba4c43b6c98ed6e261f5ab1f4825d5428026a52a441b5d9b23",
+    "tests/projection-held.cpp": "f2662d5aaaaf108b25e442a279d45352f9063ea13270d23ec396dfbc62fe4f16",
+    "tests/projection-load.cpp": "a493b356f17af84d371786d15338acbe1814bad4b2a6133d8654c1b6de6eacfc",
+    "tests/projection-menu.py": "946314bc046d262a250a3f444a26652830bd25c6170e5fb4da2656f1b04bc7f1",
+    "tests/projection-native.cpp": "010ed53b4806bc16f81b46db63f1d1d7bce1b9544256c0724e222f932c5951a4",
+    "tests/projection-render.cpp": "bad9f8c5db3555f6a5c7a0ee0a64dedf7705a488b2bca246358430e4f5c3e287",
+    "tests/projection-wayland.py": "5fef807896f74b5558b67ce336bf9d460831cdfb8770146cf628f257321d3cc1",
+    "tests/projection-xr.py": "727b3059c545887f05c5db105da72a82949c82e7d34d395bb8e08d1b6875394a",
+    "tests/xr_runtime.cpp": "a0f1a0d6bfee287ae8699154d052edb06169d60f190bc39a89c873b5f88bec97"
+  },
+  "binary_sha256": {
+    "build-projection-release/dome-sculpt": "dc23306bcbda3fd271ce60b480cd8c1c3771be5869612b0ca67024fec9519485",
+    "build-projection-release/dome-sculpt-projection-allocation-test": "ed33892fe24496d230cdf1d1c40fb8d704fb92ba672566c8b2a06bb734f86096",
+    "build-projection-release/dome-sculpt-projection-controller-test": "9d77b479c0e5e5d2b4b86c1a816f69250858240a81b85047600c35ea1f726bde",
+    "build-projection-release/dome-sculpt-projection-held-test": "ccd6a356ee529cd8e10bb8d46de76f3519528194b66363683cd6e67754cc394b",
+    "build-projection-release/dome-sculpt-projection-load-test": "7fc2d4d07e79c447373a64b4ded37ae287914a01fca4d89b7e27e6ae3510cb6b",
+    "build-projection-release/dome-sculpt-projection-native-test": "3d996851dc1a6633cfa150e57e00e4268c62e04d5c958ec3565d56b260b53eaa",
+    "build-projection-release/dome-sculpt-projection-render-test": "2e2455f91d91427d31abb01dbc6c0f4815c61407ac31ecce0eb1666ee80d9da2",
+    "build-projection-release/dome-sculpt-projection-test": "184f89be6efe22d479cd344e7c3f7aa2776a5a902415bbbfae0df3ba52902aa0",
+    "build-projection-release/libdome-sculpt-core.a": "3ec187bff1c968e94854804a02f438aaeb62ddb6320d0091bdab0ed0ee8a3d9c",
+    "build-projection-release/libdome-sculpt-render.a": "6d1ae0e1a81f1d522ed2e5f5ece73ad263ec0f094e0b2a61190790afc75d0ecc",
+    "build-projection-release/libmikktspace-robust.a": "69e7227212c8b69b19e5b922ab31d68489b33ab1e8b361dcfc26aba93d0c8e82",
+    "build-projection-release/libmikktspace.a": "e3214e28539023b4f4744dc708a3613e9d2a4cd1f8defcd5b1a67e4277703a9c",
+    "build-projection-release/libufbx.a": "2aad43948ad47553c557adc4727f62422ca1a7b9e55ff3d33800cad4c028550d",
+    "build-projection-release/libxatlas.a": "a07e7d0987e6b8c686921b1246cf4d4465eb2ee1ef81b513ce4b88ecf685b7e3",
+    "build-projection-sanitize/dome-sculpt": "8ee1714ad41277350c3ef89426b69294449cc7af31a89bf099dd0e761352ac86",
+    "build-projection-sanitize/dome-sculpt-projection-allocation-test": "58533ded6ba3e799b20956e324c50b108e500debd8e9365d7334f16863f343ae",
+    "build-projection-sanitize/dome-sculpt-projection-controller-test": "3bef5eb408f73f82d66f990277bae4013bc563225bea3c750577a032cba29ffd",
+    "build-projection-sanitize/dome-sculpt-projection-held-test": "c90352ddb04bf40ee51a6ba9e221f9fddf86092bcbd86d3a77509b70a3884309",
+    "build-projection-sanitize/dome-sculpt-projection-load-test": "fcd81c2b77f0a8f413d2150cc12886797b1c752ff744f783fd67a34d7c4374ab",
+    "build-projection-sanitize/dome-sculpt-projection-native-test": "6303c0ce5e150a2d82ffc38681af3ff2854322a6e20409966bd4fe6a5b0d341c",
+    "build-projection-sanitize/dome-sculpt-projection-render-test": "ac1b239ef037e2550c346f7ea1d22dfabaadc4116a8d723c548ced75428a0100",
+    "build-projection-sanitize/dome-sculpt-projection-test": "e13c8bac237f34e9fcf901e4e9ae8364e01811812a701d1927938e14cb34f5a9",
+    "build-projection-sanitize/libdome-sculpt-core.a": "d8bc757b4a2259dad2b20b902e09934277868dba1d104bcaeca48c3152bde662",
+    "build-projection-sanitize/libdome-sculpt-render.a": "758d5619f40d840f98eb01d8e308323d421e80765dbf7125545d23601ef5b24f",
+    "build-projection-sanitize/libmikktspace-robust.a": "3b9a6cc68339a7da41bd8791c538876a7ebcbf81763533c29fc7756d10b679ed",
+    "build-projection-sanitize/libmikktspace.a": "912dab69c07d04d287e4406f37f4dd5fa028b9cf0adabc27b65cb6a71b702967",
+    "build-projection-sanitize/libufbx.a": "a3b92a7e0b8456663c86cbb499fca81b88f4a18ac2b737368e58851471863b67",
+    "build-projection-sanitize/libxatlas.a": "77076ae968f3a44d601ba3d33a9d7c38d58735fb15e4467dd7e403a4738aa0e9"
+  },
+  "evidence_sha256": {
+    "artifacts/projection-arc-final-inputs.json": "b9e74f614e3500859d8e53a3cea93036d2a9afecf530c382fa73112398445bea",
+    "artifacts/projection-controller-first.log": "961e6a62db2d04eeb12493092d641bbd7887fc083a985cc9362df3c6055c20cc",
+    "artifacts/projection-final-configure.log": "a940b483b73bdf21e4512ba64ce0ba0d615044d582f8e9c8118b32aa2a2f5194",
+    "artifacts/projection-final-gui-status.json": "58a22b88653d2bcecb0931db325c48a6471b7345359d56affdbf797b4a5d7e25",
+    "artifacts/projection-final-release-build.log": "2c7816d8c829d2d5626df8d7fd00599adbc06c17e205a7ed2bf836869878fa71",
+    "artifacts/projection-final-release-compact.log": "d6513687a9ef8690741301ab3c03c4a6cd7f6cd479e487487bd0521d88928563",
+    "artifacts/projection-final-release-native.log": "d6513687a9ef8690741301ab3c03c4a6cd7f6cd479e487487bd0521d88928563",
+    "artifacts/projection-final-release-wayland.log": "27b0815bead3a4b13d155f6a660ac85c48a33b4b12868fcf094585a73327388e",
+    "artifacts/projection-final-sanitize-context.log": "e1001641db1a063eddecfd632ef73e4672f7925c54718e00180437bc4d526323",
+    "artifacts/projection-final-sanitize-native.log": "d6513687a9ef8690741301ab3c03c4a6cd7f6cd479e487487bd0521d88928563",
+    "artifacts/projection-kernel-first.log": "7d83da34620b8a3b1ad0baa7d23bdc6b3b5a74b972a708372ff05a20bab52351",
+    "artifacts/projection-load-fence-release-build.log": "ce02d438b3ad752c9cd461f51b99fae0d6061bda775d60b05e7a7816cba9efff",
+    "artifacts/projection-load-fence-release-detail.log": "42be55e81648555b441296afad2abf6bda358329a3e447d0480548f86cb54efc",
+    "artifacts/projection-load-fence-release.log": "69a67885e28f6b736c0cc7ccccda011a9b47490812fc9fc74d896a16f285ab87",
+    "artifacts/projection-load-fence-sanitize-build.log": "ce02d438b3ad752c9cd461f51b99fae0d6061bda775d60b05e7a7816cba9efff",
+    "artifacts/projection-load-fence-sanitize-detail.log": "68b9b63fc23c56d9a119fded62b33edcf9d773d4930cd8473e5d0070a060296c",
+    "artifacts/projection-load-fence-sanitize.log": "22317d74a67c4fba1082c766661203845ae86e6f10219fc7edc7b5440e51dfc4",
+    "artifacts/projection-menu-compact.log": "548052ea9d0643589248275a585a70afe90aed6ea3c369a47267907dc7a3ee0e",
+    "artifacts/projection-native-first-negative.log": "5739f4ed1faff8aa742a560c4bf63498b1c1771042f933442d3ab76c82eb82c6",
+    "artifacts/projection-preview-arc-final.log": "842ae496f5a610337d4dadb5a10b56fc706f99c99aecc4fc0b748383524f2796",
+    "artifacts/projection-preview-arc.log": "81d2755ac06b57b4945c1d01cdb0f411579c28caa5c69dfed7d7849a09322878",
+    "artifacts/projection-qualified-release-detail.log": "8281b8a4526a248ad87f2c4aea7744cb4b9088a4096990c988bbcafeb71ff19b",
+    "artifacts/projection-qualified-release.log": "b016427113545ed55d644234aed4f9802ec7bacead4c51fa61df0f9c92f24a4f",
+    "artifacts/projection-qualified-sanitize-detail.log": "140ad0978f3b77647558a0e9cb0aae8e5ea729c6157c66cc76b052966eb94628",
+    "artifacts/projection-qualified-sanitize.log": "35e049a21b6bd0c43dabf9ab66a7c06a6f11b868d278272e00e5cd0b920d77cc",
+    "artifacts/projection-release-focused1.log": "5244dcd6fd5b00702211ed4639e1ad6aa2f2fd3b212bb8be894362bca384a095",
+    "artifacts/projection-release-focused2.log": "9a0b144a43531ab2149297ef9867faa4f82c73a4b5056d6abb5e1b18b9a7abb0"
+  }
+}
