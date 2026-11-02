@@ -1,9 +1,12 @@
-# Current-corner target Bake — private qualification in progress
+# Current-corner target Bake — component implementation
 
 This isolated branch starts from committed `3042a86`, retaining Scene19 normal UV
 authority and the controller rebind fix. It now implements actual current-corner
 RGBA target preparation and Bake through the existing native worker and dialog.
-It is still private and not a completed qualification or full-production claim.
+This records the original frozen65b0ae9 component scopes. Its final sanitizer
+boundary completion is in TARGET-COLOR-SAN-COMPLETION.md; the combined published
+application qualification is in SCENE20-AUTHORING-INTEGRATION.md. Neither completes
+the full production goal.
 
 The geometry-only immutable `PolygonColorSurface` descriptor records exact
 ordered REST topology and current corner field. Receipt2 uses `PolygonCorners`;
@@ -45,9 +48,10 @@ operation retry; no cached preparation replaces the actual helper.
 
 Fresh own-core/C/C++ support/render ASan/UBSan/leak functional11/11 passes in508.43s,
 including both independent graphical consumers. External system dependencies are
-not claimed instrumented. The separate extended sanitizer44-shard allocation
-sweep remains live and unchanged. Its completion is a remaining qualification
-gate; the completed Release denial sweep is not represented as sanitizer proof.
+not claimed instrumented. At that original freeze the separate extended sanitizer44-shard allocation
+sweep remained live and unchanged. Its subsequent42/44 original passes and four
+samebinary timeout-only finer ranges now complete51598 unique denials; preserve
+the original timeouts as documented in TARGET-COLOR-SAN-COMPLETION.md.
 No full OneAPI/all-native suite claim is made for this private target branch.
 
 Current-field UV/topology/prepared-normal/artist/UV1 transfers remain explicitly

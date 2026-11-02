@@ -55,9 +55,9 @@ its own instrumented test. This is no new whole-project build, full OneAPI suite
 GUI/controller drawer proof or physical-headset claim. Commands and source,
 archive and binary hashes are retained in the build manifest.
 
-The separate target preparation51598-denial extended sanitizer sweep remains
-independent and live; two late precommit shards exhausted its unchanged600s
-budget and require exact finer-range completion. Other finite shards continue
-unchanged. Current-corner UV/topology, unsupported prepared-normal and artist
+The separate target preparation51598-denial extended sanitizer sweep was still
+live at this fixture freeze. It has since completed through42/44 original passes
+and four samebinary finer-range cases for the two budget timeouts; read
+TARGET-COLOR-SAN-COMPLETION.md and SCENE20-AUTHORING-INTEGRATION.md. Current-corner UV/topology, unsupported prepared-normal and artist
 domains retain their existing actionable guards. This milestone does not install,
 publish, restart a session or complete the full Dome Sculpt goal.

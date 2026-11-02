@@ -1,0 +1,223 @@
+{
+  "recorded_utc": "2026-11-02T12:56:30.416631+00:00",
+  "qualified": true,
+  "base_public_main": "09aa4d047ae1fb95bf579cd057e531762ec577db",
+  "product": "7566a8fbf7bb7450307ff948844501a926b9dd8f",
+  "test_only": "5c948624b641466c42fb9c91b34c018960751eee",
+  "docs_preserving_merge": "bdfd0a0e49a3750a1196685298142849026b5642",
+  "qualification_tree": "artifacts/color-rigid-union-d5de43b",
+  "runtime_equality": "git diff7566a8f 5c94862 --src include assets third_party empty; git diff5c94862 bdfd0a0 --src include assets third_party CMakeLists.txt tests empty",
+  "Release_full": {
+    "tests": 368,
+    "failures": 0,
+    "skipped": 0,
+    "junit": "artifacts/tests-color-rigid-full-release.xml",
+    "sha256": "663b4af8b6a324720195d75f9c29ffa4fcde0619fd803a8f9968c7c79e3bd801",
+    "case_details": [],
+    "seconds": 2827.37
+  },
+  "Release_added": {
+    "tests": 2,
+    "failures": 0,
+    "skipped": 0,
+    "junit": "artifacts/tests-color-rigid-added-release.xml",
+    "sha256": "62afb566756c1f40694bf25d7ac6e1da64d39c9f2e231e407e8d7ad6c8eb42bc",
+    "case_details": [],
+    "seconds": 35.43
+  },
+  "owned_SAN_native_initial": {
+    "tests": 52,
+    "failures": 1,
+    "skipped": 0,
+    "junit": "artifacts/tests-color-rigid-native-sanitize.xml",
+    "sha256": "1be9e8e7b43ed040c5f2ca715b93997f46bf4b8be5e4a67b80d6fc633ca4b012",
+    "case_details": [
+      {
+        "name": "vrm-rigid-source-export",
+        "seconds": 240.251,
+        "failed": true
+      }
+    ],
+    "seconds": 682.93
+  },
+  "owned_SAN_graphics": {
+    "tests": 7,
+    "failures": 0,
+    "skipped": 0,
+    "junit": "artifacts/tests-color-rigid-render-sanitize.xml",
+    "sha256": "9160ca289779784bcc5439deee093d5c34db8daae3acf431820d595cdbab7b21",
+    "case_details": [],
+    "seconds": 1358.67
+  },
+  "owned_SAN_corrected_and_added": {
+    "tests": 3,
+    "failures": 0,
+    "skipped": 0,
+    "junit": "artifacts/tests-color-rigid-added-sanitize.xml",
+    "sha256": "5811646bfc352a3cec8a9a1ef4141999310e7d4394898865666ab26c2bfd1354",
+    "case_details": [
+      {
+        "name": "vrm-rigid-source-export",
+        "seconds": 203.155,
+        "failed": false
+      },
+      {
+        "name": "current-color-dual",
+        "seconds": 114.211,
+        "failed": false
+      },
+      {
+        "name": "joint-authoring",
+        "seconds": 142.173,
+        "failed": false
+      }
+    ],
+    "seconds": 459.54
+  },
+  "owned_SAN_scope": "fresh complete owned C/C++ core/support/renderer; external system libs not instrumented; no instrumented frontend/full-project SAN claim",
+  "SAN_direct_same_binary": {
+    "source": "7566a8fbf7bb7450307ff948844501a926b9dd8f",
+    "argv": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/color-rigid-union-d5de43b/build-sanitize/dome-sculpt-vrm-rigid-source-export-test",
+      "/home/blux/de-xr/dome-sculpt/artifacts/color-rigid-union-d5de43b/assets/humanoid/vroid/base-female.vrm",
+      "/home/blux/de-xr/dome-sculpt/artifacts/color-rigid-union-d5de43b/assets/humanoid/vroid/base-male.vrm",
+      "/home/blux/de-xr/dome-sculpt/artifacts/color-rigid-union-d5de43b/artifacts/rigid-native-sanitize-budget-output"
+    ],
+    "budget_seconds": 600,
+    "elapsed_seconds": 254.50903550100338,
+    "returncode": 0,
+    "binary_sha256": "b540869f33bb25579cf2aa18d63c83257496a97e84bff698fd663b7007ebb851",
+    "unchanged_binary": true,
+    "initial": "tests-color-rigid-native-sanitize.xml;51/52 pass with one240.25sTimeout",
+    "scope": "same own-instrumented binary/assets/oracles, distinct outputdir preserving partial initial outputs; no source/product/binary changes"
+  },
+  "Arc": {
+    "checks": 761,
+    "batches": 7,
+    "selector": "pci-0000_03_00_0",
+    "device": "Intel Arc A770",
+    "terminal_returncodes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "compute_backend": "CPU; these are OpenGL render consumers, not newOneAPI compute qualification"
+  },
+  "native_Fltk": {
+    "target": 9,
+    "compact": 10,
+    "postUVkeys": 17,
+    "active_unskinned_VRM": 7
+  },
+  "private_DomeD_Wayland": 8,
+  "actual_loader_synthetic_XR": 11,
+  "interop": {
+    "emitted": 170,
+    "Khronos_errors": 0,
+    "Khronos_warnings": 1194,
+    "maxIssues": 0,
+    "filtered": false,
+    "truncated": false,
+    "VRM0_files": 71,
+    "official_schemas": 15,
+    "schema_pin": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "schema_errors": 0
+  },
+  "format": "Scene20/material6/polygon5; private21/22/23 excluded",
+  "new_physical_HMD": false,
+  "installation": false,
+  "production_complete": false,
+  "controller_drawers": "required after basic targets; not implemented by this checkpoint",
+  "hashes": {
+    "build/dome-sculpt": "9ad117876ee2df5d464bc4564b5a9178b5847acbd42be7a1dd2be58c4b3970cd",
+    "build/libdome-sculpt-core.a": "86d4e6270ef41589cfef48f87b1e8f96f7ea53f5b583ec3fc7a095cd62075398",
+    "build/libdome-sculpt-render.a": "f7fa94557b752d9ab5defbaa1e5356c6d08c2cffd87da9da737b3a6e5a355479",
+    "build/libdome-sculpt-xr.a": "9fee7f6e712497673e940fb745a40eaa212cd4ae2019eed9d90f130da96d6033",
+    "build-sanitize/libdome-sculpt-core.a": "44db013b8774a9fe9d7ca21d6b9646f8347d7fd312fab28ca981a6c76a962f63",
+    "build-sanitize/libdome-sculpt-render.a": "9c35686b5eca58bf605279e4a829909869179a81ffcbc86f3b88324a4f84e907",
+    "build-sanitize/dome-sculpt-vrm-rigid-source-export-test": "b540869f33bb25579cf2aa18d63c83257496a97e84bff698fd663b7007ebb851",
+    "build/dome-sculpt-current-color-dual-test": "42c706f45e9bfb94368a4579ec299cabf6162e9a72bec1820e2259b9fa499988",
+    "build/dome-sculpt-joint-authoring-test": "08be9573525f12aa2fa54f9dfa930530c13545041ac1579975c921d68c6bcfa3",
+    "build-sanitize/dome-sculpt-current-color-dual-test": "304cb32ccdbe92b15aa2d59ab61b567b69b4cf2e0b56bd6041badf1d6e6cb447",
+    "build-sanitize/dome-sculpt-joint-authoring-test": "b375b1752d2aea753fbabb0dfc9241c5d8e328ecdc08f1c1c859826562c16eaf",
+    "artifacts/tests-color-rigid-native-sanitize.xml": "1be9e8e7b43ed040c5f2ca715b93997f46bf4b8be5e4a67b80d6fc633ca4b012",
+    "artifacts/tests-color-rigid-render-sanitize.xml": "9160ca289779784bcc5439deee093d5c34db8daae3acf431820d595cdbab7b21",
+    "artifacts/tests-color-rigid-full-release.xml": "663b4af8b6a324720195d75f9c29ffa4fcde0619fd803a8f9968c7c79e3bd801",
+    "artifacts/tests-color-rigid-added-release.xml": "62afb566756c1f40694bf25d7ac6e1da64d39c9f2e231e407e8d7ad6c8eb42bc",
+    "artifacts/tests-color-rigid-added-sanitize.xml": "5811646bfc352a3cec8a9a1ef4141999310e7d4394898865666ab26c2bfd1354",
+    "artifacts/configure-color-rigid-union-release.log": "f10f5ad7e4eacaac021353ace487a046251fb09e6e40f9bb7400a69ea6ec3151",
+    "artifacts/build-color-rigid-union-release.log": "1b475c6cca0e4c5a5876d30d74796fbd7d1976490fbdbbca8ca27e44e02c32f3",
+    "artifacts/configure-color-rigid-union-sanitize.log": "edaf869e588e58ff412bf980f95c55d11e792eeee029010886d76462aff8fee2",
+    "artifacts/build-color-rigid-union-sanitize.log": "13ac8bc1cdfb8cc09efbce2a94b63851988de3d2386efd71b8bbc74cc3cb1447",
+    "artifacts/tests-color-rigid-render-sanitize.log": "3147e7e1fd3748b25616c25d86340778cad2b7c6de8f741af244a1311671adc7",
+    "artifacts/tests-color-rigid-native-sanitize.log": "b3a4015c6d663bd159eb9df531ca438e0ea0c2a6aa2c0722bd2f86924f0efafe",
+    "artifacts/tests-color-rigid-full-release.log": "b61106f297d913d2118ac86b5c30fab0a4f8d78aa462f70ea1e68c37c64b6908",
+    "artifacts/tests-color-rigid-native-budget.log": "32ff0ee61e6373a984c84f53b040ffe8e2e32673e36ee3361276b22baece6afc",
+    "artifacts/tests-color-rigid-target-xr.log": "62d20453f34419fff1632c6fc2fe23c4928dec5ee1ec99a2c1e10349707d0891",
+    "artifacts/tests-color-rigid-target-menu.log": "16dafc6b5df2e4632ff39547de9d5c22fa45c8c267b6723a8886bdf20ff59c12",
+    "artifacts/tests-color-rigid-target-compact.log": "a0fa5819449d45eb4ab6a3826b4aa630a488c9098d40e31f0e83c2d0cd09c6be",
+    "artifacts/tests-color-rigid-vrm-menu.log": "e6b990814d1b777200588562412b3a8283a7e6fe3fefba0ab78ade672bb1b3d0",
+    "artifacts/tests-color-rigid-wayland.log": "477aec7d50b9a89774768df0a7d6893ef1d741f7a4c45c52ccbc76ca10cbb456",
+    "artifacts/tests-color-rigid-post-uv-menu.log": "1d768ed12bc091e41698351d5292508faa76fbbcd7a3e33abe654d5ec9988a8d",
+    "artifacts/tests-color-rigid-khronos.log": "d83fdece7fbcc8e2c8e9edd068b02a54010c9dc8b4fd14e7f8f25269dfaca311",
+    "artifacts/tests-color-rigid-vrm-schema.log": "55bdf9df95d3d62b972b3152796cb88f261606ec582defd06636fc0da5fe5813",
+    "artifacts/build-color-rigid-added-tests-release-before-reconfigure.log": "eb6e09514aac3fe0da42144edc572d39a72afa45cbf43a876b63a2008a2576d5",
+    "artifacts/configure-color-rigid-added-tests-release.log": "c4c001471dd3e62d7bc3c6bff6dc0d3b68ca0604e4e6adf200e1a7d32120dae7",
+    "artifacts/build-color-rigid-added-tests-sanitize-before-reconfigure.log": "eb6e09514aac3fe0da42144edc572d39a72afa45cbf43a876b63a2008a2576d5",
+    "artifacts/configure-color-rigid-added-tests-sanitize.log": "399b6171fc4856bfda8ba571ee83dbe2e1d1c24a051b7bb6aa8bb66e828f23e1",
+    "artifacts/build-color-rigid-added-tests-release.log": "279d4433e318fa9e568ead9b7ecacfb17171681dfa2df78fb9acebf69372ff86",
+    "artifacts/build-color-rigid-added-tests-sanitize.log": "744037bc6d97d03ef60eb027fc77af8d07c9499376e021382339c7c174afa3d7",
+    "artifacts/tests-color-rigid-added-release.log": "966618617878e69f354606e08371364129298bfb8ca6b82662af9c17e4ba3113",
+    "artifacts/tests-color-rigid-added-sanitize.log": "f5b8d10748313151eb9b06cfaf4ca1231497c63c55ce324ff587d759f861e312",
+    "artifacts/color-rigid-native-budget.json": "91df132afa4c52aa79e9b0e25bba21dea51dc846b4753516ff7dcf4eae8638d8",
+    "artifacts/color-rigid-emitted-manifest.json": "49f3ccf6f6631223ae547be3539cdd26ca6d28d112bba01d66f57b46d47054a8",
+    "artifacts/color-rigid-emitted-khronos.json": "bf5b1c12a1042e541191472730841c08e35442f143115311f6205a671a3cbce8",
+    "artifacts/color-rigid-emitted-vrm-schema.json": "d01f63474cfcc935f39a7a1792577b826e9e2981d243729840fee2c1717e2612",
+    "artifacts/arc-color-rigid/report.json": "b56b4c958dc55fb66e48b18876195ea2d60722c8c04b1d44d1a45e2d0e77a1f0",
+    "artifacts/menu-bake-color-target-workflow/report.json": "e8b82caec2fcec81b4b676fa169176c01fd53c73a565f9b75a5d9e7825841cf4",
+    "artifacts/menu-bake-color-target-compact/report.json": "40514795b9e61171f9be741c6f0c6e48168aa5bb4369a526d94cbd7f4929dc5d",
+    "artifacts/menu-color-rigid-vrm/report.json": "b74169723ce4639784d44f8dfff594505cf09ec60a54a50393fb64a3585a8aed",
+    "artifacts/menu-color-rigid-post-uv/report.json": "eed8872288261f883109f7fd6ebb66f53466142c9de93726b7cc9a70b2064ce4",
+    "artifacts/dome-menu/report.json": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af",
+    "artifacts/xr-color-rigid-target/report.json": "c788df6e80a113655916481024e23d3e777c8940694ddfce2d078737c4435194",
+    "build-sanitize/CMakeFiles/dome-sculpt-core.dir/flags.make": "16175e43d77dba71a88845426b5b7593b46498f9102a9355573738be18b6f325",
+    "build-sanitize/CMakeFiles/dome-sculpt-polygon.dir/flags.make": "a9852650297e2b7f4d3254d047352f87aacdc1740ae7aac06b230b8c89e7957e",
+    "build-sanitize/CMakeFiles/ufbx.dir/flags.make": "c9458562abcf626f92da39516bd2ff5930d5f74e1694b9eeae2000bc81339741",
+    "build-sanitize/CMakeFiles/mikktspace.dir/flags.make": "0909bc44bd7bee364837cf27d96d76f643736b0f42a792d935e5d36b57a4a0d4",
+    "build-sanitize/CMakeFiles/xatlas.dir/flags.make": "e9f9f394f8d7eda827d6421ce196b40a30d158bd7ce6e6f00e40895a52ace1c5",
+    "CMakeLists.txt": "08ec26087076838c879914b440ce41b9866c873b583e8ff9240adb9e3be0b2a1",
+    "docs/SCENE20-AUTHORING-INTEGRATION.md": "b96b1cd331997d03d0c70de9795f34ee0296e8d72a93da5cf07a65c75274705b",
+    "docs/validation/CURRENT-COLOR-TARGET-SAN.json": "77dd605b9d8ebfa6011bdff82bc18c297d850ee0eb18ec17803ea40fbcfeffaa",
+    "tests/target-precommit-budget.py": "7bf7957b93f027d61dc528888b3cf4ae6eab0deb00fef24bd7595054fa8bbcb8"
+  },
+  "future_budget_policy": "4e92509 cherry-picks1a30217: originalprecommit6/7 only600\u21921200; no source/oracle/range change; no registered rerun claimed",
+  "component_boundary_ledger": {
+    "receipt": "docs/validation/CURRENT-COLOR-TARGET-SAN.json",
+    "Release_actual_denials": 51598,
+    "SAN_unique_actual_denials": 51598,
+    "SAN_original_pass": 42,
+    "SAN_original_total": 44,
+    "SAN_timeout_only_finer_ranges": 4,
+    "affected_denials": 2372,
+    "full_helper_retry_each": true,
+    "runtime_unmodified": true,
+    "original_timeouts_preserved": true
+  },
+  "runtime_tree_ids": {
+    "src": "0bf41659d48863224603cfa620cc4b6ff820c6a1",
+    "include": "ec906d0b7d9ab270ad0636e5c8bb9ac6c802828d",
+    "assets": "86d714898dc244d755ce12ced294256fa585e0d3",
+    "third_party": "f5abb76c37cf2216712bea7cbc1ca973347df5e4"
+  },
+  "hash_roots": {
+    "build/": "qualification_tree",
+    "build-sanitize/": "qualification_tree",
+    "artifacts/": "qualification_tree",
+    "CMakeLists.txt": "published source equals qualification except documented test budgets",
+    "docs/": "published source"
+  }
+}

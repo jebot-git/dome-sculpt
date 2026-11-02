@@ -14,6 +14,53 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Qualified current-colour target authoring integration — 2026-11-02
+
+Scene20/material6/polygon5 now combines actual current-corner RGBA target
+preparation/Bake with retained normalUV/artist keys, source Bake and mixed
+rigid/source VRM0 authoring. Runtime7566a8f has fresh optimized alltargets and a
+full368/368 Release pass2827.37s, plus separately added2/2 fixtures35.43s. Read
+SCENE20-AUTHORING-INTEGRATION.md and its receipt for exact hashes and scopes.
+
+Fresh owned C/C++core/support/renderer SAN initially51/52 native (one240.25s
+rigid-oracle timeout) has a samebinary direct424070-check pass254.51s, then a
+corrected registered rigid pass203.15s plus dual185/joint70 checks:3/3 in459.54s.
+Separate graphics7/7 pass1358.67s. Preserve initial51/52 plus3/3; no single54-suite
+or fully instrumented frontend claim. Arc761, nativeFLTK9+10+17+7, latestprivate
+DomeDWayland8 and actual-loader syntheticXR11 pass. Emitted170 Khronos0errors/
+1194unfiltered warnings and official71VRM0×15pinned schemas0errors pass.
+
+Component65's51598 unique persistent allocation boundaries are complete in both
+Release and ownedSAN. SAN's original42/44 pass has only precommit6/7 timeouts;
+four exact samebinary finer ranges cover all2372 affected boundaries. Initial
+7629.84s transcript and timeouts remain preserved, not relabelled44/44. The
+future budget-only policy gives just those two original shards1200 rather than
+600 seconds, without source/oracle/range changes.
+
+The common basic authoring Save continuation is now isolated frozen62d4747 in
+artifacts/ordered-authoring-save-5c94862; fresh complete changed-ABI Release12577
+and ownedSAN18621 builds remain live. Exact oldheader/archive negative reproduces
+Save refusal during pending authoring. New AssetAcceptedSnapshot/AssetWork
+completion lets a following Save capture the committed endpoint, propagate exact
+failures and drain accepted Save on Close. This is unqualified/private; no new
+completion adapter is admitted until its actual lifecycle and frontend proofs pass.
+
+Contracts' raw current-corner UV witness/transfer aec07c2 has36 native plus19/19
+Release/SAN suites,13758 real whole-helper denials; prepared Scene23 and actual
+UV/controller completion remain private/unfinished. Palette native retained
+normal-sampling91c412c passes software and actualArc166 checks, including both
+full19-part VRoid avatars after fractional UV edits with sensitive normal/UV
+negatives; new-format export, UI admission and full runtimeSAN remain required.
+Scene21/22/23 are excluded from this Scene20 milestone.
+
+Docs' native3Dmouse checkpoint has57 native,25 actual FLTK and11 Wayland checks;
+latest desktopSAN and14 Canvas-lifecycle assertions pass. Inherited Wayland
+shared-EGL and XR112-byte driver lifetime reports remain explicitly separate;
+no canonical-toolkit fork/suppression is authorized. After its freeze, native
+image-projection/stencil Document/FLTK/XR workflow remains the next basic task.
+Controller drawers stay queued after basics. No new physical test, installation
+or desktop restart occurred; the accepted saved XR session remains preserved.
+
 ## Qualified rigid source avatar integration — 2026-11-02
 
 Public merge9ccddef is runtime/header/asset/third_party/CMake/test byte-identical to
@@ -31,31 +78,8 @@ do not claim one46/46run or a newfull321suite. Arc404, active-unskinned22-part
 nativeFLTKexport7, latestprivateDomeDWayland8 and emitted105KHR0errors/1130warnings,
 official71VRM0×15pinned schemas0errors pass. No fresh physical test or install.
 
-Next combined Scene20 tree remains private/frozen7566a8f. Optimized alltargets6519
-and ownedSAN38-target build49536 are terminal0. FullRelease368job6312 remains
-live; nativeSAN52job99713 initially51passes+one240.25s rigid-oracle timeout; the
-samebinary direct600-budget47552 passes424,070checks254.51s. SANgraphics7/7job90584
-passes1358.67s. Joint test-only2e8699f separately passes70O3Release/ownedSAN/Arc
-checks on exactreadonly756: actual22-part normalUV/key/linked-pose plus independent
-current-field source+target Bake, oneScene20 Save/reopen/aliases,112materialroles/
-samplers and independentVRM/GLB pixels. No actual product repair was needed.
-This partial combined qualification does not yet publishScene20 orScene21/23.
-
-Contracts'65 extendedSAN44 is still finite/live (knownprecommit6/7 budgettimeouts
-will be rerun in exact finer ranges afterterminal); all51598Release boundaries
-remain preserved. New current-corner-uv-2e8699f starts real rawPAUV transfer with
-a fresh changed-ABI core, then prepared colourUV Scene23/material8/entry3 and typed
-orderedApply remain required. Palette's normal-sampling-context-7566a8f composes
-Scene21/material7/normalentry3 pools and paired closures; no renderer/UI/export
-admission claimed. Source21/22/23 remain private,22 reserved for corner-origin keys.
-
-Docs' native3Dmouse isolated57 native tests,25 FLTK and10 Wayland fixtures pass;
-final graceful-exit sanitizer work found an inherited baseline Fontconfig ownership
-leak and is addressing a separately reproduced narrow process lifetime fix.
-After freezing that checkpoint, Docs will implement the missing BASIC native
-image-projection/stencil Document/FLTK/XR workflow atop the existing C++ kernel.
-Controller drawers remain queued after basic targets as the user specified.
-Preserve every running proof/source tree and the accepted physical session.
+The combined Scene20 qualification and current private work are recorded above.
+Preserve these older rigid-only proofs as separately scoped history.
 
 ## Previous qualified authoring adapter checkpoint — 2026-11-02
 
@@ -83,18 +107,9 @@ is inferred from directcaller Bake admission. Fractional actual-avatar UV scale
 still has a real quality refusal; only repeated integer-texel avatar UV/key
 workflows are qualified. Every incomplete REQUIREMENTS.md row remains required.
 
-Further isolated work (not this checkpoint): root rigid-authoring-union-9e6cb1b
-atd5de43b combines separately qualified17b0ff7, fresh Release87127/SAN79530 builds
-live. Root color-rigid-union-d5de43b at7566a8f adds component65b0ae9 Scene20/material6/
-polygon5, fresh Release6519/SAN49536 builds live. Both are unqualified/unpublished.
-Contracts' isolated joint-authoring-7566a8f tests oneScene20 normalUV/keys/rigid/color
-coexistence; dual current-source+target test-only8496dec has185software/SAN/Arc
-checks. Parent65 extendedSAN44 job28449 is stilllive (Release44=51,598 actual
-failures and functionalRelease11/SAN11/Arc357 complete). Docs owns native3Dmouse
-worktree desktop-spacenav-8d68dc7. Palette Scene21/material7/normalentry3 remains
-ABI-open and unadmitted; Scene22 is reserved for independent corner-origin keys.
-Preserve frozen component/proof trees, source commits and every running handle.
-No physical launch, system installation or active desktop restart occurred.
+The subsequent rigid and Scene20 integrations are now qualified as recorded above;
+the older pending-status snapshot is superseded. No physical launch or system
+installation is implied by these source checkpoints.
 
 ## Previous desktop framing checkpoint — 2026-11-02
 
