@@ -25,15 +25,30 @@ whole-resolution speed. Tiny cases are slower; initial queue/JIT costs remain
 visible. Read GPU-SPARSE-RESAMPLE-WIP.md/.json. No before/after manifest was
 captured for that run; sealing-time hashes are scoped honestly.
 
-Separate actual-worker childc0fa331 adds selected-backend field sessions,
-bounded query batches, one source upload per field, native CPU preservation and
-an independent-reference/dispatch/failure-publication fixture. Fresh CPU,
-OneAPI and ownedSAN builds are in progress; no actual-worker test pass is
-claimed. Initial CUDA backend compile fails on host constexpr reciprocal-array
-access. Separate child2d17cb1 emits equivalent device-callable constant accessors;
-CUDA sm86 and HIP gfx1030 backend-TU compile and standalone hostR2/SAN2 pass.
-Device and actual-worker qualification remain pending, with frozen trees kept
-separate. No positive NVIDIA/AMD hardware claim or main runtime admission.
+Separate actual-worker sourcec0fa331 /metadatae16ba06 now has fresh coherent
+production core/support CPU6/6 and actualA770 OneAPI5/5. Actual native layered/
+masked output is byte-identical1,152,784bytes across CPU/GPU; a link wrapper
+proves production dispatch and later-failure atomic refusal. Document history,
+Save/reopen, controller and progress checks pass. All1,142 captured source/
+binary hashes match. The small whole-job measurement77.11msCPU/213.28msOneAPI
+is slower on GPU, including initial queue/kernel overhead and concurrent user
+activity; dense interpolation benefit does not establish whole-job acceleration.
+Whole-owned C/C++core/support SAN build29465 remains live; no SAN pass or new
+frontend qualification yet. Read GPU-RESOLUTION-WORKER-WIP.md/.json.
+
+Initial CUDA compile fails on host constexpr reciprocal-array device access.
+Portable source2d17cb1 /metadata932b344 fixes the generator: CUDA sm86 and HIP
+gfx1030 entire backend TUs compile; standaloneR2/SAN2 and actualA770 OneAPI4
+pass exact arithmetic/sparse results,1,140 source/binary hashes unchanged.
+Linked minimal CUDA/HIP probes refuse missing devices with source cells exact;
+manual HIP link-invocation errors remain preserved separately. Read
+GPU-RESAMPLE-PORTABILITY-WIP.md/.json. No positive AMD/NVIDIA device claim.
+
+New sourcef01e04f adds detached-grid lifetime, actual missing-device Scene
+publication and repeated whole-job probes. Fresh canonical FLTK/OpenXR CPU
+build99131 and OneAPI75547 are live in the portable child; no test/build pass
+is inferred. All source/header/test inputs stay frozen during their work.
+Current public runtime remains870aa6c; no GPU resolution runtime admission.
 
 Agents report paint24 preview600fe76 fully qualified software/Arc/SAN;
 export44380ef R/Arc passes, SAN3/4 plus a1200s graphics timeout remains distinct.

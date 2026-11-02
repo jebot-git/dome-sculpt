@@ -1,0 +1,50 @@
+{
+  "source_commit": "2d17cb16e2732a9065446ade2963e0464f7ea442",
+  "scope": "standalone arithmetic/sparse plus CUDA/HIP entire backend translation-unit compile; inherited worker unqualified",
+  "compile": {
+    "cuda": "13.4.59; -std=c++20 -O3 -arch=sm_86",
+    "hip": "7.1.52802; -std=c++20 -O3 --offload-arch=gfx1030"
+  },
+  "tests": {
+    "release": "2/2",
+    "whole_header_test_sanitize": "2/2; ASan/UBSan/leaks",
+    "oneapi_actual_A770": "4/4; level_zero:0"
+  },
+  "source_binary_before_after_count": 1140,
+  "timing_scope": "concurrent user VRChat/build activity; not controlled performance comparison",
+  "sha256": {
+    "tools/generate-softfloat-f64.py": "6deff45c068f26dfa4a9c8834999b6ac094fd4b232295f24da5cb1b1a4af3f2b",
+    "third_party/softfloat/dome_f64.hpp": "ac501ab9342f8756561858d0ac59f6884404a83f9182144d1f0022049cdeb240",
+    "third_party/softfloat/SOURCES.json": "fcf9034355392c4b7a4985f865e8d96c8c94546c91dad79c47b685d1532dc469",
+    "CMakeLists.txt": "d12437cd33747ed19c93329c6663bc58da237cece81a16677723bc332c51dbfb",
+    "src/backend_gpu.cu": "3e8f77c8f249c89969fc54bd11e99ac956a7a59e741160ea8c5deb4f87069109",
+    "artifacts/compile-cuda.log": "73af0055d9bd5becebf678192d7768555680b9de4200c4d14611be8bcf7c2527",
+    "artifacts/compile-hip.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/backend-cuda.o": "7b863237547df38f15abe56e3fa93473c38d5db699691c2be170b3b918111399",
+    "artifacts/backend-hip.o": "37ea15bf5521c22f3bb3bfb78eb1508bda2c54716ac94ccdd418ff1df0bdc80f",
+    "artifacts/tests-release.log": "ba410c34b8174bccf85758a989874e52c22543428c7d7cb45af5b88ae87ae324",
+    "artifacts/tests-sanitize.log": "a67a89f0a098d9ece64eb35b65cc60faa00d835d21372faca53e4525c5a83556",
+    "artifacts/tests-oneapi.log": "d95123c95dd10bef45b8dec1d082a0312c086229928244d56194fa8af5e7adb4",
+    "build/artifacts-portable-release.xml": "2e6f69a7ff7d725250a65f02940c481e36ec4b1b09a2b90e6d72b0d2332de528",
+    "build-sanitize/artifacts-portable-sanitize.xml": "1f81cfd6d74b406006d081c5f2f662cd9128d8b258f79a36b61a531faf97ff1e",
+    "build-oneapi/artifacts-portable-oneapi.xml": "74368534b86a0c416e520d3d8adfc36fb36cb344cc7aa0cadc7240bf9c481ded",
+    "artifacts/before-device.json": "efc920e68a3dcc0bdea79e8ca9c662504271a1100f22fcf61699751b57639e07",
+    "artifacts/after-device.json": "efc920e68a3dcc0bdea79e8ca9c662504271a1100f22fcf61699751b57639e07",
+    "artifacts/resample-missing-probe.cpp": "18ca99e38788a2c9bcc3c756c18691f2bb33f0ec9ea86492e4a157623dd37360",
+    "artifacts/link-cuda-missing.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/cuda-missing.log": "8a53aa5b9cb52f2d2c5ebdac6128b0969439cc5e6abe8881e133036def0ccfd5",
+    "artifacts/resample-cuda-missing": "8321511e5b134978e9a8af433add1528561c7d140cdc0a294156a151569ac5f1",
+    "artifacts/link-hip-missing.log": "ef074792136a468b554fa8e24356ccff6916847330c015bf5601f11ecb6fa528",
+    "artifacts/hip-missing.log": "ef6e5a9405d41d2de46065f78e9f4a4e3da752947e8f5641e48c9eae4866ada8",
+    "artifacts/link-hip-missing-fixed.log": "2ca2fd513a6cf54eb56525485dfa65c9007202d80258ccb89c9809cfbfc2a6c8",
+    "artifacts/link-hip-missing-runtime.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/hip-missing-runtime.log": "9c6eacd26363aa089dff043e8c65c6922d75e279f651eaef2697a341a24e2612",
+    "artifacts/resample-hip-missing": "641899736940aa1ea8742d8c283521e1ed4a67257d6305720930990dce286cdf"
+  },
+  "missing_device_probes": {
+    "CUDA": "linked actual backend object+cudart; insufficient driver; source cells unchanged",
+    "ROCM": "linked actual backend object+amdhip64; no device; source cells unchanged",
+    "scope": "minimal native module probes, not full application",
+    "initial_hip_manual_link_failures_preserved": true
+  }
+}
