@@ -77,9 +77,8 @@
   "initial_GUI_harness_failures": "Two runners defaulted to absent build-preview/build-rig-fit-release; explicit current build paths fix harness only, original logs preserved",
   "full_CPU_Release": {
     "session": 38150,
-    "state": "live",
+    "state": "terminal",
     "log": "artifacts/tests-basic-authoring-full-release.log",
-    "future_junit": "build/artifacts-basic-authoring-full-release.xml",
     "do_not_restart_on_observation_timeout": true,
     "observed_failure_count": 3,
     "observed_failures": [
@@ -91,12 +90,18 @@
       "import-options-controller": "Obsolete spatial page count25/max24; new shared projection/PBR/rig pages require28/max27 and action assertions.",
       "sculpt-mask-controller": "Product regression: material-view endpoint fence also blocks direct voxel input before first mesh publication. Separate9684486 scopes fence to mesh sampling with deterministic real worker barrier.",
       "openxr-client": "Synthetic paint fixture follows old Controls\u2192ColorPresets route, missing new projection submenu. Separate9684486 traverses real projection\u2192presets while retaining blue pixel oracle."
-    }
+    },
+    "terminal_exit": 8,
+    "tests": 395,
+    "passed": 392,
+    "failures": 3,
+    "seconds": 4541.67,
+    "junit": "build/artifacts-basic-authoring-full-release.xml"
   },
   "remaining_for_qualification": [
-    "Full395 terminal result/diagnosis",
-    "Any additional checks justified by full-run failures",
-    "Final preserved-main-doc merge/source equality and integration receipt before main publication"
+    "Final corrected full-loader result/diagnosis",
+    "Any checks justified by corrected-loader findings",
+    "Final preserved-main-doc merge/source equality and exact split-result integration receipt before runtime publication"
   ],
   "no_physical_test": true,
   "no_install": true,
@@ -154,7 +159,9 @@
     "artifacts/basic-authoring-current-glbs.json": "8972992b3dc1e66628309cc174234d5e6c361f94af8b5fa8b7df5cf269ba5bcb",
     "artifacts/validate-basic-current.cjs": "4aac71edc405a46ecc54e434d8bde50ee0e1ffa1f927434790150d3642b7b740",
     "artifacts/pbr-preview-normal-close.py": "08453d7a2dc507143a94b503d36a7367d4ad02ba6bf7204bf8840b3b73e2bc99",
-    "artifacts/basic-authoring-observed-failures.json": "4de2d3cd49c2fe11c88173aee14472444b1256fa8d8ed03367766bd944a4d797"
+    "artifacts/basic-authoring-observed-failures.json": "4de2d3cd49c2fe11c88173aee14472444b1256fa8d8ed03367766bd944a4d797",
+    "build/artifacts-basic-authoring-full-release.xml": "2fce7b744265fad867f21853392176ff63e852f5e60ab4aa4f33da1914a3fb42",
+    "artifacts/tests-basic-authoring-full-release.log": "1e5cac70c346392d3d7eb250fcaf6e355cb587c359aff39ec9274d21a547cc10"
   },
   "additional_composed_frontends": {
     "projection_compact": {
@@ -221,13 +228,43 @@
     "maxIssues": 0,
     "inputs": "20completed Arc PBR/current avatar GLBs +14 completed actual FBX/pose GLBs; not every output of stilllivefull395"
   },
-  "updated_utc": "2026-11-02T18:51:24.299060+00:00",
+  "updated_utc": "2026-11-02T19:04:45.989838+00:00",
   "correction_child": {
     "tree": "artifacts/basic-authoring-regressions-25fe208",
-    "source": "9684486",
+    "source": "9684486 production +test-only cc3bf97 tracking-recovery retime",
     "fresh_Release_build": 71240,
     "fresh_owned_SAN_build": 71315,
-    "state": "live",
-    "deterministic_old_mask_negative": true
+    "state": "partial corrected scopes pass; full loader final30315 live",
+    "deterministic_old_mask_negative": true,
+    "fresh_Release_build_terminal_exit": 0,
+    "fresh_owned_SAN_build_terminal_exit": 0,
+    "registered_Release": {
+      "tests": 5,
+      "failures": 0,
+      "seconds": 0.75
+    },
+    "registered_owned_SAN": {
+      "tests": 5,
+      "failures": 0,
+      "seconds": 3.67
+    },
+    "initial_loader_missing_helper": {
+      "session": 22752,
+      "terminal_exit": 8,
+      "checks_pass": 59
+    },
+    "second_loader_deliberate_tracking_loss": {
+      "session": 48146,
+      "terminal_exit": 8,
+      "checks_pass": 138,
+      "checks_fail": 1,
+      "reason": "Retimed stroke hit deliberate tracking-loss frame22; corrected to recovered frame24 without removing tracking/dropout or blue oracle"
+    },
+    "isolated_current_paint": {
+      "terminal_exit": 0,
+      "blue_texels": 48,
+      "required_gt": 20
+    },
+    "final_loader_session": 30315
   }
 }
