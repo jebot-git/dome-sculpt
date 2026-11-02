@@ -119,6 +119,18 @@ int main(int argc,char **argv)try {
     check(observed&&Scene::load(path).active().name=="Accepted close endpoint","Close actually waits on the accepted-operation completion predicate and drains its Save before worker shutdown");
   }
   {
+    const auto path=directory/"spatial-save.dsculpt";original.save(path);auto old=bytes(path);
+    {
+      Document doc;Release release;doc.open(path);queue(doc,"Spatial Save endpoint");
+      doc.request_save();
+      check(doc.frame().state->can_save_after_asset&&bytes(path)==old,
+        "Shared spatial Save request queues behind accepted authoring without replacing the old native file");
+      authoring.release();
+    }
+    check(Scene::load(path).active().name=="Spatial Save endpoint",
+      "The spatial Save path and immediate document Close drain the exact accepted result");
+  }
+  {
     Document doc;Release release;auto scene=current_color_target_fixture::fixture(true);doc.replace(scene.snapshot());check(doc.wait_mesh(),"Actual current-colour target publishes before Bake");
     const auto source=scene.objects().back().id;const auto unchanged=scene.encode();ObjectBakeSettings settings;settings.prepare_colors=true;settings.ao_samples=0;settings.padding=4;
     authoring.arm();doc.bake_from_object(source,settings);authoring.wait();auto path=directory/"actual-bake.dsculpt";auto saving=doc.save_async(path);
