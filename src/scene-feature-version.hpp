@@ -25,7 +25,13 @@ inline unsigned minimum_scene_version(const DeformationState *d) {
              ? 11u
              : 0u;
 }
-inline unsigned minimum_scene_version(const CreatorAppearance *a) {return a && a->source_receipt ? 11u : 0u;}
+inline unsigned minimum_scene_version(const CreatorAppearance *a) {return !a?0u:a->material==0?17u:a->source_receipt?11u:0u;}
+inline unsigned minimum_appearance_scene_version(const nlohmann::json &a){
+  if(a.is_null())return 0;
+  const auto &material=a.at("material");
+  if(!material.is_number_integer()||(material.is_number_unsigned()?material.get<uint64_t>()>INT32_MAX:material.get<int64_t>()<0||material.get<int64_t>()>INT32_MAX))throw std::runtime_error("Invalid retained appearance material identity");
+  return material.get<int64_t>()==0?17u:0u;
+}
 inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)

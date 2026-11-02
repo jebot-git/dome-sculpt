@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 #include <span>
 #include <set>
+#include <tuple>
 namespace dome {
 namespace {
 void stop(const CreatorArchiveLimits &l){if(l.cancelled&&l.cancelled())throw std::runtime_error("Creator source persistence cancelled");}
@@ -61,6 +62,7 @@ std::shared_ptr<const std::string> vrm_string(const nlohmann::json &json){
   return {};
 }
 std::pair<std::string,std::string> material_strings(const nlohmann::json &json,int material){
+  if(material==-1)return {}; // witnessed glTF implicit default, not authored material zero
   if(material<0||!json.contains("materials")||size_t(material)>=json.at("materials").size())
     throw std::runtime_error("Creator material is outside its original source");
   std::string mtoon;
@@ -156,7 +158,7 @@ void validate_model_nodes(const CreatorSourceModel &source,const nlohmann::json 
 const ImportedPrimitive &mapped_primitive(const CreatorAppearance&a){
   if(!a.asset||!a.original_bytes||!a.decoded_images||a.asset->mode!=ImportMode::PreserveGltf)
     throw std::invalid_argument("Creator appearance lacks immutable preserved source data");
-  if(a.material<1||size_t(a.material)>=a.asset->materials.size()||a.source_material!=a.material-1||a.source_mesh<0||
+  if(a.material<0||size_t(a.material)>=a.asset->materials.size()||a.source_material!=a.material-1||a.source_mesh<0||
       size_t(a.source_mesh)>=a.asset->meshes.size()||a.source_node<0||size_t(a.source_node)>=a.asset->nodes.size()||
       a.asset->nodes[a.source_node].mesh!=a.source_mesh||a.source_primitive<0)
     throw std::runtime_error("Creator appearance identity differs from original source");
@@ -168,8 +170,19 @@ const ImportedPrimitive &mapped_primitive(const CreatorAppearance&a){
   if(!primitive||primitive->material!=uint32_t(a.material))throw std::runtime_error("Creator source primitive/material mapping is invalid");
   return *primitive;
 }
+void validate_material_identity(const CreatorAppearance&a,const nlohmann::json &json){
+  const auto &primitive=json.at("meshes").at(size_t(a.source_mesh)).at("primitives").at(size_t(a.source_primitive));
+  if(a.material==0){
+    if(a.source_material!=-1 || primitive.contains("material"))throw std::runtime_error("Implicit default material requires original primitive material absence");
+    const auto &m=a.asset->materials.at(0);const ImportedMaterial d;
+    auto fields=[](const ImportedMaterial &v){return std::tie(v.name,v.color,v.emissive,v.metallic,v.roughness,v.alpha_cutoff,v.normal_scale,v.occlusion_strength,v.double_sided,v.unlit,v.alpha,v.color_texcoord,v.metal_rough_texcoord,v.normal_texcoord,v.occlusion_texcoord,v.emissive_texcoord,v.color_texture,v.metal_rough_texture,v.normal_texture,v.occlusion_texture,v.emissive_texture);};
+    if(fields(m)!=fields(d))throw std::runtime_error("Implicit glTF default material factors differ from source defaults");
+  }else if(!primitive.contains("material") || integer(primitive.at("material"))!=uint32_t(a.source_material))
+    throw std::runtime_error("Creator material identity differs from original primitive declaration");
+}
 void validate_mapping(const CreatorAppearance&a,const nlohmann::json &json,const CreatorArchiveLimits &l){
   const auto &primitive=mapped_primitive(a);
+  validate_material_identity(a,json);
   if(a.source_vertices.empty()||a.source_vertices.size()>l.max_remap_vertices)
     throw std::runtime_error("Creator source vertex mapping is invalid");
   size_t k=0;
@@ -315,12 +328,15 @@ std::shared_ptr<const CreatorAppearance> decode_creator_appearance(const nlohman
   const auto &model=*entry.source;
   result->original_bytes=model.original_bytes;result->source_receipt=model.source_receipt;
   result->asset=model.asset;result->decoded_images=model.decoded_images;result->vrm_json=model.vrm_json;
-  result->material=int(integer(j.at("material")));result->source_material=int(integer(j.at("source_material")));
+  result->material=int(integer(j.at("material")));
+  const auto &source_material=j.at("source_material");
+  result->source_material=source_material.is_number_integer()&&!source_material.is_number_unsigned()&&source_material.get<int64_t>()==-1?-1:int(integer(source_material));
   result->source_mesh=int(integer(j.at("source_mesh")));result->source_node=int(integer(j.at("source_node")));result->source_primitive=int(integer(j.at("source_primitive")));
   auto &bytes=j.at("source_vertices");
   if(!bytes.is_binary()||bytes.get_binary().empty()||bytes.get_binary().size()%4||bytes.get_binary().size()/4>assets.limits_.max_remap_vertices)
     throw std::length_error("Invalid persisted creator source vertex mapping");
   mapped_primitive(*result);
+  validate_material_identity(*result,entry.json);
   auto [material,mtoon]=material_strings(entry.json,result->source_material);
   const auto &raw=bytes.get_binary();result->source_vertices.reserve(raw.size()/4);
   for(size_t at=0;at<raw.size();at+=4)result->source_vertices.push_back(word(raw,at));

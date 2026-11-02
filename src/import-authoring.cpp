@@ -245,16 +245,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     // Editing/query inversion must be well defined before native adoption.
     (void)AffineTransform(node.world).inverse();
     auto local=similarity(node);if(local)native_locals[n]=*local;else affine_graph=true;
-    if (node.mesh >= 0) {
-      for (auto primitive : asset->meshes.at(size_t(node.mesh)).primitives) {
-        const auto &p = asset->primitives.at(primitive);
-        if (p.material == 0)
-          throw std::runtime_error(
-              "Implicit default-material provenance adoption is required "
-              "before importing this source; source was not changed");
-        ++objects;
-      }
-    }
+    if (node.mesh >= 0)
+      objects += asset->meshes.at(size_t(node.mesh)).primitives.size();
   }
   if (objects == 0)
     throw std::runtime_error(
@@ -321,8 +313,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       appearance->source_vertices.resize(p.mesh.positions.size());
       std::iota(appearance->source_vertices.begin(),
                 appearance->source_vertices.end(), 0);
-      appearance->material_json =
-          json.at("materials").at(p.material - 1).dump();
+      if(p.material)appearance->material_json=json.at("materials").at(p.material-1).dump();
       appearance->source_basis_quaternion = Quat{};
       if (json.contains("extensions") && json.at("extensions").contains("VRM"))
         throw std::runtime_error(

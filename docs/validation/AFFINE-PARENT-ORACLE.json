@@ -1,0 +1,24 @@
+{
+  "recorded_utc": "2026-11-02T05:10:02.522573+00:00",
+  "product_source": "c6324ddf464b09df514e580faa299366cf9830b0; published78a1034",
+  "change": "Replace obsolete detached-root assertion with retained parent and independent complete original world matrix comparison; original joint/IBM/posed-position and all27 cancellation checks remain",
+  "test_source_sha256": "5b0f06f31d277f4d858fe2d589cb49c9b37db2f0327c5574db8c94f168caf5d9",
+  "public_check": {
+    "checks": 106,
+    "cancellation_boundaries": 27,
+    "exit": 0,
+    "scope": "New optimized fixture compiled against exact public78 matching headers and frozen qualified9fd/c632 own-core/support archives; not a fresh full application build",
+    "log_sha256": "5669996b8383afb0ff97d2b5379dc6204e152c981a3f2a7241592b6d5c3bf2c3",
+    "link_map_sha256": "e72c3b7ad714f056979a53dcc6f64f54cfecadb28bd6afd71725b3eb3b507f85"
+  },
+  "combined_UV1_check": {
+    "source": "b59d29f",
+    "test": "affine-export",
+    "passed": 1,
+    "failed": 0,
+    "report": "artifacts/tests-affine-parent-oracle-union.xml",
+    "sha256": "990140636f87f0d97a96244873551cd5d05c5e00ad2964b04154a3fefd22027a"
+  },
+  "historical_full_union": "b59d29f259 run passed258; lone legacy detached-parent structural assertion failed and is repaired here. This record does not relabel that run as259/259.",
+  "full_production_complete": false
+}
