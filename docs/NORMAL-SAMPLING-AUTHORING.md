@@ -63,5 +63,8 @@ Read `validation/NORMAL-SAMPLING-AUTHORING.json` for exact hashes and validation
 scopes. The prior native rendering checkpoint 91c412c independently qualified
 166 software/A770 checks and 36 original-domain images, including both actual
 CC0 female/male nineteen-part models. That historical device proof remains
-separate from this authoring build; its 97-check generic consumer is rerun under
-the current fully instrumented software build. Full-goal work remains active.
+separate. The frozen e52bc71 authoring build also passes its 97-check generic
+consumer and 18 independent reference images on the actual PCI03 Intel Arc A770.
+All 640 source and three fixture/library hashes remain identical before/after
+that bounded hardware run. Its fully instrumented software consumer passes
+separately. Full-goal work remains active.

@@ -67,7 +67,7 @@
     "checks": 166,
     "images": 36,
     "device": "A770 PCI03",
-    "current_UI_hardware_run": false
+    "current_UI_hardware_run": true
   },
   "toolkit": {
     "DomeD": "d271cf65c612a462fcfa6739416b06c6565be070",
@@ -82,7 +82,7 @@
     "RGBA-only token-preserving overload is qualified; this is not new native color-only Bake UI",
     "Independent split-corner key conversion Scene22 remains required",
     "Dormant typed-to-PBR reference migration and combined current-corner colour UV adaptation remain required",
-    "No whole repository suite or new current-source A770 proof is inferred"
+    "No whole repository regression suite or new physical-headset acceptance is inferred"
   ],
   "source_sha256": {
     "CMakeLists.txt": "4e293a2a61edb217f625b68288204f88fec9661bec36cc939255d4e42e827257",
@@ -421,5 +421,17 @@
     "scene21-ui-normal-domain-openxr.log": "4602d7c2b60aceec7435127ed0524dc81fc2d7de9a70149c2d1cc588eb519b76",
     "scene21-ui-selection-openxr-final.log": "0a64f04d66d87baa4861fa87e9fb31115a9a95398d35108f9947b09a0f4fc974",
     "scene21-ui-regressions-release.log": "49c5a4a187a46e3c0bc8b647440110eccb38dd8ae3de363a22560049be7378e1"
+  },
+  "current_source_device_proof": {
+    "head": "e52bc7116d8ee1150d57d2a7f038405be4758ad2",
+    "device": "GPU Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "selector": "pci-0000_03_00_0",
+    "checks": 97,
+    "images": 18,
+    "max_image_error": 2,
+    "manifest_unchanged": true,
+    "source_hashes": 640,
+    "binary_hashes": 3,
+    "log_sha256": "e325d69c1b37a4aa555d04a9a7c8ed36319123437e092699cbea00a9621d1b3b"
   }
 }
