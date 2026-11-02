@@ -4,6 +4,33 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Authoring adapter review branch — 2026-11-02
+
+Branch work/authoring-adapters-04d contains product8d68dc7 and test-only9e6cb1b.
+See AUTHORING-ADAPTER-INTEGRATION.md and its receipt. Optimized alltargets build
+passed; fresh owned C/C++ core/support/render sanitizer native40, graphics5 and
+fault6 all pass, as do actual Arc355, native FLTK/Wayland81 and current-source
+syntheticXR11. Emitted87 Khronos0errors/770warnings and53 official VRM0/15pinned
+schemas0errors are scoped separately. Full Release317 job47563 remains LIVE;
+it currently has one obsolete picker exclusion assertion, corrected by9e with
+61native Release/SAN checks and no runtime source change. Preserve the initial
+failed run. Do not claim a single317/317 green run or broad qualification yet.
+
+Tracked source-VRM GUI now uses visible OK/chooser-close stages, failure captures
+and a bundled default fixture; final7passes. Earlier Return-only timeouts and
+missing explicit source/old-version setup attempts are retained honestly.
+All runtime/include/asset/third_party bytes match frozen8d for these proofs.
+
+A separate root artifacts/rigid-authoring-union-9e6cb1b atd5de43b integrates clean
+component17b0ff7, with fresh Release87127/SAN79530 builds LIVE. It is not qualified
+or published. Component17 own Release5/SAN5/Arc49/GUI7 proofs remain separately
+scoped. Docs agent now owns desktop-spacenav-8d68dc7 for the unmet native3Dmouse
+workflow. Contracts target20 has clean65b0ae9, Release11/SAN11/Releasefault44/Arc357,
+but extendedSAN44 job28449 is still LIVE; source+target joint-color testing is
+in an isolated child. Palette Scene21 remains ABI-open and unadmitted. Preserve
+all source/receipt trees and do not confuse these with current production scope.
+No physical headset launch, system installation or desktop restart occurred.
+
 ## Current desktop framing checkpoint — 2026-11-02
 
 Product3c491bf adds native Frame all(Home), Frame selection(Shift+F), stable orbit
