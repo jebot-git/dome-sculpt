@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "brush_kernel.hpp"
 #include "csg-kernel.hpp"
+#include "sparse-resample-backend.hpp"
 #include <stdexcept>
 #include <vector>
 #if defined(__HIPCC__)
@@ -41,6 +42,11 @@ __global__ void compose_boxes(const Sample *samples,float *distances,size_t coun
                               const CsgBox *boxes,size_t box_count,float band) {
   size_t i=blockIdx.x*blockDim.x+threadIdx.x;
   if(i<count)distances[i]=csg_detail::sample(samples[i],boxes,box_count,band);
+}
+__global__ void sparse_values(const sparse_resample::Cell *cells,uint32_t mask,
+    const sparse_resample::Point *points,uint64_t *values,size_t count,sparse_resample::Parameters p) {
+  const size_t i=blockIdx.x*blockDim.x+threadIdx.x;
+  if(i<count)values[i]=sparse_resample::sample(cells,mask,points[i],p);
 }
 template<class T> struct Buffer {
   T *data=nullptr;
@@ -94,4 +100,36 @@ void apply_csg(std::span<Sample> samples,std::span<const CsgBox> boxes,float ban
   csg_detail::checkpoint(cancelled);
   for(size_t i=0;i<samples.size();++i)samples[i].distance=result[i];
 }
+struct SparseFieldSampler::Impl {
+  Buffer<sparse_resample::Cell> cells;
+  Buffer<sparse_resample::Point> points;
+  Buffer<uint64_t> values;
+  sparse_resample::Parameters parameters;
+  uint32_t mask;size_t capacity;bool failed=false;
+  Impl(const sparse_resample::Grid &grid,sparse_resample::Parameters p,size_t count):cells(grid.cells().size()),points(count),values(count),parameters(p),mask(grid.mask()),capacity(count) {
+    checked(DS_COPY(cells.data,grid.cells().data(),grid.cells().size_bytes(),DS_TO_DEVICE));
+  }
+};
+SparseFieldSampler::SparseFieldSampler(const sparse_resample::Grid &grid,sparse_resample::Parameters p,size_t capacity) {
+  if(!capacity||capacity>65536)throw std::invalid_argument("Invalid sparse resampling chunk capacity");
+  sparse_resample::validate_queries({},p);impl_=std::make_unique<Impl>(grid,p,capacity);
+}
+SparseFieldSampler::~SparseFieldSampler()=default;
+std::vector<uint64_t> SparseFieldSampler::sample(std::span<const sparse_resample::Point> queries,const std::function<bool()> &cancelled) {
+  auto &state=*impl_;if(state.failed)throw std::runtime_error("Sparse resampling GPU session has failed");
+  sparse_resample::validate_queries(queries,state.parameters,[&]{sparse_resample_checkpoint(cancelled);});
+  std::vector<uint64_t> result(queries.size());
+  try {
+    for(size_t first=0;first<queries.size();) {
+      sparse_resample_checkpoint(cancelled);const auto count=std::min(state.capacity,queries.size()-first);
+      checked(DS_COPY(state.points.data,queries.data()+first,count*sizeof(sparse_resample::Point),DS_TO_DEVICE));
+      sparse_values<<<(count+127)/128,128>>>(state.cells.data,state.mask,state.points.data,state.values.data,count,state.parameters);
+      checked(DS_LAST_ERROR());checked(DS_SYNC());
+      checked(DS_COPY(result.data()+first,state.values.data,count*sizeof(uint64_t),DS_TO_HOST));first+=count;
+    }
+    sparse_resample_checkpoint(cancelled);
+  }catch(...){state.failed=true;(void)DS_SYNC();throw;}
+  return result;
+}
+
 } // namespace dome

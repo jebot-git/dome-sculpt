@@ -1,0 +1,24 @@
+{
+  "upstream": "https://github.com/ucb-bar/berkeley-softfloat-3",
+  "commit": "0a5ad290c6b287f6605bb99a35ad0842c1e61aa5",
+  "release": "3e",
+  "license": "BSD-3-Clause",
+  "source_files": {
+    "f64_add.c": "edb05c732053d1107456c95b7f9b18e58a25546925d3ffafac27b5f263db0b2e",
+    "f64_sub.c": "6b581000e70e679e057d2ce17e0839aa5a7da6982685b9718b6540069441e689",
+    "f64_mul.c": "335137bca17d29eddb451f562869ca7327c5fe472f347d2e36c55e4c2219e79b",
+    "f64_div.c": "c44985b8084d6407fd3cd4043dbe02c2651721ac03d1c3920798fc1b75ea2f3e",
+    "i32_to_f64.c": "de334caa22edfcfc2a35572a2e858f0c500ad5018fc4335b46dfb003e0076183",
+    "s_addMagsF64.c": "2b4f69206b4e8d3fc26bc64ca147663530b68b53b0b0e7817c724e2d99376ec5",
+    "s_subMagsF64.c": "733f17b90486602ff6c67fa3d99166a841b03276c0fcc7da66751d1e8631f01f",
+    "s_roundPackToF64.c": "e549468a71417c8fefd927d582ec8481e2d6f595c406a4db5efff9b462f8e2c8",
+    "s_normRoundPackToF64.c": "4e65ccecf8ee96e2c5815575df3a0e4495ac82987a841868cb1d130556a3dd0a",
+    "s_normSubnormalF64Sig.c": "be1efe0196eacce551f117e58f5d2bc053a4a2897f37fa5805b23e7d4e00de95",
+    "s_mul64To128.c": "1cff12724898aaace69ba3d7301404ded67156ba13466aec4a25f1a3cbb9564d",
+    "s_approxRecip32_1.c": "38e984f9c6ea5843216ba73d08fafd217b285badce557bc9eb58227acc3667ea",
+    "s_approxRecip_1Ks.c": "a073abc2d5e7a4dfd97f323027d1ef1d370225aa922ae2395398ff3c7c8e9633",
+    "s_shiftRightJam64.c": "ea54abfce241315f78b69893f6d7b20ab767e5fe8ade6b107245d8dc0745630f",
+    "8086-SSE/s_propagateNaNF64UI.c": "e3584b53c927e73a18457654125a558c58501ad7cc1de9bd3c6db75e06c190aa"
+  },
+  "adaptation": "Generated C++ header, opaque uint64 float64_t, fixed nearest-even numeric results, no floating environment flags; no native double arithmetic on device."
+}
