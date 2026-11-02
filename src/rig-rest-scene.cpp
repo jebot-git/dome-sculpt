@@ -3,6 +3,7 @@
 #include "polygon-conversion.hpp"
 #include "rig-rest-transport.hpp"
 #include "source-rigid-pose.hpp"
+#include "source-rest-scene.hpp"
 #include <nlohmann/json.hpp>
 #include <set>
 namespace dome {
@@ -25,7 +26,7 @@ void restore(SculptObject &object,const PolygonOrigin &origin){
 }
 
 std::vector<uint64_t> rig_rest_linked_objects(const Scene &scene,uint64_t id){
- const auto &source=scene.object(id);if(!source.deformation||!source.deformation->skeleton)throw std::invalid_argument("Select an existing rig for linked fitting");const auto &deformation=*source.deformation;const auto group=boundary(scene,source);std::vector<uint64_t> result{id};
+ const auto &source=scene.object(id);if(!source.deformation||!source.deformation->skeleton)throw std::invalid_argument("Select an existing rig for linked fitting");if(detail::source_rest_identity(scene,source))return detail::source_rest_targets(scene,id);const auto &deformation=*source.deformation;const auto group=boundary(scene,source);std::vector<uint64_t> result{id};
  const auto original=[](const SculptObject&o){return o.rig_source?o.rig_source->deformation:o.deformation;};
  if(!group)return result;
  for(const auto &o:scene.objects()){
@@ -41,7 +42,7 @@ bool author_rig_rest(Scene &scene,uint64_t id,std::span<const RigRestJointEdit> 
  if(edits.empty())return false;
  // Original-node rigs have different joint slot tables and rigid descendants.
  // They require the normalized source graph adapter, never name/slot guessing.
- if(detail::source_rig_instance(scene,selected))throw std::invalid_argument("Imported source rigs require authenticated original-node rest transport");
+ if(detail::source_rest_identity(scene,selected))return detail::author_source_rig_rest(scene,id,edits,options,cancelled);
  auto proposal=transport_rig_rest(*original.skeleton,original.pose,scene.world_matrix(id),edits,options,cancelled);
  if(!proposal.changed)return false;
  const auto key=original.skeleton->encode();const auto group=boundary(scene,selected);
@@ -67,7 +68,7 @@ bool author_rig_rest(Scene &scene,uint64_t id,std::span<const RigRestJointEdit> 
  if(!changed)return false;next.validate();stop(cancelled);scene=std::move(next);return true;
 }
 void restore_rig_source(Scene &scene,uint64_t id,RigRestOptions options,const std::function<bool()> &cancelled){
- options.validate();const auto linked_objects=options.linked_objects.empty()?rig_rest_linked_objects(scene,id):options.linked_objects;
+ options.validate();if(detail::source_rest_identity(scene,scene.object(id))){detail::restore_source_rig_rest(scene,id,options,cancelled);return;}const auto linked_objects=options.linked_objects.empty()?rig_rest_linked_objects(scene,id):options.linked_objects;
  stop(cancelled);const auto &selected=scene.object(id);editable(selected,true);
  if(!selected.rig_source||!selected.rig_source->deformation||!selected.rig_source->deformation->skeleton)throw std::invalid_argument("This mesh has no original rig-fitting source");
  const auto group=boundary(scene,selected);const auto key=selected.rig_source->deformation->skeleton->encode();Scene next=scene;

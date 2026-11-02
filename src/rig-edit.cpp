@@ -3,6 +3,7 @@
 #include "dome/humanoid-creator.hpp"
 #include <nlohmann/json.hpp>
 #include "source-rigid-pose.hpp"
+#include "source-rest-scene.hpp"
 namespace dome {
 namespace {
 void check_cancel(const std::function<bool()> &cancelled) {
@@ -32,6 +33,9 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
   const auto &source = scene.object(object);
   const auto &old = editable(source);
   bool pose_edit = edit.joint.has_value() || edit.reset_pose;
+  if(pose_edit&&source.rig_source&&detail::source_rest_identity(scene,source)){
+    detail::edit_source_rest_pose(scene,object,edit,cancelled);return;
+  }
   if (pose_edit && (!old.skeleton || !old.skin))
     throw std::invalid_argument("Pose editing requires a skeleton and skin");
   if (edit.joint) {

@@ -25,7 +25,7 @@ All nineteen real neutral CC0 VRoid creator parts retain paint/material/morph/
 source and their own skin products. Source generation/revision/edit authority,
 locked/isolated linked targets, Cancel/retry, oneUndo and orderedSave are covered.
 Read RIG-REST-AUTHORING.md and validation/RIG-REST-SCENE25.json. Final Release7,
-whole-own asserted SAN9, normal/compact/SAN GUI8each, d271Wayland9, loaderXR11,
+whole-own asserted SAN9, normal/compact/SAN GUI8each, d271Wayland 9, loaderXR11,
 strict actualA770guide9 and pinned Khronos0errors are recorded independently.
 
 This is private, not a full source-rig or VRM completion claim. Imported source
@@ -218,13 +218,13 @@ including the complete772.82s cut allocation sweep. Fresh owned C/C++core/suppor
 renderer ASAN+UBSAN/leaks pass15 selected suites in119.72s. Five actual A770
 consumer batches pass542 assertions. Native FLTK VRM11+normalUV13+atlas12 and
 latest private d271cf6 Wayland/universal-menu8 pass. All104 generated GLB/VRM
-files pass unfiltered/unlimited Khronos with0errors/439warnings;27 VRM0 files
+files pass unfiltered/unlimited Khronos with 0 errors/439warnings;27 VRM0 files
 pass15 hash-verified official schemas. Latest DomeD remote was rechecked
 unchanged; canonical optimized FLTK23/bitmap4 inputs and prefixes remain current.
 
 A new pure test registration separately passes1/1 actual-loader synthetic-XR
 suite with20 assertions: actual joystick browser/options/atlas import of the
-real19-part VRoid model, full88groups/exact original bytes and Cancel/Save.
+real 19-part VRoid model, full88groups/exact original bytes and Cancel/Save.
 The published merge changes no product source/header/asset/runtime bytes from
 full-run source9081677. Record298/298 plus new1/1, not one single299-suite run.
 No physical headset launch, system install or active-session restart occurred.
@@ -569,3 +569,20 @@ of the full goal. The next delegated basic task is native image projection /
 stencil painting through shared Document/desktop/XR workflows; its existing
 kernel alone is insufficient. Deferred controller drawers remain additional
 work after basic targets.
+
+
+## Private original-node source-rest continuation
+
+The bbb1792 native/grouped Scene25 milestone remains unchanged and remote-verified.
+Its private child now also implements authenticated original model/instance REST
+fitting across actual per-skin joint tables and rigid parts, targeted post-fit
+linked pose transport, complete first sources and Restore through shared native
+page27/FLTK/worker history. See [SOURCE-REST-AUTHORING](SOURCE-REST-AUTHORING.md)
+and its validation receipt for exact scope. Five same-ABI Release and fully
+instrumented support-overlay suites pass; native UI 9+9 and canonical Wayland 9
+pass. Independent generic GLB consumer covers all real corners in 3 exports;
+Khronos 0 errors/57 warnings. This is not full-source rig/VRM completion: genuinely
+shared current-pose authority is required, source-rest VRM metadata remains
+explicitly guarded, and broader per-part/generated/unbound rig ownership,
+source-global parent selection/role/rotation controls, image/device and exhaustive
+source-operation OOM evidence remain required. Full original goal remains active.
