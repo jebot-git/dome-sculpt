@@ -7,6 +7,8 @@
 namespace dome {
 struct Material;
 class PaintProjection;
+class PaintSamplingDomain;
+class PaintSamplingAttachment;
 struct PaintSourceMaps;
 class PaintImageArchive;
 struct Image {
@@ -144,6 +146,9 @@ public:
   const std::shared_ptr<const PaintSourceMaps> &source_maps() const noexcept { return source_maps_; }
   const Mesh &mesh() const;
   std::shared_ptr<const Mesh> mesh_owner() const;
+  std::shared_ptr<const PaintSamplingDomain> paint_sampling_domain() const noexcept;
+  const std::shared_ptr<const PaintSamplingAttachment> &paint_sampling_attachment() const noexcept { return sampling_attachment_; }
+  bool valid_paint_sampling_attachment() const noexcept;
   uint32_t resolution() const;
   uint64_t revision() const { return revision_; }
   const std::vector<PaintLayer> &layers() const { return layers_; }
@@ -169,7 +174,7 @@ public:
   bool pending_changes() const;
   size_t undo_count() const { return undo_.size(); }
   // Conservative retained data, including hidden/zero-opacity/mask-only tiles.
-  bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_) || bool(baked_); }
+  bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_) || bool(baked_) || bool(sampling_attachment_); }
   bool undo();
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
@@ -202,6 +207,8 @@ private:
   friend struct SourceColorPreparationAccess;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
+  friend struct SourcePaintSamplingAccess;
+  void seal_paint_sampling_attachment();
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
@@ -213,6 +220,7 @@ private:
   std::shared_ptr<CompositeCache> composite_cache_;
   uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
+  std::shared_ptr<const PaintSamplingAttachment> sampling_attachment_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::shared_ptr<const PaintColorProjection> color_projection_;
   std::shared_ptr<const PaintNormalProjection> normal_projection_;

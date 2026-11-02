@@ -1,15 +1,18 @@
 # Independent writable-paint sampling — private Scene24 work
 
-The completed goal remains active. This checkpoint is a geometry-only foundation,
-not Scene24 persistence, a repaired colour-UV workflow or current-layout texture
-compilation. It follows the real partial-Bake colour/coverage failure documented
+The complete goal remains active. The immutable geometry foundation is now
+connected to an actual SurfaceMap and editable all-channel paint grids in this
+private module. This is not Scene24 persistence, a repaired native colour-UV
+workflow or current-layout texture compilation. It follows the real partial-Bake colour/coverage failure documented
 in NORMAL-COLOR-UV-COMPOSITION.md; that strict failing oracle is retained.
 
 Scene24/material9 are reserved for independent writable-paint sampling. The Paint
 root will use a conditional genuine version2 envelope (`version`, `payload`,
 `domain`) with no legacy root `mesh`, so the old implicit1 reader rejects it
-before bulk decoding. No existing Paint codec, Scene/Material version or public
-Paint/Document/render layout has changed in this foundation.
+before bulk decoding. The Paint object now carries an immutable sampling attachment, requiring coherent
+ABI consumers. Scene/Material versions and existing Paint codec bytes are
+unchanged; context-free serialization and Scene exposure deliberately refuse
+the new domain until the paired owning archive closure is implemented.
 
 ## Exact geometry contract
 
@@ -33,7 +36,8 @@ SurfaceMap, preventing a SurfaceMap/attachment ownership cycle. The basis itself
 never owns SurfaceMap, Paint or Material. Layers, paint values, visibility and
 style factors are outside this geometry certificate. Worker/decoder deep proof
 must precede sealing; cheap publication must not scan geometry or replay planes.
-The attachment is not yet connected to PaintedMesh at this checkpoint.
+The attachment is now sealed by successful actual SurfaceMap construction and
+retained by immutable snapshots. Paint/style changes do not invalidate it.
 
 ## Finished foundation evidence
 
@@ -52,11 +56,29 @@ archives. The leaf uses the unchanged Mesh API. This is not a new complete-app
 build or a Scene24 ABI/GUI/render/export qualification; the exact source/object/
 archive hashes and commands are in artifacts/paint-sampling-foundation.json.
 
+## Actual SurfaceMap/grid stage
+
+The constructor rasterizes a temporary corner-expanded basis while keeping its
+public Mesh as current authored geometry. Current face/barycentric IDs remain
+unchanged, so transformed/evaluated world positions and normals paint the same
+retained seams. Every sparse common/PBR/channel/mask layer, original source-map
+owner, sharp partial baked coverage, composite cache/image owner and independent
+normal/colour metadata is retained exactly. UV1 and raw unprepared normal data
+remain guarded pending their own role adapters. The qualified projection metric
+fix samples actual evaluated positions/normals.
+
+Fresh coherent Release core and C/C++ support pass the62 geometry checks and84
+grid checks. Grid checks include32 measured real persistent allocation prefixes,
+all-channel post-UV painting, transformed evaluated stamps and exact cancellation,
+hidden layers, sharp coverage, snapshot ownership and10,000 allocation-free seal
+checks. Current source is frozen for a fresh wholly instrumented C/C++ sanitizer
+build; that result is pending. These are native module tests, not Scene24 codec,
+GUI, controller, GPU or export evidence.
+
 ## Required next integration
 
-SurfaceMap must own the domain and use its corner raster while retaining current
-triangle/bary identity; PaintedMesh must seal the mesh/domain attachment. Preserve
-all editable common/PBR/ORM/emission/mask/baked grids in that single basis. Add a
+SurfaceMap and the sealed Painter attachment now preserve all editable grids in
+one basis. Add a
 separately owned colour sampling node/current-field quality proof, independent
 normal replay and conditional shared archive contexts. Audit all current versus
 sampling descriptor readers, geometry identity, render attr12, material picking,

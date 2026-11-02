@@ -210,6 +210,8 @@ void Scene::validate(bool deep_sources) const {
   };
   auto retain_paint = [&](const std::shared_ptr<const PaintedMesh> &paint,bool origin) {
     if(!paint || (origin && !retained_paint.insert(paint.get()).second))return;
+    if(!paint->valid_paint_sampling_attachment())throw std::logic_error("Paint sampling attachment differs from its exact immutable geometry owner");
+    if(paint->paint_sampling_domain())throw std::logic_error("Retained writable paint is not exposed until its complete Scene24 owning closure is admitted");
     if(paint->in_stroke())throw std::invalid_argument("Retained UV paint source has an unfinished stroke");
     if(const auto &maps=paint->source_maps()) {
       maps->validate_surface(paint->mesh());
