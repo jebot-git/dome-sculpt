@@ -9,5 +9,8 @@ std::shared_ptr<const NormalDetailAuthority> transfer_normal_detail(
     const PaintedMesh &,const Mesh &,const SourceUvBakeOptions &);
 std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(
     const SourceUvBakeInput &,const SourceUvBakeResult &,const SourceUvBakeOptions &);
+std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(
+    const SourceUvBakeInput &,const SourceUvBakeResult &,const SourceUvBakeOptions &,
+    std::shared_ptr<const PaintSamplingDomain>);
 bool same_normal_detail(const NormalDetailAuthority *,const BakedTextures *,uint32_t,bool content = true);
 } // namespace dome::detail

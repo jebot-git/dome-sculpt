@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/normal-preparation.hpp"
+#include "dome/paint-sampling.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "normal-frame-runtime.hpp"
@@ -39,6 +40,33 @@ bool same_sampling(const MToonMaterial &a,const MToonMaterial &b) {
   const auto &cx=a.textures[role],&cy=b.textures[role];
   return cx.texcoord==cy.texcoord&&cx.transform_texcoord==cy.transform_texcoord&&
     x.offset==y.offset&&x.scale==y.scale&&x.rotation==y.rotation;
+}
+void metadata_basis(const PaintedMesh &before,const Mesh &target,const PaintSamplingDomain &domain,
+    const std::function<bool()> &cancelled){
+  PaintSamplingLimits limits;limits.cancelled=cancelled;domain.validate_current(target,limits);
+  const auto old=before.paint_sampling_domain();
+  if(old){
+    if(domain.basis()!=old->basis()||domain.basis().owner_before(old->basis())||old->basis().owner_before(domain.basis())||
+       domain.source_corners().size()!=old->source_corners().size()||!std::equal(domain.source_corners().begin(),domain.source_corners().end(),old->source_corners().begin()))
+      throw std::invalid_argument("Normal metadata changed its independently owned writable basis");
+  }else{
+    const auto &basis=*domain.basis(),&mesh=before.mesh();
+    if(basis.positions.size()!=mesh.positions.size()||basis.normals.size()!=mesh.normals.size()||basis.indices!=mesh.indices||basis.uv!=mesh.uv||basis.uv_pins!=mesh.uv_pins||basis.uv_seams!=mesh.uv_seams)
+      throw std::invalid_argument("Normal metadata basis is not its exact actual before paint");
+    for(size_t v=0;v<mesh.positions.size();++v){if((v&1023)==0)stop(cancelled);if(!same(basis.positions[v],mesh.positions[v])||!same(basis.normals[v],mesh.normals[v]))throw std::invalid_argument("Normal metadata basis cannot borrow evaluated or changed REST");}
+    for(size_t c=0;c<domain.source_corners().size();++c){if((c&1023)==0)stop(cancelled);if(domain.source_corners()[c]!=c)throw std::invalid_argument("Normal metadata requires the exact current ordered triangle basis");}
+  }
+}
+std::shared_ptr<const NormalDetailAuthority> actual_metadata(const PaintedMesh &before){
+  const auto baked=before.baked();if(!baked||baked->maps.normal.rgba.empty())return {};
+  baked->validate(before.resolution());
+  if(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes)
+    throw std::invalid_argument("Retained writable metadata requires its actual prepared normal interpretation");
+  if(baked->normal_authority)return baked->normal_authority;
+  auto result=std::make_shared<NormalDetailAuthority>();result->coverage=baked->coverage;
+  result->pbr=std::shared_ptr<const Image>(baked,&baked->maps.normal);
+  result->mtoon=baked->maps.mtoon_normal.rgba.empty()?result->pbr:std::shared_ptr<const Image>(baked,&baked->maps.mtoon_normal);
+  result->validate(before.resolution());return result;
 }
 std::vector<std::array<float,2>> source_mtoon_coordinates(const SourceNormalSampling &proof,
     const std::function<bool()> &cancelled) {
@@ -82,7 +110,7 @@ std::vector<std::array<float,2>> source_mtoon_coordinates(const SourceNormalSamp
 }
 }
 void NormalSamplingReceipt::validate() const {
-  if(version!=1||resolution<64||resolution>2048||(resolution&(resolution-1))||
+  if((version!=1&&version!=2)||resolution<64||resolution>2048||(resolution&(resolution-1))||
      !vertices||vertices>2'000'000||!indices||indices>6'000'000||indices%3||
      !correspondence_bytes||correspondence_bytes>128*1024*1024||
      !max_working_bytes||max_working_bytes>512*1024*1024)
@@ -93,9 +121,9 @@ nlohmann::json NormalSamplingReceipt::encode() const {
     {"indices",indices},{"correspondence_bytes",correspondence_bytes},{"max_working_bytes",max_working_bytes}};
 }
 NormalSamplingReceipt NormalSamplingReceipt::decode(const nlohmann::json &j) {
-  if(!j.is_object()||j.size()!=6||count(j.at("version"),1)!=1)
+  if(!j.is_object()||j.size()!=6||(count(j.at("version"),2)!=1&&count(j.at("version"),2)!=2))
     throw std::invalid_argument("Unsupported exact normal sampling receipt");
-  NormalSamplingReceipt result;result.resolution=uint32_t(count(j.at("resolution"),2048));
+  NormalSamplingReceipt result;result.version=uint32_t(count(j.at("version"),2));result.resolution=uint32_t(count(j.at("resolution"),2048));
   result.vertices=count(j.at("vertices"),2'000'000);result.indices=count(j.at("indices"),6'000'000);
   result.correspondence_bytes=count(j.at("correspondence_bytes"),128*1024*1024);
   result.max_working_bytes=count(j.at("max_working_bytes"),512*1024*1024);
@@ -104,6 +132,10 @@ NormalSamplingReceipt NormalSamplingReceipt::decode(const nlohmann::json &j) {
 namespace detail {
 std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(const SourceUvBakeInput &input,
     const SourceUvBakeResult &result,const SourceUvBakeOptions &options) {
+  return retain_normal_sampling(input,result,options,{});
+}
+std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(const SourceUvBakeInput &input,
+    const SourceUvBakeResult &result,const SourceUvBakeOptions &options,std::shared_ptr<const PaintSamplingDomain> metadata) {
   stop(options.cancelled);
   if(!input.paint||!input.paint->normal_projection()||!input.current_material||
      !input.current_material->normal_preparation)
@@ -136,14 +168,20 @@ std::shared_ptr<const SourceNormalSampling> retain_normal_sampling(const SourceU
   }
   const auto resolved=SourceNormalPreparationAccess::resolved(*input.paint,options.cancelled);
   domain->resolved_pbr=resolved->pbr;domain->resolved_mtoon=resolved->mtoon;
-  domain->detail=transfer_normal_detail(*input.paint,input.target,options);
+  if(metadata){metadata_basis(*input.paint,input.target,*metadata,options.cancelled);
+    input.current_material->validate(true);
+    detail::source_paint_pairing(input.paint.get(),input.current_material.get(),input.appearance.get(),true);
+    domain->detail=actual_metadata(*input.paint);
+  }else domain->detail=transfer_normal_detail(*input.paint,input.target,options);
+  proof->metadata_sampling_domain=std::move(metadata);
   auto projection=std::make_shared<PaintNormalProjection>();projection->version=2;
   projection->pbr=previous->pbr;projection->mtoon=previous->mtoon;projection->sampling_domain=domain;
   auto layout=std::make_shared<SourceNormalUvLayout>();layout->source_vertices=input.source_vertices;
   layout->indices=input.target.indices;layout->uv=input.target.uv;layout->pins=input.target.uv_pins;layout->seams=input.target.uv_seams;
   proof->projection=projection;proof->layout=layout;
+  proof->receipt.version=proof->metadata_sampling_domain?2:1;
   proof->receipt.resolution=r;proof->receipt.vertices=input.target.positions.size();proof->receipt.indices=input.target.indices.size();
-  proof->receipt.correspondence_bytes=layout->storage_bytes()+domain->storage_bytes();
+  proof->receipt.correspondence_bytes=layout->storage_bytes()+domain->storage_bytes()+(proof->metadata_sampling_domain?proof->metadata_sampling_domain->storage_bytes():0);
   proof->receipt.max_working_bytes=options.max_working_bytes;
   proof->validate(true,options.cancelled);proof->validate_current(input.target,result.appearance.get(),options.cancelled);
   return proof;
@@ -156,12 +194,15 @@ void SourceNormalSampling::validate(bool deep,const std::function<bool()> &cance
      !before_material||!before_material->normal_preparation||!sampling_material||
      before_paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)
     throw std::invalid_argument("Retained normal field needs its complete own prepared before-state");
+  if(bool(metadata_sampling_domain)!=(receipt.version==2))
+    throw std::invalid_argument("Normal metadata sampling requires its distinct version2 witness");
   const auto &domain=*projection->sampling_domain;
   const auto &previous=*before_paint->normal_projection();
   projection->validate(receipt.resolution,deep);layout->storage_bytes();
   const size_t replay_mesh=layout->uv.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+
     layout->indices.size()*4+layout->pins.size()+layout->seams.size();
-  const size_t owned=layout->storage_bytes()+domain.storage_bytes();
+  const size_t metadata_bytes=metadata_sampling_domain?(deep?metadata_sampling_domain->storage_bytes():metadata_sampling_domain->retained_bytes()):0;
+  const size_t owned=layout->storage_bytes()+domain.storage_bytes()+metadata_bytes;
   const size_t pixels=size_t(receipt.resolution)*receipt.resolution;
   if(owned>receipt.max_working_bytes||replay_mesh>receipt.max_working_bytes-owned||
      pixels>(receipt.max_working_bytes-owned-replay_mesh)/80)
@@ -169,7 +210,7 @@ void SourceNormalSampling::validate(bool deep,const std::function<bool()> &cance
   if(before_paint->resolution()!=receipt.resolution||receipt.vertices!=layout->source_vertices.size()||
      receipt.indices!=layout->indices.size()||domain.indices!=layout->indices||
      domain.coordinates.size()!=layout->source_vertices.size()||
-     receipt.correspondence_bytes!=layout->storage_bytes()+domain.storage_bytes())
+     receipt.correspondence_bytes!=layout->storage_bytes()+domain.storage_bytes()+metadata_bytes)
     throw std::invalid_argument("Retained normal field correspondence dimensions differ");
   const auto expected_sampler=before_material->normal_preparation->sampling_domain
     ?before_material->normal_preparation->sampling_domain->sampling_material:before_material;
@@ -220,7 +261,8 @@ void SourceNormalSampling::validate(bool deep,const std::function<bool()> &cance
   }
   SourceUvBakeOptions options;options.cancelled=cancelled;
   options.max_working_bytes=size_t(receipt.max_working_bytes)-mesh_bytes;
-  const auto expected=detail::transfer_normal_detail(*before_paint,target,options);
+  if(metadata_sampling_domain)metadata_basis(*before_paint,target,*metadata_sampling_domain,cancelled);
+  const auto expected=metadata_sampling_domain?actual_metadata(*before_paint):detail::transfer_normal_detail(*before_paint,target,options);
   if(bool(expected)!=bool(domain.detail))throw std::invalid_argument("Retained normal detail presence differs from owning transfer");
   if(expected&&(expected->coverage!=domain.detail->coverage||
       !same_image(*expected->pbr,*domain.detail->pbr)||!same_image(*expected->mtoon,*domain.detail->mtoon)))
@@ -230,7 +272,7 @@ void SourceNormalSampling::validate(bool deep,const std::function<bool()> &cance
 void SourceNormalSampling::validate_current(const Mesh &mesh,const CreatorAppearance *appearance,
     const std::function<bool()> &cancelled) const {
   if(!layout||!before_paint)throw std::invalid_argument("Retained normal current geometry lost its own before-state");
-  layout->storage_bytes();mesh.validate();const auto &before=before_paint->mesh();
+  layout->storage_bytes();mesh.validate();if(metadata_sampling_domain){PaintSamplingLimits limits;limits.cancelled=cancelled;metadata_sampling_domain->validate_current(mesh,limits);}const auto &before=before_paint->mesh();
   if(mesh.positions.size()!=layout->source_vertices.size()||mesh.indices!=layout->indices||
      mesh.uv!=layout->uv||mesh.uv_pins!=layout->pins||mesh.uv_seams!=layout->seams||
      bool(appearance)!=bool(before_appearance))
@@ -251,6 +293,9 @@ void SourceNormalSampling::validate_current(const Mesh &mesh,const CreatorAppear
 void SourceNormalSampling::validate_paint(const PaintedMesh &paint,const SourceMaterialBindings &binding,bool deep,
     const std::function<bool()> &cancelled) const {
   stop(cancelled);
+  if(bool(paint.paint_sampling_domain())!=bool(metadata_sampling_domain)||
+     (metadata_sampling_domain&&(paint.paint_sampling_domain()!=metadata_sampling_domain||paint.paint_sampling_domain().owner_before(metadata_sampling_domain)||metadata_sampling_domain.owner_before(paint.paint_sampling_domain()))))
+    throw std::invalid_argument("Normal metadata and current paint have different writable basis authority");
   if(!paint.normal_projection()||!detail::normal_projection_identity(*paint.normal_projection(),*projection))
     throw std::invalid_argument("Current retained normal Paint and its own field differ");
   if(binding.has_mtoon!=bool(current_sampling_reference)||

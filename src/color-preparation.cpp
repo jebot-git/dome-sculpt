@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/color-preparation.hpp"
+#include "dome/color-paint-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-visibility.hpp"
 #include "normal-frame-runtime.hpp"
@@ -31,14 +32,15 @@ template<class T>bool same_owner(const std::weak_ptr<const T>&a,const std::share
 void verify_field(const Mesh &mesh,const SourceColorPreparation &preparation,const CreatorAppearance *appearance,const PaintColorProjection &projection,
                   const std::function<bool()> &cancelled,bool initial=false) {
   if(cancelled&&cancelled())throw std::runtime_error("Color projection validation cancelled");
-  const auto &descriptor=initial?preparation.polygon_colors:preparation.current_descriptor();
+  const auto &descriptor=initial?preparation.polygon_colors:preparation.sampling_descriptor();
+  const auto &sampling_mesh=!initial&&preparation.paint_sampling?*preparation.paint_sampling->domain()->basis():mesh;
   if(descriptor&&!detail::source_vertex_colors(appearance,mesh.positions.size(),cancelled).empty())
     throw std::invalid_argument("Current corner projection conflicts with raw creator color authority");
   auto colors=descriptor
-    ?detail::polygon_target_colors(mesh,*descriptor,cancelled)
+    ?detail::polygon_target_colors(sampling_mesh,*descriptor,cancelled)
     :preparation.vertex_field(mesh.positions.size(),appearance,cancelled);
   if(colors.empty())throw std::invalid_argument("Prepared color projection lost its raw original color authority");
-  auto bound=detail::color_projection_bound(mesh,colors,*projection.vertex_rgba,128'000'000,cancelled);
+  auto bound=detail::color_projection_bound(sampling_mesh,colors,*projection.vertex_rgba,128'000'000,cancelled);
   if(bound.tested_cells!=projection.quality_cells)throw std::invalid_argument("Current color projection quality work differs from its recorded authority");
   for(size_t c=0;c<4;++c)if(bound.maximum_error[c]>projection.maximum_error[c])
     throw std::invalid_argument("Current color projection pixels exceed their recorded source-field error bound");
@@ -94,6 +96,16 @@ void SourceColorPreparation::validate(bool deep) const {
   if(depth==ancestors.size()||std::find(ancestors.begin(),ancestors.begin()+depth,this)!=ancestors.begin()+depth)
     throw std::invalid_argument("Colour preparation history is cyclic or exceeds its depth budget");
   ancestors[depth++]=this;struct Pop {size_t &depth;~Pop(){--depth;}} pop{depth};
+  if(paint_sampling){
+    const auto &source=paint_sampling->before_material();
+    if(!source||!source->color_preparation)throw std::invalid_argument("Retained paint sampling has no prepared source owner");
+    const auto &prior=*source->color_preparation;
+    if(projection!=prior.projection||initial_projection!=prior.initial_projection||original_paint!=prior.original_paint||
+       original_material!=prior.original_material||original_appearance!=prior.original_appearance||original_deformation!=prior.original_deformation||
+       polygon_colors!=prior.polygon_colors||uv_reprojection!=prior.uv_reprojection||receipt.encode()!=prior.receipt.encode())
+      throw std::invalid_argument("Retained paint sampling cannot replace initial field or projection authority");
+    paint_sampling->validate(deep);
+  }
   if(uv_reprojection){
     const auto &u=*uv_reprojection;
     if(!u.before_material||!u.before_material->color_preparation)
@@ -152,11 +164,14 @@ void SourceColorPreparation::validate(bool deep) const {
   }
 }
 const std::shared_ptr<const PolygonColorSurface> &SourceColorPreparation::current_descriptor() const noexcept {
-  return uv_reprojection?uv_reprojection->polygon_colors:polygon_colors;
+  return paint_sampling?paint_sampling->current_descriptor():uv_reprojection?uv_reprojection->polygon_colors:polygon_colors;
+}
+const std::shared_ptr<const PolygonColorSurface> &SourceColorPreparation::sampling_descriptor() const noexcept {
+  return paint_sampling?paint_sampling->sampling_descriptor():uv_reprojection?uv_reprojection->polygon_colors:polygon_colors;
 }
 void SourceColorPreparation::validate_current(const Mesh &mesh,const CreatorAppearance *appearance,
                                              const std::function<bool()> &cancelled) const {
-  validate(false);if(uv_reprojection)uv_reprojection->validate_current(mesh,appearance,cancelled);verify_field(mesh,*this,appearance,*projection,cancelled);
+  validate(false);if(paint_sampling){if(appearance)throw std::invalid_argument("Current corner retained paint conflicts with raw appearance");paint_sampling->validate_current(mesh,cancelled);}else if(uv_reprojection)uv_reprojection->validate_current(mesh,appearance,cancelled);verify_field(mesh,*this,appearance,*projection,cancelled);
 }
 std::vector<std::array<float,4>> SourceColorPreparation::vertex_field(size_t count,const CreatorAppearance *appearance,
                                                    const std::function<bool()> &cancelled) const {

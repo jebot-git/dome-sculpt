@@ -23,6 +23,7 @@ struct NormalPreparationReceipt {
 };
 struct SourceNormalUvReprojection;
 struct SourceNormalSampling;
+class PaintSamplingDomain;
 struct SourceNormalPreparation {
   NormalPreparationReceipt receipt;
   std::shared_ptr<const PaintNormalProjection> projection,initial_projection;
@@ -92,6 +93,8 @@ struct SourceNormalSampling {
   // exact ancestor rather than resetting its normal sampling semantics.
   std::shared_ptr<const SourceMaterialBindings> sampling_material;
   std::optional<MToonMaterial> current_sampling_reference;
+  // Scene24 only: independently proved basis for normal bake metadata.
+  std::shared_ptr<const PaintSamplingDomain> metadata_sampling_domain;
   void validate(bool deep = true,const std::function<bool()> &cancelled = {}) const;
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> &cancelled = {}) const;

@@ -24,6 +24,7 @@ public:
   const std::shared_ptr<const CreatorAppearance> &before_appearance() const noexcept{return before_appearance_;}
   void validate(bool deep=true,const std::function<bool()> & = {}) const;
   bool matches_current(const PaintedMesh &) const noexcept;
+  void validate_current(const Mesh &,const std::function<bool()> & = {}) const;
 private:
   CornerPaintSamplingReceipt receipt_;
   std::shared_ptr<const PaintSamplingDomain> domain_;
@@ -40,6 +41,7 @@ private:
 struct RetainedCornerPaint {
   std::shared_ptr<PaintedMesh> paint;
   std::shared_ptr<const SourceColorPaintSampling> sampling;
+  std::shared_ptr<const SourceColorPreparation> colors;
 };
 // Detached source-current proof only. The caller must atomically compose this
 // with independently adapted normal/material authority before Scene admission.

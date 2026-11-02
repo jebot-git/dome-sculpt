@@ -4,6 +4,7 @@
 #include "dome/paint.hpp"
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
+#include "dome/normal-preparation.hpp"
 #include "polygon-paint.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/normal-sampling.hpp"
@@ -407,7 +408,7 @@ bool PaintedMesh::valid_paint_sampling_attachment() const noexcept {
 void PaintedMesh::seal_paint_sampling_attachment(){
   if(!surface_->paint_domain){sampling_attachment_.reset();return;}
   if(!surface_->sampling_raster_proven)throw std::logic_error("Writable paint domain has no proved raster attachment");
-  sampling_attachment_=std::shared_ptr<const PaintSamplingAttachment>(new const PaintSamplingAttachment(mesh_owner(),surface_->paint_domain));
+  sampling_attachment_=std::shared_ptr<const PaintSamplingAttachment>(new const PaintSamplingAttachment(mesh_owner(),surface_->paint_domain,surface_));
 }
 const PaintSurfaceDiagnostics &PaintedMesh::surface_diagnostics() const {return surface_->diagnostics;}
 uint32_t PaintedMesh::resolution() const { return surface_->resolution; }
@@ -767,6 +768,38 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   return p;
 }
 struct SourcePaintSamplingAccess {
+  static std::shared_ptr<PaintedMesh> normal(const PaintedMesh &paint,const SourceNormalSampling &proof,
+      const PaintSamplingLimits &limits){
+    if(!paint.valid_paint_sampling_attachment()||paint.in_stroke()||!proof.before_paint||!proof.metadata_sampling_domain||
+       paint.paint_sampling_domain()!=proof.metadata_sampling_domain||paint.normal_projection()!=proof.before_paint->normal_projection()||
+       paint.baked()!=proof.before_paint->baked())throw std::invalid_argument("Retained normal transition requires the exact own paint basis and captured metadata");
+    proof.validate(true,limits.cancelled);proof.validate_current(paint.mesh(),nullptr,limits.cancelled);
+    auto result=paint.snapshot();result->normal_projection_=proof.projection;
+    if(result->baked_){auto baked=std::make_shared<BakedTextures>(*result->baked_);
+      baked->normal_authority=proof.projection->sampling_domain->detail;
+      baked->validate(paint.resolution());result->baked_=std::move(baked);}
+    result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();
+    if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Retained normal adoption cancelled");return result;
+  }
+  static std::shared_ptr<PaintedMesh> rebind(const PaintedMesh &paint,
+      std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
+    auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint geometry rebind cancelled");};stop();
+    if(paint.in_stroke()||!attachment||!attachment->surface_||!paint.valid_paint_sampling_attachment())
+      throw std::invalid_argument("Writable paint rebind requires finished independently sealed geometry");
+    const auto domain=paint.paint_sampling_domain();
+    if(!domain||domain!=attachment->domain()||domain.owner_before(attachment->domain())||attachment->domain().owner_before(domain))
+      throw std::invalid_argument("Writable paint rebind cannot replace its exact domain owner");
+    const auto surface=std::static_pointer_cast<const PaintedMesh::SurfaceMap>(attachment->surface_);
+    const auto &a=paint.mesh(),&b=surface->mesh;
+    if(paint.resolution()!=surface->resolution||paint.surface_->options.policy!=surface->options.policy||
+       !surface->sampling_raster_proven||!attachment->matches(std::shared_ptr<const Mesh>(surface,&surface->mesh),surface->paint_domain)||
+       a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.indices!=b.indices||a.uv!=b.uv||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)
+      throw std::invalid_argument("Writable paint rebind differs in current layout, resolution or policy");
+    domain->validate_current(a,limits);
+    for(size_t v=0;v<a.positions.size();++v){if((v&1023)==0)stop();if(a.positions[v].x!=b.positions[v].x||a.positions[v].y!=b.positions[v].y||a.positions[v].z!=b.positions[v].z||a.normals[v].x!=b.normals[v].x||a.normals[v].y!=b.normals[v].y||a.normals[v].z!=b.normals[v].z)
+      throw std::invalid_argument("Writable paint rebind differs from exact REST geometry");}
+    auto result=paint.snapshot();result->surface_=surface;result->sampling_attachment_=std::move(attachment);stop();return result;
+  }
   static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Mesh authored,
       std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
     auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-grid attachment cancelled");};stop();
@@ -808,6 +841,12 @@ struct SourcePaintSamplingAccess {
 std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &before,Mesh authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::retain(before,std::move(authored),std::move(domain),limits);
+}
+std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &paint,const SourceNormalSampling &proof,
+    const PaintSamplingLimits &limits){return SourcePaintSamplingAccess::normal(paint,proof,limits);}
+std::shared_ptr<PaintedMesh> rebind_paint_sampling_geometry(const PaintedMesh &paint,
+    std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
+  return SourcePaintSamplingAccess::rebind(paint,std::move(attachment),limits);
 }
 struct PolygonPaintAccess {
   static std::shared_ptr<PaintedMesh> rebuild(const PaintedMesh &source, Mesh target,

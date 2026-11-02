@@ -24,6 +24,7 @@ public:
   const std::shared_ptr<const Mesh> &basis() const noexcept { return basis_; }
   std::span<const uint32_t> source_corners() const noexcept { return source_corners_; }
   size_t storage_bytes(const PaintSamplingLimits & = {}) const;
+  size_t retained_bytes() const noexcept { return retained_bytes_; }
   void validate_current(const Mesh &,const PaintSamplingLimits & = {}) const;
   std::vector<std::array<float,2>> corner_coordinates(
       const Mesh &,const PaintSamplingLimits & = {}) const;
@@ -32,9 +33,11 @@ public:
   Mesh raster_mesh(const Mesh &,const PaintSamplingLimits & = {}) const;
 private:
   PaintSamplingDomain(std::shared_ptr<const Mesh> basis,std::vector<uint32_t> corners)
-      :basis_(std::move(basis)),source_corners_(std::move(corners)){}
+      :basis_(std::move(basis)),source_corners_(std::move(corners)),
+       retained_bytes_(basis_->positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+basis_->indices.size()*sizeof(uint32_t)+basis_->uv_pins.size()+basis_->uv_seams.size()+source_corners_.size()*sizeof(uint32_t)){}
   std::shared_ptr<const Mesh> basis_;
   std::vector<uint32_t> source_corners_;
+  size_t retained_bytes_=0;
   friend class PaintSamplingArchive;
   friend std::shared_ptr<const PaintSamplingDomain> retain_paint_sampling(
       const Mesh &,std::shared_ptr<const PaintSamplingDomain>,const Mesh &,
@@ -79,11 +82,14 @@ public:
   }
 private:
   PaintSamplingAttachment(std::shared_ptr<const Mesh> geometry,
-                          std::shared_ptr<const PaintSamplingDomain> domain)
-      :geometry_(std::move(geometry)),domain_(std::move(domain)){}
+                          std::shared_ptr<const PaintSamplingDomain> domain,std::shared_ptr<const void> surface)
+      :geometry_(std::move(geometry)),domain_(std::move(domain)),surface_(std::move(surface)){}
   std::shared_ptr<const Mesh> geometry_;
   std::shared_ptr<const PaintSamplingDomain> domain_;
+  // Actual geometry-only SurfaceMap owner, not a Paint/Material/recipe edge.
+  std::shared_ptr<const void> surface_;
   friend class PaintedMesh;
+  friend struct SourcePaintSamplingAccess;
 };
 // Exact, explicit source-corner map, not positional/nearest matching. A complete
 // ordered triangle may move in the array but may not reverse, duplicate or lose

@@ -47,6 +47,14 @@ void CornerPaintSamplingReceipt::validate() const {
 bool SourceColorPaintSampling::matches_current(const PaintedMesh &paint) const noexcept {
   return attachment_&&paint.valid_paint_sampling_attachment()&&attachment_->matches(paint.mesh_owner(),paint.paint_sampling_domain());
 }
+void SourceColorPaintSampling::validate_current(const Mesh &mesh,const std::function<bool()> &cancelled) const {
+  stop(cancelled);if(!attachment_)throw std::invalid_argument("Retained paint lost its sealed current geometry");
+  const auto &sealed=*attachment_->authored_geometry();
+  if(mesh.indices!=sealed.indices||mesh.uv!=sealed.uv||mesh.uv_pins!=sealed.uv_pins||mesh.uv_seams!=sealed.uv_seams||
+     mesh.positions.size()!=sealed.positions.size()||mesh.normals.size()!=sealed.normals.size())
+    throw std::invalid_argument("Retained paint current layout differs from its exact REST certificate");
+  for(size_t v=0;v<mesh.positions.size();++v){if((v&1023)==0)stop(cancelled);if(!same(mesh.positions[v],sealed.positions[v])||!same(mesh.normals[v],sealed.normals[v]))throw std::invalid_argument("Retained paint cannot borrow evaluated or changed REST geometry");}
+}
 void SourceColorPaintSampling::validate(bool deep,const std::function<bool()> &cancelled) const {
   stop(cancelled);receipt_.validate();
   if(!before_paint_||before_paint_->in_stroke()||!before_material_||!before_material_->color_preparation||
@@ -77,7 +85,7 @@ struct ColorPaintSamplingAccess {
     std::span<const uint32_t> remap,const PaintSamplingLimits &limits){
   stop(limits.cancelled);
   if(!before||before->in_stroke()||!material||!material->color_preparation||!descriptor||
-     material->color_preparation->receipt.source_field!=SourceColorField::PolygonCorners||
+     material->has_mtoon||material->color_preparation->receipt.source_field!=SourceColorField::PolygonCorners||
      before->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)
     throw std::invalid_argument("Retained corner paint requires its own strictly prepared source");
   if(!limits.max_vertices||limits.max_vertices>2'000'000||!limits.max_triangles||limits.max_triangles>2'000'000||!limits.max_basis_bytes||limits.max_basis_bytes>128*1024*1024||!limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
@@ -98,10 +106,12 @@ struct ColorPaintSamplingAccess {
   auto node=std::shared_ptr<SourceColorPaintSampling>(new SourceColorPaintSampling);
   node->receipt_=receipt;node->domain_=std::move(domain);node->layout_=std::move(layout);
   node->current_=std::make_shared<const PolygonColorSurface>(*descriptor);
-  node->sampling_=material->color_preparation->current_descriptor();
+  node->sampling_=material->color_preparation->sampling_descriptor();
   node->before_paint_=std::move(before);node->before_material_=std::move(material);node->before_deformation_=std::move(deformation);
   node->attachment_=paint->paint_sampling_attachment();node->validate(true,limits.cancelled);stop(limits.cancelled);
-  return {std::move(paint),std::move(node)};
+  auto colors=std::make_shared<SourceColorPreparation>(*node->before_material_->color_preparation);
+  colors->paint_sampling=node;colors->validate();colors->validate_current(paint->mesh(),nullptr,limits.cancelled);
+  return {std::move(paint),std::move(node),std::move(colors)};
  }
 };
 RetainedCornerPaint retain_source_corner_paint(std::shared_ptr<const PaintedMesh> before,

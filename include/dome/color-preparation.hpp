@@ -6,6 +6,7 @@ namespace dome {
 enum class SourceColorField { OriginalAccessor, Identity, PolygonCorners };
 struct PolygonColorSurface;
 struct SourceColorUvReprojection;
+class SourceColorPaintSampling;
 struct ColorPreparationOptions {
   uint64_t max_quality_cells=128'000'000, max_probe_samples=64'000'000;
   size_t max_working_bytes=256*1024*1024, max_layer_bytes=128*1024*1024;
@@ -50,7 +51,9 @@ struct SourceColorPreparation {
   // Scene23 only: initial descriptor/receipt stay immutable; this independently
   // owned node proves the current UV domain and its newly measured projection.
   std::shared_ptr<const SourceColorUvReprojection> uv_reprojection;
+  std::shared_ptr<const SourceColorPaintSampling> paint_sampling;
   const std::shared_ptr<const PolygonColorSurface> &current_descriptor() const noexcept;
+  const std::shared_ptr<const PolygonColorSurface> &sampling_descriptor() const noexcept;
   void validate(bool deep=true) const;
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> &cancelled={}) const;
