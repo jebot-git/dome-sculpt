@@ -157,6 +157,41 @@ int main()try{
   captured.rgba={0,0,255,255};for(auto &p:captured_surface.positions)p.z+=1;
   auto retained=immutable.sample({0,0,0},{0,0,1},settings);
   check(retained&&retained->settings.color[0]==1&&retained->settings.color[2]==0,"Projection image and visibility geometry are immutable source snapshots");
+  // A genuinely different evaluated metric: reflection, anisotropic scale,
+  // shear, tilt and translation, while the editable UV/rest owner stays exact.
+  auto rest=quad();auto world=std::make_shared<Mesh>(rest);
+  auto place=[](Vec3 p){return Vec3{3-1.2f*p.x+.4f*p.y,-2+.25f*p.x+.8f*p.y,.5f+.2f*p.y};};
+  for(auto &p:world->positions)p=place(p);
+  world->normals.assign(4,normalized(Vec3{-.05f,-.24f,1.06f}));
+  auto world_camera=camera();world_camera.pose.position={3,-2,2.5f};world_camera.width=world_camera.height=4;
+  auto captured_image=std::make_shared<const Image>(image({255,0,0,255}));
+  std::weak_ptr<const Image> retained_image=captured_image;
+  auto world_projection=PaintProjection::from_shared_image(captured_image,world_camera,*world);
+  captured_image.reset();
+  check(!retained_image.expired()&&world_projection.sample({3,-2,.5f},world->normals[0],settings),
+        "A shared immutable projection owns the original decoded image across worker/pose reuse");
+  check(rejects([&]{PaintProjection::from_shared_image({},world_camera,*world);}),
+        "A missing shared image refuses before projection/BVH construction");
+  PaintedMesh posed_paint(rest,64),rest_trap(rest,64);
+  auto evaluated=posed_paint.evaluate(world);auto world_brush=brush();world_brush.from=world_brush.to={3,-2,.5f};world_brush.normal=world->normals[0];world_brush.radius=.4f;
+  rest_trap.begin_stroke();rest_trap.stamp_projection(world_brush,settings,world_projection);rest_trap.end_stroke();
+  check(!rest_trap.has_paint_data(),"Rest-only projection is independently insensitive to the distant evaluated-world brush");
+  posed_paint.begin_stroke();posed_paint.stamp_projection(world_brush,settings,world_projection,*evaluated);posed_paint.end_stroke();
+  size_t inside=0;bool outside_exact=true;
+  for(uint32_t y=0;y<64;++y)for(uint32_t x=0;x<64;++x){
+    Vec3 point=place({2*(float(x)+.5f)/64-1,2*(float(y)+.5f)/64-1,0});
+    const auto weight=posed_paint.pixel(posed_paint.active_layer(),x,y).data[9];
+    const auto distance=length(point-world_brush.to);
+    if(distance<.2f&&weight)++inside;
+    if(distance>.401f&&weight)outside_exact=false;
+  }
+  check(inside>10&&outside_exact,"Projected paint follows an independent reflected/sheared WORLD footprint, not rest distances");
+  auto before_cancel=posed_paint.encode();posed_paint.begin_stroke();
+  check(rejects([&]{posed_paint.stamp_projection(world_brush,settings,world_projection,*evaluated,[]{return true;});}),
+        "Evaluated projection forwards native cancellation before pixel mutation");
+  posed_paint.cancel_stroke();
+  check(posed_paint.encode()==before_cancel,"Cancelled evaluated projection preserves exact existing pixels/history");
+
   auto invalid=camera();invalid.width=0;
   check(rejects([&]{PaintProjection bad(image({1,2,3,4}),invalid,surface);}),"Invalid metric projector dimensions fail before sampling");
   auto singular=ProjectionOptions{};singular.uv_transform={0,0,0,0,0,0};

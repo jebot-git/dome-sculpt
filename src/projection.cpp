@@ -84,7 +84,10 @@ struct PaintProjection::Impl {
   float half_height=1;
   std::shared_ptr<const SurfaceQuery> query;
   Impl(Image input,ProjectionCamera view,const Mesh&surface,ProjectionOptions opts)
-      :image(std::make_shared<const Image>(std::move(input))),camera(view),options(std::move(opts)){
+      :Impl(std::make_shared<const Image>(std::move(input)),view,surface,std::move(opts)){}
+  Impl(std::shared_ptr<const Image> input,ProjectionCamera view,const Mesh&surface,ProjectionOptions opts)
+      :image(std::move(input)),camera(view),options(std::move(opts)){
+    if(!image)throw std::invalid_argument("Projection requires an immutable image");
     configure();
     if(options.visibility)query=std::make_shared<SurfaceQuery>(surface,options.cancelled);
     cancel(options);
@@ -112,6 +115,11 @@ struct PaintProjection::Impl {
 };
 PaintProjection::PaintProjection(Image image,ProjectionCamera camera,const Mesh &surface,ProjectionOptions options)
     :impl_(std::make_shared<Impl>(std::move(image),camera,surface,std::move(options))){}
+PaintProjection::PaintProjection(std::shared_ptr<const Impl> impl):impl_(std::move(impl)){}
+PaintProjection PaintProjection::from_shared_image(std::shared_ptr<const Image> image,
+    ProjectionCamera camera,const Mesh &surface,ProjectionOptions options) {
+  return PaintProjection(std::make_shared<Impl>(std::move(image),camera,surface,std::move(options)));
+}
 PaintProjection PaintProjection::with_camera(ProjectionCamera camera)const{return with_camera(camera,impl_->options);}
 PaintProjection PaintProjection::with_camera(ProjectionCamera camera,ProjectionOptions options)const{
   auto updated=std::make_shared<Impl>(*impl_);updated->camera=camera;updated->options=std::move(options);updated->configure();
@@ -162,12 +170,22 @@ std::optional<ProjectedPaint> PaintProjection::sample(Vec3 position,Vec3 normal,
   return result;
 }
 void PaintedMesh::stamp_projection(const Brush &brush,const PaintSettings &settings,const PaintProjection &projection) {
+  stamp_projected(brush,settings,projection,nullptr,{});
+}
+void PaintedMesh::stamp_projection(const Brush &brush,const PaintSettings &settings,
+    const PaintProjection &projection,const Evaluation &evaluation,
+    const std::function<bool()> &cancelled) {
+  stamp_projected(brush,settings,projection,&evaluation,cancelled);
+}
+void PaintedMesh::stamp_projected(const Brush &brush,const PaintSettings &settings,
+    const PaintProjection &projection,const Evaluation *evaluation,
+    const std::function<bool()> &cancelled) {
   uint64_t samples=0;
   stamp_sampled(brush,settings,[&](Vec3 position,Vec3 normal)->std::optional<PaintSample>{
     if(++samples>projection.max_samples_per_stamp())throw std::length_error("Projection stamp sample budget exceeded");
     auto sample=projection.sample(position,normal,settings);
     if(!sample)return {};
     return PaintSample{sample->settings,sample->opacity};
-  });
+  },cancelled,evaluation);
 }
 } // namespace dome
