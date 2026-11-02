@@ -71,8 +71,9 @@ Fresh coherent Release core and C/C++ support pass the62 geometry checks and84
 grid checks. Grid checks include32 measured real persistent allocation prefixes,
 all-channel post-UV painting, transformed evaluated stamps and exact cancellation,
 hidden layers, sharp coverage, snapshot ownership and10,000 allocation-free seal
-checks. Current source is frozen for a fresh wholly instrumented C/C++ sanitizer
-build; that result is pending. These are native module tests, not Scene24 codec,
+checks. A fresh wholly instrumented C/C++ O1 ASan/UBSan/leak build also passes the
+new two scopes plus existing texture painting:3/3 in26.17s. Matching Release
+three scopes pass in2.75s. These are native module tests, not Scene24 codec,
 GUI, controller, GPU or export evidence.
 
 ## Required next integration
