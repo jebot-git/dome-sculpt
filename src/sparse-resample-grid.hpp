@@ -17,19 +17,24 @@ class Grid {
 public:
   std::span<const Cell> cells() const { return cells_; }
   uint32_t mask() const { return mask_; }
-  explicit Grid(std::span<const Entry> entries, const std::function<void()> &checkpoint = {}) {
+  explicit Grid(std::span<const Entry> entries, const std::function<void()> &checkpoint = {},
+                const std::function<void(size_t)> &charge = {}) {
     if (entries.size() > maximum_entries) throw std::length_error("Sparse resampling source budget exceeded");
     size_t capacity = 2;
     while (capacity < entries.size() * 2) capacity *= 2;
     cells_.resize(capacity);
     mask_ = uint32_t(capacity - 1);
-    size_t work = 0;
+    size_t pending = 0;
     for (const auto &entry : entries) {
       if (!std::isfinite(entry.value) || std::abs(entry.value) > 1e6)
         throw std::invalid_argument("Sparse resampling source value is invalid");
       uint32_t slot = hash(entry.point) & mask_, probe = 0;
       for (; probe < maximum_probe; ++probe) {
-        if ((++work & 255) == 0 && checkpoint) checkpoint();
+        if (++pending == 256) {
+          if (charge) charge(pending);
+          pending = 0;
+          if (checkpoint) checkpoint();
+        }
         auto &cell = cells_[slot];
         if (!cell.occupied) {
           cell = {entry.point, 1, std::bit_cast<uint64_t>(entry.value)};
@@ -40,6 +45,7 @@ public:
       }
       if (probe == maximum_probe) throw std::length_error("Sparse resampling source probe budget exceeded");
     }
+    if (pending && charge) charge(pending);
     if (checkpoint) checkpoint();
   }
 };

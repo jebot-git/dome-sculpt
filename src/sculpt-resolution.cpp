@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/sculpt-resolution.hpp"
+#include "sparse-resample-backend.hpp"
 #include <bit>
 #include <map>
 #include <limits>
@@ -35,7 +36,7 @@ template<class Map> double interpolate(const Map &map,Int3 q,float target,float 
 }
 // Union occupied interpolation cells before projecting supports to target tiles.
 // Disconnected objects/mirrors do not enumerate their global empty-space hull.
-template<class Map,class Emit> void sample_field(const Map &input,float source,float target,size_t remaining,Work &work,Emit emit) {
+template<class Map,class Emit> void sample_field(const Map &input,float source,float target,double background,size_t remaining,Work &work,Emit emit) {
   std::unordered_set<Int3,IntHash> cells,tiles;
   for(const auto &[key,value]:input) {
     (void)value;
@@ -64,10 +65,38 @@ template<class Map,class Emit> void sample_field(const Map &input,float source,f
     }
   }
   size_t emitted=0;
+  if(compute_backend()!="CPU" && !tiles.empty()) {
+    // Pack each immutable sparse field once. Queries carry coordinates only;
+    // lookup and all interpolation arithmetic belong to the selected GPU.
+    std::vector<sparse_resample::Entry> entries;entries.reserve(input.size());
+    for(const auto &[q,value]:input){work.visit();entries.push_back({{q.x,q.y,q.z},double(value)});}
+    sparse_resample::Grid grid(entries,[&]{work.stop();},[&](size_t count){work.visit(count);});
+    std::vector<sparse_resample::Point> queries;queries.reserve(65536);
+    std::unique_ptr<SparseFieldSampler> sampler;
+    const auto p=sparse_resample::parameters(source,target,background);
+    auto flush=[&] {
+      if(queries.empty())return;
+      work.stop();if(!sampler)sampler=std::make_unique<SparseFieldSampler>(grid,p,queries.size());
+      const auto values=sampler->sample(queries,work.options.cancelled);work.stop();
+      for(size_t i=0;i<queries.size();++i) {
+        if((i&255)==0)work.stop();const auto q=queries[i];
+        if(emit(Int3{q.x,q.y,q.z},std::bit_cast<double>(values[i])))
+          if(++emitted>remaining)throw std::length_error("Sculpt resolution layer/mask storage budget exceeded");
+      }
+      queries.clear();
+    };
+    for(auto tile:tiles)for(int z=0;z<8;++z)for(int y=0;y<8;++y)for(int x=0;x<8;++x) {
+      Int3 q{tile.x*8+x,tile.y*8+y,tile.z*8+z};
+      if(std::max({std::abs(q.x),std::abs(q.y),std::abs(q.z)})>domain)continue;
+      work.visit(8);queries.push_back({q.x,q.y,q.z});if(queries.size()==65536)flush();
+    }
+    flush();
+    return;
+  }
   for(auto tile:tiles)for(int z=0;z<8;++z)for(int y=0;y<8;++y)for(int x=0;x<8;++x) {
     Int3 q{tile.x*8+x,tile.y*8+y,tile.z*8+z};
     if(std::max({std::abs(q.x),std::abs(q.y),std::abs(q.z)})>domain)continue;
-    if(emit(q)) {if(++emitted>remaining)throw std::length_error("Sculpt resolution layer/mask storage budget exceeded");}
+    if(emit(q,interpolate(input,q,target,source,background,work))) {if(++emitted>remaining)throw std::length_error("Sculpt resolution layer/mask storage budget exceeded");}
   }
 }
 size_t crossing_cells(const Volume &volume,Work &work) {
@@ -201,8 +230,7 @@ SculptResolutionResult resample_sculpt(const Volume &source,const SculptResoluti
   for(const auto &layer:source.layers_) {
     work.phase(.4f*float(layer_index)/source.layers_.size(),.4f*float(layer_index+1)/source.layers_.size());++layer_index;
     Volume::Layer output=layer;output.delta=decltype(output.delta){};
-    sample_field(layer.delta,source.voxel_size(),next.voxel_size(),options.maximum_samples-result.report.layer_samples,work,[&](Int3 q) {
-      auto value=interpolate(layer.delta,q,next.voxel_size(),source.voxel_size(),0,work);
+    sample_field(layer.delta,source.voxel_size(),next.voxel_size(),0,options.maximum_samples-result.report.layer_samples,work,[&](Int3 q,double value) {
       if(value==0)return false;
       if(!std::isfinite(value) || std::abs(value)>1e6)throw std::runtime_error("Sculpt resolution produced an invalid layer displacement");
       output.delta.emplace(q,value);return true;
@@ -220,8 +248,8 @@ SculptResolutionResult resample_sculpt(const Volume &source,const SculptResoluti
   }
   work.phase(.4f,.5f);
   next.mask_.background=source.mask_.background;
-  sample_field(source.mask_.values,source.voxel_size(),next.voxel_size(),options.maximum_samples-result.report.layer_samples,work,[&](Int3 q) {
-    float value=float(std::clamp(interpolate(source.mask_.values,q,next.voxel_size(),source.voxel_size(),source.mask_.background,work),0.,1.));
+  sample_field(source.mask_.values,source.voxel_size(),next.voxel_size(),source.mask_.background,options.maximum_samples-result.report.layer_samples,work,[&](Int3 q,double sampled) {
+    float value=float(std::clamp(sampled,0.,1.));
     if(value==source.mask_.background)return false;
     next.mask_.values.emplace(q,value);return true;
   });
