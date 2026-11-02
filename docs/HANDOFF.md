@@ -33,6 +33,16 @@ preflight witnesses and the existing shapekey-authoring suite pass in the privat
 UV1 integration context; see validation/NULL-SHAPE-HISTORY.json. This does not
 qualify that larger private UV1 branch for publication.
 
+## Proven xatlas shutdown race
+
+Source `7c24a06` synchronizes a worker shutdown wakeup with its condition-variable
+predicate mutex. The original fails the deterministic intercepted-wait witness;
+32 forked handshakes pass in a fresh public Release and a separately instrumented
+xatlas/regression build. This repairs one demonstrated race. A separate persistent
+cut-allocation sweep still hangs and remains under investigation; this milestone
+does not claim full OOM/shutdown robustness or enable the private cut adapter.
+See XATLAS-SHUTDOWN.md and validation/XATLAS-SHUTDOWN.json.
+
 ## Current integration
 
 The focused selection request is implemented by `3cb4517` and `f3f9199` on
