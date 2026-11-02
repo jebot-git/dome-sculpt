@@ -4,6 +4,7 @@
 #include "paint-color-access.hpp"
 #include "polygon-color-target.hpp"
 #include "source-paint-pairing.hpp"
+#include "uv-canonical-transport.hpp"
 #include <bit>
 #include <algorithm>
 namespace dome {namespace {
@@ -60,7 +61,12 @@ void SourceColorUvReprojection::validate(bool deep,const std::function<bool()> &
  if(before_deformation)before_deformation->validate(before_paint->mesh());
  auto old_shape=old_descriptor->topology->encode(),new_shape=polygon_colors->topology->encode();auto remove_uv=[](auto &j){for(auto &face:j.at("faces"))for(auto &corner:face.at("corners"))corner[2]=std::array<float,2>{0,0};};remove_uv(old_shape);remove_uv(new_shape);
  if(old_shape!=new_shape)throw std::invalid_argument("Current-colour UV changed stable geometric/corner/edge identities");
- auto target=layout->target_mesh(before_paint->mesh(),cancelled);auto colors=detail::polygon_target_colors(target,*polygon_colors,cancelled);
+ auto target=layout->target_mesh(before_paint->mesh(),cancelled);
+ if(before_deformation&&(before_deformation->skin||before_deformation->morphs)&&!before_material->normal_frames&&
+    ((before_paint->source_maps()&&before_paint->source_maps()->normal.image)||(before_paint->baked()&&!before_paint->baked()->maps.normal.rgba.empty()))&&
+    !detail::preserves_canonical_uv_derivatives(before_paint->mesh(),target,layout->source_vertices,size_t(receipt.max_working_bytes),cancelled))
+  throw std::invalid_argument("Deformed current-colour UV normals require exact canonical translation or an explicit frame adapter");
+ auto colors=detail::polygon_target_colors(target,*polygon_colors,cancelled);
  ColorPreparationOptions options;options.cancelled=cancelled;options.max_projection_error=receipt.accepted_projection_error;options.max_quality_cells=receipt.max_quality_cells;options.max_working_bytes=size_t(receipt.max_working_bytes);
  auto expected=SourceColorPreparationAccess::project_uv(*before_paint,target,colors,options,receipt.raster_budget);
  if(expected.projected_texels!=receipt.projected_texels||expected.raster_samples!=receipt.raster_samples||expected.projection->maximum_error!=projection->maximum_error||expected.projection->quality_cells!=projection->quality_cells||expected.projection->vertex_rgba->width!=projection->vertex_rgba->width||expected.projection->vertex_rgba->height!=projection->vertex_rgba->height||expected.projection->vertex_rgba->rgba!=projection->vertex_rgba->rgba)
@@ -75,4 +81,33 @@ void SourceColorUvReprojection::validate_current(const Mesh &mesh,const CreatorA
  detail::polygon_target_colors(mesh,*polygon_colors,cancelled);
 }
 
+std::shared_ptr<const SourceColorPreparation> reproject_source_corner_colors(
+ const std::shared_ptr<const PaintedMesh> &paint,
+ const std::shared_ptr<const SourceMaterialBindings> &material,
+ const std::shared_ptr<const DeformationState> &deformation,
+ std::shared_ptr<const PolygonColorSurface> descriptor,const Mesh &target,
+ std::span<const uint32_t> remap,const ColorPreparationOptions &options,uint64_t raster_budget){
+ if(options.cancelled&&options.cancelled())throw std::runtime_error("Current colour UV cancelled");
+ if(!paint||!material||!material->color_preparation||!descriptor)
+  throw std::invalid_argument("Current colour UV needs its own complete before-state");
+ material->validate();material->color_preparation->validate_current(paint->mesh(),nullptr,options.cancelled);
+ auto node=std::make_shared<SourceColorUvReprojection>();
+ auto layout=std::make_shared<SourceColorUvLayout>();layout->source_vertices.assign(remap.begin(),remap.end());
+ layout->indices=target.indices;layout->uv=target.uv;layout->pins=target.uv_pins;layout->seams=target.uv_seams;
+ auto expected=layout->target_mesh(paint->mesh(),options.cancelled);
+ if(expected.positions.size()!=target.positions.size()||expected.normals.size()!=target.normals.size()||!std::equal(expected.positions.begin(),expected.positions.end(),target.positions.begin(),same)||!std::equal(expected.normals.begin(),expected.normals.end(),target.normals.begin(),same))
+  throw std::invalid_argument("Current colour UV target does not preserve ordered REST geometry");
+ auto colors=detail::polygon_target_colors(target,*descriptor,options.cancelled);
+ auto projected=SourceColorPreparationAccess::project_uv(*paint,target,colors,options,raster_budget);
+ node->layout=std::move(layout);node->polygon_colors=std::move(descriptor);node->projection=std::move(projected.projection);
+ node->before_paint=paint;node->before_material=material;node->before_deformation=deformation;
+ auto &r=node->receipt;r.resolution=paint->resolution();r.accepted_projection_error=options.max_projection_error;
+ r.projection_error_bound=node->projection->maximum_error;r.projected_texels=projected.projected_texels;
+ r.tested_quality_cells=node->projection->quality_cells;r.raster_samples=projected.raster_samples;
+ r.raster_budget=raster_budget;r.max_quality_cells=options.max_quality_cells;r.max_working_bytes=options.max_working_bytes;
+ node->validate(true,options.cancelled);
+ auto result=std::make_shared<SourceColorPreparation>(*material->color_preparation);
+ result->projection=node->projection;result->uv_reprojection=std::move(node);result->validate();
+ result->validate_current(target,nullptr,options.cancelled);return result;
+}
 } // namespace dome

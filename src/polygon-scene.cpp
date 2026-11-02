@@ -360,7 +360,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
       (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5))
     throw std::invalid_argument("Unsupported polygon source archive");
   const bool shared=j.at("version")==5;
-  if(shared&&(!materials||materials->at("version")!=6))throw std::invalid_argument("Shared corner color projection requires material archive6");
+  if(shared&&(!materials||(materials->at("version")!=6&&materials->at("version")!=8)))throw std::invalid_argument("Shared corner color projection requires material archive6");
   const bool colored = j.at("version") == 3 || shared || (j.at("version")==4 && (j.contains("color_bases")||j.contains("color_fields")));
   if (j.size() != (colored ? 7u : 5u))
     throw std::invalid_argument("Incomplete polygon color source archive");
@@ -394,6 +394,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
       if(!binding.at("color_preparation").is_null()){
         auto p=polygon_archive_index(binding.at("color_preparation"),preparations.size());used_preparation[p]=1;
         paint(preparations[p].at("paint"));predecessor(preparations[p].at("before_binding"));
+        if(preparations[p].contains("uv_reprojection")){const auto &uv=preparations[p].at("uv_reprojection");paint(uv.at("paint"));predecessor(uv.at("before_binding"));}
       }
       if(!binding.at("normal_preparation").is_null()){
         auto p=polygon_archive_index(binding.at("normal_preparation"),normals.size());used_normal[p]=1;
@@ -409,11 +410,16 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     for(size_t i=0;i<bindings.size();++i){size_t height=1;walk_binding(i,[&](const auto &,size_t prior){height=std::max(height,heights[prior]+1);});if(height>64)throw std::length_error("Corner preparation material history depth exceeded");heights[i]=height;}
     bool found=false;
     for(const auto &p:preparations)if(p.contains("polygon_colors")){
-      if(p.at("version")!=2||p.at("receipt").at("version")!=2||p.at("receipt").at("source_field")!=2)throw std::invalid_argument("Corner preparation lost its versioned field declaration");
+      if((p.at("version")!=2&&p.at("version")!=3)||p.at("receipt").at("version")!=2||p.at("receipt").at("source_field")!=2)throw std::invalid_argument("Corner preparation lost its versioned field declaration");
       const auto &source=p.at("polygon_colors");
       if(!source.is_object()||source.size()!=2)throw std::invalid_argument("Invalid current-corner projection source record");
       topology_preflight(source.at("topology"),entries);
       used_colors[polygon_archive_index(source.at("field"),used_colors.size())]=1;found=true;
+      if(p.contains("uv_reprojection")){
+        if(materials->at("version")!=8||p.at("version")!=3)throw std::invalid_argument("Colour UV descriptor requires material8/entry3");
+        const auto &current=p.at("uv_reprojection").at("polygon_colors");if(!current.is_object()||current.size()!=2)throw std::invalid_argument("Invalid current colour UV descriptor");
+        topology_preflight(current.at("topology"),entries);used_colors[polygon_archive_index(current.at("field"),used_colors.size())]=1;
+      }
     }
     if(!found)throw std::invalid_argument("Shared corner archive has no preparation authority");
   }

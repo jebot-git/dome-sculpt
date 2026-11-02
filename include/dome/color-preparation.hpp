@@ -91,6 +91,15 @@ struct SourceColorUvReprojection {
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> & = {}) const;
 };
+// Detached UV-only replay. The complete before binding owns its immutable initial
+// receipt; the returned recipe owns a separately measured current-domain proof.
+std::shared_ptr<const SourceColorPreparation> reproject_source_corner_colors(
+    const std::shared_ptr<const PaintedMesh> &,
+    const std::shared_ptr<const SourceMaterialBindings> &,
+    const std::shared_ptr<const DeformationState> &,
+    std::shared_ptr<const PolygonColorSurface>,const Mesh &,
+    std::span<const uint32_t>,const ColorPreparationOptions & = {},
+    uint64_t max_raster_samples=128'000'000);
 struct ColorPreparationInput {
   std::shared_ptr<const PaintedMesh> paint;
   std::shared_ptr<const CreatorAppearance> appearance;

@@ -339,22 +339,29 @@ void Scene::validate(bool deep_sources) const {
   }
   std::set<const SourceColorPreparation *> preparations;
   std::set<const PolygonColorSurface*> color_sources;
+  size_t color_uv_layout_bytes=0;
   size_t polygon_entries=polygons.component_entries();auto polygon_colors=polygons.color_archive();
   auto add_polygon=[&](size_t n){if(n>8'000'000-polygon_entries)throw std::length_error("Scene current color geometry/provenance exceeds polygon budget");polygon_entries+=n;};
   for(const auto &binding:source_materials.bindings())if(binding->color_preparation && preparations.insert(binding->color_preparation.get()).second) {
     const auto &p=*binding->color_preparation;p.validate(deep_sources);
     source_images.add(p.projection->vertex_rgba);source_images.add(p.initial_projection->vertex_rgba);
-    if(p.polygon_colors&&color_sources.insert(p.polygon_colors.get()).second){
-      const auto &topology=*p.polygon_colors->topology;
+    for(const auto &descriptor:{p.polygon_colors,p.current_descriptor()})if(descriptor&&color_sources.insert(descriptor.get()).second){
+      const auto &topology=*descriptor->topology;
       add_polygon(topology.vertices().size());add_polygon(topology.edges().size());add_polygon(topology.faces().size());
       for(const auto &v:topology.vertices())add_polygon(v.provenance.size());for(const auto &f:topology.faces())add_polygon(f.corners.size());
-      auto before=polygon_colors.entries();polygon_colors.add(p.polygon_colors->field);add_polygon(polygon_colors.entries()-before);
+      auto before=polygon_colors.entries();polygon_colors.add(descriptor->field);add_polygon(polygon_colors.entries()-before);
     }
     const bool fresh_paint=!retained_paint.contains(p.original_paint.get());
     retain_paint(p.original_paint,true);if(fresh_paint)origin_vertices+=p.original_paint->mesh().positions.size();
     if(origin_vertices>8'000'000)throw std::length_error("Color preparation original geometry exceeds scene budget");
     if(p.original_deformation){deformation_entries+=p.original_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes preconversion color authority");}
     if(p.original_appearance)retain_appearance(*p.original_appearance,p.original_paint->mesh().positions.size());
+    if(p.uv_reprojection){const auto &u=*p.uv_reprojection;const bool fresh=!retained_paint.contains(u.before_paint.get());retain_paint(u.before_paint,true);if(fresh)origin_vertices+=u.before_paint->mesh().positions.size();
+      if(origin_vertices>8'000'000)throw std::length_error("Colour UV retained geometry exceeds scene budget");
+      if(u.before_deformation){deformation_entries+=u.before_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Colour UV retained deformation exceeds scene budget");}
+      if(u.before_appearance)retain_appearance(*u.before_appearance,u.before_paint->mesh().positions.size());
+      source_images.add(u.projection->vertex_rgba);const auto bytes=u.layout->storage_bytes();if(bytes>128*1024*1024-color_uv_layout_bytes)throw std::length_error("Colour UV layouts exceed scene budget");color_uv_layout_bytes+=bytes;
+    }
   }
   std::set<const SourceNormalPreparation*> normal_preparations;
   std::set<const SourceNormalUvLayout*> normal_uv_layouts;size_t normal_uv_layout_bytes=0;
@@ -471,7 +478,9 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>20)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>20&&version!=23))throw std::runtime_error("Unsupported scene version");
+  if(version==23&&(!j.contains("source_materials")||j.at("source_materials").at("version")!=8||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene23 requires actual current corner colour UV authority");
+  if(version<23&&j.contains("source_materials")&&j.at("source_materials").at("version")==8)throw std::invalid_argument("Current colour UV replay requires Scene23");
   if(version==20&&(!j.contains("source_materials")||j.at("source_materials").at("version")!=6||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene20 requires explicit current corner preparation authority");
   if(version<20&&((j.contains("source_materials")&&j.at("source_materials").at("version")==6)||(j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==5)))throw std::invalid_argument("Current corner preparation requires Scene20");
   if(version==19&&(!j.contains("source_materials")||!j.at("source_materials").contains("version")||j.at("source_materials").at("version")!=5))throw std::invalid_argument("Scene19 requires material archive5 normal UV authority");
@@ -557,7 +566,7 @@ Scene Scene::decode(const nlohmann::json &j) {
         budget.deformation(o.at("deformation"), unsigned(version));
       budget.appearance(o.at("appearance"));
     }
-    if(materials.contains("color_preparations"))for(const auto &p:materials.at("color_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));}
+    if(materials.contains("color_preparations"))for(const auto &p:materials.at("color_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));if(p.contains("uv_reprojection")){const auto &u=p.at("uv_reprojection");budget.deformation(u.at("deformation"),unsigned(version));budget.appearance(u.at("appearance"));}}
     if(materials.contains("normal_preparations"))for(const auto &p:materials.at("normal_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));if(p.contains("uv_reprojection")){const auto &u=p.at("uv_reprojection");budget.deformation(u.at("deformation"),unsigned(version));budget.appearance(u.at("appearance"));}}
   } else {
     if (j.contains("polygon_sources"))
@@ -688,7 +697,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5) && (version<20 || materials.at("version")!=6)) ||
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5) && (version<20 || materials.at("version")!=6) && (version<23 || materials.at("version")!=8)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);
@@ -754,7 +763,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   }
   if(material_fields)for(const auto&origin:j.at("source_materials").at("origins"))if(origin.contains("deformation")&&detail::minimum_deformation_scene_version(origin.at("deformation"))>version)throw std::runtime_error("Retained explicit inverse binds require scene version eleven");
   if(material_fields&&j.at("source_materials").contains("color_preparations"))for(const auto &preparation:j.at("source_materials").at("color_preparations"))
-    if(detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::runtime_error("Preconversion explicit inverse binds require scene version eleven");
+    if(detail::minimum_deformation_scene_version(preparation.at("deformation"))>version || (preparation.contains("uv_reprojection")&&detail::minimum_deformation_scene_version(preparation.at("uv_reprojection").at("deformation"))>version))throw std::runtime_error("Preconversion explicit inverse binds require their actual scene version");
   if(version==15&&(!material_fields||j.at("source_materials").at("version")!=4))throw std::invalid_argument("Scene15 requires its explicit normal preparation feature");
   if(material_fields&&j.at("source_materials").contains("normal_preparations"))for(const auto &preparation:j.at("source_materials").at("normal_preparations"))
     if(version<15||detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::invalid_argument("Pre-normal-preparation source features exceed scene version");

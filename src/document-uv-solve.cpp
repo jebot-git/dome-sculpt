@@ -150,8 +150,11 @@ void Document::process_uv_transfer(FileJob &job) {
         scene_.active().id != job.object)
       throw std::runtime_error("The UV session changed before paint transfer");
     const auto &current = scene_.object(job.object);
+    const auto &leased=job.scene.object(job.object);
     if (current.painted != job.paint_identity ||
-        current.painted->revision() != job.source_revision)
+        current.painted->revision() != job.source_revision || current.polygon!=leased.polygon ||
+        current.material_bindings!=leased.material_bindings || current.deformation!=leased.deformation ||
+        current.appearance!=leased.appearance || current.shape_source!=leased.shape_source)
       throw std::runtime_error("The source mesh changed before UV transfer");
     request = uv_request_.load();
   }
@@ -190,7 +193,8 @@ void Document::process_uv_transfer(FileJob &job) {
       throw std::runtime_error("UV remap changed original triangle/corner identity");
     uv_modified |= old.uv[old.indices[corner]] != target.uv[vertex];
   }
-  const bool source_aware=uv_modified&&(source.appearance||source.painted->source_maps()||source.material_bindings||source.painted->color_projection());
+  const bool own_corners=source.polygon&&source.polygon->active&&source.polygon->colors;
+  const bool source_aware=uv_modified&&(own_corners||source.appearance||source.painted->source_maps()||source.material_bindings||source.painted->color_projection());
   // Metadata-only edits of unchanged authored UVs retain the original explicit
   // source-authored policy (shared/zero-area charts are not silently repaired).
   if (uv_modified || !source.painted->source_maps()) {
@@ -251,6 +255,9 @@ void Document::process_uv_transfer(FileJob &job) {
     SourceUvBakeInput input;input.paint=source.painted;input.appearance=source.appearance;
     input.current_material=source.material_bindings;input.current_deformation=source.deformation;
     input.target=target;input.source_vertices=*map;
+    if(own_corners){input.polygon_authority=source.polygon;
+      if(source.material_bindings&&source.material_bindings->color_preparation)input.target_polygon=polygon;
+    }
     if(!source.appearance&&!source.material_bindings)
       input.native_material=SourceNativeMaterial{source.material.color,source.material.emissive,int(source.material.alpha),source.material.alpha_cutoff,source.material.double_sided};
     SourceUvBakeOptions options;options.cancelled=cancelled;
@@ -258,6 +265,11 @@ void Document::process_uv_transfer(FileJob &job) {
     painted=std::move(adopted.paint);deformation=std::move(adopted.deformation);
     appearance=std::move(adopted.appearance);binding=std::move(adopted.material_bindings);
   }else painted=changed?source.painted->reparameterize(target,cancelled):source.painted;
+  if(uv_modified&&own_corners){
+    auto retained=std::make_shared<PolygonAuthority>(*polygon);
+    retained->origin=capture_polygon_origin(job.scene,job.object);
+    polygon=std::move(retained);
+  }
   if (cancelled()) throw std::runtime_error("UV transfer cancelled");
   Scene prepared = job.scene;
   auto &candidate = prepared.object(job.object);
@@ -281,8 +293,11 @@ void Document::process_uv_transfer(FileJob &job) {
         scene_.active().id != job.object)
       throw std::runtime_error("The UV session changed during paint transfer");
     const auto &current = scene_.object(job.object);
+    const auto &leased=job.scene.object(job.object);
     if (current.painted != job.paint_identity ||
-        current.painted->revision() != job.source_revision)
+        current.painted->revision() != job.source_revision || current.polygon!=leased.polygon ||
+        current.material_bindings!=leased.material_bindings || current.deformation!=leased.deformation ||
+        current.appearance!=leased.appearance || current.shape_source!=leased.shape_source)
       throw std::runtime_error("The source mesh changed during UV transfer");
     if(accepted)accepted->recovery=recovery_source_;
     Transaction transaction(*this);

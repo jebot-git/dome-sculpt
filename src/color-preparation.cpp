@@ -87,7 +87,25 @@ void ColorPreparationReceipt::validate() const {
     if(!std::isfinite(value) || value<0 || value>1)throw std::invalid_argument("Invalid color preparation error bound");
 }
 void SourceColorPreparation::validate(bool deep) const {
-  if(uv_reprojection)throw std::invalid_argument("Current corner UV receipts require their complete Scene23 admission; original colour state retained");
+  // Runtime DTOs must be bounded too; archive ordering alone cannot protect a
+  // caller-created cyclic predecessor chain. This guard never allocates.
+  static thread_local std::array<const SourceColorPreparation*,64> ancestors{};
+  static thread_local size_t depth=0;
+  if(depth==ancestors.size()||std::find(ancestors.begin(),ancestors.begin()+depth,this)!=ancestors.begin()+depth)
+    throw std::invalid_argument("Colour preparation history is cyclic or exceeds its depth budget");
+  ancestors[depth++]=this;struct Pop {size_t &depth;~Pop(){--depth;}} pop{depth};
+  if(uv_reprojection){
+    const auto &u=*uv_reprojection;
+    if(!u.before_material||!u.before_material->color_preparation)
+      throw std::invalid_argument("Current colour UV recipe lacks its own prepared predecessor");
+    const auto &prior=*u.before_material->color_preparation;
+    if(projection!=u.projection||initial_projection!=prior.initial_projection||
+       original_paint!=prior.original_paint||original_material!=prior.original_material||
+       original_appearance!=prior.original_appearance||original_deformation!=prior.original_deformation||
+       polygon_colors!=prior.polygon_colors||receipt.encode()!=prior.receipt.encode())
+      throw std::invalid_argument("Current colour UV recipe cannot replace its immutable initial authority");
+    u.validate(deep);
+  }
   receipt.validate();
   if(bool(polygon_colors)!=(receipt.source_field==SourceColorField::PolygonCorners) ||
      (polygon_colors&&(!polygon_colors->topology||!polygon_colors->field||polygon_colors->topology->faces().empty())))
@@ -138,7 +156,7 @@ const std::shared_ptr<const PolygonColorSurface> &SourceColorPreparation::curren
 }
 void SourceColorPreparation::validate_current(const Mesh &mesh,const CreatorAppearance *appearance,
                                              const std::function<bool()> &cancelled) const {
-  validate(false);verify_field(mesh,*this,appearance,*projection,cancelled);
+  validate(false);if(uv_reprojection)uv_reprojection->validate_current(mesh,appearance,cancelled);verify_field(mesh,*this,appearance,*projection,cancelled);
 }
 std::vector<std::array<float,4>> SourceColorPreparation::vertex_field(size_t count,const CreatorAppearance *appearance,
                                                    const std::function<bool()> &cancelled) const {

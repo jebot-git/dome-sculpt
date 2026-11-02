@@ -7,6 +7,8 @@
 #include "paint-normal-access.hpp"
 #include "normal-projection-identity.hpp"
 #include "source-colors.hpp"
+#include "polygon-color-target.hpp"
+#include "uv-canonical-transport.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/polygon-color.hpp"
 #include <algorithm>
@@ -73,15 +75,23 @@ void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(!i.paint||i.paint->in_stroke())throw std::invalid_argument("Finish source paint stroke before UV baking");
  if(bool(i.paint->normal_projection())!=bool(i.current_material&&i.current_material->normal_preparation))throw std::invalid_argument("Source UV normal paint and its own material interpretation differ");
  if(i.polygon_authority){
-  if(!i.polygon_authority->active||!i.polygon_authority->colors||i.appearance||i.current_material||i.paint->color_projection()||i.paint->normal_projection()||!i.native_material)
-   throw std::invalid_argument("Raw corner UV transfer requires its own active field and native material; prepared interpretations need their explicit adapter");
+  const bool prepared=bool(i.current_material&&i.current_material->color_preparation);
+  if(!i.polygon_authority->active||!i.polygon_authority->colors||i.appearance||i.paint->normal_projection()||(!prepared&&(i.current_material||i.paint->color_projection()||!i.native_material)))
+   throw std::invalid_argument("Corner UV transfer requires its own active field and explicit supported material authority");
+  if(prepared){
+    if(!i.target_polygon||!i.target_polygon->active||i.target_polygon->colors!=i.polygon_authority->colors||i.current_material->has_mtoon||i.current_material->normal_preparation)
+      throw std::invalid_argument("Prepared corner UV transfer requires its own exact target field/topology");
+    detail::polygon_color_owner(i.polygon_authority.get(),i.current_material->color_preparation.get(),true);
+    PolygonColorSurface target{std::make_shared<const PolygonMesh>(i.target_polygon->topology),i.target_polygon->colors};
+    detail::polygon_target_colors(i.target,target,o.cancelled);
+  }else if(i.target_polygon)throw std::invalid_argument("Raw UV transfer cannot borrow a prepared target witness");
   PolygonLimits limits;limits.cancelled=o.cancelled;
   validate_polygon_derivative(*i.polygon_authority,i.paint.get(),true,limits);
   i.polygon_authority->colors->validate(i.polygon_authority->topology,limits);
  }
  if(i.paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored&&!i.polygon_authority)throw std::invalid_argument("Source UV baking requires explicit polygon source conversion with its owning authority; original paint was retained");
  const auto preparation=i.current_material?i.current_material->color_preparation:nullptr;
- if(preparation&&preparation->polygon_colors)throw std::invalid_argument("Current corner color UV changes require their actual field remap; original geometry, UVs and paint were retained");
+ if(preparation&&preparation->polygon_colors&&!i.polygon_authority)throw std::invalid_argument("Current corner color UV changes require their own actual polygon field remap");
  if(bool(i.paint->color_projection())!=bool(preparation))throw std::invalid_argument("Source UV color preparation authority differs from current paint");
  if(preparation){preparation->validate();preparation->validate_current(i.paint->mesh(),i.appearance.get(),o.cancelled);const auto &a=*i.paint->color_projection(),&b=*preparation->projection;if(a.vertex_rgba!=b.vertex_rgba||a.maximum_error!=b.maximum_error||a.quality_cells!=b.quality_cells)throw std::invalid_argument("Source UV projected field differs from retained preparation");}
  if(!o.max_vertices||o.max_vertices>2'000'000||!o.max_triangles||o.max_triangles>2'000'000||i.target.positions.size()>o.max_vertices||i.target.indices.size()/3>o.max_triangles||i.paint->mesh().positions.size()>o.max_vertices||i.paint->mesh().indices.size()/3>o.max_triangles)throw std::length_error("Source UV geometry budget exceeded");
@@ -99,7 +109,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  result.target=i.target;result.source_vertices=i.source_vertices;
  const bool prepared=bool(i.paint->color_projection()),normal_prepared=bool(i.paint->normal_projection());
  result.animation_policy=o.animation;result.freeze_seconds=o.freeze_seconds;
- result.original_paint=i.paint;result.original_appearance=i.appearance;result.original_deformation=i.current_deformation;result.original_material=i.current_material;result.active_layer=i.paint->active_layer();result.original_polygon=i.polygon_authority;
+ result.original_paint=i.paint;result.original_appearance=i.appearance;result.original_deformation=i.current_deformation;result.original_material=i.current_material;result.active_layer=i.paint->active_layer();result.original_polygon=i.polygon_authority;result.target_polygon=i.target_polygon;
  if(i.current_material) {
   i.current_material->validate();
   if(i.current_material->normal_frames) {
@@ -125,7 +135,8 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  if(prepared){const size_t pixels=size_t(i.paint->resolution())*i.paint->resolution();if(pixels>o.max_image_pixels)throw std::length_error("Source UV color projection pixel budget exceeded");const size_t bytes=pixels*4;if(bytes>o.max_layer_bytes-result.baked_bytes||bytes>o.max_output_bytes-result.image_bytes)throw std::length_error("Source UV color projection storage budget exceeded");result.layer_bytes=bytes;result.image_bytes+=bytes;}
  if(i.current_deformation && (i.current_deformation->skin || i.current_deformation->morphs) && !result.normal_frames &&
     ((i.paint->source_maps() && i.paint->source_maps()->normal.image) || (old_bake && !old_bake->maps.normal.rgba.empty()) ||
-     (result.mtoon && result.mtoon->parameters.normal_enabled && result.mtoon->textures[size_t(MToonSlot::Normal)].index>=0)))
+     (result.mtoon && result.mtoon->parameters.normal_enabled && result.mtoon->textures[size_t(MToonSlot::Normal)].index>=0)) &&
+    !(i.target_polygon && detail::preserves_canonical_uv_derivatives(old,i.target,i.source_vertices,o.max_working_bytes,o.cancelled)))
   throw std::invalid_argument("Deformed normal transfer requires retained original attribute frames; derivative conversion is rest-only");
  bool animated=result.mtoon&&(result.mtoon->parameters.scroll!=std::array<float,2>{}||result.mtoon->parameters.rotation_speed!=0);
  if(animated&&o.animation==SourceUvAnimationPolicy::RejectAnimated)throw std::invalid_argument("Animated source UVs require explicit FreezeAtTime bake policy");
@@ -135,7 +146,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  if(result.animation_frozen)result.diagnostics.push_back("UV animation explicitly frozen at "+std::to_string(result.freeze_seconds)+" seconds; original animated source retained");
  auto original_role=[&](int role){PaintSourceTexture view;auto &t=result.mtoon->textures[size_t(role)];if(t.index<0)return view;if(role!=int(MToonSlot::Matcap))coordinate(t);if(i.current_material)return i.current_material->roles[size_t(role)];auto &a=*i.appearance;auto &texture=a.asset->textures.at(size_t(t.index));if(texture.image<0||size_t(texture.image)>=a.decoded_images->size())throw std::invalid_argument("Source UV MToon image reference is invalid");view.image=a.decoded_images->at(texture.image);view.wrap_s=texture.wrap_s;view.wrap_t=texture.wrap_t;view.min_filter=texture.min_filter;view.mag_filter=texture.mag_filter;view.validate();return view;};
  if(i.current_material&&i.current_material->uv_origin)result.uv_origin=i.current_material->uv_origin;
- else if(!i.polygon_authority) {
+ else if(!i.polygon_authority||prepared) {
   auto origin=std::make_shared<SourceUvOrigin>();origin->paint=i.paint->snapshot();
   if(i.appearance)origin->appearance=std::make_shared<const CreatorAppearance>(*i.appearance);
   origin->material=result.mtoon;
@@ -202,6 +213,19 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   if(result.mtoon){auto &normal=result.mtoon_roles[size_t(MToonSlot::Normal)];normal={};normal.image=result.normal_reprojection->projection->mtoon;normal.wrap_s=normal.wrap_t=33071;normal.min_filter=normal.mag_filter=9729;}
   result.diagnostics.push_back("Intrinsic PBR/MToon and prepared detail normals retain fixed original attribute axes; source-aware sampled-quality UV receipt retained");
  }
+ if(prepared&&i.target_polygon){
+  // Release transfer scratch before the independently budgeted field raster.
+  dest=Raster{};source=Raster{};
+  auto descriptor=std::make_shared<PolygonColorSurface>();descriptor->topology=std::make_shared<const PolygonMesh>(i.target_polygon->topology);descriptor->field=i.target_polygon->colors;
+  ColorPreparationOptions options;options.cancelled=o.cancelled;options.max_projection_error=i.current_material->color_preparation->receipt.accepted_projection_error;options.max_working_bytes=o.max_working_bytes;
+  options.max_quality_cells=std::min<uint64_t>(options.max_quality_cells,o.max_sample_operations-result.sample_operations);
+  if(!options.max_quality_cells)throw std::length_error("Current colour UV lacks quality-work budget");
+  const auto remaining=o.max_raster_samples-result.raster_samples;if(!remaining)throw std::length_error("Current colour UV lacks raster budget");
+  result.color_reprojection=reproject_source_corner_colors(i.paint,i.current_material,i.current_deformation,std::move(descriptor),i.target,i.source_vertices,options,remaining);
+  result.raster_samples+=size_t(result.color_reprojection->uv_reprojection->receipt.raster_samples);
+  result.sample_operations+=size_t(result.color_reprojection->projection->quality_cells);
+  if(result.sample_operations>o.max_sample_operations)throw std::length_error("Current colour UV cumulative work exceeds policy");
+ }
  budget.cancel();result.diagnostics.push_back("Original images/material IDs/raw avatar retained; derived RGBA8 textures resampled without material-factor flattening");result.diagnostics.push_back(result.normal_frames?"Raw source/canonical normal vectors retain original attribute frames through the sampling-atlas change":"Normal conversion matches current UV-derivative preview frames; original authored tangent4 remains retained");return result;
 }
 struct SourceUvBakeAccess {
@@ -251,8 +275,14 @@ struct SourceUvBakeAccess {
   paint->allocated_tiles_=tiles;paint->allocated_color_tiles_=color_tiles;
   if(prepared){if(!result.original_material||!result.original_material->color_preparation)throw std::invalid_argument("Source UV lost color preparation authority");
    ColorPreparationOptions options;options.cancelled=cancelled;options.max_projection_error=result.original_material->color_preparation->receipt.accepted_projection_error;
-   auto colors=result.original_material->color_preparation->vertex_field(paint->mesh().positions.size(),result.appearance.get(),cancelled);
-   paint->color_projection_=SourceColorPreparationAccess::project(*paint,colors,options).projection;
+   if(result.color_reprojection){
+    const auto &u=result.color_reprojection->uv_reprojection;
+    if(!u||u->before_paint!=result.original_paint||u->before_material!=result.original_material||u->before_deformation!=result.original_deformation||u->before_appearance!=result.original_appearance||u->layout->source_vertices!=result.source_vertices)
+      throw std::invalid_argument("Current colour UV adoption lost its exact detached source lease");
+    result.color_reprojection->validate();result.color_reprojection->validate_current(paint->mesh(),result.appearance.get(),cancelled);paint->color_projection_=result.color_reprojection->projection;
+   }else{auto colors=result.original_material->color_preparation->vertex_field(paint->mesh().positions.size(),result.appearance.get(),cancelled);
+    paint->color_projection_=SourceColorPreparationAccess::project(*paint,colors,options).projection;}
+
   }
   return paint;
  }
@@ -260,9 +290,9 @@ struct SourceUvBakeAccess {
 SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
                                      const std::function<bool()> &cancelled) {
  SourceUvBakeInput input;input.paint=result.original_paint;input.appearance=result.original_appearance;
- input.target=result.target;input.source_vertices=result.source_vertices;input.current_material=result.original_material;input.current_deformation=result.original_deformation;input.polygon_authority=result.original_polygon;if(input.polygon_authority)input.native_material=result.native_reference;
+ input.target=result.target;input.source_vertices=result.source_vertices;input.current_material=result.original_material;input.current_deformation=result.original_deformation;input.polygon_authority=result.original_polygon;input.target_polygon=result.target_polygon;if(input.polygon_authority)input.native_material=result.native_reference;
  SourceUvBakeOptions options;options.cancelled=cancelled;validate(input,options);
- if(result.original_polygon){
+ if(result.original_polygon&&!result.original_material){
   if(result.uv_origin||result.mtoon||result.normal_frames||result.normal_reprojection||result.animation_frozen||result.original_material||result.original_appearance)
    throw std::invalid_argument("Raw corner UV result cannot invent a borrowed material/source interpretation");
   auto paint=SourceUvBakeAccess::adopt(result,cancelled);
@@ -285,7 +315,8 @@ SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
  if(result.normal_reprojection){auto normal=std::make_shared<SourceNormalPreparation>(*result.original_material->normal_preparation);normal->projection=result.normal_reprojection->projection;normal->uv_reprojection=result.normal_reprojection;binding->normal_preparation=std::move(normal);}
  binding->validate();
  auto paint=SourceUvBakeAccess::adopt(result,cancelled);
- if(paint->color_projection()){auto preparation=std::make_shared<SourceColorPreparation>(*result.original_material->color_preparation);preparation->projection=paint->color_projection();binding->color_preparation=std::move(preparation);binding->validate();}
+ if(paint->color_projection()){if(result.color_reprojection)binding->color_preparation=result.color_reprojection;
+  else{auto preparation=std::make_shared<SourceColorPreparation>(*result.original_material->color_preparation);preparation->projection=paint->color_projection();binding->color_preparation=std::move(preparation);}binding->validate();}
  if(result.normal_frames)detail::normal_frame_current_authority(*binding,paint->mesh(),result.deformation.get(),cancelled);
  if(result.deformation)result.deformation->validate(paint->mesh());
  return {std::move(paint),std::move(binding),result.deformation,result.appearance};

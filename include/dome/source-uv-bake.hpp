@@ -7,6 +7,7 @@
 #include <optional>
 namespace dome {
 struct SourceNormalUvReprojection;
+struct SourceColorPreparation;
 struct PolygonAuthority;
 struct SourceUvBakeOptions {
   // Zero preserves at least each original image's largest dimension and the
@@ -37,6 +38,8 @@ struct SourceUvBakeInput {
   // Transient own-Scene witness for raw current-corner paint. A PA surface is
   // never admitted from counts or from an unrelated retained Origin alone.
   std::shared_ptr<const PolygonAuthority> polygon_authority;
+  // Required for prepared corner colour transfer: the exact new own topology.
+  std::shared_ptr<const PolygonAuthority> target_polygon;
 };
 struct SourceUvBakeResult {
   Mesh target;
@@ -70,6 +73,8 @@ struct SourceUvBakeResult {
   std::shared_ptr<const DeformationState> original_deformation;
   std::shared_ptr<const SourceNormalUvReprojection> normal_reprojection;
   std::shared_ptr<const PolygonAuthority> original_polygon;
+  std::shared_ptr<const PolygonAuthority> target_polygon;
+  std::shared_ptr<const SourceColorPreparation> color_reprojection;
 };
 // Pure bounded native worker operation. No file access, GL, source mutation,
 // automatic flattening or live-project installation. Rasterizes exact face
