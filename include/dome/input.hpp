@@ -127,6 +127,7 @@ public:
   void refresh_volume(Volume &v) { volume_ = &v; }
   void cancel();
   bool menu_open() const { return menu_; }
+  bool owns_control(VrParameter parameter) const { return menu_&&parameter!=VrParameter::None&&parameter_==parameter; }
   Vec3 menu_anchor() const { return menu_anchor_; }
   Tool tool() const { return tool_; }
   Tool menu_selection() const { return Tool(std::min(selected_, 3)); }
