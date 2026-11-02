@@ -48,9 +48,36 @@ __global__ void sparse_values(const sparse_resample::Cell *cells,uint32_t mask,
   const size_t i=blockIdx.x*blockDim.x+threadIdx.x;
   if(i<count)values[i]=sparse_resample::sample(cells,mask,points[i],p);
 }
+__global__ void sparse_errors(const sparse_resample::Cell *cells,uint32_t mask,
+    const sparse_resample::ErrorQuery *points,uint64_t *partial,size_t count,sparse_resample::Parameters p) {
+  __shared__ uint64_t local[sparse_resample::reduction_width];
+  const auto lane=threadIdx.x;const size_t i=blockIdx.x*blockDim.x+lane;
+  local[lane]=i<count?sparse_resample::absolute_error(cells,mask,points[i],p):0;
+  __syncthreads();
+  for(unsigned step=sparse_resample::reduction_width/2;step;step/=2){
+    if(lane<step&&local[lane+step]>local[lane])local[lane]=local[lane+step];
+    __syncthreads();
+  }
+  if(!lane)partial[blockIdx.x]=local[0];
+}
+__global__ void sparse_error_maximum(const uint64_t *partial,uint64_t *maximum,size_t count) {
+  __shared__ uint64_t local[sparse_resample::reduction_width];
+  const auto lane=threadIdx.x;uint64_t value=0;
+  for(size_t i=lane;i<count;i+=blockDim.x)if(partial[i]>value)value=partial[i];
+  local[lane]=value;__syncthreads();
+  for(unsigned step=sparse_resample::reduction_width/2;step;step/=2){
+    if(lane<step&&local[lane+step]>local[lane])local[lane]=local[lane+step];
+    __syncthreads();
+  }
+  if(!lane)*maximum=local[0];
+}
 template<class T> struct Buffer {
   T *data=nullptr;
-  explicit Buffer(size_t count) {checked(DS_ALLOC(reinterpret_cast<void **>(&data),count*sizeof(T)));}
+  explicit Buffer(size_t count) {
+    void *allocation=nullptr;
+    try{checked(DS_ALLOC(&allocation,count*sizeof(T)));data=static_cast<T*>(allocation);}
+    catch(...){if(allocation)(void)DS_FREE(allocation);throw;}
+  }
   ~Buffer(){if(data)(void)DS_FREE(data);}
   Buffer(const Buffer &)=delete;
 };
@@ -104,6 +131,8 @@ struct SparseFieldSampler::Impl {
   Buffer<sparse_resample::Cell> cells;
   Buffer<sparse_resample::Point> points;
   Buffer<uint64_t> values;
+  std::unique_ptr<Buffer<sparse_resample::ErrorQuery>> error_queries;
+  std::unique_ptr<Buffer<uint64_t>> error_partials;
   sparse_resample::Parameters parameters;
   uint32_t mask;size_t capacity;bool failed=false;
   Impl(const sparse_resample::Grid &grid,sparse_resample::Parameters p,size_t count):cells(grid.cells().size()),points(count),values(count),parameters(p),mask(grid.mask()),capacity(count) {
@@ -130,6 +159,30 @@ std::vector<uint64_t> SparseFieldSampler::sample(std::span<const sparse_resample
     sparse_resample_checkpoint(cancelled);
   }catch(...){state.failed=true;(void)DS_SYNC();throw;}
   return result;
+}
+uint64_t SparseFieldSampler::maximum_error(std::span<const sparse_resample::ErrorQuery> queries,const std::function<bool()> &cancelled) {
+  auto &state=*impl_;if(state.failed)throw std::runtime_error("Sparse quality GPU session has failed");
+  sparse_resample::validate_error_queries(queries,state.parameters,[&]{sparse_resample_checkpoint(cancelled);});
+  if(queries.empty())return 0;
+  uint64_t maximum=0,current=0;
+  try{
+    if(!state.error_queries){
+      auto input=std::make_unique<Buffer<sparse_resample::ErrorQuery>>(state.capacity);
+      auto partial=std::make_unique<Buffer<uint64_t>>((state.capacity+sparse_resample::reduction_width-1)/sparse_resample::reduction_width);
+      state.error_queries=std::move(input);state.error_partials=std::move(partial);
+    }
+    for(size_t first=0;first<queries.size();){
+      sparse_resample_checkpoint(cancelled);const auto count=std::min(state.capacity,queries.size()-first);
+      const auto groups=(count+sparse_resample::reduction_width-1)/sparse_resample::reduction_width;
+      checked(DS_COPY(state.error_queries->data,queries.data()+first,count*sizeof(sparse_resample::ErrorQuery),DS_TO_DEVICE));
+      sparse_errors<<<groups,sparse_resample::reduction_width>>>(state.cells.data,state.mask,state.error_queries->data,state.error_partials->data,count,state.parameters);checked(DS_LAST_ERROR());
+      sparse_error_maximum<<<1,sparse_resample::reduction_width>>>(state.error_partials->data,state.values.data,groups);checked(DS_LAST_ERROR());checked(DS_SYNC());
+      checked(DS_COPY(&current,state.values.data,sizeof(current),DS_TO_HOST));
+      maximum=std::max(maximum,sparse_resample::checked_error(current));first+=count;
+    }
+    sparse_resample_checkpoint(cancelled);
+  }catch(...){state.failed=true;(void)DS_SYNC();throw;}
+  return maximum;
 }
 
 } // namespace dome

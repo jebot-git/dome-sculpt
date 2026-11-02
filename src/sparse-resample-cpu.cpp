@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sparse-resample-backend.hpp"
+#include "sparse-resample-native.hpp"
 namespace dome {
 struct SparseFieldSampler::Impl {
   sparse_resample::Grid grid;
@@ -16,18 +17,22 @@ std::vector<uint64_t> SparseFieldSampler::sample(std::span<const sparse_resample
   const auto &grid=impl_->grid;const auto p=impl_->p;
   using namespace sparse_resample;
   validate_queries(queries,p,[&]{sparse_resample_checkpoint(cancelled);});
-  const double source=std::bit_cast<double>(p.source),target=std::bit_cast<double>(p.target),background=std::bit_cast<double>(p.background);
   std::vector<uint64_t> result;result.reserve(queries.size());
   for(size_t i=0;i<queries.size();++i) {
     if((i&255)==0)sparse_resample_checkpoint(cancelled);
-    const auto q=queries[i];const double v[]={double(q.x)*target/source,double(q.y)*target/source,double(q.z)*target/source};
-    const Point lo{int32_t(std::floor(v[0])),int32_t(std::floor(v[1])),int32_t(std::floor(v[2]))};
-    const double f[]={v[0]-lo.x,v[1]-lo.y,v[2]-lo.z};double value=background;
-    for(int z=0;z<2;++z)for(int y=0;y<2;++y)for(int x=0;x<2;++x)
-      if(const auto *cell=find(grid.cells().data(),grid.mask(),{lo.x+x,lo.y+y,lo.z+z}))
-        value+=(std::bit_cast<double>(cell->value)-background)*(x?f[0]:1-f[0])*(y?f[1]:1-f[1])*(z?f[2]:1-f[2]);
-    result.push_back(std::bit_cast<uint64_t>(value));
+    result.push_back(std::bit_cast<uint64_t>(sparse_resample::native_sample(grid,p,queries[i])));
   }
   sparse_resample_checkpoint(cancelled);return result;
+}
+uint64_t SparseFieldSampler::maximum_error(std::span<const sparse_resample::ErrorQuery> queries,
+    const std::function<bool()> &cancelled) {
+  const auto &grid=impl_->grid;const auto p=impl_->p;
+  sparse_resample::validate_error_queries(queries,p,[&]{sparse_resample_checkpoint(cancelled);});
+  double maximum=0;
+  for(size_t i=0;i<queries.size();++i){
+    if((i&255)==0)sparse_resample_checkpoint(cancelled);
+    maximum=std::max(maximum,std::abs(sparse_resample::native_sample(grid,p,queries[i].point)-std::bit_cast<double>(queries[i].expected)));
+  }
+  sparse_resample_checkpoint(cancelled);return sparse_resample::checked_error(std::bit_cast<uint64_t>(maximum));
 }
 } // namespace dome
