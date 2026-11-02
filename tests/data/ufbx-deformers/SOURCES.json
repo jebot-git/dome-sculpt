@@ -1,0 +1,56 @@
+{
+  "repository": "https://github.com/ufbx/ufbx",
+  "commit": "26a482ae66871d7de36eb722aa060bce95bce274",
+  "license": "Upstream MIT alternative A, full LICENSE retained; these are validation inputs, no new default humanoid assets",
+  "files": [
+    {
+      "upstream_path": "data/maya_game_sausage_7500_ascii.fbx",
+      "file": "maya_game_sausage_7500_ascii.fbx",
+      "bytes": 23289,
+      "git_blob_sha1": "b3c0c04b91c497ddf5f6dfa33dd15d1d53e00e56",
+      "sha256": "ec91e16e4f9508974c6bd6141e62dd8e1607addb940e07d94b1b28bad831c6f7"
+    },
+    {
+      "upstream_path": "data/maya_game_sausage_7500_ascii_combined.fbx",
+      "file": "maya_game_sausage_7500_ascii_combined.fbx",
+      "bytes": 113777,
+      "git_blob_sha1": "a37fcca3b2ca1f689adcc385bf4558e9a11fe73a",
+      "sha256": "dfc2901b8606e5db60047bb62f3ded441b51a707187a76441b3a5a9c47354e01"
+    },
+    {
+      "upstream_path": "data/max_transformed_skin_7500_ascii.fbx",
+      "file": "max_transformed_skin_7500_ascii.fbx",
+      "bytes": 62457,
+      "git_blob_sha1": "ad2704a946aaae6f2f259899ccfb607e758b9290",
+      "sha256": "767a44f9d499d1997dc157f9cd8bd156fdb958047906dfb19032fb2a6a86746f"
+    },
+    {
+      "upstream_path": "data/blender_293_half_skinned_7400_binary.fbx",
+      "file": "blender_293_half_skinned_7400_binary.fbx",
+      "bytes": 15740,
+      "git_blob_sha1": "9c376ed693a93adc78e829d7f818c2b0894d7199",
+      "sha256": "537700c737063bc9e96d3bb34dc7c7400f6327d7036fb24193e0028364337140"
+    },
+    {
+      "upstream_path": "data/maya_blend_shape_cube_7700_ascii.fbx",
+      "file": "maya_blend_shape_cube_7700_ascii.fbx",
+      "bytes": 16955,
+      "git_blob_sha1": "0e254bdbf41323ab52ce23a55d086430d1ef73b0",
+      "sha256": "2ae340094aa37a9cff77bcdf1b616b065bc7f4c662124ac81bcffec278b51bb9"
+    },
+    {
+      "upstream_path": "data/blender_279_shape_weights_7400_binary.fbx",
+      "file": "blender_279_shape_weights_7400_binary.fbx",
+      "bytes": 20828,
+      "git_blob_sha1": "a9b9dfa1fa5ebb3f20d01c9b43644ee3a914baa3",
+      "sha256": "35437239b577b0871e4ce3977334ed5d36c26ee620ca7c7ddf42b54615410f70"
+    },
+    {
+      "upstream_path": "LICENSE",
+      "file": "LICENSE",
+      "bytes": 2631,
+      "git_blob_sha1": "5db259b50e3a49019073b6ad69f9514d60638e8a",
+      "sha256": "0dd48ebadf52273c736256325c8f078c03c8bb4facee22a4122de0ad3f615391"
+    }
+  ]
+}

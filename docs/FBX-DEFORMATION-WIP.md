@@ -36,6 +36,29 @@ The largest observed absolute position error is1.54678e-7. The fixed bound is
 `2e-5 + 1e-6 * magnitude`; no bound was changed after an observed failure.
 These compare default evaluated poses/weights, not newly authored pose changes.
 
+## Subsequent editable-pose and independent-export work
+
+The new `work/fbx-authoring-3a55c84` child composes this adapter with published
+main7a4443e. Reproducible pinned upstream inputs/license/provenance and registered
+`fbx-deformation-authoring` / `fbx-import-document` fixtures now live in the
+repository. This does not retroactively make the initial mixed-object probe a
+fresh whole-project qualification.
+
+The expanded exploratory consumer runs9073 native checks across1152 independent
+world-vertex comparisons: five default inputs plus nine newly edited translation,
+rotation and anisotropic-scale poses. Every posed case must produce measurable
+motion, retain exact native Save/restart, and preserve actual editable skin/morph
+channels in independent cgltf evaluation of14 emitted GLBs. The original wrong
+vertex-index correspondence negative is preserved: retained normal-frame export
+legitimately reindexes seam vertices. The corrected oracle compares exact ordered
+triangle corners, retaining the same numerical bound and source geometry.
+
+The new Document fixture is a real source-read-barrier test for accepted import
+Save, old-file preservation, cancellation, generation replacement, retry and
+one-step global Undo/Redo across all five files. It requires a fresh coherent
+current-ABI build; no result is claimed before that run. Full frontend/device,
+attribute-quality, allocation and broader semantic coverage remain required.
+
 The genuine 3ds Max dual-quaternion input still refuses with the exact unsupported
 deformation diagnosis. A derived Maya fixture with actual coloured transparency
 still refuses with the material-semantic diagnosis. Earlier real failures are

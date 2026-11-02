@@ -286,12 +286,13 @@
     "commit": "26a482ae66871d7de36eb722aa060bce95bce274",
     "version": "0.23.1",
     "license": "MIT (selected alternative A; complete upstream dual-license notice retained)",
-    "used": "Unmodified native C FBX/OBJ reader with confined immutable source resource capture, bounded allocators and cancellation; no proprietary FBX SDK or runtime frontend. Current adapter supports static geometry/material/corner/instances with explicit guards for unsupported skin/blend/affine cases.",
+    "used": "Unmodified native C FBX/OBJ reader with confined immutable resource capture, bounded allocators and cancellation; no proprietary SDK/runtime frontend. Native adapter3 converts the bounded linear/rigid skin and independent blend-target subset, retaining original affine binds, node/cluster/channel identities and exact raw source. DQ/multiple-deformer/full-material/named-UV/normal-generation semantics remain incomplete and guarded.",
     "upstream_sha256": {
       "ufbx.c": "4a956c26a708e40d82ecb0aeaee54da709d5ba7c144c9642174970059bda7e1d",
       "ufbx.h": "f787be529af577efc04f3e3e735844a08556718dbb613d1211c2b313d72895dc",
       "LICENSE": "0dd48ebadf52273c736256325c8f078c03c8bb4facee22a4122de0ad3f615391"
-    }
+    },
+    "validation_fixtures": "tests/data/ufbx-deformers/SOURCES.json (same pinned upstream commit; MIT alternative A, complete license retained; validation inputs only, not shipped humanoid bases)"
   },
   "wings_polygon_edit": {
     "repository": "https://github.com/dgud/wings",
