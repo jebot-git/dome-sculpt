@@ -59,6 +59,8 @@ struct Fixture {
                               {"type", "SCALAR"}});
     int dp =
         values({0, .01f, 0, 0, .02f, 0, 0, .03f, 0, 0, .04f, 0}, 3, "VEC3");
+    j["accessors"][dp]["min"] = {0, .01f, 0};
+    j["accessors"][dp]["max"] = {0, .04f, 0};
     int dn = values({.1f, 0, 0, .2f, 0, 0, .3f, 0, 0, .4f, 0, 0}, 3, "VEC3");
     int dt = values({0, .1f, 0, 0, .2f, 0, 0, .3f, 0, 0, .4f, 0}, 3, "VEC3");
     Json primitive = {
