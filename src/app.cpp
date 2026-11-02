@@ -879,7 +879,7 @@ struct App {
       enable("&Edit/&Undo",!polygon->committing&&(polygon->can_undo||polygon->moving));
       enable("&Edit/&Redo",!polygon->committing&&polygon->can_redo);
     }
-    if(s->cut&&s->cut->committing&&!modal) {
+    if(s->can_save_after_asset&&!modal) {
       enable("&File/&Save",true);enable("&File/Save &As...",true);
     }
     enable("&Mesh/Retopology/Start patch", !modal && s->can_retopologize);

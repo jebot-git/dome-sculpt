@@ -26,11 +26,11 @@ void Document::input_worker_error_locked(std::exception_ptr error) noexcept {
   worker_notices_[0]=std::move(notice);retry_worker_notices_locked(true);
 }
 void Document::file_worker_error_locked(FileJob &job,std::exception_ptr error) noexcept {
-  if(job.cut_session&&job.work) {
-    // Preserve the original exception and release accepted-cut shutdown even
+  if(job.work&&job.work->accepted_scene&&!job.work->done.load()) {
+    // Preserve the original exception and release accepted-operation shutdown even
     // under permanent diagnostic-allocation denial. No stale Scene fallback.
-    job.work->cut_failure=error;
-    {std::lock_guard lock(file_mutex_);job.work->cut_done.store(true);}
+    job.work->failure=error;
+    {std::lock_guard lock(file_mutex_);job.work->done.store(true);}
     file_changed_.notify_all();
   }
   WorkerNotice notice;notice.error=std::move(error);notice.generation=job.generation;
