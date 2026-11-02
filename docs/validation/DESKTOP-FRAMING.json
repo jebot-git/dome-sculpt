@@ -1,0 +1,182 @@
+{
+  "recorded_utc": "2026-11-02T09:59:08.115467+00:00",
+  "product_source": "3c491bfd6fd8c5b6ccc39ce657664499a0e729cc",
+  "public_base": "04d3f4a7b74e1a22020128546e5a3956cfaddae9",
+  "scope": "Native desktop Frame all(Home), Frame selection(Shift+F), preserved F reset, stable orbit pivot, automatic successful-import/loaded-source framing, shared live polygon/handoff and retopo bounds; no Scene/public layout change",
+  "full_production_complete": false,
+  "native": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/tests-framing-preview-native.xml",
+    "sha256": "c841fe2150d21d47d42cbaf7d1b4a2266d2b59092a304a56d52581c308b200c8",
+    "tests": 1,
+    "failures": 0,
+    "seconds": "0",
+    "assertions": 27,
+    "coverage": "Independent perspective containment and inverse native ray; hidden/multi/active/portrait/live similarity/reflected shear; orbit pan invariant; obsolete generation/empty geometry; actual polygon GPU move offsets/handoff retirement; retopo draft vertices"
+  },
+  "sanitizer": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/tests-framing-preview-sanitized.log",
+    "sha256": "d8c1ef2c5c3c823889c1a1a831d42518e93646701721d73d3a41beeb183ac7b2",
+    "assertions": 27,
+    "flags": "ASAN+UBSAN/leaks, O1/g1 header/test object; unchanged previously whole-instrumented04d core/support archives",
+    "scope": "New inline camera/shared preview helpers instrumented against matching unchanged public/private core layouts; not a newly instrumented FLTK frontend or fresh whole-core build",
+    "link_map": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/desktop-framing-preview-sanitized.map",
+      "sha256": "32e6230d80dc91c2b9c37e20c55ea2b019d0d20fff9fa7803ffa4885f9e202c7"
+    },
+    "baseline_core": "/home/blux/de-xr/dome-sculpt/artifacts/vrm-atlas-ec/build-sanitize/libdome-sculpt-core.a"
+  },
+  "actual_native_gui": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/menu-desktop-framing/report.json",
+    "sha256": "8c09fa94fa87c55e0ab36fe0ef6355dc5caab4c03aebbbdfdb399ef3a59c5baf",
+    "checks": 12,
+    "failed": 0,
+    "complete": true
+  },
+  "native_gui_workflow": "Real exported universal menu/Home/Shift+F/F, two off-origin objects, frame/orbit, actual native Shift paint, immediately ordered Save, exact other/hidden objects, one Undo/Redo, no camera history entry",
+  "actual_wayland": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/dome-menu/report.json",
+    "sha256": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af",
+    "checks": 8,
+    "failed": 0,
+    "complete": null,
+    "compositor": "d271cf65c612a462fcfa6739416b06c6565be070",
+    "scope": "Latest private nested DomeD/canonical FLTK, actual Wayland/modal text/Close/universal-menu routing; software Vulkan, no active-session restart"
+  },
+  "synthetic_xr": {
+    "initial_two_suite_attempt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/tests-framing-preview-xr.xml",
+      "sha256": "132a403d6a5aa91c6f7d9851e2455901118f74208107edbc6c9c207a25e501ea",
+      "tests": 2,
+      "failures": 1,
+      "seconds": "13"
+    },
+    "initial_result": "Object-selection passed; polygon failed before client launch because the optional polygon-document helper target was not built. Original report preserved.",
+    "repaired_polygon": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/tests-framing-polygon-xr-repaired.xml",
+      "sha256": "d3269750f4b3fe46c9072277d0f2a621d57c9371372d798c92e2811179c5c542",
+      "tests": 1,
+      "failures": 0,
+      "seconds": "28"
+    },
+    "polygon": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/build/polygon-xr/report.json",
+      "sha256": "31a53582217f349184ec23b354a5e6a6332d054d895573eb80989a4ca402cd74",
+      "checks": 41,
+      "failed": 0,
+      "complete": true
+    },
+    "selection": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/build/object-selection-xr/report.json",
+      "sha256": "b4fb123317c3d80086203f1624706adc8c355f4385cf9ad99bb203085d127062",
+      "checks": 11,
+      "failed": 0,
+      "complete": null
+    },
+    "scope": "Actual OpenXR loader/stereo GL swapchains with synthetic tracking, no physical headset"
+  },
+  "before_preview_only_extension": {
+    "VRM_import": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/menu-import-vrm/report.json",
+      "sha256": "5bf11e95c680fa1be12298296a2a592ee267bfe51790b64c8519e7171723bb05",
+      "checks": 11,
+      "failed": 0,
+      "complete": null
+    },
+    "atlas_import": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/menu-import-texture-atlas/report.json",
+      "sha256": "8f417a69eafa08b6aea7eaee23e350512be5c0a9b0fae72d23eccd43b3d8371e",
+      "checks": 12,
+      "failed": 0,
+      "complete": null
+    },
+    "scope": "383b067 ordinary-view proof; later3c491bf adds preview bounds and factors exactly shared selector; src/app.cpp unchanged by3c",
+    "avatar_screenshot": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/menu-import-vrm/imported.png",
+      "sha256": "70d80586d31dd7f15e965bec087f6dc4bd97445f020378428d2dbb4dadd7a6ff"
+    },
+    "visual_review": "Complete original avatar now fits with top/bottom margins; original source orientation retained rather than rotating geometry"
+  },
+  "product_files": {
+    "src/app.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/src/app.cpp",
+      "sha256": "bc411dca37a55b0ec84f2d4ec60514930c5fbfbb51603666541a518926f7c2a6"
+    },
+    "src/desktop-framing.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/src/desktop-framing.hpp",
+      "sha256": "77a64eebfcfe66ab9beeb6974562bf151aa791d595367283973af8e071807b18"
+    },
+    "src/polygon-view-render.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/src/polygon-view-render.hpp",
+      "sha256": "ad065f0820f58a1076ca916caec48476432c773ee8a34fd4792983e81618fd07"
+    },
+    "src/polygon-view-state.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/src/polygon-view-state.hpp",
+      "sha256": "9444c4040311f5b124f8e0c70975a5f1dd47f756f89a12b361adc2f5a56a4a4e"
+    },
+    "tests/desktop-framing.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/tests/desktop-framing.cpp",
+      "sha256": "76ed3767129bff1cfaf5ab911b696c07d7c1837593c40c55aff21699dadfaeb0"
+    },
+    "tests/desktop-framing-fixture.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/tests/desktop-framing-fixture.cpp",
+      "sha256": "e4d67ffe63222c2253f0c074e88b0f2b4b038ae9adaac7d75b7bf6a92e7a695d"
+    },
+    "tests/desktop-framing-menu.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/tests/desktop-framing-menu.py",
+      "sha256": "721805d75bc278d862e5bd8831aa8bb5968903ace16a19eec5cb43a7cbd70ccb"
+    }
+  },
+  "binaries": {
+    "build/dome-sculpt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/build/dome-sculpt",
+      "sha256": "003ea029d9495a67f63df4c1200baa646cdded09cbfd25bb64d9e2d055dac51f"
+    },
+    "build/dome-sculpt-desktop-framing-test": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/build/dome-sculpt-desktop-framing-test",
+      "sha256": "e21f44a7c704236e0b6fe322e4d64a43987c54cb16beffabf383504e06841544"
+    },
+    "build/dome-sculpt-desktop-framing-fixture": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/build/dome-sculpt-desktop-framing-fixture",
+      "sha256": "ce817d76a2dfb9a351d7030c82769a05296cecc181c1c73929afe5c875ea04ef"
+    },
+    "build/libdome-sculpt-core.a": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/build/libdome-sculpt-core.a",
+      "sha256": "a220ed1db92aaf83665638cf9c29e7a64c3da1e25a954c6a38f2c9ca4030e0c1"
+    },
+    "build/libdome-sculpt-xr.a": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/build/libdome-sculpt-xr.a",
+      "sha256": "98624921620861223c22856269332e95ccaf56865f9731113d0d7c528e510cc1"
+    }
+  },
+  "builds": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/build-framing.log",
+      "sha256": "7cc746cf76fc789e0159b0b2038edff88631432f5438bda1739a219e150eca86"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/build-framing-qualified.log",
+      "sha256": "7b2d7d61f7471d3cedd163d01bc6b16a7ecf5c08ba6b2f6baf5387a8a0957a98"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/desktop-framing-04d/artifacts/build-framing-preview.log",
+      "sha256": "b8d9313323039fd1d99703f75e3c95621f82a978587e534e6d2f51465ed5b12b"
+    }
+  ],
+  "invariants": [
+    "Only immutable worker geometry/preview data is read; no extraction, scene copy, or GPU readback in the framing path",
+    "Object visibility and exact live placement deltas match rendering; renderer/framing share polygon preview selection and handoff retirement",
+    "Successful import auto-fit waits for current geometry and idle gestures; failed/cancelled imports never create scene/history edits",
+    "Existing F reset, DomeD Ctrl+W/Super+W/Super+Q and canonical bitmap/menu appearance remain available",
+    "04d baseline298/298+newVRM1/1 scopes are historical, not relabeled as a new all-suite framing run"
+  ],
+  "toolkit": "Canonical optimized EEE FLTK23/bitmap4; d271cf6 rechecked unchanged",
+  "physical_headset_test": false,
+  "system_installation": false,
+  "session_restart": false,
+  "next": [
+    "Review isolated BakeAdmission fix before publishing b186 source-bake extension",
+    "Qualify private7e36278 union of b0 postUV keys/b186 source bake/a799 VRM source export plus this framing implementation",
+    "Actual arbitrary avatar UV scaling needs new retained normal sampling-domain Scene21; existing integer-translation/key subset does not complete it",
+    "Remaining complete REQUIREMENTS.md matrix remains required"
+  ]
+}
