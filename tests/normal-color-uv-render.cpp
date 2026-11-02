@@ -28,6 +28,7 @@ Scene transfer(const Scene &scene){
  SourceUvBakeOptions options;options.normal_sampling=SourceNormalUvMethod::RetainSource;auto adopted=adopt_source_uv_bake(bake_source_uv(input,options));auto result=scene.snapshot();auto &out=result.active();out.painted=adopted.paint;out.material_bindings=adopted.material_bindings;out.appearance=adopted.appearance;out.deformation=adopted.deformation;out.polygon=derivative.authority;result.validate();return result;
 }
 }
+#ifndef DOME_NORMAL_COLOR_RENDER_NO_MAIN
 int main(int argc,char **argv)try{
  if(argc<2)return 2;auto prefix=std::filesystem::path(argv[1]);std::filesystem::create_directories(prefix);NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<std::endl;check(argc<3||std::string_view(argv[2])!="--hardware"||(device.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Joint fields use the requested actual graphics device");Fbo fbo;fbo.bind();SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;unsigned number=0;
  for(bool seam:{false,true})for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend}){
@@ -41,3 +42,5 @@ int main(int argc,char **argv)try{
  }
  std::cout<<"PASS "<<checks<<" joint normal+colour graphical checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
+
+#endif

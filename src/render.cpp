@@ -9,6 +9,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/color-paint-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "render-mtoon.hpp"
 #include "normal-preparation-state.hpp"
@@ -190,6 +191,10 @@ struct SurfaceRenderer::TextureState {
       if(range.paint_sampling_attachment) {
         if(!maps||maps->source_only||!range.material_bindings||range.material_bindings->has_mtoon)
           throw std::invalid_argument("Paint sampling requires its own derived untyped material");
+        const auto node=range.material_bindings->color_preparation?range.material_bindings->color_preparation->paint_sampling:nullptr;
+        const auto expected=node?node->geometry_attachment():nullptr;
+        if(!expected||expected!=range.paint_sampling_attachment||expected.owner_before(range.paint_sampling_attachment)||range.paint_sampling_attachment.owner_before(expected))
+          throw std::invalid_argument("Paint GPU range differs from its own immutable material attachment");
         const auto &domain=*range.paint_sampling_attachment->domain();
         if(mesh.paint_coordinates.size()!=count||range.count!=domain.source_corners().size())
           throw std::invalid_argument("Paint sampling GPU stream/range dimensions differ");

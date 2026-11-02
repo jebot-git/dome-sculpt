@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define main old_joint_render_main
+#define DOME_NORMAL_COLOR_RENDER_NO_MAIN
 #include "normal-color-uv-render.cpp"
-#undef main
+#undef DOME_NORMAL_COLOR_RENDER_NO_MAIN
 #include "dome/color-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include "normal-sampling-access.hpp"

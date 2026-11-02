@@ -6,6 +6,7 @@
 #include "dome/material-bindings.hpp"
 #include "source-colors.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/color-paint-sampling.hpp"
 #include "prepared-color-state.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
@@ -52,6 +53,10 @@ struct Visibility {
     if(r.paint_sampling_attachment) {
       if(!maps||maps->source_only||!r.material_bindings||r.material_bindings->has_mtoon)
         throw std::invalid_argument("Visibility paint domain requires its paired derived material");
+      const auto node=r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
+      const auto expected=node?node->geometry_attachment():nullptr;
+      if(!expected||expected!=r.paint_sampling_attachment||expected.owner_before(r.paint_sampling_attachment)||r.paint_sampling_attachment.owner_before(expected))
+        throw std::invalid_argument("Visibility paint range differs from its own immutable material attachment");
       const auto &domain=*r.paint_sampling_attachment->domain();
       if(domain.source_corners().size()!=r.count||coordinates.empty())
         throw std::invalid_argument("Visibility paint corner coordinates are incomplete");
