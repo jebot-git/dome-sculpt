@@ -241,3 +241,18 @@ The primary old frame WIP remains stashc46d1d907a9ca0cdb56cda17e54ab20284939fc1
 plus byte-verified backups. Preserve all private work and unrelated repositories.
 Commit/push authorized milestones and rebuild coherently after layout changes.
 Do not mark the full goal complete from a subset of passing checks.
+
+## Affine parent oracle follow-up
+
+The combined guarded UV1/culling run passed258/259; the remaining
+`affine-export` fixture still required an identity scene root. Its test-only
+follow-up now requires the retained parent and all16 independently parsed world
+matrix elements, preserving original IBM/posed evaluation and27 cancellation
+boundaries. The updated fixture passes in the public and UV1 contexts. See
+validation/AFFINE-PARENT-ORACLE.json; the old full run is not relabeled green.
+
+New nearest-filtered painted PBR export comparisons reveal a separate sampler
+mismatch; root is isolating it in `artifacts/paint-export-samplers-78a1034` before
+final UV1 pipeline publication. The editable-atlas import prototype is separate
+at `artifacts/uv1-editable-import-2e7d4a0`; native/controller/FLTK and worker GLB
+resource checks pass, while visual export/quality qualification is unfinished.

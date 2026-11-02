@@ -46,9 +46,12 @@ int main()try {
     check(surface&&surface->mesh,"actual mesh node is reachable");
     const auto&primitive=surface->mesh->primitives[0];auto positions=cgltf_find_accessor(&primitive,cgltf_attribute_type_position,0);
     const auto expected=AffineTransform(raw)*AffineTransform(model->asset->nodes[0].local)*AffineTransform(model->asset->nodes[1].local)*AffineTransform(raw);
+    check(surface->parent!=nullptr,"surface retains its original object and group parent");
+    float exported_world[16];cgltf_node_transform_world(surface,exported_world);
+    for(size_t element=0;element<16;++element)check(std::abs(double(exported_world[element])-expected.matrix()[element])<3e-6,"complete independently parsed surface world matrix preserves original affine placement");
     auto evaluated=skinned?scene.active().deformation->preview(mesh):mesh;
     for(size_t v=0;v<mesh.positions.size();++v){float p[3];check(cgltf_accessor_read_float(positions,v,p,3),"independent POSITION reads");Vec3 world;
-      if(skinned){check(surface->skin&&surface->parent==nullptr,"skinned surface is detached from placement as glTF requires");world={};for(size_t j=0;j<surface->skin->joints_count;++j){float ibm[16],joint[16];check(cgltf_accessor_read_float(surface->skin->inverse_bind_matrices,j,ibm,16),"authored bind accessor reads");cgltf_node_transform_world(surface->skin->joints[j],joint);world+=point(joint,point(ibm,{p[0],p[1],p[2]}));}}
+      if(skinned){check(surface->skin!=nullptr,"skinned surface retains an actual skin while preserving its original placement parent");world={};for(size_t j=0;j<surface->skin->joints_count;++j){float ibm[16],joint[16];check(cgltf_accessor_read_float(surface->skin->inverse_bind_matrices,j,ibm,16),"authored bind accessor reads");cgltf_node_transform_world(surface->skin->joints[j],joint);world+=point(joint,point(ibm,{p[0],p[1],p[2]}));}}
       else{float w[16];cgltf_node_transform_world(surface,w);world=point(w,{p[0],p[1],p[2]});}
       near(world,expected.point({evaluated.positions[v].x,evaluated.positions[v].y,evaluated.positions[v].z}),"independent world evaluation preserves affine placement and pose");
     }
