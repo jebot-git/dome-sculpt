@@ -33,8 +33,13 @@ Save retains the existing explicit refusal while accepted UV transfer is pending
 the workflow saves after its worker completes. The renderer's independent
 transposed-image and rotated-normal witnesses pass all five PBR roles, alpha
 mask/blend, picking, worker packing and invalid-domain recovery. The first Arc
-run identifies the actual A770 and all five image differences are zero. A fresh
-final-source Arc/sanitizer/integration receipt is still required.
+run identifies the actual A770 and all five image differences are zero. See validation/SOURCE-UV1-PIPELINE.json for exact source scopes. The full
+0977721 Release run passed251/252; its lone import-refusal message failure is
+repaired by an explicit native UV0 import policy, keeping the existing assertion.
+Four focused Release and two focused sanitizer suites then pass. Seven initial
+whole-core/support sanitizer suites,13 Arc checks,12 FLTK UV checks and eight
+actual latest-DomeD Wayland menu checks also pass. These scopes do not constitute
+a fresh combined affine/dependency/UV1 full regression run.
 
 Remaining work includes generic import admission, source-backed painting before
 atlas preparation (especially differing UV1 under overlapping UV0), independent
