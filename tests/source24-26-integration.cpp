@@ -3,6 +3,7 @@
 #include "paint-sampling-render.cpp"
 #undef DOME_PAINT_SAMPLING_RENDER_NO_MAIN
 #include "dome/import-authoring.hpp"
+#include "import-authoring-fixtures.hpp"
 #include "paint-source-admission.hpp"
 #include <fstream>
 namespace {
@@ -21,12 +22,24 @@ int main(int argc,char **argv)try{
  NativeGraphics graphics;const std::string gpu=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<gpu<<std::endl;
  check(argc<3||std::string_view(argv[2])!="--hardware"||(gpu.find("Intel")!=std::string::npos&&gpu.find("Arc")!=std::string::npos&&gpu.find("A770")!=std::string::npos),"Combined fixture uses its requested actual graphics device");
  auto original=joint::prepare(true,Material::AlphaMode::Mask);auto retained=retain_writable(original);Document document;document.replace(retained);endpoint(document);document.shading(false);endpoint(document);
- auto source=root/"current-extra-coordinates.glb";document.export_asset(source).get();prepared_normal_consumer::Model raw(source);
- check(prepared_normal_consumer::attr(raw.data->meshes[0].primitives[0].attributes,raw.data->meshes[0].primitives[0].attributes_count,cgltf_attribute_type_texcoord,2)!=nullptr,"Actual current-domain compiler supplies genuine contiguous UV0/UV1/UV2");
+ const auto current_file=root/"current-paint-normal.glb";document.export_asset(current_file).get();prepared_normal_consumer::Model current_glb(current_file);
+ check(prepared_normal_consumer::attr(current_glb.data->meshes[0].primitives[0].attributes,current_glb.data->meshes[0].primitives[0].attributes_count,cgltf_attribute_type_texcoord,1)!=nullptr,"Current paint/normal compiler emits its actual retained coordinate accessor without inventing a redundant UV2");
  const auto retained_id=retained.active().id;const auto retained_paint=retained.active().painted;
- ImportSettings settings;settings.paint_resolution=64;document.import_settings(settings);document.import_asset(source);endpoint(document);auto combined=document.copy_scene();
+ for(bool extra:{false,true}){
+  PaintImageArchive images;auto encoded=original.active().painted->encode(&images);PaintSourceMaps maps;
+  auto values=std::make_shared<const std::vector<std::array<float,2>>>(original.active().painted->mesh().uv);
+  maps.color.image=std::make_shared<const Image>(Image{1,1,{255,255,255,255}});maps.color.texcoord=extra?2:1;
+  if(extra)maps.extra_uv_sets[2]=values;else maps.uv1=values;encoded["source_maps"]=encode_source_maps(maps,images);
+  auto before=PaintedMesh::decode(encoded,&images);auto snapshot=before->encode(&images);std::vector<uint32_t> remap(before->mesh().positions.size());std::iota(remap.begin(),remap.end(),0u);
+  bool refused=false;try{retain_source_corner_paint(before,original.active().material_bindings,original.active().deformation,original.active().material_bindings->color_preparation->current_descriptor(),before->mesh(),remap);}catch(const std::exception&e){refused=std::string_view(e.what())=="Retained corner paint requires explicit atlas preparation of active source coordinates";}
+  check(refused&&before->encode(&images)==snapshot,"Detached KeepPaint factory refuses active original coordinate owners before remapping or mutation");
+ }
+ auto mixed=retained.snapshot();for(const auto &object:mixed.objects())mixed.object(object.id).visible=false;document.replace(mixed);endpoint(document);document.shading(false);endpoint(document);
+ import_fixture::Fixture input;while(input.bin.size()%4)input.bin.push_back(0);const auto uv2=input.values({0,1,0,0,1,0,1,1},2,"VEC2");input.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_2"]=uv2;input.j["materials"][0]["pbrMetallicRoughness"]["baseColorTexture"]["texCoord"]=2;
+ const auto source=root/"genuine-source-uv2.glb";input.save(source);
+ ImportSettings settings;settings.paint_resolution=64;document.configure_import(settings);document.import_asset(source);endpoint(document);auto combined=document.copy_scene();
  check(combined.encode().at("version")==26&&combined.encode().at("source_materials").at("version")==9,"Single native project writes actual Source26 ownership with material9 retained paint/normal context");
- check(combined.object(retained_id).painted==retained_paint&&combined.active().painted->source_maps()->uses_alternate_uv(),"Raw extra-coordinate import retains the earlier owning writable-paint object");
+ check(combined.object(retained_id).painted->mesh_owner()==retained_paint->mesh_owner()&&combined.object(retained_id).painted->paint_sampling_attachment()==retained_paint->paint_sampling_attachment()&&combined.active().painted->source_maps()->uses_alternate_uv(),"Raw extra-coordinate import retains the earlier owning writable-paint object");
  const auto image=Image{1,1,{255,0,0,255}}.png();const auto image_path=root/"projection.png";{std::ofstream out(image_path,std::ios::binary);out.write(reinterpret_cast<const char*>(image.data()),image.size());}
  ProjectionCamera camera;camera.pose.position={0,0,2};camera.width=camera.height=2;document.load_projection_image(image_path,camera);check(document.wait_projection_image(),"Actual current-main projection image worker loads on the mixed-context project");
  auto before=document.copy_scene().encode();check(!document.begin_native_stroke()&&document.frame().state->message==detail::editable_texture_atlas_notice&&document.copy_scene().encode()==before,"Projection trigger on raw extra coordinates refuses before any stroke/history mutation");

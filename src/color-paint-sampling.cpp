@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/color-paint-sampling.hpp"
 #include "dome/polygon-color.hpp"
+#include "dome/source-maps.hpp"
 #include "paint-sampling-access.hpp"
 #include "source-paint-pairing.hpp"
 #include "polygon-color-target.hpp"
@@ -93,6 +94,8 @@ struct ColorPaintSamplingAccess {
     std::span<const uint32_t> remap,const PaintSamplingLimits &limits,
     std::shared_ptr<const PaintSamplingDomain> pooled={}){
   stop(limits.cancelled);
+  if(before&&before->source_maps()&&(before->source_maps()->uv1||!before->source_maps()->extra_uv_sets.empty()))
+    throw std::invalid_argument("Retained corner paint requires explicit atlas preparation of active source coordinates");
   if(!before||before->in_stroke()||!material||!material->color_preparation||!descriptor||
      material->has_mtoon||material->color_preparation->receipt.source_field!=SourceColorField::PolygonCorners||
      before->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)
