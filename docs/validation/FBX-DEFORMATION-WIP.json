@@ -1,0 +1,121 @@
+{
+  "recorded_utc": "2026-11-02T16:33:29.610183+00:00",
+  "private": true,
+  "qualified_for_main": false,
+  "goal_complete": false,
+  "base": "badcace012e21ca4955f7c1f44b215a603577480",
+  "qualification_tree": "artifacts/native-fbx-deformers-badcace",
+  "scope": "Exploratory new optimized adapter object + actual native import probe, linked to unchanged-public-ABI frozen Scene20 archives; NOT whole project/sanitizer/frontend qualification",
+  "upstream_inputs": {
+    "repository": "https://github.com/ufbx/ufbx",
+    "commit": "26a482ae66871d7de36eb722aa060bce95bce274",
+    "license": "Upstream MIT alternative A, full LICENSE retained; these are validation inputs, no new default humanoid assets",
+    "files": [
+      {
+        "upstream_path": "data/maya_game_sausage_7500_ascii.fbx",
+        "file": "maya_game_sausage_7500_ascii.fbx",
+        "bytes": 23289,
+        "git_blob_sha1": "b3c0c04b91c497ddf5f6dfa33dd15d1d53e00e56",
+        "sha256": "ec91e16e4f9508974c6bd6141e62dd8e1607addb940e07d94b1b28bad831c6f7"
+      },
+      {
+        "upstream_path": "data/maya_game_sausage_7500_ascii_combined.fbx",
+        "file": "maya_game_sausage_7500_ascii_combined.fbx",
+        "bytes": 113777,
+        "git_blob_sha1": "a37fcca3b2ca1f689adcc385bf4558e9a11fe73a",
+        "sha256": "dfc2901b8606e5db60047bb62f3ded441b51a707187a76441b3a5a9c47354e01"
+      },
+      {
+        "upstream_path": "data/max_transformed_skin_7500_ascii.fbx",
+        "file": "max_transformed_skin_7500_ascii.fbx",
+        "bytes": 62457,
+        "git_blob_sha1": "ad2704a946aaae6f2f259899ccfb607e758b9290",
+        "sha256": "767a44f9d499d1997dc157f9cd8bd156fdb958047906dfb19032fb2a6a86746f"
+      },
+      {
+        "upstream_path": "data/blender_293_half_skinned_7400_binary.fbx",
+        "file": "blender_293_half_skinned_7400_binary.fbx",
+        "bytes": 15740,
+        "git_blob_sha1": "9c376ed693a93adc78e829d7f818c2b0894d7199",
+        "sha256": "537700c737063bc9e96d3bb34dc7c7400f6327d7036fb24193e0028364337140"
+      },
+      {
+        "upstream_path": "data/maya_blend_shape_cube_7700_ascii.fbx",
+        "file": "maya_blend_shape_cube_7700_ascii.fbx",
+        "bytes": 16955,
+        "git_blob_sha1": "0e254bdbf41323ab52ce23a55d086430d1ef73b0",
+        "sha256": "2ae340094aa37a9cff77bcdf1b616b065bc7f4c662124ac81bcffec278b51bb9"
+      },
+      {
+        "upstream_path": "data/blender_279_shape_weights_7400_binary.fbx",
+        "file": "blender_279_shape_weights_7400_binary.fbx",
+        "bytes": 20828,
+        "git_blob_sha1": "a9b9dfa1fa5ebb3f20d01c9b43644ee3a914baa3",
+        "sha256": "35437239b577b0871e4ce3977334ed5d36c26ee620ca7c7ddf42b54615410f70"
+      },
+      {
+        "upstream_path": "test/test_skin.h",
+        "file": "test_skin.h",
+        "bytes": 46137,
+        "git_blob_sha1": "b00c5ae0647156efe431aa464e08aa60761fbe32",
+        "sha256": "dd15336191bfa087f7788aee4b4122ab1f75409560d05d459bb23bfc1cb5482b"
+      },
+      {
+        "upstream_path": "LICENSE",
+        "file": "LICENSE",
+        "bytes": 2631,
+        "git_blob_sha1": "5db259b50e3a49019073b6ad69f9514d60638e8a",
+        "sha256": "0dd48ebadf52273c736256325c8f078c03c8bb4facee22a4122de0ad3f615391"
+      }
+    ]
+  },
+  "native_import_world_position_restart_cases": 5,
+  "compared_vertices": 342,
+  "maximum_error": 1.54678e-07,
+  "fixed_bound": "2e-5 + 1e-6 * magnitude",
+  "default_pose_only": true,
+  "expected_refusals": [
+    "actual-dual-quaternion",
+    "authored-legacy-transmission"
+  ],
+  "hashes": {
+    "src/import-native.cpp": "c4458a88e4903a5abb4c2012d897b919f35276d8a8d27908311d0d4ef1d5ccee",
+    "src/import-glb-builder.hpp": "481749a854d3cbca09ec6c1de60782e4f43d8449bd04407a5a9b3577a688fac8",
+    "artifacts/fbx-probe.cpp": "fc479b7f04aba05ca0a72a30e7a4483f7f25879eda7f6063d8ed5755c0578aa5",
+    "artifacts/build-fbx-probe.py": "be29b32757dc95a80c4b6f7c363fd0a4814202f01a8493fc00ff15b674984333",
+    "artifacts/fbx-probe/probe": "e03c4842495708065969e760bab4cfda5fbc729500d1ca34aad2c32756eb27e7",
+    "artifacts/fbx-probe/adapter.o": "2eb70a59ebf231d1868cf346f13fa555fd4d69149c10fced49da1f36e862b96d",
+    "artifacts/fbx-probe/link.map": "d744ff4dd1a3720f545897571231dc66e34da296eabdbe8c7dc674a40fb9b5cc",
+    "artifacts/fbx-probe/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/tests-fbx-probe.log": "0af6e6b6db94cd2155b76bfa3c6f9b32ec23e3d189dd82e62db50f0e028d83c8",
+    "artifacts/tests-fbx-probe-before-shape-weight-fix.log": "7b2624124bba08e6e98b0c4980a743d35e6c4373b9e86cefce9969f577604321",
+    "artifacts/tests-fbx-probe-before-legacy-material-fix.log": "7767500a1a7f0611835f32411133daeb5a3824847373c63e1b2bd97affc6b473",
+    "artifacts/tests-fbx-negative-authored-legacy-transmission.log": "9fe2d05d52bef6481b6c574319073306fe975fbd19d5d15aeeb6a17b62c2a98e",
+    "artifacts/tests-fbx-negative-actual-dual-quaternion.log": "2b24b92a7ba4a02cbb025608bd65403e9eaeed91b4cecdbb97fbcb54daa0b7c9",
+    "artifacts/fbx-materials.cpp": "2e0f5ca08dae5f90c017c32f7f1b9ba7a51414686a749f49d35c93aa7f968faf",
+    "artifacts/fbx-materials": "1bab5ef69152b60edb15c91f495d80f404f3f8481b76f22a6eddfcfdd6024ece",
+    "artifacts/fbx-reference/derived-transparent-sausage.fbx": "a2fe54b4e6c0af04ba474b0b5123725a3a1cf36f17032dcdb4dd3683092f1882"
+  },
+  "archive_root": "artifacts/color-rigid-union-d5de43b",
+  "archive_hashes": {
+    "build/libdome-sculpt-affine.a": "334de075b99ac298f8b8095b5cf3300ff025eab5e52b1848f076cb503ff512ca",
+    "build/libxatlas.a": "f6276c2151496e8126c5b7a84c1f125116c432f6313ae5cfbd1a0eac684bb593",
+    "build/libmikktspace.a": "827cf0f349907def39e7c359023865a290325fb25e4475d9131db55183a48b0b",
+    "build/libufbx.a": "74ff70bcf7126b04b7cd6f0b07d8bc03021d2962c6ee9a89e6f5b1ecf78189ae",
+    "build/libmikktspace-robust.a": "8cc3b74ff301b9b3206d5198e9d071c5526c02080646d31f3f2e0782859e0c07",
+    "build/libdome-sculpt-polygon.a": "8820af5071331d28881da8fa156cacb9f0f837d98f797710ada86dd28a5fbf9a",
+    "build/libdome-sculpt-core.a": "86d4e6270ef41589cfef48f87b1e8f96f7ea53f5b583ec3fc7a095cd62075398",
+    "build/libdome-sculpt-render.a": "f7fa94557b752d9ab5defbaa1e5356c6d08c2cffd87da9da737b3a6e5a355479",
+    "build/libdome-sculpt-xr.a": "9fee7f6e712497673e940fb745a40eaa212cd4ae2019eed9d90f130da96d6033"
+  },
+  "next_required": [
+    "Reproducible registered fixtures",
+    "Independent posed/unit/axis/instance/combined skin+morph and attribute oracles",
+    "Fresh own whole-project Release and sanitizer builds",
+    "Actual worker cancellation/history/ordered Save",
+    "Actual FLTK/XR and interoperability",
+    "DQ/multiple-deformer, full material/UV and generated morph-normal adapters"
+  ],
+  "physical_test": false,
+  "installed": false
+}
