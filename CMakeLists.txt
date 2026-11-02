@@ -1810,3 +1810,14 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
     ${CMAKE_CURRENT_BINARY_DIR}/fbx-named-uv-render)
   set_tests_properties(fbx-named-uv-render PROPERTIES TIMEOUT 120 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-fbx-options-deformation-test tests/fbx-options-deformation.cpp)
+  target_include_directories(dome-sculpt-fbx-options-deformation-test PRIVATE third_party/cgltf third_party/ufbx)
+  target_link_libraries(dome-sculpt-fbx-options-deformation-test PRIVATE dome-sculpt-core ufbx)
+  target_compile_definitions(dome-sculpt-fbx-options-deformation-test PRIVATE
+    DOME_FBX_FIXTURE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/ufbx-deformers")
+  add_test(NAME fbx-options-deformation COMMAND dome-sculpt-fbx-options-deformation-test
+    ${CMAKE_CURRENT_BINARY_DIR}/fbx-options-deformation)
+  set_tests_properties(fbx-options-deformation PROPERTIES TIMEOUT 180)
+endif()
