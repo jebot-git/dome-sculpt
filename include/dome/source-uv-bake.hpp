@@ -7,6 +7,7 @@
 #include <optional>
 namespace dome {
 struct SourceNormalUvReprojection;
+struct PolygonAuthority;
 struct SourceUvBakeOptions {
   // Zero preserves at least each original image's largest dimension and the
   // editable paint resolution. Nonzero is an explicit resampling choice.
@@ -33,6 +34,9 @@ struct SourceUvBakeInput {
   // Destination vertex -> original PaintedMesh vertex. Every ordered corner
   // must map exactly; topology/geometry/order changes are not nearest-projected.
   std::vector<uint32_t> source_vertices;
+  // Transient own-Scene witness for raw current-corner paint. A PA surface is
+  // never admitted from counts or from an unrelated retained Origin alone.
+  std::shared_ptr<const PolygonAuthority> polygon_authority;
 };
 struct SourceUvBakeResult {
   Mesh target;
@@ -65,6 +69,7 @@ struct SourceUvBakeResult {
   std::vector<std::string> diagnostics;
   std::shared_ptr<const DeformationState> original_deformation;
   std::shared_ptr<const SourceNormalUvReprojection> normal_reprojection;
+  std::shared_ptr<const PolygonAuthority> original_polygon;
 };
 // Pure bounded native worker operation. No file access, GL, source mutation,
 // automatic flattening or live-project installation. Rasterizes exact face

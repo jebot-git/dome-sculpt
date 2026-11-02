@@ -7,6 +7,8 @@
 #include "paint-normal-access.hpp"
 #include "normal-projection-identity.hpp"
 #include "source-colors.hpp"
+#include "dome/polygon-scene.hpp"
+#include "dome/polygon-color.hpp"
 #include <algorithm>
 #include <deque>
 #include <limits>
@@ -70,7 +72,14 @@ void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
  if(!i.paint||i.paint->in_stroke())throw std::invalid_argument("Finish source paint stroke before UV baking");
  if(bool(i.paint->normal_projection())!=bool(i.current_material&&i.current_material->normal_preparation))throw std::invalid_argument("Source UV normal paint and its own material interpretation differ");
- if(i.paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored)throw std::invalid_argument("Source UV baking requires explicit polygon source conversion with its owning authority; original paint was retained");
+ if(i.polygon_authority){
+  if(!i.polygon_authority->active||!i.polygon_authority->colors||i.appearance||i.current_material||i.paint->color_projection()||i.paint->normal_projection()||!i.native_material)
+   throw std::invalid_argument("Raw corner UV transfer requires its own active field and native material; prepared interpretations need their explicit adapter");
+  PolygonLimits limits;limits.cancelled=o.cancelled;
+  validate_polygon_derivative(*i.polygon_authority,i.paint.get(),true,limits);
+  i.polygon_authority->colors->validate(i.polygon_authority->topology,limits);
+ }
+ if(i.paint->surface_diagnostics().policy==PaintUvPolicy::PolygonAuthored&&!i.polygon_authority)throw std::invalid_argument("Source UV baking requires explicit polygon source conversion with its owning authority; original paint was retained");
  const auto preparation=i.current_material?i.current_material->color_preparation:nullptr;
  if(preparation&&preparation->polygon_colors)throw std::invalid_argument("Current corner color UV changes require their actual field remap; original geometry, UVs and paint were retained");
  if(bool(i.paint->color_projection())!=bool(preparation))throw std::invalid_argument("Source UV color preparation authority differs from current paint");
@@ -90,7 +99,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  result.target=i.target;result.source_vertices=i.source_vertices;
  const bool prepared=bool(i.paint->color_projection()),normal_prepared=bool(i.paint->normal_projection());
  result.animation_policy=o.animation;result.freeze_seconds=o.freeze_seconds;
- result.original_paint=i.paint;result.original_appearance=i.appearance;result.original_deformation=i.current_deformation;result.original_material=i.current_material;result.active_layer=i.paint->active_layer();
+ result.original_paint=i.paint;result.original_appearance=i.appearance;result.original_deformation=i.current_deformation;result.original_material=i.current_material;result.active_layer=i.paint->active_layer();result.original_polygon=i.polygon_authority;
  if(i.current_material) {
   i.current_material->validate();
   if(i.current_material->normal_frames) {
@@ -126,7 +135,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  if(result.animation_frozen)result.diagnostics.push_back("UV animation explicitly frozen at "+std::to_string(result.freeze_seconds)+" seconds; original animated source retained");
  auto original_role=[&](int role){PaintSourceTexture view;auto &t=result.mtoon->textures[size_t(role)];if(t.index<0)return view;if(role!=int(MToonSlot::Matcap))coordinate(t);if(i.current_material)return i.current_material->roles[size_t(role)];auto &a=*i.appearance;auto &texture=a.asset->textures.at(size_t(t.index));if(texture.image<0||size_t(texture.image)>=a.decoded_images->size())throw std::invalid_argument("Source UV MToon image reference is invalid");view.image=a.decoded_images->at(texture.image);view.wrap_s=texture.wrap_s;view.wrap_t=texture.wrap_t;view.min_filter=texture.min_filter;view.mag_filter=texture.mag_filter;view.validate();return view;};
  if(i.current_material&&i.current_material->uv_origin)result.uv_origin=i.current_material->uv_origin;
- else {
+ else if(!i.polygon_authority) {
   auto origin=std::make_shared<SourceUvOrigin>();origin->paint=i.paint->snapshot();
   if(i.appearance)origin->appearance=std::make_shared<const CreatorAppearance>(*i.appearance);
   origin->material=result.mtoon;
@@ -251,8 +260,15 @@ struct SourceUvBakeAccess {
 SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
                                      const std::function<bool()> &cancelled) {
  SourceUvBakeInput input;input.paint=result.original_paint;input.appearance=result.original_appearance;
- input.target=result.target;input.source_vertices=result.source_vertices;input.current_material=result.original_material;input.current_deformation=result.original_deformation;
+ input.target=result.target;input.source_vertices=result.source_vertices;input.current_material=result.original_material;input.current_deformation=result.original_deformation;input.polygon_authority=result.original_polygon;if(input.polygon_authority)input.native_material=result.native_reference;
  SourceUvBakeOptions options;options.cancelled=cancelled;validate(input,options);
+ if(result.original_polygon){
+  if(result.uv_origin||result.mtoon||result.normal_frames||result.normal_reprojection||result.animation_frozen||result.original_material||result.original_appearance)
+   throw std::invalid_argument("Raw corner UV result cannot invent a borrowed material/source interpretation");
+  auto paint=SourceUvBakeAccess::adopt(result,cancelled);
+  if(result.deformation)result.deformation->validate(paint->mesh());
+  return {std::move(paint),{},result.deformation,{}};
+ }
  if(!result.uv_origin)throw std::invalid_argument("Source UV adoption lacks first-source provenance");
  if(result.normal_reprojection&&(!result.original_material||!result.original_material->normal_preparation||!result.original_paint->normal_projection()))throw std::invalid_argument("Source UV result cannot invent an unbound normal interpretation");
  // Populate the immutable proof through the cancellation-aware path before
