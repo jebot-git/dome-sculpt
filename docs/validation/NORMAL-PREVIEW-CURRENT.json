@@ -1,0 +1,18 @@
+{
+  "base": "8858f42",
+  "scope": "Independently bind actual current paint REST/UV/event before normal preview seal",
+  "source_hashes": {
+    "src/normal-preview.cpp": "972fb29ae0d941391fce53d805bbf7cdca3d71b534bd490a5e67c82b13f3f639",
+    "tests/normal-preview-current.cpp": "7f1a857f99fd7c3ea60734d15adc273dc6b8a166d4c7c8e4737a654341e25a84",
+    "CMakeLists.txt": "6d39ce4ee78966277b8c897d082683045d93614bbf141035a12925ae4f09cdf9"
+  },
+  "old_negative": {
+    "core": "frozen8858f42 Release",
+    "header_source": "exact8858f42; test-only new fixture",
+    "session": 14588,
+    "exit": 1,
+    "result": "UNSAFE_PREVIEW_ACCEPTED changed current UV with old normal layout",
+    "log": "artifacts/tests-normal-current-old-negative.log"
+  },
+  "qualification": "pending fresh coherent Release/SAN; no integration claim"
+}

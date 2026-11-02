@@ -28,6 +28,12 @@ captures all normal-recipe owner/scalar associations. It owns neither its
 parent object nor a back-reference cycle. It does not seal editable paint
 values or unrelated material style.
 
+The follow-up factory also independently verifies the normal node's ordered
+current REST/UV/layout and exact actual paint event before issuing a preview
+proof. A staged further colour/paint derivative can still carry the previous
+normal projection; that intermediate must not acquire a current normal proof.
+This worker check remains separate from the colour/domain geometry witness.
+
 The Scene/native worker transports this proof through read-only
 `ObjectSurface` and `SurfaceRange` fields. Rendering and material picking
 use cheap validation only when the exact map/binding proof and the independent

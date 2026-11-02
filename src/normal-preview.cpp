@@ -26,7 +26,13 @@ std::shared_ptr<const NormalPreviewProof> prepare_normal_preview(const PaintedMe
  const auto recipe=binding?binding->normal_preparation:nullptr;
  const auto node=recipe?recipe->sampling_domain:nullptr;
  if(!node||!node->metadata_sampling_domain||!node->has_sealed_metadata())return {};
- binding->validate(false);auto maps=paint.preview(material);
+ binding->validate(false);
+ // The seal proves the normal node's own before/layout replay. Independently
+ // bind that layout and event to this actual current paint before minting a
+ // render proof; a staged colour/UV derivative may still carry the old normal.
+ node->validate_current(paint.mesh(),nullptr,cancelled);
+ node->validate_paint(paint,*binding,true,cancelled);
+ auto maps=paint.preview(material);
  detail::prepared_normal_state(binding.get(),maps.get(),false);
  if(!detail::normal_projection_identity(*maps->normal_projection,*node->projection))throw std::invalid_argument("Normal preview differs from its independently sealed field");
  const auto &domain=*node->projection->sampling_domain;
