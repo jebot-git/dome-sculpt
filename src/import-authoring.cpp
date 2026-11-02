@@ -5,6 +5,7 @@
 #include "dome/import-native.hpp"
 #include "dome/import-image.hpp"
 #include "dome/material-bindings.hpp"
+#include "dome/source-placement.hpp"
 #include "dome/projection.hpp"
 #include "import-skin.hpp"
 #include "source-tangent-frames.hpp"
@@ -31,7 +32,7 @@ uint32_t word(std::span<const uint8_t> b, size_t at) {
   return uint32_t(b[at]) | uint32_t(b[at + 1]) << 8 |
          uint32_t(b[at + 2]) << 16 | uint32_t(b[at + 3]) << 24;
 }
-CanvasTransform similarity(const ImportedNode &n) {
+std::optional<CanvasTransform> similarity(const ImportedNode &n) {
   const auto &m = n.local;
   const Vec3 x{m[0], m[1], m[2]}, y{m[4], m[5], m[6]}, z{m[8], m[9], m[10]};
   const float sx = length(x), sy = length(y), sz = length(z),
@@ -42,9 +43,7 @@ CanvasTransform similarity(const ImportedNode &n) {
       std::abs(dot(x, y)) > scale * scale * 2e-6f ||
       std::abs(dot(y, z)) > scale * scale * 2e-6f ||
       std::abs(dot(z, x)) > scale * scale * 2e-6f || dot(x, cross(y, z)) <= 0)
-    throw std::runtime_error(
-        "Imported nonuniform/reflected affine node requires native affine "
-        "hierarchy adoption; source was not changed");
+    return {};
   // Matrix-to-quaternion conversion is deterministic and checked by
   // reconstructing every column, rather than relying on the source's optional
   // TRS flags.
@@ -71,10 +70,9 @@ CanvasTransform similarity(const ImportedNode &n) {
                     std::pair{y, q.rotate({0, 1, 0}) * scale},
                     std::pair{z, q.rotate({0, 0, 1}) * scale}})
     if (length(pair.first - pair.second) > scale * 4e-6f)
-      throw std::runtime_error(
-          "Imported node is not a representable native similarity transform");
+      return {};
   CanvasTransform out{{m[12], m[13], m[14]}, {q.x, q.y, q.z, q.w}, scale};
-  validate_transform(out);
+  try{validate_transform(out);}catch(const std::invalid_argument&){return {};}
   return out;
 }
 Material native_material(const ImportedMaterial &m) {
@@ -229,9 +227,14 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   for (auto n : roots)
     walk(walk, n);
   size_t objects = 0;
+  bool affine_graph=false;
+  std::vector<CanvasTransform> native_locals(asset->nodes.size());
   for (auto n : ordered) {
     const auto &node = asset->nodes[n];
-    similarity(node);
+    // Full source worlds may contain shear from valid local TRS chains.
+    // Editing/query inversion must be well defined before native adoption.
+    (void)AffineTransform(node.world).inverse();
+    auto local=similarity(node);if(local)native_locals[n]=*local;else affine_graph=true;
     if (node.mesh >= 0) {
       for (auto primitive : asset->meshes.at(size_t(node.mesh)).primitives) {
         const auto &p = asset->primitives.at(primitive);
@@ -261,6 +264,13 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     pixels += count;
     images->push_back(std::make_shared<const Image>(std::move(image)));
   }
+  std::shared_ptr<CreatorSourceModel> model;
+  if(affine_graph){
+    model=std::make_shared<CreatorSourceModel>();
+    model->original_bytes=bytes;model->asset=asset;model->decoded_images=images;
+    if(captured.original->root.bytes!=bytes || captured.original->format!=ImportSourceFormat::Glb ||
+        captured.original->options!=ImportOptions{})model->source_receipt=captured.original;
+  }
   const auto root =
       output.scene.add_group(name(path.stem().string(), "Imported asset"));
   std::vector<uint64_t> groups(asset->nodes.size());
@@ -268,8 +278,13 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     stop(options);
     const auto &node = asset->nodes[n];
     groups[n] = output.scene.add_group(
-        name(node.name, "Imported node"), similarity(node),
+        name(node.name, "Imported node"), affine_graph?CanvasTransform{}:native_locals[n],
         node.parent < 0 ? root : groups.at(size_t(node.parent)));
+    if(affine_graph){
+      auto placement=std::make_shared<SourceNodePlacement>();placement->model=model;
+      placement->source_node=n;placement->source_instance=root;placement->validate();
+      output.scene.group(groups[n]).source_placement=std::move(placement);
+    }
     if (node.mesh < 0)
       continue;
     const auto &source_mesh = asset->meshes.at(size_t(node.mesh));

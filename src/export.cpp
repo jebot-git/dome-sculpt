@@ -378,8 +378,21 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
                {"scale", {t.scale.x, t.scale.y, t.scale.z}}});
           if(b.rest_matrix){if(!detail::gltf_trs_matrix(local_matrices[index]))throw std::invalid_argument("Exact joint affine requires hierarchy-preserving glTF transport; a sheared node matrix is not valid glTF");j["nodes"].back().erase("translation");j["nodes"].back().erase("rotation");j["nodes"].back().erase("scale");j["nodes"].back()["matrix"]=local_matrices[index];}
         }
-        int rig_parent=node;
-        if(s.space_matrix){if(!detail::gltf_trs_matrix(*s.space_matrix))throw std::invalid_argument("Sheared bind-space requires hierarchy-preserving glTF transport");rig_parent=int(j["nodes"].size());j["nodes"].push_back({{"name",o.name+" bind space"},{"matrix",*s.space_matrix},{"children",nlohmann::json::array()}});j["nodes"][node]["children"].push_back(rig_parent);}
+        int rig_parent=node,rig_root=-1;
+        if(s.space_matrix){
+          if(detail::gltf_trs_matrix(*s.space_matrix)){
+            rig_parent=rig_root=attach(node,{{"name",o.name+" bind space"},{"matrix",*s.space_matrix}});
+          }else{
+            // inverse(original mesh world) can contain shear even when every
+            // authored local is valid TRS. Retain it as a bounded verified TRS
+            // chain, never an invalid glTF matrix or altered inverse bind.
+            const auto factors=factor_edit_for_gltf(AffineTransform(*s.space_matrix),cancelled);
+            for(const auto &factor:factors.nodes){
+              rig_parent=attach(rig_parent,{{"name",o.name+" bind space factor"},{"matrix",factor.float_matrix()}});
+              if(rig_root<0)rig_root=rig_parent;
+            }
+          }
+        }
         for (size_t index = 0; index < s.bones.size(); ++index) {
           int parent = s.bones[index].parent < 0
                            ? rig_parent
@@ -390,7 +403,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           j["nodes"][node]["children"] = nlohmann::json::array();
           j["scenes"][0]["nodes"].push_back(mesh_node);
           // Restore rig roots after detaching the skinned surface.
-          if(s.space_matrix)j["nodes"][node]["children"].push_back(rig_parent);
+          if(s.space_matrix)j["nodes"][node]["children"].push_back(rig_root);
           else for (size_t index = 0; index < s.bones.size(); ++index)
             if (s.bones[index].parent < 0)
               j["nodes"][node]["children"].push_back(first_joint + int(index));
