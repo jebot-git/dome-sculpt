@@ -9,6 +9,7 @@ struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
 class PaintSamplingAttachment;
+class PaintSamplingArchive;
 struct PaintSourceMaps;
 class PaintImageArchive;
 struct Image {
@@ -192,6 +193,7 @@ public:
   Vec3 normal(Vec3) const;
   nlohmann::json encode(PaintImageArchive * = nullptr) const;
   nlohmann::json encode(PaintImageArchive *,NormalSamplingArchive *) const;
+  nlohmann::json encode(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *) const;
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive * = nullptr);
   // Internal Scene12 decoding must subsequently authenticate the exact polygon derivative.
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *, bool allow_polygon);
@@ -199,6 +201,8 @@ public:
   // authenticated before exposing an editable surface.
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
                                            bool allow_polygon,const NormalSamplingArchive *);
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
+      bool allow_polygon,const NormalSamplingArchive *,const PaintSamplingArchive *);
 
 private:
   friend class Document;
@@ -211,6 +215,7 @@ private:
   void seal_paint_sampling_attachment();
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
+  PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &, const std::function<bool()> &cancelled = {}, const Evaluation * = nullptr);

@@ -22,6 +22,8 @@ bool data_equal(const PaintedMesh &a,const PaintedMesh &b){
 }
 bool images_equal(const TextureMaps &a,const TextureMaps &b){for(auto pair:{std::pair{&a.color,&b.color},std::pair{&a.pbr_color,&b.pbr_color},std::pair{&a.metal_rough,&b.metal_rough},std::pair{&a.emission,&b.emission},std::pair{&a.normal,&b.normal},std::pair{&a.mtoon_normal,&b.mtoon_normal},std::pair{&a.color_coverage,&b.color_coverage},std::pair{&a.emission_coverage,&b.emission_coverage}})if(pair.first->width!=pair.second->width||pair.first->height!=pair.second->height||pair.first->rgba!=pair.second->rgba)return false;return true;}
 }
+
+#ifndef DOME_PAINT_GRID_FIXTURE_ONLY
 int main()try{
  auto source=grid_source();const auto mesh_before=source->mesh();auto target=welded();const std::array<uint32_t,6> corners{0,1,2,3,4,5};auto domain=retain_paint_sampling(source->mesh(),{},target,corners);auto result=retain_paint_grid(*source,target,domain);
  check(result->mesh().positions.size()==4&&result->mesh().uv==target.uv&&source->mesh().positions.size()==6&&source->mesh().uv!=target.uv,"PaintedMesh retains current authored welded geometry and its independent UV0");check(result->valid_paint_sampling_attachment()&&result->paint_sampling_domain()==domain&&result->paint_sampling_attachment()->matches(result->mesh_owner(),domain),"Actual SurfaceMap constructor seals exact current mesh/domain owners");
@@ -36,3 +38,5 @@ int main()try{
  for(size_t prefix=0;prefix<calls;++prefix){bool failed=false;allocation::remaining=long(prefix);allocation::hit=false;try{retain_paint_grid(*source,target,domain);}catch(const std::bad_alloc&){failed=true;}catch(...){allocation::remaining=-1;throw;}allocation::remaining=-1;check(failed&&allocation::hit&&data_equal(*source,*result)&&same(source->mesh(),mesh_before),"Every persistent grid allocation boundary preserves exact source, planes, layers and geometry");auto retry=retain_paint_grid(*source,target,domain);check(retry->valid_paint_sampling_attachment()&&data_equal(*source,*retry),"Every failed grid capture permits exact successful retry");}
  std::cout<<"PASS "<<checks<<" retained grid checks, allocations="<<calls<<std::endl;return 0;
 }catch(const std::exception&e){allocation::remaining=-1;allocation::measure=false;std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
+
+#endif

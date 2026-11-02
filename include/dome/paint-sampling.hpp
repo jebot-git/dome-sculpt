@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "mesh.hpp"
+#include <nlohmann/json_fwd.hpp>
 #include <functional>
 #include <memory>
 #include <span>
@@ -34,9 +35,33 @@ private:
       :basis_(std::move(basis)),source_corners_(std::move(corners)){}
   std::shared_ptr<const Mesh> basis_;
   std::vector<uint32_t> source_corners_;
+  friend class PaintSamplingArchive;
   friend std::shared_ptr<const PaintSamplingDomain> retain_paint_sampling(
       const Mesh &,std::shared_ptr<const PaintSamplingDomain>,const Mesh &,
       std::span<const uint32_t>,const PaintSamplingLimits &);
+};
+struct PaintSamplingArchiveLimits {
+  size_t max_domains=128,max_bases=128,max_bytes=128*1024*1024;
+  PaintSamplingLimits geometry;
+};
+// Structural geometry pool only. Decoding/attaching this pool does not grant
+// Scene24 colour, normal or source-editing authority; the owning Scene closure
+// must authenticate those independently before publication.
+class PaintSamplingArchive {
+public:
+  explicit PaintSamplingArchive(PaintSamplingArchiveLimits = {});
+  uint32_t add(std::shared_ptr<const PaintSamplingDomain>);
+  const std::shared_ptr<const PaintSamplingDomain> &at(uint32_t) const;
+  size_t size() const noexcept { return domains_.size(); }
+  size_t bytes() const noexcept { return bytes_; }
+  void require_reachable() const;
+  nlohmann::json encode() const;
+  static PaintSamplingArchive decode(const nlohmann::json &,PaintSamplingArchiveLimits = {});
+private:
+  PaintSamplingArchiveLimits limits_;
+  size_t bytes_=0;
+  std::vector<std::shared_ptr<const PaintSamplingDomain>> domains_;
+  mutable std::vector<uint8_t> referenced_;
 };
 // Ephemeral factory proof for one exact authored mesh/domain attachment. It is
 // held by PaintedMesh, never by SurfaceMap, so the strong mesh alias cannot form

@@ -379,11 +379,15 @@ void PaintedMesh::stamp_evaluated(const Brush &b,const PaintSettings &settings,c
   stamp_sampled(b,settings,{},cancelled,&evaluation);
 }
 PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r):PaintedMesh(std::move(mesh),r,{}){}
-PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options) {
+PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options)
+    :PaintedMesh(std::move(mesh),r,options,{}){}
+PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options,
+    std::shared_ptr<const PaintSamplingDomain> sampling) {
   if (r < 64 || r > 2048 || (r & (r - 1)))
     throw std::invalid_argument(
         "Paint resolution must be a power of two between 64 and 2048");
-  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r,options);
+  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r,options,std::move(sampling));
+  seal_paint_sampling_attachment();
   composite_cache_=std::make_shared<CompositeCache>();
   composite_token_=next_composite_token();
   PaintLayer layer;
@@ -1737,7 +1741,12 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
   return encode(archive,nullptr);
 }
 nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArchive *domains) const {
-  if(paint_sampling_domain())throw std::logic_error("Retained writable paint requires its complete paired Scene24 archive context");
+  return encode(archive,domains,nullptr);
+}
+nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
+  const auto sampling=paint_sampling_domain();
+  if(!valid_paint_sampling_attachment())throw std::logic_error("Paint sampling geometry attachment is invalid");
+  if(sampling&&(!paint_domains||!archive))throw std::logic_error("Retained writable paint requires its complete paired Scene24 archive context");
   if((!domains||!archive)&&((baked_&&baked_->normal_authority)||
      (normal_projection_&&normal_projection_->version==2)))
     throw std::invalid_argument("Retained normal bake requires an owning sampling archive context");
@@ -1823,6 +1832,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
       j["baked"]["normal_authority"]=domains->add_detail(baked_->normal_authority);
     }
   }
+  if(sampling)return {{"version",2},{"payload",std::move(j)},{"domain",paint_domains->add(sampling)}};
   return j;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive) {
@@ -1831,8 +1841,26 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive,bool allow_polygon) {
   return decode(j,archive,allow_polygon,nullptr);
 }
-std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive,
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
     bool allow_polygon,const NormalSamplingArchive *domains) {
+  return decode(input,archive,allow_polygon,domains,nullptr);
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
+    bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
+  std::shared_ptr<const PaintSamplingDomain> sampling;
+  const bool envelope=input.is_object()&&input.contains("version");
+  if(envelope){
+    // No legacy root mesh: frozen implicit-v1 readers reject before bulk.
+    if(input.size()!=3||!input.at("version").is_number_integer()||input.at("version")!=2||
+       !input.contains("payload")||!input.at("payload").is_object()||input.at("payload").contains("version")||
+       !input.contains("domain")||(!input.at("domain").is_number_unsigned()&&
+       (!input.at("domain").is_number_integer()||input.at("domain").get<int64_t>()<0))||
+       input.at("domain").get<uint64_t>()>UINT32_MAX)
+      throw std::invalid_argument("Invalid retained paint version2 envelope");
+    if(!archive||!paint_domains)throw std::invalid_argument("Paint version2 requires its owning Scene24 image and sampling context");
+    sampling=paint_domains->at(input.at("domain").get<uint32_t>());
+  }else if(input.contains("payload")||input.contains("domain"))throw std::invalid_argument("Paint sampling fields require version2 envelope");
+  const auto &j=envelope?input.at("payload"):input;
   const bool retained_projection=j.contains("normal_projection")&&
     j.at("normal_projection").is_object()&&j.at("normal_projection").contains("domain");
   const bool retained_bake=j.contains("baked")&&j.at("baked").is_object()&&
@@ -1893,7 +1921,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
       surface_options.policy=PaintUvPolicy::SourceAuthored;
     }
   }
-  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options));
+  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options,std::move(sampling)));
   std::optional<PaintImageArchive> local_images;
   const PaintImageArchive *images=archive;
   if(j.contains("source_maps") || j.contains("color_projection") || j.contains("normal_projection")) {
