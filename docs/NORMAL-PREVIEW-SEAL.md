@@ -71,3 +71,17 @@ The complete 414-check image/export regression now has a measured 2400 s
 registered budget. The previous source `44380ef` instrumented run timed out
 at 1200 s after 45/54 complete image groups, with no sanitizer report. That
 original result remains a timeout, not a complete green suite.
+
+The test-only follow-up `normal-preview-tamper` separates node-address rejection
+from scalar/owner rejection. It creates an actual mutable `make_shared<T>`
+sampler, populates its public fields from the genuine prepared fixture, and
+runs the real independent replay factory to mint a fresh seal. The test keeps
+that legal mutable alias and a similarly mutable recipe while publishing const
+views to the preview factory. It temporarily mutates each receipt/owner at the
+same address, requires both seal/preview rejection, restores the exact fields,
+then verifies retry and the unchanged original Scene. It never writes through
+a cast to an object allocated as `const T` and does not mutate immutable
+geometry/vector contents. Its 34 Release checks passed against the exact
+completed `3a55fa3` headers/core/support/render; the separately compiled owned
+C/C++ core/support/render O1 ASan+UBSan/leak overlay also passed all 34,
+with no report. There is no additional product or ABI change.
