@@ -33,8 +33,9 @@ pools/envelopes, orphan/version/refusal and unchanged legacy bytes. A separately
 compiled helper linked to the frozen53ff88b core/support and matching headers
 refuses the actual generated Paint2 CBOR at missing legacy root `mesh`.
 
-The fresh wholly owned C/C++ sanitizer build for this exact archive source is
-pending. No Scene24 native menu/controller/GPU/export or whole-project regression
+The fresh wholly owned C/C++ O1 ASan/UBSan/leak build for exact source58da9c4
+passes4/4 in30.16s, including existing texture painting. Matching Release4/4
+passes3.14s. No Scene24 native menu/controller/GPU/export or whole-project regression
 claim follows from these module checks. The earlier actual editable-grid source
 53ff88b has its own Release3/SAN3 evidence; the geometry-only f9b2df8 foundation
 and old partial-coverage failure remain preserved separately.
