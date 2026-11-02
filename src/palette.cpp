@@ -391,7 +391,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (s.menu_page == 16 && s.retopology) {
       auto &r = *s.retopology;
       if (sector == 0) return true;
-      if (sector == 1) return r.moving;
+      if (sector == 1) return r.moving || r.extruding;
       if (sector == 6 && r.topology && !r.selected.empty())
         return std::all_of(r.selected.begin(), r.selected.end(), [&](auto id) { return r.topology->vertices().at(id).pinned; });
     }
@@ -461,7 +461,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    const std::string label = s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -576,7 +576,7 @@ void SpatialPalette::raster(const EditorState &s) {
   }
   if (s.menu_page == 16) {
     auto r = s.retopology;
-    text(320 * unit_, 278 * unit_, !r ? "Start a source-constrained patch" : r->moving ? "Move existing points" : "Place / select ordered corners", fg);
+    text(320 * unit_, 278 * unit_, !r ? "Start a source-constrained patch" : r->extruding ? "Touch selected edge, then drag" : r->moving ? "Move existing points" : "Place / select ordered corners", fg);
     text(320 * unit_, 310 * unit_, !r ? "Source retained on Apply" : r->committing ? "Applying patch..." : r->busy ? "Updating patch..."
          : std::to_string(r->selected.size()) + " selected / " + std::to_string(r->topology ? r->topology->faces().size() : 0) + " faces", fg);
   } else if(s.menu_page==12){
@@ -665,7 +665,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
     const auto &r = *s.retopology;
     signature += ":retopo:" + std::to_string(r.revision) + ":" +
         std::to_string(reinterpret_cast<uintptr_t>(r.topology.get())) + ":" +
-        std::to_string(r.moving) + ":" + std::to_string(r.busy) + ":" + std::to_string(r.committing);
+        std::to_string(r.moving) + ":" + std::to_string(r.extruding) + ":" + std::to_string(r.busy) + ":" + std::to_string(r.committing);
   }
   if(s.cut)signature+=":cut:"+std::to_string(s.cut->request)+":"+std::to_string(s.cut->preview_request)+":"+
       std::to_string(s.cut->busy)+":"+std::to_string(s.cut->committing);

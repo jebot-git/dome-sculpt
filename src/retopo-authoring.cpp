@@ -1,12 +1,42 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
 #include "text-utf8.hpp"
+#include <limits>
+#include <type_traits>
 namespace dome {
+static_assert(std::is_nothrow_move_assignable_v<RetopoView>);
 namespace {
 ob::Vec3 obv(Vec3 p) { return {p.x, p.y, p.z}; }
 Vec3 vec(ob::Vec3 p) { return {p.x, p.y, p.z}; }
 void stop(const std::function<bool()> &cancelled) {
   if (cancelled && cancelled()) throw std::runtime_error("Retopology cancelled");
+}
+TopologyID selected_edge(const RetopoMesh &mesh, std::span<const TopologyID> selected,
+                         const std::function<bool()> &cancelled, bool required = true) {
+  if (selected.size() != 2) { if (!required) return 0; throw std::runtime_error("Select two boundary-edge endpoints before extruding"); }
+  TopologyID edge = 0;
+  for (const auto &[id, e] : mesh.edges()) {
+    stop(cancelled);
+    if ((e.a == selected[0] && e.b == selected[1]) || (e.b == selected[0] && e.a == selected[1])) edge = id;
+  }
+  if (!edge) { if (!required) return 0; throw std::runtime_error("Connect the selected endpoints before extruding"); }
+  unsigned uses = 0;
+  for (const auto &[id, f] : mesh.faces()) {
+    (void)id; stop(cancelled);
+    for (size_t i = 0; i < f.vertices.size(); ++i) {
+      auto a = f.vertices[i], b = f.vertices[(i + 1) % f.vertices.size()];
+      uses += (a == selected[0] && b == selected[1]) || (b == selected[0] && a == selected[1]);
+    }
+  }
+  if (uses > 1) { if (!required) return 0; throw std::runtime_error("Choose a wire or boundary edge"); }
+  return edge;
+}
+Vec3 face_normal(const RetopoMesh &mesh, const RetopoFace &face) {
+  Vec3 normal{};
+  for (size_t i = 0; i < face.vertices.size(); ++i)
+    normal += cross(mesh.vertices().at(face.vertices[i]).position,
+                    mesh.vertices().at(face.vertices[(i + 1) % face.vertices.size()]).position);
+  return normal;
 }
 }
 RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()> &cancelled) {
@@ -52,7 +82,7 @@ void RetopoWorkspace::remember(RetopoView before) {
 }
 void RetopoWorkspace::finish_gesture(bool cancel) {
   if (!gesture_) return;
-  if (cancel) view_ = *gesture_;
+  if (cancel) view_ = std::move(*gesture_);
   else if (gesture_->topology != view_.topology) remember(*gesture_);
   gesture_.reset(); moving_vertex_ = 0; sampled_ = false;
 }
@@ -62,7 +92,6 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
   if (!std::isfinite(snap_mm) || snap_mm < 1 || snap_mm > 200)
     throw std::invalid_argument("Retopology projection distance must be 1 to 200 mm");
   view_.snap_mm = snap_mm;
-  auto before = view_;
   if (action == RetopoAction::BeginGesture) {
     finish_gesture(false); gesture_ = view_; sampled_ = false;
   } else if (action == RetopoAction::EndGesture || action == RetopoAction::CancelGesture) {
@@ -72,18 +101,25 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
     else {
       auto &from = action == RetopoAction::Undo ? undo_ : redo_;
       auto &to = action == RetopoAction::Undo ? redo_ : undo_;
-      if (!from.empty()) { to.push_back(view_); view_ = from.back(); from.pop_back(); }
+      if (!from.empty()) { auto next = from.back(); to.push_back(view_); view_ = std::move(next); from.pop_back(); }
     }
-  } else if (action == RetopoAction::Mode || action == RetopoAction::PlaceMode || action == RetopoAction::MoveMode) {
-    const bool moving = action == RetopoAction::Mode ? !view_.moving : action == RetopoAction::MoveMode;
-    if (moving == view_.moving && !gesture_) return;
-    finish_gesture(false); view_.moving = moving;
+  } else if (action == RetopoAction::Mode || action == RetopoAction::PlaceMode || action == RetopoAction::MoveMode || action == RetopoAction::ExtrudeMode) {
+    bool moving = action == RetopoAction::MoveMode, extruding = action == RetopoAction::ExtrudeMode;
+    if (action == RetopoAction::Mode) {
+      moving = !view_.moving && !view_.extruding;
+      extruding = view_.moving && selected_edge(*view_.topology, view_.selected, cancelled, false) != 0;
+    }
+    if (extruding) selected_edge(*view_.topology, view_.selected, cancelled);
+    if (moving == view_.moving && extruding == view_.extruding && !gesture_) return;
+    finish_gesture(false); view_.moving = moving; view_.extruding = extruding;
   } else if (action == RetopoAction::Clear) {
-    finish_gesture(false); view_.selected.clear();
+    finish_gesture(false); view_.selected.clear(); view_.extruding = false;
   } else {
+    auto before = view_;
     if (action != RetopoAction::Sample) finish_gesture(false);
-    RetopoMesh draft = *view_.topology;
-    auto selected = view_.selected;
+    const bool extrusion_sample = action == RetopoAction::Sample && view_.extruding;
+    RetopoMesh draft = *(extrusion_sample && gesture_ ? gesture_->topology : view_.topology);
+    auto selected = extrusion_sample && gesture_ ? gesture_->selected : view_.selected;
     float maximum = snap_mm * .001f / view_.transform.scale;
     SurfaceQueryOptions options; options.cancelled = cancelled;
     auto project = [&](Vec3 p) {
@@ -92,11 +128,35 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
       if (hit.distance > maximum) throw std::runtime_error("Point is outside the source projection distance");
       return hit.position;
     };
+    auto outward = [&](const RetopoMesh &mesh, TopologyID face) {
+      const auto &f = mesh.faces().at(face); Vec3 center{};
+      for (auto id : f.vertices) center += mesh.vertices().at(id).position;
+      auto hit = view_.source->closest(center / float(f.vertices.size()), options);
+      return hit.distance <= maximum && dot(face_normal(mesh, f), hit.normal) > 0;
+    };
     if (action == RetopoAction::Sample) {
       if (!gesture_) throw std::logic_error("Begin a retopology gesture first");
-      if (sampled_ && !view_.moving) return;
+      if (sampled_ && !view_.moving && !view_.extruding) return;
       point = project(point);
-      if (!sampled_) {
+      if (view_.extruding) {
+        auto edge_id = selected_edge(draft, selected, cancelled);
+        auto e = draft.edges().at(edge_id);
+        auto a = draft.vertices().at(e.a).position, b = draft.vertices().at(e.b).position;
+        if (!sampled_) {
+          auto ab = b - a; const float square = dot(ab, ab);
+          if (!(square > 0)) throw std::runtime_error("Choose a nonzero boundary edge");
+          auto nearest = a + ab * std::clamp(dot(point - a, ab) / square, 0.f, 1.f);
+          if (length(point - nearest) > std::min(.01f, snap_mm * .00025f) / view_.transform.scale)
+            throw std::runtime_error("Touch the selected edge before dragging an extrusion");
+        } else {
+          const auto offset = point - extrude_anchor_;
+          if (dot(offset, offset) > 0) {
+            auto result = draft.extrude_edge(edge_id, {project(a + offset), project(b + offset)}, cancelled);
+            if (!outward(draft, result.face)) throw std::runtime_error("Extruded face is outside the source bound or faces inward");
+            selected.assign(result.outer.begin(), result.outer.end());
+          }
+        }
+      } else if (!sampled_) {
         TopologyID nearest = 0;
         float distance = std::min(.01f, snap_mm * .00025f) / view_.transform.scale;
         for (const auto &[id, v] : draft.vertices()) {
@@ -112,12 +172,30 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
           auto found = std::find(selected.begin(), selected.end(), nearest);
           if (nearest && found != selected.end()) selected.erase(found);
           else {
-            if (selected.size() == 4) throw std::runtime_error("Make a face or clear the four selected points");
+            if (selected.size() == 4) throw std::runtime_error("Make a face, bridge edges or clear the four selected points");
             if (!nearest) nearest = draft.add_vertex({point});
             selected.push_back(nearest);
           }
         }
       } else if (view_.moving && moving_vertex_) draft.move_vertex(moving_vertex_, point);
+    } else if (action == RetopoAction::BridgeEdges) {
+      if (selected.size() != 4) throw std::runtime_error("Select two boundary edges as four endpoints");
+      const auto a = selected[0], b = selected[1], c = selected[2], d = selected[3];
+      std::optional<RetopoMesh> best; float cost = std::numeric_limits<float>::infinity();
+      for (auto ids : {std::array<TopologyID,4>{a,b,c,d}, {b,a,d,c}, {a,b,d,c}, {b,a,c,d}}) {
+        stop(cancelled); auto candidate = draft; TopologyID face;
+        // Candidate errors are geometry-only: cancellation/source queries are
+        // evaluated outside this catch and can never become another candidate.
+        try { face = candidate.bridge_edges(ids); } catch (const std::runtime_error &) { continue; }
+        stop(cancelled);
+        if (!outward(candidate, face)) continue;
+        const auto delta0 = candidate.vertices().at(ids[1]).position - candidate.vertices().at(ids[2]).position;
+        const auto delta1 = candidate.vertices().at(ids[3]).position - candidate.vertices().at(ids[0]).position;
+        const float distance = dot(delta0,delta0) + dot(delta1,delta1);
+        if (distance < cost) { best = std::move(candidate); cost = distance; }
+      }
+      if (!best) throw std::runtime_error("Boundary edges cannot be bridged outward within the source bound");
+      draft = std::move(*best); selected.clear();
     } else if (action == RetopoAction::Face) {
       if (selected.size() < 3) throw std::runtime_error("Select three or four points in boundary order");
       Vec3 normal = cross(draft.vertices().at(selected[1]).position - draft.vertices().at(selected[0]).position,
@@ -154,10 +232,17 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
     }
     stop(cancelled);
     bool changed = draft.encode() != view_.topology->encode();
-    if (changed) view_.topology = std::make_shared<const RetopoMesh>(std::move(draft));
+    auto next_topology = changed ? std::make_shared<const RetopoMesh>(std::move(draft)) : view_.topology;
+    if (extrusion_sample && sampled_ && dot(point - extrude_anchor_, point - extrude_anchor_) == 0)
+      next_topology = gesture_->topology;
+    if (action != RetopoAction::Sample && changed) remember(std::move(before));
+    view_.topology = std::move(next_topology);
     view_.selected = std::move(selected);
-    if (action == RetopoAction::Sample) sampled_ = true;
-    else if (changed) remember(std::move(before));
+    if (view_.selected.size() != 2) view_.extruding = false;
+    if (action == RetopoAction::Sample) {
+      if (view_.extruding && !sampled_) extrude_anchor_ = point;
+      sampled_ = true;
+    }
   }
   view_.can_undo = !undo_.empty() || (gesture_ && gesture_->topology != view_.topology);
   view_.can_redo = !redo_.empty() && !gesture_;

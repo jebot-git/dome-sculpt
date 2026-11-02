@@ -2686,7 +2686,8 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     auto &v = *state_.retopology;
     if (!v.source || !v.topology) return false;
     if (command == SpatialCommand::RetopoFace) return v.selected.size() >= 3;
-    if (command == SpatialCommand::RetopoWire || command == SpatialCommand::RetopoSeam) return v.selected.size() == 2;
+    if (command == SpatialCommand::RetopoWire) return v.selected.size() == 2 || v.selected.size() == 4;
+    if (command == SpatialCommand::RetopoSeam) return v.selected.size() == 2;
     if (command == SpatialCommand::RetopoDelete || command == SpatialCommand::RetopoPin) return !v.selected.empty();
     if (command == SpatialCommand::RetopoApply) return !v.topology->faces().empty() && v.changed;
     return true;
@@ -2903,7 +2904,7 @@ void Document::command_locked(SpatialCommand command) {
     else {
       auto action = command == SpatialCommand::RetopoMode ? RetopoAction::Mode
           : command == SpatialCommand::RetopoFace ? RetopoAction::Face
-          : command == SpatialCommand::RetopoWire ? RetopoAction::Wire
+          : command == SpatialCommand::RetopoWire ? (state_.retopology->selected.size() == 4 ? RetopoAction::BridgeEdges : RetopoAction::Wire)
           : command == SpatialCommand::RetopoDelete ? RetopoAction::Delete
           : command == SpatialCommand::RetopoRelax ? RetopoAction::Relax
           : command == SpatialCommand::RetopoPin ? RetopoAction::Pin : RetopoAction::Seam;

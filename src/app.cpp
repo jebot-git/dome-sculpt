@@ -662,8 +662,10 @@ struct App {
     menu.add("&Mesh/Retopology/Start patch", 0, command, this);
     menu.add("&Mesh/Retopology/Place points", 0, command, this, FL_MENU_RADIO | FL_MENU_VALUE);
     menu.add("&Mesh/Retopology/Move points", 0, command, this, FL_MENU_RADIO);
+    menu.add("&Mesh/Retopology/Extrude edge", 0, command, this, FL_MENU_RADIO);
     menu.add("&Mesh/Retopology/Make face", 0, command, this);
     menu.add("&Mesh/Retopology/Connect edge", 0, command, this);
+    menu.add("&Mesh/Retopology/Bridge edges", 0, command, this);
     menu.add("&Mesh/Retopology/Delete points", 0, command, this);
     menu.add("&Mesh/Retopology/Pin points", 0, command, this);
     menu.add("&Mesh/Retopology/Seam edge", 0, command, this);
@@ -977,14 +979,17 @@ struct App {
     size_t selected = retopo ? retopo->selected.size() : 0;
     enable("&Mesh/Retopology/Make face", editing && selected >= 3);
     enable("&Mesh/Retopology/Connect edge", editing && selected == 2);
+    enable("&Mesh/Retopology/Bridge edges", editing && selected == 4);
+    enable("&Mesh/Retopology/Extrude edge", editing && selected == 2);
     enable("&Mesh/Retopology/Seam edge", editing && selected == 2);
     enable("&Mesh/Retopology/Pin points", editing && selected != 0);
     enable("&Mesh/Retopology/Delete points", editing && selected != 0);
     enable("&Mesh/Retopology/Snap points", editing && selected != 0);
     enable("&Mesh/Retopology/Apply patch", editing && retopo->topology && !retopo->topology->faces().empty() && retopo->changed);
     enable("&Mesh/Retopology/Cancel patch", !modal && retopo && (!s->asset_busy || s->can_cancel_asset));
-    checked("&Mesh/Retopology/Place points", !retopo || !retopo->moving);
+    checked("&Mesh/Retopology/Place points", !retopo || (!retopo->moving && !retopo->extruding));
     checked("&Mesh/Retopology/Move points", retopo && retopo->moving);
+    checked("&Mesh/Retopology/Extrude edge", retopo && retopo->extruding);
     enable("&Mesh/Plane cut/Start cut",!modal&&s->can_cut);
     auto cut=s->cut;bool cutting=!modal&&cut&&!cut->committing&&!s->asset_busy;
     for(auto label:{"Offset...","Direction...","Cap color...","Flip kept side","Cap cut"})
@@ -1043,7 +1048,7 @@ struct App {
     if (info->retopology) {
       auto &r = *info->retopology;
       text.str("");
-      text << "Retopology: " << (r.moving ? "Move" : "Place / select")
+      text << "Retopology: " << (r.extruding ? "Extrude edge" : r.moving ? "Move" : "Place / select")
            << " | Shift+click/drag | " << r.selected.size() << " selected";
       if (r.topology) text << " | " << r.topology->faces().size() << " faces";
       text << (r.committing ? " | Applying" : r.busy ? " | Updating" : " | Mesh > Retopology: face / apply / cancel");
@@ -1331,15 +1336,15 @@ struct App {
       canvas.document.edit_cut(settings);
     } else if (label == "Apply patch" || label == "Cancel patch") {
       canvas.document.end_retopology(label == "Apply patch");
-    } else if (label == "Place points" || label == "Move points") {
-      canvas.document.edit_retopology(label == "Move points" ? RetopoAction::MoveMode : RetopoAction::PlaceMode);
+    } else if (label == "Place points" || label == "Move points" || label == "Extrude edge") {
+      canvas.document.edit_retopology(label == "Extrude edge" ? RetopoAction::ExtrudeMode : label == "Move points" ? RetopoAction::MoveMode : RetopoAction::PlaceMode);
     } else if (label == "Projection distance...") {
       edit_retopology_distance(canvas.document);
-    } else if (label == "Make face" || label == "Connect edge" || label == "Delete points" ||
+    } else if (label == "Make face" || label == "Connect edge" || label == "Bridge edges" || label == "Delete points" ||
                label == "Pin points" || label == "Seam edge" || label == "Relax patch" ||
                label == "Snap points" || label == "Clear point selection") {
       canvas.document.edit_retopology(label == "Make face" ? RetopoAction::Face
-          : label == "Connect edge" ? RetopoAction::Wire : label == "Delete points" ? RetopoAction::Delete
+          : label == "Bridge edges" ? RetopoAction::BridgeEdges : label == "Connect edge" ? RetopoAction::Wire : label == "Delete points" ? RetopoAction::Delete
           : label == "Pin points" ? RetopoAction::Pin : label == "Seam edge" ? RetopoAction::Seam
           : label == "Relax patch" ? RetopoAction::Relax : label == "Snap points" ? RetopoAction::Snap : RetopoAction::Clear);
     } else if (label == "Prepare painting mesh") {
