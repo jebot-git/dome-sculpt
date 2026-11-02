@@ -14,6 +14,28 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Private GPU sculpt-resolution precision prototype — 2026-11-02
+
+Root source63fb384 /metadata392c8dc in artifacts/sculpt-resample-gpu-f973732
+is a separate numerical prototype. Production resample_sculpt remains its
+original CPU double path; this does not deliver a GPU resampling workload or
+complete any remaining accelerator row. The actual A770 has no nativeFP64.
+Pinned BSD3 SoftFloat3e provides integer-word nearest-even numeric binary64;
+regeneration matches checked-in bytes and all raw upstream hashes/license.
+
+Fresh standalone Release1/1, whole-header-test SAN1/1/leaks and OneAPI2/2 pass.
+Host1999168 exact arithmetic results plus499536random/7boundary integer casts;
+actualA770(native_fp64=0)1250000results×4 GPUtransactions match independent
+native reference exactly. Source/test/header/binary manifests unchanged.
+These UI/XR-disabled component builds are not whole app/core qualification.
+Arithmetic-only CPU1.13ms vswarmGPUcopy/kernel/readback2.56–2.75ms/cold250.71ms
+is not a speedup; no sparse-job benefit is claimed. Next implement/measure
+bounded sparse-field upload/lookup/query batching, compare full interpolation/
+layer/mask output against current CPU, then actual worker quality/cancel/history/
+Save and missing-device paths. CUDA/ROCm header/table device proof still needed.
+Read GPU-RESAMPLE-PRECISION-WIP.md/.json. No installation, physical launch or
+session restart; current public runtime remainsf973732.
+
 ## Private native humanoid fitting workflow — 2026-11-02
 
 A new isolated component on49projection+portableadcb implements real native
@@ -261,23 +283,46 @@ core/render plus3/3(81.56s), graphical289/54posed-alpha images(67.77s): old real
 partial-Bake .7-scale/90-turn failure now has software before/current max0 and
 independent ORIGINAL-basis GLB max1, unchanged2/3 limits. ActualPCI03A770289 also
 passes: both54image groups max0, exact source/core/render/binary manifests.
-Hardware lease released. Whole-ownSAN15551 still compiles frozen600; export24
-remains guarded and no current-project emitted-export/native admission is claimed.
-Range winding authority is explicitly coordinated with Palette; export continuation
-is a separate94d6583 child, preserving all proof trees.
-Docs' private Scene25 bbb1792 is qualified for its exact native rest-fitting
-subset; initial original-node graph1672 proof predates a small DFS refinement
-and must be rerun on final modules. Current plan184 checks cover per-skin closure,
-cross-skin parents, own poses/IBMs, rigid compensation and Scene25 restart;
-actual Scene/source public dispatch1804 checks pass. Document/controller proof
-exposed a real neutral rigid Restore float-residual affine_edit defect; its old
-SAN is kept frozen/live, with an explicit neutral-endpoint identity proof planned
-instead of generic epsilon suppression. Distinct-pose and typedVRM work remain;
-no completed current-Document admission claim. Palette's private
-Scene26 sourceUV2+ foundation has software55role/pick/normal/traffic checks and
-actual native54import/explicit-atlas/Save/history/paint/cancel/GLB checks; generated
-TUV2 provenance, full fresh ABI/SAN/hardware proof and full admission remain.
-No private Scene21+ data is admitted by974ef42. Do not rebase or mutate any live
+Hardware lease released. Preview600 still guards current-project export; the
+separate qualified exporter below is a later child. No publicScene24 admission.
+Range winding authority is explicitly coordinated with Palette. Preview600 ownSAN
+15551 is terminal0:3/3 in1208.32s (graphics289/54images998.73s), metadataaf8b9e8.
+Export44380ef separate child has fullRelease3/3(124.72s)/graphical414(103.96s)
+plus normal-domain-current99 separately1/1(3.78s), actual current-emitted54GLBs
+native/original/current image max1software andmax0strictArc; reflected/sheared
+winding and576-ray raw/packed alpha parity included. Arc82559 terminal0/source
+hashes exact; export ownSAN94501 still graphics-active with unchanged1200budget,
+so preserve any timeout rather than relabel. KeepPaint action is NEWchild: fresh
+header/FileJob fullcore/render/App+runtime build81287 terminal0; native/controller/
+queuedSave/Undo/cancel/retry63 and priornormal-document2/2 pass17.48s; FLTK10normal
+pass, compact3042 and real-loader47182 LIVE. No HMD/Wayland claim or publicScene24
+admission. Preserve exact source freezes and all prior negatives.
+Docs' private Scene25 bbb1792 remains qualified for its exact native rest-fitting
+subset. Source-rest continuation2f06246 is frozen/pushed, including the final
+rerun after DFS refinement: graph1672/plan184/Scene1806/
+actualDocument-controller63/export10 pass five Release suites39.61s and matching
+changed-TU+frozen instrumented-own-support SAN190.81s, headers byte-identical.
+Native FLTK9normal+9compact/d271Wayland9 pass; independentcgltf44430 ordered
+corners in each fitted/posed/restored output, maxWORLD3.01357e-7m;
+3KHRoutputs0errors57warnings. No full CMake/image/Arc/allocation claim. Real
+neutral-rigid Restore residual is fixed by explicit neutral-endpoint identity
+proof;1micrometre nonneutral sensitivity and original negative retained.
+Shared-pose-only/distinct-per-part/unbound/generated/joint-node rigid and typedVRM
+metadata remain required. New typedVRM child reuses original-node authority;
+primaryUniVRM efd20f6 (exact pinned record in agent source) distinguishes actual
+firstPerson head bone/erasure from offset point, Unity-vector H*C*H conjugation
+and collider attachment frames outside auto-recursed spring chains. Guards stay.
+
+Palette's private Source26 originalf615 foundation/SAN7 remains separate and includes preserved
+invalid sparse-GLB150error/89file receipt. New contiguous child corrects genuine
+full0..n arrays (no padding/relabel), preciseScene21/raw replay/min26/canonical
+pairing guards. Coherent native+XR build and Release8/8(9.12s), full ownC/C++SAN
+8/8(104.29s) include22closure and1772persistent add/decode prefixes; genuine90GLBs
+0KHRerrors60warnings. Actual strictPCI03A770 generated26+roles151+native54+
+stream55+compiler99 all385assertions pass10.79s; exactsource/core/render/native/
+binary manifests. GPUlease released. No raw import/painting guard lifted, no new
+actualFLTK/loader proof inferred; scoped foundation receipt preparing.
+No private Scene21+ data is admitted by current870aa6c. Do not rebase or mutate any live
 source/build inputs for integration. Every unfinished requirement stays active,
 including post-basic controller trays. No new physical launch, system install
 or active-session restart occurred.
