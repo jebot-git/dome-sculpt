@@ -28,7 +28,31 @@ readback or per-frame extraction is introduced. SurfaceRange, MeshSnapshot,
 EditorState, MeshJob and NativeStroke layouts changed, so every consuming
 core/render/native/XR target must be rebuilt coherently.
 
-## Qualification
+## Portable Source20 delivery
+
+The portable child is based on exact projection649befe. It carries only this
+preview feature, with no Source21 normal-coordinate field, UV control, sampling
+pool or schema change. Full core/support/render/native/XR consumers were built
+fresh. Its receipt is validation/PBR-PREVIEW-PORTABLE.json.
+
+Eight coherent Release suites pass in140.51s: native/controller/material-query
+116 (including44 persistent publication denials), actual female/male111 and18
+independent GLB images with maximum byte error0, View26 actual-loader10,
+selection native/loader11, and projection native/controller regressions. The
+separate existing projection loader passes10 assertions in20.31s. Native FLTK
+passes13 normal plus13 compact. Final actual PCI03 A770 passes116+111, all18
+images error0; explicit UHD770 refuses, and before/after source/binaries match.
+All20 emitted files pass Khronos with zero errors and342 unfiltered warnings.
+
+Projection strokes freeze the same view policy for the active target and all
+other-object visibility queries, including cached and fallback queries. Actual
+projector placement blocks mode changes until its gesture ends. This child has
+no new whole-core sanitizer claim: the final combined portable/projection/rig
+source will be rebuilt and qualified by the integration owner. The prior owned
+sanitizer receipt below is explicitly historical and does not cover a changed
+parent or new projection layout.
+
+## Historical Source21 qualification
 
 The complete scoped receipt is validation/PBR-PREVIEW.json. On the frozen
 Source21 UI parent3855882, coherent optimized native/core/render/XR builds and
@@ -78,9 +102,9 @@ UV workflows, broader format consumers and post-basic interactive controller
 trays remain required. There was no physical headset launch, system install or
 active-session restart.
 
-For portability, apply only this checkpoint's own PBR preview changes onto the
-qualified public/projection source. Do not import its Source21 ancestor merely
-to obtain the view choice. Projection strokes must capture this preview policy
+The portable delivery applies only the preview delta onto the qualified
+public/projection source. Its history does not import the Source21 ancestor
+merely to obtain the view choice. Projection strokes must capture this preview policy
 for both active-target and other-object visibility queries; rig-fit placing
 must be treated as an active gesture at the eventual union. Final registry
 union is page25 projection,26 View,27 rig fit (count28).

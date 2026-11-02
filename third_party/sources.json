@@ -286,12 +286,13 @@
     "commit": "26a482ae66871d7de36eb722aa060bce95bce274",
     "version": "0.23.1",
     "license": "MIT (selected alternative A; complete upstream dual-license notice retained)",
-    "used": "Unmodified native C FBX/OBJ reader with confined immutable source resource capture, bounded allocators and cancellation; no proprietary FBX SDK or runtime frontend. Current adapter supports static geometry/material/corner/instances with explicit guards for unsupported skin/blend/affine cases.",
+    "used": "Unmodified native C FBX/OBJ reader with confined immutable resource capture, bounded allocators and cancellation; no proprietary SDK/runtime frontend. Native adapter3 converts the bounded linear/rigid skin and independent blend-target subset, retaining original affine binds, node/cluster/channel identities and exact raw source. DQ/multiple-deformer/full-material/named-UV/normal-generation semantics remain incomplete and guarded.",
     "upstream_sha256": {
       "ufbx.c": "4a956c26a708e40d82ecb0aeaee54da709d5ba7c144c9642174970059bda7e1d",
       "ufbx.h": "f787be529af577efc04f3e3e735844a08556718dbb613d1211c2b313d72895dc",
       "LICENSE": "0dd48ebadf52273c736256325c8f078c03c8bb4facee22a4122de0ad3f615391"
-    }
+    },
+    "validation_fixtures": "tests/data/ufbx-deformers/SOURCES.json (same pinned upstream commit; MIT alternative A, complete license retained; validation inputs only, not shipped humanoid bases)"
   },
   "wings_polygon_edit": {
     "repository": "https://github.com/dgud/wings",
@@ -550,5 +551,29 @@
     },
     "tested_system_package": "lapack-3.12.0-11.fc44.x86_64; lapack-devel-3.12.0-11.fc44.x86_64",
     "pkg_config": "lapacke>=3.12.0"
+  },
+  "spacenav_protocol": {
+    "repository": "https://github.com/FreeSpacenav/libspnav",
+    "commit": "476a17b6087146f95799e3a2a12b4d13cb4d2818",
+    "license": "BSD-3-Clause",
+    "used": "Independent native C++ receive-only legacy Unix event client. Fixed eight-int32 packet constants, socket discovery conventions and button numbering reviewed from pinned spnav.c/h/proto.h. No libspnav runtime dependency or X11 event protocol.",
+    "reference_sha256": {
+      "src/spnav.c": "52076c5c8e82b1c7b71b87ce1ec458f8a2705e83e576124c6c27a37b69caf608",
+      "src/spnav.h": "616c418688df497661c7716adc6040762834220b1919ef0710640fb4267ae434",
+      "src/proto.h": "504cd2ce862ab055783dd40d707c9aad6680cecfe7e9392ddaf7370c456f9e1a"
+    },
+    "producer_reference": {
+      "repository": "https://github.com/FreeSpacenav/spacenavd",
+      "commit": "05cc67938e77ac7ad9c5b34267984d944cfd57dd",
+      "license": "GPL-3.0-or-later",
+      "used": "Source inspection only: default proto0 input mask/sensitivity; motion flush/repeat cadence and unsigned wall-clock millisecond period. No server source compiled or copied.",
+      "reference_sha256": {
+        "src/client.c": "dd09f1d2ff5e29bbf7adad9ce31c18a707daf518043a8e4d778f4ee951195d72",
+        "src/event.c": "f314fafeafd07288b37c76ff5bcf3a1c54272d1339f7de0bff8fced0b1ff3342",
+        "src/proto_unix.c": "a972f612c9be2545873b26e6a5df87f649ba5bf4684e1fa3e89d7daa968d572d",
+        "src/spnavd.c": "d0f69a53f94e5e4c37c6589bde7d3b90f831c9e0f13aed8ed5615868c673baf2",
+        "src/cfgfile.c": "45e82064af56304e374cfe028a5a862a42216a385f068fb0f3d63abcbe935d69"
+      }
+    }
   }
 }

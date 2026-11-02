@@ -169,6 +169,9 @@ public:
   void stamp(const Brush &, const PaintSettings &);
   void stamp(const Brush &, const PaintSettings &, const std::function<bool()> &cancelled);
   void stamp_projection(const Brush &, const PaintSettings &, const PaintProjection &);
+  // Projector, brush and Evaluation must share the same evaluated metric frame.
+  void stamp_projection(const Brush &, const PaintSettings &, const PaintProjection &,
+                        const Evaluation &, const std::function<bool()> &cancelled = {});
   bool end_stroke();
   void cancel_stroke();
   bool in_stroke() const { return editing_; }
@@ -219,6 +222,8 @@ private:
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &, const std::function<bool()> &cancelled = {}, const Evaluation * = nullptr);
+  void stamp_projected(const Brush &, const PaintSettings &, const PaintProjection &,
+                       const Evaluation *, const std::function<bool()> &);
   struct SurfaceMap;
   struct CompositeCache;
   std::shared_ptr<const TextureMaps> build_composite(const Material &) const;

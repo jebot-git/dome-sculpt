@@ -1,0 +1,257 @@
+{
+  "schema": 1,
+  "component": "Native humanoid landmark fitting and skin authoring",
+  "date": "2026-11-02",
+  "status": "Private qualified actual unskinned workflow; full grouped/source rest fitting remains active and guarded",
+  "base_commit": "9df542b5bf24986f9da802253855978dd61f7f43",
+  "worktree": "/home/blux/de-xr/dome-sculpt/artifacts/rig-fitting-49c06b7",
+  "scene_schema_change": false,
+  "reserved_next_phase_scene": 25,
+  "implementation": {
+    "language": "Native C++20",
+    "frontend": "Existing FLTK/OpenXR application; no additional frontend",
+    "persistent_data": "Existing DeformationState skeleton/skin/humanoid/landmarks; original painting/morph/source/appearance owners unchanged",
+    "ephemeral_data": "EditorState RigFitView source lease, world matrix, role/options and placement ownership",
+    "worker": "Existing bounded ordered SceneOperation; exact WORLD proximity and binding with REST anatomical axes",
+    "guards": "Existing skeleton replacement refused until original node/rest/current pose/IBM/metadata transport is implemented",
+    "commands": {
+      "first": 2048,
+      "last": 2061,
+      "page": 27,
+      "page_count": 28
+    },
+    "dependencies": {
+      "new": [],
+      "toolkit": "Canonical d271 inputs unchanged: toolkit-eee23b7/lib and bitmap-runtime-eee23b7/lib",
+      "compositor": "Private domed-d271cf6-target/release/dome-compositor"
+    }
+  },
+  "validation": {
+    "release_component": {
+      "passed": 8,
+      "seconds": 21.96,
+      "scope": "Five fitting suites, existing skin/modal and new actual-loader synthetic OpenXR"
+    },
+    "release_existing_humanoid_and_rig": {
+      "passed": 2,
+      "seconds": 2.65
+    },
+    "owned_sanitizer_component": {
+      "passed": 7,
+      "seconds": 12.24,
+      "scope": "Complete own C/C++core/support/renderer/frontend built with ASan/UBSan; native/softwareGL suites, no system toolkit/driver/LAPACKE instrumentation"
+    },
+    "owned_sanitizer_existing_humanoid_and_rig": {
+      "passed": 2,
+      "seconds": 14.14
+    },
+    "refined_blocked_save_fault_fixture": {
+      "release_passed": 1,
+      "release_seconds": 0.48,
+      "sanitize_passed": 1,
+      "sanitize_seconds": 5.9,
+      "persistent_allocation_boundaries": 2359,
+      "observed_cancellation_boundaries": 51,
+      "actual_worker_cancel_retry": true,
+      "already_accepted_save_waits_for_blocked_worker": true,
+      "scope": "Warm kernel measured sites; static human role registration explicitly warmed, not process-first-use or every Document allocation"
+    },
+    "assertions": {
+      "native_authoring": 22,
+      "actual_controller": 16,
+      "native_import_cgltf_interop": 7,
+      "graphics_guide": 9,
+      "synthetic_openxr": 11,
+      "fltk_normal": 8,
+      "fltk_compact_640x360": 8,
+      "fltk_sanitizer_graceful": 8,
+      "native_d271_wayland": 9
+    },
+    "gui_cases": [
+      {
+        "case": "normal",
+        "exit": 0,
+        "seconds": 13.09058770100819
+      },
+      {
+        "case": "compact",
+        "exit": 0,
+        "seconds": 12.890096439004992
+      }
+    ],
+    "graphics": {
+      "selector": "DRI_PRIME=pci-0000_03_00_0",
+      "vendor": "Intel",
+      "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "hardware_checks": 9,
+      "software_and_sanitizer_checks": 9,
+      "strict_identity": "Intel plus Arc/A770 tokens; software/UHD rejected",
+      "independent_oracles": [
+        "full reflected/sheared landmark point",
+        "wrong REST location sensitivity",
+        "role colour and bone continuation",
+        "bounded tool-only GPU uploads <4096 bytes",
+        "second-eye image equality",
+        "moved point analytical location",
+        "Cancel pixel removal",
+        "valid GL state"
+      ],
+      "final_unchanged_keys": [
+        "src/render.cpp",
+        "include/dome/document.hpp",
+        "include/dome/rig-fit-tool.hpp",
+        "tests/rig-fit-render.cpp",
+        "build-rig-fit-release/dome-sculpt-rig-fit-render-test"
+      ]
+    },
+    "interop": {
+      "consumer": "Independent cgltf attributes/weights/IBMs/morph/world hierarchy at REST and current pose",
+      "khronos_version": "2.0.0-dev.3.10",
+      "emitted_files": 3,
+      "errors": 0,
+      "warnings": 2,
+      "all_warnings_retained": true
+    }
+  },
+  "build": {
+    "release": "Regular-user optimized Release -O3 -DNDEBUG, CPU core with native FLTK/XR enabled",
+    "sanitizer_c_and_cxx": "-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer; no NDEBUG; own C dependencies instrumented too",
+    "sanitizer_environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "source_abi": "Fresh header consumers after EditorState appendix; no persistent layout change in initial workflow"
+  },
+  "negative_evidence": [
+    "Initial actual controller entry retained nonexistent hand1; fixed recorded command_device=s.id, final actualhand2 input passes",
+    "First GUI Apply X was outside real button; harness corrected actual button bounds",
+    "Next GUI used absent shell-owned Quit; final uses universal Close Window",
+    "First SAN GUI caller used relative binary under isolated HOME; final harness resolves absolute Build before launch",
+    "First fault sweep counted one-time static human-role registration; explicit warm-kernel scope/final measured 2359 sites preserved"
+  ],
+  "limitations": [
+    "Full existing grouped/source VRoid rest fitting, reparent and bind/current-pose/metadata transport remains required; initial guard not completion",
+    "Scene25 exact pose-local overrides and acyclic first rig-source capsules approved/reserved but not yet implemented",
+    "No new default mesh or MakeHuman; original verified CC0 VRoid-only creation unchanged",
+    "No physical HMD/controller/stylus acceptance or install/session restart",
+    "Synthetic XR uses actual loader and GL swapchains with synthetic input, not physical hardware",
+    "No sanitizer Wayland/XR claim; inherited shared-backend Wayland5856B/31 and standaloneXR112B scopes remain open, no suppressions/toolkitfork",
+    "No GPU fitting engine or sustained production-size performance claim",
+    "Separate PBR preview1024+/View26 and Contracts Scene24 writable-domain must merge semantically with page27/count28 and source leases"
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "8a715f6b200d1e8d46f24c203fbdcfc1afa040c29afd6852704076afadb17436",
+    "include/dome/document.hpp": "03a5d161cde9eda36d99c19221f40aacdbd3a97e074b79b619e97503dd781a72",
+    "include/dome/input.hpp": "6e5ddab855bdfed4e1e070bb8daa8c23ba2842d1da4812b78f285aaa4fb14616",
+    "include/dome/rig-fit-tool.hpp": "50b86e5d463ca38112ec8b544337e08111e66f4605250435ece3f812f6b7325b",
+    "include/dome/rig-fit.hpp": "496b8b550ab546940bf31bc3a91a91fe96c48ff495922c1ebedc6615bf81f9e0",
+    "src/app.cpp": "a765b81dc1d0c3f601c7ebabb00f8be887bcc37403e37264b3c12849026bdae2",
+    "src/document-native.cpp": "fe2175c48a4c781eea1dd666c1848532c6e76eb04d6beb3f4dff778a74b54d59",
+    "src/document-rig-fit.cpp": "52b8a1427d5de7f28730688b343aa21a1f762f08f20d860795ebe6166a2efde2",
+    "src/document.cpp": "9d0024b88808fbc4d14453f325490f3d565d0214aea9563e9a1e241afb6abab5",
+    "src/input.cpp": "0855d47ef82f9af95524be0418da5c19f88d0b96258b504fce5f4dc63d9dc391",
+    "src/palette.cpp": "392fbf32213521a3dfe64e6f0ce5583b2360372fcd4e32b6f4f12e8a47aad056",
+    "src/render.cpp": "1361b25ece36a123fd3a6eefb83186d938a2212a0b57d4eb7ce589922892b7ba",
+    "src/rig-fit-editor.cpp": "31a8a4ff8477cc46cda1bf70a69371b7c5b1519c44a3b2d2ad80746865010882",
+    "src/rig-fit-editor.hpp": "b9ecbea5f7e45abc3f85b850a8217608de302d36cf7f18a7996fd29901536dff",
+    "src/rig-fit-tool.cpp": "272b7b527dd5657cf2277d7893f6bc187087bb350025587c1f97b4811bdb603b",
+    "src/rig-fit.cpp": "372d5df7ace628073707538e034bf90a83c41b6ee9f2cdc46ec59ad9e983f6d0",
+    "tests/rig-fit-authoring.cpp": "25afeb6769a228d1bad456432d612fe251212d5c5c61fb257f00f7c4e03eecde",
+    "tests/rig-fit-controller.cpp": "a11459efab3b7d4ff3daef9751ca82f87cb445e178b4df544e46715a533af964",
+    "tests/rig-fit-faults.cpp": "ba241ad9837612ca577169744a1ec86cf0421893d8ee77e0f76cd80fe6cfed38",
+    "tests/rig-fit-import.cpp": "af8bd5e59dadb876ac0fb10d55048c2c66216fdab652c9df9bf3bdb3b778216b",
+    "tests/rig-fit-menu.py": "c757b59789a1e915402c9eb2f6552082e8ceb16f32d550d07fbdf35bae9a5a33",
+    "tests/rig-fit-render.cpp": "97343fb60f3d31f36779097ad4eebdd50fba55eab1f8f1bfba223f0365672dff",
+    "tests/rig-fit-wayland.py": "3783b2650dc614ac6fcf7de44a613bb966d403380b9aca73e5d75c04115175f5",
+    "tests/rig-fit-xr.py": "a242fca803e16926851b547b6e46b972853f2d802ea66b3dcc3b291f6643db0f",
+    "tests/xr_runtime.cpp": "b1bcca03939eaa438e3d2e6fb089fb435c517b073da1641cfe1846875dd55bb6"
+  },
+  "binary_sha256": {
+    "build-rig-fit-release/dome-sculpt": "a0f61c52c17b90443df95589447757c0815eeb082f365f143abea11d001c71eb",
+    "build-rig-fit-release/dome-sculpt-avatar-test": "485af7465f9863f23cd212b6759b9e576da14ac30abe3730b57f29331d3b7dad",
+    "build-rig-fit-release/dome-sculpt-modal-selection-controls-test": "2ad697706569101992d3562e1bfde7e5f05083397f62368315f23b439caa77f2",
+    "build-rig-fit-release/dome-sculpt-rig-edit-test": "a1ee65ffe90a508bb6b2b1ca2ae016b2f80cbe976ea234584eb07839c9129067",
+    "build-rig-fit-release/dome-sculpt-rig-fit-authoring-test": "2c6c9f9efac6cb66a2cc3650c283921da08cd5362b240405d8b664f91656a424",
+    "build-rig-fit-release/dome-sculpt-rig-fit-controller-test": "6a640686d541b333df3a40ad0ff4f571dbe76a1b9020a202092ef862809f08e1",
+    "build-rig-fit-release/dome-sculpt-rig-fit-faults-test": "b34fa21e261552ce3e0662487cce5dc38924122084ea6afa32ab226e0a2fb749",
+    "build-rig-fit-release/dome-sculpt-rig-fit-import-test": "e3aa1856ecf6043f316a3e7e47c4cc640c84df53a728e9a82df166a44820e639",
+    "build-rig-fit-release/dome-sculpt-rig-fit-render-test": "ea02e4e7ad7fa3070db3de80a6447ea9fd4f9506076beaa6effb1cde9c6116db",
+    "build-rig-fit-release/dome-sculpt-skin-authoring-test": "caaa1c51f58ebc7bc0e344b190f9ef6581605d715fb690ee572b89c6fc9c1e2c",
+    "build-rig-fit-release/libdome-sculpt-affine.a": "fff6a6e540bde4bd3d31f1cf391882886a40e06932bedf328818b3fd25aa7c26",
+    "build-rig-fit-release/libdome-sculpt-core.a": "16172ae70de24b1c0ef67a280c37bc50f4a9e5d255851d24ad985ed44c2ff901",
+    "build-rig-fit-release/libdome-sculpt-polygon.a": "f0e2a7ae3be91ef235ad62baeed4efeef3ccf5b122f19081525dda6be5214fa1",
+    "build-rig-fit-release/libdome-sculpt-render.a": "afa5ed43c668fabdfeeff1cb32fd2994338605587ac0d38842f4d3272e971c55",
+    "build-rig-fit-release/libdome-sculpt-test-runtime.so": "9964ba189f6f8f3ffad8be017b0932b9c81b40584f37f49ee9d17459af96d80e",
+    "build-rig-fit-release/libmikktspace-robust.a": "21cb0a0a8646700399a4a5367125677b488418ae3b09a069b5144146537b43e6",
+    "build-rig-fit-release/libmikktspace.a": "92619280505f689e97df888b1c4e94ddd8fc00fcd24cb2250a62c120ea54031a",
+    "build-rig-fit-release/libufbx.a": "1df76fae7ac3028a78b7cbeb632586dddf8ac99606d630620ed2f69087d04f19",
+    "build-rig-fit-release/libxatlas.a": "6e431d272365581a8e225b179ec101c54542452beb4bf2ef73baa1e61de9c50e",
+    "build-rig-fit-sanitize/dome-sculpt": "80c611701b1b6f40d92c0a1a0adf49a578f1f27b4ef335cd31932358065d273d",
+    "build-rig-fit-sanitize/dome-sculpt-avatar-test": "70679c063cbe7abc11eca1daf09b92ff9191d5933250ec92d4b2d42acbc028ba",
+    "build-rig-fit-sanitize/dome-sculpt-modal-selection-controls-test": "06e12a5d75d895785ced0e42342b3db67005105c6c5d86e8557d2e3845a5c5f5",
+    "build-rig-fit-sanitize/dome-sculpt-rig-edit-test": "c550d36b03068fdf36d3305f1e138b423afe0ee5939dfb6b7e0ca695c2b63aaa",
+    "build-rig-fit-sanitize/dome-sculpt-rig-fit-authoring-test": "9773b0633a0cec6864ea567e9ed7fdaf2711a9ff9f36283a77fea83d8780c2e2",
+    "build-rig-fit-sanitize/dome-sculpt-rig-fit-controller-test": "593a220aef95830fd9b14a1baf56a696b1a24e56a05bd5b12180aeb88e0c3021",
+    "build-rig-fit-sanitize/dome-sculpt-rig-fit-faults-test": "f3f1a7325f25b2f591532974908a3624d6ed1dec633e9fa38a1db77997e44a03",
+    "build-rig-fit-sanitize/dome-sculpt-rig-fit-import-test": "e15fdfb3926442c344ac091ec69ca0cb472554ea93b339d55883e664339220f5",
+    "build-rig-fit-sanitize/dome-sculpt-rig-fit-render-test": "8810bc8b7336b506fd1e9f4269db640264b7e771299960864632e2d273210c4c",
+    "build-rig-fit-sanitize/dome-sculpt-skin-authoring-test": "13a79dccd46b1c971a9c0da870e3af265bc6aaa4a12c675d033fa2693bc0b485",
+    "build-rig-fit-sanitize/libdome-sculpt-affine.a": "a05fd859f4675e5f746b22d75c32ae59f71ef3c0362bd162d99534da2da1bbbb",
+    "build-rig-fit-sanitize/libdome-sculpt-core.a": "8cad0457c29eb64d22d883b42928dfd6af7e3438c11a85afb0f2ba5066de8653",
+    "build-rig-fit-sanitize/libdome-sculpt-polygon.a": "0bbb6984bd83ad4fc46972f93e18c68dd6ee70cf0f68018d61c406d4f7af74a0",
+    "build-rig-fit-sanitize/libdome-sculpt-render.a": "dec4870614ddf0df6f6abe68cfc87eaa4acae5b525ee5ba958e18bfb27f8333e",
+    "build-rig-fit-sanitize/libmikktspace-robust.a": "b9f68c191e959e6edb0923780ac332807ad37dde301c2cce2335c5ecf1ccfd95",
+    "build-rig-fit-sanitize/libmikktspace.a": "33216237c958eb8b7189deecf4573462393c0ef84981af4e7e42c01e14ad37b6",
+    "build-rig-fit-sanitize/libufbx.a": "acc4d74b18f719180eb97155e2192a3f56b0dda0dd937dc3af31ee01dcca8794",
+    "build-rig-fit-sanitize/libxatlas.a": "788bf406764b1f7c441175a7f607fcca510740f4fef401e72ccae2098415718e"
+  },
+  "evidence_sha256": {
+    "artifacts/rig-fit-arc-inputs.json": "ae66033c7b07383d1fdcddca4fd1c646068cb71e285067555050633f76d74c3f",
+    "artifacts/rig-fit-controller-diag.log": "a479723aa8e8c49986ac2db8e97fc4f8c06f056deb5e7cf7a162d5e74f8f452b",
+    "artifacts/rig-fit-controller-first.log": "c8c0bfaff5a83246ccb9e0bbcffa5b47ea6fb1eb387d9bdb6fd4baba1c65f9f9",
+    "artifacts/rig-fit-faults-first.log": "4b1262f1ace11275505603fc6c86abb6a5f62d6e6b16e3c7808598e7685b1eae",
+    "artifacts/rig-fit-faults-warm.log": "c204f7c045628c2dddb5718319850127c1b02408f8d6dc0f7fa2282724cb828c",
+    "artifacts/rig-fit-import-khronos-final.json": "bcba92b6d59715d2ee9ac6e76fd63b61f3c94b1edca6d3841e0ff06b68537c20",
+    "artifacts/rig-fit-menu-corrected.log": "65a1aec5471c9206189a85d105be7f32ec98cc3f21d5c6e755f498f9ec08204e",
+    "artifacts/rig-fit-menu-first.log": "77b32cca9b59db8f580a216553751df23ed38a1ebab050680feb0692c7accb93",
+    "artifacts/rig-fit-menu-sanitize-corrected.log": "b6fb8aa9505d67a401302decfef056b5c7f7d1387f16467e924c47ed456c3c14",
+    "artifacts/rig-fit-menu-sanitize-corrected/report.json": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d",
+    "artifacts/rig-fit-menu-sanitize.log": "0fafec1f0fe35039676f3518b229d1f91da68b08b7b73ed31a4c3eab6dd109bd",
+    "artifacts/rig-fit-menu-source-final-compact.log": "b6fb8aa9505d67a401302decfef056b5c7f7d1387f16467e924c47ed456c3c14",
+    "artifacts/rig-fit-menu-source-final-compact/report.json": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d",
+    "artifacts/rig-fit-menu-source-final-normal.log": "b6fb8aa9505d67a401302decfef056b5c7f7d1387f16467e924c47ed456c3c14",
+    "artifacts/rig-fit-menu-source-final-normal/report.json": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d",
+    "artifacts/rig-fit-menu-source-final-status.json": "be16daf85d0b22b99cf6e316e940720c84973e6a8d52a60d715a2249fc9c7e0a",
+    "artifacts/rig-fit-ordered-release-build.log": "5220069b36c229c3540dfda98bbd3eb72b0b98dcc2608418ee947923ce66d5a8",
+    "artifacts/rig-fit-ordered-release-detail.log": "d84758983261585068d59fe340ffe69c25917e22d2c6e5b7bfd3e2ba9e057828",
+    "artifacts/rig-fit-ordered-release.log": "db81a683226bb7ef04cb310c1b885574d8dc696c1d6d45092f6f11dbcc2e93aa",
+    "artifacts/rig-fit-ordered-sanitize-build.log": "3b8cb7a64539b3b4a9edf3f347fbabe6ec808c40966b12763fd015ba1f10fc7d",
+    "artifacts/rig-fit-ordered-sanitize-detail.log": "0ae901c364be3bd43beb55639978d9c4dfb38d00400ff390880079e91125f23c",
+    "artifacts/rig-fit-ordered-sanitize.log": "87f4a15acb86660e21dc29a5fb014c74a382a5f137b784f35eb35485d2187bde",
+    "artifacts/rig-fit-qualified-release-detail.log": "0ceac2b3a660eb8a80a1a44ec618a6020611d91b82f28b27cb44f7891d6f5ccd",
+    "artifacts/rig-fit-qualified-release.log": "578bcfdb8b2aa9caf0b6c76c3ce0a8095116b4ddedcefd4ec4ee48ca0cdbbb53",
+    "artifacts/rig-fit-qualified-sanitize-detail.log": "7e51be58077b5dd3f42b481ea908c1841fb33e97aae814b2370b79c91cd6cad9",
+    "artifacts/rig-fit-qualified-sanitize.log": "1428425b183422357f2d8237038189016a08c2ded72c590c536a77faf98386ba",
+    "artifacts/rig-fit-regression-release.log": "d71f076d05b01e8e7608a36e8fe29ccea5d321b8a5e61854bb3d7814e6674022",
+    "artifacts/rig-fit-regression-sanitize.log": "a31ad8564df39ed8a9dc288a762bbee694f73d25535543394a60c8424f764213",
+    "artifacts/rig-fit-render-arc.log": "7bbf254851eb81e64e8895220378818f59c54d6c7de93c45d41094f30ce9422d",
+    "artifacts/rig-fit-wayland-final.log": "ade88811c4a99b65f146f211a34954997288995d4dc6580162b8d4d6b6a8a393",
+    "artifacts/rig-fit-xr-first.log": "05106173bfa3a2abf907504c32b09c1567833ca11d4557ec5f7c33ef09e58b2b",
+    "artifacts/rig-fit-xr-first/report.json": "99982a27cf95997faa8c1513abd9eb0579af52328fdecbe7497fcedc184d7730",
+    "artifacts/wayland-rig-fit-final/report.json": "b95639eb58472ab6af3448c1ef3f8dd567f1cb20b47dd3f8a71847c03c872f82",
+    "build-rig-fit-release/CMakeFiles/dome-sculpt-core.dir/flags.make": "2b08e863c4240252d3444fad6bc99c13988f385556b6349ec42948dcef12bfc6",
+    "build-rig-fit-release/CMakeFiles/dome-sculpt-render.dir/flags.make": "394a5aca7c235a4f7e763485e2b8a44671a3608a33fc7680112637f5361c4702",
+    "build-rig-fit-release/CMakeFiles/dome-sculpt.dir/flags.make": "4cbe6459acfb9d3453f74ffdbddb7058717b6464451b6e80b501deadbaa95110",
+    "build-rig-fit-release/CMakeFiles/mikktspace-robust.dir/flags.make": "aa31d13db36156c76944eec4caf2227d308a4ba45da5cfa7f83b2a3d2ff2c835",
+    "build-rig-fit-release/CMakeFiles/mikktspace.dir/flags.make": "6dd22ca70f2c4dedf06f0646357d8b016249409b89adb0af7f83ccada08be13d",
+    "build-rig-fit-release/CMakeFiles/ufbx.dir/flags.make": "f51a9ff2b43af22f2065acf75ec244d83f28e12214722588b3cb64c15429e16f",
+    "build-rig-fit-release/CMakeFiles/xatlas.dir/flags.make": "c2126d708a423d960a6ebfdd5bc2b6ac3bbdcae462e880d8a4b149df19ab902d",
+    "build-rig-fit-sanitize/CMakeFiles/dome-sculpt-core.dir/flags.make": "f01df378ebe5f7a9d047efd985013905a2786dae6fe5c6ba3b6096bd5d9ce0dc",
+    "build-rig-fit-sanitize/CMakeFiles/dome-sculpt-render.dir/flags.make": "f6168ce7c3327f2c466ce7acf94c19ff48f3aba0a4a43ad976fa97ff95970ab4",
+    "build-rig-fit-sanitize/CMakeFiles/dome-sculpt.dir/flags.make": "c20d3fb099a412e1f024597bb6a35ad54969eb71b06dd1d0d6f314f6b5d94716",
+    "build-rig-fit-sanitize/CMakeFiles/mikktspace-robust.dir/flags.make": "8a3ad3396612dbd2998ce82acc1d994282a7fd50f72faa23bd9b714bdb5fc439",
+    "build-rig-fit-sanitize/CMakeFiles/mikktspace.dir/flags.make": "52bd35cb67a0f2f753731fb33a69f6afa6077e52932ee0c2422e5ef7433f6c3f",
+    "build-rig-fit-sanitize/CMakeFiles/ufbx.dir/flags.make": "0f63363bf7f8efef192e1c5f04a9117849e49c76bacd83653de86178e4cfd7e1",
+    "build-rig-fit-sanitize/CMakeFiles/xatlas.dir/flags.make": "08f2f229a48aa16af61dfdec97838a226c94e6dcf3e0ae72c4b07ae4e5236a74"
+  }
+}

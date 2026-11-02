@@ -314,4 +314,21 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::raycast(Vec3 origin, Vec3 direct
   };
   return impl_->query.raycast(origin, direction, maximum, options);
 }
+
+std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding(Vec3 origin, Vec3 direction,
+    float maximum,double seconds,std::span<const uint64_t> excluded) const {
+  if(!std::isfinite(seconds))throw std::invalid_argument("Invalid visibility animation time");
+  SurfaceQueryOptions options;options.max_triangle_tests=65536;
+  options.ray_filter=[&](uint32_t triangle,const std::array<float,3> &bary) {
+    const size_t index=size_t(triangle)*3;
+    auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),index,
+      [](size_t value,const Visibility &surface){return value<surface.range.first;});
+    if(found==impl_->surfaces.begin())return false;
+    --found;
+    return index<found->range.first+found->range.count &&
+      std::find(excluded.begin(),excluded.end(),found->range.object)==excluded.end() &&
+      found->visible(impl_->query.mesh(),triangle,bary,direction,seconds);
+  };
+  return impl_->query.raycast(origin,direction,maximum,options);
+}
 } // namespace dome

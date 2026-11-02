@@ -91,6 +91,30 @@ int main(int argc,char **argv)try{
   check(asset.undo()&&asset.copy_scene().encode()==original,"View change adds no hidden history around the asset's exact single Undo");
  }
  {
+  auto png=Image{1,1,{255,0,0,255}}.png();const auto file=path.string()+"-projection.png";{std::ofstream out(file,std::ios::binary);out.write(reinterpret_cast<const char*>(png.data()),png.size());}
+  auto load=[&](Document &d){ProjectionCamera c;c.pose.position={-.3f,0,2};c.width=c.height=2;d.load_projection_image(file,c);if(!d.wait_projection_image()||!d.frame().state->projection->image)throw std::runtime_error("Real projection image did not load");};
+  auto stroke=[&](Document &d){if(!d.begin_native_stroke())throw std::runtime_error("Projection role stroke admission failed");NativeStrokeSample s;s.origin={-.3f,0,1};s.direction={0,0,-1};s.brush.radius=.18f;s.brush.blend=0;d.sample_native_stroke(s);d.end_native_stroke(true);if(!d.wait_native_stroke()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error("Projection role stroke failed");};
+  for(bool pbr:{false,true}){
+   Document d;d.replace(scene);ready(d);load(d);if(pbr){d.shading(false);ready(d);}stroke(d);const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];check((coverage>200)==pbr,"Active projected target query captures the actual authored/PBR alpha role");
+  }
+  for(bool cached:{false,true})for(bool pbr:{false,true}){
+   auto occluded=scene;occluded.active().transform.position.z=.5f;auto id=occluded.add("Plain projected target",Volume{});auto &target=occluded.object(id);target.mesh_active=true;target.painted=std::make_shared<PaintedMesh>(quad(),64);occluded.select(id);Document d;d.replace(occluded);ready(d);if(cached){d.configure_object_grab(true,false);ready(d);}load(d);if(pbr){d.shading(false);ready(d);}check(bool(d.frame().surface->picking)==cached,"Actual projection test exercises both immutable picking cache and fallback query construction");stroke(d);const auto coverage=d.copy_scene().active().painted->pixel(1,19,32).data[9];check((coverage>200)==!pbr,"Other-object projected occlusion captures the actual immutable authored/PBR alpha role");
+  }
+  Document placed;placed.replace(scene);ready(placed);load(placed);placed.projection_action(SpatialCommand::ProjectionPlace);const auto before=placed.copy_scene().encode();check(placed.frame().state->projection->placing&&!placed.frame().state->can_preview&&rejects([&]{placed.shading(false);})&&!placed.frame().state->pbr_view,"Physical projector placement owns its gesture and blocks preview changes atomically");placed.projection_action(SpatialCommand::ProjectionPlace);check(!placed.frame().state->projection->placing&&placed.frame().state->can_preview&&placed.copy_scene().encode()==before,"Finishing placement restores material preview availability without source mutation");
+ }
+ {
+  Document fitting;fitting.replace(scene);ready(fitting);fitting.begin_rig_fit();
+  const auto draft=fitting.frame().state->rig_fit;const auto source=fitting.copy_scene().encode();const auto revision=fitting.frame().state->revision;
+  fitting.shading(false);ready(fitting);
+  check(fitting.frame().state->rig_fit==draft&&fitting.frame().state->revision==revision&&fitting.frame().state->pbr_view,"Idle rig-fitting draft retains its exact source lease across a real PBR view change");
+  fitting.rig_fit_action(SpatialCommand::RigFitPlace);
+  check(fitting.frame().state->rig_fit->placing&&!fitting.frame().state->can_preview&&rejects([&]{fitting.authored_shading();})&&fitting.frame().state->pbr_view,"Physical landmark placement owns its gesture and rejects preview changes atomically");
+  fitting.rig_fit_action(SpatialCommand::RigFitPlace);
+  check(!fitting.frame().state->rig_fit->placing&&fitting.frame().state->can_preview,"Ending actual landmark placement restores preview availability");
+  fitting.cancel_rig_fit();fitting.authored_shading();ready(fitting);
+  check(!fitting.frame().state->rig_fit&&fitting.copy_scene().encode()==source&&!fitting.frame().state->can_undo,"Rig-fit cancellation and authored preview restoration preserve the complete source without hidden history");
+ }
+ {
   Document raced;raced.replace(scene);ready(raced);auto gate=std::make_shared<AssetGate>();AssetRelease release{gate};mesh_gate=gate;
   raced.shading(false);gate->wait();raced.authored_shading();
   check(!raced.wait_mesh(std::chrono::milliseconds(10)),"A previous mesh endpoint cannot satisfy a newer view request while the real worker is gated");

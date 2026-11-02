@@ -292,6 +292,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       if(coordinates==mesh.uv)coordinate=0;
       else if(attributes.contains("TEXCOORD_1")&&coordinates==emitted_uv1)coordinate=1;
       else if(!frame->normal_coordinates.empty()&&coordinates==frame->normal_coordinates)coordinate=retained_normal_sets.back();
+      else if(auto found=std::find_if(emitted_extra_uv.begin(),emitted_extra_uv.end(),[&](const auto &entry){return entry.second==coordinates;});found!=emitted_extra_uv.end())coordinate=found->first;
       else {
         coordinate=1;while(coordinate<8&&attributes.contains("TEXCOORD_"+std::to_string(coordinate)))++coordinate;
         if(coordinate==8)throw std::length_error("Paint export has no free glTF coordinate domain");

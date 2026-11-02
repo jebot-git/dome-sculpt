@@ -1,0 +1,152 @@
+{
+  "private_checkpoint": true,
+  "product_base": "65b0ae9",
+  "runtime_changes": false,
+  "source_runtime_frozen_at": "c9cff1c",
+  "sanitizer_binary_sha256": "3c28156ef5552c056b74bb7a2013fd379fd4088495e688096ce58e3fa560386c",
+  "original_run": {
+    "passed": 42,
+    "registered": 44,
+    "seconds": 7629.84,
+    "exit_code": 8,
+    "timeouts": [
+      "current-color-target-precommit-6-faults",
+      "current-color-target-precommit-7-faults"
+    ],
+    "timeout_seconds": 600,
+    "log": "/home/blux/de-xr/dome-sculpt/artifacts/current-color-target-bake-3042a86/artifacts/tests-target20-faults-san.log",
+    "sha256": "1925905ce50ec562dc1a0d448369cff07eb3f2b90aa920e4461492b38b011c9d",
+    "source_binary_and_registration_unchanged": true
+  },
+  "completion": {
+    "scope": "Timeout-only range completion with the same immutable binary and actual full helper per fault",
+    "binary": "/home/blux/de-xr/dome-sculpt/artifacts/current-color-target-bake-3042a86/build-san/dome-sculpt-current-color-target-faults-test",
+    "binary_sha256": "3c28156ef5552c056b74bb7a2013fd379fd4088495e688096ce58e3fa560386c",
+    "cases": [
+      {
+        "shard": 12,
+        "count": 16,
+        "range": [
+          7117,
+          7709
+        ],
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/current-color-target-bake-3042a86/build-san/dome-sculpt-current-color-target-faults-test",
+          "precommit",
+          "12",
+          "16"
+        ],
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/target20-san-budget-65b0ae9/artifacts/precommit-repair/precommit-12-of16.log",
+        "sha256": "2c3ed96bdb2b935d404b9bd25f75da63473e9b368de266d5a3811bf9ee76451d"
+      },
+      {
+        "shard": 13,
+        "count": 16,
+        "range": [
+          7710,
+          8302
+        ],
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/current-color-target-bake-3042a86/build-san/dome-sculpt-current-color-target-faults-test",
+          "precommit",
+          "13",
+          "16"
+        ],
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/target20-san-budget-65b0ae9/artifacts/precommit-repair/precommit-13-of16.log",
+        "sha256": "c7f611d5ea5e158f5e8cd20e401ca277266ea563f613f100e575ae83ed0b2d2a"
+      },
+      {
+        "shard": 14,
+        "count": 16,
+        "range": [
+          8303,
+          8895
+        ],
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/current-color-target-bake-3042a86/build-san/dome-sculpt-current-color-target-faults-test",
+          "precommit",
+          "14",
+          "16"
+        ],
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/target20-san-budget-65b0ae9/artifacts/precommit-repair/precommit-14-of16.log",
+        "sha256": "4c7991a69e5199e42aecde90c23335ac52220146dfcb724a53e26f684ad041a3"
+      },
+      {
+        "shard": 15,
+        "count": 16,
+        "range": [
+          8896,
+          9488
+        ],
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/current-color-target-bake-3042a86/build-san/dome-sculpt-current-color-target-faults-test",
+          "precommit",
+          "15",
+          "16"
+        ],
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/target20-san-budget-65b0ae9/artifacts/precommit-repair/precommit-15-of16.log",
+        "sha256": "a9d67370386719f9c6c1fbdc24f3e12c53aec13af46cdf21c08e12db86e92edd"
+      }
+    ],
+    "boundaries": 2372,
+    "preparation_replay": false,
+    "original_44_run_unchanged": true
+  },
+  "unique_completed_boundaries": {
+    "packed": 4290,
+    "precommit": 9488,
+    "encode": 20669,
+    "decode": 17151,
+    "total": 51598,
+    "precommit_original_complete_range": [
+      1,
+      7116
+    ],
+    "precommit_timeout_completion_range": [
+      7117,
+      9488
+    ]
+  },
+  "checks": {
+    "asan": true,
+    "ubsan": true,
+    "leaks": true,
+    "actual_complete_helper_retry_every_denial": true,
+    "preparation_replay": false,
+    "assertions_removed": false,
+    "original_44_single_green_claim": false
+  },
+  "future_budget_only": {
+    "test_names": [
+      "current-color-target-precommit-6-faults",
+      "current-color-target-precommit-7-faults"
+    ],
+    "before": 600,
+    "after": 1200,
+    "ranges_changed": false,
+    "new_full_suite_run": false
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "681ce1b5612748696ca50068b8f9f001ca390e287f47a9d90cec0b5458acb50c",
+    "tests/target-precommit-budget.py": "7bf7957b93f027d61dc528888b3cf4ae6eab0deb00fef24bd7595054fa8bbcb8",
+    "docs/TARGET-COLOR-SAN-COMPLETION.md": "315f32dac8fa5bf41faab275c46c756125b1c5d2a32956fd7b00582c90f4d2e8"
+  },
+  "limitations": [
+    "Scoped old65 allocation-boundary completion; no latest-union/whole-project proof inferred",
+    "Original42/44 and both600s timeouts preserved; completion is four same-binary ranges",
+    "External system dependencies not claimed instrumented",
+    "Current colourUV23/newrawUV sources are separate and private; no guard lift or feature claim here"
+  ]
+}

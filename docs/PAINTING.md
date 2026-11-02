@@ -24,7 +24,7 @@ contribute. Base material values fill unpainted areas.
 XR Materials → Paint tools → Controls provides large sliders for brush RGBA,
 metalness, roughness, emission, mask value, flow, radius, layer opacity and layer
 order. The RGBA controls have a swatch and separate selectable rows. Preset
-colors remain available within Controls → Presets. A ray/trigger drag or held
+colors remain available within Controls → Image projection → Color presets. A ray/trigger drag or held
 thumbstick adjusts the same value; scalar vertical motion gives fine adjustment.
 The menu owner confirms with a joystick press, or either ray can click Done.
 A ray-clickable Cancel button permits dismissal entirely in headset.
@@ -44,8 +44,9 @@ exports embed composited PNGs and keep the same UVs. The project retains editabl
 layers rather than only flattened images. `--export-project input.dsculpt
 output.glb` exports a saved project without opening an editor.
 
-This is an initial layered painting implementation. Stencils, image projection,
-texture-set/UDIM workflows, normal/AO baking, paint transfer after remeshing,
+Native PNG image projection and stencils now connect the existing worker,
+FLTK and XR painting tools; see [IMAGE-PROJECTION.md](IMAGE-PROJECTION.md).
+Texture-set/UDIM workflows, normal/AO baking, paint transfer after remeshing,
 advanced seam re-unwrapping/stitching, production-scale acceleration, material import and full
 MToon are pending. Surface picking is a linear triangle scan; immutable surface
 maps and CPU compositing have explicit memory/resolution budgets. Physical

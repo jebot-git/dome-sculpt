@@ -33,7 +33,7 @@ bool Document::uv_paint_retention_available_locked() const {
     o.painted->normal_projection()&&o.painted->color_projection()&&o.polygon&&o.polygon->active&&o.polygon->colors&&
     b->color_preparation->receipt.source_field==SourceColorField::PolygonCorners&&
     b->color_preparation->current_descriptor()&&b->color_preparation->current_descriptor()->field==o.polygon->colors&&
-    (!o.painted->source_maps()||!o.painted->source_maps()->uv1);
+    (!o.painted->source_maps()||(!o.painted->source_maps()->uv1&&o.painted->source_maps()->extra_uv_sets.empty()));
 }
 bool Document::uv_retention_changes_locked() const {
   if(!uv_retention_requested_locked()||!control_before_)return false;

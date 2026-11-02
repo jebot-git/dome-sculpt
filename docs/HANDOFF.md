@@ -4,7 +4,429 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
-## Current desktop framing checkpoint — 2026-11-02
+## Additional queued phase — controller spatial drawers, 2026-11-02
+
+The user additionally requires controller-mounted spatial drawers: interactive
+trays for tools, functions and selections, with streamlined direct XR interaction
+that avoids repeated multi-level menu navigation. Implement this after the basic
+goal targets are met; foundation work remains first priority. REQUIREMENTS.md
+records the added acceptance row. Existing accepted selection/joystick menus are
+the baseline, not proof that drawers exist. The full goal stays active and no
+new physical test is authorized by this specification alone.
+
+## Current private continuation checkpoints — 2026-11-02
+
+Public main85bec2e was rechecked clean and equal to remote before continuing.
+Sparse interpolation source5ed4057 /metadata520e3db is now frozen/pushed, with
+Release1/1, whole-header/test SAN1/1 and actualA770 OneAPI2/2:4,380host exact
+words and889,116GPU results×4transactions. Dense packedCPU77.22ms versus
+GPU14.02–15.57ms including packing/validation is a component measurement, not
+whole-resolution speed. Tiny cases are slower; initial queue/JIT costs remain
+visible. Read GPU-SPARSE-RESAMPLE-WIP.md/.json. No before/after manifest was
+captured for that run; sealing-time hashes are scoped honestly.
+
+Separate actual-worker sourcec0fa331 /metadatad3e5261 now has fresh coherent
+production core/support CPU6/6 and actualA770 OneAPI5/5. Actual native layered/
+masked output is byte-identical1,152,784bytes across CPU/GPU; a link wrapper
+proves production dispatch and later-failure atomic refusal. Document history,
+Save/reopen, controller and progress checks pass. All1,142 captured source/
+binary hashes match. The small whole-job measurement77.11msCPU/213.28msOneAPI
+is slower on GPU, including initial queue/kernel overhead and concurrent user
+activity; dense interpolation benefit does not establish whole-job acceleration.
+Fresh whole-owned C/C++core/support ASan+UBSan/leaks5/5 passes35.83s, all1,144
+source/binary hashes unchanged. No new frontend qualification is implied. Read GPU-RESOLUTION-WORKER-WIP.md/.json.
+
+Initial CUDA compile fails on host constexpr reciprocal-array device access.
+Portable source2d17cb1 /metadata932b344 fixes the generator: CUDA sm86 and HIP
+gfx1030 entire backend TUs compile; standaloneR2/SAN2 and actualA770 OneAPI4
+pass exact arithmetic/sparse results,1,140 source/binary hashes unchanged.
+Linked minimal CUDA/HIP probes refuse missing devices with source cells exact;
+manual HIP link-invocation errors remain preserved separately. Read
+GPU-RESAMPLE-PORTABILITY-WIP.md/.json. No positive AMD/NVIDIA device claim.
+
+New sourcef01e04f adds detached-grid lifetime, actual missing-device Scene
+publication and repeated whole-job probes. Fresh canonical FLTK/OpenXR CPU
+build99131, OneAPI75547 and fresh whole-owned native SAN53391 are live in
+the portable child; no test/build pass is inferred. All source/header/test inputs stay frozen during their work.
+Current public runtime remains870aa6c; no GPU resolution runtime admission.
+
+Agents report paint24 preview600fe76 fully qualified software/Arc/SAN;
+export44380ef R/Arc passes, SAN3/4 plus a1200s graphics timeout remains distinct.
+Native KeepPaint09989a5 passes63native/controller,10normal+10compactFLTK and
+20loader checks; new independent normal seal targets a measured86ms deep replay
+and is unqualified. Source-rest2f06246 is frozen/pushed with native/GUI/SAN and
+independent geometry/export proof; typed VRM/rest/reparent child remains guarded.
+ExtraUV26 contiguous412a565 is frozen/pushed with R8/SAN8/Arc385 and valid
+gap-free GLBs; default readonly raw-import admission child is still being tested.
+These private components require semantic union, fresh coherent builds and
+complete workflow qualification before main integration. Full requirements and
+post-basic controller drawers remain required. No installation, new physical
+launch or active desktop/session restart occurred.
+
+## Private GPU sculpt-resolution precision prototype — 2026-11-02
+
+Root source63fb384 /metadata392c8dc in artifacts/sculpt-resample-gpu-f973732
+is a separate numerical prototype. Production resample_sculpt remains its
+original CPU double path; this does not deliver a GPU resampling workload or
+complete any remaining accelerator row. The actual A770 has no nativeFP64.
+Pinned BSD3 SoftFloat3e provides integer-word nearest-even numeric binary64;
+regeneration matches checked-in bytes and all raw upstream hashes/license.
+
+Fresh standalone Release1/1, whole-header-test SAN1/1/leaks and OneAPI2/2 pass.
+Host1999168 exact arithmetic results plus499536random/7boundary integer casts;
+actualA770(native_fp64=0)1250000results×4 GPUtransactions match independent
+native reference exactly. Source/test/header/binary manifests unchanged.
+These UI/XR-disabled component builds are not whole app/core qualification.
+Arithmetic-only CPU1.13ms vswarmGPUcopy/kernel/readback2.56–2.75ms/cold250.71ms
+is not a speedup; no sparse-job benefit is claimed. Next implement/measure
+bounded sparse-field upload/lookup/query batching, compare full interpolation/
+layer/mask output against current CPU, then actual worker quality/cancel/history/
+Save and missing-device paths. CUDA/ROCm header/table device proof still needed.
+Read GPU-RESAMPLE-PRECISION-WIP.md/.json. No installation, physical launch or
+session restart; current public runtime remainsf973732.
+
+## Private native humanoid fitting workflow — 2026-11-02
+
+A new isolated component on49projection+portableadcb implements real native
+FLTK/XR landmark/finger/body-frame controls, exact world/group/affine presentation,
+worker skeleton fitting and binding for unskinned painting meshes, material/raw
+source/morph retention and oneUndo/Cancel/orderedSave. Read RIG-FITTING.md and
+validation/RIG-FITTING.json. Full source/grouped VRoid rest-fitting/reparent/bind
+transport remains required and guarded; Scene25 is reserved for its exact posed
+local matrices and acyclic first rig-source provenance. No Scene schema is added
+by the current unskinned workflow. This is not completion of the production goal.
+
+## Private image projection/stencil workflow component — 2026-11-02
+
+The isolated work/projection-paint-b197e37 component extends Scene20 with native
+PNG worker loading, FLTK/XR controls, GPU projector/stencil guide and evaluated
+world-space painting, including nested groups, pose/skin/morph, reflected/sheared
+and physically held transforms. It preserves original sources, exact one
+Undo/Cancel and accepted Save/restart. Image/tool state is ephemeral; no Scene
+schema is added. Read IMAGE-PROJECTION.md and validation/IMAGE-PROJECTION.json
+before integration; the full objective and deferred drawer phase remain active.
+
+The qualified graphics subset has 11 independent software/A770 checks, including
+zero second-eye and pose-only uploads, sRGB/linear and transparent-fringe
+sensitivity. Its initial exact A770 device-brand string false rejection is
+retained. Later busy Cancel changes are separately qualified: page25 exposes
+Cancel during PNG/browser work and the existing shared Cancel work command
+admits image loads. Controller neutral/held-trigger and stale-lease checks are
+explicit. All final counts and source scopes are in the component receipt.
+
+The bounded painter remains CPU based. No physical headset/device session,
+install, display-manager restart, suppression or toolkit fork occurred. The
+forthcoming authored/PBR preview branch must preserve per-range material policy
+in both target and scene projection visibility queries; do not mix old headers
+or label its private policy as already integrated.
+
+## Qualified current-colour target authoring integration — 2026-11-02
+
+Public merge8cfb53f is runtime/header/asset/third_party/CMake/test byte-identical
+to qualified277474f. Scene20/material6/polygon5 now combines actual current-corner RGBA target
+preparation/Bake with retained normalUV/artist keys, source Bake and mixed
+rigid/source VRM0 authoring. Runtime7566a8f has fresh optimized alltargets and a
+full368/368 Release pass2827.37s, plus separately added2/2 fixtures35.43s. Read
+SCENE20-AUTHORING-INTEGRATION.md and its receipt for exact hashes and scopes.
+
+Fresh owned C/C++core/support/renderer SAN initially51/52 native (one240.25s
+rigid-oracle timeout) has a samebinary direct424070-check pass254.51s, then a
+corrected registered rigid pass203.15s plus dual185/joint70 checks:3/3 in459.54s.
+Separate graphics7/7 pass1358.67s. Preserve initial51/52 plus3/3; no single54-suite
+or fully instrumented frontend claim. Arc761, nativeFLTK9+10+17+7, latestprivate
+DomeDWayland8 and actual-loader syntheticXR11 pass. Emitted170 Khronos0errors/
+1194unfiltered warnings and official71VRM0×15pinned schemas0errors pass.
+
+Component65's51598 unique persistent allocation boundaries are complete in both
+Release and ownedSAN. SAN's original42/44 pass has only precommit6/7 timeouts;
+four exact samebinary finer ranges cover all2372 affected boundaries. Initial
+7629.84s transcript and timeouts remain preserved, not relabelled44/44. The
+future budget-only policy gives just those two original shards1200 rather than
+600 seconds, without source/oracle/range changes.
+
+## Qualified accepted-authoring IO and desktop navigation — 2026-11-02
+
+Public merge`f8c38921e19d0091b83ee40368c1519ec28ab256` is runtime/header/asset/third_party/CMake/test
+byte-identical to qualified`7504ffe`.
+
+Frozen runtime0c6002b combines public Scene20, native3Dmouse/lifetime5e6de1d,
+commonSave62d4747 and portableUVSaveb265706; test-only0e623e7 corrects the
+obsolete pending-import Save exclusion and adds spatial Save/immediate Close.
+Read AUTHORING-IO-SPACENAV-INTEGRATION.md and its receipt for exact source,
+binary, build, test and component hashes. No new Scene21/22/23/24/25 fields.
+
+Fresh optimized alltargets and owned C/C++core/support/render/frontend builds
+pass. Full Release375 initially has373passes/two obsolete import Save-refusal
+assertions (4616.37s); corrected registered import2 plus strengthened authoring
+Save32 assertions pass3/3 Release/.13s and3/3 ownedSAN/.99s. Preserve the initial
+failures; this is not one375/375greenrun. Separate selected ownedSAN14/14 pass
+77.54s and font/GL desktop exit1/1 covers three paths plus14Canvas assertions.
+Actual production FLTK navigation26Release+26SAN, latestprivateDomeDWayland11,
+and native App acceptedSave→Ctrl+W→independentreader7Release+7SAN pass.
+
+Both Release and ownedSAN complete all9795 actual post-Bake endpoint/publication
+allocation denials in frozen62 component, with full-helper retries and exact
+source/history/content/file preservation. This is not a combined9795 rerun.
+Accepted Saves own immutable committed endpoints, propagate original failures,
+and drain on Close; UV and shared spatial Save use the common mechanism.
+Physical3Dmouse and headset production acceptance remain required. Inherited
+Wayland shared-EGL and standaloneXR Mesa allocation reports remain unresolved;
+no toolkit fork/suppression, new system install or session restart occurred.
+
+Contracts' raw current-corner UV witness/transfer57c1c42 (runtimeaec07c2) has36 native plus19/19
+Release/SAN suites,13758 real whole-helper denials; prepared Scene23 and actual
+UV/controller completion remain private/unfinished. Palette native retained
+normal-sampling91c412c passes software and actualArc166 checks, including both
+full19-part VRoid avatars after fractional UV edits with sensitive normal/UV
+negatives; new-format export, UI admission and full runtimeSAN remain required.
+Scene21/22/23 are excluded from this Scene20 milestone.
+
+Docs' frozen5e6de1d native3Dmouse checkpoint has57native/27framing,26 actual FLTK
+Release+26SAN and11Wayland checks; latest desktopSAN and14Canvas-lifecycle
+assertions pass. Inherited Wayland
+shared-EGL and XR112-byte driver lifetime reports remain explicitly separate;
+no canonical-toolkit fork/suppression is authorized. Native image-projection/
+stencil Document/FLTK/XR now belongs to the composed checkpoint below, preserving
+monotone file/source leases, worker-only evaluated/world sampling, accepted Save
+and owned desktop-lifetime fixes without a new Scene schema.
+Controller drawers stay queued after basics. No new physical test, installation
+or desktop restart occurred; the accepted saved XR session remains preserved.
+
+## Qualified composed authoring checkpoint — 2026-11-02
+
+Public merge974ef42 is runtime/header/asset/third-party/CMake/test byte-identical
+to qualifiedcc3bf97, final metadata413ac65 in artifacts/basic-authoring-regressions-25fe208. This adds
+production input repair9684486 and test-only recovery retimecc3bf97 to frozen
+25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c in
+artifacts/basic-authoring-source20-7a4443e. Read BASIC-AUTHORING-INTEGRATION.md
+and its receipt for exact split scopes and source equality.
+Metadata-only11e2a55 imports the final paint-counter receipt;6ca11f3 records
+BASIC-AUTHORING-UNION-WIP.md. Source combines public7a4443e, image projection/
+modal repair649befe, portable real PBR preview618000b, initial unskinned rig
+fittingc18a010, paint counter78736d6 and native FBX adapter/fixturesd95e29e.
+No Scene21/22/23/24/25 data is admitted. Mixed fitting/preview gesture guards
+and four new assertions preserve idle fitting leases but fence placement.
+All source/header/test inputs remain frozen during qualification.
+
+Initial25fe has three fresh builds terminal0: CPU Release alltargets94973,
+owned C/C++core/support/render/frontend+selected fixtures26164 and pinned DPC++7.2
+OneAPI alltargets74603. CPU registers395, OneAPI396 (extra missingGPU gate).
+Combined ownSAN21/21 pass85.49s including123 PBR/mixed-fitting assertions; the
+separately added actual-avatar1/1 pass172.54s (111checks/18images). Actual Arc
+OneAPI compute/native9/9 pass13.87s:184analytic endpoints,224CPU-reference batches/
+445088samples,maxerror8.9407e-08 and explicit noGPU refusal. Compute GL stayed
+software; sycl-ls separately confirms level_zero:0A770 /:1UHD. StrictPCI03renderer
+254 checks pass123PBR+111avatar+11projection+9rigguide, exact input/binary freeze.
+Actual native FLTK normal-size PBR13/projection11/rig8 and compact PBR13/
+projection11/rig8 pass. Instrumented native projection11/rig8 and actual PBR15
+normal-close checks pass; the PBR test-only artifact driver closes both native
+Apps normally. Latest private DomeDWayland projection9+rig9 and actual-loader
+syntheticXR projection10+PBR10+rig11 pass in separate outputs. Current34 emitted
+GLBs pass pinned Khronos with0errors/354unfilteredwarnings; no all-future-output
+or physical-headset claim. Initial absent GUI build paths remain preserved.
+
+Initial full CPU Release39538150 is terminal8:392pass/3fail in4541.67s.
+Its frozen log/JUnit retain the obsolete page-count assertion, actual voxel
+mask-before-first-mesh input bug and old loader palette route. Production9684486
+scopes material epoch fencing to mesh sampling; its exact strengthened mask
+fixture first fails against the old archive with the real preview worker gated.
+Corrected fresh coherent optimized core/support/render/frontend and own C/C++SAN
+builds pass; targeted5/5 pass0.75s Release and5/5 pass3.67s SAN, retaining existing
+mesh stale/held-pressure guards. Native/core/frontend inputs and binaries stay
+unchanged through the final test-only runtime retimecc3bf97.
+
+Initial full-loader22752 has59checks then a missing test helper; coherent helper
+build75542 passes. Second48146 has138passes/Bluefailure because its retimed press
+hit the generic deliberate tracking-loss frame22. Test-onlycc3bf97 moves that
+press after recovered neutral input to24, preserving dropout and Blue oracle;
+isolated paint has48blue texels (>20). Final30315 passes1/1/150assertions in
+159.41s. Both initial negatives remain preserved. These split results are not
+one395/395greenrun; no fresh whole-OneAPI/current-Document or new physical claim.
+Read BASIC-AUTHORING-REGRESSION-FIX.md/.json and the original union receipt.
+No installation or session restart. Latest canonical EEE prefixes/DomeD d271cf6,
+unrelated dirt, saved accepted XR session and all private trees stay preserved.
+
+Root649 projection/modal composition has fresh Release23/23(57.39s), owned
+SAN20/20(44.90s), nativeFLTK11normal+11compact+11SAN, latestprivateWayland9 and
+strictA77011 checks, allterminal0. These remain separately scoped to649.
+Portable PBR618000b independently has Release8/8 plus separate projection-loader
+1/1, GUI13+13, Arc116+111/18images0; its full portable ownSAN is now part of the
+new union, not borrowed from older dc64. Initial fittingc18a010 retains its exact
+native/SAN/FLTK/Wayland/loader/Arc/import/export proof. Actual paint counter787's
+three noexcept swaps fix a reproduced firstUndo visible0/privatecap4 mismatch;
+Release2/2 and whole-ownedSAN2/2 pass, with78 actual history/cancel/scratch/
+Save/reopen assertions and the old failure preserved. Final receipt3d74da8.
+
+Native FBX bounded component is frozen d95e29e, final docs/GUI checkpoint26bf0aa,
+in artifacts/fbx-authoring-3a55c84 (review branch pushed). Fresh whole-owned core/
+support/render/frontend Release and SAN build; native2/2 plus selected11/11
+Release and11/11SAN pass. Actual9073 consumer/deformation assertions compare1152
+source-world vertices across5default+9edited poses;51 real worker read-barrier
+checks cover queuedSave, Cancel, replacement, retry and exact history.14emitted
+GLBs have0KHRerrors/12unfilteredwarnings. ActualFLTK skin14+morph14 in BOTH
+Release and ownSAN close normally. Read FBX-DEFORMATION-QUALIFICATION.md/.json
+in that component; this is not a complete FBX/attribute/unit-axis/device claim.
+Earlier wrong vertex-index, wrong GUI unit-control and label negatives remain.
+
+A separate bounded binding fix b603e0b, qualified metadata823fe61, is in
+artifacts/fbx-named-uv-26bf0aa. Texture UV names now resolve per actual mesh:
+shared original materials can bind UVMap at different indices, with matching
+normal tangents, canonical material variants and original resources retained.
+New captures use adapter4; no Scene/public ABI change. Exact final fixture's
+old-code negative is preserved. Fresh Release8/8(4.42s) and owned C/C++SAN8/8
+(8.51s) include six independent named-UV/tangent corners and actual native
+explicit-atlas Save/restart. Related actual FLTK skin14+morph14 pass in BOTH
+builds with normal teardown; these use genuine deformation inputs, not a new
+named-UV visual oracle. Fourteen current emitted GLBs have0KHRerrors/12warnings.
+Read FBX-NAMED-UV-WIP.md and its qualification receipt. Native direct multi-UV,
+UV2+, broader FBX and combined-main admission remain required.
+
+Public merge870aa6c has runtime/header/assets/third-party/CMake/tests byte-exact
+to current FBX qualified069ed9c (runtime/test source8a89787); only documentation conflicts needed
+resolution. Read CURRENT-FBX-BINDINGS-INTEGRATION.md and its receipt for public
+merge identity and byte equality. Import cpp is byte-identical to b603e0b and
+combined with the public132caef authoring application. No public ABI/Scene changes.
+
+Actual named-UV source/native512atlas/CorePBR/Save/restart/export37 checks pass
+software AND strictPCI03A770 with maxpixelerror1 against unchanged4-bound; exact
+source/binary manifests. New75genuine5inputs×5units×3axes cases pass37097 checks/
+5130 independently evaluated raw-unit skin/morph corners, native Save/restart
+and parsed GLB evaluation. These are default poses; prior edited-pose proof is
+separate. Current16/16 pass8.35s Release and16/16 pass18.45s whole-own C/C++SAN/
+leaks. Actual native Maya-skin14+Blender-morph14 pass in BOTH flags, all normal
+App/GL/font teardown. Current93positiveGLBs have0KHRerrors/57unfilteredwarnings.
+
+Both optimized alltarget builds are terminal0: CPU90629 registers398 tests,
+pinnedDPC++7.2 OneAPI14599 registers399. Actual current-source OneAPI15/15 pass
+13.87s:184analytic endpoints,224reference batches/445088samples,max8.9407e-08;
+explicit missingGPU refuses with host samples unchanged. Current sycl-ls confirms
+level_zero:0A770/:1UHD; GL stayed software for compute scope, separate from Arc37.
+No full398/399suite claim. The earlier public395 split result stays preserved.
+
+Initial graphics SegFault was a test-helper assumption that canonical FBX must
+have an index accessor. Valid nonindexed triangles now synthesize sequential
+corners. Exact helper-SAN null78, old binary and failed JUnit/log remain.
+Production archives/SANApp stay hash-exact through that test-only refinement.
+All123 component evidence hashes were rechecked before main publication.
+Native raw multi-UV/UV2+, broader FBX/normal/material/deformation semantics and
+all remaining full-goal rows stay required. No GPU jobs remain active; all leases
+released. Latest DomeD d271cf6 was rechecked against remote main, unrelated dirt
+preserved. No installation, physical launch or active-session restart occurred.
+
+Palette continues unadmitted normal21 export using actual PBR preview and an
+export-local independent coordinate stream; original-beforeUV typed colour/
+alpha sharp-boundary failures remain real pending Contracts' Scene24 independent
+paint domain. Do not widen bounds or borrow normal authority. Contracts owns
+Source24 geometry-only immutable corner basis/SurfaceMap/codec/consumer work;
+normal cheap/deep forwarding0fc00db is only for its private normal21 lineage.
+Docs owns full Scene25 exact pose-local matrices, first rig_source capsules and
+actual linked/source rig-rest transport. Native subset/codec/export proofs and
+existing-rig worker work are progressing; imported source-node/VRM guards remain.
+Current private agent checkpoints: Contracts' actual paint-domain authority has
+Release5/5+whole-ownedSAN5/5; material9 shared-pool codec sourcea52f62c/final977952b
+has Release4/4(4.12s)+whole-ownSAN4/4(58.78s),44 paired assertions. New Scene24
+root/shared/before-state-only capsule/CBOR Save/reopen/Restore source915ee5a/
+finald568c71 has55checks, R4/4+separate schema1/1 and full-ownSAN5/5(336.93s).
+Actual surface/paint12/query/shader consumers source600fe76 have complete Release
+core/render plus3/3(81.56s), graphical289/54posed-alpha images(67.77s): old real
+partial-Bake .7-scale/90-turn failure now has software before/current max0 and
+independent ORIGINAL-basis GLB max1, unchanged2/3 limits. ActualPCI03A770289 also
+passes: both54image groups max0, exact source/core/render/binary manifests.
+Hardware lease released. Preview600 still guards current-project export; the
+separate qualified exporter below is a later child. No publicScene24 admission.
+Range winding authority is explicitly coordinated with Palette. Preview600 ownSAN
+15551 is terminal0:3/3 in1208.32s (graphics289/54images998.73s), metadataaf8b9e8.
+Export44380ef separate child has fullRelease3/3(124.72s)/graphical414(103.96s)
+plus normal-domain-current99 separately1/1(3.78s), actual current-emitted54GLBs
+native/original/current image max1software andmax0strictArc; reflected/sheared
+winding and576-ray raw/packed alpha parity included. Arc82559 terminal0/source
+hashes exact; export ownSAN94501 still graphics-active with unchanged1200budget,
+so preserve any timeout rather than relabel. KeepPaint action is NEWchild: fresh
+header/FileJob fullcore/render/App+runtime build81287 terminal0; native/controller/
+queuedSave/Undo/cancel/retry63 and priornormal-document2/2 pass17.48s; FLTK10normal
+pass, compact3042 and real-loader47182 LIVE. No HMD/Wayland claim or publicScene24
+admission. Preserve exact source freezes and all prior negatives.
+Docs' private Scene25 bbb1792 remains qualified for its exact native rest-fitting
+subset. Source-rest continuation2f06246 is frozen/pushed, including the final
+rerun after DFS refinement: graph1672/plan184/Scene1806/
+actualDocument-controller63/export10 pass five Release suites39.61s and matching
+changed-TU+frozen instrumented-own-support SAN190.81s, headers byte-identical.
+Native FLTK9normal+9compact/d271Wayland9 pass; independentcgltf44430 ordered
+corners in each fitted/posed/restored output, maxWORLD3.01357e-7m;
+3KHRoutputs0errors57warnings. No full CMake/image/Arc/allocation claim. Real
+neutral-rigid Restore residual is fixed by explicit neutral-endpoint identity
+proof;1micrometre nonneutral sensitivity and original negative retained.
+Shared-pose-only/distinct-per-part/unbound/generated/joint-node rigid and typedVRM
+metadata remain required. New typedVRM child reuses original-node authority;
+primaryUniVRM efd20f6 (exact pinned record in agent source) distinguishes actual
+firstPerson head bone/erasure from offset point, Unity-vector H*C*H conjugation
+and collider attachment frames outside auto-recursed spring chains. Guards stay.
+
+Palette's private Source26 originalf615 foundation/SAN7 remains separate and includes preserved
+invalid sparse-GLB150error/89file receipt. New contiguous child corrects genuine
+full0..n arrays (no padding/relabel), preciseScene21/raw replay/min26/canonical
+pairing guards. Coherent native+XR build and Release8/8(9.12s), full ownC/C++SAN
+8/8(104.29s) include22closure and1772persistent add/decode prefixes; genuine90GLBs
+0KHRerrors60warnings. Actual strictPCI03A770 generated26+roles151+native54+
+stream55+compiler99 all385assertions pass10.79s; exactsource/core/render/native/
+binary manifests. GPUlease released. No raw import/painting guard lifted, no new
+actualFLTK/loader proof inferred; scoped foundation receipt preparing.
+No private Scene21+ data is admitted by current870aa6c. Do not rebase or mutate any live
+source/build inputs for integration. Every unfinished requirement stays active,
+including post-basic controller trays. No new physical launch, system install
+or active-session restart occurred.
+
+## Qualified rigid source avatar integration — 2026-11-02
+
+Public merge9ccddef is runtime/header/asset/third_party/CMake/test byte-identical to
+qualified4f79dbb. Productd5de43b combines17b0ff7 rigid/source avatars with the
+previous Scene19 authoring application. Harness-onlyb8000cd increases one native
+oracle's timeout240→600; no runtime/layout/archive fields change. Read
+RIGID-AUTHORING-INTEGRATION.md and its receipt before using the exact proof scopes.
+
+Fresh optimized alltargets completed after an external143 interruption and
+verified incremental resume. SelectedRelease67/67 pass438.93s. Owned C/C++core/
+support/render SANnative45/46 initially has only a240.21s timeout; samebinary
+424,070checks directly pass214.11s, then corrected registered1/1 passes255.37s.
+SeparateSANgraphics6/6 andfault6/6 pass1012.74/1364.03s. Preserve all initial logs;
+do not claim one46/46run or a newfull321suite. Arc404, active-unskinned22-part
+nativeFLTKexport7, latestprivateDomeDWayland8 and emitted105KHR0errors/1130warnings,
+official71VRM0×15pinned schemas0errors pass. No fresh physical test or install.
+
+The combined Scene20 qualification and current private work are recorded above.
+Preserve these older rigid-only proofs as separately scoped history.
+
+## Previous qualified authoring adapter checkpoint — 2026-11-02
+
+Product8d68dc7 extends the Scene19 baseline with retained post-UV prepared-key
+authoring, authenticated current-corner source Bake, original-space skinned VRM0
+export, stable desktop framing and atomic direct-caller Bake admission. Test-only
+9e6cb1b repairs the obsolete source-picker exclusion expectation and drives real
+native export chooser controls. No runtime/header/asset/third_party bytes differ
+from the coherent full-run product. Read AUTHORING-ADAPTER-INTEGRATION.md and
+validation/AUTHORING-ADAPTER-INTEGRATION.json for exact source/binary/hash scopes.
+
+Optimized alltargets build passed. Full Release317 finished2086.97s:316passes and
+one old expected exclusion, then corrected registered1/1Release+1/1ownedSAN
+(61native assertions). Preserve initialfailure; do not claim one317/317greenrun.
+Fresh owned C/C++core/support/render SANnative40+graphics5+fault6 all pass (with
+the corrected1 separately). Actual Arc355, native FLTK/Wayland81, current-source
+actual-loader syntheticXR11, emitted87 Khronos0errors/770unfilteredwarnings and
+53official VRM0×15hash-pinned schemas0errors also pass. No new HMD/install claim.
+Latest committed DomeD rechecked unchangedd271cf6; canonical EEE prefixes current.
+
+All858 source packing+4393precommit persistent failures and13,555reached of13,556
+measured post-UV key failures pass owned sanitizers and full-helper retry. One
+cache-dependent key boundary is unreached; no generic input-thread OOM guarantee
+is inferred from directcaller Bake admission. Fractional actual-avatar UV scale
+still has a real quality refusal; only repeated integer-texel avatar UV/key
+workflows are qualified. Every incomplete REQUIREMENTS.md row remains required.
+
+The subsequent rigid and Scene20 integrations are now qualified as recorded above;
+the older pending-status snapshot is superseded. No physical launch or system
+installation is implied by these source checkpoints.
+
+## Previous desktop framing checkpoint — 2026-11-02
 
 Product3c491bf adds native Frame all(Home), Frame selection(Shift+F), stable orbit
 pivot and successful-import/source-model auto-fit, retaining F reset. Bounds
@@ -16,15 +438,23 @@ validation/DESKTOP-FRAMING.json; no new whole-suite/whole-core-SAN or physical
 headset claim is inferred. Earlier VRM11/atlas12 import proofs and the complete
 avatar screenshot are separately scoped.
 
-Root private artifacts/authoring-adapters-04d at7e36278 merges qualified
-b0cdeb5 post-UV keys, b186b9e current-color source Bake, a799211 source-space
-VRM0 export and this framing code. It is unqualified; its fresh build is HELD
-until the isolated BakeAdmission fix is ready. The existing Bake path has a
-second fallible publication after job acceptance; merge_contracts is staging its
-POD controls in the existing Transaction on a separate04d child. No rootqueue
-edit overlaps that fix. Do not publish the new Bake union before qualification.
+The combined8d authoring source described above has now qualified; its optimized
+build54024 and owned sanitizer build37641 are terminal0. Its initial Release317
+and corrected registered1/1 scopes remain separate. The frozen binary, source,
+receipts and initial negative logs are preserved. Public merge0833f73 has exactly
+the same runtime/header/asset/third_party/CMake/test bytes as qualified6826892;
+this merge introduces no new runtime behavior. Current private work is listed
+in the qualified checkpoint above; Scene20/21/22 are excluded from this release.
 
-Agents continue: Contracts target20/material6/polygon5; Palette retained intrinsic
+BakeAdmission80e21a6 removes a second fallible publication after queue acceptance.
+Its old04d negative fails at caller allocation91/110 with an accepted queued job;
+the fixed direct caller passes all90 actual denials and same-controller retries,
+Release3/SAN3. It stages only POD Bake controls inside the existing Transaction,
+with no new Document/FileJob fields or generic callback. Generic input-thread
+publication echo faults remain separately scoped. Preserve the frozen04d
+archive/header tree and all old/fixed proof logs.
+
+At that framing checkpoint agents continued: Contracts target20/material6/polygon5; Palette retained intrinsic
 normal-domain Scene21/material7/normalentry3 (actual integer-UV avatar key proof
 dd2314 is test-only; arbitrary .95 scale remains a real quality refusal); Docs
 mixed rigid/source-pose VRM export in a separate a799 child. Scene22 is reserved
@@ -55,7 +485,7 @@ The published merge changes no product source/header/asset/runtime bytes from
 full-run source9081677. Record298/298 plus new1/1, not one single299-suite run.
 No physical headset launch, system install or active-session restart occurred.
 
-Immediate follow-ups:
+Historical follow-ups at that checkpoint:
 - Root: desktop framing is qualified above; next qualify the authoring-adapter
   union after transactional Bake admission is repaired.
 - merge_contracts: frozen source Bake b186b9e has actual native49, Release and
@@ -373,3 +803,25 @@ mismatch; root is isolating it in `artifacts/paint-export-samplers-78a1034` befo
 final UV1 pipeline publication. The editable-atlas import prototype is separate
 at `artifacts/uv1-editable-import-2e7d4a0`; native/controller/FLTK and worker GLB
 resource checks pass, while visual export/quality qualification is unfinished.
+
+## Private native desktop 3D-mouse component
+
+The work/desktop-spacenav-8d68dc7 component extends the existing FLTK App with
+nonblocking native spacenav Unix input, six-axis elapsed-time camera navigation,
+View toggle/options, frame buttons, and focus/modal/gesture/reconnect fences.
+It changes no Document/Scene layouts or authoring archives. Real socket and
+native UI fixtures cover camera motion, option Apply/Cancel, exact saved data,
+post-navigation paint/Undo/Redo and clean window closure. See
+DESKTOP-SPACENAV.md and validation/DESKTOP-SPACENAV.json for exact final scope.
+Physical device/daemon acceptance remains required.
+
+The same qualification fixes inherited process Fontconfig ownership and
+Canvas GL release before native Wayland hide. Desktop X11 scoped sanitizer
+checks are clean; standalone XR 112-byte and native Wayland 5,856-byte
+shared-backend allocation reports remain explicitly open. Canonical toolkit
+helpers are unchanged; no suppressions, system installation or HMD test.
+This private leaf is not a replacement for the production handoff or completion
+of the full goal. The next delegated basic task is native image projection /
+stencil painting through shared Document/desktop/XR workflows; its existing
+kernel alone is insufficient. Deferred controller drawers remain additional
+work after basic targets.

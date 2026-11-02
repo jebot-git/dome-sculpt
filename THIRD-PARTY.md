@@ -32,6 +32,9 @@ The original notices and licenses on reused source files remain in force.
 - ufbx 0.23.1: MIT (selected alternative A). The unmodified native C reader,
   header and complete upstream license notice are in `third_party/ufbx`. Source
   identity and hashes are in `third_party/sources.json`; no FBX SDK is linked.
+  The same pinned upstream's validation FBX files and complete license are under
+  `tests/data/ufbx-deformers`, with per-file Git blob and SHA256 provenance.
+  These are test inputs, not installed assets or additional humanoid bases.
 
 libpng and libjpeg are linked from the system for native image decoding/encoding;
 they are not vendored.
@@ -71,3 +74,5 @@ restricted VRoid presets and proprietary application code are not included.
   revision, exact references and tested packages are in `sources.json`. The BLAS/
   LAPACK implementation stays a system dependency; no backend/session setting
   is changed, and factorization is kept off per-frame rendering.
+
+FreeSpacenav legacy Unix input protocol conventions are reviewed from pinned libspnav (BSD-3-Clause); the independent C++ client has no libspnav runtime dependency. Notice: third_party/spacenav/NOTICE. Spacenavd source is inspected for producer cadence only. Exact commits and source hashes are in third_party/sources.json.

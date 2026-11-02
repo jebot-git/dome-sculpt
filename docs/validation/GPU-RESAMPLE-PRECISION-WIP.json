@@ -1,0 +1,145 @@
+{
+  "recorded_utc": "2026-11-02T20:44:07.455357+00:00",
+  "frozen_source": "63fb384ee947b2e18f23b35e47c22cd44e3fea17",
+  "qualification_tree": "artifacts/sculpt-resample-gpu-f973732",
+  "private_prototype": true,
+  "native_resampling_integrated": false,
+  "full_goal_complete": false,
+  "upstream": {
+    "upstream": "https://github.com/ucb-bar/berkeley-softfloat-3",
+    "commit": "0a5ad290c6b287f6605bb99a35ad0842c1e61aa5",
+    "release": "3e",
+    "license": "BSD-3-Clause",
+    "source_files": {
+      "f64_add.c": "edb05c732053d1107456c95b7f9b18e58a25546925d3ffafac27b5f263db0b2e",
+      "f64_sub.c": "6b581000e70e679e057d2ce17e0839aa5a7da6982685b9718b6540069441e689",
+      "f64_mul.c": "335137bca17d29eddb451f562869ca7327c5fe472f347d2e36c55e4c2219e79b",
+      "f64_div.c": "c44985b8084d6407fd3cd4043dbe02c2651721ac03d1c3920798fc1b75ea2f3e",
+      "i32_to_f64.c": "de334caa22edfcfc2a35572a2e858f0c500ad5018fc4335b46dfb003e0076183",
+      "s_addMagsF64.c": "2b4f69206b4e8d3fc26bc64ca147663530b68b53b0b0e7817c724e2d99376ec5",
+      "s_subMagsF64.c": "733f17b90486602ff6c67fa3d99166a841b03276c0fcc7da66751d1e8631f01f",
+      "s_roundPackToF64.c": "e549468a71417c8fefd927d582ec8481e2d6f595c406a4db5efff9b462f8e2c8",
+      "s_normRoundPackToF64.c": "4e65ccecf8ee96e2c5815575df3a0e4495ac82987a841868cb1d130556a3dd0a",
+      "s_normSubnormalF64Sig.c": "be1efe0196eacce551f117e58f5d2bc053a4a2897f37fa5805b23e7d4e00de95",
+      "s_mul64To128.c": "1cff12724898aaace69ba3d7301404ded67156ba13466aec4a25f1a3cbb9564d",
+      "s_approxRecip32_1.c": "38e984f9c6ea5843216ba73d08fafd217b285badce557bc9eb58227acc3667ea",
+      "s_approxRecip_1Ks.c": "a073abc2d5e7a4dfd97f323027d1ef1d370225aa922ae2395398ff3c7c8e9633",
+      "s_shiftRightJam64.c": "ea54abfce241315f78b69893f6d7b20ab767e5fe8ade6b107245d8dc0745630f",
+      "8086-SSE/s_propagateNaNF64UI.c": "e3584b53c927e73a18457654125a558c58501ad7cc1de9bd3c6db75e06c190aa"
+    },
+    "adaptation": "Generated C++ header, opaque uint64 float64_t, fixed nearest-even numeric results, no floating environment flags; no native double arithmetic on device."
+  },
+  "generator_byte_reproduction": {
+    "source": "63fb384",
+    "generated_byte_exact": true,
+    "sha256": "13bd007ccad3bddae634fbba8cd4fbef08596498bf6b830caca01acf3b5b1fef",
+    "pinned_upstream_inputs_verified_by_generator": true
+  },
+  "coherent_component_only_builds": {
+    "UI": false,
+    "XR": false,
+    "production_core_or_frontend_claim": false,
+    "Release_target_exit": 0,
+    "whole_header_test_ASAN_UBSAN_exit": 0,
+    "OneAPI_target_exit": 0
+  },
+  "registered": {
+    "Release": {
+      "tests": 1,
+      "failed": 0
+    },
+    "SAN": {
+      "tests": 1,
+      "failed": 0,
+      "leaks_enabled": true
+    },
+    "OneAPI": {
+      "tests": 2,
+      "failed": 0
+    }
+  },
+  "host_checks": {
+    "binary64_numeric_results": 1999168,
+    "random_signed_integer_conversions": 499536,
+    "extra_boundary_integer_conversions": 7,
+    "IEEE_edges_include_signed_zero_subnormal_max_and_cancellation": true,
+    "reference": "Native volatile double operations, nearest-even, ffp-contract=off",
+    "NaN_result_payloads_compared_by_class": true,
+    "floating_environment_flags_not_modeled": true
+  },
+  "actual_Arc": {
+    "source": "63fb384",
+    "returncode": 0,
+    "unchanged": true,
+    "device": "327: DEVICE Intel(R) Arc(TM) A770 Graphics native_fp64=0",
+    "strict_A770": true,
+    "native_fp64_absent": true,
+    "gpu_exact_1250000_x4": true,
+    "timing_lines": [
+      "327: NATIVE_CPU_ARITHMETIC_MS 1.12883",
+      "327: GPU_COPY_KERNEL_READBACK_MS iteration=0 value=250.707",
+      "327: GPU_COPY_KERNEL_READBACK_MS iteration=1 value=2.63505",
+      "327: GPU_COPY_KERNEL_READBACK_MS iteration=2 value=2.56505",
+      "327: GPU_COPY_KERNEL_READBACK_MS iteration=3 value=2.7544"
+    ]
+  },
+  "performance_scope": "Arithmetic only, not sparse lookups, complete Volume resampling or quality checks; no speedup/admission claim",
+  "remaining": [
+    "Implement bounded immutable sparse-field GPU lookup and query batching",
+    "Compare exact full interpolation results and mask/layer output against current CPU formula on real volumes, adversarial coordinates and cancellation/errors",
+    "Measure full cold/warm sparse-job cost, uploads/readback and persistent memory; decide viable workloads from actual evidence",
+    "Integrate actual resolution worker with existing quality/topology checks, history/cancel/orderedSave and explicit missing-GPU failure",
+    "Compile/qualify CUDA/ROCm device header/table usage; no such proof currently",
+    "All other REQUIREMENTS rows and post-basic controller drawers remain active"
+  ],
+  "no_install": true,
+  "no_physical_test": true,
+  "no_session_restart": true,
+  "hashes": {
+    "CMakeLists.txt": "e4d3e4731c80373e21542e0324822c228b4f632275cf15279c7250c0ae867e4b",
+    "artifacts/build-softfloat-final-oneapi.log": "33091fb22912264944d5cabd0284a99c7fefb356e95e7ba99bc741d462b5256a",
+    "artifacts/build-softfloat-final-release.log": "33091fb22912264944d5cabd0284a99c7fefb356e95e7ba99bc741d462b5256a",
+    "artifacts/build-softfloat-final-sanitize.log": "33091fb22912264944d5cabd0284a99c7fefb356e95e7ba99bc741d462b5256a",
+    "artifacts/configure-softfloat-oneapi.log": "f36bd6ff3ac8beba55648b74f0a2d2dcabb4ada84073437bf797f851d8515bff",
+    "artifacts/configure-softfloat-release.log": "110322d9d0eab002225faf58fc9566e131a8a90cad1f426db49bf8b9b17823b7",
+    "artifacts/configure-softfloat-sanitize.log": "197547d7c0c7aad1356434b4de66a304e30f51a95e74f21cdd74b689e01ec1c6",
+    "artifacts/softfloat-final-arc/after.json": "647eb4958cbc02bf26fb07b7321dfad838f70ed40e96aadf705071cc242a86a5",
+    "artifacts/softfloat-final-arc/before.json": "647eb4958cbc02bf26fb07b7321dfad838f70ed40e96aadf705071cc242a86a5",
+    "artifacts/softfloat-final-arc/console.log": "5a56c3ef500ccf2019112a5b3c060d249f0a107cd7d96b5cb1b71a512d36ae20",
+    "artifacts/softfloat-final-arc/ctest.log": "5a56c3ef500ccf2019112a5b3c060d249f0a107cd7d96b5cb1b71a512d36ae20",
+    "artifacts/softfloat-final-arc/result.json": "067ed6348ef636851ae5fce72da5ddf58c0f1fec76d5878795a68fd10dbb07f0",
+    "artifacts/softfloat-reproduction.json": "48614998b2d601a8514801965b814148f2e29b2e7a6c6d32007aa706d29ea9c3",
+    "artifacts/tests-softfloat-final-release.log": "675d3eed92f6ae1f118e8bfda3aa65ebaa2b413fa6f4464a19e01cdebfeb750e",
+    "artifacts/tests-softfloat-final-sanitize.log": "e54b79bc570427d3551c4c15fae5f3a733841f94e04c5c3a1c70b1f61e5e3b02",
+    "build-oneapi/CMakeCache.txt": "5c1fcb0a00c8a9ffdd896d890b9f545fad0a78a64f3a97007f9fdcdd5054a9f5",
+    "build-oneapi/artifacts-softfloat-final-oneapi.xml": "266e37d8c1e466d68c62ca3f16df6d884345aec812e954e505cfc11600e7940b",
+    "build-oneapi/dome-sculpt-softfloat64-test": "994aca7f6a431879e7750ccb26c20d9d2ac469d11a0fc3576faf49415a51284d",
+    "build-sanitize/CMakeCache.txt": "50b6b6d3ab226dd013e7c58ca7315bab1fa718bcd0716f42de357834474df108",
+    "build-sanitize/artifacts-softfloat-final-sanitize.xml": "5a95d39552d8d03442db34edae0b3b620e07e8f6c2a7cd0ab6401a4d6d8fb015",
+    "build-sanitize/dome-sculpt-softfloat64-test": "9572c6160fcf061c0042a78df0cfd3c384ce4fb3458619d71d63f0598d3cf5b8",
+    "build/CMakeCache.txt": "6fe0e7f64ace78e6ea18358a9365200cb461240cc6f183aac2d921f24d76962c",
+    "build/artifacts-softfloat-final-release.xml": "70bc60800ef79defc85b2cbe17047f77ac184f33790f9f4e6f955effd273a18d",
+    "build/dome-sculpt-softfloat64-test": "7e636ef0a49cdb99b3285a3b5b66ca057e5d995d03a2cb6b51dc134505bde923",
+    "tests/softfloat64.cpp": "1c113122023f7aea7432181b5e48fd97cfa26b03f8650bab5ffb7e6ed7162802",
+    "third_party/softfloat/COPYING.txt": "145ea96b4a4a04a1a7738d2a2bf9e830f861971e69606187b018d9e8fc0b95c7",
+    "third_party/softfloat/SOURCES.json": "fcf9034355392c4b7a4985f865e8d96c8c94546c91dad79c47b685d1532dc469",
+    "third_party/softfloat/dome_f64.hpp": "13bd007ccad3bddae634fbba8cd4fbef08596498bf6b830caca01acf3b5b1fef",
+    "third_party/softfloat/source/8086-SSE/s_propagateNaNF64UI.c": "e3584b53c927e73a18457654125a558c58501ad7cc1de9bd3c6db75e06c190aa",
+    "third_party/softfloat/source/f64_add.c": "edb05c732053d1107456c95b7f9b18e58a25546925d3ffafac27b5f263db0b2e",
+    "third_party/softfloat/source/f64_div.c": "c44985b8084d6407fd3cd4043dbe02c2651721ac03d1c3920798fc1b75ea2f3e",
+    "third_party/softfloat/source/f64_mul.c": "335137bca17d29eddb451f562869ca7327c5fe472f347d2e36c55e4c2219e79b",
+    "third_party/softfloat/source/f64_sub.c": "6b581000e70e679e057d2ce17e0839aa5a7da6982685b9718b6540069441e689",
+    "third_party/softfloat/source/i32_to_f64.c": "de334caa22edfcfc2a35572a2e858f0c500ad5018fc4335b46dfb003e0076183",
+    "third_party/softfloat/source/s_addMagsF64.c": "2b4f69206b4e8d3fc26bc64ca147663530b68b53b0b0e7817c724e2d99376ec5",
+    "third_party/softfloat/source/s_approxRecip32_1.c": "38e984f9c6ea5843216ba73d08fafd217b285badce557bc9eb58227acc3667ea",
+    "third_party/softfloat/source/s_approxRecip_1Ks.c": "a073abc2d5e7a4dfd97f323027d1ef1d370225aa922ae2395398ff3c7c8e9633",
+    "third_party/softfloat/source/s_mul64To128.c": "1cff12724898aaace69ba3d7301404ded67156ba13466aec4a25f1a3cbb9564d",
+    "third_party/softfloat/source/s_normRoundPackToF64.c": "4e65ccecf8ee96e2c5815575df3a0e4495ac82987a841868cb1d130556a3dd0a",
+    "third_party/softfloat/source/s_normSubnormalF64Sig.c": "be1efe0196eacce551f117e58f5d2bc053a4a2897f37fa5805b23e7d4e00de95",
+    "third_party/softfloat/source/s_roundPackToF64.c": "e549468a71417c8fefd927d582ec8481e2d6f595c406a4db5efff9b462f8e2c8",
+    "third_party/softfloat/source/s_shiftRightJam64.c": "ea54abfce241315f78b69893f6d7b20ab767e5fe8ade6b107245d8dc0745630f",
+    "third_party/softfloat/source/s_subMagsF64.c": "733f17b90486602ff6c67fa3d99166a841b03276c0fcc7da66751d1e8631f01f",
+    "third_party/sources.json": "12942d739e12d2a12c52d29142756e774a1e3b5fa6748558c4b54b328ab2c365",
+    "tools/generate-softfloat-f64.py": "5e6dc906c4432aa762857eae060389709e2239cccbc7ba3ca3c017c1e59c0b54"
+  }
+}

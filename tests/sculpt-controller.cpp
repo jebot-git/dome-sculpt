@@ -3,6 +3,43 @@
 #include "sculpt-ui-values.hpp"
 #include <iostream>
 using namespace dome;
+namespace {
+struct MeshGate {
+  std::mutex mutex;
+  std::condition_variable changed;
+  bool entered = false, released = false;
+  void stop() {
+    std::unique_lock lock(mutex);
+    entered = true;
+    changed.notify_all();
+    changed.wait(lock, [&] { return released; });
+  }
+  void wait() {
+    std::unique_lock lock(mutex);
+    if (!changed.wait_for(lock, std::chrono::seconds(30), [&] { return entered; }))
+      throw std::runtime_error("First display mesh did not enter its barrier");
+  }
+  void release() {
+    std::lock_guard lock(mutex);
+    released = true;
+    changed.notify_all();
+  }
+};
+struct ReleaseMesh {
+  std::shared_ptr<MeshGate> gate;
+  ~ReleaseMesh() { gate->release(); }
+};
+std::atomic<std::shared_ptr<MeshGate>> mesh_gate;
+}
+extern "C" std::vector<ObjectSurface> surfaces_real(const Scene*, const std::function<bool()>&, const Scene::SculptMesher&)
+    asm("__real__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
+extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene*, const std::function<bool()>&, const Scene::SculptMesher&)
+    asm("__wrap__ZNK4dome5Scene16preview_surfacesERKSt8functionIFbvEERKS1_IFNS_4MeshEmRKNS_6VolumeEEE");
+extern "C" std::vector<ObjectSurface> surfaces_wrap(const Scene *scene, const std::function<bool()> &cancelled, const Scene::SculptMesher &mesher) {
+  auto result = surfaces_real(scene, cancelled, mesher);
+  if (auto gate = mesh_gate.exchange({})) gate->stop();
+  return result;
+}
 struct Driver {
   Document &doc;
   SpatialFrame frame;
@@ -81,7 +118,13 @@ struct Driver {
 };
 int main() try {
   auto require=[](bool value,const char *message) { if(!value)throw std::runtime_error(message); };
-  Document doc;doc.seed();doc.replace(doc.copy_volume());
+  Document doc;
+  auto gate = std::make_shared<MeshGate>();
+  ReleaseMesh release{gate};
+  mesh_gate = gate;
+  doc.seed();gate->wait();doc.replace(doc.copy_volume());
+  require(doc.frame().surface->view_epoch != doc.frame().state->view_epoch,
+          "Actual first display endpoint stays unpublished during voxel input");
   Driver hand(doc);
   auto masks=[&] { hand.open();hand.sector(8);hand.sector(11);hand.sector(11);require(doc.frame().state->menu_page==15,"Sculpt layers leads to mask page15"); };
   masks();hand.sector(6);
@@ -105,7 +148,9 @@ int main() try {
   hand.frame.hands[1].tracked.aimValid=false;
   hand.frame.hands[1].tracked.grip.position=ob::transform(doc.frame().state->canvas,{0,0,.22f});
   hand.send();hand.send(0,0,false,.8f);hand.send();
-  auto committed=doc.copy_volume().mask_values();require(!committed.empty(),"tracked mask pressure commits protection");
+  auto committed=doc.copy_volume().mask_values();require(!committed.empty(),"tracked mask pressure commits protection before first display publication");
+  gate->release();
+  require(doc.wait_mesh(), "Latest display mesh publishes after the voxel-mask stroke");
   hand.frame.hands[1].tracked.grip.position=ob::transform(doc.frame().state->canvas,{.13f,0,.18f});
   hand.send(0,0,false,.8f);hand.frame.focused=false;hand.send();
   require(doc.copy_volume().mask_values()==committed && !doc.frame().state->stroking,"focus loss rolls back held protection stroke");
