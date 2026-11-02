@@ -206,6 +206,9 @@ struct MeshSnapshot {
   std::vector<std::array<float,4>> source_tangents;
   uint64_t normal_frame_layout_builds=0; // Worker diagnostic, never native state.
   std::vector<std::array<float,4>> source_colors; // Linear RGBA, identity when absent.
+  // Scene21 static source sampling: xy PBR, zw MToon. Empty for ordinary
+  // geometry; packed through the exact retained-frame corner expansion.
+  std::vector<std::array<float,4>> normal_coordinates;
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0, edit_authority = 0;

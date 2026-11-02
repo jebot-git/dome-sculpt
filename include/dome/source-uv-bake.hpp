@@ -7,6 +7,8 @@
 #include <optional>
 namespace dome {
 struct SourceNormalUvReprojection;
+struct SourceNormalSampling;
+enum class SourceNormalUvMethod { Rasterize, RetainSource };
 struct SourceUvBakeOptions {
   // Zero preserves at least each original image's largest dimension and the
   // editable paint resolution. Nonzero is an explicit resampling choice.
@@ -22,6 +24,7 @@ struct SourceUvBakeOptions {
   size_t max_sample_operations = 256 * 1024 * 1024;
   std::function<bool()> cancelled;
   double max_normal_sample_error = .02;
+  SourceNormalUvMethod normal_sampling = SourceNormalUvMethod::Rasterize;
 };
 struct SourceUvBakeInput {
   std::shared_ptr<const PaintedMesh> paint;
@@ -65,6 +68,7 @@ struct SourceUvBakeResult {
   std::vector<std::string> diagnostics;
   std::shared_ptr<const DeformationState> original_deformation;
   std::shared_ptr<const SourceNormalUvReprojection> normal_reprojection;
+  std::shared_ptr<const SourceNormalSampling> normal_sampling;
 };
 // Pure bounded native worker operation. No file access, GL, source mutation,
 // automatic flattening or live-project installation. Rasterizes exact face

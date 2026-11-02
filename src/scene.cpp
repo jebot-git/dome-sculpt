@@ -2,6 +2,7 @@
 #include "dome/scene.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
+#include "dome/normal-sampling.hpp"
 #include "polygon-color-target.hpp"
 #include "dome/source-placement.hpp"
 #include "source-placement-archive.hpp"
@@ -178,6 +179,7 @@ void Scene::validate(bool deep_sources) const {
   std::map<uint64_t,uint64_t> retopology_sources;
   SourceMaterialArchive source_materials;
   detail::PolygonSceneArchive polygons;
+  NormalSamplingArchive retained_normal_domains;
   std::set<const PaintedMesh *> retained_paint;
   std::set<const CreatorSourceModel *> retained_models;
   auto retain_model=[&](const std::shared_ptr<const CreatorSourceModel> &model) {
@@ -214,7 +216,14 @@ void Scene::validate(bool deep_sources) const {
       for(const auto *slot:{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion})
         if(slot->image)source_images.add(slot->image);
     }
-    if(const auto &projection=paint->normal_projection()){projection->validate(paint->resolution());source_images.add(projection->pbr);source_images.add(projection->mtoon);}
+    if(const auto &projection=paint->normal_projection()){
+      projection->validate(paint->resolution());source_images.add(projection->pbr);source_images.add(projection->mtoon);
+      if(projection->sampling_domain){const auto &domain=projection->sampling_domain;
+        retained_normal_domains.add(domain);
+        source_images.add(domain->resolved_pbr);source_images.add(domain->resolved_mtoon);
+        if(domain->detail){source_images.add(domain->detail->pbr);source_images.add(domain->detail->mtoon);}
+      }
+    }
     texels+=size_t(paint->resolution())*paint->resolution();paint_bytes+=paint->storage_bytes();
     if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
     if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
@@ -365,7 +374,9 @@ void Scene::validate(bool deep_sources) const {
     if(origin_vertices>8'000'000)throw std::length_error("Normal preparation original geometry exceeds scene budget");
     if(p.original_deformation){deformation_entries+=p.original_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes pre-normal-preparation authority");}
     if(p.original_appearance)retain_appearance(*p.original_appearance,p.original_paint->mesh().positions.size());
-    if(p.uv_reprojection){const auto &u=*p.uv_reprojection;const bool fresh_uv=!retained_paint.contains(u.before_paint.get());retain_paint(u.before_paint,true);if(fresh_uv)origin_vertices+=u.before_paint->mesh().positions.size();if(origin_vertices>8'000'000)throw std::length_error("Normal UV retained geometry exceeds scene budget");if(u.before_deformation){deformation_entries+=u.before_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Normal UV retained deformation exceeds scene budget");}if(u.before_appearance)retain_appearance(*u.before_appearance,u.before_paint->mesh().positions.size());if(normal_uv_layouts.insert(u.layout.get()).second){auto bytes=u.layout->storage_bytes();if(bytes>128*1024*1024-normal_uv_layout_bytes)throw std::length_error("Normal UV layouts exceed scene budget");normal_uv_layout_bytes+=bytes;}}
+    auto retain_normal_before=[&](const auto &u){const bool fresh_uv=!retained_paint.contains(u.before_paint.get());retain_paint(u.before_paint,true);if(fresh_uv)origin_vertices+=u.before_paint->mesh().positions.size();if(origin_vertices>8'000'000)throw std::length_error("Normal UV retained geometry exceeds scene budget");if(u.before_deformation){deformation_entries+=u.before_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Normal UV retained deformation exceeds scene budget");}if(u.before_appearance)retain_appearance(*u.before_appearance,u.before_paint->mesh().positions.size());if(normal_uv_layouts.insert(u.layout.get()).second){auto bytes=u.layout->storage_bytes();if(bytes>128*1024*1024-normal_uv_layout_bytes)throw std::length_error("Normal UV layouts exceed scene budget");normal_uv_layout_bytes+=bytes;}};
+    if(p.uv_reprojection)retain_normal_before(*p.uv_reprojection);
+    if(p.sampling_domain)retain_normal_before(*p.sampling_domain);
   }
   retopology_acyclic(retopology_sources);
   object(active_);
@@ -391,6 +402,7 @@ nlohmann::json Scene::encode() const {
   CreatorAssetArchive source_models;
   SourceMaterialArchive source_materials;
   detail::PolygonSceneArchive polygons;
+  NormalSamplingArchive normal_domains;
   detail::SourcePlacementArchive placements;
   for(const auto &o:objects_){if(o.polygon)polygons.add(o.polygon,false);if(o.shape_source)polygons.add_origin(o.shape_source,false);}
   j["next_group_id"] = next_group_;
@@ -436,7 +448,7 @@ nlohmann::json Scene::encode() const {
            {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
          {"volume", o.volume->encode()},
          {"mesh_active", o.mesh_active},
-         {"painted", o.painted ? o.painted->encode(&source_images) : nlohmann::json(nullptr)},
+         {"painted", o.painted ? o.painted->encode(&source_images,feature_version>=21?&normal_domains:nullptr) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
                              ? o.deformation->encode(o.painted->mesh())
                              : nlohmann::json(nullptr)}});
@@ -451,10 +463,11 @@ nlohmann::json Scene::encode() const {
   }
   detail::PolygonColorArchive color_archive;
   const bool corner_prepared=feature_version>=20;
-  if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements,corner_prepared?&color_archive:nullptr);
-  if(extended)j["source_materials"]=source_materials.encode(source_images,source_models,corner_prepared?&color_archive:nullptr);
+  if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr);
+  if(extended)j["source_materials"]=source_materials.encode(source_images,source_models,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr);
   if(corner_prepared){auto records=color_archive.encode();j["polygon_sources"]["color_bases"]=std::move(records["color_bases"]);j["polygon_sources"]["color_fields"]=std::move(records["color_fields"]);}
   if(!placements.empty())j["affine_state"]=placements.encode(source_images,source_models);
+  if(feature_version>=21)j["normal_sampling"]=normal_domains.encode(source_images);
   j["source_images"] = source_images.encode();
   j["source_models"] = source_models.encode();
   return j;
@@ -471,7 +484,11 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>20)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>21)throw std::runtime_error("Unsupported scene version");
+  if(version==21&&(!j.contains("normal_sampling")||!j.contains("source_materials")||j.at("source_materials").at("version")!=7))
+    throw std::invalid_argument("Scene21 requires its owning retained normal sampling archive");
+  if(version<21&&(j.contains("normal_sampling")||(j.contains("source_materials")&&j.at("source_materials").at("version")==7)))
+    throw std::invalid_argument("Retained normal sampling requires Scene21");
   if(version==20&&(!j.contains("source_materials")||j.at("source_materials").at("version")!=6||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene20 requires explicit current corner preparation authority");
   if(version<20&&((j.contains("source_materials")&&j.at("source_materials").at("version")==6)||(j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==5)))throw std::invalid_argument("Current corner preparation requires Scene20");
   if(version==19&&(!j.contains("source_materials")||!j.at("source_materials").contains("version")||j.at("source_materials").at("version")!=5))throw std::invalid_argument("Scene19 requires material archive5 normal UV authority");
@@ -558,7 +575,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       budget.appearance(o.at("appearance"));
     }
     if(materials.contains("color_preparations"))for(const auto &p:materials.at("color_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));}
-    if(materials.contains("normal_preparations"))for(const auto &p:materials.at("normal_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));if(p.contains("uv_reprojection")){const auto &u=p.at("uv_reprojection");budget.deformation(u.at("deformation"),unsigned(version));budget.appearance(u.at("appearance"));}}
+    if(materials.contains("normal_preparations"))for(const auto &p:materials.at("normal_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));if(p.contains("uv_reprojection")){const auto &u=p.at("uv_reprojection");budget.deformation(u.at("deformation"),unsigned(version));budget.appearance(u.at("appearance"));}if(p.contains("sampling_domain")){const auto &u=p.at("sampling_domain");budget.deformation(u.at("deformation"),unsigned(version));budget.appearance(u.at("appearance"));}}
   } else {
     if (j.contains("polygon_sources"))
       throw std::invalid_argument("Polygon authority requires Scene12");
@@ -673,6 +690,7 @@ Scene Scene::decode(const nlohmann::json &j) {
         storage+=bytes.get_binary().size();
       }
       if(paint.contains("color_projection") && version<10)throw std::runtime_error("Prepared color projection requires scene10");
+      if(paint.contains("normal_projection")&&paint.at("normal_projection").at("version")==2&&version<21)throw std::invalid_argument("Retained normal field requires Scene21");
       if(paint.contains("normal_projection")&&version<15)throw std::invalid_argument("Prepared normal projection requires Scene15");
       if(paint.contains("baked")&&paint.at("baked").at("version")!=1){
         const auto &baked=paint.at("baked");const auto bv=baked.at("version").get<int>();
@@ -680,7 +698,8 @@ Scene Scene::decode(const nlohmann::json &j) {
           if(version<10||!baked.at("pbr_color").is_binary())throw std::runtime_error("Resolved baked PBR requires scene10");
           storage+=baked.at("pbr_color").get_binary().size();
         }
-        if(bv==3){if(version<15||!baked.at("mtoon_normal").is_binary())throw std::invalid_argument("Prepared baked normals require Scene15");storage+=baked.at("mtoon_normal").get_binary().size();}
+        if(bv==4&&version<21)throw std::invalid_argument("Retained normal detail requires Scene21");
+        if(bv==3||bv==4){if(version<15||!baked.at("mtoon_normal").is_binary())throw std::invalid_argument("Prepared baked normals require Scene15");storage+=baked.at("mtoon_normal").get_binary().size();}
         else if(bv!=2)throw std::invalid_argument("Unsupported retained baked payload");
       }
       if(pixels>16*1024*1024 || storage>256*1024*1024)
@@ -688,7 +707,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5) && (version<20 || materials.at("version")!=6)) ||
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5) && (version<20 || materials.at("version")!=6) && (version<21 || materials.at("version")!=7)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);
@@ -769,12 +788,14 @@ Scene Scene::decode(const nlohmann::json &j) {
   }
   detail::PolygonColorArchive color_archive;
   if(version>=20)color_archive=detail::PolygonColorArchive::decode(j.at("polygon_sources").at("color_bases"),j.at("polygon_sources").at("color_fields"));
+  NormalSamplingArchive normal_domains;
+  if(version>=21)normal_domains=NormalSamplingArchive::decode(j.at("normal_sampling"),source_images);
   SourceMaterialArchive source_materials;
-  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,version>=20?&color_archive:nullptr);
+  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,version>=20?&color_archive:nullptr,version>=21?&normal_domains:nullptr);
   detail::SourcePlacementArchive placements;
   if(j.contains("affine_state"))placements=detail::SourcePlacementArchive::decode(j.at("affine_state"),source_models);
   detail::PolygonSceneArchive polygons;
-  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,version>=20?&color_archive:nullptr);
+  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,version>=20?&color_archive:nullptr,version>=21?&normal_domains:nullptr);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -861,7 +882,7 @@ Scene Scene::decode(const nlohmann::json &j) {
           throw std::length_error("Scene paint-map budget exceeded");
         if (v.at("painted").contains("baked") && j.at("version") < 6 && !legacy_baked5)
           throw std::runtime_error("Baked textures require scene version 6");
-        o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr, polygon_fields && !v.at("polygon").is_null() && o.mesh_active);
+        o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr, polygon_fields && !v.at("polygon").is_null() && o.mesh_active,version>=21?&normal_domains:nullptr);
         paint_bytes += o.painted->storage_bytes();
         if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
       }
@@ -903,6 +924,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     result.objects_.push_back(std::move(o));
   }
   placements.require_reachable();
+  if(version>=21)normal_domains.require_reachable();
   for(const auto &o:result.objects_)if(std::max({detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get())})>unsigned(version))throw std::invalid_argument("Source sampling requires its actual scene feature version");
   result.validate();
   return result;

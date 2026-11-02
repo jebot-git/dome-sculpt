@@ -127,6 +127,8 @@ int main() try {
         a->resolved_pbr->rgba==leaf->resolved_pbr->rgba &&
         a->detail->coverage==leaf->detail->coverage && decoded.bytes()==leaf->storage_bytes(),
         "Geometry-only pool roundtrip preserves aliases, exact binary coordinates and normal detail metadata");
+  check(a->detail==decoded.detail_at(0),
+        "Leaf and baked-event references resolve the same durable detail identity");
   bool distinct_sampling=true;
   for(size_t face=0;face<2;++face)for(int i=0;i<=8;++i)for(int j=0;j<=8-i;++j){
     const double weights[]={i/8.,j/8.,1-(i+j)/8.};
@@ -139,13 +141,13 @@ int main() try {
         bilinear(*a->resolved_mtoon,actual[0],actual[1]);
   }
   check(distinct_sampling,"Distinct MToon affine coordinates retain outside-unit interpolation and clamp only at the independent image fetch");
-  auto broken=archive;broken["version"]=2;
+  auto broken=archive;broken["version"]=3;
   check(refuses([&]{NormalSamplingArchive::decode(broken,decoded_images);}),
         "Unknown pool versions explicitly refuse");
   broken=archive;broken["domains"][0]["version"]=2;
   check(refuses([&]{NormalSamplingArchive::decode(broken,decoded_images);}),
         "Unknown leaf versions explicitly refuse");
-  broken=archive;broken["domains"][0]["detail"]["interpretation"]="canonical-mikk";
+  broken=archive;broken["details"][0]["interpretation"]="canonical-mikk";
   check(refuses([&]{NormalSamplingArchive::decode(broken,decoded_images);}),
         "Captured prepared detail cannot silently reinterpret historical canonical pixels");
   broken=archive;broken["domains"][0]["coordinates"].get_binary()[0]=255;

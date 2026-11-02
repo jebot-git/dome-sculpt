@@ -38,8 +38,34 @@ nlohmann::json words(std::span<const uint32_t> values,
   }
   return nlohmann::json::binary(std::move(bytes));
 }
+size_t detail_bytes(const nlohmann::json &detail,const PaintImageArchive &image_pool) {
+  if (!detail.is_object() || detail.size()!=5 || integer(detail.at("version"),1)!=1 ||
+      !detail.at("interpretation").is_string() ||
+      detail.at("interpretation").get_ref<const std::string &>()!="prepared-attributes" ||
+      !detail.at("coverage").is_binary())
+    throw std::invalid_argument("Invalid retained normal detail authority");
+  const auto &pbr=image_pool.at(integer(detail.at("pbr"),UINT32_MAX));
+  const auto &toon=image_pool.at(integer(detail.at("mtoon"),UINT32_MAX));
+  const auto r=pbr->width;
+  if(r<64||r>2048||(r&(r-1))||detail.at("coverage").get_binary().size()!=size_t(r)*r)
+    throw std::invalid_argument("Invalid retained normal detail dimensions");
+  images(pbr,toon,r);return detail.at("coverage").get_binary().size();
+}
+std::shared_ptr<const NormalDetailAuthority> decode_detail(const nlohmann::json &data,
+    const PaintImageArchive &image_pool) {
+  detail_bytes(data,image_pool);auto detail=std::make_shared<NormalDetailAuthority>();
+  detail->pbr=image_pool.at(integer(data.at("pbr"),UINT32_MAX));
+  detail->mtoon=image_pool.at(integer(data.at("mtoon"),UINT32_MAX));
+  detail->coverage=data.at("coverage").get_binary();return detail;
+}
+nlohmann::json encode_detail(const NormalDetailAuthority &detail,PaintImageArchive &images) {
+  detail.validate(detail.pbr?detail.pbr->width:0);
+  return {{"version",1},{"interpretation","prepared-attributes"},
+      {"pbr",images.add(detail.pbr)},{"mtoon",images.add(detail.mtoon)},
+      {"coverage",nlohmann::json::binary(detail.coverage)}};
+}
 size_t encoded_bytes(const nlohmann::json &j, const PaintImageArchive &image_pool,
-                     const std::function<bool()> &cancelled) {
+                     const std::function<bool()> &cancelled,const nlohmann::json *details=nullptr) {
   if (!j.is_object() || j.size()!=7 || integer(j.at("version"),1)!=1)
     throw std::invalid_argument("Unsupported normal sampling domain");
   const auto &uv=j.at("coordinates"), &toon=j.at("mtoon_coordinates"), &indices=j.at("indices");
@@ -70,22 +96,22 @@ size_t encoded_bytes(const nlohmann::json &j, const PaintImageArchive &image_poo
     if (word(corners,at)>=coordinates.size()/8)
       throw std::invalid_argument("Encoded normal corner references unavailable coordinates");
   }
-  const auto &detail=j.at("detail");
-  if (!detail.is_null()) {
-    if (!detail.is_object() || detail.size()!=5 || integer(detail.at("version"),1)!=1 ||
-        !detail.at("interpretation").is_string() ||
-        detail.at("interpretation").get_ref<const std::string &>()!="prepared-attributes" ||
-        !detail.at("coverage").is_binary() || detail.at("coverage").get_binary().size()!=size_t(r)*r)
-      throw std::invalid_argument("Invalid retained normal detail authority");
-    bytes+=detail.at("coverage").get_binary().size();
-    images(image_pool.at(integer(detail.at("pbr"),UINT32_MAX)),
-           image_pool.at(integer(detail.at("mtoon"),UINT32_MAX)),r);
+  const auto &reference=j.at("detail");
+  if (!reference.is_null()) {
+    const nlohmann::json *detail=&reference;
+    if(details){const auto id=integer(reference,UINT32_MAX);
+      if(id>=details->size())throw std::out_of_range("Invalid retained normal detail reference");
+      detail=&details->at(id);
+    }
+    const auto count=detail_bytes(*detail,image_pool);if(!details)bytes+=count;
+    images(image_pool.at(integer(detail->at("pbr"),UINT32_MAX)),
+           image_pool.at(integer(detail->at("mtoon"),UINT32_MAX)),r);
   }
   return bytes;
 }
 }
 void NormalDetailAuthority::validate(uint32_t r) const {
-  if (version!=1 || interpretation!=BakedNormalInterpretation::PreparedAttributes ||
+  if (version!=1 || r<64||r>2048||(r&(r-1))||interpretation!=BakedNormalInterpretation::PreparedAttributes ||
       coverage.size()!=size_t(r)*r)
     throw std::invalid_argument("Invalid retained prepared-detail normal authority");
   images(pbr,mtoon,r);
@@ -100,16 +126,19 @@ size_t NormalSamplingDomain::storage_bytes() const {
   return (coordinates.size()+mtoon_coordinates.size())*8+indices.size()*4+(detail?detail->coverage.size():0);
 }
 void NormalSamplingDomain::validate(const std::function<bool()> &cancelled) const {
+  validate(true,cancelled);
+}
+void NormalSamplingDomain::validate(bool geometry,const std::function<bool()> &cancelled) const {
   storage_bytes();
   if (version!=1 || resolution<64 || resolution>2048 || (resolution&(resolution-1)))
     throw std::invalid_argument("Invalid retained normal sampling interpretation");
-  for (const auto *field : {&coordinates,&mtoon_coordinates})
+  if(geometry)for (const auto *field : {&coordinates,&mtoon_coordinates})
     for (size_t v=0;v<field->size();++v) {
       if ((v&1023)==0) stop(cancelled);
       for (const float q : (*field)[v]) if (!std::isfinite(q) || std::abs(q)>10000)
         throw std::invalid_argument("Retained normal source coordinate exceeds its finite range");
     }
-  for (size_t c=0;c<indices.size();++c) {
+  if(geometry)for (size_t c=0;c<indices.size();++c) {
     if ((c&1023)==0) stop(cancelled);
     if (indices[c]>=coordinates.size())
       throw std::invalid_argument("Retained normal field corner references unavailable coordinates");
@@ -119,7 +148,7 @@ void NormalSamplingDomain::validate(const std::function<bool()> &cancelled) cons
 }
 NormalSamplingArchive::NormalSamplingArchive(NormalSamplingArchiveLimits limits):limits_(limits) {
   if (!limits.max_domains || limits.max_domains>512 || !limits.max_bytes ||
-      limits.max_bytes>256*1024*1024)
+      limits.max_bytes>256*1024*1024||!limits.max_details||limits.max_details>1024)
     throw std::invalid_argument("Invalid retained normal sampling archive bounds");
 }
 uint32_t NormalSamplingArchive::add(std::shared_ptr<const NormalSamplingDomain> domain) {
@@ -129,24 +158,48 @@ uint32_t NormalSamplingArchive::add(std::shared_ptr<const NormalSamplingDomain> 
     referenced_[i]=true;return uint32_t(i);
   }
   domain->validate(limits_.cancelled);
-  const auto bytes=domain->storage_bytes();
-  if (domains_.size()>=limits_.max_domains || bytes>limits_.max_bytes-bytes_)
+  NormalSamplingArchive staged=*this;
+  if(domain->detail)staged.insert_detail(domain->detail);
+  const auto bytes=domain->storage_bytes()-(domain->detail?domain->detail->coverage.size():0);
+  if (staged.domains_.size()>=limits_.max_domains || bytes>limits_.max_bytes-staged.bytes_)
     throw std::length_error("Retained normal sampling archive exceeds aggregate budget");
   // Stage both allocations before publishing either owner or byte accounting.
-  domains_.reserve(domains_.size()+1);referenced_.reserve(referenced_.size()+1);
-  domains_.push_back(std::move(domain));referenced_.push_back(true);bytes_+=bytes;
-  return uint32_t(domains_.size()-1);
+  staged.domains_.reserve(staged.domains_.size()+1);staged.referenced_.reserve(staged.referenced_.size()+1);
+  staged.domains_.push_back(std::move(domain));staged.referenced_.push_back(true);staged.bytes_+=bytes;
+  *this=std::move(staged);return uint32_t(domains_.size()-1);
+}
+uint32_t NormalSamplingArchive::insert_detail(std::shared_ptr<const NormalDetailAuthority> detail){
+  stop(limits_.cancelled);
+  if(!detail||!detail->pbr)throw std::invalid_argument("Missing retained normal detail identity");
+  for(size_t i=0;i<details_.size();++i)if(details_[i]==detail){detail_referenced_[i]=true;return uint32_t(i);}
+  detail->validate(detail->pbr->width);
+  if(details_.size()>=limits_.max_details||detail->coverage.size()>limits_.max_bytes-bytes_)
+    throw std::length_error("Retained normal detail archive exceeds aggregate budget");
+  details_.reserve(details_.size()+1);detail_referenced_.reserve(detail_referenced_.size()+1);
+  bytes_+=detail->coverage.size();details_.push_back(std::move(detail));detail_referenced_.push_back(true);
+  return uint32_t(details_.size()-1);
+}
+uint32_t NormalSamplingArchive::add_detail(std::shared_ptr<const NormalDetailAuthority> detail){
+  NormalSamplingArchive staged=*this;const auto id=staged.insert_detail(std::move(detail));
+  *this=std::move(staged);return id;
 }
 const std::shared_ptr<const NormalSamplingDomain> &NormalSamplingArchive::at(uint32_t id) const {
   if (id>=domains_.size()) throw std::out_of_range("Invalid normal sampling domain reference");
   referenced_[id]=true;return domains_[id];
 }
+const std::shared_ptr<const NormalDetailAuthority> &NormalSamplingArchive::detail_at(uint32_t id)const{
+  if(id>=details_.size())throw std::out_of_range("Invalid retained normal detail reference");
+  detail_referenced_[id]=true;return details_[id];
+}
 void NormalSamplingArchive::require_reachable() const {
   if (std::find(referenced_.begin(),referenced_.end(),false)!=referenced_.end())
     throw std::invalid_argument("Unreferenced retained normal sampling authority");
+  if(std::find(detail_referenced_.begin(),detail_referenced_.end(),false)!=detail_referenced_.end())
+    throw std::invalid_argument("Unreferenced retained normal detail identity");
 }
 nlohmann::json NormalSamplingArchive::encode(PaintImageArchive &images) const {
-  auto entries=nlohmann::json::array();
+  auto entries=nlohmann::json::array(),details=nlohmann::json::array();
+  for(const auto &detail:details_){stop(limits_.cancelled);details.push_back(encode_detail(*detail,images));}
   for (const auto &domain : domains_) {
     domain->validate(limits_.cancelled);
     std::vector<uint32_t> uv;uv.reserve(domain->coordinates.size()*2);
@@ -160,10 +213,10 @@ nlohmann::json NormalSamplingArchive::encode(PaintImageArchive &images) const {
       for (const auto f : domain->mtoon_coordinates[v]) toon.push_back(std::bit_cast<uint32_t>(f));
     }
     nlohmann::json detail=nullptr;
-    if (domain->detail) detail={{"version",1},{"interpretation","prepared-attributes"},
-        {"pbr",images.add(domain->detail->pbr)},
-        {"mtoon",images.add(domain->detail->mtoon)},
-        {"coverage",nlohmann::json::binary(domain->detail->coverage)}};
+    if(domain->detail){const auto found=std::find(details_.begin(),details_.end(),domain->detail);
+      if(found==details_.end())throw std::logic_error("Missing retained normal detail table owner");
+      detail=size_t(found-details_.begin());
+    }
     entries.push_back({{"version",1},{"resolution",domain->resolution},
         {"coordinates",words(uv,limits_.cancelled)},
         {"mtoon_coordinates",words(toon,limits_.cancelled)},
@@ -171,21 +224,36 @@ nlohmann::json NormalSamplingArchive::encode(PaintImageArchive &images) const {
         {"resolved",nlohmann::json::array({images.add(domain->resolved_pbr),images.add(domain->resolved_mtoon)})},
         {"detail",std::move(detail)}});
   }
-  return {{"version",1},{"domains",std::move(entries)}};
+  return {{"version",2},{"details",std::move(details)},{"domains",std::move(entries)}};
 }
 NormalSamplingArchive NormalSamplingArchive::decode(const nlohmann::json &j,
     const PaintImageArchive &images, NormalSamplingArchiveLimits limits) {
   NormalSamplingArchive result(limits);
-  if (!j.is_object() || j.size()!=2 || integer(j.at("version"),1)!=1 ||
+  if(!j.is_object()||!j.contains("version"))throw std::invalid_argument("Unsupported normal sampling archive");
+  const auto version=integer(j.at("version"),2);
+  if ((version!=1&&version!=2)||j.size()!=(version==2?3:2)||
       !j.at("domains").is_array() || j.at("domains").size()>limits.max_domains)
     throw std::invalid_argument("Unsupported normal sampling archive");
+  const nlohmann::json *details=nullptr;
+  if(version==2){details=&j.at("details");
+    if(!details->is_array()||details->size()>limits.max_details)
+      throw std::invalid_argument("Invalid retained normal detail table");
+  }
   size_t bytes=0;
+  if(details)for(const auto &entry:*details){
+    stop(limits.cancelled);const auto size=detail_bytes(entry,images);
+    if(size>limits.max_bytes-bytes)throw std::length_error("Encoded normal detail table exceeds aggregate budget");
+    bytes+=size;
+  }
   for (const auto &entry : j.at("domains")) {
     stop(limits.cancelled);
-    const auto size=encoded_bytes(entry,images,limits.cancelled);
+    const auto size=encoded_bytes(entry,images,limits.cancelled,details);
     if (size>limits.max_bytes-bytes)
       throw std::length_error("Encoded normal sampling archive exceeds aggregate budget");
     bytes+=size;
+  }
+  if(details)for(const auto &entry:*details){
+    stop(limits.cancelled);result.insert_detail(decode_detail(entry,images));result.detail_referenced_.back()=false;
   }
   for (const auto &entry : j.at("domains")) {
     stop(limits.cancelled);
@@ -212,13 +280,12 @@ NormalSamplingArchive NormalSamplingArchive::decode(const nlohmann::json &j,
     domain->resolved_pbr=images.at(integer(resolved[0],UINT32_MAX));
     domain->resolved_mtoon=images.at(integer(resolved[1],UINT32_MAX));
     if (!entry.at("detail").is_null()) {
-      const auto &data=entry.at("detail");auto detail=std::make_shared<NormalDetailAuthority>();
-      detail->pbr=images.at(integer(data.at("pbr"),UINT32_MAX));
-      detail->mtoon=images.at(integer(data.at("mtoon"),UINT32_MAX));
-      detail->coverage=data.at("coverage").get_binary();domain->detail=std::move(detail);
+      if(details)domain->detail=result.detail_at(integer(entry.at("detail"),UINT32_MAX));
+      else domain->detail=decode_detail(entry.at("detail"),images);
     }
     result.add(std::move(domain));result.referenced_.back()=false;
   }
+  if(result.bytes_!=bytes)throw std::logic_error("Normal sampling archive aggregate accounting differs");
   return result;
 }
 } // namespace dome

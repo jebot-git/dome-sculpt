@@ -16,6 +16,9 @@ struct Image {
   std::vector<uint8_t> png() const;
 };
 struct BakedTextures;
+struct NormalSamplingDomain;
+struct NormalDetailAuthority;
+class NormalSamplingArchive;
 struct PaintColorProjection {
   // Linear RGBA in the current writable atlas. Original accessor data remains
   // in the immutable source appearance and preparation receipt.
@@ -31,7 +34,11 @@ struct PaintColorProjection {
 struct PaintNormalProjection {
   uint32_t version=1;
   std::shared_ptr<const Image> pbr,mtoon;
+  // Version2 only. This structural leaf requires the full owning normal
+  // preparation replay before it may be admitted to an editable surface.
+  std::shared_ptr<const NormalSamplingDomain> sampling_domain;
   void validate(uint32_t resolution) const;
+  void validate(uint32_t resolution,bool geometry) const;
 };
 struct TextureMaps {
   Image color, metal_rough, emission;
@@ -64,9 +71,14 @@ struct BakedTextures {
   std::vector<uint8_t> coverage;
   BakedColorInterpretation color_interpretation = BakedColorInterpretation::VertexComponent;
   BakedNormalInterpretation normal_interpretation = BakedNormalInterpretation::CanonicalMikk;
+  // Scene21 only. This identity distinguishes an authenticated retained
+  // normal field from a later byte-identical bake operation. Its coverage is
+  // normal-specific and independent of the common RGBA coverage above.
+  std::shared_ptr<const NormalDetailAuthority> normal_authority;
   void validate(uint32_t resolution) const;
   size_t storage_bytes() const;
 };
+enum class BakedNormalWrite { Replace, PreserveRetained };
 struct PaintCompositeCacheStats {
   size_t retained_bytes = 0, retained_maps = 0, limit_bytes = 0;
   uint64_t hits = 0, builds = 0;
@@ -167,15 +179,21 @@ public:
   std::shared_ptr<const TextureMaps> preview(const Material &) const;
   std::shared_ptr<const BakedTextures> baked() const { return baked_; }
   void install_bake(BakedTextures);
+  void install_bake(BakedTextures,BakedNormalWrite);
   void clear_bake();
   size_t storage_bytes() const;
   const PaintPixel &pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   std::optional<Vec3> raycast(Vec3, Vec3, float maximum = 20) const;
   Vec3 normal(Vec3) const;
   nlohmann::json encode(PaintImageArchive * = nullptr) const;
+  nlohmann::json encode(PaintImageArchive *,NormalSamplingArchive *) const;
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive * = nullptr);
   // Internal Scene12 decoding must subsequently authenticate the exact polygon derivative.
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *, bool allow_polygon);
+  // Structural owning-archive overload. Its model/recipe closure must be
+  // authenticated before exposing an editable surface.
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
+                                           bool allow_polygon,const NormalSamplingArchive *);
 
 private:
   friend class Document;
