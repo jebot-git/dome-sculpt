@@ -70,11 +70,12 @@ int main(int argc,char **argv)try {
   const auto source_before=prepared_source.encode();
   check(refuses([&]{bake_object(prepared_source,2,settings);})&&prepared_source.encode()==source_before,"Prepared source normals are explicitly guarded until their exact source frame adapter exists; no posed-atlas Mikk substitution is allowed");
   const auto before_uv=restarted.copy_scene().encode();restarted.begin_uv();check(restarted.wait_uv()&&restarted.frame().state->uv&&restarted.frame().state->uv->valid,"Prepared normal target enters the real native UV workspace without changing its source interpretation");
-  restarted.edit_uv(UvAction::Scale,.9f);check(restarted.wait_uv()&&restarted.frame().state->uv->valid,"A real changed UV draft validates its geometry before explicit guarded adoption");
+  restarted.edit_uv(UvAction::Scale,.9f);check(restarted.wait_uv()&&restarted.frame().state->uv->valid,"A real changed UV draft validates its geometry before source-aware adoption");
   const auto draft_uv=restarted.frame().state->uv->mesh->uv;
-  restarted.end_uv(true);check(restarted.wait_asset()&&!restarted.frame().state->error.empty()&&restarted.copy_scene().encode()==before_uv,"Unsupported prepared-normal UV adoption refuses without changing any source, current bake or native scene bytes");
-  check(restarted.frame().state->uv&&restarted.frame().state->uv->mesh->uv==draft_uv&&!restarted.frame().state->uv->committing,"Failed prepared-normal UV adoption preserves the exact editable draft and clears only its busy state");
-  restarted.end_uv(false);check(restarted.wait_mesh()&&restarted.copy_scene().encode()==before_uv,"Cancelling the retained UV draft restores ordinary editing with the exact pre-UV normal model");
-  check(restarted.undo()&&!restarted.frame().state->can_undo&&restarted.redo()&&restarted.copy_scene().encode()==before_uv,"Failed UV adoption contributes no hidden history entry after the single repeat-bake action");
+  restarted.end_uv(true);check(restarted.wait_asset()&&restarted.frame().state->error.empty()&&restarted.wait_mesh()&&restarted.copy_scene().encode().at("version")==19,"Explicit normalUV adapter accepts the represented prepared-normal draft through the actual worker");
+  const auto after_uv=restarted.copy_scene().encode();const auto current_uv=restarted.copy_scene().active().material_bindings->normal_preparation;
+  check(!restarted.frame().state->uv&&restarted.copy_scene().active().painted->mesh().uv==draft_uv&&current_uv->uv_reprojection&&current_uv->target_frames==repeat_recipe->target_frames&&current_uv->original_paint==repeat_recipe->original_paint,"Accepted normalUV draft owns its exact before-state and sampling layout while preserving original frame/source authority");
+  restarted.begin_uv();check(restarted.wait_uv(),"A new prepared-normal draft opens after accepted UV publication");restarted.edit_uv(UvAction::Scale,.8f);check(restarted.wait_uv(),"A new detached draft validates before explicit Cancel");restarted.end_uv(false);check(restarted.wait_mesh()&&restarted.copy_scene().encode()==after_uv,"Cancelling a subsequent draft preserves the exact accepted normalUV model");
+  check(restarted.undo()&&restarted.copy_scene().encode()==before_uv&&restarted.redo()&&restarted.copy_scene().encode()==after_uv,"Supported UV adoption adds one exact Undo/Redo entry after repeat bake without rewriting earlier authority");
   std::cout<<"PASS "<<checks<<" prepared-normal native workflow checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

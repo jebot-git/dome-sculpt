@@ -76,7 +76,11 @@ void SourceNormalPreparation::validate(bool deep) const {
   if(original_paint->resolution()!=receipt.resolution)throw std::invalid_argument("Normal preparation original resolution differs");
   if(original_paint->baked()&&!original_paint->baked()->maps.normal.rgba.empty())throw std::invalid_argument("Historical normal payload cannot be silently reinterpreted");
   projection->validate(receipt.resolution);initial_projection->validate(receipt.resolution);target_frames->validate(false);
-  if(!detail::normal_projection_identity(*projection,*initial_projection))
+  if(uv_reprojection){
+    uv_reprojection->validate(deep);const auto &before=*uv_reprojection->before_material->normal_preparation;
+    if(!detail::normal_projection_identity(*projection,*uv_reprojection->projection)||target_frames!=before.target_frames||original_paint!=before.original_paint||original_appearance!=before.original_appearance||original_deformation!=before.original_deformation||original_material!=before.original_material||receipt.encode()!=before.receipt.encode()||!detail::normal_projection_identity(*initial_projection,*before.initial_projection))
+      throw std::invalid_argument("Normal UV interpretation changed original planes, attributes or owning source authority");
+  }else if(!detail::normal_projection_identity(*projection,*initial_projection))
     throw std::invalid_argument("Derived prepared-normal UV planes require explicit source-aware reprojection authority");
   if(!target_frames->pbr||target_frames->pbr->tangents.empty()||target_frames->canonical||
      (receipt.mtoon!=PreparedMToonNormalEvaluation::Absent&&target_frames->mtoon!=target_frames->pbr))
@@ -114,6 +118,7 @@ void SourceNormalPreparation::validate(bool deep) const {
 }
 void SourceNormalPreparation::validate_current(const Mesh &mesh,const CreatorAppearance *appearance,
     const std::function<bool()> &cancelled) const {
+  if(uv_reprojection){uv_reprojection->validate_current(mesh,appearance,cancelled);return;}
   const auto &original=original_paint->mesh();mesh.validate();
   if(mesh.indices.size()!=original.indices.size())throw std::invalid_argument("Prepared normal corner authority changed");
   if(bool(appearance)!=bool(original_appearance))throw std::invalid_argument("Prepared normal appearance authority changed");

@@ -1,0 +1,48 @@
+{
+  "scope": "Detached normalUV raster worker foundation only; no Scene19 layout/codec/adoption/guard relaxation",
+  "base": "3aed93ae2957f911a55dfeae394611c665f29754",
+  "source_sha256": {
+    "CMakeLists.txt": "ec5f2478b695a558149f07342135e25d36fdebc0247ee8cf8c9565c4f8b4d867",
+    "src/paint-normal-access.hpp": "108ecae959b1208b64c71c60f350957e34382232ef49a399e63d1fe00fbef9bb",
+    "src/paint.cpp": "b4e0be43fbd98b6c47859b3278a498d35c03b7662ca9a4d19d0a3fa45743ff03",
+    "tests/normal-uv-projection.cpp": "4382a5013056b05e62d51c95201e96416b214ee5f8a176d121a853b23f1553e2"
+  },
+  "checks": {
+    "fresh_merged_core_Release": 16,
+    "changed_paint_test_ASan_UBSan_leak_overlay": 16,
+    "source_axes": "unchanged, raw bilinear vector magnitude preserved",
+    "quality_scope": "owned/padded texel quantization +every overlapping face sample +vertex/centroid constraints for subpixel faces; not an all-fragment/all-pose bound"
+  },
+  "instrumentation": {
+    "base": "2e7d4a0e2360eb1f42047b51d84c061e3b978652",
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "kind": "owned wholepaint.cpp+fixture against frozen matching-layout instrumented2e core/support/vendors; oldpaint archive member excluded",
+    "whole_3aed_adapter_SAN_claim": false,
+    "headers_2e_to_3aed": "git diff -- include empty",
+    "commands": "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-reprojection-2e7/artifacts/normal-uv-projection-sanitize/commands.json",
+    "commands_sha256": "df7cb7d6996eaf97edfa80f9be03affa8f9c5d62d78a74f5f24227664bc447ee",
+    "link_map_sha256": "943ab085ac2fca091c1c4a0ed9b66646b34cec6f20bdf6c2f153058f023d7e87"
+  },
+  "logs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-projection-worker-final-build.log": "ecd631b1f56736db8d130466193f20dea8e492cbebc31012202b095f65d0fcdb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-projection-worker-final-native.log": "2c37b20228aff38111471eadd8e5793992a535a123b35152f1c625ecad5cd8c8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-projection-worker-sanitize-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/blux/de-xr/dome-sculpt/artifacts/normal-uv-projection-worker-sanitize.log": "2c37b20228aff38111471eadd8e5793992a535a123b35152f1c625ecad5cd8c8"
+  },
+  "archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv1-affine-integration-0d2ffbb/build-sanitize/libdome-sculpt-core.a": "3f9a0b3f04cb558252b45993cd2a3826590bc2eac25fda2eac1bb39c66dd8c6e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv1-affine-integration-0d2ffbb/build-sanitize/libdome-sculpt-affine.a": "cf39b9c1816b02c394fb2240a495fadbfa677ca425a052695b3f0382ab66b566",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv1-affine-integration-0d2ffbb/build-sanitize/libdome-sculpt-polygon.a": "98ab580a845c0e9e9d527e24d8eb4e2c0971c5ad56f65412595bbcfb569f5aa3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv1-affine-integration-0d2ffbb/build-sanitize/libxatlas.a": "3e778ac84a550af68d8ee21ee702befdf19dbd29b85b303280cd00ddcafb6a64",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv1-affine-integration-0d2ffbb/build-sanitize/libmikktspace.a": "0d53506f260c9ac0a2a9aab9a6c9f427d4b39f6093972152638544b5be7140fa",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv1-affine-integration-0d2ffbb/build-sanitize/libmikktspace-robust.a": "0ed600126237e3ef9e0c9b3b99d9a47f33578ad187ca18df34c31054da9c39a7",
+    "/home/blux/de-xr/dome-sculpt/artifacts/uv1-affine-integration-0d2ffbb/build-sanitize/libufbx.a": "e387d583b504866082b324d524b8bc8fda2e4890e7d7bfa3518025a467fc8546"
+  },
+  "remaining": [
+    "SourceNormalPreparation owning UV reprojection receipt, archive/version/min-feature/quotas",
+    "SourceUV intrinsic+baked dual-plane transfer and exact source-paint pairing",
+    "Worker/native/controller/Undo/Save/restart integration",
+    "Independent PBR/MToon/VRM dynamic consumers and meaningful source-quality reports",
+    "Prepared-source normal baking and normalUV/shapekey interoperable receipt replay"
+  ]
+}

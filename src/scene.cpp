@@ -348,6 +348,7 @@ void Scene::validate(bool deep_sources) const {
     if(p.original_appearance)retain_appearance(*p.original_appearance,p.original_paint->mesh().positions.size());
   }
   std::set<const SourceNormalPreparation*> normal_preparations;
+  std::set<const SourceNormalUvLayout*> normal_uv_layouts;size_t normal_uv_layout_bytes=0;
   for(const auto &binding:source_materials.bindings())if(binding->normal_preparation&&normal_preparations.insert(binding->normal_preparation.get()).second){
     const auto &p=*binding->normal_preparation;p.validate(deep_sources);
     for(const auto &projection:{p.projection,p.initial_projection}){source_images.add(projection->pbr);source_images.add(projection->mtoon);}
@@ -355,6 +356,7 @@ void Scene::validate(bool deep_sources) const {
     if(origin_vertices>8'000'000)throw std::length_error("Normal preparation original geometry exceeds scene budget");
     if(p.original_deformation){deformation_entries+=p.original_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Scene deformation budget includes pre-normal-preparation authority");}
     if(p.original_appearance)retain_appearance(*p.original_appearance,p.original_paint->mesh().positions.size());
+    if(p.uv_reprojection){const auto &u=*p.uv_reprojection;const bool fresh_uv=!retained_paint.contains(u.before_paint.get());retain_paint(u.before_paint,true);if(fresh_uv)origin_vertices+=u.before_paint->mesh().positions.size();if(origin_vertices>8'000'000)throw std::length_error("Normal UV retained geometry exceeds scene budget");if(u.before_deformation){deformation_entries+=u.before_deformation->resource_entries();if(deformation_entries>8'000'000)throw std::length_error("Normal UV retained deformation exceeds scene budget");}if(u.before_appearance)retain_appearance(*u.before_appearance,u.before_paint->mesh().positions.size());if(normal_uv_layouts.insert(u.layout.get()).second){auto bytes=u.layout->storage_bytes();if(bytes>128*1024*1024-normal_uv_layout_bytes)throw std::length_error("Normal UV layouts exceed scene budget");normal_uv_layout_bytes+=bytes;}}
   }
   retopology_acyclic(retopology_sources);
   object(active_);
@@ -457,7 +459,9 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>18)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || version>19)throw std::runtime_error("Unsupported scene version");
+  if(version==19&&(!j.contains("source_materials")||!j.at("source_materials").contains("version")||j.at("source_materials").at("version")!=5))throw std::invalid_argument("Scene19 requires material archive5 normal UV authority");
+  if(version<19&&j.contains("source_materials")&&j.at("source_materials").contains("version")&&j.at("source_materials").at("version")==5)throw std::invalid_argument("Normal UV projection requires Scene19");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
@@ -539,6 +543,8 @@ Scene Scene::decode(const nlohmann::json &j) {
         budget.deformation(o.at("deformation"), unsigned(version));
       budget.appearance(o.at("appearance"));
     }
+    if(materials.contains("color_preparations"))for(const auto &p:materials.at("color_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));}
+    if(materials.contains("normal_preparations"))for(const auto &p:materials.at("normal_preparations")){budget.deformation(p.at("deformation"),unsigned(version));budget.appearance(p.at("appearance"));if(p.contains("uv_reprojection")){const auto &u=p.at("uv_reprojection");budget.deformation(u.at("deformation"),unsigned(version));budget.appearance(u.at("appearance"));}}
   } else {
     if (j.contains("polygon_sources"))
       throw std::invalid_argument("Polygon authority requires Scene12");
@@ -668,7 +674,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4)) ||
+      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);

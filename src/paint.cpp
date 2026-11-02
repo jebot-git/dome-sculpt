@@ -819,6 +819,75 @@ PaintNormalPreparationResult SourceNormalPreparationAccess::prepare(const Painte
   if(output->storage_bytes()>128*1024*1024)throw std::length_error("Prepared normal planes exceed paint storage budget");
   output->composite_token_=next_composite_token();++output->revision_;check();return {std::move(output),receipt};
 }
+PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const PaintedMesh &source,
+    const Mesh &target,std::span<const uint32_t> source_vertices,const NormalPreparationOptions &options) {
+  auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Prepared normal UV reprojection cancelled");};stop();
+  if(source.editing_||!source.normal_projection_)throw std::invalid_argument("Normal UV reprojection requires finished intrinsic normal planes");
+  if(!std::isfinite(options.max_angular_error)||options.max_angular_error<0||options.max_angular_error>.25||!options.max_samples||options.max_samples>64'000'000||!options.max_working_bytes||options.max_working_bytes>512*1024*1024)
+    throw std::invalid_argument("Invalid prepared normal UV reprojection bounds");
+  const auto &before=source.mesh();target.validate();
+  if(target.positions.size()>2'000'000||target.indices.size()>6'000'000||target.indices.size()!=before.indices.size()||source_vertices.size()!=target.positions.size()||target.uv.size()!=target.positions.size())
+    throw std::invalid_argument("Normal UV reprojection requires exact bounded ordered-corner geometry");
+  for(size_t v=0;v<source_vertices.size();++v){if((v&1023)==0)stop();auto old=source_vertices[v];
+    if(old>=before.positions.size()||target.positions[v].x!=before.positions[old].x||target.positions[v].y!=before.positions[old].y||target.positions[v].z!=before.positions[old].z||target.normals[v].x!=before.normals[old].x||target.normals[v].y!=before.normals[old].y||target.normals[v].z!=before.normals[old].z)
+      throw std::invalid_argument("Normal UV reprojection cannot infer changed REST geometry/directions");
+  }
+  for(size_t c=0;c<target.indices.size();++c){if((c&1023)==0)stop();if(source_vertices[target.indices[c]]!=before.indices[c])throw std::invalid_argument("Normal UV reprojection lost exact source corner identity");}
+  const auto r=source.resolution();const size_t pixels=size_t(r)*r;
+  const size_t geometry_bytes=target.positions.size()*sizeof(Vec3)+target.normals.size()*sizeof(Vec3)+target.uv.size()*sizeof(std::array<float,2>)+target.indices.size()*sizeof(uint32_t)+target.uv_pins.size()+target.uv_seams.size()+target.indices.size()/3;
+  const size_t tile_bytes=size_t(r/32)*(r/32)*sizeof(PaintedMesh::SurfaceMap::Bounds);
+  if(geometry_bytes>options.max_working_bytes||tile_bytes>options.max_working_bytes-geometry_bytes||pixels>options.max_samples||pixels>(options.max_working_bytes-geometry_bytes-tile_bytes)/(8+sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t)+2))
+    throw std::length_error("Prepared normal UV reprojection exceeds worker storage/sampling budget");
+  PaintSurfaceOptions strict;strict.cancelled=options.cancelled;strict.max_raster_samples=options.max_samples;auto atlas=std::make_shared<PaintedMesh::SurfaceMap>(target,r,strict);
+  auto pbr=std::make_shared<Image>(blank_image(r,true)),toon=std::make_shared<Image>(blank_image(r,true));PaintNormalUvProjectionResult result;
+  source.normal_projection_->validate(r);
+  auto project=[&](Image &out,size_t at,const std::shared_ptr<const Image> &image,std::array<float,2> uv){
+    PaintSourceTexture view;view.image=image;view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=9729;
+    const auto value=sample_source_texture(view,uv[0],uv[1],false);Vec3 original{value[0]*2-1,value[1]*2-1,value[2]*2-1};
+    if(!finite(original)||length(original)<1e-8f)throw std::invalid_argument("Prepared normal UV sampling has a singular decoder direction");
+    // Preserve sampled vector magnitude: normalizing here would change later
+    // interpolation and would silently author a different normal-field model.
+    for(size_t c=0;c<4;++c)out.rgba[at*4+c]=byte(value[c]);
+    const auto wanted=normalized(original);const auto decoded=normalized(Vec3{unit(out.rgba[at*4])*2-1,unit(out.rgba[at*4+1])*2-1,unit(out.rgba[at*4+2])*2-1});
+    result.observed_sample_error=std::max(result.observed_sample_error,std::atan2(double(length(cross(wanted,decoded))),std::clamp(double(dot(wanted,decoded)),-1.,1.)));
+  };
+  for(size_t at=0;at<pixels;++at){if((at&1023)==0)stop();auto owner=atlas->padding[at];if(owner<0)continue;const auto &texel=atlas->texels[size_t(owner)];
+    const float bary[]={texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]};std::array<float,2> uv{};
+    for(size_t k=0;k<3;++k){const auto q=before.uv[before.indices[size_t(texel.face)*3+k]];uv[0]+=q[0]*bary[k];uv[1]+=q[1]*bary[k];}
+    project(*pbr,at,source.normal_projection_->pbr,uv);project(*toon,at,source.normal_projection_->mtoon,uv);++result.sampled_texels;
+  }
+  // Audit every original face constraint, including coincident geometry that
+  // the ordinary paint raster may legitimately collapse to one owner. Distinct
+  // old normal fields must not disappear merely because positions coincide.
+  size_t raster_work=atlas->diagnostics.raster_samples;std::vector<uint8_t> covered(target.indices.size()/3);
+  auto audit=[&](const Image &out,size_t at,const std::shared_ptr<const Image> &image,std::array<float,2> uv){
+    PaintSourceTexture view;view.image=image;view.wrap_s=view.wrap_t=33071;view.min_filter=view.mag_filter=9729;auto value=sample_source_texture(view,uv[0],uv[1],false);
+    Vec3 wanted{value[0]*2-1,value[1]*2-1,value[2]*2-1};if(length(wanted)<1e-8f)throw std::invalid_argument("Prepared normal UV constraint has a singular decoder direction");wanted=normalized(wanted);
+    const auto decoded=normalized(Vec3{unit(out.rgba[at*4])*2-1,unit(out.rgba[at*4+1])*2-1,unit(out.rgba[at*4+2])*2-1});
+    result.observed_sample_error=std::max(result.observed_sample_error,std::atan2(double(length(cross(wanted,decoded))),std::clamp(double(dot(wanted,decoded)),-1.,1.)));
+  };
+  for(size_t face=0;face<covered.size();++face){stop();const auto a=target.uv[target.indices[face*3]],b=target.uv[target.indices[face*3+1]],c=target.uv[target.indices[face*3+2]];
+    const double denominator=(double(b[1])-c[1])*(a[0]-c[0])+(double(c[0])-b[0])*(a[1]-c[1]);
+    if(std::abs(denominator)<1e-12)throw std::invalid_argument("Normal UV projection has an unrepresented destination face");
+    const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r)));
+    const int y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
+    for(int y=y0;y<=y1;++y)for(int x=x0;x<=x1;++x){if(++raster_work>options.max_samples)throw std::length_error("Normal UV source-constraint raster exceeds its work budget");if((raster_work&1023)==0)stop();double u=(x+.5)/r,v=(y+.5)/r;float w[]={float(((double(b[1])-c[1])*(u-c[0])+(double(c[0])-b[0])*(v-c[1]))/denominator),float(((double(c[1])-a[1])*(u-c[0])+(double(a[0])-c[0])*(v-c[1]))/denominator),0};w[2]=1-w[0]-w[1];if(std::min({w[0],w[1],w[2]})<-.000001f)continue;
+      const size_t at=size_t(y)*r+size_t(x);if(!atlas->texels[at].covered)throw std::logic_error("Normal UV source constraint lost destination ownership");covered[face]=1;++result.source_constraints;
+      if(atlas->texels[at].face==face)continue;std::array<float,2> uv{};for(size_t k=0;k<3;++k){const auto q=before.uv[before.indices[face*3+k]];uv[0]+=q[0]*w[k];uv[1]+=q[1]*w[k];}audit(*pbr,at,source.normal_projection_->pbr,uv);audit(*toon,at,source.normal_projection_->mtoon,uv);
+    }
+    if(!covered[face])for(const auto weights:{std::array<float,3>{1,0,0},std::array<float,3>{0,1,0},std::array<float,3>{0,0,1},std::array<float,3>{1.f/3,1.f/3,1.f/3}}){
+      if(++raster_work>options.max_samples)throw std::length_error("Normal UV subpixel source constraints exceed work budget");
+      std::array<float,2> old_uv{},new_uv{};for(size_t k=0;k<3;++k){auto oq=before.uv[before.indices[face*3+k]],nq=target.uv[target.indices[face*3+k]];for(size_t c=0;c<2;++c){old_uv[c]+=oq[c]*weights[k];new_uv[c]+=nq[c]*weights[k];}}
+      for(const auto &images:{std::pair{std::shared_ptr<const Image>(pbr),source.normal_projection_->pbr},std::pair{std::shared_ptr<const Image>(toon),source.normal_projection_->mtoon}}){PaintSourceTexture old_view,new_view;old_view.image=images.second;new_view.image=images.first;old_view.wrap_s=old_view.wrap_t=new_view.wrap_s=new_view.wrap_t=33071;
+        auto o=sample_source_texture(old_view,old_uv[0],old_uv[1],false),n=sample_source_texture(new_view,new_uv[0],new_uv[1],false);Vec3 wanted{o[0]*2-1,o[1]*2-1,o[2]*2-1},actual{n[0]*2-1,n[1]*2-1,n[2]*2-1};if(length(wanted)<1e-8f||length(actual)<1e-8f)throw std::invalid_argument("Subpixel normal UV constraint has a singular direction");wanted=normalized(wanted);actual=normalized(actual);
+        result.observed_sample_error=std::max(result.observed_sample_error,std::atan2(double(length(cross(wanted,actual))),std::clamp(double(dot(wanted,actual)),-1.,1.)));
+      }++result.source_constraints;
+    }
+  }
+  result.raster_samples=raster_work;
+  if(!result.sampled_texels||result.observed_sample_error>options.max_angular_error)throw std::invalid_argument("Prepared normal UV quantization/source constraints exceed the declared sample quality bound");
+  auto projection=std::make_shared<PaintNormalProjection>();projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);result.projection=std::move(projection);stop();return result;
+}
 void BakedTextures::validate(uint32_t resolution) const {
   if (maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if(size_t(color_interpretation)>1 || (color_interpretation==BakedColorInterpretation::ResolvedPbr)!=!maps.pbr_color.rgba.empty())

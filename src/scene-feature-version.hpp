@@ -33,6 +33,7 @@ inline unsigned minimum_appearance_scene_version(const nlohmann::json &a){
   return material.get<int64_t>()==0?17u:0u;
 }
 inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
+
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
     return 0;
@@ -43,8 +44,12 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
     result=std::max({result,10u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
       minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
   if(const auto &preparation=binding->normal_preparation)
-    result=std::max({result,15u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
-      minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get())});
+    result=std::max({result,preparation->uv_reprojection?19u:15u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),
+      minimum_scene_version(preparation->original_appearance.get()),minimum_scene_version(preparation->original_material.get()),
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_material.get()):0u,
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_paint.get()):0u,
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_deformation.get()):0u,
+      preparation->uv_reprojection?minimum_scene_version(preparation->uv_reprojection->before_appearance.get()):0u});
   return result;
 }
 inline unsigned source_feature_version(const PolygonAuthority *root,const PolygonOrigin *source) {

@@ -87,6 +87,7 @@ void SourceMaterialBindings::validate(bool deep) const {
   if(normal_preparation){normal_preparation->validate(deep);
     if(normal_frames!=normal_preparation->target_frames||normal_frame!=SourceMaterialNormalFrame::OriginalAttributes)
       throw std::invalid_argument("Prepared normal interpretation lost its exact target frame authority");
+    if(normal_preparation->uv_reprojection&&has_mtoon){const auto &role=roles[size_t(MToonSlot::Normal)];if(role.image!=normal_preparation->projection->mtoon||role.wrap_s!=33071||role.wrap_t!=33071||role.min_filter!=9729||role.mag_filter!=9729)throw std::invalid_argument("Normal UV current resolved sampler/image differs from its declared projection");}
     if(has_mtoon){const auto expected=material.version()==MToonVersion::V0?PreparedMToonNormalEvaluation::LegacyRawInterpolated:PreparedMToonNormalEvaluation::MToon1;
       if(normal_preparation->receipt.mtoon!=expected)throw std::invalid_argument("Prepared normal interpretation cannot silently change its declared MToon version");
       const auto &normal=material.textures[size_t(MToonSlot::Normal)];
@@ -153,6 +154,8 @@ uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings
     add(value->color_preparation->original_material,deep);
   if(value->normal_preparation&&value->normal_preparation->original_material)
     add(value->normal_preparation->original_material,deep);
+  if(value->normal_preparation&&value->normal_preparation->uv_reprojection)
+    add(value->normal_preparation->uv_reprojection->before_material,deep);
   if(bindings_.size()>=256)throw std::length_error("Resolved material archive count exceeds budget");
   if(value->uv_origin && std::find(origins_.begin(),origins_.end(),value->uv_origin)==origins_.end()) {
     if(origins_.size()>=256)throw std::length_error("Original UV source archive count exceeds budget");
@@ -166,9 +169,10 @@ const std::shared_ptr<const SourceMaterialBindings> &SourceMaterialArchive::at(u
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models) const {
   const bool prepared=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->color_preparation);});
   const bool normal_prepared=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->normal_preparation);});
+  const bool normal_uv=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->normal_preparation&&b->normal_preparation->uv_reprojection;});
   const bool extended=prepared || normal_prepared || std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->normal_frames) || (b->uv_origin && !b->sampling_reparameterized);}) || std::any_of(origins_.begin(),origins_.end(),[](const auto &o){return bool(o->deformation)||!o->creator_kind.empty();});
   NormalFrameArchive frames;
-  nlohmann::json output={{"version",normal_prepared?4:prepared?3:extended?2:1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
+  nlohmann::json output={{"version",normal_uv?5:normal_prepared?4:prepared?3:extended?2:1},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
   std::vector<std::shared_ptr<const PaintedMesh>> paints;
   auto paint_id=[&](const std::shared_ptr<const PaintedMesh> &paint){
     auto found=std::find(paints.begin(),paints.end(),paint);
@@ -191,7 +195,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
         {"before_binding",p.original_material?nlohmann::json(size_t(before-bindings_.begin())):nlohmann::json(nullptr)}});
     }
   }
-  std::vector<std::shared_ptr<const SourceNormalPreparation>> normal_preparations;
+  std::vector<std::shared_ptr<const SourceNormalPreparation>> normal_preparations;size_t normal_uv_layout_bytes=0;
   if(normal_prepared){
     output["normal_preparations"]=nlohmann::json::array();
     for(const auto &binding:bindings_)if(binding->normal_preparation&&std::find(normal_preparations.begin(),normal_preparations.end(),binding->normal_preparation)==normal_preparations.end()){
@@ -204,6 +208,12 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
         {"appearance",p.original_appearance?encode_creator_appearance(*p.original_appearance,models,images):nlohmann::json(nullptr)},
         {"deformation",p.original_deformation?p.original_deformation->encode(p.original_paint->mesh()):nlohmann::json(nullptr)},
         {"before_binding",p.original_material?nlohmann::json(size_t(before-bindings_.begin())):nlohmann::json(nullptr)}});
+      if(p.uv_reprojection){const auto &u=*p.uv_reprojection;const auto layout_bytes=u.layout->storage_bytes();if(layout_bytes>128*1024*1024-normal_uv_layout_bytes)throw std::length_error("Normal UV layout archive exceeds global budget");normal_uv_layout_bytes+=layout_bytes;const auto original=std::find(bindings_.begin(),bindings_.end(),u.before_material);if(original==bindings_.end())throw std::logic_error("Missing normal UV before-state binding");auto &entry=output["normal_preparations"].back();entry["version"]=2;
+        entry["uv_reprojection"]={{"version",1},{"receipt",u.receipt.encode()},{"layout",u.layout->encode()},{"projection",encode_normal_projection(*u.projection,images)},{"paint",paint_id(u.before_paint)},
+          {"appearance",u.before_appearance?encode_creator_appearance(*u.before_appearance,models,images):nlohmann::json(nullptr)},
+          {"deformation",u.before_deformation?u.before_deformation->encode(u.before_paint->mesh()):nlohmann::json(nullptr)},
+          {"before_binding",size_t(original-bindings_.begin())}};
+      }
     }
   }
   size_t metadata=0;
@@ -244,7 +254,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
   size_t entries=0;
   if(input.at("version")==1)return 0;
-  if((input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4) || !input.at("origins").is_array() || input.at("origins").size()>256)
+  if((input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5) || !input.at("origins").is_array() || input.at("origins").size()>256)
     throw std::runtime_error("Invalid original deformation archive");
   auto add=[&](size_t n){if(n>8'000'000-entries)throw std::length_error("Original deformation archive exceeds scene budget");entries+=n;};
   auto count=[&](const nlohmann::json &d) {
@@ -264,23 +274,26 @@ size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
     }
   };
   for(const auto &origin:input.at("origins"))count(origin.at("deformation"));
-  if(input.at("version")==3||input.at("version")==4) {
+  if(input.at("version")==3||input.at("version")==4||input.at("version")==5) {
     const auto &preparations=input.at("color_preparations");
     if(!preparations.is_array() || (input.at("version")==3&&preparations.empty()) || preparations.size()>256)throw std::runtime_error("Invalid color preparation archive");
     for(const auto &p:preparations)count(p.at("deformation"));
   }
-  if(input.at("version")==4){const auto &preparations=input.at("normal_preparations");
+  if(input.at("version")==4||input.at("version")==5){const auto &preparations=input.at("normal_preparations");
     if(!preparations.is_array()||preparations.empty()||preparations.size()>256)throw std::invalid_argument("Invalid normal preparation archive");
-    for(const auto &p:preparations)count(p.at("deformation"));
+    size_t uv_bytes=0;bool found_uv=false;
+    for(const auto &p:preparations){count(p.at("deformation"));if(p.contains("uv_reprojection")){if(input.at("version")!=5||p.at("version")!=2)throw std::invalid_argument("Normal UV projections require material archive5/entry2");const auto &u=p.at("uv_reprojection");if(!u.is_object()||u.size()!=8||u.at("version")!=1)throw std::invalid_argument("Unsupported normal UV projection record");const auto bytes=SourceNormalUvLayout::encoded_storage_bytes(u.at("layout"));if(bytes>128*1024*1024-uv_bytes)throw std::length_error("Normal UV layout archive exceeds its global budget");uv_bytes+=bytes;count(u.at("deformation"));found_uv=true;}}
+    if(input.at("version")==5&&!found_uv)throw std::invalid_argument("Material archive5 requires its normal UV feature");
   }
   return entries;
 }
 SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
                                                    const CreatorAssetArchive &models) {
-  if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
+  if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
      !input.at("bindings").is_array() || input.at("bindings").size()>256)
     throw std::runtime_error("Invalid resolved material archive");
-  const bool normal_prepared=input.at("version")==4;
+  const bool normal_uv=input.at("version")==5;
+  const bool normal_prepared=input.at("version")==4||normal_uv;
   const bool prepared=input.at("version")==3||normal_prepared;
   const bool extended=input.at("version")!=1;
   if(!normal_prepared){
@@ -399,13 +412,16 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
       const auto id=index(value.at("normal_preparation"),normal_preparations.size());
       if(!normal_preparations[id]){
         const auto &v=input.at("normal_preparations").at(id);
-        if(!v.is_object()||v.size()!=9||!v.at("version").is_number_integer()||v.at("version")!=1)throw std::invalid_argument("Unsupported retained normal preparation");
+        const bool uv=v.contains("uv_reprojection");
+        if(!v.is_object()||v.size()!=(uv?10:9)||!v.at("version").is_number_integer()||v.at("version")!=(uv?2:1)||(uv&&!normal_uv))throw std::invalid_argument("Unsupported retained normal preparation");
         auto p=std::make_shared<SourceNormalPreparation>();p->receipt=NormalPreparationReceipt::decode(v.at("receipt"));
         p->projection=decode_normal_projection(v.at("projection"),images);p->initial_projection=decode_normal_projection(v.at("initial_projection"),images);
         p->target_frames=frames.at(uint32_t(index(v.at("frames"),frames.sets().size())));p->original_paint=paints.at(index(v.at("paint"),paints.size()));
         if(!v.at("appearance").is_null())p->original_appearance=decode_creator_appearance(v.at("appearance"),models);
         if(!v.at("deformation").is_null())p->original_deformation=std::make_shared<const DeformationState>(DeformationState::decode(v.at("deformation"),p->original_paint->mesh()));
         if(!v.at("before_binding").is_null())p->original_material=output.bindings_.at(index(v.at("before_binding"),output.bindings_.size()));
+        if(uv){const auto &u=v.at("uv_reprojection");auto projection=std::make_shared<SourceNormalUvReprojection>();projection->receipt=NormalUvReprojectionReceipt::decode(u.at("receipt"));projection->layout=SourceNormalUvLayout::decode(u.at("layout"));projection->projection=decode_normal_projection(u.at("projection"),images);projection->before_paint=paints.at(index(u.at("paint"),paints.size()));projection->before_material=output.bindings_.at(index(u.at("before_binding"),output.bindings_.size()));if(!u.at("appearance").is_null())projection->before_appearance=decode_creator_appearance(u.at("appearance"),models);if(!u.at("deformation").is_null())projection->before_deformation=std::make_shared<const DeformationState>(DeformationState::decode(u.at("deformation"),projection->before_paint->mesh()));
+          const auto prior=projection->before_material->normal_preparation;if(!prior)throw std::invalid_argument("Normal UV prior binding lost its own normal interpretation");const auto found=std::find(normal_preparations.begin(),normal_preparations.end(),prior);if(found==normal_preparations.end())throw std::invalid_argument("Normal UV prior recipe is not an earlier archived authority");const auto &record=input.at("normal_preparations").at(size_t(found-normal_preparations.begin()));if(v.at("appearance")!=record.at("appearance")||v.at("deformation")!=record.at("deformation"))throw std::invalid_argument("Normal UV original serialized authority differs from its immutable prior recipe");p->original_appearance=prior->original_appearance;p->original_deformation=prior->original_deformation;p->uv_reprojection=std::move(projection);}
         p->validate();normal_preparations[id]=std::move(p);
       }
       binding->normal_preparation=normal_preparations[id];
