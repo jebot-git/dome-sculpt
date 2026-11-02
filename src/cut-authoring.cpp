@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/cut-authoring.hpp"
 #include "dome/polygon-scene.hpp"
+#include "cut-color.hpp"
 namespace dome {
 namespace {
 void stop(const std::function<bool()> &cancelled) {
@@ -71,7 +72,7 @@ CutPublishReport publish_cut(Scene &scene,const CutPreview &preview,const BakeSo
                              const std::function<void(float)> &progress){
   stop(cancelled);preview.settings.validate();scene.validate();
   if(scene.active().polygon && scene.active().polygon->active && scene.active().polygon->colors)
-    throw std::logic_error("Current polygon corner colors need an explicit appearance-preserving cut field adapter");
+    return detail::publish_colored_cut(scene,preview,source,resolution,cancelled,progress);
   if(!preview.result)throw std::invalid_argument("Missing plane-cut preview");
   if(!preview.changed)return {};
   if(resolution<64||resolution>2048||(resolution&(resolution-1)))throw std::invalid_argument("Invalid cut texture resolution");

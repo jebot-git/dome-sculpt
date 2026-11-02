@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "cut-color.hpp"
 #include "affine-surface.hpp"
 #include "shapekey-preview.hpp"
 #include "document-authority.hpp"
@@ -111,6 +112,7 @@ void Document::request_worker_stop() {
 Document::~Document() {
   drain_polygon_shutdown();
   drain_native_shutdown();
+  drain_cut_shutdown();
   request_worker_stop();
   input_thread_.join();
   {
@@ -353,10 +355,12 @@ void Document::scene_changed_locked(Scene before) {
 }
 bool Document::undo_locked(bool redo) {
   AuthorityTransition authority(*this);
-  if(state_.held_object){invalidate_object_authority_locked();state_.held_object=0;}
   auto &source=redo?redo_:undo_,&dest=redo?undo_:redo_;
   if(source.empty())return false;
-  Transaction transaction(*this);const auto &h=source.back();
+  const auto &h=source.back();
+  const bool cut_held=h.held_before&&h.held_after&&state_.held_object==(redo?h.held_before:h.held_after);
+  if(state_.held_object){invalidate_object_authority_locked();state_.held_object=0;}
+  Transaction transaction(*this);
   std::shared_ptr<Volume> sculpt;
   std::shared_ptr<PaintedMesh> paint;
   if(h.paint){
@@ -372,6 +376,7 @@ bool Document::undo_locked(bool redo) {
     for(const auto &o:scene_.objects())if(o.volume==h.sculpt){auto &target=scene_.object(o.id);target.volume=sculpt;target.mesh_active=false;scene_.select(o.id);found=true;}
     if(!found)throw std::logic_error("Sculpt history target is unavailable");
   }else scene_=redo?*h.after:*h.before;
+  if(cut_held){state_.held_object=redo?h.held_after:h.held_before;state_.selected_objects={state_.held_object};}
   if(state_.selection_focus&&scene_.active().id!=transaction.before().active().id)state_.selected_objects={scene_.active().id};
   transaction.move_history(source,dest);
   content_=redo?h.to:h.from;bind_locked();publish_locked(true,false);
@@ -552,7 +557,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_author_shapes=shape_target_ready_locked();
   state_.can_restore_shapes=state_.can_author_shapes&&bool(active.shape_source);
   state_.can_select_shape=state_.can_author_shapes&&active.deformation&&active.deformation->morphs&&!active.deformation->morphs->targets.empty();
-  state_.can_cut = !(active.polygon && active.polygon->active && active.polygon->colors) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
+  state_.can_cut = !state_.shape_sculpt && detail::cut_color_supported(active) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
   state_.skin_sources=skin_sources_locked(state_.skin_options.mode);
@@ -1741,6 +1746,17 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
   auto result = completion->get_future();
   {
     std::lock_guard lock(model_mutex_);
+    if(state_.cut&&state_.cut->committing&&state_.asset_busy) {
+      auto token=asset_work_.load();
+      if(!token)throw std::logic_error("The accepted cut has no completion owner");
+      FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;
+      job.cut_capture=std::move(token);job.generation=state_.generation;
+      std::lock_guard file_lock(file_mutex_);
+      if(files_.size()>=8)throw std::runtime_error("File work queue is full");
+      // The cut job is already ahead of us on this same ordered worker.
+      // No worker may wait for work queued behind itself.
+      files_.push_back(std::move(job));file_changed_.notify_one();return result;
+    }
     if(polygon_accepting_.load()&&polygon_accept_) {
       FileJob job{};job.path=path;job.adopt_path=true;job.completion=completion;
       job.polygon_capture=polygon_accept_;job.generation=polygon_accept_->source.generation;
@@ -3182,6 +3198,16 @@ void Document::file_loop() {
       if(job->export_work && job->export_work->cancelled())
         throw std::runtime_error("Export cancelled");
       if(job->discover_import){discover_import_file(*job);continue;}
+      if(job->cut_capture) {
+        auto token=std::move(job->cut_capture);
+        if(token->cut_failure)std::rethrow_exception(token->cut_failure);
+        const auto result=token->cut_completed;
+        if(!result||!result->scene)
+          throw std::runtime_error("Accepted cut did not publish; dependent Save cancelled");
+        job->generation=result->generation;job->revision=result->revision;
+        job->content=result->content;job->object=result->object;
+        job->recovery_source=result->recovery;job->capture_scene=result->scene;
+      }
       if(job->native_capture)capture_native_file(*job);
       if(job->polygon_capture)capture_polygon_file(*job);
       if(job->capture_scene){job->scene=job->capture_scene->snapshot();job->scene.select(job->object);job->capture_scene.reset();}
@@ -3211,15 +3237,29 @@ void Document::file_loop() {
         };
         job->scene_operation(job->scene, cancelled);
         if (cancelled()) throw std::runtime_error("Scene changed during " + job->operation_label);
-        if(isolated_before)detail::require_isolated_scene(*isolated_before,job->scene,job->isolation_target);
+        if(job->cut_handoff){
+          if(!job->cut_session)throw std::logic_error("Cut structural permit has no accepted session");
+          // Source preparation/validation stays on the worker, outside the UI lock.
+          // The existing job scene before mutation is retained only under isolation.
+          if(isolated_before)validate_cut_handoff(*isolated_before,job->scene,*job->cut_handoff);
+          else if(!job->cut_handoff->sealed)throw std::logic_error("Cut structural permit is unsealed");
+        }else if(isolated_before)detail::require_isolated_scene(*isolated_before,job->scene,job->isolation_target);
         auto prepared = job->scene.snapshot();
         prepared.validate();
+        std::shared_ptr<CutAcceptedSnapshot> cut_result;
+        if(job->cut_session&&job->work) {
+          cut_result=std::make_shared<CutAcceptedSnapshot>();
+          cut_result->scene=std::make_shared<const Scene>(prepared.snapshot());
+          cut_result->generation=job->generation;
+          cut_result->object=prepared.active().id;
+        }
         std::lock_guard lock(model_mutex_);
         if (job->generation == state_.generation) {
           if(job->work && job->work->cancelled.load())throw std::runtime_error("Asset operation cancelled");
           if (job->content != content_ || job->revision != state_.revision ||
               job->object != scene_.active().id || state_.edit_authority!=job->edit_authority || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
+          if(cut_result)cut_result->recovery=recovery_source_;
           Transaction transaction(*this);
           state_.asset_busy=false;
           if(job->retopo_session&&job->retopo_session==retopo_session_.load())transaction.finish_retopo();
@@ -3230,17 +3270,32 @@ void Document::file_loop() {
           // first sample. Closed/focus-lost menus retain ordinary cancellation.
           const bool keep_shapes=job->work&&job->work->morph_target.load()!=UINT32_MAX&&
             input_.menu_open()&&input_.menu_page()==24;
-          if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked(keep_shapes);}
+          if(changed){
+            History history{{},transaction.before(),prepared};
+            if(job->cut_handoff&&job->cut_handoff->held_source){
+              const auto &permit=*job->cut_handoff;
+              if(state_.held_object!=permit.held_source||state_.edit_authority==UINT64_MAX)
+                throw std::logic_error("Held cut authority changed before publication");
+              history.held_before=permit.held_source;history.held_after=permit.shell;
+              state_.held_object=permit.shell;state_.selected_objects={permit.shell};++state_.edit_authority;
+            }
+            scene_=std::move(prepared);record_locked(std::move(history));bind_locked(keep_shapes);
+          }
           if(job->work&&job->work->morph_target.load()!=UINT32_MAX)state_.morph_target=job->work->morph_target.load();
           state_.error.clear();state_.message=job->operation_label+" complete";
           if(job->operation_report&&!job->operation_report->empty())state_.message+=" | "+*job->operation_report;
           publish_locked(changed,false);transaction.commit();asset_work_.store({});
+          if(cut_result) {
+            cut_result->revision=state_.revision;cut_result->content=content_;
+            job->work->cut_completed=std::move(cut_result);
+          }
           if(!changed)restore_weight_view_locked(job->rollback_preview);
           if(job->work)job->work->progress.store(1);
           if(job->work&&job->work->held_weight&&state_.object_grabbing&&!desktop_&&!object_navigation_.grabbing())finish_object_grab_locked(true,true);
         }
         {
           std::lock_guard file_lock(file_mutex_);
+          if(job->cut_session&&job->work)job->work->cut_done.store(true);
           file_changed_.notify_all();
         }
         continue;

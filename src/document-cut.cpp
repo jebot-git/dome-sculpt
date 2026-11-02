@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/polygon-scene.hpp"
+#include "cut-color.hpp"
+#include "document-authority.hpp"
 namespace dome {
 namespace {
 bool same(const CutSettings &a,const CutSettings &b){
@@ -11,14 +13,20 @@ bool same(const CutSettings &a,const CutSettings &b){
          a.cap_material.double_sided==b.cap_material.double_sided&&a.cap_material.alpha==b.cap_material.alpha&&
          a.cap_material.alpha_cutoff==b.cap_material.alpha_cutoff&&a.cap_material.unlit==b.cap_material.unlit;
 }
-std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t object){
+std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t object,const std::function<bool()> &cancelled){
   auto range=std::find_if(base.ranges.begin(),base.ranges.end(),[&](auto &r){return r.object==object;});
   if(range==base.ranges.end()||!range->count)throw std::logic_error("The cut source has no displayed surface");
+  if(range->first>base.mesh.indices.size()||range->count>base.mesh.indices.size()-range->first||range->count>2'000'000)
+    throw std::length_error("The cut source range exceeds its bounded surface");
+  if(!base.source_colors.empty()&&base.source_colors.size()!=base.mesh.positions.size())
+    throw std::invalid_argument("The displayed cut color stream is incomplete");
   auto source=std::make_shared<BakeSource>();source->materials[0].material=range->material;source->materials[0].maps=range->textures;
   for(size_t k=range->first;k<range->first+range->count;++k){
+    if((k&255)==0&&cancelled&&cancelled())throw std::runtime_error("Plane cutting cancelled");
     auto vertex=base.mesh.indices.at(k);auto &mesh=source->mesh;
     mesh.indices.push_back(uint32_t(mesh.positions.size()));mesh.positions.push_back(base.mesh.positions.at(vertex));
     mesh.normals.push_back(base.mesh.normals.at(vertex));if(!base.mesh.uv.empty())mesh.uv.push_back(base.mesh.uv.at(vertex));
+    if(!base.source_colors.empty())source->colors.push_back(base.source_colors.at(vertex));
   }
   source->mesh.validate();return source;
 }
@@ -50,11 +58,52 @@ std::shared_ptr<const MeshSnapshot> preview_snapshot(const MeshSnapshot &base,co
   return result;
 }
 }
+// The token is private to the actual publish_cut boundary. It authenticates
+// output identities/owners, never grants structural authority to edit_scene.
+void Document::validate_cut_handoff(const Scene &before,const Scene &after,const CutHandoff &permit) const {
+  const auto count=permit.cap?2u:1u;
+  if(!permit.sealed||!permit.source||!permit.shell||!permit.group||
+     before.active().id!=permit.source||after.active().id!=permit.shell||
+     after.objects().size()!=before.objects().size()+count||after.groups().size()!=before.groups().size()+1)
+    throw std::logic_error("Cut handoff has incomplete structural authority");
+  // The generated prefix is append-only: every pre-existing ID and owner is
+  // unchanged, including the hidden source's complete original authoring data.
+  for(size_t i=0;i<before.objects().size();++i){
+    const auto &a=before.objects()[i];const auto &b=after.objects()[i];
+    if(a.id!=b.id)throw std::logic_error("Cut handoff changed a protected object ID");
+    if(a.id==permit.source){auto hidden=a;hidden.visible=false;
+      if(!detail::same_object_authority(hidden,b))throw std::logic_error("Cut handoff changed its retained original");
+    }else if(!detail::same_object_authority(a,b))throw std::logic_error("Cut handoff changed a read-only ghost");
+  }
+  for(size_t i=0;i<before.groups().size();++i){
+    const auto &a=before.groups()[i];const auto &b=after.groups()[i];
+    if(a.id!=b.id||a.parent!=b.parent||a.name!=b.name||a.humanoid!=b.humanoid||a.source_placement!=b.source_placement||a.affine_edit!=b.affine_edit||!detail::same_transform(a.transform,b.transform))
+      throw std::logic_error("Cut handoff changed a protected group");
+  }
+  if(after.objects()[before.objects().size()].id!=permit.shell||
+     (permit.cap&&after.objects().back().id!=permit.cap)||after.groups().back().id!=permit.group)
+    throw std::logic_error("Cut handoff did not append its authenticated outputs");
+  for(auto id:{permit.shell,permit.cap})if(id){const auto &o=after.object(id);
+    if(o.group!=permit.group||!o.visible||o.locked||!o.mesh_active||!o.painted)
+      throw std::logic_error("Cut handoff output is not an editable generated surface");}
+  detail::require_isolated_scene(*permit.sealed,after,0);
+}
+void Document::drain_cut_shutdown() noexcept {
+  try {
+    std::shared_ptr<AssetWork> token;
+    {std::lock_guard lock(model_mutex_);
+      if(state_.cut&&state_.cut->committing)token=asset_work_.load();}
+    if(!token)return;
+    std::unique_lock lock(file_mutex_);
+    file_changed_.wait(lock,[&]{return token->cut_done.load();});
+  }catch(...) { /* Native synchronization failure cannot escape destruction. */ }
+}
 void Document::begin_cut(){std::lock_guard lock(model_mutex_);finish_locked();begin_cut_locked();}
 void Document::begin_cut_locked(){
   const auto &o=scene_.active();
-  if(o.polygon && o.polygon->active && o.polygon->colors)
-    throw std::logic_error("Current polygon corner colors need a cut field adapter; use color-aware polygon edge cuts");
+  if(state_.shape_sculpt)
+    throw std::logic_error("Finish selected-key sculpt mode before plane cutting");
+  detail::require_cut_color_supported(o);
   if(state_.cut||state_.retopology||state_.asset_busy||state_.recovery_busy||control_before_||action_active_locked()||
      !object_editable_locked(o.id)||(!o.mesh_active&&o.volume->voxels().empty())||scene_.objects().size()>254||scene_.groups().size()>=128)
     throw std::logic_error("Finish the current action; show and unlock a source with room for cut outputs");
@@ -114,10 +163,15 @@ void Document::end_cut_locked(bool accept){
   auto source=cut_bake_source_;if(!source)throw std::logic_error("Cut source is unavailable");
   auto view=std::make_shared<CutView>(*state_.cut);view->committing=true;state_.cut=view;
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
-  try{queue_scene_operation_locked("Apply plane cut",[preview,source,report,work](Scene &scene,const auto &cancelled){
+  auto handoff=std::make_shared<CutHandoff>();handoff->source=scene_.active().id;
+  if(state_.held_object==handoff->source)handoff->held_source=handoff->source;
+  try{queue_scene_operation_locked("Apply plane cut",[preview,source,report,work,handoff](Scene &scene,const auto &cancelled){
     auto result=publish_cut(scene,*preview,*source,512,cancelled,[work](float p){work->progress.store(p);});
+    if(!result.changed||!result.shell)throw std::logic_error("Accepted cut did not create its shell");
+    handoff->shell=result.shell;handoff->cap=result.cap;handoff->group=scene.object(result.shell).group;
+    handoff->sealed=std::make_shared<const Scene>(scene.snapshot());
     *report=std::to_string(result.projected)+" mapped texels; source retained";
-  },cut_source_,report,work,{}, {},0,view->session);}catch(...){view->committing=false;state_.cut=view;throw;}
+  },cut_source_,report,work,{}, {},0,view->session,handoff);}catch(...){view->committing=false;state_.cut=view;throw;}
   input_.cancel();
 }
 void Document::begin_cut_parameter(VrParameter parameter){
@@ -166,7 +220,7 @@ void Document::cut_loop(){
           if(cancelled())continue;
           base=mesh_.load();}
         if(base->generation!=job.expected.generation||base->revision!=job.expected.revision)throw std::runtime_error("Cut source mesh failed to prepare");
-        source=source_mesh(*base,job.expected.object);session=job.session;auto [center,radius]=cut_bounds(source->mesh);
+        source=source_mesh(*base,job.expected.object,cancelled);session=job.session;auto [center,radius]=cut_bounds(source->mesh);
         std::lock_guard lock(model_mutex_);if(cancelled()||!state_.cut)continue;
         cut_base_=base;cut_bake_source_=source;auto view=std::make_shared<CutView>(*state_.cut);
         view->center=center;view->radius=radius;view->ready=true;view->offset_limit_mm=std::min(100'000.f,std::max(1.f,radius*1000));state_.cut=view;publish_locked();

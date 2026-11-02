@@ -1,0 +1,87 @@
+{
+  "private_checkpoint": true,
+  "base": "cb7cf2c9c0a274e8ae28951c9ac93364745ab055",
+  "preserved_qualified_checkpoint": "9b823f5",
+  "toolkit_verified_domed": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "toolkit": "artifacts/toolkit-eee23b7",
+  "bitmap_runtime": "artifacts/bitmap-runtime-eee23b7",
+  "source_sha256": {
+    "CMakeLists.txt": "9ab617842fef374995383d9c46976abefc484fe3e1164f3ed00341658e8a4f82",
+    "include/dome/document.hpp": "af61447f874d882d2ffca34bf7c43342f5a9da8063b9f2bcff5fbac69ac64319",
+    "src/document-assets.cpp": "d76c1958439557afe3f280d04750a51bf99a05cde33862df5ba918fc4570f3e5",
+    "src/document-authority.hpp": "17c4417c47c61f8c6c972421fe058aa4a24a02c57fa8c67d9b43c0665d919e8a",
+    "src/document-cut.cpp": "ab2f43911f1ce1c9b0897da2b72fbb845a5437c633cb0794d296d77e81c9dec4",
+    "src/document.cpp": "782d76ecaf1c979802aa599108ff7bae8b32b613fc8fc6d82fd40a42429e978b",
+    "tests/cut-color-document.cpp": "270a1f6a3b13e2f4f9eb56d0937ee77b5cf48d487af4765f4d141d01f8e371c0",
+    "tests/cut-color-publication.cpp": "3ee452e283cbcac1c14362d72236d6edf0b2cfb1b13425e10c022a6aa6a690db",
+    "tests/cut-color-xr.py": "ee93078e0bdc118be3d19267b6bca14520fc29c2cc48e553b287cf892c309b96",
+    "tests/cut-color.cpp": "05ffa02361297ce686485669eca9c80fb530fa80c55d223234a90805f15803f8",
+    "tests/menu.py": "664c6af4f57b7d98d87cb51cf04cfe475c79c51aca2f3db48fbedd52005c0dc1",
+    "tests/xr_runtime.cpp": "f3bd7d94719717c93766cd8c62ab763e64b15092a1266941fcc2e8b427648511",
+    "docs/HELD-CUT-HANDOFF.md": "b289a5baaa29306ac6bb33c1d151025aef6d78bafed84c7f2cc5b0219c9736c0"
+  },
+  "evidence_sha256": {
+    "artifacts/tests-held-cut-first.log": "224f8450aa6e6f3d113ffc219d312f753d3178c5f8484d619ed8245ba13186c6",
+    "artifacts/tests-held-cut-release-native.log": "226dc1619a220b77a5032e6b259c9f5df5ab768f95f3e96b0683646113561ced",
+    "artifacts/tests-held-cut-san-native.log": "6a5585923426934bf4d985b6cdf7d793dd97d62bb25e259ea25d6606a34071a9",
+    "artifacts/tests-held-cut-san-transactions.log": "c0a101c76183f1b3db41b5110af70043966553d04427c6e50e5210871b9deb5a",
+    "artifacts/tests-held-cut-publication-edges.log": "b924d28ff6d2ce9eb22392a3b06e7b834264c42d0edd6320e4fc544830a07b81",
+    "artifacts/tests-held-cut-san-publication-edges.log": "b924d28ff6d2ce9eb22392a3b06e7b834264c42d0edd6320e4fc544830a07b81",
+    "artifacts/tests-menu-held-cut-first.log": "50f01a29869723d615d9259aed8266c6d41702e53e03ab0dd223716329017cfc",
+    "artifacts/tests-menu-key-cut-first.log": "caadcb6bc774ce7d379f616aa51ed613f46edffcdac21a67c3010df3b7b37931",
+    "artifacts/tests-menu-held-cut-compact.log": "93d3189317bc0957c7fd5f710e0ad0e5f8e1f7a389def7dee11eebc6280fdbce",
+    "artifacts/tests-held-cut-xr-anchor.log": "514720740902372c9bbf98c38797aaa8b030af83d804bb3002c9777c36757023",
+    "artifacts/tests-held-cut-render-software.log": "341465492dbb8037fff02561316815c1d1efc980a916f67f619e2062b4041230",
+    "artifacts/tests-held-cut-render-arc.log": "05c91c590af500060984187db6a347892004bc018613d15f3eae587654caea10"
+  },
+  "completed": {
+    "native_controller_checks": 157,
+    "release_suites": 30,
+    "san_native_suites": 4,
+    "san_transaction_suites": 25,
+    "native_held_publication_faults": {
+      "measured": 10089,
+      "injected": 64,
+      "scope": "first32 + last32, actual publication after witnessed immutable helper replay"
+    },
+    "san_held_publication_faults": {
+      "measured": 10089,
+      "injected": 32,
+      "scope": "first16 + last16, actual publication after witnessed immutable helper replay"
+    },
+    "fltk_dbusmenu": {
+      "held": 16,
+      "key_mode": 15,
+      "compact_held": 7
+    },
+    "openxr_loader": {
+      "checks": 21,
+      "cases": [
+        "accept",
+        "unconfirmed",
+        "held"
+      ],
+      "synthetic_tracking": true,
+      "software_gl": true,
+      "physical_headset": false
+    },
+    "independent_render_export": {
+      "cases": 32,
+      "checks_per_device": 257,
+      "devices": [
+        "llvmpipe software",
+        "Intel Arc A770 PCI0000:03:00.0"
+      ],
+      "maximum_full_image_error": 1
+    }
+  },
+  "limitations": [
+    "pinned Hold selected supported; moving grip + cut one combined transaction remains",
+    "current-field target bake not adapted",
+    "current-color source bake adapter next",
+    "UV1/prepared color/normal and unsupported artist-frame/MToon cut guards retained",
+    "cut-only accepted snapshot Save; not generic/UV accepted Save proof",
+    "no new exhaustive preparation or publication fault claim beyond selected boundary scope",
+    "no push/install/restart/physical headset"
+  ]
+}

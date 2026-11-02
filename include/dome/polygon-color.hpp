@@ -13,8 +13,7 @@ struct PolygonColorSample {
   std::vector<std::pair<PolygonId, double>> provenance;
 };
 struct PolygonColoredEdit;
-// Detached, immutable geometry-side color authority. This foundation has no
-// Scene codec yet; it cannot on its own remove a conversion/export guard.
+// Immutable geometry-side color authority, retained by native Scene archives.
 class PolygonColorField {
 public:
   static PolygonColorField from_corners(const PolygonMesh &,
@@ -37,6 +36,9 @@ private:
   std::shared_ptr<const std::vector<PolygonCornerRgba>> sources_;
   std::vector<PolygonColorSample> corners_;
   friend struct PolygonColorArchiveAccess;
+  friend PolygonColorField transfer_polygon_colors(
+      const PolygonMesh &, const PolygonColorField &, const PolygonMesh &,
+      std::span<const PolygonCornerSource>, const PolygonLimits &);
   friend PolygonColoredEdit edit_colored_polygon(const PolygonMesh &,
                                                  const PolygonColorField &,
                                                  const PolygonEdit &,
@@ -58,4 +60,12 @@ PolygonColoredEdit edit_colored_polygon(const PolygonMesh &,
                                         const PolygonColorField &,
                                         const PolygonEdit &,
                                         const PolygonLimits & = {});
+// Compose authenticated geometric corner transfers through the existing field.
+// The original immutable source basis is shared, never replaced by sampled
+// raster/vertex values. Every target corner requires one convex input witness.
+PolygonColorField transfer_polygon_colors(const PolygonMesh &,
+                                          const PolygonColorField &,
+                                          const PolygonMesh &,
+                                          std::span<const PolygonCornerSource>,
+                                          const PolygonLimits & = {});
 } // namespace dome

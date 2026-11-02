@@ -53,11 +53,23 @@ struct ObjectInfo {
   bool selected=false, active=false, hovered=false;
   uint32_t selection_accent=0x6babff;
 };
+// Exact accepted cut endpoint, built on the file worker before authority
+// publication. It never aliases the later mutable document scene.
+struct CutAcceptedSnapshot {
+  std::shared_ptr<const Scene> scene;
+  uint64_t revision=0,generation=0,content=0,object=0;
+  RecoverySource recovery;
+};
 struct AssetWork {
   std::atomic_bool cancelled{false};
   std::atomic<float> progress{0};
   bool held_weight=false; // Immutable job kind; set before queue publication.
   std::atomic<uint32_t> morph_target{UINT32_MAX};
+  // Written/read only by the ordered file worker. Shutdown observes cut_done,
+  // published with file_mutex_, even if diagnostic allocation fails.
+  std::shared_ptr<const CutAcceptedSnapshot> cut_completed;
+  std::exception_ptr cut_failure;
+  std::atomic_bool cut_done{false};
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
 struct EditorState {
@@ -365,6 +377,8 @@ private:
     std::optional<Scene> before, after;
     uint64_t from = 0, to = 0;
     std::shared_ptr<PaintedMesh> paint{};
+    // Only a sealed structural cut may move the corresponding held endpoint.
+    uint64_t held_before=0, held_after=0;
   };
   class AuthorityTransition;
   class Transaction;
@@ -450,6 +464,7 @@ private:
   void finish_cut_parameter_locked(bool accept);
   void cut_from_hand_locked();
   void cut_loop();
+  void drain_cut_shutdown() noexcept;
   float control_resolution_voxel_ = .03f;
   AssetSource polygon_source_{};
   std::shared_ptr<const Scene> polygon_initial_;
@@ -629,6 +644,11 @@ private:
         throw std::runtime_error("Export cancelled");
     }
   };
+  struct CutHandoff {
+    uint64_t source=0, shell=0, cap=0, group=0, held_source=0;
+    std::shared_ptr<const Scene> sealed;
+  };
+  void validate_cut_handoff(const Scene &, const Scene &, const CutHandoff &) const;
   struct FileJob {
     Scene scene;
     std::filesystem::path path;
@@ -667,6 +687,8 @@ private:
     uint64_t import_request=0;
     std::shared_ptr<PolygonAccept> polygon_capture;
     std::shared_ptr<ExportWork> export_work;
+    std::shared_ptr<AssetWork> cut_capture;
+    std::shared_ptr<CutHandoff> cut_handoff;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.
@@ -736,7 +758,7 @@ private:
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
-                                    uint64_t cut_session = 0);
+                                    uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
