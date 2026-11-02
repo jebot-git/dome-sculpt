@@ -1800,3 +1800,13 @@ if(BUILD_TESTING)
   add_test(NAME pbr-history-accounting COMMAND dome-sculpt-pbr-history-accounting-test ${CMAKE_CURRENT_BINARY_DIR}/pbr-history-accounting)
   set_tests_properties(pbr-history-accounting PROPERTIES TIMEOUT 120)
 endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-fbx-named-uv-render-test tests/fbx-named-uv-render.cpp)
+  target_include_directories(dome-sculpt-fbx-named-uv-render-test PRIVATE src third_party/cgltf third_party/ufbx third_party/desktop)
+  target_link_libraries(dome-sculpt-fbx-named-uv-render-test PRIVATE dome-sculpt-render ufbx)
+  add_test(NAME fbx-named-uv-render COMMAND dome-sculpt-fbx-named-uv-render-test
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/import-named-uv.fbx
+    ${CMAKE_CURRENT_BINARY_DIR}/fbx-named-uv-render)
+  set_tests_properties(fbx-named-uv-render PROPERTIES TIMEOUT 120 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
