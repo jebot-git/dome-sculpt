@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "base": "b0cdeb561ec4938ac9ab960bdfee80345fa83470",
+  "scope": "Test-only actual-CC0-avatar postUV qualification; no product/public/schema change",
+  "source": {
+    "CMakeLists.txt": "b2b4c03eb3e263f2f4ce25ece3499256e27acea996e37dac97943294dabf52c0",
+    "tests/post-uv-avatar.cpp": "268e1c17b67b3cc28ee544b15a1bc614ca54afa1945bfb6c820abd58ee768661",
+    "tests/post-uv-avatar-render.cpp": "47e8ab2531a1e92fbe0cc2033cdcd55da80a2ba6e2b1edead4cdf6de43e37a8f",
+    "docs/POST-UV-AVATAR-QUALIFICATION.md": "ff9b56e2abff71ce5aee12b05168bb3830fab86936d6aebb2ce9bf52ce66af56"
+  },
+  "product_sources_unchanged": true,
+  "all_public_headers_match_frozen_product": true,
+  "qualified_frozen_archives_and_flags": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libmikktspace-robust.a": "604dbf1a055ce59313eb68cd033d26c35e616cb45d31aab6201526a879371920",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libdome-sculpt-affine.a": "30ccb038e9008f8cc45db070976d0da13afea7a74f71623a56f9f311dc24d38c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libxatlas.a": "7888b2647fea8230efcefd0a4653cb2dffdda39b863675f8ac8d6848f7492f0e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libmikktspace.a": "5c010ed0c0f99a28809288f100b271339becbe9e0ff6dfae8a0de7fd5006e158",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libufbx.a": "f0e4df1fb8972b1fa7395e03651a8ad62e4ebd25ef5e48226e2893392632ec82",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libdome-sculpt-polygon.a": "b3f6ea1e048bb8fe81db79d9882af7c6507dc16851eaf27d915ece4aec6930ac",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libdome-sculpt-core.a": "f7ccbba482ada4ff3d813dca691989d3c90a7bb275cb3c77389cf08d696d115f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libdome-sculpt-render.a": "113e180800831b2986497070eefae29cab6d5f4221ca8a33e2a00d98797d14aa",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/libdome-sculpt-xr.a": "074f22c7e52e8633fb2c44bc0f4345e8d8bc991a5bf6e44666e3c8d48fba4c91",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/CMakeFiles/dome-sculpt-core.dir/flags.make": "092780511e8f86b57f7ccacd7f9b9dfd865ff0b30f7670636a17bda182c892b2",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-cpu/CMakeFiles/dome-sculpt-render.dir/flags.make": "ec19b12c0058f73088e4e49bc570ec07f3002a2d9cabae3054f2c9d26e7f028b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libmikktspace-robust.a": "5580aa77a46a9f09eeefb9c6a8ebe6de331ad17be821ee7fb365799c412e8f2f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libdome-sculpt-affine.a": "8fd9226e2658cb48e4cf222a42ff82d27287a590029af46cab53fa40f7fcc13b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libxatlas.a": "c7b92e2cdcdeffca5aa57f6f5cf2f00107d861e49743bc3b0fd0a48494ddd216",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libmikktspace.a": "728b52746c0039286edfd99832f58c3bb2223266b4da226661a89fac77030b5e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libufbx.a": "79374ea17970170bf48b55462bd143356941138ef2e5150ca4ce33e98386ca7f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libdome-sculpt-polygon.a": "5a41b9f4fe860018be460fa9e53376dc730c99e4a1e8db8e6655eb797d6786ed",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libdome-sculpt-core.a": "e23637d579d1f2a98a9482fea875841f79835f014e62d9727e10bdf7cd1ee2a1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/libdome-sculpt-render.a": "92e1629e424bc378efaa3b871cd2abfc7c6d14248368886930a674eddf184705",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/CMakeFiles/dome-sculpt-core.dir/flags.make": "3cd5c31e4a579f69a64fcc109c044d52d33a48db863001b5959544ef0d80cf8d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/prepared-keys-after-uv-bb17/build-sanitize/CMakeFiles/dome-sculpt-render.dir/flags.make": "a211c90fdcf44cb05f69356139d60828eb865e6d6148fe4e26bd945468507317"
+  },
+  "fixture_binaries": {
+    "artifacts/probe/fixture": "3dc988553d5a3cd943b653728ea64be698de9c3ca7e4d367318bfa7de541401f",
+    "artifacts/sanitize-probe/fixture": "c545bc77a95139b6633dafb170567bd64f4da845d30a93f042db0ef5dfdc9af0",
+    "artifacts/render-probe/fixture": "b112c377e6d391b8ffa6b42b4979a1a915d33aaeb58720c4581843962434bcd7",
+    "artifacts/render-sanitize-probe/fixture": "ca55f32e24bdb561590a6d40ae5febcc854118454da94e92511bd810f507ab0e"
+  },
+  "logs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-controller3.log": "54625e0d1f791e69aa71278860c9ec40cc4149bbc37b6b8a5d5fef38fbc1e3ec",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-sanitize.log": "54625e0d1f791e69aa71278860c9ec40cc4149bbc37b6b8a5d5fef38fbc1e3ec",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-render-probe3.log": "ed25dcab3379e34ee743615a87f93154d3e30f922405357087c44bee59b231f9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-render-arc87.log": "7cbc5d7003e7f645559421293afd46bf515143c1fc044c8982d4164fb4e41c9e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-render-sanitize.log": "ed25dcab3379e34ee743615a87f93154d3e30f922405357087c44bee59b231f9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-khronos.json": "c56a89e7b38a2e1f81e0fa34e82df4ef06200c0bab72637fcb32f75a6ad15cf8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-vrm-schema.json": "c28e61f848b54ace70c32a7ed560e6d62dc985fb263f287218844227c333fcd1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-cmake-registration.log": "310550db1ca5aac4655c97845778519d32d3abffe9cadfac05d6680a178968a9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/post-uv-avatar-cmake-tests.log": "85bb4d31bf5c79f76eabe46fa182a15c52ff3ef46c48ce8c8c62dd47ae679e31"
+  },
+  "native": {
+    "release": 17,
+    "whole_core_asan_ubsan_leaks": 17,
+    "models": 2,
+    "parts_per_model": 19,
+    "resolution": 256,
+    "triangles": [
+      1064,
+      1072
+    ],
+    "original_targets": [
+      56,
+      54
+    ],
+    "operations": [
+      "repeat +/-one-texel native UV Apply",
+      "Create/Replace",
+      "desktop stroke/UndoRedo/Cancel",
+      "actual joystick navigation/trigger stroke/focus cancellation",
+      "Save/new-Document/reopen",
+      "exact complete source Restore",
+      "actual fractional-scale quality refusal retains Scene and no history"
+    ]
+  },
+  "graphics": {
+    "release_software": 87,
+    "whole_core_support_renderer_asan_ubsan_leaks_software": 87,
+    "arc_a770_pci": "0000:03:00.0",
+    "arc_checks": 87,
+    "images": 18,
+    "max_byte_error": 0,
+    "poses": 3,
+    "morph_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "real_normal_fields_preserved": true,
+    "unrelated_material_lighting_controlled": true,
+    "normal_constant_substitution": false
+  },
+  "validation": {
+    "khronos_version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "files": 18,
+    "errors": 0,
+    "warnings": 360,
+    "warning_codes": {
+      "NODE_SKINNED_MESH_NON_ROOT": 342,
+      "INVALID_EXTENSION_NAME_FORMAT": 18
+    },
+    "official_vrm0_files": 18,
+    "official_schema_files": 15,
+    "official_errors": 0
+  },
+  "emitted_files_software_arc_byte_identical": [
+    {
+      "file": "consumer-vroid-beta-female-p0-w0.vrm",
+      "sha256": "6aed8d94fe8ce9155825bfd32c507253755e45a2c0a7d0e2c6bd88984dc7bba0"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p0-w100.vrm",
+      "sha256": "0e42a440ea3487329872aab7125890389e34b95ba3178ef8c9f304cf735d388e"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p0-w35.vrm",
+      "sha256": "b8df5319c23d005e2cb2f22dfba6a52f1cd8ab3697836dbcb581964954a81b4c"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p1-w0.vrm",
+      "sha256": "2c0c9d368ee86bae1a95cf7d3a811095e82c6f3f36cd15909d02abd808b35648"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p1-w100.vrm",
+      "sha256": "7c76ee74e7d69dae77f9f7795617a68664afebd9dd4ecce723199a833902c527"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p1-w35.vrm",
+      "sha256": "bfe98166fdc9d5770874b31cd56a90a6da0f1fceee03f94291f83e0a7434b1e1"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p2-w0.vrm",
+      "sha256": "ec3f70531c6cbda33edb8e6b9660354293cc3739b03b3594a9c51970e73f7132"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p2-w100.vrm",
+      "sha256": "e321bc368bf27a4782eae3c0c6d59141dc6aa3ab5749a517e5a0fce7bc72a20d"
+    },
+    {
+      "file": "consumer-vroid-beta-female-p2-w35.vrm",
+      "sha256": "19725fd11d479698d2525e6c741440b4686c4267e78743c28e7db7cd91373675"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p0-w0.vrm",
+      "sha256": "d541ae37316c45a083302a078260e921ac270b1f16926a8394b5f0dc54167797"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p0-w100.vrm",
+      "sha256": "1f04361b297b6a351c65e98816870bf46eede11b2815a39644f38e30d15d3574"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p0-w35.vrm",
+      "sha256": "e322b2ca8b5695b392657777de0764d75fb85ec32b63af55a5c48f7c67d3302c"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p1-w0.vrm",
+      "sha256": "c7f1a4782103c71aebe2a1019795940111449de14fc145593be7a18e23c946fa"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p1-w100.vrm",
+      "sha256": "3f3967036d577ac0c312ce2e255dab90d4203a15463e1a5262dd6e86d72bff77"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p1-w35.vrm",
+      "sha256": "0ec0c5f0d71f6c4640498ace13a07816bc4e875be7304370740f2edadb08ac63"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p2-w0.vrm",
+      "sha256": "a79a3df63cd1fb232fdf3ece96c0c5bbf61253627cc7774bdc66f2ab9ad3f382"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p2-w100.vrm",
+      "sha256": "033e990d24c1de14e4b2de5e5a577b679d8cfee1f4d38edd62d9ed600de7d369"
+    },
+    {
+      "file": "consumer-vroid-beta-male-p2-w35.vrm",
+      "sha256": "e81ceb73d0df196cfd247ed09f23da08c7de2e029f380aebc8e3f57bd3cc2017"
+    }
+  ],
+  "limits": [
+    "Only representable integer translations qualified; fractional .95 scale safely refuses",
+    "No arbitrary scale/general normal sampling-domain or independent corner-key authoring completion",
+    "Controlled lighting isolates original actual normal field/attribute transport; not full material feature qualification",
+    "Fixture TUs link exact frozen b0 product libraries; not a fresh all-target product build",
+    "No new GUI/OpenXR-loader/HMD/install/session proof"
+  ],
+  "parked_unadmitted_padding_v2_patch_sha256": "4782b9fbea0c8f3f22b89adf6d61b82f2b4eacd8469ba76edff47f264b6c42be"
+}
