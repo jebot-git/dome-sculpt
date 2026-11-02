@@ -40,12 +40,18 @@ struct Visibility {
   std::optional<MToonMaterial> toon;
   PaintSourceTexture color, mask, coverage, pbr;
   const ImportedPrimitive *primitive = nullptr;
+  std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv1;
   std::vector<std::array<float,4>> vertex_colors;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
                       std::span<const std::array<float,4>> packed_colors, bool explicit_colors) : range(r) {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
+    if(maps&&maps->source_maps&&maps->source_maps->uv1){
+      maps->source_maps->validate();owned_uv1=maps->source_maps->uv1;
+      if(r.first_vertex>mesh.positions.size()||owned_uv1->size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility UV1 domain exceeds packed geometry");
+      for(size_t c=r.first;c<r.first+r.count;++c){auto v=mesh.indices.at(c);if(v<r.first_vertex||v-r.first_vertex>=owned_uv1->size())throw std::invalid_argument("Visibility UV1 packed index is invalid");}
+    }
     const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get());
     if (maps) {
       if (maps->source_only) {
@@ -63,6 +69,7 @@ struct Visibility {
       if(r.material_bindings->has_mtoon)toon=r.material_bindings->material;
     } else toon = retained_mtoon(r.appearance.get());
     if (!toon) {
+      color.validate(owned_uv1?2:1);
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
       if(explicit_colors) {
         if(!packed_colors.empty()) {
@@ -144,9 +151,11 @@ struct Visibility {
       auto id = m.indices.at(size_t(triangle) * 3 + c);
       std::array<float,2> q{};
       if (secondary) {
-        if (!primitive || id < range.first_vertex) throw std::runtime_error("Visibility UV1 packed range is invalid");
-        auto source = range.appearance->source_vertices.at(id - range.first_vertex);
-        q = primitive->uv1.at(source);
+        if(id<range.first_vertex)throw std::runtime_error("Visibility UV1 packed range is invalid");
+        if(owned_uv1)q=owned_uv1->at(id-range.first_vertex);else{
+          if(!primitive)throw std::runtime_error("Visibility UV1 has no coordinate authority");
+          auto source=range.appearance->source_vertices.at(id-range.first_vertex);q=primitive->uv1.at(source);
+        }
       } else if (!m.uv.empty()) q = m.uv.at(id);
       for (size_t k = 0; k < 2; ++k) result[k] += q[k] * bary[c];
     }
@@ -161,7 +170,7 @@ struct Visibility {
     if (alpha == Material::AlphaMode::Opaque) return true;
     auto primary = uv(m, triangle, bary, false);
     auto sample = [](const PaintSourceTexture &v, std::array<float,2> q, size_t channel = 3) {
-      return sample_source_texture(v, q[0], q[1], false)[channel];
+      auto resolved=v;resolved.texcoord=0;return sample_source_texture(resolved, q[0], q[1], false)[channel];
     };
     float opacity;
     if (toon) {
@@ -180,7 +189,7 @@ struct Visibility {
         if(replacement!=0)opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) * (1-replacement);
       }
     } else {
-      opacity = factor * sample(color, primary);
+      opacity = factor * sample(color, color.texcoord==1?uv(m,triangle,bary,true):primary);
       if(!vertex_colors.empty()){float a=0;for(size_t k=0;k<3;++k)a+=bary[k]*vertex_colors.at(m.indices[first+k]-range.first_vertex)[3];opacity*=a;}
     }
     opacity = std::clamp(opacity, 0.f, 1.f);

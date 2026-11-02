@@ -89,10 +89,10 @@ void operator delete(void *p, size_t) noexcept { std::free(p); }
 void operator delete[](void *p, size_t) noexcept { std::free(p); }
 int main(int argc, char **argv) try {
   check(argc == 2 || (argc==3 && std::string_view(argv[2])=="--fallback"),
-        "Choose flat, textured or skinned import fixture [--fallback]");
+        "Choose flat, textured, skinned or atlas import fixture [--fallback]");
   force_fallback=argc==3;
   const std::string mode = argv[1];
-  check(mode == "flat" || mode == "textured" || mode == "skinned",
+  check(mode == "flat" || mode == "textured" || mode == "skinned" || mode == "atlas",
         "Unknown import fixture");
   auto dir = std::filesystem::temp_directory_path() /
              ("dome-import-memory-" + mode + "-" + std::to_string(getpid()));
@@ -123,6 +123,12 @@ int main(int argc, char **argv) try {
     f.j["images"] = import_fixture::Json::array();
     f.j["textures"] = import_fixture::Json::array();
     f.j["samplers"] = import_fixture::Json::array();
+  }
+  if(mode=="atlas"){
+    auto &m=f.j["materials"][0];m["pbrMetallicRoughness"]["baseColorTexture"]["texCoord"]=1;m["normalTexture"]={{"index",0},{"texCoord",1},{"scale",.6f}};
+    // One real instance is enough to walk all actual xatlas/adoption ownership
+    // boundaries without multiplying an exhaustive fault sweep by identical parts.
+    f.j["nodes"][0]["children"]={1};f.j["nodes"].erase(f.j["nodes"].begin()+2);
   }
   std::filesystem::path resource;
   if (mode == "textured") {
@@ -177,6 +183,7 @@ int main(int argc, char **argv) try {
   const auto revision = paint->revision();
   ImportAuthoringOptions options;
   options.paint_resolution = 64;
+  options.prepare_texture_atlas=mode=="atlas";
   auto run = [&](ImportAuthoringOptions o) {
     return prepare_authoring_import(input, path, std::move(o));
   };
@@ -202,6 +209,7 @@ int main(int argc, char **argv) try {
                 *o.appearance->source_receipt->resources[0].bytes ==
                     resource_before,
             "Texture fixture must decode and retain actual PNG material maps");
+    if(mode=="atlas")check(o.painted->source_maps()&&!o.painted->source_maps()->uv1&&o.material_bindings->uv_origin->paint->source_maps()->uv1,"Atlas fault sweep must execute real UV1 resampling/adoption and retain its original domain");
     if (mode == "skinned")
       check(o.deformation && o.deformation->skin && o.deformation->morphs &&
                 o.deformation->skeleton->inverse_bind_override,

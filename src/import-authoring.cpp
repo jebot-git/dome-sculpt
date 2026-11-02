@@ -6,6 +6,7 @@
 #include "dome/import-image.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/source-placement.hpp"
+#include "dome/source-uv-bake.hpp"
 #include "dome/projection.hpp"
 #include "import-skin.hpp"
 #include "source-tangent-frames.hpp"
@@ -95,11 +96,14 @@ Material native_material(const ImportedMaterial &m) {
 }
 std::shared_ptr<const PaintSourceMaps>
 maps(const ImportedAsset &asset, const ImportedMaterial &m,
-     const std::vector<std::shared_ptr<const Image>> &images) {
+     const std::vector<std::shared_ptr<const Image>> &images,
+     const ImportedPrimitive &primitive, std::span<const uint32_t> vertices, bool prepare) {
   auto result = std::make_shared<PaintSourceMaps>();
   auto view = [&](PaintSourceTexture &out, int index, int coordinate) {
     if (index < 0)
       return;
+    if (coordinate != 0 && !prepare)
+      throw std::invalid_argument("Native authoring import maps currently require TEXCOORD_0; enable Prepare editable texture atlas for other coordinate sets");
     const auto &t = asset.textures.at(size_t(index));
     out.image = images.at(size_t(t.image));
     out.wrap_s = t.wrap_s;
@@ -113,6 +117,12 @@ maps(const ImportedAsset &asset, const ImportedMaterial &m,
   view(result->normal, m.normal_texture, m.normal_texcoord);
   view(result->emission, m.emissive_texture, m.emissive_texcoord);
   view(result->occlusion, m.occlusion_texture, m.occlusion_texcoord);
+  if(result->uses_uv1()){
+    if(primitive.uv1.size()!=primitive.mesh.positions.size())throw std::invalid_argument("Imported texture requires missing UV1 coordinates");
+    auto domain=std::make_shared<std::vector<std::array<float,2>>>();domain->reserve(vertices.size());
+    for(auto vertex:vertices)domain->push_back(primitive.uv1.at(vertex));
+    result->uv1=std::move(domain);
+  }
   result->normal_scale = m.normal_scale;
   result->occlusion_strength = m.occlusion_strength;
   result->validate();
@@ -245,6 +255,16 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       ordered.size() + 1 > 128 - input.groups().size())
     throw std::length_error(
         "Imported hierarchy exceeds native object/group limits");
+  // Each prepared object retains its original paint domain as well as the
+  // editable atlas. Check the import's minimum Scene paint budget before any
+  // image decoding or xatlas worker allocation, then validate the cumulative
+  // result after each fully prepared primitive (including existing owners).
+  if(options.prepare_texture_atlas){
+    constexpr size_t scene_texels=16*1024*1024;
+    const size_t domains=2*size_t(options.paint_resolution)*options.paint_resolution;
+    if(objects>scene_texels/domains)
+      throw std::length_error("Editable atlas import exceeds Scene paint-map budget");
+  }
   auto images = std::make_shared<std::vector<std::shared_ptr<const Image>>>();
   size_t pixels = 0;
   for (const auto &encoded : asset->images) {
@@ -339,7 +359,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       PaintSurfaceOptions paint_options;
       paint_options.policy = PaintUvPolicy::SourceAuthored;
       paint_options.cancelled = options.limits.cancelled;
-      auto source_maps = maps(*asset, m, *images);
+      auto source_maps = maps(*asset, m, *images, p, remap, options.prepare_texture_atlas);
       // The legacy codec authorizes SourceAuthored only with raw source maps.
       // Plain original UV authority is a Scene11 feature; do not emit a record
       // the current reader would refuse, or silently alter overlapping raw UVs.
@@ -408,6 +428,28 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       binding->uv_origin = origin;
       binding->validate();
       object.material_bindings = binding;
+      if(options.prepare_texture_atlas){
+        SourceUvBakeInput atlas;atlas.paint=object.painted;atlas.appearance=object.appearance;
+        atlas.current_deformation=object.deformation;atlas.current_material=binding;
+        atlas.target=object.painted->mesh();const auto &before=object.painted->mesh();
+        unwrap(atlas.target,options.paint_resolution,4,options.limits.cancelled);
+        if(atlas.target.indices.size()!=before.indices.size())throw std::runtime_error("Editable atlas changed original triangle count");
+        atlas.source_vertices.assign(atlas.target.positions.size(),UINT32_MAX);
+        for(size_t corner=0;corner<before.indices.size();++corner){
+          if((corner&4095)==0)stop(options);
+          auto vertex=atlas.target.indices[corner],source=before.indices[corner];
+          auto &mapped=atlas.source_vertices.at(vertex);
+          if(mapped!=UINT32_MAX&&mapped!=source)throw std::runtime_error("Editable atlas merged different original vertices");
+          mapped=source;
+        }
+        if(std::find(atlas.source_vertices.begin(),atlas.source_vertices.end(),UINT32_MAX)!=atlas.source_vertices.end())throw std::runtime_error("Editable atlas contains an unproven vertex");
+        SourceUvBakeOptions bake;bake.resolution=options.paint_resolution;bake.cancelled=options.limits.cancelled;
+        auto adopted=adopt_source_uv_bake(bake_source_uv(atlas,bake),options.limits.cancelled);
+        object.painted=std::move(adopted.paint);object.appearance=std::move(adopted.appearance);
+        object.deformation=std::move(adopted.deformation);object.material_bindings=std::move(adopted.material_bindings);
+        output.diagnostics.push_back("Prepared editable texture atlas at "+std::to_string(options.paint_resolution)+" pixels; original coordinates, images and source retained");
+      }
+      if(options.prepare_texture_atlas)output.scene.validate(false);
       output.objects.push_back(id);
     }
   }

@@ -844,6 +844,7 @@ size_t BakedTextures::storage_bytes() const {
 }
 size_t PaintedMesh::storage_bytes() const {
   size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
+  if(source_maps_&&source_maps_->uv1)result+=source_maps_->uv1->size()*sizeof(std::array<float,2>);
   if(normal_projection_)result+=normal_projection_->pbr->rgba.size()+normal_projection_->mtoon->rgba.size();
   for (const auto &layer : layers_)
     for (const auto &tile : layer.tiles)
@@ -919,7 +920,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
     std::shared_ptr<const PaintSourceMaps> maps,uint32_t resolution,const PaintSurfaceOptions &options) {
   if(!maps || maps->empty())throw std::invalid_argument("Original paint maps are empty");
-  maps->validate();
+  maps->validate_surface(mesh);
   auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),resolution,options));
   // Freeze the small bundle of references/metadata. The shared image pixels must
   // already be immutable, allowing one original image cache across materials.
@@ -1105,6 +1106,7 @@ PaintedMesh::composite(const Material &material) const {
 }
 std::shared_ptr<const TextureMaps>
 PaintedMesh::build_composite(const Material &material) const {
+  if(source_maps_&&source_maps_->uses_uv1())throw std::invalid_argument("UV1 source compositing requires explicit source-coordinate preparation");
   auto maps = std::make_shared<TextureMaps>();
   maps->source_maps=source_maps_;
   maps->color_projection=color_projection_;
@@ -1342,6 +1344,7 @@ PaintedMesh::reparameterize(Mesh target,
   }
   auto result = snapshot();
   if (same) {
+    if(source_maps_&&source_maps_->uv1&&(target.indices!=mesh().indices||target.positions.size()!=mesh().positions.size()))throw std::invalid_argument("Source UV1 vertex remapping requires explicit source-coordinate preparation");
     auto surface = std::make_shared<SurfaceMap>(*surface_);
     surface->mesh = std::move(target);
     result->surface_ = std::move(surface);
@@ -1635,7 +1638,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
   if(j.contains("source_maps") || j.contains("color_projection") || j.contains("normal_projection")) {
     if(archive && j.contains("source_images"))throw std::runtime_error("Ambiguous original texture archive");
     if(!archive){local_images=PaintImageArchive::decode(j.at("source_images"));images=&*local_images;}
-    if(j.contains("source_maps"))result->source_maps_=decode_source_maps(j.at("source_maps"),*images);
+    if(j.contains("source_maps")){result->source_maps_=decode_source_maps(j.at("source_maps"),*images);result->source_maps_->validate_surface(result->mesh());}
     if(j.contains("normal_projection")){
       result->normal_projection_=decode_normal_projection(j.at("normal_projection"),*images);
       result->normal_projection_->validate(result->resolution());

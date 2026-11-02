@@ -98,7 +98,7 @@ struct SurfaceRenderer::TextureState {
   using Sampler=std::array<int,4>;
   struct SamplerHash {size_t operator()(const Sampler&s)const{size_t h=0;for(int n:s)h=h*131+size_t(n);return h;}};
   struct ImageResource {std::shared_ptr<const Image> owner;GLuint id=0;bool mips=false;size_t bytes=0;};
-  struct Slot {GLuint image=0,sampler=0;std::array<float,6> uv{1,0,0,1,0,0};};
+  struct Slot {GLuint image=0,sampler=0;std::array<float,6> uv{1,0,0,1,0,0};int coordinate=0;};
   using Binding=std::array<Slot,16>;
   struct Toon {
     std::shared_ptr<const CreatorAppearance> appearance;
@@ -174,13 +174,20 @@ struct SurfaceRenderer::TextureState {
       for(size_t i=r.first;i<r.first+r.count;++i){auto index=mesh.mesh.indices[i];if(index>=mesh.selected_weights.size())throw std::runtime_error("Weight visualization vertex is invalid");if(mesh.selected_weights[index]>=0)next_weighted.insert(r.object);}
     }
     struct Desired {std::shared_ptr<const Image> owner;bool mips=false;};
-    struct PlanSlot {Key key;Sampler sampler;std::array<float,6>uv;bool present=false;};
+    struct PlanSlot {Key key;Sampler sampler;std::array<float,6>uv;bool present=false;int coordinate=0;};
     std::unordered_map<Key,Desired,KeyHash> wanted;
     std::unordered_set<Sampler,SamplerHash> wanted_samplers;
     std::unordered_map<uint64_t,std::array<PlanSlot,16>> planned;
     std::unordered_map<uint64_t,Toon> next_toons;std::vector<std::array<float,2>> next_uv1;
     for(auto &range:mesh.ranges){
       auto maps=range.textures;auto &plan=planned[range.object];
+      const auto source_uv1=maps&&maps->source_maps?maps->source_maps->uv1:nullptr;
+      if(source_uv1&&geometry_changed){
+        maps->source_maps->validate();
+        if(range.first_vertex>count||source_uv1->size()>count-range.first_vertex)throw std::invalid_argument("Source UV1 domain exceeds packed geometry");
+        for(size_t c=range.first;c<range.first+range.count;++c)if(mesh.mesh.indices.at(c)<range.first_vertex||mesh.mesh.indices.at(c)-range.first_vertex>=source_uv1->size())throw std::invalid_argument("Source UV1 index is outside its packed domain");
+        if(next_uv1.empty())next_uv1.resize(count);std::copy(source_uv1->begin(),source_uv1->end(),next_uv1.begin()+range.first_vertex);
+      }
       if(maps&&maps->source_only) {
         auto present=[](const Image &image){return image.width||image.height||!image.rgba.empty();};
         if(!maps->source_maps || maps->source_maps->empty() || maps->baked_base ||
@@ -191,9 +198,9 @@ struct SurfaceRenderer::TextureState {
       }
       auto slot=[&](int index,std::shared_ptr<const Image> image,const PaintSourceTexture&view,bool srgb){
         if(!image)return;
-        view.validate();image->validate();Key key{image.get(),srgb};auto sample=sampler(view);
+        view.validate(source_uv1?2:1);image->validate();Key key{image.get(),srgb};auto sample=sampler(view);
         auto &desired=wanted[key];desired.owner=std::move(image);desired.mips|=mipmapped(sample);
-        wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true};
+        wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true,view.texcoord};
       };
       const bool prepared_color=detail::prepared_color_state(range.material_bindings.get(),maps.get(),geometry_changed);
       const bool prepared_normal=detail::prepared_normal_state(range.material_bindings.get(),maps.get(),geometry_changed);
@@ -264,7 +271,7 @@ struct SurfaceRenderer::TextureState {
           const ImportedPrimitive *primitive=nullptr;for(const auto &p:asset.primitives)if(p.source_mesh==appearance.source_mesh&&p.source_primitive==appearance.source_primitive){if(primitive)throw std::runtime_error("MToon source primitive identity is ambiguous");primitive=&p;}
           if(!primitive||primitive->uv1.size()!=primitive->mesh.positions.size()||appearance.source_vertices.empty()||range.first_vertex>mesh.mesh.positions.size()||appearance.source_vertices.size()>mesh.mesh.positions.size()-range.first_vertex)throw std::runtime_error("MToon selected UV1 data/remap is unavailable");
           if(next_uv1.empty())next_uv1.resize(mesh.mesh.positions.size());
-          for(size_t n=0;n<appearance.source_vertices.size();++n){auto source=appearance.source_vertices[n];if(source>=primitive->uv1.size())throw std::runtime_error("MToon UV1 authored vertex reference is invalid");next_uv1[range.first_vertex+n]=primitive->uv1[source];}
+          for(size_t n=0;n<appearance.source_vertices.size();++n){auto source=appearance.source_vertices[n];if(source>=primitive->uv1.size())throw std::runtime_error("MToon UV1 authored vertex reference is invalid");if(source_uv1&&source_uv1->at(n)!=primitive->uv1[source])throw std::invalid_argument("PBR and MToon packed UV1 authority differ");next_uv1[range.first_vertex+n]=primitive->uv1[source];}
           if(range.first>mesh.mesh.indices.size()||range.count>mesh.mesh.indices.size()-range.first)throw std::runtime_error("MToon packed index range is invalid");
           for(size_t n=range.first;n<range.first+range.count;++n)if(mesh.mesh.indices[n]<range.first_vertex||mesh.mesh.indices[n]>=range.first_vertex+appearance.source_vertices.size())throw std::runtime_error("MToon packed source vertex interval is invalid");
         }
@@ -337,7 +344,7 @@ struct SurfaceRenderer::TextureState {
     }
     packed_sources.prepare(source_packs,bytes,wanted.size(),limits);
     std::unordered_map<uint64_t,Binding> ready;
-    for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv};}
+    for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv,plan[n].coordinate};}
     bindings=std::move(ready);toons=std::move(next_toons);if(geometry_changed)uv1=std::move(next_uv1);weighted=std::move(next_weighted);
   }
 };
@@ -352,7 +359,7 @@ void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   auto vertex=mtoon_renderer_vertex();
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;
+in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color;in float source_w;in vec2 texcoord,texcoord1;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -362,7 +369,7 @@ float d=a2/(PI*pow(NH*NH*(a2-1.0)+1.0,2.0));float k=pow(rough+1.0,2.0)/8.0;
 float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F0=mix(vec3(.04),base,metallic);vec3 F=F0+(1.0-F0)*pow(1.0-VH,5.0);
 return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
 vec3 output_srgb(vec3 c){return mix(1.055*pow(max(c,vec3(0)),vec3(1.0/2.4))-.055,12.92*c,lessThanEqual(c,vec3(.0031308)));}
-vec2 source_uv(int slot){return vec2(dot(uv_x[slot],vec3(texcoord,1)),dot(uv_y[slot],vec3(texcoord,1)));}
+vec2 source_uv(int slot){vec2 q=source_coordinates[slot]==1?texcoord1:texcoord;return vec2(dot(uv_x[slot],vec3(q,1)),dot(uv_y[slot],vec3(q,1)));}
 vec3 unit(vec3 v){float m=max(max(abs(v.x),abs(v.y)),abs(v.z));return m>1e-20?normalize(v/m):vec3(0,0,1);}
 vec3 source_baked_detail(out float coverage){
 ivec2 size=textureSize(tex3,0);vec2 p=texcoord*vec2(size)-.5;ivec2 base=ivec2(floor(p));vec2 f=fract(p);vec3 sum=vec3(0);coverage=0;
@@ -371,7 +378,7 @@ return coverage>1e-8?sum/coverage:vec3(0,0,1);}
 vec3 surface_normal(){
 vec3 N=unit(source_frame==1?source_n:n);
 if(source_baked_frame==1){vec3 original=N;
-if(original_normal_present==1){vec2 q=vec2(dot(original_normal_x,vec3(texcoord,1)),dot(original_normal_y,vec3(texcoord,1)));vec3 encoded=texture(tex5,q).rgb;
+if(original_normal_present==1){vec2 input_uv=original_normal_coordinate==1?texcoord1:texcoord;vec2 q=vec2(dot(original_normal_x,vec3(input_uv,1)),dot(original_normal_y,vec3(input_uv,1)));vec3 encoded=texture(tex5,q).rgb;
 vec3 ts=unit(vec3((encoded.xy*2-1)*normal_scale,encoded.z*2-1));original=unit(unit(source_t)*ts.x+unit(source_b)*ts.y+N*ts.z);}
 float coverage;vec3 detail=source_baked_detail(coverage);vec3 canonical=unit(canonical_t*detail.x+canonical_b*detail.y+canonical_n*detail.z);
 N=unit(mix(original,canonical,coverage));return gl_FrontFacing?N:-N;}
@@ -595,20 +602,21 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     if (maps&&!maps->source_only) {
       material.color={1,1,1,1};material.metallic=material.roughness=1;material.emissive={1,1,1};
     }
-    std::array<GLint,5> present{};std::array<float,15> ux{},uy{};
+    std::array<GLint,5> present{},coordinates{};std::array<float,15> ux{},uy{};
     for(int n=0;n<5;++n){
       TextureState::Slot slot;if(maps)slot=textures_->bindings.at(id)[n];
-      glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);present[n]=slot.image!=0;
+      glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);present[n]=slot.image!=0;coordinates[n]=slot.coordinate;
       ux[n*3]=slot.uv[0];ux[n*3+1]=slot.uv[1];ux[n*3+2]=slot.uv[4];uy[n*3]=slot.uv[2];uy[n*3+1]=slot.uv[3];uy[n*3+2]=slot.uv[5];
     }
     glUniform1iv(glGetUniformLocation(program_,"slots[0]"),5,present.data());
+    glUniform1iv(glGetUniformLocation(program_,"source_coordinates[0]"),5,coordinates.data());
     glUniform3fv(glGetUniformLocation(program_,"uv_x[0]"),5,ux.data());glUniform3fv(glGetUniformLocation(program_,"uv_y[0]"),5,uy.data());
     const bool source_bake=use_source && use_canonical && maps && maps->baked_base && !maps->baked_normal.rgba.empty();
     glUniform1i(glGetUniformLocation(program_,"source_baked_frame"),source_bake);
     glUniform1i(glGetUniformLocation(program_,"original_normal_present"),0);
     if(source_bake){const auto &binding=textures_->bindings.at(id);
       for(int n:{5,6}){glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,binding[n].image);glBindSampler(n,binding[n].sampler);}
-      const auto &view=binding[5];glUniform1i(glGetUniformLocation(program_,"original_normal_present"),view.image!=0);
+      const auto &view=binding[5];glUniform1i(glGetUniformLocation(program_,"original_normal_coordinate"),view.coordinate);glUniform1i(glGetUniformLocation(program_,"original_normal_present"),view.image!=0);
       glUniform3f(glGetUniformLocation(program_,"original_normal_x"),view.uv[0],view.uv[1],view.uv[4]);glUniform3f(glGetUniformLocation(program_,"original_normal_y"),view.uv[2],view.uv[3],view.uv[5]);}
     glUniform1i(glGetUniformLocation(program_,"map_mode"),maps?(maps->source_only?2:1):0);
     glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!maps->normal_projection&&!maps->normal.rgba.empty());
@@ -672,7 +680,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     for(int n=0;n<16;++n){auto &slot=binding[n];glActiveTexture(GL_TEXTURE0+n);
       if(n==14){glBindTexture(GL_TEXTURE_BUFFER,t.derived?textures_->packed_sources.at(t.packed_inputs).texture:0);glBindSampler(n,0);}
       else {glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);}
-      present[n]=slot.image!=0;
+      present[n]=slot.image!=0;coordinates[n]=slot.coordinate;
       int role=n==12?0:n==13?3:n;scales[n*2]=scales[n*2+1]=1;
       if(role<11){auto &texture=t.material.textures[role];coordinates[n]=role==int(MToonSlot::Matcap)?0:mtoon_coordinate(texture);offsets[n*2]=texture.offset[0];offsets[n*2+1]=texture.offset[1];scales[n*2]=texture.scale[0];scales[n*2+1]=texture.scale[1];rotations[n]=texture.rotation;channels[n]=texture.channel;}
       if(n>=14){int k=n-14;pbrx[k*3]=slot.uv[0];pbrx[k*3+1]=slot.uv[1];pbrx[k*3+2]=slot.uv[4];pbry[k*3]=slot.uv[2];pbry[k*3+1]=slot.uv[3];pbry[k*3+2]=slot.uv[5];}

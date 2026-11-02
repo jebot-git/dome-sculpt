@@ -15,10 +15,13 @@ BUILD=Path(os.environ.get('DOME_SCULPT_TEST_BUILD',ROOT/'build'))
 MODE=os.environ.get('DOME_IMPORT_FORMAT','glb').lower()
 FLAT=os.environ.get('DOME_IMPORT_FLAT')=='1'
 AFFINE=os.environ.get('DOME_IMPORT_AFFINE_SOURCE')=='1'
+ATLAS=os.environ.get('DOME_IMPORT_ATLAS')=='1'
 DEFAULT=os.environ.get('DOME_IMPORT_DEFAULT_SOURCE')=='1'
 OUT=ROOT/('artifacts/menu-import-flat-'+MODE if FLAT else 'artifacts/menu-import-'+MODE if MODE!='glb' else 'artifacts/menu-import-skin' if os.environ.get('DOME_IMPORT_HELPER') else 'artifacts/menu-import-authoring');OUT.mkdir(parents=True,exist_ok=True)
 if AFFINE:
     OUT=ROOT/('artifacts/menu-import-affine-'+MODE+('-skin' if os.environ.get('DOME_IMPORT_HELPER') else ''));OUT.mkdir(parents=True,exist_ok=True)
+if ATLAS:
+    OUT=ROOT/'artifacts/menu-import-texture-atlas';OUT.mkdir(parents=True,exist_ok=True)
 if DEFAULT:
     OUT=ROOT/('artifacts/menu-import-default-'+MODE+('-skin' if os.environ.get('DOME_IMPORT_HELPER') else ''));OUT.mkdir(parents=True,exist_ok=True)
 checks=[];processes=[]
@@ -106,6 +109,9 @@ async def main():
         key('Control_L',True);key('a');key('Control_L',False);text(str(asset));key('Return')
         options=await wait(lambda:named('Import options'));options.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
         g=options.get_geometry();raw=options.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(OUT/'options.png')
+        if ATLAS:
+            check(g.height==504,'Atlas GUI fixture uses the observed native bitmap-font layout')
+            xtest.fake_input(d,X.MotionNotify,x=g.x+40,y=g.y+322);xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
         if MODE in ('obj','fbx'):
             key('Shift_L',True)
             for _ in range(5):key('Tab')
@@ -114,9 +120,9 @@ async def main():
             key('Home')
             for _ in range(3):key('Down')
             key('Return');await wait(lambda:not (mapped_windows()&popup))
-        else:key('Tab')
+        elif not ATLAS:key('Tab')
         g=options.get_geometry();raw=options.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(OUT/'options-after-keys.png')
-        if MODE in ('obj','fbx'):
+        if MODE in ('obj','fbx') or ATLAS:
             # Fixture font is the isolated default16px: click the actual Import
             # button after observing the native popup unmap, independent of
             # remaining focus traversal events in the native toolkit queue.
@@ -127,6 +133,10 @@ async def main():
         nodes=await ready(True);check(nodes['Undo'][1].get('enabled',False),'Explicit native options Import submits the source-retaining model on a background worker as one history operation')
         await command('Save');accepted=inspect();check(len(accepted['objects'])==3 and len(accepted['groups'])==int(os.environ.get('DOME_IMPORT_GROUPS','5' if MODE=='fbx' else '4')) and sum(o['mesh_active'] for o in accepted['objects'])==2,'Actual native import and Save preserve all objects and editable node hierarchy')
         check(accepted['version']==int(os.environ.get('DOME_IMPORT_VERSION','11' if MODE!='glb' else '9')) and accepted['source_models'] and accepted['source_materials']['bindings'],'Native Save includes canonical source, frame, image, material and deformation archives')
+        if ATLAS:
+            active=[o for o in accepted['objects'] if o['mesh_active']]
+            retained_paints=accepted['source_materials']['paints']
+            check(all('source_uv1' not in o['painted'].get('source_maps',{}) for o in active) and any('source_uv1' in p.get('source_maps',{}) for p in retained_paints),'Actual native checkbox prepares current textures and persists the original UV1 coordinate domains')
         if AFFINE:
             raw=bytes(accepted['source_models'][0]['original_glb']['bytes'])
             check(raw==asset.read_bytes() and accepted.get('affine_state',{}).get('nodes') and all(g.get('source_placement') is not None for g in accepted['groups'][1:]),'Real native import retains exact affine source bytes and every original node authority')
