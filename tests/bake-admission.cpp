@@ -70,10 +70,10 @@ int main(int argc,char **argv)try{
   require(d->copy_scene().encode()==before&&DocumentTransactionTestAccess::tokens(*d)==tokens&&DocumentTransactionTestAccess::leases(*d)==leases&&DocumentTransactionTestAccess::controls(*d)==controls&&DocumentTransactionTestAccess::input(*d)==input&&DocumentTransactionTestAccess::queued(*d)==0,"Caller refusal preserves exact scene/source/paint/history/redo/content/configuration/input leases and queue");
   require(Scene::load(old_file).encode()==before,"Failed caller leaves pre-existing project bytes and complete source/paint state unchanged");
   hand.sector(3);require(d->frame().state->asset_busy&&DocumentTransactionTestAccess::queued(*d)==1,"The exact same observed controller menu lease retries precisely one real Bake");
-  bool pending_refused=false;try{auto saving=d->save_async(old_file);(void)saving;}catch(const std::logic_error&){pending_refused=true;}
-  require(pending_refused&&DocumentTransactionTestAccess::queued(*d)==1&&Scene::load(old_file).encode()==before,"Pending generic Bake Save remains explicitly refused with no stale/phantom file endpoint");
-  gate.release();prior.get();require(d->wait_asset()&&d->wait_mesh()&&d->frame().state->error.empty(),"Actual same-controller retry completes preparation and normal/color Bake");
-  auto after=d->copy_scene().encode();auto path=directory/"accepted.dsculpt";d->save(path);require(Scene::load(path).encode()==after&&d->undo()&&d->copy_scene().encode()==before,"Successful retry saves its accepted result and adds exactly one source-retaining Undo");
+  auto pending_save=d->save_async(old_file);
+  require(pending_save.wait_for(std::chrono::seconds(0))!=std::future_status::ready&&DocumentTransactionTestAccess::queued(*d)==2&&Scene::load(old_file).encode()==before,"Save queues behind the actual retried Bake while preserving the existing file and its exact source endpoint");
+  gate.release();prior.get();pending_save.get();require(d->wait_asset()&&d->wait_mesh()&&d->frame().state->error.empty(),"Actual same-controller retry and its dependent Save complete preparation and normal/color Bake");
+  auto after=d->copy_scene().encode();require(Scene::load(old_file).encode()==after,"The pending Save writes the real accepted Bake result rather than its earlier source");auto path=directory/"accepted.dsculpt";d->save(path);require(Scene::load(path).encode()==after&&d->undo()&&d->copy_scene().encode()==before,"Successful retry saves its accepted result and adds exactly one source-retaining Undo");
   if((at&15)==0)std::cout<<"Reached real Bake caller failure "<<at<<std::endl;
  }
  std::cout<<"PASS actual Bake caller admission failures "<<first<<".."<<last<<" of "<<count<<" preserve exact configuration/scene/source/paint/history/leases/queue, no phantom Save and same-controller retry\n";return 0;
