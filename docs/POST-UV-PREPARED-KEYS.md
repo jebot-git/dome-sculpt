@@ -72,8 +72,11 @@ frames. No physical headset launch or system installation occurred.
 
 ## Required follow-up
 
-Actual bundled avatar UV/key workflows and the full representable native
-corner-domain conversion for independently edited seam vertices remain required.
+Actual bundled avatar integer-texel UV/key workflows are now qualified by
+POST-UV-AVATAR-QUALIFICATION.md and the later combined authoring checkpoint.
+Fractional transforms still reach a real quality refusal. General avatar UV
+transforms and the full native corner-domain conversion for independently
+edited seam vertices remain required.
 Prepared-normal source baking, broader frame/sampler/UV1 support, COLOR/UV morph
 attributes and the rest of REQUIREMENTS.md remain open. Existing guards are
 staging boundaries, not completion by refusal. All frozen prior proofs remain

@@ -81,7 +81,11 @@ source-field packing and4393 precommit failures preserve exact Scene/owners and
 full-helper retries;13,555 reached post-UV key failures from13,556 measured
 boundaries preserve the full graph and exact retry (one cache-dependent boundary
 is unreached). The untruncated six-suite transcript is retained. The complete
-Release317 run is STILL RUNNING. This branch is published for review, with
-broad regression qualification pending; do not call it a fully qualified union
-until its terminal results have been inspected and remaining failures resolved.
+Release317 run finished in2086.97s with316 passes and the one obsolete picker
+expectation failure. The corrected registered CTest separately passes1/1 in
+Release and1/1 in owned sanitizers, with61 actual native assertions. Runtime,
+headers, assets and third-party source bytes remain identical to full-run8d.
+Report316/317 initial plus corrected1/1; do not relabel this a single317/317 run.
+All original full-run logs, JUnit and the untruncated1.15MB transcript are
+preserved. No other failure or skipped suite occurred.
 All component receipts remain scoped to their original frozen source builds.

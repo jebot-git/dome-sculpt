@@ -1,12 +1,27 @@
 {
-  "recorded_utc": "2026-11-02T10:54:05.109253+00:00",
+  "recorded_utc": "2026-11-02T11:07:29.873388+00:00",
   "product_source": "8d68dc71eb8231cfe9ab4e71b72e4e8de518a0ca",
   "test_source": "9e6cb1bc826eb314b3cda4cedbd3f16f0a64866d",
   "source_equality_check": "git diff 8d68dc7 9e6cb1b -- src include assets third_party is empty",
   "broad_release": {
     "registered": 317,
-    "session": 47563,
-    "status": "live; initial legacy picker assertion obsolete; corrected focused native61 Release/SAN pass; no single317/317claim"
+    "initial_passed": 316,
+    "initial_failed": 1,
+    "initial_seconds": 2086.97,
+    "initial_failure": "polygon-color-document legacy exclusion expectation",
+    "corrected_Release": {
+      "passed": 1,
+      "failed": 0,
+      "native_assertions": 61
+    },
+    "corrected_owned_SAN": {
+      "passed": 1,
+      "failed": 0,
+      "native_assertions": 61
+    },
+    "single_317_green_run": false,
+    "product_bytes_changed_after_full_run": false,
+    "qualified": true
   },
   "sanitizer": {
     "scope": "fresh own C/C++core/support/renderer; no instrumented frontend/externaldependencies claim",
@@ -42,7 +57,7 @@
   "system_installation": false,
   "production_complete": false,
   "hashes": {
-    "docs/AUTHORING-ADAPTER-INTEGRATION.md": "b060718082a43e313c7bc9a6ab55f016e5f2d6fa47254008fde6a086fcae5e79",
+    "docs/AUTHORING-ADAPTER-INTEGRATION.md": "03f7834c633da1bba68548499f30528b94362740b38793f8a54306ca95ac8a1c",
     "tests/polygon-color-document.cpp": "5407816a553dafc5f475df6221a94e6e2efe908a226fe6f3c707db536e9d5a6b",
     "tests/vrm-source-export-menu.py": "0c262a287b5fa1635ee94bd29d6af9ec7d4786fb50cdb4088e5c7679d510fb2c",
     "src/shapekey-normal-preparation.cpp": "c08c0ae81e979b31dc84ca60ad2cf7c17dab542f68cdca0d7d0264bdaf757e01",
@@ -80,6 +95,14 @@
     "artifacts/menu-bake-color-current-compact/report.json": "9d0e1292ce032af43f1a40f0750e1b18c8a2786be105a1327e181c908c806d6d",
     "artifacts/menu-desktop-framing/report.json": "8c09fa94fa87c55e0ab36fe0ef6355dc5caab4c03aebbbdfdb399ef3a59c5baf",
     "artifacts/dome-menu/report.json": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af",
-    "artifacts/xr-adapter-current-bake/report.json": "c788df6e80a113655916481024e23d3e777c8940694ddfce2d078737c4435194"
-  }
+    "artifacts/xr-adapter-current-bake/report.json": "c788df6e80a113655916481024e23d3e777c8940694ddfce2d078737c4435194",
+    "artifacts/tests-adapter-union-full-release.xml": "2e257b83de31a7fef1052863f935ba03c5b2645f1e93a1d978758d8bfac696bb",
+    "artifacts/tests-adapter-union-full-release.log": "d59881255d1b572e65d7a2b1661b6dc70eaa5607008337caf6b5631fd05e039e",
+    "artifacts/tests-adapter-union-full-release-untruncated.log": "22192c31e31726568be6424564f56d00fe116ce99517b4b0f4044c666af314e2",
+    "artifacts/tests-adapter-union-corrected-release.xml": "2dc40e0f1a9450ed468681f472566419cb88071ec86d624777424201f987b8c9",
+    "artifacts/tests-adapter-union-corrected-release.log": "64c2fcdacfff6d7c97e0e7340f6c46333a2887f2e15412ab4c6c3c0a7825285c",
+    "artifacts/tests-adapter-union-corrected-sanitize.xml": "afe3a3a5ef2b0e20bcd939229fd3aabf25993cf003d2b4f5da7e8217e8f97f63",
+    "artifacts/tests-adapter-union-corrected-sanitize.log": "8477a1d740f68e6bc7f546e2e6c06bb35d8835fbdd1cefd50e846445f018adc3"
+  },
+  "latest_DomeD_remote": "d271cf65c612a462fcfa6739416b06c6565be070"
 }
