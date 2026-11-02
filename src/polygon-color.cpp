@@ -146,6 +146,7 @@ PolygonColorField transfer_polygon_colors(
     const PolygonMesh &source, const PolygonColorField &field,
     const PolygonMesh &target, std::span<const PolygonCornerSource> transfers,
     const PolygonLimits &limits) {
+  source.validate(limits);
   field.validate(source, limits);
   target.validate(limits);
   Budget budget{limits};

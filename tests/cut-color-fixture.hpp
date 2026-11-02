@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "dome/bake.hpp"
 #include "affine-surface.hpp"
 #include "current-colors.hpp"
 #include "dome/import-authoring.hpp"
@@ -80,12 +81,18 @@ inline Scene scene(bool seam = false, bool affine = false) {
   result.validate();
   return result;
 }
+inline void pose(Scene &scene) {
+  const auto &mesh=scene.active().painted->mesh();
+  DeformationState state(mesh);state.skeleton=Skeleton{{{"root",-1,{},.4f},{"upper",0,{{0,.1f,0},{},{1,1,1}},.2f}}};state.skin=SkinWeights{};
+  for(auto p:mesh.positions)state.skin->vertices.push_back(p.y>0?std::vector<Influence>{{0,.25f},{1,.75f}}:std::vector<Influence>{{0,1}});
+  state.pose.resize(2);state.pose[0].translation={.013f,-.009f,.007f};state.pose[1].translation={0,.1f,0};state.pose[1].rotation={.99875026f,0,0,.04997917f};
+  state.morphs=MorphSet(mesh);auto target=mesh.positions;for(auto &p:target){p.x+=.04f*p.y;p.z+=.02f*p.x;}state.morphs->set_target(mesh,"Native artist offset",target);state.morph_weights={.6f};scene.set_deformation(scene.active().id,std::move(state));
+}
 inline BakeSource source(const Scene &scene) {
   const auto &object = scene.active();
   auto rest = object.painted->mesh();
-  auto geometry = std::make_shared<const Mesh>(rest);
-  if (object.deformation)
-    object.painted->evaluate(geometry);
+  auto geometry = std::make_shared<const Mesh>(
+      object.deformation ? object.deformation->preview(rest) : rest);
   PolygonColorSurface field{std::shared_ptr<const PolygonMesh>(
                                 object.polygon, &object.polygon->topology),
                             object.polygon->colors};

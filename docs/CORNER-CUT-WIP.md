@@ -70,3 +70,48 @@ proof is claimed for this adapter.
 
 The current-field color/bake adapter and the remaining full production goal
 remain required. No new broad/device work was started for the headset launch.
+
+## Resumed current-main work, 2026-11-02
+
+Private branch agent/polygon-color-cut-8d46dfb ports the detached adapter to
+physically accepted selection main8d46dfb. The blanket refusal remains in the
+published application; this private working checkpoint replaces it with narrow
+native admission for supported current fields, but is **not qualified for
+integration yet**. It preserves UV1/prepared color/prepared normal/artist-frame
+refusals. Current fields share their original immutable corner basis through
+clipping; the generated cap has independent material. Original polygon, shape,
+paint/UV and affine placement capsules remain retained.
+
+Added bounded work/component/raster/provenance limits, complete ordered source
+and preview authentication, connected cap topology, per-boundary field-transfer
+cancellation, and actual native pose evaluation. A render check caught the
+initial mistaken use of PaintedMesh::evaluate (paint query preparation) in place
+of DeformationState::preview; this is corrected. The original pose fixture also
+used XYZW rather than native WXYZ; the corrected fixture preserves the rest bone
+translation and applies a real small joint rotation plus artist morph.
+
+Fresh current-main Release initially passed three scopes: detached colored cut,
+new quota/forged-source/cancellation/pose boundaries, and legacy cut (1.94s).
+Independent real Document/GLB/PNG/GLSL comparisons then passed 32 cases and257
+checks on software GL and actual Intel Arc A770: gradient and zero-alpha seams,
+Opaque/Mask/Blend, unlit/PBR, artist paint/common bake, reflected/sheared placement,
+actual skin/morph pose, visible caps, disk restart and source restoration.
+All before/after appearance and independent GLB maximum channel errors were at
+most1. The independent consumer now handles negative-determinant glTF winding and
+can explicitly derive missing triangle tangents; existing strict consumers keep
+their prior tangent requirement by default.
+
+Persistent owned-new cut preparation found two real xatlas lifetime defects.
+453a532 repairs a lost shutdown wakeup and baf6501 unwinds partially constructed
+native workers/context/storage. Both are separate dependency checkpoints; see
+XATLAS-SHUTDOWN.md. The original real cut boundary7288 now preserves exact source
+and retries successfully. A complete56,629-boundary preparation sweep is still
+running at this checkpoint; its completion is not claimed.
+
+New native/controller tests are incomplete: legacy cut and existing color
+Document scopes pass, while immediate Save immediately after accepted cut Apply
+is rejected by finish_locked. The required cut-only ordered accepted-snapshot
+Save extension will be developed in a NEW isolated checkout so this checkpoint
+and running sweep remain unchanged. No native GUI, real-loader XR, complete-core
+sanitizer or final integrated proof is claimed for the resumed working snapshot.
+No physical headset, install or active-session changes occurred.

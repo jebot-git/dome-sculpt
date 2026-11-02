@@ -2,7 +2,9 @@
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
 #include "current-colors.hpp"
+#include "dome/source-maps.hpp"
 #include "polygon-conversion.hpp"
+#include <atomic>
 #include <map>
 #include <set>
 #include <tuple>
@@ -12,6 +14,46 @@ void stop(const std::function<bool()> &cancelled) {
   if (cancelled && cancelled())
     throw std::runtime_error("Plane cutting cancelled");
 }
+struct Work {
+  const detail::CutColorLimits &limits;
+  const std::function<bool()> &cancelled;
+  std::atomic_size_t used{0};
+  std::function<bool()> poll;
+  Work(const detail::CutColorLimits &bounds,
+       const std::function<bool()> &cancel)
+      : limits(bounds), cancelled(cancel), poll([this] {
+          visit();
+          return false;
+        }) {
+    if (!limits.maximum_work || limits.maximum_work > 64'000'000 ||
+        !limits.maximum_vertices || limits.maximum_vertices > 500'000 ||
+        !limits.maximum_faces || limits.maximum_faces > 500'000 ||
+        !limits.maximum_corners || limits.maximum_corners > 2'000'000 ||
+        !limits.maximum_provenance || limits.maximum_provenance > 128 ||
+        !limits.maximum_raster_samples ||
+        limits.maximum_raster_samples > 128'000'000)
+      throw std::invalid_argument("Invalid colored cut resource limits");
+  }
+  void visit(size_t count = 1) {
+    auto before = used.load(std::memory_order_relaxed);
+    do {
+      if (count > limits.maximum_work - before)
+        throw std::length_error("Colored cut preparation work budget exceeded");
+    } while (!used.compare_exchange_weak(before, before + count,
+                                         std::memory_order_relaxed));
+    stop(cancelled);
+  }
+  PolygonLimits topology() const {
+    PolygonLimits out;
+    out.maximum_vertices = limits.maximum_vertices;
+    out.maximum_faces = limits.maximum_faces;
+    out.maximum_corners = limits.maximum_corners;
+    out.maximum_provenance = limits.maximum_provenance;
+    out.maximum_work = limits.maximum_work;
+    out.cancelled = poll;
+    return out;
+  }
+};
 bool same(Vec3 a, Vec3 b) { return a.x == b.x && a.y == b.y && a.z == b.z; }
 bool same_material(const Material &a, const Material &b) {
   return a.name == b.name && a.color == b.color && a.metallic == b.metallic &&
@@ -20,14 +62,14 @@ bool same_material(const Material &a, const Material &b) {
          a.alpha == b.alpha && a.alpha_cutoff == b.alpha_cutoff &&
          a.unlit == b.unlit;
 }
-bool same_image(const Image &a, const Image &b,
-                const std::function<bool()> &cancelled) {
+bool same_image(const Image &a, const Image &b, Work &work) {
+  work.visit();
   if (a.width != b.width || a.height != b.height ||
       a.rgba.size() != b.rgba.size())
     return false;
   for (size_t at = 0; at < a.rgba.size(); at += 4096) {
-    stop(cancelled);
     auto count = std::min(size_t(4096), a.rgba.size() - at);
+    work.visit(count);
     if (!std::equal(a.rgba.begin() + at, a.rgba.begin() + at + count,
                     b.rgba.begin() + at))
       return false;
@@ -35,8 +77,8 @@ bool same_image(const Image &a, const Image &b,
   return true;
 }
 bool same_maps(const std::shared_ptr<const TextureMaps> &a,
-               const std::shared_ptr<const TextureMaps> &b,
-               const std::function<bool()> &cancelled) {
+               const std::shared_ptr<const TextureMaps> &b, Work &work) {
+  work.visit();
   if (a == b)
     return true;
   if (!a || !b || a->source_maps != b->source_maps ||
@@ -48,7 +90,7 @@ bool same_maps(const std::shared_ptr<const TextureMaps> &a,
                     std::pair{&a->metal_rough, &b->metal_rough},
                     std::pair{&a->emission, &b->emission},
                     std::pair{&a->normal, &b->normal}})
-    if (!same_image(*pair.first, *pair.second, cancelled))
+    if (!same_image(*pair.first, *pair.second, work))
       return false;
   return a->pbr_color.rgba.empty() && b->pbr_color.rgba.empty();
 }
@@ -69,9 +111,10 @@ struct Shell {
   std::vector<uint32_t> triangles;
   std::vector<std::array<float, 3>> barycentrics;
 };
-Shell part(const PlaneCutResult &cut, bool cap) {
+Shell part(const PlaneCutResult &cut, bool cap, Work &work) {
   Shell out;
   for (size_t t = 0; t < cut.source_triangles.size(); ++t) {
+    work.visit(3);
     if ((cut.source_triangles[t] == UINT32_MAX) != cap)
       continue;
     out.triangles.push_back(cut.source_triangles[t]);
@@ -88,15 +131,15 @@ Shell part(const PlaneCutResult &cut, bool cap) {
   }
   return out;
 }
-void atlas(Mesh &mesh, uint32_t resolution,
-           const std::function<bool()> &cancelled) {
+void atlas(Mesh &mesh, uint32_t resolution, Work &work) {
+  const auto &cancelled = work.poll;
+  work.visit(mesh.indices.size());
   auto before = mesh;
   unwrap(mesh, resolution, 4, cancelled);
   if (mesh.indices.size() != before.indices.size())
     throw std::runtime_error("Cut atlas changed face order");
   for (size_t k = 0; k < mesh.indices.size(); ++k) {
-    if ((k & 1023) == 0)
-      stop(cancelled);
+    work.visit();
     if (!same(mesh.positions.at(mesh.indices[k]),
               before.positions.at(before.indices[k])))
       throw std::runtime_error(
@@ -104,10 +147,9 @@ void atlas(Mesh &mesh, uint32_t resolution,
   }
 }
 void localize(Shell &shell, const detail::AffineInteractionFrame &frame,
-              const std::function<bool()> &cancelled) {
+              Work &work) {
   for (size_t i = 0; i < shell.mesh.positions.size(); ++i) {
-    if ((i & 1023) == 0)
-      stop(cancelled);
+    work.visit();
     shell.mesh.positions[i] = detail::affine_position(
         frame.inverse().point(detail::affine_vector(shell.mesh.positions[i])));
     shell.mesh.normals[i] = detail::affine_unit(
@@ -115,6 +157,7 @@ void localize(Shell &shell, const detail::AffineInteractionFrame &frame,
   }
   if (frame.orientation() == AffineOrientation::Reversing)
     for (size_t i = 0; i < shell.mesh.indices.size(); i += 3) {
+      work.visit();
       std::swap(shell.mesh.indices[i + 1], shell.mesh.indices[i + 2]);
       std::swap(shell.barycentrics[i + 1], shell.barycentrics[i + 2]);
     }
@@ -123,12 +166,15 @@ struct Source {
   BakeSource common;
   std::vector<PolygonId> corners, vertices;
 };
-Source authenticate(const Scene &scene, const BakeSource &display,
-                    const std::function<bool()> &cancelled) {
+Source authenticate(const Scene &scene, const BakeSource &display, Work &work) {
+  const auto &cancelled = work.poll;
+  work.visit();
   const auto &object = scene.active();
   const auto &authority = *object.polygon;
-  PolygonLimits limits;
-  limits.cancelled = cancelled;
+  auto limits = work.topology();
+  if (display.mesh.indices.size() > limits.maximum_corners ||
+      display.mesh.positions.size() > limits.maximum_corners)
+    throw std::length_error("Colored cut source geometry budget exceeded");
   auto render = authority.topology.triangulate(limits);
   PolygonColorSurface current{
       std::shared_ptr<const PolygonMesh>(object.polygon, &authority.topology),
@@ -136,10 +182,15 @@ Source authenticate(const Scene &scene, const BakeSource &display,
   auto colors = detail::current_vertex_colors(
       object.painted->mesh(), &current, object.appearance.get(),
       object.material_bindings.get(), nullptr, cancelled);
-  auto evaluated = std::make_shared<const Mesh>(object.painted->mesh());
-  if (object.deformation)
-    object.painted->evaluate(evaluated, cancelled);
-  const auto &mesh = *evaluated;
+  Mesh mesh = object.painted->mesh();
+  if (object.deformation) {
+    work.visit(mesh.positions.size() + object.deformation->resource_entries());
+    // DeformationState::preview is the same bounded CPU evaluation used by
+    // the immutable mesh worker. PaintedMesh::evaluate only builds paint
+    // queries for an already evaluated mesh; it does not apply skin/morphs.
+    mesh = object.deformation->preview(mesh);
+    work.visit();
+  }
   auto frame = detail::placement_frame(scene, object.id);
   const bool affine = scene.has_affine_placement(object.id),
              reflected = frame.orientation() == AffineOrientation::Reversing;
@@ -154,7 +205,7 @@ Source authenticate(const Scene &scene, const BakeSource &display,
   auto maps = object.painted->preview(object.material);
   const auto &material = display.materials.front();
   if (!same_material(material.material, object.material) ||
-      !same_maps(material.maps, maps, cancelled) || material.normal_map ||
+      !same_maps(material.maps, maps, work) || material.normal_map ||
       material.normal_strength != 1 || !material.maps_are_composited ||
       material.repeat_uv)
     throw std::invalid_argument(
@@ -164,13 +215,14 @@ Source authenticate(const Scene &scene, const BakeSource &display,
   const bool canonical = maps && !maps->normal.rgba.empty();
   auto tangents =
       canonical ? tangent_corners(mesh, cancelled) : std::vector<Tangent>{};
+  std::vector<uint8_t> used(display.mesh.positions.size());
   for (size_t at = 0; at < mesh.indices.size(); ++at) {
-    if ((at & 1023) == 0)
-      stop(cancelled);
+    work.visit();
     size_t rest = at;
     if (reflected && at % 3)
       rest = at / 3 * 3 + (at % 3 == 1 ? 2 : 1);
     auto v = mesh.indices.at(rest), shown = display.mesh.indices.at(at);
+    used.at(shown) = 1;
     auto world_position =
         ob::transform(similarity, {mesh.positions[v].x, mesh.positions[v].y,
                                    mesh.positions[v].z});
@@ -206,29 +258,59 @@ Source authenticate(const Scene &scene, const BakeSource &display,
       out.common.tangents.push_back(t);
     }
   }
+  for (auto present : used) {
+    work.visit();
+    if (!present)
+      throw std::invalid_argument(
+          "The cut source contains unwitnessed vertices");
+  }
   return out;
 }
+bool same_mesh(const Mesh &a, const Mesh &b, Work &work) {
+  work.visit();
+  if (a.indices.size() > work.limits.maximum_corners ||
+      a.positions.size() > work.limits.maximum_corners ||
+      a.uv.size() > work.limits.maximum_corners ||
+      a.uv_pins.size() > work.limits.maximum_corners ||
+      a.uv_seams.size() > work.limits.maximum_corners)
+    return false;
+  work.visit(a.indices.size() + a.positions.size() + a.uv.size() +
+             a.uv_pins.size() + a.uv_seams.size());
+  if (a.indices != b.indices || a.uv != b.uv || a.uv_pins != b.uv_pins ||
+      a.uv_seams != b.uv_seams || a.positions.size() != b.positions.size() ||
+      a.normals.size() != b.normals.size())
+    return false;
+  for (size_t i = 0; i < a.positions.size(); ++i) {
+    work.visit();
+    if (!same(a.positions[i], b.positions[i]) ||
+        !same(a.normals[i], b.normals[i]))
+      return false;
+  }
+  return true;
+}
 void same_preview(const CutPreview &provided, const CutPreview &actual,
-                  const std::function<bool()> &cancelled) {
+                  Work &work) {
+  work.visit();
   if (!provided.result || !actual.result || provided.changed != actual.changed)
     throw std::invalid_argument("The cut preview is incomplete or stale");
+  if (!same(provided.plane.normal, actual.plane.normal) ||
+      provided.plane.offset != actual.plane.offset ||
+      !same_mesh(provided.cap_mesh, actual.cap_mesh, work))
+    throw std::invalid_argument(
+        "The displayed cut plane or cap changed; prepare it again");
   const auto &a = *provided.result, &b = *actual.result;
+  if (a.source_triangles.size() > work.limits.maximum_corners / 3 ||
+      a.source_corner_barycentrics.size() > work.limits.maximum_corners ||
+      a.materials.size() > work.limits.maximum_corners / 3)
+    throw std::length_error("Cut preview provenance budget exceeded");
+  work.visit(a.source_triangles.size() + a.source_corner_barycentrics.size() +
+             a.materials.size());
   if (a.source_triangles != b.source_triangles ||
       a.source_corner_barycentrics != b.source_corner_barycentrics ||
       a.materials != b.materials || a.cap_triangles != b.cap_triangles ||
-      a.mesh.indices != b.mesh.indices || a.mesh.uv != b.mesh.uv ||
-      a.mesh.positions.size() != b.mesh.positions.size() ||
-      a.mesh.normals.size() != b.mesh.normals.size())
+      !same_mesh(a.mesh, b.mesh, work))
     throw std::invalid_argument(
         "The cut preview lost its authenticated clipping correspondence");
-  for (size_t i = 0; i < a.mesh.positions.size(); ++i) {
-    if ((i & 1023) == 0)
-      stop(cancelled);
-    if (!same(a.mesh.positions[i], b.mesh.positions[i]) ||
-        !same(a.mesh.normals[i], b.mesh.normals[i]))
-      throw std::invalid_argument(
-          "The cut preview geometry changed; prepare it again");
-  }
 }
 } // namespace
 
@@ -236,24 +318,27 @@ void same_preview(const CutPreview &provided, const CutPreview &actual,
 // Position alone cannot weld unrelated coincident source vertices/shells.
 struct PolygonCutAccess {
   static PolygonMesh build(const Shell &shell, const PolygonMesh &input,
-                           const Source *source, const PolygonLimits &limits) {
-    if (!source)
-      return PolygonMesh::from_triangles(shell.mesh, limits);
+                           const Source *source, const PolygonLimits &limits,
+                           Work &work) {
     using Key = std::pair<std::array<float, 3>, std::vector<PolygonId>>;
     std::map<Key, uint32_t> vertices;
     std::map<PolygonId, const PolygonVertex *> originals;
-    for (const auto &v : input.vertices())
-      originals.emplace(v.id, &v);
+    if (source)
+      for (const auto &v : input.vertices()) {
+        work.visit();
+        originals.emplace(v.id, &v);
+      }
     std::vector<Vec3> positions;
     std::vector<std::vector<uint32_t>> faces;
     std::vector<std::vector<std::pair<PolygonId, double>>> provenance;
     for (size_t t = 0; t < shell.triangles.size(); ++t) {
-      stop(limits.cancelled);
+      work.visit();
       std::vector<uint32_t> face;
       for (size_t k = 0; k < 3; ++k) {
         const auto at = t * 3 + k;
         auto p = shell.mesh.positions.at(shell.mesh.indices.at(at));
-        auto bary = convex(shell.barycentrics.at(at));
+        auto bary = source ? convex(shell.barycentrics.at(at))
+                           : std::array<double, 3>{};
         std::vector<PolygonId> support;
         std::map<PolygonId, double> weights;
         for (size_t c = 0; c < 3; ++c)
@@ -261,28 +346,37 @@ struct PolygonCutAccess {
             const auto id =
                 source->vertices.at(size_t(shell.triangles[t]) * 3 + c);
             support.push_back(id);
-            for (auto [original, weight] : originals.at(id)->provenance)
+            for (auto [original, weight] : originals.at(id)->provenance) {
+              work.visit();
               weights[original] += bary[c] * weight;
+            }
           }
         std::sort(support.begin(), support.end());
         support.erase(std::unique(support.begin(), support.end()),
                       support.end());
         if (weights.size() > limits.maximum_provenance)
           throw std::length_error("Cut vertex source budget exceeded");
-        auto [found, inserted] =
-            vertices.emplace(Key{{p.x, p.y, p.z}, std::move(support)},
-                             uint32_t(positions.size()));
-        if (inserted) {
+        Key key{{p.x, p.y, p.z}, std::move(support)};
+        auto found = vertices.find(key);
+        if (found == vertices.end()) {
+          if (positions.size() >= limits.maximum_vertices)
+            throw std::length_error(
+                "Colored cut native vertex budget exceeded");
+          found = vertices.emplace(std::move(key), uint32_t(positions.size()))
+                      .first;
           positions.push_back(p);
           std::vector<std::pair<PolygonId, double>> row;
-          double sum = 0;
-          for (auto [id, w] : weights) {
-            (void)id;
-            sum += w;
+          if (source) {
+            double sum = 0;
+            for (auto [id, w] : weights) {
+              work.visit();
+              (void)id;
+              sum += w;
+            }
+            for (auto [id, w] : weights)
+              if (w > 0)
+                row.emplace_back(id, w / sum);
           }
-          for (auto [id, w] : weights)
-            if (w > 0)
-              row.emplace_back(id, w / sum);
           provenance.push_back(std::move(row));
         }
         face.push_back(found->second);
@@ -290,10 +384,14 @@ struct PolygonCutAccess {
       faces.push_back(std::move(face));
     }
     auto out = PolygonMesh::from_faces(positions, faces, limits);
-    for (size_t i = 0; i < out.vertices_.size(); ++i)
-      out.vertices_[i].provenance = std::move(provenance[i]);
+    if (source)
+      for (size_t i = 0; i < out.vertices_.size(); ++i) {
+        work.visit();
+        out.vertices_[i].provenance = std::move(provenance[i]);
+      }
     for (size_t t = 0; t < out.faces_.size(); ++t)
       for (size_t k = 0; k < 3; ++k) {
+        work.visit();
         auto &corner = out.faces_[t].corners[k];
         corner.uv = shell.mesh.uv.at(shell.mesh.indices.at(t * 3 + k));
         corner.generated_uv = false;
@@ -316,6 +414,11 @@ bool cut_color_supported(const SculptObject &object) noexcept {
     return false;
   if (object.painted->normal_projection() || object.painted->color_projection())
     return false;
+  if (auto maps = object.painted->source_maps())
+    for (const auto *slot : {&maps->color, &maps->metal_rough, &maps->emission,
+                             &maps->normal, &maps->occlusion})
+      if (slot->image && slot->texcoord != 0)
+        return false;
   if (auto baked = object.painted->baked();
       baked && (baked->color_interpretation !=
                     BakedColorInterpretation::VertexComponent ||
@@ -330,12 +433,13 @@ void require_cut_color_supported(const SculptObject &object) {
         "This colored mesh has source shading that plane cuts cannot yet "
         "preserve; the original is unchanged");
 }
-CutPublishReport
-publish_colored_cut(Scene &scene, const CutPreview &preview,
-                    const BakeSource &display, uint32_t resolution,
-                    const std::function<bool()> &cancelled,
-                    const std::function<void(float)> &progress) {
-  stop(cancelled);
+CutPublishReport publish_colored_cut(
+    Scene &scene, const CutPreview &preview, const BakeSource &display,
+    uint32_t resolution, const std::function<bool()> &requested_cancel,
+    const std::function<void(float)> &progress, const CutColorLimits &bounds) {
+  Work work(bounds, requested_cancel);
+  const auto &cancelled = work.poll;
+  work.visit();
   scene.validate();
   require_cut_color_supported(scene.active());
   const auto original = scene.active();
@@ -348,24 +452,29 @@ publish_colored_cut(Scene &scene, const CutPreview &preview,
     throw std::invalid_argument("Invalid cut texture resolution");
   if (scene.objects().size() > 254 || scene.groups().size() >= 128)
     throw std::length_error("No room for cut outputs");
-  auto source = authenticate(scene, display, cancelled);
+  auto source = authenticate(scene, display, work);
   auto actual = preview_cut(source.common.mesh, preview.settings, cancelled);
-  same_preview(preview, actual, cancelled);
+  same_preview(preview, actual, work);
   if (!actual.changed)
     return {};
-  auto shell = part(*actual.result, false), cap = part(*actual.result, true);
+  auto shell = part(*actual.result, false, work),
+       cap = part(*actual.result, true, work);
+  if (shell.mesh.indices.size() > bounds.maximum_corners ||
+      cap.mesh.indices.size() > bounds.maximum_corners ||
+      shell.triangles.size() > bounds.maximum_faces ||
+      cap.triangles.size() > bounds.maximum_faces)
+    throw std::length_error("Colored cut output component budget exceeded");
   if (progress)
     progress(.05f);
-  atlas(shell.mesh, resolution, cancelled);
+  atlas(shell.mesh, resolution, work);
   if (!cap.mesh.indices.empty())
-    atlas(cap.mesh, resolution, cancelled);
+    atlas(cap.mesh, resolution, work);
   auto frame = placement_frame(scene, original.id);
-  localize(shell, frame, cancelled);
-  localize(cap, frame, cancelled);
-  PolygonLimits limits;
-  limits.cancelled = cancelled;
+  localize(shell, frame, work);
+  localize(cap, frame, work);
+  auto limits = work.topology();
   auto topology = PolygonCutAccess::build(shell, original.polygon->topology,
-                                          &source, limits);
+                                          &source, limits, work);
   auto derivative = topology.triangulate(limits);
   if (derivative.mesh.indices.size() != shell.barycentrics.size() ||
       topology.faces().size() != shell.triangles.size())
@@ -391,11 +500,14 @@ publish_colored_cut(Scene &scene, const CutPreview &preview,
   Mesh low = derivative.mesh;
   auto low_tangents = tangent_corners(low, cancelled);
   place_mesh(low, frame, cancelled);
-  for (auto &t : low_tangents)
+  for (auto &t : low_tangents) {
+    work.visit();
     t = placed_tangent(frame, t);
+  }
   auto barycentrics = shell.barycentrics;
   if (frame.orientation() == AffineOrientation::Reversing)
     for (size_t k = 0; k < low.indices.size(); k += 3) {
+      work.visit();
       std::swap(low.indices[k + 1], low.indices[k + 2]);
       std::swap(barycentrics[k + 1], barycentrics[k + 2]);
     }
@@ -406,6 +518,7 @@ publish_colored_cut(Scene &scene, const CutPreview &preview,
   options.resolution = resolution;
   options.padding = 8;
   options.ao_samples = 0;
+  options.max_raster_samples = bounds.maximum_raster_samples;
   options.source_triangles = shell.triangles;
   options.source_corner_barycentrics = std::move(barycentrics);
   options.cancelled = cancelled;
@@ -420,8 +533,10 @@ publish_colored_cut(Scene &scene, const CutPreview &preview,
   BakedTextures textures;
   textures.maps = std::move(baked.maps);
   textures.maps.normal = std::move(baked.normal);
-  for (auto coverage : baked.coverage)
+  for (auto coverage : baked.coverage) {
+    work.visit();
     textures.coverage.push_back(coverage == 1 || coverage == 2 ? 255 : 0);
+  }
   auto paint =
       std::make_shared<PaintedMesh>(std::move(derivative.mesh), resolution);
   paint->install_bake(std::move(textures));
@@ -435,7 +550,7 @@ publish_colored_cut(Scene &scene, const CutPreview &preview,
   if (!cap.mesh.indices.empty()) {
     cap_authority = std::make_shared<PolygonAuthority>();
     cap_authority->topology = PolygonCutAccess::build(
-        cap, original.polygon->topology, nullptr, limits);
+        cap, original.polygon->topology, nullptr, limits, work);
     cap_authority->origin = origin;
     cap_paint = std::make_shared<PaintedMesh>(
         cap_authority->topology.triangulate(limits).mesh, resolution);

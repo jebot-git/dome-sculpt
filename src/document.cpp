@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "cut-color.hpp"
 #include "affine-surface.hpp"
 #include "shapekey-preview.hpp"
 #include "document-authority.hpp"
@@ -552,7 +553,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_author_shapes=shape_target_ready_locked();
   state_.can_restore_shapes=state_.can_author_shapes&&bool(active.shape_source);
   state_.can_select_shape=state_.can_author_shapes&&active.deformation&&active.deformation->morphs&&!active.deformation->morphs->targets.empty();
-  state_.can_cut = !(active.polygon && active.polygon->active && active.polygon->colors) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
+  state_.can_cut = detail::cut_color_supported(active) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy && !control_before_ &&
       !action_active_locked() && object_editable_locked(active.id) && scene_.objects().size()<=254 && scene_.groups().size()<128 &&
       (active.mesh_active||!active.volume->voxels().empty());
   state_.skin_sources=skin_sources_locked(state_.skin_options.mode);

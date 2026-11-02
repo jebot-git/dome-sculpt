@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/polygon-scene.hpp"
+#include "cut-color.hpp"
 namespace dome {
 namespace {
 bool same(const CutSettings &a,const CutSettings &b){
@@ -11,14 +12,20 @@ bool same(const CutSettings &a,const CutSettings &b){
          a.cap_material.double_sided==b.cap_material.double_sided&&a.cap_material.alpha==b.cap_material.alpha&&
          a.cap_material.alpha_cutoff==b.cap_material.alpha_cutoff&&a.cap_material.unlit==b.cap_material.unlit;
 }
-std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t object){
+std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t object,const std::function<bool()> &cancelled){
   auto range=std::find_if(base.ranges.begin(),base.ranges.end(),[&](auto &r){return r.object==object;});
   if(range==base.ranges.end()||!range->count)throw std::logic_error("The cut source has no displayed surface");
+  if(range->first>base.mesh.indices.size()||range->count>base.mesh.indices.size()-range->first||range->count>2'000'000)
+    throw std::length_error("The cut source range exceeds its bounded surface");
+  if(!base.source_colors.empty()&&base.source_colors.size()!=base.mesh.positions.size())
+    throw std::invalid_argument("The displayed cut color stream is incomplete");
   auto source=std::make_shared<BakeSource>();source->materials[0].material=range->material;source->materials[0].maps=range->textures;
   for(size_t k=range->first;k<range->first+range->count;++k){
+    if((k&255)==0&&cancelled&&cancelled())throw std::runtime_error("Plane cutting cancelled");
     auto vertex=base.mesh.indices.at(k);auto &mesh=source->mesh;
     mesh.indices.push_back(uint32_t(mesh.positions.size()));mesh.positions.push_back(base.mesh.positions.at(vertex));
     mesh.normals.push_back(base.mesh.normals.at(vertex));if(!base.mesh.uv.empty())mesh.uv.push_back(base.mesh.uv.at(vertex));
+    if(!base.source_colors.empty())source->colors.push_back(base.source_colors.at(vertex));
   }
   source->mesh.validate();return source;
 }
@@ -53,8 +60,7 @@ std::shared_ptr<const MeshSnapshot> preview_snapshot(const MeshSnapshot &base,co
 void Document::begin_cut(){std::lock_guard lock(model_mutex_);finish_locked();begin_cut_locked();}
 void Document::begin_cut_locked(){
   const auto &o=scene_.active();
-  if(o.polygon && o.polygon->active && o.polygon->colors)
-    throw std::logic_error("Current polygon corner colors need a cut field adapter; use color-aware polygon edge cuts");
+  detail::require_cut_color_supported(o);
   if(state_.cut||state_.retopology||state_.asset_busy||state_.recovery_busy||control_before_||action_active_locked()||
      !object_editable_locked(o.id)||(!o.mesh_active&&o.volume->voxels().empty())||scene_.objects().size()>254||scene_.groups().size()>=128)
     throw std::logic_error("Finish the current action; show and unlock a source with room for cut outputs");
@@ -166,7 +172,7 @@ void Document::cut_loop(){
           if(cancelled())continue;
           base=mesh_.load();}
         if(base->generation!=job.expected.generation||base->revision!=job.expected.revision)throw std::runtime_error("Cut source mesh failed to prepare");
-        source=source_mesh(*base,job.expected.object);session=job.session;auto [center,radius]=cut_bounds(source->mesh);
+        source=source_mesh(*base,job.expected.object,cancelled);session=job.session;auto [center,radius]=cut_bounds(source->mesh);
         std::lock_guard lock(model_mutex_);if(cancelled()||!state_.cut)continue;
         cut_base_=base;cut_bake_source_=source;auto view=std::make_shared<CutView>(*state_.cut);
         view->center=center;view->radius=radius;view->ready=true;view->offset_limit_mm=std::min(100'000.f,std::max(1.f,radius*1000));state_.cut=view;publish_locked();

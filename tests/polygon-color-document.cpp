@@ -266,26 +266,15 @@ int main(int argc, char **argv) try {
   guarded.object(plain).mesh_active = true;
   guarded.select(alpha.active().id);
   d.replace(guarded);
-  check(d.wait_mesh() && !d.frame().state->can_cut &&
-            !d.frame().state->can_bake,
-        "Native/menu readiness does not advertise unsupported "
-        "appearance-transferring Cut or Bake for a current field");
+  check(d.wait_mesh() && d.frame().state->can_cut && !d.frame().state->can_bake,
+        "Native/menu readiness enables authenticated current-field cut while "
+        "unadapted current-field Bake remains guarded");
   auto guarded_before = d.copy_scene().encode();
-  bool cut_refused = false, bake_refused = false;
-  try {
-    d.begin_cut();
-  } catch (const std::logic_error &) {
-    cut_refused = true;
-  }
-  try {
-    d.bake_from_object(plain);
-  } catch (const std::logic_error &) {
-    bake_refused = true;
-  }
-  check(cut_refused && bake_refused &&
-            d.copy_scene().encode() == guarded_before,
-        "Unsupported cut/bake entry leaves all current field, source and "
-        "history exact");
+  d.begin_cut();check(d.wait_cut(), "Current-field cut source prepares or reports bounded contour refusal");d.end_cut(false);
+  bool bake_refused = false;
+  try {d.bake_from_object(plain);}catch(const std::logic_error &){bake_refused=true;}
+  check(bake_refused && d.copy_scene().encode()==guarded_before,
+        "Cancel of current-field cut and unsupported Bake retain exact current field/source/history");
   guarded.select(plain);
   const auto plain_before = guarded.encode();
   bool low_bake_refused = false;
