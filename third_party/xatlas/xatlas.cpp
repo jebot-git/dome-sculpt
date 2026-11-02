@@ -3153,7 +3153,13 @@ public:
 		for (uint32_t i = 0; i < m_workers.size(); i++) {
 			Worker &worker = m_workers[i];
 			XA_DEBUG_ASSERT(worker.thread);
-			worker.wakeup = true;
+			// The predicate and notification must synchronize with the actual
+			// waiter mutex. Atomic wakeup alone can lose the final notification
+			// between a false predicate check and platform wait registration.
+			{
+				std::lock_guard<std::mutex> lock(worker.mutex);
+				worker.wakeup = true;
+			}
 			worker.cv.notify_one();
 			if (worker.thread->joinable())
 				worker.thread->join();

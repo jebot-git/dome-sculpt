@@ -1,0 +1,42 @@
+{
+  "checked_utc": "2026-11-02T02:56:53.584347+00:00",
+  "DomeD_remote": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "previous_verified": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+  "canonical_inputs_identical": true,
+  "FLTK_patches_verified": 23,
+  "bitmap_patches_verified": 4,
+  "runtime_libraries_verified": 16,
+  "bitmap_helper_sha256": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
+  "builder_sha256": "fe7db74e1763dc51c8362332751eefe4559aa25a654a000e4553e6afe91754ae",
+  "FLTK_prefix": "artifacts/toolkit-eee23b7",
+  "bitmap_prefix": "artifacts/bitmap-runtime-eee23b7",
+  "library_directory": "lib",
+  "build_policy": "Existing optimized libraries remain the latest canonical inputs; no relabeling of a compositor build or prior test scopes",
+  "compositor_source": "artifacts/domed-d271cf6-source; clean committed source",
+  "compositor_build": {
+    "status": "passed",
+    "profile": "optimized Release; nested feature; regular user",
+    "command": "cargo build --offline --locked --release --features nested --bin dome-compositor -j3",
+    "log": "artifacts/build-domed-d271cf6-final.log",
+    "log_sha256": "9c6f8fef583fc5cb45a9c91bcedc54ab2ee7fd5d07bf539a847d0a53cae77cad",
+    "binary": "artifacts/domed-d271cf6-target/release/dome-compositor",
+    "binary_sha256": "e6fe5237aead7d9b53b607e0fef7ca4225ccb06f75b5e423feecb917a9393b60"
+  },
+  "DomeD_unrelated_working_changes": "preserved without modification",
+  "system_installation": false,
+  "session_restart": false,
+  "native_Wayland_menu": {
+    "checked_utc": "2026-11-02T03:20:57.455561+00:00",
+    "passed": 8,
+    "failed": 0,
+    "client_product_source": "f3f9199d691b0ae005a1dabc13e5c50855115bdc",
+    "client_binary_sha256": "31b3d8654775143c8dc10e6ddb6d682085e9cecb2eb3a8b2595fb4590b0897bf",
+    "test": "tests/dome_menu.py",
+    "test_sha256": "63e87b89dac6476131cd237f8287b36e65c942dc2e82d62b3d34d1079ff02e05",
+    "report": "artifacts/domed-d271cf6-menu/report.json",
+    "report_sha256": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af",
+    "runtime_maps": "artifacts/domed-d271cf6-menu/runtime-maps.json",
+    "runtime_maps_sha256": "a620bbc306e4edd12c60a455ddebb631d2e5edb71fe98180e91742fe99a7b44f",
+    "scope": "Isolated native FLTK/Wayland client and latest private DomeD universal menu in Xvfb/private DBus; software Vulkan; no hardware/headset or system install claim"
+  }
+}
