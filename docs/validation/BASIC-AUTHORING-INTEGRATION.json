@@ -1,0 +1,149 @@
+{
+  "recorded_utc": "2026-11-02T19:12:23.105698+00:00",
+  "publication_merge": "974ef421f218ca1729283e92ccbbca23a7be5ab0",
+  "qualified_runtime_test_source": "cc3bf97005ee122061be37a60cd726825acc01fe",
+  "qualified_metadata": "413ac650074838c60ffeaf4a9bb074fc1f384f20",
+  "main_runtime_header_asset_thirdparty_CMake_test_byte_equality": true,
+  "source_manifest": {
+    "file": "artifacts/basic-authoring-published-source-974ef42.json",
+    "sha256": "686f6b1f560474e24b3d20ac4e00a4800c96ec7b376d0063da8682a0fa2eed4c",
+    "files": 741
+  },
+  "component_hash_audits": {
+    "initial_combined": {
+      "receipt": "docs/validation/BASIC-AUTHORING-UNION-WIP.json",
+      "sha256": "8a8d149fd56b0ff0d19b6f05bd1ef32bc59ff6d1e1182ebaf74c0bc3de42a269",
+      "checked": 55,
+      "missing": [],
+      "mismatches": []
+    },
+    "correction": {
+      "receipt": "docs/validation/BASIC-AUTHORING-REGRESSION-FIX.json",
+      "sha256": "fbf5d26941adb2ff0031b0b45ce147c93cbe8765c7af22b3c02190072670e645",
+      "checked": 197,
+      "missing": [],
+      "mismatches": []
+    }
+  },
+  "combined_checkpoint_qualified": true,
+  "full_goal_complete": false,
+  "persistent_format": "Scene20/material6/polygon5; no Scene21+ admission",
+  "initial_scope": {
+    "source": "25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c",
+    "fresh_optimized_CPU_alltargets": 0,
+    "fresh_OneAPI_alltargets": 0,
+    "fresh_own_C_CXX_core_support_renderer_frontend": 0,
+    "full_Release": {
+      "tests": 395,
+      "passed": 392,
+      "failures": 3,
+      "seconds": 4541.67,
+      "terminal_exit": 8
+    },
+    "separate_owned_SAN": {
+      "tests": 21,
+      "failures": 0,
+      "seconds": 85.49
+    },
+    "separate_owned_SAN_actual_avatar": {
+      "tests": 1,
+      "failures": 0,
+      "checks": 111,
+      "images": 18,
+      "seconds": 172.54
+    },
+    "A770_Renderer": {
+      "checks": 254,
+      "PBR": 123,
+      "actual_avatars": 111,
+      "projection": 11,
+      "rig_guide": 9,
+      "PCI": "0000:03:00.0"
+    },
+    "A770_OneAPI_compute_native": {
+      "tests": 9,
+      "failures": 0,
+      "analytic": 184,
+      "reference_batches": 224,
+      "samples": 445088,
+      "max_error": 8.9407e-08,
+      "missing_GPU_explicit": true
+    },
+    "native_Release": {
+      "PBR": 13,
+      "projection": 11,
+      "rig": 8
+    },
+    "native_compact": {
+      "PBR": 13,
+      "projection": 11,
+      "rig": 8
+    },
+    "native_own_SAN": {
+      "PBR_actual_normal_close": 15,
+      "projection": 11,
+      "rig": 8
+    },
+    "private_DomeD_Wayland": {
+      "projection": 9,
+      "rig": 9,
+      "DomeD_source": "d271cf65c612a462fcfa6739416b06c6565be070"
+    },
+    "separate_actual_loader_syntheticXR": {
+      "projection": 10,
+      "PBR": 10,
+      "rig": 11
+    },
+    "current_KHR": {
+      "files": 34,
+      "errors": 0,
+      "unfiltered_warnings": 354,
+      "maxIssues": 0
+    }
+  },
+  "corrected_scope": {
+    "production": "9684486",
+    "test_only": "cc3bf97",
+    "fresh_optimized_core_support_renderer_frontend_build_terminal_exit": 0,
+    "fresh_own_C_CXX_core_support_renderer_frontend_build_terminal_exit": 0,
+    "registered_Release": {
+      "tests": 5,
+      "failures": 0,
+      "seconds": 0.75
+    },
+    "registered_owned_SAN": {
+      "tests": 5,
+      "failures": 0,
+      "seconds": 3.67,
+      "leaks_enabled": true
+    },
+    "full_actual_loader_syntheticXR": {
+      "tests": 1,
+      "assertions": 150,
+      "failures": 0,
+      "seconds": 159.41,
+      "physical_headset": false,
+      "renderer": "software"
+    },
+    "native_binary_inputs_unchanged_after_test_only_runtime_retime": true,
+    "final_test_runtime_rebuilt_Release_and_own_SAN": true,
+    "new_whole_OneAPI_or_current_Document_A770_run": false
+  },
+  "preserved_initial_negatives": [
+    "Original395: obsolete import pagecount, actual first-mesh voxel-mask fence bug, old loader paint palette path",
+    "Exact strengthened first-mesh mask fails on original frozen archive",
+    "First correction loader59checks then omitted helper;59-pass/terminal8 retained",
+    "Second correction loader138pass/1Bluefailure; stroke hit deliberate tracking-loss frame22; source and outputs retained",
+    "Original missing GUI default build paths retained; explicit paths fixed fixture only"
+  ],
+  "remaining": [
+    "All incomplete REQUIREMENTS rows, including native writable paint domains, full rig-rest/import graph/VRM semantics, multi-UV/FBX semantics and accelerators/devices",
+    "Source21/24/25/26 private work is unadmitted",
+    "Controller spatial drawers after basic targets",
+    "New physical production workflow/device acceptance",
+    "Inherited Wayland shared-EGL5856byte/31allocation and XR112byte/2allocation lifetime reports, no suppression/toolkit fork"
+  ],
+  "no_new_physical_test": true,
+  "no_install": true,
+  "no_session_restart": true
+}

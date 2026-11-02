@@ -123,8 +123,8 @@ or desktop restart occurred; the accepted saved XR session remains preserved.
 
 ## Qualified composed authoring checkpoint — 2026-11-02
 
-Current runtime/test inputs are byte-identical to qualifiedcc3bf97, final
-metadata413ac65 in artifacts/basic-authoring-regressions-25fe208. This adds
+Public merge974ef42 is runtime/header/asset/third-party/CMake/test byte-identical
+to qualifiedcc3bf97, final metadata413ac65 in artifacts/basic-authoring-regressions-25fe208. This adds
 production input repair9684486 and test-only recovery retimecc3bf97 to frozen
 25fe2089cea72c2ab5e8ba4a942cb8d3de58e52c in
 artifacts/basic-authoring-source20-7a4443e. Read BASIC-AUTHORING-INTEGRATION.md
@@ -219,8 +219,20 @@ normal cheap/deep forwarding0fc00db is only for its private normal21 lineage.
 Docs owns full Scene25 exact pose-local matrices, first rig_source capsules and
 actual linked/source rig-rest transport. Native subset/codec/export proofs and
 existing-rig worker work are progressing; imported source-node/VRM guards remain.
-Every unfinished requirement stays active, including post-basic controller trays.
-No new physical launch, system install or active-session restart occurred.
+Current private agent checkpoints: Contracts' actual paint-domain authority has
+Release5/5+whole-ownedSAN5/5; material9 shared-pool codec a52f62c has Release4/4
+and ownSAN82990 live. Scene24 root/consumer/native admission remains unfinished.
+Docs' private Scene25 bbb1792 is qualified for its exact native rest-fitting
+subset; new original-node graph code has1672 checks across the actual19-part
+CC0 avatar plus3rigid accessories, with real multiple skins/reordered slots/
+poses, but source-REST/native wiring and typedVRM guards remain. Palette's private
+Scene26 sourceUV2+ foundation has software55role/pick/normal/traffic checks and
+actual native54import/explicit-atlas/Save/history/paint/cancel/GLB checks; generated
+TUV2 provenance, full fresh ABI/SAN/hardware proof and full admission remain.
+No private Scene21+ data is admitted by974ef42. Do not rebase or mutate any live
+source/build inputs for integration. Every unfinished requirement stays active,
+including post-basic controller trays. No new physical launch, system install
+or active-session restart occurred.
 
 ## Qualified rigid source avatar integration — 2026-11-02
 
