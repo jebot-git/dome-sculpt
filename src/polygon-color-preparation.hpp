@@ -10,8 +10,9 @@ namespace dome::detail {
 inline void strict_polygon_color_target(SculptObject &target,
                                         CanvasTransform world,
                                         const std::function<bool()> &cancelled,
-                                        std::shared_ptr<const SourcePlacementCapsule> placement={}) {
-  if(target.polygon && target.polygon->active && target.polygon->colors)
+                                        std::shared_ptr<const SourcePlacementCapsule> placement={},
+                                        bool allow_current_corners=false) {
+  if(target.polygon && target.polygon->active && target.polygon->colors&&!allow_current_corners)
     throw std::logic_error("Current polygon corner colors need an explicit prepared-color field adapter before baking");
   if (!target.painted || target.painted->surface_diagnostics().policy !=
                              PaintUvPolicy::PolygonAuthored)

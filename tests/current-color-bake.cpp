@@ -38,8 +38,8 @@ int main(int argc,char **argv)try{
   {auto glb=path;glb.replace_extension(".glb");reopened.export_asset(glb).get();check(std::filesystem::file_size(glb)>1000,"Actual current-source Bake exports its resolved target through existing frame guards");}
  }
  {
-  auto scene=fixture();auto source=scene.objects().front().id;auto before=scene.encode();scene.select(source);scene.object(source).visible=true;scene.object(source).locked=false;auto target_field=scene.encode();ObjectBakeSettings settings;settings.prepare_colors=true;settings.ao_samples=0;
-  check(refuses([&]{bake_object(scene,scene.objects().back().id,settings);})&&scene.encode()==target_field,"Current-field target still refuses until its own preparation/projection authority is implemented");
+  auto scene=fixture();auto source=scene.objects().front().id;auto before=scene.encode();scene.select(source);scene.object(source).visible=true;scene.object(source).locked=false;auto target_field=scene.encode();ObjectBakeSettings settings;settings.prepare_colors=false;settings.ao_samples=0;
+  check(refuses([&]{bake_object(scene,scene.objects().back().id,settings);})&&scene.encode()==target_field,"Current-field target requires explicit projection preparation before accepting a nonidentity field");
  }
  {
   auto scene=fixture();auto source=scene.objects().front().id;auto &target=scene.active();const auto &mesh=target.painted->mesh();DeformationState state(mesh);state.morphs=MorphSet(mesh);auto positions=mesh.positions;for(auto &p:positions)p.z+=.02f*p.x;state.morphs->set_target(mesh,"Target mode authority",positions);state.morph_weights={0};scene.set_deformation(target.id,std::move(state));auto before=scene.encode();

@@ -25,7 +25,8 @@ COMPACT = os.environ.get("DOME_SCULPT_BAKE_COLOR_COMPACT") == "1"
 POLYGON = os.environ.get("DOME_SCULPT_BAKE_COLOR_POLYGON") == "1"
 NORMAL = os.environ.get("DOME_SCULPT_BAKE_NORMAL") == "1"
 CURRENT = os.environ.get("DOME_SCULPT_BAKE_COLOR_CURRENT") == "1"
-OUT = ROOT / ("artifacts/menu-bake-color-" + ("current-" if CURRENT else "normal-" if NORMAL else "polygon-" if POLYGON else "") + ("compact" if COMPACT else "workflow"))
+TARGET = os.environ.get("DOME_SCULPT_BAKE_COLOR_TARGET") == "1"
+OUT = ROOT / ("artifacts/menu-bake-color-" + ("target-" if TARGET else "current-" if CURRENT else "normal-" if NORMAL else "polygon-" if POLYGON else "") + ("compact" if COMPACT else "workflow"))
 OUT.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -69,7 +70,7 @@ async def main():
             config.parent.mkdir(parents=True,exist_ok=True)
             config.write_text(json.dumps({"font":"Unifont / Sans-Serif","font_size":16,"font_scale":2}))
         fixture = Path(task_home, "procedural.dsculpt")
-        helper = "dome-sculpt-current-color-bake-test" if CURRENT else "dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
+        helper = "dome-sculpt-current-color-target-test" if TARGET else "dome-sculpt-current-color-bake-test" if CURRENT else "dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
         subprocess.run([str(BUILD / helper), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)

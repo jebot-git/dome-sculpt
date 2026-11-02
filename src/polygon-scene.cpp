@@ -379,6 +379,34 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
   if(shared){
     const auto &preparations=materials->at("color_preparations");
     if(!preparations.is_array()||preparations.empty()||preparations.size()>256)throw std::length_error("Corner color preparation count exceeded");
+    const auto &bindings=materials->at("bindings"),&paints=materials->at("paints"),&origins=materials->at("origins"),&normals=materials->at("normal_preparations");
+    for(const auto *table:{&bindings,&paints,&origins,&normals})if(!table->is_array()||table->size()>256)throw std::length_error("Corner preparation shared material table exceeded");
+    std::array<uint8_t,256> used_binding{},used_paint{},used_origin{},used_preparation{},used_normal{};
+    std::array<uint32_t,256> queue{};size_t begin=0,end=0;
+    auto add_binding=[&](const nlohmann::json &ref){if(ref.is_null())return;auto id=polygon_archive_index(ref,bindings.size());if(!used_binding[id]){used_binding[id]=1;queue[end++]=id;}};
+    for(const auto &object:objects)add_binding(object.at("material_bindings"));
+    for(const auto &origin:oo)add_binding(origin.at("material_bindings"));
+    auto paint=[&](const nlohmann::json &ref){used_paint[polygon_archive_index(ref,paints.size())]=1;};
+    auto walk_binding=[&](size_t id,const auto &before){
+      const auto &binding=bindings[id];
+      if(!binding.at("origin").is_null()){auto origin=polygon_archive_index(binding.at("origin"),origins.size());used_origin[origin]=1;paint(origins[origin].at("paint"));}
+      auto predecessor=[&](const nlohmann::json &ref){if(ref.is_null())return;auto prior=polygon_archive_index(ref,bindings.size());if(prior>=id)throw std::invalid_argument("Corner preparation material history must be acyclic and ordered");before(ref,prior);};
+      if(!binding.at("color_preparation").is_null()){
+        auto p=polygon_archive_index(binding.at("color_preparation"),preparations.size());used_preparation[p]=1;
+        paint(preparations[p].at("paint"));predecessor(preparations[p].at("before_binding"));
+      }
+      if(!binding.at("normal_preparation").is_null()){
+        auto p=polygon_archive_index(binding.at("normal_preparation"),normals.size());used_normal[p]=1;
+        const auto &normal=normals[p];paint(normal.at("paint"));predecessor(normal.at("before_binding"));
+        if(normal.contains("uv_reprojection")){const auto &uv=normal.at("uv_reprojection");paint(uv.at("paint"));predecessor(uv.at("before_binding"));}
+      }
+    };
+    while(begin<end){const auto id=queue[begin++];walk_binding(id,[&](const auto &ref,size_t){add_binding(ref);});}
+    auto reachable=[](const auto &used,size_t count){return std::all_of(used.begin(),used.begin()+count,[](auto x){return x!=0;});};
+    if(!reachable(used_binding,bindings.size())||!reachable(used_paint,paints.size())||!reachable(used_origin,origins.size())||!reachable(used_preparation,preparations.size())||!reachable(used_normal,normals.size()))
+      throw std::invalid_argument("Unreachable corner preparation material/paint records");
+    std::array<size_t,256> heights{};
+    for(size_t i=0;i<bindings.size();++i){size_t height=1;walk_binding(i,[&](const auto &,size_t prior){height=std::max(height,heights[prior]+1);});if(height>64)throw std::length_error("Corner preparation material history depth exceeded");heights[i]=height;}
     bool found=false;
     for(const auto &p:preparations)if(p.contains("polygon_colors")){
       if(p.at("version")!=2||p.at("receipt").at("version")!=2||p.at("receipt").at("source_field")!=2)throw std::invalid_argument("Corner preparation lost its versioned field declaration");

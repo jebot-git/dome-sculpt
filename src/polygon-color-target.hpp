@@ -40,4 +40,24 @@ inline void polygon_color_owner(const PolygonAuthority *authority,
   }else if(current&&preparation)
     throw std::invalid_argument("Current polygon corner colors conflict with prepared color authority");
 }
+// Conservative cheap readiness; full ordered geometry and projection validation
+// remain detached worker work. Prepared normal/artist/UV1 transfers are separate.
+inline bool corner_bake_target_supported(const SculptObject &object) noexcept {
+  if(!object.polygon||!object.polygon->active||!object.polygon->colors)return true;
+  if(!object.mesh_active||!object.painted||object.appearance||object.painted->normal_projection())return false;
+  const auto binding=object.material_bindings;
+  if(binding&&(binding->has_mtoon||binding->normal_frames||binding->normal_preparation))return false;
+  const auto recipe=binding?binding->color_preparation:nullptr;
+  const auto projection=object.painted->color_projection();
+  if(bool(recipe)!=bool(projection))return false;
+  if(recipe&&(!recipe->projection||!recipe->polygon_colors||!recipe->polygon_colors->topology||
+      recipe->polygon_colors->field!=object.polygon->colors||
+      recipe->receipt.source_field!=SourceColorField::PolygonCorners||
+      recipe->projection->vertex_rgba!=projection->vertex_rgba))return false;
+  if(const auto maps=object.painted->source_maps())for(const auto *slot:{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion})
+    if(slot->image&&slot->texcoord!=0)return false;
+  if(const auto baked=object.painted->baked();baked&&(baked->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||
+      baked->color_interpretation!=(recipe?BakedColorInterpretation::ResolvedPbr:BakedColorInterpretation::VertexComponent)))return false;
+  return true;
+}
 } // namespace dome::detail
