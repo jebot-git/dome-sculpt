@@ -80,7 +80,18 @@
     "state": "live",
     "log": "artifacts/tests-basic-authoring-full-release.log",
     "future_junit": "build/artifacts-basic-authoring-full-release.xml",
-    "do_not_restart_on_observation_timeout": true
+    "do_not_restart_on_observation_timeout": true,
+    "observed_failure_count": 3,
+    "observed_failures": [
+      " 72/395 Test  #72: import-options-controller ......................***Failed    0.06 sec",
+      "137/395 Test #137: sculpt-mask-controller .........................***Failed    0.02 sec",
+      "170/395 Test #170: openxr-client ..................................***Failed  144.60 sec"
+    ],
+    "diagnosis": {
+      "import-options-controller": "Obsolete spatial page count25/max24; new shared projection/PBR/rig pages require28/max27 and action assertions.",
+      "sculpt-mask-controller": "Product regression: material-view endpoint fence also blocks direct voxel input before first mesh publication. Separate9684486 scopes fence to mesh sampling with deterministic real worker barrier.",
+      "openxr-client": "Synthetic paint fixture follows old Controls\u2192ColorPresets route, missing new projection submenu. Separate9684486 traverses real projection\u2192presets while retaining blue pixel oracle."
+    }
   },
   "remaining_for_qualification": [
     "Full395 terminal result/diagnosis",
@@ -142,7 +153,8 @@
     "artifacts/basic-authoring-current-khronos.json": "40449ca2896390072806cd83e488b4f1a727c38d2c4a9019bb92726e36f9375b",
     "artifacts/basic-authoring-current-glbs.json": "8972992b3dc1e66628309cc174234d5e6c361f94af8b5fa8b7df5cf269ba5bcb",
     "artifacts/validate-basic-current.cjs": "4aac71edc405a46ecc54e434d8bde50ee0e1ffa1f927434790150d3642b7b740",
-    "artifacts/pbr-preview-normal-close.py": "08453d7a2dc507143a94b503d36a7367d4ad02ba6bf7204bf8840b3b73e2bc99"
+    "artifacts/pbr-preview-normal-close.py": "08453d7a2dc507143a94b503d36a7367d4ad02ba6bf7204bf8840b3b73e2bc99",
+    "artifacts/basic-authoring-observed-failures.json": "4de2d3cd49c2fe11c88173aee14472444b1256fa8d8ed03367766bd944a4d797"
   },
   "additional_composed_frontends": {
     "projection_compact": {
@@ -209,5 +221,13 @@
     "maxIssues": 0,
     "inputs": "20completed Arc PBR/current avatar GLBs +14 completed actual FBX/pose GLBs; not every output of stilllivefull395"
   },
-  "updated_utc": "2026-11-02T18:40:40.661594+00:00"
+  "updated_utc": "2026-11-02T18:51:24.299060+00:00",
+  "correction_child": {
+    "tree": "artifacts/basic-authoring-regressions-25fe208",
+    "source": "9684486",
+    "fresh_Release_build": 71240,
+    "fresh_owned_SAN_build": 71315,
+    "state": "live",
+    "deterministic_old_mask_negative": true
+  }
 }
