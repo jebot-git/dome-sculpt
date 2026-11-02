@@ -1,0 +1,35 @@
+{
+  "source_commit": "e2b85f875fdc61f616eb7f69069c0f08abe6a399",
+  "scope": "Detached paired colour/normal metadata and exact geometry rebind only; material9/Scene24 codec and native/render/export still required",
+  "source_sha256": {
+    "include/dome/color-paint-sampling.hpp": "3e242270a686b9a79b03df972690ce624043cf26a5d83c2e2623953c39b52c3f",
+    "include/dome/color-preparation.hpp": "b9d2910815338d1f26407106867744ac6a5e0ff48dcd4d7a29531254266405f9",
+    "include/dome/normal-preparation.hpp": "1a18d4a1898888ff4dc77d3c2b8fe3ffa1da416e5e33a93d8dd8b3ea5aa5700e",
+    "include/dome/paint-sampling.hpp": "fbd4465ff56cc4800a67c694ab8911ce5a3fd7f3be96cd3e8ad46b7cb7905dfc",
+    "src/color-paint-sampling.cpp": "0daa74f96531196d07e581fabbcb4affd844e825b0125e3d05ea68ef71786f33",
+    "src/color-preparation.cpp": "74f4910eba34de591e5e0304bb969c51bcc9da95c940aec61ce930fd658fb020",
+    "src/material-bindings.cpp": "531cdb6d5b87a9a9d1e20038139c659329a619e8159302e8ff1871ea465c7886",
+    "src/normal-sampling-access.hpp": "d686985e87a2d603a9f65ebeaa685964564240605335b237a7244c3b7fa8932e",
+    "src/normal-sampling-replay.cpp": "66614bef81810288c1f3d186dd5105b3a2df51b4d83524cd4a40b103bcc0c64a",
+    "src/paint-sampling-access.hpp": "791ddf712f1c497cc1b74ae8b9d169faa3f59dcd78a88eeddde15b212cd9b493",
+    "src/paint.cpp": "520970ea52c98132c641a92b0bbe6eec545de82f4301300b83cc2ee2535e39c4",
+    "src/source-paint-pairing.hpp": "529af987c068fcf1c56bed808433667972fe569e0793661042e15b04bbe93f11",
+    "tests/color-paint-sampling.cpp": "92360f28225ad760d2656fe440f98aeeb8b5c55cbd3f864dde9e443c70167e32"
+  },
+  "release": {
+    "passed": 5,
+    "seconds": 2.23,
+    "log_sha256": "4f98d8d12e9418178e7180aed27921eca98cf6ac1c29adb4e192a673d7d004bb"
+  },
+  "own_core_c_cxx_support_sanitizers": {
+    "passed": 5,
+    "seconds": 36.97,
+    "flags": "O1 g1 ASAN UBSAN fno-omit-frame-pointer fno-pie/no-pie; leaks enabled",
+    "log_sha256": "60579b203ddee1e76fda16574dfa58929ec837c8167dbd340acbccd390df2166"
+  },
+  "paired_factory_assertions": 29,
+  "core_archives": {
+    "build/libdome-sculpt-core.a": "234e54fcd6a695fac0f99e6346a416e7cc2bec37de5b1d1f669aa0a8b370572a",
+    "build-ownsan/libdome-sculpt-core.a": "1de373d15052bbf7621129d0b064897c86c77a198355b2eb93ac1276d6de4697"
+  }
+}

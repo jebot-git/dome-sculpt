@@ -32,8 +32,8 @@ Fresh coherent Release passes5/5 in2.23s. The real paired native Bake followed b
 .7 chart scale+90degree turn now exercises29 positive/negative checks, including
 independent normal metadata, equal-valued wrong field/REST/witness refusal and
 actual Paint2 decode/rebind. Existing normal-domain, grid, archive and cheap/deep
-geometry validation scopes also pass. Fresh fully owned sanitizer proof of this
-exact stage is pending. Earlier surface086, archivef79 and colour-factorycd892
+geometry validation scopes also pass. Fresh wholly owned C/C++ O1 ASan/UBSan/leak qualification of exact sourcee2b85f8
+passes5/5 in36.97s. Earlier surface086, archivef79 and colour-factorycd892
 proofs stay separately frozen.
 
 No Scene24 native workflow, restored shared material graph, GPU/picking/export
