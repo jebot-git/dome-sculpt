@@ -25,10 +25,11 @@ work and validation results. Preserve the full objective in
 Build (prepare the current canonical DomeD toolkit as in [docs/TOOLKIT.md](docs/TOOLKIT.md) first):
 
 ```sh
-export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig"
-export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib:$PWD/artifacts/toolkit-eee23b7/lib"
+export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-f797e0f/lib/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/toolkit-f797e0f/lib:$PWD/artifacts/bitmap-runtime-f797e0f/lib"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-eee23b7/share/fltk"
+  -DDOME_COMPUTE_BACKEND=CPU -DFLTK_DIR="$PWD/artifacts/toolkit-f797e0f/share/fltk" \
+  '-U*DOME_BITMAP_RUNTIME*' '-U*NATIVEGL*' '-U*RENDERFONTS*'
 cmake --build build --parallel 2
 ctest --test-dir build --output-on-failure
 ```

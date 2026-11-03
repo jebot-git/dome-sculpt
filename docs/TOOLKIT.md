@@ -82,12 +82,15 @@ cmake --build build --parallel 3
 ./build/dome-sculpt
 ```
 
-For an existing build directory, clear `*NATIVEGL*` and `*RENDERFONTS*` cache
+For an existing build directory, clear `*DOME_BITMAP_RUNTIME*`, `*NATIVEGL*`
+and `*RENDERFONTS*` cache
 entries when switching runtimes. The pkg-config font packages precede GL so
 FindPkgConfig resolves private FreeType/HarfBuzz before GL's system library
 directory; headers and same-SONAME libraries must match. Verify actual `ldd` and
 live mappings, rather than only the configured prefix. An inherited library path
-can override ELF RUNPATH.
+can override ELF RUNPATH. The current UI configuration rejects retained
+FreeType/HarfBuzz/Cairo library paths outside the selected canonical prefix,
+even when the live pkg-config metadata already names the new prefix.
 
 To prepare fresh artifacts, run the canonical DomeD
 `scripts/prepare-bitmap-runtime.py` and then `scripts/prepare-fltk-experiment.py`
