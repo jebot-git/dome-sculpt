@@ -6,6 +6,10 @@ The desktop application now requires canonical DomeD revision
 connection only after App/widgets/GL/workers and before Fontconfig cleanup.
 CMake checks the builder-installed patch and its pinned checksum to reject
 older same-version toolkits with unsafe/incomplete explicit-close teardown.
+The configure step also requires the matching FreeType/HarfBuzz/Cairo prefix
+and Cairo cache-cleanup manifest. The generated launcher prepends both selected
+library directories so inherited older same-SONAME libraries cannot silently
+replace either configured runtime.
 The source patch does not change bitmap helpers, appearance/menu conventions or
 public class layouts. This requirement applies to the desktop build; standalone
 headless compute configurations do not need a desktop toolkit.
