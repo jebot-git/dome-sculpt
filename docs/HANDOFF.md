@@ -27,9 +27,10 @@ also pass. These baseline image consumers use softwareGL alongside Arc compute;
 the distinct actual ArcGL/application evidence below remains separately scoped.
 
 The full CUDA13.4.59/sm86 native all-target build passes in1508.837s, with
-all1,434 tracked inputs exact. Three selected runtime/host tests pass: actual
-vendor status35 refuses empty/nonempty1/257/2,000,007 spans without changing
-caller bytes or silently using CPU; the native FMA-capable host sampler matches
+all1,434 tracked inputs exact. Three selected runtime/host tests pass: empty
+dispatch remains a successful no-op; actual vendor status35 refuses nonempty
+1/257/2,000,007 spans without changing caller bytes or silently using CPU.
+The native FMA-capable host sampler matches
 44,217 independently validated integer words. This proves compile/link and
 missing-device behavior, not positive NVIDIA execution, device loss or latency.
 Read validation/ONEAPI-SELECTED-b32.json and
