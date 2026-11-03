@@ -1,0 +1,497 @@
+{
+  "runtime_source": "ad7f2964d91fdadfb91069e960ff14bf3392ac41",
+  "tracked_ui_source": "b2a67565e686982f92ec82e847c3bc84d35ef527",
+  "base": "0f9ab57e663162f1dd1f4d50806a315073fe8d75",
+  "scope": "private actual desktop current-target selector; no main or full schema-union admission",
+  "implementation": [
+    "Actual Choose shapekey... document-owned FLTK Cancel-default/Select modal listing current targets",
+    "Source-leased direct selection validates all captured generation/revision/object/edit authority and rejects busy gestures/tools",
+    "No Scene/history/content/pose/weight/paint mutation; isolated preview uses view_epoch without Scene revision changes",
+    "Every valid choice including same-target retires input and requires actual post-control release; current selection mode remains unchanged",
+    "Only changed target while isolated sculpting increments view_epoch, cancelling stale target mesh results; off-sculpt or same-target causes no geometry extraction"
+  ],
+  "proof": {
+    "fresh_whole_profiles": {
+      "source": "480a0313fa8ff3d70bcb7889c5a2e3ad1ced8477",
+      "inputs": 1628,
+      "release-configure": {
+        "exit_code": 0,
+        "seconds": 2.159226943011163,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-native",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk"
+        ]
+      },
+      "release-build": {
+        "exit_code": 0,
+        "seconds": 11.179212450020714,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-native",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-shapekey-selection-test",
+          "dome-sculpt-shapekey-strokes-test",
+          "dome-sculpt-key-mirror-relative-owning-test",
+          "dome-sculpt-object-selection-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-pbr-preview-test"
+        ]
+      },
+      "release-tests": {
+        "exit_code": 0,
+        "seconds": 4.789481108979089,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-native",
+          "--output-on-failure",
+          "-R",
+          "^(shapekey-selection|shapekey-strokes|key-mirror-relative-owning|object-selection|modal-selection-controls|pbr-preview)$"
+        ]
+      },
+      "sanitize-configure": {
+        "exit_code": 0,
+        "seconds": 4.99595956900157,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-sanitize",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+        ]
+      },
+      "sanitize-build": {
+        "exit_code": 0,
+        "seconds": 867.7679930629965,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-shapekey-selection-test",
+          "dome-sculpt-shapekey-strokes-test",
+          "dome-sculpt-key-mirror-relative-owning-test",
+          "dome-sculpt-object-selection-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-pbr-preview-test"
+        ]
+      },
+      "sanitize-tests": {
+        "exit_code": 0,
+        "seconds": 11.022784323984524,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(shapekey-selection|shapekey-strokes|key-mirror-relative-owning|object-selection|modal-selection-controls|pbr-preview)$"
+        ]
+      },
+      "input_mismatches": []
+    },
+    "final_coherent_profiles": {
+      "source": "ad7f2964d91fdadfb91069e960ff14bf3392ac41",
+      "inputs": 1628,
+      "release-configure": {
+        "exit_code": 0,
+        "seconds": 1.6824936869961675,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-native",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk"
+        ]
+      },
+      "release-build": {
+        "exit_code": 0,
+        "seconds": 16.64780802099267,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-native",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-shapekey-selection-test",
+          "dome-sculpt-shapekey-strokes-test",
+          "dome-sculpt-key-mirror-relative-owning-test",
+          "dome-sculpt-object-selection-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-pbr-preview-test"
+        ]
+      },
+      "release-tests": {
+        "exit_code": 0,
+        "seconds": 1.3316515879996587,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-native",
+          "--output-on-failure",
+          "-R",
+          "^(shapekey-selection|shapekey-strokes|key-mirror-relative-owning|object-selection|modal-selection-controls|pbr-preview)$"
+        ]
+      },
+      "sanitize-configure": {
+        "exit_code": 0,
+        "seconds": 1.5521554639854003,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-sanitize",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+        ]
+      },
+      "sanitize-build": {
+        "exit_code": 0,
+        "seconds": 36.45085328799905,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-shapekey-selection-test",
+          "dome-sculpt-shapekey-strokes-test",
+          "dome-sculpt-key-mirror-relative-owning-test",
+          "dome-sculpt-object-selection-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-pbr-preview-test"
+        ]
+      },
+      "sanitize-tests": {
+        "exit_code": 0,
+        "seconds": 11.35536726700957,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(shapekey-selection|shapekey-strokes|key-mirror-relative-owning|object-selection|modal-selection-controls|pbr-preview)$"
+        ]
+      },
+      "input_mismatches": []
+    },
+    "direct_checks_per_profile": 29,
+    "persistent_publication_allocation_prefixes": {
+      "off_sculpt": 44,
+      "isolated_sculpt": 91
+    },
+    "ui": {
+      "final-normal": {
+        "checks": 21,
+        "failed": 0,
+        "complete": true,
+        "status": {
+          "source": "b2a67565e686982f92ec82e847c3bc84d35ef527",
+          "exit_code": 0,
+          "seconds": 27.51091370198992,
+          "inputs": 1641,
+          "inputs_unchanged": true,
+          "command": [
+            "/home/blux/.local/bin/uv",
+            "run",
+            "--offline",
+            "--with",
+            "dbus-next",
+            "--with",
+            "python-xlib",
+            "--with",
+            "pillow",
+            "python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/tests/shapekey-selection-menu.py"
+          ]
+        },
+        "report_sha256": "e2f72f4b73fd8dfb7d91a271571ca203be6c0dcd5278d7b54d5ce5bb7cd910cb"
+      },
+      "final-compact": {
+        "checks": 21,
+        "failed": 0,
+        "complete": true,
+        "status": {
+          "source": "b2a67565e686982f92ec82e847c3bc84d35ef527",
+          "exit_code": 0,
+          "seconds": 26.230463861022145,
+          "inputs": 1641,
+          "inputs_unchanged": true,
+          "command": [
+            "/home/blux/.local/bin/uv",
+            "run",
+            "--offline",
+            "--with",
+            "dbus-next",
+            "--with",
+            "python-xlib",
+            "--with",
+            "pillow",
+            "python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/tests/shapekey-selection-menu.py"
+          ]
+        },
+        "report_sha256": "e2f72f4b73fd8dfb7d91a271571ca203be6c0dcd5278d7b54d5ce5bb7cd910cb"
+      },
+      "final-retained": {
+        "checks": 21,
+        "failed": 0,
+        "complete": true,
+        "status": {
+          "source": "b2a67565e686982f92ec82e847c3bc84d35ef527",
+          "exit_code": 0,
+          "seconds": 36.89768033201108,
+          "inputs": 1642,
+          "inputs_unchanged": true,
+          "command": [
+            "/home/blux/.local/bin/uv",
+            "run",
+            "--offline",
+            "--with",
+            "dbus-next",
+            "--with",
+            "python-xlib",
+            "--with",
+            "pillow",
+            "python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/tests/shapekey-selection-menu.py"
+          ]
+        },
+        "report_sha256": "e2f72f4b73fd8dfb7d91a271571ca203be6c0dcd5278d7b54d5ce5bb7cd910cb"
+      }
+    },
+    "held_input_counterfactual": {
+      "old_source": "480a0313fa8ff3d70bcb7889c5a2e3ad1ced8477",
+      "old_result": {
+        "source": "480a0313fa8ff3d70bcb7889c5a2e3ad1ced8477",
+        "inputs": 1639,
+        "compile": {
+          "exit_code": 0,
+          "seconds": 6.9941628010128625,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/tests",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-probe/probe.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-probe/probe.o"
+          ]
+        },
+        "link": {
+          "exit_code": 0,
+          "seconds": 0.20652425300795585,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+            "-Wl,--dependency-file=CMakeFiles/dome-sculpt-shapekey-selection-test.dir/link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-probe/probe.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-probe/probe",
+            "libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libz.so",
+            "/usr/lib64/libjpeg.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ]
+        },
+        "run": {
+          "exit_code": 1,
+          "seconds": 0.007232969015603885,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-probe/probe"
+          ]
+        },
+        "inputs_unchanged": true
+      },
+      "old_cases_leaked": 2,
+      "fixed_result": {
+        "source": "ad7f2964d91fdadfb91069e960ff14bf3392ac41",
+        "inputs": 1639,
+        "compile": {
+          "exit_code": 0,
+          "seconds": 7.89045929297572,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/tests",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-fixed/probe.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-fixed/probe.o"
+          ]
+        },
+        "link": {
+          "exit_code": 0,
+          "seconds": 0.26222862998838536,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+            "-Wl,--dependency-file=CMakeFiles/dome-sculpt-shapekey-selection-test.dir/link.d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-fixed/probe.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-fixed/probe",
+            "libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libz.so",
+            "/usr/lib64/libjpeg.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ]
+        },
+        "run": {
+          "exit_code": 0,
+          "seconds": 0.010213421017397195,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/shapekey-target-selector-0f9ab57/artifacts/selector-held-fixed/probe"
+          ]
+        },
+        "inputs_unchanged": true
+      },
+      "fixed_cases_leaked": 0,
+      "interpretation": "Positive pressure on first return sample without a post-control neutral release; not proof of pressure already observed before a desktop modal. Actual ghost hover and fresh release/press selection are both asserted."
+    }
+  },
+  "preserved_negatives": [
+    "Initial fresh Release5/6; fixture incorrectly required cached picking for valid opaque snapshots; actual tagged constructor fallback corrected only in test480",
+    "First ignored UI helper accidentally inserted a second chooser after real stroke, comparing changed poststroke with prestroke; first chooser/freehand already passed, duplicate test block removed",
+    "Old same/different-target first-return selection selected ghost2; fenced code preserves active1 until release, then real selection rearms"
+  ],
+  "layout": "One additive Document method declaration; no appended class fields, serialization, command IDs, shader layout or asset policy. Fresh coherent native core/render/frontend consumers rebuilt.",
+  "limits": [
+    "No new GPU execution claim; software UI plus optimized/sanitized native core",
+    "Original canonical toolkit/bitmap prefixes retained, before root new SDK union; no SAN desktop chooser claim",
+    "Current-root/Source29/Source28/SDK semantic union and full regression remain separate",
+    "Generic refinement and new XR explicit Mirror plane/frame policy controls remain required"
+  ],
+  "artifacts": {
+    "tests/shapekey-selection.cpp": "0c0fc4a49cd1fa1308cf7b491222e286ca6d1033218320e6364dbdae90e76dbd",
+    "tests/shapekey-selection-menu.py": "4c58399f4dd38ae68ae8a83bf2c6de1abe75ece14f5e12b2926d1f6d1d2a2e4d",
+    "artifacts/selector-held-probe/run.log": "ab788c540bf847288b059a198b965017f73858095590fa5e3620203bd5a0922d",
+    "artifacts/selector-held-probe/probe": "0e46044830b560942dfd2d8517c859e09d784f8dae8324e39af8e4d3456dccdb",
+    "artifacts/selector-held-fixed/run.log": "7dd9cfc5ad915dffc961aeab612c3502f58df29e0131c21dbd6a2acbc8a3b8b6",
+    "artifacts/selector-held-fixed/probe": "dae6a7eca1d02a84bd163476036a516bd940797a88f6e9c3c6b4b63e105cc19d",
+    "artifacts/selector-proof/negative/LastTest.log": "298ff32e21f7c88ff336fbfa6c5393c918fd39d1f7cb46d93f6fdf168a83f562",
+    "artifacts/selector-proof-fixed/release-tests.log": "321b1482d7bf16f71395425ea66a4e2e9e915a93d3034cdc7f06a63c8a78bf40",
+    "artifacts/selector-proof-fixed/sanitize-tests.log": "2a781dd8ac0606b360248008ac5035f10b894049b762f19ced1531941b24eb05",
+    "artifacts/selector-proof-fenced/release-tests.log": "531cfee2142202a696b9b6e8b624ba293474637f9fb902cba61011d42c440a84",
+    "artifacts/selector-proof-fenced/sanitize-tests.log": "3a29888ac04a781f1f5313755feeff9856da8352f2dd1bf3f09ad75a68066fc4"
+  }
+}

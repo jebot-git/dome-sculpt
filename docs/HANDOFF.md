@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Private existing shapekey target selector — 2026-11-03
+
+Actual native Choose shapekey controls preserve Scene/history/save leases and
+select existing converted targets for freehand after Undo/Redo. Release6/SAN6,
+29 direct checks with44+91 allocation boundaries, and21normal/21compact/21real
+retained GUI checks pass. Read SHAPEKEY-TARGET-SELECTION.md and its receipt.
+This is private, with no new layout/schema or main admission; broader goals stay
+active. Next coordinated task is explicit XR editable-project export policy.
+
+
 ## Private explicit-plane Mirror / source integration — 2026-11-03
 
 Private fe3 runtime passes fresh CPU/whole-owned sanitizer selected5,1168 avatar
