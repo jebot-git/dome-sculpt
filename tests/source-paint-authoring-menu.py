@@ -88,7 +88,13 @@ async def main():
         row=48 if compact else 36;tap(options,g.width*.65,g.height-row/2-12)
         await wait(lambda:named('Editable GLB export') is None);chooser=await wait(lambda:named('Export editable project'))
         check(chooser.get_wm_transient_for().id==window.id,'Confirmed portable policy opens the actual owned GLB file chooser')
-        choose(chooser,package);await wait(lambda:named('Export editable project') is None);await wait(lambda:package.exists(),90)
+        choose(chooser,package);await wait(lambda:named('Export editable project') is None)
+        try:await wait(lambda:package.exists(),90)
+        except TimeoutError:
+            g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff)
+            Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(out/'export-timeout.png')
+            (out/'export-timeout.json').write_text(json.dumps({'window_title':str(window.get_wm_name()),'files':[str(p.relative_to(home)) for p in Path(home).rglob('*') if p.is_file()],'menu':await nodes()},indent=2)+'\n')
+            raise
         emitted=package.read_bytes();n=struct.unpack_from('<I',emitted,12)[0];metadata=json.loads(emitted[20:20+n]);native=metadata['extras']['domeSculptAuthoring']
         check(native['scope']=='wholeScene' and native['fallback']['lossless'] is False,'Actual GUI output declares complete native project scope and an approximate portable view')
         binary=emitted[28+n:];sizes=[]
