@@ -1,0 +1,33 @@
+{
+  "runtime_base": "b4ceff1",
+  "actual_work_cap": 500000000,
+  "test_only_work_limit": 16000000000,
+  "iteration_bound_unchanged": 4096,
+  "accepted_body_tops_fields": 0,
+  "coupled_pose_quality": "UNKNOWN",
+  "male_tops": {
+    "work": 7228194235,
+    "inverse_applications": 41420,
+    "inverse_refinements": 0,
+    "max_inverse_residual": 9.51114180442e-11,
+    "kkt_at3968": 2.75456080098e-07,
+    "gap_at3968": 1.1439237458e-06
+  },
+  "native_admission": false,
+  "hashes": {
+    "src/biharmonic-binding.cpp": "5f3a17944d8fcc23560ff0c8272da3f562ad13e86d0852e136b6c58939ca1e8e",
+    "src/projected-coupled-dual.hpp": "b0f2eae77a3f98b54611a3d719ca5602cbede5e7da458b3767542d51090ffdd5",
+    "artifacts/coupled-overbudget.cpp": "42e53b904eedd90bccc3d8480230654a175b335dd4746c362089715f32179298",
+    "artifacts/coupled-overbudget-poses.cpp": "5313e56a40f8e9ab89f2a350fb44e74f73c69de52acf7559d52704bce4002282",
+    "artifacts/coupled-overbudget-poses-probe": "8e030eddfc226baf5602f25bd0073e74b81af5f91f53ccac3ea250c428103503",
+    "artifacts/poses-coupled-overbudget-female.log": "dec304d7e8d4816833d59c6020b69c3d8dd84baa9a7112b731a644415ab2f106",
+    "artifacts/poses-coupled-overbudget-male.log": "526634c1b6b4e473f957035865b194d8a0b7da952891192af09b280387757a97",
+    "artifacts/coupled-quality-before.sha256": "b7f1458bab433fe11706d17e24d052d01d796ea48c7eeed31e6e14f64ee058d3",
+    "artifacts/coupled-trajectory.cpp": "d31f5ab2f62af36537235c0eb225c42d98963181a9558ff17e01c789761c15d8",
+    "artifacts/projected-dual-trace.hpp": "a9964a680372331e518e788ae2fe48faf76d2d83b4abf6eb39a007892ce238b7",
+    "artifacts/coupled-trajectory-poses.cpp": "9ffc05d798737c4d5449ea5afde0007ab13b6f158041a5079afa20efe1b66098",
+    "artifacts/coupled-trajectory-probe": "28c1cd174f2a9d8e127a9dea6962022b0e20bdab9a8fc8b1820229bb71acbf24",
+    "artifacts/trajectory-male-tops.log": "56ca8a70ccbee74f4c8d188a0f138d36b68bda7f831ef575e1e634e74d7f7e57",
+    "artifacts/coupled-trajectory-before.sha256": "7cee3e319c977e0eec25ceda8178ef596c210916ce0fbff4ac1415b61e5c06b9"
+  }
+}
