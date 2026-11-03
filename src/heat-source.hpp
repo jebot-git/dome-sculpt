@@ -72,6 +72,7 @@ imported_heat_segments(const Skeleton &rig, const CreatorAppearance &source,
 } // namespace dome::detail
 
 namespace dome::detail {
+enum class ImportedHeatPolicy { WholeSkin, OriginalPrimitive };
 struct ImportedHeatProfile {
   std::shared_ptr<const ImportedAsset> source;
   std::vector<uint8_t> eligible;
@@ -81,11 +82,12 @@ struct ImportedHeatProfile {
 };
 // Explicit ORIGINAL-SKIN-USAGE policy. Does not silently reinterpret native
 // fitted rigs or user-added joint identities as historical imported joints.
-inline ImportedHeatProfile
-imported_heat_profile(const Skeleton &rig, const CreatorAppearance &appearance,
-                      const HeatBindingOptions &options,
-                      const std::function<bool()> &cancelled = {},
-                      const HumanoidMapping *humanoid = nullptr) {
+inline ImportedHeatProfile imported_heat_profile(
+    const Skeleton &rig, const CreatorAppearance &appearance,
+    const HeatBindingOptions &options,
+    const std::function<bool()> &cancelled = {},
+    const HumanoidMapping *humanoid = nullptr,
+    ImportedHeatPolicy policy = ImportedHeatPolicy::WholeSkin) {
   if (!options.maximum_work || options.maximum_work > 500'000'000 ||
       options.maximum_bytes < 4096 ||
       options.maximum_bytes > 512u * 1024u * 1024u)
@@ -168,9 +170,28 @@ imported_heat_profile(const Skeleton &rig, const CreatorAppearance &appearance,
   if (primary >= skins.size() || !skins[primary])
     throw std::invalid_argument("Original-skin heat primary skin does not "
                                 "match current exact joint identities");
+  if (policy != ImportedHeatPolicy::WholeSkin &&
+      policy != ImportedHeatPolicy::OriginalPrimitive)
+    throw std::invalid_argument("Unknown imported heat joint-palette policy");
+  uint32_t selected_primitive = UINT32_MAX;
+  if (policy == ImportedHeatPolicy::OriginalPrimitive) {
+    if (appearance.source_mesh < 0 ||
+        size_t(appearance.source_mesh) >= asset.meshes.size() ||
+        nodes[size_t(appearance.source_node)].mesh != appearance.source_mesh ||
+        appearance.source_primitive < 0 ||
+        size_t(appearance.source_primitive) >=
+            asset.meshes[size_t(appearance.source_mesh)].primitives.size())
+      throw std::invalid_argument("Original-primitive heat lacks exact source "
+                                  "mesh/primitive/node correspondence");
+    selected_primitive = asset.meshes[size_t(appearance.source_mesh)]
+                             .primitives[size_t(appearance.source_primitive)];
+  }
   result.eligible.assign(b, 0);
   for (const auto &node : nodes) {
     step();
+    if (policy == ImportedHeatPolicy::OriginalPrimitive &&
+        &node != &nodes[size_t(appearance.source_node)])
+      continue;
     if (node.skin < 0 || node.mesh < 0)
       continue;
     if (size_t(node.skin) >= skins.size() ||
@@ -182,6 +203,9 @@ imported_heat_profile(const Skeleton &rig, const CreatorAppearance &appearance,
     const auto &skin = asset.skins[size_t(node.skin)];
     for (auto primitive : asset.meshes[size_t(node.mesh)].primitives) {
       step();
+      if (policy == ImportedHeatPolicy::OriginalPrimitive &&
+          primitive != selected_primitive)
+        continue;
       if (primitive >= asset.primitives.size())
         throw std::invalid_argument(
             "Original-skin heat source primitive index is invalid");

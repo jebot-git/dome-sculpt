@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "heat-binding.hpp"
 #include "dome/creation.hpp"
+#include "heat-seams.hpp"
 #include "heat-source.hpp"
 #include <iomanip>
 #include <iostream>
@@ -123,7 +124,7 @@ std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
   }
   return rhs;
 }
-void creator(bool positive) {
+void creator(bool positive, bool virtual_seams) {
   Scene scene;
   append_humanoid(scene, {}, "Actual CC0 heat probe", {}, 64);
   for (const auto &o : scene.objects()) {
@@ -145,15 +146,29 @@ void creator(bool positive) {
       auto effective = options;
       effective.maximum_work -= profile.work;
       effective.maximum_bytes -= profile.planned_bytes;
+      std::optional<HeatSeamGraph> seams;
+      if (virtual_seams) {
+        seams = capture_heat_seams(o, effective);
+        effective.maximum_work -= seams->work();
+        effective.maximum_bytes -= seams->planned_bytes();
+        std::cout << "SEAM_GRAPH joined=" << seams->joined_edges()
+                  << " rejected=" << seams->rejected_edges()
+                  << " ambiguous=" << seams->ambiguous_edges() << '\n';
+      }
       std::cout << "SOURCE_ELIGIBILITY root=" << int(profile.eligible[0])
                 << " eligible="
                 << std::count(profile.eligible.begin(), profile.eligible.end(),
                               uint8_t(1))
                 << " point_forks=" << profile.point_forks.size()
                 << " capture_work=" << profile.work << '\n';
-      auto w = heat_bind_surface(o.painted->mesh(), *o.deformation->skeleton,
-                                 effective, {}, &report, profile.segments,
-                                 profile.eligible);
+      auto w = heat_bind_surface(
+          o.painted->mesh(), *o.deformation->skeleton, effective, {}, &report,
+          profile.segments, profile.eligible,
+          seams ? seams->groups(o) : std::span<const uint32_t>{});
+      if (seams && seams->joined_edges() &&
+          report.matrix_vertices >= o.painted->mesh().positions.size())
+        throw std::runtime_error(
+            "Actual heat matrix omitted its authenticated virtual seam groups");
       auto next = *o.deformation;
       next.skin = w;
       auto pose = next.skeleton->bones;
@@ -185,7 +200,8 @@ void creator(bool positive) {
         }
       }
       mean /= before.positions.size();
-      std::cout << "HEAT_RESULT components=" << report.components
+      std::cout << "HEAT_RESULT matrix_vertices=" << report.matrix_vertices
+                << " components=" << report.components
                 << " negative_edges=" << report.negative_edges
                 << " removed_stiffness=" << report.removed_negative_stiffness
                 << " seeded_bones=" << report.seeded_bones
@@ -229,7 +245,7 @@ void creator(bool positive) {
 } // namespace
 int main(int argc, char **) try {
   if (argc > 1) {
-    creator(argc > 2);
+    creator(argc > 2, argc > 3);
     return 0;
   }
   auto mesh = sheet();

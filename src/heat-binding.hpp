@@ -16,7 +16,7 @@ struct HeatBindingOptions {
 struct HeatBindingReport {
   size_t vertices = 0, components = 0, seeded_bones = 0, iterations = 0,
          work = 0, planned_bytes = 0;
-  size_t negative_edges = 0;
+  size_t negative_edges = 0, matrix_vertices = 0;
   double removed_negative_stiffness = 0;
   double maximum_relative_residual = 0, minimum_unclamped_weight = 0,
          maximum_partition_error = 0;
@@ -40,5 +40,6 @@ SkinWeights heat_bind_surface(const Mesh &, const Skeleton &,
                               const std::function<bool()> &cancelled = {},
                               HeatBindingReport *report = nullptr,
                               std::span<const HeatSourceSegment> sources = {},
-                              std::span<const uint8_t> eligible = {});
+                              std::span<const uint8_t> eligible = {},
+                              std::span<const uint32_t> row_groups = {});
 } // namespace dome::detail

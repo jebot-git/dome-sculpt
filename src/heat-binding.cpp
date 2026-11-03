@@ -40,7 +40,8 @@ struct Budget {
 };
 struct System {
   std::vector<size_t> starts;
-  std::vector<uint32_t> columns, parent;
+  std::vector<uint32_t> columns, parent, raw_to_row;
+  std::vector<D> positions;
   std::vector<double> values, diagonal, mass, heat, ties;
   std::vector<D> normals;
   std::vector<std::array<uint64_t, 4>> seeds;
@@ -57,9 +58,30 @@ struct System {
     }
   }
 };
-System assemble(const Mesh &m, Budget &budget, HeatOperator operation) {
-  const size_t n = m.positions.size();
+System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
+                std::span<const uint32_t> row_groups) {
   System s;
+  const size_t raw = m.positions.size();
+  s.raw_to_row.resize(raw);
+  s.positions.reserve(raw);
+  std::vector<uint32_t> lookup(raw, UINT32_MAX);
+  for (uint32_t i = 0; i < raw; ++i) {
+    budget.step();
+    uint32_t key = row_groups.empty() ? i : row_groups[i];
+    if (key >= raw)
+      throw std::invalid_argument(
+          "Bone heat virtual row group is outside the current owner");
+    auto p = point(m.positions[i]);
+    auto &row = lookup[key];
+    if (row == UINT32_MAX) {
+      row = uint32_t(s.positions.size());
+      s.positions.push_back(p);
+    } else if (s.positions[row] != p)
+      throw std::invalid_argument(
+          "Bone heat virtual row merged different exact metric positions");
+    s.raw_to_row[i] = row;
+  }
+  const size_t n = s.positions.size();
   s.diagonal.assign(n, 0);
   s.mass.assign(n, 0);
   s.normals.resize(n);
@@ -79,10 +101,11 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation) {
   std::map<std::array<uint32_t, 2>, double> edges;
   for (size_t t = 0; t < m.indices.size(); t += 3) {
     budget.step();
-    std::array<uint32_t, 3> ids{m.indices[t], m.indices[t + 1],
-                                m.indices[t + 2]};
-    std::array<D, 3> p{point(m.positions[ids[0]]), point(m.positions[ids[1]]),
-                       point(m.positions[ids[2]])};
+    std::array<uint32_t, 3> ids{s.raw_to_row[m.indices[t]],
+                                s.raw_to_row[m.indices[t + 1]],
+                                s.raw_to_row[m.indices[t + 2]]};
+    std::array<D, 3> p{s.positions[ids[0]], s.positions[ids[1]],
+                       s.positions[ids[2]]};
     auto normal = cross(sub(p[1], p[0]), sub(p[2], p[0]));
     double area2 = norm(normal);
     if (!(area2 > 0) || !std::isfinite(area2))
@@ -215,10 +238,10 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
   };
   std::vector<Candidate> candidates;
   candidates.reserve(segments.size());
-  std::vector<uint8_t> anchored(m.positions.size());
-  for (size_t i = 0; i < m.positions.size(); ++i) {
+  std::vector<uint8_t> anchored(s.positions.size());
+  for (size_t i = 0; i < s.positions.size(); ++i) {
     budget.step();
-    auto p = point(m.positions[i]);
+    auto p = s.positions[i];
     candidates.clear();
     for (auto &source : segments) {
       budget.step();
@@ -236,7 +259,8 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
                 return a.distance != b.distance ? a.distance < b.distance
                                                 : a.bone < b.bone;
               });
-    double nearest = INFINITY;
+    double nearest =
+        candidates.empty() ? INFINITY : candidates.front().distance;
     size_t ties = 0;
     for (const auto &c : candidates) {
       budget.step();
@@ -370,7 +394,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
                               const std::function<bool()> &cancelled,
                               HeatBindingReport *report,
                               std::span<const HeatSourceSegment> sources,
-                              std::span<const uint8_t> eligible) {
+                              std::span<const uint8_t> eligible,
+                              std::span<const uint32_t> row_groups) {
   Budget budget{0, o.maximum_work, cancelled};
   budget.stop();
   const size_t n = m.positions.size(), nt = m.indices.size() / 3;
@@ -393,8 +418,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
           "Bone heat memory budget exceeded before construction");
     planned += count * stride;
   };
-  bytes(n, 384 + sizeof(VertexWeights) +
-               size_t(o.limits.max_influences) * sizeof(Influence));
+  bytes(n, 512 + 2 * (sizeof(VertexWeights) +
+                      size_t(o.limits.max_influences) * sizeof(Influence)));
   bytes(nt, 512);
   bytes(rig.bones.size() * rig.bones.size(), 64);
   bytes(rig.bones.size(), 512);
@@ -437,24 +462,29 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
         throw std::invalid_argument(
             "Bone heat source graph omitted a deforming bone");
   }
-  auto s = assemble(m, budget, o.operation);
+  if (!row_groups.empty() && row_groups.size() != n)
+    throw std::invalid_argument("Bone heat virtual row groups differ from the "
+                                "exact current vertex owner");
+  auto s = assemble(m, budget, o.operation, row_groups);
+  const size_t rows = s.positions.size();
   seed(s, m, rig, o, budget, sources, eligible);
   HeatBindingReport proof;
   proof.vertices = n;
+  proof.matrix_vertices = rows;
   proof.components = s.components;
   proof.planned_bytes = planned;
   proof.negative_edges = s.negative_edges;
   proof.removed_negative_stiffness = s.removed_negative_stiffness;
-  std::vector<double> rhs(n), field(n), sum(n);
-  SkinWeights out;
-  out.vertices.resize(n);
-  for (auto &row : out.vertices)
+  std::vector<double> rhs(rows), field(rows), sum(rows);
+  SkinWeights grouped;
+  grouped.vertices.resize(rows);
+  for (auto &row : grouped.vertices)
     row.reserve(o.limits.max_influences + 1);
   for (uint32_t bone = 0; bone < rig.bones.size(); ++bone)
     if (rig.bones[bone].deform && (eligible.empty() || eligible[bone])) {
-      budget.step(n);
+      budget.step(rows);
       bool active = false;
-      for (size_t i = 0; i < n; ++i) {
+      for (size_t i = 0; i < rows; ++i) {
         bool selected = s.seeds[i][bone / 64] & (uint64_t(1) << (bone % 64));
         rhs[i] = selected ? s.heat[i] / s.ties[i] : 0;
         active |= selected;
@@ -470,13 +500,13 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
           std::min(proof.minimum_unclamped_weight, solved.minimum);
       if (solved.minimum < -1e-7)
         throw HeatPositivityFailure(bone, solved.minimum);
-      for (size_t i = 0; i < n; ++i) {
+      for (size_t i = 0; i < rows; ++i) {
         budget.step();
         double value = std::max(0., field[i]);
         sum[i] += value;
         if (value <= 0)
           continue;
-        auto &row = out.vertices[i];
+        auto &row = grouped.vertices[i];
         row.push_back({bone, float(value)});
         std::sort(row.begin(), row.end(),
                   [](const Influence &a, const Influence &b) {
@@ -487,12 +517,18 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
           row.pop_back();
       }
     }
-  for (size_t i = 0; i < n; ++i) {
+  for (size_t i = 0; i < rows; ++i) {
     budget.step();
     proof.maximum_partition_error =
         std::max(proof.maximum_partition_error, std::abs(sum[i] - 1));
-    out.vertices[i] = normalize_weights(std::move(out.vertices[i]),
-                                        rig.bones.size(), {}, o.limits);
+    grouped.vertices[i] = normalize_weights(std::move(grouped.vertices[i]),
+                                            rig.bones.size(), {}, o.limits);
+  }
+  SkinWeights out;
+  out.vertices.reserve(n);
+  for (size_t i = 0; i < n; ++i) {
+    budget.step();
+    out.vertices.push_back(grouped.vertices[s.raw_to_row[i]]);
   }
   out.validate(n, rig.bones.size());
   budget.stop();
