@@ -4,6 +4,24 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Plain paint GPU integration — 2026-11-03
+
+Runtime `9f524e3` combines qualified `3411fabe`/`fc4d87f` with main `7693d6b`.
+Eligible plain writable512–2048 painting composites use bounded selected-GPU
+staging; source/baked/prepared owners retain their CPU route. Existing methods,
+class layouts, archives, affine skin/export, retopology and quality remain intact.
+Fresh CPU/OneAPI native applications and whole-owned sanitizer builds pass
+selected CPU21/SAN21/Arc17; independent softwareGL+Arccompute85 and actual
+ArcGL+compute85 have zero image delta. FLTK6CPU+6OneAPI and actual application/
+synthetic-XR7 pass with production kernel traces. All66 emitted GLBs validate
+with0errors/18 retained non-root warnings;913 captured hashes remain unchanged.
+Test-only6047a02 waits for the initial displayed mesh before retopo pressure,
+preserving the existing input fence and all131 assertions. Initial20/21 failure
+and zero-epoch diagnostic are retained. Read GPU-PAINT-INTEGRATION.md and its
+receipt. Source24/25/26 authoring union, complex/GPU stroke/bake adapters,
+positive AMD/NVIDIA proof, physical workflows and full production remain open.
+No system installation or active-session restart occurred.
+
 ## Full-affine skin binding checkpoint — 2026-11-03
 
 Runtime `17cbf54` extends public `30991dd`: existing desktop/controller automatic

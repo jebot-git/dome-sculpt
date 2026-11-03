@@ -1,10 +1,10 @@
 # Plain paint GPU and affine-skin integration
 
-Private runtime merge `9f524e3` combines the qualified plain-paint component
+Runtime merge `9f524e3` combines the qualified plain-paint component
 `3411fabe` / runtime `fc4d87f` with published main `7693d6b`. Test-only `6047a02`
 adds initial immutable-mesh readiness to the existing retopo controller fixture.
 The original component and its proof tree remain unchanged. This integration
-is not main publication or completion of the full production goal.
+does not complete the full production goal.
 
 The only merge conflict was CMake. Every independently declared parent target
 is retained. Main's affine skin/transfer, exact joint export, retopo, scalar
