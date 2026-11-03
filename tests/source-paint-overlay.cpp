@@ -58,6 +58,22 @@ int main(int argc,char **argv)try {
  check(saved.at("version")==28&&Scene::decode(saved).encode()==saved,"Actual owning Scene28 restores compound physical source paint");
  auto capsule=capture_polygon_origin(scene,scene.active().id);auto retained=scene.snapshot();retained.active().painted=unpainted;retained.active().shape_source=retained.active().rig_source=capsule;
  const auto retained_bytes=retained.encode();check(Scene::decode(retained_bytes).encode()==retained_bytes,"Retained shape/rig owners preserve compound source/physical paint");
+ // Exercise actual final PBR shading, independently of the float-plane
+ // compiler oracle: tiny green survives beside bright red; zero is an intent.
+ Material dark=white();dark.unlit=false;dark.color={0,0,0,1};dark.metallic=dark.roughness=1;
+ renderer.set_output_encoding(SurfaceOutputEncoding::Srgb);
+ const auto no_glow=draw(renderer,visible(unpainted,dark));auto luminous=unpainted->snapshot();
+ PaintSettings absolute;absolute.channel=PaintChannel::Emission;absolute.emission_units=PaintEmissionUnits::Physical;absolute.emission={100,.005f,0};ink(*luminous,absolute);
+ const auto glow_pixel=at(draw(renderer,visible(luminous,dark))),black_pixel=at(no_glow);
+ check(glow_pixel[0]>black_pixel[0]+100&&glow_pixel[1]>black_pixel[1]+3&&std::abs(glow_pixel[2]-black_pixel[2])<=1,
+   "Final production PBR shading preserves tiny physical green beside bright red without inventing blue");
+ dark.unlit=true;check(draw(renderer,visible(luminous,dark))==draw(renderer,visible(unpainted,dark)),"Core unlit still ignores physical emission contributions");dark.unlit=false;
+ auto background=std::make_shared<SourceMaterialBindings>();background->has_mtoon=false;background->physical_emission={.02f,.05f,.01f};
+ auto backed=visible(unpainted,dark);backed->ranges[0].material_bindings=background;
+ check(delta(draw(renderer,backed),no_glow)>3,"Final PBR shader uses actual absolute background emission ownership");
+ auto zero_background=std::make_shared<SourceMaterialBindings>(*background);zero_background->physical_emission={0,0,0};
+ auto zero=visible(unpainted,dark);zero->ranges[0].material.emissive={.5f,.5f,.5f};zero->ranges[0].material_bindings=zero_background;
+ check(draw(renderer,zero)==no_glow,"Explicit zero physical background overrides nonzero historical fallback");
  check(before->encode()==original,"Original unmodified source owner remains exact after GPU, picking and persistence");
  std::cout<<"PASS "<<checks<<" source paint overlay checks max_pair_error="<<maximum<<'\n';return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
