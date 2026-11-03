@@ -43,7 +43,7 @@ public:
         l.values.size() != nz || l.starts.front() != 0 || l.starts.back() != nz)
       throw std::invalid_argument(
           "Invalid sparse Laplacian preconditioner domain");
-    planned_bytes = n * 64 + nz * 12 + sizeof(size_t);
+    planned_bytes = n * 80 + nz * 16 + 4096;
     if (planned_bytes > maximum_bytes)
       throw std::length_error(
           "Incomplete Laplacian exceeds preconstruction byte cap");

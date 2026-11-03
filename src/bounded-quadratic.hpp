@@ -40,7 +40,9 @@ solve_bounded_quadratic(Operator &op, std::span<const uint8_t> fixed,
       !std::isfinite(options.relative_tolerance))
     throw std::invalid_argument(
         "Invalid bounded quadratic dimensions/controls");
-  if (n > options.maximum_bytes / (sizeof(double) * 8 + sizeof(uint8_t)))
+  if (options.maximum_bytes < 4096 ||
+      n > (options.maximum_bytes - 4096) /
+              (sizeof(double) * 8 + sizeof(uint8_t)))
     throw std::length_error("Bounded quadratic scratch exceeds byte cap");
   budget.step(n * 4);
   bool any_fixed = false;

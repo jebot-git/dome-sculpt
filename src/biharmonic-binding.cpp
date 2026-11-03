@@ -3,6 +3,7 @@
 // assembly. No copied libigl implementation/runtime. Operator and constrained
 // energy informed by pinned libigl bbw/harmonic and Jacobson et al.2011.
 #include "biharmonic-binding.hpp"
+#include "fixed-quadratic.hpp"
 #include "heat-binding.cpp"
 #include "squared-laplacian-preconditioner.hpp"
 #include <optional>
@@ -61,6 +62,11 @@ SkinWeights bounded_biharmonic_surface(
     const std::function<bool()> &cancelled, BiharmonicBindingReport *report,
     std::span<const std::array<uint64_t, 4>> component_usage) {
   const auto &o = options.source;
+  const bool warm = options.initialization ==
+                    BiharmonicInitialization::UnconstrainedWarmStart;
+  if (options.initialization != BiharmonicInitialization::ComponentConstant &&
+      !warm)
+    throw std::invalid_argument("Unknown biharmonic initialization");
   const bool squared = options.preconditioner ==
                        BiharmonicPreconditioner::SquaredIncompleteLaplacian;
   if (options.preconditioner != BiharmonicPreconditioner::Diagonal && !squared)
@@ -72,9 +78,12 @@ SkinWeights bounded_biharmonic_surface(
   const size_t n = mesh.positions.size(), b = rig.bones.size(),
                corners = mesh.indices.size();
   if (!n || n > 2'000'000 || !corners || corners > 12'000'000 || corners % 3 ||
-      !b || b > 256 || sources.empty() || sources.size() > b * 2 ||
-      !o.maximum_work || o.maximum_work > 500'000'000 ||
-      o.maximum_bytes < 4096 || o.maximum_bytes > 512u * 1024u * 1024u ||
+      !b || b > 256 || o.limits.max_influences < 1 ||
+      o.limits.max_influences > 32 || !std::isfinite(o.limits.prune) ||
+      o.limits.prune < 0 || o.limits.prune > 1 || sources.empty() ||
+      sources.size() > b * 2 || !o.maximum_work ||
+      o.maximum_work > 500'000'000 || o.maximum_bytes < 4096 ||
+      o.maximum_bytes > 512u * 1024u * 1024u ||
       !(o.maximum_seed_distance > 0) ||
       !std::isfinite(o.maximum_seed_distance) ||
       o.distance_rule != HeatDistanceRule::EuclideanSurface ||
@@ -91,9 +100,10 @@ SkinWeights bounded_biharmonic_surface(
         "Invalid explicit surface-biharmonic domain/options");
   // Conservative peak: assembly map/CSR, two row-by-bone projection tables,
   // optional source multiplicities, QP scratch, both grouped/raw weight owners.
-  const size_t precondition_bytes = squared ? n * 96 + corners * 32 + 64 : 0;
-  const size_t planned = n * (512 + b * 18) + corners * 128 + b * b * 64 +
-                         8192 + precondition_bytes;
+  const size_t precondition_bytes = squared ? n * 128 + corners * 48 + 8192 : 0;
+  const size_t planned = n * (1024 + 32 * o.limits.max_influences + b * 18) +
+                         corners * 160 + b * b * 64 + 16384 +
+                         precondition_bytes;
   if (planned > o.maximum_bytes || n > o.maximum_work / (sources.size() + 1))
     throw std::length_error(
         "Biharmonic construction exceeds byte/work admission");
@@ -243,6 +253,16 @@ SkinWeights bounded_biharmonic_surface(
           throw std::runtime_error(
               "Biharmonic component lacks fixed constraints");
         field[i] = initial[s.parent[i]] / counts[s.parent[i]];
+      }
+      if (warm) {
+        auto initialized =
+            solve_fixed_quadratic(q, fixed, values, field, controls, budget);
+        proof.warm_cg_iterations += initialized.cg_iterations;
+        budget.step(rows);
+        for (double &value : field) {
+          proof.warm_clamps += value < 0 || value > 1;
+          value = std::clamp(value, 0., 1.);
+        }
       }
       auto solved =
           solve_bounded_quadratic(q, fixed, values, field, controls, budget);

@@ -5,7 +5,13 @@
 namespace dome::detail {
 enum class BiharmonicProjection { VoronoiMinimum, IndependentComponent };
 enum class BiharmonicPreconditioner { Diagonal, SquaredIncompleteLaplacian };
+enum class BiharmonicInitialization {
+  ComponentConstant,
+  UnconstrainedWarmStart
+};
 struct BiharmonicBindingOptions {
+  BiharmonicInitialization initialization =
+      BiharmonicInitialization::ComponentConstant;
   BiharmonicPreconditioner preconditioner = BiharmonicPreconditioner::Diagonal;
   BiharmonicProjection projection = BiharmonicProjection::VoronoiMinimum;
   HeatBindingOptions source;
@@ -13,7 +19,8 @@ struct BiharmonicBindingOptions {
 };
 struct BiharmonicBindingReport {
   size_t vertices = 0, components = 0, fixed_rows = 0, source_bones = 0,
-         active_iterations = 0, cg_iterations = 0, work = 0, planned_bytes = 0;
+         active_iterations = 0, cg_iterations = 0, warm_cg_iterations = 0,
+         warm_clamps = 0, work = 0, planned_bytes = 0;
   double maximum_kkt_residual = 0, maximum_partition_error = 0;
 };
 // Explicit SURFACE-domain bounded biharmonic energy L' M^-1 L, not volumetric

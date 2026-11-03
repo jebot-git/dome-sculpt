@@ -1,0 +1,9 @@
+# Private unconstrained initialization control
+
+Baseae6d653 is frozen. Pinned libigl's unconstrained biharmonic initialization is now implemented natively with a fresh true free residual. Projection to[0,1] initializes a feasible active set only; a separate analytic counterexample has unconstrained(1,-1), wrong clipped(1,0), and the bounded solver must correct it to the true(.5,0) minimum. That actual control passes, including early byte/cancel admission. No clipped field is accepted as output without full bounded KKT.
+
+Optimized actual independent-component cohorts with both preconditioners still solve15parts per avatar; Body/Hands/Tops/Bottoms refuse500M work. Warm squared mode improves counted leg work219.8M→184.6M female,196.2M→143.0M male, but worsens shoe work59.8M→109.7M and66.6M→121.1M. It is not universally faster or production-admissible. All solved parts pass unchanged pose limits; auxiliary absence on female remains because required parts refuse.1513inputs match before/after.
+
+Resource audit also increased conservative preflight to explicitly include two output row owners at up to32influences, scratch/factor allocation overhead and all peak arrays. Earlier private workspace estimates were insufficiently conservative at the maximum influence count; no production code/admission or allocation-sweep guarantee existed. New estimates are stricter, caps remain512MiB/500M.
+
+Next reference alignment is libigl's block active-set constraint updates, with stricter actual KKT acceptance than its solution-difference/iteration termination. Sparse LDL with symbolic fill/work preflight is also evaluated if iterative free solves remain the blocker. Source-assisted positive-use and user-declared unskinned intent remain distinct. No complete avatar/stress/OOM/SAN/native/history/Save proof yet.
