@@ -1,0 +1,78 @@
+{
+  "base": "267bd08e5fa0458599b98cb92db014d26d642ffe",
+  "scope": "Own private metric/fixtures, copied uninstrumented b32 support archives; no native admission",
+  "admitted": false,
+  "math": {
+    "analytic_ellipsoids": 18,
+    "maximum_metric_error": 7.26009e-15,
+    "sanitizer": false
+  },
+  "actual": {
+    "oriented_unresolved": {
+      "female": 23,
+      "male": 15
+    },
+    "unsigned_female": "refuses genuine SkirtBack missing samples; no weights published",
+    "unsigned_male": {
+      "solved": 19,
+      "quality_failures": 15,
+      "source_scene_exact": true,
+      "seam_failures": 0,
+      "point_consumer_failures": 0
+    }
+  },
+  "inputs": {
+    "count": 1484,
+    "exact": true
+  },
+  "evidence": [
+    {
+      "path": "artifacts/envelope-math-probe",
+      "sha256": "27b6cbe851b9c56e89ed8b6fc95d2375f93980db93023307e646fc4b84195021"
+    },
+    {
+      "path": "artifacts/heat-envelope-female-initial-range-setup.log",
+      "sha256": "4491f5ac3a4dbe6ad08e5787f1bce5c857ad20cec6dd1130dc63e5ebfe43307e"
+    },
+    {
+      "path": "artifacts/heat-envelope-female.log",
+      "sha256": "a6c9ea9bd37819585122495e0e3d443bf0e6860fd7d55e507b4d2e99dbfe09b6"
+    },
+    {
+      "path": "artifacts/heat-envelope-male.log",
+      "sha256": "3fb2515fdaa2ae5993d72055fbe1a70213a074feb97a43d7397141df576eeb68"
+    },
+    {
+      "path": "artifacts/heat-envelope-poses-probe",
+      "sha256": "1ef26d9971dadd5b2a7ba16262e5a34196ab2a118bab19b7ad12d4c1efeac200"
+    },
+    {
+      "path": "artifacts/poses-envelope-female.log",
+      "sha256": "328d2d0186700fb27429d1e3f3ba0072b403d53770d0c5feb60dabce540ca2bd"
+    },
+    {
+      "path": "artifacts/poses-envelope-male.log",
+      "sha256": "07eca92460aa7972ae9aae38895ff8ee5b5b9f76d453a59d70a171fb302f0f86"
+    },
+    {
+      "path": "artifacts/tests-envelope-math.log",
+      "sha256": "0762d167371afdf8d38a38882b30837f5122f577a9629aff5804c31803da83c6"
+    },
+    {
+      "path": "src/envelope-binding.hpp",
+      "sha256": "1f742ca0ba899421039ca492395695580d7cf265f73a6743160282b5734adcbd"
+    },
+    {
+      "path": "tests/envelope-binding.cpp",
+      "sha256": "51ddab932bc3c87632ae6e52083213dba95d41cc232b60216c027598b46434a0"
+    },
+    {
+      "path": "tests/heat-envelope-diagnostic.cpp",
+      "sha256": "687003b772cfc591b438d613aee2b7f9c7dee328ad31d668c234623e6651d65d"
+    },
+    {
+      "path": "tests/heat-envelope-poses.cpp",
+      "sha256": "d00bd122ab23afd5f4806887c843c914ef76864a316f9cfc3f9933b2d92cf527"
+    }
+  ]
+}
