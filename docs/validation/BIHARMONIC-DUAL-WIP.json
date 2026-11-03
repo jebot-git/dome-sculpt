@@ -1,0 +1,57 @@
+{
+  "base": "eadba30",
+  "scope": "Native arithmetic kernel only; no public/native/actual-avatar admission",
+  "method_reference": {
+    "authors": [
+      "Justin Solomon",
+      "Oded Stein"
+    ],
+    "year": 2025,
+    "doi": "10.1111/cgf.70159",
+    "url": "https://odedstein.com/files/convex-duality.pdf",
+    "equations": "12-16",
+    "code_copied": false
+  },
+  "oracle": {
+    "independent_primal_qps": 128,
+    "active_faces_per_qp": 64,
+    "maximum_field_error": 3.34527e-10,
+    "maximum_actual_dual_kkt": 9.87383e-11,
+    "maximum_partition_error": 8.88178e-16,
+    "bound_coordinates": 319,
+    "independent_original_primal_stationarity": true
+  },
+  "sanitizers": {
+    "own_entire_kernel": true,
+    "address": true,
+    "undefined": true,
+    "leaks": true,
+    "support_archives": "none"
+  },
+  "refusals": [
+    "immediate cancellation",
+    "work exhausted",
+    "actual incomplete iteration"
+  ],
+  "remaining": [
+    "actual sparse inverse/step certification",
+    "native factory",
+    "real avatar cost/quality",
+    "stress/source/unskinned route",
+    "allocation/native/history/Save/GUI/export/render"
+  ],
+  "hashes": {
+    "src/coupled-biharmonic-dual.hpp": "9f7529832161b2d990d77360b688cfe5026e3b9eaff35bdd6f208430e64932ba",
+    "tests/coupled-biharmonic-dual.cpp": "057dce28a204cad1bfd7bd18e3778a3be0dfc5088d0e54828b6f036e623a24ff",
+    "artifacts/coupled-dual-probe": "8555e660a0d2f7155c471ac90be121d61848f6f45b84b2f6d790b4796225499b",
+    "artifacts/coupled-dual-sanitize": "ae3655366063d343257e9ddd3b03c0e9452113798073da0ab91f99fa5e3efaf1",
+    "artifacts/tests-coupled-dual-final.log": "744ba85318458128c1a4b22bbb5df52676561e3b363d7a492e7f679585253b59",
+    "artifacts/tests-coupled-dual-sanitize.log": "744ba85318458128c1a4b22bbb5df52676561e3b363d7a492e7f679585253b59",
+    "artifacts/build-coupled-dual-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/build-coupled-dual-sanitize.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/coupled-dual-before.sha256": "70e4b185229e100fc435d4517f142e144906662a461c0877b4d6fc0989fd9cb5",
+    "artifacts/coupled-dual-projected-mapping-initial.hpp": "2009223e69e98f9b7b80bca7666d1a73e538f68ac6acca464af7ab917d1f490a",
+    "artifacts/tests-coupled-dual-projected-mapping-initial.log": "744ba85318458128c1a4b22bbb5df52676561e3b363d7a492e7f679585253b59",
+    "artifacts/dual-reference/convex-duality.pdf": "c3aac7f9ec9ae91c0e98894d8e3b121c76c5de8201f2a7fbf5f847165ddee6bb"
+  }
+}
