@@ -14,14 +14,15 @@ void Document::select_shape_target(uint32_t target,AssetSource expected){
  const auto &deformation=scene_.active().deformation;
  if(!deformation||!deformation->morphs||target>=deformation->morphs->targets.size())
   throw std::out_of_range("Choose an existing shapekey");
- if(target==state_.morph_target)return;
- if(state_.input_epoch==UINT64_MAX||(state_.shape_sculpt&&state_.view_epoch==UINT64_MAX))
+ const bool different=target!=state_.morph_target;
+ if(state_.input_epoch==UINT64_MAX||(different&&state_.shape_sculpt&&state_.view_epoch==UINT64_MAX))
   throw std::overflow_error("Shapekey view/input identity exhausted");
  const auto message="Selected shapekey: "+deformation->morphs->targets[target].name;
  Transaction transaction(*this);
  input_.cancel();++state_.input_epoch;transaction.rebind();
  state_.morph_target=target;state_.message=message;
- if(state_.shape_sculpt)++state_.view_epoch;
+ if(different&&state_.shape_sculpt)++state_.view_epoch;
+ state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
  publish_locked(false,false);
  // No throwing work remains. A held trigger must release before it can sculpt
  // the newly chosen target, and obsolete queued samples use the retired epoch.
