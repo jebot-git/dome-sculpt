@@ -1,0 +1,31 @@
+{
+  "fixed_cap_base": "998c93a4ab2039f38a6443587f49fd9168328767",
+  "test_only_budget": 4000000000,
+  "actual_budget_remains": 500000000,
+  "native_admission": false,
+  "completed_body_tops": 4,
+  "posed_cases": 20,
+  "quality_failures": 3,
+  "source_preservation": true,
+  "independent_consumer_scope": "double morph+LBS points using native hierarchy matrices; no independent hierarchy/GLB/render",
+  "next_reference": {
+    "authors": "Justin Solomon and Oded Stein",
+    "doi": "10.1111/cgf.70159",
+    "url": "https://odedstein.com/files/convex-duality.pdf",
+    "method": "coupled PoU dual NNLS, one fixed sparse inverse operator; not yet implemented"
+  },
+  "hashes": {
+    "src/biharmonic-binding.cpp": "b68f544e15213f79e1b9496ee24b7a05d5851d0b99fa0608f3143bc17bfff46d",
+    "src/biharmonic-binding.hpp": "46808e47c7eeed6657f810d6a61a22a48b054162e38f5d070ba8d9e7d4d731ec",
+    "src/biharmonic-sparse-ldl.hpp": "264bb9f608a192e6508de32f82fddab1e95582c48b88d3656bac716b84f34f9b",
+    "artifacts/biharmonic-overbudget.cpp": "2e5d4e68e1a3ef71ecb9262eaff2595338c47954fef059be7a9dc9fe649511eb",
+    "artifacts/biharmonic-overbudget-poses.cpp": "cab678b180de46481d737507edc7d74c040580da3aef42155d1e0daca2746340",
+    "artifacts/biharmonic-overbudget-poses-probe": "b3ebc3ff571e204b026159e2642794e2e486df700ac6f6097e55a8a0fd7c7372",
+    "artifacts/poses-overbudget-female.log": "8d94590b87e725ab4fc071964c9e2e16ad9679cefeaa336983d435c6c09cccc0",
+    "artifacts/poses-overbudget-male.log": "60da727fa98d330c6a90dbb5510d688cf920fa8bb3ee132750d1842a48981997",
+    "artifacts/overbudget-inputs.sha256": "f91e234954d52bdaa1be3bacd6e35734aeef0cca498d0e13b285c57188a682b2",
+    "artifacts/dual-reference/convex-duality.pdf": "c3aac7f9ec9ae91c0e98894d8e3b121c76c5de8201f2a7fbf5f847165ddee6bb",
+    "artifacts/dual-reference/convex-duality.txt": "4a750147d0e3138588647a50f612ff940e4bc987d46fcce21e1eda778089a753",
+    "artifacts/dual-reference/supplement-headers.txt": "ea41f97032f1980a49a8c1943a18b52fa63aadb90268e53548299892b36aeefb"
+  }
+}
