@@ -120,7 +120,8 @@ MirrorRelativeAttributes relative_mirror_attributes(const Mesh &geometry,
                    std::max(std::abs(b), std::abs(e)) / std::max(std::abs(a), std::abs(d)));
     }
     for (size_t k = 0; k < 3; ++k) {
-      const auto at = c + k, s = map.corners[at];
+      const auto at = c + k;
+      const size_t s = map.corners[at];
       const auto ns = vector(before.normals[s]), nt = vector(before.normals[at]), rn = reflect(ns);
       result.report.maximum_normal_base_difference =
           std::max(result.report.maximum_normal_base_difference, norm(nt - rn));
