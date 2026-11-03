@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "render-paint-overlay.hpp"
 #include "render-source-pack.hpp"
+#include "paint-overlay-sample.hpp"
 #include "graphics.h"
 #include "dome/color-preparation.hpp"
 #include "source-color-fixtures.hpp"
@@ -53,7 +54,14 @@ std::array<std::vector<float>,5> read(const detail::PaintOverlayCompiler::Resour
  glBindFramebuffer(GL_READ_FRAMEBUFFER,0);glDeleteFramebuffers(1,&fbo);if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Fixture float plane readback failed");return pixels;
 }
 void compare(const PaintedMesh &paint,const detail::PaintOverlayCompiler::Resource &resource,bool pbr){const auto pixels=read(resource);double error=0;const auto r=paint.resolution();for(uint32_t y=0;y<r;++y)for(uint32_t x=0;x<r;++x){auto expected=oracle(paint,x,y,pbr);for(size_t plane=0;plane<5;++plane)for(size_t c=0;c<4;++c){double delta=std::abs(pixels[plane][(size_t(y)*r+x)*4+c]-expected[plane][c]);double relative=delta/std::max(plane==4?1e-6:1.,std::abs(expected[plane][c]));error=std::max(error,relative);}}
- maximum=std::max(maximum,error);std::cout<<"FLOAT_RELATIVE_MAX="<<error<<'\n';check(error<4e-6,"Every GPU contribution texel matches independent double sparse-layer arithmetic");}
+ maximum=std::max(maximum,error);std::cout<<"FLOAT_RELATIVE_MAX="<<error<<'\n';check(error<4e-6,"Every GPU contribution texel matches independent double sparse-layer arithmetic");
+ const auto packet=detail::PaintOverlayFactory::capture(paint);double sparse_error=0;
+ for(size_t point=0;point<257;++point){const float u=float((point*73)%263)/187-.2f,v=float((point*131)%269)/191-.2f;
+  const auto actual=detail::sample_overlay_values(*packet,u,v,pbr);const double x=double(std::clamp(u,0.f,1.f))*r-.5,y=double(std::clamp(v,0.f,1.f))*r-.5;const int ix=int(std::floor(x)),iy=int(std::floor(y));const double fx=x-ix,fy=y-iy;
+  for(size_t plane=0;plane<5;++plane)for(size_t c=0;c<4;++c){double expected=0;for(int corner=0;corner<4;++corner){const auto px=std::clamp(ix+(corner&1),0,int(r)-1),py=std::clamp(iy+(corner>>1),0,int(r)-1);expected+=pixels[plane][(size_t(py)*r+px)*4+c]*((corner&1)?fx:1-fx)*((corner>>1)?fy:1-fy);}sparse_error=std::max(sparse_error,std::abs(actual[plane][c]-expected)/std::max(plane==4?1e-6:1.,std::abs(expected)));}
+ }
+ std::cout<<"SPARSE_FILTERED_RELATIVE_MAX="<<sparse_error<<'\n';check(sparse_error<4e-6,"CPU asset-worker sparse point samples match independent filtering of every actual GPU float plane without dense CPU composition");
+ check(refuses([&]{detail::sample_overlay_values(*packet,std::numeric_limits<float>::quiet_NaN(),0,pbr);}),"Sparse asset sampling refuses nonfinite coordinates");}
 BakedTextures baked(uint32_t r){BakedTextures b;auto image=[&](std::array<uint8_t,4> value){Image im;im.width=im.height=r;im.rgba.resize(size_t(r)*r*4);for(size_t i=0;i<im.rgba.size();i+=4)std::copy(value.begin(),value.end(),im.rgba.begin()+i);return im;};b.maps.color=image({40,90,210,170});b.maps.metal_rough=image({190,40,230,255});b.maps.emission=image({20,40,70,255});b.maps.normal=image({128,128,255,255});b.coverage.resize(size_t(r)*r);for(uint32_t y=0;y<r;++y)for(uint32_t x=0;x<r;++x)b.coverage[size_t(y)*r+x]=uint8_t((x+y*2)%256);b.validate(r);return b;}
 }
 int main(int argc,char **argv)try{

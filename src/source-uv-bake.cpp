@@ -9,6 +9,8 @@
 #include "paint-color-access.hpp"
 #include "paint-normal-access.hpp"
 #include "paint-overlay-packet.hpp"
+#include "paint-overlay-sample.hpp"
+#include "dome/source-paint-bake.hpp"
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
 #include "source-colors.hpp"
@@ -456,6 +458,43 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   if(result.sample_operations>o.max_sample_operations)throw std::length_error("Current colour UV cumulative work exceeds policy");
  }
  budget.cancel();result.diagnostics.push_back("Original images/material IDs/raw avatar retained; derived RGBA8 textures resampled without material-factor flattening");result.diagnostics.push_back(result.normal_frames?"Raw source/canonical normal vectors retain original attribute frames through the sampling-atlas change":"Normal conversion matches current UV-derivative preview frames; original authored tangent4 remains retained");return result;
+}
+SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Material &material,const SourceUvBakeOptions &options){
+ material.validate();validate(input,options);
+ if(!input.paint->source_sampling_prepared()||!input.paint->valid_source_sampling_attachment()||input.target.uv!=input.paint->mesh().uv||input.target.indices!=input.paint->mesh().indices||input.source_vertices.size()!=input.paint->mesh().positions.size())
+  throw std::invalid_argument("Portable source material requires its exact current writable atlas");
+ for(size_t v=0;v<input.source_vertices.size();++v)if(input.source_vertices[v]!=v)throw std::invalid_argument("Portable source material cannot relabel its writable vertex domain");
+ if(std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::invalid_argument("Portable HDR source material requires its precision-qualified export adapter");
+ uint32_t r=options.resolution?options.resolution:input.paint->resolution();
+ if(!options.resolution)if(const auto &source=input.paint->source_maps())for(const auto *role:{&source->color,&source->metal_rough,&source->emission,&source->normal,&source->occlusion})if(role->image)r=std::max({r,role->image->width,role->image->height});
+ const size_t pixels=size_t(r)*r,bytes=pixels*20;
+ if(pixels>options.max_image_pixels||bytes>options.max_output_bytes)throw std::length_error("Portable source material exceeds image output budget");
+ const uint64_t operations=uint64_t(pixels)*(32+4*input.paint->layers().size());
+ if(operations>=options.max_sample_operations)throw std::length_error("Portable source material exceeds sampling work budget");
+ auto bounded=options;bounded.max_output_bytes-=bytes;bounded.max_sample_operations-=size_t(operations);
+ if(!bounded.max_output_bytes)throw std::length_error("Portable source material lacks original-role output budget");
+ SourcePaintBakeResult result;result.sampling=bake_source_uv(input,bounded);Budget budget{bounded,result.sampling};
+ auto layout=raster(input.target,r,false,true,budget);auto packet=detail::PaintOverlayFactory::capture(*input.paint,options.cancelled);
+ auto maps=std::make_shared<TextureMaps>();auto roles=std::make_shared<PaintSourceMaps>(*result.sampling.maps);
+ // A finite portable paint image has its own linear, clamped sampling. Original
+ // sampler metadata remains in the source and per-role preparation result.
+ for(auto *slot:{&roles->color,&roles->emission})slot->min_filter=slot->mag_filter=9729;
+ maps->source_maps=std::move(roles);
+ for(auto *image:{&maps->color,&maps->metal_rough,&maps->emission,&maps->color_coverage,&maps->emission_coverage}){image->width=image->height=r;image->rgba.assign(pixels*4,0);}
+ const PaintSourceMaps empty;const auto &source=input.paint->source_maps()?*input.paint->source_maps():empty;const auto &mesh=input.paint->mesh();
+ for(size_t at=0;at<pixels;++at){if((at&1023)==0)budget.cancel();const auto owner=layout.padding[at];if(owner<0)continue;const auto &hit=layout.hits[size_t(owner)];
+  const float u=(float(size_t(owner)%r)+.5f)/r,v=(float(size_t(owner)/r)+.5f)/r;const auto overlay=detail::sample_overlay_values(*packet,u,v,true);
+  const auto base=sample_surface_texture(mesh,source,source.color,hit.face,hit.bary,true),orm=sample_surface_texture(mesh,source,source.metal_rough,hit.face,hit.bary,false),emission=sample_surface_texture(mesh,source,source.emission,hit.face,hit.bary,true),occlusion=sample_surface_texture(mesh,source,source.occlusion,hit.face,hit.bary,false);
+  std::array<float,4> colour;for(size_t k=0;k<4;++k)colour[k]=material.color[k]*base[k]*(1-overlay[3][0])+overlay[0][k];
+  const float ao=(1-source.occlusion_strength*(1-occlusion[0]))*(1-overlay[1][3])+overlay[1][0];
+  const std::array<float,4> combined{ao,material.roughness*orm[1]*(1-overlay[3][2])+overlay[1][1],material.metallic*orm[2]*(1-overlay[3][1])+overlay[1][2],1};
+  for(size_t k=0;k<4;++k){maps->color.rgba[at*4+k]=byte(k<3?linear_to_srgb(colour[k]):colour[k]);maps->metal_rough.rgba[at*4+k]=byte(combined[k]);}
+  for(size_t k=0;k<3;++k){const float glow=material.emissive[k]*emission[k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];if(glow>1)throw std::invalid_argument("Portable source paint radiance exceeds byte material representation");maps->emission.rgba[at*4+k]=byte(linear_to_srgb(glow));}
+  maps->emission.rgba[at*4+3]=maps->color_coverage.rgba[at*4+3]=maps->emission_coverage.rgba[at*4+3]=255;
+  maps->color_coverage.rgba[at*4]=byte(overlay[3][0]);maps->emission_coverage.rgba[at*4]=byte(overlay[3][3]);maps->transparent|=colour[3]<.999f;
+ }
+ result.sampling.image_bytes+=bytes;result.sampling.sample_operations+=size_t(operations);if(result.sampling.sample_operations>options.max_sample_operations)throw std::length_error("Portable source material exceeds cumulative sampling budget");
+ result.textures=std::move(maps);budget.cancel();return result;
 }
 struct SourceUvBakeAccess {
  static std::shared_ptr<PaintedMesh> adopt(const SourceUvBakeResult &result,
