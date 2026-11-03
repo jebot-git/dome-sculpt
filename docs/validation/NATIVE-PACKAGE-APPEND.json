@@ -1,0 +1,424 @@
+{
+  "status": "qualified private component; no main publication",
+  "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+  "runtime_api_schema": "New standalone append result/function; Scene friend/forward only, no existing data-layout or format change",
+  "changed_source_sha256": {
+    "CMakeLists.txt": "f16dc6a790f6274299d8af81673c252f3b0ab1ea471387ef46e0ddc07b2e76e1",
+    "include/dome/scene.hpp": "1159e7e4cdd7359e9d4694682f0d97bd217f8f1b4003de427a033f6181bcdbb3",
+    "include/dome/native-scene-append.hpp": "209a0fac275084209482cd718414f209e6132a53e2a8eb113c7f0ecd42092bd9",
+    "src/document-assets.cpp": "ac42d37286d49a11a54271c70a8129f3a399f3958f55b273e237fc3a3d87bf1c",
+    "src/import-authoring.cpp": "5a541e8599f74cf76922f34ade72b36d9e2e692c659117ad46286ed1744d6818",
+    "src/native-scene-append.cpp": "da3dc97251d9d7afc6d6e1102d3c439312be47d17bcc2f818e5daee903f7e1bb",
+    "tests/import-authoring.cpp": "a1f599ef1ff8eeb50861b82eea0ecdfd2a344242c8475dc26ee5346de2e57463",
+    "tests/native-scene-append.cpp": "9ebbb82264ba2bad627c265bb94daa12d84dd80c93200853674910c5749c059d",
+    "tests/native-scene-append-real.cpp": "b8ae8eeab76f5e7eb83a05446079ebcf7be4a6e8bb17f346cfcb19a9e53893ac",
+    "tests/native-scene-append-vrm.cpp": "3e3b3f7afd684feb46e0396fcdafd3991bc317a0489ddaf93f08dbbbb1418a3f"
+  },
+  "builds": {
+    "release": {
+      "state": "terminal",
+      "profile": "release",
+      "pid": 38218,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh own initial C/C++ core/support/render/app builds followed by complete dependency-tracked root-allocator/friend-header and consumer continuation. No foreign or stale-layout archives; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 38759,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt": "1a93894dfc869049966a4ef83b790299f5bf25d2aff231a107e2a118305fe098",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-test": "3dbcad84bd46094e45972b1973b6d29f0f37d2dafa44b5ec36d56767438570be",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-real-test": "0f089e152c8376649d5cc3e92d48364ddef38b715321e9e3e832bd51068aa3c4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-vrm-test": "5917189055694d5d79ff779ce27985b034248445ee5f4c78030ad3438f00572c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-authoring-test": "66f42d313b3c79d4fe5472b9b4d6f12ede1b20a602ecbc3e5e059976694fe2dc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-import-authoring-test": "eb97a4934b076adb4ce7fab8d19be22eefd1bb0b563946376ed3780b234e694b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-scene-file-test": "cdd55ef4e486766a09aa281569e2998a85f027c1b6179c99197109ee118cc23f"
+      },
+      "exit": 0,
+      "seconds": 14.348057964001782,
+      "inputs": 2073,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "profile": "sanitize",
+      "pid": 39132,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh own initial C/C++ core/support/render/app builds followed by complete dependency-tracked root-allocator/friend-header and consumer continuation. No foreign or stale-layout archives; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 39706,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt": "a69fdc611242490e44c944b85cd5bfe8cd4c4c2283bb6a4d7efb9c6785b58dd0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-test": "25adc38800f3b8a73cd9c2d4f50ebea6874b7760486af2cb3265f9c6396ffdab",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-real-test": "f4cc29a7ab641902c8289302aa306f731ef82557ca59ff39a2a5003dc40c1e9b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-vrm-test": "578cce902bc725ec2092049b96091cb5e986b56f27c2e9473fbcf447b5193c09",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-authoring-test": "a6224602a9d6b4ca9cb56b350e55138530f4a6afba83bc54dedc6386199e71c4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-import-authoring-test": "141912e2f71ad4963250a164ce9e2e4f44a7b46fb3b99d5040d8fcc268502630",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-scene-file-test": "35b778717c9ef64c1c115cbb6a339f70f64fc9e45be3fa39792a8d7bd5a00cb3"
+      },
+      "exit": 0,
+      "seconds": 20.909833270998206,
+      "inputs": 2073,
+      "drift": []
+    }
+  },
+  "full_affected_runs": {
+    "release": {
+      "state": "terminal",
+      "pid": 8974,
+      "profile": "release",
+      "runs": [
+        {
+          "name": "native-scene-append",
+          "exit": 0,
+          "seconds": 0.11426006999681704,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-release/native-scene-append"
+          ]
+        },
+        {
+          "name": "native-scene-append-vrm",
+          "exit": 0,
+          "seconds": 1.416515093005728,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-vrm-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-release/native-scene-append-vrm"
+          ]
+        },
+        {
+          "name": "native-scene-append-real",
+          "exit": 0,
+          "seconds": 28.26666110701626,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-real-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-release/native-scene-append-real"
+          ]
+        },
+        {
+          "name": "native-authoring",
+          "exit": 0,
+          "seconds": 0.06408536899834871,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-release/native-authoring"
+          ]
+        },
+        {
+          "name": "import-authoring",
+          "exit": 0,
+          "seconds": 0.06409952000831254,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-import-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-release/import-authoring"
+          ]
+        },
+        {
+          "name": "scene-file",
+          "exit": 0,
+          "seconds": 0.06411362401559018,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-scene-file-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-release/scene-file"
+          ]
+        }
+      ],
+      "scope": "Exact own fresh support/header continuation; software/CPU native workers and independent cgltf only, no GPU/UI/physical device run. External shared libraries not own-instrumented.",
+      "phase": "scene-file",
+      "child_pid": 12645,
+      "exit": 0,
+      "seconds": 30.156414689001394,
+      "inputs": 2091,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "pid": 9729,
+      "profile": "sanitize",
+      "runs": [
+        {
+          "name": "native-scene-append",
+          "exit": 0,
+          "seconds": 0.8658361779816914,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-sanitize/native-scene-append"
+          ]
+        },
+        {
+          "name": "native-scene-append-vrm",
+          "exit": 0,
+          "seconds": 12.337281501997495,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-vrm-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-sanitize/native-scene-append-vrm"
+          ]
+        },
+        {
+          "name": "native-scene-append-real",
+          "exit": 0,
+          "seconds": 206.65050862100907,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-real-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-sanitize/native-scene-append-real"
+          ]
+        },
+        {
+          "name": "native-authoring",
+          "exit": 0,
+          "seconds": 0.3146973330003675,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-sanitize/native-authoring"
+          ]
+        },
+        {
+          "name": "import-authoring",
+          "exit": 0,
+          "seconds": 0.3648165749909822,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-import-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-sanitize/import-authoring"
+          ]
+        },
+        {
+          "name": "scene-file",
+          "exit": 0,
+          "seconds": 0.6653881630045362,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-scene-file-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof/complete-run-sanitize/scene-file"
+          ]
+        }
+      ],
+      "scope": "Exact own fresh support/header continuation; software/CPU native workers and independent cgltf only, no GPU/UI/physical device run. External shared libraries not own-instrumented.",
+      "phase": "scene-file",
+      "child_pid": 33989,
+      "exit": 0,
+      "seconds": 223.19190150601207,
+      "inputs": 2091,
+      "drift": []
+    }
+  },
+  "final_generated_fixture_only_consumer": {
+    "release": {
+      "exit": 0,
+      "seconds": 1.8241540079761762,
+      "inputs": 2086,
+      "drift": []
+    },
+    "sanitize": {
+      "exit": 0,
+      "seconds": 16.49374418600928,
+      "inputs": 2086,
+      "drift": []
+    }
+  },
+  "checks": {
+    "append": 56,
+    "real_cc0": 102,
+    "vrm_source": 12108,
+    "authoring": 28,
+    "import": 37,
+    "scene_file": 16,
+    "allocation_prefixes": 128,
+    "allocation_positive_count": 775
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "cohort": "Every actual regular GLB/VRM under three new consumer outputs, plus outside-native copy; symlink is not another emitted file. Three deliberately invalid PRIVATE-auth envelopes remain standard-glTF data only; validator is not their authority oracle.",
+    "files": 26,
+    "errors": 0,
+    "warnings": 126,
+    "infos": 185
+  },
+  "official_vrm1": {
+    "files": 12,
+    "instances": 64,
+    "errors": 0,
+    "spec_pin": "94e82dd (existing pinned VRM1.0/MToon/springBone/nodeConstraint package)"
+  },
+  "byte_equality": {
+    "files": 39,
+    "all_equal": true
+  },
+  "scope": "Fresh own initial core/support/render/app, coherent complete dependency continuations, software/CPU native workers and independent cgltf. External shared libs not claimed instrumented. No full regression/UI/GPU/HMD/system/session claim.",
+  "sdk": {
+    "fltk": "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit[-sanitize]",
+    "bitmap": "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime"
+  },
+  "evidence_root": "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/artifacts/append-proof",
+  "negative_evidence": [
+    "source-root-negative",
+    "source-root-before-after (original independent-positive, appended source-ancestry refusal; expected-text observer exits1)",
+    "combined-save-negative (42 objects accepted, subsequent Save refuses)",
+    "original-import-counterfactual (original5d TU/unchanged test fails old UV normalization assumption)",
+    "first-allocator-test.log (wrong HDR fixture extraction route)",
+    "refined-test.log (unreachable128 failure-count assumption)",
+    "refined-vrm-test.log (existing posed-constraint export guard)",
+    "run-release/native-scene-append-vrm.log (original IBM assertion invalid for fitted bind)",
+    "khronos-first-generated-inputs.json (8 errors only2 generated raw inputs;24 actual exports/copies0)",
+    "khronos-first-generated-inputs.log (Node boolean exitCode setup error)"
+  ],
+  "remaining": [
+    "V1 posed constraints/spring REST adapters remain guarded and data retained",
+    "No new GUI/controller/Wayland/GPU qualification",
+    "Parent Scene29/key/native-producer semantic union and coherent fresh dependent builds required before publication"
+  ],
+  "initial_fresh_builds": {
+    "release": {
+      "state": "terminal",
+      "profile": "release",
+      "pid": 3856620,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh coherent owned C/C++ core/support/render and native frontend build, selected complete consumers; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 3857335,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt": "595661b9d262d95aa30cd873a31aa708f9b0f601ed07816b2342346989b9b90d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-test": "0f730b6bb0bf747254191a624ae3160a0aab1025436263a9335a91b2ba9ea6c4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-real-test": "5be33c1046a8593d0c8e83a124a7a056d427d90152d6f3dd86a55e52628b4097",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-authoring-test": "f9e8d27658e4a25ab097f014262078458256fd8080864c562ff2becb2289a0ec",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-import-authoring-test": "bca214f24547d52ec6f41b67266af48e222e3c8ccdfa144cb280c65e5b4296ed",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-scene-file-test": "43b2872aa8d654543a687624f318112773c470f640c3ab7ee7e623611420a033"
+      },
+      "exit": 0,
+      "seconds": 412.1686018879991,
+      "inputs": 2072,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "profile": "sanitize",
+      "pid": 3858779,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh coherent owned C/C++ core/support/render and native frontend build, selected complete consumers; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 3860199,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt": "c1f9743a56327b3911f4186f668b8776f92042c7a815de19bc462219220bf3e1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-test": "1c1275a489bdd713cafb45582cc3f52f9b25bffbbd3c528ff7203ed1068f22c9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-real-test": "d634db820366c74ad0259dca27d4bb5a2ce5381feea64a2ec999cd51b5995165",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-authoring-test": "479a5f715d847599009c28deaa8a740f17d79b60af720f34113b06b83d4b06e5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-import-authoring-test": "cf047c09f77461455da182bd2350a73e9fbbcd2544125f2ec4713d874a319602",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-scene-file-test": "bd5399284d99ecabeebbe9748eab20c66058657be9d866138b59932cdc8afc44"
+      },
+      "exit": 0,
+      "seconds": 710.1573718260042,
+      "inputs": 2072,
+      "drift": []
+    }
+  },
+  "root_friend_header_continuations": {
+    "release": {
+      "state": "terminal",
+      "profile": "release",
+      "pid": 3969111,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh own initial C/C++ core/support/render/app builds followed by complete dependency-tracked root-allocator/friend-header and consumer continuation. No foreign or stale-layout archives; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 3969811,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt": "525f652fa7396e0c06233ba66796d10d90b0f78a3f1737c4555f7ec8bf5d9c27",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-test": "41fd354b9511eebaf68fe6b0445cf332bce4205249fa7736e27f99c03857cdc7",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-real-test": "f2f740f32795965c4dd5e0b315f92ff36a2ba4f6a706f811e545f7a4ae584f2c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-vrm-test": "8b8ca67a50ad9c28c38f6f7a1771dc644133f584a37fa647f1b6325b6998d49f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-authoring-test": "d313b2c5321f766c4155f37b79f051eeacc34cd583dedb5ec78c5962ee40ea07",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-import-authoring-test": "616c7febfc44d7debf127d1b86bde6f6be4fb771452d066280048723847b6ccf",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-scene-file-test": "7fcd9fa75ee364e9e2b8ec079d644344b76880ed2db0b99b61d2c8e05f7fc3c8"
+      },
+      "exit": 0,
+      "seconds": 343.28669528098544,
+      "inputs": 2073,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "profile": "sanitize",
+      "pid": 3970782,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh own initial C/C++ core/support/render/app builds followed by complete dependency-tracked root-allocator/friend-header and consumer continuation. No foreign or stale-layout archives; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 3971614,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt": "43439f9c40585e16f2bbf65c6b4d321f0f7917016d8ae9919b278adef5798e68",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-test": "df0c862933becdc976577929c4254676f438617c251faa3ecef2635529899a18",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-real-test": "986cb3ab40591187d393236439c5ac33f6e4c7434795baa6178026cada8664ca",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-vrm-test": "0f62af3e1c7e0bb62d8d022655fcc5694ab28e1c3f941bde8ba6df91c41c13f2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-authoring-test": "807e5eb5a9baddd04f4a3becb01969786bc20514c8b7fa533bf8251904496a11",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-import-authoring-test": "fcd8908b1cb1044c137ab2fbb4c4a35765f10b1a505da1142f4520ac2f02e8f4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-scene-file-test": "18e51f3d8b8ade5fa20f01231f671d1fc680d4064cfa44c58e5846678a54b35f"
+      },
+      "exit": 0,
+      "seconds": 689.2998643599858,
+      "inputs": 2073,
+      "drift": []
+    }
+  },
+  "final_runtime_builds": {
+    "release": {
+      "state": "terminal",
+      "profile": "release",
+      "pid": 4184762,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh own initial C/C++ core/support/render/app builds followed by complete dependency-tracked root-allocator/friend-header and consumer continuation. No foreign or stale-layout archives; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 4185319,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt": "1a93894dfc869049966a4ef83b790299f5bf25d2aff231a107e2a118305fe098",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-test": "3dbcad84bd46094e45972b1973b6d29f0f37d2dafa44b5ec36d56767438570be",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-real-test": "0f089e152c8376649d5cc3e92d48364ddef38b715321e9e3e832bd51068aa3c4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-scene-append-vrm-test": "509c5aeb32c87797039b55075dafb2c5f929e29a9446ae0e43ead62054bd6c7f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-native-authoring-test": "66f42d313b3c79d4fe5472b9b4d6f12ede1b20a602ecbc3e5e059976694fe2dc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-import-authoring-test": "eb97a4934b076adb4ce7fab8d19be22eefd1bb0b563946376ed3780b234e694b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-release/dome-sculpt-scene-file-test": "cdd55ef4e486766a09aa281569e2998a85f027c1b6179c99197109ee118cc23f"
+      },
+      "exit": 0,
+      "seconds": 16.9186027609976,
+      "inputs": 2073,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "profile": "sanitize",
+      "pid": 4187523,
+      "base": "5d155052201a4212e6362a35367dc4b450b7a94b",
+      "scope": "Fresh own initial C/C++ core/support/render/app builds followed by complete dependency-tracked root-allocator/friend-header and consumer continuation. No foreign or stale-layout archives; external canonical SDK/OpenEXR/zlib shared libraries not own-instrumented. No device/UI runs.",
+      "configure_exit": 0,
+      "child_pid": 4188125,
+      "phase": "build",
+      "build_exit": 0,
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt": "a69fdc611242490e44c944b85cd5bfe8cd4c4c2283bb6a4d7efb9c6785b58dd0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-test": "25adc38800f3b8a73cd9c2d4f50ebea6874b7760486af2cb3265f9c6396ffdab",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-real-test": "f4cc29a7ab641902c8289302aa306f731ef82557ca59ff39a2a5003dc40c1e9b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-scene-append-vrm-test": "79d1f46fcaa5f0ed34ec1151ec78725374f5ab82d596183251a8cbce0a4766e0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-native-authoring-test": "a6224602a9d6b4ca9cb56b350e55138530f4a6afba83bc54dedc6386199e71c4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-import-authoring-test": "141912e2f71ad4963250a164ce9e2e4f44a7b46fb3b99d5040d8fcc268502630",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-append-5d15505/build-append-sanitize/dome-sculpt-scene-file-test": "35b778717c9ef64c1c115cbb6a339f70f64fc9e45be3fa39792a8d7bd5a00cb3"
+      },
+      "exit": 0,
+      "seconds": 37.35931956101558,
+      "inputs": 2073,
+      "drift": []
+    }
+  },
+  "post_fixture_unchanged_libraries_and_other_consumers": {
+    "release": 16,
+    "sanitize": 16,
+    "scope": "Archives plus five unchanged affected consumer binaries; final V1 fixture rebuilt separately."
+  }
+}
