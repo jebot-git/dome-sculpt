@@ -1,0 +1,1292 @@
+{
+  "version": 1,
+  "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+  "date": "2026-11-03",
+  "private": true,
+  "main": "0b5ada05b155ef64333e7aa45db68f41f7a53f22",
+  "full_goal_complete": false,
+  "parents": [
+    "9a154137b1a209c6ae36e8375238d7bf1013b387",
+    "41b58645e45c266661953f175e7e1b692cac3905"
+  ],
+  "semantic_resolution": "Ordinary GLB/Avatar FileJobs use genuine source-aware Scene.export_surfaces; physical paths retain exact native Scene/subset and independent emission compilation. No weakening of same_mesh authentication or automatic painted Source4 admission.",
+  "canonical_DomeD": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
+  "builds": {
+    "release": {
+      "profile": "release",
+      "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 3.5886533049924765
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-test-runtime",
+            "dome-sculpt-emission-background-test",
+            "dome-sculpt-emission-scene-test",
+            "dome-sculpt-emission-paint-data-test",
+            "dome-sculpt-paint-overlay-gpu-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-source-union-version-test",
+            "dome-sculpt-unlit-fallback-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-source-paint-owning-test",
+            "dome-sculpt-source-paint-scene-test",
+            "dome-sculpt-source-paint-resources-test",
+            "dome-sculpt-source-paint-faults-test",
+            "dome-sculpt-source-paint-overlay-test",
+            "dome-sculpt-material-visibility-test",
+            "dome-sculpt-source-paint-native-test",
+            "dome-sculpt-source-paint-sampler-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-mtoon-render-test",
+            "dome-sculpt-source-paint-import-test",
+            "dome-sculpt-source-sampling-transport-test",
+            "dome-sculpt-source-capture-storage-test",
+            "dome-sculpt-source-paint-ui-test",
+            "dome-sculpt-source-paint-export-test",
+            "dome-sculpt-source-paint-bake-test",
+            "dome-sculpt-source-uv-bake-test",
+            "dome-sculpt-source-uv-adopt-test",
+            "dome-sculpt-emission-exr-test",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-vrm-test",
+            "dome-sculpt-emission-export-worker-test",
+            "dome-sculpt-emission-linear-test",
+            "dome-sculpt-mtoon-emission-test"
+          ],
+          "exit": 0,
+          "seconds": 529.2603936170053
+        }
+      ],
+      "seconds": 532.8955970800016,
+      "inputs": 1570,
+      "unchanged": true,
+      "scope": "Fresh whole own native FLTK/OpenXR app/core/support/render and selected consumers for semantic union7ecc: qualified Source4import/pristineexport, explicit portable material compiler and physical HDR GLB/VRM package1/2. Existing Gltf/Vrm export options and native read limits are appended by HDR parent, so every owned application/core/render/support/selected consumer is rebuilt from this same source/header cohort. No preceding archives reused. Build only, no runtime/GUI/hardware/export claim."
+    },
+    "sanitize": {
+      "profile": "sanitize",
+      "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+            "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+          ],
+          "exit": 0,
+          "seconds": 3.596373730979394
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-test-runtime",
+            "dome-sculpt-emission-background-test",
+            "dome-sculpt-emission-scene-test",
+            "dome-sculpt-emission-paint-data-test",
+            "dome-sculpt-paint-overlay-gpu-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-source-union-version-test",
+            "dome-sculpt-unlit-fallback-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-source-paint-owning-test",
+            "dome-sculpt-source-paint-scene-test",
+            "dome-sculpt-source-paint-resources-test",
+            "dome-sculpt-source-paint-faults-test",
+            "dome-sculpt-source-paint-overlay-test",
+            "dome-sculpt-material-visibility-test",
+            "dome-sculpt-source-paint-native-test",
+            "dome-sculpt-source-paint-sampler-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-mtoon-render-test",
+            "dome-sculpt-source-paint-import-test",
+            "dome-sculpt-source-sampling-transport-test",
+            "dome-sculpt-source-capture-storage-test",
+            "dome-sculpt-source-paint-ui-test",
+            "dome-sculpt-source-paint-export-test",
+            "dome-sculpt-source-paint-bake-test",
+            "dome-sculpt-source-uv-bake-test",
+            "dome-sculpt-source-uv-adopt-test",
+            "dome-sculpt-emission-exr-test",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-vrm-test",
+            "dome-sculpt-emission-export-worker-test",
+            "dome-sculpt-emission-linear-test",
+            "dome-sculpt-mtoon-emission-test"
+          ],
+          "exit": 0,
+          "seconds": 836.6846178590204
+        }
+      ],
+      "seconds": 840.3316996329813,
+      "inputs": 1570,
+      "unchanged": true,
+      "scope": "Fresh whole own native FLTK/OpenXR app/core/support/render and selected consumers for semantic union7ecc: qualified Source4import/pristineexport, explicit portable material compiler and physical HDR GLB/VRM package1/2. Existing Gltf/Vrm export options and native read limits are appended by HDR parent, so every owned application/core/render/support/selected consumer is rebuilt from this same source/header cohort. No preceding archives reused. Build only, no runtime/GUI/hardware/export claim."
+    }
+  },
+  "registered": {
+    "release": {
+      "state": "terminal",
+      "pid": 3411364,
+      "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+      "profile": "release",
+      "scope": "32 actual registered commands, 31 fresh same-source selected test executables; original commands/timeouts/properties, fresh owned app/core/support/render. No full-suite, hardware, physical-headset or native GUI claim.",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release",
+        "--output-on-failure",
+        "-R",
+        "^(emission\\-exr|emission\\-export|emission\\-vrm|emission\\-export\\-worker|emission\\-linear|emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-authored\\-faults|source\\-paint\\-scene|source\\-sampling\\-transport|source\\-capture\\-storage|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|source\\-paint\\-import|source\\-paint\\-export|source\\-paint\\-bake|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-uv\\-bake|source\\-uv\\-adopt|mtoon\\-emission|source\\-union\\-version)$"
+      ],
+      "selected": 32,
+      "executables": 31,
+      "child_pid": 3411405,
+      "exit_code": 0,
+      "seconds": 102.90941090800334,
+      "inputs": 2098,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "pid": 3449557,
+      "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+      "profile": "sanitize",
+      "scope": "32 actual registered commands, 31 fresh same-source selected test executables; original commands/timeouts/properties, fresh owned app/core/support/render. No full-suite, hardware, physical-headset or native GUI claim.",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize",
+        "--output-on-failure",
+        "-R",
+        "^(emission\\-exr|emission\\-export|emission\\-vrm|emission\\-export\\-worker|emission\\-linear|emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-authored\\-faults|source\\-paint\\-scene|source\\-sampling\\-transport|source\\-capture\\-storage|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|source\\-paint\\-import|source\\-paint\\-export|source\\-paint\\-bake|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-uv\\-bake|source\\-uv\\-adopt|mtoon\\-emission|source\\-union\\-version)$"
+      ],
+      "selected": 32,
+      "executables": 31,
+      "child_pid": 3450079,
+      "exit_code": 0,
+      "seconds": 479.75783996499376,
+      "inputs": 2098,
+      "drift": []
+    }
+  },
+  "ctest_seconds": {
+    "release": 102.6,
+    "sanitize": 473.17
+  },
+  "hardware": {
+    "state": "terminal",
+    "pid": 3432442,
+    "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+    "scope": "Eight actual same-source fresh Release OpenGL consumer fixtures, strict A770 in source-aware fixtures; corresponding software --hardware negative controls. Native class is Document/render fixture, not application GUI, selected-compute acceleration or physical headset.",
+    "runs": [
+      {
+        "name": "source-paint-import",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-import-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-import",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.2826334989804309
+      },
+      {
+        "name": "source-paint-export",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-export-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-export",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.6142342700040899
+      },
+      {
+        "name": "source-paint-bake",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-bake-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-bake",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 2.8135433720017318
+      },
+      {
+        "name": "source-paint-native",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-native-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-native",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.16011026498745196
+      },
+      {
+        "name": "source-paint-sampler",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-sampler-test",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.22498103900579736
+      },
+      {
+        "name": "source-paint-mtoon",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-mtoon-test",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.19190803199307993
+      },
+      {
+        "name": "paint-overlay-gpu",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-paint-overlay-gpu-test",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.06816233700374141
+      },
+      {
+        "name": "mtoon-emission",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-mtoon-emission-test",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.33227855499717407
+      },
+      {
+        "name": "source-paint-import-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-import-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-import-software-negative",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.03307808100362308
+      },
+      {
+        "name": "source-paint-export-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-export-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-export-software-negative",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.0324769529979676
+      },
+      {
+        "name": "source-paint-bake-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-bake-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-bake-software-negative",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.030901641002856195
+      },
+      {
+        "name": "source-paint-native-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-native-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/artifacts/integration-proof/hardware-release/source-paint-native-software-negative",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.03987953401519917
+      },
+      {
+        "name": "source-paint-sampler-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-sampler-test",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.029345002985792235
+      },
+      {
+        "name": "source-paint-mtoon-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-source-paint-mtoon-test",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.02901932000531815
+      },
+      {
+        "name": "paint-overlay-gpu-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-paint-overlay-gpu-test",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.03167710901470855
+      },
+      {
+        "name": "mtoon-emission-software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/dome-sculpt-mtoon-emission-test",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.03230772601091303
+      }
+    ],
+    "phase": "mtoon-emission-software-negative",
+    "child_pid": 3436444,
+    "exit_code": 0,
+    "inputs": 2099,
+    "drift": []
+  },
+  "hardware_checks": {
+    "source-paint-import": 89,
+    "source-paint-export": 387,
+    "source-paint-bake": 192,
+    "source-paint-native": 21,
+    "source-paint-sampler": {
+      "cases": 72,
+      "checks": 289
+    },
+    "source-paint-mtoon": 141,
+    "paint-overlay-gpu": 42,
+    "mtoon-emission": 43
+  },
+  "native_GUI": {
+    "normal": {
+      "checks": 13,
+      "failed": 0,
+      "status": {
+        "state": "terminal",
+        "pid": 3412109,
+        "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+        "mode": "normal",
+        "scope": "Actual freshly built combined7ecc native FLTK frontend, Source28/MToon with genuine physical paint and outside-tile original sampling; registered versioned shared preview/Save/reopen/modal/CtrlW harness, private Xvfb/bus/HOME. No native Wayland, physical XR, imported asset or export UI claim.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/tests/source-paint-menu.py"
+        ],
+        "child_pid": 3412121,
+        "exit_code": 0,
+        "seconds": 19.68043600799865,
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Universal menu starts in authored mode without rewriting the saved material"
+            },
+            {
+              "passed": true,
+              "check": "All three actual shared material preview commands are available"
+            },
+            {
+              "passed": true,
+              "check": "Native PBR command publishes the actual mutually exclusive core-PBR mode"
+            },
+            {
+              "passed": true,
+              "check": "Actual native viewport pixels change with the PBR material policy"
+            },
+            {
+              "passed": true,
+              "check": "Saving from core-PBR preview retains exact source frames, paint, original material and scene history"
+            },
+            {
+              "passed": true,
+              "check": "Native authored command restores the original checked material policy"
+            },
+            {
+              "passed": true,
+              "check": "Actual viewport restores the exact authored pixels independently of status text"
+            },
+            {
+              "passed": true,
+              "check": "Native toon preview remains a separate shared command"
+            },
+            {
+              "passed": true,
+              "check": "Actual UV modal owns editing and disables all material preview commands"
+            },
+            {
+              "passed": true,
+              "check": "DomeD Ctrl+W cancellation restores preview command availability"
+            },
+            {
+              "passed": true,
+              "check": "Preview changes and modal cancellation add no source or material mutation"
+            },
+            {
+              "passed": true,
+              "check": "Project restart uses the authored default without serializing the ephemeral preview"
+            },
+            {
+              "passed": true,
+              "check": "Real FLTK preview workflow leaves the application and desktop session running"
+            }
+          ],
+          "failed": 0
+        },
+        "inputs": 1596,
+        "drift": []
+      }
+    },
+    "compact": {
+      "checks": 13,
+      "failed": 0,
+      "status": {
+        "state": "terminal",
+        "pid": 3414861,
+        "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+        "mode": "compact",
+        "scope": "Actual freshly built combined7ecc native FLTK frontend, Source28/MToon with genuine physical paint and outside-tile original sampling; registered versioned shared preview/Save/reopen/modal/CtrlW harness, private Xvfb/bus/HOME. No native Wayland, physical XR, imported asset or export UI claim.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/tests/source-paint-menu.py"
+        ],
+        "child_pid": 3414872,
+        "exit_code": 0,
+        "seconds": 20.597333114012145,
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Universal menu starts in authored mode without rewriting the saved material"
+            },
+            {
+              "passed": true,
+              "check": "All three actual shared material preview commands are available"
+            },
+            {
+              "passed": true,
+              "check": "Native PBR command publishes the actual mutually exclusive core-PBR mode"
+            },
+            {
+              "passed": true,
+              "check": "Actual native viewport pixels change with the PBR material policy"
+            },
+            {
+              "passed": true,
+              "check": "Saving from core-PBR preview retains exact source frames, paint, original material and scene history"
+            },
+            {
+              "passed": true,
+              "check": "Native authored command restores the original checked material policy"
+            },
+            {
+              "passed": true,
+              "check": "Actual viewport restores the exact authored pixels independently of status text"
+            },
+            {
+              "passed": true,
+              "check": "Native toon preview remains a separate shared command"
+            },
+            {
+              "passed": true,
+              "check": "Actual UV modal owns editing and disables all material preview commands"
+            },
+            {
+              "passed": true,
+              "check": "DomeD Ctrl+W cancellation restores preview command availability"
+            },
+            {
+              "passed": true,
+              "check": "Preview changes and modal cancellation add no source or material mutation"
+            },
+            {
+              "passed": true,
+              "check": "Project restart uses the authored default without serializing the ephemeral preview"
+            },
+            {
+              "passed": true,
+              "check": "Real FLTK preview workflow leaves the application and desktop session running"
+            }
+          ],
+          "failed": 0
+        },
+        "inputs": 1596,
+        "drift": []
+      }
+    }
+  },
+  "output_equality": {
+    "source": "7ecc942c847a997780ab7254b95df7f54d68f72c",
+    "source_GLBS": 56,
+    "source_all_three_profiles_byte_identical": true,
+    "HDR_files": 37,
+    "HDR_release_sanitize_byte_identical": true,
+    "HDR_prior_parent_equal": 33,
+    "source_files": [
+      {
+        "role": "source-paint-export",
+        "path": "0-artist-BLEND-0.000000-output.glb",
+        "release_sha256": "cfafab3eb433ab85b08cf6a60e61a244c0a82abcd6934dec0e24c88c44fa481a",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-artist-BLEND-0.650000-output.glb",
+        "release_sha256": "93ba349966d1b08bdba8e8a16354ecdb68eba36276aa5151a10a8f5d0cf8db14",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-artist-MASK-0.000000-output.glb",
+        "release_sha256": "5ee6c591f607a6071642e0f98e2268376dc17d9fd75b2cb15081975eef3e832b",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-artist-MASK-0.650000-output.glb",
+        "release_sha256": "23ce6a3e7c51e560ae6301bb1a4f30175a865b305441e3b2d78b88546d2629a5",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-artist-OPAQUE-0.000000-output.glb",
+        "release_sha256": "0da059ca7959da6f5ea64b4706748139b9ef47b6d1b2b424d0341ad4713e9719",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-artist-OPAQUE-0.650000-output.glb",
+        "release_sha256": "bd92e0d7402388866d26eb50b2ebd5e6afffa6002d3c0c5a67671378610dfb6f",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-flat-BLEND-0.000000-output.glb",
+        "release_sha256": "26596300104dbb867de6fc285530398cb220baf9736d3610c3fced97839b15c8",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-flat-BLEND-0.650000-output.glb",
+        "release_sha256": "32b82c0970c038c759cf135a863ccd587144fde99fa6fc9c14d2765eaf6d8ac6",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-flat-MASK-0.000000-output.glb",
+        "release_sha256": "bfbbc92388438bb02e62ab857291bb5c9188cd15e83b069cb0abd4a9ea0c6abc",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-flat-MASK-0.650000-output.glb",
+        "release_sha256": "175286a0c9c9ed5ef959f111bd5325a3230e447cc8ca2588e79d15f631d3a287",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-flat-OPAQUE-0.000000-output.glb",
+        "release_sha256": "00bbd6a42b09691d881401b97b7a823d1accde87b7fd9d399a025ea5d8a4a26e",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "0-flat-OPAQUE-0.650000-output.glb",
+        "release_sha256": "3d3d2f91b7818cc54b61f6441967b1e8796b026cc659519fd2e0138473134c53",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-artist-BLEND-0.000000-output.glb",
+        "release_sha256": "61cc20d8eaec13b43546f350ba8964ca76a632164a910e81be9dd6b2412721d8",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-artist-BLEND-0.650000-output.glb",
+        "release_sha256": "8e4fe8bf0f58ea2eb598ac5780ed4bb769a54b493c37880f1a6ea78b6d1e1978",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-artist-MASK-0.000000-output.glb",
+        "release_sha256": "265e336673027342e0039e1cfbe9ef4075de9bda653396fcc8b45affac678929",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-artist-MASK-0.650000-output.glb",
+        "release_sha256": "e93e480e0d968b871f77f784adacf9f487857178bf24c4df35f78a258138e671",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-artist-OPAQUE-0.000000-output.glb",
+        "release_sha256": "323c6fa84a335db96dd719161914f9a24ef897516ba202103cbeeb613fb48ecc",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-artist-OPAQUE-0.650000-output.glb",
+        "release_sha256": "5e9d4373c8f234da716f2d2a8be60f34386f82b27be5a9946ff0d3138e63938f",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-flat-BLEND-0.000000-output.glb",
+        "release_sha256": "3c730fe0a60c4e50cfc6ab77fd4f7b003f0634f9868b9847cd62443a3a21985d",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-flat-BLEND-0.650000-output.glb",
+        "release_sha256": "9ad937a0de2304ee5062086a6feb54b1fd55027c81433044c23923137993d43f",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-flat-MASK-0.000000-output.glb",
+        "release_sha256": "08356395e25f92b02aeed5d859a46cdb6c434c9661fddb930efc5b5f3e30d755",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-flat-MASK-0.650000-output.glb",
+        "release_sha256": "f5274febeefbe5e7bbb50f41b6260017e781cd23e05fd6dc209316fc4af05f89",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-flat-OPAQUE-0.000000-output.glb",
+        "release_sha256": "8d3f2fb8b62e1df40939c451f1540460b22b8ab8888515a6e1254a229026b47f",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "1-flat-OPAQUE-0.650000-output.glb",
+        "release_sha256": "0c0d6c766abae65569b2f8b1a96722fbc7bee0e102a393bdb772d3b018df1d07",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-artist-BLEND-0.000000-output.glb",
+        "release_sha256": "e4475beacbe546519c58bbc60374ae824b6be398a14b75cd401d756faf25d5d6",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-artist-BLEND-0.650000-output.glb",
+        "release_sha256": "8c7694a4d8b35b0f4bf19a623b9d063adbe5365625023b9ce131e62c42ef762d",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-artist-MASK-0.000000-output.glb",
+        "release_sha256": "c2141ee5fd745e28d651789d302855b2d5e45aecbac19f9efc0443cd311d2f8f",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-artist-MASK-0.650000-output.glb",
+        "release_sha256": "b2b2a4dcf15984ed2c495dfa8f4ee4da5ab450b7e3a2c36963557073015242c6",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-artist-OPAQUE-0.000000-output.glb",
+        "release_sha256": "95c24231e87ac8e6ff047bac16c3c693a606da936945e94c8d32cf788f784bb9",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-artist-OPAQUE-0.650000-output.glb",
+        "release_sha256": "f7cffcf524e88220bee3423715781a5642d06ffc96812cd604af3e26ca08f938",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-flat-BLEND-0.000000-output.glb",
+        "release_sha256": "114084106788fd0bd54ab204649b231c3a99f39ae6612b4ee181fc42de59517d",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-flat-BLEND-0.650000-output.glb",
+        "release_sha256": "f39ff70193e423d064357c7b5c94518a39b16d7c89f6bc0e507c639e8c5c6f68",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-flat-MASK-0.000000-output.glb",
+        "release_sha256": "91413748a33815116d7cc59e45d6c35d54c0963002ad9461a7c2cb6afcd4ccc6",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-flat-MASK-0.650000-output.glb",
+        "release_sha256": "7a1aaa4a20aef4e46c376478dd1d4b503c4e19637e76faae860ec7ac83700a38",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-flat-OPAQUE-0.000000-output.glb",
+        "release_sha256": "7dfbe4ed7262cd9c67f50179eb7452026e74aabe4e25fc38499c8e3d76b6e121",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "2-flat-OPAQUE-0.650000-output.glb",
+        "release_sha256": "c8d0d64e7328107f985a50d0e534069ecac8e5c867156631ab1b6f45ba337be1",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-artist-BLEND-0.000000-output.glb",
+        "release_sha256": "0805f5a662c039978dbe04531364e0a1226fb2e14439f6ff6d89a70fe3c0d16f",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-artist-BLEND-0.650000-output.glb",
+        "release_sha256": "338a5404cb8af722adfacf98f119a6bb6fd122988974d440c8735d54cccba02e",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-artist-MASK-0.000000-output.glb",
+        "release_sha256": "20a5134c8503676ba1ce48700009d20d02887acf94f19f067fbb648191745624",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-artist-MASK-0.650000-output.glb",
+        "release_sha256": "a4b63d1e9cc3632a2854caefc9a4286a08e73856af9870e06ac9244389083be0",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-artist-OPAQUE-0.000000-output.glb",
+        "release_sha256": "5ec372b27cc0b45fc78bcf2850bfe9cea6288f948ac6777c90c6330d8b1f8cfc",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-artist-OPAQUE-0.650000-output.glb",
+        "release_sha256": "5eaa0766f24d4720183db40b2dec3d0d06c0e1292c6f1e1b651c2c9165ae0c8c",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-flat-BLEND-0.000000-output.glb",
+        "release_sha256": "7423bfda175cbb84f3a774e97a9868a205eeaabd13ff9ff7d0ddd8aa29d3b57b",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-flat-BLEND-0.650000-output.glb",
+        "release_sha256": "e4814735c9179db50f9a7b38ba32118cab331d6fe618e880bab6ae9b36d94798",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-flat-MASK-0.000000-output.glb",
+        "release_sha256": "75499bf4b04dedc3a27878c61c25c4207af1306085ad0b1527c37f2f9d81c183",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-flat-MASK-0.650000-output.glb",
+        "release_sha256": "e41e7302801caabb8d51acec00b9ad487dfecc4e00b41be8e952f5338f40f4ba",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-flat-OPAQUE-0.000000-output.glb",
+        "release_sha256": "0d7a74ff04b6e7f0d7442d552ef112ee17932a87b71ad0bab120128218870d5e",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-export",
+        "path": "3-flat-OPAQUE-0.650000-output.glb",
+        "release_sha256": "d30c77903368471eafd61ca86e0783e4864889e37c4c5b2565e9353cc949b8a4",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked0.glb",
+        "release_sha256": "db1b8171f5f67aaccfb4e98b87efdff9c47731495dd300d8c294c1d36a1d4f84",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked1.glb",
+        "release_sha256": "65d1144fa187ec78efb1af9d9232956dc0197ab53ba8a61cf5092c5e20a7e10d",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked2.glb",
+        "release_sha256": "9d272193221c2cca6d07a0ba1962d218af0b601fd7dff943f63382c827c70fab",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked3.glb",
+        "release_sha256": "c7d6bc026a1040f96e3c874781f07fe5a600aba45f26191ebf050051d7de54f5",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked4.glb",
+        "release_sha256": "70fa1849735f188b552b17e428db366a40763ce22d161f46228d419fa3768c48",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked5.glb",
+        "release_sha256": "bfbf5d96065b47546fe4e8fae65c53a333b005146737d964c38a436b70170275",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked6.glb",
+        "release_sha256": "0ec666cb297cc88eb657cda99838e2f9d5f9cb3fb52d73833a6110a3462f4d9d",
+        "sanitize_equal": true,
+        "arc_equal": true
+      },
+      {
+        "role": "source-paint-bake",
+        "path": "baked7.glb",
+        "release_sha256": "804e7629e6ae5595c64c679fd27effa6656e81359064315c257fee409c8711c1",
+        "sanitize_equal": true,
+        "arc_equal": true
+      }
+    ],
+    "HDR_file_details": [
+      {
+        "path": "emission-export/physical.glb",
+        "release_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export/second-cycle.glb",
+        "release_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export/subset.glb",
+        "release_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/independent-v1-before.vrm",
+        "release_sha256": "bb25b63f1876b21e05d51db5503136ac66bbe6a7e514b9fb85bed6746963baf4",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": false
+      },
+      {
+        "path": "emission-vrm/independent-v1-physical-object2.exr",
+        "release_sha256": "5f9c9b73d825198c10ca129716c2e4c402fd81911cbae4443751a4de2957650b",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/independent-v1-physical-object3.exr",
+        "release_sha256": "7f962e764b8447575d1a4d9070458a2e7c39a37e3c761d2312657f6a5d12fe25",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/independent-v1-physical.vrm",
+        "release_sha256": "93efb9f86068549711068aa6c30b628ec697f288f58fd278d429a2e6331b075a",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": false
+      },
+      {
+        "path": "emission-vrm/independent-v1-second.vrm",
+        "release_sha256": "93efb9f86068549711068aa6c30b628ec697f288f58fd278d429a2e6331b075a",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": false
+      },
+      {
+        "path": "emission-vrm/independent-v1-source.vrm",
+        "release_sha256": "fbd7275c23649cc26dfb296f859eca9fcb5f89a66a35fb49be79c4524417e7b7",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/independent-v1.dsculpt",
+        "release_sha256": "ac7ee154a6e0fedd7dacb0d9061ab21f64c5aaa01ace0b08beee5d87272ac14b",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": false
+      },
+      {
+        "path": "emission-vrm/strength-five-object2.exr",
+        "release_sha256": "2a0c044195e83d3b6539e6745ffa97e9ecd1886d0480aa37e9b26c2b03d451b1",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/strength-five-source.vrm",
+        "release_sha256": "f08c826eb6f8d450064e49eea7e4499da6c81069f56816a371d4c6b35ecca643",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/strength-five.vrm",
+        "release_sha256": "77db3aa19b4889c63c42b8605098a618508473056fb324201de62eb8f5c5ba84",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/strength-zero-object2.exr",
+        "release_sha256": "b7f87474eb9d3dc7c7941ccc72f7e67d7b46dd5588caf87324a9ec383a5b84dc",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/strength-zero-source.vrm",
+        "release_sha256": "19d86b9b1d504b79956a0d5115bfca5715d874f55091accba301217b6ff3721d",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/strength-zero.vrm",
+        "release_sha256": "fe76ce7dd9ab5b69d1e9609c0306996d689352c92156b609a42c9ee518931f5c",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-female-before.vrm",
+        "release_sha256": "96fcfa9170a343953590e3b9e67c936909858a34c6e0bae859e4f98146532c79",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-female-physical-object2.exr",
+        "release_sha256": "bf1e7417359b5b765359a25574ba377a0bf2ecc371c433e523aba59b7560757c",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-female-physical-object3.exr",
+        "release_sha256": "383215fb4b5490be8351b75ae7b796eb60dc6016f91c9ff3ac698548f776d342",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-female-physical.vrm",
+        "release_sha256": "a6b0e5e4ddfb0b4a18728b0ba160a899449129690204ab4b498716d4251b632c",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-female-second.vrm",
+        "release_sha256": "a6b0e5e4ddfb0b4a18728b0ba160a899449129690204ab4b498716d4251b632c",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-female.dsculpt",
+        "release_sha256": "4dc0b7fedde8b9759b4cb3ba456fc23986bfe650384018246e239afb782fbd22",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-male-before.vrm",
+        "release_sha256": "3e3b5232dfb8eec14cd58f97dec72c3cfa3e4a2254adce9dcba3c9d9e6e53bf9",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-male-physical-object2.exr",
+        "release_sha256": "d5d1356f036ff500bd2d55111a8b2e6645d304d8187e54c186b17a4a5acbeb9d",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-male-physical-object3.exr",
+        "release_sha256": "34c0e3d0c5cc4890b5da5b38b504fe351e01b312b917b4e973c70df5ff995992",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-male-physical.vrm",
+        "release_sha256": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-male-second.vrm",
+        "release_sha256": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-vrm/vroid-beta-male.dsculpt",
+        "release_sha256": "0a57948f349c622c23391ac6abd7fa497b30e27e344bf0268cc33d1828cb5356",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/after-edit.dsculpt",
+        "release_sha256": "18fde963c68c2308c0957b16935ebed58df5e3c83ab48e5666a5050d2cd1e935",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/avatar-ordered.dsculpt",
+        "release_sha256": "a5c4441fb0714c122a86655cdadc9c322e2e574c24c941e85dbcd944e69591ca",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/native-avatar.vrm",
+        "release_sha256": "d428908cb65dc643b8ed778d04f89d78ce30e6635a3d6e12eac0634fb9eb6c33",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/native-v1-ordered.dsculpt",
+        "release_sha256": "f9cb0ef4f4d1df20b0a1ebcb113529323d6823310e874c0c784341badf379ee3",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/native-v1.vrm",
+        "release_sha256": "53d18bec545eb17d68efea8d87aa6b86650b22752ea1c40a555f469e7e1892ca",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/ordered.dsculpt",
+        "release_sha256": "ab238eabea31bbdd3f3e378f372a5bd3c38c70512ea20c555c99be5cec28902a",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/queued.glb",
+        "release_sha256": "7581822007bf037c4c63973a5df7fe71bcc40e29add597f69b60615761f2eb90",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/running.glb",
+        "release_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      },
+      {
+        "path": "emission-export-worker/worker-v1-source.vrm",
+        "release_sha256": "25997ee250883cb7ef72a4bb2bcd8d90fdcee346a64a4d07a2d746c545e8c800",
+        "sanitize_equal": true,
+        "matches_prior_HDR_parent": true
+      }
+    ]
+  },
+  "standards": {
+    "release": {
+      "profile": "release",
+      "validator": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "files": 77,
+      "uniqueByteContents": 72,
+      "totals": {
+        "numErrors": 0,
+        "numWarnings": 143,
+        "numInfos": 717,
+        "numHints": 40
+      },
+      "scope": "All48 actual pristine Source4 Document GLBs and8 explicit portable PBR GLBs for this profile; CPU profiles also21 current HDR GLB/VRM output/raw fixtures. queued.glb is the deliberately preserved non-GLB cancellation sentinel. No issue filtering; byte-identical files reuse their exact validated content report. No official VRM schema/physical-headset/complete exporter claim."
+    },
+    "sanitize": {
+      "profile": "sanitize",
+      "validator": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "files": 77,
+      "uniqueByteContents": 72,
+      "totals": {
+        "numErrors": 0,
+        "numWarnings": 143,
+        "numInfos": 717,
+        "numHints": 40
+      },
+      "scope": "All48 actual pristine Source4 Document GLBs and8 explicit portable PBR GLBs for this profile; CPU profiles also21 current HDR GLB/VRM output/raw fixtures. queued.glb is the deliberately preserved non-GLB cancellation sentinel. No issue filtering; byte-identical files reuse their exact validated content report. No official VRM schema/physical-headset/complete exporter claim."
+    },
+    "arc": {
+      "profile": "arc",
+      "validator": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "files": 56,
+      "uniqueByteContents": 56,
+      "totals": {
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 170,
+        "numHints": 0
+      },
+      "scope": "All48 actual pristine Source4 Document GLBs and8 explicit portable PBR GLBs for this profile; CPU profiles also21 current HDR GLB/VRM output/raw fixtures. queued.glb is the deliberately preserved non-GLB cancellation sentinel. No issue filtering; byte-identical files reuse their exact validated content report. No official VRM schema/physical-headset/complete exporter claim."
+    }
+  },
+  "HDR_parent_difference": "Four independent-V1 generated files/native Scene differ from41b due to newer source-aware import: nonexistent MR/AO images no longer fabricated, original scalar .25/.65 and real nearest/mip/repeat sampler preserved. Original fixture bytes unchanged; current124 typed assertions pass. Actual diff retained. Other33of37 HDR files exactly match parent; all37 current R/SAN match.",
+  "preserved_harness_negative": "First selected-run input hashing used executable spelling for CMake shared runtime; failed before any test. Corrected to libdome-sculpt-test-runtime.so. No product/tolerance change.",
+  "known_followup": "Newly reproduced aggregate EXR decode-work cap hole remains in this frozen source; agent has independently tested a prospective header forecast fix for next integration. This checkpoint does not claim that reader hardening or the future native package Open/Save workflow.",
+  "remaining": [
+    "exact native authoring container +explicit portable material policy and actual import/append/export UI",
+    "general repeated UV/normal/colour/rig/key/HDR/VRM composition",
+    "current full regression and vendor/compute/device/physical workflow qualification",
+    "all other incomplete REQUIREMENTS rows and post-basic controller drawers"
+  ],
+  "system_install": false,
+  "physical_headset_test": false,
+  "active_session_restart": false,
+  "artifacts_sha256": {
+    "artifacts/integration-proof/fresh-release/status.json": "933fdf98265a6bec4714b9e22bb214966bde2fb52a0f29b7f429d7a7540ada9f",
+    "artifacts/integration-proof/fresh-sanitize/status.json": "396b765d071af21f64f1637359b15881b5686e540846723e4f2260ad8f6a3486",
+    "artifacts/integration-proof/selected-release/status.json": "847d1cac3d5eead85aa5424070246a1b61eec2bbe06e1cbb7c61b1b8a693635e",
+    "artifacts/integration-proof/gui-normal/status.json": "446de401c1040dc9257c405b3f59ec603db392dabb341687024abdd584473b69",
+    "artifacts/integration-proof/gui-compact/status.json": "e461ca56066a51c10162d2a6e77c17d97b874c07ee1074e45db375dd71d06b45",
+    "artifacts/integration-proof/hardware-release/status.json": "041de4f3fb084bc4476762d8240d25aa3232652acfa2106d7f751d2fc913e188",
+    "artifacts/integration-proof/selected-sanitize/status.json": "24d8ccf163d83bc59e9328cc6dea30f1de9767b114fad31f29aa052bf0216c47",
+    "artifacts/integration-proof/output-equality.json": "9c16834a4b234f79471b4eb4572eee492ca0887988193d481696ab5d19859177",
+    "artifacts/integration-proof/HDR-v1-parent-diff.json": "97fb261c5d144cc0a683bb1ca50b7af0a1579339592be2a82410cf54bbcf1939",
+    "artifacts/integration-proof/khronos-release.json": "1df1138fb99b89515d779a3e262428a630a82041f30a10a5758f782882a6580a",
+    "artifacts/integration-proof/khronos-sanitize.json": "767e0b8ed25437e5f30539de41c0831aecbbf6cb066cbb80098bd05d7cc79ca9",
+    "artifacts/integration-proof/khronos-arc.json": "cd9328adafb5bdce7189e1fa45354ab1698f36bb58c3a7ea2e3c8d713b7def5e",
+    "artifacts/integration-proof/fresh-release/before.json": "0285e52577e60a6fa12a6f77cc2582eca513a4b1de9888f86c775922b2f99320",
+    "artifacts/integration-proof/fresh-release/after.json": "0285e52577e60a6fa12a6f77cc2582eca513a4b1de9888f86c775922b2f99320",
+    "artifacts/integration-proof/fresh-release/build.log": "d084a5c6aae7e1ee9347dbebb5c078164163c9c7bb9add8a4ede76e5ad4629b3",
+    "artifacts/integration-proof/fresh-sanitize/before.json": "0285e52577e60a6fa12a6f77cc2582eca513a4b1de9888f86c775922b2f99320",
+    "artifacts/integration-proof/fresh-sanitize/after.json": "0285e52577e60a6fa12a6f77cc2582eca513a4b1de9888f86c775922b2f99320",
+    "artifacts/integration-proof/fresh-sanitize/build.log": "d2579fdf8a00a5dec7d1bb1999eb479046e77eedb93c3c77030e4c462c2f79c1",
+    "artifacts/integration-proof/selected-release/before.json": "134d233b602eea2b8bb8767e1464d94282df0f38a04f51cb460120c03b0d07d6",
+    "artifacts/integration-proof/selected-release/after.json": "134d233b602eea2b8bb8767e1464d94282df0f38a04f51cb460120c03b0d07d6",
+    "artifacts/integration-proof/selected-release/registered.json": "f2657a56e12b951d3e5c5b41ff6404dc9f64110fc4f913d6a71a69d4c1e17686",
+    "artifacts/integration-proof/selected-release/ctest.log": "f84833f4c18eea22c803d180f520ab432f4205d5c4d988e94b5d779229ab0602",
+    "artifacts/integration-proof/selected-sanitize/before.json": "61bf55911ad7678caee9deda978d439498b54ff1c97e2d04d94c0c5b823590e0",
+    "artifacts/integration-proof/selected-sanitize/after.json": "61bf55911ad7678caee9deda978d439498b54ff1c97e2d04d94c0c5b823590e0",
+    "artifacts/integration-proof/selected-sanitize/registered.json": "b2cc2b3d8b34ddd421ec40ff67de577bbfe85da487c5d85172ad679f8c17716f",
+    "artifacts/integration-proof/selected-sanitize/ctest.log": "edcf51fb65659c62a67b3452a7638c15cdf9b64e573d637427a6d3bf4043dc73",
+    "artifacts/integration-proof/hardware-release/before.json": "2e783be2b5a1b7a303dac7bc70916c251b3f18c3e4b7f652844dd1ff19af8bbd",
+    "artifacts/integration-proof/hardware-release/after.json": "2e783be2b5a1b7a303dac7bc70916c251b3f18c3e4b7f652844dd1ff19af8bbd",
+    "artifacts/integration-proof/gui-normal/before.json": "4904c7112c0a78ade6c9dbd71f0654771070828ba9100f998fbbd17d91812fc9",
+    "artifacts/integration-proof/gui-normal/after.json": "4904c7112c0a78ade6c9dbd71f0654771070828ba9100f998fbbd17d91812fc9",
+    "artifacts/integration-proof/gui-normal/report.json": "94e5e86d4cbfee35dcab2950c523d70d974a03b99a83eea7306864c1dd1d394a",
+    "artifacts/integration-proof/gui-normal/run.log": "e9cad0365acb3f4bf61c5a2facea82090d4ac5de28cf761d34f729324c0124b5",
+    "artifacts/integration-proof/gui-compact/before.json": "4904c7112c0a78ade6c9dbd71f0654771070828ba9100f998fbbd17d91812fc9",
+    "artifacts/integration-proof/gui-compact/after.json": "4904c7112c0a78ade6c9dbd71f0654771070828ba9100f998fbbd17d91812fc9",
+    "artifacts/integration-proof/gui-compact/report.json": "94e5e86d4cbfee35dcab2950c523d70d974a03b99a83eea7306864c1dd1d394a",
+    "artifacts/integration-proof/gui-compact/run.log": "e9cad0365acb3f4bf61c5a2facea82090d4ac5de28cf761d34f729324c0124b5"
+  }
+}
