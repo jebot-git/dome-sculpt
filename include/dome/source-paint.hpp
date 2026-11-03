@@ -16,7 +16,7 @@ struct SourcePaintOptions {
 };
 // Capability is supplied by the owning reader, never inferred from a file's
 // version. Older overloads deliberately reject Paint4 even for empty layers.
-struct SourcePaintDecodeContext { bool independent_source=false; };
+struct SourcePaintDecodeContext { bool independent_source=false,physical_emission=false; };
 // Exact initial source-to-atlas adoption. The original must be pristine;
 // subsequent paint/UV/detail transfer needs its own retaining adapter.
 std::shared_ptr<PaintedMesh> prepare_source_paint(

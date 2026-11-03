@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "emission.hpp"
 #include "mesh.hpp"
 #include <deque>
 #include <map>
@@ -97,6 +98,7 @@ struct PaintSettings {
   std::array<float, 3> emission{.8f, .1f, .02f};
   float metallic = 1, roughness = .25f, mask = 0, flow = 1;
   bool erase = false, front_only = true;
+  PaintEmissionUnits emission_units = PaintEmissionUnits::MaterialRelative;
   void validate() const;
 };
 struct PaintPixel {
@@ -115,6 +117,10 @@ struct PaintColorTile {
   // not grow; coverage/masks/other channels remain in the common paint tile.
   std::array<std::array<uint8_t,4>, PaintTile::size * PaintTile::size> pixels{};
 };
+struct PaintEmissionTile {
+  // Optional Scene27 physical emission; common tile coverage/mask is shared.
+  std::array<PaintEmissionValue, PaintTile::size * PaintTile::size> pixels{};
+};
 struct PaintLayer {
   uint64_t id = 0;
   std::string name = "Paint";
@@ -122,6 +128,7 @@ struct PaintLayer {
   float opacity = 1;
   std::vector<std::shared_ptr<const PaintTile>> tiles;
   std::vector<std::shared_ptr<const PaintColorTile>> pbr_tiles;
+  std::vector<std::shared_ptr<const PaintEmissionTile>> emission_tiles;
 };
 enum class PaintUvPolicy { Strict, SourceAuthored, PolygonAuthored };
 struct PaintSurfaceOptions {
@@ -157,6 +164,8 @@ public:
   const std::shared_ptr<const PaintColorProjection> &color_projection() const { return color_projection_; }
   const std::shared_ptr<const PaintNormalProjection> &normal_projection() const { return normal_projection_; }
   std::array<uint8_t,4> pbr_pixel(uint64_t layer, uint32_t x, uint32_t y) const;
+  PaintEmissionValue emission_pixel(uint64_t layer, uint32_t x, uint32_t y) const;
+  bool has_physical_emission() const noexcept;
   uint64_t active_layer() const { return active_; }
   void select_layer(uint64_t);
   void add_layer(std::string name = "Paint");
@@ -215,6 +224,10 @@ public:
       bool allow_polygon,const NormalSamplingArchive *,const PaintSamplingArchive *);
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
       bool allow_polygon,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &);
+  // Scene27 physical data is an explicit decoder capability. Legacy overloads
+  // refuse Paint3 before any SurfaceMap reconstruction, even if it is empty.
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
+      bool allow_polygon,const NormalSamplingArchive *,const PaintSamplingArchive *,bool allow_physical_emission);
 
 private:
   friend class Document;
@@ -251,6 +264,7 @@ private:
   bool editing_ = false;
   using Tiles = std::vector<std::shared_ptr<const PaintTile>>;
   using ColorTiles = std::vector<std::shared_ptr<const PaintColorTile>>;
+  using EmissionTiles = std::vector<std::shared_ptr<const PaintEmissionTile>>;
   struct Stroke {
     uint64_t layer;
     Tiles before, after;
@@ -258,9 +272,11 @@ private:
     size_t before_tiles = 0, after_tiles = 0;
     ColorTiles color_before, color_after;
     size_t before_color_tiles = 0, after_color_tiles = 0;
+    EmissionTiles emission_before, emission_after;
   };
   Tiles before_;
   ColorTiles before_colors_;
+  EmissionTiles before_emission_;
   std::deque<Stroke> undo_, redo_;
   size_t history_bytes_ = 0;
   PaintLayer &active();

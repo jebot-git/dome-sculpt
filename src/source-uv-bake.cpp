@@ -208,6 +208,7 @@ bool same_normal_detail(const NormalDetailAuthority *expected,const BakedTexture
 } // namespace detail
 SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  validate(i,o);SourceUvBakeResult result;Budget budget{o,result};budget.cancel();
+ if(i.paint->has_physical_emission())throw std::invalid_argument("Physical emission requires its explicit linear UV transfer adapter");
  result.target=i.target;result.source_vertices=i.source_vertices;
  const bool prepared=bool(i.paint->color_projection()),normal_prepared=bool(i.paint->normal_projection());
  result.animation_policy=o.animation;result.freeze_seconds=o.freeze_seconds;

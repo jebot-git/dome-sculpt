@@ -11,6 +11,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include "paint-archive-shape.hpp"
+#include "material-archive-version.hpp"
 #include "source-paint-pairing.hpp"
 #include "polygon-color-target.hpp"
 #include "dome/source-placement.hpp"
@@ -450,7 +451,7 @@ nlohmann::json Scene::encode() const {
   bool resolved=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.material_bindings) || (!o.mesh_active && bool(o.deformation));});
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
   const bool framed=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){if(!o.material_bindings)return false;const auto &b=*o.material_bindings;return bool(b.normal_frames) || (b.uv_origin && (b.uv_origin->deformation || !b.uv_origin->creator_kind.empty() || !b.sampling_reparameterized));});
-  unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
+  unsigned feature_version=detail::minimum_scene_version(*this);
   if(std::any_of(groups_.begin(),groups_.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);}) ||
       std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.affine_edit);}))feature_version=std::max(feature_version,13u);
   for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
@@ -555,7 +556,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   const bool normal_context=j.contains("normal_sampling"),paint_context=j.contains("paint_sampling");
-  const SourcePaintDecodeContext source_paint_context{version==28};
+  const SourcePaintDecodeContext source_paint_context{version==28,version>=27};
   bool flat_volume=false;
   for(const char *key:{"samples","voxel_size","distance_band","sculpt_layers","active_sculpt_layer","next_sculpt_layer","sculpt_mask","sculpt_controls"})
     flat_volume|=j.contains(key);
@@ -563,24 +564,26 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || (version>21&&version!=23&&version!=24&&version!=25&&version!=26&&version!=28))throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>21&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28))throw std::runtime_error("Unsupported scene version");
+  if(version<27&&j.contains("source_materials")&&j.at("source_materials").at("version")==11)
+    throw std::invalid_argument("Physical material11 requires Scene27");
   const bool rig_pool=j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==6;
   const bool shared_corner_context=j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==5||(rig_pool&&j.at("polygon_sources").at("shared_colors").get<bool>()));
   if(version<25&&rig_pool)throw std::invalid_argument("Rig source archive requires Scene25");
   if(paint_context&&version<24)throw std::invalid_argument("Independent writable paint requires explicit Scene24");
-  if(version==24&&(!paint_context||!j.contains("source_materials")||j.at("source_materials").at("version")!=9))throw std::invalid_argument("Scene24 requires its actual paired material9 and writable domain pool");
-  if(version<24&&j.contains("source_materials")&&j.at("source_materials").at("version")==9)throw std::invalid_argument("Material9 requires explicit Scene24");
-  if(version==23&&(!j.contains("source_materials")||j.at("source_materials").at("version")!=8||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene23 requires actual current corner colour UV authority");
-  if(version<23&&j.contains("source_materials")&&j.at("source_materials").at("version")==8)throw std::invalid_argument("Current colour UV replay requires Scene23");
+  if(version==24&&(!paint_context||!j.contains("source_materials")||detail::material_archive_base_version(j.at("source_materials"))!=9))throw std::invalid_argument("Scene24 requires its actual paired material9 and writable domain pool");
+  if(version<24&&j.contains("source_materials")&&detail::material_archive_base_version(j.at("source_materials"))==9)throw std::invalid_argument("Material9 requires explicit Scene24");
+  if(version==23&&(!j.contains("source_materials")||detail::material_archive_base_version(j.at("source_materials"))!=8||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene23 requires actual current corner colour UV authority");
+  if(version<23&&j.contains("source_materials")&&detail::material_archive_base_version(j.at("source_materials"))==8)throw std::invalid_argument("Current colour UV replay requires Scene23");
   if(version<26 && j.contains("source_models"))detail::preflight_creator_source_coordinates(j.at("source_models"),unsigned(version));
-  if(version==21&&(!j.contains("normal_sampling")||!j.contains("source_materials")||j.at("source_materials").at("version")!=7))
+  if(version==21&&(!j.contains("normal_sampling")||!j.contains("source_materials")||detail::material_archive_base_version(j.at("source_materials"))!=7))
     throw std::invalid_argument("Scene21 requires its owning retained normal sampling archive");
-  if(version<21&&(j.contains("normal_sampling")||(j.contains("source_materials")&&j.at("source_materials").at("version")==7)))
+  if(version<21&&(j.contains("normal_sampling")||(j.contains("source_materials")&&detail::material_archive_base_version(j.at("source_materials"))==7)))
     throw std::invalid_argument("Retained normal sampling requires Scene21");
-  if(version==20&&(!j.contains("source_materials")||j.at("source_materials").at("version")!=6||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene20 requires explicit current corner preparation authority");
-  if(version<20&&((j.contains("source_materials")&&j.at("source_materials").at("version")==6)||(j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==5)))throw std::invalid_argument("Current corner preparation requires Scene20");
-  if(version==19&&(!j.contains("source_materials")||!j.at("source_materials").contains("version")||j.at("source_materials").at("version")!=5))throw std::invalid_argument("Scene19 requires material archive5 normal UV authority");
-  if(version<19&&j.contains("source_materials")&&j.at("source_materials").contains("version")&&j.at("source_materials").at("version")==5)throw std::invalid_argument("Normal UV projection requires Scene19");
+  if(version==20&&(!j.contains("source_materials")||detail::material_archive_base_version(j.at("source_materials"))!=6||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene20 requires explicit current corner preparation authority");
+  if(version<20&&((j.contains("source_materials")&&detail::material_archive_base_version(j.at("source_materials"))==6)||(j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==5)))throw std::invalid_argument("Current corner preparation requires Scene20");
+  if(version==19&&(!j.contains("source_materials")||!j.at("source_materials").contains("version")||detail::material_archive_base_version(j.at("source_materials"))!=5))throw std::invalid_argument("Scene19 requires material archive5 normal UV authority");
+  if(version<19&&j.contains("source_materials")&&j.at("source_materials").contains("version")&&detail::material_archive_base_version(j.at("source_materials"))==5)throw std::invalid_argument("Normal UV projection requires Scene19");
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
@@ -638,7 +641,8 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     for(const auto &o:objects)references(o);
     for(const auto &o:j.at("polygon_sources").at("origins"))references(o);
-    detail::PolygonSceneBudget budget;budget.owning_paint_domain=paint_context;budget.independent_source_paint=source_paint_context.independent_source;
+    detail::PolygonSceneBudget budget;budget.owning_paint_domain=paint_context;
+    budget.independent_source_paint=source_paint_context.independent_source;budget.owning_physical_emission=version>=27;
     for (const auto &o : objects) {
       budget.volume(o.at("volume"));
       budget.paint(o.at("painted"),false,unsigned(version));
@@ -676,7 +680,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   // Admit policy context before allocating any decoded SurfaceMap. A table
   // association is only structural permission; final deep validation proves
   // each owner's exact current/retained polygon REST/index/UV derivative.
-  for(const auto &o:objects)if(o.contains("painted")&&detail::polygon_paint_policy(o.at("painted"))){
+  for(const auto &o:objects)if(o.contains("painted")&&!o.at("painted").is_null()&&detail::polygon_paint_policy(detail::paint_archive_payload(o.at("painted"),paint_context,version>=27))){
     if(!polygon_fields||!o.contains("polygon")||o.at("polygon").is_null()||o.at("mesh_active")!=true)
       throw std::invalid_argument("Polygon-authored paint requires authenticated Scene12 polygon authority");
     auto index=detail::polygon_archive_index(o.at("polygon"),j.at("polygon_sources").at("authorities").size());
@@ -684,7 +688,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       throw std::invalid_argument("Polygon-authored paint has an inactive current authority");
   }
   if(j.contains("source_materials")&&j.at("source_materials").is_object()&&j.at("source_materials").contains("paints"))
-    for(const auto &paint:j.at("source_materials").at("paints"))if(detail::polygon_paint_policy(paint))
+    for(const auto &paint:j.at("source_materials").at("paints"))if(detail::polygon_paint_policy(detail::paint_archive_payload(paint,paint_context,version>=27)))
       throw std::invalid_argument("Source UV origins cannot claim polygon paint authority; explicitly convert their UV source first");
   // Bound the complete serialized sculpt payload before decoding any object.
   // Masks are independent of displacement layers and must share the Scene
@@ -777,6 +781,12 @@ Scene Scene::decode(const nlohmann::json &j) {
           if(version<10 || !layer.at("pbr_color_tiles").is_array())throw std::runtime_error("Prepared PBR layers require scene10");
           storage+=layer.at("pbr_color_tiles").size()*sizeof(PaintColorTile);
         }
+        if(layer.contains("physical_emission_tiles")){
+          const auto &tiles=layer.at("physical_emission_tiles");
+          if(version<27||!detail::physical_paint_authority(record,source_paint_context)||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
+            throw std::invalid_argument("Physical paint requires actual Scene27/Paint3 capability");
+          storage+=tiles.size()*sizeof(PaintEmissionTile);
+        }
       }
       if(paint.contains("baked"))for(const auto *key:{"color","orm","emission","normal","coverage"}) {
         const auto &bytes=paint.at("baked").at(key);
@@ -801,7 +811,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     if(material_fields) {
       const auto &materials=j.at("source_materials");
-      if(!materials.is_object() || !materials.at("version").is_number_integer() || (materials.at("version")!=1 && (version<9 || materials.at("version")!=2) && (version<10 || materials.at("version")!=3) && (version<15 || materials.at("version")!=4) && (version<19 || materials.at("version")!=5) && (version<20 || materials.at("version")!=6) && (version<21 || materials.at("version")!=7) && (version<23 || materials.at("version")!=8) && (version<24 || materials.at("version")!=9)) ||
+      if(!materials.is_object() || !detail::material_archive_base_version(materials).is_number_integer() || (detail::material_archive_base_version(materials)!=1 && (version<9 || detail::material_archive_base_version(materials)!=2) && (version<10 || detail::material_archive_base_version(materials)!=3) && (version<15 || detail::material_archive_base_version(materials)!=4) && (version<19 || detail::material_archive_base_version(materials)!=5) && (version<20 || detail::material_archive_base_version(materials)!=6) && (version<21 || detail::material_archive_base_version(materials)!=7) && (version<23 || detail::material_archive_base_version(materials)!=8) && (version<24 || detail::material_archive_base_version(materials)!=9)) ||
          !materials.at("paints").is_array() || materials.at("paints").size()>256)
         throw std::runtime_error("Invalid retained source-material archive");
       for(const auto &paint:materials.at("paints"))preflight(paint);
@@ -871,7 +881,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     for(const char *key:{"uv_reprojection","paint_sampling"})if(preparation.contains(key))
       detail::require_deformation_scene_version(preparation.at(key).at("deformation"),version,"Preconversion replay exceeds its actual scene version");
   }
-  if(version==15&&(!material_fields||j.at("source_materials").at("version")!=4))throw std::invalid_argument("Scene15 requires its explicit normal preparation feature");
+  if(version==15&&(!material_fields||detail::material_archive_base_version(j.at("source_materials"))!=4))throw std::invalid_argument("Scene15 requires its explicit normal preparation feature");
   if(material_fields&&j.at("source_materials").contains("normal_preparations"))for(const auto &preparation:j.at("source_materials").at("normal_preparations"))
     if(version<15||detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::invalid_argument("Pre-normal-preparation source features exceed scene version");
   size_t preflight_deformation=material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0;
@@ -1033,6 +1043,14 @@ Scene Scene::decode(const nlohmann::json &j) {
   for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
   if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
   if(version==28&&actual_feature!=28)throw std::invalid_argument("Scene28 requires actual independent source paint ownership");
+  if(version==27&&actual_feature<27)throw std::invalid_argument("Scene27 requires genuine physical emission state");
+  if(material_fields&&detail::physical_material_archive(j.at("source_materials"))){
+    SourceMaterialArchive reachable;
+    for(const auto &o:result.objects_)if(o.material_bindings)reachable.add(o.material_bindings,false);
+    for(const auto &o:polygons.origins())if(o->material_bindings)reachable.add(o->material_bindings,false);
+    if(reachable.bindings().size()!=source_materials.bindings().size()||reachable.origins().size()!=source_materials.origins().size())
+      throw std::invalid_argument("Scene HDR material archive has unreachable owning roots");
+  }
   if(version==25&&actual_feature!=25)throw std::invalid_argument("Scene25 requires actual exact pose or rig source authority");
   for(const auto &g:result.groups_)if(g.source_placement && detail::minimum_scene_version(g.source_placement->model.get())>unsigned(version))throw std::invalid_argument("Original source coordinates require their actual scene feature version");
   result.validate();
