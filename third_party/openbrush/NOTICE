@@ -13,6 +13,8 @@ repository. Names and trademarks retain their respective ownership.
 Windowless EGL bootstrap:
 Copyright (c) 2026 Ghostty XR contributors.
 Reused under the MIT license; see third_party/LICENSE.native-graphics.
+Local Dome Sculpt changes: exception-safe partial EGL initialization cleanup,
+noncopyable ownership, and no unbinding of unrelated current contexts.
 
 DomeD/de-xr shared interface adapters:
 Copyright (c) de-xr contributors, MIT license.

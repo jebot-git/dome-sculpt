@@ -41,7 +41,8 @@
       "src/render.h": "80d5d4f5db5e9b454cf8471d2d21b4940e4210386640b86c09dfba5fdf58c715",
       "src/palette.cpp": "7d2e7846b1cac8083531a0aa4ffcda0dab0bcd419a6fbfd83ffbeac1ce3a5fb1",
       "src/panel-render.cpp": "b36476f2463860c36f46dddf175e2b7f8e27286fa52bb63eea2d8638d0c5988a"
-    }
+    },
+    "local_graphics_changes": "Exception-safe partial EGL acquisition cleanup, noncopyable resource ownership and preservation of an unrelated current context; see docs/NATIVE-GRAPHICS-LIFETIME.md. No upstream source/layout replacement."
   },
   "desktop": {
     "repository": "https://github.com/jebot-git/qimgvr",
@@ -87,10 +88,10 @@
     "third_party/openbrush/navigation.cpp": "9adc7a5a6a79cc999c9e220d12c8f8739b3c97685b36d4ea88a48db509461b70",
     "third_party/openbrush/controller-profiles.h": "013e8ecd56f1f29fe4ee939680cf49db971bf2ce57c899db95f7780ce676edcb",
     "third_party/openbrush/controller-profiles.cpp": "417735908c92e886a1dfca913c9b246215274307a516ec2f438c192e80ce58f3",
-    "third_party/openbrush/graphics.h": "202a6b8d84b5aa55fd4dec6d9e53d4a90adf5383974571c490a1404b3a1fcbbd",
-    "third_party/openbrush/graphics.cpp": "9c2be55b5f5d9a67f68940856f2ba34189863fff0b4a33001a977aa1271bb547",
+    "third_party/openbrush/graphics.h": "003741d9689a4c3a1e6af7c06d7462fee0e88fb302a1a1fb7ccc1d7221d13f5c",
+    "third_party/openbrush/graphics.cpp": "33a1dcc1dea8b4890aa9e233f0266e113bf94d2c4fda2ff5448b0b3c0f63bd38",
     "third_party/openbrush/LICENSE": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
-    "third_party/openbrush/NOTICE": "1f803515edb3051e981a6d9f1bc4eb5f4b10f720c10206bd74d3fba773355cfc",
+    "third_party/openbrush/NOTICE": "dc78f04af99cfedd7966de6be69a94d68991fa07719ed9254a7fd5aeee21cda9",
     "third_party/openbrush/LICENSE.native-graphics": "efaded5e13e8b31b1f90302da538b1d638270b432fddbf705f00fd35d9e8b499",
     "third_party/cgltf/cgltf.h": "efb169dee911696b5d35fc8e3f7ea0c56d679debc529eba9ca6aa6443ba9d5e9",
     "third_party/blender/math_geom.cc.reference": "68114c7b9742363686ab606c54791b2d745df3cb8c339aaac057397fd3c0c419",
