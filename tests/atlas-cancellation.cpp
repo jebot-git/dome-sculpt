@@ -271,6 +271,9 @@ int main() try {
   auto &primitive=fixture.j["meshes"][0]["primitives"][0];
   primitive["attributes"].erase("NORMAL");primitive["attributes"].erase("TEXCOORD_0");
   primitive["targets"][0].erase("NORMAL");
+  bool gap_refused=false;try{import_glb(fixture.bytes());}catch(const std::exception &e){gap_refused=std::string_view(e.what())=="glTF texture coordinate attributes must be contiguous from TEXCOORD_0";}
+  check(gap_refused,"An indexed UV1 gap is not a valid missing-UV authoring input");
+  primitive["attributes"].erase("TEXCOORD_1");
   fixture.j["materials"][0]["pbrMetallicRoughness"].erase("baseColorTexture");
   const auto path=std::filesystem::temp_directory_path()/("dome-flat-atlas-cancel-"+std::to_string(getpid())+".glb");
   struct Cleanup {std::filesystem::path file;~Cleanup(){std::error_code e;std::filesystem::remove(file,e);}} cleanup{path};

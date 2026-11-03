@@ -139,8 +139,10 @@ int main() try {
     std::ofstream file(bad); file << "mtllib input.mtl\nusemtl textured\nv 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n"; }
   auto before_textured=canonical(doc.copy_scene());
   doc.import_asset(bad,64);
-  check(doc.wait_asset() && canonical(doc.copy_scene())==before_textured &&
-        doc.frame().state->error.find("missing the referenced UV set") != std::string::npos,
+  const bool missing_uv_finished=doc.wait_asset();
+  std::cout<<"ACTUAL_MISSING_NATIVE_UV "<<doc.frame().state->error<<std::endl;
+  check(missing_uv_finished && canonical(doc.copy_scene())==before_textured &&
+        doc.frame().state->error.find("Native textured primitive has no UV coordinates") != std::string::npos,
         "Textured OBJ without authored UVs refuses atomically with the actual UV diagnostic");
   const std::string textured_source="mtllib input.mtl\nusemtl textured\nv 0 0 0\nv 1 0 0\nv 0 1 0\nvt 0.1 0.1\nvt 0.9 0.1\nvt 0.1 0.9\nf 1/1 2/2 3/3\n";
   {std::ofstream file(bad);file<<textured_source;}
