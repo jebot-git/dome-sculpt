@@ -1,5 +1,13 @@
 # Dome Sculpt production handoff
 
+## Private key/HDR/original-source integration — 2026-11-03
+
+The ab878 plus independent-key semantic base passes selected CPU8/8 and wholly
+owned sanitizer8/8, preserving true Source4 sampling/HDR before-key ownership,
+Save/reopen and Restore. Read KEY-HDR-SOURCE-INTEGRATION.md and its receipt.
+This private milestone does not admit Scene29, actual-avatar converted frames,
+new composed hardware/UI or general refinement. The full goal remains active.
+
 ## Private original-coordinate/MToon paint integration — 2026-11-03
 
 Private f040845/d1606ca preserves original logical UVs independently of writable
