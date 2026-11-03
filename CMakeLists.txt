@@ -1957,3 +1957,10 @@ if(BUILD_TESTING AND DOME_COMPUTE_BACKEND STREQUAL "CPU")
   add_test(NAME resolution-quality-host-aggregate COMMAND dome-sculpt-resolution-quality-host-test)
   set_tests_properties(resolution-quality-host-aggregate PROPERTIES TIMEOUT 180)
 endif()
+
+# Cross-backend XR oracle: deliberately native CPU, never a selected-GPU reference.
+# Run tests/resolution-quality-xr.py with the explicit OneAPI application/runtime.
+if(BUILD_TESTING AND DOME_COMPUTE_BACKEND STREQUAL "CPU")
+  add_executable(dome-sculpt-resolution-quality-fixture tests/resolution-quality-fixture.cpp)
+  target_link_libraries(dome-sculpt-resolution-quality-fixture PRIVATE dome-sculpt-core)
+endif()
