@@ -6,8 +6,9 @@
 namespace dome::detail {
 struct DerivedKeyTarget {
   uint64_t id=0;
-  // Original stable target in the owning anchor; null means a newly authored
-  // zero endpoint. These reference native attribute authority, not raw IDs.
+  // Actual stable target in the owning anchor; null means an authored zero
+  // seed, zero means the captured simultaneous mix. A different positive ID
+  // is a Duplicate seed. These are native endpoint references, never raw IDs.
   std::optional<uint64_t> reference;
 };
 class SourceKeyDerivation {

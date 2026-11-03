@@ -32,6 +32,33 @@ std::vector<uint32_t> anchor_map(const SourceKeyDerivation &node){
     std::vector<uint32_t> result(domain.basis()->positions.size());for(size_t i=0;i<result.size();++i)result[i]=uint32_t(i);return result;
   }return domain.origin_vertices();
 }
+std::vector<Vec3> seed_positions(const SourceKeyDerivation &node,const DerivedKeyTarget &target,
+    const std::function<bool()> &cancelled){
+  const auto &before=*node.before_material();const auto &basis=frame_position_basis(before);
+  if(!target.reference)return std::vector<Vec3>(basis.positions.size());
+  if(*target.reference)return prior_positions(before,*target.reference);
+  // Match the actual native CaptureMix accumulation order, including float
+  // addition to REST. A sum of deltas followed by one addition is different.
+  auto endpoint=basis.positions;
+  const auto &weights=node.before_deformation()->morph_weights;
+  for(size_t t=0;t<before.normal_frames->current_targets.size();++t){
+    const float w=weights.empty()?0:weights.at(t);if(!w)continue;
+    const auto delta=prior_positions(before,before.normal_frames->current_targets[t]);
+    for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);endpoint[v]+=delta.at(v)*w;}
+  }
+  for(size_t v=0;v<endpoint.size();++v)endpoint[v]=endpoint[v]-basis.positions[v];
+  return endpoint;
+}
+NormalFrameTarget seed_attributes(const SourceKeyDerivation &node,const DerivedKeyTarget &target,
+    const NormalFrames &artist,const std::function<bool()> &cancelled){
+  NormalFrameTarget result;result.id=target.id;if(!target.reference)return result;
+  if(*target.reference){result=attributes(artist,*target.reference);result.id=target.id;return result;}
+  const auto &frames=*node.before_material()->normal_frames;const auto &weights=node.before_deformation()->morph_weights;
+  for(size_t t=0;t<frames.current_targets.size();++t){const float w=weights.empty()?0:weights.at(t);if(!w)continue;const auto &key=attributes(artist,frames.current_targets[t]);
+    auto add=[&](auto &out,const auto &values){if(values.empty())return;if(out.empty())out.resize(values.size());for(size_t c=0;c<values.size();++c){if((c&1023)==0)stop(cancelled);out[c]+=values[c]*w;}};
+    add(result.normals,key.normals);add(result.tangents,key.tangents);
+  }return result;
+}
 std::vector<std::array<float,2>> role_coordinates(const SourceKeyDerivation &node,uint32_t coordinate,const std::function<bool()> &cancelled){
   auto values=frame_position_coordinates(*node.before_material(),coordinate,cancelled);const auto map=anchor_map(node);std::vector<std::array<float,2>> out;out.reserve(map.size());for(auto v:map)out.push_back(values.at(v));return out;
 }
@@ -51,12 +78,12 @@ std::shared_ptr<const NormalFrameSet> SourceKeyDerivation::replay(const std::fun
   constexpr size_t cap=128*1024*1024;size_t planned=domain_->storage_bytes();auto add=[&](size_t n,size_t size){if(n>(cap-planned)/size)throw std::length_error("Independent key attribute preflight exceeds native frame quota");planned+=n*size;};
   add(count,basis.positions.size()*sizeof(Vec3));std::set<const NormalFrames*> old;for(const auto &f:{before.pbr,before.mtoon,before.canonical})if(f&&old.insert(f.get()).second){add(1,f->storage_bytes());if(count>f->targets.size())add(count-f->targets.size(),basis.indices.size()*2*sizeof(Vec3));}
   auto out=std::make_shared<NormalFrameSet>(before);out->position_domain=domain_;out->targets.clear();out->current_targets=current_targets_;out->next_target=next_target_;
-  for(const auto &t:targets_){stop(cancelled);FrameTargetIdentity record;record.id=t.id;if(t.reference)record=identity(before,*t.reference);record.id=t.id;record.positions=positions(t.id);out->targets.push_back(std::move(record));}
+  for(const auto &t:targets_){stop(cancelled);FrameTargetIdentity record;record.id=t.id;if(t.reference&&*t.reference==t.id)record=identity(before,*t.reference);record.id=t.id;record.positions=positions(t.id);out->targets.push_back(std::move(record));}
   struct Copy {const NormalFrames*source;uint32_t coordinate;std::shared_ptr<const NormalFrames> frame;};std::vector<Copy> copies;
   auto role=[&](const std::shared_ptr<const NormalFrames> &artist,ShapeFrameRole kind)->std::shared_ptr<const NormalFrames>{
     if(!artist)return {};const auto coordinate=shapekey_frame_coordinate(*material_,*artist,kind);for(const auto &copy:copies)if(copy.source==artist.get()&&copy.coordinate==coordinate)return copy.frame;
     auto frame=std::make_shared<NormalFrames>(*artist);frame->origin_vertex_count=uint32_t(basis.positions.size());frame->origin_vertices=basis.indices;frame->targets.clear();auto mesh=basis;if(!artist->tangents.empty())mesh.uv=role_coordinates(*this,coordinate,cancelled);
-    for(const auto &t:targets_){stop(cancelled);const auto &endpoint=positions(t.id);std::vector<Vec3> previous(mesh.positions.size());const NormalFrameTarget *old_key=nullptr;if(t.reference){auto old_position=prior_positions(*material_,*t.reference);for(size_t v=0;v<map.size();++v)previous[v]=old_position.at(map[v]);old_key=&attributes(*artist,*t.reference);}
+    for(const auto &t:targets_){stop(cancelled);const auto &endpoint=positions(t.id);std::vector<Vec3> previous(mesh.positions.size());auto seed=seed_attributes(*this,t,*artist,cancelled);const NormalFrameTarget *old_key=t.reference?&seed:nullptr;if(t.reference){auto old_position=seed_positions(*this,t,cancelled);for(size_t v=0;v<map.size();++v)previous[v]=old_position.at(map[v]);}
       NormalFrameTarget target;if(vectors(previous,endpoint)){if(old_key)target=*old_key;target.id=t.id;}
       else {auto old_positions=mesh.positions,new_positions=mesh.positions;for(size_t v=0;v<map.size();++v){old_positions[v]+=previous[v];new_positions[v]+=endpoint[v];}target=author_key_attributes(mesh,*artist,old_key,old_positions,new_positions,t.id,cancelled);}
       frame->targets.push_back(std::move(target));
@@ -72,10 +99,13 @@ void SourceKeyDerivation::validate(bool deep,const std::function<bool()> &cancel
   if(!own(paint_->mesh_owner(),domain_->current_geometry()))throw std::invalid_argument("Independent key derivation borrowed a different current geometry owner");
   const auto &old_domain=material_->normal_frames->position_domain;if(!own(old_domain,domain_)&&!own(old_domain,domain_->previous()))throw std::invalid_argument("Independent key domain lost its actual before-frame authority");
   if(!material_->uv_origin||!material_->uv_origin->paint||!own(domain_->source_frame_basis(),material_->uv_origin->paint->mesh_owner()))throw std::invalid_argument("Independent key domain changed its actual original attribute coordinate owner");
-  const auto n=domain_->basis()->positions.size();std::set<uint64_t> ids;for(size_t i=0;i<targets_.size();++i){const auto&t=targets_[i];if(!t.id||t.id>=next_target_||!ids.insert(t.id).second||frames_->targets[i].positions.size()!=n||frames_->targets[i].id!=t.id)throw std::invalid_argument("Independent key target registry differs from its derived POSITION authority");if(t.reference){if(*t.reference!=t.id)throw std::invalid_argument("Independent key reference needs an explicit Duplicate/Mix provenance operation");identity(*material_->normal_frames,*t.reference);}else if(std::any_of(material_->normal_frames->targets.begin(),material_->normal_frames->targets.end(),[&](const auto &prior){return prior.id==t.id;}))throw std::invalid_argument("Independent key cannot relabel an original artist target as newly authored zero");if(deep)for(auto v:frames_->targets[i].positions)if(!finite(v))throw std::invalid_argument("Independent key POSITION authority is not finite");}
+  const auto n=domain_->basis()->positions.size();std::set<uint64_t> ids;for(size_t i=0;i<targets_.size();++i){const auto&t=targets_[i];if(!t.id||t.id>=next_target_||!ids.insert(t.id).second||frames_->targets[i].positions.size()!=n||frames_->targets[i].id!=t.id)throw std::invalid_argument("Independent key target registry differs from its derived POSITION authority");if(t.reference){if(*t.reference){identity(*material_->normal_frames,*t.reference);if(*t.reference!=t.id&&std::any_of(material_->normal_frames->targets.begin(),material_->normal_frames->targets.end(),[&](const auto &prior){return prior.id==t.id;}))throw std::invalid_argument("Duplicate seed cannot relabel an existing stable artist target");}else if(!deformation_||!deformation_->morphs||std::any_of(material_->normal_frames->targets.begin(),material_->normal_frames->targets.end(),[&](const auto &prior){return prior.id==t.id;}))throw std::invalid_argument("Captured mix requires an actual before deformation and a new stable identity");}else if(std::any_of(material_->normal_frames->targets.begin(),material_->normal_frames->targets.end(),[&](const auto &prior){return prior.id==t.id;}))throw std::invalid_argument("Independent key cannot relabel an original artist target as newly authored zero");if(deep)for(auto v:frames_->targets[i].positions)if(!finite(v))throw std::invalid_argument("Independent key POSITION authority is not finite");}
   if(targets_.size()<material_->normal_frames->targets.size()||next_target_<material_->normal_frames->next_target||next_target_-material_->normal_frames->next_target!=targets_.size()-material_->normal_frames->targets.size())throw std::invalid_argument("Independent key stable identity allocation differs from its actual before registry");
   const auto &prior_slots=material_->normal_frames->current_targets;if(current_targets_.size()<prior_slots.size()||!std::equal(prior_slots.begin(),prior_slots.end(),current_targets_.begin()))throw std::invalid_argument("Independent key operation cannot silently reorder or drop prior native target slots");
   for(const auto &prior:material_->normal_frames->targets)if(!ids.contains(prior.id))throw std::invalid_argument("Independent key operation omitted retained original target authority");
+  const auto added=targets_.size()-material_->normal_frames->targets.size();
+  if(current_targets_.size()!=prior_slots.size()+added)throw std::invalid_argument("Independent key allocation must append each actual new native target slot");
+  for(size_t i=0;i<added;++i)if(current_targets_[prior_slots.size()+i]!=material_->normal_frames->next_target+i||!ids.contains(material_->normal_frames->next_target+i))throw std::invalid_argument("Independent key allocation must preserve the genuine monotonic stable ID sequence");
   material_->validate(deep);source_paint_pairing(paint_.get(),material_.get(),appearance_.get(),false);if(deep&&material_->color_preparation)material_->color_preparation->validate_current(paint_->mesh(),appearance_.get());normal_frame_current_authority(*material_,paint_->mesh(),deformation_.get(),cancelled);
   if(!material_->normal_preparation&&appearance_){const auto original=material_->uv_origin->appearance;if(!original||!own(original->asset,appearance_->asset)||!own(original->original_bytes,appearance_->original_bytes)||original->source_mesh!=appearance_->source_mesh||original->source_primitive!=appearance_->source_primitive||original->material!=appearance_->material||appearance_->source_vertices.size()!=paint_->mesh().positions.size())throw std::invalid_argument("Generic key anchor borrowed another original primitive appearance");
     for(size_t c=0;c<domain_->basis()->indices.size();++c){if((c&1023)==0)stop(cancelled);const auto v=domain_->basis()->indices[c];if(appearance_->source_vertices.at(domain_->current_vertices().at(v))!=original->source_vertices.at(domain_->source_frame_vertices().at(v)))throw std::invalid_argument("Generic key appearance map differs from its genuine source-frame corners");}}
@@ -93,8 +123,10 @@ bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit
 }
 ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &edit,const std::function<bool()> &cancelled){
   stop(cancelled);const auto &source=scene.object(object);const auto &binding=source.material_bindings;normal_frame_current_authority(*binding,source.painted->mesh(),source.deformation.get(),cancelled);const auto recipe=binding->normal_preparation;if(recipe)recipe->validate_current(source.painted->mesh(),source.appearance.get(),cancelled);
-  if(edit.action!=ShapeKeyAction::Replace&&edit.action!=ShapeKeyAction::Create&&edit.action!=ShapeKeyAction::Rename)throw std::invalid_argument("Independent seam-key Duplicate/CaptureMix/Mirror require their own explicit target-reference adapter; original source retained");
-  const auto &current=source.painted->mesh();const auto *original_keys=source.deformation&&source.deformation->morphs?&*source.deformation->morphs:nullptr;const size_t count=original_keys?original_keys->targets.size():0;const bool create=edit.action==ShapeKeyAction::Create;if(!create&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");if(create&&count>=128)throw std::length_error("Shapekey target budget exceeded");
+  if(edit.action==ShapeKeyAction::Mirror)throw std::invalid_argument("Independent seam-key Mirror requires its own explicit geometric correspondence adapter; original source retained");
+  const auto &current=source.painted->mesh();const auto *original_keys=source.deformation&&source.deformation->morphs?&*source.deformation->morphs:nullptr;const size_t count=original_keys?original_keys->targets.size():0;const bool duplicate=edit.action==ShapeKeyAction::Duplicate,mix=edit.action==ShapeKeyAction::CaptureMix;const bool create=edit.action==ShapeKeyAction::Create||duplicate||mix;if((!create||duplicate)&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");if(create&&count>=128)throw std::length_error("Shapekey target budget exceeded");
+  // Reserve the new owning-anchor depth before snapshots or target arrays.
+  if(duplicate||mix){size_t depth=1;for(auto anchor=binding->key_derivation;anchor;anchor=anchor->before_material()->key_derivation){stop(cancelled);if(++depth>32)throw std::length_error("Named key anchor exceeds bounded source history before allocation");}}
   key_budget(source.deformation.get(),current.positions.size(),count+(create?1:0));
   const auto domain=derive_frame_position_domain(source.painted->mesh_owner(),*binding,cancelled);key_budget(source.deformation.get(),domain->basis()->positions.size(),binding->normal_frames->targets.size()+(create?1:0));
   // FrameSet target POSITION vectors are the sole retained endpoint storage.
@@ -104,17 +136,20 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   const auto slot=create?count:edit.target;const auto name=edit.action==ShapeKeyAction::Replace?deform->morphs->targets[slot].name:new_name(*deform->morphs,edit.name);
   if(edit.action==ShapeKeyAction::Rename){if(deform->expressions)deform->expressions->rename_shape(*deform->morphs,deform->morphs->targets[slot].name,name);else deform->morphs->targets[slot].name=name;Scene next=scene;next.object(object).deformation=deform;next.validate();stop(cancelled);scene=std::move(next);return{slot,true};}
   auto node=std::shared_ptr<SourceKeyDerivation>(new SourceKeyDerivation);node->owner_=node;const auto old=binding->key_derivation;
-  const bool reuse=old&&old->position_domain()==domain&&old->before_paint()->mesh_owner()==source.painted->mesh_owner()&&bool(recipe)==bool(old->before_material()->normal_preparation)&&(!recipe||key_recipe_sampling_matches(*recipe,*old->before_material()->normal_preparation));
+  const bool reuse=!duplicate&&!mix&&old&&old->position_domain()==domain&&old->before_paint()->mesh_owner()==source.painted->mesh_owner()&&bool(recipe)==bool(old->before_material()->normal_preparation)&&(!recipe||key_recipe_sampling_matches(*recipe,*old->before_material()->normal_preparation));
   auto staged=std::make_shared<NormalFrameSet>(*binding->normal_frames);staged->position_domain=domain;
   if(reuse){node->paint_=old->paint_;node->material_=old->material_;node->deformation_=old->deformation_;node->appearance_=old->appearance_;node->targets_=old->targets_;}
   else {node->paint_=source.painted->snapshot();node->material_=binding;node->deformation_=source.deformation;node->appearance_=source.appearance;node->domain_=domain;staged->targets.clear();const auto map=anchor_map(*node);for(const auto &t:binding->normal_frames->targets){node->targets_.push_back({t.id,t.id});FrameTargetIdentity record=t;auto old_positions=prior_positions(*binding,t.id);record.positions.clear();record.positions.reserve(map.size());for(auto v:map)record.positions.push_back(old_positions.at(v));staged->targets.push_back(std::move(record));}}
   node->domain_=domain;node->current_targets_=binding->normal_frames->current_targets;node->next_target_=binding->normal_frames->next_target;
-  uint64_t id;if(create){if(node->targets_.size()>=128||node->next_target_==UINT64_MAX)throw std::length_error("Independent key stable identity budget exceeded");id=node->next_target_++;node->current_targets_.push_back(id);node->targets_.push_back({id,{}});staged->targets.push_back({id,{},{},std::vector<Vec3>(domain->basis()->positions.size())});}else id=node->current_targets_.at(slot);
-  auto target=std::find_if(staged->targets.begin(),staged->targets.end(),[&](const auto&t){return t.id==id;});auto endpoint=current.positions;if(!create)endpoint=edit.positions;
-  for(size_t v=0;v<domain->current_vertices().size();++v){if((v&1023)==0)stop(cancelled);auto vertex=domain->current_vertices()[v];target->positions[v]=endpoint.at(vertex)-current.positions.at(vertex);}
+  uint64_t id;if(create){if(node->targets_.size()>=128||node->next_target_==UINT64_MAX)throw std::length_error("Independent key stable identity budget exceeded");id=node->next_target_++;node->current_targets_.push_back(id);node->targets_.push_back({id,duplicate?std::optional<uint64_t>{binding->normal_frames->current_targets.at(edit.target)}:mix?std::optional<uint64_t>{0}:std::optional<uint64_t>{}});staged->targets.push_back({id,{},{},std::vector<Vec3>(domain->basis()->positions.size())});}else id=node->current_targets_.at(slot);
+  auto target=std::find_if(staged->targets.begin(),staged->targets.end(),[&](const auto&t){return t.id==id;});auto endpoint=current.positions;
+  if(duplicate){for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);endpoint[v]+=original_keys->targets.at(edit.target).delta[v];}}
+  else if(mix){for(size_t t=0;t<count;++t){const float w=deform->morph_weights.empty()?0:deform->morph_weights[t];for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);endpoint[v]+=original_keys->targets[t].delta[v]*w;}}}
+  else if(!create)endpoint=edit.positions;
+  for(size_t v=0;v<domain->current_vertices().size();++v){if((v&1023)==0)stop(cancelled);auto vertex=domain->current_vertices()[v];target->positions[v]=duplicate?original_keys->targets.at(edit.target).delta.at(vertex):endpoint.at(vertex)-current.positions.at(vertex);}
   staged->current_targets=node->current_targets_;staged->next_target=node->next_target_;node->frames_=std::move(staged);
   node->frames_=node->replay(cancelled);node->validate(true,cancelled);
-  deform->morphs->set_target(source.painted->mesh(),name,endpoint);if(create&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);deform->validate(source.painted->mesh());std::shared_ptr<const SourceNormalPreparation> next_recipe;if(recipe){auto prepared=std::make_shared<SourceNormalPreparation>(*recipe);prepared->target_frames=node->frames_;prepared->key_derivation=node;next_recipe=std::move(prepared);}
+  deform->morphs->set_target(source.painted->mesh(),name,endpoint);if(duplicate)deform->morphs->targets.back().delta=original_keys->targets.at(edit.target).delta;if(create&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);deform->validate(source.painted->mesh());std::shared_ptr<const SourceNormalPreparation> next_recipe;if(recipe){auto prepared=std::make_shared<SourceNormalPreparation>(*recipe);prepared->target_frames=node->frames_;prepared->key_derivation=node;next_recipe=std::move(prepared);}
   auto next_binding=std::make_shared<SourceMaterialBindings>(*binding);next_binding->normal_frames=node->frames_;next_binding->normal_preparation=next_recipe;next_binding->key_derivation=node;next_binding->validate();normal_frame_current_authority(*next_binding,source.painted->mesh(),deform.get(),cancelled);
   Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;if(!reuse)output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
 }
