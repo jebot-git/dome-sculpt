@@ -1,0 +1,65 @@
+{
+  "base": "4cfe23c",
+  "scope": "Detached construction/support diagnostic only; no field or publication authority",
+  "source_informed_intent": "exact original-positive usage predicate only, not artist magnitudes; user/native intent remains separate",
+  "runtime_unchanged": true,
+  "actual_avatars": {
+    "male_parts": 19,
+    "female_parts": 19,
+    "male_unresolved_axial_parts": 16,
+    "female_unresolved_axial_parts": 17,
+    "nonempty_column_collisions": 0,
+    "scene_exact": true,
+    "weights_generated": false
+  },
+  "independent_controls": [
+    "global-min collision negative",
+    "exhaustive point projection/ties",
+    "outside bone/point unresolved, no fabricated anchors",
+    "reflection",
+    "vertex permutation",
+    "mid-construction Cancel",
+    "byte cap",
+    "original arrays exact"
+  ],
+  "sanitizers": {
+    "owned_research_TU": [
+      "ASan",
+      "UBSan",
+      "leaks"
+    ],
+    "linked_core_support": "copied uninstrumented b32; no whole-core claim"
+  },
+  "source_policies_preserved": true,
+  "native_admission": false,
+  "next_required": "authentic exterior/shared anatomical continuation and unchanged real quality/cost, then full native qualification",
+  "hashes": {
+    "src/sampled-anatomical-domain.hpp": "48ff992a2147d9fa51d0d46cabe242b79a2d307df8c2a57a1703f66e0e3c717c",
+    "src/heat-binding.cpp": "885fa4c01d6366b215f4a5e3346eba514c3aaa2c4a02aa54a47635bf05d0ab98",
+    "src/heat-binding.hpp": "da0f12cb41efeffc1660407afcb2a4b265f873013a3cce7698d87c51c101a0e7",
+    "src/heat-source.hpp": "7d5f428af62627860830b43bd6335ce46326e8c59782a5f09592ebdd1e32bcab",
+    "tests/sampled-anatomical-domain.cpp": "13342410991eae2794db292e9c92a6f83551bd6382a1f159252a5fb52f07a0a5",
+    "tests/sampled-anatomical-controls.cpp": "458d375f5e174d61e957122dcc4e1c0cf26a44f967cac1ecd9f32913b6e14f92",
+    "tests/anatomical-avatar-domains.cpp": "3d5c27f6676380d52fa8380a3e8a63c4dcae4134647582fb674a804fdf8b139b",
+    "artifacts/tests-sampled-anatomical-v2.log": "650bf9ca517cf6d75009cbacbfdb8d725129e6d420f677b1a42f4a64d68300f0",
+    "artifacts/tests-sampled-anatomical-v3.log": "a68da552395d6d239405b3276b2fcfdaff9c9cf28c0156fb8f38ef02e6192b20",
+    "artifacts/tests-sampled-anatomical-final-controls.log": "d5f5cdd4b71e822ffe167d5b005271e454ba814ad5f20bd5b3603aff7c85c1ad",
+    "artifacts/tests-anatomical-controls-sanitize.log": "d5f5cdd4b71e822ffe167d5b005271e454ba814ad5f20bd5b3603aff7c85c1ad",
+    "artifacts/anatomical-male.log": "704dc9e71fb10637be3049dc118dc72a7ef36c2651e24e14347775ccc10904d0",
+    "artifacts/anatomical-female.log": "3ece213c30e37bc7bb632c5faabf38bb4c683ccb14772e646e069b9aaf5f7d63",
+    "artifacts/anatomical-before.sha256": "a6e58b76982d8ce57dac640478ff8343a7b365f8066fed693c261e7daada3581",
+    "artifacts/anatomical-controls-sanitize-before.sha256": "72a8c6601fdf03d3e684a6812be584bd0e3eef7f72180500ba4c5b98d6ca42b9",
+    "artifacts/anatomical-avatar-probe": "2f3baefc3b44ba31e669a70543b3280dfdcddbc8973ad5466f28ec76923b5cb0",
+    "artifacts/sampled-anatomical-probe": "d56af37cb26c3a2e8d3a025d97f679c6a61e5e471e8f82af02732e8ca48af8da",
+    "artifacts/sampled-anatomical-final-controls-probe": "0439ae9f74d4a8751ae8ac136d921c394261453a39f7c9251ae739e1e4ca9ebe",
+    "artifacts/anatomical-controls-sanitize": "96c434c9a780ee67eebd0738bbdd6a54be6148a229ff2f945a92cb1febbe3bd4",
+    "artifacts/kernel-libraries/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+    "artifacts/kernel-libraries/libdome-sculpt-core.a": "fb31277a000ea0c42744c8f0863c1778f3076f323acb8ab37f308c7520aad648",
+    "artifacts/kernel-libraries/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+    "artifacts/kernel-libraries/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+    "artifacts/kernel-libraries/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+    "artifacts/kernel-libraries/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+    "artifacts/kernel-libraries/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2",
+    "artifacts/kernel-libraries/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64"
+  }
+}
