@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-export.hpp"
+#include "emission-paint-access.hpp"
 #include "emission-linear.hpp"
 #include "emission-authority.hpp"
 #include "paint-overlay-packet.hpp"
@@ -31,10 +32,7 @@ EmissionInterchangeImage field(const SculptObject &object,const std::function<bo
  out.validate();return out;
 }
 }
-struct EmissionExportAccess {
- static std::shared_ptr<PaintedMesh> without_physical(const PaintedMesh &paint){auto detached=paint.snapshot();for(auto &layer:detached->layers_)layer.emission_tiles.clear();return detached;}
- static std::shared_ptr<const TextureMaps> other_channels(const PaintedMesh &paint,Material material,const std::function<bool()> &cancelled){auto detached=without_physical(paint);material.emissive={};return detached->composite(material,cancelled);}
-};
+std::shared_ptr<const TextureMaps> EmissionExportAccess::other_channels(const PaintedMesh &paint,Material material,const std::function<bool()> &cancelled){auto detached=without_physical(paint);material.emissive={};return detached->composite(material,cancelled);}
 EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> objects,const NativeEmissionExport &options,const std::function<bool()> &cancelled){
  stop(cancelled);if(!options.scene||!options.allow_measured_core_fallback)throw std::invalid_argument("HDR export needs its immutable Scene and explicit measured fallback permission");options.scene->validate();size_t field_bytes=0;
  for(const auto &surface:objects){const auto &owner=options.scene->object(surface.id);if(hdr_emission(owner.material.emissive)||(owner.painted&&owner.painted->has_physical_emission())||(owner.material_bindings&&physical_emission(*owner.material_bindings))){if(!owner.mesh_active||!owner.painted)throw std::invalid_argument("HDR export requires its editable mesh owner");const size_t size=size_t(owner.painted->resolution())*owner.painted->resolution()*sizeof(std::array<float,10>);if(size>128*1024*1024-field_bytes)throw std::length_error("Aggregate HDR export fields exceed128MiB before allocation");field_bytes+=size;}}

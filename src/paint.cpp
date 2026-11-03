@@ -1,4 +1,5 @@
 #include "paint-overlay-packet.hpp"
+#include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
@@ -852,6 +853,16 @@ bool PaintedMesh::redo() {
   composite_token_=token;
   ++revision_;
   return true;
+}
+std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_physical(const PaintedMesh &paint) {
+  // An altered temporary may never publish maps under the original's visual
+  // content identity, including actual physical zero/hidden contributions.
+  auto cache=std::make_shared<PaintedMesh::CompositeCache>();
+  const auto token=next_composite_token();
+  auto detached=paint.snapshot();
+  detached->composite_cache_=std::move(cache);detached->composite_token_=token;
+  for(auto &layer:detached->layers_)layer.emission_tiles.clear();
+  return detached;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   auto p = std::shared_ptr<PaintedMesh>(new PaintedMesh);
