@@ -97,6 +97,31 @@ Components components(const Mesh &m, Work &work) {
       throw std::invalid_argument("Volume binding requires closed components; open edges remain unbound");
     out.edges.push_back(edge);
   }
+  // Closed paired edges alone do not prove a manifold vertex: two otherwise
+  // connected sheets can meet at one welded point. Its incident triangle link
+  // must be one cycle, not two disjoint fans.
+  std::vector<uint32_t> degree(points.size()),first(points.size(),UINT32_MAX);
+  for(uint32_t t=0;t<nt;++t)for(int k=0;k<3;++k){
+    work.step();auto v=vertex[m.indices[t*3+k]];++degree[v];first[v]=t;
+  }
+  for(uint32_t v=0;v<points.size();++v){
+    work.step();if(!degree[v])continue;
+    uint32_t current=first[v],previous=UINT32_MAX,visited=0;
+    do {
+      work.step();uint32_t next=UINT32_MAX;
+      for(int edge=0;edge<3;++edge){
+        work.step();auto a=vertex[m.indices[current*3+edge]],b=vertex[m.indices[current*3+(edge+1)%3]];
+        if(a!=v&&b!=v)continue;
+        auto adjacent=out.adjacent[current][edge];
+        if(adjacent!=previous){next=adjacent;break;}
+      }
+      if(next==UINT32_MAX||++visited>degree[v])
+        throw std::invalid_argument("Volume binding requires one manifold triangle fan at every welded vertex");
+      previous=current;current=next;
+    }while(current!=first[v]);
+    if(visited!=degree[v])
+      throw std::invalid_argument("Volume binding cannot join disjoint triangle fans at a coincident vertex");
+  }
   out.triangle.resize(nt);
   std::map<uint32_t,uint32_t> names;
   std::vector<uint32_t> position_component(positions.size(),UINT32_MAX);
@@ -426,6 +451,23 @@ bool segment_material(const Mesh &m,const Components &parts,const Endpoint &from
                       std::vector<volume_exact::Interval> &coverage,Work &work) {
   auto p=endpoint_value(from,parts),q=endpoint_value(to,parts);events.clear();events.push_back(0);events.push_back(1);
   coverage.clear();volume_exact::Arithmetic exact(work);
+  auto add_coverage=[&](volume_exact::Interval piece){
+    auto begin=std::lower_bound(coverage.begin(),coverage.end(),piece.enter,
+      [&](const auto&existing,const auto&at){return exact.compare(existing.exit,at)<0;});
+    auto end=begin;
+    while(end!=coverage.end()&&exact.compare(end->enter,piece.exit)<=0){
+      work.step();if(exact.compare(end->enter,piece.enter)<0)piece.enter=end->enter;
+      if(exact.compare(end->exit,piece.exit)>0)piece.exit=end->exit;
+      ++end;
+    }
+    // Charge actual bounded vector movement; capacity was reserved before any
+    // path checks. The interval union itself is exact, with no gap tolerance.
+    auto index=size_t(begin-coverage.begin());work.step(size_t(coverage.end()-begin));
+    if(begin==end)coverage.insert(begin,std::move(piece));
+    else {coverage.erase(begin+1,end);coverage[index]=std::move(piece);}
+    return exact.compare(coverage.front().enter,exact.zero())<=0&&
+      exact.compare(coverage.front().exit,exact.one())>=0;
+  };
   auto raw3=[](Vec3 p){return std::array{p.x,p.y,p.z};};
   auto projected=[](Vec3 p,int drop){auto a=std::array{p.x,p.y,p.z};return std::array{a[(drop+1)%3],a[(drop+2)%3]};};
   auto exact_endpoint=[&](const Endpoint&e,int drop){
@@ -456,12 +498,22 @@ bool segment_material(const Mesh &m,const Components &parts,const Endpoint &from
     if(end)y=0;
     if(std::abs(x)<=eps&&std::abs(y)<=eps) {
       auto ta=raw3(m.positions[m.indices[triangle*3]]),tb=raw3(m.positions[m.indices[triangle*3+1]]),tc=raw3(m.positions[m.indices[triangle*3+2]]);
-      auto on_plane=[&](const Endpoint&e){if(e.a==UINT32_MAX)return exact.orient3(ta,tb,tc,e.free)==0;return exact.orient3(ta,tb,tc,raw3(parts.points[e.a]))==0&&exact.orient3(ta,tb,tc,raw3(parts.points[e.b]))==0;};
+      // A constant-coordinate input plane has an exact cheaper predicate.
+      // This uses actual binary32 equality, not a near-axis/angle threshold.
+      // Every other plane still uses the bounded exact determinant.
+      int constant=-1;for(int axis=0;axis<3;++axis){work.step();if(ta[axis]==tb[axis]&&ta[axis]==tc[axis]){constant=axis;break;}}
+      auto on_plane=[&](const Endpoint&e){
+        if(constant>=0){work.step();if(e.a==UINT32_MAX)return e.free[constant]==double(ta[constant]);return raw3(parts.points[e.a])[constant]==ta[constant]&&raw3(parts.points[e.b])[constant]==ta[constant];}
+        if(e.a==UINT32_MAX)return exact.orient3(ta,tb,tc,e.free)==0;
+        return exact.orient3(ta,tb,tc,raw3(parts.points[e.a]))==0&&exact.orient3(ta,tb,tc,raw3(parts.points[e.b]))==0;
+      };
       if(!on_plane(from)||!on_plane(to))return false;
-      int drop=-1;std::array<std::array<float,2>,3> flat;
+      int drop=constant;std::array<std::array<float,2>,3> flat;
+      if(drop>=0)for(int k=0;k<3;++k)flat[k]=projected(m.positions[m.indices[triangle*3+k]],drop);
       for(int axis=0;axis<3&&drop<0;++axis){for(int k=0;k<3;++k)flat[k]=projected(m.positions[m.indices[triangle*3+k]],axis);if(exact.orient2(flat[0],flat[1],flat[2]).sign)drop=axis;}
       if(drop<0)return false;
-      if(auto interval=exact.clip(flat,exact_endpoint(from,drop),exact_endpoint(to,drop)))coverage.push_back(*interval);
+      if(auto interval=exact.clip(flat,exact_endpoint(from,drop),exact_endpoint(to,drop)))
+        if(add_coverage(std::move(*interval)))return true;
       continue;
     }
     if(start||end)continue;
@@ -484,9 +536,8 @@ bool segment_material(const Mesh &m,const Components &parts,const Endpoint &from
     events.push_back(t);
   }
   if(!coverage.empty()) {
-    std::sort(coverage.begin(),coverage.end(),[&](const auto&a,const auto&b){return exact.compare(a.enter,b.enter)<0;});
-    auto reached=exact.zero();
-    for(const auto &piece:coverage){work.step();if(exact.compare(piece.enter,reached)>0)return false;if(exact.compare(piece.exit,reached)>0)reached=piece.exit;if(exact.compare(reached,exact.one())>=0)return true;}
+    // A full cover would already have returned above. Partial coplanar contact
+    // stays conservative even when another open interval looks interior.
     return false;
   }
   std::sort(events.begin(),events.end(),[&](auto a,auto b){work.step();return a<b;});
@@ -579,7 +630,9 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
   Mesh m=input;Point center{};
   for(int a=0;a<3;++a){double lo=INFINITY,hi=-INFINITY;for(auto p:m.positions){auto v=as_point(p)[a];lo=std::min(lo,v);hi=std::max(hi,v);}center[a]=(lo+hi)*.5;}
   for(auto &p:m.positions){work.step();p=as_vec(as_point(p)-center);}
-  auto parts=components(m,work);auto g=grid_for(m,o.cell_size,o.grid_phase,o.maximum_grid_points,memory);
+  memory.add(input.positions.size(),2*sizeof(uint32_t));
+  auto parts=components(m,work);memory.release(input.positions.size(),2*sizeof(uint32_t));
+  auto g=grid_for(m,o.cell_size,o.grid_phase,o.maximum_grid_points,memory);
   rasterize(m,g,work);memory.add(64,6*sizeof(uint32_t));mark_cut_cubes(m,g,work);
   auto inside=classify(m,parts,g,work,memory);
   const size_t n=inside.grid.size(),k=o.binding.limits.max_influences;
