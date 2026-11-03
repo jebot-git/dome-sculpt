@@ -211,8 +211,16 @@ bool same_normal_detail(const NormalDetailAuthority *expected,const BakedTexture
     same(baked->maps.mtoon_normal,*expected->mtoon);
 }
 } // namespace detail
-SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
- validate(i,o);SourceUvBakeResult result;Budget budget{o,result};budget.cancel();
+SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOptions&requested){
+ validate(i,requested);auto limits=requested;
+ if(i.paint->source_sampling_prepared()){
+  const auto &mesh=i.target;size_t fixed=sizeof(SourceUvBakeResult)+(mesh.positions.size()+mesh.normals.size())*sizeof(Vec3)+mesh.uv.size()*sizeof(std::array<float,2>)+mesh.indices.size()*sizeof(uint32_t)+mesh.uv_pins.size()+mesh.uv_seams.size()+i.source_vertices.size()*sizeof(uint32_t);
+  if(i.appearance)fixed+=i.source_vertices.size()*sizeof(uint32_t);
+  for(const auto &layer:i.paint->layers())fixed+=sizeof(PaintLayer)+layer.name.size()+1+(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size())*sizeof(std::shared_ptr<const PaintTile>);
+  if(fixed>=limits.max_working_bytes)throw std::length_error("Source UV fixed geometry/layer staging exceeds working budget");
+  limits.max_working_bytes-=fixed;
+ }
+ const auto &o=limits;SourceUvBakeResult result;Budget budget{o,result};budget.cancel();
  if(i.paint->has_physical_emission())throw std::invalid_argument("Physical emission requires its explicit linear UV transfer adapter");
  result.target=i.target;result.source_vertices=i.source_vertices;
  const bool prepared=bool(i.paint->color_projection()),normal_prepared=bool(i.paint->normal_projection());
