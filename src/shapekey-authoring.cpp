@@ -74,6 +74,70 @@ NormalFrameTarget authored_attributes(const Mesh &rest,const NormalFrames &artis
  return result;
 }
 
+// Capture the native shader's face UV derivative instead of smoothing adjacent
+// face tangents with Mikk. FixedAttributes stores these genuine corner values;
+// no imported tangent authority or CanonicalMikk interpretation is claimed.
+std::vector<Tangent> native_derivative_tangents(const Mesh &mesh,
+    const NormalFrames &base,const NormalFrameTarget *key,
+    std::span<const Vec3> delta,const std::function<bool()> &cancelled) {
+ std::vector<Tangent> result;result.reserve(mesh.indices.size());
+ auto position=[&](uint32_t v){return mesh.positions[v]+(delta.empty()?Vec3{}:delta[v]);};
+ for(size_t c=0;c<mesh.indices.size();c+=3){if((c&1023)==0)stop(cancelled);
+  const auto i=mesh.indices[c],j=mesh.indices[c+1],k=mesh.indices[c+2];
+  const auto e1=position(j)-position(i),e2=position(k)-position(i);
+  const auto a=mesh.uv[i],b=mesh.uv[j],d=mesh.uv[k];
+  const float u1=b[0]-a[0],v1=b[1]-a[1],u2=d[0]-a[0],v2=d[1]-a[1],det=u1*v2-u2*v1;
+  const float scale=std::sqrt((u1*u1+v1*v1)*(u2*u2+v2*v2));
+  if(!std::isfinite(det)||std::abs(det)<=1e-8f*std::max(scale,1e-20f))
+   throw std::invalid_argument("Native normal coordinate derivatives are singular; prepare a valid normal basis before key authoring");
+  const auto raw_t=(e1*v2-e2*v1)/det,raw_b=(e2*u1-e1*u2)/det;
+  for(size_t corner=c;corner<c+3;++corner){auto n=base.normals[corner];if(key&&!key->normals.empty())n+=key->normals[corner];n=normalized(n);
+   auto t=raw_t-n*dot(n,raw_t);const float size=length(t);
+   if(!finite(t)||!std::isfinite(size)||size<1e-10f)throw std::invalid_argument("Native normal derivative tangent is singular");
+   t=t/size;const float hand=dot(cross(n,t),raw_b)<0?-1.f:1.f;result.push_back({t.x,t.y,t.z,hand});
+  }
+ }
+ stop(cancelled);return result;
+}
+std::shared_ptr<const NormalFrameSet> capture_native_key_frames(const PaintedMesh &paint,
+    const DeformationState *deformation,const SourceMaterialBindings &binding,
+    const std::function<bool()> &cancelled) {
+ const auto &origin=*binding.uv_origin;const auto &rest=paint.mesh();
+ // A native capture is a real new frame. It may not borrow a differently
+ // parameterized first source as if that were the current geometry/UV owner.
+ const auto &owner=origin.paint->mesh();
+ if(origin.paint->source_maps()!=paint.source_maps()||owner.indices!=rest.indices||owner.uv!=rest.uv||!equal(owner.positions,rest.positions))
+  throw std::invalid_argument("Native key frame capture requires its current owning coordinate domain");
+ const auto &maps=origin.paint->source_maps();
+ if(maps&&maps->normal.image&&maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0})
+  throw std::invalid_argument("Prepare source normals before capturing a transformed native normal frame");
+ auto capture=[&](detail::ShapeFrameRole role) {
+  NormalFrames selection;
+  const auto coordinate=detail::shapekey_frame_coordinate(binding,selection,role);
+  auto mesh=rest;mesh.uv=detail::shapekey_frame_coordinates(binding,coordinate,cancelled);
+  auto candidate=detail::normal_bake_frame_candidate(mesh,deformation,nullptr,
+      {128*1024*1024,128*1024*1024,cancelled});
+  auto frame=std::make_shared<NormalFrames>(*candidate.frames->pbr);
+  frame->generated_uv=coordinate;
+  const bool normal_map=role==detail::ShapeFrameRole::Pbr?bool(maps&&maps->normal.image):
+      bool(origin.material&&origin.material->parameters.normal_enabled&&origin.material->textures[size_t(MToonSlot::Normal)].index>=0);
+  if(normal_map){
+   frame->tangents=native_derivative_tangents(mesh,*frame,nullptr,{},cancelled);
+   for(size_t slot=0;slot<frame->targets.size();++slot){auto &key=frame->targets[slot];auto tangents=native_derivative_tangents(mesh,*frame,&key,deformation->morphs->targets[slot].delta,cancelled);key.tangents.clear();key.tangents.reserve(tangents.size());
+    for(size_t c=0;c<tangents.size();++c){if((c&1023)==0)stop(cancelled);const auto t=tangents[c],b=frame->tangents[c];if(t[3]!=b[3])throw std::invalid_argument("Native normal key changes immutable tangent handedness");key.tangents.push_back({t[0]-b[0],t[1]-b[1],t[2]-b[2]});}
+   }
+  }
+  frame->validate();
+  auto frames=std::make_shared<NormalFrameSet>(*candidate.frames);
+  frames->pbr=frame;frames->mtoon=frame;return frames;
+ };
+ auto frames=capture(detail::ShapeFrameRole::Pbr);
+ const bool typed_normal=origin.material&&origin.material->parameters.normal_enabled&&origin.material->textures[size_t(MToonSlot::Normal)].index>=0;
+ if(binding.has_mtoon&&(detail::shapekey_frame_coordinate(binding,NormalFrames{},detail::ShapeFrameRole::MToon)!=*frames->pbr->generated_uv||(typed_normal&&!(maps&&maps->normal.image))))
+  frames->mtoon=capture(detail::ShapeFrameRole::MToon)->pbr;
+ frames->validate();return frames;
+}
+
 }
 ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &edit,
  const std::function<bool()> &cancelled){
@@ -131,10 +195,11 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
    catch(const std::invalid_argument&e){throw std::invalid_argument(std::string("Unwrap polygon UVs before shapekey frame authoring: ")+e.what());}
   }
   auto origin=std::make_shared<SourceUvOrigin>();origin->paint=o.painted->snapshot();origin->deformation=source.deformation;
+  if(source.material_bindings&&source.material_bindings->has_mtoon){origin->material=source.material_bindings->material;origin->roles=source.material_bindings->roles;}
   if(source.material_bindings && source.material_bindings->uv_origin)binding->uv_origin=source.material_bindings->uv_origin;
   else binding->uv_origin=std::move(origin);
   binding->has_mtoon=bool(source.material_bindings)&&source.material_bindings->has_mtoon;
-  binding->normal_frames=detail::normal_bake_frame_candidate(rest,source.deformation.get(),nullptr,{128*1024*1024,128*1024*1024,cancelled}).frames;
+  binding->normal_frames=capture_native_key_frames(*o.painted,source.deformation.get(),*binding,cancelled);
   binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
   if(!source.material_bindings){binding->native_reference.color=source.material.color;binding->native_reference.emission=source.material.emissive;binding->native_reference.alpha=int(source.material.alpha);binding->native_reference.alpha_cutoff=source.material.alpha_cutoff;binding->native_reference.double_sided=source.material.double_sided;}
  }
