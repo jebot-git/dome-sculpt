@@ -1,0 +1,19 @@
+# Private bounded variational skinning
+
+## Established method and explicit first domain
+
+Primary reference is Jacobson et al.2011 bounded biharmonic weights and libigl commitb41f1944a703653ae0da81e6588650ba14c270ea (bbw/harmonic/active_set/boundary_conditions). The original operator is Q=L^T M^-1 L, with box and fixed handle constraints. Libigl currently asserts partition_unity unsupported and its tutorial normalizes rows afterward. Its volumetric example requires a genuine tetrahedral domain with handle vertices; applying its operator on triangles is a SURFACE variational construction, not volumetric BBW. No third-party code is linked/copied into this kernel. Primary exact reference URLs/hashes are in validation/BIHARMONIC-REFERENCE.json.
+
+The new native matrix-free operator uses the independently checked signed cotangent FEM and mass lumping; positive mean-mass scaling changes no minimizer and supplies unit covariance. A primal-feasible active set/PCG solves each constrained free system. Actual fresh full-product KKT and descent checks govern acceptance. Geometry, UVs, source arrays and rig are immutable; output is staged and report commits last. Initial handles are nearest-source Voronoi minima projected onto each visible connected surface component, with coincident handles sharing normalized boundary values. Missing source or component handles refuse, never nearest-bone fallback. This domain/seed rule is an explicit first control.
+
+## Completed optimized CPU evidence
+
+Independent128SPD systems each enumerate81 active states in long double: maximum solution error1.9952e-16, KKT3.22998e-16,117bounded optima,129blocking steps/188releases. The first all-interior initialization correctly failed release-coverage assertion; final runs include lower/interior/upper feasible starts. Independent gradient-FEM/mass dense Q comparison gives4.44089e-16 error and direct constrained KKT1.73563e-16. Real open strip45vertices/10anchors and separate near-contact layers90/20 pass symmetry, exact projected values and inputs; KKT<6e-15 and raw partition0. Unseeded remote component refuses without report publication. These are fresh private TUs with copied UNINSTRUMENTED b32 support archives, not whole-owned sanitizer/native admission.
+
+## Actual first cohort failures
+
+Same fixed five-pose/bounds cohorts use one common policy per run. Midpoint control solves13female/12male parts; segment control solves15/15. Remaining parts refuse missing visible projected source handles or500M actual work. No solved subset fails pose bounds, but it is rigid-heavy and NOT evidence of complete avatar quality. Female auxiliary output is absent because those required parts refuse.1498 source/support/binary hashes match before/after. All failures and prior heat/geometry controls are preserved. No limits, missing-source checks or caps are relaxed.
+
+Next independent source projection requires explicit disconnected-component intent. Parent approved a separately typed source-assisted positive-joint USAGE OR per component, with exact source/mesh/joint owners; only positivity bits leave capture, no numerical artist values enter the solver. This is not geometry-only weighting nor native/unskinned completion. Geometry/user-landmark intent remains a separate required route. Native free-solve preconditioning will be improved under unchanged actual energy/KKT/work bounds.
+
+Required stress gates remain: open holes/sheets, thin folded limbs, disconnected and touching/overlap solids, unseeded components, retessellation/metric scale and source/seam/morph/foreign-owner controls, exact cancellation/allocation/source/report staging, both actual avatar posed quality, then real native/FLTK/controller history/Save/GLB/render. No GPU, public source/schema/native admission or goal completion. Dodik et al.2025 geometric-fields paper is also being evaluated for actual unmeshed-volume/open-soup support; it is not implemented or claimed here.

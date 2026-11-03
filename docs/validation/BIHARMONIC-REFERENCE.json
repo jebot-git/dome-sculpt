@@ -1,0 +1,38 @@
+{
+  "repository": "https://github.com/libigl/libigl",
+  "commit": "b41f1944a703653ae0da81e6588650ba14c270ea",
+  "files": {
+    "bbw.cpp": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/bbw.cpp",
+      "sha256": "eaefefec92714ca4405036d945570f889530fc7cb3a1244eeb78602fdf071792"
+    },
+    "bbw.h": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/bbw.h",
+      "sha256": "f2945f986c9e29611ffbbce8bc99abedaa59431c6198bb6faae5a3d8a1958e4e"
+    },
+    "harmonic.cpp": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/harmonic.cpp",
+      "sha256": "ab3ecda53e783b0607a85823c371e3229e5f34703d060c35323bdded15269740"
+    },
+    "active_set.cpp": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/active_set.cpp",
+      "sha256": "2ef91db2306ed25c4033da662ecf1abcdc1dc91f1200347f26f18c85a50bcfe1"
+    },
+    "active_set.h": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/active_set.h",
+      "sha256": "eaeecc8859cf388fb1e65270cf7cdd66b4656bef9b5620569ce569c368f29cb2"
+    },
+    "boundary_conditions.cpp": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/boundary_conditions.cpp",
+      "sha256": "1d1b56c0f25b9bb58a9e04b94a8db7289137751b74dfc51a6065ac51df8bcedf"
+    },
+    "massmatrix.cpp": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/massmatrix.cpp",
+      "sha256": "1530d01605a0f007ab4fd38bb86fb9a8183ef8c9674551e90b2aef58846766b9"
+    },
+    "cotmatrix.cpp": {
+      "url": "https://raw.githubusercontent.com/libigl/libigl/b41f1944a703653ae0da81e6588650ba14c270ea/include/igl/cotmatrix.cpp",
+      "sha256": "72654f5b14534e4704ecf51f86fc4b115906fad63b2594b8a0a0b0bf0c7e3d2a"
+    }
+  }
+}
