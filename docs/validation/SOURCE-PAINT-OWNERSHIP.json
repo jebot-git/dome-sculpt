@@ -1,0 +1,1415 @@
+{
+  "recorded_utc": "2026-11-03T15:31:03.335383+00:00",
+  "status": "qualified private owning-data milestone; application admission incomplete",
+  "runtime": "17f5dd0",
+  "resource_fixture": "59fc945",
+  "final_registered_fault_test": "6987cf6",
+  "documentation_only_merge": "8db27ee63662051c5b386e526575ee203a7b3ba6",
+  "public_main_merged": "db8fc94cc12d5b468389b3aff71cbd35ce6caac4",
+  "scope": "Changed paint and earlier exact eight-TU Scene/archive/kernel cohort with matching immutable optimized or owned sanitizer support; no public layout append, frontend/render build, GPU or physical HMD claim.",
+  "profiles": [
+    "Release -O3",
+    "owned ASan/UBSan/leak O1 support (exact flags recorded in local status)"
+  ],
+  "owning_checks_each": 26,
+  "Scene_checks_each": 74,
+  "resource_checks_each": 24,
+  "selected_runs_each": 12,
+  "persistent_faults_each": {
+    "prepare": 45,
+    "encode": 486,
+    "decode": 109,
+    "stamp": 3,
+    "total": 643
+  },
+  "preparation_cancellation_each": 9,
+  "new_files": [
+    {
+      "name": "0-empty.dsculpt",
+      "bytes": 1971,
+      "sha256": "47efd4376c27adf3214a0c72bd674237c548ec9c8787bc07f65be897c604f060",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    },
+    {
+      "name": "0-painted.dsculpt",
+      "bytes": 30675,
+      "sha256": "de0f943d975f8f3914aa9884706092ab9da7ecf7146254e13262dc2c81566020",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    },
+    {
+      "name": "1-empty.dsculpt",
+      "bytes": 3343,
+      "sha256": "36ff062a2436e907eed4b27d9c16aacb81ebf6e2ebd7f4897abcfddd5a6e4c99",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    },
+    {
+      "name": "1-painted.dsculpt",
+      "bytes": 32047,
+      "sha256": "1035b4bb2d20e95c75271a83ec8e90e4aa2fbd74d3b1e823cb203dcdca13f1c4",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    },
+    {
+      "name": "2-empty.dsculpt",
+      "bytes": 2884,
+      "sha256": "153b13f8b242adc0d71924283595824d22888a37ece19d67d32d6e8fc7186d6f",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    },
+    {
+      "name": "2-painted.dsculpt",
+      "bytes": 31588,
+      "sha256": "fd2be8ae9e1cd88c16b0e1e1f67fdd347bee0627470ede7f743851483fc476b4",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    },
+    {
+      "name": "3-empty.dsculpt",
+      "bytes": 2923,
+      "sha256": "de148e5d245ffbcf22cbcbce0f445611a2a68f2ecf61f94f46f39d4e2ebbb44d",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    },
+    {
+      "name": "3-painted.dsculpt",
+      "bytes": 31627,
+      "sha256": "e85092e694ff86b0c26efac207c8a30fb6d29237a1583d00384647e759f35be7",
+      "Release_SAN_and_original_old_reader_inputs_identical": true
+    }
+  ],
+  "old_public_reader": {
+    "baseline_binary": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+    "binary_sha256": "f2c94f8a71202d0c2ee07acbefde260b85c7174b309f9bc53724c73759a663d1",
+    "baseline_source": "39210fca93c99a49d00d6a5209976e0caf324275",
+    "CPU_SAN_files_byte_identical": true,
+    "files": 8,
+    "results": [
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/0-empty.dsculpt",
+        "sha256": "47efd4376c27adf3214a0c72bd674237c548ec9c8787bc07f65be897c604f060",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/0-empty.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.03355454799020663,
+        "output": "Unsupported scene version\n"
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/0-painted.dsculpt",
+        "sha256": "de0f943d975f8f3914aa9884706092ab9da7ecf7146254e13262dc2c81566020",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/0-painted.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.011509255011333153,
+        "output": "Unsupported scene version\n"
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/1-empty.dsculpt",
+        "sha256": "36ff062a2436e907eed4b27d9c16aacb81ebf6e2ebd7f4897abcfddd5a6e4c99",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/1-empty.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.011376006004866213,
+        "output": "Unsupported scene version\n"
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/1-painted.dsculpt",
+        "sha256": "1035b4bb2d20e95c75271a83ec8e90e4aa2fbd74d3b1e823cb203dcdca13f1c4",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/1-painted.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.012428688001818955,
+        "output": "Unsupported scene version\n"
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/2-empty.dsculpt",
+        "sha256": "153b13f8b242adc0d71924283595824d22888a37ece19d67d32d6e8fc7186d6f",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/2-empty.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.011618318007094786,
+        "output": "Unsupported scene version\n"
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/2-painted.dsculpt",
+        "sha256": "fd2be8ae9e1cd88c16b0e1e1f67fdd347bee0627470ede7f743851483fc476b4",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/2-painted.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.011551250994671136,
+        "output": "Unsupported scene version\n"
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/3-empty.dsculpt",
+        "sha256": "de148e5d245ffbcf22cbcbce0f445611a2a68f2ecf61f94f46f39d4e2ebbb44d",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/3-empty.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.011147709999931976,
+        "output": "Unsupported scene version\n"
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/3-painted.dsculpt",
+        "sha256": "e85092e694ff86b0c26efac207c8a30fb6d29237a1583d00384647e759f35be7",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cpu/dome-sculpt",
+          "--project-info",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-owning-5e4/artifacts/owning-proof/scene-cpu-minimal/run/3-painted.dsculpt"
+        ],
+        "exit_code": 1,
+        "seconds": 0.011411701998440549,
+        "output": "Unsupported scene version\n"
+      }
+    ]
+  },
+  "proof_records": [
+    {
+      "name": "cpu",
+      "local_status": "artifacts/owning-proof/cpu/status.json",
+      "status_sha256": "688bf9fbbc13745a9c7667849f796210145566f0aa2e87c92a17a86b43124365",
+      "source": "5d74b0e54e9b97524198736d6ef7d0e0f560c2ac",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Fresh changed paint/kernel+owning consumer TUs; immutable matching CPU/SAN owned core/support, public class sizes unchanged (methods/friends only), no new TextureMaps field. Standalone owning data/gesture/history/replay, not Scene/native renderer/UI/GPU admission.",
+      "runs": [
+        {
+          "name": "compile-transport",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.735986904008314
+        },
+        {
+          "name": "compile-test",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.295617139985552
+        },
+        {
+          "name": "compile-paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 9.07766825100407
+        },
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.1042726690066047
+        },
+        {
+          "name": "owning",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.004400393983814865
+        }
+      ]
+    },
+    {
+      "name": "san",
+      "local_status": "artifacts/owning-proof/san/status.json",
+      "status_sha256": "07db7359bbe5a38c92b655676ba9d192e8054a992e62a357d2efb4bf16d476c2",
+      "source": "5d74b0e54e9b97524198736d6ef7d0e0f560c2ac",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Fresh changed paint/kernel+owning consumer TUs; immutable matching CPU/SAN owned core/support, public class sizes unchanged (methods/friends only), no new TextureMaps field. Standalone owning data/gesture/history/replay, not Scene/native renderer/UI/GPU admission.",
+      "runs": [
+        {
+          "name": "compile-transport",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.1601204609905835
+        },
+        {
+          "name": "compile-test",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.529691064002691
+        },
+        {
+          "name": "compile-paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 16.44360429199878
+        },
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.166103931987891
+        },
+        {
+          "name": "owning",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.08727985201403499
+        }
+      ]
+    },
+    {
+      "name": "scene-cpu-minimal",
+      "local_status": "artifacts/owning-proof/scene-cpu-minimal/status.json",
+      "status_sha256": "339d4a2fa9b2f48460ecc415a1b0e829841ab5d75cc6c6faf09345eab6a751ca",
+      "source": "cdb75c8f78c8ed1f58d6c124bc98041afbf483f6",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Exact unchanged 8 freshly owned matching TUs from metadata source819a2cc; new test-only true minimal-feature guard. Scene data/restart only, no renderer/UI/paint export qualification.",
+      "runs": [
+        {
+          "name": "compile-test",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.4982105550006963
+        },
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.17682464799145237
+        },
+        {
+          "name": "scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.02159693301655352
+        }
+      ]
+    },
+    {
+      "name": "scene-san-minimal",
+      "local_status": "artifacts/owning-proof/scene-san-minimal/status.json",
+      "status_sha256": "a532baeaec1a22bb3550125682fa9dc30696e23d7993ad1d47a97efa18302907",
+      "source": "cdb75c8f78c8ed1f58d6c124bc98041afbf483f6",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Exact unchanged 8 freshly owned matching TUs from metadata source819a2cc; new test-only true minimal-feature guard. Scene data/restart only, no renderer/UI/paint export qualification.",
+      "runs": [
+        {
+          "name": "compile-test",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.6728606630058493
+        },
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.3828725880011916
+        },
+        {
+          "name": "scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.1684895990183577
+        }
+      ]
+    },
+    {
+      "name": "regressions-cpu",
+      "local_status": "artifacts/owning-proof/regressions-cpu/status.json",
+      "status_sha256": "578dc8c55f91a1c7e1d6dc94e7a99c31e1a8217ee48c78b8f1d89c4e612c6749",
+      "source": "cdb75c8f78c8ed1f58d6c124bc98041afbf483f6",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Selected legacy/source/Scene plus owning-data regressions using exact matching eight fresh metadata TUs and immutable owned support. No renderer/frontend/all-suite claim.",
+      "runs": [
+        {
+          "name": "source-paint-owning-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.7999286470003426
+        },
+        {
+          "name": "source-paint-owning-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.178464819007786
+        },
+        {
+          "name": "source-paint-owning",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.005328985018422827
+        },
+        {
+          "name": "source-sampling-transport-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.4748541919980198
+        },
+        {
+          "name": "source-sampling-transport-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.19296399102313444
+        },
+        {
+          "name": "source-sampling-transport",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.007240569015266374
+        },
+        {
+          "name": "initial-source-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 6.661035010998603
+        },
+        {
+          "name": "initial-source-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.22921071597374976
+        },
+        {
+          "name": "initial-source-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.12044493897701614
+        },
+        {
+          "name": "source-uv1-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.931154370016884
+        },
+        {
+          "name": "source-uv1-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.19575361200259067
+        },
+        {
+          "name": "source-uv1",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.024369605001993477
+        },
+        {
+          "name": "source-uv-bake-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 7.5730703140143305
+        },
+        {
+          "name": "source-uv-bake-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.29580538099980913
+        },
+        {
+          "name": "source-uv-bake",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.938533508015098
+        },
+        {
+          "name": "source-uv-adopt-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 4.5483683990023565
+        },
+        {
+          "name": "source-uv-adopt-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.21737859200220555
+        },
+        {
+          "name": "source-uv-adopt",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.056154026999138296
+        },
+        {
+          "name": "source-extra-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.6212032749899663
+        },
+        {
+          "name": "source-extra-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.20497746698674746
+        },
+        {
+          "name": "source-extra-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.0055281330132856965
+        },
+        {
+          "name": "source-extra-uv-closure-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 7.46143333800137
+        },
+        {
+          "name": "source-extra-uv-closure-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.21370192701579072
+        },
+        {
+          "name": "source-extra-uv-closure",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.012196575000416487
+        },
+        {
+          "name": "paint-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.7831638290081173
+        },
+        {
+          "name": "paint-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.21920139898429625
+        },
+        {
+          "name": "paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.6566312159993686
+        },
+        {
+          "name": "scene-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.544542540999828
+        },
+        {
+          "name": "scene-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.19591220997972414
+        },
+        {
+          "name": "scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.2878691539808642
+        }
+      ]
+    },
+    {
+      "name": "regressions-san",
+      "local_status": "artifacts/owning-proof/regressions-san/status.json",
+      "status_sha256": "6a614a483ce4e5f17d345e1777884b101c419341d09f12ab27ddae3f0ed6d351",
+      "source": "cdb75c8f78c8ed1f58d6c124bc98041afbf483f6",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Selected legacy/source/Scene plus owning-data regressions using exact matching eight fresh metadata TUs and immutable owned support. No renderer/frontend/all-suite claim.",
+      "runs": [
+        {
+          "name": "source-paint-owning-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 4.377065472013783
+        },
+        {
+          "name": "source-paint-owning-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.626899656985188
+        },
+        {
+          "name": "source-paint-owning",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.11518290700041689
+        },
+        {
+          "name": "source-sampling-transport-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.4745503140147775
+        },
+        {
+          "name": "source-sampling-transport-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.585059768985957
+        },
+        {
+          "name": "source-sampling-transport",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.1198804680025205
+        },
+        {
+          "name": "initial-source-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 8.720115339994663
+        },
+        {
+          "name": "initial-source-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.690806322003482
+        },
+        {
+          "name": "initial-source-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.994603127008304
+        },
+        {
+          "name": "source-uv1-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 6.286365778010804
+        },
+        {
+          "name": "source-uv1-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.6562382449919824
+        },
+        {
+          "name": "source-uv1",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.20890176101238467
+        },
+        {
+          "name": "source-uv-bake-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 14.023781082971254
+        },
+        {
+          "name": "source-uv-bake-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.656104747991776
+        },
+        {
+          "name": "source-uv-bake",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 10.613632612978108
+        },
+        {
+          "name": "source-uv-adopt-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 7.941602683014935
+        },
+        {
+          "name": "source-uv-adopt-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.6044930450152606
+        },
+        {
+          "name": "source-uv-adopt",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.44583554298151284
+        },
+        {
+          "name": "source-extra-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 5.98123896800098
+        },
+        {
+          "name": "source-extra-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.5880174709891435
+        },
+        {
+          "name": "source-extra-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.10704465198796242
+        },
+        {
+          "name": "source-extra-uv-closure-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 10.685443560010754
+        },
+        {
+          "name": "source-extra-uv-closure-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.6366434390074573
+        },
+        {
+          "name": "source-extra-uv-closure",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.17771159901167266
+        },
+        {
+          "name": "paint-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 5.32819713500794
+        },
+        {
+          "name": "paint-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.6026334080088418
+        },
+        {
+          "name": "paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 38.139920109999366
+        },
+        {
+          "name": "scene-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 4.289672178012552
+        },
+        {
+          "name": "scene-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.5628668339923024
+        },
+        {
+          "name": "scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.2372487249958795
+        }
+      ]
+    },
+    {
+      "name": "working-budget-old",
+      "local_status": "artifacts/owning-proof/working-budget-old/status.json",
+      "status_sha256": "75553193b20f551ea573d7d8a29b4a50161ec8ef534170817f61f1f776e93d90",
+      "source": null,
+      "status": null,
+      "exit_code": null,
+      "input_drift": [],
+      "scope": null,
+      "runs": [
+        {
+          "name": "compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.7020785459899344
+        },
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.4159103709971532
+        },
+        {
+          "name": "working-budget",
+          "exit_code": 1,
+          "expected": 1,
+          "seconds": 0.5002313729783054
+        }
+      ]
+    },
+    {
+      "name": "resources-cpu",
+      "local_status": "artifacts/owning-proof/resources-cpu/status.json",
+      "status_sha256": "8e0668d5be0c88e1c31dc4e459afe852721ac0495c149bbff05c0d0ba1c39a9e",
+      "source": "17f5dd0228a520b2c2cdf73cb132b18e9e04a7f9",
+      "status": "terminal",
+      "exit_code": 1,
+      "input_drift": [],
+      "scope": "Changed paint TU with exact previous eight-TU metadata cohort for unchanged Scene/archive/kernel definitions; matching owned Release or sanitizer support, no public layout change. Real2048 source/current save/reopen;100k retained rows and actual layered stroke boundary; owning/Scene regressions. CPU controls link old paint/runtime and new test only. No renderer/native/frontend admission.",
+      "runs": [
+        {
+          "name": "compile-paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 10.189498460997129
+        },
+        {
+          "name": "source-paint-resources-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.1879283520102035
+        },
+        {
+          "name": "source-paint-resources-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.2167025530070532
+        },
+        {
+          "name": "old-resources-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.22349946000031196
+        },
+        {
+          "name": "old-grid",
+          "exit_code": 1,
+          "expected": 1,
+          "seconds": 0.3558997309883125
+        },
+        {
+          "name": "old-storage",
+          "exit_code": 1,
+          "expected": 1,
+          "seconds": 0.007724759023403749
+        },
+        {
+          "name": "source-paint-resources",
+          "exit_code": 1,
+          "expected": 0,
+          "seconds": 0.7781254910223652
+        }
+      ]
+    },
+    {
+      "name": "resources-san",
+      "local_status": "artifacts/owning-proof/resources-san/status.json",
+      "status_sha256": "e5a3c80da17922264defa008a09e597301b404b87980184d4ab3df3d2e7f65f4",
+      "source": "17f5dd0228a520b2c2cdf73cb132b18e9e04a7f9",
+      "status": "terminal",
+      "exit_code": 1,
+      "input_drift": [],
+      "scope": "Changed paint TU with exact previous eight-TU metadata cohort for unchanged Scene/archive/kernel definitions; matching owned Release or sanitizer support, no public layout change. Real2048 source/current save/reopen;100k retained rows and actual layered stroke boundary; owning/Scene regressions. CPU controls link old paint/runtime and new test only. No renderer/native/frontend admission.",
+      "runs": [
+        {
+          "name": "compile-paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 22.02237629299634
+        },
+        {
+          "name": "source-paint-resources-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.914705931994831
+        },
+        {
+          "name": "source-paint-resources-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.5741723490064032
+        },
+        {
+          "name": "source-paint-resources",
+          "exit_code": 1,
+          "expected": 0,
+          "seconds": 3.882098672009306
+        }
+      ]
+    },
+    {
+      "name": "resources-paired-cpu",
+      "local_status": "artifacts/owning-proof/resources-paired-cpu/status.json",
+      "status_sha256": "7f19cefee51cf773f504cf3e00fa79f1d95ee72f1aef47f896fcbb2f63cf5399",
+      "source": "59fc9452e09052395db544f1dbf173b6ff174304",
+      "status": "terminal",
+      "exit_code": 1,
+      "input_drift": [],
+      "scope": "Changed paint TU with exact previous eight-TU metadata cohort for unchanged Scene/archive/kernel definitions; matching owned Release or sanitizer support, no public layout change. Real2048 source/current save/reopen;100k retained rows and actual layered stroke boundary; owning/Scene regressions. CPU controls link old paint/runtime and new test only. No renderer/native/frontend admission.",
+      "runs": [
+        {
+          "name": "source-paint-resources-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.4600019849895034
+        },
+        {
+          "name": "source-paint-resources-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.2289203479886055
+        },
+        {
+          "name": "old-resources-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.30646211898420006
+        },
+        {
+          "name": "old-storage",
+          "exit_code": 1,
+          "expected": 1,
+          "seconds": 1.1691377370152622
+        },
+        {
+          "name": "source-paint-resources",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.3389988430135418
+        },
+        {
+          "name": "source-paint-owning-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.978629771998385
+        },
+        {
+          "name": "source-paint-owning-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.24401560900150798
+        },
+        {
+          "name": "source-paint-owning",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.00894137000432238
+        },
+        {
+          "name": "source-paint-scene-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.707049886987079
+        },
+        {
+          "name": "source-paint-scene-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.2089352130133193
+        },
+        {
+          "name": "source-paint-scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.029770294000627473
+        },
+        {
+          "name": "source-sampling-transport-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.5517873659846373
+        },
+        {
+          "name": "source-sampling-transport-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.26577900600386783
+        },
+        {
+          "name": "source-sampling-transport",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.007749823009362444
+        },
+        {
+          "name": "initial-source-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 9.159497019980336
+        },
+        {
+          "name": "initial-source-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.32720375899225473
+        },
+        {
+          "name": "initial-source-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.13792081701103598
+        },
+        {
+          "name": "source-uv1-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 5.286762244999409
+        },
+        {
+          "name": "source-uv1-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.3917845149990171
+        },
+        {
+          "name": "source-uv1",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.019229458004701883
+        },
+        {
+          "name": "source-uv-bake-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 11.98002098701545
+        },
+        {
+          "name": "source-uv-bake-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.44451375101925805
+        },
+        {
+          "name": "source-uv-bake",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.60913814700325
+        },
+        {
+          "name": "source-uv-adopt-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 7.550389618001645
+        },
+        {
+          "name": "source-uv-adopt-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.2984234710165765
+        },
+        {
+          "name": "source-uv-adopt",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.07725433498853818
+        },
+        {
+          "name": "source-extra-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 5.282083363010315
+        },
+        {
+          "name": "source-extra-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.35277345700887963
+        },
+        {
+          "name": "source-extra-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.015549109986750409
+        },
+        {
+          "name": "source-extra-uv-closure-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 9.894445558980806
+        },
+        {
+          "name": "source-extra-uv-closure-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.39226440302445553
+        },
+        {
+          "name": "source-extra-uv-closure",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.022840051009552553
+        },
+        {
+          "name": "paint-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 6.835423529992113
+        },
+        {
+          "name": "paint-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.4119395110174082
+        },
+        {
+          "name": "paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 4.736545827996451
+        },
+        {
+          "name": "scene-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 4.965574839996407
+        },
+        {
+          "name": "scene-link",
+          "exit_code": 1,
+          "expected": 0,
+          "seconds": 0.008501620992319658
+        }
+      ]
+    },
+    {
+      "name": "resources-paired-san",
+      "local_status": "artifacts/owning-proof/resources-paired-san/status.json",
+      "status_sha256": "80c3d70310b6efa34a3d2fab101dd02a34a7f851102374222947315c3720b4c7",
+      "source": "59fc9452e09052395db544f1dbf173b6ff174304",
+      "status": "terminal",
+      "exit_code": 1,
+      "input_drift": [],
+      "scope": "Changed paint TU with exact previous eight-TU metadata cohort for unchanged Scene/archive/kernel definitions; matching owned Release or sanitizer support, no public layout change. Real2048 source/current save/reopen;100k retained rows and actual layered stroke boundary; owning/Scene regressions. CPU controls link old paint/runtime and new test only. No renderer/native/frontend admission.",
+      "runs": [
+        {
+          "name": "source-paint-resources-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.3141922139911912
+        },
+        {
+          "name": "source-paint-resources-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.7413250590034295
+        },
+        {
+          "name": "source-paint-resources",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 25.807476050016703
+        },
+        {
+          "name": "source-paint-owning-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 6.3452567539934535
+        },
+        {
+          "name": "source-paint-owning-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.389229886000976
+        },
+        {
+          "name": "source-paint-owning",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.22916229799739085
+        },
+        {
+          "name": "source-paint-scene-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 6.6809353140124585
+        },
+        {
+          "name": "source-paint-scene-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.2404761780053377
+        },
+        {
+          "name": "source-paint-scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.3335186610056553
+        },
+        {
+          "name": "source-sampling-transport-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.507860084006097
+        },
+        {
+          "name": "source-sampling-transport-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.035899328009691
+        },
+        {
+          "name": "source-sampling-transport",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.24975285498658195
+        },
+        {
+          "name": "initial-source-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 13.432961843995145
+        },
+        {
+          "name": "initial-source-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.0328933609998785
+        },
+        {
+          "name": "initial-source-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.2855810159817338
+        },
+        {
+          "name": "source-uv1-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 8.333463699003914
+        },
+        {
+          "name": "source-uv1-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.1377325679932255
+        },
+        {
+          "name": "source-uv1",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.18670424100128002
+        },
+        {
+          "name": "source-uv-bake-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 17.12188286401215
+        },
+        {
+          "name": "source-uv-bake-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.7306020809919573
+        },
+        {
+          "name": "source-uv-bake",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 10.656832720997045
+        },
+        {
+          "name": "source-uv-adopt-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 7.923833971988643
+        },
+        {
+          "name": "source-uv-adopt-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.6149604599922895
+        },
+        {
+          "name": "source-uv-adopt",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.5614594669896178
+        },
+        {
+          "name": "source-extra-uv-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 6.209393608995015
+        },
+        {
+          "name": "source-extra-uv-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.6260645119764376
+        },
+        {
+          "name": "source-extra-uv",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.14139982900815085
+        },
+        {
+          "name": "source-extra-uv-closure-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 11.156951381010003
+        },
+        {
+          "name": "source-extra-uv-closure-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.807218294008635
+        },
+        {
+          "name": "source-extra-uv-closure",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.23851175099844113
+        },
+        {
+          "name": "paint-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 8.148971079994226
+        },
+        {
+          "name": "paint-link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.2670523569977377
+        },
+        {
+          "name": "paint",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 41.618918978987494
+        },
+        {
+          "name": "scene-compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 4.409483383002225
+        },
+        {
+          "name": "scene-link",
+          "exit_code": 1,
+          "expected": 0,
+          "seconds": 0.006216758018126711
+        }
+      ]
+    },
+    {
+      "name": "scene-path-cpu",
+      "local_status": "artifacts/owning-proof/scene-path-cpu/status.json",
+      "status_sha256": "f4c4f5f569de6ccdc904a1c5ee75371c5a649a710bcf2847ed259ce30ec507dc",
+      "source": "59fc9452e09052395db544f1dbf173b6ff174304",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Same unchanged compiled Scene regression TU and coherent paint/eight-TU/support objects; only harness executable output path avoids earlier fixture directory collision. No source edits or assertion changes.",
+      "runs": [
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.20223386600264348
+        },
+        {
+          "name": "scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.28897353197680786
+        }
+      ]
+    },
+    {
+      "name": "scene-path-san",
+      "local_status": "artifacts/owning-proof/scene-path-san/status.json",
+      "status_sha256": "7a65f6f7e0c245275e4aa95c2515648ef31c63e8550deaf7c6701cf4000597a3",
+      "source": "59fc9452e09052395db544f1dbf173b6ff174304",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Same unchanged compiled Scene regression TU and coherent paint/eight-TU/support objects; only harness executable output path avoids earlier fixture directory collision. No source edits or assertion changes.",
+      "runs": [
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.5932513370062225
+        },
+        {
+          "name": "scene",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.4037998850108124
+        }
+      ]
+    },
+    {
+      "name": "fault-final-cpu",
+      "local_status": "artifacts/owning-proof/fault-final-cpu/status.json",
+      "status_sha256": "76aac8d194f55669f7077b64d9a057f1916d876028b76384de661fae51203d9e",
+      "source": "6987cf689722cad242ce830c32e2467c9705f681",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Registered final oracle, same coherent changed paint TU and immutable owned core/support; actual measured persistent prepare/encode/decode/stamp allocation failures and cancellation. No runtime source edits, no frontend/GPU.",
+      "runs": [
+        {
+          "name": "compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.861120032990584
+        },
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.27650661300867796
+        },
+        {
+          "name": "faults",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 0.08506523701362312
+        }
+      ]
+    },
+    {
+      "name": "fault-final-san",
+      "local_status": "artifacts/owning-proof/fault-final-san/status.json",
+      "status_sha256": "1fa9f64da2dd14524881bcce323a7ea0a5eee7f2d0ccc6e511cc3f708ca02624",
+      "source": "6987cf689722cad242ce830c32e2467c9705f681",
+      "status": "terminal",
+      "exit_code": 0,
+      "input_drift": [],
+      "scope": "Registered final oracle, same coherent changed paint TU and immutable owned core/support; actual measured persistent prepare/encode/decode/stamp allocation failures and cancellation. No runtime source edits, no frontend/GPU.",
+      "runs": [
+        {
+          "name": "compile",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 3.7448683900001924
+        },
+        {
+          "name": "link",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 1.9348162130045239
+        },
+        {
+          "name": "faults",
+          "exit_code": 0,
+          "expected": 0,
+          "seconds": 2.0040912500116974
+        }
+      ]
+    }
+  ],
+  "negative_results_preserved": [
+    "Initial recursive JSON dependent-type compile error; fixed concrete type.",
+    "Real material preflight layers-not-found; fixed Paint4 payload traversal.",
+    "Old actual2048 producer explicit512MiB accepted / reader256MiB refused.",
+    "First resource fixture had UV1 coordinates without an actual UV1 texture view; corrected fixture only.",
+    "Old real100k-row layered source exceeds retained128MiB while tile-only admission accepts.",
+    "Final Scene regression output path collided with an earlier fixture directory in both wrappers; same objects relinked to distinct scene-regression path and passed."
+  ],
+  "remaining": [
+    "Painted native GPU preview and material-aware picking",
+    "Native import/authoring/UI and export/bake/normal/MToon adapter integration",
+    "Source28 plus HDR27 and seam-owner alias semantic union",
+    "Broader original-source raster/work/whole-archive budgeting",
+    "Untextured and MatCap-only raw-coordinate capture",
+    "All remaining full production requirements and post-basic controller drawers"
+  ],
+  "system_install": false,
+  "physical_headset": false,
+  "GPU": false,
+  "session_restart": false
+}

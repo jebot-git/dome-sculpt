@@ -1,5 +1,20 @@
 # Full objective and completion evidence
 
+## Private independent-source paint data checkpoint — 2026-11-03
+
+The isolated source-paint-owning continuation now owns real pristine original
+sampling beside an independent writable grid through conditional Paint4/Scene28.
+Owning26/Scene74/resource24 pass in Release and owned sanitizer profiles; twelve
+selected runs each pass after preserved test-harness corrections. All643 actual
+persistent allocation boundaries and nine cancellation points pass per profile.
+The actual public app rejects eight new-format files; all outputs are byte-exact
+between profiles. A real2048 producer/reader memory-budget mismatch and retained
+source storage omission are fixed. Read SOURCE-PAINT-OWNERSHIP.md and its receipt.
+This is data-layer evidence, not live paint preview, native import/UI, GPU/export
+or whole-app admission. The shared GPU overlay integration and every unfinished
+original/additional requirement remain required; no system/session changed.
+
+
 ## Private original-sampling transport prototype — 2026-11-03
 
 Exact source image coordinates/samplers now transport independently of a new UV0
