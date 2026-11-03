@@ -1,4 +1,8 @@
-# Reverse reconstruction quality prototype
+# Historical reverse reconstruction quality prototype
+
+The initial prototype below is retained as history. The implemented bounded
+production tier and completed evidence are in [GPU-RESOLUTION-QUALITY.md](GPU-RESOLUTION-QUALITY.md); its ledger records all remaining hardware scope.
+
 
 This private child of4fbc72d adds an actual aggregate sparse-field API, not yet
 production Volume eligibility. Existing forward interpolation and surface/
