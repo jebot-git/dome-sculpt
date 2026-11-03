@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "base_commit": "9050f3648da315a524f1b0508c91ac8b91c9a73c",
+  "status": "Detached private geometry kernel only; no runtime adoption, public layout, codec, Scene22, CMake or guard changes.",
+  "release": {
+    "checks": 30,
+    "exit_code": 0,
+    "before_after_equal": true,
+    "input_hashes": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-core.a": "132e966342b688dfd82467a770cf2a67b2758d5ab39b8b274487971207c6c7de",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/src/corner-key-expansion.cpp": "c59c2cdae9642178f44c0febcb54040ffe27aff66f75bf61f1c6513050ef257d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/src/corner-key-expansion.hpp": "23ce3e98ddbee34a5bf9400392cd50b70a2325f5685c73d350970dc9ea3889cf",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/tests/corner-key-expansion.cpp": "184a06c4999546f231511b2b1f4eae628cc0ad6c0d52382c7a71f23964ffa687",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/artifacts/corner-key-expansion-runtime.o": "190cff39eb8b4493ce18c6a0c3de6f643cc999674785d7b4886495951d774e95",
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/seam-retained.dsculpt": "f34fe63cc77881c3335f80f3110d5c9bdd4b585ebfdf65beb091386892d56094",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/artifacts/corner-key-expansion-final": "50df45cf4e0dd9ee82fcbe3c1b618c0a599631a450fb229b93387abb2cccaf2c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/artifacts/corner-key-expansion.o": "5a52ab6c77139a950636cd9e879f9afa2ec77448c48abe30dc1a91673b4cf6fd"
+    }
+  },
+  "sanitizers": {
+    "checks": 30,
+    "exit_code": 0,
+    "before_after_equal": true,
+    "scope": "Complete own corner-key-expansion.cpp and fixture translation units compiled O1/g1 ASan+UBSan, leaks enabled, linked against matching immutable native c79/38cc support archives. Support libraries are not instrumented by this run; not whole-core sanitizer qualification.",
+    "input_hashes": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-core.a": "132e966342b688dfd82467a770cf2a67b2758d5ab39b8b274487971207c6c7de",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64",
+      "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/src/corner-key-expansion.cpp": "c59c2cdae9642178f44c0febcb54040ffe27aff66f75bf61f1c6513050ef257d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/src/corner-key-expansion.hpp": "23ce3e98ddbee34a5bf9400392cd50b70a2325f5685c73d350970dc9ea3889cf",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/tests/corner-key-expansion.cpp": "184a06c4999546f231511b2b1f4eae628cc0ad6c0d52382c7a71f23964ffa687",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/artifacts/corner-key-expansion-runtime.o": "190cff39eb8b4493ce18c6a0c3de6f643cc999674785d7b4886495951d774e95",
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/seam-retained.dsculpt": "f34fe63cc77881c3335f80f3110d5c9bdd4b585ebfdf65beb091386892d56094",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/artifacts/corner-key-expansion-sanitize": "6928558402a9f15737e551200be123840c7caeb1da383d9e5d7561ae3b4d5eec",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-domain-9050/artifacts/corner-key-expansion-sanitize.o": "e5a03cacc7a59b3ad4c2ee752a42f0309f8f76aa4108fed028e40e77f5397786"
+    }
+  },
+  "independent_oracles": {
+    "opposite_seam_displacement": [
+      0.013,
+      -0.017
+    ],
+    "normal_cross_product_maximum_error": 0,
+    "tangent_uv_jacobian_maximum_error": 5.96046e-08,
+    "actual_persistent_allocation_prefixes": 8,
+    "cancel_boundaries": [
+      "entry",
+      "after actual geometry construction"
+    ]
+  },
+  "evidence": {
+    "artifacts/kernel-final.log": "f740832f24c4304b910e4c2c1c6c19834405aed4a5ba6dbf5835cb5f4fcbabea",
+    "artifacts/kernel-final-status.json": "fb06f6594b19839594b4a0ec4de7b4d254845f8478f4f01b6352ba679552dfa7",
+    "artifacts/kernel-final-before.json": "cd99e71dcbc952a09c755b1f7cef85947c57b0df04ae20cb7f3c94924349c11d",
+    "artifacts/kernel-final.map": "2b339c9a8d495e6fbc493caa98efdead7b9cd3c0fc761c924433550c15b99ef3",
+    "artifacts/kernel-sanitize.log": "f740832f24c4304b910e4c2c1c6c19834405aed4a5ba6dbf5835cb5f4fcbabea",
+    "artifacts/kernel-sanitize-status.json": "08ddb4e9d586d07b1fa87fc406a3c5b6b657756deab3b96ecbf5df250acc10f9",
+    "artifacts/kernel-sanitize-before.json": "a54c4bd21b9bb450b7816f83772bec76842650444cbec95306750ce4387c72ff",
+    "artifacts/kernel-sanitize.map": "2ca4c01a9734c2b2abb7383715a7706797504cffaf1974df8002549a62edb1a1"
+  },
+  "not_proven": [
+    "No authored artist-offset/mixed-role or skinned normal-map pixels.",
+    "No Create/Replace/Mirror/freehand public authoring admission.",
+    "No own Scene22 persistence, pool/standalone decoder or normal-preparation replay.",
+    "No GPU or physical headset execution."
+  ]
+}
