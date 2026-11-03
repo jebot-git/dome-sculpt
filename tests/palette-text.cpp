@@ -241,6 +241,15 @@ int main(int argc, char **argv) try {
   require(linear[0] < light[0] && linear[3] == 255, "Linear palette color contract changed");
   state.opacity = 64; palette.set_linear_output(false); auto translucent = capture("skin-opacity-utf8");
   require(translucent[3] == 64, "Palette opacity changed");
+  // The real export menu uses static bitmap disclosure at both supported scales.
+  for (auto label : {"Native: all objects, including hidden", "Other viewers: approximate PBR",
+                     "Open in Dome Sculpt restores edits", "Finite textures can miss fine patterns"})
+    require(complete.layout(label, 320).text == label, "Export disclosure is clipped at native bitmap size");
+  state.menu_page=28;state.opacity=255;state.light=false;state.font_file=selected.file;state.font_pixels=16;
+  state.menu_enabled.fill(true);state.menu_enabled[6]=state.menu_enabled[10]=state.menu_enabled[11]=false;
+  capture("export-dark-native");state.light=true;capture("export-light-native");
+  state.font_pixels=32;state.font_file=bdf_fonts::resolve("Unifont", "Sans-Serif", 16, 2).file;
+  capture("export-light-double");state.light=false;capture("export-dark-double");
   if(!pcf.empty()) {
     state.font_file=pcf.string();state.font_pixels=pcf_pixels;state.opacity=255;state.light=false;state.menu_page=14;
     auto native=capture("skin-pcf-native");state.font_file=pcf_bdf.string();auto reference=capture("skin-pcf-reference");
