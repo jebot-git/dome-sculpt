@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-bindings.hpp"
+#include "deformation-json.hpp"
 #include "dome/color-preparation.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/creator-archive.hpp"
@@ -271,7 +272,7 @@ size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
     if(d.is_null())return;
     if(!d.at("pose").is_array() || d.at("pose").size()>256 || !d.at("morph_weights").is_array() || d.at("morph_weights").size()>128)
       throw std::runtime_error("Invalid original deformation preview dimensions");
-    add(d.at("pose").size());add(d.at("morph_weights").size());
+    add(d.at("pose").size());add(d.at("morph_weights").size());add(detail::encoded_pose_matrix_entries(d));
     if(!d.at("skin").is_null()) {
       const auto &vertices=d.at("skin").at("vertices");
       if(!vertices.is_array() || vertices.size()>2'000'000)throw std::runtime_error("Invalid original skin count");

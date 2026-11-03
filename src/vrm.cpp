@@ -428,9 +428,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       !original.at("extensions").contains("VRM"))
     fail("only original VRM0 is supported by this source-preserving path");
   if (original_space) {
-    source_graph = detail::vrm_source_graph(input_objects, original, options.cancelled);
+    source_graph = detail::vrm_source_graph(input_objects, original, options.cancelled,options.max_output_bytes);
     group = source_graph->instance;
     original["extensions"]["VRM"]["humanoid"] = source_graph->humanoid;
+    if(source_graph->rest_metadata)original["extensions"]["VRM"]["firstPerson"]=source_graph->rest_metadata->first_person;
   }
   for (auto &extension : original.value("extensionsUsed", Json::array()))
     if (extension != "VRM" && extension != "KHR_materials_unlit" &&
@@ -462,6 +463,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     fail("source coordinate basis provenance is missing");
   Quat basis = origin->source_basis_quaternion->unit(),
        inverse = basis.inverse();
+  if(basis.x!=0||basis.z!=0)
+    fail("native bone localY authoring requires an explicit non-Y-preserving source-basis adapter");
   auto convert_trs = [&](CanvasTransform &t) {
     auto p = inverse.rotate({t.position.x, t.position.y, t.position.z});
     t.position = {p.x, p.y, p.z};
@@ -470,7 +473,20 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     q = (inverse * q * basis).unit();
     t.orientation = {q.x, q.y, q.z, q.w};
   };
+  auto convert_exact=[&](const RigMatrix &m){
+    // Original-node source admission already uses its authored basis. Even
+    // identity matrix multiplication can erase signed-zero IBM bits; retain
+    // the exact native per-skin matrix when no coordinate conversion exists.
+    if(basis.x==0&&basis.y==0&&basis.z==0&&std::abs(basis.w)==1)return m;
+    return (AffineTransform(inverse.matrix())*AffineTransform(m)*AffineTransform(basis.matrix())).float_matrix();
+  };
+  auto convert_edit=[&](std::shared_ptr<const NativeAffineEdit> &edit){
+    if(!edit || (basis.x==0&&basis.y==0&&basis.z==0&&std::abs(basis.w)==1))return;
+    edit=std::make_shared<const NativeAffineEdit>(
+        AffineTransform(inverse.matrix())*edit->matrix()*AffineTransform(basis.matrix()));
+  };
   auto convert_joint = [&](JointTransform &t) {
+    if(t.full_local_matrix)t.full_local_matrix=convert_exact(*t.full_local_matrix);
     t.translation = inverse.rotate(t.translation);
     t.rotation = (inverse * t.rotation * basis).unit();
     // Nonuniform scale can be conjugated without shear only for signed-axis
@@ -514,16 +530,21 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     for (auto &n : o.mesh.normals)
       n = inverse.rotate(n);
     convert_trs(o.transform);
-    for (auto &g : o.groups)
+    convert_edit(o.affine_edit);
+    for (auto &g : o.groups){
       convert_trs(g.transform);
+      convert_edit(g.affine_edit);
+    }
     if (!o.deformation) {
       if (source_graph) continue; // A real rigid source part has no dummy skin.
       fail("source part lacks deformation");
     }
     auto d = std::make_shared<DeformationState>(*o.deformation);
-    if (d->skeleton)
-      for (auto &bone : d->skeleton->bones)
-        convert_joint(bone.rest);
+    if (d->skeleton){
+      for (auto &bone : d->skeleton->bones){convert_joint(bone.rest);if(bone.rest_matrix)bone.rest_matrix=convert_exact(*bone.rest_matrix);}
+      if(d->skeleton->space_matrix)d->skeleton->space_matrix=convert_exact(*d->skeleton->space_matrix);
+      if(d->skeleton->inverse_bind_override)for(auto &m:*d->skeleton->inverse_bind_override)m=convert_exact(m);
+    }
     for (auto &pose : d->pose)
       convert_joint(pose);
     d->source = morph_topology_id(o.mesh);
@@ -600,10 +621,10 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   auto document = detail::make_gltf(objects, detail::SourceMorphSpace::Original,
                                     true, options.cancelled);
   report.normal_targets_recomputed = document.normal_targets_recomputed;
-  std::vector<int> source_nodes;
+  std::vector<int> source_nodes,metadata_nodes;
   if (source_graph)
     source_nodes = detail::emit_vrm_source_graph(
-        document, objects, *source_graph, options.cancelled);
+        document, objects, *source_graph, options.cancelled,&metadata_nodes);
   auto &j = document.json;
   auto &binary = document.binary;
   auto check_budget = [&] {
@@ -808,7 +829,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       fail("every avatar part requires the same grouped humanoid rig");
     if (avatar_joints.empty() && !rigid)
       avatar_joints.assign(emitted.joints.begin(), emitted.joints.end());
-    if (!rigid && std::vector<int>(emitted.joints.begin(), emitted.joints.end()) !=
+    if (!rigid && !source_graph && std::vector<int>(emitted.joints.begin(), emitted.joints.end()) !=
         avatar_joints)
       fail("avatar parts do not share one actual emitted rig/pose/transform");
     if (!o.appearance)
@@ -834,9 +855,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
       int parent = s.bones[joint].parent;
       int expected =
           parent < 0 ? -1 : int(a.source_joint_nodes.at(size_t(parent)));
-      if (asset.nodes[source].parent != expected)
+      if ((source_graph?source_graph->parents.at(source):asset.nodes[source].parent) != expected)
         fail("source joint ancestry differs from native mapping");
-      const auto &source_world = asset.nodes[source].world;
+      const auto &source_world = source_graph?source_graph->rest_world.at(source):asset.nodes[source].world;
       Vec3 expected_world =
           Vec3{source_world[12], source_world[13], source_world[14]} *
               fit_scale +
@@ -1064,6 +1085,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   }
   j["materials"]=std::move(output_materials);
   auto vrm = metadata.remap(identities);
+  if(source_graph&&source_graph->rest_metadata){const auto &transport=*source_graph->rest_metadata;auto &spring=vrm["secondaryAnimation"];for(size_t i=0;i<transport.colliders.size();++i)if(transport.colliders[i])spring["colliderGroups"][i]["node"]=metadata_nodes.at(transport.colliders[i]->source);for(size_t i=0;i<transport.centers.size();++i)if(transport.centers[i])spring["boneGroups"][i]["center"]=metadata_nodes.at(transport.centers[i]->source);}
+
   auto scale_vector = [&](Json &v) {
     for (const char *axis : {"x", "y", "z"})
       if (v.contains(axis))
@@ -1120,6 +1143,38 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
                       j["textures"].size(), j["materials"].size());
   j["extensions"]["VRM"] = vrm;
   extension("VRM");
+  // Primitive/material splits can encode the same native/source PNG many
+  // times. A fresh native import must not have to retain another full decoded
+  // copy for each identical image record. Coalesce only byte-identical encoded
+  // payloads with identical image metadata; texture/sampler/material identities
+  // and role-dependent color-space interpretation remain independent.
+  if(j.contains("images")){
+    struct ImageEntry{size_t original,offset,size;Json metadata;};
+    std::vector<ImageEntry> unique;
+    std::map<std::pair<uint64_t,size_t>,std::vector<size_t>> buckets;
+    std::vector<size_t> remap;
+    Json images=Json::array();
+    for(size_t i=0;i<j["images"].size();++i){
+      stop(options);const auto &image=j["images"][i];
+      const auto view=index(image.at("bufferView"),j["bufferViews"].size(),"emitted image bufferView");
+      const auto &range=j["bufferViews"][view];
+      const auto offset=range.value("byteOffset",size_t{}),size=range.at("byteLength").get<size_t>();
+      if(offset>binary.size()||size>binary.size()-offset)fail("emitted image byte range is invalid");
+      uint64_t hash=14695981039346656037ull;
+      for(size_t k=0;k<size;++k){if((k&65535)==0)stop(options);hash=(hash^binary[offset+k])*1099511628211ull;}
+      Json metadata=image;metadata.erase("bufferView");
+      auto &candidates=buckets[{hash,size}];size_t found=SIZE_MAX;
+      for(auto candidate:candidates){const auto &other=unique[candidate];
+        if(metadata==other.metadata && std::equal(binary.begin()+offset,binary.begin()+offset+size,binary.begin()+other.offset)){
+          found=candidate;break;
+        }
+      }
+      if(found==SIZE_MAX){found=unique.size();unique.push_back({i,offset,size,std::move(metadata)});candidates.push_back(found);images.push_back(image);}
+      remap.push_back(found);
+    }
+    for(auto &texture:j["textures"]){stop(options);if(texture.contains("source"))texture["source"]=remap.at(index(texture.at("source"),remap.size(),"emitted texture image"));}
+    j["images"]=std::move(images);
+  }
   j["buffers"] = {{{"byteLength", binary.size()}}};
   uint64_t output_size = 28 + ((uint64_t(j.dump().size()) + 3) & ~uint64_t(3)) +
                          ((uint64_t(binary.size()) + 3) & ~uint64_t(3));

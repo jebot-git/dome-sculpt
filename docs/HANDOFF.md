@@ -233,6 +233,64 @@ Save and missing-device paths. CUDA/ROCm header/table device proof still needed.
 Read GPU-RESAMPLE-PRECISION-WIP.md/.json. No installation, physical launch or
 session restart; current public runtime remainsf973732.
 
+## Private Source25 component history — not yet qualified in this merge
+
+## Private node-local bone-length checkpoint — 2026-11-03
+
+The new b953e26 child qualifies actual length metadata on genuine source joints,
+source-node graph cleanup, exact image-resource sharing and reflected/sheared
+creator placement. Both actual CC0 bases pass fresh native export/import,
+Save/restart/re-edit/re-export/Restore and unchanged source/own-IBM/material
+oracles. Release and asserted sanitizer scopes each pass 618 checks; eight
+software/A770 comparisons have maxError 0 at tolerance 2. Read
+BONE-LENGTH-AUTHORING.md and validation/BONE-LENGTH-AUTHORING.json for exact
+seven-TU/support scope, original failures, warning totals and remaining cases.
+This remains a private component, not main/Source24+25+26 integration or full
+VRM/FBX/physics completion. Prior frozen checkpoints and proofs are preserved.
+
+## Private native existing-rig checkpoint — Scene25, 2026-11-02
+
+The private genuine-source reparent continuation (2026-11-03) now covers a
+weighted head joint that also owns a true rigid mesh, a genuine new source
+parent, reflected/sheared placement and independent rigid native subgroups.
+Read VRM-SOURCE-REPARENT.md and validation/VRM-SOURCE-REPARENT.json. Its only
+runtime change admits authenticated rigid tail groups after their exact source
+endpoint; skin/foreign/interleaved paths remain refused. Native worker/history,
+current per-skin IBM/corner, typed metadata and independent software/A770 image
+proof are recorded separately from c031ba2 and from current public main.
+
+Subsequent private native source-node checkpoints2f06246 and2192365 retain
+actual multi-skin/rigid original-node fitting and bind-following rigid frames.
+The typed VRM0 continuation now exports its tested fitted/posed/restart subset
+through the actual native worker, with independent per-corner/current-IBM,
+first-person/spring topology, software/A770 image and schema proof. Read
+VRM-REST-AUTHORING.md and validation/VRM-REST-AUTHORING.json. It adds no public
+schema. Arbitrary spring/collider-radius transport, distinct current poses, fuller
+role/axis UI, VRM1 and physics remain
+required. These private component proofs are separate from current public main
+and from any future Source24/25/26 semantic union.
+
+Product checkpoint b665a14723e2 (child of c18a010) in
+artifacts/rig-rest-scene25-c18a010 adds actual shared
+FLTK/XR original-bone head/parent/length controls, native/grouped rest/reparent
+and per-part current-pose/bind transport, immutable first rig_source Restore,
+conditional Deformation2 exact pose-local matrices and polygon source archive6.
+All nineteen real neutral CC0 VRoid creator parts retain paint/material/morph/
+source and their own skin products. Source generation/revision/edit authority,
+locked/isolated linked targets, Cancel/retry, oneUndo and orderedSave are covered.
+Read RIG-REST-AUTHORING.md and validation/RIG-REST-SCENE25.json. Final Release7,
+whole-own asserted SAN9, normal/compact/SAN GUI8each, d271Wayland 9, loaderXR11,
+strict actualA770guide9 and pinned Khronos0errors are recorded independently.
+
+This is private, not a full source-rig or VRM completion claim. Imported source
+node/multi-skin/rigid REST transport and metadata refitting remain guarded; do
+not pick a first skin's pose or discard authored IBMs. Cross-placement exact
+binding and direct bone rotation/role controls also remain required. Preserve
+all source/paint/normal/PBR before-state edges during future Scene21/23/24
+semantic union: standalone25 explicitly accepts existing2–20 plus25 only.
+Fresh all-header consumers are mandatory for JointTransform/scene/view layouts.
+No physical headset, installation or external push occurred in this component.
+
 ## Private native humanoid fitting workflow — 2026-11-02
 
 A new isolated component on49projection+portableadcb implements real native
@@ -622,13 +680,13 @@ including the complete772.82s cut allocation sweep. Fresh owned C/C++core/suppor
 renderer ASAN+UBSAN/leaks pass15 selected suites in119.72s. Five actual A770
 consumer batches pass542 assertions. Native FLTK VRM11+normalUV13+atlas12 and
 latest private d271cf6 Wayland/universal-menu8 pass. All104 generated GLB/VRM
-files pass unfiltered/unlimited Khronos with0errors/439warnings;27 VRM0 files
+files pass unfiltered/unlimited Khronos with 0 errors/439warnings;27 VRM0 files
 pass15 hash-verified official schemas. Latest DomeD remote was rechecked
 unchanged; canonical optimized FLTK23/bitmap4 inputs and prefixes remain current.
 
 A new pure test registration separately passes1/1 actual-loader synthetic-XR
 suite with20 assertions: actual joystick browser/options/atlas import of the
-real19-part VRoid model, full88groups/exact original bytes and Cancel/Save.
+real 19-part VRoid model, full88groups/exact original bytes and Cancel/Save.
 The published merge changes no product source/header/asset/runtime bytes from
 full-run source9081677. Record298/298 plus new1/1, not one single299-suite run.
 No physical headset launch, system install or active-session restart occurred.
@@ -787,7 +845,7 @@ Private skinned-export fix `c6324dd` preserves the original object/group parent
 for ordinary and shared-rig surfaces instead of making them identity roots.
 The real authored-material reflected/single-sided worker-export negative was
 native error0/export255. Final software and Arc192 assertions now pass with
-all32 image errors0 and all original mesh-node world-matrix errors0; tolerance2
+all32 image errors0 and all original mesh-node world-matrix errors0; tolerance 2
 is unchanged. Selected fresh Release9 and fully instrumented own-core/render/
 support SAN9 pass. The actual CC0 VRM suite also passes on the same product.
 See SKINNED-SURFACE-HIERARCHY.md and its receipt, including the strengthened
@@ -801,7 +859,7 @@ current skin poses and authored/implicit inverse binds reach native pick/paint,
 Cancel, one Undo and ordered Save; sheared bind-space exports as valid TRS
 nodes. Fresh canonical Release17, actual FLTK static/skin import22 and actual
 Arc baseline/affine48 assertions pass, with all24 image comparisons error0 at
-unchanged tolerance2. See AFFINE-IMPORT-INTEGRATION.md and its receipt for exact
+unchanged tolerance 2. See AFFINE-IMPORT-INTEGRATION.md and its receipt for exact
 scope, prior sanitizer boundaries and retained negative evidence. Default
 material identity, native UV1 import, wider VRM/FBX and remaining affine
 authoring stay required; this private checkpoint is not a publication or
@@ -973,3 +1031,20 @@ of the full goal. The next delegated basic task is native image projection /
 stencil painting through shared Document/desktop/XR workflows; its existing
 kernel alone is insufficient. Deferred controller drawers remain additional
 work after basic targets.
+
+
+## Private original-node source-rest continuation
+
+The bbb1792 native/grouped Scene25 milestone remains unchanged and remote-verified.
+Its private child now also implements authenticated original model/instance REST
+fitting across actual per-skin joint tables and rigid parts, targeted post-fit
+linked pose transport, complete first sources and Restore through shared native
+page27/FLTK/worker history. See [SOURCE-REST-AUTHORING](SOURCE-REST-AUTHORING.md)
+and its validation receipt for exact scope. Five same-ABI Release and fully
+instrumented support-overlay suites pass; native UI 9+9 and canonical Wayland 9
+pass. Independent generic GLB consumer covers all real corners in 3 exports;
+Khronos 0 errors/57 warnings. This is not full-source rig/VRM completion: genuinely
+shared current-pose authority is required, source-rest VRM metadata remains
+explicitly guarded, and broader per-part/generated/unbound rig ownership,
+source-global parent selection/role/rotation controls, image/device and exhaustive
+source-operation OOM evidence remain required. Full original goal remains active.

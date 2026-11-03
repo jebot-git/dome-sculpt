@@ -44,6 +44,8 @@ struct SculptObject {
   std::shared_ptr<const NativeAffineEdit> affine_edit{};
   // Complete pre-shapekey-authoring source, independent of polygon topology.
   std::shared_ptr<const PolygonOrigin> shape_source{};
+  // Scene25 complete first source before rig/rest authoring.
+  std::shared_ptr<const PolygonOrigin> rig_source{};
 };
 bool source_is_dormant(const SculptObject &);
 struct ObjectSurface {
@@ -66,6 +68,7 @@ struct ObjectSurface {
   bool source_dormant = false;
   std::shared_ptr<const PolygonColorSurface> polygon_colors{};
   std::shared_ptr<const NativeAffineEdit> affine_edit{};
+  std::shared_ptr<const PolygonOrigin> rig_source{};
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.

@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "base": "bbb1792e465b25975285f9e6e7b9080d192b49e6",
+  "scope": "Private original-node Shared-pose native REST adapter; no new public layout/archive schema. Not full source/VRM completion.",
+  "source_sha256": {
+    "src/source-rest-graph.cpp": "6978fbf810d7a784f17e31d075dfaac5c5996107add8489b926c6d0a9b232196",
+    "src/source-rest-graph.hpp": "6d8bc6f441e5678069909b6ab0016cf0e5c43e44990c5f15e55c0467fffa957c",
+    "src/source-rest-plan.cpp": "feae3a7905837176e1b85742f8d6b3c95b71207af9297dcb4f6f6501ee5650fd",
+    "src/source-rest-plan.hpp": "0dfa0ec4050f30f48c0c2bc4d5b25c3be61a4020c8a9d678bc8044f9d2b0471d",
+    "src/source-rest-scene.cpp": "ffe87a8ed4a9a8cb378fff3e80b1a566b86131323044e89909c0b99edb19833f",
+    "src/source-rest-scene.hpp": "773b0a6ce88c9243041eeb05effe33ed6a1763512d32df46025a8e5a722daecd",
+    "tests/source-rest-document.cpp": "96365f2a99e905433ff89b8a15fbc5fbe76f8b573f525e83be2ce3410a12be46",
+    "tests/source-rest-export.cpp": "8cbf87a02f7836da7b68339f7dc00e3781ec63954a9c101ca553580fa626a731",
+    "tests/source-rest-graph.cpp": "b563249d8985e3391c4a6c7c0b4b73619c91e5c5f75e318e4d9a1d629ffd985c",
+    "tests/source-rest-menu.py": "822f583298b84089ac841b20bd739d8ac58a5c9a5d4354bb80282df9c95d3402",
+    "tests/source-rest-plan.cpp": "96fdfd7e16d24c0d639fedf90a892ac3f4475d257651e5e563411572a87a8914",
+    "tests/source-rest-scene.cpp": "b22c0fbced4b40fad1854430c8f0e12480f3fe2dff9a590dcee159c15649c00a",
+    "tests/source-rest-ui-fixture.cpp": "d7a8bc19eefa456da613065447be4fdf3439cb2eec23681f9238c8dc5dfefaf2",
+    "tests/source-rest-wayland.py": "82d670100a9675efe3f8797b277dc8f3106c00edb6ac05200955076aec8626b0",
+    "CMakeLists.txt": "c327a2ce5dc1297f426b43d86f6f763cded122d8d2cd9a0e95838bc768cc7d18",
+    "src/rig-edit.cpp": "d48f16c0639cd26709595b15827863101b172c6726f51daa60162653feed1517",
+    "src/rig-rest-scene.cpp": "a111a8dc55c83f0e1cf49a3b0af1d14e926154e65efa2a31f07b6c9a7b9c54b8"
+  },
+  "qualification": [
+    {
+      "suite": "source-rest-graph",
+      "configuration": "release",
+      "exit": 0,
+      "seconds": 1.0384749520017067,
+      "binary_sha256": "2119bad72f0d2385e8e7d08ec864190b35b1ce63d7737e1cc5d17b04ace105a7",
+      "log": "artifacts/overlay-final-release/source-rest-graph.log"
+    },
+    {
+      "suite": "source-rest-plan",
+      "configuration": "release",
+      "exit": 0,
+      "seconds": 2.6305105310020735,
+      "binary_sha256": "011c38d2bf8233674ec501faaf43e67f7bb0693aba7eb77abed3ecf40fa2ffe8",
+      "log": "artifacts/overlay-final-release/source-rest-plan.log"
+    },
+    {
+      "suite": "source-rest-scene",
+      "configuration": "release",
+      "exit": 0,
+      "seconds": 4.125760319002438,
+      "binary_sha256": "639182175d9d85dcd4b78f81a617135a109b1494edb6c4cf80786132e7e5a778",
+      "log": "artifacts/overlay-final-release/source-rest-scene.log"
+    },
+    {
+      "suite": "source-rest-document",
+      "configuration": "release",
+      "exit": 0,
+      "seconds": 7.388553953001974,
+      "binary_sha256": "dba43abec99d49fa5d7b2bd7be305de61c704bddb1336d818b8b37ca719d0eeb",
+      "log": "artifacts/overlay-final-release-document-final2/test.log"
+    },
+    {
+      "suite": "source-rest-export",
+      "configuration": "release",
+      "exit": 0,
+      "seconds": 24.431445057998644,
+      "binary_sha256": "572bfc3dd99722e3901cb5d89d3d9d91cfb67d213bf41f93e9fef93056fc1152",
+      "log": "artifacts/overlay-final-release-export/test.log"
+    },
+    {
+      "suite": "source-rest-graph",
+      "configuration": "sanitize",
+      "exit": 0,
+      "seconds": 8.480941244997666,
+      "binary_sha256": "c7732d5f899ac73a5542e36bc8120df5cd94d86441a63fb5cc530d4a1464c8e1",
+      "log": "artifacts/overlay-final-sanitize/source-rest-graph.log"
+    },
+    {
+      "suite": "source-rest-plan",
+      "configuration": "sanitize",
+      "exit": 0,
+      "seconds": 22.86648075899575,
+      "binary_sha256": "ac2759e1b4468b342583ca0fedabef50a88efb77b9a6aa40564629c1ca195431",
+      "log": "artifacts/overlay-final-sanitize/source-rest-plan.log"
+    },
+    {
+      "suite": "source-rest-scene",
+      "configuration": "sanitize",
+      "exit": 0,
+      "seconds": 38.11338922700088,
+      "binary_sha256": "b3ea36fb25a3fdfc02c3c03762e4cd5a8c5833629aefbc4164515dc914abb070",
+      "log": "artifacts/overlay-final-sanitize/source-rest-scene.log"
+    },
+    {
+      "suite": "source-rest-document",
+      "configuration": "sanitize",
+      "exit": 0,
+      "seconds": 66.50539842901344,
+      "binary_sha256": "83aedd5f67b50f3ef748d7661fe047e2c842ad523939e5ee642d29b6a1d5068a",
+      "log": "artifacts/overlay-final-sanitize-document-final2/test.log"
+    },
+    {
+      "suite": "source-rest-export",
+      "configuration": "sanitize",
+      "exit": 0,
+      "seconds": 54.844718442996964,
+      "binary_sha256": "dde7dd63d6333ab10a22a25b32cb030f8885ea994dda656d477272d76be5ba37",
+      "log": "artifacts/overlay-final-sanitize-export/test.log"
+    }
+  ],
+  "totals_seconds": {
+    "release": 39.61474481300684,
+    "sanitize": 190.8109281030047
+  },
+  "assertions": {
+    "graph": 1672,
+    "plan": 184,
+    "scene": 1806,
+    "document_controller_history": 63,
+    "independent_cgltf": 10,
+    "export_corners_each": 44430,
+    "max_world_error_metres": 3.01357e-07
+  },
+  "gui": [
+    {
+      "directory": "artifacts/source-rest-menu-normal2",
+      "checks": 9,
+      "exit": 0,
+      "report_sha256": "1d1cb9964e54b7d9827af0fb95af065daa940175b162930840cf7e1294fa7243"
+    },
+    {
+      "directory": "artifacts/source-rest-menu-compact2",
+      "checks": 9,
+      "exit": 0,
+      "report_sha256": "1d1cb9964e54b7d9827af0fb95af065daa940175b162930840cf7e1294fa7243"
+    },
+    {
+      "directory": "artifacts/source-rest-wayland",
+      "checks": 9,
+      "exit": 0,
+      "report_sha256": "a580f08dfb05f0911fbf07e34231453294617f5a282381ddfb1a43ef7896a40c"
+    }
+  ],
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "outputs": 3,
+    "errors": 0,
+    "warnings": 57
+  },
+  "environment": {
+    "toolkit": "canonical toolkit-eee23b7 +bitmap-runtime-eee23b7 lib, d271 unchanged inputs",
+    "wayland_compositor": "domed-d271cf6-target/release/dome-compositor",
+    "native_gui": "private Xvfb/bus +LIBGL_ALWAYS_SOFTWARE=1; actual canonical native Wayland nested; no host display/session restart",
+    "build": "optimized C++20 Release; own five changed/replacement modules freshly compiled before frozen bbb core/support; public headers byte-identical; old two override archive members excluded by link maps",
+    "sanitizer": "all changed/replacement modules and all own bbb C/C++ core/support instrumented -O1 -g1 ASan/UBSan/leaks, assertions enabled; changed test-only final followups reuse unchanged module objects",
+    "compiler": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)"
+  },
+  "unclaimed": [
+    "fresh whole-branch CMake rebuild/full regression",
+    "Arc/image comparison or physical HMD/device",
+    "new exhaustive source-operation allocation-denial sweep",
+    "distinct per-part pose authority/resolution",
+    "generated/unbound source rigs and joint-node rigid mesh compensation",
+    "source-global parent picker/role/rotation controls",
+    "typed VRM REST/parent/first-person/look-at/limits/spring/collider metadata export"
+  ],
+  "evidence_sha256": {
+    "artifacts/overlay-final-release/receipt.json": "fbaa4b3821be875e251daf77bb451ac14b319041142f98b9b1fe4a2a0a0c7adc",
+    "artifacts/overlay-final-release-document-final2/receipt.json": "ddaf6894653ce12eb39a9107e17767dd95b18f4bcbfbe34f0706f9531c03f7cf",
+    "artifacts/overlay-final-release-export/receipt.json": "0b62615f4461b614e549707e551491cb308280c0393182211b2d56caea30bdcb",
+    "artifacts/overlay-final-sanitize/receipt.json": "44956f469700209cdda200159d04533c8882fb4f3af9c34599f67fc002441f73",
+    "artifacts/overlay-final-sanitize-document-final2/receipt.json": "93ec05120ac446bac5d553d941911bad2c83b23f897d7e785d46582d713f21ba",
+    "artifacts/overlay-final-sanitize-export/receipt.json": "0a94bfaddaa4f1443998f1dc54c2832ba95ff2e72b66b1b008e40ed3af8d7835",
+    "artifacts/overlay-release/receipt.json": "ce33386a2b542eeb654d54a77c4d086702afb1d51174c31f2544a00b33c045b2",
+    "artifacts/overlay-release-document-diagnostic/receipt.json": "6ce736b7c918b5599ac241a60f23d6dc74f4de2acd5f087b1a87188fcc0e6bde",
+    "artifacts/overlay-release-document-final/receipt.json": "e0a15cd4ed97312205c4209abe528ea16fed5a3e2fe1bdf671d5451bf2e877c2",
+    "artifacts/overlay-sanitize/receipt.json": "b6dc454d5eee8d9156d008598f077d03366951dd977d9acb6bbc9fc09e72ea86",
+    "artifacts/overlay-sanitize-document-final/receipt.json": "86e5df720c9f83fd08e4e27b914b78af9e02ac0c07dce410bd6e2f90fbec9c97",
+    "artifacts/source-rest-ui-overlay/receipt.json": "f0d43a4790ea3e2066d3e9fd86dcbefd811d8ef0c35975af85a3e8261f099182",
+    "artifacts/overlay-final-release/source-rest-graph.log": "6772d9de13c91da875412658df514375a0ef63d69409d5006836fff72bd04acb",
+    "artifacts/overlay-final-release/source-rest-plan.log": "47fc487b37d34e97a27909f684d3ca8d3cf0c9eb94c4045eb445b15f9999bbeb",
+    "artifacts/overlay-final-release/source-rest-scene.log": "5753e1a3b6d81ef5b2d8027eb1bc530ade21a07a40d82516ac8889e41ee58eb5",
+    "artifacts/overlay-final-release-document-final2/test.log": "fdb4ec6937ae563f9b724b38a2d9a66a632faaf124dd385851685deec15e17f3",
+    "artifacts/overlay-final-release-export/test.log": "727923a99243c1c4e8b7ef91dbcf3852e03890a7ff7c2b0cfe2a60757da01eda",
+    "artifacts/overlay-final-sanitize/source-rest-graph.log": "6772d9de13c91da875412658df514375a0ef63d69409d5006836fff72bd04acb",
+    "artifacts/overlay-final-sanitize/source-rest-plan.log": "47fc487b37d34e97a27909f684d3ca8d3cf0c9eb94c4045eb445b15f9999bbeb",
+    "artifacts/overlay-final-sanitize/source-rest-scene.log": "5753e1a3b6d81ef5b2d8027eb1bc530ade21a07a40d82516ac8889e41ee58eb5",
+    "artifacts/overlay-final-sanitize-document-final2/test.log": "fdb4ec6937ae563f9b724b38a2d9a66a632faaf124dd385851685deec15e17f3",
+    "artifacts/overlay-final-sanitize-export/test.log": "727923a99243c1c4e8b7ef91dbcf3852e03890a7ff7c2b0cfe2a60757da01eda",
+    "artifacts/source-rest-menu-normal2/report.json": "1d1cb9964e54b7d9827af0fb95af065daa940175b162930840cf7e1294fa7243",
+    "artifacts/source-rest-menu-compact2/report.json": "1d1cb9964e54b7d9827af0fb95af065daa940175b162930840cf7e1294fa7243",
+    "artifacts/source-rest-wayland/report.json": "a580f08dfb05f0911fbf07e34231453294617f5a282381ddfb1a43ef7896a40c",
+    "artifacts/source-rest-khronos.json": "468a7b30dedc312de4c86039ded7ec0e68da6d3347c42a1058c89824ad280025",
+    "artifacts/source-rest-ui-overlay/app.map": "e3def0280ba5eb0851ca7823b19d017422a3476595c8fa1c8bed812964dc4ee4",
+    "artifacts/source-rest-ui-overlay/fixture.map": "0b25fcc19f9f4414bbc095d20b13dfd854ed7daa6cb6826993dcee2e8f62fbaf",
+    "artifacts/source-rest-graph-overlay.json": "8346965730f7e3691997115776bd9d7f3816a6b0aa8d7d6255f39b64087058e6",
+    "artifacts/source-rest-scene-dispatch-overlay.json": "085bec172fa4a4b218441182fbe4355c397dce71605dec49062034a8737c1e6c",
+    "artifacts/run-source-rest-final-overlay.py": "ffb47e47d3b71a5d91a18cedd481ae9390b91e21e6c2d70768c19b5d3e55926f",
+    "artifacts/run-source-rest-document-final2.py": "4348d3fbf98c2084e8137d3e6aec28227e6936676870e069862de7fe9f32545b",
+    "artifacts/run-source-rest-export.py": "7d991e8b690071ad6a5ed9b15afee30334a5d48a6e72dd5045d63b05c0d3822d",
+    "artifacts/link-source-rest-ui-overlay.py": "9679b100c8e7561e2069e3642ef3bc72ec6e8c7a3edcf0a07368876bc85a0a9e",
+    "artifacts/overlay-final-release-export/outputs/source-rest-fitted.glb": "0ae306be61ebdfad06295fba2ecd1d5368750aa596beca65a6dc3390dcde75d6",
+    "artifacts/overlay-final-release-export/outputs/source-rest-posed.glb": "529293931753f89096a2a20d11ae6ebde17a1e43d2f627e6c8fb8551a4dda191",
+    "artifacts/overlay-final-release-export/outputs/source-rest-restored.glb": "f422fc80ae5af61322e7ea1e56b75fd3f060f4deac6233f00bb87629c18b9038",
+    "artifacts/overlay-final-sanitize-export/outputs/source-rest-fitted.glb": "0ae306be61ebdfad06295fba2ecd1d5368750aa596beca65a6dc3390dcde75d6",
+    "artifacts/overlay-final-sanitize-export/outputs/source-rest-posed.glb": "529293931753f89096a2a20d11ae6ebde17a1e43d2f627e6c8fb8551a4dda191",
+    "artifacts/overlay-final-sanitize-export/outputs/source-rest-restored.glb": "f422fc80ae5af61322e7ea1e56b75fd3f060f4deac6233f00bb87629c18b9038",
+    "artifacts/source-rest-configure.log": "775486e76d5cc159f5a8ed4f88bcf3c9003010bb8f5293de54bfa0b91faf7452"
+  },
+  "retained_negative_sha256": {
+    "artifacts/source-rest-plan-test.log": "126331585bb1536389c0766fe5e7d9e5c74acf02914d5f45265f1c4a1202b26d",
+    "artifacts/source-rest-plan-test2.log": "0dcca3c79d0f1e6df8565fd196e3a476373a78761d8e4ebd8de5e6bb9702df0b",
+    "artifacts/source-rest-plan-test3.log": "d583b846eee107d02a51f06695ed15865e4b7917be1722b46c15a4708d716909",
+    "artifacts/source-rest-scene-test5.log": "f483a49da473a91b4614a0952b58f27e9e5c3385879672fbbacab660ac774878",
+    "artifacts/source-rest-scene-test6.log": "e154c6640a1eb197b12e18f4fbc6cb1c8d932b911e309d0919c4b9d3dc065e37",
+    "artifacts/overlay-release/source-rest-document.log": "5c57da7578bf359bdc5e93c1379155ac6d6dac85aa323bfd403b125255a27bab",
+    "artifacts/overlay-sanitize/source-rest-document.log": "5c57da7578bf359bdc5e93c1379155ac6d6dac85aa323bfd403b125255a27bab",
+    "artifacts/overlay-release-document-final/test.log": "95d201d7f694cd510e482cd36bdc2bc85baf0457a253588d0c8d6696b780ca06",
+    "artifacts/overlay-sanitize-document-final/test.log": "95d201d7f694cd510e482cd36bdc2bc85baf0457a253588d0c8d6696b780ca06",
+    "artifacts/overlay-release-document-diagnostic/test.log": "f5c755cc4f3c863aa49844932ce6be152030a0e68379f74bca0299750b800c67",
+    "artifacts/overlay-final-release/source-rest-document.log": "f84874865e0a4f3b7dc4504ec6e761293f4444d2133bdc3b68fbe53fc113dc73",
+    "artifacts/overlay-final-sanitize/source-rest-document.log": "f84874865e0a4f3b7dc4504ec6e761293f4444d2133bdc3b68fbe53fc113dc73",
+    "artifacts/source-rest-menu-normal.log": "5e2059ea12055080ed7a65a780227255a88827a3fc0e6d48f207f004f7fc65c6",
+    "artifacts/source-rest-menu-compact.log": "5e2059ea12055080ed7a65a780227255a88827a3fc0e6d48f207f004f7fc65c6"
+  }
+}

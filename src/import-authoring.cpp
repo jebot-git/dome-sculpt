@@ -12,6 +12,8 @@
 #include "source-tangent-frames.hpp"
 #include "text-utf8.hpp"
 #include "vrm-import.hpp"
+#include "bone-metadata.hpp"
+#include "humanoid-placement-import.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <numeric>
@@ -254,6 +256,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       std::make_shared<const ImportedAsset>(import_glb(*bytes, options.limits));
   const auto vrm =
       detail::vrm_import_metadata(json, *asset, options.limits.cancelled);
+  const auto bone_metadata = detail::source_bone_metadata(*asset,options.limits.cancelled);
+  std::vector<uint8_t> adopted_bone_metadata(asset->nodes.size());
   output.diagnostics = captured.diagnostics;
   output.diagnostics.insert(output.diagnostics.end(),asset->warnings.begin(),asset->warnings.end());
   if (asset->nodes.empty())
@@ -459,12 +463,19 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       if (node.skin >= 0 && !p.influences.empty()) {
         auto rig = detail::imported_rig(*asset, n, options.limits.cancelled,
                                         vrm.rig_nodes);
+        detail::apply_bone_lengths(rig.skeleton,rig.source_nodes,bone_metadata,
+                                   options.limits.cancelled);
+        for(auto source:rig.source_nodes)
+          if(bone_metadata.lengths[source])adopted_bone_metadata[source]=1;
         DeformationState deformation =
             object.deformation ? *object.deformation
                                : DeformationState(object.painted->mesh());
-        deformation.skeleton = rig.skeleton;
         deformation.skin =
             detail::imported_weights(p, rig, remap, options.limits.cancelled);
+        if (vrm.version != detail::VrmImportVersion::None)
+          detail::adopt_humanoid_placement_prefix(rig,*asset,n,vrm.human_nodes,
+                                                 *deformation.skin,options.limits.cancelled);
+        deformation.skeleton = rig.skeleton;
         appearance->source_joint_nodes = rig.source_nodes;
         if (vrm.version != detail::VrmImportVersion::None)
           deformation.humanoid = detail::vrm_import_humanoid(vrm, rig);
@@ -554,6 +565,11 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       output.objects.push_back(id);
     }
   }
+  for(auto source:ordered)
+    if(bone_metadata.lengths[source]&&!adopted_bone_metadata[source])
+      throw std::invalid_argument("Bone authoring metadata needs an associated adopted skin; unbound bone import remains required");
+  if(std::any_of(adopted_bone_metadata.begin(),adopted_bone_metadata.end(),[](auto value){return value!=0;}))
+    output.diagnostics.push_back("Retained authored bone lengths; other applications may display bones differently");
   output.scene.validate();
   if (vrm.version != detail::VrmImportVersion::None)
     output.diagnostics.push_back(

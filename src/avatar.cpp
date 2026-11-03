@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/avatar.hpp"
+#include "humanoid-placement.hpp"
 #include <limits>
 #include <nlohmann/json.hpp>
 #include <set>
@@ -113,6 +114,13 @@ void HumanoidMapping::validate(const Skeleton &s, bool complete) const {
   if (joints.size() > 55)
     fail("too many humanoid mappings");
   std::map<uint32_t, std::string> reverse;
+  // Imported source-node placement may include reflected TRS factors above
+  // the actual humanoid. They are exact, nondeforming ancestor nodes, not
+  // editable humanoid scale approximations. Keep them in the original chain:
+  // Skeleton::world composes their rest_matrix once, and the explicit mesh
+  // space/IBMs retain each skin's own bind authority. No such exemption applies
+  // inside the humanoid or to a legacy/generated TRS-only skeleton.
+  const auto exact_external_prefix=detail::humanoid_placement_prefix(s,*this);
   for (const auto &[n, i] : joints) {
     role(n);
     if (i >= s.bones.size())
@@ -121,7 +129,8 @@ void HumanoidMapping::validate(const Skeleton &s, bool complete) const {
       fail("joint assigned multiple roles: " + n);
     for (int a = int(i); a >= 0; a = s.bones[a].parent) {
       Vec3 v = s.bones[a].rest.scale;
-      if (v.x <= 0 || v.y <= 0 || v.z <= 0)
+      if ((v.x <= 0 || v.y <= 0 || v.z <= 0) &&
+          !exact_external_prefix.test(size_t(a)))
         fail("non-positive humanoid ancestor scale: " + n);
     }
   }

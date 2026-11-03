@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "deformation-json.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
 #include "polygon-color-target.hpp"
@@ -62,7 +63,7 @@ void validate_transform(CanvasTransform t) {
 }
 bool source_is_dormant(const SculptObject &o) {
   if(o.polygon && o.polygon->active)return false;
-  return !o.mesh_active && bool(o.appearance || o.material_bindings || o.deformation || o.retopology || o.polygon || o.shape_source ||
+  return !o.mesh_active && bool(o.appearance || o.material_bindings || o.deformation || o.retopology || o.polygon || o.shape_source || o.rig_source ||
     (o.painted && (o.painted->source_maps() || o.painted->baked() || o.painted->has_paint_data())));
 }
 void Scene::require_exportable_sources() const {
@@ -228,6 +229,7 @@ void Scene::validate(bool deep_sources) const {
     name_valid(o.name);
     detail::require_polygon_paint_owner(o.painted.get(),o.polygon.get(),o.mesh_active);
     if(o.shape_source)polygons.add_origin(o.shape_source,deep_sources);
+    if(o.rig_source)polygons.add_rig_origin(o.rig_source,deep_sources);
     if(o.polygon){polygons.add(o.polygon,deep_sources);if(deep_sources)validate_polygon_derivative(*o.polygon,o.painted.get(),o.mesh_active);}
     validate_transform(o.transform);
     if(has_affine_placement(o.id))(void)world_matrix(o.id);
@@ -379,7 +381,7 @@ nlohmann::json Scene::encode() const {
   unsigned feature_version=0;for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.appearance.get())});
   if(std::any_of(groups_.begin(),groups_.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);}) ||
       std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.affine_edit);}))feature_version=std::max(feature_version,13u);
-  for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get())});
+  for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
   const bool polygon_fields=feature_version>=12 || std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.polygon);});
   const bool extended=resolved || retopology || feature_version>=8;
   nlohmann::json j = {{"format", "dome-sculpt"},
@@ -392,7 +394,7 @@ nlohmann::json Scene::encode() const {
   SourceMaterialArchive source_materials;
   detail::PolygonSceneArchive polygons;
   detail::SourcePlacementArchive placements;
-  for(const auto &o:objects_){if(o.polygon)polygons.add(o.polygon,false);if(o.shape_source)polygons.add_origin(o.shape_source,false);}
+  for(const auto &o:objects_){if(o.polygon)polygons.add(o.polygon,false);if(o.shape_source)polygons.add_origin(o.shape_source,false);if(o.rig_source)polygons.add_rig_origin(o.rig_source,false);}
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
@@ -443,6 +445,7 @@ nlohmann::json Scene::encode() const {
     if(polygon_fields)j["objects"].back()["polygon"]=o.polygon?nlohmann::json(polygons.add(o.polygon)):nlohmann::json(nullptr);
     if(o.affine_edit)j["objects"].back()["affine_edit"]=placements.add_edit(o.affine_edit);
     if(feature_version>=16)j["objects"].back()["shape_source"]=o.shape_source?nlohmann::json(polygons.add_origin(o.shape_source)):nlohmann::json(nullptr);
+    if(feature_version>=25)j["objects"].back()["rig_source"]=o.rig_source?nlohmann::json(polygons.add_rig_origin(o.rig_source)):nlohmann::json(nullptr);
     if(extended) {
       j["objects"].back()["material_bindings"]=o.material_bindings
         ?nlohmann::json(source_materials.add(o.material_bindings)):nlohmann::json(nullptr);
@@ -450,7 +453,13 @@ nlohmann::json Scene::encode() const {
     }
   }
   detail::PolygonColorArchive color_archive;
-  const bool corner_prepared=feature_version>=20;
+  bool corner_prepared=feature_version==20;
+  if(feature_version>=25){
+    // A higher feature must not fabricate Scene20 color preparation tables.
+    // Populate the existing shared material DAG first, including every origin.
+    for(const auto &origin:polygons.origins())if(origin->material_bindings)source_materials.add(origin->material_bindings);
+    corner_prepared=std::any_of(source_materials.bindings().begin(),source_materials.bindings().end(),[](const auto &b){return b->color_preparation&&b->color_preparation->polygon_colors;});
+  }
   if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements,corner_prepared?&color_archive:nullptr);
   if(extended)j["source_materials"]=source_materials.encode(source_images,source_models,corner_prepared?&color_archive:nullptr);
   if(corner_prepared){auto records=color_archive.encode();j["polygon_sources"]["color_bases"]=std::move(records["color_bases"]);j["polygon_sources"]["color_fields"]=std::move(records["color_fields"]);}
@@ -471,7 +480,9 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || version>20)throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>20&&version!=25))throw std::runtime_error("Unsupported scene version");
+  const bool shared_corner_context=j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==5||(j.at("polygon_sources").at("version")==6&&j.at("polygon_sources").at("shared_colors").get<bool>()));
+  if(version<25&&j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==6)throw std::invalid_argument("Rig source archive requires Scene25");
   if(version==20&&(!j.contains("source_materials")||j.at("source_materials").at("version")!=6||!j.contains("polygon_sources")||j.at("polygon_sources").at("version")!=5))throw std::invalid_argument("Scene20 requires explicit current corner preparation authority");
   if(version<20&&((j.contains("source_materials")&&j.at("source_materials").at("version")==6)||(j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==5)))throw std::invalid_argument("Current corner preparation requires Scene20");
   if(version==19&&(!j.contains("source_materials")||!j.at("source_materials").contains("version")||j.at("source_materials").at("version")!=5))throw std::invalid_argument("Scene19 requires material archive5 normal UV authority");
@@ -510,6 +521,8 @@ Scene Scene::decode(const nlohmann::json &j) {
   for(const auto &o:objects){
     if(version>=16){if(!o.contains("shape_source"))throw std::invalid_argument("Incomplete shape source scene fields");}
     else if(o.contains("shape_source"))throw std::invalid_argument("Shape source requires Scene16");
+    if(version==25){if(!o.contains("rig_source"))throw std::invalid_argument("Incomplete rig source scene fields");}
+    else if(o.contains("rig_source"))throw std::invalid_argument("Rig source requires Scene25");
   }
   if(j.contains("polygon_sources") && j.at("polygon_sources").at("version")==4 && version<16)
     throw std::invalid_argument("Direct shape source archive requires Scene16");
@@ -520,7 +533,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(version<13 && j.at("polygon_sources").at("version")!=1)throw std::invalid_argument("Exact polygon placement requires Scene13");
     if(version<14 && j.at("polygon_sources").at("version")==3)
       throw std::invalid_argument("Current polygon corner colors require Scene14");
-    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects,version>=20?&j.at("source_materials"):nullptr);
+    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects,shared_corner_context?&j.at("source_materials"):nullptr);
     const auto &material_records=j.at("source_materials").at("bindings");
     const auto &model_records=j.at("source_models");
     if(!material_records.is_array() || material_records.size()>256 || !model_records.is_array() || model_records.size()>16)
@@ -754,27 +767,27 @@ Scene Scene::decode(const nlohmann::json &j) {
   }
   if(material_fields)for(const auto&origin:j.at("source_materials").at("origins"))if(origin.contains("deformation")&&detail::minimum_deformation_scene_version(origin.at("deformation"))>version)throw std::runtime_error("Retained explicit inverse binds require scene version eleven");
   if(material_fields&&j.at("source_materials").contains("color_preparations"))for(const auto &preparation:j.at("source_materials").at("color_preparations"))
-    if(detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::runtime_error("Preconversion explicit inverse binds require scene version eleven");
+    detail::require_deformation_scene_version(preparation.at("deformation"),version,"Preconversion explicit inverse binds require scene version eleven");
   if(version==15&&(!material_fields||j.at("source_materials").at("version")!=4))throw std::invalid_argument("Scene15 requires its explicit normal preparation feature");
   if(material_fields&&j.at("source_materials").contains("normal_preparations"))for(const auto &preparation:j.at("source_materials").at("normal_preparations"))
     if(version<15||detail::minimum_deformation_scene_version(preparation.at("deformation"))>version)throw std::invalid_argument("Pre-normal-preparation source features exceed scene version");
   size_t preflight_deformation=material_fields?SourceMaterialArchive::deformation_entries(j.at("source_materials")):0;
   if(version>=4)for(const auto &o:objects)if(!o.at("deformation").is_null()) {
     const auto &d=o.at("deformation");
-    if(detail::minimum_deformation_scene_version(d)>version)throw std::runtime_error("Explicit inverse binds require scene version eleven");
-    preflight_deformation+=d.at("pose").size()+d.at("morph_weights").size();
+    detail::require_deformation_scene_version(d,version,"Explicit inverse binds require scene version eleven");
+    preflight_deformation+=d.at("pose").size()+d.at("morph_weights").size()+detail::encoded_pose_matrix_entries(d);
     if(!d.at("skin").is_null())for(const auto &v:d.at("skin").at("vertices"))preflight_deformation+=v.size();
     if(!d.at("morphs").is_null())for(const auto &t:d.at("morphs").at("targets"))preflight_deformation+=t.at("delta").size();
     if(preflight_deformation>8'000'000)throw std::length_error("Scene original and current deformation allocations exceed budget");
   }
   detail::PolygonColorArchive color_archive;
-  if(version>=20)color_archive=detail::PolygonColorArchive::decode(j.at("polygon_sources").at("color_bases"),j.at("polygon_sources").at("color_fields"));
+  if(shared_corner_context)color_archive=detail::PolygonColorArchive::decode(j.at("polygon_sources").at("color_bases"),j.at("polygon_sources").at("color_fields"));
   SourceMaterialArchive source_materials;
-  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,version>=20?&color_archive:nullptr);
+  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,shared_corner_context?&color_archive:nullptr);
   detail::SourcePlacementArchive placements;
   if(j.contains("affine_state"))placements=detail::SourcePlacementArchive::decode(j.at("affine_state"),source_models);
   detail::PolygonSceneArchive polygons;
-  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,version>=20?&color_archive:nullptr);
+  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,shared_corner_context?&color_archive:nullptr);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -875,7 +888,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       if (!o.painted || (!o.mesh_active && !dormant_deformation))
         throw std::runtime_error("Dormant deformation requires a retained rest mesh and source-material scene schema");
       const auto &d = v.at("deformation");
-      deformation_entries += d.at("pose").size() + d.at("morph_weights").size();
+      deformation_entries += d.at("pose").size() + d.at("morph_weights").size()+detail::encoded_pose_matrix_entries(d);
       if (!d.at("skin").is_null())
         for (const auto &row : d.at("skin").at("vertices"))
           deformation_entries += row.size();
@@ -900,10 +913,14 @@ Scene Scene::decode(const nlohmann::json &j) {
     }
     if(polygon_fields && !v.at("polygon").is_null())o.polygon=polygons.at(detail::polygon_archive_index(v.at("polygon"),polygons.authorities().size()));
     if(version>=16 && !v.at("shape_source").is_null())o.shape_source=polygons.origins().at(detail::polygon_archive_index(v.at("shape_source"),polygons.origins().size()));
+    if(version==25 && !v.at("rig_source").is_null())o.rig_source=polygons.origins().at(detail::polygon_archive_index(v.at("rig_source"),polygons.origins().size()));
     result.objects_.push_back(std::move(o));
   }
   placements.require_reachable();
-  for(const auto &o:result.objects_)if(std::max({detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get())})>unsigned(version))throw std::invalid_argument("Source sampling requires its actual scene feature version");
+  unsigned actual_feature=0;
+  for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
+  if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
+  if(version==25&&actual_feature!=25)throw std::invalid_argument("Scene25 requires actual exact pose or rig source authority");
   result.validate();
   return result;
 }
@@ -969,6 +986,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
            o.mesh_active ? o.material_bindings : nullptr,
            source_is_dormant(o)});
       result.back().affine_edit=o.affine_edit;
+      result.back().rig_source=o.mesh_active?o.rig_source:nullptr;
       if(o.polygon && o.polygon->active && o.polygon->colors) {
         auto current=std::make_shared<PolygonColorSurface>();
         current->topology=std::shared_ptr<const PolygonMesh>(o.polygon,&o.polygon->topology);

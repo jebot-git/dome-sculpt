@@ -18,6 +18,7 @@ inline unsigned minimum_scene_version(const PolygonOrigin *p);
 inline unsigned minimum_scene_version(const DeformationState *d) {
   if (!d || !d->skeleton)
     return 0;
+  if(std::any_of(d->pose.begin(),d->pose.end(),[](const auto&t){return bool(t.full_local_matrix);}))return 25u;
   const auto &s = *d->skeleton;
   return s.inverse_bind_override || s.space_matrix ||
                  std::any_of(s.bones.begin(), s.bones.end(),
@@ -65,14 +66,18 @@ inline unsigned source_feature_version(const PolygonAuthority *root,const Polygo
     if(depth>32||active_o.contains(o)||done_a.size()+done_o.size()>512)throw std::invalid_argument("Invalid retained object feature-version graph");
     if(done_o.contains(o))return;
     active_o.insert(o);
-    result=std::max({result,o->placement?13u:0u,o->shape_source?16u:0u,minimum_scene_version(o->paint.get()),minimum_scene_version(o->deformation.get()),minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
-    authority(o->polygon.get(),depth+1);origin(o->shape_source.get(),depth+1);active_o.erase(o);done_o.insert(o);
+    result=std::max({result,o->placement?13u:0u,o->shape_source?16u:0u,o->rig_source?25u:0u,minimum_scene_version(o->paint.get()),minimum_scene_version(o->deformation.get()),minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
+    authority(o->polygon.get(),depth+1);origin(o->shape_source.get(),depth+1);origin(o->rig_source.get(),depth+1);active_o.erase(o);done_o.insert(o);
   };
   if(root)authority(root,1);else if(source){result=16;origin(source,1);}return result;
 }
 inline unsigned minimum_scene_version(const PolygonAuthority *p){return source_feature_version(p,nullptr);}
 inline unsigned minimum_scene_version(const PolygonOrigin *p){return source_feature_version(nullptr,p);}
 inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
+  if(!d.is_null()){
+    if(d.contains("version")&&d.at("version")==2)return 25;
+    if(d.contains("pose")&&d.at("pose").is_array())for(const auto&t:d.at("pose"))if(t.is_object()&&t.contains("full_local_matrix"))return 25;
+  }
   if (d.is_null() || d.at("skeleton").is_null())
     return 0;
   const auto &s = d.at("skeleton");
@@ -81,4 +86,10 @@ inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
              ? 11u
              : 0u;
 }
+inline void require_deformation_scene_version(const nlohmann::json &value,unsigned version,const char *legacy_message){
+ const auto required=minimum_deformation_scene_version(value);if(required<=version)return;
+ if(required==25)throw std::runtime_error("Exact pose-local matrices require Scene25");
+ throw std::runtime_error(legacy_message);
+}
+
 } // namespace dome::detail

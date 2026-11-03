@@ -498,10 +498,9 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
   if(s.menu_page==27&&s.rig_fit){
-    const auto &view=*s.rig_fit;const auto &role=human_roles().at(view.role);
-    text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_role_label(view.role),fg);
-    const auto found=view.landmarks.points.find(role.name);
-    text(320*unit_,320*unit_,found==view.landmarks.points.end()?"Not placed":std::to_string(view.landmarks.points.size())+" landmarks placed",fg);
+    const auto &view=*s.rig_fit;
+    text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
+    text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
   const char *page = s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"

@@ -13,6 +13,8 @@
 #include "normal-frame-export.hpp"
 #include "prepared-color-state.hpp"
 #include "current-colors.hpp"
+#include "bone-metadata.hpp"
+#include "humanoid-placement.hpp"
 #include <bit>
 #include <map>
 #include <set>
@@ -147,6 +149,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   }
   struct SharedRig { int root, first_joint, skin; };
   std::map<std::string, SharedRig> shared_rigs;
+  std::map<const ImportedAsset *,detail::SourceBoneMetadata> bone_metadata;
   std::vector<bool> vertex_transparency;
   vertex_transparency.reserve(objects.size());
   for (const auto &input : objects) {
@@ -344,6 +347,23 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       }
       if (d.skeleton) {
         const auto &s = *d.skeleton;
+        const detail::SourceBoneMetadata *source_bones=nullptr;
+        if(o.appearance&&!o.appearance->source_joint_nodes.empty()){
+          const auto &appearance=*o.appearance;
+          if(!appearance.asset||appearance.source_joint_nodes.size()!=s.bones.size())
+            throw std::invalid_argument("Bone authoring metadata requires the actual current source joint identity table");
+          auto at=bone_metadata.find(appearance.asset.get());
+          if(at==bone_metadata.end())at=bone_metadata.emplace(appearance.asset.get(),detail::source_bone_metadata(*appearance.asset,cancelled)).first;
+          source_bones=&at->second;std::set<uint32_t> unique;
+          for(auto source:appearance.source_joint_nodes)
+            if(source>=source_bones->extras.size()||!unique.insert(source).second)
+              throw std::invalid_argument("Bone authoring metadata source joint is invalid or repeated");
+        }
+        if(!d.skin){
+          bool authored=false;for(size_t k=0;k<s.bones.size();++k)
+            authored|=s.bones[k].length!=Bone{}.length||(source_bones&&source_bones->lengths[o.appearance->source_joint_nodes[k]].has_value());
+          if(authored)throw std::invalid_argument("Unbound skeleton bone-length export needs an explicit mesh/rig association; save the native project");
+        }
         // Keep the skinned surface under its exact object/group chain. glTF
         // computes skinned positions from the joints, but the mesh-node global
         // determinant still determines winding and tangent handedness. Moving
@@ -363,11 +383,24 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           // Object names/mesh identities are irrelevant; TRS must match exactly.
           identity["object"].erase("name"); identity["object"].erase("children");
           if(o.affine_edit)identity["nativeAffineEdit"]=o.affine_edit->matrix().matrix();
-          for(const auto &pose:d.pose) identity["pose"].push_back({
+          for(const auto &pose:d.pose){ identity["pose"].push_back({
             {"t",{pose.translation.x,pose.translation.y,pose.translation.z}},
             {"r",{pose.rotation.w,pose.rotation.x,pose.rotation.y,pose.rotation.z}},
             {"s",{pose.scale.x,pose.scale.y,pose.scale.z}}});
+            if(pose.full_local_matrix)identity["pose"].back()["full_local_matrix"]=*pose.full_local_matrix;
+          }
           if(d.humanoid) identity["humanoid"]=d.humanoid->encode();
+          if(source_bones){
+            auto extras=nlohmann::json::array();bool present=false;
+            for(auto source:o.appearance->source_joint_nodes){
+              const auto &value=source_bones->extras[source];present|=value.has_value();
+              extras.push_back(value?nlohmann::json{{"present",true},{"value",*value}}
+                                    :nlohmann::json{{"present",false}});
+            }
+            // Equal skeleton values do not authorize losing a different
+            // source joint's opaque authoring data through rig deduplication.
+            if(present)identity["sourceBoneExtras"]=std::move(extras);
+          }
           rig_key=identity.dump();
         }
         if (!rig_key.empty() && shared_rigs.contains(rig_key)) {
@@ -391,8 +424,12 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
                {"rotation",
                 {t.rotation.x, t.rotation.y, t.rotation.z, t.rotation.w}},
                {"scale", {t.scale.x, t.scale.y, t.scale.z}}});
+          if(source_bones){const auto &extra=source_bones->extras[o.appearance->source_joint_nodes[index]];
+            if(extra)j["nodes"].back()["extras"]=*extra;
+          }
+          detail::write_bone_length(j["nodes"].back(),b.length);
           joint_roots[index]=first_joint+int(index);
-          if(b.rest_matrix){
+          if(b.rest_matrix||t.full_local_matrix){
             j["nodes"].back().erase("translation");j["nodes"].back().erase("rotation");j["nodes"].back().erase("scale");
             if(detail::gltf_trs_matrix(local_matrices[index]))j["nodes"].back()["matrix"]=local_matrices[index];
             else {joint_factors[index]=factor_edit_for_gltf(AffineTransform(local_matrices[index]),cancelled);j["nodes"].back()["matrix"]=joint_factors[index]->nodes[1].float_matrix();}
@@ -446,11 +483,18 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           // licensing/meta and other constraints, so no VRM extension is
           // claimed.
           d.humanoid->validate(s, true);
-          if (!d.pose.empty())
-            for (const auto &t : d.pose)
-              if (t.scale.x <= 0 || t.scale.y <= 0 || t.scale.z <= 0)
-                throw std::invalid_argument(
-                    "Humanoid export requires positive pose scales");
+          if (!d.pose.empty()){
+            const auto prefix=detail::humanoid_placement_prefix(s,*d.humanoid);
+            const auto rest=s.local_matrices(),posed=s.local_matrices(d.pose);
+            for(size_t joint=0;joint<d.pose.size();++joint){
+              const auto &t=d.pose[joint];
+              if (t.scale.x <= 0 || t.scale.y <= 0 || t.scale.z <= 0 ||
+                  (t.full_local_matrix&&AffineTransform(*t.full_local_matrix).orientation()!=AffineOrientation::Preserving)){
+                if(!prefix.test(joint)||rest[joint]!=posed[joint])
+                  throw std::invalid_argument("Humanoid export requires positive editable pose scales; exact external placement must remain unchanged");
+              }
+            }
+          }
           auto bones = nlohmann::json::object();
           for (const auto &[role, index] : d.humanoid->joints)
             bones[role] = {{"node", first_joint + int(index)}};

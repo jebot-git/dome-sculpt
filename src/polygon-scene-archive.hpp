@@ -12,6 +12,7 @@ class PolygonSceneArchive {
 public:
   uint32_t add(std::shared_ptr<const PolygonAuthority>, bool deep = true);
   uint32_t add_origin(std::shared_ptr<const PolygonOrigin>, bool deep = true);
+  uint32_t add_rig_origin(std::shared_ptr<const PolygonOrigin> origin,bool deep=true){direct_rig_origins_=true;return add_origin(std::move(origin),deep);}
   const std::shared_ptr<const PolygonAuthority> &at(uint32_t) const;
   const auto &authorities() const { return authorities_; }
   const auto &origins() const { return origins_; }
@@ -41,7 +42,7 @@ private:
   PolygonColorArchive colors_;
   std::set<const PolygonAuthority *> deeply_validated_;
   std::set<const PolygonOrigin *> deeply_validated_origins_;
-  bool direct_origins_ = false;
+  bool direct_origins_ = false,direct_rig_origins_=false;
   void collect(std::shared_ptr<const PolygonAuthority>,
                std::shared_ptr<const PolygonOrigin>, bool deep);
   std::vector<std::shared_ptr<const PolygonAuthority>> authorities_;

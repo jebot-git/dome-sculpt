@@ -10,6 +10,11 @@ struct JointTransform {
   Vec3 translation{};
   Quat rotation{};
   Vec3 scale{1, 1, 1};
+  // POSE ONLY: exact absolute joint-local affine authority. The TRS fields
+  // remain an editable reference, not an approximation of this matrix.
+  // Skeleton::local_matrices chooses this before rest-reference transport.
+  // Bone.rest must never contain this field.
+  std::optional<RigMatrix> full_local_matrix;
 };
 struct Bone {
   std::string name;
@@ -41,6 +46,10 @@ struct Skeleton {
   nlohmann::json encode() const;
   static Skeleton decode(const nlohmann::json &);
 };
+// Parent-metric translation and bone-local rotation. Conventional TRS keeps
+// its existing delta rule. An exact affine pose uses T(delta)*M*R(delta),
+// without decomposing/shear removal; clearing the pose vector resets to REST.
+JointTransform adjust_joint_pose(JointTransform,Quat local_rotation,Vec3 parent_translation);
 struct Influence {
   uint32_t joint = 0;
   float weight = 0;

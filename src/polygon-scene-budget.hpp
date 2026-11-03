@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "deformation-json.hpp"
 #include "scene-feature-version.hpp"
 #include "volume-archive.hpp"
 #include <nlohmann/json.hpp>
@@ -98,9 +99,8 @@ struct PolygonSceneBudget {
   void deformation(const nlohmann::json &d, unsigned version) {
     if (d.is_null())
       return;
-    if (minimum_deformation_scene_version(d) > version)
-      throw std::invalid_argument(
-          "Retained authored inverse binds require Scene11");
+    require_deformation_scene_version(d,version,
+        "Retained deformation exceeds its declared Scene feature version");
     const auto &p = d.at("pose"), &w = d.at("morph_weights");
     if (!p.is_array() || p.size() > 256 || !w.is_array() || w.size() > 128)
       throw std::invalid_argument(
@@ -110,6 +110,7 @@ struct PolygonSceneBudget {
           "Scene retained deformation budget exceeded");
     };
     add_entries(p.size());
+    add_entries(encoded_pose_matrix_entries(d));
     add_entries(w.size());
     if (!d.at("skin").is_null()) {
       const auto &rows = d.at("skin").at("vertices");
