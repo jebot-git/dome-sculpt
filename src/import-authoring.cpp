@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/import-authoring.hpp"
+#include "dome/native-authoring.hpp"
+#include "dome/native-scene-append.hpp"
+#include "dome/emission-native.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/import-image.hpp"
 #include "dome/import-native.hpp"
@@ -18,6 +21,12 @@
 #include "source-decoded-images.hpp"
 #include "import-texture-transform.hpp"
 #include <fstream>
+#include <cerrno>
+#include <fcntl.h>
+#include <linux/openat2.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 #include <nlohmann/json.hpp>
 #include <numeric>
 namespace dome {
@@ -25,6 +34,80 @@ namespace {
 void stop(const ImportAuthoringOptions &o) {
   if (o.limits.cancelled && o.limits.cancelled())
     throw std::runtime_error("Authoring import cancelled");
+}
+// Probe only a bounded GLB header/JSON before ordinary source capture. Read the
+// full BIN only after a reserved marker is witnessed. A package is a project,
+// never another retained raw source (which would recursively grow on reimport).
+std::optional<Scene> native_package(const std::filesystem::path &path,
+                                    const ImportAuthoringOptions &options) {
+  struct Fd {int value;explicit Fd(int v):value(v){};Fd(const Fd&)=delete;~Fd(){if(value>=0)::close(value);}};
+  if(path.native().find('\0')!=std::string::npos)throw std::invalid_argument("Import path contains a NUL byte");
+  const auto absolute=std::filesystem::absolute(path).lexically_normal();
+  Fd directory{::open(absolute.parent_path().c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC)};
+  if(directory.value<0)throw std::runtime_error("Cannot open import directory");
+  open_how how{};how.flags=O_RDONLY|O_CLOEXEC|O_NONBLOCK;
+  how.resolve=RESOLVE_BENEATH|RESOLVE_NO_MAGICLINKS;
+  const auto leaf=absolute.filename().string();
+  int descriptor=int(::syscall(SYS_openat2,directory.value,leaf.c_str(),&how,sizeof(how)));
+  if(descriptor<0&&errno==ENOSYS)
+    descriptor=::openat(directory.value,leaf.c_str(),O_RDONLY|O_CLOEXEC|O_NONBLOCK|O_NOFOLLOW);
+  Fd file{descriptor};
+  if(file.value<0)throw std::runtime_error("Cannot open import file");
+  struct stat before{},after{};
+  if(::fstat(file.value,&before)||!S_ISREG(before.st_mode)||before.st_size<0)
+    throw std::invalid_argument("Import requires a regular file");
+  const size_t limit=std::min({size_t(256*1024*1024),options.limits.max_file_bytes,options.limits.max_resource_bytes});
+  if(uint64_t(before.st_size)>limit||!limit)throw std::length_error("Native/source import file exceeds requested byte budget");
+  auto read=[&](uint8_t *data,size_t count){
+    for(size_t at=0;at<count;){
+      stop(options);const auto n=::read(file.value,data+at,std::min(size_t(65536),count-at));
+      if(n<0&&errno==EINTR)continue;
+      if(n<=0)throw std::runtime_error("Import file changed during native package capture");
+      at+=size_t(n);
+    }
+  };
+  if(before.st_size<4)return {};
+  std::array<uint8_t,20> header{};read(header.data(),4);
+  if(header[0]!='g'||header[1]!='l'||header[2]!='T'||header[3]!='F')return {};
+  if(before.st_size<20)throw std::invalid_argument("Truncated native package GLB header");
+  read(header.data()+4,16);
+  auto word=[](std::span<const uint8_t> bytes,size_t at){return uint32_t(bytes[at])|uint32_t(bytes[at+1])<<8|uint32_t(bytes[at+2])<<16|uint32_t(bytes[at+3])<<24;};
+  const size_t length=word(header,12);
+  if(word(header,4)!=2||word(header,8)!=uint64_t(before.st_size)||word(header,16)!=0x4e4f534a||length%4||length>16*1024*1024||length>uint64_t(before.st_size)-20)
+    throw std::invalid_argument("Invalid native package GLB framing/JSON limit");
+  std::vector<uint8_t> bytes(20+length);std::copy(header.begin(),header.end(),bytes.begin());
+  read(bytes.data()+20,length);size_t visits=0;
+  const auto json=nlohmann::json::parse(bytes.begin()+20,bytes.end(),
+      [&](int depth,nlohmann::json::parse_event_t,const nlohmann::json &){
+        if(depth>128||++visits>std::min(size_t(1024*1024),options.limits.max_metadata_visits))
+          throw std::length_error("Native package metadata depth/count exceeded");
+        if((visits&4095)==0)stop(options);
+        return true;
+      });
+  if(!json.is_object())throw std::invalid_argument("Invalid native package GLB root");
+  if(!json.contains("extras")||!json.at("extras").is_object())return {};
+  const auto &extras=json.at("extras");
+  const bool authoring=extras.contains("domeSculptAuthoring"),hdr=extras.contains("domeSculptEmission");
+  if(!authoring&&!hdr)return {};
+  if(authoring&&hdr)throw std::invalid_argument("Competing native package authority");
+  bytes.reserve(size_t(before.st_size));bytes.resize(size_t(before.st_size));read(bytes.data()+20+length,bytes.size()-20-length);
+  if(::fstat(file.value,&after)||before.st_dev!=after.st_dev||before.st_ino!=after.st_ino||before.st_size!=after.st_size||
+      before.st_mtim.tv_sec!=after.st_mtim.tv_sec||before.st_mtim.tv_nsec!=after.st_mtim.tv_nsec||
+      before.st_ctim.tv_sec!=after.st_ctim.tv_sec||before.st_ctim.tv_nsec!=after.st_ctim.tv_nsec)
+    throw std::runtime_error("Native package changed during capture; retry import");
+  stop(options);
+  const auto resource=options.limits.max_resource_bytes;
+  if(authoring){
+    NativeAuthoringReadLimits limits;limits.max_container_bytes=limit;
+    limits.max_native_bytes=std::min(limits.max_native_bytes,resource);
+    limits.max_decoded_native_bytes=std::min(limits.max_decoded_native_bytes,resource);
+    limits.cancelled=options.limits.cancelled;return extract_native_authoring(bytes,limits);
+  }
+  NativeEmissionReadLimits limits;limits.max_container_bytes=limit;
+  limits.max_native_bytes=std::min(limits.max_native_bytes,resource);
+  limits.max_decoded_native_bytes=std::min(limits.max_decoded_native_bytes,resource);
+  limits.max_exr_bytes=std::min(limits.max_exr_bytes,resource);
+  limits.cancelled=options.limits.cancelled;return extract_native_emission(bytes,limits);
 }
 Mesh used_source_mesh(const Mesh &source,
                       const std::function<bool()> &cancelled) {
@@ -262,6 +345,25 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       (options.paint_resolution & (options.paint_resolution - 1)))
     throw std::invalid_argument("Invalid paint resolution");
   stop(options);
+  if(!options.limits.max_file_bytes||!options.limits.max_resource_bytes||!options.limits.max_metadata_visits||!options.limits.max_vertices||!options.limits.max_triangles)
+    throw std::invalid_argument("Invalid authoring import resource limits");
+  options.choices.validate();
+  if(auto package=native_package(path,options)){
+    size_t vertices=0,triangles=0;
+    for(const auto &object:package->objects()){
+      stop(options);if(!object.painted)continue;
+      const auto &mesh=object.painted->mesh();
+      if(mesh.positions.size()>options.limits.max_vertices-vertices||mesh.indices.size()/3>options.limits.max_triangles-triangles)
+        throw std::length_error("Native package editable geometry exceeds requested import budget");
+      vertices+=mesh.positions.size();triangles+=mesh.indices.size()/3;
+    }
+    auto choices=options.choices;
+    if(choices.format==ImportSourceFormat::Glb)choices.format=ImportSourceFormat::Automatic;
+    if(choices!=ImportOptions{})
+      throw std::invalid_argument("Native project import preserves its authored units, axes and source options");
+    auto appended=append_native_scene(input,*package,options.limits.cancelled);
+    return {std::move(appended.scene),{"Imported native project exactly; stored paint resolution and source choices preserved"},std::move(appended.objects)};
+  }
   ImportedAuthoring output;
   output.scene = input.snapshot();
   auto extension = path.extension().string();
@@ -292,6 +394,11 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
           stop(options);
         return true;
       });
+  // A JSON glTF wrapper cannot preserve the authenticated original GLB BIN.
+  // Do not reinterpret a reserved package marker as ordinary raw model extras.
+  if(json.contains("extras")&&json.at("extras").is_object()&&
+      (json.at("extras").contains("domeSculptAuthoring")||json.at("extras").contains("domeSculptEmission")))
+    throw std::invalid_argument("Native project metadata requires its original authenticated binary container");
   const auto vrm_version = detail::vrm_import_version(json);
   options.limits.allow_vrm_metadata =
       vrm_version != detail::VrmImportVersion::None;

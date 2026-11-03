@@ -218,8 +218,17 @@ int main(int argc, char **argv) try {
   check(!raw_uv1_document.begin_native_stroke()&&raw_uv1_document.frame().state->message=="Prepare an editable texture atlas before painting these original source coordinates"&&!raw_uv1_document.frame().state->native_pending&&raw_uv1_document.copy_scene().encode()==raw_uv1_before,
       "Admitted raw UV1 remains read-only and refuses actual native paint admission before history or queued work");
   auto uv1_options=options;uv1_options.prepare_texture_atlas=true;auto editable_uv1=prepare_authoring_import(source,flat_uv1_path,uv1_options);
-  check(!editable_uv1.scene.object(editable_uv1.objects[0]).painted->source_maps()->uses_alternate_uv()&&editable_uv1.scene.object(editable_uv1.objects[0]).material_bindings->uv_origin->paint->source_maps()->normal.texcoord==1,
-      "Explicit atlas preparation owns current UV0 while retaining exact original UV1 sampling authority");
+  const auto &editable_uv1_object=editable_uv1.scene.object(editable_uv1.objects[0]);
+  const auto &editable_paint=*editable_uv1_object.painted;
+  const auto retained=editable_paint.source_sampling_original();
+  bool unit_writable=true;for(const auto &uv:editable_paint.mesh().uv)unit_writable&=uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;
+  bool retained_uv1=retained&&retained->source_maps()&&retained->source_maps()->normal.texcoord==1&&bool(retained->source_maps()->uv1);
+  const auto current_to_before=editable_paint.source_sampling_vertices();
+  retained_uv1&=current_to_before.size()==editable_paint.mesh().positions.size();
+  if(retained_uv1)for(size_t v=0;v<current_to_before.size();++v)
+    retained_uv1&=retained->source_maps()->uv1->at(current_to_before[v])==editable_uv1_object.appearance->asset->primitives[0].uv1.at(editable_uv1_object.appearance->source_vertices[v]);
+  check(editable_paint.source_sampling_prepared()&&editable_paint.valid_source_sampling_attachment()&&editable_paint.surface_diagnostics().policy==PaintUvPolicy::Strict&&unit_writable&&retained_uv1&&*editable_uv1_object.appearance->original_bytes==flat_uv1.bytes(),
+      "Explicit atlas owns a strict unit UV0 writable grid with authenticated original UV1 and exact raw source");
   Document editable_uv1_document;editable_uv1_document.replace(editable_uv1.scene);check(editable_uv1_document.wait_mesh()&&editable_uv1_document.begin_native_stroke(),"The explicit atlas alternative enables actual native painting admission");editable_uv1_document.end_native_stroke(false);check(editable_uv1_document.wait_native_stroke(),"Cancelled empty atlas gesture retires its worker cleanly");
   auto flat_no_uv=no_uv;
   flat_no_uv.j["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");

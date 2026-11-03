@@ -107,7 +107,7 @@ void Document::import_asset_locked(const std::filesystem::path &path,const Impor
   auto view=import_view_?std::make_shared<ImportView>(*import_view_):nullptr;
   if(view)view->settings=settings;
   queue_scene_operation_locked("Import mesh", [path, settings, report](Scene &scene, const auto &cancelled) {
-    ImportAuthoringOptions options;options.paint_resolution=settings.paint_resolution;options.choices=settings.choices;options.prepare_texture_atlas=settings.prepare_texture_atlas;options.limits.cancelled=cancelled;
+    ImportAuthoringOptions options;options.paint_resolution=settings.paint_resolution;options.choices=settings.choices;options.prepare_texture_atlas=settings.prepare_texture_atlas;options.limits.cancelled=cancelled;options.limits.max_file_bytes=256*1024*1024;
     auto prepared=prepare_authoring_import(scene,path,std::move(options));
     for(size_t i=0;i<std::min<size_t>(prepared.diagnostics.size(),8);++i){if(!report->empty())*report+="; ";*report+=text::utf8_prefix(prepared.diagnostics[i],200);}
     if(prepared.diagnostics.size()>8)*report+="; additional import diagnostics omitted";

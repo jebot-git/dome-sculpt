@@ -50,6 +50,7 @@ struct SculptObject {
 bool source_is_dormant(const SculptObject &);
 class PaintSamplingAttachment;
 class NormalPreviewProof;
+struct NativeSceneAppend;
 struct ObjectSurface {
   uint64_t id = 0;
   std::string name;
@@ -125,6 +126,10 @@ public:
   std::vector<ObjectSurface> preview_surfaces(const std::function<bool()> &, const SculptMesher &) const;
 
 private:
+  // Detached native append reserves nonlive provenance IDs without inventing
+  // geometry or bypassing the live object/group quotas. No layout change.
+  friend NativeSceneAppend append_native_scene(const Scene &,const Scene &,
+                                                const std::function<bool()> &);
   std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &, const SculptMesher & = {}) const;
   std::vector<SculptObject> objects_;
   uint64_t active_ = 1, next_ = 2;
