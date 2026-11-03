@@ -1,5 +1,16 @@
 # Full objective and completion evidence
 
+## Private original-sampling transport prototype — 2026-11-03
+
+Exact source image coordinates/samplers now transport independently of a new UV0
+atlas. Release/SAN47,781 kernel checks and72 native GL cases each pass; actual
+A77072 also has maximum image difference0. Actual72 GLBs are byte-identical across
+profiles and validate with0errors/72unfilteredwarnings. This remains a private
+kernel/graphics prototype: live paint, owning Scene/history/persistence and the
+import/UV adapter are unfinished. See SOURCE-SAMPLING-TRANSPORT.md; existing
+atlas workflow failures are not relabeled fixed. The full goal remains active.
+
+
 ## Private source-capture storage follow-up — 2026-11-03
 
 Read-only original-coordinate captures no longer allocate dense writable grids.
