@@ -162,6 +162,7 @@ void SourceMaterialBindings::validate(bool deep) const {
     if(normal_frame!=SourceMaterialNormalFrame::OriginalAttributes)throw std::invalid_argument("Original frame payload cannot reinterpret legacy converted normal pixels");
     normal_frames->validate(deep);
     if(!uv_origin || !uv_origin->paint)throw std::invalid_argument("Normal frames require retained native rest authority");
+    if(normal_frames->position_domain){const auto &root=normal_frames->position_domain->source_frame_basis();const auto original=uv_origin->paint->mesh_owner();if(root!=original||root.owner_before(original)||original.owner_before(root))throw std::invalid_argument("Derived native POSITION basis borrowed another original attribute-coordinate owner");}
     const auto &mesh=detail::frame_position_basis(*this);
     for(const auto &f:{normal_frames->pbr,normal_frames->mtoon,normal_frames->canonical})if(f) {
       if(f->origin_vertex_count!=mesh.positions.size() || f->normals.size()!=mesh.indices.size())throw std::invalid_argument("Normal frame origin geometry differs");

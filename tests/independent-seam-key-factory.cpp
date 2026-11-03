@@ -3,12 +3,34 @@
 #include "dome/normal-preparation.hpp"
 #include "normal-key-derivation.hpp"
 #include "normal-frame-runtime.hpp"
+#include "shapekey-source-uv.hpp"
+#include <chrono>
 #include "normal-projection-identity.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/paint-sampling.hpp"
 #include <iostream>
 using namespace dome;
 namespace {size_t checks=0;void check(bool b,const char*m){if(!b)throw std::runtime_error(m);++checks;std::cout<<"PASS "<<m<<std::endl;}bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}nlohmann::json paint_bytes(const PaintedMesh &paint){PaintImageArchive images;NormalSamplingArchive normals;PaintSamplingArchive sampling;auto data=paint.encode(&images,&normals,&sampling);data["normal_domains"]=normals.encode(images);data["paint_domains"]=sampling.encode();data["images"]=images.encode();return data;}bool refuses(auto f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<std::endl;return true;}}}
+namespace {
+const NormalFrameTarget &key_attributes(const NormalFrames &frame,uint64_t id){for(const auto &t:frame.targets)if(t.id==id)return t;throw std::runtime_error("Independent oracle missing target");}
+void artist_oracle(const detail::SourceKeyDerivation &node,uint64_t id){
+ const auto &before=*node.before_material();const auto &basis=*node.position_domain()->basis();const auto &frames=*node.frames();const auto &maps=node.position_domain()->origin_vertices();
+ const auto rec=std::find_if(node.targets().begin(),node.targets().end(),[&](const auto&t){return t.id==id;});if(rec==node.targets().end()||!rec->reference)throw std::runtime_error("Oracle needs actual replaced artist target");
+ const auto identity=std::find_if(before.normal_frames->targets.begin(),before.normal_frames->targets.end(),[&](const auto&t){return t.id==*rec->reference;});auto prior=identity->positions.empty()?before.uv_origin->deformation->morphs->targets.at(*identity->origin_slot).delta:identity->positions;
+ auto old_positions=basis.positions,new_positions=basis.positions;for(size_t v=0;v<maps.size();++v){old_positions[v]+=prior.at(maps[v]);new_positions[v]+=rec->positions[v];}
+ std::set<uint32_t> distinct(basis.indices.begin(),basis.indices.end());check(distinct.size()==basis.indices.size(),"Analytic artist oracle uses the actual deindexed independent triangles");
+ const std::array<std::shared_ptr<const NormalFrames>,3> old_roles{before.normal_frames->pbr,before.normal_frames->mtoon,before.normal_frames->canonical},new_roles{frames.pbr,frames.mtoon,frames.canonical};float normal_error=0,tangent_error=0,wrong_uv_error=0;
+ for(size_t role=0;role<old_roles.size();++role){if(!old_roles[role])continue;const auto &a=*old_roles[role],&b=*new_roles[role];const auto &ak=key_attributes(a,*rec->reference),&bk=key_attributes(b,id);check(a.normals.size()==b.normals.size()&&a.tangents==b.tangents&&a.source_vertices==b.source_vertices&&a.source_corners==b.source_corners&&a.source_vertex_count==b.source_vertex_count&&a.source_corner_count==b.source_corner_count,"Derived roles preserve every original artist tangent and raw attribute/corner identity");for(size_t c=0;c<a.normals.size();++c)check(same(a.normals[c],b.normals[c]),"Derived role keeps original artist base normal exact");
+  auto coordinate=detail::shapekey_frame_coordinate(before,a,detail::ShapeFrameRole(role));auto native=detail::frame_position_coordinates(before,coordinate,{});std::vector<std::array<float,2>> uv;for(auto v:maps)uv.push_back(native.at(v));
+  for(size_t c=0;c<basis.indices.size();c+=3){auto i=basis.indices[c],j=basis.indices[c+1],k=basis.indices[c+2];
+   auto frame=[&](const std::vector<Vec3>&p,const std::vector<std::array<float,2>>&coordinates){auto n=normalized(cross(p[j]-p[i],p[k]-p[i]));auto x=coordinates[i],y=coordinates[j],z=coordinates[k];const float u1=y[0]-x[0],v1=y[1]-x[1],u2=z[0]-x[0],v2=z[1]-x[1],det=u1*v2-u2*v1;auto t=((p[j]-p[i])*v2-(p[k]-p[i])*v1)/det;t=normalized(t-n*dot(n,t));return std::array<Vec3,3>{t,cross(n,t),n};};
+   auto old=frame(old_positions,uv),now=frame(new_positions,uv);std::vector<std::array<float,2>> edited;for(auto v:node.position_domain()->current_vertices())edited.push_back(node.before_paint()->mesh().uv.at(v));auto wrong_old=frame(old_positions,edited),wrong_new=frame(new_positions,edited);
+   for(size_t corner=c;corner<c+3;++corner){const float sign=a.tangents.empty()?1:a.tangents[corner][3];auto rotate=[&](const auto &left,const auto &right,Vec3 value){auto b0=left[1]*sign,b1=right[1]*sign;return right[0]*dot(value,left[0])+b1*dot(value,b0)+right[2]*dot(value,left[2]);};auto previous=a.normals[corner]+(ak.normals.empty()?Vec3{}:ak.normals[corner]);auto expected=rotate(old,now,previous);auto actual=b.normals[corner]+bk.normals[corner];normal_error=std::max(normal_error,length(expected-actual));wrong_uv_error=std::max(wrong_uv_error,length(rotate(wrong_old,wrong_new,previous)-actual));if(!a.tangents.empty()){auto t=a.tangents[corner];Vec3 base{t[0],t[1],t[2]};auto old_t=base+(ak.tangents.empty()?Vec3{}:ak.tangents[corner]);tangent_error=std::max(tangent_error,length(rotate(old,now,old_t)-(base+bk.tangents[corner])));check(b.tangents[corner][3]==t[3],"Independent key never changes immutable artist tangent handedness");}}
+  }
+ }
+ std::cout<<"ARTIST_NORMAL_MAX "<<normal_error<<" ARTIST_TANGENT_MAX "<<tangent_error<<" WRONG_EDITED_UV_MAX "<<wrong_uv_error<<std::endl;check(normal_error<1e-6f&&tangent_error<1e-6f,"Independent triangle/UV-Jacobian artist-frame transport matches real derived N/T endpoints");check(wrong_uv_error>1e-6f,"Oracle detects substituting the edited sampling atlas for original role tangent coordinates");
+}
+}
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;const auto input=Scene::load(argv[1]);const auto exact=input.encode();const auto &original=input.active();const auto &current=original.painted->mesh();auto before=original.material_bindings->normal_preparation->sampling_domain;
  check(current.positions.size()==6&&before->before_paint->mesh().positions.size()==4,"Actual saved seam fixture has distinct current6 and original4 native domains");
@@ -16,10 +38,13 @@ int main(int argc,char **argv)try{
  ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=original.deformation->morphs->targets.size()-1;edit.positions=current.positions;edit.positions[a].z+=.013f;edit.positions[b].z-=.017f;auto scene=input.snapshot();const auto actual_source_paint=scene.active().painted;size_t polls=0;auto result=author_shapekey(scene,scene.active().id,edit,[&]{++polls;return false;});
  check(result.changed,"Real detached key factory accepts opposite edits through a new owning derivation");const auto &output=scene.active();const auto recipe=output.material_bindings->normal_preparation;const auto node=recipe->key_derivation;const auto frames=output.material_bindings->normal_frames;
  check(node&&frames->position_domain&&node->frames()==frames&&node->position_domain()==frames->position_domain,"Factory owns separate key-frame and POSITION replay authorities");
+ artist_oracle(*node,frames->current_targets.at(edit.target));
  check(output.painted==actual_source_paint&&output.painted->baked()->normal_authority==original.painted->baked()->normal_authority&&output.painted->normal_projection()==original.painted->normal_projection(),"All current writable paint and normal planes/events remain exact owners");
  check(output.material_bindings->color_preparation==original.material_bindings->color_preparation&&output.appearance==original.appearance&&output.rig_source==original.rig_source,"Current colour/raw appearance and first rig source remain exact");
  check(frames->position_domain->basis()->positions.size()==6&&output.material_bindings->uv_origin==original.material_bindings->uv_origin&&output.material_bindings->uv_origin->paint->mesh().positions.size()==4,"Derived POSITION6 never relabels the retained original coordinate/attribute domain4");
  const auto &delta=output.deformation->morphs->targets[edit.target].delta;check(delta[a].z==.013f&&delta[b].z==-.017f,"Accepted native key keeps both independent seam displacements");recipe->validate();detail::normal_frame_current_authority(*output.material_bindings,current,output.deformation.get());check(true,"Independent owning recipe and complete current POSITION/frame association replay");
+ auto foreign=Scene::decode(exact);auto bad=scene.snapshot();auto borrowed=std::make_shared<SourceMaterialBindings>(*bad.active().material_bindings);borrowed->uv_origin=foreign.active().material_bindings->uv_origin;bad.active().material_bindings=borrowed;check(refuses([&]{bad.validate();}),"Equal-valued separately decoded original coordinates cannot impersonate the actual frame source owner");
+ bad=scene.snapshot();borrowed=std::make_shared<SourceMaterialBindings>(*bad.active().material_bindings);borrowed->key_derivation.reset();bad.active().material_bindings=borrowed;check(refuses([&]{bad.validate();}),"A derived frame domain without its real owning material key node refuses");
  const auto frozen_paint=paint_bytes(*node->before_paint());const auto frozen_geometry=node->before_paint()->mesh_owner();const auto frozen_event=node->before_paint()->baked()->normal_authority;
  scene.active().painted->add_layer("After key");scene.active().painted->layer_properties("After key opacity",true,.23f);scene.active().painted->clear_bake();
  check(paint_bytes(*scene.active().painted)!=frozen_paint&&paint_bytes(*node->before_paint())==frozen_paint,"Actual current layer/opacity and Clear-detail edits cannot mutate the immutable before-Paint snapshot");
