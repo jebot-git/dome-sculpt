@@ -2,6 +2,7 @@
 #pragma once
 #include "corner-key-expansion.hpp"
 #include <memory>
+#include <set>
 namespace dome {
 struct SourceMaterialBindings;
 namespace detail {
@@ -18,6 +19,7 @@ public:
   const std::vector<uint32_t> &origin_vertices() const noexcept{return origin_vertices_;}
   const std::vector<uint32_t> &source_frame_vertices() const noexcept{return source_vertices_;}
   size_t storage_bytes() const;
+  void charge_storage(size_t &,size_t,std::set<const FramePositionDomain*> &,std::set<const Mesh*> &) const;
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
 private:
   std::shared_ptr<const Mesh> basis_,before_,current_,source_;

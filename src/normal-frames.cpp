@@ -116,8 +116,8 @@ uint32_t NormalFrameArchive::add(std::shared_ptr<const NormalFrameSet> set,bool 
 }
 const std::shared_ptr<const NormalFrameSet> &NormalFrameArchive::at(uint32_t id) const {return sets_.at(id);}
 size_t NormalFrameArchive::storage_bytes() const {
-  size_t bytes=0;std::set<const NormalFrames*> frames;
-  for(const auto &s:sets_){for(const auto &f:{s->pbr,s->mtoon,s->canonical})if(f && frames.insert(f.get()).second)checked_add(bytes,f->storage_bytes());for(const auto &t:s->targets)checked_add(bytes,t.positions.size()*sizeof(Vec3));}return bytes;
+  size_t bytes=0;std::set<const NormalFrames*> frames;std::set<const detail::FramePositionDomain*> domains;std::set<const Mesh*> meshes;
+  for(const auto &s:sets_){if(s->position_domain)s->position_domain->charge_storage(bytes,max_bytes,domains,meshes);for(const auto &f:{s->pbr,s->mtoon,s->canonical})if(f && frames.insert(f.get()).second)checked_add(bytes,f->storage_bytes());for(const auto &t:s->targets)checked_add(bytes,t.positions.size()*sizeof(Vec3));}return bytes;
 }
 nlohmann::json NormalFrameArchive::encode() const {
   for(const auto &set:sets_)if(set->position_domain)throw std::invalid_argument("Derived native key domains require their owning frame archive2 codec");

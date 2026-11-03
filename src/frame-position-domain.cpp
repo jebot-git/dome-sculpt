@@ -10,16 +10,22 @@ bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
 bool same_mesh(const Mesh&a,const Mesh&b){if(a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.uv!=b.uv||a.indices!=b.indices||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)return false;for(size_t v=0;v<a.positions.size();++v)if(!same(a.positions[v],b.positions[v])||!same(a.normals[v],b.normals[v]))return false;return true;}
 template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 }
-size_t FramePositionDomain::storage_bytes() const {
-  constexpr size_t limit=128*1024*1024;size_t total=0;auto add=[&](size_t n,size_t stride){if(n>(limit-total)/stride)throw std::length_error("Native key position-domain storage exceeds budget");total+=n*stride;};
-  std::set<const Mesh*> seen;std::set<const FramePositionDomain*> domains;
+size_t FramePositionDomain::storage_bytes() const {size_t total=0;std::set<const Mesh*> meshes;std::set<const FramePositionDomain*> domains;charge_storage(total,128*1024*1024,domains,meshes);return total;}
+void FramePositionDomain::charge_storage(size_t &total,size_t limit,std::set<const FramePositionDomain*> &domains,std::set<const Mesh*> &meshes) const {
+  auto add=[&](size_t n,size_t stride){if(total>limit||n>(limit-total)/stride)throw std::length_error("Native key position-domain storage exceeds budget");total+=n*stride;};
+  std::set<const FramePositionDomain*> path;
   for(auto node=this;node;node=node->previous_.get()){
-    if(domains.size()>=32||!domains.insert(node).second)throw std::length_error("Native key position-domain history exceeds bounded acyclic depth");
+    if(path.size()>=32||!path.insert(node).second)throw std::length_error("Native key position-domain history exceeds bounded acyclic depth");
+    if(!domains.insert(node).second)break;
     if(!node->basis_||!node->before_||!node->current_||!node->source_)throw std::invalid_argument("Missing native key position-domain geometry");
-    for(const auto &mesh:{node->basis_,node->before_,node->current_,node->source_})if(seen.insert(mesh.get()).second){add(mesh->positions.size()+mesh->normals.size(),sizeof(Vec3));add(mesh->uv.size(),sizeof(std::array<float,2>));add(mesh->indices.size(),sizeof(uint32_t));add(mesh->uv_pins.size()+mesh->uv_seams.size(),1);}
+    for(const auto &mesh:{node->basis_,node->before_,node->current_,node->source_})if(meshes.insert(mesh.get()).second){
+      if(mesh->positions.size()>2'000'000||mesh->normals.size()>2'000'000||mesh->uv.size()>2'000'000||mesh->indices.size()>6'000'000||mesh->uv_pins.size()>2'000'000||mesh->uv_seams.size()>6'000'000)throw std::length_error("Native key position-domain geometry exceeds bounds");
+      add(mesh->positions.size()+mesh->normals.size(),sizeof(Vec3));add(mesh->uv.size(),sizeof(std::array<float,2>));add(mesh->indices.size(),sizeof(uint32_t));add(mesh->uv_pins.size()+mesh->uv_seams.size(),1);
+    }
     add(node->current_vertices_.size()+node->origin_vertices_.size()+node->source_vertices_.size(),sizeof(uint32_t));
-  }return total;
+  }
 }
+
 void FramePositionDomain::validate(bool deep,const std::function<bool()> &cancelled) const {
   storage_bytes();const auto n=basis_->positions.size();if(!n||n>2'000'000||basis_->indices.size()>6'000'000||current_vertices_.size()!=n||origin_vertices_.size()!=n||source_vertices_.size()!=n)
     throw std::invalid_argument("Invalid native key position-domain dimensions");
