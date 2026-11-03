@@ -8,6 +8,7 @@
 #include "paint-sampling-access.hpp"
 #include "paint-color-access.hpp"
 #include "paint-normal-access.hpp"
+#include "paint-overlay-packet.hpp"
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
 #include "source-colors.hpp"
@@ -65,9 +66,9 @@ std::optional<MToonMaterial> typed(const CreatorAppearance*a){
 }
 struct Plan {
  PaintSourceTexture view;bool srgb=false,normal=false,check_backface=false;int coord=0,role=-1;
- std::array<float,6> transform{1,0,0,1,0,0};bool animated=false;
+ std::array<float,6> transform{1,0,0,1,0,0};bool animated=false,logical=false;
 };
-bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.coord==b.coord&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
+bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.coord==b.coord&&a.logical==b.logical&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
 void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
  if((i.current_material&&detail::physical_emission(*i.current_material))||(i.native_material&&detail::hdr_emission(i.native_material->emission))||(i.paint&&i.paint->has_physical_emission()))throw std::invalid_argument("Physical emission requires an exact UV transfer adapter; source retained");
@@ -233,6 +234,8 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   }
  }
  const auto &old=i.paint->mesh();std::vector<std::array<float,2>> authored_uv1;
+ const auto independent=i.paint->source_sampling_prepared()?detail::PaintOverlayFactory::capture(*i.paint,o.cancelled):nullptr;
+ if(independent&&!i.paint->valid_source_sampling_attachment())throw std::invalid_argument("Source UV bake lost its exact independent original sampling owner");
  const std::vector<std::array<float,2>> *uv1=i.paint->source_maps()?i.paint->source_maps()->uv1.get():nullptr;
  if(i.current_deformation)result.deformation=detail::normal_frame_remap_deformation(i.current_deformation,old,i.target,i.source_vertices,o.cancelled);
  if(i.appearance){auto appearance=std::make_shared<CreatorAppearance>(*i.appearance);appearance->source_vertices.clear();appearance->source_vertices.reserve(i.source_vertices.size());for(auto v:i.source_vertices)appearance->source_vertices.push_back(i.appearance->source_vertices.at(v));result.appearance=std::move(appearance);}
@@ -313,17 +316,39 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   result.diagnostics.push_back("Paint and normal detail preserved in their original sampling coordinates; edited UV layout retained independently");
   budget.cancel();return result;
  }
- if(result.mtoon){bool needs=false;for(size_t role=0;role<size_t(MToonSlot::Count);++role){auto &t=result.mtoon->textures[role];if(t.index>=0&&role!=size_t(MToonSlot::Matcap))needs|=coordinate(t)==1;}if(needs){if(!i.appearance||!i.appearance->asset)throw std::invalid_argument("Resolved UV1 requires retained original primitive provenance");const ImportedPrimitive*p=nullptr;for(auto &v:i.appearance->asset->primitives)if(v.source_mesh==i.appearance->source_mesh&&v.source_primitive==i.appearance->source_primitive){if(p)throw std::invalid_argument("Source UV primitive identity is ambiguous");p=&v;}if(!p||p->uv1.size()!=p->mesh.positions.size()||i.appearance->source_vertices.size()!=old.positions.size())throw std::invalid_argument("Source UV1 requires exact retained primitive/accessor remap");if(!uv1)authored_uv1.reserve(old.positions.size());size_t vertex=0;for(auto v:i.appearance->source_vertices){if(v>=p->uv1.size())throw std::invalid_argument("Source UV1 remap is invalid");auto q=p->uv1[v];if(!std::isfinite(q[0])||!std::isfinite(q[1]))throw std::invalid_argument("Source UV1 is not finite");if(uv1){if(uv1->at(vertex)!=q)throw std::invalid_argument("PBR and MToon UV1 source domains differ");}else authored_uv1.push_back(q);++vertex;}if(!uv1)uv1=&authored_uv1;}}
- auto coordinate_domain=[&](int coordinate)->const std::vector<std::array<float,2>>*{
-  if(coordinate==0)return nullptr;if(coordinate==1){if(!uv1)throw std::invalid_argument("Source UV1 bake requires its exact coordinate domain");return uv1;}
+ // Typed roles use authored logical UVs. PBR roles use the genuine current
+ // image carriers; a generated UV0 carrier1 is never original TEXCOORD_1.
+ const auto *typed_uv1=independent?independent->original_uv1().get():uv1;
+ if(result.mtoon){
+  bool needs=false;for(size_t role=0;role<size_t(MToonSlot::Count);++role){const auto &t=result.mtoon->textures[role];if(t.index>=0&&role!=size_t(MToonSlot::Matcap))needs|=coordinate(t)==1;}
+  if(needs){
+   if(!i.appearance||!i.appearance->asset)throw std::invalid_argument("Resolved UV1 requires retained original primitive provenance");
+   const ImportedPrimitive *primitive=nullptr;for(const auto &p:i.appearance->asset->primitives)if(p.source_mesh==i.appearance->source_mesh&&p.source_primitive==i.appearance->source_primitive){if(primitive)throw std::invalid_argument("Source UV primitive identity is ambiguous");primitive=&p;}
+   if(!primitive||primitive->uv1.size()!=primitive->mesh.positions.size()||i.appearance->source_vertices.size()!=old.positions.size())throw std::invalid_argument("Source UV1 requires exact retained primitive/accessor remap");
+   if(!typed_uv1)authored_uv1.reserve(old.positions.size());
+   for(size_t vertex=0;vertex<i.appearance->source_vertices.size();++vertex){
+    if((vertex&1023)==0)budget.cancel();const auto source=i.appearance->source_vertices[vertex];if(source>=primitive->uv1.size())throw std::invalid_argument("Source UV1 remap is invalid");const auto q=primitive->uv1[source];
+    if(!std::isfinite(q[0])||!std::isfinite(q[1]))throw std::invalid_argument("Source UV1 is not finite");
+    if(typed_uv1){if(typed_uv1->at(vertex)!=q)throw std::invalid_argument("PBR and MToon UV1 source domains differ");}else authored_uv1.push_back(q);
+   }
+   if(!typed_uv1)typed_uv1=&authored_uv1;
+  }
+ }
+ auto coordinate_domain=[&](int coordinate,bool logical=false)->const std::vector<std::array<float,2>>*{
+  if(logical&&independent&&coordinate<=1){const auto &owner=coordinate==0?independent->original_uv0():independent->original_uv1();if(!owner||owner->size()!=old.positions.size())throw std::invalid_argument("Source UV bake requires its genuine logical source coordinate owner");return owner.get();}
+  if(coordinate==0)return nullptr;
+  if(coordinate==1){const auto *values=logical?typed_uv1:uv1;if(!values)throw std::invalid_argument("Source UV1 bake requires its exact coordinate domain");return values;}
   const auto &maps=i.paint->source_maps();if(coordinate<2||coordinate>7||!maps)throw std::invalid_argument("Extra source UV bake requires its exact coordinate owner");auto found=maps->extra_uv_sets.find(uint32_t(coordinate));if(found==maps->extra_uv_sets.end()||!found->second||found->second->size()!=old.positions.size())throw std::invalid_argument("Extra source UV bake coordinate correspondence differs");return found->second.get();
  };
- auto mapped=[&](const Plan&p,const Hit&h){auto q=uv(old,coordinate_domain(p.coord),h);if(!p.animated)return affine(q,p.transform);float mask=1;auto maskview=original_role(8);if(maskview.image){auto &mt=result.mtoon->textures[8];auto mu=uv(old,coordinate(mt)?uv1:nullptr,h);mu=mtoon_uv(*result.mtoon,MToonSlot::UvMask,mu,0,1);mask=sample_source_texture(maskview,mu[0],mu[1],mt.encoding==MToonEncoding::Srgb)[mt.channel];budget.work();}return mtoon_uv(*result.mtoon,MToonSlot(p.role),q,o.freeze_seconds,mask);};
+ auto mapped=[&](const Plan &p,const Hit &h){
+  auto q=uv(old,coordinate_domain(p.coord,p.logical),h);if(!p.animated)return affine(q,p.transform);
+  float mask=1;auto maskview=original_role(8);if(maskview.image){const auto &mt=result.mtoon->textures[8];auto mu=uv(old,coordinate_domain(coordinate(mt),true),h);mu=mtoon_uv(*result.mtoon,MToonSlot::UvMask,mu,0,1);mask=sample_source_texture(maskview,mu[0],mu[1],mt.encoding==MToonEncoding::Srgb)[mt.channel];budget.work();}
+  return mtoon_uv(*result.mtoon,MToonSlot(p.role),q,o.freeze_seconds,mask);
+ };
  std::vector<std::pair<Plan,std::shared_ptr<const Image>>> completed;std::optional<Raster> current;
  auto bake=[&](Plan p){
   if(!p.view.image)return p.view;
-  if(p.coord==1&&!uv1)throw std::invalid_argument("Source UV1 bake requires its exact coordinate domain");
-  coordinate_domain(p.coord);p.view.validate(unsigned(p.coord+1));p.view.image->validate();for(auto &[other,image]:completed)if(same(p,other)){auto out=p.view;out.image=image;out.texcoord=0;out.uv_transform={1,0,0,1,0,0};out.wrap_s=out.wrap_t=33071;return out;}
+  coordinate_domain(p.coord,p.logical);p.view.validate(unsigned(p.coord+1));p.view.image->validate();for(auto &[other,image]:completed)if(same(p,other)){auto out=p.view;out.image=image;out.texcoord=0;out.uv_transform={1,0,0,1,0,0};out.wrap_s=out.wrap_t=33071;return out;}
   uint32_t size=o.resolution?o.resolution:std::max({p.view.image->width,p.view.image->height,i.paint->resolution()});if(size_t(size)*size>o.max_image_pixels)throw std::length_error("Source UV output image pixel budget exceeded");size_t bytes=size_t(size)*size*4;if(bytes>o.max_output_bytes-result.image_bytes)throw std::length_error("Source UV output image budget exceeded");
   if(!current||current->size!=size){current.reset();current=raster(i.target,size,false,true,budget);}
   auto image=std::make_shared<Image>();image->width=image->height=size;image->rgba.assign(bytes,0);
@@ -341,14 +366,33 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   *maps=*source;PaintSourceTexture *dest[]={&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion};int role=0;for(auto slot:dest){Plan p;p.view=*slot;p.coord=slot->texcoord;p.srgb=role==0||role==2;p.normal=role==3 && !result.normal_frames;p.transform=slot->uv_transform;*slot=bake(p);++role;}
   maps->uv1.reset();maps->extra_uv_sets.clear();
  }
- if(result.mtoon){auto original=*result.mtoon;for(size_t role=0;role<size_t(MToonSlot::Count);++role){Plan p;p.view=original_role(int(role));if(!p.view.image)continue;p.role=int(role);auto &t=original.textures[role];p.coord=role==size_t(MToonSlot::Matcap)?0:coordinate(t);p.srgb=t.encoding==MToonEncoding::Srgb;p.normal=role==size_t(MToonSlot::Normal) && !result.normal_frames;p.check_backface=p.normal&&original.version()==MToonVersion::V1&&original.parameters.normal_enabled&&original.parameters.normal_scale!=0&&(original.parameters.cull!=MToonCull::Back||(original.parameters.outline!=MToonOutline::None&&original.parameters.outline_width>0));
+ if(result.mtoon){auto original=*result.mtoon;for(size_t role=0;role<size_t(MToonSlot::Count);++role){Plan p;p.view=original_role(int(role));if(!p.view.image)continue;p.role=int(role);p.logical=true;auto &t=original.textures[role];p.coord=role==size_t(MToonSlot::Matcap)?0:coordinate(t);p.srgb=t.encoding==MToonEncoding::Srgb;p.normal=role==size_t(MToonSlot::Normal) && !result.normal_frames;p.check_backface=p.normal&&original.version()==MToonVersion::V1&&original.parameters.normal_enabled&&original.parameters.normal_scale!=0&&(original.parameters.cull!=MToonCull::Back||(original.parameters.outline!=MToonOutline::None&&original.parameters.outline_width>0));
    if(role==size_t(MToonSlot::Matcap)){result.mtoon_roles[role]=p.view;result.view_dependent[role]=true;continue;}
    auto q0=mtoon_uv(original,MToonSlot(role),{0,0},0,1),qx=mtoon_uv(original,MToonSlot(role),{1,0},0,1),qy=mtoon_uv(original,MToonSlot(role),{0,1},0,1);p.transform={qx[0]-q0[0],qy[0]-q0[0],qx[1]-q0[1],qy[1]-q0[1],q0[0],q0[1]};p.animated=sampling_animation&&role!=size_t(MToonSlot::UvMask)&&!(original.version()==MToonVersion::V0&&role==size_t(MToonSlot::OutlineWidth));result.mtoon_roles[role]=bake(p);
   }
   for(size_t role=0;role<size_t(MToonSlot::Count);++role)if(!result.view_dependent[role]){auto &t=result.mtoon->textures[role];t.texcoord=0;t.transform_texcoord=-1;t.offset={};t.scale={1,1};t.rotation=0;}
   if(result.animation_frozen){result.mtoon->parameters.scroll={};result.mtoon->parameters.rotation_speed=0;}
  }
- maps->validate_surface(i.target);result.maps=maps;current.reset();size_t tangent_bytes=old_bake&&!old_bake->maps.normal.rgba.empty()&&!result.normal_frames?old.indices.size()*sizeof(Tangent)*2:0;if(tangent_bytes>o.max_working_bytes||size_t(i.paint->resolution())*i.paint->resolution()*(sizeof(Hit)*2+sizeof(int32_t)*2)>o.max_working_bytes-tangent_bytes)throw std::length_error("Source UV layer transfer working memory budget exceeded");// A pristine captured source has no atlas-space edits to transfer. Its raw
+ maps->validate_surface(i.target);result.maps=maps;current.reset();
+ if(independent&&!prepared&&!normal_prepared&&!old_bake&&i.target.indices==old.indices&&
+    i.target.positions.size()==old.positions.size()&&i.target.uv==old.uv){
+  bool identity=true;for(size_t v=0;v<i.source_vertices.size();++v){budget.work();identity&=i.source_vertices[v]==v;}
+  if(identity){
+   // The image roles move from their original logical sampling to this exact
+   // writable atlas. Editable paint already lives here: preserve every sparse
+   // owner/byte rather than roundtrip it through a second bilinear raster.
+   result.layers=i.paint->layers();
+   for(const auto &layer:result.layers){
+    for(const auto &tile:layer.tiles)if(tile)result.layer_bytes+=sizeof(PaintTile);
+    for(const auto &tile:layer.pbr_tiles)if(tile)result.layer_bytes+=sizeof(PaintColorTile);
+    for(const auto &tile:layer.emission_tiles)if(tile)result.layer_bytes+=sizeof(PaintEmissionTile);
+   }
+   if(result.layer_bytes>o.max_layer_bytes)throw std::length_error("Source UV paint tile budget exceeded");
+   budget.cancel();result.diagnostics.push_back("Original image roles explicitly resampled into the current atlas; editable paint layers retain exact sparse owners and bytes");
+   return result;
+  }
+ }
+ size_t tangent_bytes=old_bake&&!old_bake->maps.normal.rgba.empty()&&!result.normal_frames?old.indices.size()*sizeof(Tangent)*2:0;if(tangent_bytes>o.max_working_bytes||size_t(i.paint->resolution())*i.paint->resolution()*(sizeof(Hit)*2+sizeof(int32_t)*2)>o.max_working_bytes-tangent_bytes)throw std::length_error("Source UV layer transfer working memory budget exceeded");// A pristine captured source has no atlas-space edits to transfer. Its raw
  // UVs may be outside any unit tile; source textures above were sampled through
  // their exact own samplers, not through this legacy editable-layer raster.
  const bool transfer_layers=old_bake||std::any_of(i.paint->layers().begin(),i.paint->layers().end(),[](const auto &layer){
