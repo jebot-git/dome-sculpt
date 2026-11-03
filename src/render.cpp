@@ -336,10 +336,10 @@ struct SurfaceRenderer::TextureState {
         };
         for(int role=0;role<11;++role)if(!prepared_normal||role!=int(MToonSlot::Normal))original(role,role);
         if(toon.overlay){
-          toon.packed_views[0]=toon.roles[0];toon.packed_views[1]=toon.roles[3];
-          toon.packed_srgb[0]=typed->textures[0].encoding==MToonEncoding::Srgb;
-          toon.packed_srgb[1]=typed->textures[3].encoding==MToonEncoding::Srgb;
-          for(int view:{2,3}){auto &v=toon.packed_views[view];v.wrap_s=v.wrap_t=GL_CLAMP_TO_EDGE;v.min_filter=v.mag_filter=GL_LINEAR;}
+          // Original images keep their native texture samplers, including
+          // implementation-defined precision at animated wrap boundaries.
+          // Only the four actual linear paint fields share the buffer unit.
+          for(auto &v:toon.packed_views){v.wrap_s=v.wrap_t=GL_CLAMP_TO_EDGE;v.min_filter=v.mag_filter=GL_LINEAR;}
         }
         if(prepared_normal){PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;view.min_filter=view.mag_filter=GL_LINEAR;
           auto image=std::shared_ptr<const Image>(maps,&maps->mtoon_normal);
@@ -430,6 +430,8 @@ struct SurfaceRenderer::TextureState {
       }
       if(toon.overlay){
         detail::PaintOverlayCompiler::Resource forecast;forecast.owner=toon.overlay->contribution_owner()?toon.overlay->contribution_owner():toon.overlay;forecast.pbr=true;
+        toon.packed_inputs[0]=MToonSourcePacks::Input::linear(forecast,0);
+        toon.packed_inputs[1]=MToonSourcePacks::Input::linear(forecast,2);
         toon.packed_inputs[2]=MToonSourcePacks::Input::linear(forecast,4);
         toon.packed_inputs[3]=MToonSourcePacks::Input::linear(forecast,3);
       }
@@ -473,6 +475,8 @@ struct SurfaceRenderer::TextureState {
     for(auto &[object,toon]:next_toons)if(toon.derived||toon.overlay) {
       for(auto &view:toon.packed_inputs)if(view.owner)view.texture=images.at(Key{view.owner.get(),view.srgb}).id;
       if(toon.overlay){const auto &resource=paint_overlays.at(toon.overlay,true);
+        toon.packed_inputs[0]=MToonSourcePacks::Input::linear(resource,0);
+        toon.packed_inputs[1]=MToonSourcePacks::Input::linear(resource,2);
         toon.packed_inputs[2]=MToonSourcePacks::Input::linear(resource,4);
         toon.packed_inputs[3]=MToonSourcePacks::Input::linear(resource,3);
       }
@@ -855,7 +859,6 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     for(int n=0;n<16;++n){auto &slot=binding[n];glActiveTexture(GL_TEXTURE0+n);
       if(n==14){glBindTexture(GL_TEXTURE_BUFFER,(t.derived||t.overlay)?textures_->packed_sources.at(t.packed_inputs).texture:0);glBindSampler(n,0);}
       else {glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);}
-      if(t.overlay&&(n==0||n==3)){glBindTexture(GL_TEXTURE_2D,textures_->paint_overlays.at(t.overlay,true).planes[n==0?0:2]);glBindSampler(n,0);}
       present[n]=slot.image!=0;coordinates[n]=slot.coordinate;
       int role=n==12?0:n==13?3:n;scales[n*2]=scales[n*2+1]=1;
       if(role<11){auto &texture=t.material.textures[role];coordinates[n]=role==int(MToonSlot::Matcap)?0:mtoon_coordinate(texture);offsets[n*2]=texture.offset[0];offsets[n*2+1]=texture.offset[1];scales[n*2]=texture.scale[0];scales[n*2+1]=texture.scale[1];rotations[n]=texture.rotation;channels[n]=texture.channel;}

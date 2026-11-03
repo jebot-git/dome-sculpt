@@ -118,8 +118,8 @@ if(mt_derived[0]!=0){float coverage=mt_read(11,texcoord).r;vec4 original=mt_read
 vec3 paint=coverage==0?vec3(0):max(vec3(0),s.base.rgb-mt_native_color.rgb*pbr.rgb*(1-coverage));
 if(mt_shade_alias==1){vec3 contribution;for(int k=0;k<3;++k)contribution[k]=mt_native_color[k]!=0?paint[k]/mt_native_color[k]:paint[k];s.shade=max(vec3(0),s.shade*(1-coverage)+contribution);}
 s.base=coverage==0?mt_effective_color*original:max(vec4(0),s.base+(mt_effective_color*original-mt_native_color*pbr)*(1-coverage));s.base.a=clamp(s.base.a,0,1);}
-if(mt_overlay==1){float coverage=mt_packed_read(3,paintcoord).r;vec4 paint=texture(tex0,paintcoord);
-vec4 original=mt_packed_read(0,mt_uv(0,texcoord,texcoord1,N,V,mask));
+if(mt_overlay==1){float coverage=mt_packed_read(3,paintcoord).r;vec4 paint=mt_packed_read(0,paintcoord);
+vec4 original=s.base;
 if(mt_shade_alias==1){vec3 contribution;for(int k=0;k<3;++k)contribution[k]=mt_native_color[k]!=0?paint[k]/mt_native_color[k]:paint[k];s.shade=s.shade*(1-coverage)+contribution;}
 s.base=mt_effective_color*original*(1-coverage)+paint;s.base.a=clamp(s.base.a,0,1);}
 s.emission=mt_read(3,mt_uv(3,texcoord,texcoord1,N,V,mask)).rgb;
@@ -129,9 +129,9 @@ vec2 genericUV=vec2(dot(mt_pbr_x[1],vec3(texcoord,1)),dot(mt_pbr_y[1],vec3(texco
 vec3 generic=mt_packed_read(2,genericUV).rgb;
 s.emission=coverage==0?mt_effective_emission*original:max(vec3(0),s.emission+(mt_effective_emission*original-mt_native_emission*generic)*(1-coverage));}
 if(mt_overlay==1){float coverage=mt_packed_read(3,paintcoord).a;
-vec3 original=mt_packed_read(1,mt_original_emission_uv(texcoord,texcoord1,N,V,mask)).rgb;
+vec3 original=s.emission;
 vec3 background=mt_absolute_background==1?mt_background:mt_effective_emission*mt_emission_strength;
-s.emission=background*original*(1-coverage)+texture(tex3,paintcoord).rgb*mt_emission_strength+mt_packed_read(2,paintcoord).rgb;
+s.emission=background*original*(1-coverage)+mt_packed_read(1,paintcoord).rgb*mt_emission_strength+mt_packed_read(2,paintcoord).rgb;
 }else if(mt_absolute_background==1)s.emission*=mt_background;
 s.rim=mt_read(4,mt_uv(4,texcoord,texcoord1,N,V,mask)).rgb;s.matcap=mt_read(5,mt_uv(5,texcoord,texcoord1,N,V,mask)).rgb;
 s.shift=mt_scalar(6,mt_read(6,mt_uv(6,texcoord,texcoord1,N,V,mask)));s.receiveShadow=mt_scalar(9,mt_read(9,mt_uv(9,texcoord,texcoord1,N,V,mask)));s.grade=mt_scalar(10,mt_read(10,mt_uv(10,texcoord,texcoord1,N,V,mask)));
