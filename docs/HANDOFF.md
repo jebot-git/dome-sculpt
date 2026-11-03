@@ -26,7 +26,7 @@ Fresh coherent builds and combined native/GUI/graphics/interoperability,
 sanitizer and device gates are required before admission. Read
 SOURCE25-MAIN-PROOF.md for the separate fresh39-suite parent evidence,
 RIG-LENGTH-METRIC.md for the two-TU precision proof, SOURCE-NATIVE-HINTS.md and
-LOSSLESS-PREPARED-UV.md for their precise component boundaries. The full
+LOSSLESS-PREPARED-UV-WIP.md for their precise component boundaries. The full
 production goal, remaining feature rows and post-basic drawers remain active.
 
 ## Plain paint GPU integration — 2026-11-03
