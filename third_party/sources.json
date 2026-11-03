@@ -594,5 +594,16 @@
     "manifest": "third_party/softfloat/SOURCES.json",
     "generator": "tools/generate-softfloat-f64.py",
     "scope": "Integer-only nearest-even binary64 numeric results for selected-backend forward sculpt layer/mask resampling. Floating environment flags are not exposed; reconstruction and geometry quality remain host work."
+  },
+  "suitesparse_ldl_research": {
+    "repository": "https://github.com/DrTimothyAldenDavis/SuiteSparse",
+    "commit": "0f41a7786b08d3399c6fd6cf7033714bc7f019f3",
+    "license": "LGPL-2.1-or-later",
+    "adapted": "src/biharmonic-sparse-ldl.hpp",
+    "scope": "Private unregistered weight research only; no production/native admission. Native bounded C++ symbolic/numeric LDL port, positive preconditioner pivots, exact minimum-degree ordering and per-bind free-mask factor cache. Actual original-Q residual/KKT remains required.",
+    "reference": "docs/validation/BIHARMONIC-LDL-REFERENCE.json",
+    "port_sha256": "f75234ab3f18f2cb488825da1641b24f3829850fdd8d43cf82c06e1c2b27791e",
+    "license_path": "third_party/ldl/LICENSE",
+    "complete_license": "third_party/ldl/COPYING.LESSER"
   }
 }
