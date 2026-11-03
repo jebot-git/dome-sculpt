@@ -1342,16 +1342,19 @@ struct SourceKeyPaintAccess {
       SourcePaintOptions options;
       options.cancelled = cancelled;
       options.max_working_bytes = SourcePaintOptions::maximum_working_bytes;
-      SourcePaintAccess::budget(*proof->before, current.mesh(), options);
+      SourcePaintAccess::budget(*proof->before, current.mesh(), options, proof->authored_uv1);
+      SourcePaintAccess::authored(*proof->before, proof->authored_uv1, options);
+      if (proof->authored_uv1 && SourcePaintAccess::maps(*proof->before).uv1)
+        throw std::invalid_argument("Key source-sampling alias has redundant authored UV1");
       if (SourcePaintAccess::working_bytes(current) > SourcePaintOptions::maximum_working_bytes)
         throw std::length_error("Key source-sampling alias exceeds original working quota");
       auto expected = detail::transport_source_sampling(
-          proof->before->mesh(), *proof->before->source_maps_, current.mesh(), proof->vertices,
-          SourcePaintAccess::limits(options, proof->vertices.size()));
+          proof->before->mesh(), SourcePaintAccess::maps(*proof->before), current.mesh(), proof->vertices,
+          SourcePaintAccess::limits(options, proof->vertices.size(), proof->authored_uv1 ? proof->authored_uv1->size() : 0));
       if (!SourcePaintAccess::same(*expected, *current.source_maps_))
         throw std::invalid_argument(
             "Key source-sampling alias differs from complete original replay");
-      const auto &old = *proof->before->source_maps_, &now = *current.source_maps_;
+      const auto &old = SourcePaintAccess::maps(*proof->before), &now = *current.source_maps_;
       const std::array<const PaintSourceTexture *, 5> original{
           &old.color, &old.metal_rough, &old.emission, &old.normal, &old.occlusion},
           transported{&now.color, &now.metal_rough, &now.emission, &now.normal, &now.occlusion};
@@ -1379,12 +1382,19 @@ struct SourceKeyPaintAccess {
         if (std::memcmp(&value, &proof->original_uv0->at(v), sizeof(value)))
           throw std::invalid_argument("Key source-sampling alias changed original logical UV0");
       }
-      if (bool(proof->original_uv1) != bool(old.uv1) ||
-          (old.uv1 && (!now.uv1 || proof->original_uv1 != now.uv1 ||
-                       proof->original_uv1.owner_before(now.uv1) ||
-                       now.uv1.owner_before(proof->original_uv1))))
-        throw std::invalid_argument(
-            "Key source-sampling alias changed actual logical UV1 ownership");
+      const auto &before_uv1 = proof->authored_uv1 ? proof->authored_uv1 : old.uv1;
+      if (bool(proof->original_uv1) != bool(before_uv1) ||
+          (before_uv1 && proof->original_uv1->size() != proof->vertices.size()))
+        throw std::invalid_argument("Key source-sampling alias changed actual logical UV1 ownership");
+      if (old.uv1 && (!now.uv1 || proof->original_uv1 != now.uv1 ||
+                     proof->original_uv1.owner_before(now.uv1) || now.uv1.owner_before(proof->original_uv1)))
+        throw std::invalid_argument("Key source-sampling alias changed actual PBR UV1 owner");
+      if (before_uv1) for (size_t v = 0; v < proof->vertices.size(); ++v) {
+        if ((v & 1023) == 0) stop();
+        const auto value = before_uv1->at(proof->vertices[v]);
+        if (std::memcmp(&value, &proof->original_uv1->at(v), sizeof(value)))
+          throw std::invalid_argument("Key source-sampling alias changed authored UV1 correspondence");
+      }
       stop();
     };
     verify(paint, a);
@@ -1403,11 +1413,12 @@ struct SourceKeyPaintAccess {
     const auto &x = *a->before, &y = *b->before;
     const auto &xm = x.mesh(), &ym = y.mesh();
     if (a->vertices != b->vertices || !coordinates(a->original_uv0, b->original_uv0) ||
-        !coordinates(a->original_uv1, b->original_uv1) || x.resolution() != y.resolution() ||
+        !coordinates(a->original_uv1, b->original_uv1) ||
+        !coordinates(a->authored_uv1, b->authored_uv1) || x.resolution() != y.resolution() ||
         x.surface_diagnostics().policy != y.surface_diagnostics().policy ||
         !same(xm.positions, ym.positions) || !same(xm.normals, ym.normals) || xm.uv != ym.uv ||
         xm.indices != ym.indices || xm.uv_pins != ym.uv_pins || xm.uv_seams != ym.uv_seams ||
-        !SourcePaintAccess::same(*x.source_maps_, *y.source_maps_) ||
+        !SourcePaintAccess::same(SourcePaintAccess::maps(x), SourcePaintAccess::maps(y)) ||
         !SourcePaintAccess::same(*paint.source_maps_, *anchor.source_maps_) ||
         x.active_ != y.active_ || x.next_ != y.next_ || x.layers_.size() != y.layers_.size())
       return false;
