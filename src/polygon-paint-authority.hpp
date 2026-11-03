@@ -18,7 +18,7 @@ inline void require_polygon_paint_owner(const PaintedMesh *paint,const PolygonAu
 inline bool polygon_paint_policy(const nlohmann::json &paint) {
  // Structural policy inspection is not decoder admission; the owning reader
  // separately supplies its actual Paint4 capability and validates the proof.
- if(!paint.is_object())return false;const auto &p=paint_archive_payload(paint,true,SourcePaintDecodeContext{true});
+ if(!paint.is_object())return false;const auto &p=paint_archive_payload(paint,true,SourcePaintDecodeContext{true,true});
  return p.contains("uv_policy")&&p.at("uv_policy").is_string()&&p.at("uv_policy").get_ref<const std::string&>()=="polygon-authored";
 }
 }

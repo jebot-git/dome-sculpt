@@ -7,6 +7,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/polygon-scene.hpp"
 #include "paint-overlay-alpha.hpp"
+#include "polygon-conversion.hpp"
 namespace {
 std::shared_ptr<MeshSnapshot> visible(const std::shared_ptr<PaintedMesh> &paint,const Material &m) {
  auto out=std::make_shared<MeshSnapshot>();out->mesh=paint->mesh();out->ranges.push_back({1,0,out->mesh.indices.size(),m,paint->preview(m),{},0});return out;

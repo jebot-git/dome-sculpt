@@ -474,7 +474,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
       polygon_archive_index(o.at("painted"), j.at("paints").size());
     if (!o.at("polygon").is_null())
       polygon_archive_index(o.at("polygon"), aa.size());
-    if(!o.at("painted").is_null()&&polygon_paint_policy(paint_archive_payload(j.at("paints")[polygon_archive_index(o.at("painted"),j.at("paints").size())],true,true))){
+    if(!o.at("painted").is_null()&&polygon_paint_policy(paint_archive_payload(j.at("paints")[polygon_archive_index(o.at("painted"),j.at("paints").size())],true,SourcePaintDecodeContext{true,true}))){
       if(o.at("mesh_active")!=true||o.at("polygon").is_null())
         throw std::invalid_argument("Retained polygon-authored paint requires its own active authority");
       auto authority=polygon_archive_index(o.at("polygon"),aa.size());

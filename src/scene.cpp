@@ -682,7 +682,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   // Admit policy context before allocating any decoded SurfaceMap. A table
   // association is only structural permission; final deep validation proves
   // each owner's exact current/retained polygon REST/index/UV derivative.
-  for(const auto &o:objects)if(o.contains("painted")&&!o.at("painted").is_null()&&detail::polygon_paint_policy(detail::paint_archive_payload(o.at("painted"),paint_context,version>=27))){
+  for(const auto &o:objects)if(o.contains("painted")&&!o.at("painted").is_null()&&detail::polygon_paint_policy(detail::paint_archive_payload(o.at("painted"),paint_context,source_paint_context))){
     if(!polygon_fields||!o.contains("polygon")||o.at("polygon").is_null()||o.at("mesh_active")!=true)
       throw std::invalid_argument("Polygon-authored paint requires authenticated Scene12 polygon authority");
     auto index=detail::polygon_archive_index(o.at("polygon"),j.at("polygon_sources").at("authorities").size());
@@ -690,7 +690,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       throw std::invalid_argument("Polygon-authored paint has an inactive current authority");
   }
   if(j.contains("source_materials")&&j.at("source_materials").is_object()&&j.at("source_materials").contains("paints"))
-    for(const auto &paint:j.at("source_materials").at("paints"))if(detail::polygon_paint_policy(detail::paint_archive_payload(paint,paint_context,version>=27)))
+    for(const auto &paint:j.at("source_materials").at("paints"))if(detail::polygon_paint_policy(detail::paint_archive_payload(paint,paint_context,source_paint_context)))
       throw std::invalid_argument("Source UV origins cannot claim polygon paint authority; explicitly convert their UV source first");
   // Bound the complete serialized sculpt payload before decoding any object.
   // Masks are independent of displacement layers and must share the Scene
