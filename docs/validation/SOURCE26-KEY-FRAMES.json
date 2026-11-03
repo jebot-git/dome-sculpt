@@ -1,0 +1,47 @@
+{
+  "runtime_source": "cab4669",
+  "base": "cf5fa43bed7024ac35cd1fa5c7c016ad974fc965",
+  "status": "private retained-frame route; native no-frame capture prerequisite is separate",
+  "release": {
+    "existing_tests": 3,
+    "native_analytic_controller_assertions": 42,
+    "graphics_assertions": 385,
+    "cases": 72,
+    "maximum_pixel_error": 1
+  },
+  "sanitizer": {
+    "selected_tests": 5,
+    "seconds": 22.01,
+    "scope": "fresh wholly-owned C/C++ core/support/render O1 ASan/UBSan/leaks",
+    "suppressions": false
+  },
+  "hardware": {
+    "device": "PCI0000:03:00.0 Intel Arc A770",
+    "assertions": 385,
+    "cases": 72,
+    "maximum_pixel_error": 1,
+    "manifest_entries": 874,
+    "hash_changes": 0
+  },
+  "khronos": {
+    "files": 84,
+    "errors": 0,
+    "warnings": 210,
+    "expected_non_asset_cancellation_sentinels": 0
+  },
+  "evidence_sha256": {
+    "artifacts/tests-release.log": "0e2fccbcb3a2b17c1b072ce6b85d035c83b21fc26e9ef82c0503fbd5f8a7e6b5",
+    "artifacts/tests-fixture-endpoints.log": "d4e16c86f9d1e0191fc96a02527aeaa44404017b39b664d771b873fae6c57dc6",
+    "artifacts/tests-sanitize.log": "631f2e6d2670ed8c4f314e1a43b5e5d675df58d68d260c5ffa9201eb71851485",
+    "artifacts/hardware-key.log": "ec2742cc6e2dc0a684d7f65a71ead75e2af7360136e40c3bc7d7e360a472f389",
+    "artifacts/source26-khronos.json": "8a4a51b54fefca3d5c39a0e79cfd57c87e682d891263947e5cede143243948ce"
+  },
+  "remaining": [
+    "native no-retained-frame capture full qualification",
+    "broader native derivative/current-frame conversion",
+    "independent seam-key origin expansion",
+    "full candidate479 regression",
+    "later retopo/GPU-main semantic union",
+    "prepared-domain and typedUV2 interoperability"
+  ]
+}

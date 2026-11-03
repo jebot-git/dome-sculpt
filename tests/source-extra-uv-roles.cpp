@@ -17,6 +17,7 @@ import_fixture::Fixture role_fixture(int role,int coordinate){
 }
 Scene restore_raw(const Scene &scene){auto out=scene.snapshot();for(const auto &part:scene.objects())if(part.appearance){auto &o=out.object(part.id);auto b=std::make_shared<SourceMaterialBindings>(*o.material_bindings);const auto &source=*b->uv_origin;o.painted=source.paint->snapshot();o.appearance=source.appearance;o.deformation=source.deformation;b->sampling_reparameterized=false;o.material_bindings=b;}out.validate();return out;}
 }
+#ifndef DOME_EXTRA_UV_ROLE_NO_MAIN
 int main(int argc,char **argv)try{
  if(argc<2)return 2;const std::filesystem::path dir=argv[1];std::filesystem::create_directories(dir);NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<3||std::string_view(argv[2])!="--hardware"||(device.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Independent per-role source UV consumer uses the exact requested device");Fbo fbo;fbo.bind();SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
  for(int coordinate=2;coordinate<=7;++coordinate)for(int role=0;role<5;++role){auto fixture=role_fixture(role,coordinate);const auto stem="uv"+std::to_string(coordinate)+"-role"+std::to_string(role);const auto path=dir/(stem+"-source.glb");fixture.save(path);Scene before;before.active().visible=false;ImportAuthoringOptions options;options.paint_resolution=64;options.prepare_texture_atlas=true;const auto prepared=prepare_authoring_import(before,path,options);auto raw=restore_raw(prepared.scene);const auto raw_state=raw.encode();Document document;document.replace(raw);settled(document);document.shading(false);settled(document);const auto native=draw(renderer,document.frame().surface);
@@ -29,3 +30,5 @@ int main(int argc,char **argv)try{
  }
  std::cout<<"PASS "<<checks<<" independently parsed all-role extra UV checks\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+#endif
