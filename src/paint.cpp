@@ -272,6 +272,10 @@ struct PaintedMesh::SurfaceMap {
       if (uv[0] < 0 || uv[0] > 1 || uv[1] < 0 || uv[1] > 1) {
         if(options.policy!=PaintUvPolicy::SourceAuthored||paint_domain)
           throw std::invalid_argument("Paint UVs must fit a single texture tile");
+        // Match the existing source UV1/extra-set range. This is an explicit
+        // admission bound, never a clamp of authored sampling coordinates.
+        if(std::abs(uv[0])>10000||std::abs(uv[1])>10000)
+          throw std::invalid_argument("Original UV0 coordinate exceeds the finite native bound");
         source_capture_only=true;
       }
     }
