@@ -15,8 +15,10 @@ negatives refuse. Initial e901 failed the real key-beforePaint reachability
 edge; its unchanged failure evidence remains preserved. Traversal includes
 that actual edge, rather than removing orphan checks.
 
-This private Scene path has not yet passed its new whole-owned sanitizer run,
-native/controller/UI/pixels/export, generic no-preparation dispatch, all key
-commands, mixed Scene23/24/25/26 graphs, or full allocation coverage. The
+The same private Scene path also passes85 checks in a fresh whole-owned
+C/C++ O1 ASan/UBSan/leak core/support build plus4 baseline suites, with977
+captured hashes exact and zero reports. Native/controller/UI/pixels/export,
+generic no-preparation dispatch, all key commands, mixed Scene23/24/25/26 graphs
+and full allocation coverage remain required. The
 material-only parent has separately scoped R80/SAN80 plus4 baseline evidence.
 No master changes, main admission or device execution is implied.

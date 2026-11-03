@@ -6,12 +6,24 @@
     "before_after_equal": true
   },
   "scope": "Private initial owning Scene22 path; complete native/export and mixed-context qualification pending",
-  "whole_owned_sanitize": "pending",
+  "whole_owned_sanitize": {
+    "factory_exit_code": 0,
+    "baseline_exit_code": 0,
+    "before_after_equal": true,
+    "inputs": 977,
+    "elapsed_seconds": 194.51142463000724,
+    "checks": 85,
+    "baseline_suites": 4
+  },
   "files": {
     "artifacts/key-scene2-status.json": "13a137c26124ae40abbbadf29008a44d027c280526d585ab3057ebc2d9d87b8d",
     "artifacts/key-scene2-before.json": "90241a4ece33f203c477dec8e2f3ab70694a9a80ab347f31ebe4ffa6f38a6202",
     "artifacts/key-scene2-test.log": "d5374a8594088da196cc02c8c67e0d5b6ad4b9dabf86b12803405f15cf90d52a",
     "artifacts/key-scene2-build.log": "ee69357d4467a246f1cb410d8d484a573282d3949f936507b2bbe88ba64d844a",
-    "artifacts/key-scene-missing-reachability-negative.log": "0c8714f909c341b21ea08c63a5d0a34927f0a1cdb31797c7b770c2385d2e3200"
+    "artifacts/key-scene-missing-reachability-negative.log": "0c8714f909c341b21ea08c63a5d0a34927f0a1cdb31797c7b770c2385d2e3200",
+    "artifacts/key-scene-whole-sanitize-status.json": "3c07ad0e9256636219219d2f31c1d7ed36efd6bccfa37e459b51ac15205333e1",
+    "artifacts/key-scene-whole-sanitize.log": "d5374a8594088da196cc02c8c67e0d5b6ad4b9dabf86b12803405f15cf90d52a",
+    "artifacts/key-scene-whole-sanitize-baselines.log": "c1f7e4797ed362bbe9871555af0425293942bf3fa1d872fd481f726f3f4ad2f1",
+    "artifacts/key-scene-sanitize-before.json": "faa094d2477d41e7f8c27412b946ebe589d5159d5a10da5e6412c8e255fa60b5"
   }
 }
