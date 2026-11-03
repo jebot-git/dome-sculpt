@@ -210,7 +210,7 @@ void edit_uv(Document &doc) {
           else
             button->activate();
         if(buttons.size()>14){
-          buttons[14]->copy_label(v->paint_sampling_available?"Keep normal + paint detail":"Keep normal detail");
+          buttons[14]->copy_label(v->paint_sampling_available?"Keep paint + normal":"Keep normal detail");
           buttons[14]->value(v->retain_normal_sampling&&!v->retain_paint_sampling);
           if(v->retain_paint_sampling||!v->normal_sampling_available||v->normal_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[14]->deactivate();
           else buttons[14]->activate();

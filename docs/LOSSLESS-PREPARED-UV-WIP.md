@@ -52,3 +52,25 @@ adapters. Source25 remains explicitly guarded until its semantic union.
 Typed/artist/raw OriginalAccessor/alternate source-coordinate and independent
 corner-normal adaptations, current compact-atlas compilation, and broader UV
 transport remain required. This candidate does not claim those complete.
+
+## Caller quota followup
+
+This descendant adds a pre-allocation bound for the retained OLD paint-basis
+raster bounding boxes, cumulative work, and disjoint paint/normal scratch shares.
+Existing retained grids reject an explicit resize until an actual sampling
+compiler exists, preserving their current coordinates and source graph.
+
+Final descendant Release overlays pass native/controller 49, preserved explicit
+raster/Scene23 unit 94 and graphical 229. Native 54 image groups remain exact;
+original/current GLB groups each have maximum 1. All captured source paths are
+unchanged. Focused O1 ASan/UBSan/leak overlay 17 passes actual initial native Bake,
+detached owning replay, cancellation, replacement image/baked data and caller
+raster/work/scratch/image bounds. It compiles the complete changed SourceUV TU
+and complete derived fixture before frozen fully instrumented cf5 archives;
+this is not a fresh whole-source build or the whole native/controller sanitizer
+scope. The predecessor's native/controller 44 sanitizer checks also passed;
+its separate legacy94 and graphical229 sanitizer run remains finite and live.
+
+No hardware slot has been acquired for this repair. The UI wording remains
+unqualified by a fresh frontend build/actual FLTK fixture. Whole-source current
+main integration and the other missing adapters remain required.

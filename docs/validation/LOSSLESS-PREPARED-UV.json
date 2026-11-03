@@ -1,0 +1,66 @@
+{
+  "parent": "f715fe96af7286508e9f83cb98962277e6c5cb9a",
+  "status": "private scoped component; whole-source main integration and remaining gates required",
+  "full_failed_baseline": {
+    "commit": "cf5fa43bed7024ac35cd1fa5c7c016ad974fc965",
+    "passed": 474,
+    "total": 479,
+    "seconds": 6423.16,
+    "unchanged_manifest_entries": 888,
+    "failures": [
+      "atlas-cancellation",
+      "vrm-typed-uv1-import",
+      "import-authoring",
+      "document-assets",
+      "normal-color-uv-render"
+    ]
+  },
+  "fixture_only_repairs": "6ca9bcd93a93b2c37dc76179c4ad3e67ef0cd498",
+  "release": {
+    "matching_layout_overlay": true,
+    "native_controller": 49,
+    "legacy_explicit_resolution": 94,
+    "graphical": 229,
+    "image_groups": {
+      "JOINT_NATIVE": {
+        "count": 54,
+        "maximum_error": 0
+      },
+      "JOINT_ORIGINAL_GLB": {
+        "count": 54,
+        "maximum_error": 1
+      },
+      "JOINT_CURRENT_GLB": {
+        "count": 54,
+        "maximum_error": 1
+      }
+    },
+    "unchanged_source_paths": 1290
+  },
+  "sanitizer": {
+    "focused_new_quota_and_owning_replay": 17,
+    "predecessor_native_controller": 44,
+    "scope": "complete owned TUs and fixtures before immutable wholly instrumented C/C++ cf5 core/support/render archives; not fresh whole-source build",
+    "predecessor_legacy_and_graphics": "still running; not claimed"
+  },
+  "gpu": "no lease or device run for this repair",
+  "source_sha256": {
+    "src/source-uv-bake.cpp": "417fab2c25df60dfe5c86dd4e3fa08a0fa53433bdec7dcbeecddf0f6d8df9da0",
+    "src/document-uv-solve.cpp": "ad61b2158b6e35996598f043009e443073c9b3014587f854094b963846ff2bac",
+    "src/uv-editor.cpp": "71093e738d1e6e202755f420e2e62f413e15b6396a86ff540b3372ac7f32c3f1",
+    "src/palette.cpp": "812bdcb0628f029ca9e301213e984eb926de41de76cd73882cbf497b0e2be4b9",
+    "include/dome/source-uv-bake.hpp": "792af85cd9ce733fe8a998718ecbcabd601db613aee1a37c435149b1c082e029",
+    "tests/lossless-prepared-uv.cpp": "85984e72d785a80833f0a4ae39cf3d8ac06c4ed08d5c8bbd09adcd1250ef327c",
+    "tests/normal-color-uv-render.cpp": "5b7a1416c76c739eb0aca0d8eb9de938c50d5b9860715d2c4f14f510b5f4e155",
+    "tests/normal-color-uv.cpp": "a7330c70e69b7b433e44a24d4cfed431d8bb7b2ed08dcadf6ee2db06eca6e1da"
+  },
+  "remaining": [
+    "finite predecessor SAN94/229",
+    "fresh coherent current-main plus key adapters",
+    "whole optimized build/full regression",
+    "frontend/actual-loader",
+    "granted hardware",
+    "typed/artist/OriginalAccessor/alternate-domain and independent corner-normal adapters",
+    "real compact current-layout compilation"
+  ]
+}

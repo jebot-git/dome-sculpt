@@ -72,6 +72,8 @@ void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(size_t(o.normal_sampling)>1)throw std::invalid_argument("Invalid normal UV sampling method");
  if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&(!i.paint||!i.paint->normal_projection()))
    throw std::invalid_argument("Retained normal sampling requires an owning prepared source");
+ if(i.paint&&i.paint->paint_sampling_domain()&&o.resolution)
+  throw std::invalid_argument("Retained paint detail needs an explicit sampling conversion before changing its resolution; original state retained");
  if(i.paint&&i.paint->normal_projection()){
   if(i.paint->normal_projection()->version==2&&o.normal_sampling!=SourceNormalUvMethod::RetainSource)throw std::invalid_argument("Retained normal UV fields require exact correspondence, not legacy raster reinterpretation");
   if(!i.current_material||!i.current_material->normal_preparation)throw std::invalid_argument("Prepared normal UV source requires its own material interpretation");
@@ -260,7 +262,32 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  if(o.resolution==0&&o.normal_sampling==SourceNormalUvMethod::RetainSource&&prepared&&normal_prepared&&
     i.polygon_authority&&i.target_polygon&&!i.appearance&&!result.mtoon&&
     (!i.paint->source_maps()||(!i.paint->source_maps()->uv1&&i.paint->source_maps()->extra_uv_sets.empty()))){
-  const size_t normal_bytes=size_t(i.paint->resolution())*i.paint->resolution()*8;
+  // The retained SurfaceMap rebuild rasterizes its original paint coordinates,
+  // not the new authored UV0. Charge that exact conservative bounding-box work
+  // before either factory allocates a grid; its own default cap cannot replace
+  // a tighter bound supplied by this caller.
+  const auto domain=i.paint->paint_sampling_domain();
+  const auto &basis=domain?*domain->basis():old;
+  const auto r=i.paint->resolution();const uint64_t pixels=uint64_t(r)*r;
+  const uint64_t fixed_work=pixels*16+uint64_t(old.indices.size())*16+uint64_t(old.positions.size())*8;
+  if(fixed_work>o.max_sample_operations)throw std::length_error("Retained UV sampling work budget exceeded");
+  result.sample_operations=size_t(fixed_work);
+  for(size_t face=0;face<old.indices.size();face+=3){
+   if((face&1023)==0)budget.cancel();
+   std::array<std::array<float,2>,3> q;
+   for(size_t k=0;k<3;++k){const auto c=domain?domain->source_corners()[face+k]:uint32_t(face+k);q[k]=basis.uv[basis.indices[c]];}
+   auto extent=[&](size_t axis){
+    const int low=std::max(0,int(std::floor(std::min({q[0][axis],q[1][axis],q[2][axis]})*r)));
+    const int high=std::min(int(r)-1,int(std::ceil(std::max({q[0][axis],q[1][axis],q[2][axis]})*r)));
+    return high<low?uint64_t(0):uint64_t(high-low+1);
+   };
+   const uint64_t samples=extent(0)*extent(1);
+   if(samples>o.max_raster_samples-result.raster_samples)throw std::length_error("Retained UV paint raster budget exceeded");
+   result.raster_samples+=size_t(samples);
+   if(samples>o.max_sample_operations-result.sample_operations)throw std::length_error("Retained UV sampling work budget exceeded");
+   result.sample_operations+=size_t(samples);
+  }
+  const size_t normal_bytes=size_t(pixels)*8;
   if(normal_bytes>o.max_output_bytes-result.image_bytes)throw std::length_error("Retained UV normal fields exceed image output budget");
   result.image_bytes+=normal_bytes;
   // Both owning stages coexist: reserve disjoint scratch shares instead of

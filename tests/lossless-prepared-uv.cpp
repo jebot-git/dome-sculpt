@@ -28,6 +28,7 @@ int main(int argc,char **argv)try{
  options.resolution=256;auto explicit_raster=bake_source_uv(input,options);
  check(explicit_raster.color_reprojection->uv_reprojection&&!explicit_raster.color_reprojection->paint_sampling,"Explicit resolution preserves genuine raster Scene23 transfer semantics");
  options.resolution=0;options.max_layer_bytes=1;check(refuses([&]{bake_source_uv(input,options);}),"Lossless default respects the existing caller storage quota");options.max_layer_bytes=128*1024*1024;
+ for(int quota=0;quota<4;++quota){auto bounded=options;switch(quota){case 0:bounded.max_raster_samples=1;break;case 1:bounded.max_sample_operations=1;break;case 2:bounded.max_working_bytes=1;break;case 3:bounded.max_output_bytes=1;break;}check(refuses([&]{bake_source_uv(input,bounded);}),"Lossless source transfer respects caller raster/work/scratch/image quotas before publication");}
  options.cancelled=[]{return true;};check(refuses([&]{bake_source_uv(input,options);}),"Cancelled lossless preparation publishes no detached result");options.cancelled={};
  auto bad=result;auto maps=std::make_shared<PaintSourceMaps>(*bad.maps);bad.maps=maps;
  check(!adopt_source_uv_bake(bad).paint->source_maps(),"An empty structural source table does not invent sampling authority");
@@ -35,6 +36,9 @@ int main(int argc,char **argv)try{
  check(refuses([&]{adopt_source_uv_bake(bad);}),"A newly supplied source image cannot borrow retained coordinate authority");
  bad=result;auto baked=std::make_shared<BakedTextures>(*bad.baked);baked->maps.color.rgba[0]^=1;bad.baked=baked;
  check(refuses([&]{adopt_source_uv_bake(bad);}),"Modified baked pixels cannot borrow a lossless source receipt");
+ auto kept=source.snapshot();kept.active().painted=adopted.paint;kept.active().material_bindings=adopted.material_bindings;kept.active().deformation=adopted.deformation;kept.active().polygon=input.target_polygon;kept.validate();
+ auto kept_input=detached(kept);auto resize=options;resize.resolution=256;
+ check(refuses([&]{bake_source_uv(kept_input,resize);}),"Existing retained detail cannot be silently rasterized by a resolution request without its required compiler");
  check(source.encode()==exact,"Detached positive, quota, cancellation and tamper attempts preserve the complete input");
  {
   Document doc;paint_gate::Release release;doc.replace(source);ready(doc);lossless_accept(doc);auto path=directory/"accepted.dsculpt";auto f=doc.save_async(path);
