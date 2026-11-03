@@ -43,7 +43,7 @@ int main(int argc,char **argv)try{
   check(fitted.active().rig_source&&fitted.object(raw).rig_source,"Actual separate native rest edits capture both complete first rig sources");
   union_authoring::skin_products(*before.active().deformation,*fitted.active().deformation);
   check(std::any_of(fitted.active().deformation->pose.begin(),fitted.active().deformation->pose.end(),[](const auto &p){return bool(p.full_local_matrix);}),"Combined fitting owns genuine compensated exact-pose matrices");
-  Document doc;doc.replace(fitted);settled(doc);doc.spatial_action(26,1);settled(doc);doc.begin_uv();check(doc.wait_uv(),"Actual master UV worker opens the fitted prepared source");doc.edit_uv(UvAction::RetainNormals);
+  Document doc;doc.replace(fitted);settled(doc);doc.shading(false);settled(doc);doc.begin_uv();check(doc.wait_uv(),"Actual master UV worker opens the fitted prepared source");doc.edit_uv(UvAction::RetainNormals);
   const auto &mesh=fitted.active().painted->mesh();size_t face=0;while(face<mesh.indices.size()/3&&mesh.normals[mesh.indices[face*3]].z<.9f)++face;std::array<float,2> p{};for(size_t k=0;k<3;++k){auto uv=mesh.uv[mesh.indices[face*3+k]];p[0]+=uv[0]/3;p[1]+=uv[1]/3;}
   doc.edit_uv(UvAction::Pick,p[0],p[1]);doc.edit_uv(UvAction::Scale,.7f);doc.edit_uv(UvAction::Rotate,1.57079632679f);check(doc.wait_uv()&&doc.frame().state->uv->valid,"Fitted master source validates the actual fractional scale and turn");doc.end_uv(true);
   const auto project=directory/("fitted-"+std::to_string(pose)+".dsculpt");doc.save_async(project).get();settled(doc);auto accepted=doc.copy_scene();auto encoded=accepted.encode();auto restarted=Scene::load(project);
@@ -56,7 +56,7 @@ int main(int argc,char **argv)try{
   check(doc.undo()&&doc.copy_scene().encode()==fitted.encode()&&doc.redo()&&doc.copy_scene().encode()==encoded,"Combined UV worker retains exactly one global Undo/Redo and all first rig sources");settled(doc);
   for(float weight:{0.f,.35f,1.f}){
    auto a=before.snapshot(),c=restarted.snapshot();for(auto *s:{&a,&c}){auto d=*s->active().deformation;d.morph_weights[0]=weight;s->set_deformation(active,std::move(d));}
-   Document old,current;old.replace(a);current.replace(c);settled(old);settled(current);old.spatial_action(26,1);current.spatial_action(26,1);settled(old);settled(current);
+   Document old,current;old.replace(a);current.replace(c);settled(old);settled(current);old.shading(false);current.shading(false);settled(old);settled(current);
    const auto x=draw(renderer,old.frame().surface),y=draw(renderer,current.frame().surface);std::cout<<"UNION_NATIVE pose="<<pose<<" morph="<<weight<<" max="<<delta(x,y)<<std::endl;check(delta(x,y)<=2,"Exact-pose rig transport and lossless UV preserve actual partial-Bake pixels under morph mixing");
    auto output=directory/("fitted-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+".glb");current.export_asset(output).get();prepared_normal_consumer::Model model(output);fbo.bind();independent.render(model.data);auto z=read();std::cout<<"UNION_GLB max="<<delta(y,z)<<std::endl;check(delta(y,z)<=3,"Independent current GLB preserves rig factoring, authored frames and independent paint/normal sampling");
   }
