@@ -21,10 +21,14 @@ if os.environ.get("DOME_NATIVE_GUI_BUS") != "1":
               {**os.environ, "DOME_NATIVE_GUI_BUS": "1"})
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = Path(os.environ.get("DOME_SCULPT_TEST_BUILD",str(ROOT / "build")))
+HELPER = Path(os.environ.get("DOME_NATIVE_GUI_HELPER", str(BUILD / "dome-sculpt-native-strokes-test")))
 COMPACT = os.environ.get("DOME_NATIVE_GUI_COMPACT") == "1"
 PAINT=os.environ.get("DOME_NATIVE_GUI_PAINT")=="1"
 OUT = ROOT / ("artifacts/menu-native-strokes-failure" if os.environ.get("DOME_NATIVE_FAIL") else "artifacts/menu-native-strokes-paint" if PAINT else "artifacts/menu-native-strokes-accept" if os.environ.get("DOME_NATIVE_GUI_ACCEPT")=="1" else "artifacts/menu-native-strokes-cancel")
 OUT.mkdir(parents=True, exist_ok=True)
+if os.environ.get("DOME_NATIVE_GUI_OUTPUT"):
+    OUT = Path(os.environ["DOME_NATIVE_GUI_OUTPUT"])
+    OUT.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
 
@@ -67,7 +71,7 @@ async def main():
             config.parent.mkdir(parents=True,exist_ok=True)
             config.write_text(json.dumps({"font":"Unifont / Sans-Serif","font_size":16,"font_scale":2}))
         fixture = Path(task_home, "resolution.dsculpt")
-        subprocess.run([str(BUILD / "dome-sculpt-native-strokes-test"), "--paint-fixture" if PAINT else "--ui-fixture", str(fixture)], check=True)
+        subprocess.run([str(HELPER), "--paint-fixture" if PAINT else "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
         env["LD_PRELOAD"]=str(BUILD/"libdome-sculpt-native-gui-gate.so");env["DOME_NATIVE_GATE"]=str(Path(task_home,"gate"))
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
@@ -146,7 +150,7 @@ async def main():
             raise TimeoutError("Native command remained busy: " + label)
 
         def inspect():
-            return json.loads(subprocess.check_output([str(BUILD / "dome-sculpt-native-strokes-test"), "--inspect", str(fixture)], env=env))
+            return json.loads(subprocess.check_output([str(HELPER), "--inspect", str(fixture)], env=env))
 
         def enter(widget, y, text):
             geometry = widget.get_geometry()
