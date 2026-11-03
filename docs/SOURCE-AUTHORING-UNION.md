@@ -74,3 +74,22 @@ negative remains recorded; no resource cap or quality bound was raised.
 Private merge17ef104 composes both fixes and the independent test. Fresh
 combined native/GUI/device/interop/sanitizer qualification remains required
 before main admission. No new physical session or system installation occurred.
+
+The subsequent isolated broad endpoint (4689 fixture +38cc runtime) completes
+all134 native checks. Every44,484 exported corner agrees in WORLD with maximum
+9.83025e-7; independent GLB image error is0, while removing real normal detail
+produces4 against the unchanged3 bound. Actual source Cancel now explicitly
+requires its expected cancellation diagnostic and exact state/file/history.
+Read RETAINED-KEY-WORKFLOW.md for all1441 unchanged captured hashes and the
+preserved failed512-import and successful-cancel-helper attempts. This is a
+matched-archive software consumer overlay, not a fresh combined app or sanitizer
+qualification.
+
+The new commutation fixture is conditional on the render target, preserving
+core-only UI/XR-disabled configurations. Initial combined CPU/SAN multi-target
+build invocations regenerated their Makefiles but the already-running outer
+make retained its old target table and refused the new target. Successful
+app/core/three-fixture outputs and terminal2 logs are retained; explicitly
+configure before retrying the unchanged compilation scope. e063 OneAPI explicit
+configuration builds all26 listed targets successfully with1425 source hashes
+unchanged. No current GPU test follows from that build.

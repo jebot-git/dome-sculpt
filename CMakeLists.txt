@@ -2613,7 +2613,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   set_tests_properties(source-union-workflow PROPERTIES TIMEOUT 1800 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_executable(dome-sculpt-key-uv-commutation-test tests/key-uv-commutation.cpp)
   target_include_directories(dome-sculpt-key-uv-commutation-test PRIVATE src third_party/cgltf third_party/desktop)
   target_link_libraries(dome-sculpt-key-uv-commutation-test PRIVATE dome-sculpt-render)
