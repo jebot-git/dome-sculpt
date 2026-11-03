@@ -1,5 +1,18 @@
 # Full objective and completion evidence
 
+## Private painted native-project GLB producer — 2026-11-03
+
+The native Scene-owned producer/Document worker and Cancel-default FLTK export
+policy now pass131R/SAN/Arc,35selected regressions perCPU profile and15 actual
+normal-layout native GUI checks perprofile. All78 emitted outputs have0Khronos
+errors/warnings with exact cross-profile bytes. Read PAINTED-NATIVE-AUTHORING.md
+for the finite-view minification limitation, matching-component build boundary,
+retained failed input diagnostics and unresolved compact native chooser viewport.
+XR policy and generic painted physical/HDR production remain separate required
+work. This private scope is not main admission or full-goal completion; no system
+or physical session changed. Every unfinished original/additional row remains.
+
+
 ## Qualified canonical bitmap SDK continuation — 2026-11-03
 
 Private runtime592bc76 now has fresh native app/core/support/render and selected
