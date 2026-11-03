@@ -1,0 +1,2816 @@
+{
+  "recorded_utc": "2026-11-03T16:57:09.845019+00:00",
+  "status": "qualified private PBR/native subset, full production and broader admission incomplete",
+  "runtime": "b986faa",
+  "strict_native_hardware_fixture": "d43af79d590f4c35a05e7625566daccc3d90b511",
+  "visible_physical_fixture": "7749d4f",
+  "qualified_final_source": "7749d4f",
+  "public_docs_merge": "0b5ada05b155ef64333e7aa45db68f41f7a53f22",
+  "source_runtime_snapshot": {
+    "base": "e8e54fef31dac6eb81dc0c031d8cc6d687a5b9bb",
+    "files": 1495,
+    "manifest_sha256": "1e78e19a09db37697acf21cccc3be3deb044ec14d0e43d6847de4299fa66876f",
+    "patch_sha256": "f035ad138a609a4e876ff05010b48b17efcd9c5342e4cd4b8c3cfd5a5b1eee70",
+    "later_06816fe_changes_not_integrated": true
+  },
+  "selected_tests_each": 16,
+  "final_source_inputs_each": 1527,
+  "selected_artifacts_each": 26,
+  "native_worker_checks_each": 19,
+  "SurfaceRenderer_checks_each": 44,
+  "paired_max_code_error": 1,
+  "actual_sampler_cases_each": 72,
+  "sampler_checks_each": 289,
+  "sampler_max_code_error": 0,
+  "persistent_faults_each": 643,
+  "preparation_cancellation_each": 9,
+  "hardware": {
+    "device": "Intel Arc A770 /PCI0000:03:00.0",
+    "overlay_checks": 44,
+    "native_checks": 19,
+    "sampler_cases": 72,
+    "sampler_checks": 289,
+    "paired_max_code_error": 1,
+    "sampler_max_code_error": 0,
+    "software_hardware_negatives": 3,
+    "Native_Sampler_and_ten_libraries_identical_to_prior_positive_hardware": {
+      "build-overlay-release/dome-sculpt-source-paint-native-test": "d5042186625c34aad295bc97d2d0a6f8874ca04037b7317bbe0f17e6cd9855d3",
+      "build-overlay-release/dome-sculpt-source-paint-sampler-test": "a73c27213dc9d18ccf08e5241c346954ca593468a51da9fe3ef2f5f9e7d621cc",
+      "build-overlay-release/libmikktspace-robust.a": "6a271014d8ff5306fb6c537006daa87604c97f97af794a8a0c9c7dc1680a6374",
+      "build-overlay-release/libdome-sculpt-affine.a": "29fbec05aad206ac3d89841e3b91072fd3c222f8eef24ff1e4273cf7c37852fc",
+      "build-overlay-release/libxatlas.a": "c9ea10c95d5207b187e4e86398b722fc2bdcd2212024617aae80792107e6a9f6",
+      "build-overlay-release/libmikktspace.a": "ac19b411e45bb2d10f4b633cff35daf8360969c72ad0e237704a97ba632e0f49",
+      "build-overlay-release/libufbx.a": "a904adc773ae809c829f9f2d6ebe0c8d2c2cd67143cb1c6497eba0f82ba8e5ea",
+      "build-overlay-release/libdome-sculpt-spacenav.a": "1d377ca6bde4386452f2185f63bd2d1b3d98a93ea728b9abaf058be508c07116",
+      "build-overlay-release/libdome-sculpt-polygon.a": "57b8bc1e02b72883cf6d2158d4c73ab08e5b435cc24f0d185671bbb8f3a7148b",
+      "build-overlay-release/libdome-sculpt-xr.a": "39f07a79c0b583858e8bea804478bd8daced2399ab2c8955ef71c56edeadb083",
+      "build-overlay-release/libdome-sculpt-core.a": "29d72e9c6303a1c311bb79d0bcd735300b22962c11709e6fb52e192ef37fcba9",
+      "build-overlay-release/libdome-sculpt-render.a": "9e670caf6cbdd6cb0c500631b72ae22d21727ed04cc5246f10294bdd9346da33"
+    }
+  },
+  "runtime_snapshot_manifest_local": "artifacts/union/runtime-snapshot/manifest.json",
+  "proofs": [
+    {
+      "name": "release",
+      "local_status": "artifacts/overlay-proof/release/status.json",
+      "status_sha256": "fef24d9290d9c43b5b8c3bf9ff7a2abfcbd95496161de7216a60fee7acb7e6f4",
+      "result": {
+        "profile": "release",
+        "source": "13db77beffb4a098e77eccf32eaed33d9502e8c0",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 4.5696547600091435
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test"
+            ],
+            "exit": 2,
+            "seconds": 396.8913941360079
+          }
+        ],
+        "seconds": 401.6382870399975,
+        "inputs": 1523,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Fresh own entire linked core/support/render/native FLTK/OpenXR app; no old archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "sanitize",
+      "local_status": "artifacts/overlay-proof/sanitize/status.json",
+      "status_sha256": "ef6735994b603634d900bd5ef83193d0db3239d2ac4fddb35b836a8ba71b3369",
+      "result": {
+        "profile": "sanitize",
+        "source": "13db77beffb4a098e77eccf32eaed33d9502e8c0",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 4.636494297999889
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test"
+            ],
+            "exit": 2,
+            "seconds": 621.1750745959871
+          }
+        ],
+        "seconds": 625.8659219209803,
+        "inputs": 1523,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Fresh own entire linked core/support/render/native FLTK/OpenXR app; no old archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "corrected-release",
+      "local_status": "artifacts/overlay-proof/corrected-release/status.json",
+      "status_sha256": "0d8f1ad754fceb6ac22fb3b438f5aaf34a88447bc788dd732f76a96abfdb40d1",
+      "result": {
+        "profile": "release",
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 2.064621001976775
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 37.5184512839769
+          }
+        ],
+        "seconds": 39.63705131498864,
+        "inputs": 1523,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after policy-inspector and missing-test-include corrections; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "corrected-sanitize",
+      "local_status": "artifacts/overlay-proof/corrected-sanitize/status.json",
+      "status_sha256": "d3cf9e3a5d334217ec6b8a86b2310dbc8369ba07787b19d5ad79feacce06affd",
+      "result": {
+        "profile": "sanitize",
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 2.0577251840149984
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 72.10371685400605
+          }
+        ],
+        "seconds": 74.20735365801374,
+        "inputs": 1523,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after policy-inspector and missing-test-include corrections; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "packed-release",
+      "local_status": "artifacts/overlay-proof/packed-release/status.json",
+      "status_sha256": "51bf481af878bbb4974a517131272108129527934cc0e59d28432762deb9f499",
+      "result": {
+        "profile": "release",
+        "source": "ae4900773cf415a0828a7ad7bef61b810da8fde3",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 1.934034318983322
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 43.161374524002895
+          }
+        ],
+        "seconds": 45.14200474097743,
+        "inputs": 1523,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after exact native packed-source coordinate ownership correction; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "packed-sanitize",
+      "local_status": "artifacts/overlay-proof/packed-sanitize/status.json",
+      "status_sha256": "7e9a9045846da88ddbfeff45ba9b37d7c39c6901cb78b71d295ad8a3eedf3ab2",
+      "result": {
+        "profile": "sanitize",
+        "source": "ae4900773cf415a0828a7ad7bef61b810da8fde3",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 1.8992082919867244
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 87.59290228199097
+          }
+        ],
+        "seconds": 89.5480420840031,
+        "inputs": 1523,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after exact native packed-source coordinate ownership correction; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "canonical-release",
+      "local_status": "artifacts/overlay-proof/canonical-release/status.json",
+      "status_sha256": "dec11f0c9a604c16ce74b9a944629e51e8722773196bd5779a6f05a970c50432",
+      "result": {
+        "profile": "release",
+        "source": "b986faad5102dd59302638d92bfc59f900d3da82",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 4.2753899569797795
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test"
+            ],
+            "exit": 0,
+            "seconds": 109.62018213799456
+          }
+        ],
+        "seconds": 113.94237971800612,
+        "inputs": 1525,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after canonical contribution-owner and registered native/sampler fixture continuation; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "canonical-sanitize",
+      "local_status": "artifacts/overlay-proof/canonical-sanitize/status.json",
+      "status_sha256": "90512e0f7cb4df9a35e6871092a2d7744b99157f825a72aafca0d372f9345efe",
+      "result": {
+        "profile": "sanitize",
+        "source": "b986faad5102dd59302638d92bfc59f900d3da82",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 4.1896418640099
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test"
+            ],
+            "exit": 0,
+            "seconds": 178.43775338400155
+          }
+        ],
+        "seconds": 182.67378276199452,
+        "inputs": 1525,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after canonical contribution-owner and registered native/sampler fixture continuation; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "canonical-hardware-release",
+      "local_status": "artifacts/overlay-proof/canonical-hardware-release/status.json",
+      "status_sha256": "3a6470f67bc78bbf4256b6dff8bc489d3dfa37f76bbdbb3abafab27d490a85f6",
+      "result": {
+        "profile": "release",
+        "source": "d43af79d590f4c35a05e7625566daccc3d90b511",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 3.9266142999986187
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test"
+            ],
+            "exit": 0,
+            "seconds": 19.096419017994776
+          }
+        ],
+        "seconds": 23.0865594370116,
+        "inputs": 1525,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after canonical contribution-owner and registered native/sampler fixture continuation; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "canonical-hardware-sanitize",
+      "local_status": "artifacts/overlay-proof/canonical-hardware-sanitize/status.json",
+      "status_sha256": "dd19e0a08a5e5bac0097d0de98b715e44fe4daec05f3e89e09be928dd6c9feae",
+      "result": {
+        "profile": "sanitize",
+        "source": "d43af79d590f4c35a05e7625566daccc3d90b511",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 3.6985073370160535
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test"
+            ],
+            "exit": 0,
+            "seconds": 27.1701343729801
+          }
+        ],
+        "seconds": 30.925878581998404,
+        "inputs": 1525,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after canonical contribution-owner and registered native/sampler fixture continuation; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "physical-final-release",
+      "local_status": "artifacts/overlay-proof/physical-final-release/status.json",
+      "status_sha256": "6ac113d600cc7a68764c1fa9c5265c69e53dafd33d6fc91160c901d353fd1560",
+      "result": {
+        "profile": "release",
+        "source": "7749d4f945002ec3d50dae3fe9cebe4a5c6feb5c",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 1.795063638011925
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test"
+            ],
+            "exit": 0,
+            "seconds": 10.555187541991472
+          }
+        ],
+        "seconds": 12.394849861011608,
+        "inputs": 1527,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after canonical contribution-owner and registered native/sampler fixture continuation; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "physical-final-sanitize",
+      "local_status": "artifacts/overlay-proof/physical-final-sanitize/status.json",
+      "status_sha256": "a38b02a1a4413d89360e4d3a9bbeff7601ada52d16afcd92a1b8a570aac8f2c8",
+      "result": {
+        "profile": "sanitize",
+        "source": "7749d4f945002ec3d50dae3fe9cebe4a5c6feb5c",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 1.8040152059984393
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test"
+            ],
+            "exit": 0,
+            "seconds": 14.874156367994146
+          }
+        ],
+        "seconds": 16.72343850301695,
+        "inputs": 1527,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; Source28+Scene27+new TextureMaps/material ABI union; PBR SurfaceRenderer overlay and sparse point-alpha are newly wired. Coherent continuation of fresh13db77b whole own core/support/render/native FLTK/OpenXR build after canonical contribution-owner and registered native/sampler fixture continuation; same public ABI, untouched support archives. Build only, no run/GUI/GPU/HMD proof."
+      }
+    },
+    {
+      "name": "first-release-tests",
+      "local_status": "artifacts/overlay-proof/first-release-tests/status.json",
+      "status_sha256": "11893b2bb1aa7f13e3e7813b81864d0e07bd1ed0d4fca2e6158497fb93cb2ac7",
+      "result": {
+        "status": "terminal",
+        "pid": 1579174,
+        "source": "13db77beffb4a098e77eccf32eaed33d9502e8c0",
+        "scope": "Actual fresh-ABI linked core/support/render CPU/SAN consumers. New SurfaceRenderer overlay test not compiled yet (preserved missing test include); no UI/HMD/Arc proof. Source files remain frozen while separate sanitizer builder finishes.",
+        "runs": [
+          {
+            "name": "emission-background",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-background-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/first-release-tests/emission-background-output"
+            ],
+            "exit": 0,
+            "seconds": 0.009541968000121415
+          },
+          {
+            "name": "emission-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/first-release-tests/emission-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 4.603753584990045
+          },
+          {
+            "name": "emission-paint-data",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-paint-data-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/first-release-tests/emission-paint-data-output"
+            ],
+            "exit": 0,
+            "seconds": 0.010926907998509705
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "exit": 0,
+            "seconds": 0.14284014998702332
+          },
+          {
+            "name": "scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-scene-test"
+            ],
+            "exit": 0,
+            "seconds": 0.22700171201722696
+          },
+          {
+            "name": "source-union-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-union-version-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/first-release-tests/source-union-version-output"
+            ],
+            "exit": 0,
+            "seconds": 0.014038963010534644
+          },
+          {
+            "name": "unlit-fallback",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-unlit-fallback-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/first-release-tests/unlit-fallback-output"
+            ],
+            "exit": 0,
+            "seconds": 8.861777143989457
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 2.6001277650066186
+          },
+          {
+            "name": "source-paint-owning",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-owning-test"
+            ],
+            "exit": 0,
+            "seconds": 0.004181658005109057
+          },
+          {
+            "name": "source-paint-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/first-release-tests/source-paint-scene-output"
+            ],
+            "exit": 1,
+            "seconds": 0.003459515981376171
+          },
+          {
+            "name": "source-paint-resources",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-resources-test"
+            ],
+            "exit": 0,
+            "seconds": 1.7787675239960663
+          },
+          {
+            "name": "source-paint-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-faults-test"
+            ],
+            "exit": 0,
+            "seconds": 0.061084327986463904
+          }
+        ],
+        "phase": "source-paint-faults",
+        "child_pid": 1581287,
+        "failed": [
+          "source-paint-scene"
+        ],
+        "exit_code": true,
+        "source_inputs": 1523,
+        "artifacts": 22,
+        "unchanged": true
+      }
+    },
+    {
+      "name": "corrected-release-tests",
+      "local_status": "artifacts/overlay-proof/corrected-release-tests/status.json",
+      "status_sha256": "1c48cfb75e12b1ae84d8e59d6f21e19dd9b227b68cacbe34885af3d208e2b0ab",
+      "result": {
+        "status": "terminal",
+        "pid": 1607572,
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "scope": "Actual fresh-ABI linked core/support/render CPU/SAN consumers. All14 actual consumers after preserved policy inspector failure and missing test include; fresh coherent own app/support/render ABI with corrected source consumers; no GUI/HMD/Arc proof.",
+        "runs": [
+          {
+            "name": "emission-background",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-background-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-release-tests/emission-background-output"
+            ],
+            "exit": 0,
+            "seconds": 0.006981996993999928
+          },
+          {
+            "name": "emission-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-release-tests/emission-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 4.6191074890084565
+          },
+          {
+            "name": "emission-paint-data",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-paint-data-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-release-tests/emission-paint-data-output"
+            ],
+            "exit": 0,
+            "seconds": 0.012613598024472594
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "exit": 0,
+            "seconds": 0.06780618100310676
+          },
+          {
+            "name": "scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-scene-test"
+            ],
+            "exit": 0,
+            "seconds": 0.23251671198522672
+          },
+          {
+            "name": "source-union-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-union-version-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-release-tests/source-union-version-output"
+            ],
+            "exit": 0,
+            "seconds": 0.015181056980509311
+          },
+          {
+            "name": "unlit-fallback",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-unlit-fallback-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-release-tests/unlit-fallback-output"
+            ],
+            "exit": 0,
+            "seconds": 2.559706742002163
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 3.0558541040227283
+          },
+          {
+            "name": "source-paint-owning",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-owning-test"
+            ],
+            "exit": 0,
+            "seconds": 0.004932337993523106
+          },
+          {
+            "name": "source-paint-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-release-tests/source-paint-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 0.024639528011903167
+          },
+          {
+            "name": "source-paint-resources",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-resources-test"
+            ],
+            "exit": 0,
+            "seconds": 1.9456727629876696
+          },
+          {
+            "name": "source-paint-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-faults-test"
+            ],
+            "exit": 0,
+            "seconds": 0.07307486797799356
+          },
+          {
+            "name": "source-paint-overlay",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test"
+            ],
+            "exit": 0,
+            "seconds": 2.6788021639804356
+          },
+          {
+            "name": "material-visibility",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 0.00850052700843662
+          }
+        ],
+        "phase": "material-visibility",
+        "child_pid": 1609382,
+        "failed": [],
+        "exit_code": false,
+        "source_inputs": 1523,
+        "artifacts": 24,
+        "unchanged": true
+      }
+    },
+    {
+      "name": "corrected-sanitize-tests",
+      "local_status": "artifacts/overlay-proof/corrected-sanitize-tests/status.json",
+      "status_sha256": "f331f6b0567b585953307646af2c13c6505236f6037f0541418a55e3891bc0e4",
+      "result": {
+        "status": "terminal",
+        "pid": 1607717,
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "scope": "Actual fresh-ABI linked core/support/render CPU/SAN consumers. All14 actual consumers after preserved policy inspector failure and missing test include; fresh coherent own app/support/render ABI with corrected source consumers; no GUI/HMD/Arc proof.",
+        "runs": [
+          {
+            "name": "emission-background",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-background-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-sanitize-tests/emission-background-output"
+            ],
+            "exit": 0,
+            "seconds": 0.10758549199090339
+          },
+          {
+            "name": "emission-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-sanitize-tests/emission-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 74.92541247801273
+          },
+          {
+            "name": "emission-paint-data",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-paint-data-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-sanitize-tests/emission-paint-data-output"
+            ],
+            "exit": 0,
+            "seconds": 0.19672494399128482
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "exit": 0,
+            "seconds": 0.3409981529985089
+          },
+          {
+            "name": "scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-scene-test"
+            ],
+            "exit": 0,
+            "seconds": 3.3824770470091607
+          },
+          {
+            "name": "source-union-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-union-version-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-sanitize-tests/source-union-version-output"
+            ],
+            "exit": 0,
+            "seconds": 0.16748898700461723
+          },
+          {
+            "name": "unlit-fallback",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-unlit-fallback-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-sanitize-tests/unlit-fallback-output"
+            ],
+            "exit": 0,
+            "seconds": 4.435527584981173
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 38.118859306996455
+          },
+          {
+            "name": "source-paint-owning",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-owning-test"
+            ],
+            "exit": 0,
+            "seconds": 0.08060563198523596
+          },
+          {
+            "name": "source-paint-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/corrected-sanitize-tests/source-paint-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 0.20482708502095193
+          },
+          {
+            "name": "source-paint-resources",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-resources-test"
+            ],
+            "exit": 0,
+            "seconds": 19.991377875005128
+          },
+          {
+            "name": "source-paint-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-faults-test"
+            ],
+            "exit": 0,
+            "seconds": 1.9552738580096047
+          },
+          {
+            "name": "source-paint-overlay",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-overlay-test"
+            ],
+            "exit": 0,
+            "seconds": 5.249894976994256
+          },
+          {
+            "name": "material-visibility",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 0.12457900700974278
+          }
+        ],
+        "phase": "material-visibility",
+        "child_pid": 1624003,
+        "failed": [],
+        "exit_code": false,
+        "source_inputs": 1523,
+        "artifacts": 24,
+        "unchanged": true
+      }
+    },
+    {
+      "name": "final-release-tests",
+      "local_status": "artifacts/overlay-proof/final-release-tests/status.json",
+      "status_sha256": "3235d27df248fc976e37343695112c1145728290efed41356fc521ec956c711c",
+      "result": {
+        "status": "terminal",
+        "pid": 1830728,
+        "source": "d43af79d590f4c35a05e7625566daccc3d90b511",
+        "scope": "Actual fresh-ABI linked core/support/render CPU/SAN consumers. All16 actual consumers after preserved policy inspector failure and missing test include; fresh coherent own app/support/render ABI with corrected source consumers; no GUI/HMD/Arc proof.",
+        "runs": [
+          {
+            "name": "emission-background",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-background-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/emission-background-output"
+            ],
+            "exit": 0,
+            "seconds": 0.00580307500786148
+          },
+          {
+            "name": "emission-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/emission-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 4.640792652993696
+          },
+          {
+            "name": "emission-paint-data",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-paint-data-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/emission-paint-data-output"
+            ],
+            "exit": 0,
+            "seconds": 0.010645976988598704
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "exit": 0,
+            "seconds": 0.0662364849995356
+          },
+          {
+            "name": "scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-scene-test"
+            ],
+            "exit": 0,
+            "seconds": 0.23204014598741196
+          },
+          {
+            "name": "source-union-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-union-version-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/source-union-version-output"
+            ],
+            "exit": 0,
+            "seconds": 0.015264540008502081
+          },
+          {
+            "name": "unlit-fallback",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-unlit-fallback-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/unlit-fallback-output"
+            ],
+            "exit": 0,
+            "seconds": 2.456620623008348
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 2.6669054630037863
+          },
+          {
+            "name": "source-paint-owning",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-owning-test"
+            ],
+            "exit": 0,
+            "seconds": 0.004525959986494854
+          },
+          {
+            "name": "source-paint-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/source-paint-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 0.021063349005999044
+          },
+          {
+            "name": "source-paint-resources",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-resources-test"
+            ],
+            "exit": 0,
+            "seconds": 1.9126430669857655
+          },
+          {
+            "name": "source-paint-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-faults-test"
+            ],
+            "exit": 0,
+            "seconds": 0.06375439598923549
+          },
+          {
+            "name": "source-paint-overlay",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test"
+            ],
+            "exit": 0,
+            "seconds": 2.6951239529880695
+          },
+          {
+            "name": "material-visibility",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 0.009008399007143453
+          },
+          {
+            "name": "source-paint-native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/source-paint-native-output"
+            ],
+            "exit": 0,
+            "seconds": 0.1265739090158604
+          },
+          {
+            "name": "source-paint-sampler",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-sampler-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-release-tests/source-paint-sampler-output"
+            ],
+            "exit": 0,
+            "seconds": 3.2719745490176138
+          }
+        ],
+        "phase": "source-paint-sampler",
+        "child_pid": 1832749,
+        "failed": [],
+        "exit_code": false,
+        "source_inputs": 1525,
+        "artifacts": 26,
+        "unchanged": true
+      }
+    },
+    {
+      "name": "final-sanitize-tests",
+      "local_status": "artifacts/overlay-proof/final-sanitize-tests/status.json",
+      "status_sha256": "b1daa1e59e56453a7bc4683c5017ef5c8d15da58c478106f797898064038d531",
+      "result": {
+        "status": "terminal",
+        "pid": 1830861,
+        "source": "d43af79d590f4c35a05e7625566daccc3d90b511",
+        "scope": "Actual fresh-ABI linked core/support/render CPU/SAN consumers. All16 actual consumers after preserved policy inspector failure and missing test include; fresh coherent own app/support/render ABI with corrected source consumers; no GUI/HMD/Arc proof.",
+        "runs": [
+          {
+            "name": "emission-background",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-background-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/emission-background-output"
+            ],
+            "exit": 0,
+            "seconds": 0.10531521798111498
+          },
+          {
+            "name": "emission-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/emission-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 85.48181285499595
+          },
+          {
+            "name": "emission-paint-data",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-paint-data-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/emission-paint-data-output"
+            ],
+            "exit": 0,
+            "seconds": 0.20076516101835296
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "exit": 0,
+            "seconds": 0.35498924501007423
+          },
+          {
+            "name": "scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-scene-test"
+            ],
+            "exit": 0,
+            "seconds": 3.687580944999354
+          },
+          {
+            "name": "source-union-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-union-version-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/source-union-version-output"
+            ],
+            "exit": 0,
+            "seconds": 0.17342624301090837
+          },
+          {
+            "name": "unlit-fallback",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-unlit-fallback-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/unlit-fallback-output"
+            ],
+            "exit": 0,
+            "seconds": 0.3398587619885802
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 39.481076422991464
+          },
+          {
+            "name": "source-paint-owning",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-owning-test"
+            ],
+            "exit": 0,
+            "seconds": 0.07987686397973448
+          },
+          {
+            "name": "source-paint-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/source-paint-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 0.21536423999350518
+          },
+          {
+            "name": "source-paint-resources",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-resources-test"
+            ],
+            "exit": 0,
+            "seconds": 21.25220352798351
+          },
+          {
+            "name": "source-paint-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-faults-test"
+            ],
+            "exit": 0,
+            "seconds": 1.5108187810110394
+          },
+          {
+            "name": "source-paint-overlay",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-overlay-test"
+            ],
+            "exit": 0,
+            "seconds": 4.39881921801134
+          },
+          {
+            "name": "material-visibility",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 0.09777739600394852
+          },
+          {
+            "name": "source-paint-native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/source-paint-native-output"
+            ],
+            "exit": 0,
+            "seconds": 0.3682105759799015
+          },
+          {
+            "name": "source-paint-sampler",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-sampler-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/final-sanitize-tests/source-paint-sampler-output"
+            ],
+            "exit": 0,
+            "seconds": 5.236750369978836
+          }
+        ],
+        "phase": "source-paint-sampler",
+        "child_pid": 1850967,
+        "failed": [],
+        "exit_code": false,
+        "source_inputs": 1525,
+        "artifacts": 26,
+        "unchanged": true
+      }
+    },
+    {
+      "name": "physical-final-release-tests",
+      "local_status": "artifacts/overlay-proof/physical-final-release-tests/status.json",
+      "status_sha256": "6f1a234fc7ed1ca5f90ba91ab4707edd2339250e59f19daf832b686b3f265c49",
+      "result": {
+        "status": "terminal",
+        "pid": 1937627,
+        "source": "7749d4f945002ec3d50dae3fe9cebe4a5c6feb5c",
+        "scope": "Actual fresh-ABI linked core/support/render CPU/SAN consumers. All16 actual consumers after preserved policy inspector failure and missing test include; fresh coherent own app/support/render ABI with corrected source consumers; no GUI/HMD/Arc proof.",
+        "runs": [
+          {
+            "name": "emission-background",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-background-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/emission-background-output"
+            ],
+            "exit": 0,
+            "seconds": 0.0059818239824380726
+          },
+          {
+            "name": "emission-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/emission-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 4.631933544005733
+          },
+          {
+            "name": "emission-paint-data",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-emission-paint-data-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/emission-paint-data-output"
+            ],
+            "exit": 0,
+            "seconds": 0.011286095017567277
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "exit": 0,
+            "seconds": 0.06565084101748653
+          },
+          {
+            "name": "scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-scene-test"
+            ],
+            "exit": 0,
+            "seconds": 0.226765992003493
+          },
+          {
+            "name": "source-union-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-union-version-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/source-union-version-output"
+            ],
+            "exit": 0,
+            "seconds": 0.01405355500173755
+          },
+          {
+            "name": "unlit-fallback",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-unlit-fallback-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/unlit-fallback-output"
+            ],
+            "exit": 0,
+            "seconds": 0.10839349997695535
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 2.6042845670017414
+          },
+          {
+            "name": "source-paint-owning",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-owning-test"
+            ],
+            "exit": 0,
+            "seconds": 0.007105352997314185
+          },
+          {
+            "name": "source-paint-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/source-paint-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 0.02159346197731793
+          },
+          {
+            "name": "source-paint-resources",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-resources-test"
+            ],
+            "exit": 0,
+            "seconds": 1.7879299650085159
+          },
+          {
+            "name": "source-paint-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-faults-test"
+            ],
+            "exit": 0,
+            "seconds": 0.060491540003567934
+          },
+          {
+            "name": "source-paint-overlay",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test"
+            ],
+            "exit": 0,
+            "seconds": 2.4485470590007026
+          },
+          {
+            "name": "material-visibility",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 0.008504110999638215
+          },
+          {
+            "name": "source-paint-native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/source-paint-native-output"
+            ],
+            "exit": 0,
+            "seconds": 0.105632199003594
+          },
+          {
+            "name": "source-paint-sampler",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-sampler-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-release-tests/source-paint-sampler-output"
+            ],
+            "exit": 0,
+            "seconds": 2.8301574690267444
+          }
+        ],
+        "phase": "source-paint-sampler",
+        "child_pid": 1939289,
+        "failed": [],
+        "exit_code": false,
+        "source_inputs": 1527,
+        "artifacts": 26,
+        "unchanged": true
+      }
+    },
+    {
+      "name": "physical-final-sanitize-tests",
+      "local_status": "artifacts/overlay-proof/physical-final-sanitize-tests/status.json",
+      "status_sha256": "e5e190d9621e17826c16b54471ef47f6ec0e8ae2f90ac1b092d5e2d531ec4511",
+      "result": {
+        "status": "terminal",
+        "pid": 1937779,
+        "source": "7749d4f945002ec3d50dae3fe9cebe4a5c6feb5c",
+        "scope": "Actual fresh-ABI linked core/support/render CPU/SAN consumers. All16 actual consumers after preserved policy inspector failure and missing test include; fresh coherent own app/support/render ABI with corrected source consumers; no GUI/HMD/Arc proof.",
+        "runs": [
+          {
+            "name": "emission-background",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-background-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/emission-background-output"
+            ],
+            "exit": 0,
+            "seconds": 0.10334411900839768
+          },
+          {
+            "name": "emission-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/emission-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 65.96235432897811
+          },
+          {
+            "name": "emission-paint-data",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-emission-paint-data-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/emission-paint-data-output"
+            ],
+            "exit": 0,
+            "seconds": 0.1688887639902532
+          },
+          {
+            "name": "paint-overlay-gpu",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-paint-overlay-gpu-test"
+            ],
+            "exit": 0,
+            "seconds": 0.29909696901449934
+          },
+          {
+            "name": "scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-scene-test"
+            ],
+            "exit": 0,
+            "seconds": 3.085313938994659
+          },
+          {
+            "name": "source-union-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-union-version-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/source-union-version-output"
+            ],
+            "exit": 0,
+            "seconds": 0.14136818799306639
+          },
+          {
+            "name": "unlit-fallback",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-unlit-fallback-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/unlit-fallback-output"
+            ],
+            "exit": 0,
+            "seconds": 0.2627598709950689
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 31.29433899599826
+          },
+          {
+            "name": "source-paint-owning",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-owning-test"
+            ],
+            "exit": 0,
+            "seconds": 0.0629786669742316
+          },
+          {
+            "name": "source-paint-scene",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-scene-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/source-paint-scene-output"
+            ],
+            "exit": 0,
+            "seconds": 0.14766620899899863
+          },
+          {
+            "name": "source-paint-resources",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-resources-test"
+            ],
+            "exit": 0,
+            "seconds": 16.371327328990446
+          },
+          {
+            "name": "source-paint-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-faults-test"
+            ],
+            "exit": 0,
+            "seconds": 1.2208030570182018
+          },
+          {
+            "name": "source-paint-overlay",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-overlay-test"
+            ],
+            "exit": 0,
+            "seconds": 0.4129374990006909
+          },
+          {
+            "name": "material-visibility",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-material-visibility-test"
+            ],
+            "exit": 0,
+            "seconds": 0.07948574799229391
+          },
+          {
+            "name": "source-paint-native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/source-paint-native-output"
+            ],
+            "exit": 0,
+            "seconds": 0.2914062310010195
+          },
+          {
+            "name": "source-paint-sampler",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-sanitize/dome-sculpt-source-paint-sampler-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/physical-final-sanitize-tests/source-paint-sampler-output"
+            ],
+            "exit": 0,
+            "seconds": 4.098925703001441
+          }
+        ],
+        "phase": "source-paint-sampler",
+        "child_pid": 1952568,
+        "failed": [],
+        "exit_code": false,
+        "source_inputs": 1527,
+        "artifacts": 26,
+        "unchanged": true
+      }
+    },
+    {
+      "name": "forced-include-release",
+      "local_status": "artifacts/overlay-proof/forced-include-release/status.json",
+      "status_sha256": "e891517cd8be77b5828a572e0fe87ba9aa02a06391b1b2024d59948a21521e92",
+      "result": {
+        "status": "terminal",
+        "source": "13db77beffb4a098e77eccf32eaed33d9502e8c0",
+        "pid": 1586138,
+        "scope": "Only missing declaration header supplied with -include to compile unchanged registered test while sanitizer source tree stays frozen. All runtime/body/linked libraries exactly actual freshRelease ABI cohort. Not final registered-test build or GUI/HMD proof.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-include",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src/polygon-conversion.hpp",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/forced-include-release/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/tests/source-paint-overlay.cpp"
+            ],
+            "exit": 0,
+            "seconds": 6.464785532007227
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/forced-include-release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/forced-include-release/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.14301912998780608
+          },
+          {
+            "name": "overlay",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/forced-include-release/consumer"
+            ],
+            "exit": 1,
+            "seconds": 10.70308201998705
+          }
+        ],
+        "phase": "overlay",
+        "child_pid": 1586860,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "native-release",
+      "local_status": "artifacts/overlay-proof/native-release/status.json",
+      "status_sha256": "c2d02ad56dadc7f9e25900aa315719a41934d2ed5e238387af023118d2ac10fc",
+      "result": {
+        "status": "terminal",
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "pid": 1623335,
+        "scope": "Draft actual native Document/worker/queuedSave/UndoRedo/Cancel/restart plus production GL upload on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-release/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/native.cpp"
+            ],
+            "exit": 1,
+            "seconds": 3.8962600349914283
+          }
+        ],
+        "phase": "compile",
+        "child_pid": 1623357,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "native-sanitize",
+      "local_status": "artifacts/overlay-proof/native-sanitize/status.json",
+      "status_sha256": "0e971f76af6a525eee8ca76150dcce2d3ffa33e2adda6c536a35467cb5fdce1c",
+      "result": {
+        "status": "terminal",
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "pid": 1623438,
+        "scope": "Draft actual native Document/worker/queuedSave/UndoRedo/Cancel/restart plus production GL upload on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-sanitize/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/native.cpp"
+            ],
+            "exit": 1,
+            "seconds": 2.870034402003512
+          }
+        ],
+        "phase": "compile",
+        "child_pid": 1623525,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "native-surface-release",
+      "local_status": "artifacts/overlay-proof/native-surface-release/status.json",
+      "status_sha256": "873d6eac929c74749305a80be0d4ee31bba9b539199ad873a52f2be40efde911",
+      "result": {
+        "status": "terminal",
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "pid": 1634766,
+        "scope": "Draft actual native Document/worker/queuedSave/UndoRedo/Cancel/restart plus production GL upload on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-release/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/native.cpp"
+            ],
+            "exit": 0,
+            "seconds": 7.205145463987719
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-release/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.22041961702052504
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-release/run"
+            ],
+            "exit": 1,
+            "seconds": 0.09040043599088676
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1635523,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "native-surface-sanitize",
+      "local_status": "artifacts/overlay-proof/native-surface-sanitize/status.json",
+      "status_sha256": "9a4cc69127e4ff6ee74be1c84f101e6b00ba08cac2bf8f3ce427480c62a06cee",
+      "result": {
+        "status": "terminal",
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "pid": 1634911,
+        "scope": "Draft actual native Document/worker/queuedSave/UndoRedo/Cancel/restart plus production GL upload on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-sanitize/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/native.cpp"
+            ],
+            "exit": 0,
+            "seconds": 10.613724561990239
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-sanitize/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-sanitize/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.5348647299979348
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-surface-sanitize/run"
+            ],
+            "exit": 1,
+            "seconds": 0.23519717800081708
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1636512,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "native-packed-release",
+      "local_status": "artifacts/overlay-proof/native-packed-release/status.json",
+      "status_sha256": "8353bf747d9b1154979f40defc8b4b3077e4d46721fd22de950cb38167247d3d",
+      "result": {
+        "status": "terminal",
+        "source": "ae4900773cf415a0828a7ad7bef61b810da8fde3",
+        "pid": 1687455,
+        "scope": "Draft actual native Document/worker/queuedSave/UndoRedo/Cancel/restart plus production GL upload on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-release/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/native.cpp"
+            ],
+            "exit": 0,
+            "seconds": 6.876209779991768
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-release/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.20244464199640788
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-release/run"
+            ],
+            "exit": 0,
+            "seconds": 2.410487232002197
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1688311,
+        "exit_code": 0,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "native-packed-sanitize",
+      "local_status": "artifacts/overlay-proof/native-packed-sanitize/status.json",
+      "status_sha256": "9a7cda1dc48af2f9ad6fabce653d587870ad436780f148cefc06039f969e0b2f",
+      "result": {
+        "status": "terminal",
+        "source": "ae4900773cf415a0828a7ad7bef61b810da8fde3",
+        "pid": 1687579,
+        "scope": "Draft actual native Document/worker/queuedSave/UndoRedo/Cancel/restart plus production GL upload on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-sanitize/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/native.cpp"
+            ],
+            "exit": 0,
+            "seconds": 10.08732639599475
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-sanitize/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-sanitize/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.3262902040150948
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/native-packed-sanitize/run"
+            ],
+            "exit": 0,
+            "seconds": 0.28845623999950476
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1688980,
+        "exit_code": 0,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "sampler-draft-release",
+      "local_status": "artifacts/overlay-proof/sampler-draft-release/status.json",
+      "status_sha256": "0a1aecac9b10249eaa77c48042afa88a9722894eb6dbfad59041da6e6b94de7b",
+      "result": {
+        "status": "terminal",
+        "source": "ae4900773cf415a0828a7ad7bef61b810da8fde3",
+        "pid": 1703202,
+        "scope": "Draft actual72 per-role sampler/affine/wrap/high-low-frequency/alpha Source28 paint overlay comparisons plus production GL execution on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-release/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/sampler.cpp"
+            ],
+            "exit": 0,
+            "seconds": 9.023903113993583
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-release/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.21762830298393965
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-release/run"
+            ],
+            "exit": 0,
+            "seconds": 185.55570570900454
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1704322,
+        "exit_code": 0,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "sampler-draft-sanitize",
+      "local_status": "artifacts/overlay-proof/sampler-draft-sanitize/status.json",
+      "status_sha256": "8320217cfba48b61e92dd209b0295c25c8e4c315aa658cb3848cbb73ce80d730",
+      "result": {
+        "status": "terminal",
+        "source": "ae4900773cf415a0828a7ad7bef61b810da8fde3",
+        "pid": 1703370,
+        "scope": "Draft actual72 per-role sampler/affine/wrap/high-low-frequency/alpha Source28 paint overlay comparisons plus production GL execution on current coherent own linked ABI cohort. No runtime edits, registered native UI/controller/HMD claim.",
+        "runs": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-sanitize/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/union/sampler.cpp"
+            ],
+            "exit": 0,
+            "seconds": 13.875751970015699
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-source-paint-overlay-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-sanitize/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-sanitize/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.1463297989976127
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/sampler-draft-sanitize/run"
+            ],
+            "exit": 0,
+            "seconds": 179.6777749050234
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1705157,
+        "exit_code": 0,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "arc",
+      "local_status": "artifacts/overlay-proof/arc/status.json",
+      "status_sha256": "e44ac55a0ae0462b3b3c9fdbb393701326220bdaedcb0bbf764113b6897f7376",
+      "result": {
+        "status": "terminal",
+        "source": "1eae98a5fec01993e5103174738628fad36706d2",
+        "pid": 1630498,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test",
+          "--hardware"
+        ],
+        "scope": "Actual A770 SurfaceRenderer/picker/Source28 physical/legacy39 tests on current coherentRelease ABI; same binary as software test, no GUI/HMD/system/session claim.",
+        "child_pid": 1630509,
+        "exit_code": 0,
+        "seconds": 4.117890208988683,
+        "inputs": 1535,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "arc-final",
+      "local_status": "artifacts/overlay-proof/arc-final/status.json",
+      "status_sha256": "0db61ea732eb8f79a307bb7f4fa5f00448db0bc0720a3d2a3301c5f85ed5682e",
+      "result": {
+        "status": "terminal",
+        "source": "d43af79d590f4c35a05e7625566daccc3d90b511",
+        "pid": 1838684,
+        "scope": "Current canonical GPU contribution-owner exact coherentRelease cohort; strict actual A770/PCI03 overlay39/native19/sampler72 and explicit software negatives. Actual native worker/Save/history/render but no FLTK menu/HMD/system/session claim.",
+        "runs": [
+          {
+            "name": "overlay-software-negative",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test",
+              "--hardware"
+            ],
+            "exit": 1,
+            "expected": 1,
+            "seconds": 0.061633042991161346
+          },
+          {
+            "name": "overlay-hardware",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test",
+              "--hardware"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.5239830579957925
+          },
+          {
+            "name": "native-software-negative",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/arc-final/native-output",
+              "--hardware"
+            ],
+            "exit": 1,
+            "expected": 1,
+            "seconds": 0.06669440399855375
+          },
+          {
+            "name": "native-hardware",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/artifacts/overlay-proof/arc-final/native-output",
+              "--hardware"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.349944069981575
+          },
+          {
+            "name": "sampler-software-negative",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-sampler-test",
+              "--hardware"
+            ],
+            "exit": 1,
+            "expected": 1,
+            "seconds": 0.06262482999591157
+          },
+          {
+            "name": "sampler-hardware",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-sampler-test",
+              "--hardware"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.40500868001254275
+          }
+        ],
+        "phase": "sampler-hardware",
+        "child_pid": 1839019,
+        "exit_code": 0,
+        "inputs": 1539,
+        "input_drift": []
+      }
+    },
+    {
+      "name": "arc-physical",
+      "local_status": "artifacts/overlay-proof/arc-physical/status.json",
+      "status_sha256": "0672efa6e593a4b3f2f5d313d8af6f6a4330cd498aa35758060841d13cce460c",
+      "result": {
+        "status": "terminal",
+        "source": "7749d4f945002ec3d50dae3fe9cebe4a5c6feb5c",
+        "pid": 1984702,
+        "scope": "Current canonical GPU contribution-owner exact coherentRelease cohort; strict actual A770/PCI03 extendedoverlay44 including visible HDRtiny/nativeabsolutezero, and explicit software negative; native19/sampler72 binaries unchanged from prior positive hardware run. Actual native worker/Save/history/render but no FLTK menu/HMD/system/session claim.",
+        "runs": [
+          {
+            "name": "overlay-software-negative",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test",
+              "--hardware"
+            ],
+            "exit": 1,
+            "expected": 1,
+            "seconds": 0.031193746021017432
+          },
+          {
+            "name": "overlay-hardware",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-overlay-413/build-overlay-release/dome-sculpt-source-paint-overlay-test",
+              "--hardware"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.20387287900666706
+          }
+        ],
+        "phase": "overlay-hardware",
+        "child_pid": 1984763,
+        "exit_code": 0,
+        "inputs": 1541,
+        "input_drift": []
+      }
+    }
+  ],
+  "fresh_build_scope": "Both profiles fresh own linked core/support/render/nativeFLTK/OpenXR application at13db77b; first selected-target command fails on missing newtest include after app built. Documented coherent changed-source/header continuations then all selected targets/tests pass. No stale cross-ABI parent archives or full ALL-target/full-suite claim.",
+  "remaining": [
+    "06816fe prospective planner/empty/retention/float sourcepack semantic union",
+    "OriginalUV0/UV1 typedMToon +untextured/MatCap-only capture",
+    "Actual native source-aware import/adoption/UV/bake/colour/normal/rig/key authoring",
+    "HDR native controls and faithful interchange/export",
+    "FLTK/Wayland/controller/syntheticXR/physicalHMD/newvendor/fullregression qualification",
+    "All unfinished original requirements and controller drawers"
+  ],
+  "system_install": false,
+  "physical_headset": false,
+  "session_restart": false
+}

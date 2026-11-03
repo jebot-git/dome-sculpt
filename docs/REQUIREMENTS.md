@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Private original-source PBR/native paint integration — 2026-11-03
+
+The isolated Source28/physical27 integration now has live sparse GPU PBR preview,
+point-alpha picking, actual native worker/queued Save/history/Cancel/restart and
+exact authenticated render-vertex packing. R16/SAN16 pass; SurfaceRenderer44,
+native19 and72sampler/289checks also pass on strict actual A770, with paired
+max1 and samplermax0. Packed metadata shares canonical contribution owners,
+reusing all five GPU planes. Read SOURCE-PAINT-OVERLAY.md and its JSON receipt.
+This private subset does not admit typed/original-UV MToon, new native import,
+standard export or complete production. Later06816fe planner/empty/retention/
+float-sourcepack changes still need semantic union. Every unfinished original
+and additional requirement stays required; no system/session/HMD changed.
+
+
 ## Private independent-source paint data checkpoint — 2026-11-03
 
 The isolated source-paint-owning continuation now owns real pristine original
