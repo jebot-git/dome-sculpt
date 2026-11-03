@@ -66,3 +66,24 @@ refinement remain required. The supported reflection kernel is an authenticated
 triangle/corner bijection; these guards are not completion. Integration with
 latest main/VRM1 and future HDR/Source28 needs a separate coherent semantic union.
 No physical headset, system installation or new hardware-render claim is made.
+
+
+## Subsequent private Mirror Apply UI proof
+
+A fresh coherent optimized native core/render/XR/FLTK build on5344b43 passes
+actual universal-menu Mirror Apply in10 normal and12 compact bitmap GUI checks.
+Each resulting native file passes66 endpoint assertions using an explicit
+opposite-corner map, exact reflected POSITION/N and the independently signed
+artistT for both latent PBR/MToon roles. It preserves base handedness and Paint
+bytes; actual universal Undo/Redo reproduces complete files and detached Restore
+recovers the complete before-Mirror source. The same66 assertions pass for both
+files in a matching one-TU sanitizer oracle on unchanged whole-owned534 archives.
+This is a native provided source5/current12 fixture, not prepared/dual-paint or
+real-avatar Mirror evidence. No correspondence implementation supplies its map.
+
+The first GUI negative is retained: Home/Return selected visible Shape1 instead
+of the original target; the saved record correctly named that actual selection
+and the independent oracle failed. An actual Up selection corrects only the
+fixture. No runtime guard, numeric bound or product timeout changes. See
+validation/KEY-MIRROR-UI.json. Rendering is software/private Xvfb; whole UI SAN,
+Mirror export pixels, actual assets and general triangulation remain required.
