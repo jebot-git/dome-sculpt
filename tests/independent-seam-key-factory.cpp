@@ -2,6 +2,7 @@
 #include "dome/shapekey-authoring.hpp"
 #include "dome/normal-preparation.hpp"
 #include "normal-key-derivation.hpp"
+#include "key-derivation-codec.hpp"
 #include "normal-frame-runtime.hpp"
 #include "shapekey-source-uv.hpp"
 #include <chrono>
@@ -14,6 +15,37 @@
 using namespace dome;
 namespace {size_t checks=0;void check(bool b,const char*m){if(!b)throw std::runtime_error(m);++checks;std::cout<<"PASS "<<m<<std::endl;}bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}nlohmann::json paint_bytes(const PaintedMesh &paint){PaintImageArchive images;NormalSamplingArchive normals;PaintSamplingArchive sampling;auto data=paint.encode(&images,&normals,&sampling);data["normal_domains"]=normals.encode(images);data["paint_domains"]=sampling.encode();data["images"]=images.encode();return data;}bool refuses(auto f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<std::endl;return true;}}}
 namespace {
+void key_codec(const Scene &input,const Scene &authored){
+ const auto &source=authored.active();const auto node=source.material_bindings->key_derivation;
+ NormalFrameArchive frames;PaintImageArchive images;CreatorAssetArchive models;
+ const auto record=detail::KeyDerivationCodec::encode(*node,frames,0,0,models,images);
+ const auto encoded=detail::KeyFrameArchive::encode(frames);
+ check(encoded.at("version")==2&&encoded.at("position_domains").size()==1,"Actual owning key frames emit conditional archive2 and one genuine domain");
+ NormalFrameArchive legacy;legacy.add(input.active().material_bindings->normal_frames);
+ check(legacy.encode()==detail::KeyFrameArchive::encode(legacy),"Unused key codec preserves complete historical frame archive1 bytes");
+ check(refuses([&]{NormalFrameArchive::decode(encoded);}),"Bare old frame reader refuses archive2 before binding geometry authority");
+ detail::KeyFrameArchive reader(encoded);
+ check(refuses([&]{reader.at(0);}),"Structurally valid frame2 remains unavailable without its actual owning key context");
+ auto restored=Scene::decode(input.encode());const auto &before=restored.active();
+ std::vector<std::shared_ptr<const SourceMaterialBindings>> materials{before.material_bindings};
+ auto resolve=[&](uint32_t id,const std::shared_ptr<const SourceMaterialBindings>&b)->std::shared_ptr<const PaintedMesh>{if(id||b!=before.material_bindings)throw std::runtime_error("Wrong owning paint/material record");return before.painted;};
+ const auto source_bytes=restored.encode();
+ auto decode=[&](const nlohmann::json &r,detail::KeyFrameArchive &f,const std::function<bool()> &cancelled={}){return detail::KeyDerivationCodec::decode(r,1,materials,resolve,f,models,cancelled);};
+ size_t polls=0;const auto read=decode(record,reader,[&]{++polls;return false;});reader.require_complete();
+ check(read->valid_owner(read)&&read->before_material()==before.material_bindings&&read->position_domain()->source_frame_basis()==before.material_bindings->uv_origin->paint->mesh_owner(),"Owning key decoder reconstructs actual freshly decoded before/source owners");
+ check(read->frames()->pbr->encode()==node->frames()->pbr->encode()&&read->frames()->mtoon->encode()==node->frames()->mtoon->encode()&&std::equal(read->positions(read->frames()->current_targets.back()).begin(),read->positions(read->frames()->current_targets.back()).end(),node->positions(node->frames()->current_targets.back()).begin(),node->positions(node->frames()->current_targets.back()).end(),same),"Complete decoded artist N/T and independent POSITION endpoints match original writer bytes");
+ auto binding=std::make_shared<SourceMaterialBindings>(*before.material_bindings);auto recipe=std::make_shared<SourceNormalPreparation>(*binding->normal_preparation);recipe->target_frames=read->frames();recipe->key_derivation=read;binding->normal_frames=read->frames();binding->normal_preparation=recipe;binding->key_derivation=read;
+ restored.active().material_bindings=binding;restored.active().deformation=std::make_shared<const DeformationState>(DeformationState::decode(source.deformation->encode(source.painted->mesh()),before.painted->mesh()));restored.validate();
+ check(true,"Reconstructed owning node authenticates real current prepared Paint and new native keys after anchor restart");
+ auto bad=record;bad["before_binding"]=1;detail::KeyFrameArchive fresh(encoded);check(refuses([&]{decode(bad,fresh);}),"Forward/self material key references refuse before publication");
+ bad=record;bad["targets"][0]["reference"]=nullptr;check(refuses([&]{decode(bad,fresh);}),"Decoder cannot relabel a genuine original artist target as zero");
+ check(refuses([&]{fresh.at(0);}),"Failed key replay leaves the staged frame reader unbound for exact retry");
+ auto corrupt=encoded;corrupt["position_domains"][0]["source_frame_vertices"].get_binary()[0]^=1;detail::KeyFrameArchive wrong(corrupt);check(refuses([&]{decode(record,wrong);}),"Serialized raw-source correspondence tampering fails actual corner replay");
+ corrupt=encoded;corrupt["frames"][0]["targets"][0]["normals"].get_binary()[0]^=1;detail::KeyFrameArchive wrong_attributes(corrupt);check(refuses([&]{decode(record,wrong_attributes);}),"Serialized artist N/T tampering fails independent owning authoring replay");
+ corrupt=encoded;corrupt["position_domains"].push_back(corrupt["position_domains"][0]);check(refuses([&]{detail::KeyFrameArchive orphan(corrupt);}),"Unused native key domain records refuse before bulk reconstruction");
+ for(auto cut:{size_t(1),polls/2,polls}){detail::KeyFrameArchive cancelled(encoded);size_t at=0;check(refuses([&]{decode(record,cancelled,[&]{return ++at>=cut;});}),"Early/middle/late owning record cancellation refuses atomically");check(refuses([&]{cancelled.at(0);}),"Cancelled owning decode does not expose a partial frame/domain authority");}
+ check(input.encode()==source_bytes,"All owning record attempts preserve the genuine source Scene exactly");
+}
 const NormalFrameTarget &key_attributes(const NormalFrames &frame,uint64_t id){for(const auto &t:frame.targets)if(t.id==id)return t;throw std::runtime_error("Independent oracle missing target");}
 void artist_oracle(const detail::SourceKeyDerivation &node,uint64_t id){
  const auto &before=*node.before_material();const auto &basis=*node.position_domain()->basis();const auto &frames=*node.frames();const auto &maps=node.position_domain()->origin_vertices();
@@ -46,6 +78,7 @@ int main(int argc,char **argv)try{
  check(result.changed,"Real detached key factory accepts opposite edits through a new owning derivation");const auto &output=scene.active();const auto recipe=output.material_bindings->normal_preparation;const auto node=recipe->key_derivation;const auto frames=output.material_bindings->normal_frames;
  check(node&&frames->position_domain&&node->frames()==frames&&node->position_domain()==frames->position_domain,"Factory owns separate key-frame and POSITION replay authorities");
  artist_oracle(*node,frames->current_targets.at(edit.target));
+ key_codec(input,scene);
  check(output.painted==actual_source_paint&&output.painted->baked()->normal_authority==original.painted->baked()->normal_authority&&output.painted->normal_projection()==original.painted->normal_projection(),"All current writable paint and normal planes/events remain exact owners");
  check(output.material_bindings->color_preparation==original.material_bindings->color_preparation&&output.appearance==original.appearance&&output.rig_source==original.rig_source,"Current colour/raw appearance and first rig source remain exact");
  check(frames->position_domain->basis()->positions.size()==6&&output.material_bindings->uv_origin==original.material_bindings->uv_origin&&output.material_bindings->uv_origin->paint->mesh().positions.size()==4,"Derived POSITION6 never relabels the retained original coordinate/attribute domain4");

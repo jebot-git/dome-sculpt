@@ -24,6 +24,7 @@ public:
   const std::vector<Vec3> &positions(uint64_t id) const;
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
 private:
+  friend class KeyDerivationCodec;
   SourceKeyDerivation()=default;
   SourceKeyDerivation(const SourceKeyDerivation&)=delete;
   SourceKeyDerivation &operator=(const SourceKeyDerivation&)=delete;
