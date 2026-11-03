@@ -2,6 +2,8 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "dome/source-paint.hpp"
+#include "source-sampling-transport.hpp"
 #include "paint-source-admission.hpp"
 #include "source-uv-archive.hpp"
 #include "dome/paint-sampling.hpp"
@@ -223,7 +225,12 @@ void PaintSettings::validate() const {
     throw std::invalid_argument("Invalid paint brush settings");
 }
 struct PaintedMesh::SurfaceMap {
+  struct OriginalSampling {
+    std::shared_ptr<const PaintedMesh> before;
+    std::vector<uint32_t> vertices;
+  };
   Mesh mesh;
+  std::shared_ptr<const OriginalSampling> original_sampling;
   std::shared_ptr<const PaintSamplingDomain> paint_domain;
   bool sampling_raster_proven=false;
   bool source_capture_only=false;
@@ -429,6 +436,141 @@ PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options
   layers_.push_back(std::move(layer));
 }
 const Mesh &PaintedMesh::mesh() const { return surface_->mesh; }
+bool PaintedMesh::source_sampling_prepared() const noexcept {return surface_&&bool(surface_->original_sampling);}
+std::shared_ptr<const PaintedMesh> PaintedMesh::source_sampling_original() const noexcept {
+  return source_sampling_prepared()?surface_->original_sampling->before:nullptr;
+}
+std::span<const uint32_t> PaintedMesh::source_sampling_vertices() const noexcept {
+  return source_sampling_prepared()?std::span<const uint32_t>(surface_->original_sampling->vertices):std::span<const uint32_t>{};
+}
+struct SourcePaintAccess {
+  static void pristine(const PaintedMesh &before) {
+    if(before.in_stroke()||before.source_sampling_prepared()||before.paint_sampling_domain()||
+       before.baked_||before.color_projection_||before.normal_projection_||!before.source_maps_||
+       std::any_of(before.layers_.begin(),before.layers_.end(),[](const auto &l){return tile_count(l)||color_tile_count(l);}))
+      throw std::invalid_argument("Initial source paint requires its own pristine original image sampling");
+  }
+  static bool same(const PaintSourceMaps &a,const PaintSourceMaps &b) {
+    auto coordinates=[](const auto &x,const auto &y){
+      return bool(x)==bool(y)&&(!x||(x->size()==y->size()&&!std::memcmp(x->data(),y->data(),x->size()*sizeof(x->front()))));
+    };
+    if(!coordinates(a.uv1,b.uv1)||a.extra_uv_sets.size()!=b.extra_uv_sets.size()||
+       std::bit_cast<uint32_t>(a.normal_scale)!=std::bit_cast<uint32_t>(b.normal_scale)||
+       std::bit_cast<uint32_t>(a.occlusion_strength)!=std::bit_cast<uint32_t>(b.occlusion_strength))return false;
+    for(const auto &[set,values]:a.extra_uv_sets){auto it=b.extra_uv_sets.find(set);if(it==b.extra_uv_sets.end()||!coordinates(values,it->second))return false;}
+    const std::array<const PaintSourceTexture*,5> x{&a.color,&a.metal_rough,&a.emission,&a.normal,&a.occlusion},
+      y{&b.color,&b.metal_rough,&b.emission,&b.normal,&b.occlusion};
+    for(size_t n=0;n<x.size();++n)if(x[n]->image!=y[n]->image||x[n]->texcoord!=y[n]->texcoord||
+      x[n]->wrap_s!=y[n]->wrap_s||x[n]->wrap_t!=y[n]->wrap_t||x[n]->min_filter!=y[n]->min_filter||
+      x[n]->mag_filter!=y[n]->mag_filter||std::bit_cast<std::array<uint32_t,6>>(x[n]->uv_transform)!=std::bit_cast<std::array<uint32_t,6>>(y[n]->uv_transform))return false;
+    return true;
+  }
+  static detail::SourceSamplingLimits limits(const SourcePaintOptions &o) {
+    return {o.max_vertices,o.max_triangles,o.max_coordinate_bytes,o.max_work,o.cancelled};
+  }
+  static void budget(const PaintedMesh &before,const Mesh &target,const SourcePaintOptions &o) {
+    if(!o.max_working_bytes||o.max_working_bytes>512*1024*1024||!o.max_raster_samples||o.max_raster_samples>512*1024*1024)
+      throw std::invalid_argument("Invalid independent source paint resource bounds");
+    const auto &maps=*before.source_maps_;
+    const size_t sets=size_t(bool(maps.uv1))+maps.extra_uv_sets.size()+1;
+    const uint64_t pixels=uint64_t(before.resolution())*before.resolution();
+    uint64_t bytes=pixels*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t))+
+      pixels/1024*sizeof(PaintedMesh::SurfaceMap::Bounds)+
+      uint64_t(target.positions.size())*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t)+2*sets*sizeof(std::array<float,2>))+
+      uint64_t(target.indices.size())*sizeof(uint32_t)+target.uv_pins.size()+target.uv_seams.size();
+    bytes+=before.surface_->texels.size()*sizeof(PaintedMesh::SurfaceMap::Texel)+
+      before.surface_->padding.size()*sizeof(int32_t)+before.surface_->tiles.size()*sizeof(PaintedMesh::SurfaceMap::Bounds)+
+      before.mesh().positions.size()*sizeof(Vec3)+before.mesh().normals.size()*sizeof(Vec3)+
+      before.mesh().uv.size()*sizeof(std::array<float,2>)+before.mesh().indices.size()*sizeof(uint32_t)+
+      before.mesh().uv_pins.size()+before.mesh().uv_seams.size()+before.storage_bytes();
+    for(const auto &l:before.layers_)bytes+=2*(l.tiles.size()+l.pbr_tiles.size())*sizeof(std::shared_ptr<const PaintTile>);
+    if(bytes>o.max_working_bytes)throw std::length_error("Independent source paint exceeds cumulative raster/coordinate/geometry budget");
+  }
+  static void encoded_budget(const nlohmann::json &input) {
+    uint64_t total=input.at("vertices").get_binary().size();
+    const auto measure=[&](const nlohmann::json &p,bool original) {
+      if(!p.is_object()||p.contains("version")||p.contains("domain")||p.contains("payload")||
+         p.contains("baked")||p.contains("color_projection")||p.contains("normal_projection")||
+         (!original&&p.contains("uv_policy")))
+        throw std::invalid_argument("Independent source paint has an unsupported encoded interpretation");
+      const auto &r=p.at("resolution");
+      if(!r.is_number_integer()||r.get<int64_t>()<64||r.get<uint64_t>()>2048||
+         (r.get<uint64_t>()&(r.get<uint64_t>()-1)))throw std::invalid_argument("Invalid source paint resolution");
+      const uint64_t size=r.get<uint64_t>();const auto &mesh=p.at("mesh");
+      auto bytes=[&](const char *key,size_t stride,size_t count){const auto &v=mesh.at(key);
+        if(!v.is_binary()||v.get_binary().size()%stride||v.get_binary().size()/stride>count)
+          throw std::invalid_argument("Independent source paint geometry exceeds bounds");return uint64_t(v.get_binary().size());};
+      const auto positions=bytes("positions",12,2'000'000),normals=bytes("normals",12,2'000'000),
+        uv=bytes("uv",8,2'000'000),indices=bytes("indices",12,2'000'000);
+      if(positions!=normals||positions/12!=uv/8)throw std::invalid_argument("Incomplete source paint geometry");
+      total+=positions+normals+uv+indices;
+      for(const char *key:{"uv_pins","uv_seams"})if(mesh.contains(key)){
+        if(!mesh.at(key).is_binary())throw std::invalid_argument("Invalid source paint edit flags");total+=mesh.at(key).get_binary().size();
+      }
+      if(!p.contains("source_maps"))throw std::invalid_argument("Independent source paint lacks actual original images");
+      const auto coordinates=detail::source_uv_archive_measure(p.at("source_maps"));
+      total+=coordinates.bytes*(original?1:2); // detached replay coexists with decoded current coordinates
+      bool outside=false;
+      if(original&&p.value("uv_policy",std::string{})=="source-authored") {
+        const auto &values=mesh.at("uv").get_binary();
+        for(size_t at=0;at<values.size();at+=4){uint32_t word=0;for(size_t k=0;k<4;++k)word|=uint32_t(values[at+k])<<(k*8);
+          const float q=std::bit_cast<float>(word);if(!std::isfinite(q)||std::abs(q)>10000)throw std::invalid_argument("Invalid original source paint coordinate");
+          outside|=q<0||q>1;}
+      }
+      if(!outside)total+=size*size*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t));
+      total+=size*size/1024*sizeof(PaintedMesh::SurfaceMap::Bounds);
+      const auto &layers=p.at("layers");if(!layers.is_array()||layers.empty()||layers.size()>16)throw std::invalid_argument("Invalid source paint layers");
+      total+=uint64_t(layers.size())*(size/32)*(size/32)*sizeof(std::shared_ptr<const PaintTile>)*2;
+      for(const auto &layer:layers) {
+        if(layer.contains("physical_emission_tiles"))throw std::invalid_argument("Physical source paint requires its own capability");
+        const auto &tiles=layer.at("tiles");
+        if(!tiles.is_array()||tiles.size()>size*size/1024||(original&&!tiles.empty()))throw std::invalid_argument("Invalid or nonpristine source paint tiles");
+        total+=tiles.size()*sizeof(PaintTile);
+        if(layer.contains("pbr_color_tiles")&&(!layer.at("pbr_color_tiles").is_array()||!layer.at("pbr_color_tiles").empty()))
+          throw std::invalid_argument("Independent source paint cannot borrow a prepared color plane");
+      }
+      if(total>256*1024*1024)throw std::length_error("Encoded independent source paint exceeds cumulative working budget");
+    };
+    measure(input.at("before"),true);measure(input.at("payload"),false);
+    if(input.at("vertices").get_binary().size()/4!=input.at("payload").at("mesh").at("positions").get_binary().size()/12)
+      throw std::invalid_argument("Independent source paint remap size differs");
+  }
+  static void bind(PaintedMesh &current,std::shared_ptr<const PaintedMesh> before,
+                   std::span<const uint32_t> vertices,const SourcePaintOptions &o) {
+    pristine(*before);budget(*before,current.mesh(),o);
+    if(current.surface_->diagnostics.policy!=PaintUvPolicy::Strict||current.paint_sampling_domain()||
+       current.baked_||current.color_projection_||current.normal_projection_||!current.source_maps_||
+       current.resolution()!=before->resolution())
+      throw std::invalid_argument("Independent source sampling requires its own strict current paint grid");
+    auto expected=detail::transport_source_sampling(before->mesh(),*before->source_maps_,current.mesh(),vertices,limits(o));
+    if(!expected->uses_alternate_uv()||!same(*expected,*current.source_maps_))
+      throw std::invalid_argument("Independent source paint differs from its exact original sampling transport");
+    auto proof=std::make_shared<PaintedMesh::SurfaceMap::OriginalSampling>();
+    proof->before=before->snapshot();proof->vertices.assign(vertices.begin(),vertices.end());
+    // Only fresh, unpublished factory/decoder construction reaches this bind.
+    // No render snapshot or geometry alias may observe a mutable attachment.
+    if(current.surface_.use_count()!=1)throw std::logic_error("Source paint attachment escaped before construction completed");
+    std::const_pointer_cast<PaintedMesh::SurfaceMap>(current.surface_)->original_sampling=std::move(proof);
+  }
+  static std::shared_ptr<PaintedMesh> prepare(std::shared_ptr<const PaintedMesh> before,Mesh target,
+                                           std::span<const uint32_t> vertices,const SourcePaintOptions &o) {
+    if(!before)throw std::invalid_argument("Independent source paint has no original owner");
+    if(o.cancelled&&o.cancelled())throw std::runtime_error("Independent source paint cancelled");
+    pristine(*before);budget(*before,target,o);
+    auto maps=detail::transport_source_sampling(before->mesh(),*before->source_maps_,target,vertices,limits(o));
+    PaintSurfaceOptions surface;surface.cancelled=o.cancelled;surface.max_raster_samples=o.max_raster_samples;
+    auto result=PaintedMesh::from_maps(std::move(target),std::move(maps),before->resolution(),surface);
+    result->layers_=before->layers_;result->active_=before->active_;result->next_=before->next_;
+    result->revision_=before->revision_+1;
+    // The factory already produced the exact transported maps. bind replays
+    // detached admission as well, so decoder and factory cannot diverge.
+    bind(*result,std::move(before),vertices,o);return result;
+  }
+};
+std::shared_ptr<PaintedMesh> prepare_source_paint(std::shared_ptr<const PaintedMesh> before,Mesh target,
+    std::span<const uint32_t> vertices,const SourcePaintOptions &options) {
+  return SourcePaintAccess::prepare(std::move(before),std::move(target),vertices,options);
+}
 std::shared_ptr<const Mesh> PaintedMesh::mesh_owner() const { return {surface_, &surface_->mesh}; }
 std::shared_ptr<const PaintSamplingDomain> PaintedMesh::paint_sampling_domain() const noexcept {return surface_?surface_->paint_domain:nullptr;}
 bool PaintedMesh::valid_paint_sampling_attachment() const noexcept {
@@ -1122,12 +1264,19 @@ size_t PaintedMesh::storage_bytes() const {
     for (const auto &tile : layer.tiles)
       if (tile) result += sizeof(PaintTile);
   for(const auto &layer:layers_)result+=color_tile_count(layer)*sizeof(PaintColorTile);
+  if(source_sampling_prepared()) {
+    const auto original=source_sampling_original();const auto &m=original->mesh();
+    result+=original->storage_bytes()+source_sampling_vertices().size()*sizeof(uint32_t)+
+      m.positions.size()*sizeof(Vec3)+m.normals.size()*sizeof(Vec3)+m.uv.size()*sizeof(std::array<float,2>)+
+      m.indices.size()*sizeof(uint32_t)+m.uv_pins.size()+m.uv_seams.size();
+  }
   return result;
 }
 void PaintedMesh::install_bake(BakedTextures incoming) {
   install_bake(std::move(incoming),BakedNormalWrite::Replace);
 }
 void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_write) {
+  if(source_sampling_prepared())throw std::logic_error("Independent source paint requires its own source-aware bake adapter");
   if(surface_->source_capture_only)
     throw std::logic_error(detail::editable_texture_atlas_notice);
   if (editing_) throw std::logic_error("Finish the paint stroke before baking");
@@ -1898,7 +2047,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
   if(source_maps_)j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
   if(color_projection_)j["color_projection"]=encode_color_projection(*color_projection_,archive?*archive:local);
   if(normal_projection_)j["normal_projection"]=encode_normal_projection(*normal_projection_,archive?*archive:local,domains);
-  if(!archive && (source_maps_ || color_projection_ || normal_projection_))j["source_images"]=local.encode();
+  if(!archive && !source_sampling_prepared() && (source_maps_ || color_projection_ || normal_projection_))j["source_images"]=local.encode();
   std::vector<uint8_t> positions, normals, uv, indices;
   for (auto p : mesh().positions)
     for (float f : {p.x, p.y, p.z})
@@ -1968,6 +2117,18 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
       j["baked"]["normal_authority"]=domains->add_detail(baked_->normal_authority);
     }
   }
+  if(source_sampling_prepared()) {
+    if(sampling||baked_||color_projection_||normal_projection_||surface_->diagnostics.policy!=PaintUvPolicy::Strict)
+      throw std::invalid_argument("Independent source paint has an unsupported current interpretation");
+    auto before=source_sampling_original();SourcePaintAccess::pristine(*before);
+    std::vector<uint8_t> vertices;vertices.reserve(source_sampling_vertices().size()*4);
+    for(auto v:source_sampling_vertices())word(vertices,v);
+    auto encoded=before->encode(archive?archive:&local,domains,paint_domains);
+    nlohmann::json envelope{{"version",4},{"payload",std::move(j)},{"before",std::move(encoded)},
+      {"vertices",nlohmann::json::binary(std::move(vertices))}};
+    if(!archive)envelope["source_images"]=local.encode();
+    return envelope;
+  }
   if(sampling)return {{"version",2},{"payload",std::move(j)},{"domain",paint_domains->add(sampling)}};
   return j;
 }
@@ -1983,20 +2144,48 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
     bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
+  return decode(input,archive,allow_polygon,domains,paint_domains,SourcePaintDecodeContext{});
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
+    bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,
+    const SourcePaintDecodeContext &context) {
+  const bool independent=input.is_object()&&input.contains("version")&&input.at("version")==4;
+  std::optional<PaintImageArchive> independent_images;
+  std::shared_ptr<PaintedMesh> original;
+  std::vector<uint32_t> original_vertices;
+  if(independent) {
+    if(!context.independent_source||input.size()!=(archive?4u:5u)||
+       !input.at("version").is_number_integer()||!input.contains("payload")||!input.at("payload").is_object()||
+       input.at("payload").contains("version")||input.at("payload").contains("source_images")||
+       !input.contains("before")||!input.at("before").is_object()||input.at("before").contains("version")||
+       input.at("before").contains("source_images")||!input.contains("vertices")||!input.at("vertices").is_binary()||
+       input.at("vertices").get_binary().size()%4||input.at("vertices").get_binary().size()>8'000'000)
+      throw std::invalid_argument("Paint4 requires its complete independent-source owning context");
+    SourcePaintAccess::encoded_budget(input);
+    if(!archive){independent_images=PaintImageArchive::decode(input.at("source_images"));archive=&*independent_images;}
+    else if(input.contains("source_images"))throw std::invalid_argument("Ambiguous independent source image archive");
+    const auto &bytes=input.at("vertices").get_binary();
+    original_vertices.reserve(bytes.size()/4);
+    for(size_t at=0;at<bytes.size();at+=4)original_vertices.push_back(uint32_t(bytes[at])|
+      uint32_t(bytes[at+1])<<8|uint32_t(bytes[at+2])<<16|uint32_t(bytes[at+3])<<24);
+    original=decode(input.at("before"),archive,false,nullptr,nullptr);
+    SourcePaintAccess::pristine(*original);
+  }
+  const auto &record=independent?input.at("payload"):input;
   std::shared_ptr<const PaintSamplingDomain> sampling;
-  const bool envelope=input.is_object()&&input.contains("version");
+  const bool envelope=record.is_object()&&record.contains("version");
   if(envelope){
     // No legacy root mesh: frozen implicit-v1 readers reject before bulk.
-    if(input.size()!=3||!input.at("version").is_number_integer()||input.at("version")!=2||
-       !input.contains("payload")||!input.at("payload").is_object()||input.at("payload").contains("version")||
-       !input.contains("domain")||(!input.at("domain").is_number_unsigned()&&
-       (!input.at("domain").is_number_integer()||input.at("domain").get<int64_t>()<0))||
-       input.at("domain").get<uint64_t>()>UINT32_MAX)
+    if(record.size()!=3||!record.at("version").is_number_integer()||record.at("version")!=2||
+       !record.contains("payload")||!record.at("payload").is_object()||record.at("payload").contains("version")||
+       !record.contains("domain")||(!record.at("domain").is_number_unsigned()&&
+       (!record.at("domain").is_number_integer()||record.at("domain").get<int64_t>()<0))||
+       record.at("domain").get<uint64_t>()>UINT32_MAX)
       throw std::invalid_argument("Invalid retained paint version2 envelope");
     if(!archive||!paint_domains)throw std::invalid_argument("Paint version2 requires its owning Scene24 image and sampling context");
-    sampling=paint_domains->at(input.at("domain").get<uint32_t>());
-  }else if(input.contains("payload")||input.contains("domain"))throw std::invalid_argument("Paint sampling fields require version2 envelope");
-  const auto &j=envelope?input.at("payload"):input;
+    sampling=paint_domains->at(record.at("domain").get<uint32_t>());
+  }else if(record.contains("payload")||record.contains("domain"))throw std::invalid_argument("Paint sampling fields require version2 envelope");
+  const auto &j=envelope?record.at("payload"):record;
   if(j.contains("source_maps"))detail::source_uv_archive_measure(j.at("source_maps"));
   const bool retained_projection=j.contains("normal_projection")&&
     j.at("normal_projection").is_object()&&j.at("normal_projection").contains("domain");
@@ -2093,6 +2282,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
   std::set<uint64_t> ids;
   size_t allocated = 0;
   for (auto &v : layers) {
+    if(v.contains("physical_emission_tiles"))throw std::invalid_argument("Physical emission requires its independent owning capability");
     PaintLayer l;
     l.id = positive(v.at("id"));
     if (l.id >= result->next_ || !ids.insert(l.id).second)
@@ -2205,7 +2395,14 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
      (!result->source_maps_||result->baked_||result->color_projection_||result->normal_projection_||
       result->allocated_tiles_||result->allocated_color_tiles_))
     throw std::invalid_argument("Initial original-coordinate capture cannot contain writable paint data");
+  if(!independent&&result->source_maps_&&result->source_maps_->uses_alternate_uv()&&
+     (result->allocated_tiles_||result->allocated_color_tiles_||result->baked_))
+    throw std::invalid_argument("Paint on independent original coordinates requires its actual Paint4 owner");
   if(result->storage_bytes()>128*1024*1024)throw std::length_error("Persisted paint exceeds total storage budget");
+  if(independent) {
+    SourcePaintAccess::bind(*result,std::move(original),original_vertices,{});
+    if(result->storage_bytes()>128*1024*1024)throw std::length_error("Independent source paint exceeds total retained storage budget");
+  }
   return result;
 }
 void PaintedMesh::swap_state(PaintedMesh &other) noexcept {

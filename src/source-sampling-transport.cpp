@@ -19,7 +19,18 @@ std::shared_ptr<const PaintSourceMaps> transport_source_sampling(
   if(before.positions.size()>limits.max_vertices||target.positions.size()>limits.max_vertices||
      before.indices.size()/3>limits.max_triangles||target.indices.size()/3>limits.max_triangles)
     throw std::length_error("Original sampling geometry exceeds its budget");
-  before.validate();target.validate();source.validate_surface(before);cancel();
+  // Bound validation as well as output remapping before traversing any large
+  // input arrays. A small declared work quota must not be spent after a full
+  // source-coordinate scan has already happened.
+  uint64_t validation_work=uint64_t(before.positions.size())+before.normals.size()+before.uv.size()+before.indices.size()+
+    before.uv_pins.size()+before.uv_seams.size()+target.positions.size()+target.normals.size()+target.uv.size()+
+    target.indices.size()+target.uv_pins.size()+target.uv_seams.size();
+  if(source.extra_uv_sets.size()>6)throw std::invalid_argument("Original sampling coordinate table exceeds bounds");
+  if(source.uv1){if(source.uv1->size()!=before.positions.size())throw std::invalid_argument("Original sampling UV1 size differs");validation_work+=source.uv1->size();}
+  for(const auto &[set,values]:source.extra_uv_sets){
+    if(set<2||set>7||!values||values->size()!=before.positions.size())throw std::invalid_argument("Original sampling extra-coordinate size differs");
+    validation_work+=values->size();
+  }
   if(source.empty()||before.uv.size()!=before.positions.size()||
      target.uv.size()!=target.positions.size()||vertices.size()!=target.positions.size()||
      before.indices.size()!=target.indices.size())
@@ -37,9 +48,10 @@ std::shared_ptr<const PaintSourceMaps> transport_source_sampling(
   // Charge every new coordinate array before allocating any of them. Images
   // are retained by immutable identity, never duplicated or downsampled here.
   const uint64_t bytes=uint64_t(sets)*vertices.size()*sizeof(std::array<float,2>);
-  const uint64_t work=uint64_t(sets+1)*vertices.size()+target.indices.size();
+  const uint64_t work=validation_work+uint64_t(sets+1)*vertices.size()+target.indices.size();
   if(bytes>limits.max_coordinate_bytes||work>limits.max_work)
     throw std::length_error("Original sampling transport exceeds coordinate/work budget");
+  before.validate();target.validate();source.validate_surface(before);cancel();
   auto equal=[](Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;};
   for(size_t v=0;v<vertices.size();++v) {
     if((v&1023)==0)cancel();const auto old=vertices[v];

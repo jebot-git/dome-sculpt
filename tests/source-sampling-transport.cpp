@@ -59,6 +59,8 @@ int main()try {
   check(refuses([&]{detail::transport_source_sampling(before,maps,target,vertices,limits);}),"Cumulative coordinate budget refuses before output");
   limits={};limits.max_work=1;
   check(refuses([&]{detail::transport_source_sampling(before,maps,target,vertices,limits);}),"Cumulative work budget refuses");
+  limits={};limits.max_work=64;
+  check(refuses([&]{detail::transport_source_sampling(before,maps,target,vertices,limits);}),"Validation and remapping share the declared work budget");
   limits={};limits.cancelled=[]{return true;};
   check(refuses([&]{detail::transport_source_sampling(before,maps,target,vertices,limits);}),"Cancellation refuses before output");
   auto one=maps;one.metal_rough={};one.normal={};one.emission={};one.uv1.reset();one.extra_uv_sets.clear();

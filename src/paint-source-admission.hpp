@@ -8,7 +8,7 @@ inline constexpr const char *editable_texture_atlas_notice=
     "Prepare an editable texture atlas before painting these original source coordinates";
 inline bool paint_requires_editable_atlas(const PaintedMesh &paint) noexcept {
   if(!paint.source_maps())return false;
-  if(paint.source_maps()->uses_alternate_uv())return true;
+  if(paint.source_maps()->uses_alternate_uv()&&!paint.source_sampling_prepared())return true;
   // A retained sampling domain has its own independently validated raster.
   // Otherwise raw UVs outside the first tile require explicit atlas creation.
   return !paint.paint_sampling_domain()&&std::any_of(paint.mesh().uv.begin(),paint.mesh().uv.end(),[](const auto &uv){

@@ -10,6 +10,7 @@ class PaintProjection;
 class PaintSamplingDomain;
 class PaintSamplingAttachment;
 class PaintSamplingArchive;
+struct SourcePaintDecodeContext;
 struct PaintSourceMaps;
 class PaintImageArchive;
 struct Image {
@@ -182,6 +183,9 @@ public:
   bool undo();
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
+  bool source_sampling_prepared() const noexcept;
+  std::shared_ptr<const PaintedMesh> source_sampling_original() const noexcept;
+  std::span<const uint32_t> source_sampling_vertices() const noexcept;
   std::shared_ptr<PaintedMesh>
   reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
   std::shared_ptr<const TextureMaps> composite(const Material &) const;
@@ -208,11 +212,14 @@ public:
                                            bool allow_polygon,const NormalSamplingArchive *);
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
       bool allow_polygon,const NormalSamplingArchive *,const PaintSamplingArchive *);
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
+      bool allow_polygon,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &);
 
 private:
   friend class Document;
   void swap_state(PaintedMesh &) noexcept;
   friend struct SourceUvBakeAccess;
+  friend struct SourcePaintAccess;
   friend struct SourceColorPreparationAccess;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
