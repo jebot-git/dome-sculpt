@@ -1,5 +1,14 @@
 # Dome Sculpt production handoff
 
+## Private connected artist-frame Mirror owner — 2026-11-03
+
+Conditional29/12/4/6 now has coherent CPU5/SAN5 plus legacy92 and actual
+retained24/Source28-HDR/twoCC0 owning save/reopen/Restore evidence. Read
+KEY-MIRROR-RELATIVE-OWNING.md and receipt. New pixel comparison125 remains
+negative and also occurs BEFOREMirror; fidelity, UI/OOM and real general
+refinement remain unfinished. This is private data qualification, not main
+admission or full completion. The goal stays active.
+
 ## Private key/HDR/original-source integration — 2026-11-03
 
 The ab878 plus independent-key semantic base passes selected CPU8/8 and wholly
