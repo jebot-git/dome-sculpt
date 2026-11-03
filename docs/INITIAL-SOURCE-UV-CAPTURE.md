@@ -100,9 +100,9 @@ Next work must preserve original per-role sampling/LOD where representable and
 provide the initial independent writable authority needed for more general
 cases, rather than hide the failure or assume a larger map solves it. Default
 untextured/MatCap-only outside-tile captures also need a real owning adapter;
-this checkpoint does not invent a white texture to admit them. The read-only
-capture still reserves inactive CPU grid storage; lazy allocation remains an
-explicit performance task. Full UV/VRM/HDR/physics, GPU, device and production
+this checkpoint does not invent a white texture to admit them. The earlier capture reserved inactive CPU grid storage. The subsequent
+private SOURCE-CAPTURE-STORAGE.md follow-up removes that dense allocation with
+Release/sanitizer storage and affected-consumer evidence. Full UV/VRM/HDR/physics, GPU, device and production
 requirements and post-basic controller drawers remain active.
 
 Initial malformed fixture alignment, omitted decoder guard, a correctly

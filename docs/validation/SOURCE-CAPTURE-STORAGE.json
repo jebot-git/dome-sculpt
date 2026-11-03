@@ -1,0 +1,1066 @@
+{
+  "recorded_utc": "2026-11-03T13:21:05.147480+00:00",
+  "runtime_source": "eb4ce01e84450b17083be92e3a89cc6ce3305fe9",
+  "parent": "8725c1b63f1ee1dda086d41e5875c8b49ac1c61c",
+  "scope": "Private initial-source candidate; lazy dense-raster allocation only, no public layout or archive change. Initial outside-UV atlas image-quality failure remains open.",
+  "old_negative": {
+    "runs": [
+      {
+        "name": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/test.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-capture-storage.cpp"
+        ],
+        "exit_code": 0,
+        "seconds": 2.167559738009004
+      },
+      {
+        "name": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-initial-source-uv-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/test.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/old-consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so.3.12.0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+          "/usr/lib64/libpng16.so.16.58.0",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng",
+          "/usr/lib64/libjpeg.so.62.4.0",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit_code": 0,
+        "seconds": 0.10456750000594184
+      },
+      {
+        "name": "old-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/old-consumer"
+        ],
+        "exit_code": 1,
+        "seconds": 0.0029753109847661108
+      }
+    ]
+  },
+  "profiles": {
+    "cpu": {
+      "component": {
+        "status": "terminal",
+        "pid": 3664158,
+        "source": "eb4ce01e84450b17083be92e3a89cc6ce3305fe9",
+        "inputs": 1496,
+        "scope": "Fresh changed paint TU and allocation-oracle consumer, immutable matching128 CPU whole-owned archives or f99 wholly instrumented SAN support plus immutable matching128 sourceUV/import/Document TUs. No new public layout; not a fresh wholefrontend build.",
+        "runs": [
+          {
+            "name": "compile-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-capture-storage.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/test.o"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 2.213351247017272
+          },
+          {
+            "name": "compile-paint",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/src/paint.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 8.507983399002114
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.10783384999376722
+          },
+          {
+            "name": "storage",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/consumer"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.005271216010442004
+          }
+        ],
+        "phase": "storage",
+        "child_pid": 3665791,
+        "exit_code": 0,
+        "input_drift": []
+      },
+      "regressions": {
+        "status": "terminal",
+        "pid": 3698769,
+        "source": "eb4ce01e84450b17083be92e3a89cc6ce3305fe9",
+        "scope": "Fresh changed paint TU and allocation-oracle consumer, immutable matching128 CPU whole-owned archives or f99 wholly instrumented SAN support plus immutable matching128 sourceUV/import/Document TUs. No new public layout; not a fresh wholefrontend build.",
+        "runs": [
+          {
+            "name": "initial-source-uv-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/initial-source-uv.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv.o"
+            ],
+            "exit_code": 0,
+            "seconds": 4.716282601992134
+          },
+          {
+            "name": "initial-source-uv-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.15555652001057751
+          },
+          {
+            "name": "initial-source-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial"
+            ],
+            "exit_code": 0,
+            "seconds": 0.08156412100652233
+          },
+          {
+            "name": "initial-source-uv-pixels-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/initial-source-uv-pixels.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv-pixels.o"
+            ],
+            "exit_code": 0,
+            "seconds": 4.8690765039937105
+          },
+          {
+            "name": "initial-source-uv-pixels-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv-pixels.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv-pixels",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16378134698607028
+          },
+          {
+            "name": "initial-source-uv-pixels",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/initial-source-uv-pixels",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/pixels"
+            ],
+            "exit_code": 0,
+            "seconds": 0.015220778004731983
+          },
+          {
+            "name": "source-uv1-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-uv1.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv1.o"
+            ],
+            "exit_code": 0,
+            "seconds": 2.766780881007435
+          },
+          {
+            "name": "source-uv1-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv1.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv1",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.149450277996948
+          },
+          {
+            "name": "source-uv1",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv1",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/uv1"
+            ],
+            "exit_code": 0,
+            "seconds": 0.01152726702275686
+          },
+          {
+            "name": "source-uv-bake-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-uv-bake.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-bake.o"
+            ],
+            "exit_code": 0,
+            "seconds": 5.50902262100135
+          },
+          {
+            "name": "source-uv-bake-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-bake.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10924679200979881
+          },
+          {
+            "name": "source-uv-bake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/assets/humanoid/vroid/base-female.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/assets/humanoid/vroid/base-male.vrm"
+            ],
+            "exit_code": 0,
+            "seconds": 1.536201645998517
+          },
+          {
+            "name": "source-uv-adopt-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-uv-adopt.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-adopt.o"
+            ],
+            "exit_code": 0,
+            "seconds": 3.454392331012059
+          },
+          {
+            "name": "source-uv-adopt-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-adopt.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-adopt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.14849524199962616
+          },
+          {
+            "name": "source-uv-adopt",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/source-uv-adopt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.04296091999276541
+          },
+          {
+            "name": "paint-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/paint.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/paint.o"
+            ],
+            "exit_code": 0,
+            "seconds": 2.682009933021618
+          },
+          {
+            "name": "paint-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/paint.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/paint.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/paint",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/build-cpu/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.15120776198455133
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/cpu/regressions/paint"
+            ],
+            "exit_code": 0,
+            "seconds": 2.598271246999502
+          }
+        ],
+        "phase": "paint",
+        "child_pid": 3703910,
+        "exit_code": 0,
+        "input_drift": []
+      },
+      "storage_result": "PASS 139 source-capture storage checks; largest watched allocation=98304 cumulative watched bytes=4057362 construction OOM prefixes=19\n",
+      "before_sha256": "2bcffa3031f1efbeeea60aee33735365f3cc53bafb911054ac13759ed57526ce",
+      "after_sha256": "2bcffa3031f1efbeeea60aee33735365f3cc53bafb911054ac13759ed57526ce",
+      "regression_before_sha256": "a86455cfd83d9d075c3456403204431b544d78e7f83929382e7dd7796ad2802a",
+      "regression_after_sha256": "a86455cfd83d9d075c3456403204431b544d78e7f83929382e7dd7796ad2802a",
+      "log_sha256": {
+        "compile-test.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "compile-paint.log": "6fc04712fada205083e2c303fe0e0871d7177061c5ab8b465533d21607373104",
+        "link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "storage.log": "fcc279b63d172fff3fde8d9b5e6fa0e972bf8877ffd703515bea0c98ad046ce1",
+        "regressions/initial-source-uv-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv.log": "e9a7239cdd5842482ae8857d266379a3f0bd3fd3fd8f00057453cc088880d23c",
+        "regressions/initial-source-uv-pixels-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv-pixels-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv-pixels.log": "045ff94a6ef3205b45a7d64b62ef8559ee7d60e32c2e5ed274ccaa32d15e6ac0",
+        "regressions/source-uv1-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv1-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv1.log": "d86cddbabf1f29365fbe83c7ce34cf435d8c99b4a9185b8aaed0142bf2388160",
+        "regressions/source-uv-bake-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-bake-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-bake.log": "003554a444ea51af33bd6bcbc650c7f474c3d352dcd9535dcd45fa56efa5378c",
+        "regressions/source-uv-adopt-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-adopt-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-adopt.log": "8b286cfce2c388fbca58f85c7abc060b01151a4214a533bfd49d447e39273ece",
+        "regressions/paint-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/paint-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/paint.log": "d1306cc968be36cb01f00974313fcaefb39eb5c3e066b8922f9d48d97127dc3f"
+      }
+    },
+    "san": {
+      "component": {
+        "status": "terminal",
+        "pid": 3664340,
+        "source": "eb4ce01e84450b17083be92e3a89cc6ce3305fe9",
+        "inputs": 1499,
+        "scope": "Fresh changed paint TU and allocation-oracle consumer, immutable matching128 CPU whole-owned archives or f99 wholly instrumented SAN support plus immutable matching128 sourceUV/import/Document TUs. No new public layout; not a fresh wholefrontend build.",
+        "runs": [
+          {
+            "name": "compile-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-capture-storage.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/test.o"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 3.1577297580079176
+          },
+          {
+            "name": "compile-paint",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/src/paint.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 15.342714596015867
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/source-uv-bake.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/import-authoring.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/document.o",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.1682930109964218
+          },
+          {
+            "name": "storage",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/consumer"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.09231614600867033
+          }
+        ],
+        "phase": "storage",
+        "child_pid": 3667398,
+        "exit_code": 0,
+        "input_drift": []
+      },
+      "regressions": {
+        "status": "terminal",
+        "pid": 3698949,
+        "source": "eb4ce01e84450b17083be92e3a89cc6ce3305fe9",
+        "scope": "Fresh changed paint TU and allocation-oracle consumer, immutable matching128 CPU whole-owned archives or f99 wholly instrumented SAN support plus immutable matching128 sourceUV/import/Document TUs. No new public layout; not a fresh wholefrontend build.",
+        "runs": [
+          {
+            "name": "initial-source-uv-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/initial-source-uv.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv.o"
+            ],
+            "exit_code": 0,
+            "seconds": 6.610895563004306
+          },
+          {
+            "name": "initial-source-uv-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/source-uv-bake.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/import-authoring.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/document.o",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2119273290154524
+          },
+          {
+            "name": "initial-source-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial"
+            ],
+            "exit_code": 0,
+            "seconds": 0.6420933420013171
+          },
+          {
+            "name": "initial-source-uv-pixels-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/initial-source-uv-pixels.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv-pixels.o"
+            ],
+            "exit_code": 0,
+            "seconds": 6.776641998993
+          },
+          {
+            "name": "initial-source-uv-pixels-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/source-uv-bake.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/import-authoring.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/document.o",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv-pixels.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv-pixels",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.210509964992525
+          },
+          {
+            "name": "initial-source-uv-pixels",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/initial-source-uv-pixels",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/pixels"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16332197698648088
+          },
+          {
+            "name": "source-uv1-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-uv1.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv1.o"
+            ],
+            "exit_code": 0,
+            "seconds": 4.471002956997836
+          },
+          {
+            "name": "source-uv1-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/source-uv-bake.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/import-authoring.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/document.o",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv1.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv1",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2024916730006225
+          },
+          {
+            "name": "source-uv1",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv1",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/uv1"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1268072729872074
+          },
+          {
+            "name": "source-uv-bake-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-uv-bake.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-bake.o"
+            ],
+            "exit_code": 0,
+            "seconds": 9.867656648013508
+          },
+          {
+            "name": "source-uv-bake-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/source-uv-bake.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/import-authoring.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/document.o",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-bake.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2014898649940733
+          },
+          {
+            "name": "source-uv-bake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/assets/humanoid/vroid/base-female.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/assets/humanoid/vroid/base-male.vrm"
+            ],
+            "exit_code": 0,
+            "seconds": 8.545960180985276
+          },
+          {
+            "name": "source-uv-adopt-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/source-uv-adopt.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-adopt.o"
+            ],
+            "exit_code": 0,
+            "seconds": 6.0660214420058765
+          },
+          {
+            "name": "source-uv-adopt-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/source-uv-bake.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/import-authoring.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/document.o",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-adopt.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-adopt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2084916610037908
+          },
+          {
+            "name": "source-uv-adopt",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/source-uv-adopt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3734879359835759
+          },
+          {
+            "name": "paint-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/tests/paint.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/paint.o"
+            ],
+            "exit_code": 0,
+            "seconds": 4.182299390988192
+          },
+          {
+            "name": "paint-link",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/paint.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/source-uv-bake.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/import-authoring.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/initial-source-uv-f99/artifacts/initial-proof/san-bounded/document.o",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/paint.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/paint",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so.3.12.0",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/build-sanitize/libufbx.a",
+              "/usr/lib64/libpng16.so.16.58.0",
+              "/usr/lib64/libz.so.1.3.1.zlib-ng",
+              "/usr/lib64/libjpeg.so.62.4.0",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.233422479010187
+          },
+          {
+            "name": "paint",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-capture-lazy-8725/artifacts/storage-proof/san/regressions/paint"
+            ],
+            "exit_code": 0,
+            "seconds": 32.03143475600518
+          }
+        ],
+        "phase": "paint",
+        "child_pid": 3708447,
+        "exit_code": 0,
+        "input_drift": []
+      },
+      "storage_result": "PASS 139 source-capture storage checks; largest watched allocation=98304 cumulative watched bytes=4057362 construction OOM prefixes=19\n",
+      "before_sha256": "c6203004ea7d8e98ebb98f29c91136457da4f12575ed0f955d145252cbfd37f3",
+      "after_sha256": "c6203004ea7d8e98ebb98f29c91136457da4f12575ed0f955d145252cbfd37f3",
+      "regression_before_sha256": "5b4c1943f7b246fb636b7e5ba4882f340f719b9c63025aa27e5180a6b70d4132",
+      "regression_after_sha256": "5b4c1943f7b246fb636b7e5ba4882f340f719b9c63025aa27e5180a6b70d4132",
+      "log_sha256": {
+        "compile-test.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "compile-paint.log": "6fc04712fada205083e2c303fe0e0871d7177061c5ab8b465533d21607373104",
+        "link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "storage.log": "fcc279b63d172fff3fde8d9b5e6fa0e972bf8877ffd703515bea0c98ad046ce1",
+        "regressions/initial-source-uv-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv.log": "e9a7239cdd5842482ae8857d266379a3f0bd3fd3fd8f00057453cc088880d23c",
+        "regressions/initial-source-uv-pixels-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv-pixels-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/initial-source-uv-pixels.log": "045ff94a6ef3205b45a7d64b62ef8559ee7d60e32c2e5ed274ccaa32d15e6ac0",
+        "regressions/source-uv1-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv1-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv1.log": "d86cddbabf1f29365fbe83c7ce34cf435d8c99b4a9185b8aaed0142bf2388160",
+        "regressions/source-uv-bake-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-bake-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-bake.log": "7fe636099044efef57ba92f644286c2383047a74fb2961e0fe5f35afb7a477dc",
+        "regressions/source-uv-adopt-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-adopt-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/source-uv-adopt.log": "8b286cfce2c388fbca58f85c7abc060b01151a4214a533bfd49d447e39273ece",
+        "regressions/paint-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/paint-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "regressions/paint.log": "d1306cc968be36cb01f00974313fcaefb39eb5c3e066b8922f9d48d97127dc3f"
+      }
+    }
+  }
+}

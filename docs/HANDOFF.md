@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Private source-capture storage follow-up — 2026-11-03
+
+Read-only original-coordinate captures no longer allocate dense writable grids.
+Release/SAN each pass139 allocation/storage checks and six affected consumers,
+including actual native import/history/Save and both CC0 bases. See
+SOURCE-CAPTURE-STORAGE.md for exact matching-archive scopes. This branch remains
+private; its original atlas render discrepancy and all full-goal requirements
+remain open. No system or physical session changed.
+
+
 ## Private initial source-UV capture checkpoint
 
 This branch additionally contains `128b0f7` original outside-tile textured UV0
