@@ -4,6 +4,9 @@
 #include <span>
 namespace dome {
 struct SourcePaintOptions {
+  // The reader and producer share this ceiling. max_working_bytes may impose
+  // a smaller caller budget; it never creates a file requiring a larger one.
+  static constexpr size_t maximum_working_bytes=512*1024*1024;
   size_t max_vertices=2'000'000,max_triangles=2'000'000;
   size_t max_coordinate_bytes=128*1024*1024;
   size_t max_working_bytes=256*1024*1024;
