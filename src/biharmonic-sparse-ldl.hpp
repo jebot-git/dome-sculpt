@@ -29,36 +29,98 @@ class BiharmonicSparseLDL {
   std::vector<int32_t> parent_, flag_;
   std::vector<double> ax_, lx_, d_, y_, scratch_, diagonal_;
   std::vector<uint8_t> cached_;
+  std::vector<size_t> free_ap_;
+  std::vector<uint32_t> free_ai_, free_index_, free_old_;
+  std::vector<double> free_ax_;
+  size_t free_n_ = 0;
   bool valid_ = false;
   template <class Budget>
   void factor(std::span<const uint8_t> status, Budget &budget) {
     const size_t n = d_.size();
-    if (predicted_factor_work > budget.maximum - budget.used)
-      throw std::length_error("Sparse LDL numeric work exceeds remaining "
-                              "budget before factorization");
     valid_ = false;
+    free_n_ = 0;
+    budget.step(n);
+    for (uint32_t old = 0; old < n; ++old) {
+      if (status[permutation_[old]])
+        free_index_[old] = UINT32_MAX;
+      else {
+        free_index_[old] = uint32_t(free_n_);
+        free_old_[free_n_++] = old;
+      }
+    }
+    if (!free_n_)
+      throw std::logic_error("Sparse LDL requested with no free variables");
+    const size_t nf = free_n_;
+    free_ap_[0] = 0;
+    size_t nz = 0;
+    for (size_t k = 0; k < nf; ++k) {
+      budget.step(1);
+      auto old = free_old_[k];
+      for (size_t at = ap_[old]; at < ap_[old + 1]; ++at) {
+        budget.step(1);
+        auto row = free_index_[ai_[at]];
+        if (row != UINT32_MAX) {
+          free_ai_[nz] = row;
+          free_ax_[nz++] = ax_[at];
+        }
+      }
+      free_ap_[k + 1] = nz;
+    }
+    // Every free elimination path is also an earlier-vertex path in the
+    // global graph. Restricting its ordering cannot introduce outside fill.
+    for (uint32_t k = 0; k < nf; ++k) {
+      budget.stop();
+      budget.step(4);
+      parent_[k] = -1;
+      flag_[k] = int32_t(k);
+      lnz_[k] = 0;
+      for (size_t at = free_ap_[k]; at < free_ap_[k + 1]; ++at) {
+        budget.step(1);
+        auto i = free_ai_[at];
+        if (i < k)
+          while (flag_[i] != int32_t(k)) {
+            budget.step(4);
+            if (parent_[i] < 0)
+              parent_[i] = int32_t(k);
+            ++lnz_[i];
+            flag_[i] = int32_t(k);
+            i = uint32_t(parent_[i]);
+          }
+      }
+    }
+    lp_[0] = 0;
+    predicted_factor_work = n + 10 * nf + 4 * nz;
+    for (size_t i = 0; i < nf; ++i) {
+      budget.step(1);
+      lp_[i + 1] = lp_[i] + lnz_[i];
+      predicted_factor_work += size_t(lnz_[i]) * (lnz_[i] + 12);
+    }
+    if (lp_[nf] > factor_nonzeros)
+      throw std::logic_error(
+          "Free principal factor exceeded global symbolic fill bound");
+    if (predicted_factor_work > budget.maximum - budget.used)
+      throw std::length_error("Free sparse LDL numeric work exceeds remaining "
+                              "budget before factorization");
     size_t changed = 0;
     const auto before = budget.used;
-    budget.step(y_.size());
-    std::fill(y_.begin(), y_.end(), 0);
-    for (uint32_t k = 0; k < n; ++k) {
+    budget.step(nf);
+    std::fill(y_.begin(), y_.begin() + nf, 0);
+    for (uint32_t k = 0; k < nf; ++k) {
       budget.stop();
       budget.step(8);
       y_[k] = 0;
-      size_t top = n;
+      size_t top = nf;
       flag_[k] = int32_t(k);
       lnz_[k] = 0;
-      for (size_t at = ap_[k]; at < ap_[k + 1]; ++at) {
+      for (size_t at = free_ap_[k]; at < free_ap_[k + 1]; ++at) {
         budget.step(4);
-        uint32_t i = ai_[at];
-        const bool pin = status[permutation_[i]] || status[permutation_[k]];
-        double value = pin ? (i == k ? 1. : 0.) : ax_[at];
-        y_[i] += value;
+        auto i = free_ai_[at];
+        y_[i] += free_ax_[at];
         size_t length = 0;
         while (flag_[i] != int32_t(k)) {
           budget.step(4);
-          if (length >= n || parent_[i] < 0)
-            throw std::logic_error("Invalid sparse LDL elimination path");
+          if (length >= nf || parent_[i] < 0)
+            throw std::logic_error("Invalid free LDL elimination path");
           pattern_[length++] = i;
           flag_[i] = int32_t(k);
           i = uint32_t(parent_[i]);
@@ -66,21 +128,21 @@ class BiharmonicSparseLDL {
         while (length) {
           budget.step(1);
           if (!top)
-            throw std::logic_error("Sparse LDL pattern stack overflow");
+            throw std::logic_error("Free LDL pattern stack overflow");
           pattern_[--top] = pattern_[--length];
         }
       }
       d_[k] = y_[k];
       y_[k] = 0;
-      for (; top < n; ++top) {
+      for (; top < nf; ++top) {
         budget.step(8);
-        const auto i = pattern_[top];
+        auto i = pattern_[top];
         double yi = y_[i];
         y_[i] = 0;
         size_t end = lp_[i] + lnz_[i];
         if (end >= lp_[i + 1])
           throw std::logic_error(
-              "Sparse LDL numeric fill exceeded symbolic plan");
+              "Free LDL numeric fill exceeded symbolic plan");
         for (size_t at = lp_[i]; at < end; ++at) {
           budget.step(2);
           y_[li_[at]] -= lx_[at] * yi;
@@ -88,35 +150,39 @@ class BiharmonicSparseLDL {
         double value = yi / d_[i];
         d_[k] -= value * yi;
         if (!std::isfinite(value) || !std::isfinite(d_[k]))
-          throw std::runtime_error("Sparse LDL factor overflow");
+          throw std::runtime_error("Free LDL factor overflow");
         li_[end] = k;
         lx_[end] = value;
         ++lnz_[i];
       }
-      const double original = status[permutation_[k]] ? 1 : diagonal_[k],
-                   floor = 1e-12 * original;
+      const double floor = 1e-12 * diagonal_[free_old_[k]];
       changed += d_[k] <= floor;
       d_[k] = std::max(std::abs(d_[k]), floor);
       if (!(d_[k] > 0) || !std::isfinite(d_[k]))
-        throw std::runtime_error("Sparse LDL positive pivot invalid");
+        throw std::runtime_error("Free LDL positive pivot invalid");
     }
-    for (size_t i = 0; i < n; ++i) {
-      budget.step(2);
-      cached_[i] = status[i] != 0;
+    for (size_t i = 0; i < nf; ++i) {
+      budget.step(1);
       if (lnz_[i] != lp_[i + 1] - lp_[i])
-        throw std::logic_error(
-            "Sparse LDL numeric column count differs from symbolic fill");
+        throw std::logic_error("Free LDL numeric column count differs");
     }
+    budget.step(n);
+    for (size_t i = 0; i < n; ++i)
+      cached_[i] = status[i] != 0;
     if (budget.used - before != predicted_factor_work)
-      throw std::logic_error("Sparse LDL numeric work plan was insufficient");
+      throw std::logic_error(
+          "Free LDL numeric work plan differs from actual count");
     ++factorizations;
     modified_pivots += changed;
+    last_free_vertices = nf;
+    peak_free_fill = std::max(peak_free_fill, lp_[nf]);
     valid_ = true;
   }
 
 public:
   size_t planned_bytes = 0, matrix_nonzeros = 0, factor_nonzeros = 0,
-         predicted_factor_work = 0, factorizations = 0, modified_pivots = 0;
+         predicted_factor_work = 0, factorizations = 0, modified_pivots = 0,
+         last_free_vertices = 0, peak_free_fill = 0;
   template <class System, class Budget>
   BiharmonicSparseLDL(const System &l, size_t maximum_bytes, Budget &budget) {
     budget.stop();
@@ -379,12 +445,11 @@ public:
     }
     factor_nonzeros = lp_.back();
     const size_t factor_bytes =
-        n * 128 + matrix_nonzeros * 16 + factor_nonzeros * 16 + 16384;
+        n * 192 + matrix_nonzeros * 32 + factor_nonzeros * 16 + 32768;
     if (factor_bytes > maximum_bytes)
       throw std::length_error(
           "Sparse LDL symbolic fill exceeds byte cap before allocation");
-    if (predicted_factor_work > budget.maximum - budget.used)
-      throw std::length_error("Sparse LDL symbolic numeric-work cap exceeded");
+
     planned_bytes = std::max(planned_bytes, factor_bytes);
     li_.resize(factor_nonzeros);
     lx_.resize(factor_nonzeros);
@@ -393,6 +458,11 @@ public:
     scratch_.resize(n);
     pattern_.resize(n);
     cached_.resize(n);
+    free_ap_.resize(n + 1);
+    free_ai_.resize(matrix_nonzeros);
+    free_ax_.resize(matrix_nonzeros);
+    free_index_.resize(n);
+    free_old_.resize(n);
   }
   template <class Budget>
   void apply(std::span<const double> r, std::span<double> z,
@@ -409,35 +479,36 @@ public:
     }
     if (!same)
       factor(status, budget);
-    for (size_t k = 0; k < n; ++k) {
+    const size_t nf = free_n_;
+    for (size_t k = 0; k < nf; ++k) {
       budget.step(1);
-      scratch_[k] = status[permutation_[k]] ? 0 : r[permutation_[k]];
+      scratch_[k] = r[permutation_[free_old_[k]]];
     }
-    for (size_t j = 0; j < n; ++j) {
+    for (size_t j = 0; j < nf; ++j) {
       budget.stop();
       for (size_t at = lp_[j]; at < lp_[j + 1]; ++at) {
         budget.step(1);
         scratch_[li_[at]] -= lx_[at] * scratch_[j];
       }
     }
-    for (size_t j = 0; j < n; ++j) {
+    for (size_t j = 0; j < nf; ++j) {
       budget.step(1);
       scratch_[j] /= d_[j];
     }
-    for (size_t j = n; j-- > 0;) {
+    for (size_t j = nf; j-- > 0;) {
       budget.stop();
       for (size_t at = lp_[j]; at < lp_[j + 1]; ++at) {
         budget.step(1);
         scratch_[j] -= lx_[at] * scratch_[li_[at]];
       }
     }
-    for (size_t k = 0; k < n; ++k) {
+    budget.step(n);
+    std::fill(z.begin(), z.end(), 0);
+    for (size_t k = 0; k < nf; ++k) {
       budget.step(1);
-      auto i = permutation_[k];
-      z[i] = status[i] ? 0 : scratch_[k];
-      if (!std::isfinite(z[i]))
-        throw std::runtime_error(
-            "Sparse LDL preconditioner produced nonfinite output");
+      if (!std::isfinite(scratch_[k]))
+        throw std::runtime_error("Free sparse LDL produced nonfinite output");
+      z[permutation_[free_old_[k]]] = scratch_[k];
     }
   }
 };

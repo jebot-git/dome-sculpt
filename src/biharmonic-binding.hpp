@@ -27,7 +27,8 @@ struct BiharmonicBindingReport {
   size_t vertices = 0, components = 0, fixed_rows = 0, source_bones = 0,
          active_iterations = 0, cg_iterations = 0, warm_cg_iterations = 0,
          warm_clamps = 0, warm_outside = 0, sparse_nonzeros = 0,
-         factor_nonzeros = 0, factorizations = 0, modified_pivots = 0, work = 0,
+         factor_nonzeros = 0, factorizations = 0, modified_pivots = 0,
+         free_fill_peak = 0, last_free_vertices = 0, work = 0,
          planned_bytes = 0;
   double maximum_kkt_residual = 0, maximum_partition_error = 0;
 };

@@ -1,0 +1,40 @@
+{
+  "base": "77eb5e7e1a153eb943e2e16508d3f55da8904bff",
+  "scope": "Private optimized research TUs with copied uninstrumented b32 archives; no new native/public/SAN/OOM admission",
+  "female": {
+    "solved": 17,
+    "refused": 2,
+    "posed_cases_on_solved_parts": 85,
+    "quality_failures": 0,
+    "absent_auxiliaries": 4
+  },
+  "male": {
+    "solved": 17,
+    "refused": 2,
+    "posed_cases_on_solved_parts": 85,
+    "quality_failures": 0,
+    "absent_auxiliaries": 0
+  },
+  "remaining": "Body/Tops500M work refusal; full-avatar/native and geometry-only authoring remain required",
+  "hashes": {
+    "src/biharmonic-binding.cpp": "b68f544e15213f79e1b9496ee24b7a05d5851d0b99fa0608f3143bc17bfff46d",
+    "src/biharmonic-binding.hpp": "46808e47c7eeed6657f810d6a61a22a48b054162e38f5d070ba8d9e7d4d731ec",
+    "src/biharmonic-sparse-ldl.hpp": "264bb9f608a192e6508de32f82fddab1e95582c48b88d3656bac716b84f34f9b",
+    "tests/biharmonic-free-poses.cpp": "e4ee98743bafbcdbe040727d670eb7f6486e9b305a255a8e3a63052dcef109f7",
+    "tests/biharmonic-binding.cpp": "d0edb500e12cb4bfcee8fb1dcc3fae0916b76e09e23173a5d16db65ddb45283a",
+    "third_party/sources.json": "4af43266125259a5a20b56062c6f0c8899bc8fffb8d8c400813d2dfba3e21503",
+    "artifacts/tests-biharmonic-free-v2.log": "364205390d8ed079a76d5c6c2e0f252dd1d91f6628ddac6d3f9ee38739a8cba1",
+    "artifacts/poses-free-female.log": "e5cd7dfe6b424c9f42aa161ef58b209ca19eb5f83d250f4ac5727b55c7852850",
+    "artifacts/poses-free-male.log": "1ef13ba3d664bae50d00c9e352b072b5d25ccd55cc41906735abd916def87164",
+    "artifacts/biharmonic-free-v2-probe": "9a23064b5105dc17d7a51834511d5cb7eb0cebad14a69ed72f6884f3732fec57",
+    "artifacts/biharmonic-free-poses-probe": "04be48bd2174849a1a43c56348aca6c99e5c7e1e94f1f7ad112dc79e3121219e",
+    "artifacts/biharmonic-free-before.json": "2c059b1a19bcd639e786d9e9894764536299bce121bd203867389deb74062827",
+    "artifacts/biharmonic-free-after.json": "2c059b1a19bcd639e786d9e9894764536299bce121bd203867389deb74062827",
+    "artifacts/biharmonic-diagnostic.cpp": "652ebed8e4f225d88899534d92d87a77e942f8fb958cc12f52e8f8156705fe23",
+    "artifacts/biharmonic-diagnostic-poses.cpp": "bab818f74f348e4597a0141aaf2c7a4a9d544b7ad1e5d5832bf68b920aeb707c",
+    "artifacts/biharmonic-diagnostic-poses-probe": "9ecdac7c18495e27bdeb36321d4933c1020b9054bdd53c7f9f709d0fa1bef5e6",
+    "artifacts/poses-diagnostic-male.log": "e95a80862df0f95a825da9e4e76aebe7f67e4a9598955c588c4e89a290973713",
+    "artifacts/biharmonic-diagnostic-inputs.sha256": "3c299c1540fbc819d5fac3fe2bde17bb8f68957e6441a1d204f26040e82c07a7",
+    "artifacts/tests-biharmonic-free-old-source-control.log": "db3229a7fc6a9852ead2115411de96f3452cb926255ccf316b194324c2d666b9"
+  }
+}

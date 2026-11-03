@@ -331,6 +331,8 @@ SkinWeights bounded_biharmonic_surface(
     proof.factor_nonzeros = q.full->factor_nonzeros;
     proof.factorizations = q.full->factorizations;
     proof.modified_pivots = q.full->modified_pivots;
+    proof.free_fill_peak = q.full->peak_free_fill;
+    proof.last_free_vertices = q.full->last_free_vertices;
   }
   if (report)
     *report = proof;
