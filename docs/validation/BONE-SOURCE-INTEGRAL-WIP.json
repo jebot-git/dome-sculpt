@@ -1,0 +1,45 @@
+{
+  "base": "c2912f610732e079b0536e7c7b1a3a07c1d09a74",
+  "status": "private standalone arithmetic/geometry components only; actual field/quality remains unfinished",
+  "line": {
+    "cases": 512,
+    "absolute_error": 7.8442e-17,
+    "relative_error": 1.79801e-14,
+    "metamorphic_error": 1.11022e-16,
+    "Release": 0,
+    "own_ASAN_UBSAN_leaks": 0
+  },
+  "shadow": {
+    "random_cases": 512,
+    "independent_point_ray_oracles": 131584,
+    "positive_intervals": 69,
+    "random_ambiguities": 0,
+    "exact_metamorphic_cases": 1024,
+    "Release": 0,
+    "own_ASAN_UBSAN_leaks": 0,
+    "endpoint_midpoint_shortcut_negative": true,
+    "explicit_coplanar_grazing_origin_guards": true
+  },
+  "source_owners_or_volume_or_binding_authority": false,
+  "GPU": false,
+  "public_binding_changed": false,
+  "whole_solver_SAN_or_OOM_or_native_UI_Save": false,
+  "still_required": "bounded complete owning BVH/interval union + source closure + unchanged actual Body/Tops/500M, then full38/native admission",
+  "hashes": {
+    "src/bone-line-integral.hpp": "938f07d5ee2a86289926281ac8ff272a458f1d5e0382b6fd1b75f568973fccb6",
+    "src/bone-source-shadow.hpp": "de2a95bb1a98a764626d753a7622d00d8a49724814bc57f64c5965258501a520",
+    "src/volume-exact.hpp": "f1a85b8d5db21093b816d5d66e5d3cfb2b27fa219be26ad2ae985926232e784e",
+    "tests/bone-line-integral.cpp": "da39530a6a51121f238d11cc778f34d50be90e1a34a30c667b66724a6c651b32",
+    "tests/bone-source-shadow.cpp": "0d0f68966269a8436e15d3f56fbe2b1fdfde640d8998cb8b4013cae9b000ee47",
+    "artifacts/bone-line-integral-final": "86a8de63c9444552c5ce8e4ddc0a59180b248f5d38228483313b64708988c887",
+    "artifacts/bone-line-integral-final-sanitize": "18db2357cff5448a20e5fe3e6d9d6ef908ceecbf2a9eb7c6c2555310fba5993a",
+    "artifacts/bone-source-shadow-final": "da954aff5a4770531d91485f01b9c57cbf22451d1b26cbad6b6423094c963774",
+    "artifacts/bone-source-shadow-final-sanitize": "d8f600c0bccf53e888eaa1848efbabdff4b02e7a335fb72eb014a95bc2151087",
+    "artifacts/bone-line-integral-final.log": "daf9d1f7beeb27d3ee17761bc2a12e624f530f4017e818b6542c2e7f6b45a3aa",
+    "artifacts/bone-line-integral-final-sanitize.log": "daf9d1f7beeb27d3ee17761bc2a12e624f530f4017e818b6542c2e7f6b45a3aa",
+    "artifacts/bone-source-shadow-final.log": "b7732478a9bd834ef97477c9c0dff325fc8bd97ea7a4c0cbb3076bc01107078a",
+    "artifacts/bone-source-shadow-final-sanitize.log": "b7732478a9bd834ef97477c9c0dff325fc8bd97ea7a4c0cbb3076bc01107078a",
+    "artifacts/analytic-kernels-final.sha256": "c232c09299ceae4fc2a11c147202060117c51bcbf6efdde976e60b0e2a3250a4",
+    "artifacts/predicate-reference/predicates.c": "f8662c3f407d1c1c5dcd4dd49ea8b8ddd801a71827d65734206ddc3741792029"
+  }
+}
