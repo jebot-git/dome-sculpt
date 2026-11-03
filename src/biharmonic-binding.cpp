@@ -5,6 +5,7 @@
 #include "biharmonic-binding.hpp"
 #include "biharmonic-sparse-ldl.hpp"
 #include "block-bounded-quadratic.hpp"
+#include "coupled-biharmonic-dual.hpp"
 #include "fixed-quadratic.hpp"
 #include "heat-binding.cpp"
 #include "squared-laplacian-preconditioner.hpp"
@@ -64,6 +65,216 @@ struct BiharmonicOperator {
     l.multiply(temporary, out, budget);
   }
 };
+struct CoupledSparseInverse {
+  BiharmonicOperator &q;
+  std::span<const uint8_t> fixed;
+  std::vector<uint32_t> rows;
+  std::vector<double> rhs, result, product, residual, correction;
+  double lipschitz = 0, tolerance;
+  size_t applications = 0, refinements = 0;
+  double maximum_residual = 0;
+  CoupledSparseInverse(BiharmonicOperator &op, std::span<const uint8_t> pins,
+                       double tol)
+      : q(op), fixed(pins), rhs(pins.size()), result(pins.size()),
+        product(pins.size()), residual(pins.size()), correction(pins.size()),
+        tolerance(tol) {}
+  void apply_inverse(std::span<const double> in, std::span<double> out,
+                     Budget &budget) {
+    if (in.size() != rows.size() || out.size() != rows.size())
+      throw std::invalid_argument("Coupled sparse inverse domain differs");
+    ++applications;
+    budget.step(rhs.size() + rows.size() * 2);
+    std::fill(rhs.begin(), rhs.end(), 0);
+    long double rhs_norm = 0;
+    for (size_t i = 0; i < rows.size(); ++i) {
+      if (!std::isfinite(in[i]))
+        throw std::invalid_argument("Nonfinite dual inverse RHS");
+      if (!fixed[rows[i]])
+        rhs[rows[i]] = in[i];
+      rhs_norm += static_cast<long double>(rhs[rows[i]]) * rhs[rows[i]];
+    }
+    if (rhs_norm == 0) {
+      std::fill(out.begin(), out.end(), 0);
+      return;
+    }
+    q.precondition(rhs, result, fixed, budget);
+    const long double scale = std::max(1.L, std::sqrt(rhs_norm));
+    bool certified = false;
+    for (unsigned iteration = 0; iteration < 8; ++iteration) {
+      q.apply(result, product, budget);
+      budget.step(rhs.size() * 3);
+      long double error = 0;
+      for (size_t i = 0; i < rhs.size(); ++i) {
+        residual[i] = fixed[i] ? 0 : rhs[i] - product[i];
+        error += static_cast<long double>(residual[i]) * residual[i];
+      }
+      double relative = double(std::sqrt(error) / scale);
+      if (!std::isfinite(relative))
+        throw std::runtime_error("Dual sparse inverse residual overflow");
+      if (relative <= tolerance) {
+        maximum_residual = std::max(maximum_residual, relative);
+        certified = true;
+        break;
+      }
+      q.precondition(residual, correction, fixed, budget);
+      budget.step(rhs.size());
+      for (size_t i = 0; i < rhs.size(); ++i)
+        result[i] += correction[i];
+      ++refinements;
+    }
+    if (!certified)
+      throw std::runtime_error(
+          "Dual sparse inverse missed original-Q residual");
+    budget.step(rows.size());
+    for (size_t i = 0; i < rows.size(); ++i)
+      out[i] = result[rows[i]];
+  }
+};
+SkinWeights coupled_fields(const System &s, BiharmonicOperator &q,
+                           std::span<const uint8_t> fixed,
+                           std::span<const std::array<uint64_t, 4>> anchors,
+                           std::span<const std::array<uint64_t, 4>> domains,
+                           const std::array<bool, 256> &covered,
+                           bool independent,
+                           const BoundedQuadraticOptions &controls,
+                           const WeightLimits &limits, size_t maximum_bytes,
+                           Budget &budget, BiharmonicBindingReport &proof) {
+  const size_t n = s.positions.size();
+  std::vector<uint32_t> joints;
+  for (uint32_t k = 0; k < covered.size(); ++k)
+    if (covered[k])
+      joints.push_back(k);
+  budget.step(n * joints.size());
+  std::vector<double> unconstrained(n * joints.size()), values(n), field(n),
+      pins(n), derivative(n);
+  // Same hard projected handles. Build the equality-only stationary fields
+  // once through the fixed Dirichlet factor; no box-column normalization.
+  for (size_t k = 0; k < joints.size(); ++k) {
+    budget.step(n * 3);
+    std::fill(values.begin(), values.end(), 0);
+    std::fill(field.begin(), field.end(), 0);
+    for (size_t i = 0; i < n; ++i)
+      if (fixed[i]) {
+        unsigned count = 0;
+        for (auto word : anchors[i])
+          count += std::popcount(word);
+        values[i] =
+            (anchors[i][joints[k] / 64] & (uint64_t(1) << (joints[k] % 64)))
+                ? 1. / count
+                : 0;
+      }
+    auto initial =
+        solve_fixed_quadratic(q, fixed, values, field, controls, budget);
+    proof.warm_cg_iterations += initial.cg_iterations;
+    for (size_t i = 0; i < n; ++i)
+      unconstrained[i * joints.size() + k] = field[i];
+  }
+  CoupledSparseInverse inverse(q, fixed, controls.relative_tolerance * .1);
+  SkinWeights grouped;
+  grouped.vertices.resize(n);
+  std::vector<std::vector<uint32_t>> components(n);
+  for (uint32_t i = 0; i < n; ++i) {
+    budget.step();
+    components[s.parent[i]].push_back(i);
+  }
+  for (size_t root = 0; root < n; ++root)
+    if (!components[root].empty()) {
+      std::vector<size_t> columns;
+      for (size_t k = 0; k < joints.size(); ++k)
+        if (!independent ||
+            (domains[root][joints[k] / 64] & (uint64_t(1) << (joints[k] % 64))))
+          columns.push_back(k);
+      if (columns.empty())
+        throw std::runtime_error("Coupled component lacks declared handles");
+      inverse.rows = components[root];
+      const size_t rows = inverse.rows.size(), labels = columns.size(),
+                   count = rows * labels;
+      budget.step(count * 2 + rows);
+      std::vector<double> r(count), output(count), lambda(count),
+          gradients(count);
+      inverse.lipschitz = 0;
+      for (size_t i = 0; i < rows; ++i) {
+        auto row = inverse.rows[i];
+        long double sum = 0;
+        for (size_t k = 0; k < labels; ++k)
+          sum += (r[i * labels + k] =
+                      unconstrained[row * joints.size() + columns[k]]);
+        // Eq14's affine correction is the exact coupled equality solution R.
+        // Fixed rows already have their exact handle proportions and remain so.
+        for (size_t k = 0; k < labels; ++k)
+          if (!fixed[row])
+            r[i * labels + k] += double((1 - sum) / labels);
+        inverse.lipschitz += 1 / q.diagonal[row] / rows;
+      }
+      if (labels == 1) {
+        std::fill(output.begin(), output.end(), 1);
+      } else {
+        CoupledDualOptions options;
+        options.relative_tolerance = controls.relative_tolerance;
+        options.maximum_iterations = controls.maximum_active_iterations;
+        options.maximum_bytes = maximum_bytes;
+        auto result = solve_coupled_biharmonic_dual(
+            inverse, rows, labels, r, output, lambda, options, budget);
+        proof.dual_iterations += result.iterations;
+        proof.dual_backtracks += result.backtracks;
+        proof.maximum_dual_kkt = std::max(proof.maximum_dual_kkt, result.kkt);
+        proof.maximum_partition_error =
+            std::max(proof.maximum_partition_error, result.partition_error);
+      }
+      // Independent actual primal stationarity, evaluated using ORIGINAL Q,
+      // with its own row multiplier. The inverse/dual stop cannot grant it.
+      long double scale = 0, stationarity = 0;
+      for (size_t k = 0; k < labels; ++k) {
+        budget.step(n + rows);
+        std::fill(pins.begin(), pins.end(), 0);
+        for (size_t i = 0; i < rows; ++i)
+          pins[inverse.rows[i]] = output[i * labels + k];
+        q.apply(pins, derivative, budget);
+        for (size_t i = 0; i < rows; ++i) {
+          gradients[i * labels + k] =
+              derivative[inverse.rows[i]] - lambda[i * labels + k];
+          scale += static_cast<long double>(derivative[inverse.rows[i]]) *
+                   derivative[inverse.rows[i]];
+        }
+      }
+      budget.step(count * 2);
+      for (size_t i = 0; i < rows; ++i)
+        if (!fixed[inverse.rows[i]]) {
+          long double mean = 0;
+          for (size_t k = 0; k < labels; ++k)
+            mean += gradients[i * labels + k] / labels;
+          for (size_t k = 0; k < labels; ++k) {
+            long double d = gradients[i * labels + k] - mean;
+            stationarity += d * d;
+          }
+        }
+      double primal =
+          double(std::sqrt(stationarity) / std::max(1.L, std::sqrt(scale)));
+      if (!std::isfinite(primal) || primal > controls.relative_tolerance)
+        throw std::runtime_error(
+            "Coupled field missed original primal stationarity");
+      proof.maximum_primal_kkt = std::max(proof.maximum_primal_kkt, primal);
+      proof.maximum_kkt_residual = std::max(
+          {proof.maximum_kkt_residual, primal, proof.maximum_dual_kkt});
+      for (size_t i = 0; i < rows; ++i) {
+        budget.step(labels + limits.max_influences);
+        auto &target = grouped.vertices[inverse.rows[i]];
+        for (size_t k = 0; k < labels; ++k)
+          if (output[i * labels + k] > 0)
+            target.push_back(
+                {joints[columns[k]], float(output[i * labels + k])});
+        // Existing explicit output influence/prune policy, separately measured
+        // by posed consumers. Never a substitute for either field KKT proof.
+        target =
+            normalize_weights(std::move(target), covered.size(), {}, limits);
+      }
+    }
+  proof.inverse_applications = inverse.applications;
+  proof.inverse_refinements = inverse.refinements;
+  proof.maximum_inverse_residual = inverse.maximum_residual;
+  return grouped;
+}
+
 } // namespace
 SkinWeights bounded_biharmonic_surface(
     const Mesh &mesh, const Skeleton &rig,
@@ -74,7 +285,9 @@ SkinWeights bounded_biharmonic_surface(
     std::span<const std::array<uint64_t, 4>> component_usage) {
   const auto &o = options.source;
   const bool block = options.box_solver == BiharmonicBoxSolver::BlockActiveSet;
-  if (options.box_solver != BiharmonicBoxSolver::PrimalFeasible && !block)
+  const bool coupled = options.box_solver == BiharmonicBoxSolver::CoupledDual;
+  if (options.box_solver != BiharmonicBoxSolver::PrimalFeasible && !block &&
+      !coupled)
     throw std::invalid_argument("Unknown biharmonic box solver");
   const bool warm = options.initialization ==
                     BiharmonicInitialization::UnconstrainedWarmStart;
@@ -88,6 +301,9 @@ SkinWeights bounded_biharmonic_surface(
   if (options.preconditioner != BiharmonicPreconditioner::Diagonal &&
       !squared && !sparse)
     throw std::invalid_argument("Unknown biharmonic preconditioner");
+  if (coupled && (!sparse || !warm))
+    throw std::invalid_argument("Coupled dual requires explicit fixed sparse "
+                                "inverse and equality initialization");
   const bool independent =
       options.projection == BiharmonicProjection::IndependentComponent;
   Budget budget{0, o.maximum_work, cancelled};
@@ -120,7 +336,8 @@ SkinWeights bounded_biharmonic_surface(
   const size_t precondition_bytes = squared ? n * 128 + corners * 48 + 8192 : 0;
   const size_t planned = n * (1024 + 32 * o.limits.max_influences + b * 18) +
                          corners * 160 + b * b * 64 + 16384 +
-                         precondition_bytes;
+                         precondition_bytes +
+                         (coupled ? n * b * 160 + 32768 : 0);
   if (planned > o.maximum_bytes || n > o.maximum_work / (sources.size() + 1))
     throw std::length_error(
         "Biharmonic construction exceeds byte/work admission");
@@ -250,65 +467,72 @@ SkinWeights bounded_biharmonic_surface(
   grouped.vertices.resize(rows);
   for (auto &row : grouped.vertices)
     row.reserve(o.limits.max_influences + 1);
-  for (uint32_t joint = 0; joint < b; ++joint)
-    if (covered[joint]) {
-      budget.stop();
-      std::fill(values.begin(), values.end(), 0);
-      std::fill(initial.begin(), initial.end(), 0);
-      for (size_t i = 0; i < rows; ++i)
-        if (fixed[i]) {
-          budget.step(8);
-          size_t count = 0;
-          for (auto mask : anchors[i])
-            count += std::popcount(mask);
-          values[i] = (anchors[i][joint / 64] & (uint64_t(1) << (joint % 64)))
-                          ? 1. / count
-                          : 0;
-          initial[s.parent[i]] += values[i];
+  if (coupled) {
+    grouped = coupled_fields(s, q, fixed, anchors, domains, covered,
+                             independent, controls, o.limits,
+                             o.maximum_bytes - planned, budget, proof);
+    std::fill(sum.begin(), sum.end(), 1);
+  } else
+    for (uint32_t joint = 0; joint < b; ++joint)
+      if (covered[joint]) {
+        budget.stop();
+        std::fill(values.begin(), values.end(), 0);
+        std::fill(initial.begin(), initial.end(), 0);
+        for (size_t i = 0; i < rows; ++i)
+          if (fixed[i]) {
+            budget.step(8);
+            size_t count = 0;
+            for (auto mask : anchors[i])
+              count += std::popcount(mask);
+            values[i] = (anchors[i][joint / 64] & (uint64_t(1) << (joint % 64)))
+                            ? 1. / count
+                            : 0;
+            initial[s.parent[i]] += values[i];
+          }
+        for (size_t i = 0; i < rows; ++i) {
+          budget.step();
+          if (!(counts[s.parent[i]] > 0))
+            throw std::runtime_error(
+                "Biharmonic component lacks fixed constraints");
+          field[i] = initial[s.parent[i]] / counts[s.parent[i]];
         }
-      for (size_t i = 0; i < rows; ++i) {
-        budget.step();
-        if (!(counts[s.parent[i]] > 0))
-          throw std::runtime_error(
-              "Biharmonic component lacks fixed constraints");
-        field[i] = initial[s.parent[i]] / counts[s.parent[i]];
-      }
-      if (warm) {
-        auto initialized =
-            solve_fixed_quadratic(q, fixed, values, field, controls, budget);
-        proof.warm_cg_iterations += initialized.cg_iterations;
-        budget.step(rows);
-        for (double &value : field) {
-          proof.warm_outside += value < 0 || value > 1;
-          if (!block) {
-            proof.warm_clamps += value < 0 || value > 1;
-            value = std::clamp(value, 0., 1.);
+        if (warm) {
+          auto initialized =
+              solve_fixed_quadratic(q, fixed, values, field, controls, budget);
+          proof.warm_cg_iterations += initialized.cg_iterations;
+          budget.step(rows);
+          for (double &value : field) {
+            proof.warm_outside += value < 0 || value > 1;
+            if (!block) {
+              proof.warm_clamps += value < 0 || value > 1;
+              value = std::clamp(value, 0., 1.);
+            }
           }
         }
+        auto solved = block ? solve_block_bounded_quadratic(
+                                  q, fixed, values, field, controls, budget)
+                            : solve_bounded_quadratic(q, fixed, values, field,
+                                                      controls, budget);
+        proof.active_iterations += solved.active_iterations;
+        proof.cg_iterations += solved.cg_iterations;
+        proof.maximum_kkt_residual =
+            std::max(proof.maximum_kkt_residual, solved.kkt_residual);
+        for (size_t i = 0; i < rows; ++i) {
+          budget.step(8);
+          double value = field[i];
+          sum[i] += value;
+          if (value <= 0)
+            continue;
+          auto &row = grouped.vertices[i];
+          row.push_back({joint, float(value)});
+          std::sort(row.begin(), row.end(), [](auto a, auto b) {
+            return a.weight != b.weight ? a.weight > b.weight
+                                        : a.joint < b.joint;
+          });
+          if (row.size() > o.limits.max_influences)
+            row.pop_back();
+        }
       }
-      auto solved = block ? solve_block_bounded_quadratic(
-                                q, fixed, values, field, controls, budget)
-                          : solve_bounded_quadratic(q, fixed, values, field,
-                                                    controls, budget);
-      proof.active_iterations += solved.active_iterations;
-      proof.cg_iterations += solved.cg_iterations;
-      proof.maximum_kkt_residual =
-          std::max(proof.maximum_kkt_residual, solved.kkt_residual);
-      for (size_t i = 0; i < rows; ++i) {
-        budget.step(8);
-        double value = field[i];
-        sum[i] += value;
-        if (value <= 0)
-          continue;
-        auto &row = grouped.vertices[i];
-        row.push_back({joint, float(value)});
-        std::sort(row.begin(), row.end(), [](auto a, auto b) {
-          return a.weight != b.weight ? a.weight > b.weight : a.joint < b.joint;
-        });
-        if (row.size() > o.limits.max_influences)
-          row.pop_back();
-      }
-    }
   for (size_t i = 0; i < rows; ++i) {
     budget.step();
     proof.maximum_partition_error =

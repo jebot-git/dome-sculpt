@@ -2,6 +2,7 @@
 #pragma once
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <span>
 #include <stdexcept>
 #include <vector>
@@ -10,7 +11,8 @@ namespace dome::detail {
 // eqs12-16. No copied implementation/runtime. For free-row SPD energy A,
 // R is its unconstrained minimum corrected to sum1 per row. H(Y)=A^-1 Y P,
 // P=I-11'/labels. min_{Y>=0} .5<Y,H(Y)>+<R,Y>; primal W=R+H(Y).
-// Input inverse/Lipschitz certification belongs to its caller. This kernel
+// Input inverse certification belongs to its caller. Each quadratic step
+// majorization is independently checked and backtracked. This kernel
 // enforces actual dual projected KKT, not iteration count or squared-variable
 // stationarity; no postnormalization or accepted unconverged field.
 struct CoupledDualOptions {
@@ -19,7 +21,8 @@ struct CoupledDualOptions {
   double relative_tolerance = 1e-10;
 };
 struct CoupledDualReport {
-  size_t iterations = 0;
+  size_t iterations = 0, backtracks = 0;
+  double final_lipschitz = 0;
   double kkt = 0, minimum = 0, partition_error = 0;
 };
 template <class Inverse, class Budget>
@@ -83,19 +86,51 @@ CoupledDualReport solve_coupled_biharmonic_dual(
       }
     }
   };
-  double acceleration = 1;
+  double acceleration = 1, lipschitz = inverse.lipschitz;
   CoupledDualReport report;
   for (unsigned iteration = 0; iteration < o.maximum_iterations; ++iteration) {
     budget.stop();
     evaluate(extrapolated, gradient);
-    budget.step(count * 2);
-    for (size_t i = 0; i < count; ++i) {
-      next[i] = std::max(0., extrapolated[i] - gradient[i] / inverse.lipschitz);
-      if (!std::isfinite(next[i]))
-        throw std::runtime_error("Coupled dual iterate overflow");
+    bool certified = false;
+    for (unsigned backtrack = 0; backtrack < 64; ++backtrack) {
+      budget.step(count * 2);
+      for (size_t i = 0; i < count; ++i) {
+        next[i] = std::max(0., extrapolated[i] - gradient[i] / lipschitz);
+        if (!std::isfinite(next[i]))
+          throw std::runtime_error("Coupled dual iterate overflow");
+      }
+      // For a quadratic, this is exactly2*(f(next)-f(y)-grad(y)'d).
+      // Use independently evaluated inverse/gradient at next, not a
+      // guessed spectral bound or an unchanged source's observed constant.
+      evaluate(next, current_gradient);
+      budget.step(count * 4);
+      long double curvature = 0, squared_step = 0, absolute = 0;
+      for (size_t i = 0; i < count; ++i) {
+        long double d = static_cast<long double>(next[i]) - extrapolated[i];
+        long double term =
+            d * (static_cast<long double>(current_gradient[i]) - gradient[i]);
+        curvature += term;
+        absolute += std::abs(term);
+        squared_step += d * d;
+      }
+      if (!std::isfinite(curvature) || !std::isfinite(squared_step) ||
+          curvature < -64 * std::numeric_limits<double>::epsilon() * absolute)
+        throw std::runtime_error(
+            "Coupled dual inverse lost positive curvature");
+      if (curvature <= lipschitz * squared_step) {
+        certified = true;
+        break;
+      }
+      if (!(squared_step > 0))
+        throw std::runtime_error("Coupled dual backtrack has no finite step");
+      lipschitz = 2 * std::max(lipschitz, double(curvature / squared_step));
+      ++report.backtracks;
+      if (!std::isfinite(lipschitz))
+        throw std::runtime_error("Coupled dual backtrack scale overflow");
     }
-    // Fresh actual gradient at the nonnegative candidate authorizes output.
-    evaluate(next, current_gradient);
+    if (!certified)
+      throw std::runtime_error("Coupled dual step was not certified");
+    report.final_lipschitz = lipschitz;
     budget.step(count * 2);
     long double residual = 0;
     for (size_t i = 0; i < count; ++i) {

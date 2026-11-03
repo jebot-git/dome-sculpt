@@ -1,0 +1,36 @@
+{
+  "base": "9b7af75b9a83e086eb675a6c1a90556e739cc9d2",
+  "scope": "Private actual native C++ factory + copied uninstrumented b32 support; no new SAN/native authoring admission",
+  "female": {
+    "solved": 13,
+    "refused": 6,
+    "solved_part_quality_failures": 0,
+    "absent_auxiliaries": 10
+  },
+  "male": {
+    "solved": 12,
+    "refused": 7,
+    "solved_part_quality_failures": 0,
+    "absent_auxiliaries": 0
+  },
+  "unchanged_inputs": 1538,
+  "original_work_cap": 500000000,
+  "remaining": "plain projected dual iteration/work cost; no full avatar/native admission",
+  "hashes": {
+    "src/biharmonic-binding.cpp": "dc6abb03a5715a0bec7afacdad47db0ab3a9b26856ef75e87f37c8a526ca487b",
+    "src/biharmonic-binding.hpp": "4d6a43633280cb95e701f607efa862e9a645c9a4952fb0d1cead0087d81bb81f",
+    "src/coupled-biharmonic-dual.hpp": "f1ad448d471f9b5f17431168e69f3f26627c1eae72118040b251fa820373e27a",
+    "tests/coupled-biharmonic-dual.cpp": "05a0a64bab6d7587d52c7c6a28f8deaf884becbb5bc96e0c4d8e93f441384f23",
+    "tests/biharmonic-coupled.cpp": "776d0586e36e78b1ff4ed43962895d49d14deddb2923750a080df099499661cc",
+    "tests/biharmonic-coupled-poses.cpp": "47e70c34dadb5fef3ca5e8eb43a3e380892d325685f7f0b4211d79b0cd313554",
+    "artifacts/poses-coupled-female.log": "ef8265ab763167146d3c55abc3166704d7769fc5cad31423b6a90d174ee81e8f",
+    "artifacts/poses-coupled-male.log": "4cf10ff1077bfe425b7c0a0758672c6dd7c494bd9a7e6890eacb6566923a8721",
+    "artifacts/coupled-before.json": "56a8d480fb4dd5c71d6b98adb225fa63c00fb548ae4216b6ef146a967ff8459e",
+    "artifacts/coupled-after.json": "56a8d480fb4dd5c71d6b98adb225fa63c00fb548ae4216b6ef146a967ff8459e",
+    "artifacts/biharmonic-coupled-probe": "e49bf3f29bfe521d461a1bfb9ddf59df1e4eed754df0a23c9a5ee37fa380bad5",
+    "artifacts/biharmonic-coupled-poses-probe": "89b3473c73d5f5a2551744b2e7144b2d69d27f174ff2229b017154e87b46441f",
+    "artifacts/coupled-dual-backtrack-probe": "0c517ab6a11d731101f05436bf8f7c8475aa5b8b81541a06e134f0474839c0e6",
+    "artifacts/tests-biharmonic-coupled.log": "2ef7017f213df97de1375bc9db957d7e3de9ad9d1d9eba842ce1ba232e761519",
+    "artifacts/tests-coupled-dual-backtrack.log": "744ba85318458128c1a4b22bbb5df52676561e3b363d7a492e7f679585253b59"
+  }
+}

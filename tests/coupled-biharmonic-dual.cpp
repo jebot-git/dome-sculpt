@@ -150,6 +150,21 @@ int main() try {
         if (std::abs(value - mean) > 1e-8L)
           throw std::runtime_error("primal stationarity");
     }
+    auto tiny_bound = op;
+    tiny_bound.lipschitz *= 1e-8;
+    std::array<double, 6> certified{}, certified_lambda{};
+    Budget backtrack_budget;
+    auto backtracked = solve_coupled_biharmonic_dual(
+        tiny_bound, 2, 3, input, certified, certified_lambda, options,
+        backtrack_budget);
+    for (size_t i = 0; i < 6; ++i)
+      if (std::abs(certified[i] - expected[i]) > 1e-8)
+        throw std::runtime_error(
+            "Backtracked step changed independent primal solution");
+    if (backtracked.backtracks == 0 &&
+        std::any_of(input.begin(), input.end(), [](double v) { return v < 0; }))
+      throw std::runtime_error(
+          "Deliberately undersized step bound was not rejected");
     auto unchanged = x;
     std::fill(x.begin(), x.end(), 173);
     std::fill(lambda.begin(), lambda.end(), 181);
