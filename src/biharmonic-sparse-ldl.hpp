@@ -470,7 +470,8 @@ public:
   template <class Budget>
   void apply_restricted(std::span<const double> r, std::span<double> z,
                         std::span<const uint8_t> base_status,
-                        std::span<const uint8_t> status, Budget &budget) {
+                        std::span<const uint8_t> status, Budget &budget,
+                        bool allow_released = false) {
     const size_t n = d_.size();
     if (r.size() != n || z.size() != n || status.size() != n ||
         base_status.size() != n)
@@ -478,7 +479,8 @@ public:
     bool same = valid_;
     budget.step(n);
     for (size_t i = 0; i < n; ++i) {
-      if (status[i] > 3 || base_status[i] > 3 || (base_status[i] && !status[i]))
+      if (status[i] > 3 || base_status[i] > 3 ||
+          (!allow_released && base_status[i] && !status[i]))
         throw std::invalid_argument("Invalid restricted sparse LDL constraint");
       same &= cached_[i] == (base_status[i] != 0);
     }
@@ -510,6 +512,19 @@ public:
     }
     budget.step(n);
     std::fill(z.begin(), z.end(), 0);
+    if (allow_released) {
+      // Disjoint positive diagonal block for vertices absent from the saved
+      // inverse domain but free now. The two blocks are independently SPD.
+      budget.step(n);
+      for (size_t old = 0; old < n; ++old) {
+        auto i = permutation_[old];
+        if (base_status[i] && !status[i]) {
+          z[i] = r[i] / diagonal_[old];
+          if (!std::isfinite(z[i]))
+            throw std::runtime_error("Lagged diagonal block overflow");
+        }
+      }
+    }
     for (size_t k = 0; k < nf; ++k) {
       budget.step(1);
       if (!std::isfinite(scratch_[k]))

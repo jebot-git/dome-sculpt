@@ -82,6 +82,8 @@ solve_fixed_quadratic(Operator &op, std::span<const uint8_t> fixed,
         z[i] = fixed[i] ? 0 : r[i] / op.diagonal[i];
     }
   };
+  if constexpr (requires { op.begin_free_solve(status, budget); })
+    op.begin_free_solve(status, budget);
   precondition();
   double rho = 0;
   budget.step(n);

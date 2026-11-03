@@ -602,7 +602,7 @@
     "adapted": "src/biharmonic-sparse-ldl.hpp",
     "scope": "Private unregistered weight research only; no production/native admission. Native bounded C++ symbolic/numeric LDL port, positive preconditioner pivots, exact minimum-degree ordering and per-bind free-mask factor cache. Actual original-Q residual/KKT remains required.",
     "reference": "docs/validation/BIHARMONIC-LDL-REFERENCE.json",
-    "port_sha256": "b7f2ed70f7a9877e0238877b6ca698faf3d16ad51e43ab431df62b52c07c8292",
+    "port_sha256": "23da39717cda7db19b6c40cba1a3d22ff46f02bc44120329f29affff28a4952c",
     "license_path": "third_party/ldl/LICENSE",
     "complete_license": "third_party/ldl/COPYING.LESSER"
   }

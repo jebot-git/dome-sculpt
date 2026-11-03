@@ -8,7 +8,8 @@ enum class BiharmonicPreconditioner {
   Diagonal,
   SquaredIncompleteLaplacian,
   SparseLDL,
-  RestrictedSparseLDL
+  RestrictedSparseLDL,
+  LaggedSparseLDL
 };
 enum class BiharmonicInitialization {
   ComponentConstant,
