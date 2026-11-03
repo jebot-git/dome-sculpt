@@ -13,7 +13,9 @@ The original notices and licenses on reused source files remain in force.
   reservation. Exact hashes and deviations are in `docs/IMPORT-AND-MESH.md`
   and `docs/RIGGING.md`.
 - OpenBrush Native: Apache-2.0. Its `navigation` and `controller-profiles` sources
-  are compiled unchanged, along with the EGL graphics helper. Native session
+  are compiled unchanged. The EGL graphics helper has local exception-safe
+  acquisition and exclusive resource-ownership fixes documented in
+  `docs/NATIVE-GRAPHICS-LIFETIME.md`. Native session
   lifecycle, controller actions, matrices and BDF palette rendering are adapted
   in `src/xr.cpp`, `src/render.cpp` and `src/palette.cpp`. The graphics helper is
   MIT, with the upstream de-xr notice in `third_party/openbrush/LICENSE.native-graphics`.

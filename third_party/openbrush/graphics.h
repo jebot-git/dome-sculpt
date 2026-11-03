@@ -10,4 +10,9 @@ struct NativeGraphics {
   EGLSurface surface = EGL_NO_SURFACE;
   NativeGraphics();
   ~NativeGraphics();
+  NativeGraphics(const NativeGraphics &) = delete;
+  NativeGraphics &operator=(const NativeGraphics &) = delete;
+
+private:
+  void release() noexcept;
 };

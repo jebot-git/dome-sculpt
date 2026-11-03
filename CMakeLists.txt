@@ -623,6 +623,13 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR)
   target_sources(dome-sculpt-render PRIVATE src/polygon-render.cpp)
   target_link_libraries(dome-sculpt-render PUBLIC dome-sculpt-core PkgConfig::NATIVEGL)
   if(BUILD_TESTING)
+    # Link the actual EGL owner against a deterministic vendor API supplied by
+    # the fixture. No graphics device or copied lifecycle implementation.
+    add_executable(dome-sculpt-native-graphics-lifetime-test
+      tests/native-graphics-lifetime.cpp third_party/openbrush/graphics.cpp)
+    target_include_directories(dome-sculpt-native-graphics-lifetime-test PRIVATE third_party/openbrush)
+    add_test(NAME native-graphics-lifetime COMMAND dome-sculpt-native-graphics-lifetime-test)
+    set_tests_properties(native-graphics-lifetime PROPERTIES TIMEOUT 30)
     add_executable(dome-sculpt-current-color-bake-render-test tests/current-color-bake-render.cpp)
     target_include_directories(dome-sculpt-current-color-bake-render-test PRIVATE src third_party/cgltf)
     target_link_libraries(dome-sculpt-current-color-bake-render-test PRIVATE dome-sculpt-render)
