@@ -33,8 +33,9 @@ struct VrmExportReport {
   std::vector<std::string> diagnostics;
   size_t materials = 0, painted_materials = 0;
 };
-// Source-version-preserving VRM0 only. Requires retained source identities;
-// unsupported versions/features reject rather than being silently converted.
+// Source-version-preserving VRM0 and the supported VRM1 original-node route.
+// Requires retained source identities; unrepresented material/physics edits
+// reject explicitly rather than being converted or silently discarded.
 VrmExportReport export_vrm(const std::vector<ObjectSurface> &,
                            const std::filesystem::path &,
                            const VrmExportOptions & = {});

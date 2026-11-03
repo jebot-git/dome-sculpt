@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "vrm-import.hpp"
+#include "vrm1-metadata.hpp"
 #include <set>
 namespace dome::detail {
 namespace {
@@ -169,6 +170,7 @@ VrmImportMetadata vrm_import_metadata(const nlohmann::json &j,
         throw std::invalid_argument("VRM import repeats a humanoid role");
     }
   } else {
+    validate_vrm1_metadata(j,cancelled);
     // Version-specific structural/reference checks; unknown metadata remains in
     // the original source, never reinterpreted as VRM0 material properties.
     const auto &meta = out.source.at("meta"),

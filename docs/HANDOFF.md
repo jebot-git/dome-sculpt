@@ -4,6 +4,18 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Private VRM1/display integration candidate — 2026-11-03
+
+This isolated candidate composes cleanup base69ca191 and qualified private
+VRM1 componenta21843b. Root display ownership, SDK/runtime guards and provenance
+are preserved. The new ImportedMaterial/ImportedAsset parsed layouts require
+fresh complete dependent builds and affected native/render/replay/UI proofs;
+those integration gates are not yet complete. The component evidence in
+[VRM1-SOURCE-EXPORT.md](VRM1-SOURCE-EXPORT.md) retains its exact earlier parent
+and does not qualify this composition. Full painted/frame/HDR/initial-UV and
+dynamic V1 constraints/physics requirements remain open. No physical/session or
+system-installation action is authorized by this integration.
+
 ## Qualified authoring union — 2026-11-03
 
 Published main `fd5ecc7` now contains this qualified union. The remote main

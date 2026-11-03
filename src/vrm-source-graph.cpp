@@ -53,6 +53,7 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
                                 const Json &original,
                                 const std::function<bool()> &cancelled,size_t max_snapshot_bytes) {
   VrmSourceGraph graph;
+  const bool version1=original.at("extensions").contains("VRMC_vrm");
   // Normalize only the new fitted route. Ordinary unedited source exports keep
   // their existing allocation/geometry path. The format's existing256MiB output
   // bound is also the explicit detached REST-snapshot budget; no renderer cap.
@@ -106,11 +107,13 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
       graph.original_nodes = original.at("nodes").get<std::vector<Json>>();
       graph.names.resize(a.asset->nodes.size());
       joint_lengths.resize(a.asset->nodes.size());
-      graph.humanoid = original.at("extensions").at("VRM").at("humanoid");
-      for (const auto &bone : graph.humanoid.at("humanBones"))
-        baseline_roles.emplace(
-            human_role(bone.at("bone").get<std::string>(), true),
-            bone.at("node").get<uint32_t>());
+      graph.humanoid = original.at("extensions").at(version1?"VRMC_vrm":"VRM").at("humanoid");
+      if(version1){for(const auto &bone:graph.humanoid.at("humanBones").items())
+        baseline_roles.emplace(bone.key(),bone.value().at("node").get<uint32_t>());
+      }else for (const auto &bone : graph.humanoid.at("humanBones"))
+          baseline_roles.emplace(
+              human_role(bone.at("bone").get<std::string>(), true),
+              bone.at("node").get<uint32_t>());
     }
     require(placement->model == graph.model &&
                 placement->source_instance == graph.instance &&
@@ -223,8 +226,12 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
       }
     }
   }
-  require(bool(graph.model) && rig_source,
+  require(bool(graph.model) && (rig_source||version1),
           "original-space VRM needs at least one authenticated humanoid skin");
+  // VRM1 expressions and first-person annotations also support genuine rigid
+  // avatars. Their complete raw humanoid remains source authority when there
+  // is no adopted skin; never manufacture a dummy skin to enter this route.
+  if(!rig_source)return graph;
   auto resolved = baseline_roles;
   for (const auto &[role, value] : edits) {
     if (value)
@@ -243,6 +250,15 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
                            uint32_t(at - first.source_joint_nodes.begin()));
   }
   mapping.validate(*rig_source->deformation->skeleton, true);
+  if(version1){
+    Json bones=Json::object();
+    for(const auto &[role,source]:resolved){
+      auto bone=graph.humanoid.at("humanBones").value(role,Json::object());
+      bone["node"]=source;bones[role]=std::move(bone);
+    }
+    graph.humanoid["humanBones"]=std::move(bones);
+    return graph;
+  }
   Json bones = Json::array();
   std::set<std::string> emitted;
   for (const auto &bone : graph.humanoid.at("humanBones")) {

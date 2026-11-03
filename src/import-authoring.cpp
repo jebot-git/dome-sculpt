@@ -15,6 +15,7 @@
 #include "bone-metadata.hpp"
 #include "humanoid-placement-import.hpp"
 #include "source-decoded-images.hpp"
+#include "import-texture-transform.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <numeric>
@@ -109,6 +110,13 @@ Material native_material(const ImportedMaterial &m) {
   out.metallic = m.metallic;
   out.roughness = m.roughness;
   out.emissive = m.emissive;
+  for (auto &value : out.emissive) {
+    value *= m.emissive_strength;
+    if (!std::isfinite(value) || value > 1)
+      throw std::invalid_argument(
+          "Native HDR emissive authoring requires an explicit material/paint "
+          "adapter; original source is retained by preserving import");
+  }
   out.double_sided = m.double_sided;
   out.unlit = m.unlit;
   out.alpha_cutoff = m.alpha_cutoff;
@@ -125,7 +133,8 @@ maps(const ImportedAsset &asset, const ImportedMaterial &m,
      const std::vector<std::shared_ptr<const Image>> &images,
      const ImportedPrimitive &primitive, std::span<const uint32_t> vertices) {
   auto result = std::make_shared<PaintSourceMaps>();
-  auto view = [&](PaintSourceTexture &out, int index, int coordinate) {
+  auto view = [&](PaintSourceTexture &out, int index, int coordinate,
+                  const ImportedTextureTransform &transform) {
     if (index < 0)
       return;
     const auto &t = asset.textures.at(size_t(index));
@@ -134,25 +143,44 @@ maps(const ImportedAsset &asset, const ImportedMaterial &m,
     out.wrap_t = t.wrap_t;
     out.min_filter = t.min_filter;
     out.mag_filter = t.mag_filter;
-    out.texcoord = coordinate;
+    out.texcoord = detail::imported_texture_coordinate(coordinate, transform);
+    out.uv_transform = detail::imported_texture_matrix(transform);
   };
-  view(result->color, m.color_texture, m.color_texcoord);
-  view(result->metal_rough, m.metal_rough_texture, m.metal_rough_texcoord);
-  view(result->normal, m.normal_texture, m.normal_texcoord);
-  view(result->emission, m.emissive_texture, m.emissive_texcoord);
-  view(result->occlusion, m.occlusion_texture, m.occlusion_texcoord);
-  if(result->uses_uv1()){
-    if(primitive.uv1.size()!=primitive.mesh.positions.size())throw std::invalid_argument("Imported texture requires missing UV1 coordinates");
-    auto domain=std::make_shared<std::vector<std::array<float,2>>>();domain->reserve(vertices.size());
-    for(auto vertex:vertices)domain->push_back(primitive.uv1.at(vertex));
-    result->uv1=std::move(domain);
+  view(result->color, m.color_texture, m.color_texcoord, m.color_transform);
+  view(result->metal_rough, m.metal_rough_texture, m.metal_rough_texcoord,
+       m.metal_rough_transform);
+  view(result->normal, m.normal_texture, m.normal_texcoord, m.normal_transform);
+  view(result->emission, m.emissive_texture, m.emissive_texcoord,
+       m.emissive_transform);
+  view(result->occlusion, m.occlusion_texture, m.occlusion_texcoord,
+       m.occlusion_transform);
+  if (result->uses_uv1()) {
+    if (primitive.uv1.size() != primitive.mesh.positions.size())
+      throw std::invalid_argument(
+          "Imported texture requires missing UV1 coordinates");
+    auto domain = std::make_shared<std::vector<std::array<float, 2>>>();
+    domain->reserve(vertices.size());
+    for (auto vertex : vertices)
+      domain->push_back(primitive.uv1.at(vertex));
+    result->uv1 = std::move(domain);
   }
-  for(const auto *view:{&result->color,&result->metal_rough,&result->normal,&result->emission,&result->occlusion})if(view->image&&view->texcoord>=2){
-    const auto set=uint32_t(view->texcoord);if(result->extra_uv_sets.contains(set))continue;
-    const auto &source=primitive.extra_uv_sets.at(set);
-    if(source.size()!=primitive.mesh.positions.size())throw std::invalid_argument("Imported texture requires missing additional UV coordinates");
-    auto domain=std::make_shared<std::vector<std::array<float,2>>>();domain->reserve(vertices.size());for(auto vertex:vertices)domain->push_back(source.at(vertex));result->extra_uv_sets.emplace(set,std::move(domain));
-  }
+  for (const auto *view :
+       {&result->color, &result->metal_rough, &result->normal,
+        &result->emission, &result->occlusion})
+    if (view->image && view->texcoord >= 2) {
+      const auto set = uint32_t(view->texcoord);
+      if (result->extra_uv_sets.contains(set))
+        continue;
+      const auto &source = primitive.extra_uv_sets.at(set);
+      if (source.size() != primitive.mesh.positions.size())
+        throw std::invalid_argument(
+            "Imported texture requires missing additional UV coordinates");
+      auto domain = std::make_shared<std::vector<std::array<float, 2>>>();
+      domain->reserve(vertices.size());
+      for (auto vertex : vertices)
+        domain->push_back(source.at(vertex));
+      result->extra_uv_sets.emplace(set, std::move(domain));
+    }
   result->normal_scale = m.normal_scale;
   result->occlusion_strength = m.occlusion_strength;
   result->validate();
@@ -170,15 +198,26 @@ frames(const ImportedPrimitive &p, const ImportedMaterial &m,
   f->source_vertices = p.mesh.indices;
   f->source_corners.resize(p.mesh.indices.size());
   std::iota(f->source_corners.begin(), f->source_corners.end(), 0);
-  const bool tangent = (p.normals_authored && !p.tangents.empty()) || m.normal_texture >= 0;
+  const bool tangent =
+      (p.normals_authored && !p.tangents.empty()) || m.normal_texture >= 0;
   if (tangent) {
-    const auto &uv = m.normal_texcoord==0 ? p.mesh.uv : m.normal_texcoord==1 ? p.uv1 : p.extra_uv_sets.at(uint32_t(m.normal_texcoord));
+    const auto coordinate = detail::imported_texture_coordinate(
+        m.normal_texcoord, m.normal_transform);
+    if (p.tangents.empty() && m.normal_texture >= 0 &&
+        detail::imported_texture_matrix(m.normal_transform) !=
+            std::array<float, 6>{1, 0, 0, 1, 0, 0})
+      throw std::invalid_argument("Generated normal tangents for transformed "
+                                  "sampling need an owning frame adapter");
+    const auto &uv = coordinate == 0 ? p.mesh.uv
+                     : coordinate == 1
+                         ? p.uv1
+                         : p.extra_uv_sets.at(uint32_t(coordinate));
     auto original = detail::source_tangent_frames(p, uv, cancelled);
     f->normals = std::move(original.normals);
     f->tangents = std::move(original.base);
     f->generated_tangents = original.generated;
     if (original.generated)
-      f->generated_uv = uint32_t(m.normal_texcoord);
+      f->generated_uv = uint32_t(coordinate);
     for (size_t t = 0; t < p.morph_targets.size(); ++t)
       f->targets.push_back({t + 1, std::move(original.normal_targets[t]),
                             std::move(original.targets[t])});
@@ -304,29 +343,59 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   if (objects == 0)
     throw std::runtime_error(
         "Imported selected scene has no triangle primitives");
+  std::vector<uint8_t> editable_group(asset->nodes.size(), 1);
+  size_t group_count = ordered.size();
+  if (vrm.version != detail::VrmImportVersion::None &&
+      group_count + 1 > 128 - input.groups().size()) {
+    // Non-rendered rig branches already have exact node/IBM authority in the
+    // retained model and native Skeleton. Do not duplicate every joint as an
+    // editable SceneGroup merely to place the real surface instances.
+    std::fill(editable_group.begin(), editable_group.end(), 0);
+    group_count = 0;
+    for (auto n : ordered)
+      if (asset->nodes[n].mesh >= 0) {
+        for (int ancestor = int(n); ancestor >= 0;
+             ancestor = asset->nodes[size_t(ancestor)].parent) {
+          if (editable_group[size_t(ancestor)])
+            break;
+          editable_group[size_t(ancestor)] = 1;
+          ++group_count;
+        }
+      }
+    output.diagnostics.push_back(
+        "Original non-rendered rig nodes retained in the complete "
+        "source/skeleton graph; native placement groups contain every mesh "
+        "ancestor");
+  }
   if (objects > 256 - input.objects().size() ||
-      ordered.size() + 1 > 128 - input.groups().size())
+      group_count + 1 > 128 - input.groups().size())
     throw std::length_error(
         "Imported hierarchy exceeds native object/group limits");
   // Each prepared object retains its original paint domain as well as the
   // editable atlas. Check the import's minimum Scene paint budget before any
   // image decoding or xatlas worker allocation, then validate the cumulative
   // result after each fully prepared primitive (including existing owners).
-  if(options.prepare_texture_atlas){
-    constexpr size_t scene_texels=16*1024*1024;
-    const size_t domains=2*size_t(options.paint_resolution)*options.paint_resolution;
-    if(objects>scene_texels/domains)
-      throw std::length_error("Editable atlas import exceeds Scene paint-map budget");
+  if (options.prepare_texture_atlas) {
+    constexpr size_t scene_texels = 16 * 1024 * 1024;
+    const size_t domains =
+        2 * size_t(options.paint_resolution) * options.paint_resolution;
+    if (objects > scene_texels / domains)
+      throw std::length_error(
+          "Editable atlas import exceeds Scene paint-map budget");
   }
-  auto images=detail::decode_source_images(asset->images,64*1024*1024,
-                                           options.limits.cancelled);
+  auto images = detail::decode_source_images(asset->images, 64 * 1024 * 1024,
+                                             options.limits.cancelled);
   std::shared_ptr<CreatorSourceModel> model;
-  if(affine_graph){
-    model=std::make_shared<CreatorSourceModel>();
-    model->original_bytes=bytes;model->asset=asset;model->decoded_images=images;
+  if (affine_graph) {
+    model = std::make_shared<CreatorSourceModel>();
+    model->original_bytes = bytes;
+    model->asset = asset;
+    model->decoded_images = images;
     model->vrm_json = vrm.vrm0_json;
-    if(captured.original->root.bytes!=bytes || captured.original->format!=ImportSourceFormat::Glb ||
-        captured.original->options!=ImportOptions{})model->source_receipt=captured.original;
+    if (captured.original->root.bytes != bytes ||
+        captured.original->format != ImportSourceFormat::Glb ||
+        captured.original->options != ImportOptions{})
+      model->source_receipt = captured.original;
   }
   const auto root =
       output.scene.add_group(name(path.stem().string(), "Imported asset"));
@@ -334,12 +403,18 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   for (auto n : ordered) {
     stop(options);
     const auto &node = asset->nodes[n];
+    if (!editable_group[n])
+      continue;
     groups[n] = output.scene.add_group(
-        name(node.name, "Imported node"), affine_graph?CanvasTransform{}:native_locals[n],
+        name(node.name, "Imported node"),
+        affine_graph ? CanvasTransform{} : native_locals[n],
         node.parent < 0 ? root : groups.at(size_t(node.parent)));
-    if(affine_graph){
-      auto placement=std::make_shared<SourceNodePlacement>();placement->model=model;
-      placement->source_node=n;placement->source_instance=root;placement->validate();
+    if (affine_graph) {
+      auto placement = std::make_shared<SourceNodePlacement>();
+      placement->model = model;
+      placement->source_node = n;
+      placement->source_instance = root;
+      placement->validate();
       output.scene.group(groups[n]).source_placement=std::move(placement);
     }
     if (node.mesh < 0)
@@ -506,13 +581,25 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
             binding->material.textures[size_t(MToonSlot::Normal)];
         normal.normal_texture =
             binding->material.parameters.normal_enabled ? role.index : -1;
-        normal.normal_texcoord =
-            binding->material.version() == MToonVersion::V0 ? 0
-            : role.transform_texcoord >= 0 ? role.transform_texcoord
-                                           : int(role.texcoord);
+        normal.normal_texcoord = binding->material.version() == MToonVersion::V0
+                                     ? 0
+                                     : int(role.texcoord);
+        normal.normal_transform = {};
+        if (binding->material.version() == MToonVersion::V1) {
+          normal.normal_transform.authored = true;
+          normal.normal_transform.offset = role.offset;
+          normal.normal_transform.scale = role.scale;
+          normal.normal_transform.rotation = role.rotation;
+          normal.normal_transform.texcoord = role.transform_texcoord;
+        }
         resolved->mtoon =
             (m.normal_texture >= 0) == (normal.normal_texture >= 0) &&
-                    m.normal_texcoord == normal.normal_texcoord
+                    detail::imported_texture_coordinate(m.normal_texcoord,
+                                                        m.normal_transform) ==
+                        detail::imported_texture_coordinate(
+                            normal.normal_texcoord, normal.normal_transform) &&
+                    detail::imported_texture_matrix(m.normal_transform) ==
+                        detail::imported_texture_matrix(normal.normal_transform)
                 ? resolved->pbr
                 : frames(p, normal, object.painted->mesh(),
                          options.limits.cancelled)
