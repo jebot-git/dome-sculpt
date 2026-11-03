@@ -6,8 +6,9 @@
     "unit_normals": "Independent analytic unequal-area, orientation/permutation, artist normal independence and virtual seam",
     "mass": "Long-double triangle clipping by squared-distance halfplanes; explicit obtuse half/quarter; independent barycentric-gradient dense solve",
     "edges": "Independent gradient matrix scaled by counted edge incidences; separate diagonal reconstruction",
-    "maximum_weight_error": 2.594e-08,
-    "true_residual_limit": 1e-09
+    "maximum_weight_error": 2.78178e-08,
+    "true_residual_limit": 1e-09,
+    "maximum_new_mass_weight_error": 2.594e-08
   },
   "quality_bounds": {
     "mean_height_fraction": 0.005,
