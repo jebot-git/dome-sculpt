@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Private original-coordinate/MToon paint integration — 2026-11-03
+
+Private f040845/d1606ca preserves original logical UVs independently of writable
+paint and supports actual typed MToon GPU overlays, alpha picking and physical
+emission. Fresh coherent CPU/owned-sanitizer apps and shader continuations pass;
+selected CTest18/18 each, actual FLTK13normal+13compact and separately scoped
+strict A770141+44+21+72 pass. Read SOURCE-PAINT-LOGICAL-UV-INTEGRATION.md and its
+receipt. Public main remains0b5ada0. Native source-aware import/adoption,
+untextured/MatCap-only and MToon-only UV1 capture, repeated compound authoring,
+standard export, HDR UI/interchange and all other unfinished requirements remain
+required. The full goal stays active/incomplete, including later controller
+drawers. No system installation, physical HMD or active session change occurred.
+
+
 ## Private original-source PBR/native paint integration — 2026-11-03
 
 The isolated Source28/physical27 integration now has live sparse GPU PBR preview,

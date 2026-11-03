@@ -30,6 +30,10 @@ dispatch. Colour, shade aliases and alpha compose using explicit coverage.
 Physical emission remains visible at authored emissive strength0; explicit zero
 absolute background overrides historical fallback.
 
+The later coherent application/desktop qualification is recorded separately in
+SOURCE-PAINT-LOGICAL-UV-INTEGRATION.md. Its completed results supersede the
+pending frontend/data statements below, while earlier receipt scopes stay intact.
+
 ## Evidence and limits
 
 Release and matched wholly owned ASan/UBSan/leak component batches each pass all

@@ -1,0 +1,719 @@
+{
+  "recorded_utc": "2026-11-03T18:01:54.757661+00:00",
+  "source": "d1606cab1a231173b09441728b1b22e35069ff75",
+  "runtime": "f040845",
+  "test_only_promotion": "d1606ca",
+  "published_main_unchanged": "0b5ada05b155ef64333e7aa45db68f41f7a53f22",
+  "status": "qualified private coherent CPU/owned-sanitizer/desktop workflow; full goal active and incomplete",
+  "fresh_build_release": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/fresh-release/status.json",
+    "sha256": "d2fd1d241a586a865edf901f83196cd2ca8cb4f9adbf65e5a2fca56f62943e4e",
+    "result": {
+      "profile": "release",
+      "source": "bdb2b199f81f0744141b51f2a5e881f0aeea827d",
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 3.3864761469885707
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-test-runtime",
+            "dome-sculpt-emission-background-test",
+            "dome-sculpt-emission-scene-test",
+            "dome-sculpt-emission-paint-data-test",
+            "dome-sculpt-paint-overlay-gpu-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-source-union-version-test",
+            "dome-sculpt-unlit-fallback-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-source-paint-owning-test",
+            "dome-sculpt-source-paint-scene-test",
+            "dome-sculpt-source-paint-resources-test",
+            "dome-sculpt-source-paint-faults-test",
+            "dome-sculpt-source-paint-overlay-test",
+            "dome-sculpt-material-visibility-test",
+            "dome-sculpt-source-paint-native-test",
+            "dome-sculpt-source-paint-sampler-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-mtoon-render-test"
+          ],
+          "exit": 0,
+          "seconds": 446.9982170870062
+        }
+      ],
+      "seconds": 450.4708958879928,
+      "inputs": 1532,
+      "unchanged": true,
+      "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and20 selected consumers; no prior build archives reused. Source28/physical emission plus prospective compiler and original logical UV/MToon overlay candidate. Build only, no tests/GUI/GPU/HMD claim."
+    }
+  },
+  "fresh_build_owned_SAN": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/fresh-sanitize/status.json",
+    "sha256": "626a0c2e66bb874885da8ea256a2e07cf4a5d3fbf91eab9be215dd2a498a98b3",
+    "result": {
+      "profile": "sanitize",
+      "source": "bdb2b199f81f0744141b51f2a5e881f0aeea827d",
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+            "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+          ],
+          "exit": 0,
+          "seconds": 3.4501768499903847
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-test-runtime",
+            "dome-sculpt-emission-background-test",
+            "dome-sculpt-emission-scene-test",
+            "dome-sculpt-emission-paint-data-test",
+            "dome-sculpt-paint-overlay-gpu-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-source-union-version-test",
+            "dome-sculpt-unlit-fallback-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-source-paint-owning-test",
+            "dome-sculpt-source-paint-scene-test",
+            "dome-sculpt-source-paint-resources-test",
+            "dome-sculpt-source-paint-faults-test",
+            "dome-sculpt-source-paint-overlay-test",
+            "dome-sculpt-material-visibility-test",
+            "dome-sculpt-source-paint-native-test",
+            "dome-sculpt-source-paint-sampler-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-mtoon-render-test"
+          ],
+          "exit": 0,
+          "seconds": 717.7824677799945
+        }
+      ],
+      "seconds": 721.277818438015,
+      "inputs": 1532,
+      "unchanged": true,
+      "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and20 selected consumers; no prior build archives reused. Source28/physical emission plus prospective compiler and original logical UV/MToon overlay candidate. Build only, no tests/GUI/GPU/HMD claim."
+    }
+  },
+  "fresh_data_release": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/fresh-release-data/status.json",
+    "sha256": "aae8030edcfac0c3d73fd06b6beec11d1721a1d19a5b37de69a695d3cc106705",
+    "result": {
+      "state": "terminal",
+      "pid": 2291430,
+      "source": "bdb2b199f81f0744141b51f2a5e881f0aeea827d",
+      "scope": "Ten actual data/persistence/quota/fault consumers from fresh whole-owned app/core/support build. Original logical UV metadata and conservative resource/work charges. No graphics, UI or full-suite claim.",
+      "runs": [
+        {
+          "name": "emission-background",
+          "exit": 0,
+          "seconds": 0.0075877970084548
+        },
+        {
+          "name": "emission-scene",
+          "exit": 0,
+          "seconds": 5.747659871994983
+        },
+        {
+          "name": "emission-paint-data",
+          "exit": 0,
+          "seconds": 0.013531548000173643
+        },
+        {
+          "name": "scene",
+          "exit": 0,
+          "seconds": 0.29407566800364293
+        },
+        {
+          "name": "source-union-version",
+          "exit": 0,
+          "seconds": 0.0175131690048147
+        },
+        {
+          "name": "paint",
+          "exit": 0,
+          "seconds": 4.555786242010072
+        },
+        {
+          "name": "source-paint-owning",
+          "exit": 0,
+          "seconds": 0.005772731004981324
+        },
+        {
+          "name": "source-paint-scene",
+          "exit": 0,
+          "seconds": 0.035410105978371575
+        },
+        {
+          "name": "source-paint-resources",
+          "exit": 0,
+          "seconds": 2.2059176709735766
+        },
+        {
+          "name": "source-paint-faults",
+          "exit": 0,
+          "seconds": 0.07509765401482582
+        }
+      ],
+      "phase": "source-paint-faults",
+      "child_pid": 2292719,
+      "exit_code": 0,
+      "inputs": 1553,
+      "drift": []
+    }
+  },
+  "fresh_data_owned_SAN": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/fresh-sanitize-data/status.json",
+    "sha256": "7f7c7dde3a74457c436200d7b1f64dd7fa7d5be1d44b4336cb428076a41ddb02",
+    "result": {
+      "state": "terminal",
+      "pid": 2314101,
+      "source": "bdb2b199f81f0744141b51f2a5e881f0aeea827d",
+      "scope": "Ten actual data/persistence/quota/fault consumers from fresh whole-owned app/core/support build. Original logical UV metadata and conservative resource/work charges. No graphics, UI or full-suite claim.",
+      "runs": [
+        {
+          "name": "emission-background",
+          "exit": 0,
+          "seconds": 0.10536656301701441
+        },
+        {
+          "name": "emission-scene",
+          "exit": 0,
+          "seconds": 65.30964652399416
+        },
+        {
+          "name": "emission-paint-data",
+          "exit": 0,
+          "seconds": 0.14995036600157619
+        },
+        {
+          "name": "scene",
+          "exit": 0,
+          "seconds": 2.725348631007364
+        },
+        {
+          "name": "source-union-version",
+          "exit": 0,
+          "seconds": 0.13473669698578306
+        },
+        {
+          "name": "paint",
+          "exit": 0,
+          "seconds": 30.86229267399176
+        },
+        {
+          "name": "source-paint-owning",
+          "exit": 0,
+          "seconds": 0.060939090995816514
+        },
+        {
+          "name": "source-paint-scene",
+          "exit": 0,
+          "seconds": 0.14767620601924136
+        },
+        {
+          "name": "source-paint-resources",
+          "exit": 0,
+          "seconds": 16.27688755397685
+        },
+        {
+          "name": "source-paint-faults",
+          "exit": 0,
+          "seconds": 1.1702310400141869
+        }
+      ],
+      "phase": "source-paint-faults",
+      "child_pid": 2326679,
+      "exit_code": 0,
+      "inputs": 1553,
+      "drift": []
+    }
+  },
+  "continuation_release": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/continuation-release/status.json",
+    "sha256": "b2ef5ccc5bc6bcabbd0237bcbd252d68ba6b86360597c11fd355114f24e6f3d0",
+    "result": {
+      "profile": "release",
+      "source": "51fcfdc92e7259019d24c3265901e7849f2a58fc",
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 2.0243860830087215
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-test-runtime",
+            "dome-sculpt-emission-background-test",
+            "dome-sculpt-emission-scene-test",
+            "dome-sculpt-emission-paint-data-test",
+            "dome-sculpt-paint-overlay-gpu-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-source-union-version-test",
+            "dome-sculpt-unlit-fallback-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-source-paint-owning-test",
+            "dome-sculpt-source-paint-scene-test",
+            "dome-sculpt-source-paint-resources-test",
+            "dome-sculpt-source-paint-faults-test",
+            "dome-sculpt-source-paint-overlay-test",
+            "dome-sculpt-material-visibility-test",
+            "dome-sculpt-source-paint-native-test",
+            "dome-sculpt-source-paint-sampler-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-mtoon-render-test"
+          ],
+          "exit": 0,
+          "seconds": 13.560098868008936
+        }
+      ],
+      "seconds": 15.631020297994837,
+      "inputs": 1534,
+      "unchanged": true,
+      "scope": "Coherent whole-owned native FLTK/OpenXR application/core/support/render and20-consumer continuation after shader-only f040845 on fresh bdb Release/SAN builds. Public ABI and all private packet fields unchanged; original fresh support retained, changed renderer and dependents rebuilt/relinked. Build only; no full regression/GUI/GPU/HMD claim."
+    }
+  },
+  "continuation_owned_SAN": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/continuation-sanitize/status.json",
+    "sha256": "f3e1b9bc33c1c62bc91afda9d9f3ba8f6df83276686bc6214f3f8d0912e21839",
+    "result": {
+      "profile": "sanitize",
+      "source": "51fcfdc92e7259019d24c3265901e7849f2a58fc",
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+            "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+          ],
+          "exit": 0,
+          "seconds": 2.0318865370063577
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-test-runtime",
+            "dome-sculpt-emission-background-test",
+            "dome-sculpt-emission-scene-test",
+            "dome-sculpt-emission-paint-data-test",
+            "dome-sculpt-paint-overlay-gpu-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-source-union-version-test",
+            "dome-sculpt-unlit-fallback-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-source-paint-owning-test",
+            "dome-sculpt-source-paint-scene-test",
+            "dome-sculpt-source-paint-resources-test",
+            "dome-sculpt-source-paint-faults-test",
+            "dome-sculpt-source-paint-overlay-test",
+            "dome-sculpt-material-visibility-test",
+            "dome-sculpt-source-paint-native-test",
+            "dome-sculpt-source-paint-sampler-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-mtoon-render-test"
+          ],
+          "exit": 0,
+          "seconds": 27.938040316017577
+        }
+      ],
+      "seconds": 30.015199285990093,
+      "inputs": 1534,
+      "unchanged": true,
+      "scope": "Coherent whole-owned native FLTK/OpenXR application/core/support/render and20-consumer continuation after shader-only f040845 on fresh bdb Release/SAN builds. Public ABI and all private packet fields unchanged; original fresh support retained, changed renderer and dependents rebuilt/relinked. Build only; no full regression/GUI/GPU/HMD claim."
+    }
+  },
+  "selected_release": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/continuation-release-tests/status.json",
+    "sha256": "74af80ad68f72a243cd992bd622fbaca19d0464517804897e364299a730f03ce",
+    "result": {
+      "state": "terminal",
+      "pid": 2344321,
+      "source": "51fcfdc92e7259019d24c3265901e7849f2a58fc",
+      "profile": "release",
+      "scope": "Actual18 registered selected CTest commands on current coherent owned app/support/render continuation from fresh bdb builds plus shader-only f040. Software GL, leak-enabled sanitizer; existing CTest time/quality bounds unchanged. Not full registered suite, native GUI/physical HMD/vendor proof.",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-release",
+        "--output-on-failure",
+        "-R",
+        "^(emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-scene|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-union\\-version)$"
+      ],
+      "selected": [
+        "emission-paint-data",
+        "physical-emission-background",
+        "emission-scene",
+        "source-paint-owning",
+        "source-paint-resources",
+        "source-paint-faults",
+        "source-paint-scene",
+        "texture-painting",
+        "scene-authoring",
+        "source-paint-overlay",
+        "source-paint-native",
+        "source-paint-sampler",
+        "source-paint-mtoon",
+        "material-visibility",
+        "paint-overlay-gpu",
+        "unlit-fallback",
+        "mtoon-render",
+        "source-union-version"
+      ],
+      "child_pid": 2344345,
+      "exit_code": 0,
+      "seconds": 25.26226656298968,
+      "inputs": 1565,
+      "drift": []
+    }
+  },
+  "selected_owned_SAN": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/continuation-sanitize-tests/status.json",
+    "sha256": "79f6404d3714e7b2b4e990aa49427b0d3d31001a86196c9c03c6afa9a90660b5",
+    "result": {
+      "state": "terminal",
+      "pid": 2344322,
+      "source": "51fcfdc92e7259019d24c3265901e7849f2a58fc",
+      "profile": "sanitize",
+      "scope": "Actual18 registered selected CTest commands on current coherent owned app/support/render continuation from fresh bdb builds plus shader-only f040. Software GL, leak-enabled sanitizer; existing CTest time/quality bounds unchanged. Not full registered suite, native GUI/physical HMD/vendor proof.",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-sanitize",
+        "--output-on-failure",
+        "-R",
+        "^(emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-scene|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-union\\-version)$"
+      ],
+      "selected": [
+        "emission-paint-data",
+        "physical-emission-background",
+        "emission-scene",
+        "source-paint-owning",
+        "source-paint-resources",
+        "source-paint-faults",
+        "source-paint-scene",
+        "texture-painting",
+        "scene-authoring",
+        "source-paint-overlay",
+        "source-paint-native",
+        "source-paint-sampler",
+        "source-paint-mtoon",
+        "material-visibility",
+        "paint-overlay-gpu",
+        "unlit-fallback",
+        "mtoon-render",
+        "source-union-version"
+      ],
+      "child_pid": 2344630,
+      "exit_code": 0,
+      "seconds": 147.64538343899767,
+      "inputs": 1565,
+      "drift": []
+    }
+  },
+  "GUI_fixture_build": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/gui/promoted-build/status.json",
+    "sha256": "708623de05b09423deb58690b160eabeaf7215bf1baf47f7bcc53319ede32847",
+    "result": {
+      "source": "d1606cab1a231173b09441728b1b22e35069ff75",
+      "steps": [
+        {
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 1.834774272982031
+        },
+        {
+          "command": [
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/build-coordinate-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt-source-paint-ui-test"
+          ],
+          "exit": 0,
+          "seconds": 6.903000632999465
+        }
+      ],
+      "inputs": 1547,
+      "drift": [],
+      "scope": "Configure new fixture target, build only native Source28 GUI fixture; original coherent app/core/support/render inputs must remain byte-identical."
+    }
+  },
+  "GUI_normal": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/gui-promoted-normal/status.json",
+    "sha256": "19ac93ae7359064b60db9c80df6a3fcadba7a9fef504c955086b064c103152a5",
+    "result": {
+      "state": "terminal",
+      "pid": 2383794,
+      "source": "d1606cab1a231173b09441728b1b22e35069ff75",
+      "mode": "normal",
+      "scope": "Actual coherent native FLTK desktop frontend, Source28/MToon with genuine physical paint and outside-tile original sampling; shared preview/Save/reopen/modal/CtrlW menu harness on private Xvfb/bus/HOME. No native Wayland/physical XR/device/UI-import claim.",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/tests/source-paint-menu.py"
+      ],
+      "child_pid": 2383807,
+      "exit_code": 0,
+      "seconds": 19.20057436998468,
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Universal menu starts in authored mode without rewriting the saved material"
+          },
+          {
+            "passed": true,
+            "check": "All three actual shared material preview commands are available"
+          },
+          {
+            "passed": true,
+            "check": "Native PBR command publishes the actual mutually exclusive core-PBR mode"
+          },
+          {
+            "passed": true,
+            "check": "Actual native viewport pixels change with the PBR material policy"
+          },
+          {
+            "passed": true,
+            "check": "Saving from core-PBR preview retains exact source frames, paint, original material and scene history"
+          },
+          {
+            "passed": true,
+            "check": "Native authored command restores the original checked material policy"
+          },
+          {
+            "passed": true,
+            "check": "Actual viewport restores the exact authored pixels independently of status text"
+          },
+          {
+            "passed": true,
+            "check": "Native toon preview remains a separate shared command"
+          },
+          {
+            "passed": true,
+            "check": "Actual UV modal owns editing and disables all material preview commands"
+          },
+          {
+            "passed": true,
+            "check": "DomeD Ctrl+W cancellation restores preview command availability"
+          },
+          {
+            "passed": true,
+            "check": "Preview changes and modal cancellation add no source or material mutation"
+          },
+          {
+            "passed": true,
+            "check": "Project restart uses the authored default without serializing the ephemeral preview"
+          },
+          {
+            "passed": true,
+            "check": "Real FLTK preview workflow leaves the application and desktop session running"
+          }
+        ],
+        "failed": 0
+      },
+      "inputs": 1561,
+      "drift": []
+    }
+  },
+  "GUI_compact": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/artifacts/coordinate-proof/gui-promoted-compact/status.json",
+    "sha256": "1b3347116dbb480c6cb8a8b3507535aaa8147832b548484cb114c987fbfe23d5",
+    "result": {
+      "state": "terminal",
+      "pid": 2383793,
+      "source": "d1606cab1a231173b09441728b1b22e35069ff75",
+      "mode": "compact",
+      "scope": "Actual coherent native FLTK desktop frontend, Source28/MToon with genuine physical paint and outside-tile original sampling; shared preview/Save/reopen/modal/CtrlW menu harness on private Xvfb/bus/HOME. No native Wayland/physical XR/device/UI-import claim.",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-compiler-7d/tests/source-paint-menu.py"
+      ],
+      "child_pid": 2383808,
+      "exit_code": 0,
+      "seconds": 19.401849518006202,
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Universal menu starts in authored mode without rewriting the saved material"
+          },
+          {
+            "passed": true,
+            "check": "All three actual shared material preview commands are available"
+          },
+          {
+            "passed": true,
+            "check": "Native PBR command publishes the actual mutually exclusive core-PBR mode"
+          },
+          {
+            "passed": true,
+            "check": "Actual native viewport pixels change with the PBR material policy"
+          },
+          {
+            "passed": true,
+            "check": "Saving from core-PBR preview retains exact source frames, paint, original material and scene history"
+          },
+          {
+            "passed": true,
+            "check": "Native authored command restores the original checked material policy"
+          },
+          {
+            "passed": true,
+            "check": "Actual viewport restores the exact authored pixels independently of status text"
+          },
+          {
+            "passed": true,
+            "check": "Native toon preview remains a separate shared command"
+          },
+          {
+            "passed": true,
+            "check": "Actual UV modal owns editing and disables all material preview commands"
+          },
+          {
+            "passed": true,
+            "check": "DomeD Ctrl+W cancellation restores preview command availability"
+          },
+          {
+            "passed": true,
+            "check": "Preview changes and modal cancellation add no source or material mutation"
+          },
+          {
+            "passed": true,
+            "check": "Project restart uses the authored default without serializing the ephemeral preview"
+          },
+          {
+            "passed": true,
+            "check": "Real FLTK preview workflow leaves the application and desktop session running"
+          }
+        ],
+        "failed": 0
+      },
+      "inputs": 1561,
+      "drift": []
+    }
+  },
+  "earlier_component_and_hardware": "SOURCE-PAINT-LOGICAL-UV.json",
+  "target_count_annotation": "Fresh/continuation build command has20 targets: native app, synthetic runtime and18 test executables. The earlier generated scope string incorrectly called them20 consumers; exact command is preserved.",
+  "canonical_DomeD_remote_main": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
+  "local_DomeD": "15c038e; only src/stereo.rs differs, no FLTK changes",
+  "full_registered_suite": false,
+  "fresh_vendor_builds": false,
+  "native_Wayland": false,
+  "physical_HMD": false,
+  "system_install": false,
+  "session_restart": false,
+  "remaining": [
+    "source-aware native initial import/adoption replacing resampling route",
+    "MToon-only UV1 authority and untextured/MatCap-only source capture",
+    "repeated UV/bake/normal/colour/rig/key composition and independent standard export",
+    "HDR interchange and authoring controls",
+    "broader regression/vendor/Wayland/controller/physical production qualification",
+    "all other original/additional requirements including controller drawers"
+  ]
+}
