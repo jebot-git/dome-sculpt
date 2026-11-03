@@ -1,0 +1,1449 @@
+{
+  "recorded_utc": "2026-11-03T20:30:31.303441+00:00",
+  "runtime": "d8870e696ee1a60c76af5f946c33e4cbb9fbb5bd",
+  "status": "Qualified private explicit finite portable-material compiler and sparse point sampler components; default strict export unchanged, no native owner/file worker/main admission",
+  "published_main_unchanged": "0b5ada05b155ef64333e7aa45db68f41f7a53f22",
+  "parent": "b2ca53be3bbf6d388275a0866418f1c5a6c291a6",
+  "build_components": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/status.json",
+      "sha256": "dcb11d9c8c0eaf8a76a7569a733beec3ee50ba5eeb39681fd5c061579809d7e7",
+      "result": {
+        "state": "terminal",
+        "source": "d8870e696ee1a60c76af5f946c33e4cbb9fbb5bd",
+        "pid": 3266076,
+        "scope": "Four-TU matched component qualification: complete changed paint.cpp/source-uv-bake.cpp plus new material bake and actual GPU/sparse sampler consumers, immutable own fresh734/fdc support/render and frozen whole5f Scene/Document replacement with old paint/source-uv-bake archive members removed. No public/private ABI layout changes. Not fresh native app/coherent all-target/vendor/HMD proof.",
+        "phase": "source-paint-bake-test",
+        "child_pid": 3269965,
+        "steps": [
+          {
+            "name": "compile-paint.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/paint.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src/paint.cpp"
+            ],
+            "exit": 0,
+            "seconds": 10.807901503983885
+          },
+          {
+            "name": "compile-source-uv-bake.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/source-uv-bake.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src/source-uv-bake.cpp"
+            ],
+            "exit": 0,
+            "seconds": 7.972304320021067
+          },
+          {
+            "name": "compile-source-paint-bake.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/source-paint-bake.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/source-paint-bake.cpp",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/cgltf"
+            ],
+            "exit": 0,
+            "seconds": 12.894885878980858
+          },
+          {
+            "name": "compile-paint-overlay-gpu.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/paint-overlay-gpu.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/paint-overlay-gpu.cpp"
+            ],
+            "exit": 0,
+            "seconds": 8.727596502983943
+          },
+          {
+            "name": "remove-old-scene",
+            "command": [
+              "ar",
+              "d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/libdome-sculpt-core.a",
+              "source-uv-bake.cpp.o",
+              "paint.cpp.o"
+            ],
+            "exit": 0,
+            "seconds": 0.06163762099458836
+          },
+          {
+            "name": "replace-scene",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/source-uv-bake.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/paint.cpp.o"
+            ],
+            "exit": 0,
+            "seconds": 0.06945731097948737
+          },
+          {
+            "name": "link-source-paint-bake-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/source-paint-bake.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/source-paint-bake-test",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.21373323601437733
+          },
+          {
+            "name": "link-paint-overlay-sampling-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/paint-overlay-gpu.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/paint-overlay-sampling-test",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.1603313959785737
+          },
+          {
+            "name": "paint-overlay-sampling-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/paint-overlay-sampling-test"
+            ],
+            "exit": 0,
+            "seconds": 0.07516482099890709
+          },
+          {
+            "name": "source-paint-bake-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/source-paint-bake-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/outputs"
+            ],
+            "exit": 0,
+            "seconds": 8.66819792901515
+          }
+        ],
+        "exit_code": 0,
+        "seconds": 49.8343264980067,
+        "inputs": 3103,
+        "drift": []
+      }
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/status.json",
+      "sha256": "a0b51076a4180fa70e3fe2a6181c62f75ad3424650a04e32ea8a21663094f5d7",
+      "result": {
+        "state": "terminal",
+        "source": "d8870e696ee1a60c76af5f946c33e4cbb9fbb5bd",
+        "pid": 3266081,
+        "scope": "Four-TU matched component qualification: complete changed paint.cpp/source-uv-bake.cpp plus new material bake and actual GPU/sparse sampler consumers, immutable own fresh734/fdc support/render and frozen whole5f Scene/Document replacement with old paint/source-uv-bake archive members removed. No public/private ABI layout changes. Not fresh native app/coherent all-target/vendor/HMD proof.",
+        "phase": "source-paint-bake-test",
+        "child_pid": 3275577,
+        "steps": [
+          {
+            "name": "compile-paint.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/paint.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src/paint.cpp"
+            ],
+            "exit": 0,
+            "seconds": 20.195318843005225
+          },
+          {
+            "name": "compile-source-uv-bake.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/source-uv-bake.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src/source-uv-bake.cpp"
+            ],
+            "exit": 0,
+            "seconds": 17.510522664000746
+          },
+          {
+            "name": "compile-source-paint-bake.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/source-paint-bake.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/source-paint-bake.cpp",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/cgltf"
+            ],
+            "exit": 0,
+            "seconds": 25.548348304000683
+          },
+          {
+            "name": "compile-paint-overlay-gpu.cpp.o",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/paint-overlay-gpu.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/paint-overlay-gpu.cpp"
+            ],
+            "exit": 0,
+            "seconds": 17.755208174989093
+          },
+          {
+            "name": "remove-old-scene",
+            "command": [
+              "ar",
+              "d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/libdome-sculpt-core.a",
+              "source-uv-bake.cpp.o",
+              "paint.cpp.o"
+            ],
+            "exit": 0,
+            "seconds": 0.8889714959950652
+          },
+          {
+            "name": "replace-scene",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/source-uv-bake.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/paint.cpp.o"
+            ],
+            "exit": 0,
+            "seconds": 0.6797366120154038
+          },
+          {
+            "name": "link-source-paint-bake-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/source-paint-bake.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/source-paint-bake-test",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.3820840429980308
+          },
+          {
+            "name": "link-paint-overlay-sampling-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/paint-overlay-gpu.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/paint-overlay-sampling-test",
+              "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.8245703680149745
+          },
+          {
+            "name": "paint-overlay-sampling-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/paint-overlay-sampling-test"
+            ],
+            "exit": 0,
+            "seconds": 0.27891960900160484
+          },
+          {
+            "name": "source-paint-bake-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/source-paint-bake-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/outputs"
+            ],
+            "exit": 0,
+            "seconds": 14.363341357995523
+          }
+        ],
+        "exit_code": 0,
+        "seconds": 100.73449940801947,
+        "inputs": 3103,
+        "drift": []
+      }
+    }
+  },
+  "affected_regressions": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-release/status.json",
+      "sha256": "286bb02190efd4a48093ffbcb28d923ffaa2126bbd4ed51233bf76e4a1c0b0f8",
+      "result": {
+        "state": "terminal",
+        "pid": 3284295,
+        "source": "d8870e696ee1a60c76af5f946c33e4cbb9fbb5bd",
+        "scope": "22 actual previously registered commands replayed on matching component relinks of unchanged21 test TUs, complete current d887 paint/SourceUV plus frozen5f scene/document owned archive, immutable fresh734/fdc support/render. Actual original CTest arguments/properties preserved except isolated artifact output prefix. No new coherent native app/whole-build or full559-test claim.",
+        "links": [
+          {
+            "name": "dome-sculpt-emission-background-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-emission-paint-data-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-emission-scene-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-material-visibility-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-mtoon-render-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-paint-overlay-gpu-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-paint-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-scene-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-capture-storage-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-faults-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-import-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-mtoon-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-native-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-overlay-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-owning-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-resources-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-sampler-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-scene-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-sampling-transport-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-union-version-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-unlit-fallback-test",
+            "exit": 0
+          }
+        ],
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-release",
+          "--output-on-failure"
+        ],
+        "phase": "ctest",
+        "child_pid": 3284659,
+        "exit_code": 0,
+        "seconds": 26.472429856017698,
+        "inputs": 3144,
+        "drift": []
+      }
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-sanitize/status.json",
+      "sha256": "119c7db136e61bbf63e4b02dc7c2b8886c120b7e2eba6d10733ad20ed1dd8fa1",
+      "result": {
+        "state": "terminal",
+        "pid": 3284294,
+        "source": "d8870e696ee1a60c76af5f946c33e4cbb9fbb5bd",
+        "scope": "22 actual previously registered commands replayed on matching component relinks of unchanged21 test TUs, complete current d887 paint/SourceUV plus frozen5f scene/document owned archive, immutable fresh734/fdc support/render. Actual original CTest arguments/properties preserved except isolated artifact output prefix. No new coherent native app/whole-build or full559-test claim.",
+        "links": [
+          {
+            "name": "dome-sculpt-emission-background-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-emission-paint-data-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-emission-scene-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-material-visibility-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-mtoon-render-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-paint-overlay-gpu-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-paint-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-scene-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-capture-storage-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-faults-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-import-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-mtoon-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-native-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-overlay-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-owning-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-resources-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-sampler-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-paint-scene-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-sampling-transport-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-source-union-version-test",
+            "exit": 0
+          },
+          {
+            "name": "dome-sculpt-unlit-fallback-test",
+            "exit": 0
+          }
+        ],
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-sanitize",
+          "--output-on-failure"
+        ],
+        "phase": "ctest",
+        "child_pid": 3287490,
+        "exit_code": 0,
+        "seconds": 160.11572950799018,
+        "inputs": 3144,
+        "drift": []
+      }
+    }
+  },
+  "legacy_raw_bake_and_adoption": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/status.json",
+      "sha256": "52b104e2f43199bbdf26797537a8c43cae676c1e5bb245e918b18a439d403df1",
+      "result": {
+        "state": "terminal",
+        "pid": 3241991,
+        "source": "14d5ec7f6143cf26edd88ddb77c78dd357428c23",
+        "scope": "Actual unchanged original SourceUV bake/adopt consumers, original compile flags and registered arguments with both real CC0 baselines, current completePaint/SourceUV matched core replacement and immutable owned5f/734/fdc support. No private header workaround, fresh whole-app/full-suite claim.",
+        "steps": [
+          {
+            "name": "source-uv-bake-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-bake.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/source-uv-bake.cpp"
+            ],
+            "exit": 0,
+            "seconds": 5.585991430009017
+          },
+          {
+            "name": "source-uv-bake-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-bake.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.1211944289971143
+          },
+          {
+            "name": "source-uv-bake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid/vroid/base-female.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid/vroid/base-male.vrm"
+            ],
+            "exit": 0,
+            "seconds": 1.5413717760238796
+          },
+          {
+            "name": "source-uv-adopt-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-adopt.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/source-uv-adopt.cpp"
+            ],
+            "exit": 0,
+            "seconds": 3.5611024200043175
+          },
+          {
+            "name": "source-uv-adopt-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-adopt.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-adopt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.17356011201627553
+          },
+          {
+            "name": "source-uv-adopt",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/source-uv-adopt"
+            ],
+            "exit": 0,
+            "seconds": 0.043978531000902876
+          }
+        ],
+        "phase": "source-uv-adopt",
+        "child_pid": 3243063,
+        "exit_code": 0,
+        "seconds": 11.10819131002063,
+        "inputs": 1561,
+        "drift": []
+      }
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/status.json",
+      "sha256": "7328c82e1e45eb9f07bcb81002aabe10e9504c0aa01c5fef8955b89dfae1a924",
+      "result": {
+        "state": "terminal",
+        "pid": 3241992,
+        "source": "14d5ec7f6143cf26edd88ddb77c78dd357428c23",
+        "scope": "Actual unchanged original SourceUV bake/adopt consumers, original compile flags and registered arguments with both real CC0 baselines, current completePaint/SourceUV matched core replacement and immutable owned5f/734/fdc support. No private header workaround, fresh whole-app/full-suite claim.",
+        "steps": [
+          {
+            "name": "source-uv-bake-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-bake.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/source-uv-bake.cpp"
+            ],
+            "exit": 0,
+            "seconds": 10.080747236992465
+          },
+          {
+            "name": "source-uv-bake-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-bake.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.8081485450093169
+          },
+          {
+            "name": "source-uv-bake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-bake",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid/vroid/base-female.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/assets/humanoid/vroid/base-male.vrm"
+            ],
+            "exit": 0,
+            "seconds": 8.40290119801648
+          },
+          {
+            "name": "source-uv-adopt-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-adopt.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/tests/source-uv-adopt.cpp"
+            ],
+            "exit": 0,
+            "seconds": 6.239539575995877
+          },
+          {
+            "name": "source-uv-adopt-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-adopt.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-adopt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libz.so",
+              "/usr/lib64/libjpeg.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.297293390991399
+          },
+          {
+            "name": "source-uv-adopt",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/source-uv-adopt"
+            ],
+            "exit": 0,
+            "seconds": 0.37618868600111455
+          }
+        ],
+        "phase": "source-uv-adopt",
+        "child_pid": 3244639,
+        "exit_code": 0,
+        "seconds": 28.19918648499879,
+        "inputs": 1561,
+        "drift": []
+      }
+    }
+  },
+  "hardware": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/hardware-release-tests/status.json",
+    "sha256": "c7d3d300c44bf63663aab84a13126ea73248cb4146412d041757e71f9e4dffd9",
+    "result": {
+      "state": "terminal",
+      "pid": 3285312,
+      "source": "d8870e696ee1a60c76af5f946c33e4cbb9fbb5bd",
+      "scope": "Actual strict Intel Arc A770 portable compiler192 including retained minification negative plus GPU/sparse sampler42; no Document export worker/nativeGUI/current compute admission plus software-only --hardware rejection. Current CPU build; not selected compute backend/native-app/HMD/export proof.",
+      "runs": [
+        {
+          "name": "source-paint-bake",
+          "exit": 0,
+          "seconds": 2.8360052610223647
+        },
+        {
+          "name": "paint-overlay-sampling",
+          "exit": 0,
+          "seconds": 0.0653686510049738
+        },
+        {
+          "name": "bake-negative",
+          "exit": 1,
+          "seconds": 0.02833568598725833
+        },
+        {
+          "name": "overlay-negative",
+          "exit": 1,
+          "seconds": 0.025650908995885402
+        }
+      ],
+      "phase": "overlay-negative",
+      "child_pid": 3286079,
+      "exit_code": 0,
+      "inputs": 1563,
+      "drift": []
+    }
+  },
+  "interop": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/portable-khronos-all.json",
+    "sha256": "be0c1d39b8857c3113aaf8439e40bb9ed11f5460760620aa25109c8cc2312465",
+    "validator": "2.0.0-dev.3.10",
+    "files": 24,
+    "corresponding_files_byte_identical": true,
+    "unfiltered_issues": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 42,
+      "numHints": 0
+    }
+  },
+  "material_checks_each_profile": 192,
+  "GPU_sparse_checks_each_profile": 42,
+  "raw_bake_checks_each_profile": 98,
+  "raw_bake_real_CC0_parts_each_profile": 38,
+  "near_view_quality": {
+    "comparisons": 16,
+    "maximum_visible_mean": 0.350887,
+    "maximum_visible_interior": 1,
+    "maximum_including_discontinuous_edge_footprint": 255,
+    "unchanged_admission_bounds": "visible mean2 and interior maximum2; independent PBR emitted GLB maximum2"
+  },
+  "retained_minification_counterexample": {
+    "source": "Actual128x128 checker, original nearest/mipmap sampler plus independent unmipped linear paint, small model footprint",
+    "release_and_SAN_visible_mean": 26.0125,
+    "Arc_visible_mean": 25.6375,
+    "maximum_pixel_error": 106,
+    "conclusion": "Finite portable linear/clamp image is not lossless independent sampling; strict default Source4 export still refuses, exact native owner and explicit portable policy remain required."
+  },
+  "preserved_history": [
+    "01c Source4 image/layer preparation reaches native state but original MASK/mip quality mean5.966/interior3 fails unchanged bounds; no relaxation.",
+    "9d sparse linear compositor fixes stepped paint/interior error but combined MToon image sampler case mean3.04805 still fails.",
+    "545 portable PBR and MToon role filters share one declared finite linear/clamp interpretation; original samplers stay in pure preparation/native source; all near-view cases pass.",
+    "Old hardware wrapper referenced another tree core path and failed before any GPU work; corrected archived wrapper then runs strict positive and software-negative controls.",
+    "Read-only public-header suspicion disproven by actual original-flag source-uv-bake/adopt compile0; no public-header workaround or purported fix."
+  ],
+  "resource_scope": [
+    "Explicit image/output, fixed geometry/layer staging, raster/sample/layer quotas and source preservation checks. No new persistent allocator frontier or full Document job/GUI cancellation qualification claimed.",
+    "Source4 unchanged atlas reuses exact sparse layers/IDs/masks/opacity/hidden state/owners. General UV moves still need complete independent source/paint domain composition and quality.",
+    "Private coordinate getter returns factory-sealed immutable owners without constructing sparse GPU/upload packets.",
+    "CPU sparse point reference matches actual GPU-compiled five-plane values including physical tiny/HDR values and PBR/authored colour variants. It is asset-worker evaluation, not a new selected-backend accelerator."
+  ],
+  "scope_limits": [
+    "Four complete changed/test TUs rebuilt on matching immutable owned fresh734/fdc support and whole5f Scene/Document replacements; no old members mixed, no existing public class layout or archive append. New standalone result/API is component-only.",
+    "22 old registered commands replay21 matching immutable test objects with isolated executable/output prefixes; not full560-test regression.",
+    "Old raw98+adopt runs are on14d before the later callback-only change; both real CC0 baselines cover raw kernel parts, not new full skinned native avatar workflows.",
+    "24 explicit compiled PBR GLBs:8 in Release/ownedSAN/strictArc, not ordinary native export-worker output.",
+    "No current native FLTK app/all-target/vendor rebuild, GUI, Wayland or physical headset proof.",
+    "Current default painted Source4 export remains strict. Exact native package, import/append, UI and worker integration, repeatedUV and HDR/VRM/skin/advanced authoring and all other production requirements remain open.",
+    "No system installation or active-session change. Full goal active/incomplete."
+  ],
+  "archived_evidence": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/component-release/status.json",
+      "sha256": "07d9ef7db01b22cb05cfb7480b51f3de7db1e22036899f76107086cfa722c97e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/component-release/before.json",
+      "sha256": "13e674277857d00bc9998c9f02fa9ea858c7467d90df5b82d39e6fbfbbd5fb6a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/component-release/after.json",
+      "sha256": "13e674277857d00bc9998c9f02fa9ea858c7467d90df5b82d39e6fbfbbd5fb6a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/component-sanitize/status.json",
+      "sha256": "bb40edd24c9c012731f843066d51d3e98afc6cfd88373d4cd1236305cbc8d302"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/component-sanitize/before.json",
+      "sha256": "0fde7a5d3afef6f3dbaca24f9d571b7ec8442624f3de8d37adf2b8ac4c3d4b5c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/component-sanitize/after.json",
+      "sha256": "0fde7a5d3afef6f3dbaca24f9d571b7ec8442624f3de8d37adf2b8ac4c3d4b5c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-release/status.json",
+      "sha256": "fd59e7862987d5a5c6df6380d7459001235cc4d7b44b3f812d3f84a348ac497e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-release/before.json",
+      "sha256": "d8adeb60b0569adbff8f1c77d3a0698e25937ff60fada85bfab3b0e6cab5a2d8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-release/after.json",
+      "sha256": "d8adeb60b0569adbff8f1c77d3a0698e25937ff60fada85bfab3b0e6cab5a2d8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-release/source-paint-bake-test.log",
+      "sha256": "e206bc99e208e1d4c0cbc1163cb943e751bf3006ad6694708460643b9fa78e06"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-release/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-sanitize/status.json",
+      "sha256": "72ead75407b757751587d14f7b4d0acb87a039f3cc745855e89103c37cb5bd72"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-sanitize/before.json",
+      "sha256": "6b47c0fb5f99adcd61d0017819b857ed6bc50a8d6451b46630697a05b100597e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-sanitize/after.json",
+      "sha256": "6b47c0fb5f99adcd61d0017819b857ed6bc50a8d6451b46630697a05b100597e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-sanitize/source-paint-bake-test.log",
+      "sha256": "e206bc99e208e1d4c0cbc1163cb943e751bf3006ad6694708460643b9fa78e06"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/linear-sanitize/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-release/status.json",
+      "sha256": "4406a282d71986f1407fa57548c9721d65608b342f641801b0e172e436347025"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-release/before.json",
+      "sha256": "8b9e7a7673f7b4dc383010b086476d2e88ca8f5284f7ebc92867902d1a1d5e41"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-release/after.json",
+      "sha256": "8b9e7a7673f7b4dc383010b086476d2e88ca8f5284f7ebc92867902d1a1d5e41"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-release/source-paint-bake-test.log",
+      "sha256": "dc6d886f0a44a2ed5f7c62440f541399b4835cba85148ca9a8d6e21f386cdbbc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-release/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-sanitize/status.json",
+      "sha256": "1ccd58208914a4434c217c9010034258124362302a0f11b1a4d7922c65933304"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-sanitize/before.json",
+      "sha256": "79a4a2a028db233e32867b5a73121b6bae9ae404964eff124e04d4c78f6297cf"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-sanitize/after.json",
+      "sha256": "79a4a2a028db233e32867b5a73121b6bae9ae404964eff124e04d4c78f6297cf"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-sanitize/source-paint-bake-test.log",
+      "sha256": "dc6d886f0a44a2ed5f7c62440f541399b4835cba85148ca9a8d6e21f386cdbbc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/roles-sanitize/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-release/status.json",
+      "sha256": "f18624a7a6c57d5603b3f7b1cabad27666c31cc13b35bd80ec7dce8eaa5a868a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-release/before.json",
+      "sha256": "244e58758f601d9ed935ef8b330c7dd02e812fbe2b5968af7bfd8b08429119be"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-release/after.json",
+      "sha256": "244e58758f601d9ed935ef8b330c7dd02e812fbe2b5968af7bfd8b08429119be"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-release/source-paint-bake-test.log",
+      "sha256": "83cee2aa330170d58738a914176ff3d93d13b05292a01436509cb7e4a0036eb0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-release/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-sanitize/status.json",
+      "sha256": "73343d62ff6862535354ec5ade2d9d36a7157edbcef4d037f29477403c346f32"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-sanitize/before.json",
+      "sha256": "a6b8a6fb99ab3f61e1c850a11b7875e32cbfbb570a7aa253dfce70c6f4571957"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-sanitize/after.json",
+      "sha256": "a6b8a6fb99ab3f61e1c850a11b7875e32cbfbb570a7aa253dfce70c6f4571957"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-sanitize/source-paint-bake-test.log",
+      "sha256": "83cee2aa330170d58738a914176ff3d93d13b05292a01436509cb7e4a0036eb0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/lit-sanitize/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-release/status.json",
+      "sha256": "c939d8e52ebd82ca1164fe483d852e5367e852707bf9dbd96ca1ca0cce2da22c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-release/before.json",
+      "sha256": "bca71f5e4843957b823dea6a708086a01ddfe5648fcaa37ff604544067482aec"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-release/after.json",
+      "sha256": "bca71f5e4843957b823dea6a708086a01ddfe5648fcaa37ff604544067482aec"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-release/source-paint-bake-test.log",
+      "sha256": "83cee2aa330170d58738a914176ff3d93d13b05292a01436509cb7e4a0036eb0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-release/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-sanitize/status.json",
+      "sha256": "9a2d31f87c78264f835c09160e7341a44916adba3fdf50cfb6202e912749b6bb"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-sanitize/before.json",
+      "sha256": "ec33e715c02fafd5bb266d24652cced08d8c7c14eb9fbf12c20a882c27f24fdf"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-sanitize/after.json",
+      "sha256": "ec33e715c02fafd5bb266d24652cced08d8c7c14eb9fbf12c20a882c27f24fdf"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-sanitize/source-paint-bake-test.log",
+      "sha256": "83cee2aa330170d58738a914176ff3d93d13b05292a01436509cb7e4a0036eb0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/domain-sanitize/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/status.json",
+      "sha256": "dcb11d9c8c0eaf8a76a7569a733beec3ee50ba5eeb39681fd5c061579809d7e7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/before.json",
+      "sha256": "e7ce81d04bbec2b878764b0a4f4c3820f2ccb7f88832dd2f05ceb0bfe2611e24"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/after.json",
+      "sha256": "e7ce81d04bbec2b878764b0a4f4c3820f2ccb7f88832dd2f05ceb0bfe2611e24"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/source-paint-bake-test.log",
+      "sha256": "b0b331d6331cee00d0daa951553ec11c5f3c58dc0adf8fd09adcd0bb4173d827"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-release/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/status.json",
+      "sha256": "a0b51076a4180fa70e3fe2a6181c62f75ad3424650a04e32ea8a21663094f5d7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/before.json",
+      "sha256": "7100dfa7a59b79cdc8f6092d75e984ce5f42d256e75513549ddc38e3fa71b5d9"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/after.json",
+      "sha256": "7100dfa7a59b79cdc8f6092d75e984ce5f42d256e75513549ddc38e3fa71b5d9"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/source-paint-bake-test.log",
+      "sha256": "b0b331d6331cee00d0daa951553ec11c5f3c58dc0adf8fd09adcd0bb4173d827"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/full-role-sanitize/paint-overlay-sampling-test.log",
+      "sha256": "5b2cc8f87e6176bf1fa047bf3c5f42323f401edbe84ba0a70fc5cfa9b214a41f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/status.json",
+      "sha256": "52b104e2f43199bbdf26797537a8c43cae676c1e5bb245e918b18a439d403df1"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/before.json",
+      "sha256": "6e0f3b1ca6d1c0044f8398210021c67757a9259784649fef5309a8618381f9b3"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-release/after.json",
+      "sha256": "6e0f3b1ca6d1c0044f8398210021c67757a9259784649fef5309a8618381f9b3"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/status.json",
+      "sha256": "7328c82e1e45eb9f07bcb81002aabe10e9504c0aa01c5fef8955b89dfae1a924"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/before.json",
+      "sha256": "ee367925d04e670f82729ace5777ded1c1df4c159199b2f7d23650cc3d507ec5"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/legacy-sanitize/after.json",
+      "sha256": "ee367925d04e670f82729ace5777ded1c1df4c159199b2f7d23650cc3d507ec5"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-release/status.json",
+      "sha256": "286bb02190efd4a48093ffbcb28d923ffaa2126bbd4ed51233bf76e4a1c0b0f8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-release/before.json",
+      "sha256": "3fc907459785d64fc805d911e0a3d594af8419941953aba05b66e49ecff19c0f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-release/after.json",
+      "sha256": "3fc907459785d64fc805d911e0a3d594af8419941953aba05b66e49ecff19c0f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-release/ctest.log",
+      "sha256": "d0dc585e679300e5204463fd5e4ded6182bfb04718bfd5b9371229686a8d3090"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-sanitize/status.json",
+      "sha256": "119c7db136e61bbf63e4b02dc7c2b8886c120b7e2eba6d10733ad20ed1dd8fa1"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-sanitize/before.json",
+      "sha256": "79c14b23121279d87167ad9ff39172cd25adf9ab61c3b445439ef4323a46fa7a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-sanitize/after.json",
+      "sha256": "79c14b23121279d87167ad9ff39172cd25adf9ab61c3b445439ef4323a46fa7a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/regressions-sanitize/ctest.log",
+      "sha256": "d68f4ad41722424dcc65962c00c907c987c51909ad94be23ed3db6150effd341"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/hardware-release-tests/status.json",
+      "sha256": "c7d3d300c44bf63663aab84a13126ea73248cb4146412d041757e71f9e4dffd9"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/hardware-release-tests/before.json",
+      "sha256": "2621e0be6de238a4770b22fb351f2b73add1f19732bfa538acdfda82a48f5e6a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/hardware-release-tests/after.json",
+      "sha256": "2621e0be6de238a4770b22fb351f2b73add1f19732bfa538acdfda82a48f5e6a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/hardware-release-tests/source-paint-bake.log",
+      "sha256": "bccffb15cff0d47aefd167b2c4f5e3eaeaab04951712607553541269f9525b1a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/bake-proof/hardware-release-tests/paint-overlay-sampling.log",
+      "sha256": "ddd6d00099cf3f6cf8abb861f1b5071bdd41d5def0ea93c6919a5312bd8a17dc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-component.py",
+      "sha256": "5857b822564690771224da826a9888c5eb672b87d4bf23aca4cc3c6edc1555d0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-domain.py",
+      "sha256": "f71604cc4015632e2245dda507725edc19fdf3c5405afd5ce63db01f8ff0c806"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-full-role.py",
+      "sha256": "4b0eca3db68f18d73642a0aed9647efae56c5fd07586ac86a18cf5078e218531"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-hardware-old-path.py",
+      "sha256": "80470228872d71c709c57826764eca3d77c265b3872da1df0c5a5be0b574c9e1"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-hardware.py",
+      "sha256": "2d3854c80c44ef1e4b634fcec884ea26aa9baa0037d7f9074acf48c3c146202c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-legacy.py",
+      "sha256": "6a2b48d9675e13ea4d2bcaf4bf1da3d2a0387d77b969d2b24fe17303a418e66e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-linear.py",
+      "sha256": "4a2590b48ec1de77a4c07b725dab4e0e4edf6971aaed7e8a657e3c9fe343853a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-lit.py",
+      "sha256": "5da29975a4d993b2cc718853f30249c17c235204f80ac3e81ae7ef4e5b8ce761"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-regressions.py",
+      "sha256": "27dc5663cf5c222d329eb4851d9a88dc8e13006ea58aad7779df3f1b20e9dd87"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-roles.py",
+      "sha256": "8d60eb979299fbaefe5fb64e59e4c640576bb0951d5d824781f59c11dc845bb7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-portable-b2/artifacts/union/bake-validator.cjs",
+      "sha256": "c61fc6e5f8d4189bfd3c0d9a8e55a1847c9ae181d5db44477f9336c5055ed309"
+    }
+  ]
+}
