@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=28; //25 projection;26 preview;27 rig fitting.
+inline constexpr int spatial_page_count=29; //25 projection;26 preview;27 rig fitting;28 export.
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -94,8 +94,10 @@ enum class SpatialCommand {
   PreviewAuthored=1024, PreviewPbr, PreviewToon,
   RigFitBegin=2048, RigFitPrevious, RigFitNext, RigFitPlace, RigFitRemove,
   RigFitXDown, RigFitXUp, RigFitYDown, RigFitYUp, RigFitZDown, RigFitZUp,
-  RigFitApply, RigFitCancel, RigFitOptions
+  RigFitApply, RigFitCancel, RigFitOptions,
+  ExportEditable256=4096, ExportEditable512, ExportEditable1024
 };
+inline bool editable_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditable256&&c<=SpatialCommand::ExportEditable1024;}
 inline bool rig_fit_command(SpatialCommand c){return c>=SpatialCommand::RigFitBegin&&c<=SpatialCommand::RigFitOptions;}
 inline bool projection_command(SpatialCommand c){return c>=SpatialCommand::ProjectionBrowse&&c<=SpatialCommand::ProjectionIncrease;}
 inline bool preview_command(SpatialCommand c){return c>=SpatialCommand::PreviewAuthored&&c<=SpatialCommand::PreviewToon;}

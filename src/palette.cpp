@@ -497,7 +497,7 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 24 && s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
+  if (s.menu_page != 28 && s.menu_page != 24 && s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
@@ -506,7 +506,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
     text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
-  const char *page = s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -522,6 +522,12 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==28){
+    text(320*unit_,252*unit_,"Exact native project: all objects",fg);
+    text(320*unit_,280*unit_,"Other viewers: approximate PBR",fg);
+    text(320*unit_,308*unit_,"Open in Dome Sculpt restores edits",fg);
+    text(320*unit_,550*unit_,"Finite textures can miss fine patterns",fg);
+  }
   if(s.menu_page==24){
     const auto *keys=s.deformation&&s.deformation->morphs?&*s.deformation->morphs:nullptr;
     text(320*unit_,280*unit_,keys&&!keys->targets.empty()?keys->targets.at(std::min(s.morph_target,keys->targets.size()-1)).name:"Create a shape target",fg);
