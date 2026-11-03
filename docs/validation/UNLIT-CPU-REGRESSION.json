@@ -1,0 +1,2732 @@
+{
+  "status": "terminal evidence recovered after wrapper termination",
+  "source": "39210fca93c99a49d00d6a5209976e0caf324275",
+  "CTest_passed": 540,
+  "CTest_failed": 0,
+  "registered_tests": 540,
+  "unique_command_IDs": "1..540 exact",
+  "CTest_summary_seconds": 6185.97,
+  "captured_inputs": 1905,
+  "input_drift": [],
+  "wrapper_exec_session": 91430,
+  "wrapper_exec_exit": 143,
+  "wrapper_exit_note": "Actual unified exec returned143 and no final post-hash status was written. Preserve original running status.json. CTest itself completed and emitted all540 Passed records plus final100% summary; its standalone wait exit was not captured. Independently recovered post-run rehash of all1905 original inputs matches exactly. No test rerun or source edits.",
+  "recovery_hash_seconds": 3.557233779982198,
+  "result_records": [
+    {
+      "test_ID": 386,
+      "name": "colored-bake-workflow ..........................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 538,
+      "name": "vrm1-source-export .............................",
+      "seconds": 0.82
+    },
+    {
+      "test_ID": 2,
+      "name": "desktop-spacenav ...............................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 3,
+      "name": "desktop-framing ................................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 4,
+      "name": "input-rebind-publication .......................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 5,
+      "name": "import-unmapped-atlas ..........................",
+      "seconds": 0.09
+    },
+    {
+      "test_ID": 6,
+      "name": "import-texture-atlas ...........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 7,
+      "name": "source-uv1 .....................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 8,
+      "name": "authoring-source-union .........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 9,
+      "name": "affine-contact .................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 10,
+      "name": "native-worker-publication ......................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 11,
+      "name": "native-worker-generation .......................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 12,
+      "name": "native-worker-held-publication .................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 13,
+      "name": "input-worker-publication .......................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 14,
+      "name": "file-worker-publication ........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 15,
+      "name": "export-worker-publication ......................",
+      "seconds": 0.09
+    },
+    {
+      "test_ID": 16,
+      "name": "input-worker-busy-file .........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 17,
+      "name": "input-worker-generation ........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 18,
+      "name": "file-worker-generation .........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 19,
+      "name": "export-worker-generation .......................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 1,
+      "name": "gpu-brush-transfer-shims .......................",
+      "seconds": 6.17
+    },
+    {
+      "test_ID": 21,
+      "name": "polygon-color-document .........................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 22,
+      "name": "polygon-color-scene ............................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 23,
+      "name": "polygon-color-current ..........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 24,
+      "name": "polygon-color-source ...........................",
+      "seconds": 0.09
+    },
+    {
+      "test_ID": 25,
+      "name": "polygon-color-allocation .......................",
+      "seconds": 0.66
+    },
+    {
+      "test_ID": 26,
+      "name": "polygon-color ..................................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 20,
+      "name": "polygon-color-scene-faults .....................",
+      "seconds": 9.4
+    },
+    {
+      "test_ID": 28,
+      "name": "corner-color-uv23-domain .......................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 27,
+      "name": "corner-color-uv23-admission ....................",
+      "seconds": 19.44
+    },
+    {
+      "test_ID": 29,
+      "name": "corner-color-uv23-0-faults .....................",
+      "seconds": 218.15
+    },
+    {
+      "test_ID": 30,
+      "name": "corner-color-uv23-1-faults .....................",
+      "seconds": 222.64
+    },
+    {
+      "test_ID": 31,
+      "name": "corner-color-uv23-2-faults .....................",
+      "seconds": 241.8
+    },
+    {
+      "test_ID": 32,
+      "name": "corner-color-uv23-3-faults .....................",
+      "seconds": 249.47
+    },
+    {
+      "test_ID": 33,
+      "name": "corner-color-uv23-4-faults .....................",
+      "seconds": 261.0
+    },
+    {
+      "test_ID": 34,
+      "name": "corner-color-uv23-5-faults .....................",
+      "seconds": 270.36
+    },
+    {
+      "test_ID": 35,
+      "name": "corner-color-uv23-6-faults .....................",
+      "seconds": 291.12
+    },
+    {
+      "test_ID": 36,
+      "name": "corner-color-uv23-7-faults .....................",
+      "seconds": 297.42
+    },
+    {
+      "test_ID": 37,
+      "name": "corner-color-uv23-8-faults .....................",
+      "seconds": 295.57
+    },
+    {
+      "test_ID": 38,
+      "name": "corner-color-uv23-9-faults .....................",
+      "seconds": 316.64
+    },
+    {
+      "test_ID": 39,
+      "name": "corner-color-uv23-10-faults ....................",
+      "seconds": 395.0
+    },
+    {
+      "test_ID": 40,
+      "name": "corner-color-uv23-11-faults ....................",
+      "seconds": 432.54
+    },
+    {
+      "test_ID": 41,
+      "name": "corner-color-uv23-12-faults ....................",
+      "seconds": 398.73
+    },
+    {
+      "test_ID": 42,
+      "name": "corner-color-uv23-13-faults ....................",
+      "seconds": 393.56
+    },
+    {
+      "test_ID": 43,
+      "name": "corner-color-uv23-14-faults ....................",
+      "seconds": 387.4
+    },
+    {
+      "test_ID": 45,
+      "name": "corner-color-uv23-document .....................",
+      "seconds": 2.06
+    },
+    {
+      "test_ID": 46,
+      "name": "corner-color-uv23 ..............................",
+      "seconds": 0.78
+    },
+    {
+      "test_ID": 47,
+      "name": "polygon-color-uv ...............................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 48,
+      "name": "polygon-color-uv-0-faults ......................",
+      "seconds": 3.34
+    },
+    {
+      "test_ID": 49,
+      "name": "polygon-color-uv-1-faults ......................",
+      "seconds": 3.3
+    },
+    {
+      "test_ID": 50,
+      "name": "polygon-color-uv-2-faults ......................",
+      "seconds": 3.24
+    },
+    {
+      "test_ID": 51,
+      "name": "polygon-color-uv-3-faults ......................",
+      "seconds": 3.19
+    },
+    {
+      "test_ID": 52,
+      "name": "polygon-color-uv-4-faults ......................",
+      "seconds": 3.25
+    },
+    {
+      "test_ID": 53,
+      "name": "polygon-color-uv-5-faults ......................",
+      "seconds": 3.26
+    },
+    {
+      "test_ID": 54,
+      "name": "polygon-color-uv-6-faults ......................",
+      "seconds": 3.51
+    },
+    {
+      "test_ID": 55,
+      "name": "polygon-color-uv-7-faults ......................",
+      "seconds": 3.97
+    },
+    {
+      "test_ID": 56,
+      "name": "polygon-color-uv-8-faults ......................",
+      "seconds": 4.11
+    },
+    {
+      "test_ID": 57,
+      "name": "polygon-color-uv-9-faults ......................",
+      "seconds": 4.02
+    },
+    {
+      "test_ID": 58,
+      "name": "polygon-color-uv-10-faults .....................",
+      "seconds": 4.13
+    },
+    {
+      "test_ID": 59,
+      "name": "polygon-color-uv-11-faults .....................",
+      "seconds": 4.2
+    },
+    {
+      "test_ID": 60,
+      "name": "polygon-color-uv-12-faults .....................",
+      "seconds": 4.18
+    },
+    {
+      "test_ID": 61,
+      "name": "polygon-color-uv-13-faults .....................",
+      "seconds": 4.25
+    },
+    {
+      "test_ID": 62,
+      "name": "polygon-color-uv-14-faults .....................",
+      "seconds": 4.12
+    },
+    {
+      "test_ID": 63,
+      "name": "polygon-color-uv-15-faults .....................",
+      "seconds": 4.02
+    },
+    {
+      "test_ID": 64,
+      "name": "polygon-paint-policy ...........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 65,
+      "name": "color-polygon-authority ........................",
+      "seconds": 0.23
+    },
+    {
+      "test_ID": 66,
+      "name": "polygon-paint-authority ........................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 67,
+      "name": "polygon-uv .....................................",
+      "seconds": 0.82
+    },
+    {
+      "test_ID": 68,
+      "name": "polygon-controller .............................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 69,
+      "name": "polygon-document ...............................",
+      "seconds": 5.63
+    },
+    {
+      "test_ID": 70,
+      "name": "affine-math ....................................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 71,
+      "name": "import-affine-hierarchy ........................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 72,
+      "name": "affine-interaction .............................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 73,
+      "name": "source-model ...................................",
+      "seconds": 0.2
+    },
+    {
+      "test_ID": 74,
+      "name": "source-placement ...............................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 75,
+      "name": "source-placement-allocation ....................",
+      "seconds": 3.79
+    },
+    {
+      "test_ID": 76,
+      "name": "affine-export ..................................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 77,
+      "name": "affine-document ................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 78,
+      "name": "affine-held ....................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 79,
+      "name": "affine-held-allocation .........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 80,
+      "name": "affine-held-worker-allocation ..................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 81,
+      "name": "affine-factor ..................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 82,
+      "name": "atlas-cancellation .............................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 83,
+      "name": "polygon-kernel .................................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 84,
+      "name": "polygon-allocation .............................",
+      "seconds": 0.28
+    },
+    {
+      "test_ID": 85,
+      "name": "polygon-source-allocation ......................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 86,
+      "name": "polygon-import-source ..........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 87,
+      "name": "polygon-source .................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 88,
+      "name": "polygon-authoring ..............................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 89,
+      "name": "polygon-authoring-allocation ...................",
+      "seconds": 0.82
+    },
+    {
+      "test_ID": 90,
+      "name": "bake-projection-policy .........................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 91,
+      "name": "sculpt-tangent-recovery ........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 92,
+      "name": "authoring-journey ..............................",
+      "seconds": 0.4
+    },
+    {
+      "test_ID": 93,
+      "name": "compute-csg ....................................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 94,
+      "name": "procedural-sculpt ..............................",
+      "seconds": 0.22
+    },
+    {
+      "test_ID": 95,
+      "name": "procedural-document ............................",
+      "seconds": 0.17
+    },
+    {
+      "test_ID": 96,
+      "name": "import-admission-atomicity .....................",
+      "seconds": 6.37
+    },
+    {
+      "test_ID": 97,
+      "name": "consumer-handedness ............................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 98,
+      "name": "import-source-chain-document ...................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 99,
+      "name": "import-source-chain ............................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 100,
+      "name": "import-default-material ........................",
+      "seconds": 0.1
+    },
+    {
+      "test_ID": 101,
+      "name": "vrm-typed-uv1-import ...........................",
+      "seconds": 0.05
+    },
+    {
+      "test_ID": 102,
+      "name": "vrm-matcap-import ..............................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 103,
+      "name": "vrm-source-export-worker .......................",
+      "seconds": 7.3
+    },
+    {
+      "test_ID": 44,
+      "name": "corner-color-uv23-15-faults ....................",
+      "seconds": 381.66
+    },
+    {
+      "test_ID": 104,
+      "name": "vrm-rigid-authoring ............................",
+      "seconds": 6.26
+    },
+    {
+      "test_ID": 105,
+      "name": "vrm-rigid-source-worker ........................",
+      "seconds": 8.11
+    },
+    {
+      "test_ID": 107,
+      "name": "vrm-source-export ..............................",
+      "seconds": 42.43
+    },
+    {
+      "test_ID": 108,
+      "name": "generic-vrm-import .............................",
+      "seconds": 6.67
+    },
+    {
+      "test_ID": 109,
+      "name": "import-default-document ........................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 110,
+      "name": "import-options-controller ......................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 111,
+      "name": "import-source-capture ..........................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 112,
+      "name": "retopology-authoring ...........................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 106,
+      "name": "vrm-rigid-source-export ........................",
+      "seconds": 61.78
+    },
+    {
+      "test_ID": 113,
+      "name": "colored-cut-publication-0 ......................",
+      "seconds": 35.72
+    },
+    {
+      "test_ID": 114,
+      "name": "colored-cut-publication-1 ......................",
+      "seconds": 35.65
+    },
+    {
+      "test_ID": 115,
+      "name": "colored-cut-publication-2 ......................",
+      "seconds": 35.23
+    },
+    {
+      "test_ID": 116,
+      "name": "colored-cut-publication-3 ......................",
+      "seconds": 36.2
+    },
+    {
+      "test_ID": 118,
+      "name": "colored-cut-held-publication ...................",
+      "seconds": 1.37
+    },
+    {
+      "test_ID": 119,
+      "name": "current-color-source-bake-packed-faults ........",
+      "seconds": 14.09
+    },
+    {
+      "test_ID": 117,
+      "name": "colored-cut-publication-4 ......................",
+      "seconds": 41.03
+    },
+    {
+      "test_ID": 120,
+      "name": "current-color-source-bake-precommit-0-faults ...",
+      "seconds": 27.27
+    },
+    {
+      "test_ID": 121,
+      "name": "current-color-source-bake-precommit-1-faults ...",
+      "seconds": 26.74
+    },
+    {
+      "test_ID": 122,
+      "name": "current-color-source-bake-precommit-2-faults ...",
+      "seconds": 27.89
+    },
+    {
+      "test_ID": 124,
+      "name": "current-color-source-bake ......................",
+      "seconds": 4.32
+    },
+    {
+      "test_ID": 123,
+      "name": "current-color-source-bake-precommit-3-faults ...",
+      "seconds": 29.22
+    },
+    {
+      "test_ID": 126,
+      "name": "colored-cut-document ...........................",
+      "seconds": 3.61
+    },
+    {
+      "test_ID": 127,
+      "name": "colored-cut-boundaries .........................",
+      "seconds": 0.17
+    },
+    {
+      "test_ID": 125,
+      "name": "colored-cut-admission ..........................",
+      "seconds": 54.22
+    },
+    {
+      "test_ID": 129,
+      "name": "colored-plane-cut ..............................",
+      "seconds": 0.15
+    },
+    {
+      "test_ID": 130,
+      "name": "xatlas-construction-allocation .................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 131,
+      "name": "xatlas-shutdown-handshake ......................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 132,
+      "name": "cut-authoring ..................................",
+      "seconds": 1.32
+    },
+    {
+      "test_ID": 133,
+      "name": "uv-authoring ...................................",
+      "seconds": 3.66
+    },
+    {
+      "test_ID": 134,
+      "name": "controller-controls ............................",
+      "seconds": 3.15
+    },
+    {
+      "test_ID": 135,
+      "name": "texture-painting ...............................",
+      "seconds": 3.17
+    },
+    {
+      "test_ID": 136,
+      "name": "scene-authoring ................................",
+      "seconds": 0.29
+    },
+    {
+      "test_ID": 137,
+      "name": "shared-document ................................",
+      "seconds": 8.08
+    },
+    {
+      "test_ID": 138,
+      "name": "sculpt-geometry ................................",
+      "seconds": 2.44
+    },
+    {
+      "test_ID": 139,
+      "name": "mesh-degeneracy ................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 140,
+      "name": "sculpt-raycast .................................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 141,
+      "name": "sculpt-resolution-allocation ...................",
+      "seconds": 1.18
+    },
+    {
+      "test_ID": 142,
+      "name": "transaction-structural .........................",
+      "seconds": 0.29
+    },
+    {
+      "test_ID": 143,
+      "name": "transaction-scalar .............................",
+      "seconds": 0.18
+    },
+    {
+      "test_ID": 144,
+      "name": "transaction-control ............................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 145,
+      "name": "transaction-undo ...............................",
+      "seconds": 0.11
+    },
+    {
+      "test_ID": 146,
+      "name": "transaction-paint-undo .........................",
+      "seconds": 0.26
+    },
+    {
+      "test_ID": 147,
+      "name": "transaction-sculpt-undo ........................",
+      "seconds": 0.3
+    },
+    {
+      "test_ID": 148,
+      "name": "transaction-asset ..............................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 149,
+      "name": "transaction-import .............................",
+      "seconds": 0.82
+    },
+    {
+      "test_ID": 150,
+      "name": "transaction-procedural .........................",
+      "seconds": 2.63
+    },
+    {
+      "test_ID": 151,
+      "name": "transaction-uv .................................",
+      "seconds": 0.17
+    },
+    {
+      "test_ID": 152,
+      "name": "transaction-open ...............................",
+      "seconds": 0.2
+    },
+    {
+      "test_ID": 153,
+      "name": "transaction-save ...............................",
+      "seconds": 0.11
+    },
+    {
+      "test_ID": 154,
+      "name": "transaction-recovery ...........................",
+      "seconds": 0.25
+    },
+    {
+      "test_ID": 155,
+      "name": "transaction-asset-queue ........................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 156,
+      "name": "transaction-uv-queue ...........................",
+      "seconds": 0.16
+    },
+    {
+      "test_ID": 157,
+      "name": "transaction-open-queue .........................",
+      "seconds": 0.15
+    },
+    {
+      "test_ID": 158,
+      "name": "transaction-save-queue .........................",
+      "seconds": 0.17
+    },
+    {
+      "test_ID": 159,
+      "name": "transaction-export-queue .......................",
+      "seconds": 0.28
+    },
+    {
+      "test_ID": 160,
+      "name": "transaction-native-begin-queue .................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 161,
+      "name": "transaction-native-save-queue ..................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 162,
+      "name": "transaction-prepare-queue ......................",
+      "seconds": 0.65
+    },
+    {
+      "test_ID": 163,
+      "name": "transaction-refresh-queue ......................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 164,
+      "name": "transaction-restore-queue ......................",
+      "seconds": 0.97
+    },
+    {
+      "test_ID": 165,
+      "name": "transaction-restore ............................",
+      "seconds": 1.15
+    },
+    {
+      "test_ID": 166,
+      "name": "transaction-postcommit .........................",
+      "seconds": 0.12
+    },
+    {
+      "test_ID": 167,
+      "name": "native-stroke-allocation .......................",
+      "seconds": 1.89
+    },
+    {
+      "test_ID": 168,
+      "name": "native-strokes .................................",
+      "seconds": 0.25
+    },
+    {
+      "test_ID": 169,
+      "name": "native-live-preview ............................",
+      "seconds": 0.12
+    },
+    {
+      "test_ID": 170,
+      "name": "resolution-ui-values ...........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 171,
+      "name": "resolution-progress ............................",
+      "seconds": 0.29
+    },
+    {
+      "test_ID": 172,
+      "name": "resolution-document ............................",
+      "seconds": 0.82
+    },
+    {
+      "test_ID": 173,
+      "name": "resolution-controller ..........................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 174,
+      "name": "sculpt-resolution ..............................",
+      "seconds": 0.88
+    },
+    {
+      "test_ID": 175,
+      "name": "sculpt-mask-controller .........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 176,
+      "name": "sculpt-mask-document ...........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 177,
+      "name": "sculpt-mask-symmetry ...........................",
+      "seconds": 0.11
+    },
+    {
+      "test_ID": 178,
+      "name": "sculpt-mask-dispatch ...........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 179,
+      "name": "sculpt-mask-transactions .......................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 180,
+      "name": "gltf-interoperability ..........................",
+      "seconds": 2.61
+    },
+    {
+      "test_ID": 181,
+      "name": "native-graphics-lifetime .......................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 182,
+      "name": "current-color-source-bake-render ...............",
+      "seconds": 12.68
+    },
+    {
+      "test_ID": 183,
+      "name": "corner-color-uv23-paint-render .................",
+      "seconds": 50.77
+    },
+    {
+      "test_ID": 184,
+      "name": "corner-color-uv23-render .......................",
+      "seconds": 41.46
+    },
+    {
+      "test_ID": 185,
+      "name": "current-color-target-render ....................",
+      "seconds": 36.37
+    },
+    {
+      "test_ID": 186,
+      "name": "current-color-dual .............................",
+      "seconds": 10.24
+    },
+    {
+      "test_ID": 187,
+      "name": "joint-authoring ................................",
+      "seconds": 25.74
+    },
+    {
+      "test_ID": 188,
+      "name": "colored-cut-render .............................",
+      "seconds": 4.17
+    },
+    {
+      "test_ID": 189,
+      "name": "import-texture-atlas-render ....................",
+      "seconds": 19.05
+    },
+    {
+      "test_ID": 190,
+      "name": "source-uv1-render ..............................",
+      "seconds": 14.8
+    },
+    {
+      "test_ID": 191,
+      "name": "polygon-color-render ...........................",
+      "seconds": 0.16
+    },
+    {
+      "test_ID": 192,
+      "name": "polygon-render .................................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 193,
+      "name": "session-appearance .............................",
+      "seconds": 7.27
+    },
+    {
+      "test_ID": 194,
+      "name": "vrm-rigid-source-export-render .................",
+      "seconds": 49.28
+    },
+    {
+      "test_ID": 195,
+      "name": "vrm-source-export-render .......................",
+      "seconds": 47.86
+    },
+    {
+      "test_ID": 196,
+      "name": "generic-vrm-import-render ......................",
+      "seconds": 9.88
+    },
+    {
+      "test_ID": 197,
+      "name": "import-skin-render .............................",
+      "seconds": 2.68
+    },
+    {
+      "test_ID": 198,
+      "name": "import-skin-affine-render ......................",
+      "seconds": 0.19
+    },
+    {
+      "test_ID": 199,
+      "name": "paint-export-samplers ..........................",
+      "seconds": 11.25
+    },
+    {
+      "test_ID": 200,
+      "name": "import-skin-export-render ......................",
+      "seconds": 3.34
+    },
+    {
+      "test_ID": 201,
+      "name": "import-default-render ..........................",
+      "seconds": 4.41
+    },
+    {
+      "test_ID": 202,
+      "name": "import-authoring-render ........................",
+      "seconds": 5.02
+    },
+    {
+      "test_ID": 203,
+      "name": "import-flat-render .............................",
+      "seconds": 10.19
+    },
+    {
+      "test_ID": 204,
+      "name": "spatial-gpu-render .............................",
+      "seconds": 28.38
+    },
+    {
+      "test_ID": 205,
+      "name": "palette-unicode ................................",
+      "seconds": 1.11
+    },
+    {
+      "test_ID": 206,
+      "name": "corner-color-uv23-xr ...........................",
+      "seconds": 29.28
+    },
+    {
+      "test_ID": 207,
+      "name": "polygon-openxr .................................",
+      "seconds": 41.85
+    },
+    {
+      "test_ID": 208,
+      "name": "polygon-color-openxr ...........................",
+      "seconds": 37.79
+    },
+    {
+      "test_ID": 209,
+      "name": "bake-policy-openxr .............................",
+      "seconds": 20.95
+    },
+    {
+      "test_ID": 210,
+      "name": "procedural-openxr ..............................",
+      "seconds": 23.89
+    },
+    {
+      "test_ID": 211,
+      "name": "resolution-openxr ..............................",
+      "seconds": 33.29
+    },
+    {
+      "test_ID": 128,
+      "name": "colored-cut-allocation .........................",
+      "seconds": 818.71
+    },
+    {
+      "test_ID": 213,
+      "name": "native-fontconfig-desktop-exit .................",
+      "seconds": 16.96
+    },
+    {
+      "test_ID": 214,
+      "name": "native-fontconfig-xr-exit ......................",
+      "seconds": 10.67
+    },
+    {
+      "test_ID": 215,
+      "name": "colored-cut-openxr .............................",
+      "seconds": 34.79
+    },
+    {
+      "test_ID": 212,
+      "name": "openxr-client ..................................",
+      "seconds": 223.05
+    },
+    {
+      "test_ID": 216,
+      "name": "import-atlas-openxr ............................",
+      "seconds": 23.3
+    },
+    {
+      "test_ID": 218,
+      "name": "sculpt-layers ..................................",
+      "seconds": 0.1
+    },
+    {
+      "test_ID": 219,
+      "name": "durable-recovery ...............................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 220,
+      "name": "rig-authoring ..................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 221,
+      "name": "import-skin ....................................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 222,
+      "name": "authored-bind ..................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 223,
+      "name": "import-authoring ...............................",
+      "seconds": 0.05
+    },
+    {
+      "test_ID": 224,
+      "name": "mesh-import ....................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 225,
+      "name": "mesh-processing ................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 226,
+      "name": "document-recovery ..............................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 227,
+      "name": "document-assets ................................",
+      "seconds": 0.14
+    },
+    {
+      "test_ID": 228,
+      "name": "voxel-authoring ................................",
+      "seconds": 0.24
+    },
+    {
+      "test_ID": 229,
+      "name": "deformation ....................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 230,
+      "name": "retopo .........................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 231,
+      "name": "remesh .........................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 232,
+      "name": "bake ...........................................",
+      "seconds": 0.37
+    },
+    {
+      "test_ID": 233,
+      "name": "baked-textures .................................",
+      "seconds": 0.05
+    },
+    {
+      "test_ID": 234,
+      "name": "bake-workflow ..................................",
+      "seconds": 5.34
+    },
+    {
+      "test_ID": 235,
+      "name": "bake-controls ..................................",
+      "seconds": 0.05
+    },
+    {
+      "test_ID": 236,
+      "name": "groups .........................................",
+      "seconds": 4.25
+    },
+    {
+      "test_ID": 237,
+      "name": "humanoid-creator ...............................",
+      "seconds": 8.44
+    },
+    {
+      "test_ID": 238,
+      "name": "projection .....................................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 239,
+      "name": "source-maps ....................................",
+      "seconds": 0.73
+    },
+    {
+      "test_ID": 240,
+      "name": "vroid-creator ..................................",
+      "seconds": 1.85
+    },
+    {
+      "test_ID": 241,
+      "name": "creator-archive ................................",
+      "seconds": 0.79
+    },
+    {
+      "test_ID": 242,
+      "name": "source-uv ......................................",
+      "seconds": 2.75
+    },
+    {
+      "test_ID": 217,
+      "name": "import-vrm-openxr ..............................",
+      "seconds": 51.2
+    },
+    {
+      "test_ID": 244,
+      "name": "mtoon ..........................................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 245,
+      "name": "vroid-groom ....................................",
+      "seconds": 8.27
+    },
+    {
+      "test_ID": 243,
+      "name": "composite-cache ................................",
+      "seconds": 53.19
+    },
+    {
+      "test_ID": 247,
+      "name": "weight-edit ....................................",
+      "seconds": 0.74
+    },
+    {
+      "test_ID": 248,
+      "name": "uv-solve .......................................",
+      "seconds": 0.77
+    },
+    {
+      "test_ID": 249,
+      "name": "source-morph ...................................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 250,
+      "name": "material-visibility ............................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 251,
+      "name": "humanoid-authoring .............................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 252,
+      "name": "mtoon-gpu ......................................",
+      "seconds": 0.33
+    },
+    {
+      "test_ID": 246,
+      "name": "vrm ............................................",
+      "seconds": 94.42
+    },
+    {
+      "test_ID": 254,
+      "name": "source-preview .................................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 255,
+      "name": "rig-editing ....................................",
+      "seconds": 2.34
+    },
+    {
+      "test_ID": 256,
+      "name": "uv-workflow ....................................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 257,
+      "name": "uv-initialize ..................................",
+      "seconds": 1.05
+    },
+    {
+      "test_ID": 258,
+      "name": "uv-loader ......................................",
+      "seconds": 0.55
+    },
+    {
+      "test_ID": 253,
+      "name": "source-gpu .....................................",
+      "seconds": 59.72
+    },
+    {
+      "test_ID": 260,
+      "name": "skin-authoring .................................",
+      "seconds": 0.76
+    },
+    {
+      "test_ID": 261,
+      "name": "unlit-fallback .................................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 262,
+      "name": "unlit-consumer-role ............................",
+      "seconds": 0.09
+    },
+    {
+      "test_ID": 263,
+      "name": "unlit-consumer-prepared ........................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 259,
+      "name": "weight-authoring ...............................",
+      "seconds": 2.54
+    },
+    {
+      "test_ID": 264,
+      "name": "mtoon-render ...................................",
+      "seconds": 4.05
+    },
+    {
+      "test_ID": 266,
+      "name": "export-cancellation ............................",
+      "seconds": 4.5
+    },
+    {
+      "test_ID": 265,
+      "name": "document-export ................................",
+      "seconds": 9.93
+    },
+    {
+      "test_ID": 268,
+      "name": "source-uv-adopt ................................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 267,
+      "name": "source-uv-bake .................................",
+      "seconds": 3.2
+    },
+    {
+      "test_ID": 270,
+      "name": "compute-backend ................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 271,
+      "name": "mesh-scale .....................................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 272,
+      "name": "vrm-painted ....................................",
+      "seconds": 0.1
+    },
+    {
+      "test_ID": 273,
+      "name": "source-tangent-frames ..........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 274,
+      "name": "source-flat-faults .............................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 275,
+      "name": "project-files ..................................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 276,
+      "name": "fbx-deformation-authoring ......................",
+      "seconds": 0.18
+    },
+    {
+      "test_ID": 277,
+      "name": "fbx-import-document ............................",
+      "seconds": 0.12
+    },
+    {
+      "test_ID": 278,
+      "name": "fbx-named-uv ...................................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 279,
+      "name": "authoring-save .................................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 269,
+      "name": "mtoon-emission .................................",
+      "seconds": 7.11
+    },
+    {
+      "test_ID": 281,
+      "name": "atlas-robustness ...............................",
+      "seconds": 11.34
+    },
+    {
+      "test_ID": 282,
+      "name": "worker-shutdown ................................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 283,
+      "name": "text-utf8 ......................................",
+      "seconds": 0.13
+    },
+    {
+      "test_ID": 284,
+      "name": "scene-schema-compat ............................",
+      "seconds": 0.8
+    },
+    {
+      "test_ID": 285,
+      "name": "retopo-cancellation-boundaries .................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 286,
+      "name": "normal-frame-archive ...........................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 287,
+      "name": "normal-frame-runtime ...........................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 280,
+      "name": "mtoon-visibility ...............................",
+      "seconds": 20.23
+    },
+    {
+      "test_ID": 289,
+      "name": "normal-frame-creator ...........................",
+      "seconds": 3.41
+    },
+    {
+      "test_ID": 288,
+      "name": "normal-frame-render ............................",
+      "seconds": 14.4
+    },
+    {
+      "test_ID": 291,
+      "name": "local-surface ..................................",
+      "seconds": 0.94
+    },
+    {
+      "test_ID": 292,
+      "name": "cut-cancellation-boundaries ....................",
+      "seconds": 0.42
+    },
+    {
+      "test_ID": 293,
+      "name": "sculpt-mask-render .............................",
+      "seconds": 0.34
+    },
+    {
+      "test_ID": 294,
+      "name": "normal-frame-export ............................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 290,
+      "name": "normal-frame-uv ................................",
+      "seconds": 19.49
+    },
+    {
+      "test_ID": 295,
+      "name": "normal-frame-consumer ..........................",
+      "seconds": 14.0
+    },
+    {
+      "test_ID": 297,
+      "name": "authenticated-local-surface ....................",
+      "seconds": 0.98
+    },
+    {
+      "test_ID": 298,
+      "name": "render-buffer-reuse ............................",
+      "seconds": 5.17
+    },
+    {
+      "test_ID": 299,
+      "name": "affine-held-render .............................",
+      "seconds": 12.43
+    },
+    {
+      "test_ID": 300,
+      "name": "affine-document-render .........................",
+      "seconds": 10.46
+    },
+    {
+      "test_ID": 301,
+      "name": "document-render-capacity .......................",
+      "seconds": 8.75
+    },
+    {
+      "test_ID": 296,
+      "name": "normal-frame-vrm-consumer ......................",
+      "seconds": 46.92
+    },
+    {
+      "test_ID": 303,
+      "name": "resolution-authenticated .......................",
+      "seconds": 0.68
+    },
+    {
+      "test_ID": 304,
+      "name": "paged-storage ..................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 302,
+      "name": "document-render-buffer-reuse ...................",
+      "seconds": 12.27
+    },
+    {
+      "test_ID": 306,
+      "name": "paged-replay ...................................",
+      "seconds": 2.45
+    },
+    {
+      "test_ID": 307,
+      "name": "paged-ray ......................................",
+      "seconds": 3.39
+    },
+    {
+      "test_ID": 305,
+      "name": "paged-volume ...................................",
+      "seconds": 13.38
+    },
+    {
+      "test_ID": 308,
+      "name": "transactions-paged-state .......................",
+      "seconds": 0.87
+    },
+    {
+      "test_ID": 310,
+      "name": "source-color-render ............................",
+      "seconds": 0.46
+    },
+    {
+      "test_ID": 309,
+      "name": "native-paged-ray-cancellation ..................",
+      "seconds": 14.69
+    },
+    {
+      "test_ID": 312,
+      "name": "vrm-role-consumer ..............................",
+      "seconds": 10.82
+    },
+    {
+      "test_ID": 313,
+      "name": "object-selection ...............................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 314,
+      "name": "object-isolation ...............................",
+      "seconds": 0.11
+    },
+    {
+      "test_ID": 315,
+      "name": "object-selection-render ........................",
+      "seconds": 0.18
+    },
+    {
+      "test_ID": 316,
+      "name": "object-isolation-render ........................",
+      "seconds": 5.65
+    },
+    {
+      "test_ID": 317,
+      "name": "object-hold-edit ...............................",
+      "seconds": 0.05
+    },
+    {
+      "test_ID": 318,
+      "name": "json-binary-normal .............................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 319,
+      "name": "json-promotion-normal ..........................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 320,
+      "name": "json-binary-diagnostics ........................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 321,
+      "name": "json-promotion-diagnostics .....................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 322,
+      "name": "json-memory-normal .............................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 323,
+      "name": "json-memory-diagnostics ........................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 324,
+      "name": "json-comparison-cpp20 ..........................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 325,
+      "name": "json-comparison-cpp17 ..........................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 326,
+      "name": "json-comparison-legacy .........................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 327,
+      "name": "import-memory-flat .............................",
+      "seconds": 2.67
+    },
+    {
+      "test_ID": 328,
+      "name": "import-memory-flat-fallback ....................",
+      "seconds": 2.63
+    },
+    {
+      "test_ID": 329,
+      "name": "import-memory-textured .........................",
+      "seconds": 3.3
+    },
+    {
+      "test_ID": 330,
+      "name": "import-memory-textured-fallback ................",
+      "seconds": 3.29
+    },
+    {
+      "test_ID": 331,
+      "name": "import-memory-skinned ..........................",
+      "seconds": 4.43
+    },
+    {
+      "test_ID": 311,
+      "name": "source-color-vrm ...............................",
+      "seconds": 48.18
+    },
+    {
+      "test_ID": 332,
+      "name": "import-memory-skinned-fallback .................",
+      "seconds": 4.57
+    },
+    {
+      "test_ID": 333,
+      "name": "import-memory-atlas ............................",
+      "seconds": 66.95
+    },
+    {
+      "test_ID": 335,
+      "name": "atlas-authoring-cancellation ...................",
+      "seconds": 1.9
+    },
+    {
+      "test_ID": 336,
+      "name": "color-projection-quality .......................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 337,
+      "name": "color-preparation ..............................",
+      "seconds": 0.24
+    },
+    {
+      "test_ID": 334,
+      "name": "import-memory-atlas-fallback ...................",
+      "seconds": 67.33
+    },
+    {
+      "test_ID": 338,
+      "name": "current-color-target-packed-0-faults ...........",
+      "seconds": 27.48
+    },
+    {
+      "test_ID": 339,
+      "name": "current-color-target-packed-1-faults ...........",
+      "seconds": 30.11
+    },
+    {
+      "test_ID": 340,
+      "name": "current-color-target-packed-2-faults ...........",
+      "seconds": 31.46
+    },
+    {
+      "test_ID": 341,
+      "name": "current-color-target-packed-3-faults ...........",
+      "seconds": 37.21
+    },
+    {
+      "test_ID": 342,
+      "name": "current-color-target-precommit-0-faults ........",
+      "seconds": 41.8
+    },
+    {
+      "test_ID": 343,
+      "name": "current-color-target-precommit-1-faults ........",
+      "seconds": 42.01
+    },
+    {
+      "test_ID": 344,
+      "name": "current-color-target-precommit-2-faults ........",
+      "seconds": 42.03
+    },
+    {
+      "test_ID": 345,
+      "name": "current-color-target-precommit-3-faults ........",
+      "seconds": 41.93
+    },
+    {
+      "test_ID": 346,
+      "name": "current-color-target-precommit-4-faults ........",
+      "seconds": 45.01
+    },
+    {
+      "test_ID": 347,
+      "name": "current-color-target-precommit-5-faults ........",
+      "seconds": 45.28
+    },
+    {
+      "test_ID": 348,
+      "name": "current-color-target-precommit-6-faults ........",
+      "seconds": 38.58
+    },
+    {
+      "test_ID": 349,
+      "name": "current-color-target-precommit-7-faults ........",
+      "seconds": 37.04
+    },
+    {
+      "test_ID": 350,
+      "name": "current-color-target-encode-0-faults ...........",
+      "seconds": 12.93
+    },
+    {
+      "test_ID": 351,
+      "name": "current-color-target-encode-1-faults ...........",
+      "seconds": 13.2
+    },
+    {
+      "test_ID": 352,
+      "name": "current-color-target-encode-2-faults ...........",
+      "seconds": 13.28
+    },
+    {
+      "test_ID": 353,
+      "name": "current-color-target-encode-3-faults ...........",
+      "seconds": 13.33
+    },
+    {
+      "test_ID": 354,
+      "name": "current-color-target-encode-4-faults ...........",
+      "seconds": 13.85
+    },
+    {
+      "test_ID": 355,
+      "name": "current-color-target-encode-5-faults ...........",
+      "seconds": 16.02
+    },
+    {
+      "test_ID": 356,
+      "name": "current-color-target-encode-6-faults ...........",
+      "seconds": 16.53
+    },
+    {
+      "test_ID": 357,
+      "name": "current-color-target-encode-7-faults ...........",
+      "seconds": 19.12
+    },
+    {
+      "test_ID": 358,
+      "name": "current-color-target-encode-8-faults ...........",
+      "seconds": 18.83
+    },
+    {
+      "test_ID": 359,
+      "name": "current-color-target-encode-9-faults ...........",
+      "seconds": 18.74
+    },
+    {
+      "test_ID": 360,
+      "name": "current-color-target-encode-10-faults ..........",
+      "seconds": 18.73
+    },
+    {
+      "test_ID": 361,
+      "name": "current-color-target-encode-11-faults ..........",
+      "seconds": 18.95
+    },
+    {
+      "test_ID": 362,
+      "name": "current-color-target-encode-12-faults ..........",
+      "seconds": 19.49
+    },
+    {
+      "test_ID": 363,
+      "name": "current-color-target-encode-13-faults ..........",
+      "seconds": 23.96
+    },
+    {
+      "test_ID": 364,
+      "name": "current-color-target-encode-14-faults ..........",
+      "seconds": 22.84
+    },
+    {
+      "test_ID": 365,
+      "name": "current-color-target-encode-15-faults ..........",
+      "seconds": 24.29
+    },
+    {
+      "test_ID": 366,
+      "name": "current-color-target-decode-0-faults ...........",
+      "seconds": 31.24
+    },
+    {
+      "test_ID": 367,
+      "name": "current-color-target-decode-1-faults ...........",
+      "seconds": 29.79
+    },
+    {
+      "test_ID": 368,
+      "name": "current-color-target-decode-2-faults ...........",
+      "seconds": 30.42
+    },
+    {
+      "test_ID": 369,
+      "name": "current-color-target-decode-3-faults ...........",
+      "seconds": 27.0
+    },
+    {
+      "test_ID": 370,
+      "name": "current-color-target-decode-4-faults ...........",
+      "seconds": 25.07
+    },
+    {
+      "test_ID": 371,
+      "name": "current-color-target-decode-5-faults ...........",
+      "seconds": 28.11
+    },
+    {
+      "test_ID": 372,
+      "name": "current-color-target-decode-6-faults ...........",
+      "seconds": 29.05
+    },
+    {
+      "test_ID": 373,
+      "name": "current-color-target-decode-7-faults ...........",
+      "seconds": 30.53
+    },
+    {
+      "test_ID": 374,
+      "name": "current-color-target-decode-8-faults ...........",
+      "seconds": 32.15
+    },
+    {
+      "test_ID": 375,
+      "name": "current-color-target-decode-9-faults ...........",
+      "seconds": 35.03
+    },
+    {
+      "test_ID": 376,
+      "name": "current-color-target-decode-10-faults ..........",
+      "seconds": 30.31
+    },
+    {
+      "test_ID": 377,
+      "name": "current-color-target-decode-11-faults ..........",
+      "seconds": 29.15
+    },
+    {
+      "test_ID": 378,
+      "name": "current-color-target-decode-12-faults ..........",
+      "seconds": 29.16
+    },
+    {
+      "test_ID": 379,
+      "name": "current-color-target-decode-13-faults ..........",
+      "seconds": 29.42
+    },
+    {
+      "test_ID": 380,
+      "name": "current-color-target-decode-14-faults ..........",
+      "seconds": 29.4
+    },
+    {
+      "test_ID": 382,
+      "name": "current-color-target-interactions ..............",
+      "seconds": 0.17
+    },
+    {
+      "test_ID": 383,
+      "name": "current-color-target-preparation ...............",
+      "seconds": 0.31
+    },
+    {
+      "test_ID": 384,
+      "name": "bake-caller-admission ..........................",
+      "seconds": 6.38
+    },
+    {
+      "test_ID": 385,
+      "name": "bake-color-controls ............................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 387,
+      "name": "colored-bake-vrm-render ........................",
+      "seconds": 10.52
+    },
+    {
+      "test_ID": 381,
+      "name": "current-color-target-decode-15-faults ..........",
+      "seconds": 32.67
+    },
+    {
+      "test_ID": 388,
+      "name": "colored-bake-render ............................",
+      "seconds": 7.77
+    },
+    {
+      "test_ID": 389,
+      "name": "color-preparation-render .......................",
+      "seconds": 1.29
+    },
+    {
+      "test_ID": 391,
+      "name": "polygon-scene-archive ..........................",
+      "seconds": 0.05
+    },
+    {
+      "test_ID": 392,
+      "name": "polygon-scene-faults ...........................",
+      "seconds": 0.38
+    },
+    {
+      "test_ID": 393,
+      "name": "shapekey-sculpt ................................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 394,
+      "name": "shapekey-strokes ...............................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 395,
+      "name": "shapekey-allocation ............................",
+      "seconds": 0.66
+    },
+    {
+      "test_ID": 396,
+      "name": "shapekey-document ..............................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 397,
+      "name": "shapekey-authoring .............................",
+      "seconds": 2.33
+    },
+    {
+      "test_ID": 398,
+      "name": "normal-bake-frame-authoring ....................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 399,
+      "name": "normal-bake-frame-encoding .....................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 400,
+      "name": "normal-preparation-native ......................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 401,
+      "name": "normal-preparation-render ......................",
+      "seconds": 0.41
+    },
+    {
+      "test_ID": 402,
+      "name": "normal-preparation-vrm .........................",
+      "seconds": 4.62
+    },
+    {
+      "test_ID": 403,
+      "name": "bake-normal-controller .........................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 390,
+      "name": "bake-color-openxr ..............................",
+      "seconds": 24.9
+    },
+    {
+      "test_ID": 404,
+      "name": "affine-contact-openxr ..........................",
+      "seconds": 15.73
+    },
+    {
+      "test_ID": 406,
+      "name": "prepared-normal-shapes .........................",
+      "seconds": 0.08
+    },
+    {
+      "test_ID": 407,
+      "name": "prepared-normal-shape-render ...................",
+      "seconds": 1.3
+    },
+    {
+      "test_ID": 408,
+      "name": "prepared-normal-shapes-faults ..................",
+      "seconds": 2.7
+    },
+    {
+      "test_ID": 409,
+      "name": "prepared-normal-shape-strokes ..................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 410,
+      "name": "prepared-normal-vroid ..........................",
+      "seconds": 4.41
+    },
+    {
+      "test_ID": 405,
+      "name": "object-selection-openxr ........................",
+      "seconds": 13.5
+    },
+    {
+      "test_ID": 412,
+      "name": "normal-uv-projection ...........................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 413,
+      "name": "normal-uv-adoption .............................",
+      "seconds": 0.06
+    },
+    {
+      "test_ID": 414,
+      "name": "normal-uv-document .............................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 415,
+      "name": "uv-worker-cancellation .........................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 416,
+      "name": "normal-uv-render ...............................",
+      "seconds": 5.86
+    },
+    {
+      "test_ID": 417,
+      "name": "post-uv-avatar .................................",
+      "seconds": 26.74
+    },
+    {
+      "test_ID": 411,
+      "name": "prepared-normal-vroid-render ...................",
+      "seconds": 82.93
+    },
+    {
+      "test_ID": 419,
+      "name": "prepared-keys-after-uv .........................",
+      "seconds": 0.23
+    },
+    {
+      "test_ID": 420,
+      "name": "prepared-keys-after-uv-render ..................",
+      "seconds": 4.35
+    },
+    {
+      "test_ID": 421,
+      "name": "post-uv-key-strokes ............................",
+      "seconds": 0.24
+    },
+    {
+      "test_ID": 418,
+      "name": "post-uv-avatar-render ..........................",
+      "seconds": 91.21
+    },
+    {
+      "test_ID": 423,
+      "name": "normal-sampling-domain .........................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 424,
+      "name": "normal-sampling-replay .........................",
+      "seconds": 0.17
+    },
+    {
+      "test_ID": 422,
+      "name": "post-uv-key-faults .............................",
+      "seconds": 42.04
+    },
+    {
+      "test_ID": 425,
+      "name": "normal-domain-render ...........................",
+      "seconds": 2.7
+    },
+    {
+      "test_ID": 427,
+      "name": "uv-accepted-save ...............................",
+      "seconds": 0.11
+    },
+    {
+      "test_ID": 428,
+      "name": "normal-domain-document .........................",
+      "seconds": 0.2
+    },
+    {
+      "test_ID": 429,
+      "name": "normal-domain-transitions ......................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 430,
+      "name": "normal-domain-archive-faults ...................",
+      "seconds": 56.65
+    },
+    {
+      "test_ID": 426,
+      "name": "normal-domain-avatar ...........................",
+      "seconds": 106.09
+    },
+    {
+      "test_ID": 432,
+      "name": "normal-color-uv-render .........................",
+      "seconds": 77.0
+    },
+    {
+      "test_ID": 433,
+      "name": "paint-sampling .................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 434,
+      "name": "paint-sampling-grid ............................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 435,
+      "name": "paint-sampling-archive .........................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 431,
+      "name": "normal-color-uv ................................",
+      "seconds": 151.25
+    },
+    {
+      "test_ID": 437,
+      "name": "normal-validation-geometry .....................",
+      "seconds": 0.09
+    },
+    {
+      "test_ID": 438,
+      "name": "color-paint-sampling ...........................",
+      "seconds": 36.91
+    },
+    {
+      "test_ID": 439,
+      "name": "projection-native ..............................",
+      "seconds": 0.16
+    },
+    {
+      "test_ID": 440,
+      "name": "projection-controller ..........................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 441,
+      "name": "projection-render ..............................",
+      "seconds": 0.42
+    },
+    {
+      "test_ID": 442,
+      "name": "projection-held ................................",
+      "seconds": 0.05
+    },
+    {
+      "test_ID": 443,
+      "name": "projection-allocation ..........................",
+      "seconds": 1.53
+    },
+    {
+      "test_ID": 444,
+      "name": "projection-load ................................",
+      "seconds": 0.12
+    },
+    {
+      "test_ID": 436,
+      "name": "material-validation-dag ........................",
+      "seconds": 85.11
+    },
+    {
+      "test_ID": 446,
+      "name": "modal-selection-controls .......................",
+      "seconds": 1.69
+    },
+    {
+      "test_ID": 445,
+      "name": "projection-openxr ..............................",
+      "seconds": 26.84
+    },
+    {
+      "test_ID": 447,
+      "name": "pbr-preview ....................................",
+      "seconds": 7.96
+    },
+    {
+      "test_ID": 449,
+      "name": "pbr-preview-openxr .............................",
+      "seconds": 31.8
+    },
+    {
+      "test_ID": 450,
+      "name": "normal-domain-glb-current ......................",
+      "seconds": 5.72
+    },
+    {
+      "test_ID": 448,
+      "name": "pbr-preview-avatar .............................",
+      "seconds": 98.76
+    },
+    {
+      "test_ID": 452,
+      "name": "normal-domain-transition-glb ...................",
+      "seconds": 2.09
+    },
+    {
+      "test_ID": 453,
+      "name": "export-corner-coordinates ......................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 454,
+      "name": "source-extra-uv ................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 455,
+      "name": "source-extra-uv-closure ........................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 456,
+      "name": "source-extra-uv-faults .........................",
+      "seconds": 0.29
+    },
+    {
+      "test_ID": 457,
+      "name": "source-extra-uv-render .........................",
+      "seconds": 3.7
+    },
+    {
+      "test_ID": 458,
+      "name": "source-extra-uv-import .........................",
+      "seconds": 6.0
+    },
+    {
+      "test_ID": 459,
+      "name": "source-extra-uv-generated ......................",
+      "seconds": 0.29
+    },
+    {
+      "test_ID": 460,
+      "name": "source-extra-uv-roles ..........................",
+      "seconds": 4.19
+    },
+    {
+      "test_ID": 461,
+      "name": "source-extra-uv-raw ............................",
+      "seconds": 1.65
+    },
+    {
+      "test_ID": 451,
+      "name": "normal-domain-avatar-glb .......................",
+      "seconds": 85.8
+    },
+    {
+      "test_ID": 462,
+      "name": "source-extra-uv-atlas-openxr ...................",
+      "seconds": 36.99
+    },
+    {
+      "test_ID": 463,
+      "name": "source-extra-uv-raw-openxr .....................",
+      "seconds": 34.79
+    },
+    {
+      "test_ID": 465,
+      "name": "paint-sampling-document ........................",
+      "seconds": 29.1
+    },
+    {
+      "test_ID": 466,
+      "name": "lossless-prepared-uv ...........................",
+      "seconds": 23.28
+    },
+    {
+      "test_ID": 467,
+      "name": "normal-preview-seal ............................",
+      "seconds": 6.05
+    },
+    {
+      "test_ID": 468,
+      "name": "normal-preview-current .........................",
+      "seconds": 3.28
+    },
+    {
+      "test_ID": 469,
+      "name": "normal-preview-tamper ..........................",
+      "seconds": 2.79
+    },
+    {
+      "test_ID": 470,
+      "name": "rig-fit-authoring ..............................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 471,
+      "name": "rig-fit-controller .............................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 472,
+      "name": "rig-fit-faults .................................",
+      "seconds": 0.56
+    },
+    {
+      "test_ID": 473,
+      "name": "rig-fit-import .................................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 474,
+      "name": "rig-fit-render .................................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 475,
+      "name": "rig-fit-openxr .................................",
+      "seconds": 20.2
+    },
+    {
+      "test_ID": 476,
+      "name": "pbr-history-accounting .........................",
+      "seconds": 0.16
+    },
+    {
+      "test_ID": 477,
+      "name": "fbx-named-uv-render ............................",
+      "seconds": 0.59
+    },
+    {
+      "test_ID": 478,
+      "name": "fbx-options-deformation ........................",
+      "seconds": 1.02
+    },
+    {
+      "test_ID": 464,
+      "name": "paint-sampling-render ..........................",
+      "seconds": 95.5
+    },
+    {
+      "test_ID": 480,
+      "name": "softfloat64-host ...............................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 481,
+      "name": "sparse-resample-host ...........................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 482,
+      "name": "resample-backend ...............................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 483,
+      "name": "resample-native-contract .......................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 484,
+      "name": "source-extra-uv-key-render .....................",
+      "seconds": 4.55
+    },
+    {
+      "test_ID": 485,
+      "name": "source-extra-uv-key-admission ..................",
+      "seconds": 0.09
+    },
+    {
+      "test_ID": 486,
+      "name": "retopo-edges ...................................",
+      "seconds": 0.21
+    },
+    {
+      "test_ID": 487,
+      "name": "retopo-edges-allocation ........................",
+      "seconds": 0.95
+    },
+    {
+      "test_ID": 488,
+      "name": "resample-quality-aggregate .....................",
+      "seconds": 0.23
+    },
+    {
+      "test_ID": 489,
+      "name": "resolution-quality-integration .................",
+      "seconds": 0.7
+    },
+    {
+      "test_ID": 490,
+      "name": "resolution-quality-host-aggregate ..............",
+      "seconds": 1.38
+    },
+    {
+      "test_ID": 491,
+      "name": "paint-composite-compute ........................",
+      "seconds": 0.33
+    },
+    {
+      "test_ID": 492,
+      "name": "paint-composite-native .........................",
+      "seconds": 0.66
+    },
+    {
+      "test_ID": 493,
+      "name": "paint-composite-allocation .....................",
+      "seconds": 1.36
+    },
+    {
+      "test_ID": 494,
+      "name": "paint-composite-render .........................",
+      "seconds": 9.84
+    },
+    {
+      "test_ID": 495,
+      "name": "skin-affine-authoring ..........................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 496,
+      "name": "skin-affine-allocation .........................",
+      "seconds": 0.15
+    },
+    {
+      "test_ID": 497,
+      "name": "skin-affine-controller .........................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 498,
+      "name": "skin-affine-export .............................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 499,
+      "name": "rig-rest-pose ..................................",
+      "seconds": 0.07
+    },
+    {
+      "test_ID": 500,
+      "name": "rig-rest-export ................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 501,
+      "name": "rig-rest-authoring .............................",
+      "seconds": 1.81
+    },
+    {
+      "test_ID": 502,
+      "name": "rig-rest-faults ................................",
+      "seconds": 0.31
+    },
+    {
+      "test_ID": 503,
+      "name": "rig-rest-render ................................",
+      "seconds": 0.1
+    },
+    {
+      "test_ID": 479,
+      "name": "source24-26-integration ........................",
+      "seconds": 35.27
+    },
+    {
+      "test_ID": 505,
+      "name": "source-rest-graph ..............................",
+      "seconds": 1.35
+    },
+    {
+      "test_ID": 506,
+      "name": "source-rest-plan ...............................",
+      "seconds": 3.3
+    },
+    {
+      "test_ID": 504,
+      "name": "rig-rest-openxr ................................",
+      "seconds": 18.24
+    },
+    {
+      "test_ID": 507,
+      "name": "source-rest-scene ..............................",
+      "seconds": 5.09
+    },
+    {
+      "test_ID": 508,
+      "name": "source-rest-document ...........................",
+      "seconds": 7.53
+    },
+    {
+      "test_ID": 509,
+      "name": "source-rest-export-graph .......................",
+      "seconds": 7.76
+    },
+    {
+      "test_ID": 510,
+      "name": "source-rigid-bind-rest .........................",
+      "seconds": 5.11
+    },
+    {
+      "test_ID": 512,
+      "name": "vrm-rest-metadata ..............................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 513,
+      "name": "vrm-rest-length-guard ..........................",
+      "seconds": 13.92
+    },
+    {
+      "test_ID": 511,
+      "name": "source-rest-export .............................",
+      "seconds": 25.5
+    },
+    {
+      "test_ID": 515,
+      "name": "vrm-rest-source-worker .........................",
+      "seconds": 11.13
+    },
+    {
+      "test_ID": 514,
+      "name": "vrm-rest-source-export .........................",
+      "seconds": 66.68
+    },
+    {
+      "test_ID": 516,
+      "name": "vrm-rest-source-render .........................",
+      "seconds": 57.3
+    },
+    {
+      "test_ID": 518,
+      "name": "vrm-rest-reparent-worker .......................",
+      "seconds": 10.82
+    },
+    {
+      "test_ID": 519,
+      "name": "vrm-rest-reparent-render .......................",
+      "seconds": 21.28
+    },
+    {
+      "test_ID": 520,
+      "name": "bone-metadata ..................................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 521,
+      "name": "bone-length-space ..............................",
+      "seconds": 12.82
+    },
+    {
+      "test_ID": 517,
+      "name": "vrm-rest-reparent-source .......................",
+      "seconds": 60.94
+    },
+    {
+      "test_ID": 523,
+      "name": "bone-length-creator-basis ......................",
+      "seconds": 23.63
+    },
+    {
+      "test_ID": 524,
+      "name": "humanoid-placement .............................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 525,
+      "name": "bone-length-worker .............................",
+      "seconds": 12.4
+    },
+    {
+      "test_ID": 526,
+      "name": "bone-length-render .............................",
+      "seconds": 38.18
+    },
+    {
+      "test_ID": 527,
+      "name": "bone-length-glb ................................",
+      "seconds": 0.04
+    },
+    {
+      "test_ID": 528,
+      "name": "skin-source-pose ...............................",
+      "seconds": 0.03
+    },
+    {
+      "test_ID": 529,
+      "name": "rig-fit-metric .................................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 530,
+      "name": "source-node-extras .............................",
+      "seconds": 0.0
+    },
+    {
+      "test_ID": 531,
+      "name": "source-native-hints ............................",
+      "seconds": 137.67
+    },
+    {
+      "test_ID": 532,
+      "name": "source-decoded-images ..........................",
+      "seconds": 0.01
+    },
+    {
+      "test_ID": 533,
+      "name": "source-union-version ...........................",
+      "seconds": 0.02
+    },
+    {
+      "test_ID": 534,
+      "name": "source-union-authoring .........................",
+      "seconds": 39.69
+    },
+    {
+      "test_ID": 522,
+      "name": "bone-length-roundtrip ..........................",
+      "seconds": 264.02
+    },
+    {
+      "test_ID": 535,
+      "name": "native-shape-sampling ..........................",
+      "seconds": 207.0
+    },
+    {
+      "test_ID": 537,
+      "name": "key-uv-commutation .............................",
+      "seconds": 98.97
+    },
+    {
+      "test_ID": 539,
+      "name": "vrm1-export-worker .............................",
+      "seconds": 0.23
+    },
+    {
+      "test_ID": 540,
+      "name": "vrm1-source-replay .............................",
+      "seconds": 0.24
+    },
+    {
+      "test_ID": 536,
+      "name": "source-union-workflow ..........................",
+      "seconds": 317.64
+    }
+  ],
+  "recorded_utc": "2026-11-03T15:57:21.073731+00:00",
+  "scope": "Complete540 registered CPU CTest command results from fresh current published ALL-target build. SoftwareGL/private display/syntheticXR only; full wrapper terminated143, actual CTest passed summary preserved and independent post-run hash audit recovered1905 exact inputs.",
+  "published_before_this_doc_commit": "db8fc94cc12d5b468389b3aff71cbd35ce6caac4",
+  "runtime_sources_byte_identical_to_published": true,
+  "artifact_hashes": {
+    "artifacts/vrm1-vendors-fc562/artifacts/unlit-cpu-regression/ctest.log": "a277a3992b45d45312d464e8949407beddb003e2d3096021b4b1b3b8b73cbfaf",
+    "artifacts/vrm1-vendors-fc562/artifacts/unlit-cpu-regression/registered-tests.json": "0703bbecc5f0322167a8428b2504cc65fcfb543d8adc9b3c7de5adf99ac66659",
+    "artifacts/vrm1-vendors-fc562/artifacts/unlit-cpu-regression/before.json": "cf415233857874fd41988355ed76283f3d965831ccfe8be12ebc1e331b7b76f1",
+    "artifacts/vrm1-vendors-fc562/artifacts/unlit-cpu-regression/after-recovered.json": "cf415233857874fd41988355ed76283f3d965831ccfe8be12ebc1e331b7b76f1",
+    "artifacts/vrm1-vendors-fc562/artifacts/unlit-cpu-regression/status.json": "308caa61680abd20a3d996a7cfdc1db180b8aaa570bd18f3cd86849f2ca2490f",
+    "artifacts/vrm1-vendors-fc562/artifacts/unlit-cpu-regression/recovery.json": "21f4643670488737e10af1f21ff0435f8e49a606e13b1ba8def3a09eb2cf55be"
+  },
+  "physical_headset": false,
+  "system_install": false,
+  "session_restart": false
+}
