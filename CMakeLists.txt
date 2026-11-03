@@ -2943,3 +2943,8 @@ target_include_directories(dome-sculpt-key-mirror-relative-owning-test PRIVATE s
 target_link_libraries(dome-sculpt-key-mirror-relative-owning-test PRIVATE dome-sculpt-core)
 target_link_options(dome-sculpt-key-mirror-relative-owning-test PRIVATE "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE")
 add_test(NAME key-mirror-relative-owning COMMAND dome-sculpt-key-mirror-relative-owning-test ${CMAKE_CURRENT_BINARY_DIR}/key-mirror-relative-owning)
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-key-mirror-relative-render-test tests/key-mirror-relative-render.cpp)
+  target_include_directories(dome-sculpt-key-mirror-relative-render-test PRIVATE src tests third_party/cgltf third_party/desktop)
+  target_link_libraries(dome-sculpt-key-mirror-relative-render-test PRIVATE dome-sculpt-render)
+endif()
