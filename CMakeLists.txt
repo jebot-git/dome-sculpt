@@ -675,6 +675,9 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR)
       add_test(NAME source-paint-${source_paint_component} COMMAND dome-sculpt-source-paint-${source_paint_component}-test ${CMAKE_CURRENT_BINARY_DIR}/source-paint-${source_paint_component})
       set_tests_properties(source-paint-${source_paint_component} PROPERTIES TIMEOUT 180 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
     endforeach()
+    add_executable(dome-sculpt-source-paint-ui-test tests/source-paint-ui.cpp)
+    target_include_directories(dome-sculpt-source-paint-ui-test PRIVATE src)
+    target_link_libraries(dome-sculpt-source-paint-ui-test PRIVATE dome-sculpt-render)
     # Link the actual EGL owner against a deterministic vendor API supplied by
     # the fixture. No graphics device or copied lifecycle implementation.
     add_executable(dome-sculpt-native-graphics-lifetime-test
