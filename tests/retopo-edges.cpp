@@ -103,7 +103,7 @@ int main(int argc,char **argv)try{
   std::filesystem::create_directories(destination);for(auto name:{"strip.dsculpt","strip.glb"})std::filesystem::copy_file(directory/name,std::filesystem::path(destination)/name,std::filesystem::copy_options::overwrite_existing);
  }
  std::filesystem::remove_all(directory);
- Document xr;xr.replace(source.snapshot());Controller hand(xr);hand.send(0,0,0,true);hand.send();hand.sector(8);hand.sector(9);hand.sector(11);require(xr.frame().state->menu_page==16,"Controller navigates to Retopology page");hand.sector(0);settle(xr);
+ Document xr;xr.replace(source.snapshot());require(xr.wait_mesh(),"Current reference mesh ready before actual tracked pressure");Controller hand(xr);hand.send(0,0,0,true);hand.send();hand.sector(8);hand.sector(9);hand.sector(11);require(xr.frame().state->menu_page==16,"Controller navigates to Retopology page");hand.sector(0);settle(xr);
  for(auto p:std::array<Vec3,4>{{{-.1f,-.1f,0},{-.1f,.1f,0},{.1f,.1f,0},{.1f,-.1f,0}}})hand.point(p);
  hand.menu();require(xr.frame().state->menu_enabled[3],"Four selected endpoints enable contextual bridge on controller page");hand.sector(3);settle(xr);
  require(xr.frame().state->retopology->topology->faces().size()==3,"Actual joystick Connect/Bridge action builds outward bridge");
