@@ -6,10 +6,6 @@ namespace dome::detail {
 // Detached geometry only: no frame/material/paint authority or editable seal.
 // Triangle indices always refer to the real immutable input mesh. An interior
 // point is not a new raw source vertex identity.
-// Explicit object-local X plane. It never supplies a direction-vector offset.
-struct KeyMirrorPlane {
-  double offset = 0;
-};
 struct MirrorSurfacePoint {
   uint32_t triangle = 0;
   std::array<double, 3> barycentric{};

@@ -2931,3 +2931,9 @@ if(BUILD_TESTING)
   add_test(NAME key-hdr-source-integration COMMAND dome-sculpt-key-hdr-source-integration-test ${CMAKE_CURRENT_BINARY_DIR}/key-hdr-source-integration)
   set_tests_properties(key-hdr-source-integration PROPERTIES TIMEOUT 1200)
 endif()
+
+# Detached explicit frame-relative kernel; this is not material/Scene29 admission.
+add_executable(dome-sculpt-key-mirror-relative-test tests/key-mirror-relative.cpp src/key-mirror-relative.cpp src/key-mirror-correspondence.cpp)
+target_include_directories(dome-sculpt-key-mirror-relative-test PRIVATE src)
+target_link_libraries(dome-sculpt-key-mirror-relative-test PRIVATE dome-sculpt-core)
+add_test(NAME key-mirror-relative-kernel COMMAND dome-sculpt-key-mirror-relative-test)

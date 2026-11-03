@@ -11,11 +11,15 @@ struct KeyMirrorLimits {
   size_t max_bytes=128*1024*1024,max_work=64*1024*1024;
   std::function<bool()> cancelled;
 };
+// Explicit object-local X plane; direction vectors never receive its offset.
+struct KeyMirrorPlane { double offset=0; };
 struct KeyMirrorCorrespondence {
   std::vector<uint32_t> corners,vertices;
   double maximum_rest_error=0;
   float tolerance=0;
 };
+KeyMirrorCorrespondence reflected_key_correspondence(const Mesh &,KeyMirrorPlane,float tolerance,
+    const KeyMirrorLimits & = {});
 KeyMirrorCorrespondence reflected_key_correspondence(const Mesh &,float tolerance,
     const KeyMirrorLimits & = {});
 // Explicit logical CORNER coordinates of this actual named role. An owning
