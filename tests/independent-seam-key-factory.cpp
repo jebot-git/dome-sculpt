@@ -5,6 +5,7 @@
 #include "normal-frame-runtime.hpp"
 #include "shapekey-source-uv.hpp"
 #include <chrono>
+#include <set>
 #include "normal-projection-identity.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/paint-sampling.hpp"
