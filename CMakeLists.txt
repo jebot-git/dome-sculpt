@@ -2612,7 +2612,15 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
     "-Wl,--wrap=_ZN4dome16ShapeSculptDraft5stampERKNS_5BrushERKSt8functionIFbvEE"
     "-Wl,--wrap=_ZN4dome20MaterialSurfaceQueryC1ERKNS_4MeshESt4spanIKNS_12SurfaceRangeELm18446744073709551615EERKSt8functionIFbvEES4_IKSt5arrayIfLm4EELm18446744073709551615EENS_22PaintCornerCoordinatesE")
   add_test(NAME native-shape-sampling COMMAND dome-sculpt-native-shape-sampling-test ${CMAKE_CURRENT_BINARY_DIR}/native-shape-sampling)
-  set_tests_properties(native-shape-sampling PROPERTIES TIMEOUT 1800 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+  # Full source/quality replay took about 50 minutes with wholly owned O1
+  # ASan/UBSan archives; retain the optimized-build budget when uninstrumented.
+  set(_native_shape_sampling_timeout 1800)
+  string(TOUPPER "${CMAKE_BUILD_TYPE}" _native_shape_sampling_config)
+  set(_native_shape_sampling_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${_native_shape_sampling_config}}")
+  if(_native_shape_sampling_flags MATCHES "-fsanitize=[^ ]*(address|undefined)")
+    set(_native_shape_sampling_timeout 6000)
+  endif()
+  set_tests_properties(native-shape-sampling PROPERTIES TIMEOUT ${_native_shape_sampling_timeout} ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
