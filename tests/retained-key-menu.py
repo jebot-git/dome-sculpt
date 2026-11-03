@@ -125,6 +125,26 @@ async def main():
    d.sync();await wait(lambda:pixels(dialog).tobytes()!=initial_dialog.tobytes());scrolled=pixels(dialog);scrolled.save(out/'new-key-scrolled.png');check(scrolled.crop((0,g.height-85,g.width,g.height)).tobytes()==initial_dialog.crop((0,g.height-85,g.width,g.height)).tobytes(),'Compact content scrolls while genuine Cancel/Apply controls remain fixed')
   tap(dialog,g.width*.75,g.height-(46 if compact else 32)*2+24);await wait(lambda:named('New shapekey') is None);created=await save(len(targets(original))+1);await ready('Duplicate shapekey...');preserve(original,created,'Native Create');created_frames=current_frames(created);(out/'created.json').write_text(json.dumps(created))
   await command('Undo');check(await save()==original,'Universal Undo restores the exact pre-Create retained source and domain pools');await command('Redo');check(await save()==created,'Universal Redo restores the exact created target, frames and ownership graph')
+  # Undo clamps the ephemeral selection when it removes the new slot; Redo
+  # restores data, not selection. Select the existing slot through the real
+  # editor rather than assuming the last-created target remained selected.
+  async def select_existing(label):
+   mark('native-existing-target-selection-'+label);await command('Rename shapekey...');dialog=await wait(lambda:named('Rename shapekey'));g=dialog.get_geometry();row=46 if compact else 32
+   visible={w.id for w in d.screen().root.query_tree().children if w.get_attributes().map_state==X.IsViewable}
+   pixels(dialog).save(out/('target-choice-before-'+label+'.png'));tap(dialog,g.width*.5,row*4 if compact else row*3+row*.35)
+   def popup_window():
+    for w in d.screen().root.query_tree().children:
+     try:
+      a=w.get_attributes()
+      if w.id not in visible and a.map_state==X.IsViewable and a.override_redirect:return w
+     except error.BadWindow:pass
+   popup=await wait(popup_window,10,'native Source target popup');pg=popup.get_geometry();pixels(popup).save(out/('target-popup-'+label+'.png'));tap(popup,pg.width*.5,pg.height*.75)
+   def popup_closed():
+    try:return popup.get_attributes().map_state!=X.IsViewable
+    except error.BadWindow:return True
+   await wait(popup_closed)
+   check(named('Rename shapekey') is not None,'Existing target selection clicks the real Source target popup without accepting or dismissing the modal');pixels(dialog).save(out/('selected-existing-target-'+label+'.png'));(out/'selected-existing-target.json').write_text(json.dumps({'index':len(targets(created))-1,'name':targets(created)[-1]['name']}));tap(dialog,g.width*.75,g.height-row*2+24);await wait(lambda:named('Rename shapekey') is None);check(await save()==created,'Selecting the existing new key with its unchanged name preserves the exact complete native Scene')
+  await select_existing('history');await command('Undo');check(await save()==original,'Unchanged-name selection adds no Undo entry: one Undo still removes the real Create');await command('Redo');check(await save()==created,'Redo after the selection-only history check restores the exact real Create');await select_existing('for-stroke')
   mark('native-selected-key-replace');await command('Sculpt selected shapekey');check(await save()==created,'Entering actual selected-key sculpt mode changes no saved weights, paint or source')
   for _ in range(8):await command('Larger brush')
   await asyncio.sleep(.2);g=window.get_geometry();before=pixels(window);before.save(out/'before-stroke.png');view=before.crop((int(g.width*.1),35,int(g.width*.9),g.height-55));mask=Image.new('L',view.size);mask.putdata([255 if max(p)-min(p)>18 and max(p)>70 else 0 for p in view.getdata()]);bounds=mask.getbbox();check(bounds is not None,'Actual retained-domain keyed mesh has a visible colored native paint surface');x0,y0,x1,y1=bounds;x0+=int(g.width*.1);x1+=int(g.width*.1);y0+=35;y1+=35
