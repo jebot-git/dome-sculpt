@@ -1,0 +1,81 @@
+{
+  "source": "bb594a4 (runtime0b44b74; tests2bf1243/bb594a4)",
+  "status": "Private functional subset; NOT ready for main admission. Proved aggregate frame preallocation gap remains blocking.",
+  "release": {
+    "correspondence": 54,
+    "owning_native_restart_restore_cancel": 92,
+    "named_command_regression": 141,
+    "persistent_mirror_cpp_denials": 5369,
+    "fault_checks": 3
+  },
+  "owned_sanitizer": {
+    "C_and_CXX": "fresh whole owned core/support O1 ASan UBSan leak enabled",
+    "results": [
+      {
+        "name": "correspondence",
+        "exit_code": 0,
+        "seconds": 0.0764577109948732
+      },
+      {
+        "name": "owning",
+        "exit_code": 0,
+        "seconds": 1.2428514840139542
+      },
+      {
+        "name": "faults",
+        "exit_code": 0,
+        "seconds": 63.8542713150091
+      },
+      {
+        "name": "commands",
+        "exit_code": 0,
+        "seconds": 9.775212134001777
+      }
+    ],
+    "all_sources_archives_and_binaries_unchanged": true,
+    "captured_source_inputs": 1467,
+    "captured_binary_inputs": 11
+  },
+  "legacy_writer_byte_equality": [
+    {
+      "name": "prepared-record2.dsculpt",
+      "old": "a0225b9268891e0483496de860ffe442abf44e3ba38f257f7bb5108a05b27688",
+      "current": "a0225b9268891e0483496de860ffe442abf44e3ba38f257f7bb5108a05b27688",
+      "equal": true
+    },
+    {
+      "name": "generic-record2.dsculpt",
+      "old": "221c85bc0e9dfad378e560284f5fb2e6f00d5e164352044106bdee222e005f22",
+      "current": "221c85bc0e9dfad378e560284f5fb2e6f00d5e164352044106bdee222e005f22",
+      "equal": true
+    }
+  ],
+  "prior_reader_negative": {
+    "exit_code": 1,
+    "genuine_prior_record2_reader_refuses_record3": true,
+    "inputs_unchanged": true,
+    "hashes": {
+      "../seam-key-commands-cab6451/build-commands/dome-sculpt-prepared-normal-shapes-test": "2d1ec8e6a1c4fedff8d3511a4d559654187b769e3989e968d10b5e5496d285a9",
+      "artifacts/mirror-owning/output-r2/0-1.dsculpt": "f3863b7b6fa14ffe02693e3cd6792e85be079ce26c2fd9feb0f75c0d5b11df21"
+    }
+  },
+  "quota_gap": {
+    "source_frame_bytes": 73920000,
+    "vertices": 10000,
+    "corners": 24000,
+    "before_targets": 127,
+    "attempted_targets": 128,
+    "cumulative_standard_new_bytes_before_rejection": 1170669387,
+    "standard_new_calls": 164377,
+    "actual_error": "Native normal frame payload exceeds 128 MiB",
+    "scene_exact": true,
+    "note": "Cumulative allocation traffic, not peak RSS. Aggregate prospective archive preflight must move ahead of frame/deformation copies."
+  },
+  "remaining": [
+    "exact recursive aggregate future-frame/deformation preflight including replacement exclusions",
+    "prepared-normal and dual paint-domain Mirror ownership proof",
+    "independent Mirror GLB/VRM pixels, native UI and full coherent current-main integration",
+    "nonmatching triangulation/refinement, ambiguous coincidences, asymmetric welds, mixed tangent-axis/base parity conversions",
+    "actual assets and full goal remain required"
+  ]
+}
