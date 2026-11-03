@@ -1,0 +1,57 @@
+{
+  "base": "cab4669",
+  "status": "private native-capture development overlay; broader qualification incomplete",
+  "public_abi_changed": false,
+  "release_assertions": 395,
+  "sanitizer_assertions": 395,
+  "old_author_member_extracted": false,
+  "native_capture_pixel_errors": {
+    "non_affine_uv2_plane": 0,
+    "non_affine_uv2_nonplanar_height_0_65": 1
+  },
+  "preserved_initial_mikk_error": 3,
+  "unchanged_pixel_bound": 2,
+  "regressions": [
+    {
+      "test": "shapekey-authoring",
+      "variant": "build",
+      "exit_code": 0
+    },
+    {
+      "test": "shapekey-strokes",
+      "variant": "build",
+      "exit_code": 0
+    },
+    {
+      "test": "prepared-normal-shapes",
+      "variant": "build",
+      "exit_code": 0
+    },
+    {
+      "test": "shapekey-authoring",
+      "variant": "build-sanitize",
+      "exit_code": 0
+    },
+    {
+      "test": "shapekey-strokes",
+      "variant": "build-sanitize",
+      "exit_code": 0
+    },
+    {
+      "test": "prepared-normal-shapes",
+      "variant": "build-sanitize",
+      "exit_code": 0
+    }
+  ],
+  "sha256": {
+    "src/shapekey-authoring.cpp": "6cccaa1828972088b440a7f83a33342cc5a509b3005d5135c0083a6e0ec58072",
+    "tests/source-extra-uv-key-render.cpp": "1ccfc48eac45b48826ed21f1bb3fc3f3c41c50fff5992b2a43720d2e5e720195",
+    "artifacts/native-skew-probe.log": "18d1e37257cba293521921d3cc7f34973662898f36e9ce54132cfd22f8c14b44",
+    "artifacts/native-skew-sanitize.log": "18d1e37257cba293521921d3cc7f34973662898f36e9ce54132cfd22f8c14b44",
+    "artifacts/native-regressions.json": "f283492d38c2dded979dee8359519ffb266517ec781b708fa6311f00bfaadc7d",
+    "artifacts/native-link.map": "5ee7346f4155f5e2c81ab91a556ced834d59fa42f4f74a1026619ca304538415",
+    "artifacts/native-link-sanitize.map": "91be9239bb1a64aa2998ae6fe5617f122d9c80023a950aa5dc472bf1720bbb2b",
+    "artifacts/overlay-archives-before.json": "2125cfc26cc3e597278356a36249c7805b3d36129fd7f8344197bdfc198eab69",
+    "artifacts/overlay-sanitize-archives-before.json": "6137b3ea85d53ea7f84d71c934841377a0b4aae1e51fb9c0bef120dccd18dbb3"
+  }
+}
