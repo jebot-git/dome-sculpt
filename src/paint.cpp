@@ -250,8 +250,7 @@ struct PaintedMesh::SurfaceMap {
              std::shared_ptr<const PaintSamplingDomain> domain = {},
              PaintSamplingLimits domain_limits = {})
       : mesh(std::move(input)), paint_domain(std::move(domain)), resolution(r), columns(r / 32),options(std::move(opts)),
-        texels(size_t(r) * r), tiles(size_t(columns) * columns),
-        padding(size_t(r) * r, -1) {
+        tiles(size_t(columns) * columns) {
     if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored&&options.policy!=PaintUvPolicy::PolygonAuthored)||
        !options.max_raster_samples||options.max_raster_samples>512*1024*1024||
        options.max_additional_candidates>8*1024*1024||!options.max_candidate_checks||options.max_candidate_checks>512*1024*1024||
@@ -291,6 +290,12 @@ struct PaintedMesh::SurfaceMap {
       options.cancelled={};
       return;
     }
+    // Original-coordinate captures above have no writable raster. Keep only
+    // their bounded tile slots for layer/pixel metadata; allocating these
+    // dense grids would spend O(resolution^2) memory on permanently unused
+    // storage for every retained source owner.
+    texels.resize(size_t(r) * r);
+    padding.assign(size_t(r) * r, -1);
     for (size_t k = 0; k < raster.indices.size(); k += 3) {
       uint32_t ids[] = {raster.indices[k], raster.indices[k + 1],
                         raster.indices[k + 2]};
