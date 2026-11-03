@@ -2192,6 +2192,10 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
   }
   result->allocated_tiles_ = 0;
   for(const auto &layer:result->layers_)result->allocated_tiles_+=tile_count(layer);
+  if(result->surface_->source_capture_only &&
+     (!result->source_maps_||result->baked_||result->color_projection_||result->normal_projection_||
+      result->allocated_tiles_||result->allocated_color_tiles_))
+    throw std::invalid_argument("Initial original-coordinate capture cannot contain writable paint data");
   if(result->storage_bytes()>128*1024*1024)throw std::length_error("Persisted paint exceeds total storage budget");
   return result;
 }
