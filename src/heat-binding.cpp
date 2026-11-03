@@ -242,7 +242,7 @@ D closest(D p, const Segment &s) {
 void seed(System &s, const Mesh &m, const Skeleton &rig,
           const HeatBindingOptions &o, Budget &budget,
           std::span<const HeatSourceSegment> sources,
-          std::span<const uint8_t> eligible) {
+          std::span<const uint8_t> eligible, bool all_visible = false) {
   auto world = rig.world();
   std::vector<Segment> segments;
   segments.reserve(sources.empty() ? rig.bones.size() : sources.size());
@@ -354,7 +354,7 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
     size_t ties = 0;
     for (const auto &c : candidates) {
       budget.step();
-      if (c.distance > nearest * (1 + tie_epsilon))
+      if (!all_visible && c.distance > nearest * (1 + tie_epsilon))
         break;
       auto d = sub(c.target, p);
       bool visible = true;

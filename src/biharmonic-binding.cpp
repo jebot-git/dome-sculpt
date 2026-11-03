@@ -41,8 +41,11 @@ SkinWeights bounded_biharmonic_surface(
     const BiharmonicBindingOptions &options,
     std::span<const HeatSourceSegment> sources,
     std::span<const uint8_t> eligible, std::span<const uint32_t> row_groups,
-    const std::function<bool()> &cancelled, BiharmonicBindingReport *report) {
+    const std::function<bool()> &cancelled, BiharmonicBindingReport *report,
+    std::span<const std::array<uint64_t, 4>> component_usage) {
   const auto &o = options.source;
+  const bool independent =
+      options.projection == BiharmonicProjection::IndependentComponent;
   Budget budget{0, o.maximum_work, cancelled};
   budget.stop();
   const size_t n = mesh.positions.size(), b = rig.bones.size(),
@@ -58,7 +61,11 @@ SkinWeights bounded_biharmonic_surface(
       o.visibility != HeatVisibility::EntryFaces ||
       o.occlusion != HeatOcclusion::ConnectedSurface ||
       (!eligible.empty() && eligible.size() != b) ||
-      (!row_groups.empty() && row_groups.size() != n))
+      (!row_groups.empty() && row_groups.size() != n) ||
+      (options.projection != BiharmonicProjection::VoronoiMinimum &&
+       !independent) ||
+      (independent && component_usage.size() != n) ||
+      (!independent && !component_usage.empty()))
     throw std::invalid_argument(
         "Invalid explicit surface-biharmonic domain/options");
   // Conservative peak: assembly map/CSR, two row-by-bone projection tables,
@@ -96,14 +103,38 @@ SkinWeights bounded_biharmonic_surface(
                     HeatNormals::UnitFaces, HeatMass::MixedVoronoi,
                     HeatEdges::CotangentHalf);
   auto diagonal = s.diagonal;
-  seed(s, mesh, rig, o, budget, sources, eligible);
+  seed(s, mesh, rig, o, budget, sources, eligible, independent);
   s.diagonal.swap(diagonal); // Restore exact L, not floating subtraction of H.
   const size_t rows = s.positions.size();
+  std::vector<std::array<uint64_t, 4>> domains(rows);
+  std::vector<uint8_t> assigned(rows);
+  if (independent)
+    for (size_t raw = 0; raw < n; ++raw) {
+      budget.step(8);
+      auto row = s.raw_to_row[raw], root = s.parent[row];
+      const auto mask = component_usage[raw];
+      if (mask == std::array<uint64_t, 4>{} ||
+          (assigned[root] && domains[root] != mask))
+        throw std::invalid_argument(
+            "Component intent is empty or varies inside a component");
+      assigned[root] = 1;
+      domains[root] = mask;
+      for (size_t joint = 0; joint < 256; ++joint) {
+        budget.step();
+        if ((mask[joint / 64] & (uint64_t(1) << (joint % 64))) &&
+            (joint >= b || !covered[joint]))
+          throw std::invalid_argument(
+              "Component intent names absent source joint");
+      }
+    }
   std::vector<double> distances(rows * b, INFINITY),
       minimum(rows * b, INFINITY);
   for (size_t i = 0; i < rows; ++i)
     for (const auto &source : sources) {
       budget.step(16);
+      if (independent && !(domains[s.parent[i]][source.bone / 64] &
+                           (uint64_t(1) << (source.bone % 64))))
+        continue;
       if (!(s.seeds[i][source.bone / 64] & (uint64_t(1) << (source.bone % 64))))
         continue;
       double distance =
@@ -132,6 +163,16 @@ SkinWeights bounded_biharmonic_surface(
         fixed[i] = 1;
       }
     }
+  if (independent)
+    for (size_t row = 0; row < rows; ++row)
+      if (s.parent[row] == row)
+        for (size_t joint = 0; joint < b; ++joint)
+          if (domains[row][joint / 64] & (uint64_t(1) << (joint % 64))) {
+            budget.step();
+            if (!std::isfinite(minimum[row * b + joint]))
+              throw std::runtime_error(
+                  "Declared component source lacks a visible projection");
+          }
   for (size_t i = 0; i < b; ++i)
     if (covered[i]) {
       if (!anchored[i])

@@ -3,7 +3,9 @@
 #include "bounded-quadratic.hpp"
 #include "heat-binding.hpp"
 namespace dome::detail {
+enum class BiharmonicProjection { VoronoiMinimum, IndependentComponent };
 struct BiharmonicBindingOptions {
+  BiharmonicProjection projection = BiharmonicProjection::VoronoiMinimum;
   HeatBindingOptions source;
   BoundedQuadraticOptions solve;
 };
@@ -22,5 +24,6 @@ SkinWeights bounded_biharmonic_surface(
     std::span<const HeatSourceSegment>, std::span<const uint8_t> eligible = {},
     std::span<const uint32_t> row_groups = {},
     const std::function<bool()> &cancelled = {},
-    BiharmonicBindingReport *report = nullptr);
+    BiharmonicBindingReport *report = nullptr,
+    std::span<const std::array<uint64_t, 4>> component_usage = {});
 } // namespace dome::detail
