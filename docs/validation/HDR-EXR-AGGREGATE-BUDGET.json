@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "parent": "41b58645e45c266661953f175e7e1b692cac3905",
+  "private": true,
+  "date": "2026-11-03",
+  "sourceSha256": {
+    "CMakeLists.txt": "c7d550ff4bf349539c244517357efb7cb28fed762eac4c2fbe33761628b4ac62",
+    "src/emission-exr.cpp": "6432666f246bc5fafc1f6155c1c7bb2042784b387a6d07c5aa8fcf787da9ba32",
+    "src/emission-package.cpp": "1f1cdf6e0a6ededc936a65fcb1560af8936647b247d1016653ee3d7c63784d6b",
+    "src/emission-exr-access.hpp": "cf28a516a699a90e978d03fc4b14b4016ff43d1e8939a62a1239108aaaaafe34",
+    "tests/emission-package-budget.cpp": "c9891faa50fff1e503ab7a492d36f6deee9aab2a883f1d4123bd488f0813e152"
+  },
+  "publicLayoutChange": false,
+  "capRaised": false,
+  "serializedFormatChanged": false,
+  "aggregateDecodedCapBytes": 134217728,
+  "oldNegative": {
+    "oldSource": "41b58645e45c266661953f175e7e1b692cac3905",
+    "exit": 1,
+    "seconds": 0.9379541590169538,
+    "unchanged": true,
+    "sha256": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libdome-sculpt-core.a": "a678eaaea88c65157c9a31cf74c5c6e116604cdf0cc3dcf8357b89880dfd99cf",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libdome-sculpt-affine.a": "e0363c8a9406b3738feea6a7d2832bf7954914e3f4b7ff8ed5591f9dbf320a33",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libdome-sculpt-polygon.a": "17e545abb995e5b3178a9ffc33909f189acccb3abddb194c589c5fb658d0bb30",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libxatlas.a": "e7fcc969c1c43c6696497e0d891042ce2c41fc97073f080587e0977a185f4558",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libmikktspace.a": "b3a53d9224948763a39444c406626f2704467d6db098d8735e873dac1a7660fd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libmikktspace-robust.a": "876e9d9a09f5c50389c0ac11a68170c6e0a0cd89ff7ae26153862db0554dd6a5",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libufbx.a": "5fac78d86641bba119ae62beb1de6d0129c89cc3b587247ab30d95bacdc93f02",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/libraries/libdome-sculpt-emission-codec.a": "5cce127b4720b20f1664f29ed1d7c03367647cd80028d40fa0c3825a15729d22",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/tests/emission-package-budget.cpp": "0ee54f6fce5f1d735f8720d375ea664303473df6fc21d6ffcdb22a581d3e60ca",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/artifacts/exr-aggregate-old/test": "b8a833de2ccb1d671b316d11779e2bc35acd725392cc879dfd3af09d6f9d24e8"
+    },
+    "scope": "One complete new regression TU, matching41b public/private headers,8 byteverified immutable same-source archive copies. Old-negative expected, no production code mutated."
+  },
+  "oldOriginalSource": {
+    "sha256": "0ee54f6fce5f1d735f8720d375ea664303473df6fc21d6ffcdb22a581d3e60ca",
+    "preservedAs": "artifacts/exr-aggregate-old/initial-test.cpp",
+    "proofOriginalKey": "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-package-41b5864/tests/emission-package-budget.cpp",
+    "postProofChange": "Added writer-budget positive assertion only; old bytes reconstructed and SHA-exact"
+  },
+  "oldNegativeLogSha256": "373d7c4528e1c24041e951d8918c7c6fa8d06769a87eb284b46b48c9f4b59bef",
+  "actualAdversary": {
+    "encodedExrBytes": 309628,
+    "decodedFieldBytes": 167772160,
+    "oldLargePixelAllocations": 4,
+    "newLargePixelAllocations": 0,
+    "smallValidNativeOwnerExact": true,
+    "belowLimitMixedResolutionLargeAllocations": 1,
+    "belowLimitNativeOwnerExact": true,
+    "privateWriterForecastRefuses": true
+  },
+  "profiles": {
+    "release": {
+      "result": {
+        "profile": "release",
+        "buildSeconds": 15.489894910017028,
+        "tests": [
+          {
+            "name": "budget",
+            "exit": 0,
+            "seconds": 0.2470478389877826
+          },
+          {
+            "name": "codec",
+            "exit": 0,
+            "seconds": 0.005756582017056644
+          },
+          {
+            "name": "package",
+            "exit": 0,
+            "seconds": 0.09966470798826776
+          }
+        ],
+        "unchanged": true,
+        "inputs": 1534,
+        "scope": "Matched41b immutable8archive copies, exactly2 entire runtime TUs replaced with original archive members removed;3 complete consumer TUs, canonical same profile flags. OwnSAN support already wholly instrumented; external OpenEXR/zlib uninstrumented. Not fresh whole app/core build."
+      },
+      "artifacts": {
+        "artifacts/exr-aggregate-fixed/release/before.json": "182a7f3af306904bd2259dd8b108919d3d49c437a268754df6087e27fe82fc94",
+        "artifacts/exr-aggregate-fixed/release/after.json": "182a7f3af306904bd2259dd8b108919d3d49c437a268754df6087e27fe82fc94",
+        "artifacts/exr-aggregate-fixed/release/build.log": "6c6d9119b13c2caea8a0ee6900ddb8931ec9effe03ace4e2441e6801d862f67f",
+        "artifacts/exr-aggregate-fixed/release/budget.log": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+        "artifacts/exr-aggregate-fixed/release/codec.log": "a75e59d488824ad55c0eaff8e193e1218b148c6436098c7c3b2c52be35d87a21",
+        "artifacts/exr-aggregate-fixed/release/package.log": "ed4c53e5611fe74c9e74928c81527bcc24a8db27d798e1b70b2b97bc7a26bb43",
+        "artifacts/exr-aggregate-fixed/release/status.json": "55c1a477327c11c858aed5cdc3587d5b70a205148a10d3b1391fea168525910e"
+      }
+    },
+    "sanitize": {
+      "result": {
+        "profile": "sanitize",
+        "buildSeconds": 31.309756636008387,
+        "tests": [
+          {
+            "name": "budget",
+            "exit": 0,
+            "seconds": 0.496262413013028
+          },
+          {
+            "name": "codec",
+            "exit": 0,
+            "seconds": 0.0180448479950428
+          },
+          {
+            "name": "package",
+            "exit": 0,
+            "seconds": 0.7215305810095742
+          }
+        ],
+        "unchanged": true,
+        "inputs": 1534,
+        "scope": "Matched41b immutable8archive copies, exactly2 entire runtime TUs replaced with original archive members removed;3 complete consumer TUs, canonical same profile flags. OwnSAN support already wholly instrumented; external OpenEXR/zlib uninstrumented. Not fresh whole app/core build."
+      },
+      "artifacts": {
+        "artifacts/exr-aggregate-fixed/sanitize/before.json": "4295db7de69db06a8edf27c1bfa03c169f9455f5792fa86dc00dd78cbcf44c61",
+        "artifacts/exr-aggregate-fixed/sanitize/after.json": "4295db7de69db06a8edf27c1bfa03c169f9455f5792fa86dc00dd78cbcf44c61",
+        "artifacts/exr-aggregate-fixed/sanitize/build.log": "6c6d9119b13c2caea8a0ee6900ddb8931ec9effe03ace4e2441e6801d862f67f",
+        "artifacts/exr-aggregate-fixed/sanitize/budget.log": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+        "artifacts/exr-aggregate-fixed/sanitize/codec.log": "a75e59d488824ad55c0eaff8e193e1218b148c6436098c7c3b2c52be35d87a21",
+        "artifacts/exr-aggregate-fixed/sanitize/package.log": "ed4c53e5611fe74c9e74928c81527bcc24a8db27d798e1b70b2b97bc7a26bb43",
+        "artifacts/exr-aggregate-fixed/sanitize/status.json": "0d1dac8126c3f0fa264d1a0b01872b1eac7e7a504cf96abc59edbabad8eb821c"
+      }
+    }
+  },
+  "pairedFixtureFiles": [
+    {
+      "file": "budget-output/aggregate-rebound.glb",
+      "bytes": 97076,
+      "sha256": "f033f695c4a6cb277133e2af7494c931c3e759e93cc8403ccad3bcc8f2411a24"
+    },
+    {
+      "file": "budget-output/large-valid.glb",
+      "bytes": 97072,
+      "sha256": "196b57ac2ec29a69792d9c7c01ecda6a97cd42a7c60fae8fbad98a7122159749"
+    },
+    {
+      "file": "budget-output/small-valid.glb",
+      "bytes": 19612,
+      "sha256": "e158abc7d4ee5aaa45a883741129ddce5f8cc49ab2179eeeabbe8ae55d561fb6"
+    },
+    {
+      "file": "codec-output/actual-emission.exr",
+      "bytes": 6296,
+      "sha256": "b251f7d2de189641bf8496db9135dd6543b90423ad84c52d38262453127440b6"
+    },
+    {
+      "file": "package-output/physical.glb",
+      "bytes": 1244176,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+    },
+    {
+      "file": "package-output/second-cycle.glb",
+      "bytes": 1244176,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+    },
+    {
+      "file": "package-output/subset.glb",
+      "bytes": 838236,
+      "sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63"
+    }
+  ],
+  "existingThreeHdrGlbsUnchanged": [
+    {
+      "file": "physical.glb",
+      "equal": true,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+      "bytes": 1244176
+    },
+    {
+      "file": "second-cycle.glb",
+      "equal": true,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+      "bytes": 1244176
+    },
+    {
+      "file": "subset.glb",
+      "equal": true,
+      "sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+      "bytes": 838236
+    }
+  ],
+  "scope": "2 complete runtime TUs and3 complete consumers over8 verified immutable own41b archives; original members removed. Header/layout ABI unchanged. Not fresh whole-app/core or all-regression/device/GUI proof."
+}

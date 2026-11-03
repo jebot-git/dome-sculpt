@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/emission-interchange.hpp"
+#include "emission-exr-access.hpp"
 #include <OpenEXR/ImfOutputFile.h>
 #include <OpenEXR/ImfHeader.h>
 #include <OpenEXR/openexr.h>
@@ -46,11 +47,11 @@ struct ReadState{std::span<const uint8_t> bytes;const EmissionInterchangeLimits 
 int64_t read_size(exr_const_context_t,void *p){return int64_t(static_cast<ReadState*>(p)->bytes.size());}
 int64_t read_bytes(exr_const_context_t,void *p,void *out,uint64_t count,uint64_t offset,exr_stream_error_func_ptr_t){auto &s=*static_cast<ReadState*>(p);try{stop(*s.limits);}catch(...){s.failure=std::current_exception();return -1;}if(offset>=s.bytes.size())return 0;auto n=std::min<uint64_t>(count,s.bytes.size()-offset);std::memcpy(out,s.bytes.data()+size_t(offset),size_t(n));return int64_t(n);}
 void quiet_error(exr_const_context_t,exr_result_t,const char*){}
-void preflight(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l){
+size_t preflight(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l){
  HeaderBudget budget{0,std::min(l.max_working_bytes,size_t(1024*1024))};auto *old=header_budget;header_budget=&budget;exr_context_t context=nullptr;
  try{ReadState state{bytes,&l};exr_context_initializer_t init=EXR_DEFAULT_CONTEXT_INITIALIZER;init.user_data=&state;init.read_fn=read_bytes;init.size_fn=read_size;init.error_handler_fn=quiet_error;init.alloc_fn=header_alloc;init.free_fn=header_free;init.max_image_width=int(l.max_dimension);init.max_image_height=int(l.max_dimension);init.flags=EXR_CONTEXT_FLAG_STRICT_HEADER|EXR_CONTEXT_FLAG_DISABLE_CHUNK_RECONSTRUCTION;
   auto require=[&](exr_result_t result){if(state.failure)std::rethrow_exception(state.failure);if(result!=EXR_ERR_SUCCESS)throw std::invalid_argument("Invalid or oversized HDR EXR header");};require(exr_start_read(&context,"native-emission.exr",&init));int parts=0;require(exr_get_count(context,&parts));if(parts!=1)throw std::invalid_argument("HDR EXR must contain exactly one image part");exr_storage_t storage;require(exr_get_storage(context,0,&storage));exr_compression_t compression;require(exr_get_compression(context,0,&compression));if(storage!=EXR_STORAGE_SCANLINE||compression!=EXR_COMPRESSION_ZIP)throw std::invalid_argument("HDR EXR requires lossless ZIP scanlines");exr_attr_box2i_t window;require(exr_get_data_window(context,0,&window));if(window.min.x||window.min.y||window.max.x<0||window.max.y<0)throw std::invalid_argument("Invalid HDR EXR data window");const auto raw=measure(uint32_t(window.max.x)+1,uint32_t(window.max.y)+1,l);if(bytes.size()>l.max_working_bytes||raw>l.max_working_bytes-bytes.size())throw std::length_error("HDR EXR decode forecast exceeds working budget");const exr_attr_chlist_t *list=nullptr;require(exr_get_channels(context,0,&list));if(!list||list->num_channels!=10)throw std::invalid_argument("HDR EXR must contain ten named FLOAT channels");for(int i=0;i<list->num_channels;++i){const auto &channel=list->entries[i];if(channel.pixel_type!=EXR_PIXEL_FLOAT||channel.x_sampling!=1||channel.y_sampling!=1||std::find_if(channels.begin(),channels.end(),[&](const char *name){return std::strcmp(name,channel.name.str)==0;})==channels.end())throw std::invalid_argument("Invalid HDR EXR channel interpretation");}
-  exr_finish(&context);header_budget=old;if(budget.used)throw std::runtime_error("HDR EXR preflight did not release header storage");
+  exr_finish(&context);header_budget=old;if(budget.used)throw std::runtime_error("HDR EXR preflight did not release header storage");return raw;
  }catch(...){if(context)exr_finish(&context);header_budget=old;throw;}
 }
 void check_header(const exr::Header &h){
@@ -59,6 +60,9 @@ void check_header(const exr::Header &h){
  if(!version||version->value()!=1||!units||units->value()!="linear-cd/m2;legacy-relative-premult;physical-absolute-premult;coverage-linear"||!origin||origin->value()!="row0=v0")throw std::invalid_argument("Unknown HDR emission EXR interpretation");
  size_t count=0;for(auto it=h.channels().begin();it!=h.channels().end();++it){++count;if(std::find_if(channels.begin(),channels.end(),[&](const char *n){return std::strcmp(n,it.name())==0;})==channels.end()||it.channel().type!=exr::FLOAT||it.channel().xSampling!=1||it.channel().ySampling!=1)throw std::invalid_argument("HDR EXR requires its exact ten FLOAT channels");}if(count!=channels.size())throw std::invalid_argument("Missing HDR EXR contribution channels");
 }
+}
+size_t detail::emission_exr_decoded_bytes(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l){
+ limits(l);if(bytes.empty()||bytes.size()>l.max_encoded_bytes)throw std::length_error("HDR EXR capture exceeds encoded byte budget");return preflight(bytes,l);
 }
 void EmissionInterchangeImage::validate(const EmissionInterchangeLimits &l)const{
  const auto bytes=measure(width,height,l);if(pixels.size()!=bytes/sizeof(pixels[0])||bytes>l.max_working_bytes)throw std::length_error("HDR emission image storage exceeds limits");
