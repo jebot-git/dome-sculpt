@@ -20,7 +20,7 @@ std::shared_ptr<const SourceKeyDerivation> KeyDerivationCodec::decode(const nloh
     uint32_t current,const std::vector<std::shared_ptr<const SourceMaterialBindings>> &earlier,
     const PaintResolver &paint,KeyFrameArchive &frames,const CreatorAssetArchive &models,
     const std::function<bool()> &cancelled){
-  stop(cancelled);if(!input.is_object()||input.size()!=7||!input.at("version").is_number_integer()||(input.at("version")!=1&&input.at("version")!=2)||!input.at("targets").is_array()||input.at("targets").size()>128)throw std::invalid_argument("Unsupported owning native key record");
+  stop(cancelled);if(!input.is_object()||input.size()!=7||!input.at("version").is_number_integer()||(input.at("version")!=1&&input.at("version")!=2)||!input.at("targets").is_array()||input.at("targets").empty()||input.at("targets").size()>128)throw std::invalid_argument("Unsupported owning native key record");
   const bool named=input.at("version")==2;bool has_operation=false;
   const auto before=number(input.at("before_binding"));const auto paint_id=number(input.at("paint"));const auto frame_id=number(input.at("frames"));if(before>=current||before>=earlier.size()||paint_id>=256||frame_id>=256||!paint)throw std::invalid_argument("Owning native key record must reference an actual earlier model");
   for(const auto&t:input.at("targets")){
