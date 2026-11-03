@@ -56,8 +56,8 @@ Fresh combined qualification is still pending; no main admission is claimed.
 
 Runtime7c9891f adds owning Duplicate/CaptureMix record2 to privateScene22.
 Release103+141, all29,490 standard-C++ allocation prefixes and4 baselines pass;
-whole-owned sanitizer103+141 plus4 baselines pass, with the extended sanitizer
-allocation sweep still running. No main admission or UI/render/export/Mirror
+whole-owned sanitizer103+141 plus4 baselines and all29,490 allocation prefixes
+pass as test children; the final outer tool-harness143 caveat is retained. No main admission or UI/render/export/Mirror
 completion. Read KEY-COMMANDS-WIP.md and validation/KEY-COMMANDS.json.
 
 ## Plain paint GPU integration — 2026-11-03

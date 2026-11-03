@@ -71,7 +71,18 @@
       }
     ],
     "functional_primary_binary_archive_inputs_unchanged": 10,
-    "extended_allocation_sweep": "Still running at receipt creation; no terminal/all-prefix sanitizer claim"
+    "extended_allocation_sweep": {
+      "child_exit_code": 0,
+      "elapsed_seconds": 3033.3986432529928,
+      "checks": 7,
+      "persistent_standard_cpp_prefixes": {
+        "duplicate": 14737,
+        "capture_mix": 14753
+      },
+      "before_after_equal": true,
+      "outer_exec_exit_code": 143,
+      "harness_caveat": "All child exits and final manifests completed; outer tool termination143 retained separately."
+    }
   },
   "actual_old_reader_negative": {
     "scope": "actual frozen cab6451 qualified old-reader binary receives genuine new record2 Scene file",
@@ -88,8 +99,7 @@
     "Actual freehand/controller/UI on new authority",
     "Independent dynamic GLB/VRM consumers and original/source export maps",
     "Actual CC0 avatars and mixed23/24/25/26 graphs",
-    "Fresh final frontend/renderer/XR/all-target regression integration",
-    "Whole extended sanitizer allocation result"
+    "Fresh final frontend/renderer/XR/all-target regression integration"
   ],
   "files": {
     "artifacts/commands-hardened/source-before.sha256": "f440d4a0f7778df1c3333cfd4b9a21c75aa36e0dd01d17d0704fdbb1faa5cd2e",
@@ -107,6 +117,10 @@
     "artifacts/commands-hardened-sanitize/binaries-before.json": "c10cb8d75737c44d010d1bb4e8771062ad6f455bbc1e36c626f11f63740facc2",
     "artifacts/commands-hardened-sanitize/functional-binaries-after.json": "c10cb8d75737c44d010d1bb4e8771062ad6f455bbc1e36c626f11f63740facc2",
     "artifacts/commands-final/old-reader-negative.json": "c93b89be773466d055dd61199a36f83bb596f88b3be39199b322a6c0079776c0",
-    "artifacts/commands-final/old-reader-negative.log": "2c0fa178e54fd1ff6f46d9655ff7dbba7d37c3baba66f39a17d80ef6f241c6e6"
+    "artifacts/commands-final/old-reader-negative.log": "2c0fa178e54fd1ff6f46d9655ff7dbba7d37c3baba66f39a17d80ef6f241c6e6",
+    "artifacts/commands-hardened-sanitize/status.json": "b65974e8470f3901bfd2eeecaff4b948d84aa98d81c7c5e92d0fab2d11c4f253",
+    "artifacts/commands-hardened-sanitize/faults.log": "d599517f5ad31982045f1ffc50e81f5de046c4fd2571a8e5281bb5928b4be88f",
+    "artifacts/commands-hardened-sanitize/binaries-after.json": "c10cb8d75737c44d010d1bb4e8771062ad6f455bbc1e36c626f11f63740facc2",
+    "artifacts/commands-hardened-sanitize/outer-status.json": "c60710c6b81ccfcb45c7022a3360c3fb184cd855741255ac3c80b718b9f5dc48"
   }
 }

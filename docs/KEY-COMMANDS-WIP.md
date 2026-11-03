@@ -35,8 +35,11 @@ without claiming a missing historical binary manifest.
 Fresh wholly owned C/C++ O1 ASan/UBSan/leak core/support and matching consumers
 pass103+141 functional checks and4 baselines (214.79s for baselines). The final
 strictness descendant rebuilt three owned C++ TUs and relinked the consumers;
-no old/new-header overlay is used. The extended sanitizer allocation sweep is
-still running at this receipt: no terminal/all-prefix sanitizer claim is made.
+no old/new-header overlay is used. The extended sanitizer allocation test child subsequently passes all29,490
+prefixes plus the128-target check in3033.40s, exit0, with zero reports and final
+primary binaries/archives unchanged. The outer tool harness separately returned
+143 after emitting complete child0 results and the final unchanged-manifest
+marker; that status is retained, without claiming a wrapper exit0 or a cause.
 Build and run failures retained separately include the initial unsupported Vec3
 operator and a first multi-target make invocation before its regenerated new
 target was visible; neither is a product acceptance result.
