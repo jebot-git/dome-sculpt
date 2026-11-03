@@ -65,5 +65,90 @@
     "artifacts/build-cpu-critical-after-evaluation.json": "05a6a81f8f4f56a5dd5173a3b6faa2bd4f79fd5862dc14232d528f03102ae129",
     "artifacts/build-sanitize-critical-before.json": "420de3326753faf93afdebf4adea9065eee4bb195259a49817b8130b22cace0d",
     "artifacts/build-sanitize-critical-after-evaluation.json": "420de3326753faf93afdebf4adea9065eee4bb195259a49817b8130b22cace0d"
+  },
+  "updated_utc": "2026-11-03T04:22:02.672882+00:00",
+  "retained_key_candidate": {
+    "source": "c79a140e0b19e82d013409f0e9f5129f903a4f43",
+    "qualified": false,
+    "builds": {
+      "CPU": {
+        "session": 98905,
+        "terminal_exit": 0
+      },
+      "whole_owned_SAN": {
+        "session": 33752,
+        "terminal_exit": 0
+      },
+      "ONEAPI": {
+        "session": 89853,
+        "terminal_exit": 0,
+        "listed_targets": 21,
+        "tests_run": false
+      }
+    },
+    "critical": {
+      "CPU": {
+        "session": 4201,
+        "terminal_exit": 8,
+        "passed": 2,
+        "total": 3,
+        "seconds": 172.1
+      },
+      "whole_owned_SAN": {
+        "session": 72045,
+        "terminal_exit": 8,
+        "passed": 2,
+        "total": 3,
+        "seconds": 871.15,
+        "authoring_seconds": 597.33
+      }
+    },
+    "passed_checks_each": {
+      "version": 22,
+      "authoring": 59
+    },
+    "failure": "Workflow completion gate masks a real detached-authoring topology mismatch. Independently exposed by direct c79 commutation: beforePaint is rewound but PolygonAuthority remains current.",
+    "selected_CPU_baselines": {
+      "build_session": 95325,
+      "test_session": 92628,
+      "terminal_exit": 0,
+      "passed": 14,
+      "seconds": 314.62
+    },
+    "immutability": {
+      "tracked_inputs": 1422,
+      "mismatches": 0,
+      "critical_CPU_binaries": 14,
+      "critical_SAN_binaries": 14,
+      "baseline_CPU_binaries": 29
+    },
+    "fix": "38cced9d99213a7dd9c318c646191c09bba50297 authenticates actual before-domain polygon descriptor; no guard bypass",
+    "test_protocol": "9859546 calls explicit ImportSettings overload for intended 64-pixel and raw UV2 atlas imports; old default-512 failure retained, caps unchanged",
+    "integration": "17ef104 composes runtime38cc with independent commutation test and its receipt22429df; combined proof still required"
+  },
+  "quota_differential": {
+    "tree": "artifacts/pose-remap-quota-c79a140",
+    "scope": "Same exact version fixture and immutable matching c79 archives; only one private inline preflight loop removed for negative; not whole-source proof",
+    "current_positive_exit": 0,
+    "checks": 22,
+    "old_preflight_negative_exit": 1,
+    "test_unchanged": true,
+    "retained_caps": true
+  },
+  "retained_key_artifact_hashes": {
+    "artifacts/tests-cpu-retained-key-critical.log": "51bfbe99e169728814ad5ccfe1653eb4cd47a804229d8837fb55d25a76fc9fc8",
+    "artifacts/tests-sanitize-retained-key-critical.log": "c015669db3b5d91ba863cf3de1a353a3cacdf38c303d2e225dfd98795c6f990e",
+    "artifacts/tests-cpu-retained-key-baselines.log": "f233f2dc47acc9afdf1ea22656666369324c59c93c7c4d4b6805b28fcd01366f",
+    "artifacts/source-retained-key-before.json": "cb9ec779f8de953692124fd489dc3745d3d74bf2d0ffba6f55bacb94ba90ce34",
+    "artifacts/source-retained-key-after-sanitize.json": "cb9ec779f8de953692124fd489dc3745d3d74bf2d0ffba6f55bacb94ba90ce34",
+    "artifacts/source-retained-key-after-baselines.json": "cb9ec779f8de953692124fd489dc3745d3d74bf2d0ffba6f55bacb94ba90ce34",
+    "artifacts/build-cpu-retained-key-critical-before.json": "840fa08cd342b81c5960eee70d60e5685bbf9a0a3972977e45ae55f3536e825d",
+    "artifacts/build-cpu-retained-key-critical-after.json": "840fa08cd342b81c5960eee70d60e5685bbf9a0a3972977e45ae55f3536e825d",
+    "artifacts/build-sanitize-retained-key-critical-before.json": "d60bab67b839ce158e8c8d17fae1ef92786ae5421b0e10fb8e53f6f1480b2f03",
+    "artifacts/build-sanitize-retained-key-critical-after-sanitize.json": "d60bab67b839ce158e8c8d17fae1ef92786ae5421b0e10fb8e53f6f1480b2f03",
+    "artifacts/cpu-retained-key-baselines-before.json": "76a9343099f0fa0963ecc3ce44e2268a66ab3a76e9e37c9ecd6bb89f63fe756b",
+    "artifacts/cpu-retained-key-baselines-after-baselines.json": "76a9343099f0fa0963ecc3ce44e2268a66ab3a76e9e37c9ecd6bb89f63fe756b",
+    "artifacts/oneapi-retained-key-status.json": "df1795d502e4fd025f597331c6dfe2aa44a08aa62c1f5b5aad178d7b3903c96d",
+    "artifacts/oneapi-retained-key-binaries.json": "46d9aebeed3dc1945bda4ff26f99a83cd332fc3349ed12f0e5a3a0cb7bb9212c"
   }
 }

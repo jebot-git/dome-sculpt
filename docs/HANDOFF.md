@@ -38,6 +38,20 @@ RIG-LENGTH-METRIC.md for the two-TU precision proof, SOURCE-NATIVE-HINTS.md and
 LOSSLESS-PREPARED-UV-WIP.md for their precise component boundaries. The full
 production goal, remaining feature rows and post-basic drawers remain active.
 
+## Combined retained-key continuation — 2026-11-03
+
+Private c79 builds CPU/OneAPI/whole-owned sanitizer native apps. Critical CPU2/3
+and SAN2/3 pass22 version and59 rig/UV checks; selected CPU14/14 baselines pass.
+All1422 tracked inputs and14 critical/29 CPU-baseline captured binaries remain
+exact. The remaining failure is independently traced to a before-Paint/current
+polygon mismatch. Private38cc authenticates before-domain topology; scoped
+commutation101 passes with9native+18independent GLB images max0 and Khronos
+18files0errors. Merge17ef104 includes that fix and the test/receipt22429df.
+The broad workflow also corrects an actual test overload mistake to pass the
+intended64/atlas ImportSettings explicitly; the512 quota failure is retained
+and no caps changed. Read SOURCE-AUTHORING-UNION.md for all exact scopes.
+Fresh combined qualification is still pending; no main admission is claimed.
+
 ## Plain paint GPU integration — 2026-11-03
 
 Runtime `9f524e3` combines qualified `3411fabe`/`fc4d87f` with main `7693d6b`.
