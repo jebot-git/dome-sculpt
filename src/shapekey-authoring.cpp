@@ -10,7 +10,7 @@
 #include "dome/tangents.hpp"
 #include "shapekey-normal-preparation.hpp"
 #include "shapekey-source-uv.hpp"
-#include <map>
+#include <vector>
 namespace dome {
 namespace {
 void stop(const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("Shapekey authoring cancelled");}
@@ -96,8 +96,6 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  bool existing=edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
  if(existing&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");
  if(edit.action==ShapeKeyAction::Replace && edit.positions.size()!=rest.positions.size())throw std::invalid_argument("Shapekey edits must preserve the complete REST vertex domain");
- if((edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Mirror)&&detail::source_uv_geometry_keys_require_atlas(source))
-  throw std::invalid_argument(detail::source_uv_key_notice);
  if(edit.action==ShapeKeyAction::Replace){std::vector<Vec3> old;old.reserve(rest.positions.size());for(size_t v=0;v<rest.positions.size();++v)old.push_back(rest.positions[v]+deform->morphs->targets[edit.target].delta[v]);if(equal(old,edit.positions))return {edit.target,false};}
  if(edit.action==ShapeKeyAction::Rename && edit.name==deform->morphs->targets[edit.target].name)return {edit.target,false};
  const bool replace=edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
@@ -152,10 +150,13 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const auto identity=std::find_if(frames->targets.begin(),frames->targets.end(),[&](const auto&t){return t.id==id;});
  if(replace)identity->positions=origin_delta;
  else{frames->targets.push_back({id,{},{},std::move(origin_delta)});frames->current_targets.push_back(id);}
- std::map<const NormalFrames*,std::shared_ptr<const NormalFrames>> copies;
- auto author=[&](const std::shared_ptr<const NormalFrames>&old)->std::shared_ptr<const NormalFrames>{
+ struct Copy {const NormalFrames *source;uint32_t coordinate;std::shared_ptr<const NormalFrames> frame;};
+ std::vector<Copy> copies;
+ auto author=[&](const std::shared_ptr<const NormalFrames>&old,detail::ShapeFrameRole role)->std::shared_ptr<const NormalFrames>{
   if(!old)return {};
-  if(auto i=copies.find(old.get());i!=copies.end())return i->second;
+  const bool geometric=edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace;
+  const auto coordinate=geometric?detail::shapekey_frame_coordinate(*binding,*old,role):0;
+  for(const auto &copy:copies)if(copy.source==old.get()&&copy.coordinate==coordinate)return copy.frame;
   auto frame=std::make_shared<NormalFrames>(*old);NormalFrameTarget key;key.id=id;
   if(edit.action==ShapeKeyAction::Duplicate){key=frame_target(*old,frames->current_targets[edit.target]);key.id=id;}
   else if(edit.action==ShapeKeyAction::CaptureMix){
@@ -164,16 +165,18 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
     add(key.normals,k.normals);add(key.tangents,k.tangents);
    }
   }else if(edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace){
-   const auto &mesh=binding->uv_origin->paint->mesh();std::vector<Vec3> edited=mesh.positions;
+   auto mesh=binding->uv_origin->paint->mesh();
+   if(!old->tangents.empty())mesh.uv=detail::shapekey_frame_coordinates(*binding,coordinate,cancelled);
+   std::vector<Vec3> edited=mesh.positions;
    const auto &authority=replace?identity->positions:frames->targets.back().positions;
    for(size_t v=0;v<edited.size();++v)edited[v]+=authority[v];
    key=authored_attributes(mesh,*old,replace?&frame_target(*old,id):nullptr,old_positions,edited,id,cancelled);
   }
   if(replace){auto target=std::find_if(frame->targets.begin(),frame->targets.end(),[&](const auto&t){return t.id==id;});*target=std::move(key);}
   else frame->targets.push_back(std::move(key));
-  frame->validate();copies[old.get()]=frame;return frame;
+  frame->validate();copies.push_back({old.get(),coordinate,frame});return frame;
  };
- frames->pbr=author(frames->pbr);frames->mtoon=author(frames->mtoon);frames->canonical=author(frames->canonical);frames->validate();binding->normal_frames=frames;
+ frames->pbr=author(frames->pbr,detail::ShapeFrameRole::Pbr);frames->mtoon=author(frames->mtoon,detail::ShapeFrameRole::MToon);frames->canonical=author(frames->canonical,detail::ShapeFrameRole::Canonical);frames->validate();binding->normal_frames=frames;
  deform->morphs->set_target(rest,name,positions);if(!replace&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);
  deform->validate(rest);binding->validate();detail::normal_frame_current_authority(*binding,rest,deform.get(),cancelled);
  o.deformation=deform;o.material_bindings=binding;next.validate();stop(cancelled);scene=std::move(next);return {slot,true};

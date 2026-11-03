@@ -2218,6 +2218,12 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING)
+  add_executable(dome-sculpt-source-extra-uv-key-render-test tests/source-extra-uv-key-render.cpp)
+  target_include_directories(dome-sculpt-source-extra-uv-key-render-test PRIVATE src tests third_party/cgltf third_party/desktop)
+  target_link_libraries(dome-sculpt-source-extra-uv-key-render-test PRIVATE dome-sculpt-render)
+  add_test(NAME source-extra-uv-key-render COMMAND dome-sculpt-source-extra-uv-key-render-test ${CMAKE_CURRENT_BINARY_DIR}/source-extra-uv-key-render)
+  set_tests_properties(source-extra-uv-key-render PROPERTIES TIMEOUT 600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+
   add_executable(dome-sculpt-source-extra-uv-key-admission-test tests/source-extra-uv-key-admission.cpp)
   target_include_directories(dome-sculpt-source-extra-uv-key-admission-test PRIVATE src tests)
   target_link_libraries(dome-sculpt-source-extra-uv-key-admission-test PRIVATE dome-sculpt-core)
