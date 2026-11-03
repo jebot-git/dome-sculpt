@@ -19,6 +19,7 @@
 #include <set>
 namespace dome {
 namespace {
+template<class T>bool owning_key_ref(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
 constexpr size_t role_count=size_t(MToonSlot::Count);
 thread_local std::array<const SourceMaterialBindings*,64> material_validation_path{};
 thread_local size_t material_validation_depth=0;
@@ -122,9 +123,9 @@ void SourceMaterialBindings::validate(bool deep) const {
     throw std::invalid_argument("Invalid derived material frame or animation provenance");
   if(sampling_reparameterized && !uv_origin)throw std::invalid_argument("Reparameterized sampling requires retained original provenance");
   if(color_preparation)color_preparation->validate(deep);
-  if(key_derivation){if(!normal_frames||key_derivation->frames()!=normal_frames||key_derivation->position_domain()!=normal_frames->position_domain)throw std::invalid_argument("Material key derivation lost its own native frame/POSITION authority");key_derivation->validate(deep);}
+  if(key_derivation){if(!key_derivation->valid_owner(key_derivation))throw std::invalid_argument("Material key derivation has no genuine owning node lease");if(!normal_frames||!owning_key_ref(key_derivation->frames(),normal_frames)||!owning_key_ref(key_derivation->position_domain(),normal_frames->position_domain))throw std::invalid_argument("Material key derivation lost its own native frame/POSITION authority");key_derivation->validate(deep);}
   if(normal_frames&&normal_frames->position_domain&&!key_derivation)throw std::invalid_argument("Derived native frame POSITION geometry needs an owning material key derivation");
-  if(normal_preparation){if(normal_preparation->key_derivation!=key_derivation)throw std::invalid_argument("Prepared normal key replay differs from its actual material key derivation");normal_preparation->validate(deep);
+  if(normal_preparation){if(!owning_key_ref(normal_preparation->key_derivation,key_derivation))throw std::invalid_argument("Prepared normal key replay differs from its actual material key derivation");normal_preparation->validate(deep);
     if(normal_frames!=normal_preparation->target_frames||normal_frame!=SourceMaterialNormalFrame::OriginalAttributes)
       throw std::invalid_argument("Prepared normal interpretation lost its exact target frame authority");
     if(normal_preparation->uv_reprojection&&has_mtoon){const auto &role=roles[size_t(MToonSlot::Normal)];if(role.image!=normal_preparation->projection->mtoon||role.wrap_s!=33071||role.wrap_t!=33071||role.min_filter!=9729||role.mag_filter!=9729)throw std::invalid_argument("Normal UV current resolved sampler/image differs from its declared projection");}

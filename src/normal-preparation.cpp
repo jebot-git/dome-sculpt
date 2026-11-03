@@ -103,8 +103,9 @@ void SourceNormalPreparation::validate(bool deep) const {
     throw std::invalid_argument("Retained normal sampling requires its complete owning domain replay");
   bool derived_key=false;
   if(key_derivation){
+    if(!key_derivation->valid_owner(key_derivation))throw std::invalid_argument("Prepared key derivation has no genuine owning node lease");
     key_derivation->validate(deep);
-    if(target_frames!=key_derivation->frames()||target_frames->position_domain!=key_derivation->position_domain())throw std::invalid_argument("Prepared normal key frames differ from their own derived POSITION authority");
+    if(target_frames!=key_derivation->frames()||target_frames.owner_before(key_derivation->frames())||key_derivation->frames().owner_before(target_frames)||target_frames->position_domain!=key_derivation->position_domain()||target_frames->position_domain.owner_before(key_derivation->position_domain())||key_derivation->position_domain().owner_before(target_frames->position_domain))throw std::invalid_argument("Prepared normal key frames differ from their own derived POSITION authority");
     derived_key=detail::key_recipe_sampling_matches(*this,*key_derivation->before_material()->normal_preparation);
   }
   if(derived_key){

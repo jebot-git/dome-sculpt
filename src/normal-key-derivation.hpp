@@ -12,6 +12,8 @@ struct DerivedKeyTarget {
 };
 class SourceKeyDerivation {
 public:
+  ~SourceKeyDerivation()=default;
+  bool valid_owner(const std::shared_ptr<const SourceKeyDerivation> &p) const noexcept{return p.get()==this&&!owner_.expired()&&!owner_.owner_before(p)&&!p.owner_before(owner_);}
   const auto &before_paint() const noexcept{return paint_;}
   const auto &before_material() const noexcept{return material_;}
   const auto &before_deformation() const noexcept{return deformation_;}
@@ -22,6 +24,10 @@ public:
   const std::vector<Vec3> &positions(uint64_t id) const;
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
 private:
+  SourceKeyDerivation()=default;
+  SourceKeyDerivation(const SourceKeyDerivation&)=delete;
+  SourceKeyDerivation &operator=(const SourceKeyDerivation&)=delete;
+  std::weak_ptr<const SourceKeyDerivation> owner_;
   std::shared_ptr<const PaintedMesh> paint_;
   std::shared_ptr<const SourceMaterialBindings> material_;
   std::shared_ptr<const DeformationState> deformation_;

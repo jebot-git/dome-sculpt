@@ -100,7 +100,7 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(current));if(!deform->morphs)deform->morphs=MorphSet(current);
   const auto slot=create?count:edit.target;const auto name=edit.action==ShapeKeyAction::Replace?deform->morphs->targets[slot].name:new_name(*deform->morphs,edit.name);
   if(edit.action==ShapeKeyAction::Rename){if(deform->expressions)deform->expressions->rename_shape(*deform->morphs,deform->morphs->targets[slot].name,name);else deform->morphs->targets[slot].name=name;Scene next=scene;next.object(object).deformation=deform;next.validate();stop(cancelled);scene=std::move(next);return{slot,true};}
-  auto node=std::shared_ptr<SourceKeyDerivation>(new SourceKeyDerivation);const auto old=recipe->key_derivation;
+  auto node=std::shared_ptr<SourceKeyDerivation>(new SourceKeyDerivation);node->owner_=node;const auto old=recipe->key_derivation;
   const bool reuse=old&&old->position_domain()==domain&&old->before_paint()->mesh_owner()==source.painted->mesh_owner()&&key_recipe_sampling_matches(*recipe,*old->before_material()->normal_preparation);
   auto staged=std::make_shared<NormalFrameSet>(*binding->normal_frames);staged->position_domain=domain;
   if(reuse){node->paint_=old->paint_;node->material_=old->material_;node->deformation_=old->deformation_;node->appearance_=old->appearance_;node->targets_=old->targets_;}

@@ -10,6 +10,7 @@ namespace detail {
 // NormalFrames::source_* retain their separate actual original attribute IDs.
 class FramePositionDomain {
 public:
+  ~FramePositionDomain()=default;
   const std::shared_ptr<const Mesh> &basis() const noexcept{return basis_;}
   const std::shared_ptr<const Mesh> &before_basis() const noexcept{return before_;}
   const std::shared_ptr<const Mesh> &current_geometry() const noexcept{return current_;}
@@ -22,6 +23,9 @@ public:
   void charge_storage(size_t &,size_t,std::set<const FramePositionDomain*> &,std::set<const Mesh*> &) const;
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
 private:
+  FramePositionDomain()=default;
+  FramePositionDomain(const FramePositionDomain&)=delete;
+  FramePositionDomain &operator=(const FramePositionDomain&)=delete;
   std::shared_ptr<const Mesh> basis_,before_,current_,source_;
   std::shared_ptr<const FramePositionDomain> previous_;
   std::vector<uint32_t> current_vertices_,origin_vertices_,source_vertices_;
