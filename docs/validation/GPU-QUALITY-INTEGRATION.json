@@ -1,0 +1,134 @@
+{
+  "runtime_merge": "772213d",
+  "component": "1be8ab6917dfbdaf9dc88053b3abde1dc7e4030a",
+  "reproducible_xr_tests": "050b443",
+  "main_base": "ede6686d46df5a13d2228d60034f6e5702fa7160",
+  "scope": "Selected-backend reverse reconstruction maxima for measured large coarsening, integrated with main retopology and atomic brush transfers; full goal remains active",
+  "source_composition": {
+    "component_runtime_except_backend_gpu": "byte-identical",
+    "backend_gpu": "component quality methods plus unchanged newer main BrushApi/scalar kernel",
+    "cmake": "current-main definitions plus component targets and CPU-only oracle helper",
+    "schema_and_public_layout_changes": false
+  },
+  "fresh_builds": {
+    "CPU": "optimized full native FLTK/OpenXR application and selected targets",
+    "ONEAPI": "optimized full native FLTK/OpenXR application and selected targets",
+    "sanitizer": "fresh owned C/C++ core/support O1 ASan+UBSan/leaks; UI/XR disabled for this sanitizer scope",
+    "CUDA": "actual merged entire backend quality and brush standalone modules, sm86",
+    "HIP": "actual merged entire backend quality and brush standalone modules, gfx1030"
+  },
+  "tests": {
+    "CPU": {
+      "suites": 12,
+      "passed": 12,
+      "seconds": 5.84
+    },
+    "actual_Arc_ONEAPI": {
+      "suites": 9,
+      "passed": 9,
+      "seconds": 6.02,
+      "integration_requires_PCI": "0000:03:00.0"
+    },
+    "owned_SAN": {
+      "suites": 12,
+      "passed": 12,
+      "seconds": 67.79,
+      "host_aggregate_seam": "Native CPU sampler forced through actual aggregate staging/transactions; not GPU execution"
+    },
+    "native_Xvfb_software_GUI": {
+      "checks": 15,
+      "passed": 15
+    },
+    "compact_BDF_GUI": {
+      "checks": 4,
+      "passed": 4
+    },
+    "vendor_missing": {
+      "CUDA": "brush registered1/1 and direct quality --missing pass, actual insufficient-driver refusal",
+      "HIP": "brush registered1/1 and direct quality --missing pass, actual no-device refusal"
+    }
+  },
+  "actual_native_XR": {
+    "checks": 10,
+    "passed": 10,
+    "runtime": "synthetic OpenXR loader, real application and real Arc GL+OneAPI compute",
+    "physical_headset": false,
+    "original_layer_samples": 37193,
+    "coarsened_layer_samples": 4697,
+    "source_spacing": 0.01,
+    "target_spacing": 0.02,
+    "CPU_reference": "independently linked native CPU oracle, rejects non-CPU compilation",
+    "accepted_comparison": "complete serialized object data exact",
+    "cancelled_comparison": "complete original scene exact",
+    "trace": "actual application creates both maximum_error kernels and copies scalar8 result while rendering both eyes",
+    "GPU_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+  },
+  "manifests": {
+    "tracked_source_inputs_unchanged_through_initial_gates": 1166,
+    "CPU_binaries_unchanged": 24,
+    "ONEAPI_binaries_unchanged": 21,
+    "SAN_binaries_unchanged": 19,
+    "vendor_binaries_unchanged": 4,
+    "CPU_oracle_sources_binary_unchanged": 4,
+    "metadata_and_oracle_additions_after_initial_gates": "Only docs, CMake CPU helper definition and new test sources; existing application/library/test hashes rechecked unchanged before and after committed XR reproduction"
+  },
+  "preserved_setup_failures": [
+    "standalone oracle initial optional/shared-pointer compile error",
+    "new CMake target invoked before explicit reconfigure"
+  ],
+  "remaining": [
+    "positive AMD/NVIDIA hardware numerics/performance/device-loss",
+    "surface/topology/normal certification acceleration",
+    "other eligible meshing/paint/bake/rig workloads",
+    "sustained production-size/physical input workflows",
+    "complete requirements matrix and post-basic controller drawers"
+  ],
+  "system_install_or_session_restart": false,
+  "artifacts": {
+    "configure-cpu.log": "feaae1cde4302bacf197b1f92b009847ca7f567c99473234855ae95e457e990d",
+    "configure-oneapi.log": "e305b94bf9a46ff1265b2b682389126c3099f25731c9a3eb6d13f06103697d0d",
+    "configure-sanitize.log": "62e4145abc8c9b2d2735a69fc0fea79265a28711ebc6a11794854b63f579d232",
+    "configure-cuda.log": "f8eec912f455add3993446874b3da69e7b11033296e9bd0861d35c8a74933b5a",
+    "configure-hip.log": "0e823132fa176d696e1d59c2c21753d00f1febdfb26dfcde9b8b0606ad8eeecb",
+    "build-cpu.log": "962dbde8c51bc144e624f6624aba1b309ad48cf203adf66c081024ec2b3ac4ec",
+    "build-oneapi.log": "1502b361724afb0eae57c19910ce260c6a82b1fdced560439d04fc5fac00a7cc",
+    "build-sanitize.log": "91c454230e9e62fba29159a41cc3c1c3ef7608a6ec79974281bd50f4cb3f9228",
+    "build-cuda.log": "22375d71ee84e522882efe4443cea6fb5b3334e38fa7ae416d67295f7c9daa3b",
+    "build-hip.log": "92427b8882259590a7923892a18862d56efa87ff68444e4a91cb12e468bca4df",
+    "tests-cpu.log": "ff4dc3ebaca0e37640568bb5d2bbc45b44b2e8cb850e7c7bef06551af446a508",
+    "tests-oneapi.log": "7555f39f11b155e62f01e0afcf8fe4c1795f7618eb2d97428909fcb1475ba266",
+    "tests-sanitize.log": "d7e3d9636eb55a45b6cdfbf63d8d13256f23352231df660e51c1dc6a102a2de2",
+    "vendor-cuda-brush.log": "f1b62a0b983f9b2fbcb44d4a50488adddfd7c4aac834c5f3d48501f1a0e856dd",
+    "vendor-cuda-quality.log": "3cc8073c73543800920414a3438a6d5ac340816068b346b94d41671de35790a5",
+    "vendor-hip-brush.log": "f7c1f1fc42cafc300633e9e27034bab747c932d0d00e5b6874506ad799690386",
+    "vendor-hip-quality.log": "d2a147eb924ba7739df8b42920d70e15c9cc367727187770a5b0dd9bc9a60042",
+    "menu-native.log": "a5e858a21743bcd872dd33bcaadf9306f569d8630c8281a13e00691b77a97587",
+    "menu-compact.log": "2394abc285bf2d53fdb94f585402ef1daff35a1d40808e63ed0f542e0c543064",
+    "tests-quality-xr-repro.log": "eb60f08f656b5bee034dfc0f54b9578d292e443c820e24355ff3b558d7272783",
+    "quality-xr-repro/report.json": "138b3ef56e52d86d0b596c7197c8118c10fba526c1fe60a0841714d378444534",
+    "quality-xr-repro/oracle.log": "2060d07e3c5d6aed8686b5ed62cb9366eac4d3eb9e71d073c5a4d8f5b71c85ae",
+    "quality-xr-repro/accept.log": "146b326d825b0d3d4ea1a7240627451543d73f290d590748af092e8d40628f45",
+    "quality-xr-repro/cancel.log": "b3d092dca6e36bfb24beda0a3cfb75ae5a27dccbd65228b1c24cf542aa23f66c",
+    "quality-xr-repro/accept.json": "a697185eba57dad57f2bb67d061915f83774491eba1457213222f0c5aebe8a43",
+    "quality-xr-repro/cancel.json": "a0251e514edad79358605c162b99fd16fbc9269e414283b0eb1f5a58c24aa391",
+    "quality-xr-repro/aggregate-trace-summary.json": "95ec5047b9f4dfa1209dc21232a19c7f08a6a2873872e6b22bf9bb9dc2861d05",
+    "quality-xr-repro/source.dsculpt": "b16033b5873d4e99312007c59fb5d08ec0afd8ba31e5757a53ff3a6e5ad39f32",
+    "quality-xr-repro/expected.dsculpt": "868cd5ca44de71a250390c4cedd71161621319f3ddc55585f4fdfc6e29c5e6c0",
+    "quality-xr-repro/accept.dsculpt": "868cd5ca44de71a250390c4cedd71161621319f3ddc55585f4fdfc6e29c5e6c0",
+    "quality-xr-repro/cancel.dsculpt": "b16033b5873d4e99312007c59fb5d08ec0afd8ba31e5757a53ff3a6e5ad39f32",
+    "build-oracle-unconfigured.log": "83d9ef8c690b14115568b422e760df962a021f8f3bc92660d290ab89732e2064",
+    "compile-quality-fixture-initial.log": "dd8bf8d7cfb98ae4718f8b878958eb309b56744fe85c51dfddbf6ba7dde94a1b",
+    "source-before.json": "1b20f7ae5ed4118b1cbad63e7e33941df30bfb9bf72ee6895d8480fe1d63ba8c",
+    "source-after.json": "1b20f7ae5ed4118b1cbad63e7e33941df30bfb9bf72ee6895d8480fe1d63ba8c",
+    "build-before.json": "b66861b5539ed30e34917670f399464d973d82d6844078b7b597457f7c8ad037",
+    "build-final-after.json": "b66861b5539ed30e34917670f399464d973d82d6844078b7b597457f7c8ad037",
+    "build-oneapi-before.json": "43997290f6d72df981434d806dab17da5a2406fce5b706c8864adc303adb4ea0",
+    "build-oneapi-final-after.json": "43997290f6d72df981434d806dab17da5a2406fce5b706c8864adc303adb4ea0",
+    "sanitize-before.json": "a2273d240d0db51302aaceb70aaaab4add9bb70b5f20d111311183209bbeb67d",
+    "sanitize-final-after.json": "a2273d240d0db51302aaceb70aaaab4add9bb70b5f20d111311183209bbeb67d",
+    "vendor-before.json": "787e72350e5234481319e369ccbae0328faca883f9b750600b97008e50c720b3",
+    "vendor-final-after.json": "787e72350e5234481319e369ccbae0328faca883f9b750600b97008e50c720b3",
+    "repro-before.json": "b1d19f0298fa0d1082179ee4e1acef31df6a55f9d6af552ca66f1325c2dc5269",
+    "repro-final-after.json": "b1d19f0298fa0d1082179ee4e1acef31df6a55f9d6af552ca66f1325c2dc5269"
+  }
+}

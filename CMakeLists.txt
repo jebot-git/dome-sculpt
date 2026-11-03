@@ -1921,3 +1921,53 @@ if(BUILD_TESTING)
 endif()
 
 target_sources(dome-sculpt-core PRIVATE src/paint-composite.cpp)
+
+# Standalone actual-backend component: no old-core overlay or per-query CPU staging.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-resample-quality-test tests/resample-quality.cpp src/sculpt-storage.cpp ${compute_source})
+  target_include_directories(dome-sculpt-resample-quality-test PRIVATE include src third_party)
+  target_compile_options(dome-sculpt-resample-quality-test PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-ffp-contract=off>")
+  if(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
+    target_compile_definitions(dome-sculpt-resample-quality-test PRIVATE DOME_TEST_SYCL=1)
+    target_compile_options(dome-sculpt-resample-quality-test PRIVATE -fsycl)
+    target_link_options(dome-sculpt-resample-quality-test PRIVATE -fsycl)
+  endif()
+  add_test(NAME resample-quality-aggregate COMMAND dome-sculpt-resample-quality-test)
+  set_tests_properties(resample-quality-aggregate PROPERTIES TIMEOUT 300)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-resolution-quality-test tests/resolution-quality.cpp)
+  target_include_directories(dome-sculpt-resolution-quality-test PRIVATE src third_party)
+  target_compile_options(dome-sculpt-resolution-quality-test PRIVATE -ffp-contract=off)
+  target_link_libraries(dome-sculpt-resolution-quality-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-resolution-quality-test PRIVATE -Wl,--wrap=_ZN4dome18SparseFieldSampler13maximum_errorESt4spanIKNS_15sparse_resample10ErrorQueryELm18446744073709551615EERKSt8functionIFbvEE)
+  if(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")
+    target_compile_definitions(dome-sculpt-resolution-quality-test PRIVATE DOME_TEST_SYCL=1)
+    target_compile_options(dome-sculpt-resolution-quality-test PRIVATE -fsycl)
+    target_link_options(dome-sculpt-resolution-quality-test PRIVATE -fsycl)
+  endif()
+  add_test(NAME resolution-quality-integration COMMAND dome-sculpt-resolution-quality-test)
+  set_tests_properties(resolution-quality-integration PROPERTIES TIMEOUT 180)
+endif()
+
+# Test-only host branch seam: actual aggregate staging and Document transactions
+# with the native sampler. This is not a GPU/SDK numerical test.
+if(BUILD_TESTING AND DOME_COMPUTE_BACKEND STREQUAL "CPU")
+  add_executable(dome-sculpt-resolution-quality-host-test tests/resolution-quality.cpp tests/resolution-quality-host.cpp)
+  target_include_directories(dome-sculpt-resolution-quality-host-test PRIVATE src third_party)
+  target_compile_options(dome-sculpt-resolution-quality-host-test PRIVATE -ffp-contract=off)
+  target_link_libraries(dome-sculpt-resolution-quality-host-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-resolution-quality-host-test PRIVATE
+    -Wl,--wrap=_ZN4dome15compute_backendEv
+    -Wl,--wrap=_ZN4dome18SparseFieldSampler13maximum_errorESt4spanIKNS_15sparse_resample10ErrorQueryELm18446744073709551615EERKSt8functionIFbvEE)
+  add_test(NAME resolution-quality-host-aggregate COMMAND dome-sculpt-resolution-quality-host-test)
+  set_tests_properties(resolution-quality-host-aggregate PROPERTIES TIMEOUT 180)
+endif()
+
+# Cross-backend XR oracle: deliberately native CPU, never a selected-GPU reference.
+# Run tests/resolution-quality-xr.py with the explicit OneAPI application/runtime.
+if(BUILD_TESTING AND DOME_COMPUTE_BACKEND STREQUAL "CPU")
+  add_executable(dome-sculpt-resolution-quality-fixture tests/resolution-quality-fixture.cpp)
+  target_link_libraries(dome-sculpt-resolution-quality-fixture PRIVATE dome-sculpt-core)
+endif()
