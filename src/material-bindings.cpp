@@ -452,9 +452,9 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5 && input.at("version")!=6 && input.at("version")!=8 && input.at("version")!=7 && input.at("version")!=9 && input.at("version")!=10) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
      !input.at("bindings").is_array() || input.at("bindings").size()>256)
     throw std::runtime_error("Invalid resolved material archive");
-  if(input.at("version")==9&&!paint_domains)throw std::invalid_argument("Material9 requires its actual paired Paint sampling pool");
   const bool keyed=input.at("version")==10;
   if(!keyed){if(input.contains("key_derivations"))throw std::invalid_argument("Key derivations require owning material10");for(const auto &b:input.at("bindings"))if(b.contains("key_derivation"))throw std::invalid_argument("Key binding reference requires owning material10");if(input.contains("normal_preparations"))for(const auto &p:input.at("normal_preparations"))if(p.contains("key_derivation"))throw std::invalid_argument("Normal key entry requires owning material10");}
+  if(input.at("version")==9&&!paint_domains)throw std::invalid_argument("Material9 requires its actual paired Paint sampling pool");
   auto has_leaf=[&](const char *table,const char *key){if(!input.contains(table))return false;const auto &a=input.at(table);if(!a.is_array()||a.size()>256)throw std::invalid_argument("Invalid material feature table");return std::any_of(a.begin(),a.end(),[&](const auto &p){return p.contains(key);});};
   const bool keyed_corners=keyed&&has_leaf("color_preparations","polygon_colors");
   const bool keyed_paint=keyed&&(has_leaf("color_preparations","paint_sampling")||std::any_of(input.at("normal_preparations").begin(),input.at("normal_preparations").end(),[](const auto&p){return p.contains("sampling_domain")&&p.at("sampling_domain").contains("metadata_sampling_domain");}));
