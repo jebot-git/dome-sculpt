@@ -1,0 +1,42 @@
+{
+  "runtime_base": "02a066b",
+  "actual_work_cap": 500000000,
+  "test_only_limit": 16000000000,
+  "admitted": false,
+  "male_tops": {
+    "work": 6670380592,
+    "outer": 102,
+    "cg": 4089,
+    "dual_kkt": 6.003996159e-10,
+    "original_primal": 1.40223017e-12,
+    "duality_gap": 4.387665323e-10,
+    "pose1_maximum": 0.03712138114,
+    "unchanged_maximum_bound": 0.03513306141,
+    "passed_quality": false
+  },
+  "indistinguishable_male_tops_columns": [
+    4,
+    5,
+    9,
+    33
+  ],
+  "shared_row": 919,
+  "outside_domain_caveat": "Do not force outside head/leg samples onto a garment or silently drop eligible controls",
+  "hashes": {
+    "src/biharmonic-binding.cpp": "fdb72a1ba1cd1f4ddaa3cee6ecd67369132130ad646a4e1c19d6d6099ab00e69",
+    "src/newton-coupled-dual.hpp": "0629106ce6aeb3db55924727788c58909ee63a5aedbd05daf4d3cbc44ac63960",
+    "src/heat-source.hpp": "7d5f428af62627860830b43bd6335ce46326e8c59782a5f09592ebdd1e32bcab",
+    "artifacts/newton-overbudget.cpp": "76021c0c5ab3e17e980d19e357facf11bcf000cc889f3e157d5b3842a9ec15f4",
+    "artifacts/newton-overbudget-poses.cpp": "093444cce3d8b5f8e2f16cf12cf9832efb5b002a145d9fa3f055fdc6c58da5d9",
+    "artifacts/newton-overbudget-poses-probe": "3965328b03c08ba962e8a8a4c53ca79b42f485ec85c39879aa17eab6ab7c4e6f",
+    "artifacts/poses-newton-overbudget-female.log": "486f5fd8f4540668766595277ac319f4285dedb0fe832a90b7b23992a0d6e0a9",
+    "artifacts/poses-newton-overbudget-male.log": "2ce7dbdde55706e6bf7170d10dfd33b9aac6fef87a59b3b2bd976401811735d0",
+    "artifacts/newton-quality-before.sha256": "9a8e46abc1f7edf3c34a4218565e874de2b623e5d8ceafb9ca456b18f5c27a87",
+    "artifacts/newton-boundary.cpp": "91bfd6ab5e8f4ca3b94e9e6b4060d8f680e05bb3fc997d46ce8aaefee4914900",
+    "artifacts/newton-boundary-poses.cpp": "d3e043c164363b1b8170032e7877ee198c39adb1a13eec7534588dfee996bc6f",
+    "artifacts/newton-boundary-probe": "ed485282ff29a5f0d96a73a6a8789d45f0b1b621a8fd32c84efeda9e736e331d",
+    "artifacts/boundary-male-tops.log": "86cb599803addeb15830acb62c419fe930c20b6de3c11b9d62b2092c065c8ad7",
+    "artifacts/boundary-female-tops.log": "760966457fd01be09bf389cde663bd0ab5f880d5a9801169d2fd87cd95e6cc9e",
+    "artifacts/newton-boundary-before.sha256": "5cee324bc2495196d34cc6ec93d4a2fa702374f7b590ed559181980fa5669ff7"
+  }
+}
