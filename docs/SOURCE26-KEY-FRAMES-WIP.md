@@ -25,7 +25,12 @@ reopen, exact Undo/Redo/Restore, cancellation, controller strokes and focus-loss
 cancellation are exercised. All72 parsed emitted GLB cases (UV2..7, provided or
 generated tangents, mixed-joint pose and weights0/.35/1, Replace+Mirror) match
 native pixels within1; deliberately sampling UV0 fails. Upload reuse is checked.
-No current sanitizer, A770, Khronos or GUI claim is made for this child yet.
+Fresh wholly-owned C/C++ core/support/render O1 ASan/UBSan/leak qualification
+passes the five selected tests in22.01s. The exact source also passes385
+assertions/72 emitted-image cases on PCI03 Intel Arc A770 (maximum error1);
+all874 captured source/binary hashes are unchanged. Pinned Khronos validation
+is unfiltered and unlimited; its result is recorded in the accompanying receipt.
+No new actual desktop-menu or physical-headset claim is made.
 
 Two initial fixture negatives remain in artifacts: replacing an imported root's
 rest scale3 with absolute1.1 reduced visible coverage to80 despite exact pixels;
