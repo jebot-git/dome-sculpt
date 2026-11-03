@@ -28,11 +28,13 @@ struct Work {
 };
 struct Memory {
   size_t planned = 0, maximum;
+  size_t peak = 0;
   void add(size_t count, size_t bytes) {
     if (count > (maximum - planned) / bytes)
       throw std::length_error("Volume binding memory budget exceeded");
-    planned += count * bytes;
+    planned += count * bytes;peak=std::max(peak,planned);
   }
+  void release(size_t count,size_t bytes){planned-=count*bytes;}
 };
 using Point = std::array<double, 3>;
 Point as_point(Vec3 p) { return {p.x, p.y, p.z}; }
@@ -51,15 +53,20 @@ double norm(Point p) { return std::sqrt(dot3(p,p)); }
 Vec3 as_vec(Point p) { return {float(p[0]),float(p[1]),float(p[2])}; }
 struct Components {
   std::vector<uint32_t> triangle;
+  std::vector<uint32_t> vertex;
+  std::vector<Vec3> points;
+  std::vector<std::array<uint32_t,2>> edges;
   size_t count = 0;
 };
 Components components(const Mesh &m, Work &work) {
   const size_t nt = m.indices.size()/3;
   std::map<std::array<float,3>,uint32_t> positions;
   std::vector<uint32_t> vertex(m.positions.size()), parent(nt);
+  std::vector<Vec3> points;points.reserve(m.positions.size());
   for (size_t i = 0; i < vertex.size(); ++i) {
     work.step(); auto p=m.positions[i];
     auto [at,added]=positions.emplace(std::array{p.x,p.y,p.z},uint32_t(positions.size()));
+    if(added)points.push_back(p);
     vertex[i]=at->second;
   }
   std::iota(parent.begin(),parent.end(),0);
@@ -80,11 +87,13 @@ Components components(const Mesh &m, Work &work) {
       auto x=root(t),y=root(at->second.face);parent[x]=y;
     }
   }
+  Components out;out.edges.reserve(edges.size());
   for(const auto &[edge,e]:edges) {
     work.step();if(e.count!=2)
       throw std::invalid_argument("Volume binding requires closed components; open edges remain unbound");
+    out.edges.push_back(edge);
   }
-  Components out;out.triangle.resize(nt);
+  out.triangle.resize(nt);
   std::map<uint32_t,uint32_t> names;
   std::vector<uint32_t> position_component(positions.size(),UINT32_MAX);
   for(uint32_t t=0;t<nt;++t) {
@@ -97,7 +106,7 @@ Components components(const Mesh &m, Work &work) {
       previous=at->second;
     }
   }
-  out.count=names.size();return out;
+  out.count=names.size();out.vertex=std::move(vertex);out.points=std::move(points);return out;
 }
 // Integer winding in each closed component is orientation-independent. Nested
 // components use odd/even material fill, so a sealed inner cavity stays empty.
@@ -284,6 +293,59 @@ std::optional<uint32_t> offset(const Grid &g,uint32_t at,std::array<int,3>d) {
   for(int a=0;a<3;++a){int64_t n=int64_t(p[a])+d[a];if(n<0||n>=g.size[a])return {};q[a]=uint32_t(n);}
   return g.index(q[0],q[1],q[2]);
 }
+struct Arc { uint32_t to;double cost; };
+struct BoundaryGraph {
+  std::vector<uint32_t> component;
+  std::vector<size_t> starts;
+  std::vector<Arc> arcs;
+};
+template<class Visible>
+BoundaryGraph boundary_graph(const Components &parts,const Grid &g,const Interior &inside,
+                             Visible &&visible,Work &work,Memory &memory) {
+  struct Connection {uint32_t from,to;double cost;};
+  size_t n=inside.grid.size(),v=parts.points.size(),total=n+v;
+  memory.add(v,sizeof(uint32_t));memory.add(total+1,2*sizeof(size_t));
+  BoundaryGraph graph;graph.component.assign(v,UINT32_MAX);
+  std::vector<Connection> connections;const size_t maximum=64*v+parts.edges.size();
+  auto add=[&](Connection c){work.step();
+    if(connections.size()==connections.capacity()){
+      size_t before=connections.capacity(),next=std::min(maximum,std::max(size_t(256),before*2));
+      if(next<=before)throw std::length_error("Volume boundary graph edge budget exceeded");
+      memory.add(next,sizeof(Connection));connections.reserve(next);memory.release(before,sizeof(Connection));
+    }
+    connections.push_back(c);
+  };
+  for(uint32_t at=0;at<v;++at) {
+    work.step();auto p=as_point(parts.points[at]);std::array<int,3> q;
+    for(int a=0;a<3;++a)q[a]=int(std::floor((p[a]-g.origin[a])/g.h));
+    size_t support=0;
+    for(int z=q[2]-1;z<=q[2]+2;++z)for(int y=q[1]-1;y<=q[1]+2;++y)for(int x=q[0]-1;x<=q[0]+2;++x){
+      work.step();if(x<0||y<0||z<0||x>=int(g.size[0])||y>=int(g.size[1])||z>=int(g.size[2]))continue;
+      auto gi=g.index(x,y,z);auto id=g.nodes[gi];if(id<0)continue;
+      auto point=g.point(gi);double distance=norm(point-p);if(distance>g.h*2||!visible(p,point))continue;
+      if(graph.component[at]!=UINT32_MAX&&graph.component[at]!=inside.component[id])
+        throw std::runtime_error("A surface vertex sees unresolved disconnected volume regions; choose a finer explicit cell size");
+      graph.component[at]=inside.component[id];++support;
+      add({uint32_t(n+at),uint32_t(id),distance});
+    }
+    if(!support)throw std::runtime_error("A surface vertex has no resolved same-volume support; choose a finer explicit cell size");
+  }
+  for(auto edge:parts.edges) {
+    work.step();if(graph.component[edge[0]]!=graph.component[edge[1]])
+      throw std::runtime_error("A surface edge crosses unresolved volume regions; choose a finer explicit cell size");
+    // This edge belongs to the actual input triangle surface, so its complete
+    // segment lies in the material closure, even at a reflex corner. It is not
+    // inferred from endpoint proximity or from an unrelated source mesh.
+    add({uint32_t(n+edge[0]),uint32_t(n+edge[1]),norm(as_point(parts.points[edge[0]])-as_point(parts.points[edge[1]]))});
+  }
+  memory.add(2*connections.size(),sizeof(Arc));graph.starts.resize(total+1);
+  for(auto c:connections){work.step();++graph.starts[c.from+1];++graph.starts[c.to+1];}
+  for(size_t i=1;i<graph.starts.size();++i){work.step();graph.starts[i]+=graph.starts[i-1];}
+  graph.arcs.resize(graph.starts.back());auto cursor=graph.starts;
+  for(auto c:connections){work.step();graph.arcs[cursor[c.from]++]={c.to,c.cost};graph.arcs[cursor[c.to]++]={c.from,c.cost};}
+  auto capacity=connections.capacity();std::vector<Connection>().swap(connections);memory.release(capacity,sizeof(Connection));
+  return graph;
+}
 void validate_resolution(const Mesh &m,const Components &parts,const Grid &g,
                          const SurfaceQuery &query,const SurfaceQueryOptions &qo,
                          Work &work) {
@@ -368,8 +430,7 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
   auto parts=components(m,work);auto g=grid_for(m,o.cell_size,o.grid_phase,o.maximum_grid_points,memory);
   rasterize(m,g,work);auto inside=classify(m,parts,g,work,memory);
   const size_t n=inside.grid.size(),k=o.binding.limits.max_influences;
-  memory.add(n,k*(sizeof(Slot)+sizeof(uint32_t))+sizeof(uint32_t));
-  std::vector<Slot> labels(n*k);
+  memory.add(n,sizeof(uint32_t));
   memory.add(inside.components,sizeof(uint8_t)+sizeof(double));
   memory.add(inside.components*s.bones.size(),sizeof(uint32_t));
   memory.add(s.bones.size(),2*sizeof(Point));
@@ -405,6 +466,11 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
     }
     links[v]|=uint32_t(1)<<d;links[id]|=uint32_t(1)<<(25-d);
   }
+  auto boundary=boundary_graph(parts,g,inside,visible,work,memory);
+  const size_t total_nodes=n+parts.points.size();
+  if(total_nodes>UINT32_MAX/k)throw std::length_error("Volume label index budget exceeded");
+  memory.add(total_nodes,k*(sizeof(Slot)+sizeof(uint32_t)));
+  std::vector<Slot> labels(total_nodes*k);
   Pending queue(labels,k,work);
   auto worlds=s.world();bool deform=false;
   double radius=std::min(double(o.binding.maximum_seed_distance),g.h+o.binding.seed_margin);
@@ -426,58 +492,51 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
   if(!deform)throw std::runtime_error("Volume binding requires a deforming bone");
   for(size_t c=0;c<seeded.size();++c)if(!seeded[c])
     throw std::runtime_error("No internal deform-bone seed for volume component "+std::to_string(c));
+  // Exact visible source-to-boundary paths are valid additional initial
+  // distances, not a nearest-surface fallback. Certify each bone endpoint
+  // from a genuine interior anchor of this same volume first.
+  for(uint32_t v=0;v<parts.points.size();++v)for(uint32_t bone=0;bone<s.bones.size();++bone) {
+    work.step();auto component=boundary.component[v];auto anchor=bone_seed[component*s.bones.size()+bone];
+    if(anchor==UINT32_MAX)continue;
+    auto p=as_point(parts.points[v]),endpoint=closest_segment(p,bone_segments[bone][0],bone_segments[bone][1]);
+    if(visible(g.point(inside.grid[anchor]),endpoint)&&visible(p,endpoint))
+      queue.relax(uint32_t(n+v),{norm(p-endpoint),bone});
+  }
   while(!queue.empty()) {
     work.step();auto at=queue.pop();auto item=labels[at];uint32_t node=uint32_t(at/k);
-    for(size_t d=0;d<directions.size();++d)if(links[node]&(uint32_t(1)<<d)) {
+    for(size_t d=0;node<n&&d<directions.size();++d)if(links[node]&(uint32_t(1)<<d)) {
       work.step();auto next=offset(g,inside.grid[node],directions[d]);auto id=g.nodes[*next];
       auto direction=directions[d];double cost=g.h*std::sqrt(double(direction[0]*direction[0]+direction[1]*direction[1]+direction[2]*direction[2]));
       queue.relax(uint32_t(id),{item.distance+cost,item.bone});
+    }
+    for(size_t edge=boundary.starts[node];edge<boundary.starts[node+1];++edge) {
+      work.step();auto e=boundary.arcs[edge];queue.relax(e.to,{item.distance+e.cost,item.bone});
     }
   }
   // A pruned source is dominated by K distinct sources at this node. Every
   // continuation adds the same nonnegative edge cost to all K, so it cannot
   // enter the first K at any later node by following that continuation.
   memory.add(m.positions.size(),sizeof(VertexWeights)+k*sizeof(Influence));
+  memory.add(parts.points.size(),sizeof(VertexWeights)+k*sizeof(Influence));
   memory.add(k,sizeof(Label));
+  work.step(parts.points.size()*k*16+m.positions.size()*k);
+  std::vector<VertexWeights> vertex_rows;vertex_rows.reserve(parts.points.size());
   SkinWeights out;out.vertices.reserve(m.positions.size());
-  for(auto vertex:m.positions) {
-    work.step();Point p=as_point(vertex);std::vector<Label> row(k);
-    std::array<int,3> q;for(int a=0;a<3;++a)q[a]=int(std::floor((p[a]-g.origin[a])/g.h));
-    size_t support=0;uint32_t volume_component=UINT32_MAX;
-    for(int z=q[2]-1;z<=q[2]+2;++z)for(int y=q[1]-1;y<=q[1]+2;++y)for(int x=q[0]-1;x<=q[0]+2;++x) {
-      work.step();if(x<0||y<0||z<0||x>=int(g.size[0])||y>=int(g.size[1])||z>=int(g.size[2]))continue;
-      auto gi=g.index(x,y,z);auto id=g.nodes[gi];if(id<0)continue;
-      auto at=g.point(gi);double distance=norm(at-p);if(distance>g.h*2 || !visible(p,at))continue;
-      if(volume_component!=UINT32_MAX && volume_component!=inside.component[id])
-        throw std::runtime_error("A surface vertex sees unresolved disconnected volume regions; choose a finer explicit cell size");
-      volume_component=inside.component[id];
-      ++support;for(size_t c=0;c<k;++c){auto l=labels[size_t(id)*k+c];if(l.bone!=UINT32_MAX)insert_label(row,{l.distance+distance,l.bone});}
-    }
-    if(!support || row.front().bone==UINT32_MAX)
-      throw std::runtime_error("A surface vertex has no resolved same-volume support; choose a finer explicit cell size");
-    // An actual visible bone-to-vertex segment attains the Euclidean lower
-    // bound exactly, avoiding grid anisotropy near a source. Its bone endpoint
-    // must first be certified from an interior anchor of this same volume;
-    // visibility starting at a surface vertex alone cannot prove that an
-    // external bone is inside. All sources get this terminal shortcut, so a
-    // source pruned from the grid's K labels is not lost from the final rank.
-    for(uint32_t bone=0;bone<s.bones.size();++bone) {
-      work.step();auto anchor=bone_seed[volume_component*s.bones.size()+bone];
-      if(anchor==UINT32_MAX)continue;
-      auto endpoint=closest_segment(p,bone_segments[bone][0],bone_segments[bone][1]);
-      if(visible(g.point(inside.grid[anchor]),endpoint) && visible(p,endpoint))
-        insert_label(row,{norm(p-endpoint),bone});
-    }
+  for(uint32_t vertex=0;vertex<parts.points.size();++vertex) {
+    work.step();std::vector<Label> row(k);
+    for(size_t c=0;c<k;++c){auto l=labels[(n+vertex)*k+c];if(l.bone!=UINT32_MAX)insert_label(row,{l.distance,l.bone});}
+    if(row.front().bone==UINT32_MAX)throw std::logic_error("Volume boundary node lost its seeded path");
     // Physical falloff must not change merely because the numerical grid is
     // refined. Use the legacy2%-bone-length policy, scoped to actual sources
     // inside this volume, rather than using cell_size as a regularizer.
-    VertexWeights weights;weights.reserve(k);double nearest=row.front().distance,scale=component_scale[volume_component];
+    VertexWeights weights;weights.reserve(k);double nearest=row.front().distance,scale=component_scale[boundary.component[vertex]];
     for(auto l:row)if(l.bone!=UINT32_MAX)
       weights.push_back({l.bone,float(std::pow((nearest+scale)/(l.distance+scale),o.binding.falloff))});
-    out.vertices.push_back(normalize_weights(std::move(weights),s.bones.size(),{},o.binding.limits));
+    vertex_rows.push_back(normalize_weights(std::move(weights),s.bones.size(),{},o.binding.limits));
   }
+  for(auto vertex:parts.vertex){work.step();out.vertices.push_back(vertex_rows[vertex]);}
   out.validate(m.positions.size(),s.bones.size());work.check();
-  if(report)*report={g.count(),n,inside.components,work.used,memory.planned};
+  if(report)*report={g.count(),n,inside.components,work.used,memory.peak};
   return out;
 }
 } // namespace dome::detail

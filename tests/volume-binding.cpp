@@ -5,6 +5,7 @@
 #include <set>
 #include <map>
 #include <algorithm>
+#include <chrono>
 using namespace dome;
 namespace {
 int checks=0;
@@ -59,7 +60,7 @@ double u_distance(Vec3 p,const Bone &bone) {
   return std::hypot(planar,double(p.z)-bone.rest.translation.z);
 }
 }
-int main()try{
+int main(int argc,char **argv)try{
   auto source=cells(arms(false),.01f);auto before=source;auto rig=pair(.04f,.03f,.14f);auto o=options();detail::VolumeBindingReport report;
   auto bound=detail::volume_bind_native(source,rig,o,{},&report);
   float leak=0;for(size_t i=0;i<source.positions.size();++i)leak=std::max(leak,weight(bound.vertices[i],source.positions[i].x<.025f?1:0));
@@ -87,10 +88,12 @@ int main()try{
   unsigned polls=0;rejects([&]{detail::volume_bind_native(source,rig,o,[&]{return ++polls>12;});},"Actual construction cancellation returns no partial result");
   check(same_positions(source,before),"All refusals retain the complete original input geometry");
   auto nondeform=rig;nondeform.bones[1].deform=false;rejects([&]{detail::volume_bind_native(source,nondeform,o);},"A disconnected component cannot borrow a nondeforming bone seed");
-  auto u=cells(arms(true),.01f);auto uw=detail::volume_bind_native(u,rig,o);float tip_leak=0;double reference_leak=0,field_error=0;
+  auto u=cells(arms(true),.01f);auto uo=o;if(argc==2)uo.cell_size=std::stof(argv[1]);uo.binding.maximum_work=500'000'000;
+  detail::VolumeBindingReport ur;auto started=std::chrono::steady_clock::now();auto uw=detail::volume_bind_native(u,rig,uo,{},&ur);double seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();float tip_leak=0;double reference_leak=0,field_error=0;Vec3 worst{};double actual_worst=0,expected_worst=0;
   double scale=std::max(double(rig.bones[0].length),double(rig.bones[1].length))*.02;
-  for(size_t i=0;i<u.positions.size();++i){auto p=u.positions[i];double a=u_distance(p,rig.bones[0]),b=u_distance(p,rig.bones[1]);double w0=1/(1+std::pow((a+scale)/(b+scale),o.binding.falloff));field_error=std::max(field_error,std::abs(weight(uw.vertices[i],0)-w0));if(p.y>.15f){tip_leak=std::max(tip_leak,weight(uw.vertices[i],p.x<.025f?1:0));reference_leak=std::max(reference_leak,p.x<.025f?1-w0:w0);}}
-  std::cout<<"U_TIP wrong_limb="<<tip_leak<<" continuous_reference="<<reference_leak<<" max_field_error="<<field_error<<'\n';
+  for(size_t i=0;i<u.positions.size();++i){auto p=u.positions[i];double a=u_distance(p,rig.bones[0]),b=u_distance(p,rig.bones[1]);double w0=1/(1+std::pow((a+scale)/(b+scale),o.binding.falloff));double e=std::abs(weight(uw.vertices[i],0)-w0);if(e>field_error){field_error=e;worst=p;actual_worst=weight(uw.vertices[i],0);expected_worst=w0;}if(p.y>.15f){tip_leak=std::max(tip_leak,weight(uw.vertices[i],p.x<.025f?1:0));reference_leak=std::max(reference_leak,p.x<.025f?1-w0:w0);}}
+  std::cout<<"U_CELL "<<uo.cell_size<<" grid="<<ur.grid_points<<" interior="<<ur.interior_points<<" work="<<ur.work<<" planned_bytes="<<ur.peak_planned_bytes<<" total_kernel_seconds="<<seconds<<'\n';
+  std::cout<<"U_TIP wrong_limb="<<tip_leak<<" continuous_reference="<<reference_leak<<" max_field_error="<<field_error<<" worst="<<worst.x<<','<<worst.y<<','<<worst.z<<" actual="<<actual_worst<<" expected="<<expected_worst<<'\n';
   check(reference_leak<.03,"Independent continuous volume weighting meets the unchanged U-tip intent");
   check(tip_leak<.03f,"Connected U limbs propagate through the material base instead of crossing the air gap");
   check(field_error<.01,"Discrete weights remain within one percentage point of the independent continuous U field");
