@@ -1,0 +1,60 @@
+{
+  "source": "1cea70d13539401397a65ecb6b882a08db40db5f",
+  "scope": "three owned kernel/fixture TUs; matching whole-owned8ae R/SAN support archives; no app or authoring admission",
+  "release-compile-tests-key-mirror-relative.cpp": {
+    "exit_code": 0,
+    "seconds": 1.643432480021147
+  },
+  "release-compile-src-key-mirror-relative.cpp": {
+    "exit_code": 0,
+    "seconds": 0.6285830769920722
+  },
+  "release-compile-src-key-mirror-correspondence.cpp": {
+    "exit_code": 0,
+    "seconds": 0.7316700369992759
+  },
+  "release-link": {
+    "exit_code": 0,
+    "seconds": 0.13684634101809934
+  },
+  "release-run": {
+    "exit_code": 0,
+    "seconds": 0.0029159380064811558
+  },
+  "release-binary-sha256": "dd78ece6c622d4d94ec70c9dbfdce320f30948218d1ec672589827ec6c6b2476",
+  "sanitize-compile-tests-key-mirror-relative.cpp": {
+    "exit_code": 0,
+    "seconds": 2.3587019039841834
+  },
+  "sanitize-compile-src-key-mirror-relative.cpp": {
+    "exit_code": 0,
+    "seconds": 0.9276500939740799
+  },
+  "sanitize-compile-src-key-mirror-correspondence.cpp": {
+    "exit_code": 0,
+    "seconds": 1.0448243010032456
+  },
+  "sanitize-link": {
+    "exit_code": 0,
+    "seconds": 0.8919316919927951
+  },
+  "sanitize-run": {
+    "exit_code": 0,
+    "seconds": 0.053648230008548126
+  },
+  "sanitize-binary-sha256": "1bb8baf3e18231f0877bacad0b455eba98ebeb17d78ec43cb41946793f60ab24",
+  "input_mismatches": [],
+  "inputs": 1617,
+  "checks_per_profile": 34,
+  "persistent_allocation_prefixes": 3,
+  "cancellation_polls": 4,
+  "meaning": "detached base-relative CHANNEL-linear conversion only; no material ownership or Scene29 admission",
+  "negative_preserved": "artifacts/relative-kernel: first compile failed mixed auto deduction; corrected type only",
+  "source_sha256": {
+    "src/key-mirror-relative.cpp": "626acb5be9a94d3b332915de303d242b06a0614eeea2259019dd270f06c3eba7",
+    "src/key-mirror-relative.hpp": "2c6eb8d581e5f38665e404000c98eeb644ed6aa28f3b899c4071ad53d0aa5537",
+    "src/key-mirror-correspondence.cpp": "3a4256231d96f5fa8758bf39d577d0ac23bfd682de29b9a3aca75cbc84beca6a",
+    "src/key-mirror-correspondence.hpp": "7a85bc37bf2c1f108e69372c41c0523071bdecfeeee92960a4b40395827e0502",
+    "tests/key-mirror-relative.cpp": "020d4aed4e22e3e0ad3347fc37d334baab14903b673437b6fe5acd38b4b943b2"
+  }
+}
