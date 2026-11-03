@@ -1,0 +1,1756 @@
+{
+  "version": 1,
+  "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+  "private": true,
+  "main": "0b5ada05b155ef64333e7aa45db68f41f7a53f22",
+  "full_goal_complete": false,
+  "implementation": "New bounded worker load_scene_file returns Scene and project/package kind. Scene.load delegates; native Document Open restores authenticated HDR packages as dirty/unsaved with empty project_path; native chooser accepts project/GLB/VRM. Ordinary CBOR remains a normal saved project. No existing class/option/archive layout append.",
+  "aggregate_fix": "Original agent466d84b cherry-picked as64b46cb: complete EXR/package TUs and codec/core archives replaced. Prospective128MiB decoded aggregate forecast rejects before pixel allocation; no cap/format raise.",
+  "profiles": {
+    "release": {
+      "state": "terminal",
+      "pid": 3517833,
+      "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+      "profile": "release",
+      "scope": "Matching component rebuild: complete changed Scene/Document/emission-package/EXR TUs, new scene-file worker, new recovery/budget tests, existing project-files and actual native app TU against immutable fresh7ecc own support/render and unchanged app objects. No existing class layout/option/archive append. Parent sanitizer whole-own; external shared libraries are not instrumented. Not a fresh whole-app/all-target build.",
+      "compiles": [
+        {
+          "source": "src/scene.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/scene.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/scene.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/document.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/document.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/document.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/scene-file.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/scene-file.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/scene-file.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "tests/scene-file.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/scene-file-test.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/tests/scene-file.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/app.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_HAS_XR=1",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/desktop",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/include",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+            "-isystem",
+            "/usr/include/pixman-1",
+            "-isystem",
+            "/usr/include/libmount",
+            "-isystem",
+            "/usr/include/blkid",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/app.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/app.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/emission-package.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/emission-package.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/emission-package.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/emission-exr.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-isystem",
+            "/usr/include/OpenEXR",
+            "-isystem",
+            "/usr/include/Imath",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/emission-exr.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/emission-exr.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "tests/emission-package-budget.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/OpenEXR",
+            "-isystem",
+            "/usr/include/Imath",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/emission-package-budget.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/tests/emission-package-budget.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "tests/project-files.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/project-files.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/tests/project-files.cpp"
+          ],
+          "exit": 0
+        }
+      ],
+      "links": [
+        {
+          "name": "dome-sculpt-scene-file-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/scene-file-test.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/dome-sculpt-scene-file-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-package-budget-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/emission-package-budget.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/dome-sculpt-emission-package-budget-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-project-files-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=fsync",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/project-files.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/dome-sculpt-project-files-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/app.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/dome-sculpt",
+            "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib",
+            "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+            "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib:/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib:",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-spacenav.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+            "/usr/lib64/libGLU.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-xr.a",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libpng.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+            "-lcairo",
+            "-L/usr/lib64",
+            "-lX11",
+            "-lGLU",
+            "-lGL",
+            "/usr/lib64/libdl.a",
+            "/usr/lib64/libSM.so",
+            "/usr/lib64/libICE.so",
+            "/usr/lib64/libXext.so",
+            "/usr/lib64/libXinerama.so",
+            "/usr/lib64/libXfixes.so",
+            "/usr/lib64/libXcursor.so",
+            "/usr/lib64/libXrender.so",
+            "/usr/lib64/libXft.so",
+            "/usr/lib64/libwayland-egl.so",
+            "/usr/lib64/libwayland-cursor.so",
+            "/usr/lib64/libxkbcommon.so",
+            "/usr/lib64/libGLX.so",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libcairo.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/usr/lib64/libEGL.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "/usr/lib64/libopenxr_loader.so",
+            "/usr/lib64/libgio-2.0.so",
+            "/usr/lib64/libgobject-2.0.so",
+            "/usr/lib64/libglib-2.0.so",
+            "/usr/lib64/libX11.so",
+            "/usr/lib64/libwayland-client.so",
+            "-lm",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        }
+      ],
+      "runs": [
+        {
+          "name": "scene-file",
+          "exit": 0
+        },
+        {
+          "name": "emission-package-budget",
+          "exit": 0
+        },
+        {
+          "name": "project-files",
+          "exit": 0
+        }
+      ],
+      "phase": "project-files",
+      "child_pid": 3522670,
+      "exit_code": 0,
+      "seconds": 51.647948866011575,
+      "inputs": 3669,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "pid": 3517940,
+      "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+      "profile": "sanitize",
+      "scope": "Matching component rebuild: complete changed Scene/Document/emission-package/EXR TUs, new scene-file worker, new recovery/budget tests, existing project-files and actual native app TU against immutable fresh7ecc own support/render and unchanged app objects. No existing class layout/option/archive append. Parent sanitizer whole-own; external shared libraries are not instrumented. Not a fresh whole-app/all-target build.",
+      "compiles": [
+        {
+          "source": "src/scene.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/scene.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/scene.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/document.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/document.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/document.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/scene-file.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/scene-file.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/scene-file.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "tests/scene-file.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/scene-file-test.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/tests/scene-file.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/app.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_HAS_XR=1",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/desktop",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/include",
+            "-isystem",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+            "-isystem",
+            "/usr/include/pixman-1",
+            "-isystem",
+            "/usr/include/libmount",
+            "-isystem",
+            "/usr/include/blkid",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/app.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/app.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/emission-package.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/emission-package.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/emission-package.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "src/emission-exr.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-isystem",
+            "/usr/include/OpenEXR",
+            "-isystem",
+            "/usr/include/Imath",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/emission-exr.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src/emission-exr.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "tests/emission-package-budget.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-isystem",
+            "/usr/include/OpenEXR",
+            "-isystem",
+            "/usr/include/Imath",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/emission-package-budget.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/tests/emission-package-budget.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "source": "tests/project-files.cpp",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/project-files.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/tests/project-files.cpp"
+          ],
+          "exit": 0
+        }
+      ],
+      "links": [
+        {
+          "name": "dome-sculpt-scene-file-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/scene-file-test.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/dome-sculpt-scene-file-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-package-budget-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/emission-package-budget.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/dome-sculpt-emission-package-budget-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-project-files-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=fsync",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/project-files.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/dome-sculpt-project-files-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/app.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/dome-sculpt",
+            "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib",
+            "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+            "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib:/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib:",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-spacenav.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_images.so.1.4.5",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_gl.so.1.4.5",
+            "/usr/lib64/libGLU.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-xr.a",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libpng.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk.so.1.4.5",
+            "-lcairo",
+            "-L/usr/lib64",
+            "-lX11",
+            "-lGLU",
+            "-lGL",
+            "/usr/lib64/libdl.a",
+            "/usr/lib64/libSM.so",
+            "/usr/lib64/libICE.so",
+            "/usr/lib64/libXext.so",
+            "/usr/lib64/libXinerama.so",
+            "/usr/lib64/libXfixes.so",
+            "/usr/lib64/libXcursor.so",
+            "/usr/lib64/libXrender.so",
+            "/usr/lib64/libXft.so",
+            "/usr/lib64/libwayland-egl.so",
+            "/usr/lib64/libwayland-cursor.so",
+            "/usr/lib64/libxkbcommon.so",
+            "/usr/lib64/libGLX.so",
+            "/usr/lib64/libOpenGL.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libcairo.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-authoring-hdr-9a154/build-authoring-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/usr/lib64/libEGL.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "/usr/lib64/libopenxr_loader.so",
+            "/usr/lib64/libgio-2.0.so",
+            "/usr/lib64/libgobject-2.0.so",
+            "/usr/lib64/libglib-2.0.so",
+            "/usr/lib64/libX11.so",
+            "/usr/lib64/libwayland-client.so",
+            "-lm",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0
+        }
+      ],
+      "runs": [
+        {
+          "name": "scene-file",
+          "exit": 0
+        },
+        {
+          "name": "emission-package-budget",
+          "exit": 0
+        },
+        {
+          "name": "project-files",
+          "exit": 0
+        }
+      ],
+      "phase": "project-files",
+      "child_pid": 3526878,
+      "exit_code": 0,
+      "seconds": 90.33819304799545,
+      "inputs": 3669,
+      "drift": []
+    }
+  },
+  "new_checks": {
+    "scene_file_each": 16,
+    "aggregate_budget_each": 4
+  },
+  "regressions": {
+    "release": {
+      "state": "terminal",
+      "pid": 3529475,
+      "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+      "scope": "32 qualified7ecc registered commands replayed on31 unchanged fresh matching test TUs, plus new native scene-file/budget and registered project-files consumers, complete changed Scene/Document/package/EXR TUs and exact unchanged fresh7ecc support/render. Original properties and arguments except isolated artifact output prefix. No whole-build/full-suite or physical-device claim.",
+      "links": [
+        {
+          "name": "dome-sculpt-emission-background-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-export-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-export-worker-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-exr-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-linear-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-paint-data-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-scene-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-vrm-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-material-visibility-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-mtoon-emission-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-mtoon-render-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-paint-overlay-gpu-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-paint-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-scene-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-capture-storage-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-bake-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-export-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-faults-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-import-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-mtoon-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-native-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-overlay-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-owning-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-resources-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-sampler-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-scene-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-sampling-transport-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-union-version-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-uv-adopt-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-uv-bake-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-unlit-fallback-test",
+          "exit": 0
+        }
+      ],
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/regressions-release",
+        "--output-on-failure"
+      ],
+      "phase": "ctest",
+      "child_pid": 3530294,
+      "exit_code": 0,
+      "seconds": 84.46063191999565,
+      "inputs": 3230,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "pid": 3530516,
+      "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+      "scope": "32 qualified7ecc registered commands replayed on31 unchanged fresh matching test TUs, plus new native scene-file/budget and registered project-files consumers, complete changed Scene/Document/package/EXR TUs and exact unchanged fresh7ecc support/render. Original properties and arguments except isolated artifact output prefix. No whole-build/full-suite or physical-device claim.",
+      "links": [
+        {
+          "name": "dome-sculpt-emission-background-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-export-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-export-worker-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-exr-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-linear-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-paint-data-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-scene-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-emission-vrm-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-material-visibility-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-mtoon-emission-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-mtoon-render-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-paint-overlay-gpu-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-paint-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-scene-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-capture-storage-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-bake-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-export-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-faults-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-import-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-mtoon-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-native-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-overlay-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-owning-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-resources-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-sampler-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-paint-scene-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-sampling-transport-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-union-version-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-uv-adopt-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-source-uv-bake-test",
+          "exit": 0
+        },
+        {
+          "name": "dome-sculpt-unlit-fallback-test",
+          "exit": 0
+        }
+      ],
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/regressions-sanitize",
+        "--output-on-failure"
+      ],
+      "phase": "ctest",
+      "child_pid": 3534111,
+      "exit_code": 0,
+      "seconds": 446.043890416011,
+      "inputs": 3230,
+      "drift": []
+    }
+  },
+  "ctest_seconds": {
+    "release": 77.66,
+    "sanitize": 411.28
+  },
+  "output_equality": [
+    {
+      "file": "original.dsculpt",
+      "sha256": "3d217a6821bba104b2cfb287abb2f0ed79e458ef00106f13ffad31d3183590f8",
+      "R_SAN_equal": true
+    },
+    {
+      "file": "editable.glb",
+      "sha256": "870d5d5820fe41d8629cc0b26bfd5626479783826e254d662610e8c81e0e3573",
+      "R_SAN_equal": true
+    },
+    {
+      "file": "restored.dsculpt",
+      "sha256": "3d217a6821bba104b2cfb287abb2f0ed79e458ef00106f13ffad31d3183590f8",
+      "R_SAN_equal": true
+    }
+  ],
+  "native_GUI_release": {
+    "state": "terminal",
+    "pid": 3550956,
+    "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+    "mode": "normal",
+    "scope": "Actual matched native FLTK package Open via universal menu, native chooser/modal cancel, unsaved identity, Save As to exact native project, reopen and Quit. Private Xvfb/bus/HOME; no native Wayland or physical headset claim.",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/union/package-menu.py"
+    ],
+    "child_pid": 3550968,
+    "exit_code": 0,
+    "seconds": 10.20334810600616,
+    "report": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Package Open uses the actual native chooser with DomeD modal ownership"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels Open without changing the current project"
+        },
+        {
+          "passed": true,
+          "check": "Actual native Open restores the package as Untitled with an unsaved marker and preserves its source bytes"
+        },
+        {
+          "passed": true,
+          "check": "Ordinary Save after package Open requests a native project destination"
+        },
+        {
+          "passed": true,
+          "check": "Cancelling Save As preserves the unsaved document and original package"
+        },
+        {
+          "passed": true,
+          "check": "Actual FLTK Save writes the exact recovered native scene to a new project without overwriting the GLB"
+        },
+        {
+          "passed": true,
+          "check": "Reopening the saved native project restores its clean project identity"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Close Window exits cleanly after package recovery and leaves both formats intact"
+        }
+      ],
+      "failed": 0
+    },
+    "inputs": 1599,
+    "drift": []
+  },
+  "native_GUI_SAN_old_SDK": {
+    "state": "terminal",
+    "pid": 3566147,
+    "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+    "mode": "normal",
+    "scope": "Actual matched native FLTK package Open via universal menu, native chooser/modal cancel, unsaved identity, Save As to exact native project, reopen and Quit. Private Xvfb/bus/HOME; no native Wayland or physical headset claim.",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/union/package-menu-sanitize.py"
+    ],
+    "child_pid": 3566234,
+    "exit_code": 1,
+    "seconds": 17.74465029500425,
+    "report": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Package Open uses the actual native chooser with DomeD modal ownership"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels Open without changing the current project"
+        },
+        {
+          "passed": true,
+          "check": "Actual native Open restores the package as Untitled with an unsaved marker and preserves its source bytes"
+        },
+        {
+          "passed": true,
+          "check": "Ordinary Save after package Open requests a native project destination"
+        },
+        {
+          "passed": true,
+          "check": "Cancelling Save As preserves the unsaved document and original package"
+        },
+        {
+          "passed": true,
+          "check": "Actual FLTK Save writes the exact recovered native scene to a new project without overwriting the GLB"
+        },
+        {
+          "passed": true,
+          "check": "Reopening the saved native project restores its clean project identity"
+        },
+        {
+          "passed": false,
+          "check": "DomeD Close Window exits cleanly after package recovery and leaves both formats intact"
+        }
+      ],
+      "failed": 1
+    },
+    "inputs": 1599,
+    "drift": []
+  },
+  "native_GUI_SAN_fixed_SDK": {
+    "state": "terminal",
+    "pid": 3647913,
+    "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+    "mode": "normal",
+    "scope": "Same matched sanitizer native app with ABI-compatible new canonical bitmap SDK; package Open via universal menu, native chooser/modal cancel, unsaved identity, Save As to exact native project, reopen and Quit. Private Xvfb/bus/HOME; no native Wayland or physical headset claim.",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/union/package-menu-sanitize-sdk.py"
+    ],
+    "child_pid": 3648057,
+    "exit_code": 0,
+    "seconds": 18.27634660102194,
+    "report": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Package Open uses the actual native chooser with DomeD modal ownership"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels Open without changing the current project"
+        },
+        {
+          "passed": true,
+          "check": "Actual native Open restores the package as Untitled with an unsaved marker and preserves its source bytes"
+        },
+        {
+          "passed": true,
+          "check": "Ordinary Save after package Open requests a native project destination"
+        },
+        {
+          "passed": true,
+          "check": "Cancelling Save As preserves the unsaved document and original package"
+        },
+        {
+          "passed": true,
+          "check": "Actual FLTK Save writes the exact recovered native scene to a new project without overwriting the GLB"
+        },
+        {
+          "passed": true,
+          "check": "Reopening the saved native project restores its clean project identity"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Close Window exits cleanly after package recovery and leaves both formats intact"
+        }
+      ],
+      "failed": 0
+    },
+    "inputs": 1648,
+    "drift": []
+  },
+  "Cairo_followup": "Actual old-SDK SAN UI7/8 fails clean exit with32B Cairo SHM metadata leak. Canonical isolated DomeD3627 runtime/53b0fca qualification fixes actual4record/128B leak with exact pixels,153headers byte-identical; same app+FLTK/newSDK UI8/8 clean. New CMake guard/coherent SDK selection still pending. Old prefixes remain immutable for agent proofs.",
+  "native_XR": {
+    "state": "terminal",
+    "pid": 3574522,
+    "source": "64b46cb658ee20608c657566b7bb5e242bf3c494",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/dome-sculpt",
+      "--xr",
+      "--open",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/component-fixed-release/scene-file/editable.glb",
+      "--frames",
+      "1",
+      "--save",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-package-open-7ecc/artifacts/open-proof/native-xr-arc/recovered.dsculpt"
+    ],
+    "scope": "Actual matching native application restores an authenticated HDR package through its worker, renders one synthetic OpenXR stereo frame on requested Arc and saves exact recovered native data. Synthetic loader/runtime only, no physical headset, new compute backend or controller usability claim.",
+    "child_pid": 3574534,
+    "application_exit": 0,
+    "runtime": {
+      "acquires": 2,
+      "action_syncs": 1,
+      "application": "Dome Sculpt",
+      "bindings": {
+        "/interaction_profiles/htc/vive_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/click",
+            "/user/hand/right/input/squeeze/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/trackpad"
+          ],
+          "mirror": [
+            "/user/hand/left/input/trackpad/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/menu/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/trackpad/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/trackpad"
+          ]
+        },
+        "/interaction_profiles/khr/simple_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/select/click",
+            "/user/hand/right/input/select/click"
+          ],
+          "palette": [
+            "/user/hand/left/input/menu/click"
+          ]
+        },
+        "/interaction_profiles/logitech/mx_ink_stylus_logitech": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/tip_logitech/pose",
+            "/user/hand/right/input/tip_logitech/pose"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/cluster_middle_logitech/force",
+            "/user/hand/right/input/cluster_middle_logitech/force"
+          ],
+          "tip_force": [
+            "/user/hand/left/input/tip_logitech/force",
+            "/user/hand/right/input/tip_logitech/force"
+          ]
+        },
+        "/interaction_profiles/meta/touch_controller_plus": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "eraser": [
+            "/user/hand/left/input/y/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/x/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "redo": [
+            "/user/hand/right/input/b/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ],
+          "undo": [
+            "/user/hand/right/input/a/click"
+          ]
+        },
+        "/interaction_profiles/oculus/touch_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "eraser": [
+            "/user/hand/left/input/y/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/x/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "redo": [
+            "/user/hand/right/input/b/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ],
+          "undo": [
+            "/user/hand/right/input/a/click"
+          ]
+        },
+        "/interaction_profiles/valve/index_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/b/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ]
+        }
+      },
+      "egl_binding": true,
+      "frames_begun": 1,
+      "frames_ended": 1,
+      "frames_waited": 1,
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "gl_vendor": "Intel",
+      "image_waits": 2,
+      "overlay": true,
+      "releases": 2,
+      "sessions_begun": 1,
+      "sessions_destroyed": 1,
+      "stereo_submissions": 1,
+      "swapchain_format": 32856,
+      "swapchains_created": 2,
+      "swapchains_destroyed": 2
+    },
+    "exact_native_save": true,
+    "strict_Arc": true,
+    "stereo": true,
+    "exit_code": 0,
+    "seconds": 19.520220998005243,
+    "inputs": 1587,
+    "drift": []
+  },
+  "scope": "Matching complete changed Scene/Document/new worker/actual app and complete EXR/package TUs against immutable fresh7ecc app/support/render objects; selected consumers relinked. No fresh whole-app/all-target build for this new feature, no complete native-container import/append/generic Source4 compiler, new persistent fault frontier or physical-headset proof.",
+  "preserved_negatives": [
+    "First harness gave src/tests scene-file one object basename; R compiled product then failed link1; SAN intentionally terminated143. Corrected separate test object, original logs retained.",
+    "First native menu trial completed7checks then looked for shell-owned Quit under private Xvfb. Corrected to canonical Close Window, no application menu change.",
+    "Actual old-SDK32B sanitizer UI shutdown leak retained; fixed SDK is a distinct runtime proof."
+  ],
+  "remaining": [
+    "Generic native-authoring container and explicit painted-source portable policy",
+    "Actual package Import/append and full typed/HDR/source/UV/rig/key workflow integration",
+    "Canonical new bitmapSDK CMake guard and coherent app configuration/build",
+    "Every unfinished REQUIREMENTS row, sustained/device/vendor qualification and controller drawers"
+  ],
+  "system_install": false,
+  "physical_headset": false,
+  "active_session_restart": false,
+  "artifacts_sha256": {
+    "artifacts/open-proof/component-fixed-release/before.json": "dccfef170dd698dd0a909961f3400dce8830228c904029f7e6479757c386bea9",
+    "artifacts/open-proof/component-fixed-release/after.json": "dccfef170dd698dd0a909961f3400dce8830228c904029f7e6479757c386bea9",
+    "artifacts/open-proof/component-fixed-release/status.json": "61055b278dc37f24eec7b896c56aceada32f61754632a1fa472842f3a0dbc889",
+    "artifacts/open-proof/component-fixed-release/scene-file.log": "bc8efcb26ee0083c498b75028e10d44443886134164c59a749d01bb91ecfc562",
+    "artifacts/open-proof/component-fixed-release/emission-package-budget.log": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+    "artifacts/open-proof/component-fixed-release/project-files.log": "e67c96faf5999d13625e8b2fb4c9f62ac5dce4c977a641931235da6d8f576d5c",
+    "artifacts/open-proof/regressions-release/before.json": "6c77eacee83b4e85af08df5dbe36101c589d75694b57a77747e9b3a4b4fbd8da",
+    "artifacts/open-proof/regressions-release/after.json": "6c77eacee83b4e85af08df5dbe36101c589d75694b57a77747e9b3a4b4fbd8da",
+    "artifacts/open-proof/regressions-release/status.json": "0a5b67e8b6623695df5b0b87468a7d697709257c801c986f8cab6a223909157c",
+    "artifacts/open-proof/regressions-release/registered.json": "f2657a56e12b951d3e5c5b41ff6404dc9f64110fc4f913d6a71a69d4c1e17686",
+    "artifacts/open-proof/regressions-release/ctest.log": "16a16f82eac7b0944dec11fa2d3ef269d2e2b44bbfe6219d965817a0549e8816",
+    "artifacts/open-proof/component-fixed-sanitize/before.json": "8452ee8b2f6f5a5af83460a893171c7c8e23c84af827eb356b3728fb4a1dd089",
+    "artifacts/open-proof/component-fixed-sanitize/after.json": "8452ee8b2f6f5a5af83460a893171c7c8e23c84af827eb356b3728fb4a1dd089",
+    "artifacts/open-proof/component-fixed-sanitize/status.json": "fd25cb97827f8a6b26996e23491dd38361ecf50ed7d862c32fbdc112470c1c08",
+    "artifacts/open-proof/component-fixed-sanitize/scene-file.log": "bc8efcb26ee0083c498b75028e10d44443886134164c59a749d01bb91ecfc562",
+    "artifacts/open-proof/component-fixed-sanitize/emission-package-budget.log": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+    "artifacts/open-proof/component-fixed-sanitize/project-files.log": "e67c96faf5999d13625e8b2fb4c9f62ac5dce4c977a641931235da6d8f576d5c",
+    "artifacts/open-proof/regressions-sanitize/before.json": "6e51aaecf5e5143fb9be557d3e935d6655d5b9302b51d52494832947079fd1d3",
+    "artifacts/open-proof/regressions-sanitize/after.json": "6e51aaecf5e5143fb9be557d3e935d6655d5b9302b51d52494832947079fd1d3",
+    "artifacts/open-proof/regressions-sanitize/status.json": "c06357a64b32218f0bf8d70ad50f36d2055825f5d98c8c97f358c5027fc53c2e",
+    "artifacts/open-proof/regressions-sanitize/registered.json": "b2cc2b3d8b34ddd421ec40ff67de577bbfe85da487c5d85172ad679f8c17716f",
+    "artifacts/open-proof/regressions-sanitize/ctest.log": "6284467d36eed66038b9690f0f1af772a6ba1bffdc856f5d0b8802cdf7e05b72",
+    "artifacts/open-proof/native-menu-wrapper/before.json": "f9721d444841f4fd4e7d5498d089161699c73ace7b89a5d1be5f896caa6f1e15",
+    "artifacts/open-proof/native-menu-wrapper/after.json": "f9721d444841f4fd4e7d5498d089161699c73ace7b89a5d1be5f896caa6f1e15",
+    "artifacts/open-proof/native-menu-wrapper/status.json": "de55528ed383d47b80d8185f15574be9e4b24a141d21b66ca79ae752b2bbc29a",
+    "artifacts/open-proof/native-menu-sanitize-wrapper/before.json": "636eab37f28a7ac7c813c6672efcdab8fb7b67df4d3524bb3d3ca76b5cfe9bfd",
+    "artifacts/open-proof/native-menu-sanitize-wrapper/after.json": "636eab37f28a7ac7c813c6672efcdab8fb7b67df4d3524bb3d3ca76b5cfe9bfd",
+    "artifacts/open-proof/native-menu-sanitize-wrapper/status.json": "3cfd493d88f24d1132677f9806ad547c57d29fc36636cf3f9f1ee46367c32013",
+    "artifacts/open-proof/native-menu-sanitize-sdk-wrapper/before.json": "a25e27c3b4683fb1a512912c667287150993d18f0eb7f4564d49142898b5894b",
+    "artifacts/open-proof/native-menu-sanitize-sdk-wrapper/after.json": "a25e27c3b4683fb1a512912c667287150993d18f0eb7f4564d49142898b5894b",
+    "artifacts/open-proof/native-menu-sanitize-sdk-wrapper/status.json": "cde99d6a9493edf1af94661769c8321e2c3c7053c60f9d50189bb3790e43ccf0",
+    "artifacts/open-proof/native-xr-arc/before.json": "9e00d2c9768477b5f3de1773a20a08aee20fae75865555d059082d8a56c576ec",
+    "artifacts/open-proof/native-xr-arc/after.json": "9e00d2c9768477b5f3de1773a20a08aee20fae75865555d059082d8a56c576ec",
+    "artifacts/open-proof/native-xr-arc/status.json": "864c424e52d00b88ae00b93fd5cba96b18b47cdbf9448ed0a59153684ecaf893",
+    "artifacts/open-proof/native-menu/report.json": "1aaf7908bfe8af495a60f722d0ff6eb5cddfb055009726f0a7b9910d57c6c1e2",
+    "artifacts/open-proof/native-menu-sanitize/report.json": "325b86b4ed0a729338a4b366b7af5e93aa74a43c5d04b2e68dabb4248b9b72d7",
+    "artifacts/open-proof/native-menu-sanitize/app.log": "82184d103a8629ad3aca8aa100f4e88c3b2ae20105b69aca7accc5025a7f1a26",
+    "artifacts/open-proof/native-menu-sanitize-sdk/report.json": "1aaf7908bfe8af495a60f722d0ff6eb5cddfb055009726f0a7b9910d57c6c1e2",
+    "artifacts/open-proof/native-menu-sanitize-sdk/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
