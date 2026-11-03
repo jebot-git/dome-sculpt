@@ -226,6 +226,7 @@ struct PaintedMesh::SurfaceMap {
   Mesh mesh;
   std::shared_ptr<const PaintSamplingDomain> paint_domain;
   bool sampling_raster_proven=false;
+  bool source_capture_only=false;
   uint32_t resolution, columns;
   struct Texel {
     Vec3 position, normal;
@@ -264,9 +265,28 @@ struct PaintedMesh::SurfaceMap {
     const auto &raster=domain_raster?*domain_raster:mesh;
     if (raster.uv.size() != raster.positions.size())
       throw std::invalid_argument("Painting requires persisted UV coordinates");
-    for (auto uv : raster.uv)
-      if (uv[0] < 0 || uv[0] > 1 || uv[1] < 0 || uv[1] > 1)
-        throw std::invalid_argument("Paint UVs must fit a single texture tile");
+    for (size_t vertex=0;vertex<raster.uv.size();++vertex) {
+      if((vertex&4095)==0&&options.cancelled&&options.cancelled())
+        throw std::runtime_error("Source paint surface construction cancelled");
+      const auto uv=raster.uv[vertex];
+      if (uv[0] < 0 || uv[0] > 1 || uv[1] < 0 || uv[1] > 1) {
+        if(options.policy!=PaintUvPolicy::SourceAuthored||paint_domain)
+          throw std::invalid_argument("Paint UVs must fit a single texture tile");
+        source_capture_only=true;
+      }
+    }
+    if(source_capture_only) {
+      // Raw source coordinates are valid for texture viewing and an initial
+      // source-aware atlas conversion, but do not define a writable unit grid.
+      // Never clamp them or fabricate partial coverage of repeated triangles.
+      for(size_t face=0;face<raster.indices.size()/3;++face) {
+        if((face&4095)==0&&options.cancelled&&options.cancelled())
+          throw std::runtime_error("Source paint surface construction cancelled");
+        diagnostics.unpaintable_uv_faces.push_back(uint32_t(face));
+      }
+      options.cancelled={};
+      return;
+    }
     for (size_t k = 0; k < raster.indices.size(); k += 3) {
       uint32_t ids[] = {raster.indices[k], raster.indices[k + 1],
                         raster.indices[k + 2]};
@@ -1099,6 +1119,8 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
   install_bake(std::move(incoming),BakedNormalWrite::Replace);
 }
 void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_write) {
+  if(surface_->source_capture_only)
+    throw std::logic_error(detail::editable_texture_atlas_notice);
   if (editing_) throw std::logic_error("Finish the paint stroke before baking");
   if(size_t(normal_write)>1)throw std::invalid_argument("Invalid normal bake write intent");
   incoming.validate(resolution());
@@ -1380,6 +1402,12 @@ PaintedMesh::composite(const Material &material) const {return composite(materia
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);material.validate();
+  if(surface_->source_capture_only) {
+    if(!source_maps_||baked_||color_projection_||normal_projection_||
+       std::any_of(layers_.begin(),layers_.end(),[](const auto &layer){return tile_count(layer)||color_tile_count(layer);}))
+      throw std::invalid_argument("Initial original-coordinate capture cannot contain writable paint data");
+    return preview(material,cancelled);
+  }
   CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
   std::lock_guard lock(composite_cache_->mutex);paint_compute::checkpoint(cancelled);
   if(composite_cache_->token==composite_token_&&composite_cache_->factors==factors)
@@ -1816,6 +1844,10 @@ PaintedMesh::reparameterize(Mesh target,
   }
   result->allocated_tiles_ = 0;
   for(const auto &layer:result->layers_)result->allocated_tiles_+=tile_count(layer);
+  if(result->surface_->source_capture_only &&
+     (!result->source_maps_||result->baked_||result->color_projection_||result->normal_projection_||
+      result->allocated_tiles_||result->allocated_color_tiles_))
+    throw std::invalid_argument("Initial original-coordinate capture cannot contain writable paint data");
   result->composite_token_=next_composite_token();
   ++result->revision_;
   return result;

@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/document.hpp"
+#include "dome/gltf-export.hpp"
+#include "dome/material-bindings.hpp"
+#include "dome/humanoid-creator.hpp"
+#include "import-authoring-fixtures.hpp"
+#include "cgltf.h"
+#include <iostream>
+using namespace dome;
+namespace {
+size_t checks=0;
+void check(bool ok,const char *text){if(!ok)throw std::runtime_error(text);++checks;std::cout<<"PASS "<<text<<std::endl;}
+template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception &e){std::cout<<"Expected refusal: "<<e.what()<<std::endl;return true;}}
+void valid_glb(const std::filesystem::path &path){cgltf_options options{};cgltf_data *raw=nullptr;check(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,"Independent cgltf reads the actual exported GLB");std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(raw,cgltf_free);check(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success&&cgltf_validate(raw)==cgltf_result_success,"Independent source-coordinate GLB validation passes");}
+import_fixture::Fixture source(int wrap){import_fixture::Fixture f;auto &p=f.j["meshes"][0]["primitives"][0];p["attributes"]["TEXCOORD_0"]=f.values({-1.25f,-.5f,1.75f,-.5f,1.75f,2.5f,-1.25f,2.5f},2,"VEC2");f.j["samplers"][0]["wrapS"]=wrap;f.j["samplers"][0]["wrapT"]=wrap;return f;}
+}
+int main(int argc,char **argv)try{
+ if(argc!=2&&argc!=4)return 2;const auto out=std::filesystem::path(argv[1]);std::filesystem::create_directories(out);Scene original;const auto baseline=original.encode();ImportAuthoringOptions options;options.paint_resolution=64;
+ if(argc==4&&std::string_view(argv[2])=="--external"){
+  for(bool atlas:{false,true}){options.prepare_texture_atlas=atlas;auto imported=prepare_authoring_import(original,argv[3],options);check(!imported.objects.empty()&&original.encode()==baseline,"Actual unmodified external source imports atomically");auto encoded=imported.scene.encode();check(Scene::decode(encoded).encode()==encoded,"Actual unmodified external source and native restart retain exact authority");imported.scene.save(out/(atlas?"external-atlas.dsculpt":"external-source.dsculpt"));std::cout<<"External objects "<<imported.objects.size()<<" atlas "<<atlas<<std::endl;}return 0;
+ }
+ for(int wrap:{10497,33648,33071}){
+  auto fixture=source(wrap);auto path=out/(std::to_string(wrap)+"-raw.glb");fixture.save(path);auto imported=prepare_authoring_import(original,path,options);check(original.encode()==baseline&&imported.objects.size()==2,"Original out-of-unit source imports both instances without changing its caller");
+  for(auto id:imported.objects){const auto &object=imported.scene.object(id);auto paint=object.painted;auto encoded=paint->encode();check(*object.appearance->original_bytes==fixture.bytes()&&paint->mesh().uv==object.appearance->asset->primitives[0].mesh.uv,"Raw source bytes and every authored outside-tile UV remain unchanged");check(paint->surface_diagnostics().covered_texels==0&&paint->surface_diagnostics().unpaintable_uv_faces.size()==paint->mesh().indices.size()/3,"Initial raw capture never invents partial writable raster coverage");check(paint->preview(object.material)->source_only&&paint->composite(object.material)->source_only,"Preview and export retain the actual source sampler without compiling a partial tile");check(refuses([&]{paint->begin_stroke();})&&!paint->in_stroke()&&paint->encode()==encoded,"Direct painting refuses before changing raw source, layers or stroke state");check(refuses([&]{PaintedMesh strict(paint->mesh(),64);}),"Strict writable paint still refuses outside-tile coordinates");auto forged=encoded;forged["layers"][0]["tiles"].push_back({{"index",0},{"data",nlohmann::json::binary(std::vector<uint8_t>(32*32*14))}});check(refuses([&]{(void)PaintedMesh::decode(forged);}),"Persisted hidden or empty paint tiles cannot fabricate an initial writable source domain");}
+  auto encoded=imported.scene.encode();check(Scene::decode(encoded).encode()==encoded,"Full native raw source capture restarts exactly");auto exported=out/(std::to_string(wrap)+"-raw-export.glb");export_glb(imported.scene.surfaces(),exported);valid_glb(exported);check(imported.scene.encode()==encoded,"Unedited source export leaves original native authoring state exact");
+  auto atlas_options=options;atlas_options.prepare_texture_atlas=true;auto prepared=prepare_authoring_import(original,path,atlas_options);check(prepared.objects.size()==2&&original.encode()==baseline,"Explicit editable atlas prepares the real outside-tile source without caller mutation");
+  for(auto id:prepared.objects){const auto &object=prepared.scene.object(id);check(object.material_bindings->sampling_reparameterized&&object.material_bindings->uv_origin->paint->mesh().uv==imported.scene.object(id).painted->mesh().uv,"Atlas retains its complete actual raw outside-tile source owner");check(std::all_of(object.painted->mesh().uv.begin(),object.painted->mesh().uv.end(),[](const auto &uv){return uv[0]>=0&&uv[0]<=1&&uv[1]>=0&&uv[1]<=1;}),"New writable atlas has independently generated unit coordinates");auto editable=object.painted->snapshot();editable->begin_stroke();editable->cancel_stroke();check(!editable->in_stroke()&&editable->encode()==object.painted->encode(),"Prepared atlas accepts a normal cancellable paint gesture");}
+  auto accepted=prepared.scene.encode();check(Scene::decode(accepted).encode()==accepted,"Prepared initial source atlas and all retained authorities restart exactly");
+  for(int threshold:{4,20,60,150}){auto cancelled=atlas_options;int visits=0;cancelled.limits.cancelled=[&]{return ++visits>=threshold;};check(refuses([&]{(void)prepare_authoring_import(original,path,cancelled);})&&original.encode()==baseline,"Initial source or atlas cancellation leaves its complete caller exact");}
+  Document document;document.replace(original);ImportSettings settings;settings.paint_resolution=64;settings.prepare_texture_atlas=true;document.import_asset(path,settings);check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),"Actual native worker accepts outside-tile source atlas import");auto doc_imported=document.copy_scene().encode();check(document.undo()&&document.copy_scene().encode()==baseline&&document.redo()&&document.copy_scene().encode()==doc_imported,"Native worker import preserves exact Undo and Redo boundaries");auto saved=out/(std::to_string(wrap)+"-atlas.dsculpt");document.save_async(saved).get();check(Scene::load(saved).encode()==doc_imported,"Ordered native Save reopens the complete accepted source atlas");
+ }
+ std::cout<<checks<<" initial source-UV checks passed\n";return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}

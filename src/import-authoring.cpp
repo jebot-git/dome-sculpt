@@ -654,7 +654,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   if(std::any_of(adopted_bone_metadata.begin(),adopted_bone_metadata.end(),[](auto value){return value!=0;}))
     output.diagnostics.push_back("Retained authored bone lengths; other applications may display bones differently");
   output.scene.validate();
-  if(!options.prepare_texture_atlas && std::any_of(output.objects.begin(),output.objects.end(),[&](uint64_t id){const auto &o=output.scene.object(id);return o.painted && o.painted->source_maps() && o.painted->source_maps()->uses_alternate_uv();}))
+  if(!options.prepare_texture_atlas && std::any_of(output.objects.begin(),output.objects.end(),[&](uint64_t id){const auto &o=output.scene.object(id);return o.painted && o.painted->source_maps() && (o.painted->source_maps()->uses_alternate_uv()||std::any_of(o.painted->mesh().uv.begin(),o.painted->mesh().uv.end(),[](const auto &uv){return uv[0]<0||uv[0]>1||uv[1]<0||uv[1]>1;}));}))
     output.diagnostics.insert(output.diagnostics.begin(),"Original source coordinates retained; prepare an editable texture atlas before painting");
   if (vrm.version != detail::VrmImportVersion::None)
     output.diagnostics.push_back(
