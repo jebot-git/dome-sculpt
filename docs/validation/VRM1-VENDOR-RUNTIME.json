@@ -1,0 +1,406 @@
+{
+  "recorded_utc": "2026-11-03T13:22:12.833661+00:00",
+  "runtime_source": "fc56265411f80e6d4a4e1a2c40e309c23a1d5b1e",
+  "published_source_relation": "fc562 runtime/API is the published VRM1 baseline. Subsequent core-unlit correction has separate component evidence; these vendor runs precede that shader correction.",
+  "status": {
+    "status": "terminal",
+    "pid": 3688019,
+    "source": "fc56265411f80e6d4a4e1a2c40e309c23a1d5b1e",
+    "inputs": 1498,
+    "scope": "Selected fresh current-ABI backend runtime tests, actual A770 compute against CPU reference; CUDA/HIP actual missing-device/host only. No physical HMD or full-regression claim.",
+    "runs": [
+      {
+        "profile": "cuda",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-cuda",
+          "--output-on-failure",
+          "-V",
+          "-R",
+          "^(compute-missing-gpu|gpu-brush-missing-device|gpu-brush-transfer-shims|sparse-resample-host)$"
+        ],
+        "exit_code": 0,
+        "seconds": 6.326022016000934
+      },
+      {
+        "profile": "rocm",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-rocm",
+          "--output-on-failure",
+          "-V",
+          "-R",
+          "^(gpu-brush-missing-device|gpu-brush-transfer-shims|sparse-resample-host)$"
+        ],
+        "exit_code": 0,
+        "seconds": 6.412394440994831
+      },
+      {
+        "profile": "oneapi",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-oneapi",
+          "--output-on-failure",
+          "-V",
+          "-R",
+          "^(compute-backend|compute-missing-gpu|sparse-resample-host|sparse-resample-device|softfloat64-device|paint-composite-compute)$"
+        ],
+        "exit_code": 0,
+        "seconds": 1.1940011389961
+      },
+      {
+        "profile": "strict-softfloat",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-softfloat64-test",
+          "--device",
+          "--arc"
+        ],
+        "exit_code": 0,
+        "seconds": 0.07610379401012324
+      },
+      {
+        "profile": "strict-resample",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-sparse-resample-test",
+          "--device",
+          "--arc"
+        ],
+        "exit_code": 0,
+        "seconds": 0.2934128699998837
+      },
+      {
+        "profile": "native-xr",
+        "command": [
+          "python3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/tests/paint-composite-xr.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/libdome-sculpt-test-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/arc/paint512.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-paint-composite-fixture",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/artifacts/vendor-runtime-complete/xr"
+        ],
+        "exit_code": 0,
+        "seconds": 13.14245237200521
+      }
+    ],
+    "profile": "native-xr",
+    "child_pid": 3690336,
+    "exit_code": 0,
+    "input_drift": []
+  },
+  "before_manifest_sha256": "bc2f4a43e18edc066db35cd076a4a0b71813761fe225f11e15aa0c4a0e3e4ea5",
+  "after_manifest_sha256": "bc2f4a43e18edc066db35cd076a4a0b71813761fe225f11e15aa0c4a0e3e4ea5",
+  "native_xr": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Actual native OpenXR application paints/drains/saves and shuts down normally"
+      },
+      {
+        "passed": true,
+        "check": "Actual stereo renderer matches explicitly requested GL device: Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+      },
+      {
+        "passed": true,
+        "check": "Both actual GL eyes and tracked paint palette render with balanced image ownership"
+      },
+      {
+        "passed": true,
+        "check": "Tracked pressure updates actual512 writable layers while preserving original geometry/material/authoring sources"
+      },
+      {
+        "passed": true,
+        "check": "Real nested controller paint controls select blue ink before the pressure stroke"
+      },
+      {
+        "passed": true,
+        "check": "Actual rendering application dispatches selected-backend plain paint kernels"
+      },
+      {
+        "passed": true,
+        "check": "Bounded compositor performs actual65536-pixel16-byte device-to-host output readbacks"
+      }
+    ],
+    "failed": 0
+  },
+  "runtime": {
+    "acquires": 76,
+    "action_syncs": 42,
+    "application": "Dome Sculpt",
+    "bindings": {
+      "/interaction_profiles/htc/vive_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/click",
+          "/user/hand/right/input/squeeze/click"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/trackpad"
+        ],
+        "mirror": [
+          "/user/hand/left/input/trackpad/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/menu/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/trackpad/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/trackpad"
+        ]
+      },
+      "/interaction_profiles/khr/simple_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/select/click",
+          "/user/hand/right/input/select/click"
+        ],
+        "palette": [
+          "/user/hand/left/input/menu/click"
+        ]
+      },
+      "/interaction_profiles/logitech/mx_ink_stylus_logitech": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/tip_logitech/pose",
+          "/user/hand/right/input/tip_logitech/pose"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/cluster_middle_logitech/force",
+          "/user/hand/right/input/cluster_middle_logitech/force"
+        ],
+        "tip_force": [
+          "/user/hand/left/input/tip_logitech/force",
+          "/user/hand/right/input/tip_logitech/force"
+        ]
+      },
+      "/interaction_profiles/meta/touch_controller_plus": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/value",
+          "/user/hand/right/input/squeeze/value"
+        ],
+        "eraser": [
+          "/user/hand/left/input/y/click"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/thumbstick"
+        ],
+        "mirror": [
+          "/user/hand/left/input/thumbstick/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/x/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/thumbstick/click"
+        ],
+        "redo": [
+          "/user/hand/right/input/b/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/thumbstick"
+        ],
+        "undo": [
+          "/user/hand/right/input/a/click"
+        ]
+      },
+      "/interaction_profiles/oculus/touch_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/value",
+          "/user/hand/right/input/squeeze/value"
+        ],
+        "eraser": [
+          "/user/hand/left/input/y/click"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/thumbstick"
+        ],
+        "mirror": [
+          "/user/hand/left/input/thumbstick/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/x/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/thumbstick/click"
+        ],
+        "redo": [
+          "/user/hand/right/input/b/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/thumbstick"
+        ],
+        "undo": [
+          "/user/hand/right/input/a/click"
+        ]
+      },
+      "/interaction_profiles/valve/index_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/value",
+          "/user/hand/right/input/squeeze/value"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/thumbstick"
+        ],
+        "mirror": [
+          "/user/hand/left/input/thumbstick/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/b/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/thumbstick/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/thumbstick"
+        ]
+      }
+    },
+    "egl_binding": true,
+    "empty_submissions": 7,
+    "focus_losses": 1,
+    "focus_regains": 1,
+    "frames_begun": 45,
+    "frames_ended": 45,
+    "frames_waited": 45,
+    "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "gl_vendor": "Intel",
+    "image_waits": 76,
+    "left_eye_nonblank": 37,
+    "overlay": true,
+    "palette_images": 22,
+    "reference_changes": 1,
+    "releases": 76,
+    "right_eye_nonblank": 37,
+    "sessions_begun": 1,
+    "sessions_destroyed": 1,
+    "stereo_submissions": 38,
+    "swapchain_format": 32856,
+    "swapchains_created": 2,
+    "swapchains_destroyed": 2,
+    "tracking_losses": 4,
+    "trigger_pressure_samples": 5
+  },
+  "trace_summary": {
+    "paint_kernel_calls": 1,
+    "bounded_output_chunk_reads": 9
+  },
+  "log_sha256": {
+    "cuda.log": "593f26bbc8a00c2d6597c1583dc27086c4b0c68bd9647cef706a48d40479b7c3",
+    "rocm.log": "da86e3be7c51143b9102b69335d12349ba5ac67e0ccf459b6fa5108d4ffbe4cb",
+    "oneapi.log": "4bed211754c15f9936919d2d7701b1eda0baf1e08b969891afe7efb6f9127cdb",
+    "strict-softfloat.log": "e6d201d6b9d68e10285ab521ee3ae524e88f53b4615f114672cefe0fdf893572",
+    "strict-resample.log": "9872a743a9ebb13ca8d37c3aed1ad36b3df4cba3567518ab8879f828e7a1328d",
+    "native-xr.log": "c63ea51a7579f47583ad2705e7a8d7c600e3500f20fe9e58cd04162e10ad4739",
+    "xr/app.log": "39430a9ad6b8a83c1cdc3ad5f5772a6c3d72e4c1853d7cddcb022a590182a392"
+  },
+  "selected_binary_and_sdk_hashes": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/libdome-sculpt-core.a": "e9c2a9e420464e4dbb75e991a53b8355a467e303fa45c4c1e67ed9d9ba38cf87",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-compute-backend-test": "95a34a7a3e59b240f45acab47683d3c040afb97e45ef0d7679e6c1996c5964e3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-sparse-resample-test": "a04d1756a229fe1916d849965bf17789835961c564435b0fb8a502aad4ad3862",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-gpu-brush-transfer-test": "c954925fe057c7a26a9816cfd15368c09308ce2b6a3850eea713a7c732de0b90",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cuda/libdome-sculpt-core.a": "04b16572d6ee5345605ca0f50d45aaf575f961be07eff21df968923d4002c179",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cuda/dome-sculpt-compute-backend-test": "149f6f9bcb6e238104eb9d9669877e0d4cd18cb80fa3bd83b09aa2b4775a3fab",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cuda/dome-sculpt-sparse-resample-test": "41837b27b3d5c856da1dba895993491799200160f827a409a84962b84c70c2d6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cuda/dome-sculpt-gpu-brush-transfer-test": "30940cb5093e010b40329eb4e7d7e878199a957d656c4354773f6b5d30266623",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-rocm/libdome-sculpt-core.a": "24c3dd68dd0044f8bcf78b72879c368a314a1f3ad8a7e35259db4f709bfa33c3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-rocm/dome-sculpt-compute-backend-test": "47ccdfcd2cc878fbc6073ff60de86e6d354e47c5af4c303362917223d83dddc9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-rocm/dome-sculpt-sparse-resample-test": "1de742fd97c46de2db5f2c70f6d8fc03a07be4f64adb9aae05c85d46624f43b1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-rocm/dome-sculpt-gpu-brush-transfer-test": "b5d299554bd14dccc66f56d3ab5d4c3a68262a2ff025148b91dd33de85387be2",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-cuda/dome-sculpt-gpu-brush-missing-test": "e43bfcb92259a9045a7761ffd4a2c9f0e2a976a4531cd3a3d0c078b2833ce2a2",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-rocm/dome-sculpt-gpu-brush-missing-test": "4e2557840435bf5e286a8d63fb7514c559a7bd1ded5390f5a11b328c4b046b05",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-softfloat64-test": "7b2d5cd0d29a52a463fc0132c6e274bf1c2f0fd12bd578b3c5c4d8f5ab66776d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-paint-composite-compute-test": "c65a76465688e4581b50101c2af1c4fcddf2c0295d384810e5f7cff7100ffbc1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt": "3a622d67e2d0d47a36abda0d37a50e43de893cc178220ee532fe96056ea79d26",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-paint-composite-fixture": "1b68ab856954cd0ff838cc5d7794aa8a109b8de605ce24189a08e16f0cc16bbf",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/libdome-sculpt-test-runtime.so": "df373d0aa3141f02d0c0b0fce67ce7f541cfc9efd46393bf1a75e74cd62a03af",
+    "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so": "fbda435edba582503d01fd4954a3c65e2cf9087195543bcf98fa176346601e11",
+    "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libcairo.so.2": "8f45f554372a1b6531ec049199f19e6a8feb5a7294341b28b51c60906eb894ef"
+  },
+  "scope": "Current full fc562 native builds: CUDA4/ROCm3 missing-device/host, ONEAPI6 plus strict A770 arithmetic/resample, actual A770 GL+compute application synthetic tracking7. No positive AMD/NVIDIA, physical HMD, fresh all-suite regression, or post-unlit whole-build claim."
+}

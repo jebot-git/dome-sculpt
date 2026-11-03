@@ -1,6 +1,6 @@
 # Core unlit fallback conformance
 
-This private component on `13f7e57` fixes a concrete core-glTF rendering defect:
+This qualified component on `13f7e57`, now integrated into main, fixes a concrete core-glTF rendering defect:
 `KHR_materials_unlit` previously added fallback emission to the base color. The
 native shader now evaluates the base color term alone. Factor, decoded texture,
 linear vertex color, alpha modes, sidedness and editor overlays keep their

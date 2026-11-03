@@ -1,5 +1,23 @@
 # Full objective and completion evidence
 
+## Core-unlit correction and vendor runtime qualification — 2026-11-03
+
+The qualified core-unlit fix b35b517 is integrated: ignored PBR fallback emission
+no longer brightens unlit base color; typed MToon and retained fallback data keep
+their existing semantics. Release/SAN each252 checks plus8 parsed-reader checks
+and actual A77028 pass in the explicit matched-component scope. See
+CORE-UNLIT-FALLBACK.md. No public layout or archive changed.
+
+On the preceding identical VRM1 fc562 baseline, fresh full-build CUDA4/ROCm3
+missing-device/host checks and OneAPI6 checks pass, followed by strict A770
+arithmetic/resample and actual native application GL+compute synthetic-XR7.
+See validation/VRM1-VENDOR-RUNTIME.json. These runs precede the unlit shader fix;
+they are not a new post-fix whole-build, full-suite or physical-device claim.
+The full goal and the initial-UV, weights, seam-key, HDR, physics, broader
+authoring/interop/device and post-basic drawer requirements remain unfinished.
+No system installation or active session changed.
+
+
 ## Published VRM1 source-export integration — 2026-11-03
 
 Main `13f7e57` now includes the qualified first source-preserving VRM1 writer,
