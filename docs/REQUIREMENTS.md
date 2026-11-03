@@ -277,3 +277,9 @@ VRM1.0 route in VRM1-SOURCE-EXPORT.md. Its explicit painted/frame/HDR/initial-UV
 constraint/physics/fitted-version limitations remain required full-goal work.
 This component and its appended parsed DTO ABI require coherent root integration;
 none of its selected scopes are an all-suite or full VRM1 completion claim.
+
+The subsequent private fc56265 integration now has fresh coherent CPU535-command
+build, selected Release28/SAN18 and native/image/replay/schema evidence in
+VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds are pending on a
+frozen copy; full V1/physics/HDR/painting and broader workflow requirements stay
+open. This is not an all535-test or full-goal completion claim.
