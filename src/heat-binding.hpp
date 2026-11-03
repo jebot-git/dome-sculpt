@@ -6,6 +6,7 @@ enum class HeatOperator { FiniteElements, PositiveGraph };
 enum class HeatVisibility { AllFaces, EntryFaces };
 enum class HeatOcclusion { WholeMesh, ConnectedSurface };
 enum class HeatNormals { AreaWeighted, UnitFaces };
+enum class HeatMass { Barycentric, MixedVoronoi };
 // Private open-surface PDE prototype. Raw vertex/topology identity is retained;
 // no coordinate-only welding, authoring admission or legacy solver change.
 struct HeatBindingOptions {
@@ -13,6 +14,7 @@ struct HeatBindingOptions {
   HeatVisibility visibility = HeatVisibility::AllFaces;
   HeatOcclusion occlusion = HeatOcclusion::WholeMesh;
   HeatNormals geometry_normals = HeatNormals::AreaWeighted;
+  HeatMass mass = HeatMass::Barycentric;
   WeightLimits limits;
   double maximum_seed_distance = .3, heat_strength = 1,
          relative_tolerance = 1e-9;

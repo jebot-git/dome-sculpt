@@ -60,7 +60,8 @@ struct System {
 };
 System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
                 std::span<const uint32_t> row_groups,
-                HeatNormals geometry_normals = HeatNormals::AreaWeighted) {
+                HeatNormals geometry_normals = HeatNormals::AreaWeighted,
+                HeatMass mass = HeatMass::Barycentric) {
   System s;
   const size_t raw = m.positions.size();
   s.raw_to_row.resize(raw);
@@ -112,10 +113,34 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
     if (!(area2 > 0) || !std::isfinite(area2))
       throw std::invalid_argument(
           "Bone heat requires finite nondegenerate triangles");
+    std::array<double, 3> cotangent;
+    int obtuse = -1;
+    for (int k = 0; k < 3; ++k) {
+      budget.step(8);
+      cotangent[k] =
+          dot(sub(p[(k + 1) % 3], p[k]), sub(p[(k + 2) % 3], p[k])) / area2;
+      if (cotangent[k] < 0)
+        obtuse = k;
+    }
     for (int k = 0; k < 3; ++k) {
       budget.step();
       auto id = ids[k];
-      s.mass[id] += area2 / 6;
+      double vertex_area = area2 / 6;
+      if (mass == HeatMass::MixedVoronoi) {
+        budget.step(12);
+        if (obtuse >= 0)
+          vertex_area = area2 * (k == obtuse ? .25 : .125);
+        else {
+          auto a = sub(p[(k + 1) % 3], p[k]);
+          auto b = sub(p[(k + 2) % 3], p[k]);
+          vertex_area = .125 * (dot(a, a) * cotangent[(k + 2) % 3] +
+                                dot(b, b) * cotangent[(k + 1) % 3]);
+        }
+      }
+      if (!(vertex_area > 0) || !std::isfinite(vertex_area))
+        throw std::invalid_argument(
+            "Bone heat requires finite positive vertex area");
+      s.mass[id] += vertex_area;
       for (int a = 0; a < 3; ++a) {
         budget.step();
         s.normals[id][a] += geometry_normals == HeatNormals::UnitFaces
@@ -126,9 +151,7 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
       if (a == b)
         throw std::invalid_argument("Bone heat triangle repeats a vertex");
       s.parent[root(a)] = root(b);
-      double weight =
-          .5 * dot(sub(p[(k + 1) % 3], p[k]), sub(p[(k + 2) % 3], p[k])) /
-          area2;
+      double weight = .5 * cotangent[k];
       if (!std::isfinite(weight))
         throw std::runtime_error("Bone heat stiffness overflow");
       edges[{std::min(a, b), std::max(a, b)}] += weight;
@@ -488,6 +511,7 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
        o.occlusion != HeatOcclusion::ConnectedSurface) ||
       (o.geometry_normals != HeatNormals::AreaWeighted &&
        o.geometry_normals != HeatNormals::UnitFaces) ||
+      (o.mass != HeatMass::Barycentric && o.mass != HeatMass::MixedVoronoi) ||
       !o.maximum_work || o.maximum_work > 500'000'000 ||
       o.maximum_bytes < 4096 || o.maximum_bytes > 512u * 1024u * 1024u ||
       !o.maximum_iterations || o.maximum_iterations > 4096 ||
@@ -552,7 +576,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   if (!row_groups.empty() && row_groups.size() != n)
     throw std::invalid_argument("Bone heat virtual row groups differ from the "
                                 "exact current vertex owner");
-  auto s = assemble(m, budget, o.operation, row_groups, o.geometry_normals);
+  auto s =
+      assemble(m, budget, o.operation, row_groups, o.geometry_normals, o.mass);
   const size_t rows = s.positions.size();
   seed(s, m, rig, o, budget, sources, eligible);
   HeatBindingReport proof;

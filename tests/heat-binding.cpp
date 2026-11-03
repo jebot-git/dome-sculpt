@@ -47,10 +47,65 @@ void check(bool b, const char *message) {
     throw std::runtime_error(message);
   std::cout << "PASS " << message << '\n';
 }
+// Independently integrate nearest-vertex cells by clipping the triangle with
+// squared-distance halfplanes. This uses no cotangent-area formula. For an
+// obtuse triangle the declared mixed policy instead assigns 1/2,1/4,1/4.
+std::array<long double, 3> mixed_areas(std::array<Vec3, 3> p) {
+  using P = std::array<long double, 2>;
+  std::array<P, 3> q;
+  for (int i = 0; i < 3; ++i)
+    q[i] = {p[i].x, p[i].y};
+  auto cross = [](P a, P b, P c) {
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+  };
+  long double area = std::abs(cross(q[0], q[1], q[2])) / 2;
+  for (int i = 0; i < 3; ++i) {
+    auto a = q[(i + 1) % 3], b = q[(i + 2) % 3], v = q[i];
+    if ((a[0] - v[0]) * (b[0] - v[0]) + (a[1] - v[1]) * (b[1] - v[1]) < 0) {
+      std::array<long double, 3> out{area / 4, area / 4, area / 4};
+      out[i] = area / 2;
+      return out;
+    }
+  }
+  std::array<long double, 3> out{};
+  for (int i = 0; i < 3; ++i) {
+    std::vector<P> polygon(q.begin(), q.end());
+    for (int j = 0; j < 3; ++j)
+      if (i != j) {
+        const auto a = q[i], b = q[j];
+        auto side = [&](P x) {
+          return 2 * x[0] * (b[0] - a[0]) + 2 * x[1] * (b[1] - a[1]) -
+                 (b[0] * b[0] + b[1] * b[1] - a[0] * a[0] - a[1] * a[1]);
+        };
+        std::vector<P> next;
+        for (size_t k = 0; k < polygon.size(); ++k) {
+          P x = polygon[k], y = polygon[(k + 1) % polygon.size()];
+          long double sx = side(x), sy = side(y);
+          if (sx <= 0)
+            next.push_back(x);
+          if ((sx < 0 && sy > 0) || (sx > 0 && sy < 0)) {
+            long double t = sx / (sx - sy);
+            next.push_back(
+                {x[0] + t * (y[0] - x[0]), x[1] + t * (y[1] - x[1])});
+          }
+        }
+        polygon = std::move(next);
+      }
+    for (size_t k = 0; k < polygon.size(); ++k) {
+      auto a = polygon[k], b = polygon[(k + 1) % polygon.size()];
+      out[i] += a[0] * b[1] - a[1] * b[0];
+    }
+    out[i] = std::abs(out[i]) / 2;
+  }
+  if (std::abs(out[0] + out[1] + out[2] - area) > 1e-16L)
+    throw std::runtime_error(
+        "Independent Voronoi cells do not partition triangle");
+  return out;
+}
 // Independent dense FEM assembly from planar barycentric gradients, followed
 // by pivoted long-double elimination; no private CSR/PCG data is consumed.
 std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
-                                bool positive = false) {
+                                bool positive = false, bool mixed = false) {
   size_t n = m.positions.size();
   std::vector<std::vector<long double>> a(n, std::vector<long double>(n));
   std::vector<long double> mass(n), rhs(n);
@@ -65,8 +120,9 @@ std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
     std::array<long double, 3> gx{(q.y - r.y) / det, (r.y - p.y) / det,
                                   (p.y - q.y) / det},
         gy{(r.x - q.x) / det, (p.x - r.x) / det, (q.x - p.x) / det};
+    auto areas = mixed_areas({p, q, r});
     for (int i = 0; i < 3; ++i) {
-      mass[v[i]] += area / 3;
+      mass[v[i]] += mixed ? areas[i] : area / 3;
       for (int j = 0; j < 3; ++j)
         a[v[i]][v[j]] += area * (gx[i] * gx[j] + gy[i] * gy[j]);
     }
@@ -296,6 +352,24 @@ int main(int argc, char **) try {
         "genuine obtuse triangles");
   check(energy_difference > 1e-4,
         "Positive graph is explicitly a distinct energy from raw FEM");
+  auto mixed = positive;
+  mixed.mass = HeatMass::MixedVoronoi;
+  mixed.geometry_normals = HeatNormals::UnitFaces;
+  for (const auto &test : {mesh, obtuse}) {
+    HeatBindingReport measured;
+    auto result = heat_bind_surface(test, rig, mixed, {}, &measured);
+    auto dense = oracle(test, rig, true, true);
+    double maximum = 0;
+    for (size_t i = 0; i < dense.size(); ++i)
+      maximum = std::max(
+          maximum, double(std::abs(dense[i] - weight(result.vertices[i], 0))));
+    std::cout << "MIXED_MASS oracle_error=" << maximum
+              << " residual=" << measured.maximum_relative_residual << '\n';
+    check(maximum < 1e-6 &&
+              measured.maximum_relative_residual <= mixed.relative_tolerance,
+          "Mixed Voronoi heat matches independent clipped-cell/dense solve on "
+          "right and obtuse cases");
+  }
   auto nondeform = rig;
   nondeform.bones[1].deform = false;
   auto only = heat_bind_surface(mesh, nondeform, o);
