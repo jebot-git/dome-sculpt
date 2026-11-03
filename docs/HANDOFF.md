@@ -1135,3 +1135,18 @@ shared current-pose authority is required, source-rest VRM metadata remains
 explicitly guarded, and broader per-part/generated/unbound rig ownership,
 source-global parent selection/role/rotation controls, image/device and exhaustive
 source-operation OOM evidence remain required. Full original goal remains active.
+
+
+## Private retained paint/normal Mirror composition
+
+The test-only retained child of eed311e passes a fresh coherent optimized native
+app/core/render build plus registered2/2 fixtures (85native/36graphics), matched
+whole-owned sanitizer85/36, FLTK10normal+12compact with66 exact endpoint checks
+each, and actual PCI03A77036/nine independent GLB images max0. All1495 hardware
+inputs/binaries stay exact. Its actual original/current topology is12→12, not
+the prior4→6 case. Current paint/event/owner/history/Cancel/queuedSave remain
+exact. Ten GLBs have zero Khronos errors/ten unfiltered warnings per cohort.
+Read KEY-MIRROR-RETAINED.md and its receipt. Actual female/male Mirror probes now
+show genuine nonmatching-triangle refusal with exact rollback; a real general
+refinement/role-frame adapter and avatar/UI/VRM/freehand coverage remain required.
+No new runtime, main admission, physical HMD or Source27/28 union is claimed.
