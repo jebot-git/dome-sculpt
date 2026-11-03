@@ -1,13 +1,13 @@
 # Current DomeD toolkit and conventions
 
 The desktop application now requires canonical DomeD revision
-`f797e0f1d43e7be5a06128ca7b0b0b0259fefabd` and its24th
+`53b0fcaf533ad867300d65a4178285d0a2dbef58` and its24th
 `fltk-1.4.5-process-cleanup.patch`. The native process display owner closes the
 connection only after App/widgets/GL/workers and before Fontconfig cleanup.
 CMake checks the builder-installed patch and its pinned checksum to reject
 older same-version toolkits with unsafe/incomplete explicit-close teardown.
 The configure step also requires the matching FreeType/HarfBuzz/Cairo prefix
-and Cairo cache-cleanup manifest. The generated launcher prepends both selected
+and Cairo cache/deferred-SHM cleanup manifest. The generated launcher prepends both selected
 library directories so inherited older same-SONAME libraries cannot silently
 replace either configured runtime.
 The source patch does not change bitmap helpers, appearance/menu conventions or
@@ -15,21 +15,21 @@ public class layouts. This requirement applies to the desktop build; standalone
 headless compute configurations do not need a desktop toolkit.
 
 Prepare the toolkit from a checkout at that exact DomeD commit, as the regular
-user, with private paths. The matching bitmap runtime includes the Xlib source-cache fix. All153 public
+user, with private paths. The matching bitmap runtime includes both Xlib source-cache and deferred-SHM record cleanup. All153 public
 headers remain byte-identical to the previous SDK. Prepare both private prefixes:
 
 ```sh
 python3 "$DOME_TOOLKIT_SOURCE/scripts/prepare-bitmap-runtime.py" \
-  --work "$PWD/artifacts/bitmap-f797e0f-work" \
-  --prefix "$PWD/artifacts/bitmap-f797e0f" --jobs 2
-export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-f797e0f/lib/pkgconfig"
-export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-f797e0f/lib"
+  --work "$PWD/artifacts/bitmap-53b0fca-work" \
+  --prefix "$PWD/artifacts/bitmap-53b0fca" --jobs 2
+export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-53b0fca/lib/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-53b0fca/lib"
 python3 "$DOME_TOOLKIT_SOURCE/scripts/prepare-fltk-experiment.py" \
-  --deps "$PWD/artifacts/toolkit-f797e0f-deps" \
-  --prefix "$PWD/artifacts/toolkit-f797e0f"
-export LD_LIBRARY_PATH="$PWD/artifacts/toolkit-f797e0f/lib:$LD_LIBRARY_PATH"
+  --deps "$PWD/artifacts/toolkit-53b0fca-deps" \
+  --prefix "$PWD/artifacts/toolkit-53b0fca"
+export LD_LIBRARY_PATH="$PWD/artifacts/toolkit-53b0fca/lib:$LD_LIBRARY_PATH"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOME_COMPUTE_BACKEND=CPU \
-  -DFLTK_DIR="$PWD/artifacts/toolkit-f797e0f/share/fltk"
+  -DFLTK_DIR="$PWD/artifacts/toolkit-53b0fca/share/fltk"
 cmake --build build --parallel 2
 ```
 
@@ -38,11 +38,14 @@ The builder retains the verified archive, COPYING and all24 patches under
 `share/fltk-bdf-source`. The whole-toolkit sanitizer counterpart must retain the
 same source notices. Current application lifecycle evidence is qualified in
 [NATIVE-DISPLAY-LIFETIME.md](NATIVE-DISPLAY-LIFETIME.md); prior62b6417/application
-proofs below retain their original scopes. The toolkit and matching Cairo runtime have clean native Wayland and X11
-sanitizer lifecycle evidence. The older800-byte Cairo Xlib source report is
-retained as a negative and corrected by the matching runtime; standalone-XR's
-Mesa112-byte report is separate and remains unresolved. No suppression is
-introduced.
+proofs below retain their original scopes. The earlier f797 stack has clean native Wayland and X11 lifecycle evidence.
+The new canonical bitmap SDK independently passes actual SHM/source-cache pixel
+and teardown checks; the same sanitizer app/FLTK binaries also pass the real
+package Open/Save chooser flow with clean exit. See NATIVE-PACKAGE-OPEN.md and
+DomeD native/bitmap-runtime/SHM-LIFETIME.md. Coherent current-SDK application
+build and broader compositor qualification are separate gates. Older800-byte
+source-cache and32-byte deferred-SHM reports are preserved negatives; the
+standalone-XR Mesa112-byte report remains unresolved. No suppression is used.
 
 ## Earlier23-patch toolkit baseline
 
