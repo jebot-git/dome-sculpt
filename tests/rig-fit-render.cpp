@@ -16,6 +16,11 @@ int main(int argc,char **argv)try{
  check(count(first,.45f,-.06f,false)>0,"Optional guide bone continuation and unselected marker retain independent role colour");
  check(uploaded>0&&uploaded<4096,"Landmark guide uploads only bounded tool lines and extracts no scene geometry");
  check(render()==first,"Second-eye landmark guide image is deterministic with unchanged immutable tool source");
+ auto selected_spine=std::make_shared<RigFitView>(*guide);const auto &roles=human_roles();auto spine=std::find_if(roles.begin(),roles.end(),[](const auto &r){return r.name=="spine";});check(spine!=roles.end(),"Selection change uses the actual required spine role");selected_spine->role=size_t(spine-roles.begin());state.rig_fit=selected_spine;auto selected=render();
+ check(count(selected,.45f,-.06f,true)>0&&count(selected,.405f,-.18f,false)>0,"Changing the required landmark moves its highlight while the prior landmark retains its unselected colour");
+ auto existing=std::make_shared<RigFitView>(*selected_spine);auto deformation=std::make_shared<DeformationState>(quad());deformation->skeleton=Skeleton{{{"Root (required)",-1,{},.15f},{"Editable child",0,{},.2f}}};deformation->validate(quad());existing->rest_source=deformation;existing->bone_heads={{.2f,.15f,0},{.2f,.3f,0}};existing->bone_parents={-1,0};existing->bone_lengths={.15f,.2f};existing->role=1;state.rig_fit=existing;
+ check(render()==selected,"Existing-rig joint selection retains the same marker geometry and colours independently of bone display names");
+ state.rig_fit=guide;check(render()==first,"Returning to the original immutable landmark view restores its exact guide pixels");
  auto moved=std::make_shared<RigFitView>(*guide);moved->landmarks.points["hips"].x+=.2f;state.rig_fit=moved;auto after=render();check(after!=first&&count(after,.165f,-.18f,true)>0,"Landmark edit changes the guide at independently computed full-affine location");
  state.rig_fit.reset();auto absent=render();check(std::all_of(absent.begin(),absent.end(),[](auto x){return x==0;}),"Cancelling fitting removes all guide pixels without altering a model");
  check(glGetError()==GL_NO_ERROR,"Rig-fitting guide preserves valid OpenGL state");std::cout<<checks<<" humanoid fitting GPU guide checks passed\n";return 0;
