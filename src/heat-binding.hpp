@@ -2,30 +2,43 @@
 #pragma once
 #include "dome/rig.hpp"
 namespace dome::detail {
+enum class HeatOperator { FiniteElements, PositiveGraph };
 // Private open-surface PDE prototype. Raw vertex/topology identity is retained;
 // no coordinate-only welding, authoring admission or legacy solver change.
 struct HeatBindingOptions {
+  HeatOperator operation = HeatOperator::FiniteElements;
   WeightLimits limits;
-  double maximum_seed_distance=.3,heat_strength=1,relative_tolerance=1e-9;
-  size_t maximum_work=500'000'000,maximum_bytes=256u*1024u*1024u;
-  uint32_t maximum_iterations=2048;
+  double maximum_seed_distance = .3, heat_strength = 1,
+         relative_tolerance = 1e-9;
+  size_t maximum_work = 500'000'000, maximum_bytes = 256u * 1024u * 1024u;
+  uint32_t maximum_iterations = 2048;
 };
 struct HeatBindingReport {
-  size_t vertices=0,components=0,seeded_bones=0,iterations=0,work=0,planned_bytes=0;
-  double maximum_relative_residual=0,minimum_unclamped_weight=0,
-    maximum_partition_error=0;
+  size_t vertices = 0, components = 0, seeded_bones = 0, iterations = 0,
+         work = 0, planned_bytes = 0;
+  size_t negative_edges = 0;
+  double removed_negative_stiffness = 0;
+  double maximum_relative_residual = 0, minimum_unclamped_weight = 0,
+         maximum_partition_error = 0;
 };
 // Caller-authenticated actual metric source geometry. Imported raw joint axes
 // must not be silently interpreted as authored native bone-Y tail authority.
 struct HeatSourceSegment {
-  std::array<double,3> head{},tail{};
-  uint32_t bone=0;
+  std::array<double, 3> head{}, tail{};
+  uint32_t bone = 0;
 };
-struct HeatPositivityFailure:std::runtime_error {
-  uint32_t joint;double minimum;
-  HeatPositivityFailure(uint32_t j,double m):std::runtime_error("Bone heat FEM field violates its independently checked positivity bound"),joint(j),minimum(m){}
+struct HeatPositivityFailure : std::runtime_error {
+  uint32_t joint;
+  double minimum;
+  HeatPositivityFailure(uint32_t j, double m)
+      : std::runtime_error("Bone heat FEM field violates its independently "
+                           "checked positivity bound"),
+        joint(j), minimum(m) {}
 };
-SkinWeights heat_bind_surface(const Mesh&,const Skeleton&,const HeatBindingOptions&,
-  const std::function<bool()>&cancelled={},HeatBindingReport*report=nullptr,
-  std::span<const HeatSourceSegment>sources={});
-}
+SkinWeights heat_bind_surface(const Mesh &, const Skeleton &,
+                              const HeatBindingOptions &,
+                              const std::function<bool()> &cancelled = {},
+                              HeatBindingReport *report = nullptr,
+                              std::span<const HeatSourceSegment> sources = {},
+                              std::span<const uint8_t> eligible = {});
+} // namespace dome::detail
