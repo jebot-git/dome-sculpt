@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
-#include <FL/platform.H>
 
 namespace dome::desktop {
 // Process-owned desktop connection. Construct after the Fontconfig owner and
@@ -10,7 +9,7 @@ namespace dome::desktop {
 class NativeDisplayRuntime {
 public:
   NativeDisplayRuntime() = default;
-  ~NativeDisplayRuntime() { fl_close_display(); }
+  ~NativeDisplayRuntime();
   NativeDisplayRuntime(const NativeDisplayRuntime &) = delete;
   NativeDisplayRuntime &operator=(const NativeDisplayRuntime &) = delete;
 };
