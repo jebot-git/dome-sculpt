@@ -1,0 +1,472 @@
+{
+  "scope": "Private first plain writable-UV0 HDR GLB package; full task remains active/incomplete",
+  "base": "06816fe96269581c239e34860719ae935f36b6a6",
+  "runtime_sha256": {
+    "CMakeLists.txt": "b6a92591a47c90f14b25881f01034730e3382bb2ea273a86900589b8004201a3",
+    "THIRD-PARTY.md": "d29d43bfdbb8b9bfd3655cc4ba377544ebafa9de9aedba316aaa71fd00bd6c1b",
+    "include/dome/emission-interchange.hpp": "50c16df0dc193c854cd490ce94682823c89ad2de22f9449e95cf40ba239042c7",
+    "include/dome/emission-native.hpp": "6bca166a3e8838991e687c965671c64958e38326f2598f6b978e7e5bfc424580",
+    "include/dome/gltf-export.hpp": "60deece250e9f8059cd6e847f36945ff473a6a9d402e6902172d0c22bdf7ddaa",
+    "include/dome/paint.hpp": "b46c79c1b1b107c2c822ef96a57efba13896d54a86c8aa8fa7e5a80e38209da1",
+    "include/dome/vrm.hpp": "48433a05a31f268d57faa2fca9af90026d678183c44f18169f56cb1e81375b67",
+    "src/emission-export.cpp": "df9999e6fbb7021f420c384be3f1963b045cb5d04b5071bf3e13771d456d38b4",
+    "src/emission-export.hpp": "01d571c48502f7a4408dede4fdce4734e2eac5afb2a173a9fe1772bc8ac5b578",
+    "src/emission-exr.cpp": "e6eee3ec28735f98b06913c9b109fea0c6e8c7bc2ee676bf61c989a1a120654b",
+    "src/emission-package.cpp": "8684a96a398b9e3b90c91158bf6a7e4a0ba9b330fc20ee5b22154147875ed849",
+    "src/emission-package.hpp": "3830b6873db569c432e3c9d647793943c7487b6104f76a130866900b5d51fc83",
+    "src/export.cpp": "ebb2ff682ba5b7983a75eebf61fb22583c0576bee4508e0e386dd856c859f949",
+    "src/vrm.cpp": "3646762619f28be055b355d915d25fa82d3cba220b0827c53ba81cc0989b375e",
+    "tests/emission-export.cpp": "85d1bb111faf7c3b324aefc290f6944d3c4e6292dce1ddbe08b1d50415ea55ff",
+    "tests/emission-exr.cpp": "2c5d815338955002a87335da013381d4e8bfee292adeec0679b726eadde245c8",
+    "third_party/sources.json": "779c06a1faa0f9cb29ee6fb63ac601f6ab14667a5a754408c4e2fec108ac41e0"
+  },
+  "api": {
+    "append": [
+      "GltfExportOptions.emission",
+      "VrmExportOptions.emission: reserved capability explicitly refuses, no silent native-package loss"
+    ],
+    "new": [
+      "NativeEmissionExport immutable Scene::snapshot owner + explicit scope/fallback intent",
+      "emission_export_surfaces worker-only helper",
+      "extract_native_emission bounded exact Scene extraction",
+      "FLOAT32 ZIP codec"
+    ],
+    "unchanged": [
+      "Scene schema27",
+      "Material/Paint sparse tile layouts",
+      "TextureMaps layout",
+      "default LDR APIs owner-optional"
+    ]
+  },
+  "profiles": {
+    "release": {
+      "initial_fresh_whole_owned_build": {
+        "profile": "release",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 3.566387819009833
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-unlit-fallback-test"
+            ],
+            "exit": 0,
+            "seconds": 338.5887858060014
+          }
+        ],
+        "seconds": 342.2001094010193,
+        "inputs": 1508,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; new options owner ABI and first EXR/native/GLB adapter. No prior core/support/archive consumers reused."
+      },
+      "final_incremental_private_TU_or_test_continuation": {
+        "profile": "release",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 2.043311941990396
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-unlit-fallback-test"
+            ],
+            "exit": 0,
+            "seconds": 7.415822577022482
+          }
+        ],
+        "seconds": 9.506767943996238,
+        "inputs": 1510,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; new options owner ABI and first EXR/native/GLB adapter. No prior core/support/archive consumers reused."
+      },
+      "final_run": {
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-release",
+          "--output-on-failure",
+          "-R",
+          "^(emission-exr|emission-export|physical-emission-background|emission-scene|emission-paint-data|source-union-version|export-cancellation|vrm1-source-export|unlit-fallback)$"
+        ],
+        "exit": 0,
+        "seconds": 9.327116509026382,
+        "inputs": 1534,
+        "unchanged": true,
+        "scope": "Whole-owned fresh core/support/app/dependent affected tests; external OpenEXR/Imath system libraries not instrumented. Software GL only."
+      },
+      "selected_tests": 9,
+      "selected_passed": 9,
+      "external_libraries_not_instrumented": "OpenEXR3.2.4/Imath3.1.12 system",
+      "proof_manifest_sha256": {
+        "before": "fd25dd19e572ec4584eead0fd387ce7ef12df26a8f3f1e536fb40944de34aa6a",
+        "after": "fd25dd19e572ec4584eead0fd387ce7ef12df26a8f3f1e536fb40944de34aa6a",
+        "test_log": "391c1b9e93984259474075dea505efe3bb1f8722d640b324dcbe241fecdd1eb9",
+        "ctest_detail": "0859805a9739b39b360e7ea4f19d9dd255e63dea4c52096fff7cd759fe776f9d"
+      },
+      "owned_artifacts_sha256": {
+        "build-export-release/libdome-sculpt-emission-codec.a": "050bcc9b23020090b8383728abb0570eccaa66988ebc65105f89265acfdcc7b0",
+        "build-export-release/libdome-sculpt-affine.a": "7834438aa7e51ea42f55800841a6752a3290f7905aadd814e273fcc9f73891c4",
+        "build-export-release/libxatlas.a": "e2b1d2cedced58b317886974cc671808e014977bb4e993b5f28a0ec5ab8ac334",
+        "build-export-release/libmikktspace.a": "15570a57d61e2e9b7783b6dcede3f55d3c51c696ee7c348a95ee9c35af094afe",
+        "build-export-release/libufbx.a": "fe55aebde0e1b101237847afa40616701baf071964964589749bb408e66e4523",
+        "build-export-release/libdome-sculpt-polygon.a": "f13a37066e5a2ce0a477e9c6f4d6dd890aefa3e367e840e2d82a10b87085fb54",
+        "build-export-release/libmikktspace-robust.a": "67b46df25b226c82a98e2eeab06d86129cd4e12499738236a6c71f35e6124b74",
+        "build-export-release/libdome-sculpt-spacenav.a": "81014b87b9cd7bb6029f81ff7ded8aecd4434aec640f51aa136779e85aec4c9f",
+        "build-export-release/libdome-sculpt-render.a": "bab89a7b864d50b32c0092cf42e309dea9f67a1b7b47a021dbf7c8878e8385e2",
+        "build-export-release/libdome-sculpt-xr.a": "7d3cd6786612323c6b9803235d5694cec7b6e66a611dcb43810c29244ab7d0c5",
+        "build-export-release/dome-sculpt-emission-exr-test": "3bba556f94cb7e6ec4c74a3ff0e867b8952f48136d6ea1b7e4db6c584e32f000",
+        "build-export-release/libdome-sculpt-core.a": "3b98e1beed143f70da9cdc2ef348f9224559e3c694ca4baf1bdaa55af8faf9d2",
+        "build-export-release/dome-sculpt": "aeb4522e6e4a8c4588c0f33b49ee2a14e164d19f3a718ecfe021931425a5ef42",
+        "build-export-release/dome-sculpt-emission-export-test": "fd54b2ae6db9786052b7687f066aa7e299cacff859860eb0227a8e3cc9908feb",
+        "build-export-release/dome-sculpt-emission-background-test": "48cdc9aa49c3b2d3b7bdd886e69db9d694b32a095a308f5047ea30023446a01b",
+        "build-export-release/dome-sculpt-emission-scene-test": "c4b077f1d3af8eb5f73075a5632c92c8705d3f565f1a76998931b53a91fe7c89",
+        "build-export-release/dome-sculpt-emission-paint-data-test": "1425d3b6187263a95d22b3502d15e9fff492afede8575b928c670b05ecc7c9ed",
+        "build-export-release/dome-sculpt-source-union-version-test": "0caecf71345ef01ec023a52e060b3d7dd417be17dc260c48253eb063889e3192",
+        "build-export-release/dome-sculpt-export-cancellation-test": "c29e7413ff4e3a0c6097d78e01d61c1215fdd326d3a31820621af0d76cbb25c2",
+        "build-export-release/dome-sculpt-vrm1-source-export-test": "7520548764d9c7dd394c2b97888221a4de2177b2fb7f10907a9546a450b6f8fa",
+        "build-export-release/dome-sculpt-unlit-fallback-test": "c429be78579223d7a4ea2b7951391aa21c22d7c8b15b652fd5a8f98c33924092"
+      },
+      "KHR": {
+        "version": "2.0.0-dev.3.10",
+        "maxIssues": 0,
+        "files": 3,
+        "errors": 0,
+        "warnings": 0,
+        "infos": 9,
+        "report_sha256": "18dbc479269f283aedfe6f67718441640141c3a0441a24a5a62f38655f9021c8",
+        "outputs": [
+          {
+            "path": "build-export-release/emission-export/physical.glb",
+            "bytes": 1244804,
+            "sha256": "66c2c87d6fcb23bc1fd07a35320e92a4b22c32749365cccb0a9e3bb8c060f3c6"
+          },
+          {
+            "path": "build-export-release/emission-export/second-cycle.glb",
+            "bytes": 1244804,
+            "sha256": "66c2c87d6fcb23bc1fd07a35320e92a4b22c32749365cccb0a9e3bb8c060f3c6"
+          },
+          {
+            "path": "build-export-release/emission-export/subset.glb",
+            "bytes": 838868,
+            "sha256": "c280fc9d7c573d51fba85e8e603c5d5fca273126322a36a7d64f20ad79911eee"
+          }
+        ]
+      }
+    },
+    "sanitize": {
+      "initial_fresh_whole_owned_build": {
+        "profile": "sanitize",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 3.7941736369975843
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-unlit-fallback-test"
+            ],
+            "exit": 0,
+            "seconds": 552.6795250450086
+          }
+        ],
+        "seconds": 556.5163941410137,
+        "inputs": 1508,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; new options owner ABI and first EXR/native/GLB adapter. No prior core/support/archive consumers reused."
+      },
+      "final_incremental_private_TU_or_test_continuation": {
+        "profile": "sanitize",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 2.0485636449884623
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-unlit-fallback-test"
+            ],
+            "exit": 0,
+            "seconds": 29.473427749995608
+          }
+        ],
+        "seconds": 31.567047968012048,
+        "inputs": 1510,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; new options owner ABI and first EXR/native/GLB adapter. No prior core/support/archive consumers reused."
+      },
+      "final_run": {
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-export-06816fe/build-export-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(emission-exr|emission-export|physical-emission-background|emission-scene|emission-paint-data|source-union-version|export-cancellation|vrm1-source-export|unlit-fallback)$"
+        ],
+        "exit": 0,
+        "seconds": 85.52501682098955,
+        "inputs": 1534,
+        "unchanged": true,
+        "scope": "Whole-owned fresh core/support/app/dependent affected tests; external OpenEXR/Imath system libraries not instrumented. Software GL only."
+      },
+      "selected_tests": 9,
+      "selected_passed": 9,
+      "external_libraries_not_instrumented": "OpenEXR3.2.4/Imath3.1.12 system",
+      "proof_manifest_sha256": {
+        "before": "92f613efc1cc9030a22821a5b15ee39272a65ee8e30fdf08e3e830ac71ccab0e",
+        "after": "92f613efc1cc9030a22821a5b15ee39272a65ee8e30fdf08e3e830ac71ccab0e",
+        "test_log": "9b4baf8fb80e29f0179114046e12269e92a35710a63f37909a6272da8e244590",
+        "ctest_detail": "52355e9433fdb34471fa5ce6355039cfb299794dd1b0cd8176c57f4eb432fa53"
+      },
+      "owned_artifacts_sha256": {
+        "build-export-sanitize/libdome-sculpt-emission-codec.a": "55f1825e5bd4c2c6e7834216ea4aee1985e9486ba755d7eac94fe25f0359974c",
+        "build-export-sanitize/libdome-sculpt-affine.a": "7b7cc56c6deadcbe236f110ffcaaee53dd817813f4fbd2db32f6c7cc71646ac2",
+        "build-export-sanitize/libxatlas.a": "339cc509349d09c023c9357930654f692848caa2985ced1dc2ffc451cb37707b",
+        "build-export-sanitize/libmikktspace.a": "2cae37a6a6f8d69c698be9ccad0cd031a2f92e02da82be1aed2b15eb432e174b",
+        "build-export-sanitize/libufbx.a": "e89ba7c39bcac1a9009b40b507d88b2e56c0c477e80801fb2dfaf03429d59ba3",
+        "build-export-sanitize/libmikktspace-robust.a": "58515a8375a46776e746f743d278c9065f31b49ae9542d7d75977ad6afc14447",
+        "build-export-sanitize/libdome-sculpt-spacenav.a": "6a2e99963f790c1a958b56ac36c77ce19ae08ccb031596adcb27d8d3a9efcf40",
+        "build-export-sanitize/libdome-sculpt-polygon.a": "335d63c80f4a596ab829ab7fd105af2636db3cf4e3a040c705388b7ca5bec7ee",
+        "build-export-sanitize/libdome-sculpt-render.a": "aed0f152068f7a4be66b8d868b2141ffc8600d3d098bda12e01595279721ae57",
+        "build-export-sanitize/libdome-sculpt-xr.a": "8f7a48c51e2b399e4134b401c638d82c7263b98242e786db35add6eafec7ae13",
+        "build-export-sanitize/dome-sculpt-emission-exr-test": "a5616309b194bd9658fe5e25fc8099b29ba6f1273f44c1c03433697a096dfb4f",
+        "build-export-sanitize/libdome-sculpt-core.a": "0a3268a1fb6a90fca5f1791767233da00688f5aab53a7d584564c1123ffde7ac",
+        "build-export-sanitize/dome-sculpt": "1270c49822ae2415fed1ecb51cf006021efe8069751558d7b1af5bfcc209521a",
+        "build-export-sanitize/dome-sculpt-emission-export-test": "46f3d5c77acdcaadc4f448c7be2542f4c0ef55017952e116a4b1878046892d49",
+        "build-export-sanitize/dome-sculpt-emission-background-test": "3dac764356ed4e64f69ee4e8a0d22ad50ca76bd7f5cf02a3c1c245db28828c0b",
+        "build-export-sanitize/dome-sculpt-emission-scene-test": "14fc34768003987e73473fc73487cf46849f7ea06d14348a7b4393006931397e",
+        "build-export-sanitize/dome-sculpt-emission-paint-data-test": "1456c8129e0cea4b4c2ffdbe7bb909009ef965a48a07ad5a8bb99eb096fc2f56",
+        "build-export-sanitize/dome-sculpt-source-union-version-test": "5f82aa8c149750a6017e5d745c039f46a9ed236fe4145a98c0f867dfbdafa3a1",
+        "build-export-sanitize/dome-sculpt-export-cancellation-test": "04a583678241045075a5fd9bc36d907090510c5380c0e398e858a424fc1493c7",
+        "build-export-sanitize/dome-sculpt-vrm1-source-export-test": "54e5aefddb782ad349d3fb3d56e163cab302480fa9ef609ccb7e6c299604bc07",
+        "build-export-sanitize/dome-sculpt-unlit-fallback-test": "6354d8067f915e167b0456a1249317e2422c86a4309ead064bc57b3386d225c8"
+      },
+      "KHR": {
+        "version": "2.0.0-dev.3.10",
+        "maxIssues": 0,
+        "files": 3,
+        "errors": 0,
+        "warnings": 0,
+        "infos": 9,
+        "report_sha256": "a259cf2c63ba7b05eec5789b005379edccc888d196512312e762636238cb087a",
+        "outputs": [
+          {
+            "path": "build-export-sanitize/emission-export/physical.glb",
+            "bytes": 1244804,
+            "sha256": "66c2c87d6fcb23bc1fd07a35320e92a4b22c32749365cccb0a9e3bb8c060f3c6"
+          },
+          {
+            "path": "build-export-sanitize/emission-export/second-cycle.glb",
+            "bytes": 1244804,
+            "sha256": "66c2c87d6fcb23bc1fd07a35320e92a4b22c32749365cccb0a9e3bb8c060f3c6"
+          },
+          {
+            "path": "build-export-sanitize/emission-export/subset.glb",
+            "bytes": 838868,
+            "sha256": "c280fc9d7c573d51fba85e8e603c5d5fca273126322a36a7d64f20ad79911eee"
+          }
+        ]
+      }
+    }
+  },
+  "format": {
+    "package": "extras.domeSculptEmission version1",
+    "image": "OpenEXR ten FLOAT32 ZIP scanline channels, arbitrary binary bufferView; never core images/KHR_texture_basisu",
+    "exact_native": "Scene CBOR, typed actual existing feature decoder",
+    "binding": "canonical JSON CBOR excluding documentSha256 plus complete BIN digest, individual native/EXR digests; integrity not authentication",
+    "scope": "whole visible surface closure checked; default subset prunes unrelated objects/groups",
+    "caps_bytes": {
+      "GLB": 268435456,
+      "JSON": 16777216,
+      "native_CBOR": 134217728,
+      "aggregate_EXR": 134217728,
+      "aggregate_dense_fields": 134217728
+    }
+  },
+  "new_checks": {
+    "codec": 14,
+    "OpenEXRCore_bitwise_samples": 21450,
+    "encoder_cancellation_polls": 313,
+    "package": 28,
+    "independent_fallback_green": 0.005001984978040004,
+    "independent_fallback_green_absolute_error": 1.984978040004e-06,
+    "mixed_field_maximum_absolute_fallback_error": 38.4169921875,
+    "mixed_field_erased_nonzero_channels": 3480,
+    "second_cycle": "byte identical, native original owners restored directly",
+    "all_encoder_cancel_boundaries": {
+      "scope": "Artifact-only complete probe TU linked final owned codec library; no old core/render ABI",
+      "release": 313,
+      "sanitize": 313,
+      "source_sha256": "0d35e390ee1a6dae48750a2dcf438571ec9025af803d540314c92689d92a9082",
+      "release_binary_sha256": "00334ced173ddd0c4e0498845ef8fdca0b97e385355cc52c3c79532172e4dada",
+      "sanitize_binary_sha256": "c467b848ca656fd969866eb61fa62af973e37a8bd926d46523c54d7b99426a9b",
+      "release_log_sha256": "1bc08680d86dd30db02e51c7afe25fdf57bcc3a465e5e69dc402ff26785ee068",
+      "sanitize_log_sha256": "1bc08680d86dd30db02e51c7afe25fdf57bcc3a465e5e69dc402ff26785ee068"
+    }
+  },
+  "negatives": [
+    {
+      "cohort": "initial-release/sanitize",
+      "outcome": "each8/9; only test read NORMAL-first attribute as POSITION; exact POSITION(-.5,-.5,0) verified then accessor type lookup corrected"
+    },
+    {
+      "cohort": "per-channel-release/sanitize",
+      "outcome": "each8/9; stale white-green expectation after actual added relative stroke raises green maximum; corrected by independent decoded-PNG*factor*strength radiance oracle, runtime unchanged for this correction"
+    },
+    {
+      "cohort": "mixed-legacy-negative",
+      "outcome": "Actual new ordinary visible emitter fails old-core byte-map comparison; fixed by restricting temporary emission sanitization to actual HDR owners",
+      "status_sha256": "6bc0103a67cd03bbd37a654f97e67bfbea282d0a0e740aa92ae70a02b48d0013",
+      "log_sha256": "9b69b22a7d0e11424be64e715a3672bd15e4de68612ef4e85c21b10f7ccf13b7"
+    }
+  ],
+  "excluded": [
+    "new HDR native FileJob/GUI/XR admission (legacy export-cancellation passes only)",
+    "typed MToon/VRM0/VRM1 adapters",
+    "retained/alternate/Source28 UV export adapter",
+    "imported HDR producer/authoring controls",
+    "larger-field streaming",
+    "exhaustive persistent allocation-failure proof",
+    "GPU HDR/third-party viewer/full regression/all vendor qualification"
+  ],
+  "gpu_lease": "none acquired/no GPU jobs",
+  "system_session_changes": false,
+  "reproduction_scripts_sha256": {
+    "artifacts/export-proof/build.py": "668305c5f3d491c5de68cf9e938f8f56b0d3fd52a2e4015888bcd2c0d8bbcd06",
+    "artifacts/export-proof/run.py": "49c5a75fc5024c7b5b015d0a1064ff311fab2bcfe0580dd796073404028eebc3",
+    "artifacts/export-proof/validate.cjs": "1c37631affe8b0f4219b3dd190301e6163976612f1019a9296c210b9b7fdad64"
+  }
+}

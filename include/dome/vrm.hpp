@@ -4,6 +4,7 @@
 #include <map>
 #include <nlohmann/json.hpp>
 namespace dome {
+struct NativeEmissionExport;
 // VRM0 indices never migrate by names or by assuming output array order.
 struct Vrm0IdentityMap {
   std::vector<int> nodes, textures;
@@ -27,6 +28,9 @@ struct VrmExportOptions {
   // explicit resampling choice for compiled paint maps, never a hidden fallback.
   uint32_t paint_resolution = 0;
   std::function<void()> before_commit;
+  // Optional immutable exact HDR/native package owner. Standard-view loss must
+  // be explicitly accepted; unhandled typed/animated routes refuse precisely.
+  std::shared_ptr<const NativeEmissionExport> emission;
 };
 struct VrmExportReport {
   size_t meshes = 0, joints = 0, normal_targets_recomputed = 0;

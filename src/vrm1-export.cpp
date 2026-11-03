@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "emission-export.hpp"
 #include "vrm1-export.hpp"
 #include "dome/material-bindings.hpp"
 #include "normal-frame-export.hpp"
@@ -27,7 +28,7 @@ bool painted(const Image &image) {
 VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
                             const J &original,
                             const std::filesystem::path &path,
-                            const VrmExportOptions &options) {
+                            const VrmExportOptions &options,EmissionExportPrepared *physical) {
   stop(options);
   validate_vrm1_metadata(original, options.cancelled, true);
   require(!objects.empty(), "no original source surfaces");
@@ -83,6 +84,8 @@ VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
             "parts do not share one immutable original model");
     require(!object.source_dormant, "original source is dormant");
     const auto &appearance = *object.appearance;
+    const bool hdr_object=physical&&std::any_of(physical->images.begin(),physical->images.end(),[&](const auto &image){return image.object==object.id;});
+    if(hdr_object){require(!uv_expression_materials.contains(appearance.source_material),"HDR emission on a UV-expression material requires an exact animated sampling adapter");if(vrm.contains("expressions"))for(const auto *table:{"preset","custom"})if(vrm.at("expressions").contains(table))for(const auto &expression:vrm.at("expressions").at(table))for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==appearance.source_material&&bind.at("type").get_ref<const std::string&>()=="emissionColor")throw std::invalid_argument("VRM1 HDR emission expressions require an exact material-factor adapter");}
     if (uv_expression_materials.contains(appearance.source_material)) {
       require(
           !object.paint_sampling_attachment &&
@@ -579,6 +582,7 @@ VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
   report.diagnostics.push_back(
       "Source-version VRM1 metadata/node/material/morph identities preserved; "
       "physics and constraint simulation are not evaluated by this exporter");
+  if(physical){finish_emission_export(document,*physical,*options.emission,options.max_output_bytes,options.cancelled);validate_vrm1_metadata(j,options.cancelled,true);for(const auto &image:physical->images)report.diagnostics.push_back("Exact native/FLOAT32 HDR object "+std::to_string(image.object)+"; measured VRM1 fallback maximum radiance error "+std::to_string(image.maximum_absolute_error));}
   budget();
   const auto json_bytes = j.dump().size();
   require(json_bytes <= options.max_output_bytes - binary.size() &&

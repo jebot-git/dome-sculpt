@@ -597,5 +597,40 @@
     "manifest": "third_party/softfloat/SOURCES.json",
     "generator": "tools/generate-softfloat-f64.py",
     "scope": "Integer-only nearest-even binary64 numeric results for selected-backend forward sculpt layer/mask resampling. Floating environment flags are not exposed; reconstruction and geometry quality remain host work."
+  },
+  "openexr_system": {
+    "repository": "https://github.com/AcademySoftwareFoundation/openexr",
+    "version": "3.2.4",
+    "packages": [
+      "openexr-devel-3.2.4-7.fc44.x86_64",
+      "openexr-libs-3.2.4-7.fc44.x86_64",
+      "openexr-libs-3.2.4-7.fc44.i686",
+      "imath-devel-3.1.12-6.fc44.x86_64"
+    ],
+    "license": "BSD-3-Clause",
+    "used": "System-linked FLOAT32 ZIP scanline emission interchange codec; independent OpenEXRCore channel/chunk test consumer. No source code vendored and no core glTF image-format claim. Imath3.1.12 remains a system dependency.",
+    "primary_reference": "https://openexr.com/en/latest/TechnicalIntroduction.html",
+    "system_evidence_sha256": {
+      "/usr/include/OpenEXR/ImfHeader.h": "4b66195abb46b0e21e3b3a58feb0fb3c6d12c1acf2e82eed6d37cc12ead01306",
+      "/usr/include/OpenEXR/openexr.h": "64112b55030b83dc5826db78d5ff05bd72d31bb9aed8bef268b8ba63c5649824",
+      "/usr/share/licenses/openexr-libs/LICENSE.md": "84853c91d4c2e0310741d4773469d98bb93e61029608e0ba0882a3fffdf330bd",
+      "/usr/share/licenses/imath/LICENSE.md": "c20236d3b39fd20eba8e3d1fb3b892a5483df2e7d8d61bf43f165d3fac22f601"
+    }
+  },
+  "zlib_native_emission_system": {
+    "repository": "https://github.com/zlib-ng/zlib-ng",
+    "version": "2.3.3",
+    "compatibility_api": "zlib1.3.1",
+    "packages": [
+      "zlib-ng-compat-2.3.3-5.nobara.fc44.x86_64",
+      "zlib-ng-compat-devel-2.3.3-5.nobara.fc44.x86_64"
+    ],
+    "license": "Zlib",
+    "used": "System-linked zlib-compatible DEFLATE for conditional native HDR package2. No source code vendored; stored128MiB/expanded256MiB/wholeGLB256MiB limits are independently enforced. Existing PNG/OpenEXR dependency remains system-owned.",
+    "primary_reference": "https://zlib.net/manual.html",
+    "system_evidence_sha256": {
+      "/usr/include/zlib.h": "8bc935aeb8909d05fe58f9286a0fe2c674a41638c374786ee888485ab5ff4409",
+      "/usr/lib64/libz.so.1.3.1.zlib-ng": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e"
+    }
   }
 }
