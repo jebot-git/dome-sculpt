@@ -1,0 +1,168 @@
+{
+  "runtime_source": "8ae72c3abc867fbc20b432b8e258d1101a13bb6d",
+  "base_merge": "d3d90878575c1b8fece53887342cc689c2f8c5b1",
+  "release": {
+    "source": "8ae72c3abc867fbc20b432b8e258d1101a13bb6d",
+    "session": 91259,
+    "exit_code": 0,
+    "tests": 8,
+    "passed": 8,
+    "seconds": 16.59,
+    "inputs": 1600,
+    "input_mismatches": [],
+    "scope": "fresh coherent selected CPU app and selected R tests, software GL; no SAN/device qualification yet"
+  },
+  "build_closure": {
+    "source": "8ae72c3abc867fbc20b432b8e258d1101a13bb6d",
+    "exit_code": 0,
+    "seconds": 7.429598587012151,
+    "scope": "same selected targets closure; test-only diagnostic changed since original lost handle95142",
+    "command": [
+      "nice",
+      "-n",
+      "15",
+      "cmake",
+      "--build",
+      "build-native",
+      "--parallel",
+      "2",
+      "--target",
+      "dome-sculpt",
+      "dome-sculpt-key-hdr-source-integration-test",
+      "dome-sculpt-independent-seam-key-mirror-retained-test",
+      "dome-sculpt-independent-seam-key-mirror-retained-render-test",
+      "dome-sculpt-independent-seam-key-mirror-test",
+      "dome-sculpt-key-archive-preflight-test",
+      "dome-sculpt-emission-scene-test",
+      "dome-sculpt-source-paint-scene-test",
+      "dome-sculpt-source-paint-owning-test"
+    ]
+  },
+  "sanitizer": {
+    "source": "8ae72c3abc867fbc20b432b8e258d1101a13bb6d",
+    "scope": "fresh own C/C++ O1 ASan+UBSan app/core/support/render and selected tests",
+    "configure-sanitize-8ae72c3": {
+      "exit_code": 0,
+      "seconds": 3.231518168002367,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-sanitize",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+      ]
+    },
+    "build-sanitize-8ae72c3": {
+      "exit_code": 0,
+      "seconds": 603.5208370210021,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-sanitize",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-key-hdr-source-integration-test",
+        "dome-sculpt-independent-seam-key-mirror-retained-test",
+        "dome-sculpt-independent-seam-key-mirror-retained-render-test",
+        "dome-sculpt-key-archive-preflight-test",
+        "dome-sculpt-emission-scene-test",
+        "dome-sculpt-source-paint-scene-test",
+        "dome-sculpt-source-paint-owning-test"
+      ]
+    },
+    "tests-sanitize-8ae72c3": {
+      "exit_code": 0,
+      "seconds": 286.03235843000584,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "ctest",
+        "--test-dir",
+        "build-sanitize",
+        "--output-on-failure",
+        "-R",
+        "^(key-hdr-source-integration|independent-seam-key-mirror-retained(-render)?|key-archive-preflight-(small|alias)|emission-scene|source-paint-(scene|owning))$"
+      ]
+    },
+    "tracked_input_mismatches": [],
+    "total_seconds": 892.9386829810101
+  },
+  "libraries_sha256": {
+    "build-native/libmikktspace-robust.a": "4316a441100707bc4abfd9e25562d65a44413b0cac386e2070c2adf68ef95873",
+    "build-native/libdome-sculpt-affine.a": "ebf541287665801da537179c2ca103e16ca98104ba6fd3e6f9ec9a2b6125564c",
+    "build-native/libxatlas.a": "94d583ddc55ff53f8e0fd60e6a4075936d4c5920aee9cf8562e18c7fbe0b62eb",
+    "build-native/libmikktspace.a": "e89548f12fac0e69773f585d632ada59765db92971b25d58ed6c5bd4f5553916",
+    "build-native/libufbx.a": "bd5510437ec087fcc32ef15058332558940055f40d138b31b58d050d21a0bca3",
+    "build-native/libdome-sculpt-spacenav.a": "d1641d6d61bf2133d1b7aa08c9c88e873239192c03689928dc1f807491ee91c5",
+    "build-native/libdome-sculpt-polygon.a": "6bb157a863ef39e0414fa1882e8bf1b6afb37a664d57ce385b3ae1b8cca7f74f",
+    "build-native/libdome-sculpt-core.a": "6c6d524f9fddb89a388fc392ddace0fe614c9b62ba11b8158fec9fc32856a765",
+    "build-native/libdome-sculpt-render.a": "9db287579afb9d527fa3b44c5084f343f831c5e99bec83e28d0cb9def4d2dee6",
+    "build-native/libdome-sculpt-xr.a": "651008a2d7db2de7e0d8f49926f426555450b1ce22d86257f97829f5b5cd8d0d",
+    "build-sanitize/libmikktspace-robust.a": "edcb8e045669597d33d347300a65592d5fcd8c58cc83dcdcb99026789a0508d2",
+    "build-sanitize/libdome-sculpt-affine.a": "6767cbe01a1f115ca304ab3e8006b7bdad54fec52084dff08318aad0fe26c395",
+    "build-sanitize/libxatlas.a": "b2ae4854406326f472cd2fda870ac4b093470170eb67d7cc4b8220d0bb26b57b",
+    "build-sanitize/libmikktspace.a": "3fa4c91e21c4c0dbdc72f915032cf7bd240ff1cf49a8788663d0f45b82281ac5",
+    "build-sanitize/libufbx.a": "282cd8f9fccf565b2e4f2b99a1856a272a446ef00452171078f791aae1bff53e",
+    "build-sanitize/libdome-sculpt-spacenav.a": "89faeb62eb111e8b6bec286b2aa2e1e18653aaf8796c2e17c308f7a18f0b5050",
+    "build-sanitize/libdome-sculpt-polygon.a": "69c48b9215caf2253fb8d525af6606f344e964ea7f1392fd8babf5742ed0405a",
+    "build-sanitize/libdome-sculpt-core.a": "6ea89e68fd2aa7687b7d3494af10587cc8fc0b1d8fa58373f1a79fafcad697e1",
+    "build-sanitize/libdome-sculpt-render.a": "ba337096595898bbf0f9d3b0cbc0ce5e6d24031fd5cf602f35298cf8a7444a76",
+    "build-sanitize/libdome-sculpt-xr.a": "35951aedfa54ad607826698b45e3410f7a5f8cc44beea4844b98e27986530f09"
+  },
+  "binaries_sha256": {
+    "build-native/dome-sculpt": "58d53c916fc9da80fa7c6b21ca7337638795d0840127ee904b47707311a8408b",
+    "build-native/dome-sculpt-independent-seam-key-mirror-retained-test": "79c2ba422fe058bd3bca55a3c850b0032a1cbd797e365127a9dfa0f29e09284a",
+    "build-native/dome-sculpt-independent-seam-key-mirror-retained-render-test": "a18b2869b93f8cd67bfdde60ef844fdc8c900ea2bbf85ffc0b14f53637af42a0",
+    "build-native/dome-sculpt-independent-seam-key-mirror-test": "07ed970e0f3cb904a5f6164c10ef2f16ebc290397ee8b371f7715898ca783376",
+    "build-native/dome-sculpt-key-archive-preflight-test": "3784945ce0ade86c69ea1b7a7ef9cccda8c01151f83686c5d24d27c0f4d6ccf9",
+    "build-native/dome-sculpt-emission-scene-test": "8712e6940cb0c6003ff99875c6bfa286d65582377f7b20aca6fc833ccedd1898",
+    "build-native/dome-sculpt-source-paint-scene-test": "35508d7e6e7ee0085894e9415e319d600c05826bd50212ebc4b86553f9a7d6a3",
+    "build-native/dome-sculpt-source-paint-owning-test": "8d91a21bb8aa2e0acd738867cfa7a3151e194c867b0cbb3cc56c222bad694761",
+    "build-native/dome-sculpt-key-hdr-source-integration-test": "ea7bfadbc5d055d9d1b0eaa5cfb613acb3c8506a0851ecad5eb64e3cac82c7fd",
+    "build-sanitize/dome-sculpt": "749172d3c911ba7a7abf10512e7492b5905e99a1314729574ba96115b81af430",
+    "build-sanitize/dome-sculpt-key-hdr-source-integration-test": "09f81ddfa4d6fbe3d452a3c6c0d23dbe7fbc77c938472306874ed5a475beb5ca",
+    "build-sanitize/dome-sculpt-independent-seam-key-mirror-retained-test": "486da3ae7a83530a4743613fbc39d642d8bacebafeb7b384591a4a2b6134a32a",
+    "build-sanitize/dome-sculpt-independent-seam-key-mirror-retained-render-test": "1df29d61c8733db989472102c82444cc43079fdb8d9e55e922d789750d3c06b5",
+    "build-sanitize/dome-sculpt-key-archive-preflight-test": "da2eb2b8b4cc8860822261a4298491d431a1e19b060ecdc60ba2a4cd94b322ef",
+    "build-sanitize/dome-sculpt-emission-scene-test": "f5a8e7e89e119f30e1f778ade2ec885791333c4e779c14e4c80524993588b913",
+    "build-sanitize/dome-sculpt-source-paint-scene-test": "db55e8c624660acaf40142e99a416a59343add9d5c4e9fad6fa7b87f4e382656",
+    "build-sanitize/dome-sculpt-source-paint-owning-test": "f9b0c7734ebb107dcc7cdaaca4f24480b5404e1c6a48972c1fb5f4b3ee06344e"
+  },
+  "matching_saved_files": {
+    "build-native/key-hdr-source-integration/source4-key-hdr.dsculpt": true,
+    "build-native/independent-seam-key-mirror-retained/before-uv.dsculpt": true,
+    "build-native/independent-seam-key-mirror-retained/retained.dsculpt": true,
+    "build-native/independent-seam-key-mirror-retained/before-mirror.dsculpt": true,
+    "build-native/independent-seam-key-mirror-retained/native-after.dsculpt": true,
+    "build-native/independent-seam-key-mirror-retained/late-cancel.dsculpt": true
+  },
+  "scope": "private semantic ab878 HDR27/Source28 plus qualified key22 lineage; selected coherent CPU/software GL tests only",
+  "not_qualified": [
+    "Scene29/material12 connected authoring",
+    "actual-avatar relative conversion",
+    "general-refinement owning representation",
+    "fresh composed device or UI runtime",
+    "root later d7/b2 Source4 import/export followups"
+  ],
+  "preserved_negatives": [
+    "old canonical prefix without patch24 configure refused",
+    "original95142 handle unrecoverable; final closure exit is separately recorded",
+    "d3d7/8 lowercase diagnostic mismatch; runtime actually refused malformed base9"
+  ]
+}
