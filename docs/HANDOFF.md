@@ -4,6 +4,21 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Reverse quality GPU checkpoint — 2026-11-03
+
+Runtime merge `772213d` combines qualified `1be8ab6`/`ac920ed` with main
+`ede6686`, preserving retopology and newer atomic vendor brush transfers. Large
+measured coarsening uses exact layer/mask error maxima on the selected GPU;
+other tiers retain deliberate native CPU quality. Fresh native CPU/OneAPI apps
+compile; selected CPU 12/12, Arc 9/9 and owned-core sanitizer 12/12 pass. Native
+FLTK 15 plus compact BDF 4 checks pass. The committed CPU oracle and actual
+application/synthetic-XR test add ten checks: 37,193 to 4,697 samples, complete
+accepted object data exact, cancelled scene exact, both Arc GL eyes and actual
+maximum_error kernels/scalar readback in the rendering application. Merged
+vendor modules and missing-device probes pass; positive AMD/NVIDIA execution
+remains unavailable. Read GPU-QUALITY-INTEGRATION.md and its receipt. No physical
+test, system installation or session restart. The full goal remains active.
+
 ## Manual retopology bridge/extrude checkpoint — 2026-11-03
 
 Runtime/test b001ac7 extends main 2c31f3e with disjoint boundary/wire bridging and
