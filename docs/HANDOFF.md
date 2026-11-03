@@ -14,6 +14,19 @@ records the added acceptance row. Existing accepted selection/joystick menus are
 the baseline, not proof that drawers exist. The full goal stays active and no
 new physical test is authorized by this specification alone.
 
+## Private node-local bone-length checkpoint — 2026-11-03
+
+The new b953e26 child qualifies actual length metadata on genuine source joints,
+source-node graph cleanup, exact image-resource sharing and reflected/sheared
+creator placement. Both actual CC0 bases pass fresh native export/import,
+Save/restart/re-edit/re-export/Restore and unchanged source/own-IBM/material
+oracles. Release and asserted sanitizer scopes each pass 618 checks; eight
+software/A770 comparisons have maxError 0 at tolerance 2. Read
+BONE-LENGTH-AUTHORING.md and validation/BONE-LENGTH-AUTHORING.json for exact
+seven-TU/support scope, original failures, warning totals and remaining cases.
+This remains a private component, not main/Source24+25+26 integration or full
+VRM/FBX/physics completion. Prior frozen checkpoints and proofs are preserved.
+
 ## Private native existing-rig checkpoint — Scene25, 2026-11-02
 
 The private genuine-source reparent continuation (2026-11-03) now covers a
@@ -31,8 +44,8 @@ The typed VRM0 continuation now exports its tested fitted/posed/restart subset
 through the actual native worker, with independent per-corner/current-IBM,
 first-person/spring topology, software/A770 image and schema proof. Read
 VRM-REST-AUTHORING.md and validation/VRM-REST-AUTHORING.json. It adds no public
-schema. Arbitrary spring/collider-radius transport, native-length export
-receipts, distinct current poses, fuller role/axis UI, VRM1 and physics remain
+schema. Arbitrary spring/collider-radius transport, distinct current poses, fuller
+role/axis UI, VRM1 and physics remain
 required. These private component proofs are separate from current public main
 and from any future Source24/25/26 semantic union.
 
@@ -403,7 +416,7 @@ Private skinned-export fix `c6324dd` preserves the original object/group parent
 for ordinary and shared-rig surfaces instead of making them identity roots.
 The real authored-material reflected/single-sided worker-export negative was
 native error0/export255. Final software and Arc192 assertions now pass with
-all32 image errors0 and all original mesh-node world-matrix errors0; tolerance2
+all32 image errors0 and all original mesh-node world-matrix errors0; tolerance 2
 is unchanged. Selected fresh Release9 and fully instrumented own-core/render/
 support SAN9 pass. The actual CC0 VRM suite also passes on the same product.
 See SKINNED-SURFACE-HIERARCHY.md and its receipt, including the strengthened
@@ -417,7 +430,7 @@ current skin poses and authored/implicit inverse binds reach native pick/paint,
 Cancel, one Undo and ordered Save; sheared bind-space exports as valid TRS
 nodes. Fresh canonical Release17, actual FLTK static/skin import22 and actual
 Arc baseline/affine48 assertions pass, with all24 image comparisons error0 at
-unchanged tolerance2. See AFFINE-IMPORT-INTEGRATION.md and its receipt for exact
+unchanged tolerance 2. See AFFINE-IMPORT-INTEGRATION.md and its receipt for exact
 scope, prior sanitizer boundaries and retained negative evidence. Default
 material identity, native UV1 import, wider VRM/FBX and remaining affine
 authoring stay required; this private checkpoint is not a publication or

@@ -55,9 +55,14 @@ deterministic material profile. Male fitting/pose exports remain qualified in
 the prior component, not newly qualified for reparent by this fixture. No new
 FLTK/Wayland/physical headset, allocation-sweep or performance claim is made.
 
-General source rest/role/axis authoring, authored native-length receipts,
+General source rest/role/axis authoring,
 distinct per-part pose reconciliation, wider collider/sphere/capsule and spring
 reauthoring, eye/look-at/dynamic physics, generated/unbound rigs and VRM1 remain
 required. Matrix and image equality do not establish physics equivalence.
 The prior translation-only collider authority and explicit unsupported-case
 diagnostics stay in force. Source24/25/26 semantic union remains separate.
+
+The subsequent private bone-length child supplies explicit node-local length
+interchange and actual fresh native reimport/Save/Restore. See
+BONE-LENGTH-AUTHORING.md for its separately qualified scope and source graph/image
+resource fixes; this checkpoint remains frozen.

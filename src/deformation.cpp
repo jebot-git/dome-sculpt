@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/deformation.hpp"
+#include "humanoid-placement.hpp"
 #include <nlohmann/json.hpp>
 namespace dome {
 namespace {
@@ -52,8 +53,16 @@ void DeformationState::validate(const Mesh &rest) const {
       skeleton->world(pose);
     if (skin)
       skin->validate(rest.positions.size(), skeleton->bones.size());
-    if (humanoid)
+    if (humanoid){
       humanoid->validate(*skeleton, false);
+      // Bone.deform is editor metadata; actual influences are the authority.
+      // A manually cleared flag must not turn a weighted joint into external
+      // placement. Imported source slots also mark every real skin joint.
+      const auto prefix=detail::humanoid_placement_prefix(*skeleton,*humanoid);
+      if(skin && prefix.any())for(const auto &vertex:skin->vertices)
+        for(const auto &influence:vertex)if(influence.weight!=0 && prefix.test(influence.joint))
+          fail("Humanoid external placement prefix carries actual skin weights");
+    }
   }
   if (!morphs && (!morph_weights.empty() || expressions))
     fail("Morph values or expressions require morph targets");

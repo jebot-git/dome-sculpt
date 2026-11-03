@@ -463,6 +463,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     fail("source coordinate basis provenance is missing");
   Quat basis = origin->source_basis_quaternion->unit(),
        inverse = basis.inverse();
+  if(basis.x!=0||basis.z!=0)
+    fail("native bone localY authoring requires an explicit non-Y-preserving source-basis adapter");
   auto convert_trs = [&](CanvasTransform &t) {
     auto p = inverse.rotate({t.position.x, t.position.y, t.position.z});
     t.position = {p.x, p.y, p.z};
@@ -477,6 +479,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     // the exact native per-skin matrix when no coordinate conversion exists.
     if(basis.x==0&&basis.y==0&&basis.z==0&&std::abs(basis.w)==1)return m;
     return (AffineTransform(inverse.matrix())*AffineTransform(m)*AffineTransform(basis.matrix())).float_matrix();
+  };
+  auto convert_edit=[&](std::shared_ptr<const NativeAffineEdit> &edit){
+    if(!edit || (basis.x==0&&basis.y==0&&basis.z==0&&std::abs(basis.w)==1))return;
+    edit=std::make_shared<const NativeAffineEdit>(
+        AffineTransform(inverse.matrix())*edit->matrix()*AffineTransform(basis.matrix()));
   };
   auto convert_joint = [&](JointTransform &t) {
     if(t.full_local_matrix)t.full_local_matrix=convert_exact(*t.full_local_matrix);
@@ -523,8 +530,11 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     for (auto &n : o.mesh.normals)
       n = inverse.rotate(n);
     convert_trs(o.transform);
-    for (auto &g : o.groups)
+    convert_edit(o.affine_edit);
+    for (auto &g : o.groups){
       convert_trs(g.transform);
+      convert_edit(g.affine_edit);
+    }
     if (!o.deformation) {
       if (source_graph) continue; // A real rigid source part has no dummy skin.
       fail("source part lacks deformation");
@@ -1133,6 +1143,38 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
                       j["textures"].size(), j["materials"].size());
   j["extensions"]["VRM"] = vrm;
   extension("VRM");
+  // Primitive/material splits can encode the same native/source PNG many
+  // times. A fresh native import must not have to retain another full decoded
+  // copy for each identical image record. Coalesce only byte-identical encoded
+  // payloads with identical image metadata; texture/sampler/material identities
+  // and role-dependent color-space interpretation remain independent.
+  if(j.contains("images")){
+    struct ImageEntry{size_t original,offset,size;Json metadata;};
+    std::vector<ImageEntry> unique;
+    std::map<std::pair<uint64_t,size_t>,std::vector<size_t>> buckets;
+    std::vector<size_t> remap;
+    Json images=Json::array();
+    for(size_t i=0;i<j["images"].size();++i){
+      stop(options);const auto &image=j["images"][i];
+      const auto view=index(image.at("bufferView"),j["bufferViews"].size(),"emitted image bufferView");
+      const auto &range=j["bufferViews"][view];
+      const auto offset=range.value("byteOffset",size_t{}),size=range.at("byteLength").get<size_t>();
+      if(offset>binary.size()||size>binary.size()-offset)fail("emitted image byte range is invalid");
+      uint64_t hash=14695981039346656037ull;
+      for(size_t k=0;k<size;++k){if((k&65535)==0)stop(options);hash=(hash^binary[offset+k])*1099511628211ull;}
+      Json metadata=image;metadata.erase("bufferView");
+      auto &candidates=buckets[{hash,size}];size_t found=SIZE_MAX;
+      for(auto candidate:candidates){const auto &other=unique[candidate];
+        if(metadata==other.metadata && std::equal(binary.begin()+offset,binary.begin()+offset+size,binary.begin()+other.offset)){
+          found=candidate;break;
+        }
+      }
+      if(found==SIZE_MAX){found=unique.size();unique.push_back({i,offset,size,std::move(metadata)});candidates.push_back(found);images.push_back(image);}
+      remap.push_back(found);
+    }
+    for(auto &texture:j["textures"]){stop(options);if(texture.contains("source"))texture["source"]=remap.at(index(texture.at("source"),remap.size(),"emitted texture image"));}
+    j["images"]=std::move(images);
+  }
   j["buffers"] = {{{"byteLength", binary.size()}}};
   uint64_t output_size = 28 + ((uint64_t(j.dump().size()) + 3) & ~uint64_t(3)) +
                          ((uint64_t(binary.size()) + 3) & ~uint64_t(3));

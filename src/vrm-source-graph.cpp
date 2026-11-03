@@ -6,6 +6,8 @@
 #include "source-morph.hpp"
 #include "source-rest-graph.hpp"
 #include "dome/polygon-scene.hpp"
+#include "dome/humanoid-creator.hpp"
+#include "bone-metadata.hpp"
 #include <set>
 namespace dome::detail {
 namespace {
@@ -57,6 +59,7 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
   if(std::any_of(objects.begin(),objects.end(),[](const auto &o){return bool(o.rig_source);})){auto selected=std::find_if(objects.begin(),objects.end(),[](const auto &o){return o.deformation&&o.deformation->skin;});require(selected!=objects.end(),"fitted source export needs an actual source skin");fitted=capture_source_rest_graph(objects,selected->id,max_snapshot_bytes,cancelled);}
 
   std::vector<bool> current;
+  std::vector<std::optional<float>> joint_lengths;
   const ObjectSurface *rig_source = nullptr;
   std::map<std::string, uint32_t> baseline_roles;
   std::map<std::string, std::optional<uint32_t>> edits;
@@ -101,6 +104,7 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
               "original node JSON/table identity changed");
       graph.original_nodes = original.at("nodes").get<std::vector<Json>>();
       graph.names.resize(a.asset->nodes.size());
+      joint_lengths.resize(a.asset->nodes.size());
       graph.humanoid = original.at("extensions").at("VRM").at("humanoid");
       for (const auto &bone : graph.humanoid.at("humanBones"))
         baseline_roles.emplace(
@@ -190,16 +194,9 @@ VrmSourceGraph vrm_source_graph(const std::vector<ObjectSurface> &objects,
               "joint identity is outside original nodes");
       const auto &native = s.bones[bone];
       const auto &original = a.asset->nodes[source];
-      if(o.rig_source){
-        const auto &before=*o.rig_source;
-        require(before.appearance&&before.deformation&&before.deformation->skeleton,
-                "fitted source has no complete original rig authority");
-        const auto &ids=before.appearance->source_joint_nodes;
-        const auto previous=std::find(ids.begin(),ids.end(),source);
-        require(previous!=ids.end(),"original rig lacks the current source joint identity");
-        require(native.length==before.deformation->skeleton->bones.at(size_t(previous-ids.begin())).length,
-                "native bone-length edits need explicit VRM authoring metadata; save the native project to retain them");
-      }
+      if(joint_lengths[source])require(*joint_lengths[source]==native.length,
+          "one actual source joint has conflicting per-part localY lengths; resolve that authority explicitly");
+      else joint_lengths[source]=native.length;
       if (native.name != imported_bone_name(original, source)) {
         if (graph.names[source])
           require(
@@ -273,6 +270,27 @@ std::vector<int> emit_vrm_source_graph(
   const auto &asset = *graph.model->asset;
   require(objects.size() == doc.objects.size(),
           "emitted object identity count changed");
+  // make_gltf's native placement/joint nodes are an implementation graph,
+  // not another authored source. Keep its actual surface payloads and skin
+  // accessors, then build exactly one original-node graph below. Leaving the
+  // generated forest active duplicates every joint and makes our own output
+  // exceed native hierarchy limits on fresh import.
+  std::vector<Json> surfaces;
+  std::vector<size_t> source_surfaces(asset.nodes.size());
+  surfaces.reserve(objects.size());
+  for(size_t i=0;i<objects.size();++i){
+    stop(cancelled);
+    const auto &emitted=doc.objects[i];
+    require(emitted.node>=0 && size_t(emitted.node)<j.at("nodes").size(),
+            "surface node identity is invalid");
+    auto surface=j.at("nodes").at(size_t(emitted.node));
+    require(surface.contains("mesh") && surface.at("mesh").get<int>()==emitted.mesh &&
+                !surface.contains("children"),"generated surface payload is not a mesh leaf");
+    ++source_surfaces.at(size_t(objects[i].appearance->source_node));
+    surfaces.push_back(std::move(surface));
+  }
+  j["nodes"]=Json::array();
+  j["scenes"][0]["nodes"]=Json::array();
   auto attach = [&](int parent, Json node) {
     stop(cancelled);
     if (j["nodes"].size() >= 200000)
@@ -301,6 +319,10 @@ std::vector<int> emit_vrm_source_graph(
     if (g.affine_edit)
       root = matrix(root, g.affine_edit->matrix(), g.name + " native affine");
     root = matrix(root, affine_similarity(g.transform), g.name);
+    if(g.humanoid){g.humanoid->validate();
+      j["nodes"][root]["extras"]["domeSculptCreator"]={
+        {"type","humanoid"},{"version",1},{"controls",g.humanoid->encode()}};
+    }
     if (g.source_placement)
       root = matrix(root, g.source_placement->local(), g.name + " original");
   }
@@ -367,6 +389,13 @@ std::vector<int> emit_vrm_source_graph(
     if(children.empty())j["nodes"][nodes[parent]].erase("children");
     else j["nodes"][nodes[parent]]["children"]=std::move(children);
   }
+  for(const auto &object:objects)if(object.deformation&&object.deformation->skin){
+    const auto &lengths=object.deformation->skeleton->bones;
+    const auto &sources=object.appearance->source_joint_nodes;
+    for(size_t slot=0;slot<sources.size();++slot){stop(cancelled);
+      write_bone_length(j["nodes"][nodes.at(sources[slot])],lengths.at(slot).length);
+    }
+  }
   if(metadata_nodes)*metadata_nodes=nodes;
   if(graph.rest_metadata){
     std::map<uint32_t,int> attachments;
@@ -374,45 +403,41 @@ std::vector<int> emit_vrm_source_graph(
     for(const auto &frame:graph.rest_metadata->colliders)attach_frame(frame);
     for(const auto &frame:graph.rest_metadata->centers)attach_frame(frame);
   }
-  // Move the actual rendered surface under its original node and retarget
-  // skins. Existing generated bind-space joints are no longer authoritative.
-  // They are left as inert empty graph nodes for now; no metadata or skin
-  // references them.
-  std::vector<int> parents(j["nodes"].size(), -1);
-  for (size_t parent = 0; parent < j["nodes"].size(); ++parent)
-    if (j["nodes"][parent].contains("children"))
-      for (const auto &child : j["nodes"][parent]["children"])
-        parents.at(child.get<size_t>()) = int(parent);
+  // Reattach real surfaces only. One unambiguous surface can live directly on
+  // its original node, retaining that node's name/extras/ordered children.
+  // Material/primitive splits and nonidentity rigid artist placements retain
+  // separate mesh leaves; no dummy skins or skeletal end-sites are invented.
   for (size_t i = 0; i < objects.size(); ++i) {
     stop(cancelled);
     auto &emitted = doc.objects[i];
     const auto &a = *objects[i].appearance;
-    require(emitted.node >= 0 && size_t(emitted.node) < parents.size(),
-            "surface node identity is invalid");
-    auto old = parents[size_t(emitted.node)];
-    require(old >= 0, "skinned surface has no native object parent");
-    auto &children = j["nodes"][old]["children"];
-    children.erase(
-        std::remove(children.begin(), children.end(), Json(emitted.node)),
-        children.end());
-    if (children.empty())
-      j["nodes"][old].erase("children");
-    if (j["nodes"][old].contains("extras"))
-      j["nodes"][old]["extras"].erase("domeSculptHumanoid");
+    auto surface=std::move(surfaces[i]);
     int target = nodes.at(size_t(a.source_node));
+    bool direct=source_surfaces.at(size_t(a.source_node))==1;
+    for(auto at=surface.begin();at!=surface.end();++at)
+      if(at.key()!="name" && at.key()!="mesh" && at.key()!="skin" && at.key()!="weights" &&
+         at.key()!="translation" && at.key()!="rotation" && at.key()!="scale" && at.key()!="matrix")direct=false;
     if (!objects[i].deformation || !objects[i].deformation->skin) {
-      require(!j["nodes"][emitted.node].contains("skin") && emitted.joints.empty(),
+      require(!surface.contains("skin") && emitted.joints.empty(),
               "rigid source surface unexpectedly acquired a skin");
       const auto local = source_world.at(size_t(a.source_node)).inverse() *
                          objects[i].world_matrix();
-      if (local.matrix() != AffineTransform{}.matrix())
+      if (local.matrix() != AffineTransform{}.matrix()){
+        direct=false;
         target = matrix(target, local, objects[i].name + " native rigid placement");
+      }
       for (const char *key : {"translation","rotation","scale","matrix"})
-        j["nodes"][emitted.node].erase(key);
-      j["nodes"][target]["children"].push_back(emitted.node);
-      continue;
+        surface.erase(key);
+    }else{
+      for(const char *key:{"translation","rotation","scale","matrix"})
+        require(!surface.contains(key),"generated skinned surface has an unexpected local transform");
     }
-    j["nodes"][target]["children"].push_back(emitted.node);
+    if(direct){
+      for(const char *key:{"mesh","skin","weights"})
+        if(surface.contains(key))j["nodes"][target][key]=std::move(surface[key]);
+      emitted.node=target;
+    }else emitted.node=attach(target,std::move(surface));
+    if (!objects[i].deformation || !objects[i].deformation->skin)continue;
     auto skin = j["nodes"][emitted.node].at("skin").get<size_t>();
     auto &output = j["skins"].at(skin);
     output["joints"] = Json::array();

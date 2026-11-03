@@ -144,6 +144,12 @@ shading is inside it.
 | Build-time CUDA | Full native FLTK/OpenXR/alltargets compile with checksum-pinned CUDA13.4.1,NVCC13.4.59,GCC16.2.1,C++20,compute86/sm86. A real nonempty missing-device dispatch fails explicitly with host samples byte-identical; positive oracle exits with insufficient-driver error. No NVIDIA numerical/hardware execution, loss recovery or eligible additional workload proof yet | Compile, CPU-reference comparisons and hardware execution; integrate required accelerated workloads |
 | User chooses backend during build | CMake CPU/ONEAPI/ROCM/CUDA choices and complete SYCL compile/link qualification implemented. CPU plus actual Arc native and syntheticXR execution verified, missingGPU explicitly fails. HIP compiles but lacks hardware; CUDA full frontend compilation and explicit missing-device failure are qualified; NVIDIA hardware and full cross-backend production coverage remain incomplete | Verified selection and failure behavior for every supported toolchain; no silent CPU substitution |
 
+Private bone-length continuation of b953e26 now qualifies actual source-local
+length interchange and eight-state both-base fresh native persistence/re-edit
+proof, with complete own-IBM/node/material preservation and independent
+software/A770/schema evidence. See BONE-LENGTH-AUTHORING.md. It does not admit
+all source-rig/VRM1/physics cases or imply Source24/25/26 main integration.
+
 ## Next integration work
 
 1. Integrate the existing import/retopology/rig/deformation kernels into complete
