@@ -88,10 +88,21 @@ int main(int argc,char **argv)try{
   unsigned polls=0;rejects([&]{detail::volume_bind_native(source,rig,o,[&]{return ++polls>12;});},"Actual construction cancellation returns no partial result");
   check(same_positions(source,before),"All refusals retain the complete original input geometry");
   auto nondeform=rig;nondeform.bones[1].deform=false;rejects([&]{detail::volume_bind_native(source,nondeform,o);},"A disconnected component cannot borrow a nondeforming bone seed");
-  auto u=cells(arms(true),.01f);auto uo=o;if(argc==2)uo.cell_size=std::stof(argv[1]);uo.binding.maximum_work=500'000'000;
-  detail::VolumeBindingReport ur;auto started=std::chrono::steady_clock::now();auto uw=detail::volume_bind_native(u,rig,uo,{},&ur);double seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();float tip_leak=0;double reference_leak=0,field_error=0;Vec3 worst{};double actual_worst=0,expected_worst=0;
+  auto u=cells(arms(true),.01f);auto uo=o;if(argc>=2)uo.cell_size=std::stof(argv[1]);uo.binding.maximum_work=500'000'000;
+  auto oracle_u=u;auto u_rig=rig;std::string mode=argc>=3?argv[2]:"default";
+  if(mode=="phase1")uo.grid_phase={.1f,.2f,.3f};
+  if(mode=="phase2")uo.grid_phase={.9f,.8f,.7f};
+  if(mode=="reverse")for(size_t c=0;c<u.indices.size();c+=3)std::swap(u.indices[c+1],u.indices[c+2]);
+  if(mode=="alternate")for(size_t c=0;c<u.indices.size();c+=6){auto a=u.indices[c],b=u.indices[c+1],d=u.indices[c+2],e=u.indices[c+5];u.indices[c]=a;u.indices[c+1]=b;u.indices[c+2]=e;u.indices[c+3]=b;u.indices[c+4]=d;u.indices[c+5]=e;}
+  if(mode=="rotate"){
+    for(auto&p:u.positions){auto old=p;p={-old.y,old.x,old.z};}
+    for(auto&n:u.normals){auto old=n;n={-old.y,old.x,old.z};}
+    for(auto&bone:u_rig.bones){auto t=bone.rest.translation;bone.rest.translation={-t.y,t.x,t.z};bone.rest_matrix=RigMatrix{0,1,0,0,-1,0,0,0,0,0,1,0,-t.y,t.x,t.z,1};}
+  }
+  std::cout<<"U_MODE "<<mode<<'\n';
+  detail::VolumeBindingReport ur;auto started=std::chrono::steady_clock::now();auto uw=detail::volume_bind_native(u,u_rig,uo,{},&ur);double seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();float tip_leak=0;double reference_leak=0,field_error=0;Vec3 worst{};double actual_worst=0,expected_worst=0;
   double scale=std::max(double(rig.bones[0].length),double(rig.bones[1].length))*.02;
-  for(size_t i=0;i<u.positions.size();++i){auto p=u.positions[i];double a=u_distance(p,rig.bones[0]),b=u_distance(p,rig.bones[1]);double w0=1/(1+std::pow((a+scale)/(b+scale),o.binding.falloff));double e=std::abs(weight(uw.vertices[i],0)-w0);if(e>field_error){field_error=e;worst=p;actual_worst=weight(uw.vertices[i],0);expected_worst=w0;}if(p.y>.15f){tip_leak=std::max(tip_leak,weight(uw.vertices[i],p.x<.025f?1:0));reference_leak=std::max(reference_leak,p.x<.025f?1-w0:w0);}}
+  for(size_t i=0;i<u.positions.size();++i){auto p=oracle_u.positions[i];double a=u_distance(p,rig.bones[0]),b=u_distance(p,rig.bones[1]);double w0=1/(1+std::pow((a+scale)/(b+scale),o.binding.falloff));double e=std::abs(weight(uw.vertices[i],0)-w0);if(e>field_error){field_error=e;worst=p;actual_worst=weight(uw.vertices[i],0);expected_worst=w0;}if(p.y>.15f){tip_leak=std::max(tip_leak,weight(uw.vertices[i],p.x<.025f?1:0));reference_leak=std::max(reference_leak,p.x<.025f?1-w0:w0);}}
   std::cout<<"U_CELL "<<uo.cell_size<<" grid="<<ur.grid_points<<" interior="<<ur.interior_points<<" work="<<ur.work<<" planned_bytes="<<ur.peak_planned_bytes<<" total_kernel_seconds="<<seconds<<'\n';
   std::cout<<"U_TIP wrong_limb="<<tip_leak<<" continuous_reference="<<reference_leak<<" max_field_error="<<field_error<<" worst="<<worst.x<<','<<worst.y<<','<<worst.z<<" actual="<<actual_worst<<" expected="<<expected_worst<<'\n';
   check(reference_leak<.03,"Independent continuous volume weighting meets the unchanged U-tip intent");

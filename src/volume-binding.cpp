@@ -3,6 +3,7 @@
 // barriers/flood regions and armature_skinning.cc deform-bone filtering.
 // This is an original interior geodesic solver, not Blender's heat solver.
 #include "volume-binding.hpp"
+#include "volume-exact.hpp"
 #include "dome/mesh-processing.hpp"
 #include <bit>
 #include <map>
@@ -56,6 +57,7 @@ struct Components {
   std::vector<uint32_t> vertex;
   std::vector<Vec3> points;
   std::vector<std::array<uint32_t,2>> edges;
+  std::vector<std::array<uint32_t,3>> adjacent;
   size_t count = 0;
 };
 Components components(const Mesh &m, Work &work) {
@@ -74,20 +76,22 @@ Components components(const Mesh &m, Work &work) {
     while (a!=parent[a]) {work.step();parent[a]=parent[parent[a]];a=parent[a];}
     return a;
   };
-  struct Edge { uint32_t face; bool direction; unsigned count; };
+  Components out;out.adjacent.assign(nt,{UINT32_MAX,UINT32_MAX,UINT32_MAX});
+  struct Edge { uint32_t face,local; bool direction; unsigned count; };
   std::map<std::array<uint32_t,2>,Edge> edges;
   for (uint32_t t=0;t<nt;++t) for (int k=0;k<3;++k) {
     work.step();auto a=vertex[m.indices[t*3+k]],b=vertex[m.indices[t*3+(k+1)%3]];
     if(a==b)throw std::invalid_argument("Volume binding requires nondegenerate faces");
     bool direction=a<b;auto key=std::array{std::min(a,b),std::max(a,b)};
-    auto [at,added]=edges.emplace(key,Edge{t,direction,1});
+    auto [at,added]=edges.emplace(key,Edge{t,uint32_t(k),direction,1});
     if(!added) {
       if(at->second.count++!=1 || at->second.direction==direction)
         throw std::invalid_argument("Volume binding requires consistently oriented closed manifold components");
       auto x=root(t),y=root(at->second.face);parent[x]=y;
+      out.adjacent[t][k]=at->second.face;out.adjacent[at->second.face][at->second.local]=t;
     }
   }
-  Components out;out.edges.reserve(edges.size());
+  out.edges.reserve(edges.size());
   for(const auto &[edge,e]:edges) {
     work.step();if(e.count!=2)
       throw std::invalid_argument("Volume binding requires closed components; open edges remain unbound");
@@ -110,14 +114,14 @@ Components components(const Mesh &m, Work &work) {
 }
 // Integer winding in each closed component is orientation-independent. Nested
 // components use odd/even material fill, so a sealed inner cavity stays empty.
-bool material_inside(const Mesh &m,const Components &parts,Point p,Work &work) {
+std::optional<bool> material_classification(const Mesh &m,const Components &parts,Point p,Work &work) {
   std::vector<double> sum(parts.count),compensation(parts.count);
   for(size_t t=0;t<parts.triangle.size();++t) {
     work.step();auto a=as_point(m.positions[m.indices[t*3]])-p;
     auto b=as_point(m.positions[m.indices[t*3+1]])-p;
     auto c=as_point(m.positions[m.indices[t*3+2]])-p;
     double la=norm(a),lb=norm(b),lc=norm(c);
-    if(!la || !lb || !lc)throw std::runtime_error("Volume classification touches a surface vertex");
+    if(!la || !lb || !lc)return {};
     double value=2*std::atan2(dot3(a,cross3(b,c)),
       la*lb*lc+dot3(a,b)*lc+dot3(b,c)*la+dot3(c,a)*lb);
     auto id=parts.triangle[t];double y=value-compensation[id],next=sum[id]+y;
@@ -127,10 +131,15 @@ bool material_inside(const Mesh &m,const Components &parts,Point p,Work &work) {
   for(auto angle:sum) {
     double winding=std::abs(angle)/(4*std::numbers::pi);
     if(!std::isfinite(winding) || std::min(winding,std::abs(winding-1))>1e-5)
-      throw std::runtime_error("Volume classification is ambiguous or the closed shell intersects itself");
+      return {};
     if(winding>.5)inside=!inside;
   }
   return inside;
+}
+bool material_inside(const Mesh &m,const Components &parts,Point p,Work &work) {
+  auto value=material_classification(m,parts,p,work);
+  if(!value)throw std::runtime_error("Volume classification is ambiguous or the closed shell intersects itself");
+  return *value;
 }
 struct Grid {
   std::array<uint32_t,3> size{};
@@ -204,6 +213,34 @@ void rasterize(const Mesh &m,Grid &g,Work &work) {
           xyz[axis]=uint32_t(rounded);g.barriers[g.index(xyz[0],xyz[1],xyz[2])]|=8;
         }
       }
+    }
+  }
+}
+// A multi-axis Eikonal update spans a simplex, not just its edges. Mark every
+// cube touched by the actual surface so no mixed stencil can cut a subcell
+// cavity or thin wall whose boundary happens to miss the grid edges.
+void mark_cut_cubes(const Mesh &m,Grid &g,Work &work) {
+  struct Box {std::array<uint32_t,3> lo,hi;};
+  auto intersects=[&](const std::array<Point,3>&p,const Box &box) {
+    Point center{},half{};std::array<Point,3> q;
+    for(int a=0;a<3;++a){center[a]=g.origin[a]+(double(box.lo[a])+box.hi[a]+1)*g.h*.5;half[a]=(double(box.hi[a])-box.lo[a]+1)*g.h*.5;}
+    for(int i=0;i<3;++i)q[i]=p[i]-center;
+    auto separated=[&](Point axis){work.step();double r=0;for(int a=0;a<3;++a)r+=std::abs(axis[a])*half[a];double lo=INFINITY,hi=-INFINITY;for(auto v:q){auto projection=dot3(v,axis);lo=std::min(lo,projection);hi=std::max(hi,projection);}double epsilon=128*std::numeric_limits<double>::epsilon()*(r+std::max(std::abs(lo),std::abs(hi)));return lo>r+epsilon||hi<-r-epsilon;};
+    const std::array<Point,3> axes{Point{1,0,0},Point{0,1,0},Point{0,0,1}};
+    for(auto axis:axes)if(separated(axis))return false;
+    if(separated(cross3(q[1]-q[0],q[2]-q[0])))return false;
+    for(int i=0;i<3;++i)for(auto axis:axes)if(separated(cross3(q[(i+1)%3]-q[i],axis)))return false;
+    return true;
+  };
+  for(size_t t=0;t<m.indices.size();t+=3) {
+    work.step();std::array<Point,3> p;for(int k=0;k<3;++k)p[k]=as_point(m.positions[m.indices[t+k]]);
+    Box root;
+    for(int a=0;a<3;++a){double lo=INFINITY,hi=-INFINITY;for(auto v:p){lo=std::min(lo,v[a]);hi=std::max(hi,v[a]);}root.lo[a]=uint32_t(std::max(0,int(std::floor((lo-g.origin[a])/g.h))-1));root.hi[a]=uint32_t(std::min(int(g.size[a])-2,int(std::floor((hi-g.origin[a])/g.h))+1));}
+    std::array<Box,64> stack;size_t count=1;stack[0]=root;
+    while(count){work.step();auto box=stack[--count];if(!intersects(p,box))continue;int axis=0;for(int a=1;a<3;++a)if(box.hi[a]-box.lo[a]>box.hi[axis]-box.lo[axis])axis=a;
+      if(box.lo[axis]==box.hi[axis]){g.barriers[g.index(box.lo[0],box.lo[1],box.lo[2])]|=16;continue;}
+      if(count+2>stack.size())throw std::length_error("Volume surface raster depth exceeded");
+      auto other=box;auto middle=box.lo[axis]+(box.hi[axis]-box.lo[axis])/2;box.hi[axis]=middle;other.lo[axis]=middle+1;stack[count++]=box;stack[count++]=other;
     }
   }
 }
@@ -293,6 +330,25 @@ std::optional<uint32_t> offset(const Grid &g,uint32_t at,std::array<int,3>d) {
   for(int a=0;a<3;++a){int64_t n=int64_t(p[a])+d[a];if(n<0||n>=g.size[a])return {};q[a]=uint32_t(n);}
   return g.index(q[0],q[1],q[2]);
 }
+double eikonal_value(uint32_t node,const Grid &g,const Interior &inside,
+                     std::span<const Slot> field,Work &work) {
+  struct Upwind {double distance;int axis,sign;};
+  std::array<Upwind,3> values;size_t count=0;
+  for(int axis=0;axis<3;++axis){Upwind best{INFINITY,axis,0};for(int sign:{-1,1}){
+    work.step();auto neighbor=g.neighbor(inside.grid[node],axis*2+(sign>0));if(!neighbor)continue;
+    auto id=g.nodes[*neighbor];if(id>=0&&field[id].settled&&field[id].distance<best.distance)best={field[id].distance,axis,sign};
+  }if(std::isfinite(best.distance))values[count++]=best;}
+  if(!count)return INFINITY;
+  if(count>1){work.step();if(values[1].distance<values[0].distance)std::swap(values[0],values[1]);}
+  if(count>2){work.step();if(values[2].distance<values[1].distance)std::swap(values[1],values[2]);work.step();if(values[1].distance<values[0].distance)std::swap(values[0],values[1]);}
+  auto clear=[&](size_t used){auto p=g.coordinates(inside.grid[node]);std::array<int,3> sign{};for(size_t i=0;i<used;++i)sign[values[i].axis]=values[i].sign;
+    for(unsigned variant=0;variant<8;++variant){work.step();std::array<uint32_t,3> q;bool valid=true;for(int a=0;a<3;++a){int64_t base=p[a];if(sign[a]<0||(!sign[a]&&(variant&(1u<<a))))--base;if(base<0||base+1>=g.size[a]){valid=false;break;}q[a]=uint32_t(base);}if(valid&&!(g.barriers[g.index(q[0],q[1],q[2])]&16))return true;}
+    return false;
+  };
+  double first=values[0].distance,best=first+g.h,sum=0,squared=0;
+  for(size_t used=1;used<=count;++used){work.step();double delta=values[used-1].distance-first;sum+=delta;squared+=delta*delta;if(used==1||values[used-1].distance>best||!clear(used))continue;double discriminant=sum*sum-used*(squared-g.h*g.h);if(discriminant<0)continue;double value=first+(sum+std::sqrt(discriminant))/used;if(value>=values[used-1].distance)best=std::min(best,value);}
+  return best;
+}
 struct Arc { uint32_t to;double cost; };
 struct BoundaryGraph {
   std::vector<uint32_t> component;
@@ -345,6 +401,102 @@ BoundaryGraph boundary_graph(const Components &parts,const Grid &g,const Interio
   for(auto c:connections){work.step();graph.arcs[cursor[c.from]++]={c.to,c.cost};graph.arcs[cursor[c.to]++]={c.from,c.cost};}
   auto capacity=connections.capacity();std::vector<Connection>().swap(connections);memory.release(capacity,sizeof(Connection));
   return graph;
+}
+struct Endpoint {
+  Point free{};
+  uint32_t a=UINT32_MAX,b=UINT32_MAX;
+  double t=0;
+};
+Endpoint vertex_endpoint(uint32_t v){Endpoint e;e.a=e.b=v;return e;}
+Endpoint edge_endpoint(uint32_t a,uint32_t b,double t){Endpoint e;e.a=a;e.b=b;e.t=t;if(t==0)e.b=a;if(t==1)e.a=b;return e;}
+Point endpoint_value(const Endpoint &e,const Components &parts) {
+  if(e.a==UINT32_MAX)return e.free;
+  if(e.a>=parts.points.size()||e.b>=parts.points.size()||!std::isfinite(e.t)||e.t<0||e.t>1)
+    throw std::logic_error("Invalid owning volume endpoint");
+  auto p=as_point(parts.points[e.a]),q=as_point(parts.points[e.b]);
+  for(int a=0;a<3;++a)p[a]+=e.t*(q[a]-p[a]);
+  return p;
+}
+// Partition the ENTIRE segment at every possible surface event. Every open
+// interval must be classified as material. Coplanar/uncertain contact is
+// refused unless both endpoints are structurally owned by one actual triangle,
+// whose convex closure independently proves the complete path.
+bool segment_material(const Mesh &m,const Components &parts,const Endpoint &from,
+                      const Endpoint &to,std::vector<long double> &events,
+                      std::vector<volume_exact::Interval> &coverage,Work &work) {
+  auto p=endpoint_value(from,parts),q=endpoint_value(to,parts);events.clear();events.push_back(0);events.push_back(1);
+  coverage.clear();volume_exact::Arithmetic exact(work);
+  auto raw3=[](Vec3 p){return std::array{p.x,p.y,p.z};};
+  auto projected=[](Vec3 p,int drop){auto a=std::array{p.x,p.y,p.z};return std::array{a[(drop+1)%3],a[(drop+2)%3]};};
+  auto exact_endpoint=[&](const Endpoint&e,int drop){
+    if(e.a==UINT32_MAX){volume_exact::Point2 p;p.ordinary=true;p.free={e.free[(drop+1)%3],e.free[(drop+2)%3]};return p;}
+    long double parameter=std::ldexp(static_cast<long double>(e.t),60);
+    if(parameter!=std::floor(parameter)||parameter<0||parameter>volume_exact::parameter_scale)
+      throw std::logic_error("A volume portal exceeds the supported exact dyadic parameter bound");
+    return volume_exact::Point2{projected(parts.points[e.a],drop),projected(parts.points[e.b],drop),uint64_t(parameter)};
+  };
+  auto owns=[](const std::array<uint32_t,3>&ids,const Endpoint&e){if(e.a==UINT32_MAX)return false;return std::find(ids.begin(),ids.end(),e.a)!=ids.end()&&std::find(ids.begin(),ids.end(),e.b)!=ids.end();};
+  using L=std::array<long double,3>;
+  auto minus=[](L a,L b){for(int i=0;i<3;++i)a[i]-=b[i];return a;};
+  auto cross=[](L a,L b){return L{a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]};};
+  auto dot=[](L a,L b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];};
+  L lp{p[0],p[1],p[2]},lq{q[0],q[1],q[2]};
+  for(size_t triangle=0;triangle<parts.triangle.size();++triangle) {
+    work.step();std::array<L,3> v;std::array<uint32_t,3> ids;
+    for(int k=0;k<3;++k){auto index=m.indices[triangle*3+k];ids[k]=parts.vertex[index];auto a=as_point(m.positions[index]);v[k]={a[0],a[1],a[2]};}
+    bool start=owns(ids,from),end=owns(ids,to);if(start&&end)return true;
+    bool overlap=true;
+    for(int a=0;a<3;++a){auto lo=std::min({v[0][a],v[1][a],v[2][a]}),hi=std::max({v[0][a],v[1][a],v[2][a]});long double eps=256*std::numeric_limits<double>::epsilon()*std::max({std::abs(lo),std::abs(hi),std::abs(lp[a]),std::abs(lq[a]),1e-20L});if(std::max(lp[a],lq[a])<lo-eps||std::min(lp[a],lq[a])>hi+eps){overlap=false;break;}}
+    if(!overlap)continue;
+    auto normal=cross(minus(v[1],v[0]),minus(v[2],v[0])),a=minus(lp,v[0]),b=minus(lq,v[0]);
+    long double x=dot(normal,a),y=dot(normal,b),scale=0;
+    for(int c=0;c<3;++c)scale+=std::abs(normal[c])*(std::abs(a[c])+std::abs(b[c]));
+    long double eps=256*std::numeric_limits<double>::epsilon()*scale;
+    if(start)x=0;
+    if(end)y=0;
+    if(std::abs(x)<=eps&&std::abs(y)<=eps) {
+      auto ta=raw3(m.positions[m.indices[triangle*3]]),tb=raw3(m.positions[m.indices[triangle*3+1]]),tc=raw3(m.positions[m.indices[triangle*3+2]]);
+      auto on_plane=[&](const Endpoint&e){if(e.a==UINT32_MAX)return exact.orient3(ta,tb,tc,e.free)==0;return exact.orient3(ta,tb,tc,raw3(parts.points[e.a]))==0&&exact.orient3(ta,tb,tc,raw3(parts.points[e.b]))==0;};
+      if(!on_plane(from)||!on_plane(to))return false;
+      int drop=-1;std::array<std::array<float,2>,3> flat;
+      for(int axis=0;axis<3&&drop<0;++axis){for(int k=0;k<3;++k)flat[k]=projected(m.positions[m.indices[triangle*3+k]],axis);if(exact.orient2(flat[0],flat[1],flat[2]).sign)drop=axis;}
+      if(drop<0)return false;
+      if(auto interval=exact.clip(flat,exact_endpoint(from,drop),exact_endpoint(to,drop)))coverage.push_back(*interval);
+      continue;
+    }
+    if(start||end)continue;
+    if((x>eps&&y>eps)||(x<-eps&&y<-eps))continue;
+    if(std::abs(x-y)<=256*std::numeric_limits<double>::epsilon()*scale)return false;
+    long double t=x/(x-y);
+    if(t<0||t>1){if(std::abs(x)>eps&&std::abs(y)>eps)continue;t=std::clamp(t,0.L,1.L);}
+    L hit;for(int c=0;c<3;++c)hit[c]=lp[c]+t*(lq[c]-lp[c]);
+    int drop=0;for(int c=1;c<3;++c)if(std::abs(normal[c])>std::abs(normal[drop]))drop=c;
+    int u=(drop+1)%3,w=(drop+2)%3;
+    auto ax=v[1][u]-v[0][u],ay=v[1][w]-v[0][w],bx=v[2][u]-v[0][u],by=v[2][w]-v[0][w];
+    auto hx=hit[u]-v[0][u],hy=hit[w]-v[0][w],det=ax*by-ay*bx;
+    auto area_scale=std::abs(ax*by)+std::abs(ay*bx);
+    if(std::abs(det)<=256*std::numeric_limits<double>::epsilon()*area_scale)return false;
+    auto s=(hx*by-hy*bx)/det,r=(ax*hy-ay*hx)/det;
+    auto tolerance=256*std::numeric_limits<double>::epsilon()*
+      (area_scale*(1+std::abs(s)+std::abs(r))+std::abs(hx*by)+std::abs(hy*bx)+std::abs(ax*hy)+std::abs(ay*hx))/std::abs(det);
+    if(s<-tolerance||r<-tolerance||s+r>1+tolerance)continue;
+    if(t<=0||t>=1)return false; // Unowned endpoint contact is ambiguous.
+    events.push_back(t);
+  }
+  if(!coverage.empty()) {
+    std::sort(coverage.begin(),coverage.end(),[&](const auto&a,const auto&b){return exact.compare(a.enter,b.enter)<0;});
+    auto reached=exact.zero();
+    for(const auto &piece:coverage){work.step();if(exact.compare(piece.enter,reached)>0)return false;if(exact.compare(piece.exit,reached)>0)reached=piece.exit;if(exact.compare(reached,exact.one())>=0)return true;}
+    return false;
+  }
+  std::sort(events.begin(),events.end(),[&](auto a,auto b){work.step();return a<b;});
+  for(size_t i=1;i<events.size();++i) {
+    work.step();if(events[i]==events[i-1])continue;
+    auto t=(events[i]+events[i-1])*.5L;Point sample;
+    for(int a=0;a<3;++a)sample[a]=double(lp[a]+t*(lq[a]-lp[a]));
+    auto inside=material_classification(m,parts,sample,work);if(!inside||!*inside)return false;
+  }
+  return true;
 }
 void validate_resolution(const Mesh &m,const Components &parts,const Grid &g,
                          const SurfaceQuery &query,const SurfaceQueryOptions &qo,
@@ -428,28 +580,27 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
   for(int a=0;a<3;++a){double lo=INFINITY,hi=-INFINITY;for(auto p:m.positions){auto v=as_point(p)[a];lo=std::min(lo,v);hi=std::max(hi,v);}center[a]=(lo+hi)*.5;}
   for(auto &p:m.positions){work.step();p=as_vec(as_point(p)-center);}
   auto parts=components(m,work);auto g=grid_for(m,o.cell_size,o.grid_phase,o.maximum_grid_points,memory);
-  rasterize(m,g,work);auto inside=classify(m,parts,g,work,memory);
+  rasterize(m,g,work);memory.add(64,6*sizeof(uint32_t));mark_cut_cubes(m,g,work);
+  auto inside=classify(m,parts,g,work,memory);
   const size_t n=inside.grid.size(),k=o.binding.limits.max_influences;
   memory.add(n,sizeof(uint32_t));
-  memory.add(inside.components,sizeof(uint8_t)+sizeof(double));
-  memory.add(inside.components*s.bones.size(),sizeof(uint32_t));
-  memory.add(s.bones.size(),2*sizeof(Point));
+  memory.add(inside.components,sizeof(uint8_t)+sizeof(double)+sizeof(uint32_t));
   std::vector<uint8_t> seeded(inside.components);
   std::vector<double> component_scale(inside.components,1e-5);
-  std::vector<uint32_t> bone_seed(inside.components*s.bones.size(),UINT32_MAX);
-  std::vector<std::array<Point,2>> bone_segments(s.bones.size());
+  std::vector<uint32_t> bone_seed(inside.components,UINT32_MAX);
   work.step(nt*(16*std::bit_width(nt+1)));
   SurfaceQuery query(m,[&]{work.step();work.check();return false;});
   SurfaceQueryOptions qo;qo.cancelled=[&]{work.step();work.check();return false;};
   qo.triangle_filter=[&](uint32_t){work.step();return true;};
   validate_resolution(m,parts,g,query,qo,work);
-  auto visible=[&](Point a,Point b) {
+  auto first_hit=[&](Point a,Point b)->std::optional<SurfaceHit> {
     auto delta=b-a;double distance=norm(delta);
-    if(distance<g.h*1e-6)return true;
+    if(distance<g.h*1e-6)return {};
     double trim=std::min(distance*.001,g.h*1e-5);
     for(int c=0;c<3;++c)a[c]+=delta[c]*(trim/distance);
-    return !query.raycast(as_vec(a),as_vec(delta),float(distance-2*trim),qo);
+    return query.raycast(as_vec(a),as_vec(delta),float(distance-2*trim),qo);
   };
+  auto visible=[&](Point a,Point b){return !first_hit(a,b);};
   std::vector<uint32_t> links(n);
   for(uint32_t v=0;v<n;++v)for(size_t d=0;d<directions.size();++d) {
     work.step();auto next=offset(g,inside.grid[v],directions[d]);if(!next||*next<=inside.grid[v])continue;
@@ -467,55 +618,117 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
     links[v]|=uint32_t(1)<<d;links[id]|=uint32_t(1)<<(25-d);
   }
   auto boundary=boundary_graph(parts,g,inside,visible,work,memory);
+  memory.add(nt+2,sizeof(long double));
+  memory.add(nt,sizeof(volume_exact::Interval));
+  std::vector<long double> segment_events;segment_events.reserve(nt+2);
+  std::vector<volume_exact::Interval> segment_coverage;segment_coverage.reserve(nt);
+  struct Portal {uint32_t a,b;double t,cost;};
+  memory.add(nt,3*sizeof(uint32_t)+3*sizeof(Portal));
+  std::vector<uint32_t> marks(nt),patch,todo;patch.reserve(nt);todo.reserve(nt);
+  std::vector<Portal> portals;portals.reserve(3*nt);uint32_t epoch=0;
+  auto portal_distance=[&](uint32_t vertex,uint32_t triangle,Point bone_a,Point bone_b,Point bone_anchor)->double {
+    work.step();auto component=boundary.component[vertex];
+    if(boundary.component[parts.vertex[m.indices[triangle*3]]]!=component)return INFINITY;
+    auto p=as_point(parts.points[vertex]);patch.clear();todo.clear();portals.clear();
+    if(++epoch==0){for(auto &mark:marks){work.step();mark=0;}epoch=1;}
+    auto reference=as_point(m.positions[m.indices[triangle*3]]);
+    auto plane=cross3(as_point(m.positions[m.indices[triangle*3+1]])-reference,as_point(m.positions[m.indices[triangle*3+2]])-reference);
+    auto coplanar=[&](uint32_t face){work.step();for(int k=0;k<3;++k){auto d=as_point(m.positions[m.indices[face*3+k]])-reference;double value=dot3(plane,d),scale=0;for(int c=0;c<3;++c)scale+=std::abs(plane[c]*d[c]);if(std::abs(value)>256*std::numeric_limits<double>::epsilon()*scale)return false;}return true;};
+    marks[triangle]=epoch;todo.push_back(triangle);
+    while(!todo.empty()){work.step();auto face=todo.back();todo.pop_back();patch.push_back(face);for(auto next:parts.adjacent[face])if(next!=UINT32_MAX&&marks[next]!=epoch&&coplanar(next)){marks[next]=epoch;todo.push_back(next);}}
+    // Candidate discovery follows the actual planar topology patch, not an
+    // arbitrary triangulation diagonal. It grants no path authority: each
+    // chosen real edge still needs the independent whole-segment proof.
+    for(auto face:patch)for(int edge=0;edge<3;++edge) {
+      work.step();auto next=parts.adjacent[face][edge];if(next!=UINT32_MAX&&marks[next]==epoch)continue;
+      auto va=parts.vertex[m.indices[face*3+edge]],vb=parts.vertex[m.indices[face*3+(edge+1)%3]];
+      auto a=as_point(parts.points[va]),b=as_point(parts.points[vb]),direction=b-a;
+      auto point=[&](double t){Point r=a;for(int c=0;c<3;++c)r[c]+=t*direction[c];return r;};
+      double lo=0,hi=1;
+      for(int iteration=0;iteration<56;++iteration){work.step();auto r=point((lo+hi)*.5),q=closest_segment(r,bone_a,bone_b);auto x=r-p,y=r-q;double lx=norm(x),ly=norm(y);double derivative=(lx?dot3(x,direction)/lx:0)+(ly?dot3(y,direction)/ly:0);if(derivative<0)lo=(lo+hi)*.5;else hi=(lo+hi)*.5;}
+      double t=(lo+hi)*.5;auto r=point(t);portals.push_back({va,vb,t,norm(p-r)+norm(r-closest_segment(r,bone_a,bone_b))});
+    }
+    std::sort(portals.begin(),portals.end(),[&](const Portal&a,const Portal&b){work.step();return a.cost<b.cost;});
+    double best=INFINITY;
+    for(auto candidate:portals) {
+      auto va=candidate.a,vb=candidate.b;auto a=as_point(parts.points[va]),b=as_point(parts.points[vb]),direction=b-a;
+      auto point=[&](double t){Point r=a;for(int c=0;c<3;++c)r[c]+=t*direction[c];return r;};
+      for(double t:{candidate.t,0.,1.}) {
+        work.step();auto r=point(t),q=closest_segment(r,bone_a,bone_b);
+        double cost=norm(p-r)+norm(r-q);if(cost>=best)continue;
+        Endpoint anchor;anchor.free=bone_anchor;Endpoint target;target.free=q;
+        auto portal=edge_endpoint(va,vb,t),source=vertex_endpoint(vertex);
+        if(segment_material(m,parts,anchor,target,segment_events,segment_coverage,work)&&
+           segment_material(m,parts,source,portal,segment_events,segment_coverage,work)&&
+           segment_material(m,parts,portal,target,segment_events,segment_coverage,work))best=cost;
+      }
+    }
+    return best;
+  };
   const size_t total_nodes=n+parts.points.size();
-  if(total_nodes>UINT32_MAX/k)throw std::length_error("Volume label index budget exceeded");
-  memory.add(total_nodes,k*(sizeof(Slot)+sizeof(uint32_t)));
-  std::vector<Slot> labels(total_nodes*k);
-  Pending queue(labels,k,work);
+  if(total_nodes>UINT32_MAX)throw std::length_error("Volume label index budget exceeded");
+  memory.add(total_nodes,sizeof(Slot)+sizeof(uint32_t));
+  memory.add(parts.points.size(),k*sizeof(Label));
+  std::vector<Slot> field(total_nodes);
+  std::vector<Label> labels(parts.points.size()*k);
   auto worlds=s.world();bool deform=false;
   double radius=std::min(double(o.binding.maximum_seed_distance),g.h+o.binding.seed_margin);
   for(uint32_t bone=0;bone<s.bones.size();++bone)if(s.bones[bone].deform) {
     deform=true;const auto &w=worlds[bone];Point a{w[12]-center[0],w[13]-center[1],w[14]-center[2]},b=a;
     for(int c=0;c<3;++c)b[c]+=double(w[4+c])*s.bones[bone].length;
-    bone_segments[bone]={a,b};
+    for(auto &slot:field){work.step();slot=Slot{};}
+    for(auto &anchor:bone_seed){work.step();anchor=UINT32_MAX;}
+    Pending queue(field,1,work);
     for(uint32_t v=0;v<n;++v) {
       work.step();auto p=g.point(inside.grid[v]),q=closest_segment(p,a,b);double distance=norm(p-q);
-      if(distance<=radius && visible(p,q)) {
+      if(distance<=radius && visible(p,q) && material_classification(m,parts,q,work)==std::optional<bool>(true)) {
         queue.relax(v,{distance,bone});
         seeded[inside.component[v]]=1;
         component_scale[inside.component[v]]=std::max(component_scale[inside.component[v]],norm(b-a)*.02);
-        auto &anchor=bone_seed[inside.component[v]*s.bones.size()+bone];
+        auto &anchor=bone_seed[inside.component[v]];
         if(anchor==UINT32_MAX)anchor=v;
       }
     }
+    // Exact visible source-to-boundary paths are additional initial values.
+    // The bone endpoint first needs a genuine same-volume interior witness.
+    for(uint32_t v=0;v<parts.points.size();++v) {
+      work.step();auto component=boundary.component[v];auto anchor=bone_seed[component];
+      if(anchor==UINT32_MAX)continue;
+      auto p=as_point(parts.points[v]),endpoint=closest_segment(p,a,b);
+      auto bone_anchor=g.point(inside.grid[anchor]);
+      if(!visible(bone_anchor,endpoint)||material_classification(m,parts,endpoint,work)!=std::optional<bool>(true))continue;
+      auto hit=first_hit(p,endpoint);
+      if(!hit)queue.relax(uint32_t(n+v),{norm(p-endpoint),bone});
+      else {
+        auto distance=portal_distance(v,hit->triangle,a,b,bone_anchor);
+        if(std::isfinite(distance))queue.relax(uint32_t(n+v),{distance,bone});
+      }
+    }
+    while(!queue.empty()) {
+      work.step();auto node=queue.pop();auto item=field[node];
+      for(size_t d=0;node<n&&d<directions.size();++d)if(links[node]&(uint32_t(1)<<d)) {
+        work.step();auto next=offset(g,inside.grid[node],directions[d]);auto id=g.nodes[*next];
+        auto direction=directions[d];double cost=g.h*std::sqrt(double(direction[0]*direction[0]+direction[1]*direction[1]+direction[2]*direction[2]));
+        queue.relax(uint32_t(id),{item.distance+cost,item.bone});
+      }
+      for(size_t edge=boundary.starts[node];edge<boundary.starts[node+1];++edge) {
+        work.step();auto e=boundary.arcs[edge];queue.relax(e.to,{item.distance+e.cost,item.bone});
+      }
+      if(node<n)for(int direction=0;direction<6;++direction) {
+        work.step();auto next=g.neighbor(inside.grid[node],direction);if(!next)continue;
+        auto id=g.nodes[*next];if(id<0||field[id].settled)continue;
+        double distance=eikonal_value(uint32_t(id),g,inside,field,work);
+        if(std::isfinite(distance))queue.relax(uint32_t(id),{distance,bone});
+      }
+    }
+    // Complete each nonlinear field independently. Graph K-label dominance
+    // is not assumed for this upwind PDE discretization.
+    for(size_t v=0;v<parts.points.size();++v){work.step();auto value=field[n+v].distance;
+      if(std::isfinite(value))insert_label(std::span<Label>(labels).subspan(v*k,k),{value,bone});}
   }
   if(!deform)throw std::runtime_error("Volume binding requires a deforming bone");
   for(size_t c=0;c<seeded.size();++c)if(!seeded[c])
     throw std::runtime_error("No internal deform-bone seed for volume component "+std::to_string(c));
-  // Exact visible source-to-boundary paths are valid additional initial
-  // distances, not a nearest-surface fallback. Certify each bone endpoint
-  // from a genuine interior anchor of this same volume first.
-  for(uint32_t v=0;v<parts.points.size();++v)for(uint32_t bone=0;bone<s.bones.size();++bone) {
-    work.step();auto component=boundary.component[v];auto anchor=bone_seed[component*s.bones.size()+bone];
-    if(anchor==UINT32_MAX)continue;
-    auto p=as_point(parts.points[v]),endpoint=closest_segment(p,bone_segments[bone][0],bone_segments[bone][1]);
-    if(visible(g.point(inside.grid[anchor]),endpoint)&&visible(p,endpoint))
-      queue.relax(uint32_t(n+v),{norm(p-endpoint),bone});
-  }
-  while(!queue.empty()) {
-    work.step();auto at=queue.pop();auto item=labels[at];uint32_t node=uint32_t(at/k);
-    for(size_t d=0;node<n&&d<directions.size();++d)if(links[node]&(uint32_t(1)<<d)) {
-      work.step();auto next=offset(g,inside.grid[node],directions[d]);auto id=g.nodes[*next];
-      auto direction=directions[d];double cost=g.h*std::sqrt(double(direction[0]*direction[0]+direction[1]*direction[1]+direction[2]*direction[2]));
-      queue.relax(uint32_t(id),{item.distance+cost,item.bone});
-    }
-    for(size_t edge=boundary.starts[node];edge<boundary.starts[node+1];++edge) {
-      work.step();auto e=boundary.arcs[edge];queue.relax(e.to,{item.distance+e.cost,item.bone});
-    }
-  }
-  // A pruned source is dominated by K distinct sources at this node. Every
-  // continuation adds the same nonnegative edge cost to all K, so it cannot
-  // enter the first K at any later node by following that continuation.
   memory.add(m.positions.size(),sizeof(VertexWeights)+k*sizeof(Influence));
   memory.add(parts.points.size(),sizeof(VertexWeights)+k*sizeof(Influence));
   memory.add(k,sizeof(Label));
@@ -524,7 +737,7 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
   SkinWeights out;out.vertices.reserve(m.positions.size());
   for(uint32_t vertex=0;vertex<parts.points.size();++vertex) {
     work.step();std::vector<Label> row(k);
-    for(size_t c=0;c<k;++c){auto l=labels[(n+vertex)*k+c];if(l.bone!=UINT32_MAX)insert_label(row,{l.distance,l.bone});}
+    for(size_t c=0;c<k;++c){auto l=labels[vertex*k+c];if(l.bone!=UINT32_MAX)insert_label(row,l);}
     if(row.front().bone==UINT32_MAX)throw std::logic_error("Volume boundary node lost its seeded path");
     // Physical falloff must not change merely because the numerical grid is
     // refined. Use the legacy2%-bone-length policy, scoped to actual sources
