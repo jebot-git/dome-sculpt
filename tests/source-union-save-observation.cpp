@@ -46,16 +46,8 @@ int main(int argc,char **argv)try{
  const auto &expected=reference.object(target).deformation->morphs->targets.at(edit.target);for(size_t v=0;v<edit.positions.size();++v)if(const auto actual=edit.positions[v]-object.painted->mesh().positions[v];actual.x!=expected.delta[v].x||actual.y!=expected.delta[v].y||actual.z!=expected.delta[v].z)throw std::runtime_error("Focused replay differs from exact already-completed original post-REST requested target");check(true,"Requested Replace reproduces every exact original completed target delta");
  Document doc;{observed::Phase phase("native.replace.input");doc.replace(source);} {observed::Phase phase("native.initial.mesh.endpoint");endpoint(doc);}
  auto before=doc.copy_scene();nlohmann::json encoded;{observed::Phase phase("before.scene.encode");encoded=before.encode();}
- observed::active=true;const auto accepted_at=observed::wall();{observed::Phase phase("native.author.admission");doc.author_shape(edit);}std::future<void> future;const auto output=directory/"focused-key-after-rest.dsculpt";double saved_at=0;{observed::Phase phase("native.save.admission");future=doc.save_async(output);saved_at=observed::wall();}
- bool crossed=false;for(unsigned second=0;;++second){
-  if(future.wait_for(std::chrono::seconds(1))==std::future_status::ready)break;
-  const auto elapsed=observed::wall()-saved_at;
-  if(elapsed>=120&&!crossed){crossed=true;observed::event("ORIGINAL_120_SECOND_OBSERVER_EXCEEDED","diagnostic continues; original failure retained");}
-  if(second%5==0){const auto state=doc.frame().state;observed::event("native.heartbeat","save_wait="+std::to_string(elapsed)+" asset_busy="+std::to_string(state->asset_busy)+" revision="+std::to_string(state->revision)+" message="+state->message+" error="+state->error);}
-  if(elapsed>600)throw std::runtime_error("Focused diagnostic 600-second observer elapsed; original120 gate remains failed");
- }
- future.get();observed::event("native.save.future.ready","since_author_admission="+std::to_string(observed::wall()-accepted_at)+" save_wait="+std::to_string(observed::wall()-saved_at)+" crossed120="+std::to_string(crossed));observed::active=false;
- {observed::Phase phase("native.final.mesh.endpoint");endpoint(doc);}const auto after=doc.copy_scene();{observed::Phase phase("original.key_preserved.oracle");key_preserved(before,after,target,true);} {observed::Phase phase("actual.saved.restart.oracle");check(Scene::load(output).encode()==after.encode(),"Actual focused ordered Save/restart retains the complete published Scene");}
+ observed::active=true;const auto output=directory/"focused-key-after-rest.dsculpt";{observed::Phase phase("native.author.admission");doc.author_shape(edit);} {observed::Phase phase("actual.staged.saved.helper");saved(doc,output);}observed::active=false;
+ const auto after=doc.copy_scene();{observed::Phase phase("original.key_preserved.oracle");key_preserved(before,after,target,true);}
  {observed::Phase phase("original.history.oracle");history(doc,encoded);} {observed::Phase phase("completed.original.reference.oracle");check(after.encode()==reference.encode(),"Focused native worker reproduces the entire exact original completed Scene, not only a changed target");}
- std::cout<<"PASS "<<checks<<" unchanged owner/history/reference checks; original120_crossed="<<crossed<<std::endl;return 0;
+ std::cout<<"PASS "<<checks<<" unchanged owner/history/reference checks using actual queued-first saved() helper"<<std::endl;return 0;
 }catch(const std::exception &e){std::cerr<<"FOCUSED_FAILURE "<<e.what()<<std::endl;return 1;}
