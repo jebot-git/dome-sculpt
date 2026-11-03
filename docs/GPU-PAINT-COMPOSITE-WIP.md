@@ -1,5 +1,7 @@
 # Plain writable-paint compositing checkpoint
 
+Integrated-main qualification is separately recorded in [GPU-PAINT-INTEGRATION.md](GPU-PAINT-INTEGRATION.md); this document retains the original component scope.
+
 This private component implements a selected-backend compositor in actual native
 paint/mesh/Bake workers. It is based on ede6686 plus published30991dd; runtime
 fc4d87f is frozen in artifacts/gpu-workload-ede6686. The test/receipt child is
