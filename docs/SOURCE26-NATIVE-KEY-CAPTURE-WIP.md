@@ -33,8 +33,14 @@ pass3 Release and3 sanitizer overlays with the new production TU. All linked
 C/C++ sanitizer core/support/render archives are instrumented; this is not a
 fresh all-source native-capture build or whole regression claim.
 
+The same runtime175dbc2 with test-only strict CLIbfe3d09 also passes395 on
+actual PCI03 Intel Arc A770. The source/objects/executable and unchanged CAB
+archives have865 before/after hashes with no changes. Neutral non-affine plane
+and nonplanar errors remain0/1. This is still the matched-ABI overlay, not a
+fresh all-source build. Unfiltered pinned Khronos output is in the receipt.
+
 Still required before broad integration: a fresh coherent final source build,
-actual A770 on this native-capture source, malformed/ambiguous association and
+malformed/ambiguous association and
 cancel/allocation tests, broader preexisting morph/skin/world placement and
 native typed-material capture, transformed-coordinate transport, and measured
 quality/representation for arbitrary curved derivative fields. Keep the complete
