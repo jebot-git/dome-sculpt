@@ -23,7 +23,7 @@ struct NormalPreparationReceipt {
 };
 struct SourceNormalUvReprojection;
 struct SourceNormalSampling;
-namespace detail { struct NormalMetadataSealAccess; }
+namespace detail { struct NormalMetadataSealAccess; class SourceKeyDerivation; }
 class PaintSamplingDomain;
 struct SourceNormalPreparation {
   NormalPreparationReceipt receipt;
@@ -40,6 +40,7 @@ struct SourceNormalPreparation {
   // the writable atlas. This is mutually exclusive with the latest raster UV
   // operation; older recipes remain in the immutable before-graph.
   std::shared_ptr<const SourceNormalSampling> sampling_domain;
+  std::shared_ptr<const detail::SourceKeyDerivation> key_derivation;
   void validate(bool deep=true) const;
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> &cancelled={}) const;

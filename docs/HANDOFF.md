@@ -402,6 +402,14 @@ intended64/atlas ImportSettings explicitly; the512 quota failure is retained
 and no caps changed. Read SOURCE-AUTHORING-UNION.md for all exact scopes.
 Fresh combined qualification is still pending; no main admission is claimed.
 
+## Private independent seam-key commands — 2026-11-03
+
+Runtime7c9891f adds owning Duplicate/CaptureMix record2 to privateScene22.
+Release103+141, all29,490 standard-C++ allocation prefixes and4 baselines pass;
+whole-owned sanitizer103+141 plus4 baselines pass, with the extended sanitizer
+allocation sweep still running. No main admission or UI/render/export/Mirror
+completion. Read KEY-COMMANDS-WIP.md and validation/KEY-COMMANDS.json.
+
 ## Plain paint GPU integration — 2026-11-03
 
 Runtime `9f524e3` combines qualified `3411fabe`/`fc4d87f` with main `7693d6b`.
@@ -1478,3 +1486,47 @@ shared current-pose authority is required, source-rest VRM metadata remains
 explicitly guarded, and broader per-part/generated/unbound rig ownership,
 source-global parent selection/role/rotation controls, image/device and exhaustive
 source-operation OOM evidence remain required. Full original goal remains active.
+
+
+## Private retained paint/normal Mirror composition
+
+The test-only retained child of eed311e passes a fresh coherent optimized native
+app/core/render build plus registered2/2 fixtures (85native/36graphics), matched
+whole-owned sanitizer85/36, FLTK10normal+12compact with66 exact endpoint checks
+each, and actual PCI03A77036/nine independent GLB images max0. All1495 hardware
+inputs/binaries stay exact. Its actual original/current topology is12→12, not
+the prior4→6 case. Current paint/event/owner/history/Cancel/queuedSave remain
+exact. Ten GLBs have zero Khronos errors/ten unfiltered warnings per cohort.
+Read KEY-MIRROR-RETAINED.md and its receipt. Actual female/male Mirror probes now
+show genuine nonmatching-triangle refusal with exact rollback; a real general
+refinement/role-frame adapter and avatar/UI/VRM/freehand coverage remain required.
+No new runtime, main admission, physical HMD or Source27/28 union is claimed.
+
+
+## Private general Mirror refinement continuation
+
+The isolated child of6e94806 adds only a detached geometry/provenance kernel,
+not native authoring admission.94 Release/94 own-SAN checks,22 persistent OOM
+frontiers, explicit two-sided barycentrics/involution, conservative resource
+boundaries and a preserved float-quantization counterexample pass. Raw4 and
+derived36 corners remain distinct. Actual avatar rest-distance diagnostics show
+that local-zero-plane mismatch is primarily source rig-midline placement: exact
+hips REST planes reduce sampled maxima from0.511/1.018mm to0.487/0.383µm. These
+are finite diagnostic samples, not field authority/global-coincidence proof.
+Actual accepted/user planes stay exact. Read KEY-MIRROR-REFINEMENT.md. Conditional
+Scene29/key4/frame-position3 and genuine paint-domain2 context are next; full
+native/UI/artist/skin/paint/codec/export integration remains required.
+
+
+## Private explicit Mirror plane continuation
+
+The child ofc73b925 passes98 Release/98 own-SAN detached kernel checks. Zero-plane
+semantics remain exact; explicit offset retains actual source coordinates and
+owner. Crucially, declared hips planes make the existing strict triangle map
+accept BOTH actual avatar faces (588/596 vertices). Their next gap is genuine
+role-frame transport, not topology refinement. Current exact parity differs, so
+no artist interpretation/admission is claimed. Frame-relative-mirror and actual
+common-refinement are separate approved record4 kinds within owning29/material12;
+conditional Paint5/domain2/frame-position3/normal6 only apply when used. Full
+native/UI/persistence/render/export remain required; no public DTO/schema edits.
+Read KEY-MIRROR-PLANE.md and its receipt.

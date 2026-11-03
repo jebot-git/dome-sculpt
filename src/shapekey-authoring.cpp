@@ -10,6 +10,8 @@
 #include "dome/tangents.hpp"
 #include "shapekey-normal-preparation.hpp"
 #include "shapekey-source-uv.hpp"
+#include "shapekey-attributes.hpp"
+#include "normal-key-derivation.hpp"
 #include <vector>
 namespace dome {
 namespace {
@@ -33,47 +35,6 @@ const NormalFrameTarget &frame_target(const NormalFrames &frame,uint64_t id){
  if(i==frame.targets.end())throw std::invalid_argument("Shapekey normal target identity is missing");
  return *i;
 }
-NormalFrameTarget authored_attributes(const Mesh &rest,const NormalFrames &artist,
-    const NormalFrameTarget *old_key,std::span<const Vec3> old_positions,
-    std::span<const Vec3> new_positions,uint64_t id,const std::function<bool()> &cancelled){
- // Rotate the previous artist endpoint by the geometric frame's change. This
- // preserves smoothing/normal offsets; it does not label generated N/T as the
- // original authored channels. REST and every other key remain immutable.
- MorphSet before(rest);before.set_target(rest,"geometric-reference",old_positions);
- auto mesh=before.evaluate(rest,std::array<float,1>{1});
- NormalFrames geometric;geometric.origin_vertex_count=uint32_t(rest.positions.size());geometric.origin_vertices=rest.indices;
- geometric.normals.reserve(rest.indices.size());for(auto v:rest.indices)geometric.normals.push_back(mesh.normals[v]);
- if(!artist.tangents.empty()){
-  geometric.tangents=tangent_corners(mesh,cancelled);geometric.generated_tangents=true;geometric.generated_uv=0;
- }
- auto after=detail::normal_bake_author_native_target(rest,geometric,new_positions,id,{128*1024*1024,128*1024*1024,cancelled}).attributes;
- NormalFrameTarget result;result.id=id;result.normals.reserve(rest.indices.size());if(!artist.tangents.empty())result.tangents.reserve(rest.indices.size());
- for(size_t c=0;c<rest.indices.size();++c){if((c&1023)==0)stop(cancelled);
-  auto n0=geometric.normals[c],n1=n0+after.normals[c];Vec3 t0,t1;float handedness=1;
-  if(!artist.tangents.empty()){
-   const auto &t=geometric.tangents[c];t0={t[0],t[1],t[2]};t1=t0+after.tangents[c];handedness=t[3];
-  }else{
-   auto old_edge=old_positions[rest.indices[(c/3)*3+1]]-old_positions[rest.indices[(c/3)*3]];
-   auto new_edge=new_positions[rest.indices[(c/3)*3+1]]-new_positions[rest.indices[(c/3)*3]];
-   auto project=[](Vec3 edge,Vec3 n){return edge-n*dot(edge,n);};
-   t0=project(old_edge,n0);t1=project(new_edge,n1);
-   if(length(t0)<1e-10f||length(t1)<1e-10f){auto a=rest.indices[(c/3)*3],b=rest.indices[(c/3)*3+2];t0=project(old_positions[b]-old_positions[a],n0);t1=project(new_positions[b]-new_positions[a],n1);}
-   if(length(t0)<1e-10f||length(t1)<1e-10f)throw std::invalid_argument("Shapekey edit collapses a geometric frame; reduce the adjustment");
-   t0=normalized(t0);t1=normalized(t1);
-  }
-  auto b0=cross(n0,t0)*handedness,b1=cross(n1,t1)*handedness;
-  auto transport=[&](Vec3 v){return t1*dot(v,t0)+b1*dot(v,b0)+n1*dot(v,n0);};
-  auto previous=artist.normals[c];if(old_key&&!old_key->normals.empty())previous+=old_key->normals[c];
-  result.normals.push_back(transport(previous)-artist.normals[c]);
-  if(!artist.tangents.empty()){
-   const auto &base=artist.tangents[c];Vec3 previous_t{base[0],base[1],base[2]};
-   if(old_key&&!old_key->tangents.empty())previous_t+=old_key->tangents[c];
-   result.tangents.push_back(transport(previous_t)-Vec3{base[0],base[1],base[2]});
-  }
- }
- return result;
-}
-
 // Capture the native shader's face UV derivative instead of smoothing adjacent
 // face tangents with Mikk. FixedAttributes stores these genuine corner values;
 // no imported tangent authority or CanonicalMikk interpretation is claimed.
@@ -154,20 +115,21 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
  const auto &rest=source.painted->mesh();rest.validate();
- auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));
- if(!deform->morphs)deform->morphs=MorphSet(rest);
- const size_t count=deform->morphs->targets.size();
+ const MorphSet empty(rest);const auto &keys=source.deformation&&source.deformation->morphs?*source.deformation->morphs:empty;
+ const size_t count=keys.targets.size();
  bool existing=edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
  if(existing&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");
  if(edit.action==ShapeKeyAction::Replace && edit.positions.size()!=rest.positions.size())throw std::invalid_argument("Shapekey edits must preserve the complete REST vertex domain");
- if(edit.action==ShapeKeyAction::Replace){std::vector<Vec3> old;old.reserve(rest.positions.size());for(size_t v=0;v<rest.positions.size();++v)old.push_back(rest.positions[v]+deform->morphs->targets[edit.target].delta[v]);if(equal(old,edit.positions))return {edit.target,false};}
- if(edit.action==ShapeKeyAction::Rename && edit.name==deform->morphs->targets[edit.target].name)return {edit.target,false};
+ if(edit.action==ShapeKeyAction::Replace){bool unchanged=true;for(size_t v=0;v<rest.positions.size();++v){auto old=rest.positions[v]+keys.targets[edit.target].delta[v];unchanged&=old.x==edit.positions[v].x&&old.y==edit.positions[v].y&&old.z==edit.positions[v].z;}if(unchanged)return {edit.target,false};}
+ if(edit.action==ShapeKeyAction::Rename && edit.name==keys.targets[edit.target].name)return {edit.target,false};
  const bool replace=edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
- std::string name=edit.action==ShapeKeyAction::Replace?deform->morphs->targets[slot].name:key_name(*deform->morphs,edit.name);
+ std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
+ if(detail::needs_independent_key_domain(source,edit))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
  if(source.material_bindings&&source.material_bindings->normal_preparation)
   return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
+ auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));if(!deform->morphs)deform->morphs=MorphSet(rest);
  Scene next=scene;auto &o=next.object(object);
  if(!o.shape_source)o.shape_source=capture_polygon_origin(scene,object);
  if(edit.action==ShapeKeyAction::Rename){
@@ -235,7 +197,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
    std::vector<Vec3> edited=mesh.positions;
    const auto &authority=replace?identity->positions:frames->targets.back().positions;
    for(size_t v=0;v<edited.size();++v)edited[v]+=authority[v];
-   key=authored_attributes(mesh,*old,replace?&frame_target(*old,id):nullptr,old_positions,edited,id,cancelled);
+   key=detail::author_key_attributes(mesh,*old,replace?&frame_target(*old,id):nullptr,old_positions,edited,id,cancelled);
   }
   if(replace){auto target=std::find_if(frame->targets.begin(),frame->targets.end(),[&](const auto&t){return t.id==id;});*target=std::move(key);}
   else frame->targets.push_back(std::move(key));

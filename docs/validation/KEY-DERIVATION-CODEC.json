@@ -1,0 +1,16 @@
+{
+  "source": "2c7199e",
+  "scope": "Private owning contextual frame2/material10 codec; outer Scene writer fail-closed",
+  "release": {
+    "checks": 80,
+    "inputs": 972,
+    "before_after_equal": true
+  },
+  "whole_owned_sanitize": "pending",
+  "files": {
+    "artifacts/key-material3-status.json": "804fa83677f75feab0a619d41e1ac53f4ef5f2beead99e19acc89108e37287a7",
+    "artifacts/key-material3-before.json": "193f3d3cc19a90a1be1963398da5f5a4ab4dbcc6c6d0f9510f93ec751d1b13f2",
+    "artifacts/key-material3-test.log": "c261f89e183d4986a0f22cd0ba101b505ca1b883b5f5c829748206295ebf9438",
+    "artifacts/key-material3-build.log": "90653709ebff679bcd8ec7d62a2405da48099aa00748ad82db428ef74ab5d27f"
+  }
+}

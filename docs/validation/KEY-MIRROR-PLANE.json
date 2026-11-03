@@ -1,0 +1,67 @@
+{
+  "status": "private explicit-plane geometry/provenance kernel; no native/UI or schema admission",
+  "base": "c73b925e79f6d76a1e8a1d8c63afcc76d2f82676",
+  "source_changes": "private geometry-only KeyMirrorPlane/overload; existing public DTOs, production authoring and writers/readers untouched",
+  "checks_each": 98,
+  "runs": [
+    {
+      "name": "release",
+      "code": 0,
+      "seconds": 0.03256994401453994,
+      "inputs": 415,
+      "unchanged": true
+    },
+    {
+      "name": "sanitize",
+      "code": 0,
+      "seconds": 0.684446408005897,
+      "inputs": 427,
+      "unchanged": true
+    }
+  ],
+  "old_zero_plane": "default overload dispatches explicit0 with identical geometry/provenance/work; negative user zero plane is never shifted to source center",
+  "explicit_plane": "offset is captured verbatim; positions/barycentric source IDs and exact source address+control-block retained; invalid nonfinite plane refuses",
+  "persistent_allocation_prefixes": 22,
+  "scratch_forecast_boundary": 6972,
+  "work_boundary": 75,
+  "coherent_scope": "two new own Release/O1 ASan/UBSan/leak TUs on matching immutable whole-owned core/support archives; private result-header consumers freshly rebuilt; no whole app/GUI/GPU proof",
+  "actual_assets": {
+    "geometry_only_new_refinement": "explicit true hips plane still refuses numerically unresolved contact, leaving exact Scene; do not force unnecessary refinement",
+    "strict_existing_bijection_diagnostic": {
+      "female": {
+        "vertices": 588,
+        "corners": 3192,
+        "maximum_rest_error_m": 7.15732e-07,
+        "normal_parity_error": 6.38712e-05,
+        "tangent_best_sign_lower_bound": 0.0298695,
+        "handedness_mismatches": 0
+      },
+      "male": {
+        "vertices": 596,
+        "corners": 3216,
+        "maximum_rest_error_m": 5.99031e-07,
+        "normal_parity_error": 0.000337419,
+        "tangent_best_sign_lower_bound": 0.0257391,
+        "handedness_mismatches": 0
+      },
+      "role_order": "explicit origin_vertices equals actual mesh indices for both current PBR/MToon roles",
+      "diagnostic_transform": "a separate geometry-only mesh COPY is translated by exact declared hips plane only to invoke old zero-plane structural kernel; original Scene remains exact; no new owning field/frame certificate",
+      "scope": "Actual faces are compatible strict triangle bijections at correct explicit plane, not demonstrated nonmatching-triangulation failures."
+    }
+  },
+  "next_semantic_contract": {
+    "record4_kinds": [
+      "frame-relative-mirror: explicit plane + real strict bijection + declared linear base-relative role conversion, source geometry/IDs stay actual588/596",
+      "common-refinement: actual two-sided barycentric geometry/paint-domain2; no fake identity refinement for avatar path"
+    ],
+    "versions": "owning Scene29/material12; frame-position3 and Paint5/domain2 only when genuinely used; paired normal-entry6 conditional; physical material11 and Source28 preserved",
+    "preservation": "old record3 exact semantics/bytes unchanged; complete immutable before frames/paint/material/deform/appearance and original artist target identities retained; zero key remains zero; resource/cycle/context closure mandatory",
+    "quality": "converted artist interpretation requires independent named-role, poses/morphs, native/controller/GUI/history/Cancel and GLB/VRM consumer proof; not yet implemented"
+  },
+  "artifacts": [
+    "artifacts/kernel/final/",
+    "artifacts/kernel/avatar-current.log",
+    "artifacts/strict-midline/"
+  ],
+  "gpu": "none"
+}

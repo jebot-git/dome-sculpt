@@ -1,0 +1,19 @@
+{
+  "scope": "Detached two-owned-TU correspondence kernel linked with exact216 matching Release/O1 sanitizer support archives; no new runtime admission, writer or app linkage",
+  "checks_release": 54,
+  "checks_sanitize": 54,
+  "persistent_cpp_allocation_prefixes": 11,
+  "source_sha256": {
+    "src/key-mirror-correspondence.hpp": "bc2e87687daa3509df55a06eef90f35b41138397f24a02a3a1b32cc3a43ca231",
+    "src/key-mirror-correspondence.cpp": "3a45188443a2f65f3f2ad7a3386378cb214ccae0fdf69d8b75c60828df60d91f",
+    "tests/key-mirror-correspondence.cpp": "7b8c3c8b5b2541499ed63bf524e0e8acfcbda11c4c982a2b3a6b38d704893394"
+  },
+  "limits": [
+    "non-reflection-invariant triangulation requires actual refinement",
+    "asymmetric welded current vertex partitions require actual expansion",
+    "mixed tangent-axis or asymmetric base frames require actual owning conversion"
+  ],
+  "preserved_failures": [
+    "r1 malformed per-triangle W negative refused by existing NormalFrames.validate before intended rule; corrected whole triangle in r2"
+  ]
+}

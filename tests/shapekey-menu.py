@@ -84,6 +84,15 @@ async def main():
   await command('Redo');await command('Save');check(inspect()==duplicated,'One universal Redo restores the exact accepted shape endpoint')
   await command('Mirror shapekey...');dialog=await wait(lambda:named('Mirror shapekey'));await command('Close Window');await wait(lambda:named('Mirror shapekey') is None);await command('Save')
   check(inspect()==duplicated and app.poll() is None,'Universal Close cancels native mirror controls without changing source or history')
+  if os.environ.get('DOME_SHAPE_APPLY_MIRROR')=='1':
+   prior=out/'mirror-before.dsculpt';prior.write_bytes(project.read_bytes())
+   await command('Mirror shapekey...');dialog=await wait(lambda:named('Mirror shapekey'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=46 if compact else 32
+   tap(dialog,g.width*.5,row*3+(row-4)/2);key('Home');key('Return');key('Up');await asyncio.sleep(.08);pixels(dialog).save(out/'mirror-source-selection.png')
+   tap(dialog,g.width*.75,g.height-row*2+24);await wait(lambda:named('Mirror shapekey') is None);await ready('New shapekey...');await command('Save');mirrored=inspect();saved=out/'mirror-after.dsculpt';saved.write_bytes(project.read_bytes())
+   subprocess.run([helper,'--verify-ui-mirror',str(prior),str(saved)],env=env,check=True)
+   check(len(mirrored['objects'][0]['deformation']['morphs']['targets'])==initial_targets+3,'Actual FLTK Apply accepts genuine independent-corner Mirror with authenticated artist attributes')
+   await command('Undo');await command('Save');check(inspect()==duplicated,'One universal Undo restores the complete pre-Mirror source and target set')
+   await command('Redo');await command('Save');check(inspect()==mirrored,'One universal Redo restores exact actual Mirror owning provenance')
   if strokes:
    await command('New shapekey...');dialog=await wait(lambda:named('New shapekey'));g=dialog.get_geometry();tap(dialog,g.width*.75,g.height-(46 if compact else 32)*2+24);await wait(lambda:named('New shapekey') is None);await ready('Duplicate shapekey...');await command('Save');duplicated=inspect();selected=len(duplicated['objects'][0]['deformation']['morphs']['targets'])-1
    check(selected==initial_targets+2,'Actual native creation selects a fresh target for the subsequent freehand stroke')

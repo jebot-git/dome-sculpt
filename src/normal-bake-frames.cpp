@@ -156,7 +156,7 @@ NormalBakeFrameCandidate normal_bake_frame_candidate(const Mesh &mesh,
     else {
       if(!binding||!binding->uv_origin||!binding->uv_origin->paint)
         throw std::invalid_argument("Inactive normal target has no retained native POSITION authority");
-      const auto &origin=binding->uv_origin->paint->mesh();
+      const auto &origin=frame_position_basis(*binding);
       const std::vector<Vec3> *authority=&identity.positions;
       if(authority->empty()) {
         if(!identity.origin_slot||!binding->uv_origin->deformation||!binding->uv_origin->deformation->morphs)

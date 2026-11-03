@@ -1,0 +1,300 @@
+{
+  "status": "private detached geometry/provenance kernel only; no native/frame/paint/codec/export admission",
+  "base": "6e9480674113b6db53b57cd37eb3fef70fb6e25d",
+  "public_layout_schema_changes": false,
+  "build_scope": "new kernel+fixture C++ TUs compiled at O3 Release and O1 ASan/UBSan/leaks against immutable matching whole-owned core/support archives; existing src/include remain unchanged; not whole-app rebuild",
+  "runs": [
+    {
+      "name": "release",
+      "code": 0,
+      "seconds": 0.03251631499733776,
+      "inputs": 415,
+      "unchanged": true
+    },
+    {
+      "name": "sanitize",
+      "code": 0,
+      "seconds": 0.6441070820146706,
+      "inputs": 427,
+      "unchanged": true
+    }
+  ],
+  "checks_each": 94,
+  "persistent_allocation_prefixes": 22,
+  "cancellation_polls": 58,
+  "work_units": 75,
+  "smallest_accepted_conservative_forecast_bytes": 6972,
+  "resource_boundaries": "one byte/work unit below refuses; input cardinality checked before Mesh.validate; forecast includes vector reallocation peak and temporary cells",
+  "geometry": {
+    "actual_input_vertices": 4,
+    "input_triangles": 2,
+    "derived_triangles": 12,
+    "derived_deindexed_corners": 36,
+    "total_area": 1,
+    "mirrored_piecewise_field_max_error": 1.49012e-09,
+    "independent_geometric_normal_error": 7.02886e-08,
+    "independent_uv_tangent_error": 8.96647e-08,
+    "note": "Geometry-derived N/T in the TEST oracle do not qualify transport of authored role frames."
+  },
+  "provenance": "Exact strong original Mesh owner; each derived corner carries current and reflected actual triangle IDs plus double convex barycentrics; explicit corner involution; no raw4-to-derived36 identity relabeling, seam choice or averaging",
+  "negative_cases": [
+    "historical record3 corner correspondence still refuses opposite diagonals",
+    "duplicate overlapping source faces refuse ambiguous authority",
+    "asymmetric/unrepresented surfaces refuse",
+    "clockwise and fixed-plane input winding retained without minting role-normal parity",
+    "distinct coincident source-face fields remain distinct",
+    "source/output count and prospective resource/work failures",
+    "early/middle/late cancellation and every persistent allocation prefix leave source/exact retry",
+    "old draft accepted a large-coordinate centroid outside float representability; preserved old binary fails new control, fixed kernel checks actual stored float against both source stencils"
+  ],
+  "float_counterfactual": "artifacts/kernel/quantization-old-negative.log (exit1 at intended representability assertion); old kernel/object/source preserved r2-preserved",
+  "actual_asset_diagnostics": [
+    {
+      "name": "vroid-beta-female",
+      "vertices": 588,
+      "triangles": 1064,
+      "local_zero_plane": {
+        "sample_count": 15960,
+        "minimum_distance_sample_max": 0.0005108267108119679,
+        "above_declared_1e_minus4": 13252,
+        "worst": {
+          "closest_barycentric": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "closest_face": 38,
+          "closest_point": [
+            0.0920814722776413,
+            1.505988359451294,
+            0.009456893429160118
+          ],
+          "distance": 0.0005108267108119679,
+          "origin": {
+            "vertex": 179
+          },
+          "point": [
+            -0.09259229898452759,
+            1.505988359451294,
+            0.009456830099225044
+          ],
+          "reflected": [
+            0.09259229898452759,
+            1.505988359451294,
+            0.009456830099225044
+          ],
+          "source_sample": -0.09259229898452759
+        }
+      },
+      "explicit_hips_rest_plane": {
+        "offset": -0.00025547973928041756,
+        "sample_count": 15960,
+        "minimum_distance_sample_max": 4.871722438003311e-07,
+        "above_declared_1e_minus4": 0,
+        "source": "actual humanoid hips REST world matrix, including native skeleton space_matrix; not bbox",
+        "midline_joints": [
+          {
+            "bone": 3,
+            "name": "J_Bip_C_Chest",
+            "rest_world_position": [
+              -0.0002554590464569628,
+              1.0768183469772339,
+              0.029767174273729324
+            ],
+            "slot": "chest"
+          },
+          {
+            "bone": 10,
+            "name": "J_Bip_C_Head",
+            "rest_world_position": [
+              -0.0002554510429035872,
+              1.387745976448059,
+              -0.007964556105434895
+            ],
+            "slot": "head"
+          },
+          {
+            "bone": 1,
+            "name": "J_Bip_C_Hips",
+            "rest_world_position": [
+              -0.00025547973928041756,
+              0.9099168181419373,
+              0.0057732281275093555
+            ],
+            "slot": "hips"
+          },
+          {
+            "bone": 2,
+            "name": "J_Bip_C_Spine",
+            "rest_world_position": [
+              -0.0002554710954427719,
+              0.9628306031227112,
+              0.015597853809595108
+            ],
+            "slot": "spine"
+          }
+        ],
+        "worst": {
+          "closest_barycentric": [
+            8.152552879725494e-05,
+            0.00016954438308723545,
+            0.9997489300881155
+          ],
+          "closest_face": 989,
+          "closest_point": [
+            -0.014012999145075004,
+            1.3897192326477263,
+            0.08979895930208943
+          ],
+          "distance": 4.871722438003311e-07,
+          "origin": {
+            "vertex": 502
+          },
+          "point": [
+            0.013502176851034164,
+            1.3897188901901245,
+            0.08979927748441696
+          ],
+          "reflected": [
+            -0.014013136329595,
+            1.3897188901901245,
+            0.08979927748441696
+          ],
+          "source_sample": 0.013502176851034164
+        }
+      },
+      "scene_unchanged": true
+    },
+    {
+      "name": "vroid-beta-male",
+      "vertices": 596,
+      "triangles": 1072,
+      "local_zero_plane": {
+        "sample_count": 16080,
+        "minimum_distance_sample_max": 0.0010175788012654827,
+        "above_declared_1e_minus4": 14232,
+        "worst": {
+          "closest_barycentric": [
+            0.9997431124423911,
+            0.0002568875576088644,
+            0.0
+          ],
+          "closest_face": 57,
+          "closest_point": [
+            0.08993536065759034,
+            1.6277034990203259,
+            0.01849506064656873
+          ],
+          "distance": 0.0010175788012654827,
+          "origin": {
+            "vertex": 130
+          },
+          "point": [
+            -0.09095293283462524,
+            1.627699851989746,
+            0.018494635820388794
+          ],
+          "reflected": [
+            0.09095293283462524,
+            1.627699851989746,
+            0.018494635820388794
+          ],
+          "source_sample": -0.09095293283462524
+        }
+      },
+      "explicit_hips_rest_plane": {
+        "offset": -0.0005088425241410732,
+        "sample_count": 16080,
+        "minimum_distance_sample_max": 3.833623013898285e-07,
+        "above_declared_1e_minus4": 0,
+        "source": "actual humanoid hips REST world matrix, including native skeleton space_matrix; not bbox",
+        "midline_joints": [
+          {
+            "bone": 3,
+            "name": "J_Bip_C_Chest",
+            "rest_world_position": [
+              -0.0005088099278509617,
+              1.2272740602493286,
+              0.00648073386400938
+            ],
+            "slot": "chest"
+          },
+          {
+            "bone": 6,
+            "name": "J_Bip_C_Head",
+            "rest_world_position": [
+              -0.0005088174948468804,
+              1.5449053049087524,
+              0.006267928518354893
+            ],
+            "slot": "head"
+          },
+          {
+            "bone": 1,
+            "name": "J_Bip_C_Hips",
+            "rest_world_position": [
+              -0.0005088425241410732,
+              1.0077613592147827,
+              0.01016148179769516
+            ],
+            "slot": "hips"
+          },
+          {
+            "bone": 2,
+            "name": "J_Bip_C_Spine",
+            "rest_world_position": [
+              -0.0005088216857984662,
+              1.148290753364563,
+              0.010900397785007954
+            ],
+            "slot": "spine"
+          }
+        ],
+        "worst": {
+          "closest_barycentric": [
+            2.4758602124030915e-06,
+            0.00019073504191847207,
+            0.9998067890978691
+          ],
+          "closest_face": 861,
+          "closest_point": [
+            0.04467734820694647,
+            1.587612531062254,
+            0.0894179024010848
+          ],
+          "distance": 3.833623013898285e-07,
+          "origin": {
+            "vertex": 302
+          },
+          "point": [
+            -0.04569493979215622,
+            1.587612271308899,
+            0.08941763639450073
+          ],
+          "reflected": [
+            0.04467725474387407,
+            1.587612271308899,
+            0.08941763639450073
+          ],
+          "source_sample": -0.04569493979215622
+        }
+      },
+      "scene_unchanged": true
+    }
+  ],
+  "diagnostic_limits": [
+    "Minimum distance is diagnostic only: no nearest-match authoring map or authority is emitted.",
+    "Quarter-barycentric finite sampling certifies mismatches at observed points but is not a global Hausdorff upper bound or proof of coincidence.",
+    "The current kernel remains explicitly x=0. No active operation/user plane is shifted by these diagnostics.",
+    "Actual-avatar kernel at x=0 still refuses rest correspondence. Declared rig-plane overload, true nonmatching/curved correspondence, own frame/paint/skin/codec/native/UI/render/export remain required."
+  ],
+  "next_reserved_contract": "conditional key record4/frame-position record3/owning Scene29; explicit paint domain2/new envelope and composition with HDR material11+Source28 require exact field/context plan before public edits",
+  "artifacts": [
+    "artifacts/kernel/final/",
+    "artifacts/kernel/r2-preserved/",
+    "artifacts/kernel/quantization-old-negative.log",
+    "artifacts/kernel/avatar-current.log",
+    "artifacts/avatar-rest-metrics/",
+    "artifacts/avatar-rest-metrics/midline/"
+  ]
+}

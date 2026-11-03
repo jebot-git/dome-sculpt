@@ -1617,8 +1617,10 @@ void Document::mesh_loop() {
         if(o.mesh_active){dep.paint=o.painted->mesh_owner();dep.paint_sampling_attachment=o.painted->paint_sampling_attachment();if(o.painted->source_maps()){dep.source_uv1=o.painted->source_maps()->uv1;dep.source_extra_uv=o.painted->source_maps()->extra_uv_sets;}}
         else {dep.volume=o.volume->geometry_owner();dep.voxel=o.volume->voxel_size();dep.band=o.volume->band();}
         dep.deformation=o.deformation;dep.appearance=o.appearance;dep.material_bindings=o.material_bindings;dep.polygon=o.polygon;
-        if(auto frames=o.material_bindings?o.material_bindings->normal_frames:nullptr)
+        if(auto frames=o.material_bindings?o.material_bindings->normal_frames:nullptr){
+          dep.frame_positions=frames->position_domain;
           dep.frame_role=!job->pbr_view&&o.material_bindings->has_mtoon&&!geometry_detail::same_owner(frames->pbr,frames->mtoon)?1:0;
+        }
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
         dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
         dependencies->objects.push_back(std::move(dep));

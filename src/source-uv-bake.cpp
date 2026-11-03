@@ -543,7 +543,7 @@ SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
  if(result.mtoon)binding->material=*result.mtoon;
  binding->roles=result.mtoon_roles;binding->uv_origin=result.uv_origin;binding->sampling_reparameterized=true;
  binding->native_reference=result.native_reference;
- if(result.normal_frames){binding->normal_frames=result.normal_frames;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;}
+ if(result.normal_frames){binding->normal_frames=result.normal_frames;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;binding->key_derivation=result.original_material->key_derivation;}
  binding->animation_policy=result.animation_policy;binding->freeze_seconds=result.freeze_seconds;
  binding->animation_frozen=result.animation_frozen;
  if(result.normal_reprojection){auto normal=std::make_shared<SourceNormalPreparation>(*result.original_material->normal_preparation);normal->projection=result.normal_reprojection->projection;normal->uv_reprojection=result.normal_reprojection;normal->sampling_domain.reset();binding->normal_preparation=std::move(normal);}

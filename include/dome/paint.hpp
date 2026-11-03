@@ -242,6 +242,7 @@ private:
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;
+  friend struct SourceKeyPaintAccess;
   void seal_paint_sampling_attachment();
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);

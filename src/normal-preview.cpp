@@ -2,6 +2,7 @@
 #include "dome/normal-preview.hpp"
 #include "dome/material-bindings.hpp"
 #include "normal-preparation-state.hpp"
+#include "normal-key-derivation.hpp"
 #include <bit>
 namespace dome {namespace {
 template<class T>bool owner(const std::shared_ptr<const T> &a,const std::shared_ptr<const T> &b)noexcept{return a==b&&!a.owner_before(b)&&!b.owner_before(a);}
@@ -17,6 +18,8 @@ bool NormalPreviewProof::matches(const std::shared_ptr<const SourceMaterialBindi
  if(!owner(binding,binding_)||!owner(maps,maps_)||!binding||!maps||!owner(binding->normal_preparation,recipe_))return false;
  const auto &p=*recipe_;
  return p.sampling_domain&&p.sampling_domain->has_sealed_metadata()&&receipt(p.receipt,source_.receipt)&&
+   owner(p.key_derivation,source_.key_derivation)&&owner(binding->key_derivation,p.key_derivation)&&
+   (p.key_derivation?owner(p.target_frames->position_domain,p.key_derivation->position_domain()):!p.target_frames->position_domain)&&
    owner(p.projection,source_.projection)&&owner(p.initial_projection,source_.initial_projection)&&owner(p.target_frames,source_.target_frames)&&owner(p.original_paint,source_.original_paint)&&
    owner(p.original_appearance,source_.original_appearance)&&owner(p.original_deformation,source_.original_deformation)&&owner(p.original_material,source_.original_material)&&owner(p.uv_reprojection,source_.uv_reprojection)&&owner(p.sampling_domain,source_.sampling_domain)&&
    owner(maps->normal_projection,maps_projection_)&&owner(maps->baked_base,baked_)&&!maps->source_only;
