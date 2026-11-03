@@ -253,6 +253,19 @@ session restart; current public runtime remainsf973732.
 
 ## Private Source25 component history — not yet qualified in this merge
 
+## Private repeated-creator metadata/resource checkpoint — 2026-11-03
+
+The child of 1f6658f now repairs stale native humanoid node-ID hints and duplicate
+decoded image ownership across real creator→native fit/pose→export→reimport→
+Save cycles. Both actual CC0 bases under ordinary/reflected placement retain
+all raw source bytes/descriptors, own skin/pose/material and independently
+checked metadata/geometry. The 64M owned-pixel and 256MiB project caps are
+unchanged. Final Release and asserted sanitizer scopes each pass 218 checks;
+eight independent software/A770 images have maxError 0 at tolerance 2. The exact
+controlled final sanitizer outer/native exit 0 is separate from an earlier
+outer 143/native 0 attempt. Read SOURCE-NATIVE-HINTS.md and its validation receipt.
+This remains private, with no new public layout/schema/GUI/headset claim.
+
 ## Private node-local bone-length checkpoint — 2026-11-03
 
 The new b953e26 child qualifies actual length metadata on genuine source joints,

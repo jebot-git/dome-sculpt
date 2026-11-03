@@ -14,6 +14,7 @@
 #include "vrm-import.hpp"
 #include "bone-metadata.hpp"
 #include "humanoid-placement-import.hpp"
+#include "source-decoded-images.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <numeric>
@@ -313,17 +314,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
     if(objects>scene_texels/domains)
       throw std::length_error("Editable atlas import exceeds Scene paint-map budget");
   }
-  auto images = std::make_shared<std::vector<std::shared_ptr<const Image>>>();
-  size_t pixels = 0;
-  for (const auto &encoded : asset->images) {
-    stop(options);
-    auto image = decode_import_image(encoded,64*1024*1024-pixels,options.limits.cancelled);
-    auto count = size_t(image.width) * image.height;
-    if (count > 64 * 1024 * 1024 - pixels)
-      throw std::length_error("Imported decoded image budget exceeded");
-    pixels += count;
-    images->push_back(std::make_shared<const Image>(std::move(image)));
-  }
+  auto images=detail::decode_source_images(asset->images,64*1024*1024,
+                                           options.limits.cancelled);
   std::shared_ptr<CreatorSourceModel> model;
   if(affine_graph){
     model=std::make_shared<CreatorSourceModel>();
