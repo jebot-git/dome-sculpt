@@ -20,6 +20,9 @@ struct NativeEmissionReadLimits {
   size_t max_images = 256;
   EmissionInterchangeLimits image;
   std::function<bool()> cancelled;
+  // Conditional package2 uses bounded lossless compression; stored native
+  // bytes keep the independent128MiB cap above. This caps expanded CBOR.
+  size_t max_decoded_native_bytes = 256*1024*1024;
 };
 // Worker-only surface extraction. Other channels are compiled without routing
 // physical coefficients through the historical byte emission plane.

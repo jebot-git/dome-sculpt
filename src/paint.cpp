@@ -854,14 +854,14 @@ bool PaintedMesh::redo() {
   ++revision_;
   return true;
 }
-std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_physical(const PaintedMesh &paint) {
+std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(const PaintedMesh &paint) {
   // An altered temporary may never publish maps under the original's visual
   // content identity, including actual physical zero/hidden contributions.
   auto cache=std::make_shared<PaintedMesh::CompositeCache>();
   const auto token=next_composite_token();
   auto detached=paint.snapshot();
   detached->composite_cache_=std::move(cache);detached->composite_token_=token;
-  for(auto &layer:detached->layers_)layer.emission_tiles.clear();
+  for(auto &layer:detached->layers_){layer.emission_tiles.clear();for(auto &tile:layer.tiles)if(tile){bool emission=false;for(const auto &pixel:tile->pixels)emission|=pixel.data[6]||pixel.data[7]||pixel.data[8]||pixel.data[12];if(emission){auto copy=std::make_shared<PaintTile>(*tile);for(auto &pixel:copy->pixels){pixel.data[6]=pixel.data[7]=pixel.data[8]=pixel.data[12]=0;}tile=std::move(copy);}}}
   return detached;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {

@@ -1,4 +1,6 @@
 #include "emission-authority.hpp"
+#include "emission-export.hpp"
+#include "humanoid-sha256.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/vrm.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -384,18 +386,20 @@ Json Vrm0Metadata::remap(const Vrm0IdentityMap &map) const {
             mapped(value.value(), map.textures, "MToon texture", true);
   return result;
 }
-VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
+VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_objects,
                            const std::filesystem::path &path,
                            const VrmExportOptions &options) {
   if (path.extension() != ".vrm")
     fail("output must use .vrm");
-  if(options.emission)fail("Native HDR VRM package adapter is not admitted in this checkpoint");
   if (!options.max_output_bytes || options.max_output_bytes > 256 * 1024 * 1024)
     fail("invalid output resource bound");
   if (options.paint_resolution && (options.paint_resolution<64 || options.paint_resolution>4096))
     fail("explicit painted texture resolution must be64..4096");
   VrmExportReport report;
   stop(options);
+  std::optional<detail::EmissionExportPrepared> physical;
+  if(options.emission)physical=detail::prepare_emission_export(original_input_objects,*options.emission,options.cancelled,true);
+  const auto &input_objects=physical?physical->surfaces:original_input_objects;
   if (input_objects.empty())
     fail("no avatar surfaces");
 
@@ -430,7 +434,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   const auto &asset = *origin->asset;
   auto original = original_json(*origin);
   if(original.contains("extensions")&&original.at("extensions").contains("VRMC_vrm"))
-    return detail::export_vrm1(input_objects,original,path,options);
+    return detail::export_vrm1(input_objects,original,path,options,physical?&*physical:nullptr);
   if (!original.contains("extensions") ||
       !original.at("extensions").contains("VRM"))
     fail("only original VRM0 is supported by this source-preserving path");
@@ -798,8 +802,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     if(properties.contains("textureProperties"))for(auto &texture:properties["textureProperties"].items())texture.value()=texture_identity(texture.value());
     return Json{{"material",std::move(material)},{"properties",std::move(properties)}};
   };
-  auto add_material=[&](int source,Json material,Json properties,std::set<std::string> rewritten) {
-    auto signature=material_signature(material,properties);
+  auto add_material=[&](int source,Json material,Json properties,std::set<std::string> rewritten,std::string hdr_field={}) {
+    auto signature=material_signature(material,properties);if(!hdr_field.empty())signature["currentHdrField"]=std::move(hdr_field);
     for(int previous:source_variants[source])if(variants[size_t(previous)].signature==signature) {
       variants[size_t(previous)].rewritten.insert(rewritten.begin(),rewritten.end());return previous;
     }
@@ -1049,7 +1053,9 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     if(toon.parameters.alpha==MToonAlpha::Mask)source_material["alphaCutoff"]=toon.parameters.alpha_cutoff;
     else source_material.erase("alphaCutoff");
     source_material["doubleSided"]=toon.parameters.cull==MToonCull::Off;
-    auto material=add_material(a.source_material,std::move(source_material),std::move(properties),std::move(rewritten));
+    std::string hdr_field;
+    if(physical)if(auto found=std::find_if(physical->images.begin(),physical->images.end(),[&](const auto &image){return image.object==o.id;});found!=physical->images.end()){const auto *bytes=reinterpret_cast<const uint8_t*>(found->image.pixels.data());hdr_field=creator_detail::sha256(std::span<const uint8_t>(bytes,found->image.pixels.size()*sizeof(found->image.pixels[0])));rewritten.insert("_EmissionColor");}
+    auto material=add_material(a.source_material,std::move(source_material),std::move(properties),std::move(rewritten),std::move(hdr_field));
     if(o.textures && !o.textures->source_only)painted_variants.insert(material);
     j["meshes"][emitted.mesh]["primitives"][0]["material"]=material;
     check_budget();
@@ -1203,6 +1209,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     report.diagnostics.push_back(
         "Changed morph normals recomputed from edited geometry; exact original "
         "NORMAL deltas remain in the native source archive");
+  if(physical){detail::finish_emission_export(document,*physical,*options.emission,options.max_output_bytes,options.cancelled);Vrm0Metadata::parse(j.at("extensions").at("VRM"),j.at("nodes").size(),j.at("meshes").size(),j.at("textures").size(),j.at("materials").size());for(const auto &image:physical->images)report.diagnostics.push_back("Exact native/FLOAT32 HDR object "+std::to_string(image.object)+"; measured VRM fallback maximum radiance error "+std::to_string(image.maximum_absolute_error));}
   detail::write_glb(std::move(document), path,options.cancelled,options.before_commit);
   return report;
 }

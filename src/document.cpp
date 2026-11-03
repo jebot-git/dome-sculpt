@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "emission-export.hpp"
 #include "dome/document.hpp"
 #include "dome/normal-sampling.hpp"
 #include "cut-color.hpp"
@@ -3577,17 +3578,26 @@ void Document::file_loop() {
           for (const auto &object : job->scene.objects())
             if (!in_group(job->scene, object, group)) job->scene.object(object.id).visible = false;
           job->scene.require_exportable_sources();
+          std::vector<uint64_t> subject_ids;for(const auto &object:job->scene.objects())if(object.visible)subject_ids.push_back(object.id);
+          auto subject=detail::emission_export_subset(job->scene,subject_ids);
+          const bool physical=detail::requires_native_emission_package(subject,cancelled);
+          auto native_owner=physical?std::make_shared<const Scene>(std::move(subject)):nullptr;
+          auto surfaces=physical?emission_export_surfaces(*native_owner,cancelled):job->scene.preview_surfaces(cancelled);
           VrmExportOptions options;options.cancelled=cancelled;options.before_commit=before_commit;
-          auto report = export_vrm(job->scene.preview_surfaces(cancelled), job->path,options);
+          if(physical){auto emission=std::make_shared<NativeEmissionExport>();emission->scene=std::move(native_owner);emission->scope=NativeEmissionExport::Scope::ExportedObjects;emission->allow_measured_core_fallback=true;options.emission=std::move(emission);}
+          auto report = export_vrm(surfaces, job->path,options);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
         } else {
           job->scene.require_exportable_sources();
-          auto surfaces = job->scene.preview_surfaces(cancelled);
+          const bool physical=detail::requires_native_emission_package(job->scene,cancelled);
+          auto native_owner=physical?std::make_shared<const Scene>(job->scene.snapshot()):nullptr;
+          auto surfaces = physical?emission_export_surfaces(*native_owner,cancelled):job->scene.preview_surfaces(cancelled);
           for (auto &surface : surfaces)
             if (surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
           GltfExportOptions options; options.recompute_changed_normals = true;
           options.cancelled=cancelled;options.before_commit=before_commit;
+          if(physical){auto emission=std::make_shared<NativeEmissionExport>();emission->scene=std::move(native_owner);emission->scope=NativeEmissionExport::Scope::WholeScene;emission->allow_measured_core_fallback=true;options.emission=std::move(emission);}
           auto report = export_glb(surfaces, job->path, options);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);

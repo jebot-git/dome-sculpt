@@ -28,8 +28,8 @@ struct VrmExportOptions {
   // explicit resampling choice for compiled paint maps, never a hidden fallback.
   uint32_t paint_resolution = 0;
   std::function<void()> before_commit;
-  // Reserved capability: a nonnull owner explicitly refuses until the typed
-  // VRM package adapter is admitted; it is never silently ignored.
+  // Optional immutable exact HDR/native package owner. Standard-view loss must
+  // be explicitly accepted; unhandled typed/animated routes refuse precisely.
   std::shared_ptr<const NativeEmissionExport> emission;
 };
 struct VrmExportReport {

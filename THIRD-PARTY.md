@@ -83,3 +83,7 @@ FreeSpacenav legacy Unix input protocol conventions are reviewed from pinned lib
   The native emission interchange codec writes lossless ZIP FLOAT32 scanlines;
   a separate OpenEXRCore channel/chunk consumer checks the actual sample bits.
   Exact package/header/license evidence is in third_party/sources.json.
+
+- zlib-ng2.3.3, zlib1.3.1 compatibility API: Zlib-licensed system library, not
+  vendored. Conditional native HDR package2 uses bounded lossless DEFLATE;
+  `third_party/sources.json` records installed package, header and library hashes.

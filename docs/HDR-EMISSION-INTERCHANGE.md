@@ -1,5 +1,8 @@
 # Native HDR emission interchange — first GLB checkpoint
 
+The historical GLB-only scope below is preserved. The later qualified VRM and
+file-worker continuation is in [HDR-VRM-EXPORT.md](HDR-VRM-EXPORT.md).
+
 This private component extends 06816fe. It is the first plain writable-mesh GLB
 adapter, not full HDR/VRM/source-coordinate or frontend admission. Root owns the
 separate Source28 renderer/import integration; this tree does not contain it.

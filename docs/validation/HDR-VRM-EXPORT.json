@@ -1,0 +1,901 @@
+{
+  "version": 1,
+  "component": "Native HDR VRM0/VRM1 and real native export FileJobs",
+  "date": "2026-11-03",
+  "parent": "ee5769729fd23900ce256ce4b3f0da0d0a24bba1",
+  "qualifiedAncestor": "ccf096eacd5ef9958e2e76b86fcc1c6aa0296133",
+  "private": true,
+  "publishedMain": false,
+  "fullGoalComplete": false,
+  "sourceSha256": {
+    "CMakeLists.txt": "b8dac2163cc13c6c6e3d786664d24e9c9a39ce921d33214c90ca91be0739cb08",
+    "include/dome/emission-native.hpp": "b073cbb2a92a33a97e7f79992dc8e2d69e85e2a2e168fabf9aa7ce8f6c15fd46",
+    "include/dome/vrm.hpp": "e7f5ea6783b4f20d76cd994612a3162d5121c994e92a7ea49f09dbf00888aa0e",
+    "src/document.cpp": "64a880557d922c96998cb68c797faec88375845891a552600530f42e03a2998e",
+    "src/emission-export.cpp": "7514548e309864c6c0d0396423a35907bfb71299d6dd3c68ee50991c5f937c34",
+    "src/emission-export.hpp": "290d40c78a28633ee719f93cb97bc4bf0d5fcc931ff312df8015dba53e9a37d6",
+    "src/emission-package.cpp": "b44f10a8b81281499ce01c47f107844d89322983194b965c1c005c820b9d8ef0",
+    "src/emission-package.hpp": "cff9f9179ff88f630f2cf59196953f14ae8a0168210c64929ddd24e0f3186bf0",
+    "src/emission-paint-access.hpp": "54491a79e405ec0b7c0e6a6adcbc5eb760d56bfd9b0fcd504ecc2bbc5b339a13",
+    "src/paint.cpp": "8d6bb705813ab5e19030fda6ddeafcaf1cb3fe56b7f92b3df987097d57168713",
+    "src/vrm.cpp": "f53421f69cf5ea9ceaf88c56304fb9c4994dedf9a11d8f0cded0fe81c2fde736",
+    "src/vrm1-export.cpp": "b9f0bdc38d9d737f39bc752ed5dc06a29a70bdd4df50b0a5757218c9c25b2cb2",
+    "src/vrm1-export.hpp": "fc3f60c2ef67701b57fd6fb6f0fc88ca98e194795eab1f8945a081be1ffc7895",
+    "tests/emission-core-consumer.hpp": "423fd5b26a629800656691c4e945b14291934ee7a427d9cdeaf9f05a88d5e372",
+    "tests/emission-export-worker.cpp": "3f81fa2cef156178acbaa4c2c2dfb328c0926ee9e4d8596ceda0e6f0f4e27eed",
+    "tests/emission-export.cpp": "e4be4416cd4f6d83cb99b4141db5def193c737117700c98a46f308211e1278dd",
+    "tests/emission-vrm.cpp": "fbc54d11673e8f3b32ec83bf51f5c766dde5c69ce0c85df5c0bb162c64c16308",
+    "third_party/sources.json": "a8afe1ab1e254cf4e1bb11cbf3592078549fc07e433f93eeca356edaa0768b5b"
+  },
+  "api": {
+    "publicAppend": "NativeEmissionReadLimits.max_decoded_native_bytes default256MiB, max256MiB",
+    "existingOptions": "Uses already qualified GltfExportOptions.emission and VrmExportOptions.emission; no new option/Scene/FileJob layout append",
+    "privateAbi": "EmissionExportPrepared appends authored_mtoon; every caller rebuilt with matching headers",
+    "sceneArchiveVersionChange": false,
+    "container2": "Conditional explicit zlib-wrapped DEFLATE native CBOR when raw CBOR exceeds128MiB; independent expanded limit; legacy package1 path retained"
+  },
+  "profiles": {
+    "release": {
+      "postProofDocumentationChanges": {
+        "THIRD-PARTY.md": {
+          "proofEndSha256": "d29d43bfdbb8b9bfd3655cc4ba377544ebafa9de9aedba316aaa71fd00bd6c1b",
+          "currentSha256": "9e40f43816265ab6bdc32aa4b8c9dc4d13635aae5a7a2555ae6541f62ffc75cf"
+        },
+        "docs/HDR-EMISSION-INTERCHANGE.md": {
+          "proofEndSha256": "429490ba08efb86b1972add23ee111cd2a83f30281767eafface5968400043d2",
+          "currentSha256": "0da33caf21686aa6d5817884ec6a5148c914f92f6555bd01c950aabf8d1e7d2d"
+        }
+      },
+      "freshInitial": {
+        "profile": "release",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 3.796630818018457
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-vrm-test",
+              "dome-sculpt-emission-export-worker-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-vrm-painted-test"
+            ],
+            "exit": 0,
+            "seconds": 374.5784539479937
+          }
+        ],
+        "seconds": 378.4293156899803,
+        "inputs": 1515,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; private prepared-return ABI/view changes; typed HDR/native FileJob adapter first proof. No prior archives or consumers reused."
+      },
+      "finalCoherentBuild": {
+        "profile": "release",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 2.014502307982184
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-vrm-test",
+              "dome-sculpt-emission-export-worker-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-vrm-painted-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-unlit-fallback-test"
+            ],
+            "exit": 0,
+            "seconds": 10.482893100008368
+          }
+        ],
+        "seconds": 12.54423775599571,
+        "inputs": 1516,
+        "unchanged": true,
+        "scope": "Coherent incremental continuation after same-tree fresh whole-own build: all changed runtime/header consumers and selected tests rebuilt; conditional package2/native decoded-limit append. No foreign archives/old-layout consumers. External shared OpenEXR/zlib not instrumented."
+      },
+      "finalRun": {
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release",
+          "--output-on-failure",
+          "-R",
+          "^(emission-vrm|emission-export-worker|emission-exr|emission-export|physical-emission-background|emission-scene|emission-paint-data|source-union-version|export-cancellation|vrm1-source-export|vrm-painted|unlit-fallback)$"
+        ],
+        "exit": 0,
+        "seconds": 57.31562336301431,
+        "inputs": 1546,
+        "unchanged": true,
+        "scope": "Same-tree fresh-owned core/support/app followed coherent final-source incremental rebuild. External OpenEXR/Imath/zlib system libraries not instrumented. Software GL only."
+      },
+      "ctestSeconds": 57.18,
+      "selectedSuites": 12,
+      "passed": 12,
+      "manifestSha256": {
+        "artifacts/vrm-proof/valid-sources-final/release/before.json": "2a00f468b293db0fab8f65430745feb23e87a0422025ba4ec2ba1f394edfc614",
+        "artifacts/vrm-proof/valid-sources-final/release/after.json": "2a00f468b293db0fab8f65430745feb23e87a0422025ba4ec2ba1f394edfc614",
+        "artifacts/vrm-proof/valid-sources-final/release/run-before.json": "a7d75f2d693d31f578119e6329a70d8c6cfe82cf861362e8e321f871f4ecb46d",
+        "artifacts/vrm-proof/valid-sources-final/release/run-after.json": "a7d75f2d693d31f578119e6329a70d8c6cfe82cf861362e8e321f871f4ecb46d",
+        "artifacts/vrm-proof/valid-sources-final/release/build.log": "97011cfcf24a8a0874450e8bbce1db011568413eb95d9edfbeba394da69674b3",
+        "artifacts/vrm-proof/valid-sources-final/release/run.log": "2b79ae64ad691280fc8744f98a5bf2569cb6885e4f116e6cf44a2b01e331b48f",
+        "artifacts/vrm-proof/valid-sources-final/release/run-status.json": "06d296e61621e23b61c981f9bd20976f1237e4b0e77fd299f19112e0cdb2b24d"
+      }
+    },
+    "sanitize": {
+      "postProofDocumentationChanges": {
+        "THIRD-PARTY.md": {
+          "proofEndSha256": "d29d43bfdbb8b9bfd3655cc4ba377544ebafa9de9aedba316aaa71fd00bd6c1b",
+          "currentSha256": "9e40f43816265ab6bdc32aa4b8c9dc4d13635aae5a7a2555ae6541f62ffc75cf"
+        },
+        "docs/HDR-EMISSION-INTERCHANGE.md": {
+          "proofEndSha256": "429490ba08efb86b1972add23ee111cd2a83f30281767eafface5968400043d2",
+          "currentSha256": "0da33caf21686aa6d5817884ec6a5148c914f92f6555bd01c950aabf8d1e7d2d"
+        }
+      },
+      "freshInitial": {
+        "profile": "sanitize",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 3.921786364982836
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-vrm-test",
+              "dome-sculpt-emission-export-worker-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-vrm-painted-test"
+            ],
+            "exit": 0,
+            "seconds": 615.729177909001
+          }
+        ],
+        "seconds": 619.6955341190042,
+        "inputs": 1515,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; private prepared-return ABI/view changes; typed HDR/native FileJob adapter first proof. No prior archives or consumers reused."
+      },
+      "finalCoherentBuild": {
+        "profile": "sanitize",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 1.9950526569737121
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-vrm-test",
+              "dome-sculpt-emission-export-worker-test",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-export-cancellation-test",
+              "dome-sculpt-vrm1-source-export-test",
+              "dome-sculpt-vrm-painted-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-unlit-fallback-test"
+            ],
+            "exit": 0,
+            "seconds": 16.6495077930158
+          }
+        ],
+        "seconds": 18.68937474300037,
+        "inputs": 1516,
+        "unchanged": true,
+        "scope": "Coherent incremental continuation after same-tree fresh whole-own build: all changed runtime/header consumers and selected tests rebuilt; conditional package2/native decoded-limit append. No foreign archives/old-layout consumers. External shared OpenEXR/zlib not instrumented."
+      },
+      "finalRun": {
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(emission-vrm|emission-export-worker|emission-exr|emission-export|physical-emission-background|emission-scene|emission-paint-data|source-union-version|export-cancellation|vrm1-source-export|vrm-painted|unlit-fallback)$"
+        ],
+        "exit": 0,
+        "seconds": 353.21302525297506,
+        "inputs": 1546,
+        "unchanged": true,
+        "scope": "Same-tree fresh-owned core/support/app followed coherent final-source incremental rebuild. External OpenEXR/Imath/zlib system libraries not instrumented. Software GL only."
+      },
+      "ctestSeconds": 349.99,
+      "selectedSuites": 12,
+      "passed": 12,
+      "manifestSha256": {
+        "artifacts/vrm-proof/valid-sources-final/sanitize/before.json": "2a00f468b293db0fab8f65430745feb23e87a0422025ba4ec2ba1f394edfc614",
+        "artifacts/vrm-proof/valid-sources-final/sanitize/after.json": "2a00f468b293db0fab8f65430745feb23e87a0422025ba4ec2ba1f394edfc614",
+        "artifacts/vrm-proof/valid-sources-final/sanitize/run-before.json": "f98e00186518da7865b96fb32f37380f140458f294764e1ddcb589b567f2508d",
+        "artifacts/vrm-proof/valid-sources-final/sanitize/run-after.json": "f98e00186518da7865b96fb32f37380f140458f294764e1ddcb589b567f2508d",
+        "artifacts/vrm-proof/valid-sources-final/sanitize/build.log": "4b41491d28be0ef01e45c66eb1a66b1c44ee5dec5b2ae213c26e9479a1f6ca6c",
+        "artifacts/vrm-proof/valid-sources-final/sanitize/run.log": "12bdf3aa2fbb15e198eba1c698ad69f34c90d70c2ec07c0c2f7a2dfe47447ae7",
+        "artifacts/vrm-proof/valid-sources-final/sanitize/run-status.json": "3717eba7395897d3cd3e48b223c591690f2e44d192b6910b4fb6778d2b98cdbe"
+      }
+    }
+  },
+  "newChecks": {
+    "typedVrm": 124,
+    "actualFileJob": 20,
+    "actualEmbeddedExrCoreConsumers": 8,
+    "typedStrengths": [
+      0,
+      5
+    ],
+    "actualHalfTileKhrTransform": true,
+    "bothActualCc0Bases": true,
+    "independentVrm1": true,
+    "actualControllerCancel": true,
+    "actualVrm0AndVrm1AvatarJobs": true
+  },
+  "outputEquality": {
+    "files": 37,
+    "allIdentical": true,
+    "missing": [],
+    "pairs": [
+      {
+        "relativePath": "emission-export/physical.glb",
+        "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "bytes": 1244176,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export/second-cycle.glb",
+        "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "bytes": 1244176,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export/subset.glb",
+        "sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "bytes": 838236,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/independent-v1-before.vrm",
+        "sha256": "8274178a920c44b1c6620d95f0f62f45d8673f6b13ce3cbb89dee12a79f0da57",
+        "bytes": 10428,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/independent-v1-physical-object2.exr",
+        "sha256": "5f9c9b73d825198c10ca129716c2e4c402fd81911cbae4443751a4de2957650b",
+        "bytes": 47314,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/independent-v1-physical-object3.exr",
+        "sha256": "7f962e764b8447575d1a4d9070458a2e7c39a37e3c761d2312657f6a5d12fe25",
+        "bytes": 47738,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/independent-v1-physical.vrm",
+        "sha256": "1bc1b0ddec4f48bc4f1fefa32c6b026d8c947fad2b5b2d14a391e539b472e4af",
+        "bytes": 475164,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/independent-v1-second.vrm",
+        "sha256": "1bc1b0ddec4f48bc4f1fefa32c6b026d8c947fad2b5b2d14a391e539b472e4af",
+        "bytes": 475164,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/independent-v1-source.vrm",
+        "sha256": "fbd7275c23649cc26dfb296f859eca9fcb5f89a66a35fb49be79c4524417e7b7",
+        "bytes": 4816,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/independent-v1.dsculpt",
+        "sha256": "140cfc84b8a5fc515e3284c896ef33a4c9909ab0bc5230b5b3382393706a9afb",
+        "bytes": 369821,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/strength-five-object2.exr",
+        "sha256": "2a0c044195e83d3b6539e6745ffa97e9ecd1886d0480aa37e9b26c2b03d451b1",
+        "bytes": 103284,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/strength-five-source.vrm",
+        "sha256": "f08c826eb6f8d450064e49eea7e4499da6c81069f56816a371d4c6b35ecca643",
+        "bytes": 5056,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/strength-five.vrm",
+        "sha256": "77db3aa19b4889c63c42b8605098a618508473056fb324201de62eb8f5c5ba84",
+        "bytes": 311176,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/strength-zero-object2.exr",
+        "sha256": "b7f87474eb9d3dc7c7941ccc72f7e67d7b46dd5588caf87324a9ec383a5b84dc",
+        "bytes": 74648,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/strength-zero-source.vrm",
+        "sha256": "19d86b9b1d504b79956a0d5115bfca5715d874f55091accba301217b6ff3721d",
+        "bytes": 4976,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/strength-zero.vrm",
+        "sha256": "fe76ce7dd9ab5b69d1e9609c0306996d689352c92156b609a42c9ee518931f5c",
+        "bytes": 282172,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-female-before.vrm",
+        "sha256": "96fcfa9170a343953590e3b9e67c936909858a34c6e0bae859e4f98146532c79",
+        "bytes": 25141136,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-female-physical-object2.exr",
+        "sha256": "bf1e7417359b5b765359a25574ba377a0bf2ecc371c433e523aba59b7560757c",
+        "bytes": 30241,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-female-physical-object3.exr",
+        "sha256": "383215fb4b5490be8351b75ae7b796eb60dc6016f91c9ff3ac698548f776d342",
+        "bytes": 27709,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-female-physical.vrm",
+        "sha256": "a6b0e5e4ddfb0b4a18728b0ba160a899449129690204ab4b498716d4251b632c",
+        "bytes": 159084908,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-female-second.vrm",
+        "sha256": "a6b0e5e4ddfb0b4a18728b0ba160a899449129690204ab4b498716d4251b632c",
+        "bytes": 159084908,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-female.dsculpt",
+        "sha256": "4dc0b7fedde8b9759b4cb3ba456fc23986bfe650384018246e239afb782fbd22",
+        "bytes": 133882331,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-male-before.vrm",
+        "sha256": "3e3b5232dfb8eec14cd58f97dec72c3cfa3e4a2254adce9dcba3c9d9e6e53bf9",
+        "bytes": 27929592,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-male-physical-object2.exr",
+        "sha256": "d5d1356f036ff500bd2d55111a8b2e6645d304d8187e54c186b17a4a5acbeb9d",
+        "bytes": 32451,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-male-physical-object3.exr",
+        "sha256": "34c0e3d0c5cc4890b5da5b38b504fe351e01b312b917b4e973c70df5ff995992",
+        "bytes": 31285,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-male-physical.vrm",
+        "sha256": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3",
+        "bytes": 57628568,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-male-second.vrm",
+        "sha256": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3",
+        "bytes": 57628568,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-vrm/vroid-beta-male.dsculpt",
+        "sha256": "0a57948f349c622c23391ac6abd7fa497b30e27e344bf0268cc33d1828cb5356",
+        "bytes": 138713595,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/after-edit.dsculpt",
+        "sha256": "18fde963c68c2308c0957b16935ebed58df5e3c83ab48e5666a5050d2cd1e935",
+        "bytes": 1210039,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/avatar-ordered.dsculpt",
+        "sha256": "a5c4441fb0714c122a86655cdadc9c322e2e574c24c941e85dbcd944e69591ca",
+        "bytes": 133709900,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/native-avatar.vrm",
+        "sha256": "d428908cb65dc643b8ed778d04f89d78ce30e6635a3d6e12eac0634fb9eb6c33",
+        "bytes": 158882532,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/native-v1-ordered.dsculpt",
+        "sha256": "f9cb0ef4f4d1df20b0a1ebcb113529323d6823310e874c0c784341badf379ee3",
+        "bytes": 198493,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/native-v1.vrm",
+        "sha256": "53d18bec545eb17d68efea8d87aa6b86650b22752ea1c40a555f469e7e1892ca",
+        "bytes": 256028,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/ordered.dsculpt",
+        "sha256": "ab238eabea31bbdd3f3e378f372a5bd3c38c70512ea20c555c99be5cec28902a",
+        "bytes": 1210039,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/queued.glb",
+        "sha256": "7581822007bf037c4c63973a5df7fe71bcc40e29add597f69b60615761f2eb90",
+        "bytes": 24,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/running.glb",
+        "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "bytes": 1244176,
+        "equal": true
+      },
+      {
+        "relativePath": "emission-export-worker/worker-v1-source.vrm",
+        "sha256": "25997ee250883cb7ef72a4bb2bcd8d90fdcee346a64a4d07a2d746c545e8c800",
+        "bytes": 4860,
+        "equal": true
+      }
+    ]
+  },
+  "standards": {
+    "validator": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "files": 23,
+    "actualExports": 19,
+    "validSyntheticSourceInputs": 4,
+    "errors": 0,
+    "warningsUnfiltered": 183,
+    "infosUnfiltered": 652,
+    "officialVrmFiles": 19,
+    "officialSchemaInstances": 35,
+    "officialErrors": 0,
+    "officialPin": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "cohort": {
+      "inputs": [
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/independent-v1-before.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--independent-v1-before.vrm",
+          "bytes": 10428,
+          "sha256": "8274178a920c44b1c6620d95f0f62f45d8673f6b13ce3cbb89dee12a79f0da57",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/independent-v1-physical.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--independent-v1-physical.vrm",
+          "bytes": 475164,
+          "sha256": "1bc1b0ddec4f48bc4f1fefa32c6b026d8c947fad2b5b2d14a391e539b472e4af",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/independent-v1-second.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--independent-v1-second.vrm",
+          "bytes": 475164,
+          "sha256": "1bc1b0ddec4f48bc4f1fefa32c6b026d8c947fad2b5b2d14a391e539b472e4af",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/independent-v1-source.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--independent-v1-source.vrm",
+          "bytes": 4816,
+          "sha256": "fbd7275c23649cc26dfb296f859eca9fcb5f89a66a35fb49be79c4524417e7b7",
+          "role": "original synthetic source input"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/strength-five-source.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--strength-five-source.vrm",
+          "bytes": 5056,
+          "sha256": "f08c826eb6f8d450064e49eea7e4499da6c81069f56816a371d4c6b35ecca643",
+          "role": "original synthetic source input"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/strength-five.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--strength-five.vrm",
+          "bytes": 311176,
+          "sha256": "77db3aa19b4889c63c42b8605098a618508473056fb324201de62eb8f5c5ba84",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/strength-zero-source.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--strength-zero-source.vrm",
+          "bytes": 4976,
+          "sha256": "19d86b9b1d504b79956a0d5115bfca5715d874f55091accba301217b6ff3721d",
+          "role": "original synthetic source input"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/strength-zero.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--strength-zero.vrm",
+          "bytes": 282172,
+          "sha256": "fe76ce7dd9ab5b69d1e9609c0306996d689352c92156b609a42c9ee518931f5c",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-female-before.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--vroid-beta-female-before.vrm",
+          "bytes": 25141136,
+          "sha256": "96fcfa9170a343953590e3b9e67c936909858a34c6e0bae859e4f98146532c79",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-female-physical.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--vroid-beta-female-physical.vrm",
+          "bytes": 159084908,
+          "sha256": "a6b0e5e4ddfb0b4a18728b0ba160a899449129690204ab4b498716d4251b632c",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-female-second.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--vroid-beta-female-second.vrm",
+          "bytes": 159084908,
+          "sha256": "a6b0e5e4ddfb0b4a18728b0ba160a899449129690204ab4b498716d4251b632c",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-male-before.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--vroid-beta-male-before.vrm",
+          "bytes": 27929592,
+          "sha256": "3e3b5232dfb8eec14cd58f97dec72c3cfa3e4a2254adce9dcba3c9d9e6e53bf9",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-male-physical.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--vroid-beta-male-physical.vrm",
+          "bytes": 57628568,
+          "sha256": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-male-second.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-vrm--vroid-beta-male-second.vrm",
+          "bytes": 57628568,
+          "sha256": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export/physical.glb",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-export--physical.glb",
+          "bytes": 1244176,
+          "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export/second-cycle.glb",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-export--second-cycle.glb",
+          "bytes": 1244176,
+          "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export/subset.glb",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-export--subset.glb",
+          "bytes": 838236,
+          "sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export-worker/native-avatar.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-export-worker--native-avatar.vrm",
+          "bytes": 158882532,
+          "sha256": "d428908cb65dc643b8ed778d04f89d78ce30e6635a3d6e12eac0634fb9eb6c33",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export-worker/native-v1.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-export-worker--native-v1.vrm",
+          "bytes": 256028,
+          "sha256": "53d18bec545eb17d68efea8d87aa6b86650b22752ea1c40a555f469e7e1892ca",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export-worker/running.glb",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-export-worker--running.glb",
+          "bytes": 1244176,
+          "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+          "role": "actual exported output"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export-worker/worker-v1-source.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/emission-export-worker--worker-v1-source.vrm",
+          "bytes": 4860,
+          "sha256": "25997ee250883cb7ef72a4bb2bcd8d90fdcee346a64a4d07a2d746c545e8c800",
+          "role": "original synthetic source input"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/legacy-counterfactual/output/baseline.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/legacy-counterfactual--baseline.vrm",
+          "bytes": 25140720,
+          "sha256": "5b3caf141f37f4e032fc1e35368cb6c9e87af3c31c19c4c5fed7a72dc041a800",
+          "role": "actual exported output; exact old counterfactual source recompiled with final coherent library"
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/legacy-counterfactual/output/unsupported.vrm",
+          "cohortPath": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/standards/cohort/legacy-counterfactual--unsupported.vrm",
+          "bytes": 158882964,
+          "sha256": "08d1da23a1af25d3a2f30e23cd6aecdfeec5b29779121f1fda1be76496a7b289",
+          "role": "actual exported output; exact old counterfactual source recompiled with final coherent library"
+        }
+      ],
+      "excluded": [
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-export-worker/queued.glb",
+          "bytes": 24,
+          "sha256": "7581822007bf037c4c63973a5df7fe71bcc40e29add597f69b60615761f2eb90",
+          "reason": "Intentional retained prior-byte cancellation sentinel, not emitted glTF"
+        }
+      ]
+    }
+  },
+  "oldReader": {
+    "exit": 0,
+    "seconds": 1.6333558630140033,
+    "oldSource": "ccf096eacd5ef9958e2e76b86fcc1c6aa0296133",
+    "scope": "Old-reader complete TU with generated old flags/exact old public headers and8 byteverified sealed archive copies; package1 positive/package2 precise refusal",
+    "sha256": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libdome-sculpt-core.a": "3b98e1beed143f70da9cdc2ef348f9224559e3c694ca4baf1bdaa55af8faf9d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libdome-sculpt-affine.a": "7834438aa7e51ea42f55800841a6752a3290f7905aadd814e273fcc9f73891c4",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libdome-sculpt-polygon.a": "f13a37066e5a2ce0a477e9c6f4d6dd890aefa3e367e840e2d82a10b87085fb54",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libxatlas.a": "e2b1d2cedced58b317886974cc671808e014977bb4e993b5f28a0ec5ab8ac334",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libmikktspace.a": "15570a57d61e2e9b7783b6dcede3f55d3c51c696ee7c348a95ee9c35af094afe",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libmikktspace-robust.a": "67b46df25b226c82a98e2eeab06d86129cd4e12499738236a6c71f35e6124b74",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libufbx.a": "fe55aebde0e1b101237847afa40616701baf071964964589749bb408e66e4523",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/libraries/libdome-sculpt-emission-codec.a": "050bcc9b23020090b8383728abb0570eccaa66988ebc65105f89265acfdcc7b0",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/old-reader": "01cba23139e58576db4a4bf888ca024515ea5adfaf088fdd827d2bcf18d64570",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/old-reader/old-reader.cpp": "28eed2fb29c6e59ef70558a0d7184ebd2503ff832c56f62da5b903c8d60ae72f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-female-physical.vrm": "a6b0e5e4ddfb0b4a18728b0ba160a899449129690204ab4b498716d4251b632c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/build-vrm-release/emission-vrm/vroid-beta-male-physical.vrm": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3"
+    }
+  },
+  "actualOldCounterfactual": {
+    "exit": 0,
+    "seconds": 6.979714656015858,
+    "oldSource": "ccf096eacd5ef9958e2e76b86fcc1c6aa0296133",
+    "exactCounterfactualSourceSha256": "479c45e8c625584feb3ebca1dfad078a244af557ccf0d8c89494f819f0d225a0",
+    "oldActualHdrRefusalExit": 1,
+    "newActualHdrAdmissionExit": 0,
+    "ordinaryLdrBytes": 25140720,
+    "ordinaryLdrIdentical": true,
+    "ordinaryLdrOldSha256": "5b3caf141f37f4e032fc1e35368cb6c9e87af3c31c19c4c5fed7a72dc041a800",
+    "ordinaryLdrNewSha256": "5b3caf141f37f4e032fc1e35368cb6c9e87af3c31c19c4c5fed7a72dc041a800",
+    "outputSha256": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/legacy-counterfactual/output/baseline.vrm": "5b3caf141f37f4e032fc1e35368cb6c9e87af3c31c19c4c5fed7a72dc041a800",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-vrm-native-ccf096e/artifacts/vrm-proof/legacy-counterfactual/output/unsupported.vrm": "08d1da23a1af25d3a2f30e23cd6aecdfeec5b29779121f1fda1be76496a7b289"
+    },
+    "scope": "Original complete TU recompiled with current headers and coherent final own core/support. No runtime edits. Ordinary source export before HDR is byte-exact old baseline, and old refused HDR call now succeeds."
+  },
+  "guardDiagnostics": {
+    "exit": 0,
+    "seconds": 9.007768251991365,
+    "inputSha256": "910fc97b4a22493074278b1642cc6d39c54c18b282d2c9ead3b11f37066e67b3",
+    "inputUnchanged": true,
+    "probeSha256": "3c46a903e4f57a80c56d26ceaaec4c1d7dcac17910248ec6c76869cdf0ca9a90",
+    "scope": "Complete same-source consumer TU with diagnostic exception logging only, exact current own headers/core/support; no production/test source mutation."
+  },
+  "limits": {
+    "storedNativeBytes": 134217728,
+    "expandedNativeCborBytes": 268435456,
+    "wholeGlbBytes": 268435456,
+    "aggregateExrBytes": 134217728,
+    "jsonBytes": 16777216,
+    "denseAggregateFieldBytes": 134217728,
+    "streamChunkBytes": 65536,
+    "lowRssClaim": false
+  },
+  "male": {
+    "packageVersion": 2,
+    "expandedNativeBytes": 138713063,
+    "storedNativeBytes": 29632484,
+    "wholeVrmBytes": 57628568
+  },
+  "female": {
+    "packageVersion": 1,
+    "rawNativeBytes": 133881799,
+    "wholeVrmBytes": 159084908
+  },
+  "preservedNegatives": [
+    {
+      "path": "artifacts/old-vrm-refusal",
+      "kind": "Actual old real-CC0 HDR export refusal"
+    },
+    {
+      "path": "artifacts/vrm-proof/initial-release-negative",
+      "kind": "Numeric thumbnail index assumption plus2 omitted target setup NotRun"
+    },
+    {
+      "path": "artifacts/vrm-proof/thumbnail-refined",
+      "kind": "Actual male native raw128MiB cap failure"
+    },
+    {
+      "path": "artifacts/vrm-native-size",
+      "kind": "Measured legitimate native source/image ownership by top-level CBOR size"
+    },
+    {
+      "path": "artifacts/vrm-proof/package2-first-cohort",
+      "kind": "Default SDF/null PaintedMesh fixture selection crash; typed92 positive preserved"
+    },
+    {
+      "path": "artifacts/vrm-proof/typed116-subset-fixture-negative",
+      "kind": "Incorrect wholeScene expectation for Avatar subset"
+    },
+    {
+      "path": "artifacts/vrm-proof/v1-worker-compile-typo",
+      "kind": "Test-only wrong return-type spelling compile negative"
+    },
+    {
+      "path": "artifacts/vrm-proof/initial-raw-emptychildren",
+      "kind": "Raw generated leaf children arrays caused15 Khronos errors; all16 actual emitted outputs already had0errors"
+    },
+    {
+      "path": "artifacts/typed-strength-negative/setup-null-selection-negative.log",
+      "kind": "Diagnostic-only default-SDF selection mistake, then genuine strength5 analytic positive"
+    }
+  ],
+  "scope": {
+    "wholeOwnedOwnCodeSanitizers": true,
+    "externalLibrariesInstrumented": false,
+    "freshInitialAppCoreSupportBuildThenCoherentContinuations": true,
+    "allTargetRegression": false,
+    "newGuiQualification": false,
+    "gpuUsed": false,
+    "physicalHeadset": false,
+    "externalViewer": false,
+    "exhaustivePackageAllocationSweep": false
+  },
+  "integrationObligations": [
+    "Root ordinary FileJobs now use Scene::export_surfaces; retain that ordinary branch in semantic union.",
+    "Keep strict immutable source/geometry/material authentication; Source4 UV compiler needs its actual precompiler witness, not weaker mesh equality.",
+    "Preserve fresh cache/token and temporary-only removal of relative/absolute emission.",
+    "No implicit admission of Source4/retained/alternate/dynamic expression cases; actual adapters remain required.",
+    "Retain actual-feature Scene closure for future29 before-states; container extraction delegates Scene::decode.",
+    "Generic authoring package follows in separate child with Scene-based/additive API, no fake EXR/HDR table or competing marker authority."
+  ],
+  "artifactsSha256": {
+    "artifacts/vrm-proof/final-output-equality.json": "e631bbdb18da34cd167435e754ef5bb027d3049fbdf3be60a3c960b9e836757f",
+    "artifacts/vrm-proof/standards/inputs.json": "bcd5023395f6f95c889611469a999bb573d709a6203ed307889b4af4419a476a",
+    "artifacts/vrm-proof/standards/khronos.json": "87d2d6d358f205609a005df1679fbca60c58af5bbb3a3a1cf8adeac780dd8260",
+    "artifacts/vrm-proof/standards/official.json": "3072bea20062a3848e837c78a8efebb924665280bf78f7e1e98376be8475ea3e",
+    "artifacts/vrm-proof/old-reader/status.json": "9f7f7488f75166fa9b12793c30116da0a9fe067c1a7efb98be660b0ed7e640b3",
+    "artifacts/vrm-proof/old-reader/run.log": "19821dcc7de85b45649590596631aba6c9cd64e3d2870efe0902b43c2afbdc21",
+    "artifacts/vrm-proof/legacy-counterfactual/status.json": "ef96e5fda11e2c37f393d8d40d00ee049ce5b517acfaacaa9da322405fc43b0d",
+    "artifacts/vrm-proof/precise-negative-diagnostics/status.json": "2e1c05bba96ba67f1013b6dd0510692575efbb7b061a7e6147e5b511417fd596",
+    "artifacts/vrm-proof/precise-negative-diagnostics/run.log": "501096d33074b72ead34275561ad4297b63ace031346fce5998970eaa8f66481"
+  }
+}

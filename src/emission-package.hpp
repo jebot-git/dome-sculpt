@@ -4,6 +4,7 @@
 #include "dome/source-maps.hpp"
 #include "gltf-document.hpp"
 namespace dome::detail {
+Scene emission_export_subset(const Scene &,std::span<const uint64_t>);
 struct EmissionExportImage {
  uint64_t object=0;
  int node=-1,material=-1;

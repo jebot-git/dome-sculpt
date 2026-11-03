@@ -2,8 +2,9 @@
 #pragma once
 #include "dome/vrm.hpp"
 namespace dome::detail {
+struct EmissionExportPrepared;
 VrmExportReport export_vrm1(const std::vector<ObjectSurface> &,
                             const nlohmann::json &original,
                             const std::filesystem::path &,
-                            const VrmExportOptions &);
+                            const VrmExportOptions &,EmissionExportPrepared * = nullptr);
 }
