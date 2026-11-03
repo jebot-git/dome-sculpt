@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "status": "private certified graph/field counterexample; anatomical quality fails; no admission",
+  "base": "709d27b270028af597125189ba980d4a74105afc",
+  "energy": "screened positive surface/contact graph with fixed genuine source auxiliary nodes; no surface hard constraints; not volume or BBW",
+  "source_intent": "same retained asset/joint/bind; component positive usage only, no artist magnitude in energy or rhs",
+  "resources": {
+    "work": 500000000,
+    "bytes": 536870912,
+    "relative_residual": 1e-09,
+    "partition": 1e-09
+  },
+  "cohorts": {
+    "male": {
+      "certificate": "rows=8122 controls=54 samples=312 contacts=15185 iterations=54 residual=4.82934205013e-12 minimum=0 partition=1.34647848427e-12 work=181045770 bytes=103836768",
+      "summary": "parts=2 quality_failures=5 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "expected_exit": 1,
+      "admitted": false,
+      "pose_count": 10,
+      "original_mean_fraction": 0.005,
+      "original_max_fraction": 0.02
+    },
+    "female": {
+      "certificate": "rows=7942 controls=64 samples=375 contacts=12278 iterations=64 residual=1.63619727096e-12 minimum=0 partition=1.47926115801e-12 work=167398379 bytes=99001616",
+      "summary": "parts=2 quality_failures=5 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "expected_exit": 1,
+      "admitted": false,
+      "pose_count": 10,
+      "original_mean_fraction": 0.005,
+      "original_max_fraction": 0.02
+    }
+  },
+  "arithmetic": {
+    "dense_cases": 128,
+    "long_double_max": 6.40059e-16,
+    "IC_control_max": 1.93934e-10,
+    "release": 0,
+    "own_math_asan_ubsan_leaks": 0,
+    "full_core_or_solver_san": false,
+    "actual_cancel_cases": 128,
+    "work_refusal_cases": 128
+  },
+  "scope": {
+    "GPU": false,
+    "public_headers_or_legacy_binding_changed": false,
+    "native_UI_history_save": false,
+    "full_19_plus_19_poses": false,
+    "copied_b32_support": "uninstrumented, matching own research TU headers; no mutable root archives",
+    "remaining": "anatomical continuation quality; stress/open/native intent, full solver SAN/OOM/Cancel and native integration"
+  },
+  "compiler": "c++ -std=c++20 -O3 -Wall -Wextra -Wpedantic; math SAN -O1 -g -fno-omit-frame-pointer -fsanitize=address,undefined",
+  "inputs": {
+    "src/anatomical-continuation.hpp": "a350f0817da2702e2a728eebb04cfcd96ccdd7047fb11f4b8f7d835d9603f352",
+    "src/screened-continuation-solve.hpp": "5a8ab8d3b6fa25e241ca0e6984fdf57176f611f4da0d707da43f904bddb292ad",
+    "src/screened-sparse-ldl.hpp": "7db39d4cdd1d0dba7cccea9a49d9b5533a6321b13bc2fe612306027e9abbbc80",
+    "tests/anatomical-continuation-avatars.cpp": "834b75443ba367729faa19c44c76a2e2706d449a1e26c8ad0192c8474fe70f02",
+    "tests/screened-continuation-solve.cpp": "750af6eb8e7048db50f33fd029f2c6f79736dbf67ba88963a351d5fc000f1313",
+    "third_party/sources.json": "8c598723c5095909ca9beb932da87c885354445f271089b39caf962acd4bb151"
+  },
+  "binaries": {
+    "artifacts/anatomical-continuation-qualified-negative": "e1e8a64863144bde3d4c8886fb55d621c25ec9eaa60eece67e678378fbb4b4b1",
+    "artifacts/screened-continuation-solve-v2": "38508793c16b31b8304424b617a177e300fec44ad41e9b216793bc891ce8b385",
+    "artifacts/screened-continuation-solve-v2-sanitize": "0870b429f6250bff6016332f55c14be76d6ea7483fee94bce6569c051160bfe8",
+    "artifacts/kernel-libraries/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+    "artifacts/kernel-libraries/libdome-sculpt-core.a": "fb31277a000ea0c42744c8f0863c1778f3076f323acb8ab37f308c7520aad648",
+    "artifacts/kernel-libraries/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+    "artifacts/kernel-libraries/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+    "artifacts/kernel-libraries/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+    "artifacts/kernel-libraries/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+    "artifacts/kernel-libraries/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2",
+    "artifacts/kernel-libraries/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64"
+  },
+  "evidence": {
+    "artifacts/continuation-sealed-male.log": "e5de771337f3ac0aac098c39f3fd789e8b75195ad2a57945f67ac139285f0c7f",
+    "artifacts/continuation-sealed-female.log": "12fac51eb990d5810c86d92d47b0c713fe119f60a2c91eb70d2ff570d9cb15cb",
+    "artifacts/continuation-sealed-male-time.log": "927f49b025f5dab58bbd10f55b642a919fd012893f805c138d0a5614c6b3e6bc",
+    "artifacts/continuation-sealed-female-time.log": "7818fc271b0db1d2d0fc4eb85c902e66b427d25a1a3dcd6dea56ebc33d71747d",
+    "artifacts/continuation-sealed-before.sha256": "894389e05f03088ef1e22d71b55e5ea94300c1680f04ed5ec4556e67a43f1c15",
+    "artifacts/continuation-sealed-after-check.log": "421dd8f94300edc491fbe39d347594d263cfb3bcc7006f71060ccf53b4307d3a",
+    "artifacts/screened-solve-v2-release.log": "ee35b497362efc7543e7f6a294054c200277269e9391d46efe5c0210444ca99c",
+    "artifacts/screened-solve-v2-sanitize.log": "ee35b497362efc7543e7f6a294054c200277269e9391d46efe5c0210444ca99c",
+    "artifacts/group-authority-male.log": "d3b90875e7b94dc4f8595b1ca80b7988a71e77b8e739b27a9744f592fdefb469",
+    "artifacts/group-authority-female.log": "0cd6e2ad1a5dfcf6f526b1ce6204b1fdba1475f692a9bfb945bbaf0d10d676c4",
+    "artifacts/group-authority-audit.cpp": "6e8ed34b0ede83457c010b503e98049e6aef3b472a8eb98eb1bf3b34d9b50314",
+    "artifacts/continuation-male-initial-cost-negative.log": "f75e03d6a69628efe46a86d4bda2ddef4204ab6779ceedbaf063ceb73d58dd8c",
+    "artifacts/continuation-male-initial-cost-negative-time.log": "260fb7b6fa1742a8d50a2785411b2ada4284cd8a8698e1db373964514a04b380",
+    "artifacts/continuation-male-diagnostic.log": "f75e03d6a69628efe46a86d4bda2ddef4204ab6779ceedbaf063ceb73d58dd8c",
+    "artifacts/continuation-male-diagnostic-time.log": "4fcdb64b1c768d01d42c139503d689b3f6c37201b96e5ea4697e98406963e0fa",
+    "artifacts/anatomical-continuation-ic-cost-negative.hpp": "af0c1a8bafce0dbcb8825865c6fa486db30884bf9d1c18a01008590701b2075f",
+    "artifacts/continuation-fixed-male-initial-selector-nine.log": "cc56d32c069175d60e2e28c4ade6ebb453b852c1fdbd7d45aa60213526deb028",
+    "artifacts/build-continuation-qualified-negative.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

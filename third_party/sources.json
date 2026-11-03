@@ -605,5 +605,16 @@
     "port_sha256": "264bb9f608a192e6508de32f82fddab1e95582c48b88d3656bac716b84f34f9b",
     "license_path": "third_party/ldl/LICENSE",
     "complete_license": "third_party/ldl/COPYING.LESSER"
+  },
+  "suitesparse_screened_ldl_research": {
+    "repository": "https://github.com/DrTimothyAldenDavis/SuiteSparse",
+    "commit": "0f41a7786b08d3399c6fd6cf7033714bc7f019f3",
+    "license": "LGPL-2.1-or-later",
+    "adapted": "src/screened-sparse-ldl.hpp",
+    "scope": "Private unregistered anatomical continuation research only. Bounded actual screened graph LDL; no squared matrix and no modified pivots. Whole original-system residual, maximum principle and partition checks remain acceptance authority. Both avatar Body/Tops quality cohorts fail; no production/native admission.",
+    "reference": "docs/validation/BIHARMONIC-LDL-REFERENCE.json",
+    "port_sha256": "7db39d4cdd1d0dba7cccea9a49d9b5533a6321b13bc2fe612306027e9abbbc80",
+    "license_path": "third_party/ldl/LICENSE",
+    "complete_license": "third_party/ldl/COPYING.LESSER"
   }
 }
