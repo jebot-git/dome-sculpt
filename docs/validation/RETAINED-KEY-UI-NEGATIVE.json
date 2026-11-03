@@ -1,0 +1,319 @@
+{
+  "source_base": "9050f3648da315a524f1b0508c91ac8b91c9a73c",
+  "scope": "Actual unchanged 9050 native FLTK application and helper, private signed-RPM Xvfb namespace + private D-Bus; software-only; no builds/SAN/device/HMD/system/session changes",
+  "harness_sha256": "341a6f3624d9bdfb92383a4d37947b766feba31906471b57ede4474dd1dd77cf",
+  "runs": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-normal-r4",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 54.29249943300965
+      },
+      "passed_checks": 13,
+      "complete": false,
+      "failure": "Actual native Shift/left gesture replaces the selected key without changing prior targets",
+      "visible_worker_status": "Visibility paint range omitted or fabricated its own sampling attachment",
+      "input_hashes_match": true,
+      "scene_rollback_exact": true,
+      "files": {
+        "artifacts/retained-key-normal-r4/runner.log": "e6bda6b148eb679994463927946be29e8526f9999638e798ca40a901e1400017",
+        "artifacts/retained-key-normal-r4/before.json": "293ea80e95c942bbbfc01124be5629fd590cabef7a427788337b20e47ddf87ae",
+        "artifacts/retained-key-normal-r4/report.json": "ebe5fef93eada2765164024e6c00a90727192abb663aed0225b5b0f965ac256d",
+        "artifacts/retained-key-normal-r4/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-normal-r4/latest-inspect.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-normal-r4/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-normal-r4/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-normal-r4/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+        "artifacts/retained-key-normal-r4/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-normal-r4/before-stroke.png": "6ccbb8269f4e41aa29f4117ac02096c6aa9941cf288aaef3d584d27ca0c38aec",
+        "artifacts/retained-key-normal-r4/stroke-result-before-save.png": "56b0cc369f87fe3be96847941b3e7aefb1bd1a130e967c8326ba7b2a12dd53a7",
+        "artifacts/retained-key-normal-r4/exception.txt": "16ec0e2191398a68e4c1511cff18a3e2b708374554c522be339bb690f55da5e7",
+        "artifacts/retained-key-normal-r4/runner-receipt.json": "4e7184f9b9c0e6c8766447987f98a48296aa8c404fddf28bda4c0db4121cd481",
+        "artifacts/retained-key-normal-r4/after.json": "293ea80e95c942bbbfc01124be5629fd590cabef7a427788337b20e47ddf87ae"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-compact-r1",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 54.01390257498133
+      },
+      "passed_checks": 15,
+      "complete": false,
+      "failure": "Actual native Shift/left gesture replaces the selected key without changing prior targets",
+      "visible_worker_status": "Visibility paint range omitted or fabricated its own sampling attachment",
+      "input_hashes_match": true,
+      "scene_rollback_exact": true,
+      "files": {
+        "artifacts/retained-key-compact-r1/runner.log": "89c6dd9c3927cff6631620fa6ca8f99ec814c465b2c1ea0bf1b74022661b1932",
+        "artifacts/retained-key-compact-r1/before.json": "293ea80e95c942bbbfc01124be5629fd590cabef7a427788337b20e47ddf87ae",
+        "artifacts/retained-key-compact-r1/report.json": "0122337b211f918cb3de5fca614a8b92bc315a5db8ec90fb36dd118375805b44",
+        "artifacts/retained-key-compact-r1/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-compact-r1/latest-inspect.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-compact-r1/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-compact-r1/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-compact-r1/new-key.png": "761c4859f016caf7f223d59c7d417d9fbbe0a67b45bc45cd0b3ba05da0b3f016",
+        "artifacts/retained-key-compact-r1/new-key-scrolled.png": "0fb3c60aae6f08c6f97c9823f7bd48f807f8b808df2dee3be2bdca47bcdb9d9d",
+        "artifacts/retained-key-compact-r1/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-compact-r1/before-stroke.png": "a83a010625a638be175f5dfce39b7b09dfcb96cc95d7328b2fa8151f8c076dbd",
+        "artifacts/retained-key-compact-r1/stroke-result-before-save.png": "1b539ad33613803e7a3234a7127a081f3782664fc50d4da650e15b27b64518d2",
+        "artifacts/retained-key-compact-r1/exception.txt": "16ec0e2191398a68e4c1511cff18a3e2b708374554c522be339bb690f55da5e7",
+        "artifacts/retained-key-compact-r1/runner-receipt.json": "aee4952edb4e68164863e1c59de5129d8f1b7aa7f86df400f3e9073e59f7138d",
+        "artifacts/retained-key-compact-r1/after.json": "293ea80e95c942bbbfc01124be5629fd590cabef7a427788337b20e47ddf87ae"
+      }
+    }
+  ],
+  "open_gate": "Native freehand retained-key preview range omits paint_sampling_attachment, normal_preview_proof and corner paint coordinates at document-native.cpp shape refresh; guarded worker rolls back. Replace/Cancel/reopen checks not yet reached.",
+  "setup_negatives": [
+    "retained-key-setup-negative: Xvfb intentionally retired from host",
+    "retained-key-normal-r2: namespace-only /run bind destination read-only, before app launch"
+  ],
+  "private_rpms": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.i686.rpm",
+      "sha256": "05dec03a990507afd7d391ab639291416ccc59b1f2464cfc7e302c6f227910da",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.i686.rpm: digests signatures OK",
+      "extracted": false
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.x86_64.rpm",
+      "sha256": "f23f973ac4de9e8006217d650554252c443df7cec4351b1668a17bbdf85a1c58",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.x86_64.rpm: digests signatures OK",
+      "extracted": true
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.i686.rpm",
+      "sha256": "dcb5962141e1389e7c072e4cd322d14597bf9a5970789fa32208351750fac5a0",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.i686.rpm: digests signatures OK",
+      "extracted": false
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.x86_64.rpm",
+      "sha256": "26dd6f9bfa97987e8d9d0b9aa86b2b8d79b9ba95d3222d8a6b46655ba1293c6f",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.x86_64.rpm: digests signatures OK",
+      "extracted": true
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xorg-x11-server-Xvfb-21.1.25-2.fc44.x86_64.rpm",
+      "sha256": "b25c6d7b27c711dd8fa8cc435d970663560b3ea771a65790f71ec45afaa0d4dc",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xorg-x11-server-Xvfb-21.1.25-2.fc44.x86_64.rpm: digests signatures OK",
+      "extracted": true
+    }
+  ],
+  "live_jobs": [],
+  "gpu_lease": null,
+  "checkpoint": "Private negative regression checkpoint; full GUI gate remains failing",
+  "date": "2026-11-03",
+  "positive_checks": 28,
+  "tracked_paths": [
+    "tests/retained-key-menu.py",
+    "docs/RETAINED-KEY-UI.md",
+    "docs/validation/RETAINED-KEY-UI-NEGATIVE.json"
+  ],
+  "inputs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/9050-binaries/dome-sculpt": "1dec3c9475a5beb9d82b66aab4fc9c3494b6246643aaa35fa84b7bc60a37613e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/9050-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "341a6f3624d9bdfb92383a4d37947b766feba31906471b57ede4474dd1dd77cf"
+  },
+  "canonical_app_library_path": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+  "run_command": [
+    "/home/blux/.local/bin/uv",
+    "run",
+    "--offline",
+    "--with",
+    "python-xlib",
+    "--with",
+    "pillow",
+    "--with",
+    "dbus-next",
+    "python",
+    "tests/retained-key-menu.py"
+  ],
+  "private_server": {
+    "launcher": "#!/usr/bin/python3\nimport os,sys\nfrom pathlib import Path\nbase=Path(__file__).resolve().parents[1]\nargs=sys.argv[1:]\nif '-displayfd' in args:\n i=args.index('-displayfd')+1;fd=int(args[i]);os.dup2(fd,1);args[i]='1'\n if fd!=1:os.close(fd)\nenv=os.environ.copy();env['LD_LIBRARY_PATH']=str(base/'prefix/usr/lib64');env['LIBGL_ALWAYS_SOFTWARE']='1';env['LP_NUM_THREADS']='2'\n# /usr/bin exists only in this server's unprivileged mount namespace. The\n# retired host compiler is neither restored nor modified; only signed private\n# xkbcomp and the host shell are visible there. App processes stay outside.\ncommand=['/usr/bin/bwrap','--die-with-parent','--new-session','--unshare-user','--unshare-pid','--ro-bind','/','/','--bind','/tmp','/tmp','--tmpfs','/run','--ro-bind','/usr/bin','/run/dome-xvfb-host-bin','--ro-bind',str(base/'server-bin'),'/usr/bin','--',str(base/'prefix/usr/bin/Xvfb'),*args]\nos.execve(command[0],command,env)\n",
+    "launcher_sha256": "b7321c8c7dcf97208c24cd845cdb9b03907b81c751c1548edb0ef478b987bab3",
+    "scope": "Server-only unprivileged bwrap namespace, private /run tmpfs and /usr/bin mapping for signed xkbcomp; no host paths changed. App outside namespace with canonical runtime library path. Five signed RPMs downloaded, only three x86_64 payloads extracted; i686 downloads unused. DNF exclusion override command-only for download, no package installation or configuration edits.",
+    "evidence": {
+      "artifacts/private-xvfb/download.log": "dd717c1d4fe130f6f69f211ca3fa5b2f4e4c5b47595578aa23a5beea829dc6f8",
+      "artifacts/private-xvfb/download-nobara.log": "239dff1b0b71532d43383eed2ba0b63a503f3e98446cbee46dd07274a6247197",
+      "artifacts/private-xvfb/download-private-only.log": "78e3efc39a6e8361525b47e0f839513ef45ad77fe05db6868037dca1b7d04ab4"
+    }
+  },
+  "setup_attempts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-setup-negative",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 0.34491768199950457
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          }
+        ],
+        "failed": 0,
+        "complete": false,
+        "stage": "private-session",
+        "error": "[Errno 2] No such file or directory: 'Xvfb'"
+      },
+      "artifacts": {
+        "artifacts/retained-key-setup-negative/command.json": "c39f6a653e9dbaffd9e829204ac6b54ec3c483850be07e20222466e0537298e8",
+        "artifacts/retained-key-setup-negative/runner.log": "a13ff267f35ee498a6f8ab4dfb07a81db8701439d77db495e446564df1e55a0b",
+        "artifacts/retained-key-setup-negative/before.json": "da5da3bc0014050609817e851af77b0a16845d5fdcf9ac8fbd50710890f6496d",
+        "artifacts/retained-key-setup-negative/report.json": "7cf5b07355c54993abf28856c23819a4caad25e1f66fa24f1edaf5e37e287eea",
+        "artifacts/retained-key-setup-negative/xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-setup-negative/exception.txt": "02e1ab94b81e965e5517cd54d7f837cae77f291f8b9426b9f531ae0b274a3af0",
+        "artifacts/retained-key-setup-negative/runner-receipt.json": "1b403a39f2cb78b56073bd30b89393458305d48c9f33fd034d720ff41b02252f"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-normal",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 0.34491768199950457
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          }
+        ],
+        "failed": 0,
+        "complete": false,
+        "stage": "private-session",
+        "error": "[Errno 2] No such file or directory: 'Xvfb'"
+      },
+      "artifacts": {
+        "artifacts/retained-key-normal/command.json": "c39f6a653e9dbaffd9e829204ac6b54ec3c483850be07e20222466e0537298e8",
+        "artifacts/retained-key-normal/runner.log": "a13ff267f35ee498a6f8ab4dfb07a81db8701439d77db495e446564df1e55a0b",
+        "artifacts/retained-key-normal/before.json": "da5da3bc0014050609817e851af77b0a16845d5fdcf9ac8fbd50710890f6496d",
+        "artifacts/retained-key-normal/report.json": "7cf5b07355c54993abf28856c23819a4caad25e1f66fa24f1edaf5e37e287eea",
+        "artifacts/retained-key-normal/xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-normal/exception.txt": "02e1ab94b81e965e5517cd54d7f837cae77f291f8b9426b9f531ae0b274a3af0",
+        "artifacts/retained-key-normal/runner-receipt.json": "1b403a39f2cb78b56073bd30b89393458305d48c9f33fd034d720ff41b02252f"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-normal-r2",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 2.566532731987536
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          },
+          {
+            "passed": true,
+            "check": "Fixture owns actual paint24/material9 and independently retained normal21 domains"
+          }
+        ],
+        "failed": 0,
+        "complete": false,
+        "stage": "private-session",
+        "error": "Bad display name \":\""
+      },
+      "artifacts": {
+        "artifacts/retained-key-normal-r2/command.json": "1e5804701bf583d0676ea9169ddb04186d5daae6684db3b5e26086c2e91d1c3e",
+        "artifacts/retained-key-normal-r2/runner.log": "7a5bbe66489a69d93f494d651b55c6a4f73488f94dded545aab617214cc4e5ac",
+        "artifacts/retained-key-normal-r2/before.json": "da5da3bc0014050609817e851af77b0a16845d5fdcf9ac8fbd50710890f6496d",
+        "artifacts/retained-key-normal-r2/report.json": "0de74f6f973e2b7bd8ac89f21ba195e1041a5d42432e1314a97c25dfb02a26db",
+        "artifacts/retained-key-normal-r2/xvfb.log": "e7090e3caf2b0427e4626661b937b46487501d49cab88ca1d93da71615bd3ce2",
+        "artifacts/retained-key-normal-r2/latest-inspect.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-normal-r2/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-normal-r2/exception.txt": "a4ab234deb10bc0a9b2940a64759f8f884fc4a7772b54bf812ea250bb519c69c",
+        "artifacts/retained-key-normal-r2/runner-receipt.json": "3705ec5006452b6cdeca6976c4f92882d5c1d1721812958ae72160b086fa3456"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-normal-r3",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 53.36198726500152
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          },
+          {
+            "passed": true,
+            "check": "Fixture owns actual paint24/material9 and independently retained normal21 domains"
+          },
+          {
+            "passed": true,
+            "check": "Retained-key controls are a real document-owned FLTK modal using universal-menu identity"
+          },
+          {
+            "passed": true,
+            "check": "Default Return cancels retained-domain key creation with exact complete source state"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Native Create preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Create retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Create does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Universal Undo restores the exact pre-Create retained source and domain pools"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores the exact created target, frames and ownership graph"
+          },
+          {
+            "passed": true,
+            "check": "Entering actual selected-key sculpt mode changes no saved weights, paint or source"
+          },
+          {
+            "passed": true,
+            "check": "Actual retained-domain keyed mesh has a visible colored native paint surface"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": false,
+            "check": "Actual native Shift/left gesture replaces the selected key without changing prior targets"
+          }
+        ],
+        "failed": 1,
+        "complete": false,
+        "stage": "native-selected-key-replace",
+        "error": "Actual native Shift/left gesture replaces the selected key without changing prior targets"
+      },
+      "artifacts": {
+        "artifacts/retained-key-normal-r3/runner.log": "73879455e91d5d3ffcf4ca8921e073e0ae5ab2f93155d333509233e9b594761f",
+        "artifacts/retained-key-normal-r3/before.json": "da5da3bc0014050609817e851af77b0a16845d5fdcf9ac8fbd50710890f6496d",
+        "artifacts/retained-key-normal-r3/report.json": "ebe5fef93eada2765164024e6c00a90727192abb663aed0225b5b0f965ac256d",
+        "artifacts/retained-key-normal-r3/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-normal-r3/latest-inspect.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-normal-r3/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-normal-r3/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-normal-r3/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+        "artifacts/retained-key-normal-r3/before-stroke.png": "e77ee5adc53517ce74419297a41aebfe0a77a187c452b6438aa5e075cf69a1af",
+        "artifacts/retained-key-normal-r3/exception.txt": "942eddfef709c3555b2404cf4e3f9cf0d775686b53e073341a527def87af6e13",
+        "artifacts/retained-key-normal-r3/runner-receipt.json": "b12c48dc3c730521bd8c1c437d808165efc2374584d73e96e4a115396da5843d"
+      }
+    }
+  ]
+}
