@@ -1929,9 +1929,9 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   paint_compute::checkpoint(cancelled);
   if(has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::logic_error("Physical emission requires its linear composite adapter");
   // This packet owns only the legacy grid/padding. Independent paint domains,
-  // normal metadata/events, original source maps and prepared projections need
+  // normal metadata/events, actual original images and prepared projections need
   // their existing CPU interpretation until a genuine packet adapter exists.
-  if(!surface_->paint_domain&&!sampling_attachment_&&!source_maps_&&!baked_&&!color_projection_&&!normal_projection_&&gpu_plain_composite_eligible(resolution(),layers_))
+  if(!surface_->paint_domain&&!sampling_attachment_&&(!source_maps_||source_maps_->empty())&&!baked_&&!color_projection_&&!normal_projection_&&gpu_plain_composite_eligible(resolution(),layers_))
     return gpu_plain_composite(resolution(),layers_,surface_->padding,material,cancelled);
   if(source_maps_&&source_maps_->uses_alternate_uv())throw std::invalid_argument(source_maps_->extra_uv_sets.empty()?"UV1 source compositing requires explicit source-coordinate preparation":"Extra source UV compositing requires explicit source-coordinate preparation");
   auto maps = std::make_shared<TextureMaps>();
