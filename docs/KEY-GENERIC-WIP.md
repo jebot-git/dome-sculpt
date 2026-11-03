@@ -19,7 +19,8 @@ to fit that mistaken assumption.
 
 This is not complete native/controller/UI/render/export qualification, nor
 CC0 avatar, mixed23/24/25/26 graph, all allocation, Mirror/Duplicate/CaptureMix
-or general corner-geometry authoring completion. The new universal dispatch
-needs its own whole-owned sanitizer proof; Scene-only R85/SAN85+4 and material
+or general corner-geometry authoring completion. The same universal dispatch also passes103 checks in a fresh wholly owned
+C/C++ O1 ASan/UBSan/leak core/support build plus4 baselines,244.20s with977
+captured hashes unchanged and zero reports; Scene-only R85/SAN85+4 and material
 R80/SAN80+4 remain separately scoped predecessor evidence. No master edit,
 main admission, physical test or GPU execution is implied.

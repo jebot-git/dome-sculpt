@@ -6,13 +6,25 @@
     "inputs": 974,
     "before_after_equal": true
   },
-  "whole_owned_sanitize": "pending",
+  "whole_owned_sanitize": {
+    "factory_exit_code": 0,
+    "baseline_exit_code": 0,
+    "before_after_equal": true,
+    "inputs": 977,
+    "elapsed_seconds": 244.20218495099107,
+    "checks": 103,
+    "baseline_suites": 4
+  },
   "files": {
     "artifacts/key-generic2-status.json": "76febf4df12401fad00177c171cbbb713e61286279598059902b07961c117cb2",
     "artifacts/key-generic2-before.json": "37ff4a54f7b40efed7f412d16c847f410ee0e075271127ec066c10b5e2f643b0",
     "artifacts/key-generic2-test.log": "f72f2ea4ccccdd189fb5e4567489023469ca3090c95e598b870c7e387c7d629b",
     "artifacts/key-generic2-build.log": "59e61a0c9c7d74fa45629b85377727caf848a2e772bbd7c24c2a5147be4dff55",
     "artifacts/key-generic-source-attributes-negative.log": "f9d536f94895ba5e756a3732b470aca5898ffe58a086047db74330db794bc8e7",
-    "artifacts/key-generic-diagnostic.log": "2d312107df51c8ad33084949b88ddbbcf6e39a3f72d10535fe51e259a8639c12"
+    "artifacts/key-generic-diagnostic.log": "2d312107df51c8ad33084949b88ddbbcf6e39a3f72d10535fe51e259a8639c12",
+    "artifacts/key-generic-whole-sanitize-status.json": "8c9a9b24cef06af34d53c943cd79fbb91a521c9b4d802b255ad0a2319c0bf4d2",
+    "artifacts/key-generic-whole-sanitize.log": "f72f2ea4ccccdd189fb5e4567489023469ca3090c95e598b870c7e387c7d629b",
+    "artifacts/key-generic-whole-sanitize-baselines.log": "0a06e3407955099f0c42fb9dbcac5cbee536c2720c4843f71414a6f0b520c80f",
+    "artifacts/key-generic-sanitize-before.json": "1682ca157e34f3f48c733d99d668da3141c9b26182a84613ab062b5860dd8ad6"
   }
 }
