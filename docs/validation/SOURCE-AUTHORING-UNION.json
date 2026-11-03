@@ -1,0 +1,69 @@
+{
+  "recorded_utc": "2026-11-03T03:50:10.059348+00:00",
+  "qualification_tree": "artifacts/authoring-master-3f4b2ba",
+  "frozen_source": "a025cdd163ee63ff0d078632ba453d854720c1e9",
+  "published_main": "3f4b2ba146b0e1b9f02583f7bd5de000348f20a3",
+  "qualified": false,
+  "goal_complete": false,
+  "builds": {
+    "CPU": {
+      "session": 29085,
+      "terminal_exit": 0
+    },
+    "whole_owned_SAN": {
+      "session": 98465,
+      "terminal_exit": 0
+    },
+    "ONEAPI": {
+      "session": 76089,
+      "terminal_exit": 0,
+      "tests_run": false
+    }
+  },
+  "critical_tests": {
+    "CPU": {
+      "session": 90011,
+      "terminal_exit": 8,
+      "passed": 1,
+      "total": 3,
+      "seconds": 11.2
+    },
+    "whole_owned_SAN": {
+      "session": 23799,
+      "terminal_exit": 8,
+      "passed": 1,
+      "total": 3,
+      "seconds": 160.59
+    }
+  },
+  "passed_fixture": "source-union-version:21 checks each",
+  "failures": {
+    "source-union-authoring": "Fixture assumes REST must fabricate full_local_matrix; correction must preserve REST and real affine-pose cases plus world/pixel/export oracles.",
+    "source-union-workflow": "Genuine native key creation gap after actual retained-paint UV Apply, Save/restart and exact Undo/Redo. Intrinsic sampling identity guard is correct; retained-domain authoring adapter is required."
+  },
+  "immutability": {
+    "tracked_inputs": 1420,
+    "CPU_binaries": 14,
+    "SAN_binaries": 14,
+    "mismatches_each": 0,
+    "measured": "After both runs terminated, before any fixture or runtime corrections."
+  },
+  "environment": {
+    "renderer": "Mesa llvmpipe software GL",
+    "sanitizers": "Whole-owned C/C++ O1 ASan/UBSan with leaks; external canonical FLTK libraries",
+    "DomeD_HEAD_and_remote": "db0dba05209ff09255e12455c8d0e3b8f0bd075c",
+    "physical_headset": false,
+    "system_install": false,
+    "session_restart": false
+  },
+  "artifact_hashes": {
+    "artifacts/tests-cpu-critical-initial.log": "ac92eb26f6f083fd7223f017c023044045c06ca647a796b8ccf6ba94b24373ae",
+    "artifacts/tests-sanitize-critical-initial.log": "f15b8bffefab235837e3d837fb32121ebaad92dc1d0b81845b203456ce0abeca",
+    "artifacts/source-fixtures-fixed-before.json": "9d6f3011e54739598f685a9afc8ae0312947c6be202bf5584a04208821f01c8a",
+    "artifacts/source-fixtures-fixed-after-evaluation.json": "9d6f3011e54739598f685a9afc8ae0312947c6be202bf5584a04208821f01c8a",
+    "artifacts/build-cpu-critical-before.json": "05a6a81f8f4f56a5dd5173a3b6faa2bd4f79fd5862dc14232d528f03102ae129",
+    "artifacts/build-cpu-critical-after-evaluation.json": "05a6a81f8f4f56a5dd5173a3b6faa2bd4f79fd5862dc14232d528f03102ae129",
+    "artifacts/build-sanitize-critical-before.json": "420de3326753faf93afdebf4adea9065eee4bb195259a49817b8130b22cace0d",
+    "artifacts/build-sanitize-critical-after-evaluation.json": "420de3326753faf93afdebf4adea9065eee4bb195259a49817b8130b22cace0d"
+  }
+}

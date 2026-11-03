@@ -22,7 +22,16 @@ GPU paint path explicitly excludes new independent-domain owners. New tests
 exercise version/budget closure, actual compensated REST+lossless UV+export,
 and one real native UV/key/rig/VRoid/raw-UV2/paint/Save/Cancel/restart workflow.
 
-Fresh coherent builds and combined native/GUI/graphics/interoperability,
+Frozen a025cdd builds all three native CPU/OneAPI/whole-owned sanitizer
+configurations. Initial combined tests finish 1/3 on CPU and 1/3 under
+sanitizers: version closure passes21 checks; the authoring fixture wrongly
+requires an exact-pose marker for REST, and the real native UV24→key workflow
+reveals a missing retained-domain key adapter. Both failures remain recorded;
+no combined green or hardware qualification is claimed. All1420 tracked inputs
+and14 CPU/14 sanitizer captured binaries stay exact through both runs. Read
+SOURCE-AUTHORING-UNION.md and its receipt for the scoped failure evidence.
+
+Fresh corrected combined native/GUI/graphics/interoperability,
 sanitizer and device gates are required before admission. Read
 SOURCE25-MAIN-PROOF.md for the separate fresh39-suite parent evidence,
 RIG-LENGTH-METRIC.md for the two-TU precision proof, SOURCE-NATIVE-HINTS.md and
