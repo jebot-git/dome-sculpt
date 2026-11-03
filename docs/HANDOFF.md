@@ -8,8 +8,8 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 This proof-only checkpoint records the frozen private candidate b32aa8b; it
 changes no runtime, header, CMake, test, asset or public main implementation.
-The candidate's full533 CPU regression and sequential CUDA/ROCm builds remain
-live in authoring-master-3f4b2ba. Do not edit its tracked files during those runs.
+The candidate's full533 CPU regression and remaining ROCm build remain live
+in authoring-master-3f4b2ba. Do not edit its tracked files during those runs.
 
 The complete optimized OneAPI all-target build passes in1278.605s, with all1,434
 tracked inputs unchanged,407 ELF/static archives hashed and all534 registered
@@ -18,6 +18,22 @@ application passes actual normal35/compact37 FLTK checks, including selected-key
 editing, exact paint/source preservation, Cancel, Undo/Redo, Save/reopen and
 Close. Its latest62b6417 DomeD native Wayland/menu run passes8 checks with the
 actual canonical library paths verified.
+
+An additional selected OneAPI21/21 passes (CTest15.55s, wrapper17.45s), with
+all1,844 inputs exact. Its real A770 brush oracle passes184 analytic endpoints
+and224 independent CPU-reference batches/445,088 samples, maximum8.9407e-8;
+missing-GPU refusal, native paint, sampling/quality and skin/retopo regressions
+also pass. These baseline image consumers use softwareGL alongside Arc compute;
+the distinct actual ArcGL/application evidence below remains separately scoped.
+
+The full CUDA13.4.59/sm86 native all-target build passes in1508.837s, with
+all1,434 tracked inputs exact. Three selected runtime/host tests pass: actual
+vendor status35 refuses empty/nonempty1/257/2,000,007 spans without changing
+caller bytes or silently using CPU; the native FMA-capable host sampler matches
+44,217 independently validated integer words. This proves compile/link and
+missing-device behavior, not positive NVIDIA execution, device loss or latency.
+Read validation/ONEAPI-SELECTED-b32.json and
+validation/CUDA-FULL-BUILD-b32.json for exact commands, hashes and results.
 
 Strict actual A770/PCI0000:03:00.0 validation passes301 checks: the combined134
 workflow,101 key/UV commutation,59 rig/UV authoring, and7 actual application

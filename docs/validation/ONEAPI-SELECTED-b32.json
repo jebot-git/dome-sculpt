@@ -1,0 +1,63 @@
+{
+  "status": "terminal",
+  "source": "b32aa8b7259cb670edab8a37a4e703cc09f84a9e",
+  "started_utc": "2026-11-03T07:04:07.076586+00:00",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "build-oneapi",
+    "--output-on-failure",
+    "--parallel",
+    "1",
+    "-R",
+    "^(retopology-authoring|texture-painting|scene-authoring|native-strokes|native-live-preview|sculpt-resolution|skin-authoring|projection-native|retopo-edges|resample-quality-aggregate|resolution-quality-integration|paint-composite-compute|paint-composite-native|paint-composite-render|skin-affine-authoring|skin-affine-controller|skin-affine-export|compute-backend|compute-missing-gpu|resample-backend|resample-native-contract)$",
+    "--output-junit",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-selected-b32/junit.xml"
+  ],
+  "tests": [
+    "retopology-authoring",
+    "texture-painting",
+    "scene-authoring",
+    "native-strokes",
+    "native-live-preview",
+    "sculpt-resolution",
+    "skin-authoring",
+    "projection-native",
+    "retopo-edges",
+    "resample-quality-aggregate",
+    "resolution-quality-integration",
+    "paint-composite-compute",
+    "paint-composite-native",
+    "paint-composite-render",
+    "skin-affine-authoring",
+    "skin-affine-controller",
+    "skin-affine-export",
+    "compute-backend",
+    "compute-missing-gpu",
+    "resample-backend",
+    "resample-native-contract"
+  ],
+  "scope": "StrictPCI03 A770 compute; softwareGL baseline consumers; nohardware-render orHMD claim; actualGPU brush/reference and explicitmissingGPU assertions",
+  "input_hashes": 1844,
+  "GPU_lease": "released; ctest andallownedchildren terminal",
+  "exit_code": 0,
+  "seconds": 17.45493485100451,
+  "input_drift": [],
+  "compute_oracle": {
+    "actual_device": "Intel Arc A770 / Intel Corporation",
+    "analytic_endpoints": 184,
+    "CPU_reference_batches": 224,
+    "samples": 445088,
+    "max_error": 8.9407e-08
+  },
+  "CTest_seconds": 15.55,
+  "passed_suites": 21,
+  "output_hashes": {
+    "artifacts/arc-selected-b32/LastTest.log": "e3b0acd298b37a37c915865223030faa9ba55cef96a774ba9fb220500439d1c2",
+    "artifacts/arc-selected-b32/ctest.log": "e87c14ebc856faeac63b4bba6030d68e1e973135e8627bb402df93ae4eed2eb9",
+    "artifacts/arc-selected-b32/inputs-after.json": "03a5538c52b328e0db4e04d1c1e1d4d6e94cac43ecf382c2022aa28af3fe121f",
+    "artifacts/arc-selected-b32/inputs-before.json": "03a5538c52b328e0db4e04d1c1e1d4d6e94cac43ecf382c2022aa28af3fe121f",
+    "artifacts/arc-selected-b32/junit.xml": "579d351e277fcaaf146bbbbb288fa506f20514c2471c64714cd0f8df6b1d3247",
+    "artifacts/arc-selected-b32/status.json": "ea06b1193bf2445d227fc6309c109e8cffc0aeac8b148e2b6a466ce6286fc71c"
+  }
+}
