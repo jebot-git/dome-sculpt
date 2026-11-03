@@ -39,3 +39,10 @@ made. The standalone-XR Mesa112-byte report remains open. Later generic append,
 painted native-container producer and agent changes are outside this source.
 The original full production objective remains active and incomplete. No system
 installation or active session changed.
+
+The follow-up provenance-only continuation refreshes `third_party/sources.json`
+from the exact installed53b bitmap lock/manifest. Its four patch digests, all16
+built-library hashes, all24 unchanged FLTK patches and unchanged builder digest
+are verified against the canonical commit. FLTK retains its actual f797 source
+commit with53b verification; bitmap provenance records53b. This corrects stale
+manifest data and does not reinterpret the592 runtime proof as a new build.

@@ -64,15 +64,48 @@ async def main():
         def key(symbol,down=None):
             for kind in ([X.KeyPress,X.KeyRelease] if down is None else [X.KeyPress if down else X.KeyRelease]):xtest.fake_input(d,kind,d.keysym_to_keycode(XK.string_to_keysym(symbol)))
             d.sync()
-        def text(value):
-            for c in value:
-                code=d.keysym_to_keycode(ord(c));shift=d.keycode_to_keysym(code,0)!=ord(c)
-                if shift:key('Shift_L',True)
-                xtest.fake_input(d,X.KeyPress,code);xtest.fake_input(d,X.KeyRelease,code)
-                if shift:key('Shift_L',False)
-            d.sync()
-        def choose(chooser,target):
-            chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();key('Control_L',True);key('a');key('Control_L',False);text(str(target));key('Return')
+        # Serve the real X11 clipboard throughout D-Bus menu calls: toolkit
+        # clipboard probing may be synchronous. XSync alone does not acknowledge
+        # FLTK input processing; copy the actual text back before submitting.
+        async def choose(chooser,target):
+            from Xlib import Xatom
+            from Xlib.protocol import event
+            clipboard=d.intern_atom('CLIPBOARD');utf8=d.intern_atom('UTF8_STRING');targets=d.intern_atom('TARGETS')
+            owner=d.screen().root.create_window(0,0,1,1,0,X.CopyFromParent)
+            sent=False;copied=[]
+            async def serve():
+                nonlocal sent
+                while True:
+                    while d.pending_events():
+                        request=d.next_event()
+                        if request.type==X.MappingNotify:d.refresh_keyboard_mapping(request)
+                        if request.type==X.SelectionNotify and request.property!=X.NONE:
+                            received=request.requestor.get_full_property(request.property,utf8)
+                            if received:copied.append(bytes(received.value).decode())
+                        if request.type==X.SelectionRequest:
+                            prop=request.property or request.target
+                            if request.target==targets:request.requestor.change_property(prop,Xatom.ATOM,32,[utf8,Xatom.STRING,targets])
+                            elif request.target in [utf8,Xatom.STRING]:request.requestor.change_property(prop,request.target,8,str(target).encode());sent=True
+                            else:prop=X.NONE
+                            request.requestor.send_event(event.SelectionNotify(time=request.time,requestor=request.requestor,selection=request.selection,target=request.target,property=prop),propagate=False);d.flush()
+                    await asyncio.sleep(.01)
+            server=asyncio.create_task(serve())
+            owner.set_selection_owner(clipboard,X.CurrentTime);d.sync()
+            chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+            g=chooser.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2,y=g.y+g.height-57);xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
+            await asyncio.sleep(.2);await command('Select All')
+            for _ in range(100):
+                state=await nodes()
+                if state['Copy'][1].get('enabled',True) and state['Paste'][1].get('enabled',True):break
+                await asyncio.sleep(.05)
+            else:raise AssertionError('Native filename input did not acquire editable focus')
+            await command('Paste')
+            await asyncio.sleep(.2)
+            await command('Select All');await command('Copy')
+            reader=d.screen().root.create_window(0,0,1,1,0,X.CopyFromParent);reader.convert_selection(clipboard,utf8,d.intern_atom('DOME_INPUT_ACK'),X.CurrentTime);d.flush();await wait(lambda:copied,10)
+            check(copied[0]==str(target),'Native filename input acknowledges the complete '+target.name+' destination');reader.destroy()
+            raw=chooser.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(out/('chooser-'+target.name+'.png'))
+            tap(chooser,g.width-118,g.height-21);await asyncio.sleep(.2);server.cancel();await asyncio.gather(server,return_exceptions=True);owner.destroy();d.sync()
         def tap(window,x,y):
             g=window.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
         await ready();values=await nodes();label='Export editable project (.glb)...'
@@ -88,7 +121,7 @@ async def main():
         row=48 if compact else 36;tap(options,g.width*.65,g.height-row/2-12)
         await wait(lambda:named('Editable GLB export') is None);chooser=await wait(lambda:named('Export editable project'))
         check(chooser.get_wm_transient_for().id==window.id,'Confirmed portable policy opens the actual owned GLB file chooser')
-        choose(chooser,package);await wait(lambda:named('Export editable project') is None)
+        await choose(chooser,package);await wait(lambda:named('Export editable project') is None)
         try:await wait(lambda:package.exists(),90)
         except TimeoutError:
             g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff)
@@ -103,10 +136,10 @@ async def main():
             if blob.startswith(b'\x89PNG\r\n\x1a\n'):sizes.append(struct.unpack_from('>II',blob,16))
         check((512,512) in sizes,'Default native policy really emits the selected512-pixel portable paint images')
         check(inspect(package)==baseline and project.read_bytes()==original,'Actual GUI file worker preserves all editable source, paint, metadata and the original project file')
-        await command('Open...');chooser=await wait(lambda:named('Open project or editable package'));choose(chooser,package)
+        await command('Open...');chooser=await wait(lambda:named('Open project or editable package'));await choose(chooser,package)
         await wait(lambda:named('Open project or editable package') is None);await wait(lambda:'Untitled' in str(window.get_wm_name()) and '*' in str(window.get_wm_name()));await ready()
         check(package.read_bytes()==emitted,'Actual Open restores the exported native project as unsaved and preserves the interchange source')
-        await command('Save');chooser=await wait(lambda:named('Save sculpt project'));choose(chooser,saved);await wait(lambda:saved.exists());await wait(lambda:'recovered.dsculpt' in str(window.get_wm_name()) and '*' not in str(window.get_wm_name()))
+        await command('Save');chooser=await wait(lambda:named('Save sculpt project'));await choose(chooser,saved);await wait(lambda:saved.exists());await wait(lambda:'recovered.dsculpt' in str(window.get_wm_name()) and '*' not in str(window.get_wm_name()))
         check(inspect(saved)==baseline and package.read_bytes()==emitted,'Actual subsequent Save writes the original editable project independently of the portable GLB')
         await command('Close Window');await wait(lambda:app.poll() is not None)
         check(app.returncode==0,'Native export/recovery/Save workflow exits cleanly without sanitizer suppression')
