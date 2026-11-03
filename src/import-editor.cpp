@@ -31,7 +31,7 @@ std::optional<ImportSettings> import_options_dialog(const std::filesystem::path 
   auto paint=choice("Paint resolution","64|128|256|512|1024|2048",resolution);
   Fl_Check_Button atlas(20,y,width-56,row,"Prepare editable texture atlas");atlas.value(settings.prepare_texture_atlas);y+=row;
   Fl_Check_Button materials(20,y,width-56,row,"Import materials and textures");materials.value(settings.choices.materials);y+=row;
-  const char *retained="Original files, coordinates and textures are retained. Preparing an editable atlas resamples textures at the selected paint resolution.";
+  const char *retained="Original files, coordinates and texture sampling are retained. The selected resolution sets the editable paint atlas.";
   Fl_Box info(20,y,width-56,row*2,retained);info.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   const char *meaning="From file reads FBX units and axes. Unitless OBJ assumes metres. Explicit normal generation replaces source shading normals.";
   Fl_Box help(20,y,width-56,row*3,meaning);help.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*3;

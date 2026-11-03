@@ -5,7 +5,8 @@
 #include "dome/import-native.hpp"
 #include "dome/import-source.hpp"
 #include "dome/material-bindings.hpp"
-#include "dome/source-uv-bake.hpp"
+#include "dome/source-paint.hpp"
+#include "normal-frame-runtime.hpp"
 #include "dome/projection.hpp"
 #include "dome/source-placement.hpp"
 #include "import-skin.hpp"
@@ -451,20 +452,9 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       Mesh mesh = p.normals_authored
           ? used_source_mesh(p.mesh, options.limits.cancelled)
           : detail::source_flat_mesh(p.mesh, {}, options.limits.cancelled);
-      // Count every sampled typed role; MatCap is view-dependent. Unused
-      // original UV metadata can be atlased only by the explicit user choice.
-      const auto *raw_material=p.material?&json.at("materials").at(p.material-1):nullptr;
-      const auto *typed=vrm.version!=detail::VrmImportVersion::None&&vrm.materials.at(p.material)
-          ? &*vrm.materials.at(p.material):nullptr;
-      bool sampled_toon=false;
-      if(typed)for(size_t role=0;role<typed->textures.size();++role)
-        if(role!=size_t(MToonSlot::Matcap)&&typed->textures[role].index>=0)sampled_toon=true;
-      const bool unresolved_toon=!typed&&raw_material&&raw_material->contains("extensions")&&
-          raw_material->at("extensions").contains("VRMC_materials_mtoon");
-      const bool no_texture_roles=!unresolved_toon&&!sampled_toon&&m.color_texture<0&&m.metal_rough_texture<0&&
-          m.normal_texture<0&&m.emissive_texture<0&&m.occlusion_texture<0;
-      const bool generated_uv = mesh.uv.empty() ||
-          (options.prepare_texture_atlas&&no_texture_roles);
+      // Generate only genuinely missing UV0. An explicit editable-atlas
+      // request must first capture every existing original coordinate exactly.
+      const bool generated_uv = mesh.uv.empty();
       if (generated_uv)
         unwrap(mesh, options.paint_resolution, 4, options.limits.cancelled);
       // The atlas retains exact ordered corners, not just coincident positions.
@@ -493,17 +483,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       paint_options.policy = PaintUvPolicy::SourceAuthored;
       paint_options.cancelled = options.limits.cancelled;
       auto source_maps = maps(*asset, m, *images, p, remap);
-      // The legacy codec authorizes SourceAuthored only with raw source maps.
-      // Plain original UV authority is a Scene11 feature; do not emit a record
-      // the current reader would refuse, or silently alter overlapping raw UVs.
-      if (source_maps->empty())
-        paint_options.policy = PaintUvPolicy::Strict;
-      object.painted =
-          source_maps->empty()
-              ? PaintedMesh::from_mesh(std::move(mesh),
-                                       options.paint_resolution, paint_options)
-              : PaintedMesh::from_maps(std::move(mesh), source_maps,
-                                       options.paint_resolution, paint_options);
+      object.painted = capture_source_sampling(std::move(mesh),source_maps,
+                                                options.paint_resolution,paint_options);
       object.mesh_active = true;
       object.appearance = appearance;
       if (!p.morph_targets.empty()) {
@@ -568,10 +549,16 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       binding->normal_frame = SourceMaterialNormalFrame::OriginalAttributes;
       binding->normal_frames =
           frames(p, m, object.painted->mesh(), options.limits.cancelled);
-      if (vrm.version != detail::VrmImportVersion::None &&
-          vrm.materials.at(p.material)) {
+      std::optional<MToonMaterial> imported_mtoon;
+      if(vrm.version!=detail::VrmImportVersion::None&&vrm.materials.at(p.material))imported_mtoon=*vrm.materials[p.material];
+      else if(p.material){
+        const auto &raw=json.at("materials").at(p.material-1);
+        if(raw.contains("extensions")&&raw.at("extensions").contains("VRMC_materials_mtoon"))
+          imported_mtoon=MToonMaterial::from_vrm1(raw,asset->textures.size());
+      }
+      if (imported_mtoon) {
         binding->has_mtoon = true;
-        binding->material = *vrm.materials[p.material];
+        binding->material = *imported_mtoon;
         binding->roles =
             detail::vrm_import_roles(binding->material, *asset, *images);
         auto resolved =
@@ -624,25 +611,33 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       binding->validate();
       object.material_bindings = binding;
       if(options.prepare_texture_atlas){
-        SourceUvBakeInput atlas;atlas.paint=object.painted;atlas.appearance=object.appearance;
-        atlas.current_deformation=object.deformation;atlas.current_material=binding;
-        atlas.target=object.painted->mesh();const auto &before=object.painted->mesh();
-        unwrap(atlas.target,options.paint_resolution,4,options.limits.cancelled);
-        if(atlas.target.indices.size()!=before.indices.size())throw std::runtime_error("Editable atlas changed original triangle count");
-        atlas.source_vertices.assign(atlas.target.positions.size(),UINT32_MAX);
+        auto atlas=object.painted->mesh();const auto &before=object.painted->mesh();
+        unwrap(atlas,options.paint_resolution,4,options.limits.cancelled);
+        if(atlas.indices.size()!=before.indices.size())throw std::runtime_error("Editable atlas changed original triangle count");
+        std::vector<uint32_t> vertices(atlas.positions.size(),UINT32_MAX);
         for(size_t corner=0;corner<before.indices.size();++corner){
           if((corner&4095)==0)stop(options);
-          auto vertex=atlas.target.indices[corner],source=before.indices[corner];
-          auto &mapped=atlas.source_vertices.at(vertex);
+          auto vertex=atlas.indices[corner],source=before.indices[corner];
+          auto &mapped=vertices.at(vertex);
           if(mapped!=UINT32_MAX&&mapped!=source)throw std::runtime_error("Editable atlas merged different original vertices");
           mapped=source;
         }
-        if(std::find(atlas.source_vertices.begin(),atlas.source_vertices.end(),UINT32_MAX)!=atlas.source_vertices.end())throw std::runtime_error("Editable atlas contains an unproven vertex");
-        SourceUvBakeOptions bake;bake.resolution=options.paint_resolution;bake.cancelled=options.limits.cancelled;
-        auto adopted=adopt_source_uv_bake(bake_source_uv(atlas,bake),options.limits.cancelled);
-        object.painted=std::move(adopted.paint);object.appearance=std::move(adopted.appearance);
-        object.deformation=std::move(adopted.deformation);object.material_bindings=std::move(adopted.material_bindings);
-        output.diagnostics.push_back("Prepared editable texture atlas at "+std::to_string(options.paint_resolution)+" pixels; original coordinates, images and source retained");
+        if(std::find(vertices.begin(),vertices.end(),UINT32_MAX)!=vertices.end())throw std::runtime_error("Editable atlas contains an unproven vertex");
+        std::shared_ptr<const std::vector<std::array<float,2>>> authored_uv1;
+        if(!p.uv1.empty()&&!source_maps->uv1){
+          if(p.uv1.size()!=p.mesh.positions.size())throw std::invalid_argument("Imported authored UV1 domain differs");
+          auto coordinates=std::make_shared<std::vector<std::array<float,2>>>();coordinates->reserve(appearance->source_vertices.size());
+          for(size_t v=0;v<appearance->source_vertices.size();++v){if((v&1023)==0)stop(options);coordinates->push_back(p.uv1.at(appearance->source_vertices[v]));}
+          authored_uv1=std::move(coordinates);
+        }
+        SourcePaintOptions paint;paint.cancelled=options.limits.cancelled;
+        auto adopted=prepare_source_paint(object.painted,atlas,vertices,std::move(authored_uv1),paint);
+        auto deformation=detail::normal_frame_remap_deformation(object.deformation,before,adopted->mesh(),vertices,options.limits.cancelled);
+        auto remapped=std::make_shared<CreatorAppearance>(*appearance);remapped->source_vertices.clear();remapped->source_vertices.reserve(vertices.size());
+        for(size_t v=0;v<vertices.size();++v){if((v&1023)==0)stop(options);remapped->source_vertices.push_back(appearance->source_vertices.at(vertices[v]));}
+        detail::normal_frame_current_authority(*binding,adopted->mesh(),deformation.get(),options.limits.cancelled);
+        object.painted=std::move(adopted);object.appearance=std::move(remapped);object.deformation=std::move(deformation);
+        output.diagnostics.push_back("Prepared editable paint atlas at "+std::to_string(options.paint_resolution)+" pixels; original image sampling, material roles and source coordinates retained");
       }
       if(options.prepare_texture_atlas)output.scene.validate(false);
       output.objects.push_back(id);

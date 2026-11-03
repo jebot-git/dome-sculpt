@@ -49,7 +49,8 @@ inline void extra_source_uv_pair(const PaintedMesh &paint,const CreatorAppearanc
   }
   if(!primitive)throw std::invalid_argument("Additional source UV primitive identity is missing");
   const auto original=paint.source_sampling_original();
-  const auto &source=original?*original->source_maps():*maps;
+  const PaintSourceMaps empty;
+  const auto &source=original?(original->source_maps()?*original->source_maps():empty):*maps;
   const auto vertices=paint.source_sampling_vertices();
   if(original&&(!paint.valid_source_sampling_attachment()||vertices.size()!=paint.mesh().positions.size()))
     throw std::invalid_argument("Independent source UVs lost their actual original paint owner");
@@ -65,7 +66,13 @@ inline void extra_source_uv_pair(const PaintedMesh &paint,const CreatorAppearanc
   // Generated carriers are authenticated by the source-paint factory/replay.
   // Pair their genuine original arrays to the actual asset, rather than pretend
   // the new carrier number was an authored TEXCOORD_n accessor in that asset.
-  if(original){pair(original->mesh().uv,primitive->mesh.uv);if(source.uv1)pair(*source.uv1,primitive->uv1);}
+  if(original){
+    if(!primitive->mesh.uv.empty())pair(original->mesh().uv,primitive->mesh.uv);
+    else for(const auto *role:{&source.color,&source.metal_rough,&source.emission,&source.normal,&source.occlusion})
+      if(role->image&&role->texcoord==0)throw std::invalid_argument("Original UV0 image role lacks its authored attribute");
+    if(source.uv1)pair(*source.uv1,primitive->uv1);
+    if(const auto uv1=paint.source_sampling_authored_uv1())pair(*uv1,primitive->uv1);
+  }
   for(const auto &[set,values]:source.extra_uv_sets) {
     const auto found=primitive->extra_uv_sets.find(set);
     if(found==primitive->extra_uv_sets.end())throw std::invalid_argument("Additional source UV owner has no original attribute");

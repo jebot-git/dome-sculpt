@@ -50,6 +50,10 @@ struct PolygonSceneBudget {
     if(input.contains("version")&&input.at("version")==4){
       if(version<28)throw std::invalid_argument("Independent source paint requires its actual Scene28 feature");
       add(paint_bytes,input.at("vertices").get_binary().size(),256*1024*1024,"Source paint corner-map budget exceeded");
+      if(const auto bytes=source_paint_authored_uv1_bytes(input)){
+        add(paint_bytes,bytes,256*1024*1024,"Scene authored UV1 before-domain storage exceeded");
+        add(paint_bytes,input.at("vertices").get_binary().size()*2,256*1024*1024,"Scene authored UV1 current-domain storage exceeded");
+      }
       paint(input.at("before"),true,version);
     }
     if(p.contains("source_maps"))add(paint_bytes,source_uv_archive_measure(p.at("source_maps"),version).bytes,256*1024*1024,"Scene retained source UV storage exceeded");

@@ -280,9 +280,14 @@ struct SurfaceRenderer::TextureState {
         for(size_t c=range.first;c<range.first+range.count;++c)if(mesh.mesh.indices.at(c)<range.first_vertex||mesh.mesh.indices.at(c)-range.first_vertex>=source_uv1->size())throw std::invalid_argument("Source UV1 index is outside its packed domain");
         if(next_uv1.empty())next_uv1.resize(count);std::copy(source_uv1->begin(),source_uv1->end(),next_uv1.begin()+range.first_vertex);
       }
+      if(maps&&maps->overlay&&maps->overlay->original_uv1()&&geometry_changed){
+        const auto &logical=*maps->overlay->original_uv1();
+        if(range.first_vertex>count||logical.size()>count-range.first_vertex)throw std::invalid_argument("Original logical UV1 exceeds packed geometry");
+        if(next_uv1.empty())next_uv1.resize(count);std::copy(logical.begin(),logical.end(),next_uv1.begin()+range.first_vertex);
+      }
       if(maps&&maps->source_only) {
         auto present=[](const Image &image){return image.width||image.height||!image.rgba.empty();};
-        if(!maps->source_maps || maps->source_maps->empty() || maps->baked_base ||
+        if(!maps->source_maps || maps->baked_base ||
            present(maps->color)||present(maps->metal_rough)||present(maps->emission)||present(maps->normal)||
            present(maps->color_coverage)||present(maps->emission_coverage)||present(maps->baked_normal)||present(maps->baked_coverage)||present(maps->mtoon_normal)||maps->normal_projection)
           throw std::invalid_argument("Raw source preview marker contains derived material payload");
@@ -373,7 +378,7 @@ struct SurfaceRenderer::TextureState {
         }
         if(needs_uv1&&maps&&maps->overlay){
           const auto &logical=maps->overlay->original_uv1();
-          if(!logical||logical!=source_uv1||logical.owner_before(source_uv1)||source_uv1.owner_before(logical))
+          if(!logical)
             throw std::invalid_argument("MToon UV1 lacks its actual original authored coordinate owner");
         }else if(needs_uv1&&geometry_changed){
           if(!range.appearance || !range.appearance->asset)throw std::runtime_error("Resolved MToon UV1 requires retained primitive provenance");
@@ -389,7 +394,7 @@ struct SurfaceRenderer::TextureState {
       }
       if(!maps)continue;
       if(maps->source_only){
-        if(!maps->source_maps||maps->source_maps->empty()||maps->color.width||maps->metal_rough.width||maps->emission.width||maps->normal.width)
+        if(!maps->source_maps||maps->color.width||maps->metal_rough.width||maps->emission.width||maps->normal.width)
           throw std::runtime_error("Invalid raw source preview marker");
         maps->source_maps->validate();auto &s=*maps->source_maps;
         slot(0,s.color.image,s.color,true);slot(1,s.metal_rough.image,s.metal_rough,false);slot(2,s.emission.image,s.emission,true);slot(3,s.normal.image,s.normal,false);slot(4,s.occlusion.image,s.occlusion,false);
@@ -503,7 +508,7 @@ SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::mak
   textures_->vertex_attributes=attributes;
   auto vertex=mtoon_renderer_vertex(true);
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color,normal_coordinates,source_uv23,source_uv45,source_uv67;in float source_w;in vec2 texcoord,texcoord1,paintcoord;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int overlay_mode;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
+in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color,normal_coordinates,source_uv23,source_uv45,source_uv67;in float source_w;in vec2 texcoord,texcoord1,paintcoord;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int source_uv1_is_uv0;uniform int overlay_mode;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -513,7 +518,7 @@ float d=a2/(PI*pow(NH*NH*(a2-1.0)+1.0,2.0));float k=pow(rough+1.0,2.0)/8.0;
 float g=NV/(NV*(1.0-k)+k)*NL/(NL*(1.0-k)+k);vec3 F0=mix(vec3(.04),base,metallic);vec3 F=F0+(1.0-F0)*pow(1.0-VH,5.0);
 return ((1.0-F)*(1.0-metallic)*base/PI+d*g*F/max(4.0*NV*NL,.0001))*power*NL;}
 vec3 output_srgb(vec3 c){return mix(1.055*pow(max(c,vec3(0)),vec3(1.0/2.4))-.055,12.92*c,lessThanEqual(c,vec3(.0031308)));}
-vec2 source_coordinate(int set){if(set==1)return texcoord1;if(set==2)return source_uv23.xy;if(set==3)return source_uv23.zw;if(set==4)return source_uv45.xy;if(set==5)return source_uv45.zw;if(set==6)return source_uv67.xy;if(set==7)return source_uv67.zw;return texcoord;}
+vec2 source_coordinate(int set){if(set==1)return source_uv1_is_uv0==1?texcoord:texcoord1;if(set==2)return source_uv23.xy;if(set==3)return source_uv23.zw;if(set==4)return source_uv45.xy;if(set==5)return source_uv45.zw;if(set==6)return source_uv67.xy;if(set==7)return source_uv67.zw;return texcoord;}
 vec2 source_uv(int slot){if(slot==3&&retained_normal_domain==1)return normal_coordinates.xy;vec2 q=map_mode==1?paintcoord:source_coordinate(source_coordinates[slot]);return vec2(dot(uv_x[slot],vec3(q,1)),dot(uv_y[slot],vec3(q,1)));}
 vec3 unit(vec3 v){float m=max(max(abs(v.x),abs(v.y)),abs(v.z));return m>1e-20?normalize(v/m):vec3(0,0,1);}
 vec3 source_baked_detail(out float coverage){
@@ -768,6 +773,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&maps->normal_projection);
     glUniform1i(glGetUniformLocation(program_,"paint_domain"),paint_domain||(maps&&maps->overlay&&maps->overlay->original_uv0()));
     glUniform1i(glGetUniformLocation(program_,"retained_normal_domain"),maps&&maps->normal_projection&&maps->normal_projection->version==2);
+    const auto overlay=maps?maps->overlay:nullptr;
+    const auto uv0=overlay?overlay->original_uv0():nullptr;
+    const auto carrier=maps&&maps->source_maps?maps->source_maps->uv1:nullptr;
+    glUniform1i(glGetUniformLocation(program_,"source_uv1_is_uv0"),overlay&&overlay->original_uv1()&&uv0&&uv0==carrier&&!uv0.owner_before(carrier)&&!carrier.owner_before(uv0));
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),0);glUniform1i(glGetUniformLocation(program_,"mt_outline"),0);
     if (maps&&!maps->source_only) {
       material.color={1,1,1,1};material.metallic=material.roughness=1;material.emissive={1,1,1};

@@ -198,6 +198,7 @@ public:
   bool source_sampling_prepared() const noexcept;
   bool valid_source_sampling_attachment() const noexcept;
   std::shared_ptr<const PaintedMesh> source_sampling_original() const noexcept;
+  std::shared_ptr<const std::vector<std::array<float,2>>> source_sampling_authored_uv1() const noexcept;
   std::span<const uint32_t> source_sampling_vertices() const noexcept;
   std::shared_ptr<PaintedMesh>
   reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
