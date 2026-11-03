@@ -3,6 +3,7 @@
 // assembly. No copied libigl implementation/runtime. Operator and constrained
 // energy informed by pinned libigl bbw/harmonic and Jacobson et al.2011.
 #include "biharmonic-binding.hpp"
+#include "block-bounded-quadratic.hpp"
 #include "fixed-quadratic.hpp"
 #include "heat-binding.cpp"
 #include "squared-laplacian-preconditioner.hpp"
@@ -62,6 +63,9 @@ SkinWeights bounded_biharmonic_surface(
     const std::function<bool()> &cancelled, BiharmonicBindingReport *report,
     std::span<const std::array<uint64_t, 4>> component_usage) {
   const auto &o = options.source;
+  const bool block = options.box_solver == BiharmonicBoxSolver::BlockActiveSet;
+  if (options.box_solver != BiharmonicBoxSolver::PrimalFeasible && !block)
+    throw std::invalid_argument("Unknown biharmonic box solver");
   const bool warm = options.initialization ==
                     BiharmonicInitialization::UnconstrainedWarmStart;
   if (options.initialization != BiharmonicInitialization::ComponentConstant &&
@@ -260,12 +264,17 @@ SkinWeights bounded_biharmonic_surface(
         proof.warm_cg_iterations += initialized.cg_iterations;
         budget.step(rows);
         for (double &value : field) {
-          proof.warm_clamps += value < 0 || value > 1;
-          value = std::clamp(value, 0., 1.);
+          proof.warm_outside += value < 0 || value > 1;
+          if (!block) {
+            proof.warm_clamps += value < 0 || value > 1;
+            value = std::clamp(value, 0., 1.);
+          }
         }
       }
-      auto solved =
-          solve_bounded_quadratic(q, fixed, values, field, controls, budget);
+      auto solved = block ? solve_block_bounded_quadratic(
+                                q, fixed, values, field, controls, budget)
+                          : solve_bounded_quadratic(q, fixed, values, field,
+                                                    controls, budget);
       proof.active_iterations += solved.active_iterations;
       proof.cg_iterations += solved.cg_iterations;
       proof.maximum_kkt_residual =

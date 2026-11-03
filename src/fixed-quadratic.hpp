@@ -9,7 +9,8 @@ template <class Operator, class Budget>
 BoundedQuadraticReport
 solve_fixed_quadratic(Operator &op, std::span<const uint8_t> fixed,
                       std::span<const double> values, std::span<double> x,
-                      const BoundedQuadraticOptions &options, Budget &budget) {
+                      const BoundedQuadraticOptions &options, Budget &budget,
+                      double absolute_target = 0) {
   budget.stop();
   const size_t n = x.size();
   if (!options.maximum_bytes || options.maximum_bytes > 512u * 1024u * 1024u ||
@@ -17,7 +18,8 @@ solve_fixed_quadratic(Operator &op, std::span<const uint8_t> fixed,
       op.diagonal.size() != n || !options.maximum_cg_iterations ||
       options.maximum_cg_iterations > 16384 ||
       !(options.relative_tolerance > 0) || options.relative_tolerance > 1e-3 ||
-      !std::isfinite(options.relative_tolerance))
+      !std::isfinite(options.relative_tolerance) || absolute_target < 0 ||
+      !std::isfinite(absolute_target))
     throw std::invalid_argument("Invalid fixed quadratic dimensions/options");
   if (options.maximum_bytes < 4096 ||
       n > (options.maximum_bytes - 4096) /
@@ -66,7 +68,9 @@ solve_fixed_quadratic(Operator &op, std::span<const uint8_t> fixed,
       throw std::runtime_error("Nonfinite unconstrained quadratic residual");
     return std::sqrt(norm);
   };
-  const double target = options.relative_tolerance * .1 * scale;
+  const double target = absolute_target > 0
+                            ? absolute_target
+                            : options.relative_tolerance * .1 * scale;
   if (residual() <= target)
     return report;
   auto precondition = [&] {

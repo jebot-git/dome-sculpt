@@ -9,7 +9,9 @@ enum class BiharmonicInitialization {
   ComponentConstant,
   UnconstrainedWarmStart
 };
+enum class BiharmonicBoxSolver { PrimalFeasible, BlockActiveSet };
 struct BiharmonicBindingOptions {
+  BiharmonicBoxSolver box_solver = BiharmonicBoxSolver::PrimalFeasible;
   BiharmonicInitialization initialization =
       BiharmonicInitialization::ComponentConstant;
   BiharmonicPreconditioner preconditioner = BiharmonicPreconditioner::Diagonal;
@@ -20,7 +22,7 @@ struct BiharmonicBindingOptions {
 struct BiharmonicBindingReport {
   size_t vertices = 0, components = 0, fixed_rows = 0, source_bones = 0,
          active_iterations = 0, cg_iterations = 0, warm_cg_iterations = 0,
-         warm_clamps = 0, work = 0, planned_bytes = 0;
+         warm_clamps = 0, warm_outside = 0, work = 0, planned_bytes = 0;
   double maximum_kkt_residual = 0, maximum_partition_error = 0;
 };
 // Explicit SURFACE-domain bounded biharmonic energy L' M^-1 L, not volumetric
