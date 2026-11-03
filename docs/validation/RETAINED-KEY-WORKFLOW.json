@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "runtime_commit": "38cced9d99213a7dd9c318c646191c09bba50297",
+  "fixture_commit": "4689f45fcfdbdbdc09159c28f6033c1514b46dd2",
+  "scope": "Full workflow test translation unit and the whole changed shapekey-normal-preparation runtime translation unit linked over eight immutable matching c79 native CPU/render/support archives. Software EGL only; not a fresh whole-application build, sanitizer run, or physical/device qualification.",
+  "result": {
+    "exit_code": 0,
+    "checks": 134,
+    "tracked_inputs_and_archive_object_binary_hashes": 1441,
+    "all_before_after_equal": true,
+    "independent_glb": {
+      "corners": 44484,
+      "maximum_world_position_error": 9.83025e-07,
+      "maximum_native_pixel_error": 0,
+      "normal_disabled_pixel_error": 4,
+      "unchanged_pixel_bound": 3
+    }
+  },
+  "archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-core.a": "132e966342b688dfd82467a770cf2a67b2758d5ab39b8b274487971207c6c7de",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fixed-support/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2"
+  },
+  "runtime_source_sha256": "bb1c1665b3bd411e37d4ded564f01eb4e6872e7a7b630bbc4bde7fa536125e98",
+  "fixture_source_sha256": "90d36c699ffedfeedca1bc6006d7737307c7f24c235a35b549bd251d0922b602",
+  "binary_sha256": "812c4773669b07c24ae5fd15d96dd6eece412a7f8cd7f6e2ed8a70651f76fd8d",
+  "evidence": {
+    "artifacts/workflow-cancel-before.json": "ce211525b566294a8c1cfbb1f84e1ff5ea33f31d6de2958403866c33241d4029",
+    "artifacts/workflow-cancel-after.json": "ce211525b566294a8c1cfbb1f84e1ff5ea33f31d6de2958403866c33241d4029",
+    "artifacts/workflow-cancel-status.json": "0f9da27855483ba0f77e975be5df97eec87efe225992070f5f3d3b84ddf9df72",
+    "artifacts/workflow-cancel.log": "5f14f04a2f5093f4922b313dec3028e5ea1f474d7eaa42c9da38c7c016c0a523",
+    "artifacts/workflow-cancel.map": "bbc24ec9fd50e65c6b5fa4942850807f3e8df0699875e29bba270d54d8ef0c2a",
+    "artifacts/workflow-fixed-status.json": "a6404460847e2901024dda655a4478f75c27ee543dfdd9c7ca03a232183a63a1",
+    "artifacts/workflow-fixed.log": "f36561a5738c185f020b766d8765a9b1e6a558b5803e849e0ae73c9bbe640404",
+    "artifacts/workflow-settings-status.json": "490022efa4c0be4f43869a95dbc7c7ef9e242034387967c5a4c6011674a9a7cd",
+    "artifacts/workflow-settings.log": "0a8ced35137a6985e2c356246502a9a46b71361fbe373978aa4926c64333425c"
+  },
+  "preserved_failures": [
+    "Original c79 retained-domain key fails Prepared corner topology differs from its exact current authority.",
+    "84833 original broad fixture used default512 import overload and exceeded unchanged16M scene paint-map quota after capturing23source parts.",
+    "99028 explicit-settings fixture reached actual running cancellation, then its success-only endpoint helper rejected the precise expected cancellation diagnostic."
+  ],
+  "remaining": [
+    "Fresh coherent whole-application and sanitizer qualification belongs to the private master.",
+    "No hardware/physical-launch claim from this proof.",
+    "Independent corner-normal authoring and remaining unsupported UV/typed-authoring routes remain required."
+  ]
+}
