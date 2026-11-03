@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Private initial source-UV capture checkpoint
+
+This branch additionally contains `128b0f7` original outside-tile textured UV0
+capture plus published-main metadata merge `173ee52`. Final CPU10/10, actual
+native UI13, owned-sanitizer123 controls and real Twist13-part CPU/SAN source/
+atlas import/restart/export pass. Read INITIAL-SOURCE-UV-CAPTURE.md and its receipt.
+A real original-to-atlas MASK/morph render error exceeds the fixed mean bound
+at512 and1024; broader atlas fidelity is unqualified and this branch is not
+admitted to main. Untextured capture, inactive grid memory and all unfinished
+original/additional requirements remain active. No system/session changed.
+
+
 ## Published VRM1 source-export integration — 2026-11-03
 
 Main `13f7e57` now includes the qualified first source-preserving VRM1 writer,
