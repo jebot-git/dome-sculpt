@@ -1,9 +1,28 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "render-paint-overlay.hpp"
+#include "render-source-pack.hpp"
 #include "graphics.h"
 #include "dome/color-preparation.hpp"
 #include "source-color-fixtures.hpp"
 #include <iostream>
+#include <cstdlib>
+#include <new>
+thread_local size_t overlay_deny_large=0;thread_local bool overlay_large_attempt=false;
+void *operator new(size_t n){if(overlay_deny_large&&n>=overlay_deny_large){overlay_large_attempt=true;throw std::bad_alloc();}if(void*p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
+void *operator new[](size_t n){return ::operator new(n);}
+void operator delete(void*p)noexcept{std::free(p);}void operator delete[](void*p)noexcept{std::free(p);}
+void operator delete(void*p,size_t)noexcept{std::free(p);}void operator delete[](void*p,size_t)noexcept{std::free(p);}
+void *operator new(size_t n,const std::nothrow_t&)noexcept{try{return ::operator new(n);}catch(...){return nullptr;}}
+void *operator new[](size_t n,const std::nothrow_t&)noexcept{try{return ::operator new[](n);}catch(...){return nullptr;}}
+void operator delete(void*p,const std::nothrow_t&)noexcept{std::free(p);}void operator delete[](void*p,const std::nothrow_t&)noexcept{std::free(p);}
+void *operator new(size_t n,std::align_val_t alignment){if(overlay_deny_large&&n>=overlay_deny_large){overlay_large_attempt=true;throw std::bad_alloc();}void*p=nullptr;if(posix_memalign(&p,std::max(sizeof(void*),size_t(alignment)),n?n:1)==0)return p;throw std::bad_alloc();}
+void *operator new[](size_t n,std::align_val_t a){return ::operator new(n,a);}
+void operator delete(void*p,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,std::align_val_t)noexcept{std::free(p);}
+void operator delete(void*p,size_t,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,size_t,std::align_val_t)noexcept{std::free(p);}
+void *operator new(size_t n,std::align_val_t a,const std::nothrow_t&)noexcept{try{return ::operator new(n,a);}catch(...){return nullptr;}}
+void *operator new[](size_t n,std::align_val_t a,const std::nothrow_t&)noexcept{try{return ::operator new[](n,a);}catch(...){return nullptr;}}
+void operator delete(void*p,std::align_val_t,const std::nothrow_t&)noexcept{std::free(p);}void operator delete[](void*p,std::align_val_t,const std::nothrow_t&)noexcept{std::free(p);}
+
 using namespace dome;
 namespace {
 unsigned checks=0;double maximum=0;
@@ -40,16 +59,33 @@ BakedTextures baked(uint32_t r){BakedTextures b;auto image=[&](std::array<uint8_
 int main(int argc,char **argv)try{
  NativeGraphics graphics;std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<'\n';
  check(argc<2||std::string_view(argv[1])!="--hardware"||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos&&device.find("UHD")==std::string::npos),"Hardware requests require actual Intel Arc A770");
+ detail::PaintOverlayCompiler metadata;auto empty_paint=std::make_shared<PaintedMesh>(quad(),64);auto empty_packet=detail::PaintOverlayFactory::capture(*empty_paint);metadata.prepare({{empty_packet,false},{empty_packet,true}},0,0,0);check(empty_packet->empty()&&metadata.bytes()==0&&std::all_of(metadata.at(empty_packet,false).planes.begin(),metadata.at(empty_packet,false).planes.end(),[](GLuint t){return t==0;}),"Metadata-only empty packets allocate no output planes or GPU image budget");metadata.clear(true);
  detail::PaintOverlayCompiler compiler;auto paint=std::make_shared<PaintedMesh>(quad(),64);
  PaintSettings setting;setting.color={.2f,.7f,.3f,.4f};stroke(*paint,setting);setting.channel=PaintChannel::Metallic;setting.metallic=.8f;stroke(*paint,setting);setting.channel=PaintChannel::Roughness;setting.roughness=.1f;stroke(*paint,setting);setting.channel=PaintChannel::Emission;setting.emission={.3f,.8f,.2f};stroke(*paint,setting);
  paint->add_layer("Absolute physical");setting.emission_units=PaintEmissionUnits::Physical;setting.emission={10000,.005f,12};stroke(*paint,setting);paint->layer_properties("Absolute physical",true,.61f);
  auto packet=detail::PaintOverlayFactory::capture(*paint);auto same_padding=detail::PaintOverlayFactory::capture(*paint);check(packet->padding()==same_padding->padding()&&!packet->padding().owner_before(same_padding->padding())&&!same_padding->padding().owner_before(packet->padding()),"Packets alias the real immutable padding owner without dense copying");
  const auto original=paint->encode();glEnable(GL_BLEND);glEnable(GL_SCISSOR_TEST);glViewport(2,3,17,19);compiler.prepare({{packet,false},{packet,false}});GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);check(glIsEnabled(GL_BLEND)&&glIsEnabled(GL_SCISSOR_TEST)&&viewport[0]==2&&viewport[1]==3&&viewport[2]==17&&viewport[3]==19,"GPU compiler restores caller viewport and render switches");glDisable(GL_BLEND);glDisable(GL_SCISSOR_TEST);check(compiler.size()==1,"Repeated immutable inputs reuse one five-plane owner");compare(*paint,compiler.at(packet,false),false);
  auto pixels=read(compiler.at(packet,false));const size_t center=(32*64+32)*4;check(pixels[4][center+1]>0&&pixels[4][center]>100,"Tiny and HDR physical radiance both survive float GPU composition");
- check(refuses([&]{compiler.prepare({{packet,false}},8);})&&compiler.size()==1,"Budget refusal precedes cache mutation and GPU allocation");check(paint->encode()==original,"GPU compilation leaves all native paint/source bytes exact");
+ check(refuses([&]{compiler.prepare({{packet,false}},8);})&&compiler.size()==1,"Budget refusal precedes cache mutation and GPU allocation");check(paint->encode()==original,"GPU compilation leaves all native paint/source bytes exact");check(packet->storage_bytes()>=packet->padding()->size()*sizeof(int32_t),"Retained sparse packet charges its real aliased SurfaceMap and tile owners");
+ detail::PaintOverlayCompiler cpu_limited;check(refuses([&]{cpu_limited.prepare({{packet,false}},1024ull*1024*1024,1024,1);})&&cpu_limited.size()==0,"Pointer planning obeys an explicit CPU working budget before packing");
+ detail::PaintOverlayCompiler prospective;bool forecast_refusal=false;overlay_large_attempt=false;overlay_deny_large=64*1024;
+ try{prospective.prepare({{packet,false}},compiler.at(packet,false).bytes);}catch(const std::length_error&){forecast_refusal=true;}catch(const std::bad_alloc&){}overlay_deny_large=0;
+ check(forecast_refusal&&!overlay_large_attempt&&prospective.size()==0,"Upload budget refusal precedes large sparse CPU allocations and GPU mutation");
  paint->begin_stroke();setting.erase=true;paint->stamp(Brush{{0,0,0},{0,0,0},{0,0,1},2,.3f},setting);paint->cancel_stroke();check(paint->encode()==original,"Cancel restores exact physical/legacy owners before reusing a GPU packet");
  auto based=paint->snapshot();based->install_bake(baked(64));auto bp=detail::PaintOverlayFactory::capture(*based);compiler.prepare({{bp,false}});compare(*based,compiler.at(bp,false),false);
  auto scene=source_color_fixture::model(true);auto &o=scene.active();PaintSettings white;white.color={1,1,1,1};stroke(*o.painted,white,.99f);auto prepared=prepare_source_colors({o.painted,o.appearance,o.material_bindings,o.deformation,o.material});auto pp=detail::PaintOverlayFactory::capture(*prepared.paint);check(pp->source_maps()==prepared.paint->source_maps(),"Packet retains the exact optional original source-map identity");compiler.prepare({{pp,false},{pp,true}});compare(*prepared.paint,compiler.at(pp,false),false);compare(*prepared.paint,compiler.at(pp,true),true);auto a=read(compiler.at(pp,false)),b=read(compiler.at(pp,true));double colour_delta=0;for(size_t i=0;i<a[0].size();++i)colour_delta=std::max(colour_delta,std::abs(double(a[0][i])-b[0][i]));check(colour_delta>.1,"Real prepared zero-colour source distinguishes PBR and authored overlay planes");
+ {
+  detail::PaintOverlayCompiler emitter;emitter.prepare({{packet,false}});const auto &resource=emitter.at(packet,false);const auto direct=read(resource);
+  auto image=std::make_shared<const Image>(Image{1,1,{64,128,192,255}});GLuint texture=0;glGenTextures(1,&texture);glBindTexture(GL_TEXTURE_2D,texture);glTexImage2D(GL_TEXTURE_2D,0,GL_SRGB8_ALPHA8,1,1,0,GL_RGBA,GL_UNSIGNED_BYTE,image->rgba.data());
+  MToonSourcePacks packs;MToonSourcePacks::Inputs legacy{};legacy[0]={image,texture,false,true};legacy[2]=legacy[0];packs.prepare({legacy},0,0,{});check(!packs.at(legacy).floating&&packs.at(legacy).bytes==4,"Unchanged source-only packed views keep their exact RGBA8 path and alias reuse");
+  auto mixed=legacy;mixed[1]=MToonSourcePacks::Input::linear(resource,4,true);mixed[3]=MToonSourcePacks::Input::linear(resource,2,false);packs.prepare({legacy,mixed},0,0,{});const auto &packed=packs.at(mixed);check(packed.floating&&packed.info[1][0]==7&&packed.levels[28]==packed.levels[0],"Real float planes promote one GPU pack, retain mips, and deduplicate exact byte-source aliases");
+  std::vector<float> stored(packed.bytes/sizeof(float));glBindBuffer(GL_COPY_READ_BUFFER,packed.buffer);glGetBufferSubData(GL_COPY_READ_BUFFER,0,GLsizeiptr(packed.bytes),stored.data());glBindBuffer(GL_COPY_READ_BUFFER,0);
+  const auto old_at=size_t(packed.levels[0][0])*4;bool raw_exact=true;for(size_t c=0;c<4;++c)raw_exact&=std::abs(stored[old_at+c]-image->rgba[c]/255.f)<1e-7;check(raw_exact,"Mixed float transport preserves original encoded sRGB samples without a second decode");
+  const auto physical_at=size_t(packed.levels[14][0])*4;bool physical_exact=true;for(size_t i=0;i<direct[4].size();++i)physical_exact&=stored[physical_at+i]==direct[4][i];check(physical_exact,"GPU PBO float transfer preserves every physical coefficient bit exactly");
+  double mean=0;for(size_t i=1;i<direct[4].size();i+=4)mean+=direct[4][i];mean/=64*64;const auto last=size_t(packed.levels[20][0])*4;check(stored[last+1]>0&&std::abs(stored[last+1]-mean)<mean*2e-6,"Tiny physical emission stays linear through the complete GPU mip chain");
+  auto authored=MToonSourcePacks::Input::linear(compiler.at(pp,false),0),pbr=MToonSourcePacks::Input::linear(compiler.at(pp,true),0);MToonSourcePacks::Inputs authored_set{},pbr_set{};authored_set[0]=authored;pbr_set[0]=pbr;check(MToonSourcePacks::key(authored_set)!=MToonSourcePacks::key(pbr_set),"Packed float ownership distinguishes current authored/PBR colour interpretations");
+  SurfaceTextureLimits small;small.max_bytes=packed.bytes-1;check(refuses([&]{packs.preflight({mixed},0,0,small);}),"Float source pack charges sixteen bytes per actual mip texel before allocation");packs.clear(true);glDeleteTextures(1,&texture);
+ }
  auto recursive=baked(64);recursive.maps.overlay=pp;check(refuses([&]{recursive.validate(64);}),"Baked payload cannot recursively own an overlay packet");
  check(refuses([&]{detail::PaintOverlayFactory::capture(*paint,[]{return true;});})&&paint->encode()==original,"Factory cancellation preserves exact caller state");compiler.clear(true);check(compiler.size()==0&&compiler.bytes()==0,"Owned GPU plane resources release completely");std::cout<<"Sparse GPU overlay: "<<checks<<" checks maximum_relative="<<maximum<<'\n';return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -5,6 +5,8 @@
 #include <map>
 #include <tuple>
 #include <cstring>
+#include <algorithm>
+#include <cstdint>
 namespace dome::detail {
 // Five GPU-only premultiplied contribution planes. No source texture/material
 // is flattened into them: original sampling and absolute background stay live.
@@ -72,19 +74,38 @@ void main(){
   ~Temporary(){glDeleteBuffers(4,buffers.data());glDeleteTextures(4,views.data());glDeleteTextures(4,baked.data());if(fbo)glDeleteFramebuffers(1,&fbo);}
  };
  static void image(GLuint name,uint32_t width,uint32_t height,GLenum internal,GLenum format,const void *pixels){glBindTexture(GL_TEXTURE_2D,name);glTexImage2D(GL_TEXTURE_2D,0,GLint(internal),GLsizei(width),GLsizei(height),0,format,GL_UNSIGNED_BYTE,pixels);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);}
- Resource build(std::shared_ptr<const PaintOverlayPacket> packet,bool pbr,size_t budget){
+ Resource build(std::shared_ptr<const PaintOverlayPacket> packet,bool pbr,size_t budget,size_t working_budget){
   Resource result;result.owner=std::move(packet);result.pbr=pbr;result.resolution=result.owner->resolution();const auto &input=*result.owner;
-  const size_t grid=size_t(input.resolution()/32)*(input.resolution()/32);std::vector<std::array<uint32_t,4>> common;std::vector<float> physical;std::vector<std::array<int32_t,2>> offsets(input.layers().size()*grid,{-1,-1});
-  std::map<std::pair<const PaintTile*,const PaintColorTile*>,int32_t> common_owners;std::map<const PaintEmissionTile*,int32_t> physical_owners;
-  for(size_t layer=0;layer<input.layers().size();++layer)for(size_t tile=0;tile<grid;++tile){const auto &l=input.layers()[layer];if(!l.tiles[tile])continue;
-   const auto *colour=pbr&&!l.pbr_tiles.empty()?l.pbr_tiles[tile].get():nullptr;auto key=std::pair{l.tiles[tile].get(),colour};auto [ci,fresh]=common_owners.emplace(key,int32_t(common.size()));if(fresh){for(size_t px=0;px<1024;++px){std::array<uint8_t,16> bytes{};std::copy(l.tiles[tile]->pixels[px].data.begin(),l.tiles[tile]->pixels[px].data.end(),bytes.begin());if(colour)std::copy(colour->pixels[px].begin(),colour->pixels[px].end(),bytes.begin());std::array<uint32_t,4> words{};for(size_t b=0;b<16;++b)words[b/4]|=uint32_t(bytes[b])<<((b%4)*8);common.push_back(words);}}
-   auto &out=offsets[layer*grid+tile];out[0]=ci->second;if(!l.emission_tiles.empty()&&l.emission_tiles[tile]){auto [hi,new_hdr]=physical_owners.emplace(l.emission_tiles[tile].get(),int32_t(physical.size()));if(new_hdr)for(const auto &value:l.emission_tiles[tile]->pixels){physical.insert(physical.end(),value.legacy.begin(),value.legacy.end());physical.insert(physical.end(),value.physical.begin(),value.physical.end());physical.push_back(value.coverage);}out[1]=hi->second;}
-  }
-  const size_t pixels=size_t(input.resolution())*input.resolution();size_t mip_pixels=0;for(size_t width=input.resolution();;width=std::max(size_t(1),width/2)){mip_pixels+=width*width;if(width==1)break;}result.bytes=mip_pixels*16*5;size_t upload=common.size()*16+physical.size()*sizeof(float)+offsets.size()*8+pixels*sizeof(int32_t);if(input.baked())upload+=pixels*13;
-  if(result.bytes>budget||upload>budget-result.bytes)throw std::length_error("GPU overlay byte budget exceeded");
+  if(input.empty())return result;
+  const size_t grid=size_t(input.resolution()/32)*(input.resolution()/32),pixels=size_t(input.resolution())*input.resolution();
+  size_t mip_pixels=0;for(size_t width=input.resolution();;width=std::max(size_t(1),width/2)){mip_pixels+=width*width;if(width==1)break;}result.bytes=mip_pixels*16*5;
+  if(result.bytes>budget)throw std::length_error("GPU overlay byte budget exceeded");
+  struct CommonRef{const PaintTile*tile;const PaintColorTile*colour;size_t destination;};
+  struct PhysicalRef{const PaintEmissionTile*tile;size_t destination;};
+  size_t common_refs=0,physical_refs=0;
+  for(const auto &layer:input.layers())for(size_t tile=0;tile<grid;++tile)if(layer.tiles[tile]){++common_refs;if(!layer.emission_tiles.empty()&&layer.emission_tiles[tile])++physical_refs;}
+  auto add=[](size_t &total,size_t amount,size_t limit,const char*error){if(total>limit||amount>limit-total)throw std::length_error(error);total+=amount;};
+  // Allocate only small, prospectively bounded pointer records to discover
+  // actual aliasing. Sorting is in-place; no map-node allocation or pixel
+  // packing occurs until both CPU scratch and GPU limits have passed.
+  size_t key_bytes=0;add(key_bytes,common_refs*sizeof(CommonRef),working_budget,"GPU overlay planning exceeds CPU working budget");add(key_bytes,physical_refs*sizeof(PhysicalRef),working_budget,"GPU overlay planning exceeds CPU working budget");
+  std::vector<CommonRef> common_keys;std::vector<PhysicalRef> physical_keys;common_keys.reserve(common_refs);physical_keys.reserve(physical_refs);
+  for(size_t layer=0;layer<input.layers().size();++layer)for(size_t tile=0;tile<grid;++tile){const auto &l=input.layers()[layer];if(!l.tiles[tile])continue;const auto *colour=pbr&&!l.pbr_tiles.empty()?l.pbr_tiles[tile].get():nullptr;common_keys.push_back({l.tiles[tile].get(),colour,layer*grid+tile});if(!l.emission_tiles.empty()&&l.emission_tiles[tile])physical_keys.push_back({l.emission_tiles[tile].get(),layer*grid+tile});}
+  auto common_key=[](const CommonRef &v){return std::pair{reinterpret_cast<uintptr_t>(v.tile),reinterpret_cast<uintptr_t>(v.colour)};};
+  std::sort(common_keys.begin(),common_keys.end(),[&](const auto&a,const auto&b){return common_key(a)<common_key(b);});std::sort(physical_keys.begin(),physical_keys.end(),[](const auto&a,const auto&b){return reinterpret_cast<uintptr_t>(a.tile)<reinterpret_cast<uintptr_t>(b.tile);});
+  size_t common_count=0,physical_count=0;for(size_t i=0;i<common_keys.size();++i)if(!i||common_key(common_keys[i])!=common_key(common_keys[i-1]))++common_count;for(size_t i=0;i<physical_keys.size();++i)if(!i||physical_keys[i].tile!=physical_keys[i-1].tile)++physical_count;
+  const size_t common_pixels=std::max(size_t(1),common_count*1024),physical_values=std::max(size_t(1),physical_count*1024*7),offset_count=std::max(size_t(1),input.layers().size()*grid);
+  size_t upload=0;for(auto size:{common_pixels*16,physical_values*4,offset_count*8,pixels*4,input.baked()?pixels*13:16})add(upload,size,budget-result.bytes,"GPU overlay byte budget exceeded");
+  size_t working=key_bytes;for(auto size:{common_pixels*16,physical_values*4,offset_count*8})add(working,size,working_budget,"GPU overlay sparse packing exceeds CPU working budget");
+  // A known byte refusal stays entirely in owned CPU code. Query the driver
+  // only after that forecast, still before any large pixel-vector allocation.
   GLint max_buffer=0,max_size=0,max_draw=0;glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE,&max_buffer);glGetIntegerv(GL_MAX_TEXTURE_SIZE,&max_size);glGetIntegerv(GL_MAX_DRAW_BUFFERS,&max_draw);
-  if(common.size()>size_t(std::max(0,max_buffer))||physical.size()>size_t(std::max(0,max_buffer))||offsets.size()>size_t(std::max(0,max_buffer))||pixels>size_t(std::max(0,max_buffer))||input.resolution()>uint32_t(std::max(0,max_size))||max_draw<5)throw std::length_error("GPU overlay exceeds device limits");
-  if(common.empty())common.push_back({});if(physical.empty())physical.push_back(0);if(offsets.empty())offsets.push_back({-1,-1});
+  if(pixels>size_t(std::max(0,max_buffer))||common_pixels>size_t(std::max(0,max_buffer))||physical_values>size_t(std::max(0,max_buffer))||offset_count>size_t(std::max(0,max_buffer))||input.resolution()>uint32_t(std::max(0,max_size))||max_draw<5)throw std::length_error("GPU overlay exceeds device limits");
+  std::vector<std::array<uint32_t,4>> common;std::vector<float> physical;std::vector<std::array<int32_t,2>> offsets(offset_count,{-1,-1});common.reserve(common_pixels);physical.reserve(physical_values);
+  int32_t common_offset=-1,physical_offset=-1;
+  for(size_t i=0;i<common_keys.size();++i){const auto &key=common_keys[i];if(!i||common_key(key)!=common_key(common_keys[i-1])){common_offset=int32_t(common.size());for(size_t px=0;px<1024;++px){std::array<uint8_t,16> bytes{};std::copy(key.tile->pixels[px].data.begin(),key.tile->pixels[px].data.end(),bytes.begin());if(key.colour)std::copy(key.colour->pixels[px].begin(),key.colour->pixels[px].end(),bytes.begin());std::array<uint32_t,4> words{};for(size_t b=0;b<16;++b)words[b/4]|=uint32_t(bytes[b])<<((b%4)*8);common.push_back(words);}}offsets[key.destination][0]=common_offset;}
+  for(size_t i=0;i<physical_keys.size();++i){const auto &key=physical_keys[i];if(!i||key.tile!=physical_keys[i-1].tile){physical_offset=int32_t(physical.size());for(const auto &value:key.tile->pixels){physical.insert(physical.end(),value.legacy.begin(),value.legacy.end());physical.insert(physical.end(),value.physical.begin(),value.physical.end());physical.push_back(value.coverage);}}offsets[key.destination][1]=physical_offset;}
+  if(common.empty())common.push_back({});if(physical.empty())physical.push_back(0);
   State state;initialise();Temporary temp;
   try{
    glGenBuffers(4,temp.buffers.data());glGenTextures(4,temp.views.data());glGenTextures(4,temp.baked.data());glGenTextures(5,result.planes.data());glGenFramebuffers(1,&temp.fbo);
@@ -104,19 +125,28 @@ void main(){
 public:
  PaintOverlayCompiler()=default;PaintOverlayCompiler(const PaintOverlayCompiler&)=delete;PaintOverlayCompiler&operator=(const PaintOverlayCompiler&)=delete;
  struct Input {std::shared_ptr<const PaintOverlayPacket> owner;bool pbr=false;};
- void prepare(const std::vector<Input> &inputs,size_t budget=1024ull*1024*1024,size_t max_images=1024){
-  std::map<Key,Input> wanted;size_t bytes=0;
-  auto measure=[](uint32_t r){size_t pixels=0;for(size_t width=r;;width=std::max(size_t(1),width/2)){pixels+=width*width;if(width==1)break;}return pixels*16*5;};
-  for(const auto &input:inputs){if(!input.owner)throw std::invalid_argument("Missing immutable overlay input");auto owner=contribution(input.owner);Key key{owner.get(),input.pbr};if(wanted.contains(key))continue;const auto size=measure(owner->resolution());if(size>budget-bytes)throw std::length_error("GPU overlay cache byte budget exceeded");bytes+=size;wanted.emplace(key,Input{std::move(owner),input.pbr});}
-  if(wanted.size()>max_images/5)throw std::length_error("GPU overlay image count exceeded");
+ static size_t texture_bytes(const std::shared_ptr<const PaintOverlayPacket> &owner){
+  if(!owner)throw std::invalid_argument("Missing immutable overlay input");if(owner->empty())return 0;
+  size_t pixels=0;for(size_t width=owner->resolution();;width=std::max(size_t(1),width/2)){pixels+=width*width;if(width==1)break;}return pixels*16*5;
+ }
+ static size_t texture_images(const std::shared_ptr<const PaintOverlayPacket> &owner){if(!owner)throw std::invalid_argument("Missing immutable overlay input");return owner->empty()?0:5;}
+
+ void prepare(const std::vector<Input> &inputs,size_t budget=1024ull*1024*1024,size_t max_images=1024,size_t working_budget=256ull*1024*1024){
+  if(inputs.size()>512)throw std::length_error("GPU overlay descriptor count exceeds two interpretations per native object");
+  std::map<Key,Input> wanted;size_t bytes=0,images=0;
+  for(const auto &input:inputs){auto owner=contribution(input.owner);Key key{owner.get(),input.pbr};if(wanted.contains(key))continue;
+    const auto size=texture_bytes(owner);images+=texture_images(owner);if(size>budget-bytes)throw std::length_error("GPU overlay cache byte budget exceeded");
+    bytes+=size;wanted.emplace(key,Input{std::move(owner),input.pbr});}
+  if(images>max_images)throw std::length_error("GPU overlay image count exceeded");
   for(auto it=cache_.begin();it!=cache_.end();)if(!wanted.contains(it->first)){glDeleteTextures(5,it->second.planes.data());it=cache_.erase(it);}else ++it;
   std::vector<Key> added;added.reserve(wanted.size());
-  try{for(const auto &[key,input]:wanted)if(!cache_.contains(key)){auto value=build(input.owner,input.pbr,budget-(bytes-measure(input.owner->resolution())));try{cache_.emplace(key,std::move(value));added.push_back(key);}catch(...){glDeleteTextures(5,value.planes.data());throw;}}}
+  try{for(const auto &[key,input]:wanted)if(!cache_.contains(key)){auto value=build(input.owner,input.pbr,budget-(bytes-(texture_bytes(input.owner))),working_budget);try{cache_.emplace(key,std::move(value));added.push_back(key);}catch(...){glDeleteTextures(5,value.planes.data());throw;}}}
   catch(...){for(const auto &key:added){auto it=cache_.find(key);glDeleteTextures(5,it->second.planes.data());cache_.erase(it);}throw;}
  }
  const Resource &at(const std::shared_ptr<const PaintOverlayPacket> &packet,bool pbr)const{return cache_.at({contribution(packet).get(),pbr});}
  size_t bytes()const{size_t count=0;for(const auto &[key,value]:cache_)count+=value.bytes;return count;}
  size_t size()const noexcept{return cache_.size();}
+ size_t image_count()const noexcept{size_t n=0;for(const auto &[key,value]:cache_)if(value.bytes)n+=5;return n;}
  void clear(bool release){if(release)for(const auto &[key,value]:cache_)glDeleteTextures(5,value.planes.data());cache_.clear();if(release){if(program_)glDeleteProgram(program_);if(vao_)glDeleteVertexArrays(1,&vao_);}program_=vao_=0;}
  ~PaintOverlayCompiler(){clear(true);}
 };

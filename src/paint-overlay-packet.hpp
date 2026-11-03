@@ -13,7 +13,7 @@ struct PaintOverlayLayer {
 // current PaintedMesh/Scene back-edge, serialized seal or dense CPU float image.
 class PaintOverlayPacket {
  friend struct PaintOverlayFactory;
- uint32_t resolution_=0;
+ uint32_t resolution_=0;bool empty_=true;size_t storage_bytes_=0;
  std::vector<PaintOverlayLayer> layers_;
  std::shared_ptr<const std::vector<int32_t>> padding_;
  std::shared_ptr<const BakedTextures> baked_;
@@ -22,6 +22,8 @@ class PaintOverlayPacket {
  PaintOverlayPacket()=default;
 public:
  uint32_t resolution()const noexcept{return contribution_owner_?contribution_owner_->resolution():resolution_;}
+ bool empty()const noexcept{return contribution_owner_?contribution_owner_->empty():empty_;}
+ size_t storage_bytes()const noexcept{return storage_bytes_+(contribution_owner_?contribution_owner_->storage_bytes():0);}
  std::span<const PaintOverlayLayer> layers()const noexcept{return contribution_owner_?contribution_owner_->layers():std::span<const PaintOverlayLayer>(layers_);}
  const std::shared_ptr<const std::vector<int32_t>>&padding()const noexcept{return contribution_owner_?contribution_owner_->padding():padding_;}
  const std::shared_ptr<const BakedTextures>&baked()const noexcept{return contribution_owner_?contribution_owner_->baked():baked_;}
