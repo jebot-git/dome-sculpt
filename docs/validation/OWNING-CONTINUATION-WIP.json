@@ -1,0 +1,426 @@
+{
+  "date": "2026-11-03",
+  "parent": "169918d53de3d7ca36c10bc02a1a836522cc04fe",
+  "admission": false,
+  "goal": "Robust native automatic weights remains incomplete/active. Public automatic_bind unchanged.",
+  "source": {
+    "src/anatomical-continuation.hpp": "e21118db7fd12834c088380b4f345e6adbecf0572344bc2c4532329e447246af",
+    "src/bone-shadow-query.hpp": "8acd39d4f0a1369ea6ed179e58b23ab3e3206b7151be22db24c6787ddc772129",
+    "src/bone-shadow-filter.hpp": "f9fcbce9c9973cd7c89e994a7baff3baa4927444e17d4e8d6d9777ec185862e0",
+    "src/material-visibility-seams.hpp": "69f2e206cd6577c7b9050e43cfb69a8c9e1c4c6b177056be538b7cd993554720",
+    "src/bone-line-integral.hpp": "938f07d5ee2a86289926281ac8ff272a458f1d5e0382b6fd1b75f568973fccb6",
+    "src/bone-source-shadow.hpp": "de2a95bb1a98a764626d753a7622d00d8a49724814bc57f64c5965258501a520",
+    "tests/anatomical-continuation-avatars.cpp": "555bc324e3de8681990a87e4ac803480d3ae898bd9ab4961a328e54fbff0f27f",
+    "tests/bone-shadow-query.cpp": "a20ffe1e3d8ce5e364aead5ac21befed886064715bdb85ff6dace92c93877a89",
+    "tests/bone-shadow-filter.cpp": "670545f7e4949622e62cd90f9f867d019f042ac7c01bdf3df23ce736faff2d3d",
+    "tests/continuation-cost-diagnostic.py": "0613eb6b99f92666d64c40b9dec73b8e405111598dbb9c8437defb1afb89bc76",
+    "third_party/sources.json": "9e56019c0668871d3b871ab15f01bb12c9bf87ed60ca90ff0c5568a79a7bc721"
+  },
+  "actual_energy": "screened positive surface/contact graph with analytic finite-source visible integrals; not BBW/volume",
+  "intent": "OriginalPositiveUsage per connected source component; no artist magnitude in energy/RHS; general user/native intent unfinished",
+  "wall_domain": "ConnectedSourceSurface explicitly selected before running; WholeGroup unknown-origin control remains refused",
+  "production_limits": {
+    "work": 500000000,
+    "workspace_bytes": 536870912,
+    "pose_mean_height": 0.005,
+    "pose_max_height": 0.02,
+    "solver_relative": 1e-09,
+    "partition": 1e-09
+  },
+  "storage": {
+    "implementation": "src/rig.cpp normalize_weights linked from matching frozen native core",
+    "max_influences": 4,
+    "prune": 1e-05,
+    "locks": [],
+    "policy_selection": "existing defaults fixed before pose outcomes; no custom pruning or failed-solve normalization",
+    "qualification": "Diagnostic actually calls native function. Candidate field is NOT wired to production UI/locks/publication yet.",
+    "raw_negative": "Male Tops torso full untruncated mean0.00918137560944 exceeds0.00878326535225. Native four-influence mean0.00549215252662 passes. Raw fields/metrics preserved."
+  },
+  "overlay_scope": {
+    "method": "fresh own test/heat/query TU + unchanged matching b32 native core/render/support archives; no public layout changes; not whole fresh app/solver SAN",
+    "libraries": {
+      "artifacts/kernel-libraries/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+      "artifacts/kernel-libraries/libdome-sculpt-core.a": "fb31277a000ea0c42744c8f0863c1778f3076f323acb8ab37f308c7520aad648",
+      "artifacts/kernel-libraries/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+      "artifacts/kernel-libraries/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+      "artifacts/kernel-libraries/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+      "artifacts/kernel-libraries/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+      "artifacts/kernel-libraries/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2",
+      "artifacts/kernel-libraries/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64"
+    },
+    "public_headers": {
+      "include/dome/affine.hpp": "6d281334bb635072a98d806bb0642ce7b08739c5c8dd438c36e29fbcf7a07a47",
+      "include/dome/avatar.hpp": "1850232616222ecc48d73f281bb3160afbfa0a15a30cd6b6444d779fed7f1866",
+      "include/dome/bake-authoring.hpp": "ee78d758edf3c1e9be9abbe56f46b94673d892f586022717b980ee68d189d33f",
+      "include/dome/bake.hpp": "d789377adf3b4df6a51341d296bf8c96bddf9ad7213ee6c309b9063a5489f3ed",
+      "include/dome/brush.hpp": "60b61ab21cae66c2a5fdf560c610c1b9a0ba600953d44baa90a97ef8dfc4aac1",
+      "include/dome/color-paint-sampling.hpp": "d13b0bbcf3b5f90f2beddd84d173417b8a9270afa17494a811de7b891f51ed0d",
+      "include/dome/color-preparation.hpp": "b9d2910815338d1f26407106867744ac6a5e0ff48dcd4d7a29531254266405f9",
+      "include/dome/cow-map.hpp": "313ed0271bd68475b309518aca3d66ecb583936eba4f134211dfcda38cbd98d2",
+      "include/dome/creation.hpp": "7c00308874bd191d5d0f86066a28f20741ab0d7f94614a3739e071eedfdd269f",
+      "include/dome/creator-archive.hpp": "aa0cafa0d182ae65a1579f6c0d52d77212bbf483852ad64ed0f2e1da9223c24c",
+      "include/dome/csg.hpp": "9a61f12342d3afc7b61144fe570ef77a1f9481c1bf7f0f502d4ae470638890e9",
+      "include/dome/cut-authoring.hpp": "4fcd370017c833e3f21c75f42194476ce40c16662ee4b3a648e1820064f75c22",
+      "include/dome/deformation.hpp": "21cfc5c2baec53ee57940586c2e2b85cf3c3e027ffb4cfb366e577a6bd5bcc49",
+      "include/dome/document.hpp": "8b409f16a50689bbe91947f28c47c0cc48b3943731cf59151d8dc06f3ac1fc1c",
+      "include/dome/frame-clock.hpp": "27f172acd02d608b4894cde6313fd2f1f0e9cd8ed197977a035635d7c3e4c9a2",
+      "include/dome/gltf-export.hpp": "f1dba0e3f785aebdb31cdaea7c5477b19b83375ea8c13cd3b538ed9fcb344e05",
+      "include/dome/groups.hpp": "ab5d0b99908fe81d5a100e97642a2e13381c0bfb56e8f01c54d5364739bdce89",
+      "include/dome/humanoid-creator.hpp": "5d834229fc4a8f824e52f22db56d9bf833608e35ee5f240d6eab9eb33d838d1a",
+      "include/dome/import-authoring.hpp": "5d2ceac6ea531d5552a5ff904daff1599655365e7ed8265c7de8d4c7b40075e8",
+      "include/dome/import-browser.hpp": "4a8f82dcecb293a944422c67733c6a19bd7ef93db41a7693e9ee9591392f421d",
+      "include/dome/import-image.hpp": "657899e993c2b9510c8d08f45d1d3ffb761f3d463feec78aee24c285684b6ac2",
+      "include/dome/import-native.hpp": "75a828f0245ef1f50f776a2fbb9ec662d20f6134640b4da88dd3c9c4c972696e",
+      "include/dome/import-options.hpp": "60f86b619f15ea4b91b9f647986c8f03af3ab0b50f1bddace98bd3aac726290a",
+      "include/dome/import-source.hpp": "0c1ae2816d40bd8512a13c842c11ce5272ea9d8c0386946c02ca033eaa418ec9",
+      "include/dome/import.hpp": "d109e660ee4231c3708614296be45d4ff3ff1cf8a55a89dcda7d130f3a18922e",
+      "include/dome/input.hpp": "ae838cba0cfba7e79df3d7bcc07acc5155af23243b27c25644b56a00ebf50070",
+      "include/dome/local-surface.hpp": "2c83a5cb8534611061bcb38a041bffdc30cfec1f4a528452372b56e079eedc9c",
+      "include/dome/material-bindings.hpp": "bb6ccc4b745739bccf0f79dac702c6f15c3ffd5fb596164c48417540ba948e27",
+      "include/dome/material-visibility.hpp": "f61dfcf26e1322b6ce4178a5c1852c0fb422d5446fd1b67b228bd693645dea62",
+      "include/dome/math.hpp": "838e53b6c6c3881b3b73ea93bb680be268947a5b28b6e4657771e43b1f1d1f3f",
+      "include/dome/mesh-authoring.hpp": "fab921b5505d6a78e2341518cad4ab2adf35b788781c94ec1e9754f231aac344",
+      "include/dome/mesh-processing.hpp": "a53fe4e768f47807e9d9cb3dd4cc03eab48a2583a8e42e0b27cc1b3c925e53fc",
+      "include/dome/mesh.hpp": "c4d9196f4d6c8a817da71b7849a44196f5f317ad05da59cb5efae1ccb932fd5f",
+      "include/dome/mtoon-shader.hpp": "0b0367d3b78a33312c6f8b92aebdb29d67383cbcdd435a3289202eb2a594e47d",
+      "include/dome/mtoon.hpp": "d452ce2a3615de38b918bb0fbd63d103f5e016d47db71ea1c474871e7d4c430d",
+      "include/dome/native-stroke.hpp": "157035979faa84169e04ee2a19154b021f6b202c8990bfe785f752ad14d18d68",
+      "include/dome/navigation.hpp": "435432e2ebd15812382ef6691bdfbb074533bf450ddfd55ed1ad1466c27f3ae2",
+      "include/dome/normal-frames.hpp": "1c9b22240da185c11fc5babce936a9127dc67eec028e6a9a09ebb730ab87edb9",
+      "include/dome/normal-preparation.hpp": "334c1713aef1803c99d37608540e6610e85a69009e90bdcfd47950fc407e4eae",
+      "include/dome/normal-preview.hpp": "7d9a62279687ca780a45cf1496af4413350d6d571e6dd8e840dc6b9d0d7da3d6",
+      "include/dome/normal-sampling.hpp": "ef36fe1eafd0799725b2a6a72f71ce6de9618c02e950309b650956a3ec39e45e",
+      "include/dome/object-selection.hpp": "f860745a8f763667a095f4d9a7272e2e023c24f45b841a1ae422c7cb8651e022",
+      "include/dome/paint-sampling.hpp": "fbd4465ff56cc4800a67c694ab8911ce5a3fd7f3be96cd3e8ad46b7cb7905dfc",
+      "include/dome/paint.hpp": "12306cb41489eb853dbec0591ca7feab0b792fc26dfc04b7af80a0529d3331ed",
+      "include/dome/palette.hpp": "f1050595a21353d2697306332776f45123c894b1d803a1e7d8d4f1b77a6c2676",
+      "include/dome/polygon-authoring.hpp": "8eb260e02bf3fea8b9334d64c2dcf261a0f7eff6f8d287f76035b2d000fae2ad",
+      "include/dome/polygon-color.hpp": "dbf5a8b382970af1578bb58bad0fc8590126055fa6bdebf376c2382f3e2c2638",
+      "include/dome/polygon-controls.hpp": "c31dd43d0e4d00f294086adbbb0263765db47ddfac4e58cf8c6c2da6c8924d6f",
+      "include/dome/polygon-render.hpp": "e0a2374db60e1e1912093fbe0bdb085b0fc3d109b467c37bb930b062d3be27f3",
+      "include/dome/polygon-scene.hpp": "b86c63e74453df16cf6cf272592e5d6d2718747687044d5bd0e917b10f6988a6",
+      "include/dome/polygon-source.hpp": "7482a153e631de0980e5e595dcad3f0d927210ab3845c0fb7a72200028a8b781",
+      "include/dome/polygon.hpp": "90f1915d19105c3b1269978e827b99c58f39aa5eae1d587cde1b6b0b5937abfe",
+      "include/dome/procedural-sculpt.hpp": "44f02f174caf656771e69ee65d48a72ce8a0b427720e4a11c7a32e049b638f5e",
+      "include/dome/projection-tool.hpp": "3c65893d140c23b71e22ff96980c8e4b8992e9f349692dbb9c8f3f7b504df37a",
+      "include/dome/projection.hpp": "7cf949f0576fb2c4b445c8750c8dfd36515fc15b86b0ca9174cc9f4a5524d578",
+      "include/dome/recovery.hpp": "a5dd5ccc013c1b3734937814d1126fffde7d3fe59edab485739e23e33bdc78b9",
+      "include/dome/remesh.hpp": "8be22f603ccebfbebbca9582cf35bedc473a2d49b982a8c65fb8135bacefb0d0",
+      "include/dome/render.hpp": "18dedd439e2b1974ea8d38e216bf164a88663e5660eeaa4d3e98639cdf47b867",
+      "include/dome/retopo-authoring.hpp": "41597175a1ce00bbae941f99b019c065af013caa2579790186e81306cf4ac2c8",
+      "include/dome/retopo.hpp": "e0994d5d4a879ddb182c2a53a6e69a056c4d3fdafc431eec96aae5005a9f5a14",
+      "include/dome/rig-edit.hpp": "89cc3a8896b4d2a56839bf136d0dffe5c4964c4966659c8cca2bf968015d0273",
+      "include/dome/rig-fit-tool.hpp": "9de366724cf33a79fa3c49db3a99213c0f680c06b8151119b8fa4324d595c3db",
+      "include/dome/rig-fit.hpp": "496b8b550ab546940bf31bc3a91a91fe96c48ff495922c1ebedc6615bf81f9e0",
+      "include/dome/rig-rest.hpp": "85bad1052c4b776a2956eae997b19c8dc107a327fd7a24eede40d1258b02f1fb",
+      "include/dome/rig.hpp": "d896f2da376b942e6d5e0eb7f75323db1315621929bafeb2220799d24ca2d837",
+      "include/dome/scene.hpp": "49a92bc2bd5b0046591069557c29fcd61eb847f9b3d3388b6e34c0044b33a843",
+      "include/dome/sculpt-resolution.hpp": "9940ab416d84c340ce1a032556b95a883504907360965ee6866396ffc94e6803",
+      "include/dome/sculpt-storage.hpp": "33c6f86d8d4ef6d5d3be560da2ccbeca9ded02491c1045213479ce056dc7d9bc",
+      "include/dome/session-appearance.hpp": "6bfad9c9ac339fd11bbbf1367a799f840a64bc8451215282ebd5a0c2a4c36c71",
+      "include/dome/shapekey-authoring.hpp": "ca8c19fd6033f0441501795d80ab87054924f87cfd97163a31184ed32c3728e6",
+      "include/dome/shapekey-sculpt.hpp": "856faa9bef79f2893f99b60a6190798aefa8d70c6ba501f7760b168c9d224413",
+      "include/dome/skin-authoring.hpp": "66c90c1413cad80f301b38926a2653f4a7fdcd65ea5318566142b715fd180e19",
+      "include/dome/source-maps.hpp": "448a6ce687a623bfa4de12c649c3e15ac915b211621908b37d6fdb49c9f7010a",
+      "include/dome/source-placement.hpp": "efcc19f45778b70bd878c91080874c6ad69dbfa1b5ccda8a32e2e6363ee09a4c",
+      "include/dome/source-uv-bake.hpp": "792af85cd9ce733fe8a998718ecbcabd601db613aee1a37c435149b1c082e029",
+      "include/dome/tangents.hpp": "94a6ff78b1ed0c27aa3e5da8b2991fc1e69a91aab43738a19dd3efc6ac25b1d4",
+      "include/dome/uv-solve.hpp": "91975fae61a91dfc8508adf05140f5bc672fb58673e381bda0fb09a25cedbc9c",
+      "include/dome/uv.hpp": "b56838939e46211b48d15fd2f90baaa0bdf30717a2794234345f04f74db1a0fa",
+      "include/dome/volume.hpp": "27d97b346073f815f5228d62e86fe49f9f523891d60d89bb567d79c8b783cab7",
+      "include/dome/vr-controls.hpp": "d7cc4f95f0e6406476c169740ae47ec1accf84b207f8c0c2f217a0b1cc884fb4",
+      "include/dome/vrm.hpp": "3dd0ef99d84cd8e7f69b607f008d2ac7c465655008eaec6533729f461c970b3c",
+      "include/dome/weight-authoring.hpp": "c6e854e995c354cc4ccab84dd611b3cd659ea2831cfb1a9bc8ff16120b851d80",
+      "include/dome/weight-edit.hpp": "17d0c55eb08131db6ba30a9196acd70e3b91a35fb71f7176b4f606b4d0ad31c5",
+      "include/dome/xr.hpp": "f1c2ea34b362e24333b8a206692af4d0909610948015b7509bfbeb16a5857ee6"
+    }
+  },
+  "complete_diagnostics": {
+    "deferred_exact_baseline": {
+      "male": {
+        "certified": "CERTIFIED rows=8122 controls=54 source_integrals=77896 contacts=15185 iterations=54 residual=2.80580856525e-13 minimum=0 partition=2.07611705605e-14 work=2403170333 bytes=131858926 visibility_seams=0 query_nodes=10608966 query_candidates=3468225 shadow_intervals=540491 shadow_unions=50856 exact_predicates=759109 filtered_misses=2871321 filtered_full=8353 row_hits=1287826 row_misses=2180399 source_hits=1648568 source_misses=85255",
+        "summary": "SUMMARY parts=2 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "pose_lines": [
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=0 mean=0.00205785108912 max=0.0148019658092 full_mean=0.00364728590524 full_max=0.0203346095546 worst=1894 quality=1 seam=1 native=2.02561048864e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=1 mean=0.000729654525753 max=0.0129495018336 full_mean=0.00282091636415 full_max=0.0115996927532 worst=534 quality=1 seam=1 native=1.87042115053e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=2 mean=0.00100704585088 max=0.0116009940674 full_mean=0.00159355844877 full_max=0.0113048303518 worst=2112 quality=1 seam=1 native=1.76181229852e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=3 mean=0.00303311355174 max=0.0308580527426 full_mean=0.00851847591288 full_max=0.023528710372 worst=273 quality=1 seam=1 native=2.18487243853e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=4 mean=0.00100704585088 max=0.0116009940674 full_mean=0.00159355844877 full_max=0.0113048303518 worst=2112 quality=1 seam=1 native=1.76181229852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=0 mean=0.000209425284275 max=0.00701445485557 full_mean=0.00101418627439 full_max=0.00599053375838 worst=724 quality=1 seam=1 native=1.49164448619e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=1 mean=0.00227276891313 max=0.0216741157848 full_mean=0.00527239982225 full_max=0.0184723125323 worst=1072 quality=1 seam=1 native=1.76965399256e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=2 mean=2.35865786063e-08 max=9.75944733855e-08 full_mean=0.000205853574307 full_max=0.000808086920337 worst=194 quality=1 seam=1 native=1.49164448619e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=3 mean=0.00549215252662 max=0.031623928677 full_mean=0.00918137560944 full_max=0.0309928352356 worst=1 quality=1 seam=1 native=2.33407340081e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=4 mean=2.35865786063e-08 max=9.75944733855e-08 full_mean=0.000205853574307 full_max=0.000808086920337 worst=194 quality=1 seam=1 native=1.49164448619e-07"
+        ],
+        "products": {
+          "artifacts/continuation-field-snapshot-16b/male-full-fields.bin": "c4923e95937e70b8466f0178ae5bf2a037438270e9979565d200aea7f54a6887",
+          "artifacts/continuation-field-snapshot-16b/male-field-layout.json": "fa82913b063ebeab999a45d685740442512a87e11b7051c843ff3bb18a65fd82",
+          "artifacts/continuation-field-snapshot-16b/male-native-output-skins.json": "9097eda799b753244f70917b0ade40f2d032e195cfc5700b423180c62fb9c754",
+          "artifacts/continuation-field-snapshot-16b/male-input-scene.json": "e6a4f66452bb73cf895e36738510decc5695ac8fd3f3ff60478207800f31dbf3"
+        },
+        "log": {
+          "path": "artifacts/continuation-field-snapshot-16b/male.log",
+          "sha256": "bee54955dd9495d7225eb6ff715d067b9f129a2804cb1660c88dde75173213f0"
+        },
+        "time_report": {
+          "path": "artifacts/continuation-field-snapshot-16b/male-time.log",
+          "sha256": "abf47d60f923c55e30e3be5662c09abda7fd0a22b1539be2ecee014a66428142",
+          "text": "\tCommand being timed: \"artifacts/continuation-field-snapshot-16b/probe male body connected artifacts/continuation-field-snapshot-16b/male\"\n\tUser time (seconds): 7.85\n\tSystem time (seconds): 0.24\n\tPercent of CPU this job got: 99%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:08.13\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 913436\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 66767\n\tVoluntary context switches: 1\n\tInvoluntary context switches: 250\n\tSwaps: 0\n\tFile system inputs: 0\n\tFile system outputs: 953152\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n"
+        }
+      },
+      "female": {
+        "certified": "CERTIFIED rows=7942 controls=64 source_integrals=92971 contacts=12278 iterations=64 residual=2.37787386462e-13 minimum=0 partition=1.02140518266e-14 work=2800552561 bytes=126544782 visibility_seams=0 query_nodes=13907663 query_candidates=4004379 shadow_intervals=616911 shadow_unions=60091 exact_predicates=863010 filtered_misses=3319612 filtered_full=14077 row_hits=1388514 row_misses=2615865 source_hits=1850624 source_misses=95280",
+        "summary": "SUMMARY parts=2 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "pose_lines": [
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=0 mean=0.00141045914823 max=0.0142851625422 full_mean=0.00342124082172 full_max=0.0208538938339 worst=1516 quality=1 seam=1 native=1.69501835717e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=1 mean=0.000497825018738 max=0.0104864245859 full_mean=0.00174940603056 full_max=0.00943353160797 worst=1119 quality=1 seam=1 native=1.75283082387e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=2 mean=0.000639303027847 max=0.00975448909052 full_mean=0.00124327596734 full_max=0.0101205219938 worst=1612 quality=1 seam=1 native=1.55180132309e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=3 mean=0.00240279917442 max=0.0159671061007 full_mean=0.00694046165316 full_max=0.0201051509826 worst=168 quality=1 seam=1 native=2.03678875751e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=4 mean=0.000639303027847 max=0.00975448909052 full_mean=0.00124327596734 full_max=0.0101205219938 worst=1612 quality=1 seam=1 native=1.55180132309e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=0 mean=0.000138628874135 max=0.00916893298528 full_mean=0.000906960940536 full_max=0.0086691391064 worst=588 quality=1 seam=1 native=1.56094076852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=1 mean=0.00283012131414 max=0.0177152507321 full_mean=0.00430941977657 full_max=0.0128174820117 worst=1101 quality=1 seam=1 native=1.71293877992e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=2 mean=2.17266013842e-08 max=9.78870290343e-08 full_mean=9.88658690802e-05 full_max=0.000524388888778 worst=913 quality=1 seam=1 native=1.56094076852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=3 mean=0.00383662977281 max=0.0256207677879 full_mean=0.00699070808827 full_max=0.0295451622293 worst=740 quality=1 seam=1 native=2.24245508011e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=4 mean=2.17266013842e-08 max=9.78870290343e-08 full_mean=9.88658690802e-05 full_max=0.000524388888778 worst=913 quality=1 seam=1 native=1.56094076852e-07"
+        ],
+        "products": {
+          "artifacts/continuation-field-snapshot-16b/female-full-fields.bin": "ebcf28d3a1123bab5beb00b8b84981ce5a8c5cb4ac8b59a146f8021e4ceb067f",
+          "artifacts/continuation-field-snapshot-16b/female-field-layout.json": "10c106c1026ca5ed8dfb40525b15d932ad990c20ae2e90d65e1b057ef4af2ba3",
+          "artifacts/continuation-field-snapshot-16b/female-native-output-skins.json": "3fc1716c0fd43592d9fa09bf9d5f363049d53372c5afeb55cd56c2040badac27",
+          "artifacts/continuation-field-snapshot-16b/female-input-scene.json": "e9c2487e8bb3e8d145d50643b7cdb0097b04e77f7c15e5d943b979dd37b5dbe0"
+        },
+        "log": {
+          "path": "artifacts/continuation-field-snapshot-16b/female.log",
+          "sha256": "6544b894a56daa911e5a106f4b0916348b9665a2e52447ed4dce49edc2bc0756"
+        },
+        "time_report": {
+          "path": "artifacts/continuation-field-snapshot-16b/female-time.log",
+          "sha256": "2d00935dabb6429068a8093fec6a2b6bea5e6e74b5389b0d28590e870cee38ea",
+          "text": "\tCommand being timed: \"artifacts/continuation-field-snapshot-16b/probe female body connected artifacts/continuation-field-snapshot-16b/female\"\n\tUser time (seconds): 9.03\n\tSystem time (seconds): 0.22\n\tPercent of CPU this job got: 99%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:09.27\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 901588\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 69031\n\tVoluntary context switches: 1\n\tInvoluntary context switches: 31\n\tSwaps: 0\n\tFile system inputs: 0\n\tFile system outputs: 921856\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n"
+        }
+      }
+    },
+    "retained_incremental": {
+      "male": {
+        "certified": "CERTIFIED rows=8122 controls=54 source_integrals=77896 contacts=15185 iterations=54 residual=2.80580856525e-13 minimum=0 partition=2.07611705605e-14 work=1883140268 bytes=131867048 visibility_seams=0 query_nodes=7965523 query_candidates=2447259 shadow_intervals=456374 shadow_unions=51271 exact_predicates=591973 filtered_misses=1946433 filtered_full=7222 row_hits=830775 row_misses=1617232 source_hits=1168353 source_misses=69666",
+        "summary": "SUMMARY parts=2 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "pose_lines": [
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=0 mean=0.00205785108912 max=0.0148019658092 full_mean=0.00364728590524 full_max=0.0203346095546 worst=1894 quality=1 seam=1 native=2.02561048864e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=1 mean=0.000729654525753 max=0.0129495018336 full_mean=0.00282091636415 full_max=0.0115996927532 worst=534 quality=1 seam=1 native=1.87042115053e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=2 mean=0.00100704585088 max=0.0116009940674 full_mean=0.00159355844877 full_max=0.0113048303518 worst=2112 quality=1 seam=1 native=1.76181229852e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=3 mean=0.00303311355174 max=0.0308580527426 full_mean=0.00851847591288 full_max=0.023528710372 worst=273 quality=1 seam=1 native=2.18487243853e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=4 mean=0.00100704585088 max=0.0116009940674 full_mean=0.00159355844877 full_max=0.0113048303518 worst=2112 quality=1 seam=1 native=1.76181229852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=0 mean=0.000209425284275 max=0.00701445485557 full_mean=0.00101418627439 full_max=0.00599053375838 worst=724 quality=1 seam=1 native=1.49164448619e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=1 mean=0.00227276891313 max=0.0216741157848 full_mean=0.00527239982225 full_max=0.0184723125323 worst=1072 quality=1 seam=1 native=1.76965399256e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=2 mean=2.35865786063e-08 max=9.75944733855e-08 full_mean=0.000205853574307 full_max=0.000808086920337 worst=194 quality=1 seam=1 native=1.49164448619e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=3 mean=0.00549215252662 max=0.031623928677 full_mean=0.00918137560944 full_max=0.0309928352356 worst=1 quality=1 seam=1 native=2.33407340081e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=4 mean=2.35865786063e-08 max=9.75944733855e-08 full_mean=0.000205853574307 full_max=0.000808086920337 worst=194 quality=1 seam=1 native=1.49164448619e-07"
+        ],
+        "products": {
+          "artifacts/continuation-incremental-snapshot-16b/male-full-fields.bin": "c4923e95937e70b8466f0178ae5bf2a037438270e9979565d200aea7f54a6887",
+          "artifacts/continuation-incremental-snapshot-16b/male-field-layout.json": "fa82913b063ebeab999a45d685740442512a87e11b7051c843ff3bb18a65fd82",
+          "artifacts/continuation-incremental-snapshot-16b/male-native-output-skins.json": "9097eda799b753244f70917b0ade40f2d032e195cfc5700b423180c62fb9c754",
+          "artifacts/continuation-incremental-snapshot-16b/male-input-scene.json": "e6a4f66452bb73cf895e36738510decc5695ac8fd3f3ff60478207800f31dbf3"
+        },
+        "log": {
+          "path": "artifacts/continuation-incremental-snapshot-16b/male.log",
+          "sha256": "300a78cf0846b41b03eddb95a94e1d32148e5e9a93c1a1e84c5b8967074c55ea"
+        },
+        "time_report": {
+          "path": "artifacts/continuation-incremental-snapshot-16b/male-time.log",
+          "sha256": "b361227bd9e2737f2bc317dcf5bff6df986305a8ac20eeb7525ee39ad8c88f01",
+          "text": "\tCommand being timed: \"artifacts/continuation-incremental-snapshot-16b/probe male body connected artifacts/continuation-incremental-snapshot-16b/male\"\n\tUser time (seconds): 7.47\n\tSystem time (seconds): 0.28\n\tPercent of CPU this job got: 99%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:07.78\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 911532\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 64391\n\tVoluntary context switches: 3\n\tInvoluntary context switches: 163\n\tSwaps: 0\n\tFile system inputs: 0\n\tFile system outputs: 953152\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n"
+        }
+      },
+      "female": {
+        "certified": "CERTIFIED rows=7942 controls=64 source_integrals=92971 contacts=12278 iterations=64 residual=2.37787386462e-13 minimum=0 partition=1.02140518266e-14 work=2148631632 bytes=126552724 visibility_seams=0 query_nodes=10194890 query_candidates=2789070 shadow_intervals=513136 shadow_unions=60418 exact_predicates=661033 filtered_misses=2221813 filtered_full=11534 row_hits=864752 row_misses=1925090 source_hits=1277483 source_misses=77707",
+        "summary": "SUMMARY parts=2 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "pose_lines": [
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=0 mean=0.00141045914823 max=0.0142851625422 full_mean=0.00342124082172 full_max=0.0208538938339 worst=1516 quality=1 seam=1 native=1.69501835717e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=1 mean=0.000497825018738 max=0.0104864245859 full_mean=0.00174940603056 full_max=0.00943353160797 worst=1119 quality=1 seam=1 native=1.75283082387e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=2 mean=0.000639303027847 max=0.00975448909052 full_mean=0.00124327596734 full_max=0.0101205219938 worst=1612 quality=1 seam=1 native=1.55180132309e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=3 mean=0.00240279917442 max=0.0159671061007 full_mean=0.00694046165316 full_max=0.0201051509826 worst=168 quality=1 seam=1 native=2.03678875751e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=4 mean=0.000639303027847 max=0.00975448909052 full_mean=0.00124327596734 full_max=0.0101205219938 worst=1612 quality=1 seam=1 native=1.55180132309e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=0 mean=0.000138628874135 max=0.00916893298528 full_mean=0.000906960940536 full_max=0.0086691391064 worst=588 quality=1 seam=1 native=1.56094076852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=1 mean=0.00283012131414 max=0.0177152507321 full_mean=0.00430941977657 full_max=0.0128174820117 worst=1101 quality=1 seam=1 native=1.71293877992e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=2 mean=2.17266013842e-08 max=9.78870290343e-08 full_mean=9.88658690802e-05 full_max=0.000524388888778 worst=913 quality=1 seam=1 native=1.56094076852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=3 mean=0.00383662977281 max=0.0256207677879 full_mean=0.00699070808827 full_max=0.0295451622293 worst=740 quality=1 seam=1 native=2.24245508011e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=4 mean=2.17266013842e-08 max=9.78870290343e-08 full_mean=9.88658690802e-05 full_max=0.000524388888778 worst=913 quality=1 seam=1 native=1.56094076852e-07"
+        ],
+        "products": {
+          "artifacts/continuation-incremental-snapshot-16b/female-full-fields.bin": "ebcf28d3a1123bab5beb00b8b84981ce5a8c5cb4ac8b59a146f8021e4ceb067f",
+          "artifacts/continuation-incremental-snapshot-16b/female-field-layout.json": "10c106c1026ca5ed8dfb40525b15d932ad990c20ae2e90d65e1b057ef4af2ba3",
+          "artifacts/continuation-incremental-snapshot-16b/female-native-output-skins.json": "3fc1716c0fd43592d9fa09bf9d5f363049d53372c5afeb55cd56c2040badac27",
+          "artifacts/continuation-incremental-snapshot-16b/female-input-scene.json": "e9c2487e8bb3e8d145d50643b7cdb0097b04e77f7c15e5d943b979dd37b5dbe0"
+        },
+        "log": {
+          "path": "artifacts/continuation-incremental-snapshot-16b/female.log",
+          "sha256": "5acdc4a9c6088f7e2859e1331de34dd8359f5635a2cec47b88aabd3b21a51aaa"
+        },
+        "time_report": {
+          "path": "artifacts/continuation-incremental-snapshot-16b/female-time.log",
+          "sha256": "28670decd2e725980eac56f8819a43852b5a2650ec824292d156fa13c402455f",
+          "text": "\tCommand being timed: \"artifacts/continuation-incremental-snapshot-16b/probe female body connected artifacts/continuation-incremental-snapshot-16b/female\"\n\tUser time (seconds): 8.19\n\tSystem time (seconds): 0.26\n\tPercent of CPU this job got: 99%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:08.48\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 901184\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 69562\n\tVoluntary context switches: 2\n\tInvoluntary context switches: 197\n\tSwaps: 0\n\tFile system inputs: 0\n\tFile system outputs: 921888\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n"
+        }
+      }
+    },
+    "rejected_projected_fan": {
+      "male": {
+        "certified": "CERTIFIED rows=8122 controls=54 source_integrals=77896 contacts=15185 iterations=54 residual=2.80580856525e-13 minimum=0 partition=2.07611705605e-14 work=2137551827 bytes=131867048 visibility_seams=0 query_nodes=6803831 query_candidates=1215846 shadow_intervals=456374 shadow_unions=51271 exact_predicates=524420 filtered_misses=716093 filtered_full=7222 row_hits=289762 row_misses=926832 source_hits=652900 source_misses=52560",
+        "summary": "SUMMARY parts=2 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "pose_lines": [
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=0 mean=0.00205785108912 max=0.0148019658092 full_mean=0.00364728590524 full_max=0.0203346095546 worst=1894 quality=1 seam=1 native=2.02561048864e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=1 mean=0.000729654525753 max=0.0129495018336 full_mean=0.00282091636415 full_max=0.0115996927532 worst=534 quality=1 seam=1 native=1.87042115053e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=2 mean=0.00100704585088 max=0.0116009940674 full_mean=0.00159355844877 full_max=0.0113048303518 worst=2112 quality=1 seam=1 native=1.76181229852e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=3 mean=0.00303311355174 max=0.0308580527426 full_mean=0.00851847591288 full_max=0.023528710372 worst=273 quality=1 seam=1 native=2.18487243853e-07",
+          "POSE part=12 name=Actual continuation Body.baked / M00_001_01_Body_00_SKIN #0 pose=4 mean=0.00100704585088 max=0.0116009940674 full_mean=0.00159355844877 full_max=0.0113048303518 worst=2112 quality=1 seam=1 native=1.76181229852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=0 mean=0.000209425284275 max=0.00701445485557 full_mean=0.00101418627439 full_max=0.00599053375838 worst=724 quality=1 seam=1 native=1.49164448619e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=1 mean=0.00227276891313 max=0.0216741157848 full_mean=0.00527239982225 full_max=0.0184723125323 worst=1072 quality=1 seam=1 native=1.76965399256e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=2 mean=2.35865786063e-08 max=9.75944733855e-08 full_mean=0.000205853574307 full_max=0.000808086920337 worst=194 quality=1 seam=1 native=1.49164448619e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=3 mean=0.00549215252662 max=0.031623928677 full_mean=0.00918137560944 full_max=0.0309928352356 worst=1 quality=1 seam=1 native=2.33407340081e-07",
+          "POSE part=16 name=Actual continuation Body.baked / M00_001_01_Tops_01_CLOTH #4 pose=4 mean=2.35865786063e-08 max=9.75944733855e-08 full_mean=0.000205853574307 full_max=0.000808086920337 worst=194 quality=1 seam=1 native=1.49164448619e-07"
+        ],
+        "products": {
+          "artifacts/continuation-projected-snapshot-16b/male-full-fields.bin": "c4923e95937e70b8466f0178ae5bf2a037438270e9979565d200aea7f54a6887",
+          "artifacts/continuation-projected-snapshot-16b/male-field-layout.json": "fa82913b063ebeab999a45d685740442512a87e11b7051c843ff3bb18a65fd82",
+          "artifacts/continuation-projected-snapshot-16b/male-native-output-skins.json": "9097eda799b753244f70917b0ade40f2d032e195cfc5700b423180c62fb9c754",
+          "artifacts/continuation-projected-snapshot-16b/male-input-scene.json": "e6a4f66452bb73cf895e36738510decc5695ac8fd3f3ff60478207800f31dbf3"
+        },
+        "log": {
+          "path": "artifacts/continuation-projected-snapshot-16b/male.log",
+          "sha256": "67e6508f35fa03b58d7db1e0c60e1805286e98e17bd70f1eb1354da0bd6f13f7"
+        },
+        "time_report": {
+          "path": "artifacts/continuation-projected-snapshot-16b/male-time.log",
+          "sha256": "76d5dfa8405a9b8bef31795eec57c206fdccb511ad9ede524d5cb429a6f66591",
+          "text": "\tCommand being timed: \"artifacts/continuation-projected-snapshot-16b/probe male body connected artifacts/continuation-projected-snapshot-16b/male\"\n\tUser time (seconds): 7.87\n\tSystem time (seconds): 0.27\n\tPercent of CPU this job got: 99%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:08.18\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 912188\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 66634\n\tVoluntary context switches: 15\n\tInvoluntary context switches: 171\n\tSwaps: 0\n\tFile system inputs: 29288\n\tFile system outputs: 953216\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n"
+        }
+      },
+      "female": {
+        "certified": "CERTIFIED rows=7942 controls=64 source_integrals=92971 contacts=12278 iterations=64 residual=2.37787386462e-13 minimum=0 partition=1.02140518266e-14 work=2497930786 bytes=126552724 visibility_seams=0 query_nodes=8781102 query_candidates=1524422 shadow_intervals=513136 shadow_unions=60418 exact_predicates=594540 filtered_misses=958315 filtered_full=11534 row_hits=360526 row_misses=1164668 source_hits=763167 source_misses=59854",
+        "summary": "SUMMARY parts=2 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "pose_lines": [
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=0 mean=0.00141045914823 max=0.0142851625422 full_mean=0.00342124082172 full_max=0.0208538938339 worst=1516 quality=1 seam=1 native=1.69501835717e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=1 mean=0.000497825018738 max=0.0104864245859 full_mean=0.00174940603056 full_max=0.00943353160797 worst=1119 quality=1 seam=1 native=1.75283082387e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=2 mean=0.000639303027847 max=0.00975448909052 full_mean=0.00124327596734 full_max=0.0101205219938 worst=1612 quality=1 seam=1 native=1.55180132309e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=3 mean=0.00240279917442 max=0.0159671061007 full_mean=0.00694046165316 full_max=0.0201051509826 worst=168 quality=1 seam=1 native=2.03678875751e-07",
+          "POSE part=12 name=Actual continuation Body.baked / F00_001_01_Body_00_SKIN #0 pose=4 mean=0.000639303027847 max=0.00975448909052 full_mean=0.00124327596734 full_max=0.0101205219938 worst=1612 quality=1 seam=1 native=1.55180132309e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=0 mean=0.000138628874135 max=0.00916893298528 full_mean=0.000906960940536 full_max=0.0086691391064 worst=588 quality=1 seam=1 native=1.56094076852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=1 mean=0.00283012131414 max=0.0177152507321 full_mean=0.00430941977657 full_max=0.0128174820117 worst=1101 quality=1 seam=1 native=1.71293877992e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=2 mean=2.17266013842e-08 max=9.78870290343e-08 full_mean=9.88658690802e-05 full_max=0.000524388888778 worst=913 quality=1 seam=1 native=1.56094076852e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=3 mean=0.00383662977281 max=0.0256207677879 full_mean=0.00699070808827 full_max=0.0295451622293 worst=740 quality=1 seam=1 native=2.24245508011e-07",
+          "POSE part=16 name=Actual continuation Body.baked / F00_001_01_Tops_01_CLOTH #4 pose=4 mean=2.17266013842e-08 max=9.78870290343e-08 full_mean=9.88658690802e-05 full_max=0.000524388888778 worst=913 quality=1 seam=1 native=1.56094076852e-07"
+        ],
+        "products": {
+          "artifacts/continuation-projected-snapshot-16b/female-full-fields.bin": "ebcf28d3a1123bab5beb00b8b84981ce5a8c5cb4ac8b59a146f8021e4ceb067f",
+          "artifacts/continuation-projected-snapshot-16b/female-field-layout.json": "10c106c1026ca5ed8dfb40525b15d932ad990c20ae2e90d65e1b057ef4af2ba3",
+          "artifacts/continuation-projected-snapshot-16b/female-native-output-skins.json": "3fc1716c0fd43592d9fa09bf9d5f363049d53372c5afeb55cd56c2040badac27",
+          "artifacts/continuation-projected-snapshot-16b/female-input-scene.json": "e9c2487e8bb3e8d145d50643b7cdb0097b04e77f7c15e5d943b979dd37b5dbe0"
+        },
+        "log": {
+          "path": "artifacts/continuation-projected-snapshot-16b/female.log",
+          "sha256": "9575cf0c9c2dad9e8bae5cacd1c77cf4f82d8e89c83f67c3b14add7e643ebdfe"
+        },
+        "time_report": {
+          "path": "artifacts/continuation-projected-snapshot-16b/female-time.log",
+          "sha256": "f6b2a47ea335cf61f5f254e4740e621edd52d1d72d8f6a496ea05d72687193f6",
+          "text": "\tCommand being timed: \"artifacts/continuation-projected-snapshot-16b/probe female body connected artifacts/continuation-projected-snapshot-16b/female\"\n\tUser time (seconds): 8.65\n\tSystem time (seconds): 0.29\n\tPercent of CPU this job got: 99%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:08.99\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 901276\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 69072\n\tVoluntary context switches: 15\n\tInvoluntary context switches: 152\n\tSwaps: 0\n\tFile system inputs: 26608\n\tFile system outputs: 922016\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n"
+        }
+      }
+    }
+  },
+  "reproduction": {
+    "script": "tests/continuation-cost-diagnostic.py",
+    "manifest": {
+      "results": {
+        "male": {
+          "exit": 0,
+          "wall_seconds": 7.278311066998867
+        },
+        "female": {
+          "exit": 0,
+          "wall_seconds": 7.6289422389818355
+        }
+      },
+      "binary": "c06c4c40308dfef0c0cf6ee4f14d6ccbca800d1b679273453c6e93974245d5ae",
+      "production_500M_admission": false,
+      "diagnostic_ceiling": 16000000000,
+      "products": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/after.json": "29a8109c30f7a46b997b61a167ddccc1385b3338d969f5771f0c87089e207b2e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/anatomical-continuation-diagnostic.cpp": "ce4c42f3c2395195065156a91e0f5aac23bc21f7ceb74986870309f2d028ed46",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/anatomical-continuation-diagnostic.hpp": "180b7811cc2cbd90393a034c2c642794fbabd36e39385df0533f37cb9b4b4494",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/before.json": "29a8109c30f7a46b997b61a167ddccc1385b3338d969f5771f0c87089e207b2e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/compile-command.json": "b709666f808f09705f162c96090cfac4d4272d042167aa375cbc66dd64020229",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/compiler.txt": "1ec97cade9463bc6e46d21fb06cd72855b96218e690e869fa9e11cea2b442115",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/female-field-layout.json": "10c106c1026ca5ed8dfb40525b15d932ad990c20ae2e90d65e1b057ef4af2ba3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/female-full-fields.bin": "ebcf28d3a1123bab5beb00b8b84981ce5a8c5cb4ac8b59a146f8021e4ceb067f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/female-input-scene.json": "e9c2487e8bb3e8d145d50643b7cdb0097b04e77f7c15e5d943b979dd37b5dbe0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/female-native-output-skins.json": "3fc1716c0fd43592d9fa09bf9d5f363049d53372c5afeb55cd56c2040badac27",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/female.log": "5acdc4a9c6088f7e2859e1331de34dd8359f5635a2cec47b88aabd3b21a51aaa",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/male-field-layout.json": "fa82913b063ebeab999a45d685740442512a87e11b7051c843ff3bb18a65fd82",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/male-full-fields.bin": "c4923e95937e70b8466f0178ae5bf2a037438270e9979565d200aea7f54a6887",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/male-input-scene.json": "e6a4f66452bb73cf895e36738510decc5695ac8fd3f3ff60478207800f31dbf3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/male-native-output-skins.json": "9097eda799b753244f70917b0ade40f2d032e195cfc5700b423180c62fb9c754",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/male.log": "300a78cf0846b41b03eddb95a94e1d32148e5e9a93c1a1e84c5b8967074c55ea",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-analytic-query/artifacts/continuation-repro-script-16b/probe": "c06c4c40308dfef0c0cf6ee4f14d6ccbca800d1b679273453c6e93974245d5ae"
+      }
+    },
+    "command": "python3 tests/continuation-cost-diagnostic.py <new-output-dir> --libraries artifacts/kernel-libraries",
+    "hard_diagnostic_work": 16000000000,
+    "per_process_seconds": 180,
+    "production_500M_admission": false
+  },
+  "component_proofs": {
+    "bone-shadow-query-incremental-controls": {
+      "log": "artifacts/bone-shadow-query-incremental-controls.log",
+      "log_sha256": "d4350ab67f24e460533ad383e047c3efefbb55c759832cc127db3f5873c8f600",
+      "text": "PASS owning_BVH=1 exact_union=1 outward_integral_error=0 duplicate_nested=1 positive_gap=1 work=12153 allocation_boundaries=15 admitted_query_noalloc=1 connected_wall=1 unresolved_gap_refusal=1 opaque_origin_refusal=1 complete_control=128 control_error=0 opaque_work=9304/20901 source_field_claim=0\n",
+      "binary_sha256": "1d3403fc1044099aa048b5a010b42691ee2cfeb797b3adfa26b0c9cc2e7bcf77"
+    },
+    "bone-shadow-query-incremental-sanitize": {
+      "log": "artifacts/bone-shadow-query-incremental-sanitize.log",
+      "log_sha256": "d4350ab67f24e460533ad383e047c3efefbb55c759832cc127db3f5873c8f600",
+      "text": "PASS owning_BVH=1 exact_union=1 outward_integral_error=0 duplicate_nested=1 positive_gap=1 work=12153 allocation_boundaries=15 admitted_query_noalloc=1 connected_wall=1 unresolved_gap_refusal=1 opaque_origin_refusal=1 complete_control=128 control_error=0 opaque_work=9304/20901 source_field_claim=0\n",
+      "binary_sha256": "3957c9425a17f81f9f605bd63d4900d9a4d76d8c36a387958d534431c33cded1"
+    },
+    "bone-shadow-filter-sanitize": {
+      "log": "artifacts/bone-shadow-filter-sanitize.log",
+      "log_sha256": "d97f607dc049f01429b9706e1db895badf2f1c835d639c8bf2d5742db555bc69",
+      "text": "PASS exact_equivalence=4102 exact_calls=668 certified_misses=3376 certified_full=58 work=5255688 original_ambiguities_preserved=1 rounding_guard=1 field_claim=0\n",
+      "binary_sha256": "1c255ff05be219d8ee0dcbd6e516a8939f7b063ca8e9e5b05af7d71c80603bbe"
+    }
+  },
+  "original_cap_failures": {
+    "male": {
+      "exit": 2,
+      "log": "artifacts/owning-incremental-male.log",
+      "sha256": "6df4b6b74d1012ba91b1a702baa259e6175a264f7a1dfc229b47a28e9a71db9c",
+      "text": "POLICY whole-group-analytic-visible-source-graph artist_magnitudes_in_energy=0 source_positive_intent=1 volume_claim=0 work_cap=500000000 mean_limit=0.00878326535225 wall_domain=connected max_limit=0.035133061409\nREFUSAL_ORIGINAL_SCENE_EXACT 1\nREFUSED analytic visible source fields: Bone heat work budget exceeded base_work=54721245 source=11 row=2160 completed_integrals=27740 candidates=704707 exact=119713 row_hits=263908 source_hits=306686 search_work=440177466 union_work=17585281 integration_work=3336539 predicate_work=155588151 used=499999959\n"
+    },
+    "female": {
+      "exit": 2,
+      "log": "artifacts/owning-incremental-female.log",
+      "sha256": "b29d37557e6497f4705b5b681c92bdb124345e3892bed28e6ae0102e8d0470fe",
+      "text": "POLICY whole-group-analytic-visible-source-graph artist_magnitudes_in_energy=0 source_positive_intent=1 volume_claim=0 work_cap=500000000 mean_limit=0.0079890871048 wall_domain=connected max_limit=0.0319563484192\nREFUSAL_ORIGINAL_SCENE_EXACT 1\nREFUSED analytic visible source fields: Bone heat work budget exceeded base_work=54050686 source=8 row=2336 completed_integrals=24032 candidates=694111 exact=109596 row_hits=159721 source_hits=271298 search_work=441563222 union_work=15497110 integration_work=3137157 predicate_work=153523974 used=500000000\n"
+    }
+  },
+  "retained_controls": {
+    "artifacts/bone-shadow-query-deferred-union-control.hpp": "142c53ca9b7caf9ecad40b6efbbbcb1611eca6b396197bb75a5bdbce3215f294",
+    "artifacts/bone-shadow-query-incremental-control.hpp": "8acd39d4f0a1369ea6ed179e58b23ab3e3206b7151be22db24c6787ddc772129",
+    "artifacts/bone-shadow-query-projected-control.hpp": "30e1415dc2d0c0206745c1fa4638283cfb3562b21df1261fc2ca54cc680eb662"
+  },
+  "missing": [
+    "500M production cost",
+    "full19+19 poses",
+    "whole owning solver SAN/persistent failures",
+    "source/pose/lease adversarials",
+    "material incidence adversarials",
+    "unskinned/native user intent",
+    "thin/open/disconnected/near-contact/refinement stress",
+    "locks/configured output limits",
+    "native/controller/UI/history/orderedSave/Restore",
+    "independent export/render quality"
+  ],
+  "equivalence": "All four products (full double matrix,19raw-row maps,native Body/Tops skins,input Scene) bit-identical across deferred/online/rejected-SAT/repro-script for BOTH avatars."
+}

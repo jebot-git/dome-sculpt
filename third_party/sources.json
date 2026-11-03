@@ -616,5 +616,15 @@
     "port_sha256": "7db39d4cdd1d0dba7cccea9a49d9b5533a6321b13bc2fe612306027e9abbbc80",
     "license_path": "third_party/ldl/LICENSE",
     "complete_license": "third_party/ldl/COPYING.LESSER"
+  },
+  "shewchuk_predicate_filter_research": {
+    "repository": "https://www.cs.cmu.edu/~quake/robust.html",
+    "source": "https://www.cs.cmu.edu/afs/cs/project/quake/public/code/predicates.c",
+    "version": "May 18, 1996",
+    "license": "public-domain",
+    "source_sha256": "f8662c3f407d1c1c5dcd4dd49ea8b8ddd801a71827d65734206ddc3741792029",
+    "adapted": "src/bone-shadow-filter.hpp",
+    "port_sha256": "f9fcbce9c9973cd7c89e994a7baff3baa4927444e17d4e8d6d9777ec185862e0",
+    "scope": "Private unregistered bone visibility research. First-stage orient3d bound only, binary64/no contraction/FE_TONEAREST; uncertified cases use the existing exact dyadic predicate. Actual avatar fields pass Body/Tops stored-output diagnostics but still fail unchanged 500M work; no native or public binding admission."
   }
 }

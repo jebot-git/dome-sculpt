@@ -4,6 +4,19 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Private automatic-weight query checkpoint — 2026-11-03
+
+Read the continuation status in [OWNING-CONTINUATION-WIP.md](OWNING-CONTINUATION-WIP.md)
+and validation/OWNING-CONTINUATION-WIP.json. Public automatic_bind is unchanged.
+Explicit connected-source analytic fields now pass original stored Body/Tops
+10/10 poses in BOTH actual avatars in finite test-only16B diagnostics, with
+full raw fields/output skins preserved; exact online query optimization retains
+bit-identical fields but still costs1.883B/2.149B, above unchanged500M. The
+untruncated male-Tops torso mean still fails. Whole-group foreign-origin refusal,
+older failed field/cost series and worse SAT experiment remain retained. Query
+R/standalone-ownSAN15 allocation boundaries/128 exact controls and filter4102
+pass; no whole-solver/native/history/Save/whole38 admission. Goal stays active.
+
 ## Current coherent retained-key checkpoint and freehand repair — 2026-11-03
 
 Private9050 has coherent nativeCPU/OneAPI/whole-owned sanitizer applications.

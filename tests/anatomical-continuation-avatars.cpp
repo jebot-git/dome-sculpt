@@ -81,6 +81,12 @@ void pose(DeformationState &d, int which) {
 int main(int argc, char **argv) try {
   const std::string gender = argc > 1 ? argv[1] : "male";
   const bool full = argc > 2 && std::string(argv[2]) == "full";
+  const std::string wall_name = argc > 3 ? argv[3] : "group";
+  if (wall_name != "group" && wall_name != "connected")
+    throw std::invalid_argument("Unknown explicit wall domain");
+  const auto wall_domain = wall_name == "group"
+                               ? BoneWallDomain::WholeGroup
+                               : BoneWallDomain::ConnectedSourceSurface;
   if (gender != "male" && gender != "female")
     throw std::invalid_argument("Unknown actual cohort");
   Scene scene;
@@ -101,20 +107,41 @@ int main(int argc, char **argv) try {
       }
     }
   std::cout << std::setprecision(12)
-            << "POLICY whole-group-integrated-visible-source-graph "
+            << "POLICY whole-group-analytic-visible-source-graph "
                "artist_magnitudes_in_energy=0 source_positive_intent=1 "
                "volume_claim=0 "
                "work_cap=500000000 mean_limit="
-            << (hi - lo) * .005 << " max_limit=" << (hi - lo) * .02 << '\n'
+            << (hi - lo) * .005 << " wall_domain=" << wall_name
+            << " max_limit=" << (hi - lo) * .02 << '\n'
             << std::flush;
-  auto fields = anatomical_continuation(scene, group);
+  ContinuationFields fields;
+  try {
+    fields = anatomical_continuation(scene, group, {}, wall_domain);
+  } catch (...) {
+    std::cout << "REFUSAL_ORIGINAL_SCENE_EXACT " << (scene.encode() == original)
+              << '\n'
+              << std::flush;
+    throw;
+  }
   const auto &r = fields.report;
   std::cout << "CERTIFIED rows=" << r.rows
-            << " controls=" << fields.joints.size() << " samples=" << r.samples
-            << " contacts=" << r.contacts << " iterations=" << r.iterations
-            << " residual=" << r.residual << " minimum=" << r.minimum
-            << " partition=" << r.partition << " work=" << r.work
-            << " bytes=" << r.bytes << '\n'
+            << " controls=" << fields.joints.size()
+            << " source_integrals=" << r.samples << " contacts=" << r.contacts
+            << " iterations=" << r.iterations << " residual=" << r.residual
+            << " minimum=" << r.minimum << " partition=" << r.partition
+            << " work=" << r.work << " bytes=" << r.bytes
+            << " visibility_seams=" << fields.visibility_seams
+            << " query_nodes=" << fields.query_report.nodes
+            << " query_candidates=" << fields.query_report.candidates
+            << " shadow_intervals=" << fields.query_report.intervals
+            << " shadow_unions=" << fields.query_report.unions
+            << " exact_predicates=" << fields.query_report.exact_predicates
+            << " filtered_misses=" << fields.query_report.filtered_misses
+            << " filtered_full=" << fields.query_report.filtered_full
+            << " row_hits=" << fields.query_report.row_hits
+            << " row_misses=" << fields.query_report.row_misses
+            << " source_hits=" << fields.query_report.source_hits
+            << " source_misses=" << fields.query_report.source_misses << '\n'
             << std::flush;
   size_t parts = 0, quality = 0, consumer = 0, seamfail = 0;
   const size_t labels = fields.joints.size();
