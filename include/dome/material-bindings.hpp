@@ -5,7 +5,7 @@
 #include "normal-frames.hpp"
 #include <optional>
 namespace dome {
-namespace detail { class PolygonColorArchive; }
+namespace detail { class PolygonColorArchive; class SourceKeyDerivation; }
 class PaintedMesh;
 class CreatorAssetArchive;
 class NormalSamplingArchive;
@@ -55,6 +55,7 @@ struct SourceMaterialBindings {
   bool sampling_reparameterized=false;
   std::shared_ptr<const SourceColorPreparation> color_preparation;
   std::shared_ptr<const SourceNormalPreparation> normal_preparation;
+  std::shared_ptr<const detail::SourceKeyDerivation> key_derivation;
   void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;

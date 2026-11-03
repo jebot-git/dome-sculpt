@@ -113,3 +113,18 @@ the genuine selected native copies through the same factory and publication
 boundary. Create/CaptureMix/Duplicate must retain stable targets and current
 mix, followed by all these connected paths. None is complete by a compatible
 seam-only workaround or by leaving the present refusal in place.
+
+
+## Owning factory WIP continuation
+
+The next isolated child appends a universal material SourceKeyDerivation owner
+as well as the optional paired prepared-normal entry handle. A no-normal path
+will not need a dummy projection: the geometry leaf and replay are independent.
+The first dispatch currently implements prepared Create/Replace/Rename; other
+commands and the generic no-normal dispatch remain to connect. Original role
+coordinates are expanded from the actual uv_origin maps/source arrays for
+UV0..7, independently of the current edited atlas. The universal node keeps a
+fixed actual before-material anchor plus per-target endpoints, so repeated
+Replace/strokes do not add an archive edge per update. New UV/domain conversions
+may keep a genuine prior domain/node. Old frame/material encoders explicitly
+refuse this WIP representation. No new reader or writer is admitted yet.

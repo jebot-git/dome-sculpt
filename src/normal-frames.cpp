@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/normal-frames.hpp"
+#include "frame-position-domain.hpp"
 #include <algorithm>
 #include <bit>
 #include <limits>
@@ -101,10 +102,11 @@ void NormalFrameSet::validate(bool deep) const {
   for(const auto &frame:{pbr,mtoon,canonical})if(frame){frame->validate(deep);if(deep && first && frame->origin_vertices!=first->origin_vertices)throw std::invalid_argument("Normal frame origin corner identities differ");if(!first)first=frame.get();if((count && *count!=frame->origin_vertex_count)||(corners && *corners!=frame->normals.size()))throw std::invalid_argument("Normal frame domains differ");count=frame->origin_vertex_count;corners=frame->normals.size();if(frame->targets.size()!=targets.size())throw std::invalid_argument("Normal frame target registry is incomplete");for(size_t i=0;i<targets.size();++i)if(frame->targets[i].id!=targets[i].id)throw std::invalid_argument("Normal frame target order differs from registry");}
   for(const auto &target:targets){if(!target.id || target.id>=next_target || !ids.insert(target.id).second || (!target.origin_slot && target.positions.empty()))throw std::invalid_argument("Invalid frame target authority");if(target.origin_slot && *target.origin_slot>=max_targets)throw std::invalid_argument("Frame origin target slot is out of range");if(!target.positions.empty() && target.positions.size()!=*count)throw std::invalid_argument("Frame POSITION authority size differs");if(deep)vectors(target.positions,*count,true);}
   for(auto id:current_targets)if(!ids.contains(id)||!active.insert(id).second)throw std::invalid_argument("Current native morph slots have ambiguous or unknown frame IDs");
+  if(position_domain){position_domain->validate(deep);if(*count!=position_domain->basis()->positions.size())throw std::invalid_argument("Derived frame POSITION count differs from its actual native basis");for(const auto &frame:{pbr,mtoon,canonical})if(frame&&frame->origin_vertices!=position_domain->basis()->indices)throw std::invalid_argument("Derived frame origin corners differ from their native POSITION basis");}
   storage_bytes();
 }
 size_t NormalFrameSet::storage_bytes() const {
-  size_t bytes=0;std::set<const NormalFrames*> seen;for(const auto &f:{pbr,mtoon,canonical})if(f && seen.insert(f.get()).second)checked_add(bytes,f->storage_bytes());
+  size_t bytes=0;if(position_domain)checked_add(bytes,position_domain->storage_bytes());std::set<const NormalFrames*> seen;for(const auto &f:{pbr,mtoon,canonical})if(f && seen.insert(f.get()).second)checked_add(bytes,f->storage_bytes());
   for(const auto &t:targets)checked_add(bytes,t.positions.size()*sizeof(Vec3));
   return bytes;
 }
@@ -118,6 +120,7 @@ size_t NormalFrameArchive::storage_bytes() const {
   for(const auto &s:sets_){for(const auto &f:{s->pbr,s->mtoon,s->canonical})if(f && frames.insert(f.get()).second)checked_add(bytes,f->storage_bytes());for(const auto &t:s->targets)checked_add(bytes,t.positions.size()*sizeof(Vec3));}return bytes;
 }
 nlohmann::json NormalFrameArchive::encode() const {
+  for(const auto &set:sets_)if(set->position_domain)throw std::invalid_argument("Derived native key domains require their owning frame archive2 codec");
   nlohmann::json j={{"version",1},{"frames",nlohmann::json::array()},{"sets",nlohmann::json::array()}};std::vector<std::shared_ptr<const NormalFrames>> frames;
   auto add=[&](auto frame)->nlohmann::json{if(!frame)return nullptr;auto it=std::find(frames.begin(),frames.end(),frame);if(it==frames.end()){frames.push_back(frame);return frames.size()-1;}return size_t(it-frames.begin());};
   size_t bytes=0;

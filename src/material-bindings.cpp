@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-bindings.hpp"
+#include "normal-key-derivation.hpp"
+#include "frame-position-domain.hpp"
 #include "deformation-json.hpp"
 #include "dome/color-preparation.hpp"
 #include "dome/color-paint-sampling.hpp"
@@ -120,7 +122,9 @@ void SourceMaterialBindings::validate(bool deep) const {
     throw std::invalid_argument("Invalid derived material frame or animation provenance");
   if(sampling_reparameterized && !uv_origin)throw std::invalid_argument("Reparameterized sampling requires retained original provenance");
   if(color_preparation)color_preparation->validate(deep);
-  if(normal_preparation){normal_preparation->validate(deep);
+  if(key_derivation){if(!normal_frames||key_derivation->frames()!=normal_frames||key_derivation->position_domain()!=normal_frames->position_domain)throw std::invalid_argument("Material key derivation lost its own native frame/POSITION authority");key_derivation->validate(deep);}
+  if(normal_frames&&normal_frames->position_domain&&!key_derivation)throw std::invalid_argument("Derived native frame POSITION geometry needs an owning material key derivation");
+  if(normal_preparation){if(normal_preparation->key_derivation!=key_derivation)throw std::invalid_argument("Prepared normal key replay differs from its actual material key derivation");normal_preparation->validate(deep);
     if(normal_frames!=normal_preparation->target_frames||normal_frame!=SourceMaterialNormalFrame::OriginalAttributes)
       throw std::invalid_argument("Prepared normal interpretation lost its exact target frame authority");
     if(normal_preparation->uv_reprojection&&has_mtoon){const auto &role=roles[size_t(MToonSlot::Normal)];if(role.image!=normal_preparation->projection->mtoon||role.wrap_s!=33071||role.wrap_t!=33071||role.min_filter!=9729||role.mag_filter!=9729)throw std::invalid_argument("Normal UV current resolved sampler/image differs from its declared projection");}
@@ -158,7 +162,7 @@ void SourceMaterialBindings::validate(bool deep) const {
     if(normal_frame!=SourceMaterialNormalFrame::OriginalAttributes)throw std::invalid_argument("Original frame payload cannot reinterpret legacy converted normal pixels");
     normal_frames->validate(deep);
     if(!uv_origin || !uv_origin->paint)throw std::invalid_argument("Normal frames require retained native rest authority");
-    const auto &mesh=uv_origin->paint->mesh();
+    const auto &mesh=detail::frame_position_basis(*this);
     for(const auto &f:{normal_frames->pbr,normal_frames->mtoon,normal_frames->canonical})if(f) {
       if(f->origin_vertex_count!=mesh.positions.size() || f->normals.size()!=mesh.indices.size())throw std::invalid_argument("Normal frame origin geometry differs");
       if(deep && f->origin_vertices!=mesh.indices)throw std::invalid_argument("Normal frames must retain exact ordered origin corners");
@@ -168,7 +172,7 @@ void SourceMaterialBindings::validate(bool deep) const {
           const auto &a=*uv_origin->appearance;const ImportedPrimitive *primitive=nullptr;
           for(const auto &p:a.asset->primitives)if(p.source_mesh==a.source_mesh && p.source_primitive==a.source_primitive){if(primitive)throw std::invalid_argument("Normal frame source primitive is ambiguous");primitive=&p;}
           if(!primitive || primitive->mesh.positions.size()!=f->source_vertex_count || primitive->mesh.indices.size()!=f->source_corner_count)throw std::invalid_argument("Normal frame source domain differs");
-          for(size_t c=0;c<f->source_vertices.size();++c)if(f->source_vertices[c]!=a.source_vertices.at(mesh.indices[c]) || primitive->mesh.indices.at(f->source_corners[c])!=f->source_vertices[c])throw std::invalid_argument("Normal frame source corner provenance differs");
+          for(size_t c=0;c<f->source_vertices.size();++c)if(f->source_vertices[c]!=a.source_vertices.at(uv_origin->paint->mesh().indices[c]) || primitive->mesh.indices.at(f->source_corners[c])!=f->source_vertices[c])throw std::invalid_argument("Normal frame source corner provenance differs");
         }
       }
     }
@@ -193,6 +197,7 @@ uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings
     add(value->color_preparation->uv_reprojection->before_material,deep);
   if(value->color_preparation&&value->color_preparation->paint_sampling)
     add(value->color_preparation->paint_sampling->before_material(),deep);
+  if(value->key_derivation)add(value->key_derivation->before_material(),deep);
   if(value->normal_preparation&&value->normal_preparation->original_material)
     add(value->normal_preparation->original_material,deep);
   if(value->normal_preparation&&value->normal_preparation->uv_reprojection)
@@ -223,6 +228,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 }
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,
     detail::PolygonColorArchive *colors,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
+  for(const auto &binding:bindings_)if(binding->key_derivation)throw std::invalid_argument("Independent normal keys require their owning material10 codec");
   const bool corners=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->color_preparation&&b->color_preparation->polygon_colors;});
   if(corners&&!colors)throw std::invalid_argument("Current corner color preparation requires its shared Scene20 archive");
   const bool paint_sampling=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return (b->color_preparation&&b->color_preparation->paint_sampling)||(b->normal_preparation&&b->normal_preparation->sampling_domain&&b->normal_preparation->sampling_domain->metadata_sampling_domain);});

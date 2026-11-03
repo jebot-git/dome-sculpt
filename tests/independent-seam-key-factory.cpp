@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/shapekey-authoring.hpp"
+#include "dome/normal-preparation.hpp"
+#include "normal-key-derivation.hpp"
+#include "normal-frame-runtime.hpp"
+#include "normal-projection-identity.hpp"
+#include <iostream>
+using namespace dome;
+namespace {size_t checks=0;void check(bool b,const char*m){if(!b)throw std::runtime_error(m);++checks;std::cout<<"PASS "<<m<<std::endl;}bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}bool refuses(auto f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<std::endl;return true;}}}
+int main(int argc,char **argv)try{
+ if(argc!=2)return 2;const auto input=Scene::load(argv[1]);const auto exact=input.encode();const auto &original=input.active();const auto &current=original.painted->mesh();auto before=original.material_bindings->normal_preparation->sampling_domain;
+ check(current.positions.size()==6&&before->before_paint->mesh().positions.size()==4,"Actual saved seam fixture has distinct current6 and original4 native domains");
+ const auto &map=before->layout->source_vertices;size_t a=SIZE_MAX,b=SIZE_MAX;for(size_t i=0;i<map.size();++i)for(size_t j=i+1;j<map.size();++j)if(map[i]==map[j]){a=i;b=j;}check(a!=SIZE_MAX,"Input owns a genuine duplicated original vertex");
+ ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=original.deformation->morphs->targets.size()-1;edit.positions=current.positions;edit.positions[a].z+=.013f;edit.positions[b].z-=.017f;auto scene=input;size_t polls=0;auto result=author_shapekey(scene,scene.active().id,edit,[&]{++polls;return false;});
+ check(result.changed,"Real detached key factory accepts opposite edits through a new owning derivation");const auto &output=scene.active();const auto recipe=output.material_bindings->normal_preparation;const auto node=recipe->key_derivation;const auto frames=output.material_bindings->normal_frames;
+ check(node&&frames->position_domain&&node->frames()==frames&&node->position_domain()==frames->position_domain,"Factory owns separate key-frame and POSITION replay authorities");
+ check(output.painted==original.painted&&output.painted->baked()->normal_authority==original.painted->baked()->normal_authority&&output.painted->normal_projection()==original.painted->normal_projection(),"All current writable paint and normal planes/events remain exact owners");
+ check(output.material_bindings->color_preparation==original.material_bindings->color_preparation&&output.appearance==original.appearance&&output.rig_source==original.rig_source,"Current colour/raw appearance and first rig source remain exact");
+ check(frames->position_domain->basis()->positions.size()==6&&output.material_bindings->uv_origin==original.material_bindings->uv_origin&&output.material_bindings->uv_origin->paint->mesh().positions.size()==4,"Derived POSITION6 never relabels the retained original coordinate/attribute domain4");
+ const auto &delta=output.deformation->morphs->targets[edit.target].delta;check(delta[a].z==.013f&&delta[b].z==-.017f,"Accepted native key keeps both independent seam displacements");recipe->validate();detail::normal_frame_current_authority(*output.material_bindings,current,output.deformation.get());check(true,"Independent owning recipe and complete current POSITION/frame association replay");
+ check(refuses([&]{scene.encode();}),"Unimplemented codec refuses before an old writer could omit the new authority");
+ ShapeKeyEdit create;create.name="Independent new key";author_shapekey(scene,scene.active().id,create);check(scene.active().material_bindings->normal_preparation->key_derivation->before_material()==node->before_material(),"Later Create reuses the genuine fixed anchor instead of growing a before-chain per stroke");
+ edit.target=scene.active().deformation->morphs->targets.size()-1;edit.positions=current.positions;edit.positions[a].z-=.021f;edit.positions[b].z+=.019f;auto capsule=scene.active().shape_source;author_shapekey(scene,scene.active().id,edit);check(scene.active().shape_source==capsule&&scene.active().material_bindings->normal_preparation->key_derivation->before_material()==node->before_material(),"Repeated Replace keeps the fixed source anchor and complete first capsule");
+ // The source remains encodable throughout cancellation. The final callback is
+ // after genuine detached computation/validation, before scene replacement.
+ auto count_polls=[&]{auto candidate=input;size_t count=0;auto request=edit;request.target=original.deformation->morphs->targets.size()-1;author_shapekey(candidate,candidate.active().id,request,[&]{++count;return false;});return count;};const auto count=count_polls();check(count>2,"Actual complete factory exposes measured cancellation boundaries");
+ for(auto cut:{size_t(1),count/2,count}){auto candidate=input;size_t at=0;auto request=edit;request.target=original.deformation->morphs->targets.size()-1;bool failed=false;try{author_shapekey(candidate,candidate.active().id,request,[&]{return ++at>=cut;});}catch(const std::exception&e){failed=std::string_view(e.what()).find("cancel")!=std::string_view::npos;}check(failed&&candidate.encode()==exact,"Early/middle/late real factory cancellation preserves exact full source Scene");}
+ ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;author_shapekey(scene,scene.active().id,restore);check(scene.encode()==exact,"Restore returns the full original paint/material/key/rig/source state");check(input.encode()==exact,"All derived factory attempts preserve the actual source fixture");std::cout<<"PASS "<<checks<<" independent owning seam-key factory checks polls="<<polls<<std::endl;return 0;
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
