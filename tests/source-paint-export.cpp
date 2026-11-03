@@ -49,10 +49,10 @@ int main(int argc,char **argv)try{
   }
   check(kind>=2||materials==2,"Both selected source instances retain their independently emitted material bindings");
   if(kind==0&&!flat&&std::string_view(alpha)=="OPAQUE"&&weight==0){
-   int polls=0;auto probe=imported.scene.surfaces(true,[&]{++polls;return false;});check(polls>1&&probe.size()==2,"Actual original-coordinate export staging exposes cancellation checkpoints");
-   for(int boundary=1;boundary<=polls;++boundary){int count=0;check(rejects([&]{imported.scene.surfaces(true,[&]{return ++count==boundary;});})&&imported.scene.encode()==before,"Every actual export coordinate cancellation preserves the original complete native scene");}
+   int polls=0;auto probe=imported.scene.export_surfaces([&]{++polls;return false;});check(polls>1&&probe.size()==2,"Actual original-coordinate export staging exposes cancellation checkpoints");
+   for(int boundary=1;boundary<=polls;++boundary){int count=0;check(rejects([&]{imported.scene.export_surfaces([&]{return ++count==boundary;});})&&imported.scene.encode()==before,"Every actual export coordinate cancellation preserves the original complete native scene");}
    auto &object=imported.scene.active();auto paint=object.painted->snapshot();PaintSettings ink;ink.front_only=false;ink.color={.1f,.8f,.3f,.6f};Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=1;paint->begin_stroke();paint->stamp(brush,ink);check(paint->end_stroke(),"Real source-overlay paint contributes before the unimplemented portable bake control");object.painted=paint;
-   const auto painted=imported.scene.encode();check(rejects([&]{imported.scene.surfaces(true);})&&imported.scene.encode()==painted,"Unimplemented painted standard bake refuses without silently losing paint or changing source state");
+   const auto painted=imported.scene.encode();check(rejects([&]{imported.scene.export_surfaces();})&&imported.scene.encode()==painted,"Unimplemented painted standard bake refuses without silently losing paint or changing source state");
   }
  }
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;

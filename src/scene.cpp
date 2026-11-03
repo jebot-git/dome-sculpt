@@ -1099,6 +1099,16 @@ Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled) const {
   return surfaces_impl(false, true, cancelled);
 }
+std::vector<ObjectSurface> Scene::export_surfaces(const std::function<bool()> &cancelled) const {
+  auto result=preview_surfaces(cancelled);
+  for(auto &surface:result){
+    if(cancelled&&cancelled())throw std::runtime_error("Source paint export cancelled");
+    const auto &o=object(surface.id);
+    if(o.mesh_active&&o.painted->source_sampling_prepared())
+      detail::source_paint_export(*o.painted,surface,cancelled);
+  }
+  return result;
+}
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
   return surfaces_impl(false, true, cancelled, mesher);
 }
