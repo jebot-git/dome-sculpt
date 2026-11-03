@@ -15,9 +15,11 @@ checks with972 source/library/binary/input hashes unchanged. Actual material10
 CBOR restart restores one shared universal/normal/frame node, original4 source
 identities and independent derived6 endpoints. Tests exercise source-map and
 artist N/T tamper, forward/self binding references, orphan records, failed-read
-rollback/retry, and entry/middle/late cancellation. The historical55-check
-factory has separate wholly owned sanitizer proof; the new codec's whole-owned
-sanitizer run is not yet complete. Initial moved-test-context and missing-empty-
+rollback/retry, and entry/middle/late cancellation. The new codec also passes80 checks in a
+fresh wholly owned C/C++ O1 ASan/UBSan/leak build plus four baseline suites
+(prepared-normal-shapes, normal-domain-transitions, color-paint-sampling and
+source-union-version). All975 captured hashes remain exact; the retained-paint
+baseline takes214.41s and the complete execution219.35s, with zero reports. Initial moved-test-context and missing-empty-
 pool/diagnostic-order negatives are retained, not counted as corrected proof.
 
 The outer Scene writer deliberately still refuses key domains: full recursive

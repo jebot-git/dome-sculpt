@@ -6,11 +6,22 @@
     "inputs": 972,
     "before_after_equal": true
   },
-  "whole_owned_sanitize": "pending",
+  "whole_owned_sanitize": {
+    "factory_checks": 80,
+    "baseline_suites": 4,
+    "before_after_equal": true,
+    "inputs": 975,
+    "elapsed_seconds": 219.3529995799763,
+    "flags": "Release O1 g1 ASan/UBSan/leaks; whole own core/support C/C++"
+  },
   "files": {
     "artifacts/key-material3-status.json": "804fa83677f75feab0a619d41e1ac53f4ef5f2beead99e19acc89108e37287a7",
     "artifacts/key-material3-before.json": "193f3d3cc19a90a1be1963398da5f5a4ab4dbcc6c6d0f9510f93ec751d1b13f2",
     "artifacts/key-material3-test.log": "c261f89e183d4986a0f22cd0ba101b505ca1b883b5f5c829748206295ebf9438",
-    "artifacts/key-material3-build.log": "90653709ebff679bcd8ec7d62a2405da48099aa00748ad82db428ef74ab5d27f"
+    "artifacts/key-material3-build.log": "90653709ebff679bcd8ec7d62a2405da48099aa00748ad82db428ef74ab5d27f",
+    "artifacts/key-codec-whole-sanitize-status.json": "bd8ffbd1af5c27e74a852bac1064493500562709ff6e5a445aeab9f27a30f2c4",
+    "artifacts/key-codec-whole-sanitize.log": "c261f89e183d4986a0f22cd0ba101b505ca1b883b5f5c829748206295ebf9438",
+    "artifacts/key-codec-whole-sanitize-baselines.log": "02719722f44119f9052562f93b1c57e2a158fa6d1eed6ee6278313efd83ad29d",
+    "artifacts/key-codec-sanitize-before.json": "f64c2c1b21c143ab38d171673ebddcf49dbcef0f74881d96abef7041f3f71c2d"
   }
 }
