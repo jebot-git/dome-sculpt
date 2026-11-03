@@ -10,6 +10,7 @@
 #include "paint-archive-shape.hpp"
 #include "source-uv-archive.hpp"
 #include "material-archive-version.hpp"
+#include "material-key-context.hpp"
 #include "emission-authority.hpp"
 #include "emission-linear.hpp"
 #include "dome/normal-preparation.hpp"
