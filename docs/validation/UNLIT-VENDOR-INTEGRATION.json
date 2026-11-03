@@ -1,0 +1,551 @@
+{
+  "recorded_utc": "2026-11-03T13:42:39.435476+00:00",
+  "source": "39210fca93c99a49d00d6a5209976e0caf324275",
+  "published_runtime_tree": "ed6290eba2c633a943bd27ec175047eb9426e6db",
+  "scope": "Complete optimized coherent vendor ALL-target continuations from fresh fc562 builds after qualified unlit shader/test-consumer change. No public ABI append. Selected native/runtime gates, not full regression, positive AMD/NVIDIA or physical headset. Fresh CPU ALL remains pending.",
+  "builds": {
+    "ONEAPI": {
+      "result": {
+        "status": "terminal",
+        "source": "39210fca93c99a49d00d6a5209976e0caf324275",
+        "profile": "ONEAPI",
+        "wrapper_pid": 3757023,
+        "source_inputs": 1484,
+        "runs": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build-oneapi",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=ONEAPI",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+              "-DCMAKE_CXX_COMPILER=/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++"
+            ],
+            "exit_code": 0,
+            "seconds": 0.5240186130104121
+          },
+          {
+            "name": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "build-oneapi",
+              "--parallel",
+              "2"
+            ],
+            "exit_code": 0,
+            "seconds": 587.5913863930036
+          }
+        ],
+        "scope": "Complete native all-target optimized continuation after qualified unlit shader/comparison-consumer change; coherent existing fc562 vendor objects, no public ABI append. CPU profile starts fresh. Matching f797 canonical toolkit/bitmap SDK. Build only, not all-suite or physical-device proof.",
+        "phase": "build",
+        "child_pid": 3757161,
+        "exit_code": 0,
+        "source_drift": []
+      },
+      "before_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+      "after_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+      "build_log_sha256": "bbf0f886ee4c04a8d3bd82060d953642bf1be5220279314dab9463bad8fefcd1"
+    },
+    "CUDA": {
+      "result": {
+        "status": "terminal",
+        "source": "39210fca93c99a49d00d6a5209976e0caf324275",
+        "profile": "CUDA",
+        "wrapper_pid": 3758260,
+        "source_inputs": 1484,
+        "runs": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build-cuda",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CUDA",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+              "-DCMAKE_CUDA_COMPILER=/home/blux/de-xr/dome-sculpt/artifacts/cuda-toolchain/13.4.1/bin/nvcc",
+              "-DCMAKE_CUDA_ARCHITECTURES=86"
+            ],
+            "exit_code": 0,
+            "seconds": 0.8868125070002861
+          },
+          {
+            "name": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "build-cuda",
+              "--parallel",
+              "2"
+            ],
+            "exit_code": 0,
+            "seconds": 549.714839585009
+          }
+        ],
+        "scope": "Complete native all-target optimized continuation after qualified unlit shader/comparison-consumer change; coherent existing fc562 vendor objects, no public ABI append. CPU profile starts fresh. Matching f797 canonical toolkit/bitmap SDK. Build only, not all-suite or physical-device proof.",
+        "phase": "build",
+        "child_pid": 3758584,
+        "exit_code": 0,
+        "source_drift": []
+      },
+      "before_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+      "after_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+      "build_log_sha256": "6bfb4eae52e8e9794f24cb6c919d8488d521e71fbaba2466989d55cd26809cb8"
+    },
+    "ROCM": {
+      "result": {
+        "status": "terminal",
+        "source": "39210fca93c99a49d00d6a5209976e0caf324275",
+        "profile": "ROCM",
+        "wrapper_pid": 3758259,
+        "source_inputs": 1484,
+        "runs": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build-rocm",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=ROCM",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+              "-DCMAKE_HIP_COMPILER=/usr/lib64/rocm/llvm/bin/clang++",
+              "-DCMAKE_HIP_COMPILER_ROCM_ROOT=/usr",
+              "-DCMAKE_HIP_ARCHITECTURES=gfx1030",
+              "-DCMAKE_HIP_FLAGS=--hip-device-lib-path=/usr/lib64/rocm/llvm/lib/clang/20/lib/amdgcn/bitcode"
+            ],
+            "exit_code": 0,
+            "seconds": 0.6747083160153124
+          },
+          {
+            "name": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "build-rocm",
+              "--parallel",
+              "2"
+            ],
+            "exit_code": 0,
+            "seconds": 551.8827884430066
+          }
+        ],
+        "scope": "Complete native all-target optimized continuation after qualified unlit shader/comparison-consumer change; coherent existing fc562 vendor objects, no public ABI append. CPU profile starts fresh. Matching f797 canonical toolkit/bitmap SDK. Build only, not all-suite or physical-device proof.",
+        "phase": "build",
+        "child_pid": 3758519,
+        "exit_code": 0,
+        "source_drift": []
+      },
+      "before_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+      "after_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+      "build_log_sha256": "53a5c49ba90a86d2daddc0f2013fa3afa25ef75e66703cf0b2a3e92e7f88a8bc"
+    }
+  },
+  "runtime": {
+    "result": {
+      "status": "terminal",
+      "pid": 3946296,
+      "source": "39210fca93c99a49d00d6a5209976e0caf324275",
+      "inputs": 1512,
+      "scope": "Selected fresh current-ABI backend runtime tests, actual A770 compute against CPU reference; CUDA/HIP actual missing-device/host only. No physical HMD or full-regression claim.",
+      "runs": [
+        {
+          "profile": "cuda",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-cuda",
+            "--output-on-failure",
+            "-V",
+            "-R",
+            "^(unlit-fallback|unlit-consumer-role|unlit-consumer-prepared|compute-missing-gpu|gpu-brush-missing-device|gpu-brush-transfer-shims|sparse-resample-host)$"
+          ],
+          "exit_code": 0,
+          "seconds": 8.700407638010802
+        },
+        {
+          "profile": "rocm",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-rocm",
+            "--output-on-failure",
+            "-V",
+            "-R",
+            "^(unlit-fallback|unlit-consumer-role|unlit-consumer-prepared|gpu-brush-missing-device|gpu-brush-transfer-shims|sparse-resample-host)$"
+          ],
+          "exit_code": 0,
+          "seconds": 8.77299003402004
+        },
+        {
+          "profile": "oneapi",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-oneapi",
+            "--output-on-failure",
+            "-V",
+            "-R",
+            "^(unlit-fallback|unlit-consumer-role|unlit-consumer-prepared|compute-backend|compute-missing-gpu|sparse-resample-host|sparse-resample-device|softfloat64-device|paint-composite-compute)$"
+          ],
+          "exit_code": 0,
+          "seconds": 1.994186408992391
+        },
+        {
+          "profile": "strict-unlit",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-unlit-fallback-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/artifacts/unlit-runtime/arc-unlit",
+            "--hardware"
+          ],
+          "exit_code": 0,
+          "seconds": 0.14522746598231606
+        },
+        {
+          "profile": "strict-softfloat",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-softfloat64-test",
+            "--device",
+            "--arc"
+          ],
+          "exit_code": 0,
+          "seconds": 0.077545687003294
+        },
+        {
+          "profile": "strict-resample",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-sparse-resample-test",
+            "--device",
+            "--arc"
+          ],
+          "exit_code": 0,
+          "seconds": 0.3962039879988879
+        },
+        {
+          "profile": "native-xr",
+          "command": [
+            "python3",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/tests/paint-composite-xr.py",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/libdome-sculpt-test-runtime.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/arc/paint512.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/build-oneapi/dome-sculpt-paint-composite-fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-vendors-fc562/artifacts/unlit-runtime/xr"
+          ],
+          "exit_code": 0,
+          "seconds": 16.6211699769774
+        }
+      ],
+      "profile": "native-xr",
+      "child_pid": 3949555,
+      "exit_code": 0,
+      "input_drift": []
+    },
+    "before_sha256": "326041b4218717670099b3e3d493191cd23144572d3140e9acfdfdc7ac05171d",
+    "after_sha256": "326041b4218717670099b3e3d493191cd23144572d3140e9acfdfdc7ac05171d",
+    "log_sha256": {
+      "cuda.log": "3f693e1842e474da9e1741b7b52bd997dd78249a2b511242a7915784aef575cc",
+      "rocm.log": "d415c90fbd9d10cebf57e69c889e100c32e3747377ee63996c2d910be9b3ed09",
+      "oneapi.log": "c4f77ab6e76b913cae96633762b5769931f6e48900b45196eb551aa5832eb1bb",
+      "strict-unlit.log": "f088ed847ffc10f1c4fb3a82a8d6cd12f3fe95ebc2de63d90cb08a0280533185",
+      "strict-softfloat.log": "3c70e2e5c9b11385847510b71c8d109e931678c71ee329847c6907ef43dc5790",
+      "strict-resample.log": "83a47a38b4ba486570b7259c081b82d4df7bedefb1ba4ccc581e9f2eba16b49c",
+      "native-xr.log": "c63ea51a7579f47583ad2705e7a8d7c600e3500f20fe9e58cd04162e10ad4739",
+      "xr/app.log": "afc71567cfa1aede836148a8f9ec55763917202c6847435e93ea329820050012"
+    },
+    "actual_xr": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Actual native OpenXR application paints/drains/saves and shuts down normally"
+        },
+        {
+          "passed": true,
+          "check": "Actual stereo renderer matches explicitly requested GL device: Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+        },
+        {
+          "passed": true,
+          "check": "Both actual GL eyes and tracked paint palette render with balanced image ownership"
+        },
+        {
+          "passed": true,
+          "check": "Tracked pressure updates actual512 writable layers while preserving original geometry/material/authoring sources"
+        },
+        {
+          "passed": true,
+          "check": "Real nested controller paint controls select blue ink before the pressure stroke"
+        },
+        {
+          "passed": true,
+          "check": "Actual rendering application dispatches selected-backend plain paint kernels"
+        },
+        {
+          "passed": true,
+          "check": "Bounded compositor performs actual65536-pixel16-byte device-to-host output readbacks"
+        }
+      ],
+      "failed": 0
+    },
+    "frame_ownership": {
+      "acquires": 76,
+      "action_syncs": 42,
+      "application": "Dome Sculpt",
+      "bindings": {
+        "/interaction_profiles/htc/vive_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/click",
+            "/user/hand/right/input/squeeze/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/trackpad"
+          ],
+          "mirror": [
+            "/user/hand/left/input/trackpad/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/menu/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/trackpad/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/trackpad"
+          ]
+        },
+        "/interaction_profiles/khr/simple_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/select/click",
+            "/user/hand/right/input/select/click"
+          ],
+          "palette": [
+            "/user/hand/left/input/menu/click"
+          ]
+        },
+        "/interaction_profiles/logitech/mx_ink_stylus_logitech": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/tip_logitech/pose",
+            "/user/hand/right/input/tip_logitech/pose"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/cluster_middle_logitech/force",
+            "/user/hand/right/input/cluster_middle_logitech/force"
+          ],
+          "tip_force": [
+            "/user/hand/left/input/tip_logitech/force",
+            "/user/hand/right/input/tip_logitech/force"
+          ]
+        },
+        "/interaction_profiles/meta/touch_controller_plus": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "eraser": [
+            "/user/hand/left/input/y/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/x/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "redo": [
+            "/user/hand/right/input/b/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ],
+          "undo": [
+            "/user/hand/right/input/a/click"
+          ]
+        },
+        "/interaction_profiles/oculus/touch_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "eraser": [
+            "/user/hand/left/input/y/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/x/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "redo": [
+            "/user/hand/right/input/b/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ],
+          "undo": [
+            "/user/hand/right/input/a/click"
+          ]
+        },
+        "/interaction_profiles/valve/index_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/b/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ]
+        }
+      },
+      "egl_binding": true,
+      "empty_submissions": 7,
+      "focus_losses": 1,
+      "focus_regains": 1,
+      "frames_begun": 45,
+      "frames_ended": 45,
+      "frames_waited": 45,
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "gl_vendor": "Intel",
+      "image_waits": 76,
+      "left_eye_nonblank": 37,
+      "overlay": true,
+      "palette_images": 22,
+      "reference_changes": 1,
+      "releases": 76,
+      "right_eye_nonblank": 37,
+      "sessions_begun": 1,
+      "sessions_destroyed": 1,
+      "stereo_submissions": 38,
+      "swapchain_format": 32856,
+      "swapchains_created": 2,
+      "swapchains_destroyed": 2,
+      "tracking_losses": 4,
+      "trigger_pressure_samples": 5
+    }
+  }
+}

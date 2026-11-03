@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Post-unlit vendor application integration — 2026-11-03
+
+The exact published unlit runtime now has complete optimized coherent OneAPI/
+CUDA/ROCm ALL-target continuations and selected vendor runtime checks. CUDA7/
+ROCm6 missing-device, host and unlit tests pass; OneAPI9 plus strict A770 unlit28,
+arithmetic/resample and actual rebuilt application GL+compute synthetic-XR7 pass.
+Read validation/UNLIT-VENDOR-INTEGRATION.json. These extend the earlier unlit
+component scope to current vendor applications; they are not fresh clean vendor
+builds, full-suite passes, positive AMD/NVIDIA or physical-headset tests.
+The fresh CPU ALL-target build is still running in the frozen vendor cohort.
+The full production goal and all incomplete original/additional rows remain
+required. No system installation or active session changed.
+
+
 ## Core-unlit correction and vendor runtime qualification — 2026-11-03
 
 The qualified core-unlit fix b35b517 is integrated: ignored PBR fallback emission
