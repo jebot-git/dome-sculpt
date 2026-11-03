@@ -1024,7 +1024,10 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
     vertices.push_back({{b.x, b.y, b.z}, color});
   };
   if(state.rig_fit){
-    const auto &view=*state.rig_fit;const auto selected=rig_fit_selection_label(view);
+    const auto &view=*state.rig_fit;
+    // Required-role display labels include a suffix; landmark keys do not.
+    // Keep existing-rig lookup/validation while using raw landmark identity.
+    const auto selected=view.rest_source?rig_fit_selection_label(view):human_roles().at(view.role).name;
     auto point=[&](Vec3 p){auto w=view.world.point({p.x,p.y,p.z});return ob::transform(state.canvas,{float(w[0]),float(w[1]),float(w[2])});};
     const float radius=std::clamp(view.step*.3f,.002f,.02f)*state.canvas.scale;
     if(view.rest_source){for(size_t j=0;j<view.bone_heads.size();++j){const auto center=point(view.bone_heads[j]);const auto color=j==view.role?Vec3{1,.8f,.05f}:Vec3{.1f,1,.4f};for(auto axis:{ob::Vec3{radius,0,0},ob::Vec3{0,radius,0},ob::Vec3{0,0,radius}})line(center-axis,center+axis,color);const auto parent=view.bone_parents.at(j);if(parent>=0)line(point(view.bone_heads.at(size_t(parent))),center,color);}}

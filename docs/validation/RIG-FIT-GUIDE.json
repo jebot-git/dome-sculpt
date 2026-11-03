@@ -1,0 +1,105 @@
+{
+  "status": "terminal",
+  "base": "b32aa8b7259cb670edab8a37a4e703cc09f84a9e",
+  "started_utc": "2026-11-03T07:58:21.609013+00:00",
+  "scope": "Matched wholeowned immutableb32CPU/SANsupport, one rebuilt rendererTU +newtest consumer; no header/class/schema changes or fresh wholeproject/app claim",
+  "runs": [
+    {
+      "profile": "cpu",
+      "old_exit": 1,
+      "fixed_exit": 0,
+      "checks": 13,
+      "support_libraries": 8,
+      "support_drift": 0
+    },
+    {
+      "profile": "sanitize",
+      "old_exit": 1,
+      "fixed_exit": 0,
+      "checks": 13,
+      "support_libraries": 8,
+      "support_drift": 0
+    }
+  ],
+  "exit_code": 0,
+  "source_inputs": 1434,
+  "source_drift": [],
+  "hardware": {
+    "status": "terminal",
+    "exit_code": 0,
+    "scope": "ActualstrictPCI03A770 GL; originalrendernegative thenfixed13; matchedCPU core/support andone rebuiltO3rendererTU, nofreshwholeapp/SYCLdispatch/physicalXRclaim",
+    "runs": [
+      {
+        "name": "old",
+        "exit_code": 1,
+        "seconds": 0.11471575000905432
+      },
+      {
+        "name": "fixed",
+        "exit_code": 0,
+        "seconds": 0.06445207798969932
+      }
+    ],
+    "inputs_before": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-guide-b32/artifacts/guide-proof/cpu/old": "1da7b52870cc0d03fb03ebb5222a07d40a6e802c83716927fc6ed7fad3922d7a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-guide-b32/artifacts/guide-proof/cpu/fixed": "cec489bba14667d92141ba3995df6e2dcdd43935be86995a7d15aba199ee0122"
+    },
+    "inputs_after": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-guide-b32/artifacts/guide-proof/cpu/old": "1da7b52870cc0d03fb03ebb5222a07d40a6e802c83716927fc6ed7fad3922d7a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-guide-b32/artifacts/guide-proof/cpu/fixed": "cec489bba14667d92141ba3995df6e2dcdd43935be86995a7d15aba199ee0122"
+    },
+    "GPU_lease": "released, allownprocessesterminal"
+  },
+  "runtime_files": {
+    "src/render.cpp": "9c90e15a7b584877dd63562fba8c6bc2c42017f76855c13b40f298825b7c0a90",
+    "tests/rig-fit-render.cpp": "6e21cb2836e8d24a0bd5be7ec1d867b45c93cde6b0dfaa6133ba918acd4b152a"
+  },
+  "before_after_source_manifest_sha256": {
+    "source-before.json": "adb5778d393a27025a1e935aecba8bf0963bea1d00b70b69d0bb50fc566ae481",
+    "source-after.json": "adb5778d393a27025a1e935aecba8bf0963bea1d00b70b69d0bb50fc566ae481"
+  },
+  "output_hashes": {
+    "artifacts/guide-proof/arc/fixed.log": "b5dd88e617edeeeacba1125cff099d4513f94b7f2804daa2cd06a6b9bcdb841b",
+    "artifacts/guide-proof/arc/old.log": "769eea66e135feabe21a04322f35f2b4a2704123da569ce843be802062e0b8a3",
+    "artifacts/guide-proof/arc/status.json": "1e47bdba1cde23d79c93168c8452412c7c304d2d108bde2316c2117e61aea199",
+    "artifacts/guide-proof/cpu/compile-render.json": "3e0142f08be248df90d81d17255e4cdd42ead6e6c0788c883e0e0b4851a828ac",
+    "artifacts/guide-proof/cpu/compile-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/cpu/compile-test.json": "6a5f8391547cf19bee48d07fc89cf2cd7f0fd151d3c80df4df6acf5cf8f66770",
+    "artifacts/guide-proof/cpu/compile-test.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/cpu/fixed.log": "c33487c91f6d33a75664ca1aa58bdac6c8c00aa6b0a4a3628f511911a4a5b152",
+    "artifacts/guide-proof/cpu/index-fixed.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/cpu/insert-fixed-member.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/cpu/library-inputs-after.json": "56a302eab27e49b4e77ead747cf56c01ad3041e303fb1116d0ebe766507cdf35",
+    "artifacts/guide-proof/cpu/library-inputs-before.json": "56a302eab27e49b4e77ead747cf56c01ad3041e303fb1116d0ebe766507cdf35",
+    "artifacts/guide-proof/cpu/link-fixed.json": "24cf718405f23506ec64062acabc9c9ef4deec5cc3559de50ba764c2cb7f14a6",
+    "artifacts/guide-proof/cpu/link-fixed.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/cpu/link-old.json": "a561cead44a47848e19c35283cfdadd2b00b081b2f0b109b83adba8081d04293",
+    "artifacts/guide-proof/cpu/link-old.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/cpu/old.log": "3e61cb9c23bae5900d3c5e3c945c7cd1cc87bddef7018b92597313a1bc2183cd",
+    "artifacts/guide-proof/cpu/remove-old-member.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/cpu/render.d": "768f8810e8cafdc99567ad63f48eb082aae8acfbabbbfdb046af643bf5fe5e6d",
+    "artifacts/guide-proof/cpu/test.d": "8f57b79a91fd1b3e47173c2dbb3a8abc13e6ee7b7906f6801d528b404fd85c1b",
+    "artifacts/guide-proof/sanitize/compile-render.json": "eaff61e0442b10dcea354ef6c17147ebb95922993718d46ecbe44965d1cf88b1",
+    "artifacts/guide-proof/sanitize/compile-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/sanitize/compile-test.json": "2bff833bd4da767475e85d0297a440690d5f982effdb8ce7f9e858dc0c1a8525",
+    "artifacts/guide-proof/sanitize/compile-test.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/sanitize/fixed.log": "c33487c91f6d33a75664ca1aa58bdac6c8c00aa6b0a4a3628f511911a4a5b152",
+    "artifacts/guide-proof/sanitize/index-fixed.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/sanitize/insert-fixed-member.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/sanitize/library-inputs-after.json": "4f8cb7d73aedec194ef7b4169635408145597ae563ae2668a8b2a0b43e23f8b2",
+    "artifacts/guide-proof/sanitize/library-inputs-before.json": "4f8cb7d73aedec194ef7b4169635408145597ae563ae2668a8b2a0b43e23f8b2",
+    "artifacts/guide-proof/sanitize/link-fixed.json": "7102a414bd93cb28912db72bd5137b11b0a7afea021a59551bf667d0d2f052a9",
+    "artifacts/guide-proof/sanitize/link-fixed.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/sanitize/link-old.json": "4a346ed0b02d6acc02731755798d385b4e0ae62b8e0a149e81c273a7ab0cfd8c",
+    "artifacts/guide-proof/sanitize/link-old.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/sanitize/old.log": "3e61cb9c23bae5900d3c5e3c945c7cd1cc87bddef7018b92597313a1bc2183cd",
+    "artifacts/guide-proof/sanitize/remove-old-member.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/guide-proof/sanitize/render.d": "0d69d656c5cd8b035531b4e422b201d855ae6df54878dc386f7ba2e3fb173bf3",
+    "artifacts/guide-proof/sanitize/test.d": "9d675a987a75794d546e29aa448de90b52d264392d94a60edb132a923ce9e6df",
+    "artifacts/guide-proof/source-after.json": "adb5778d393a27025a1e935aecba8bf0963bea1d00b70b69d0bb50fc566ae481",
+    "artifacts/guide-proof/source-before.json": "adb5778d393a27025a1e935aecba8bf0963bea1d00b70b69d0bb50fc566ae481",
+    "artifacts/guide-proof/status.json": "5d8b09d074e2dd00c5f7220976f71dfefe6542777a25e7dbabe90cc35cb82dec"
+  },
+  "verified_utc": "2026-11-03T08:11:06.325700+00:00",
+  "scope_precision": "CPU13 +wholeownedC/C++ O1ASan/UBSan/leaks13 use matchingimmutableb32support andone rebuiltO3/O1rendererTU, not freshwholeproject/app. ActualA770GL13 usesCPU-linkedrenderer consumer, noSYCLdispatch/physicalXRclaim. Oldb32renderer fails same independent marker oracle onall3."
+}
