@@ -389,6 +389,7 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
                            const VrmExportOptions &options) {
   if (path.extension() != ".vrm")
     fail("output must use .vrm");
+  if(options.emission)fail("Native HDR VRM package adapter is not admitted in this checkpoint");
   if (!options.max_output_bytes || options.max_output_bytes > 256 * 1024 * 1024)
     fail("invalid output resource bound");
   if (options.paint_resolution && (options.paint_resolution<64 || options.paint_resolution>4096))

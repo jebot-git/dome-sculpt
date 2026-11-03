@@ -78,3 +78,8 @@ restricted VRoid presets and proprietary application code are not included.
   is changed, and factorization is kept off per-frame rendering.
 
 FreeSpacenav legacy Unix input protocol conventions are reviewed from pinned libspnav (BSD-3-Clause); the independent C++ client has no libspnav runtime dependency. Notice: third_party/spacenav/NOTICE. Spacenavd source is inspected for producer cadence only. Exact commits and source hashes are in third_party/sources.json.
+
+- OpenEXR3.2.4 and Imath3.1.12: BSD-3-Clause system libraries, not vendored.
+  The native emission interchange codec writes lossless ZIP FLOAT32 scanlines;
+  a separate OpenEXRCore channel/chunk consumer checks the actual sample bits.
+  Exact package/header/license evidence is in third_party/sources.json.

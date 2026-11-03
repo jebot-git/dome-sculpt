@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "affine-matrix.hpp"
 #include "emission-authority.hpp"
+#include "emission-export.hpp"
 #include "affine-factor.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/material-bindings.hpp"
@@ -42,13 +43,17 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
   if(path.extension()!=".glb")throw std::invalid_argument("Binary glTF export requires .glb");
   if(!options.max_output_bytes || options.max_output_bytes>256*1024*1024)
     throw std::invalid_argument("Invalid glTF output resource budget");
-  auto document=detail::make_gltf(objects,detail::SourceMorphSpace::Native,
+  std::optional<detail::EmissionExportPrepared> physical;
+  if(options.emission)physical=detail::prepare_emission_export(objects,*options.emission,options.cancelled);
+  auto document=detail::make_gltf(physical?physical->surfaces:objects,detail::SourceMorphSpace::Native,
                                  options.recompute_changed_normals,options.cancelled);
+  if(physical)detail::finish_emission_export(document,*physical,*options.emission,options.max_output_bytes,options.cancelled);
   document.json["buffers"]={{{"byteLength",document.binary.size()}}};
   uint64_t bytes=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+
                     ((uint64_t(document.binary.size())+3)&~uint64_t(3));
   if(bytes>options.max_output_bytes)throw std::length_error("glTF output resource budget exceeded");
   GltfExportReport report{objects.size(),document.normal_targets_recomputed,{}};
+  if(physical)for(const auto &entry:physical->images)report.diagnostics.push_back("HDR object "+std::to_string(entry.object)+": exact FLOAT32/native payload; measured standard fallback maximum absolute error "+std::to_string(entry.maximum_absolute_error)+", erased nonzero samples "+std::to_string(entry.erased_nonzero_samples));
   if(report.normal_targets_recomputed)report.diagnostics.push_back(
     "Source NORMAL deltas recomputed from edited geometry; original authoring data remains unchanged");
   stop();detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;
@@ -58,7 +63,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
-  for(const auto &object:input_objects)if(detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings)))throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
+  for(const auto &object:input_objects)if((object.textures&&object.textures->overlay)||detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings)))throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
   for(const auto &object:input_objects)if((object.paint_sampling_attachment||!object.paint_corner_coordinates.empty())&&
       (source_space!=SourceMorphSpace::Native||!object.material_bindings||!object.material_bindings->normal_frames))
     throw std::invalid_argument("Retained paint export requires its complete native normal/colour coordinate compiler");
