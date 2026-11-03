@@ -1,0 +1,29 @@
+{
+  "base": "d7fb236",
+  "scope": "Private native actual factory + copied uninstrumented b32 support",
+  "independent_primal_qps": 128,
+  "primal_field_error": 2.09368e-10,
+  "actual_dual_kkt": 8.82399e-11,
+  "female_solved": 14,
+  "male_solved": 14,
+  "work_cap": 500000000,
+  "captured_inputs": 1550,
+  "admitted": false,
+  "hashes": {
+    "src/projected-coupled-dual.hpp": "b0f2eae77a3f98b54611a3d719ca5602cbede5e7da458b3767542d51090ffdd5",
+    "src/biharmonic-binding.cpp": "5f3a17944d8fcc23560ff0c8272da3f562ad13e86d0852e136b6c58939ca1e8e",
+    "src/biharmonic-binding.hpp": "f4b17d9c618a2f72ec532dfef4cfa522df344160b14eb3696bdf3f7c33dcc5a4",
+    "tests/projected-coupled-dual.cpp": "d3905f5fa752a95ffc106c294030ca082ae335a1dc4a5a75253fbbacc7684087",
+    "tests/biharmonic-projected-lbfgs.cpp": "bfec6dcd21c65632a7366f96cbd0db8fa1fcf2379d5235580aa21ada2af18a18",
+    "tests/biharmonic-projected-lbfgs-poses.cpp": "341d0087240f3a4efde419e97ef426a116c34a29a56a81ce04ed7529862dec78",
+    "artifacts/tests-projected-dual.log": "c7f12b029dfd8c4391b091e4404615ed45ec6f944ba5d1d59bf760992107df54",
+    "artifacts/tests-biharmonic-projected-lbfgs.log": "87ae16a4eae0459c03a2cda9e462fb97ace7eefe411476f4ce1a9aa41a260da1",
+    "artifacts/poses-projected-lbfgs-female.log": "5a88b010fe93448335daa175b45b576abe7bb496db911692b2bbadea7505ce00",
+    "artifacts/poses-projected-lbfgs-male.log": "865689a66f72720d1a9b9e694bb6da8b56c8d518d8d04325c75ef44f36ac6aed",
+    "artifacts/projected-lbfgs-before.json": "2e0e2b2f9af7a647f26c059e75ba36424d3e3aa1c3a956788124a8070c01ebc7",
+    "artifacts/projected-lbfgs-after.json": "2e0e2b2f9af7a647f26c059e75ba36424d3e3aa1c3a956788124a8070c01ebc7",
+    "artifacts/biharmonic-projected-lbfgs-probe": "9e48d9ecd26226bba712f9e9286589cfd65929661ad8661ca59e15ded2599677",
+    "artifacts/biharmonic-projected-lbfgs-poses-probe": "8f1a2f310bacadcd9b03fc05284e7ef4da4ffad899eabb4fcb2af08dd4ff6e5d",
+    "artifacts/projected-dual-probe": "ebe40ea938603f0656ea65e14b2b22a070a7a0e22fcfc71cd4b705e7647e7da6"
+  }
+}

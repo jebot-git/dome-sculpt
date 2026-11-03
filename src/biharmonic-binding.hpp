@@ -17,7 +17,8 @@ enum class BiharmonicBoxSolver {
   PrimalFeasible,
   BlockActiveSet,
   CoupledDual,
-  CoupledSquaredDual
+  CoupledSquaredDual,
+  CoupledProjectedDual
 };
 struct BiharmonicBindingOptions {
   BiharmonicBoxSolver box_solver = BiharmonicBoxSolver::PrimalFeasible;

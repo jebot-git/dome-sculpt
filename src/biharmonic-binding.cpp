@@ -8,6 +8,7 @@
 #include "coupled-biharmonic-dual.hpp"
 #include "fixed-quadratic.hpp"
 #include "heat-binding.cpp"
+#include "projected-coupled-dual.hpp"
 #include "squared-coupled-dual.hpp"
 #include "squared-laplacian-preconditioner.hpp"
 #include <optional>
@@ -137,6 +138,7 @@ SkinWeights coupled_fields(const System &s, BiharmonicOperator &q,
                            std::span<const std::array<uint64_t, 4>> domains,
                            const std::array<bool, 256> &covered,
                            bool independent, bool squared_dual,
+                           bool projected_dual,
                            const BoundedQuadraticOptions &controls,
                            const WeightLimits &limits, size_t maximum_bytes,
                            Budget &budget, BiharmonicBindingReport &proof) {
@@ -215,7 +217,10 @@ SkinWeights coupled_fields(const System &s, BiharmonicOperator &q,
         options.maximum_iterations = controls.maximum_active_iterations;
         options.maximum_bytes = maximum_bytes;
         auto result =
-            squared_dual
+            projected_dual
+                ? solve_projected_coupled_dual(inverse, rows, labels, r, output,
+                                               lambda, options, budget)
+            : squared_dual
                 ? solve_squared_coupled_dual(inverse, rows, labels, r, output,
                                              lambda, options, budget)
                 : solve_coupled_biharmonic_dual(inverse, rows, labels, r,
@@ -295,8 +300,10 @@ SkinWeights bounded_biharmonic_surface(
   const bool block = options.box_solver == BiharmonicBoxSolver::BlockActiveSet;
   const bool squared_dual =
       options.box_solver == BiharmonicBoxSolver::CoupledSquaredDual;
-  const bool coupled =
-      squared_dual || options.box_solver == BiharmonicBoxSolver::CoupledDual;
+  const bool projected_dual =
+      options.box_solver == BiharmonicBoxSolver::CoupledProjectedDual;
+  const bool coupled = projected_dual || squared_dual ||
+                       options.box_solver == BiharmonicBoxSolver::CoupledDual;
   if (options.box_solver != BiharmonicBoxSolver::PrimalFeasible && !block &&
       !coupled)
     throw std::invalid_argument("Unknown biharmonic box solver");
@@ -348,7 +355,8 @@ SkinWeights bounded_biharmonic_surface(
   const size_t planned =
       n * (1024 + 32 * o.limits.max_influences + b * 18) + corners * 160 +
       b * b * 64 + 16384 + precondition_bytes +
-      (coupled ? n * b * (squared_dual ? 384 : 160) + 32768 : 0);
+      (coupled ? n * b * ((squared_dual || projected_dual) ? 384 : 160) + 32768
+               : 0);
   if (planned > o.maximum_bytes || n > o.maximum_work / (sources.size() + 1))
     throw std::length_error(
         "Biharmonic construction exceeds byte/work admission");
@@ -479,9 +487,10 @@ SkinWeights bounded_biharmonic_surface(
   for (auto &row : grouped.vertices)
     row.reserve(o.limits.max_influences + 1);
   if (coupled) {
-    grouped = coupled_fields(s, q, fixed, anchors, domains, covered,
-                             independent, squared_dual, controls, o.limits,
-                             o.maximum_bytes - planned, budget, proof);
+    grouped =
+        coupled_fields(s, q, fixed, anchors, domains, covered, independent,
+                       squared_dual, projected_dual, controls, o.limits,
+                       o.maximum_bytes - planned, budget, proof);
     std::fill(sum.begin(), sum.end(), 1);
   } else
     for (uint32_t joint = 0; joint < b; ++joint)
