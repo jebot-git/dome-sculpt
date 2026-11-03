@@ -43,7 +43,21 @@ namespace union_workflow {
 std::filesystem::path directory;std::string stage;
 void mark(std::string value){stage=std::move(value);std::ofstream(directory/"stage.txt")<<stage<<'\n';std::cout<<"STAGE "<<stage<<std::endl;}
 void endpoint(Document &d){if(!d.wait_native_stroke(std::chrono::seconds(120))||!d.wait_asset(std::chrono::seconds(120))||!d.wait_mesh(std::chrono::seconds(120))||!d.frame().state->error.empty())throw std::runtime_error("Union endpoint "+stage+": "+d.frame().state->error);}
-void saved(Document &d,const std::filesystem::path &path){auto future=d.save_async(path);if(future.wait_for(std::chrono::seconds(120))!=std::future_status::ready)throw std::runtime_error("Union ordered Save timeout at "+stage);future.get();endpoint(d);check(Scene::load(path).encode()==d.copy_scene().encode(),"Actual ordered Save/restart retains this complete union endpoint");}
+void saved(Document &d,const std::filesystem::path &path){
+ // Queue first: this must still capture the accepted endpoint, not a settled
+ // snapshot selected only after authoring has finished. Observe its existing
+ // native/asset/persistence phases separately, each with the same120s bound.
+ auto future=d.save_async(path);
+ auto phase=[&](const char *name,auto wait){
+  const auto start=std::chrono::steady_clock::now();std::cout<<"UNION_SAVE stage="<<stage<<" phase="<<name<<" begin"<<std::endl;
+  const bool ready=wait();std::cout<<"UNION_SAVE stage="<<stage<<" phase="<<name<<" seconds="<<std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count()<<" ready="<<ready<<std::endl;
+  if(!ready)throw std::runtime_error(std::string("Union ordered Save ")+name+" timeout at "+stage);
+ };
+ phase("native",[&]{return d.wait_native_stroke(std::chrono::seconds(120));});
+ phase("asset",[&]{return d.wait_asset(std::chrono::seconds(120));});
+ phase("persistence",[&]{return future.wait_for(std::chrono::seconds(120))==std::future_status::ready;});
+ future.get();endpoint(d);check(Scene::load(path).encode()==d.copy_scene().encode(),"Actual ordered Save/restart retains this complete union endpoint");
+}
 void history(Document &d,const nlohmann::json &before){const auto after=d.copy_scene().encode();check(after!=before&&d.undo()&&d.copy_scene().encode()==before&&d.redo()&&d.copy_scene().encode()==after,"One actual accepted authoring operation has one exact whole-project Undo/Redo");endpoint(d);}
 std::array<float,2> chart(const Mesh&m){for(size_t f=0;f<m.indices.size();f+=3)if(m.normals[m.indices[f]].z>.9f){std::array<float,2> p{};for(size_t k=0;k<3;++k)for(size_t a=0;a<2;++a)p[a]+=m.uv[m.indices[f+k]][a]/3;return p;}throw std::runtime_error("No visible front chart in actual retained target");}
 bool reaches(const std::shared_ptr<const PolygonOrigin> &root,const std::shared_ptr<const PolygonOrigin> &wanted){

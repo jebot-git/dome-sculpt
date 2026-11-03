@@ -2629,7 +2629,19 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   target_link_libraries(dome-sculpt-source-union-workflow-test PRIVATE dome-sculpt-render)
   target_link_options(dome-sculpt-source-union-workflow-test PRIVATE "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE")
   add_test(NAME source-union-workflow COMMAND dome-sculpt-source-union-workflow-test ${CMAKE_CURRENT_BINARY_DIR}/source-union-workflow ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-female.vrm)
-  set_tests_properties(source-union-workflow PROPERTIES TIMEOUT 1800 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+  # The unchanged full retained-source workflow is CPU-bound under owned
+  # ASan/UBSan. Keep normal Release at1800s; give that instrumented whole-test
+  # scope a finite7200s budget. Individual operation observers remain120s.
+  set(_source_union_workflow_timeout 1800)
+  string(TOUPPER "${CMAKE_BUILD_TYPE}" _source_union_workflow_config)
+  set(_source_union_workflow_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${_source_union_workflow_config}}")
+  if(_source_union_workflow_flags MATCHES "(^|[ \t])-fsanitize=([^ \t,]+,)*(address|undefined)(,|[ \t]|$)")
+    set(_source_union_workflow_timeout 7200)
+  endif()
+  set_tests_properties(source-union-workflow PROPERTIES TIMEOUT ${_source_union_workflow_timeout} ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+  unset(_source_union_workflow_timeout)
+  unset(_source_union_workflow_config)
+  unset(_source_union_workflow_flags)
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
