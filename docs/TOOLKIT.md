@@ -1,7 +1,7 @@
 # Current DomeD toolkit and conventions
 
 The desktop application now requires canonical DomeD revision
-`b2f23ce68d92b9a43e62fddb3bb69fb6eec13d20` and its24th
+`f797e0f1d43e7be5a06128ca7b0b0b0259fefabd` and its24th
 `fltk-1.4.5-process-cleanup.patch`. The native process display owner closes the
 connection only after App/widgets/GL/workers and before Fontconfig cleanup.
 CMake checks the builder-installed patch and its pinned checksum to reject
@@ -11,17 +11,21 @@ public class layouts. This requirement applies to the desktop build; standalone
 headless compute configurations do not need a desktop toolkit.
 
 Prepare the toolkit from a checkout at that exact DomeD commit, as the regular
-user, with private paths. The existing verified bitmap runtime remains valid:
+user, with private paths. The matching bitmap runtime includes the Xlib source-cache fix. All153 public
+headers remain byte-identical to the previous SDK. Prepare both private prefixes:
 
 ```sh
-export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig"
-export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib"
+python3 "$DOME_TOOLKIT_SOURCE/scripts/prepare-bitmap-runtime.py" \
+  --work "$PWD/artifacts/bitmap-f797e0f-work" \
+  --prefix "$PWD/artifacts/bitmap-f797e0f" --jobs 2
+export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-f797e0f/lib/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-f797e0f/lib"
 python3 "$DOME_TOOLKIT_SOURCE/scripts/prepare-fltk-experiment.py" \
-  --deps "$PWD/artifacts/toolkit-b2f23ce-deps" \
-  --prefix "$PWD/artifacts/toolkit-b2f23ce"
-export LD_LIBRARY_PATH="$PWD/artifacts/toolkit-b2f23ce/lib:$LD_LIBRARY_PATH"
+  --deps "$PWD/artifacts/toolkit-f797e0f-deps" \
+  --prefix "$PWD/artifacts/toolkit-f797e0f"
+export LD_LIBRARY_PATH="$PWD/artifacts/toolkit-f797e0f/lib:$LD_LIBRARY_PATH"
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOME_COMPUTE_BACKEND=CPU \
-  -DFLTK_DIR="$PWD/artifacts/toolkit-b2f23ce/share/fltk"
+  -DFLTK_DIR="$PWD/artifacts/toolkit-f797e0f/share/fltk"
 cmake --build build --parallel 2
 ```
 
@@ -29,11 +33,11 @@ cmake --build build --parallel 2
 The builder retains the verified archive, COPYING and all24 patches under
 `share/fltk-bdf-source`. The whole-toolkit sanitizer counterpart must retain the
 same source notices. New application integration evidence is pending separately;
-prior62b6417/application proofs below retain their original scopes. The toolkit
-component has clean native Wayland sanitizer evidence; its optional X11 fixture
-still reports800 bytes/two allocations in Cairo's Xlib source helper, also
-present in the old toolkit control. Standalone-XR's Mesa112-byte report is
-separate and remains unresolved. No suppression is introduced.
+prior62b6417/application proofs below retain their original scopes. The toolkit and matching Cairo runtime have clean native Wayland and X11
+sanitizer lifecycle evidence. The older800-byte Cairo Xlib source report is
+retained as a negative and corrected by the matching runtime; standalone-XR's
+Mesa112-byte report is separate and remains unresolved. No suppression is
+introduced.
 
 ## Earlier23-patch toolkit baseline
 

@@ -122,7 +122,7 @@
   },
   "domed_fltk": {
     "repository": "https://github.com/jebot-git/DomeD",
-    "commit": "b2f23ce68d92b9a43e62fddb3bb69fb6eec13d20",
+    "commit": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
     "version": "1.4.5",
     "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
     "patches_in_application_order": [
@@ -179,7 +179,7 @@
     },
     "combined_patch_sha256": "d9e70caf0b983f4b12dfe6a345d0f7525af87812749a5b3f3880be7210455b18",
     "used": "Canonical Release FLTK1.4.5 with all24 patches, native BDF/PCF, exception-safe process display cleanup and plugin construction; regular-user optimized lib prefix. Whole-toolkit sanitizer counterpart uses identical source/patches. Bitmap helper/runtime pins unchanged.",
-    "verified_at_commit": "b2f23ce68d92b9a43e62fddb3bb69fb6eec13d20",
+    "verified_at_commit": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
     "builder_sha256_at_verified_commit": "7a6bef76fcb22805ebcb655b17d8fc5f1bbf082991fab3be557c6a79fb136d44"
   },
   "vrm_specification": {
@@ -356,7 +356,7 @@
   },
   "domed_bitmap_runtime": {
     "repository": "https://github.com/jebot-git/DomeD",
-    "commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
+    "commit": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
     "lock": {
       "policy": "native-unicode-bitmap-only",
       "formats": [
@@ -405,7 +405,7 @@
           "version": "1.18.4",
           "directory": "cairo-1.18.4",
           "patch": "cairo-1.18.4-bitmap.patch",
-          "patch_sha256": "4aa6c2229c3cf6e99d955b4df0f9dddbc969fd3bdd56e1f779c008fc2c3e3f23",
+          "patch_sha256": "025e4b8b70edd9d7397c71e13622e4676319f8505566326d4ffa2bfc533d5957",
           "licenses": [
             "COPYING",
             "COPYING-LGPL-2.1",
@@ -476,7 +476,7 @@
           "version": "1.18.4",
           "directory": "cairo-1.18.4",
           "patch": "cairo-1.18.4-bitmap.patch",
-          "patch_sha256": "4aa6c2229c3cf6e99d955b4df0f9dddbc969fd3bdd56e1f779c008fc2c3e3f23",
+          "patch_sha256": "025e4b8b70edd9d7397c71e13622e4676319f8505566326d4ffa2bfc533d5957",
           "licenses": [
             "COPYING",
             "COPYING-LGPL-2.1",
@@ -500,25 +500,25 @@
       ],
       "libraries": {
         "libfreetype.so.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
-        "libharfbuzz.so.0": "35fcdcf82f23dc5301513ec8ac75d154d1342ed5e5a24f38930abed3a46c9edc",
-        "libharfbuzz-subset.so.0": "bec1b6aaa8efb1f296600bb29f0fa976e7781fe181237b4b847cd042a99fd748",
-        "libharfbuzz-raster.so.0": "65df1846fe460e96cd68bd4911c54c10d7b03012ed906a52dc5ea4a10c38ff14",
-        "libharfbuzz-vector.so.0": "a2335d97a051dca9db35bd097d72eae752f72450ad0f0d8b234aa3af6a9dfedb",
-        "libharfbuzz-gpu.so.0": "f4c2b18eda9725fb117ebbedac7885f703efdf8ec5719e3702b15c9d338a243d",
-        "libharfbuzz-cairo.so.0": "72a787c0421104d8a1b919b12f2d9c833290c31788890edadc5dda52a3cb9a6c",
-        "libharfbuzz-icu.so.0": "1a83fb4e5e9085dcc3c5c5b521c938b855efd508616573930765037b228ed5d6",
-        "libharfbuzz-gobject.so.0": "26a75ec631ba4d446d722b4975480b8aba02751f76d73b56c62dd989ba0be8fe",
-        "libcairo.so.2": "7d4db5c2c967ad834a6506e1f83eee5959a85a172bee968d1be38fa3c6f5ea32",
-        "libcairo-gobject.so.2": "3e5df98597dd80cbb05e9faddf220fe5b9d940c0ac502b501a4253ba4f707a77",
-        "libcairo-script-interpreter.so.2": "5d9c5146a1d7ac858f4351e2bc29071b6b68d21de2d34d97c8e1738d1797a7fa",
-        "libpango-1.0.so.0": "78bef364dcef44efc44a21fd92584d889a954e975777a2a3e6d1d2d14de3b1d4",
-        "libpangoft2-1.0.so.0": "4b4ae1867fd311c25f4f9750c9fbb3c9d8afa25446bb1658117315de33eacb46",
-        "libpangoxft-1.0.so.0": "acf16e4aa66954213f5e4306bb4556b50367e9061a2fb5a38bd96a446d8b2172",
-        "libpangocairo-1.0.so.0": "3c338cbc91c96b508106cb23c3b1db1e385aa1b08b47ed553d92e8c63db781db"
+        "libharfbuzz.so.0": "881d7b6a6aac2bb647ab5b5187142710a921695df2e341a7adc8c0f6f7a95e99",
+        "libharfbuzz-subset.so.0": "bc6722de7371cfeb22937205d9a54e91e07c798edacfda45534d336a2d685859",
+        "libharfbuzz-raster.so.0": "c3b595cd42e68ca6317370085d4c5a4bb84975021a05f12097b22c51ec73acf2",
+        "libharfbuzz-vector.so.0": "2502981dbbafeca4ff0760dc54376cb4f05874dc3f78f309dfe9d00a5f88489f",
+        "libharfbuzz-gpu.so.0": "e0df8308357102f9d7587ff2dfbc60a72d4ebdb0caa5e4dc44d7a3246bb8ee1d",
+        "libharfbuzz-cairo.so.0": "f3af7cbb7f7b84345187275e009fd2a834bee3b62ea7055cb06f6ba53da2e822",
+        "libharfbuzz-icu.so.0": "4ed43f1c638ca55455d10370840e81a45c923be86b4f05109f1d9f153a419621",
+        "libharfbuzz-gobject.so.0": "3924ae25330d8d755e020207cb51865d6886d76357e95e4b1b30f90436c28c87",
+        "libcairo.so.2": "8f45f554372a1b6531ec049199f19e6a8feb5a7294341b28b51c60906eb894ef",
+        "libcairo-gobject.so.2": "5ba8389b3149a962d63e5ebbed6403b395a7aaa106ab0eb8866204057f688914",
+        "libcairo-script-interpreter.so.2": "73fa57f28d91acf128db90b3301f79ebe0da9cf1b7017506889f7485ae68ab4c",
+        "libpango-1.0.so.0": "19afae7d7a87da694fff94b9367a9c1b406e20464f026478d113b2586ed5ee18",
+        "libpangoft2-1.0.so.0": "cba202c5d64cb96dc21f2ee88ca145d5503fa16478a998a290d156bbbefcc62e",
+        "libpangoxft-1.0.so.0": "d4810b2f313d91039f273972a31ac390a295e4233ccd1377c10c93fa4aa4b5d8",
+        "libpangocairo-1.0.so.0": "16f93d2a0067c869a07c4c8ca8e524008c75b11a0d9eb6a127cea7f4287548c7"
       }
     },
-    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack; no Pango application frontend, no outlines, no system installation.",
-    "verified_at_commit": "d271cf65c612a462fcfa6739416b06c6565be070"
+    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack with locked Cairo Xlib source-cache cleanup. All153 public headers match previous SDK byte-for-byte; actual runtime maps qualified separately. No Pango frontend, outlines, suppression or system installation.",
+    "verified_at_commit": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd"
   },
   "nlohmann_json": {
     "repository": "https://github.com/nlohmann/json",
