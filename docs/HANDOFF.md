@@ -8,8 +8,8 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 This proof-only checkpoint records the frozen private candidate b32aa8b; it
 changes no runtime, header, CMake, test, asset or public main implementation.
-The candidate's full533 CPU regression and remaining ROCm build remain live
-in authoring-master-3f4b2ba. Do not edit its tracked files during those runs.
+The candidate's full533 CPU regression remains live in
+authoring-master-3f4b2ba. Do not edit its tracked files during that run.
 
 The complete optimized OneAPI all-target build passes in1278.605s, with all1,434
 tracked inputs unchanged,407 ELF/static archives hashed and all534 registered
@@ -35,6 +35,21 @@ The native FMA-capable host sampler matches
 missing-device behavior, not positive NVIDIA execution, device loss or latency.
 Read validation/ONEAPI-SELECTED-b32.json and
 validation/CUDA-FULL-BUILD-b32.json for exact commands, hashes and results.
+
+The full ROCm7.1/Clang20/gfx1030 native all-target build also passes in1493.641s,
+with all1,434 source inputs exact. The actual executable is PIE, with the
+project's default mixed-driver app/core PIC policy retained. Two selected
+registered tests and three direct session/Scene/quality probes pass; actual HIP
+status100 reports no device, nonempty dispatch refuses without caller changes,
+the layered/masked Scene retains its exact owner/data, and the native host
+sampler matches44,217 words. All1,843 captured probe inputs remain exact.
+CUDA additionally passes the same missing session/Scene/quality probes against
+a real current CPU-generated and successfully refined layered/masked input.
+This is current native build/failure evidence for all four backend choices;
+positive AMD/NVIDIA hardware and device-loss/performance requirements remain
+open. Read validation/ROCM-FULL-BUILD-b32.json and
+validation/CUDA-MISSING-FIELDS-b32.json. The sequential vendor build queue has
+finished; the full CPU regression and separate broad134 SAN run remain active.
 
 Strict actual A770/PCI0000:03:00.0 validation passes301 checks: the combined134
 workflow,101 key/UV commutation,59 rig/UV authoring, and7 actual application

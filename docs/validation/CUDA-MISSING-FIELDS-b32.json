@@ -1,0 +1,86 @@
+{
+  "source": "b32aa8b7259cb670edab8a37a4e703cc09f84a9e",
+  "status": "terminal",
+  "started_utc": "2026-11-03T07:25:58.751129+00:00",
+  "scope": "Native CPU-generated layered/masked volume plus actualCUDA absent-device session/Scene/quality refusal; no positiveNVIDIA/device-loss claim",
+  "inputs_before": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt-resample-backend-test": "76a3bf2e86db39a161d0adbde288aa2f411196ef234a0710a6b03784c4f69446",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/dome-sculpt-resample-backend-test": "11a43bba59494ca75d737db9357563906694faede04f6bec36e9e9a1d8f16da5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/dome-sculpt-resample-quality-test": "8c0b84924639ed91cc603851bca12752d152b2118d0c39dba68a80023bd4c062"
+  },
+  "runs": [
+    {
+      "name": "make",
+      "exit_code": 0,
+      "seconds": 0.016555562993744388,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt-resample-backend-test",
+        "--make",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/vendor-missing-fields-b32/layered-mask.json"
+      ]
+    },
+    {
+      "name": "cpu-reference",
+      "exit_code": 0,
+      "seconds": 0.11459671301417984,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt-resample-backend-test",
+        "--volume",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/vendor-missing-fields-b32/layered-mask.json",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/vendor-missing-fields-b32/cpu-reference.json"
+      ]
+    },
+    {
+      "name": "cuda-missing-session",
+      "exit_code": 0,
+      "seconds": 0.00378986302530393,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/dome-sculpt-resample-backend-test",
+        "--missing"
+      ]
+    },
+    {
+      "name": "cuda-missing-scene",
+      "exit_code": 0,
+      "seconds": 0.016090054996311665,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/dome-sculpt-resample-backend-test",
+        "--missing-volume",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/vendor-missing-fields-b32/layered-mask.json"
+      ]
+    },
+    {
+      "name": "cuda-missing-quality",
+      "exit_code": 0,
+      "seconds": 0.0038517920183949172,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/dome-sculpt-resample-quality-test",
+        "--missing"
+      ]
+    }
+  ],
+  "exit_code": 0,
+  "inputs_after": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt-resample-backend-test": "76a3bf2e86db39a161d0adbde288aa2f411196ef234a0710a6b03784c4f69446",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/dome-sculpt-resample-backend-test": "11a43bba59494ca75d737db9357563906694faede04f6bec36e9e9a1d8f16da5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/dome-sculpt-resample-quality-test": "8c0b84924639ed91cc603851bca12752d152b2118d0c39dba68a80023bd4c062"
+  },
+  "input_drift": [],
+  "fixture_sha256": "568ebf79458c8892cfc67893e02511a64bd256de8c92277f78ad6be0effca8bc",
+  "CPU_reference_sha256": "82c9547e97f0cc57a756d43343c3211ea8b2533434b86b633606ff53cfb1235b",
+  "direct_assertion_counts": {
+    "CUDA_session": 1,
+    "CUDA_Scene_preservation": 2,
+    "CUDA_quality": 1
+  },
+  "output_hashes": {
+    "artifacts/vendor-missing-fields-b32/cpu-reference.json": "82c9547e97f0cc57a756d43343c3211ea8b2533434b86b633606ff53cfb1235b",
+    "artifacts/vendor-missing-fields-b32/cpu-reference.log": "3705fe34c079fea3a7e053d0f36c27c8180e08c775ac9c34c7cda23eabc7f4fb",
+    "artifacts/vendor-missing-fields-b32/cuda-missing-quality.log": "3cc8073c73543800920414a3438a6d5ac340816068b346b94d41671de35790a5",
+    "artifacts/vendor-missing-fields-b32/cuda-missing-scene.log": "bba786df09d4935b15d5d305931edadf4e4ae9849b00696fb2baad3dcf628513",
+    "artifacts/vendor-missing-fields-b32/cuda-missing-session.log": "fc2058d121e5a4050a0a769c42aed61efc449fc53d90625cd2653df5b04c5241",
+    "artifacts/vendor-missing-fields-b32/layered-mask.json": "568ebf79458c8892cfc67893e02511a64bd256de8c92277f78ad6be0effca8bc",
+    "artifacts/vendor-missing-fields-b32/make.log": "18c949d6a6aa0346f57b3155bf426661d125c1cb411491d6b6b6a836891ccd33",
+    "artifacts/vendor-missing-fields-b32/status.json": "520f7b3bae355269a45aa98ffb64b22a3db0b3fc223c062d7f8623778d3abb7a"
+  }
+}
