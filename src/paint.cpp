@@ -761,6 +761,38 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
   }
   paint_compute::checkpoint(cancelled);return packet;
 }
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::pack_source_maps(
+    const std::shared_ptr<const PaintOverlayPacket> &packet,std::shared_ptr<const PaintSourceMaps> packed,
+    std::span<const uint32_t> vertices,const std::function<bool()> &cancelled) {
+  paint_compute::checkpoint(cancelled);
+  if(!packet||!packet->source_maps_||!packed||vertices.empty()||vertices.size()>6'000'000)
+    throw std::invalid_argument("Packed overlay requires its actual bounded source coordinate expansion");
+  const auto &source=*packet->source_maps_;
+  if(std::bit_cast<uint32_t>(source.normal_scale)!=std::bit_cast<uint32_t>(packed->normal_scale)||
+     std::bit_cast<uint32_t>(source.occlusion_strength)!=std::bit_cast<uint32_t>(packed->occlusion_strength)||
+     source.extra_uv_sets.size()!=packed->extra_uv_sets.size())
+    throw std::invalid_argument("Packed overlay changed source material sampling");
+  const std::array<const PaintSourceTexture*,5> a{&source.color,&source.metal_rough,&source.emission,&source.normal,&source.occlusion},
+    b{&packed->color,&packed->metal_rough,&packed->emission,&packed->normal,&packed->occlusion};
+  for(size_t k=0;k<a.size();++k)if(a[k]->image!=b[k]->image||a[k]->image.owner_before(b[k]->image)||b[k]->image.owner_before(a[k]->image)||
+      a[k]->wrap_s!=b[k]->wrap_s||a[k]->wrap_t!=b[k]->wrap_t||a[k]->min_filter!=b[k]->min_filter||a[k]->mag_filter!=b[k]->mag_filter||
+      a[k]->texcoord!=b[k]->texcoord||std::bit_cast<std::array<uint32_t,6>>(a[k]->uv_transform)!=std::bit_cast<std::array<uint32_t,6>>(b[k]->uv_transform))
+    throw std::invalid_argument("Packed overlay changed original image/view ownership");
+  auto coordinates=[&](const auto &before,const auto &after){
+    if(bool(before)!=bool(after)|| (after&&after->size()!=vertices.size()))throw std::invalid_argument("Packed overlay coordinate domain differs");
+    if(!before)return;
+    for(size_t v=0;v<vertices.size();++v){
+      if((v&1023)==0)paint_compute::checkpoint(cancelled);
+      if(vertices[v]>=before->size()||std::bit_cast<std::array<uint32_t,2>>(after->at(v))!=std::bit_cast<std::array<uint32_t,2>>(before->at(vertices[v])))
+        throw std::invalid_argument("Packed overlay coordinates differ from exact source vertex expansion");
+    }
+  };
+  coordinates(source.uv1,packed->uv1);
+  for(const auto &[set,values]:source.extra_uv_sets){auto it=packed->extra_uv_sets.find(set);
+    if(it==packed->extra_uv_sets.end())throw std::invalid_argument("Packed overlay changed original coordinate identities");coordinates(values,it->second);}
+  auto out=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket(*packet));out->source_maps_=std::move(packed);
+  paint_compute::checkpoint(cancelled);return out;
+}
 PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y) const {
   const auto &p=pixel(id,x,y);const auto &l=layer(id);
   if(!l.emission_tiles.empty())if(const auto &tile=l.emission_tiles.at(size_t(y/32)*surface_->columns+x/32))

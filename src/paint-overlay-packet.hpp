@@ -28,5 +28,9 @@ public:
 };
 struct PaintOverlayFactory {
  static std::shared_ptr<const PaintOverlayPacket> capture(const PaintedMesh &,const std::function<bool()> &cancelled={});
+ // Render-only ordered vertex expansion. Does not grant Scene/paint authority.
+ static std::shared_ptr<const PaintOverlayPacket> pack_source_maps(
+   const std::shared_ptr<const PaintOverlayPacket> &,std::shared_ptr<const PaintSourceMaps>,
+   std::span<const uint32_t> source_vertices,const std::function<bool()> &cancelled={});
 };
 }

@@ -1,3 +1,4 @@
+#include "paint-overlay-packet.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/normal-sampling.hpp"
@@ -1735,12 +1736,15 @@ void Document::mesh_loop() {
         auto frames = canonical && !retained ? tangent_corners(o.mesh, cancelled)
                                             : std::vector<Tangent>{};
         std::shared_ptr<std::vector<std::array<float,2>>> packed_uv1;
+        std::vector<uint32_t> overlay_vertices;
+        if(o.textures&&o.textures->overlay)overlay_vertices.reserve(packed_vertices);
         std::map<uint32_t,std::shared_ptr<std::vector<std::array<float,2>>>> packed_extra_uv;
         if(o.textures&&o.textures->source_maps&&!o.textures->source_maps->extra_uv_sets.empty()){o.textures->source_maps->validate_surface(o.mesh);for(const auto &[set,owner]:o.textures->source_maps->extra_uv_sets){auto values=std::make_shared<std::vector<std::array<float,2>>>();values->reserve(packed_vertices);packed_extra_uv.emplace(set,std::move(values));}}
         if(o.textures&&o.textures->source_maps&&o.textures->source_maps->uv1){
           o.textures->source_maps->validate_surface(o.mesh);packed_uv1=std::make_shared<std::vector<std::array<float,2>>>();packed_uv1->reserve(packed_vertices);
         }
         auto append = [&](uint32_t vertex, Tangent tangent, size_t frame_vertex=SIZE_MAX) {
+          if(o.textures&&o.textures->overlay)overlay_vertices.push_back(vertex);
           if(paint_attachment||!snapshot->paint_coordinates.empty())snapshot->paint_coordinates.push_back(paint_attachment?paint_coordinates->at(frame_vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex));
           if(packed_uv1)packed_uv1->push_back(o.textures->source_maps->uv1->at(vertex));
           for(auto &[set,values]:packed_extra_uv)values->push_back(o.textures->source_maps->extra_uv_sets.at(set)->at(vertex));
@@ -1814,7 +1818,9 @@ void Document::mesh_loop() {
         // agree with the original local primitive. Rest indices stay untouched.
         if(reflected)for(size_t c=first;c<snapshot->mesh.indices.size();c+=3)std::swap(snapshot->mesh.indices[c+1],snapshot->mesh.indices[c+2]);
         auto textures=o.textures;
-        if(packed_uv1||!packed_extra_uv.empty()){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);if(packed_uv1)maps->uv1=std::move(packed_uv1);for(auto &[set,values]:packed_extra_uv)maps->extra_uv_sets[set]=std::move(values);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);textures=std::move(packed);}
+        if(packed_uv1||!packed_extra_uv.empty()){auto maps=std::make_shared<PaintSourceMaps>(*textures->source_maps);if(packed_uv1)maps->uv1=std::move(packed_uv1);for(auto &[set,values]:packed_extra_uv)maps->extra_uv_sets[set]=std::move(values);auto packed=std::make_shared<TextureMaps>(*textures);packed->source_maps=std::move(maps);
+          if(packed->overlay)packed->overlay=detail::PaintOverlayFactory::pack_source_maps(packed->overlay,packed->source_maps,overlay_vertices,cancelled);
+          textures=std::move(packed);}
         snapshot->ranges.push_back({o.id, first, o.mesh.indices.size(), o.material, std::move(textures), std::move(appearance), offset, o.material_bindings, bool(retained), bool(retained && canonical), bool(retained && retained_pose->tangents[source_role].empty()),world,!affine});
         snapshot->ranges.back().paint_sampling_attachment=paint_attachment;
         if(o.normal_preview_proof&&o.normal_preview_proof->matches(o.material_bindings,snapshot->ranges.back().textures))snapshot->ranges.back().normal_preview_proof=o.normal_preview_proof;
