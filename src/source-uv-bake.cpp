@@ -69,8 +69,9 @@ std::optional<MToonMaterial> typed(const CreatorAppearance*a){
 struct Plan {
  PaintSourceTexture view;bool srgb=false,normal=false,check_backface=false;int coord=0,role=-1;
  std::array<float,6> transform{1,0,0,1,0,0};bool animated=false,logical=false;
+ const std::vector<std::array<float,2>> *domain=nullptr;
 };
-bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.coord==b.coord&&a.logical==b.logical&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
+bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.domain==b.domain&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
 void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
  if((i.current_material&&detail::physical_emission(*i.current_material))||(i.native_material&&detail::hdr_emission(i.native_material->emission))||(i.paint&&i.paint->has_physical_emission()))throw std::invalid_argument("Physical emission requires an exact UV transfer adapter; source retained");
@@ -353,14 +354,14 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   const auto &maps=i.paint->source_maps();if(coordinate<2||coordinate>7||!maps)throw std::invalid_argument("Extra source UV bake requires its exact coordinate owner");auto found=maps->extra_uv_sets.find(uint32_t(coordinate));if(found==maps->extra_uv_sets.end()||!found->second||found->second->size()!=old.positions.size())throw std::invalid_argument("Extra source UV bake coordinate correspondence differs");return found->second.get();
  };
  auto mapped=[&](const Plan &p,const Hit &h){
-  auto q=uv(old,coordinate_domain(p.coord,p.logical),h);if(!p.animated)return affine(q,p.transform);
+  auto q=uv(old,p.domain,h);if(!p.animated)return affine(q,p.transform);
   float mask=1;auto maskview=original_role(8);if(maskview.image){const auto &mt=result.mtoon->textures[8];auto mu=uv(old,coordinate_domain(coordinate(mt),true),h);mu=mtoon_uv(*result.mtoon,MToonSlot::UvMask,mu,0,1);mask=sample_source_texture(maskview,mu[0],mu[1],mt.encoding==MToonEncoding::Srgb)[mt.channel];budget.work();}
   return mtoon_uv(*result.mtoon,MToonSlot(p.role),q,o.freeze_seconds,mask);
  };
  std::vector<std::pair<Plan,std::shared_ptr<const Image>>> completed;std::optional<Raster> current;
  auto bake=[&](Plan p){
   if(!p.view.image)return p.view;
-  coordinate_domain(p.coord,p.logical);p.view.validate(unsigned(p.coord+1));p.view.image->validate();for(auto &[other,image]:completed)if(same(p,other)){auto out=p.view;out.image=image;out.texcoord=0;out.uv_transform={1,0,0,1,0,0};out.wrap_s=out.wrap_t=33071;return out;}
+  p.domain=coordinate_domain(p.coord,p.logical);p.view.validate(unsigned(p.coord+1));p.view.image->validate();for(auto &[other,image]:completed)if(same(p,other)){auto out=p.view;out.image=image;out.texcoord=0;out.uv_transform={1,0,0,1,0,0};out.wrap_s=out.wrap_t=33071;return out;}
   uint32_t size=o.resolution?o.resolution:std::max({p.view.image->width,p.view.image->height,i.paint->resolution()});if(size_t(size)*size>o.max_image_pixels)throw std::length_error("Source UV output image pixel budget exceeded");size_t bytes=size_t(size)*size*4;if(bytes>o.max_output_bytes-result.image_bytes)throw std::length_error("Source UV output image budget exceeded");
   if(!current||current->size!=size){current.reset();current=raster(i.target,size,false,true,budget);}
   auto image=std::make_shared<Image>();image->width=image->height=size;image->rgba.assign(bytes,0);
