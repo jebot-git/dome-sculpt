@@ -2605,6 +2605,17 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-native-shape-sampling-test tests/native-shape-sampling.cpp)
+  target_include_directories(dome-sculpt-native-shape-sampling-test PRIVATE src tests third_party/cgltf third_party/desktop)
+  target_link_libraries(dome-sculpt-native-shape-sampling-test PRIVATE dome-sculpt-render)
+  target_link_options(dome-sculpt-native-shape-sampling-test PRIVATE
+    "-Wl,--wrap=_ZN4dome16ShapeSculptDraft5stampERKNS_5BrushERKSt8functionIFbvEE"
+    "-Wl,--wrap=_ZN4dome20MaterialSurfaceQueryC1ERKNS_4MeshESt4spanIKNS_12SurfaceRangeELm18446744073709551615EERKSt8functionIFbvEES4_IKSt5arrayIfLm4EELm18446744073709551615EENS_22PaintCornerCoordinatesE")
+  add_test(NAME native-shape-sampling COMMAND dome-sculpt-native-shape-sampling-test ${CMAKE_CURRENT_BINARY_DIR}/native-shape-sampling)
+  set_tests_properties(native-shape-sampling PROPERTIES TIMEOUT 1800 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_executable(dome-sculpt-source-union-workflow-test tests/source-union-workflow.cpp)
   target_include_directories(dome-sculpt-source-union-workflow-test PRIVATE src third_party/cgltf third_party/desktop)
   target_link_libraries(dome-sculpt-source-union-workflow-test PRIVATE dome-sculpt-render)

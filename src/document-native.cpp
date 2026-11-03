@@ -144,6 +144,7 @@ void Document::native_loop(){
       Scene working=session->initial->snapshot();working.select(session->source.object);auto &o=working.active();
       size_t budget=4'000'000;if(!session->shape_target)for(const auto &other:working.objects())if(other.id!=o.id){auto used=std::max(other.volume->stored_samples(),other.volume->voxels().size());if(used>budget)throw std::length_error("Scene sculpt storage budget exceeded");budget-=used;}
       std::unique_ptr<MaterialSurfaceQuery> query;
+      std::optional<SurfaceRange> query_range;
       std::vector<std::array<float,4>> query_colors;
       std::vector<std::array<float,2>> query_paint;
       std::unique_ptr<ShapeSculptDraft> shape;
@@ -165,8 +166,13 @@ void Document::native_loop(){
         } else geometry=shape?std::make_shared<const Mesh>(shape->preview()):o.deformation?std::make_shared<const Mesh>(o.deformation->preview(o.painted->mesh())):std::shared_ptr<const Mesh>(o.painted,&o.painted->mesh());
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
         if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
-        SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings};
+        query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});
+        auto &range=*query_range;
         range.reflected=reflected;
+        // This query keeps logical REST triangle order. place_mesh transforms
+        // positions/normals without reindexing; only the packed render worker
+        // reverses corners for reflected placement.
+        range.paint_winding_reversed=false;
         if(o.painted->paint_sampling_domain()) {
           range.paint_sampling_attachment=o.painted->paint_sampling_attachment();
           range.normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
@@ -255,7 +261,12 @@ void Document::native_loop(){
         if(now-shown>=std::chrono::milliseconds(30)){
           auto preview=working.snapshot();
           if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());author_shapekey(preview,o.id,edit,cancelled);detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
-            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);SurfaceRange range{o.id,0,geometry.indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings};range.reflected=session->affine_world&&frame.orientation()==AffineOrientation::Reversing;range.pbr_view=session->pbr_view;query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);
+            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);
+            // Only evaluated geometry changes during this gesture. Preserve
+            // the original immutable material, sampling attachment/proof and
+            // its explicitly logical-corner paint stream for every refresh.
+            if(!query_range||geometry.indices.size()!=query_range->count)throw std::logic_error("Shape preview changed its visibility triangle correspondence");
+            query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&*query_range,1),cancelled,query_colors,PaintCornerCoordinates{query_paint});
           }
           std::lock_guard lock(model_mutex_);
           if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");
