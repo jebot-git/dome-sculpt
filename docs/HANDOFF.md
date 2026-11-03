@@ -6,6 +6,10 @@ remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
 ## Qualified authoring union — 2026-11-03
 
+Published main `fd5ecc7` now contains this qualified union. The remote main
+reference was verified after its fast-forward from `3f4b2ba`; all local commits
+were preserved. The runtime remains byte-identical to qualified `eec7753`.
+
 Runtime source `eec7753` completes the coherent admission gates for the retained
 source UV/paint/key and rig/rest/length authoring union on public `3f4b2ba`.
 This candidate includes the native preview-owner repair, required-landmark

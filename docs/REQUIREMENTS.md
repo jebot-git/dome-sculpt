@@ -1,6 +1,7 @@
 # Full objective and completion evidence
 
-The combined retained source UV/paint/key and source-rig/rest/length union now
+Published main `fd5ecc7` contains the combined retained source UV/paint/key and
+source-rig/rest/length union, which now
 has coherent runtimeeec7753 qualification: optimized all-target CPU/OneAPI/CUDA/
 ROCm builds, affected CPU17/17 and whole-owned sanitizer14/14, native UI/
 controller/compositor52, actual A770 guide13/selected21 and synthetic-XR7.
