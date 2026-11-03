@@ -248,6 +248,7 @@ void Scene::validate(bool deep_sources) const {
   };
   auto retain_paint = [&](const std::shared_ptr<const PaintedMesh> &paint,bool origin) {
     if(!paint || (origin && !retained_paint.insert(paint.get()).second))return;
+    if(paint->has_physical_emission())throw std::invalid_argument("Physical emission requires the complete Scene27 owning archive adapter");
     if(!paint->valid_paint_sampling_attachment())throw std::logic_error("Paint sampling attachment differs from its exact immutable geometry owner");
     if(const auto domain=paint->paint_sampling_domain()){domain_paints.insert(paint.get());retain_domain(domain);}
     if(paint->in_stroke())throw std::invalid_argument("Retained UV paint source has an unfinished stroke");

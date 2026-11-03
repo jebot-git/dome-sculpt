@@ -1,0 +1,574 @@
+{
+  "format": 1,
+  "date": "2026-11-03",
+  "base": "13f7e57378cece52f011a8f316d4232747d7a922",
+  "stage": "Private sparse physical emission data/standalone Paint3; not Scene27 or HDR frontend/import/render/export admission.",
+  "layout_changes": [
+    "PaintSettings appends emission_units; legacy default.",
+    "PaintLayer appends optional immutable PaintEmissionTile grid; PaintPixel14/Tile14336 unchanged.",
+    "PaintedMesh owns physical stroke-history vectors.",
+    "PaintEmissionValue owns two unpremultiplied RGB arrays plus float coverage."
+  ],
+  "capability": "New decode(json,PaintImageArchive*,bool allow_polygon,NormalSamplingArchive*,PaintSamplingArchive*,bool allow_physical_emission); existing overloads retain symbols and refuse3.",
+  "scope": "Fresh native CPU core/support C/C++ and three headless tests in optimized Release and assertion-enabled ASan/UBSan/leak builds. No old archives, app/render/GPU or vendor qualification.",
+  "profiles": {
+    "release": {
+      "build": {
+        "profile": "release",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-13f7e57",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-13f7e57/build-data-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=OFF",
+              "-DDOME_BUILD_XR=OFF",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 1.2240935759909917
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-13f7e57/build-data-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-emission-linear-test",
+              "dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 250.68559524597367
+          }
+        ],
+        "seconds": 251.96087557601277,
+        "inputs": 1482,
+        "unchanged": true,
+        "scope": "Fresh own core/support C/C++ and three headless paint consumers; no prior archives, no app/render/GPU qualification."
+      },
+      "tests": {
+        "exit": 0,
+        "seconds": 3.195468568999786,
+        "inputs": 1492,
+        "unchanged": true
+      },
+      "artifacts": {
+        "build-data-release/dome-sculpt-emission-linear-test": "09041412597c107f92558c8ae5f8d1dafd5f0d7f5d8942488aedd8e3df80192b",
+        "build-data-release/dome-sculpt-emission-paint-data-test": "6799d4115ed7a020a2233037f311f16b5b5e8621a0d59bd8538c75206bef8f21",
+        "build-data-release/dome-sculpt-paint-test": "7e831a869a229512ce749f325fc215a3fe80f854a7323cce95180ee72e85678a",
+        "build-data-release/libdome-sculpt-affine.a": "7b60bba8620238a7c4d95b9dfbc3536164ab39dabcdc4bef0840fbf6e5f4dbe8",
+        "build-data-release/libdome-sculpt-core.a": "39176a60b9e7d11093ed733bcfc8a089c1342cf9b2db41477d3f04309c480dff",
+        "build-data-release/libdome-sculpt-polygon.a": "50bc7a77a690909756f7664df57ff5dfbac08a55093901945ebdb2d3cbf44038",
+        "build-data-release/libmikktspace-robust.a": "d38c11f311ac741f12be0eb6a7044ef14f0302176b8faaf54d1eb3a622132f22",
+        "build-data-release/libmikktspace.a": "b6032bcc6870962e5367996f6c8ebd91d04ac9b1df05d66980c0cf6988e8106b",
+        "build-data-release/libufbx.a": "9e98f95e404309e732ad1e6a324065d92873b8271c1d35f9ad661fe6d3c38569",
+        "build-data-release/libxatlas.a": "dac88b905effd4be5447357f929c5218a823e584546f77f334e91beac588ecd3"
+      }
+    },
+    "sanitize": {
+      "build": {
+        "profile": "sanitize",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-13f7e57",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-13f7e57/build-data-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=OFF",
+              "-DDOME_BUILD_XR=OFF",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 1.2119065900042187
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-13f7e57/build-data-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-emission-linear-test",
+              "dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 413.97159112099325
+          }
+        ],
+        "seconds": 415.229254610982,
+        "inputs": 1482,
+        "unchanged": true,
+        "scope": "Fresh own core/support C/C++ and three headless paint consumers; no prior archives, no app/render/GPU qualification."
+      },
+      "tests": {
+        "exit": 0,
+        "seconds": 35.942702987988014,
+        "inputs": 1492,
+        "unchanged": true
+      },
+      "artifacts": {
+        "build-data-sanitize/dome-sculpt-emission-linear-test": "8b268031ec14acc5674c15ef2f177528272ed00566f6793db5329ec44df23888",
+        "build-data-sanitize/dome-sculpt-emission-paint-data-test": "10c4002ef3b6e7657fa659f4cefd1c5b7871b33c70b0a24784893ca30b5a9dce",
+        "build-data-sanitize/dome-sculpt-paint-test": "ab8e9c2fd7acaaa949aa7bc61e468f11e5aa345af0021e0572e05c56fbf82f07",
+        "build-data-sanitize/libdome-sculpt-affine.a": "ef84cca73da4e52646ad7af04dc21043df5b767df5a4a398cfd88d90f49eab82",
+        "build-data-sanitize/libdome-sculpt-core.a": "9f8a9423ed6ba74091a8405b28f9f8a5a640372cb0de19efd60a6ef7028c6029",
+        "build-data-sanitize/libdome-sculpt-polygon.a": "c7587573ba3f65737503b23aa5217d8969aef6d5c6cd2c6c2d44c926bbaa40f3",
+        "build-data-sanitize/libmikktspace-robust.a": "787511c02d8249495b6efd043a6d7132f055986b47e872a1a4e36677ff677164",
+        "build-data-sanitize/libmikktspace.a": "f1c6c9d1f65b307ce14bff48e1a131d98183393cd6aa97584ba023fc6110192e",
+        "build-data-sanitize/libufbx.a": "0a7b29f12d837e4e5e972c2b21b4dd598eacbc3ccc01497636e34238814a988b",
+        "build-data-sanitize/libxatlas.a": "ac4a0bc9bb0cecf969e8866c375e0952518a1eeeae5d08abb2babd83e10fcf08"
+      }
+    }
+  },
+  "checks": {
+    "linear_emission": 74,
+    "physical_paint_data": 50,
+    "cancel_polls": 22,
+    "persistent_host_stamp_allocation_boundaries": 10
+  },
+  "legacy_bridge": {
+    "old": {
+      "exit": 0,
+      "seconds": 0.0044342589972075075
+    },
+    "new": {
+      "exit": 0,
+      "seconds": 0.004980463010724634
+    },
+    "legacy_byte_exact": true,
+    "legacy_bytes": 57706,
+    "legacy_sha256": "264111d5bae32b82ae55f1a97c8f8cddee75ffb541442a28b97d97b0d31345d7",
+    "inputs": 18,
+    "unchanged": true
+  },
+  "guards_remaining": [
+    "Native source >1 import unchanged.",
+    "Physical composite refuses until linear preview exists.",
+    "Physical reparameterization/sourceUV transfer refuses until exact adapter exists.",
+    "Native Scene ownership refuses until full Scene27 closure exists."
+  ],
+  "source_sha256": {
+    "CMakeLists.txt": "a46a00f349337d17e1e83d42781f534d8acabdbb3d2c1697c2ccdcb42e46f2db",
+    "include/dome/emission.hpp": "b85d7b4ec7b91a574a1e8604634e2550f552a1060c1daae50235d22e4eab438e",
+    "include/dome/paint.hpp": "52f2c8a829dbd589d81a9280d1093d04917a1b75a25f9c0888b2c2ac6076f053",
+    "src/emission-linear.hpp": "e01a5d28691614b225cba72bb52d95e60c584411c35a540a1b5f0bc6218f7d1a",
+    "src/paint-archive-shape.hpp": "e52477c68e943a3040884831b16de8df59aed1c27550940abecc1a871085a3ce",
+    "src/paint.cpp": "5aab13a23b8b92cbdcca79834ecc4a810fb70dd545f4e03b79fda2ccec46fe71",
+    "src/scene.cpp": "b512faecbf361c74640f6a9c4c4f1d15e8d1f32748d55550e075c85333b819ef",
+    "src/source-uv-bake.cpp": "0551915a0d34e18d70ba955771755c6aec35b202124a8c1e1486f7b6186458d5",
+    "tests/emission-linear.cpp": "c3c80b706e1cdf1d8e83ac496373ea935a7cfcf9c55a062aa7b866b37c8684e5",
+    "tests/emission-paint-data.cpp": "ae56754fa242470c020c99dcf1b3d5d84bf28bf58b3ddaa11ee434fc00795031"
+  },
+  "quantization_negative": {
+    "scope": "Analytic standard sRGB texture/global-strength representability counterfactual, native core PBR tone map only; not PNG codec, renderer or export proof.",
+    "rows": [
+      {
+        "bits": 8,
+        "strength": 1.72079539,
+        "radiance": 0.0003,
+        "stored": 1,
+        "recovered": 0.0005223078340314454,
+        "preview_reference": 1,
+        "preview_recovered": 2,
+        "delta": 1
+      },
+      {
+        "bits": 8,
+        "strength": 1.72079539,
+        "radiance": 0.005,
+        "stored": 10,
+        "recovered": 0.005223078340314454,
+        "preview_reference": 15,
+        "preview_recovered": 16,
+        "delta": 1
+      },
+      {
+        "bits": 8,
+        "strength": 1.72079539,
+        "radiance": 0.01,
+        "stored": 17,
+        "recovered": 0.009645732066072658,
+        "preview_reference": 25,
+        "preview_recovered": 25,
+        "delta": 0
+      },
+      {
+        "bits": 8,
+        "strength": 1.72079539,
+        "radiance": 0.1,
+        "stored": 68,
+        "recovered": 0.0994713177897553,
+        "preview_reference": 85,
+        "preview_recovered": 85,
+        "delta": 0
+      },
+      {
+        "bits": 8,
+        "strength": 1.72079539,
+        "radiance": 1,
+        "stored": 201,
+        "recovered": 1.0050794489056087,
+        "preview_reference": 188,
+        "preview_recovered": 188,
+        "delta": 0
+      },
+      {
+        "bits": 8,
+        "strength": 12,
+        "radiance": 0.0003,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 1,
+        "preview_recovered": 0,
+        "delta": 1
+      },
+      {
+        "bits": 8,
+        "strength": 12,
+        "radiance": 0.005,
+        "stored": 1,
+        "recovered": 0.00364232380258605,
+        "preview_reference": 15,
+        "preview_recovered": 12,
+        "delta": 3
+      },
+      {
+        "bits": 8,
+        "strength": 12,
+        "radiance": 0.01,
+        "stored": 3,
+        "recovered": 0.01092697140775815,
+        "preview_reference": 25,
+        "preview_recovered": 27,
+        "delta": 2
+      },
+      {
+        "bits": 8,
+        "strength": 12,
+        "radiance": 0.1,
+        "stored": 23,
+        "recovered": 0.10281750741683168,
+        "preview_reference": 85,
+        "preview_recovered": 86,
+        "delta": 1
+      },
+      {
+        "bits": 8,
+        "strength": 12,
+        "radiance": 1,
+        "stored": 82,
+        "recovered": 1.0125145385297858,
+        "preview_reference": 188,
+        "preview_recovered": 188,
+        "delta": 0
+      },
+      {
+        "bits": 8,
+        "strength": 12,
+        "radiance": 12,
+        "stored": 255,
+        "recovered": 12.0,
+        "preview_reference": 246,
+        "preview_recovered": 246,
+        "delta": 0
+      },
+      {
+        "bits": 8,
+        "strength": 10000,
+        "radiance": 0.0003,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 1,
+        "preview_recovered": 0,
+        "delta": 1
+      },
+      {
+        "bits": 8,
+        "strength": 10000,
+        "radiance": 0.005,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 15,
+        "preview_recovered": 0,
+        "delta": 15
+      },
+      {
+        "bits": 8,
+        "strength": 10000,
+        "radiance": 0.01,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 25,
+        "preview_recovered": 0,
+        "delta": 25
+      },
+      {
+        "bits": 8,
+        "strength": 10000,
+        "radiance": 0.1,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 85,
+        "preview_recovered": 0,
+        "delta": 85
+      },
+      {
+        "bits": 8,
+        "strength": 10000,
+        "radiance": 1,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 188,
+        "preview_recovered": 0,
+        "delta": 188
+      },
+      {
+        "bits": 8,
+        "strength": 10000,
+        "radiance": 12,
+        "stored": 4,
+        "recovered": 12.141079341953501,
+        "preview_reference": 246,
+        "preview_recovered": 246,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 1.72079539,
+        "radiance": 0.0003,
+        "stored": 148,
+        "recovered": 0.00030078427796363395,
+        "preview_reference": 1,
+        "preview_recovered": 1,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 1.72079539,
+        "radiance": 0.005,
+        "stored": 2460,
+        "recovered": 0.004999522458044184,
+        "preview_reference": 15,
+        "preview_recovered": 15,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 1.72079539,
+        "radiance": 0.01,
+        "stored": 4490,
+        "recovered": 0.0100007785325484,
+        "preview_reference": 25,
+        "preview_recovered": 25,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 1.72079539,
+        "radiance": 0.1,
+        "stored": 17523,
+        "recovered": 0.10000441336809604,
+        "preview_reference": 85,
+        "preview_recovered": 85,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 1.72079539,
+        "radiance": 1,
+        "stored": 51540,
+        "recovered": 0.9999799033390561,
+        "preview_reference": 188,
+        "preview_recovered": 188,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 12,
+        "radiance": 0.0003,
+        "stored": 21,
+        "recovered": 0.00029762178931636984,
+        "preview_reference": 1,
+        "preview_recovered": 1,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 12,
+        "radiance": 0.005,
+        "stored": 353,
+        "recovered": 0.0050028805537465975,
+        "preview_reference": 15,
+        "preview_recovered": 16,
+        "delta": 1
+      },
+      {
+        "bits": 16,
+        "strength": 12,
+        "radiance": 0.01,
+        "stored": 706,
+        "recovered": 0.010005761107493195,
+        "preview_reference": 25,
+        "preview_recovered": 25,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 12,
+        "radiance": 0.1,
+        "stored": 5801,
+        "recovered": 0.0999879427959938,
+        "preview_reference": 85,
+        "preview_recovered": 85,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 12,
+        "radiance": 1,
+        "stored": 20946,
+        "recovered": 0.9999563652202841,
+        "preview_reference": 188,
+        "preview_recovered": 188,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 12,
+        "radiance": 12,
+        "stored": 65535,
+        "recovered": 12.0,
+        "preview_reference": 246,
+        "preview_recovered": 246,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 10000,
+        "radiance": 0.0003,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 1,
+        "preview_recovered": 0,
+        "delta": 1
+      },
+      {
+        "bits": 16,
+        "strength": 10000,
+        "radiance": 0.005,
+        "stored": 0,
+        "recovered": 0.0,
+        "preview_reference": 15,
+        "preview_recovered": 0,
+        "delta": 15
+      },
+      {
+        "bits": 16,
+        "strength": 10000,
+        "radiance": 0.01,
+        "stored": 1,
+        "recovered": 0.01181038846493531,
+        "preview_reference": 25,
+        "preview_recovered": 28,
+        "delta": 3
+      },
+      {
+        "bits": 16,
+        "strength": 10000,
+        "radiance": 0.1,
+        "stored": 8,
+        "recovered": 0.09448310771948248,
+        "preview_reference": 85,
+        "preview_recovered": 83,
+        "delta": 2
+      },
+      {
+        "bits": 16,
+        "strength": 10000,
+        "radiance": 1,
+        "stored": 85,
+        "recovered": 1.0038830195195014,
+        "preview_reference": 188,
+        "preview_recovered": 188,
+        "delta": 0
+      },
+      {
+        "bits": 16,
+        "strength": 10000,
+        "radiance": 12,
+        "stored": 1016,
+        "recovered": 11.999354680374276,
+        "preview_reference": 246,
+        "preview_recovered": 246,
+        "delta": 0
+      }
+    ]
+  },
+  "current_primary_sources": {
+    "heads": {
+      "glTF": "9d23a5a5b1d10f22d1554e847f2a1a3f24222392",
+      "KTX-Specification": "ac39917e8240f51db97715a2453134a42ff959fd",
+      "KTX-Software": "e0e9868d82b00e6fac6a1aff55759a7cf77fe5f6"
+    },
+    "files": [
+      {
+        "repository": "glTF",
+        "commit": "9d23a5a5b1d10f22d1554e847f2a1a3f24222392",
+        "path": "extensions/2.0/Khronos/KHR_texture_basisu/README.md",
+        "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/9d23a5a5b1d10f22d1554e847f2a1a3f24222392/extensions/2.0/Khronos/KHR_texture_basisu/README.md",
+        "sha256": "6f6d0767b95a8ac4f197c9394a28e8d4c71a2ff3ced2c4fd9357ed1c869b83a6",
+        "bytes": 12510
+      },
+      {
+        "repository": "glTF",
+        "commit": "9d23a5a5b1d10f22d1554e847f2a1a3f24222392",
+        "path": "extensions/README.md",
+        "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/9d23a5a5b1d10f22d1554e847f2a1a3f24222392/extensions/README.md",
+        "sha256": "32868b162d85305f633cbb78747abfddda8ebbf9c51f4bf4456cafc2af54952d",
+        "bytes": 16007
+      },
+      {
+        "repository": "KTX-Specification",
+        "commit": "ac39917e8240f51db97715a2453134a42ff959fd",
+        "path": "ktxspec.adoc",
+        "url": "https://raw.githubusercontent.com/KhronosGroup/KTX-Specification/ac39917e8240f51db97715a2453134a42ff959fd/ktxspec.adoc",
+        "sha256": "f415b8cb7e2d05d126a2a7253a6eca75495d9e631817de647531e58e83f438e6",
+        "bytes": 106775
+      },
+      {
+        "repository": "glTF",
+        "commit": "9d23a5a5b1d10f22d1554e847f2a1a3f24222392",
+        "path": "extensions/2.0/Vendor/MSFT_texture_dds/README.md",
+        "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/9d23a5a5b1d10f22d1554e847f2a1a3f24222392/extensions/2.0/Vendor/MSFT_texture_dds/README.md",
+        "sha256": "07669e44a7ce174fe7aa5554927cf6c44687f958a5fae107fbd47e0c14532227",
+        "bytes": 2204
+      }
+    ]
+  },
+  "no_actions": [
+    "No GPU lease or device job",
+    "No native UI or HMD",
+    "No system install/session action"
+  ],
+  "remaining": "Actual owning Scene27/material11/bake before-state closure, GPU sparse7float preview, HDR source admission, FLTK/XR controls, native worker/orderedSave/history and independent source/image/interoperability gates; standard high-dynamic-range export representation still under primary audit."
+}

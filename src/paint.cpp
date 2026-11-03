@@ -3,6 +3,7 @@
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
 #include "paint-source-admission.hpp"
+#include "paint-archive-shape.hpp"
 #include "source-uv-archive.hpp"
 #include "dome/paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
@@ -32,6 +33,11 @@ uint8_t byte(float v) {
   return uint8_t(std::lround(std::clamp(v, 0.f, 1.f) * 255));
 }
 float unit(uint8_t v) { return float(v) / 255; }
+bool emission_fallback_matches(const PaintEmissionValue &value,const PaintPixel &fallback) {
+  if(byte(value.coverage)!=fallback.data[12])return false;
+  for(size_t k=0;k<3;++k)if(byte(linear_to_srgb(value.legacy[k]))!=fallback.data[6+k])return false;
+  return true;
+}
 void name_valid(const std::string &s) {
   if (s.empty() || s.size() > 256 || s.find('\0') != std::string::npos)
     throw std::invalid_argument("Invalid paint layer name");
@@ -41,6 +47,9 @@ size_t tile_count(const PaintLayer &layer) {
 }
 size_t color_tile_count(const PaintLayer &layer) {
   return std::count_if(layer.pbr_tiles.begin(),layer.pbr_tiles.end(),[](const auto &tile){return bool(tile);});
+}
+size_t emission_tile_count(const PaintLayer &layer) {
+  return std::count_if(layer.emission_tiles.begin(),layer.emission_tiles.end(),[](const auto &tile){return bool(tile);});
 }
 uint64_t next_composite_token() {
   static std::atomic<uint64_t> sequence{1};auto value=sequence.load(std::memory_order_relaxed);
@@ -218,7 +227,8 @@ void PaintSettings::validate() const {
   auto valid = [](float f) { return std::isfinite(f) && f >= 0 && f <= 1; };
   if (int(channel) < 0 || int(channel) > 4 ||
       !std::all_of(color.begin(), color.end(), valid) ||
-      !std::all_of(emission.begin(), emission.end(), valid) ||
+      (emission_units!=PaintEmissionUnits::MaterialRelative&&emission_units!=PaintEmissionUnits::Physical) ||
+      !std::all_of(emission.begin(), emission.end(), [&](float f){return std::isfinite(f)&&f>=0&&f<=(emission_units==PaintEmissionUnits::Physical?maximum_native_emission:1);}) ||
       !valid(metallic) || !valid(roughness) || !valid(mask) || !valid(flow))
     throw std::invalid_argument("Invalid paint brush settings");
 }
@@ -506,6 +516,19 @@ std::array<uint8_t,4> PaintedMesh::pbr_pixel(uint64_t id,uint32_t x,uint32_t y) 
   }
   const auto &p=pixel(id,x,y);return {p.data[0],p.data[1],p.data[2],p.data[3]};
 }
+PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y) const {
+  const auto &p=pixel(id,x,y);const auto &l=layer(id);
+  if(!l.emission_tiles.empty())if(const auto &tile=l.emission_tiles.at(size_t(y/32)*surface_->columns+x/32))
+    return tile->pixels[size_t(y%32)*32+x%32];
+  PaintEmissionValue result;
+  for(size_t k=0;k<3;++k)result.legacy[k]=srgb_to_linear(unit(p.data[6+k]));
+  result.coverage=unit(p.data[12]);
+  return result;
+}
+bool PaintedMesh::has_physical_emission() const noexcept {
+  for(const auto &l:layers_)if(emission_tile_count(l))return true;
+  return false;
+}
 void PaintedMesh::begin_stroke() {
   detail::require_editable_texture_atlas(*this);
   if (editing_)
@@ -514,13 +537,14 @@ void PaintedMesh::begin_stroke() {
     throw std::logic_error("Show the active paint layer before painting");
   before_ = active().tiles;
   before_colors_ = active().pbr_tiles;
+  before_emission_ = active().emission_tiles;
   before_allocated_tiles_ = tile_count(active());
   before_allocated_color_tiles_ = color_tile_count(active());
   before_composite_token_=composite_token_;
   editing_ = true;
 }
 bool PaintedMesh::pending_changes() const {
-  return editing_ && (before_ != layer(active_).tiles || before_colors_ != layer(active_).pbr_tiles);
+  return editing_ && (before_ != layer(active_).tiles || before_colors_ != layer(active_).pbr_tiles || before_emission_!=layer(active_).emission_tiles);
 }
 void PaintedMesh::stamp(const Brush &b, const PaintSettings &settings) {
   stamp_sampled(b,settings,{});
@@ -548,6 +572,8 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
   auto token=l.visible&&l.opacity>0?next_composite_token():composite_token_;
   auto prior = l.tiles;
   auto prior_colors = l.pbr_tiles;
+  auto prior_emission = l.emission_tiles;
+  size_t emission_bytes=0;for(const auto &layer:layers_)emission_bytes+=emission_tile_count(layer)*sizeof(PaintEmissionTile);
   size_t allocated = allocated_tiles_;
   size_t allocated_colors = allocated_color_tiles_;
   bool changed = false;
@@ -562,7 +588,9 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
       auto copy = l.tiles[tile] ? std::make_shared<PaintTile>(*l.tiles[tile])
                                 : std::make_shared<PaintTile>();
       std::shared_ptr<PaintColorTile> color_copy;
+      std::shared_ptr<PaintEmissionTile> emission_copy;
       bool color_changed=false;
+      bool emission_changed=false;
       bool tile_changed = false;
       uint32_t tx = uint32_t(tile % surface_->columns) * 32,
                ty = uint32_t(tile / surface_->columns) * 32;
@@ -606,9 +634,26 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
                 byte(unit(p.data[13]) * (1 - alpha) + selected.mask * alpha);
           else {
             int channel = int(selected.channel), coverage = 9 + channel;
-            float previous = unit(p.data[coverage]);
+            const bool linear_emission=channel==3&&(selected.emission_units==PaintEmissionUnits::Physical||(!l.emission_tiles.empty()&&l.emission_tiles[tile]));
+            PaintEmissionValue *linear=nullptr,old_linear;
+            if(linear_emission) {
+              if(!emission_copy) {
+                // Absolute zero and fractional coverage both require their
+                // genuine owning plane, even if fallback bytes do not change.
+                emission_changed|=l.emission_tiles.empty()||!l.emission_tiles[tile];
+                emission_copy=std::make_shared<PaintEmissionTile>();
+                if(!l.emission_tiles.empty()&&l.emission_tiles[tile])*emission_copy=*l.emission_tiles[tile];
+                else if(l.tiles[tile])for(size_t i=0;i<emission_copy->pixels.size();++i){
+                  auto &value=emission_copy->pixels[i];const auto &q=l.tiles[tile]->pixels[i];
+                  for(size_t k=0;k<3;++k)value.legacy[k]=srgb_to_linear(unit(q.data[6+k]));
+                  value.coverage=unit(q.data[12]);
+                }
+              }
+              linear=&emission_copy->pixels[y*32+x];old_linear=*linear;
+            }
+            float previous = linear?linear->coverage:unit(p.data[coverage]);
             if (selected.erase)
-              p.data[coverage] = byte(previous * (1 - alpha));
+              {const float next=previous*(1-alpha);p.data[coverage]=byte(next);if(linear)linear->coverage=next;}
             else {
               float next = alpha + previous * (1 - alpha);
               p.data[coverage] = byte(next);
@@ -645,21 +690,33 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
                 mix(4, selected.metallic, false);
               else if (channel == 2)
                 mix(5, selected.roughness, false);
-              else
-                for (int k = 0; k < 3; ++k)
-                  mix(6 + k, selected.emission[k], true);
+              else if(linear) {
+                auto &value=*linear;value.coverage=next;
+                for(size_t k=0;k<3;++k) {
+                  const float relative=selected.emission_units==PaintEmissionUnits::MaterialRelative?selected.emission[k]:0;
+                  const float physical=selected.emission_units==PaintEmissionUnits::Physical?selected.emission[k]:0;
+                  // lerp is bounded by its endpoints, including the exact
+                  // maximum physical value; do not clip a rounded quotient.
+                  value.legacy[k]=std::lerp(value.legacy[k],relative,alpha/next);
+                  value.physical[k]=std::lerp(value.physical[k],physical,alpha/next);
+                  p.data[6+k]=byte(linear_to_srgb(value.legacy[k]));
+                }
+              } else for (int k = 0; k < 3; ++k)mix(6 + k, selected.emission[k], true);
             }
+            if(linear)emission_changed|=*linear!=old_linear;
           }
           tile_changed |= p != old;
         }
-      if (tile_changed || color_changed) {
+      if (tile_changed || color_changed || emission_changed) {
         if(!l.tiles[tile])++allocated;
         if(color_changed && !l.pbr_tiles[tile])++allocated_colors;
+        if(emission_changed && (l.emission_tiles.empty()||!l.emission_tiles[tile]))emission_bytes+=sizeof(PaintEmissionTile);
         if(allocated*sizeof(PaintTile)+allocated_colors*sizeof(PaintColorTile)+
-            (baked_?baked_->storage_bytes():0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0)+(normal_projection_?normal_projection_->pbr->rgba.size()+normal_projection_->mtoon->rgba.size():0)>128*1024*1024)
+            emission_bytes+(baked_?baked_->storage_bytes():0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0)+(normal_projection_?normal_projection_->pbr->rgba.size()+normal_projection_->mtoon->rgba.size():0)>128*1024*1024)
           throw std::length_error("Paint storage budget exceeded");
         l.tiles[tile] = std::move(copy);
         if(color_changed)l.pbr_tiles[tile]=std::move(color_copy);
+        if(emission_changed){if(l.emission_tiles.empty())l.emission_tiles.resize(l.tiles.size());l.emission_tiles[tile]=std::move(emission_copy);}
         changed = true;
       }
     }
@@ -667,6 +724,7 @@ void PaintedMesh::stamp_sampled(const Brush &b,const PaintSettings &settings,con
   } catch (...) {
     l.tiles = std::move(prior);
     l.pbr_tiles = std::move(prior_colors);
+    l.emission_tiles = std::move(prior_emission);
     throw;
   }
   allocated_tiles_ = allocated;
@@ -682,9 +740,11 @@ bool PaintedMesh::end_stroke() {
   editing_ = false;
   auto &tiles = active().tiles;
   auto &colors=active().pbr_tiles;
-  if (before_ == tiles && before_colors_ == colors) {
+  auto &emission=active().emission_tiles;
+  if (before_ == tiles && before_colors_ == colors && before_emission_==emission) {
     before_.clear();
     before_colors_.clear();
+    before_emission_.clear();
     return false;
   }
   size_t bytes = 0;
@@ -692,10 +752,12 @@ bool PaintedMesh::end_stroke() {
     if (before_[i] != tiles[i])
       bytes += sizeof(PaintTile) * 2;
   for(size_t i=0;i<colors.size();++i)if(before_colors_[i]!=colors[i])bytes+=sizeof(PaintColorTile)*2;
+  for(size_t i=0;i<std::max(before_emission_.size(),emission.size());++i)
+    if((i<before_emission_.size()?before_emission_[i]:nullptr)!=(i<emission.size()?emission[i]:nullptr))bytes+=sizeof(PaintEmissionTile)*2;
   for (auto &s : redo_)
     history_bytes_ -= s.bytes;
   redo_.clear();
-  undo_.push_back({active_, std::move(before_), tiles, bytes,before_allocated_tiles_,tile_count(active()),std::move(before_colors_),colors,before_allocated_color_tiles_,color_tile_count(active())});
+  undo_.push_back({active_, std::move(before_), tiles, bytes,before_allocated_tiles_,tile_count(active()),std::move(before_colors_),colors,before_allocated_color_tiles_,color_tile_count(active()),std::move(before_emission_),emission});
   history_bytes_ += bytes;
   while (undo_.size() > 1 &&
          (history_bytes_ > 64 * 1024 * 1024 || undo_.size() > 128)) {
@@ -710,6 +772,7 @@ void PaintedMesh::cancel_stroke() {
     active().tiles = std::move(before_);
     allocated_color_tiles_=allocated_color_tiles_-color_tile_count(active())+before_allocated_color_tiles_;
     active().pbr_tiles=std::move(before_colors_);
+    active().emission_tiles=std::move(before_emission_);
     editing_ = false;
     composite_token_=before_composite_token_;
     ++revision_;
@@ -729,6 +792,7 @@ bool PaintedMesh::undo() {
   active().tiles = s.before;
   allocated_color_tiles_=allocated_color_tiles_-color_tile_count(active())+s.before_color_tiles;
   active().pbr_tiles=s.color_before;
+  active().emission_tiles=s.emission_before;
   redo_.push_back(std::move(s));
   composite_token_=token;
   ++revision_;
@@ -748,6 +812,7 @@ bool PaintedMesh::redo() {
   active().tiles = s.after;
   allocated_color_tiles_=allocated_color_tiles_-color_tile_count(active())+s.after_color_tiles;
   active().pbr_tiles=s.color_after;
+  active().emission_tiles=s.emission_after;
   undo_.push_back(std::move(s));
   composite_token_=token;
   ++revision_;
@@ -1093,6 +1158,7 @@ size_t PaintedMesh::storage_bytes() const {
     for (const auto &tile : layer.tiles)
       if (tile) result += sizeof(PaintTile);
   for(const auto &layer:layers_)result+=color_tile_count(layer)*sizeof(PaintColorTile);
+  for(const auto &layer:layers_)result+=emission_tile_count(layer)*sizeof(PaintEmissionTile);
   return result;
 }
 void PaintedMesh::install_bake(BakedTextures incoming) {
@@ -1434,6 +1500,7 @@ PaintedMesh::build_composite(const Material &material) const {return build_compo
 std::shared_ptr<const TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);
+  if(has_physical_emission())throw std::logic_error("Physical emission requires its linear composite adapter");
   // This packet owns only the legacy grid/padding. Independent paint domains,
   // normal metadata/events, original source maps and prepared projections need
   // their existing CPU interpretation until a genuine packet adapter exists.
@@ -1659,6 +1726,7 @@ Vec3 PaintedMesh::normal(Vec3 point) const {
 std::shared_ptr<PaintedMesh>
 PaintedMesh::reparameterize(Mesh target,
                             const std::function<bool()> &cancelled) const {
+  if(has_physical_emission())throw std::logic_error("Physical emission requires explicit linear UV transfer");
   if(paint_sampling_domain())throw std::logic_error("Retained writable paint requires explicit source-domain UV transfer");
   if (editing_)
     throw std::logic_error("Finish the paint stroke before editing UVs");
@@ -1903,6 +1971,22 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
       }
       j["layers"].back()["pbr_color_tiles"]=std::move(colors);
     } else if(!l.pbr_tiles.empty())throw std::logic_error("PBR color planes have no preparation");
+    if(!l.emission_tiles.empty()) {
+      if(l.emission_tiles.size()!=l.tiles.size())throw std::logic_error("Incomplete physical emission tile grid");
+      auto emission=nlohmann::json::array();
+      for(size_t i=0;i<l.emission_tiles.size();++i)if(l.emission_tiles[i]) {
+        if(!l.tiles[i])throw std::logic_error("Physical emission tile has no common coverage owner");
+        std::vector<uint8_t> bytes;bytes.reserve(sizeof(PaintEmissionTile));
+        size_t pixel_index=0;
+        for(const auto &pixel:l.emission_tiles[i]->pixels){pixel.validate();
+          if(!emission_fallback_matches(pixel,l.tiles[i]->pixels[pixel_index++]))throw std::logic_error("Physical emission fallback bytes differ from their owning linear plane");
+          for(float v:pixel.legacy)word(bytes,std::bit_cast<uint32_t>(v));
+          for(float v:pixel.physical)word(bytes,std::bit_cast<uint32_t>(v));
+          word(bytes,std::bit_cast<uint32_t>(pixel.coverage));}
+        emission.push_back({{"index",i},{"data",nlohmann::json::binary(bytes)}});
+      }
+      if(!emission.empty())j["layers"].back()["physical_emission_tiles"]=std::move(emission);
+    }
   }
   if (baked_) {
     j["baked"] = {{"version", 1},
@@ -1927,6 +2011,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
       j["baked"]["normal_authority"]=domains->add_detail(baked_->normal_authority);
     }
   }
+  if(has_physical_emission())return {{"version",3},{"payload",std::move(j)},{"domain",sampling?nlohmann::json(paint_domains->add(sampling)):nlohmann::json(nullptr)}};
   if(sampling)return {{"version",2},{"payload",std::move(j)},{"domain",paint_domains->add(sampling)}};
   return j;
 }
@@ -1942,20 +2027,18 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
     bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
+  return decode(input,archive,allow_polygon,domains,paint_domains,false);
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
+    bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,bool allow_physical_emission) {
   std::shared_ptr<const PaintSamplingDomain> sampling;
-  const bool envelope=input.is_object()&&input.contains("version");
-  if(envelope){
-    // No legacy root mesh: frozen implicit-v1 readers reject before bulk.
-    if(input.size()!=3||!input.at("version").is_number_integer()||input.at("version")!=2||
-       !input.contains("payload")||!input.at("payload").is_object()||input.at("payload").contains("version")||
-       !input.contains("domain")||(!input.at("domain").is_number_unsigned()&&
-       (!input.at("domain").is_number_integer()||input.at("domain").get<int64_t>()<0))||
-       input.at("domain").get<uint64_t>()>UINT32_MAX)
-      throw std::invalid_argument("Invalid retained paint version2 envelope");
-    if(!archive||!paint_domains)throw std::invalid_argument("Paint version2 requires its owning Scene24 image and sampling context");
+  const bool physical=input.is_object()&&input.contains("version")&&input.at("version")==3;
+  if(physical&&!allow_physical_emission)throw std::invalid_argument("Physical emission Paint3 requires explicit decoder capability");
+  // One structural preflight serves both standalone capability and owning
+  // archive paths; an envelope never inherits authority from a nested payload.
+  const auto &j=detail::paint_archive_payload(input,archive&&paint_domains,allow_physical_emission);
+  if(input.contains("version")&&!input.at("domain").is_null())
     sampling=paint_domains->at(input.at("domain").get<uint32_t>());
-  }else if(input.contains("payload")||input.contains("domain"))throw std::invalid_argument("Paint sampling fields require version2 envelope");
-  const auto &j=envelope?input.at("payload"):input;
   if(j.contains("source_maps"))detail::source_uv_archive_measure(j.at("source_maps"));
   const bool retained_projection=j.contains("normal_projection")&&
     j.at("normal_projection").is_object()&&j.at("normal_projection").contains("domain");
@@ -2102,8 +2185,34 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
         l.pbr_tiles[i]=std::move(tile);++result->allocated_color_tiles_;
       }
     } else if(v.contains("pbr_color_tiles"))throw std::runtime_error("PBR color tiles require explicit current color preparation");
+    if(v.contains("physical_emission_tiles")) {
+      if(!physical)throw std::invalid_argument("Physical emission tiles require Paint3");
+      const auto &emission=v.at("physical_emission_tiles");
+      if(!emission.is_array()||emission.empty()||emission.size()>l.tiles.size())throw std::invalid_argument("Invalid physical emission tile count");
+      l.emission_tiles.resize(l.tiles.size());
+      for(const auto &record:emission) {
+        if(!record.is_object()||record.size()!=2)throw std::invalid_argument("Invalid physical emission tile record");
+        const auto &index=record.at("index"),&data=record.at("data");
+        if((!index.is_number_unsigned()&&(!index.is_number_integer()||index.get<int64_t>()<0))||index.get<uint64_t>()>=l.tiles.size())throw std::invalid_argument("Invalid physical emission tile identity");
+        const auto i=size_t(index.get<uint64_t>());
+        if(!l.tiles[i]||l.emission_tiles[i]||!data.is_binary()||data.get_binary().size()!=32*32*7*4)throw std::invalid_argument("Invalid physical emission tile data");
+        allocated+=sizeof(PaintEmissionTile);
+        if(allocated>128*1024*1024)throw std::length_error("Physical paint storage budget exceeded");
+        auto tile=std::make_shared<PaintEmissionTile>();size_t offset=0;
+        size_t pixel_index=0;
+        for(auto &pixel:tile->pixels){
+          for(auto &value:pixel.legacy){value=std::bit_cast<float>(word(data.get_binary(),offset));offset+=4;}
+          for(auto &value:pixel.physical){value=std::bit_cast<float>(word(data.get_binary(),offset));offset+=4;}
+          pixel.coverage=std::bit_cast<float>(word(data.get_binary(),offset));offset+=4;
+          pixel.validate();
+          if(!emission_fallback_matches(pixel,l.tiles[i]->pixels[pixel_index++]))throw std::invalid_argument("Physical emission fallback bytes differ from their linear plane");
+        }
+        l.emission_tiles[i]=std::move(tile);
+      }
+    }
     result->layers_.push_back(std::move(l));
   }
+  if(physical&&!result->has_physical_emission())throw std::invalid_argument("Paint3 requires genuine physical emission tiles");
   result->layer(result->active_);
   if (j.contains("baked")) {
     const auto &v = j.at("baked");
@@ -2181,6 +2290,7 @@ void PaintedMesh::swap_state(PaintedMesh &other) noexcept {
   static_assert(noexcept(swap(editing_,other.editing_)));swap(editing_,other.editing_);
   static_assert(noexcept(swap(before_,other.before_)));swap(before_,other.before_);
   static_assert(noexcept(swap(before_colors_,other.before_colors_)));swap(before_colors_,other.before_colors_);
+  static_assert(noexcept(swap(before_emission_,other.before_emission_)));swap(before_emission_,other.before_emission_);
   static_assert(noexcept(swap(undo_,other.undo_)));swap(undo_,other.undo_);
   static_assert(noexcept(swap(redo_,other.redo_)));swap(redo_,other.redo_);
   static_assert(noexcept(swap(history_bytes_,other.history_bytes_)));swap(history_bytes_,other.history_bytes_);
