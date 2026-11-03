@@ -49,9 +49,23 @@ This is a matched archive-consumer overlay, **not a fresh whole-branch build**.
 
 Renderer: `llvmpipe (LLVM 22.1.8, 256 bits)`. No GPU lease was used. The frozen
 test has an optional `--hardware` mode requiring Intel/Arc/A770 renderer tokens;
-it has not been executed. No new sanitizer, physical-device, Khronos or VRM
+it has not been executed. No new sanitizer, physical-device or official VRM
 schema qualification is claimed here. Root owns coherent integration and wider
 qualification.
+
+## Independent glTF validation
+
+A separate read-only pass counted every actual emitted `.glb` beneath the
+terminal fixed run's output directory: 18 files, three poses × three new-key
+weights × both authoring orders. Every file was validated by pinned Khronos
+`gltf-validator` 2.0.0-dev.3.10 with `maxIssues: 0` (unlimited), no issue filters,
+and no truncated reports. The validator command exited 0: **0 errors, 18 warnings,
+18 informational issues**. Each file reports one `NODE_SKINNED_MESH_NON_ROOT`
+warning and one `UNUSED_OBJECT` informational issue for retained `TEXCOORD_0`.
+Both messages remain in the unfiltered report. Exact byte lengths and SHA-256
+hashes for all 18 inputs match before/after; the receipt also pins validator
+module files, harness and full reports. This pass did not rerun authoring or
+rendering and used no GPU lease.
 
 The machine receipt in `validation/KEY-UV-COMMUTATION.json` records source,
 object, archive, command, binary and evidence hashes, all nine image rows, and

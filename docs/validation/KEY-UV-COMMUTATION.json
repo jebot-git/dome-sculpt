@@ -137,7 +137,7 @@
     "No fresh whole-branch build for this test component",
     "No ASan/UBSan/leak qualification of this new test/fix tuple",
     "No actual GPU/device or physical-headset run",
-    "No Khronos or official VRM schema run for this component; exported GLBs were parsed and cgltf-validated by the independent consumer",
+    "No official VRM schema run for this generic GLB test component; separate pinned Khronos glTF validation is recorded in khronos",
     "The late cancellation gate proves post-computation native publication cancellation, not an internal kernel poll or exhaustive allocation boundary"
   ],
   "compile_command": [
@@ -260,6 +260,26 @@
     "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/fix-status.json": {
       "sha256": "12827b4961d6d87491d9f92dcc0b765055a9368c441594f14e7df6d1744acf20",
       "bytes": 3537
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/khronos/validate.cjs": {
+      "sha256": "776582e08a13c89fa5dcc19d7fc32082a77b1257d62e43869fa9b2238465dfb1",
+      "bytes": 2560
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/khronos/before.json": {
+      "sha256": "8ca1ecd9151262589fd927d85508e2fd820058e85ded92eafff2f79071ac3856",
+      "bytes": 4052
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/khronos/after.json": {
+      "sha256": "8ca1ecd9151262589fd927d85508e2fd820058e85ded92eafff2f79071ac3856",
+      "bytes": 4052
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/khronos/report.json": {
+      "sha256": "ca91192b3ed88cc45e03f8bfde371967a7d203adc80d77e7b575fd796663cc42",
+      "bytes": 66583
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/khronos/receipt.json": {
+      "sha256": "779f6b16841dd2d0abc653c7ce7532b52b237a727a88c129d2cd5cb1db39a70d",
+      "bytes": 2634
     }
   },
   "final_fingerprints": {
@@ -1717,5 +1737,2383 @@
     "tests/key-uv-commutation.cpp",
     "docs/KEY-UV-COMMUTATION.md",
     "docs/validation/KEY-UV-COMMUTATION.json"
-  ]
+  ],
+  "khronos": {
+    "qualification": "independent emitted-byte validation, separate from prior rendering run",
+    "receipt": {
+      "exit_code": 0,
+      "command": [
+        "node",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/khronos/validate.cjs",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/khronos/report.json"
+      ],
+      "validator_module_files": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/ISSUES.md": "72981a105335964111253e7e5db4e956b8ab3a17fd74c2d02180bffc7f533c20",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/LICENSE": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/NOTICES": "933f161ca1e7b3ead5a6cf93ebb3bf6cb67f0e79b38e08d2046f8cdc41cb78a3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/README.md": "f5f26dc624a62817b356cec631b33af7358d046a4b2c0499a5f55189d986afa5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/gltf_validator.dart.js": "b73a7b2d455ac217567725138b46d826a13d7d1bb0c88c15f7c571bfb349298c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/index.js": "78deff9ea85743e86461c2d14fae76e7fc3ca0432e652f62948066b55fa16f0d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/module.mjs": "d2a88775a8b22f61be8e00644760f0f04b615fad0fc5175fefd40e0da4df2c8f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/package.json": "3578d16153fa237c72784588da2e8fcccc9cd3c1c58ef34c7912f0732d2f5fa6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator/validation.schema.json": "e33db4da1e907481a5fc056d2daab40be1a603620d8f4a1c81919120f3340365"
+      },
+      "input_manifest_sha256": "8ca1ecd9151262589fd927d85508e2fd820058e85ded92eafff2f79071ac3856",
+      "after_manifest_sha256": "8ca1ecd9151262589fd927d85508e2fd820058e85ded92eafff2f79071ac3856",
+      "harness_sha256": "776582e08a13c89fa5dcc19d7fc32082a77b1257d62e43869fa9b2238465dfb1",
+      "report_sha256": "ca91192b3ed88cc45e03f8bfde371967a7d203adc80d77e7b575fd796663cc42",
+      "cohort_count": 18,
+      "input_hashes_unchanged": true,
+      "maxIssues": 0,
+      "unfiltered": true,
+      "all_reports_untruncated": true,
+      "totals": {
+        "errors": 0,
+        "warnings": 18,
+        "infos": 18,
+        "hints": 0
+      },
+      "issueCounts": {
+        "UNUSED_OBJECT": 18,
+        "NODE_SKINNED_MESH_NON_ROOT": 18
+      }
+    },
+    "report": {
+      "format": "dome-sculpt-commutation-khronos-report",
+      "version": 1,
+      "validator": {
+        "modulePath": "/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator",
+        "packageVersion": "2.0.0-dev.3.10",
+        "libraryVersion": "2.0.0-dev.3.10",
+        "options": {
+          "maxIssues": 0
+        },
+        "issueFiltering": false
+      },
+      "inputDirectory": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output",
+      "actualFileCount": 18,
+      "allInputsUnchanged": true,
+      "totals": {
+        "errors": 0,
+        "warnings": 18,
+        "infos": 18,
+        "hints": 0
+      },
+      "issueCounts": {
+        "UNUSED_OBJECT": 18,
+        "NODE_SKINNED_MESH_NON_ROOT": 18
+      },
+      "files": [
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-0-0.glb",
+          "relative": "0-0-0.glb",
+          "before": {
+            "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+            "bytes": 16728
+          },
+          "after": {
+            "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+            "bytes": 16728
+          },
+          "cohort": {
+            "pose": 0,
+            "new_key_weight": 0,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "0-0-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.455Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-0-1.glb",
+          "relative": "0-0-1.glb",
+          "before": {
+            "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+            "bytes": 16728
+          },
+          "after": {
+            "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+            "bytes": 16728
+          },
+          "cohort": {
+            "pose": 0,
+            "new_key_weight": 0,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "0-0-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.469Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-100-0.glb",
+          "relative": "0-100-0.glb",
+          "before": {
+            "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+            "bytes": 16728
+          },
+          "after": {
+            "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+            "bytes": 16728
+          },
+          "cohort": {
+            "pose": 0,
+            "new_key_weight": 1,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "0-100-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.474Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-100-1.glb",
+          "relative": "0-100-1.glb",
+          "before": {
+            "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+            "bytes": 16728
+          },
+          "after": {
+            "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+            "bytes": 16728
+          },
+          "cohort": {
+            "pose": 0,
+            "new_key_weight": 1,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "0-100-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.478Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-35-0.glb",
+          "relative": "0-35-0.glb",
+          "before": {
+            "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+            "bytes": 16744
+          },
+          "after": {
+            "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+            "bytes": 16744
+          },
+          "cohort": {
+            "pose": 0,
+            "new_key_weight": 0.35,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "0-35-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.482Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-35-1.glb",
+          "relative": "0-35-1.glb",
+          "before": {
+            "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+            "bytes": 16744
+          },
+          "after": {
+            "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+            "bytes": 16744
+          },
+          "cohort": {
+            "pose": 0,
+            "new_key_weight": 0.35,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "0-35-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.487Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-0-0.glb",
+          "relative": "1-0-0.glb",
+          "before": {
+            "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 1,
+            "new_key_weight": 0,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "1-0-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.493Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-0-1.glb",
+          "relative": "1-0-1.glb",
+          "before": {
+            "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 1,
+            "new_key_weight": 0,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "1-0-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.497Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-100-0.glb",
+          "relative": "1-100-0.glb",
+          "before": {
+            "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 1,
+            "new_key_weight": 1,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "1-100-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.502Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-100-1.glb",
+          "relative": "1-100-1.glb",
+          "before": {
+            "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 1,
+            "new_key_weight": 1,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "1-100-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.507Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-35-0.glb",
+          "relative": "1-35-0.glb",
+          "before": {
+            "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+            "bytes": 16860
+          },
+          "after": {
+            "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+            "bytes": 16860
+          },
+          "cohort": {
+            "pose": 1,
+            "new_key_weight": 0.35,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "1-35-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.511Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-35-1.glb",
+          "relative": "1-35-1.glb",
+          "before": {
+            "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+            "bytes": 16860
+          },
+          "after": {
+            "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+            "bytes": 16860
+          },
+          "cohort": {
+            "pose": 1,
+            "new_key_weight": 0.35,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "1-35-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.515Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-0-0.glb",
+          "relative": "2-0-0.glb",
+          "before": {
+            "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 2,
+            "new_key_weight": 0,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "2-0-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.519Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-0-1.glb",
+          "relative": "2-0-1.glb",
+          "before": {
+            "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 2,
+            "new_key_weight": 0,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "2-0-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.527Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-100-0.glb",
+          "relative": "2-100-0.glb",
+          "before": {
+            "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 2,
+            "new_key_weight": 1,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "2-100-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.530Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-100-1.glb",
+          "relative": "2-100-1.glb",
+          "before": {
+            "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+            "bytes": 16848
+          },
+          "after": {
+            "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+            "bytes": 16848
+          },
+          "cohort": {
+            "pose": 2,
+            "new_key_weight": 1,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "2-100-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.533Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-35-0.glb",
+          "relative": "2-35-0.glb",
+          "before": {
+            "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+            "bytes": 16864
+          },
+          "after": {
+            "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+            "bytes": 16864
+          },
+          "cohort": {
+            "pose": 2,
+            "new_key_weight": 0.35,
+            "order": "intrinsic-key-then-retained-uv"
+          },
+          "report": {
+            "uri": "2-35-0.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.536Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        },
+        {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-35-1.glb",
+          "relative": "2-35-1.glb",
+          "before": {
+            "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+            "bytes": 16864
+          },
+          "after": {
+            "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+            "bytes": 16864
+          },
+          "cohort": {
+            "pose": 2,
+            "new_key_weight": 0.35,
+            "order": "retained-uv-then-key"
+          },
+          "report": {
+            "uri": "2-35-1.glb",
+            "mimeType": "model/gltf-binary",
+            "validatorVersion": "2.0.0-dev.3.10",
+            "validatedAt": "2026-11-03T04:17:39.539Z",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 1,
+              "numInfos": 1,
+              "numHints": 0,
+              "messages": [
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "NODE_SKINNED_MESH_NON_ROOT",
+                  "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                  "severity": 1,
+                  "pointer": "/nodes/3"
+                }
+              ],
+              "truncated": false
+            },
+            "info": {
+              "version": "2.0",
+              "generator": "Dome Sculpt",
+              "resources": [
+                {
+                  "pointer": "/buffers/0",
+                  "mimeType": "application/gltf-buffer",
+                  "storage": "glb",
+                  "byteLength": 11776
+                },
+                {
+                  "pointer": "/images/0",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/1",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/2",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                },
+                {
+                  "pointer": "/images/3",
+                  "mimeType": "image/png",
+                  "storage": "buffer-view",
+                  "image": {
+                    "width": 256,
+                    "height": 256,
+                    "format": "rgba",
+                    "primaries": "srgb",
+                    "transfer": "srgb",
+                    "bits": 8
+                  }
+                }
+              ],
+              "animationCount": 0,
+              "materialCount": 1,
+              "hasMorphTargets": true,
+              "hasSkins": true,
+              "hasTextures": true,
+              "hasDefaultScene": true,
+              "drawCallCount": 1,
+              "totalVertexCount": 36,
+              "totalTriangleCount": 12,
+              "maxUVs": 2,
+              "maxInfluences": 4,
+              "maxAttributes": 7
+            }
+          }
+        }
+      ]
+    },
+    "input_before": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-0-0.glb": {
+        "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-0-1.glb": {
+        "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-100-0.glb": {
+        "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-100-1.glb": {
+        "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-35-0.glb": {
+        "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+        "bytes": 16744
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-35-1.glb": {
+        "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+        "bytes": 16744
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-0-0.glb": {
+        "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-0-1.glb": {
+        "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-100-0.glb": {
+        "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-100-1.glb": {
+        "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-35-0.glb": {
+        "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+        "bytes": 16860
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-35-1.glb": {
+        "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+        "bytes": 16860
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-0-0.glb": {
+        "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-0-1.glb": {
+        "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-100-0.glb": {
+        "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-100-1.glb": {
+        "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-35-0.glb": {
+        "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+        "bytes": 16864
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-35-1.glb": {
+        "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+        "bytes": 16864
+      }
+    },
+    "input_after": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-0-0.glb": {
+        "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-0-1.glb": {
+        "sha256": "ac6379ed73468862017ca19b4ff34e12ab56bffefa19a3ecc9c42f3381eaef06",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-100-0.glb": {
+        "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-100-1.glb": {
+        "sha256": "982ae5b2c7219565da10c9dc59eade23e46fc164c7cd5689f0761098bbe39886",
+        "bytes": 16728
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-35-0.glb": {
+        "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+        "bytes": 16744
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/0-35-1.glb": {
+        "sha256": "07f6ac610836fe69634a4fbea4c87444a2c765d83247c5ab27493fe5a9ff93d5",
+        "bytes": 16744
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-0-0.glb": {
+        "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-0-1.glb": {
+        "sha256": "6bd932b310ae3a6b78ec311d24e7d0858adeef46b362b61d22e7c2e7826d5f72",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-100-0.glb": {
+        "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-100-1.glb": {
+        "sha256": "f6e8c5d04ab9131e1b8a47cf0eaa3a626e5d086c5f454dea4e36d88a0c3f823d",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-35-0.glb": {
+        "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+        "bytes": 16860
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/1-35-1.glb": {
+        "sha256": "a55476da4c430344cc6d6b0c9d8030bb62e99f72af6f4e08e70ec048da95a15e",
+        "bytes": 16860
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-0-0.glb": {
+        "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-0-1.glb": {
+        "sha256": "c9dd7878ac29ea62f3df64f84ba7a502087c8ecc7accc2bd7143cfa49174f4ec",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-100-0.glb": {
+        "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-100-1.glb": {
+        "sha256": "9c0afa73de9771dfd0433b536eb4e4569502ccb4b2db2e1e264e64c0a8da90cf",
+        "bytes": 16848
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-35-0.glb": {
+        "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+        "bytes": 16864
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/key-uv-commutation-c79a140/artifacts/commutation-fixed/output/2-35-1.glb": {
+        "sha256": "1148e32a877c84e2d50ac8b49df306fae042d92a2b8fe118bf9a4de0f5381045",
+        "bytes": 16864
+      }
+    }
+  }
 }
