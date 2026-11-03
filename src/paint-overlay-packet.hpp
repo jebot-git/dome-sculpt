@@ -38,6 +38,10 @@ public:
  const std::shared_ptr<const PaintOverlayPacket>&contribution_owner()const noexcept{return contribution_owner_;}
 };
 struct PaintOverlayFactory {
+ // Read only the sealed original coordinate owners; no sparse tile packet or
+ // padding upload is needed by a CPU asset worker.
+ static std::array<std::shared_ptr<const std::vector<std::array<float,2>>>,2>
+   source_coordinates(const PaintedMesh &);
  static std::shared_ptr<const PaintOverlayPacket> capture(const PaintedMesh &,const std::function<bool()> &cancelled={});
  // Render-only ordered vertex expansion. Does not grant Scene/paint authority.
  static std::shared_ptr<const PaintOverlayPacket> pack_source_maps(

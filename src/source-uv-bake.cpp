@@ -234,8 +234,9 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   }
  }
  const auto &old=i.paint->mesh();std::vector<std::array<float,2>> authored_uv1;
- const auto independent=i.paint->source_sampling_prepared()?detail::PaintOverlayFactory::capture(*i.paint,o.cancelled):nullptr;
- if(independent&&!i.paint->valid_source_sampling_attachment())throw std::invalid_argument("Source UV bake lost its exact independent original sampling owner");
+ const bool independent=i.paint->source_sampling_prepared();
+ const auto logical_coordinates=independent?detail::PaintOverlayFactory::source_coordinates(*i.paint):
+   std::array<std::shared_ptr<const std::vector<std::array<float,2>>>,2>{};
  const std::vector<std::array<float,2>> *uv1=i.paint->source_maps()?i.paint->source_maps()->uv1.get():nullptr;
  if(i.current_deformation)result.deformation=detail::normal_frame_remap_deformation(i.current_deformation,old,i.target,i.source_vertices,o.cancelled);
  if(i.appearance){auto appearance=std::make_shared<CreatorAppearance>(*i.appearance);appearance->source_vertices.clear();appearance->source_vertices.reserve(i.source_vertices.size());for(auto v:i.source_vertices)appearance->source_vertices.push_back(i.appearance->source_vertices.at(v));result.appearance=std::move(appearance);}
@@ -318,7 +319,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  }
  // Typed roles use authored logical UVs. PBR roles use the genuine current
  // image carriers; a generated UV0 carrier1 is never original TEXCOORD_1.
- const auto *typed_uv1=independent?independent->original_uv1().get():uv1;
+ const auto *typed_uv1=independent?logical_coordinates[1].get():uv1;
  if(result.mtoon){
   bool needs=false;for(size_t role=0;role<size_t(MToonSlot::Count);++role){const auto &t=result.mtoon->textures[role];if(t.index>=0&&role!=size_t(MToonSlot::Matcap))needs|=coordinate(t)==1;}
   if(needs){
@@ -327,7 +328,8 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
    if(!primitive||primitive->uv1.size()!=primitive->mesh.positions.size()||i.appearance->source_vertices.size()!=old.positions.size())throw std::invalid_argument("Source UV1 requires exact retained primitive/accessor remap");
    if(!typed_uv1)authored_uv1.reserve(old.positions.size());
    for(size_t vertex=0;vertex<i.appearance->source_vertices.size();++vertex){
-    if((vertex&1023)==0)budget.cancel();const auto source=i.appearance->source_vertices[vertex];if(source>=primitive->uv1.size())throw std::invalid_argument("Source UV1 remap is invalid");const auto q=primitive->uv1[source];
+    if((vertex&1023)==0)budget.cancel();
+    const auto source=i.appearance->source_vertices[vertex];if(source>=primitive->uv1.size())throw std::invalid_argument("Source UV1 remap is invalid");const auto q=primitive->uv1[source];
     if(!std::isfinite(q[0])||!std::isfinite(q[1]))throw std::invalid_argument("Source UV1 is not finite");
     if(typed_uv1){if(typed_uv1->at(vertex)!=q)throw std::invalid_argument("PBR and MToon UV1 source domains differ");}else authored_uv1.push_back(q);
    }
@@ -335,7 +337,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   }
  }
  auto coordinate_domain=[&](int coordinate,bool logical=false)->const std::vector<std::array<float,2>>*{
-  if(logical&&independent&&coordinate<=1){const auto &owner=coordinate==0?independent->original_uv0():independent->original_uv1();if(!owner||owner->size()!=old.positions.size())throw std::invalid_argument("Source UV bake requires its genuine logical source coordinate owner");return owner.get();}
+  if(logical&&independent&&coordinate<=1){const auto &owner=logical_coordinates[size_t(coordinate)];if(!owner||owner->size()!=old.positions.size())throw std::invalid_argument("Source UV bake requires its genuine logical source coordinate owner");return owner.get();}
   if(coordinate==0)return nullptr;
   if(coordinate==1){const auto *values=logical?typed_uv1:uv1;if(!values)throw std::invalid_argument("Source UV1 bake requires its exact coordinate domain");return values;}
   const auto &maps=i.paint->source_maps();if(coordinate<2||coordinate>7||!maps)throw std::invalid_argument("Extra source UV bake requires its exact coordinate owner");auto found=maps->extra_uv_sets.find(uint32_t(coordinate));if(found==maps->extra_uv_sets.end()||!found->second||found->second->size()!=old.positions.size())throw std::invalid_argument("Extra source UV bake coordinate correspondence differs");return found->second.get();

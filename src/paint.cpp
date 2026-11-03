@@ -814,6 +814,13 @@ std::array<uint8_t,4> PaintedMesh::pbr_pixel(uint64_t id,uint32_t x,uint32_t y) 
   }
   const auto &p=pixel(id,x,y);return {p.data[0],p.data[1],p.data[2],p.data[3]};
 }
+std::array<std::shared_ptr<const std::vector<std::array<float,2>>>,2>
+detail::PaintOverlayFactory::source_coordinates(const PaintedMesh &paint){
+  if(!paint.source_sampling_prepared()||!paint.valid_source_sampling_attachment())
+    throw std::invalid_argument("Original source coordinates require their own exact native sampling owner");
+  const auto &proof=*paint.surface_->original_sampling;
+  return {proof.original_uv0,proof.original_uv1};
+}
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture(const PaintedMesh &paint,const std::function<bool()> &cancelled){
   paint_compute::checkpoint(cancelled);
   auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
