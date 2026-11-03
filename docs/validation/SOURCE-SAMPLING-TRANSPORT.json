@@ -2,7 +2,7 @@
   "recorded_utc": "2026-11-03T13:38:28.453039+00:00",
   "runtime_kernel": "5ce0bca",
   "graphics_source": "ba0d2f4",
-  "scope": "Private exact original PBR sampling transport kernel and graphics prototype. Same production renderer before/after exact UV remap, independent CPU point-sampling/coordinate comparison and parsed GLB metadata/PNG. No independent exported pixel consumer, live editing, native owning Scene/persistence, actual avatar or full-goal admission.",
+  "scope": "Private exact original PBR sampling transport kernel and graphics prototype. Same production renderer before/after exact UV remap, paired original/transported CPU point-sampling/coordinate comparison and parsed GLB metadata/PNG. No independent exported pixel consumer, live editing, native owning Scene/persistence, actual avatar or full-goal admission.",
   "profiles": {
     "cpu": {
       "result": {

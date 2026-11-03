@@ -16,7 +16,7 @@ fabrication occurs. Exhausted carriers, correspondence errors, cancellation and
 cumulative coordinate/work bounds refuse without publishing output.
 
 Kernel source `5ce0bca` passes 47,781 checks in optimized Release and owned
-ASan/UBSan, including independent role coordinates and point samples across all
+ASan/UBSan, including paired original/transported role coordinates and point samples across all
 three wrap modes, six minification modes and two magnification modes. Graphics
 source `ba0d2f4` adds only the consumer and its CMake target; the kernel is exact.
 Release and sanitizer each pass 5,617 checks across 72 real GL cases: 2/128-pixel
