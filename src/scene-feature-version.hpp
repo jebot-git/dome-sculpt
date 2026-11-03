@@ -6,6 +6,7 @@
 #include "dome/color-preparation.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "dome/normal-preparation.hpp"
+#include "normal-key-derivation.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/source-placement.hpp"
@@ -52,6 +53,7 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   unsigned result=binding->uv_origin
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;
+  if(binding->key_derivation){const auto &k=*binding->key_derivation;result=std::max({result,22u,minimum_scene_version(k.before_paint().get()),minimum_scene_version(k.before_material().get()),minimum_scene_version(k.before_deformation().get()),minimum_scene_version(k.before_appearance().get())});}
   if(binding->normal_frames)for(const auto &frame:{binding->normal_frames->pbr,binding->normal_frames->mtoon,binding->normal_frames->canonical})if(frame&&frame->generated_uv&&*frame->generated_uv>=2)result=std::max(result,26u);
   if(const auto &preparation=binding->color_preparation)
     result=std::max({result,preparation->polygon_colors?20u:10u,minimum_scene_version(preparation->original_paint.get()),minimum_scene_version(preparation->original_deformation.get()),

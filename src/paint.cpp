@@ -2,6 +2,9 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "key-paint-adoption.hpp"
+#include "normal-frame-runtime.hpp"
+#include "source-paint-pairing.hpp"
 #include "paint-source-admission.hpp"
 #include "source-uv-archive.hpp"
 #include "dome/paint-sampling.hpp"
@@ -851,6 +854,25 @@ std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &pain
 std::shared_ptr<PaintedMesh> rebind_paint_sampling_geometry(const PaintedMesh &paint,
     std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::rebind(paint,std::move(attachment),limits);
+}
+struct SourceKeyPaintAccess {
+  static std::shared_ptr<PaintedMesh> adopt(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){
+    auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Native key geometry adoption cancelled");};stop();
+    const auto node=binding.key_derivation;if(!node||!node->valid_owner(node)||node->frames()!=binding.normal_frames)throw std::invalid_argument("Native key geometry adoption requires its actual owning material node");
+    node->validate(true,cancelled);detail::source_paint_pairing(&paint,&binding,appearance,true);detail::normal_frame_current_authority(binding,paint.mesh(),deformation,cancelled);
+    const auto &anchor=*node->before_paint();auto same=[](const auto &a,const auto &b){return a.size()==b.size()&&(a.empty()||std::memcmp(a.data(),b.data(),a.size()*sizeof(a[0]))==0);};
+    const auto &a=paint.mesh(),&b=anchor.mesh();const auto domain=paint.paint_sampling_domain(),prior=anchor.paint_sampling_domain();
+    const bool same_domain=domain==prior&&!domain.owner_before(prior)&&!prior.owner_before(domain);
+    auto result=paint.snapshot();
+    if(!same_domain||paint.resolution()!=anchor.resolution()||paint.surface_diagnostics().policy!=anchor.surface_diagnostics().policy||!same(a.positions,b.positions)||!same(a.normals,b.normals)||a.uv!=b.uv||a.indices!=b.indices||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)return result;
+    // Full source/field replay above proves the owning model. Exact ordered
+    // geometry + actual independent grid-domain identity proves this raster
+    // is unchanged; geometry equality alone never grants field authority.
+    result->surface_=anchor.surface_;result->sampling_attachment_=anchor.sampling_attachment_;stop();return result;
+  }
+};
+namespace detail {
+std::shared_ptr<PaintedMesh> adopt_key_paint_geometry(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){return SourceKeyPaintAccess::adopt(paint,binding,appearance,deformation,cancelled);}
 }
 struct PolygonPaintAccess {
   static std::shared_ptr<PaintedMesh> rebuild(const PaintedMesh &source, Mesh target,
