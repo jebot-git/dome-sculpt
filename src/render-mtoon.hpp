@@ -5,7 +5,7 @@
 namespace dome {
 inline std::string mtoon_renderer_common(){
   return std::string(mtoon_glsl())+R"GLSL(
-uniform int source_frame,canonical_frame,prepared_pbr_frame;
+uniform int source_frame,canonical_frame,prepared_pbr_frame,retained_normal_domain;
 uniform int mt_mode,mt_outline,mt_present[16],mt_coord[16],mt_derived[16],mt_channel[16];
 uniform vec4 mt[12];uniform vec2 mt_offset[16],mt_scale[16];uniform float mt_rotation[16],mt_time;
 uniform vec3 mt_camera_up,mt_camera_forward;uniform float mt_aspect;
@@ -26,17 +26,18 @@ int transform=mt[8].x<.5?0:s;
 return dome_mtoon_uv(mt,q,mt_offset[transform],mt_scale[transform],mt_rotation[transform],s==5,s==8,s==7,mt_time,mask);}
 )GLSL";
 }
-inline std::string mtoon_renderer_vertex(){return std::string("#version 330 core\n")+mtoon_renderer_common()+R"GLSL(
+inline std::string mtoon_renderer_vertex(bool paint_supported=true){return std::string("#version 330 core\n")+mtoon_renderer_common()+(paint_supported?"layout(location=12)in vec2 retained_paint_coordinates;\n":"const vec2 retained_paint_coordinates=vec2(0);\n")+R"GLSL(
 layout(location=0)in vec3 position;layout(location=1)in vec3 normal;layout(location=2)in vec2 uv;layout(location=3)in vec2 uv1;layout(location=4)in float selected_weight;layout(location=5)in vec4 tangent;layout(location=6)in float sculpt_mask;layout(location=7)in vec3 retained_normal;layout(location=8)in vec4 retained_tangent;layout(location=9)in vec3 retained_canonical_normal;
-layout(location=10)in vec4 retained_color;out vec4 source_color;
-uniform mat4 model,mvp,view_projection;uniform vec3 camera;uniform mat3 normal_model;uniform int affine_motion;uniform float model_hand;
-out vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;out float source_w;out vec2 texcoord,texcoord1;out float weight_value,mask_value;
+layout(location=13)in vec4 extra_uv23;layout(location=14)in vec4 extra_uv45;layout(location=15)in vec4 extra_uv67;out vec4 source_uv23,source_uv45,source_uv67;
+layout(location=10)in vec4 retained_color;layout(location=11)in vec4 retained_normal_coordinates;out vec4 normal_coordinates;out vec4 source_color;
+uniform int paint_domain;uniform mat4 model,mvp,view_projection;uniform vec3 camera;uniform mat3 normal_model;uniform int affine_motion;uniform float model_hand;
+out vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;out float source_w;out vec2 texcoord,texcoord1,paintcoord;out float weight_value,mask_value;
 void main(){mat3 normal_transform=affine_motion==1?normal_model:mat3(model);vec4 p=model*vec4(position,1);vec3 geometric=dome_mtoon_unit(normal_transform*normal),V=dome_mtoon_unit(camera-p.xyz);
 source_n=dome_mtoon_unit(normal_transform*dome_mtoon_unit(retained_normal));source_t=dome_mtoon_unit(mat3(model)*dome_mtoon_unit(retained_tangent.xyz));source_w=retained_tangent.w*model_hand;source_b=cross(source_n,source_t)*source_w;
 if(prepared_pbr_frame==1)source_b=dome_mtoon_unit(source_b);
-vec3 N=source_frame==1?source_n:geometric;world=p.xyz;cut_position=position;n=geometric;source_color=retained_color;
+vec3 N=source_frame==1?source_n:geometric;world=p.xyz;cut_position=position;n=geometric;source_color=retained_color;normal_coordinates=retained_normal_coordinates;source_uv23=extra_uv23;source_uv45=extra_uv45;source_uv67=extra_uv67;
 canonical_n=canonical_frame==1?dome_mtoon_unit(normal_transform*dome_mtoon_unit(retained_canonical_normal)):geometric;
-canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(canonical_n,canonical_t)*tangent.w*model_hand;texcoord=uv;texcoord1=uv1;weight_value=selected_weight;mask_value=sculpt_mask;gl_Position=mvp*vec4(position,1);
+canonical_t=dome_mtoon_unit(mat3(model)*tangent.xyz);canonical_b=cross(canonical_n,canonical_t)*tangent.w*model_hand;texcoord=uv;texcoord1=uv1;paintcoord=paint_domain==1?retained_paint_coordinates:uv;weight_value=selected_weight;mask_value=sculpt_mask;gl_Position=mvp*vec4(position,1);
 if(mt_mode==1&&mt_outline==1&&selected_weight<0){float mask=mt_scalar(8,mt_read(8,mt_uv(8,uv,uv1,N,V,1)));
 float width=mt_scalar(7,mt_read(7,mt_uv(7,uv,uv1,N,V,mask)));
 if(int(mt[10].x+.5)==1){world+=N*dome_mtoon_outline_world_width(mt,width);gl_Position=view_projection*vec4(world,1);}
@@ -78,7 +79,7 @@ vec4 mt_packed_read(int view,vec2 q){return mt_packed_sample(view,q,dFdx(q),dFdy
 // Reconstruct canonical detail in coverage-premultiplied space. Protected
 // texels may contain arbitrary unused normal bytes and must not bleed in.
 vec3 mt_baked_detail(out float coverage){
-ivec2 size=textureSize(tex13,0);vec2 p=texcoord*vec2(size)-.5;ivec2 base=ivec2(floor(p));vec2 f=fract(p);vec3 sum=vec3(0);coverage=0;
+ivec2 size=textureSize(tex13,0);vec2 p=paintcoord*vec2(size)-.5;ivec2 base=ivec2(floor(p));vec2 f=fract(p);vec3 sum=vec3(0);coverage=0;
 for(int y=0;y<2;++y)for(int x=0;x<2;++x){ivec2 q=clamp(base+ivec2(x,y),ivec2(0),size-1);float w=(x==1?f.x:1-f.x)*(y==1?f.y:1-f.y)*texelFetch(tex15,q,0).r;coverage+=w;sum+=(texelFetch(tex13,q,0).rgb*2-1)*w;}
 return coverage>1e-8?sum/coverage:vec3(0,0,1);
 }
@@ -96,7 +97,7 @@ return dome_mtoon_unit(T*ts.x+B*ts.y+N*ts.z);
 }
 vec4 mt_surface(vec3 geometric,vec3 V,out bool killed){
 vec3 N=dome_mtoon_unit(source_frame==1?source_n:geometric);float mask=mt_scalar(8,mt_read(8,mt_uv(8,texcoord,texcoord1,N,V,1)));
-vec2 normalUV=mt_uv(2,texcoord,texcoord1,N,V,mask),a=dFdx(normalUV),b=dFdy(normalUV);vec3 dx=dFdx(world),dy=dFdy(world);
+vec2 normalUV=retained_normal_domain==1?normal_coordinates.zw:mt_uv(2,texcoord,texcoord1,N,V,mask),a=dFdx(normalUV),b=dFdy(normalUV);vec3 dx=dFdx(world),dy=dFdy(world);
 float determinant=a.x*b.y-a.y*b.x;vec4 tangent=vec4(1,0,0,1);bool valid=abs(determinant)>1e-8*max(length(a)*length(b),1e-20);
 if(valid){vec3 T=(dx*b.y-dy*a.y)/determinant,B=(dy*a.x-dx*b.x)/determinant;T=dome_mtoon_unit(T-N*dot(N,T));tangent=vec4(T,dot(cross(N,T),B)<0?-1:1);}
 if(mt_baked_normal==0){

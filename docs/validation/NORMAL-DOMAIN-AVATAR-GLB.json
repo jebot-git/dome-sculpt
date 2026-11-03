@@ -1,0 +1,109 @@
+{
+  "base": "f8223586d370e6bc594fb0f343c1759ad2cf6dfc",
+  "status": "Qualified private tests for f822 current-state core-PBR exporter; no new product or public ABI",
+  "owned_sources": {
+    "tests/normal-domain-avatar-glb.cpp": "3a1c89023c6ea89d07334e99c94f8e33b3a25e854365850712d2f8e9803a3f65",
+    "tests/normal-domain-transition-glb.cpp": "48f9271b3cc3dd043f815aca81e85df6b77e14c97d4bb37e384282b2388958c2",
+    "CMakeLists.txt": "432612a32b5dbded3a3a2b39d4b208afbcc721e94e4d68870f10c7ca0db5a5ca"
+  },
+  "product_src_include_byte_identical_to_base": true,
+  "compile_scope": "Both added test TUs compiled O3 and O1 ASan/UBSan/leaks against exact frozen f822 fresh coherent C/C++ core/support/renderer archives; hash equality checked before every compile. No old-header/new-archive mix. Not a new whole-suite run.",
+  "cmake": "Two standard test targets configured after device run; generated CXX definitions/includes/flags match actual O3 fixture compile inputs exactly. No product source or test-TU changes after proof.",
+  "avatar": {
+    "checks": 89,
+    "images": 18,
+    "parts_per_file": 19,
+    "baselines": [
+      "actual bundled CC0 female",
+      "actual bundled CC0 male"
+    ],
+    "authoring": "Explicit native material.unlit=false before normal preparation and genuine geometry-ray Bake; raw source bytes/roles/has_mtoon intact. Retain .95 UV scale, Save/reopen, actual Document PBR command/current export.",
+    "poses": "rest; nonuniform mixed hips/spine; same with spine rotation",
+    "morph_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "software_max_error": 1,
+    "sanitizer_max_error": 1,
+    "arc_max_error": 0,
+    "normal_disabled_sensitivity": [
+      22,
+      37
+    ],
+    "wrong_atlas_sensitive": true,
+    "source_exact": true
+  },
+  "default_unlit_evidence": {
+    "images": 1,
+    "parity_error": 0,
+    "normal_disabled_sensitivity": 0,
+    "outcome": "Original strengthened fixture fails as expected because actual default PBR fallback is unlit. Preserved separately; not counted as edited-lit proof."
+  },
+  "clear_rgba": {
+    "checks": 51,
+    "images": 36,
+    "software_max_error": 0,
+    "sanitizer_max_error": 0,
+    "arc_max_error": 0,
+    "normal_event_independent_of_expanded_rgba_coverage": true,
+    "clear_returns_intrinsic": true,
+    "restart_and_original_exact": true
+  },
+  "arc": {
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "source_binary_frozen_archives_raw_inputs_before_equal_after": true,
+    "runs": [
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/normal-domain-avatar-f822358/artifacts/normal-domain-avatar-glb-build-export-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/normal-domain-avatar-f822358/artifacts/arc/avatar/native",
+          "--hardware"
+        ],
+        "returncode": 0,
+        "seconds": 66.86590623599477
+      },
+      {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/normal-domain-avatar-f822358/artifacts/normal-domain-transition-glb-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/normal-domain-avatar-f822358/artifacts/arc/transition/native",
+          "--hardware"
+        ],
+        "returncode": 0,
+        "seconds": 1.630567020009039
+      }
+    ]
+  },
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "files": 54,
+    "errors": 0,
+    "warnings": 378,
+    "maxIssues": 0
+  },
+  "remaining_required": [
+    "Pre-UV colour/alpha fidelity68/89 remains unfixed",
+    "Native third UV set reimport still refuses",
+    "VRM retained-domain standard sampling compiler remains guarded",
+    "Paint24 grid-domain composition not integrated",
+    "No broad reflected/affine normal-export claim",
+    "No new controller/FLTK/human headset claim from these fixture tests"
+  ],
+  "evidence_sha256": {
+    "avatar-software.log": "57b484bca97be852a825c8f7d8682f58a38b0aae4a3a6ca62ccf7f99753a6485",
+    "avatar-lit-software.log": "014cd82d239719913de5450c09fd147287aa667444d1f8c33da5ab8cc55733bd",
+    "avatar-lit-sanitize.log": "014cd82d239719913de5450c09fd147287aa667444d1f8c33da5ab8cc55733bd",
+    "transition-software.log": "452603039de397c92a86750daf444dd259077cf3e6337f25a9375c92a59f9ec9",
+    "transition-sanitize.log": "452603039de397c92a86750daf444dd259077cf3e6337f25a9375c92a59f9ec9",
+    "khronos.json": "596cec4a7da891455b52168aff650bb70113caa1195553a35922750127b464c0",
+    "arc/before.json": "bbd5324d1c753d6a96cfc475c67b975938ec23f3142b2c970c61a733824f9a83",
+    "arc/after.json": "bbd5324d1c753d6a96cfc475c67b975938ec23f3142b2c970c61a733824f9a83",
+    "arc/results.json": "9b0cd52bb789dca4920e6207f80988bbb448ecf7edfcd7dd2f0a7ef82a942afd",
+    "arc/avatar.log": "47e83e6706fd9a6701a69fb1455fd58061c340bb58465468726fd96907b391cd",
+    "arc/transition.log": "a796dbc5cdb1a3abdd2427a6f6c86f8ea7143162e71ed088557ded4bb702b192",
+    "build_fixture.py": "7c3c6bc5770c290f7a81058cf9670989261cdbe7a3588092ec421feeb32c9fa2",
+    "cmake-registration.log": "71ea008e19235e9f92fcb77787886501d2fc8b183a13621f5080823588bf6c6d",
+    "cmake-test-registration.log": "7132b27ec6310b86bd336aab7dd38de2c086fc5cb830b48c1eda37c44a2ea9e2"
+  }
+}

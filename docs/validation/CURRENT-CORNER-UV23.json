@@ -1,0 +1,317 @@
+{
+  "scope": "Private guarded current-corner UV23 authoring milestone; not full-goal completion or latest-main/normal21 integration",
+  "runtime_commit": "3af48a62b1392a8549422f1b4babea3ad22dc354",
+  "base": "ca4a85d",
+  "initial_basis": "ad56d12",
+  "worktree": "/home/blux/de-xr/dome-sculpt/artifacts/corner-color-uv23-ui-ca4a85d",
+  "representation": {
+    "scene": 23,
+    "materials": 8,
+    "colour_entry": 3,
+    "polygon_sources": 5,
+    "initial_authority": "immutable initial descriptor, receipt, projection, original before-state",
+    "current_authority": "exact own stable-corner topology, shared independent RGBA field, measured current projection and complete immediate before-state"
+  },
+  "final_guard_scope": {
+    "runtime_delta": "only explicit UV1 refusal in caller, factory and replay; no public ABI/schema change from ca4a",
+    "old_negative": {
+      "exit": 1,
+      "reason": "actual paired UV1 prepared input accepted by oldca4a without a qualified adapter"
+    },
+    "fresh_release": {
+      "passed": 6,
+      "total": 6,
+      "seconds": 49.01,
+      "assertions": {
+        "factory_codec_cancel": 116,
+        "paired_domain": 1,
+        "native_endpoint_controller": 44,
+        "caller_allocation_boundaries": 200,
+        "post_uv_paint_graphics": 49,
+        "actual_loader": 11
+      }
+    },
+    "fresh_owned_sanitizer": {
+      "passed": 4,
+      "total": 4,
+      "seconds": 333.55,
+      "flags": "C/C++ O1 ASan+UBSan+leaks across all owned core/support",
+      "scopes": [
+        "116 factory/codec/cancel",
+        "1 real paired UV1 negative",
+        "44 actual endpoint/controller",
+        "200 actual caller allocations with exact ready draft/queue/history and successful retry"
+      ]
+    },
+    "gui": {
+      "normal": 12,
+      "compact": 12,
+      "compact_screen": "640x520",
+      "toolkit": "toolkit-eee23b7/lib",
+      "bitmap": "bitmap-runtime-eee23b7/lib",
+      "canonical_compatibility": "parent verified latest DomeD d271cf65 builders/assets unchanged",
+      "acknowledgement": "actual rendered draft Redo ack across DBus/X11; atomic saved-file replacement ack, not fixed delay"
+    },
+    "actual_loader": {
+      "checks": 11,
+      "modes": [
+        "accept",
+        "physical panel cancel followed by Confirm",
+        "focus loss/regain followed by Confirm"
+      ],
+      "synthetic_devices": true,
+      "real_stereo_gl": true,
+      "physical_hmd": false
+    },
+    "post_uv_paint": {
+      "cases": 12,
+      "checks": 49,
+      "software": "all native image errors0; independent GLB0-1",
+      "hardware": "all native image errors0; independent GLB0-1",
+      "device": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "selector": "DRI_PRIME=pci-0000_03_00_0",
+      "scope": "RGBA seams, Opaque/Mask/Blend, rest/certified posed translation; colour/metal/rough/emission/mask beforeUV versus afterUV, actual Save/reopen and independent parsed GLB"
+    }
+  },
+  "frozen_ca4a_proof": {
+    "worktree": "/home/blux/de-xr/dome-sculpt/artifacts/corner-color-uv23-aec07c2",
+    "actual_allocation_sweep": {
+      "boundaries": 65493,
+      "shards": 16,
+      "passed": 16,
+      "seconds": 1503.2,
+      "preparation_replayed": false,
+      "all_refusals": 65493,
+      "optional_acceptances": 0,
+      "ranges": [
+        {
+          "total": 65493,
+          "begin": 0,
+          "end_exclusive": 4093,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 4093,
+          "end_exclusive": 8186,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 8186,
+          "end_exclusive": 12279,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 12279,
+          "end_exclusive": 16373,
+          "checked": 4094,
+          "refusals": 4094,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 16373,
+          "end_exclusive": 20466,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 20466,
+          "end_exclusive": 24559,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 24559,
+          "end_exclusive": 28653,
+          "checked": 4094,
+          "refusals": 4094,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 28653,
+          "end_exclusive": 32746,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 32746,
+          "end_exclusive": 36839,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 36839,
+          "end_exclusive": 40933,
+          "checked": 4094,
+          "refusals": 4094,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 40933,
+          "end_exclusive": 45026,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 45026,
+          "end_exclusive": 49119,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 49119,
+          "end_exclusive": 53213,
+          "checked": 4094,
+          "refusals": 4094,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 53213,
+          "end_exclusive": 57306,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 57306,
+          "end_exclusive": 61399,
+          "checked": 4093,
+          "refusals": 4093,
+          "optional": 0
+        },
+        {
+          "total": 65493,
+          "begin": 61399,
+          "end_exclusive": 65493,
+          "checked": 4094,
+          "refusals": 4094,
+          "optional": 0
+        }
+      ]
+    },
+    "release_regressions": "6/6: new native/kernel plus unchanged raw UV, sourceUV, normalUV, target preparation",
+    "owned_sanitizer_original": {
+      "passed": 6,
+      "total": 7,
+      "timeout": "graphical12-case test at600 seconds after case10 GLB; no assertion/SAN report",
+      "log": "../corner-color-uv23-aec07c2/tests-uv23-focused-san.log",
+      "log_sha256": "4e6f9995459bf8ef0596d8eb2e8dab8ddc3f0ba54f20e09739a7f7d98ecb4897"
+    },
+    "same_binary_budget_completion": {
+      "budget_seconds": 1200,
+      "exit": 0,
+      "checks": 85,
+      "cases": 12,
+      "binary_sha256": "957fe516aba28d4c758e2e408983ec6accef7c320b8ef2c53f5b5e515da7619c",
+      "log": "../corner-color-uv23-aec07c2/tests-uv23-render-san-budget1200.log",
+      "log_sha256": "66b3ca11bd773fb1a03345326bee3a1d39d306b23880f8df7017471c0d1106ea"
+    },
+    "prior_graphics": {
+      "software": 85,
+      "arc": 85,
+      "native_lit_maxerror": 0,
+      "independent_glb_maxerror": 1,
+      "pose_transform": "integer1/256 UV translation;37 mixed skin/morph/anisotropic Mikk basis comparisons bit-exact"
+    },
+    "full_instrumented_65493_sweep": false
+  },
+  "remaining_required": [
+    "Deformed nontranslation scale/rotation/unwrap and introduced/merged seams need actual normal-frame/domain transfer",
+    "Internal N-gon corner UV split requires actual face split, not averaging",
+    "Prepared normal21 + colour23 shared context/consumer composition remains unintegrated",
+    "Current-corner paired UV1 remains explicit refusal pending its actual field/domain adapter",
+    "MToon target current-corner UV remains guarded; OriginalAccessor PBR fallback work is separate",
+    "No whole-project latest-main regression, system installation, physical headset test or whole-goal completion claimed"
+  ],
+  "source_hashes": {
+    "CMakeLists.txt": "593967efef57da7613a173916de9c6cd832c34a2573a281b5ba0bd030c0b40b4",
+    "src/color-uv-reprojection.cpp": "37a5b1906aa8ca14586d2dc55cb90bde745ed6618c13d41093094275aae67d41",
+    "src/corner-uv-domain.hpp": "3146d52518d1fe1c7440741d84a94861a7970f956558465bd882e8b34a7da658",
+    "src/source-uv-bake.cpp": "be3040c2f3c1f22cf910e71bf4121a821fdb580bc487d69482c58541c4f8a32e",
+    "tests/corner-color-uv23-admission.cpp": "157189383dd5607c73a9c7b6e864a62b2a0446068ea4c596c787459b29881af1",
+    "tests/corner-color-uv23-document.cpp": "a16d92da29f3934c2dafd0d2338e91fb1f1ca5bff2e95dbea16af8040edcf60f",
+    "tests/corner-color-uv23-domain.cpp": "e0c3718d94958f3cb995d12be2f2dc1082c9e1d6065f20697a7130c5cefa5028",
+    "tests/corner-color-uv23-gui-fixture.cpp": "dc897959ffa0e4afae5bcbbf89b2dde75581958b7db8a870dc8434c70ca36927",
+    "tests/corner-color-uv23-menu.py": "715510319b4786ae25ec9a4a967969725fe1b365dd737a0d64bc7d5a59420f39",
+    "tests/corner-color-uv23-paint-render.cpp": "3bba9a7b84146baa11270557b50bcc72ca9f6ca870bb89164eebbec7c85da541",
+    "tests/corner-color-uv23-xr.py": "796663bcd66887eea0eee94b9ee47c9b4513a289fc03f9d1a3c7a930f5bc4021",
+    "tests/xr_runtime.cpp": "9be6a3d257c2eaae1990615fc86f9ab58b14f9455f2e16914b4c42dc6946b9e3"
+  },
+  "complete_source_freeze_sha256": "b053346a659efbce52eb2907d67992a72c5fa8e66c69d51eca915841c2f00356",
+  "binaries": {
+    "build/dome-sculpt": "7822d59db71a31e040baa7deaf6df55989b203ff36f11b017336185f88cf763b",
+    "build/dome-sculpt-corner-color-uv23-paint-render-test": "b2533739a1fbf2c79766d53e123d88d61bbd605b2aa77a238c9aa30f60e54e64",
+    "build/dome-sculpt-corner-color-uv23-admission-test": "3402676aca0d261366fd1d6c12122c2763338c3c0c91f6b09caa381fb3e66bfd",
+    "build-san/dome-sculpt-corner-color-uv23-admission-test": "8ca2d51ab2b6171cf344735ad62a8003c59371da2f89ccdee44e6731c9ba9306",
+    "build/libdome-sculpt-core.a": "c2419be02ce937a9008b00353562fc97e4b09887b82dc3e1d3a45cfa46166fc4",
+    "build-san/libdome-sculpt-core.a": "43d08016987dfee6b7482505951711221a5fad595385af35c12f7b8b18e1cf95",
+    "build/libdome-sculpt-test-runtime.so": "9b97d9af191b751b5ff4f24d6fdb2dff29de25fca89d19968ac7275ce38ea919"
+  },
+  "logs": {
+    "guard_release": {
+      "path": "artifacts/tests-guard-focused-release.log",
+      "sha256": "870ad9a7f251140f9c1bec3d908340d636883ba9bffe9ae4479f6d52f7001092"
+    },
+    "guard_sanitizer": {
+      "path": "artifacts/tests-guard-focused-san.log",
+      "sha256": "cf9583d1cc1d84ca0a4a9831dfff9748172212fef8b355b725496d57bee15ba6"
+    },
+    "guard_fltk_normal": {
+      "path": "artifacts/tests-menu-guard-normal.log",
+      "sha256": "677d1b52b9cdc2a76e511a916fbfa42a0a34d1b4fa0ab570c8541544130dfaa8"
+    },
+    "guard_fltk_compact": {
+      "path": "artifacts/tests-menu-guard-compact.log",
+      "sha256": "5847215b373e73bdbda66675ea28bd19bed6c3c21355c45f495b7373338b1e59"
+    },
+    "guard_postpaint_arc": {
+      "path": "artifacts/tests-postpaint-render-final-arc.log",
+      "sha256": "afbfd863cb72b5b40f034b409d6290363afb4915458edd2c7d7bde235be06151"
+    },
+    "old_domain_negative": {
+      "path": "artifacts/tests-domain-old-negative.log",
+      "sha256": "4ff15c17118df5e5efb7a6865d0600e1281e836e8b5fd1117879b8d1b97a28ce"
+    },
+    "paired_domain_release": {
+      "path": "artifacts/tests-domain-release.log",
+      "sha256": "c1eb6432c870bb4e7a8fcad11e095a0249c3d15b2d459cabee35438ca2144496"
+    },
+    "paired_domain_sanitizer": {
+      "path": "artifacts/tests-domain-san.log",
+      "sha256": "c1eb6432c870bb4e7a8fcad11e095a0249c3d15b2d459cabee35438ca2144496"
+    }
+  },
+  "commands": {
+    "fresh_release": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/share/fltk; nice -n15 cmake --build build --target dome-sculpt dome-sculpt-test-runtime dome-sculpt-corner-color-uv23-test dome-sculpt-corner-color-uv23-document-test dome-sculpt-corner-color-uv23-domain-test dome-sculpt-corner-color-uv23-admission-test dome-sculpt-corner-color-uv23-gui-fixture dome-sculpt-corner-color-uv23-paint-render-test -j2",
+    "selected_release": "ctest --test-dir build --output-on-failure -j2 -R ^(corner-color-uv23|corner-color-uv23-domain|corner-color-uv23-document|corner-color-uv23-admission|corner-color-uv23-paint-render|corner-color-uv23-xr)$",
+    "selected_san": "ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 UBSAN_OPTIONS=halt_on_error=1 ctest --test-dir build-san --output-on-failure -j2 -R ^(corner-color-uv23|corner-color-uv23-domain|corner-color-uv23-document|corner-color-uv23-admission)$",
+    "hardware": "DRI_PRIME=pci-0000_03_00_0 build/dome-sculpt-corner-color-uv23-paint-render-test artifacts/postpaint-render-final-arc --hardware",
+    "gui": "DOME_UV_BUILD=build DOME_UV_HELPER=dome-sculpt-corner-color-uv23-gui-fixture uv run --with python-xlib --with pillow --with dbus-next python tests/corner-color-uv23-menu.py; compact DOME_UV23_SCREEN=640x520x24",
+    "loader": "registered corner-color-uv23-xr uses Python3, fresh app/runtime/helper; real loader/EGL images, synthetic controllers"
+  }
+}

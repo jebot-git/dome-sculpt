@@ -20,10 +20,11 @@ inline std::vector<PolygonRgba> current_vertex_colors(
   }
   if(prepared_color_state(binding,textures,false)){
     const auto &recipe=*binding->color_preparation;
-    if(!recipe.polygon_colors||!current->topology||!current->field||
-       current->field!=recipe.polygon_colors->field||
-       current->field.owner_before(recipe.polygon_colors->field)||recipe.polygon_colors->field.owner_before(current->field)||
-       current->topology->encode()!=recipe.polygon_colors->topology->encode())
+    const auto &descriptor=recipe.current_descriptor();
+    if(!descriptor||!current->topology||!current->field||
+       current->field!=descriptor->field||
+       current->field.owner_before(descriptor->field)||descriptor->field.owner_before(current->field)||
+       current->topology->encode()!=descriptor->topology->encode())
       throw std::invalid_argument("Prepared corner pixels lost their exact current geometry/field authority");
     (void)polygon_target_colors(mesh,*current,cancelled);
     recipe.validate_current(mesh,appearance,cancelled);

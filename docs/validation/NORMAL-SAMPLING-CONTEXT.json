@@ -1,0 +1,27 @@
+{
+  "scope": "private guarded owning archive and detached factory foundation",
+  "base": "7566a8fbf7bb7450307ff948844501a926b9dd8f",
+  "foundation": "576e17c51672dde51fb5d2daa9be54e526780000",
+  "release_suites": 5,
+  "structural_assertions": 23,
+  "owning_assertions": 24,
+  "audit": {
+    "core_objects": 100,
+    "stale_dependencies": [],
+    "source_mismatches": [],
+    "archive_sha256": "e0812cdbd8e35675d16ee2f8aa3bbca54787205293103ded2a9bed64fdcfae2d",
+    "native_log_sha256": "21467fe07653f83a9303dd18f2f1b896b05d3c3ee21b261533ef5bd630ae3209"
+  },
+  "sanitizer": "build running; not qualified",
+  "gpu": false,
+  "production_admission": false,
+  "incomplete": [
+    "domain-aware native worker and renderer",
+    "independent PBR/MToon/VRM consumers",
+    "actual female/male arbitrary Scale",
+    "clear/detail/rebake transitions",
+    "paired persistent allocation denials",
+    "Scene22 independent split-UV keys",
+    "Scene23 color-UV composition"
+  ]
+}

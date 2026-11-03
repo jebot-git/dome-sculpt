@@ -57,8 +57,11 @@ void avatar_graphics(const std::filesystem::path &prefix,const char *baseline,Su
  ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;author_shapekey(scene,object,restore);check(scene.encode()==before,"Actual avatar Restore after restart/export recovers all original expressions, source frames, paint and deformation exactly");
 }
 }
+#ifndef DOME_POST_UV_AVATAR_RENDER_NO_MAIN
 int main(int argc,char **argv)try{
  if(argc<2)return 2;std::filesystem::path prefix=argv[1];std::filesystem::create_directories(prefix.parent_path());NativeGraphics graphics;std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<'\n';check(argc<3||std::string(argv[2])!="--hardware"||device.find("A770")!=std::string::npos,"Actual prepared VRoid consumer uses requested A770");Fbo framebuffer;framebuffer.bind();SurfaceRenderer native;frame_consumer::Renderer consumer;
  avatar_graphics(prefix,"vroid-beta-female",native,framebuffer,consumer);avatar_graphics(prefix,"vroid-beta-male",native,framebuffer,consumer);
  std::cout<<"PASS "<<checks<<" actual post-UV prepared VRoid consumer checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+#endif

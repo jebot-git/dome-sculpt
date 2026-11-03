@@ -7,6 +7,9 @@
 namespace dome {
 struct Material;
 class PaintProjection;
+class PaintSamplingDomain;
+class PaintSamplingAttachment;
+class PaintSamplingArchive;
 struct PaintSourceMaps;
 class PaintImageArchive;
 struct Image {
@@ -16,6 +19,9 @@ struct Image {
   std::vector<uint8_t> png() const;
 };
 struct BakedTextures;
+struct NormalSamplingDomain;
+struct NormalDetailAuthority;
+class NormalSamplingArchive;
 struct PaintColorProjection {
   // Linear RGBA in the current writable atlas. Original accessor data remains
   // in the immutable source appearance and preparation receipt.
@@ -31,7 +37,11 @@ struct PaintColorProjection {
 struct PaintNormalProjection {
   uint32_t version=1;
   std::shared_ptr<const Image> pbr,mtoon;
+  // Version2 only. This structural leaf requires the full owning normal
+  // preparation replay before it may be admitted to an editable surface.
+  std::shared_ptr<const NormalSamplingDomain> sampling_domain;
   void validate(uint32_t resolution) const;
+  void validate(uint32_t resolution,bool geometry) const;
 };
 struct TextureMaps {
   Image color, metal_rough, emission;
@@ -64,9 +74,14 @@ struct BakedTextures {
   std::vector<uint8_t> coverage;
   BakedColorInterpretation color_interpretation = BakedColorInterpretation::VertexComponent;
   BakedNormalInterpretation normal_interpretation = BakedNormalInterpretation::CanonicalMikk;
+  // Scene21 only. This identity distinguishes an authenticated retained
+  // normal field from a later byte-identical bake operation. Its coverage is
+  // normal-specific and independent of the common RGBA coverage above.
+  std::shared_ptr<const NormalDetailAuthority> normal_authority;
   void validate(uint32_t resolution) const;
   size_t storage_bytes() const;
 };
+enum class BakedNormalWrite { Replace, PreserveRetained };
 struct PaintCompositeCacheStats {
   size_t retained_bytes = 0, retained_maps = 0, limit_bytes = 0;
   uint64_t hits = 0, builds = 0;
@@ -132,6 +147,9 @@ public:
   const std::shared_ptr<const PaintSourceMaps> &source_maps() const noexcept { return source_maps_; }
   const Mesh &mesh() const;
   std::shared_ptr<const Mesh> mesh_owner() const;
+  std::shared_ptr<const PaintSamplingDomain> paint_sampling_domain() const noexcept;
+  const std::shared_ptr<const PaintSamplingAttachment> &paint_sampling_attachment() const noexcept { return sampling_attachment_; }
+  bool valid_paint_sampling_attachment() const noexcept;
   uint32_t resolution() const;
   uint64_t revision() const { return revision_; }
   const std::vector<PaintLayer> &layers() const { return layers_; }
@@ -160,7 +178,7 @@ public:
   bool pending_changes() const;
   size_t undo_count() const { return undo_.size(); }
   // Conservative retained data, including hidden/zero-opacity/mask-only tiles.
-  bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_) || bool(baked_); }
+  bool has_paint_data() const noexcept { return allocated_tiles_ != 0 || bool(source_maps_) || bool(baked_) || bool(sampling_attachment_); }
   bool undo();
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
@@ -172,15 +190,24 @@ public:
   std::shared_ptr<const TextureMaps> preview(const Material &, const std::function<bool()> &) const;
   std::shared_ptr<const BakedTextures> baked() const { return baked_; }
   void install_bake(BakedTextures);
+  void install_bake(BakedTextures,BakedNormalWrite);
   void clear_bake();
   size_t storage_bytes() const;
   const PaintPixel &pixel(uint64_t layer, uint32_t x, uint32_t y) const;
   std::optional<Vec3> raycast(Vec3, Vec3, float maximum = 20) const;
   Vec3 normal(Vec3) const;
   nlohmann::json encode(PaintImageArchive * = nullptr) const;
+  nlohmann::json encode(PaintImageArchive *,NormalSamplingArchive *) const;
+  nlohmann::json encode(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *) const;
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive * = nullptr);
   // Internal Scene12 decoding must subsequently authenticate the exact polygon derivative.
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *, bool allow_polygon);
+  // Structural owning-archive overload. Its model/recipe closure must be
+  // authenticated before exposing an editable surface.
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
+                                           bool allow_polygon,const NormalSamplingArchive *);
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &, const PaintImageArchive *,
+      bool allow_polygon,const NormalSamplingArchive *,const PaintSamplingArchive *);
 
 private:
   friend class Document;
@@ -189,8 +216,11 @@ private:
   friend struct SourceColorPreparationAccess;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
+  friend struct SourcePaintSamplingAccess;
+  void seal_paint_sampling_attachment();
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
+  PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &, const std::function<bool()> &cancelled = {}, const Evaluation * = nullptr);
@@ -203,6 +233,7 @@ private:
   std::shared_ptr<CompositeCache> composite_cache_;
   uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
+  std::shared_ptr<const PaintSamplingAttachment> sampling_attachment_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::shared_ptr<const PaintColorProjection> color_projection_;
   std::shared_ptr<const PaintNormalProjection> normal_projection_;

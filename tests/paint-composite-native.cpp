@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "paint-composite-backend.hpp"
+#include "dome/paint-sampling.hpp"
+#include "paint-sampling-access.hpp"
+#include <numeric>
 #include <nlohmann/json.hpp>
 #include <atomic>
 #include <iostream>
@@ -29,6 +32,15 @@ int main()try{
  if(real_backend()=="CPU")std::cout<<"TEST-ONLY HOST-CONTROL-FLOW; native sampler, no GPU/SDK numerical claim\n";
  set_paint_composite_cache_budget(0);auto scene=source();const auto raw=scene.active().painted->encode();Material a,b;b.color={.12f,.37f,.8f,.997f};b.emissive={.07f,.01f,.09f};b.metallic=.71f;b.roughness=.22f;
  reference_mode=true;auto expected=clone(raw)->composite(b);reference_mode=false;
+ // A detached valid grid-domain stage can have no source maps/bake/projection
+ // yet. Its independent owner alone must keep it off the legacy GPU packet.
+ auto domain_source=clone(raw);auto target=domain_source->mesh();for(auto &uv:target.uv){uv[0]=uv[0]*.7f+.1f;uv[1]=uv[1]*.7f+.1f;}
+ std::vector<uint32_t> corners(target.indices.size());std::iota(corners.begin(),corners.end(),0u);
+ auto domain=retain_paint_sampling(domain_source->mesh(),{},target,corners);
+ auto retained=retain_paint_grid(*domain_source,target,domain);const auto domain_start=calls.load();
+ check(retained->paint_sampling_domain()&&retained->paint_sampling_attachment()&&retained->valid_paint_sampling_attachment(),"Combined valid independent paint domain owns its exact current geometry before source/material adoption");
+ auto domain_maps=retained->composite(b);check(calls==domain_start&&equal(*domain_maps,*expected),"Domain-only paint uses the exact retained CPU grid and never the plain selected-backend packet");
+ check(retained->preview(b)==domain_maps&&calls==domain_start,"Domain-only preview reuses its own immutable CPU maps without a backend dispatch");
  auto p=clone(raw);auto base=p->composite(a);const auto pixels=base->color.rgba;auto current=p->composite(b);check(equal(*current,*expected),"Complete producer maps exactly match legacy native CPU for the same immutable paint input");auto n=calls.load();check(p->composite(b)==current&&calls==n,"Unchanged material/token reuses exact immutable maps without another backend call");
  for(int f:{1,2}){
   p=clone(raw);base=p->composite(a);n=calls.load();fault=f;check(refuses([&]{p->composite(b);})&&calls==n+1,"Backend/late image-validation failure does not retry on CPU");n=calls.load();check(p->composite(a)==base&&calls==n&&base->color.rgba==pixels&&p->encode()==raw,"Failure leaves prior cache, held frame bytes and complete source paint exact");check(equal(*p->composite(b),*expected),"Same-source retry succeeds after failed detached map publication");

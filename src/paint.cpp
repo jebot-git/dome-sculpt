@@ -2,9 +2,15 @@
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
 #include "dome/paint.hpp"
+#include "paint-source-admission.hpp"
+#include "source-uv-archive.hpp"
+#include "dome/paint-sampling.hpp"
+#include "paint-sampling-access.hpp"
+#include "dome/normal-preparation.hpp"
 #include "polygon-paint.hpp"
 #include "paint-composite-backend.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/normal-sampling.hpp"
 #include "dome/scene.hpp"
 #include "dome/tangents.hpp"
 #include "paint-color-access.hpp"
@@ -14,6 +20,7 @@
 #include <cstring>
 #include <nlohmann/json.hpp>
 #include <png.h>
+#include <optional>
 #include <set>
 #include <unordered_map>
 #include <atomic>
@@ -119,7 +126,7 @@ BakedPixel baked_pixel(const BakedTextures &baked, size_t at) {
   }
   return result;
 }
-void baked_pixel(BakedTextures &baked, size_t at, BakedPixel values) {
+void baked_pixel(BakedTextures &baked, size_t at, BakedPixel values, bool write_normal=true) {
   auto &m = baked.maps;
   size_t i = at * 4;
   for (int c = 0; c < 4; ++c)
@@ -129,7 +136,7 @@ void baked_pixel(BakedTextures &baked, size_t at, BakedPixel values) {
     m.emission.rgba[i + c] = byte(linear_to_srgb(values[7 + c]));
   }
   m.metal_rough.rgba[i + 3] = m.emission.rgba[i + 3] = 255;
-  if (!m.normal.rgba.empty()) {
+  if (write_normal && !m.normal.rgba.empty()) {
     auto n = Vec3{values[10], values[11], values[12]};
     n = length(n) > 1e-8f ? normalized(n) : Vec3{0, 0, 1};
     m.normal.rgba[i] = byte(n.x * .5f + .5f);
@@ -217,6 +224,8 @@ void PaintSettings::validate() const {
 }
 struct PaintedMesh::SurfaceMap {
   Mesh mesh;
+  std::shared_ptr<const PaintSamplingDomain> paint_domain;
+  bool sampling_raster_proven=false;
   uint32_t resolution, columns;
   struct Texel {
     Vec3 position, normal;
@@ -236,8 +245,10 @@ struct PaintedMesh::SurfaceMap {
   std::vector<Texel> texels;
   std::vector<Bounds> tiles;
   std::vector<int32_t> padding;
-  SurfaceMap(Mesh input, uint32_t r, PaintSurfaceOptions opts = {})
-      : mesh(std::move(input)), resolution(r), columns(r / 32),options(std::move(opts)),
+  SurfaceMap(Mesh input, uint32_t r, PaintSurfaceOptions opts = {},
+             std::shared_ptr<const PaintSamplingDomain> domain = {},
+             PaintSamplingLimits domain_limits = {})
+      : mesh(std::move(input)), paint_domain(std::move(domain)), resolution(r), columns(r / 32),options(std::move(opts)),
         texels(size_t(r) * r), tiles(size_t(columns) * columns),
         padding(size_t(r) * r, -1) {
     if((options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored&&options.policy!=PaintUvPolicy::PolygonAuthored)||
@@ -248,15 +259,18 @@ struct PaintedMesh::SurfaceMap {
     diagnostics.policy=options.policy;
     const bool source=options.policy!=PaintUvPolicy::Strict;
     mesh.validate();
-    if (mesh.uv.size() != mesh.positions.size())
+    std::optional<Mesh> domain_raster;
+    if(paint_domain)domain_raster=paint_domain->raster_mesh(mesh,domain_limits);
+    const auto &raster=domain_raster?*domain_raster:mesh;
+    if (raster.uv.size() != raster.positions.size())
       throw std::invalid_argument("Painting requires persisted UV coordinates");
-    for (auto uv : mesh.uv)
+    for (auto uv : raster.uv)
       if (uv[0] < 0 || uv[0] > 1 || uv[1] < 0 || uv[1] > 1)
         throw std::invalid_argument("Paint UVs must fit a single texture tile");
-    for (size_t k = 0; k < mesh.indices.size(); k += 3) {
-      uint32_t ids[] = {mesh.indices[k], mesh.indices[k + 1],
-                        mesh.indices[k + 2]};
-      auto a = mesh.uv[ids[0]], b = mesh.uv[ids[1]], c = mesh.uv[ids[2]];
+    for (size_t k = 0; k < raster.indices.size(); k += 3) {
+      uint32_t ids[] = {raster.indices[k], raster.indices[k + 1],
+                        raster.indices[k + 2]};
+      auto a = raster.uv[ids[0]], b = raster.uv[ids[1]], c = raster.uv[ids[2]];
       double den = double(b[1] - c[1]) * (a[0] - c[0]) +
                    double(c[0] - b[0]) * (a[1] - c[1]);
       if(source&&options.cancelled&&options.cancelled())throw std::runtime_error("Source paint surface construction cancelled");
@@ -283,11 +297,11 @@ struct PaintedMesh::SurfaceMap {
                 w2 = 1 - w0 - w1;
           if (!std::isfinite(w0)||!std::isfinite(w1)||!std::isfinite(w2)||std::min({w0, w1, w2}) < -.000001f)
             continue;
-          auto p = mesh.positions[ids[0]] * w0 + mesh.positions[ids[1]] * w1 +
-                   mesh.positions[ids[2]] * w2;
+          auto p = raster.positions[ids[0]] * w0 + raster.positions[ids[1]] * w1 +
+                   raster.positions[ids[2]] * w2;
           size_t index = size_t(y) * r + x;
           auto &t = texels[index];
-          Texel candidate{p,normalized(mesh.normals[ids[0]]*w0+mesh.normals[ids[1]]*w1+mesh.normals[ids[2]]*w2),true,uint32_t(k/3),{w0,w1}};
+          Texel candidate{p,normalized(raster.normals[ids[0]]*w0+raster.normals[ids[1]]*w1+raster.normals[ids[2]]*w2),true,uint32_t(k/3),{w0,w1}};
           if(!t.covered){t=candidate;++diagnostics.covered_texels;}
           else if(!source){
             if(length(t.position-p)>1e-4f)throw std::invalid_argument("Overlapping UV islands cannot be painted independently");
@@ -337,6 +351,7 @@ struct PaintedMesh::SurfaceMap {
       padding = std::move(next);
     }
     options.cancelled={};
+    sampling_raster_proven=bool(paint_domain);
   }
 };
 struct PaintedMesh::Evaluation {
@@ -368,11 +383,15 @@ void PaintedMesh::stamp_evaluated(const Brush &b,const PaintSettings &settings,c
   stamp_sampled(b,settings,{},cancelled,&evaluation);
 }
 PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r):PaintedMesh(std::move(mesh),r,{}){}
-PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options) {
+PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options)
+    :PaintedMesh(std::move(mesh),r,options,{}){}
+PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options,
+    std::shared_ptr<const PaintSamplingDomain> sampling) {
   if (r < 64 || r > 2048 || (r & (r - 1)))
     throw std::invalid_argument(
         "Paint resolution must be a power of two between 64 and 2048");
-  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r,options);
+  surface_ = std::make_shared<SurfaceMap>(std::move(mesh), r,options,std::move(sampling));
+  seal_paint_sampling_attachment();
   composite_cache_=std::make_shared<CompositeCache>();
   composite_token_=next_composite_token();
   PaintLayer layer;
@@ -382,6 +401,18 @@ PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options
 }
 const Mesh &PaintedMesh::mesh() const { return surface_->mesh; }
 std::shared_ptr<const Mesh> PaintedMesh::mesh_owner() const { return {surface_, &surface_->mesh}; }
+std::shared_ptr<const PaintSamplingDomain> PaintedMesh::paint_sampling_domain() const noexcept {return surface_?surface_->paint_domain:nullptr;}
+bool PaintedMesh::valid_paint_sampling_attachment() const noexcept {
+  const auto domain=paint_sampling_domain();
+  if(!domain)return !sampling_attachment_;
+  return sampling_attachment_&&surface_->sampling_raster_proven&&
+    sampling_attachment_->matches(std::shared_ptr<const Mesh>(surface_,&surface_->mesh),domain);
+}
+void PaintedMesh::seal_paint_sampling_attachment(){
+  if(!surface_->paint_domain){sampling_attachment_.reset();return;}
+  if(!surface_->sampling_raster_proven)throw std::logic_error("Writable paint domain has no proved raster attachment");
+  sampling_attachment_=std::shared_ptr<const PaintSamplingAttachment>(new const PaintSamplingAttachment(mesh_owner(),surface_->paint_domain,surface_));
+}
 const PaintSurfaceDiagnostics &PaintedMesh::surface_diagnostics() const {return surface_->diagnostics;}
 uint32_t PaintedMesh::resolution() const { return surface_->resolution; }
 const PaintLayer &PaintedMesh::layer(uint64_t id) const {
@@ -476,6 +507,7 @@ std::array<uint8_t,4> PaintedMesh::pbr_pixel(uint64_t id,uint32_t x,uint32_t y) 
   const auto &p=pixel(id,x,y);return {p.data[0],p.data[1],p.data[2],p.data[3]};
 }
 void PaintedMesh::begin_stroke() {
+  detail::require_editable_texture_atlas(*this);
   if (editing_)
     throw std::logic_error("A paint stroke is already active");
   if (!active().visible)
@@ -726,6 +758,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   p->composite_cache_=composite_cache_;
   p->composite_token_=composite_token_;
   p->surface_ = surface_;
+  p->sampling_attachment_ = sampling_attachment_;
   p->source_maps_ = source_maps_;
   p->color_projection_ = color_projection_;
   p->normal_projection_ = normal_projection_;
@@ -738,10 +771,92 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   p->allocated_color_tiles_ = allocated_color_tiles_;
   return p;
 }
+struct SourcePaintSamplingAccess {
+  static std::shared_ptr<PaintedMesh> normal(const PaintedMesh &paint,const SourceNormalSampling &proof,
+      const PaintSamplingLimits &limits){
+    if(!paint.valid_paint_sampling_attachment()||paint.in_stroke()||!proof.before_paint||!proof.metadata_sampling_domain||
+       paint.paint_sampling_domain()!=proof.metadata_sampling_domain||paint.normal_projection()!=proof.before_paint->normal_projection()||
+       paint.baked()!=proof.before_paint->baked())throw std::invalid_argument("Retained normal transition requires the exact own paint basis and captured metadata");
+    proof.validate(true,limits.cancelled);proof.validate_current(paint.mesh(),nullptr,limits.cancelled);
+    auto result=paint.snapshot();result->normal_projection_=proof.projection;
+    if(result->baked_){auto baked=std::make_shared<BakedTextures>(*result->baked_);
+      baked->normal_authority=proof.projection->sampling_domain->detail;
+      baked->validate(paint.resolution());result->baked_=std::move(baked);}
+    result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();
+    if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Retained normal adoption cancelled");return result;
+  }
+  static std::shared_ptr<PaintedMesh> rebind(const PaintedMesh &paint,
+      std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
+    auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint geometry rebind cancelled");};stop();
+    if(paint.in_stroke()||!attachment||!attachment->surface_||!paint.valid_paint_sampling_attachment())
+      throw std::invalid_argument("Writable paint rebind requires finished independently sealed geometry");
+    const auto domain=paint.paint_sampling_domain();
+    if(!domain||domain!=attachment->domain()||domain.owner_before(attachment->domain())||attachment->domain().owner_before(domain))
+      throw std::invalid_argument("Writable paint rebind cannot replace its exact domain owner");
+    const auto surface=std::static_pointer_cast<const PaintedMesh::SurfaceMap>(attachment->surface_);
+    const auto &a=paint.mesh(),&b=surface->mesh;
+    if(paint.resolution()!=surface->resolution||paint.surface_->options.policy!=surface->options.policy||
+       !surface->sampling_raster_proven||!attachment->matches(std::shared_ptr<const Mesh>(surface,&surface->mesh),surface->paint_domain)||
+       a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.indices!=b.indices||a.uv!=b.uv||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)
+      throw std::invalid_argument("Writable paint rebind differs in current layout, resolution or policy");
+    domain->validate_current(a,limits);
+    for(size_t v=0;v<a.positions.size();++v){if((v&1023)==0)stop();if(a.positions[v].x!=b.positions[v].x||a.positions[v].y!=b.positions[v].y||a.positions[v].z!=b.positions[v].z||a.normals[v].x!=b.normals[v].x||a.normals[v].y!=b.normals[v].y||a.normals[v].z!=b.normals[v].z)
+      throw std::invalid_argument("Writable paint rebind differs from exact REST geometry");}
+    auto result=paint.snapshot();result->surface_=surface;result->sampling_attachment_=std::move(attachment);stop();return result;
+  }
+  static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Mesh authored,
+      std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
+    auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-grid attachment cancelled");};stop();
+    if(before.in_stroke()||!domain||!before.valid_paint_sampling_attachment())
+      throw std::invalid_argument("Writable paint-grid attachment requires a finished valid source");
+    if(before.source_maps_&&before.source_maps_->uses_uv1())
+      throw std::invalid_argument("Retained paint with original UV1 requires its own coordinate-role adapter");
+    if(!before.normal_projection_&&((before.source_maps_&&before.source_maps_->normal.image)||
+       (before.baked_&&!before.baked_->maps.normal.rgba.empty())))
+      throw std::invalid_argument("Retained paint with raw normal data requires independent prepared-normal authority");
+    if(before.revision_==UINT64_MAX)throw std::overflow_error("Paint geometry identity exhausted");
+    domain->validate_current(authored,limits);
+    if(const auto previous=before.paint_sampling_domain()){
+      if(domain->basis()!=previous->basis()||domain->basis().owner_before(previous->basis())||previous->basis().owner_before(domain->basis()))
+        throw std::invalid_argument("Repeated UV edits must retain their exact original paint basis owner");
+    }else{
+      const auto &basis=*domain->basis(),&source=before.mesh();
+      auto vectors=[](const auto &a,const auto &b){return a.size()==b.size()&&(!a.size()||std::memcmp(a.data(),b.data(),a.size()*sizeof(a[0]))==0);};
+      if(!vectors(basis.positions,source.positions)||!vectors(basis.normals,source.normals)||basis.indices!=source.indices||basis.uv!=source.uv||basis.uv_pins!=source.uv_pins||basis.uv_seams!=source.uv_seams)
+        throw std::invalid_argument("Writable paint basis is not the exact detached original authoring mesh");
+    }
+    const size_t pixels=size_t(before.resolution())*before.resolution();
+    const size_t raster_bytes=authored.indices.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t));
+    const size_t grid_bytes=pixels*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t))+
+      size_t(before.resolution()/32)*(before.resolution()/32)*sizeof(PaintedMesh::SurfaceMap::Bounds);
+    const auto owned=domain->storage_bytes(limits);
+    if(owned>limits.max_working_bytes||raster_bytes>limits.max_working_bytes-owned||grid_bytes>limits.max_working_bytes-owned-raster_bytes)
+      throw std::length_error("Writable paint domain/raster/grid exceed the combined working budget");
+    auto options=before.surface_->options;options.cancelled=limits.cancelled;
+    auto surface=std::make_shared<PaintedMesh::SurfaceMap>(std::move(authored),before.resolution(),options,std::move(domain),limits);
+    auto result=before.snapshot();result->surface_=std::move(surface);result->seal_paint_sampling_attachment();
+    // Paint values, their one grid, and every image/projection owner are exact.
+    // Sampling geometry lives outside TextureMaps, so this stage needs neither
+    // a composite rebuild nor a texture upload. A later normal/colour authority
+    // change must independently invalidate the relevant interpretation.
+    ++result->revision_;stop();return result;
+  }
+};
+std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &before,Mesh authored,
+    std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
+  return SourcePaintSamplingAccess::retain(before,std::move(authored),std::move(domain),limits);
+}
+std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &paint,const SourceNormalSampling &proof,
+    const PaintSamplingLimits &limits){return SourcePaintSamplingAccess::normal(paint,proof,limits);}
+std::shared_ptr<PaintedMesh> rebind_paint_sampling_geometry(const PaintedMesh &paint,
+    std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
+  return SourcePaintSamplingAccess::rebind(paint,std::move(attachment),limits);
+}
 struct PolygonPaintAccess {
   static std::shared_ptr<PaintedMesh> rebuild(const PaintedMesh &source, Mesh target,
                                               const PaintSurfaceOptions &options) {
     if(source.editing_)throw std::logic_error("Finish the paint stroke before rebuilding polygon geometry");
+    if(source.paint_sampling_domain())throw std::logic_error("Polygon topology changes require an explicit retained paint-domain adapter");
     if(source.color_projection_)throw std::logic_error("Polygon topology changes cannot yet preserve this mesh's prepared source colors");
     if(source.normal_projection_)throw std::logic_error("Polygon topology changes require explicit prepared-normal frame transport");
     if(source.revision_==UINT64_MAX)throw std::overflow_error("Paint geometry identity exhausted");
@@ -760,8 +875,58 @@ std::shared_ptr<PaintedMesh> polygon_paint_geometry(const PaintedMesh &source,Me
   return PolygonPaintAccess::rebuild(source,std::move(target),options);
 }
 void PaintNormalProjection::validate(uint32_t resolution) const {
-  if(version!=1||!pbr||!mtoon)throw std::invalid_argument("Prepared normal projection is incomplete");
+  validate(resolution,true);
+}
+void PaintNormalProjection::validate(uint32_t resolution,bool geometry) const {
+  if((version!=1&&version!=2)||!pbr||!mtoon||bool(sampling_domain)!=(version==2))throw std::invalid_argument("Prepared normal projection is incomplete");
   for(const auto &image:{pbr,mtoon}){image->validate();if(image->width!=resolution||image->height!=resolution)throw std::invalid_argument("Prepared normal projection grid differs from paint");}
+  if(sampling_domain){sampling_domain->validate(geometry);if(sampling_domain->resolution!=resolution)throw std::invalid_argument("Retained normal domain resolution differs from paint");}
+}
+std::shared_ptr<const PaintNormalProjection> SourceNormalPreparationAccess::resolved(
+    const PaintedMesh &source,const std::function<bool()> &cancelled) {
+  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Normal field resolution cancelled");};stop();
+  if(source.editing_||!source.normal_projection_)
+    throw std::invalid_argument("Normal field resolution requires finished intrinsic normal planes");
+  const auto r=source.resolution();source.normal_projection_->validate(r);
+  const auto baked=source.baked_;
+  if(source.normal_projection_->version==2){
+    const auto &domain=*source.normal_projection_->sampling_domain;
+    if(!baked||baked->maps.normal.rgba.empty())return source.normal_projection_;
+    const auto detail=domain.detail;
+    auto same=[](const Image &a,const Image &b){return a.width==b.width&&a.height==b.height&&a.rgba==b.rgba;};
+    if(!detail||baked->normal_authority!=detail||
+       baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||
+       !same(baked->maps.normal,*detail->pbr)||
+       !same(baked->maps.mtoon_normal,*detail->mtoon))
+      throw std::invalid_argument("Changed normal detail requires an explicit retained-field bake transition");
+    auto result=std::make_shared<PaintNormalProjection>();
+    result->pbr=domain.resolved_pbr;result->mtoon=domain.resolved_mtoon;
+    result->validate(r);stop();return result;
+  }
+  if(!baked||baked->maps.normal.rgba.empty())return source.normal_projection_;
+  baked->validate(r);
+  if(baked->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes)
+    throw std::invalid_argument("Retained normal sampling cannot reinterpret a historical canonical bake");
+  auto pbr=std::make_shared<Image>(*source.normal_projection_->pbr);
+  auto toon=std::make_shared<Image>(*source.normal_projection_->mtoon);
+  // Keep this version1 evaluation byte-for-byte equivalent to the historical
+  // prepared branch of composite(). It deliberately runs before filtering.
+  for(size_t at=0;at<size_t(r)*r;++at){
+    if((at&1023)==0)stop();
+    const auto owner=source.surface_->padding[at];if(owner<0)continue;
+    const float coverage=unit(baked->coverage[size_t(owner)]);
+    for(auto pair:{std::pair{pbr.get(),&baked->maps.normal},std::pair{toon.get(),&baked->maps.mtoon_normal}}){
+      const size_t a=at*4,b=size_t(owner)*4;
+      Vec3 original{unit(pair.first->rgba[a])*2-1,unit(pair.first->rgba[a+1])*2-1,unit(pair.first->rgba[a+2])*2-1};
+      Vec3 detail{unit(pair.second->rgba[b])*2-1,unit(pair.second->rgba[b+1])*2-1,unit(pair.second->rgba[b+2])*2-1};
+      auto value=original*(1-coverage)+detail*coverage;
+      value=length(value)>1e-8f?normalized(value):Vec3{0,0,1};
+      pair.first->rgba[a]=byte(value.x*.5f+.5f);pair.first->rgba[a+1]=byte(value.y*.5f+.5f);
+      pair.first->rgba[a+2]=byte(value.z*.5f+.5f);pair.first->rgba[a+3]=255;
+    }
+  }
+  auto result=std::make_shared<PaintNormalProjection>();result->pbr=std::move(pbr);result->mtoon=std::move(toon);
+  result->validate(r);stop();return result;
 }
 PaintNormalPreparationResult SourceNormalPreparationAccess::prepare(const PaintedMesh &source,
     const SourceMaterialBindings *binding,const NormalPreparationOptions &options) {
@@ -824,6 +989,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
     const Mesh &target,std::span<const uint32_t> source_vertices,const NormalPreparationOptions &options) {
   auto stop=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Prepared normal UV reprojection cancelled");};stop();
   if(source.editing_||!source.normal_projection_)throw std::invalid_argument("Normal UV reprojection requires finished intrinsic normal planes");
+  if(source.normal_projection_->version!=1)throw std::invalid_argument("Retained normal fields require their source-owning correspondence adapter, not raster reinterpretation");
   if(!std::isfinite(options.max_angular_error)||options.max_angular_error<0||options.max_angular_error>.25||!options.max_samples||options.max_samples>64'000'000||!options.max_working_bytes||options.max_working_bytes>512*1024*1024)
     throw std::invalid_argument("Invalid prepared normal UV reprojection bounds");
   const auto &before=source.mesh();target.validate();
@@ -897,6 +1063,12 @@ void BakedTextures::validate(uint32_t resolution) const {
      (normal_interpretation==BakedNormalInterpretation::CanonicalMikk&&!maps.mtoon_normal.rgba.empty())||
      (normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&maps.normal.rgba.empty()!=maps.mtoon_normal.rgba.empty()))
     throw std::invalid_argument("Baked normal interpretation is incomplete");
+  if(normal_authority){
+    if(normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||
+       maps.normal.rgba.empty()||maps.mtoon_normal.rgba.empty())
+      throw std::invalid_argument("Retained normal identity requires prepared detail channels");
+    normal_authority->validate(resolution);
+  }
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
@@ -915,6 +1087,7 @@ size_t BakedTextures::storage_bytes() const {
 size_t PaintedMesh::storage_bytes() const {
   size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
   if(source_maps_&&source_maps_->uv1)result+=source_maps_->uv1->size()*sizeof(std::array<float,2>);
+  if(source_maps_)for(const auto &[set,uv]:source_maps_->extra_uv_sets)result+=uv->size()*sizeof(std::array<float,2>);
   if(normal_projection_)result+=normal_projection_->pbr->rgba.size()+normal_projection_->mtoon->rgba.size();
   for (const auto &layer : layers_)
     for (const auto &tile : layer.tiles)
@@ -923,14 +1096,33 @@ size_t PaintedMesh::storage_bytes() const {
   return result;
 }
 void PaintedMesh::install_bake(BakedTextures incoming) {
+  install_bake(std::move(incoming),BakedNormalWrite::Replace);
+}
+void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_write) {
   if (editing_) throw std::logic_error("Finish the paint stroke before baking");
+  if(size_t(normal_write)>1)throw std::invalid_argument("Invalid normal bake write intent");
   incoming.validate(resolution());
+  if(incoming.normal_authority)
+    throw std::invalid_argument("Retained normal identity requires a source-owning field transition");
   if(bool(color_projection_)!=(incoming.color_interpretation==BakedColorInterpretation::ResolvedPbr))
     throw std::invalid_argument("Baked color interpretation must match explicit current color preparation");
   if(bool(normal_projection_)!=(incoming.normal_interpretation==BakedNormalInterpretation::PreparedAttributes))
     throw std::invalid_argument("Baked normal interpretation must match explicit normal preparation");
+  const bool retained=normal_projection_&&normal_projection_->version==2;
+  const bool preserve_normal=normal_write==BakedNormalWrite::PreserveRetained;
+  if(preserve_normal&&(!retained||!incoming.maps.normal.rgba.empty()||!incoming.maps.mtoon_normal.rgba.empty()))
+    throw std::invalid_argument("Color-only normal preservation requires an explicit retained field and no incoming normal payload");
+  if(retained&&!preserve_normal&&!incoming.maps.normal.rgba.empty()&&
+     std::any_of(incoming.coverage.begin(),incoming.coverage.end(),[](auto a){return a!=0;}))
+    throw std::invalid_argument("New normal baking requires an explicit retained-field node transition");
+  if(retained&&!incoming.maps.normal.rgba.empty()&&
+     (!baked_||!baked_->normal_authority))
+    throw std::invalid_argument("A new normal payload requires an explicit retained-field node transition");
+  if(retained&&baked_&&!baked_->maps.normal.rgba.empty()&&
+     (!baked_->normal_authority||baked_->normal_authority!=normal_projection_->sampling_domain->detail))
+    throw std::invalid_argument("Current normal bake lost its retained interpretation identity");
   auto token = next_composite_token();
-  if (baked_ && !baked_->maps.normal.rgba.empty() && incoming.maps.normal.rgba.empty())
+  if (!preserve_normal && baked_ && !baked_->maps.normal.rgba.empty() && incoming.maps.normal.rgba.empty())
     throw std::invalid_argument("A replacement bake must retain the existing normal channel");
   if (storage_bytes() - (baked_ ? baked_->storage_bytes() : 0) +
           incoming.storage_bytes() > 128 * 1024 * 1024)
@@ -956,10 +1148,10 @@ void PaintedMesh::install_bake(BakedTextures incoming) {
         const float value=(x*a+y*b*(1-a))/coverage;
         merged.maps.pbr_color.rgba[at]=byte(c<3?linear_to_srgb(value):value);
       }
-      for (int c = 0; c < 13; ++c) {
+      for (int c = 0; c < (preserve_normal?10:13); ++c) {
         next[c] = (next[c] * a + prior[c] * b * (1 - a)) / coverage;
       }
-      baked_pixel(merged, i, next);
+      baked_pixel(merged, i, next,!preserve_normal);
       if(incoming.normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&!incoming.maps.mtoon_normal.rgba.empty())
         for(size_t c=0;c<3;++c){const auto at=i*4+c;const float x=unit(incoming.maps.mtoon_normal.rgba[at])*2-1,y=unit(merged.maps.mtoon_normal.rgba[at])*2-1;
           merged.maps.mtoon_normal.rgba[at]=byte(((x*a+y*b*(1-a))/coverage)*.5f+.5f);
@@ -1000,6 +1192,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {return preview(material,{});}
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);material.validate();
+  if(baked_&&baked_->normal_authority&&(!normal_projection_||normal_projection_->version!=2))
+    throw std::invalid_argument("Retained normal identity requires its own source sampling interpretation");
   if(source_maps_ && !baked_ && !color_projection_ && !normal_projection_){
     std::lock_guard lock(composite_cache_->mutex);
     if(composite_cache_->preview_token!=composite_token_){
@@ -1067,6 +1261,24 @@ PaintColorProjectionResult SourceColorPreparationAccess::project(
   auto projection=std::make_shared<PaintColorProjection>();projection->vertex_rgba=vertex_image;
   projection->maximum_error=maximum_error;projection->quality_cells=bound.tested_cells;projection->validate(r);
   result.projection=std::move(projection);check();return result;
+}
+PaintColorProjectionResult SourceColorPreparationAccess::project_uv(
+    const PaintedMesh &before,const Mesh &target,
+    std::span<const std::array<float,4>> colors,
+    const ColorPreparationOptions &options,uint64_t max_raster_samples) {
+  if(!max_raster_samples||max_raster_samples>512'000'000)
+    throw std::invalid_argument("Invalid current-colour UV raster budget");
+  const size_t pixels=size_t(before.resolution())*before.resolution();
+  const size_t geometry=target.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+target.indices.size()*4+target.uv_pins.size()+target.uv_seams.size();
+  const size_t working=pixels*(sizeof(PaintedMesh::SurfaceMap::Texel)+sizeof(int32_t)+4)+geometry+
+      pixels/(PaintTile::size*PaintTile::size)*sizeof(PaintedMesh::SurfaceMap::Bounds);
+  if(working>options.max_working_bytes)
+    throw std::length_error("Current-colour UV projection exceeds its declared raster working budget");
+  PaintSurfaceOptions surface;surface.cancelled=options.cancelled;surface.max_raster_samples=max_raster_samples;
+  auto atlas=std::make_shared<PaintedMesh::SurfaceMap>(target,before.resolution(),surface);
+  auto canvas=before.snapshot();canvas->surface_=std::move(atlas);
+  auto result=project(*canvas,colors,options);result.raster_samples=canvas->surface_->diagnostics.raster_samples;
+  return result;
 }
 PaintColorPreparationResult SourceColorPreparationAccess::prepare(
     const PaintedMesh &source,std::span<const std::array<float,4>> colors,
@@ -1222,9 +1434,12 @@ PaintedMesh::build_composite(const Material &material) const {return build_compo
 std::shared_ptr<const TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);
-  if(!source_maps_&&!baked_&&!color_projection_&&!normal_projection_&&gpu_plain_composite_eligible(resolution(),layers_))
+  // This packet owns only the legacy grid/padding. Independent paint domains,
+  // normal metadata/events, original source maps and prepared projections need
+  // their existing CPU interpretation until a genuine packet adapter exists.
+  if(!surface_->paint_domain&&!sampling_attachment_&&!source_maps_&&!baked_&&!color_projection_&&!normal_projection_&&gpu_plain_composite_eligible(resolution(),layers_))
     return gpu_plain_composite(resolution(),layers_,surface_->padding,material,cancelled);
-  if(source_maps_&&source_maps_->uses_uv1())throw std::invalid_argument("UV1 source compositing requires explicit source-coordinate preparation");
+  if(source_maps_&&source_maps_->uses_alternate_uv())throw std::invalid_argument(source_maps_->extra_uv_sets.empty()?"UV1 source compositing requires explicit source-coordinate preparation":"Extra source UV compositing requires explicit source-coordinate preparation");
   auto maps = std::make_shared<TextureMaps>();
   maps->source_maps=source_maps_;
   maps->color_projection=color_projection_;
@@ -1268,7 +1483,8 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   maps->baked_base=baked_;
   if(normal_projection_) {
     normal_projection_->validate(r);
-    maps->normal=*normal_projection_->pbr;maps->mtoon_normal=*normal_projection_->mtoon;
+    auto field=normal_projection_->version==2?SourceNormalPreparationAccess::resolved(*this):normal_projection_;
+    maps->normal=*field->pbr;maps->mtoon_normal=*field->mtoon;
   } else if (baked_ && !baked_->maps.normal.rgba.empty()) {
     maps->normal=blank_image(r,true);maps->baked_normal=blank_image(r,true);
     maps->baked_coverage=blank_image(r);for(size_t at=3;at<maps->baked_coverage.rgba.size();at+=4)maps->baked_coverage.rgba[at]=255;
@@ -1345,7 +1561,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
         maps->emission_coverage.rgba[at]=byte(replacement_coverage);
     }
   }
-  if(normal_projection_ && baked_ && !baked_->maps.normal.rgba.empty()) {
+  if(normal_projection_ && normal_projection_->version==1 && baked_ && !baked_->maps.normal.rgba.empty()) {
     if(baked_->normal_interpretation!=BakedNormalInterpretation::PreparedAttributes)
       throw std::logic_error("Prepared normal model cannot reinterpret historical canonical pixels");
     for(size_t at=0;at<size_t(r)*r;++at){
@@ -1360,7 +1576,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
         pair.first->rgba[a]=byte(value.x*.5f+.5f);pair.first->rgba[a+1]=byte(value.y*.5f+.5f);pair.first->rgba[a+2]=byte(value.z*.5f+.5f);pair.first->rgba[a+3]=255;
       }
     }
-  } else if (baked_ && !maps->normal.rgba.empty()) {
+  } else if (!normal_projection_ && baked_ && !maps->normal.rgba.empty()) {
     // Protected/fractional coverage keeps original source normal detail. Convert
     // that affine-UV derivative frame into the canonical baked tangent basis.
     std::vector<Tangent> corners;
@@ -1443,6 +1659,7 @@ Vec3 PaintedMesh::normal(Vec3 point) const {
 std::shared_ptr<PaintedMesh>
 PaintedMesh::reparameterize(Mesh target,
                             const std::function<bool()> &cancelled) const {
+  if(paint_sampling_domain())throw std::logic_error("Retained writable paint requires explicit source-domain UV transfer");
   if (editing_)
     throw std::logic_error("Finish the paint stroke before editing UVs");
   target.validate();
@@ -1463,7 +1680,7 @@ PaintedMesh::reparameterize(Mesh target,
   }
   auto result = snapshot();
   if (same) {
-    if(source_maps_&&source_maps_->uv1&&(target.indices!=mesh().indices||target.positions.size()!=mesh().positions.size()))throw std::invalid_argument("Source UV1 vertex remapping requires explicit source-coordinate preparation");
+    if(source_maps_&&source_maps_->uses_alternate_uv()&&(target.indices!=mesh().indices||target.positions.size()!=mesh().positions.size()))throw std::invalid_argument("Source UV1 vertex remapping requires explicit source-coordinate preparation");
     auto surface = std::make_shared<SurfaceMap>(*surface_);
     surface->mesh = std::move(target);
     result->surface_ = std::move(surface);
@@ -1616,6 +1833,18 @@ uint32_t word(const std::vector<uint8_t> &bytes, size_t offset) {
 }
 } // namespace
 nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
+  return encode(archive,nullptr);
+}
+nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArchive *domains) const {
+  return encode(archive,domains,nullptr);
+}
+nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
+  const auto sampling=paint_sampling_domain();
+  if(!valid_paint_sampling_attachment())throw std::logic_error("Paint sampling geometry attachment is invalid");
+  if(sampling&&(!paint_domains||!archive))throw std::logic_error("Retained writable paint requires its complete paired Scene24 archive context");
+  if((!domains||!archive)&&((baked_&&baked_->normal_authority)||
+     (normal_projection_&&normal_projection_->version==2)))
+    throw std::invalid_argument("Retained normal bake requires an owning sampling archive context");
   if (editing_)
     throw std::logic_error("Finish the paint stroke before saving");
   nlohmann::json j = {{"resolution", resolution()},
@@ -1627,7 +1856,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
   PaintImageArchive local;
   if(source_maps_)j["source_maps"]=encode_source_maps(*source_maps_,archive?*archive:local);
   if(color_projection_)j["color_projection"]=encode_color_projection(*color_projection_,archive?*archive:local);
-  if(normal_projection_)j["normal_projection"]=encode_normal_projection(*normal_projection_,archive?*archive:local);
+  if(normal_projection_)j["normal_projection"]=encode_normal_projection(*normal_projection_,archive?*archive:local,domains);
   if(!archive && (source_maps_ || color_projection_ || normal_projection_))j["source_images"]=local.encode();
   std::vector<uint8_t> positions, normals, uv, indices;
   for (auto p : mesh().positions)
@@ -1690,13 +1919,50 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive) const {
       j["baked"]["version"]=3;j["baked"]["normal_interpretation"]="prepared-attributes-v1";
       j["baked"]["mtoon_normal"]=nlohmann::json::binary(baked_->maps.mtoon_normal.rgba);
     }
+    if(baked_->normal_authority){
+      if(!domains||!normal_projection_||normal_projection_->version!=2)
+        throw std::invalid_argument("Retained normal bake requires its own sampling model");
+      j["baked"]["version"]=4;
+      j["baked"]["normal_interpretation"]="retained-field-metadata-v1";
+      j["baked"]["normal_authority"]=domains->add_detail(baked_->normal_authority);
+    }
   }
+  if(sampling)return {{"version",2},{"payload",std::move(j)},{"domain",paint_domains->add(sampling)}};
   return j;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive) {
   return decode(j,archive,false);
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const PaintImageArchive *archive,bool allow_polygon) {
+  return decode(j,archive,allow_polygon,nullptr);
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
+    bool allow_polygon,const NormalSamplingArchive *domains) {
+  return decode(input,archive,allow_polygon,domains,nullptr);
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
+    bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
+  std::shared_ptr<const PaintSamplingDomain> sampling;
+  const bool envelope=input.is_object()&&input.contains("version");
+  if(envelope){
+    // No legacy root mesh: frozen implicit-v1 readers reject before bulk.
+    if(input.size()!=3||!input.at("version").is_number_integer()||input.at("version")!=2||
+       !input.contains("payload")||!input.at("payload").is_object()||input.at("payload").contains("version")||
+       !input.contains("domain")||(!input.at("domain").is_number_unsigned()&&
+       (!input.at("domain").is_number_integer()||input.at("domain").get<int64_t>()<0))||
+       input.at("domain").get<uint64_t>()>UINT32_MAX)
+      throw std::invalid_argument("Invalid retained paint version2 envelope");
+    if(!archive||!paint_domains)throw std::invalid_argument("Paint version2 requires its owning Scene24 image and sampling context");
+    sampling=paint_domains->at(input.at("domain").get<uint32_t>());
+  }else if(input.contains("payload")||input.contains("domain"))throw std::invalid_argument("Paint sampling fields require version2 envelope");
+  const auto &j=envelope?input.at("payload"):input;
+  if(j.contains("source_maps"))detail::source_uv_archive_measure(j.at("source_maps"));
+  const bool retained_projection=j.contains("normal_projection")&&
+    j.at("normal_projection").is_object()&&j.at("normal_projection").contains("domain");
+  const bool retained_bake=j.contains("baked")&&j.at("baked").is_object()&&
+    j.at("baked").contains("normal_authority");
+  if((retained_projection||retained_bake)&&(!domains||!archive))
+    throw std::invalid_argument("Retained normal Paint requires paired image and sampling archive context");
   auto &m = j.at("mesh");
   auto blob = [&](const char *name, size_t stride,
                   size_t limit) -> const std::vector<uint8_t> & {
@@ -1751,7 +2017,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
       surface_options.policy=PaintUvPolicy::SourceAuthored;
     }
   }
-  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options));
+  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options,std::move(sampling)));
   std::optional<PaintImageArchive> local_images;
   const PaintImageArchive *images=archive;
   if(j.contains("source_maps") || j.contains("color_projection") || j.contains("normal_projection")) {
@@ -1759,7 +2025,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
     if(!archive){local_images=PaintImageArchive::decode(j.at("source_images"));images=&*local_images;}
     if(j.contains("source_maps")){result->source_maps_=decode_source_maps(j.at("source_maps"),*images);result->source_maps_->validate_surface(result->mesh());}
     if(j.contains("normal_projection")){
-      result->normal_projection_=decode_normal_projection(j.at("normal_projection"),*images);
+      result->normal_projection_=decode_normal_projection(j.at("normal_projection"),*images,domains);
       result->normal_projection_->validate(result->resolution());
       if(result->surface_->diagnostics.policy!=PaintUvPolicy::Strict||result->surface_->diagnostics.additional_candidates||!result->surface_->diagnostics.unpaintable_uv_faces.empty())throw std::runtime_error("Prepared normal archive has no strict writable atlas");
     }
@@ -1841,7 +2107,14 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
   result->layer(result->active_);
   if (j.contains("baked")) {
     const auto &v = j.at("baked");
-    if(!v.at("version").is_number_integer() || (v.at("version")!=1 && v.at("version")!=2 && v.at("version")!=3))throw std::runtime_error("Unsupported baked texture version");
+    if(v.contains("normal_authority")&&!domains)
+      throw std::invalid_argument("Retained normal bake requires a complete owning sampling archive context");
+    if(!v.at("version").is_number_integer() || (v.at("version")!=1 && v.at("version")!=2 && v.at("version")!=3 && v.at("version")!=4))throw std::runtime_error("Unsupported baked texture version");
+    const bool retained=v.at("version")==4;
+    if(retained&&(!domains||!v.contains("normal_authority")||!result->normal_projection_||result->normal_projection_->version!=2))
+      throw std::invalid_argument("Retained normal metadata requires complete paired field context");
+    if(!retained&&v.contains("normal_authority"))
+      throw std::invalid_argument("Normal event identity requires baked metadata4");
     if(v.at("version")==1 && (v.contains("color_interpretation") || v.contains("pbr_color")))throw std::runtime_error("Resolved baked colors require baked payload2");
     uint32_t r = result->resolution();
     auto bytes = [&](const char *key, size_t count, bool optional = false) {
@@ -1858,18 +2131,32 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &j,const P
     auto normal = bytes("normal", size_t(r)*r*4, true);
     if (!normal.empty()) baked.maps.normal = {r, r, std::move(normal)};
     baked.coverage = bytes("coverage", size_t(r)*r);
-    if(v.at("version")!=3&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
-    if(v.at("version")==2||(v.at("version")==3&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
+    if(v.at("version")!=3&&!retained&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
+    if(v.at("version")==2||((v.at("version")==3||retained)&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
       if(v.at("color_interpretation")!="resolved-pbr")throw std::runtime_error("Unknown baked color interpretation");
       baked.color_interpretation=BakedColorInterpretation::ResolvedPbr;baked.maps.pbr_color={r,r,bytes("pbr_color",size_t(r)*r*4)};
     }
-    if(v.at("version")==3){
+    if(v.at("version")==3||retained){
       const auto &kind=v.at("normal_interpretation");
-      if(!kind.is_string()||kind.get_ref<const std::string&>()!="prepared-attributes-v1")throw std::runtime_error("Unknown baked normal interpretation");
+      if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))throw std::runtime_error("Unknown baked normal interpretation");
       baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
       auto normal=bytes("mtoon_normal",size_t(r)*r*4,true);if(!normal.empty())baked.maps.mtoon_normal={r,r,std::move(normal)};
     }
-    result->install_bake(std::move(baked));
+    if(retained){
+      const auto &reference=v.at("normal_authority");
+      if((!reference.is_number_unsigned()&&(!reference.is_number_integer()||reference.get<int64_t>()<0))||
+         reference.get<uint64_t>()>UINT32_MAX)
+        throw std::invalid_argument("Invalid retained normal event reference");
+      baked.normal_authority=domains->detail_at(reference.get<uint32_t>());
+      baked.validate(r);
+      if(bool(result->color_projection_)!=(baked.color_interpretation==BakedColorInterpretation::ResolvedPbr))
+        throw std::invalid_argument("Retained baked color interpretation differs");
+      // Only structural reconstruction here. Source replay/pairing happens in
+      // the owning model before publication; ordinary install_bake cannot
+      // manufacture or smuggle a retained event identity.
+      result->baked_=std::make_shared<const BakedTextures>(std::move(baked));
+      result->composite_token_=next_composite_token();++result->revision_;
+    }else result->install_bake(std::move(baked));
   }
   result->allocated_tiles_ = 0;
   for(const auto &layer:result->layers_)result->allocated_tiles_+=tile_count(layer);
@@ -1882,6 +2169,7 @@ void PaintedMesh::swap_state(PaintedMesh &other) noexcept {
   static_assert(noexcept(swap(composite_token_,other.composite_token_)));swap(composite_token_,other.composite_token_);
   static_assert(noexcept(swap(before_composite_token_,other.before_composite_token_)));swap(before_composite_token_,other.before_composite_token_);
   static_assert(noexcept(swap(surface_,other.surface_)));swap(surface_,other.surface_);
+  static_assert(noexcept(swap(sampling_attachment_,other.sampling_attachment_)));swap(sampling_attachment_,other.sampling_attachment_);
   static_assert(noexcept(swap(source_maps_,other.source_maps_)));swap(source_maps_,other.source_maps_);
   static_assert(noexcept(swap(color_projection_,other.color_projection_)));swap(color_projection_,other.color_projection_);
   static_assert(noexcept(swap(normal_projection_,other.normal_projection_)));swap(normal_projection_,other.normal_projection_);

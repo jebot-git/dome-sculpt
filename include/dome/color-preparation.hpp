@@ -5,6 +5,8 @@
 namespace dome {
 enum class SourceColorField { OriginalAccessor, Identity, PolygonCorners };
 struct PolygonColorSurface;
+struct SourceColorUvReprojection;
+class SourceColorPaintSampling;
 struct ColorPreparationOptions {
   uint64_t max_quality_cells=128'000'000, max_probe_samples=64'000'000;
   size_t max_working_bytes=256*1024*1024, max_layer_bytes=128*1024*1024;
@@ -43,15 +45,64 @@ struct SourceColorPreparation {
   std::shared_ptr<const DeformationState> original_deformation;
   // Must not itself contain a color preparation: bounded acyclic ownership.
   std::shared_ptr<const SourceMaterialBindings> original_material;
-  // Geometry-only current CORNER authority. This is not an Origin/material
-  // edge: its immutable topology and field can be authenticated independently.
+  // Initial geometry-only CORNER authority. This is not an Origin/material
+  // edge; current_descriptor() selects the separately owned later UV domain.
   std::shared_ptr<const PolygonColorSurface> polygon_colors;
+  // Scene23 only: initial descriptor/receipt stay immutable; this independently
+  // owned node proves the current UV domain and its newly measured projection.
+  std::shared_ptr<const SourceColorUvReprojection> uv_reprojection;
+  std::shared_ptr<const SourceColorPaintSampling> paint_sampling;
+  const std::shared_ptr<const PolygonColorSurface> &current_descriptor() const noexcept;
+  const std::shared_ptr<const PolygonColorSurface> &sampling_descriptor() const noexcept;
   void validate(bool deep=true) const;
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> &cancelled={}) const;
   std::vector<std::array<float,4>> vertex_field(size_t,const CreatorAppearance *,
                          const std::function<bool()> &cancelled={}) const;
 };
+struct ColorUvReprojectionReceipt {
+  uint32_t version=1,resolution=0;
+  float accepted_projection_error=.04f;
+  std::array<float,4> projection_error_bound{};
+  uint64_t projected_texels=0,tested_quality_cells=0;
+  uint64_t raster_samples=0,raster_budget=128'000'000;
+  uint64_t max_quality_cells=128'000'000,max_working_bytes=256*1024*1024;
+  void validate() const;
+  nlohmann::json encode() const;
+  static ColorUvReprojectionReceipt decode(const nlohmann::json &);
+};
+struct SourceColorUvLayout {
+  std::vector<uint32_t> source_vertices,indices;
+  std::vector<std::array<float,2>> uv;
+  std::vector<uint8_t> pins,seams;
+  size_t storage_bytes() const;
+  Mesh target_mesh(const Mesh &,const std::function<bool()> & = {}) const;
+  nlohmann::json encode() const;
+  static size_t encoded_storage_bytes(const nlohmann::json &);
+  static std::shared_ptr<const SourceColorUvLayout> decode(const nlohmann::json &);
+};
+struct SourceColorUvReprojection {
+  ColorUvReprojectionReceipt receipt;
+  std::shared_ptr<const SourceColorUvLayout> layout;
+  std::shared_ptr<const PolygonColorSurface> polygon_colors;
+  std::shared_ptr<const PaintColorProjection> projection;
+  std::shared_ptr<const PaintedMesh> before_paint;
+  std::shared_ptr<const CreatorAppearance> before_appearance;
+  std::shared_ptr<const DeformationState> before_deformation;
+  std::shared_ptr<const SourceMaterialBindings> before_material;
+  void validate(bool deep=true,const std::function<bool()> & = {}) const;
+  void validate_current(const Mesh &,const CreatorAppearance *,
+                        const std::function<bool()> & = {}) const;
+};
+// Detached UV-only replay. The complete before binding owns its immutable initial
+// receipt; the returned recipe owns a separately measured current-domain proof.
+std::shared_ptr<const SourceColorPreparation> reproject_source_corner_colors(
+    const std::shared_ptr<const PaintedMesh> &,
+    const std::shared_ptr<const SourceMaterialBindings> &,
+    const std::shared_ptr<const DeformationState> &,
+    std::shared_ptr<const PolygonColorSurface>,const Mesh &,
+    std::span<const uint32_t>,const ColorPreparationOptions & = {},
+    uint64_t max_raster_samples=128'000'000);
 struct ColorPreparationInput {
   std::shared_ptr<const PaintedMesh> paint;
   std::shared_ptr<const CreatorAppearance> appearance;

@@ -147,6 +147,7 @@ int main(int argc, char **argv) try {
         "archives and hierarchy");
   auto no_uv = fixture;
   no_uv.j["meshes"][0]["primitives"][0]["attributes"].erase("TEXCOORD_0");
+  no_uv.j["meshes"][0]["primitives"][0]["attributes"].erase("TEXCOORD_1");
   no_uv.j["materials"][0]["pbrMetallicRoughness"].erase("baseColorTexture");
   auto no_uv_path = directory / "no-uv.glb";
   no_uv.save(no_uv_path);
@@ -201,13 +202,25 @@ int main(int argc, char **argv) try {
   auto flat_uv1=flat_normal_map;
   flat_uv1.j["materials"][0]["normalTexture"]["texCoord"]=1;
   auto flat_uv1_path=directory/"missing-normal-uv1.glb";flat_uv1.save(flat_uv1_path);
-  bool uv1_guard=false;
-  try { prepare_authoring_import(source,flat_uv1_path,options); }
-  catch(const std::invalid_argument &e) {
-    uv1_guard=std::string_view(e.what()).find("require TEXCOORD_0")!=std::string_view::npos;
-  }
-  check(uv1_guard && source.encode()==unchanged,
-      "Existing UV1 paint-source restriction stays explicit and source-exact; full UV1 sampling/provenance remains required");
+  auto raw_uv1=prepare_authoring_import(source,flat_uv1_path,options);
+  const auto &raw_uv1_object=raw_uv1.scene.object(raw_uv1.objects[0]);
+  const auto &uv1_frame=*raw_uv1_object.material_bindings->normal_frames->pbr;
+  bool owned_uv1=raw_uv1_object.painted->source_maps()->normal.texcoord==1&&
+      raw_uv1_object.painted->source_maps()->uv1&&uv1_frame.generated_uv==1&&
+      uv1_frame.generated_tangents&&uv1_frame.tangents[0][3]==1;
+  for(size_t v=0;v<raw_uv1_object.painted->mesh().positions.size();++v)
+    owned_uv1&=raw_uv1_object.painted->source_maps()->uv1->at(v)==raw_uv1_object.appearance->asset->primitives[0].uv1.at(raw_uv1_object.appearance->source_vertices[v]);
+  check(owned_uv1&&source.encode()==unchanged,
+      "Missing NORMAL with UV1 retains exact native/source coordinate ownership and genuinely generated UV1 tangent authority");
+  auto raw_uv1_saved=directory/"raw-flat-uv1.dsculpt";raw_uv1.scene.save(raw_uv1_saved);
+  check(Scene::load(raw_uv1_saved).encode()==raw_uv1.scene.encode(),"Raw flat-normal UV1 viewing source survives native restart");
+  Document raw_uv1_document;raw_uv1_document.replace(raw_uv1.scene);check(raw_uv1_document.wait_mesh(),"Raw UV1 immutable native surface is ready");const auto raw_uv1_before=raw_uv1_document.copy_scene().encode();
+  check(!raw_uv1_document.begin_native_stroke()&&raw_uv1_document.frame().state->message=="Prepare an editable texture atlas before painting these original source coordinates"&&!raw_uv1_document.frame().state->native_pending&&raw_uv1_document.copy_scene().encode()==raw_uv1_before,
+      "Admitted raw UV1 remains read-only and refuses actual native paint admission before history or queued work");
+  auto uv1_options=options;uv1_options.prepare_texture_atlas=true;auto editable_uv1=prepare_authoring_import(source,flat_uv1_path,uv1_options);
+  check(!editable_uv1.scene.object(editable_uv1.objects[0]).painted->source_maps()->uses_alternate_uv()&&editable_uv1.scene.object(editable_uv1.objects[0]).material_bindings->uv_origin->paint->source_maps()->normal.texcoord==1,
+      "Explicit atlas preparation owns current UV0 while retaining exact original UV1 sampling authority");
+  Document editable_uv1_document;editable_uv1_document.replace(editable_uv1.scene);check(editable_uv1_document.wait_mesh()&&editable_uv1_document.begin_native_stroke(),"The explicit atlas alternative enables actual native painting admission");editable_uv1_document.end_native_stroke(false);check(editable_uv1_document.wait_native_stroke(),"Cancelled empty atlas gesture retires its worker cleanly");
   auto flat_no_uv=no_uv;
   flat_no_uv.j["meshes"][0]["primitives"][0]["attributes"].erase("NORMAL");
   flat_no_uv.j["meshes"][0]["primitives"][0]["targets"][0].erase("NORMAL");

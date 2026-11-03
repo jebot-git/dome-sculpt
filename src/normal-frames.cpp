@@ -47,7 +47,7 @@ void NormalFrames::validate(bool deep) const {
   const size_t corners=normals.size();
   if(size_t(transport)>1 || !corners || corners%3 || corners>max_corners || !origin_vertex_count || origin_vertex_count>max_vertices ||
      source_vertex_count>max_vertices || source_corner_count>max_corners || origin_vertices.size()!=corners || targets.size()>max_targets ||
-     (!tangents.empty() && tangents.size()!=corners) || (generated_uv && (!generated_tangents || *generated_uv>1)) ||
+     (!tangents.empty() && tangents.size()!=corners) || (generated_uv && (!generated_tangents || *generated_uv>7)) ||
      (generated_tangents && (tangents.empty() || !generated_uv)))throw std::invalid_argument("Invalid normal frame shape or provenance");
   storage_bytes();
   for(const auto &target:targets)if((!target.normals.empty() && target.normals.size()!=corners)||(!target.tangents.empty() && target.tangents.size()!=corners))throw std::invalid_argument("Normal frame target size differs");
@@ -71,7 +71,7 @@ void NormalFrames::validate(bool deep) const {
   for(const auto &target:targets){if(!target.id || !ids.insert(target.id).second)throw std::invalid_argument("Duplicate or missing normal frame target identity");vectors(target.normals,corners,true);vectors(target.tangents,corners,true);if(tangents.empty() && !target.tangents.empty())throw std::invalid_argument("N-only frame cannot invent target tangents");}
 }
 nlohmann::json NormalFrames::encode() const {
-  validate();nlohmann::json j={{"version",1},{"transport",int(transport)},{"generated",generated_tangents},{"generated_uv",generated_uv?nlohmann::json(*generated_uv):nlohmann::json(nullptr)},
+  validate();nlohmann::json j={{"version",generated_uv&&*generated_uv>=2?2:1},{"transport",int(transport)},{"generated",generated_tangents},{"generated_uv",generated_uv?nlohmann::json(*generated_uv):nlohmann::json(nullptr)},
     {"origin_count",origin_vertex_count},{"source_count",source_vertex_count},{"source_corner_count",source_corner_count},
     {"origin_vertices",binary(origin_vertices)},{"source_vertices",binary(source_vertices)},{"source_corners",binary(source_corners)},
     {"normals",binary(normals)},{"tangents",binary(tangents)},{"targets",nlohmann::json::array()}};
@@ -79,11 +79,13 @@ nlohmann::json NormalFrames::encode() const {
   return j;
 }
 NormalFrames NormalFrames::decode(const nlohmann::json &j) {
-  if(!j.is_object() || j.size()!=13 || !j.at("version").is_number_integer() || j.at("version")!=1 || !j.at("targets").is_array() || j.at("targets").size()>max_targets)throw std::runtime_error("Unsupported normal frame payload");
+  if(!j.is_object() || j.size()!=13 || !j.at("version").is_number_integer() || (j.at("version").get<int64_t>()!=1&&j.at("version").get<int64_t>()!=2) || !j.at("targets").is_array() || j.at("targets").size()>max_targets)throw std::runtime_error("Unsupported normal frame payload");
+  const bool extra=j.at("version").get<int64_t>()==2;
+  if(extra&&(!j.at("generated").is_boolean()||!j.at("generated").get<bool>()||!j.at("generated_uv").is_number_integer()||j.at("generated_uv").get<int64_t>()<2||j.at("generated_uv").get<uint64_t>()>7))throw std::invalid_argument("Invalid additional normal tangent UV provenance");
   size_t bytes=0;for(auto key:{"origin_vertices","source_vertices","source_corners","normals","tangents"}){const auto &v=j.at(key);if(!v.is_binary())throw std::runtime_error("Invalid frame buffer");checked_add(bytes,v.get_binary().size());}
   for(const auto &t:j.at("targets"))if(!t.is_object() || t.size()!=3)throw std::runtime_error("Invalid normal target fields");
   for(const auto &t:j.at("targets"))for(auto key:{"normals","tangents"}){const auto &v=t.at(key);if(!v.is_binary())throw std::runtime_error("Invalid frame target buffer");checked_add(bytes,v.get_binary().size());}
-  NormalFrames f;f.transport=NormalFrameTransport(u32(j.at("transport"),1));f.generated_tangents=j.at("generated").get<bool>();if(!j.at("generated_uv").is_null())f.generated_uv=u32(j.at("generated_uv"),1);
+  NormalFrames f;f.transport=NormalFrameTransport(u32(j.at("transport"),1));f.generated_tangents=j.at("generated").get<bool>();if(!j.at("generated_uv").is_null())f.generated_uv=u32(j.at("generated_uv"),extra?7:1);
   f.origin_vertex_count=u32(j.at("origin_count"),max_vertices);f.source_vertex_count=u32(j.at("source_count"),max_vertices);f.source_corner_count=u32(j.at("source_corner_count"),max_corners);
   f.origin_vertices=unbinary<uint32_t>(j.at("origin_vertices"),max_corners);f.source_vertices=unbinary<uint32_t>(j.at("source_vertices"),max_corners);f.source_corners=unbinary<uint32_t>(j.at("source_corners"),max_corners);
   f.normals=unbinary<Vec3>(j.at("normals"),max_corners);f.tangents=unbinary<std::array<float,4>>(j.at("tangents"),max_corners);

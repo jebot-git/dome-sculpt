@@ -1,0 +1,68 @@
+{
+  "runtime": "cf5fa43bed7024ac35cd1fa5c7c016ad974fc965",
+  "production_changed": false,
+  "scope": "Four corrected test TUs linked against unchanged coherent frozen Release and wholly-owned sanitizer core/support archives; public ABI unchanged",
+  "results": [
+    {
+      "test": "atlas-cancellation",
+      "variant": "build",
+      "exit_code": 0
+    },
+    {
+      "test": "vrm-typed-uv1-import",
+      "variant": "build",
+      "exit_code": 0
+    },
+    {
+      "test": "import-authoring",
+      "variant": "build",
+      "exit_code": 0
+    },
+    {
+      "test": "document-assets",
+      "variant": "build",
+      "exit_code": 0
+    },
+    {
+      "test": "atlas-cancellation",
+      "variant": "build-sanitize",
+      "exit_code": 0
+    },
+    {
+      "test": "vrm-typed-uv1-import",
+      "variant": "build-sanitize",
+      "exit_code": 0
+    },
+    {
+      "test": "import-authoring",
+      "variant": "build-sanitize",
+      "exit_code": 0
+    },
+    {
+      "test": "document-assets",
+      "variant": "build-sanitize",
+      "exit_code": 0
+    }
+  ],
+  "assertions": {
+    "artifacts/atlas-cancellation-build.log": 14,
+    "artifacts/vrm-typed-uv1-import-build.log": 14,
+    "artifacts/import-authoring-build.log": 37,
+    "artifacts/document-assets-build.log": 18,
+    "artifacts/atlas-cancellation-build-sanitize.log": 14,
+    "artifacts/vrm-typed-uv1-import-build-sanitize.log": 14,
+    "artifacts/import-authoring-build-sanitize.log": 37,
+    "artifacts/document-assets-build-sanitize.log": 18
+  },
+  "sha256": {
+    "artifacts/atlas-cancellation-build.log": "28ff31b1e889b2baab7d32697f78671046a8124d4b88eb299fb5193638e5a68f",
+    "artifacts/vrm-typed-uv1-import-build.log": "89465352fa5b9ad667b045ba8b7236a965707f5eebc58a1dbe288c3838da9f54",
+    "artifacts/import-authoring-build.log": "4c733bdc9df12092378f8f84eeec62f9a52b0ed4600192de8e547bb2b336a586",
+    "artifacts/document-assets-build.log": "1db6411ed1ccd4fa9149f03742e9da700454f80741593f99bdce463138a1fe60",
+    "artifacts/atlas-cancellation-build-sanitize.log": "28ff31b1e889b2baab7d32697f78671046a8124d4b88eb299fb5193638e5a68f",
+    "artifacts/vrm-typed-uv1-import-build-sanitize.log": "89465352fa5b9ad667b045ba8b7236a965707f5eebc58a1dbe288c3838da9f54",
+    "artifacts/import-authoring-build-sanitize.log": "4c733bdc9df12092378f8f84eeec62f9a52b0ed4600192de8e547bb2b336a586",
+    "artifacts/document-assets-build-sanitize.log": "1db6411ed1ccd4fa9149f03742e9da700454f80741593f99bdce463138a1fe60"
+  },
+  "full479": "Original run continues unchanged; these are separate corrected tests, not a relabeled full pass"
+}

@@ -1,0 +1,111 @@
+{
+  "artifact_sha256": {
+    "artifacts/arc-raw/after.json": "1c5f38bf6cb0292f9459aedad0aca5f56a7b19b28d7b8a97773a373fdb199493",
+    "artifacts/arc-raw/before.json": "1c5f38bf6cb0292f9459aedad0aca5f56a7b19b28d7b8a97773a373fdb199493",
+    "artifacts/arc-raw/results.json": "c3ccf93847413451b53a3d2c7ae5a214fc7a6328c2028c124effb51380a2ac76",
+    "artifacts/gui-extra-atlas-source7.log": "50c32ff420b279fbd0e05094973c88be743e05ac1c5cda7ec8661c3694bc877d",
+    "artifacts/gui-extra-raw.log": "bbd149f562e2e6f863923ef73261b23622e0c0f0f669b28ce8583fc55b7b400b",
+    "artifacts/raw-arc-khronos.json": "0f4ed8e56f34dc5bd5a476d374ffa229f82161f0a45496b232835c130fc8e24c",
+    "artifacts/raw-khronos.log": "2959780611fa78da2f1cb871483ecd9bd968c0164721516d7d9f4c80848235df",
+    "artifacts/raw-source5-before.json": "19e13c5d7d7d992623842d414382f3e9c61d4531fd3be25b794a81bcb3fc2699",
+    "artifacts/raw-source7-before.json": "f3f89f72fbde23ae508216f9e1bb62316e714f2d21d461635ca95983077b2886",
+    "artifacts/tests-extra-openxr.log": "8b1ac467990c7e986c8e0ba823dcce3a606ea94d0a41700c9ed97df803bed7fe",
+    "artifacts/tests-raw-sanitize.log": "d1819d60e8e3c769ebde3af9706bb2a3d9e0f421ea7861de4366e125ce756210",
+    "artifacts/tests-raw4.log": "a6c68ab58781f875fa1126ceeb0181255a9f980ef25d9d6c4fe3571def63b5b1"
+  },
+  "base": "412a565bf696c4f6c3ce7d63af8565a05091979e",
+  "fltk": {
+    "atlas": 14,
+    "marker_ack": "Actual blue checkmark; first white-only detector negative preserved",
+    "raw": 12
+  },
+  "hardware": {
+    "assertions": 288,
+    "before_after_equal": true,
+    "cases": [
+      {
+        "case": "raw",
+        "returncode": 0,
+        "seconds": 1.4667800489987712
+      },
+      {
+        "case": "generated",
+        "returncode": 0,
+        "seconds": 0.3146361440012697
+      },
+      {
+        "case": "roles",
+        "returncode": 0,
+        "seconds": 0.9656676559970947
+      },
+      {
+        "case": "native",
+        "returncode": 0,
+        "seconds": 2.719028410007013
+      }
+    ],
+    "hashes": 672,
+    "pci": "0000:03:00.0",
+    "required_tokens": [
+      "Intel",
+      "Arc",
+      "A770"
+    ],
+    "software_uhd_refused": true
+  },
+  "incomplete": [
+    "raw alternate-UV painting",
+    "arbitrary extra UV editing/remapping",
+    "actual composed projection UI",
+    "Paint24/Source25/latest main semantic union",
+    "FBX extra sets",
+    "broader VRM export",
+    "sets above7",
+    "full production goal"
+  ],
+  "independent_pixels": {
+    "bound_unchanged": 2,
+    "nine_pose_native_current_glb_max": 1,
+    "original_input_morph": 0,
+    "wrong_uv_sensitive": true
+  },
+  "khronos": {
+    "hardware": {
+      "errors": 0,
+      "files": 101,
+      "warnings": 71
+    },
+    "maxIssues": 0,
+    "raw_two_runs": {
+      "errors": 0,
+      "files": 24,
+      "warnings": 22
+    },
+    "unfiltered": true,
+    "version": "2.0.0-dev.3.10"
+  },
+  "loader": {
+    "actual_stereo_gl_swapchains": true,
+    "checks": 40,
+    "physical_hmd": false,
+    "seconds": 73.68,
+    "suites": 2,
+    "synthetic_tracking": true
+  },
+  "main_admitted": false,
+  "native_checks": 57,
+  "private_api": "Document::reject_texture_paint_locked",
+  "public_data_layout_changes": false,
+  "release": {
+    "seconds": 5.49,
+    "suites": 7
+  },
+  "sanitizers": {
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "leaks": true,
+    "owned_cpp_c_core_support_renderer": true,
+    "seconds": 79.9,
+    "suites": 7
+  },
+  "status": "qualified-private-readonly-admission"
+}

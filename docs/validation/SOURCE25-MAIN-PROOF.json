@@ -1,0 +1,270 @@
+{
+  "source": "8d5a5e3eeaaa0829a3c0fbb14550aed6352bbb42",
+  "worktree": "artifacts/source25-main-7693d6b",
+  "base_main": "7693d6bbe7b370e651c52ad080205f44c5c8cafd",
+  "scope": "Frozen fresh coherent Source25 parent; does not qualify current combined master",
+  "release": {
+    "passed": 39,
+    "seconds": 428.97,
+    "complete_native_app_build": true
+  },
+  "sanitize": {
+    "passed": 39,
+    "seconds": 1695.07,
+    "owned_core_support": "O1 ASan+UBSan+leaks",
+    "UI_XR": false
+  },
+  "real_avatar_roundtrip": {
+    "checks": 496,
+    "release_seconds": 300.77,
+    "sanitize_seconds": 1161.21,
+    "timeout_seconds": 2400
+  },
+  "gui": {
+    "menu-rig-merge": {
+      "checks": 8,
+      "sha256": "4953fe996e0a7cc4adfb4c1bd39d1cd7d7375fd67078fd3a2037c94e782c6c97"
+    },
+    "menu-source-rig-merge": {
+      "checks": 9,
+      "sha256": "1d1cb9964e54b7d9827af0fb95af065daa940175b162930840cf7e1294fa7243"
+    },
+    "menu-rig-merge-compact": {
+      "checks": 8,
+      "sha256": "4953fe996e0a7cc4adfb4c1bd39d1cd7d7375fd67078fd3a2037c94e782c6c97"
+    },
+    "menu-source-rig-merge-compact": {
+      "checks": 9,
+      "sha256": "1d1cb9964e54b7d9827af0fb95af065daa940175b162930840cf7e1294fa7243"
+    },
+    "menu-skin-affine": {
+      "checks": 11,
+      "sha256": "de0123111817af92b759de464d069aaa3453aa86f80f11bbf85e56c1b12309ce"
+    },
+    "menu-skin-affine-compact": {
+      "checks": 5,
+      "sha256": "be36996ffe490bb0eb39445e974a37bae0fb2aa27c47766a4d874cd9f1042be7"
+    }
+  },
+  "graphics": {
+    "software_suites": 4,
+    "software_seconds": 81.78,
+    "Arc_suites": 4,
+    "checks_per_lane": 111,
+    "pixel_max_error": 0,
+    "pixel_tolerance": 2,
+    "pci": "0000:03:00.0",
+    "Arc_results": [
+      {
+        "command": [
+          "build/dome-sculpt-rig-rest-render-test",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 0.10590927899465896
+      },
+      {
+        "command": [
+          "build/dome-sculpt-vrm-rest-source-render-test",
+          "assets/humanoid/vroid/base-female.vrm",
+          "assets/humanoid/vroid/base-male.vrm",
+          "artifacts/render-arc/vrm-rest-source-render",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 94.23962316798861
+      },
+      {
+        "command": [
+          "build/dome-sculpt-vrm-rest-reparent-render-test",
+          "assets/humanoid/vroid/base-female.vrm",
+          "assets/humanoid/vroid/base-male.vrm",
+          "artifacts/render-arc/vrm-rest-reparent-render",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 35.999616797984345
+      },
+      {
+        "command": [
+          "build/dome-sculpt-bone-length-render-test",
+          "assets/humanoid/vroid/base-female.vrm",
+          "assets/humanoid/vroid/base-male.vrm",
+          "artifacts/render-arc/bone-length-render",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 64.79834266999387
+      }
+    ]
+  },
+  "manifests": {
+    "source": 1245,
+    "release": 52,
+    "sanitize": 46,
+    "render": 14,
+    "before_after_identical": true,
+    "release_binary_sha256": {
+      "build/dome-sculpt": "65e12492f920860849bbe3db19c482d741b63b170f033a15008ce4a7ffe12942",
+      "build/dome-sculpt-affine-export-test": "350406eb281155c446c469bb3f9b3fe25388495f4d6cb68c6317492b81120f8e",
+      "build/dome-sculpt-bone-length-creator-basis-test": "ca360ba18c96ce1af25388d00b6fcd184fad4f86fed0d1a5cd4acd78272293bf",
+      "build/dome-sculpt-bone-length-glb-test": "bfcb99148fcd3c4279977c130bc7264d9d5041ff362b4605b9350bdb645043ea",
+      "build/dome-sculpt-bone-length-roundtrip-test": "7f07008c87b257e2d9b378ae2906c313c1b581067c179c4a1aaf02a3aa210ec4",
+      "build/dome-sculpt-bone-length-space-test": "30ebb68f285fb59e2d26f41bea6a1018558fe032062aba3de4353739bd9a2038",
+      "build/dome-sculpt-bone-length-worker-test": "1277841b3b9c008e471ca68b0405cdaa9d922b97c85ef98c5cb18e65d5172733",
+      "build/dome-sculpt-bone-metadata-test": "ba7f7dc77d0a6dd24f5f2e657d0f65571a7d5533e2789e70954a2990b36d14bc",
+      "build/dome-sculpt-document-export-test": "66a15b97e582e1476f05b08f64c6b59b1ddee3296c6189e00ef1122d0137875a",
+      "build/dome-sculpt-humanoid-placement-test": "58f22f7471900d1fda887458de80fa2bfbcaa8ac90d7145331ff1a961ffaf303",
+      "build/dome-sculpt-resample-native-contract-test": "1a48b57f73e13066a2aff6d07aa0b0df48c4bb2e2cf850ae93b66c6a630df72d",
+      "build/dome-sculpt-resolution-quality-host-test": "a0a68f2db436cb528152cdcf3bc78b6e2261d143f0dcc28f30e4d88f631eb30d",
+      "build/dome-sculpt-resolution-quality-test": "abbba13cda13abe0619c3336c6dd5794386de9c18d8474e6a732ba36ad40b698",
+      "build/dome-sculpt-retopo-edges-allocation-test": "1625bcd14a03da3eb447d585de921d7e49b899bb257236a6a4d508e0e15928c1",
+      "build/dome-sculpt-retopo-edges-test": "19df399f8a10f6b80ea95224a3328b7cb4c27656c4860cefbd43c840c326369f",
+      "build/dome-sculpt-rig-fit-authoring-test": "756d95eecfad62c16b35c8a7e4edb69a391476b8c70b2b34793b81e0c02e06b0",
+      "build/dome-sculpt-rig-fit-import-test": "074604e56abbb76323eb9024e2d9aa15c1ef88de29971ad283fac125a5c32d25",
+      "build/dome-sculpt-rig-rest-authoring-test": "e2ea61758ca1e242cf10715c31818957042d525329ae8b741e0c89a5005ce943",
+      "build/dome-sculpt-rig-rest-export-test": "60bd23de7c80b1a1a910aaa80f7d178fbe2410e4cf1724ba32f35934a1840f2b",
+      "build/dome-sculpt-rig-rest-faults-test": "08f3ca9a86486190176c92717c3a2aad66fe0a58a7b3e2d647bd107e060fa1fc",
+      "build/dome-sculpt-rig-rest-pose-test": "5b3ac58f9528ce18dd8a910ed5560cc5aeca85502d9f8b25336d7c6990b275d7",
+      "build/dome-sculpt-skin-affine-allocation-test": "cb12d40fd4934087352f4a07f41802289a2c0862eccc09591000341af6559463",
+      "build/dome-sculpt-skin-affine-controller-test": "9b1775fc8d2e5991765b7e2cf3aa199761e568400e6cda8cbbd2d19d82108169",
+      "build/dome-sculpt-skin-affine-export-test": "1717807596b397c933ab9b69e5f8be3c381da4ba3356df99b52868e9e019beaa",
+      "build/dome-sculpt-skin-affine-test": "8062df1ae9610a429a07d3907ec432d43efe6acd0f4cb541c6ee7b2d3a56e34d",
+      "build/dome-sculpt-skin-authoring-test": "f68a54684f5075789b51faf3c8805966b0f5890991858c6462f838bfb5d93659",
+      "build/dome-sculpt-skin-source-pose-test": "c8296ce6b5ff1ef5a70d13343ad5a3b65180d5267accfbfae737f4b58344e967",
+      "build/dome-sculpt-source-rest-document-test": "0cf948b7f810a89e0a16db3a37d5f00b94cce19b4fb11a77c67a677527b1b6a6",
+      "build/dome-sculpt-source-rest-export-graph-test": "1d3708e0ba12434a7ecf30cf7f7aa2cab8b607957ef997b98723080b43aedbe1",
+      "build/dome-sculpt-source-rest-export-test": "01288553a03a939fcfd43884b10f5d6230f353ce1a6e6f51580e006cf51436a8",
+      "build/dome-sculpt-source-rest-graph-test": "ac20be0f9d4bae99c4befdf5f94a57b02541f8234e3d2d9fb347a5d89d0e620c",
+      "build/dome-sculpt-source-rest-plan-test": "9e60e8dc1ae0ddcd940625ce30e2b945f45ca9c9eaebaca361919804f78c3a17",
+      "build/dome-sculpt-source-rest-scene-test": "45044466e6530b1527249d2994ace1b7b28cdfa3015cf9b708c2e09caa68092a",
+      "build/dome-sculpt-source-rest-ui-fixture": "1af42248992fda687f4efaff266076b60b1a301af5b55cc5a117fd01b736c43d",
+      "build/dome-sculpt-source-rigid-bind-rest-test": "ab2f145d141d61dd176d0146f5409be15a9a471ae83b7246f52fbd8b6fc20ca3",
+      "build/dome-sculpt-vrm-rest-length-guard-test": "77362384c665652e1fbaa3261245679942b444b599aa47afc23e1219b4844f80",
+      "build/dome-sculpt-vrm-rest-metadata-test": "c9a753ee2abe4ae188badff831742b45f0c42ae3f6a1618c1111405452b9e608",
+      "build/dome-sculpt-vrm-rest-reparent-source-test": "91915ebe0c89ac15ee4b0a5f4508bf8336cd71fdb7dbcee49cc5d2a9e54f88bc",
+      "build/dome-sculpt-vrm-rest-reparent-worker-test": "f5e88d85e3d38cfd2f246c7b0de2021e72c229a78adb12275b2fd15359d4d141",
+      "build/dome-sculpt-vrm-rest-source-export-test": "33b831af233314e42a13c3c47183a7dc4222ab43423bf515cdc0480b42f378ce",
+      "build/dome-sculpt-vrm-rest-source-worker-test": "cf5636d386cbbe970d1084b097e1d189f382a4475a560bddd595abcd5a029d47",
+      "build/libdome-sculpt-affine.a": "36807e0dd6824a3d665ac4603e2cfb3b8c873b512c14e89331ffc256cc15c731",
+      "build/libdome-sculpt-core.a": "e0698205ea4bfa6e27b3bb181e044f1ce0092581be5540868d8b8765330a0a62",
+      "build/libdome-sculpt-polygon.a": "2f6688141d34ec4382914efa2f7f236c9ccb54599a4e788c9292bfc33c60eb8c",
+      "build/libdome-sculpt-render.a": "4054c80be00c78898b2715f0ee9c3511f0a150e89bb76f4ac609b9748b902c7d",
+      "build/libdome-sculpt-spacenav.a": "1d7027d0279f5d78e20cd57549629cf6fedf5f702c44348654c87ddda679b131",
+      "build/libdome-sculpt-test-runtime.so": "c1196a4cc9b1e4acea13f99d676b619f81369ca2b9584282299d9b249fc31cc2",
+      "build/libdome-sculpt-xr.a": "5a210a85e5abff53e04247f09c4c8e6f6a5f0895ef6b5a9a2c3236f259d8c48c",
+      "build/libmikktspace-robust.a": "554c7b019c19d9e076865f7d1ef1cb87b81d25502f739d8d21ef5fc9d528db1b",
+      "build/libmikktspace.a": "619255e47b43ba6042ee7db60e5ac564a09665e80c8e7ba65d562b2d33db7591",
+      "build/libufbx.a": "45b36f2a3c72b11053c63e029462aa53b386b3a8a34ae08319a8cbddd73d3dc4",
+      "build/libxatlas.a": "4619d93627200abee8e6e3ae7c4d0452b561431dc774ac7446889a511873f534"
+    },
+    "sanitize_binary_sha256": {
+      "build-sanitize/dome-sculpt-affine-export-test": "65cc267edb65e04576b917c68746166dbcf96d8bb9f9bf96aeca333cb5023f79",
+      "build-sanitize/dome-sculpt-bone-length-creator-basis-test": "ec7a082e2705cecc3b199cc224f734e6434b225e658ece955e4f59d7983833ea",
+      "build-sanitize/dome-sculpt-bone-length-glb-test": "3de4e43adae86fc53eeb553775fda7ce72efbfe684fa3e7b77bc6fcfc9a14c5a",
+      "build-sanitize/dome-sculpt-bone-length-roundtrip-test": "6b054ad7a8a737c7bf103663f22e4fb7beb148d7d2a582486baf666c5d66f96a",
+      "build-sanitize/dome-sculpt-bone-length-space-test": "c9f6aff28748066eb36cb653da202574082d55a850fd18c42b3f73918292581b",
+      "build-sanitize/dome-sculpt-bone-length-worker-test": "8c4c42d5ad7c31bca4a43b441872d89d436b8173e7cfbcf1e36b3c78c51a4184",
+      "build-sanitize/dome-sculpt-bone-metadata-test": "4b9e304d6568dd0c5bd5d7010721eaba6c601a5f46b588ff860d68ea3660b343",
+      "build-sanitize/dome-sculpt-document-export-test": "73dc2c62a6e3d6561864944af728d6b250160941163ff580dac16cbd6bf101b9",
+      "build-sanitize/dome-sculpt-humanoid-placement-test": "65f991ce417c07fa6e8cd4fc8fefd40b11838eb1ab149b362e6bc15e2c0fe313",
+      "build-sanitize/dome-sculpt-resample-native-contract-test": "753612ba2468ea9afac942fc19e8a4e220df1d3100fa632187a23e36dbabff3c",
+      "build-sanitize/dome-sculpt-resolution-quality-host-test": "6cd1432ff3a40e736454f1b3cf9f58e8a2690a6533bb9852d680d43c8d20c1b6",
+      "build-sanitize/dome-sculpt-resolution-quality-test": "c73725faf7ad470753c6b77f361e712eaf6e6fc3c0fb293a219663f9c21ac274",
+      "build-sanitize/dome-sculpt-retopo-edges-allocation-test": "ce7231f4f6f8c720896d953246752f383fed057a412a47fc663eea94becd3646",
+      "build-sanitize/dome-sculpt-retopo-edges-test": "6ae68b4c5e4607c01cd317b1e5916537df70d2408454b3e311cf44e8243fe135",
+      "build-sanitize/dome-sculpt-rig-fit-authoring-test": "11d5bf3191110eb00de47bc540e98c986a6868c1483c9edbb06afc59c7895e38",
+      "build-sanitize/dome-sculpt-rig-fit-import-test": "d7c813eb8cc314c9e392dc084c677ba2ee51e4d4462a00e39049804e5b8fd24c",
+      "build-sanitize/dome-sculpt-rig-rest-authoring-test": "e66717b933762ad52c9044be301df69701e71f97f26bdd379c9993e609d25af7",
+      "build-sanitize/dome-sculpt-rig-rest-export-test": "49cf14497ba422dd35dfb036f9e32ed4a7be70aaa2c2ed074430e965ea3764bf",
+      "build-sanitize/dome-sculpt-rig-rest-faults-test": "e1cd55eb5f4a40b2e7a010e6e52f5868cb6dd1b328075bf46d3d49982ac28786",
+      "build-sanitize/dome-sculpt-rig-rest-pose-test": "bd74edbd274dbf6969e35b534bcdbb665da5aa0fab36f36237d7d4fd680449c6",
+      "build-sanitize/dome-sculpt-skin-affine-allocation-test": "c2cdf09fe82195d06eb76acb6d6f59291739729c62a15095d6b9dc680dba7f8f",
+      "build-sanitize/dome-sculpt-skin-affine-controller-test": "1a1061a702bfd7c2cd2c9aa89fb65e332240f283c072c717a320c37d3b16c453",
+      "build-sanitize/dome-sculpt-skin-affine-export-test": "64b60fd254599c45e92d18355a88f620712a04545796cb912a9676efa78f4d02",
+      "build-sanitize/dome-sculpt-skin-affine-test": "451127d2eea4ccdb9f1d9a8932a9b5f43fa93b51a4e8839bf2832eb4e571024c",
+      "build-sanitize/dome-sculpt-skin-authoring-test": "767279d5395d6a65c0278df2bef83458d6efed7a60d5fc97af0a99bffaab1376",
+      "build-sanitize/dome-sculpt-skin-source-pose-test": "4338f7795d857ea1738b0f849e027b519b0e29b654c839629885e9bb1ad019d4",
+      "build-sanitize/dome-sculpt-source-rest-document-test": "f3bc37f5fed2812fd68b8f887470fabda7ffbec68339b59f29e85658afbc6f08",
+      "build-sanitize/dome-sculpt-source-rest-export-graph-test": "be313ad9b25581dc9b6502f5b876305f1e531a7b9e37255561efbc807d84a9a2",
+      "build-sanitize/dome-sculpt-source-rest-export-test": "12b2613bd10e90f0504826f7f6bbd5a1ddcb58bcb4623cf70ab86e977c44f84a",
+      "build-sanitize/dome-sculpt-source-rest-graph-test": "72f6bd52ec3f45bf3dd2b345aa3aa61fade7e38de4e56453d1e53d6aae4e0e2f",
+      "build-sanitize/dome-sculpt-source-rest-plan-test": "c872fd0eb44f9ad386ffd12e95693fac7ff9c7a51100705e1ec0c4abbfe6ce54",
+      "build-sanitize/dome-sculpt-source-rest-scene-test": "2138ae5c9d42a680fab6011ef02844a79770ee4cb75c14c7f569741d60b070dd",
+      "build-sanitize/dome-sculpt-source-rigid-bind-rest-test": "25636f11dfc33a1ec4cf839235d6abc87ab5a54397f72215d5e5b09ded4cc7a2",
+      "build-sanitize/dome-sculpt-vrm-rest-length-guard-test": "01008f5355bee4297f1887420d88d0d980b47fd794ce472e29b27c24e2d66eec",
+      "build-sanitize/dome-sculpt-vrm-rest-metadata-test": "e5534a2e2d647595eb1ac3b3b8f429ef81a52806eecd526f649f860b244a5c6e",
+      "build-sanitize/dome-sculpt-vrm-rest-reparent-source-test": "6b36b8e8dfce2bbbe61582b86967ae888bb8845f1230dc34a231abae0991d751",
+      "build-sanitize/dome-sculpt-vrm-rest-reparent-worker-test": "9568a824b88eeaad40b59fba6e058e0228bd7144d6aab6d5f87ffcb51bdf93f5",
+      "build-sanitize/dome-sculpt-vrm-rest-source-export-test": "c763daf1ca0e97142669596aed4a813203a04650dd6ca7a29cdbc8ebfae6fa9b",
+      "build-sanitize/dome-sculpt-vrm-rest-source-worker-test": "06fd0485f44b2f8e9537041e7b006e506a43e8e0e6a7d552245fc5a289a3801b",
+      "build-sanitize/libdome-sculpt-affine.a": "5168a9b43c9f0eb6173851f358d20df1b3685f13b7d413086878968272acbf61",
+      "build-sanitize/libdome-sculpt-core.a": "688c3275deca33bf726d8d8b1545f98ce63df2382d2966431ea1ed5f18cc0681",
+      "build-sanitize/libdome-sculpt-polygon.a": "322212655e516cd75a6c361d4b8186c2baa05826e1446b78be6de09d9874bdac",
+      "build-sanitize/libmikktspace-robust.a": "0395eb6a7eb49e540c283566cddf960325a059e8b008db625582fab2d19f4307",
+      "build-sanitize/libmikktspace.a": "941e0605bd1e0e1225bf4415f5d538be8ecb472ac9c2bf2202d3f9a77fccec9b",
+      "build-sanitize/libufbx.a": "5aadefe07268412af1498cbd071e92cb2a4bdd6ca2494a0ec7f94138d8b04208",
+      "build-sanitize/libxatlas.a": "702b7cde68e69762a0efecfa2f38aaff8116838d2f924a1060a8ab9682a2e986"
+    },
+    "render_binary_sha256": {
+      "build/dome-sculpt-rig-rest-render-test": "a927dc6514041d3fc0537634cb684132ef14a0efb0890170ee75ecfb7acc6e07",
+      "build/dome-sculpt-vrm-rest-source-render-test": "3d8a630c8092811c7a06bced5a913ccbc582be0f2c8fc2882d2d142c2276ef3c",
+      "build/dome-sculpt-vrm-rest-reparent-render-test": "b4547f838f9320cb731c95f0fa4f883593737dc2bcf8b1462a56e0a6f6ba760e",
+      "build/dome-sculpt-bone-length-render-test": "acdf2ceb55a5d41e98ea47105e97243c6612a608b40e085857155421d1d8e645",
+      "build/libmikktspace.a": "619255e47b43ba6042ee7db60e5ac564a09665e80c8e7ba65d562b2d33db7591",
+      "build/libdome-sculpt-polygon.a": "2f6688141d34ec4382914efa2f7f236c9ccb54599a4e788c9292bfc33c60eb8c",
+      "build/libufbx.a": "45b36f2a3c72b11053c63e029462aa53b386b3a8a34ae08319a8cbddd73d3dc4",
+      "build/libmikktspace-robust.a": "554c7b019c19d9e076865f7d1ef1cb87b81d25502f739d8d21ef5fc9d528db1b",
+      "build/libdome-sculpt-affine.a": "36807e0dd6824a3d665ac4603e2cfb3b8c873b512c14e89331ffc256cc15c731",
+      "build/libxatlas.a": "4619d93627200abee8e6e3ae7c4d0452b561431dc774ac7446889a511873f534",
+      "build/libdome-sculpt-spacenav.a": "1d7027d0279f5d78e20cd57549629cf6fedf5f702c44348654c87ddda679b131",
+      "build/libdome-sculpt-render.a": "4054c80be00c78898b2715f0ee9c3511f0a150e89bb76f4ac609b9748b902c7d",
+      "build/libdome-sculpt-xr.a": "5a210a85e5abff53e04247f09c4c8e6f6a5f0895ef6b5a9a2c3236f259d8c48c",
+      "build/libdome-sculpt-core.a": "e0698205ea4bfa6e27b3bb181e044f1ce0092581be5540868d8b8765330a0a62"
+    }
+  },
+  "preserved_negatives": [
+    "Exact-pose-only skin failed both old R/SAN world commutation; f2181c0 adds pose authority predicate",
+    "Earlier far-origin diagnostic probes exceeded the separate rendering workspace; metric child uses actual ready90m source"
+  ],
+  "artifact_sha256": {
+    "artifacts/tests-selected-release.log": "f41380931cdccb79d0c92e351df3cc4f0dc40c59fbf6b177e5a3e2c424170206",
+    "artifacts/tests-selected-sanitize.log": "ae2459f70182de91c186d43a1d6cf5e107e227a7a221390ce6b522c43bcb0c51",
+    "artifacts/selected-status-release.json": "26d464fc23457d9e1780eaddee1f3f8b77c22037abbe22babbb546d02f644308",
+    "artifacts/selected-status-sanitize.json": "b76d00cfb5904a2d833a956d92191e7e95a3fb52a05673b971845b18bcc9ed67",
+    "artifacts/source-selected-before.json": "6899bd4eb3cff89c1bc27a1d1048d7824906c427931cd808fc0eb5019d05ed03",
+    "artifacts/source-selected-release-after.json": "6899bd4eb3cff89c1bc27a1d1048d7824906c427931cd808fc0eb5019d05ed03",
+    "artifacts/source-selected-sanitize-after.json": "6899bd4eb3cff89c1bc27a1d1048d7824906c427931cd808fc0eb5019d05ed03",
+    "artifacts/binaries-selected-release-before.json": "95a6febf682546bba2ac414241658145c33d3db7fbc25969a0fd64d10ab63be2",
+    "artifacts/binaries-selected-release-after.json": "95a6febf682546bba2ac414241658145c33d3db7fbc25969a0fd64d10ab63be2",
+    "artifacts/binaries-selected-sanitize-before.json": "1d5be60587e2d65ffe2745d52f15b09e18bd661cb813f11119c3b2c833d87e85",
+    "artifacts/binaries-selected-sanitize-after.json": "1d5be60587e2d65ffe2745d52f15b09e18bd661cb813f11119c3b2c833d87e85",
+    "artifacts/tests-render-software.log": "c03f87b8d23af2e4ce6de93d247f9139bf8ba7f722c88b51a18bb2888a76eb74",
+    "artifacts/render-before.json": "520c52223703825020b220a976cde79cdc057bc9f27d2e1f283a3ae8996b7d83",
+    "artifacts/render-software-after.json": "520c52223703825020b220a976cde79cdc057bc9f27d2e1f283a3ae8996b7d83",
+    "artifacts/render-arc-before.json": "520c52223703825020b220a976cde79cdc057bc9f27d2e1f283a3ae8996b7d83",
+    "artifacts/render-arc-after.json": "520c52223703825020b220a976cde79cdc057bc9f27d2e1f283a3ae8996b7d83",
+    "artifacts/source-render-arc-after.json": "6899bd4eb3cff89c1bc27a1d1048d7824906c427931cd808fc0eb5019d05ed03",
+    "artifacts/render-arc-devices.json": "6212601db343c8132d16cf15fb7a3efdafcc809ffa3a39e77efd5e13e827ac4d",
+    "artifacts/render-arc-results.json": "a5bd00ab482e57c6e1c9ce164021eea78d7eec8b5f037624bf8c295d343a4eb3",
+    "artifacts/test-pose-negative.log": "d38089be278e16e41104c4279edad866070dee7c66abc721b682d5050add9d3d",
+    "artifacts/test-pose-negative-sanitize.log": "dceba95cef6955973c51d527b3e94e22121cbc2f0cab168e6fb347d808c1630c",
+    "artifacts/test-pose-fixed.log": "1b246494c0daa47c7af25f6419c2baa766f1aa8e7c3a05c38380d70305ddeafd",
+    "artifacts/test-pose-fixed-sanitize.log": "2bc4f175492055d7b7289019ffa4b931e48ac5d232ac06be3302352c154eed13",
+    "artifacts/test-pose-consumer-probe.log": "9c99175fa445e91dc1a60b695eebcc334f776145683e7008d4765d6b54ec1cc3",
+    "artifacts/khronos-pose-probe.json": "59e7f8f68b79b4816ede8d0c675adcdbfc42d35e88c8a022eef74d69ae529b90",
+    "artifacts/dome-sculpt-rig-rest-render-test-arc.log": "33ee5746e8f470a2263b923624b4c3e8b1ab994de910cc920f67b2792401fe5a",
+    "artifacts/dome-sculpt-vrm-rest-source-render-test-arc.log": "831e6323ce213b0e524c0c030ba1318ef6326717c3ece407d743b64ee63ffd1a",
+    "artifacts/dome-sculpt-vrm-rest-reparent-render-test-arc.log": "19d68a8c4d93204edd05cfa6a7f6f227a90c161cc2ff0152da19955b706b5fe5",
+    "artifacts/dome-sculpt-bone-length-render-test-arc.log": "f7b9f06d077ef7d8f463d82966f886d3de8942451450f39a728b7cff3babde3a"
+  },
+  "not_claimed": [
+    "current Source24/25/26 master qualification",
+    "full registered-suite qualification",
+    "new physical headset or OpenXR-loader proof",
+    "new GPU rig execution",
+    "new complete emitted-file validator corpus",
+    "system installation",
+    "full production completion"
+  ]
+}

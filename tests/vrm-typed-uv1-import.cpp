@@ -7,17 +7,22 @@
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  auto fixture=source(false);import_fixture::Fixture original;
+ // Author the real original UV0 as well: indexed glTF attributes cannot have a gap.
+ fixture.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"]=original.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"];
+ const auto original_uv0=import_glb(original.bytes()).primitives[0].mesh.uv;
  fixture.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_1"]=original.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_1"];
  fixture.j["materials"][0]["extensions"]["VRMC_materials_mtoon"]["shadeMultiplyTexture"]={{"index",0},{"texCoord",1}};
  fixture.j["samplers"][0]={{"wrapS",33071},{"wrapT",33071},{"magFilter",9729},{"minFilter",9729}};
  auto path=out/"toon-shade-only-uv1.vrm";fixture.save(path);Scene empty;const auto before=empty.encode();
  ImportAuthoringOptions options;options.paint_resolution=64;options.prepare_texture_atlas=true;
+ auto sparse=fixture;sparse.j["meshes"][0]["primitives"][0]["attributes"].erase("TEXCOORD_0");auto invalid_path=out/"invalid-uv1-gap.vrm";sparse.save(invalid_path);bool gap_refused=false;try{prepare_authoring_import(empty,invalid_path,options);}catch(const std::exception &e){gap_refused=std::string_view(e.what())=="glTF texture coordinate attributes must be contiguous from TEXCOORD_0";}
+ check(gap_refused&&empty.encode()==before,"A real UV1-without-UV0 source is rejected precisely with the caller graph unchanged");
  auto imported=prepare_authoring_import(empty,path,options);
  check(imported.objects.size()==2&&empty.encode()==before,"Typed-only shade UV1 imports both real source instances with explicit atlas choice");
  double max_error=0;
  for(auto id:imported.objects){const auto &object=imported.scene.object(id);const auto &binding=*object.material_bindings;const auto &origin=*binding.uv_origin;
   check(binding.sampling_reparameterized&&binding.material.textures[size_t(MToonSlot::Shade)].texcoord==0&&origin.material->textures[size_t(MToonSlot::Shade)].texcoord==1,"Current atlas resolves the typed role while first-source descriptor retains original UV1 selection");
-  check(!origin.paint->source_maps()&&object.appearance->asset->primitives[0].mesh.uv.empty(),"No fabricated PBR map or original UV0 stream is required to own typed-only UV1 sampling");
+  check(!origin.paint->source_maps()&&object.appearance->asset->primitives[0].mesh.uv==original_uv0,"Typed-only UV1 owns its genuine source UV0 stream without fabricating any PBR image map");
   const auto &raw=object.appearance->asset->primitives[0];const auto &mesh=object.painted->mesh();const auto &view=binding.roles[size_t(MToonSlot::Shade)];
   for(size_t c=0;c<mesh.indices.size();c+=3){std::array<float,2> target{},uv{};for(size_t k=0;k<3;++k){auto v=mesh.indices[c+k];auto original_vertex=object.appearance->source_vertices[v];for(size_t axis=0;axis<2;++axis){target[axis]+=mesh.uv[v][axis]/3;uv[axis]+=raw.uv1[original_vertex][axis]/3;}}
    // Independent analytic bilinear oracle for the fixture's 2x2 red/green/blue/white image.

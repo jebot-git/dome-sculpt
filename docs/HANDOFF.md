@@ -4,6 +4,31 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Private combined authoring candidate — 2026-11-03
+
+The authoring-master-3f4b2ba worktree composes published3f4 GPU painting with
+e4a4b7f/8d5a5e3 source-rig/exact-pose authoring and length correction, ffaddb5
+repeated VRoid import/image/node-reference fixes, and c6c2c06 Source24/26 UV/key
+and lossless prepared-field work. This combined source is not yet qualified or
+published. All parent receipts remain scoped to their frozen sources.
+
+The semantic merge retains actual rig-history pool6 and its explicit shared
+colour witness with material6–9, forwards common paint/normal pools through
+current and retained sources, combines feature scans and exact-pose budgets,
+and restores genuine Deformation2 decoding. Legacy UV-only26 files keep their
+omitted rig fields; a null marker is no history, while non-null rig data still
+requires25 and the actual bounded history archive. Main's cancellation-aware
+GPU paint path explicitly excludes new independent-domain owners. New tests
+exercise version/budget closure, actual compensated REST+lossless UV+export,
+and one real native UV/key/rig/VRoid/raw-UV2/paint/Save/Cancel/restart workflow.
+
+Fresh coherent builds and combined native/GUI/graphics/interoperability,
+sanitizer and device gates are required before admission. Read
+SOURCE25-MAIN-PROOF.md for the separate fresh39-suite parent evidence,
+RIG-LENGTH-METRIC.md for the two-TU precision proof, SOURCE-NATIVE-HINTS.md and
+LOSSLESS-PREPARED-UV.md for their precise component boundaries. The full
+production goal, remaining feature rows and post-basic drawers remain active.
+
 ## Plain paint GPU integration — 2026-11-03
 
 Runtime `9f524e3` combines qualified `3411fabe`/`fc4d87f` with main `7693d6b`.

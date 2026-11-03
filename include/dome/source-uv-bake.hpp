@@ -7,9 +7,15 @@
 #include <optional>
 namespace dome {
 struct SourceNormalUvReprojection;
+struct SourceColorPreparation;
+struct PolygonAuthority;
+struct SourceNormalSampling;
+enum class SourceNormalUvMethod { Rasterize, RetainSource };
 struct SourceUvBakeOptions {
   // Zero preserves at least each original image's largest dimension and the
-  // editable paint resolution. Nonzero is an explicit resampling choice.
+  // editable paint resolution. With RetainSource, supported prepared corner
+  // paint keeps its independent editable grid losslessly. Nonzero is an explicit
+  // resampling choice, including that paint grid.
   uint32_t resolution = 0, padding = 4;
   SourceUvAnimationPolicy animation = SourceUvAnimationPolicy::RejectAnimated;
   double freeze_seconds = 0;
@@ -22,6 +28,7 @@ struct SourceUvBakeOptions {
   size_t max_sample_operations = 256 * 1024 * 1024;
   std::function<bool()> cancelled;
   double max_normal_sample_error = .02;
+  SourceNormalUvMethod normal_sampling = SourceNormalUvMethod::Rasterize;
 };
 struct SourceUvBakeInput {
   std::shared_ptr<const PaintedMesh> paint;
@@ -33,6 +40,11 @@ struct SourceUvBakeInput {
   // Destination vertex -> original PaintedMesh vertex. Every ordered corner
   // must map exactly; topology/geometry/order changes are not nearest-projected.
   std::vector<uint32_t> source_vertices;
+  // Transient own-Scene witness for raw current-corner paint. A PA surface is
+  // never admitted from counts or from an unrelated retained Origin alone.
+  std::shared_ptr<const PolygonAuthority> polygon_authority;
+  // Required for prepared corner colour transfer: the exact new own topology.
+  std::shared_ptr<const PolygonAuthority> target_polygon;
 };
 struct SourceUvBakeResult {
   Mesh target;
@@ -65,6 +77,10 @@ struct SourceUvBakeResult {
   std::vector<std::string> diagnostics;
   std::shared_ptr<const DeformationState> original_deformation;
   std::shared_ptr<const SourceNormalUvReprojection> normal_reprojection;
+  std::shared_ptr<const PolygonAuthority> original_polygon;
+  std::shared_ptr<const PolygonAuthority> target_polygon;
+  std::shared_ptr<const SourceColorPreparation> color_reprojection;
+  std::shared_ptr<const SourceNormalSampling> normal_sampling;
 };
 // Pure bounded native worker operation. No file access, GL, source mutation,
 // automatic flattening or live-project installation. Rasterizes exact face

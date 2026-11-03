@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "paint-archive-shape.hpp"
 #include "dome/polygon-scene.hpp"
 #include <nlohmann/json.hpp>
 namespace dome::detail {
@@ -15,6 +16,7 @@ inline void require_polygon_paint_owner(const PaintedMesh *paint,const PolygonAu
   throw std::invalid_argument("Polygon-authored paint requires its own nonempty active polygon authority and rest derivative");
 }
 inline bool polygon_paint_policy(const nlohmann::json &paint) {
- return paint.is_object()&&paint.contains("uv_policy")&&paint.at("uv_policy").is_string()&&paint.at("uv_policy").get_ref<const std::string&>()=="polygon-authored";
+ if(!paint.is_object())return false;const auto &p=paint_archive_payload(paint,true);
+ return p.contains("uv_policy")&&p.at("uv_policy").is_string()&&p.at("uv_policy").get_ref<const std::string&>()=="polygon-authored";
 }
 }

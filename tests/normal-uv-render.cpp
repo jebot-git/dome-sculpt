@@ -13,8 +13,8 @@ void settled(Document &document) {
     throw std::runtime_error("Normal UV authoring: " + document.frame().state->error);
 }
 
-Scene prepared(bool typed) {
-  auto scene = typed ? colored_vrm_fixture::model(true, true, true)
+Scene prepared(bool typed,bool secondary_uv=false) {
+  auto scene = typed ? colored_vrm_fixture::model(true, true, true,secondary_uv)
                      : normal_preparation_fixture::model();
   ObjectBakeSettings settings;
   settings.prepare_normals = true;

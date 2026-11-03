@@ -123,13 +123,11 @@ Material native_material(const ImportedMaterial &m) {
 std::shared_ptr<const PaintSourceMaps>
 maps(const ImportedAsset &asset, const ImportedMaterial &m,
      const std::vector<std::shared_ptr<const Image>> &images,
-     const ImportedPrimitive &primitive, std::span<const uint32_t> vertices, bool prepare) {
+     const ImportedPrimitive &primitive, std::span<const uint32_t> vertices) {
   auto result = std::make_shared<PaintSourceMaps>();
   auto view = [&](PaintSourceTexture &out, int index, int coordinate) {
     if (index < 0)
       return;
-    if (coordinate != 0 && !prepare)
-      throw std::invalid_argument("Native authoring import maps currently require TEXCOORD_0; enable Prepare editable texture atlas for other coordinate sets");
     const auto &t = asset.textures.at(size_t(index));
     out.image = images.at(size_t(t.image));
     out.wrap_s = t.wrap_s;
@@ -148,6 +146,12 @@ maps(const ImportedAsset &asset, const ImportedMaterial &m,
     auto domain=std::make_shared<std::vector<std::array<float,2>>>();domain->reserve(vertices.size());
     for(auto vertex:vertices)domain->push_back(primitive.uv1.at(vertex));
     result->uv1=std::move(domain);
+  }
+  for(const auto *view:{&result->color,&result->metal_rough,&result->normal,&result->emission,&result->occlusion})if(view->image&&view->texcoord>=2){
+    const auto set=uint32_t(view->texcoord);if(result->extra_uv_sets.contains(set))continue;
+    const auto &source=primitive.extra_uv_sets.at(set);
+    if(source.size()!=primitive.mesh.positions.size())throw std::invalid_argument("Imported texture requires missing additional UV coordinates");
+    auto domain=std::make_shared<std::vector<std::array<float,2>>>();domain->reserve(vertices.size());for(auto vertex:vertices)domain->push_back(source.at(vertex));result->extra_uv_sets.emplace(set,std::move(domain));
   }
   result->normal_scale = m.normal_scale;
   result->occlusion_strength = m.occlusion_strength;
@@ -168,7 +172,7 @@ frames(const ImportedPrimitive &p, const ImportedMaterial &m,
   std::iota(f->source_corners.begin(), f->source_corners.end(), 0);
   const bool tangent = (p.normals_authored && !p.tangents.empty()) || m.normal_texture >= 0;
   if (tangent) {
-    const auto &uv = m.normal_texcoord == 1 ? p.uv1 : p.mesh.uv;
+    const auto &uv = m.normal_texcoord==0 ? p.mesh.uv : m.normal_texcoord==1 ? p.uv1 : p.extra_uv_sets.at(uint32_t(m.normal_texcoord));
     auto original = detail::source_tangent_frames(p, uv, cancelled);
     f->normals = std::move(original.normals);
     f->tangents = std::move(original.base);
@@ -413,7 +417,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       PaintSurfaceOptions paint_options;
       paint_options.policy = PaintUvPolicy::SourceAuthored;
       paint_options.cancelled = options.limits.cancelled;
-      auto source_maps = maps(*asset, m, *images, p, remap, options.prepare_texture_atlas);
+      auto source_maps = maps(*asset, m, *images, p, remap);
       // The legacy codec authorizes SourceAuthored only with raw source maps.
       // Plain original UV authority is a Scene11 feature; do not emit a record
       // the current reader would refuse, or silently alter overlapping raw UVs.
@@ -563,6 +567,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
   if(std::any_of(adopted_bone_metadata.begin(),adopted_bone_metadata.end(),[](auto value){return value!=0;}))
     output.diagnostics.push_back("Retained authored bone lengths; other applications may display bones differently");
   output.scene.validate();
+  if(!options.prepare_texture_atlas && std::any_of(output.objects.begin(),output.objects.end(),[&](uint64_t id){const auto &o=output.scene.object(id);return o.painted && o.painted->source_maps() && o.painted->source_maps()->uses_alternate_uv();}))
+    output.diagnostics.insert(output.diagnostics.begin(),"Original source coordinates retained; prepare an editable texture atlas before painting");
   if (vrm.version != detail::VrmImportVersion::None)
     output.diagnostics.push_back(
         "VRM source version, humanoid/node/material/morph identities, "

@@ -391,6 +391,13 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
       return;
     }
     float x = s.panel_u * 640, y = s.panel_v * 640;
+    if(pressed&&x>=8&&x<=102&&y>=301&&y<=343){
+      uv_gesture_end(true);controls_.push_back({VrControlEventType::UvCommand,parameter_,int(UvAction::RetainPaint),0});return;
+    }
+    if(pressed&&x>=8&&x<=102&&y>=249&&y<=291){
+      uv_gesture_end(true);
+      controls_.push_back({VrControlEventType::UvCommand,parameter_,int(UvAction::RetainNormals),0});return;
+    }
     if (pressed && x >= 8 && x <= 102 &&
         ((y >= 145 && y <= 187) || (y >= 197 && y <= 239))) {
       uv_gesture_end(true);

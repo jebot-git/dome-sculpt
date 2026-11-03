@@ -1,0 +1,43 @@
+{
+  "source_commit": "58da9c42b39eb20f8b60bb0b37f598ef507d25ed",
+  "scope": "Structural pool1/Paint2 envelope only; Scene24 material/current-field/normal closure and native exposure remain guarded",
+  "source_sha256": {
+    "CMakeLists.txt": "0669b4e0786a8889fd396bec0058445296d2d5b8a810a5ecd86f9436c5498a9e",
+    "include/dome/paint-sampling.hpp": "9d79430340a0166117c71965820dc727f951a7a9e880d1ad323e191f3ba70e87",
+    "include/dome/paint.hpp": "b35422ff2a0baa379a628f14f67f16d943fb2514edd92a520145b824e998a39b",
+    "src/paint.cpp": "48546b94966ae6da9129c92d78f3d2a2b7a3a37d90e3a58d6c0e58c5343728c0",
+    "src/paint-sampling.cpp": "514cba2b2d3b9bda034682556a3cbdf2f9f866c143fec7c793e7c873ffff1e3a",
+    "src/paint-sampling-archive.cpp": "e4f72e599f4987f051866525e8b00da368f6d61ad67a0a254608bc0b477381a4",
+    "tests/paint-sampling-grid.cpp": "2e5d715bea687eb2d77b5afd87946d091b86c2f2d9b451354b2fdebcf54def31",
+    "tests/paint-sampling-archive.cpp": "c384c388dec2803b3e47c221f5097245040113110bf5a9b1ebc1114db47ddffb"
+  },
+  "release": {
+    "passed": 4,
+    "seconds": 3.14,
+    "log_sha256": "542615350d51c23123419b9586e0fb5b3ea1cebf2c68b36f6087e7ca917d424f"
+  },
+  "own_c_cxx_core_support_sanitizers": {
+    "passed": 4,
+    "seconds": 30.16,
+    "flags": "O1 g1 ASAN UBSAN fno-omit-frame-pointer fno-pie/no-pie; leaks enabled",
+    "log_sha256": "a257dbe7a595ee9bdd3d971f88db676455b4b4adbcbead1b8b65affdb4f0956a"
+  },
+  "assertions": {
+    "geometry": 62,
+    "grid": 84,
+    "archive": 194,
+    "persistent_reconstruction_allocation_boundaries": 80
+  },
+  "frozen_implicit_v1_negative": {
+    "source_commit": "53ff88b",
+    "helper_sha256": "68b711723d98cce7109968b709235545daf28b9fef95d9922a7fa2cc69a866d2",
+    "binary_sha256": "3a214958377fef2f2851374f2d0eb14ec9f297435fe8d5ef97cd244f24aa861c",
+    "log_sha256": "c626621ce984bada003df59d90b886379bf66f538c018cae2a2a535da4079d42",
+    "old_core_sha256": "b5459023f34d377a1ba7d4b19e336492996064c05cf41e0e8c1278f748433972",
+    "old_paint_header_sha256": "daa4c0e80db4bf974aac9af888bd8f78322c62f1027bebdd28896b6095f10be3"
+  },
+  "core_archives": {
+    "build/libdome-sculpt-core.a": "4e7bb0504681b4f58f2d0eb5bf39fe5a9a150c071de9d14576bda8b27fed3962",
+    "build-ownsan/libdome-sculpt-core.a": "48e4489fe80fa89cd25f4ec49a5a2b2b1b06c2d9a9cd8b040723d4809e838014"
+  }
+}

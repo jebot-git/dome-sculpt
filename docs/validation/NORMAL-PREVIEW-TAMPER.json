@@ -1,0 +1,38 @@
+{
+  "runtime": "3a55fa3",
+  "scope": "test-only overlay against exact frozen3a headers and completed wholly owned C/C++core/support/render; no new runtime/ABI",
+  "runtime_sources_unchanged": 375,
+  "libraries": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libdome-sculpt-core.a": "302684ab2cf5ba7b9fb7a2f45fe027ee4a7047b68a68f878f4d19d55d415bb55",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libdome-sculpt-render.a": "4fc3d1ec9853875e2841ffbcaf6ad19ed6998a0ed86e22d77f5fa28ecffde562",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libdome-sculpt-affine.a": "1742c0cd94a04cfc73eefa975c249ed91ca63e046a6697aadc6e9056ab0798f2",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libdome-sculpt-polygon.a": "cd56464ef2e324840c10874c1e15befb8b40678979fee07f71480f4d81d4aadb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libxatlas.a": "4e532a7d40be2b1c1b668b73f8b82879e2bca01b3691afbe6131f44bf872346b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libmikktspace.a": "4e9a1017057c875b49cc01d0ebd7413925387c26934d9cc718fdcf043f903a1a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libmikktspace-robust.a": "8c07a8dee5940350e8b036478a57af539474e72eba566571781daa3f77a784e5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build/libufbx.a": "a8a0afb8bf4e264b8a82b4f5a708b89d31a666dfe279d86d93400a6fdb2d8f19",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libdome-sculpt-core.a": "a6e94950b2b9289e0195caa40737c0836b6c014022ed48cd68550978cb723759",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libdome-sculpt-render.a": "477eb4a30f683b20b0e59bee0910b1629ca1d6204fbc1c9e4f1df826b412406e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libdome-sculpt-affine.a": "5b3ada898c158707e7799bb54b5459c94da7a8323448618dc92f79f3241d0b39",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libdome-sculpt-polygon.a": "1636714f511a65115c118f169372c2abf0de6c20137db2c9320b4bda9135b1e8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libxatlas.a": "f9b12c2046cd4b5e4a41137ab67931b925e748a110e1f73242cad06fce4a8905",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libmikktspace.a": "54ef6dac670ed0e10718b60be812fd7be7e9e6ba40fa12d5efcf9146b1dbcff0",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libmikktspace-robust.a": "92dc8f8cfa322378122db3adfb138b99de44db63bd2313ef32b28eb2c151605d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/paint-sampling-normal-current-8858f42/build-sanitize/libufbx.a": "e20745ce83533d6499209127e16dbf48f3e6eb3ddde2fb991d71581d812534e0"
+  },
+  "test_sha256": "2ff4e9d81e838f0e2da3b20cec8bc3bfbbbe1c3d88a49cc5d450b5eef851f94c",
+  "release": {
+    "checks": 34,
+    "session": 7699,
+    "exit": 0
+  },
+  "sanitizer": {
+    "checks": 34,
+    "session": 13143,
+    "exit": 0,
+    "owned_c_cpp": "O1 ASan+UBSan/leaks",
+    "reports": 0
+  },
+  "allocation_legality": "make_shared<T> sampler and recipe, genuine replay factory, mutable aliases intentionally retained; no const_cast and no private geometry/vector mutation",
+  "remaining": "Full8858SAN7 and3aSAN8 remain live; no final admission claim"
+}

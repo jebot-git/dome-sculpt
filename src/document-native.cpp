@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/paint-sampling.hpp"
+#include "dome/normal-preview.hpp"
 #include "affine-surface.hpp"
 #include "document-held-affine.hpp"
 #include "dome/polygon-scene.hpp"
@@ -30,6 +32,7 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   if(o.mesh_active&&!state_.shape_sculpt&&state_.projection&&state_.projection->loading)return false;
   if(native_stroke_){state_.message="Finish or cancel the current desktop stroke before starting another";publish_locked();return false;}
   if((o.polygon&&o.polygon->active&&!o.mesh_active)||desktop_||state_.polygon||state_.cut||state_.retopology||state_.weights.enabled||uv_||control_before_||state_.asset_busy||state_.recovery_busy||action_active_locked()||input_.menu_open()||!object_editable_locked(o.id)||(!o.mesh_active&&!volume().editable_layer()&&!volume().sculpt_settings().mask_edit))return false;
+  if(!state_.shape_sculpt && reject_texture_paint_locked())return false;
   if(scene_.has_affine_placement(o.id)&&state_.object_grabbing&&(space!=NativeStrokeSpace::EvaluatedWorldBrush||!held_affine_||held_affine_->base_edit!=o.affine_edit))return false;
   if(scene_.has_affine_placement(o.id)&&!o.mesh_active){state_.message="Affine sculpt strokes require the full field metric path";publish_locked();return false;}
   auto preview=mesh_.load();
@@ -142,6 +145,7 @@ void Document::native_loop(){
       size_t budget=4'000'000;if(!session->shape_target)for(const auto &other:working.objects())if(other.id!=o.id){auto used=std::max(other.volume->stored_samples(),other.volume->voxels().size());if(used>budget)throw std::length_error("Scene sculpt storage budget exceeded");budget-=used;}
       std::unique_ptr<MaterialSurfaceQuery> query;
       std::vector<std::array<float,4>> query_colors;
+      std::vector<std::array<float,2>> query_paint;
       std::unique_ptr<ShapeSculptDraft> shape;
       std::shared_ptr<const PaintedMesh::Evaluation> evaluation;
       if(session->shape_target){
@@ -163,6 +167,12 @@ void Document::native_loop(){
         if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
         SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings};
         range.reflected=reflected;
+        if(o.painted->paint_sampling_domain()) {
+          range.paint_sampling_attachment=o.painted->paint_sampling_attachment();
+          range.normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
+          PaintSamplingLimits limits;limits.cancelled=cancelled;
+          query_paint=o.painted->paint_sampling_domain()->corner_coordinates(o.painted->mesh(),limits);
+        }
         range.pbr_view=session->pbr_view;
         PolygonColorSurface current_colors;
         if(o.polygon && o.polygon->active && o.polygon->colors) {
@@ -172,7 +182,7 @@ void Document::native_loop(){
         query_colors=detail::current_vertex_colors(o.painted->mesh(),
             current_colors.field?&current_colors:nullptr,o.appearance.get(),
             o.material_bindings.get(),range.textures.get(),cancelled);
-        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);if(!shape)o.painted->begin_stroke();
+        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors,PaintCornerCoordinates{query_paint});if(!shape)o.painted->begin_stroke();
       }else o.volume->begin_stroke();
       std::shared_ptr<const MaterialSurfaceQuery> scene_query;
       std::optional<PaintProjection> world_projector;
@@ -185,7 +195,7 @@ void Document::native_loop(){
            std::any_of(session->original_preview->ranges.begin(),session->original_preview->ranges.end(),[&](const auto &range){return range.count&&std::find(session->projection_excluded.begin(),session->projection_excluded.end(),range.object)==session->projection_excluded.end();})){
           scene_query=session->original_preview->picking;
           if(!scene_query)scene_query=std::make_shared<MaterialSurfaceQuery>(session->original_preview->mesh,
-              session->original_preview->ranges,cancelled,session->original_preview->source_colors);
+              session->original_preview->ranges,cancelled,session->original_preview->source_colors,PaintVertexCoordinates{session->original_preview->paint_coordinates});
         }
       }
       std::optional<Vec3> previous;size_t processed=0;auto shown=std::chrono::steady_clock::now();

@@ -13,6 +13,8 @@ std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *);
 int mtoon_coordinate(const MToonTexture &);
 SourceNativeMaterial native_source(const CreatorAppearance &);
 float mtoon_factor(float typed, float original, float current);
+struct PaintCornerCoordinates { std::span<const std::array<float,2>> values; };
+struct PaintVertexCoordinates { std::span<const std::array<float,2>> values; };
 class MaterialSurfaceQuery {
   struct Impl;
   std::unique_ptr<Impl> impl_;
@@ -24,6 +26,11 @@ public:
   MaterialSurfaceQuery(const Mesh &, std::span<const SurfaceRange>,
                        const std::function<bool()> &cancelled,
                        std::span<const std::array<float,4>> packed_colors);
+  // Explicit coordinate alignment: logical input triangles or packed vertices.
+  MaterialSurfaceQuery(const Mesh &,std::span<const SurfaceRange>,const std::function<bool()> &,
+                       std::span<const std::array<float,4>>,PaintCornerCoordinates);
+  MaterialSurfaceQuery(const Mesh &,std::span<const SurfaceRange>,const std::function<bool()> &,
+                       std::span<const std::array<float,4>>,PaintVertexCoordinates);
   ~MaterialSurfaceQuery();
   MaterialSurfaceQuery(const MaterialSurfaceQuery &) = delete;
   MaterialSurfaceQuery &operator=(const MaterialSurfaceQuery &) = delete;

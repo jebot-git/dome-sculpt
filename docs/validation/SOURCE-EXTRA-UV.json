@@ -1,0 +1,109 @@
+{
+  "artifact_sha256": {
+    "arc-contiguous/after.json": "1d8c122e1d16d538fac7c905965e018d876f31b3152651132f5a604b83b351a9",
+    "arc-contiguous/before.json": "1d8c122e1d16d538fac7c905965e018d876f31b3152651132f5a604b83b351a9",
+    "arc-contiguous/results.json": "69318e1201367f4ebcd96a23ac94ff55ea186f5b38de39363df95f0a7bb7d5b1",
+    "contiguous-source2-after.json": "a575ada9ba4e1dd173f7d6b4d6a92a9ea6cbe5959d9b7ed8f83f153d723c9ab1",
+    "contiguous-source2-before.json": "a575ada9ba4e1dd173f7d6b4d6a92a9ea6cbe5959d9b7ed8f83f153d723c9ab1",
+    "source26-arc-khronos.json": "935c3d5d300fb123ed1e31459e116ff7eafa623bd4e719ac7c115bbf432f8c96",
+    "source26-software-khronos.json": "9eb9421091f9f68369eadb04e20ac4c9e06f01aac13684525a3a9b502ed846e2",
+    "tests-contiguous-sanitize.log": "88c23cdc773b216e5f36c83d776b4cd723fb9d3e8ea0b4273c24abd1bad7628a",
+    "tests-contiguous2.log": "341d1e8eaa84cdbf8c5e6eb0516c68be4befccb78a16a8e1d16d5beff24fc954"
+  },
+  "base": "f615fd2b3400b38f0471aab13f59d729cc0afc09",
+  "formats": {
+    "generated_extra_uv_frames": 2,
+    "legacy_bytes": "conditional unchanged when feature unused",
+    "scene": 26,
+    "source_maps": 2
+  },
+  "hardware": {
+    "assertions": 385,
+    "cases": [
+      {
+        "case": "generated",
+        "returncode": 0,
+        "seconds": 4.372122875996865
+      },
+      {
+        "case": "roles",
+        "returncode": 0,
+        "seconds": 0.46480028600490186
+      },
+      {
+        "case": "native",
+        "returncode": 0,
+        "seconds": 2.1678728590050014
+      },
+      {
+        "case": "stream",
+        "returncode": 0,
+        "seconds": 0.16421505900507327
+      },
+      {
+        "case": "compiler",
+        "returncode": 0,
+        "seconds": 3.620776083000237
+      }
+    ],
+    "hashes_unchanged": true,
+    "pci": "0000:03:00.0",
+    "renderer_required": [
+      "Intel",
+      "Arc",
+      "A770"
+    ],
+    "software_uhd_refused": true,
+    "source_binary_hashes": 670
+  },
+  "khronos": {
+    "filtered": false,
+    "hardware": {
+      "errors": 0,
+      "files": 143,
+      "intentional_non_asset_cancellation_sentinels": 3,
+      "warnings": 114
+    },
+    "maxIssues": 0,
+    "software": {
+      "errors": 0,
+      "files": 90,
+      "warnings": 60
+    },
+    "version": "2.0.0-dev.3.10"
+  },
+  "main_admission": false,
+  "not_claimed": [
+    "raw alternate-UV import or painting admission",
+    "new FLTK/menu execution",
+    "synthetic-loader Source26 run",
+    "physical headset or installation",
+    "FBX sets above1",
+    "Paint24 composition",
+    "preUV colour/alpha preservation",
+    "full-suite completion"
+  ],
+  "persistent_new_denials": {
+    "admission": 646,
+    "decode": 1126,
+    "total": 1772
+  },
+  "preserved_negative": "f615 sparse UV3..7 fixtures:89 files/150errors/60warnings; later genuine complete arrays and parser/export gap refusals replace that interoperability claim",
+  "public_abi": [
+    "ImportedPrimitive.extra_uv_sets",
+    "PaintSourceMaps.extra_uv_sets"
+  ],
+  "release": {
+    "native_ui_xr_build": true,
+    "seconds": 9.12,
+    "suites": 8
+  },
+  "sanitizers": {
+    "flags": "-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+    "leaks": true,
+    "owned_cpp_and_c_support": true,
+    "seconds": 104.29,
+    "suites": 8
+  },
+  "status": "qualified-private-foundation"
+}

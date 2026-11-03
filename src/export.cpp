@@ -57,6 +57,13 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
+  for(const auto &object:input_objects)if((object.paint_sampling_attachment||!object.paint_corner_coordinates.empty())&&
+      (source_space!=SourceMorphSpace::Native||!object.material_bindings||!object.material_bindings->normal_frames))
+    throw std::invalid_argument("Retained paint export requires its complete native normal/colour coordinate compiler");
+  for(const auto &object:input_objects) {
+    const auto node=object.material_bindings&&object.material_bindings->color_preparation?object.material_bindings->color_preparation->paint_sampling:nullptr;
+    if(bool(node)!=bool(object.paint_sampling_attachment))throw std::invalid_argument("Current paint export omitted or fabricated its own sampling attachment");
+  }
   GltfDocument result;
   const auto &objects=input_objects;
   if (objects.empty() || objects.size()>256)
@@ -152,8 +159,12 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   std::map<const ImportedAsset *,detail::SourceBoneMetadata> bone_metadata;
   std::vector<bool> vertex_transparency;
   vertex_transparency.reserve(objects.size());
+  // Compiled coordinate bindings are not native PaintSourceTexture authority.
+  std::vector<unsigned> retained_normal_sets;retained_normal_sets.reserve(objects.size());
+  std::vector<unsigned> retained_paint_sets;retained_paint_sets.reserve(objects.size());
   for (const auto &input : objects) {
     stop();
+    retained_normal_sets.push_back(0);retained_paint_sets.push_back(0);
     auto validated_colors=detail::current_vertex_colors(input,cancelled);
     bool vertex_alpha=false;
     if(!validated_colors.empty())for(auto v:input.mesh.indices) {
@@ -163,13 +174,14 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
-    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled);
+    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
     if(frame){emission.canonical_normal=frame->canonical_normal;emission.prepared_normal=frame->prepared_normal;}
     auto &mesh = o.mesh;
     const auto source_uv1=input.textures&&input.textures->source_maps?input.textures->source_maps->uv1:nullptr;
-    if(source_uv1)input.textures->source_maps->validate_surface(input.mesh);
+    const auto source_maps=input.textures?input.textures->source_maps:nullptr;
+    if(source_maps&&(source_uv1||!source_maps->extra_uv_sets.empty()))source_maps->validate_surface(input.mesh);
     std::optional<SourceMorphTransport> source_attributes;
     if(!frame)source_attributes.emplace(o,source_space,cancelled);
     mesh.validate();
@@ -196,6 +208,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     int normals = add(begin, data.size() - begin, 34962, mesh.normals.size(),
                       5126, "VEC3");
     nlohmann::json attributes = {{"POSITION", positions}, {"NORMAL", normals}};
+    std::vector<std::array<float,2>> emitted_uv1;
+    std::map<unsigned,std::vector<std::array<float,2>>> emitted_extra_uv;
     if (!mesh.uv.empty()) {
       begin = data.size();
       for (auto p : mesh.uv)
@@ -216,11 +230,25 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         begin=data.size();for(auto v:a.source_vertices){if(v>=values.size())throw std::invalid_argument("Source attribute vertex index is missing");floats(values[v]);}
         attributes[name]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,type);
       };
-      if(!source_uv1)attribute(source->uv1,"TEXCOORD_1","VEC2");
+      if(!source_uv1){
+        attribute(source->uv1,"TEXCOORD_1","VEC2");
+        if(frame&&(!frame->normal_coordinates.empty()||!frame->paint_coordinates.empty())&&!source->uv1.empty())
+          for(auto v:a.source_vertices)emitted_uv1.push_back(source->uv1.at(v));
+      }
       else if(!source->uv1.empty()){
         if(a.source_vertices.size()!=mesh.positions.size())throw std::invalid_argument("Export UV1 appearance domain differs from emitted vertices");
         for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();auto native=frame?frame->rest_vertices.at(vertex):vertex;
           if(source_uv1->at(native)!=source->uv1.at(a.source_vertices[vertex]))throw std::invalid_argument("Export PBR and retained source UV1 domains differ");
+        }
+      }
+      for(const auto &[set,values]:source->extra_uv_sets){
+        if(set<2||set>7)throw std::invalid_argument("Original additional UV attribute exceeds export policy");
+        if(source_maps&&source_maps->extra_uv_sets.contains(set)){
+          const auto &current=*source_maps->extra_uv_sets.at(set);
+          for(size_t v=0;v<mesh.positions.size();++v){checkpoint();auto native=frame?frame->rest_vertices.at(v):v;if(current.at(native)!=values.at(a.source_vertices.at(v)))throw std::invalid_argument("Export additional source UV authority differs from original attributes");}
+        }else{
+          std::vector<std::array<float,2>> remapped;remapped.reserve(a.source_vertices.size());for(auto v:a.source_vertices){checkpoint();remapped.push_back(values.at(v));}
+          begin=data.size();for(auto uv:remapped)floats(uv);attributes["TEXCOORD_"+std::to_string(set)]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");emitted_extra_uv[set]=std::move(remapped);
         }
       }
       if(!frame)tangents=source_attributes->base_tangents();
@@ -236,8 +264,50 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     }
     if(source_uv1){
       begin=data.size();
-      for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();floats(source_uv1->at(frame?frame->rest_vertices.at(vertex):vertex));}
+      for(size_t vertex=0;vertex<mesh.positions.size();++vertex){checkpoint();auto uv=source_uv1->at(frame?frame->rest_vertices.at(vertex):vertex);floats(uv);if(frame&&(!frame->normal_coordinates.empty()||!frame->paint_coordinates.empty()))emitted_uv1.push_back(uv);}
       attributes["TEXCOORD_1"]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");
+    }
+    if(source_maps)for(const auto &[set,coordinates]:source_maps->extra_uv_sets){
+      std::vector<std::array<float,2>> remapped;remapped.reserve(mesh.positions.size());for(size_t v=0;v<mesh.positions.size();++v){checkpoint();remapped.push_back(coordinates->at(frame?frame->rest_vertices.at(v):v));}
+      begin=data.size();for(auto uv:remapped)floats(uv);attributes["TEXCOORD_"+std::to_string(set)]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");emitted_extra_uv[set]=std::move(remapped);
+    }
+    if(frame&&!frame->normal_coordinates.empty()){
+      if(frame->normal_coordinates.size()!=mesh.positions.size())throw std::invalid_argument("Retained normal export vertex correspondence differs");
+      if(frame->normal_coordinates==mesh.uv)retained_normal_sets.back()=0;
+      else if(attributes.contains("TEXCOORD_1")&&frame->normal_coordinates==emitted_uv1)retained_normal_sets.back()=1;
+      else{
+        auto existing=std::find_if(emitted_extra_uv.begin(),emitted_extra_uv.end(),[&](const auto &entry){return entry.second==frame->normal_coordinates;});
+        if(existing!=emitted_extra_uv.end())retained_normal_sets.back()=existing->first;
+        else{unsigned coordinate=1;while(attributes.contains("TEXCOORD_"+std::to_string(coordinate)))++coordinate;
+          if(coordinate>7)throw std::length_error("Retained normal export exceeds source UV coordinate policy");
+          begin=data.size();for(auto uv:frame->normal_coordinates)floats(uv);
+          attributes["TEXCOORD_"+std::to_string(coordinate)]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");retained_normal_sets.back()=coordinate;
+        }
+      }
+      // The source image/sampler remains a valid native view. Only the glTF
+      // compiler owns the separate emitted accessor/texture-info association.
+      emission.prepared_normal.texcoord=0;
+    }
+    if(frame&&!frame->paint_coordinates.empty()) {
+      const auto &coordinates=frame->paint_coordinates;
+      if(coordinates.size()!=mesh.positions.size())throw std::invalid_argument("Paint export vertex correspondence differs");
+      unsigned coordinate=0;
+      if(coordinates==mesh.uv)coordinate=0;
+      else if(attributes.contains("TEXCOORD_1")&&coordinates==emitted_uv1)coordinate=1;
+      else if(!frame->normal_coordinates.empty()&&coordinates==frame->normal_coordinates)coordinate=retained_normal_sets.back();
+      else if(auto found=std::find_if(emitted_extra_uv.begin(),emitted_extra_uv.end(),[&](const auto &entry){return entry.second==coordinates;});found!=emitted_extra_uv.end())coordinate=found->first;
+      else {
+        coordinate=1;while(coordinate<8&&attributes.contains("TEXCOORD_"+std::to_string(coordinate)))++coordinate;
+        if(coordinate==8)throw std::length_error("Paint export has no free glTF coordinate domain");
+        begin=data.size();for(auto uv:coordinates){checkpoint();floats(uv);}
+        attributes["TEXCOORD_"+std::to_string(coordinate)]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");
+      }
+      retained_paint_sets.back()=coordinate;
+    }
+    bool uv_gap=false;
+    for(unsigned coordinate=0;coordinate<8;++coordinate) {
+      if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))uv_gap=true;
+      else if(uv_gap)throw std::invalid_argument("glTF export requires genuine contiguous TEXCOORD arrays; missing source sets cannot be invented or relabeled");
     }
     if(!tangents.empty()){
       begin=data.size();for(auto t:tangents)floats(t);
@@ -579,10 +649,10 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     j["textures"].push_back({{"source",source},{"sampler",sampler}});
     texture_ids[key2]=index; return index;
   };
-  bool secondary_uv_available=false;
+  std::array<bool,8> uv_available{};
   auto source_info = [&](const PaintSourceTexture &slot) {
-    slot.validate(secondary_uv_available?2:1);
-    if(slot.texcoord!=0 && !(slot.texcoord==1 && secondary_uv_available)) throw std::invalid_argument("Export surface has no requested source UV set");
+    slot.validate(8);
+    if(slot.texcoord<0||slot.texcoord>7||!uv_available[size_t(slot.texcoord)]) throw std::invalid_argument("Export surface has no requested source UV set");
     nlohmann::json info={{"index",texture(*slot.image,slot)}};
     if(slot.texcoord) info["texCoord"]=slot.texcoord;
     const auto &m=slot.uv_transform;
@@ -604,7 +674,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   };
   for(size_t i=0;i<objects.size();++i) if(objects[i].textures) {
     if(objects[i].mesh.uv.empty()) throw std::invalid_argument("Textured meshes require UV coordinates");
-    secondary_uv_available=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_1");
+    for(size_t coordinate=0;coordinate<8;++coordinate)uv_available[coordinate]=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_"+std::to_string(coordinate));
     const auto &maps=*objects[i].textures;
     const bool prepared_color=detail::prepared_color_state(objects[i].material_bindings.get(),&maps);
     detail::prepared_normal_state(objects[i].material_bindings.get(),&maps);
@@ -639,9 +709,15 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       int orm=texture(maps.metal_rough,sampler);
       pbr["metallicRoughnessTexture"]={{"index",orm}};
       material["occlusionTexture"]={{"index",orm}};
-      if(!maps.normal.rgba.empty()) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
+      if(!maps.normal.rgba.empty()&&!(maps.normal_projection&&maps.normal_projection->version==2)) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
       material["emissiveTexture"]={{"index",texture(maps.emission,emission_sampler)}};
       material["emissiveFactor"]={1,1,1};
+      if(objects[i].paint_sampling_attachment) {
+        const auto coordinate=retained_paint_sets.at(i);
+        const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
+        if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))throw std::logic_error("Compiled paint coordinate accessor is missing");
+        if(coordinate)for(auto *info:{&pbr["baseColorTexture"],&pbr["metallicRoughnessTexture"],&material["occlusionTexture"],&material["emissiveTexture"]})(*info)["texCoord"]=coordinate;
+      }
     }
     if(maps.source_maps) {
       const auto &source=*maps.source_maps; source.validate();
@@ -659,6 +735,14 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           (prepared_color?maps.pbr_transparent:maps.transparent))?"BLEND":"OPAQUE";
     if(result.objects[i].canonical_normal.image) {
       material["normalTexture"]=source_info(result.objects[i].canonical_normal);
+      material["normalTexture"]["scale"]=1;
+    }
+    if(maps.normal_projection&&maps.normal_projection->version==2){
+      material["normalTexture"]=source_info(result.objects[i].prepared_normal);
+      const auto coordinate=retained_normal_sets.at(i);
+      const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
+      if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))throw std::logic_error("Compiled normal coordinate accessor is missing");
+      if(coordinate)material["normalTexture"]["texCoord"]=coordinate;
       material["normalTexture"]["scale"]=1;
     }
   }

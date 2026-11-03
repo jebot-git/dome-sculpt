@@ -9,7 +9,8 @@
 #include "text-utf8.hpp"
 #include "dome/tangents.hpp"
 #include "shapekey-normal-preparation.hpp"
-#include <map>
+#include "shapekey-source-uv.hpp"
+#include <vector>
 namespace dome {
 namespace {
 void stop(const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("Shapekey authoring cancelled");}
@@ -73,6 +74,70 @@ NormalFrameTarget authored_attributes(const Mesh &rest,const NormalFrames &artis
  return result;
 }
 
+// Capture the native shader's face UV derivative instead of smoothing adjacent
+// face tangents with Mikk. FixedAttributes stores these genuine corner values;
+// no imported tangent authority or CanonicalMikk interpretation is claimed.
+std::vector<Tangent> native_derivative_tangents(const Mesh &mesh,
+    const NormalFrames &base,const NormalFrameTarget *key,
+    std::span<const Vec3> delta,const std::function<bool()> &cancelled) {
+ std::vector<Tangent> result;result.reserve(mesh.indices.size());
+ auto position=[&](uint32_t v){return mesh.positions[v]+(delta.empty()?Vec3{}:delta[v]);};
+ for(size_t c=0;c<mesh.indices.size();c+=3){if((c&1023)==0)stop(cancelled);
+  const auto i=mesh.indices[c],j=mesh.indices[c+1],k=mesh.indices[c+2];
+  const auto e1=position(j)-position(i),e2=position(k)-position(i);
+  const auto a=mesh.uv[i],b=mesh.uv[j],d=mesh.uv[k];
+  const float u1=b[0]-a[0],v1=b[1]-a[1],u2=d[0]-a[0],v2=d[1]-a[1],det=u1*v2-u2*v1;
+  const float scale=std::sqrt((u1*u1+v1*v1)*(u2*u2+v2*v2));
+  if(!std::isfinite(det)||std::abs(det)<=1e-8f*std::max(scale,1e-20f))
+   throw std::invalid_argument("Native normal coordinate derivatives are singular; prepare a valid normal basis before key authoring");
+  const auto raw_t=(e1*v2-e2*v1)/det,raw_b=(e2*u1-e1*u2)/det;
+  for(size_t corner=c;corner<c+3;++corner){auto n=base.normals[corner];if(key&&!key->normals.empty())n+=key->normals[corner];n=normalized(n);
+   auto t=raw_t-n*dot(n,raw_t);const float size=length(t);
+   if(!finite(t)||!std::isfinite(size)||size<1e-10f)throw std::invalid_argument("Native normal derivative tangent is singular");
+   t=t/size;const float hand=dot(cross(n,t),raw_b)<0?-1.f:1.f;result.push_back({t.x,t.y,t.z,hand});
+  }
+ }
+ stop(cancelled);return result;
+}
+std::shared_ptr<const NormalFrameSet> capture_native_key_frames(const PaintedMesh &paint,
+    const DeformationState *deformation,const SourceMaterialBindings &binding,
+    const std::function<bool()> &cancelled) {
+ const auto &origin=*binding.uv_origin;const auto &rest=paint.mesh();
+ // A native capture is a real new frame. It may not borrow a differently
+ // parameterized first source as if that were the current geometry/UV owner.
+ const auto &owner=origin.paint->mesh();
+ if(origin.paint->source_maps()!=paint.source_maps()||owner.indices!=rest.indices||owner.uv!=rest.uv||!equal(owner.positions,rest.positions))
+  throw std::invalid_argument("Native key frame capture requires its current owning coordinate domain");
+ const auto &maps=origin.paint->source_maps();
+ if(maps&&maps->normal.image&&maps->normal.uv_transform!=std::array<float,6>{1,0,0,1,0,0})
+  throw std::invalid_argument("Prepare source normals before capturing a transformed native normal frame");
+ auto capture=[&](detail::ShapeFrameRole role) {
+  NormalFrames selection;
+  const auto coordinate=detail::shapekey_frame_coordinate(binding,selection,role);
+  auto mesh=rest;mesh.uv=detail::shapekey_frame_coordinates(binding,coordinate,cancelled);
+  auto candidate=detail::normal_bake_frame_candidate(mesh,deformation,nullptr,
+      {128*1024*1024,128*1024*1024,cancelled});
+  auto frame=std::make_shared<NormalFrames>(*candidate.frames->pbr);
+  frame->generated_uv=coordinate;
+  const bool normal_map=role==detail::ShapeFrameRole::Pbr?bool(maps&&maps->normal.image):
+      bool(origin.material&&origin.material->parameters.normal_enabled&&origin.material->textures[size_t(MToonSlot::Normal)].index>=0);
+  if(normal_map){
+   frame->tangents=native_derivative_tangents(mesh,*frame,nullptr,{},cancelled);
+   for(size_t slot=0;slot<frame->targets.size();++slot){auto &key=frame->targets[slot];auto tangents=native_derivative_tangents(mesh,*frame,&key,deformation->morphs->targets[slot].delta,cancelled);key.tangents.clear();key.tangents.reserve(tangents.size());
+    for(size_t c=0;c<tangents.size();++c){if((c&1023)==0)stop(cancelled);const auto t=tangents[c],b=frame->tangents[c];if(t[3]!=b[3])throw std::invalid_argument("Native normal key changes immutable tangent handedness");key.tangents.push_back({t[0]-b[0],t[1]-b[1],t[2]-b[2]});}
+   }
+  }
+  frame->validate();
+  auto frames=std::make_shared<NormalFrameSet>(*candidate.frames);
+  frames->pbr=frame;frames->mtoon=frame;return frames;
+ };
+ auto frames=capture(detail::ShapeFrameRole::Pbr);
+ const bool typed_normal=origin.material&&origin.material->parameters.normal_enabled&&origin.material->textures[size_t(MToonSlot::Normal)].index>=0;
+ if(binding.has_mtoon&&(detail::shapekey_frame_coordinate(binding,NormalFrames{},detail::ShapeFrameRole::MToon)!=*frames->pbr->generated_uv||(typed_normal&&!(maps&&maps->normal.image))))
+  frames->mtoon=capture(detail::ShapeFrameRole::MToon)->pbr;
+ frames->validate();return frames;
+}
+
 }
 ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &edit,
  const std::function<bool()> &cancelled){
@@ -130,10 +195,11 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
    catch(const std::invalid_argument&e){throw std::invalid_argument(std::string("Unwrap polygon UVs before shapekey frame authoring: ")+e.what());}
   }
   auto origin=std::make_shared<SourceUvOrigin>();origin->paint=o.painted->snapshot();origin->deformation=source.deformation;
+  if(source.material_bindings&&source.material_bindings->has_mtoon){origin->material=source.material_bindings->material;origin->roles=source.material_bindings->roles;}
   if(source.material_bindings && source.material_bindings->uv_origin)binding->uv_origin=source.material_bindings->uv_origin;
   else binding->uv_origin=std::move(origin);
   binding->has_mtoon=bool(source.material_bindings)&&source.material_bindings->has_mtoon;
-  binding->normal_frames=detail::normal_bake_frame_candidate(rest,source.deformation.get(),nullptr,{128*1024*1024,128*1024*1024,cancelled}).frames;
+  binding->normal_frames=capture_native_key_frames(*o.painted,source.deformation.get(),*binding,cancelled);
   binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
   if(!source.material_bindings){binding->native_reference.color=source.material.color;binding->native_reference.emission=source.material.emissive;binding->native_reference.alpha=int(source.material.alpha);binding->native_reference.alpha_cutoff=source.material.alpha_cutoff;binding->native_reference.double_sided=source.material.double_sided;}
  }
@@ -149,10 +215,13 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const auto identity=std::find_if(frames->targets.begin(),frames->targets.end(),[&](const auto&t){return t.id==id;});
  if(replace)identity->positions=origin_delta;
  else{frames->targets.push_back({id,{},{},std::move(origin_delta)});frames->current_targets.push_back(id);}
- std::map<const NormalFrames*,std::shared_ptr<const NormalFrames>> copies;
- auto author=[&](const std::shared_ptr<const NormalFrames>&old)->std::shared_ptr<const NormalFrames>{
+ struct Copy {const NormalFrames *source;uint32_t coordinate;std::shared_ptr<const NormalFrames> frame;};
+ std::vector<Copy> copies;
+ auto author=[&](const std::shared_ptr<const NormalFrames>&old,detail::ShapeFrameRole role)->std::shared_ptr<const NormalFrames>{
   if(!old)return {};
-  if(auto i=copies.find(old.get());i!=copies.end())return i->second;
+  const bool geometric=edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace;
+  const auto coordinate=geometric?detail::shapekey_frame_coordinate(*binding,*old,role):0;
+  for(const auto &copy:copies)if(copy.source==old.get()&&copy.coordinate==coordinate)return copy.frame;
   auto frame=std::make_shared<NormalFrames>(*old);NormalFrameTarget key;key.id=id;
   if(edit.action==ShapeKeyAction::Duplicate){key=frame_target(*old,frames->current_targets[edit.target]);key.id=id;}
   else if(edit.action==ShapeKeyAction::CaptureMix){
@@ -161,16 +230,18 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
     add(key.normals,k.normals);add(key.tangents,k.tangents);
    }
   }else if(edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace){
-   const auto &mesh=binding->uv_origin->paint->mesh();std::vector<Vec3> edited=mesh.positions;
+   auto mesh=binding->uv_origin->paint->mesh();
+   if(!old->tangents.empty())mesh.uv=detail::shapekey_frame_coordinates(*binding,coordinate,cancelled);
+   std::vector<Vec3> edited=mesh.positions;
    const auto &authority=replace?identity->positions:frames->targets.back().positions;
    for(size_t v=0;v<edited.size();++v)edited[v]+=authority[v];
    key=authored_attributes(mesh,*old,replace?&frame_target(*old,id):nullptr,old_positions,edited,id,cancelled);
   }
   if(replace){auto target=std::find_if(frame->targets.begin(),frame->targets.end(),[&](const auto&t){return t.id==id;});*target=std::move(key);}
   else frame->targets.push_back(std::move(key));
-  frame->validate();copies[old.get()]=frame;return frame;
+  frame->validate();copies.push_back({old.get(),coordinate,frame});return frame;
  };
- frames->pbr=author(frames->pbr);frames->mtoon=author(frames->mtoon);frames->canonical=author(frames->canonical);frames->validate();binding->normal_frames=frames;
+ frames->pbr=author(frames->pbr,detail::ShapeFrameRole::Pbr);frames->mtoon=author(frames->mtoon,detail::ShapeFrameRole::MToon);frames->canonical=author(frames->canonical,detail::ShapeFrameRole::Canonical);frames->validate();binding->normal_frames=frames;
  deform->morphs->set_target(rest,name,positions);if(!replace&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);
  deform->validate(rest);binding->validate();detail::normal_frame_current_authority(*binding,rest,deform.get(),cancelled);
  o.deformation=deform;o.material_bindings=binding;next.validate();stop(cancelled);scene=std::move(next);return {slot,true};

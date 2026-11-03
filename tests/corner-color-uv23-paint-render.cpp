@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define main prior_material_suite
+#include "mtoon-render.cpp"
+#undef main
+#include "current-color-target-fixture.hpp"
+#include "dome/uv.hpp"
+#include "source-color-consumer.hpp"
+namespace {
+void settled(Document &d){if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error("PostUV paint: "+d.frame().state->error);}
+void translate(Document &d){d.begin_uv();if(!d.wait_uv())throw std::runtime_error("PostUV init");auto mesh=d.frame().state->uv->mesh;size_t face=0;while(face<mesh->indices.size()/3&&mesh->normals[mesh->indices[face*3]].z<.9f)++face;std::array<float,2> cursor{};for(size_t k=0;k<3;++k){auto q=mesh->uv[mesh->indices[face*3+k]];cursor[0]+=q[0]/3;cursor[1]+=q[1]/3;}d.edit_uv(UvAction::Pick,cursor[0],cursor[1]);if(!d.wait_uv())throw std::runtime_error("PostUV Pick");d.edit_uv(UvAction::Move,4.f/256,0);if(!d.wait_uv()||!d.frame().state->uv->valid)throw std::runtime_error("PostUV translated draft");d.end_uv(true);settled(d);}
+void ink(Scene &s){auto &o=s.active();o.painted=o.painted->snapshot();Brush brush;brush.from=brush.to={0,0,.5f};brush.radius=.6f;PaintSettings settings;settings.front_only=false;settings.flow=.4f;settings.mask=.6f;settings.color={.9f,.15f,.5f,.67f};settings.metallic=.6f;settings.roughness=.25f;settings.emission={.03f,.08f,.02f};
+ for(auto channel:{PaintChannel::Color,PaintChannel::Metallic,PaintChannel::Roughness,PaintChannel::Emission,PaintChannel::Mask}){settings.channel=channel;o.painted->begin_stroke();o.painted->stamp(brush,settings);o.painted->end_stroke();}o.painted->layer_properties("Independent current domain ink",true,.6f);
+}
+}
+int main(int argc,char**argv)try{
+ if(argc<2)return 2;const auto directory=std::filesystem::path(argv[1]);std::filesystem::create_directories(directory);NativeGraphics context;auto device=std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));std::cout<<"GPU "<<device<<std::endl;check(argc<3||std::string_view(argv[2])!="--hardware"||device.find("A770")!=std::string::npos,"PostUV paint uses the requested actual renderer");Fbo fbo;fbo.bind();SurfaceRenderer renderer;color_consumer::Renderer independent;size_t number=0;
+ for(bool seam:{false,true})for(bool posed:{false,true})for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend}){
+  auto original=current_color_target_fixture::fixture(seam,256);const auto source=original.objects().back().id;for(auto id:{source,original.active().id}){original.object(id).material.unlit=false;original.object(id).material.alpha=alpha;original.object(id).material.color={.72f,.83f,.61f,.7f};}
+  auto &ordinary=original.object(source);auto mesh=ordinary.painted->mesh();for(size_t v=0;v<mesh.positions.size();++v){auto p=mesh.positions[v];mesh.normals[v]=normalized(mesh.normals[v]+Vec3{.19f*p.y,.23f*p.x,.11f*p.z});}ordinary.painted=std::make_shared<PaintedMesh>(mesh,256);Document baked;baked.replace(original);ObjectBakeSettings settings;settings.prepare_colors=true;settings.ao_samples=0;baked.bake_from_object(source,settings);settled(baked);auto scene=baked.copy_scene();if(posed)cut_color_fixture::pose(scene);
+  auto before=scene.snapshot();ink(before);Document paint_first;paint_first.replace(before);settled(paint_first);translate(paint_first);const auto reference=draw(renderer,paint_first.frame().surface);
+  Document uv_first;uv_first.replace(scene);settled(uv_first);translate(uv_first);auto after=uv_first.copy_scene();const auto recipe=after.active().material_bindings->color_preparation;ink(after);Document painted;painted.replace(after);settled(painted);check(painted.copy_scene().active().material_bindings->color_preparation==recipe&&recipe->uv_reprojection,"Painting after UV uses the actual retained current descriptor instead of inventing a new initial conversion");auto result=draw(renderer,painted.frame().surface);auto error=delta(reference,result);std::cout<<"POST_UV case="<<number<<" seam="<<seam<<" pose="<<posed<<" alpha="<<int(alpha)<<" maxerror="<<error<<std::endl;check(error<=2,"Independent paint-before-transfer versus paint-after-transfer full images retain current RGBA, alpha, PBR and normal appearance");
+  auto path=directory/(std::to_string(number)+".dsculpt");painted.save(path);Document restarted;restarted.open(path);settled(restarted);check(restarted.copy_scene().encode()==after.encode(),"New common/PBR/metal/rough/emission/mask edits survive actual Scene23 Save/reopen");auto glb=path;glb.replace_extension(".glb");restarted.export_asset(glb).get();color_consumer::Model model(glb);fbo.bind();independent.render(model.data,nullptr,{},true);auto exported=delta(result,read());std::cout<<"POST_UV_GLB case="<<number<<" maxerror="<<exported<<std::endl;check(exported<=1,"Independent GLB consumer matches genuine postUV authored channels, current-field modulation, normal, pose and alpha");++number;
+ }
+ std::cout<<checks<<" postUV current-field painting consumers in "<<number<<" cases\n";return 0;
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

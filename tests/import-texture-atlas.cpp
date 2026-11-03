@@ -21,7 +21,8 @@ int main(int argc,char **argv)try{
  if(argc!=2)return 2;auto directory=std::filesystem::path(argv[1]);std::filesystem::create_directories(directory);
  Scene original;auto baseline=original.encode();ImportAuthoringOptions options;options.paint_resolution=64;
  for(bool flat:{false,true}){auto fixture=source(flat);auto path=directory/(flat?"flat.glb":"artist.glb");fixture.save(path);
-  check(refuses([&]{prepare_authoring_import(original,path,options);})&&original.encode()==baseline,"Default original-coordinate import keeps its explicit unsupported-UV1 refusal and exact caller");
+  auto raw=prepare_authoring_import(original,path,options);check(raw.objects.size()==2&&raw.scene.active().painted->source_maps()->uv1&&!raw.scene.active().material_bindings->sampling_reparameterized&&original.encode()==baseline,"Default original-coordinate import retains genuine UV1 for viewing without mutating the caller");
+  auto detached=raw.scene.active().painted->snapshot();const auto raw_before=detached->encode();check(refuses([&]{detached->begin_stroke();})&&!detached->in_stroke()&&detached->encode()==raw_before,"Raw UV1 paint admission refuses before tiles/stroke/history change; explicit preparation remains required");
   auto prepared_options=options;prepared_options.prepare_texture_atlas=true;auto prepared=prepare_authoring_import(original,path,prepared_options);
   check(prepared.objects.size()==2&&prepared.scene.groups().size()==4&&original.encode()==baseline,"Explicit editable-atlas import retains instances and hierarchy without changing the caller");
   for(auto id:prepared.objects){const auto &object=prepared.scene.object(id);const auto &binding=*object.material_bindings;

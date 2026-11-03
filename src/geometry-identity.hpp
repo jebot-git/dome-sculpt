@@ -11,7 +11,9 @@ struct Dependency {
   Volume::GeometryOwner volume;
   float voxel = 0, band = 0;
   std::shared_ptr<const Mesh> paint;
+  std::shared_ptr<const PaintSamplingAttachment> paint_sampling_attachment;
   std::shared_ptr<const std::vector<std::array<float,2>>> source_uv1;
+  std::map<uint32_t,std::shared_ptr<const std::vector<std::array<float,2>>>> source_extra_uv;
   std::shared_ptr<const DeformationState> deformation;
   std::shared_ptr<const CreatorAppearance> appearance;
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
@@ -46,9 +48,11 @@ struct Identity {
       return false;
     for (size_t i = 0; i < objects.size(); ++i) {
       const auto &a = objects[i], &b = other.objects[i];
+      if(a.source_extra_uv.size()!=b.source_extra_uv.size())return false;
+      for(const auto &[set,owner]:a.source_extra_uv){auto found=b.source_extra_uv.find(set);if(found==b.source_extra_uv.end()||!same_owner(owner,found->second))return false;}
       if (a.object != b.object || !same_owner(a.volume, b.volume) ||
           !same(a.voxel, b.voxel) || !same(a.band, b.band) ||
-          !same_owner(a.paint, b.paint) || !same_owner(a.source_uv1,b.source_uv1) ||
+          !same_owner(a.paint, b.paint) || !same_owner(a.paint_sampling_attachment,b.paint_sampling_attachment) || !same_owner(a.source_uv1,b.source_uv1) ||
           !same_owner(a.deformation, b.deformation) ||
           !same_owner(a.appearance, b.appearance) ||
           !same_owner(a.material_bindings, b.material_bindings) ||

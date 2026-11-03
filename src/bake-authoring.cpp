@@ -26,8 +26,6 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
   if(!detail::corner_bake_target_supported(target))
     throw std::logic_error("This corner-color target has shading roles that target baking cannot yet preserve");
-  if(current_target&&settings.prepare_normals)
-    throw std::logic_error("Normal attribute preparation needs a separate current-corner frame adapter; the original target is unchanged");
   // This source route uses the same authenticated ordinary shading domain as
   // plane cutting. Other original/prepared roles still require their adapters.
   if(current_source&&!detail::cut_color_supported(source))
@@ -90,7 +88,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   bool normal_converted=false;
   if(settings.prepare_normals&&!target.painted->normal_projection()){
-    detail::strict_polygon_color_target(target,scene.world_transform(target.id),cancelled);
+    auto placement=capture_source_placement(scene,target.id);
+    const auto world=placement?CanvasTransform{}:scene.world_transform(target.id);
+    detail::strict_polygon_color_target(target,world,cancelled,std::move(placement),current_target);
     NormalPreparationOptions normal_options;normal_options.max_angular_error=settings.normal_error;normal_options.cancelled=cancelled;
     auto prepared=prepare_source_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material},normal_options);
     target.painted=std::move(prepared.paint);target.material_bindings=std::move(prepared.material_bindings);normal_converted=prepared.converted;

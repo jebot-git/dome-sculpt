@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/normal-preparation.hpp"
+#include "dome/normal-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "normal-bake-frames.hpp"
 #include "normal-frame-export.hpp"
@@ -55,6 +56,7 @@ NormalPreparationReceipt NormalPreparationReceipt::decode(const nlohmann::json &
   out.accepted_angular_error=j.at("accepted_angular_error").get<double>();out.observed_initial_error=j.at("observed_initial_error").get<double>();out.sampled_texels=integer(j.at("sampled_texels"),4'194'304);out.validate();return out;
 }
 nlohmann::json encode_normal_projection(const PaintNormalProjection &p,PaintImageArchive &images){
+  if(p.version!=1)throw std::invalid_argument("Retained normal projection requires an owning sampling archive context");
   if(!p.pbr)throw std::invalid_argument("Missing prepared PBR normal plane");
   p.validate(p.pbr->width);
   return {{"version",1},{"pbr",images.add(p.pbr)},{"mtoon",images.add(p.mtoon)}};
@@ -62,6 +64,26 @@ nlohmann::json encode_normal_projection(const PaintNormalProjection &p,PaintImag
 std::shared_ptr<const PaintNormalProjection> decode_normal_projection(const nlohmann::json &j,const PaintImageArchive &images){
   if(!j.is_object()||j.size()!=3||integer(j.at("version"),1)!=1)throw std::invalid_argument("Unsupported prepared normal projection");
   auto out=std::make_shared<PaintNormalProjection>();out->pbr=images.at(uint32_t(integer(j.at("pbr"),UINT32_MAX)));out->mtoon=images.at(uint32_t(integer(j.at("mtoon"),UINT32_MAX)));out->validate(out->pbr->width);return out;
+}
+nlohmann::json encode_normal_projection(const PaintNormalProjection &p,
+    PaintImageArchive &images,NormalSamplingArchive *domains){
+  if(p.version==1)return encode_normal_projection(p,images);
+  if(!domains||!p.pbr)throw std::invalid_argument("Retained normal projection requires an owning sampling archive context");
+  p.validate(p.pbr->width);
+  const auto domain=domains->add(p.sampling_domain);
+  return {{"version",2},{"pbr",images.add(p.pbr)},{"mtoon",images.add(p.mtoon)},{"domain",domain}};
+}
+std::shared_ptr<const PaintNormalProjection> decode_normal_projection(const nlohmann::json &j,
+    const PaintImageArchive &images,const NormalSamplingArchive *domains){
+  if(j.is_object()&&j.contains("version")&&integer(j.at("version"),2)==1)
+    return decode_normal_projection(j,images);
+  if(!domains||!j.is_object()||j.size()!=4||integer(j.at("version"),2)!=2)
+    throw std::invalid_argument("Retained normal projection requires a complete owning sampling archive context");
+  auto out=std::make_shared<PaintNormalProjection>();out->version=2;
+  out->pbr=images.at(integer(j.at("pbr"),UINT32_MAX));
+  out->mtoon=images.at(integer(j.at("mtoon"),UINT32_MAX));
+  out->sampling_domain=domains->at(integer(j.at("domain"),UINT32_MAX));
+  out->validate(out->pbr->width);return out;
 }
 void SourceNormalPreparation::validate(bool deep) const {
   receipt.validate();
@@ -75,8 +97,17 @@ void SourceNormalPreparation::validate(bool deep) const {
   detail::source_paint_pairing(original_paint.get(),original_material.get(),original_appearance.get(),deep);
   if(original_paint->resolution()!=receipt.resolution)throw std::invalid_argument("Normal preparation original resolution differs");
   if(original_paint->baked()&&!original_paint->baked()->maps.normal.rgba.empty())throw std::invalid_argument("Historical normal payload cannot be silently reinterpreted");
-  projection->validate(receipt.resolution);initial_projection->validate(receipt.resolution);target_frames->validate(false);
-  if(uv_reprojection){
+  projection->validate(receipt.resolution,deep);initial_projection->validate(receipt.resolution,deep);target_frames->validate(false);
+  if(initial_projection->version!=1 || (sampling_domain?projection->version!=2:projection->version!=1) || (sampling_domain&&uv_reprojection))
+    throw std::invalid_argument("Retained normal sampling requires its complete owning domain replay");
+  if(sampling_domain){
+    sampling_domain->validate(deep);const auto &before=*sampling_domain->before_material->normal_preparation;
+    if(!detail::normal_projection_identity(*projection,*sampling_domain->projection)||target_frames!=before.target_frames||
+       original_paint!=before.original_paint||original_appearance!=before.original_appearance||
+       original_deformation!=before.original_deformation||original_material!=before.original_material||
+       receipt.encode()!=before.receipt.encode()||!detail::normal_projection_identity(*initial_projection,*before.initial_projection))
+      throw std::invalid_argument("Retained normal interpretation changed its original frame or source authority");
+  }else if(uv_reprojection){
     uv_reprojection->validate(deep);const auto &before=*uv_reprojection->before_material->normal_preparation;
     if(!detail::normal_projection_identity(*projection,*uv_reprojection->projection)||target_frames!=before.target_frames||original_paint!=before.original_paint||original_appearance!=before.original_appearance||original_deformation!=before.original_deformation||original_material!=before.original_material||receipt.encode()!=before.receipt.encode()||!detail::normal_projection_identity(*initial_projection,*before.initial_projection))
       throw std::invalid_argument("Normal UV interpretation changed original planes, attributes or owning source authority");
@@ -118,6 +149,7 @@ void SourceNormalPreparation::validate(bool deep) const {
 }
 void SourceNormalPreparation::validate_current(const Mesh &mesh,const CreatorAppearance *appearance,
     const std::function<bool()> &cancelled) const {
+  if(sampling_domain){sampling_domain->validate_current(mesh,appearance,cancelled);return;}
   if(uv_reprojection){uv_reprojection->validate_current(mesh,appearance,cancelled);return;}
   const auto &original=original_paint->mesh();mesh.validate();
   if(mesh.indices.size()!=original.indices.size())throw std::invalid_argument("Prepared normal corner authority changed");

@@ -3,6 +3,8 @@
 #include "dome/material-bindings.hpp"
 #include "dome/deformation.hpp"
 #include "dome/paint.hpp"
+#include "dome/humanoid-creator.hpp"
+#include "dome/source-maps.hpp"
 #include "source-frame-skin.hpp"
 #include <bit>
 #include <unordered_map>
@@ -39,6 +41,17 @@ inline void normal_frame_current_authority(const SourceMaterialBindings &binding
   auto equal=[](Vec3 a,Vec3 b){return a.x==b.x && a.y==b.y && a.z==b.z;};
   const auto &set=*binding.normal_frames;const auto &origin=binding.uv_origin->paint->mesh();
   if(current.indices.size()!=origin.indices.size())throw std::invalid_argument("Normal frame corner identity changed: reauthor frames before preview/export");
+  for(const auto &frame:{set.pbr,set.mtoon,set.canonical})if(frame&&frame->generated_uv&&*frame->generated_uv>=2){
+    const auto &maps=binding.uv_origin->paint->source_maps();const auto coordinate=*frame->generated_uv;
+    if(!maps||!maps->normal.image||maps->normal.texcoord!=int(coordinate)||!maps->extra_uv_sets.contains(coordinate))throw std::invalid_argument("Generated extra-UV tangents require their genuine retained normal sampler and coordinate owner");
+    maps->validate_surface(origin);
+    if(const auto &appearance=binding.uv_origin->appearance){
+      if(!appearance->asset)throw std::invalid_argument("Generated tangent original asset is missing");
+      const ImportedPrimitive *primitive=nullptr;for(const auto &p:appearance->asset->primitives)if(p.source_mesh==appearance->source_mesh&&p.source_primitive==appearance->source_primitive){if(primitive)throw std::invalid_argument("Generated tangent source primitive is ambiguous");primitive=&p;}
+      if(!primitive||!primitive->extra_uv_sets.contains(coordinate)||appearance->source_vertices.size()!=origin.positions.size())throw std::invalid_argument("Generated extra-UV tangents lack exact original primitive identity");
+      const auto &raw=primitive->extra_uv_sets.at(coordinate);const auto &owned=*maps->extra_uv_sets.at(coordinate);for(size_t v=0;v<owned.size();++v){if((v&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Extra-UV normal authority check cancelled");if(appearance->source_vertices[v]>=raw.size()||owned[v]!=raw[appearance->source_vertices[v]])throw std::invalid_argument("Generated tangent source UV association differs from original attributes");}
+    }
+  }
   if(deformation)deformation->validate(current);
   const size_t active=deformation && deformation->morphs?deformation->morphs->targets.size():0;
   if(active!=set.current_targets.size())throw std::invalid_argument("Native morph slot mapping changed: update explicit frame target identities");
