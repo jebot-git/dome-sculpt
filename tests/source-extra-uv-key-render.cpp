@@ -40,11 +40,11 @@ void pose_keys(Scene &scene,int pose,float weight){
 }
 }
 int main(int argc,char**argv)try{
- if(argc<2)return 2;const std::filesystem::path root=argv[1];std::filesystem::create_directories(root);
+ if(argc<2)return 2;bool hardware=false,stress=false;for(int i=2;i<argc;++i){auto arg=std::string_view(argv[i]);if(arg=="--hardware")hardware=true;else if(arg=="--skew")stress=true;else throw std::invalid_argument("Unknown key consumer option");}const std::filesystem::path root=argv[1];std::filesystem::create_directories(root);
  NativeGraphics graphics;const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GL_VENDOR "<<vendor<<"\nGL_RENDERER "<<device<<std::endl;
- check(argc<3||std::string_view(argv[2])!="--hardware"||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos),"New key consumer runs on the exact requested graphics device");
+ check(!hardware||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos),"New key consumer runs on the exact requested graphics device");
  Fbo fbo;fbo.bind();SurfaceRenderer renderer;prepared_normal_consumer::Renderer consumer;
- native_capture(root,renderer,fbo,consumer,argc>2&&std::string_view(argv[2])=="--skew");
+ native_capture(root,renderer,fbo,consumer,stress);
  for(int coordinate=2;coordinate<=7;++coordinate)for(bool generated:{false,true}){
   const auto stem="uv"+std::to_string(coordinate)+(generated?"-generated":"-artist");const auto input=root/(stem+"-source.glb");key_source(coordinate,generated).save(input);
   Scene empty;empty.active().visible=false;ImportAuthoringOptions options;options.paint_resolution=64;auto scene=prepare_authoring_import(empty,input,options).scene;const auto before=scene.encode();std::vector<uint64_t> ids;for(const auto &object:scene.objects())if(object.appearance)ids.push_back(object.id);
