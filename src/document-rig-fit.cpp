@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/rig-fit.hpp"
+#include "rig-fit-metric.hpp"
 #include "document-transaction.hpp"
 #include <nlohmann/json.hpp>
 namespace dome {
@@ -38,7 +39,7 @@ void Document::begin_rig_fit_locked(){
  if(stopping_.load()||state_.asset_busy||state_.recovery_busy||state_.object_grabbing||state_.polygon||state_.cut||state_.retopology||uv_||native_stroke_||desktop_||action_active_locked()||control_before_||!object_editable_locked(o.id)||!o.mesh_active||!o.painted)
   throw std::logic_error("Select an idle editable painting mesh before placing humanoid landmarks");
  auto next=std::make_shared<RigFitView>();next->generation=state_.generation;next->revision=state_.revision;next->object=o.id;next->edit_authority=state_.edit_authority;next->world=scene_.world_matrix(o.id);
- if(o.deformation&&o.deformation->skeleton){next->rest_source=o.deformation;next->linked_objects=rig_rest_linked_objects(scene_,o.id);const auto heads=o.deformation->skeleton->segments();for(size_t j=0;j<heads.size();++j){next->bone_heads.push_back(heads[j][0]);next->bone_parents.push_back(o.deformation->skeleton->bones[j].parent);auto a=next->world.point({heads[j][0].x,heads[j][0].y,heads[j][0].z}),b=next->world.point({heads[j][1].x,heads[j][1].y,heads[j][1].z});next->bone_lengths.push_back(length(Vec3{float(a[0]),float(a[1]),float(a[2])}-Vec3{float(b[0]),float(b[1]),float(b[2])}));}}
+ if(o.deformation&&o.deformation->skeleton){next->rest_source=o.deformation;next->linked_objects=rig_rest_linked_objects(scene_,o.id);const auto heads=o.deformation->skeleton->segments();const auto rest=o.deformation->skeleton->world();for(size_t j=0;j<heads.size();++j){next->bone_heads.push_back(heads[j][0]);next->bone_parents.push_back(o.deformation->skeleton->bones[j].parent);next->bone_lengths.push_back(detail::rig_fit_world_length(next->world,rest[j],o.deformation->skeleton->bones[j].length));}}
  if(o.deformation&&o.deformation->landmarks)next->landmarks=*o.deformation->landmarks;
  else if(o.deformation&&o.deformation->skeleton&&o.deformation->humanoid){auto segments=o.deformation->skeleton->segments();for(auto &[role,joint]:o.deformation->humanoid->joints)next->landmarks.points.emplace(role,segments.at(joint)[0]);}
  Transaction transaction(*this);state_.rig_fit=std::move(next);state_.weights.enabled=false;state_.shape_sculpt=false;state_.message="Place and review every required humanoid landmark";publish_locked(false,false);transaction.commit(false);

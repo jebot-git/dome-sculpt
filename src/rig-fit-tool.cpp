@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/rig-fit-tool.hpp"
+#include "rig-fit-metric.hpp"
 namespace dome {
 namespace { Vec3 world_point(const AffineTransform &world,Vec3 point){auto p=world.point({point.x,point.y,point.z});return {float(p[0]),float(p[1]),float(p[2])};} }
 size_t rig_fit_selection_count(const RigFitView &v){if(v.rest_source&&!v.rest_source->skeleton)throw std::invalid_argument("Missing original fitting skeleton");return v.rest_source?v.rest_source->skeleton->bones.size():human_roles().size();}
@@ -9,12 +10,12 @@ std::optional<Vec3> rig_fit_selection_point(const RigFitView &v){if(v.rest_sourc
 void rig_fit_selection_point(RigFitView &v,std::optional<Vec3> p){if(v.rest_source){if(!p)throw std::logic_error("Existing bone heads cannot be removed; use role assignment separately");v.bone_heads.at(v.role)=*p;return;}const auto &name=human_roles().at(v.role).name;if(p)v.landmarks.points[name]=*p;else v.landmarks.points.erase(name);}
 std::vector<RigRestJointEdit> rig_fit_rest_edits(const RigFitView &v){
  if(!v.rest_source||!v.rest_source->skeleton)throw std::invalid_argument("This fitting tool has no original REST skeleton");
- const auto &s=*v.rest_source->skeleton;const auto segments=s.segments();std::vector<RigRestJointEdit> edits;
+ const auto &s=*v.rest_source->skeleton;const auto segments=s.segments();const auto rest=s.world();std::vector<RigRestJointEdit> edits;
  if(v.bone_heads.size()!=s.bones.size()||v.bone_parents.size()!=s.bones.size()||v.bone_lengths.size()!=s.bones.size())throw std::invalid_argument("Incomplete fitting bone identities");
  for(size_t j=0;j<s.bones.size();++j){RigRestJointEdit edit;edit.joint=uint32_t(j);
   if(v.bone_heads[j].x!=segments[j][0].x||v.bone_heads[j].y!=segments[j][0].y||v.bone_heads[j].z!=segments[j][0].z)edit.world_position=world_point(v.world,v.bone_heads[j]);
   if(v.bone_parents[j]!=s.bones[j].parent)edit.parent=v.bone_parents[j];
-  const float original=length(world_point(v.world,segments[j][1])-world_point(v.world,segments[j][0]));
+  const float original=detail::rig_fit_world_length(v.world,rest[j],s.bones[j].length);
   if(v.bone_lengths[j]!=original)edit.world_length=v.bone_lengths[j];
   if(edit.world_position||edit.parent||edit.world_length)edits.push_back(edit);
  }return edits;
