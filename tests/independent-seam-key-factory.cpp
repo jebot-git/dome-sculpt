@@ -16,6 +16,7 @@ using namespace dome;
 namespace {size_t checks=0;void check(bool b,const char*m){if(!b)throw std::runtime_error(m);++checks;std::cout<<"PASS "<<m<<std::endl;}bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}nlohmann::json paint_bytes(const PaintedMesh &paint){PaintImageArchive images;NormalSamplingArchive normals;PaintSamplingArchive sampling;auto data=paint.encode(&images,&normals,&sampling);data["normal_domains"]=normals.encode(images);data["paint_domains"]=sampling.encode();data["images"]=images.encode();return data;}bool refuses(auto f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<std::endl;return true;}}}
 namespace {
 void key_codec(const Scene &input,const Scene &authored){
+ auto rejected=[](auto call,std::string_view diagnostic){try{call();return false;}catch(const std::exception&e){std::cout<<"CODEC_REFUSAL "<<e.what()<<std::endl;return std::string_view(e.what()).find(diagnostic)!=std::string_view::npos;}};
  const auto &source=authored.active();const auto node=source.material_bindings->key_derivation;
  NormalFrameArchive frames;PaintImageArchive images;CreatorAssetArchive models;
  const auto record=detail::KeyDerivationCodec::encode(*node,frames,0,0,models,images);
@@ -26,9 +27,9 @@ void key_codec(const Scene &input,const Scene &authored){
  check(refuses([&]{NormalFrameArchive::decode(encoded);}),"Bare old frame reader refuses archive2 before binding geometry authority");
  detail::KeyFrameArchive reader(encoded);
  check(refuses([&]{reader.at(0);}),"Structurally valid frame2 remains unavailable without its actual owning key context");
- auto restored=Scene::decode(input.encode());const auto &before=restored.active();
- std::vector<std::shared_ptr<const SourceMaterialBindings>> materials{before.material_bindings};
- auto resolve=[&](uint32_t id,const std::shared_ptr<const SourceMaterialBindings>&b)->std::shared_ptr<const PaintedMesh>{if(id||b!=before.material_bindings)throw std::runtime_error("Wrong owning paint/material record");return before.painted;};
+ auto restored=Scene::decode(input.encode());const auto &before=restored.active();const auto before_material=before.material_bindings;const auto before_paint=before.painted;
+ std::vector<std::shared_ptr<const SourceMaterialBindings>> materials{before_material};
+ auto resolve=[&](uint32_t id,const std::shared_ptr<const SourceMaterialBindings>&b)->std::shared_ptr<const PaintedMesh>{if(id||b!=before_material)throw std::runtime_error("Wrong owning paint/material record");return before_paint;};
  const auto source_bytes=restored.encode();
  auto decode=[&](const nlohmann::json &r,detail::KeyFrameArchive &f,const std::function<bool()> &cancelled={}){return detail::KeyDerivationCodec::decode(r,1,materials,resolve,f,models,cancelled);};
  size_t polls=0;const auto read=decode(record,reader,[&]{++polls;return false;});reader.require_complete();
@@ -37,13 +38,13 @@ void key_codec(const Scene &input,const Scene &authored){
  auto binding=std::make_shared<SourceMaterialBindings>(*before.material_bindings);auto recipe=std::make_shared<SourceNormalPreparation>(*binding->normal_preparation);recipe->target_frames=read->frames();recipe->key_derivation=read;binding->normal_frames=read->frames();binding->normal_preparation=recipe;binding->key_derivation=read;
  restored.active().material_bindings=binding;restored.active().deformation=std::make_shared<const DeformationState>(DeformationState::decode(source.deformation->encode(source.painted->mesh()),before.painted->mesh()));restored.validate();
  check(true,"Reconstructed owning node authenticates real current prepared Paint and new native keys after anchor restart");
- auto bad=record;bad["before_binding"]=1;detail::KeyFrameArchive fresh(encoded);check(refuses([&]{decode(bad,fresh);}),"Forward/self material key references refuse before publication");
- bad=record;bad["targets"][0]["reference"]=nullptr;check(refuses([&]{decode(bad,fresh);}),"Decoder cannot relabel a genuine original artist target as zero");
+ auto bad=record;bad["before_binding"]=1;detail::KeyFrameArchive fresh(encoded);check(rejected([&]{decode(bad,fresh);},"actual earlier model"),"Forward/self material key references refuse before publication");
+ bad=record;bad["targets"][0]["reference"]=nullptr;check(rejected([&]{decode(bad,fresh);},"relabel an original artist target"),"Decoder cannot relabel a genuine original artist target as zero");
  check(refuses([&]{fresh.at(0);}),"Failed key replay leaves the staged frame reader unbound for exact retry");
- auto corrupt=encoded;corrupt["position_domains"][0]["source_frame_vertices"].get_binary()[0]^=1;detail::KeyFrameArchive wrong(corrupt);check(refuses([&]{decode(record,wrong);}),"Serialized raw-source correspondence tampering fails actual corner replay");
- corrupt=encoded;corrupt["frames"][0]["targets"][0]["normals"].get_binary()[0]^=1;detail::KeyFrameArchive wrong_attributes(corrupt);check(refuses([&]{decode(record,wrong_attributes);}),"Serialized artist N/T tampering fails independent owning authoring replay");
+ auto corrupt=encoded;corrupt["position_domains"][0]["source_frame_vertices"].get_binary()[0]^=1;detail::KeyFrameArchive wrong(corrupt);check(rejected([&]{decode(record,wrong);},"actual ordered-corner replay"),"Serialized raw-source correspondence tampering fails actual corner replay");
+ corrupt=encoded;corrupt["frames"][0]["targets"][0]["normals"].get_binary()[0]^=1;detail::KeyFrameArchive wrong_attributes(corrupt);check(rejected([&]{decode(record,wrong_attributes);},"genuine source-role authoring replay"),"Serialized artist N/T tampering fails independent owning authoring replay");
  corrupt=encoded;corrupt["position_domains"].push_back(corrupt["position_domains"][0]);check(refuses([&]{detail::KeyFrameArchive orphan(corrupt);}),"Unused native key domain records refuse before bulk reconstruction");
- for(auto cut:{size_t(1),polls/2,polls}){detail::KeyFrameArchive cancelled(encoded);size_t at=0;check(refuses([&]{decode(record,cancelled,[&]{return ++at>=cut;});}),"Early/middle/late owning record cancellation refuses atomically");check(refuses([&]{cancelled.at(0);}),"Cancelled owning decode does not expose a partial frame/domain authority");}
+ for(auto cut:{size_t(1),polls/2,polls}){detail::KeyFrameArchive cancelled(encoded);size_t at=0;check(rejected([&]{decode(record,cancelled,[&]{return ++at>=cut;});},"cancelled"),"Early/middle/late owning record cancellation refuses atomically");check(refuses([&]{cancelled.at(0);}),"Cancelled owning decode does not expose a partial frame/domain authority");}
  check(input.encode()==source_bytes,"All owning record attempts preserve the genuine source Scene exactly");
 }
 const NormalFrameTarget &key_attributes(const NormalFrames &frame,uint64_t id){for(const auto &t:frame.targets)if(t.id==id)return t;throw std::runtime_error("Independent oracle missing target");}
