@@ -13,6 +13,7 @@
 #include "paint-archive-shape.hpp"
 #include "material-archive-version.hpp"
 #include "source-paint-pairing.hpp"
+#include "source-paint-export.hpp"
 #include "polygon-color-target.hpp"
 #include "dome/source-placement.hpp"
 #include "source-placement-archive.hpp"
@@ -1120,13 +1121,15 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
         unwrap(mesh, 1024, 4, cancelled);
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
-           o.mesh_active ? (preview ? o.painted->preview(o.material,cancelled) : o.painted->composite(o.material,cancelled)) : nullptr,
+           o.mesh_active ? ((preview||o.painted->source_sampling_prepared()) ? o.painted->preview(o.material,cancelled) : o.painted->composite(o.material,cancelled)) : nullptr,
            o.mesh_active ? o.deformation : nullptr, group_path(o.group),
            o.mesh_active ? o.appearance : nullptr,
            o.mesh_active ? o.material_bindings : nullptr,
            source_is_dormant(o)});
       result.back().affine_edit=o.affine_edit;
       result.back().rig_source=o.mesh_active?o.rig_source:nullptr;
+      if(!preview&&o.mesh_active&&o.painted->source_sampling_prepared())
+        detail::source_paint_export(*o.painted,result.back(),cancelled);
       if(o.mesh_active&&o.painted->paint_sampling_domain()){
         result.back().paint_sampling_attachment=o.painted->paint_sampling_attachment();
         result.back().normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
