@@ -15,6 +15,17 @@ struct HeatBindingReport {
   double maximum_relative_residual=0,minimum_unclamped_weight=0,
     maximum_partition_error=0;
 };
+// Caller-authenticated actual metric source geometry. Imported raw joint axes
+// must not be silently interpreted as authored native bone-Y tail authority.
+struct HeatSourceSegment {
+  std::array<double,3> head{},tail{};
+  uint32_t bone=0;
+};
+struct HeatPositivityFailure:std::runtime_error {
+  uint32_t joint;double minimum;
+  HeatPositivityFailure(uint32_t j,double m):std::runtime_error("Bone heat FEM field violates its independently checked positivity bound"),joint(j),minimum(m){}
+};
 SkinWeights heat_bind_surface(const Mesh&,const Skeleton&,const HeatBindingOptions&,
-  const std::function<bool()>&cancelled={},HeatBindingReport*report=nullptr);
+  const std::function<bool()>&cancelled={},HeatBindingReport*report=nullptr,
+  std::span<const HeatSourceSegment>sources={});
 }
