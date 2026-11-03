@@ -9,6 +9,7 @@
 #include "normal-projection-identity.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/paint-sampling.hpp"
+#include "dome/source-uv-bake.hpp"
 #include <iostream>
 using namespace dome;
 namespace {size_t checks=0;void check(bool b,const char*m){if(!b)throw std::runtime_error(m);++checks;std::cout<<"PASS "<<m<<std::endl;}bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}nlohmann::json paint_bytes(const PaintedMesh &paint){PaintImageArchive images;NormalSamplingArchive normals;PaintSamplingArchive sampling;auto data=paint.encode(&images,&normals,&sampling);data["normal_domains"]=normals.encode(images);data["paint_domains"]=sampling.encode();data["images"]=images.encode();return data;}bool refuses(auto f){try{f();return false;}catch(const std::exception&e){std::cout<<"REFUSAL "<<e.what()<<std::endl;return true;}}}
@@ -33,7 +34,12 @@ void artist_oracle(const detail::SourceKeyDerivation &node,uint64_t id){
 }
 }
 int main(int argc,char **argv)try{
- if(argc!=2)return 2;const auto input=Scene::load(argv[1]);const auto exact=input.encode();const auto &original=input.active();const auto &current=original.painted->mesh();auto before=original.material_bindings->normal_preparation->sampling_domain;
+ if(argc!=2)return 2;auto input=Scene::load(argv[1]);const auto baseline=input.encode();
+ // A uniform UV scale cannot detect a wrong tangent-coordinate basis. Author a
+ // real, independently replayed atlas rotation instead of fabricating a stream
+ // or weakening the oracle. Preserve the old saved fixture and its before DAG.
+ {auto &object=input.active();SourceUvBakeInput request;request.paint=object.painted;request.appearance=object.appearance;request.current_material=object.material_bindings;request.current_deformation=object.deformation;request.polygon_authority=object.polygon;request.target=object.painted->mesh();request.source_vertices.resize(request.target.positions.size());for(size_t v=0;v<request.source_vertices.size();++v){request.source_vertices[v]=uint32_t(v);auto uv=request.target.uv[v];const auto x=uv[0]-.5f,y=uv[1]-.5f;request.target.uv[v]={.5f+.8f*(std::cos(.25f)*x-std::sin(.25f)*y),.5f+.8f*(std::sin(.25f)*x+std::cos(.25f)*y)};}SourceUvBakeOptions options;options.normal_sampling=SourceNormalUvMethod::RetainSource;auto adopted=adopt_source_uv_bake(bake_source_uv(request,options));object.painted=adopted.paint;object.material_bindings=adopted.material_bindings;object.appearance=adopted.appearance;object.deformation=adopted.deformation;input.validate();check(input.encode()!=baseline&&object.material_bindings->normal_frames==request.current_material->normal_frames,"Sensitivity fixture uses actual source-aware UV rotation while retaining original role frame authority");}
+ const auto exact=input.encode();const auto &original=input.active();const auto &current=original.painted->mesh();auto before=original.material_bindings->normal_preparation->sampling_domain;
  check(current.positions.size()==6&&before->before_paint->mesh().positions.size()==4,"Actual saved seam fixture has distinct current6 and original4 native domains");
  const auto &map=before->layout->source_vertices;size_t a=SIZE_MAX,b=SIZE_MAX;for(size_t i=0;i<map.size();++i)for(size_t j=i+1;j<map.size();++j)if(map[i]==map[j]){a=i;b=j;}check(a!=SIZE_MAX,"Input owns a genuine duplicated original vertex");
  ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=original.deformation->morphs->targets.size()-1;edit.positions=current.positions;edit.positions[a].z+=.013f;edit.positions[b].z-=.017f;auto scene=input.snapshot();const auto actual_source_paint=scene.active().painted;size_t polls=0;auto result=author_shapekey(scene,scene.active().id,edit,[&]{++polls;return false;});
