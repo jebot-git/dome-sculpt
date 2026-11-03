@@ -1203,7 +1203,7 @@ struct App {
     } else if (label == "Open...") {
       if (!discard())
         return;
-      auto path = fl_file_chooser("Open sculpt project", "*.dsculpt", nullptr);
+      auto path = fl_file_chooser("Open project or editable package", "*.{dsculpt,glb,vrm}", nullptr);
       if (path) {
         canvas.document.open_async(path);
       }

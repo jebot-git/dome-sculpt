@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-export.hpp"
 #include "dome/document.hpp"
+#include "dome/scene-file.hpp"
 #include "dome/normal-sampling.hpp"
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
@@ -3409,11 +3410,15 @@ void Document::file_loop() {
           return stopping_.load() || job->work->cancelled.load() ||
                  published_.load()->generation != job->generation;
         };
-        auto next = Scene::load(job->path, cancelled);
+        auto loaded = load_scene_file(job->path, cancelled);
         std::lock_guard lock(model_mutex_);
         if (cancelled() || content_ != job->content || action_active_locked() || control_before_)
           throw std::runtime_error("Project loading cancelled or document changed");
-        replace_locked(std::move(next),true,job->path,"Opened "+job->path.string());
+        const bool package = loaded.kind == SceneFileKind::AuthoringPackage;
+        replace_locked(std::move(loaded.scene), !package,
+                       package ? std::filesystem::path{} : job->path,
+                       package ? "Restored editable package as an unsaved project; save to a new project path"
+                               : "Opened " + job->path.string());
         job->completion->set_value();
         {
           std::lock_guard file_lock(file_mutex_);

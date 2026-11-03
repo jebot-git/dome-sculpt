@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
+#include "dome/scene-file.hpp"
 #include "deformation-json.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
@@ -1067,29 +1068,7 @@ void Scene::save(const std::filesystem::path &path) const {
 }
 Scene Scene::load(const std::filesystem::path &path) { return load(path, {}); }
 Scene Scene::load(const std::filesystem::path &path, const std::function<bool()> &cancelled) {
-  constexpr size_t limit = 256 * 1024 * 1024;
-  auto check = [&] { if (cancelled && cancelled()) throw std::runtime_error("Project loading cancelled"); };
-  check();
-  if (std::filesystem::file_size(path) > limit)
-    throw std::length_error("Scene exceeds file size limit");
-  std::ifstream input(path, std::ios::binary);
-  if (!input) throw std::runtime_error("Cannot open scene");
-  std::vector<uint8_t> bytes;
-  std::array<char, 65536> chunk;
-  while (input) {
-    check();
-    input.read(chunk.data(), chunk.size());
-    auto count = size_t(input.gcount());
-    if (count > limit - bytes.size()) throw std::length_error("Scene exceeds file size limit");
-    bytes.insert(bytes.end(), chunk.data(), chunk.data() + count);
-  }
-  if (!input.eof()) throw std::runtime_error("Cannot read scene");
-  check();
-  auto json = nlohmann::json::from_cbor(bytes);
-  check();
-  auto result = decode(json);
-  check();
-  return result;
+  return load_scene_file(path, cancelled).scene;
 }
 std::vector<ObjectSurface>
 Scene::surfaces(bool atlas, const std::function<bool()> &cancelled) const {
