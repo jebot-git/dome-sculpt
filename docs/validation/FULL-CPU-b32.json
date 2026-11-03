@@ -1,0 +1,40 @@
+{
+  "status": "terminal",
+  "source": "b32aa8b7259cb670edab8a37a4e703cc09f84a9e",
+  "started_utc": "2026-11-03T06:10:35.009619+00:00",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu",
+    "--output-on-failure",
+    "--parallel",
+    "2",
+    "--output-junit",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/full-cpu-regression/junit.xml"
+  ],
+  "registered_tests": 533,
+  "input_hashes": 1901,
+  "scope": "All registered CPU tests; software graphics; explicit synthetic XR; no physical HMD/session installation",
+  "environment": {
+    "HOME": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/full-cpu-regression/home",
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+    "PATH": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/bin:/home/blux/.codex/packages/standalone/releases/0.166.0-x86_64-unknown-linux-musl/codex-path:/home/blux/.codex/tmp/arg0-linux/codex-arg08RCTEn:/home/blux/.codex/tmp/arg0-linux/codex-arg02SjOQH:/home/blux/.local/bin:/home/blux/bin:/usr/share/Modules/bin:/usr/local/bin:/usr/bin:/bin",
+    "PYTHONPATH": "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/lib/python3.14/site-packages",
+    "XR_RUNTIME_JSON": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/full-cpu-regression/no-real-runtime.json",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LP_NUM_THREADS": "2"
+  },
+  "exit_code": 8,
+  "seconds": 6046.033136738988,
+  "input_drift": [],
+  "passed_suites": 532,
+  "failed_suites": [
+    "rig-fit-render"
+  ],
+  "registered_suites": 533,
+  "source_before_manifest_sha256": "4bd543f18864a90308a2c91e2764209a65b492c4cafdb7c25c5e600ac20bbc12",
+  "source_after_manifest_sha256": "4bd543f18864a90308a2c91e2764209a65b492c4cafdb7c25c5e600ac20bbc12",
+  "ctest_log_sha256": "4022ad782fba06c216f5d98aff993f86227778862001d19a4ce669135a6a6b23",
+  "junit_sha256": "0b74a011b1d2848760603ccac9a5dacb5a9284ee2a1f2a042c1df023680ead3c",
+  "scope_precision": "Actualfull533suite b32run;532pass/one realrig-fit required-landmarkselection regression. Fix465009fseparatelyqualified13CPU/SAN/A770. Thisnegative neverrelabeled fullgreen."
+}

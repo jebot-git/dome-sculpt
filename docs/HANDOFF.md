@@ -4,12 +4,47 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
-## Coherent b32 evidence milestone — 2026-11-03
+## Current integration and remaining qualification — 2026-11-03
 
-This proof-only checkpoint records the frozen private candidate b32aa8b; it
-changes no runtime, header, CMake, test, asset or public main implementation.
-The candidate's full533 CPU regression remains live in
-authoring-master-3f4b2ba. Do not edit its tracked files during that run.
+The private authoring master now contains the qualified b32 source/rig/UV/key
+union, the renderer-only required-landmark fix465009f, the native shape observer
+follow-up9f4ee1f and staged Save observer4823a36/final receipt62e5196. No public
+header, class layout or schema changed after b32. Public main remains3f4b2ba;
+this integration still needs fresh coherent affected builds/workflows.
+
+The actual complete b32 CPU run is TERMINAL8:532/533 suites pass in6042.50s
+(wrapper6046.03s); all1,901 captured inputs are exact. Its sole failure is
+rig-fit-render: decorated UI labels prevented required landmarks highlighting.
+Fix465009f passes the extended13-check real renderer fixture on softwareGL,
+whole-owned sanitizer support and strict actual A770GL, with the old renderer
+negative preserved in all three profiles. These component proofs do not relabel
+the earlier full run green. Read validation/FULL-CPU-b32.json and
+RIG-FIT-GUIDE.md. Fresh native UI/controller/compositor and affected rendering
+qualification are the next integration gates.
+
+The exact queued-first Save fixture passes CPU134, focused SAN11 and complete
+whole-owned SAN134 (4295.552360s), with1,448 inputs exact and no sanitizer/leak
+report. Native/asset/persistence each retain120s; all30 observations pass. The
+original failed aggregate wait and1800s CTest timeout remain recorded. The
+native query component separately passes84 with whole-owned sanitizer support;
+its finite registration is6000s only under explicit sanitizer flags,1800s for
+optimized builds. No production timeout, quota, tolerance or guard was relaxed.
+Read UNION-STAGED-SAVE.md and NATIVE-SHAPE-SAMPLING.md for exact source scopes.
+
+All four optimized b32 native backend configurations compile/link; actual Arc
+301 plus selected21, rebuiltCPU FLTK72, latestDomeD Wayland8 and unfiltered
+interchange proof remain scoped below. Post-b32 changes are the small guide
+renderer fix and test-only observation corrections; fresh coherent builds are
+required before main admission. Derived seam-key and volume-weight continuations
+remain separate, unfinished prototypes. Every unfinished original requirement
+and the later controller-drawer phase remain required. No physical HMD launch,
+system installation or active-session restart occurred.
+
+## Frozen b32 evidence milestone (before current integration) — 2026-11-03
+
+The earlier proof-only branch0582c3e records the frozen private candidate
+b32aa8b without changing its runtime, header, CMake, test or assets. The full
+CPU run subsequently completed with the single guide failure described above.
 
 The complete optimized OneAPI all-target build passes in1278.605s, with all1,434
 tracked inputs unchanged,407 ELF/static archives hashed and all534 registered
@@ -49,7 +84,8 @@ This is current native build/failure evidence for all four backend choices;
 positive AMD/NVIDIA hardware and device-loss/performance requirements remain
 open. Read validation/ROCM-FULL-BUILD-b32.json and
 validation/CUDA-MISSING-FIELDS-b32.json. The sequential vendor build queue has
-finished; the full CPU regression and separate broad134 SAN run remain active.
+finished. The full CPU result and completed separate broad134 SAN proof are
+recorded above; neither changes the original scope of these b32 receipts.
 
 Strict actual A770/PCI0000:03:00.0 validation passes301 checks: the combined134
 workflow,101 key/UV commutation,59 rig/UV authoring, and7 actual application
@@ -71,7 +107,8 @@ Separate private9f4ee1f qualifies all84 shape-query checks with matched wholly
 owned sanitizer support and a rebuilt e7 TU; it is not a fresh full frontend
 build. Separate4823a36 qualifies the queued-first phase-separated Save observer
 with CPU134 and focused SAN11; its broad134 SAN run is still live/unqualified.
-Neither test follow-up is included in this proof-only checkpoint. The derived
+Neither test follow-up was included in that earlier proof-only branch; the
+current integration above now contains them. The derived
 seam-key factory also remains private:55 Release/owned-SAN checks and3 sanitizer
 baselines do not implement its unfinished owning codecs, generic commands or UI.
 
