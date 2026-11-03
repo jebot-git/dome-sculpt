@@ -308,7 +308,12 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
       auto d = sub(c.target, p);
       bool visible = true;
       if (c.physical > 0) {
-        double trim = std::min(c.physical * 1e-5, 1e-5);
+        // Entry-face mode rejects the exact incident faces structurally. Do
+        // not displace its origin: even a tiny bias can jump a genuine nearby
+        // entry wall belonging to this same connected surface.
+        double trim = o.visibility == HeatVisibility::EntryFaces
+                          ? 0
+                          : std::min(c.physical * 1e-5, 1e-5);
         D start = p;
         for (int k = 0; k < 3; ++k)
           start[k] += trim * d[k] / c.physical;

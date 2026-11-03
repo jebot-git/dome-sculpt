@@ -1,0 +1,153 @@
+{
+  "negative_source": "4463159",
+  "scope": "Own private kernel and fixtures, copied immutable uninstrumented b32 support archives",
+  "tests": {
+    "near_wall": 30,
+    "seam": 20,
+    "dense": "pass unchanged independent FEM/positive graph controls",
+    "private_kernel_sanitizer": 2,
+    "female_pose": {
+      "solved": 19,
+      "quality_failures": 1
+    },
+    "male_pose": {
+      "solved": 19,
+      "quality_failures": 2
+    }
+  },
+  "input_count": 1470,
+  "inputs_exact": true,
+  "admission": false,
+  "evidence": [
+    {
+      "path": "artifacts/build-heat-occlusion-domain-unbiased-sanitize.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/build-heat-occlusion-domain-unbiased.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/build-heat-visibility-near-unbiased-sanitize.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/build-heat-visibility-near-unbiased.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/build-heat-visibility-unbiased.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/build-unbiased-fresh.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/heat-avatar-poses-unbiased-probe",
+      "sha256": "1d2cb57442e99b4f854474113dd76d58f938475852143a4f4aaa72d0303739d1",
+      "bytes": 5078424
+    },
+    {
+      "path": "artifacts/heat-binding-unbiased-probe",
+      "sha256": "2002d7f1943a45a855dcb1fa5e45be04c5d60ce3a1b152438b1afd48a8fd92b3",
+      "bytes": 5085040
+    },
+    {
+      "path": "artifacts/heat-occlusion-domain-unbiased-probe",
+      "sha256": "8881fe256456c04397f12afcd897d9a09d620c1c484c171d09964423731b491c",
+      "bytes": 821216
+    },
+    {
+      "path": "artifacts/heat-occlusion-domain-unbiased-sanitize",
+      "sha256": "8187c0e1960abc5799c0e6c46c42515a7e3dee17fb71007da895a66e313b384f",
+      "bytes": 2664160
+    },
+    {
+      "path": "artifacts/heat-seams-unbiased-probe",
+      "sha256": "df95b71dbdcaf02c38efa2c2a2385a4dbef71bccb51704aac2f2b9f60c79915b",
+      "bytes": 4781968
+    },
+    {
+      "path": "artifacts/heat-visibility-near-unbiased-probe",
+      "sha256": "542be45f77e8c1eda23552ad1bdb2748f50728f088265115c2c226eb732adb9d",
+      "bytes": 821328
+    },
+    {
+      "path": "artifacts/heat-visibility-near-unbiased-sanitize",
+      "sha256": "4dfa29aa9c9b2e20d700d1c09efe47e8aca28efc23cc422416338d3fa2bd078b",
+      "bytes": 2662176
+    },
+    {
+      "path": "artifacts/heat-visibility-unbiased-probe",
+      "sha256": "fadb587fadecd473c3cc48f9bab0be539b0bcc4ab1476f5492a33137d3d1888c",
+      "bytes": 821312
+    },
+    {
+      "path": "artifacts/poses-unbiased-female-h1.log",
+      "sha256": "4b5f95d5072b67e7047c0db1c6501b890f767069cf9c7101e6471c418b41393f",
+      "bytes": 14532
+    },
+    {
+      "path": "artifacts/poses-unbiased-male-h1.log",
+      "sha256": "2d1f6cc4c0fe65e492620f8e2e8805d47e10d0365d85a0cdf141f0e1b76522d3",
+      "bytes": 14658
+    },
+    {
+      "path": "artifacts/tests-heat-binding-unbiased.log",
+      "sha256": "da51c43c9ef2d499859e907d3dcd639567375bb102d29c70ebc97d0e27e76cb8",
+      "bytes": 2061
+    },
+    {
+      "path": "artifacts/tests-heat-occlusion-domain-unbiased-sanitize.log",
+      "sha256": "39d3106cdd1ef9e61185d26380e703bc7211a3f19413fa4a6e11f39fa3017938",
+      "bytes": 108
+    },
+    {
+      "path": "artifacts/tests-heat-occlusion-domain-unbiased.log",
+      "sha256": "39d3106cdd1ef9e61185d26380e703bc7211a3f19413fa4a6e11f39fa3017938",
+      "bytes": 108
+    },
+    {
+      "path": "artifacts/tests-heat-seams-unbiased.log",
+      "sha256": "33bb3b51197d2c471519e35f5ee9e46e717884d6e80d52f761820193751bf618",
+      "bytes": 1496
+    },
+    {
+      "path": "artifacts/tests-heat-visibility-near-unbiased-sanitize.log",
+      "sha256": "d68e49435639fcd95030719e341b80d5b0eedcefbbedf6fff6c7554c429b83bc",
+      "bytes": 2122
+    },
+    {
+      "path": "artifacts/tests-heat-visibility-near-unbiased.log",
+      "sha256": "d68e49435639fcd95030719e341b80d5b0eedcefbbedf6fff6c7554c429b83bc",
+      "bytes": 2122
+    },
+    {
+      "path": "artifacts/tests-heat-visibility-unbiased.log",
+      "sha256": "df539858136e9de1ec1aa45d918c51d013b8d5a878d5cb3bae68eca046c18e0d",
+      "bytes": 170
+    },
+    {
+      "path": "src/heat-binding.cpp",
+      "sha256": "a43abc4ecd29de713eaa75034130ea3602ca0ebb1790f2da3da778ec52fa6305",
+      "bytes": 22503
+    },
+    {
+      "path": "src/heat-binding.hpp",
+      "sha256": "066eacc6284dcb04dc3ab5b3630d04eb54f9dd6a57282740dc491495f6335d53",
+      "bytes": 2910
+    },
+    {
+      "path": "tests/heat-visibility-near.cpp",
+      "sha256": "922bcec526b39dd5fa8b9666f4d1fbbbfa043cbe5d3d51bd747fc003eeecc362",
+      "bytes": 2372
+    }
+  ]
+}
