@@ -472,7 +472,7 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
  material.validate();validate(input,options);
  if(!input.paint->source_sampling_prepared()||!input.paint->valid_source_sampling_attachment()||input.target.uv!=input.paint->mesh().uv||input.target.indices!=input.paint->mesh().indices||input.source_vertices.size()!=input.paint->mesh().positions.size())
   throw std::invalid_argument("Portable source material requires its exact current writable atlas");
- for(size_t v=0;v<input.source_vertices.size();++v)if(input.source_vertices[v]!=v)throw std::invalid_argument("Portable source material cannot relabel its writable vertex domain");
+ for(size_t v=0;v<input.source_vertices.size();++v){if((v&1023)==0&&options.cancelled&&options.cancelled())throw std::runtime_error("Portable source material cancelled");if(input.source_vertices[v]!=v)throw std::invalid_argument("Portable source material cannot relabel its writable vertex domain");}
  if(std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::invalid_argument("Portable HDR source material requires its precision-qualified export adapter");
  uint32_t r=options.resolution?options.resolution:input.paint->resolution();
  if(!options.resolution)if(const auto &source=input.paint->source_maps())for(const auto *role:{&source->color,&source->metal_rough,&source->emission,&source->normal,&source->occlusion})if(role->image)r=std::max({r,role->image->width,role->image->height});
