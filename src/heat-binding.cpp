@@ -523,6 +523,71 @@ Solve solve(const System &s, std::span<const double> rhs, std::span<double> x,
   throw std::runtime_error(
       "Bone heat PCG did not meet its measured residual bound");
 }
+struct BoundSolve {
+  size_t sweeps = 0;
+  double residual = 0;
+};
+// A separately selected convex energy, not a recovery path after an error.
+// Standard FEM L is PSD; visible H anchors every component. Each coordinate
+// update exactly minimizes .5*x'Ax-b'x over [0,1]. An unconstrained PCG result
+// is only its initial guess. Acceptance requires the actual bound KKT residual.
+BoundSolve solve_bounds(const System &s, std::span<const double> rhs,
+                        std::span<double> x, const HeatBindingOptions &o,
+                        Budget &budget) {
+  budget.stop();
+  const size_t n = x.size();
+  std::vector<double> product(n);
+  double scale = 0;
+  budget.step(n);
+  for (size_t i = 0; i < n; ++i) {
+    if (!std::isfinite(x[i]))
+      throw std::runtime_error("Bounded heat has a nonfinite initial field");
+    x[i] = std::clamp(x[i], 0., 1.);
+    scale += rhs[i] * rhs[i];
+  }
+  scale = scale ? std::sqrt(scale) : 1;
+  BoundSolve result;
+  auto inspect = [&] {
+    s.multiply(x, product, budget);
+    budget.step(n);
+    double squared = 0, energy = 0;
+    for (size_t i = 0; i < n; ++i) {
+      double gradient = product[i] - rhs[i];
+      double violation = x[i] == 0   ? std::min(gradient, 0.)
+                         : x[i] == 1 ? std::max(gradient, 0.)
+                                     : gradient;
+      squared += violation * violation;
+      energy += .5 * x[i] * product[i] - rhs[i] * x[i];
+    }
+    result.residual = std::sqrt(squared) / scale;
+    if (!std::isfinite(result.residual) || !std::isfinite(energy))
+      throw std::runtime_error("Bounded heat has nonfinite KKT/energy");
+    return energy;
+  };
+  double energy = inspect();
+  if (result.residual <= o.relative_tolerance)
+    return result;
+  for (uint32_t iteration = 0; iteration < o.maximum_iterations; ++iteration) {
+    budget.stop();
+    budget.step(n + s.columns.size());
+    for (size_t i = 0; i < n; ++i) {
+      double numerator = rhs[i];
+      for (size_t j = s.starts[i]; j < s.starts[i + 1]; ++j)
+        numerator -= s.values[j] * x[s.columns[j]];
+      x[i] = std::clamp(numerator / s.diagonal[i], 0., 1.);
+    }
+    ++result.sweeps;
+    if (iteration % 8 == 0 || iteration + 1 == o.maximum_iterations) {
+      double next = inspect();
+      if (next > energy + 1e-12 * std::max(1., std::abs(energy)))
+        throw std::runtime_error("Bounded heat coordinate energy increased");
+      energy = next;
+      if (result.residual <= o.relative_tolerance)
+        return result;
+    }
+  }
+  throw std::runtime_error("Bounded heat did not meet its measured KKT bound");
+}
 } // namespace
 SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
                               const HeatBindingOptions &o,
@@ -535,7 +600,10 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   budget.stop();
   const size_t n = m.positions.size(), nt = m.indices.size() / 3;
   if ((o.operation != HeatOperator::FiniteElements &&
-       o.operation != HeatOperator::PositiveGraph) ||
+       o.operation != HeatOperator::PositiveGraph &&
+       o.operation != HeatOperator::BoundedFiniteElements) ||
+      (o.operation == HeatOperator::BoundedFiniteElements &&
+       o.edges != HeatEdges::CotangentHalf) ||
       (o.visibility != HeatVisibility::AllFaces &&
        o.visibility != HeatVisibility::EntryFaces) ||
       (o.occlusion != HeatOcclusion::WholeMesh &&
@@ -572,6 +640,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   bytes(rig.bones.size(), 512);
   if (o.seed_rule == HeatSeedRule::ReferenceSegments)
     bytes(n, rig.bones.size() * sizeof(uint16_t));
+  if (o.operation == HeatOperator::BoundedFiniteElements)
+    bytes(n, sizeof(double));
   bytes(1, 8192);
   budget.step(n + m.indices.size() + rig.bones.size() * rig.bones.size());
   budget.step(m.indices.size() *
@@ -652,7 +722,12 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
           std::max(proof.maximum_relative_residual, solved.residual);
       proof.minimum_unclamped_weight =
           std::min(proof.minimum_unclamped_weight, solved.minimum);
-      if (solved.minimum < -1e-7)
+      if (o.operation == HeatOperator::BoundedFiniteElements) {
+        auto bounded = solve_bounds(s, rhs, field, o, budget);
+        proof.bound_sweeps += bounded.sweeps;
+        proof.maximum_kkt_residual =
+            std::max(proof.maximum_kkt_residual, bounded.residual);
+      } else if (solved.minimum < -1e-7)
         throw HeatPositivityFailure(bone, solved.minimum);
       for (size_t i = 0; i < rows; ++i) {
         budget.step();

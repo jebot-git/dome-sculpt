@@ -1,0 +1,141 @@
+{
+  "base": "3fd812cce854139853ea86decb55d051bdacac13",
+  "scope": "Own private kernel and fixtures with copied uninstrumented b32 support AR; no native authoring/Save/render/GPU scope",
+  "admitted": false,
+  "dense_oracle": {
+    "systems": 16,
+    "states_each": 81,
+    "max_error": 2.20038e-10,
+    "kkt": 3.89929e-10,
+    "nontrivial": 8
+  },
+  "failure_controls": {
+    "persistent_actual_allocation_prefixes": 100,
+    "cancellation_checkpoints": 160,
+    "actual_coordinate_sweeps": 146,
+    "work": 3039,
+    "planned_bytes": 13360,
+    "source_report_owners_exact": true
+  },
+  "inputs": {
+    "bounded": {
+      "count": 1477,
+      "exact": true,
+      "before": "7376e0a4962aec6f0cd921ad7bea73198cc40310eb81f7274451ba4fdfb168e8",
+      "after": "7376e0a4962aec6f0cd921ad7bea73198cc40310eb81f7274451ba4fdfb168e8"
+    },
+    "bounded-coordinate-proof": {
+      "count": 1478,
+      "exact": true,
+      "before": "fafaab625a8815521358d219619614954ab79c8270e476d3012276fef9c793f5",
+      "after": "fafaab625a8815521358d219619614954ab79c8270e476d3012276fef9c793f5"
+    }
+  },
+  "cohorts": [
+    {
+      "path": "artifacts/poses-bounded-female.log",
+      "sha256": "fe4b7e81d0996be4669db3a70a110741c305d1784ffb97d671a6e367d9cb4f8a",
+      "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "quality_failures": []
+    },
+    {
+      "path": "artifacts/poses-bounded-male.log",
+      "sha256": "abcbd4c177a9a55f7646790c5c278c3d1efe4b89f4c560f1339feb430a72ca0f",
+      "summary": "SUMMARY solved=19 refused=0 quality_failures=3 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "quality_failures": [
+        "POSE 3 artist_mean=0.001106174849 artist_max=0.03728105861 native_consumer_max=2.648100657e-07 seam_exact=1 quality=0",
+        "POSE 3 artist_mean=0.004686905281 artist_max=0.03847691238 native_consumer_max=2.085722748e-07 seam_exact=1 quality=0",
+        "POSE 0 artist_mean=0.004242700109 artist_max=0.03705805034 native_consumer_max=3.346304783e-08 seam_exact=1 quality=0"
+      ]
+    }
+  ],
+  "runtime_sha256": "3156ed2d46b3e07c57eccbfd0c631073289a901b4e5b3d65ce2a1e7652ec5207",
+  "private_header_sha256": "865f07214eaab6677a8d3066010474022aee4f36dde6bcea5c6db9567cebe0ff",
+  "final_strict_test_sha256": "f4010a4accf543b5d38b0eae83f381053000f319bff5c15cf0876a1521275227",
+  "evidence": [
+    {
+      "path": "artifacts/bounded-coordinate-commands.json",
+      "sha256": "1adb414570428f256baf963be643480c2a59618c43226d4a68fd486e81c588c8"
+    },
+    {
+      "path": "artifacts/build-heat-bounded-allocation-coordinate-release.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/build-heat-bounded-allocation-coordinate-sanitize.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/build-heat-bounded-coordinate-release.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/build-heat-bounded-coordinate-sanitize.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/build-heat-bounded-strict-release.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/build-heat-bounded-strict-sanitize.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/heat-bounded-allocation-coordinate-release",
+      "sha256": "62b0834f3638b608b39b877dce36416e0ff1461bb4f6004c3147c92ef62b1261"
+    },
+    {
+      "path": "artifacts/heat-bounded-allocation-coordinate-sanitize",
+      "sha256": "3cea6ea3d4bd84815ee9e8e154dbee74efbcece70f963f4ff19d89e600b1ffa9"
+    },
+    {
+      "path": "artifacts/heat-bounded-coordinate-release",
+      "sha256": "1fa5d6df7adaff4591f5c3421f6828b21c5bf2cf3aa332690b0664e8a9c50ad2"
+    },
+    {
+      "path": "artifacts/heat-bounded-coordinate-sanitize",
+      "sha256": "90e938139297369b45cf6b85601ee3728ab4f442583b0c27b70ae96e61d15056"
+    },
+    {
+      "path": "artifacts/heat-bounded-strict-release",
+      "sha256": "099cddb1589d840be65315f1c90af077d98187d3c663bc2a5ee4ae8f052fbdfb"
+    },
+    {
+      "path": "artifacts/heat-bounded-strict-sanitize",
+      "sha256": "c55cd41b2727b0bfb1466456259f507c0904395052913a1d71c8c9dc2ceeb25b"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-allocation-before-coordinate-control-release.log",
+      "sha256": "56941975e726c5d13d682035492ef085537c44b8c9cba3b5142707a9d2356e4a"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-allocation-before-coordinate-control-sanitize.log",
+      "sha256": "56941975e726c5d13d682035492ef085537c44b8c9cba3b5142707a9d2356e4a"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-allocation-coordinate-release.log",
+      "sha256": "f35401806f7c7beeea9161789ef02f0ee4f12b43e116b0ba07ac54e5add2d420"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-allocation-coordinate-sanitize.log",
+      "sha256": "f35401806f7c7beeea9161789ef02f0ee4f12b43e116b0ba07ac54e5add2d420"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-coordinate-release.log",
+      "sha256": "babd56322fc1f02d9c167399251dc10ecd6e3782330c0a32e987fe12e63f459d"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-coordinate-sanitize.log",
+      "sha256": "babd56322fc1f02d9c167399251dc10ecd6e3782330c0a32e987fe12e63f459d"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-strict-release.log",
+      "sha256": "a462fc8f6f81eb10761faeb46e9704ace60100f41b93c19e1e83c5688a15f426"
+    },
+    {
+      "path": "artifacts/tests-heat-bounded-strict-sanitize.log",
+      "sha256": "a462fc8f6f81eb10761faeb46e9704ace60100f41b93c19e1e83c5688a15f426"
+    }
+  ]
+}

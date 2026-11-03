@@ -2,7 +2,11 @@
 #pragma once
 #include "dome/rig.hpp"
 namespace dome::detail {
-enum class HeatOperator { FiniteElements, PositiveGraph };
+enum class HeatOperator {
+  FiniteElements,
+  PositiveGraph,
+  BoundedFiniteElements
+};
 enum class HeatVisibility { AllFaces, EntryFaces };
 enum class HeatOcclusion { WholeMesh, ConnectedSurface };
 enum class HeatNormals { AreaWeighted, UnitFaces };
@@ -31,9 +35,11 @@ struct HeatBindingReport {
   size_t vertices = 0, components = 0, seeded_bones = 0, iterations = 0,
          work = 0, planned_bytes = 0;
   size_t negative_edges = 0, matrix_vertices = 0;
+  size_t bound_sweeps = 0;
   double removed_negative_stiffness = 0;
   double maximum_relative_residual = 0, minimum_unclamped_weight = 0,
          maximum_partition_error = 0;
+  double maximum_kkt_residual = 0;
 };
 // Caller-authenticated actual metric source geometry. Imported raw joint axes
 // must not be silently interpreted as authored native bone-Y tail authority.

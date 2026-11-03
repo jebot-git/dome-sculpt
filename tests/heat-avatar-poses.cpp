@@ -102,7 +102,7 @@ int main(int argc, char **argv) try {
       source_rule != "reference-raw")
     throw std::invalid_argument("Unknown explicit heat source rule");
   std::string operation = argc > 10 ? argv[10] : "positive";
-  if (operation != "positive" && operation != "fem")
+  if (operation != "positive" && operation != "fem" && operation != "bounded")
     throw std::invalid_argument("Unknown explicit heat operator");
   Scene scene;
   auto controls =
@@ -136,7 +136,9 @@ int main(int argc, char **argv) try {
     try {
       HeatBindingOptions options;
       options.operation = operation == "fem" ? HeatOperator::FiniteElements
-                                             : HeatOperator::PositiveGraph;
+                          : operation == "bounded"
+                              ? HeatOperator::BoundedFiniteElements
+                              : HeatOperator::PositiveGraph;
       options.visibility = visibility == "entry" ? HeatVisibility::EntryFaces
                                                  : HeatVisibility::AllFaces;
       options.occlusion = domain == "component"
@@ -176,6 +178,9 @@ int main(int argc, char **argv) try {
                 << std::count(profile.eligible.begin(), profile.eligible.end(),
                               uint8_t(1))
                 << " residual=" << report.maximum_relative_residual
+                << " kkt=" << report.maximum_kkt_residual
+                << " bound_sweeps=" << report.bound_sweeps
+                << " raw_minimum=" << report.minimum_unclamped_weight
                 << " partition=" << report.maximum_partition_error
                 << " work_total=" << profile.work + seams.work() + report.work
                 << '\n';
