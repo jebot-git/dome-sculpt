@@ -12,7 +12,7 @@ size_t checks=0;
 void check(bool ok,const char *text){if(!ok)throw std::runtime_error(text);++checks;std::cout<<"PASS "<<text<<std::endl;}
 template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception &e){std::cout<<"Expected refusal: "<<e.what()<<std::endl;return true;}}
 void valid_glb(const std::filesystem::path &path){cgltf_options options{};cgltf_data *raw=nullptr;check(cgltf_parse_file(&options,path.c_str(),&raw)==cgltf_result_success,"Independent cgltf reads the actual exported GLB");std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(raw,cgltf_free);check(cgltf_load_buffers(&options,raw,path.c_str())==cgltf_result_success&&cgltf_validate(raw)==cgltf_result_success,"Independent source-coordinate GLB validation passes");}
-import_fixture::Fixture source(int wrap){import_fixture::Fixture f;auto &p=f.j["meshes"][0]["primitives"][0];p["attributes"]["TEXCOORD_0"]=f.values({-1.25f,-.5f,1.75f,-.5f,1.75f,2.5f,-1.25f,2.5f},2,"VEC2");f.j["samplers"][0]["wrapS"]=wrap;f.j["samplers"][0]["wrapT"]=wrap;return f;}
+import_fixture::Fixture source(int wrap){import_fixture::Fixture f;while(f.bin.size()%4)f.bin.push_back(0);auto &p=f.j["meshes"][0]["primitives"][0];p["attributes"]["TEXCOORD_0"]=f.values({-1.25f,-.5f,1.75f,-.5f,1.75f,2.5f,-1.25f,2.5f},2,"VEC2");f.j["samplers"][0]["wrapS"]=wrap;f.j["samplers"][0]["wrapT"]=wrap;return f;}
 }
 int main(int argc,char **argv)try{
  if(argc!=2&&argc!=4)return 2;const auto out=std::filesystem::path(argv[1]);std::filesystem::create_directories(out);Scene original;const auto baseline=original.encode();ImportAuthoringOptions options;options.paint_resolution=64;
