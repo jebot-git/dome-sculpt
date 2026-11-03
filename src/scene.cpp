@@ -539,6 +539,7 @@ nlohmann::json Scene::encode() const {
   }
   if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr);
   if(extended)j["source_materials"]=source_materials.encode(source_images,source_models,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr);
+  if(extended&&j.at("source_materials").at("version")==10)throw std::invalid_argument("Independent keys require the complete owning Scene22 graph codec");
   if(corner_prepared){auto records=color_archive.encode();j["polygon_sources"]["color_bases"]=std::move(records["color_bases"]);j["polygon_sources"]["color_fields"]=std::move(records["color_fields"]);}
   if(!placements.empty())j["affine_state"]=placements.encode(source_images,source_models);
   if(normal_domains.size())j["normal_sampling"]=normal_domains.encode(source_images);

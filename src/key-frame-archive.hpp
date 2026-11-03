@@ -15,6 +15,7 @@ public:
       std::shared_ptr<const Mesh> current,
       const SourceMaterialBindings &before,
       const std::function<bool()> &cancelled={});
+  size_t size() const noexcept{return frames_.sets_.size();}
   void require_complete() const;
 private:
   friend class KeyDerivationCodec;

@@ -3,6 +3,7 @@
 #include "dome/normal-preparation.hpp"
 #include "normal-key-derivation.hpp"
 #include "key-derivation-codec.hpp"
+#include "polygon-color-archive.hpp"
 #include "normal-frame-runtime.hpp"
 #include "shapekey-source-uv.hpp"
 #include <chrono>
@@ -46,6 +47,19 @@ void key_codec(const Scene &input,const Scene &authored){
  corrupt=encoded;corrupt["position_domains"].push_back(corrupt["position_domains"][0]);check(refuses([&]{detail::KeyFrameArchive orphan(corrupt);}),"Unused native key domain records refuse before bulk reconstruction");
  for(auto cut:{size_t(1),polls/2,polls}){detail::KeyFrameArchive cancelled(encoded);size_t at=0;check(rejected([&]{decode(record,cancelled,[&]{return ++at>=cut;});},"cancelled"),"Early/middle/late owning record cancellation refuses atomically");check(refuses([&]{cancelled.at(0);}),"Cancelled owning decode does not expose a partial frame/domain authority");}
  check(input.encode()==source_bytes,"All owning record attempts preserve the genuine source Scene exactly");
+ // Full material table uses actual independent colour/normal/Paint contexts.
+ // It is deliberately separate from the not-yet-admitted outer Scene codec.
+ SourceMaterialArchive table;const auto material_id=table.add(source.material_bindings);
+ PaintImageArchive material_images;CreatorAssetArchive material_models;detail::PolygonColorArchive colour_pool;NormalSamplingArchive normal_pool;PaintSamplingArchive paint_pool;
+ auto data=table.encode(material_images,material_models,&colour_pool,&normal_pool,&paint_pool);auto normal_data=normal_pool.encode(material_images);auto colour_data=colour_pool.encode();auto paint_data=paint_pool.encode();
+ check(data.at("version")==10&&data.at("key_derivations").size()==1&&data.at("normal_preparations").back().at("version")==5,"Actual material writer conditionally owns one universal key record and paired normal entry5");
+ auto read_images=PaintImageArchive::decode(material_images.encode());auto read_models=CreatorAssetArchive::decode(material_models.encode(),read_images);auto read_colours=detail::PolygonColorArchive::decode(colour_data.at("color_bases"),colour_data.at("color_fields"));auto read_normals=NormalSamplingArchive::decode(normal_data,read_images);auto read_paint=PaintSamplingArchive::decode(paint_data);
+ auto read_table=[&](const nlohmann::json &j){return SourceMaterialArchive::decode(j,read_images,read_models,&read_colours,&read_normals,&read_paint);};
+ auto read_materials=read_table(nlohmann::json::from_cbor(nlohmann::json::to_cbor(data)));auto complete=read_materials.at(material_id);complete->validate();
+ check(complete->key_derivation&&complete->key_derivation==complete->normal_preparation->key_derivation&&complete->normal_frames==complete->key_derivation->frames(),"Full material10 CBOR restart preserves actual universal/normal/frame node aliases");
+ check(complete->normal_frames->pbr->encode()==source.material_bindings->normal_frames->pbr->encode()&&complete->key_derivation->before_material()->normal_frames->pbr->origin_vertex_count==4&&complete->normal_frames->pbr->origin_vertex_count==6,"Full material restart keeps independent derived6 POSITION and genuine original4 role identities");
+ auto previous=data;previous["version"]=9;check(rejected([&]{read_table(previous);},"require owning material10"),"Version9 cannot silently discard a new key node or entry5");
+ auto orphan=data;orphan["key_derivations"].push_back(orphan["key_derivations"][0]);check(rejected([&]{read_table(orphan);},"Unreferenced material10 key record"),"Unused owning key records cannot hide extra source history");
 }
 const NormalFrameTarget &key_attributes(const NormalFrames &frame,uint64_t id){for(const auto &t:frame.targets)if(t.id==id)return t;throw std::runtime_error("Independent oracle missing target");}
 void artist_oracle(const detail::SourceKeyDerivation &node,uint64_t id){
@@ -92,7 +106,7 @@ int main(int argc,char **argv)try{
  scene.active().painted->add_layer("After key");scene.active().painted->layer_properties("After key opacity",true,.23f);scene.active().painted->clear_bake();
  check(paint_bytes(*scene.active().painted)!=frozen_paint&&paint_bytes(*node->before_paint())==frozen_paint,"Actual current layer/opacity and Clear-detail edits cannot mutate the immutable before-Paint snapshot");
  check(node->before_paint()->mesh_owner()==frozen_geometry&&node->before_paint()->baked()->normal_authority==frozen_event&&node->before_paint()->baked()==original.painted->baked(),"Frozen geometry/base detail event stays shared exactly while current metadata changes");scene.validate();check(true,"Current metadata transitions preserve the separately replayed key authority");
- check(refuses([&]{scene.encode();}),"Unimplemented codec refuses before an old writer could omit the new authority");
+ check(refuses([&]{scene.encode();}),"Unadmitted outer Scene writer refuses before omitting its complete owning graph");
  ShapeKeyEdit create;create.name="Independent new key";author_shapekey(scene,scene.active().id,create);check(scene.active().material_bindings->normal_preparation->key_derivation->before_material()==node->before_material(),"Later Create reuses the genuine fixed anchor instead of growing a before-chain per stroke");
  edit.target=scene.active().deformation->morphs->targets.size()-1;edit.positions=current.positions;edit.positions[a].z-=.021f;edit.positions[b].z+=.019f;auto capsule=scene.active().shape_source;author_shapekey(scene,scene.active().id,edit);check(scene.active().shape_source==capsule&&scene.active().material_bindings->normal_preparation->key_derivation->before_material()==node->before_material(),"Repeated Replace keeps the fixed source anchor and complete first capsule");
  // The source remains encodable throughout cancellation. The final callback is
