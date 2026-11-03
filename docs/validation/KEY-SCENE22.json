@@ -1,0 +1,17 @@
+{
+  "source": "b165891",
+  "release": {
+    "checks": 85,
+    "inputs": 974,
+    "before_after_equal": true
+  },
+  "scope": "Private initial owning Scene22 path; complete native/export and mixed-context qualification pending",
+  "whole_owned_sanitize": "pending",
+  "files": {
+    "artifacts/key-scene2-status.json": "13a137c26124ae40abbbadf29008a44d027c280526d585ab3057ebc2d9d87b8d",
+    "artifacts/key-scene2-before.json": "90241a4ece33f203c477dec8e2f3ab70694a9a80ab347f31ebe4ffa6f38a6202",
+    "artifacts/key-scene2-test.log": "d5374a8594088da196cc02c8c67e0d5b6ad4b9dabf86b12803405f15cf90d52a",
+    "artifacts/key-scene2-build.log": "ee69357d4467a246f1cb410d8d484a573282d3949f936507b2bbe88ba64d844a",
+    "artifacts/key-scene-missing-reachability-negative.log": "0c8714f909c341b21ea08c63a5d0a34927f0a1cdb31797c7b770c2385d2e3200"
+  }
+}
