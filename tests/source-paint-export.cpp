@@ -40,7 +40,7 @@ int main(int argc,char **argv)try{
   Document document;document.replace(Scene::decode(before));document.shading(false);settled(document);const auto pixels=draw(native,document.frame().surface);
   size_t visible=0;for(size_t p=3;p<pixels.size();p+=4)visible+=pixels[p]>0;check(visible>128,"Independent export comparison contains substantial visible surface coverage");
   const auto output=out/(prefix+"-output.glb");document.export_asset(output).get();
-  color_consumer::Model model(output);fbo.bind();if(kind==1)separate_roles.render(model.data);else independent.render(model.data);const int error=delta(pixels,read());maximum=std::max(maximum,error);
+  color_consumer::Model model(output);fbo.bind();if(kind==1)separate_roles.render(model.data);else independent.render(model.data,nullptr,{},true);const int error=delta(pixels,read());maximum=std::max(maximum,error);
   std::cout<<"SOURCE_EXPORT "<<prefix<<" max="<<error<<'\n';check(error<=2,"Independently parsed standard GLB matches actual source-aware imported PBR pixels, source sampling, frames, alpha, colour and morphs");
   check(document.copy_scene().encode()==before&&Scene::decode(before).encode()==before,"Standard export compilation leaves exact native paint, source coordinate owners and source history unchanged");
   size_t materials=0;for(size_t n=0;n<model.data->materials_count;++n){const auto &material=model.data->materials[n];
@@ -49,11 +49,20 @@ int main(int argc,char **argv)try{
    if(kind==1)check(material.normal_texture.texture&&material.normal_texture.texcoord==1&&std::abs(material.normal_texture.scale-.6f)<1e-6f,"Original UV1 normal role and strength survive writable atlas import/export");
   }
   check(kind>=2||materials==2,"Both selected source instances retain their independently emitted material bindings");
+  if(kind==1&&!flat&&std::string_view(alpha)=="OPAQUE"&&weight==0){
+   for(size_t n=0;n<model.data->materials_count;++n)model.data->materials[n].pbr_metallic_roughness.base_color_texture.texcoord=0;
+   fbo.bind();separate_roles.render(model.data);check(delta(pixels,read())>4,"Independent source consumer visibly rejects substituting UV0 for the actual UV1 base role");
+  }
   if(kind==0&&!flat&&std::string_view(alpha)=="OPAQUE"&&weight==0){
    int polls=0;auto fresh=Scene::decode(before);auto probe=fresh.export_surfaces([&]{++polls;return false;});check(polls>1&&probe.size()==2,"Actual original-coordinate export staging exposes cancellation checkpoints");
    for(int boundary=1;boundary<=polls;++boundary){int count=0;auto candidate=Scene::decode(before);check(rejects([&]{candidate.export_surfaces([&]{return ++count>=boundary;});})&&count==boundary&&candidate.encode()==before,"Every actual export coordinate cancellation preserves the original complete native scene");}
    auto &object=imported.scene.active();auto paint=object.painted->snapshot();PaintSettings ink;ink.front_only=false;ink.color={.1f,.8f,.3f,.6f};Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=1;paint->begin_stroke();paint->stamp(brush,ink);check(paint->end_stroke(),"Real source-overlay paint contributes before the unimplemented portable bake control");object.painted=paint;
    const auto painted=imported.scene.encode();check(rejects([&]{imported.scene.export_surfaces();})&&imported.scene.encode()==painted,"Unimplemented painted standard bake refuses without silently losing paint or changing source state");
+   Document rejected;rejected.replace(imported.scene);const auto protected_file=out/"protected-painted.glb",saved=out/"painted-queued.dsculpt";
+   {std::ofstream file(protected_file,std::ios::binary);file<<"earlier export";}
+   auto failed=rejected.export_asset(protected_file);auto save=rejected.save_async(saved);check(rejects([&]{failed.get();}),"Actual native export worker reports the required portable painted bake rather than emitting an incomplete model");save.get();
+   std::ifstream file(protected_file,std::ios::binary);std::string protected_bytes((std::istreambuf_iterator<char>(file)),{});
+   check(protected_bytes=="earlier export"&&rejected.copy_scene().encode()==painted&&Scene::load(saved).encode()==painted,"Failed painted standard export preserves prior output, native ownership and immediately queued Save");
   }
  }
  std::cout<<"PASS "<<checks<<" source-aware original standard export checks maxerror="<<maximum<<'\n';return 0;
