@@ -13,7 +13,12 @@ enum class BiharmonicInitialization {
   ComponentConstant,
   UnconstrainedWarmStart
 };
-enum class BiharmonicBoxSolver { PrimalFeasible, BlockActiveSet, CoupledDual };
+enum class BiharmonicBoxSolver {
+  PrimalFeasible,
+  BlockActiveSet,
+  CoupledDual,
+  CoupledSquaredDual
+};
 struct BiharmonicBindingOptions {
   BiharmonicBoxSolver box_solver = BiharmonicBoxSolver::PrimalFeasible;
   BiharmonicInitialization initialization =
@@ -33,7 +38,7 @@ struct BiharmonicBindingReport {
          inverse_applications = 0, inverse_refinements = 0;
   double maximum_kkt_residual = 0, maximum_partition_error = 0,
          maximum_dual_kkt = 0, maximum_primal_kkt = 0,
-         maximum_inverse_residual = 0;
+         maximum_inverse_residual = 0, maximum_duality_gap = 0;
 };
 // Explicit SURFACE-domain bounded biharmonic energy L' M^-1 L, not volumetric
 // BBW. Handles are visible nearest-source minima projected onto each connected

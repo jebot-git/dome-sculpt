@@ -22,7 +22,7 @@ struct CoupledDualOptions {
 };
 struct CoupledDualReport {
   size_t iterations = 0, backtracks = 0;
-  double final_lipschitz = 0;
+  double final_lipschitz = 0, duality_gap = 0;
   double kkt = 0, minimum = 0, partition_error = 0;
 };
 template <class Inverse, class Budget>
