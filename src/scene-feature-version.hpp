@@ -44,7 +44,7 @@ inline unsigned minimum_appearance_scene_version(const nlohmann::json &a){
   if(!material.is_number_integer()||(material.is_number_unsigned()?material.get<uint64_t>()>INT32_MAX:material.get<int64_t>()<0||material.get<int64_t>()>INT32_MAX))throw std::runtime_error("Invalid retained appearance material identity");
   return material.get<int64_t>()==0?17u:0u;
 }
-inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->paint_sampling_domain()?24u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
+inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->has_physical_emission()?27u:paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->paint_sampling_domain()?24u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
 
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
@@ -111,6 +111,20 @@ inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
                  (s.contains("version") && s.at("version") == 2)
              ? 11u
              : 0u;
+}
+inline unsigned minimum_scene_version(const Scene &scene){
+  unsigned result=0;
+  for(const auto &o:scene.objects()){
+    result=std::max({result,minimum_scene_version(o.painted.get()),minimum_scene_version(o.deformation.get()),
+      minimum_scene_version(o.material_bindings.get()),minimum_scene_version(o.appearance.get()),
+      minimum_scene_version(o.polygon.get()),minimum_scene_version(o.shape_source.get()),
+      o.rig_source?25u:0u,minimum_scene_version(o.rig_source.get()),o.affine_edit?13u:0u});
+  }
+  for(const auto &g:scene.groups()){
+    if(g.source_placement||g.affine_edit)result=std::max(result,13u);
+    if(g.source_placement)result=std::max(result,minimum_scene_version(g.source_placement->model.get()));
+  }
+  return result;
 }
 inline void require_deformation_scene_version(const nlohmann::json &value,unsigned version,const char *legacy_message){
  const auto required=minimum_deformation_scene_version(value);if(required<=version)return;

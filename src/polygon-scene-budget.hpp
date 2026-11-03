@@ -12,6 +12,7 @@ namespace dome::detail {
 // sharing is represented by bounded table references, not an assumed alias.
 struct PolygonSceneBudget {
   bool owning_paint_domain=false;
+  bool owning_physical_emission=false;
   size_t samples = 0, pixels = 0, paint_bytes = 0, deformations = 0, remaps = 0,
          retopo_entries = 0, retopo_bytes = 0, retained_vertices = 0;
   static void add(size_t &n, size_t amount, size_t maximum,
@@ -44,7 +45,7 @@ struct PolygonSceneBudget {
   void paint(const nlohmann::json &input, bool retained=false,unsigned version=std::numeric_limits<unsigned>::max()) {
     if (input.is_null())
       return;
-    const auto &p=paint_archive_payload(input,owning_paint_domain);
+    const auto &p=paint_archive_payload(input,owning_paint_domain,owning_physical_emission&&version>=27);
     if(p.contains("source_maps"))add(paint_bytes,source_uv_archive_measure(p.at("source_maps"),version).bytes,256*1024*1024,"Scene retained source UV storage exceeded");
     const auto &r = p.at("resolution");
     if (!r.is_number_unsigned() &&
@@ -70,6 +71,12 @@ struct PolygonSceneBudget {
           throw std::invalid_argument("Invalid polygon PBR color tile count");
         add(paint_bytes, pbr.size() * sizeof(PaintColorTile),
             256 * 1024 * 1024, "Scene retained PBR paint storage exceeded");
+      }
+      if(l.contains("physical_emission_tiles")){
+        const auto &tiles=l.at("physical_emission_tiles");
+        if(!owning_physical_emission||version<27||!input.contains("version")||input.at("version")!=3||!tiles.is_array()||tiles.empty()||tiles.size()>4096)
+          throw std::invalid_argument("Physical paint requires actual Scene27/Paint3 capability");
+        add(paint_bytes,tiles.size()*sizeof(PaintEmissionTile),256*1024*1024,"Scene retained physical paint storage exceeded");
       }
     }
     const auto &mesh = p.at("mesh");

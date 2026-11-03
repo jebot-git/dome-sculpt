@@ -80,6 +80,8 @@ int main(int argc,char **argv)try {
   check(rejects([]{PaintedMesh::decode({{"version",3},{"payload",nlohmann::json::object()},{"domain",nullptr}});}),"Old capability refuses even empty Paint3 before geometry");
   check(rejects([&]{zero->composite(Material{});}),"Unimplemented RGBA8 preview is explicitly refused rather than clipping physical data");
   Scene scene;scene.active().mesh_active=true;scene.active().painted=zero;
-  check(rejects([&]{scene.encode();}),"Scene adoption remains refused until the complete Scene27 closure exists");
+  auto scene_data=scene.encode();
+  check(scene_data.at("version")==27&&Scene::decode(scene_data).encode()==scene_data,
+        "Plain physical paint owns an actual Scene27 restart instead of relying on a capability marker");
   std::cout<<"Physical paint data: "<<checks<<" checks; "<<polls<<" cancellation polls; "<<count<<" persistent allocation boundaries\n";return 0;
 }catch(const std::exception&e){deny=-1;observe=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

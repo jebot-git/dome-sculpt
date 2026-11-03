@@ -1,0 +1,250 @@
+{
+  "status": "qualified private owning-data checkpoint; not full HDR workflow or main-ready",
+  "base": "0e9bcab",
+  "parent_data": "f072b8677a08096bde7ea49f0254670116332c3f",
+  "unlit_component": "b35b517f7b8df66b3ef94c40f81de1172fb441ee",
+  "source_files": {
+    "CMakeLists.txt": "6aa63e6aa99b36e56aa0d098ad6d0399b3cc60c0782d18bee41b8c2f95432a06",
+    "src/material-archive-version.hpp": "dc1bc78142a31cbbad422d56a9971c86b58717777b2e7d4bcec29e4b0c55c815",
+    "src/material-bindings.cpp": "2c68f6199b3084c80e7cb45c70daee7316dce53b36c79e5d1252a4f485c2f0cd",
+    "src/polygon-scene-archive.hpp": "288b3637c8c17b6102381be3b01feaeba3da392d7f10a29ec2a968c7a53c467b",
+    "src/polygon-scene-budget.hpp": "dc8831b1d8144c1b63475145e1702e91b1a7f821204d0105bad42cb61965824c",
+    "src/polygon-scene.cpp": "82b5c20dfc0980c0eaf71d14115c519091737eb35cc7f941d75425589370a278",
+    "src/scene-feature-version.hpp": "879f0af3384218a7b1e801da0ba4c2a7aa8feb4798cb4f0fd0de73ff21d95da1",
+    "src/scene.cpp": "96068cba04f101dd89c612f55d03ac9bf7d7e7effc42b257f2739f11612262bb",
+    "tests/emission-paint-data.cpp": "a179824f1252698bf4b0c5d8712ec3ec8d1786e5518679f3a9b3c703a31b8c6f",
+    "tests/emission-scene.cpp": "b8b9b8b10c68674936ff16ffabdd163deeeaf0b3c546a1b0a6cc0d78ad94a9e5"
+  },
+  "profiles": {
+    "release": {
+      "build": {
+        "seconds": 51.604123700992204,
+        "source_inputs": 1490,
+        "unchanged": true,
+        "affected": [
+          "material-bindings.cpp",
+          "polygon-scene.cpp",
+          "scene.cpp",
+          "vrm.cpp"
+        ],
+        "scope": "Four affected core TUs +two full test TUs over seven verified immutable f072 archives; public headers byte-identical; dependency audit; no fresh full-app/render claim."
+      },
+      "new_consumers": {
+        "results": {
+          "emission-paint-data": {
+            "exit_code": 0,
+            "seconds": 0.012121486011892557
+          },
+          "emission-scene": {
+            "exit_code": 0,
+            "seconds": 5.374348131008446
+          }
+        },
+        "seconds": 5.597905400994932,
+        "unchanged": true,
+        "source_inputs": 1490,
+        "artifacts": 16
+      },
+      "legacy_consumers": {
+        "results": {
+          "scene": {
+            "exit_code": 0,
+            "seconds": 3.7884952719905414
+          },
+          "scene-compat": {
+            "exit_code": 0,
+            "seconds": 4.557463290024316
+          },
+          "source-union-version": {
+            "exit_code": 0,
+            "seconds": 7.059218656009762
+          },
+          "normal-color-uv": {
+            "exit_code": 0,
+            "seconds": 141.52031685999827
+          }
+        },
+        "unchanged": true,
+        "source_inputs": 1490,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libdome-sculpt-affine.a": "7b60bba8620238a7c4d95b9dfbc3536164ab39dabcdc4bef0840fbf6e5f4dbe8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libdome-sculpt-core.a": "39176a60b9e7d11093ed733bcfc8a089c1342cf9b2db41477d3f04309c480dff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libdome-sculpt-polygon.a": "50bc7a77a690909756f7664df57ff5dfbac08a55093901945ebdb2d3cbf44038",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libmikktspace-robust.a": "d38c11f311ac741f12be0eb6a7044ef14f0302176b8faaf54d1eb3a622132f22",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libmikktspace.a": "b6032bcc6870962e5367996f6c8ebd91d04ac9b1df05d66980c0cf6988e8106b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libufbx.a": "9e98f95e404309e732ad1e6a324065d92873b8271c1d35f9ad661fe6d3c38569",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libxatlas.a": "dac88b905effd4be5447357f929c5218a823e584546f77f334e91beac588ecd3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/libcore-graph.a": "d0adbeb4a257337c9423d3595e2287bb13844485bcb9745324d7afc08ae118e4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/scene": "28d557562ab537d295362a7e4eeceabea2e89e76b13e55fe3c4f54f70120d378",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/scene.o": "81bb63ee5a5b2a48cbe3d329019e772dacb65bbdc669bc4b39c954f8987382a0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/scene-compat": "766606defa42dfcc7bec9d32acd7264ea6a7992cc894fb61c40ff3f6f4ed0a67",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/scene-compat.o": "4c620bc5ab163ba58459fefbf215973647e43798edd61e924375dd9a95c4e462",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/source-union-version": "a50165f63128f3bc448f9fb272e5b585568cfa9a00d7153e9e5f213ccab369be",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/source-union-version.o": "e6ff55d0f52b2856663368bc3da5be0a402c2a9b83de33b2d90d85c1b21064ca",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/normal-color-uv": "c76ce466dc3620967c6adc31bdb9f5e196de1347d2ec1f1c0bd5aa678f2e94f5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/regressions/normal-color-uv.o": "5d7237393de8c4f7a54dfe3dd3eae19aa19b30cc522613b96535045b70230dc8"
+        },
+        "scope": "Four complete unchanged legacy/combined tests compiled against exact current public headers and matched four-runtime-TU graph archive plus seven immutable f072 supports."
+      },
+      "evidence": {
+        "artifacts/scene27-proof/release/before.json": "60d44f6cb59e30c2deffe2f10ca66d7750eff8b57fc170e3683578c3771e45fb",
+        "artifacts/scene27-proof/release/after.json": "60d44f6cb59e30c2deffe2f10ca66d7750eff8b57fc170e3683578c3771e45fb",
+        "artifacts/scene27-proof/release/run-before.json": "e5e20ac317f6d7af761e46264127f85ab381b27f7d8c671f18885fd3752f97f3",
+        "artifacts/scene27-proof/release/run-after.json": "e5e20ac317f6d7af761e46264127f85ab381b27f7d8c671f18885fd3752f97f3",
+        "artifacts/scene27-proof/release/emission-scene-run.log": "ee9bff75b08fe4a02b780bd99b2381e92878c0043a9611d00f04cea4892f9249",
+        "artifacts/scene27-proof/release/emission-paint-data-run.log": "58f3f3ec4046be36dc307be6425176d0efd125d71b03b7227b67e88c4a6c7ee8",
+        "artifacts/scene27-proof/release/regressions/normal-color-uv.log": "bd65e3861ce53d1d6c4baccfbbe7f08a97fe981629ef48ae6e3cbce1ece19178"
+      }
+    },
+    "sanitize": {
+      "build": {
+        "seconds": 99.72769340602099,
+        "source_inputs": 1490,
+        "unchanged": true,
+        "affected": [
+          "material-bindings.cpp",
+          "polygon-scene.cpp",
+          "scene.cpp",
+          "vrm.cpp"
+        ],
+        "scope": "Four affected core TUs +two full test TUs over seven verified immutable f072 archives; public headers byte-identical; dependency audit; no fresh full-app/render claim."
+      },
+      "new_consumers": {
+        "results": {
+          "emission-paint-data": {
+            "exit_code": 0,
+            "seconds": 0.18401048899977468
+          },
+          "emission-scene": {
+            "exit_code": 0,
+            "seconds": 83.07577382199815
+          }
+        },
+        "seconds": 86.35718206199817,
+        "unchanged": true,
+        "source_inputs": 1490,
+        "artifacts": 16
+      },
+      "legacy_consumers": {
+        "results": {
+          "scene": {
+            "exit_code": 0,
+            "seconds": 9.95247835299233
+          },
+          "scene-compat": {
+            "exit_code": 0,
+            "seconds": 24.738518942991504
+          },
+          "source-union-version": {
+            "exit_code": 0,
+            "seconds": 14.551604665000923
+          },
+          "normal-color-uv": {
+            "exit_code": 0,
+            "seconds": 2061.006707305991
+          }
+        },
+        "unchanged": true,
+        "source_inputs": 1490,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libdome-sculpt-affine.a": "ef84cca73da4e52646ad7af04dc21043df5b767df5a4a398cfd88d90f49eab82",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libdome-sculpt-core.a": "9f8a9423ed6ba74091a8405b28f9f8a5a640372cb0de19efd60a6ef7028c6029",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libdome-sculpt-polygon.a": "c7587573ba3f65737503b23aa5217d8969aef6d5c6cd2c6c2d44c926bbaa40f3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libmikktspace-robust.a": "787511c02d8249495b6efd043a6d7132f055986b47e872a1a4e36677ff677164",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libmikktspace.a": "f1c6c9d1f65b307ce14bff48e1a131d98183393cd6aa97584ba023fc6110192e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libufbx.a": "0a7b29f12d837e4e5e972c2b21b4dd598eacbc3ccc01497636e34238814a988b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libxatlas.a": "ac4a0bc9bb0cecf969e8866c375e0952518a1eeeae5d08abb2babd83e10fcf08",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/libcore-graph.a": "c794115177cdd879254f4875afc6c84c78863431cb20e9390ebaae047658b8a0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/scene": "571fec15066a2a544d60bbb3a422dee6cd717314b02bac0f85342e076dd3dfe5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/scene.o": "0b1a437f2e4e1b63ab122f79c83f949fd0f5d118e2e64abcbd32c4e3a9a9ee21",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/scene-compat": "418ffa421d07a0b51eb874cb24d73a03c411966eb83e9807d21c66aeb4b2e308",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/scene-compat.o": "9d60f958d3867ca0105ee8914669d2dbc50092a95c2f4e081984f239df6d89b1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/source-union-version": "8028615c17198dcca5eb5ac1752f34f9a1413384353b9e903e4a4bd2b1511dfe",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/source-union-version.o": "bfd973cab9ea5ca88283246e4e3f932ee12c5640b0eb6d13bb38d7b2e2fb6c44",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/normal-color-uv": "b1b93bc037f76471c012e7ef3edbab5d4b55506227af05926730f328fa750fb5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/sanitize/regressions/normal-color-uv.o": "8224c7f36c9ee1edc8a7c8b36e5f451efd16455a841f1965b9bf078b22a7f331"
+        },
+        "scope": "Four complete unchanged legacy/combined tests compiled against exact current public headers and matched four-runtime-TU graph archive plus seven immutable f072 supports."
+      },
+      "evidence": {
+        "artifacts/scene27-proof/sanitize/before.json": "60d44f6cb59e30c2deffe2f10ca66d7750eff8b57fc170e3683578c3771e45fb",
+        "artifacts/scene27-proof/sanitize/after.json": "60d44f6cb59e30c2deffe2f10ca66d7750eff8b57fc170e3683578c3771e45fb",
+        "artifacts/scene27-proof/sanitize/run-before.json": "2c64b9907284884ae841fbba239d64648e1de909e55141d18d5c43240a1f8066",
+        "artifacts/scene27-proof/sanitize/run-after.json": "2c64b9907284884ae841fbba239d64648e1de909e55141d18d5c43240a1f8066",
+        "artifacts/scene27-proof/sanitize/emission-scene-run.log": "ee9bff75b08fe4a02b780bd99b2381e92878c0043a9611d00f04cea4892f9249",
+        "artifacts/scene27-proof/sanitize/emission-paint-data-run.log": "58f3f3ec4046be36dc307be6425176d0efd125d71b03b7227b67e88c4a6c7ee8",
+        "artifacts/scene27-proof/sanitize/regressions/normal-color-uv.log": "bd65e3861ce53d1d6c4baccfbbe7f08a97fe981629ef48ae6e3cbce1ece19178"
+      }
+    }
+  },
+  "legacy_scene": {
+    "legacy_bytes": 58291,
+    "legacy_sha256": "646ab857415d5d5bebb485f8d1f3a4002722ff166c476c5b02cac4aae5cf763c",
+    "old_scene27_refusal": "Unsupported scene version",
+    "source_unchanged": true,
+    "consumer_inputs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/legacy-scene/old": "352c5c43d18c11f736478a8342284c4b68bc2da91fe8e9e29cd9bd76034b0850",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/legacy-scene/old.o": "e4cd9bf62bf69f36aefa642370dd57da229eb206825931dbb1b5ff2125add74b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/legacy-scene/new": "888f2c259df40b1f888e05f971302b3ae6d562c6068f9ba624c94d6f6dfcda3c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-scene27-f072b86/artifacts/scene27-proof/release/legacy-scene/new.o": "e4cd9bf62bf69f36aefa642370dd57da229eb206825931dbb1b5ff2125add74b"
+    }
+  },
+  "negative_cohorts": {
+    "scene27-proof-first-negative": {
+      "artifacts/scene27-proof-first-negative/release/build-status.json": "60aa2d158c35fc1bc617f3cb5c7463ece7608eaabfc6f0c8402dc74144597d15",
+      "artifacts/scene27-proof-first-negative/release/emission-scene-run.log": "281b969d866523fca8931b1ebe1457bfa0bb37f111a5e1a5bf709a59309a17b8",
+      "artifacts/scene27-proof-first-negative/release/run-status.json": "a6a373a24fb3448b5d5218b803ea90fbab150e27872708e69b4324b87314479d",
+      "artifacts/scene27-proof-first-negative/sanitize/build-status.json": "f2b26f2c538fb8f5de15434fc6a164a6f4aa8c3ca5f61afaba3e95bbf641ffef",
+      "artifacts/scene27-proof-first-negative/sanitize/emission-scene-run.log": "281b969d866523fca8931b1ebe1457bfa0bb37f111a5e1a5bf709a59309a17b8",
+      "artifacts/scene27-proof-first-negative/sanitize/run-status.json": "63007ca414faebc109659372d4353bda4469df8c378da916f912d9ea1f6d5a11"
+    },
+    "scene27-proof-second-negative": {
+      "artifacts/scene27-proof-second-negative/release/build-status.json": "64ba82cd2e8bea441c8ed7ab0994e87375b8641d31a09f4170eadeff7fd0d349",
+      "artifacts/scene27-proof-second-negative/release/emission-scene-run.log": "fb12b3cfd1bf88d7835cba96454ae7b52b671c617f158158355a1054df95b4d7",
+      "artifacts/scene27-proof-second-negative/release/run-status.json": "fb6c51b02490e83a94bea5181a4aaab8a0e2302d2f76ac683200ba45ffa49c74",
+      "artifacts/scene27-proof-second-negative/sanitize/build-status.json": "8752223b5414b4aa99bf83852f94ef22ca4a77380575a725eea25880965ec7f9",
+      "artifacts/scene27-proof-second-negative/sanitize/emission-scene-run.log": "fb12b3cfd1bf88d7835cba96454ae7b52b671c617f158158355a1054df95b4d7",
+      "artifacts/scene27-proof-second-negative/sanitize/run-status.json": "b72c5fd754bac7f7ed285f296e09bafa587d2356c505ee2008ee02b599fd308e"
+    },
+    "scene27-proof-third-negative": {
+      "artifacts/scene27-proof-third-negative/release/build-status.json": "7b74a06113eda06df2fdb537f9092306f45f9ee24ed8d6969b9bd5dab5228948",
+      "artifacts/scene27-proof-third-negative/release/emission-scene-run.log": "a59a8886b192ee348fb896bab586774de268688fc8c7acd823dd7847595429e4",
+      "artifacts/scene27-proof-third-negative/release/run-status.json": "e99c1cdf54908f503fbad72d32449108653f32b69690214f3455c4f599985446",
+      "artifacts/scene27-proof-third-negative/sanitize/build-status.json": "2d860de8e4df7bc0e36c1027fb3a5b7957c0f4ffe3e8bf32e7ae8b00c0d225a2",
+      "artifacts/scene27-proof-third-negative/sanitize/emission-scene-run.log": "a59a8886b192ee348fb896bab586774de268688fc8c7acd823dd7847595429e4",
+      "artifacts/scene27-proof-third-negative/sanitize/run-status.json": "78f37cf859d1f4314f776c0e6b0c387d6e98f1602ce0156c5aebc320f479b1b9"
+    },
+    "scene27-proof-fourth-negative": {
+      "artifacts/scene27-proof-fourth-negative/release/build-status.json": "a72a8e3312c7295e0438666476f1e87a947010a80b5d75af9debc9e9d32ed01e",
+      "artifacts/scene27-proof-fourth-negative/release/emission-scene-run.log": "211e2c8425a5a744dab983fa99da8ebc881dd0e3c572269c0f9a97c1a8e7d482",
+      "artifacts/scene27-proof-fourth-negative/release/run-status.json": "fd5b268b3c395d00ca01959b0ad041cec2a9337941a7d0c9768cfae64cf8b83c",
+      "artifacts/scene27-proof-fourth-negative/sanitize/build-status.json": "696a3e488e6e55c5f1d862d71fc69b6d4c965cac93d76f57f4331f9fb0279faf",
+      "artifacts/scene27-proof-fourth-negative/sanitize/emission-scene-run.log": "211e2c8425a5a744dab983fa99da8ebc881dd0e3c572269c0f9a97c1a8e7d482",
+      "artifacts/scene27-proof-fourth-negative/sanitize/run-status.json": "a7cd182a17c64e3f1db1b0262925429556ae099a83df520132f05b64158367a2"
+    }
+  },
+  "limits": {
+    "scene_bytes": 268435456,
+    "paint_bytes": 134217728,
+    "base_material_layouts": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "not_qualified": [
+    "HDR source/import admission",
+    "actual application/FLTK/OpenXR physical painting",
+    "linear native preview",
+    "HDR GLB/VRM export precision",
+    "GPU or physical HMD",
+    "full CTest/all-target build",
+    "normal-colour sanitizer configured600s CTest timing gate"
+  ]
+}
