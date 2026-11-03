@@ -3,10 +3,14 @@
 #include "dome/rig.hpp"
 namespace dome::detail {
 enum class HeatOperator { FiniteElements, PositiveGraph };
+enum class HeatVisibility { AllFaces, EntryFaces };
+enum class HeatOcclusion { WholeMesh, ConnectedSurface };
 // Private open-surface PDE prototype. Raw vertex/topology identity is retained;
 // no coordinate-only welding, authoring admission or legacy solver change.
 struct HeatBindingOptions {
   HeatOperator operation = HeatOperator::FiniteElements;
+  HeatVisibility visibility = HeatVisibility::AllFaces;
+  HeatOcclusion occlusion = HeatOcclusion::WholeMesh;
   WeightLimits limits;
   double maximum_seed_distance = .3, heat_strength = 1,
          relative_tolerance = 1e-9;
@@ -34,6 +38,18 @@ struct HeatPositivityFailure : std::runtime_error {
       : std::runtime_error("Bone heat FEM field violates its independently "
                            "checked positivity bound"),
         joint(j), minimum(m) {}
+};
+struct HeatSeedFailure : std::runtime_error {
+  size_t component, rows, entry_hits, exit_hits, grazing_hits, own_hits,
+      foreign_hits;
+  std::array<double, 3> lower, upper;
+  HeatSeedFailure(size_t id, size_t r, size_t e, size_t x, size_t g, size_t own,
+                  size_t foreign, std::array<double, 3> lo,
+                  std::array<double, 3> hi)
+      : std::runtime_error("Bone heat has a disconnected component without a "
+                           "visible deform-bone seed"),
+        component(id), rows(r), entry_hits(e), exit_hits(x), grazing_hits(g),
+        own_hits(own), foreign_hits(foreign), lower(lo), upper(hi) {}
 };
 SkinWeights heat_bind_surface(const Mesh &, const Skeleton &,
                               const HeatBindingOptions &,

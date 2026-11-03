@@ -4,8 +4,8 @@
 #include "heat-source.hpp"
 #include <iomanip>
 #include <iostream>
-#include <numbers>
 #include <nlohmann/json.hpp>
+#include <numbers>
 using namespace dome;
 using namespace dome::detail;
 namespace {
@@ -77,8 +77,17 @@ void pose(DeformationState &d, int which) {
 }
 } // namespace
 int main(int argc, char **argv) try {
-  bool primitive = argc > 1 && std::string(argv[1]) == "primitive";
-  bool male = argc > 2 && std::string(argv[2]) == "male";
+  std::string policy = argc > 1 ? argv[1] : "whole",
+              gender = argc > 2 ? argv[2] : "female",
+              visibility = argc > 3 ? argv[3] : "all",
+              domain = argc > 4 ? argv[4] : "whole";
+  if ((policy != "whole" && policy != "primitive") ||
+      (gender != "male" && gender != "female") ||
+      (visibility != "all" && visibility != "entry") ||
+      (domain != "whole" && domain != "component"))
+    throw std::invalid_argument("Unknown explicit heat pose control");
+  bool primitive = policy == "primitive", male = gender == "male";
+  double strength = argc > 5 ? std::stod(argv[5]) : 1;
   Scene scene;
   auto controls =
       male ? humanoid_baseline_defaults("vroid-beta-male") : HumanoidControls{};
@@ -96,8 +105,10 @@ int main(int argc, char **argv) try {
   std::cout << std::setprecision(10)
             << "FIXED_QUALITY gender=" << (male ? "male" : "female")
             << " policy=" << (primitive ? "original-primitive" : "whole-skin")
-            << " height=" << height << " mean_limit=" << mean_limit
-            << " max_limit=" << max_limit << '\n';
+            << " visibility=" << visibility << " occlusion=" << domain
+            << " heat_strength=" << strength << " height=" << height
+            << " mean_limit=" << mean_limit << " max_limit=" << max_limit
+            << '\n';
   size_t solved = 0, refused = 0, quality = 0, seam_fail = 0, native_fail = 0;
   for (const auto &o : scene.objects()) {
     if (!o.painted || !o.deformation || !o.deformation->skin ||
@@ -107,7 +118,13 @@ int main(int argc, char **argv) try {
     try {
       HeatBindingOptions options;
       options.operation = HeatOperator::PositiveGraph;
+      options.visibility = visibility == "entry" ? HeatVisibility::EntryFaces
+                                                 : HeatVisibility::AllFaces;
+      options.occlusion = domain == "component"
+                              ? HeatOcclusion::ConnectedSurface
+                              : HeatOcclusion::WholeMesh;
       options.maximum_seed_distance = 1;
+      options.heat_strength = strength;
       auto profile = imported_heat_profile(
           *o.deformation->skeleton, *o.appearance, options, {},
           &*o.deformation->humanoid,
@@ -162,6 +179,15 @@ int main(int argc, char **argv) try {
                   << " native_consumer_max=" << consumer
                   << " seam_exact=" << seam << " quality=" << good << '\n';
       }
+    } catch (const HeatSeedFailure &e) {
+      ++refused;
+      std::cout << "REFUSED_SEED rows=" << e.rows
+                << " entry_hits=" << e.entry_hits
+                << " exit_hits=" << e.exit_hits
+                << " grazing_hits=" << e.grazing_hits << " lower=" << e.lower[0]
+                << ',' << e.lower[1] << ',' << e.lower[2]
+                << " upper=" << e.upper[0] << ',' << e.upper[1] << ','
+                << e.upper[2] << '\n';
     } catch (const std::exception &e) {
       ++refused;
       std::cout << "REFUSED " << e.what() << '\n';

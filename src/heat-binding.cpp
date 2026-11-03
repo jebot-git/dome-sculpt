@@ -40,7 +40,7 @@ struct Budget {
 };
 struct System {
   std::vector<size_t> starts;
-  std::vector<uint32_t> columns, parent, raw_to_row;
+  std::vector<uint32_t> columns, parent, raw_to_row, surface_parent;
   std::vector<D> positions;
   std::vector<double> values, diagonal, mass, heat, ties;
   std::vector<D> normals;
@@ -128,6 +128,11 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
         throw std::runtime_error("Bone heat stiffness overflow");
       edges[{std::min(a, b), std::max(a, b)}] += weight;
     }
+  }
+  s.surface_parent.resize(n);
+  for (size_t i = 0; i < n; ++i) {
+    budget.step();
+    s.surface_parent[i] = root(uint32_t(i));
   }
   s.starts.assign(n + 1, 0);
   if (operation == HeatOperator::PositiveGraph) {
@@ -227,10 +232,43 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
     budget.step();
     return false;
   };
-  qo.triangle_filter = [&](uint32_t) {
-    budget.step();
-    return true;
+  D ray_direction{};
+  size_t active_row = 0;
+  auto facing = [&](uint32_t triangle) {
+    budget.step(16);
+    size_t at = size_t(triangle) * 3;
+    auto a = point(m.positions[m.indices[at]]),
+         b = point(m.positions[m.indices[at + 1]]),
+         c = point(m.positions[m.indices[at + 2]]);
+    auto normal = cross(sub(b, a), sub(c, a));
+    double value = dot(normal, ray_direction), scale = 0;
+    for (int k = 0; k < 3; ++k)
+      scale += std::abs(normal[k] * ray_direction[k]);
+    double error = 16 * std::numeric_limits<double>::epsilon() * scale;
+    return value > error ? 1 : value < -error ? -1 : 0;
   };
+  qo.triangle_filter = [&](uint32_t triangle) {
+    budget.step();
+    if (o.occlusion == HeatOcclusion::ConnectedSurface &&
+        s.surface_parent[s.raw_to_row[m.indices[size_t(triangle) * 3]]] !=
+            s.surface_parent[active_row])
+      return false;
+    if (o.visibility == HeatVisibility::AllFaces)
+      return true;
+    for (int k = 0; k < 3; ++k) {
+      budget.step();
+      if (s.raw_to_row[m.indices[size_t(triangle) * 3 + k]] == active_row)
+        return false;
+    }
+    // Surface bone heat tests entry occluders, not closed-material path
+    // membership. Exit faces are ignored as in the pinned heat reference;
+    // ambiguous grazing remains conservative. Volume FMM is unaffected.
+    return facing(triangle) <= 0;
+  };
+  struct Trace {
+    size_t entry = 0, exit = 0, grazing = 0, own = 0, foreign = 0;
+  };
+  std::vector<Trace> trace(s.positions.size());
   struct Candidate {
     double distance = INFINITY, physical = 0;
     D target{};
@@ -242,6 +280,7 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
   for (size_t i = 0; i < s.positions.size(); ++i) {
     budget.step();
     auto p = s.positions[i];
+    active_row = i;
     candidates.clear();
     for (auto &source : segments) {
       budget.step();
@@ -273,8 +312,26 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
         D start = p;
         for (int k = 0; k < 3; ++k)
           start[k] += trim * d[k] / c.physical;
-        visible = !query.raycast(
+        ray_direction = d;
+        auto hit = query.raycast(
             vec(start), vec(d), float(std::max(0., c.physical - 2 * trim)), qo);
+        visible = !hit;
+        if (hit) {
+          int side = facing(hit->triangle);
+          auto &record = trace[s.parent[i]];
+          if (s.surface_parent
+                  [s.raw_to_row[m.indices[size_t(hit->triangle) * 3]]] ==
+              s.surface_parent[i])
+            ++record.own;
+          else
+            ++record.foreign;
+          if (side < 0)
+            ++record.entry;
+          else if (side > 0)
+            ++record.exit;
+          else
+            ++record.grazing;
+        }
       }
       if (!visible)
         continue;
@@ -300,9 +357,23 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
   }
   for (size_t i = 0; i < s.parent.size(); ++i) {
     budget.step();
-    if (s.parent[i] == i && !anchored[i])
-      throw std::runtime_error("Bone heat has a disconnected component without "
-                               "a visible deform-bone seed");
+    if (s.parent[i] == i && !anchored[i]) {
+      size_t rows = 0;
+      D lo{INFINITY, INFINITY, INFINITY}, hi{-INFINITY, -INFINITY, -INFINITY};
+      for (size_t row = 0; row < s.parent.size(); ++row) {
+        budget.step();
+        if (s.parent[row] != i)
+          continue;
+        ++rows;
+        for (int k = 0; k < 3; ++k) {
+          lo[k] = std::min(lo[k], s.positions[row][k]);
+          hi[k] = std::max(hi[k], s.positions[row][k]);
+        }
+      }
+      const auto &t = trace[i];
+      throw HeatSeedFailure(i, rows, t.entry, t.exit, t.grazing, t.own,
+                            t.foreign, lo, hi);
+    }
   }
 }
 struct Solve {
@@ -401,6 +472,10 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   const size_t n = m.positions.size(), nt = m.indices.size() / 3;
   if ((o.operation != HeatOperator::FiniteElements &&
        o.operation != HeatOperator::PositiveGraph) ||
+      (o.visibility != HeatVisibility::AllFaces &&
+       o.visibility != HeatVisibility::EntryFaces) ||
+      (o.occlusion != HeatOcclusion::WholeMesh &&
+       o.occlusion != HeatOcclusion::ConnectedSurface) ||
       !o.maximum_work || o.maximum_work > 500'000'000 ||
       o.maximum_bytes < 4096 || o.maximum_bytes > 512u * 1024u * 1024u ||
       !o.maximum_iterations || o.maximum_iterations > 4096 ||
@@ -418,7 +493,7 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
           "Bone heat memory budget exceeded before construction");
     planned += count * stride;
   };
-  bytes(n, 512 + 2 * (sizeof(VertexWeights) +
+  bytes(n, 576 + 2 * (sizeof(VertexWeights) +
                       size_t(o.limits.max_influences) * sizeof(Influence)));
   bytes(nt, 512);
   bytes(rig.bones.size() * rig.bones.size(), 64);

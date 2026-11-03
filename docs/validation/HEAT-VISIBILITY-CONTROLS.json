@@ -1,0 +1,75 @@
+{
+  "base": "631c8516b311f76b469a6862c1369a09e59ee727",
+  "scope": "Private CPU kernel and fixture, copied b32 support archives; no native application admission",
+  "bounds": "unchanged mean .5% and maximum 2% avatar height",
+  "quality_failures": {
+    "female": [
+      3,
+      1,
+      0
+    ],
+    "male": [
+      3,
+      2,
+      3
+    ]
+  },
+  "strengths": [
+    0.25,
+    1,
+    4
+  ],
+  "near_contact": "genuine original negative, biased ray skips connected entry wall",
+  "evidence": [
+    {
+      "path": "artifacts/poses-component-female-h.25.log",
+      "sha256": "a91e6bdf1dc981c7c6e7be95ed42aa03dd83cd5d327d9672f2796cc5a4382943",
+      "bytes": 14542
+    },
+    {
+      "path": "artifacts/poses-component-female-h1.log",
+      "sha256": "3c567eea589f963ba72ab684298c477bde6f9531e50c15310edefe28eb2160a8",
+      "bytes": 14532
+    },
+    {
+      "path": "artifacts/poses-component-female-h4.log",
+      "sha256": "898dee9fe7bdf3f3445e9afa0e1d393c5188cf810889a8fe83471579aba96e34",
+      "bytes": 14532
+    },
+    {
+      "path": "artifacts/poses-component-male-h.25.log",
+      "sha256": "7e63ef50dcc154eec7c182f5863857e54d234773fcec087368e866ed5ae70964",
+      "bytes": 14664
+    },
+    {
+      "path": "artifacts/poses-component-male-h1.log",
+      "sha256": "c8ce8cc8b9923baed727050ac937dce9578c654951c1f08eb22fddd9a1c3b0dd",
+      "bytes": 14658
+    },
+    {
+      "path": "artifacts/poses-component-male-h4.log",
+      "sha256": "fa8f6b7f700c44dd1a0f48baafe1d68dcb92f0494dd56c695ec136e74ed7b7af",
+      "bytes": 14661
+    },
+    {
+      "path": "artifacts/tests-heat-visibility-near-old.log",
+      "sha256": "53f3bc5eb1e99cf89b8d60cd04cfc8440b722f11d75fd0c374c4ee80b2b44e0e",
+      "bytes": 162
+    },
+    {
+      "path": "artifacts/heat-visibility-near-old-probe",
+      "sha256": "6fb0a3b3303324cd8ff427daa38e68f5f74d993c0ff197c288204664c009ddb1",
+      "bytes": 821320
+    },
+    {
+      "path": "artifacts/tests-heat-occlusion-domain.log",
+      "sha256": "39d3106cdd1ef9e61185d26380e703bc7211a3f19413fa4a6e11f39fa3017938",
+      "bytes": 108
+    },
+    {
+      "path": "artifacts/tests-heat-visibility-control.log",
+      "sha256": "df539858136e9de1ec1aa45d918c51d013b8d5a878d5cb3bae68eca046c18e0d",
+      "bytes": 170
+    }
+  ]
+}
