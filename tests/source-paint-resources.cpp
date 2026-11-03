@@ -42,6 +42,7 @@ int main(int argc,char **argv)try {
     raw.positions.resize(100'000,{0,0,0});raw.normals.resize(raw.positions.size(),{0,0,1});
     raw.uv.resize(raw.positions.size(),{-1,-1});auto maps=source();
     maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(raw.uv);
+    maps->normal.image=std::make_shared<const Image>(Image{1,1,{128,128,255,255}});maps->normal.texcoord=1;
     PaintSurfaceOptions policy;policy.policy=PaintUvPolicy::SourceAuthored;
     auto before=PaintedMesh::from_maps(raw,maps,1024,policy);auto target=raw;
     target.uv.assign(target.positions.size(),{0,0});auto corners=quad().uv;
