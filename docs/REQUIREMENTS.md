@@ -9,7 +9,9 @@ arithmetic/resample and actual rebuilt application GL+compute synthetic-XR7 pass
 Read validation/UNLIT-VENDOR-INTEGRATION.json. These extend the earlier unlit
 component scope to current vendor applications; they are not fresh clean vendor
 builds, full-suite passes, positive AMD/NVIDIA or physical-headset tests.
-The fresh CPU ALL-target build is still running in the frozen vendor cohort.
+The fresh optimized CPU ALL-target build now passes in 1509.29 seconds;
+all tracked inputs remain unchanged. See validation/UNLIT-CPU-BUILD.json. The
+full 540-command CTest run is live and has no completed full-pass claim.
 The full production goal and all incomplete original/additional rows remain
 required. No system installation or active session changed.
 
