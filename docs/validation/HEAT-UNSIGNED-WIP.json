@@ -1,0 +1,34 @@
+{
+  "scope": "private CPU geometric source and bounded-FEM controls; no native admission",
+  "base": "523365d7d9594b750358df0412977a33ba24dc0a",
+  "oversized_negative": "d4a4aef",
+  "old_extra_memberships": {
+    "female": 475,
+    "male": 395
+  },
+  "fixed_palette_parts_each": 19,
+  "fixed_support_mismatches": 0,
+  "pose_inputs": 1491,
+  "pose_inputs_before_after_equal": true,
+  "sanitizer_scope": "3 own private TUs/invocations; copied b32 support libraries uninstrumented",
+  "full_goal_complete": false,
+  "sealing_hashes": {
+    "src/heat-binding.hpp": "da0f12cb41efeffc1660407afcb2a4b265f873013a3cce7698d87c51c101a0e7",
+    "src/heat-binding.cpp": "e4e56da062e548cc20eb6d16084f2ba1ab17601306072c1478d331104528207f",
+    "src/heat-source.hpp": "7d5f428af62627860830b43bd6335ce46326e8c59782a5f09592ebdd1e32bcab",
+    "tests/heat-source-palette.cpp": "19be79d5bbfd5672436abd7fee8531c1c00e545b70856dae7252c105d83b5c1f",
+    "tests/heat-unsigned-distance.cpp": "dcd4b4baee2143087a1750cdd9cd2e2fac280f0238064ba05e75cd7bf1bd1c90",
+    "tests/heat-unsigned-poses.cpp": "e340e234412fd20b92d8dd1d8296ebbe28a9a04e3b16dfdc065e20729bd237f1",
+    "tests/heat-unsigned-diagnostic.cpp": "fb8fb1b10156344b4407e94f870ee4929d0adc70bf137d6b83a442c8abecec23",
+    "artifacts/kernel-libraries/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+    "artifacts/kernel-libraries/libdome-sculpt-core.a": "fb31277a000ea0c42744c8f0863c1778f3076f323acb8ab37f308c7520aad648",
+    "artifacts/kernel-libraries/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+    "artifacts/kernel-libraries/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+    "artifacts/kernel-libraries/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+    "artifacts/kernel-libraries/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+    "artifacts/kernel-libraries/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2",
+    "artifacts/kernel-libraries/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64",
+    "artifacts/heat-source-palette-index-san": "a7a58f68d646a9cbd60869097ff5eb482ce43fa602dad0d16b8dd83885ff7da2",
+    "artifacts/heat-unsigned-distance-index-san": "cd294c9ed83fb0580534608cc537e117f498588c457a77f220a73f5741071adf"
+  }
+}

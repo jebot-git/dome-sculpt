@@ -216,7 +216,15 @@ inline ImportedHeatProfile imported_heat_profile(
             set.weights.size() != p.mesh.positions.size())
           throw std::invalid_argument(
               "Original-skin heat influence dimensions differ");
-        for (size_t v = 0; v < set.weights.size(); ++v)
+        // Accessors may be shared by distinct material primitives. Only the
+        // actual indexed draw witnesses primitive joint usage; unused rows do
+        // not authorize sources. Duplicate indices are deliberately revisited
+        // and charged, avoiding an unbounded deduplication allocation.
+        for (auto v : p.mesh.indices) {
+          step();
+          if (v >= set.weights.size())
+            throw std::invalid_argument(
+                "Original-skin heat drawn vertex index is invalid");
           for (int c = 0; c < 4; ++c) {
             step(16);
             float weight = set.weights[v][c];
@@ -236,6 +244,7 @@ inline ImportedHeatProfile imported_heat_profile(
             if (rig.bones[at->second].deform)
               result.eligible[at->second] = 1;
           }
+        }
       }
     }
   }
