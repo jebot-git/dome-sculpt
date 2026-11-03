@@ -1,0 +1,9 @@
+# Private finite-handle metric negative
+
+Base684174d's skeletal capsule radius rule is unchanged. This distinct geometry uses half the genuine edge length along midpoint limb handles and shortest incident half-edge at finite axial end caps; transverse radii retain the bilateral/incident rule. Exact role construction and current joint-head/direct-child-tail association are checked. Real point handles stay isotropic and auxiliary sources physical. No per-avatar/part-outcome switching or artist-value guidance.
+
+Independent finite cap precision/H, bilateral radii, common geometric-mean calibration, six rotation/scale(.01/10), resource/cancel/missing-role/forged-source checks pass Release. The first test diagonal expectation omitted a genuine shorter parent edge; that fixture-only error is retained and corrected to the exact analytic16. The first actual cohort accidentally called the old isotropic factory; those logs remain explicitly labelled wiring-control, not anisotropic evidence. Corrected fixture now requires nonzero anisotropic matrices and uses the real factory.
+
+Actual corrected cohorts solve19parts each:55female/63male anisotropic metrics are observed, all auxiliary output is present, seam/source/native-point checks stay exact and1505inputs match before/after. Fixed bounds still fail: female3cases(head35.538mm/shoes48.309mm); male5cases(head36.703mm, Body35.275mm, Tops40.797mm, shoes64.646mm). Limits remain female31.956mm/male35.133mm maximum, mean0.5%height. No solver sanitizer/native/history/Save/export/render admission.
+
+Repeated geometry priors are insufficient. Parent directs the next isolated established bounded biharmonic/variational construction from primary source, with declared open/disconnected domain and handle projection assumptions, independent KKT/energy oracles and planned difficult stress gates. All heat/capsule failures remain preserved; no robustness or volumetric completion is claimed.
