@@ -83,16 +83,38 @@ async def main():
    rect=named('navigation.dsculpt')['desktop'];return Image.open(out/'render.ppm').transpose(Image.Transpose.FLIP_TOP_BOTTOM).convert('RGB').crop((int(rect['x'])+8,int(rect['y'])+8,int(rect['x']+rect['w'])-8,int(rect['y']+rect['h'])-40))
   def difference(a,b):
    delta=ImageChops.difference(a,b);return sum(any(c>8 for c in p) for p in (delta.get_flattened_data() if hasattr(delta,'get_flattened_data') else delta.getdata()))
+  async def settled_pixels(label):
+   # The compositor capture can lag the client's final neutral/redraw. Require
+   # fresh captures to settle before retaining a navigation baseline; repeatedly
+   # reading one old image would otherwise appear stable while a frame is queued.
+   first=previous=None;stamp=None;steady=None;fresh=0;start=time.monotonic()
+   while time.monotonic()-start<60:
+    current_stamp=(out/'render.ppm').stat().st_mtime_ns
+    if current_stamp!=stamp:
+     stamp=current_stamp
+     try:current=pixels()
+     except (OSError,ValueError):
+      await asyncio.sleep(.08);continue
+     fresh+=1
+     if first is None:first=current
+     if previous is None or difference(previous,current)!=0:steady=time.monotonic()
+     previous=current
+     if fresh>=3 and time.monotonic()-steady>=.3:
+      current.save(out/(label+'.png'))
+      with (out/'capture-settle.jsonl').open('a') as trace:trace.write(json.dumps({'label':label,'fresh_captures':fresh,'seconds':time.monotonic()-start,'initial_changed_pixels':difference(first,current)})+'\n')
+      return current
+    await asyncio.sleep(.08)
+   raise TimeoutError('Private DomeD navigation capture did not settle: '+label)
   async def motion(axes=(0,0,0,0,0,0),duration=.12):
    end=time.monotonic()+duration
    while time.monotonic()<end:await asyncio.get_running_loop().sock_sendall(peer,struct.pack('=8i',0,*axes,0));await asyncio.sleep(.015)
    await asyncio.sleep(.1)
-  await exported('Frame selection');focus();await motion();await asyncio.sleep(.3);before=pixels();await motion((250,120,50,100,80,60),.35);await motion();after=pixels();after.save(out/'six-axis.png');check(difference(before,after)>100,'Native Wayland viewport accepts composed six-axis camera navigation through the real Unix socket')
+  await exported('Frame selection');focus();await motion();before=await settled_pixels('before-motion');await motion((250,120,50,100,80,60),.35);await motion();after=await settled_pixels('six-axis');check(difference(before,after)>100,'Native Wayland viewport accepts composed six-axis camera navigation through the real Unix socket')
   nodes=await layout();check(nodes['3D mouse navigation'][1].get('toggle-state')==1,'DomeD universal View menu reflects the default enabled navigation state')
   await native('View','3D mouse options...');dialog=await wait(lambda:named('3D mouse navigation'));check(scene()['focused']==dialog['id'] and dialog['app_id']==window['app_id'],'Actual DomeD View command opens and focuses the canonical FLTK options under the same identity')
-  await motion((250,0,0,0,0,0),.2);await key('Escape');await wait(lambda:not named('3D mouse navigation'));await asyncio.sleep(.3);check(difference(after,pixels())==0,'Wayland modal options fence incoming camera motion and Escape cancels the draft')
-  focus();await motion((250,0,0,0,0,0),.2);check(difference(after,pixels())==0,'Native Wayland focus restoration requires fresh neutral rather than replaying held axes')
-  await motion();await motion((250,0,0,0,0,0),.2);await motion();check(difference(after,pixels())>100,'Fresh neutral resumes the actual Wayland view after the modal fence')
+  await motion((250,0,0,0,0,0),.2);await key('Escape');await wait(lambda:not named('3D mouse navigation'));check(difference(after,await settled_pixels('modal-return'))==0,'Wayland modal options fence incoming camera motion and Escape cancels the draft')
+  focus();await motion((250,0,0,0,0,0),.2);check(difference(after,await settled_pixels('held-axis'))==0,'Native Wayland focus restoration requires fresh neutral rather than replaying held axes')
+  await motion();await motion((250,0,0,0,0,0),.2);await motion();check(difference(after,await settled_pixels('resumed-motion'))>100,'Fresh neutral resumes the actual Wayland view after the modal fence')
   stamp=project.stat().st_mtime_ns;await exported('Save');await wait(lambda:project.stat().st_mtime_ns!=stamp);check(inspect()==original and not (await layout())['Undo'][1].get('enabled',True),'Native Wayland navigation and options preserve complete saved authoring state and Undo boundary')
   await native('View','3D mouse navigation');check(await asyncio.wait_for(asyncio.get_running_loop().sock_recv(peer,1),10)==b'','Actual DomeD View toggle closes the native daemon stream')
   check(client.poll() is None and host_process.poll() is None,'Native client and private DomeD remain live after navigation and controls')
