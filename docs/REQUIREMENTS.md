@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Qualified canonical bitmap SDK continuation — 2026-11-03
+
+Private runtime592bc76 now has fresh native app/core/support/render and selected
+consumer builds on canonical DomeD53b0fca,35 registered Release+35 sanitizer
+passes and actual native package Open/Save/Close8+8 passes. The old bitmap SDK
+is explicitly rejected. See [NATIVE-PACKAGE-SDK.md](NATIVE-PACKAGE-SDK.md) for
+exact build/runtime scopes, uninstrumented external SDK boundary and retained
+negative controls. This is not a full-suite/device or later painted-producer/
+append qualification; every unfinished original and additional requirement stays
+required. No system installation or session changed.
+
+
 ## Private original-coordinate/MToon paint integration — 2026-11-03
 
 Private f040845/d1606ca preserves original logical UVs independently of writable
