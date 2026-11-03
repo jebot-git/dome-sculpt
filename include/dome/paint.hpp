@@ -167,7 +167,9 @@ public:
   std::shared_ptr<PaintedMesh>
   reparameterize(Mesh, const std::function<bool()> &cancelled = {}) const;
   std::shared_ptr<const TextureMaps> composite(const Material &) const;
+  std::shared_ptr<const TextureMaps> composite(const Material &, const std::function<bool()> &) const;
   std::shared_ptr<const TextureMaps> preview(const Material &) const;
+  std::shared_ptr<const TextureMaps> preview(const Material &, const std::function<bool()> &) const;
   std::shared_ptr<const BakedTextures> baked() const { return baked_; }
   void install_bake(BakedTextures);
   void clear_bake();
@@ -197,6 +199,7 @@ private:
   struct SurfaceMap;
   struct CompositeCache;
   std::shared_ptr<const TextureMaps> build_composite(const Material &) const;
+  std::shared_ptr<const TextureMaps> build_composite(const Material &, const std::function<bool()> &) const;
   std::shared_ptr<CompositeCache> composite_cache_;
   uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
