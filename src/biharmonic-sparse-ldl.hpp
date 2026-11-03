@@ -464,25 +464,31 @@ public:
     free_index_.resize(n);
     free_old_.resize(n);
   }
+  // P_F (Q_D)^{-1} P_F is SPD on every free subspace F contained in the
+  // base Dirichlet-free space D. Reusing this factor changes the PCG
+  // preconditioner only, never the actual Q, fixed values or KKT acceptance.
   template <class Budget>
-  void apply(std::span<const double> r, std::span<double> z,
-             std::span<const uint8_t> status, Budget &budget) {
+  void apply_restricted(std::span<const double> r, std::span<double> z,
+                        std::span<const uint8_t> base_status,
+                        std::span<const uint8_t> status, Budget &budget) {
     const size_t n = d_.size();
-    if (r.size() != n || z.size() != n || status.size() != n)
+    if (r.size() != n || z.size() != n || status.size() != n ||
+        base_status.size() != n)
       throw std::invalid_argument("Sparse LDL free-mask dimensions differ");
     bool same = valid_;
     budget.step(n);
     for (size_t i = 0; i < n; ++i) {
-      if (status[i] > 3)
-        throw std::invalid_argument("Invalid sparse LDL working constraint");
-      same &= cached_[i] == (status[i] != 0);
+      if (status[i] > 3 || base_status[i] > 3 || (base_status[i] && !status[i]))
+        throw std::invalid_argument("Invalid restricted sparse LDL constraint");
+      same &= cached_[i] == (base_status[i] != 0);
     }
     if (!same)
-      factor(status, budget);
+      factor(base_status, budget);
     const size_t nf = free_n_;
     for (size_t k = 0; k < nf; ++k) {
       budget.step(1);
-      scratch_[k] = r[permutation_[free_old_[k]]];
+      auto i = permutation_[free_old_[k]];
+      scratch_[k] = status[i] ? 0 : r[i];
     }
     for (size_t j = 0; j < nf; ++j) {
       budget.stop();
@@ -508,8 +514,15 @@ public:
       budget.step(1);
       if (!std::isfinite(scratch_[k]))
         throw std::runtime_error("Free sparse LDL produced nonfinite output");
-      z[permutation_[free_old_[k]]] = scratch_[k];
+      auto i = permutation_[free_old_[k]];
+      if (!status[i])
+        z[i] = scratch_[k];
     }
+  }
+  template <class Budget>
+  void apply(std::span<const double> r, std::span<double> z,
+             std::span<const uint8_t> status, Budget &budget) {
+    apply_restricted(r, z, status, status, budget);
   }
 };
 } // namespace dome::detail

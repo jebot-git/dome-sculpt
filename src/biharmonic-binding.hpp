@@ -7,7 +7,8 @@ enum class BiharmonicProjection { VoronoiMinimum, IndependentComponent };
 enum class BiharmonicPreconditioner {
   Diagonal,
   SquaredIncompleteLaplacian,
-  SparseLDL
+  SparseLDL,
+  RestrictedSparseLDL
 };
 enum class BiharmonicInitialization {
   ComponentConstant,

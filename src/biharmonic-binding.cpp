@@ -17,11 +17,13 @@ struct BiharmonicOperator {
   double mass_scale = 0;
   std::optional<SquaredLaplacianPreconditioner> incomplete;
   std::optional<BiharmonicSparseLDL> full;
-  bool wants_full = false;
+  bool wants_full = false, restrict_full = false;
+  std::vector<uint8_t> base_status;
   size_t full_bytes = 0;
   BiharmonicOperator(const System &system, Budget &budget,
                      std::span<const uint8_t> fixed = {}, bool squared = false,
-                     size_t maximum_bytes = 0, bool sparse = false)
+                     size_t maximum_bytes = 0, bool sparse = false,
+                     bool restricted = false)
       : l(system), diagonal(l.diagonal.size()), temporary(l.diagonal.size()) {
     budget.step(diagonal.size() * 2 + l.values.size());
     for (double mass : l.mass)
@@ -38,6 +40,11 @@ struct BiharmonicOperator {
         throw std::runtime_error("Invalid biharmonic quadratic diagonal");
     }
     wants_full = sparse;
+    restrict_full = restricted;
+    if (restricted) {
+      budget.step(fixed.size());
+      base_status.assign(fixed.begin(), fixed.end());
+    }
     full_bytes = maximum_bytes;
     if (squared)
       incomplete.emplace(l, fixed, maximum_bytes, budget);
@@ -46,9 +53,12 @@ struct BiharmonicOperator {
                     std::span<const uint8_t> status, Budget &budget) {
     if (wants_full && !full)
       full.emplace(l, full_bytes, budget);
-    if (full)
-      full->apply(r, z, status, budget);
-    else if (incomplete)
+    if (full) {
+      if (restrict_full)
+        full->apply_restricted(r, z, base_status, status, budget);
+      else
+        full->apply(r, z, status, budget);
+    } else if (incomplete)
       incomplete->apply(r, z, status, budget);
     else {
       budget.step(r.size());
@@ -83,8 +93,10 @@ SkinWeights bounded_biharmonic_surface(
     throw std::invalid_argument("Unknown biharmonic initialization");
   const bool squared = options.preconditioner ==
                        BiharmonicPreconditioner::SquaredIncompleteLaplacian;
-  const bool sparse =
-      options.preconditioner == BiharmonicPreconditioner::SparseLDL;
+  const bool restricted =
+      options.preconditioner == BiharmonicPreconditioner::RestrictedSparseLDL;
+  const bool sparse = restricted || options.preconditioner ==
+                                        BiharmonicPreconditioner::SparseLDL;
   if (options.preconditioner != BiharmonicPreconditioner::Diagonal &&
       !squared && !sparse)
     throw std::invalid_argument("Unknown biharmonic preconditioner");
@@ -120,7 +132,7 @@ SkinWeights bounded_biharmonic_surface(
   const size_t precondition_bytes = squared ? n * 128 + corners * 48 + 8192 : 0;
   const size_t planned = n * (1024 + 32 * o.limits.max_influences + b * 18) +
                          corners * 160 + b * b * 64 + 16384 +
-                         precondition_bytes;
+                         precondition_bytes + (restricted ? n : 0);
   if (planned > o.maximum_bytes || n > o.maximum_work / (sources.size() + 1))
     throw std::length_error(
         "Biharmonic construction exceeds byte/work admission");
@@ -238,7 +250,7 @@ SkinWeights bounded_biharmonic_surface(
   diagonal.clear(); // Peak remains accounted.
   BiharmonicOperator q(s, budget, fixed, squared,
                        sparse ? o.maximum_bytes - planned : precondition_bytes,
-                       sparse);
+                       sparse, restricted);
   auto controls = options.solve;
   controls.maximum_bytes = std::min(controls.maximum_bytes, o.maximum_bytes);
   std::vector<double> values(rows), field(rows), sum(rows), counts(rows),
