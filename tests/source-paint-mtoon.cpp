@@ -29,6 +29,7 @@ int main(int argc,char **argv)try{
   auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=split;maps->color.min_filter=maps->color.mag_filter=GL_NEAREST;
   if(original_one||!pbr_zero){maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{.1f,.2f},{.4f,.2f},{.4f,.8f},{.1f,.8f}});}
   if(!pbr_zero)maps->color.texcoord=1;
+  if(original_one&&pbr_zero){maps->occlusion=maps->color;maps->occlusion.texcoord=1;}
   PaintSurfaceOptions policy;policy.policy=PaintUvPolicy::SourceAuthored;auto before=PaintedMesh::from_maps(raw,maps,64,policy);const auto frozen=before->encode();auto paint=prepare_source_paint(before,target,vertices);
   Material m=white();m.color={.65f,.8f,.4f,.85f};m.alpha=Material::AlphaMode::Mask;m.alpha_cutoff=.5f;
   auto holder=binding(legacy,m,split);holder->material.parameters.scroll={.23f,-.17f};holder->material.textures[0].texcoord=original_one?1:0;
