@@ -15,7 +15,8 @@ struct BoneQueryReport {
          exact_predicates = 0, filtered_misses = 0, filtered_full = 0,
          row_hits = 0, row_misses = 0, source_hits = 0, source_misses = 0,
          search_work = 0, union_work = 0, integration_work = 0,
-         predicate_work = 0;
+         predicate_work = 0, node_plane_checks = 0, node_plane_hits = 0,
+         node_plane_culls = 0;
 };
 struct BoneQueryAmbiguity : std::runtime_error {
   bone_shadow::Kind kind;
@@ -230,20 +231,27 @@ public:
   BoneShadowQuery(BoneShadowQuery &&) noexcept = default;
   BoneShadowQuery &operator=(BoneShadowQuery &&) = delete;
   struct Scratch {
+  private:
+    friend class BoneShadowQuery;
     std::vector<volume_exact::Interval> shadows;
     std::vector<uint32_t> stack;
     std::vector<RowPlane> rows;
     std::vector<SourcePlane> sources;
     std::vector<uint8_t> origin_checked;
+    std::vector<uint64_t> face_states, node_states;
     std::shared_ptr<const uint8_t> geometry;
     uint32_t source_epoch = 0;
     P head{}, tail{};
+
+  public:
     explicit Scratch(const BoneShadowQuery &q) {
       shadows.reserve(q.faces_.size());
       stack.reserve(q.nodes_.size());
       rows.resize(cache_slots(q.points_.size()));
       sources.resize(q.faces_.size());
       origin_checked.resize(q.points_.size());
+      face_states.resize((q.points_.size() * q.faces_.size() + 31) / 32);
+      node_states.resize((q.points_.size() * q.nodes_.size() + 31) / 32);
     }
   };
 
@@ -253,12 +261,15 @@ private:
     if (s.geometry.get() != identity_.get() ||
         s.geometry.owner_before(identity_) ||
         identity_.owner_before(s.geometry)) {
-      w.step(s.rows.size() + s.sources.size() + s.origin_checked.size());
+      w.step(s.rows.size() + s.sources.size() + s.origin_checked.size() +
+             s.face_states.size() + s.node_states.size());
       for (auto &row : s.rows)
         row.key = UINT64_MAX;
       for (auto &source : s.sources)
         source.epoch = 0;
       std::fill(s.origin_checked.begin(), s.origin_checked.end(), uint8_t(0));
+      std::fill(s.face_states.begin(), s.face_states.end(), uint64_t(0));
+      std::fill(s.node_states.begin(), s.node_states.end(), uint64_t(0));
       s.geometry = identity_;
       s.source_epoch = 0;
     }
@@ -273,6 +284,60 @@ private:
       s.head = head;
       s.tail = tail;
     }
+  }
+  static unsigned get_state(const std::vector<uint64_t> &bits, size_t index) {
+    return unsigned((bits[index >> 5] >> (2 * (index & 31))) & 3);
+  }
+  static void set_state(std::vector<uint64_t> &bits, size_t index,
+                        unsigned state) {
+    const auto shift = 2 * (index & 31);
+    auto &word = bits[index >> 5];
+    word = (word & ~(uint64_t(3) << shift)) | (uint64_t(state) << shift);
+  }
+  template <class Budget>
+  bool back_facing(uint32_t row, uint32_t node, Scratch &s, Budget &w,
+                   BoneQueryReport &r, bool classify_leaf) const {
+    w.step(8);
+    const size_t key = size_t(row) * nodes_.size() + node;
+    unsigned state = get_state(s.node_states, key);
+    if (state) {
+      ++r.node_plane_hits;
+      r.node_plane_culls += state == 2;
+      return state == 2;
+    }
+    const auto &n = nodes_[node];
+    if (!n.count) {
+      w.step(8);
+      auto left =
+               get_state(s.node_states, size_t(row) * nodes_.size() + n.left),
+           right =
+               get_state(s.node_states, size_t(row) * nodes_.size() + n.right);
+      if (left == 2 && right == 2)
+        state = 2;
+      else if (left == 1 || right == 1)
+        state = 1;
+    } else if (classify_leaf) {
+      ++r.node_plane_checks;
+      state = 2;
+      for (size_t at = n.first; at < n.first + n.count; ++at) {
+        w.step(4);
+        const auto face = order_[at];
+        const auto &ids = faces_[face];
+        if (std::any_of(ids.begin(), ids.end(), [&](uint32_t id) {
+              return incidence_[id] == incidence_[row];
+            }))
+          continue;
+        const auto plane = row_plane(row, face, s, w, r);
+        if (plane.side >= 0) {
+          state = 1;
+          break;
+        }
+      }
+    }
+    if (state)
+      set_state(s.node_states, key, state);
+    r.node_plane_culls += state == 2;
+    return state == 2;
   }
   template <class Budget>
   int plane_sign(uint32_t face, P point, Budget &w) const {
@@ -289,6 +354,15 @@ private:
   template <class Budget>
   RowPlane row_plane(uint32_t row, uint32_t face, Scratch &s, Budget &w,
                      BoneQueryReport &r) const {
+    const size_t slot = size_t(row) * faces_.size() + face;
+    w.step(4);
+    const auto known = get_state(s.face_states, slot);
+    if (known == 1 || known == 3) {
+      ++r.row_hits;
+      RowPlane result;
+      result.side = known == 1 ? -1 : 1;
+      return result;
+    }
     const uint64_t key = (uint64_t(row) << 32) | face;
     uint64_t hash = key ^ (key >> 33);
     hash *= 0xff51afd7ed558ccdULL;
@@ -302,7 +376,7 @@ private:
     ++r.row_misses;
     RowPlane result;
     result.key = key;
-    result.side = plane_sign(face, points_[row], w);
+    result.side = known == 2 ? 0 : plane_sign(face, points_[row], w);
     if (!result.side) {
       const auto &f = faces_[face];
       volume_exact::Arithmetic exact(w);
@@ -330,6 +404,10 @@ private:
       }
     }
     cached = result;
+    set_state(s.face_states, slot,
+              result.side < 0   ? 1
+              : result.side > 0 ? 3
+                                : 2);
     return result;
   }
   // Source-independent origin ownership is proved over the COMPLETE selected
@@ -640,7 +718,9 @@ public:
             (sizeof(std::array<uint32_t, 3>) + sizeof(Box) + sizeof(uint32_t) +
              2 * sizeof(Node) + sizeof(volume_exact::Interval) +
              2 * sizeof(uint32_t) + sizeof(SourcePlane) + sizeof(uint32_t)) +
-        cache_slots(points.size()) * sizeof(RowPlane) + 65536;
+        cache_slots(points.size()) * sizeof(RowPlane) +
+        8 * ((points.size() * count + 31) / 32) +
+        8 * ((points.size() * 2 * count + 31) / 32) + 65536;
     if (planned_bytes > maximum_bytes ||
         construction_forecast > w.maximum - w.used)
       throw std::length_error(
@@ -761,7 +841,11 @@ public:
         scratch.stack.capacity() < nodes_.size() ||
         scratch.rows.size() != cache_slots(points_.size()) ||
         scratch.sources.size() != faces_.size() ||
-        scratch.origin_checked.size() != points_.size())
+        scratch.origin_checked.size() != points_.size() ||
+        scratch.face_states.size() !=
+            (points_.size() * faces_.size() + 31) / 32 ||
+        scratch.node_states.size() !=
+            (points_.size() * nodes_.size() + 31) / 32)
       throw std::invalid_argument("Unadmitted bone query scratch");
     if (lo == hi)
       return 0;
@@ -799,13 +883,16 @@ public:
       ++staged.nodes;
       const auto &node = nodes_[at];
       if (!overlaps(fan, node.box, w) ||
-          (use_filter && !possible(bounded_fan, node.box, w)))
+          (use_filter && (back_facing(row, at, scratch, w, staged, false) ||
+                          !possible(bounded_fan, node.box, w))))
         continue;
       if (!node.count) {
         scratch.stack.push_back(node.right);
         scratch.stack.push_back(node.left);
         continue;
       }
+      if (use_filter && back_facing(row, at, scratch, w, staged, true))
+        continue;
       for (size_t at = node.first; at < node.first + node.count; ++at) {
         w.step(4);
         const auto face = order_[at];
@@ -817,7 +904,8 @@ public:
                           return incidence_[id] == incidence_[row];
                         }) ||
             !overlaps(fan, boxes_[face], w) ||
-            (use_filter && !possible(bounded_fan, boxes_[face], w)))
+            (use_filter && (row_plane(row, face, scratch, w, staged).side < 0 ||
+                            !possible(bounded_fan, boxes_[face], w))))
           continue;
         ++staged.candidates;
         const bone_shadow::Triangle wall{points_[ids[0]], points_[ids[1]],
@@ -909,13 +997,25 @@ public:
     staged.exact_predicates = filter_report.exact;
     staged.filtered_misses = filter_report.rejected;
     staged.filtered_full = filter_report.full;
-    const std::array<size_t, 15> values{
-        staged.nodes,         staged.candidates,       staged.intervals,
-        staged.unions,        staged.exact_predicates, staged.filtered_misses,
-        staged.filtered_full, staged.row_hits,         staged.row_misses,
-        staged.source_hits,   staged.source_misses,    staged.search_work,
-        staged.union_work,    staged.integration_work, staged.predicate_work};
-    const std::array<size_t *, 15> destinations{&report.nodes,
+    const std::array<size_t, 18> values{staged.nodes,
+                                        staged.candidates,
+                                        staged.intervals,
+                                        staged.unions,
+                                        staged.exact_predicates,
+                                        staged.filtered_misses,
+                                        staged.filtered_full,
+                                        staged.row_hits,
+                                        staged.row_misses,
+                                        staged.source_hits,
+                                        staged.source_misses,
+                                        staged.search_work,
+                                        staged.union_work,
+                                        staged.integration_work,
+                                        staged.predicate_work,
+                                        staged.node_plane_checks,
+                                        staged.node_plane_hits,
+                                        staged.node_plane_culls};
+    const std::array<size_t *, 18> destinations{&report.nodes,
                                                 &report.candidates,
                                                 &report.intervals,
                                                 &report.unions,
@@ -929,7 +1029,10 @@ public:
                                                 &report.search_work,
                                                 &report.union_work,
                                                 &report.integration_work,
-                                                &report.predicate_work};
+                                                &report.predicate_work,
+                                                &report.node_plane_checks,
+                                                &report.node_plane_hits,
+                                                &report.node_plane_culls};
     for (size_t i = 0; i < values.size(); ++i)
       if (values[i] > SIZE_MAX - *destinations[i])
         throw std::length_error("Bone query report overflow");

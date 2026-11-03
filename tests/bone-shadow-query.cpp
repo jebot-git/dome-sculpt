@@ -285,6 +285,57 @@ int main() try {
     if (std::abs(actual - reference) > 1e-13)
       throw std::runtime_error("filtered/incremental vs exact complete query");
   }
+  size_t certified_culls = 0;
+  auto real_sample = [&]() {
+    random ^= random << 13;
+    random ^= random >> 17;
+    random ^= random << 5;
+    return float(int32_t(random)) / 536870912.f;
+  };
+  for (size_t trial = 0; trial < 128; ++trial) {
+    std::vector<P> p{P{0, 0, 1}};
+    std::vector<uint32_t> ix;
+    for (size_t wall = 0; wall < 12; ++wall) {
+      uint32_t first = uint32_t(p.size());
+      for (size_t c = 0; c < 3; ++c)
+        p.push_back({real_sample(), real_sample(), real_sample()});
+      ix.insert(ix.end(), {first, first + 1, first + 2});
+    }
+    Work build;
+    BoneShadowQuery q(p, ix, 16u * 1024u * 1024u, build);
+    BoneShadowQuery::Scratch a(q), b(q);
+    BoneQueryReport ar, br;
+    Work aw, bw;
+    const P h{real_sample(), real_sample(), real_sample()},
+        t = trial % 3 ? P{real_sample(), real_sample(), real_sample()} : h;
+    const double actual = q.integrate(0, h, t, .1, 0, 1, a, aw, ar);
+    const double reference = q.integrate(
+        0, h, t, .1, 0, 1, b, bw, br, BoneWallDomain::WholeGroup, false, false);
+    maximum_control_error =
+        std::max(maximum_control_error, std::abs(actual - reference));
+    certified_culls += ar.node_plane_culls;
+    if (std::abs(actual - reference) > 1e-13)
+      throw std::runtime_error(
+          "3D immutable plane envelope changed exact query");
+  }
+  if (!certified_culls)
+    throw std::runtime_error("unexercised behind-wall certificates");
+  // Reusing admitted worker scratch with another same-sized owning query must
+  // invalidate even successful behind-wall certificates, not just plane signs.
+  Work owner_build;
+  std::vector<uint32_t> reversed{1, 3, 2};
+  BoneShadowQuery behind(before, reversed, 16u * 1024u * 1024u, owner_build);
+  BoneShadowQuery::Scratch owner_scratch(behind);
+  BoneQueryReport behind_report, changed_owner_report;
+  const P point_source{0, 0, -1};
+  const double unoccluded =
+      behind.integrate(0, point_source, point_source, .1, 0, 1, owner_scratch,
+                       owner_build, behind_report);
+  const double owned_blocked =
+      query.integrate(0, point_source, point_source, .1, 0, 1, owner_scratch,
+                      owner_build, changed_owner_report);
+  if (!(unoccluded > 0) || !behind_report.node_plane_culls || owned_blocked)
+    throw std::runtime_error("foreign owner reused a behind-wall certificate");
   points = before;
   indices = old_indices;
   if (points != before || indices != old_indices)
@@ -295,9 +346,11 @@ int main() try {
             << " allocation_boundaries=" << measured
             << " admitted_query_noalloc=1 connected_wall=1 "
                "unresolved_gap_refusal=1 opaque_origin_refusal=1 "
-               "complete_control=128 control_error="
+               "complete_control=256 control_error="
             << maximum_control_error << " opaque_work=" << opaque_fast_work.used
-            << "/" << opaque_full_work.used << " source_field_claim=0\n";
+            << "/" << opaque_full_work.used
+            << " certified_3D_culls=" << certified_culls
+            << " foreign_owner_reset=1 source_field_claim=0\n";
 } catch (const std::exception &e) {
   std::cerr << "FAIL " << e.what() << '\n';
   return 1;

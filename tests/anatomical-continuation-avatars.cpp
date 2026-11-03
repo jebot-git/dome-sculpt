@@ -141,7 +141,11 @@ int main(int argc, char **argv) try {
             << " row_hits=" << fields.query_report.row_hits
             << " row_misses=" << fields.query_report.row_misses
             << " source_hits=" << fields.query_report.source_hits
-            << " source_misses=" << fields.query_report.source_misses << '\n'
+            << " source_misses=" << fields.query_report.source_misses
+            << " node_plane_checks=" << fields.query_report.node_plane_checks
+            << " node_plane_hits=" << fields.query_report.node_plane_hits
+            << " node_plane_culls=" << fields.query_report.node_plane_culls
+            << '\n'
             << std::flush;
   size_t parts = 0, quality = 0, consumer = 0, seamfail = 0;
   const size_t labels = fields.joints.size();
