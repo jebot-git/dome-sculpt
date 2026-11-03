@@ -27,6 +27,7 @@ struct Hand{Document&d;SpatialFrame f;explicit Hand(Document&doc):d(doc){f.focus
 extern "C" RetainedCornerPaint paint_real(Paint,Binding,Deformation,Descriptor,const Mesh&,std::span<const uint32_t>,const PaintSamplingLimits&) asm("__real__ZN4dome26retain_source_corner_paintESt10shared_ptrIKNS_11PaintedMeshEES0_IKNS_22SourceMaterialBindingsEES0_IKNS_16DeformationStateEES0_IKNS_19PolygonColorSurfaceEERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE");
 extern "C" RetainedCornerPaint paint_wrap(Paint,Binding,Deformation,Descriptor,const Mesh&,std::span<const uint32_t>,const PaintSamplingLimits&) asm("__wrap__ZN4dome26retain_source_corner_paintESt10shared_ptrIKNS_11PaintedMeshEES0_IKNS_22SourceMaterialBindingsEES0_IKNS_16DeformationStateEES0_IKNS_19PolygonColorSurfaceEERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE");
 extern "C" RetainedCornerPaint paint_wrap(Paint p,Binding b,Deformation d,Descriptor c,const Mesh&m,std::span<const uint32_t>v,const PaintSamplingLimits&limits){const bool fail=paint_gate::pause();auto result=paint_real(std::move(p),std::move(b),std::move(d),std::move(c),m,v,limits);if(fail)throw ExactPaintFailure();return result;}
+#ifndef DOME_PAINT_SAMPLING_DOCUMENT_NO_MAIN
 int main(int argc,char**argv)try {
  if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){prepared(false).save(argv[2]);return 0;}
  if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
@@ -50,3 +51,5 @@ int main(int argc,char**argv)try {
  }
  check(source.encode()==exact,"All worker/controller/Save attempts retain the complete immutable original source");std::cout<<"PASS "<<checks<<" retained paint native/controller checks\n";return 0;
 }catch(const std::exception&e){paint_gate::release();std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
+
+#endif

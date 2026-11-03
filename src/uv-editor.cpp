@@ -193,7 +193,7 @@ void edit_uv(Document &doc) {
       status.copy_label(
           v->solving ? state->message.c_str()
           : !state->error.empty() ? state->error.c_str()
-          : v->retain_paint_sampling
+          : (v->retain_paint_sampling||(v->retain_normal_sampling&&v->paint_sampling_available))
               ? "UV layout changes; paint and normal detail keep their existing coordinates."
           : v->retain_normal_sampling
               ? "Original normal detail is kept. Save the native project; glTF/VRM export still needs a sampling conversion."
@@ -210,6 +210,7 @@ void edit_uv(Document &doc) {
           else
             button->activate();
         if(buttons.size()>14){
+          buttons[14]->copy_label(v->paint_sampling_available?"Keep normal + paint detail":"Keep normal detail");
           buttons[14]->value(v->retain_normal_sampling&&!v->retain_paint_sampling);
           if(v->retain_paint_sampling||!v->normal_sampling_available||v->normal_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[14]->deactivate();
           else buttons[14]->activate();

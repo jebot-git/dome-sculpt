@@ -13,7 +13,9 @@ struct SourceNormalSampling;
 enum class SourceNormalUvMethod { Rasterize, RetainSource };
 struct SourceUvBakeOptions {
   // Zero preserves at least each original image's largest dimension and the
-  // editable paint resolution. Nonzero is an explicit resampling choice.
+  // editable paint resolution. With RetainSource, supported prepared corner
+  // paint keeps its independent editable grid losslessly. Nonzero is an explicit
+  // resampling choice, including that paint grid.
   uint32_t resolution = 0, padding = 4;
   SourceUvAnimationPolicy animation = SourceUvAnimationPolicy::RejectAnimated;
   double freeze_seconds = 0;

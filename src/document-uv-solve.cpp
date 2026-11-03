@@ -38,7 +38,7 @@ bool Document::uv_paint_retention_available_locked() const {
 bool Document::uv_retention_changes_locked() const {
   if(!uv_retention_requested_locked()||!control_before_)return false;
   const auto &o=scene_.object(control_object_);
-  return o.painted&&((uv_paint_retention_requested_locked()&&!o.painted->paint_sampling_domain())||(o.painted->normal_projection()&&o.painted->normal_projection()->version==1));
+  return o.painted&&(((uv_paint_retention_requested_locked()||uv_paint_retention_available_locked())&&!o.painted->paint_sampling_domain())||(o.painted->normal_projection()&&o.painted->normal_projection()->version==1));
 }
 void Document::edit_uv(UvAction action, float x, float y) {
   std::lock_guard lock(model_mutex_);
@@ -73,7 +73,7 @@ void Document::apply_uv_action_locked(UvAction action, float x, float y) {
         throw std::logic_error("Wait for UV validation before changing normal detail");
       state_.controls.value[3]=uv_retention_requested_locked()?0.f:1.f;
       state_.message=uv_retention_requested_locked()
-        ?"Original normal detail will be kept. Save the native project; glTF/VRM export still needs a sampling conversion."
+        ?(uv_paint_retention_available_locked()?"Paint and normal detail will keep their original coordinates while the UV layout changes.":"Original normal detail will be kept. Save the native project; glTF/VRM export still needs a sampling conversion.")
         :"Normal detail will be resampled into the edited UVs";
     }
     else if (heavy_uv(action)) queue_uv_operation_locked(action);
@@ -337,7 +337,9 @@ void Document::process_uv_transfer(FileJob &job) {
     painted=std::move(adopted.paint);deformation=std::move(adopted.deformation);
     appearance=std::move(adopted.appearance);binding=std::move(adopted.material_bindings);
   }else painted=changed?source.painted->reparameterize(target,cancelled):source.painted;
-  if((uv_modified||job.uv_keep_paint)&&own_corners){
+  const bool retained_paint=bool(painted->paint_sampling_domain());
+  changed=changed||(retained_paint&&!source.painted->paint_sampling_domain());
+  if((uv_modified||job.uv_keep_paint||changed)&&own_corners){
     auto retained=std::make_shared<PolygonAuthority>(*polygon);
     retained->origin=capture_polygon_origin(job.scene,job.object);
     polygon=std::move(retained);
@@ -376,7 +378,7 @@ void Document::process_uv_transfer(FileJob &job) {
     transaction.finish_uv();
     if(job.uv_desktop)desktop_=false;
     if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
-    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=job.uv_keep_paint?"UV layout updated. Paint and normal detail retained; save the native project to keep editable sources.":job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
+    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=retained_paint?"UV layout updated. Paint and normal detail retained; save the native project to keep editable sources.":job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
     publish_locked(changed,false);transaction.commit();
     if(accepted){
       accepted->revision=state_.revision;accepted->content=content_;

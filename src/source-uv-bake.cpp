@@ -3,6 +3,8 @@
 #include "dome/tangents.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/color-preparation.hpp"
+#include "dome/color-paint-sampling.hpp"
+#include "paint-sampling-access.hpp"
 #include "paint-color-access.hpp"
 #include "paint-normal-access.hpp"
 #include "normal-projection-identity.hpp"
@@ -251,6 +253,36 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
   if(result.mtoon)for(size_t role=0;role<size_t(MToonSlot::Count);++role)origin->roles[role]=original_role(int(role));
   result.uv_origin=std::move(origin);
  }
+ // Default-resolution retained normal authoring preserves the independent
+ // writable paint grid as well. Resampling its fractional coverage would lose
+ // colour/alpha under morphs even when the normal field remains exact.
+ // An explicit resolution still requests the legacy raster transfer.
+ if(o.resolution==0&&o.normal_sampling==SourceNormalUvMethod::RetainSource&&prepared&&normal_prepared&&
+    i.polygon_authority&&i.target_polygon&&!i.appearance&&!result.mtoon&&
+    (!i.paint->source_maps()||(!i.paint->source_maps()->uv1&&i.paint->source_maps()->extra_uv_sets.empty()))){
+  const size_t normal_bytes=size_t(i.paint->resolution())*i.paint->resolution()*8;
+  if(normal_bytes>o.max_output_bytes-result.image_bytes)throw std::length_error("Retained UV normal fields exceed image output budget");
+  result.image_bytes+=normal_bytes;
+  // Both owning stages coexist: reserve disjoint scratch shares instead of
+  // allowing each factory to consume the entire caller budget.
+  PaintSamplingLimits limits;limits.cancelled=o.cancelled;limits.max_vertices=o.max_vertices;limits.max_triangles=o.max_triangles;
+  limits.max_working_bytes=o.max_working_bytes/2;limits.max_basis_bytes=std::min(limits.max_basis_bytes,limits.max_working_bytes);
+  limits.max_work=std::min<uint64_t>(limits.max_work,o.max_sample_operations);
+  auto descriptor=std::make_shared<const PolygonColorSurface>(PolygonColorSurface{
+    std::shared_ptr<const PolygonMesh>(i.target_polygon,&i.target_polygon->topology),i.target_polygon->colors});
+  auto retained=retain_source_corner_paint(i.paint,i.current_material,i.current_deformation,descriptor,i.target,i.source_vertices,limits);
+  result.color_reprojection=retained.colors;
+  auto normal_options=o;normal_options.max_working_bytes=o.max_working_bytes-limits.max_working_bytes;
+  result.normal_sampling=detail::retain_normal_sampling(i,result,normal_options,retained.paint->paint_sampling_domain());
+  auto paint=adopt_retained_paint_normal(*retained.paint,*result.normal_sampling,limits);
+  result.maps=paint->source_maps();if(!result.maps)result.maps=std::make_shared<const PaintSourceMaps>();
+  result.layers=paint->layers();result.baked=paint->baked();
+  size_t tiles=0,colors=0;for(const auto &layer:result.layers){tiles+=std::count_if(layer.tiles.begin(),layer.tiles.end(),[](const auto &t){return bool(t);});colors+=std::count_if(layer.pbr_tiles.begin(),layer.pbr_tiles.end(),[](const auto &t){return bool(t);});}
+  result.layer_bytes=tiles*sizeof(PaintTile)+colors*sizeof(PaintColorTile)+size_t(paint->resolution())*paint->resolution()*12;
+  if(result.layer_bytes>o.max_layer_bytes-result.baked_bytes)throw std::length_error("Retained UV paint exceeds combined layer budget");
+  result.diagnostics.push_back("Paint and normal detail preserved in their original sampling coordinates; edited UV layout retained independently");
+  budget.cancel();return result;
+ }
  if(result.mtoon){bool needs=false;for(size_t role=0;role<size_t(MToonSlot::Count);++role){auto &t=result.mtoon->textures[role];if(t.index>=0&&role!=size_t(MToonSlot::Matcap))needs|=coordinate(t)==1;}if(needs){if(!i.appearance||!i.appearance->asset)throw std::invalid_argument("Resolved UV1 requires retained original primitive provenance");const ImportedPrimitive*p=nullptr;for(auto &v:i.appearance->asset->primitives)if(v.source_mesh==i.appearance->source_mesh&&v.source_primitive==i.appearance->source_primitive){if(p)throw std::invalid_argument("Source UV primitive identity is ambiguous");p=&v;}if(!p||p->uv1.size()!=p->mesh.positions.size()||i.appearance->source_vertices.size()!=old.positions.size())throw std::invalid_argument("Source UV1 requires exact retained primitive/accessor remap");if(!uv1)authored_uv1.reserve(old.positions.size());size_t vertex=0;for(auto v:i.appearance->source_vertices){if(v>=p->uv1.size())throw std::invalid_argument("Source UV1 remap is invalid");auto q=p->uv1[v];if(!std::isfinite(q[0])||!std::isfinite(q[1]))throw std::invalid_argument("Source UV1 is not finite");if(uv1){if(uv1->at(vertex)!=q)throw std::invalid_argument("PBR and MToon UV1 source domains differ");}else authored_uv1.push_back(q);++vertex;}if(!uv1)uv1=&authored_uv1;}}
  auto coordinate_domain=[&](int coordinate)->const std::vector<std::array<float,2>>*{
   if(coordinate==0)return nullptr;if(coordinate==1){if(!uv1)throw std::invalid_argument("Source UV1 bake requires its exact coordinate domain");return uv1;}
@@ -370,6 +402,42 @@ struct SourceUvBakeAccess {
   if(result.baked){result.baked->validate(old.resolution());bytes+=result.baked->storage_bytes();}
   if(bytes>128*1024*1024)throw std::length_error("Source UV adoption exceeds combined paint storage budget");
   if(!result.maps)throw std::invalid_argument("Source UV adoption lacks its generic source table");
+  if(result.color_reprojection&&result.color_reprojection->paint_sampling){
+   const auto &node=*result.color_reprojection->paint_sampling;
+   if(!result.normal_sampling||!node.layout()||node.before_paint()!=result.original_paint||
+      node.before_material()!=result.original_material||node.before_deformation()!=result.original_deformation||
+      node.before_appearance()!=result.original_appearance||node.layout()->source_vertices!=result.source_vertices||
+      result.normal_sampling->metadata_sampling_domain!=node.domain())
+    throw std::invalid_argument("Lossless UV adoption lost its independent paint/normal source leases");
+   PaintSamplingLimits limits;limits.cancelled=cancelled;
+   node.validate(true,cancelled);node.validate_current(result.target,cancelled);
+   auto replay=retain_source_corner_paint(result.original_paint,result.original_material,result.original_deformation,
+     node.current_descriptor(),result.target,result.source_vertices,node.domain(),limits);
+   auto paint=rebind_paint_sampling_geometry(*replay.paint,node.geometry_attachment(),limits);
+   paint=adopt_retained_paint_normal(*paint,*result.normal_sampling,limits);
+   // Result payloads must be the actual unchanged grid, not an independently
+   // supplied raster that merely shares the recipe or a coverage checksum.
+   const auto expected_maps=paint->source_maps();
+   if(expected_maps?expected_maps!=result.maps:!result.maps->empty())
+    throw std::invalid_argument("Lossless UV result replaced its retained maps or baked owner");
+   if(result.baked){
+    const auto &a=*paint->baked(),&b=*result.baked;
+    auto images=[](const TextureMaps &m){return std::array<const Image*,10>{&m.color,&m.metal_rough,&m.emission,&m.color_coverage,&m.normal,&m.baked_normal,&m.baked_coverage,&m.emission_coverage,&m.pbr_color,&m.mtoon_normal};};
+    if(a.coverage!=b.coverage||a.normal_authority!=b.normal_authority||a.maps.transparent!=b.maps.transparent||
+       a.maps.pbr_transparent!=b.maps.pbr_transparent||a.maps.source_only!=b.maps.source_only||
+       a.maps.source_maps!=b.maps.source_maps||a.maps.baked_base!=b.maps.baked_base||
+       a.maps.color_projection!=b.maps.color_projection||a.maps.normal_projection!=b.maps.normal_projection)
+     throw std::invalid_argument("Lossless UV result replaced its captured baked metadata");
+    auto x=images(a.maps),y=images(b.maps);for(size_t n=0;n<x.size();++n)
+     if(x[n]->width!=y[n]->width||x[n]->height!=y[n]->height||x[n]->rgba!=y[n]->rgba)
+      throw std::invalid_argument("Lossless UV result replaced its captured baked pixels");
+   }
+   const auto &expected=paint->layers();for(size_t n=0;n<expected.size();++n)
+    if(expected[n].tiles!=result.layers[n].tiles||expected[n].pbr_tiles!=result.layers[n].pbr_tiles)
+     throw std::invalid_argument("Lossless UV result replaced its editable grid owners");
+   result.color_reprojection->validate();
+   return paint;
+  }
   result.maps->validate();
   PaintSourceMaps empty;const auto &before=old.source_maps_?*old.source_maps_:empty;
   if(before.normal_scale!=result.maps->normal_scale || before.occlusion_strength!=result.maps->occlusion_strength)
@@ -423,6 +491,17 @@ SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
  if(result.normal_reprojection)result.normal_reprojection->validate(true,cancelled);
  if(result.normal_sampling)result.normal_sampling->validate(true,cancelled);
  if(result.normal_frames!=(result.original_material?result.original_material->normal_frames:nullptr))throw std::invalid_argument("Source UV adoption cannot discard or replace original frame authority");
+ if(result.color_reprojection&&result.color_reprojection->paint_sampling){
+  auto paint=SourceUvBakeAccess::adopt(result,cancelled);
+  auto binding=std::make_shared<SourceMaterialBindings>(*result.original_material);
+  binding->color_preparation=result.color_reprojection;
+  auto normal=std::make_shared<SourceNormalPreparation>(*binding->normal_preparation);
+  normal->projection=result.normal_sampling->projection;normal->sampling_domain=result.normal_sampling;normal->uv_reprojection.reset();
+  binding->normal_preparation=std::move(normal);binding->validate();
+  if(result.normal_frames)detail::normal_frame_current_authority(*binding,paint->mesh(),result.deformation.get(),cancelled);
+  if(result.deformation)result.deformation->validate(paint->mesh());
+  return {std::move(paint),std::move(binding),result.deformation,result.appearance};
+ }
  auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=result.mtoon.has_value();
  if(result.mtoon)binding->material=*result.mtoon;
  binding->roles=result.mtoon_roles;binding->uv_origin=result.uv_origin;binding->sampling_reparameterized=true;

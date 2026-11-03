@@ -2071,6 +2071,13 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-paint-sampling-document-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-paint-sampling-document-test PRIVATE -Wl,--wrap=_ZN4dome26retain_source_corner_paintESt10shared_ptrIKNS_11PaintedMeshEES0_IKNS_22SourceMaterialBindingsEES0_IKNS_16DeformationStateEES0_IKNS_19PolygonColorSurfaceEERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE)
   add_test(NAME paint-sampling-document COMMAND dome-sculpt-paint-sampling-document-test ${CMAKE_CURRENT_BINARY_DIR}/paint-sampling/document)
+
+  add_executable(dome-sculpt-lossless-prepared-uv-test tests/lossless-prepared-uv.cpp)
+  target_include_directories(dome-sculpt-lossless-prepared-uv-test PRIVATE src)
+  target_link_libraries(dome-sculpt-lossless-prepared-uv-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-lossless-prepared-uv-test PRIVATE -Wl,--wrap=_ZN4dome26retain_source_corner_paintESt10shared_ptrIKNS_11PaintedMeshEES0_IKNS_22SourceMaterialBindingsEES0_IKNS_16DeformationStateEES0_IKNS_19PolygonColorSurfaceEERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE)
+  add_test(NAME lossless-prepared-uv COMMAND dome-sculpt-lossless-prepared-uv-test ${CMAKE_CURRENT_BINARY_DIR}/lossless-prepared-uv)
+
   set_tests_properties(paint-sampling-document PROPERTIES TIMEOUT 900)
 endif()
 
