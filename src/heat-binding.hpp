@@ -49,6 +49,16 @@ struct HeatSourceSegment {
   std::array<double, 3> head{}, tail{};
   uint32_t bone = 0;
 };
+enum class HeatSourceMetricKind { Physical, Envelope };
+// Private worker input, not a serialized/native authority. Caller must capture
+// the exact current geometry/rig scope. Physical auxiliary handles are selected
+// by role policy before fitting, never substituted after an envelope failure.
+struct HeatSourceMetric {
+  HeatSourceMetricKind kind = HeatSourceMetricKind::Physical;
+  HeatSourceSegment source;
+  std::array<double, 9> precision{};
+  double reference_length = 0;
+};
 struct HeatPositivityFailure : std::runtime_error {
   uint32_t joint;
   double minimum;
@@ -69,11 +79,12 @@ struct HeatSeedFailure : std::runtime_error {
         component(id), rows(r), entry_hits(e), exit_hits(x), grazing_hits(g),
         own_hits(own), foreign_hits(foreign), lower(lo), upper(hi) {}
 };
-SkinWeights heat_bind_surface(const Mesh &, const Skeleton &,
-                              const HeatBindingOptions &,
-                              const std::function<bool()> &cancelled = {},
-                              HeatBindingReport *report = nullptr,
-                              std::span<const HeatSourceSegment> sources = {},
-                              std::span<const uint8_t> eligible = {},
-                              std::span<const uint32_t> row_groups = {});
+SkinWeights
+heat_bind_surface(const Mesh &, const Skeleton &, const HeatBindingOptions &,
+                  const std::function<bool()> &cancelled = {},
+                  HeatBindingReport *report = nullptr,
+                  std::span<const HeatSourceSegment> sources = {},
+                  std::span<const uint8_t> eligible = {},
+                  std::span<const uint32_t> row_groups = {},
+                  std::span<const HeatSourceMetric> source_metrics = {});
 } // namespace dome::detail

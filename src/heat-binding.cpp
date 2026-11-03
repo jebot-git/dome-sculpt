@@ -242,7 +242,8 @@ D closest(D p, const Segment &s) {
 void seed(System &s, const Mesh &m, const Skeleton &rig,
           const HeatBindingOptions &o, Budget &budget,
           std::span<const HeatSourceSegment> sources,
-          std::span<const uint8_t> eligible) {
+          std::span<const uint8_t> eligible,
+          std::span<const HeatSourceMetric> source_metrics = {}) {
   auto world = rig.world();
   std::vector<Segment> segments;
   segments.reserve(sources.empty() ? rig.bones.size() : sources.size());
@@ -334,13 +335,27 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
       if (length > o.maximum_seed_distance)
         continue;
       double cosine = length ? dot(d, s.normals[i]) / length : 1;
-      // The outward-normal reference presumes an oriented boundary containing
-      // its bone. An explicitly selected surface domain does not infer inside
-      // from cloth/lining orientation or penalize its genuinely nearer source.
+      double effective_length = length;
+      if (!source_metrics.empty() &&
+          source_metrics[source.bone].kind == HeatSourceMetricKind::Envelope) {
+        budget.step(24);
+        const auto &metric = source_metrics[source.bone];
+        long double squared = 0;
+        for (int a = 0; a < 3; ++a)
+          for (int b = 0; b < 3; ++b)
+            squared += static_cast<long double>(d[a]) *
+                       metric.precision[a * 3 + b] * d[b];
+        if (!(squared >= 0) || !std::isfinite(squared))
+          throw std::runtime_error(
+              "Envelope source has invalid metric distance");
+        effective_length = metric.reference_length * std::sqrt(double(squared));
+      }
       double distance =
           o.distance_rule == HeatDistanceRule::EuclideanSurface
-              ? length
-              : length / (.5 * (std::clamp(cosine, -1., 1.) + 1.001));
+              ? effective_length
+              : effective_length / (.5 * (std::clamp(cosine, -1., 1.) + 1.001));
+      if (!std::isfinite(distance))
+        throw std::runtime_error("Envelope source distance overflow");
       candidates.push_back({distance, length, q, source.bone});
     }
     std::sort(candidates.begin(), candidates.end(),
@@ -595,13 +610,12 @@ BoundSolve solve_bounds(const System &s, std::span<const double> rhs,
   throw std::runtime_error("Bounded heat did not meet its measured KKT bound");
 }
 } // namespace
-SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
-                              const HeatBindingOptions &o,
-                              const std::function<bool()> &cancelled,
-                              HeatBindingReport *report,
-                              std::span<const HeatSourceSegment> sources,
-                              std::span<const uint8_t> eligible,
-                              std::span<const uint32_t> row_groups) {
+SkinWeights heat_bind_surface(
+    const Mesh &m, const Skeleton &rig, const HeatBindingOptions &o,
+    const std::function<bool()> &cancelled, HeatBindingReport *report,
+    std::span<const HeatSourceSegment> sources,
+    std::span<const uint8_t> eligible, std::span<const uint32_t> row_groups,
+    std::span<const HeatSourceMetric> source_metrics) {
   Budget budget{0, o.maximum_work, cancelled};
   budget.stop();
   const size_t n = m.positions.size(), nt = m.indices.size() / 3;
@@ -650,6 +664,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
     bytes(n, rig.bones.size() * sizeof(uint16_t));
   if (o.operation == HeatOperator::BoundedFiniteElements)
     bytes(n, sizeof(double));
+  if (!source_metrics.empty())
+    bytes(rig.bones.size(), sizeof(HeatSourceMetric));
   bytes(1, 8192);
   budget.step(n + m.indices.size() + rig.bones.size() * rig.bones.size());
   budget.step(m.indices.size() *
@@ -689,13 +705,61 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
         throw std::invalid_argument(
             "Bone heat source graph omitted a deforming bone");
   }
+  if (!source_metrics.empty()) {
+    if (sources.empty() || source_metrics.size() != rig.bones.size())
+      throw std::invalid_argument(
+          "Typed heat metrics require the exact source graph");
+    std::array<bool, 256> checked{};
+    for (const auto &source : sources) {
+      budget.step(128);
+      const auto &metric = source_metrics[source.bone];
+      if (checked[source.bone] || metric.source.bone != source.bone ||
+          metric.source.head != source.head ||
+          metric.source.tail != source.tail)
+        throw std::invalid_argument(
+            "Typed heat metric/source geometry differs");
+      checked[source.bone] = true;
+      if (metric.kind == HeatSourceMetricKind::Physical)
+        continue;
+      if (metric.kind != HeatSourceMetricKind::Envelope ||
+          !std::isfinite(metric.reference_length) ||
+          !(metric.reference_length > 0))
+        throw std::invalid_argument(
+            "Invalid typed heat source metric kind/scale");
+      const auto &a = metric.precision;
+      for (double value : a)
+        if (!std::isfinite(value))
+          throw std::invalid_argument("Nonfinite typed heat metric");
+      for (int i = 0; i < 3; ++i)
+        for (int j = i + 1; j < 3; ++j)
+          if (a[i * 3 + j] != a[j * 3 + i])
+            throw std::invalid_argument("Typed heat metric is not symmetric");
+      const long double determinant =
+          static_cast<long double>(a[0]) *
+              (static_cast<long double>(a[4]) * a[8] -
+               static_cast<long double>(a[5]) * a[7]) -
+          static_cast<long double>(a[1]) *
+              (static_cast<long double>(a[3]) * a[8] -
+               static_cast<long double>(a[5]) * a[6]) +
+          static_cast<long double>(a[2]) *
+              (static_cast<long double>(a[3]) * a[7] -
+               static_cast<long double>(a[4]) * a[6]);
+      if (!(a[0] > 0) ||
+          !(static_cast<long double>(a[0]) * a[4] -
+                static_cast<long double>(a[1]) * a[3] >
+            0) ||
+          !(determinant > 0) || !std::isfinite(determinant))
+        throw std::invalid_argument(
+            "Typed heat metric is not positive definite");
+    }
+  }
   if (!row_groups.empty() && row_groups.size() != n)
     throw std::invalid_argument("Bone heat virtual row groups differ from the "
                                 "exact current vertex owner");
   auto s = assemble(m, budget, o.operation, row_groups, o.geometry_normals,
                     o.mass, o.edges);
   const size_t rows = s.positions.size();
-  seed(s, m, rig, o, budget, sources, eligible);
+  seed(s, m, rig, o, budget, sources, eligible, source_metrics);
   HeatBindingReport proof;
   proof.vertices = n;
   proof.matrix_vertices = rows;
