@@ -489,7 +489,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   NormalFrameArchive frames;if(extended)frames=NormalFrameArchive::decode(input.at("normal_frames"));
   // Preflight all implicit SurfaceMap allocations before constructing any.
   size_t texels=0,vertices=0,tile_bytes=0,metadata=0;
-  std::function<void(const nlohmann::json&)> preflight_paint=[&](const auto &record) {
+  std::function<void(const nlohmann::json&)> preflight_paint=[&](const nlohmann::json &record) {
     const auto &paint=detail::paint_archive_payload(record,input.at("version")==9,context);
     if(record.contains("version")&&record.at("version")==4){
       tile_bytes+=record.at("vertices").get_binary().size();preflight_paint(record.at("before"));
