@@ -114,13 +114,19 @@ anatomical_continuation(const Scene &scene, uint64_t group,
               first->deformation->skeleton->encode() ||
           o.deformation->humanoid->encode() !=
               first->deformation->humanoid->encode() ||
-          !o.deformation->pose.empty() ||
-          std::any_of(o.deformation->morph_weights.begin(),
-                      o.deformation->morph_weights.end(),
-                      [](float x) { return x != 0; }) ||
-          scene.world_matrix(o.id).matrix() != AffineTransform{}.matrix())
+          scene.has_affine_placement(o.id) ||
+          scene.world_matrix(o.id).matrix() !=
+              scene.world_matrix(first->id).matrix())
         throw std::invalid_argument(
             "Continuation current source/rig/metric changed");
+      // Solve in the common source REST frame. A shared native positive
+      // similarity leaves angles, the mass/(distance^2+mass) kernel and
+      // normalized output invariant. Pose/morph are retained display state,
+      // never substituted for REST geometry. Relative/affine placements refuse.
+      if (!(scene.world_transform(o.id).scale > 0))
+        throw std::invalid_argument(
+            "Continuation requires positive similarity placement");
+      o.deformation->validate(o.painted->mesh());
       budget.step(o.deformation->skeleton->bones.size() *
                   o.deformation->skeleton->bones.size());
       objects.push_back(&o);

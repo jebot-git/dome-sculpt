@@ -615,7 +615,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.skin_sources.empty()?0:state_.skin_sources.front();
   }
   state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
-  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
+  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty() &&
+      (state_.skin_options.mode!=SkinAuthoringMode::SourceVisible || !state_.shape_sculpt);
+  state_.can_bind_selected_skin=selected_skin_ready_locked(state_.skin_options.mode);
   state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
@@ -692,6 +694,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
                              : command ? command_enabled_locked(*command)
                                        : true;
     if(state_.menu_page==26&&i>2&&i!=8)state_.menu_enabled[i]=false;
+    if(state_.menu_page==29&&i>8)state_.menu_enabled[i]=false;
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
       (weight_scheduled_epoch_ != state_.weight_gesture || weight_scheduled_samples_ != weight_samples_.size());
@@ -1441,11 +1444,11 @@ void Document::process_locked(const SpatialFrame &incoming) {
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
-        input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
+        input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && input_.menu_page()!=29 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
     import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c))&&published_.load()!=command_publication;
-    if((command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    if((command_page==29)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
@@ -2055,7 +2058,8 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
   if (state_.retopology) return false;
-  if(skin_parameter(parameter)) return skin_target_ready_locked() &&
+  if(skin_parameter(parameter)) return
+    (state_.skin_options.mode!=SkinAuthoringMode::SourceVisible || parameter==VrParameter::SkinSource || parameter==VrParameter::SkinMode) && skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection || parameter==VrParameter::BakeColors)
@@ -2186,7 +2190,10 @@ void Document::finish_control_locked(bool accept) {
       else if(c.parameter==VrParameter::SkinInfluences) options.limits.max_influences=uint32_t(std::lround(c.value[0]));
       else if(c.parameter==VrParameter::SkinPrune) options.limits.prune=c.value[0];
     }
-    control_before_.reset();control_changed_=false;state_.controls={};return;
+    control_before_.reset();control_changed_=false;state_.controls={};
+    if(accept && c.parameter==VrParameter::SkinMode && input_.menu_open())
+      input_.retain_page(state_.skin_options.mode==SkinAuthoringMode::SourceVisible?29:14,input_.menu_device(),1);
+    return;
   }
   if (state_.controls.parameter == VrParameter::RetopoDistance) {
     retopo_snap_mm_ = accept ? state_.controls.value[0] : control_retopo_mm_;
@@ -2371,7 +2378,7 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
     }
     case VrParameter::SkinMode:
-      c.title="Automatic bind / weight transfer";c.value[0]=int(state_.skin_options.mode);break;
+      c.title="Surface / transfer / source-assisted";c.maximum=2;c.value[0]=int(state_.skin_options.mode);break;
     case VrParameter::SkinDistances:
       c.title="Seed / margin / transfer (world mm)";c.components=3;
       c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;
@@ -2792,7 +2799,9 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   }
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
-  if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
+  if(command==SpatialCommand::BindSkinSelected)return !control_before_ && selected_skin_ready_locked(state_.skin_options.mode);
+  if(command==SpatialCommand::BindSkin) return !control_before_ &&
+    (state_.skin_options.mode!=SkinAuthoringMode::SourceVisible || !state_.shape_sculpt) && skin_target_ready_locked() &&
     !skin_sources_locked(state_.skin_options.mode).empty();
   if(command==SpatialCommand::SkinUseLocks) return !control_before_ && skin_target_ready_locked() && state_.can_paint_weights;
   if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
@@ -3011,12 +3020,12 @@ void Document::command_locked(SpatialCommand command) {
   if(command==SpatialCommand::CancelWork){cancel_background_work_locked();return;}
   if(command==SpatialCommand::BakeSurface){if(command_enabled_locked(command))queue_bake_locked(state_.bake_source,state_.bake_settings);return;}
   if(command==SpatialCommand::ClearBake){if(command_enabled_locked(command))queue_clear_bake_locked();return;}
-  if(command==SpatialCommand::BindSkin) {
+  if(command==SpatialCommand::BindSkin || command==SpatialCommand::BindSkinSelected) {
     if(command_enabled_locked(command)) {
       auto options=state_.skin_options;
       if(state_.skin_use_locks && state_.can_paint_weights) options.locks=state_.weights.locks;
       else options.locks.clear();
-      queue_bind_skin_locked(std::move(options));
+      queue_bind_skin_locked(std::move(options),{},command==SpatialCommand::BindSkinSelected);
     }
     return;
   }

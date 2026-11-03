@@ -94,7 +94,8 @@ bool author_source_visible_skin(Scene &scene, std::span<const uint64_t> targets,
   const auto &reference = scene.object(options.reference);
   if (!reference.group || !reference.deformation ||
       !reference.deformation->skeleton || !reference.appearance ||
-      !reference.painted)
+      !reference.appearance->asset ||
+      !reference.appearance->original_bytes || !reference.painted)
     throw std::invalid_argument(
         "Choose an authenticated imported source group/rig");
   Work work{0, options.source_visible.maximum_work, cancelled};
@@ -117,6 +118,10 @@ bool author_source_visible_skin(Scene &scene, std::span<const uint64_t> targets,
   std::vector<SculptObject> captured;
   bytes.add(targets.size(), sizeof(SculptObject));
   captured.reserve(targets.size());
+  const bool all_joints_locked =
+      !options.locks.empty() &&
+      std::all_of(options.locks.begin(), options.locks.end(),
+                  [](auto x) { return x != 0; });
   bool every_target_closed = !options.locks.empty();
   for (auto id : targets) {
     work.step();
@@ -191,7 +196,8 @@ bool author_source_visible_skin(Scene &scene, std::span<const uint64_t> targets,
         if (count > 4 || sum > 1.000001)
           throw std::invalid_argument("Locked influences cannot satisfy the "
                                       "fixed4 source-assisted preset");
-        every_target_closed &= !has_free && sum >= 1 - 1e-6;
+        every_target_closed &=
+            !has_free && (all_joints_locked || sum >= 1 - 1e-6);
       }
     captured.push_back(o);
   }

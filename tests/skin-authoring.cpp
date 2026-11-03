@@ -230,7 +230,7 @@ int main(int argc,char **argv) try {
   {
     auto scene=fixture();Document xr;xr.replace(scene);Driver driver(xr);driver.open();
     check(xr.frame().state->menu_page==14,"Joystick reaches bind and transfer controls for an unskinned target");
-    auto before=xr.copy_scene().encode();driver.sector(1);driver.value(1);driver.confirm();
+    auto before=xr.copy_scene().encode();driver.sector(1);driver.value(.5f);driver.confirm();
     check(xr.frame().state->skin_options.mode==SkinAuthoringMode::Transfer&&xr.copy_scene().encode()==before&&!xr.frame().state->dirty,
           "Controller method selection is staged configuration with no native data or history change");
     driver.sector(2);driver.value(0,1);driver.confirm();
