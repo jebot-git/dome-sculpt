@@ -1,9 +1,11 @@
 # Current DomeD toolkit and conventions
 
-Current canonical DomeD is `db0dba05209ff09255e12455c8d0e3b8f0bd075c`, checked
+Current canonical DomeD is `62b6417bb251aef8e00a1c3e8d4d1a69c043572b`, checked
 against remote main on 2026-11-03. Its toolkit hooks, bitmap patch directory and
 BDF helper are byte-identical to d271cf65c612a462fcfa6739416b06c6565be070.
-The new notification-audio popup changes are confined to compositor chrome. All 23 FLTK patches, four bitmap patches,
+The subsequent GTK/Qt/X11 retirement changes leave these canonical inputs
+unchanged. System Xvfb/Xwayland removal is preserved; GUI tests use a signed,
+private Xvfb server without installing it. All 23 FLTK patches, four bitmap patches,
 16 installed runtime libraries, builder and canonical font helper were verified
 against their recorded hashes. Inputs remain byte-identical to3024fb6 and
 eee23b7, which added native PCF and a23rd FLTK patch. The current helper also
@@ -48,6 +50,13 @@ LD_LIBRARY_PATH and CMAKE_PREFIX_PATH at the new bitmap prefix while building
 FLTK; this workstation's FLTK cache confirms it used that FreeType's headers and
 library. Both scripts build Release as the regular user. Existing source/build
 artifacts are retained, including old compositor binaries.
+
+The latest private optimized nested compositor is
+`artifacts/domed-62b6417-target/release/dome-compositor`: its full Release build
+passes with all1,000 source inputs unchanged. Eight actual native Wayland/menu
+checks pass on the immutable9050/e7 frontend snapshot, with six live canonical
+libraries verified. This is not a fresh master42e frontend, sanitizer or hardware
+claim. Read validation/TOOLKIT-62b6417.json for exact scope and file hashes.
 
 The previously qualified private compositor is
 `artifacts/domed-3024fb6-target/release/dome-compositor`. A clean latest d271cf6

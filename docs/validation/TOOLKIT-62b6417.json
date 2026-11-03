@@ -1,0 +1,190 @@
+{
+  "checked_utc": "2026-11-03T06:06:05.558943+00:00",
+  "DomeD_remote": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
+  "previous_qualified": "d271cf65c612a462fcfa6739416b06c6565be070",
+  "canonical_inputs": {
+    "checked_utc": "2026-11-03T05:59:27.937703+00:00",
+    "domed_HEAD": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
+    "previous_qualified": "d271cf65c612a462fcfa6739416b06c6565be070",
+    "source_hashes": {
+      "native/bdf_font.hpp": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
+      "native/bitmap-runtime/README.md": "03f4e05303d5486ec218c383ec40142adc2e7d09cf8fea06045ca384904cd128",
+      "native/bitmap-runtime/VALIDATION.json": "9d66379744efbd35bc9f055d40418e0fab551d803e87abeea7dd6c554f9bf1ae",
+      "native/bitmap-runtime/cairo-1.18.4-bitmap.patch": "4aa6c2229c3cf6e99d955b4df0f9dddbc969fd3bdd56e1f779c008fc2c3e3f23",
+      "native/bitmap-runtime/freetype-2.14.3-bitmap.patch": "d4bc632b097cc78f3baeafc59d9e2b854359b5125e63f69be3d9c53a3d11be4e",
+      "native/bitmap-runtime/harfbuzz-14.1.0-bitmap.patch": "bc141a1d93dedf0a3c9f8f44e9a48fbce268e2d1cdd9c723fa24544962322bf4",
+      "native/bitmap-runtime/pango-1.57.1-bitmap.patch": "8d190e919dc188f435bf05c9c7b363053d36ac8bced8f0242c9bf6c1e38f6ea0",
+      "native/bitmap-runtime/probe.c": "27d7b8f589590923a62ace43f3409d1a056fc5c4a3da384bac9f263979fe7075",
+      "native/bitmap-runtime/sources.json": "255d1c5a1043875dc4ac82364dbf72baca8a4e45dc509c3c12ce8385be9e8e89",
+      "native/bitmap-runtime/test-pcf-adapter.cpp": "d891da570e3bbc832af398177c217d842178aa64dcd289a6e2ed48ea588e1a7b",
+      "native/toolkit-hooks/README.md": "f50dd908792a9eb35c97c4b606cf53c005a1a52ce02b9d962379b2e50ea12446",
+      "native/toolkit-hooks/fltk-1.4.4-popup-done.patch": "706e716d1e1c03dcb3fd28d074f86ff51097dd646d2533549b6ffb34e6381dad",
+      "native/toolkit-hooks/fltk-1.4.5-bdf-fallback.patch": "a56ac45851e1a3ab7928a3a8f8526a2194a7ee594c8c1c9715ec4c97ebc2ab07",
+      "native/toolkit-hooks/fltk-1.4.5-bdf-ink.patch": "5b9feba6b7933c0bf8fb066b35afad1d08e08ce10f38a2a67c02d17eb1d3aadd",
+      "native/toolkit-hooks/fltk-1.4.5-bdf-only.patch": "d3772d82603e083dd489da692250d2df79cb750e14e656897e686e07f2b85c5e",
+      "native/toolkit-hooks/fltk-1.4.5-bitmap-fonts.patch": "5a4318d315dae55e7e5d3fff18d3875d16a0a1886a413501d5e97ba51f6d6261",
+      "native/toolkit-hooks/fltk-1.4.5-bitmap-refresh.patch": "ff5aa25c91ae3ec7770203eadeabd62bd51b9d321e44cd4529480ee98b620635",
+      "native/toolkit-hooks/fltk-1.4.5-bitmap-styles.patch": "7954242bc1afe7a7433b294b178c8cf16ebd9e7bef30cb02f09819e7079c223a",
+      "native/toolkit-hooks/fltk-1.4.5-borderless-app-id.patch": "4c1fbd6cd5d6e57a3d729cfbec2ac51101c86e7b52d10f441caa8598efb2083a",
+      "native/toolkit-hooks/fltk-1.4.5-compositor-fullscreen.patch": "716ae88954a439e3142dd0e56c842aa7587b20a812654a12190f7ff7e8eeb7e6",
+      "native/toolkit-hooks/fltk-1.4.5-depth-buffer.patch": "136b1a9605bde5a5e759b42b96fea9c83fd10b85c2818cf8a8ab01f3b1c2b578",
+      "native/toolkit-hooks/fltk-1.4.5-empty-gl-text.patch": "0318167f676825965e5ed632c8c2761a254ea4b1eb083684251476ce64d68bc0",
+      "native/toolkit-hooks/fltk-1.4.5-escape-dialogs.patch": "4daed62408f1e0dd674313681ca52ea3a00b1d87395f4ce43a3f41b2d0c24253",
+      "native/toolkit-hooks/fltk-1.4.5-file-picker-places.patch": "f4d46edf598e20de5abfb9c89a412001093a6fd259e6469e516642e53c935a1a",
+      "native/toolkit-hooks/fltk-1.4.5-file-picker.patch": "4184d53a8fe466ac9822e3bb785904d12b536383319c25fe7c74f30de8fbf583",
+      "native/toolkit-hooks/fltk-1.4.5-first-configure.patch": "ca9ac305247fbc2f54911a59cc5c6308ee06d0b93d96059bd1261a81f875be37",
+      "native/toolkit-hooks/fltk-1.4.5-freetype-decor.patch": "8c33728002148e711867ca733d4a889fbbd5fc31d17fa0e9f224407ede570201",
+      "native/toolkit-hooks/fltk-1.4.5-freetype-only.patch": "1df312a1f2a4706e5863dae02acc094a66a748db380f1ea8ef5c3cf0ad0d67bd",
+      "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch": "3dc6e2f311db0661e1b8117afa0b4fbabfe84d356a75c8bace3cd39a5782eec2",
+      "native/toolkit-hooks/fltk-1.4.5-pen-input.patch": "f90bab41cb33c949bd4efe2659f6e103d06611fdaeb98b06e8af0dd817f44152",
+      "native/toolkit-hooks/fltk-1.4.5-popup-done.patch": "76694f92a2ba25a91c487cf19024f4d83fd1f0492dada4da2f7df462b110b2c1",
+      "native/toolkit-hooks/fltk-1.4.5-primary-selection.patch": "36a0a211147565a122998d8a14645a4ddc71adb5cba46bf7141aba08d4d1be68",
+      "native/toolkit-hooks/fltk-1.4.5-touch-input.patch": "80b54a5f69889f4197f1a3a7dfffaa8a70a493b1192983c0ae21ffaa588ce27a",
+      "native/toolkit-hooks/fltk-1.4.5-window-close.patch": "6270c9c1438a4f81f4d6575bf0d861e1fcb3118462064e84783338bcd2320ec8",
+      "native/toolkit-hooks/fltk-1.4.5-window-suspended.patch": "aa887b3d11a85e1470535253ff6cbfa7a00f5ad25c54be9acc5ef914f2f720d0",
+      "native/toolkit-hooks/miro-0.12.0-dome-theme.patch": "e584715f3fe063b034cc0a9bf334293962a4fd447f231fa625aa2a53f7f2c636",
+      "native/toolkit-hooks/miro-0.12.0-global-menu.patch": "c8a81b516c894e1cb672c32649ac52da7c7aa52dc80da68fb664fd3fcb0bc739",
+      "native/toolkit-hooks/pango-1.57.0-native-bdf.patch": "e31d1a98e24a2e3cc2909d33e17317d375bbe7df7d2c4912cee16bfc85c916c1",
+      "scripts/prepare-bitmap-runtime.py": "df44413892b38098703fc4e5c0be04e5015382b524f83a9f5478fb22077ed151",
+      "scripts/prepare-fltk-experiment.py": "fe7db74e1763dc51c8362332751eefe4559aa25a654a000e4553e6afe91754ae"
+    },
+    "canonical_input_changes": [],
+    "vendored_bdf_exact": true,
+    "system_changes": false,
+    "session_restart": false,
+    "bitmap_runtime_libraries": {
+      "libfreetype.so.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+      "libharfbuzz.so.0": "35fcdcf82f23dc5301513ec8ac75d154d1342ed5e5a24f38930abed3a46c9edc",
+      "libharfbuzz-subset.so.0": "bec1b6aaa8efb1f296600bb29f0fa976e7781fe181237b4b847cd042a99fd748",
+      "libharfbuzz-raster.so.0": "65df1846fe460e96cd68bd4911c54c10d7b03012ed906a52dc5ea4a10c38ff14",
+      "libharfbuzz-vector.so.0": "a2335d97a051dca9db35bd097d72eae752f72450ad0f0d8b234aa3af6a9dfedb",
+      "libharfbuzz-gpu.so.0": "f4c2b18eda9725fb117ebbedac7885f703efdf8ec5719e3702b15c9d338a243d",
+      "libharfbuzz-cairo.so.0": "72a787c0421104d8a1b919b12f2d9c833290c31788890edadc5dda52a3cb9a6c",
+      "libharfbuzz-icu.so.0": "1a83fb4e5e9085dcc3c5c5b521c938b855efd508616573930765037b228ed5d6",
+      "libharfbuzz-gobject.so.0": "26a75ec631ba4d446d722b4975480b8aba02751f76d73b56c62dd989ba0be8fe",
+      "libcairo.so.2": "7d4db5c2c967ad834a6506e1f83eee5959a85a172bee968d1be38fa3c6f5ea32",
+      "libcairo-gobject.so.2": "3e5df98597dd80cbb05e9faddf220fe5b9d940c0ac502b501a4253ba4f707a77",
+      "libcairo-script-interpreter.so.2": "5d9c5146a1d7ac858f4351e2bc29071b6b68d21de2d34d97c8e1738d1797a7fa",
+      "libpango-1.0.so.0": "78bef364dcef44efc44a21fd92584d889a954e975777a2a3e6d1d2d14de3b1d4",
+      "libpangoft2-1.0.so.0": "4b4ae1867fd311c25f4f9750c9fbb3c9d8afa25446bb1658117315de33eacb46",
+      "libpangoxft-1.0.so.0": "acf16e4aa66954213f5e4306bb4556b50367e9061a2fb5a38bd96a446d8b2172",
+      "libpangocairo-1.0.so.0": "3c338cbc91c96b508106cb23c3b1db1e385aa1b08b47ed553d92e8c63db781db"
+    },
+    "bitmap_runtime_mismatches": []
+  },
+  "compositor_build": {
+    "source": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
+    "start_utc": "2026-11-03T05:59:46.834865+00:00",
+    "command": [
+      "/usr/bin/cargo",
+      "build",
+      "--offline",
+      "--locked",
+      "--release",
+      "--features",
+      "nested",
+      "--bin",
+      "dome-compositor",
+      "-j2"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/domed-62b6417-target",
+      "DOME_FLTK_PREFIX": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7",
+      "PKG_CONFIG_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig",
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib"
+    },
+    "profile": "optimized Release; regular user; private nested compositor",
+    "reused_dependencies": "independent reflink/copy of prior target; historical target untouched",
+    "status": "terminal",
+    "exit_code": 0,
+    "seconds": 120.48463330900995,
+    "source_inputs": 1000,
+    "source_drift": [],
+    "log_sha256": "c80c7bfd74edc208690185a402e7301ca40a38c2c6933819230d02b19a873b33",
+    "binary": "/home/blux/de-xr/dome-sculpt/artifacts/domed-62b6417-target/release/dome-compositor",
+    "binary_sha256": "0400d3d7629d54d63dddc65ca127b6d341ad44b1de63c1301acae0f80fba0bb6"
+  },
+  "native_Wayland_menu": {
+    "status": "terminal",
+    "started_utc": "2026-11-03T06:02:31.828704+00:00",
+    "compositor_source": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
+    "app_scope": "Matched immutable9050+e7 oneTU application snapshot; not full master42e app qualification",
+    "inputs_before": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/dome_menu.py": "63e87b89dac6476131cd237f8287b36e65c942dc2e82d62b3d34d1079ff02e05",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-shape-sampling-9050/artifacts/fixed-app/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+      "/home/blux/de-xr/dome-sculpt/artifacts/domed-62b6417-target/release/dome-compositor": "0400d3d7629d54d63dddc65ca127b6d341ad44b1de63c1301acae0f80fba0bb6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/domed-62b6417-menu-root/packaging/org.domed.Sculpt.desktop": "663a71189cebf541043c766bdd127698fc4766ab544a7ad49d9a2a96ccdd4cd7"
+    },
+    "hardware": "private software Vulkan/GL and Xvfb; native Wayland client; no HMD or system changes",
+    "exit_code": 0,
+    "seconds": 31.30892214999767,
+    "inputs_after": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/dome_menu.py": "63e87b89dac6476131cd237f8287b36e65c942dc2e82d62b3d34d1079ff02e05",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-shape-sampling-9050/artifacts/fixed-app/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+      "/home/blux/de-xr/dome-sculpt/artifacts/domed-62b6417-target/release/dome-compositor": "0400d3d7629d54d63dddc65ca127b6d341ad44b1de63c1301acae0f80fba0bb6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/domed-62b6417-menu-root/packaging/org.domed.Sculpt.desktop": "663a71189cebf541043c766bdd127698fc4766ab544a7ad49d9a2a96ccdd4cd7"
+    },
+    "inputs_unchanged": true,
+    "report": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Native Wayland sculpt window publishes the installed Dome Sculpt application identity"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Super+F10 and header/row navigation activate the actual exported Duplicate command"
+        },
+        {
+          "passed": true,
+          "check": "DomeD focuses the native parameter dialog as part of the same application"
+        },
+        {
+          "passed": true,
+          "check": "The compositor keeps the focused native field and its text selection while opening universal menus"
+        },
+        {
+          "passed": true,
+          "check": "A focused Wayland dialog inherits its parent's universal menu and routes Edit Cut to its field"
+        },
+        {
+          "passed": true,
+          "check": "Universal Edit Undo restores dialog text through the real compositor"
+        },
+        {
+          "passed": true,
+          "check": "The compositor's universal File Close cancels the modal dialog and retains the sculpt document"
+        },
+        {
+          "passed": true,
+          "check": "The universal Window menu retains DomeD's Send Window to Desktop action"
+        }
+      ],
+      "failed": 0
+    },
+    "verified_runtime_library_hashes": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libcairo.so.2.11804.4": "7d4db5c2c967ad834a6506e1f83eee5959a85a172bee968d1be38fa3c6f5ea32",
+      "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libfreetype.so.6.20.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+      "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk.so.1.4.5": "4f37792b4767fd1c184aa7aec6f581920e81dcfcbcd79a83b819357787639597",
+      "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_images.so.1.4.5": "e06642f26fb03147b5e0f75725642c96aa9536ae83454799e7598bf170c86957",
+      "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libharfbuzz.so.0.61410.0": "35fcdcf82f23dc5301513ec8ac75d154d1342ed5e5a24f38930abed3a46c9edc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_gl.so.1.4.5": "acd4b8c0b0b591ac9ea33fcc6a29436cf698fd6b20efe165b28c8f703e5703f8"
+    },
+    "runtime_map_sha256": "0b059d01a16e7612f916ee96793305191296f894930378b1f5cb9984be50ea81"
+  },
+  "emitted_file_hashes": {
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/client.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/compositor.log": "d9f8fa039b04cb0749b26395b794e4fb378dfb6a2b99cba5d93fcbbc987f1a74",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/dialog.json": "c211002020e68c57de98d75ac93e411f92bfd2e1a93810736249d2277eddd995",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/render.ppm": "c37dc736b701418fb8c2386969096d08f9d04f2e2eb5890d1423883c842a885c",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/report.json": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/runtime-maps.json": "0b059d01a16e7612f916ee96793305191296f894930378b1f5cb9984be50ea81",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/scene.json": "24e7f41c34b9b8456a99824c8d2f2982ef3a4797942ca43cc920503f51c9b9d9",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/universal-menu.png": "96f51d7b64626a9fc4ee929cc5a23b0130ac438a5c07cf6adee75efce7903114",
+    "artifacts/domed-62b6417-menu-root/artifacts/dome-menu/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+    "artifacts/domed-62b6417-menu-root/packaging/org.domed.Sculpt.desktop": "663a71189cebf541043c766bdd127698fc4766ab544a7ad49d9a2a96ccdd4cd7",
+    "artifacts/domed-62b6417-menu-root/runner.log": "5e50eb6e91bf1cb3e8c26da14c5ffd5bdae5f5ad14c7e06cec8902714a4b85b3",
+    "artifacts/domed-62b6417-menu-root/status.json": "94b363fb2df89d17ecf0968b3318a8033a7ef333864fbeabd085bff138273425"
+  },
+  "scope": "Private optimized latest DomeD plus matched immutable9050/e7 native frontend. Eight real universal-menu/Wayland checks, software Vulkan/GL. No full master42e frontend, SAN, GPU, HMD, system install or active-session restart claim."
+}

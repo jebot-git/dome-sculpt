@@ -16,10 +16,13 @@ artifacts remain exact. Main remains3f4b2ba; the full goal is incomplete.
 Owned sanitizer selection8337 is TERMINAL8:5/6 pass in3209.74s, including the
 complete101 commutation in1398.34s. The broad134 workflow hits its1800.15s CTest
 limit after keys/cancellation/native rest; preserve that negative. The identical
-instrumented binary is being run with an explicit7200s outer bound in a separate
-frozen9050 worktree artifacts/san-union-long-9050 (handle28731). Assertions,
-numerical tolerances and per-operation limits are unchanged. Inspect actual
-handle/status; no all-green sanitizer or failed-process leak-clean claim.
+instrumented binary's separate7200s run28731 is TERMINAL1: the existing120s
+ordered-Save observer expires at native-post-rest-key-replace. The atomic file
+eventually completes during teardown; the outer7200s bound did not expire.
+Assertions, numerical tolerances and per-operation limits were unchanged. A
+separate fixture-only phase diagnostic measures factory, validation and file
+costs before any observer correction. No broad134 sanitizer pass or
+failed-process leak-clean claim.
 
 Real normal/compact nativeFLTK tests expose a genuine freehand query refresh
 that drops sampling attachment/proof/coordinates. Integration7c0820f (private
@@ -27,19 +30,41 @@ component e7a3c7c) preserves the complete immutable initial range during each
 shape refresh. Logical native winding stays logical, with reflected culling;
 packed EBO reversal is separate. Its old-code negative and84 native/controller
 checks pass with matched9050 support, unchanged header ABI. A first SAN20s
-observer timeout remains unqualified. Exact fixed GUI tests now report Stroke
-complete and real target0 changes: their last-target1 assertion assumed selection
-survives Undo/Redo, but Undo intentionally clamps ephemeral selection. Actual
-existing-target dropdown selection is being tested before re-running the strict
-target/source/history assertions. Full GUI qualification remains open. Signed
-private Xvfb dependencies/bwrap do not reverse system X11 retirement.
+observer timeout remains preserved; the unchanged runtime with a measured
+diagnostic observer continues its four native/controller/reflected cases. The
+final actual FLTK harness selects the existing target through its real dropdown
+after Undo/Redo, preserving ephemeral selection semantics. Normal35 and compact37
+strict checks pass on the immutable9050/e7 app snapshot; read RETAINED-KEY-UI.md
+and validation/RETAINED-KEY-UI.json. These are scoped single-TU/relink application
+proofs, not a fresh full master build or SAN claim. Signed private Xvfb
+dependencies/bwrap do not reverse system X11 retirement.
 
 The new seam-key position-domain work remains separate/unfinished in
 artifacts/seam-key-domain-9050: private geometry kernel30R/30 scopedSAN and a
-fresh coherent factory21 prove useful subsets, including immutable anchor
-metadata; codecs/native admission/UI/export and complete validation are pending.
+fresh coherent factory53 prove useful subsets, including immutable anchor
+metadata and an independent original artist-frame transport oracle;
+codecs/native admission/UI/export and complete validation are pending.
 No derived-key schema or prototype is included in this master. Preserve the
 complete requirements and queued post-basic controller drawers.
+
+## Full native build and current DomeD boundary — 2026-11-03
+
+Exact42e868e completes the full optimized CPU all-target build (93234,
+TERMINAL0), with native FLTK/OpenXR; all533 registered test commands have their
+required executables available.
+All1,431 tracked source inputs remain exact, and410 built ELF/static archives
+are hashed. This is a build-only gate; the complete533 regression has not yet
+run. Read validation/FULL-NATIVE-BUILD-42e.json. The subsequent UI harness and
+provenance commits do not change compiled C++/headers/CMake or bundled assets.
+
+Latest DomeD62b6417 also builds optimized in an independent private target,
+with1,000 source inputs unchanged. Eight native Wayland universal-menu checks
+pass on the immutable9050/e7 frontend snapshot, with actual canonical live
+library paths verified. Its40 canonical toolkit/bitmap/builder/helper inputs
+and16 bitmap libraries remain exact; no toolkit rebuild or system X11 package
+restoration is needed. Read TOOLKIT.md/validation/TOOLKIT-62b6417.json. Full
+candidate, sanitizer, interchange, device and production gates remain required;
+public main stays3f4b2ba and the original full goal is active/incomplete.
 
 ## Private combined authoring candidate — 2026-11-03
 
@@ -149,9 +174,10 @@ Read RETOPO-AUTHORING.md and validation/RETOPO-EDGES.json for scoped proof and
 preserved initial wire/control-fixture failures. No new physical headset,
 loader/GPU proof or system installation. The complete goal stays active.
 
-DomeD HEAD/remote is now db0dba0; its toolkit hooks, bitmap patches and BDF helper
+DomeD HEAD/remote is now62b6417; its toolkit hooks, bitmap patches and BDF helper
 are unchanged from d271cf6. Existing canonical toolkit/bitmap builds remain valid;
-notification-audio chrome changes do not alter the shared toolkit.
+the GTK/Qt/X11 retirement is preserved. Latest private compositor/menu evidence
+is recorded above and in validation/TOOLKIT-62b6417.json.
 
 ## Additional queued phase — controller spatial drawers, 2026-11-02
 
