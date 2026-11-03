@@ -1,0 +1,55 @@
+{
+  "recorded_utc": "2026-11-03T14:37:07.623933+00:00",
+  "scope": "Fresh optimized CPU all-target native FLTK/OpenXR build on current unlit runtime; not full regression pass. Full registered540 CTest run remains live in frozen cohort.",
+  "build": {
+    "status": "terminal",
+    "source": "39210fca93c99a49d00d6a5209976e0caf324275",
+    "profile": "CPU",
+    "wrapper_pid": 3758258,
+    "source_inputs": 1484,
+    "runs": [
+      {
+        "name": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-cpu",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DPython3_EXECUTABLE=/usr/bin/python3.14"
+        ],
+        "exit_code": 0,
+        "seconds": 4.095144160994096
+      },
+      {
+        "name": "build",
+        "command": [
+          "cmake",
+          "--build",
+          "build-cpu",
+          "--parallel",
+          "2"
+        ],
+        "exit_code": 0,
+        "seconds": 1509.2897462710098
+      }
+    ],
+    "scope": "Complete native all-target optimized continuation after qualified unlit shader/comparison-consumer change; coherent existing fc562 vendor objects, no public ABI append. CPU profile starts fresh. Matching f797 canonical toolkit/bitmap SDK. Build only, not all-suite or physical-device proof.",
+    "phase": "build",
+    "child_pid": 3759404,
+    "exit_code": 0,
+    "source_drift": []
+  },
+  "before_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+  "after_sha256": "80daf3132760cd8f042eaaffd0c2a0b8b55eb52662e162ca8292dd5838662785",
+  "build_log_sha256": "c745ec520a58546eef318ead86bc5d4640164be45570308f96d6fa143b6f7edc",
+  "registered_tests": 540,
+  "ELF_static_outputs": 418,
+  "full_test_status_at_recording": "running"
+}
