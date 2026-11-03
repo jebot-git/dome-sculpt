@@ -1,0 +1,1826 @@
+{
+  "recorded_utc": "2026-11-03T11:14:57.990204+00:00",
+  "base": "bd2bcde7e3fa151ea6fa211305544b3eabfa8fdb",
+  "build_source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+  "final_python_observer_source": "69ca191711a5f5eeda8c84386c66e0b44a08db7b",
+  "scope": "Native desktop connection lifetime plus partial-EGL ownership. No Scene/archive/public class data-layout append. Current coherent owned CPU/SAN native consumers and matching canonical Release/SAN FLTK; external bitmap/driver remain Release. Matching cached unchanged owned TUs retained; not a clean all-target or full regression claim.",
+  "canonical_domed": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
+  "proof": {
+    "cpu_build": {
+      "status": {
+        "status": "terminal",
+        "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+        "started_utc": "2026-11-03T11:07:22.776617+00:00",
+        "source_inputs": 1461,
+        "runs": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build-cpu",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit_code": 0,
+            "seconds": 1.6039256980002392
+          },
+          {
+            "name": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "build-cpu",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-desktop-context-lifetime-test",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-native-graphics-lifetime-test",
+              "dome-sculpt-desktop-framing-fixture",
+              "dome-sculpt-spacenav-test",
+              "dome-sculpt-desktop-framing-test",
+              "dome-sculpt-rig-fit-render-test",
+              "dome-sculpt-rig-fit-controller-test",
+              "dome-sculpt-rig-fit-authoring-test",
+              "dome-sculpt-palette-text-test",
+              "dome-sculpt-object-selection-render-test",
+              "dome-sculpt-render-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.02548057699459605
+          }
+        ],
+        "toolkit": "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit",
+        "scope": "Coherent whole-owned current app/core/support/render/XR C/C++; matching unchanged cached TUs from initial own builds retained; CPU optimizedRelease or O1ASanUBSan, matching canonical Release or whole-ownedSAN toolkit. Selected lifecycle/render/control consumers, not all targets.",
+        "exit_code": 0,
+        "source_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/cpu/status.json",
+      "artifact_sha256": "e897f5356c5521b60a12d30f2a9b6d82b47833e1a2a8516145e0412ee2d3e2be",
+      "source-before.json": {
+        "sha256": "9c7e88a8e5d372ad2d15d5d265ff9ada03ab469be029cec93e05316b20462b93",
+        "entries": 1461
+      },
+      "source-after.json": {
+        "sha256": "9c7e88a8e5d372ad2d15d5d265ff9ada03ab469be029cec93e05316b20462b93",
+        "entries": 1461
+      }
+    },
+    "cpu_selected": {
+      "status": {
+        "status": "terminal",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-cpu",
+          "--output-on-failure",
+          "--parallel",
+          "2",
+          "-R",
+          "^(desktop-spacenav|desktop-framing|native-graphics-lifetime|rig-fit-controller|rig-fit-authoring|rig-fit-render|palette-unicode|object-selection-render|spatial-gpu-render|native-fontconfig-desktop-exit)$",
+          "--output-junit",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/cpu/selected/junit.xml"
+        ],
+        "inputs": 1533,
+        "toolkit": "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit",
+        "bitmap": "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime",
+        "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+        "exit_code": 0,
+        "seconds": 21.59302707898314,
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/cpu/selected/status.json",
+      "artifact_sha256": "1eb85b6d85efae6934f7c030fd4a4fbc7b6789d53de9ff109c3a8fcbf70a12a8",
+      "before.json": {
+        "sha256": "f7b3ed87198c121aad38cf25f04807c0cee7d78a309944d3658fc78057396d4f",
+        "entries": 1533
+      },
+      "after.json": {
+        "sha256": "f7b3ed87198c121aad38cf25f04807c0cee7d78a309944d3658fc78057396d4f",
+        "entries": 1533
+      },
+      "testcases": [
+        {
+          "name": "desktop-spacenav",
+          "classname": "desktop-spacenav",
+          "time": "0.00328167",
+          "status": "run"
+        },
+        {
+          "name": "desktop-framing",
+          "classname": "desktop-framing",
+          "time": "0.00378197",
+          "status": "run"
+        },
+        {
+          "name": "native-graphics-lifetime",
+          "classname": "native-graphics-lifetime",
+          "time": "0.00181148",
+          "status": "run"
+        },
+        {
+          "name": "spatial-gpu-render",
+          "classname": "spatial-gpu-render",
+          "time": "21.5799",
+          "status": "run"
+        },
+        {
+          "name": "palette-unicode",
+          "classname": "palette-unicode",
+          "time": "0.914092",
+          "status": "run"
+        },
+        {
+          "name": "native-fontconfig-desktop-exit",
+          "classname": "native-fontconfig-desktop-exit",
+          "time": "14.6875",
+          "status": "run"
+        },
+        {
+          "name": "object-selection-render",
+          "classname": "object-selection-render",
+          "time": "0.114046",
+          "status": "run"
+        },
+        {
+          "name": "rig-fit-authoring",
+          "classname": "rig-fit-authoring",
+          "time": "0.00953893",
+          "status": "run"
+        },
+        {
+          "name": "rig-fit-controller",
+          "classname": "rig-fit-controller",
+          "time": "0.00814891",
+          "status": "run"
+        },
+        {
+          "name": "rig-fit-render",
+          "classname": "rig-fit-render",
+          "time": "0.0420348",
+          "status": "run"
+        }
+      ]
+    },
+    "cpu_native_wayland": {
+      "status": {
+        "status": "terminal",
+        "inputs": 1525,
+        "mode": "cpu",
+        "scope": "Actual native App/GL/document/universal menu with canonical process owner, private latestf797 DomeD nested compositor. Client selected Release or whollyinstrumented toolkit; compiler/core/app whollyowned. Actual new bitmap runtime; no HMD.",
+        "exit_code": 0,
+        "seconds": 22.929039379989263,
+        "checks": 11,
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/cpu/wayland-settled/status.json",
+      "artifact_sha256": "eac7d0e2cb019d949fb0a72448f1948724e48d9aa2d0e75a263e5dd19176cd80",
+      "before.json": {
+        "sha256": "ce5fe04727acab5e10de57b8ce611e781254cdc14fe7b5184ac1aa4ada5bbdfc",
+        "entries": 1525
+      },
+      "after.json": {
+        "sha256": "ce5fe04727acab5e10de57b8ce611e781254cdc14fe7b5184ac1aa4ada5bbdfc",
+        "entries": 1525
+      },
+      "capture_observations": [
+        {
+          "label": "before-motion",
+          "fresh_captures": 3,
+          "seconds": 0.43541633599670604,
+          "initial_changed_pixels": 0
+        },
+        {
+          "label": "six-axis",
+          "fresh_captures": 3,
+          "seconds": 0.4000846020062454,
+          "initial_changed_pixels": 0
+        },
+        {
+          "label": "modal-return",
+          "fresh_captures": 4,
+          "seconds": 0.6098242200096138,
+          "initial_changed_pixels": 82905
+        },
+        {
+          "label": "held-axis",
+          "fresh_captures": 3,
+          "seconds": 0.41289544600294903,
+          "initial_changed_pixels": 0
+        },
+        {
+          "label": "resumed-motion",
+          "fresh_captures": 3,
+          "seconds": 0.39422227401519194,
+          "initial_changed_pixels": 0
+        }
+      ],
+      "actual_process_libraries": {
+        "compositor": [
+          "7f9ae1600000-7f9ae1725000 r-xp 00000000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f9ae1725000-7f9ae17f8000 r--p 00125000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f9ae17f8000-7f9ae1809000 r--p 001f7000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f9ae1809000-7f9ae1811000 rw-p 00208000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f9ae19a9000-7f9ae19d0000 r-xp 00000000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f9ae19d0000-7f9ae19e6000 r--p 00027000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f9ae19e6000-7f9ae19e7000 r--p 0003d000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f9ae19e7000-7f9ae19e9000 rw-p 0003e000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f9ae1f52000-7f9ae2010000 r-xp 00000000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7f9ae2010000-7f9ae2046000 r--p 000be000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7f9ae2046000-7f9ae204e000 r--p 000f4000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6"
+        ],
+        "client": [
+          "7fb56dab0000-7fb56db6e000 r-xp 00000000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7fb56db6e000-7fb56dba4000 r--p 000be000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7fb56dba4000-7fb56dbac000 r--p 000f4000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7fb56de5b000-7fb56dfda000 r-xp 00000000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7fb56dfda000-7fb56e01f000 r--p 0017f000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7fb56e01f000-7fb56e021000 r--p 001c4000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7fb56e021000-7fb56e022000 rw-p 001c6000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7fb56e400000-7fb56e525000 r-xp 00000000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7fb56e525000-7fb56e5f8000 r--p 00125000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7fb56e5f8000-7fb56e609000 r--p 001f7000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7fb56e609000-7fb56e611000 rw-p 00208000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7fb56e88b000-7fb56e89c000 r-xp 00000000 00:25 95958008                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+          "7fb56e89c000-7fb56e8b9000 r--p 00011000 00:25 95958008                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+          "7fb56e8b9000-7fb56e8bd000 r--p 0002e000 00:25 95958008                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+          "7fb56e8bd000-7fb56e8bf000 rw-p 00032000 00:25 95958008                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+          "7fb56e8bf000-7fb56e8e6000 r-xp 00000000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7fb56e8e6000-7fb56e8fc000 r--p 00027000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7fb56e8fc000-7fb56e8fd000 r--p 0003d000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7fb56e8fd000-7fb56e8ff000 rw-p 0003e000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5"
+        ]
+      },
+      "tracked_source_entries_authenticated": 1461
+    },
+    "san_build": {
+      "status": {
+        "status": "terminal",
+        "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+        "started_utc": "2026-11-03T11:07:22.777608+00:00",
+        "source_inputs": 1461,
+        "runs": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build-san",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit_code": 0,
+            "seconds": 1.6031536899972707
+          },
+          {
+            "name": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "build-san",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-desktop-context-lifetime-test",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-native-graphics-lifetime-test",
+              "dome-sculpt-desktop-framing-fixture",
+              "dome-sculpt-spacenav-test",
+              "dome-sculpt-desktop-framing-test",
+              "dome-sculpt-rig-fit-render-test",
+              "dome-sculpt-rig-fit-controller-test",
+              "dome-sculpt-rig-fit-authoring-test",
+              "dome-sculpt-palette-text-test",
+              "dome-sculpt-object-selection-render-test",
+              "dome-sculpt-render-test"
+            ],
+            "exit_code": 0,
+            "seconds": 82.8068786879885
+          }
+        ],
+        "toolkit": "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize",
+        "scope": "Coherent whole-owned current app/core/support/render/XR C/C++; matching unchanged cached TUs from initial own builds retained; CPU optimizedRelease or O1ASanUBSan, matching canonical Release or whole-ownedSAN toolkit. Selected lifecycle/render/control consumers, not all targets.",
+        "exit_code": 0,
+        "source_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/san/status.json",
+      "artifact_sha256": "b8a671a1969b4cd236bc06b9d24e36c57df89046650c395d7101d85051e36d66",
+      "source-before.json": {
+        "sha256": "9c7e88a8e5d372ad2d15d5d265ff9ada03ab469be029cec93e05316b20462b93",
+        "entries": 1461
+      },
+      "source-after.json": {
+        "sha256": "9c7e88a8e5d372ad2d15d5d265ff9ada03ab469be029cec93e05316b20462b93",
+        "entries": 1461
+      }
+    },
+    "san_selected": {
+      "status": {
+        "status": "terminal",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-san",
+          "--output-on-failure",
+          "--parallel",
+          "2",
+          "-R",
+          "^(desktop-spacenav|desktop-framing|native-graphics-lifetime|rig-fit-controller|rig-fit-authoring|rig-fit-render|palette-unicode|object-selection-render|spatial-gpu-render|native-fontconfig-desktop-exit)$",
+          "--output-junit",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/san/selected/junit.xml"
+        ],
+        "inputs": 1533,
+        "toolkit": "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize",
+        "bitmap": "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime",
+        "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+        "exit_code": 0,
+        "seconds": 73.93870344298193,
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/san/selected/status.json",
+      "artifact_sha256": "6a6d342f0a68cb31b8f25853da4c6b8c191853e6b46a874b06f14e9213e1f3bf",
+      "before.json": {
+        "sha256": "bc0bbe17c5527f16833261bb966944ebcaad4125f9ce47a429b390ddd5242c20",
+        "entries": 1533
+      },
+      "after.json": {
+        "sha256": "bc0bbe17c5527f16833261bb966944ebcaad4125f9ce47a429b390ddd5242c20",
+        "entries": 1533
+      },
+      "testcases": [
+        {
+          "name": "desktop-spacenav",
+          "classname": "desktop-spacenav",
+          "time": "0.0133645",
+          "status": "run"
+        },
+        {
+          "name": "desktop-framing",
+          "classname": "desktop-framing",
+          "time": "0.0518188",
+          "status": "run"
+        },
+        {
+          "name": "native-graphics-lifetime",
+          "classname": "native-graphics-lifetime",
+          "time": "0.00968524",
+          "status": "run"
+        },
+        {
+          "name": "spatial-gpu-render",
+          "classname": "spatial-gpu-render",
+          "time": "73.9135",
+          "status": "run"
+        },
+        {
+          "name": "palette-unicode",
+          "classname": "palette-unicode",
+          "time": "2.15185",
+          "status": "run"
+        },
+        {
+          "name": "native-fontconfig-desktop-exit",
+          "classname": "native-fontconfig-desktop-exit",
+          "time": "44.9704",
+          "status": "run"
+        },
+        {
+          "name": "object-selection-render",
+          "classname": "object-selection-render",
+          "time": "0.239435",
+          "status": "run"
+        },
+        {
+          "name": "rig-fit-authoring",
+          "classname": "rig-fit-authoring",
+          "time": "0.152518",
+          "status": "run"
+        },
+        {
+          "name": "rig-fit-controller",
+          "classname": "rig-fit-controller",
+          "time": "0.13438",
+          "status": "run"
+        },
+        {
+          "name": "rig-fit-render",
+          "classname": "rig-fit-render",
+          "time": "0.134488",
+          "status": "run"
+        }
+      ]
+    },
+    "san_native_wayland": {
+      "status": {
+        "status": "terminal",
+        "inputs": 1537,
+        "mode": "san",
+        "scope": "Actual native App/GL/document/universal menu with canonical process owner, private latestf797 DomeD nested compositor. Client selected Release or whollyinstrumented toolkit; compiler/core/app whollyowned. Actual new bitmap runtime; no HMD.",
+        "exit_code": 0,
+        "seconds": 32.66078312601894,
+        "checks": 11,
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/san/wayland-settled/status.json",
+      "artifact_sha256": "575b15d54afdb9293100bbc5fbb3b47ff5b760da3a06da9e977f9c95c919e3b9",
+      "before.json": {
+        "sha256": "84b1b77f94226330da4430873b86c622d17e43ea96845a9dccda762d79a7ac77",
+        "entries": 1537
+      },
+      "after.json": {
+        "sha256": "84b1b77f94226330da4430873b86c622d17e43ea96845a9dccda762d79a7ac77",
+        "entries": 1537
+      },
+      "capture_observations": [
+        {
+          "label": "before-motion",
+          "fresh_captures": 3,
+          "seconds": 0.38155561601161025,
+          "initial_changed_pixels": 0
+        },
+        {
+          "label": "six-axis",
+          "fresh_captures": 3,
+          "seconds": 0.3567948560230434,
+          "initial_changed_pixels": 0
+        },
+        {
+          "label": "modal-return",
+          "fresh_captures": 3,
+          "seconds": 0.3707825750170741,
+          "initial_changed_pixels": 0
+        },
+        {
+          "label": "held-axis",
+          "fresh_captures": 3,
+          "seconds": 0.36232860101154074,
+          "initial_changed_pixels": 0
+        },
+        {
+          "label": "resumed-motion",
+          "fresh_captures": 3,
+          "seconds": 0.3470640429877676,
+          "initial_changed_pixels": 0
+        }
+      ],
+      "actual_process_libraries": {
+        "compositor": [
+          "7f3d8bc00000-7f3d8bd25000 r-xp 00000000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f3d8bd25000-7f3d8bdf8000 r--p 00125000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f3d8bdf8000-7f3d8be09000 r--p 001f7000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f3d8be09000-7f3d8be11000 rw-p 00208000 00:25 95958002                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+          "7f3d8beb1000-7f3d8bed8000 r-xp 00000000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f3d8bed8000-7f3d8beee000 r--p 00027000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f3d8beee000-7f3d8beef000 r--p 0003d000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f3d8beef000-7f3d8bef1000 rw-p 0003e000 00:25 95958005                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+          "7f3d8c45a000-7f3d8c518000 r-xp 00000000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7f3d8c518000-7f3d8c54e000 r--p 000be000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7f3d8c54e000-7f3d8c556000 r--p 000f4000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6"
+        ],
+        "client": [
+          "7f91e273c000-7f91e27fa000 r-xp 00000000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7f91e27fa000-7f91e2830000 r--p 000be000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7f91e2830000-7f91e2838000 r--p 000f4000 00:25 95853287                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+          "7f91e2839000-7f91e29b8000 r-xp 00000000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7f91e29b8000-7f91e29fd000 r--p 0017f000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7f91e29fd000-7f91e29ff000 r--p 001c4000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7f91e29ff000-7f91e2a00000 rw-p 001c6000 00:25 95860236                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+          "7f91e2e00000-7f91e36ef000 r-xp 00000000 00:25 95961615                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk.so.1.4.5",
+          "7f91e36ef000-7f91e494e000 r--p 008ef000 00:25 95961615                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk.so.1.4.5",
+          "7f91e494e000-7f91e4960000 r--p 01b4d000 00:25 95961615                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk.so.1.4.5",
+          "7f91e4960000-7f91e5c32000 rw-p 01b5f000 00:25 95961615                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk.so.1.4.5",
+          "7f91e5e00000-7f91e5e5d000 r-xp 00000000 00:25 95961621                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_gl.so.1.4.5",
+          "7f91e5e5d000-7f91e5f41000 r--p 0005d000 00:25 95961621                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_gl.so.1.4.5",
+          "7f91e5f41000-7f91e5f49000 r--p 00140000 00:25 95961621                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_gl.so.1.4.5",
+          "7f91e5f49000-7f91e600f000 rw-p 00148000 00:25 95961621                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_gl.so.1.4.5",
+          "7f91e6200000-7f91e62cf000 r-xp 00000000 00:25 95961618                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_images.so.1.4.5",
+          "7f91e62cf000-7f91e6468000 r--p 000cf000 00:25 95961618                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_images.so.1.4.5",
+          "7f91e6468000-7f91e6469000 r--p 00268000 00:25 95961618                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_images.so.1.4.5",
+          "7f91e6469000-7f91e65ff000 rw-p 00269000 00:25 95961618                   /home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/lib/libfltk_images.so.1.4.5"
+        ]
+      },
+      "tracked_source_entries_authenticated": 1461
+    },
+    "vendor_component_builds": {
+      "status": {
+        "status": "terminal",
+        "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+        "scope": "Native OneAPI/CUDA/ROCm app component relinks: immutable matching eec/BD2 owned support and frontend objects, newly compiled app/main+display+graphics TUs, no public class data-layout changes. Not clean whole-project rebuild or positive AMD/NVIDIA execution.",
+        "profiles": [
+          {
+            "name": "ONEAPI",
+            "runs": [
+              {
+                "name": "ONEAPI-app",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++",
+                  "-DDOME_HAS_XR=1",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/desktop",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/include",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+                  "-isystem",
+                  "/usr/include/pixman-1",
+                  "-isystem",
+                  "/usr/include/libmount",
+                  "-isystem",
+                  "/usr/include/blkid",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/src/app.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-app.o"
+                ],
+                "exit_code": 0,
+                "seconds": 7.577606703998754
+              },
+              {
+                "name": "ONEAPI-display",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++",
+                  "-DDOME_HAS_XR=1",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/desktop",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/include",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+                  "-isystem",
+                  "/usr/include/pixman-1",
+                  "-isystem",
+                  "/usr/include/libmount",
+                  "-isystem",
+                  "/usr/include/blkid",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/src/native-display-runtime.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-display.o"
+                ],
+                "exit_code": 0,
+                "seconds": 0.030403159995330498
+              },
+              {
+                "name": "ONEAPI-graphics",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush/graphics.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-graphics.o"
+                ],
+                "exit_code": 0,
+                "seconds": 0.3176432079926599
+              },
+              {
+                "name": "ONEAPI-link",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-display.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-graphics.o",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-fsycl",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-app.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-dome-sculpt",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+                  "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib:/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib:",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-spacenav.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-core.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-render.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+                  "/usr/lib64/libGLU.so.1.3.1",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-xr.a",
+                  "/usr/lib64/libjpeg.so.62.4.0",
+                  "/usr/lib64/libpng16.so.16.58.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+                  "-lcairo",
+                  "-L/usr/lib64",
+                  "-lX11",
+                  "-lGLU",
+                  "-lGL",
+                  "/usr/lib64/libdl.a",
+                  "/usr/lib64/libSM.so.6.0.1",
+                  "/usr/lib64/libICE.so.6.3.0",
+                  "/usr/lib64/libXext.so.6.4.0",
+                  "/usr/lib64/libXinerama.so.1.0.0",
+                  "/usr/lib64/libXfixes.so.3.1.0",
+                  "/usr/lib64/libXcursor.so.1.0.2",
+                  "/usr/lib64/libXrender.so.1.3.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libcairo.so.2.11804.4",
+                  "/usr/lib64/libXft.so.2.3.8",
+                  "/usr/lib64/libwayland-egl.so.1.26.0",
+                  "/usr/lib64/libwayland-cursor.so.0.26.0",
+                  "/usr/lib64/libxkbcommon.so.0.13.1",
+                  "/usr/lib64/libGLX.so.0.0.0",
+                  "/usr/lib64/libOpenGL.so.0.0.0",
+                  "/usr/lib64/libz.so.1.3.1.zlib-ng",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-render.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-core.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-affine.a",
+                  "/usr/lib64/liblapacke.so.3.12.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-polygon.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libxatlas.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libmikktspace.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libmikktspace-robust.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libufbx.a",
+                  "/usr/lib64/libpng16.so.16.58.0",
+                  "/usr/lib64/libz.so.1.3.1.zlib-ng",
+                  "/usr/lib64/libjpeg.so.62.4.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+                  "/usr/lib64/libEGL.so.1.1.0",
+                  "/usr/lib64/libGL.so.1.7.0",
+                  "/usr/lib64/libfontconfig.so.1.16.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+                  "/usr/lib64/libicui18n.so.77.1",
+                  "/usr/lib64/libicuuc.so.77.1",
+                  "/usr/lib64/libopenxr_loader.so.1.1.65",
+                  "/usr/lib64/libgio-2.0.so.0.8800.4",
+                  "/usr/lib64/libgobject-2.0.so.0.8800.4",
+                  "/usr/lib64/libglib-2.0.so.0.8800.4",
+                  "/usr/lib64/libX11.so.6.4.0",
+                  "/usr/lib64/libwayland-client.so.0.26.0",
+                  "-lm",
+                  "-lgcc_s_asneeded",
+                  "-latomic_asneeded",
+                  "-lgcc_s_asneeded"
+                ],
+                "exit_code": 0,
+                "seconds": 1.3744954140274785
+              },
+              {
+                "name": "ONEAPI-version",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-dome-sculpt",
+                  "--version"
+                ],
+                "exit_code": 0,
+                "seconds": 0.016492643975652754
+              }
+            ]
+          },
+          {
+            "name": "CUDA",
+            "runs": [
+              {
+                "name": "CUDA-app",
+                "command": [
+                  "/usr/bin/c++",
+                  "-DDOME_HAS_XR=1",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/desktop",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/include",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+                  "-isystem",
+                  "/usr/include/pixman-1",
+                  "-isystem",
+                  "/usr/include/libmount",
+                  "-isystem",
+                  "/usr/include/blkid",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/src/app.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-app.o"
+                ],
+                "exit_code": 0,
+                "seconds": 9.586272429005476
+              },
+              {
+                "name": "CUDA-display",
+                "command": [
+                  "/usr/bin/c++",
+                  "-DDOME_HAS_XR=1",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/desktop",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/include",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+                  "-isystem",
+                  "/usr/include/pixman-1",
+                  "-isystem",
+                  "/usr/include/libmount",
+                  "-isystem",
+                  "/usr/include/blkid",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/src/native-display-runtime.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-display.o"
+                ],
+                "exit_code": 0,
+                "seconds": 0.02429708300041966
+              },
+              {
+                "name": "CUDA-graphics",
+                "command": [
+                  "/usr/bin/c++",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush/graphics.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-graphics.o"
+                ],
+                "exit_code": 0,
+                "seconds": 0.2220731030101888
+              },
+              {
+                "name": "CUDA-link",
+                "command": [
+                  "/usr/bin/c++",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-display.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-graphics.o",
+                  "-O3",
+                  "-DNDEBUG",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-app.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-dome-sculpt",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/cuda-toolchain/13.4.1/lib64/stubs",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/cuda-toolchain/13.4.1/lib64",
+                  "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib:/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib:",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-spacenav.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-core.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-render.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+                  "/usr/lib64/libGLU.so.1.3.1",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-xr.a",
+                  "/usr/lib64/libjpeg.so.62.4.0",
+                  "/usr/lib64/libpng16.so.16.58.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+                  "-lcairo",
+                  "-L/usr/lib64",
+                  "-lX11",
+                  "-lGLU",
+                  "-lGL",
+                  "/usr/lib64/libdl.a",
+                  "/usr/lib64/libSM.so.6.0.1",
+                  "/usr/lib64/libICE.so.6.3.0",
+                  "/usr/lib64/libXext.so.6.4.0",
+                  "/usr/lib64/libXinerama.so.1.0.0",
+                  "/usr/lib64/libXfixes.so.3.1.0",
+                  "/usr/lib64/libXcursor.so.1.0.2",
+                  "/usr/lib64/libXrender.so.1.3.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libcairo.so.2.11804.4",
+                  "/usr/lib64/libXft.so.2.3.8",
+                  "/usr/lib64/libwayland-egl.so.1.26.0",
+                  "/usr/lib64/libwayland-cursor.so.0.26.0",
+                  "/usr/lib64/libxkbcommon.so.0.13.1",
+                  "/usr/lib64/libGLX.so.0.0.0",
+                  "/usr/lib64/libOpenGL.so.0.0.0",
+                  "/usr/lib64/libz.so.1.3.1.zlib-ng",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-render.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-core.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-affine.a",
+                  "/usr/lib64/liblapacke.so.3.12.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libdome-sculpt-polygon.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libxatlas.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libmikktspace.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libmikktspace-robust.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-cuda/libufbx.a",
+                  "/usr/lib64/libpng16.so.16.58.0",
+                  "/usr/lib64/libz.so.1.3.1.zlib-ng",
+                  "/usr/lib64/libjpeg.so.62.4.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+                  "/usr/lib64/libEGL.so.1.1.0",
+                  "/usr/lib64/libGL.so.1.7.0",
+                  "/usr/lib64/libfontconfig.so.1.16.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+                  "/usr/lib64/libicui18n.so.77.1",
+                  "/usr/lib64/libicuuc.so.77.1",
+                  "/usr/lib64/libopenxr_loader.so.1.1.65",
+                  "/usr/lib64/libgio-2.0.so.0.8800.4",
+                  "/usr/lib64/libgobject-2.0.so.0.8800.4",
+                  "/usr/lib64/libglib-2.0.so.0.8800.4",
+                  "/usr/lib64/libX11.so.6.4.0",
+                  "/usr/lib64/libwayland-client.so.0.26.0",
+                  "-lm",
+                  "-lcudadevrt",
+                  "-lcudart_static",
+                  "-lrt",
+                  "-lpthread",
+                  "-ldl",
+                  "-lgcc_s_asneeded",
+                  "-lgcc_s_asneeded"
+                ],
+                "exit_code": 0,
+                "seconds": 0.2662237240001559
+              },
+              {
+                "name": "CUDA-version",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/CUDA-dome-sculpt",
+                  "--version"
+                ],
+                "exit_code": 0,
+                "seconds": 0.012978258018847555
+              }
+            ]
+          },
+          {
+            "name": "ROCM",
+            "runs": [
+              {
+                "name": "ROCM-app",
+                "command": [
+                  "/usr/bin/c++",
+                  "-DDOME_HAS_XR=1",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/desktop",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/include",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+                  "-isystem",
+                  "/usr/include/pixman-1",
+                  "-isystem",
+                  "/usr/include/libmount",
+                  "-isystem",
+                  "/usr/include/blkid",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-fPIE",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/src/app.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-app.o"
+                ],
+                "exit_code": 0,
+                "seconds": 9.454645972989965
+              },
+              {
+                "name": "ROCM-display",
+                "command": [
+                  "/usr/bin/c++",
+                  "-DDOME_HAS_XR=1",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/desktop",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/include",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/cairo",
+                  "-isystem",
+                  "/usr/include/pixman-1",
+                  "-isystem",
+                  "/usr/include/libmount",
+                  "-isystem",
+                  "/usr/include/blkid",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-fPIE",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/src/native-display-runtime.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-display.o"
+                ],
+                "exit_code": 0,
+                "seconds": 0.02341977899777703
+              },
+              {
+                "name": "ROCM-graphics",
+                "command": [
+                  "/usr/bin/c++",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/include",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush",
+                  "-I/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/nlohmann",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/harfbuzz",
+                  "-isystem",
+                  "/usr/include/glib-2.0",
+                  "-isystem",
+                  "/usr/lib64/glib-2.0/include",
+                  "-isystem",
+                  "/usr/include/sysprof-6",
+                  "-isystem",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/include/freetype2",
+                  "-isystem",
+                  "/usr/include/libpng16",
+                  "-isystem",
+                  "/usr/include/libxml2",
+                  "-O3",
+                  "-DNDEBUG",
+                  "-std=gnu++20",
+                  "-fPIC",
+                  "-pthread",
+                  "-DWITH_GZFILEOP",
+                  "-c",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/third_party/openbrush/graphics.cpp",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-graphics.o"
+                ],
+                "exit_code": 0,
+                "seconds": 0.2079994379892014
+              },
+              {
+                "name": "ROCM-link",
+                "command": [
+                  "/usr/lib64/rocm/llvm/bin/clang++",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-display.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-graphics.o",
+                  "--hip-device-lib-path=/usr/lib64/rocm/llvm/lib/clang/20/lib/amdgcn/bitcode",
+                  "-O3",
+                  "-DNDEBUG",
+                  "--offload-arch=gfx1030",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-app.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+                  "-o",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-dome-sculpt",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib",
+                  "-L/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib",
+                  "-Wl,-rpath,/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib:/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib:",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-spacenav.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-core.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-render.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_images.so.1.4.5",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk_gl.so.1.4.5",
+                  "/usr/lib64/libGLU.so.1.3.1",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-xr.a",
+                  "/usr/lib64/libjpeg.so.62.4.0",
+                  "/usr/lib64/libpng16.so.16.58.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/lib/libfltk.so.1.4.5",
+                  "-lcairo",
+                  "-L/usr/lib64",
+                  "-lX11",
+                  "-lGLU",
+                  "-lGL",
+                  "/usr/lib64/libdl.a",
+                  "/usr/lib64/libSM.so.6.0.1",
+                  "/usr/lib64/libICE.so.6.3.0",
+                  "/usr/lib64/libXext.so.6.4.0",
+                  "/usr/lib64/libXinerama.so.1.0.0",
+                  "/usr/lib64/libXfixes.so.3.1.0",
+                  "/usr/lib64/libXcursor.so.1.0.2",
+                  "/usr/lib64/libXrender.so.1.3.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libcairo.so.2.11804.4",
+                  "/usr/lib64/libXft.so.2.3.8",
+                  "/usr/lib64/libwayland-egl.so.1.26.0",
+                  "/usr/lib64/libwayland-cursor.so.0.26.0",
+                  "/usr/lib64/libxkbcommon.so.0.13.1",
+                  "/usr/lib64/libGLX.so.0.0.0",
+                  "/usr/lib64/libOpenGL.so.0.0.0",
+                  "/usr/lib64/libz.so.1.3.1.zlib-ng",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-render.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-core.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-affine.a",
+                  "/usr/lib64/liblapacke.so.3.12.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libdome-sculpt-polygon.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libxatlas.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libmikktspace.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libmikktspace-robust.a",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-native-rocm/libufbx.a",
+                  "/usr/lib64/libpng16.so.16.58.0",
+                  "/usr/lib64/libz.so.1.3.1.zlib-ng",
+                  "/usr/lib64/libjpeg.so.62.4.0",
+                  "/usr/lib64/libamdhip64.so.7.1.52802",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0",
+                  "/usr/lib64/libEGL.so.1.1.0",
+                  "/usr/lib64/libGL.so.1.7.0",
+                  "/usr/lib64/libfontconfig.so.1.16.0",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6",
+                  "/usr/lib64/libicui18n.so.77.1",
+                  "/usr/lib64/libicuuc.so.77.1",
+                  "/usr/lib64/libopenxr_loader.so.1.1.65",
+                  "/usr/lib64/libgio-2.0.so.0.8800.4",
+                  "/usr/lib64/libgobject-2.0.so.0.8800.4",
+                  "/usr/lib64/libglib-2.0.so.0.8800.4",
+                  "/usr/lib64/libX11.so.6.4.0",
+                  "/usr/lib64/libwayland-client.so.0.26.0",
+                  "-lm",
+                  "-lgcc",
+                  "-latomic_asneeded",
+                  "-lgcc",
+                  "-lgcc",
+                  "-lgcc_s_asneeded",
+                  "-latomic_asneeded",
+                  "-lgcc",
+                  "-lgcc_s_asneeded"
+                ],
+                "exit_code": 0,
+                "seconds": 0.116835638997145
+              },
+              {
+                "name": "ROCM-version",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ROCM-dome-sculpt",
+                  "--version"
+                ],
+                "exit_code": 0,
+                "seconds": 0.02593959102523513
+              }
+            ]
+          }
+        ],
+        "exit_code": 0,
+        "input_drift": [],
+        "inputs": 1669
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/status.json",
+      "artifact_sha256": "7d1f6546266989a1924287af4551d523035dc911db1f3cf7f5fcd01c4f32758a",
+      "before.json": {
+        "sha256": "cc0fd7bf9a1bd2f90c4008e7b47017f080e7f66a098aea5aacfd315ec87169ab",
+        "entries": 1669
+      },
+      "after.json": {
+        "sha256": "cc0fd7bf9a1bd2f90c4008e7b47017f080e7f66a098aea5aacfd315ec87169ab",
+        "entries": 1669
+      }
+    },
+    "actual_arc_app": {
+      "status": {
+        "status": "terminal",
+        "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+        "inputs": 1526,
+        "runs": [
+          {
+            "name": "device",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/gpu-paint-main-7693d6b/artifacts/paint-device-info"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16264675700222142
+          },
+          {
+            "name": "actual-app-paint7",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "tests/paint-composite-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/vendor-final/ONEAPI-dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/arc/paint512.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-paint-composite-fixture",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/arc-final/run"
+            ],
+            "exit_code": 0,
+            "seconds": 26.342876053997315
+          }
+        ],
+        "GPU_lease": "released after all owned children terminal",
+        "scope": "Actual current OneAPI app/main/display/graphics with matched immutable eec backend/core/frontend support; real ArcGL+compute and synthetic tracking. No physical HMD or new kernel/fullvendor rebuild claim.",
+        "exit_code": 0,
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/arc-final/status.json",
+      "artifact_sha256": "8ab0c03d9fab9bc837a47ed5ae3f5284365c97c484d5ba7b7f5d939547e0ca01",
+      "before.json": {
+        "sha256": "70a09b3b7d154998a74eafe1af96f73f1ccb397817364a05a9341bc749758507",
+        "entries": 1526
+      },
+      "after.json": {
+        "sha256": "70a09b3b7d154998a74eafe1af96f73f1ccb397817364a05a9341bc749758507",
+        "entries": 1526
+      }
+    },
+    "launcher": {
+      "status": {
+        "status": "terminal",
+        "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+        "inputs": 1599,
+        "profiles": [
+          {
+            "mode": "cpu",
+            "inherited_library_path": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib",
+            "runs": [
+              {
+                "name": "version",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-cpu/run-dome-sculpt",
+                  "--version"
+                ],
+                "exit_code": 0,
+                "seconds": 0.028191757010063156
+              },
+              {
+                "name": "desktop",
+                "command": [
+                  "/usr/bin/python3.14",
+                  "tests/native-fontconfig-exit.py",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-cpu/run-dome-sculpt",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-cpu/libdome-sculpt-test-runtime.so",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/launcher/cpu/run"
+                ],
+                "exit_code": 0,
+                "seconds": 17.722205477999523
+              }
+            ],
+            "desktop_checks": 2
+          },
+          {
+            "mode": "san",
+            "inherited_library_path": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib",
+            "runs": [
+              {
+                "name": "version",
+                "command": [
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-san/run-dome-sculpt",
+                  "--version"
+                ],
+                "exit_code": 0,
+                "seconds": 0.17407874501077458
+              },
+              {
+                "name": "desktop",
+                "command": [
+                  "/usr/bin/python3.14",
+                  "tests/native-fontconfig-exit.py",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-san/run-dome-sculpt",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-san/libdome-sculpt-test-runtime.so",
+                  "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/launcher/san/run"
+                ],
+                "exit_code": 0,
+                "seconds": 24.21782373599126
+              }
+            ],
+            "desktop_checks": 2
+          }
+        ],
+        "exit_code": 0,
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/launcher/status.json",
+      "artifact_sha256": "c145efb30b4a6f4f43eb8ef335f46b0abf3818725c7ca8a61090a6fd3442d536",
+      "before.json": {
+        "sha256": "a372e23c44cfdd00be3dde77d681ea8703d4f161f062264781b3875c5d001228",
+        "entries": 1599
+      },
+      "after.json": {
+        "sha256": "a372e23c44cfdd00be3dde77d681ea8703d4f161f062264781b3875c5d001228",
+        "entries": 1599
+      }
+    },
+    "standalone_xr": {
+      "status": {
+        "status": "terminal",
+        "runs": [
+          {
+            "name": "cpu",
+            "command": [
+              "/usr/bin/python3.14",
+              "tests/native-fontconfig-exit.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-cpu/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-cpu/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/xr-final/cpu"
+            ],
+            "exit_code": 0,
+            "seconds": 10.618790674983757
+          },
+          {
+            "name": "san",
+            "command": [
+              "/usr/bin/python3.14",
+              "tests/native-fontconfig-exit.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-san/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/build-san/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/xr-final/san"
+            ],
+            "exit_code": 1,
+            "seconds": 21.49838469098904,
+            "retained_negative": "Mesa112B/two allocations, balanced16frame session"
+          }
+        ],
+        "scope": "Release syntheticXR3 passes; currentSAN owned-application/toolkit completes session then retains inherited Mesa112B report. No wholeXR leak-clean claim."
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/xr-final/status.json",
+      "artifact_sha256": "f427ed26ad14dfed44b8f7a674480b5cbd54d0556a92f2432c1f1973961572ed"
+    },
+    "arc_runtime": {
+      "acquires": 76,
+      "action_syncs": 42,
+      "application": "Dome Sculpt",
+      "bindings": {
+        "/interaction_profiles/htc/vive_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/click",
+            "/user/hand/right/input/squeeze/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/trackpad"
+          ],
+          "mirror": [
+            "/user/hand/left/input/trackpad/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/menu/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/trackpad/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/trackpad"
+          ]
+        },
+        "/interaction_profiles/khr/simple_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/select/click",
+            "/user/hand/right/input/select/click"
+          ],
+          "palette": [
+            "/user/hand/left/input/menu/click"
+          ]
+        },
+        "/interaction_profiles/logitech/mx_ink_stylus_logitech": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/tip_logitech/pose",
+            "/user/hand/right/input/tip_logitech/pose"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/cluster_middle_logitech/force",
+            "/user/hand/right/input/cluster_middle_logitech/force"
+          ],
+          "tip_force": [
+            "/user/hand/left/input/tip_logitech/force",
+            "/user/hand/right/input/tip_logitech/force"
+          ]
+        },
+        "/interaction_profiles/meta/touch_controller_plus": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "eraser": [
+            "/user/hand/left/input/y/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/x/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "redo": [
+            "/user/hand/right/input/b/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ],
+          "undo": [
+            "/user/hand/right/input/a/click"
+          ]
+        },
+        "/interaction_profiles/oculus/touch_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "eraser": [
+            "/user/hand/left/input/y/click"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/x/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "redo": [
+            "/user/hand/right/input/b/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ],
+          "undo": [
+            "/user/hand/right/input/a/click"
+          ]
+        },
+        "/interaction_profiles/valve/index_controller": {
+          "aim_pose": [
+            "/user/hand/left/input/aim/pose",
+            "/user/hand/right/input/aim/pose"
+          ],
+          "canvas_grab": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+          ],
+          "feedback": [
+            "/user/hand/left/output/haptic",
+            "/user/hand/right/output/haptic"
+          ],
+          "grip_pose": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+          ],
+          "left_stick": [
+            "/user/hand/left/input/thumbstick"
+          ],
+          "mirror": [
+            "/user/hand/left/input/thumbstick/click"
+          ],
+          "paint_pressure": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+          ],
+          "palette": [
+            "/user/hand/left/input/b/click"
+          ],
+          "recenter": [
+            "/user/hand/right/input/thumbstick/click"
+          ],
+          "right_stick": [
+            "/user/hand/right/input/thumbstick"
+          ]
+        }
+      },
+      "egl_binding": true,
+      "empty_submissions": 7,
+      "focus_losses": 1,
+      "focus_regains": 1,
+      "frames_begun": 45,
+      "frames_ended": 45,
+      "frames_waited": 45,
+      "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "gl_vendor": "Intel",
+      "image_waits": 76,
+      "left_eye_nonblank": 37,
+      "overlay": true,
+      "palette_images": 22,
+      "reference_changes": 1,
+      "releases": 76,
+      "right_eye_nonblank": 37,
+      "sessions_begun": 1,
+      "sessions_destroyed": 1,
+      "stereo_submissions": 38,
+      "swapchain_format": 32856,
+      "swapchains_created": 2,
+      "swapchains_destroyed": 2,
+      "tracking_losses": 4,
+      "trigger_pressure_samples": 5
+    },
+    "arc_transfers": {
+      "kernels": [
+        "   <--- urKernelCreate(.hProgram = 0x7f6d74659c70, .pKernelName = 0xabeda8 (_ZTSZN4dome13paint_compute9compositeERKNS0_5InputERKSt8functionIFbvEEEUlN4sycl3_V12idILi1EEEE_), .phKernel = 0x7f6d99df9dc0 (0x7f6d75f717f0)) -> UR_RESULT_SUCCESS;"
+      ],
+      "output_chunk_reads": [
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d7479dd90, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x7f6d74c1a090)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d7479dd90, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x7f6d74c1a090)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d7489dd90, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x1656fa00)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d7499dd90, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x7f6d74797000)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d74a9dd90, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x7f6d745b9570)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d752c0ef0, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x7f6d745b9570)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d753c0ef0, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x14ee4d00)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d754c0ef0, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x17f3b270)) -> UR_RESULT_SUCCESS;",
+        "   <--- urEnqueueUSMMemcpy(.hQueue = 0x7f6d74774760, .blocking = 0, .pDst = 0x7f6d755c0ef0, .pSrc = 0xffffc001ff2b0000, .size = 1048576, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 0x7f6d99dfa7a8 (0x7f6d747977a0)) -> UR_RESULT_SUCCESS;"
+      ]
+    }
+  },
+  "primary_hashes": {
+    "CMakeLists.txt": "bb1d976d12a46b92faee0dc64cda6153e12c88cb03a909f7493a64f12e759092",
+    "AGENTS.md": "cf8cf7a20261ccd927e66476b74ba9f995516cc8acf801e8ea1a8b9a9bec46d6",
+    "src/app.cpp": "af0fc3fefea33d01b6ac784d65e92912c63f04c8d0ce140f4b600e620d358e35",
+    "src/native-display-runtime.cpp": "62a6dc442a5c1f55fc2ee530236f667e02a66e92f8a8c3c99d9798f3947c1b2d",
+    "src/native-display-runtime.hpp": "6f54e2eda2a73566ba25616a01c98d4515797435ba47c2eec4708117075e1e71",
+    "tests/desktop-context-lifetime.cpp": "14a26171307eba598d6a702571a52adb8f3e366e4ff10daf8c54789622b40473",
+    "tests/native-graphics-lifetime.cpp": "580a33503cea4a39aab4da8e8ced5f3b98f3dadcf896678f136137dc04284160",
+    "tests/spacenav-wayland.py": "b789b0fd63a440e9cf09ec6a904679b1d25ea32a10b76fe71a3b36c53b8104a0",
+    "third_party/openbrush/graphics.cpp": "33a1dcc1dea8b4890aa9e233f0266e113bf94d2c4fda2ff5448b0b3c0f63bd38",
+    "third_party/openbrush/graphics.h": "003741d9689a4c3a1e6af7c06d7462fee0e88fb302a1a1fb7ccc1d7221d13f5c",
+    "third_party/sources.json": "227e5f94f3b73f5e25e5d8ca54e5596a693d3fd5b12d4354288f50db97fe5acd",
+    "build-cpu/dome-sculpt": "ee85b683133d8e3fa00dd1831d74cb056e48ecd663e22cf4bd8f9514848b2808",
+    "build-cpu/run-dome-sculpt": "6fc66a741ab7721be348293d2df242ae9141b6514ba231c9ce8e5c081ffeb48d",
+    "build-cpu/libdome-sculpt-test-runtime.so": "b8d25bc614f692b0df09e14dac7cc7c1975adc7bcff49092da4fe6667c5447d9",
+    "build-cpu/dome-sculpt-desktop-context-lifetime-test": "2d14d07f32736ef04a567f4df4ad27a99c1a56d0418ebfa0b540ab0422807f3f",
+    "build-cpu/dome-sculpt-native-graphics-lifetime-test": "609f362e5d9fa576fa78093e435903837e72f1754f78aed1ff7a9e60812d5b41",
+    "build-san/dome-sculpt": "554473a4164b39a3b673dce66ba3066dde60baff25e4c5581be15a62d73880f0",
+    "build-san/run-dome-sculpt": "0283d3545e8760d86330a79df64b2c2c8b7966f8dffb24cf3a5ba603ab86036f",
+    "build-san/libdome-sculpt-test-runtime.so": "32b8fffb2c7cb4e7074cb61b3cc169c1fcc316a491d73ea9618f9e26e34bd164",
+    "build-san/dome-sculpt-desktop-context-lifetime-test": "2bf24f51166bd6884e05cce9b94fd2f17275c40fef3a6db762d9f9991766bd43",
+    "build-san/dome-sculpt-native-graphics-lifetime-test": "1187b1f43502febc4dc9ce5ae56efb0cb60c4fab9aea00b0c2c2f2293db015a2"
+  },
+  "negatives": {
+    "cached_sdk_refusal": {
+      "exit_code": 1,
+      "expected_refusal": true,
+      "seconds": 0.23230154797784053,
+      "source": "7481d63ec9b11eaaf8b502ffb62a36d486bf1f41",
+      "command": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-san",
+        "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk"
+      ]
+    },
+    "earlier_same_version_toolkit_refusal": "artifacts/configuration/old-toolkit.*",
+    "old_bitmap_manifest_refusal": "artifacts/display-proof/configuration/old-bitmap.*",
+    "initial_platform_header": "Initial owner header exposed Xlib None macro and failed CPU compilation; corrected by out-of-line destructor. SAN build deliberately interrupted on that diagnosed error. Logs retained cpu-initial-None-negative/san-initial-controlled-interrupt.",
+    "initial_wayland_capture": {
+      "status": {
+        "status": "terminal",
+        "inputs": 1525,
+        "mode": "cpu",
+        "scope": "Actual native App/GL/document/universal menu with canonical process owner, private latestf797 DomeD nested compositor. Client selected Release or whollyinstrumented toolkit; compiler/core/app whollyowned. Actual new bitmap runtime; no HMD.",
+        "exit_code": 1,
+        "seconds": 20.219544430001406,
+        "failure": "Traceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/wayland-current.py\", line 22, in <module>\n    state.update(exit_code=p.returncode,seconds=time.monotonic()-t);assert p.returncode==0,(out/'harness.log').read_text()[-3000:]\n                                                                           ^^^^^^^^^^^^^^^\nAssertionError: dbus-daemon[2606526]: [session uid=1000 pid=2606526 pidfd=5] Activating service name='org.gtk.vfs.Daemon' requested by ':1.5' (uid=1000 pid=2606546 comm=\"/home/blux/de-xr/dome-sculpt/artifacts/domed-f797e\" label=\"unconfined\")\ndbus-daemon[2606526]: [session uid=1000 pid=2606526 pidfd=5] Successfully activated service 'org.gtk.vfs.Daemon'\nfusermount3: failed to access mountpoint /run/user/1000/gvfs: Permission denied\nPASS Native Wayland application retains the Dome Sculpt identity while using the Unix 3D-mouse transport\nPASS Native Wayland viewport accepts composed six-axis camera navigation through the real Unix socket\nPASS DomeD universal View menu reflects the default enabled navigation state\nPASS Actual DomeD View command opens and focuses the canonical FLTK options under the same identity\nFAIL Wayland modal options fence incoming camera motion and Escape cancels the draft\nTraceback (most recent call last):\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/tests/spacenav-wayland.py\", line 102, in <module>\n    try:asyncio.run(main())\n        ~~~~~~~~~~~^^^^^^^^\n  File \"/usr/lib64/python3.14/asyncio/runners.py\", line 205, in run\n    return runner.run(main)\n           ~~~~~~~~~~^^^^^^\n  File \"/usr/lib64/python3.14/asyncio/runners.py\", line 128, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/usr/lib64/python3.14/asyncio/base_events.py\", line 720, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/tests/spacenav-wayland.py\", line 93, in main\n    await motion((250,0,0,0,0,0),.2);await key('Escape');await wait(lambda:not named('3D mouse navigation'));await asyncio.sleep(.3);check(difference(after,pixels())==0,'Wayland modal options fence incoming camera motion and Escape cancels the draft')\n                                                                                                                                     ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/tests/spacenav-wayland.py\", line 14, in check\n    checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'complete':False},indent=2)+'\\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label\n                                                                                                                                                                                                              ^^\nAssertionError: Wayland modal options fence incoming camera motion and Escape cancels the draft\nA connection to the bus can't be made\n\n",
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/cpu/wayland-current/status.json",
+      "artifact_sha256": "c1bc220ca1395361605ab6721478ad223ee1bbe8aa6469b797c8136540efc032",
+      "before.json": {
+        "sha256": "09c22f674b9675f8abcd0f1d152c729b362f04a6560ba7fbe315e3bbc7decb77",
+        "entries": 1525
+      },
+      "after.json": {
+        "sha256": "09c22f674b9675f8abcd0f1d152c729b362f04a6560ba7fbe315e3bbc7decb77",
+        "entries": 1525
+      }
+    },
+    "diagnostic_unchanged_runtime": {
+      "status": {
+        "status": "terminal",
+        "inputs": 1525,
+        "mode": "cpu",
+        "scope": "Actual native App/GL/document/universal menu with canonical process owner, private latestf797 DomeD nested compositor. Client selected Release or whollyinstrumented toolkit; compiler/core/app whollyowned. Actual new bitmap runtime; no HMD.",
+        "exit_code": 0,
+        "seconds": 19.15352036600234,
+        "checks": 11,
+        "input_drift": []
+      },
+      "local_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native-display-runtime-bd2bcde/artifacts/display-proof/cpu/wayland-diagnostic/status.json",
+      "artifact_sha256": "5c820add097cc66e3785b55aa10f7bc18974eb7cdd65fc0d7cd007051f2237bf",
+      "before.json": {
+        "sha256": "b53e64a51570ae5992e259faf0eccaa42d4cafc0fb36c4785c10d52471583c7b",
+        "entries": 1525
+      },
+      "after.json": {
+        "sha256": "b53e64a51570ae5992e259faf0eccaa42d4cafc0fb36c4785c10d52471583c7b",
+        "entries": 1525
+      }
+    },
+    "capture_observer": "Original image guard fails on initial Release run; unchanged-runtime diagnostic11 passes and final settled observer11 perprofile passes. Final Release modal dismissal changes82905 pixels across fresh captures before matching the original viewport exactly; old pixel threshold8 and no-motion zero criterion unchanged. No production navigation/authority change.",
+    "xr_mesa": "Whole-owned app/SAN toolkit still completes16 frames/session then reports112 bytes/two Mesa allocations. No suppression; prior eglReleaseThread and current-program unbind diagnostic did not remove it.",
+    "old_rpath": "Intermediate cached SDK and mixed imported-toolkit configurations retained separately; final configure logs have no RPATH cycle warning.",
+    "prior_full_regression": "Earlier full CPU532/533 remains preserved. Later affected checks qualify the actual guide fix; no fresh full533/533 claim."
+  },
+  "remaining": [
+    "Standalone XR Mesa allocation report",
+    "Full-goal feature/interoperability/production matrix and controller drawers",
+    "Positive AMD/NVIDIA hardware, device loss and sustained performance",
+    "Physical HMD/controller/stylus/spacenav production workflows"
+  ],
+  "system_actions": {
+    "system_install": false,
+    "active_session_restart": false,
+    "headset_launch": false
+  },
+  "publication_metadata_only": {
+    "third_party/sources.json": {
+      "before_sha256": "227e5f94f3b73f5e25e5d8ca54e5596a693d3fd5b12d4354288f50db97fe5acd",
+      "after_sha256": "b12a16dd34b5b12cfc6bc20a95cc545d1c08e1408595ca3f64574755ed1e393b",
+      "change": "Clarify canonical toolkit provenance prose; source revisions, patch hashes, runtime manifest/library hashes unchanged."
+    },
+    "documentation": [
+      "docs/NATIVE-DISPLAY-LIFETIME.md",
+      "docs/HANDOFF.md",
+      "docs/REQUIREMENTS.md",
+      "docs/TOOLKIT.md",
+      "docs/NATIVE-GRAPHICS-LIFETIME.md"
+    ]
+  }
+}
