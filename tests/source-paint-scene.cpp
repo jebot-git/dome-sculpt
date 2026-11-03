@@ -60,8 +60,14 @@ int main(int argc,char **argv)try {
       check(owned->source_sampling_original()->encode()==before,"Serialization does not mutate the original source authority");
     }
   }
-  Scene old;const auto old_bytes=old.encode();auto fake=old_bytes;fake["version"]=28;
-  check(refuses([&]{Scene::decode(fake);}),"Scene28 without actual owning feature refuses");
+  Scene old;const auto old_bytes=old.encode();Scene shaped;
+  shaped.active().painted=source(false);shaped.active().mesh_active=true;auto fake=shaped.encode();
+  // Keep every required Scene28 field structurally valid. Remove only the
+  // actual owning feature, so this reaches the minimal-feature guard itself.
+  fake["objects"][0]["painted"]=PaintedMesh(shaped.active().painted->mesh(),64).encode();
+  fake["source_images"]=nlohmann::json::array();bool missing_feature=false;
+  try{Scene::decode(fake);}catch(const std::invalid_argument &e){missing_feature=std::string_view(e.what())=="Scene28 requires actual independent source paint ownership";}
+  check(missing_feature,"Structurally complete Scene28 without its actual owning feature refuses at the feature guard");
   check(Scene::decode(old_bytes).encode()==old_bytes,"Ordinary legacy native Scene bytes remain unchanged");
   std::cout<<"PASS "<<checks<<" source-paint Scene data checks; renderer/UI/export adapters remain unfinished\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
