@@ -1,0 +1,404 @@
+{
+  "source": "eec7753284f99b65fae94a22795917efaf63f6d5",
+  "previous_main": "3f4b2ba146b0e1b9f02583f7bd5de000348f20a3",
+  "scope": "Combined retained source UV/paint/key, rig/rest/length and owning native histories; preserved GPU integration; preview ownership and required-landmark renderer fixes; exact staged Save observer. All unfinished full production rows remain required.",
+  "builds": {
+    "status": "terminal",
+    "source": "eec7753284f99b65fae94a22795917efaf63f6d5",
+    "started_utc": "2026-11-03T08:24:26.258241+00:00",
+    "source_inputs": 1452,
+    "nice": 10,
+    "workers": 2,
+    "scope": "Coherentintegration updates; CPU/OneAPI/CUDA/ROCMalltargets; wholeownedSANapp+15selectedtargets. MatchingunchangedcachedTUs retained, no all-clean recompilation claim. No runtime/HMD/systemactions.",
+    "profiles": [
+      {
+        "name": "CPU",
+        "status": "terminal",
+        "configure": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-cpu",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/share/fltk"
+        ],
+        "build": [
+          "cmake",
+          "--build",
+          "build-cpu",
+          "--parallel",
+          "2"
+        ],
+        "started_utc": "2026-11-03T08:24:26.258431+00:00",
+        "configure_exit_code": 0,
+        "exit_code": 0,
+        "seconds": 38.17300079402048
+      },
+      {
+        "name": "SAN",
+        "status": "terminal",
+        "configure": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-sanitize",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/share/fltk"
+        ],
+        "build": [
+          "cmake",
+          "--build",
+          "build-sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-rig-fit-render-test",
+          "dome-sculpt-native-shape-sampling-test",
+          "dome-sculpt-source-union-workflow-test",
+          "dome-sculpt-rig-fit-authoring-test",
+          "dome-sculpt-rig-fit-controller-test",
+          "dome-sculpt-rig-fit-faults-test",
+          "dome-sculpt-rig-fit-import-test",
+          "dome-sculpt-bone-length-render-test",
+          "dome-sculpt-projection-render-test",
+          "dome-sculpt-object-selection-render-test",
+          "dome-sculpt-object-isolation-render-test",
+          "dome-sculpt-polygon-render-test",
+          "dome-sculpt-mtoon-render-test",
+          "dome-sculpt-palette-text-test"
+        ],
+        "started_utc": "2026-11-03T08:25:04.431843+00:00",
+        "configure_exit_code": 0,
+        "exit_code": 0,
+        "seconds": 160.12160049998784
+      },
+      {
+        "name": "ONEAPI",
+        "status": "terminal",
+        "configure": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-oneapi",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/share/fltk"
+        ],
+        "build": [
+          "cmake",
+          "--build",
+          "build-oneapi",
+          "--parallel",
+          "2"
+        ],
+        "started_utc": "2026-11-03T08:27:44.553859+00:00",
+        "configure_exit_code": 0,
+        "exit_code": 0,
+        "seconds": 146.53321964701172
+      },
+      {
+        "name": "CUDA",
+        "status": "terminal",
+        "configure": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-native-cuda",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/share/fltk"
+        ],
+        "build": [
+          "cmake",
+          "--build",
+          "build-native-cuda",
+          "--parallel",
+          "2"
+        ],
+        "started_utc": "2026-11-03T08:30:11.087545+00:00",
+        "configure_exit_code": 0,
+        "exit_code": 0,
+        "seconds": 41.39930521999486
+      },
+      {
+        "name": "ROCM",
+        "status": "terminal",
+        "configure": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-native-rocm",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/share/fltk"
+        ],
+        "build": [
+          "cmake",
+          "--build",
+          "build-native-rocm",
+          "--parallel",
+          "2"
+        ],
+        "started_utc": "2026-11-03T08:30:52.487321+00:00",
+        "configure_exit_code": 0,
+        "exit_code": 0,
+        "seconds": 39.02955395297613
+      }
+    ],
+    "exit_code": 0,
+    "source_drift": []
+  },
+  "CPU_affected": {
+    "status": "terminal",
+    "source": "eec7753284f99b65fae94a22795917efaf63f6d5",
+    "started_utc": "2026-11-03T08:29:52.870963+00:00",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build-cpu",
+      "--output-on-failure",
+      "--parallel",
+      "2",
+      "-R",
+      "^(rig-fit-render|rig-fit-authoring|rig-fit-controller|rig-fit-faults|rig-fit-import|rig-fit-metric|bone-length-render|projection-render|object-selection-render|object-isolation-render|polygon-render|mtoon-render|palette-unicode|source-union-version|source-union-workflow|native-shape-sampling|key-uv-commutation)$",
+      "--output-junit",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/cpu/affected-tests/junit.xml"
+    ],
+    "suites": 17,
+    "scope": "FreshcoherentCPU affectedguide/cursor/sharedrender+newobserver/union regressions; doesnotrelabelearlier533run",
+    "input_hashes": 1479,
+    "exit_code": 0,
+    "seconds": 285.5688656469865,
+    "input_drift": []
+  },
+  "SAN_affected": {
+    "status": "terminal",
+    "source": "eec7753284f99b65fae94a22795917efaf63f6d5",
+    "started_utc": "2026-11-03T08:36:37.684320+00:00",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build-sanitize",
+      "--output-on-failure",
+      "--parallel",
+      "2",
+      "-R",
+      "^(rig-fit-render|rig-fit-authoring|rig-fit-controller|rig-fit-faults|rig-fit-import|bone-length-render|projection-render|object-selection-render|object-isolation-render|polygon-render|mtoon-render|palette-unicode|source-union-workflow|native-shape-sampling)$",
+      "--output-junit",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/san/affected-tests/junit.xml"
+    ],
+    "suites": 14,
+    "scope": "Currentcoherentwhole-owned C/C++ O1ASanUBSanleaks affectedrenderer+newobserver/mixedworkflow; externalcanonicaltoolkit, no suppressions or physicalXR",
+    "input_hashes": 1476,
+    "exit_code": 0,
+    "seconds": 4146.432517260022,
+    "input_drift": []
+  },
+  "SAN_cases": [
+    {
+      "name": "polygon-render",
+      "seconds": 0.147381
+    },
+    {
+      "name": "palette-unicode",
+      "seconds": 1.86931
+    },
+    {
+      "name": "mtoon-render",
+      "seconds": 3.70186
+    },
+    {
+      "name": "object-selection-render",
+      "seconds": 0.216272
+    },
+    {
+      "name": "object-isolation-render",
+      "seconds": 0.241953
+    },
+    {
+      "name": "projection-render",
+      "seconds": 0.127873
+    },
+    {
+      "name": "rig-fit-authoring",
+      "seconds": 0.129564
+    },
+    {
+      "name": "rig-fit-controller",
+      "seconds": 0.117876
+    },
+    {
+      "name": "rig-fit-faults",
+      "seconds": 4.71904
+    },
+    {
+      "name": "rig-fit-import",
+      "seconds": 0.150274
+    },
+    {
+      "name": "rig-fit-render",
+      "seconds": 0.133032
+    },
+    {
+      "name": "bone-length-render",
+      "seconds": 109.825
+    },
+    {
+      "name": "native-shape-sampling",
+      "seconds": 2597.54
+    },
+    {
+      "name": "source-union-workflow",
+      "seconds": 4142.82
+    }
+  ],
+  "actual_Arc": {
+    "status": "terminal",
+    "source": "eec7753284f99b65fae94a22795917efaf63f6d5",
+    "started_utc": "2026-11-03T08:45:40.305508+00:00",
+    "input_hashes": 1861,
+    "scope": "FreshcoherentOneAPI renderer/app/current guide13 +selected21 Arccompute/softwareGL +actualGL/stereo syntheticXR7/productionpainttrace; no physicalHMD/systemactions",
+    "GPU_lease": "released; allownsubprocessesterminal",
+    "runs": [
+      {
+        "name": "device",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/gpu-paint-main-7693d6b/artifacts/paint-device-info"
+        ],
+        "exit_code": 0,
+        "seconds": 0.16402047401061282
+      },
+      {
+        "name": "guide",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-rig-fit-render-test",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 0.06393942001159303
+      },
+      {
+        "name": "selected21",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-oneapi",
+          "--output-on-failure",
+          "--parallel",
+          "1",
+          "-R",
+          "^(retopology-authoring|texture-painting|scene-authoring|native-strokes|native-live-preview|sculpt-resolution|skin-authoring|projection-native|retopo-edges|resample-quality-aggregate|resolution-quality-integration|paint-composite-compute|paint-composite-native|paint-composite-render|skin-affine-authoring|skin-affine-controller|skin-affine-export|compute-backend|compute-missing-gpu|resample-backend|resample-native-contract)$",
+          "--output-junit",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/arc/selected21.xml"
+        ],
+        "exit_code": 0,
+        "seconds": 15.093206568999449
+      },
+      {
+        "name": "paint-fixture",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-paint-composite-fixture",
+          "--xr-fixture",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/arc/paint512.dsculpt"
+        ],
+        "exit_code": 0,
+        "seconds": 3.320166154007893
+      },
+      {
+        "name": "synthetic-xr7",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/paint-composite-xr.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-test-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/arc/paint512.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-paint-composite-fixture",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/arc/synthetic-xr7"
+        ],
+        "exit_code": 0,
+        "seconds": 14.694262096978491
+      }
+    ],
+    "exit_code": 0,
+    "input_drift": []
+  },
+  "native_UI_receipt": "RIG-FIT-GUIDE-UI.json",
+  "native_UI_assertions": 52,
+  "native_UI_component_commit": "ca1b0f999d73eafb32a0f0a45ddc80afeed5f1c9",
+  "actual_Arc_guide_assertions": 13,
+  "Arc_selected_suites": 21,
+  "actual_synthetic_XR_assertions": 7,
+  "paint_kernel_creates": 1,
+  "bounded_device_to_host_chunks": 9,
+  "parent_full_CPU": {
+    "receipt": "FULL-CPU-b32.json",
+    "passed": 532,
+    "total": 533,
+    "exit_code": 8,
+    "sole_failure": "rig-fit-render decorated required-role identity, corrected in current source; old negative retained. Affected CPU17/SAN14/UI52/Arc guide13 pass; no fresh full533-allgreen claim."
+  },
+  "parent_interchange": {
+    "receipt": "ARC-AUTHORING-COHERENT-b32.json",
+    "files": 29,
+    "errors": 0,
+    "warnings": 47,
+    "warnings_kind": "NODE_SKINNED_MESH_NON_ROOT",
+    "infos": 43,
+    "hints": 11,
+    "filters": false,
+    "scope": "Frozen parent b32 runtime interchange proof; later runtime change is guide identity only. Not relabelled as a new current29 export run."
+  },
+  "DomeD_main": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
+  "limitations": [
+    "Full goal remains incomplete; independent seam-key commands/export, robust actual-avatar automatic weights, VRM1/physics and broad FBX still require implementation.",
+    "CUDA/ROCm compile/link and actual missing-device behavior are qualified; positive NVIDIA/AMD numerical/device-loss/performance proof remains unavailable.",
+    "Eligible complex paint, meshing, bake and rig compute work remains CPU; existing plain paint/brush/resolution GPU paths are preserved.",
+    "Inherited standaloneXR112B and shared-Wayland5856B lifetime reports remain unresolved in this candidate. Separate later toolkit/native graphics work is not included.",
+    "No new physical headset/controller/stylus verification, system installation or active-session restart.",
+    "Controller drawers remain queued after basic targets."
+  ],
+  "evidence_sha256": {
+    "artifacts/integrated-eec7753/arc/device.log": "0843e28bf7d31d65687666968242b27f2ebd4590af87acaf4ce328101985dc00",
+    "artifacts/integrated-eec7753/arc/guide.log": "b5dd88e617edeeeacba1125cff099d4513f94b7f2804daa2cd06a6b9bcdb841b",
+    "artifacts/integrated-eec7753/arc/inputs-after.json": "880bdf7a6d53183388f8466e1cd3e136c621449b5f261d02f9dced29b8cac5f5",
+    "artifacts/integrated-eec7753/arc/inputs-before.json": "880bdf7a6d53183388f8466e1cd3e136c621449b5f261d02f9dced29b8cac5f5",
+    "artifacts/integrated-eec7753/arc/paint-fixture.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/integrated-eec7753/arc/selected21-LastTest.log": "89b855ee58b3e3508ef726ade75b62171312ef1e0296ec37211fac32e364355b",
+    "artifacts/integrated-eec7753/arc/selected21.log": "31dfe7574dfecb434f992714d6fab5fada61562756bee07d0e8b836314d21181",
+    "artifacts/integrated-eec7753/arc/selected21.xml": "1854deb8651b908c03cf19f679bbbf28c562c1ce54bfcf8eba9b73d86c4f08dc",
+    "artifacts/integrated-eec7753/arc/status.json": "b7f9993d968d799d7e50d1e1ecd433a1865c2510b8e041e53b15a5026b9edb15",
+    "artifacts/integrated-eec7753/arc/synthetic-xr7/app.log": "935513d77135ad772894d0cec142bbc45991a73bcf6dda3d11246614d65ec0f5",
+    "artifacts/integrated-eec7753/arc/synthetic-xr7/report.json": "a3a346737f6e1de2e4e02fb6b115f9494b9f1a05d02f00b51966e2de34ee4243",
+    "artifacts/integrated-eec7753/arc/synthetic-xr7/runtime.json": "5bbeefc2451aa69fcf42bfee0091d10e1c26fb6119ee91262e4f750f690c5585",
+    "artifacts/integrated-eec7753/arc/synthetic-xr7/transfer-trace.json": "eee267ac1c8a5cc9ea57a14d5de82559a3b66b99fcea133cb75485784ab0eb7a",
+    "artifacts/integrated-eec7753/arc/synthetic-xr7.log": "c63ea51a7579f47583ad2705e7a8d7c600e3500f20fe9e58cd04162e10ad4739",
+    "artifacts/integrated-eec7753/cpu/affected-tests/ctest.log": "2ecff92a5ccd75c559873ae3f8263f0afdaebcba7bdbe34ae73b6775e17db609",
+    "artifacts/integrated-eec7753/cpu/affected-tests/inputs-after.json": "9a1498de41b4d0b9df3b3327da5232d9ccf184fa62652a0b9023ef54f227b3a7",
+    "artifacts/integrated-eec7753/cpu/affected-tests/inputs-before.json": "9a1498de41b4d0b9df3b3327da5232d9ccf184fa62652a0b9023ef54f227b3a7",
+    "artifacts/integrated-eec7753/cpu/affected-tests/junit.xml": "d965ef599ef54a68ab6c08ba87b7544baaada8c0350a7a1f681b58bbd188488a",
+    "artifacts/integrated-eec7753/cpu/affected-tests/status.json": "bf15c240dbe0a73af38410c13eaf28d72f6cbb7c90e746152edfa8ebf41c58c1",
+    "artifacts/integrated-eec7753/cpu/build.log": "8db0db50368a18343101150871d6e5ad4d1995f104ac3146b9ebe09541094ed3",
+    "artifacts/integrated-eec7753/cpu/configure.log": "0fc507ea7d74b132127846656cf87974ba7dae93f2265ceccf5a19301305fbf3",
+    "artifacts/integrated-eec7753/cpu/snapshot-manifest.json": "320eee3a80c17bc14f802ccfe6207712fda1a3aab594c2769de1f62c6fc8956f",
+    "artifacts/integrated-eec7753/cuda/build.log": "d0dfee7ce503f2fb6ddcb704194832c5461567405b0fb3d526a29a522f829493",
+    "artifacts/integrated-eec7753/cuda/configure.log": "8bbfdf982e9f926b1c1cfa8558cdba067b67362af1b49eeb1b2b49413a41dfc0",
+    "artifacts/integrated-eec7753/oneapi/build.log": "bbc5e6d61db4e72512c6527972c8097e1fd4ed83831048435d84c5d52ed3aba1",
+    "artifacts/integrated-eec7753/oneapi/configure.log": "a00f0c76d7d22da99405e57d32a2a6a454fc7e32b3e4e2d571a83b3a11908713",
+    "artifacts/integrated-eec7753/rocm/build.log": "1051c0d15f719407dc6b498fcc23457f2e6948ec6589f5d3934c0c6f5e5d2d27",
+    "artifacts/integrated-eec7753/rocm/configure.log": "6ff9f44cdeeff3af51272709f7fe79ae22d2528d6d09a117426fdc4a5f28a42b",
+    "artifacts/integrated-eec7753/san/affected-tests/ctest.log": "b6b7e5194e500a996f8df7e67d47f81ab502f268fc42d748fc9b22df2118c72f",
+    "artifacts/integrated-eec7753/san/affected-tests/inputs-after.json": "d538f34cf0f65ccc2d8c398b63e3e0c91dc785da4af1fa19ffd37b2f4352797a",
+    "artifacts/integrated-eec7753/san/affected-tests/inputs-before.json": "d538f34cf0f65ccc2d8c398b63e3e0c91dc785da4af1fa19ffd37b2f4352797a",
+    "artifacts/integrated-eec7753/san/affected-tests/junit.xml": "1bacefabfb7ae4b21eb14d8220398a98950915eda6c6620d98a8be641767e1e3",
+    "artifacts/integrated-eec7753/san/affected-tests/plan.json": "7aba2d67bc9dcbb2aad12465272eb6bb15c38cd167c93a456f2db9d5e978c95e",
+    "artifacts/integrated-eec7753/san/affected-tests/status.json": "4ba7a3d2b1208735787ed2adeab5433d240576324d1638ff30bf73f1afd12930",
+    "artifacts/integrated-eec7753/san/build.log": "3267b1a0a1da7b012c234c960385e309922950d88bb52496f23a823c452630c7",
+    "artifacts/integrated-eec7753/san/configure.log": "efa8daa12d36a671326f38305197a834f3f28ffc93ac81fbdbba029d184e272e",
+    "artifacts/integrated-eec7753/source-after.json": "68548301a3ed85ab491e56df195dc7940ef0c8868702161270049e4152ac1334",
+    "artifacts/integrated-eec7753/source-before.json": "68548301a3ed85ab491e56df195dc7940ef0c8868702161270049e4152ac1334",
+    "artifacts/integrated-eec7753/status.json": "cbe4b183cff37e4c0267d6f43be233d17bd20aa8ad486b698d1824ec564dad2c"
+  }
+}

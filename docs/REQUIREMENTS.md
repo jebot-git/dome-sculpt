@@ -1,5 +1,13 @@
 # Full objective and completion evidence
 
+The combined retained source UV/paint/key and source-rig/rest/length union now
+has coherent runtimeeec7753 qualification: optimized all-target CPU/OneAPI/CUDA/
+ROCm builds, affected CPU17/17 and whole-owned sanitizer14/14, native UI/
+controller/compositor52, actual A770 guide13/selected21 and synthetic-XR7.
+Read AUTHORING-UNION-COHERENT.md for exact scopes and the preserved earlier
+full532/533 negative. This is a production milestone, not full-goal completion;
+all unfinished original and additional rows below remain required.
+
 The full goal resumed on 2026-11-02. Published main8d46dfb combines retained
 Scene13 placements, Scene14 corner color, Scene15 explicit normal preparation,
 Scene16 key tools/freehand editing and the physically accepted XR selection

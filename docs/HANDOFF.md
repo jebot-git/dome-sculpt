@@ -4,41 +4,37 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
-## Current integration and remaining qualification — 2026-11-03
+## Qualified authoring union — 2026-11-03
 
-The private authoring master now contains the qualified b32 source/rig/UV/key
-union, the renderer-only required-landmark fix465009f, the native shape observer
-follow-up9f4ee1f and staged Save observer4823a36/final receipt62e5196. No public
-header, class layout or schema changed after b32. Public main remains3f4b2ba;
-this integration still needs fresh coherent affected builds/workflows.
+Runtime source `eec7753` completes the coherent admission gates for the retained
+source UV/paint/key and rig/rest/length authoring union on public `3f4b2ba`.
+This candidate includes the native preview-owner repair, required-landmark
+highlight fix and faithful queued-first staged Save observer. Source, ABI and
+archive histories from the qualified components are preserved. Read
+[AUTHORING-UNION-COHERENT.md](AUTHORING-UNION-COHERENT.md) and its validation receipt.
 
-The actual complete b32 CPU run is TERMINAL8:532/533 suites pass in6042.50s
-(wrapper6046.03s); all1,901 captured inputs are exact. Its sole failure is
-rig-fit-render: decorated UI labels prevented required landmarks highlighting.
-Fix465009f passes the extended13-check real renderer fixture on softwareGL,
-whole-owned sanitizer support and strict actual A770GL, with the old renderer
-negative preserved in all three profiles. These component proofs do not relabel
-the earlier full run green. Read validation/FULL-CPU-b32.json and
-RIG-FIT-GUIDE.md. Fresh native UI/controller/compositor and affected rendering
-qualification are the next integration gates.
+All four optimized native backend all-target builds pass; the whole-owned
+sanitizer application and15 selected targets build successfully. Affected CPU
+17/17, whole-owned ASan/UBSan/leak14/14, native UI/controller/compositor52,
+strict actual A770 guide13 plus selected21 suites and actual application
+synthetic-XR7 pass. The broad sanitizer workflow finishes in4142.82s, the
+native shape workflow in2597.54s; wrapper4146.432517s. All1,476 sanitizer inputs
+and the separately captured build/CPU/UI/Arc inputs remain exact. No sanitizer
+suppression or per-operation limit/quality-bound relaxation was used.
 
-The exact queued-first Save fixture passes CPU134, focused SAN11 and complete
-whole-owned SAN134 (4295.552360s), with1,448 inputs exact and no sanitizer/leak
-report. Native/asset/persistence each retain120s; all30 observations pass. The
-original failed aggregate wait and1800s CTest timeout remain recorded. The
-native query component separately passes84 with whole-owned sanitizer support;
-its finite registration is6000s only under explicit sanitizer flags,1800s for
-optimized builds. No production timeout, quota, tolerance or guard was relaxed.
-Read UNION-STAGED-SAVE.md and NATIVE-SHAPE-SAMPLING.md for exact source scopes.
+The full b32 CPU run remains532/533 with its original negative. The actual
+landmark renderer defect is corrected and passes the affected checks above;
+this does not relabel that earlier full run as533/533. Parent b32 interchange,
+CUDA/ROCm missing-device and earlier hardware301 evidence retain their original
+source scopes. UI receipt ca1b0f9 is now included as documentation only.
 
-All four optimized b32 native backend configurations compile/link; actual Arc
-301 plus selected21, rebuiltCPU FLTK72, latestDomeD Wayland8 and unfiltered
-interchange proof remain scoped below. Post-b32 changes are the small guide
-renderer fix and test-only observation corrections; fresh coherent builds are
-required before main admission. Derived seam-key and volume-weight continuations
-remain separate, unfinished prototypes. Every unfinished original requirement
-and the later controller-drawer phase remain required. No physical HMD launch,
-system installation or active-session restart occurred.
+The full goal remains active and incomplete. Independent seam-key commands/
+export, robust actual-avatar automatic weights, broad FBX, full VRM1/physics,
+remaining GPU-eligible work and physical production workflows are unfinished.
+The later native-EGL cleanup branchf58f464 and private canonical FLTK cleanup
+experiments are excluded. Inherited frontend lifetime reports remain open in
+this candidate. Controller drawers remain required after basic targets. No
+physical HMD launch, system installation or active-session restart occurred.
 
 ## Frozen b32 evidence milestone (before current integration) — 2026-11-03
 
