@@ -10,6 +10,8 @@ struct DerivedKeyTarget {
   // seed, zero means the captured simultaneous mix. A different positive ID
   // is a Duplicate seed. These are native endpoint references, never raw IDs.
   std::optional<uint64_t> reference;
+  // Mirror record3: actual reflected-corner proof from this fixed anchor.
+  std::optional<float> mirror_tolerance;
 };
 class SourceKeyDerivation {
 public:
