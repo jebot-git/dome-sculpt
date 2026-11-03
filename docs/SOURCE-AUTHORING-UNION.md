@@ -93,3 +93,30 @@ app/core/three-fixture outputs and terminal2 logs are retained; explicitly
 configure before retrying the unchanged compilation scope. e063 OneAPI explicit
 configuration builds all26 listed targets successfully with1425 source hashes
 unchanged. No current GPU test follows from that build.
+
+## Coherent9050 proof and actual freehand follow-up
+
+The coherent native CPU selection passes7/7 in454.39s. All134 combined workflow,
+101 commutation and59 authoring checks complete; source1427/CPU18 hashes stay
+exact. Actual PCI03 A770 additionally passes101+59, all images0, with27 emitted
+GLBs0Khronos errors/27warnings; these native/ArcGL checks do not imply new GPU
+compute dispatch. The owned sanitizer selection ends5/6 in3209.74s:101 complete
+commutation passes1398.34s, while the broad workflow is killed by its actual
+1800.15s CTest limit after valid key/rest progress. Its same exact binary is
+running in a separate frozen snapshot with7200s outer allowance; assertions,
+numerical tolerances and per-operation limits stay unchanged. No six-suite
+green claim is made, and an observation timeout is not a terminal state.
+
+The actual nativeFLTK interface reveals a separate query-refresh omission:
+after beginning a real shapekey gesture, the newly constructed query loses its
+paint sampling attachment/proof/corner stream and correctly rejects mutation.
+Privatee7a3c7c/integration7c0820f reuses the whole captured range and explicit
+logical corners; no ABI, visibility guard or schema change.84 actual native/
+controller checks pass ordinary/reflected multi-preview gestures, real masked
+hit/hole equivalence, oneUndo/Redo, Save/reopen and changed-preview Cancel/focus
+loss. The first scopedSAN20s preview observation expires and remains pending.
+Unchanged normal/compact GUI tests then show actual Strokecomplete/target0
+changes; their assumed target1 had been clamped to0 by Undo. An explicit real
+existing-target selection step is being qualified; full GUI remains open.
+Read RETAINED-KEY-UI.md and the preserved negative receipt. Do not confuse
+passing direct position-authoring/API consumers with complete freehand UI.

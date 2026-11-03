@@ -4,6 +4,43 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Current coherent retained-key checkpoint and freehand repair — 2026-11-03
+
+Private9050 has coherent nativeCPU/OneAPI/whole-owned sanitizer applications.
+Selected CPU7/7 passes454.39s, including134 full mixed-workflow,101 commutation
+and59 rig/UV checks. Strict actual PCI03 A770 passes160 checks with all recorded
+image errors0;27GLBs validate0errors/27unfilteredwarnings. Native flow/ArcGL is
+proved, not new compute dispatch. Captured1427 inputs and18CPU/18SAN/37OneAPI
+artifacts remain exact. Main remains3f4b2ba; the full goal is incomplete.
+
+Owned sanitizer selection8337 is TERMINAL8:5/6 pass in3209.74s, including the
+complete101 commutation in1398.34s. The broad134 workflow hits its1800.15s CTest
+limit after keys/cancellation/native rest; preserve that negative. The identical
+instrumented binary is being run with an explicit7200s outer bound in a separate
+frozen9050 worktree artifacts/san-union-long-9050 (handle28731). Assertions,
+numerical tolerances and per-operation limits are unchanged. Inspect actual
+handle/status; no all-green sanitizer or failed-process leak-clean claim.
+
+Real normal/compact nativeFLTK tests expose a genuine freehand query refresh
+that drops sampling attachment/proof/coordinates. Integration7c0820f (private
+component e7a3c7c) preserves the complete immutable initial range during each
+shape refresh. Logical native winding stays logical, with reflected culling;
+packed EBO reversal is separate. Its old-code negative and84 native/controller
+checks pass with matched9050 support, unchanged header ABI. A first SAN20s
+observer timeout remains unqualified. Exact fixed GUI tests now report Stroke
+complete and real target0 changes: their last-target1 assertion assumed selection
+survives Undo/Redo, but Undo intentionally clamps ephemeral selection. Actual
+existing-target dropdown selection is being tested before re-running the strict
+target/source/history assertions. Full GUI qualification remains open. Signed
+private Xvfb dependencies/bwrap do not reverse system X11 retirement.
+
+The new seam-key position-domain work remains separate/unfinished in
+artifacts/seam-key-domain-9050: private geometry kernel30R/30 scopedSAN and a
+fresh coherent factory21 prove useful subsets, including immutable anchor
+metadata; codecs/native admission/UI/export and complete validation are pending.
+No derived-key schema or prototype is included in this master. Preserve the
+complete requirements and queued post-basic controller drawers.
+
 ## Private combined authoring candidate — 2026-11-03
 
 The authoring-master-3f4b2ba worktree composes published3f4 GPU painting with

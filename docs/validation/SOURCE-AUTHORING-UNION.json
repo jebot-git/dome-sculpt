@@ -66,7 +66,7 @@
     "artifacts/build-sanitize-critical-before.json": "420de3326753faf93afdebf4adea9065eee4bb195259a49817b8130b22cace0d",
     "artifacts/build-sanitize-critical-after-evaluation.json": "420de3326753faf93afdebf4adea9065eee4bb195259a49817b8130b22cace0d"
   },
-  "updated_utc": "2026-11-03T04:22:02.672882+00:00",
+  "updated_utc": "2026-11-03T05:43:54.162012+00:00",
   "retained_key_candidate": {
     "source": "c79a140e0b19e82d013409f0e9f5129f903a4f43",
     "qualified": false,
@@ -150,5 +150,92 @@
     "artifacts/cpu-retained-key-baselines-after-baselines.json": "76a9343099f0fa0963ecc3ce44e2268a66ab3a76e9e37c9ecd6bb89f63fe756b",
     "artifacts/oneapi-retained-key-status.json": "df1795d502e4fd025f597331c6dfe2aa44a08aa62c1f5b5aad178d7b3903c96d",
     "artifacts/oneapi-retained-key-binaries.json": "46d9aebeed3dc1945bda4ff26f99a83cd332fc3349ed12f0e5a3a0cb7bb9212c"
+  },
+  "coherent_9050": {
+    "source": "9050f3648da315a524f1b0508c91ac8b91c9a73c",
+    "qualified_for_main": false,
+    "CPU": {
+      "build_session": 69481,
+      "build_exit": 0,
+      "test_session": 39923,
+      "test_exit": 0,
+      "selected_suites": 7,
+      "seconds": 454.39,
+      "workflow_checks": 134,
+      "commutation_checks": 101,
+      "rig_UV_checks": 59
+    },
+    "owned_SAN": {
+      "build_session": 25365,
+      "build_exit": 0,
+      "test_session": 8337,
+      "test_exit": 8,
+      "passed_suites": 5,
+      "total_suites": 6,
+      "seconds": 3209.74,
+      "commutation_checks": 101,
+      "commutation_seconds": 1398.34,
+      "workflow": "actual CTest Timeout1800.15s after keys/cancellation/native rest; no all-green or failed-process leak-clean claim"
+    },
+    "same_binary_retry": {
+      "tree": "artifacts/san-union-long-9050",
+      "session": 28731,
+      "outer_seconds": 7200,
+      "state": "running at this record; inspect handle/status, never infer terminal from elapsed observation",
+      "binary_sha256": "f32d0ce643af54358f6e48eb81e94d778a2493fce92e5eb8afe303abf01d1dfc",
+      "changes": "outer allowance/output/HOME/byte-identical input asset path only; no assertion, tolerance, per-operation-bound or compilation changes"
+    },
+    "ONEAPI": {
+      "build_session": 30070,
+      "build_exit": 0,
+      "targets": 26,
+      "source_inputs": 1427,
+      "binary_config_hashes": 37,
+      "e063_binary_drift": 0
+    },
+    "Arc": {
+      "session": 45669,
+      "exit": 0,
+      "PCI": "0000:03:00.0",
+      "device": "Intel Arc A770",
+      "authoring_checks": 59,
+      "commutation_checks": 101,
+      "all_recorded_image_errors": 0,
+      "Khronos_files": 27,
+      "Khronos_errors": 0,
+      "Khronos_unfiltered_warnings": 27,
+      "scope": "strict actual ArcGL/selected OneAPI native flow; no new compute-kernel execution claim",
+      "GPU_lease": "released"
+    },
+    "immutability": {
+      "source_inputs": 1427,
+      "CPU_artifacts": 18,
+      "SAN_artifacts": 18,
+      "mismatches_all": 0
+    }
+  },
+  "native_freehand_followup": {
+    "source_parent": "9050f36",
+    "production": "e7a3c7c6931057a799dbdfcdfeb75b5583487d48; integration cherry7c0820f",
+    "change": "Keep complete initial immutable SurfaceRange, attachment, normal preview proof and logical paint-corner stream during shape visibility-query refresh. Native placement does not flip indices; preserve logical winding and reflected culling.",
+    "scope": "single whole production TU+matching9050 CPU core/support; unchanged headers/ABI",
+    "old_negative": "actual first-preview omitted/fabricated sampling attachment; complete Scene rolls back",
+    "fixed_native_controller_checks": 84,
+    "scenarios": "ordinary/reflected3sample target changes, per-refresh owners, real masked hit/hole parity, wrong permutation rejection, oneUndo/Redo, Save/reopen, changed-preview Cancel/focus loss",
+    "owned_SAN": "first new fixture20s observation bound expires; diagnosis/revalidation pending, no sanitizer clean pass claimed",
+    "UI": "6e50d35 records28 positive checks and original worker refusal. Fixed exact harness removes refusal and Strokecomplete changes target0; harness incorrectly assumes last1 after Undo clamps ephemeral target to0. Real existing-target selection check in progress; no full UI gate claimed."
+  },
+  "coherent_9050_artifact_hashes": {
+    "artifacts/tests-cpu-9050-key.log": "a50d8725f41a8fc78cc26b1a8a64726ae991a54c597f6f0b1979e4e141d44b9a",
+    "artifacts/tests-sanitize-9050-key.log": "39ac33a66bd0207adb3db4253e969e138e9c4567d1529a6e5a21e7e9941f5cc6",
+    "artifacts/source-integrated-key-9050-before.json": "a9268d2844a449a95a0c9f14a4f75082d3dd7395cff4fb5130fb02ce204fccbf",
+    "artifacts/source-integrated-key-9050-after-cpu.json": "a9268d2844a449a95a0c9f14a4f75082d3dd7395cff4fb5130fb02ce204fccbf",
+    "artifacts/source-integrated-key-9050-after-sanitize.json": "a9268d2844a449a95a0c9f14a4f75082d3dd7395cff4fb5130fb02ce204fccbf",
+    "artifacts/build-cpu-9050-before.json": "2092bddb92d8758a657212668b556c7723bf2ffaa7f28e703aa92e5c6f1ad2f9",
+    "artifacts/build-cpu-9050-after.json": "2092bddb92d8758a657212668b556c7723bf2ffaa7f28e703aa92e5c6f1ad2f9",
+    "artifacts/build-sanitize-9050-before.json": "c6fc8517d1b69ed22a8640ea9eedc5e4570684226c92dd80416606c9c0878f6f",
+    "artifacts/build-sanitize-9050-after-sanitize.json": "c6fc8517d1b69ed22a8640ea9eedc5e4570684226c92dd80416606c9c0878f6f",
+    "artifacts/oneapi-hardware-status.json": "5c23aabd6f4025fb8e50eed8674aa42dd18e641b219333efe639b3d9919f5305",
+    "artifacts/oneapi-cmake-guard-status.json": "f94c992eec0aeda5489cdc409adaf3a2f021902cf7b2cfdb4b30c669730b0ad1"
   }
 }
