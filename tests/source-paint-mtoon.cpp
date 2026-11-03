@@ -32,7 +32,9 @@ int main(int argc,char **argv)try{
   PaintSurfaceOptions policy;policy.policy=PaintUvPolicy::SourceAuthored;auto before=PaintedMesh::from_maps(raw,maps,64,policy);const auto frozen=before->encode();auto paint=prepare_source_paint(before,target,vertices);
   Material m=white();m.color={.65f,.8f,.4f,.85f};m.alpha=Material::AlphaMode::Mask;m.alpha_cutoff=.5f;
   auto holder=binding(legacy,m,split);holder->material.parameters.scroll={.23f,-.17f};holder->material.textures[0].texcoord=original_one?1:0;
+  if(legacy&&original_one){check(rejects([&]{holder->validate();}),"VRM0 retains its explicit rejection of an unrepresentable UV1 texture edit");continue;}
   auto raw_marker=before->preview(m);auto original=frame(raw,raw_marker,m,holder),adopted=frame(target,paint->preview(m),m,holder);
+  if(original_one){auto a=appearance(holder->material,{split});auto asset=std::make_shared<ImportedAsset>(*a->asset);asset->primitives[0].mesh=raw;asset->primitives[0].uv1=*maps->uv1;a->asset=asset;original->ranges[0].appearance=std::move(a);}
   const auto &packet=adopted->ranges[0].textures->overlay;
   check(packet&&packet->empty()&&*packet->original_uv0()==raw.uv,"Unpainted Source4 retains exact logical UV0 independently of generated image carriers");
   check(bool(packet->original_uv1())==bool(maps->uv1),"Logical UV1 exists only when the actual pristine source owned it");
