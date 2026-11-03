@@ -59,7 +59,8 @@ struct System {
   }
 };
 System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
-                std::span<const uint32_t> row_groups) {
+                std::span<const uint32_t> row_groups,
+                HeatNormals geometry_normals = HeatNormals::AreaWeighted) {
   System s;
   const size_t raw = m.positions.size();
   s.raw_to_row.resize(raw);
@@ -115,8 +116,12 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
       budget.step();
       auto id = ids[k];
       s.mass[id] += area2 / 6;
-      for (int a = 0; a < 3; ++a)
-        s.normals[id][a] += normal[a];
+      for (int a = 0; a < 3; ++a) {
+        budget.step();
+        s.normals[id][a] += geometry_normals == HeatNormals::UnitFaces
+                                ? normal[a] / area2
+                                : normal[a];
+      }
       auto a = ids[(k + 1) % 3], b = ids[(k + 2) % 3];
       if (a == b)
         throw std::invalid_argument("Bone heat triangle repeats a vertex");
@@ -481,6 +486,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
        o.visibility != HeatVisibility::EntryFaces) ||
       (o.occlusion != HeatOcclusion::WholeMesh &&
        o.occlusion != HeatOcclusion::ConnectedSurface) ||
+      (o.geometry_normals != HeatNormals::AreaWeighted &&
+       o.geometry_normals != HeatNormals::UnitFaces) ||
       !o.maximum_work || o.maximum_work > 500'000'000 ||
       o.maximum_bytes < 4096 || o.maximum_bytes > 512u * 1024u * 1024u ||
       !o.maximum_iterations || o.maximum_iterations > 4096 ||
@@ -545,7 +552,7 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   if (!row_groups.empty() && row_groups.size() != n)
     throw std::invalid_argument("Bone heat virtual row groups differ from the "
                                 "exact current vertex owner");
-  auto s = assemble(m, budget, o.operation, row_groups);
+  auto s = assemble(m, budget, o.operation, row_groups, o.geometry_normals);
   const size_t rows = s.positions.size();
   seed(s, m, rig, o, budget, sources, eligible);
   HeatBindingReport proof;

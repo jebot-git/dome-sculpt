@@ -88,6 +88,9 @@ int main(int argc, char **argv) try {
     throw std::invalid_argument("Unknown explicit heat pose control");
   bool primitive = policy == "primitive", male = gender == "male";
   double strength = argc > 5 ? std::stod(argv[5]) : 1;
+  std::string geometry_normals = argc > 6 ? argv[6] : "area";
+  if (geometry_normals != "area" && geometry_normals != "unit")
+    throw std::invalid_argument("Unknown explicit heat geometric normal mode");
   Scene scene;
   auto controls =
       male ? humanoid_baseline_defaults("vroid-beta-male") : HumanoidControls{};
@@ -106,9 +109,9 @@ int main(int argc, char **argv) try {
             << "FIXED_QUALITY gender=" << (male ? "male" : "female")
             << " policy=" << (primitive ? "original-primitive" : "whole-skin")
             << " visibility=" << visibility << " occlusion=" << domain
-            << " heat_strength=" << strength << " height=" << height
-            << " mean_limit=" << mean_limit << " max_limit=" << max_limit
-            << '\n';
+            << " heat_strength=" << strength << " normals=" << geometry_normals
+            << " height=" << height << " mean_limit=" << mean_limit
+            << " max_limit=" << max_limit << '\n';
   size_t solved = 0, refused = 0, quality = 0, seam_fail = 0, native_fail = 0;
   for (const auto &o : scene.objects()) {
     if (!o.painted || !o.deformation || !o.deformation->skin ||
@@ -125,6 +128,9 @@ int main(int argc, char **argv) try {
                               : HeatOcclusion::WholeMesh;
       options.maximum_seed_distance = 1;
       options.heat_strength = strength;
+      options.geometry_normals = geometry_normals == "unit"
+                                     ? HeatNormals::UnitFaces
+                                     : HeatNormals::AreaWeighted;
       auto profile = imported_heat_profile(
           *o.deformation->skeleton, *o.appearance, options, {},
           &*o.deformation->humanoid,
