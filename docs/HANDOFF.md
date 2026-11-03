@@ -4,6 +4,52 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Full-affine skin binding checkpoint — 2026-11-03
+
+Runtime `17cbf54` extends public `30991dd`: existing desktop/controller automatic
+bind and transfer accept reflected/sheared placements, measure actual world
+distances, preserve exact local rest/pose/inverse-bind authority and retain
+source/paint/morph data. Common-origin packing fixes valid distant scenes.
+Actual exported sheared joints use valid factored TRS helper hierarchies.
+Selected Release9/9 and fresh owned-core/support sanitizer9/9 pass; native
+FLTK11 plus compact BDF5 pass. New proof includes136 authoring assertions,
+733 persistent allocation-denial boundaries,11 controller and162 independent
+export assertions. Twelve GLBs have0Khronos errors/12 retained non-root warnings.
+Read SKIN-AFFINE.md and validation/SKIN-AFFINE.json. No new schema, physical
+test, GPU rig solver, system installation or complete production qualification.
+
+## Reverse quality GPU checkpoint — 2026-11-03
+
+Runtime merge `772213d` combines qualified `1be8ab6`/`ac920ed` with main
+`ede6686`, preserving retopology and newer atomic vendor brush transfers. Large
+measured coarsening uses exact layer/mask error maxima on the selected GPU;
+other tiers retain deliberate native CPU quality. Fresh native CPU/OneAPI apps
+compile; selected CPU 12/12, Arc 9/9 and owned-core sanitizer 12/12 pass. Native
+FLTK 15 plus compact BDF 4 checks pass. The committed CPU oracle and actual
+application/synthetic-XR test add ten checks: 37,193 to 4,697 samples, complete
+accepted object data exact, cancelled scene exact, both Arc GL eyes and actual
+maximum_error kernels/scalar readback in the rendering application. Merged
+vendor modules and missing-device probes pass; positive AMD/NVIDIA execution
+remains unavailable. Read GPU-QUALITY-INTEGRATION.md and its receipt. No physical
+test, system installation or session restart. The full goal remains active.
+
+## Manual retopology bridge/extrude checkpoint — 2026-11-03
+
+Runtime/test b001ac7 extends main 2c31f3e with disjoint boundary/wire bridging and
+source-projected edge extrusion through the shared native/controller worker.
+Stable IDs, source attributes, no-motion/return-to-anchor/Cancel, one draft
+Undo, Apply/global history, Save/reopen and actual GLB export are verified.
+Five selected Release suites pass 2.20 s; five fresh owned-core/support sanitizer
+suites pass 31.58 s, including 2,978 persistent-denial boundaries per build.
+Actual FLTK 15 plus compact-BDF 6 and four Khronos files, 0 errors/0 warnings pass.
+Read RETOPO-AUTHORING.md and validation/RETOPO-EDGES.json for scoped proof and
+preserved initial wire/control-fixture failures. No new physical headset,
+loader/GPU proof or system installation. The complete goal stays active.
+
+DomeD HEAD/remote is now db0dba0; its toolkit hooks, bitmap patches and BDF helper
+are unchanged from d271cf6. Existing canonical toolkit/bitmap builds remain valid;
+notification-audio chrome changes do not alter the shared toolkit.
+
 ## Additional queued phase — controller spatial drawers, 2026-11-02
 
 The user additionally requires controller-mounted spatial drawers: interactive
@@ -333,7 +379,7 @@ mask-before-first-mesh input bug and old loader palette route. Production9684486
 scopes material epoch fencing to mesh sampling; its exact strengthened mask
 fixture first fails against the old archive with the real preview worker gated.
 Corrected fresh coherent optimized core/support/render/frontend and own C/C++SAN
-builds pass; targeted5/5 pass0.75s Release and5/5 pass3.67s SAN, retaining existing
+builds pass; targeted5/5 pass0.75s Release and 5/5 pass3.67s SAN, retaining existing
 mesh stale/held-pressure guards. Native/core/frontend inputs and binaries stay
 unchanged through the final test-only runtime retimecc3bf97.
 

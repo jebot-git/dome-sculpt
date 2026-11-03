@@ -21,7 +21,8 @@ creator_flow=os.environ.get("DOME_MENU_CREATOR_ONLY")=="1"
 bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
 rig_compact = os.environ.get("DOME_MENU_RIG_COMPACT") == "1"
 retopo_compact = os.environ.get("DOME_MENU_RETOPO_COMPACT") == "1"
-retopo_flow = os.environ.get("DOME_MENU_RETOPO") == "1" or retopo_compact
+retopo_edges = os.environ.get("DOME_MENU_RETOPO_EDGES") == "1"
+retopo_flow = os.environ.get("DOME_MENU_RETOPO") == "1" or retopo_compact or retopo_edges
 cut_compact = os.environ.get("DOME_MENU_CUT_COMPACT") == "1"
 colored_cut = os.environ.get("DOME_MENU_COLORED_CUT") == "1"
 key_cut = os.environ.get("DOME_MENU_CUT_KEY_SCULPT") == "1"
@@ -36,7 +37,7 @@ if sum((rig_flow, export_flow, bake_flow, retopo_flow, cut_flow)) > 1:
     raise ValueError("Select one menu fixture flow: rig, export or bake")
 out = root / ("artifacts/menu-rig-compact" if rig_compact else "artifacts/menu-export" if export_flow else "artifacts/menu-bake-compact" if bake_compact else "artifacts/menu-bake-cancel" if bake_cancel else "artifacts/menu-bake" if bake_flow else "artifacts/menu-rig" if rig_flow else "artifacts/menu-voxel-compact" if compact else "artifacts/menu")
 if retopo_flow:
-    out = root / ("artifacts/menu-retopo-compact" if retopo_compact else "artifacts/menu-retopo")
+    out = root / ("artifacts/menu-retopo-edges" if retopo_edges else "artifacts/menu-retopo-compact" if retopo_compact else "artifacts/menu-retopo")
 if cut_flow:
     out = root / (("artifacts/menu-colored-held-cut-compact" if held_cut and cut_compact else "artifacts/menu-colored-held-cut" if held_cut else "artifacts/menu-colored-key-cut" if key_cut else "artifacts/menu-colored-cut-compact" if cut_compact else "artifacts/menu-colored-cut") if colored_cut else ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut"))
 if creator_flow:
@@ -399,8 +400,23 @@ async def main():
             for dx,dy in ((-70,70),(70,70),(70,-70),(-70,-70)):
                 press(g.width*.5+dx,g.height*.5+dy);release();await asyncio.sleep(.25)
             await ready("Make face");pixels().save(out/"ordered-corners.png")
+            if retopo_edges:
+                nodes,_=await layout()
+                check(nodes["Bridge edges"][1].get("enabled") is True and nodes["Extrude edge"][1].get("enabled") is False,
+                      "Four selected points enable Bridge and disable Extrude in the universal menu")
             await click("Make face");await ready("Apply patch")
             check(info()["scene_hash"]==baseline["scene_hash"],"Ordered face remains an unconfirmed draft until Apply")
+            if retopo_edges:
+                for dx in (-70,70):
+                    press(g.width*.5+dx,g.height*.5+70);release();await asyncio.sleep(.3)
+                await ready("Extrude edge");await click("Extrude edge")
+                nodes,_=await layout()
+                check(nodes["Extrude edge"][1].get("toggle-state")==1 and nodes["Move points"][1].get("toggle-state")==0 and nodes["Place points"][1].get("toggle-state")==0,
+                      "Extrude is an exclusive native tool radio with selected edge endpoints")
+                press(g.width*.5,g.height*.5+70);await asyncio.sleep(.3)
+                xtest.fake_input(d,X.MotionNotify,x=g.x+int(g.width*.5),y=g.y+int(g.height*.5+100));d.sync();await asyncio.sleep(.5)
+                pixels().save(out/"extruded-preview.png");release();await asyncio.sleep(.4)
+                check(info()["scene_hash"]==baseline["scene_hash"],"Actual native extrusion drag retains the committed source until Apply")
             await click("Move points")
             nodes,_=await layout()
             check(nodes["Move points"][1].get("toggle-state")==1 and nodes["Place points"][1].get("toggle-state")==0,
@@ -408,7 +424,7 @@ async def main():
             await click("Apply patch");await ready("Save");await click("Save")
             accepted=info()
             (out / "accepted-scene.json").write_text(json.dumps({"baseline": baseline, "accepted": accepted}, indent=2))
-            check(len(accepted["objects"])==2 and accepted["retopology_vertices"]==4 and accepted["retopology_faces"]==1
+            check(len(accepted["objects"])==2 and accepted["retopology_vertices"]==(6 if retopo_edges else 4) and accepted["retopology_faces"]==(2 if retopo_edges else 1)
                   and accepted["objects"][0]["payload_hash"]==baseline["objects"][0]["payload_hash"]
                   and accepted["objects"][0]["visible"] is False,
                   "Native Apply and Save persist an editable quad and atlas mesh while retaining the exact hidden source")

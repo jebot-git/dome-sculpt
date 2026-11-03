@@ -11,7 +11,8 @@ struct RetopoPatch {
 };
 enum class RetopoAction {
   BeginGesture, Sample, EndGesture, CancelGesture,
-  Mode, Face, Wire, Delete, Pin, Seam, Relax, Snap, Clear, Undo, Redo, PlaceMode, MoveMode
+  Mode, Face, Wire, Delete, Pin, Seam, Relax, Snap, Clear, Undo, Redo, PlaceMode, MoveMode,
+  BridgeEdges, ExtrudeMode
 };
 struct RetopoView {
   std::shared_ptr<const RetopoMesh> topology;
@@ -21,6 +22,7 @@ struct RetopoView {
   uint64_t revision = 1;
   bool moving = false, can_undo = false, can_redo = false, changed = false;
   bool busy = false, committing = false;
+  bool extruding = false;
   float snap_mm = 50;
   std::string error;
 };
@@ -41,6 +43,7 @@ private:
   std::optional<RetopoView> gesture_;
   TopologyID moving_vertex_ = 0;
   bool sampled_ = false;
+  Vec3 extrude_anchor_{};
   void remember(RetopoView);
   void finish_gesture(bool cancel);
 };

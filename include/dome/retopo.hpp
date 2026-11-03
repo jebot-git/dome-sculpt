@@ -28,6 +28,10 @@ struct RetopoRelaxOptions {
   float strength = .5f, maximum_snap_distance = .1f;
   std::function<bool()> cancelled;
 };
+struct RetopoExtrusion {
+  std::array<TopologyID, 2> outer{};
+  TopologyID edge = 0, face = 0;
+};
 // Value snapshots preserve all stable IDs, attributes and the allocation
 // cursor. Mutations either complete or leave the original value untouched. IDs
 // are never recycled inside a history branch. Wire edges and isolated vertices
@@ -47,6 +51,14 @@ public:
   TopologyID add_vertex(RetopoVertex);
   TopologyID add_edge(TopologyID a, TopologyID b, bool seam = false);
   TopologyID add_face(std::span<const TopologyID>, uint32_t material = 0);
+  // Ordered quad boundary: first/second and third/fourth must be existing,
+  // disjoint wire or boundary edges. Existing IDs/materials/seams survive.
+  TopologyID bridge_edges(std::array<TopologyID, 4>,
+                         const std::function<bool()> &cancelled = {});
+  // Positions correspond to edge.a/edge.b. New endpoints are unpinned; the
+  // outer edge inherits the source seam and the face its incident material.
+  RetopoExtrusion extrude_edge(TopologyID, std::array<Vec3, 2>,
+                              const std::function<bool()> &cancelled = {});
   void remove_face(TopologyID);
   void remove_edge(TopologyID);   // Must have no incident face.
   void remove_vertex(TopologyID); // Must have no incident edge/face.

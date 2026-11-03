@@ -165,7 +165,7 @@ void Document::native_loop(){
         } else geometry=shape?std::make_shared<const Mesh>(shape->preview()):o.deformation?std::make_shared<const Mesh>(o.deformation->preview(o.painted->mesh())):std::shared_ptr<const Mesh>(o.painted,&o.painted->mesh());
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
         if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
-        SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};
+        SurfaceRange range{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings};
         range.reflected=reflected;
         if(o.painted->paint_sampling_domain()) {
           range.paint_sampling_attachment=o.painted->paint_sampling_attachment();
@@ -255,7 +255,7 @@ void Document::native_loop(){
         if(now-shown>=std::chrono::milliseconds(30)){
           auto preview=working.snapshot();
           if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());author_shapekey(preview,o.id,edit,cancelled);detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
-            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);SurfaceRange range{o.id,0,geometry.indices.size(),o.material,o.painted->preview(o.material),o.appearance,0,o.material_bindings};range.reflected=session->affine_world&&frame.orientation()==AffineOrientation::Reversing;range.pbr_view=session->pbr_view;query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);
+            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);SurfaceRange range{o.id,0,geometry.indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings};range.reflected=session->affine_world&&frame.orientation()==AffineOrientation::Reversing;range.pbr_view=session->pbr_view;query=std::make_unique<MaterialSurfaceQuery>(geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors);
           }
           std::lock_guard lock(model_mutex_);
           if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");

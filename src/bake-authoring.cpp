@@ -58,7 +58,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   // Authenticate ordered REST geometry before evaluation. Skin/morph changes
   // positions/normals later, never the source field's corner identity or RGBA.
-  auto source_maps=source.mesh_active?source.painted->preview(source.material):std::shared_ptr<const TextureMaps>{};
+  auto source_maps=source.mesh_active?source.painted->preview(source.material,cancelled):std::shared_ptr<const TextureMaps>{};
   auto source_colors=source.mesh_active?detail::current_vertex_colors(source.painted->mesh(),current?&*current:nullptr,
       source.appearance.get(),source.material_bindings.get(),source_maps.get(),cancelled):std::vector<PolygonRgba>{};
   std::shared_ptr<const PolygonColorSurface> target_current;
@@ -67,7 +67,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     descriptor->topology=std::make_shared<const PolygonMesh>(target.polygon->topology);
     descriptor->field=target.polygon->colors;target_current=std::move(descriptor);
   }
-  auto target_maps=current_target?target.painted->preview(target.material):std::shared_ptr<const TextureMaps>{};
+  auto target_maps=current_target?target.painted->preview(target.material,cancelled):std::shared_ptr<const TextureMaps>{};
   auto target_colors=current_target?detail::current_vertex_colors(target.painted->mesh(),target_current.get(),
       target.appearance.get(),target.material_bindings.get(),target_maps.get(),cancelled)
       :detail::source_vertex_colors(target.appearance.get(),target.painted->mesh().positions.size(),cancelled);

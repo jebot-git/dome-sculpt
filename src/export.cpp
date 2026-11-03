@@ -448,6 +448,8 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
         } else {
         const auto local_matrices=s.local_matrices(d.pose);
         int first_joint = int(j["nodes"].size());
+        std::vector<std::optional<AffineGltfFactors>> joint_factors(s.bones.size());
+        std::vector<int> joint_roots(s.bones.size());
         for (size_t index = 0; index < s.bones.size(); ++index) {
           emission.joints.push_back(uint32_t(first_joint+index));
           const auto &b = s.bones[index];
@@ -459,7 +461,19 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
                {"rotation",
                 {t.rotation.x, t.rotation.y, t.rotation.z, t.rotation.w}},
                {"scale", {t.scale.x, t.scale.y, t.scale.z}}});
-          if(b.rest_matrix){if(!detail::gltf_trs_matrix(local_matrices[index]))throw std::invalid_argument("Exact joint affine requires hierarchy-preserving glTF transport; a sheared node matrix is not valid glTF");j["nodes"].back().erase("translation");j["nodes"].back().erase("rotation");j["nodes"].back().erase("scale");j["nodes"].back()["matrix"]=local_matrices[index];}
+          joint_roots[index]=first_joint+int(index);
+          if(b.rest_matrix){
+            j["nodes"].back().erase("translation");j["nodes"].back().erase("rotation");j["nodes"].back().erase("scale");
+            if(detail::gltf_trs_matrix(local_matrices[index]))j["nodes"].back()["matrix"]=local_matrices[index];
+            else {joint_factors[index]=factor_edit_for_gltf(AffineTransform(local_matrices[index]),cancelled);j["nodes"].back()["matrix"]=joint_factors[index]->nodes[1].float_matrix();}
+          }
+        }
+        // Keep bone leaf IDs contiguous/stable for JOINTS and semantic metadata.
+        // A verified affine helper is the parent of that bone, never a sheared
+        // glTF node or a rewritten inverse bind.
+        for(size_t index=0;index<s.bones.size();++index)if(joint_factors[index]){
+          joint_roots[index]=int(j["nodes"].size());
+          j["nodes"].push_back({{"name",s.bones[index].name+" affine pose/rest factor"},{"matrix",joint_factors[index]->nodes[0].float_matrix()},{"children",nlohmann::json::array({first_joint+int(index)})}});
         }
         int rig_parent=node;
         if(s.space_matrix){
@@ -479,7 +493,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
           int parent = s.bones[index].parent < 0
                            ? rig_parent
                            : first_joint + s.bones[index].parent;
-          j["nodes"][parent]["children"].push_back(first_joint + int(index));
+          j["nodes"][parent]["children"].push_back(joint_roots[index]);
         }
         if (d.skin) {
           begin = data.size();

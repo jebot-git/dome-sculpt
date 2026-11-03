@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/skin-authoring.hpp"
+#include "skin-affine.hpp"
 #include <nlohmann/json.hpp>
 namespace dome {
 namespace {
@@ -64,12 +65,27 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   source.validate(reference.painted->mesh());
   if(target.id!=reference.id && target.deformation) target.deformation->validate(target.painted->mesh());
   stop(cancelled);
-  auto reference_world=scene.world_transform(reference.id), target_world=scene.world_transform(target.id);
+  const bool exact_metric=scene.has_affine_placement(reference.id)||scene.has_affine_placement(target.id)||
+    source.skeleton->space_matrix||source.skeleton->inverse_bind_override||
+    std::any_of(source.skeleton->bones.begin(),source.skeleton->bones.end(),[](const Bone &b){return bool(b.rest_matrix);});
+  auto reference_world=exact_metric?CanvasTransform{}:scene.world_transform(reference.id);
+  auto target_world=exact_metric?CanvasTransform{}:scene.world_transform(target.id);
   auto source_to_target=ob::compose(ob::inverse(target_world),reference_world);
   auto target_to_source=ob::compose(ob::inverse(reference_world),target_world);
+  auto reference_matrix=exact_metric?scene.world_matrix(reference.id):AffineTransform{};
+  auto target_matrix=exact_metric?scene.world_matrix(target.id):AffineTransform{};
+  // Translation does not belong to a distance metric. Use one common world
+  // origin so distant valid placements neither lose float precision nor hit
+  // the solver's local coordinate bound merely because of a shared offset.
+  auto origin=AffineTransform{}.matrix();
+  for(size_t i=0;i<3;++i)origin[12+i]=-reference_matrix.matrix()[12+i];
+  const auto shift=AffineTransform(origin);
+  const auto reference_metric=shift*reference_matrix,target_metric=shift*target_matrix;
+  auto change=target_metric.inverse()*reference_metric;
+  detail::SkinGeometryWork placement_work(options.maximum_work,cancelled);
   auto skeleton=*source.skeleton;
   auto pose=source.pose;
-  for(size_t i=0;i<skeleton.bones.size();++i) if(skeleton.bones[i].parent<0) {
+  for(size_t i=0;!exact_metric && i<skeleton.bones.size();++i) if(skeleton.bones[i].parent<0) {
     skeleton.bones[i].rest=root_transform(skeleton.bones[i].rest,source_to_target);
     if(!pose.empty()) pose[i]=root_transform(pose[i],source_to_target);
   }
@@ -85,7 +101,8 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
     return a.position.x==b.position.x && a.position.y==b.position.y && a.position.z==b.position.z &&
       rotation && a.scale==b.scale;
   };
-  bool same_placement=equal_placement(reference_world,target_world);
+  bool same_placement=exact_metric?reference_matrix.matrix()==target_matrix.matrix():equal_placement(reference_world,target_world);
+  if(exact_metric&&!same_placement)skeleton=detail::skin_reframe(*source.skeleton,change,placement_work);
   if(same_placement) { skeleton=*source.skeleton; pose=source.pose; }
   if(existing && target.deformation->skeleton->encode()!=skeleton.encode())
     throw std::invalid_argument("Target has a different rest rig; use an explicit joint-mapping workflow");
@@ -107,20 +124,31 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
     }
     if(closed){stop(cancelled);return false;}
   }
+  std::optional<HumanLandmarks> affine_landmarks;
+  if(!existing&&source.landmarks&&exact_metric&&!same_placement)
+    affine_landmarks=detail::skin_reframe_landmarks(*source.landmarks,change,placement_work);
   auto rest=target.painted->mesh();
-  for(size_t i=0;!same_placement && i<rest.positions.size();++i) {
+  for(size_t i=0;!exact_metric && !same_placement && i<rest.positions.size();++i) {
     if(!(i%1024)) stop(cancelled);
     rest.positions[i]=point(target_to_source,rest.positions[i]);
     rest.normals[i]=direction(target_to_source,rest.normals[i]);
   }
+  if(exact_metric)rest=detail::skin_world_mesh(rest,target_metric,placement_work);
   SkinWeights weights;
   if(options.mode==SkinAuthoringMode::Automatic) {
     BindOptions bind; bind.limits=options.limits; bind.maximum_work=options.maximum_work;
     bind.maximum_seed_distance=options.seed_distance/reference_world.scale;
     bind.seed_margin=options.seed_margin/reference_world.scale; bind.falloff=options.falloff;
-    weights=automatic_bind(rest,*source.skeleton,bind,cancelled);
+    if(exact_metric){
+      auto world_rig=detail::skin_reframe(*source.skeleton,reference_metric,placement_work);
+      bind.maximum_seed_distance=options.seed_distance;bind.seed_margin=options.seed_margin;bind.maximum_work=placement_work.remaining();
+      weights=automatic_bind(rest,world_rig,bind,cancelled);
+    }else weights=automatic_bind(rest,*source.skeleton,bind,cancelled);
   } else {
-    weights=transfer_weights(reference.painted->mesh(),*source.skin,rest,skeleton.bones.size(),
+    if(exact_metric){
+      auto source_mesh=detail::skin_world_mesh(reference.painted->mesh(),reference_metric,placement_work);
+      weights=transfer_weights(source_mesh,*source.skin,rest,skeleton.bones.size(),options.transfer_distance,options.limits,cancelled,placement_work.remaining());
+    }else weights=transfer_weights(reference.painted->mesh(),*source.skin,rest,skeleton.bones.size(),
                              options.transfer_distance/reference_world.scale,options.limits,cancelled,options.maximum_work);
   }
   if(!options.locks.empty()) for(size_t vertex=0;vertex<weights.vertices.size();++vertex) {
@@ -148,7 +176,8 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
     next.pose=std::move(pose); next.humanoid=source.humanoid;
     if(source.landmarks) {
       next.landmarks=*source.landmarks;
-      if(!same_placement) {
+      if(affine_landmarks)next.landmarks=std::move(affine_landmarks);
+      else if(!same_placement) {
         for(auto &[name,p]:next.landmarks->points) p=point(source_to_target,p);
         next.landmarks->left=direction(source_to_target,next.landmarks->left);
         next.landmarks->up=direction(source_to_target,next.landmarks->up);

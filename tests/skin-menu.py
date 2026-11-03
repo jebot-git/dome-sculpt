@@ -21,7 +21,9 @@ if os.environ.get("DOME_SKIN_MENU_BUS") != "1":
               {**os.environ, "DOME_SKIN_MENU_BUS": "1"})
 ROOT = Path(__file__).resolve().parents[1]
 COMPACT = os.environ.get("DOME_SKIN_MENU_COMPACT") == "1"
-OUT = ROOT / ("artifacts/menu-skin-compact" if COMPACT else "artifacts/menu-skin-workflow")
+AFFINE = os.environ.get("DOME_SKIN_MENU_AFFINE") == "1"
+FIXTURE_TOOL = "dome-sculpt-skin-affine-test" if AFFINE else "dome-sculpt-skin-authoring-test"
+OUT = ROOT / ("artifacts/menu-skin-affine-compact" if AFFINE and COMPACT else "artifacts/menu-skin-affine" if AFFINE else "artifacts/menu-skin-compact" if COMPACT else "artifacts/menu-skin-workflow")
 OUT.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -65,7 +67,7 @@ async def main():
             config.parent.mkdir(parents=True,exist_ok=True)
             config.write_text(json.dumps({"font":"Unifont / Sans-Serif","font_size":16,"font_scale":2}))
         fixture = Path(task_home, "skin.dsculpt")
-        subprocess.run([str(ROOT / "build/dome-sculpt-skin-authoring-test"), "--ui-fixture", str(fixture)], check=True)
+        subprocess.run([str(ROOT / "build" / FIXTURE_TOOL), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
         app = subprocess.Popen([str(ROOT / "build/dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
         processes.append(app)
@@ -143,7 +145,7 @@ async def main():
             raise TimeoutError("Native command remained busy: " + label)
 
         def inspect():
-            return json.loads(subprocess.check_output([str(ROOT / "build/dome-sculpt-skin-authoring-test"), "--inspect", str(fixture)], env=env))
+            return json.loads(subprocess.check_output([str(ROOT / "build" / FIXTURE_TOOL), "--inspect", str(fixture)], env=env))
 
         def enter(widget, y, text):
             geometry = widget.get_geometry()

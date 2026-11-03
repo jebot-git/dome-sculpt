@@ -1,0 +1,105 @@
+{
+  "runtime_source": "b001ac75a9c9a325bdbd346013f2f13dda474a67",
+  "worktree": "artifacts/retopo-bridge-extrude-2c31f3e",
+  "base_main": "2c31f3e5f58ad8a868040ff49cab0733a2eef882",
+  "scope": "Native manual retopology bridge/extrude extension; full production goal incomplete",
+  "release": {
+    "registered_suites": 5,
+    "passed": 5,
+    "seconds": 2.2,
+    "new_workflow_checks": 130,
+    "persistent_denial_boundaries": 2978
+  },
+  "sanitize": {
+    "registered_suites": 5,
+    "passed": 5,
+    "seconds": 31.58,
+    "instrumentation": "Fresh owned C/C++ core/support/render/frontend -O1 ASan+UBSan; selected native core tests execute, no SAN GUI claim",
+    "persistent_denial_boundaries": 2978
+  },
+  "gui": {
+    "native_xvfb_software_checks": 15,
+    "compact_640x360_2x_unifont_checks": 6,
+    "visually_reviewed": [
+      "extruded-preview.png",
+      "projection-large-bdf.png"
+    ]
+  },
+  "interop": {
+    "gltf_validator": "2.0.0-dev.3.10",
+    "files": 4,
+    "unique_geometries": 2,
+    "errors": 0,
+    "warnings": 0,
+    "includes": "Actual native strip and controller bridge+strip; Release and SAN exports"
+  },
+  "source_manifest": {
+    "tracked_inputs_unchanged_through_validation": 1160,
+    "source_commit": "b001ac7",
+    "metadata_edits_after_validation": true
+  },
+  "binary_manifest": {
+    "release_unchanged": 16,
+    "sanitize_unchanged": 16,
+    "timing_note": "Release capture precedes its selected tests. SAN test command started concurrently with binary hash collection; SAN hashes are sealing/unchanged observations, not a strict pre-execution manifest."
+  },
+  "preserved_initials": [
+    "5ed872e Release 2/3: controller fixture navigated after opening modal workspace; final fixture navigates before Begin, using actual menu",
+    "Standalone old wire probe accepts +Y but refuses -Y; b001ac7 adds outward orientation only for wires",
+    "5ed872e owned SAN selected 3/3,19.22s; final 5/5 supersedes that scope"
+  ],
+  "toolkit": {
+    "current_domed_and_remote": "db0dba05209ff09255e12455c8d0e3b8f0bd075c",
+    "unchanged_from": "d271cf65c612a462fcfa6739416b06c6565be070",
+    "paths_compared": [
+      "native/toolkit-hooks",
+      "native/bdf_font.hpp",
+      "native/bitmap-runtime"
+    ],
+    "prefixes": [
+      "artifacts/toolkit-eee23b7",
+      "artifacts/bitmap-runtime-eee23b7"
+    ]
+  },
+  "not_claimed": [
+    "physical headset/stylus acceptance",
+    "new OpenXR loader or XR palette raster proof",
+    "new positive GPU/backend proof",
+    "system installation",
+    "full-suite production qualification",
+    "certified face-interior Hausdorff bound",
+    "automatic quad generation or completed retopology row"
+  ],
+  "artifacts": {
+    "build-release.log": "08e71bc74b1e325439a7cb10250a7f2ebb4772d245083a9b6e1a965e710ee1fd",
+    "build-sanitize.log": "0aa52597a9af136b5add7bffe972bf42dcc0a875071d0dbf36e44a672c528021",
+    "build-release-final.log": "d1c65787408ae245bf4baa561019af4ba13ce6899e35ef38ea0ea9c3d3027b53",
+    "build-sanitize-final.log": "e29460dda0c019fd99dcdb76dbd0d024b0a360f30c26320db35ff56f1374fe3f",
+    "tests-release-initial.log": "8fafff2f5dcfb5dbf06a39715836fd24e7eaa395f1641646d2452dbf89c90d5f",
+    "tests-boundaries-initial.log": "ed27186bc369bdbbf7a2556d9c167b77d77327467a39cdb64a477457098c9d5e",
+    "tests-sanitize-initial.log": "c85b868acc10b4e20f9b1ec671d04ac6381336dbd2b16ded9114130c567d820c",
+    "tests-release-final.log": "43e03177e34b05c630a574808e7954c0f32bd4f3a46e6193e02b2411cd490f3f",
+    "tests-sanitize-final.log": "6a5459a75eb718cb2db0f8ab752e62b234f3325968394339fe8e69d7d41a88c8",
+    "menu-edges-final.log": "817548be7b88a7b4e72400db34727eb5380c60cf4ce29f9f581694fd7c4347dc",
+    "menu-compact-final.log": "76e79b59d3e66ce0f371b5f04b4c89333c7b1d090d845c13cc99212e77916ade",
+    "wire-direction-negative.cpp": "756b975ee9ceb431d46eb49e1b30f9a355eb8ce07f23a28d5d44318c63071f0a",
+    "wire-direction-negative": "33d77e1425732649f8d041246dc5cb646b4235d7327d304065c2ace3f9132a46",
+    "wire-direction-negative.log": "7c4ed9f0673f074dbb828466267b04d57c2b699455a4edca9489e35fabc5e783",
+    "khronos-final.json": "349cc13c233eafb96a33fb417ab128db2d1700ee66d76a76892d95d42f46114b",
+    "source-final-before.json": "09c5921af765eef0301ca55a6c5eabd3d45979c488824c14a63ca32d70f09ba0",
+    "source-final-after.json": "09c5921af765eef0301ca55a6c5eabd3d45979c488824c14a63ca32d70f09ba0",
+    "build-final-before.json": "a095e92dd02c856f0f31ef7b66d5ac0dd42e6723044264252b8228b07b186919",
+    "build-final-after.json": "a095e92dd02c856f0f31ef7b66d5ac0dd42e6723044264252b8228b07b186919",
+    "build-sanitize-final-before.json": "4a69ed37e0d57e53ab251538cc1d20450deeebfb9efc8f7789961640efae1ef8",
+    "build-sanitize-final-after.json": "4a69ed37e0d57e53ab251538cc1d20450deeebfb9efc8f7789961640efae1ef8",
+    "menu-retopo-edges/report.json": "ac0d27448ddbe81e04149576d89b99ab9594d03870caffddf66c54cfedbbd4d3",
+    "menu-retopo-compact/report.json": "aaf4a284962b4974a6af105a376575704b296778b21ec279ec2a1487540b343b",
+    "menu-retopo-edges/extruded-preview.png": "79ed6fa5be6f93563ab2e5e03177713cf424fd0171a82c16765ca0c013d4024a",
+    "menu-retopo-compact/projection-large-bdf.png": "c181bca81b91b973d5b89e2e46f2f5ccdb17e984ba107a6b0dce9e777c45f4bc",
+    "consumer-release/strip.glb": "fb910f338c1f0a3a3f83eade4369f38c40b4d5f2d6d031f29913ba16581da5d7",
+    "consumer-release/bridge-strip.glb": "ecd9ccbeb810e781265f0533659d32785030a76d240fc9853311ffdb85264b88",
+    "consumer-sanitize/strip.glb": "fb910f338c1f0a3a3f83eade4369f38c40b4d5f2d6d031f29913ba16581da5d7",
+    "consumer-sanitize/bridge-strip.glb": "ecd9ccbeb810e781265f0533659d32785030a76d240fc9853311ffdb85264b88",
+    "current-toolkit-inputs-diff.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -34,6 +34,40 @@ template<class Map> double interpolate(const Map &map,Int3 q,float target,float 
   }
   return result;
 }
+// The complete-cost benchmark justifies this tier only for sizeable coarsening.
+// Small fields/refinement deliberately retain the native paged-map quality path;
+// backend errors never cause a change of path or a CPU retry.
+bool aggregate_quality(size_t original,size_t reconstructed,float source,float target) {
+  return compute_backend()!="CPU" && target>=source*1.25f &&
+         original>=32768 && reconstructed<=original;
+}
+template<class Original,class Reconstructed>
+double reconstruction_error(const Original &original,const Reconstructed &reconstructed,
+                            float source,float target,double background,Work &work) {
+  if(!aggregate_quality(original.size(),reconstructed.size(),source,target)) {
+    double maximum=0;
+    for(auto [q,value]:original)
+      maximum=std::max(maximum,std::abs(interpolate(reconstructed,q,source,target,background,work)-double(value)));
+    return maximum;
+  }
+  std::vector<sparse_resample::Entry> entries;entries.reserve(reconstructed.size());
+  for(auto [q,value]:reconstructed){work.visit();entries.push_back({{q.x,q.y,q.z},double(value)});}
+  sparse_resample::Grid grid(entries,[&]{work.stop();},[&](size_t count){work.visit(count);});
+  std::vector<sparse_resample::ErrorQuery> queries;queries.reserve(65536);
+  SparseFieldSampler sampler(grid,sparse_resample::parameters(target,source,background));
+  uint64_t maximum=0;
+  auto flush=[&] {
+    if(queries.empty())return;
+    work.stop();maximum=std::max(maximum,sampler.maximum_error(queries,work.options.cancelled));
+    work.stop();queries.clear();
+  };
+  for(auto [q,value]:original) {
+    work.visit(8);
+    queries.push_back({{q.x,q.y,q.z},0,std::bit_cast<uint64_t>(double(value))});
+    if(queries.size()==65536)flush();
+  }
+  flush();return std::bit_cast<double>(maximum);
+}
 // Union occupied interpolation cells before projecting supports to target tiles.
 // Disconnected objects/mirrors do not enumerate their global empty-space hull.
 template<class Map,class Emit> void sample_field(const Map &input,float source,float target,double background,size_t remaining,Work &work,Emit emit) {
@@ -237,13 +271,12 @@ SculptResolutionResult resample_sculpt(const Volume &source,const SculptResoluti
       output.delta.emplace(q,value);return true;
     });
     bool meaningful=false;
+    size_t checked=0;
+    for(auto [q,value]:layer.delta){(void)q;if(value!=0){meaningful=true;break;}if((++checked&255)==0)work.stop();}
     const double tolerance=options.maximum_layer_error>0?options.maximum_layer_error:std::max(source.voxel_size(),next.voxel_size());
-    for(auto [q,value]:layer.delta) {
-      meaningful|=value!=0;
-      auto error=std::abs(interpolate(output.delta,q,source.voxel_size(),next.voxel_size(),0,work)-value);
-      result.report.maximum_layer_error=std::max(result.report.maximum_layer_error,float(error));
-      if(error>tolerance)throw std::runtime_error("Sculpt resolution loses independent layer detail beyond the requested metre bound");
-    }
+    const auto error=reconstruction_error(layer.delta,output.delta,source.voxel_size(),next.voxel_size(),0,work);
+    result.report.maximum_layer_error=std::max(result.report.maximum_layer_error,float(error));
+    if(error>tolerance)throw std::runtime_error("Sculpt resolution loses independent layer detail beyond the requested metre bound");
     if(meaningful && !output.delta.size())throw std::runtime_error("Sculpt resolution removes an existing displacement layer");
     result.report.layer_samples+=output.delta.size();next.layers_.push_back(std::move(output));
   }
@@ -255,11 +288,9 @@ SculptResolutionResult resample_sculpt(const Volume &source,const SculptResoluti
     next.mask_.values.emplace(q,value);return true;
   });
   result.report.mask_samples=next.mask_.values.size();
-  for(auto [q,value]:source.mask_.values) {
-    auto error=std::abs(interpolate(next.mask_.values,q,source.voxel_size(),next.voxel_size(),next.mask_.background,work)-value);
-    result.report.maximum_mask_error=std::max(result.report.maximum_mask_error,float(error));
-    if(error>options.maximum_mask_error)throw std::runtime_error("Sculpt resolution loses protection detail beyond the requested bound");
-  }
+  const auto mask_error=reconstruction_error(source.mask_.values,next.mask_.values,source.voxel_size(),next.voxel_size(),next.mask_.background,work);
+  result.report.maximum_mask_error=std::max(result.report.maximum_mask_error,float(mask_error));
+  if(mask_error>options.maximum_mask_error)throw std::runtime_error("Sculpt resolution loses protection detail beyond the requested bound");
   if(source.mask_.values.size() && !next.mask_.values.size())throw std::runtime_error("Sculpt resolution removes existing protection detail");
   work.phase(.5f,.55f);next.recompose();next.geometry_history_.reset();quality(source,next,work);work.stop();
   work.notify(.98f);work.stop();

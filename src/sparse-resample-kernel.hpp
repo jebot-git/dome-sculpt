@@ -2,6 +2,7 @@
 #pragma once
 #include "softfloat/dome_f64.hpp"
 #include <cstdint>
+#include <cstddef>
 #if defined(__CUDACC__) || defined(__HIPCC__)
 #define DOME_RESAMPLE_FN __host__ __device__ inline
 #else
@@ -9,6 +10,7 @@
 #endif
 namespace dome::sparse_resample {
 struct Point { int32_t x, y, z; };
+struct ErrorQuery { Point point{}; uint32_t reserved=0; uint64_t expected=0; };
 struct Cell { Point point; uint32_t occupied; uint64_t value; };
 struct Parameters { uint64_t source, target, background; };
 inline constexpr uint32_t maximum_probe = 128;
@@ -69,6 +71,11 @@ DOME_RESAMPLE_FN uint64_t sample(const Cell *cells, uint32_t mask, Point q, Para
   }
   return result.v;
 }
-static_assert(sizeof(Point) == 12 && sizeof(Cell) == 24 && sizeof(Parameters) == 24);
+DOME_RESAMPLE_FN uint64_t absolute_error(const Cell *cells,uint32_t mask,const ErrorQuery &query,Parameters parameters) {
+  const auto actual=sample(cells,mask,query.point,parameters);
+  return softfloat64::f64_sub({actual},{query.expected}).v&UINT64_C(0x7FFFFFFFFFFFFFFF);
+}
+inline constexpr size_t reduction_width=128;
+static_assert(sizeof(Point) == 12 && sizeof(Cell) == 24 && sizeof(Parameters) == 24 && sizeof(ErrorQuery)==24);
 } // namespace dome::sparse_resample
 #undef DOME_RESAMPLE_FN

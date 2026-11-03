@@ -8,6 +8,7 @@
 #include "paint-sampling-access.hpp"
 #include "dome/normal-preparation.hpp"
 #include "polygon-paint.hpp"
+#include "paint-composite-backend.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/scene.hpp"
@@ -1188,8 +1189,9 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
   result->source_maps_=std::make_shared<const PaintSourceMaps>(*maps);
   return result;
 }
-std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {
-  material.validate();
+std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {return preview(material,{});}
+std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material,const std::function<bool()> &cancelled) const {
+  paint_compute::checkpoint(cancelled);material.validate();
   if(baked_&&baked_->normal_authority&&(!normal_projection_||normal_projection_->version!=2))
     throw std::invalid_argument("Retained normal identity requires its own source sampling interpretation");
   if(source_maps_ && !baked_ && !color_projection_ && !normal_projection_){
@@ -1214,7 +1216,7 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
       return composite_cache_->source_preview;
     }
   }
-  return composite(material);
+  return composite(material,cancelled);
 }
 PaintColorProjectionResult SourceColorPreparationAccess::project(
     const PaintedMesh &source,std::span<const std::array<float,4>> colors,
@@ -1374,20 +1376,69 @@ PaintColorPreparationResult SourceColorPreparationAccess::prepare(
   receipt.validate();check();return {std::move(result),receipt};
 }
 std::shared_ptr<const TextureMaps>
-PaintedMesh::composite(const Material &material) const {
-  material.validate();
+PaintedMesh::composite(const Material &material) const {return composite(material,{});}
+std::shared_ptr<const TextureMaps>
+PaintedMesh::composite(const Material &material,const std::function<bool()> &cancelled) const {
+  paint_compute::checkpoint(cancelled);material.validate();
   CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
-  std::lock_guard lock(composite_cache_->mutex);
+  std::lock_guard lock(composite_cache_->mutex);paint_compute::checkpoint(cancelled);
   if(composite_cache_->token==composite_token_&&composite_cache_->factors==factors)
     if(auto maps=composite_cache_->maps.lock()){composite_retention().retain(maps,composite_token_,factors,true);return maps;}
   auto maps=composite_retention().find(composite_token_,factors);
   if(maps){composite_cache_->token=composite_token_;composite_cache_->factors=factors;composite_cache_->maps=maps;return maps;}
-  maps=build_composite(material);
+  maps=build_composite(material,cancelled);
   composite_cache_->token=composite_token_;composite_cache_->factors=factors;composite_cache_->maps=maps;
   composite_retention().retain(maps,composite_token_,factors,false);return maps;
 }
+namespace {
+bool gpu_plain_composite_eligible(uint32_t r,const std::vector<PaintLayer> &layers){
+ if(compute_backend()=="CPU"||r<512||r>2048)return false;
+ size_t contributing=0;
+ for(const auto &l:layers){
+  if(std::any_of(l.pbr_tiles.begin(),l.pbr_tiles.end(),[](const auto &p){return bool(p);}))return false;
+  if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);}))++contributing;
+ }
+ return contributing&&uint64_t(r)*r*contributing<=128*1024*1024;
+}
+std::shared_ptr<const TextureMaps> gpu_plain_composite(uint32_t r,const std::vector<PaintLayer> &layers,
+    const std::vector<int32_t> &padding,const Material &material,const std::function<bool()> &cancelled){
+ using namespace paint_compute;checkpoint(cancelled);Input in;auto &p=in.parameters;
+ p.resolution=r;p.tiles=((r+31)/32)*((r+31)/32);std::copy(material.color.begin(),material.color.end(),p.color);std::copy(material.emissive.begin(),material.emissive.end(),p.emission);p.metallic=material.metallic;p.roughness=material.roughness;
+ bool color_coverage=false,emission_coverage=false;
+ for(const auto &l:layers)if(l.visible&&l.opacity>0&&std::any_of(l.tiles.begin(),l.tiles.end(),[](const auto &p){return bool(p);})){
+  checkpoint(cancelled);in.layers.push_back({l.opacity,uint32_t(in.tiles.size())});
+  for(const auto &tile:l.tiles){
+   checkpoint(cancelled);if(!tile){in.tiles.push_back(absent);continue;}
+   if(in.pixels.size()>maximum_tile_bytes/sizeof(Pixel)-1024)throw std::length_error("Paint composite packed tile budget exceeded");
+   in.tiles.push_back(uint32_t(in.pixels.size()/1024));const auto first=in.pixels.size();in.pixels.resize(first+1024);
+   for(size_t i=0;i<1024;++i){const auto &v=tile->pixels[i].data;std::copy(v.begin(),v.end(),in.pixels[first+i].data);color_coverage|=v[13]&&v[9];emission_coverage|=v[13]&&v[12];}
+  }
+ }
+ p.layers=uint32_t(in.layers.size());in.padding=padding;checkpoint(cancelled);
+ // No model/cache/renderer memory is passed to the backend. All readbacks
+ // complete before any output image is constructed or exposed.
+ const auto pixels=paint_compute::composite(in,cancelled);auto maps=std::make_shared<TextureMaps>();
+ for(auto image:{&maps->color,&maps->metal_rough,&maps->emission})*image={r,r,std::vector<uint8_t>(size_t(r)*r*4)};
+ auto coverage=[&](Image &im,bool full){const uint32_t n=full?r:1;im={n,n,std::vector<uint8_t>(size_t(n)*n*4)};for(size_t at=3;at<im.rgba.size();at+=4)im.rgba[at]=255;};
+ coverage(maps->color_coverage,color_coverage);coverage(maps->emission_coverage,emission_coverage);
+ for(size_t i=0;i<pixels.size();++i){
+  if((i&4095)==0)checkpoint(cancelled);const auto &v=pixels[i];if(v.reserved||v.transparent>1)throw std::runtime_error("Paint composite backend returned invalid metadata");
+  std::copy_n(v.color,4,maps->color.rgba.data()+i*4);std::copy_n(v.orm,4,maps->metal_rough.rgba.data()+i*4);std::copy_n(v.emission,4,maps->emission.rgba.data()+i*4);maps->transparent|=v.transparent;
+  if(color_coverage)maps->color_coverage.rgba[i*4]=v.color_coverage;if(emission_coverage)maps->emission_coverage.rgba[i*4]=v.emission_coverage;
+ }
+ checkpoint(cancelled);return maps;
+}
+}
 std::shared_ptr<const TextureMaps>
-PaintedMesh::build_composite(const Material &material) const {
+PaintedMesh::build_composite(const Material &material) const {return build_composite(material,{});}
+std::shared_ptr<const TextureMaps>
+PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
+  paint_compute::checkpoint(cancelled);
+  // This packet owns only the legacy grid/padding. Independent paint domains,
+  // normal metadata/events, original source maps and prepared projections need
+  // their existing CPU interpretation until a genuine packet adapter exists.
+  if(!surface_->paint_domain&&!sampling_attachment_&&!source_maps_&&!baked_&&!color_projection_&&!normal_projection_&&gpu_plain_composite_eligible(resolution(),layers_))
+    return gpu_plain_composite(resolution(),layers_,surface_->padding,material,cancelled);
   if(source_maps_&&source_maps_->uses_alternate_uv())throw std::invalid_argument(source_maps_->extra_uv_sets.empty()?"UV1 source compositing requires explicit source-coordinate preparation":"Extra source UV compositing requires explicit source-coordinate preparation");
   auto maps = std::make_shared<TextureMaps>();
   maps->source_maps=source_maps_;
@@ -1442,6 +1493,7 @@ PaintedMesh::build_composite(const Material &material) const {
   for(int channel=0;channel<3;++channel){
     auto &image=channel==0?maps->color:channel==1?maps->metal_rough:maps->emission;
     for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
+      if((x&255)==0)paint_compute::checkpoint(cancelled);
       float u=(float(x)+.5f)/image.width,v=(float(y)+.5f)/image.height;
       auto sampled=sample_source_texture(channel==0?source.color:channel==1?source.metal_rough:source.emission,u,v,channel!=1);
       std::array<float,4> value{};
@@ -1555,7 +1607,7 @@ PaintedMesh::build_composite(const Material &material) const {
       maps->normal.rgba[at*4+2]=byte(n.z*.5f+.5f);
     }
   }
-  return maps;
+  paint_compute::checkpoint(cancelled);return maps;
 }
 std::optional<Vec3> PaintedMesh::raycast(Vec3 origin, Vec3 direction,
                                          float maximum) const {
