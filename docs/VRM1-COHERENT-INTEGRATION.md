@@ -1,4 +1,4 @@
-# Private coherent VRM1/display integration
+# Coherent VRM1/display integration
 
 Runtime/CMake head `fc56265411f80e6d4a4e1a2c40e309c23a1d5b1e` composes the
 qualified first VRM1 component `a21843b` with cleanup base `69ca191` and published
@@ -9,8 +9,9 @@ standalone sparse-quality fixture. No runtime/header/API/source-code change was
 made after the frozen `f99ac01` build/gate cohort.
 
 The [machine receipt](validation/VRM1-COHERENT-INTEGRATION.json) records exact
-commands, sources, outputs and profiles. This remains a private integration for
-root review; it is not a claim of public-main admission or full VRM1 completion.
+commands, sources, outputs and profiles. Published main `13f7e57` now contains this qualified integration, verified against
+the remote after its fast-forward from `431a187`. This does not complete full
+VRM1 support or the production goal.
 The earlier [component receipt](VRM1-SOURCE-EXPORT.md) retains its own parent and
 SDK/proof scopes and is not substituted for this fresh build.
 
@@ -83,3 +84,14 @@ the new desktop18 checks pass cleanly without suppression. These fixtures use
 private Xvfb/D-Bus or nested native Wayland and fail-closed XR environment. No
 physical HMD, system install, active desktop or display-manager action occurred.
 All own proof jobs are terminal and no device lease remains.
+
+## Publication
+
+The publication preserves every integration/local commit and leaves runtime,
+headers, CMake, tests and assets byte-identical to qualified `fc56265`. The
+publication follow-up changes only these status notes and the receipt.
+Fresh OneAPI/CUDA/ROCm ALL-target ABI builds are running separately on immutable
+`fc56265` in `artifacts/vrm1-vendors-fc562`; all three configure successfully.
+Their pending builds are not promoted to completed evidence here. The earlier
+backend builds retain their previous source scopes. No system install or session
+change accompanied publication.

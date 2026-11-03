@@ -1065,5 +1065,13 @@
     "ROCM_handle": 80232,
     "no_old_archives": true,
     "not_claimed_by_this_receipt": true
+  },
+  "publication": {
+    "main_integration": "13f7e57378cece52f011a8f316d4232747d7a922",
+    "previous_main": "431a187b3ae58ac985ec62dff5f535fbc7fa491a",
+    "remote_verified_utc": "2026-11-03T12:23:31.854341+00:00",
+    "method": "Fast-forward, no discarded local commits",
+    "followup_scope": "Documentation/receipt publication status only; runtime/header/CMake/test/assets unchanged from fc56265",
+    "source_goal": "active and incomplete"
   }
 }
