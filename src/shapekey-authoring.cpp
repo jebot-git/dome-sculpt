@@ -114,20 +114,20 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
  const auto &rest=source.painted->mesh();rest.validate();
- auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));
- if(!deform->morphs)deform->morphs=MorphSet(rest);
- const size_t count=deform->morphs->targets.size();
+ const MorphSet empty(rest);const auto &keys=source.deformation&&source.deformation->morphs?*source.deformation->morphs:empty;
+ const size_t count=keys.targets.size();
  bool existing=edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::Mirror||edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
  if(existing&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");
  if(edit.action==ShapeKeyAction::Replace && edit.positions.size()!=rest.positions.size())throw std::invalid_argument("Shapekey edits must preserve the complete REST vertex domain");
- if(edit.action==ShapeKeyAction::Replace){std::vector<Vec3> old;old.reserve(rest.positions.size());for(size_t v=0;v<rest.positions.size();++v)old.push_back(rest.positions[v]+deform->morphs->targets[edit.target].delta[v]);if(equal(old,edit.positions))return {edit.target,false};}
- if(edit.action==ShapeKeyAction::Rename && edit.name==deform->morphs->targets[edit.target].name)return {edit.target,false};
+ if(edit.action==ShapeKeyAction::Replace){bool unchanged=true;for(size_t v=0;v<rest.positions.size();++v){auto old=rest.positions[v]+keys.targets[edit.target].delta[v];unchanged&=old.x==edit.positions[v].x&&old.y==edit.positions[v].y&&old.z==edit.positions[v].z;}if(unchanged)return {edit.target,false};}
+ if(edit.action==ShapeKeyAction::Rename && edit.name==keys.targets[edit.target].name)return {edit.target,false};
  const bool replace=edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
- std::string name=edit.action==ShapeKeyAction::Replace?deform->morphs->targets[slot].name:key_name(*deform->morphs,edit.name);
+ std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
  if(source.material_bindings&&source.material_bindings->normal_preparation)
   return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
+ auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));if(!deform->morphs)deform->morphs=MorphSet(rest);
  Scene next=scene;auto &o=next.object(object);
  if(!o.shape_source)o.shape_source=capture_polygon_origin(scene,object);
  if(edit.action==ShapeKeyAction::Rename){

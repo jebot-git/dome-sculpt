@@ -9,7 +9,6 @@ struct DerivedKeyTarget {
   // Original stable target in the owning anchor; null means a newly authored
   // zero endpoint. These reference native attribute authority, not raw IDs.
   std::optional<uint64_t> reference;
-  std::vector<Vec3> positions;
 };
 class SourceKeyDerivation {
 public:
@@ -20,6 +19,7 @@ public:
   const auto &position_domain() const noexcept{return domain_;}
   const auto &frames() const noexcept{return frames_;}
   const auto &targets() const noexcept{return targets_;}
+  const std::vector<Vec3> &positions(uint64_t id) const;
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
 private:
   std::shared_ptr<const PaintedMesh> paint_;
