@@ -3,6 +3,8 @@
 #include "emission-export.hpp"
 #include "dome/document.hpp"
 #include "dome/scene-file.hpp"
+#include "dome/native-authoring.hpp"
+#include "dome/source-uv-bake.hpp"
 #include "dome/normal-sampling.hpp"
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
@@ -1962,7 +1964,9 @@ std::future<void> Document::save_async(const std::filesystem::path &path) {
 
 std::future<void> Document::export_asset(const std::filesystem::path &path,
                                        AssetExportFormat format) {
-  if (path.empty() || (format != AssetExportFormat::Glb && format != AssetExportFormat::Avatar))
+  if (path.empty() || (format != AssetExportFormat::Glb && format != AssetExportFormat::Avatar &&
+      format != AssetExportFormat::EditableGlb256 && format != AssetExportFormat::EditableGlb512 &&
+      format != AssetExportFormat::EditableGlb1024))
     throw std::invalid_argument("Choose an export filename and supported format");
   auto completion = std::make_shared<std::promise<void>>();
   auto result = completion->get_future();
@@ -3599,6 +3603,23 @@ void Document::file_loop() {
           auto report = export_vrm(surfaces, job->path,options);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
+        } else if (job->export_format == AssetExportFormat::EditableGlb256 ||
+                   job->export_format == AssetExportFormat::EditableGlb512 ||
+                   job->export_format == AssetExportFormat::EditableGlb1024) {
+          NativeAuthoringExport owner;
+          owner.scene = std::make_shared<const Scene>(job->scene.snapshot());
+          owner.scope = NativeAuthoringExport::Scope::WholeScene;
+          owner.allow_portable_fallback = true;
+          SourceUvBakeOptions policy;
+          policy.resolution = job->export_format == AssetExportFormat::EditableGlb256 ? 256 :
+                              job->export_format == AssetExportFormat::EditableGlb512 ? 512 : 1024;
+          GltfExportOptions options;
+          options.recompute_changed_normals = true;
+          options.cancelled = cancelled;
+          options.before_commit = before_commit;
+          auto report = export_glb_authoring(owner,job->path,options,policy);
+          for (size_t i=0;i<std::min<size_t>(8,report.diagnostics.size());++i)
+            export_diagnostics += " | " + report.diagnostics[i].substr(0,200);
         } else {
           job->scene.require_exportable_sources();
           const bool physical=detail::requires_native_emission_package(job->scene,cancelled);

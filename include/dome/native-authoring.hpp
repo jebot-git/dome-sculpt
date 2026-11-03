@@ -4,6 +4,7 @@
 #include <optional>
 #include <span>
 namespace dome {
+struct SourceUvBakeOptions;
 // Worker API: capture Scene::snapshot() before publishing the const owner.
 // Source surfaces are derived internally, before any portable compiler runs.
 struct NativeAuthoringExport {
@@ -31,6 +32,12 @@ struct NativeAuthoringReadLimits {
 GltfExportReport export_glb_authoring(const NativeAuthoringExport &,
                                      const std::filesystem::path &,
                                      const GltfExportOptions & = {});
+// Explicit portable paint resolution/animation/resource policy. The embedded
+// Scene remains exact; the standard PBR view is never declared lossless.
+GltfExportReport export_glb_authoring(const NativeAuthoringExport &,
+                                     const std::filesystem::path &,
+                                     const GltfExportOptions &,
+                                     const SourceUvBakeOptions &);
 // Absent marker returns nullopt; malformed/present competing authority refuses.
 // Restore the returned Scene directly, never recapture the container as source.
 std::optional<Scene> extract_native_authoring(std::span<const uint8_t>,
