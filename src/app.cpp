@@ -631,6 +631,7 @@ struct App {
     menu.add("&Scene/Shapekeys/Duplicate shapekey...",0,command,this);
     menu.add("&Scene/Shapekeys/Mirror shapekey...",0,command,this);
     menu.add("&Scene/Shapekeys/Rename shapekey...",0,command,this);
+    menu.add("&Scene/Shapekeys/Choose shapekey...",0,command,this);
     menu.add("&Scene/Shapekeys/Sculpt selected shapekey",0,command,this,FL_MENU_TOGGLE);
     menu.add("&Scene/Shapekeys/Restore before shape authoring...",0,command,this);
 
@@ -840,6 +841,7 @@ struct App {
     for(const auto *name:{"&Scene/Shapekeys/New shapekey...","&Scene/Shapekeys/Capture shape mix..."})enable(name,!modal&&s->can_author_shapes);
     for(const auto *name:{"&Scene/Shapekeys/Duplicate shapekey...","&Scene/Shapekeys/Mirror shapekey...","&Scene/Shapekeys/Rename shapekey..."})enable(name,!modal&&s->can_select_shape);
     enable("&Scene/Shapekeys/Restore before shape authoring...",!modal&&s->can_restore_shapes);
+    enable("&Scene/Shapekeys/Choose shapekey...",!modal&&s->can_select_shape);
     enable("&Scene/Shapekeys/Sculpt selected shapekey",!modal&&s->can_select_shape);checked("&Scene/Shapekeys/Sculpt selected shapekey",s->shape_sculpt);
     if (active != s->objects.end()) {
       checked("&Scene/&Visible", active->visible);
@@ -1252,6 +1254,8 @@ struct App {
     } else if (label == "Skin weights...") {
       edit_weights_dialog(canvas.document);
 
+    } else if(label=="Choose shapekey..."){
+      choose_shapekey_dialog(canvas.document);
     } else if(label=="Sculpt selected shapekey"){
       canvas.document.configure_shape_sculpt(!canvas.document.frame().state->shape_sculpt);
     } else if(label=="New shapekey..."||label=="Capture shape mix..."||label=="Duplicate shapekey..."||label=="Mirror shapekey..."||label=="Rename shapekey..."){

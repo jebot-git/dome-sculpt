@@ -10,6 +10,25 @@
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 namespace dome {
+void choose_shapekey_dialog(Document &doc){
+ auto draft=doc.draft_scene();const auto state=doc.frame().state;const auto &o=draft.scene.active();
+ if(!state->can_select_shape||!o.deformation||!o.deformation->morphs||o.deformation->morphs->targets.empty())
+  throw std::logic_error("Choose an editable mesh with shapekeys after finishing current editing");
+ int sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);const int row=std::max(32,dx::size+14);
+ const int width=std::min(std::max(560,dx::size*34),sw-40),height=std::min(row*7,sh-40);
+ DomeDialog window(width,height,"Choose shapekey");
+ Fl_Box hint(16,8,width-32,row*2,"Choose the target to sculpt. Saved weights and geometry stay unchanged.");
+ hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
+ Fl_Choice target(20,row*3,width-40,row-4,"Shapekey");target.align(FL_ALIGN_TOP_LEFT);
+ std::vector<Fl_Menu_Item> entries;for(const auto &key:o.deformation->morphs->targets){Fl_Menu_Item item{};item.label(key.name.c_str());entries.push_back(item);}entries.emplace_back();target.copy(entries.data());target.value(int(state->morph_target));
+ const int button_width=std::min(width/2-24,std::max(140,dx::size*9));
+ Fl_Button cancel(width/2-button_width-10,height-row*2+8,button_width,row,"Cancel"),select(width/2+10,height-row*2+8,button_width,row,"Select");
+ struct State{Fl_Window *window;Fl_Choice *target;std::optional<uint32_t> selected;} local{&window,&target,{}};
+ cancel.callback([](Fl_Widget*w,void*){w->window()->hide();});
+ select.callback([](Fl_Widget*,void*p){auto&s=*static_cast<State*>(p);s.selected=uint32_t(s.target->value());s.window->hide();},&local);
+ window.end();window.set_modal();dx::style(&window);window.show();cancel.take_focus();while(window.shown())Fl::wait();
+ if(local.selected)doc.select_shape_target(*local.selected,draft.source);
+}
 void edit_shapekey_dialog(Document &doc,ShapeKeyAction action){
  auto draft=doc.draft_scene();const auto &o=draft.scene.active();auto state=doc.frame().state;
  if(!state->can_author_shapes)throw std::invalid_argument("Choose an editable mesh after finishing current editing or object motion");
