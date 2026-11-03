@@ -67,6 +67,7 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   stop(cancelled);
   const bool exact_metric=scene.has_affine_placement(reference.id)||scene.has_affine_placement(target.id)||
     source.skeleton->space_matrix||source.skeleton->inverse_bind_override||
+    std::any_of(source.pose.begin(),source.pose.end(),[](const JointTransform &p){return bool(p.full_local_matrix);})||
     std::any_of(source.skeleton->bones.begin(),source.skeleton->bones.end(),[](const Bone &b){return bool(b.rest_matrix);});
   auto reference_world=exact_metric?CanvasTransform{}:scene.world_transform(reference.id);
   auto target_world=exact_metric?CanvasTransform{}:scene.world_transform(target.id);
