@@ -18,13 +18,16 @@ class PaintOverlayPacket {
  std::shared_ptr<const std::vector<int32_t>> padding_;
  std::shared_ptr<const BakedTextures> baked_;
  std::shared_ptr<const PaintSourceMaps> source_maps_;
+ std::shared_ptr<const PaintOverlayPacket> contribution_owner_;
  PaintOverlayPacket()=default;
 public:
- uint32_t resolution()const noexcept{return resolution_;}
- std::span<const PaintOverlayLayer> layers()const noexcept{return layers_;}
- const std::shared_ptr<const std::vector<int32_t>>&padding()const noexcept{return padding_;}
- const std::shared_ptr<const BakedTextures>&baked()const noexcept{return baked_;}
+ uint32_t resolution()const noexcept{return contribution_owner_?contribution_owner_->resolution():resolution_;}
+ std::span<const PaintOverlayLayer> layers()const noexcept{return contribution_owner_?contribution_owner_->layers():std::span<const PaintOverlayLayer>(layers_);}
+ const std::shared_ptr<const std::vector<int32_t>>&padding()const noexcept{return contribution_owner_?contribution_owner_->padding():padding_;}
+ const std::shared_ptr<const BakedTextures>&baked()const noexcept{return contribution_owner_?contribution_owner_->baked():baked_;}
  const std::shared_ptr<const PaintSourceMaps>&source_maps()const noexcept{return source_maps_;}
+ // Packed coordinate metadata shares one actual immutable contribution owner.
+ const std::shared_ptr<const PaintOverlayPacket>&contribution_owner()const noexcept{return contribution_owner_;}
 };
 struct PaintOverlayFactory {
  static std::shared_ptr<const PaintOverlayPacket> capture(const PaintedMesh &,const std::function<bool()> &cancelled={});

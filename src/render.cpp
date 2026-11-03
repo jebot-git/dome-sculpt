@@ -405,11 +405,13 @@ struct SurfaceRenderer::TextureState {
       source_packs.push_back(toon.packed_inputs);
     }
     std::map<const detail::PaintOverlayPacket*,size_t> overlay_sizes;size_t overlay_bytes=0;
-    for(const auto &input:overlay_inputs)if(!overlay_sizes.contains(input.owner.get())){
+    for(const auto &input:overlay_inputs){
+      const auto *identity=input.owner->contribution_owner()?input.owner->contribution_owner().get():input.owner.get();
+      if(overlay_sizes.contains(identity))continue;
       size_t pixels=0;for(size_t width=input.owner->resolution();;width=std::max(size_t(1),width/2)){pixels+=width*width;if(width==1)break;}
       const size_t size=pixels*16*5;
       if(size>limits.max_bytes-bytes||overlay_bytes>limits.max_bytes-bytes-size)throw std::length_error("GPU overlay byte budget exceeded");
-      overlay_sizes.emplace(input.owner.get(),size);overlay_bytes+=size;
+      overlay_sizes.emplace(identity,size);overlay_bytes+=size;
     }
     const size_t overlay_images=overlay_sizes.size()*5;
     if(overlay_images>limits.max_images-wanted.size())throw std::length_error("GPU overlay image count exceeded");

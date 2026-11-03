@@ -790,7 +790,9 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::p
   coordinates(source.uv1,packed->uv1);
   for(const auto &[set,values]:source.extra_uv_sets){auto it=packed->extra_uv_sets.find(set);
     if(it==packed->extra_uv_sets.end())throw std::invalid_argument("Packed overlay changed original coordinate identities");coordinates(values,it->second);}
-  auto out=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket(*packet));out->source_maps_=std::move(packed);
+  auto out=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
+  out->contribution_owner_=packet->contribution_owner_?packet->contribution_owner_:packet;
+  out->source_maps_=std::move(packed);
   paint_compute::checkpoint(cancelled);return out;
 }
 PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y) const {

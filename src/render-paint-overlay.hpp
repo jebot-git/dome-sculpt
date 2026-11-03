@@ -16,6 +16,10 @@ public:
  };
 private:
  using Key=std::pair<const PaintOverlayPacket*,bool>;
+ static std::shared_ptr<const PaintOverlayPacket> contribution(const std::shared_ptr<const PaintOverlayPacket> &packet){
+  if(!packet)throw std::invalid_argument("Missing immutable overlay input");
+  return packet->contribution_owner()?packet->contribution_owner():packet;
+ }
  std::map<Key,Resource> cache_;GLuint program_=0,vao_=0;
  static GLuint shader(GLenum type,const char *source){
   GLuint id=glCreateShader(type);if(!id)throw std::runtime_error("Cannot allocate overlay shader");glShaderSource(id,1,&source,nullptr);glCompileShader(id);GLint ok=0;glGetShaderiv(id,GL_COMPILE_STATUS,&ok);
@@ -103,14 +107,14 @@ public:
  void prepare(const std::vector<Input> &inputs,size_t budget=1024ull*1024*1024,size_t max_images=1024){
   std::map<Key,Input> wanted;size_t bytes=0;
   auto measure=[](uint32_t r){size_t pixels=0;for(size_t width=r;;width=std::max(size_t(1),width/2)){pixels+=width*width;if(width==1)break;}return pixels*16*5;};
-  for(const auto &input:inputs){if(!input.owner)throw std::invalid_argument("Missing immutable overlay input");Key key{input.owner.get(),input.pbr};if(wanted.contains(key))continue;const auto size=measure(input.owner->resolution());if(size>budget-bytes)throw std::length_error("GPU overlay cache byte budget exceeded");bytes+=size;wanted.emplace(key,input);}
+  for(const auto &input:inputs){if(!input.owner)throw std::invalid_argument("Missing immutable overlay input");auto owner=contribution(input.owner);Key key{owner.get(),input.pbr};if(wanted.contains(key))continue;const auto size=measure(owner->resolution());if(size>budget-bytes)throw std::length_error("GPU overlay cache byte budget exceeded");bytes+=size;wanted.emplace(key,Input{std::move(owner),input.pbr});}
   if(wanted.size()>max_images/5)throw std::length_error("GPU overlay image count exceeded");
   for(auto it=cache_.begin();it!=cache_.end();)if(!wanted.contains(it->first)){glDeleteTextures(5,it->second.planes.data());it=cache_.erase(it);}else ++it;
   std::vector<Key> added;added.reserve(wanted.size());
   try{for(const auto &[key,input]:wanted)if(!cache_.contains(key)){auto value=build(input.owner,input.pbr,budget-(bytes-measure(input.owner->resolution())));try{cache_.emplace(key,std::move(value));added.push_back(key);}catch(...){glDeleteTextures(5,value.planes.data());throw;}}}
   catch(...){for(const auto &key:added){auto it=cache_.find(key);glDeleteTextures(5,it->second.planes.data());cache_.erase(it);}throw;}
  }
- const Resource &at(const std::shared_ptr<const PaintOverlayPacket> &packet,bool pbr)const{return cache_.at({packet.get(),pbr});}
+ const Resource &at(const std::shared_ptr<const PaintOverlayPacket> &packet,bool pbr)const{return cache_.at({contribution(packet).get(),pbr});}
  size_t bytes()const{size_t count=0;for(const auto &[key,value]:cache_)count+=value.bytes;return count;}
  size_t size()const noexcept{return cache_.size();}
  void clear(bool release){if(release)for(const auto &[key,value]:cache_)glDeleteTextures(5,value.planes.data());cache_.clear();if(release){if(program_)glDeleteProgram(program_);if(vao_)glDeleteVertexArrays(1,&vao_);}program_=vao_=0;}
