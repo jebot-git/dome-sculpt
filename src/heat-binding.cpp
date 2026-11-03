@@ -334,7 +334,13 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
       if (length > o.maximum_seed_distance)
         continue;
       double cosine = length ? dot(d, s.normals[i]) / length : 1;
-      double distance = length / (.5 * (std::clamp(cosine, -1., 1.) + 1.001));
+      // The outward-normal reference presumes an oriented boundary containing
+      // its bone. An explicitly selected surface domain does not infer inside
+      // from cloth/lining orientation or penalize its genuinely nearer source.
+      double distance =
+          o.distance_rule == HeatDistanceRule::EuclideanSurface
+              ? length
+              : length / (.5 * (std::clamp(cosine, -1., 1.) + 1.001));
       candidates.push_back({distance, length, q, source.bone});
     }
     std::sort(candidates.begin(), candidates.end(),
@@ -616,6 +622,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
       (o.seed_rule != HeatSeedRule::DistinctBones &&
        o.seed_rule != HeatSeedRule::ReferenceSegments) ||
       (o.output != HeatOutput::Raw && o.output != HeatOutput::ReferenceLimit) ||
+      (o.distance_rule != HeatDistanceRule::OutwardNormal &&
+       o.distance_rule != HeatDistanceRule::EuclideanSurface) ||
       !o.maximum_work || o.maximum_work > 500'000'000 ||
       o.maximum_bytes < 4096 || o.maximum_bytes > 512u * 1024u * 1024u ||
       !o.maximum_iterations || o.maximum_iterations > 4096 ||

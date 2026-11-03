@@ -14,6 +14,7 @@ enum class HeatMass { Barycentric, MixedVoronoi };
 enum class HeatEdges { CotangentHalf, IncidentMean };
 enum class HeatSeedRule { DistinctBones, ReferenceSegments };
 enum class HeatOutput { Raw, ReferenceLimit };
+enum class HeatDistanceRule { OutwardNormal, EuclideanSurface };
 // Private open-surface PDE prototype. Raw vertex/topology identity is retained;
 // no coordinate-only welding, authoring admission or legacy solver change.
 struct HeatBindingOptions {
@@ -25,6 +26,7 @@ struct HeatBindingOptions {
   HeatEdges edges = HeatEdges::CotangentHalf;
   HeatSeedRule seed_rule = HeatSeedRule::DistinctBones;
   HeatOutput output = HeatOutput::Raw;
+  HeatDistanceRule distance_rule = HeatDistanceRule::OutwardNormal;
   WeightLimits limits;
   double maximum_seed_distance = .3, heat_strength = 1,
          relative_tolerance = 1e-9;

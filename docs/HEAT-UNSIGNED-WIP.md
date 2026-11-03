@@ -1,0 +1,7 @@
+# Private unsigned source-distance control
+
+This checkpoint preserves the signed-normal negative and a common Euclidean source-distance control. Existing entry/self-occlusion, midpoint/auxiliary handles, bounded FEM and fixed five-pose quality bounds remain unchanged. Independent nearer-source, winding reversal, analytic H, small QP and rotation/unit controls pass optimized Release. No sanitizer or native admission claim.
+
+The same-binary whole-skin cohort solves all 19 parts for each avatar with exact original Scene, seam and native point-consumer checks. Female 95 cases pass. Male shoes now pass; Body max38.853407mm and Tops max39.087519mm exceed35.133061mm, and Tie mean9.703685mm exceeds8.783265mm. The earlier signed control retains Body36.472mm/Shoes41.459mm failures. Logs and 1488 input hashes are retained in artifacts.
+
+The first source-palette audit incorrectly repeated the producer's all-accessor-row assumption. Imported primitives share vertex accessors while drawing different index subsets. The private OriginalPrimitive eligibility therefore includes joints from unreferenced vertices. This checkpoint preserves that oversized control before an independent drawn-index negative and a bounded helper correction. It is a private helper defect, not a published importer defect. No source arrays or artist weights are copied into solved output. Full robust weights, native/history/Save/export/render and independent difficult-geometry quality remain required.
