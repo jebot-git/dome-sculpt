@@ -16,7 +16,8 @@ void require(bool ok,const char *why){if(!ok)throw std::runtime_error(why);}
 [[gnu::noinline]] void operator delete[](void *p)noexcept{std::free(p);}
 [[gnu::noinline]] void operator delete(void *p,size_t)noexcept{std::free(p);}
 [[gnu::noinline]] void operator delete[](void *p,size_t)noexcept{std::free(p);}
-int main()try{
+int main(int argc,char **argv)try{
+ const bool authored=argc==2&&std::string_view(argv[1])=="--authored";if(argc>2||(argc==2&&!authored))return 2;
  using namespace dome;set_paint_composite_cache_budget(0);
  Mesh raw;raw.positions={{0,0,0},{1,0,0},{1,1,0},{0,1,0}};raw.normals.assign(4,{0,0,1});
  raw.uv={{-1,-1},{2,-1},{2,2},{-1,2}};raw.indices={0,1,2,0,2,3};
@@ -24,18 +25,22 @@ int main()try{
  maps->normal.image=std::make_shared<const Image>(Image{1,1,{128,128,255,255}});maps->normal.texcoord=1;
  maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(raw.uv);
  PaintSurfaceOptions policy;policy.policy=PaintUvPolicy::SourceAuthored;
- auto before=PaintedMesh::from_maps(raw,maps,64,policy);const auto original=before->encode();
+ if(authored)maps=std::make_shared<PaintSourceMaps>();
+ auto before=authored?capture_source_sampling(raw,maps,64,policy):PaintedMesh::from_maps(raw,maps,64,policy);const auto original=before->encode();
+ std::shared_ptr<const std::vector<std::array<float,2>>> authored_uv1;
+ if(authored)authored_uv1=std::make_shared<const std::vector<std::array<float,2>>>(raw.uv);
  const std::vector<uint32_t> vertices{0,1,2,0,2,3};Mesh target;
  for(auto v:vertices){target.positions.push_back(raw.positions[v]);target.normals.push_back(raw.normals[v]);}
  target.indices={0,1,2,3,4,5};target.uv={{.05f,.05f},{.45f,.05f},{.45f,.45f},{.55f,.55f},{.95f,.95f},{.55f,.95f}};
- auto empty=prepare_source_paint(before,target,vertices);const auto empty_bytes=empty->encode();
+ auto prepare=[&](const SourcePaintOptions &options=SourcePaintOptions{}){return prepare_source_paint(before,target,vertices,authored_uv1,options);};
+ auto empty=prepare();const auto empty_bytes=empty->encode();
  Brush brush;brush.from=brush.to={.5f,.5f,0};brush.normal={0,0,1};brush.radius=.5f;
  PaintSettings ink;ink.color={.2f,.8f,.4f,.6f};ink.front_only=false;
  auto painted=empty->snapshot();painted->begin_stroke();painted->stamp(brush,ink);require(painted->end_stroke(),"Actual allocation fixture paints source atlas");
  const auto encoded=painted->encode();size_t total=0;
  for(int phase=0;phase<4;++phase){
   auto operation=[&](std::shared_ptr<PaintedMesh> &candidate){
-   if(phase==0)candidate=prepare_source_paint(before,target,vertices);
+   if(phase==0)candidate=prepare();
    if(phase==1){auto out=painted->encode();armed=false;require(out==encoded,"Owning encode output exact");}
    if(phase==2)candidate=PaintedMesh::decode(encoded,nullptr,false,nullptr,nullptr,SourcePaintDecodeContext{true});
    if(phase==3)candidate->stamp(brush,ink);
@@ -61,12 +66,12 @@ int main()try{
   total+=measured;std::cout<<"PASS phase="<<phase<<" actual persistent allocation boundaries="<<measured<<std::endl;
  }
  size_t polls=0;SourcePaintOptions options;options.cancelled=[&]{++polls;return false;};
- require(prepare_source_paint(before,target,vertices,options)->encode()==empty_bytes,"Counted preparation exact");
+ require(prepare(options)->encode()==empty_bytes,"Counted preparation exact");
  const auto count=polls;require(count>1&&count<65536,"Actual preparation cancellation polls measured");
  for(size_t boundary=1;boundary<=count;++boundary){polls=0;options.cancelled=[&]{return ++polls==boundary;};bool stopped=false;
-  try{(void)prepare_source_paint(before,target,vertices,options);}catch(const std::runtime_error&){stopped=true;}
+  try{(void)prepare(options);}catch(const std::runtime_error&){stopped=true;}
   require(stopped&&polls==boundary&&before->encode()==original,"Each cancellation prevents publication and preserves input");
-  require(prepare_source_paint(before,target,vertices)->encode()==empty_bytes,"Complete preparation retry after cancellation exact");
+  require(prepare()->encode()==empty_bytes,"Complete preparation retry after cancellation exact");
  }
  require(empty->encode()==empty_bytes&&painted->encode()==encoded,"All immutable seed states remain exact");
  std::cout<<"PASS "<<total<<" persistent allocation boundaries and "<<count<<" cancellation boundaries\n";return 0;

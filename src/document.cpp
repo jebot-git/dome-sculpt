@@ -3586,12 +3586,12 @@ void Document::file_loop() {
             if (!in_group(job->scene, object, group)) job->scene.object(object.id).visible = false;
           job->scene.require_exportable_sources();
           VrmExportOptions options;options.cancelled=cancelled;options.before_commit=before_commit;
-          auto report = export_vrm(job->scene.preview_surfaces(cancelled), job->path,options);
+          auto report = export_vrm(job->scene.export_surfaces(cancelled), job->path,options);
           for (size_t i = 0; i < std::min<size_t>(8, report.diagnostics.size()); ++i)
             export_diagnostics += " | " + report.diagnostics[i].substr(0, 200);
         } else {
           job->scene.require_exportable_sources();
-          auto surfaces = job->scene.preview_surfaces(cancelled);
+          auto surfaces = job->scene.export_surfaces(cancelled);
           for (auto &surface : surfaces)
             if (surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
           GltfExportOptions options; options.recompute_changed_normals = true;

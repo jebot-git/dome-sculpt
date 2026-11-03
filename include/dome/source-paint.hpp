@@ -17,9 +17,22 @@ struct SourcePaintOptions {
 // Capability is supplied by the owning reader, never inferred from a file's
 // version. Older overloads deliberately reject Paint4 even for empty layers.
 struct SourcePaintDecodeContext { bool independent_source=false,physical_emission=false; };
+// Explicit first-source capture, including materials without PBR image roles.
+// An empty role bundle describes no images; no placeholder image is invented.
+std::shared_ptr<PaintedMesh> capture_source_sampling(Mesh,
+    std::shared_ptr<const PaintSourceMaps>,uint32_t resolution,
+    const PaintSurfaceOptions & = {});
 // Exact initial source-to-atlas adoption. The original must be pristine;
 // subsequent paint/UV/detail transfer needs its own retaining adapter.
 std::shared_ptr<PaintedMesh> prepare_source_paint(
     std::shared_ptr<const PaintedMesh>,Mesh target,
     std::span<const uint32_t> source_vertices,const SourcePaintOptions & = {});
+// Optional genuine authored UV1 in the BEFORE vertex domain, e.g. a MToon-only
+// accessor absent from PBR roles. It remains a coordinate field, never a fake
+// image role or generated TEXCOORD carrier. The factory freezes its own data.
+std::shared_ptr<PaintedMesh> prepare_source_paint(
+    std::shared_ptr<const PaintedMesh>,Mesh target,
+    std::span<const uint32_t> source_vertices,
+    std::shared_ptr<const std::vector<std::array<float,2>>> authored_uv1,
+    const SourcePaintOptions &);
 }

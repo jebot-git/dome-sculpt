@@ -31,10 +31,10 @@ std::shared_ptr<const PaintSourceMaps> transport_source_sampling(
     if(set<2||set>7||!values||values->size()!=before.positions.size())throw std::invalid_argument("Original sampling extra-coordinate size differs");
     validation_work+=values->size();
   }
-  if(source.empty()||before.uv.size()!=before.positions.size()||
+  if(before.uv.size()!=before.positions.size()||
      target.uv.size()!=target.positions.size()||vertices.size()!=target.positions.size()||
      before.indices.size()!=target.indices.size())
-    throw std::invalid_argument("Original sampling requires actual images and complete ordered correspondence");
+    throw std::invalid_argument("Original sampling requires complete ordered correspondence");
   const std::array<const PaintSourceTexture*,5> slots{
     &source.color,&source.metal_rough,&source.emission,&source.normal,&source.occlusion};
   const bool needs_zero=std::any_of(slots.begin(),slots.end(),

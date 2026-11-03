@@ -116,6 +116,9 @@ public:
   surfaces(bool atlas = false,
            const std::function<bool()> &cancelled = {}) const;
   std::vector<ObjectSurface> preview_surfaces(const std::function<bool()> &cancelled = {}) const;
+  // Snapshot export preserves source-only legacy previews and compiles any
+  // independent source/paint coordinates into their explicit format view.
+  std::vector<ObjectSurface> export_surfaces(const std::function<bool()> &cancelled = {}) const;
   // Optional immutable source geometry cache for render workers. Material, pose
   // and source ownership still come from this Scene snapshot.
   using SculptMesher = std::function<Mesh(uint64_t, const Volume &)>;

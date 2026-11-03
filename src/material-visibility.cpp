@@ -170,7 +170,7 @@ struct Visibility {
       if (mtoon_coordinate(slot) == 1) {
         if(overlay){
           const auto &logical=overlay->original_uv1();
-          if(!logical||logical!=owned_uv1||logical.owner_before(owned_uv1)||owned_uv1.owner_before(logical))
+          if(!logical)
             throw std::invalid_argument("Visibility MToon UV1 lacks actual original authored authority");
           return view;
         }
@@ -213,7 +213,8 @@ struct Visibility {
         auto values=owned_extra_uv.find(uint32_t(coordinate));if(values==owned_extra_uv.end()||id<range.first_vertex)throw std::runtime_error("Visibility additional UV has no exact coordinate owner");q=values->second->at(id-range.first_vertex);
       }else if (coordinate==1) {
         if(id<range.first_vertex)throw std::runtime_error("Visibility UV1 packed range is invalid");
-        if(owned_uv1)q=owned_uv1->at(id-range.first_vertex);else{
+        if(toon&&overlay&&overlay->original_uv1())q=overlay->original_uv1()->at(id-range.first_vertex);
+        else if(owned_uv1)q=owned_uv1->at(id-range.first_vertex);else{
           if(!primitive)throw std::runtime_error("Visibility UV1 has no coordinate authority");
           auto source=range.appearance->source_vertices.at(id-range.first_vertex);q=primitive->uv1.at(source);
         }
