@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <new>
+#include <limits>
 thread_local size_t overlay_deny_large=0;thread_local bool overlay_large_attempt=false;
 void *operator new(size_t n){if(overlay_deny_large&&n>=overlay_deny_large){overlay_large_attempt=true;throw std::bad_alloc();}if(void*p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
 void *operator new[](size_t n){return ::operator new(n);}
