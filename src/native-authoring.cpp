@@ -4,9 +4,11 @@
 #include "native-authoring-compiler.hpp"
 #include "native-scene-payload.hpp"
 #include "emission-package.hpp"
+#include "emission-authority.hpp"
 #include "gltf-document.hpp"
 #include "humanoid-sha256.hpp"
 #include <charconv>
+#include <algorithm>
 #include <set>
 namespace dome {
 namespace {
@@ -68,7 +70,8 @@ std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(con
  if((options.scope==NativeAuthoringExport::Scope::WholeScene&&!options.objects.empty())||(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&options.objects.empty()))throw std::invalid_argument("Native authoring scope and object selection disagree");
  auto scene=options.scene->snapshot();if(options.scope==NativeAuthoringExport::Scope::ExportedObjects)scene=emission_export_subset(scene,options.objects);scene.validate();scene.require_exportable_sources();stop(cancelled);
  // No caller-provided surface or changed-surface equivalence flag enters here.
- auto originals=scene.preview_surfaces(cancelled);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
+ const bool physical=std::any_of(scene.objects().begin(),scene.objects().end(),[](const auto &o){return detail::hdr_emission(o.material.emissive)||(o.painted&&o.painted->has_physical_emission())||(o.material_bindings&&detail::physical_emission(*o.material_bindings));});
+ auto originals=physical?emission_export_surfaces(scene,cancelled):scene.preview_surfaces(cancelled);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
  for(const auto &object:originals){stop(cancelled);scene.object(object.id);if(!unique.insert(object.id).second)throw std::invalid_argument("Duplicate native authoring original identity");ids.push_back(object.id);}
  if(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&unique!=std::set<uint64_t>(options.objects.begin(),options.objects.end()))throw std::invalid_argument("Native authoring subset contains hidden or empty nonexported objects");
  return std::shared_ptr<const NativeAuthoringCapture>(new NativeAuthoringCapture(std::make_shared<const Scene>(std::move(scene)),std::move(originals),std::move(ids),options.scope));
@@ -84,6 +87,7 @@ GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const s
  auto compiler_policy=paint_policy;compiler_policy.cancelled={};
  auto compiled=detail::compile_native_authoring(*capture,compiler_policy,options.max_output_bytes,options.cancelled);
  auto document=detail::make_gltf(compiled.surfaces,detail::SourceMorphSpace::Native,options.recompute_changed_normals,options.cancelled);
+ detail::finish_native_authoring_emission(document,compiled,options.max_output_bytes,options.cancelled);
  attach(document,*capture,options.max_output_bytes,options.cancelled);const uint64_t size=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+((uint64_t(document.binary.size())+3)&~uint64_t(3));if(size>options.max_output_bytes)throw std::length_error("Complete native authoring GLB exceeds output budget");
  GltfExportReport report{capture->ids().size(),document.normal_targets_recomputed,{"Exact native authoring Scene retained; portable core view is not declared lossless"}};report.diagnostics.insert(report.diagnostics.end(),compiled.diagnostics.begin(),compiled.diagnostics.end());stop(options.cancelled);detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;
 }
