@@ -4,13 +4,18 @@
 // energy informed by pinned libigl bbw/harmonic and Jacobson et al.2011.
 #include "biharmonic-binding.hpp"
 #include "heat-binding.cpp"
+#include "squared-laplacian-preconditioner.hpp"
+#include <optional>
 namespace dome::detail {
 namespace {
 struct BiharmonicOperator {
   const System &l;
   std::vector<double> diagonal, temporary;
   double mass_scale = 0;
-  BiharmonicOperator(const System &system, Budget &budget)
+  std::optional<SquaredLaplacianPreconditioner> incomplete;
+  BiharmonicOperator(const System &system, Budget &budget,
+                     std::span<const uint8_t> fixed = {}, bool squared = false,
+                     size_t maximum_bytes = 0)
       : l(system), diagonal(l.diagonal.size()), temporary(l.diagonal.size()) {
     budget.step(diagonal.size() * 2 + l.values.size());
     for (double mass : l.mass)
@@ -25,6 +30,18 @@ struct BiharmonicOperator {
       diagonal[i] = mass_scale * q;
       if (!(diagonal[i] > 0) || !std::isfinite(diagonal[i]))
         throw std::runtime_error("Invalid biharmonic quadratic diagonal");
+    }
+    if (squared)
+      incomplete.emplace(l, fixed, maximum_bytes, budget);
+  }
+  void precondition(std::span<const double> r, std::span<double> z,
+                    std::span<const uint8_t> status, Budget &budget) {
+    if (incomplete)
+      incomplete->apply(r, z, status, budget);
+    else {
+      budget.step(r.size());
+      for (size_t i = 0; i < r.size(); ++i)
+        z[i] = status[i] ? 0 : r[i] / diagonal[i];
     }
   }
   void apply(std::span<const double> x, std::span<double> out, Budget &budget) {
@@ -44,6 +61,10 @@ SkinWeights bounded_biharmonic_surface(
     const std::function<bool()> &cancelled, BiharmonicBindingReport *report,
     std::span<const std::array<uint64_t, 4>> component_usage) {
   const auto &o = options.source;
+  const bool squared = options.preconditioner ==
+                       BiharmonicPreconditioner::SquaredIncompleteLaplacian;
+  if (options.preconditioner != BiharmonicPreconditioner::Diagonal && !squared)
+    throw std::invalid_argument("Unknown biharmonic preconditioner");
   const bool independent =
       options.projection == BiharmonicProjection::IndependentComponent;
   Budget budget{0, o.maximum_work, cancelled};
@@ -70,7 +91,9 @@ SkinWeights bounded_biharmonic_surface(
         "Invalid explicit surface-biharmonic domain/options");
   // Conservative peak: assembly map/CSR, two row-by-bone projection tables,
   // optional source multiplicities, QP scratch, both grouped/raw weight owners.
-  const size_t planned = n * (512 + b * 18) + corners * 128 + b * b * 64 + 8192;
+  const size_t precondition_bytes = squared ? n * 96 + corners * 32 + 64 : 0;
+  const size_t planned = n * (512 + b * 18) + corners * 128 + b * b * 64 +
+                         8192 + precondition_bytes;
   if (planned > o.maximum_bytes || n > o.maximum_work / (sources.size() + 1))
     throw std::length_error(
         "Biharmonic construction exceeds byte/work admission");
@@ -186,7 +209,7 @@ SkinWeights bounded_biharmonic_surface(
   distances.clear();
   minimum.clear();
   diagonal.clear(); // Peak remains accounted.
-  BiharmonicOperator q(s, budget);
+  BiharmonicOperator q(s, budget, fixed, squared, precondition_bytes);
   auto controls = options.solve;
   controls.maximum_bytes = std::min(controls.maximum_bytes, o.maximum_bytes);
   std::vector<double> values(rows), field(rows), sum(rows), counts(rows),

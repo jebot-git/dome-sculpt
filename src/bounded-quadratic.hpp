@@ -102,6 +102,15 @@ solve_bounded_quadratic(Operator &op, std::span<const uint8_t> fixed,
       if (status[i])
         out[i] = 0;
   };
+  auto precondition = [&] {
+    if constexpr (requires { op.precondition(r, z, status, budget); })
+      op.precondition(r, z, status, budget);
+    else {
+      budget.step(n);
+      for (size_t i = 0; i < n; ++i)
+        z[i] = status[i] ? 0 : r[i] / op.diagonal[i];
+    }
+  };
   for (uint32_t outer = 0; outer < options.maximum_active_iterations; ++outer) {
     budget.stop();
     double free_norm = inspect();
@@ -131,7 +140,9 @@ solve_bounded_quadratic(Operator &op, std::span<const uint8_t> fixed,
     budget.step(n * 4);
     for (size_t i = 0; i < n; ++i) {
       r[i] = status[i] ? 0 : -gradient[i];
-      z[i] = r[i] / op.diagonal[i];
+    }
+    precondition();
+    for (size_t i = 0; i < n; ++i) {
       p[i] = z[i];
       rho += r[i] * z[i];
     }
@@ -173,8 +184,8 @@ solve_bounded_quadratic(Operator &op, std::span<const uint8_t> fixed,
           break;
         rho = 0;
         budget.step(n * 3);
+        precondition();
         for (size_t i = 0; i < n; ++i) {
-          z[i] = r[i] / op.diagonal[i];
           p[i] = z[i];
           rho += r[i] * z[i];
         }
@@ -182,10 +193,9 @@ solve_bounded_quadratic(Operator &op, std::span<const uint8_t> fixed,
       }
       double next = 0;
       budget.step(n * 3);
-      for (size_t i = 0; i < n; ++i) {
-        z[i] = r[i] / op.diagonal[i];
+      precondition();
+      for (size_t i = 0; i < n; ++i)
         next += r[i] * z[i];
-      }
       double beta = next / rho;
       for (size_t i = 0; i < n; ++i)
         p[i] = z[i] + beta * p[i];

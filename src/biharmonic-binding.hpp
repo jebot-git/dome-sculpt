@@ -4,7 +4,9 @@
 #include "heat-binding.hpp"
 namespace dome::detail {
 enum class BiharmonicProjection { VoronoiMinimum, IndependentComponent };
+enum class BiharmonicPreconditioner { Diagonal, SquaredIncompleteLaplacian };
 struct BiharmonicBindingOptions {
+  BiharmonicPreconditioner preconditioner = BiharmonicPreconditioner::Diagonal;
   BiharmonicProjection projection = BiharmonicProjection::VoronoiMinimum;
   HeatBindingOptions source;
   BoundedQuadraticOptions solve;
