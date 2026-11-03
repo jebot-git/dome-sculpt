@@ -7,7 +7,7 @@
 #include <filesystem>
 #include "render-paint-overlay.hpp"
 int main(int argc,char **argv)try{
- if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
+ if(argc!=2&&(argc!=3||std::string_view(argv[2])!="--hardware"))return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  auto raw=quad();raw.uv={{-1,-1},{2,-1},{2,2},{-1,2}};auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=image({180,120,60,255});
  PaintSurfaceOptions policy;policy.policy=PaintUvPolicy::SourceAuthored;auto before=PaintedMesh::from_maps(raw,maps,64,policy);
  Scene scene;scene.active().painted=prepare_source_paint(before,quad(),std::array<uint32_t,4>{0,1,2,3});scene.active().mesh_active=true;scene.active().material=white();
@@ -18,7 +18,11 @@ int main(int argc,char **argv)try{
  check(doc.wait_native_stroke()&&doc.wait_mesh()&&doc.frame().state->error.empty(),"Accepted source paint and immediately queued native Save finish without error");
  const auto painted=doc.copy_scene().encode();check(painted!=baseline&&Scene::load(file).encode()==painted,"Actual queued Save reopens exact accepted source paint");
  auto frame=doc.frame();check(frame.surface&&!frame.surface->ranges.empty()&&frame.surface->ranges[0].textures&&frame.surface->ranges[0].textures->overlay,"Native immutable mesh snapshot contains the sparse original-source overlay");
- NativeGraphics graphics;Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_output_encoding(SurfaceOutputEncoding::Linear);const auto pixels=draw(renderer,frame.surface);
+ NativeGraphics graphics;
+ const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+ std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<'\n';
+ check(argc<3||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos),"Requested native hardware run requires actual A770");
+ Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_output_encoding(SurfaceOutputEncoding::Linear);const auto pixels=draw(renderer,frame.surface);
  check(at(pixels)[3]>0,"Actual worker snapshot reaches production EGL SurfaceRenderer");
  auto owner=doc.copy_scene().active().painted->preview(scene.active().material)->overlay;
  const std::array<uint32_t,6> corners{0,1,2,0,2,3};auto packed_maps=std::make_shared<PaintSourceMaps>(*owner->source_maps());
