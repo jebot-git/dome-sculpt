@@ -8,6 +8,7 @@
 #include "dome/polygon-scene.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "bone-metadata.hpp"
+#include "source-node-extras.hpp"
 #include <set>
 namespace dome::detail {
 namespace {
@@ -389,6 +390,7 @@ std::vector<int> emit_vrm_source_graph(
     if(children.empty())j["nodes"][nodes[parent]].erase("children");
     else j["nodes"][nodes[parent]]["children"]=std::move(children);
   }
+  for(auto node:nodes)remap_source_node_extras(j["nodes"][node],nodes,cancelled);
   for(const auto &object:objects)if(object.deformation&&object.deformation->skin){
     const auto &lengths=object.deformation->skeleton->bones;
     const auto &sources=object.appearance->source_joint_nodes;
