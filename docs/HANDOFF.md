@@ -4,6 +4,20 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Full-affine skin binding checkpoint — 2026-11-03
+
+Runtime `17cbf54` extends public `30991dd`: existing desktop/controller automatic
+bind and transfer accept reflected/sheared placements, measure actual world
+distances, preserve exact local rest/pose/inverse-bind authority and retain
+source/paint/morph data. Common-origin packing fixes valid distant scenes.
+Actual exported sheared joints use valid factored TRS helper hierarchies.
+Selected Release9/9 and fresh owned-core/support sanitizer9/9 pass; native
+FLTK11 plus compact BDF5 pass. New proof includes136 authoring assertions,
+733 persistent allocation-denial boundaries,11 controller and162 independent
+export assertions. Twelve GLBs have0Khronos errors/12 retained non-root warnings.
+Read SKIN-AFFINE.md and validation/SKIN-AFFINE.json. No new schema, physical
+test, GPU rig solver, system installation or complete production qualification.
+
 ## Reverse quality GPU checkpoint — 2026-11-03
 
 Runtime merge `772213d` combines qualified `1be8ab6`/`ac920ed` with main
