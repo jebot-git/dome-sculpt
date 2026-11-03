@@ -82,7 +82,8 @@
       "exit_code": 0,
       "seconds": 214.65942753700074,
       "inputs_unchanged": true
-    }
+    },
+    "ctest_budget": "Exact parent9f4ee1f block: optimized1800s retained, instrumented address/undefined builds6000s only; measured final84=2649.64s"
   },
   "remaining": [
     "Mirror owning/export/UI support is a separate private component",
