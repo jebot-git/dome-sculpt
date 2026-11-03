@@ -6,6 +6,7 @@ namespace dome {
 struct SourcePaintBakeResult {
  SourceUvBakeResult sampling;
  std::shared_ptr<const TextureMaps> textures;
+ std::shared_ptr<const SourceMaterialBindings> material_bindings;
 };
 // Explicit portable material compilation. Native independent sampler/LOD
 // semantics cannot in general be flattened losslessly into a single standard

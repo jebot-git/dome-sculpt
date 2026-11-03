@@ -478,7 +478,7 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
  auto maps=std::make_shared<TextureMaps>();auto roles=std::make_shared<PaintSourceMaps>(*result.sampling.maps);
  // A finite portable paint image has its own linear, clamped sampling. Original
  // sampler metadata remains in the source and per-role preparation result.
- for(auto *slot:{&roles->color,&roles->emission})slot->min_filter=slot->mag_filter=9729;
+ for(auto *slot:{&roles->color,&roles->metal_rough,&roles->emission,&roles->normal,&roles->occlusion})slot->min_filter=slot->mag_filter=9729;
  maps->source_maps=std::move(roles);
  for(auto *image:{&maps->color,&maps->metal_rough,&maps->emission,&maps->color_coverage,&maps->emission_coverage}){image->width=image->height=r;image->rgba.assign(pixels*4,0);}
  const PaintSourceMaps empty;const auto &source=input.paint->source_maps()?*input.paint->source_maps():empty;const auto &mesh=input.paint->mesh();
@@ -494,6 +494,13 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
   maps->color_coverage.rgba[at*4]=byte(overlay[3][0]);maps->emission_coverage.rgba[at*4]=byte(overlay[3][3]);maps->transparent|=colour[3]<.999f;
  }
  result.sampling.image_bytes+=bytes;result.sampling.sample_operations+=size_t(operations);if(result.sampling.sample_operations>options.max_sample_operations)throw std::length_error("Portable source material exceeds cumulative sampling budget");
+ auto adopted=adopt_source_uv_bake(result.sampling);
+ if(adopted.material_bindings){
+  auto binding=std::make_shared<SourceMaterialBindings>(*adopted.material_bindings);
+  for(size_t role=0;role<binding->roles.size();++role)if(binding->roles[role].image&&!result.sampling.view_dependent[role])
+    binding->roles[role].min_filter=binding->roles[role].mag_filter=9729;
+  binding->validate();result.material_bindings=std::move(binding);
+ }
  result.textures=std::move(maps);budget.cancel();return result;
 }
 struct SourceUvBakeAccess {
