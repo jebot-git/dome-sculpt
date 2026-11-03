@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "component": "native retained-paint shape preview visibility",
+  "production_commit": "e7a3c7c6931057a799dbdfcdfeb75b5583487d48",
+  "base": "9050f3648da315a524f1b0508c91ac8b91c9a73c",
+  "production_unchanged_after_original_fix": true,
+  "scope": "Own isolated headers/test/native TU plus exact immutable copied9050 core/render/support archives; not a fresh whole-project or frontend compilation. No header/class/schema ABI change.",
+  "tests": {
+    "old_production_negative": {
+      "session": 84850,
+      "exit_code": 1,
+      "error": "Visibility paint range omitted or fabricated its own sampling attachment",
+      "log": "artifacts/tests-old-native-shape.log"
+    },
+    "optimized_original_observer": {
+      "session": 41916,
+      "exit_code": 0,
+      "checks": 84,
+      "observer_seconds": 20,
+      "log": "artifacts/tests-fixed-native-shape.log"
+    },
+    "owned_sanitizer_original_observer": {
+      "session": 56811,
+      "exit_code": 1,
+      "error": "Actual multi-sample target preview and immutable mesh acknowledge this processed prefix",
+      "observer_seconds": 20,
+      "polling": "yield",
+      "sanitizer_diagnostic": false,
+      "log": "artifacts/tests-sanitize-native-shape.log"
+    },
+    "owned_sanitizer_completed_observer": {
+      "session": 30679,
+      "exit_code": 0,
+      "checks": 84,
+      "observer_seconds": 180,
+      "polling": "1ms sleep",
+      "compile": "O1 g1 ASan+UBSan, wholly owned C/C++ core/render/support archives and own native/test TUs",
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1",
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2",
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib"
+      },
+      "native_start_utc": "2026-11-03T05:38:23.770000+00:00",
+      "last_success_log_utc": "2026-11-03T06:27:45.229829+00:00",
+      "last_success_log_elapsed_seconds": 2961.46,
+      "terminal_observed_utc": "2026-11-03T06:28:05+00:00",
+      "elapsed_to_terminal_observation_seconds": 2981.23,
+      "exact_wrapper_duration_available": false,
+      "timing_scope": "Last success was logged before process/leak teardown; actual exit was observed by the later timestamp. Do not call terminal-observation interval exact runtime.",
+      "sanitizer_diagnostics": [],
+      "log": "artifacts/tests-sanitize-observation180.log",
+      "fixture_byte_identical_to_final_tracked_test": true
+    },
+    "actual_fltk": {
+      "checkpoint": "fbd3c32eca2df9734d6b2c26fbcfbd0ac68400f1",
+      "harness_sha256_prefix": "5ccb6478",
+      "ordinary": {
+        "session": 52695,
+        "exit_code": 0,
+        "checks": 35,
+        "seconds": 140.88123
+      },
+      "compact": {
+        "session": 11267,
+        "exit_code": 0,
+        "checks": 37,
+        "seconds": 140.941804
+      },
+      "receipt": "docs/validation/RETAINED-KEY-UI.json",
+      "scope": "Independent agent actual native UI proof with unchanged supplied app and inspector; retained earlier harness negatives remain separate.",
+      "harness_sha256": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb"
+    }
+  },
+  "test_only_followup": {
+    "observer": "20s yield observer ->180s 1ms polling, explicit progress logs and flushed test output; same assertions, operations and tolerances",
+    "ctest_timeout_release_seconds": 1800,
+    "ctest_timeout_explicit_address_or_undefined_sanitizer_seconds": 6000,
+    "reason": "Completed owned O1 run logged final success at2961.46s, beyond inherited1800s global test limit. Generated CTest configuration verifies release1800 and sanitizer6000.",
+    "config_only_no_redundant_whole_test_rerun": true
+  },
+  "before_after_audit": {
+    "checks": 147,
+    "mismatches": [],
+    "scope": "147 own frozen header/staged app/archive/dependency/binary/source checks through terminal; mutable master archives are not post-run dependencies."
+  },
+  "cpu_parent_archives": {
+    "libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+    "libdome-sculpt-core.a": "cc16f7f36d25c24b55ae517a19c267f773470bb2788df9d00128d3b880e37966",
+    "libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+    "libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+    "libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64",
+    "libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+    "libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+    "libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2"
+  },
+  "sanitizer_parent_archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libdome-sculpt-render.a": "407b8ac05ad302f2dab71832b8bd810484f46553b073698081897307cfe5d1a3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libdome-sculpt-core.a": "07aa8e3749fae0a1d466fecc430a26617465889df84e9eeea731060435537426",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libdome-sculpt-affine.a": "3ba2fac930e888cea317a8de55fe0a2283a1c22b56fb56d33a72d4044b99bd4d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libdome-sculpt-polygon.a": "fcf3d9566ca5b8ab3b59b2ac382e5daaee45e722342f126cfb7f4e479da6cef3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libxatlas.a": "df72246abc1cbe99457298883079a1611a97dbe005f9b12b8e98832c2fbcb66c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libmikktspace.a": "304849defffcb6e0e5ebdde4072b02051bad72a12cfc03d11bb3fb60d86fb60a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libmikktspace-robust.a": "4b135dc0e21067ec75aba1d48dd967ec742f6aed8ddfa832a75e539bfc52687e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-sanitize/libufbx.a": "21f779895c9cd3a811f7a2401680fd2f84988e8be14dc1a9cef18639d35e6046"
+  },
+  "hashes": {
+    "src/document-native.cpp": "02063021d160dea804415b482ab37f55e0277179f13d67d1d894fb06a9dcc2f7",
+    "tests/native-shape-sampling.cpp": "de7652cbfaebfa9d5bd74b632ca7b0680edc9e7de9aa5fc4b027e9daed92e460",
+    "CMakeLists.txt": "24c03cf786fb464e68a2bcbe653b5ef14954d31c3546d1985f1e3ef60987a338",
+    "artifacts/native-shape-old": "f63f255b2691b4f26efa2573399ff83c4de07334df9b475633c5308a9afc8902",
+    "artifacts/native-shape-fixed": "c8600c06a1f9ddbbaa22ced5f6ca79b98b3c8daf31b7c5f362d88c741229a378",
+    "artifacts/sanitize/native-shape-sampling": "3078dfab4e089f03734ad83623e5e018c3c7b084888dbd66d8a99fe57d386129",
+    "artifacts/sanitize/native-shape-observation180": "9ffb453961da6f2979ce1049c050c5f89ce00eeeb9c5f1ad51913551a14d49a1",
+    "artifacts/document-native-fixed.o": "6ac31a9fe1f6d7ac544243ace1ec6ea098b01a5ff9c8bfa39533177842397baa",
+    "artifacts/sanitize/document-native.o": "9e656cd0504218349501ee93018fa81b11fa9d70731e62f1016868a8bf5cc3d6",
+    "artifacts/fixed-app/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+    "artifacts/fixed-app/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+    "artifacts/fixed-app-manifest.json": "5b4fbfc8806ff5c6081562deb330637ad0933d9026230226b6d79ced8896c1b3",
+    "artifacts/inputs-after-audit.json": "f933b33b302b02af8a1b86f0ef16dcca88b107a5bb3d38324f7cf8a170324738",
+    "artifacts/test-compile.json": "bf8e7b999f1df48f560fb5dafac516d3ae990100bebd592cd54ad424c531fbde",
+    "artifacts/test-link-old.json": "67a9c85b7e30908b3eba4d5a9aac35f349a4a5cf66c8c627ac7967d1ea882219",
+    "artifacts/test-link-fixed.json": "f9fe38ed168d058f859e406aca937147d9816e03dfb5c292a4014ee5b21daa41",
+    "artifacts/core-TU-compile.json": "160b1f791da5edead45da075d1e5463c2a32012e89a5853781fc5119540df877",
+    "artifacts/app-link-fixed.json": "a030397f81266b36147f518e10def67a1467b61d3f5498c14a3da054d230e402",
+    "artifacts/sanitize/document-native.o.command.json": "70655e37c96a2a7f99814d50e6e443c7f1e2a38904a639dc5d50ac5cdfc095a4",
+    "artifacts/sanitize/observation180-compile.json": "492b949bc9295f4b97cfb41b9291140941185290ae2e53381dc0d3f1df11e792",
+    "artifacts/sanitize/link-command.json": "b24377fd6930a1a825c84a7aa82d7a26e07035ac169cbd82b78c3d1be39bcacd",
+    "artifacts/budget-config-verification.json": "fa86b16015cc0e4567cbc45ae1a0493984b72af2f39777c085ee4b9817263572",
+    "artifacts/tests-old-native-shape.log": "2d9d46d49215f202dcbef7c21a6921dad62688c673ff3ea88f409f7c8d03c76b",
+    "artifacts/tests-fixed-native-shape.log": "af6657c9eb0daad4db4bf650086d66192f1e2a8a510f41f40af1650b458543a1",
+    "artifacts/tests-sanitize-native-shape.log": "ab740583b56c2c15af602a00c1264a9e9abf7f032f10746d922649e5f9b47374",
+    "artifacts/tests-sanitize-observation180.log": "81c192875c73c927c72ea80898b3de39655baab9e160e697c73a384970b25ab9",
+    "artifacts/sanitize-observation180-progress.log": "cec313385b9e926e9f03e21908ed3a9e291624d3df023f24e22b97976a0a9c40",
+    "artifacts/sanitize-observation180-process.json": "c43f2b768a63ce76d360ccbfd89ae347474437b1e0ba5c8b0a9aa14922d5c018",
+    "artifacts/sanitize-observation180-maps.log": "0a7b556a2432336f39a86aa8daab6ac478e61e103633d0fb0edda46c4165b640"
+  },
+  "limitations": [
+    "No fresh whole-project build claim for this overlay. Root owns later coherent builds.",
+    "No new GPU numerical/dispatch, physical-headset, fault-injection or performance qualification.",
+    "Test stamp wrapper deliberately crosses30ms preview throttle; this is correctness evidence, not native UI latency measurement.",
+    "Legacy20s observer failure is preserved; it is not relabeled as a pass.",
+    "Source24/normal/seam/topology guards remain unchanged; this does not complete the broader authoring goal."
+  ]
+}
