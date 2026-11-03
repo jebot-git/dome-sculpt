@@ -19,6 +19,7 @@ inline std::shared_ptr<const DeformationState> normal_frame_remap_deformation(
   input->validate(source);
   if(vertices.size()!=target.positions.size() || vertices.size()>2'000'000)throw std::invalid_argument("Deformation remap dimensions differ");
   size_t entries=input->pose.size()+input->morph_weights.size();constexpr size_t limit=8'000'000;
+  for(const auto &pose:input->pose)if(pose.full_local_matrix){if(16>limit-entries)throw std::length_error("Remapped exact pose matrices exceed native deformation quota");entries+=16;}
   if(input->morphs && vertices.size() && input->morphs->targets.size()>(limit-entries)/vertices.size())throw std::length_error("Remapped morph POSITION arrays exceed native deformation quota");
   if(input->morphs)entries+=input->morphs->targets.size()*vertices.size();
   bool identity=vertices.size()==source.positions.size();

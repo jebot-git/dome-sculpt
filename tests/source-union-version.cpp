@@ -4,6 +4,7 @@
 #include "polygon-conversion.hpp"
 #include "polygon-scene-budget.hpp"
 #include "scene-feature-version.hpp"
+#include "normal-frame-runtime.hpp"
 #include <iostream>
 using namespace dome;
 namespace {
@@ -41,6 +42,16 @@ int main(int argc,char **argv)try{
  check(refuses([&]{detail::PolygonSceneBudget old;old.deformation(encoded,24);},"Scene25"),"A down-version retained before-state refuses in aggregate preflight");
  budget.deformations=8'000'000-16;
  check(refuses([&]{budget.deformation(encoded,26);},"budget"),"Scene26 does not exempt exact before-state matrices from the aggregate budget");
+ // 127 targets x 62,992 mapped vertices consume 7,999,984 entries. The
+ // genuine exact pose consumes17 more, so refuse BEFORE allocating ~96MB
+ // of output POSITION arrays. This is a valid unused-vertex UV derivative;
+ // its tiny source and map deliberately keep the negative itself inexpensive.
+ auto quota=std::make_shared<DeformationState>(exact);quota->morphs=MorphSet(part.painted->mesh());
+ for(size_t n=0;n<127;++n)quota->morphs->targets.push_back({"quota-"+std::to_string(n),std::vector<Vec3>(part.painted->mesh().positions.size())});
+ auto expanded=part.painted->mesh();constexpr size_t vertices=62'992;
+ expanded.positions.resize(vertices,expanded.positions.front());expanded.normals.resize(vertices,expanded.normals.front());expanded.uv.resize(vertices,expanded.uv.front());expanded.uv_pins.clear();expanded.uv_seams.clear();expanded.validate();
+ std::vector<uint32_t> remap(vertices);for(size_t n=0;n<part.painted->mesh().positions.size();++n)remap[n]=uint32_t(n);
+ check(refuses([&]{detail::normal_frame_remap_deformation(quota,part.painted->mesh(),expanded,remap);},"Remapped morph POSITION arrays exceed"),"Real exact-pose UV remap refuses its over-budget output before constructing target arrays");
  auto materials=nlohmann::json{{"version",2},{"origins",nlohmann::json::array({{{"deformation",encoded}}})}};
  check(SourceMaterialArchive::deformation_entries(materials)==17,"Retained material deformation counting uses the same exact-pose charge");
  // The current object is plain SDF. Both new features exist only in its one

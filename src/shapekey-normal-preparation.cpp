@@ -4,6 +4,7 @@
 #include "normal-bake-frames.hpp"
 #include "normal-frame-runtime.hpp"
 #include "normal-projection-identity.hpp"
+#include "normal-sampling-access.hpp"
 #include "polygon-conversion.hpp"
 namespace dome::detail {
 namespace {
@@ -23,6 +24,19 @@ bool same_image(const Image &a,const Image &b){return a.width==b.width&&a.height
 bool same_base_set(const NormalFrameSet &a,const NormalFrameSet &b){
   return a.skin_policy==b.skin_policy&&a.canonical_evaluation==b.canonical_evaluation&&
       same_base(a.pbr,b.pbr)&&same_base(a.mtoon,b.mtoon)&&same_base(a.canonical,b.canonical);
+}
+
+
+// Count the destination model before allocating remapped target arrays. The
+// historical before-pose and current output-pose can have different exact
+// matrix payloads; neither may disappear from the aggregate resource bound.
+void domain_key_budget(const DeformationState *base,size_t vertices,size_t targets,
+    size_t weights,const std::function<bool()> &cancelled){
+  constexpr size_t limit=8'000'000;size_t entries=0;
+  auto add=[&](size_t n){if(n>limit-entries)throw std::length_error("Prepared key remap exceeds native deformation quota");entries+=n;};add(weights);
+  if(base){add(base->pose.size());for(const auto &pose:base->pose)if(pose.full_local_matrix)add(16);
+    if(base->skin)for(size_t v=0;v<base->skin->vertices.size();++v){if((v&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Prepared key remap cancelled");add(base->skin->vertices[v].size());}}
+  if(targets&&vertices>(limit-entries)/targets)throw std::length_error("Prepared key target arrays exceed native deformation quota");
 }
 
 // UV correspondence is an authored identity, not a nearest-position query.
@@ -51,33 +65,46 @@ std::vector<Vec3> uv_origin_delta(const std::vector<Vec3> &delta,
   return out;
 }
 
-ShapeKeyResult author_uv_prepared_key(Scene &scene, uint64_t object,
+ShapeKeyResult author_domain_prepared_key(Scene &scene, uint64_t object,
     const ShapeKeyEdit &edit, const std::function<bool()> &cancelled) {
   const auto &source = scene.object(object);
   const auto binding = source.material_bindings;
   const auto &recipe = *binding->normal_preparation;
-  const auto &uv = *recipe.uv_reprojection;
-  const auto &before = uv.before_paint->mesh();
+  const auto sampled=recipe.sampling_domain;
+  const auto raster=recipe.uv_reprojection;
+  const auto before_paint=sampled?sampled->before_paint:raster->before_paint;
+  const auto before_material=sampled?sampled->before_material:raster->before_material;
+  const auto before_appearance=sampled?sampled->before_appearance:raster->before_appearance;
+  const auto before_deformation=sampled?sampled->before_deformation:raster->before_deformation;
+  const auto layout=sampled?sampled->layout:raster->layout;
+  const auto &before = before_paint->mesh();
   const auto &current = source.painted->mesh();
   const auto projection = source.painted->normal_projection();
   auto stop = [&] { if (cancelled && cancelled())
       throw std::runtime_error("Post-UV prepared key authoring cancelled"); };
   stop();
   normal_frame_current_authority(*binding, current, source.deformation.get(), cancelled);
+  const auto source_deform=source.deformation.get();
+  const size_t targets=source_deform&&source_deform->morphs?source_deform->morphs->targets.size():0;
+  const size_t weights=source_deform?source_deform->morph_weights.size():0;
+  const bool replacing=edit.action==ShapeKeyAction::Replace||edit.action==ShapeKeyAction::Rename;
+  domain_key_budget(before_deformation.get(),before.positions.size(),targets,weights,cancelled);
+  if(!replacing)domain_key_budget(before_deformation.get(),before.positions.size(),targets+1,targets+1,cancelled);
+  domain_key_budget(source_deform,current.positions.size(),targets+(replacing?0:1),replacing?weights:targets+1,cancelled);
 
   auto before_deform = std::make_shared<DeformationState>(
-      uv.before_deformation ? *uv.before_deformation : DeformationState(before));
+      before_deformation ? *before_deformation : DeformationState(before));
   before_deform->morphs = MorphSet(before);
   if (source.deformation && source.deformation->morphs) {
     for (size_t slot = 0; slot < source.deformation->morphs->targets.size(); ++slot) {
       stop();
       const auto &target = source.deformation->morphs->targets[slot];
       const std::vector<Vec3> *retained = nullptr;
-      if (uv.before_deformation && uv.before_deformation->morphs &&
-          slot < uv.before_deformation->morphs->targets.size())
-        retained = &uv.before_deformation->morphs->targets[slot].delta;
+      if (before_deformation && before_deformation->morphs &&
+          slot < before_deformation->morphs->targets.size())
+        retained = &before_deformation->morphs->targets[slot].delta;
       before_deform->morphs->targets.push_back({target.name,
-          uv_origin_delta(target.delta, *uv.layout, before.positions.size(), retained, cancelled)});
+          uv_origin_delta(target.delta, *layout, before.positions.size(), retained, cancelled)});
     }
     before_deform->morph_weights = source.deformation->morph_weights;
     before_deform->expressions = source.deformation->expressions;
@@ -97,7 +124,7 @@ ShapeKeyResult author_uv_prepared_key(Scene &scene, uint64_t object,
     const std::vector<Vec3> *retained = before_deform->morphs &&
         edit.target < before_deform->morphs->targets.size()
         ? &before_deform->morphs->targets[edit.target].delta : nullptr;
-    auto original = uv_origin_delta(delta, *uv.layout, before.positions.size(), retained, cancelled);
+    auto original = uv_origin_delta(delta, *layout, before.positions.size(), retained, cancelled);
     mapped.positions = before.positions;
     for (size_t v = 0; v < mapped.positions.size(); ++v) mapped.positions[v] += original[v];
   }
@@ -111,9 +138,9 @@ ShapeKeyResult author_uv_prepared_key(Scene &scene, uint64_t object,
 
   Scene detached = scene;
   auto &input = detached.object(object);
-  input.painted = uv.before_paint->snapshot();
-  input.material_bindings = uv.before_material;
-  input.appearance = uv.before_appearance;
+  input.painted = before_paint->snapshot();
+  input.material_bindings = before_material;
+  input.appearance = before_appearance;
   input.deformation = std::move(before_deform);
   auto result = author_prepared_normal_shapekey(detached, object, mapped, cancelled);
   if (!result.changed) return result;
@@ -124,17 +151,41 @@ ShapeKeyResult author_uv_prepared_key(Scene &scene, uint64_t object,
   // Authenticate the newly edited before-model through every real UV replay.
   // Keep current paint/detail/mask bytes and material values on the output;
   // reinstalling a historical full bake would discard edits made after UV Apply.
-  auto next_uv = std::make_shared<SourceNormalUvReprojection>(uv);
-  next_uv->before_paint = edited.painted;
-  next_uv->before_material = edited.material_bindings;
-  next_uv->before_appearance = edited.appearance;
-  next_uv->before_deformation = edited.deformation;
-  next_uv->projection = projection;
-  next_uv->validate(true, cancelled);
   auto next_recipe = std::make_shared<SourceNormalPreparation>(
       *edited.material_bindings->normal_preparation);
   next_recipe->projection = projection;
-  next_recipe->uv_reprojection = std::move(next_uv);
+  if(sampled){
+    // This is a new owning replay of newly authored attributes, not a pointer
+    // substitution into the old proof. In particular, never copy its private
+    // runtime seal: the node identity and every before-owner have changed.
+    auto next_sampling=std::make_shared<SourceNormalSampling>();
+    next_sampling->receipt=sampled->receipt;
+    next_sampling->layout=sampled->layout;
+    next_sampling->projection=projection;
+    next_sampling->before_paint=edited.painted;
+    next_sampling->before_material=edited.material_bindings;
+    next_sampling->before_appearance=edited.appearance;
+    next_sampling->before_deformation=edited.deformation;
+    const auto &prior=edited.material_bindings->normal_preparation->sampling_domain;
+    next_sampling->sampling_material=prior?prior->sampling_material:edited.material_bindings;
+    next_sampling->current_sampling_reference=sampled->current_sampling_reference;
+    next_sampling->metadata_sampling_domain=sampled->metadata_sampling_domain;
+    // Current intrinsic/resolved images, normal-specific coverage and detail
+    // event owners stay exact. Full replay must authenticate all of them from
+    // the edited before-model before the independent metadata seal is minted.
+    authenticate_normal_sampling_metadata(next_sampling,cancelled);
+    next_recipe->sampling_domain=std::move(next_sampling);
+    next_recipe->uv_reprojection.reset();
+  }else{
+    auto next_uv=std::make_shared<SourceNormalUvReprojection>(*raster);
+    next_uv->before_paint=edited.painted;
+    next_uv->before_material=edited.material_bindings;
+    next_uv->before_appearance=edited.appearance;
+    next_uv->before_deformation=edited.deformation;
+    next_uv->projection=projection;
+    next_uv->validate(true,cancelled);
+    next_recipe->uv_reprojection=std::move(next_uv);
+  }
   next_recipe->validate();
   auto next_binding = std::make_shared<SourceMaterialBindings>(*binding);
   next_binding->normal_frames = next_recipe->target_frames;
@@ -149,7 +200,7 @@ ShapeKeyResult author_uv_prepared_key(Scene &scene, uint64_t object,
     stop();
     std::vector<Vec3> delta;
     delta.reserve(current.positions.size());
-    for (auto original : uv.layout->source_vertices) delta.push_back(target.delta.at(original));
+    for (auto original : layout->source_vertices) delta.push_back(target.delta.at(original));
     deform->morphs->targets.push_back({target.name, std::move(delta)});
   }
   deform->morph_weights = edited.deformation->morph_weights;
@@ -175,7 +226,7 @@ ShapeKeyResult author_prepared_normal_shapekey(Scene &scene,uint64_t object,cons
     throw std::invalid_argument("Prepared shapekey authoring requires its finished owning normal model");
   const auto &recipe=*binding->normal_preparation;binding->validate();
   recipe.validate_current(source.painted->mesh(),source.appearance.get(),cancelled);
-  if(recipe.uv_reprojection)return author_uv_prepared_key(scene,object,edit,cancelled);
+  if(recipe.uv_reprojection||recipe.sampling_domain)return author_domain_prepared_key(scene,object,edit,cancelled);
   const auto projection=source.painted->normal_projection();
   if(!normal_projection_identity(*projection,*recipe.projection)||!normal_projection_identity(*projection,*recipe.initial_projection))
     throw std::invalid_argument("Prepared shapekey authoring requires authenticated intrinsic sampling authority");
