@@ -97,6 +97,13 @@ int main(int argc, char **argv) try {
   std::string edges = argc > 8 ? argv[8] : "half";
   if (edges != "half" && edges != "incident")
     throw std::invalid_argument("Unknown explicit heat edge control");
+  std::string source_rule = argc > 9 ? argv[9] : "distinct";
+  if (source_rule != "distinct" && source_rule != "reference" &&
+      source_rule != "reference-raw")
+    throw std::invalid_argument("Unknown explicit heat source rule");
+  std::string operation = argc > 10 ? argv[10] : "positive";
+  if (operation != "positive" && operation != "fem")
+    throw std::invalid_argument("Unknown explicit heat operator");
   Scene scene;
   auto controls =
       male ? humanoid_baseline_defaults("vroid-beta-male") : HumanoidControls{};
@@ -116,6 +123,7 @@ int main(int argc, char **argv) try {
             << " policy=" << (primitive ? "original-primitive" : "whole-skin")
             << " visibility=" << visibility << " occlusion=" << domain
             << " heat_strength=" << strength << " normals=" << geometry_normals
+            << " operation=" << operation << " source_rule=" << source_rule
             << " edges=" << edges << " mass=" << mass << " height=" << height
             << " mean_limit=" << mean_limit << " max_limit=" << max_limit
             << '\n';
@@ -127,7 +135,8 @@ int main(int argc, char **argv) try {
     std::cout << "PART " << o.id << ' ' << o.name << '\n' << std::flush;
     try {
       HeatBindingOptions options;
-      options.operation = HeatOperator::PositiveGraph;
+      options.operation = operation == "fem" ? HeatOperator::FiniteElements
+                                             : HeatOperator::PositiveGraph;
       options.visibility = visibility == "entry" ? HeatVisibility::EntryFaces
                                                  : HeatVisibility::AllFaces;
       options.occlusion = domain == "component"
@@ -137,6 +146,11 @@ int main(int argc, char **argv) try {
           mass == "mixed" ? HeatMass::MixedVoronoi : HeatMass::Barycentric;
       options.edges = edges == "incident" ? HeatEdges::IncidentMean
                                           : HeatEdges::CotangentHalf;
+      if (source_rule != "distinct") {
+        options.seed_rule = HeatSeedRule::ReferenceSegments;
+        options.output = source_rule == "reference" ? HeatOutput::ReferenceLimit
+                                                    : HeatOutput::Raw;
+      }
       options.maximum_seed_distance = 1;
       options.heat_strength = strength;
       options.geometry_normals = geometry_normals == "unit"
@@ -196,6 +210,10 @@ int main(int argc, char **argv) try {
                   << " native_consumer_max=" << consumer
                   << " seam_exact=" << seam << " quality=" << good << '\n';
       }
+    } catch (const HeatPositivityFailure &e) {
+      ++refused;
+      std::cout << "REFUSED_POSITIVITY joint=" << e.joint
+                << " minimum=" << e.minimum << '\n';
     } catch (const HeatSeedFailure &e) {
       ++refused;
       std::cout << "REFUSED_SEED rows=" << e.rows

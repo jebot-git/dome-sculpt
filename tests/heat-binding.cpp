@@ -106,7 +106,8 @@ std::array<long double, 3> mixed_areas(std::array<Vec3, 3> p) {
 // by pivoted long-double elimination; no private CSR/PCG data is consumed.
 std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
                                 bool positive = false, bool mixed = false,
-                                bool incident = false) {
+                                bool incident = false,
+                                bool reference_rows = false) {
   size_t n = m.positions.size();
   std::vector<std::vector<long double>> a(n, std::vector<long double>(n));
   std::vector<long double> mass(n), rhs(n);
@@ -156,6 +157,10 @@ std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
         }
       a[i][i] = diagonal;
     }
+  if (reference_rows)
+    for (size_t i = 0; i < n; ++i)
+      for (auto &value : a[i])
+        value /= 4 * mass[i];
   for (size_t i = 0; i < n; ++i) {
     std::array<long double, 2> d;
     auto p = m.positions[i];
@@ -171,11 +176,13 @@ std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
       d[j] = distance / (.5L * (cosine + 1.001L));
     }
     auto nearest = std::min(d[0], d[1]);
-    int ties =
-        int(d[0] <= nearest * (1 + 1e-6L)) + int(d[1] <= nearest * (1 + 1e-6L));
-    long double h = mass[i] * ties / (nearest * nearest);
+    const long double epsilon = reference_rows ? 1e-4L : 1e-6L;
+    int ties = int(d[0] <= nearest * (1 + epsilon)) +
+               int(d[1] <= nearest * (1 + epsilon));
+    long double h =
+        (reference_rows ? 1.L : mass[i]) * ties / (nearest * nearest);
     a[i][i] += h;
-    rhs[i] = d[0] <= nearest * (1 + 1e-6L) ? h / ties : 0;
+    rhs[i] = d[0] <= nearest * (1 + epsilon) ? h / ties : 0;
   }
   for (size_t k = 0; k < n; ++k) {
     size_t pivot = k;
@@ -393,6 +400,27 @@ int main(int argc, char **) try {
           "Mixed Voronoi heat matches independent clipped-cell/dense solve on "
           "right and obtuse cases");
     }
+  }
+  auto reference = mixed;
+  reference.heat_strength = 4;
+  reference.seed_rule = HeatSeedRule::ReferenceSegments;
+  reference.output = HeatOutput::ReferenceLimit;
+  for (const auto &test : {mesh, obtuse}) {
+    auto result = heat_bind_surface(test, rig, reference);
+    auto dense = oracle(test, rig, true, true, true, true);
+    auto limit = [](long double x) {
+      return x < .025L ? 0.L : x < .05L ? 2 * (x - .025L) : x;
+    };
+    double maximum = 0;
+    for (size_t i = 0; i < dense.size(); ++i) {
+      long double a = limit(dense[i]), b = limit(1 - dense[i]);
+      maximum = std::max(
+          maximum,
+          double(std::abs(a / (a + b) - weight(result.vertices[i], 0))));
+    }
+    std::cout << "REFERENCE_ROWS oracle_error=" << maximum << '\n';
+    check(maximum < 1e-6, "Symmetric PCG agrees with independent reference row "
+                          "scaling, H and output limiter");
   }
   auto nondeform = rig;
   nondeform.bones[1].deform = false;

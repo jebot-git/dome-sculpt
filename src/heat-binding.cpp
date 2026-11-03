@@ -45,6 +45,7 @@ struct System {
   std::vector<double> values, diagonal, mass, heat, ties;
   std::vector<D> normals;
   std::vector<std::array<uint64_t, 4>> seeds;
+  std::vector<uint16_t> source_counts;
   size_t components = 0, negative_edges = 0;
   double removed_negative_stiffness = 0;
   void multiply(std::span<const double> x, std::span<double> out,
@@ -316,6 +317,11 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
   std::vector<Candidate> candidates;
   candidates.reserve(segments.size());
   std::vector<uint8_t> anchored(s.positions.size());
+  const size_t bones = rig.bones.size();
+  if (o.seed_rule == HeatSeedRule::ReferenceSegments)
+    s.source_counts.assign(s.positions.size() * bones, 0);
+  const double tie_epsilon =
+      o.seed_rule == HeatSeedRule::ReferenceSegments ? 1e-4 : 1e-6;
   for (size_t i = 0; i < s.positions.size(); ++i) {
     budget.step();
     auto p = s.positions[i];
@@ -342,7 +348,7 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
     size_t ties = 0;
     for (const auto &c : candidates) {
       budget.step();
-      if (c.distance > nearest * (1 + 1e-6))
+      if (c.distance > nearest * (1 + tie_epsilon))
         break;
       auto d = sub(c.target, p);
       bool visible = true;
@@ -381,7 +387,14 @@ void seed(System &s, const Mesh &m, const Skeleton &rig,
         continue;
       nearest = std::min(nearest, c.distance);
       auto mask = uint64_t(1) << (c.bone % 64);
-      if (!(s.seeds[i][c.bone / 64] & mask)) {
+      if (o.seed_rule == HeatSeedRule::ReferenceSegments) {
+        // The reference counts source segments, then adds their independently
+        // solved fields back to their owning bone. Aggregate the same linear
+        // right-hand sides without inventing a second bone identity.
+        ++s.source_counts[i * bones + c.bone];
+        s.seeds[i][c.bone / 64] |= mask;
+        ++ties;
+      } else if (!(s.seeds[i][c.bone / 64] & mask)) {
         s.seeds[i][c.bone / 64] |= mask;
         ++ties;
       }
@@ -424,6 +437,13 @@ struct Solve {
   size_t iterations = 0;
   double residual = 0, minimum = 0;
 };
+double reference_limit(double weight) {
+  if (weight < .025)
+    return 0;
+  if (weight < .05)
+    return (weight - .025) * 2;
+  return weight;
+}
 Solve solve(const System &s, std::span<const double> rhs, std::span<double> x,
             const HeatBindingOptions &o, Budget &budget) {
   const size_t n = x.size();
@@ -525,6 +545,9 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
       (o.mass != HeatMass::Barycentric && o.mass != HeatMass::MixedVoronoi) ||
       (o.edges != HeatEdges::CotangentHalf &&
        o.edges != HeatEdges::IncidentMean) ||
+      (o.seed_rule != HeatSeedRule::DistinctBones &&
+       o.seed_rule != HeatSeedRule::ReferenceSegments) ||
+      (o.output != HeatOutput::Raw && o.output != HeatOutput::ReferenceLimit) ||
       !o.maximum_work || o.maximum_work > 500'000'000 ||
       o.maximum_bytes < 4096 || o.maximum_bytes > 512u * 1024u * 1024u ||
       !o.maximum_iterations || o.maximum_iterations > 4096 ||
@@ -547,6 +570,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   bytes(nt, 544);
   bytes(rig.bones.size() * rig.bones.size(), 64);
   bytes(rig.bones.size(), 512);
+  if (o.seed_rule == HeatSeedRule::ReferenceSegments)
+    bytes(n, rig.bones.size() * sizeof(uint16_t));
   bytes(1, 8192);
   budget.step(n + m.indices.size() + rig.bones.size() * rig.bones.size());
   budget.step(m.indices.size() *
@@ -611,7 +636,11 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
       bool active = false;
       for (size_t i = 0; i < rows; ++i) {
         bool selected = s.seeds[i][bone / 64] & (uint64_t(1) << (bone % 64));
-        rhs[i] = selected ? s.heat[i] / s.ties[i] : 0;
+        const unsigned multiplicity =
+            s.source_counts.empty()
+                ? 1
+                : s.source_counts[i * rig.bones.size() + bone];
+        rhs[i] = selected ? multiplicity * s.heat[i] / s.ties[i] : 0;
         active |= selected;
       }
       if (!active)
@@ -629,6 +658,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
         budget.step();
         double value = std::max(0., field[i]);
         sum[i] += value;
+        if (o.output == HeatOutput::ReferenceLimit)
+          value = reference_limit(value);
         if (value <= 0)
           continue;
         auto &row = grouped.vertices[i];

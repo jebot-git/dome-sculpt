@@ -21,7 +21,7 @@ int main() try {
                   "Actual male diagnosis", {}, 64);
   std::cout << std::setprecision(10);
   for (const auto &o : scene.objects()) {
-    if (o.id != 12 && o.id != 16 && o.id != 18)
+    if (o.id != 12 && o.id != 16)
       continue;
     const auto &m = o.painted->mesh();
     auto &d = *o.deformation;
@@ -29,6 +29,11 @@ int main() try {
     options.operation = HeatOperator::PositiveGraph;
     options.visibility = HeatVisibility::EntryFaces;
     options.maximum_seed_distance = 1;
+    options.occlusion = HeatOcclusion::ConnectedSurface;
+    options.geometry_normals = HeatNormals::UnitFaces;
+    options.mass = HeatMass::MixedVoronoi;
+    options.edges = HeatEdges::IncidentMean;
+    options.heat_strength = 4;
     auto profile = imported_heat_profile(*d.skeleton, *o.appearance, options,
                                          {}, &*d.humanoid);
     auto seams = capture_heat_seams(o, options);
@@ -109,6 +114,82 @@ int main() try {
     rows(d, d.skin->vertices[worst]);
     std::cout << "HEAT";
     rows(d, weights.vertices[worst]);
+    std::function<bool()> cancel;
+    Budget budget{0, options.maximum_work, cancel};
+    auto system =
+        assemble(m, budget, options.operation, seams.groups(o),
+                 options.geometry_normals, options.mass, options.edges);
+    seed(system, m, *d.skeleton, options, budget, profile.segments,
+         profile.eligible);
+    size_t r = system.raw_to_row[worst];
+    std::cout << "ROW id=" << r << " mass=" << system.mass[r]
+              << " heat=" << system.heat[r] << " ties=" << system.ties[r]
+              << " normal=" << system.normals[r][0] << ','
+              << system.normals[r][1] << ',' << system.normals[r][2] << '\n';
+    struct Candidate {
+      long double distance, physical, cosine, t;
+      uint32_t bone;
+      std::array<double, 3> head, tail;
+    };
+    std::vector<Candidate> candidates;
+    for (const auto &source : profile.segments) {
+      std::array<long double, 3> v, e, q, delta;
+      long double l2 = 0, numerator = 0;
+      for (int k = 0; k < 3; ++k) {
+        v[k] = system.positions[r][k];
+        e[k] = (long double)source.tail[k] - source.head[k];
+        l2 += e[k] * e[k];
+        numerator += (v[k] - source.head[k]) * e[k];
+      }
+      long double t = l2 ? std::clamp(numerator / l2, 0.L, 1.L) : 0,
+                  physical = 0, cosine = 0;
+      for (int k = 0; k < 3; ++k) {
+        q[k] = source.head[k] + t * e[k];
+        delta[k] = v[k] - q[k];
+        physical += delta[k] * delta[k];
+        cosine += delta[k] * system.normals[r][k];
+      }
+      physical = std::sqrt(physical);
+      cosine = physical ? cosine / physical : 0;
+      candidates.push_back({physical / (.5L * (cosine + 1.001L)), physical,
+                            cosine, t, source.bone, source.head, source.tail});
+    }
+    std::sort(
+        candidates.begin(), candidates.end(),
+        [](const auto &a, const auto &b) { return a.distance < b.distance; });
+    for (size_t k = 0; k < std::min(size_t(12), candidates.size()); ++k) {
+      const auto &c = candidates[k];
+      std::cout << "SOURCE " << c.bone << ':' << d.skeleton->bones[c.bone].name
+                << " adjusted=" << c.distance << " physical=" << c.physical
+                << " cosine=" << c.cosine << " t=" << c.t
+                << " head=" << c.head[0] << ',' << c.head[1] << ',' << c.head[2]
+                << " tail=" << c.tail[0] << ',' << c.tail[1] << ',' << c.tail[2]
+                << " selected="
+                << bool(system.seeds[r][c.bone / 64] &
+                        (uint64_t(1) << (c.bone % 64)))
+                << '\n';
+    }
+    std::vector<double> rhs(system.positions.size()), field(rhs.size());
+    for (uint32_t bone = 0; bone < d.skeleton->bones.size(); ++bone)
+      if (profile.eligible[bone]) {
+        size_t hits = 0;
+        long double integrated = 0;
+        for (size_t row = 0; row < rhs.size(); ++row) {
+          bool chosen =
+              system.seeds[row][bone / 64] & (uint64_t(1) << (bone % 64));
+          rhs[row] = chosen ? system.heat[row] / system.ties[row] : 0;
+          hits += chosen;
+          integrated += rhs[row];
+        }
+        if (!hits)
+          continue;
+        auto measured = solve(system, rhs, field, options, budget);
+        if (field[r] > .001)
+          std::cout << "FIELD " << bone << ':' << d.skeleton->bones[bone].name
+                    << " raw=" << field[r] << " source_rows=" << hits
+                    << " integrated_heat=" << integrated
+                    << " residual=" << measured.residual << '\n';
+      }
   }
   return 0;
 } catch (const std::exception &e) {

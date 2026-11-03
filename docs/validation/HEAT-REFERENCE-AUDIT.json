@@ -1,0 +1,131 @@
+{
+  "scope": "Private own kernel/tests plus copied uninstrumented b32 support AR; no native admission",
+  "reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2/intern/eigen/intern/linear_solver.cc",
+    "sha256": "886e3061226fef8e10106b86d9e535c18782368999bcb8089363a1589c377e32"
+  },
+  "inputs": {
+    "count": 1474,
+    "pose_exact": true
+  },
+  "runtime_sha256": "d3cbeba98c7b9c826e37c4b67010e4bb2dfcb623a2d8b0ace393631296cd4d69",
+  "private_header_sha256": "e32d10a10b815c49a502500ce524148f14349993757b12d2ae09adde1536abf6",
+  "dense_reference_max_errors": [
+    2.62928e-08,
+    4.85803e-09
+  ],
+  "negative_curvature_certificate": {
+    "standard_FEM": "23/5",
+    "incidence_normalized": "-1/5"
+  },
+  "cohorts": [
+    {
+      "path": "artifacts/poses-reference-female.log",
+      "sha256": "2379bc012cfc929c30c0f7527ad26909765acf80bdd8d8be2e1bdbd8768d4eaf",
+      "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "failures": []
+    },
+    {
+      "path": "artifacts/poses-reference-male.log",
+      "sha256": "64d6021140fc1d47afc268347e438418b7bb30f533fd83491e3847c7dedbd3fc",
+      "summary": "SUMMARY solved=19 refused=0 quality_failures=3 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "failures": [
+        "POSE 3 artist_mean=0.00107431627 artist_max=0.03712533401 native_consumer_max=2.192766795e-07 seam_exact=1 quality=0",
+        "POSE 3 artist_mean=0.004801126369 artist_max=0.04024013274 native_consumer_max=2.080287773e-07 seam_exact=1 quality=0",
+        "POSE 0 artist_mean=0.002080737039 artist_max=0.03657028995 native_consumer_max=3.295260998e-08 seam_exact=1 quality=0"
+      ]
+    },
+    {
+      "path": "artifacts/poses-reference-raw-female.log",
+      "sha256": "388efcbc4f60b4eb1ec8596db4624c7753915016b7c6d532c670fc05420df613",
+      "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "failures": []
+    },
+    {
+      "path": "artifacts/poses-reference-raw-male.log",
+      "sha256": "747992dc1ddf82e3f41bf2123fb9ecb0d9f98c9522c9dc2bf5bdd1147d360173",
+      "summary": "SUMMARY solved=19 refused=0 quality_failures=3 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "failures": [
+        "POSE 3 artist_mean=0.001110803775 artist_max=0.03712533401 native_consumer_max=2.67342654e-07 seam_exact=1 quality=0",
+        "POSE 3 artist_mean=0.004775372041 artist_max=0.04024013274 native_consumer_max=2.080287773e-07 seam_exact=1 quality=0",
+        "POSE 0 artist_mean=0.004142430127 artist_max=0.03657028995 native_consumer_max=4.133112809e-08 seam_exact=1 quality=0"
+      ]
+    },
+    {
+      "path": "artifacts/poses-reference-strict-fem-female.log",
+      "sha256": "6f46e9a0c88e031866aef229137927c353f1140441600f6b3de8b5f545f25eb8",
+      "summary": "SUMMARY solved=17 refused=2 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "failures": [
+        "REFUSED Bone heat PCG lost positive curvature",
+        "REFUSED_POSITIVITY joint=21 minimum=-1.198802837e-07"
+      ]
+    },
+    {
+      "path": "artifacts/poses-reference-strict-fem-male.log",
+      "sha256": "2b97586df958bb822264333b09da812d67b792eb45b5eb8b3dc031b64b92cc1d",
+      "summary": "SUMMARY solved=17 refused=2 quality_failures=3 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+      "failures": [
+        "POSE 3 artist_mean=0.001068486062 artist_max=0.0372810265 native_consumer_max=2.521319658e-07 seam_exact=1 quality=0",
+        "REFUSED_POSITIVITY joint=17 minimum=-1.171976254e-07",
+        "POSE 3 artist_mean=0.004719087008 artist_max=0.03847691238 native_consumer_max=2.124260076e-07 seam_exact=1 quality=0",
+        "REFUSED Bone heat PCG lost positive curvature",
+        "POSE 0 artist_mean=0.002200255766 artist_max=0.03705805034 native_consumer_max=3.272572368e-08 seam_exact=1 quality=0"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "artifacts/heat-binding-final-release",
+      "sha256": "28911f9564ce4b4b2199f04eda903faf07844e19f2977f6e455e011791f7ce4e"
+    },
+    {
+      "path": "artifacts/heat-binding-final-sanitize",
+      "sha256": "81fe3360bc7ee01e6cf5ac8a75830dd8e54797768ebac6795b890bcb86b9d850"
+    },
+    {
+      "path": "artifacts/heat-reference-energy-release",
+      "sha256": "f5d441136f24fa58ad979226874bc3fbc2de30f4b8f93b8c2a4649a14a390757"
+    },
+    {
+      "path": "artifacts/heat-reference-energy-sanitize",
+      "sha256": "66ab9834b30386d577fa5ba72155eca7397d2d1cfb0e45146319c93e6a2cd3d6"
+    },
+    {
+      "path": "artifacts/heat-reference-final-release",
+      "sha256": "dbeeb3e7cb3ef64d0056ac95d89b136570eac43d02a826b7c3578e11f44c7b68"
+    },
+    {
+      "path": "artifacts/heat-reference-final-sanitize",
+      "sha256": "25d2cd9ea2ac24b13543456ddfd85a6f34c902ea008b06a69189d0749c7653fb"
+    },
+    {
+      "path": "artifacts/tests-heat-binding-final-release.log",
+      "sha256": "9392f5c84f43171a652ae99d766d86da6e0a88b9eef5ee7736519ba930e88fa0"
+    },
+    {
+      "path": "artifacts/tests-heat-binding-final-sanitize.log",
+      "sha256": "9392f5c84f43171a652ae99d766d86da6e0a88b9eef5ee7736519ba930e88fa0"
+    },
+    {
+      "path": "artifacts/tests-heat-reference-energy-release.log",
+      "sha256": "618690af32340f2b403eaf4bc555ebadbd9a91af6be50d318367987628229067"
+    },
+    {
+      "path": "artifacts/tests-heat-reference-energy-sanitize.log",
+      "sha256": "618690af32340f2b403eaf4bc555ebadbd9a91af6be50d318367987628229067"
+    },
+    {
+      "path": "artifacts/tests-heat-reference-final-release.log",
+      "sha256": "5175d37bc997ca2725c525880bea4283cf7ab02f42779e4bd125cd13ca0d7142"
+    },
+    {
+      "path": "artifacts/tests-heat-reference-final-sanitize.log",
+      "sha256": "5175d37bc997ca2725c525880bea4283cf7ab02f42779e4bd125cd13ca0d7142"
+    },
+    {
+      "path": "artifacts/tests-heat-reference-rows.log",
+      "sha256": "1049d6402e6e8dbafac973db7b24a6274c079861cdccbcf8bfdf5a64f6801de7"
+    }
+  ],
+  "admitted": false
+}
