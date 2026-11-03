@@ -52,6 +52,14 @@ intended64/atlas ImportSettings explicitly; the512 quota failure is retained
 and no caps changed. Read SOURCE-AUTHORING-UNION.md for all exact scopes.
 Fresh combined qualification is still pending; no main admission is claimed.
 
+## Private independent seam-key commands — 2026-11-03
+
+Runtime7c9891f adds owning Duplicate/CaptureMix record2 to privateScene22.
+Release103+141, all29,490 standard-C++ allocation prefixes and4 baselines pass;
+whole-owned sanitizer103+141 plus4 baselines pass, with the extended sanitizer
+allocation sweep still running. No main admission or UI/render/export/Mirror
+completion. Read KEY-COMMANDS-WIP.md and validation/KEY-COMMANDS.json.
+
 ## Plain paint GPU integration — 2026-11-03
 
 Runtime `9f524e3` combines qualified `3411fabe`/`fc4d87f` with main `7693d6b`.
