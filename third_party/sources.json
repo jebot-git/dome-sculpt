@@ -632,5 +632,26 @@
       "/usr/include/zlib.h": "8bc935aeb8909d05fe58f9286a0fe2c674a41638c374786ee888485ab5ff4409",
       "/usr/lib64/libz.so.1.3.1.zlib-ng": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e"
     }
+  },
+  "suitesparse_source_visible_weights": {
+    "repository": "https://github.com/DrTimothyAldenDavis/SuiteSparse",
+    "commit": "0f41a7786b08d3399c6fd6cf7033714bc7f019f3",
+    "license": "LGPL-2.1-or-later",
+    "adapted": "src/screened-sparse-ldl.hpp",
+    "scope": "Native source-assisted visible-bone implementation candidate. Fresh CPU core/API2cohorts pass, but app/SAN/fault/history/Save/export gates are incomplete; no publication admission. Existing surface automatic path and500M controls unchanged.",
+    "reference": "docs/validation/BIHARMONIC-LDL-REFERENCE.json",
+    "port_sha256": "7db39d4cdd1d0dba7cccea9a49d9b5533a6321b13bc2fe612306027e9abbbc80",
+    "license_path": "third_party/ldl/LICENSE",
+    "complete_license": "third_party/ldl/COPYING.LESSER"
+  },
+  "shewchuk_source_visible_filter": {
+    "repository": "https://www.cs.cmu.edu/~quake/robust.html",
+    "source": "https://www.cs.cmu.edu/afs/cs/project/quake/public/code/predicates.c",
+    "version": "May 18, 1996",
+    "license": "public-domain",
+    "source_sha256": "f8662c3f407d1c1c5dcd4dd49ea8b8ddd801a71827d65734206ddc3741792029",
+    "adapted": "src/bone-shadow-filter.hpp",
+    "port_sha256": "f9fcbce9c9973cd7c89e994a7baff3baa4927444e17d4e8d6d9777ec185862e0",
+    "scope": "Native source-assisted visible-bone implementation candidate. Fresh CPU core/API2cohorts pass, but app/SAN/fault/history/Save/export gates are incomplete; no publication admission. Existing surface automatic path and500M controls unchanged."
   }
 }

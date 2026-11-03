@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-03",
+  "base": "592bc76b67f396b5fc594535722e6528740fc278",
+  "best_solver": "808310d53bdea5308367f727e92812b2f3b03545",
+  "admission": false,
+  "scope": "Fresh optimized CPU headless native core/support/API, no old archives. Proper shared positive assembly header; no production include-of-CPP. Direct actual source-visible calls on19+19genuine CC0 parts,5poses each.",
+  "sources": {
+    "src/source-visible-weights.cpp": "b1ed0de3b2524542a34359c5488fd65029dd21ac1769abe22e63f0bb69400b07",
+    "src/weight-surface-system.hpp": "7487522482f7a94f79c103049f17d79c27d22095d698c965b0ed2cefd9a8a823",
+    "src/anatomical-continuation.hpp": "d8655979b20c4f0e7cfc92783fcfe421e0200aa9d3360e0d8802ee55e9b8f146",
+    "include/dome/skin-authoring.hpp": "9c962941c68e749afe9f7365f8cc32426c76662f5df21e03a6bea61da04d3f84",
+    "src/skin-authoring.cpp": "d3239f39a14e73fe33f1bfd8d7770c22c93aa9dc96d1b158472dc2b54bb2f338",
+    "CMakeLists.txt": "76393a5bc849e4bd05e3a5bfd122ce27661717610990123107f77e8e97bf7388",
+    "tests/source-visible-skin.cpp": "f4117780b773b9f2e8c85fc8e9cae7875a957771440b97c674bf4ec01cf34c35",
+    "tests/source-visible-pose.hpp": "b542308df8ea50fda37716c245f26d80e8e458d0013e6fc3bc8406b4f9918ae1"
+  },
+  "native_api_limits": {
+    "source_assisted_work": 3000000000,
+    "default_workspace": 268435456,
+    "maximum_workspace": 536870912,
+    "fixed_influences": 4,
+    "fixed_prune": 1e-05
+  },
+  "legacy_limits": "Automatic/Transfer unchanged; original research default500M/failed controls retained. No fallback or cap relabel.",
+  "cohorts": {
+    "female": {
+      "parts": 19,
+      "poses": 95,
+      "failures": 0,
+      "work": 2293208337,
+      "planned_workspace": 132240304,
+      "method_seconds": 6.577966876
+    },
+    "male": {
+      "parts": 19,
+      "poses": 95,
+      "failures": 0,
+      "work": 1988758949,
+      "planned_workspace": 137348600,
+      "method_seconds": 5.468791754
+    }
+  },
+  "checks": [
+    "unchanged original pose mean/max limits",
+    "exact active paint/volume/appearance/material/shape/polygon/affine owners",
+    "all nonweight deformation fields exact",
+    "first prebind rig_source owns original deformation/mesh",
+    "fixed4 output",
+    "Cancel leaves exact Scene and report",
+    "alljointlocks exact no-op"
+  ],
+  "build": "build-core; fresh CPU Release, native architecture, UI/XROFF; wholly coherent core/support and test consumers of appended options layout; no UI/app/render/SAN proof",
+  "evidence": {
+    "artifacts/native-core-before.json": "570d231e3c6c88634460e54fc845de06db11684782d0800620cd2b4f83ef4236",
+    "artifacts/native-core-initial-after.json": "570d231e3c6c88634460e54fc845de06db11684782d0800620cd2b4f83ef4236",
+    "artifacts/native-core-fixture-fixed-before.json": "7d7c4acb86b81a672e43a6fbb20e075a85485ce35280c2552cdd7ed69295fa18",
+    "artifacts/native-core-fixture-fixed-after.json": "7d7c4acb86b81a672e43a6fbb20e075a85485ce35280c2552cdd7ed69295fa18",
+    "artifacts/native-core-fixture-fixed-binaries.json": "2bc2a58979bca6b2f25d5874586099b9151d7d197909e0fb0998c68b975dec17",
+    "artifacts/build-core-native-test.log": "231fba59edec8ae74cf67f33351e777d681b973a1c246a17e20e7265d4fe9d80",
+    "artifacts/build-core-native-test-fixture-fixed.log": "76269165245a83e0c79ee360154174385fba13d364988c5096836f028964d6e8",
+    "artifacts/native-core-cohorts-initial.log": "fb7f6203a3b2079eb8c130c8be194bbf9a850ceaceb845bdf90baa677c354dda",
+    "build-core/Testing/Temporary/LastTest.log": "5ddf85dc5a92cb05442a8593a057cf50293a69e0590f79846d8258158e97c329"
+  },
+  "pending": [
+    "partial/zero locks and infeasible locks",
+    "work/memory/planning adversarials",
+    "source/pose/common-placement domain qualification",
+    "typed SkinAdmission caller OOM atomicity",
+    "active/selected native/controller/UI actions",
+    "orderedSave/Close/history/Restore",
+    "source repeat/reopen",
+    "whole-own kernel/app SAN/faults",
+    "independent export/rendered poses",
+    "general user/native intent and broader stress"
+  ],
+  "native_test_log": "Test project /home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-source-rebind-592bc76/build-core\n    Start 451: source-visible-skin-female\n1/2 Test #451: source-visible-skin-female .......   Passed    7.98 sec\n    Start 452: source-visible-skin-male\n2/2 Test #452: source-visible-skin-male .........   Passed    6.72 sec\n\n100% tests passed, 0 tests failed out of 2\n\nTotal Test time (real) =  14.71 sec\n",
+  "initial_build_negative": "All core compiled; new fixture forgot fullJSON include. Initialterminal2 preserved. Only that test include changed before fixedbuild/test;967core/header/test input hashes exact in both cohorts.",
+  "binaries": {
+    "build-core/libdome-sculpt-core.a": "22684c0ac505b8411c1d04fbdf76ac3a73bcf5311c2ad3166251478b047ec08b",
+    "build-core/libdome-sculpt-affine.a": "b7a34329b162176a6ccbebc222495814b66fd2266d9935b007b6ff6075a6d718",
+    "build-core/libdome-sculpt-polygon.a": "290d12967724f5b9e9980f9d87548e16420afae4586a929975e6e17673425311",
+    "build-core/libxatlas.a": "2940667b66d9478b57c3107c7347c0c845c81233b00b625056bbdaef4a66c3c7",
+    "build-core/libufbx.a": "9aad3df9e3cb8b6008e7ba3c41fd79ed8fdcaebe3025ae5f9e30086c4a91929d",
+    "build-core/libmikktspace.a": "a4c18c9552f51a102b79010322c49114027033e69477a442d4a9a1dcc7764e77",
+    "build-core/libmikktspace-robust.a": "4870f0f1e1136d45fa578ff867793765579cf978211107ee7ebd19ed07493b2f",
+    "build-core/dome-sculpt-source-visible-skin-test": "d524ff9966532c81f3278b47d48ab8d23a7fbdec9e7e397eb90626171b91f9a8",
+    "build-core/CMakeCache.txt": "dfb560229e81890ccd2d8d8e4a5f1544b7fe1dbc9a256693cefe137021e0a397",
+    "build-core/compile_commands.json": "6fe8882cd94dad675260f1f82ef2bcf92f5e591ec0e954ab33de8a5013614c79"
+  }
+}

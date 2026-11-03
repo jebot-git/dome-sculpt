@@ -1,0 +1,22 @@
+{
+  "repository": "https://github.com/DrTimothyAldenDavis/SuiteSparse",
+  "commit": "0f41a7786b08d3399c6fd6cf7033714bc7f019f3",
+  "files": {
+    "ldl.c": {
+      "url": "https://raw.githubusercontent.com/DrTimothyAldenDavis/SuiteSparse/0f41a7786b08d3399c6fd6cf7033714bc7f019f3/LDL/Source/ldl.c",
+      "sha256": "52a90b15c77eca8fde5e2474c916443d58829762670ae857315b63ba6ca3a06b"
+    },
+    "ldl.h": {
+      "url": "https://raw.githubusercontent.com/DrTimothyAldenDavis/SuiteSparse/0f41a7786b08d3399c6fd6cf7033714bc7f019f3/LDL/Include/ldl.h",
+      "sha256": "123eb6c6664ce138e0db31a228cd521d62ceb2eb9abdd74999095c82255d355f"
+    },
+    "License.txt": {
+      "url": "https://raw.githubusercontent.com/DrTimothyAldenDavis/SuiteSparse/0f41a7786b08d3399c6fd6cf7033714bc7f019f3/LDL/Doc/License.txt",
+      "sha256": "7168978e490731854a5fd52942cafaaea914728481cb445e374edacda2a0e5b8"
+    }
+  },
+  "license_text": {
+    "url": "https://raw.githubusercontent.com/spdx/license-list-data/main/text/LGPL-2.1-or-later.txt",
+    "sha256": "5749785c8bdefafcb5d798270ed0a967036fe2ca63dcedade1627565dfef81d2"
+  }
+}

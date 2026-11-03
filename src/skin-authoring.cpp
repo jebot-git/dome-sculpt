@@ -22,7 +22,8 @@ JointTransform root_transform(JointTransform joint,const CanvasTransform &t) {
 }
 }
 void SkinAuthoringOptions::validate() const {
-  if(mode!=SkinAuthoringMode::Automatic && mode!=SkinAuthoringMode::Transfer)
+  source_visible.validate();
+  if(mode!=SkinAuthoringMode::Automatic && mode!=SkinAuthoringMode::Transfer && mode!=SkinAuthoringMode::SourceVisible)
     throw std::invalid_argument("Unknown skin authoring operation");
   if(!reference || !std::isfinite(seed_distance) || seed_distance<0 || seed_distance>10000 ||
      !std::isfinite(seed_margin) || seed_margin<0 || seed_margin>10000 ||
@@ -50,6 +51,8 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
                  const std::function<bool()> &cancelled) {
   stop(cancelled);
   options.validate();
+  if(options.mode==SkinAuthoringMode::SourceVisible)
+    return author_source_visible_skin(scene,std::span(&target_id,1),options,cancelled);
   const auto &target=scene.object(target_id), &reference=scene.object(options.reference);
   if(!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::invalid_argument("Select a visible, unlocked mesh to bind");
