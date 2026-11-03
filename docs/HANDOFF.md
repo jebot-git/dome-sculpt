@@ -1,5 +1,21 @@
 # Dome Sculpt production handoff
 
+## Private XR editable-project export page — 2026-11-04
+
+Runtime `7e5b16f` on root's `c5c1893` adds discoverable shared joystick export
+policies (256/512/1024), strict Export, Avatar, Native Save, Cancel/Back/Close.
+Existing worker formats and command identities remain; no stored/schema/layout
+field changes. The page explicitly discloses approximate PBR and exact whole
+native project including hidden objects. Fresh app/core/render/support R/SAN
+baseline5/5 and final matching6/6 pass, final controller69 each; eight GLBs are
+byte-identical, all16 Khronos validations0errors/0warnings, four actual bitmap
+captures identical across profiles and visually reviewed. Original Close/text
+overlap is retained then corrected. No hardware or physical session was used.
+Read [XR-EDITABLE-EXPORT.md](XR-EDITABLE-EXPORT.md) and its receipt. This private
+component awaits coordinator integration; broader authoring, general Mirror
+refinement and later spatial drawers remain unfinished. Goal stays active.
+
+
 ## Private original-coordinate/MToon paint integration — 2026-11-03
 
 Private f040845/d1606ca preserves original logical UVs independently of writable
