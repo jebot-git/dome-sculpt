@@ -119,7 +119,11 @@ validation/ARC-AUTHORING-COHERENT-b32.json. No physical HMD launch, system
 installation or active-session restart occurred. Full main admission and every
 unfinished REQUIREMENTS.md row remain required; the production goal is active.
 
-## Current coherent retained-key checkpoint and freehand repair — 2026-11-03
+## Earlier retained-key checkpoint and freehand repair history — 2026-11-03
+
+The following records describe earlier frozen checkpoints. Their pending-run
+statements are historical; current completed results and remaining gates are
+reported at the top of this handoff.
 
 Private9050 has coherent nativeCPU/OneAPI/whole-owned sanitizer applications.
 Selected CPU7/7 passes454.39s, including134 full mixed-workflow,101 commutation
