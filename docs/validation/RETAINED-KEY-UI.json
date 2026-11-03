@@ -1,0 +1,858 @@
+{
+  "date": "2026-11-03",
+  "source_base": "9050f3648da315a524f1b0508c91ac8b91c9a73c",
+  "required_runtime_fix": "e7a3c7c6931057a799dbdfcdfeb75b5583487d48",
+  "negative_checkpoint": "6e50d35a290d8b72d6482872205d727fccdf9720",
+  "scope": "Actual native FLTK universal-menu/XTest normal+compact; matched9050 application/frontend/render/support with only document-native.cpp rebuiltO3 and original core member removed locally. No own fresh whole-application build, SAN, GPU, Wayland, XR or physical-device claim.",
+  "harness_sha256": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb",
+  "total_final_checks": 72,
+  "runs": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-normal-r6",
+      "runner": {
+        "exit_code": 0,
+        "seconds": 140.88122957601445
+      },
+      "check_count": 35,
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          },
+          {
+            "passed": true,
+            "check": "Fixture owns actual paint24/material9 and independently retained normal21 domains"
+          },
+          {
+            "passed": true,
+            "check": "Retained-key controls are a real document-owned FLTK modal using universal-menu identity"
+          },
+          {
+            "passed": true,
+            "check": "Default Return cancels retained-domain key creation with exact complete source state"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Native Create preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Create retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Create does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Universal Undo restores the exact pre-Create retained source and domain pools"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores the exact created target, frames and ownership graph"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Unchanged-name selection adds no Undo entry: one Undo still removes the real Create"
+          },
+          {
+            "passed": true,
+            "check": "Redo after the selection-only history check restores the exact real Create"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Entering actual selected-key sculpt mode changes no saved weights, paint or source"
+          },
+          {
+            "passed": true,
+            "check": "Actual retained-domain keyed mesh has a visible colored native paint surface"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native Shift/left gesture replaces the selected key without changing prior targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace updates its real role-frame attributes while keeping saved mixed weights"
+          },
+          {
+            "passed": true,
+            "check": "Actual native canvas displays changed selected-key geometry/shading"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores complete pre-stroke retained paint/keys/source"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact selected-key geometry and normal-frame endpoint"
+          },
+          {
+            "passed": true,
+            "check": "Actual Escape during the next held key stroke restores exact native Scene and all ownership pools"
+          },
+          {
+            "passed": true,
+            "check": "Cancelled native key gesture does not create or consume Undo/Redo history"
+          },
+          {
+            "passed": true,
+            "check": "Finishing key preview preserves accepted source, paint and original saved mix"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close performs normal frontend/worker teardown"
+          },
+          {
+            "passed": true,
+            "check": "A new real native frontend reopens exact retained key/normal/paint/source data"
+          },
+          {
+            "passed": true,
+            "check": "DomeD Ctrl+W cancels owned modal controls after reopen without closing or mutating the document"
+          },
+          {
+            "passed": true,
+            "check": "Final universal-menu Close drains the accepted native application cleanly"
+          },
+          {
+            "passed": true,
+            "check": "Exact retained fixture, verified application/inspector and harness bytes remain unchanged"
+          }
+        ],
+        "failed": 0,
+        "complete": true,
+        "stage": "complete",
+        "error": null
+      },
+      "before": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb"
+      },
+      "after": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb"
+      },
+      "files": {
+        "artifacts/retained-key-fixed-normal-r6/runner.log": "6170878e98388ded55a494352ad70328a6fb2922be2807d1eef5b840dabe8aff",
+        "artifacts/retained-key-fixed-normal-r6/before.json": "059f124d3977bb800b42b312297ed7c3bdfef2bf39bf33e51c8108f496c07ef1",
+        "artifacts/retained-key-fixed-normal-r6/report.json": "35efd8b6b01d9b919d394bc722f879522aedbd18cb8621d4e881dd4769116156",
+        "artifacts/retained-key-fixed-normal-r6/xvfb.log": "4fde5698a6ec7b3dcd1c5225813b53e557cc75f1d28785a0bab5a0339ba070be",
+        "artifacts/retained-key-fixed-normal-r6/latest-inspect.json": "c9581507d1f875e71d7e7e04e637ba0a52c9ba1de4fda94f1a80b36b08c80d86",
+        "artifacts/retained-key-fixed-normal-r6/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-normal-r6/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-normal-r6/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+        "artifacts/retained-key-fixed-normal-r6/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-normal-r6/target-choice-before-history.png": "17cc1c23a3a2b3968fa57b595a2ad198fbe089bf1705d954b22d27dd107217e2",
+        "artifacts/retained-key-fixed-normal-r6/target-popup-history.png": "3f07ca363eab38ee91095595c80a97c834cbc5ed4708d873f23e15b82425e71b",
+        "artifacts/retained-key-fixed-normal-r6/selected-existing-target-history.png": "06e3c7eb8e23041883a2bac935c8fb2e9b3c22cf0465cc8cb07349fef9a265c0",
+        "artifacts/retained-key-fixed-normal-r6/selected-existing-target.json": "e19846e32f8230ec36e49ece9452a291748dc05d96c96feddcd88ae7f097176c",
+        "artifacts/retained-key-fixed-normal-r6/target-choice-before-for-stroke.png": "17cc1c23a3a2b3968fa57b595a2ad198fbe089bf1705d954b22d27dd107217e2",
+        "artifacts/retained-key-fixed-normal-r6/target-popup-for-stroke.png": "3f07ca363eab38ee91095595c80a97c834cbc5ed4708d873f23e15b82425e71b",
+        "artifacts/retained-key-fixed-normal-r6/selected-existing-target-for-stroke.png": "06e3c7eb8e23041883a2bac935c8fb2e9b3c22cf0465cc8cb07349fef9a265c0",
+        "artifacts/retained-key-fixed-normal-r6/before-stroke.png": "19150e5e5e1fd62bab0437d8b18719db83f2a390d06b861b93759a238349eaa7",
+        "artifacts/retained-key-fixed-normal-r6/stroke-result-before-save.png": "f66c5e50edd6a128393022341df4fc9b4dd61e2da237706c928891e195f0f517",
+        "artifacts/retained-key-fixed-normal-r6/after-stroke.png": "d080c591c90bc859d46c1a1a37c5cec1ff67f7c1a507c84b85b4bddd4d205fba",
+        "artifacts/retained-key-fixed-normal-r6/app-reopened.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-normal-r6/after.json": "059f124d3977bb800b42b312297ed7c3bdfef2bf39bf33e51c8108f496c07ef1",
+        "artifacts/retained-key-fixed-normal-r6/runner-receipt.json": "2cf49fd9067f400dff75ac4746a98244b6c952a05c067e620d3ee4353d6928a2"
+      },
+      "environment": {
+        "PATH_prefix": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/bin",
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+        "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries",
+        "DOME_RETAINED_KEY_OUT": "retained-key-fixed-normal-r6",
+        "DOME_RETAINED_KEY_COMPACT": null
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-compact-r3",
+      "runner": {
+        "exit_code": 0,
+        "seconds": 140.94180408498505
+      },
+      "check_count": 37,
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          },
+          {
+            "passed": true,
+            "check": "Fixture owns actual paint24/material9 and independently retained normal21 domains"
+          },
+          {
+            "passed": true,
+            "check": "Retained-key controls are a real document-owned FLTK modal using universal-menu identity"
+          },
+          {
+            "passed": true,
+            "check": "Default Return cancels retained-domain key creation with exact complete source state"
+          },
+          {
+            "passed": true,
+            "check": "Canonical large-bitmap-font key controls fit the compact native desktop"
+          },
+          {
+            "passed": true,
+            "check": "Compact content scrolls while genuine Cancel/Apply controls remain fixed"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Native Create preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Create retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Create does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Universal Undo restores the exact pre-Create retained source and domain pools"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores the exact created target, frames and ownership graph"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Unchanged-name selection adds no Undo entry: one Undo still removes the real Create"
+          },
+          {
+            "passed": true,
+            "check": "Redo after the selection-only history check restores the exact real Create"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Entering actual selected-key sculpt mode changes no saved weights, paint or source"
+          },
+          {
+            "passed": true,
+            "check": "Actual retained-domain keyed mesh has a visible colored native paint surface"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native Shift/left gesture replaces the selected key without changing prior targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace updates its real role-frame attributes while keeping saved mixed weights"
+          },
+          {
+            "passed": true,
+            "check": "Actual native canvas displays changed selected-key geometry/shading"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores complete pre-stroke retained paint/keys/source"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact selected-key geometry and normal-frame endpoint"
+          },
+          {
+            "passed": true,
+            "check": "Actual Escape during the next held key stroke restores exact native Scene and all ownership pools"
+          },
+          {
+            "passed": true,
+            "check": "Cancelled native key gesture does not create or consume Undo/Redo history"
+          },
+          {
+            "passed": true,
+            "check": "Finishing key preview preserves accepted source, paint and original saved mix"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close performs normal frontend/worker teardown"
+          },
+          {
+            "passed": true,
+            "check": "A new real native frontend reopens exact retained key/normal/paint/source data"
+          },
+          {
+            "passed": true,
+            "check": "DomeD Ctrl+W cancels owned modal controls after reopen without closing or mutating the document"
+          },
+          {
+            "passed": true,
+            "check": "Final universal-menu Close drains the accepted native application cleanly"
+          },
+          {
+            "passed": true,
+            "check": "Exact retained fixture, verified application/inspector and harness bytes remain unchanged"
+          }
+        ],
+        "failed": 0,
+        "complete": true,
+        "stage": "complete",
+        "error": null
+      },
+      "before": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb"
+      },
+      "after": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb"
+      },
+      "files": {
+        "artifacts/retained-key-fixed-compact-r3/runner.log": "5d74e0294c32f77130ea7879f5e4bd6893f75be828258ef2ddf70ce25cd67e2f",
+        "artifacts/retained-key-fixed-compact-r3/before.json": "059f124d3977bb800b42b312297ed7c3bdfef2bf39bf33e51c8108f496c07ef1",
+        "artifacts/retained-key-fixed-compact-r3/report.json": "7181f988e386c0c7750d737b740c4d9ca9077923ee97facec721c86d051559a6",
+        "artifacts/retained-key-fixed-compact-r3/xvfb.log": "e2a9cdea904f5b78cdec4d818de81709784ea2f07961a4cbb0c9b8fae1d95308",
+        "artifacts/retained-key-fixed-compact-r3/latest-inspect.json": "a758b3ca2e75d798b85a33d1e59d34da77708c430c10deb9e52bbefb5f76f5fe",
+        "artifacts/retained-key-fixed-compact-r3/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-compact-r3/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-compact-r3/new-key.png": "761c4859f016caf7f223d59c7d417d9fbbe0a67b45bc45cd0b3ba05da0b3f016",
+        "artifacts/retained-key-fixed-compact-r3/new-key-scrolled.png": "0fb3c60aae6f08c6f97c9823f7bd48f807f8b808df2dee3be2bdca47bcdb9d9d",
+        "artifacts/retained-key-fixed-compact-r3/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-compact-r3/target-choice-before-history.png": "2c405addebced5027fc885b37159f467c409c322265263542eafd13901325562",
+        "artifacts/retained-key-fixed-compact-r3/target-popup-history.png": "4ec3f9f73c5fa5d657d824023a7e5c03182b5efc89fdcd1ce3236f021fd5ff1e",
+        "artifacts/retained-key-fixed-compact-r3/selected-existing-target-history.png": "3593317d26186961d49b48137b8aa03c5c42b8a1f55101b55d42b0c9764696a8",
+        "artifacts/retained-key-fixed-compact-r3/selected-existing-target.json": "e19846e32f8230ec36e49ece9452a291748dc05d96c96feddcd88ae7f097176c",
+        "artifacts/retained-key-fixed-compact-r3/target-choice-before-for-stroke.png": "2c405addebced5027fc885b37159f467c409c322265263542eafd13901325562",
+        "artifacts/retained-key-fixed-compact-r3/target-popup-for-stroke.png": "4ec3f9f73c5fa5d657d824023a7e5c03182b5efc89fdcd1ce3236f021fd5ff1e",
+        "artifacts/retained-key-fixed-compact-r3/selected-existing-target-for-stroke.png": "3593317d26186961d49b48137b8aa03c5c42b8a1f55101b55d42b0c9764696a8",
+        "artifacts/retained-key-fixed-compact-r3/before-stroke.png": "3eeea1fe053b4da741173ba372dee87e91fdac11291fa75b756d759c2f25bc81",
+        "artifacts/retained-key-fixed-compact-r3/stroke-result-before-save.png": "3090e04b4135bf67c59f1e8a5c8da7de6e694a5c2ccc46cc92784214a42655b8",
+        "artifacts/retained-key-fixed-compact-r3/after-stroke.png": "16dda0715e96878549cd74ecb3697a6004f973f49b490ecf98b8aba00ffdd4ec",
+        "artifacts/retained-key-fixed-compact-r3/app-reopened.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-compact-r3/after.json": "059f124d3977bb800b42b312297ed7c3bdfef2bf39bf33e51c8108f496c07ef1",
+        "artifacts/retained-key-fixed-compact-r3/runner-receipt.json": "5408c0f37c49fabdaf295f5f625dc35114380a6a29cb4fad92dd1bb129848763"
+      },
+      "environment": {
+        "PATH_prefix": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/bin",
+        "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+        "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries",
+        "DOME_RETAINED_KEY_OUT": "retained-key-fixed-compact-r3",
+        "DOME_RETAINED_KEY_COMPACT": "1"
+      }
+    }
+  ],
+  "binary_manifest": {
+    "source_commit": "e7a3c7c6931057a799dbdfcdfeb75b5583487d48",
+    "base": "9050f3648da315a524f1b0508c91ac8b91c9a73c",
+    "scope": "Matched9050frontend/render/support/object archives, exact9050headers, only document-native.cpp rebuiltO3; original core member removed from local copy; no fresh whole-app compilation",
+    "fixed_TU_source": "02063021d160dea804415b482ab37f55e0277179f13d67d1d894fb06a9dcc2f7",
+    "fixed_TU_object": "6ac31a9fe1f6d7ac544243ace1ec6ea098b01a5ff9c8bfa39533177842397baa",
+    "app": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+    "inspector": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+    "original_object_archive_inputs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o": "2fb2cbb4390f6ba100032f31f9cdb6a25e8cb915fcc13c715c53b1f2229a061d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o": "449007f62f3a6f07518f7a8a2baa05fc0041d009c72b1c7afe5ff688f77ed203",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o": "0cf464a7d94f3729ad2c12fd927e63b7bd17dd152e035e9b25bc5c8c9f678c60",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/app.cpp.o": "8fbfa2442701eaf094c70551fcfd23852737a39249e973132111b0c727824b57",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o": "7955be231b95d69b20a031f7198faa30487f7c3940e2f8bc162aa9ec19d34daa",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o": "74fdb34e32b209bc263e692bf1dcac9d167b83949aebee0f01f1cace486204ae",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o": "2e7307fa93f7a950dfec29c852489282bfb1fcd8e8d8200f46672811038d823c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o": "7beb0bf6e2dd783f04f3501d0a9c8a81a652c720c0c128ae90190207b4d228c9",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o": "0d5488e1ce2e955c2e1ab36d6dec78c7c8a2bc6dec459a61d5456f508c34785b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o": "994af75987239d1b080088189bc9eaaa775813ec7f39c7395c7f391215aa20df",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o": "bec7aadf6e6178a3c3c3b880a4b4735f8d6b43a1046ce9111d4684dcaa000442",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o": "c6e0f398467804cd2feb1b7fb0bcb3da01c69e8816a3bfdbe2c9fe5472884a43",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o": "ff8fb152d9af5e67d8879865b58c202b7def144f22fb67a6146844dca06e56be",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o": "c4cd470191aeba67717e86b579d0b56a003b8653cb71b7540cd5e2916876d8b6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o": "65247ce2ef8e7660879924e6f6d3a16d5bdb8345b200721554a11f7a553e547c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o": "ed630682aa54b4781eee18c3ff3ed701f0500847e87e7095548dd487e88f172b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o": "907106f22b8046be18acc59a5dd009f803465a563d056609be5a6541f3fb4235",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o": "c117d416253226fccc551e3bddd3d24c57c27b5ae3e703a53a88d0aa34af9679",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o": "3fba487c9160e4e58585ae0b831b6bcf62ede7ca45b33c45939b506921847a14",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o": "25be2688fe3af820492d4fc36dd1ea272748363b9adbfa6fa5ae4bf82f8dd085",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o": "20acea2f68307ade471cd7f56ad02d839a8865b23cf5cd7f220edb87764781d7",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o": "61b076c0388205c073957b993491e8cdf5cbb2b0824ec0994f65aaa58a5e5c29",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o": "c2656ff292e85cc87cd8d6e6bb5fcc0373f3f3eb051098684a3a246f06173729",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libdome-sculpt-spacenav.a": "83f63d3a30b4462578f98f3150fb99659cbcd27b1f55118a4e61ece5802bc01d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libdome-sculpt-core.a": "cc16f7f36d25c24b55ae517a19c267f773470bb2788df9d00128d3b880e37966",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libdome-sculpt-render.a": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libdome-sculpt-xr.a": "e4182bbe7b896bcae36d2e65b07ce8c05f4389643c06f73580d448416679a5ad",
+      "/usr/lib64/libdl.a": "f0a17a43c74d2fe5474fa2fd29c8f14799e777d7d75a2cc4d11c20a6e7b161c5",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libdome-sculpt-affine.a": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libdome-sculpt-polygon.a": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libxatlas.a": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libmikktspace.a": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libmikktspace-robust.a": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/libufbx.a": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2"
+    },
+    "own_header_hashes": {
+      "include/dome/affine.hpp": "6d281334bb635072a98d806bb0642ce7b08739c5c8dd438c36e29fbcf7a07a47",
+      "include/dome/avatar.hpp": "1850232616222ecc48d73f281bb3160afbfa0a15a30cd6b6444d779fed7f1866",
+      "include/dome/bake-authoring.hpp": "ee78d758edf3c1e9be9abbe56f46b94673d892f586022717b980ee68d189d33f",
+      "include/dome/bake.hpp": "d789377adf3b4df6a51341d296bf8c96bddf9ad7213ee6c309b9063a5489f3ed",
+      "include/dome/brush.hpp": "60b61ab21cae66c2a5fdf560c610c1b9a0ba600953d44baa90a97ef8dfc4aac1",
+      "include/dome/color-paint-sampling.hpp": "d13b0bbcf3b5f90f2beddd84d173417b8a9270afa17494a811de7b891f51ed0d",
+      "include/dome/color-preparation.hpp": "b9d2910815338d1f26407106867744ac6a5e0ff48dcd4d7a29531254266405f9",
+      "include/dome/cow-map.hpp": "313ed0271bd68475b309518aca3d66ecb583936eba4f134211dfcda38cbd98d2",
+      "include/dome/creation.hpp": "7c00308874bd191d5d0f86066a28f20741ab0d7f94614a3739e071eedfdd269f",
+      "include/dome/creator-archive.hpp": "aa0cafa0d182ae65a1579f6c0d52d77212bbf483852ad64ed0f2e1da9223c24c",
+      "include/dome/csg.hpp": "9a61f12342d3afc7b61144fe570ef77a1f9481c1bf7f0f502d4ae470638890e9",
+      "include/dome/cut-authoring.hpp": "4fcd370017c833e3f21c75f42194476ce40c16662ee4b3a648e1820064f75c22",
+      "include/dome/deformation.hpp": "21cfc5c2baec53ee57940586c2e2b85cf3c3e027ffb4cfb366e577a6bd5bcc49",
+      "include/dome/document.hpp": "8b409f16a50689bbe91947f28c47c0cc48b3943731cf59151d8dc06f3ac1fc1c",
+      "include/dome/frame-clock.hpp": "27f172acd02d608b4894cde6313fd2f1f0e9cd8ed197977a035635d7c3e4c9a2",
+      "include/dome/gltf-export.hpp": "f1dba0e3f785aebdb31cdaea7c5477b19b83375ea8c13cd3b538ed9fcb344e05",
+      "include/dome/groups.hpp": "ab5d0b99908fe81d5a100e97642a2e13381c0bfb56e8f01c54d5364739bdce89",
+      "include/dome/humanoid-creator.hpp": "5d834229fc4a8f824e52f22db56d9bf833608e35ee5f240d6eab9eb33d838d1a",
+      "include/dome/import-authoring.hpp": "5d2ceac6ea531d5552a5ff904daff1599655365e7ed8265c7de8d4c7b40075e8",
+      "include/dome/import-browser.hpp": "4a8f82dcecb293a944422c67733c6a19bd7ef93db41a7693e9ee9591392f421d",
+      "include/dome/import-image.hpp": "657899e993c2b9510c8d08f45d1d3ffb761f3d463feec78aee24c285684b6ac2",
+      "include/dome/import-native.hpp": "75a828f0245ef1f50f776a2fbb9ec662d20f6134640b4da88dd3c9c4c972696e",
+      "include/dome/import-options.hpp": "60f86b619f15ea4b91b9f647986c8f03af3ab0b50f1bddace98bd3aac726290a",
+      "include/dome/import-source.hpp": "0c1ae2816d40bd8512a13c842c11ce5272ea9d8c0386946c02ca033eaa418ec9",
+      "include/dome/import.hpp": "d109e660ee4231c3708614296be45d4ff3ff1cf8a55a89dcda7d130f3a18922e",
+      "include/dome/input.hpp": "ae838cba0cfba7e79df3d7bcc07acc5155af23243b27c25644b56a00ebf50070",
+      "include/dome/local-surface.hpp": "2c83a5cb8534611061bcb38a041bffdc30cfec1f4a528452372b56e079eedc9c",
+      "include/dome/material-bindings.hpp": "bb6ccc4b745739bccf0f79dac702c6f15c3ffd5fb596164c48417540ba948e27",
+      "include/dome/material-visibility.hpp": "f61dfcf26e1322b6ce4178a5c1852c0fb422d5446fd1b67b228bd693645dea62",
+      "include/dome/math.hpp": "838e53b6c6c3881b3b73ea93bb680be268947a5b28b6e4657771e43b1f1d1f3f",
+      "include/dome/mesh-authoring.hpp": "fab921b5505d6a78e2341518cad4ab2adf35b788781c94ec1e9754f231aac344",
+      "include/dome/mesh-processing.hpp": "a53fe4e768f47807e9d9cb3dd4cc03eab48a2583a8e42e0b27cc1b3c925e53fc",
+      "include/dome/mesh.hpp": "c4d9196f4d6c8a817da71b7849a44196f5f317ad05da59cb5efae1ccb932fd5f",
+      "include/dome/mtoon-shader.hpp": "0b0367d3b78a33312c6f8b92aebdb29d67383cbcdd435a3289202eb2a594e47d",
+      "include/dome/mtoon.hpp": "d452ce2a3615de38b918bb0fbd63d103f5e016d47db71ea1c474871e7d4c430d",
+      "include/dome/native-stroke.hpp": "157035979faa84169e04ee2a19154b021f6b202c8990bfe785f752ad14d18d68",
+      "include/dome/navigation.hpp": "435432e2ebd15812382ef6691bdfbb074533bf450ddfd55ed1ad1466c27f3ae2",
+      "include/dome/normal-frames.hpp": "1c9b22240da185c11fc5babce936a9127dc67eec028e6a9a09ebb730ab87edb9",
+      "include/dome/normal-preparation.hpp": "334c1713aef1803c99d37608540e6610e85a69009e90bdcfd47950fc407e4eae",
+      "include/dome/normal-preview.hpp": "7d9a62279687ca780a45cf1496af4413350d6d571e6dd8e840dc6b9d0d7da3d6",
+      "include/dome/normal-sampling.hpp": "ef36fe1eafd0799725b2a6a72f71ce6de9618c02e950309b650956a3ec39e45e",
+      "include/dome/object-selection.hpp": "f860745a8f763667a095f4d9a7272e2e023c24f45b841a1ae422c7cb8651e022",
+      "include/dome/paint-sampling.hpp": "fbd4465ff56cc4800a67c694ab8911ce5a3fd7f3be96cd3e8ad46b7cb7905dfc",
+      "include/dome/paint.hpp": "12306cb41489eb853dbec0591ca7feab0b792fc26dfc04b7af80a0529d3331ed",
+      "include/dome/palette.hpp": "f1050595a21353d2697306332776f45123c894b1d803a1e7d8d4f1b77a6c2676",
+      "include/dome/polygon-authoring.hpp": "8eb260e02bf3fea8b9334d64c2dcf261a0f7eff6f8d287f76035b2d000fae2ad",
+      "include/dome/polygon-color.hpp": "dbf5a8b382970af1578bb58bad0fc8590126055fa6bdebf376c2382f3e2c2638",
+      "include/dome/polygon-controls.hpp": "c31dd43d0e4d00f294086adbbb0263765db47ddfac4e58cf8c6c2da6c8924d6f",
+      "include/dome/polygon-render.hpp": "e0a2374db60e1e1912093fbe0bdb085b0fc3d109b467c37bb930b062d3be27f3",
+      "include/dome/polygon-scene.hpp": "b86c63e74453df16cf6cf272592e5d6d2718747687044d5bd0e917b10f6988a6",
+      "include/dome/polygon-source.hpp": "7482a153e631de0980e5e595dcad3f0d927210ab3845c0fb7a72200028a8b781",
+      "include/dome/polygon.hpp": "90f1915d19105c3b1269978e827b99c58f39aa5eae1d587cde1b6b0b5937abfe",
+      "include/dome/procedural-sculpt.hpp": "44f02f174caf656771e69ee65d48a72ce8a0b427720e4a11c7a32e049b638f5e",
+      "include/dome/projection-tool.hpp": "3c65893d140c23b71e22ff96980c8e4b8992e9f349692dbb9c8f3f7b504df37a",
+      "include/dome/projection.hpp": "7cf949f0576fb2c4b445c8750c8dfd36515fc15b86b0ca9174cc9f4a5524d578",
+      "include/dome/recovery.hpp": "a5dd5ccc013c1b3734937814d1126fffde7d3fe59edab485739e23e33bdc78b9",
+      "include/dome/remesh.hpp": "8be22f603ccebfbebbca9582cf35bedc473a2d49b982a8c65fb8135bacefb0d0",
+      "include/dome/render.hpp": "18dedd439e2b1974ea8d38e216bf164a88663e5660eeaa4d3e98639cdf47b867",
+      "include/dome/retopo-authoring.hpp": "41597175a1ce00bbae941f99b019c065af013caa2579790186e81306cf4ac2c8",
+      "include/dome/retopo.hpp": "e0994d5d4a879ddb182c2a53a6e69a056c4d3fdafc431eec96aae5005a9f5a14",
+      "include/dome/rig-edit.hpp": "89cc3a8896b4d2a56839bf136d0dffe5c4964c4966659c8cca2bf968015d0273",
+      "include/dome/rig-fit-tool.hpp": "9de366724cf33a79fa3c49db3a99213c0f680c06b8151119b8fa4324d595c3db",
+      "include/dome/rig-fit.hpp": "496b8b550ab546940bf31bc3a91a91fe96c48ff495922c1ebedc6615bf81f9e0",
+      "include/dome/rig-rest.hpp": "85bad1052c4b776a2956eae997b19c8dc107a327fd7a24eede40d1258b02f1fb",
+      "include/dome/rig.hpp": "d896f2da376b942e6d5e0eb7f75323db1315621929bafeb2220799d24ca2d837",
+      "include/dome/scene.hpp": "49a92bc2bd5b0046591069557c29fcd61eb847f9b3d3388b6e34c0044b33a843",
+      "include/dome/sculpt-resolution.hpp": "9940ab416d84c340ce1a032556b95a883504907360965ee6866396ffc94e6803",
+      "include/dome/sculpt-storage.hpp": "33c6f86d8d4ef6d5d3be560da2ccbeca9ded02491c1045213479ce056dc7d9bc",
+      "include/dome/session-appearance.hpp": "6bfad9c9ac339fd11bbbf1367a799f840a64bc8451215282ebd5a0c2a4c36c71",
+      "include/dome/shapekey-authoring.hpp": "ca8c19fd6033f0441501795d80ab87054924f87cfd97163a31184ed32c3728e6",
+      "include/dome/shapekey-sculpt.hpp": "856faa9bef79f2893f99b60a6190798aefa8d70c6ba501f7760b168c9d224413",
+      "include/dome/skin-authoring.hpp": "66c90c1413cad80f301b38926a2653f4a7fdcd65ea5318566142b715fd180e19",
+      "include/dome/source-maps.hpp": "448a6ce687a623bfa4de12c649c3e15ac915b211621908b37d6fdb49c9f7010a",
+      "include/dome/source-placement.hpp": "efcc19f45778b70bd878c91080874c6ad69dbfa1b5ccda8a32e2e6363ee09a4c",
+      "include/dome/source-uv-bake.hpp": "792af85cd9ce733fe8a998718ecbcabd601db613aee1a37c435149b1c082e029",
+      "include/dome/tangents.hpp": "94a6ff78b1ed0c27aa3e5da8b2991fc1e69a91aab43738a19dd3efc6ac25b1d4",
+      "include/dome/uv-solve.hpp": "91975fae61a91dfc8508adf05140f5bc672fb58673e381bda0fb09a25cedbc9c",
+      "include/dome/uv.hpp": "b56838939e46211b48d15fd2f90baaa0bdf30717a2794234345f04f74db1a0fa",
+      "include/dome/volume.hpp": "27d97b346073f815f5228d62e86fe49f9f523891d60d89bb567d79c8b783cab7",
+      "include/dome/vr-controls.hpp": "d7cc4f95f0e6406476c169740ae47ec1accf84b207f8c0c2f217a0b1cc884fb4",
+      "include/dome/vrm.hpp": "3dd0ef99d84cd8e7f69b607f008d2ac7c465655008eaec6533729f461c970b3c",
+      "include/dome/weight-authoring.hpp": "c6e854e995c354cc4ccab84dd611b3cd659ea2831cfb1a9bc8ff16120b851d80",
+      "include/dome/weight-edit.hpp": "17d0c55eb08131db6ba30a9196acd70e3b91a35fb71f7176b4f606b4d0ad31c5",
+      "include/dome/xr.hpp": "f1c2ea34b362e24333b8a206692af4d0909610948015b7509bfbeb16a5857ee6"
+    }
+  },
+  "header_matching": "All84 public headers matched supplied9050 manifest before launch and again after both final terminal runs; fixed copied app/inspector before/after byte hashes exact.",
+  "canonical_app_library_path": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+  "argv": [
+    "/home/blux/.local/bin/uv",
+    "run",
+    "--offline",
+    "--with",
+    "python-xlib",
+    "--with",
+    "pillow",
+    "--with",
+    "dbus-next",
+    "python",
+    "tests/retained-key-menu.py"
+  ],
+  "private_server": {
+    "launcher": "#!/usr/bin/python3\nimport os,sys\nfrom pathlib import Path\nbase=Path(__file__).resolve().parents[1]\nargs=sys.argv[1:]\nif '-displayfd' in args:\n i=args.index('-displayfd')+1;fd=int(args[i]);os.dup2(fd,1);args[i]='1'\n if fd!=1:os.close(fd)\nenv=os.environ.copy();env['LD_LIBRARY_PATH']=str(base/'prefix/usr/lib64');env['LIBGL_ALWAYS_SOFTWARE']='1';env['LP_NUM_THREADS']='2'\n# /usr/bin exists only in this server's unprivileged mount namespace. The\n# retired host compiler is neither restored nor modified; only signed private\n# xkbcomp and the host shell are visible there. App processes stay outside.\ncommand=['/usr/bin/bwrap','--die-with-parent','--new-session','--unshare-user','--unshare-pid','--ro-bind','/','/','--bind','/tmp','/tmp','--tmpfs','/run','--ro-bind','/usr/bin','/run/dome-xvfb-host-bin','--ro-bind',str(base/'server-bin'),'/usr/bin','--',str(base/'prefix/usr/bin/Xvfb'),*args]\nos.execve(command[0],command,env)\n",
+    "launcher_sha256": "b7321c8c7dcf97208c24cd845cdb9b03907b81c751c1548edb0ef478b987bab3",
+    "scope": "Server-only unprivileged bwrap namespace, private /run tmpfs and /usr/bin mapping for signed xkbcomp; no host paths changed. App outside namespace with canonical runtime library path. Five signed RPMs downloaded, only three x86_64 payloads extracted; i686 downloads unused. DNF exclusion override command-only for download, no package installation or configuration edits.",
+    "evidence": {
+      "artifacts/private-xvfb/download.log": "dd717c1d4fe130f6f69f211ca3fa5b2f4e4c5b47595578aa23a5beea829dc6f8",
+      "artifacts/private-xvfb/download-nobara.log": "239dff1b0b71532d43383eed2ba0b63a503f3e98446cbee46dd07274a6247197",
+      "artifacts/private-xvfb/download-private-only.log": "78e3efc39a6e8361525b47e0f839513ef45ad77fe05db6868037dca1b7d04ab4"
+    }
+  },
+  "private_rpms": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.i686.rpm",
+      "sha256": "05dec03a990507afd7d391ab639291416ccc59b1f2464cfc7e302c6f227910da",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.i686.rpm: digests signatures OK",
+      "extracted": false
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.x86_64.rpm",
+      "sha256": "f23f973ac4de9e8006217d650554252c443df7cec4351b1668a17bbdf85a1c58",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/libXfont2-2.0.9-1.fc44.x86_64.rpm: digests signatures OK",
+      "extracted": true
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.i686.rpm",
+      "sha256": "dcb5962141e1389e7c072e4cd322d14597bf9a5970789fa32208351750fac5a0",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.i686.rpm: digests signatures OK",
+      "extracted": false
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.x86_64.rpm",
+      "sha256": "26dd6f9bfa97987e8d9d0b9aa86b2b8d79b9ba95d3222d8a6b46655ba1293c6f",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xkbcomp-1.5.0-2.fc44.x86_64.rpm: digests signatures OK",
+      "extracted": true
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xorg-x11-server-Xvfb-21.1.25-2.fc44.x86_64.rpm",
+      "sha256": "b25c6d7b27c711dd8fa8cc435d970663560b3ea771a65790f71ec45afaa0d4dc",
+      "signature": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms/xorg-x11-server-Xvfb-21.1.25-2.fc44.x86_64.rpm: digests signatures OK",
+      "extracted": true
+    }
+  ],
+  "other_fixed_snapshot_cohorts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-normal-r1",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 0.40087176399538293
+      },
+      "scope": "Setup only: snapshot inspector mode0600; copied binary chmodu+x fixes permissions without changing bytes.",
+      "report_complete": false,
+      "passed_checks": 1,
+      "failure": "[Errno 13] Permission denied: '/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test'",
+      "input_hashes": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "341a6f3624d9bdfb92383a4d37947b766feba31906471b57ede4474dd1dd77cf"
+      },
+      "after_matches": null,
+      "files": {
+        "artifacts/retained-key-fixed-normal-r1/runner.log": "8d74c69446e784eef3d25f529fb9cf167078e31d14513d982d48c8f006459d18",
+        "artifacts/retained-key-fixed-normal-r1/before.json": "4796de0f1e72b0a09cea2b92c03b5c59c565d6274cf19c174333d6b6a2826a13",
+        "artifacts/retained-key-fixed-normal-r1/report.json": "ec1b58d6f62aba19774eab9c3e0a83fe93e74f65a1e6e107f6eb739571002309",
+        "artifacts/retained-key-fixed-normal-r1/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-fixed-normal-r1/exception.txt": "352bfd127ef740ddb36453029c1d28f5e72190868b904fd7c0ee8c6cb3808fa1",
+        "artifacts/retained-key-fixed-normal-r1/runner-receipt.json": "e7059e8a4bb4d5c147411b0bac43b014c67dc333981eb9a8d016d0a58c55fd41"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-normal-r2",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 71.89496825999231
+      },
+      "scope": "Exact original341a harness: stroke complete and real target0 changes; failure from assuming last slot remains selected after Undo clamps selection.",
+      "report_complete": false,
+      "passed_checks": 13,
+      "failure": "Actual native Shift/left gesture replaces the selected key without changing prior targets",
+      "input_hashes": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "341a6f3624d9bdfb92383a4d37947b766feba31906471b57ede4474dd1dd77cf"
+      },
+      "after_matches": true,
+      "files": {
+        "artifacts/retained-key-fixed-normal-r2/runner.log": "e6bda6b148eb679994463927946be29e8526f9999638e798ca40a901e1400017",
+        "artifacts/retained-key-fixed-normal-r2/before.json": "4796de0f1e72b0a09cea2b92c03b5c59c565d6274cf19c174333d6b6a2826a13",
+        "artifacts/retained-key-fixed-normal-r2/report.json": "ebe5fef93eada2765164024e6c00a90727192abb663aed0225b5b0f965ac256d",
+        "artifacts/retained-key-fixed-normal-r2/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-fixed-normal-r2/latest-inspect.json": "a3526cf35d18e4cc6f2990f7dd69be61b070b7bd87a550a2a042560fbb24a450",
+        "artifacts/retained-key-fixed-normal-r2/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-normal-r2/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-normal-r2/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+        "artifacts/retained-key-fixed-normal-r2/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-normal-r2/before-stroke.png": "26a18488455d308ecba97d2c5880cdc9cf30f116314506d157b1f6d40e4c6ace",
+        "artifacts/retained-key-fixed-normal-r2/command.json": "3dfc78ff69cf25813d44b10319dcd0b40742dcac7095825ebfeb98a0a7554e32",
+        "artifacts/retained-key-fixed-normal-r2/stroke-result-before-save.png": "ea6bc0ea80c1534cc5e7c39303e4de4b57698abba5a226d3a39024d52f19b557",
+        "artifacts/retained-key-fixed-normal-r2/exception.txt": "16ec0e2191398a68e4c1511cff18a3e2b708374554c522be339bb690f55da5e7",
+        "artifacts/retained-key-fixed-normal-r2/runner-receipt.json": "c1366fc6454b6f0d0121fa40eeccf6869e9f8e66cfe77abdd569e0f416d8edd7",
+        "artifacts/retained-key-fixed-normal-r2/after.json": "4796de0f1e72b0a09cea2b92c03b5c59c565d6274cf19c174333d6b6a2826a13"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-compact-r1",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 72.4793338799791
+      },
+      "scope": "Same exact original341a selection assumption under compact UI; stroke complete and target0 changes.",
+      "report_complete": false,
+      "passed_checks": 15,
+      "failure": "Actual native Shift/left gesture replaces the selected key without changing prior targets",
+      "input_hashes": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "341a6f3624d9bdfb92383a4d37947b766feba31906471b57ede4474dd1dd77cf"
+      },
+      "after_matches": true,
+      "files": {
+        "artifacts/retained-key-fixed-compact-r1/runner.log": "89c6dd9c3927cff6631620fa6ca8f99ec814c465b2c1ea0bf1b74022661b1932",
+        "artifacts/retained-key-fixed-compact-r1/before.json": "4796de0f1e72b0a09cea2b92c03b5c59c565d6274cf19c174333d6b6a2826a13",
+        "artifacts/retained-key-fixed-compact-r1/report.json": "0122337b211f918cb3de5fca614a8b92bc315a5db8ec90fb36dd118375805b44",
+        "artifacts/retained-key-fixed-compact-r1/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-fixed-compact-r1/latest-inspect.json": "1901211a23262c2a146c3c3428662564d80db63086e08e6659d5a3b732c65c11",
+        "artifacts/retained-key-fixed-compact-r1/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-compact-r1/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-compact-r1/new-key.png": "761c4859f016caf7f223d59c7d417d9fbbe0a67b45bc45cd0b3ba05da0b3f016",
+        "artifacts/retained-key-fixed-compact-r1/new-key-scrolled.png": "0fb3c60aae6f08c6f97c9823f7bd48f807f8b808df2dee3be2bdca47bcdb9d9d",
+        "artifacts/retained-key-fixed-compact-r1/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-compact-r1/before-stroke.png": "952bd9a3281cec0b75aae3ac61ef57a205352d0c0e1a1e2c4309a6d8cfa4fc30",
+        "artifacts/retained-key-fixed-compact-r1/stroke-result-before-save.png": "d973811ba06dcbede32e8daa0ec0e70858795c5931f7a5d00226532f9f1933a5",
+        "artifacts/retained-key-fixed-compact-r1/exception.txt": "16ec0e2191398a68e4c1511cff18a3e2b708374554c522be339bb690f55da5e7",
+        "artifacts/retained-key-fixed-compact-r1/runner-receipt.json": "5a77fa8481e0cd22885135eb34f541bb35a08febe7c54c0b2064af786cb55f13",
+        "artifacts/retained-key-fixed-compact-r1/after.json": "4796de0f1e72b0a09cea2b92c03b5c59c565d6274cf19c174333d6b6a2826a13"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-normal-r3",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 79.07972613198217
+      },
+      "scope": "Test-only keyboard End/Return did not advance visible target choice; strict intendedtarget1 predicate rejects actualtarget0.",
+      "report_complete": false,
+      "passed_checks": 15,
+      "failure": "Actual native Shift/left gesture replaces the selected key without changing prior targets",
+      "input_hashes": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "5cd7197124af663c8592ca51a650683ac1f2a7d77ac5f47035eb9e0f6a40116e"
+      },
+      "after_matches": true,
+      "files": {
+        "artifacts/retained-key-fixed-normal-r3/runner.log": "525b3d5ca314c75e174a5d5c5dfe5307647f27fad456efcbdcc8ba6b3ad858d9",
+        "artifacts/retained-key-fixed-normal-r3/before.json": "e670156f68a53ff268175aae59cf5956f8975ab7f7f3ceb4566e0749ba6d62c6",
+        "artifacts/retained-key-fixed-normal-r3/report.json": "a1a742260b155de28fd898580ab8039380fab0787862e3ce8938ae911c971876",
+        "artifacts/retained-key-fixed-normal-r3/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-fixed-normal-r3/latest-inspect.json": "a3526cf35d18e4cc6f2990f7dd69be61b070b7bd87a550a2a042560fbb24a450",
+        "artifacts/retained-key-fixed-normal-r3/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-normal-r3/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-normal-r3/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+        "artifacts/retained-key-fixed-normal-r3/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-normal-r3/selected-existing-target.png": "14af43714349d251b14d634c12c80ad4acc30875c3bfb6e908d2d95b3ab5e56c",
+        "artifacts/retained-key-fixed-normal-r3/selected-existing-target.json": "e19846e32f8230ec36e49ece9452a291748dc05d96c96feddcd88ae7f097176c",
+        "artifacts/retained-key-fixed-normal-r3/before-stroke.png": "dcc8605c490951d3b7661aa3b369277dce335ecc66435ecd3d2d18976ed924bb",
+        "artifacts/retained-key-fixed-normal-r3/stroke-result-before-save.png": "ea6bc0ea80c1534cc5e7c39303e4de4b57698abba5a226d3a39024d52f19b557",
+        "artifacts/retained-key-fixed-normal-r3/exception.txt": "927ab62e6df1a4a7af80f6ff0a5c48068a7743b6ffd0d532dcf4827ab1586537",
+        "artifacts/retained-key-fixed-normal-r3/runner-receipt.json": "b0d1eae102413e61adac2401f4508b865439d726fc638c59e1e179f5afc50f78",
+        "artifacts/retained-key-fixed-normal-r3/after.json": "e670156f68a53ff268175aae59cf5956f8975ab7f7f3ceb4566e0749ba6d62c6",
+        "artifacts/retained-key-fixed-normal-r3/harness.py": "5cd7197124af663c8592ca51a650683ac1f2a7d77ac5f47035eb9e0f6a40116e"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-normal-r4",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 39.72175815299852
+      },
+      "scope": "Test-only BadWindow race observing the native popup after successful destruction.",
+      "report_complete": false,
+      "passed_checks": 10,
+      "failure": "<class 'Xlib.error.BadWindow'>: code = 3, resource_id = <Resource 0x004155a2>, sequence_number = 521, major_opcode = 3, minor_opcode = 0",
+      "input_hashes": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "8f4880cacc3f126d6f5249a918b3d7dcf507eec5cbd907734b779b157b1c936f"
+      },
+      "after_matches": true,
+      "files": {
+        "artifacts/retained-key-fixed-normal-r4/runner.log": "29671d54529a7890b04a06712098e1ed4019f85c740167936eb555dac2c4b32f",
+        "artifacts/retained-key-fixed-normal-r4/before.json": "7eb5815080d3ccc8984a765d11d423999e02032fbbd59a544e08b17031a0e422",
+        "artifacts/retained-key-fixed-normal-r4/report.json": "b9adaaabbe3c4ee50bd30b63b8ce6675cae45fe5c4afb49e4f4aa5e8de1f1666",
+        "artifacts/retained-key-fixed-normal-r4/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-fixed-normal-r4/latest-inspect.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-normal-r4/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-normal-r4/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-normal-r4/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+        "artifacts/retained-key-fixed-normal-r4/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-normal-r4/target-popup-history.png": "3f07ca363eab38ee91095595c80a97c834cbc5ed4708d873f23e15b82425e71b",
+        "artifacts/retained-key-fixed-normal-r4/exception.txt": "ac0a982cda208fc61725ba3908d234df8c38cd38493ab824e2c0f7a022c2773b",
+        "artifacts/retained-key-fixed-normal-r4/runner-receipt.json": "a3691044a6bc2bcec07dbe0a5a1f3f75c7182faf78f51aed2359f5e1a9ea99f9",
+        "artifacts/retained-key-fixed-normal-r4/after.json": "7eb5815080d3ccc8984a765d11d423999e02032fbbd59a544e08b17031a0e422",
+        "artifacts/retained-key-fixed-normal-r4/harness.py": "8f4880cacc3f126d6f5249a918b3d7dcf507eec5cbd907734b779b157b1c936f"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-normal-r5",
+      "runner": {
+        "exit_code": 0,
+        "seconds": 140.05888631098787
+      },
+      "scope": "Preliminary full normal35 pass on6acad harness; kept separate from final5ccb bytes.",
+      "report_complete": true,
+      "passed_checks": 35,
+      "failure": null,
+      "input_hashes": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "6acad737bf4d9105f6c0d07862f05e440133d96b00157623e4be49c91d473700"
+      },
+      "after_matches": true,
+      "files": {
+        "artifacts/retained-key-fixed-normal-r5/runner.log": "6170878e98388ded55a494352ad70328a6fb2922be2807d1eef5b840dabe8aff",
+        "artifacts/retained-key-fixed-normal-r5/before.json": "4647ffb7f8fd8254a8e1493afbd3ed8a8a0b99559e33b4e86330c3de5ef39d42",
+        "artifacts/retained-key-fixed-normal-r5/report.json": "35efd8b6b01d9b919d394bc722f879522aedbd18cb8621d4e881dd4769116156",
+        "artifacts/retained-key-fixed-normal-r5/xvfb.log": "e2a9cdea904f5b78cdec4d818de81709784ea2f07961a4cbb0c9b8fae1d95308",
+        "artifacts/retained-key-fixed-normal-r5/latest-inspect.json": "c9581507d1f875e71d7e7e04e637ba0a52c9ba1de4fda94f1a80b36b08c80d86",
+        "artifacts/retained-key-fixed-normal-r5/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-normal-r5/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-normal-r5/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+        "artifacts/retained-key-fixed-normal-r5/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-normal-r5/target-popup-history.png": "3f07ca363eab38ee91095595c80a97c834cbc5ed4708d873f23e15b82425e71b",
+        "artifacts/retained-key-fixed-normal-r5/selected-existing-target-history.png": "06e3c7eb8e23041883a2bac935c8fb2e9b3c22cf0465cc8cb07349fef9a265c0",
+        "artifacts/retained-key-fixed-normal-r5/selected-existing-target.json": "e19846e32f8230ec36e49ece9452a291748dc05d96c96feddcd88ae7f097176c",
+        "artifacts/retained-key-fixed-normal-r5/target-popup-for-stroke.png": "3f07ca363eab38ee91095595c80a97c834cbc5ed4708d873f23e15b82425e71b",
+        "artifacts/retained-key-fixed-normal-r5/selected-existing-target-for-stroke.png": "06e3c7eb8e23041883a2bac935c8fb2e9b3c22cf0465cc8cb07349fef9a265c0",
+        "artifacts/retained-key-fixed-normal-r5/before-stroke.png": "705d879d15a4af08744c8a6c34089ef11dda534bedef32180553707ed91b7e68",
+        "artifacts/retained-key-fixed-normal-r5/stroke-result-before-save.png": "f66c5e50edd6a128393022341df4fc9b4dd61e2da237706c928891e195f0f517",
+        "artifacts/retained-key-fixed-normal-r5/after-stroke.png": "26f1ee4c77a3548edce0540508569d7d887338825a5a2c5d068c839eb63ae42c",
+        "artifacts/retained-key-fixed-normal-r5/app-reopened.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-normal-r5/after.json": "4647ffb7f8fd8254a8e1493afbd3ed8a8a0b99559e33b4e86330c3de5ef39d42",
+        "artifacts/retained-key-fixed-normal-r5/runner-receipt.json": "7ff0297376d46f6a71d8f55939f33a007beecf2e5f38f9da42af5544867d5e90"
+      }
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/retained-key-fixed-compact-r2",
+      "runner": {
+        "exit_code": 1,
+        "seconds": 48.63437523099128
+      },
+      "scope": "Test-only pointer y154 hit Source target label after large-font help wrapped3lines; popup timeout. Final clicky184 lies in actual visible choice159..199.",
+      "report_complete": false,
+      "passed_checks": 12,
+      "failure": "native Source target popup timed out at native-existing-target-selection-history",
+      "input_hashes": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt": "36bc09406050df433e9d1cf463099d1e2025cfb34f8aea1e57467f79dff950ad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/e7-fixed-binaries/dome-sculpt-prepared-normal-shapes-test": "c91eb08b87d4ef6f30a3f2c1b75302ed78ae451580e39edfd6716c1a84040fb1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/tests/retained-key-menu.py": "6acad737bf4d9105f6c0d07862f05e440133d96b00157623e4be49c91d473700"
+      },
+      "after_matches": true,
+      "files": {
+        "artifacts/retained-key-fixed-compact-r2/runner.log": "a12fd2582948ee6446d0b864e9d6687f5aa591799ddc4b7498b5c86d0284ab86",
+        "artifacts/retained-key-fixed-compact-r2/before.json": "4647ffb7f8fd8254a8e1493afbd3ed8a8a0b99559e33b4e86330c3de5ef39d42",
+        "artifacts/retained-key-fixed-compact-r2/report.json": "74201ced4af31c89a18d26e69797c80ba3fda7e339d6b26d97f296d355678668",
+        "artifacts/retained-key-fixed-compact-r2/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+        "artifacts/retained-key-fixed-compact-r2/latest-inspect.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-compact-r2/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+        "artifacts/retained-key-fixed-compact-r2/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/retained-key-fixed-compact-r2/new-key.png": "761c4859f016caf7f223d59c7d417d9fbbe0a67b45bc45cd0b3ba05da0b3f016",
+        "artifacts/retained-key-fixed-compact-r2/new-key-scrolled.png": "0fb3c60aae6f08c6f97c9823f7bd48f807f8b808df2dee3be2bdca47bcdb9d9d",
+        "artifacts/retained-key-fixed-compact-r2/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+        "artifacts/retained-key-fixed-compact-r2/exception.txt": "8528747aa474f96a46587d7723b8d27bcb8054218677f5fa0287a5b93253c8cc",
+        "artifacts/retained-key-fixed-compact-r2/runner-receipt.json": "1430155b455de4298e71ef98e8e3ca4042b849ca39401d2f6fe788d511723bf7",
+        "artifacts/retained-key-fixed-compact-r2/after.json": "4647ffb7f8fd8254a8e1493afbd3ed8a8a0b99559e33b4e86330c3de5ef39d42",
+        "artifacts/retained-key-fixed-compact-r2/harness.py": "6acad737bf4d9105f6c0d07862f05e440133d96b00157623e4be49c91d473700"
+      }
+    }
+  ],
+  "original_product_failure_receipt": "docs/validation/RETAINED-KEY-UI-NEGATIVE.json",
+  "setup_and_negative_policy": "Original product failure, setup failures, failed interaction variants and preliminary pass are retained separately; none relabeled as final success.",
+  "live_jobs": [],
+  "gpu_lease": null,
+  "private_server_files_after": {
+    "artifacts/private-xvfb/prefix/usr/lib64/libXfont2.so.2.0.0": "c840504435c9c6a849bd38c3d02334ecec4896b0b105a3edfdec4e85e4ee230b",
+    "artifacts/private-xvfb/prefix/usr/bin/xkbcomp": "5a6ef960a1cc7511e6c14ffe3d63fe2144a99165aa81c90b5b8d7700e92c96f4",
+    "artifacts/private-xvfb/prefix/usr/bin/Xvfb": "83ee48fef2a12fd70572e2c63d5278735ff0afbed06864165076ee27d3d1f9ff"
+  }
+}
