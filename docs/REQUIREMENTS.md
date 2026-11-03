@@ -243,3 +243,11 @@ does not reduce any unfinished original requirement or mark basic targets met.
 The trays must use the existing shared document commands and respect DomeD
 appearance, bitmap text, universal-menu and keybinding conventions where viable.
 Specific tray layouts and controller bindings remain design work for that phase.
+
+## Private VRM1 first source/export route (2026-11-03)
+
+The isolated eec7753 continuation implements and qualifies the guarded source-only
+VRM1.0 route in VRM1-SOURCE-EXPORT.md. Its explicit painted/frame/HDR/initial-UV/
+constraint/physics/fitted-version limitations remain required full-goal work.
+This component and its appended parsed DTO ABI require coherent root integration;
+none of its selected scopes are an all-suite or full VRM1 completion claim.

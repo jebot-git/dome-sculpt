@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/import.hpp"
 #include "dome/mtoon.hpp"
+#include "dome/vrm.hpp"
+#include "import-texture-transform.hpp"
+#include "vrm1-metadata.hpp"
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
 #include <cctype>
@@ -759,6 +762,7 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
     throw std::runtime_error("Cannot parse glTF/GLB");
   std::unique_ptr<cgltf_data, decltype(&cgltf_free)> data(raw, cgltf_free);
   auto &d = *data;
+  ImportedAvatarVersion avatar_version = ImportedAvatarVersion::None;
   if (d.extensions_required_count) {
     if (!o.allow_vrm_metadata || o.mode != ImportMode::PreserveGltf)
       throw std::runtime_error(
@@ -790,6 +794,8 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
       throw std::invalid_argument(
           "Required VRM metadata requires exact VRM1.0 source authority");
     bool typed = false;
+    detail::validate_vrm1_metadata(source, o.cancelled);
+    avatar_version = ImportedAvatarVersion::Vrm1;
     if (source.contains("materials"))
       for (const auto &material : source.at("materials")) {
         stop(o);
@@ -801,11 +807,53 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
       }
     for (size_t i = 0; i < d.extensions_required_count; ++i) {
       const std::string_view required = d.extensions_required[i];
-      if (required != "VRMC_vrm" &&
-          !(required == "VRMC_materials_mtoon" && typed))
+      const bool constraint =
+          required == "VRMC_node_constraint" &&
+          std::any_of(
+              source.at("nodes").begin(), source.at("nodes").end(),
+              [](const auto &node) {
+                return node.contains("extensions") &&
+                       node.at("extensions").contains("VRMC_node_constraint");
+              });
+      if (required != "VRMC_vrm" && required != "KHR_texture_transform" &&
+          required != "KHR_materials_unlit" &&
+          required != "KHR_materials_emissive_strength" &&
+          !(required == "VRMC_springBone" &&
+            extensions.contains("VRMC_springBone")) &&
+          !constraint && !(required == "VRMC_materials_mtoon" && typed))
         throw std::runtime_error(
             "Required glTF extension has no authenticated VRM adapter: " +
             std::string(required));
+    }
+  }
+  // Optional V1 extensions need the same authentication during immutable
+  // source/archive replay, not only in the outer authoring importer.
+  bool actual_vrm = false;
+  for (size_t i = 0; i < d.data_extensions_count; ++i)
+    actual_vrm |= std::string_view(d.data_extensions[i].name) == "VRMC_vrm" ||
+                  std::string_view(d.data_extensions[i].name) == "VRM";
+  if (!d.extensions_required_count && o.allow_vrm_metadata &&
+      o.mode == ImportMode::PreserveGltf && actual_vrm) {
+    if (d.json_size > 16 * 1024 * 1024)
+      throw std::length_error("VRM source metadata exceeds JSON bound");
+    b.take(d.json_size * 6);
+    size_t visits = 0;
+    const auto source = nlohmann::json::parse(
+        d.json, d.json + d.json_size,
+        [&](int depth, nlohmann::json::parse_event_t, const nlohmann::json &) {
+          if (depth > 64 || ++visits > o.max_metadata_visits)
+            throw std::length_error("VRM source metadata exceeds visit bounds");
+          if ((visits & 4095) == 0)
+            stop(o);
+          return true;
+        });
+    if (source.at("extensions").contains("VRMC_vrm")) {
+      detail::validate_vrm1_metadata(source, o.cancelled);
+      avatar_version = ImportedAvatarVersion::Vrm1;
+    } else if (source.at("extensions").contains("VRM")) {
+      Vrm0Metadata::parse(source.at("extensions").at("VRM"), d.nodes_count,
+                          d.meshes_count, d.textures_count, d.materials_count);
+      avatar_version = ImportedAvatarVersion::Vrm0;
     }
   }
   if (d.nodes_count > 100000 || d.meshes_count > 65536 ||
@@ -895,6 +943,7 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
     throw std::runtime_error("Invalid glTF data");
   ImportedAsset out;
   out.mode = o.mode;
+  out.avatar_version=avatar_version;
   bool legacy_hint = false;
   if (o.allow_legacy_vrm_skin_hint) {
     if (o.mode != ImportMode::PreserveGltf)
@@ -976,20 +1025,32 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
     }
     out.textures.push_back(tex);
   }
-  auto texture = [&](const cgltf_texture_view &v) {
+  auto texture = [&](const cgltf_texture_view &v,
+                     ImportedTextureTransform &transform) {
     if (!v.texture)
       return -1;
-    if (v.texcoord < 0 || v.texcoord > 7 || v.has_transform)
+    if (v.texcoord < 0 || v.texcoord > 7 ||
+        (v.has_transform && o.mode != ImportMode::PreserveGltf))
       throw std::runtime_error("Unsupported texture coordinate set/transform");
+    if (v.has_transform) {
+      transform.authored = true;
+      std::copy_n(v.transform.offset, 2, transform.offset.begin());
+      std::copy_n(v.transform.scale, 2, transform.scale.begin());
+      transform.rotation = v.transform.rotation;
+      transform.texcoord = v.transform.has_texcoord ? v.transform.texcoord : -1;
+      (void)detail::imported_texture_coordinate(v.texcoord, transform);
+      (void)detail::imported_texture_matrix(transform);
+    }
     return int(v.texture - d.textures);
   };
   for (size_t i = 0; i < d.materials_count; i++) {
     auto &m = d.materials[i];
     if (m.has_pbr_specular_glossiness || m.has_clearcoat ||
         m.has_transmission || m.has_volume || m.has_ior || m.has_specular ||
-        m.has_sheen || m.has_emissive_strength || m.has_iridescence ||
-        m.has_diffuse_transmission || m.has_anisotropy || m.has_dispersion ||
-        (m.unlit && o.mode != ImportMode::PreserveGltf))
+        m.has_sheen ||
+        (m.has_emissive_strength && o.mode != ImportMode::PreserveGltf) ||
+        m.has_iridescence || m.has_diffuse_transmission || m.has_anisotropy ||
+        m.has_dispersion || (m.unlit && o.mode != ImportMode::PreserveGltf))
       throw std::runtime_error(
           "This material requires a non-core glTF shader import path");
     ImportedMaterial material;
@@ -997,6 +1058,12 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
     auto &pbr = m.pbr_metallic_roughness;
     std::copy_n(pbr.base_color_factor, 4, material.color.begin());
     std::copy_n(m.emissive_factor, 3, material.emissive.begin());
+    if (m.has_emissive_strength) {
+      material.emissive_strength = m.emissive_strength.emissive_strength;
+      if (!std::isfinite(material.emissive_strength) ||
+          material.emissive_strength < 0 || material.emissive_strength > 10000)
+        throw std::runtime_error("Invalid bounded source emissive strength");
+    }
     material.metallic = pbr.metallic_factor;
     material.roughness = pbr.roughness_factor;
     for (auto f : material.color)
@@ -1019,11 +1086,16 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
                          : ImportedMaterial::AlphaMode::Opaque;
     material.alpha_cutoff = m.alpha_cutoff;
     unit(material.alpha_cutoff);
-    material.color_texture = texture(pbr.base_color_texture);
-    material.metal_rough_texture = texture(pbr.metallic_roughness_texture);
-    material.normal_texture = texture(m.normal_texture);
-    material.occlusion_texture = texture(m.occlusion_texture);
-    material.emissive_texture = texture(m.emissive_texture);
+    material.color_texture =
+        texture(pbr.base_color_texture, material.color_transform);
+    material.metal_rough_texture =
+        texture(pbr.metallic_roughness_texture, material.metal_rough_transform);
+    material.normal_texture =
+        texture(m.normal_texture, material.normal_transform);
+    material.occlusion_texture =
+        texture(m.occlusion_texture, material.occlusion_transform);
+    material.emissive_texture =
+        texture(m.emissive_texture, material.emissive_transform);
     material.color_texcoord = pbr.base_color_texture.texcoord;
     material.metal_rough_texcoord = pbr.metallic_roughness_texture.texcoord;
     material.normal_texcoord = m.normal_texture.texcoord;
@@ -1240,10 +1312,18 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
       }
       // glTF indexed attribute names cannot have gaps. Keep genuine source
       // identities; absent arrays are never invented from another UV set.
-      if(!prim.uv1.empty() && prim.mesh.uv.empty())throw std::invalid_argument("glTF texture coordinate attributes must be contiguous from TEXCOORD_0");
-      if(!prim.extra_uv_sets.empty()) {
-        if(prim.mesh.uv.empty() || prim.uv1.empty())throw std::invalid_argument("glTF texture coordinate attributes must be contiguous from TEXCOORD_0");
-        uint32_t expected=2;for(const auto &[set,values]:prim.extra_uv_sets)if(set!=expected++)throw std::invalid_argument("glTF texture coordinate attributes must be contiguous from TEXCOORD_0");
+      if (!prim.uv1.empty() && prim.mesh.uv.empty())
+        throw std::invalid_argument("glTF texture coordinate attributes must "
+                                    "be contiguous from TEXCOORD_0");
+      if (!prim.extra_uv_sets.empty()) {
+        if (prim.mesh.uv.empty() || prim.uv1.empty())
+          throw std::invalid_argument("glTF texture coordinate attributes must "
+                                      "be contiguous from TEXCOORD_0");
+        uint32_t expected = 2;
+        for (const auto &[set, values] : prim.extra_uv_sets)
+          if (set != expected++)
+            throw std::invalid_argument("glTF texture coordinate attributes "
+                                        "must be contiguous from TEXCOORD_0");
       }
       if (preserve)
         deformation(p, *mesh, prim, b, o, out);
@@ -1251,12 +1331,25 @@ ImportedAsset gltf(const fs::path &path, const ImportLimits &o, Budget &b,
         throw std::runtime_error("Invalid primitive material");
       auto &mat = out.materials[prim.material];
       for (auto [texture, set] :
-           {std::pair{mat.color_texture, mat.color_texcoord},
-            {mat.metal_rough_texture, mat.metal_rough_texcoord},
-            {mat.normal_texture, mat.normal_texcoord},
-            {mat.occlusion_texture, mat.occlusion_texcoord},
-            {mat.emissive_texture, mat.emissive_texcoord}})
-        if (texture >= 0 && (set==0 ? prim.mesh.uv.empty() : set==1 ? prim.uv1.empty() : !prim.extra_uv_sets.contains(uint32_t(set))))
+           {std::pair{mat.color_texture,
+                      detail::imported_texture_coordinate(mat.color_texcoord,
+                                                          mat.color_transform)},
+            {mat.metal_rough_texture,
+             detail::imported_texture_coordinate(mat.metal_rough_texcoord,
+                                                 mat.metal_rough_transform)},
+            {mat.normal_texture,
+             detail::imported_texture_coordinate(mat.normal_texcoord,
+                                                 mat.normal_transform)},
+            {mat.occlusion_texture,
+             detail::imported_texture_coordinate(mat.occlusion_texcoord,
+                                                 mat.occlusion_transform)},
+            {mat.emissive_texture,
+             detail::imported_texture_coordinate(mat.emissive_texcoord,
+                                                 mat.emissive_transform)}})
+        if (texture >= 0 &&
+            (set == 0   ? prim.mesh.uv.empty()
+             : set == 1 ? prim.uv1.empty()
+                        : !prim.extra_uv_sets.contains(uint32_t(set))))
           throw std::runtime_error(
               "Textured primitive is missing the referenced UV set");
       for (auto color : prim.colors)

@@ -224,7 +224,7 @@ void validate_material_identity(const CreatorAppearance&a,const nlohmann::json &
   if(a.material==0){
     if(a.source_material!=-1 || primitive.contains("material"))throw std::runtime_error("Implicit default material requires original primitive material absence");
     const auto &m=a.asset->materials.at(0);const ImportedMaterial d;
-    auto fields=[](const ImportedMaterial &v){return std::tie(v.name,v.color,v.emissive,v.metallic,v.roughness,v.alpha_cutoff,v.normal_scale,v.occlusion_strength,v.double_sided,v.unlit,v.alpha,v.color_texcoord,v.metal_rough_texcoord,v.normal_texcoord,v.occlusion_texcoord,v.emissive_texcoord,v.color_texture,v.metal_rough_texture,v.normal_texture,v.occlusion_texture,v.emissive_texture);};
+    auto fields=[](const ImportedMaterial &v){return std::tie(v.name,v.color,v.emissive,v.metallic,v.roughness,v.alpha_cutoff,v.normal_scale,v.occlusion_strength,v.double_sided,v.unlit,v.alpha,v.color_texcoord,v.metal_rough_texcoord,v.normal_texcoord,v.occlusion_texcoord,v.emissive_texcoord,v.color_texture,v.metal_rough_texture,v.normal_texture,v.occlusion_texture,v.emissive_texture,v.color_transform,v.metal_rough_transform,v.normal_transform,v.occlusion_transform,v.emissive_transform,v.emissive_strength);};
     if(fields(m)!=fields(d))throw std::runtime_error("Implicit glTF default material factors differ from source defaults");
   }else if(!primitive.contains("material") || integer(primitive.at("material"))!=uint32_t(a.source_material))
     throw std::runtime_error("Creator material identity differs from original primitive declaration");

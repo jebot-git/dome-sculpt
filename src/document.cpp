@@ -38,13 +38,23 @@ namespace dome {
 namespace {
 ob::Vec3 obv(Vec3 p) { return {p.x, p.y, p.z}; }
 Vec3 vec(ob::Vec3 p) { return {p.x, p.y, p.z}; }
+bool retained_avatar(const SculptObject &object) {
+  if (!object.appearance)
+    return false;
+  if (object.appearance->vrm_json)
+    return true;
+  const auto &asset = object.appearance->asset;
+  return asset && asset->mode == ImportMode::PreserveGltf &&
+         asset->avatar_version != ImportedAvatarVersion::None;
+}
 uint64_t avatar_group(const Scene &scene, uint64_t object) {
   auto group = scene.object(object).group;
   auto path = scene.group_path(group);
   for (auto it = path.rbegin(); it != path.rend(); ++it)
-    if (it->humanoid) return it->id;
+    if (it->humanoid)
+      return it->id;
   const auto &appearance = scene.object(object).appearance;
-  if (appearance && appearance->vrm_json)
+  if (retained_avatar(scene.object(object)))
     for (auto it = path.rbegin(); it != path.rend(); ++it) {
       if (!it->source_placement || !it->source_placement->model ||
           it->source_placement->model->asset != appearance->asset ||
@@ -627,7 +637,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_voxel_remesh = parameter_enabled_locked(VrParameter::VoxelSize);
   auto avatar = avatar_group(scene_, active.id);
   state_.can_export_avatar = avatar && std::any_of(scene_.objects().begin(), scene_.objects().end(),
-      [&](const auto &o) { return o.appearance && o.appearance->vrm_json && in_group(scene_, o, avatar); });
+      [&](const auto &o) { return retained_avatar(o) && in_group(scene_, o, avatar); });
   state_.sculpt_settings = volume().sculpt_settings();
   state_.sculpt_transform = scene_.has_affine_placement(active.id)?CanvasTransform{}:scene_.world_transform(active.id);
   state_.can_configure_sculpt = sculpt_target_ready_locked();

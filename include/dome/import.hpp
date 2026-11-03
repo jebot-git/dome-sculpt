@@ -7,6 +7,7 @@
 #include <string>
 namespace dome {
 enum class ImportMode { StaticScene, PreserveGltf };
+enum class ImportedAvatarVersion { None, Vrm0, Vrm1 };
 using ImportedMatrix = std::array<float, 16>;
 struct ImportLimits {
   size_t max_file_bytes = 128 * 1024 * 1024,
@@ -32,6 +33,14 @@ struct ImportedTexture {
   int image = -1;
   int wrap_s = 10497, wrap_t = 10497, min_filter = 0, mag_filter = 0;
 };
+struct ImportedTextureTransform {
+  bool authored = false;
+  std::array<float, 2> offset{}, scale{1, 1};
+  float rotation = 0;
+  // Optional extension override; the material's base texcoord stays authored.
+  int texcoord = -1;
+  bool operator==(const ImportedTextureTransform &) const = default;
+};
 struct ImportedMaterial {
   std::string name = "Material";
   std::array<float, 4> color{1, 1, 1, 1};
@@ -44,6 +53,9 @@ struct ImportedMaterial {
       occlusion_texcoord = 0, emissive_texcoord = 0;
   int color_texture = -1, metal_rough_texture = -1, normal_texture = -1,
       occlusion_texture = -1, emissive_texture = -1;
+  ImportedTextureTransform color_transform, metal_rough_transform,
+      normal_transform, occlusion_transform, emissive_transform;
+  float emissive_strength = 1;
 };
 struct ImportedInfluenceSet {
   uint32_t set = 0;
@@ -125,6 +137,9 @@ struct ImportedAsset {
   std::vector<ImportedImage> images;
   std::vector<ImportedTexture> textures;
   std::vector<std::string> warnings;
+  // Derived from actual supported metadata under the explicit avatar adapter.
+  // Replayed from immutable bytes; extensions_used remains the authored list.
+  ImportedAvatarVersion avatar_version = ImportedAvatarVersion::None;
 };
 // OBJ concave polygons are ear-clipped. Default static glTF import explicitly
 // rejects skins/morphs. PreserveGltf retains node/skin/morph authoring payload

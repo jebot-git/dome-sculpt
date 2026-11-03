@@ -1,0 +1,533 @@
+{
+  "receipt_version": 1,
+  "status": "Qualified private first VRM1.0 source-export milestone; full VRM1 and root integration remain incomplete",
+  "source_parent": "eec7753284f99b65fae94a22795917efaf63f6d5",
+  "branch": "work/vrm1-source-eec7753",
+  "runtime_source_sha256": {
+    "include/dome/import.hpp": "b4c2a1fb77dbbf7087601684f848fa5ea4e3f559a979469f1eed600a4e8b6e64",
+    "include/dome/vrm.hpp": "669efa8ca0555850ac3e1cff525a8e5bf4b88239a4f1466dfb2aa1c290249b81",
+    "src/creator-archive.cpp": "4147347c8c4d3de58c6c650d84fd5371889ffec5f7705c87c680943de6018cad",
+    "src/document.cpp": "88313b3e69168f402b489b84726526a2723cd02084130510b84d7e3212c845a5",
+    "src/import-authoring.cpp": "ba15174a79a34f508274b15031c00b67f8df3509a575e6228047c96d4e207283",
+    "src/import-texture-transform.hpp": "9712ab0ffd418b7cbb12d178826e10245d4af590a87a87b1cb9ddba224d742a9",
+    "src/import.cpp": "a78a8e9867cc4dddabb5701caa017560538d72c831595ba83b165ded824976c2",
+    "src/vrm-import.cpp": "7741d8e4979895e88f1524236c8767cf107b4255edfb95bced382abbaf9084b9",
+    "src/vrm-source-graph.cpp": "2c4b7ff395bb9d757e6975b3311f8c7719b5689288e2bdf7d4218d72c58614db",
+    "src/vrm.cpp": "86e7b18fb8a9955acb477667624ac2a54e3a40fa39492d1a7c6d6ace10e77d5a",
+    "src/vrm1-export.cpp": "8cab475fb21aeb615deeadf7c807c7ca618858511ef122d68dbafe3ca3712484",
+    "src/vrm1-export.hpp": "c4de3cf0469af89c3248ea64e7ede7d3196390c23b032ae6ad5a389256907ff5",
+    "src/vrm1-metadata.cpp": "9bb39f2bc508c7a5c34a76c17c695ea98b92f18d711839a5ea4a57adb9c64f7b",
+    "src/vrm1-metadata.hpp": "b9767365125a8472ebda62ef03112dbe452769227c22436658b64d60ea215215"
+  },
+  "test_source_sha256": {
+    "tests/vrm1-export-worker.cpp": "b3d3033233e7f0ff605423bee135224f50472aa77d03c843874fae0973ed254a",
+    "tests/vrm1-source-export-menu.py": "895f376c7ec28300cfde3fd10940b40645aff528acb0150da35d39e71970607c",
+    "tests/vrm1-source-export-ui.cpp": "902f3833dfa47d3a3d228ffac7ab9aef54a6e949a5348b9e05a8d02939c9f53c",
+    "tests/vrm1-source-export.cpp": "727c7c75cb8d7696ce96d978d7e84ca4c1d1fe031d04b49a6b66026ae4ef8dc2",
+    "tests/vrm1-source-render.cpp": "4efe8377e579c571d563a0e835370de88bd149ebeb7811612174c80862dacbfe",
+    "tests/vrm1-source-replay.cpp": "e7b1b809bb8e765bc056f6b2147456044351748b4028ea30577241472c6d0016"
+  },
+  "cmake_sha256": "5f76cc38d40d9af9195785246c098b506e6ad86ab68223943e72ae4e1388166f",
+  "post_frozen_proof_changes": "Separate replay test/CMake registration, docs and provenance only; every final native/image/UI runtime and header SHA is unchanged. No new schema or serialized advisory version.",
+  "abi_changes": {
+    "ImportedMaterial": "Append five exact ImportedTextureTransform role DTOs and emissive_strength",
+    "ImportedAsset": "Append derived nonserialized ImportedAvatarVersion avatar_version",
+    "requirement": "Fresh affected whole core/support/render/frontend/header consumers; do not mix with eec archives"
+  },
+  "release": {
+    "scope": "Affected core/support/render/OpenXR/FLTK app and selected fixtures; not all-target/all-backend",
+    "native": {
+      "results": [
+        {
+          "profile": "release",
+          "returncode": 0,
+          "seconds": 55.65080974000739
+        },
+        {
+          "profile": "sanitize",
+          "returncode": 0,
+          "seconds": 84.70631973497802
+        }
+      ],
+      "inputs": 1490,
+      "unchanged": true
+    },
+    "source_fixture_pass_assertions": 2606,
+    "worker_checks": 14,
+    "registered_tests": [
+      "vrm-source-export",
+      "generic-vrm-import",
+      "vrm1-source-export",
+      "vrm1-export-worker"
+    ]
+  },
+  "owned_sanitizer": {
+    "scope": "Fresh complete own C/C++ core/support at O1 with assertions; UIoff/XRon; not GL-driver/UI sanitizer coverage",
+    "C_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g1",
+    "CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g1 -std=gnu++20",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "suppression": null,
+    "registered_tests": [
+      "generic-vrm-import",
+      "vrm1-source-export",
+      "vrm1-export-worker"
+    ],
+    "source_fixture_pass_assertions": 2606,
+    "worker_checks": 14,
+    "status": {
+      "profile": "sanitize",
+      "returncode": 0,
+      "seconds": 84.70631973497802
+    },
+    "generated_flags_sha256": {
+      "build-sanitize/CMakeFiles/dome-sculpt-core.dir/flags.make": "68dd5e26c49b7ff4d4e3ac6c4a0e34370b65c1d97090a22677b69cdd987b1c21",
+      "build-sanitize/CMakeFiles/dome-sculpt-affine.dir/flags.make": "aa49bda15ea9c0195da5133db702df544c079edc1c0d7b342e22a3da4715b9de",
+      "build-sanitize/CMakeFiles/dome-sculpt-polygon.dir/flags.make": "4fbb0f50ac7e102d1e595f6eb7ce10fc66c5a1b3824ed38ffdc61ad0d9a02155",
+      "build-sanitize/CMakeFiles/xatlas.dir/flags.make": "c0a9dc851c185adf29b6e96f30e1859eb2d5600bc52512151d24ca82b26cbe38",
+      "build-sanitize/CMakeFiles/mikktspace.dir/flags.make": "321a02eefef252f1802243d21deb392916b23a22b197871fbdff6146d5fffaec",
+      "build-sanitize/CMakeFiles/mikktspace-robust.dir/flags.make": "d67016b091633f0d7bfd691bee78194b65dbcd639cf11651dc7535be2bb16fab",
+      "build-sanitize/CMakeFiles/ufbx.dir/flags.make": "1c017774f1030b4b95d7c699c3ea8f0266d8cf817f91124d631bf7f835b82250",
+      "build-sanitize/CMakeFiles/dome-sculpt-vrm1-source-export-test.dir/flags.make": "fe3336c28d84fae88e90abb51f34b3975c630db4e64a5aa22d1a1f18fc6b2c26",
+      "build-sanitize/CMakeFiles/dome-sculpt-vrm1-export-worker-test.dir/flags.make": "2f98d8301ef751e1b739ff59a1c19608338653fb08bdca688c41b5cb900e81f5",
+      "build-sanitize/CMakeFiles/dome-sculpt-vrm1-source-replay-test.dir/flags.make": "917f50e7b4528907f6440003a15adeaafd30157be9c30ebda0cc2f2128f63d9b"
+    },
+    "core_generated_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g1 -std=gnu++20 -Wall -Wextra -Wpedantic"
+  },
+  "replay": {
+    "scope": "Separate newly compiled consumer, exact same final owned core/support; direct executable runs",
+    "checks_each": 16,
+    "release": {
+      "returncode": 0,
+      "seconds": 0.16512896999483928,
+      "inputs": 21,
+      "unchanged": true
+    },
+    "sanitize": {
+      "returncode": 0,
+      "seconds": 2.202812712988816,
+      "inputs": 18,
+      "unchanged": true
+    }
+  },
+  "native_reimport": {
+    "results": [
+      {
+        "profile": "release",
+        "input": "build-release/vrm1-source-export/current.vrm",
+        "output": "artifacts/native-reimport-vrm1-current/release/0/reexport.vrm",
+        "returncode": 0,
+        "seconds": 0.1142937509866897
+      },
+      {
+        "profile": "release",
+        "input": "build-release/vrm1-source-export/kinematic.vrm",
+        "output": "artifacts/native-reimport-vrm1-current/release/1/reexport.vrm",
+        "returncode": 0,
+        "seconds": 0.11653176898835227
+      },
+      {
+        "profile": "release",
+        "input": "artifacts/final-vrm1-arc/outputs/official-animation.vrm",
+        "output": "artifacts/native-reimport-vrm1-current/release/2/reexport.vrm",
+        "returncode": 0,
+        "seconds": 0.0875106499879621
+      },
+      {
+        "profile": "sanitize",
+        "input": "build-release/vrm1-source-export/current.vrm",
+        "output": "artifacts/native-reimport-vrm1-current/sanitize/0/reexport.vrm",
+        "returncode": 0,
+        "seconds": 1.2368200749915559
+      },
+      {
+        "profile": "sanitize",
+        "input": "build-release/vrm1-source-export/kinematic.vrm",
+        "output": "artifacts/native-reimport-vrm1-current/sanitize/1/reexport.vrm",
+        "returncode": 0,
+        "seconds": 1.3284552429977339
+      },
+      {
+        "profile": "sanitize",
+        "input": "artifacts/final-vrm1-arc/outputs/official-animation.vrm",
+        "output": "artifacts/native-reimport-vrm1-current/sanitize/2/reexport.vrm",
+        "returncode": 0,
+        "seconds": 0.6716770910134073
+      }
+    ],
+    "inputs": 1486,
+    "unchanged": true
+  },
+  "frontend": {
+    "status": [
+      {
+        "mode": "software",
+        "returncode": 0,
+        "seconds": 9.114568586985115
+      },
+      {
+        "mode": "normal",
+        "returncode": 0,
+        "seconds": 16.83452681399649
+      },
+      {
+        "mode": "compact",
+        "returncode": 0,
+        "seconds": 15.206218517996604
+      }
+    ],
+    "inputs": {
+      "count": 1478,
+      "unchanged": true
+    },
+    "software_image_checks": 16,
+    "normal_gui_checks": 7,
+    "compact_gui_checks": 7,
+    "software_image_maximum": 1,
+    "tolerance": 2,
+    "source_current_image_comparisons": 6,
+    "times": [
+      0,
+      0.37,
+      1.1
+    ],
+    "native_actual_PBR_and_time_sensitivity": true,
+    "private_Xvfb_wrapper": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/bin/Xvfb",
+    "private_Xvfb_provenance": "docs/validation/RETAINED-KEY-UI-NEGATIVE.json",
+    "canonical_LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib"
+  },
+  "hardware": {
+    "status": {
+      "returncode": 0,
+      "seconds": 4.957783016987378,
+      "inputs": 1474,
+      "unchanged": true,
+      "DRI_PRIME": "pci-0000_03_00_0"
+    },
+    "GL_VENDOR": "Intel",
+    "GL_RENDERER": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "checks": 16,
+    "image_maximum": 1,
+    "tolerance": 2,
+    "source_current_image_comparisons": 6,
+    "lease": "Released; no live GPU jobs",
+    "scope": "Independent normative static official-sample V1 GLSL; not posed skin N/T or physics images"
+  },
+  "interoperability": {
+    "validator": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "file_cohort": [
+      {
+        "path": "build-release/vrm1-source-export/current.vrm",
+        "bytes": 48708,
+        "sha256": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a"
+      },
+      {
+        "path": "build-release/vrm1-source-export/worker.vrm",
+        "bytes": 48708,
+        "sha256": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a"
+      },
+      {
+        "path": "build-release/vrm1-source-export/kinematic.vrm",
+        "bytes": 48160,
+        "sha256": "a0bfdcbec71ecfdcddce2dd680390051760684f1c40f50bffe94be396c498740"
+      },
+      {
+        "path": "artifacts/final-vrm1-frontend/software-output/official-animation.vrm",
+        "bytes": 111852,
+        "sha256": "ccb4ad578145771823dd7656355c750bf6988084d2692609528c27c4601cf425"
+      },
+      {
+        "path": "artifacts/final-vrm1-arc/outputs/official-animation.vrm",
+        "bytes": 111852,
+        "sha256": "ccb4ad578145771823dd7656355c750bf6988084d2692609528c27c4601cf425"
+      },
+      {
+        "path": "artifacts/native-reimport-vrm1-current/release/0/reexport.vrm",
+        "bytes": 49572,
+        "sha256": "4869e101d27980958ebf3e9e47f6e08dafe3d420bf368f9b3834480375ee6ecf"
+      },
+      {
+        "path": "artifacts/native-reimport-vrm1-current/release/1/reexport.vrm",
+        "bytes": 49296,
+        "sha256": "731f78dc9755c90cc73070e997c574c877187c79f03062233d83ba4e06cbda7c"
+      },
+      {
+        "path": "artifacts/native-reimport-vrm1-current/release/2/reexport.vrm",
+        "bytes": 160052,
+        "sha256": "7e44a426f03b79602873b58c76134c976344348df97eefa1bb1b42bf4f578097"
+      },
+      {
+        "path": "artifacts/native-reimport-vrm1-current/sanitize/0/reexport.vrm",
+        "bytes": 49572,
+        "sha256": "4869e101d27980958ebf3e9e47f6e08dafe3d420bf368f9b3834480375ee6ecf"
+      },
+      {
+        "path": "artifacts/native-reimport-vrm1-current/sanitize/1/reexport.vrm",
+        "bytes": 49296,
+        "sha256": "731f78dc9755c90cc73070e997c574c877187c79f03062233d83ba4e06cbda7c"
+      },
+      {
+        "path": "artifacts/native-reimport-vrm1-current/sanitize/2/reexport.vrm",
+        "bytes": 160052,
+        "sha256": "7e44a426f03b79602873b58c76134c976344348df97eefa1bb1b42bf4f578097"
+      }
+    ],
+    "files": 11,
+    "errors": 0,
+    "warnings": 73,
+    "warning_codes": {
+      "MULTIPLE_EXTENSIONS": 33,
+      "NODE_SKINNED_MESH_NON_ROOT": 14,
+      "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 14,
+      "IMAGE_FEATURES_UNSUPPORTED": 12
+    },
+    "official_schema_instances": 60,
+    "official_schema_errors": 0,
+    "scope": "Eleven retained positive outputs: final source/current3, official software/hardware2, and actual fresh native reimport/reexport6. Source fixtures and intentional malformed inputs are not emitted-output claims; transient GUI/worker outputs are independently parsed in their own scoped tests."
+  },
+  "provenance": {
+    "VRM_specification_commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "VRM_pin_changed": false,
+    "VRM_repository_code_license_inferred": false,
+    "copied_upstream_implementation": false,
+    "private_spec_files_sha256": {
+      "samples/README.md": "938f5ec695eccd821a20657a9c44e69de3e065e83169c6d6305ba64f3c6ccf49",
+      "samples/Seed-san/README.md": "f0fdc21cf26437d9becd90a64d350bc0307fcfa172e1caea5aa39c52a5b3b9b6",
+      "samples/VRM1_Constraint_Twist_Sample/README.md": "079d48f0b8f15852e9b28b197c5c87c92c3fe7a614524a0afa939c74f649cc5a",
+      "samples/VRMC_vrm_expressions_isBinary_Overrides/README.md": "f41ee6ebc34da294ba107db7eb95a649af3993d296dfafeead0be01bffadeef6",
+      "specification/VRMC_materials_mtoon-1.0/MToon_comparision.md": "d93efbed847d9cea7d3eefff51cbb5be765668c5eba50efc439939b7afd91b79",
+      "specification/VRMC_materials_mtoon-1.0/README.md": "ac2b6060587b2cd5ddabb26bd7a07e04992a73d0bcbae5e6acb4cdc94da3f70b",
+      "specification/VRMC_materials_mtoon-1.0/schema/VRMC_materials_mtoon.schema.json": "39e69f102c7ae3bdaa35ff8f2bcbc022a5a4c052fe97009198566105c667e941",
+      "specification/VRMC_materials_mtoon-1.0/schema/mtoon.shadingShiftTexture.schema.json": "248280f5bbb0d0677125237d6837d8157f88632a3a3c1aef1f7ee923e23c152c",
+      "specification/VRMC_node_constraint-1.0/README.md": "2cbc9322c50c071d079623746cae8244984ae990876ffdb20307488f33b244b0",
+      "specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.aimConstraint.schema.json": "84f64fc5d303bfc4539ec12cdfde2421e21ede58f51d8b6858a51e49f4cdf940",
+      "specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.constraint.schema.json": "fbc6d976e94791e9132b23854fe2a96a8fbf3f4f771485fa4a705c139f92e928",
+      "specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.rollConstraint.schema.json": "c7f24b5139a14bd079f2e35ea65eb9fc7b31b17627ebc5c247363af8dee03a1b",
+      "specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.rotationConstraint.schema.json": "896d5dee6caec10d532ca0397883502416f2f3a25ed30c3dad53acc9b61e5d4f",
+      "specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.schema.json": "1864d42685b7d06cc333ca1ba16e1a2edcd2ad620501a1cf15f988200304208a",
+      "specification/VRMC_springBone-1.0/README.md": "ee7108a44ce9bf16ac0b049ad98a0ecfb64d6556ee56c5088b74bc68241c4c21",
+      "specification/VRMC_springBone-1.0/schema/VRMC_springBone.collider.schema.json": "d323adbea9133c20ad554514a75d1c48ddac33f8866745332cd3dfc1921d08c2",
+      "specification/VRMC_springBone-1.0/schema/VRMC_springBone.colliderGroup.schema.json": "73c6a51ceb4f21493cc6f7bdb62a08874bfee4d969c88301e0c8d87d680b22bc",
+      "specification/VRMC_springBone-1.0/schema/VRMC_springBone.joint.schema.json": "886dba93de146dd529c7e0fa8e0e8b585e5160d5455764f4bdfbcdf800a8d8d6",
+      "specification/VRMC_springBone-1.0/schema/VRMC_springBone.schema.json": "084ec425e4e69da15dbc2127726c70d9a26291cfaabaeddd8f5a173f23dbeb02",
+      "specification/VRMC_springBone-1.0/schema/VRMC_springBone.shape.schema.json": "448c92d1961a314a4c9b48e194b145cb2a8cbb2c59d021ec02a0da84dd3929ee",
+      "specification/VRMC_springBone-1.0/schema/VRMC_springBone.spring.schema.json": "3a4a7a1311f7653c1955c478de3fcca4ae44efafa6ee3688208dcd345584647e",
+      "specification/VRMC_vrm-1.0/README.md": "290e45788090227d306a7bfb26d945e44a41c5e0e7578897689bf9f0ba2cb314",
+      "specification/VRMC_vrm-1.0/expressions.md": "e1d27d4717de6625189d01abbe77c46550ac71d4f1caed7ed5dccad1a6ebd0c9",
+      "specification/VRMC_vrm-1.0/firstPerson.md": "32195ea87e968e7701d9b248d3c8a683ad35cdc6b693a2527a3ea8c36c1a7cdd",
+      "specification/VRMC_vrm-1.0/humanoid.md": "fa9f22dd491568a3b4437f85707bdc4381bd4f60e59bcd64b0ebaa741f6cdcf5",
+      "specification/VRMC_vrm-1.0/lookAt.md": "859e7c5d1d56ee7b0d795826c1bd70df628e8fe337392f808e788a7dbc714ee8",
+      "specification/VRMC_vrm-1.0/meta.md": "3c64fac57939b36d85bfe10a63fd634e98404b0209c29ba7c73cc233d36c17f8",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.materialColorBind.schema.json": "3106d724bf5f680f40e76a4386a7d19d91069edaf942b7a50075e62b92658950",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.morphTargetBind.schema.json": "32e94d057ee4a590426e92597ba9b0b7ebd527d3be924e5ffbe722d7a6eec4ba",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.schema.json": "35671fab00107e0cd95bf7a2675fae4a44aeb5058ea9be3fd88464fb9311beeb",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.textureTransformBind.schema.json": "692155ed69e8c8ebb6da57d380a11847260064e64dd3ec4bbe57767b42aaef53",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.schema.json": "1aafa72830f3ac7cbbb26ca21f9f0e0da2025db453e2df223dbb2750cc848748",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.firstPerson.meshAnnotation.schema.json": "833b4f9309c59925ee46fba4fc2106a37eee31b0ddee8df2de78045a6273cf00",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.firstPerson.schema.json": "95c524ae48ac6d9163fd1dc7fee6dba1730e86f17f2c370c9239c1486b74c81d",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.humanBones.humanBone.schema.json": "1d9c3ffe288e49d38e17048756c35af19b5cb4d3f9b9a9096c91ed51248e6e7a",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.humanBones.schema.json": "eb74f10a7bcae4a4fb44073ffc99b64cadb4c41c000ff137fac651106163f033",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.schema.json": "40f033c9f47d04aae8fa9d5d2ffae6dd5fa2f1592c6885a526a5b4232992f4a0",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.lookAt.rangeMap.schema.json": "ca423bbb60628a55cd08438201e2dff9f5d0f0fcf939fc69e5e9ebac508fae46",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.lookAt.schema.json": "a2c5e057f5294e8cae61b51a95a049db46415c818b516f8e2bada98bd5e32c78",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.meta.schema.json": "8d1d11ce15deedf91da1c5179febf4cc59168a02701e631538962d61f0e146f2",
+      "specification/VRMC_vrm-1.0/schema/VRMC_vrm.schema.json": "b852c4ecaf66cc2ba8af00659d1c408f5b1ae06174ba766319ef7e4d8db2f5e0",
+      "specification/VRMC_vrm-1.0/tpose.md": "0a82b76ebfef0d259673df8054e4b01fc6ee8f4b4d2f28937b19f46834ed5a03"
+    },
+    "gltf_common_schemas_commit": "3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded",
+    "samples": [
+      {
+        "path": "artifacts/spec/samples/Seed-san/vrm/Seed-san.vrm",
+        "source_url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/samples/Seed-san/vrm/Seed-san.vrm",
+        "sha256": "624d0d554bc205bbdc33e22a68a2c3c20edebb3e573011ead8878a65e5329b23",
+        "bytes": 10917800,
+        "readme_sha256": "f0fdc21cf26437d9becd90a64d350bc0307fcfa172e1caea5aa39c52a5b3b9b6",
+        "original_meta": {
+          "allowAntisocialOrHateUsage": true,
+          "allowExcessivelySexualUsage": true,
+          "allowExcessivelyViolentUsage": true,
+          "allowPoliticalOrReligiousUsage": true,
+          "allowRedistribution": true,
+          "authors": [
+            "VirtualCast, Inc."
+          ],
+          "avatarPermission": "everyone",
+          "commercialUsage": "corporation",
+          "copyrightInformation": "VirtualCast, Inc.",
+          "creditNotation": "required",
+          "licenseUrl": "https://vrm.dev/licenses/1.0/",
+          "modification": "allowModificationRedistribution",
+          "name": "Seed-san",
+          "thumbnailImage": 14,
+          "version": "1"
+        },
+        "bundled_creation_base": false
+      },
+      {
+        "path": "artifacts/spec/samples/VRM1_Constraint_Twist_Sample/vrm/VRM1_Constraint_Twist_Sample.vrm",
+        "source_url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/samples/VRM1_Constraint_Twist_Sample/vrm/VRM1_Constraint_Twist_Sample.vrm",
+        "sha256": "12c2b97e95e700783a6a550dc0eee2d7880aeedccef9ae67bc4c5a2f0f2631a2",
+        "bytes": 10776032,
+        "readme_sha256": "079d48f0b8f15852e9b28b197c5c87c92c3fe7a614524a0afa939c74f649cc5a",
+        "original_meta": {
+          "allowAntisocialOrHateUsage": false,
+          "allowExcessivelySexualUsage": true,
+          "allowExcessivelyViolentUsage": true,
+          "allowPoliticalOrReligiousUsage": true,
+          "allowRedistribution": true,
+          "authors": [
+            "pixiv Inc."
+          ],
+          "avatarPermission": "everyone",
+          "commercialUsage": "corporation",
+          "copyrightInformation": "(c) 2022 pixiv Inc.",
+          "creditNotation": "unnecessary",
+          "licenseUrl": "https://vrm.dev/licenses/1.0/",
+          "modification": "allowModificationRedistribution",
+          "name": "VRM1_Constraint_Twist_Sample",
+          "thumbnailImage": 18,
+          "version": "v1.0.1"
+        },
+        "bundled_creation_base": false
+      },
+      {
+        "path": "artifacts/spec/samples/VRMC_vrm_expressions_isBinary_Overrides/vrm/VRMC_vrm_expressions_isBinary_Overrides.vrm",
+        "source_url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/samples/VRMC_vrm_expressions_isBinary_Overrides/vrm/VRMC_vrm_expressions_isBinary_Overrides.vrm",
+        "sha256": "574171bca604608dd8b3197b3424d4b46b1ca0e8a417c4ab5547c011439a4fda",
+        "bytes": 21184,
+        "readme_sha256": "f41ee6ebc34da294ba107db7eb95a649af3993d296dfafeead0be01bffadeef6",
+        "original_meta": {
+          "name": "isBinary overrides",
+          "version": "v1.0.0",
+          "authors": [
+            "pixiv Inc."
+          ],
+          "copyrightInformation": "(c) 2025 pixiv Inc.",
+          "contactInformation": "(c) 2025 pixiv Inc.",
+          "references": [],
+          "licenseUrl": "https://vrm.dev/licenses/1.0/",
+          "avatarPermission": "everyone",
+          "allowExcessivelyViolentUsage": true,
+          "allowExcessivelySexualUsage": true,
+          "commercialUsage": "corporation",
+          "allowPoliticalOrReligiousUsage": true,
+          "allowAntisocialOrHateUsage": false,
+          "creditNotation": "unnecessary",
+          "allowRedistribution": true,
+          "modification": "allowModificationRedistribution"
+        },
+        "bundled_creation_base": false
+      },
+      {
+        "path": "artifacts/spec/samples/VRMC_materials_mtoon_UV_Animation_Test/vrm/VRMC_materials_mtoon_UV_Animation_Test.vrm",
+        "source_url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/samples/VRMC_materials_mtoon_UV_Animation_Test/vrm/VRMC_materials_mtoon_UV_Animation_Test.vrm",
+        "sha256": "23933c7aa9f2b1515bf44835d50080baa8d9698202cf20eb652f28c3d4537c81",
+        "bytes": 61732,
+        "readme_sha256": "5c285a800555802822ca4d2a2ea44d702398eb99fec4be49bfd40f00d0b461e6",
+        "original_meta": {
+          "allowAntisocialOrHateUsage": false,
+          "allowExcessivelySexualUsage": true,
+          "allowExcessivelyViolentUsage": true,
+          "allowPoliticalOrReligiousUsage": true,
+          "allowRedistribution": true,
+          "authors": [
+            "pixiv Inc."
+          ],
+          "avatarPermission": "everyone",
+          "commercialUsage": "corporation",
+          "creditNotation": "unnecessary",
+          "licenseUrl": "https://vrm.dev/licenses/1.0/",
+          "modification": "allowModificationRedistribution",
+          "name": "VRMC_materials_mtoon UV Animation Test",
+          "version": "v1.0.0"
+        },
+        "bundled_creation_base": false
+      }
+    ],
+    "creation_bases_unchanged": "Only existing verified CC0 VRoid female/male"
+  },
+  "preserved_negatives": {
+    "exact_eec_small_source": "artifacts/baseline/independent.log: actual V1 native import then original VRM0-only writer refusal",
+    "actual_eec_samples": [
+      {
+        "name": "VRMC_vrm_expressions_isBinary_Overrides",
+        "returncode": 1,
+        "seconds": 0.008874235994881019
+      },
+      {
+        "name": "Seed-san",
+        "returncode": 1,
+        "seconds": 0.014985424000769854
+      },
+      {
+        "name": "VRM1_Constraint_Twist_Sample",
+        "returncode": 1,
+        "seconds": 0.023365069006104022
+      }
+    ],
+    "old_reader_new_raw_transform_source": {
+      "returncode": 1,
+      "helper": "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/app-snapshot/dome-sculpt-rig-fit-authoring-test"
+    },
+    "old_reader_diagnostic": "Unsupported texture coordinate set/transform",
+    "inherited_official_isBinary_schema": "artifacts/schema-preliminary-r4.log: empty optional meta.references violates minItems1; current standard writer refuses without normalizing it",
+    "preliminary_V1_basis_frame_refusals": "artifacts/first-vrm1",
+    "test_only_initial_compile_failures": [
+      "artifacts/gui-vrm1-support/build-incomplete-type-negative.log",
+      "artifacts/build-vrm1-replay-incomplete-json-negative.log",
+      "artifacts/build-vrm1-replay-sanitize-incomplete-json-negative.log"
+    ],
+    "earlier_positive_scopes": [
+      "artifacts/hygiene-vrm1",
+      "artifacts/image-vrm1-r1",
+      "artifacts/image-vrm1-arc-r1",
+      "artifacts/gui-vrm1-current",
+      "artifacts/sanitize-vrm1-current"
+    ]
+  },
+  "artifact_sha256": {
+    "artifacts/final-vrm1-native/before.json": "66d19d41305de4541116ebb5456ddd938389b92fa25f344213e4b1127b305749",
+    "artifacts/final-vrm1-native/after.json": "66d19d41305de4541116ebb5456ddd938389b92fa25f344213e4b1127b305749",
+    "artifacts/final-vrm1-native/status.json": "385560a20959ec91360950c8b3721e56ee3e69a323bf10dc1f0ffda4ef6de6a7",
+    "artifacts/final-vrm1-native/release.log": "c29f979d8ed04a361ec9fbe5c5d28e53ac1117c642809c0079f29f9ac58fb568",
+    "artifacts/final-vrm1-native/sanitize.log": "882dce3a1b8b4bd712c673489620ea8a294169c54a59e079eabf4ab3df7633da",
+    "artifacts/final-vrm1-frontend/before.json": "e4eeede94c2da913246a371fd723313485af681e36ffa97363134e33b04d04cf",
+    "artifacts/final-vrm1-frontend/after.json": "e4eeede94c2da913246a371fd723313485af681e36ffa97363134e33b04d04cf",
+    "artifacts/final-vrm1-frontend/inputs.json": "bc73ab3e0e14659870e43cbd690c12facdd57d486163fb7219067cade8da0f65",
+    "artifacts/final-vrm1-frontend/status.json": "d546fc34984e64eae8816cf984e6fab543a54a600e6df2dda0b8df548d8b70d6",
+    "artifacts/final-vrm1-frontend/software.log": "b8d80a586019cb3c06ddbe6f2715b77034113b79b6664ac6a3b49e96002b3fc7",
+    "artifacts/final-vrm1-frontend/normal.log": "ba142707664317ef0c51a6e1b8ddfbd0604e75ba466eb8bc32022ca3002f77e6",
+    "artifacts/final-vrm1-frontend/compact.log": "ba142707664317ef0c51a6e1b8ddfbd0604e75ba466eb8bc32022ca3002f77e6",
+    "artifacts/final-vrm1-arc/before.json": "0048084c58f676f6cd4b13ff807438348bbee3e6bb453a7a646734f814d702a9",
+    "artifacts/final-vrm1-arc/after.json": "0048084c58f676f6cd4b13ff807438348bbee3e6bb453a7a646734f814d702a9",
+    "artifacts/final-vrm1-arc/status.json": "b52d25bb71664224efab7f4c9c6eff552cbfcf8e5eefc32c8063dbb5e0fd0953",
+    "artifacts/final-vrm1-arc/run.log": "89191fed29a7b4d4908042ae23680fbe3825e9827906343c5ab35566e0b6c795",
+    "artifacts/replay-vrm1-current/release-before.json": "e82c7598b11fdf21bc291e177792db118e9ca852f3e1f7f06b6ea4fe73cd512c",
+    "artifacts/replay-vrm1-current/release-after.json": "e82c7598b11fdf21bc291e177792db118e9ca852f3e1f7f06b6ea4fe73cd512c",
+    "artifacts/replay-vrm1-current/release-status.json": "6b5725cb641dcb72ec75905ba8cabf4d5c44ac3b158bae45c4be06e8b1eb9605",
+    "artifacts/replay-vrm1-current/release.log": "aa48e43c46e8db9bf8f2083f90284227eabb83d2f7b176bd4b7b04209be25d50",
+    "artifacts/replay-vrm1-current/sanitize-before.json": "dbb6a81a0a170fdbda1a4fd50f3d092773193728f55efd9bf43936217884832c",
+    "artifacts/replay-vrm1-current/sanitize-after.json": "dbb6a81a0a170fdbda1a4fd50f3d092773193728f55efd9bf43936217884832c",
+    "artifacts/replay-vrm1-current/sanitize-status.json": "b4250ffe0d0008702ad8d998a8f2bfaaf8f28e373dd2939c972feca300e991fd",
+    "artifacts/replay-vrm1-current/sanitize.log": "aa48e43c46e8db9bf8f2083f90284227eabb83d2f7b176bd4b7b04209be25d50",
+    "artifacts/native-reimport-vrm1-current/before.json": "3d5e21a65f1d25626fc58e8e8324cfcf21c4cf3dd9a9e1b6e6397a75b443ca10",
+    "artifacts/native-reimport-vrm1-current/after.json": "3d5e21a65f1d25626fc58e8e8324cfcf21c4cf3dd9a9e1b6e6397a75b443ca10",
+    "artifacts/native-reimport-vrm1-current/status.json": "15c94982f83fbb065d9b0c5cb27bcd83ffd14181052be29724066270abd658f8",
+    "artifacts/final-vrm1-schema-eleven/inputs.json": "13fe1f5430a6c7de4aec496969eebc748a56ed64ed0a8d44feebf00c74cadfa0",
+    "artifacts/final-vrm1-schema-eleven/official.json": "9b3d78a6be9033c9da898bd1fe6e10ef4fb55d52ce82c1e85e686868e7069ba1",
+    "artifacts/final-vrm1-schema-eleven/official-status.json": "c5382b1317d741998256216ac1b455586416c2ec4cc76e67ac09f69c1bed353e",
+    "artifacts/final-vrm1-schema-eleven/khronos.json": "0153abd04a3b72067ff3aab9e4b9bc2a3a7fc5d55fb11bf8d356b1f9f93e0eec"
+  },
+  "remaining_required": [
+    "Actual dynamic constraint/spring evaluation and general source-REST/physics/collider affine representation",
+    "Painted V1 common colour/emission compiler, prepared role/frame and UV-expression transports",
+    "Native HDR material authoring (actual Seed-san) and owning initial out-of-unit source UV sampler/writable basis (actual Twist)",
+    "All five transformed-role normal/tangent authoring/export combinations; generated transformed tangent cases remain guarded",
+    "Broader independent skinned/morphed N/T image/affine source and fitted V1 workflows",
+    "Unsupported tracks/cameras/lights, multiple scenes and opaque reference/attribute semantics require their actual adapters",
+    "Actual synthetic-loader VRM1 export and coherent root integration; no physical qualification"
+  ],
+  "live_jobs": [],
+  "physical_or_system_actions": false
+}

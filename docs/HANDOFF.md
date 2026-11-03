@@ -4,6 +4,20 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Private VRM1 continuation in this branch — 2026-11-03
+
+This isolated eec7753 child now has a first native source-node VRM1.0 exporter,
+actual metadata/ref remapping, derived raw-version eligibility, exact parsed
+texture-transform fields and bounded mesh-ancestor placement admission. Final
+selected Release4/SAN3, independent official-sample software16/A77016,
+universal-menu normal7+compact7, separate malformed-source replay16 in both
+profiles, fresh native reimport3 in both profiles and11-file Khronos/official
+schema gates pass.
+Read [VRM1-SOURCE-EXPORT.md](VRM1-SOURCE-EXPORT.md) and its exact receipt. This is
+not yet the root production integration, full VRM1 completion, or a physical
+headset qualification. Painted V1 compilation, HDR/initial out-of-unit UVs,
+dynamic physics/constraints and fuller fitted/frame workflows remain required.
+
 ## Current integration and remaining qualification — 2026-11-03
 
 The private authoring master now contains the qualified b32 source/rig/UV/key

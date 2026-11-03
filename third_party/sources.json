@@ -182,7 +182,7 @@
   "vrm_specification": {
     "repository": "https://github.com/vrm-c/vrm-specification",
     "commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
-    "used": "Normative humanoid and expression references only; no schema/code copied; exact file hashes in docs/AVATAR.md",
+    "used": "Pinned VRM0/VRM1 humanoid, expression, metadata, MToon1, springBone1 and nodeConstraint1 normative references; no upstream implementation copied. Existing pin unchanged. Private official schema/sample qualification and licenses: docs/VRM1-SOURCE-EXPORT.md and validation/VRM1-SOURCE-EXPORT.json.",
     "license": "No repository license file; no code license grant inferred"
   },
   "gltf_specification": {

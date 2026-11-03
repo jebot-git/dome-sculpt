@@ -8,6 +8,7 @@
 #include "scene-feature-version.hpp"
 #include "vrm-painted.hpp"
 #include "vrm-source-graph.hpp"
+#include "vrm1-export.hpp"
 #include <bit>
 #include <set>
 namespace dome {
@@ -424,6 +425,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
     fail("avatar lacks preserved original source");
   const auto &asset = *origin->asset;
   auto original = original_json(*origin);
+  if(original.contains("extensions")&&original.at("extensions").contains("VRMC_vrm"))
+    return detail::export_vrm1(input_objects,original,path,options);
   if (!original.contains("extensions") ||
       !original.at("extensions").contains("VRM"))
     fail("only original VRM0 is supported by this source-preserving path");
