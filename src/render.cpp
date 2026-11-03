@@ -168,7 +168,8 @@ struct SurfaceRenderer::TextureState {
     if(!mesh.source_tangents.empty() && mesh.source_tangents.size()!=count)throw std::invalid_argument("Retained tangent frame size differs from geometry");
     if(geometry_changed)for(auto t:mesh.source_tangents){float n=length(Vec3{t[0],t[1],t[2]});if(!finite(Vec3{t[0],t[1],t[2]})||!std::isfinite(n)||n<1e-8f||(t[3]!=-1&&t[3]!=1))throw std::invalid_argument("Retained tangent frame is invalid");}
     for(const auto &range:mesh.ranges) {
-      if(range.material_bindings&&range.material_bindings->physical_emission&&range.textures&&!range.textures->source_only)
+      if(range.material_bindings&&range.material_bindings->physical_emission&&
+         ((range.material_bindings->has_mtoon&&!range.pbr_view)||(range.textures&&!range.textures->source_only)))
         throw std::invalid_argument("Derived absolute emission requires its physical overlay adapter");
       if(range.material_bindings && range.material_bindings->normal_frames && !range.source_frame)throw std::invalid_argument("Retained material frames require complete worker frame publication");
       if(range.source_frame && (mesh.source_normals.size()!=count || (!range.source_normal_only && mesh.source_tangents.size()!=count)))throw std::invalid_argument("Source frame arrays are unavailable");

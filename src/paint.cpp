@@ -514,7 +514,7 @@ struct SourcePaintAccess {
   static uint64_t working_bytes(const Footprint &before,const Footprint &current,uint64_t remap) {
     auto surface=[](const Footprint &p) {
       return p.geometry+p.tiles+p.pixels/1024*sizeof(PaintedMesh::SurfaceMap::Bounds)+
-        p.pixels/1024*16*2*sizeof(std::shared_ptr<const PaintTile>)+
+        p.pixels/1024*16*3*sizeof(std::shared_ptr<const PaintTile>)+
         (p.raster?p.pixels*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t)):0);
     };
     return surface(before)+surface(current)+before.coordinates+2*current.coordinates+remap;
