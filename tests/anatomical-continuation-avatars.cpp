@@ -101,8 +101,9 @@ int main(int argc, char **argv) try {
       }
     }
   std::cout << std::setprecision(12)
-            << "POLICY whole-group-screened-surface-contact-graph "
-               "artist_magnitudes_in_energy=0 source_positive_intent=1 volume_claim=0 "
+            << "POLICY whole-group-integrated-visible-source-graph "
+               "artist_magnitudes_in_energy=0 source_positive_intent=1 "
+               "volume_claim=0 "
                "work_cap=500000000 mean_limit="
             << (hi - lo) * .005 << " max_limit=" << (hi - lo) * .02 << '\n'
             << std::flush;

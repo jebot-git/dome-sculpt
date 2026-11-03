@@ -1,0 +1,32 @@
+{
+  "base": "ccdd6f80e3d42481539d70aad82c55a622a22e1d",
+  "status": "private research; 500M support refusal; no field/admission",
+  "limits_unchanged": true,
+  "point_axial_negative": {
+    "bone": 7,
+    "permitted": 122,
+    "axial": 0,
+    "blocked": 0
+  },
+  "GPU": false,
+  "full_solver_SAN": false,
+  "hashes": {
+    "src/anatomical-continuation.hpp": "dd63eec07441f3fdd4d3be0044b5f8b3ef7edfe46ac0394ed62f886e19765dbd",
+    "tests/anatomical-continuation-avatars.cpp": "d29f5019117c3b8f9a91adc7a66e9884161a27d31aaf7da048c5588f6faefd06",
+    "artifacts/anatomical-integrated-probe": "68c8d36b7f879a1a8f6cacaf84b965036fa2e39cf53eba9cce02889296dbec73",
+    "artifacts/anatomical-integrated-hit-probe": "9b24205fcb81e002a1f6fd702b2935772aacaa79b72cad87c4bd1adda47efc13",
+    "artifacts/anatomical-integrated-diagnostic": "c1463e946ef271d1f9ee376ded51afa42907a0d8bda54575ba6f8e7d1f961397",
+    "artifacts/anatomical-integrated-point-probe": "dcbadaf8671d2d1cbf4879278f37319f77148adc5540a98c588ca1c16d6f6814",
+    "artifacts/integrated-male-time.log": "26b7c2666a5942c24ba247631d7af7f93327ea0db0a6de7fe0e9866813232693",
+    "artifacts/integrated-hit-male-time.log": "137d7e34c626dee871d4d58c92e3ff323bcb31a0ab5864be1a137aa22f641470",
+    "artifacts/integrated-diagnostic-male-time.log": "1c2cf2d45946179b29b4147b6400ea53093f9c71907331089b2d17afeff07e00",
+    "artifacts/integrated-point-male-time.log": "03e0baec5b50eca6520d6ff8c66049ab1ec3a3e7435a052326486a7301a142aa",
+    "artifacts/integrated-initial-overbudget.hpp": "e5613887ad006bff85dc95452a1df667266c3bff798edabe9da6519fce8c0b1d",
+    "artifacts/integrated-hit-first-unseeded.hpp": "1025bf96f0758bff56bdfa27928015b05440200dc353942b36991e99e824024e",
+    "artifacts/integrated-point-axial-negative.hpp": "19bc7d93acbd578ebf08e14e295a01c629c3edde6d476fa5856d5249d7d31b00",
+    "artifacts/integrated-initial-after-check.log": "c6497312039f23585e2721549f037de58376e4bf3d9c793684aa042d898f2c25",
+    "artifacts/integrated-hit-after-check.log": "2f2d1dd1b4b44be9fa113fcb7d21d65f9772719400b5e8d4a54bd06060896b68",
+    "artifacts/integrated-point-before.sha256": "59ee577316c31f4c3a3486548345bd93892530e7701a4f28998c9fe35bff63d6",
+    "artifacts/integrated-point-after-check.log": "56ac5ba69b28d26a9a8338841dc9387f775f54eccf328a38c7c9ba01dd835bb1"
+  }
+}

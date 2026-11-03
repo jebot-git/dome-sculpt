@@ -90,7 +90,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     for (size_t j = 0; j < labels; ++j)
       joint_label[out.joints[j]] = j;
     std::vector<HeatJointMask> usage;
-    std::vector<uint32_t> row_owner, face_owner;
+    std::vector<uint32_t> row_owner, face_owner, support_root;
     struct EdgeLess {
       Budget *budget;
       bool operator()(const std::array<uint32_t, 2> &a,
@@ -129,6 +129,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         s.normals.push_back(part.normals[i]);
         s.mass.push_back(part.mass[i]);
         row_owner.push_back(owner);
+        support_root.push_back(offset + part.surface_parent[i]);
         mesh.positions.push_back(vec(part.positions[i]));
         mesh.normals.push_back(vec(part.normals[i]));
         for (size_t at = part.starts[i]; at < part.starts[i + 1]; ++at) {
@@ -155,6 +156,14 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     const double h = length / edges.size();
     if (!(h > 0) || !std::isfinite(h))
       throw std::runtime_error("Continuation invalid scale");
+    std::vector<D> face_normals(mesh.indices.size() / 3);
+    for (size_t face = 0; face < face_normals.size(); ++face) {
+      budget.step(16);
+      auto a = s.positions[mesh.indices[face * 3]],
+           b = s.positions[mesh.indices[face * 3 + 1]],
+           c = s.positions[mesh.indices[face * 3 + 2]];
+      face_normals[face] = cross(sub(b, a), sub(c, a));
+    }
     SurfaceQuery query(mesh, [&] {
       budget.step();
       return false;
@@ -202,57 +211,107 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       }
     }
     std::vector<double> rhs(n * labels), screen(n);
-    stage = "bone sample support";
+    stage = "integrated visible source support";
+    std::vector<double> low(n), high(n);
+    budget.step(bones * bones);
     for (const auto &source : profile.segments) {
-      const double physical = norm(sub(source.tail, source.head));
+      const auto delta = sub(source.tail, source.head);
+      const double physical = norm(delta);
+      auto axis = delta;
+      // A point source is isotropic: no parent-derived one-dimensional support
+      // interval is invented for a genuine punctual control behind a surface.
+      if (physical)
+        for (double &v : axis)
+          v /= physical;
+      std::fill(low.begin(), low.end(), INFINITY);
+      std::fill(high.begin(), high.end(), -INFINITY);
+      for (uint32_t i = 0; i < n; ++i) {
+        budget.step(16);
+        if (!(usage[i][source.bone / 64] & (uint64_t(1) << (source.bone % 64))))
+          continue;
+        double t = dot(sub(s.positions[i], source.head), axis);
+        low[support_root[i]] = std::min(low[support_root[i]], t);
+        high[support_root[i]] = std::max(high[support_root[i]], t);
+      }
       const size_t intervals =
           physical ? std::max(size_t(1), size_t(std::ceil(physical / h))) : 0;
       if (intervals > budget.maximum - budget.used)
-        throw std::length_error("Continuation samples exceed work");
+        throw std::length_error("Integrated source samples exceed work");
       bool supported = false;
+      size_t permitted = 0, axial = 0, blocked = 0;
       for (size_t sample = 0; sample <= intervals; ++sample) {
         budget.stop();
-        auto p = source.head;
-        if (intervals)
-          for (size_t k = 0; k < 3; ++k)
-            p[k] +=
-                double(sample) / intervals * (source.tail[k] - source.head[k]);
-        SurfaceQueryOptions qo;
-        qo.cancelled = [&] {
-          budget.step();
-          return false;
-        };
-        qo.triangle_filter = [&](uint32_t face) {
-          budget.step(4);
-          auto row = mesh.indices[size_t(face) * 3];
-          return bool(usage[row][source.bone / 64] &
-                      (uint64_t(1) << (source.bone % 64)));
-        };
-        auto hit = query.nearest(vec(p), qo);
-        if (!hit)
-          throw std::runtime_error(
-              "Continuation bone has no declared group support");
-        // Trapezoid quadrature integrates one normalized source segment; point
-        // sources have unit quadrature. No target error/artist-value parameter.
-        double quadrature =
+        const double t = intervals ? physical * double(sample) / intervals : 0;
+        auto target = source.head;
+        for (size_t k = 0; k < 3; ++k)
+          target[k] += t * axis[k];
+        const double quadrature =
             intervals
                 ? ((sample == 0 || sample == intervals) ? .5 : 1.) / intervals
                 : 1.;
-        for (size_t c = 0; c < 3; ++c) {
+        for (uint32_t i = 0; i < n; ++i) {
+          budget.step(4);
+          auto root = support_root[i];
+          permitted += bool(usage[i][source.bone / 64] &
+                            (uint64_t(1) << (source.bone % 64)));
+          if (!(usage[i][source.bone / 64] &
+                (uint64_t(1) << (source.bone % 64))) ||
+              (physical && (t < low[root] || t > high[root])))
+            continue;
+          ++axial;
+          auto ray = sub(target, s.positions[i]);
+          const double distance2 = dot(ray, ray),
+                       distance = std::sqrt(distance2);
           budget.step(16);
-          auto i = mesh.indices[size_t(hit->triangle) * 3 + c];
-          double conductance =
-              quadrature * hit->barycentric[c] * s.mass[i] /
-              (double(hit->distance) * hit->distance + s.mass[i]);
-          if (conductance > 0) {
-            screen[i] += conductance;
-            rhs[i * labels + joint_label[source.bone]] += conductance;
-            supported = true;
+          SurfaceQueryOptions qo;
+          qo.cancelled = [&] {
+            budget.step();
+            return false;
+          };
+          // Whole-group entry walls, including other owners, block a direct
+          // auxiliary edge. Only actual incident source faces are excluded.
+          qo.triangle_filter = [&](uint32_t face) {
+            size_t c = size_t(face) * 3;
+            budget.step(4);
+            for (size_t k = 0; k < 3; ++k)
+              if (mesh.indices[c + k] == i)
+                return false;
+            return true;
+          };
+          // Exact same entry predicate, applied only after an actual triangle
+          // hit. Its normal is immutable geometry computed once, not per ray.
+          qo.ray_filter = [&](uint32_t face, const std::array<float, 3> &) {
+            const auto &normal = face_normals[face];
+            double product = dot(normal, ray), scale = 0;
+            budget.step(12);
+            for (size_t k = 0; k < 3; ++k)
+              scale += std::abs(normal[k] * ray[k]);
+            return product <=
+                   16 * std::numeric_limits<double>::epsilon() * scale;
+          };
+          if (distance > 0 && query.raycast(vec(s.positions[i]), vec(ray),
+                                            float(distance), qo)) {
+            ++blocked;
+            continue;
           }
+          // Surface area quadrature of the same dimensionless inverse-square
+          // kernel, instead of a Dirac projection onto one closest triangle.
+          double conductance = quadrature * s.mass[i] / (distance2 + s.mass[i]);
+          if (!(conductance > 0) || !std::isfinite(conductance))
+            throw std::runtime_error("Nonfinite integrated conductance");
+          screen[i] += conductance;
+          rhs[i * labels + joint_label[source.bone]] += conductance;
+          supported = true;
         }
         ++out.report.samples;
       }
-      out.report.supported_controls += supported;
+      if (!supported)
+        throw std::runtime_error(
+            "Integrated source has no genuine in-group support bone=" +
+            std::to_string(source.bone) + " permitted=" +
+            std::to_string(permitted) + " axial=" + std::to_string(axial) +
+            " blocked=" + std::to_string(blocked));
+      ++out.report.supported_controls;
     }
     stage = "screened matrix assembly";
     s.diagonal = screen;
