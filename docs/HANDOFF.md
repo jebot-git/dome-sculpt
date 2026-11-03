@@ -8,8 +8,11 @@ and coherent canonical FLTK/display integration. Fresh CPU ALL-target build,
 affected Release28/SAN18, native FLTK7+7/Wayland11, actual A77016 and independent
 schema/reimport checks pass. These are scoped gates, not an all535-test pass or
 full VRM1/physics/HDR qualification. Read VRM1-COHERENT-INTEGRATION.md and its
-receipt for exact boundaries. Three fresh vendor ALL-target builds are running
-on the identical `fc56265` runtime/API source; they remain pending.
+receipt for exact boundaries. Fresh optimized OneAPI/CUDA/ROCm ALL-target
+builds now pass on identical
+`fc56265` runtime/API source, with all 1,476 tracked inputs unchanged per profile.
+See validation/VRM1-VENDOR-BUILDS.json. This is build-only evidence; fresh vendor
+runtime and positive AMD/NVIDIA device qualification are not claimed.
 The independent initial outside-tile source UV, seam-key and automatic-weight
 branches are not admitted. Every unfinished original requirement and the later
 controller drawers remains required. No system or physical session changed.
@@ -49,9 +52,11 @@ All416 Release outputs remain byte-identical across the test-only header and
 root documentation merges. Read [VRM1-COHERENT-INTEGRATION.md](VRM1-COHERENT-INTEGRATION.md)
 and its receipt for exact scope; this is not an all535-test pass or full V1.
 
-Root owns the separate fresh OneAPI/CUDA/ROCm all-target builds on a frozen
-fc56265 copy; these are pending and are not replaced by earlier component
-proofs. Full painted/frame/HDR/initial-UV, fitted metadata and dynamic V1
+Root completed separate fresh OneAPI/CUDA/ROCm all-target builds on a frozen
+fc56265 copy, each exit0 with 1,476 unchanged tracked inputs. The build-only
+receipt is validation/VRM1-VENDOR-BUILDS.json; earlier runtime/device proofs keep
+their original source scopes. Full painted/frame/HDR/initial-UV, fitted metadata
+and dynamic V1
 constraints/physics requirements remain open. Root's outsideUV follow-up is
 separate, not merged or relabeled qualified here. Main publication/review and
 any physical qualification remain separate. No system/session action occurred.

@@ -8,8 +8,11 @@ and coherent canonical FLTK/display integration. Fresh CPU ALL-target build,
 affected Release28/SAN18, native FLTK7+7/Wayland11, actual A77016 and independent
 schema/reimport checks pass. These are scoped gates, not an all535-test pass or
 full VRM1/physics/HDR qualification. Read VRM1-COHERENT-INTEGRATION.md and its
-receipt for exact boundaries. Three fresh vendor ALL-target builds are running
-on the identical `fc56265` runtime/API source; they remain pending.
+receipt for exact boundaries. Fresh optimized OneAPI/CUDA/ROCm ALL-target
+builds now pass on identical
+`fc56265` runtime/API source, with all 1,476 tracked inputs unchanged per profile.
+See validation/VRM1-VENDOR-BUILDS.json. This is build-only evidence; fresh vendor
+runtime and positive AMD/NVIDIA device qualification are not claimed.
 The independent initial outside-tile source UV, seam-key and automatic-weight
 branches are not admitted. Every unfinished original requirement and the later
 controller drawers remains required. No system or physical session changed.
@@ -295,6 +298,7 @@ none of its selected scopes are an all-suite or full VRM1 completion claim.
 
 The subsequent private fc56265 integration now has fresh coherent CPU535-command
 build, selected Release28/SAN18 and native/image/replay/schema evidence in
-VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds are pending on a
-frozen copy; full V1/physics/HDR/painting and broader workflow requirements stay
+VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds now pass on a
+frozen copy (build-only; see validation/VRM1-VENDOR-BUILDS.json). Full V1/physics/
+HDR/painting and broader workflow requirements stay
 open. This is not an all535-test or full-goal completion claim.

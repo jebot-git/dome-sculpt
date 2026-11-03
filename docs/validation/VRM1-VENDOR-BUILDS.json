@@ -1,0 +1,167 @@
+{
+  "recorded_utc": "2026-11-03T13:06:19.411732+00:00",
+  "source": "fc56265411f80e6d4a4e1a2c40e309c23a1d5b1e",
+  "scope": "Fresh optimized all-target native FLTK/OpenXR builds only; no new runtime test, positive accelerator execution, physical HMD or system installation claim.",
+  "profiles": {
+    "ONEAPI": {
+      "status": "terminal",
+      "source": "fc56265411f80e6d4a4e1a2c40e309c23a1d5b1e",
+      "profile": "ONEAPI",
+      "wrapper_pid": 3149162,
+      "source_inputs": 1476,
+      "runs": [
+        {
+          "name": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-oneapi",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=ONEAPI",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+            "-DCMAKE_CXX_COMPILER=/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++"
+          ],
+          "exit_code": 0,
+          "seconds": 32.26057376500103
+        },
+        {
+          "name": "build",
+          "command": [
+            "cmake",
+            "--build",
+            "build-oneapi",
+            "--parallel",
+            "2"
+          ],
+          "exit_code": 0,
+          "seconds": 2041.1347897470114
+        }
+      ],
+      "scope": "Fresh optimized complete native all-target build after ImportedMaterial/Asset layout append; matching canonical f797 toolkit/bitmap SDK; no old archives reused. Build only, no positive vendor hardware/runtime or physical HMD claim.",
+      "phase": "build",
+      "child_pid": 3154627,
+      "exit_code": 0,
+      "source_drift": [],
+      "registered_test_commands": 538,
+      "before_manifest_sha256": "6a12eb72d3c95d1a514736b9f4367dc5f22e9f9975c76b175e80756d30d3bff3",
+      "after_manifest_sha256": "6a12eb72d3c95d1a514736b9f4367dc5f22e9f9975c76b175e80756d30d3bff3",
+      "build_log_sha256": "31e2d31112bfd2094a84188b1416c0113e0481f387408e52de351eb157f707c8",
+      "cmake_cache_sha256": "79a8c62b7816e3eabce163241e203dec758ae7fdca46f0bf7390eb3d54c58472",
+      "test_listing_sha256": "6be6269ccbce0db0c610c93c9cf7345720826fe11427f60d6ce1820838ba93d7"
+    },
+    "CUDA": {
+      "status": "terminal",
+      "source": "fc56265411f80e6d4a4e1a2c40e309c23a1d5b1e",
+      "profile": "CUDA",
+      "wrapper_pid": 3149161,
+      "source_inputs": 1476,
+      "runs": [
+        {
+          "name": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-cuda",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CUDA",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+            "-DCMAKE_CUDA_COMPILER=/home/blux/de-xr/dome-sculpt/artifacts/cuda-toolchain/13.4.1/bin/nvcc",
+            "-DCMAKE_CUDA_ARCHITECTURES=86"
+          ],
+          "exit_code": 0,
+          "seconds": 11.177362058020663
+        },
+        {
+          "name": "build",
+          "command": [
+            "cmake",
+            "--build",
+            "build-cuda",
+            "--parallel",
+            "2"
+          ],
+          "exit_code": 0,
+          "seconds": 2050.339431640983
+        }
+      ],
+      "scope": "Fresh optimized complete native all-target build after ImportedMaterial/Asset layout append; matching canonical f797 toolkit/bitmap SDK; no old archives reused. Build only, no positive vendor hardware/runtime or physical HMD claim.",
+      "phase": "build",
+      "child_pid": 3151668,
+      "exit_code": 0,
+      "source_drift": [],
+      "registered_test_commands": 537,
+      "before_manifest_sha256": "6a12eb72d3c95d1a514736b9f4367dc5f22e9f9975c76b175e80756d30d3bff3",
+      "after_manifest_sha256": "6a12eb72d3c95d1a514736b9f4367dc5f22e9f9975c76b175e80756d30d3bff3",
+      "build_log_sha256": "a71c66acdf01006c94580056d3912b45c4c88806172191491c5435b877386e0a",
+      "cmake_cache_sha256": "f5dcacb595e3e8dec43b7a382c5aab5893e71852ede7ec31ef1e03b6cb960dd6",
+      "test_listing_sha256": "64952f12169dc19a4eadbd0e70940b397a50fa1ef818577d5f575fdbf6d1a364"
+    },
+    "ROCM": {
+      "status": "terminal",
+      "source": "fc56265411f80e6d4a4e1a2c40e309c23a1d5b1e",
+      "profile": "ROCM",
+      "wrapper_pid": 3149163,
+      "source_inputs": 1476,
+      "runs": [
+        {
+          "name": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-rocm",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=ROCM",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DPython3_EXECUTABLE=/usr/bin/python3.14",
+            "-DCMAKE_HIP_COMPILER=/usr/lib64/rocm/llvm/bin/clang++",
+            "-DCMAKE_HIP_COMPILER_ROCM_ROOT=/usr",
+            "-DCMAKE_HIP_ARCHITECTURES=gfx1030",
+            "-DCMAKE_HIP_FLAGS=--hip-device-lib-path=/usr/lib64/rocm/llvm/lib/clang/20/lib/amdgcn/bitcode"
+          ],
+          "exit_code": 0,
+          "seconds": 10.655809866992058
+        },
+        {
+          "name": "build",
+          "command": [
+            "cmake",
+            "--build",
+            "build-rocm",
+            "--parallel",
+            "2"
+          ],
+          "exit_code": 0,
+          "seconds": 2030.9030506320123
+        }
+      ],
+      "scope": "Fresh optimized complete native all-target build after ImportedMaterial/Asset layout append; matching canonical f797 toolkit/bitmap SDK; no old archives reused. Build only, no positive vendor hardware/runtime or physical HMD claim.",
+      "phase": "build",
+      "child_pid": 3151572,
+      "exit_code": 0,
+      "source_drift": [],
+      "registered_test_commands": 536,
+      "before_manifest_sha256": "6a12eb72d3c95d1a514736b9f4367dc5f22e9f9975c76b175e80756d30d3bff3",
+      "after_manifest_sha256": "6a12eb72d3c95d1a514736b9f4367dc5f22e9f9975c76b175e80756d30d3bff3",
+      "build_log_sha256": "2dc7d5df6d24c36ce2a74bde092dcf665a214507870a076b0fe9e11cb11520c1",
+      "cmake_cache_sha256": "0de231b8e2b1ec1a159214ad91e92203dc2eb5c1c896502238df8789a0302921",
+      "test_listing_sha256": "08b564cc7bd8383d3b25618c635f12ed18187afc627a78e02ca77b8f1322a08f"
+    }
+  }
+}

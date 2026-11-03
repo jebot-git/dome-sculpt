@@ -90,8 +90,11 @@ All own proof jobs are terminal and no device lease remains.
 The publication preserves every integration/local commit and leaves runtime,
 headers, CMake, tests and assets byte-identical to qualified `fc56265`. The
 publication follow-up changes only these status notes and the receipt.
-Fresh OneAPI/CUDA/ROCm ALL-target ABI builds are running separately on immutable
-`fc56265` in `artifacts/vrm1-vendors-fc562`; all three configure successfully.
-Their pending builds are not promoted to completed evidence here. The earlier
-backend builds retain their previous source scopes. No system install or session
+Fresh OneAPI/CUDA/ROCm ALL-target ABI builds now pass separately on immutable
+`fc56265` in `artifacts/vrm1-vendors-fc562`, in 2041.135/2050.339/2030.903 seconds
+respectively. Each profile preserves all 1,476 tracked source inputs. Read
+[the build-only receipt](validation/VRM1-VENDOR-BUILDS.json) for exact commands,
+logs and manifests. This adds no fresh vendor runtime or positive AMD/NVIDIA
+hardware claim; earlier backend runtime proofs retain their previous scopes.
+No system install or session
 change accompanied publication.
