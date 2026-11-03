@@ -1,0 +1,78 @@
+{
+  "base": "267bd08e5fa0458599b98cb92db014d26d642ffe",
+  "admitted": false,
+  "scope": "Private fresh kernel/tests with copied uninstrumented b32 support archives; Release-only new producer",
+  "inputs": {
+    "count": 1483,
+    "exact": true
+  },
+  "fixed_actual": {
+    "segment_female": 0,
+    "segment_male": 3,
+    "midpoint_female": 0,
+    "midpoint_male": 2,
+    "auxiliary_absent": 0,
+    "seam_consumer_source_failures": 0
+  },
+  "shoe_cause": {
+    "physical_mm": {
+      "left": 43.29438476,
+      "right": 74.57520058
+    },
+    "signed_adjusted_mm": {
+      "left": 272.2511559,
+      "right": 127.2505526
+    },
+    "wrong_right_foot_weight": 0.1326593161
+  },
+  "evidence": [
+    {
+      "path": "artifacts/heat-midpoint-poses-probe",
+      "sha256": "235247209a506ebbb7447a328dd3b75b963881f6fbe2db0f5c89b1d162145b78"
+    },
+    {
+      "path": "artifacts/heat-midpoint-shoe-probe",
+      "sha256": "99130dcde14c43eebf425c0cb569c7c9fe0b6c8e3ae31246d47a499a6c73663a"
+    },
+    {
+      "path": "artifacts/poses-midpoints-female.log",
+      "sha256": "50a7e634c7b4dc07797cebb8cc1d462d8bdf2d34675d2357bcf697bcdd9b0c6d"
+    },
+    {
+      "path": "artifacts/poses-midpoints-male.log",
+      "sha256": "51ffb1a2363c48a6cb87185c747925faea1ff367fc8e103d6876da8c8ce3a026"
+    },
+    {
+      "path": "artifacts/poses-segments-female.log",
+      "sha256": "ad944b87a7f914cc353cb836bea3dfb881bdf9e52cdd76dbce0a116c3b45fbc5"
+    },
+    {
+      "path": "artifacts/poses-segments-male.log",
+      "sha256": "3f95572bd27dc13cead059ec5f6522acce86bed01ab288bc2ee71500efa1311c"
+    },
+    {
+      "path": "artifacts/tests-heat-midpoint-shoe.log",
+      "sha256": "3be44a94b7bec42a4cf45535ad444a6818d0051de10fb5746171a33ecc5bbb1b"
+    },
+    {
+      "path": "artifacts/tests-heat-midpoint.log",
+      "sha256": "ec1a5ec1f53a217469ee8cd1654681cb66fb717b93932f7d03029d175cd68fab"
+    },
+    {
+      "path": "src/heat-midpoint-source.hpp",
+      "sha256": "efd3e041c576bdf7706ad56bef4a184c612632ba2ee6d95a7f8b8cd7c8649db5"
+    },
+    {
+      "path": "tests/heat-midpoint-poses.cpp",
+      "sha256": "5f7f0d03f293fa915754e9528e2d9163363974fee04ab80ee146eadb6c9c0d4b"
+    },
+    {
+      "path": "tests/heat-midpoint-shoe.cpp",
+      "sha256": "910ce796cf51ce1a60888c0801f4e8a9a175494c1d26f037b1173acb7b472766"
+    },
+    {
+      "path": "tests/heat-midpoint.cpp",
+      "sha256": "539fefbb36a6cdeb800233c1745851c3a223ab166a146347bc953727795efe09"
+    }
+  ]
+}
