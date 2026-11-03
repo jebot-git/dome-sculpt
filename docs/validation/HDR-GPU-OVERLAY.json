@@ -1,0 +1,497 @@
+{
+  "status": "qualified private sparse GPU/compiler and owning-data component; not full HDR workflow or main-ready",
+  "base": "0e9bcab",
+  "graph_component": "e8e54fef31dac6eb81dc0c031d8cc6d687a5b9bb",
+  "source_files": {
+    "CMakeLists.txt": "ed9749cf3b1eb7ac596f5f5a864bcafbb2503e770f33ad815051a4b916714ad5",
+    "include/dome/material-bindings.hpp": "718a547e12640dd945899a866fe2760805894690f37728153650e777b9139b2f",
+    "include/dome/paint.hpp": "d3f2de7f4d04d82789c4c8bb4fb6dd806a11fa926745ef86dcb2333e95a4d9f0",
+    "src/emission-authority.hpp": "e031edd881ab549deca5f03b45e9f64f21223d90e27157fa4d42fb2a557447a9",
+    "src/export.cpp": "28918be1c17bca4baf25b584e96ec8be833f74a35e2c5ce975c94613de0bbb48",
+    "src/material-archive-version.hpp": "dc1bc78142a31cbbad422d56a9971c86b58717777b2e7d4bcec29e4b0c55c815",
+    "src/material-bindings.cpp": "27d0123582b61e3899594d3be62abdb3e94c7c4873585150060fdd449a782fbe",
+    "src/paint-overlay-packet.hpp": "f3f326907c018ec85bd49ff7920ebcfa4b7450de3fe52d971eb6fbdc20fb77a5",
+    "src/paint.cpp": "8975113a544e2e98197385fe8172712c4aa21bff9bc975ca2bec7eaae15e6e41",
+    "src/polygon-scene-archive.hpp": "288b3637c8c17b6102381be3b01feaeba3da392d7f10a29ec2a968c7a53c467b",
+    "src/polygon-scene-budget.hpp": "dc8831b1d8144c1b63475145e1702e91b1a7f821204d0105bad42cb61965824c",
+    "src/polygon-scene.cpp": "82b5c20dfc0980c0eaf71d14115c519091737eb35cc7f941d75425589370a278",
+    "src/render-paint-overlay.hpp": "6749908f3f1ff1eacbe332feaee778f764d00a8fe393020befb3c26108eca1a5",
+    "src/render-source-pack.hpp": "1d955379c513b03ee2de262c41188b5df788b567ce33740a7d4027c1e7b6bc7a",
+    "src/render.cpp": "82f720eea32a736445b58c2383097d94ebb7d88b1db407ca1870be127c02d1a9",
+    "src/scene-feature-version.hpp": "4ee414ab1ff2b12382644616bd503c8327b527f4be4c67f41e0027f48b91d7c7",
+    "src/scene.cpp": "78826cad4a89d65186114928c60f813d76b0a000f8db364db833ec26c999b3db",
+    "src/source-uv-bake.cpp": "9ef98e801c98fe4e2dca6542d8234e6480e220ae0b4116bd66dafce76e82ff48",
+    "src/vrm.cpp": "e250933debc7ebac97468f8b0301f62210ab49922f5b2d4ffe1fd0e1024532f7",
+    "tests/emission-background.cpp": "adde55d29212f1fe4caf02ba603b6594dd0042d7f570bc1ad40875cbc9ab4fdb",
+    "tests/emission-paint-data.cpp": "a179824f1252698bf4b0c5d8712ec3ec8d1786e5518679f3a9b3c703a31b8c6f",
+    "tests/emission-scene.cpp": "0196067103c88db9e500c0c7ad8d0b09d71b3bd9072cc7eb6f6b84f9142ba23c",
+    "tests/paint-overlay-gpu.cpp": "1c5e6ae08476c5ac6aecf9a8237bb09d92bb6d40b81a252498167cec25bfbd27"
+  },
+  "api": {
+    "appended": [
+      "TextureMaps::overlay shared_ptr<const detail::PaintOverlayPacket>",
+      "SourceMaterialBindings::physical_emission optional<array<float,3>> absolute linear background includingzero"
+    ],
+    "unchanged": [
+      "PaintPixel14B",
+      "PaintTile14336B",
+      "ImportedMaterial/ImportedAsset layout",
+      "ordinary unit Paint1/2 and material writes"
+    ],
+    "private": [
+      "PaintOverlayFactory::capture",
+      "PaintOverlayCompiler::prepare/at readonlyResource5planes",
+      "MToonSourcePacks::Input::linear(actualResource,plane,mips)"
+    ]
+  },
+  "profiles": {
+    "release": {
+      "initial_fresh_build": {
+        "profile": "release",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab/build-runtime-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 4.650999789009802
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab/build-runtime-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 489.6693386939878
+          }
+        ],
+        "seconds": 494.56248326800414,
+        "inputs": 1495,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; compiler helper not yet wired into SurfaceRenderer."
+      },
+      "initial_functional": {
+        "results": {
+          "emission-background": {
+            "exit": 0,
+            "seconds": 0.008108112990157679
+          },
+          "emission-scene": {
+            "exit": 0,
+            "seconds": 5.836323949013604
+          },
+          "emission-paint-data": {
+            "exit": 0,
+            "seconds": 0.017247779003810138
+          },
+          "paint-overlay-gpu": {
+            "exit": 0,
+            "seconds": 0.2750863640103489
+          },
+          "scene": {
+            "exit": 0,
+            "seconds": 0.3114009000128135
+          },
+          "source-union-version": {
+            "exit": 0,
+            "seconds": 0.028570413996931165
+          },
+          "unlit-fallback": {
+            "exit": 0,
+            "seconds": 0.20232353699975647
+          },
+          "paint": {
+            "exit": 0,
+            "seconds": 4.103247304010438
+          }
+        },
+        "source_inputs": 1495,
+        "artifacts": 18,
+        "unchanged": true
+      },
+      "final_rebuild": {
+        "exit": 0,
+        "seconds": 21.72072428802494,
+        "source_inputs": 1495,
+        "unchanged": true,
+        "command": [
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab/build-runtime-release",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-test-runtime",
+          "dome-sculpt-emission-background-test",
+          "dome-sculpt-emission-scene-test",
+          "dome-sculpt-emission-paint-data-test",
+          "dome-sculpt-paint-overlay-gpu-test",
+          "dome-sculpt-scene-test",
+          "dome-sculpt-source-union-version-test",
+          "dome-sculpt-unlit-fallback-test",
+          "dome-sculpt-paint-test"
+        ],
+        "scope": "Incremental header-dependent rebuild atop complete fresh own ABI builds; public layouts unchanged from initial8R/8SAN cohort; private packet/compiler/source-pack and factory changed."
+      },
+      "final_tests": {
+        "results": {
+          "emission-background": {
+            "exit": 0,
+            "seconds": 0.008598068990977481
+          },
+          "emission-scene": {
+            "exit": 0,
+            "seconds": 5.571097739011748
+          },
+          "emission-paint-data": {
+            "exit": 0,
+            "seconds": 0.01737736299401149
+          },
+          "paint-overlay-gpu": {
+            "exit": 0,
+            "seconds": 0.126135703001637
+          },
+          "scene": {
+            "exit": 0,
+            "seconds": 0.408424722001655
+          },
+          "source-union-version": {
+            "exit": 0,
+            "seconds": 0.030235261016059667
+          },
+          "unlit-fallback": {
+            "exit": 0,
+            "seconds": 0.2773175269830972
+          },
+          "paint": {
+            "exit": 0,
+            "seconds": 5.785024724027608
+          }
+        },
+        "source_inputs": 1495,
+        "artifacts": 18,
+        "unchanged": true
+      },
+      "artifacts": {
+        "build-runtime-release/dome-sculpt-emission-background-test": "0d5e02184a36cbc2e275e43fade7ffa494f715b14c255af6e4bec259d1a233a7",
+        "build-runtime-release/dome-sculpt-emission-scene-test": "327618334e72ba927e1f894234a33fe301416efe1be8950ba5c6408e38db8e5f",
+        "build-runtime-release/dome-sculpt-emission-paint-data-test": "b816fa71ab7f0f150da9838b14f9417d0d0c5c8d20fb52f79139aa019fa38946",
+        "build-runtime-release/dome-sculpt-paint-overlay-gpu-test": "6fd6fec5cb6e11462751005baab3c1e15c294b23de188b5dfb539db1906b8877",
+        "build-runtime-release/dome-sculpt-scene-test": "d33daa83eb2952413a753ebc1531f36e45c055e6f3413f9a1a9e9dee73c70e72",
+        "build-runtime-release/dome-sculpt-source-union-version-test": "b7ba9888630dd743985d916f38ea45080fc9e9f38e7def069447562fcfc05d52",
+        "build-runtime-release/dome-sculpt-unlit-fallback-test": "7ed4e72d5c5fcdc08a5fb5dc2a5159800ddfda200f8a01ad64101296b3c2f53e",
+        "build-runtime-release/dome-sculpt-paint-test": "5dd168246f37d2c1d70b5d34d2d858e7659cbaaf38ec3f9aac7f8f330be5fde7",
+        "build-runtime-release/libmikktspace-robust.a": "31ba1185f91ff72b5b5ba09267b28470d016867dc7ee0d4eda49b7832ba50517",
+        "build-runtime-release/libdome-sculpt-affine.a": "de8b490192a43ccdaa1198f844e89037676dd373d5cf2c4e2dad8233a163068d",
+        "build-runtime-release/libxatlas.a": "aec5278e5d6586f246afa5d599acd7aa74e6bae0b30384c5cb594709c59a192c",
+        "build-runtime-release/libmikktspace.a": "203bbb009b1c377a4a4a6b8b5f852bfa72a8612f26d3106c27a0131a31f2aeb2",
+        "build-runtime-release/libufbx.a": "87fbccd7e6773bc9a817e21c636fff82a96a1b692edd5424341141256e83183b",
+        "build-runtime-release/libdome-sculpt-spacenav.a": "84efb53a0faefb2a9b9ef7c495202103a3d295c8e38dc986d4a4c039110fdacc",
+        "build-runtime-release/libdome-sculpt-polygon.a": "b05b4e3521ad6aa401fad07b45698cd01143c9c211d5445409f5d3f4b8c9b8e3",
+        "build-runtime-release/libdome-sculpt-xr.a": "3478e17f20c491e3cb08179c2413f32d7b1479f278874bf48aa727694a7de115",
+        "build-runtime-release/libdome-sculpt-core.a": "80846cf9701648d46122a6f1c5f90de200e2f6a275996493cdb8201204a9f3de",
+        "build-runtime-release/libdome-sculpt-render.a": "a3c7c5268269127b5b2c95fb8210b037cff752d266b8fde1ba9e37bca4f18a68"
+      },
+      "evidence": {
+        "artifacts/forecast-final-proof/release/before.json": "2fe35baa9785d4aa0c08bcd7d6a7e0709af51aee7b446c42a90b69e7982407aa",
+        "artifacts/forecast-final-proof/release/after.json": "2fe35baa9785d4aa0c08bcd7d6a7e0709af51aee7b446c42a90b69e7982407aa",
+        "artifacts/forecast-final-proof/release/tests-before.json": "c2525e027dc1d5158b99cdb86340b9e9e093272548715f6e44d5fee526c51a5e",
+        "artifacts/forecast-final-proof/release/tests-after.json": "c2525e027dc1d5158b99cdb86340b9e9e093272548715f6e44d5fee526c51a5e",
+        "artifacts/forecast-final-proof/release/paint-overlay-gpu.log": "971853b0b28e8cfd2546e6b08043138114f8d1b1a314058f57ea1deff8d1e0dd"
+      }
+    },
+    "sanitize": {
+      "initial_fresh_build": {
+        "profile": "sanitize",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab/build-runtime-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 5.0695573490229435
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab/build-runtime-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test"
+            ],
+            "exit": 0,
+            "seconds": 761.4175435790094
+          }
+        ],
+        "seconds": 766.5409016979975,
+        "inputs": 1495,
+        "unchanged": true,
+        "scope": "Fresh whole own core/support/render/native FLTK+OpenXR app and affected tests; no previous archives reused; compiler helper not yet wired into SurfaceRenderer."
+      },
+      "initial_functional": {
+        "results": {
+          "emission-background": {
+            "exit": 0,
+            "seconds": 0.12474927899893373
+          },
+          "emission-scene": {
+            "exit": 0,
+            "seconds": 76.39685240000836
+          },
+          "emission-paint-data": {
+            "exit": 0,
+            "seconds": 0.15926844399655238
+          },
+          "paint-overlay-gpu": {
+            "exit": 0,
+            "seconds": 0.3779568939935416
+          },
+          "scene": {
+            "exit": 0,
+            "seconds": 2.896729513973696
+          },
+          "source-union-version": {
+            "exit": 0,
+            "seconds": 0.1420707140059676
+          },
+          "unlit-fallback": {
+            "exit": 0,
+            "seconds": 0.2641553040011786
+          },
+          "paint": {
+            "exit": 0,
+            "seconds": 38.276860950980335
+          }
+        },
+        "source_inputs": 1495,
+        "artifacts": 18,
+        "unchanged": true
+      },
+      "final_rebuild": {
+        "exit": 0,
+        "seconds": 52.83381755501614,
+        "source_inputs": 1495,
+        "unchanged": true,
+        "command": [
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab/build-runtime-sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-test-runtime",
+          "dome-sculpt-emission-background-test",
+          "dome-sculpt-emission-scene-test",
+          "dome-sculpt-emission-paint-data-test",
+          "dome-sculpt-paint-overlay-gpu-test",
+          "dome-sculpt-scene-test",
+          "dome-sculpt-source-union-version-test",
+          "dome-sculpt-unlit-fallback-test",
+          "dome-sculpt-paint-test"
+        ],
+        "scope": "Incremental header-dependent rebuild atop complete fresh own ABI builds; public layouts unchanged from initial8R/8SAN cohort; private packet/compiler/source-pack and factory changed."
+      },
+      "final_tests": {
+        "results": {
+          "emission-background": {
+            "exit": 0,
+            "seconds": 0.2724283529969398
+          },
+          "emission-scene": {
+            "exit": 0,
+            "seconds": 87.28829176400905
+          },
+          "emission-paint-data": {
+            "exit": 0,
+            "seconds": 0.2515106509963516
+          },
+          "paint-overlay-gpu": {
+            "exit": 0,
+            "seconds": 0.45696279098046944
+          },
+          "scene": {
+            "exit": 0,
+            "seconds": 4.0941030899994075
+          },
+          "source-union-version": {
+            "exit": 0,
+            "seconds": 0.16781014800653793
+          },
+          "unlit-fallback": {
+            "exit": 0,
+            "seconds": 0.29735381100908853
+          },
+          "paint": {
+            "exit": 0,
+            "seconds": 37.5787918450078
+          }
+        },
+        "source_inputs": 1495,
+        "artifacts": 18,
+        "unchanged": true
+      },
+      "artifacts": {
+        "build-runtime-sanitize/dome-sculpt-emission-background-test": "51925bff1cfaa88fe0cbefc130f661eaf22444aaa1356c3d3d389ba67c5ef381",
+        "build-runtime-sanitize/dome-sculpt-emission-scene-test": "bed72d4b96bac967568ee29485b19a42db0975f1877ccf4e7a8d8b6255c27f49",
+        "build-runtime-sanitize/dome-sculpt-emission-paint-data-test": "9a6bf5c624f60f2ba03fd93ae97148a7384d33ad74795cabe199768cd4fa4a9e",
+        "build-runtime-sanitize/dome-sculpt-paint-overlay-gpu-test": "7797a1586be48b142b440431dc0d0ca328075f05aa5da27dc71f56ca745408a0",
+        "build-runtime-sanitize/dome-sculpt-scene-test": "385bda96a5fca49d8336c92e96f03b32e997995e21997cd70ac5b7f701ab867f",
+        "build-runtime-sanitize/dome-sculpt-source-union-version-test": "41421e85daa5af5bcbd9916f531c5c2323c79323fdf8fd46c6a35c12f2d9408f",
+        "build-runtime-sanitize/dome-sculpt-unlit-fallback-test": "a5438a5ffc93b1e7e8daba43cbc404e3d88ed5e0cc44455303177017c167cf16",
+        "build-runtime-sanitize/dome-sculpt-paint-test": "6192ea85acf3fc044a0eae0361d64b87a870ed6d2eddf08fd67e80e9f866691b",
+        "build-runtime-sanitize/libmikktspace-robust.a": "a2b669c20b40d87b6ea2d8ad699de746d1646ab4860af8a08ac4de0febd29608",
+        "build-runtime-sanitize/libdome-sculpt-affine.a": "7a8a8d776c42d6b87e7bf12d9cdfb618a37bfe88291d75d4b46a22bb3142efce",
+        "build-runtime-sanitize/libxatlas.a": "60225e245cce85bb305f0626002ac2d77061b4126c136bd9c90a9ae0a4501f77",
+        "build-runtime-sanitize/libmikktspace.a": "30b63a54c4e0e7692f2cae7627962662214ba0e6d7ecdb3a88d57afe32e53ba7",
+        "build-runtime-sanitize/libufbx.a": "3f3065bcf2d47604b35c901fcaf32d8af677aa10a6530bf6c2b0e1853a7b18a2",
+        "build-runtime-sanitize/libdome-sculpt-spacenav.a": "2fef4ec9dc47032b2990e6e02e7a8971ffa6c86c127a04837140b2b6e09888a7",
+        "build-runtime-sanitize/libdome-sculpt-polygon.a": "3132ebd448208087dad4cd7e59e2ae4fbad944d26101dbb20c0ed333c831e54d",
+        "build-runtime-sanitize/libdome-sculpt-xr.a": "3de73525d89d26af6c127c00d1f5c4bfe33df7600859cea8e59b647f60529161",
+        "build-runtime-sanitize/libdome-sculpt-core.a": "742b1e44e1690b19feb0585b174e51c7e20cfc5eecf296ce1c7e4c2838abbe46",
+        "build-runtime-sanitize/libdome-sculpt-render.a": "95df0690426c6fc345835f0cde53b46a38a32093d68e05ca73c95c63bb429d91"
+      },
+      "evidence": {
+        "artifacts/forecast-final-proof/sanitize/before.json": "2fe35baa9785d4aa0c08bcd7d6a7e0709af51aee7b446c42a90b69e7982407aa",
+        "artifacts/forecast-final-proof/sanitize/after.json": "2fe35baa9785d4aa0c08bcd7d6a7e0709af51aee7b446c42a90b69e7982407aa",
+        "artifacts/forecast-final-proof/sanitize/tests-before.json": "c8eb0e743c181f88e9a8a4c4cb6ff5c5b9c240a097a5368c46ba12ae039531b3",
+        "artifacts/forecast-final-proof/sanitize/tests-after.json": "c8eb0e743c181f88e9a8a4c4cb6ff5c5b9c240a097a5368c46ba12ae039531b3",
+        "artifacts/forecast-final-proof/sanitize/paint-overlay-gpu.log": "971853b0b28e8cfd2546e6b08043138114f8d1b1a314058f57ea1deff8d1e0dd"
+      }
+    }
+  },
+  "hardware": {
+    "exit": 0,
+    "seconds": 0.12268557498464361,
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-runtime-0e9bcab/build-runtime-release/dome-sculpt-paint-overlay-gpu-test",
+      "--hardware"
+    ],
+    "selector": "pci-0000_03_00_0",
+    "LIBGL_ALWAYS_SOFTWARE": "unset",
+    "inputs": 1506,
+    "unchanged": true,
+    "renderer_line": "GL_VENDOR=Intel GL_RENDERER=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+  },
+  "software_hardware_negative": {
+    "exit": 1,
+    "seconds": 0.10004629599279724,
+    "inputs": 1506,
+    "unchanged": true
+  },
+  "preserved_negatives": {
+    "artifacts/runtime-proof/forecast-negative-source": {
+      "artifacts/runtime-proof/forecast-negative-source/hashes.json": "fcd942de2597afc56f49f0bc0655e40667083251f3bb50ed5f8b92e4c92bc9fa",
+      "artifacts/runtime-proof/forecast-negative-source/src/render-paint-overlay.hpp": "2dff09c0b0f467240c90d6402899bc62701a86f2856daba05b8b8ebcdeadca89",
+      "artifacts/runtime-proof/forecast-negative-source/tests/paint-overlay-gpu.cpp": "d44447acc9d888b9fae0e01c1ee6699d7c5a23ef27dff83d9deab1f7b1337cfa"
+    },
+    "artifacts/final-compiler-proof/allocator-negative": {
+      "artifacts/final-compiler-proof/allocator-negative/paint-overlay-gpu.cpp": "1295d63deb19130a609e92a2e8c63c83aaa6f682927f808718fcb1e9d0eb4340",
+      "artifacts/final-compiler-proof/allocator-negative/dome-sculpt-paint-overlay-gpu-test": "07ba2645f635f5a8f7b8ea56677dc064c9013bac91c6d3aa78484ed0bac1eded"
+    },
+    "artifacts/allocator-corrected-proof/alignment-negative": {
+      "artifacts/allocator-corrected-proof/alignment-negative/paint-overlay-gpu.cpp": "28d0b8c44b3f32cb3d2abd24d4a4960fdbe5ccfa10b560e539b04dd66e3e45d7",
+      "artifacts/allocator-corrected-proof/alignment-negative/release-binary": "887d44091554e715a63a01f0aa88d5794b72b4db30beb0883786e535c506fd53",
+      "artifacts/allocator-corrected-proof/alignment-negative/sanitize-binary": "43caace55f68da7460938670a0fbefc1188f82c2efabbac56fcd3c434a6a3e78"
+    }
+  },
+  "not_qualified": [
+    "SurfaceRenderer/application HDR route (compiler not connected here)",
+    "source-aware Source28 packed-map/canonical-owner integration",
+    "actual HDR import/Seed-san admission",
+    "native/controller physical paint controls/history/Save workflow",
+    "typed MToon full physical background/expression/export adapter",
+    "standard HDR GLB/VRM quantization and semantic precision",
+    "full CTest/all-target/vendor build or physical device"
+  ],
+  "resource_contract": {
+    "packing_default_bytes": 268435456,
+    "gpu_default_bytes": 1073741824,
+    "max_metadata_descriptors": 512,
+    "legacy_tile_source_bytes_per_pixel": 14,
+    "legacy_gpu_sparse_record_bytes": 16,
+    "physical_sparse_bytes_per_pixel": 28,
+    "output_planes": 5,
+    "output_bytes_per_texel_per_plane": 16,
+    "original_only_packed_bytes_per_texel": 4,
+    "mixed_float_packed_bytes_per_texel": 16
+  },
+  "production_transfer_directions": [
+    "CPU sparse immutable tile/index/padding/baked uploads toGPU",
+    "GPU FBO fiveRGBA32Fplanes andGPUmips",
+    "GPU texture -> boundpixel-packbuffer -> RGBA32Ftexturebuffer foroptionalfloatMToonviews"
+  ],
+  "test_only_downloads": [
+    "glReadPixels float-plane oracle",
+    "glGetBufferSubData mixed-pack bit/mip oracle"
+  ],
+  "primary_source": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/extensions/EXT/EXT_texture_sRGB.txt issue20",
+  "negative_logs": {
+    "artifacts/runtime-proof/forecast-negative.log": "aff0e9c2e5b9d11965dbba3a19bd7b6567523d635f05bae5bd0e1ee6e6e5181f",
+    "artifacts/final-compiler-proof/sanitize/paint-overlay-gpu.log": "9063fe388387a01bc0af65f722dea9c02a2ee80236ead828f562bbe20aab2633",
+    "artifacts/allocator-corrected-proof/release/paint-overlay-gpu.log": "2dd1fe2b3cae4978399e57fd8b099d55c3afc920452590712ad443d5ae455c05",
+    "artifacts/allocator-corrected-proof/sanitize/paint-overlay-gpu.log": "38b720caf9f35949bef205c0645fe1be39f70851a152235ad6d51d962dfdff7e"
+  },
+  "hardware_evidence": {
+    "artifacts/forecast-final-proof/hardware/before.json": "db03a84a545c3c08c642fc0bda32e371d54dfdbc4601d14424411ebb7b893641",
+    "artifacts/forecast-final-proof/hardware/run.log": "47c157f7ee8bb3ffbe3ef30e28cdd65443714d3fb7533ce49fe5d004ccee4646",
+    "artifacts/forecast-final-proof/hardware/after.json": "db03a84a545c3c08c642fc0bda32e371d54dfdbc4601d14424411ebb7b893641",
+    "artifacts/forecast-final-proof/hardware/status.json": "b778a618c284c5b4d1d4564c0f711374cf098120286fbca67a6fca2a4e6c015c",
+    "artifacts/forecast-final-proof/hardware/software-hardware-negative.log": "9149907f51c5f39a1758bf6483d99f3dd66f5e37497383272b150aad8b7f5665",
+    "artifacts/forecast-final-proof/hardware/software-hardware-negative.json": "fdff74395cdcb5886bb0d1b3f8ab47a4dcac8c9f93b622f4a681fb119e6c888b"
+  }
+}

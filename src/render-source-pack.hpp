@@ -1,22 +1,30 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/render.hpp"
+#include "render-paint-overlay.hpp"
 #include <map>
 #include <set>
 #include <tuple>
 #include <climits>
 namespace dome {
 // Four arbitrary-sized sampled images share one fragment texture unit. Mips
-// stay GPU-resident: texture -> pixel-pack buffer -> texture-buffer attachment.
+// stay GPU-resident: texture -> pixel-pack buffer -> texture-buffer attachment. Linear overlay
+// views promote the shared destination to RGBA32F; legacy source-only packs
+// retain their exact RGBA8 path and byte budget.
 // glGetTexImage writes only GPU-buffer byte offsets: no host download, mapping,
 // fence wait or CPU resampling is involved.
 class MToonSourcePacks {
 public:
-  struct Input {std::shared_ptr<const Image> owner;GLuint texture=0;bool mips=false,srgb=true;};
+  struct Input {
+    std::shared_ptr<const Image> owner;GLuint texture=0;bool mips=false,srgb=true;
+    // Actual floating GPU plane authority; no fabricated byte Image is needed.
+    std::shared_ptr<const detail::PaintOverlayPacket> overlay;uint32_t plane=0;bool overlay_pbr=false;
+    static Input linear(const detail::PaintOverlayCompiler::Resource &resource,uint32_t plane,bool mips=false){if(plane>=5)throw std::invalid_argument("Invalid GPU overlay plane");Input in;in.texture=resource.planes[plane];in.mips=mips;in.srgb=false;in.overlay=resource.owner;in.plane=plane;in.overlay_pbr=resource.pbr;return in;}
+  };
   using Inputs=std::array<Input,4>;
-  using Key=std::array<std::tuple<uintptr_t,bool,bool>,4>;
+  using Key=std::array<std::tuple<uintptr_t,bool,bool,uint32_t>,4>;
   struct Resource {
-    GLuint texture=0,buffer=0;size_t bytes=0;
+    GLuint texture=0,buffer=0;size_t bytes=0;bool floating=false;
     Inputs owners;
     // offset (RGBA texels), width, height, reserved, for4x14 mip levels.
     std::array<std::array<GLint,4>,56> levels{};
@@ -27,18 +35,20 @@ private:
   uint64_t builds_=0;
   static Resource specification(const Inputs &inputs) {
     Resource output;output.owners=inputs;
-    std::map<std::tuple<const Image*,bool,bool>,size_t> shared;
+    std::map<std::tuple<uintptr_t,bool,bool,uint32_t>,size_t> shared;
+    output.floating=std::any_of(inputs.begin(),inputs.end(),[](const auto &in){return bool(in.overlay);});
     size_t texels=0;
     for(size_t view=0;view<4;++view) {
-      const auto &input=inputs[view];if(!input.owner)continue;
-      input.owner->validate();
-      auto key=std::tuple{input.owner.get(),input.mips,input.srgb};
+      const auto &input=inputs[view];if(!input.owner&&!input.overlay)continue;
+      if(input.overlay){if(input.owner||input.overlay->empty()||input.srgb||input.plane>=5)throw std::invalid_argument("Invalid linear overlay source-pack authority");}
+      else input.owner->validate();
+      auto key=std::tuple{reinterpret_cast<uintptr_t>(input.overlay?static_cast<const void*>(input.overlay.get()):static_cast<const void*>(input.owner.get())),input.mips,input.srgb,input.overlay?input.plane+1+(input.overlay_pbr?5u:0u):0u};
       if(auto found=shared.find(key);found!=shared.end()) {
         auto previous=found->second;output.info[view]=output.info[previous];
         std::copy_n(output.levels.begin()+previous*14,14,output.levels.begin()+view*14);continue;
       }
       shared.emplace(key,view);
-      uint32_t width=input.owner->width,height=input.owner->height;
+      uint32_t width=input.overlay?input.overlay->resolution():input.owner->width,height=input.overlay?input.overlay->resolution():input.owner->height;
       for(size_t level=0;;++level) {
         if(level>=14 || texels>size_t(INT_MAX)-size_t(width)*height)
           throw std::length_error("GPU source pack metadata exceeds index limits");
@@ -49,7 +59,7 @@ private:
         width=std::max(1u,width/2);height=std::max(1u,height/2);
       }
     }
-    output.bytes=texels*4;return output;
+    output.bytes=texels*(output.floating?16:4);return output;
   }
   struct PackState {
     GLint buffer=0,texture2d=0,texture_buffer=0;
@@ -80,12 +90,12 @@ private:
         if(!copied.insert(offset).second)continue;
         if(!resource.owners[view].texture)throw std::invalid_argument("GPU source pack has no uploaded texture");
         glBindTexture(GL_TEXTURE_2D,resource.owners[view].texture);
-        glGetTexImage(GL_TEXTURE_2D,level,GL_RGBA,GL_UNSIGNED_BYTE,
-                      reinterpret_cast<void*>(uintptr_t(offset)*4));
+        glGetTexImage(GL_TEXTURE_2D,level,GL_RGBA,resource.floating?GL_FLOAT:GL_UNSIGNED_BYTE,
+                      reinterpret_cast<void*>(uintptr_t(offset)*(resource.floating?16:4)));
         if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU source mip copy into buffer failed");
       }
       glGenTextures(1,&resource.texture);glBindTexture(GL_TEXTURE_BUFFER,resource.texture);
-      glTexBuffer(GL_TEXTURE_BUFFER,GL_RGBA8,resource.buffer);
+      glTexBuffer(GL_TEXTURE_BUFFER,resource.floating?GL_RGBA32F:GL_RGBA8,resource.buffer);
       if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU packed source view allocation failed");
     } catch(...) {
       if(resource.texture)glDeleteTextures(1,&resource.texture);
@@ -101,7 +111,7 @@ private:
       auto id=key(input);if(wanted.contains(id))continue;
       auto spec=specification(input);
       if(!spec.bytes)continue;
-      if(spec.bytes/4>size_t(std::max(0,maximum)))throw std::length_error("GPU packed source exceeds texture-buffer limit");
+      if(spec.bytes/(spec.floating?16:4)>size_t(std::max(0,maximum)))throw std::length_error("GPU packed source exceeds texture-buffer limit");
       if(spec.bytes>limits.max_bytes-bytes)throw std::length_error("GPU packed source byte budget exceeded");
       bytes+=spec.bytes;wanted.emplace(id,std::move(spec));
     }
@@ -116,7 +126,7 @@ private:
   }
 public:
   static Key key(const Inputs &inputs) {
-    Key result;for(size_t n=0;n<4;++n)result[n]={reinterpret_cast<uintptr_t>(inputs[n].owner.get()),inputs[n].mips,inputs[n].srgb};return result;
+    Key result;for(size_t n=0;n<4;++n)result[n]={reinterpret_cast<uintptr_t>(inputs[n].overlay?static_cast<const void*>(inputs[n].overlay.get()):static_cast<const void*>(inputs[n].owner.get())),inputs[n].mips,inputs[n].srgb,inputs[n].overlay?inputs[n].plane+1+(inputs[n].overlay_pbr?5u:0u):0u};return result;
   }
   void preflight(const std::vector<Inputs> &inputs,size_t base_bytes,size_t base_images,const SurfaceTextureLimits &limits) {
     auto wanted=planning(inputs,base_bytes,base_images,limits);sweep(wanted);
@@ -136,7 +146,7 @@ public:
     sweep(wanted);
   }
   const Resource &at(const Inputs &input) const {
-    if(std::none_of(input.begin(),input.end(),[](const auto &v){return bool(v.owner);})) {static const Resource empty;return empty;}
+    if(std::none_of(input.begin(),input.end(),[](const auto &v){return bool(v.owner)||bool(v.overlay);})) {static const Resource empty;return empty;}
     return cache_.at(key(input));
   }
   size_t bytes() const {size_t result=0;for(const auto &[key,r]:cache_)result+=r.bytes;return result;}

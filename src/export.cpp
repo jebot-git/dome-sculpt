@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "affine-matrix.hpp"
+#include "emission-authority.hpp"
 #include "affine-factor.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/material-bindings.hpp"
@@ -57,6 +58,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
+  for(const auto &object:input_objects)if(detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings)))throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
   for(const auto &object:input_objects)if((object.paint_sampling_attachment||!object.paint_corner_coordinates.empty())&&
       (source_space!=SourceMorphSpace::Native||!object.material_bindings||!object.material_bindings->normal_frames))
     throw std::invalid_argument("Retained paint export requires its complete native normal/colour coordinate compiler");

@@ -1,3 +1,4 @@
+#include "paint-overlay-packet.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
@@ -86,7 +87,7 @@ struct CompositeRetention {
     std::lock_guard lock(mutex);if(hit)++hits;else ++builds;
     auto found=std::find_if(entries.begin(),entries.end(),[&](auto &e){return e.maps.get()==maps.get();});
     if(found!=entries.end()){entries.splice(entries.begin(),entries,found);return;}
-    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->mtoon_normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size()+maps->pbr_color.rgba.size();
+    Entry entry;entry.maps=maps;entry.token=token;entry.factors=factors;entry.derived=(maps->overlay?maps->overlay->storage_bytes():0)+maps->color.rgba.size()+maps->metal_rough.rgba.size()+maps->emission.rgba.size()+maps->normal.rgba.size()+maps->mtoon_normal.rgba.size()+maps->color_coverage.rgba.size()+maps->baked_normal.rgba.size()+maps->baked_coverage.rgba.size()+maps->emission_coverage.rgba.size()+maps->pbr_color.rgba.size();
     entry.base=maps->baked_base.get();
     if(maps->source_maps)for(auto slot:{&maps->source_maps->color,&maps->source_maps->metal_rough,&maps->source_maps->emission,&maps->source_maps->normal,&maps->source_maps->occlusion})
       if(slot->image&&std::find(entry.sources.begin(),entry.sources.begin()+entry.count,slot->image.get())==entry.sources.begin()+entry.count)
@@ -515,6 +516,40 @@ std::array<uint8_t,4> PaintedMesh::pbr_pixel(uint64_t id,uint32_t x,uint32_t y) 
     if(tile)return tile->pixels[size_t(y%32)*32+x%32];
   }
   const auto &p=pixel(id,x,y);return {p.data[0],p.data[1],p.data[2],p.data[3]};
+}
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture(const PaintedMesh &paint,const std::function<bool()> &cancelled){
+  paint_compute::checkpoint(cancelled);
+  auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
+  packet->resolution_=paint.resolution();
+  packet->padding_=std::shared_ptr<const std::vector<int32_t>>(paint.surface_,&paint.surface_->padding);
+  packet->baked_=paint.baked_;packet->source_maps_=paint.source_maps_;
+  const size_t count=size_t(packet->resolution_/32)*(packet->resolution_/32);
+  if(packet->resolution_<64||packet->resolution_>2048||(packet->resolution_&(packet->resolution_-1))||packet->padding_->size()!=size_t(packet->resolution_)*packet->resolution_||paint.layers_.size()>16)
+    throw std::invalid_argument("Invalid native sparse overlay source");
+  packet->layers_.reserve(paint.layers_.size());
+  packet->empty_=!packet->baked_;
+  // The aliasing padding pointer keeps its complete immutable SurfaceMap alive.
+  // Charge that retained owner conservatively, not only the padding subvector.
+  const auto &surface=*paint.surface_;const auto &mesh=surface.mesh;
+  packet->storage_bytes_=sizeof(PaintOverlayPacket)+sizeof(PaintedMesh::SurfaceMap)+
+    (mesh.positions.capacity()+mesh.normals.capacity())*sizeof(Vec3)+mesh.uv.capacity()*sizeof(std::array<float,2>)+mesh.indices.capacity()*sizeof(uint32_t)+mesh.uv_pins.capacity()+mesh.uv_seams.capacity()+
+    surface.texels.capacity()*sizeof(PaintedMesh::SurfaceMap::Texel)+surface.extra.capacity()*sizeof(PaintedMesh::SurfaceMap::Extra)+surface.tiles.capacity()*sizeof(PaintedMesh::SurfaceMap::Bounds)+surface.padding.capacity()*sizeof(int32_t)+
+    surface.linked.size()*(sizeof(std::pair<const uint32_t,PaintedMesh::SurfaceMap::Head>)+2*sizeof(void*))+surface.linked.bucket_count()*sizeof(void*)+surface.diagnostics.unpaintable_uv_faces.capacity()*sizeof(uint32_t)+
+    (surface.paint_domain?surface.paint_domain->retained_bytes():0);
+  std::set<const PaintTile*> common_owners;std::set<const PaintColorTile*> color_owners;std::set<const PaintEmissionTile*> emission_owners;
+  for(const auto &layer:paint.layers_){
+    paint_compute::checkpoint(cancelled);
+    if(!std::isfinite(layer.opacity)||layer.opacity<0||layer.opacity>1||layer.tiles.size()!=count||(!layer.pbr_tiles.empty()&&layer.pbr_tiles.size()!=count)||(!layer.emission_tiles.empty()&&layer.emission_tiles.size()!=count))
+      throw std::invalid_argument("Invalid sparse overlay layer");
+    if(layer.visible&&layer.opacity>0){
+      packet->layers_.push_back({layer.opacity,layer.tiles,layer.pbr_tiles,layer.emission_tiles});
+      packet->storage_bytes_+=(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size())*sizeof(std::shared_ptr<const PaintTile>);
+      for(const auto &tile:layer.tiles)if(tile){packet->empty_=false;if(common_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintTile);}
+      for(const auto &tile:layer.pbr_tiles)if(tile&&color_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintColorTile);
+      for(const auto &tile:layer.emission_tiles)if(tile&&emission_owners.insert(tile.get()).second)packet->storage_bytes_+=sizeof(PaintEmissionTile);
+    }
+  }
+  paint_compute::checkpoint(cancelled);return packet;
 }
 PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y) const {
   const auto &p=pixel(id,x,y);const auto &l=layer(id);
@@ -1121,7 +1156,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
   auto projection=std::make_shared<PaintNormalProjection>();projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);result.projection=std::move(projection);stop();return result;
 }
 void BakedTextures::validate(uint32_t resolution) const {
-  if (maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
+  if (maps.overlay || maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if(size_t(color_interpretation)>1 || (color_interpretation==BakedColorInterpretation::ResolvedPbr)!=!maps.pbr_color.rgba.empty())
     throw std::invalid_argument("Baked PBR color interpretation is incomplete");
   if(size_t(normal_interpretation)>1||maps.normal_projection||
@@ -1500,7 +1535,7 @@ PaintedMesh::build_composite(const Material &material) const {return build_compo
 std::shared_ptr<const TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);
-  if(has_physical_emission())throw std::logic_error("Physical emission requires its linear composite adapter");
+  if(has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::logic_error("Physical emission requires its linear composite adapter");
   // This packet owns only the legacy grid/padding. Independent paint domains,
   // normal metadata/events, original source maps and prepared projections need
   // their existing CPU interpretation until a genuine packet adapter exists.

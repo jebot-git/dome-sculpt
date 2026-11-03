@@ -55,6 +55,9 @@ struct SourceMaterialBindings {
   bool sampling_reparameterized=false;
   std::shared_ptr<const SourceColorPreparation> color_preparation;
   std::shared_ptr<const SourceNormalPreparation> normal_preparation;
+  // Explicit absolute background radiance (linear cd/m^2), including zero.
+  // Absent preserves historical typed-strength/native-factor correction.
+  std::optional<std::array<float,3>> physical_emission;
   void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;

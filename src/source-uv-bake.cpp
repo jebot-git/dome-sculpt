@@ -1,3 +1,4 @@
+#include "emission-authority.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/source-uv-bake.hpp"
 #include "dome/tangents.hpp"
@@ -69,6 +70,7 @@ struct Plan {
 bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.coord==b.coord&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
 void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
+ if((i.current_material&&detail::physical_emission(*i.current_material))||(i.native_material&&detail::hdr_emission(i.native_material->emission))||(i.paint&&i.paint->has_physical_emission()))throw std::invalid_argument("Physical emission requires an exact UV transfer adapter; source retained");
  if(size_t(o.normal_sampling)>1)throw std::invalid_argument("Invalid normal UV sampling method");
  if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&(!i.paint||!i.paint->normal_projection()))
    throw std::invalid_argument("Retained normal sampling requires an owning prepared source");
