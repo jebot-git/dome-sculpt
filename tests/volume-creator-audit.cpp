@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Read-only actual CC0 creator closure/contact audit, not binding admission.
+#include "../src/volume-binding.cpp"
+#include "dome/creation.hpp"
+#include <iostream>
+using namespace dome;
+using namespace dome::detail;
+int main()try{Scene scene;append_humanoid(scene,{},"Actual CC0 closure audit",{},64);size_t closed=0,accepted=0;std::map<std::tuple<const ImportedAsset*,int,int>,Mesh> groups;for(const auto&o:scene.objects()){if(!o.painted)continue;auto mesh=o.painted->mesh();if(o.appearance){auto&group=groups[{o.appearance->asset.get(),o.appearance->source_mesh,o.appearance->source_node}];uint32_t start=group.positions.size();group.positions.insert(group.positions.end(),mesh.positions.begin(),mesh.positions.end());for(auto index:mesh.indices)group.indices.push_back(start+index);}std::function<bool()> cancel;Work work{0,100'000'000,cancel};Memory memory{0,256u*1024u*1024u};std::cout<<"PART "<<o.id<<" name="<<o.name<<" vertices="<<mesh.positions.size()<<" triangles="<<mesh.indices.size()/3<<'\n'<<std::flush;try{auto part=components(mesh,work);++closed;volume_topology::validate(mesh,work,memory);++accepted;std::cout<<"CLOSED_CONTACT_PASS components="<<part.count<<" work="<<work.used<<'\n';}catch(const std::exception&e){std::cout<<"REFUSED "<<e.what()<<" work="<<work.used<<'\n';}std::cout<<std::flush;}for(const auto&[key,mesh]:groups){std::function<bool()> cancel;Work work{0,100'000'000,cancel};std::cout<<"SOURCE_GROUP mesh="<<std::get<1>(key)<<" node="<<std::get<2>(key)<<" triangles="<<mesh.indices.size()/3<<'\n';try{auto p=components(mesh,work);std::cout<<"GROUP_CLOSED components="<<p.count<<'\n';}catch(const std::exception&e){std::cout<<"GROUP_REFUSED "<<e.what()<<'\n';}}
+std::cout<<"SUMMARY objects="<<scene.objects().size()<<" closed="<<closed<<" exact_contact_pass="<<accepted<<" NO_WEIGHT_OR_DEFORMATION_CLAIM\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

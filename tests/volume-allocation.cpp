@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Persistent global-new denial on the CPU-only private solver; no GPU/runtime shim.
+#include "volume-binding.hpp"
+#include <cstdlib>
+#include <new>
+#include <iostream>
+#include <nlohmann/json.hpp>
+namespace{thread_local bool tracking=false,denied=false;thread_local size_t calls=0,fail=SIZE_MAX;void observe(){if(tracking&&(denied||calls++==fail)){denied=true;throw std::bad_alloc();}}}
+void*operator new(size_t n){observe();if(auto*p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
+void*operator new[](size_t n){return ::operator new(n);}
+void operator delete(void*p)noexcept{std::free(p);}void operator delete[](void*p)noexcept{std::free(p);}void operator delete(void*p,size_t)noexcept{std::free(p);}void operator delete[](void*p,size_t)noexcept{std::free(p);}
+void*operator new(size_t n,std::align_val_t a){observe();void*p=nullptr;if(!posix_memalign(&p,size_t(a),n?n:1))return p;throw std::bad_alloc();}
+void*operator new[](size_t n,std::align_val_t a){return ::operator new(n,a);}void operator delete(void*p,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,std::align_val_t)noexcept{std::free(p);}void operator delete(void*p,size_t,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,size_t,std::align_val_t)noexcept{std::free(p);}
+using namespace dome;
+using namespace dome::detail;
+Mesh cube(){Mesh m;for(int z=0;z<2;++z)for(int y=0;y<2;++y)for(int x=0;x<2;++x){m.positions.push_back({x*.03f,y*.03f,z*.03f});m.normals.push_back({0,0,1});m.uv.push_back({x*.5f,y*.5f});}m.indices={0,2,3,0,3,1,4,5,7,4,7,6,0,1,5,0,5,4,2,6,7,2,7,3,0,4,6,0,6,2,1,3,7,1,7,5};return m;}
+bool same(const Mesh&a,const Mesh&b){if(a.indices!=b.indices||a.uv!=b.uv||a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)return false;for(size_t i=0;i<a.positions.size();++i)if(a.positions[i].x!=b.positions[i].x||a.positions[i].y!=b.positions[i].y||a.positions[i].z!=b.positions[i].z||a.normals[i].x!=b.normals[i].x||a.normals[i].y!=b.normals[i].y||a.normals[i].z!=b.normals[i].z)return false;return true;}
+int main()try{auto mesh=cube(),before=mesh;Skeleton rig;Bone bone;bone.name="Interior";bone.length=.015f;bone.rest.translation={.015f,.005f,.015f};rig.bones.push_back(bone);auto rig_before=rig.encode();VolumeBindingOptions options;options.cell_size=.005f;auto expected=volume_bind_native(mesh,rig,options).encode();calls=0;fail=SIZE_MAX;tracking=true;auto measured=volume_bind_native(mesh,rig,options);tracking=false;size_t count=calls;if(!count||measured.encode()!=expected)throw std::runtime_error("Invalid allocation measurement");for(size_t boundary=0;boundary<count;++boundary){VolumeBindingReport report{1,2,3,4,5};calls=0;fail=boundary;denied=false;tracking=true;bool failed=false;try{volume_bind_native(mesh,rig,options,{},&report);}catch(const std::exception&){failed=true;}tracking=false;if(!failed||!denied||!same(mesh,before)||rig.encode()!=rig_before||report.grid_points!=1||report.interior_points!=2||report.volume_components!=3||report.work!=4||report.peak_planned_bytes!=5)throw std::runtime_error("Allocation failure lost exact input/report atomicity at"+std::to_string(boundary));denied=false;fail=SIZE_MAX;auto retry=volume_bind_native(mesh,rig,options);if(retry.encode()!=expected)throw std::runtime_error("Successful retry differs at"+std::to_string(boundary));}std::cout<<"PASS "<<count<<" actual persistent CPU allocation boundaries, exact input/rig/report and successful retry\n";return 0;}catch(const std::exception&e){tracking=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

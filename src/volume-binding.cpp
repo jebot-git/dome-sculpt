@@ -4,6 +4,7 @@
 // This is an original interior geodesic solver, not Blender's heat solver.
 #include "volume-binding.hpp"
 #include "volume-exact.hpp"
+#include "volume-topology.hpp"
 #include "dome/mesh-processing.hpp"
 #include <bit>
 #include <map>
@@ -632,6 +633,7 @@ SkinWeights volume_bind_native(const Mesh &input,const Skeleton &s,
   for(auto &p:m.positions){work.step();p=as_vec(as_point(p)-center);}
   memory.add(input.positions.size(),2*sizeof(uint32_t));
   auto parts=components(m,work);memory.release(input.positions.size(),2*sizeof(uint32_t));
+  volume_topology::validate(m,work,memory);
   auto g=grid_for(m,o.cell_size,o.grid_phase,o.maximum_grid_points,memory);
   rasterize(m,g,work);memory.add(64,6*sizeof(uint32_t));mark_cut_cubes(m,g,work);
   auto inside=classify(m,parts,g,work,memory);
