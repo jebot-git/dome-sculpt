@@ -1,3 +1,4 @@
+#include "paint-overlay-packet.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
@@ -742,6 +743,24 @@ std::array<uint8_t,4> PaintedMesh::pbr_pixel(uint64_t id,uint32_t x,uint32_t y) 
   }
   const auto &p=pixel(id,x,y);return {p.data[0],p.data[1],p.data[2],p.data[3]};
 }
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture(const PaintedMesh &paint,const std::function<bool()> &cancelled){
+  paint_compute::checkpoint(cancelled);
+  auto packet=std::shared_ptr<PaintOverlayPacket>(new PaintOverlayPacket);
+  packet->resolution_=paint.resolution();
+  packet->padding_=std::shared_ptr<const std::vector<int32_t>>(paint.surface_,&paint.surface_->padding);
+  packet->baked_=paint.baked_;packet->source_maps_=paint.source_maps_;
+  const size_t count=size_t(packet->resolution_/32)*(packet->resolution_/32);
+  if(packet->resolution_<64||packet->resolution_>2048||(packet->resolution_&(packet->resolution_-1))||packet->padding_->size()!=size_t(packet->resolution_)*packet->resolution_||paint.layers_.size()>16)
+    throw std::invalid_argument("Invalid native sparse overlay source");
+  packet->layers_.reserve(paint.layers_.size());
+  for(const auto &layer:paint.layers_){
+    paint_compute::checkpoint(cancelled);
+    if(!std::isfinite(layer.opacity)||layer.opacity<0||layer.opacity>1||layer.tiles.size()!=count||(!layer.pbr_tiles.empty()&&layer.pbr_tiles.size()!=count)||(!layer.emission_tiles.empty()&&layer.emission_tiles.size()!=count))
+      throw std::invalid_argument("Invalid sparse overlay layer");
+    if(layer.visible&&layer.opacity>0)packet->layers_.push_back({layer.opacity,layer.tiles,layer.pbr_tiles,layer.emission_tiles});
+  }
+  paint_compute::checkpoint(cancelled);return packet;
+}
 PaintEmissionValue PaintedMesh::emission_pixel(uint64_t id,uint32_t x,uint32_t y) const {
   const auto &p=pixel(id,x,y);const auto &l=layer(id);
   if(!l.emission_tiles.empty())if(const auto &tile=l.emission_tiles.at(size_t(y/32)*surface_->columns+x/32))
@@ -1353,7 +1372,7 @@ PaintNormalUvProjectionResult SourceNormalPreparationAccess::reproject(const Pai
   auto projection=std::make_shared<PaintNormalProjection>();projection->pbr=std::move(pbr);projection->mtoon=std::move(toon);projection->validate(r);result.projection=std::move(projection);stop();return result;
 }
 void BakedTextures::validate(uint32_t resolution) const {
-  if (maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
+  if (maps.overlay || maps.source_maps || maps.source_only || maps.baked_base || maps.color_projection || maps.pbr_transparent || !maps.emission_coverage.rgba.empty() || maps.emission_coverage.width || maps.emission_coverage.height || !maps.color_coverage.rgba.empty() || maps.color_coverage.width || maps.color_coverage.height || !maps.baked_normal.rgba.empty() || maps.baked_normal.width || maps.baked_normal.height || !maps.baked_coverage.rgba.empty() || maps.baked_coverage.width || maps.baked_coverage.height) throw std::invalid_argument("Attach original maps through from_maps, not a baked payload");
   if(size_t(color_interpretation)>1 || (color_interpretation==BakedColorInterpretation::ResolvedPbr)!=!maps.pbr_color.rgba.empty())
     throw std::invalid_argument("Baked PBR color interpretation is incomplete");
   if(size_t(normal_interpretation)>1||maps.normal_projection||
@@ -1512,11 +1531,20 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
         }
         if(contributing)break;
       }
+      if(source_sampling_prepared()&&!contributing)for(const auto &l:layers_)if(l.visible&&l.opacity>0)
+        for(const auto &tile:l.emission_tiles)if(tile)for(const auto &p:tile->pixels)if(p.coverage>0){contributing=true;break;}
+      if(source_sampling_prepared())composite_cache_->source_preview.reset();
       composite_cache_->source_eligible=!contributing;composite_cache_->preview_token=composite_token_;
     }
-    if(composite_cache_->source_eligible){
+    if(composite_cache_->source_eligible||source_sampling_prepared()){
+      if(!valid_source_sampling_attachment())throw std::invalid_argument("Source paint preview lost its actual immutable attachment");
       if(!composite_cache_->source_preview){
         auto marker=std::make_shared<TextureMaps>();marker->source_maps=source_maps_;marker->source_only=true;
+        if(source_sampling_prepared()&&!composite_cache_->source_eligible){
+          marker->overlay=detail::PaintOverlayFactory::capture(*this,cancelled);
+          for(const auto &l:layers_)if(l.visible&&l.opacity>0)for(const auto &tile:l.tiles)if(tile)
+            for(const auto &p:tile->pixels)if(p.data[13]&&p.data[9]&&p.data[3]!=255){marker->transparent=true;break;}
+        }
         if(auto image=source_maps_->color.image)for(size_t i=3;i<image->rgba.size();i+=4)if(image->rgba[i]!=255){marker->transparent=true;break;}
         composite_cache_->source_preview=std::move(marker);
       }
@@ -1747,7 +1775,7 @@ PaintedMesh::build_composite(const Material &material) const {return build_compo
 std::shared_ptr<const TextureMaps>
 PaintedMesh::build_composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);
-  if(has_physical_emission())throw std::logic_error("Physical emission requires its linear composite adapter");
+  if(has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;}))throw std::logic_error("Physical emission requires its linear composite adapter");
   // This packet owns only the legacy grid/padding. Independent paint domains,
   // normal metadata/events, original source maps and prepared projections need
   // their existing CPU interpretation until a genuine packet adapter exists.

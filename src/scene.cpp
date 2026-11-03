@@ -60,7 +60,7 @@ void Material::validate() const {
   if (alpha < AlphaMode::Automatic || alpha > AlphaMode::Blend || !unit(alpha_cutoff))
     throw std::invalid_argument("Invalid material alpha mode/cutoff");
   if (!std::all_of(color.begin(), color.end(), unit) || !unit(metallic) ||
-      !unit(roughness) || !std::all_of(emissive.begin(), emissive.end(), unit))
+      !unit(roughness) || !std::all_of(emissive.begin(), emissive.end(), [](float v){return std::isfinite(v)&&v>=0&&v<=maximum_native_emission;}))
     throw std::invalid_argument("Invalid material channel value");
 }
 void validate_transform(CanvasTransform t) {
@@ -616,11 +616,13 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("polygon_sources"))for(const auto &o:j.at("polygon_sources").at("origins"))if(o.contains("placement"))detail::placement_index(o.at("placement"),state.at("capsules").size());
   }
   for(const auto &o:objects){
+    detail::require_material_emission_version(o.at("material"),unsigned(version));
     if(version>=16){if(!o.contains("shape_source"))throw std::invalid_argument("Incomplete shape source scene fields");}
     else if(o.contains("shape_source"))throw std::invalid_argument("Shape source requires Scene16");
     if(version==25||rig_pool){if(!o.contains("rig_source"))throw std::invalid_argument("Incomplete rig source scene fields");}
     else if(version<25&&o.contains("rig_source")&&!o.at("rig_source").is_null())throw std::invalid_argument("Rig source requires Scene25");
   }
+  if(j.contains("polygon_sources"))for(const auto &origin:j.at("polygon_sources").at("origins"))detail::require_material_emission_version(origin.at("material"),unsigned(version));
   if(j.contains("polygon_sources") && j.at("polygon_sources").at("version")==4 && version<16)
     throw std::invalid_argument("Direct shape source archive requires Scene16");
   const bool polygon_fields = version >= 12;
@@ -1040,7 +1042,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   placements.require_reachable();
   if(normal_context)normal_domains.require_reachable();if(paint_context)writable_domains.require_reachable();
   unsigned actual_feature=0;
-  for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
+  for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,detail::hdr_emission(o.material.emissive)?27u:0u,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
   if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
   if(version==28&&actual_feature!=28)throw std::invalid_argument("Scene28 requires actual independent source paint ownership");
   if(version==27&&actual_feature<27)throw std::invalid_argument("Scene27 requires genuine physical emission state");

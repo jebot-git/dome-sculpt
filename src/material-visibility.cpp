@@ -9,6 +9,7 @@
 #include "dome/normal-preview.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "prepared-color-state.hpp"
+#include "paint-overlay-alpha.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
   if(!appearance)return {};
@@ -42,6 +43,7 @@ struct Visibility {
   float cutoff = .5f, factor = 1;
   std::optional<MToonMaterial> toon;
   PaintSourceTexture color, mask, coverage, pbr;
+  std::shared_ptr<const detail::PaintOverlayPacket> overlay;
   const ImportedPrimitive *primitive = nullptr;
   std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv1;
   std::map<uint32_t,std::shared_ptr<const std::vector<std::array<float,2>>>> owned_extra_uv;
@@ -52,6 +54,12 @@ struct Visibility {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
+    if(maps&&maps->overlay){
+      const auto &source=maps->overlay->source_maps();
+      if(!maps->source_only||!source||source!=maps->source_maps||source.owner_before(maps->source_maps)||maps->source_maps.owner_before(source))
+        throw std::invalid_argument("Visibility overlay lost its exact original source sampling owner");
+      overlay=maps->overlay;
+    }
     const auto paint_node=r.material_bindings&&r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
     if(bool(paint_node)!=bool(r.paint_sampling_attachment))throw std::invalid_argument("Visibility paint range omitted or fabricated its own sampling attachment");
     if(r.paint_sampling_attachment) {
@@ -124,6 +132,7 @@ struct Visibility {
       }
       return;
     }
+    if(overlay)throw std::invalid_argument("Typed source paint needs its MToon overlay coordinate adapter");
     const auto source=r.material_bindings?r.material_bindings->native_reference:native_source(*r.appearance);
     const auto &parameters = toon->parameters;
     cull = parameters.cull;
@@ -233,6 +242,8 @@ struct Visibility {
         for(size_t c=0;c<3;++c)for(size_t k=0;k<2;++k)sampling[k]+=bary[c]*paint_corners.at(local+c)[k];
       }
       opacity = factor * sample(color, color.texcoord!=0?uv(m,triangle,bary,color.texcoord):sampling);
+      if(overlay){const auto paint=detail::sample_overlay_alpha(*overlay,sampling[0],sampling[1],true);
+        opacity=opacity*(1-paint.coverage)+paint.premultiplied;}
       if(!vertex_colors.empty()){float a=0;for(size_t k=0;k<3;++k)a+=bary[k]*vertex_colors.at(m.indices[first+k]-range.first_vertex)[3];opacity*=a;}
     }
     opacity = std::clamp(opacity, 0.f, 1.f);

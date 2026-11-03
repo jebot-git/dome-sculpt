@@ -17,6 +17,7 @@ Scene retained_domain(){auto scene=prepared(false);const auto &o=scene.active();
   SourceUvBakeOptions options;options.normal_sampling=SourceNormalUvMethod::RetainSource;auto result=adopt_source_uv_bake(bake_source_uv(in,options));auto &target=scene.active();target.painted=result.paint;target.material_bindings=result.material_bindings;target.deformation=result.deformation;target.appearance=result.appearance;target.polygon=derivative.authority;scene.validate();check(scene.encode().at("version")==24&&target.painted->paint_sampling_domain(),"Actual factories produce a paired owning Scene24 writable domain");return scene;
 }
 }
+#ifndef DOME_HDR_SCENE_FIXTURE_ONLY
 int main(int argc,char **argv)try {
   if(argc!=2)return 2;const std::filesystem::path dir=argv[1];std::filesystem::create_directories(dir);
   auto ordinary=hdr_scene::plain();const auto legacy=ordinary.encode();check(legacy.at("version")<27,"Ordinary native material/paint does not select HDR schema");
@@ -44,3 +45,5 @@ int main(int argc,char **argv)try {
   auto domain_read=hdr_scene::restart(domain,dir/"genuine-uv24-hdr.dsculpt");check(domain_read.active().painted->paint_sampling_domain()&&domain_read.active().painted->normal_projection()&&domain_read.active().painted->has_physical_emission(),"Actual Scene24 factory result composes with physical data through native restart");
   std::cout<<"HDR owning scene: "<<checks<<" checks\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+#endif

@@ -1,3 +1,4 @@
+#include "emission-authority.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/vrm.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -397,6 +398,8 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &input_objects,
   if (input_objects.empty())
     fail("no avatar surfaces");
 
+  for(const auto &object:input_objects)if(detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings)))
+    fail("physical emission requires a precision-qualified VRM export adapter");
   for(const auto &object:input_objects)if(object.source_dormant)
     fail("source attributes are dormant for "+object.name+
       "; restore the original mesh or explicitly prepare, reproject and bake its source data before export");

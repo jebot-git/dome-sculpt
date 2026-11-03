@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 namespace dome {
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
@@ -66,6 +67,8 @@ struct TextureMaps {
   std::shared_ptr<const PaintColorProjection> color_projection;
   Image mtoon_normal;
   std::shared_ptr<const PaintNormalProjection> normal_projection;
+  // Transient sparse GPU contribution input; never a serialized image authority.
+  std::shared_ptr<const detail::PaintOverlayPacket> overlay;
 };
 enum class BakedColorInterpretation { VertexComponent, ResolvedPbr };
 enum class BakedNormalInterpretation { CanonicalMikk, PreparedAttributes };
@@ -235,6 +238,7 @@ private:
   friend struct SourceUvBakeAccess;
   friend struct SourcePaintAccess;
   friend struct SourceColorPreparationAccess;
+  friend struct detail::PaintOverlayFactory;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;

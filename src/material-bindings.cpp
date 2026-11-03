@@ -7,6 +7,8 @@
 #include "paint-archive-shape.hpp"
 #include "source-uv-archive.hpp"
 #include "material-archive-version.hpp"
+#include "emission-authority.hpp"
+#include "emission-linear.hpp"
 #include "dome/normal-preparation.hpp"
 #include "normal-sampling-access.hpp"
 #include "dome/normal-sampling.hpp"
@@ -130,8 +132,8 @@ std::set<const PaintedMesh*> material_paint_owners(
   }
   return owners;
 }
-bool physical_material_state(const std::set<const PaintedMesh*> &paints){
-  return std::any_of(paints.begin(),paints.end(),[](const auto *p){return p->has_physical_emission();});
+bool physical_material_state(const std::set<const PaintedMesh*> &paints,const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings){
+  return std::any_of(paints.begin(),paints.end(),[](const auto *p){return p->has_physical_emission();})||std::any_of(bindings.begin(),bindings.end(),[](const auto &b){return detail::physical_emission(*b);});
 }
 size_t index(const nlohmann::json &value,size_t size) {
   if((!value.is_number_unsigned() && (!value.is_number_integer() || value.get<int64_t>()<0)) ||
@@ -141,7 +143,7 @@ size_t index(const nlohmann::json &value,size_t size) {
 }
 void SourceNativeMaterial::validate() const {
   auto unit=[](float value){return std::isfinite(value) && value>=0 && value<=1;};
-  if(!std::all_of(color.begin(),color.end(),unit) || !std::all_of(emission.begin(),emission.end(),unit) ||
+  if(!std::all_of(color.begin(),color.end(),unit) || !std::all_of(emission.begin(),emission.end(),[](float v){return std::isfinite(v)&&v>=0&&v<=maximum_native_emission;}) ||
      alpha<0 || alpha>3 || !unit(alpha_cutoff))
     throw std::invalid_argument("Invalid native factor baseline for resolved material");
 }
@@ -167,6 +169,7 @@ void SourceMaterialBindings::validate(bool deep) const {
     }
   }
   native_reference.validate();
+  if(physical_emission)detail::validate_emission_rgb(*physical_emission,maximum_native_emission);
   roles_valid(has_mtoon?std::optional<MToonMaterial>(material):std::nullopt,roles);
   if(animation_frozen && has_mtoon &&
      (material.parameters.scroll!=std::array<float,2>{} || material.parameters.rotation_speed!=0))
@@ -381,6 +384,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
         {"alpha",binding->native_reference.alpha},{"alpha_cutoff",binding->native_reference.alpha_cutoff},
         {"double_sided",binding->native_reference.double_sided}}},
       {"origin",binding->uv_origin?nlohmann::json(size_t(origin-origins_.begin())):nlohmann::json(nullptr)}});
+    if(binding->physical_emission)output["bindings"].back()["physical_emission"]=*binding->physical_emission;
     if(normal_prepared||corners){const auto found=std::find(normal_preparations.begin(),normal_preparations.end(),binding->normal_preparation);
       output["bindings"].back()["normal_preparation"]=binding->normal_preparation?nlohmann::json(size_t(found-normal_preparations.begin())):nlohmann::json(nullptr);
     }
@@ -391,7 +395,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
     if(extended){output["bindings"].back()["frames"]=binding->normal_frames?nlohmann::json(frames.add(binding->normal_frames)):nlohmann::json(nullptr);output["bindings"].back()["sampling_reparameterized"]=binding->sampling_reparameterized;}
   }
   if(extended)output["normal_frames"]=frames.encode();
-  if(physical_material_state(material_paint_owners(bindings_,origins_))){
+  if(physical_material_state(material_paint_owners(bindings_,origins_),bindings_)){
     output["base_version"]=output.at("version");output["version"]=11;
   }
   return output;
@@ -609,6 +613,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     const auto &frame=value.at("normal_frame");
     if(!frame.is_string() || (frame.get_ref<const std::string&>()!="uv-derivative" && (!extended || frame.get_ref<const std::string&>()!="original-attributes")))throw std::runtime_error("Unsupported derived material normal frame");
     auto binding=std::make_shared<SourceMaterialBindings>();
+    if(value.contains("physical_emission")){if(!physical)throw std::invalid_argument("Absolute background emission requires material11");binding->physical_emission=value.at("physical_emission").get<std::array<float,3>>();}
     if(frame.get_ref<const std::string&>()=="original-attributes")binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
     if(extended && !value.at("frames").is_null())binding->normal_frames=frames.at(uint32_t(index(value.at("frames"),frames.sets().size())));
     binding->has_mtoon=!value.at("material").is_null();
@@ -738,7 +743,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     if(reachable.origins_.size()!=output.origins_.size())throw std::invalid_argument("HDR archive has unreferenced source origins");
     const auto owners=material_paint_owners(reachable.bindings_,reachable.origins_);
     if(owners.size()!=paints.size())throw std::invalid_argument("HDR archive has unreferenced paint owners");
-    if(!physical_material_state(owners))throw std::invalid_argument("Material11 requires genuine physical emission state");
+    if(!physical_material_state(owners,reachable.bindings_))throw std::invalid_argument("Material11 requires genuine physical emission state");
     if(material_shape_version(reachable.bindings_,reachable.origins_)!=detail::material_archive_base_version(input).get<unsigned>())
       throw std::invalid_argument("HDR material base layout differs from its actual owning features");
   }
