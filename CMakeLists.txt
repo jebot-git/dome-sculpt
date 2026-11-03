@@ -2333,6 +2333,7 @@ target_sources(dome-sculpt-core PRIVATE src/paint-composite.cpp ${paint_compute_
 # Standalone actual-backend component: no old-core overlay or per-query CPU staging.
 if(BUILD_TESTING)
   add_executable(dome-sculpt-resample-quality-test tests/resample-quality.cpp src/sculpt-storage.cpp ${compute_source})
+  target_link_libraries(dome-sculpt-resample-quality-test PRIVATE dome-sculpt-json)
   target_include_directories(dome-sculpt-resample-quality-test PRIVATE include src third_party)
   target_compile_options(dome-sculpt-resample-quality-test PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-ffp-contract=off>")
   if(DOME_COMPUTE_BACKEND STREQUAL "ONEAPI")

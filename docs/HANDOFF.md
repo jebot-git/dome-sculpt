@@ -1,20 +1,60 @@
 # Dome Sculpt production handoff
 
+## Published VRM1 source-export integration — 2026-11-03
+
+Main `13f7e57` now includes the qualified first source-preserving VRM1 writer,
+actual-metadata version dispatch, typed texture-transform/emissive descriptors
+and coherent canonical FLTK/display integration. Fresh CPU ALL-target build,
+affected Release28/SAN18, native FLTK7+7/Wayland11, actual A77016 and independent
+schema/reimport checks pass. These are scoped gates, not an all535-test pass or
+full VRM1/physics/HDR qualification. Read VRM1-COHERENT-INTEGRATION.md and its
+receipt for exact boundaries. Three fresh vendor ALL-target builds are running
+on the identical `fc56265` runtime/API source; they remain pending.
+The independent initial outside-tile source UV, seam-key and automatic-weight
+branches are not admitted. Every unfinished original requirement and the later
+controller drawers remains required. No system or physical session changed.
+
+
+## Native display lifetime integration — 2026-11-03
+
+The next qualified integration extends published `bd2bcde` with explicit desktop
+display ownership, exception-safe partial EGL cleanup and the matching canonical
+DomeD `f797e0f` FLTK/Cairo stack. Affected Release10/10 and whole-owned sanitizer
+10/10, actual native Wayland/universal-menu11+11 and launcher desktop2+2 pass.
+Current OneAPI/CUDA/ROCm app component relinks and actual A770 GL/compute
+synthetic-XR7 pass with their explicit matching-support scope. These are selected
+checks, not a fresh full-regression/all-vendor-build or physical-device claim.
+Read [NATIVE-DISPLAY-LIFETIME.md](NATIVE-DISPLAY-LIFETIME.md) and its receipt for
+exact source boundaries, preserved initial capture/cache failures and source
+hashes. The standalone-XR Mesa112-byte allocation report remains unresolved.
+The full goal remains active and incomplete; robust weights, independent seam
+keys, broader VRM1/FBX/interoperability, remaining GPU/production/device work and
+post-basic controller drawers are still required. No system or session changed.
+
+
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
-## Private VRM1/display integration candidate — 2026-11-03
+## Qualified private VRM1/display integration — 2026-11-03
 
-This isolated candidate composes cleanup base69ca191 and qualified private
-VRM1 componenta21843b. Root display ownership, SDK/runtime guards and provenance
-are preserved. The new ImportedMaterial/ImportedAsset parsed layouts require
-fresh complete dependent builds and affected native/render/replay/UI proofs;
-those integration gates are not yet complete. The component evidence in
-[VRM1-SOURCE-EXPORT.md](VRM1-SOURCE-EXPORT.md) retains its exact earlier parent
-and does not qualify this composition. Full painted/frame/HDR/initial-UV and
-dynamic V1 constraints/physics requirements remain open. No physical/session or
-system-installation action is authorized by this integration.
+Runtime/CMake fc56265 composes cleanup69ca191, first V1 source-export component
+a21843b, test-only forward-header closure a5770ff and published431 metadata.
+Fresh optimized CPU ALL535-command build and whole-owned sanitizer app/support
+builds pass. Affected Release28/SAN18, independent V1 images16 in Release/SAN/
+actualA770, real native menu7normal+7compact, current nativeWayland11 and clean
+sanitizer desktop-context18 pass. Native V1 export→fresh reimport/restart3 in
+both profiles and15-output Khronos/84officialschema instances have0errors.
+All416 Release outputs remain byte-identical across the test-only header and
+root documentation merges. Read [VRM1-COHERENT-INTEGRATION.md](VRM1-COHERENT-INTEGRATION.md)
+and its receipt for exact scope; this is not an all535-test pass or full V1.
+
+Root owns the separate fresh OneAPI/CUDA/ROCm all-target builds on a frozen
+fc56265 copy; these are pending and are not replaced by earlier component
+proofs. Full painted/frame/HDR/initial-UV, fitted metadata and dynamic V1
+constraints/physics requirements remain open. Root's outsideUV follow-up is
+separate, not merged or relabeled qualified here. Main publication/review and
+any physical qualification remain separate. No system/session action occurred.
 
 ## Qualified authoring union — 2026-11-03
 

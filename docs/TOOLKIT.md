@@ -36,8 +36,9 @@ cmake --build build --parallel 2
 `DOME_TOOLKIT_SOURCE` denotes that source checkout. The prefix uses **lib**.
 The builder retains the verified archive, COPYING and all24 patches under
 `share/fltk-bdf-source`. The whole-toolkit sanitizer counterpart must retain the
-same source notices. New application integration evidence is pending separately;
-prior62b6417/application proofs below retain their original scopes. The toolkit and matching Cairo runtime have clean native Wayland and X11
+same source notices. Current application lifecycle evidence is qualified in
+[NATIVE-DISPLAY-LIFETIME.md](NATIVE-DISPLAY-LIFETIME.md); prior62b6417/application
+proofs below retain their original scopes. The toolkit and matching Cairo runtime have clean native Wayland and X11
 sanitizer lifecycle evidence. The older800-byte Cairo Xlib source report is
 retained as a negative and corrected by the matching runtime; standalone-XR's
 Mesa112-byte report is separate and remains unresolved. No suppression is

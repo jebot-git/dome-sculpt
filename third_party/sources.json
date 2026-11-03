@@ -178,7 +178,7 @@
       "native/toolkit-hooks/fltk-1.4.5-process-cleanup.patch": "c40abb454f7cd648227cdaca8802a9f01073b992250accd10969c5b9627537c3"
     },
     "combined_patch_sha256": "d9e70caf0b983f4b12dfe6a345d0f7525af87812749a5b3f3880be7210455b18",
-    "used": "Canonical Release FLTK1.4.5 with all24 patches, native BDF/PCF, exception-safe process display cleanup and plugin construction; regular-user optimized lib prefix. Whole-toolkit sanitizer counterpart uses identical source/patches. Bitmap helper/runtime pins unchanged.",
+    "used": "Canonical Release FLTK1.4.5 with all24 patches, native BDF/PCF, exception-safe process display cleanup and plugin construction; regular-user optimized lib prefix. Whole-toolkit sanitizer counterpart uses identical source/patches. BDF helper bytes unchanged; the matching corrected bitmap-runtime pin is recorded below.",
     "verified_at_commit": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
     "builder_sha256_at_verified_commit": "7a6bef76fcb22805ebcb655b17d8fc5f1bbf082991fab3be557c6a79fb136d44"
   },

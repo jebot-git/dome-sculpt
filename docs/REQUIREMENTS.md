@@ -1,5 +1,37 @@
 # Full objective and completion evidence
 
+## Published VRM1 source-export integration — 2026-11-03
+
+Main `13f7e57` now includes the qualified first source-preserving VRM1 writer,
+actual-metadata version dispatch, typed texture-transform/emissive descriptors
+and coherent canonical FLTK/display integration. Fresh CPU ALL-target build,
+affected Release28/SAN18, native FLTK7+7/Wayland11, actual A77016 and independent
+schema/reimport checks pass. These are scoped gates, not an all535-test pass or
+full VRM1/physics/HDR qualification. Read VRM1-COHERENT-INTEGRATION.md and its
+receipt for exact boundaries. Three fresh vendor ALL-target builds are running
+on the identical `fc56265` runtime/API source; they remain pending.
+The independent initial outside-tile source UV, seam-key and automatic-weight
+branches are not admitted. Every unfinished original requirement and the later
+controller drawers remains required. No system or physical session changed.
+
+
+## Native display lifetime integration — 2026-11-03
+
+The next qualified integration extends published `bd2bcde` with explicit desktop
+display ownership, exception-safe partial EGL cleanup and the matching canonical
+DomeD `f797e0f` FLTK/Cairo stack. Affected Release10/10 and whole-owned sanitizer
+10/10, actual native Wayland/universal-menu11+11 and launcher desktop2+2 pass.
+Current OneAPI/CUDA/ROCm app component relinks and actual A770 GL/compute
+synthetic-XR7 pass with their explicit matching-support scope. These are selected
+checks, not a fresh full-regression/all-vendor-build or physical-device claim.
+Read [NATIVE-DISPLAY-LIFETIME.md](NATIVE-DISPLAY-LIFETIME.md) and its receipt for
+exact source boundaries, preserved initial capture/cache failures and source
+hashes. The standalone-XR Mesa112-byte allocation report remains unresolved.
+The full goal remains active and incomplete; robust weights, independent seam
+keys, broader VRM1/FBX/interoperability, remaining GPU/production/device work and
+post-basic controller drawers are still required. No system or session changed.
+
+
 Published main `fd5ecc7` contains the combined retained source UV/paint/key and
 source-rig/rest/length union, which now
 has coherent runtimeeec7753 qualification: optimized all-target CPU/OneAPI/CUDA/
@@ -260,3 +292,9 @@ VRM1.0 route in VRM1-SOURCE-EXPORT.md. Its explicit painted/frame/HDR/initial-UV
 constraint/physics/fitted-version limitations remain required full-goal work.
 This component and its appended parsed DTO ABI require coherent root integration;
 none of its selected scopes are an all-suite or full VRM1 completion claim.
+
+The subsequent private fc56265 integration now has fresh coherent CPU535-command
+build, selected Release28/SAN18 and native/image/replay/schema evidence in
+VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds are pending on a
+frozen copy; full V1/physics/HDR/painting and broader workflow requirements stay
+open. This is not an all535-test or full-goal completion claim.
