@@ -8,6 +8,7 @@
 #include "coupled-biharmonic-dual.hpp"
 #include "fixed-quadratic.hpp"
 #include "heat-binding.cpp"
+#include "newton-coupled-dual.hpp"
 #include "projected-coupled-dual.hpp"
 #include "squared-coupled-dual.hpp"
 #include "squared-laplacian-preconditioner.hpp"
@@ -73,13 +74,33 @@ struct CoupledSparseInverse {
   std::vector<uint32_t> rows;
   std::vector<double> rhs, result, product, residual, correction;
   double lipschitz = 0, tolerance;
-  size_t applications = 0, refinements = 0;
+  size_t applications = 0, refinements = 0, energy_applications = 0;
   double maximum_residual = 0;
   CoupledSparseInverse(BiharmonicOperator &op, std::span<const uint8_t> pins,
                        double tol)
       : q(op), fixed(pins), rhs(pins.size()), result(pins.size()),
         product(pins.size()), residual(pins.size()), correction(pins.size()),
         tolerance(tol) {}
+  void apply_energy(std::span<const double> in, std::span<double> out,
+                    Budget &budget) {
+    if (in.size() != rows.size() || out.size() != rows.size())
+      throw std::invalid_argument("Coupled energy domain differs");
+    ++energy_applications;
+    budget.step(result.size() + rows.size() * 2);
+    std::fill(result.begin(), result.end(), 0);
+    for (size_t i = 0; i < rows.size(); ++i) {
+      if (!std::isfinite(in[i]))
+        throw std::invalid_argument("Nonfinite coupled energy input");
+      if (!fixed[rows[i]])
+        result[rows[i]] = in[i];
+    }
+    q.apply(result, product, budget);
+    for (size_t i = 0; i < rows.size(); ++i) {
+      out[i] = fixed[rows[i]] ? 0 : product[rows[i]];
+      if (!std::isfinite(out[i]))
+        throw std::runtime_error("Coupled energy output overflow");
+    }
+  }
   void apply_inverse(std::span<const double> in, std::span<double> out,
                      Budget &budget) {
     if (in.size() != rows.size() || out.size() != rows.size())
@@ -137,11 +158,14 @@ SkinWeights coupled_fields(const System &s, BiharmonicOperator &q,
                            std::span<const std::array<uint64_t, 4>> anchors,
                            std::span<const std::array<uint64_t, 4>> domains,
                            const std::array<bool, 256> &covered,
-                           bool independent, bool squared_dual,
-                           bool projected_dual,
+                           bool independent, BiharmonicBoxSolver solver,
                            const BoundedQuadraticOptions &controls,
                            const WeightLimits &limits, size_t maximum_bytes,
                            Budget &budget, BiharmonicBindingReport &proof) {
+  const bool squared_dual = solver == BiharmonicBoxSolver::CoupledSquaredDual;
+  const bool projected_dual =
+      solver == BiharmonicBoxSolver::CoupledProjectedDual;
+  const bool newton_dual = solver == BiharmonicBoxSolver::CoupledNewtonDual;
   const size_t n = s.positions.size();
   std::vector<uint32_t> joints;
   for (uint32_t k = 0; k < covered.size(); ++k)
@@ -215,9 +239,13 @@ SkinWeights coupled_fields(const System &s, BiharmonicOperator &q,
         CoupledDualOptions options;
         options.relative_tolerance = controls.relative_tolerance;
         options.maximum_iterations = controls.maximum_active_iterations;
+        options.maximum_cg_iterations = controls.maximum_cg_iterations;
         options.maximum_bytes = maximum_bytes;
         auto result =
-            projected_dual
+            newton_dual
+                ? solve_newton_coupled_dual(inverse, rows, labels, r, output,
+                                            lambda, options, budget)
+            : projected_dual
                 ? solve_projected_coupled_dual(inverse, rows, labels, r, output,
                                                lambda, options, budget)
             : squared_dual
@@ -229,6 +257,7 @@ SkinWeights coupled_fields(const System &s, BiharmonicOperator &q,
         proof.maximum_duality_gap =
             std::max(proof.maximum_duality_gap, result.duality_gap);
         proof.dual_iterations += result.iterations;
+        proof.cg_iterations += result.cg_iterations;
         proof.dual_backtracks += result.backtracks;
         proof.maximum_dual_kkt = std::max(proof.maximum_dual_kkt, result.kkt);
         proof.maximum_partition_error =
@@ -284,6 +313,7 @@ SkinWeights coupled_fields(const System &s, BiharmonicOperator &q,
     }
   proof.inverse_applications = inverse.applications;
   proof.inverse_refinements = inverse.refinements;
+  proof.energy_applications = inverse.energy_applications;
   proof.maximum_inverse_residual = inverse.maximum_residual;
   return grouped;
 }
@@ -302,7 +332,9 @@ SkinWeights bounded_biharmonic_surface(
       options.box_solver == BiharmonicBoxSolver::CoupledSquaredDual;
   const bool projected_dual =
       options.box_solver == BiharmonicBoxSolver::CoupledProjectedDual;
-  const bool coupled = projected_dual || squared_dual ||
+  const bool newton_dual =
+      options.box_solver == BiharmonicBoxSolver::CoupledNewtonDual;
+  const bool coupled = newton_dual || projected_dual || squared_dual ||
                        options.box_solver == BiharmonicBoxSolver::CoupledDual;
   if (options.box_solver != BiharmonicBoxSolver::PrimalFeasible && !block &&
       !coupled)
@@ -355,8 +387,12 @@ SkinWeights bounded_biharmonic_surface(
   const size_t planned =
       n * (1024 + 32 * o.limits.max_influences + b * 18) + corners * 160 +
       b * b * 64 + 16384 + precondition_bytes +
-      (coupled ? n * b * ((squared_dual || projected_dual) ? 384 : 160) + 32768
-               : 0);
+      (coupled
+           ? n * b *
+                     ((squared_dual || projected_dual || newton_dual) ? 384
+                                                                      : 160) +
+                 32768
+           : 0);
   if (planned > o.maximum_bytes || n > o.maximum_work / (sources.size() + 1))
     throw std::length_error(
         "Biharmonic construction exceeds byte/work admission");
@@ -487,10 +523,9 @@ SkinWeights bounded_biharmonic_surface(
   for (auto &row : grouped.vertices)
     row.reserve(o.limits.max_influences + 1);
   if (coupled) {
-    grouped =
-        coupled_fields(s, q, fixed, anchors, domains, covered, independent,
-                       squared_dual, projected_dual, controls, o.limits,
-                       o.maximum_bytes - planned, budget, proof);
+    grouped = coupled_fields(
+        s, q, fixed, anchors, domains, covered, independent, options.box_solver,
+        controls, o.limits, o.maximum_bytes - planned, budget, proof);
     std::fill(sum.begin(), sum.end(), 1);
   } else
     for (uint32_t joint = 0; joint < b; ++joint)

@@ -1,0 +1,51 @@
+{
+  "base": "9121a51",
+  "scope": "Private actual native C++ factory with copied uninstrumented b32 support; kernel-only owned SAN",
+  "independent_primal_qps": 128,
+  "primal_field_error": 4.11607e-11,
+  "actual_dual_kkt": 2.46155e-11,
+  "kernel_outer_iterations": 342,
+  "kernel_sanitizers": [
+    "ASan",
+    "UBSan",
+    "leaks"
+  ],
+  "female_solved": 15,
+  "male_solved": 15,
+  "posed_cases_each_solved_subset": 75,
+  "captured_inputs": 1558,
+  "original_work_cap": 500000000,
+  "full_avatar_admission": false,
+  "remaining": [
+    "Body/Hands/Tops/Bottoms cost",
+    "coupled Body/Tops quality unknown",
+    "source-free/native/unskinned domain",
+    "stress/full solver SAN/OOM/Cancel",
+    "native history/Save/UI/export"
+  ],
+  "hashes": {
+    "src/newton-coupled-dual.hpp": "0629106ce6aeb3db55924727788c58909ee63a5aedbd05daf4d3cbc44ac63960",
+    "src/coupled-biharmonic-dual.hpp": "0e8cac70ec22861d2bff2e869aa51a3ee7e050cd6354e41d58faa58e666258f5",
+    "src/biharmonic-binding.cpp": "fdb72a1ba1cd1f4ddaa3cee6ecd67369132130ad646a4e1c19d6d6099ab00e69",
+    "src/biharmonic-binding.hpp": "561ce0680d338774c2fd54fb28794f3e1ac00122e8b3105232f5aaa05468145f",
+    "tests/newton-coupled-dual.cpp": "3987a045b0ba3c2ce2aa226b7e7c57cc841b3c8d4ef059e4e6d73bee5818d9e9",
+    "tests/biharmonic-newton.cpp": "26d3a53e47e0c0245c1ef56de0c890753911d7a8cba3972aecba04943708bcda",
+    "tests/biharmonic-newton-energy.cpp": "e6e5455f09afc94e8f268da04d7974b955418f6176853837ad8ac8fdefbf8411",
+    "tests/biharmonic-newton-poses.cpp": "6f21b52827b1b74d3d5ad0f3dacd38160e030cde8f55a17105f221522da0b00b",
+    "artifacts/newton-before.json": "aa9a25089b4f937fccc41dfe4f78d563c77a4e22b9af9abc5a2edfded69d4b2f",
+    "artifacts/newton-after.json": "aa9a25089b4f937fccc41dfe4f78d563c77a4e22b9af9abc5a2edfded69d4b2f",
+    "artifacts/poses-newton-female.log": "18a982355848ee0ddc7272562a9412ac7281ead4e07a9dd3ecf3ed789383db43",
+    "artifacts/poses-newton-male.log": "7c731a9551d82889cf34d5868c6b2276b51d3b476b56b8681faf3796772d5214",
+    "artifacts/tests-newton-dual-v3.log": "236e4bf5ca01eda8677124a8be9608a529a327baa44c186aab13e7af55903d6d",
+    "artifacts/tests-newton-dual-sanitize.log": "236e4bf5ca01eda8677124a8be9608a529a327baa44c186aab13e7af55903d6d",
+    "artifacts/newton-kernel-sanitize-before.sha256": "077d62b22b38435ac0e6437087dece8245c581c3689905103f2bb1e6185b7b7f",
+    "artifacts/newton-energy-control.cpp": "e6e5455f09afc94e8f268da04d7974b955418f6176853837ad8ac8fdefbf8411",
+    "artifacts/tests-newton-energy-control.log": "87ae16a4eae0459c03a2cda9e462fb97ace7eefe411476f4ce1a9aa41a260da1",
+    "artifacts/biharmonic-newton-probe": "632df929060f6171d9c68412c55fcb89e69cfa11b1ab0d3084553b4f42eb0863",
+    "artifacts/biharmonic-newton-poses-probe": "32fad3c5953f6f4c7a62efcea5847e8063afccf950f70f826cf22024215b59ba",
+    "artifacts/newton-dual-v3-probe": "2c0945360d8b9ecaafc71e06db1ce037a310baf7e92da474e01942ce05e87392",
+    "artifacts/newton-dual-sanitize": "8f06fe515be37d6862f3aa39952af4d52c46cb03c5bd666ccb893fbb5b0c7455",
+    "artifacts/newton-energy-control-probe": "844d42cd00525a8eb08d2aa068691fc965a15237abd69c76c37030890f591bc8",
+    "artifacts/build-newton-dual.log": "74761994b3f27f19618d33c6466b38ab8d23a504c7248629ecffcdcd398db323"
+  }
+}

@@ -17,11 +17,12 @@ namespace dome::detail {
 // stationarity; no postnormalization or accepted unconverged field.
 struct CoupledDualOptions {
   size_t maximum_bytes = 128u * 1024u * 1024u;
-  unsigned maximum_iterations = 16384;
+  unsigned maximum_iterations = 16384, maximum_cg_iterations = 4096;
   double relative_tolerance = 1e-10;
 };
 struct CoupledDualReport {
-  size_t iterations = 0, backtracks = 0;
+  size_t iterations = 0, backtracks = 0, cg_iterations = 0,
+         direction_restarts = 0;
   double final_lipschitz = 0, duality_gap = 0;
   double kkt = 0, minimum = 0, partition_error = 0;
 };
