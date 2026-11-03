@@ -1,0 +1,159 @@
+{
+  "status": "private component; no main admission",
+  "base": "a465321c8a51c46574d2fc639b8a75c9b2b5bd3a",
+  "preflight_parent": "2736acc",
+  "caps_unchanged": {
+    "frames_bytes": 134217728,
+    "deformation_entries": 8000000
+  },
+  "exact_allocation_differential": {
+    "original": {
+      "standard_new_bytes": 1170669387,
+      "calls": 164377
+    },
+    "fixed": {
+      "standard_new_bytes": 1652485,
+      "calls": 554,
+      "scene_exact": true
+    },
+    "scope": "byte-identical original2000-module probe recompiled against fresh fixed whole core; cumulative allocation traffic, not peak RSS"
+  },
+  "near_cap": {
+    "modules": 1629,
+    "frame_bytes": 134170956,
+    "headroom": 46772,
+    "native_save_reopen": "pass",
+    "replacement": "pass",
+    "another_object_retaining_old_current": "early refusal, source exact"
+  },
+  "conditional_codec": {
+    "frame_archive": 2,
+    "position_domain_record": 2,
+    "witness": "current_alias:source only for actual address+controlblock alias",
+    "old_domain1_bytes": "unchanged when unused",
+    "actual_old_a465_reader": "explicit Unsupported native key domain record",
+    "legacy_files_byte_identical": [
+      {
+        "name": "prepared-record2.dsculpt",
+        "current": "a0225b9268891e0483496de860ffe442abf44e3ba38f257f7bb5108a05b27688",
+        "old": "a0225b9268891e0483496de860ffe442abf44e3ba38f257f7bb5108a05b27688",
+        "equal": true
+      },
+      {
+        "name": "generic-record2.dsculpt",
+        "current": "221c85bc0e9dfad378e560284f5fb2e6f00d5e164352044106bdee222e005f22",
+        "old": "221c85bc0e9dfad378e560284f5fb2e6f00d5e164352044106bdee222e005f22",
+        "equal": true
+      },
+      {
+        "name": "retained-unused/generic-record2.dsculpt",
+        "current": "09a676827a74b3def9df871df83b53445a0b26f83c9a38e653781c3d1b37f0cf",
+        "old": "09a676827a74b3def9df871df83b53445a0b26f83c9a38e653781c3d1b37f0cf",
+        "equal": true
+      }
+    ]
+  },
+  "release": {
+    "checks": {
+      "small": 17,
+      "alias": 9,
+      "large": 9,
+      "zeros": 8,
+      "mirror": 92,
+      "commands": 141,
+      "mirror_faults": 3
+    },
+    "persistent_mirror_prefixes": 5466,
+    "all_final_scopes_exit0": true
+  },
+  "whole_owned_sanitizers": {
+    "build": {
+      "exit_code": 0,
+      "inputs_unchanged": true
+    },
+    "runtime": [
+      {
+        "name": "small",
+        "exit_code": 0,
+        "seconds": 0.47764490099507384
+      },
+      {
+        "name": "alias",
+        "exit_code": 0,
+        "seconds": 0.1492432179802563
+      },
+      {
+        "name": "large",
+        "exit_code": 0,
+        "seconds": 169.47293243400054
+      },
+      {
+        "name": "zeros",
+        "exit_code": 0,
+        "seconds": 442.40054926398443
+      },
+      {
+        "name": "mirror",
+        "exit_code": 0,
+        "seconds": 1.1961912300030235
+      },
+      {
+        "name": "commands",
+        "exit_code": 0,
+        "seconds": 8.918500580999535
+      },
+      {
+        "name": "faults",
+        "exit_code": 0,
+        "seconds": 54.448720838990994
+      }
+    ],
+    "tracked_inputs_exact": 1471,
+    "archives_and_binaries_exact": true,
+    "source_exact": true,
+    "sanitizer_reports": 0
+  },
+  "decoder_faults": {
+    "prefixes": 1644,
+    "test_only_registered_mode": [
+      {
+        "name": "release",
+        "exit_code": 0,
+        "seconds": 0.9211852320004255,
+        "whole_owned_runtime_archives_unchanged": true
+      },
+      {
+        "name": "sanitize",
+        "exit_code": 0,
+        "seconds": 9.851245805999497,
+        "whole_owned_runtime_archives_unchanged": true
+      }
+    ],
+    "probe_scope": "one matching test TU; whole-owned runtime libraries unchanged"
+  },
+  "old_replay_counterfactual": {
+    "actual_exit_code": 1,
+    "expected_old_negative": true,
+    "seconds": 40.0218931339914,
+    "inputs_unchanged": true,
+    "old_archive_member_excluded": true
+  },
+  "counterfactual_failure": "target122, old phantom full-corner N/T forecast; current128 zero/revert/save/reopen passes",
+  "source28_union_requirement": "geometry rebind must authenticate and preserve actual SurfaceMap raw-source sampling proof; no numeric admission",
+  "limitations": [
+    "No main integration",
+    "Mirror prepared-normal/dual-paint and actual CC0 assets unqualified here",
+    "No new Mirror graphical/export/UI evidence",
+    "Nonmatching reflected triangulation/refinement and ambiguous corner partitions remain required",
+    "Latest main VRM1/HDR/Source28 composition needs fresh semantic union"
+  ],
+  "artifacts": [
+    "artifacts/alias-release/",
+    "artifacts/alias-sanitize/",
+    "artifacts/alias-registered-fault/",
+    "artifacts/replay-counterfactual/",
+    "artifacts/exact-allocation-differential/",
+    "../seam-key-mirror-216e363/artifacts/key-archive-budget/",
+    "../seam-key-mirror-216e363/artifacts/alias-old-reader/"
+  ]
+}

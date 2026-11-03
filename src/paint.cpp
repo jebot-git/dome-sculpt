@@ -856,6 +856,21 @@ std::shared_ptr<PaintedMesh> rebind_paint_sampling_geometry(const PaintedMesh &p
   return SourcePaintSamplingAccess::rebind(paint,std::move(attachment),limits);
 }
 struct SourceKeyPaintAccess {
+  static std::shared_ptr<PaintedMesh> source(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){
+    auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Native key source-alias adoption cancelled");};stop();
+    if(!binding.uv_origin||!binding.uv_origin->paint||paint.in_stroke()||!paint.valid_paint_sampling_attachment())throw std::invalid_argument("Native key source alias requires an actual finished source raster");
+    binding.validate(true);detail::source_paint_pairing(&paint,&binding,appearance,true);detail::normal_frame_current_authority(binding,paint.mesh(),deformation,cancelled);
+    const auto &anchor=*binding.uv_origin->paint;const auto &a=paint.mesh(),&b=anchor.mesh();auto same=[](const auto &a,const auto &b){return a.size()==b.size()&&(a.empty()||std::memcmp(a.data(),b.data(),a.size()*sizeof(a[0]))==0);};
+    const auto domain=paint.paint_sampling_domain(),prior=anchor.paint_sampling_domain();const bool same_domain=domain==prior&&!domain.owner_before(prior)&&!prior.owner_before(domain);
+    if(anchor.in_stroke()||!anchor.valid_paint_sampling_attachment()||!same_domain||paint.resolution()!=anchor.resolution()||paint.surface_diagnostics().policy!=anchor.surface_diagnostics().policy||!same(a.positions,b.positions)||!same(a.normals,b.normals)||!same(a.uv,b.uv)||a.indices!=b.indices||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)throw std::invalid_argument("Native key source alias differs from its exact declared current raster");
+    // The explicit domain2 witness names this source SurfaceMap. Full current
+    // material/field replay above independently grants its own authority; all
+    // current layers/maps/projections/baked event and cache remain current.
+    // Source28 union MUST also authenticate its immutable raw-source sampling
+    // proof here before sharing a surface; geometry equality is insufficient.
+    auto result=paint.snapshot();result->surface_=anchor.surface_;result->sampling_attachment_=anchor.sampling_attachment_;
+    detail::source_paint_pairing(result.get(),&binding,appearance,true);detail::normal_frame_current_authority(binding,result->mesh(),deformation,cancelled);stop();return result;
+  }
   static std::shared_ptr<PaintedMesh> adopt(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){
     auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Native key geometry adoption cancelled");};stop();
     const auto node=binding.key_derivation;if(!node||!node->valid_owner(node)||node->frames()!=binding.normal_frames)throw std::invalid_argument("Native key geometry adoption requires its actual owning material node");
@@ -873,6 +888,7 @@ struct SourceKeyPaintAccess {
 };
 namespace detail {
 std::shared_ptr<PaintedMesh> adopt_key_paint_geometry(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){return SourceKeyPaintAccess::adopt(paint,binding,appearance,deformation,cancelled);}
+std::shared_ptr<PaintedMesh> adopt_key_source_geometry(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){return SourceKeyPaintAccess::source(paint,binding,appearance,deformation,cancelled);}
 }
 struct PolygonPaintAccess {
   static std::shared_ptr<PaintedMesh> rebuild(const PaintedMesh &source, Mesh target,

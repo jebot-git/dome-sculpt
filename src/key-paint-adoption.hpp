@@ -8,4 +8,8 @@ namespace dome::detail {
 std::shared_ptr<PaintedMesh> adopt_key_paint_geometry(const PaintedMesh &,
     const SourceMaterialBindings &,const CreatorAppearance *,
     const DeformationState *,const std::function<bool()> &cancelled={});
+// Conditional domain2 owning source alias; no heuristic mesh interning.
+std::shared_ptr<PaintedMesh> adopt_key_source_geometry(const PaintedMesh &,
+    const SourceMaterialBindings &,const CreatorAppearance *,
+    const DeformationState *,const std::function<bool()> &cancelled={});
 }

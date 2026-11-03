@@ -39,6 +39,8 @@ std::shared_ptr<const SourceKeyDerivation> KeyDerivationCodec::decode(const nloh
   if(!input.at("deformation").is_null())node->deformation_=std::make_shared<const DeformationState>(DeformationState::decode(input.at("deformation"),node->paint_->mesh()));
   if(!input.at("appearance").is_null())node->appearance_=decode_creator_appearance(input.at("appearance"),models);
   if(node->material_->key_derivation)node->paint_=adopt_key_paint_geometry(*node->paint_,*node->material_,node->appearance_.get(),node->deformation_.get(),cancelled);
+  if(const auto domain=frames.references_.at(size_t(frame_id));domain&&frames.input_.at("position_domains").at(*domain).at("version")==2)
+    node->paint_=adopt_key_source_geometry(*node->paint_,*node->material_,node->appearance_.get(),node->deformation_.get(),cancelled);
   auto staged=frames;node->frames_=staged.bind(uint32_t(frame_id),node->paint_->mesh_owner(),*node->material_,cancelled);node->domain_=node->frames_->position_domain;node->current_targets_=node->frames_->current_targets;node->next_target_=node->frames_->next_target;
   for(const auto&t:input.at("targets")){
     std::optional<uint64_t> reference;
