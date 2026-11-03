@@ -5,7 +5,7 @@
 #include "normal-frames.hpp"
 #include <optional>
 namespace dome {
-namespace detail { class PolygonColorArchive; }
+namespace detail { class PolygonColorArchive; class SourceKeyDerivation; }
 class PaintedMesh;
 class CreatorAssetArchive;
 class NormalSamplingArchive;
@@ -59,6 +59,7 @@ struct SourceMaterialBindings {
   // Explicit absolute background radiance (linear cd/m^2), including zero.
   // Absent preserves historical typed-strength/native-factor correction.
   std::optional<std::array<float,3>> physical_emission;
+  std::shared_ptr<const detail::SourceKeyDerivation> key_derivation;
   void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;

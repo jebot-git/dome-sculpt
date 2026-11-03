@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include <cstdlib>
+#include <new>
+namespace mirror_failure {thread_local long remaining=-1;thread_local bool count=false;thread_local size_t calls=0;}
+void *operator new(size_t n){if(mirror_failure::count)++mirror_failure::calls;if(mirror_failure::remaining>=0&&mirror_failure::remaining--==0){mirror_failure::remaining=0;throw std::bad_alloc();}if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
+void *operator new[](size_t n){return ::operator new(n);}void operator delete(void*p)noexcept{std::free(p);}void operator delete[](void*p)noexcept{std::free(p);}void operator delete(void*p,size_t)noexcept{std::free(p);}void operator delete[](void*p,size_t)noexcept{std::free(p);}
+#define main mirror_positive_suite
+#include "independent-seam-key-mirror.cpp"
+#undef main
+int main()try{
+ auto source=fixture(false);ShapeKeyEdit change;change.action=ShapeKeyAction::Replace;change.target=0;change.positions=source.active().painted->mesh().positions;change.positions[0].z+=.013f;change.positions[3].z-=.017f;author_shapekey(source,source.active().id,change);ShapeKeyEdit mirror;mirror.action=ShapeKeyAction::Mirror;mirror.target=0;mirror.name="Fault Mirror";const auto before=source.encode();auto positive=source;author_shapekey(positive,positive.active().id,mirror);positive=source;mirror_failure::calls=0;mirror_failure::count=true;author_shapekey(positive,positive.active().id,mirror);mirror_failure::count=false;const auto count=mirror_failure::calls;const auto endpoint=positive.encode();check(count>0&&count<100'000,"Owning Mirror has a bounded measured standard-C++ allocation set");
+ for(size_t cut=0;cut<count;++cut){auto candidate=source;mirror_failure::remaining=long(cut);bool denied=false;try{author_shapekey(candidate,candidate.active().id,mirror);}catch(const std::bad_alloc&){denied=true;}catch(...){mirror_failure::remaining=-1;throw;}mirror_failure::remaining=-1;if(!denied||candidate.encode()!=before)throw std::runtime_error("Mirror failed persistent allocation rollback at prefix "+std::to_string(cut));}
+ std::cout<<"MIRROR_OWNING_ALLOCATION_PREFIXES "<<count<<std::endl;auto retry=source;author_shapekey(retry,retry.active().id,mirror);check(retry.encode()==endpoint&&source.encode()==before,"Every persistent Mirror allocation denial preserves full source and exact retry");
+ auto capped=source;for(size_t n=capped.active().deformation->morphs->targets.size();n<128;++n){ShapeKeyEdit next;next.name="Budget "+std::to_string(n);author_shapekey(capped,capped.active().id,next);}const auto exact=capped.encode();check(refuses([&]{author_shapekey(capped,capped.active().id,mirror);},"budget")&&capped.encode()==exact,"Actual128-target registry refuses new Mirror before source publication");std::cout<<"PASS "<<checks<<" owning Mirror fault checks"<<std::endl;return 0;
+}catch(const std::exception&e){mirror_failure::remaining=-1;mirror_failure::count=false;std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/normal-preparation.hpp"
+#include "normal-key-derivation.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "normal-bake-frames.hpp"
@@ -100,16 +101,26 @@ void SourceNormalPreparation::validate(bool deep) const {
   projection->validate(receipt.resolution,deep);initial_projection->validate(receipt.resolution,deep);target_frames->validate(false);
   if(initial_projection->version!=1 || (sampling_domain?projection->version!=2:projection->version!=1) || (sampling_domain&&uv_reprojection))
     throw std::invalid_argument("Retained normal sampling requires its complete owning domain replay");
-  if(sampling_domain){
+  bool derived_key=false;
+  if(key_derivation){
+    if(!key_derivation->valid_owner(key_derivation))throw std::invalid_argument("Prepared key derivation has no genuine owning node lease");
+    key_derivation->validate(deep);
+    if(target_frames!=key_derivation->frames()||target_frames.owner_before(key_derivation->frames())||key_derivation->frames().owner_before(target_frames)||target_frames->position_domain!=key_derivation->position_domain()||target_frames->position_domain.owner_before(key_derivation->position_domain())||key_derivation->position_domain().owner_before(target_frames->position_domain))throw std::invalid_argument("Prepared normal key frames differ from their own derived POSITION authority");
+    derived_key=detail::key_recipe_sampling_matches(*this,*key_derivation->before_material()->normal_preparation);
+  }
+  if(derived_key){
+    // The genuinely replayed key derivation changes attributes only. Exact
+    // original planes/receipt/sampling owners were checked independently above.
+  }else if(sampling_domain){
     sampling_domain->validate(deep);const auto &before=*sampling_domain->before_material->normal_preparation;
-    if(!detail::normal_projection_identity(*projection,*sampling_domain->projection)||target_frames!=before.target_frames||
+    if(!detail::normal_projection_identity(*projection,*sampling_domain->projection)||target_frames!=before.target_frames||key_derivation!=before.key_derivation||
        original_paint!=before.original_paint||original_appearance!=before.original_appearance||
        original_deformation!=before.original_deformation||original_material!=before.original_material||
        receipt.encode()!=before.receipt.encode()||!detail::normal_projection_identity(*initial_projection,*before.initial_projection))
       throw std::invalid_argument("Retained normal interpretation changed its original frame or source authority");
   }else if(uv_reprojection){
     uv_reprojection->validate(deep);const auto &before=*uv_reprojection->before_material->normal_preparation;
-    if(!detail::normal_projection_identity(*projection,*uv_reprojection->projection)||target_frames!=before.target_frames||original_paint!=before.original_paint||original_appearance!=before.original_appearance||original_deformation!=before.original_deformation||original_material!=before.original_material||receipt.encode()!=before.receipt.encode()||!detail::normal_projection_identity(*initial_projection,*before.initial_projection))
+    if(!detail::normal_projection_identity(*projection,*uv_reprojection->projection)||target_frames!=before.target_frames||key_derivation!=before.key_derivation||original_paint!=before.original_paint||original_appearance!=before.original_appearance||original_deformation!=before.original_deformation||original_material!=before.original_material||receipt.encode()!=before.receipt.encode()||!detail::normal_projection_identity(*initial_projection,*before.initial_projection))
       throw std::invalid_argument("Normal UV interpretation changed original planes, attributes or owning source authority");
   }else if(!detail::normal_projection_identity(*projection,*initial_projection))
     throw std::invalid_argument("Derived prepared-normal UV planes require explicit source-aware reprojection authority");
@@ -117,7 +128,7 @@ void SourceNormalPreparation::validate(bool deep) const {
      (receipt.mtoon!=PreparedMToonNormalEvaluation::Absent&&target_frames->mtoon!=target_frames->pbr))
     throw std::invalid_argument("Prepared normal target has no explicit compatible complete attribute model");
   if(original_appearance&&original_appearance->source_vertices.size()!=original_paint->mesh().positions.size())throw std::invalid_argument("Normal preparation original appearance remap differs");
-  if(!deep)return;
+  if(!deep||key_derivation)return;
   const auto receipt_data=receipt.encode();
   {
     std::lock_guard lock(proof_mutex);

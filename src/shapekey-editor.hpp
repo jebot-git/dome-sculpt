@@ -1,4 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/document.hpp"
-namespace dome { void edit_shapekey_dialog(Document &,ShapeKeyAction); }
+namespace dome { void edit_shapekey_dialog(Document &,ShapeKeyAction); void choose_shapekey_dialog(Document &); }

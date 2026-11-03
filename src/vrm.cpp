@@ -1097,6 +1097,14 @@ VrmExportReport export_vrm(const std::vector<ObjectSurface> &original_input_obje
     add_material(int(source),std::move(material),std::move(properties),{});
   }
   j["materials"]=std::move(output_materials);
+  // Retained source materials can restore unlit after make_gltf emitted a
+  // lit current material. Declare the extension from the final material set.
+  for (const auto &material : j["materials"]) {
+    stop(options);
+    if (material.contains("extensions") &&
+        material.at("extensions").contains("KHR_materials_unlit"))
+      extension("KHR_materials_unlit");
+  }
   auto vrm = metadata.remap(identities);
   if(source_graph&&source_graph->rest_metadata){const auto &transport=*source_graph->rest_metadata;auto &spring=vrm["secondaryAnimation"];for(size_t i=0;i<transport.colliders.size();++i)if(transport.colliders[i])spring["colliderGroups"][i]["node"]=metadata_nodes.at(transport.colliders[i]->source);for(size_t i=0;i<transport.centers.size();++i)if(transport.centers[i])spring["boneGroups"][i]["center"]=metadata_nodes.at(transport.centers[i]->source);}
 

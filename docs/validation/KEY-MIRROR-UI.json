@@ -1,0 +1,70 @@
+{
+  "status": "private test-only native GUI milestone; runtime unchanged5344b43",
+  "base": "5344b43387291847d7b6efd05de12e19d05b97f6",
+  "build": {
+    "exit_code": 0,
+    "inputs_unchanged": true
+  },
+  "build_scope": "fresh coherent optimized CPU core/support/render/XR/native FLTK app and matched native helper; canonical toolkit/bitmap runtime; no system installation",
+  "fixture": "genuine native provided fullT source5, actual UV split current12, conflicting seam Replace owning frame2/material10 source; original and both named roles remain real",
+  "normal": {
+    "gui_checks": 10,
+    "endpoint_checks": 66,
+    "exit_code": 0,
+    "seconds": 22.524966924014734,
+    "inputs_unchanged": true
+  },
+  "compact": {
+    "gui_checks": 12,
+    "endpoint_checks": 66,
+    "exit_code": 0,
+    "seconds": 18.443004720000317,
+    "inputs_unchanged": true
+  },
+  "native_regression": {
+    "checks": 92,
+    "exit_code": 0
+  },
+  "oracle": "explicit opposite triangle-corner map[0,2,1,9,11,10,6,8,7,3,5,4], numeric exact reflected POSITION/N and UV-parity-signed artistT for BOTH latent PBR/MToon roles; base tangents/W unchanged; no runtime correspondence function used by oracle",
+  "history": "actual universal oneUndoRedo reproduces complete before/after Mirror native files; detached source Restore exact",
+  "sanitizers": {
+    "scope": "one new matched O1 instrumented endpoint oracle TU on byte-identical534 whole-owned core/support archives; NOT whole UI sanitizer run",
+    "runtime_header_files_compared": 473,
+    "checks_per_case": 66,
+    "cases": [
+      {
+        "name": "normal-r2",
+        "exit_code": 0,
+        "seconds": 0.17649627599166706
+      },
+      {
+        "name": "compact-r2",
+        "exit_code": 0,
+        "seconds": 0.17413676998694427
+      }
+    ],
+    "inputs_unchanged": true
+  },
+  "preserved_negative": {
+    "first_normal_exit": 1,
+    "seconds": 18.53753712499747,
+    "actual_saved_reference": 2,
+    "intended_reference": 1,
+    "diagnosis": "Fixture Home/Return selected visible Shape1; decoded record matches actual UI selection. Independent numeric oracle correctly refused. One additional actual Up selects intended first source, all later endpoints pass. No runtime/quality/timeout change."
+  },
+  "limitations": [
+    "software GL private Xvfb only; no hardware or physical headset claim",
+    "No new prepared-normal/dual-Paint Mirror coverage",
+    "No real CC0 avatar or Mirror GLB/VRM pixel evidence",
+    "No new actual GUI freehand or Restore confirmation coverage",
+    "General nonmatching reflected triangulation/refinement remains required",
+    "Latest main VRM1/HDR/Source28 composition unqualified here"
+  ],
+  "artifacts": [
+    "artifacts/workflow-build/",
+    "artifacts/mirror-ui/normal/",
+    "artifacts/mirror-ui/normal-r2/",
+    "artifacts/mirror-ui/compact-r2/",
+    "artifacts/mirror-ui/sanitize-endpoint/"
+  ]
+}

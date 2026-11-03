@@ -1,0 +1,103 @@
+{
+  "source": "c762973d9fbe0f1fcd7952071978372521becd9c",
+  "production_source": "030d92bee5e34ee34692ded7f40ee7d8546a0fea",
+  "scope": "private test consumer on matching immutable coherent native archives; no main delivery",
+  "profiles": {
+    "release": {
+      "exit_code": 0,
+      "checks": 880,
+      "actual_image_comparisons": 36,
+      "max_rgba8_error": 1,
+      "bound": 4,
+      "seconds": 196.68059213401284,
+      "inputs": 1623,
+      "input_mismatches": 0,
+      "stats": "artifacts/consumer-alpha-order/status.json",
+      "log": "artifacts/consumer-alpha-order/after-lit.log",
+      "log_sha256": "43acdb1bce2f6fd52c3713e1fa8e835ffc9c0b3ffc63c90fce20f526d1bb830b"
+    },
+    "sanitize": {
+      "exit_code": 0,
+      "checks": 880,
+      "actual_image_comparisons": 36,
+      "max_rgba8_error": 1,
+      "bound": 4,
+      "seconds": 642.4028489899938,
+      "inputs": 1623,
+      "input_mismatches": 0,
+      "stats": "artifacts/consumer-sanitize/status.json",
+      "log": "artifacts/consumer-sanitize/software.log",
+      "log_sha256": "43acdb1bce2f6fd52c3713e1fa8e835ffc9c0b3ffc63c90fce20f526d1bb830b"
+    },
+    "arc": {
+      "exit_code": 0,
+      "checks": 880,
+      "actual_image_comparisons": 36,
+      "max_rgba8_error": 0,
+      "bound": 4,
+      "seconds": 178.560221421998,
+      "inputs": 1625,
+      "input_mismatches": 0,
+      "stats": "artifacts/consumer-hardware/status.json",
+      "log": "artifacts/consumer-hardware/run.log",
+      "log_sha256": "2bdc41009f8ca5f15a447a53dafb054332ef31c0632e98093b8652671a7fb7d8",
+      "identity": {
+        "selector": "pci-0000_03_00_0",
+        "vendor": "Intel",
+        "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "lease": "released",
+        "physical_HMD": false
+      }
+    }
+  },
+  "output_equality": {
+    "files": 37,
+    "profiles": 3,
+    "all_equal": true
+  },
+  "format_validation": {
+    "khronos_version": "2.0.0-dev.3.10",
+    "files": 111,
+    "errors": 864,
+    "warnings": 2106,
+    "filters": [],
+    "maxIssues": 0,
+    "error_codes": {
+      "UNDECLARED_EXTENSION": 864
+    },
+    "affected": "54 VRM0 files; final retained KHR_materials_unlit omitted from extensionsUsed. Genuine exporter defect remains in this snapshot. 54 core GLB and3 analytic GLB files have0errors.",
+    "official_vrm0": {
+      "files": 54,
+      "pinned_schema_files": 15,
+      "schema_commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+      "errors": 0
+    }
+  },
+  "negative_controls": [
+    "Original lit same-input before/after zero-key: max125; original default-unlit214, same2pixels, buffers byteexact before/after",
+    "Analytic alpha-over glTF: expected89,63,39,255; old immediate file order differs99; corrected consumer draws Opaque/Mask/Blend",
+    "Software --hardware actual strict refusal exit1; no actual UHD-device run claimed"
+  ],
+  "limits": [
+    "Not production exporter qualification until final extension declaration defect fixed and all formats rerun",
+    "VRM controlled current lighting authored before Mirror, not unrestricted advanced raw MToon parity",
+    "No new actual GUI/controller or full named-command persistent OOM proof",
+    "General barycentric refinement and its owning codec remain separate unfinished work"
+  ],
+  "report_provenance_incident": {
+    "affected_prior_receipt": "docs/validation/PREPARED-NORMAL-SHAPEKEYS-QUALIFICATION.json",
+    "affected_ignored_report": "/home/blux/de-xr/dome-sculpt/artifacts/prepared-normal-shapes-vrm-schema.json",
+    "historical_sha256": "c967bbc798d9dcd09c755e6e2f9cd82437e7a6f88bbcd79fdaf561fa00571c1e",
+    "event": "First copied schema runner failed to replace the shared output path and overwrote this ignored historical report with new54cohort. No authoritative byte-identical backup located; old report hash is not reconstructed/relabelled. Corrected own runner writes isolated report below. Historical saved artifacts/receipt unchanged."
+  },
+  "artifacts": {
+    "artifacts/consumer-validation/khronos.json": "584d2af28c852a32828e169281feb1670e8efdbfefbad66dcd19503e8f6d851a",
+    "artifacts/consumer-validation/official-vrm0.json": "7833910d04d8eaf09df19bf47c1759aee6b3de428962648f3dae936d79c5c6f6",
+    "artifacts/consumer-validation/output-equality.json": "3a3535ecb4c8ddcdc430182d3efab7b54dff2d3cbfdfa4ece7afc3721686a768",
+    "artifacts/consumer-validation/software-hardware-negative.json": "1cb1f2cc23d682433c15b3b833d2e278d023f2d2e41f10efdc46649a5e07740d",
+    "artifacts/consumer-validation/official.py": "ffbd46a6d0390dbd242fd3b9fa7f39cb6238d9e4b28b85a593cc84174ffec2fc",
+    "artifacts/consumer-validation/validate.cjs": "44d5bc9cd91aa1c5056fb802c830f6562c16604de67f0d64370435a246885e06",
+    "artifacts/consumer-alpha-order/consumer": "2b61120accbb5d44c473ad5de71bea81173880d70c37fd987822ffa91bd59203",
+    "artifacts/consumer-sanitize/consumer": "ca16a434c389a2713a843c3eecd44d345be693e9ab7dd2dfec4b7d605628243c"
+  }
+}

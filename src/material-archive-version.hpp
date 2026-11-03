@@ -8,9 +8,14 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   if(!input.is_object()||!input.contains("version")||!input.at("version").is_number_integer())
     throw std::invalid_argument("Invalid material archive version");
   const auto &wire=input.at("version");
+  if(wire==12){
+    if(!input.contains("base_version")||input.at("base_version")!=10||!input.contains("physical_emission")||!input.at("physical_emission").is_boolean())throw std::invalid_argument("Explicit Mirror material12 requires owning base10 and physical capability boolean");
+    return input.at("base_version");
+  }
+  if(input.contains("physical_emission"))throw std::invalid_argument("Physical capability boolean requires material12");
   if(wire==11){
     if(!input.contains("base_version")||!input.at("base_version").is_number_integer()||
-       (input.at("base_version").is_number_unsigned()?input.at("base_version").get<uint64_t>()<1||input.at("base_version").get<uint64_t>()>9:input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>9))
+       (input.at("base_version").is_number_unsigned()?input.at("base_version").get<uint64_t>()<1||input.at("base_version").get<uint64_t>()>10:input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>10))
       throw std::invalid_argument("HDR material11 requires an explicitly supported base layout");
     return input.at("base_version");
   }
@@ -18,6 +23,6 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   return wire;
 }
 inline bool physical_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==11;
+  material_archive_base_version(input);return input.at("version")==11||(input.at("version")==12&&input.at("physical_emission").get<bool>());
 }
 } // namespace dome::detail

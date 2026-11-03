@@ -283,6 +283,7 @@ public:
   void seed();
   bool begin_native_stroke();
   void configure_shape_sculpt(bool enabled);
+  void select_shape_target(uint32_t target, AssetSource expected = {});
   bool sample_native_stroke(NativeStrokeSample);
   void end_native_stroke(bool accept = true);
   bool wait_native_stroke(std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;

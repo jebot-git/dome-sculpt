@@ -1,0 +1,112 @@
+{
+  "runtime": "7c9891f",
+  "parent": "cab6451",
+  "owner_fix": "fafd6b1 (original e1b5e66)",
+  "scope": "Private universal owning Duplicate/CaptureMix; no main admission, GPU, UI, rendered export or Mirror qualification",
+  "representation": {
+    "scene_minimum": 22,
+    "material": 10,
+    "frame_archive": 2,
+    "normal_preparation_entry": 5,
+    "conditional_key_record": 2,
+    "legacy_key_record": 1,
+    "additional_public_layout": false,
+    "extra_cache": false
+  },
+  "release": {
+    "factory_checks": 103,
+    "named_checks": 141,
+    "allocation_checks": 7,
+    "persistent_standard_cpp_prefixes": {
+      "duplicate": 14737,
+      "capture_mix": 14753
+    },
+    "four_baseline_suites": 4,
+    "runtime_seconds": [
+      {
+        "name": "factory",
+        "exit_code": 0,
+        "elapsed": 0.2913658769975882
+      },
+      {
+        "name": "commands",
+        "exit_code": 0,
+        "elapsed": 0.9642603250104003
+      },
+      {
+        "name": "faults",
+        "exit_code": 0,
+        "elapsed": 433.63667757000076
+      },
+      {
+        "name": "four_baselines",
+        "exit_code": 0,
+        "elapsed": 15.148883506015409
+      }
+    ],
+    "source_inputs_unchanged": 967,
+    "primary_binary_archive_inputs_unchanged": 10
+  },
+  "whole_owned_sanitize": {
+    "flags": "C and C++ -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer; leak checks",
+    "build": "Fresh complete core/support; then three runtime C++ TUs and all matching consumers relinked for strictness descendant; no overlay",
+    "factory_checks": 103,
+    "named_checks": 141,
+    "four_baseline_suites": 4,
+    "terminal_functional_runs": [
+      {
+        "name": "factory",
+        "exit_code": 0,
+        "elapsed": 1.9163142559991684
+      },
+      {
+        "name": "commands",
+        "exit_code": 0,
+        "elapsed": 6.6768608650017995
+      },
+      {
+        "name": "four_baselines",
+        "exit_code": 0,
+        "elapsed": 214.79949509201106
+      }
+    ],
+    "functional_primary_binary_archive_inputs_unchanged": 10,
+    "extended_allocation_sweep": "Still running at receipt creation; no terminal/all-prefix sanitizer claim"
+  },
+  "actual_old_reader_negative": {
+    "scope": "actual frozen cab6451 qualified old-reader binary receives genuine new record2 Scene file",
+    "exit_code": 1,
+    "before": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-generic-0f36/build-generic/dome-sculpt-independent-seam-key-factory-test": "11b135f3b98791544745519a360b4be7ed897300006673fa662c494eeca8e4e4",
+      "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-commands-cab6451/artifacts/commands-final/output/prepared-record2.dsculpt": "a0225b9268891e0483496de860ffe442abf44e3ba38f257f7bb5108a05b27688"
+    },
+    "after_equal": true,
+    "diagnostic": "FAIL Scene22 requires actual owning native key derivation"
+  },
+  "remaining": [
+    "Mirror correspondence and general corner geometry",
+    "Actual freehand/controller/UI on new authority",
+    "Independent dynamic GLB/VRM consumers and original/source export maps",
+    "Actual CC0 avatars and mixed23/24/25/26 graphs",
+    "Fresh final frontend/renderer/XR/all-target regression integration",
+    "Whole extended sanitizer allocation result"
+  ],
+  "files": {
+    "artifacts/commands-hardened/source-before.sha256": "f440d4a0f7778df1c3333cfd4b9a21c75aa36e0dd01d17d0704fdbb1faa5cd2e",
+    "artifacts/commands-hardened/status.json": "6bafd6d41b9b124f478222507dbe93d9daf227fe6cf9a8734d42c8ba922c70a5",
+    "artifacts/commands-hardened/factory.log": "f72f2ea4ccccdd189fb5e4567489023469ca3090c95e598b870c7e387c7d629b",
+    "artifacts/commands-hardened/commands.log": "dee1c1c0108d6d8deec3b84957fa1abe09e229408efe350a4db748dd06a32b12",
+    "artifacts/commands-hardened/faults.log": "d599517f5ad31982045f1ffc50e81f5de046c4fd2571a8e5281bb5928b4be88f",
+    "artifacts/commands-hardened/baselines.log": "af37096cb7c12af8b2d6550869c65980170d5fc710b88accb471da394f9e1229",
+    "artifacts/commands-hardened/binaries-before.json": "63b6ba88946ad832a7f6c8d3124b8a91878ac4a0a4ff9343435b2b2b6dc84740",
+    "artifacts/commands-hardened/binaries-after.json": "63b6ba88946ad832a7f6c8d3124b8a91878ac4a0a4ff9343435b2b2b6dc84740",
+    "artifacts/commands-hardened-sanitize/functional-status.json": "95d381baa937c9fd97c85f40a3837a2134967cc9f15d894bd2daa3148c6a44ad",
+    "artifacts/commands-hardened-sanitize/factory.log": "f72f2ea4ccccdd189fb5e4567489023469ca3090c95e598b870c7e387c7d629b",
+    "artifacts/commands-hardened-sanitize/commands.log": "dee1c1c0108d6d8deec3b84957fa1abe09e229408efe350a4db748dd06a32b12",
+    "artifacts/commands-hardened-sanitize/four_baselines.log": "634284ab04207f4c83af913852e6cffdc73ed0e9d7a67b2ecd8b436323e58bda",
+    "artifacts/commands-hardened-sanitize/binaries-before.json": "c10cb8d75737c44d010d1bb4e8771062ad6f455bbc1e36c626f11f63740facc2",
+    "artifacts/commands-hardened-sanitize/functional-binaries-after.json": "c10cb8d75737c44d010d1bb4e8771062ad6f455bbc1e36c626f11f63740facc2",
+    "artifacts/commands-final/old-reader-negative.json": "c93b89be773466d055dd61199a36f83bb596f88b3be39199b322a6c0079776c0",
+    "artifacts/commands-final/old-reader-negative.log": "2c0fa178e54fd1ff6f46d9655ff7dbba7d37c3baba66f39a17d80ef6f241c6e6"
+  }
+}

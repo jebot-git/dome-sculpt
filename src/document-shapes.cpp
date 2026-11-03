@@ -2,6 +2,33 @@
 #include "dome/document.hpp"
 #include "document-transaction.hpp"
 namespace dome {
+void Document::select_shape_target(uint32_t target,AssetSource expected){
+ std::lock_guard lock(model_mutex_);
+ const bool leased=expected.generation||expected.revision||expected.object||expected.edit_authority;
+ if(leased&&(expected.generation!=state_.generation||expected.revision!=state_.revision||
+     expected.object!=scene_.active().id||expected.edit_authority!=state_.edit_authority))
+  throw std::logic_error("The shapekey source changed; reopen the selector");
+ if(!shape_target_ready_locked()||native_stroke_||desktop_||navigation_.grabbing()||
+     (state_.projection&&state_.projection->placing)||(state_.rig_fit&&state_.rig_fit->placing))
+  throw std::logic_error("Finish the current gesture or tool before choosing a shapekey");
+ const auto &deformation=scene_.active().deformation;
+ if(!deformation||!deformation->morphs||target>=deformation->morphs->targets.size())
+  throw std::out_of_range("Choose an existing shapekey");
+ const bool different=target!=state_.morph_target;
+ if(state_.input_epoch==UINT64_MAX||(different&&state_.shape_sculpt&&state_.view_epoch==UINT64_MAX))
+  throw std::overflow_error("Shapekey view/input identity exhausted");
+ const auto message="Selected shapekey: "+deformation->morphs->targets[target].name;
+ Transaction transaction(*this);
+ input_.cancel();++state_.input_epoch;transaction.rebind();
+ state_.morph_target=target;state_.message=message;
+ if(different&&state_.shape_sculpt)++state_.view_epoch;
+ state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
+ publish_locked(false,false);
+ // No throwing work remains. A held trigger must release before it can sculpt
+ // the newly chosen target, and obsolete queued samples use the retired epoch.
+ shape_rearmed_={};
+ transaction.commit(false);
+}
 void Document::configure_shape_sculpt(bool enabled){std::lock_guard lock(model_mutex_);configure_shape_sculpt_locked(enabled);}
 void Document::configure_shape_sculpt_locked(bool enabled){
  if(state_.shape_sculpt==enabled)return;

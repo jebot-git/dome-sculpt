@@ -1,0 +1,126 @@
+{
+  "status": "private test-only retained Paint24/normal/key Mirror milestone; no main delivery or runtime/header changes",
+  "base": "eed311ecb5f1ad0c5c27912514589fd96d456b8e",
+  "runtime": "5344b43387291847d7b6efd05de12e19d05b97f6",
+  "fixture": {
+    "source_vertices": 12,
+    "current_vertices": 12,
+    "triangles": 4,
+    "original_control_vertices": 5,
+    "description": "Native PolygonMesh triangulation produces twelve actual native vertices; no source4/derived6 relabeling. Real partial Bake prepares current corner colors and normals, projects2048 texels and misses2048. Actual native RetainPaint seams and scale0.7 preserve writable grids and independently authenticated normal metadata. Conflicting current-corner Replace precedes Mirror.",
+    "rig": "Actual mixed two-bone skin, saved nonuniform pose and morph mix; PBR/MToon named roles retained, untyped canonical source."
+  },
+  "coherent_release": {
+    "build_exit": 0,
+    "scope": "fresh optimized CPU core/support/render/native FLTK/OpenXR app and both new registered fixtures",
+    "ctest": "2/2",
+    "ctest_seconds": 11.85,
+    "native_checks": 85,
+    "graphical_checks": 36,
+    "tracked_inputs": 1480,
+    "inputs_unchanged": true
+  },
+  "sanitizers": {
+    "scope": "Two new fully instrumented O1 C++ fixture TUs on immutable eed whole-owned C/C++ core/support/render ASan/UBSan/leak archives. Exact src/include/third_party/assets bytes checked against archive source. This is not another whole-app sanitizer build/run.",
+    "native_checks": 85,
+    "native_seconds": 74.03736805100925,
+    "graphics_checks": 36,
+    "graphics_seconds": 136.78142799800844,
+    "exit_codes": [
+      0,
+      0
+    ],
+    "reports": 0,
+    "inputs_unchanged": true
+  },
+  "oracle": "Explicit twelve-corner opposite map[0,2,1,9,11,10,6,8,7,3,5,4]. Exact mirrored POSITION and both named-role N/T arrays; UV tangent parity and baseW exact. Expected values never call runtime mirror correspondence.",
+  "ownership_history": [
+    "Every current Paint metadata/image/grid byte, geometry owner, attachment, normal projection and positive detail event stays exact across Replace/Mirror.",
+    "Save/reopen authenticates shared current color-field and independently owned normal metadata basis. Scene24/material10/key-record3; normal-entry4 retained and paired entry5 current.",
+    "One native Undo/Redo and complete detached Restore recover exact states.",
+    "Foreign equal-valued independently decoded metadata-domain owner refuses without publication.",
+    "Actual completed Mirror is gated only by test wrapper before publication: queued Save waits, Cancel propagates exact dependent failure, scene/file/history remain exact, retry succeeds."
+  ],
+  "pixels": {
+    "poses": 3,
+    "new_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "existing_weight": 0.2,
+    "native_glb_comparisons": 9,
+    "software_max_error": 0,
+    "a770_max_error": 0,
+    "normal_map_sensitivity": 8,
+    "artist_nt_sensitivity": "greater than2, unchanged bound",
+    "second_eye_noop": "zero extra geometry/image uploads",
+    "before_commit": "actual atomic GLB cancellation preserves existing marker and source"
+  },
+  "hardware": {
+    "code": 0,
+    "seconds": 7.780554269993445,
+    "inputs": 1495,
+    "inputs_unchanged": true
+  },
+  "device": {
+    "pci": "0000:03:00.0",
+    "vendor": "0x8086",
+    "device": "0x56a0",
+    "gl_vendor": "Intel",
+    "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "physical_headset": false,
+    "lease": "47281 terminal0, released"
+  },
+  "gui": {
+    "scope": "fresh coherent native FLTK app, software GL/private Xvfb, existing actual universal-menu fixture; separate own matched endpoint helper TU",
+    "normal_checks": 10,
+    "compact_checks": 12,
+    "endpoint_checks_each": 66,
+    "normal_seconds": 19.54205811599968,
+    "compact_seconds": 19.621523569978308,
+    "all_exit_codes": 0,
+    "inputs_unchanged": true,
+    "proof": "Actual Create/Duplicate/Mirror dialogs/Apply/Cancel, one universal Undo/Redo; exact explicit POSITION/N/T, allPaint and complete Restore endpoint oracle."
+  },
+  "khronos": {
+    "module": "gltf-validator 2.0.0-dev.3.10",
+    "successful_files_per_sw_arc_cohort": 10,
+    "errors": 0,
+    "unfiltered_warnings_each": 10,
+    "warning": "NODE_SKINNED_MESH_NON_ROOT",
+    "maxIssues": 0,
+    "filters": [],
+    "expected_cancel_marker": "excluded, not a GLB"
+  },
+  "next_actual_failures": {
+    "scope": "diagnostic, not acceptance. Actual bundled CC0 female/male artist face, actual native normal preparation then detached Mirror0.",
+    "female": {
+      "vertices": 588,
+      "corners": 3192,
+      "targets": 56
+    },
+    "male": {
+      "vertices": 596,
+      "corners": 3216,
+      "targets": 54
+    },
+    "diagnostic": "Reflected topology needs triangle refinement; no exact corner-bijection Mirror exists",
+    "scene_unchanged": true,
+    "required": "Authentic general triangulation/corner provenance adapter, real-avatar native/UI/render/VRM and freehand coverage remain required."
+  },
+  "limitations": [
+    "This native fixture is genuinely12\u219212; it does not replace or claim earlier source4\u2192derived6 tests.",
+    "No actual avatar Mirror acceptance or general nonmatching triangulation/refinement.",
+    "No typed/VRM Mirror consumer in this new retained case, no new freehand/controller-stroke/physical HMD claim.",
+    "Latest main VRM1/HDR27/source-sampling28 semantic union is not qualified. SurfaceMap alias rebinding must preserve/authenticate actual original_sampling proof."
+  ],
+  "artifacts": [
+    "artifacts/retained-probe/",
+    "artifacts/retained-native/",
+    "artifacts/retained-render/",
+    "artifacts/coherent/",
+    "artifacts/retained-ui/",
+    "artifacts/avatar-next/"
+  ]
+}

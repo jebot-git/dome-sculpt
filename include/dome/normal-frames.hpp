@@ -5,6 +5,7 @@
 #include <optional>
 #include <nlohmann/json_fwd.hpp>
 namespace dome {
+namespace detail {class FramePositionDomain; class KeyFrameArchive;}
 // Attribute transport is independent of the material's TBN interpolation policy.
 enum class NormalFrameTransport { FixedAttributes, CanonicalMikk };
 struct NormalFrameTarget {
@@ -44,6 +45,7 @@ struct NormalFrameSet {
   std::vector<FrameTargetIdentity> targets;
   std::vector<uint64_t> current_targets; // Current native slot -> stable frame ID.
   uint64_t next_target=1;
+  std::shared_ptr<const detail::FramePositionDomain> position_domain;
   void validate(bool deep=true) const;
   size_t storage_bytes() const;
 };
@@ -56,6 +58,9 @@ public:
   static NormalFrameArchive decode(const nlohmann::json &);
   const auto &sets() const { return sets_; }
 private:
+  friend class detail::KeyFrameArchive;
+  nlohmann::json encode_impl(const std::function<uint32_t(std::shared_ptr<const detail::FramePositionDomain>)> &) const;
+  static NormalFrameArchive decode_impl(const nlohmann::json &,bool owning_context);
   std::vector<std::shared_ptr<const NormalFrameSet>> sets_;
 };
 } // namespace dome

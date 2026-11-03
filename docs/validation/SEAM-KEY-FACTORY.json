@@ -1,0 +1,49 @@
+{
+  "source": "782faedf8817adfdfd2f9cb073f49771a72cb9d5",
+  "scope": "Private detached independent seam-key owning factory; not Scene/native/export admission",
+  "release": {
+    "checks": 55,
+    "before_after_equal": true,
+    "inputs": 968
+  },
+  "whole_owned_sanitize": {
+    "checks": 55,
+    "baselines": [
+      "prepared-normal-shapes",
+      "normal-domain-transitions",
+      "source-union-version"
+    ],
+    "before_after_equal": true,
+    "inputs": 970,
+    "flags": "Release -O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer; detect_leaks=1"
+  },
+  "oracle": {
+    "normal_max": 3.332e-08,
+    "tangent_max": 1.78853e-07,
+    "wrong_edited_atlas_difference": 4.92772e-05,
+    "bound": 1e-06
+  },
+  "evidence": {
+    "artifacts/factory-oracle-status.json": {
+      "sha256": "0699537cb01b73a0cf90ad997cd323e779071bafc2e5230868901acffd0df5d9"
+    },
+    "artifacts/factory-whole-sanitize-status.json": {
+      "sha256": "77be3ce0b875f7b1d0887bc8877b4529dc60f8b4e2f4359a768643bded559cfe"
+    },
+    "artifacts/factory-oracle-fixed.log": {
+      "sha256": "a48318f90cc752aacd32f612c8ff1762636402b6b740d14474f8a0ed1b7d739b"
+    },
+    "artifacts/factory-whole-sanitize.log": {
+      "sha256": "a48318f90cc752aacd32f612c8ff1762636402b6b740d14474f8a0ed1b7d739b"
+    },
+    "artifacts/factory-whole-sanitize-baselines.log": {
+      "sha256": "4c9c2b1246c6d09890c7ff859121b8f0e7b524b9f3382813ffd70454e7c7d7fa"
+    }
+  },
+  "remaining": [
+    "Owning FrameArchive2/material10/normal-entry5 codec with exact feature/version/resource closure",
+    "Generic no-normal-preparation dispatch without dummy normal field",
+    "Native/controller/UI/history/persistence/export and dynamic pixels",
+    "Duplicate/CaptureMix/Mirror/freehand, independent current skin/pose authority"
+  ]
+}

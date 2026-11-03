@@ -6,6 +6,9 @@
 #include "dome/paint.hpp"
 #include "dome/source-paint.hpp"
 #include "source-sampling-transport.hpp"
+#include "key-paint-adoption.hpp"
+#include "normal-frame-runtime.hpp"
+#include "source-paint-pairing.hpp"
 #include "paint-source-admission.hpp"
 #include "paint-archive-shape.hpp"
 #include "source-uv-archive.hpp"
@@ -1336,6 +1339,245 @@ std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &pain
 std::shared_ptr<PaintedMesh> rebind_paint_sampling_geometry(const PaintedMesh &paint,
     std::shared_ptr<const PaintSamplingAttachment> attachment,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::rebind(paint,std::move(attachment),limits);
+}
+struct SourceKeyPaintAccess {
+  // A declared key-domain alias names a complete SurfaceMap, including Source4
+  // ownership. Authenticate that independent proof before restoring the alias;
+  // ordinary equal geometry never grants permission to merge source histories.
+  static bool source_alias(const PaintedMesh &paint, const PaintedMesh &anchor,
+                           const std::function<bool()> &cancelled) {
+    const auto a = paint.surface_->original_sampling, b = anchor.surface_->original_sampling;
+    auto stop = [&] {
+      if (cancelled && cancelled())
+        throw std::runtime_error("Key source-sampling alias replay cancelled");
+    };
+    auto verify = [&](const PaintedMesh &current, const auto &proof) {
+      if (!proof)
+        return;
+      if (!current.valid_source_sampling_attachment())
+        throw std::invalid_argument("Key source-sampling alias lost its exact current attachment");
+      SourcePaintAccess::pristine(*proof->before);
+      SourcePaintOptions options;
+      options.cancelled = cancelled;
+      options.max_working_bytes = SourcePaintOptions::maximum_working_bytes;
+      SourcePaintAccess::budget(*proof->before, current.mesh(), options, proof->authored_uv1);
+      SourcePaintAccess::authored(*proof->before, proof->authored_uv1, options);
+      if (proof->authored_uv1 && SourcePaintAccess::maps(*proof->before).uv1)
+        throw std::invalid_argument("Key source-sampling alias has redundant authored UV1");
+      if (SourcePaintAccess::working_bytes(current) > SourcePaintOptions::maximum_working_bytes)
+        throw std::length_error("Key source-sampling alias exceeds original working quota");
+      auto expected = detail::transport_source_sampling(
+          proof->before->mesh(), SourcePaintAccess::maps(*proof->before), current.mesh(), proof->vertices,
+          SourcePaintAccess::limits(options, proof->vertices.size(), proof->authored_uv1 ? proof->authored_uv1->size() : 0));
+      if (!SourcePaintAccess::same(*expected, *current.source_maps_))
+        throw std::invalid_argument(
+            "Key source-sampling alias differs from complete original replay");
+      const auto &old = SourcePaintAccess::maps(*proof->before), &now = *current.source_maps_;
+      const std::array<const PaintSourceTexture *, 5> original{
+          &old.color, &old.metal_rough, &old.emission, &old.normal, &old.occlusion},
+          transported{&now.color, &now.metal_rough, &now.emission, &now.normal, &now.occlusion};
+      std::shared_ptr<const std::vector<std::array<float, 2>>> uv0;
+      for (size_t slot = 0; slot < original.size(); ++slot)
+        if (original[slot]->image && original[slot]->texcoord == 0) {
+          const auto carrier = transported[slot]->texcoord;
+          if (carrier == 1)
+            uv0 = now.uv1;
+          else {
+            const auto found = now.extra_uv_sets.find(uint32_t(carrier));
+            if (found == now.extra_uv_sets.end())
+              throw std::invalid_argument(
+                  "Key source-sampling alias lost actual logical UV0 carrier");
+            uv0 = found->second;
+          }
+          break;
+        }
+      if (!proof->original_uv0 || proof->original_uv0->size() != proof->vertices.size())
+        throw std::invalid_argument("Key source-sampling alias lost complete logical UV0");
+      for (size_t v = 0; v < proof->vertices.size(); ++v) {
+        if ((v & 1023) == 0)
+          stop();
+        const auto value = uv0 ? uv0->at(v) : proof->before->mesh().uv.at(proof->vertices[v]);
+        if (std::memcmp(&value, &proof->original_uv0->at(v), sizeof(value)))
+          throw std::invalid_argument("Key source-sampling alias changed original logical UV0");
+      }
+      const auto &before_uv1 = proof->authored_uv1 ? proof->authored_uv1 : old.uv1;
+      if (bool(proof->original_uv1) != bool(before_uv1) ||
+          (before_uv1 && proof->original_uv1->size() != proof->vertices.size()))
+        throw std::invalid_argument("Key source-sampling alias changed actual logical UV1 ownership");
+      if (old.uv1 && (!now.uv1 || proof->original_uv1 != now.uv1 ||
+                     proof->original_uv1.owner_before(now.uv1) || now.uv1.owner_before(proof->original_uv1)))
+        throw std::invalid_argument("Key source-sampling alias changed actual PBR UV1 owner");
+      if (before_uv1) for (size_t v = 0; v < proof->vertices.size(); ++v) {
+        if ((v & 1023) == 0) stop();
+        const auto value = before_uv1->at(proof->vertices[v]);
+        if (std::memcmp(&value, &proof->original_uv1->at(v), sizeof(value)))
+          throw std::invalid_argument("Key source-sampling alias changed authored UV1 correspondence");
+      }
+      stop();
+    };
+    verify(paint, a);
+    verify(anchor, b);
+    if (bool(a) != bool(b))
+      return false;
+    if (!a)
+      return true;
+    auto same = [](const auto &x, const auto &y) {
+      return x.size() == y.size() &&
+             (x.empty() || !std::memcmp(x.data(), y.data(), x.size() * sizeof(x[0])));
+    };
+    auto coordinates = [&](const auto &x, const auto &y) {
+      return bool(x) == bool(y) && (!x || same(*x, *y));
+    };
+    const auto &x = *a->before, &y = *b->before;
+    const auto &xm = x.mesh(), &ym = y.mesh();
+    if (a->vertices != b->vertices || !coordinates(a->original_uv0, b->original_uv0) ||
+        !coordinates(a->original_uv1, b->original_uv1) ||
+        !coordinates(a->authored_uv1, b->authored_uv1) || x.resolution() != y.resolution() ||
+        x.surface_diagnostics().policy != y.surface_diagnostics().policy ||
+        !same(xm.positions, ym.positions) || !same(xm.normals, ym.normals) || xm.uv != ym.uv ||
+        xm.indices != ym.indices || xm.uv_pins != ym.uv_pins || xm.uv_seams != ym.uv_seams ||
+        !SourcePaintAccess::same(SourcePaintAccess::maps(x), SourcePaintAccess::maps(y)) ||
+        !SourcePaintAccess::same(*paint.source_maps_, *anchor.source_maps_) ||
+        x.active_ != y.active_ || x.next_ != y.next_ || x.layers_.size() != y.layers_.size())
+      return false;
+    auto tiles = [&](const auto &l, const auto &r) {
+      for (size_t i = 0; i < std::max(l.size(), r.size()); ++i) {
+        if ((i & 31) == 0)
+          stop();
+        const auto *a = i < l.size() ? l[i].get() : nullptr,
+                   *b = i < r.size() ? r[i].get() : nullptr;
+        if (bool(a) != bool(b))
+          return false;
+        if (a && a != b && std::memcmp(a, b, sizeof(*a)))
+          return false;
+      }
+      return true;
+    };
+    for (size_t i = 0; i < x.layers_.size(); ++i) {
+      const auto &l = x.layers_[i], &r = y.layers_[i];
+      if (l.id != r.id || l.name != r.name || l.visible != r.visible ||
+          std::bit_cast<uint32_t>(l.opacity) != std::bit_cast<uint32_t>(r.opacity) ||
+          !tiles(l.tiles, r.tiles) || !tiles(l.pbr_tiles, r.pbr_tiles) ||
+          !tiles(l.emission_tiles, r.emission_tiles))
+        return false;
+      stop();
+    }
+    return true;
+  }
+  static std::shared_ptr<PaintedMesh> source(const PaintedMesh &paint,
+                                             const SourceMaterialBindings &binding,
+                                             const CreatorAppearance *appearance,
+                                             const DeformationState *deformation,
+                                             const std::function<bool()> &cancelled) {
+    auto stop = [&] {
+      if (cancelled && cancelled())
+        throw std::runtime_error("Native key source-alias adoption cancelled");
+    };
+    stop();
+    if (!binding.uv_origin || !binding.uv_origin->paint || paint.in_stroke() ||
+        !paint.valid_paint_sampling_attachment())
+      throw std::invalid_argument(
+          "Native key source alias requires an actual finished source raster");
+    binding.validate(true);
+    detail::source_paint_pairing(&paint, &binding, appearance, true);
+    detail::normal_frame_current_authority(binding, paint.mesh(), deformation, cancelled);
+    const auto &anchor = *binding.uv_origin->paint;
+    const auto &a = paint.mesh(), &b = anchor.mesh();
+    auto same = [](const auto &a, const auto &b) {
+      return a.size() == b.size() &&
+             (a.empty() || std::memcmp(a.data(), b.data(), a.size() * sizeof(a[0])) == 0);
+    };
+    const auto domain = paint.paint_sampling_domain(), prior = anchor.paint_sampling_domain();
+    const bool same_domain =
+        domain == prior && !domain.owner_before(prior) && !prior.owner_before(domain);
+    if (anchor.in_stroke() || !anchor.valid_paint_sampling_attachment() || !same_domain ||
+        paint.resolution() != anchor.resolution() ||
+        paint.surface_diagnostics().policy != anchor.surface_diagnostics().policy ||
+        !same(a.positions, b.positions) || !same(a.normals, b.normals) || !same(a.uv, b.uv) ||
+        a.indices != b.indices || a.uv_pins != b.uv_pins || a.uv_seams != b.uv_seams)
+      throw std::invalid_argument(
+          "Native key source alias differs from its exact declared current raster");
+    // The explicit domain2 witness names this source SurfaceMap. Full current
+    // material/field replay above independently grants its own authority; all
+    // current layers/maps/projections/baked event and cache remain current.
+    if (!source_alias(paint, anchor, cancelled))
+      throw std::invalid_argument(
+          "Native key declared source alias differs from complete original sampling ownership");
+    auto result = paint.snapshot();
+    result->surface_ = anchor.surface_;
+    result->sampling_attachment_ = anchor.sampling_attachment_;
+    if (anchor.source_sampling_prepared()) {
+      const bool same_maps = result->source_maps_ == anchor.source_maps_ &&
+                             !result->source_maps_.owner_before(anchor.source_maps_) &&
+                             !anchor.source_maps_.owner_before(result->source_maps_);
+      result->source_maps_ = anchor.source_maps_;
+      if (!same_maps) {
+        result->composite_cache_ = std::make_shared<PaintedMesh::CompositeCache>();
+        result->composite_token_ = next_composite_token();
+      }
+    }
+    detail::source_paint_pairing(result.get(), &binding, appearance, true);
+    detail::normal_frame_current_authority(binding, result->mesh(), deformation, cancelled);
+    stop();
+    return result;
+  }
+  static std::shared_ptr<PaintedMesh> adopt(const PaintedMesh &paint,
+                                            const SourceMaterialBindings &binding,
+                                            const CreatorAppearance *appearance,
+                                            const DeformationState *deformation,
+                                            const std::function<bool()> &cancelled) {
+    auto stop = [&] {
+      if (cancelled && cancelled())
+        throw std::runtime_error("Native key geometry adoption cancelled");
+    };
+    stop();
+    const auto node = binding.key_derivation;
+    if (!node || !node->valid_owner(node) || node->frames() != binding.normal_frames)
+      throw std::invalid_argument(
+          "Native key geometry adoption requires its actual owning material node");
+    node->validate(true, cancelled);
+    detail::source_paint_pairing(&paint, &binding, appearance, true);
+    detail::normal_frame_current_authority(binding, paint.mesh(), deformation, cancelled);
+    const auto &anchor = *node->before_paint();
+    auto same = [](const auto &a, const auto &b) {
+      return a.size() == b.size() &&
+             (a.empty() || std::memcmp(a.data(), b.data(), a.size() * sizeof(a[0])) == 0);
+    };
+    const auto &a = paint.mesh(), &b = anchor.mesh();
+    const auto domain = paint.paint_sampling_domain(), prior = anchor.paint_sampling_domain();
+    const bool same_domain =
+        domain == prior && !domain.owner_before(prior) && !prior.owner_before(domain);
+    auto result = paint.snapshot();
+    if (!same_domain || paint.resolution() != anchor.resolution() ||
+        paint.surface_diagnostics().policy != anchor.surface_diagnostics().policy ||
+        !same(a.positions, b.positions) || !same(a.normals, b.normals) || !same(a.uv, b.uv) ||
+        a.indices != b.indices || a.uv_pins != b.uv_pins || a.uv_seams != b.uv_seams)
+      return result;
+    // Full source/field replay above proves the owning model. Exact ordered
+    // geometry + actual independent grid-domain identity proves this raster
+    // is unchanged; geometry equality alone never grants field authority.
+    if (!source_alias(paint, anchor, cancelled))
+      return result;
+    result->surface_ = anchor.surface_;
+    result->sampling_attachment_ = anchor.sampling_attachment_;
+    if (anchor.source_sampling_prepared()) {
+      const bool same_maps = result->source_maps_ == anchor.source_maps_ &&
+                             !result->source_maps_.owner_before(anchor.source_maps_) &&
+                             !anchor.source_maps_.owner_before(result->source_maps_);
+      result->source_maps_ = anchor.source_maps_;
+      if (!same_maps) {
+        result->composite_cache_ = std::make_shared<PaintedMesh::CompositeCache>();
+        result->composite_token_ = next_composite_token();
+      }
+    }
+    stop();
+    return result;
+  }
+};
+
+namespace detail {
+std::shared_ptr<PaintedMesh> adopt_key_paint_geometry(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){return SourceKeyPaintAccess::adopt(paint,binding,appearance,deformation,cancelled);}
+std::shared_ptr<PaintedMesh> adopt_key_source_geometry(const PaintedMesh &paint,const SourceMaterialBindings &binding,const CreatorAppearance *appearance,const DeformationState *deformation,const std::function<bool()> &cancelled){return SourceKeyPaintAccess::source(paint,binding,appearance,deformation,cancelled);}
 }
 struct PolygonPaintAccess {
   static std::shared_ptr<PaintedMesh> rebuild(const PaintedMesh &source, Mesh target,

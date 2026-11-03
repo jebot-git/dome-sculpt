@@ -118,7 +118,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   else {
     // VRM already converted the mesh and current POSITION targets to source
     // axes. Check against retained native authority through its explicit basis.
-    const auto &origin=binding.uv_origin->paint->mesh();const size_t active=input.deformation && input.deformation->morphs?input.deformation->morphs->targets.size():0;
+    const auto &origin=frame_position_basis(binding);const size_t active=input.deformation && input.deformation->morphs?input.deformation->morphs->targets.size():0;
     if(input.mesh.indices.size()!=origin.indices.size() || set.current_targets.size()!=active)throw std::invalid_argument("Original frame export target/corner identity differs");
     for(size_t c=0;c<input.mesh.indices.size();++c){if((c&1023)==0 && cancelled && cancelled())throw std::runtime_error("Normal frame export cancelled");auto a=input.mesh.indices[c],b=origin.indices[c];if(length(to_native.rotate(input.mesh.positions.at(a))-origin.positions.at(b))>1e-5f)throw std::invalid_argument("Export rest positions differ from retained frame authority");for(size_t slot=0;slot<active;++slot){auto id=set.current_targets[slot];auto t=std::find_if(set.targets.begin(),set.targets.end(),[&](const auto &t){return t.id==id;});const auto &delta=t->positions.empty()?binding.uv_origin->deformation->morphs->targets.at(*t->origin_slot).delta:t->positions;if(length(to_native.rotate(input.deformation->morphs->targets[slot].delta.at(a))-delta.at(b))>1e-5f)throw std::invalid_argument("Export morph positions differ from retained frame authority");}}
     if(set.pbr) {
@@ -172,7 +172,14 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     auto appearance=std::make_shared<CreatorAppearance>(*input.appearance);appearance->source_vertices.clear();
     for(size_t v=0;v<layout.vertices.size();++v){auto corner=layout.corners[v];uint32_t id;
       if(!selected->source_vertices.empty())id=selected->source_vertices.at(corner);
-      else if(binding.uv_origin->appearance)id=binding.uv_origin->appearance->source_vertices.at(selected->origin_vertices.at(corner));
+      else if(binding.uv_origin->appearance){
+        auto original=selected->origin_vertices.at(corner);
+        // These are derived native POSITION vertices, not raw asset indices.
+        // Compose the authenticated original-native map before the owning
+        // appearance maps that separate domain into the actual source asset.
+        if(set.position_domain)original=set.position_domain->source_frame_vertices().at(original);
+        id=binding.uv_origin->appearance->source_vertices.at(original);
+      }
       else id=input.appearance->source_vertices.at(layout.vertices[v]);
       appearance->source_vertices.push_back(id);}
 
