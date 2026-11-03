@@ -19,7 +19,7 @@ int main(int argc,char**argv)try{
  const auto encoded=scene.encode();check(encoded.at("version")==28&&encoded.at("source_materials").at("version")==11&&encoded.at("source_materials").at("base_version")==10,"Writer composes actual28 sampling and physical11 over genuine owning key table10");
  scene.save(out/"source4-key-hdr.dsculpt");auto read=Scene::load(out/"source4-key-hdr.dsculpt");check(read.encode()==encoded,"Scene28 source/physical/key closure Save/reopen is exact");
  check(read.active().painted->valid_source_sampling_attachment()&&read.active().painted->source_sampling_original()->mesh().uv==original_uv&&!read.active().painted->has_physical_emission()&&read.active().material_bindings->key_derivation->before_paint()->has_physical_emission(),"Owning alias decode retains genuine original coordinates/proof and separate current/before physical planes");
- auto bad=encoded;bad["source_materials"]["base_version"]=9;check(refuses([&]{Scene::decode(bad);},"key"),"HDR wrapper cannot relabel genuine key records as unsupported old base9");
+ auto bad=encoded;bad["source_materials"]["base_version"]=9;check(refuses([&]{Scene::decode(bad);},"Key derivations require owning material10"),"HDR wrapper cannot relabel genuine key records as unsupported old base9");
  bad=encoded;bad["version"]=27;check(refuses([&]{Scene::decode(bad);},"source")&&scene.encode()==encoded,"Source4 remains an actual feature requirement in every key before-owner");
  ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;author_shapekey(read,target,restore);check(read.encode()==original,"Complete key Restore recovers original sampling, physical emission and all old artist/rig state");
  std::cout<<"PASS "<<checks<<" key/HDR/original-source integration checks\n";return 0;
