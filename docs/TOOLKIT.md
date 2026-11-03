@@ -1,5 +1,43 @@
 # Current DomeD toolkit and conventions
 
+The desktop application now requires canonical DomeD revision
+`b2f23ce68d92b9a43e62fddb3bb69fb6eec13d20` and its24th
+`fltk-1.4.5-process-cleanup.patch`. The native process display owner closes the
+connection only after App/widgets/GL/workers and before Fontconfig cleanup.
+CMake checks the builder-installed patch and its pinned checksum to reject
+older same-version toolkits with unsafe/incomplete explicit-close teardown.
+The source patch does not change bitmap helpers, appearance/menu conventions or
+public class layouts. This requirement applies to the desktop build; standalone
+headless compute configurations do not need a desktop toolkit.
+
+Prepare the toolkit from a checkout at that exact DomeD commit, as the regular
+user, with private paths. The existing verified bitmap runtime remains valid:
+
+```sh
+export PKG_CONFIG_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib/pkgconfig"
+export LD_LIBRARY_PATH="$PWD/artifacts/bitmap-runtime-eee23b7/lib"
+python3 "$DOME_TOOLKIT_SOURCE/scripts/prepare-fltk-experiment.py" \
+  --deps "$PWD/artifacts/toolkit-b2f23ce-deps" \
+  --prefix "$PWD/artifacts/toolkit-b2f23ce"
+export LD_LIBRARY_PATH="$PWD/artifacts/toolkit-b2f23ce/lib:$LD_LIBRARY_PATH"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOME_COMPUTE_BACKEND=CPU \
+  -DFLTK_DIR="$PWD/artifacts/toolkit-b2f23ce/share/fltk"
+cmake --build build --parallel 2
+```
+
+`DOME_TOOLKIT_SOURCE` denotes that source checkout. The prefix uses **lib**.
+The builder retains the verified archive, COPYING and all24 patches under
+`share/fltk-bdf-source`. The whole-toolkit sanitizer counterpart must retain the
+same source notices. New application integration evidence is pending separately;
+prior62b6417/application proofs below retain their original scopes. The toolkit
+component has clean native Wayland sanitizer evidence; its optional X11 fixture
+still reports800 bytes/two allocations in Cairo's Xlib source helper, also
+present in the old toolkit control. Standalone-XR's Mesa112-byte report is
+separate and remains unresolved. No suppression is introduced.
+
+## Earlier23-patch toolkit baseline
+
+
 Current canonical DomeD is `62b6417bb251aef8e00a1c3e8d4d1a69c043572b`, checked
 against remote main on 2026-11-03. Its toolkit hooks, bitmap patch directory and
 BDF helper are byte-identical to d271cf65c612a462fcfa6739416b06c6565be070.

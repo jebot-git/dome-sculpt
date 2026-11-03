@@ -6,6 +6,7 @@
 #include "desktop-framing.hpp"
 #include "spacenav-options.hpp"
 #include "native-fontconfig.hpp"
+#include "native-display-runtime.hpp"
 #include "dome/mesh.hpp"
 #include "dome/render.hpp"
 #include "dome/session-appearance.hpp"
@@ -1639,6 +1640,7 @@ int main(int argc, char **argv) try {
     return 0;
   }
   desktop::NativeFontconfigRuntime fontconfig;
+  desktop::NativeDisplayRuntime display;
   Fl_Window::default_xclass("org.domed.Sculpt");
   dx::init();
   App app;

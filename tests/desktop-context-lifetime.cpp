@@ -8,6 +8,7 @@
 #include <unistd.h>
 int main() try {
   desktop::NativeFontconfigRuntime fontconfig;
+  desktop::NativeDisplayRuntime display;
   dx::init();
   size_t checks=0;
   auto check=[&](bool ok,const char*message){if(!ok)throw std::runtime_error(message);++checks;std::cout<<"PASS "<<message<<'\n';};

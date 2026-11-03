@@ -806,6 +806,18 @@ endif()
 if(DOME_BUILD_UI)
   list(PREPEND CMAKE_PREFIX_PATH /opt/fltk-vr/toolkit/share/fltk)
   find_package(FLTK 1.4.5 EXACT CONFIG REQUIRED)
+  # Final process display teardown needs the canonical callback/ownership fixes.
+  # Check the builder's retained patch, rather than accepting an older same-
+  # version toolkit that leaks or accesses its deleted display driver at exit.
+  get_filename_component(dome_fltk_prefix "${FLTK_DIR}/../.." REALPATH)
+  set(dome_fltk_cleanup_patch "${dome_fltk_prefix}/share/fltk-bdf-source/fltk-1.4.5-process-cleanup.patch")
+  if(NOT EXISTS "${dome_fltk_cleanup_patch}")
+    message(FATAL_ERROR "Dome Sculpt needs the current canonical DomeD FLTK process-cleanup patch. Prepare the toolkit as documented in docs/TOOLKIT.md and set FLTK_DIR to its share/fltk directory.")
+  endif()
+  file(SHA256 "${dome_fltk_cleanup_patch}" dome_fltk_cleanup_sha256)
+  if(NOT dome_fltk_cleanup_sha256 STREQUAL "c40abb454f7cd648227cdaca8802a9f01073b992250accd10969c5b9627537c3")
+    message(FATAL_ERROR "The selected FLTK process-cleanup patch differs from the qualified canonical revision; update the pinned toolkit/provenance together.")
+  endif()
   find_package(OpenGL REQUIRED)
   find_library(DOME_GLU NAMES GLU libGLU.so.1 REQUIRED)
   find_package(PkgConfig REQUIRED)

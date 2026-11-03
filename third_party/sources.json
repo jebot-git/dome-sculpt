@@ -122,7 +122,7 @@
   },
   "domed_fltk": {
     "repository": "https://github.com/jebot-git/DomeD",
-    "commit": "eee23b759be31d9549e926f45b0f30237de2bb15",
+    "commit": "b2f23ce68d92b9a43e62fddb3bb69fb6eec13d20",
     "version": "1.4.5",
     "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
     "patches_in_application_order": [
@@ -148,7 +148,8 @@
       "native/toolkit-hooks/fltk-1.4.5-window-suspended.patch",
       "native/toolkit-hooks/fltk-1.4.5-touch-input.patch",
       "native/toolkit-hooks/fltk-1.4.5-pen-input.patch",
-      "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch"
+      "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch",
+      "native/toolkit-hooks/fltk-1.4.5-process-cleanup.patch"
     ],
     "patch_sha256": {
       "native/toolkit-hooks/fltk-1.4.5-bitmap-fonts.patch": "5a4318d315dae55e7e5d3fff18d3875d16a0a1886a413501d5e97ba51f6d6261",
@@ -173,12 +174,13 @@
       "native/toolkit-hooks/fltk-1.4.5-window-suspended.patch": "aa887b3d11a85e1470535253ff6cbfa7a00f5ad25c54be9acc5ef914f2f720d0",
       "native/toolkit-hooks/fltk-1.4.5-touch-input.patch": "80b54a5f69889f4197f1a3a7dfffaa8a70a493b1192983c0ae21ffaa588ce27a",
       "native/toolkit-hooks/fltk-1.4.5-pen-input.patch": "f90bab41cb33c949bd4efe2659f6e103d06611fdaeb98b06e8af0dd817f44152",
-      "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch": "3dc6e2f311db0661e1b8117afa0b4fbabfe84d356a75c8bace3cd39a5782eec2"
+      "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch": "3dc6e2f311db0661e1b8117afa0b4fbabfe84d356a75c8bace3cd39a5782eec2",
+      "native/toolkit-hooks/fltk-1.4.5-process-cleanup.patch": "c40abb454f7cd648227cdaca8802a9f01073b992250accd10969c5b9627537c3"
     },
-    "combined_patch_sha256": "f44bf778691abd5418756e0f427266ca205a2e45c262d63026799b9222dc92b2",
-    "used": "Canonical Release FLTK1.4.5 with all23 patches, native BDF/PCF selection, -O3/local CPU tuning, libraries in lib. Current application/runtime qualification is scoped separately from the older22-patch milestone.",
-    "verified_at_commit": "d271cf65c612a462fcfa6739416b06c6565be070",
-    "builder_sha256_at_verified_commit": "fe7db74e1763dc51c8362332751eefe4559aa25a654a000e4553e6afe91754ae"
+    "combined_patch_sha256": "d9e70caf0b983f4b12dfe6a345d0f7525af87812749a5b3f3880be7210455b18",
+    "used": "Canonical Release FLTK1.4.5 with all24 patches, native BDF/PCF, exception-safe process display cleanup and plugin construction; regular-user optimized lib prefix. Whole-toolkit sanitizer counterpart uses identical source/patches. Bitmap helper/runtime pins unchanged.",
+    "verified_at_commit": "b2f23ce68d92b9a43e62fddb3bb69fb6eec13d20",
+    "builder_sha256_at_verified_commit": "7a6bef76fcb22805ebcb655b17d8fc5f1bbf082991fab3be557c6a79fb136d44"
   },
   "vrm_specification": {
     "repository": "https://github.com/vrm-c/vrm-specification",
