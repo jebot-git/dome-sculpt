@@ -1,0 +1,148 @@
+{
+  "status": "private qualified test milestone; no main integration",
+  "source": "b8955ab",
+  "runtime": "byte-identical5344b43 runtime; only tests/CMake/receipts differ",
+  "route": "untyped native provided source5/current12; actual intrinsic normal projection1 and nonconstant positive PreparedAttributes Bake detail; no retained normal21 or Paint24 domain",
+  "fixture_precondition": "Original saved nonuniform pose/mix refused Bake correctly. Fixture explicitly rests/zeros for Bake, then restores saved pose/mix before independent seam Replace/Mirror. Guard unchanged; old refusal preserved.",
+  "native": {
+    "checks": 15,
+    "scope": "actual normal Bake kernel then detached owning key +real native Mirror fileworker, not actual Bake GUI worker",
+    "release_and_matched_san_TU": [
+      {
+        "name": "release",
+        "exit_code": 0,
+        "seconds": 0.1506895319907926,
+        "inputs_unchanged": true
+      },
+      {
+        "name": "sanitize",
+        "exit_code": 0,
+        "seconds": 1.877934441989055,
+        "inputs_unchanged": true
+      }
+    ],
+    "covers": [
+      "nonconstant positive normal detail",
+      "all current Paint bytes exact",
+      "real Scene22/material10/paired-normal5/Mirror3 capabilities",
+      "native Save/reopen",
+      "one UndoRedo",
+      "post-computation native publication Cancel",
+      "queued Save failure and exact source/file/history",
+      "exact retry",
+      "original provided source/Restore"
+    ]
+  },
+  "independent_manual_corner_oracle": {
+    "checks": 66,
+    "scope": "separately compiled10fe explicit corner-map endpoint oracle on R/SAN native files",
+    "runs": [
+      {
+        "name": "release",
+        "exit_code": 0,
+        "seconds": 0.023655052995309234,
+        "inputs_unchanged": true
+      },
+      {
+        "name": "sanitize",
+        "exit_code": 0,
+        "seconds": 0.5722703070205171,
+        "inputs_unchanged": true
+      }
+    ]
+  },
+  "fresh_owned_sanitizers": {
+    "build": {
+      "exit_code": 0,
+      "inputs_unchanged": true
+    },
+    "ctest": {
+      "exit_code": 0,
+      "seconds": 3.1938070410105865,
+      "inputs_unchanged": true
+    },
+    "registered_suites": 2,
+    "checks": [
+      15,
+      36
+    ],
+    "scope": "fresh whole C/C++ CPU core/support/render/native FLTK app O1 ASan+UBSan+leaks; actual native+graphics fixture executions, UI app build only",
+    "tracked_inputs": 1476,
+    "all_runtime_archives_and_binaries_exact": true,
+    "all_tracked_inputs_exact": true,
+    "reports": 0
+  },
+  "optimized_graphics": {
+    "exit_code": 0,
+    "seconds": 0.22136309900088236,
+    "inputs_unchanged": true,
+    "scope": "new final test TU on unchanged matched10fe optimized core/render/support"
+  },
+  "hardware": {
+    "checks": 36,
+    "independent_current_GLB_images": 9,
+    "poses": 3,
+    "new_key_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "simultaneous_original_key_weight": 0.2,
+    "max_pixel_error": 0,
+    "normal_map_sensitivity": 8,
+    "artist_NT_removal_sensitivity": true,
+    "second_eye_noop_extra_geometry_and_image_uploads": 0,
+    "before_commit_cancel_source_and_existing_file": "exact",
+    "device": "Intel / Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "drm": {
+      "renderD128": {
+        "pci": "0000:00:02.0",
+        "vendor": "0x8086",
+        "device": "0x4680"
+      },
+      "renderD129": {
+        "pci": "0000:03:00.0",
+        "vendor": "0x8086",
+        "device": "0x56a0"
+      }
+    },
+    "exit_code": 0,
+    "seconds": 0.4619708120007999,
+    "inputs_unchanged": true,
+    "inputs": 1489,
+    "source": "b8955ab",
+    "selector": "pci-0000_03_00_0",
+    "binary_scope": "optimized final oracle TU on unchanged matched10fe native core/render/support",
+    "software_hardware_negative": {
+      "actual_exit_code": 1,
+      "expected_rejection": true
+    }
+  },
+  "khronos": {
+    "module": "gltf-validator",
+    "version": "2.0.0-dev.3.10",
+    "files": 10,
+    "errors": 0,
+    "unfiltered_warnings": 10,
+    "warning_codes": {
+      "NODE_SKINNED_MESH_NON_ROOT": 10
+    },
+    "scope": "10 successful hardware GLBs; expected raw cancellation marker excluded explicitly; no issue filters, maxIssues0 unlimited"
+  },
+  "limits": [
+    "No main or currentVRM1/HDR/Source28 semantic union",
+    "No retained normal21/Paint24 or typed-MToon/VRM Mirror coverage",
+    "No actual CC0 female/male avatar symmetry",
+    "No new prepared-field GUI/controller command or Bake-UI evidence",
+    "No Mirror VRM output",
+    "Nonmatching triangulation/refinement/ambiguous mirror partition remain required",
+    "No physical HMD/session/system changes; no authoring compute acceleration claim"
+  ],
+  "artifacts": [
+    "artifacts/prepared-probe/",
+    "artifacts/prepared-worker/",
+    "artifacts/prepared-release-final/",
+    "artifacts/prepared-sanitize/",
+    "artifacts/prepared-arc/"
+  ]
+}
