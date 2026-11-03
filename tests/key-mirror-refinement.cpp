@@ -69,7 +69,8 @@ Vec3 at(const Mesh &m, const MirrorSurfacePoint &s) {
 }
 bool same(const KeyMirrorRefinement &a, const KeyMirrorRefinement &b) {
   if (a.source != b.source || a.opposite != b.opposite || a.corners.size() != b.corners.size() ||
-      a.maximum_rest_error != b.maximum_rest_error || a.work_units != b.work_units)
+      a.maximum_rest_error != b.maximum_rest_error || a.work_units != b.work_units ||
+      a.plane_offset != b.plane_offset)
     return false;
   for (size_t c = 0; c < a.corners.size(); ++c) {
     const auto &x = a.corners[c];
@@ -103,6 +104,34 @@ int main() try {
   check(refuses([&] { reflected_key_correspondence(*source, 1e-6f); }, "triangle refinement"),
         "Genuine opposite diagonals cannot use the historical corner bijection");
   const auto result = refine_reflected_key(source, 1e-6f);
+  check(same(result, refine_reflected_key(source, KeyMirrorPlane{0}, 1e-6f)),
+        "Historical zero-plane overload retains exact default geometry/provenance/work semantics");
+  auto shifted = std::make_shared<Mesh>(*source);
+  for (auto &p : shifted->positions)
+    p.x += .125f;
+  const auto shifted_positions = shifted->positions;
+  const auto shifted_result = refine_reflected_key(shifted, KeyMirrorPlane{.125}, 1e-6f);
+  bool plane_exact = shifted_result.plane_offset == .125 && shifted_result.source == shifted &&
+                     !shifted_result.source.owner_before(shifted) &&
+                     !shifted.owner_before(shifted_result.source) &&
+                     shifted_result.corners.size() == result.corners.size() &&
+                     shifted_result.opposite == result.opposite;
+  for (size_t c = 0; c < result.corners.size() && plane_exact; ++c) {
+    const auto &a = result.corners[c], &b = shifted_result.corners[c];
+    plane_exact &= length(b.position - (a.position + Vec3{.125f, 0, 0})) < 1e-7f &&
+                   a.current.triangle == b.current.triangle &&
+                   a.current.barycentric == b.current.barycentric &&
+                   a.reflected.triangle == b.reflected.triangle &&
+                   a.reflected.barycentric == b.reflected.barycentric;
+  }
+  check(plane_exact && same_positions(shifted->positions, shifted_positions),
+        "Explicit captured plane retains real source coordinates and exact source owners without "
+        "recentering");
+  check(refuses([&] { refine_reflected_key(shifted, 1e-6f); }, "hole") &&
+            same_positions(shifted->positions, shifted_positions),
+        "Default user zero plane is never silently shifted to the source center");
+  check(refuses([&] { refine_reflected_key(source, KeyMirrorPlane{NAN}, 1e-6f); }, "plane"),
+        "Nonfinite explicit plane refuses before derived output");
   check(result.source == source && source->positions.size() == 4 &&
             result.corners.size() > source->indices.size() && result.corners.size() % 3 == 0,
         "Detached refinement keeps the genuine raw4 source and owns newly derived corners");

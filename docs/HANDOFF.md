@@ -1165,3 +1165,17 @@ are finite diagnostic samples, not field authority/global-coincidence proof.
 Actual accepted/user planes stay exact. Read KEY-MIRROR-REFINEMENT.md. Conditional
 Scene29/key4/frame-position3 and genuine paint-domain2 context are next; full
 native/UI/artist/skin/paint/codec/export integration remains required.
+
+
+## Private explicit Mirror plane continuation
+
+The child ofc73b925 passes98 Release/98 own-SAN detached kernel checks. Zero-plane
+semantics remain exact; explicit offset retains actual source coordinates and
+owner. Crucially, declared hips planes make the existing strict triangle map
+accept BOTH actual avatar faces (588/596 vertices). Their next gap is genuine
+role-frame transport, not topology refinement. Current exact parity differs, so
+no artist interpretation/admission is claimed. Frame-relative-mirror and actual
+common-refinement are separate approved record4 kinds within owning29/material12;
+conditional Paint5/domain2/frame-position3/normal6 only apply when used. Full
+native/UI/persistence/render/export remain required; no public DTO/schema edits.
+Read KEY-MIRROR-PLANE.md and its receipt.

@@ -14,7 +14,7 @@ V operator-(V a, V b) { return {a.x - b.x, a.y - b.y, a.z - b.z}; }
 V operator*(V a, double b) { return {a.x * b, a.y * b, a.z * b}; }
 double dot(V a, V b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 V cross(V a, V b) { return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x}; }
-V reflected(V a) { return {-a.x, a.y, a.z}; }
+V reflected(V a, double offset = 0) { return {offset == 0 ? -a.x : 2 * offset - a.x, a.y, a.z}; }
 V point(Vec3 a) { return {a.x, a.y, a.z}; }
 struct P {
   double x, y;
@@ -110,12 +110,12 @@ struct Budget {
     v.reserve(capacity);
   }
 };
-std::array<V, 3> triangle(const Mesh &m, uint32_t t, bool mirror = false) {
+std::array<V, 3> triangle(const Mesh &m, uint32_t t, bool mirror = false, double offset = 0) {
   std::array<V, 3> v;
   for (size_t k = 0; k < 3; ++k) {
     v[k] = point(m.positions[m.indices[size_t(t) * 3 + k]]);
     if (mirror)
-      v[k] = reflected(v[k]);
+      v[k] = reflected(v[k], offset);
   }
   return v;
 }
@@ -163,6 +163,12 @@ bool same_weights(const std::array<double, 3> &a, const std::array<double, 3> &b
 } // namespace
 KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, float tolerance,
                                          const KeyMirrorLimits &limits) {
+  return refine_reflected_key(std::move(source), KeyMirrorPlane{}, tolerance, limits);
+}
+KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, KeyMirrorPlane plane,
+                                         float tolerance, const KeyMirrorLimits &limits) {
+  if (!std::isfinite(plane.offset) || !std::isfinite(plane.offset * 2))
+    throw std::invalid_argument("Invalid explicit Mirror plane");
   if (!source || !std::isfinite(tolerance) || tolerance <= 0 || tolerance > 1 ||
       !limits.max_bytes || limits.max_bytes > 256 * 1024 * 1024 || !limits.max_work ||
       limits.max_work > 256 * 1024 * 1024)
@@ -201,6 +207,7 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, flo
   }
   KeyMirrorRefinement out;
   out.source = source;
+  out.plane_offset = plane.offset;
   auto append_piece = [&](uint32_t t, const std::vector<MirrorRefinementCorner> &corners) {
     Polygon p;
     p.count = corners.size();
@@ -258,15 +265,15 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, flo
     for (uint32_t s = t; s < count; ++s) {
       budget.poll();
       const auto reflected_box =
-          Bounds{reflected({boxes[s].high.x, boxes[s].low.y, boxes[s].low.z}),
-                 reflected({boxes[s].low.x, boxes[s].high.y, boxes[s].high.z})};
+          Bounds{reflected({boxes[s].high.x, boxes[s].low.y, boxes[s].low.z}, plane.offset),
+                 reflected({boxes[s].low.x, boxes[s].high.y, boxes[s].high.z}, plane.offset)};
       if (!overlaps(boxes[t], reflected_box, tolerance))
         continue;
-      const auto b = triangle(*source, s, true);
-      bool plane = true;
+      const auto b = triangle(*source, s, true, plane.offset);
+      bool within_plane = true;
       for (auto p : b)
-        plane &= std::abs(dot(n, p - a[0])) <= double(tolerance) * nlen;
-      if (!plane)
+        within_plane &= std::abs(dot(n, p - a[0])) <= double(tolerance) * nlen;
+      if (!within_plane)
         continue;
       std::array<P, 3> bp;
       Polygon pb;
@@ -289,7 +296,8 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, flo
         MirrorRefinementCorner c;
         c.current = {t, bary(intersection.p[k], ap)};
         c.reflected = {s, bary(intersection.p[k], bp)};
-        const auto p = evaluate(*source, c.current), q = reflected(evaluate(*source, c.reflected));
+        const auto p = evaluate(*source, c.current),
+                   q = reflected(evaluate(*source, c.reflected), plane.offset);
         c.position = {float(p.x), float(p.y), float(p.z)};
         const double error = std::sqrt(dot(p - q, p - q));
         if (error > tolerance)
@@ -389,7 +397,7 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, flo
     const auto &a = out.corners[c];
     const auto &b = out.corners[out.opposite[c]];
     const auto stored = point(a.position), current = evaluate(*source, a.current),
-               mirrored = reflected(evaluate(*source, a.reflected));
+               mirrored = reflected(evaluate(*source, a.reflected), plane.offset);
     const double represented_error = std::sqrt(std::max(dot(stored - current, stored - current),
                                                         dot(stored - mirrored, stored - mirrored)));
     if (represented_error > tolerance)
