@@ -456,15 +456,17 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   if(!normal_prepared){
     if(input.contains("normal_preparations"))throw std::invalid_argument("Normal preparations require material archive4");
     for(const auto &b:input.at("bindings"))if(b.contains("normal_preparation"))throw std::invalid_argument("Normal preparation references require material archive4");
-    for(const auto &p:input.at("paints"))if(p.contains("normal_projection")||(p.contains("baked")&&p.at("baked").at("version")==3))throw std::invalid_argument("Prepared normal paint requires material archive4");
+    for(const auto &record:input.at("paints"))detail::visit_paint_archive_payloads(record,input.at("version")==9,context,[&](const nlohmann::json &p){
+      if(p.contains("normal_projection")||(p.contains("baked")&&p.at("baked").at("version")==3))throw std::invalid_argument("Prepared normal paint requires material archive4");
+    });
   }
   if(!prepared) {
     if(input.contains("color_preparations"))throw std::runtime_error("Color preparations require material archive3");
     for(const auto &b:input.at("bindings"))if(b.contains("color_preparation"))throw std::runtime_error("Color preparation references require material archive3");
-    for(const auto &p:input.at("paints")) {
+    for(const auto &record:input.at("paints"))detail::visit_paint_archive_payloads(record,input.at("version")==9,context,[&](const nlohmann::json &p) {
       if(p.contains("color_projection") || (p.contains("baked") && p.at("baked").at("version")!=1))throw std::runtime_error("Prepared paint requires material archive3");
       for(const auto &l:p.at("layers"))if(l.contains("pbr_color_tiles"))throw std::runtime_error("Prepared paint layers require material archive3");
-    }
+    });
   }
   if(!extended){if(input.contains("normal_frames"))throw std::runtime_error("Normal frames require material archive2");for(const auto &o:input.at("origins"))if(o.contains("deformation")||o.contains("creator"))throw std::runtime_error("Native frame origin requires material archive2");for(const auto &b:input.at("bindings"))if(b.contains("frames") || b.contains("sampling_reparameterized"))throw std::runtime_error("Normal frame references require material archive2");}
   deformation_entries(input);

@@ -33,4 +33,10 @@ inline const nlohmann::json &paint_archive_payload(const nlohmann::json &input,b
   paint_archive_payload(input.at("before"),false);
   return paint_archive_payload(input.at("payload"),false);
 }
+template<class F> void visit_paint_archive_payloads(const nlohmann::json &input,bool owning_domain,
+                                                    const SourcePaintDecodeContext &context,F &&visit){
+  const auto &payload=paint_archive_payload(input,owning_domain,context);
+  if(input.contains("version")&&input.at("version")==4)visit(input.at("before"));
+  visit(payload);
+}
 } // namespace dome::detail
