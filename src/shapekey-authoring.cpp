@@ -114,6 +114,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;o.rig_source=origin.rig_source;
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
+ if(edit.action==ShapeKeyAction::Mirror&&(!std::isfinite(edit.mirror_plane)||std::abs(edit.mirror_plane)>1e6||size_t(edit.mirror_frames)>1))throw std::invalid_argument("Invalid explicit Mirror plane or frame interpretation");
  const auto &rest=source.painted->mesh();rest.validate();
  const MorphSet empty(rest);const auto &keys=source.deformation&&source.deformation->morphs?*source.deformation->morphs:empty;
  const size_t count=keys.targets.size();
@@ -127,6 +128,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
  std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
  if(detail::needs_independent_key_domain(source,edit))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
+ if(edit.action==ShapeKeyAction::Mirror&&(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored))throw std::invalid_argument("Explicit-plane frame conversion requires genuine owning native frame authority");
  if(source.material_bindings&&source.material_bindings->normal_preparation)
   return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
  auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));if(!deform->morphs)deform->morphs=MorphSet(rest);

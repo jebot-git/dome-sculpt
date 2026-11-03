@@ -4,6 +4,10 @@
 #include "dome/normal-preparation.hpp"
 #include "frame-position-domain.hpp"
 namespace dome::detail {
+struct DerivedMirrorConversion {
+  double plane=0;
+  ShapeKeyMirrorFrames frames=ShapeKeyMirrorFrames::ExactAuthored;
+};
 struct DerivedKeyTarget {
   uint64_t id=0;
   // Actual stable target in the owning anchor; null means an authored zero
@@ -12,6 +16,7 @@ struct DerivedKeyTarget {
   std::optional<uint64_t> reference;
   // Mirror record3: actual reflected-corner proof from this fixed anchor.
   std::optional<float> mirror_tolerance;
+  std::optional<DerivedMirrorConversion> mirror_conversion;
 };
 class SourceKeyDerivation {
 public:
@@ -24,6 +29,7 @@ public:
   const auto &position_domain() const noexcept{return domain_;}
   const auto &frames() const noexcept{return frames_;}
   const auto &targets() const noexcept{return targets_;}
+  bool uses_explicit_mirror() const noexcept;
   const std::vector<Vec3> &positions(uint64_t id) const;
   void validate(bool deep=true,const std::function<bool()> &cancelled={}) const;
 private:

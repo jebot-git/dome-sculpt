@@ -16,6 +16,6 @@ public:
       uint32_t current_binding,
       const std::vector<std::shared_ptr<const SourceMaterialBindings>> &earlier,
       const PaintResolver &,KeyFrameArchive &,const CreatorAssetArchive &,
-      const std::function<bool()> &cancelled={});
+      const std::function<bool()> &cancelled={},bool explicit_mirror_capability=false);
 };
 } // namespace dome::detail

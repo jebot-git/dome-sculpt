@@ -20,7 +20,7 @@ void edit_shapekey_dialog(Document &doc,ShapeKeyAction action){
  const char *title=action==ShapeKeyAction::Mirror?"Mirror shapekey":action==ShapeKeyAction::Duplicate?"Duplicate shapekey":action==ShapeKeyAction::Rename?"Rename shapekey":action==ShapeKeyAction::CaptureMix?"Capture shape mix":"New shapekey";
  DomeDialog window(width,height,title);Fl_Scroll scroll(0,0,width,height-row*2);scroll.type(Fl_Scroll::VERTICAL);
  Fl_Group content(0,0,width-24,row*6);content.resizable(nullptr);
- const char *help="Original mesh state stays restorable.\nMirror uses the local X=0 plane.";
+ const char *help=action==ShapeKeyAction::Mirror?"Mirror uses the entered local X plane. Relative mode converts artist-frame deltas; the complete original stays restorable.":"Original mesh state stays restorable.";
  fl_font(dx::font,dx::size);int text_width=width-56,header=0;fl_measure(help,text_width,header,0);header=std::max(row*2,header+16);
  Fl_Box hint(16,4,width-56,header-4,help);hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
  int y=header+row;Fl_Choice target(20,y,width-64,row-4,"Source target");target.align(FL_ALIGN_TOP_LEFT);y+=row*2;
@@ -28,15 +28,18 @@ void edit_shapekey_dialog(Document &doc,ShapeKeyAction action){
  Fl_Input name(20,y,width-64,row-4,"Name (empty: automatic)");name.align(FL_ALIGN_TOP_LEFT);y+=row*2;
  if(action==ShapeKeyAction::Rename)name.value(keys->targets[state->morph_target].name.c_str());
  Fl_Value_Input tolerance(20,y,width-64,row-4,"Local tolerance (mm)");tolerance.align(FL_ALIGN_TOP_LEFT);y+=row;tolerance.bounds(.001,1000);tolerance.step(.01);tolerance.value(.1);if(action!=ShapeKeyAction::Mirror)tolerance.deactivate();
+ Fl_Value_Input plane(20,y+row,width-64,row-4,"Plane X (mm)");plane.align(FL_ALIGN_TOP_LEFT);y+=row*3;plane.bounds(-1e9,1e9);plane.step(.001);plane.value(0);
+ Fl_Choice frames(20,y,width-64,row-4,"Artist frames");frames.align(FL_ALIGN_TOP_LEFT);frames.add("Exact authored reflection|Relative artist-frame conversion");frames.value(0);y+=row*2;if(action!=ShapeKeyAction::Mirror){plane.deactivate();frames.deactivate();}
  content.size(width-24,y+16);content.end();scroll.end();
  int button_width=std::min(width/2-24,std::max(140,dx::size*9));
  Fl_Button cancel(width/2-button_width-10,height-row*2+8,button_width,row,"Cancel"),apply(width/2+10,height-row*2+8,button_width,row,"Apply");
- struct State{Fl_Window *window;Fl_Choice *target;Fl_Input *name;Fl_Value_Input *tolerance;ShapeKeyAction action;std::optional<ShapeKeyEdit> request;} local{&window,&target,&name,&tolerance,action,{}};
+ struct State{Fl_Window *window;Fl_Choice *target;Fl_Input *name;Fl_Value_Input *tolerance,*plane;Fl_Choice *frames;ShapeKeyAction action;std::optional<ShapeKeyEdit> request;} local{&window,&target,&name,&tolerance,&plane,&frames,action,{}};
  target.callback([](Fl_Widget*,void *p){auto &s=*static_cast<State*>(p);if(s.action==ShapeKeyAction::Rename)s.name->value(s.target->text());},&local);
  cancel.callback([](Fl_Widget *w,void*){w->window()->hide();});
  apply.callback([](Fl_Widget*,void *p){auto &s=*static_cast<State*>(p);try{
   ShapeKeyEdit edit;edit.action=s.action;edit.target=uint32_t(std::max(0,s.target->value()));edit.name=s.name->value();
   double value=s.tolerance->value();if(!std::isfinite(value)||value<.001||value>1000)throw std::invalid_argument("Mirror tolerance is outside the supported range");edit.mirror_tolerance=float(value*.001);
+  if(s.action==ShapeKeyAction::Mirror){const auto x=s.plane->value();if(!std::isfinite(x)||std::abs(x)>1e9)throw std::invalid_argument("Mirror plane is outside the supported local range");edit.mirror_plane=x*.001;edit.mirror_frames=s.frames->value()==0?ShapeKeyMirrorFrames::ExactAuthored:ShapeKeyMirrorFrames::BaseRelative;}
   if(s.action==ShapeKeyAction::Rename&&edit.name.empty())throw std::invalid_argument("Enter a nonempty shape name");s.request=std::move(edit);s.window->hide();
  }catch(const std::exception &e){fl_alert("%s",e.what());}},&local);
  window.end();window.set_modal();dx::style(&window);window.show();cancel.take_focus();while(window.shown())Fl::wait();
