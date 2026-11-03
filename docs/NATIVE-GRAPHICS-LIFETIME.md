@@ -40,3 +40,8 @@ this component. Earlier observation setup failures (missing private Xvfb PATH,
 then an assumed unbuilt parent runtime) are retained separately from the
 corrected explicit-mode runs. No system package, active session or physical
 headset was changed. The complete production goal remains incomplete.
+
+The subsequent [native display integration](NATIVE-DISPLAY-LIFETIME.md) qualifies
+the actual desktop connection owner with the corrected canonical FLTK/Cairo
+stack. Its stronger current native Wayland scope is separate from this original
+EGL-only component; the standalone-XR Mesa report remains open.

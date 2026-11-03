@@ -1,5 +1,22 @@
 # Dome Sculpt production handoff
 
+## Native display lifetime integration — 2026-11-03
+
+The next qualified integration extends published `bd2bcde` with explicit desktop
+display ownership, exception-safe partial EGL cleanup and the matching canonical
+DomeD `f797e0f` FLTK/Cairo stack. Affected Release10/10 and whole-owned sanitizer
+10/10, actual native Wayland/universal-menu11+11 and launcher desktop2+2 pass.
+Current OneAPI/CUDA/ROCm app component relinks and actual A770 GL/compute
+synthetic-XR7 pass with their explicit matching-support scope. These are selected
+checks, not a fresh full-regression/all-vendor-build or physical-device claim.
+Read [NATIVE-DISPLAY-LIFETIME.md](NATIVE-DISPLAY-LIFETIME.md) and its receipt for
+exact source boundaries, preserved initial capture/cache failures and source
+hashes. The standalone-XR Mesa112-byte allocation report remains unresolved.
+The full goal remains active and incomplete; robust weights, independent seam
+keys, broader VRM1/FBX/interoperability, remaining GPU/production/device work and
+post-basic controller drawers are still required. No system or session changed.
+
+
 The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
