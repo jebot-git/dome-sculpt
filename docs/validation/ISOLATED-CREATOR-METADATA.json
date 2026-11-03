@@ -1,0 +1,81 @@
+{
+  "scope": "Private portable creator-metadata isolation guard; Release proof within coherent source-assisted workflow, not fresh guard-only/SAN/main admission",
+  "ancestor": "13a86c281cd3d85abd3383109986149a7f08e059",
+  "release": {
+    "ctest_passed": 2,
+    "ctest_total": 2,
+    "seconds": 19.09,
+    "metadata_checks": 43,
+    "encoded_fields": 21,
+    "encoded_components": 30,
+    "source_workflow_checks": 21
+  },
+  "audit": {
+    "inputs": 1624,
+    "mismatches": 0
+  },
+  "preserved_negatives": [
+    "original native5/6",
+    "pinned diagnostic exact Scene/held",
+    "original-helper independent failure"
+  ],
+  "remaining": [
+    "whole-owned sanitizer qualification",
+    "fresh root/main integration",
+    "independent full automatic-weight qualification"
+  ],
+  "files": {
+    "src/document-authority.hpp": {
+      "sha256": "72e7201811e46ebcc8e0aa32a7c646bbc6a0afd345bdf69c8b3568518919c218",
+      "bytes": 4106
+    },
+    "tests/isolated-humanoid.cpp": {
+      "sha256": "0a27d9917a4f21706e76873b93abe0612245c8e34deff6ed2d7a4dedd8c8e13a",
+      "bytes": 6549
+    },
+    "artifacts/isolated-humanoid-old-negative.log": {
+      "sha256": "4156eccbc1d80b79206f499f3b0517f320c14b4b33618e0621805abb1cd7ce56",
+      "bytes": 57
+    },
+    "artifacts/isolated-humanoid-old-binary": {
+      "sha256": "a460d324094858190dea37ed44058c97e2cdd9b55b4d5636431df4277b03c7f7",
+      "bytes": 10653736
+    },
+    "artifacts/native-full-tests.log": {
+      "sha256": "026533a3148e101cba2407a7f4badbfca71ad672ef318953d9ec9d546f676c18",
+      "bytes": 2292
+    },
+    "artifacts/native-held-diagnostic.log": {
+      "sha256": "e3a454e7397c26abd304cec449b9f34cefcb854247928d09dec72f9b04a16195",
+      "bytes": 1479
+    },
+    "artifacts/isolated-humanoid-fixed-tests.log": {
+      "sha256": "714b230dad233f7bcb17683790cadf3be12fbfcddc5e64ae64782ac180b2b167",
+      "bytes": 395
+    },
+    "artifacts/isolated-humanoid-fixed-before.json": {
+      "sha256": "e3a0e23d2418aad295e7c1c45c045caced9cd36282698dfd45d3bd671fc3623a",
+      "bytes": 167886
+    },
+    "artifacts/isolated-humanoid-fixed-after.json": {
+      "sha256": "f7d724f4818bbe5218c0e57ac9877dda1a1b2b999ac51c9b5cf820ea98156cba",
+      "bytes": 41
+    },
+    "build/dome-sculpt": {
+      "sha256": "1d6dea75941d99225f348c5c83569c1548f12410454e3a1dabd43e7683ddaf7e",
+      "bytes": 11930240
+    },
+    "build/libdome-sculpt-core.a": {
+      "sha256": "dede4ceb114bade973eaff78eaf9f6e0ee26045dbdf9045ac6fafca1b189a693",
+      "bytes": 27830296
+    },
+    "build/dome-sculpt-isolated-humanoid-test": {
+      "sha256": "aa27e9fe449e0c48a3cff8dcb4a9e00ca9adb2918bc7b477a8595ffa0a1f5042",
+      "bytes": 10653784
+    },
+    "build/dome-sculpt-source-visible-document-test": {
+      "sha256": "90d1ed6d5e532566e6642198316f2f13e7b667f5cfff932dfff233c958ceea22",
+      "bytes": 10645072
+    }
+  }
+}
