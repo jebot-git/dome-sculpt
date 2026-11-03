@@ -16,7 +16,11 @@ import_fixture::Fixture input(int kind){
  auto &m=f.j["materials"][0];
  if(kind!=0&&kind!=2)m["pbrMetallicRoughness"].erase("baseColorTexture");
  if(kind>=1&&kind<=3){m["extensions"]["VRMC_materials_mtoon"]={{"specVersion","1.0"}};f.j["extensionsUsed"].push_back("VRMC_materials_mtoon");
-  if(kind==1||kind==2){m["extensions"]["VRMC_materials_mtoon"]["shadeMultiplyTexture"]={{"index",0},{"texCoord",1}};m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]={.4f,.6f,.8f};}
+  if(kind==1||kind==2){
+   auto &mt=m["extensions"]["VRMC_materials_mtoon"];mt["shadeMultiplyTexture"]={{"index",0},{"texCoord",1},{"extensions",{{"KHR_texture_transform",{{"offset",{.13f,-.27f}},{"scale",{.8f,1.1f}},{"rotation",.17f},{"texCoord",1}}}}}};
+   mt["shadeColorFactor"]={.4f,.6f,.8f};mt["shadingShiftFactor"]=-1;mt["shadingToonyFactor"]=0;
+   f.j["extensionsUsed"].push_back("KHR_texture_transform");
+  }
   if(kind==3){m["extensions"]["VRMC_materials_mtoon"]["matcapTexture"]={{"index",0}};m["extensions"]["VRMC_materials_mtoon"]["matcapFactor"]={.4f,.3f,.2f};}
  }
  if(kind>=4){m["alphaMode"]="OPAQUE";m.erase("alphaCutoff");}
@@ -29,7 +33,7 @@ void zero_emission(Scene &scene){for(const auto &o:scene.objects())if(o.mesh_act
 }}
 }
 int main(int argc,char **argv)try{
- if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<'\n';check(argc<3||std::string_view(argv[2])!="--hardware"||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Requested import hardware proof requires actual A770");Fbo fbo;fbo.bind();SurfaceRenderer renderer;int maximum=0;
+ if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<'\n';check(argc<3||std::string_view(argv[2])!="--hardware"||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Requested import hardware proof requires actual A770");Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_frame_time(0);int maximum=0;
  Scene original;original.active().visible=false;const auto original_bytes=original.encode();ImportAuthoringOptions raw_options;raw_options.paint_resolution=64;auto atlas_options=raw_options;atlas_options.prepare_texture_atlas=true;
  for(int kind=0;kind<6;++kind){auto source=input(kind);const auto path=out/("case"+std::to_string(kind)+".glb");source.save(path);auto raw=prepare_authoring_import(original,path,raw_options),prepared=prepare_authoring_import(original,path,atlas_options);
   check(original.encode()==original_bytes&&prepared.objects.size()==1,"Actual initial source-aware import preserves caller and selected hierarchy");const auto id=prepared.objects[0];const auto &object=prepared.scene.object(id);const auto &paint=*object.painted;
@@ -44,6 +48,11 @@ int main(int argc,char **argv)try{
   for(bool pbr:{false,true}){if(pbr){a.shading(false);b.shading(false);}else{a.authored_shading();b.authored_shading();}settle(a);settle(b);
    const auto wanted=draw(renderer,a.frame().surface),actual=draw(renderer,b.frame().surface);const int error=delta(wanted,actual);maximum=std::max(maximum,error);size_t visible=0;for(size_t n=3;n<wanted.size();n+=4)visible+=wanted[n]>0;
    std::cout<<"IMPORT kind="<<kind<<" pbr="<<pbr<<" covered="<<visible<<" max="<<error<<'\n';check(visible>20&&error<=2,"Actual imported original/painted/reopened authored and PBR pixels retain source sampling and role frames");
+   if(!pbr&&(kind==1||kind==2)){
+    auto wrong=restart.snapshot();auto material=std::make_shared<SourceMaterialBindings>(*wrong.active().material_bindings);material->material.textures[1].texcoord=0;material->material.textures[1].transform_texcoord=0;wrong.active().material_bindings=std::move(material);Document control;control.replace(wrong);settle(control);
+    check(delta(actual,draw(renderer,control.frame().surface))>4,"Independent UV0 substitution visibly changes the actual UV1 shade role");
+    draw(renderer,b.frame().surface);
+   }
    auto uploads=renderer.buffer_stats();check(draw(renderer,b.frame().surface)==actual&&renderer.buffer_stats().geometry_uploads==uploads.geometry_uploads,"Actual source-aware import second eye reuses immutable geometry");
   }
   if(kind==2){const auto packet=paint.preview(object.material)->overlay;check(packet->original_uv0()==paint.source_maps()->uv1&&packet->original_uv1()!=paint.source_maps()->uv1,"Generated UV0 carrier1 stays distinct from actual authored logical UV1");}
