@@ -6,6 +6,8 @@
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
 #include "polygon-conversion.hpp"
+#include "polygon-color-target.hpp"
+#include <set>
 namespace dome::detail {
 namespace {
 bool same_vectors(const std::vector<Vec3> &a,const std::vector<Vec3> &b){
@@ -37,6 +39,56 @@ void domain_key_budget(const DeformationState *base,size_t vertices,size_t targe
   if(base){add(base->pose.size());for(const auto &pose:base->pose)if(pose.full_local_matrix)add(16);
     if(base->skin)for(size_t v=0;v<base->skin->vertices.size();++v){if((v&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Prepared key remap cancelled");add(base->skin->vertices[v].size());}}
   if(targets&&vertices>(limit-entries)/targets)throw std::length_error("Prepared key target arrays exceed native deformation quota");
+}
+
+
+// Rewinding the paint/model alone is insufficient: the live object's topology
+// may already describe a later UV layout. A prepared corner descriptor owns the
+// actual earlier topology/field; validate it against the earlier REST paint
+// before constructing this detached control state. The live authority is never
+// replaced. Its genuine retained origin chain is preserved in the rewind.
+std::shared_ptr<const PolygonAuthority> key_before_polygon(const SculptObject &source,
+    const std::shared_ptr<const PaintedMesh> &paint,
+    const std::shared_ptr<const SourceMaterialBindings> &binding,
+    const std::function<bool()> &cancelled){
+  const auto current=source.polygon;if(!current||!current->active)return current;
+  PolygonLimits limits;limits.cancelled=cancelled;
+  if(const auto colours=binding?binding->color_preparation:nullptr;colours&&colours->current_descriptor()){
+    const auto &descriptor=*colours->current_descriptor();
+    polygon_color_owner(current.get(),source.material_bindings?source.material_bindings->color_preparation.get():nullptr,true);
+    polygon_target_colors(paint->mesh(),descriptor,cancelled);
+    auto before=std::make_shared<PolygonAuthority>(*current);
+    before->topology=*descriptor.topology;before->colors=descriptor.field;
+    polygon_color_owner(before.get(),colours.get(),true);
+    validate_polygon_derivative(*before,paint.get(),true,limits);
+    return before;
+  }
+  // Without a colour descriptor, geometry equality cannot supply a corner
+  // field. Follow only an uncoloured authority attached to the exact original
+  // SurfaceMap/domain owner, and reject competing historical certificates.
+  auto same_owner=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
+  auto own_mesh=[&](const PaintedMesh *candidate){return candidate&&same_owner(candidate->mesh_owner(),paint->mesh_owner())&&same_owner(candidate->paint_sampling_domain(),paint->paint_sampling_domain());};
+  std::shared_ptr<const PolygonAuthority> found;
+  auto accept=[&](const std::shared_ptr<const PolygonAuthority> &candidate,const PaintedMesh *owner){
+    if(!candidate||!candidate->active||candidate->colors||!own_mesh(owner))return;
+    validate_polygon_derivative(*candidate,paint.get(),true,limits);
+    if(found&&!same_owner(found,candidate))throw std::invalid_argument("Prepared key topology rewind has ambiguous historical authorities");
+    found=candidate;
+  };
+  accept(current,source.painted.get());
+  std::set<const PolygonOrigin*> visited;
+  std::function<void(const std::shared_ptr<const PolygonOrigin>&,size_t)> find;
+  find=[&](const auto &origin,size_t depth){
+    if(!origin)return;if(cancelled&&cancelled())throw std::runtime_error("Prepared key topology rewind cancelled");
+    if(depth>32||visited.size()>=512)throw std::length_error("Prepared key topology rewind exceeds retained history budget");
+    if(!visited.insert(origin.get()).second)return;
+    accept(origin->polygon,origin->paint.get());
+    if(origin->polygon)find(origin->polygon->origin,depth+1);
+    find(origin->shape_source,depth+1);find(origin->rig_source,depth+1);
+  };
+  find(current->origin,1);find(source.shape_source,1);find(source.rig_source,1);
+  if(found)return found;
+  throw std::invalid_argument("Prepared key topology rewind requires its genuine before-domain authority");
 }
 
 // UV correspondence is an authored identity, not a nearest-position query.
@@ -142,6 +194,7 @@ ShapeKeyResult author_domain_prepared_key(Scene &scene, uint64_t object,
   input.material_bindings = before_material;
   input.appearance = before_appearance;
   input.deformation = std::move(before_deform);
+  input.polygon=key_before_polygon(source,input.painted,input.material_bindings,cancelled);
   auto result = author_prepared_normal_shapekey(detached, object, mapped, cancelled);
   if (!result.changed) return result;
   const auto &edited = detached.object(object);
@@ -257,6 +310,7 @@ ShapeKeyResult author_prepared_normal_shapekey(Scene &scene,uint64_t object,cons
   Scene detached=scene;auto &input=detached.object(object);
   input.painted=recipe.original_paint->snapshot();input.appearance=recipe.original_appearance;
   input.deformation=std::move(before_deform);input.material_bindings=std::move(before_binding);input.shape_source=capsule;
+  input.polygon=key_before_polygon(source,input.painted,input.material_bindings,cancelled);
   ShapeKeyEdit mapped=edit;
   if(edit.action==ShapeKeyAction::Replace){
     std::vector<Vec3> delta(current.positions.size());
