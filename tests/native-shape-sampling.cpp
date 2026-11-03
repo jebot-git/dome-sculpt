@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define DOME_PAINT_SAMPLING_RENDER_NO_MAIN
+#include "paint-sampling-render.cpp"
+#undef DOME_PAINT_SAMPLING_RENDER_NO_MAIN
+#include "dome/shapekey-sculpt.hpp"
+#include <atomic>
+#include <thread>
+#include <pthread.h>
+namespace refresh_test {
+std::atomic_bool throttle=false,owners=true,geometry_changed=false;
+std::atomic_size_t queries=0;
+bool same_points(std::span<const Vec3>a,std::span<const Vec3>b){return a.size()==b.size()&&std::equal(a.begin(),a.end(),b.begin(),[](Vec3 x,Vec3 y){return x.x==y.x&&x.y==y.y&&x.z==y.z;});}
+std::vector<Vec3> initial_geometry; // Accessed only by the single native worker.
+bool native_thread(){char name[16]{};return !pthread_getname_np(pthread_self(),name,sizeof(name))&&std::string_view(name)=="dome-native";}
+void reset(){queries=0;owners=true;geometry_changed=false;initial_geometry.clear();}
+}
+extern "C" bool real_stamp(ShapeSculptDraft*,const Brush&,const std::function<bool()>&) asm("__real__ZN4dome16ShapeSculptDraft5stampERKNS_5BrushERKSt8functionIFbvEE");
+extern "C" bool wrap_stamp(ShapeSculptDraft*d,const Brush&b,const std::function<bool()>&c) asm("__wrap__ZN4dome16ShapeSculptDraft5stampERKNS_5BrushERKSt8functionIFbvEE");
+extern "C" bool wrap_stamp(ShapeSculptDraft*d,const Brush&b,const std::function<bool()>&c){
+ // Exercise the production30ms preview boundary deterministically; completion
+ // is acknowledged through published native_samples/mesh, never a UI sleep.
+ auto due=std::chrono::steady_clock::now()+std::chrono::milliseconds(40);
+ auto changed=real_stamp(d,b,c);if(refresh_test::throttle)std::this_thread::sleep_until(due);return changed;
+}
+extern "C" void real_query(MaterialSurfaceQuery*,const Mesh&,std::span<const SurfaceRange>,const std::function<bool()>&,std::span<const std::array<float,4>>,PaintCornerCoordinates) asm("__real__ZN4dome20MaterialSurfaceQueryC1ERKNS_4MeshESt4spanIKNS_12SurfaceRangeELm18446744073709551615EERKSt8functionIFbvEES4_IKSt5arrayIfLm4EELm18446744073709551615EENS_22PaintCornerCoordinatesE");
+extern "C" void wrap_query(MaterialSurfaceQuery*,const Mesh&,std::span<const SurfaceRange>,const std::function<bool()>&,std::span<const std::array<float,4>>,PaintCornerCoordinates) asm("__wrap__ZN4dome20MaterialSurfaceQueryC1ERKNS_4MeshESt4spanIKNS_12SurfaceRangeELm18446744073709551615EERKSt8functionIFbvEES4_IKSt5arrayIfLm4EELm18446744073709551615EENS_22PaintCornerCoordinatesE");
+extern "C" void wrap_query(MaterialSurfaceQuery*q,const Mesh&m,std::span<const SurfaceRange>r,const std::function<bool()>&c,std::span<const std::array<float,4>>rgba,PaintCornerCoordinates uv){
+ if(refresh_test::native_thread()){
+  if(r.size()!=1||!r[0].paint_sampling_attachment||!r[0].normal_preview_proof||uv.values.size()!=m.indices.size()||r[0].paint_winding_reversed)refresh_test::owners=false;
+  if(refresh_test::queries++==0)refresh_test::initial_geometry=m.positions;
+  else if(!refresh_test::same_points(m.positions,refresh_test::initial_geometry))refresh_test::geometry_changed=true;
+ }
+ real_query(q,m,r,c,rgba,uv);
+}
+namespace {
+void done(Document&d){if(!d.wait_native_stroke()||!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error("Native shape endpoint: "+d.frame().state->error);}
+void preview(Document&d,size_t count){auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(20);while(d.frame().state->native_samples<count&&d.frame().state->error.empty()&&std::chrono::steady_clock::now()<deadline)std::this_thread::yield();if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);check(d.frame().state->native_samples>=count&&d.wait_mesh()&&d.frame().surface->native_samples>=count,"Actual multi-sample target preview and immutable mesh acknowledge this processed prefix");}
+Scene fixture(){
+ auto s=joint::prepare(false,Material::AlphaMode::Mask);s.active().material.alpha_cutoff=.5f;
+ Document d;d.replace(s);done(d);d.begin_uv();check(d.wait_uv(),"Real UV workspace opens its prepared corner-colour source");d.edit_uv(UvAction::RetainPaint);const auto&m=s.active().painted->mesh();size_t c=0;while(c<m.indices.size()&&m.normals[m.indices[c]].z<.9f)c+=3;std::array<float,2> uv{};for(int k=0;k<3;++k)for(int a=0;a<2;++a)uv[a]+=m.uv[m.indices[c+k]][a]/3;
+ d.edit_uv(UvAction::Pick,uv[0],uv[1]);d.edit_uv(UvAction::Scale,.7f);d.edit_uv(UvAction::Rotate,1.57079632679f);check(d.wait_uv()&&d.frame().state->uv->valid,"Actual fractional UV draft is valid");d.end_uv(true);done(d);auto out=d.copy_scene();check(out.active().painted->paint_sampling_domain()&&out.active().material_bindings->normal_preparation->sampling_domain,"Actual UV Apply owns independent retained paint and normal domains");return out;
+}
+NativeStrokeSample visible_ray(Document&d){auto f=d.frame();check(bool(f.surface->picking),"Real shaped snapshot owns material-visible picking");const auto&m=f.surface->mesh;for(size_t c=0;c<m.indices.size();c+=3)for(int corner=0;corner<3;++corner){Vec3 p{};for(int k=0;k<3;++k)p+=m.positions[m.indices[c+k]]*(k==corner?.97f:.015f);NativeStrokeSample s;s.origin=p+Vec3{0,0,2};s.direction={0,0,-1};auto h=f.surface->picking->raycast(s.origin,s.direction,4);if(h&&length(h->position-p)<1e-4f){s.brush.radius=.3f;s.brush.tool=Tool::Clay;s.brush.strength=1;return s;}}throw std::runtime_error("No visible near-vertex target: fixture must really deform coarse geometry");}
+void paint_exact(const Scene&before,const Scene&after){const auto&a=*before.active().painted,&b=*after.active().painted;bool same=a.mesh_owner()==b.mesh_owner()&&a.paint_sampling_domain()==b.paint_sampling_domain()&&a.baked()->normal_authority==b.baked()->normal_authority&&a.layers().size()==b.layers().size();for(size_t i=0;same&&i<a.layers().size();++i){const auto&x=a.layers()[i],&y=b.layers()[i];same=x.id==y.id&&x.name==y.name&&x.visible==y.visible&&x.opacity==y.opacity&&x.tiles==y.tiles&&x.pbr_tiles==y.pbr_tiles;}check(same&&before.active().shape_source==after.active().shape_source&&before.active().rig_source==after.active().rig_source&&before.active().polygon==after.active().polygon&&before.active().appearance==after.active().appearance,"Target gestures retain exact rest/tile/domain/event/original-source owners");}
+struct Hand{Document&d;SpatialFrame f;explicit Hand(Document&v):d(v){f.focused=f.head_valid=true;f.head.position={0,1.6f,0};f.hands[1].tracked.valid=f.hands[1].tracked.aimValid=true;}void send(const NativeStrokeSample&s,float pressure){++f.sequence;f.time+=.05;auto&h=f.hands[1].tracked;h.aim.position=h.grip.position=ob::transform(d.frame().state->canvas,{s.origin.x,s.origin.y,s.origin.z});h.aim.orientation=h.grip.orientation=d.frame().state->canvas.orientation;h.trigger=pressure;d.submit(f);if(!d.wait_input())throw std::runtime_error("Actual controller input did not drain");}};
+void run(Scene s,bool controller,const std::filesystem::path&path){
+ Document d;d.replace(s);done(d);const auto old_targets=s.active().deformation->morphs->targets.size();ShapeKeyEdit key;key.name="Actual retained UV new sculpt target";d.author_shape(key);done(d);check(d.frame().state->morph_target==old_targets,"Native Create selects a genuine newly appended target");d.configure_shape_sculpt(true);d.configure(Tool::Clay,.3f);done(d);const auto before=d.copy_scene();auto original=before.encode();auto sample=visible_ray(d);Hand hand(d);if(controller)hand.send(sample,0);
+ refresh_test::reset();refresh_test::throttle=true;if(!controller)check(d.begin_native_stroke(),"Actual native selected-target gesture admitted");
+ for(size_t i=0;i<3;++i){sample.brush.pressure=.3f+.3f*float(i);if(controller)hand.send(sample,sample.brush.pressure);else check(d.sample_native_stroke(sample),"Ordered target sample accepted");preview(d,i+1);check(d.copy_scene().encode()==original,"Visible target previews leave authoritative scene/history untouched");}
+ check(refresh_test::queries>=4&&refresh_test::owners&&refresh_test::geometry_changed,"Initial and every refreshed visibility query retain actual attachment/proof/corner stream while geometry really changes");
+ if(controller)hand.send(sample,0);else d.end_native_stroke();auto save=d.save_async(path);save.get();done(d);const auto after=d.copy_scene();check(after.encode()!=original&&!refresh_test::same_points(after.active().deformation->morphs->targets[old_targets].delta,before.active().deformation->morphs->targets[old_targets].delta),"Accepted multi-sample gesture changes actual selected target positions");paint_exact(before,after);check(after.active().deformation->morph_weights==before.active().deformation->morph_weights&&Scene::load(path).encode()==after.encode(),"Ordered Save/reopen retains exact accepted target and saved mixed weights");check(d.undo()&&d.copy_scene().encode()==original&&d.redo()&&d.copy_scene().encode()==after.encode(),"Entire multi-preview gesture is exactly one global Undo/Redo");done(d);
+ auto accepted=after.encode();refresh_test::reset();if(!controller)check(d.begin_native_stroke(),"Cancelled target gesture admitted");else hand.send(sample,0);for(size_t i=0;i<2;++i){if(controller)hand.send(sample,.8f);else check(d.sample_native_stroke(sample),"Cancelled target sample admitted");preview(d,i+1);}if(controller){hand.f.focused=false;hand.send(sample,.8f);}else d.end_native_stroke(false);done(d);check(d.copy_scene().encode()==accepted,"Actual changed-preview Cancel/focus loss retains complete scene and history");refresh_test::throttle=false;
+}
+void reflection_picking(Scene s){auto matrix=AffineTransform{}.matrix();matrix[0]=-1;matrix[4]=.15;matrix[8]=.08;s.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(matrix));Document d;d.replace(s);done(d);auto snapshot=d.frame().surface;auto logical=snapshot->mesh;auto ranges=snapshot->ranges;for(auto&r:ranges){check(r.paint_winding_reversed,"Packed reflected query records its genuine EBO flip");for(size_t c=r.first;c<r.first+r.count;c+=3)std::swap(logical.indices[c+1],logical.indices[c+2]);r.reflected=true;r.paint_winding_reversed=false;}
+ std::vector<std::array<float,2>> coords;for(auto v:logical.indices)coords.push_back(snapshot->paint_coordinates[v]);MaterialSurfaceQuery raw(logical,ranges,{},snapshot->source_colors,PaintCornerCoordinates{coords});SurfaceQuery geometric(logical);size_t visible=0,transparent=0;bool same=true;for(int y=0;y<32;++y)for(int x=0;x<32;++x){Vec3 origin{(x+.5f)/16-1,(y+.5f)/16-1,2};auto a=raw.raycast(origin,{0,0,-1},4),b=snapshot->picking->raycast(origin,{0,0,-1},4);same&=bool(a)==bool(b);if(a&&b){++visible;same&=length(a->position-b->position)<1e-5f;}else if(geometric.raycast(origin,{0,0,-1},4))++transparent;}
+ check(same&&visible>8&&transparent>8,"Actual masked visibility hits and alpha holes agree between logical and packed reflected geometry");auto bad=ranges;bad.front().paint_winding_reversed=true;check(rejects([&]{MaterialSurfaceQuery mismatch(logical,bad,{},snapshot->source_colors,PaintCornerCoordinates{coords});}),"Visibility still refuses fabricated logical-to-packed corner permutation");
+}
+}
+int main(int argc,char**argv)try{if(argc!=2)return 2;std::filesystem::path out=argv[1];std::filesystem::create_directories(out);auto source=fixture();reflection_picking(source);for(bool reflect:{false,true})for(bool controller:{false,true}){auto s=source;if(reflect){auto m=AffineTransform{}.matrix();m[0]=-1;m[4]=.15;m[8]=.08;s.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(m));}run(std::move(s),controller,out/(std::to_string(reflect)+"-"+std::to_string(controller)+".dsculpt"));}std::cout<<"PASS "<<checks<<" native retained-shape refresh checks\n";return 0;}catch(const std::exception&e){refresh_test::throttle=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
