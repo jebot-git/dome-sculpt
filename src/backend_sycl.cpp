@@ -82,6 +82,8 @@ struct SparseFieldSampler::Impl {
   std::unique_ptr<sparse_resample::Cell,UsmDeleter> cells{nullptr,{&queue}};
   std::unique_ptr<sparse_resample::Point,UsmDeleter> points{nullptr,{&queue}};
   std::unique_ptr<uint64_t,UsmDeleter> values{nullptr,{&queue}};
+  std::unique_ptr<sparse_resample::ErrorQuery,UsmDeleter> error_queries{nullptr,{&queue}};
+  std::unique_ptr<uint64_t,UsmDeleter> error_partials{nullptr,{&queue}};
   sparse_resample::Parameters parameters;
   uint32_t mask;size_t capacity;bool failed=false;
   Impl(const sparse_resample::Grid &grid,sparse_resample::Parameters p,size_t count):parameters(p),mask(grid.mask()),capacity(count) {
@@ -115,6 +117,52 @@ std::vector<uint64_t> SparseFieldSampler::sample(std::span<const sparse_resample
     sparse_resample_checkpoint(cancelled);
   }catch(...){state.failed=true;try{state.queue.wait_and_throw();}catch(...){}throw;}
   return result;
+}
+uint64_t SparseFieldSampler::maximum_error(std::span<const sparse_resample::ErrorQuery> queries,const std::function<bool()> &cancelled) {
+  auto &state=*impl_;if(state.failed)throw std::runtime_error("Sparse quality GPU session has failed");
+  sparse_resample::validate_error_queries(queries,state.parameters,[&]{sparse_resample_checkpoint(cancelled);});
+  if(queries.empty())return 0;
+  constexpr auto width=sparse_resample::reduction_width;
+  uint64_t maximum=0,current=0; // Keep readback storage alive through catch/drain.
+  try{
+    if(!state.error_queries){
+      const auto device=state.queue.get_device();
+      if(device.get_info<sycl::info::device::max_work_group_size>()<width||device.get_info<sycl::info::device::local_mem_size>()<width*sizeof(uint64_t))
+        throw std::runtime_error("Selected GPU lacks bounded quality reduction storage");
+      decltype(state.error_queries) input{sycl::malloc_device<sparse_resample::ErrorQuery>(state.capacity,state.queue),{&state.queue}};
+      decltype(state.error_partials) partial{sycl::malloc_device<uint64_t>((state.capacity+width-1)/width,state.queue),{&state.queue}};
+      if(!input||!partial)throw std::bad_alloc();state.error_queries=std::move(input);state.error_partials=std::move(partial);
+    }
+    const auto *cells=state.cells.get();const auto mask=state.mask;const auto p=state.parameters;
+    auto *points=state.error_queries.get();auto *partial=state.error_partials.get();auto *value=state.values.get();
+    for(size_t first=0;first<queries.size();){
+      sparse_resample_checkpoint(cancelled);const auto count=std::min(state.capacity,queries.size()-first);const auto groups=(count+width-1)/width;
+      state.queue.memcpy(points,queries.data()+first,count*sizeof(sparse_resample::ErrorQuery));
+      state.queue.submit([&](sycl::handler &handler){
+        sycl::local_accessor<uint64_t,1> local{sycl::range<1>{width},handler};
+        handler.parallel_for(sycl::nd_range<1>{sycl::range<1>{groups*width},sycl::range<1>{width}},[=](sycl::nd_item<1> item){
+          const auto lane=item.get_local_linear_id(),i=item.get_global_linear_id();
+          local[lane]=i<count?sparse_resample::absolute_error(cells,mask,points[i],p):0;sycl::group_barrier(item.get_group());
+          for(size_t step=width/2;step;step/=2){if(lane<step&&local[lane+step]>local[lane])local[lane]=local[lane+step];sycl::group_barrier(item.get_group());}
+          if(!lane)partial[item.get_group_linear_id()]=local[0];
+        });
+      });
+      state.queue.submit([&](sycl::handler &handler){
+        sycl::local_accessor<uint64_t,1> local{sycl::range<1>{width},handler};
+        handler.parallel_for(sycl::nd_range<1>{sycl::range<1>{width},sycl::range<1>{width}},[=](sycl::nd_item<1> item){
+          const auto lane=item.get_local_linear_id();uint64_t result=0;
+          for(size_t i=lane;i<groups;i+=width)if(partial[i]>result)result=partial[i];
+          local[lane]=result;sycl::group_barrier(item.get_group());
+          for(size_t step=width/2;step;step/=2){if(lane<step&&local[lane+step]>local[lane])local[lane]=local[lane+step];sycl::group_barrier(item.get_group());}
+          if(!lane)value[0]=local[0];
+        });
+      });
+      state.queue.memcpy(&current,value,sizeof(current));state.queue.wait_and_throw();
+      maximum=std::max(maximum,sparse_resample::checked_error(current));first+=count;
+    }
+    sparse_resample_checkpoint(cancelled);
+  }catch(...){state.failed=true;try{state.queue.wait_and_throw();}catch(...){}throw;}
+  return maximum;
 }
 
 void apply_csg(std::span<Sample> samples,std::span<const CsgBox> boxes,float band,
