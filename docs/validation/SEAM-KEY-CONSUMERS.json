@@ -1,0 +1,102 @@
+{
+  "status": "private qualified consumer component; no main integration",
+  "runtime_source": "216e3630f39295b00f5377c7e0f36b13eb07c0bd",
+  "runtime_changes": [
+    "Export derived POSITION through actual position-domain basis, preserve genuine raw4 frame identities",
+    "Map appearance fallback through derived-to-source frame vertices",
+    "Resolve inactive target tangent origin in derived frame basis",
+    "Native/controller independent seam strokes and complete immutable preview range owners"
+  ],
+  "release": {
+    "checks": [
+      116,
+      5,
+      79,
+      84
+    ],
+    "status": "all exit0, exact frozen source/binaries"
+  },
+  "arc": {
+    "checks": 116,
+    "glb_images": 27,
+    "vrm_images": 18,
+    "max_error": 0,
+    "selector": "pci-0000_03_00_0",
+    "inputs": 1473,
+    "inputs_unchanged": true,
+    "khronos": {
+      "files": 45,
+      "errors": 0,
+      "unfiltered_warnings": 63
+    },
+    "official_vrm0": {
+      "files": 18,
+      "pinned_schemas": 15,
+      "errors": 0
+    }
+  },
+  "owned_sanitizers": {
+    "checks": [
+      116,
+      5,
+      79
+    ],
+    "status": "all exit0, whole-owned C/C++ core/support/render O1 ASan+UBSan+leaks",
+    "native84_initial": {
+      "exit_code": 1,
+      "seconds": 119.487422006001,
+      "stage": "20s test prefix observer",
+      "sanitizer_report": false
+    },
+    "native84_second": {
+      "exit_code": 1,
+      "seconds": 1796.69,
+      "scope": "one fixture TU on same owned archives; generic endpoint wait, empty error; no sanitizer report"
+    },
+    "native84_final": {
+      "exit_code": 0,
+      "checks": 84,
+      "seconds": 2649.638336316013,
+      "scope": "one test-only TU, known parent9f4ee1f prefix180/sleep1ms plus per-default-wait diagnostics on SAME owned archives",
+      "original_wait_expirations": 0,
+      "recovery_used": false,
+      "inputs_unchanged": true,
+      "sanitizer_report": false
+    },
+    "reflected_only": {
+      "exit_code": 0,
+      "checks": 45,
+      "seconds": 1425.722,
+      "original_wait_expirations": 0
+    }
+  },
+  "fltk": {
+    "normal_checks": 9,
+    "compact_checks": 11,
+    "scope": "actual native menu/modal/Duplicate/UndoRedo/Mirror-Cancel, not Mirror Apply/freehand"
+  },
+  "test_observer": {
+    "source": "9f4ee1f:tests/native-shape-sampling.cpp",
+    "change": "prefix observer20\u2192180s, sleep1ms, diagnostics/unitbuf only; no product deadline changes",
+    "final_optimized_rebuild_and_run": {
+      "exit_code": 0,
+      "seconds": 214.65942753700074,
+      "inputs_unchanged": true
+    }
+  },
+  "remaining": [
+    "Mirror owning/export/UI support is a separate private component",
+    "Aggregate prospective resource and alias-preserving codec repairs remain separate and unadmitted",
+    "Actual female/male VRoid seam assets and general triangulation/refinement are not qualified here",
+    "No public main admission or physical HMD test"
+  ],
+  "artifacts": [
+    "artifacts/consumer-final/runtime-status.json",
+    "artifacts/consumer-sanitize/runtime-status.json",
+    "artifacts/consumer-sanitize/diagnostic/status.json",
+    "artifacts/consumer-sanitize/reflected-waits/status.json",
+    "artifacts/consumer-sanitize/full-waits/status.json",
+    "artifacts/consumer-arc/status.json",
+    "artifacts/consumer-arc/image-summary.json"
+  ]
+}

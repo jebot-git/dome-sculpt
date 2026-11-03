@@ -151,3 +151,28 @@ key route, Mirror/CaptureMix/Duplicate or performance target. The universal node
 is present; generic dispatch and owning persistence remain required next work.
 Original raw attribute identities, source role coordinates and immutable
 before-deformation are separate from current derived skin/key/pose authority.
+
+
+## Private consumer checkpoint 216e363
+
+Actual derived POSITION6 exports now retain the real raw/source4 identities and
+role attributes. Fresh optimized native consumers pass116 graphics,5 inactive
+tangent,79 independent seam stroke and84 retained-preview checks. Actual A770
+passes116 checks/45 independent GLB+VRM images with maximum error0;45 Khronos
+files report0 errors/63 unfiltered warnings and18 VRM0 files pass15 pinned schemas.
+Actual FLTK menu/modal gates pass9 normal and11 compact checks. These synthetic
+CC0 sources do not establish real female/male VRoid seam coverage.
+
+Wholly owned O1 ASan/UBSan/leak core/support/render passes the three new consumers
+(116/5/79). The existing84-check consumer initially failed its20s prefix observer;
+a second diagnostic failed an unspecified generic endpoint wait. Both negatives
+remain preserved. A final observer-only fixture on the exact same owned archives
+passes all84 in2649.64s, with zero original60s native/asset or10s mesh wait
+expirations, zero recovery use and zero sanitizer reports. The tracked test adopts
+only the known parent9f4ee1f180s prefix observer/sleep1ms change; no product wait
+is changed and no cause is inferred for the earlier generic-wait negative. This
+is a one-TU test overlay scope, not a fresh whole-application sanitizer rerun.
+
+See validation/SEAM-KEY-CONSUMERS.json. Mirror/general topology and the separately
+proved aggregate resource/alias-persistence gap remain required work. This
+private component is not main delivery or a physical headset qualification.
