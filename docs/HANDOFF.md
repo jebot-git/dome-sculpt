@@ -1150,3 +1150,18 @@ Read KEY-MIRROR-RETAINED.md and its receipt. Actual female/male Mirror probes no
 show genuine nonmatching-triangle refusal with exact rollback; a real general
 refinement/role-frame adapter and avatar/UI/VRM/freehand coverage remain required.
 No new runtime, main admission, physical HMD or Source27/28 union is claimed.
+
+
+## Private general Mirror refinement continuation
+
+The isolated child of6e94806 adds only a detached geometry/provenance kernel,
+not native authoring admission.94 Release/94 own-SAN checks,22 persistent OOM
+frontiers, explicit two-sided barycentrics/involution, conservative resource
+boundaries and a preserved float-quantization counterexample pass. Raw4 and
+derived36 corners remain distinct. Actual avatar rest-distance diagnostics show
+that local-zero-plane mismatch is primarily source rig-midline placement: exact
+hips REST planes reduce sampled maxima from0.511/1.018mm to0.487/0.383µm. These
+are finite diagnostic samples, not field authority/global-coincidence proof.
+Actual accepted/user planes stay exact. Read KEY-MIRROR-REFINEMENT.md. Conditional
+Scene29/key4/frame-position3 and genuine paint-domain2 context are next; full
+native/UI/artist/skin/paint/codec/export integration remains required.

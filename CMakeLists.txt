@@ -2732,3 +2732,12 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_test(NAME independent-seam-key-mirror-retained-render COMMAND dome-sculpt-independent-seam-key-mirror-retained-render-test "${CMAKE_CURRENT_BINARY_DIR}/independent-seam-key-mirror-retained-render" "${CMAKE_CURRENT_BINARY_DIR}/independent-seam-key-mirror-retained/native-after.dsculpt")
   set_tests_properties(independent-seam-key-mirror-retained-render PROPERTIES TIMEOUT 1200 FIXTURES_REQUIRED independent_mirror_retained ENVIRONMENT "EGL_PLATFORM=surfaceless;LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
+
+if(BUILD_TESTING)
+  # Detached geometry/provenance prototype, intentionally not an authoring API.
+  add_executable(dome-sculpt-key-mirror-refinement-test tests/key-mirror-refinement.cpp src/key-mirror-refinement.cpp)
+  target_include_directories(dome-sculpt-key-mirror-refinement-test PRIVATE src)
+  target_link_libraries(dome-sculpt-key-mirror-refinement-test PRIVATE dome-sculpt-core)
+  add_test(NAME key-mirror-refinement COMMAND dome-sculpt-key-mirror-refinement-test)
+  set_tests_properties(key-mirror-refinement PROPERTIES TIMEOUT 120)
+endif()
