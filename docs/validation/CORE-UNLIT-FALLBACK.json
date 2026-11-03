@@ -1,0 +1,216 @@
+{
+  "format": 1,
+  "date": "2026-11-03",
+  "base": "13f7e57378cece52f011a8f316d4232747d7a922",
+  "runtime_change": "Core-unlit baseColor only; typed MToon dispatch remains earlier. No layout, archive, source metadata or material authoring change.",
+  "primary_spec": {
+    "commit": "3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded",
+    "url": "https://github.com/KhronosGroup/glTF/blob/3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded/extensions/2.0/Khronos/KHR_materials_unlit/README.md",
+    "sha256": "a07fc5833a2b93c6570dc6eda7baa794a2c0873c4453e9dd75815a6f3b0ef384"
+  },
+  "scope": "Matched-header render.cpp replacement over separately copied and ledger-verified eight Release and eight complete-owned-sanitizer parent archives; old render.cpp archive member removed. Fresh affected test TUs; original MToon regression objects relinked where present. Not a fresh full application/all-target build or all-regression pass.",
+  "old_negative": {
+    "release": {
+      "exit": 1,
+      "seconds": 0.11408957000821829,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/old-negative.log"
+    },
+    "sanitize": {
+      "exit": 1,
+      "seconds": 0.2141281079966575,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/old-negative.log"
+    },
+    "unchanged": true,
+    "input_count": 1499
+  },
+  "release": {
+    "unlit-fallback": {
+      "exit": 0,
+      "seconds": 4.87320734601235,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/unlit-fallback-fixed.log"
+    },
+    "mtoon-render": {
+      "exit": 0,
+      "seconds": 34.22738073201617,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/mtoon-render-fixed.log"
+    },
+    "mtoon-emission": {
+      "exit": 0,
+      "seconds": 33.52888625502237,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/mtoon-emission-fixed.log"
+    },
+    "source-color-render": {
+      "exit": 0,
+      "seconds": 14.442114303004928,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/source-color-render-fixed.log"
+    },
+    "unchanged": true,
+    "input_count": 1498
+  },
+  "sanitize": {
+    "unlit-fallback": {
+      "exit": 0,
+      "seconds": 3.520409048011061,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/unlit-fallback-fixed.log"
+    },
+    "mtoon-render": {
+      "exit": 0,
+      "seconds": 4.021775914996397,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/mtoon-render-fixed.log"
+    },
+    "mtoon-emission": {
+      "exit": 0,
+      "seconds": 30.774546822998673,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/mtoon-emission-fixed.log"
+    },
+    "source-color-render": {
+      "exit": 0,
+      "seconds": 15.244048474996816,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/source-color-render-fixed.log"
+    },
+    "unchanged": true,
+    "input_count": 1498
+  },
+  "checks_each_profile": {
+    "unlit_fallback": 28,
+    "mtoon_render": 81,
+    "mtoon_emission": 43,
+    "source_color_render": 100,
+    "total": 252
+  },
+  "additional_consumers": {
+    "old-role": {
+      "exit": 1,
+      "seconds": 0.06388201500521973,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/consumer-proof/old-role.log"
+    },
+    "old-prepared": {
+      "exit": 1,
+      "seconds": 0.06387777198688127,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/consumer-proof/old-prepared.log"
+    },
+    "release-role": {
+      "exit": 0,
+      "seconds": 0.11409068998182192,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/consumer-proof/release-role.log"
+    },
+    "release-prepared": {
+      "exit": 0,
+      "seconds": 0.11406149898539297,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/consumer-proof/release-prepared.log"
+    },
+    "sanitize-role": {
+      "exit": 0,
+      "seconds": 0.1643218999961391,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/consumer-proof/sanitize-role.log"
+    },
+    "sanitize-prepared": {
+      "exit": 0,
+      "seconds": 0.1640521030058153,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/consumer-proof/sanitize-prepared.log"
+    },
+    "unchanged": true,
+    "inputs": 1509,
+    "source_scope": "Final added fixture exercises both corrected reader headers; original28-check native/Arc fixture is unchanged."
+  },
+  "additional_checks_each_profile": 8,
+  "arc": {
+    "exit": 0,
+    "seconds": 3.9613338019989897,
+    "inputs": 1498,
+    "unchanged": true,
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "binary_sha256": "33266149e423811016e0634760243e27b2c4ad119ddccff9f7ca10f5e8df7b9e"
+  },
+  "arc_vendor": "Intel",
+  "arc_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+  "arc_native_consumer_maxerror": 0,
+  "tolerance": 2,
+  "interoperability": {
+    "validator": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "count": 61,
+    "errors": 0,
+    "warnings": 54,
+    "infos": 4
+  },
+  "interoperability_cohort_sha256": "26ed0181e094c43b42baba85fbb045241f4e13fc986985495ca1fe746e558079",
+  "interoperability_report_sha256": "bee071d20bc471506e379db6649fcbada2c578989748511757db2a3ea7f9baf8",
+  "source_sha256": {
+    "src/render.cpp": "51781334db6e240a62a9659a08ff28f084d70221aeac912fed55cfff0806e881",
+    "tests/source-color-consumer.hpp": "a32146781d511d1e7c0f3d8435bf1b78da292bf5b78fcf6e6746c82614cc990b",
+    "tests/vrm-role-consumer.hpp": "49db93686843639bc010f2ad8dc13f3f5999d63e434eba5442d5b6cb72703965",
+    "tests/prepared-normal-consumer.hpp": "b731318e844491739f8f59d75ff92b6a1fa14c70b7db65e6c65aebbb05503339",
+    "tests/unlit-fallback.cpp": "3556e2046fa31bb44594b6d9dedfd751df54e3a4839f8e62b7323c5c01804f7e",
+    "tests/unlit-consumers.cpp": "8319f2a28536bca032ed5141e606c4d2d008380ef4f35342b0047dc6ed0888cb",
+    "CMakeLists.txt": "57db138b12d2291083a269ef8d2635ee1984f12d2d33f2fd73b8a66763df3e01"
+  },
+  "binary_sha256": {
+    "artifacts/unlit-proof/release/mtoon-emission-fixed": "6461eb877679b8f1c56b62fa0a8b0bd524f34fd86596e677df65de0b5ca3f12c",
+    "artifacts/unlit-proof/release/mtoon-render-fixed": "52f428ee3a2beb19e554dcfd43b0183b1070a8227712328b5ee51e965e1e6d6c",
+    "artifacts/unlit-proof/release/source-color-render-fixed": "a689b4b2de136bc292b94b61e79aaccb12a789d8d58094b287a912a3c6bcad95",
+    "artifacts/unlit-proof/release/unlit-consumers": "aa04050e0d5a44fc60d1cf089b24e45d128bb09820e637826f5714e5e3617d62",
+    "artifacts/unlit-proof/release/unlit-fallback-fixed": "33266149e423811016e0634760243e27b2c4ad119ddccff9f7ca10f5e8df7b9e",
+    "artifacts/unlit-proof/sanitize/mtoon-emission-fixed": "8fbc305fdcc16de12edd4cf89f110d4625f2f05f37049231f326b944801a3690",
+    "artifacts/unlit-proof/sanitize/mtoon-render-fixed": "5b6416442c32bc5e6fcb1cfc9eae19a5c8719961d3b2d21aac6b381e69251023",
+    "artifacts/unlit-proof/sanitize/source-color-render-fixed": "47fb30ac85f3552c6454916088451c9ab1b61d51e0be2eab7461af7558909261",
+    "artifacts/unlit-proof/sanitize/unlit-consumers": "25630597cd173b8350b97614cbfd496de2bdb4922fc40795114b2bb49658f6d8",
+    "artifacts/unlit-proof/sanitize/unlit-fallback-fixed": "2305e4720fb58edb16ed9c613bc57f2e0577f3d8a2345416a89ef9d8a946f6f4"
+  },
+  "archive_manifests": {
+    "release": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libdome-sculpt-render.a": "8884c57bee46d84ed11b3a36afe0ee7016eaa5ffc0dc7ccdb8e6541d2897366b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libdome-sculpt-core.a": "ee082770f4f3e80920412ad88a687681c98d37c54aa62ab271ad8e0b90f863ad",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libdome-sculpt-affine.a": "77e1988788d0b9a25e57a422b05a7dadd2dcb8ce27d00edb64ed0ca1771a0d02",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libdome-sculpt-polygon.a": "44b6752b8d0cdc5d14c14101217008ddaaddf8979d7abd22957623b9021dd743",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libxatlas.a": "f6a3363ff96b02129dc193bc5132c7d2417ed46b7a9957692c3b6ce5dfcd2a96",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libmikktspace.a": "7593514d7c6f2a8e0c0a76be62b07cd5b428d06ba4e8f83df32d4a62d3f4a7c3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libmikktspace-robust.a": "98e48e0e37080ba28b1efd5543c192408346339c8ff34d12d038b820385c67bc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/release/libufbx.a": "6ed9cb65c338618b67732c6c8e49a524f15f419d26648d887908e68bd6302b3b"
+    },
+    "sanitize": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libdome-sculpt-render.a": "ba2750d8ca74bbe90e5a9f86777562671b68262c5ef8ea79c130dcd550d1f289",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libdome-sculpt-core.a": "a28ac61f3292e9679582db3d93862e9e464771e067e4862ce24fd2ed0b57133d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libdome-sculpt-affine.a": "8ebe5c7e94fbe096b81654585517371569b2352a2c1675222206c66a8bde098a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libdome-sculpt-polygon.a": "35cd6d5452b93d671d4db213eb4687b4e45e379f9ae83f36e6ef341166dcff1c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libxatlas.a": "b189a4c63326d7a48777ef1486528cdf913c9e3bf32b1e7bc033a63daf4835df",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libmikktspace.a": "54bf78080b9aad5b0ce12ffafea305acc142b89f99c8c6aa110f1ea89f200c4f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libmikktspace-robust.a": "8709a8d87f542da015067ad7e2c92fc6eb530be28b0ab8176475becd1c6bbe12",
+      "/home/blux/de-xr/dome-sculpt/artifacts/unlit-fallback-13f7e57/artifacts/unlit-proof/sanitize/libufbx.a": "4d70bf7bd12d9b92eff6684750a740444111099082e3373ad7fbbe892162cf14"
+    }
+  },
+  "configuration": "Fresh optimized canonical-FLTK/bitmap CMake configure succeeds and registers unlit-fallback plus role/prepared consumer tests. This is configure-only; compiled consumers used explicit matching parent flags and link commands.",
+  "preserved_setup_and_fixture_negatives": [
+    "Initial new test used wrong parsed-renderer argument types: compile error, corrected before runtime counterfactual.",
+    "First fixed analytic23/source-preservation controls passed, then fixture mutated a retained vertex-color snapshot and failed parsed comparison; corrected only by publishing a new immutable snapshot (same tolerance), original log/manifests retained under release/mutable-snapshot-fixture-negative.",
+    "Parent sanitizer mtoon-emission object was absent; compiled unchanged complete test TU against owned sanitizer archives instead, logs retained."
+  ],
+  "limitations": [
+    "HDR Scene27 source/painting/preview/export remains separate unfinished work.",
+    "Two added consumer-only fixtures ran softwareGL in Release/SAN; Arc28 is only the original native/parsed unlit fixture.",
+    "No new native UI, physical headset/device, system install or display-session action.",
+    "Inherited standalone-XR Mesa112-byte sanitizer report remains separate and unresolved."
+  ],
+  "gpu_lease": "released; no own live jobs",
+  "final_test_old_renderer_negative": {
+    "release": {
+      "exit": 1,
+      "seconds": 0.11397091401158832
+    },
+    "sanitize": {
+      "exit": 1,
+      "seconds": 0.21436302797519602
+    },
+    "unchanged": true,
+    "inputs": 1502,
+    "scope": "Final unchanged analytic/immutable-snapshot test object relinked with original parent render archive in both profiles; both exit1 at the independent baseColor oracle."
+  },
+  "evidence_sha256": {
+    "artifacts/unlit-proof/final-old/status.json": "e676462070eff0480a1e99ea4d6dd7e2ee37f281c46572ac3d37b9f37b606752",
+    "artifacts/unlit-proof/release/fixed-status.json": "8b580c3cbbbf50aaadd4ac33f4f82678d10b4795598509f69bcda9a0decf6077",
+    "artifacts/unlit-proof/sanitize/fixed-status.json": "2b18ecb33cbf34265c59913db0054f46dc04fd082505514aeb8bd09561d67c72",
+    "artifacts/unlit-proof/consumer-proof/status.json": "1e35562d59ee6bebf08d59dad35f06183bfc4ea7f0e2bb79ecb9c086a3f2e63a",
+    "artifacts/unlit-proof/arc/status.json": "e12b0e3fe9580bbd70aa3a75a1df8a6d512e2c7909885869c1fa5b00bb6716c4",
+    "artifacts/unlit-proof/interoperability/report.json": "bee071d20bc471506e379db6649fcbada2c578989748511757db2a3ea7f9baf8"
+  }
+}
