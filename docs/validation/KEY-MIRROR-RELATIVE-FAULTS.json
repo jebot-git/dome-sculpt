@@ -1,0 +1,52 @@
+{
+  "source": "1abe09de06284b09fbf37e5bea1f7ad307bed89c",
+  "production_source": "030d92bee5e34ee34692ded7f40ee7d8546a0fea",
+  "scope": "pure new test TU on matching immutable coherent683 CPU and whole-owned C/C++ O1 sanitizer archives; no source/header/layout changes",
+  "profiles": {
+    "release": {
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 0,
+      "seconds": 2.7189742810151074,
+      "persistent_prefixes": 5464,
+      "assertions": 3,
+      "inputs": 1620,
+      "inputs_unchanged": true
+    },
+    "sanitize": {
+      "compile_exit": 0,
+      "link_exit": 0,
+      "run_exit": 0,
+      "seconds": 47.05353980700602,
+      "persistent_prefixes": 5464,
+      "assertions": 3,
+      "inputs": 1620,
+      "inputs_unchanged": true
+    }
+  },
+  "positive": "Actual12-corner generic artist-frame native source, independent Replace then explicit BaseRelative Mirror record4",
+  "controls": [
+    "Persistent standard-C++ bad_alloc at each of5464 measured owning factory allocation prefixes; complete encoded Scene/source unchanged each time",
+    "Exact successful retry after all denials",
+    "128-target registry cap refuses new Mirror before publication; unchanged Scene"
+  ],
+  "limits": [
+    "No allocator sweep of codec decoder/FLTK or every retained Paint24/Source28 payload variant",
+    "Not a fresh whole-app rebuild in this pure-test continuation",
+    "No hardware/physicalHMD claim; generic source is distinct from avatar/retained fixtures"
+  ],
+  "artifacts": {
+    "artifacts/owning-faults/release/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/owning-faults/release/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/owning-faults/release/run.log": "4d6f5061d6b4c5409e01493dd6e554e73706b67100567ecfef8856f46549d153",
+    "artifacts/owning-faults/release/inputs-before.json": "9959fff0699685509369236ecc48622fe300728277482b6fc94a5788e72b7aae",
+    "artifacts/owning-faults/release/inputs-after.json": "9959fff0699685509369236ecc48622fe300728277482b6fc94a5788e72b7aae",
+    "artifacts/owning-faults/release/consumer": "5b9bfdce562cd430d833d39186ab57243e8f7b6910811c1a98486bf84e4917a0",
+    "artifacts/owning-faults/sanitize/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/owning-faults/sanitize/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/owning-faults/sanitize/run.log": "4d6f5061d6b4c5409e01493dd6e554e73706b67100567ecfef8856f46549d153",
+    "artifacts/owning-faults/sanitize/inputs-before.json": "e06a65b3fb7c6703d0a391c43b05a1be066fe738af35ac895c1b4a5e6e04a15f",
+    "artifacts/owning-faults/sanitize/inputs-after.json": "e06a65b3fb7c6703d0a391c43b05a1be066fe738af35ac895c1b4a5e6e04a15f",
+    "artifacts/owning-faults/sanitize/consumer": "e73573e2eae7a3b0042ae2bb1995073378fa6b0ee884ab0a57fc57177122f5fa"
+  }
+}
