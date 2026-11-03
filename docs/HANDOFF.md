@@ -58,8 +58,10 @@ Read validation/UNLIT-VENDOR-INTEGRATION.json. These extend the earlier unlit
 component scope to current vendor applications; they are not fresh clean vendor
 builds, full-suite passes, positive AMD/NVIDIA or physical-headset tests.
 The fresh optimized CPU ALL-target build now passes in 1509.29 seconds;
-all tracked inputs remain unchanged. See validation/UNLIT-CPU-BUILD.json. The
-full 540-command CTest run is live and has no completed full-pass claim.
+all tracked inputs remain unchanged. See validation/UNLIT-CPU-BUILD.json. All540 registered CTest commands now have actual Passed results, zero failures,
+in6185.97 seconds. The wrapper terminated143 after the complete result log;
+an independent post-run audit confirms all1905 captured inputs unchanged. See
+UNLIT-CPU-REGRESSION.md and its receipt for this recovered audit's exact scope.
 The full production goal and all incomplete original/additional rows remain
 required. No system installation or active session changed.
 
