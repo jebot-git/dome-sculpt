@@ -1,0 +1,221 @@
+{
+  "source": "eec7753284f99b65fae94a22795917efaf63f6d5",
+  "scope": "Unchanged existing native/compact/Wayland/controller/synthetic-OpenXR harnesses against copied coherent optimized CPU snapshot; no consumer compilation or new SAN/device run",
+  "snapshot": {
+    "source": "eec7753284f99b65fae94a22795917efaf63f6d5",
+    "scope": "Coherent optimized CPU alltargets configured/built38.173s, unchangedmatchingcachedTUs retained; actualrenderer465+fixtureobserverupdates integrated",
+    "source_hashes": 1452,
+    "source_drift": 0,
+    "files": {
+      "dome-sculpt": "decad1cc6d3bf07388f8713883c32fafa720d8871979c89103a2cede88a56d35",
+      "dome-sculpt-rig-fit-authoring-test": "88b6bb0478f8703aee0480a8642b3adf2986d284888e3e885cd13bc6d96d14a9",
+      "dome-sculpt-rig-fit-controller-test": "cf378f8583b6a9753ad6d37536f2372d4aed0510bcc2948b6d984d11e063852e",
+      "libdome-sculpt-test-runtime.so": "0ec8fa7516cc5d8f860a3aeb88066b52145b922ba3f0674033e701406c9692bb"
+    },
+    "snapshot": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/integrated-eec7753/cpu/snapshot",
+    "library_path": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib"
+  },
+  "gates": [
+    {
+      "name": "normal",
+      "command": [
+        "/home/blux/.local/bin/uv",
+        "run",
+        "--offline",
+        "--with",
+        "python-xlib",
+        "--with",
+        "pillow",
+        "--with",
+        "dbus-next",
+        "python",
+        "tests/rig-fit-menu.py"
+      ],
+      "environment_overrides": {
+        "DOME_RIG_FIT_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/normal"
+      },
+      "returncode": 0,
+      "seconds": 11.73587866598973,
+      "checks": 8
+    },
+    {
+      "name": "compact",
+      "command": [
+        "/home/blux/.local/bin/uv",
+        "run",
+        "--offline",
+        "--with",
+        "python-xlib",
+        "--with",
+        "pillow",
+        "--with",
+        "dbus-next",
+        "python",
+        "tests/rig-fit-menu.py"
+      ],
+      "environment_overrides": {
+        "DOME_RIG_FIT_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/compact",
+        "DOME_RIG_FIT_COMPACT": "1"
+      },
+      "returncode": 0,
+      "seconds": 12.13711850400432,
+      "checks": 8
+    },
+    {
+      "name": "wayland",
+      "command": [
+        "/home/blux/.local/bin/uv",
+        "run",
+        "--offline",
+        "--with",
+        "python-xlib",
+        "--with",
+        "pillow",
+        "--with",
+        "dbus-next",
+        "python",
+        "tests/rig-fit-wayland.py"
+      ],
+      "environment_overrides": {
+        "DOME_RIG_FIT_WL_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/wayland"
+      },
+      "returncode": 0,
+      "seconds": 15.043502323009307,
+      "checks": 9
+    },
+    {
+      "name": "xr",
+      "command": [
+        "/home/blux/.local/bin/uv",
+        "run",
+        "--offline",
+        "--with",
+        "python-xlib",
+        "--with",
+        "pillow",
+        "--with",
+        "dbus-next",
+        "python",
+        "tests/rig-fit-xr.py",
+        "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/app-snapshot/dome-sculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/app-snapshot/libdome-sculpt-test-runtime.so",
+        "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/app-snapshot/dome-sculpt-rig-fit-authoring-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/xr"
+      ],
+      "environment_overrides": {},
+      "returncode": 0,
+      "seconds": 14.741740429977654,
+      "checks": 11
+    },
+    {
+      "name": "controller",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/rig-fit-ui-eec7753/artifacts/app-snapshot/dome-sculpt-rig-fit-controller-test"
+      ],
+      "environment_overrides": {},
+      "returncode": 0,
+      "seconds": 0.007633504021214321,
+      "checks": 16
+    }
+  ],
+  "checks_total": 52,
+  "input_count": 1458,
+  "input_drift": 0,
+  "inputs_before_sha256": "a93de2073c52f5ff7bd426d43e0a251b74a1755ab67120cfd302d38bd7865d05",
+  "inputs_after_sha256": "a93de2073c52f5ff7bd426d43e0a251b74a1755ab67120cfd302d38bd7865d05",
+  "canonical_environment": {
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+    "private_xvfb_path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/bin",
+    "private_tool_provenance": "docs/validation/RETAINED-KEY-UI-NEGATIVE.json",
+    "compositor": "/home/blux/de-xr/dome-sculpt/artifacts/domed-62b6417-target/release/dome-compositor",
+    "compositor_sha256": "0400d3d7629d54d63dddc65ca127b6d341ad44b1de63c1301acae0f80fba0bb6",
+    "global_XR_RUNTIME_JSON": "/nonexistent/dome-no-physical-headset.json",
+    "xr_fixture": "Script creates explicit temporary manifest pointing to copied libdome-sculpt-test-runtime.so",
+    "software_rendering": true
+  },
+  "observations": [
+    "Normal and compact screenshots visibly retain decorated hips (required) label; these screenshots document controls, not a numeric guide-colour oracle.",
+    "Selected-guide colour/affine location correctness is covered separately by parent 465 renderer 13-check CPU/SAN/A770 proof and old-code negatives; no duplicate claim for these UI runs.",
+    "Wayland private D-Bus startup logged a failed GVFS mount attempt; all nine client assertions and clean App teardown passed."
+  ],
+  "limitations": [
+    "No physical headset or controller test",
+    "No new sanitizer or hardware execution",
+    "No installed system/session changes",
+    "No precise selected-colour screenshot threshold introduced"
+  ],
+  "evidence": {
+    "artifacts/gate-status.json": {
+      "bytes": 2502,
+      "sha256": "f07bc675c3a72a9d14ae63bdff4771888f3f500c671f0e2eae789488de6d0a7c"
+    },
+    "artifacts/inputs-before.json": {
+      "bytes": 235109,
+      "sha256": "a93de2073c52f5ff7bd426d43e0a251b74a1755ab67120cfd302d38bd7865d05"
+    },
+    "artifacts/inputs-after.json": {
+      "bytes": 235109,
+      "sha256": "a93de2073c52f5ff7bd426d43e0a251b74a1755ab67120cfd302d38bd7865d05"
+    },
+    "artifacts/snapshot-manifest.json": {
+      "bytes": 967,
+      "sha256": "320eee3a80c17bc14f802ccfe6207712fda1a3aab594c2769de1f62c6fc8956f"
+    },
+    "artifacts/run-gates.py": {
+      "bytes": 2202,
+      "sha256": "484a51589ef21aa9ce35d44734116af44facb5fed0635a26166f3b3b7f602129"
+    },
+    "artifacts/normal-runner.log": {
+      "bytes": 607,
+      "sha256": "b6fb8aa9505d67a401302decfef056b5c7f7d1387f16467e924c47ed456c3c14"
+    },
+    "artifacts/compact-runner.log": {
+      "bytes": 607,
+      "sha256": "b6fb8aa9505d67a401302decfef056b5c7f7d1387f16467e924c47ed456c3c14"
+    },
+    "artifacts/wayland-runner.log": {
+      "bytes": 1185,
+      "sha256": "bb2c9a2b8c02a791a6fc03bf1d1759f8d40885b73ba57512343b17d408ce240a"
+    },
+    "artifacts/xr-runner.log": {
+      "bytes": 879,
+      "sha256": "05106173bfa3a2abf907504c32b09c1567833ca11d4557ec5f7c33ef09e58b2b"
+    },
+    "artifacts/controller-runner.log": {
+      "bytes": 1336,
+      "sha256": "7efa79392bbde2427ace22a4354707fa755e1373cebdf832a0577fd6b82c6a56"
+    },
+    "artifacts/normal/report.json": {
+      "bytes": 1019,
+      "sha256": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d"
+    },
+    "artifacts/compact/report.json": {
+      "bytes": 1019,
+      "sha256": "471fbe4829028181cfbdc930636d018146a94c93e3d09203fcdea3a27902f53d"
+    },
+    "artifacts/wayland/report.json": {
+      "bytes": 1305,
+      "sha256": "b95639eb58472ab6af3448c1ef3f8dd567f1cb20b47dd3f8a71847c03c872f82"
+    },
+    "artifacts/xr/report.json": {
+      "bytes": 1398,
+      "sha256": "99982a27cf95997faa8c1513abd9eb0579af52328fdecbe7497fcedc184d7730"
+    },
+    "artifacts/normal/landmark-controls.png": {
+      "bytes": 13021,
+      "sha256": "1a7f97563776e1afe3c8ba5a3438c8b8215b89764506dc485bd0189295b76314"
+    },
+    "artifacts/compact/landmark-controls.png": {
+      "bytes": 6214,
+      "sha256": "72b67fca06e9cc71f53628d7c669954a4a590ab965e6e290bd3795f8b44320ed"
+    },
+    "artifacts/xr/accept.json": {
+      "bytes": 6415,
+      "sha256": "1708886dc3046253300ee03f2f6bb57fadd670af9430b6bd670e72431aad61ef"
+    },
+    "artifacts/xr/focus.json": {
+      "bytes": 6458,
+      "sha256": "2791d9a23715e7aeefff324a2b041ea601f1bf6e51d2a87339d2f0f3573b0e12"
+    }
+  }
+}
