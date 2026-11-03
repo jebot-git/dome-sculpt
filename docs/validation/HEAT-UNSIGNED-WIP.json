@@ -10,7 +10,7 @@
   "fixed_support_mismatches": 0,
   "pose_inputs": 1491,
   "pose_inputs_before_after_equal": true,
-  "sanitizer_scope": "3 own private TUs/invocations; copied b32 support libraries uninstrumented",
+  "sanitizer_scope": "2 own private TUs, 3 invocations; copied b32 support libraries uninstrumented",
   "full_goal_complete": false,
   "sealing_hashes": {
     "src/heat-binding.hpp": "da0f12cb41efeffc1660407afcb2a4b265f873013a3cce7698d87c51c101a0e7",
