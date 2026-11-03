@@ -38,7 +38,7 @@ inline size_t extra_source_uv_storage(const ImportedAsset &asset,
 inline void extra_source_uv_pair(const PaintedMesh &paint,const CreatorAppearance &appearance,
     const std::function<bool()> &cancelled={}) {
   const auto &maps=paint.source_maps();
-  if(!maps || maps->extra_uv_sets.empty())return;
+  if(!maps || (maps->extra_uv_sets.empty()&&!paint.source_sampling_prepared()))return;
   maps->validate_surface(paint.mesh());
   if(!appearance.asset || appearance.source_vertices.size()!=paint.mesh().positions.size())
     throw std::invalid_argument("Additional source UVs lack their original vertex mapping");
@@ -48,15 +48,28 @@ inline void extra_source_uv_pair(const PaintedMesh &paint,const CreatorAppearanc
     primitive=&p;
   }
   if(!primitive)throw std::invalid_argument("Additional source UV primitive identity is missing");
-  for(const auto &[set,values]:maps->extra_uv_sets) {
-    const auto found=primitive->extra_uv_sets.find(set);
-    if(found==primitive->extra_uv_sets.end())throw std::invalid_argument("Additional source UV owner has no original attribute");
-    for(size_t v=0;v<values->size();++v) {
-      if((v&1023)==0 && cancelled && cancelled())throw std::runtime_error("Additional source UV association cancelled");
-      const auto original=appearance.source_vertices[v];
-      if(original>=found->second.size() || std::bit_cast<std::array<uint32_t,2>>(values->at(v))!=std::bit_cast<std::array<uint32_t,2>>(found->second[original]))
+  const auto original=paint.source_sampling_original();
+  const auto &source=original?*original->source_maps():*maps;
+  const auto vertices=paint.source_sampling_vertices();
+  if(original&&(!paint.valid_source_sampling_attachment()||vertices.size()!=paint.mesh().positions.size()))
+    throw std::invalid_argument("Independent source UVs lost their actual original paint owner");
+  auto pair=[&](const auto &values,const auto &authored){
+    for(size_t v=0;v<appearance.source_vertices.size();++v) {
+      if((v&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Additional source UV association cancelled");
+      const auto before=original?vertices[v]:uint32_t(v),source_vertex=appearance.source_vertices[v];
+      if(before>=values.size()||source_vertex>=authored.size()||
+         std::bit_cast<std::array<uint32_t,2>>(values[before])!=std::bit_cast<std::array<uint32_t,2>>(authored[source_vertex]))
         throw std::invalid_argument("Additional source UV association differs from its original attribute");
     }
+  };
+  // Generated carriers are authenticated by the source-paint factory/replay.
+  // Pair their genuine original arrays to the actual asset, rather than pretend
+  // the new carrier number was an authored TEXCOORD_n accessor in that asset.
+  if(original){pair(original->mesh().uv,primitive->mesh.uv);if(source.uv1)pair(*source.uv1,primitive->uv1);}
+  for(const auto &[set,values]:source.extra_uv_sets) {
+    const auto found=primitive->extra_uv_sets.find(set);
+    if(found==primitive->extra_uv_sets.end())throw std::invalid_argument("Additional source UV owner has no original attribute");
+    pair(*values,found->second);
   }
 }
 } // namespace dome::detail

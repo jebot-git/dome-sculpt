@@ -14,6 +14,7 @@ struct CreatorAppearance;
 struct DeformationState;
 struct SourceColorPreparation;
 struct SourceNormalPreparation;
+struct SourcePaintDecodeContext;
 enum class SourceUvAnimationPolicy { RejectAnimated, FreezeAtTime };
 // Canonical Mikk normals belong to PaintedMesh::baked(), not this role table.
 enum class SourceMaterialNormalFrame { UvDerivative, OriginalAttributes };
@@ -75,6 +76,7 @@ public:
   static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &,const detail::PolygonColorArchive *);
   static SourceMaterialArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &,const detail::PolygonColorArchive *,const NormalSamplingArchive *);
   static SourceMaterialArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const detail::PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *);
+  static SourceMaterialArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const detail::PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &);
 private:
   std::vector<std::shared_ptr<const SourceMaterialBindings>> bindings_;
   std::vector<std::shared_ptr<const SourceUvOrigin>> origins_;

@@ -227,6 +227,7 @@ void PaintSettings::validate() const {
 struct PaintedMesh::SurfaceMap {
   struct OriginalSampling {
     std::shared_ptr<const PaintedMesh> before;
+    std::shared_ptr<const PaintSourceMaps> current_maps;
     std::vector<uint32_t> vertices;
   };
   Mesh mesh;
@@ -437,6 +438,12 @@ PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options
 }
 const Mesh &PaintedMesh::mesh() const { return surface_->mesh; }
 bool PaintedMesh::source_sampling_prepared() const noexcept {return surface_&&bool(surface_->original_sampling);}
+bool PaintedMesh::valid_source_sampling_attachment() const noexcept {
+  if(!source_sampling_prepared())return true;
+  const auto &maps=surface_->original_sampling->current_maps;
+  return maps&&source_maps_&&maps==source_maps_&&!maps.owner_before(source_maps_)&&!source_maps_.owner_before(maps)&&
+    surface_->options.policy==PaintUvPolicy::Strict&&!surface_->paint_domain&&!baked_&&!color_projection_&&!normal_projection_;
+}
 std::shared_ptr<const PaintedMesh> PaintedMesh::source_sampling_original() const noexcept {
   return source_sampling_prepared()?surface_->original_sampling->before:nullptr;
 }
@@ -546,7 +553,7 @@ struct SourcePaintAccess {
     if(!expected->uses_alternate_uv()||!same(*expected,*current.source_maps_))
       throw std::invalid_argument("Independent source paint differs from its exact original sampling transport");
     auto proof=std::make_shared<PaintedMesh::SurfaceMap::OriginalSampling>();
-    proof->before=before->snapshot();proof->vertices.assign(vertices.begin(),vertices.end());
+    proof->before=before->snapshot();proof->current_maps=current.source_maps_;proof->vertices.assign(vertices.begin(),vertices.end());
     // Only fresh, unpublished factory/decoder construction reaches this bind.
     // No render snapshot or geometry alias may observe a mutable attachment.
     if(current.surface_.use_count()!=1)throw std::logic_error("Source paint attachment escaped before construction completed");
@@ -2029,6 +2036,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
   return encode(archive,domains,nullptr);
 }
 nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
+  if(!valid_source_sampling_attachment())throw std::invalid_argument("Independent source paint lost its own sampling attachment");
   const auto sampling=paint_sampling_domain();
   if(!valid_paint_sampling_attachment())throw std::logic_error("Paint sampling geometry attachment is invalid");
   if(sampling&&(!paint_domains||!archive))throw std::logic_error("Retained writable paint requires its complete paired Scene24 archive context");

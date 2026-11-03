@@ -40,6 +40,7 @@ public:
                                     const SourcePlacementArchive *,const PolygonColorArchive *);
   static PolygonSceneArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &, const SourceMaterialArchive &, const SourcePlacementArchive *, const PolygonColorArchive *, const NormalSamplingArchive *);
   static PolygonSceneArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const SourceMaterialArchive &,const SourcePlacementArchive *,const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *);
+  static PolygonSceneArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const SourceMaterialArchive &,const SourcePlacementArchive *,const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &);
 
 private:
   size_t entries_ = 0;

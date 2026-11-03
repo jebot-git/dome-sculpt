@@ -249,6 +249,7 @@ void Scene::validate(bool deep_sources) const {
   auto retain_paint = [&](const std::shared_ptr<const PaintedMesh> &paint,bool origin) {
     if(!paint || (origin && !retained_paint.insert(paint.get()).second))return;
     if(!paint->valid_paint_sampling_attachment())throw std::logic_error("Paint sampling attachment differs from its exact immutable geometry owner");
+    if(!paint->valid_source_sampling_attachment())throw std::invalid_argument("Independent source paint lost its exact original sampling owner");
     if(const auto domain=paint->paint_sampling_domain()){domain_paints.insert(paint.get());retain_domain(domain);}
     if(paint->in_stroke())throw std::invalid_argument("Retained UV paint source has an unfinished stroke");
     if(const auto &maps=paint->source_maps()) {
@@ -269,6 +270,7 @@ void Scene::validate(bool deep_sources) const {
       }
     }
     texels+=size_t(paint->resolution())*paint->resolution();paint_bytes+=paint->storage_bytes();
+    if(auto original=paint->source_sampling_original())texels+=size_t(original->resolution())*original->resolution();
     if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
     if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
   };
@@ -553,6 +555,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   const bool normal_context=j.contains("normal_sampling"),paint_context=j.contains("paint_sampling");
+  const SourcePaintDecodeContext source_paint_context{version==28};
   bool flat_volume=false;
   for(const char *key:{"samples","voxel_size","distance_band","sculpt_layers","active_sculpt_layer","next_sculpt_layer","sculpt_mask","sculpt_controls"})
     flat_volume|=j.contains(key);
@@ -560,7 +563,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || (version>21&&version!=23&&version!=24&&version!=25&&version!=26))throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>21&&version!=23&&version!=24&&version!=25&&version!=26&&version!=28))throw std::runtime_error("Unsupported scene version");
   const bool rig_pool=j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==6;
   const bool shared_corner_context=j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==5||(rig_pool&&j.at("polygon_sources").at("shared_colors").get<bool>()));
   if(version<25&&rig_pool)throw std::invalid_argument("Rig source archive requires Scene25");
@@ -635,7 +638,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     };
     for(const auto &o:objects)references(o);
     for(const auto &o:j.at("polygon_sources").at("origins"))references(o);
-    detail::PolygonSceneBudget budget;budget.owning_paint_domain=paint_context;
+    detail::PolygonSceneBudget budget;budget.owning_paint_domain=paint_context;budget.independent_source_paint=source_paint_context.independent_source;
     for (const auto &o : objects) {
       budget.volume(o.at("volume"));
       budget.paint(o.at("painted"),false,unsigned(version));
@@ -753,8 +756,11 @@ Scene Scene::decode(const nlohmann::json &j) {
     // Include retained original paint surfaces before any implicit UV raster
     // allocation; a tiny file must not request hundreds of huge SurfaceMaps.
     size_t pixels=0,storage=0;
-    auto preflight=[&](const nlohmann::json &record) {
-      if(record.is_null())return;const auto &paint=detail::paint_archive_payload(record,paint_context);
+    std::function<void(const nlohmann::json&)> preflight=[&](const nlohmann::json &record) {
+      if(record.is_null())return;const auto &paint=detail::paint_archive_payload(record,paint_context,source_paint_context);
+      if(record.contains("version")&&record.at("version")==4){
+        storage+=record.at("vertices").get_binary().size();preflight(record.at("before"));
+      }
       if(paint.contains("source_maps")){auto coordinates=detail::source_uv_archive_measure(paint.at("source_maps"),unsigned(version));storage+=coordinates.bytes;}
       const auto &resolution=paint.at("resolution");
       if(!resolution.is_number_unsigned() && (!resolution.is_number_integer() || resolution.get<int64_t>()<64))
@@ -883,11 +889,11 @@ Scene Scene::decode(const nlohmann::json &j) {
   if(normal_context)normal_domains=NormalSamplingArchive::decode(j.at("normal_sampling"),source_images);
   PaintSamplingArchive writable_domains;if(paint_context)writable_domains=PaintSamplingArchive::decode(j.at("paint_sampling"));
   SourceMaterialArchive source_materials;
-  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr);
+  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
   detail::SourcePlacementArchive placements;
   if(j.contains("affine_state"))placements=detail::SourcePlacementArchive::decode(j.at("affine_state"),source_models);
   detail::PolygonSceneArchive polygons;
-  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr);
+  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -963,7 +969,7 @@ Scene Scene::decode(const nlohmann::json &j) {
           if(paint.contains("color_projection") || (paint.contains("baked") && paint.at("baked").at("version")!=1))throw std::runtime_error("Prepared paint requires scene10");
           for(const auto &layer:paint.at("layers"))if(layer.contains("pbr_color_tiles"))throw std::runtime_error("Prepared PBR layers require scene10");
         }
-        const auto &paint_payload=detail::paint_archive_payload(v.at("painted"),paint_context);const auto &size = paint_payload.at("resolution");
+        const auto &paint_payload=detail::paint_archive_payload(v.at("painted"),paint_context,source_paint_context);const auto &size = paint_payload.at("resolution");
         if ((!size.is_number_unsigned() &&
              (!size.is_number_integer() || size.get<int64_t>() < 64)) ||
             size.get<uint64_t>() > 2048)
@@ -974,7 +980,7 @@ Scene Scene::decode(const nlohmann::json &j) {
           throw std::length_error("Scene paint-map budget exceeded");
         if (v.at("painted").contains("baked") && j.at("version") < 6 && !legacy_baked5)
           throw std::runtime_error("Baked textures require scene version 6");
-        o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr, polygon_fields && !v.at("polygon").is_null() && o.mesh_active,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr);
+        o.painted = PaintedMesh::decode(v.at("painted"), archives ? &source_images : nullptr, polygon_fields && !v.at("polygon").is_null() && o.mesh_active,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
         paint_bytes += o.painted->storage_bytes();
         if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
       }
@@ -1026,6 +1032,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   unsigned actual_feature=0;
   for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
   if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
+  if(version==28&&actual_feature!=28)throw std::invalid_argument("Scene28 requires actual independent source paint ownership");
   if(version==25&&actual_feature!=25)throw std::invalid_argument("Scene25 requires actual exact pose or rig source authority");
   for(const auto &g:result.groups_)if(g.source_placement && detail::minimum_scene_version(g.source_placement->model.get())>unsigned(version))throw std::invalid_argument("Original source coordinates require their actual scene feature version");
   result.validate();

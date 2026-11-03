@@ -12,6 +12,7 @@ namespace dome::detail {
 // sharing is represented by bounded table references, not an assumed alias.
 struct PolygonSceneBudget {
   bool owning_paint_domain=false;
+  bool independent_source_paint=false;
   size_t samples = 0, pixels = 0, paint_bytes = 0, deformations = 0, remaps = 0,
          retopo_entries = 0, retopo_bytes = 0, retained_vertices = 0;
   static void add(size_t &n, size_t amount, size_t maximum,
@@ -44,7 +45,12 @@ struct PolygonSceneBudget {
   void paint(const nlohmann::json &input, bool retained=false,unsigned version=std::numeric_limits<unsigned>::max()) {
     if (input.is_null())
       return;
-    const auto &p=paint_archive_payload(input,owning_paint_domain);
+    const auto &p=paint_archive_payload(input,owning_paint_domain,SourcePaintDecodeContext{independent_source_paint});
+    if(input.contains("version")&&input.at("version")==4){
+      if(version<28)throw std::invalid_argument("Independent source paint requires its actual Scene28 feature");
+      add(paint_bytes,input.at("vertices").get_binary().size(),256*1024*1024,"Source paint corner-map budget exceeded");
+      paint(input.at("before"),true,version);
+    }
     if(p.contains("source_maps"))add(paint_bytes,source_uv_archive_measure(p.at("source_maps"),version).bytes,256*1024*1024,"Scene retained source UV storage exceeded");
     const auto &r = p.at("resolution");
     if (!r.is_number_unsigned() &&

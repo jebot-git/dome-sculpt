@@ -543,6 +543,9 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
   return decode(j,images,models,materials,placements,shared_colors,domains,nullptr);
 }
 PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const PaintImageArchive &images,const CreatorAssetArchive &models,const SourceMaterialArchive &materials,const SourcePlacementArchive *placements,const PolygonColorArchive *shared_colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
+  return decode(j,images,models,materials,placements,shared_colors,domains,paint_domains,SourcePaintDecodeContext{});
+}
+PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const PaintImageArchive &images,const CreatorAssetArchive &models,const SourceMaterialArchive &materials,const SourcePlacementArchive *placements,const PolygonColorArchive *shared_colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,const SourcePaintDecodeContext &context) {
   PolygonSceneArchive out;out.direct_origins_=j.at("version")>=4;out.direct_rig_origins_=j.at("version")==6;
   if((j.at("version")==5||(j.at("version")==6&&j.at("shared_colors").get<bool>()))&&!shared_colors)throw std::invalid_argument("Shared current corner archive requires Scene20");
   const bool colored=j.at("version")==3 || j.contains("color_fields");
@@ -551,7 +554,7 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
   for (const auto &v : j.at("volumes"))
     out.volumes_.push_back(std::make_shared<const Volume>(Volume::decode(v)));
   for (const auto &p : j.at("paints"))
-    out.paints_.push_back(PaintedMesh::decode(p, &images, true,domains,paint_domains));
+    out.paints_.push_back(PaintedMesh::decode(p, &images, true,domains,paint_domains,context));
   std::vector<std::shared_ptr<const PaintSamplingAttachment>> bound_paints(out.paints_.size());
   std::vector<std::shared_ptr<PolygonAuthority>> authorities;
   std::vector<std::shared_ptr<PolygonOrigin>> origins;

@@ -44,7 +44,7 @@ inline unsigned minimum_appearance_scene_version(const nlohmann::json &a){
   if(!material.is_number_integer()||(material.is_number_unsigned()?material.get<uint64_t>()>INT32_MAX:material.get<int64_t>()<0||material.get<int64_t>()>INT32_MAX))throw std::runtime_error("Invalid retained appearance material identity");
   return material.get<int64_t>()==0?17u:0u;
 }
-inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->paint_sampling_domain()?24u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
+inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_sampling_prepared()?28u:paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->paint_sampling_domain()?24u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
 
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)

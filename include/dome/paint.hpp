@@ -184,6 +184,7 @@ public:
   bool redo();
   std::shared_ptr<PaintedMesh> snapshot() const;
   bool source_sampling_prepared() const noexcept;
+  bool valid_source_sampling_attachment() const noexcept;
   std::shared_ptr<const PaintedMesh> source_sampling_original() const noexcept;
   std::span<const uint32_t> source_sampling_vertices() const noexcept;
   std::shared_ptr<PaintedMesh>

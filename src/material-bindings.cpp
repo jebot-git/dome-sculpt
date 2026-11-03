@@ -5,6 +5,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include "paint-archive-shape.hpp"
+#include "source-uv-archive.hpp"
 #include "dome/normal-preparation.hpp"
 #include "normal-sampling-access.hpp"
 #include "dome/normal-sampling.hpp"
@@ -435,6 +436,10 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
 }
 SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
     const CreatorAssetArchive &models,const detail::PolygonColorArchive *colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains) {
+  return decode(input,images,models,colors,domains,paint_domains,SourcePaintDecodeContext{});
+}
+SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
+    const CreatorAssetArchive &models,const detail::PolygonColorArchive *colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,const SourcePaintDecodeContext &context) {
   if(!input.at("version").is_number_integer() || (input.at("version")!=1 && input.at("version")!=2 && input.at("version")!=3 && input.at("version")!=4 && input.at("version")!=5 && input.at("version")!=6 && input.at("version")!=8 && input.at("version")!=7 && input.at("version")!=9) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
      !input.at("bindings").is_array() || input.at("bindings").size()>256)
     throw std::runtime_error("Invalid resolved material archive");
@@ -484,9 +489,13 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   NormalFrameArchive frames;if(extended)frames=NormalFrameArchive::decode(input.at("normal_frames"));
   // Preflight all implicit SurfaceMap allocations before constructing any.
   size_t texels=0,vertices=0,tile_bytes=0,metadata=0;
-  for(const auto &record:input.at("paints")) {
-    const auto &paint=detail::paint_archive_payload(record,input.at("version")==9);
-    if(record.contains("version"))paint_domains->at(uint32_t(index(record.at("domain"),paint_domains->size())));
+  std::function<void(const nlohmann::json&)> preflight_paint=[&](const auto &record) {
+    const auto &paint=detail::paint_archive_payload(record,input.at("version")==9,context);
+    if(record.contains("version")&&record.at("version")==4){
+      tile_bytes+=record.at("vertices").get_binary().size();preflight_paint(record.at("before"));
+    }
+    if(paint.contains("source_maps"))tile_bytes+=detail::source_uv_archive_measure(paint.at("source_maps")).bytes;
+    if(record.contains("version")&&record.at("version")==2)paint_domains->at(uint32_t(index(record.at("domain"),paint_domains->size())));
     const auto &resolution=paint.at("resolution");
     if(!resolution.is_number_unsigned() && (!resolution.is_number_integer() || resolution.get<int64_t>()<64))
       throw std::runtime_error("Invalid original UV paint resolution");
@@ -521,10 +530,11 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     }
     if(texels>16*1024*1024 || vertices>8'000'000 || tile_bytes>256*1024*1024)
       throw std::length_error("Original UV source archive exceeds scene budgets");
-  }
+  };
+  for(const auto &record:input.at("paints"))preflight_paint(record);
   SourceMaterialArchive output;
   std::vector<std::shared_ptr<const PaintedMesh>> paints;
-  for(const auto &paint:input.at("paints"))paints.push_back(PaintedMesh::decode(paint,&images,false,domains,paint_domains));
+  for(const auto &paint:input.at("paints"))paints.push_back(PaintedMesh::decode(paint,&images,false,domains,paint_domains,context));
   std::vector<std::shared_ptr<const PaintSamplingAttachment>> bound_paints(paints.size());
   auto bind_paint=[&](size_t id,const std::shared_ptr<const SourceMaterialBindings> &before){
     if(!paints[id]->paint_sampling_domain())return paints[id];
