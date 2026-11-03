@@ -864,7 +864,7 @@ struct SourceKeyPaintAccess {
     const auto &a=paint.mesh(),&b=anchor.mesh();const auto domain=paint.paint_sampling_domain(),prior=anchor.paint_sampling_domain();
     const bool same_domain=domain==prior&&!domain.owner_before(prior)&&!prior.owner_before(domain);
     auto result=paint.snapshot();
-    if(!same_domain||paint.resolution()!=anchor.resolution()||paint.surface_diagnostics().policy!=anchor.surface_diagnostics().policy||!same(a.positions,b.positions)||!same(a.normals,b.normals)||a.uv!=b.uv||a.indices!=b.indices||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)return result;
+    if(!same_domain||paint.resolution()!=anchor.resolution()||paint.surface_diagnostics().policy!=anchor.surface_diagnostics().policy||!same(a.positions,b.positions)||!same(a.normals,b.normals)||!same(a.uv,b.uv)||a.indices!=b.indices||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)return result;
     // Full source/field replay above proves the owning model. Exact ordered
     // geometry + actual independent grid-domain identity proves this raster
     // is unchanged; geometry equality alone never grants field authority.
