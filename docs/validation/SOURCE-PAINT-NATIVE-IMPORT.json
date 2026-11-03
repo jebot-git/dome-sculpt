@@ -1,0 +1,706 @@
+{
+  "recorded_utc": "2026-11-03T19:13:26.326746+00:00",
+  "source": "fdc7cefde7c066dff2810878d7428dd997f982d4",
+  "runtime": "50d82e27029473d6dd6f0cd616361a3bbddbf4aa",
+  "published_main_unchanged": "0b5ada05b155ef64333e7aa45db68f41f7a53f22",
+  "status": "Qualified private initial import subset; not main admission or complete production/export qualification",
+  "fresh_builds": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-release/status.json",
+      "sha256": "afe344c7d2d45def435d1683a8894aa9a9a678626876b4e0126cd9bd3d6512bf",
+      "result": {
+        "profile": "release",
+        "source": "734b9c51fce698f6f2b471b39b81bdefc10ab2db",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 3.5207661589956842
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test",
+              "dome-sculpt-source-paint-mtoon-test",
+              "dome-sculpt-mtoon-render-test",
+              "dome-sculpt-source-paint-import-test",
+              "dome-sculpt-source-sampling-transport-test",
+              "dome-sculpt-source-capture-storage-test",
+              "dome-sculpt-source-paint-ui-test"
+            ],
+            "exit": 0,
+            "seconds": 590.2497655980114
+          }
+        ],
+        "seconds": 594.0325539789919,
+        "inputs": 1539,
+        "unchanged": true,
+        "scope": "Fresh whole own native FLTK/OpenXR app/core/support/render and selected test targets for actual native source-aware import, empty image-role captures and supplemental genuine UV1. No preceding archives reused. Build only, no runtime/GUI/hardware/export claim."
+      }
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-sanitize/status.json",
+      "sha256": "c8b752380f19d7683b8550e36bca593ec2938ed5abcbb70ad863830b69e6c832",
+      "result": {
+        "profile": "sanitize",
+        "source": "734b9c51fce698f6f2b471b39b81bdefc10ab2db",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 3.6026104259944987
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test",
+              "dome-sculpt-source-paint-mtoon-test",
+              "dome-sculpt-mtoon-render-test",
+              "dome-sculpt-source-paint-import-test",
+              "dome-sculpt-source-sampling-transport-test",
+              "dome-sculpt-source-capture-storage-test",
+              "dome-sculpt-source-paint-ui-test"
+            ],
+            "exit": 0,
+            "seconds": 939.1547747460136
+          }
+        ],
+        "seconds": 942.8089191369945,
+        "inputs": 1539,
+        "unchanged": true,
+        "scope": "Fresh whole own native FLTK/OpenXR app/core/support/render and selected test targets for actual native source-aware import, empty image-role captures and supplemental genuine UV1. No preceding archives reused. Build only, no runtime/GUI/hardware/export claim."
+      }
+    }
+  },
+  "coherent_final_builds": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-release/status.json",
+      "sha256": "5b229b6e39d0d150538b2dd1df4a695578faa24340f2aca8f23fe5ebba5ccd0d",
+      "result": {
+        "profile": "release",
+        "source": "fdc7cefde7c066dff2810878d7428dd997f982d4",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 3.0343381359998602
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test",
+              "dome-sculpt-source-paint-mtoon-test",
+              "dome-sculpt-mtoon-render-test",
+              "dome-sculpt-source-paint-import-test",
+              "dome-sculpt-source-sampling-transport-test",
+              "dome-sculpt-source-capture-storage-test",
+              "dome-sculpt-source-paint-ui-test"
+            ],
+            "exit": 0,
+            "seconds": 9.825330100982683
+          }
+        ],
+        "seconds": 12.92446696900879,
+        "inputs": 1539,
+        "unchanged": true,
+        "scope": "Coherent continuation from fresh734 own Release/SAN app/core/support/render builds. Continuation on50d runtime, test-only supplemental-UV1/empty-role persistent fault and cancellation mode; no runtime/header/asset changes. Same public/private ABI, retained matching support; changed paint and dependents rebuilt/relinked. Build only, no tests/export/GUI/hardware claim."
+      }
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-sanitize/status.json",
+      "sha256": "994c47cf7846bfa367d31025bf1547ec12d5bf9b7198f4cbb109bf3890595e20",
+      "result": {
+        "profile": "sanitize",
+        "source": "fdc7cefde7c066dff2810878d7428dd997f982d4",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 3.2406964279944077
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test",
+              "dome-sculpt-source-paint-mtoon-test",
+              "dome-sculpt-mtoon-render-test",
+              "dome-sculpt-source-paint-import-test",
+              "dome-sculpt-source-sampling-transport-test",
+              "dome-sculpt-source-capture-storage-test",
+              "dome-sculpt-source-paint-ui-test"
+            ],
+            "exit": 0,
+            "seconds": 11.509481996006798
+          }
+        ],
+        "seconds": 14.813419663987588,
+        "inputs": 1539,
+        "unchanged": true,
+        "scope": "Coherent continuation from fresh734 own Release/SAN app/core/support/render builds. Continuation on50d runtime, test-only supplemental-UV1/empty-role persistent fault and cancellation mode; no runtime/header/asset changes. Same public/private ABI, retained matching support; changed paint and dependents rebuilt/relinked. Build only, no tests/export/GUI/hardware claim."
+      }
+    }
+  },
+  "registered_selected": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-release-tests/status.json",
+      "sha256": "81242032141610a6eb2bdf9d4dc1377472af3bff720f9f5f7469c07c58453ce0",
+      "result": {
+        "state": "terminal",
+        "pid": 2792567,
+        "source": "fdc7cefde7c066dff2810878d7428dd997f982d4",
+        "profile": "release",
+        "scope": "Actual22 registered selected CTest commands on current fdc test-only continuation, runtime50d, from fresh734 owned app/support/render builds. Software GL, leak-enabled sanitizer; existing CTest time/quality bounds unchanged. Not full registered suite, native GUI/physical HMD/vendor proof.",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release",
+          "--output-on-failure",
+          "-R",
+          "^(emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-authored\\-faults|source\\-paint\\-scene|source\\-sampling\\-transport|source\\-capture\\-storage|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|source\\-paint\\-import|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-union\\-version)$"
+        ],
+        "selected": [
+          "emission-paint-data",
+          "physical-emission-background",
+          "emission-scene",
+          "source-paint-owning",
+          "source-paint-resources",
+          "source-paint-faults",
+          "source-paint-authored-faults",
+          "source-paint-scene",
+          "source-sampling-transport",
+          "source-capture-storage",
+          "texture-painting",
+          "scene-authoring",
+          "source-paint-overlay",
+          "source-paint-native",
+          "source-paint-sampler",
+          "source-paint-mtoon",
+          "source-paint-import",
+          "material-visibility",
+          "paint-overlay-gpu",
+          "unlit-fallback",
+          "mtoon-render",
+          "source-union-version"
+        ],
+        "child_pid": 2792596,
+        "exit_code": 0,
+        "seconds": 236.24469751497963,
+        "inputs": 1573,
+        "drift": []
+      }
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-sanitize-tests/status.json",
+      "sha256": "e24202c94c84a59ea0fae8095df1eb2827070aee5088e474a4c1798e8655cfee",
+      "result": {
+        "state": "terminal",
+        "pid": 2792568,
+        "source": "fdc7cefde7c066dff2810878d7428dd997f982d4",
+        "profile": "sanitize",
+        "scope": "Actual22 registered selected CTest commands on current fdc test-only continuation, runtime50d, from fresh734 owned app/support/render builds. Software GL, leak-enabled sanitizer; existing CTest time/quality bounds unchanged. Not full registered suite, native GUI/physical HMD/vendor proof.",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-authored\\-faults|source\\-paint\\-scene|source\\-sampling\\-transport|source\\-capture\\-storage|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|source\\-paint\\-import|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-union\\-version)$"
+        ],
+        "selected": [
+          "emission-paint-data",
+          "physical-emission-background",
+          "emission-scene",
+          "source-paint-owning",
+          "source-paint-resources",
+          "source-paint-faults",
+          "source-paint-authored-faults",
+          "source-paint-scene",
+          "source-sampling-transport",
+          "source-capture-storage",
+          "texture-painting",
+          "scene-authoring",
+          "source-paint-overlay",
+          "source-paint-native",
+          "source-paint-sampler",
+          "source-paint-mtoon",
+          "source-paint-import",
+          "material-visibility",
+          "paint-overlay-gpu",
+          "unlit-fallback",
+          "mtoon-render",
+          "source-union-version"
+        ],
+        "child_pid": 2792898,
+        "exit_code": 0,
+        "seconds": 234.085309970018,
+        "inputs": 1573,
+        "drift": []
+      }
+    }
+  },
+  "initial_import_components": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/eligible-release-tests/status.json",
+      "sha256": "083cf9a5b2e880adc3b41efe21a14f99563daba808b349c93390c452c6f3fb73",
+      "result": {
+        "state": "terminal",
+        "pid": 2741555,
+        "source": "50d82e27029473d6dd6f0cd616361a3bbddbf4aa",
+        "scope": "Actual new source-aware Import/native worker/persistence/graphics plus original sampling and capture regression executables from current fresh owned build. No export/GUI/hardware/full-suite claim.",
+        "runs": [
+          {
+            "name": "source-paint-import",
+            "exit": 0,
+            "seconds": 2.780612649017712
+          },
+          {
+            "name": "source-sampling-transport",
+            "exit": 0,
+            "seconds": 0.00593774500885047
+          },
+          {
+            "name": "source-capture-storage",
+            "exit": 0,
+            "seconds": 0.004987554013496265
+          }
+        ],
+        "phase": "source-capture-storage",
+        "child_pid": 2742165,
+        "exit_code": 0,
+        "inputs": 1553,
+        "drift": []
+      }
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/eligible-sanitize-tests/status.json",
+      "sha256": "97d6248472dbc85f76c7443ba48c5d81d12673558d8c36d31ea3940d22b97a9d",
+      "result": {
+        "state": "terminal",
+        "pid": 2741556,
+        "source": "50d82e27029473d6dd6f0cd616361a3bbddbf4aa",
+        "scope": "Actual new source-aware Import/native worker/persistence/graphics plus original sampling and capture regression executables from current fresh owned build. No export/GUI/hardware/full-suite claim.",
+        "runs": [
+          {
+            "name": "source-paint-import",
+            "exit": 0,
+            "seconds": 4.23872652897262
+          },
+          {
+            "name": "source-sampling-transport",
+            "exit": 0,
+            "seconds": 0.07189040302182548
+          },
+          {
+            "name": "source-capture-storage",
+            "exit": 0,
+            "seconds": 0.06522040901472792
+          }
+        ],
+        "phase": "source-capture-storage",
+        "child_pid": 2742636,
+        "exit_code": 0,
+        "inputs": 1553,
+        "drift": []
+      }
+    }
+  },
+  "strict_A770_and_software_negative": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/hardware-release-tests/status.json",
+    "sha256": "d83edc5b37a807065c804a7ef78ca298a7743d11665625ec091ac1fa2c95cf31",
+    "result": {
+      "state": "terminal",
+      "pid": 2803234,
+      "source": "fdc7cefde7c066dff2810878d7428dd997f982d4",
+      "scope": "Actual strict Intel Arc A770 current source-aware native import component89 plus software-only --hardware rejection. Current CPU build; not selected compute backend/native-app/HMD/export proof.",
+      "runs": [
+        {
+          "name": "source-paint-import",
+          "exit": 0,
+          "seconds": 4.321120426000562
+        },
+        {
+          "name": "software-negative",
+          "exit": 1,
+          "seconds": 0.030548153998097405
+        }
+      ],
+      "phase": "software-negative",
+      "child_pid": 2803931,
+      "exit_code": 0,
+      "inputs": 1551,
+      "drift": []
+    }
+  },
+  "native_FLTK_import": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/native-import-gui/status.json",
+    "sha256": "e21d82e784b70d999a5ac693172241b8622e4a9bd9ece7e521f98a1501c3655b",
+    "result": {
+      "state": "terminal",
+      "source": "fdc7cefde7c066dff2810878d7428dd997f982d4",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/union/import-source-menu.py"
+      ],
+      "scope": "Actual current native FLTK Import chooser, options checkbox, physical Source28 existing project plus MToon-only UV1 source case2, queued Save, Undo/Redo. Private Xvfb/bus/HOME; no Wayland/HMD/export claim.",
+      "pid": 2812194,
+      "child_pid": 2812227,
+      "exit_code": 0,
+      "seconds": 20.605893342988566,
+      "inputs": 1555,
+      "drift": []
+    }
+  },
+  "native_FLTK_checks": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/menu-import-texture-atlas/report.json",
+    "sha256": "e607901b3da9e1ac8fa68473bf33e215d1dd20812ac14e0eb3274d8d14378580",
+    "result": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Import uses the real native chooser with DomeD identity and document ownership"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels native import without touching source or scene"
+        },
+        {
+          "passed": true,
+          "check": "Import options use DomeD native modal ownership and appearance identity"
+        },
+        {
+          "passed": true,
+          "check": "Return on the default Cancel discards native import options without submitting asset work"
+        },
+        {
+          "passed": true,
+          "check": "Atlas GUI fixture uses the observed native bitmap-font layout"
+        },
+        {
+          "passed": true,
+          "check": "The actual native checked atlas marker is rasterized before capturing options or accepting Import"
+        },
+        {
+          "passed": true,
+          "check": "Explicit native options Import submits the source-retaining model on a background worker as one history operation"
+        },
+        {
+          "passed": true,
+          "check": "Actual native import and Save preserve all objects and editable node hierarchy"
+        },
+        {
+          "passed": true,
+          "check": "Native Save includes canonical source, frame, image, material and deformation archives"
+        },
+        {
+          "passed": true,
+          "check": "Actual native checkbox keeps immutable original images, raw source coordinates and genuine authored UV1 separate from the writable atlas"
+        },
+        {
+          "passed": true,
+          "check": "One universal Undo restores exact pre-import scene with no partial groups"
+        },
+        {
+          "passed": true,
+          "check": "One universal Redo restores exact imported editable source state"
+        },
+        {
+          "passed": true,
+          "check": "The original input file remains byte-exact and the native application remains responsive"
+        }
+      ],
+      "failed": 0
+    }
+  },
+  "authored_faults": {
+    "persistent_allocations": 389,
+    "cancellation_boundaries": 11
+  },
+  "existing_faults": {
+    "persistent_allocations": 639,
+    "cancellation_boundaries": 10
+  },
+  "preserved_negatives": [
+    "Initial fixture appended float accessor after PNG without alignment; loader correctly refused misaligned accessor. Fixed fixture padding, no loader relaxation.",
+    "Aligned diagnostic reached real case5 fixture which removed UV0 but left UV1. Loader correctly refused noncontiguous coordinates. Removed both only for genuinely UV-less fixture.",
+    "Wrong-coordinate counterfactual substitutes UV0 for genuine visibly contributing affine MToon UV1 and must change pixels by more than4.",
+    "Standard export of alternate source images remains unavailable until actual adapter and portable painted-bake implementation; legacy resampling assertions require meaningful migration."
+  ],
+  "scope_limits": [
+    "22 selected commands, not all558 registered tests",
+    "CPU compute builds and actual Arc GL component only; no new vendor compute/app/HMD claim",
+    "Native import uses actual FLTK app in private Xvfb/bus/HOME; no Wayland or headset claim",
+    "GUI orchestration is an archived adaptation of tests/import-menu.py using real generated case2 plus Source28 physical initial project; not a newly versioned GUI helper target",
+    "No system installation or active-session restart",
+    "Full production goal, every incomplete requirement and post-basic controller drawers remain required"
+  ],
+  "archived_evidence": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-release/before.json",
+      "sha256": "fe0afc7774d7488d1514dba21affcb27214b7b0ff248aa9d2302807b67d130da"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-release/after.json",
+      "sha256": "fe0afc7774d7488d1514dba21affcb27214b7b0ff248aa9d2302807b67d130da"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-release/build.log",
+      "sha256": "57f34f0fbe1eb0affa6732d4869a1f48ba7bf032d268fd1cd13faf513bac0fd0"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-sanitize/before.json",
+      "sha256": "fe0afc7774d7488d1514dba21affcb27214b7b0ff248aa9d2302807b67d130da"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-sanitize/after.json",
+      "sha256": "fe0afc7774d7488d1514dba21affcb27214b7b0ff248aa9d2302807b67d130da"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/fresh-sanitize/build.log",
+      "sha256": "a594f94bfcfc1d8903b7d20c9d1cfc6fb758f9fadeb63a1c4c5d63d3f09cdc2e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-release/before.json",
+      "sha256": "8fad9994a02d4ddaebdf8fe0da4b808be079a606d98bc6d943fdbe7da0ad3a03"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-release/after.json",
+      "sha256": "8fad9994a02d4ddaebdf8fe0da4b808be079a606d98bc6d943fdbe7da0ad3a03"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-release/build.log",
+      "sha256": "cc3d569144bae4f95c7660d13af32e8bc622746489c6de614f855cd4665ebb75"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-sanitize/before.json",
+      "sha256": "8fad9994a02d4ddaebdf8fe0da4b808be079a606d98bc6d943fdbe7da0ad3a03"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-sanitize/after.json",
+      "sha256": "8fad9994a02d4ddaebdf8fe0da4b808be079a606d98bc6d943fdbe7da0ad3a03"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/faults-sanitize/build.log",
+      "sha256": "4487505fb95bd2704bce60bffd1fbe040f24ed80ed1deedac783733361ac6f8e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-release-tests/before.json",
+      "sha256": "0f8870561c363260d9430fcc647794c8e5b2079326998a34bff2a595da313da7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-release-tests/after.json",
+      "sha256": "0f8870561c363260d9430fcc647794c8e5b2079326998a34bff2a595da313da7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-release-tests/ctest.log",
+      "sha256": "b8bfe9f060fbc2faf0fd0169c16f95babdd4649af0d0d6f5e4671dadd3197db6"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-sanitize-tests/before.json",
+      "sha256": "cedebf6cc76eed7b2b43513660b0ced2d90f179b617cf073c2cb3ccb0e24a4a5"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-sanitize-tests/after.json",
+      "sha256": "cedebf6cc76eed7b2b43513660b0ced2d90f179b617cf073c2cb3ccb0e24a4a5"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/registered-sanitize-tests/ctest.log",
+      "sha256": "f8ccb13681c7c260356b2ae19545747f77392f8123df4bf0171ced83aa16df39"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/hardware-release-tests/before.json",
+      "sha256": "2b2cfcdc3aac4e6005517c35b810ca551aa021b3e2c38f359412c083346d9e2c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/hardware-release-tests/after.json",
+      "sha256": "2b2cfcdc3aac4e6005517c35b810ca551aa021b3e2c38f359412c083346d9e2c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/native-import-gui/before.json",
+      "sha256": "0034f9becee344fb80749a507049cb88eab42a20a983ed2af9fa686674181b93"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/native-import-gui/after.json",
+      "sha256": "0034f9becee344fb80749a507049cb88eab42a20a983ed2af9fa686674181b93"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/import-proof/native-import-gui/gui.log",
+      "sha256": "ba8df3c9c98fc72e3bd3951fc2ea180baf954b7edd226982dfe8c3fbc61d54bc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/union/import-regressions.py",
+      "sha256": "c9f21add222a4b20e0f6c92608d2d5c6ad1462553c808fab21f056ee6b0c31b5"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/union/import-hardware.py",
+      "sha256": "20f326793fe5a95ab2cbe06a4968caf14eaa519001537461dd93b6b7b98a0a3a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/union/import-gui-proof.py",
+      "sha256": "436dd36fa47c0a921e2e849f7a6e2511e54b09792e6b16c2c50a3129d6e040f1"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/artifacts/union/import-source-menu.py",
+      "sha256": "5162e65c99c21def98fdfa96b49cb15fa7e5153d73d1e57ea24ca1b37764a196"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/source-paint-import-ab878/build-import-release/dome-sculpt-source-paint-import-gui-helper",
+      "sha256": "cacb6736c83f3f8ef8c4b32cd0b9526dd186284a6c2f406860ea5b5b74b8d536"
+    }
+  ]
+}
