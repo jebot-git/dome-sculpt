@@ -469,6 +469,8 @@ struct SourcePaintAccess {
   using Coordinates=std::vector<std::array<float,2>>;
   static const PaintSourceMaps &maps(const PaintedMesh &paint){static const PaintSourceMaps empty;return paint.source_maps_?*paint.source_maps_:empty;}
   static std::shared_ptr<PaintedMesh> capture(Mesh mesh,std::shared_ptr<const PaintSourceMaps> input,uint32_t resolution,PaintSurfaceOptions options){
+    if(mesh.positions.size()>2'000'000||mesh.indices.size()/3>2'000'000)
+      throw std::length_error("Original sampling capture exceeds native persisted geometry bounds");
     if(options.policy!=PaintUvPolicy::Strict&&options.policy!=PaintUvPolicy::SourceAuthored)
       throw std::invalid_argument("Original sampling capture cannot reinterpret a polygon paint domain");
     options.policy=PaintUvPolicy::SourceAuthored;

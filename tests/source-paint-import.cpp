@@ -11,7 +11,7 @@
 namespace {
 using Json=nlohmann::json;
 import_fixture::Fixture input(int kind){
- import_fixture::Fixture f;auto &p=f.j["meshes"][0]["primitives"][0];p["attributes"]["TEXCOORD_0"]=f.values({-1.25f,-.5f,1.75f,-.5f,1.75f,2.5f,-1.25f,2.5f},2,"VEC2");
+ import_fixture::Fixture f;while(f.bin.size()%4)f.bin.push_back(0);auto &p=f.j["meshes"][0]["primitives"][0];p["attributes"]["TEXCOORD_0"]=f.values({-1.25f,-.5f,1.75f,-.5f,1.75f,2.5f,-1.25f,2.5f},2,"VEC2");
  f.j["nodes"][0]["translation"]={0,0,0};f.j["nodes"][0]["children"]={1};f.j["nodes"][1]["translation"]={0,0,0};f.j["nodes"][1]["scale"]={5,5,5};
  auto &m=f.j["materials"][0];
  if(kind!=0&&kind!=2)m["pbrMetallicRoughness"].erase("baseColorTexture");
@@ -20,7 +20,7 @@ import_fixture::Fixture input(int kind){
   if(kind==3){m["extensions"]["VRMC_materials_mtoon"]["matcapTexture"]={{"index",0}};m["extensions"]["VRMC_materials_mtoon"]["matcapFactor"]={.4f,.3f,.2f};}
  }
  if(kind>=4){m["alphaMode"]="OPAQUE";m.erase("alphaCutoff");}
- if(kind==5)p["attributes"].erase("TEXCOORD_0");
+ if(kind==5){p["attributes"].erase("TEXCOORD_0");p["attributes"].erase("TEXCOORD_1");}
  return f;
 }
 void settle(Document &d){if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error("Actual native source import/paint worker: "+d.frame().state->error);}
@@ -37,7 +37,8 @@ int main(int argc,char **argv)try{
   check(paint.source_maps()->empty()==(kind!=0&&kind!=2),"Untextured and typed-only imports contain no invented PBR image roles");
   check(object.material_bindings->has_mtoon==(kind>=1&&kind<=3),"Standalone glTF MToon roles are adopted independently of a VRM humanoid root");
   const auto baseline=prepared.scene.encode();check(baseline.at("version")==28&&Scene::decode(baseline).encode()==baseline,"Owning Scene28 restores actual native imported source and supplemental logical UV1");
-  check(paint.source_sampling_authored_uv1()&&paint.source_sampling_authored_uv1()->size()==paint.source_sampling_original()->mesh().positions.size(),"Unused-by-PBR authored UV1 remains a genuine before-domain field");
+  const auto authored_uv1=paint.source_sampling_authored_uv1();
+  check(kind==5?!authored_uv1:authored_uv1&&authored_uv1->size()==paint.source_sampling_original()->mesh().positions.size(),"Only genuine unused-by-PBR authored UV1 is retained as a before-domain field");
   auto active=prepared.scene.snapshot();zero_emission(active);const auto saved=active.encode();auto restart=Scene::decode(saved);check(restart.encode()==saved,"Real painted source-aware import preserves exact metadata through native restart");
   Document a,b;a.replace(raw.scene);b.replace(restart);settle(a);settle(b);
   for(bool pbr:{false,true}){if(pbr){a.shading(false);b.shading(false);}else{a.authored_shading();b.authored_shading();}settle(a);settle(b);
