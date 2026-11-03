@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Private explicit-plane Mirror / source integration — 2026-11-03
+
+Private fe3 runtime passes fresh CPU/whole-owned sanitizer selected5,1168 avatar
+consumer checks in each R/SAN/strictA770 profile,111 Khronos files0errors, and
+5464 owning allocation denials per profile. Actual native controls/freehand and
+source-alias details are in KEY-SOURCE-MIRROR-INTEGRATION.md and its receipt.
+This remains private; existing-target desktop selector, XR policy controls,
+general refinement and full current-main admission remain unfinished.
+
+
 ## Private connected artist-frame Mirror owner — 2026-11-03
 
 Conditional29/12/4/6 now has coherent CPU5/SAN5 plus legacy92 and actual

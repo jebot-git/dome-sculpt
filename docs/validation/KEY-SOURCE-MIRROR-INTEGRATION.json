@@ -1,0 +1,424 @@
+{
+  "runtime_source": "fe3a6f628ac1fc57a1c19aadd9dce1481434017e",
+  "test_merge": "7a935d859270148f22bc15dc6c25986e053e9a4c",
+  "parents": {
+    "owning29": "68349596159aa86f701f1c0e94546082f2ceeadf",
+    "root_pristine_source_export": "b2ca53be3bbf6d388275a0866418f1c5a6c291a6",
+    "pixel_evidence": "56277b4a3ba3ec27983c3466d1e1268f3ca9fbab",
+    "fault_fixture": "51b0592defec05a865f76b8a338caa2a3c13e677"
+  },
+  "scope": "private coherent CPU/native/whole-owned C/C++ sanitizer/actualArc composition; no main admission",
+  "fixes": {
+    "552c19e": "Authenticate independently authored logical UV1 and empty/null before-PBR maps in actual source-alias replay, including quota and correspondence; no coordinate/image fabrication",
+    "fe3a6f6": "Declare KHR_materials_unlit from final retained VRM material set after source remap, keeping all other JSON and binary payloads exact"
+  },
+  "profiles": {
+    "release": {
+      "exit_code": 0,
+      "checks": 1168,
+      "images": 36,
+      "maximum_rgba_error": 1,
+      "unchanged_bound": 4,
+      "stats": {
+        "source": "fe3a6f628ac1fc57a1c19aadd9dce1481434017e",
+        "inputs": 1620,
+        "build": {
+          "exit_code": 0,
+          "seconds": 26.678434002998983,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-native",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-key-source-authored-uv1-test",
+            "dome-sculpt-key-mirror-relative-owning-test",
+            "dome-sculpt-key-mirror-relative-render-test",
+            "dome-sculpt-key-hdr-source-integration-test",
+            "dome-sculpt-source-paint-export-test",
+            "dome-sculpt-source-paint-import-test"
+          ]
+        },
+        "tests": {
+          "exit_code": 0,
+          "seconds": 1.3884444589784835,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-native",
+            "--output-on-failure",
+            "-R",
+            "^(key-source-authored-uv1|key-mirror-relative-owning|key-hdr-source-integration|source-paint-export|source-paint-import)$"
+          ]
+        },
+        "software": {
+          "exit_code": 0,
+          "seconds": 188.21002732298803,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/build-native/dome-sculpt-key-mirror-relative-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-export-fixed/software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-connected-8ae72c3/build-native/key-mirror-relative-owning/relative-native.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-mirror-retained-eed311e/artifacts/avatar-next/output/vroid-beta-female-before.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-mirror-retained-eed311e/artifacts/avatar-next/output/vroid-beta-male-before.dsculpt"
+          ]
+        },
+        "input_mismatches": []
+      },
+      "log": "artifacts/mirror-export-fixed/software.log",
+      "log_sha256": "d9d478e42d8cca8cb5caada4ed3896bac2a17d841a82d34edcb57d29d7c62f9e"
+    },
+    "sanitize": {
+      "exit_code": 0,
+      "checks": 1168,
+      "images": 36,
+      "maximum_rgba_error": 1,
+      "unchanged_bound": 4,
+      "stats": {
+        "source": "fe3a6f628ac1fc57a1c19aadd9dce1481434017e",
+        "inputs": 1620,
+        "configure": {
+          "exit_code": 0,
+          "seconds": 3.4715809680055827,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+          ]
+        },
+        "build": {
+          "exit_code": 0,
+          "seconds": 593.5587345769745,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-key-source-authored-uv1-test",
+            "dome-sculpt-key-mirror-relative-owning-test",
+            "dome-sculpt-key-mirror-relative-render-test",
+            "dome-sculpt-key-hdr-source-integration-test",
+            "dome-sculpt-source-paint-export-test",
+            "dome-sculpt-source-paint-import-test"
+          ]
+        },
+        "tests": {
+          "exit_code": 0,
+          "seconds": 5.0142274019890465,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-sanitize",
+            "--output-on-failure",
+            "-R",
+            "^(key-source-authored-uv1|key-mirror-relative-owning|key-hdr-source-integration|source-paint-export|source-paint-import)$"
+          ]
+        },
+        "software": {
+          "exit_code": 0,
+          "seconds": 652.9391166120186,
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/build-sanitize/dome-sculpt-key-mirror-relative-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-export-sanitize/software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-connected-8ae72c3/build-native/key-mirror-relative-owning/relative-native.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-mirror-retained-eed311e/artifacts/avatar-next/output/vroid-beta-female-before.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-mirror-retained-eed311e/artifacts/avatar-next/output/vroid-beta-male-before.dsculpt"
+          ]
+        },
+        "input_mismatches": []
+      },
+      "log": "artifacts/mirror-export-sanitize/software.log",
+      "log_sha256": "d9d478e42d8cca8cb5caada4ed3896bac2a17d841a82d34edcb57d29d7c62f9e"
+    },
+    "arc": {
+      "exit_code": 0,
+      "checks": 1168,
+      "images": 36,
+      "maximum_rgba_error": 0,
+      "unchanged_bound": 4,
+      "stats": {
+        "source": "fe3a6f628ac1fc57a1c19aadd9dce1481434017e",
+        "exit_code": 0,
+        "seconds": 155.54972747000284,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/build-native/dome-sculpt-key-mirror-relative-render-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-export-hardware/output",
+          "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-connected-8ae72c3/build-native/key-mirror-relative-owning/relative-native.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-mirror-retained-eed311e/artifacts/avatar-next/output/vroid-beta-female-before.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/seam-key-mirror-retained-eed311e/artifacts/avatar-next/output/vroid-beta-male-before.dsculpt",
+          "--hardware"
+        ],
+        "device_selector": "pci-0000_03_00_0",
+        "source_and_binary_inputs": 1636,
+        "input_mismatches": [],
+        "scope": "actual offscreen PCI03 OpenGL; no compute/physicalHMD/UI claim"
+      },
+      "log": "artifacts/mirror-export-hardware/run.log",
+      "log_sha256": "024ea5acc9a96391b9509ccc8800ad80583158d4c133efa0ba2662bda99d85ca"
+    }
+  },
+  "format": {
+    "files": 111,
+    "khronos_version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "filters": [],
+    "errors": 0,
+    "warnings": 2106,
+    "official_vrm0_files": 54,
+    "official_schema_files": 15,
+    "official_errors": 0,
+    "profile_byte_equal_files": 37,
+    "all_bin_chunks_match_old_failure": true,
+    "only18_vrm_json_declaration_changes": true
+  },
+  "ui": {
+    "normal": {
+      "assertions": 11,
+      "failed": 0,
+      "complete": true,
+      "status": {
+        "exit_code": 0,
+        "seconds": 22.913819373992737,
+        "inputs": 1623,
+        "inputs_unchanged": true,
+        "command": [
+          "/home/blux/.local/bin/uv",
+          "run",
+          "--offline",
+          "--with",
+          "dbus-next",
+          "--with",
+          "python-xlib",
+          "--with",
+          "pillow",
+          "python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-ui/mirror-ui-r3.py"
+        ]
+      },
+      "report_sha256": "bf9337faea1eda543476a30644364a4cb43366244df213dc17f6afc5a4dc55df"
+    },
+    "compact": {
+      "assertions": 11,
+      "failed": 0,
+      "complete": true,
+      "status": {
+        "exit_code": 0,
+        "seconds": 16.729524850001326,
+        "inputs": 1623,
+        "inputs_unchanged": true,
+        "command": [
+          "/home/blux/.local/bin/uv",
+          "run",
+          "--offline",
+          "--with",
+          "dbus-next",
+          "--with",
+          "python-xlib",
+          "--with",
+          "pillow",
+          "python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-ui/mirror-ui-r3.py"
+        ]
+      },
+      "report_sha256": "bf9337faea1eda543476a30644364a4cb43366244df213dc17f6afc5a4dc55df"
+    },
+    "female19_explicit_hips": {
+      "assertions": 12,
+      "failed": 0,
+      "complete": true,
+      "status": {
+        "exit_code": 0,
+        "seconds": 75.48855726001784,
+        "inputs": 1623,
+        "inputs_unchanged": true,
+        "command": [
+          "/home/blux/.local/bin/uv",
+          "run",
+          "--offline",
+          "--with",
+          "dbus-next",
+          "--with",
+          "python-xlib",
+          "--with",
+          "pillow",
+          "python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-ui/mirror-avatar-ui.py"
+        ]
+      },
+      "report_sha256": "a0b797ed4b6dedcaf08e3e7b25d25a19a99ae1aca28334cfcd839e1e70d407bc"
+    },
+    "immediate_converted_freehand": {
+      "assertions": 14,
+      "failed": 0,
+      "complete": true,
+      "status": {
+        "exit_code": 0,
+        "seconds": 22.261082366021583,
+        "inputs": 1623,
+        "inputs_unchanged": true,
+        "command": [
+          "/home/blux/.local/bin/uv",
+          "run",
+          "--offline",
+          "--with",
+          "dbus-next",
+          "--with",
+          "python-xlib",
+          "--with",
+          "pillow",
+          "python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-ui/mirror-freehand-ui-r3.py"
+        ]
+      },
+      "report_sha256": "7cd2aa7b8f71975fc0ec596e56bbe4358d186d953514a5fd87275feb8afa985c"
+    }
+  },
+  "owning_faults": {
+    "source": "7a935d859270148f22bc15dc6c25986e053e9a4c",
+    "inputs": 1625,
+    "production_identical_to": "fe3a6f628ac1fc57a1c19aadd9dce1481434017e",
+    "release-configure": {
+      "exit_code": 0,
+      "seconds": 2.220725772989681,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-native"
+      ]
+    },
+    "release-build": {
+      "exit_code": 0,
+      "seconds": 10.741631740995217,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-native",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt-key-mirror-relative-faults-test"
+      ]
+    },
+    "release-run": {
+      "exit_code": 0,
+      "seconds": 4.432440851989668,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/build-native/dome-sculpt-key-mirror-relative-faults-test"
+      ]
+    },
+    "sanitize-configure": {
+      "exit_code": 0,
+      "seconds": 1.567928429984022,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-sanitize"
+      ]
+    },
+    "sanitize-build": {
+      "exit_code": 0,
+      "seconds": 16.699090311012696,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-sanitize",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt-key-mirror-relative-faults-test"
+      ]
+    },
+    "sanitize-run": {
+      "exit_code": 0,
+      "seconds": 91.72082950000186,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/build-sanitize/dome-sculpt-key-mirror-relative-faults-test"
+      ]
+    },
+    "input_mismatches": []
+  },
+  "negatives": [
+    "77019 actual authoredUV1 source alias replay refused;552 fixes owning geometry/logical metadata proof rather than dropping field",
+    "Preserved old125 lit and214 unlit pixel errors diagnosed as independent immediate alpha-order error, analytic2quad sensitivity99; test consumer only fixed",
+    "Old111-file cohort864 UNDECLARED_EXTENSION errors preserved; new111 cohort0errors",
+    "First UI End-key trials did not select relative (screenshot exact), Down/Return genuine selection succeeds",
+    "First freehand used point outside sloped surface (unchanged); visible-edge retry changed actual target0 afterUndo/Redo selection clamp, not expected new1; immediateMirror\u2192new1 freehand passes",
+    "Composed-fault initial71188 unknown target exit2 before explicit CMake reconfigure;36691 configured/rebuilt and actual R/SAN5464prefixes pass"
+  ],
+  "limits": [
+    "No broad current-main integration or fresh full CTest regression",
+    "No exhaustive decoder/FLTK or every retained payload allocation sweep",
+    "New desktop existing-target selector remains required; actual UndoRedo ephemeral selection unchanged",
+    "No new XR explicit Mirror plane/frame-policy controls qualified",
+    "General nonmatching-triangle refinement remains separate kernel-only; no Paint5/barycentric owning admission",
+    "Root painted Source4 portable export remains separately unqualified here",
+    "VRM image proof uses explicitly authored controlled current lighting, not unrestricted advanced original MToon"
+  ],
+  "artifacts": {
+    "artifacts/mirror-export-validation/khronos-final.json": "7d2f06493e3d32cab0c2167ddc864deff64443b551f9678b668016ea8e54fac4",
+    "artifacts/mirror-export-validation/official-final.json": "d9caa0e1fa44c5e8c8f80cf0af1ad5316c071f3f687b8879360639e8d0c70128",
+    "artifacts/mirror-export-validation/output-equality.json": "02d3b122314ff8d63bde3203ecdff789c07ad51410ce571e361911b87005b438",
+    "artifacts/mirror-export-validation/before-after-declaration.json": "0d112ce677b46aaf242cfcbfb37d20c08b1ef894330c39222c9019cca3f84744",
+    "artifacts/mirror-export-validation/official-final.py": "1c0b30ed688b86c9460a47401c39ba48b8e03898e78741ae78364ea2634da308",
+    "artifacts/mirror-export-validation/validate.cjs": "44d5bc9cd91aa1c5056fb802c830f6562c16604de67f0d64370435a246885e06",
+    "artifacts/mirror-ui/mirror-ui-r3.py": "17fb22a4d31a8ba5ed4a368e95227a4b47c2766364ff9d25df8d28c47eb789f1",
+    "artifacts/mirror-ui/mirror-avatar-ui.py": "093d99b604f9ef1d705a2b764a10fa090affff7dc65dc65ca387b01ce159da6b",
+    "artifacts/mirror-ui/mirror-freehand-ui-r3.py": "8accbb552b116a831500326b9a0e58c5a3e2129bd56c8620e72038ed65df96a7",
+    "artifacts/composed-faults-r2/release-run.log": "4d6f5061d6b4c5409e01493dd6e554e73706b67100567ecfef8856f46549d153",
+    "artifacts/composed-faults-r2/sanitize-run.log": "4d6f5061d6b4c5409e01493dd6e554e73706b67100567ecfef8856f46549d153"
+  },
+  "native_artifact_preservation": {
+    "files": 12,
+    "mismatches": []
+  }
+}
