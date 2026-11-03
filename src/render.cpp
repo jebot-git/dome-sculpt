@@ -113,6 +113,7 @@ struct SurfaceRenderer::TextureState {
     std::array<PaintSourceTexture,4> packed_views;
     std::array<bool,4> packed_srgb{true,true,true,false};
     MToonSourcePacks::Inputs packed_inputs;
+    std::shared_ptr<const detail::PaintOverlayPacket> overlay;
     bool derived=false,shade_alias=false,baked_normal=false;
   };
   GLint vertex_attributes=0;
@@ -121,6 +122,7 @@ struct SurfaceRenderer::TextureState {
   detail::PaintOverlayCompiler paint_overlays;
   std::unordered_map<uint64_t,std::array<float,3>> physical_backgrounds;
   std::vector<std::array<float,2>> uv1;
+  std::vector<std::array<float,2>> original_uv0,paint_coordinates;
   std::array<std::vector<std::array<float,4>>,3> extra_uv;
   std::unordered_map<uint64_t,std::shared_ptr<const PaintSourceMaps>> source_maps;
   std::unordered_set<uint64_t> weighted;
@@ -143,7 +145,7 @@ struct SurfaceRenderer::TextureState {
   static Sampler sampler(const PaintSourceTexture&s){return {s.wrap_s,s.wrap_t,s.min_filter?s.min_filter:GL_LINEAR,s.mag_filter?s.mag_filter:GL_LINEAR};}
   static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
   SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size()+paint_overlays.image_count(),samplers.size(),bytes+packed_sources.bytes()+paint_overlays.bytes(),uploads,packed_sources.bytes(),packed_sources.builds()};}
-  void clear(bool release){paint_overlays.clear(release);physical_backgrounds.clear();packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();for(auto &values:extra_uv)values.clear();source_maps.clear();weighted.clear();vertex_alpha.clear();}
+  void clear(bool release){paint_overlays.clear(release);physical_backgrounds.clear();packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();original_uv0.clear();paint_coordinates.clear();for(auto &values:extra_uv)values.clear();source_maps.clear();weighted.clear();vertex_alpha.clear();}
   void prepare(const MeshSnapshot&mesh,bool geometry_changed){
     if(geometry_changed && (!mesh.mesh.positions.empty() || !mesh.mesh.indices.empty()))mesh.mesh.validate();
     const auto count=mesh.mesh.positions.size();
@@ -169,7 +171,7 @@ struct SurfaceRenderer::TextureState {
     if(geometry_changed)for(auto t:mesh.source_tangents){float n=length(Vec3{t[0],t[1],t[2]});if(!finite(Vec3{t[0],t[1],t[2]})||!std::isfinite(n)||n<1e-8f||(t[3]!=-1&&t[3]!=1))throw std::invalid_argument("Retained tangent frame is invalid");}
     for(const auto &range:mesh.ranges) {
       if(range.material_bindings&&range.material_bindings->physical_emission&&
-         ((range.material_bindings->has_mtoon&&!range.pbr_view)||(range.textures&&!range.textures->source_only)))
+         (range.textures&&!range.textures->source_only))
         throw std::invalid_argument("Derived absolute emission requires its physical overlay adapter");
       if(range.material_bindings && range.material_bindings->normal_frames && !range.source_frame)throw std::invalid_argument("Retained material frames require complete worker frame publication");
       if(range.source_frame && (mesh.source_normals.size()!=count || (!range.source_normal_only && mesh.source_tangents.size()!=count)))throw std::invalid_argument("Source frame arrays are unavailable");
@@ -195,6 +197,7 @@ struct SurfaceRenderer::TextureState {
     std::unordered_set<Sampler,SamplerHash> wanted_samplers;
     std::unordered_map<uint64_t,std::array<PlanSlot,16>> planned;
     std::unordered_map<uint64_t,Toon> next_toons;std::vector<std::array<float,2>> next_uv1;
+    std::vector<std::array<float,2>> next_original_uv0,next_paint_coordinates;
     std::array<std::vector<std::array<float,4>>,3> next_extra_uv;
     std::unordered_map<uint64_t,std::shared_ptr<const PaintSourceMaps>> next_source_maps;
     std::unordered_map<uint64_t,std::array<float,3>> next_physical_backgrounds;
@@ -208,6 +211,19 @@ struct SurfaceRenderer::TextureState {
         if(!maps->source_only||!owner||owner!=maps->source_maps||owner.owner_before(maps->source_maps)||maps->source_maps.owner_before(owner))
           throw std::invalid_argument("GPU overlay lost its exact original sampling owner");
         overlay_inputs.push_back({maps->overlay,true});
+        const auto &logical=maps->overlay->original_uv0();
+        if(!logical)throw std::invalid_argument("Source paint packet omitted its authenticated original UV0");
+        if(vertex_attributes<13)throw std::runtime_error("Independent source painting requires thirteen vertex attribute slots");
+        if(geometry_changed){
+          if(range.first_vertex>count||logical->size()>count-range.first_vertex)throw std::invalid_argument("Original UV0 domain exceeds packed geometry");
+          for(size_t c=range.first;c<range.first+range.count;++c){const auto v=mesh.mesh.indices.at(c);if(v<range.first_vertex||v-range.first_vertex>=logical->size())throw std::invalid_argument("Original UV0 index is outside its sealed packed domain");}
+          if(next_original_uv0.empty())next_original_uv0=mesh.mesh.uv;
+          if(next_paint_coordinates.empty())next_paint_coordinates=mesh.paint_coordinates.empty()?mesh.mesh.uv:mesh.paint_coordinates;
+          std::copy(logical->begin(),logical->end(),next_original_uv0.begin()+range.first_vertex);
+          // Source4's current mesh UV0 is the actual writable grid, even when
+          // another range supplies an independently prepared paint stream.
+          std::copy_n(mesh.mesh.uv.begin()+range.first_vertex,logical->size(),next_paint_coordinates.begin()+range.first_vertex);
+        }
       }
       if(maps&&maps->source_maps){
         const auto &owner=maps->source_maps;auto before=source_maps.find(range.object);
@@ -294,10 +310,10 @@ struct SurfaceRenderer::TextureState {
       if(range.source_normal_only && ((typed && typed->parameters.normal_enabled && typed->parameters.normal_scale!=0 && typed->textures[size_t(MToonSlot::Normal)].index>=0) ||
           (!typed && maps && maps->source_maps && maps->source_maps->normal.image && maps->source_maps->normal_scale!=0)))
         throw std::invalid_argument("Normal-mapped source material requires retained tangent authority");
-      if(typed&&maps&&maps->overlay)throw std::invalid_argument("Typed source paint needs its MToon overlay coordinate adapter");
       if(typed){
         Toon toon;toon.appearance=range.appearance;toon.source=range.material_bindings;toon.material=*typed;
         toon.derived=maps&&!maps->source_only;
+        if(maps&&maps->overlay&&!maps->overlay->empty())toon.overlay=maps->overlay;
         if(toon.source) {toon.roles=toon.source->roles;toon.native=toon.source->native_reference;}
         else {
           toon.native=native_source(*range.appearance);const auto &asset=*range.appearance->asset;
@@ -319,6 +335,12 @@ struct SurfaceRenderer::TextureState {
           const auto &view=toon.roles[role];slot(destination,view.image,view,t.encoding==MToonEncoding::Srgb);
         };
         for(int role=0;role<11;++role)if(!prepared_normal||role!=int(MToonSlot::Normal))original(role,role);
+        if(toon.overlay){
+          toon.packed_views[0]=toon.roles[0];toon.packed_views[1]=toon.roles[3];
+          toon.packed_srgb[0]=typed->textures[0].encoding==MToonEncoding::Srgb;
+          toon.packed_srgb[1]=typed->textures[3].encoding==MToonEncoding::Srgb;
+          for(int view:{2,3}){auto &v=toon.packed_views[view];v.wrap_s=v.wrap_t=GL_CLAMP_TO_EDGE;v.min_filter=v.mag_filter=GL_LINEAR;}
+        }
         if(prepared_normal){PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;view.min_filter=view.mag_filter=GL_LINEAR;
           auto image=std::shared_ptr<const Image>(maps,&maps->mtoon_normal);
           if(maps->normal_projection->version==2){const auto &p=*maps->normal_projection;
@@ -349,7 +371,11 @@ struct SurfaceRenderer::TextureState {
             slot(13,std::shared_ptr<const Image>(maps,&maps->baked_normal),view,false);slot(15,std::shared_ptr<const Image>(maps,&maps->baked_coverage),view,false);toon.baked_normal=true;
           }
         }
-        if(needs_uv1&&geometry_changed){
+        if(needs_uv1&&maps&&maps->overlay){
+          const auto &logical=maps->overlay->original_uv1();
+          if(!logical||logical!=source_uv1||logical.owner_before(source_uv1)||source_uv1.owner_before(logical))
+            throw std::invalid_argument("MToon UV1 lacks its actual original authored coordinate owner");
+        }else if(needs_uv1&&geometry_changed){
           if(!range.appearance || !range.appearance->asset)throw std::runtime_error("Resolved MToon UV1 requires retained primitive provenance");
           const auto &appearance=*range.appearance;const auto &asset=*appearance.asset;
           const ImportedPrimitive *primitive=nullptr;for(const auto &p:asset.primitives)if(p.source_mesh==appearance.source_mesh&&p.source_primitive==appearance.source_primitive){if(primitive)throw std::runtime_error("MToon source primitive identity is ambiguous");primitive=&p;}
@@ -397,10 +423,15 @@ struct SurfaceRenderer::TextureState {
       size_t count=storage(i,desired.mips);if(count>limits.max_bytes-bytes)throw std::length_error("GPU original texture byte budget exceeded");bytes+=count;
     }
     std::vector<MToonSourcePacks::Inputs> source_packs;
-    for(auto &[object,toon]:next_toons)if(toon.derived) {
+    for(auto &[object,toon]:next_toons)if(toon.derived||toon.overlay) {
       for(size_t view=0;view<4;++view)if(const auto &image=toon.packed_views[view].image) {
         Key key{image.get(),toon.packed_srgb[view]};
         toon.packed_inputs[view]={image,0,wanted.at(key).mips,key.srgb};
+      }
+      if(toon.overlay){
+        detail::PaintOverlayCompiler::Resource forecast;forecast.owner=toon.overlay->contribution_owner()?toon.overlay->contribution_owner():toon.overlay;forecast.pbr=true;
+        toon.packed_inputs[2]=MToonSourcePacks::Input::linear(forecast,4);
+        toon.packed_inputs[3]=MToonSourcePacks::Input::linear(forecast,3);
       }
       source_packs.push_back(toon.packed_inputs);
     }
@@ -439,14 +470,18 @@ struct SurfaceRenderer::TextureState {
       try{samplers.emplace(sample,id);}catch(...){glDeleteSamplers(1,&id);throw;}
     }
     source_packs.clear();
-    for(auto &[object,toon]:next_toons)if(toon.derived) {
+    for(auto &[object,toon]:next_toons)if(toon.derived||toon.overlay) {
       for(auto &view:toon.packed_inputs)if(view.owner)view.texture=images.at(Key{view.owner.get(),view.srgb}).id;
+      if(toon.overlay){const auto &resource=paint_overlays.at(toon.overlay,true);
+        toon.packed_inputs[2]=MToonSourcePacks::Input::linear(resource,4);
+        toon.packed_inputs[3]=MToonSourcePacks::Input::linear(resource,3);
+      }
       source_packs.push_back(toon.packed_inputs);
     }
     packed_sources.prepare(source_packs,bytes+overlay_bytes,wanted.size()+overlay_images,limits);
     std::unordered_map<uint64_t,Binding> ready;
     for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv,plan[n].coordinate};}
-    bindings=std::move(ready);toons=std::move(next_toons);physical_backgrounds=std::move(next_physical_backgrounds);if(geometry_changed){uv1=std::move(next_uv1);extra_uv=std::move(next_extra_uv);}source_maps=std::move(next_source_maps);weighted=std::move(next_weighted);
+    bindings=std::move(ready);toons=std::move(next_toons);physical_backgrounds=std::move(next_physical_backgrounds);if(geometry_changed){uv1=std::move(next_uv1);extra_uv=std::move(next_extra_uv);original_uv0=std::move(next_original_uv0);paint_coordinates=next_paint_coordinates.empty()?mesh.paint_coordinates:std::move(next_paint_coordinates);}source_maps=std::move(next_source_maps);weighted=std::move(next_weighted);
   }
 };
 SurfaceRenderer::SurfaceRenderer():SurfaceRenderer(SurfaceTextureLimits{}){}
@@ -608,7 +643,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       if(!mesh->normal_coordinates.empty()&&mesh->normal_coordinates.size()!=count)throw std::invalid_argument("Retained normal coordinate vertex count differs");
       const size_t normal_bytes=render_detail::buffer_bytes(mesh->normal_coordinates.size(),sizeof(std::array<float,4>));
       const size_t paint_offset=render_detail::buffer_sum(normal_offset,normal_bytes);
-      const size_t paint_bytes=render_detail::buffer_bytes(mesh->paint_coordinates.size(),sizeof(std::array<float,2>));
+      const size_t paint_bytes=render_detail::buffer_bytes(textures_->paint_coordinates.size(),sizeof(std::array<float,2>));
       std::array<size_t,3> extra_offsets{},extra_bytes{};
       size_t geometry_bytes=render_detail::buffer_sum(paint_offset,paint_bytes);
       for(size_t block=0;block<3;++block){const auto &values=textures_->extra_uv[block];if(!values.empty()&&values.size()!=count)throw std::invalid_argument("Extra source UV packed count differs");extra_offsets[block]=geometry_bytes;extra_bytes[block]=render_detail::buffer_bytes(values.size(),sizeof(std::array<float,4>));geometry_bytes=render_detail::buffer_sum(geometry_bytes,extra_bytes[block]);}
@@ -617,7 +652,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       vertices.reserve(count);
       for(size_t i=0;i<count;++i)
         vertices.push_back({mesh->mesh.positions[i],mesh->mesh.normals[i],
-          mesh->mesh.uv.empty()?std::array<float,2>{}:mesh->mesh.uv[i],
+          textures_->original_uv0.empty()?(mesh->mesh.uv.empty()?std::array<float,2>{}:mesh->mesh.uv[i]):textures_->original_uv0[i],
           textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],
           mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i]});
       glBindBuffer(GL_ARRAY_BUFFER,vertices_);
@@ -636,7 +671,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         if(color_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(color_offset),GLsizeiptr(color_bytes),mesh->source_colors.data());
         if(normal_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(normal_offset),GLsizeiptr(normal_bytes),mesh->normal_coordinates.data());
         for(size_t block=0;block<3;++block)if(extra_bytes[block])glBufferSubData(GL_ARRAY_BUFFER,GLintptr(extra_offsets[block]),GLsizeiptr(extra_bytes[block]),textures_->extra_uv[block].data());
-        if(paint_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(paint_offset),GLsizeiptr(paint_bytes),mesh->paint_coordinates.data());
+        if(paint_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(paint_offset),GLsizeiptr(paint_bytes),textures_->paint_coordinates.data());
       } else glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes),vertices.data(),GL_STATIC_DRAW);
       check_surface_buffer("Surface vertex buffer upload failed");
       glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),nullptr);glEnableVertexAttribArray(0);
@@ -727,7 +762,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
     glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&maps->normal_projection);
-    glUniform1i(glGetUniformLocation(program_,"paint_domain"),paint_domain);
+    glUniform1i(glGetUniformLocation(program_,"paint_domain"),paint_domain||(maps&&maps->overlay&&maps->overlay->original_uv0()));
     glUniform1i(glGetUniformLocation(program_,"retained_normal_domain"),maps&&maps->normal_projection&&maps->normal_projection->version==2);
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),0);glUniform1i(glGetUniformLocation(program_,"mt_outline"),0);
     if (maps&&!maps->source_only) {
@@ -809,22 +844,26 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     }
     u[0]=effective;
     if(t.derived){u[0]={1,1,1,1};u[2][0]=u[2][1]=u[2][2]=emission_strength;}
+    const auto background=textures_->physical_backgrounds.find(r.object);
+    if(t.overlay)u[0]={1,1,1,1};
+    if(t.overlay||background!=textures_->physical_backgrounds.end())u[2][0]=u[2][1]=u[2][2]=1;
     auto original=Material::AlphaMode(source.alpha);
     if(r.material.alpha!=Material::AlphaMode::Automatic&&r.material.alpha!=original)u[8][1]=r.material.alpha==Material::AlphaMode::Opaque?0:r.material.alpha==Material::AlphaMode::Mask?1:2;
     if(r.material.alpha_cutoff!=source.alpha_cutoff)u[6][3]=r.material.alpha_cutoff;
     std::array<GLint,16> present{},coordinates{},derived{},channels{};std::array<float,32> offsets{},scales{};std::array<float,16> rotations{};std::array<float,6> pbrx{},pbry{};
     auto &binding=textures_->bindings.at(r.object);
     for(int n=0;n<16;++n){auto &slot=binding[n];glActiveTexture(GL_TEXTURE0+n);
-      if(n==14){glBindTexture(GL_TEXTURE_BUFFER,t.derived?textures_->packed_sources.at(t.packed_inputs).texture:0);glBindSampler(n,0);}
+      if(n==14){glBindTexture(GL_TEXTURE_BUFFER,(t.derived||t.overlay)?textures_->packed_sources.at(t.packed_inputs).texture:0);glBindSampler(n,0);}
       else {glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);}
+      if(t.overlay&&(n==0||n==3)){glBindTexture(GL_TEXTURE_2D,textures_->paint_overlays.at(t.overlay,true).planes[n==0?0:2]);glBindSampler(n,0);}
       present[n]=slot.image!=0;coordinates[n]=slot.coordinate;
       int role=n==12?0:n==13?3:n;scales[n*2]=scales[n*2+1]=1;
       if(role<11){auto &texture=t.material.textures[role];coordinates[n]=role==int(MToonSlot::Matcap)?0:mtoon_coordinate(texture);offsets[n*2]=texture.offset[0];offsets[n*2+1]=texture.offset[1];scales[n*2]=texture.scale[0];scales[n*2+1]=texture.scale[1];rotations[n]=texture.rotation;channels[n]=texture.channel;}
       if(n>=14){int k=n-14;pbrx[k*3]=slot.uv[0];pbrx[k*3+1]=slot.uv[1];pbrx[k*3+2]=slot.uv[4];pbry[k*3]=slot.uv[2];pbry[k*3+1]=slot.uv[3];pbry[k*3+2]=slot.uv[5];}
       auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);
     }
-    if(t.derived) {
-      derived[0]=derived[3]=1;
+    if(t.derived||t.overlay) {
+      if(t.derived)derived[0]=derived[3]=1;
       const auto &pack=textures_->packed_sources.at(t.packed_inputs);
       std::array<std::array<GLint,4>,4> sampling{};
       for(size_t view=0;view<4;++view)sampling[view]=TextureState::sampler(t.packed_views[view]);
@@ -837,12 +876,16 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     }
     glUniform1i(glGetUniformLocation(program_,"source_frame"),r.source_frame);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),r.canonical_frame);
     glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),0);
-    glUniform1i(glGetUniformLocation(program_,"paint_domain"),bool(r.paint_sampling_attachment));
+    glUniform1i(glGetUniformLocation(program_,"paint_domain"),bool(r.paint_sampling_attachment)||(r.textures&&r.textures->overlay&&r.textures->overlay->original_uv0()));
     glUniform1i(glGetUniformLocation(program_,"retained_normal_domain"),r.textures&&r.textures->normal_projection&&r.textures->normal_projection->version==2);
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),1);glUniform1i(glGetUniformLocation(program_,"mt_outline"),outline);glUniform1i(glGetUniformLocation(program_,"mt_baked_normal"),t.baked_normal);glUniform4fv(glGetUniformLocation(program_,"mt[0]"),12,u[0].data());
     glUniform1iv(glGetUniformLocation(program_,"mt_present[0]"),16,present.data());glUniform1iv(glGetUniformLocation(program_,"mt_coord[0]"),16,coordinates.data());glUniform1iv(glGetUniformLocation(program_,"mt_derived[0]"),16,derived.data());glUniform1iv(glGetUniformLocation(program_,"mt_channel[0]"),16,channels.data());
     glUniform2fv(glGetUniformLocation(program_,"mt_offset[0]"),16,offsets.data());glUniform2fv(glGetUniformLocation(program_,"mt_scale[0]"),16,scales.data());glUniform1fv(glGetUniformLocation(program_,"mt_rotation[0]"),16,rotations.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_x[0]"),2,pbrx.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_y[0]"),2,pbry.data());
     glUniform3fv(glGetUniformLocation(program_,"mt_effective_emission"),1,effective_emission.data());
+    glUniform1i(glGetUniformLocation(program_,"mt_overlay"),bool(t.overlay));
+    glUniform1f(glGetUniformLocation(program_,"mt_emission_strength"),emission_strength);
+    glUniform1i(glGetUniformLocation(program_,"mt_absolute_background"),background!=textures_->physical_backgrounds.end());
+    if(background!=textures_->physical_backgrounds.end())glUniform3fv(glGetUniformLocation(program_,"mt_background"),1,background->second.data());
     glUniform3fv(glGetUniformLocation(program_,"mt_native_emission"),1,r.material.emissive.data());
     glUniform4fv(glGetUniformLocation(program_,"mt_effective_color"),1,effective.data());glUniform4fv(glGetUniformLocation(program_,"mt_native_color"),1,r.material.color.data());glUniform1i(glGetUniformLocation(program_,"mt_shade_alias"),t.shade_alias);
     auto state=toon_state(r,t,outline);

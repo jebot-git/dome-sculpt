@@ -45,6 +45,7 @@ struct Visibility {
   PaintSourceTexture color, mask, coverage, pbr;
   std::shared_ptr<const detail::PaintOverlayPacket> overlay;
   const ImportedPrimitive *primitive = nullptr;
+  std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv0;
   std::shared_ptr<const std::vector<std::array<float,2>>> owned_uv1;
   std::map<uint32_t,std::shared_ptr<const std::vector<std::array<float,2>>>> owned_extra_uv;
   std::vector<std::array<float,4>> vertex_colors;
@@ -59,6 +60,14 @@ struct Visibility {
       if(!maps->source_only||!source||source!=maps->source_maps||source.owner_before(maps->source_maps)||maps->source_maps.owner_before(source))
         throw std::invalid_argument("Visibility overlay lost its exact original source sampling owner");
       overlay=maps->overlay;
+      owned_uv0=overlay->original_uv0();
+      if(!owned_uv0||r.first_vertex>mesh.positions.size()||owned_uv0->size()>mesh.positions.size()-r.first_vertex)
+        throw std::invalid_argument("Visibility source paint omitted its sealed original UV0 domain");
+      paint_corners.reserve(r.count);
+      for(size_t c=r.first;c<r.first+r.count;++c){const auto v=mesh.indices.at(c);
+        if(v<r.first_vertex||v-r.first_vertex>=owned_uv0->size())throw std::invalid_argument("Visibility original UV0 index is outside its sealed domain");
+        paint_corners.push_back(mesh.uv.at(v));
+      }
     }
     const auto paint_node=r.material_bindings&&r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
     if(bool(paint_node)!=bool(r.paint_sampling_attachment))throw std::invalid_argument("Visibility paint range omitted or fabricated its own sampling attachment");
@@ -132,7 +141,6 @@ struct Visibility {
       }
       return;
     }
-    if(overlay)throw std::invalid_argument("Typed source paint needs its MToon overlay coordinate adapter");
     const auto source=r.material_bindings?r.material_bindings->native_reference:native_source(*r.appearance);
     const auto &parameters = toon->parameters;
     cull = parameters.cull;
@@ -160,6 +168,12 @@ struct Visibility {
       }
       view.validate();
       if (mtoon_coordinate(slot) == 1) {
+        if(overlay){
+          const auto &logical=overlay->original_uv1();
+          if(!logical||logical!=owned_uv1||logical.owner_before(owned_uv1)||owned_uv1.owner_before(logical))
+            throw std::invalid_argument("Visibility MToon UV1 lacks actual original authored authority");
+          return view;
+        }
         if(!r.appearance || !r.appearance->asset)
           throw std::runtime_error("Visibility UV1 requires retained primitive provenance");
         const auto &a=*r.appearance;
@@ -203,7 +217,8 @@ struct Visibility {
           if(!primitive)throw std::runtime_error("Visibility UV1 has no coordinate authority");
           auto source=range.appearance->source_vertices.at(id-range.first_vertex);q=primitive->uv1.at(source);
         }
-      } else if (!m.uv.empty()) q = m.uv.at(id);
+      } else if(owned_uv0){if(id<range.first_vertex)throw std::invalid_argument("Visibility original UV0 packed offset is invalid");q=owned_uv0->at(id-range.first_vertex);}
+      else if (!m.uv.empty()) q = m.uv.at(id);
       for (size_t k = 0; k < 2; ++k) result[k] += q[k] * bary[c];
     }
     return result;
@@ -220,6 +235,11 @@ struct Visibility {
       auto resolved=v;resolved.texcoord=0;return sample_source_texture(resolved, q[0], q[1], false)[channel];
     };
     float opacity;
+    auto sampling=primary;
+    if(!paint_corners.empty()){
+      sampling={};const auto local=size_t(triangle)*3-range.first;
+      for(size_t c=0;c<3;++c)for(size_t k=0;k<2;++k)sampling[k]+=bary[c]*paint_corners.at(local+c)[k];
+    }
     if (toon) {
       auto coordinate = [&](MToonSlot role) {
         auto &slot = toon->textures[size_t(role)];
@@ -230,17 +250,14 @@ struct Visibility {
       float animation = sample(mask, mask_uv, toon->textures[size_t(MToonSlot::UvMask)].channel);
       auto main_uv = mtoon_uv(*toon, MToonSlot::Base, coordinate(MToonSlot::Base), seconds, animation);
       opacity = factor * sample(color, main_uv);
+      if(overlay){const auto paint=detail::sample_overlay_alpha(*overlay,sampling[0],sampling[1],true);
+        opacity=opacity*(1-paint.coverage)+paint.premultiplied;}
       if (range.textures && !range.textures->source_only) {
         auto derived = derived_view(range.textures, range.textures->color);
         const float replacement=sample(coverage,primary,0);
         if(replacement!=0)opacity = sample(derived, primary) + (opacity - range.material.color[3]*sample(pbr,primary)) * (1-replacement);
       }
     } else {
-      auto sampling=primary;
-      if(!paint_corners.empty()) {
-        sampling={};const auto local=size_t(triangle)*3-range.first;
-        for(size_t c=0;c<3;++c)for(size_t k=0;k<2;++k)sampling[k]+=bary[c]*paint_corners.at(local+c)[k];
-      }
       opacity = factor * sample(color, color.texcoord!=0?uv(m,triangle,bary,color.texcoord):sampling);
       if(overlay){const auto paint=detail::sample_overlay_alpha(*overlay,sampling[0],sampling[1],true);
         opacity=opacity*(1-paint.coverage)+paint.premultiplied;}

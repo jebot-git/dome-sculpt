@@ -28,6 +28,9 @@ int main(int argc,char **argv)try{
  const std::array<uint32_t,6> corners{0,1,2,0,2,3};auto packed_maps=std::make_shared<PaintSourceMaps>(*owner->source_maps());
  auto coordinates=std::make_shared<std::vector<std::array<float,2>>>();for(auto id:corners)coordinates->push_back(owner->source_maps()->uv1->at(id));packed_maps->uv1=coordinates;
  auto packed=detail::PaintOverlayFactory::pack_source_maps(owner,packed_maps,corners);
+ check(owner->original_uv0()&&*owner->original_uv0()==raw.uv&&!owner->original_uv1(),"Actual native source packet retains logical UV0 without fabricating authored UV1");
+ std::vector<std::array<float,2>> expected_uv;for(auto id:corners)expected_uv.push_back(raw.uv[id]);
+ check(packed->original_uv0()&&*packed->original_uv0()==expected_uv&&!packed->original_uv1(),"Actual render expansion preserves exact logical UV0 in its own six-vertex domain");
  check(packed->source_maps()==packed_maps&&packed->contribution_owner()==owner&&packed->layers().data()==owner->layers().data(),"Validated packed metadata shares its real immutable contribution owner without copying layers");
  detail::PaintOverlayCompiler compiler;compiler.prepare({{owner,true},{packed,true}});
  check(compiler.size()==1&&compiler.at(owner,true).planes==compiler.at(packed,true).planes,"Packed render metadata reuses all five actual GPU contribution planes");

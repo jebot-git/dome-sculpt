@@ -18,6 +18,10 @@ class PaintOverlayPacket {
  std::shared_ptr<const std::vector<int32_t>> padding_;
  std::shared_ptr<const BakedTextures> baked_;
  std::shared_ptr<const PaintSourceMaps> source_maps_;
+ // Logical authored coordinates are independent of writable atlas UV0 and of
+ // any generated source-image carrier. Only the sealed Source4 factory owns
+ // their correspondence; packed wrappers own their actual expanded domain.
+ std::shared_ptr<const std::vector<std::array<float,2>>> original_uv0_,original_uv1_;
  std::shared_ptr<const PaintOverlayPacket> contribution_owner_;
  PaintOverlayPacket()=default;
 public:
@@ -28,6 +32,8 @@ public:
  const std::shared_ptr<const std::vector<int32_t>>&padding()const noexcept{return contribution_owner_?contribution_owner_->padding():padding_;}
  const std::shared_ptr<const BakedTextures>&baked()const noexcept{return contribution_owner_?contribution_owner_->baked():baked_;}
  const std::shared_ptr<const PaintSourceMaps>&source_maps()const noexcept{return source_maps_;}
+ const std::shared_ptr<const std::vector<std::array<float,2>>>&original_uv0()const noexcept{return original_uv0_;}
+ const std::shared_ptr<const std::vector<std::array<float,2>>>&original_uv1()const noexcept{return original_uv1_;}
  // Packed coordinate metadata shares one actual immutable contribution owner.
  const std::shared_ptr<const PaintOverlayPacket>&contribution_owner()const noexcept{return contribution_owner_;}
 };

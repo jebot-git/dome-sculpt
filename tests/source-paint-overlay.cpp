@@ -45,7 +45,7 @@ int main(int argc,char **argv)try {
  auto forged=std::make_shared<TextureMaps>(*marker);forged->source_maps=std::make_shared<const PaintSourceMaps>(*paint->source_maps());auto invalid=visible(paint,material);invalid->ranges[0].textures=forged;
  check(rejects([&]{MaterialSurfaceQuery bad(invalid->mesh,invalid->ranges);})&&rejects([&]{draw(renderer,invalid);}),"Equal-valued foreign source-map owners cannot borrow a live overlay packet");
  auto hidden=paint->snapshot();hidden->layer_properties("Hidden actual paint",false,.63f);
- check(!hidden->preview(material)->overlay&&draw(renderer,visible(hidden,material))==draw(renderer,visible(unpainted,material)),"Hiding actual paint restores exact original source rendering");
+ check(hidden->preview(material)->overlay&&hidden->preview(material)->overlay->empty()&&draw(renderer,visible(hidden,material))==draw(renderer,visible(unpainted,material)),"Hiding actual paint retains logical source metadata and restores exact original rendering");
  SurfaceTextureLimits limited;limited.max_bytes=100'000;SurfaceRenderer bounded(limited);
  check(rejects([&]{draw(bounded,visible(paint,material));})&&bounded.texture_stats().images==0&&paint->encode()==state,"Shared source-plus-overlay GPU quota refuses before publication and preserves all paint");
  // Compound ownership retains separate explicit capabilities, including a
