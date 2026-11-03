@@ -94,6 +94,9 @@ int main(int argc, char **argv) try {
   std::string mass = argc > 7 ? argv[7] : "barycentric";
   if (mass != "barycentric" && mass != "mixed")
     throw std::invalid_argument("Unknown explicit heat mass control");
+  std::string edges = argc > 8 ? argv[8] : "half";
+  if (edges != "half" && edges != "incident")
+    throw std::invalid_argument("Unknown explicit heat edge control");
   Scene scene;
   auto controls =
       male ? humanoid_baseline_defaults("vroid-beta-male") : HumanoidControls{};
@@ -113,7 +116,7 @@ int main(int argc, char **argv) try {
             << " policy=" << (primitive ? "original-primitive" : "whole-skin")
             << " visibility=" << visibility << " occlusion=" << domain
             << " heat_strength=" << strength << " normals=" << geometry_normals
-            << " mass=" << mass << " height=" << height
+            << " edges=" << edges << " mass=" << mass << " height=" << height
             << " mean_limit=" << mean_limit << " max_limit=" << max_limit
             << '\n';
   size_t solved = 0, refused = 0, quality = 0, seam_fail = 0, native_fail = 0;
@@ -132,6 +135,8 @@ int main(int argc, char **argv) try {
                               : HeatOcclusion::WholeMesh;
       options.mass =
           mass == "mixed" ? HeatMass::MixedVoronoi : HeatMass::Barycentric;
+      options.edges = edges == "incident" ? HeatEdges::IncidentMean
+                                          : HeatEdges::CotangentHalf;
       options.maximum_seed_distance = 1;
       options.heat_strength = strength;
       options.geometry_normals = geometry_normals == "unit"

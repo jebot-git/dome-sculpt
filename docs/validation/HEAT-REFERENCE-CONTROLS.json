@@ -1,0 +1,232 @@
+{
+  "base": "0b3bdf81d93ea188177e835e76f957ebd676d577",
+  "scope": "Private source-only prototype: own freshly compiled private kernel/tests, copied immutable b32 support archives. No ordinary CMake/native application change. No GPU or GL context.",
+  "public_api": "Unchanged; private HeatBindingOptions callers rebuilt coherently",
+  "oracles": {
+    "unit_normals": "Independent analytic unequal-area, orientation/permutation, artist normal independence and virtual seam",
+    "mass": "Long-double triangle clipping by squared-distance halfplanes; explicit obtuse half/quarter; independent barycentric-gradient dense solve",
+    "edges": "Independent gradient matrix scaled by counted edge incidences; separate diagonal reconstruction",
+    "maximum_weight_error": 2.594e-08,
+    "true_residual_limit": 1e-09
+  },
+  "quality_bounds": {
+    "mean_height_fraction": 0.005,
+    "max_height_fraction": 0.02,
+    "unchanged": true
+  },
+  "admitted": false,
+  "blockers": [
+    "Male torso quality exceeds unchanged bound",
+    "Source-aware native edited/added role semantics",
+    "Local thin/finger/retessellation metric quality",
+    "Whole-owned solver/failure/cancellation proof",
+    "Native worker/controller/history/Save/locks and independent GLB/render"
+  ],
+  "sanitizer": {
+    "own_kernel_fixtures": 2,
+    "copied_support_instrumented": false,
+    "diagnostics": false
+  },
+  "input_checks": {
+    "unit-normal": {
+      "count": 1472,
+      "exact": true,
+      "before_sha256": "a152c9a06cd48d8f1ca2a657cc0333f2177b8b8f1eae869a385eec031043ff3a",
+      "after_sha256": "a152c9a06cd48d8f1ca2a657cc0333f2177b8b8f1eae869a385eec031043ff3a"
+    },
+    "mixed-mass": {
+      "count": 1472,
+      "exact": true,
+      "before_sha256": "59a243eb41205e63906b6835ec665eb23464318b595efe927f282d9bc51368fd",
+      "after_sha256": "59a243eb41205e63906b6835ec665eb23464318b595efe927f282d9bc51368fd"
+    },
+    "incident": {
+      "count": 1472,
+      "exact": true,
+      "before_sha256": "9e636e24d32ca13eaf02b6b7ca3e7e85baf3caded9c67ad4f887a4d20a3fb37a",
+      "after_sha256": "9e636e24d32ca13eaf02b6b7ca3e7e85baf3caded9c67ad4f887a4d20a3fb37a"
+    }
+  },
+  "pose_phases": {
+    "unit": [
+      {
+        "path": "artifacts/poses-unit-female-h1.log",
+        "sha256": "2ed51efdb91f2d222da6cf0e6e3956a955b56e4f041fad20c86ccb1c18b0221b",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": []
+      },
+      {
+        "path": "artifacts/poses-unit-male-h1.log",
+        "sha256": "fe7eeea12f007d561efc71f4e39fc23302505608843dec93214d300fa2c52b76",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=2 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": [
+          "POSE 3 artist_mean=0.00170520986 artist_max=0.03613096796 native_consumer_max=2.204114424e-07 seam_exact=1 quality=0",
+          "POSE 3 artist_mean=0.005966288003 artist_max=0.04192354691 native_consumer_max=2.30422076e-07 seam_exact=1 quality=0"
+        ]
+      }
+    ],
+    "mixed": [
+      {
+        "path": "artifacts/poses-mixed-female-h1.log",
+        "sha256": "052212fe3910f2a5ec1a797bd4a67987810ad09d7f707944034c6121c07cd3d7",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": []
+      },
+      {
+        "path": "artifacts/poses-mixed-female-h4.log",
+        "sha256": "f7d5567db22fb986a1be18d64541253b1571964631bf65739892baf9788b0546",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": []
+      },
+      {
+        "path": "artifacts/poses-mixed-male-h1.log",
+        "sha256": "2bbd4ab210b4acd9ebd8f59e90b3159b8813022b5247b23ba49e17c8d1722bf6",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=2 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": [
+          "POSE 3 artist_mean=0.001717641739 artist_max=0.0360500243 native_consumer_max=2.216731092e-07 seam_exact=1 quality=0",
+          "POSE 3 artist_mean=0.005967700626 artist_max=0.04191831842 native_consumer_max=2.220594613e-07 seam_exact=1 quality=0"
+        ]
+      },
+      {
+        "path": "artifacts/poses-mixed-male-h4.log",
+        "sha256": "2d977ef08fa5bc71e8c9ca0245454726f192bdca9c3593840852f33e9dac13a2",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=3 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": [
+          "POSE 3 artist_mean=0.001115311192 artist_max=0.0371523458 native_consumer_max=2.711621668e-07 seam_exact=1 quality=0",
+          "POSE 3 artist_mean=0.004766596049 artist_max=0.03985282839 native_consumer_max=1.989720837e-07 seam_exact=1 quality=0",
+          "POSE 0 artist_mean=0.004142430127 artist_max=0.03657028995 native_consumer_max=4.133112809e-08 seam_exact=1 quality=0"
+        ]
+      }
+    ],
+    "incident": [
+      {
+        "path": "artifacts/poses-incident-female-h1.log",
+        "sha256": "4812df7e3002904445884a4951bafb02199f49bb4831377990962a5ec5283dce",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": []
+      },
+      {
+        "path": "artifacts/poses-incident-female-h4.log",
+        "sha256": "7436bbaedcf492ffbc103d9e0037fb665d1387c2cd7a68e05dfdc7b637cd1cc8",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=0 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": []
+      },
+      {
+        "path": "artifacts/poses-incident-male-h1.log",
+        "sha256": "5c03427e6e8901c49d540ff2e195e51cbe6b2d6c777363865b9f6dbeb81888ca",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=2 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": [
+          "POSE 3 artist_mean=0.001717536097 artist_max=0.03605004882 native_consumer_max=2.235312423e-07 seam_exact=1 quality=0",
+          "POSE 3 artist_mean=0.005967700626 artist_max=0.04191831842 native_consumer_max=2.220594613e-07 seam_exact=1 quality=0"
+        ]
+      },
+      {
+        "path": "artifacts/poses-incident-male-h4.log",
+        "sha256": "9bab53a165990c033e07dac37dd6b797f367cf433715e0511f993ee8913450c0",
+        "summary": "SUMMARY solved=19 refused=0 quality_failures=3 seam_failures=0 consumer_failures=0 original_scene_exact=1",
+        "quality_failures": [
+          "POSE 3 artist_mean=0.001115327263 artist_max=0.0371523458 native_consumer_max=2.240006775e-07 seam_exact=1 quality=0",
+          "POSE 3 artist_mean=0.004766596049 artist_max=0.03985282839 native_consumer_max=1.989720837e-07 seam_exact=1 quality=0",
+          "POSE 0 artist_mean=0.004142430127 artist_max=0.03657028995 native_consumer_max=4.133112809e-08 seam_exact=1 quality=0"
+        ]
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "artifacts/heat-avatar-poses-incident-probe",
+      "sha256": "b5f6a18c7a3b1161857f93c41aafb78e3aeeedfee62245d00ee3d008d60ed68f",
+      "bytes": 5082704
+    },
+    {
+      "path": "artifacts/heat-avatar-poses-mixed-probe",
+      "sha256": "e16ccccd9c85dcbb273b6a66a83175a398bbe1583e5068fb24a09afd89d8d795",
+      "bytes": 5082584
+    },
+    {
+      "path": "artifacts/heat-avatar-poses-unit-probe",
+      "sha256": "4f253f6d62228017c8fe23d52035f23b7a82ed61faa708dbfd91f80442fd99a6",
+      "bytes": 5078456
+    },
+    {
+      "path": "artifacts/heat-binding-incident-probe",
+      "sha256": "8c8a099ea66a0d32a64cccfa2cee69c73b263af65a4b096484e098d8248689f6",
+      "bytes": 5097952
+    },
+    {
+      "path": "artifacts/heat-binding-incident-sanitize",
+      "sha256": "a7bf7e046a13843129a40e9410de348c67a3d813caca5197ca88e045716bbe88",
+      "bytes": 10339920
+    },
+    {
+      "path": "artifacts/heat-binding-mixed-probe",
+      "sha256": "0b6ce931652b2b969999bcf8a14e609ddcdf8026de45cde2fd9a6d53a24027e9",
+      "bytes": 5093640
+    },
+    {
+      "path": "artifacts/heat-normals-incident-sanitize",
+      "sha256": "c9dbd97574168888fe924f92d59aa66487d983c9c5f79b7c8595224c90705b3c",
+      "bytes": 2606304
+    },
+    {
+      "path": "artifacts/heat-normals-unit-probe",
+      "sha256": "2f0e4964f309c6c4f5d2a1bb8962936aec7c989ef664d22d61e33b5144363694",
+      "bytes": 820984
+    },
+    {
+      "path": "artifacts/kernel-libraries/libdome-sculpt-affine.a",
+      "sha256": "7f94eba0fda72b477432e2d1677cc37b01c4bd172028865d22ad34e225f37d61",
+      "bytes": 109806
+    },
+    {
+      "path": "artifacts/kernel-libraries/libdome-sculpt-core.a",
+      "sha256": "fb31277a000ea0c42744c8f0863c1778f3076f323acb8ab37f308c7520aad648",
+      "bytes": 24974364
+    },
+    {
+      "path": "artifacts/kernel-libraries/libdome-sculpt-polygon.a",
+      "sha256": "42d8950eacf9fb23d6560e84d562e328be9f30be4672d06ac75ab0ce1be88644",
+      "bytes": 454768
+    },
+    {
+      "path": "artifacts/kernel-libraries/libdome-sculpt-render.a",
+      "sha256": "b6aef244bebd123ec1c518e510e9a9ba042ac6e40410e9895d172417a8e9c26d",
+      "bytes": 743784
+    },
+    {
+      "path": "artifacts/kernel-libraries/libmikktspace-robust.a",
+      "sha256": "59e04dc96114ef39f5e067f439bec8781d3fa122a1cb9e15acda103588098336",
+      "bytes": 30512
+    },
+    {
+      "path": "artifacts/kernel-libraries/libmikktspace.a",
+      "sha256": "726ef79d25614ad04b3409134e6e8dc18ec542b98abf500e98e2aacafeeff7a6",
+      "bytes": 30118
+    },
+    {
+      "path": "artifacts/kernel-libraries/libufbx.a",
+      "sha256": "721fb7195bfcb8f89742a8fbe8abb1e2d5a454054f85e01ef95bb012e734e8d2",
+      "bytes": 705554
+    },
+    {
+      "path": "artifacts/kernel-libraries/libxatlas.a",
+      "sha256": "8fe351ee7edaee4503e134674dc56ad44de9652f453702ba41500f07be6dae64",
+      "bytes": 304734
+    },
+    {
+      "path": "artifacts/tests-heat-binding-incident-sanitize.log",
+      "sha256": "e5a685936d4cb5d334751cc2bba6fd2575e4b850f5f6f726701ece82607ad25e",
+      "bytes": 2710
+    },
+    {
+      "path": "artifacts/tests-heat-binding-incident.log",
+      "sha256": "e5a685936d4cb5d334751cc2bba6fd2575e4b850f5f6f726701ece82607ad25e",
+      "bytes": 2710
+    },
+    {
+      "path": "artifacts/tests-heat-normals-incident-sanitize.log",
+      "sha256": "54051ffe262b31e76db0702275a067a06d353998cec6bc219f801643b3f0d22c",
+      "bytes": 138
+    }
+  ]
+}

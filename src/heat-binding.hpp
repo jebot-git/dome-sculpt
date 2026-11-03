@@ -7,6 +7,7 @@ enum class HeatVisibility { AllFaces, EntryFaces };
 enum class HeatOcclusion { WholeMesh, ConnectedSurface };
 enum class HeatNormals { AreaWeighted, UnitFaces };
 enum class HeatMass { Barycentric, MixedVoronoi };
+enum class HeatEdges { CotangentHalf, IncidentMean };
 // Private open-surface PDE prototype. Raw vertex/topology identity is retained;
 // no coordinate-only welding, authoring admission or legacy solver change.
 struct HeatBindingOptions {
@@ -15,6 +16,7 @@ struct HeatBindingOptions {
   HeatOcclusion occlusion = HeatOcclusion::WholeMesh;
   HeatNormals geometry_normals = HeatNormals::AreaWeighted;
   HeatMass mass = HeatMass::Barycentric;
+  HeatEdges edges = HeatEdges::CotangentHalf;
   WeightLimits limits;
   double maximum_seed_distance = .3, heat_strength = 1,
          relative_tolerance = 1e-9;

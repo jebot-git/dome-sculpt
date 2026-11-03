@@ -61,7 +61,8 @@ struct System {
 System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
                 std::span<const uint32_t> row_groups,
                 HeatNormals geometry_normals = HeatNormals::AreaWeighted,
-                HeatMass mass = HeatMass::Barycentric) {
+                HeatMass mass = HeatMass::Barycentric,
+                HeatEdges edge_policy = HeatEdges::CotangentHalf) {
   System s;
   const size_t raw = m.positions.size();
   s.raw_to_row.resize(raw);
@@ -100,7 +101,11 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
     }
     return x;
   };
-  std::map<std::array<uint32_t, 2>, double> edges;
+  struct Edge {
+    double weight = 0;
+    size_t faces = 0;
+  };
+  std::map<std::array<uint32_t, 2>, Edge> edges;
   for (size_t t = 0; t < m.indices.size(); t += 3) {
     budget.step();
     std::array<uint32_t, 3> ids{s.raw_to_row[m.indices[t]],
@@ -154,7 +159,9 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
       double weight = .5 * cotangent[k];
       if (!std::isfinite(weight))
         throw std::runtime_error("Bone heat stiffness overflow");
-      edges[{std::min(a, b), std::max(a, b)}] += weight;
+      auto &edge = edges[{std::min(a, b), std::max(a, b)}];
+      edge.weight += weight;
+      ++edge.faces;
     }
   }
   s.surface_parent.resize(n);
@@ -167,8 +174,11 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
     budget.step(n);
     std::iota(s.parent.begin(), s.parent.end(), 0);
   }
-  for (auto [edge, w] : edges) {
+  for (auto &[edge, value] : edges) {
     budget.step();
+    if (edge_policy == HeatEdges::IncidentMean)
+      value.weight *= 2. / double(value.faces);
+    double w = value.weight;
     if (!std::isfinite(w))
       throw std::runtime_error("Bone heat edge stiffness overflow");
     if (operation == HeatOperator::PositiveGraph) {
@@ -202,8 +212,9 @@ System assemble(const Mesh &m, Budget &budget, HeatOperator operation,
   s.columns.resize(s.starts.back());
   s.values.resize(s.starts.back());
   auto cursor = s.starts;
-  for (auto [edge, w] : edges) {
+  for (auto [edge, value] : edges) {
     budget.step();
+    double w = value.weight;
     if (operation == HeatOperator::PositiveGraph && w <= 0)
       continue;
     auto a = cursor[edge[0]]++, b = cursor[edge[1]]++;
@@ -512,6 +523,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
       (o.geometry_normals != HeatNormals::AreaWeighted &&
        o.geometry_normals != HeatNormals::UnitFaces) ||
       (o.mass != HeatMass::Barycentric && o.mass != HeatMass::MixedVoronoi) ||
+      (o.edges != HeatEdges::CotangentHalf &&
+       o.edges != HeatEdges::IncidentMean) ||
       !o.maximum_work || o.maximum_work > 500'000'000 ||
       o.maximum_bytes < 4096 || o.maximum_bytes > 512u * 1024u * 1024u ||
       !o.maximum_iterations || o.maximum_iterations > 4096 ||
@@ -531,7 +544,7 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   };
   bytes(n, 576 + 2 * (sizeof(VertexWeights) +
                       size_t(o.limits.max_influences) * sizeof(Influence)));
-  bytes(nt, 512);
+  bytes(nt, 544);
   bytes(rig.bones.size() * rig.bones.size(), 64);
   bytes(rig.bones.size(), 512);
   bytes(1, 8192);
@@ -576,8 +589,8 @@ SkinWeights heat_bind_surface(const Mesh &m, const Skeleton &rig,
   if (!row_groups.empty() && row_groups.size() != n)
     throw std::invalid_argument("Bone heat virtual row groups differ from the "
                                 "exact current vertex owner");
-  auto s =
-      assemble(m, budget, o.operation, row_groups, o.geometry_normals, o.mass);
+  auto s = assemble(m, budget, o.operation, row_groups, o.geometry_normals,
+                    o.mass, o.edges);
   const size_t rows = s.positions.size();
   seed(s, m, rig, o, budget, sources, eligible);
   HeatBindingReport proof;

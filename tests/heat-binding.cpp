@@ -105,10 +105,12 @@ std::array<long double, 3> mixed_areas(std::array<Vec3, 3> p) {
 // Independent dense FEM assembly from planar barycentric gradients, followed
 // by pivoted long-double elimination; no private CSR/PCG data is consumed.
 std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
-                                bool positive = false, bool mixed = false) {
+                                bool positive = false, bool mixed = false,
+                                bool incident = false) {
   size_t n = m.positions.size();
   std::vector<std::vector<long double>> a(n, std::vector<long double>(n));
   std::vector<long double> mass(n), rhs(n);
+  std::vector<std::vector<unsigned>> faces(n, std::vector<unsigned>(n));
   for (size_t t = 0; t < m.indices.size(); t += 3) {
     std::array<uint32_t, 3> v{m.indices[t], m.indices[t + 1], m.indices[t + 2]};
     auto p = m.positions[v[0]], q = m.positions[v[1]], r = m.positions[v[2]];
@@ -121,12 +123,28 @@ std::vector<long double> oracle(const Mesh &m, const Skeleton &s,
                                   (p.y - q.y) / det},
         gy{(r.x - q.x) / det, (p.x - r.x) / det, (q.x - p.x) / det};
     auto areas = mixed_areas({p, q, r});
+    for (int k = 0; k < 3; ++k) {
+      auto x = v[k], y = v[(k + 1) % 3];
+      ++faces[x][y];
+      ++faces[y][x];
+    }
     for (int i = 0; i < 3; ++i) {
       mass[v[i]] += mixed ? areas[i] : area / 3;
       for (int j = 0; j < 3; ++j)
         a[v[i]][v[j]] += area * (gx[i] * gx[j] + gy[i] * gy[j]);
     }
   }
+  if (incident)
+    for (size_t i = 0; i < n; ++i) {
+      long double diagonal = 0;
+      for (size_t j = 0; j < n; ++j)
+        if (i != j) {
+          if (faces[i][j])
+            a[i][j] *= 2.L / faces[i][j];
+          diagonal -= a[i][j];
+        }
+      a[i][i] = diagonal;
+    }
   if (positive)
     for (size_t i = 0; i < n; ++i) {
       long double diagonal = 0;
@@ -355,20 +373,26 @@ int main(int argc, char **) try {
   auto mixed = positive;
   mixed.mass = HeatMass::MixedVoronoi;
   mixed.geometry_normals = HeatNormals::UnitFaces;
-  for (const auto &test : {mesh, obtuse}) {
-    HeatBindingReport measured;
-    auto result = heat_bind_surface(test, rig, mixed, {}, &measured);
-    auto dense = oracle(test, rig, true, true);
-    double maximum = 0;
-    for (size_t i = 0; i < dense.size(); ++i)
-      maximum = std::max(
-          maximum, double(std::abs(dense[i] - weight(result.vertices[i], 0))));
-    std::cout << "MIXED_MASS oracle_error=" << maximum
-              << " residual=" << measured.maximum_relative_residual << '\n';
-    check(maximum < 1e-6 &&
+  for (bool incident : {false, true}) {
+    mixed.edges = incident ? HeatEdges::IncidentMean : HeatEdges::CotangentHalf;
+    for (const auto &test : {mesh, obtuse}) {
+      HeatBindingReport measured;
+      auto result = heat_bind_surface(test, rig, mixed, {}, &measured);
+      auto dense = oracle(test, rig, true, true, incident);
+      double maximum = 0;
+      for (size_t i = 0; i < dense.size(); ++i)
+        maximum = std::max(
+            maximum,
+            double(std::abs(dense[i] - weight(result.vertices[i], 0))));
+      std::cout << "MIXED_MASS incident=" << incident
+                << " oracle_error=" << maximum
+                << " residual=" << measured.maximum_relative_residual << '\n';
+      check(
+          maximum < 1e-6 &&
               measured.maximum_relative_residual <= mixed.relative_tolerance,
           "Mixed Voronoi heat matches independent clipped-cell/dense solve on "
           "right and obtuse cases");
+    }
   }
   auto nondeform = rig;
   nondeform.bones[1].deform = false;
