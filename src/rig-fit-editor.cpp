@@ -9,12 +9,36 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/fl_ask.H>
+#include <FL/fl_draw.H>
 namespace dome {
 namespace {
 Vec3 world_point(const AffineTransform &m,Vec3 p){auto v=m.point({p.x,p.y,p.z});return {float(v[0]),float(v[1]),float(v[2])};}
+void edit_existing_rig_dialog(Document &doc,const std::shared_ptr<const RigFitView> &source){
+ int row=std::max(36,dx::size+16),sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);const int width=std::min(std::max(700,dx::size*40),sw-40),height=std::min(row*14,sh-40),label=width/2;
+ DomeDialog window(width,height,"Fit existing rig");Fl_Scroll scroll(0,0,width,height-row*2);scroll.type(Fl_Scroll::VERTICAL);Fl_Group content(0,0,width-24,row*13);content.resizable(nullptr);
+ const char *help="Bone controls use world metres.\nSkin pose and original paint stay intact.\nApply is one Undo step.";fl_font(dx::font,dx::size);int text_width=width-48,header=0;fl_measure(help,text_width,header,0);header=std::max(row*2,header+16);
+ Fl_Box hint(16,4,width-48,header-4,help);hint.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);int y=header;
+ const bool stacked=width<dx::size*22;const int input_x=stacked?20:label,input_width=stacked?width-56:width-label-40;
+ if(stacked)y+=row;Fl_Choice bone(input_x,y,input_width,row-4,"Bone");if(stacked)bone.align(FL_ALIGN_TOP_LEFT);y+=row;
+ if(stacked)y+=row;Fl_Choice parent(input_x,y,input_width,row-4,"Parent");if(stacked)parent.align(FL_ALIGN_TOP_LEFT);y+=row;
+ std::vector<Fl_Menu_Item> bones,parents;std::vector<std::string> names;names.reserve(source->bone_heads.size()+1);names.push_back("Root");for(const auto &b:source->rest_source->skeleton->bones)names.push_back(b.name);
+ for(size_t j=0;j<names.size();++j){Fl_Menu_Item item{};item.label(names[j].c_str());parents.push_back(item);if(j)bones.push_back(item);}parents.emplace_back();bones.emplace_back();bone.copy(bones.data());parent.copy(parents.data());bone.value(int(source->role));
+ auto number=[&](const char *name,double low,double high){if(stacked)y+=row;auto *w=new Fl_Value_Input(input_x,y,input_width,row-4,name);if(stacked)w->align(FL_ALIGN_TOP_LEFT);w->bounds(low,high);w->step(.001);y+=row;return w;};std::array<Fl_Value_Input*,3> xyz{number("Head world X (m)",-10000,10000),number("Head world Y (m)",-10000,10000),number("Head world Z (m)",-10000,10000)};auto *length=number("Bone length (world m)",.000001,10000),*step=number("Adjustment step (m)",.00001,10);
+ Fl_Check_Button linked(20,y,width-56,row,"Fit linked parts");y+=row;Fl_Check_Button restore(20,y,width-56,row,"Restore first rig source");y+=row;linked.tooltip("Includes hidden linked parts; locked or isolated objects remain protected");restore.tooltip("Restore the complete immutable first rig-fitting source instead of applying these edits");content.size(width-24,y+row);content.end();scroll.end();
+ struct Draft{Document *doc;RigFitView view;Fl_Choice *bone,*parent;std::array<Fl_Value_Input*,3> xyz;Fl_Value_Input *length,*step;Fl_Check_Button *linked,*restore;Fl_Window *window;bool updating=false,accepted=false;
+  void load(){updating=true;view.role=size_t(bone->value());auto p=world_point(view.world,view.bone_heads.at(view.role));xyz[0]->value(p.x);xyz[1]->value(p.y);xyz[2]->value(p.z);parent->value(view.bone_parents.at(view.role)+1);length->value(view.bone_lengths.at(view.role));step->value(view.step);linked->value(view.linked_rest);restore->value(view.restore_source);updating=false;}
+  void update(){if(updating)return;auto next=view;next.role=size_t(bone->value());auto current=world_point(next.world,next.bone_heads.at(next.role));if(float(xyz[0]->value())!=current.x||float(xyz[1]->value())!=current.y||float(xyz[2]->value())!=current.z)next.bone_heads.at(next.role)=world_point(next.world.inverse(),{float(xyz[0]->value()),float(xyz[1]->value()),float(xyz[2]->value())});next.bone_parents.at(next.role)=parent->value()-1;next.bone_lengths.at(next.role)=float(length->value());next.step=float(step->value());next.linked_rest=linked->value();next.restore_source=restore->value();doc->configure_rig_fit(next);view=std::move(next);}
+ } draft{&doc,*source,&bone,&parent,xyz,length,step,&linked,&restore,&window};
+ bone.callback([](Fl_Widget*,void *p){auto &d=*static_cast<Draft*>(p);try{d.load();d.doc->configure_rig_fit(d.view);}catch(const std::exception&e){fl_alert("%s",e.what());}},&draft);
+ auto changed=[](Fl_Widget*,void *p){auto &d=*static_cast<Draft*>(p);try{d.update();}catch(const std::exception&e){fl_alert("%s",e.what());}};parent.callback(changed,&draft);for(auto *w:xyz)w->callback(changed,&draft);length->callback(changed,&draft);step->callback(changed,&draft);linked.callback(changed,&draft);restore.callback(changed,&draft);
+ int bw=std::min(width/2-24,std::max(140,dx::size*8));Fl_Button cancel(width/2-bw-10,height-row*2+8,bw,row,"Cancel"),apply(width/2+10,height-row*2+8,bw,row,"Apply");cancel.callback([](Fl_Widget *w,void*){w->window()->hide();});apply.callback([](Fl_Widget*,void*p){auto &d=*static_cast<Draft*>(p);try{d.update();d.doc->accept_rig_fit();d.accepted=true;d.window->hide();}catch(const std::exception&e){fl_alert("%s",e.what());}},&draft);
+ draft.load();window.end();window.set_modal();dx::style(&window);window.show();cancel.take_focus();while(window.shown())Fl::wait();if(!draft.accepted)doc.cancel_rig_fit({source->generation,source->revision,source->object,source->edit_authority});
+}
+
 }
 void edit_humanoid_fit_dialog(Document &doc){
  doc.begin_rig_fit();const auto published=doc.frame().state->rig_fit;if(!published)throw std::logic_error("Humanoid fitting is unavailable");
+ if(published->rest_source){edit_existing_rig_dialog(doc,published);return;}
  int row=std::max(36,dx::size+16),sx,sy,sw,sh;Fl::screen_work_area(sx,sy,sw,sh);
  int width=std::min(std::max(700,dx::size*40),sw-40),height=std::min(row*16,sh-40),label=width/2;
  DomeDialog window(width,height,"Humanoid rig fitting");Fl_Scroll scroll(0,0,width,height-row*2);scroll.type(Fl_Scroll::VERTICAL);

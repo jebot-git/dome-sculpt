@@ -3,6 +3,7 @@
 #include "dome/humanoid-creator.hpp"
 #include <nlohmann/json.hpp>
 #include "source-rigid-pose.hpp"
+#include "source-rest-scene.hpp"
 namespace dome {
 namespace {
 void check_cancel(const std::function<bool()> &cancelled) {
@@ -32,6 +33,9 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
   const auto &source = scene.object(object);
   const auto &old = editable(source);
   bool pose_edit = edit.joint.has_value() || edit.reset_pose;
+  if(pose_edit&&source.rig_source&&detail::source_rest_identity(scene,source)){
+    detail::edit_source_rest_pose(scene,object,edit,cancelled);return;
+  }
   if (pose_edit && (!old.skeleton || !old.skin))
     throw std::invalid_argument("Pose editing requires a skeleton and skin");
   if (edit.joint) {
@@ -56,8 +60,7 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
     auto d = edit.joint->degrees;
     auto rotation = axis_rotation({0, 0, 1}, d.z) * axis_rotation({0, 1, 0}, d.y) *
                     axis_rotation({1, 0, 0}, d.x);
-    joint.rotation = (joint.rotation * rotation).unit();
-    joint.translation += edit.joint->translation;
+    joint = adjust_joint_pose(std::move(joint),rotation,edit.joint->translation);
   }
   std::vector<std::pair<uint64_t, std::shared_ptr<const DeformationState>>> changes;
   for (const auto &o : scene.objects()) {
