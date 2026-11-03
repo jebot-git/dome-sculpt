@@ -1,0 +1,85 @@
+{
+  "status": "terminal",
+  "started_utc": "2026-11-03T06:22:05.651253+00:00",
+  "source": "b32aa8b7259cb670edab8a37a4e703cc09f84a9e",
+  "compositor_source": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
+  "app_scope": "Coherent fullalltargets CPU application from42e; metadata/UIharness b32; unchanged matching cached TUs retained",
+  "inputs_before": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/dome_menu.py": "63e87b89dac6476131cd237f8287b36e65c942dc2e82d62b3d34d1079ff02e05",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt": "86b0fb3ab810da910d6e88f38bf43c1db1ab77a1326fb7d2ec8987dc1066da01",
+    "/home/blux/de-xr/dome-sculpt/artifacts/domed-62b6417-target/release/dome-compositor": "0400d3d7629d54d63dddc65ca127b6d341ad44b1de63c1301acae0f80fba0bb6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/domed-62b6417-coherent-b32-menu-root/packaging/org.domed.Sculpt.desktop": "663a71189cebf541043c766bdd127698fc4766ab544a7ad49d9a2a96ccdd4cd7"
+  },
+  "hardware": "Private software Vulkan/GL+Xvfb host, native Wayland client, no HMD or system changes",
+  "exit_code": 0,
+  "seconds": 31.89195158201619,
+  "inputs_after": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/dome_menu.py": "63e87b89dac6476131cd237f8287b36e65c942dc2e82d62b3d34d1079ff02e05",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt": "86b0fb3ab810da910d6e88f38bf43c1db1ab77a1326fb7d2ec8987dc1066da01",
+    "/home/blux/de-xr/dome-sculpt/artifacts/domed-62b6417-target/release/dome-compositor": "0400d3d7629d54d63dddc65ca127b6d341ad44b1de63c1301acae0f80fba0bb6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/domed-62b6417-coherent-b32-menu-root/packaging/org.domed.Sculpt.desktop": "663a71189cebf541043c766bdd127698fc4766ab544a7ad49d9a2a96ccdd4cd7"
+  },
+  "inputs_unchanged": true,
+  "report": {
+    "checks": [
+      {
+        "passed": true,
+        "check": "Native Wayland sculpt window publishes the installed Dome Sculpt application identity"
+      },
+      {
+        "passed": true,
+        "check": "DomeD Super+F10 and header/row navigation activate the actual exported Duplicate command"
+      },
+      {
+        "passed": true,
+        "check": "DomeD focuses the native parameter dialog as part of the same application"
+      },
+      {
+        "passed": true,
+        "check": "The compositor keeps the focused native field and its text selection while opening universal menus"
+      },
+      {
+        "passed": true,
+        "check": "A focused Wayland dialog inherits its parent's universal menu and routes Edit Cut to its field"
+      },
+      {
+        "passed": true,
+        "check": "Universal Edit Undo restores dialog text through the real compositor"
+      },
+      {
+        "passed": true,
+        "check": "The compositor's universal File Close cancels the modal dialog and retains the sculpt document"
+      },
+      {
+        "passed": true,
+        "check": "The universal Window menu retains DomeD's Send Window to Desktop action"
+      }
+    ],
+    "failed": 0
+  },
+  "verified_runtime_libraries": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libcairo.so.2.11804.4": "7d4db5c2c967ad834a6506e1f83eee5959a85a172bee968d1be38fa3c6f5ea32",
+    "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libfreetype.so.6.20.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+    "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk.so.1.4.5": "4f37792b4767fd1c184aa7aec6f581920e81dcfcbcd79a83b819357787639597",
+    "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_images.so.1.4.5": "e06642f26fb03147b5e0f75725642c96aa9536ae83454799e7598bf170c86957",
+    "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libharfbuzz.so.0.61410.0": "35fcdcf82f23dc5301513ec8ac75d154d1342ed5e5a24f38930abed3a46c9edc",
+    "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib/libfltk_gl.so.1.4.5": "acd4b8c0b0b591ac9ea33fcc6a29436cf698fd6b20efe165b28c8f703e5703f8"
+  },
+  "verified_utc": "2026-11-03T06:23:48.603546+00:00",
+  "build_receipt": "docs/validation/FULL-NATIVE-BUILD-42e.json",
+  "compositor_receipt": "docs/validation/TOOLKIT-62b6417.json",
+  "output_hashes": {
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/client.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/compositor.log": "d2ac164fdbb08c5db4f301e25b8828dbef877d4a306bffc2d437d0ff3aaddb18",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/dialog.json": "6fbb0d63d8db6a18058a2a33ebf2d82b3c53f5e4ca8f35e0a6b0daf0e777788b",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/render.ppm": "48a904d4b7d5ecb4f40346e7619ccfcf3ca6e541f7586d18d3fea39a96fea2aa",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/report.json": "8662519b02295941c38c5974aa8872c5a79bd1d80188471af12a57d0a976a2af",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/runtime-maps.json": "23047e6e23275a934d73fcedbea3decd17c442d047ab5f33c49ae8bcaaf9adff",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/scene.json": "7817c1afde9d592223f0e4f677952dd34477b3f77c674b8cbace2e254cf63786",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/universal-menu.png": "db37f9a213972416ef9de8e132c2499072211d2500f67cbd892892bf00f605cb",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/artifacts/dome-menu/xvfb.log": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/packaging/org.domed.Sculpt.desktop": "663a71189cebf541043c766bdd127698fc4766ab544a7ad49d9a2a96ccdd4cd7",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/runner.log": "a1db5f93292bd2ab030e8e20d45bfda09d9570a875a874c5416d459174028dfe",
+    "artifacts/domed-62b6417-coherent-b32-menu-root/status.json": "deb291ae8be51860b0e008e33691fc27a13c2270b37936d481ffebb7a28fc314"
+  }
+}

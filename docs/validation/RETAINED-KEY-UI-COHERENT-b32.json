@@ -1,0 +1,388 @@
+{
+  "status": "terminal",
+  "source": "b32aa8b7259cb670edab8a37a4e703cc09f84a9e",
+  "runtime_source": "42e868e615911790888c801f9d9c5dfe89489980",
+  "scope": "Fresh whole optimized CPU application/core/support build; actual private Xvfb FLTK universal menu and canvas; software GL; no SAN/device/HMD claim",
+  "started_utc": "2026-11-03T06:11:30.114052+00:00",
+  "inputs_before": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/retained-key-menu.py": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt": "86b0fb3ab810da910d6e88f38bf43c1db1ab77a1326fb7d2ec8987dc1066da01",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt-prepared-normal-shapes-test": "9bc467743474d6b06daf92395be7d691a9158c4568e455fbe710a064e89c461e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a"
+  },
+  "runs": [
+    {
+      "mode": "normal",
+      "exit_code": 0,
+      "seconds": 137.4029026760254,
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          },
+          {
+            "passed": true,
+            "check": "Fixture owns actual paint24/material9 and independently retained normal21 domains"
+          },
+          {
+            "passed": true,
+            "check": "Retained-key controls are a real document-owned FLTK modal using universal-menu identity"
+          },
+          {
+            "passed": true,
+            "check": "Default Return cancels retained-domain key creation with exact complete source state"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Native Create preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Create retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Create does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Universal Undo restores the exact pre-Create retained source and domain pools"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores the exact created target, frames and ownership graph"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Unchanged-name selection adds no Undo entry: one Undo still removes the real Create"
+          },
+          {
+            "passed": true,
+            "check": "Redo after the selection-only history check restores the exact real Create"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Entering actual selected-key sculpt mode changes no saved weights, paint or source"
+          },
+          {
+            "passed": true,
+            "check": "Actual retained-domain keyed mesh has a visible colored native paint surface"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native Shift/left gesture replaces the selected key without changing prior targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace updates its real role-frame attributes while keeping saved mixed weights"
+          },
+          {
+            "passed": true,
+            "check": "Actual native canvas displays changed selected-key geometry/shading"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores complete pre-stroke retained paint/keys/source"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact selected-key geometry and normal-frame endpoint"
+          },
+          {
+            "passed": true,
+            "check": "Actual Escape during the next held key stroke restores exact native Scene and all ownership pools"
+          },
+          {
+            "passed": true,
+            "check": "Cancelled native key gesture does not create or consume Undo/Redo history"
+          },
+          {
+            "passed": true,
+            "check": "Finishing key preview preserves accepted source, paint and original saved mix"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close performs normal frontend/worker teardown"
+          },
+          {
+            "passed": true,
+            "check": "A new real native frontend reopens exact retained key/normal/paint/source data"
+          },
+          {
+            "passed": true,
+            "check": "DomeD Ctrl+W cancels owned modal controls after reopen without closing or mutating the document"
+          },
+          {
+            "passed": true,
+            "check": "Final universal-menu Close drains the accepted native application cleanly"
+          },
+          {
+            "passed": true,
+            "check": "Exact retained fixture, verified application/inspector and harness bytes remain unchanged"
+          }
+        ],
+        "failed": 0,
+        "complete": true,
+        "stage": "complete",
+        "error": null
+      }
+    },
+    {
+      "mode": "compact",
+      "exit_code": 0,
+      "seconds": 143.78633061499568,
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "UI input is the exact actual terminal broad-proof retained Scene24 fixture"
+          },
+          {
+            "passed": true,
+            "check": "Fixture owns actual paint24/material9 and independently retained normal21 domains"
+          },
+          {
+            "passed": true,
+            "check": "Retained-key controls are a real document-owned FLTK modal using universal-menu identity"
+          },
+          {
+            "passed": true,
+            "check": "Default Return cancels retained-domain key creation with exact complete source state"
+          },
+          {
+            "passed": true,
+            "check": "Canonical large-bitmap-font key controls fit the compact native desktop"
+          },
+          {
+            "passed": true,
+            "check": "Compact content scrolls while genuine Cancel/Apply controls remain fixed"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Native Create preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Create retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Create does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Universal Undo restores the exact pre-Create retained source and domain pools"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores the exact created target, frames and ownership graph"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Unchanged-name selection adds no Undo entry: one Undo still removes the real Create"
+          },
+          {
+            "passed": true,
+            "check": "Redo after the selection-only history check restores the exact real Create"
+          },
+          {
+            "passed": true,
+            "check": "Existing target selection clicks the real Source target popup without accepting or dismissing the modal"
+          },
+          {
+            "passed": true,
+            "check": "Selecting the existing new key with its unchanged name preserves the exact complete native Scene"
+          },
+          {
+            "passed": true,
+            "check": "Entering actual selected-key sculpt mode changes no saved weights, paint or source"
+          },
+          {
+            "passed": true,
+            "check": "Actual retained-domain keyed mesh has a visible colored native paint surface"
+          },
+          {
+            "passed": true,
+            "check": "Saved native target count matches the accepted menu/gesture operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native Shift/left gesture replaces the selected key without changing prior targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace preserves complete retained paint, normal event, skin/rest and saved pose"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace retains original raw source bytes and the original first shape capsule witness"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace does not replace or invent a first rig source"
+          },
+          {
+            "passed": true,
+            "check": "Native Replace updates its real role-frame attributes while keeping saved mixed weights"
+          },
+          {
+            "passed": true,
+            "check": "Actual native canvas displays changed selected-key geometry/shading"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores complete pre-stroke retained paint/keys/source"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact selected-key geometry and normal-frame endpoint"
+          },
+          {
+            "passed": true,
+            "check": "Actual Escape during the next held key stroke restores exact native Scene and all ownership pools"
+          },
+          {
+            "passed": true,
+            "check": "Cancelled native key gesture does not create or consume Undo/Redo history"
+          },
+          {
+            "passed": true,
+            "check": "Finishing key preview preserves accepted source, paint and original saved mix"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close performs normal frontend/worker teardown"
+          },
+          {
+            "passed": true,
+            "check": "A new real native frontend reopens exact retained key/normal/paint/source data"
+          },
+          {
+            "passed": true,
+            "check": "DomeD Ctrl+W cancels owned modal controls after reopen without closing or mutating the document"
+          },
+          {
+            "passed": true,
+            "check": "Final universal-menu Close drains the accepted native application cleanly"
+          },
+          {
+            "passed": true,
+            "check": "Exact retained fixture, verified application/inspector and harness bytes remain unchanged"
+          }
+        ],
+        "failed": 0,
+        "complete": true,
+        "stage": "complete",
+        "error": null
+      }
+    }
+  ],
+  "inputs_after": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/retained-key-menu.py": "5ccb64780e9a6d86752dfe26f48f7240916e40adcf27abedc676e871a04bbefb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt": "86b0fb3ab810da910d6e88f38bf43c1db1ab77a1326fb7d2ec8987dc1066da01",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-cpu/dome-sculpt-prepared-normal-shapes-test": "9bc467743474d6b06daf92395be7d691a9158c4568e455fbe710a064e89c461e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/probe-retained-key-c79/artifacts/workflow-cancel-output/uv24.dsculpt": "d6deb7b47165a960f92e644b68d6221e0bb3724634c267280c05021c2beb9b2a"
+  },
+  "inputs_unchanged": true,
+  "exit_code": 0,
+  "verified_utc": "2026-11-03T06:18:47.623327+00:00",
+  "total_checks": 72,
+  "build_receipt": "docs/validation/FULL-NATIVE-BUILD-42e.json",
+  "build_scope_precision": "Coherent full-alltargets Release CMake build; matching unchanged cached TUs retained; no clean-recompile-every-TU claim.",
+  "visual_review": "Actual compact modal screenshot inspected: canonical bitmap text, scrollable content and fixed Cancel-default/Apply footer.",
+  "output_hashes": {
+    "artifacts/retained-key-coherent-b32/compact/after-stroke.png": "851d48fb60ed41cc128e77e71bcfeaa72e6f6d37528d3c37cee59463e4efaf1f",
+    "artifacts/retained-key-coherent-b32/compact/after.json": "e639cd68a78bd87a6dbe97849552476b5d306f0e5c5d5a633a549ee6bd4b1292",
+    "artifacts/retained-key-coherent-b32/compact/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/retained-key-coherent-b32/compact/app-reopened.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/retained-key-coherent-b32/compact/before-stroke.png": "2ae6e4ff1aa6927a6a2d28c8e1e2cb944f529be0f776613a43183eb7c84c43c9",
+    "artifacts/retained-key-coherent-b32/compact/before.json": "e639cd68a78bd87a6dbe97849552476b5d306f0e5c5d5a633a549ee6bd4b1292",
+    "artifacts/retained-key-coherent-b32/compact/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+    "artifacts/retained-key-coherent-b32/compact/latest-inspect.json": "a758b3ca2e75d798b85a33d1e59d34da77708c430c10deb9e52bbefb5f76f5fe",
+    "artifacts/retained-key-coherent-b32/compact/new-key-scrolled.png": "0fb3c60aae6f08c6f97c9823f7bd48f807f8b808df2dee3be2bdca47bcdb9d9d",
+    "artifacts/retained-key-coherent-b32/compact/new-key.png": "761c4859f016caf7f223d59c7d417d9fbbe0a67b45bc45cd0b3ba05da0b3f016",
+    "artifacts/retained-key-coherent-b32/compact/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+    "artifacts/retained-key-coherent-b32/compact/report.json": "7181f988e386c0c7750d737b740c4d9ca9077923ee97facec721c86d051559a6",
+    "artifacts/retained-key-coherent-b32/compact/selected-existing-target-for-stroke.png": "3593317d26186961d49b48137b8aa03c5c42b8a1f55101b55d42b0c9764696a8",
+    "artifacts/retained-key-coherent-b32/compact/selected-existing-target-history.png": "8cf87a78a1723c6ad75491a73eb0b268f1a7d05a749bad2bed7281d53f0728e4",
+    "artifacts/retained-key-coherent-b32/compact/selected-existing-target.json": "e19846e32f8230ec36e49ece9452a291748dc05d96c96feddcd88ae7f097176c",
+    "artifacts/retained-key-coherent-b32/compact/stroke-result-before-save.png": "3090e04b4135bf67c59f1e8a5c8da7de6e694a5c2ccc46cc92784214a42655b8",
+    "artifacts/retained-key-coherent-b32/compact/target-choice-before-for-stroke.png": "2c405addebced5027fc885b37159f467c409c322265263542eafd13901325562",
+    "artifacts/retained-key-coherent-b32/compact/target-choice-before-history.png": "2c405addebced5027fc885b37159f467c409c322265263542eafd13901325562",
+    "artifacts/retained-key-coherent-b32/compact/target-popup-for-stroke.png": "4ec3f9f73c5fa5d657d824023a7e5c03182b5efc89fdcd1ce3236f021fd5ff1e",
+    "artifacts/retained-key-coherent-b32/compact/target-popup-history.png": "4ec3f9f73c5fa5d657d824023a7e5c03182b5efc89fdcd1ce3236f021fd5ff1e",
+    "artifacts/retained-key-coherent-b32/compact/xvfb.log": "e2a9cdea904f5b78cdec4d818de81709784ea2f07961a4cbb0c9b8fae1d95308",
+    "artifacts/retained-key-coherent-b32/compact-runner.log": "29431f3d59f70539aca2cff9a3ef6ce854895fc481d8e7c366db8889a5a66740",
+    "artifacts/retained-key-coherent-b32/normal/after-stroke.png": "2dd1b3a32a4ba0f93012607c8d0308f17bd2d0e88c42e800911300e545a0baae",
+    "artifacts/retained-key-coherent-b32/normal/after.json": "e639cd68a78bd87a6dbe97849552476b5d306f0e5c5d5a633a549ee6bd4b1292",
+    "artifacts/retained-key-coherent-b32/normal/app-initial.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/retained-key-coherent-b32/normal/app-reopened.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/retained-key-coherent-b32/normal/before-stroke.png": "19b594f7d0203459c2236b05a18edd429cbfc5d64b77b2ab8d3a81c38a0d3b85",
+    "artifacts/retained-key-coherent-b32/normal/before.json": "e639cd68a78bd87a6dbe97849552476b5d306f0e5c5d5a633a549ee6bd4b1292",
+    "artifacts/retained-key-coherent-b32/normal/created.json": "c0ddb7c001e24bd8f61a8b92a398f5646be4e0ce468c2f7ec7510d47f850eb5f",
+    "artifacts/retained-key-coherent-b32/normal/latest-inspect.json": "c9581507d1f875e71d7e7e04e637ba0a52c9ba1de4fda94f1a80b36b08c80d86",
+    "artifacts/retained-key-coherent-b32/normal/new-key.png": "3c3df6f2a289129180a7e6714ea5c0f4a61abeefcc72e04b7ecdcecf21d0cedb",
+    "artifacts/retained-key-coherent-b32/normal/original.json": "675d26bd3dee68d5682166f8996a608ccd007b067e0cfece559788fd0fde3468",
+    "artifacts/retained-key-coherent-b32/normal/report.json": "35efd8b6b01d9b919d394bc722f879522aedbd18cb8621d4e881dd4769116156",
+    "artifacts/retained-key-coherent-b32/normal/selected-existing-target-for-stroke.png": "06e3c7eb8e23041883a2bac935c8fb2e9b3c22cf0465cc8cb07349fef9a265c0",
+    "artifacts/retained-key-coherent-b32/normal/selected-existing-target-history.png": "06e3c7eb8e23041883a2bac935c8fb2e9b3c22cf0465cc8cb07349fef9a265c0",
+    "artifacts/retained-key-coherent-b32/normal/selected-existing-target.json": "e19846e32f8230ec36e49ece9452a291748dc05d96c96feddcd88ae7f097176c",
+    "artifacts/retained-key-coherent-b32/normal/stroke-result-before-save.png": "f66c5e50edd6a128393022341df4fc9b4dd61e2da237706c928891e195f0f517",
+    "artifacts/retained-key-coherent-b32/normal/target-choice-before-for-stroke.png": "17cc1c23a3a2b3968fa57b595a2ad198fbe089bf1705d954b22d27dd107217e2",
+    "artifacts/retained-key-coherent-b32/normal/target-choice-before-history.png": "17cc1c23a3a2b3968fa57b595a2ad198fbe089bf1705d954b22d27dd107217e2",
+    "artifacts/retained-key-coherent-b32/normal/target-popup-for-stroke.png": "3f07ca363eab38ee91095595c80a97c834cbc5ed4708d873f23e15b82425e71b",
+    "artifacts/retained-key-coherent-b32/normal/target-popup-history.png": "3f07ca363eab38ee91095595c80a97c834cbc5ed4708d873f23e15b82425e71b",
+    "artifacts/retained-key-coherent-b32/normal/xvfb.log": "e2a9cdea904f5b78cdec4d818de81709784ea2f07961a4cbb0c9b8fae1d95308",
+    "artifacts/retained-key-coherent-b32/normal-runner.log": "57ee406816e69380c038b4e782ba56b4e7740064dc1b7cdc0becdc1d0381b470",
+    "artifacts/retained-key-coherent-b32/status.json": "90f528ced5c8bce46bf60eb008d69572b6caa936a8ee097f81839bfef7f3527a"
+  }
+}
