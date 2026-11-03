@@ -12,7 +12,7 @@ void stop(const std::function<bool()> &cancelled) {
   if (cancelled && cancelled()) throw std::runtime_error("Retopology cancelled");
 }
 TopologyID selected_edge(const RetopoMesh &mesh, std::span<const TopologyID> selected,
-                         const std::function<bool()> &cancelled, bool required = true) {
+                         const std::function<bool()> &cancelled, bool required = true, bool *incident = nullptr) {
   if (selected.size() != 2) { if (!required) return 0; throw std::runtime_error("Select two boundary-edge endpoints before extruding"); }
   TopologyID edge = 0;
   for (const auto &[id, e] : mesh.edges()) {
@@ -29,6 +29,7 @@ TopologyID selected_edge(const RetopoMesh &mesh, std::span<const TopologyID> sel
     }
   }
   if (uses > 1) { if (!required) return 0; throw std::runtime_error("Choose a wire or boundary edge"); }
+  if (incident) *incident = uses != 0;
   return edge;
 }
 Vec3 face_normal(const RetopoMesh &mesh, const RetopoFace &face) {
@@ -139,7 +140,8 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
       if (sampled_ && !view_.moving && !view_.extruding) return;
       point = project(point);
       if (view_.extruding) {
-        auto edge_id = selected_edge(draft, selected, cancelled);
+        bool incident = false;
+        auto edge_id = selected_edge(draft, selected, cancelled, true, &incident);
         auto e = draft.edges().at(edge_id);
         auto a = draft.vertices().at(e.a).position, b = draft.vertices().at(e.b).position;
         if (!sampled_) {
@@ -152,7 +154,17 @@ void RetopoWorkspace::edit(RetopoAction action, Vec3 point, float snap_mm,
           const auto offset = point - extrude_anchor_;
           if (dot(offset, offset) > 0) {
             auto result = draft.extrude_edge(edge_id, {project(a + offset), project(b + offset)}, cancelled);
-            if (!outward(draft, result.face)) throw std::runtime_error("Extruded face is outside the source bound or faces inward");
+            bool valid = outward(draft, result.face);
+            if (!incident && !valid) {
+              // A wire has no adjacent face to fix its winding. Orient the
+              // candidate to the reference without changing existing IDs.
+              auto face = draft.faces().at(result.face);
+              std::reverse(face.vertices.begin(), face.vertices.end());
+              draft.remove_face(result.face);
+              result.face = draft.add_face(face.vertices, face.material);
+              valid = outward(draft, result.face);
+            }
+            if (!valid) throw std::runtime_error("Extruded face is outside the source bound or faces inward");
             selected.assign(result.outer.begin(), result.outer.end());
           }
         }

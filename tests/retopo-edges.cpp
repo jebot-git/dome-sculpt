@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/import.hpp"
 #include <unistd.h>
+#include <cstdlib>
 #include <nlohmann/json.hpp>
 #include <iostream>
 using namespace dome;
@@ -18,10 +19,11 @@ Pair patches(){
  }
  return p;
 }
-Scene reference(const RetopoMesh &topology){
+Scene plane(){
  Mesh m;m.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};
- Scene s;s.active().painted=std::make_shared<PaintedMesh>(m,64);s.active().mesh_active=true;publish_retopology(s,topology,s.active().id,{});return s;
+ Scene s;s.active().painted=std::make_shared<PaintedMesh>(m,64);s.active().mesh_active=true;return s;
 }
+Scene reference(const RetopoMesh &topology){auto s=plane();publish_retopology(s,topology,s.active().id,{});return s;}
 void point(RetopoWorkspace &w,Vec3 p){w.edit(RetopoAction::BeginGesture);w.edit(RetopoAction::Sample,p);w.edit(RetopoAction::EndGesture);}
 void settle(Document &d){require(d.wait_retopology(),"Retopology worker drains");if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
 void point(Document &d,Vec3 p){require(d.begin_desktop(),"Native retopo gesture begins");Brush b;b.from=b.to=p;b.radius=.01f;d.stamp_desktop(b);d.end_desktop();settle(d);}
@@ -57,6 +59,12 @@ int main(int argc,char **argv)try{
   const bool rejected=refuses([&]{copy.mesh.extrude_edge(edge(copy.mesh,copy.left[0],copy.left[1]),{Vec3{-.3f,-.2f,0},Vec3{-.1f,-.2f,0}},[&]{return ++calls>=at;});});
   require(!rejected||copy.mesh.encode()==snapshot,"Cancelled extrusion never consumes IDs or partial attributes");
  }
+ for(float y:{.1f,-.1f}){
+  RetopoWorkspace wire(plane());point(wire,{-.1f,0,0});point(wire,{.1f,0,0});wire.edit(RetopoAction::Wire);wire.edit(RetopoAction::ExtrudeMode);
+  auto original=wire.view();wire.edit(RetopoAction::BeginGesture);wire.edit(RetopoAction::Sample,{0,0,0});wire.edit(RetopoAction::Sample,{0,y,0});wire.edit(RetopoAction::EndGesture);
+  require(wire.view().topology->faces().size()==1&&wire.view().topology->triangulate().mesh.normals.front().z>0,"Wire extrusion follows source outward normal in either drag direction");
+  wire.edit(RetopoAction::Undo);require(wire.view().topology==original.topology,"Wire orientation choice remains one exact history operation");
+ }
  auto source=reference(patches().mesh);const auto source_bytes=source.encode();RetopoWorkspace w(source);
  point(w,{-.1f,-.1f,0});point(w,{-.1f,.1f,0});point(w,{.1f,.1f,0});point(w,{.1f,-.1f,0});
  auto selection=w.view();w.edit(RetopoAction::BridgeEdges);auto bridge=w.view();
@@ -91,8 +99,11 @@ int main(int argc,char **argv)try{
  require(doc.undo()&&doc.copy_scene().encode()==source_bytes,"One global Undo restores exact pre-Apply source and target");
  require(doc.redo()&&doc.copy_scene().encode()==applied,"Global Redo restores editable strip and atlas exactly");
  doc.begin_retopology();settle(doc);require(doc.frame().state->retopology->topology->encode()==native,"Reopened workspace retains stable extrusion topology");doc.end_retopology(false);
+ if(auto destination=std::getenv("DOME_RETOPO_EDGE_OUTPUT")){
+  std::filesystem::create_directories(destination);for(auto name:{"strip.dsculpt","strip.glb"})std::filesystem::copy_file(directory/name,std::filesystem::path(destination)/name,std::filesystem::copy_options::overwrite_existing);
+ }
  std::filesystem::remove_all(directory);
- Document xr;xr.replace(source.snapshot());Controller hand(xr);xr.begin_retopology();settle(xr);hand.send();hand.send(0,0,0,true);hand.send();hand.sector(8);hand.sector(9);hand.sector(11);require(xr.frame().state->menu_page==16,"Controller navigates to Retopology page");hand.sector(0);
+ Document xr;xr.replace(source.snapshot());Controller hand(xr);hand.send(0,0,0,true);hand.send();hand.sector(8);hand.sector(9);hand.sector(11);require(xr.frame().state->menu_page==16,"Controller navigates to Retopology page");hand.sector(0);settle(xr);
  for(auto p:std::array<Vec3,4>{{{-.1f,-.1f,0},{-.1f,.1f,0},{.1f,.1f,0},{.1f,-.1f,0}}})hand.point(p);
  hand.menu();require(xr.frame().state->menu_enabled[3],"Four selected endpoints enable contextual bridge on controller page");hand.sector(3);settle(xr);
  require(xr.frame().state->retopology->topology->faces().size()==3,"Actual joystick Connect/Bridge action builds outward bridge");
@@ -105,5 +116,6 @@ int main(int argc,char **argv)try{
  require(xr.copy_scene().encode()==source_bytes,"Controller bridge/extrusion drafts preserve committed reference scene");
  hand.menu();hand.sector(10);xr.finish_spatial();require(xr.wait_asset()&&!xr.frame().state->retopology&&xr.frame().state->error.empty(),"Accepted controller strip Apply survives input shutdown");
  require(xr.copy_scene().active().retopology->topology.faces().size()==4,"Controller result retains bridge plus extrusion as editable quads");
+ if(auto destination=std::getenv("DOME_RETOPO_EDGE_OUTPUT")){xr.export_asset(std::filesystem::path(destination)/"bridge-strip.glb").get();xr.save(std::filesystem::path(destination)/"bridge-strip.dsculpt");}
  std::cout<<"PASS "<<checks<<" bridge/extrusion checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<e.what()<<'\n';return 1;}
