@@ -87,10 +87,45 @@ scenes cap aggregate topology records at one million and decoded payloads at
 64 MiB. Draft undo retains at most 128 entries and one million topology records.
 Projection distance is 1–200 mm; nearby-point selection uses at most 10 mm, scaled
 with that distance. Scene object and texture budgets still apply. No automatic
-quad generation, bridging/extrusion, edge collapse, multi-point brush motion,
+quad generation, edge collapse, multi-point brush motion,
 production-scale latency guarantee or physical device validation is implied.
 
 Read NATIVE-RETOPOLOGY.md for the kernel's original provenance, geometric
 validation and plane-cut limitations. Plane cuts remain a separate kernel with
 their own unfinished interactive workflow. REQUIREMENTS.md preserves the full
 production objective; a working manual patch editor does not complete it.
+
+## Boundary bridge and extrusion extension
+
+Select four endpoints as two existing disjoint wire/boundary edges, then use
+**Bridge edges** in the universal menu. The XR Connect cell becomes Bridge
+when four endpoints are selected. The worker chooses a noncrossing outward
+quad; existing vertex IDs, pins, UVs and seams remain intact. The new face
+inherits the first selected edge's incident face material (zero for a wire).
+Interior edges and invalid/out-of-bound candidates refuse without publication.
+
+Select an edge's two endpoints and choose **Extrude edge**. On the controller
+page the mode cell cycles Place, Move, Extrude, then Place when a boundary pair
+is selected; otherwise it skips Extrude. Touch the selected edge, then hold
+and drag to grow a projected strip. Only two new points and one quad are added
+per gesture. Continuing the gesture updates those same new IDs; release selects
+the outer edge for the next strip. A click without movement is a no-op.
+Returning to the anchor restores the original snapshot; Cancel restores the
+complete original gesture. A wire's new face follows the source normal in
+either drag direction; adjacent-face boundaries retain consistent winding.
+
+Each bridge or completed strip is one draft Undo. Apply uses the existing
+ordered atlas/publication transaction, preserving editable records in native
+Save/Open and triangulating for GLB. It retains the existing explicit paint/rig
+transfer boundaries. Projection checks endpoints and face center/orientation;
+it does not certify every point inside a curved quad.
+
+Qualified source b001ac7 has 5/5 Release and 5/5 selected owned sanitizer suites,
+130 native/core/controller workflow checks, 2,978 persistent allocation-denial
+boundaries in each build, 15 real FLTK universal-menu assertions and 6 compact
+bitmap-font checks. Four actual GLBs (two geometries across both builds) pass
+Khronos with zero errors or warnings. Initial wire/control-fixture failures are
+retained in the receipt. See validation/RETOPO-EDGES.json for exact scopes.
+No new physical-headset, loader, GPU, installation or full-production claim is
+made. Production retopology quality/performance and the remaining matrix stay
+required.

@@ -4,6 +4,23 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Manual retopology bridge/extrude checkpoint — 2026-11-03
+
+Runtime/test b001ac7 extends main 2c31f3e with disjoint boundary/wire bridging and
+source-projected edge extrusion through the shared native/controller worker.
+Stable IDs, source attributes, no-motion/return-to-anchor/Cancel, one draft
+Undo, Apply/global history, Save/reopen and actual GLB export are verified.
+Five selected Release suites pass 2.20 s; five fresh owned-core/support sanitizer
+suites pass 31.58 s, including 2,978 persistent-denial boundaries per build.
+Actual FLTK 15 plus compact-BDF 6 and four Khronos files, 0 errors/0 warnings pass.
+Read RETOPO-AUTHORING.md and validation/RETOPO-EDGES.json for scoped proof and
+preserved initial wire/control-fixture failures. No new physical headset,
+loader/GPU proof or system installation. The complete goal stays active.
+
+DomeD HEAD/remote is now db0dba0; its toolkit hooks, bitmap patches and BDF helper
+are unchanged from d271cf6. Existing canonical toolkit/bitmap builds remain valid;
+notification-audio chrome changes do not alter the shared toolkit.
+
 ## Additional queued phase — controller spatial drawers, 2026-11-02
 
 The user additionally requires controller-mounted spatial drawers: interactive
@@ -333,7 +350,7 @@ mask-before-first-mesh input bug and old loader palette route. Production9684486
 scopes material epoch fencing to mesh sampling; its exact strengthened mask
 fixture first fails against the old archive with the real preview worker gated.
 Corrected fresh coherent optimized core/support/render/frontend and own C/C++SAN
-builds pass; targeted5/5 pass0.75s Release and5/5 pass3.67s SAN, retaining existing
+builds pass; targeted5/5 pass0.75s Release and 5/5 pass3.67s SAN, retaining existing
 mesh stale/held-pressure guards. Native/core/frontend inputs and binaries stay
 unchanged through the final test-only runtime retimecc3bf97.
 

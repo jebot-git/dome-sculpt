@@ -1,11 +1,13 @@
 # Current DomeD toolkit and conventions
 
-Current canonical DomeD is `d271cf65c612a462fcfa6739416b06c6565be070`, checked
-against remote main on 2026-11-02. All 23 FLTK patches, four bitmap patches,
+Current canonical DomeD is `db0dba05209ff09255e12455c8d0e3b8f0bd075c`, checked
+against remote main on 2026-11-03. Its toolkit hooks, bitmap patch directory and
+BDF helper are byte-identical to d271cf65c612a462fcfa6739416b06c6565be070.
+The new notification-audio popup changes are confined to compositor chrome. All 23 FLTK patches, four bitmap patches,
 16 installed runtime libraries, builder and canonical font helper were verified
 against their recorded hashes. Inputs remain byte-identical to3024fb6 and
 eee23b7, which added native PCF and a23rd FLTK patch. The current helper also
-exports media aliases correctly and excludes generated aliases from host choices. The earlier22-patch artifacts and6feb runtime are retained
+exports media aliases correctly and excludes generated aliases from host choices. The earlier22-patch artifacts and 6feb runtime are retained
 as historical evidence; they no longer identify the latest toolkit inputs.
 
 The canonical Release builder prepared `artifacts/toolkit-eee23b7` with all23
