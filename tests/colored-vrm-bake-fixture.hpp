@@ -3,10 +3,10 @@
 #include "source-color-fixtures.hpp"
 namespace colored_vrm_fixture {
 using namespace dome;
-inline Scene model(bool directional=false,bool curved=false,bool mixed_skin=false,bool secondary_uv=false){
+inline Scene model(bool directional=false,bool curved=false,bool mixed_skin=false,bool secondary_uv=false,bool zero_colors=true){
   // Independently authored planar CC0 test asset. Its real POSITION-only key
   // and rigid skin are deliberately representable; no post-bake frame edits.
-  auto scene=source_color_fixture::model(true,directional,curved);auto &o=scene.active();auto &raw=*o.appearance->original_bytes;
+  auto scene=source_color_fixture::model(zero_colors,directional,curved);auto &o=scene.active();auto &raw=*o.appearance->original_bytes;
   auto word=[&](size_t n){return uint32_t(raw.at(n))|uint32_t(raw.at(n+1))<<8|uint32_t(raw.at(n+2))<<16|uint32_t(raw.at(n+3))<<24;};
   auto j=nlohmann::json::parse(raw.begin()+20,raw.begin()+20+word(12));size_t start=20+word(12);std::vector<uint8_t> bin(raw.begin()+start+8,raw.begin()+start+8+word(start));
   const std::array<const char*,19> roles={"hips","spine","chest","neck","head","leftShoulder","leftUpperArm","leftLowerArm","leftHand","rightShoulder","rightUpperArm","rightLowerArm","rightHand","leftUpperLeg","leftLowerLeg","leftFoot","rightUpperLeg","rightLowerLeg","rightFoot"};
