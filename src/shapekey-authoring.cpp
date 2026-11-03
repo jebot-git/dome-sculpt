@@ -11,6 +11,7 @@
 #include "shapekey-normal-preparation.hpp"
 #include "shapekey-source-uv.hpp"
 #include "shapekey-attributes.hpp"
+#include "normal-key-derivation.hpp"
 #include <vector>
 namespace dome {
 namespace {
@@ -125,6 +126,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
  std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
+ if(detail::needs_independent_key_domain(source,edit))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
  if(source.material_bindings&&source.material_bindings->normal_preparation)
   return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
  auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));if(!deform->morphs)deform->morphs=MorphSet(rest);
