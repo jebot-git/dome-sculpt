@@ -1,0 +1,718 @@
+{
+  "status": "terminal",
+  "source": "b32aa8b7259cb670edab8a37a4e703cc09f84a9e",
+  "started_utc": "2026-11-03T06:41:35.857633+00:00",
+  "scope": "Current coherent OneAPI native flow + actual strictPCI03 ArcGL; explicit syntheticXR app/kerneltrace; no physicalHMD/session/system changes",
+  "GPU_lease": "released after all own child processes terminal",
+  "input_hashes": 1844,
+  "environment": {
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/compat:/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/lib:/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib:/home/blux/de-xr/dome-sculpt/artifacts/toolkit-eee23b7/lib",
+    "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+    "DRI_PRIME": "pci-0000_03_00_0",
+    "XR_RUNTIME_JSON": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-authoring-b32/no-real-runtime.json"
+  },
+  "runs": [
+    {
+      "name": "device",
+      "exit_code": 0,
+      "seconds": 0.40082059701671824,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/gpu-paint-main-7693d6b/artifacts/paint-device-info"
+      ]
+    },
+    {
+      "name": "workflow",
+      "exit_code": 0,
+      "seconds": 301.4638589339738,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-source-union-workflow-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-authoring-b32/workflow",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/assets/humanoid/vroid/base-female.vrm",
+        "--hardware"
+      ]
+    },
+    {
+      "name": "commutation",
+      "exit_code": 0,
+      "seconds": 87.63837437998154,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-key-uv-commutation-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-authoring-b32/commutation",
+        "--hardware"
+      ]
+    },
+    {
+      "name": "authoring",
+      "exit_code": 0,
+      "seconds": 40.74243792099878,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-source-union-authoring-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-authoring-b32/authoring",
+        "--hardware"
+      ]
+    },
+    {
+      "name": "paint-fixture",
+      "exit_code": 0,
+      "seconds": 7.077624789002584,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-paint-composite-fixture",
+        "--xr-fixture",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-authoring-b32/paint512.dsculpt"
+      ]
+    },
+    {
+      "name": "application-synthetic-xr",
+      "exit_code": 0,
+      "seconds": 8.531034179992275,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/tests/paint-composite-xr.py",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/libdome-sculpt-test-runtime.so",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-authoring-b32/paint512.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/build-oneapi/dome-sculpt-paint-composite-fixture",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-master-3f4b2ba/artifacts/arc-authoring-b32/application-synthetic-xr"
+      ]
+    }
+  ],
+  "device": "ACTUAL_DEVICE Intel(R) Corporation / Intel(R) Arc(TM) A770 Graphics / 0000:03:00.0",
+  "exit_code": 0,
+  "input_drift": [],
+  "check_counts": {
+    "workflow": 134,
+    "commutation": 101,
+    "authoring": 59,
+    "actual_application_synthetic_XR": 7
+  },
+  "total_checks": 301,
+  "geometry": {
+    "world_corners": 44484,
+    "world_max": 9.83025e-07,
+    "workflow_GLB_max": 0,
+    "workflow_wrong_normal_max": 4
+  },
+  "commutation_role_maxima": [
+    0.0,
+    0.0
+  ],
+  "commutation_order_maxima": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "authoring_GLB_maxima": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "Khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 29,
+    "exported_files": 28,
+    "generated_actual_raw_UV2_input": 1,
+    "errors": 0,
+    "warnings": 47,
+    "infos": 43,
+    "hints": 11,
+    "filters": [],
+    "maxIssues": 0,
+    "issue_counts": [
+      {
+        "severity": 1,
+        "code": "NODE_SKINNED_MESH_NON_ROOT",
+        "count": 47
+      },
+      {
+        "severity": 2,
+        "code": "NODE_MATRIX_DEFAULT",
+        "count": 5
+      },
+      {
+        "severity": 2,
+        "code": "UNUSED_MESH_TANGENT",
+        "count": 3
+      },
+      {
+        "severity": 2,
+        "code": "UNUSED_MESH_WEIGHTS",
+        "count": 1
+      },
+      {
+        "severity": 2,
+        "code": "UNUSED_OBJECT",
+        "count": 34
+      },
+      {
+        "severity": 3,
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "count": 11
+      }
+    ],
+    "all_inputs_before_after_exact": true
+  },
+  "runtime_report": {
+    "acquires": 76,
+    "action_syncs": 42,
+    "application": "Dome Sculpt",
+    "bindings": {
+      "/interaction_profiles/htc/vive_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/click",
+          "/user/hand/right/input/squeeze/click"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/trackpad"
+        ],
+        "mirror": [
+          "/user/hand/left/input/trackpad/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/menu/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/trackpad/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/trackpad"
+        ]
+      },
+      "/interaction_profiles/khr/simple_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/select/click",
+          "/user/hand/right/input/select/click"
+        ],
+        "palette": [
+          "/user/hand/left/input/menu/click"
+        ]
+      },
+      "/interaction_profiles/logitech/mx_ink_stylus_logitech": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/tip_logitech/pose",
+          "/user/hand/right/input/tip_logitech/pose"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/cluster_middle_logitech/force",
+          "/user/hand/right/input/cluster_middle_logitech/force"
+        ],
+        "tip_force": [
+          "/user/hand/left/input/tip_logitech/force",
+          "/user/hand/right/input/tip_logitech/force"
+        ]
+      },
+      "/interaction_profiles/meta/touch_controller_plus": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/value",
+          "/user/hand/right/input/squeeze/value"
+        ],
+        "eraser": [
+          "/user/hand/left/input/y/click"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/thumbstick"
+        ],
+        "mirror": [
+          "/user/hand/left/input/thumbstick/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/x/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/thumbstick/click"
+        ],
+        "redo": [
+          "/user/hand/right/input/b/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/thumbstick"
+        ],
+        "undo": [
+          "/user/hand/right/input/a/click"
+        ]
+      },
+      "/interaction_profiles/oculus/touch_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/value",
+          "/user/hand/right/input/squeeze/value"
+        ],
+        "eraser": [
+          "/user/hand/left/input/y/click"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/thumbstick"
+        ],
+        "mirror": [
+          "/user/hand/left/input/thumbstick/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/x/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/thumbstick/click"
+        ],
+        "redo": [
+          "/user/hand/right/input/b/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/thumbstick"
+        ],
+        "undo": [
+          "/user/hand/right/input/a/click"
+        ]
+      },
+      "/interaction_profiles/valve/index_controller": {
+        "aim_pose": [
+          "/user/hand/left/input/aim/pose",
+          "/user/hand/right/input/aim/pose"
+        ],
+        "canvas_grab": [
+          "/user/hand/left/input/squeeze/value",
+          "/user/hand/right/input/squeeze/value"
+        ],
+        "feedback": [
+          "/user/hand/left/output/haptic",
+          "/user/hand/right/output/haptic"
+        ],
+        "grip_pose": [
+          "/user/hand/left/input/grip/pose",
+          "/user/hand/right/input/grip/pose"
+        ],
+        "left_stick": [
+          "/user/hand/left/input/thumbstick"
+        ],
+        "mirror": [
+          "/user/hand/left/input/thumbstick/click"
+        ],
+        "paint_pressure": [
+          "/user/hand/left/input/trigger/value",
+          "/user/hand/right/input/trigger/value"
+        ],
+        "palette": [
+          "/user/hand/left/input/b/click"
+        ],
+        "recenter": [
+          "/user/hand/right/input/thumbstick/click"
+        ],
+        "right_stick": [
+          "/user/hand/right/input/thumbstick"
+        ]
+      }
+    },
+    "egl_binding": true,
+    "empty_submissions": 7,
+    "focus_losses": 1,
+    "focus_regains": 1,
+    "frames_begun": 45,
+    "frames_ended": 45,
+    "frames_waited": 45,
+    "gl_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "gl_vendor": "Intel",
+    "image_waits": 76,
+    "left_eye_nonblank": 37,
+    "overlay": true,
+    "palette_images": 22,
+    "reference_changes": 1,
+    "releases": 76,
+    "right_eye_nonblank": 37,
+    "sessions_begun": 1,
+    "sessions_destroyed": 1,
+    "stereo_submissions": 38,
+    "swapchain_format": 32856,
+    "swapchains_created": 2,
+    "swapchains_destroyed": 2,
+    "tracking_losses": 4,
+    "trigger_pressure_samples": 5
+  },
+  "production_compute_evidence": {
+    "paint_kernel_creates": 1,
+    "actual_65536pixel_device_to_host_reads": 9,
+    "scope": "Production plain paint compositing only; no new domain/rig/bake compute claim"
+  },
+  "mapped_libraries": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/compat/libumf.so.1": "bda249ee52531e640a01c6629a4654f048cf5dccec0b8299bf6551e49b7c08e4",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/lib/libsycl.so.9.0.0-0": "fbad8a92f17890d71aa2468744d73fa20d86837357f783338fef977a2456be28",
+    "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libfreetype.so.6.20.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+    "/home/blux/de-xr/dome-sculpt/artifacts/bitmap-runtime-eee23b7/lib/libharfbuzz.so.0.61410.0": "35fcdcf82f23dc5301513ec8ac75d154d1342ed5e5a24f38930abed3a46c9edc",
+    "/usr/lib64/libze_intel_gpu.so.1.17.39758": "75a5d660302f1199fc2718478518e6c4d17deb0ca1771a9a05c18222f92bd5ce",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/lib/libur_adapter_level_zero_v2.so.0.12.0": "b3592e7c9489cfda44d8ef09dd11acf2783cc66829a85809c70c6dd4302b65d3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/lib/libur_adapter_level_zero.so.0.12.0": "da8ff95533eefdf0720b2e888a9626edd023623e463d9c383b288436e2cafd76"
+  },
+  "verified_utc": "2026-11-03T06:54:09.728298+00:00",
+  "output_hashes": {
+    "artifacts/arc-authoring-b32/KHR-00.json": "b06bab8705ff1da91d836b018325851209ed9e0f85c31a2ffa6c8d3486115210",
+    "artifacts/arc-authoring-b32/KHR-01.json": "232f7d8373d9e0cb00157b9d47155bd4d5958ec0bd175e7fe6b949713a317d14",
+    "artifacts/arc-authoring-b32/KHR-02.json": "09748db42e0bc7262bcb7d63b4e69f70160819dd1bbf67ed8dcc8cb4367a0252",
+    "artifacts/arc-authoring-b32/KHR-03.json": "4f196056bb5b183e2ba561b3b247dce4c594626eca7a6b9da7aa12347e1f1aeb",
+    "artifacts/arc-authoring-b32/KHR-04.json": "a94db40be881512a6e4021cb58509a40d2c7f1fe0215019e88ec2ecb6e61dba0",
+    "artifacts/arc-authoring-b32/KHR-05.json": "a11227f3a709f6ac09f0abc92818b7b4e3aa0a5e2e5090eed7bc72e0519b9a40",
+    "artifacts/arc-authoring-b32/KHR-06.json": "10e2458700f02561e5c021aafa9d9e291f1fdeb50d8752a458997b25794c1718",
+    "artifacts/arc-authoring-b32/KHR-07.json": "8660985db4206caa1a8b6c1de230bd34042932c0af6ec54c2a2db7b245a4c6c6",
+    "artifacts/arc-authoring-b32/KHR-08.json": "d5232506fc2b6d319f633872e80c152ee0714a60e6b0d7c2c2588af2df3619ba",
+    "artifacts/arc-authoring-b32/KHR-09.json": "87493da4fbaf8010e047715bded39cc99a549c895f22fa662b6001550eea5ff0",
+    "artifacts/arc-authoring-b32/KHR-10.json": "cbd0620beabee6a7ed3f368e3199f1ac23b4466ca64bbaa2a9067fc2ca5fd37a",
+    "artifacts/arc-authoring-b32/KHR-11.json": "eb2e3f47a115c6163d4e91e7a84df9374b96d2a2c9dd39b07010cb68a9e2923e",
+    "artifacts/arc-authoring-b32/KHR-12.json": "96f15b9eacd5abbd84b94daa805c4a31a4ffbb638cfe53b96bbaa5962c5c624e",
+    "artifacts/arc-authoring-b32/KHR-13.json": "ab6fcc8dc2958200dc4fd677f1015902b423fed57bb2e4db3db3f33d0f0cbdec",
+    "artifacts/arc-authoring-b32/KHR-14.json": "97d16708af4cb0d2d7b70f788db6d0e3bea9fd187dbda59b369de3976461a2b7",
+    "artifacts/arc-authoring-b32/KHR-15.json": "e2549c7a491594cf55d48daf03ff48fa129b536ca5acd0d92a61fb1ec146fa76",
+    "artifacts/arc-authoring-b32/KHR-16.json": "0caaad23ad93dbeaf182a5f1295f513768000421b2546d9a722bfbe4690c41d0",
+    "artifacts/arc-authoring-b32/KHR-17.json": "d56b4821b216cfc9f44feabd19fce17b070df226c933c441c7991c8888b3acf8",
+    "artifacts/arc-authoring-b32/KHR-18.json": "73abfe01b7d0d7dc7dd106ebdda25c7023ed9a9b8081d7326961a357a21638c3",
+    "artifacts/arc-authoring-b32/KHR-19.json": "73b8ce0bada6d6df3b92e7600265236873eb59b2ff42f9104561a49328b1ba6e",
+    "artifacts/arc-authoring-b32/KHR-20.json": "dbcedfae71d3a4dee690e6920f9da2d182d65e2aae728008c034a5d88ace5818",
+    "artifacts/arc-authoring-b32/KHR-21.json": "679ec5649939ebe56a63dda69be87888a0c0f209c9130adf980a87c32a1e87fe",
+    "artifacts/arc-authoring-b32/KHR-22.json": "58222633283aef8b19cdc33961656d67d7e371f6c0f8de74a8290a66db3f21c3",
+    "artifacts/arc-authoring-b32/KHR-23.json": "781ef9a2333444df08f367165a10e68f342fab94cc9059b8f32ab901d7f89a73",
+    "artifacts/arc-authoring-b32/KHR-24.json": "e4fb2c3f12dab9fb428082936a27c7d6e6d98e36f2b93995c0ceca174c291c4f",
+    "artifacts/arc-authoring-b32/KHR-25.json": "05fa01a661a2f9f31ea191b574a27679087d3be13af21e97e24fc304b5126589",
+    "artifacts/arc-authoring-b32/KHR-26.json": "4b1f3d344a14b338fcaca876d50057a1cd372716b7909a6eefd8310987d7745f",
+    "artifacts/arc-authoring-b32/KHR-27.json": "27fbca0f452f09bead40d259f25611e018352641ea5352088757ff602e05e903",
+    "artifacts/arc-authoring-b32/KHR-28.json": "359e9a20e9ec88e8d9c07121343e950be76f0d96ba723682e19248b5525efc16",
+    "artifacts/arc-authoring-b32/KHR-files.json": "28073a0bec7f491cde1a5748f8b917bd86a83497901176838aaedafc91e7e3a8",
+    "artifacts/arc-authoring-b32/KHR-inputs-after.json": "896cac6efa6187733e1774449636561a146ea5beb439011bde08146ba9d7fd9f",
+    "artifacts/arc-authoring-b32/KHR-inputs-before.json": "896cac6efa6187733e1774449636561a146ea5beb439011bde08146ba9d7fd9f",
+    "artifacts/arc-authoring-b32/KHR-preflight-negative.json": "d19e32439dee53ca6ca9fd77e3172441e0a76eb1e0aea8ea3b8cf751570009f4",
+    "artifacts/arc-authoring-b32/KHR-summary.json": "97fe0e8f0d1a55f39ca44ac9eecbb2d92f005848fbc51bfc5fd09db14efcc028",
+    "artifacts/arc-authoring-b32/application-synthetic-xr/app.log": "0fd41adfcf4246e805574cde91d4f3bf3f5a6dd2d5ddd1d94894e015f4cef24f",
+    "artifacts/arc-authoring-b32/application-synthetic-xr/painted.dsculpt": "ccddf88ef1d0ae6945721d054c0f7eeb759e91c7f47f43c604a040bc10331e10",
+    "artifacts/arc-authoring-b32/application-synthetic-xr/report.json": "a3a346737f6e1de2e4e02fb6b115f9494b9f1a05d02f00b51966e2de34ee4243",
+    "artifacts/arc-authoring-b32/application-synthetic-xr/runtime.json": "5bbeefc2451aa69fcf42bfee0091d10e1c26fb6119ee91262e4f750f690c5585",
+    "artifacts/arc-authoring-b32/application-synthetic-xr/transfer-trace.json": "7d8d09afeb2890caa5c2b0d564b9825103da9eda1b80e627a4e6176935f4e963",
+    "artifacts/arc-authoring-b32/application-synthetic-xr-maps.txt": "9bc5fb86180e976bb7dbe31f5490660120c0f2d994e0481e703c6043f89bf948",
+    "artifacts/arc-authoring-b32/application-synthetic-xr.log": "c63ea51a7579f47583ad2705e7a8d7c600e3500f20fe9e58cd04162e10ad4739",
+    "artifacts/arc-authoring-b32/authoring/fitted-0-0.glb": "26032ef65575a987b7b606166fcde5986655db0ee92e7c69f43eec71c97207ad",
+    "artifacts/arc-authoring-b32/authoring/fitted-0-100.glb": "d6663d3183d340c7cdf79ef6950ba236994a917e7706e87a6038c4658d6b29ee",
+    "artifacts/arc-authoring-b32/authoring/fitted-0-35.glb": "be207a266330c051f8c60fb8ec6aa2b91551ce321d8d5d8ae4f5a855215531f6",
+    "artifacts/arc-authoring-b32/authoring/fitted-0.dsculpt": "e1dc9e294dc79bdabcb28a536aaa2b8788b1d4810a3aa78c2fe8a5d3e7c09b55",
+    "artifacts/arc-authoring-b32/authoring/fitted-1-0.glb": "81280f454ef90489c91a580e922e81d8838cf51ba2fb50443e8c1527fcfb833f",
+    "artifacts/arc-authoring-b32/authoring/fitted-1-100.glb": "1776d3c9dbc3316af421a85e41bbd08a32f52260c2cc29a7db1ef3e3f858d002",
+    "artifacts/arc-authoring-b32/authoring/fitted-1-35.glb": "c7d576dd492c44a0f0838ce156ea46e977a242d1a387530419bd2148bde37d11",
+    "artifacts/arc-authoring-b32/authoring/fitted-1.dsculpt": "26b7f584792057ce247f9582ddf88569b41483a26b022f8d990d729632fd988b",
+    "artifacts/arc-authoring-b32/authoring/fitted-2-0.glb": "71ee9cf3f71820cae906c22c821bc55387327332a746d6e118282a010a41337a",
+    "artifacts/arc-authoring-b32/authoring/fitted-2-100.glb": "4639a2aded83a72e57fe4d622e9fa63820f44dc92cb85a232a96c9611052ff54",
+    "artifacts/arc-authoring-b32/authoring/fitted-2-35.glb": "94619ed6926bd58448638d5f3a5a1415c83356cc9c777beda07aa3cc3c6b3ba9",
+    "artifacts/arc-authoring-b32/authoring/fitted-2.dsculpt": "5c31ad61c2b408b58cf0e626c2b9981e6b0856c24801e634be4211c9695dfa0b",
+    "artifacts/arc-authoring-b32/authoring/post-paint.dsculpt": "dc3b2895ae3b4d6bf37db00304e3302d724eb7ec7eaeae229c94aa90c5f9f6cf",
+    "artifacts/arc-authoring-b32/authoring-maps.txt": "cfcf7912b57048a383c655c4f878a27420e580f80fdac59aa784d0a36c298396",
+    "artifacts/arc-authoring-b32/authoring.log": "b691fda2e47c604b809ecc29251e461bdfd57a932c1da40a34b1b115a4393201",
+    "artifacts/arc-authoring-b32/commutation/0-0-0.glb": "201ace89f2a21d09a758839fd690a427ac39b07c90516fc1532d12a0962c0bf6",
+    "artifacts/arc-authoring-b32/commutation/0-0-1.glb": "201ace89f2a21d09a758839fd690a427ac39b07c90516fc1532d12a0962c0bf6",
+    "artifacts/arc-authoring-b32/commutation/0-100-0.glb": "864fa8f0904915d9f7bb3b9bcb42a68350cef9c484cf05153d34111eae9052fc",
+    "artifacts/arc-authoring-b32/commutation/0-100-1.glb": "864fa8f0904915d9f7bb3b9bcb42a68350cef9c484cf05153d34111eae9052fc",
+    "artifacts/arc-authoring-b32/commutation/0-35-0.glb": "8c4336b4d957a3be957e113a0b87eed643a1c821eb0915f39c6a41ac1a275900",
+    "artifacts/arc-authoring-b32/commutation/0-35-1.glb": "8c4336b4d957a3be957e113a0b87eed643a1c821eb0915f39c6a41ac1a275900",
+    "artifacts/arc-authoring-b32/commutation/1-0-0.glb": "4e5504819a28a1d6ce75be444dc4b6fe3f46b0fab414cdcad73ebb707aa61dd9",
+    "artifacts/arc-authoring-b32/commutation/1-0-1.glb": "4e5504819a28a1d6ce75be444dc4b6fe3f46b0fab414cdcad73ebb707aa61dd9",
+    "artifacts/arc-authoring-b32/commutation/1-100-0.glb": "aaeaa185e6973b0f10ae31ddb6defa58ae5531ae276745aca5eba4e791485aea",
+    "artifacts/arc-authoring-b32/commutation/1-100-1.glb": "aaeaa185e6973b0f10ae31ddb6defa58ae5531ae276745aca5eba4e791485aea",
+    "artifacts/arc-authoring-b32/commutation/1-35-0.glb": "e259aebebe7bd4388cc62aec01ccfcb407b3e65a46437ba5996356b77252ebd0",
+    "artifacts/arc-authoring-b32/commutation/1-35-1.glb": "e259aebebe7bd4388cc62aec01ccfcb407b3e65a46437ba5996356b77252ebd0",
+    "artifacts/arc-authoring-b32/commutation/2-0-0.glb": "00b4c7a4136549ab8463b2deba2dfda83713ef2e635b3a55adfa85db326b3f78",
+    "artifacts/arc-authoring-b32/commutation/2-0-1.glb": "00b4c7a4136549ab8463b2deba2dfda83713ef2e635b3a55adfa85db326b3f78",
+    "artifacts/arc-authoring-b32/commutation/2-100-0.glb": "1e8ae6c8534b3a42cd0725023606a6f6b178cc5f2a72bd8b227b8dfadc970b20",
+    "artifacts/arc-authoring-b32/commutation/2-100-1.glb": "1e8ae6c8534b3a42cd0725023606a6f6b178cc5f2a72bd8b227b8dfadc970b20",
+    "artifacts/arc-authoring-b32/commutation/2-35-0.glb": "af92005725668ef8e6fe9d5328d47aeb6e8227901065938d31355f4dc7c3ecf4",
+    "artifacts/arc-authoring-b32/commutation/2-35-1.glb": "af92005725668ef8e6fe9d5328d47aeb6e8227901065938d31355f4dc7c3ecf4",
+    "artifacts/arc-authoring-b32/commutation/intrinsic-first-create.dsculpt": "e5e8e6956c582d4a9576e125b42b0e7198a1ffc17212b81e3f813516e6fc5680",
+    "artifacts/arc-authoring-b32/commutation/intrinsic-first-replace.dsculpt": "f5cb556ae77c92d70f6ca6720c17610777f0580e5ad9402746da1c8746c3e979",
+    "artifacts/arc-authoring-b32/commutation/key-then-uv.dsculpt": "fc7fee4e34de1d6dd91a5c8fbbf2ed8d11f8df1c7863336daac8599b7d3950de",
+    "artifacts/arc-authoring-b32/commutation/metrics.json": "7ebb27c857229b641ee39f1b743b98a523b4518e8745a1d67ccd7250d3f3189b",
+    "artifacts/arc-authoring-b32/commutation/paint-key-uv.dsculpt": "55f0b09766967105f80d5ab6bff8c4f88ad840addbff491d03f0215b03a3febd",
+    "artifacts/arc-authoring-b32/commutation/paint-uv-key.dsculpt": "29a05e884e389d15f000b19a3a96f2409c619ef6999a204f8dd4884a60b8afb4",
+    "artifacts/arc-authoring-b32/commutation/projection.png": "6c25f820e1afee1682d2bd45827fabadf68a620242be3b1c1c32947d51d22538",
+    "artifacts/arc-authoring-b32/commutation/retained-first-create.dsculpt": "b2d216db90cd80a3124ffbc9126b953b96ad5759da76b35d593ca92bd86db46d",
+    "artifacts/arc-authoring-b32/commutation/retained-first-replace.dsculpt": "0d93f167d9ac3914aa2b16cc6a58b298e72f53438305ce5645074ce7a6199cbd",
+    "artifacts/arc-authoring-b32/commutation/seam-cancel.dsculpt": "a013f1ee9b7c40f51b487758415d56b07c99e79fc912641a58912a8bb21689a2",
+    "artifacts/arc-authoring-b32/commutation/seam-positive.dsculpt": "a013f1ee9b7c40f51b487758415d56b07c99e79fc912641a58912a8bb21689a2",
+    "artifacts/arc-authoring-b32/commutation/seam-retained.dsculpt": "f34fe63cc77881c3335f80f3110d5c9bdd4b585ebfdf65beb091386892d56094",
+    "artifacts/arc-authoring-b32/commutation/seam-retry.dsculpt": "37445e6608a21f783b54859a1c4723686dd9776392daa7adef99904b27eb443f",
+    "artifacts/arc-authoring-b32/commutation/stage.txt": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+    "artifacts/arc-authoring-b32/commutation/uv-before-key.dsculpt": "1468ec45f374ebce052ed1c5925547df91a80e36785428bc911e75d2e9406cd8",
+    "artifacts/arc-authoring-b32/commutation-maps.txt": "698e6a3e18e17a4443cfa428049ceefc2afd94c9bb3844728aa3f3e245a06dd6",
+    "artifacts/arc-authoring-b32/commutation.log": "29a00fc4f6394c10e913378e5fe57f2be27132815e91d25e4378f9c48d3b98b6",
+    "artifacts/arc-authoring-b32/device-maps.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/arc-authoring-b32/device.log": "0843e28bf7d31d65687666968242b27f2ebd4590af87acaf4ce328101985dc00",
+    "artifacts/arc-authoring-b32/drm.json": "d72d7289f266996638bba95e5b1f9ab22240337eec58fc3f044e7fa538e9c4a2",
+    "artifacts/arc-authoring-b32/home/cache/de-xr/fontconfig/3639432535055294855.conf": "4554ce50a72b4505d699ed109a409489fafc23a157d5cad3a3f86fdbd44b68d4",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/0112daae822d2a0b07c65b21dcf554ec-le64.cache-9": "cc4b27c216151091e0e0a408b82ba064bbc3fc2f16f240f5e0797628892f3e46",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/0386fdd3823f3bfa9d2ee5453ea348c4-le64.cache-9": "b0447a58cdd6ba43c67632cc3a2f5304931e96e486753b80a1f65bd181b2c3b1",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/07cf402d599a6d6ee499cedd5c2d16e2-le64.cache-9": "3b59a6fbfbc0ff558d889e36fb237210726afffc79d27915d7a767bda60b703d",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/0a16b2663ea75f65a2fb24d760a13c50-le64.cache-9": "40f9ada7126ad936aca0a50c10e42119697afe1ec09f135453e4106ef44a8b3f",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/0c656b8370a9f1ce1c5e5d3fca753d65-le64.cache-9": "2aa3e0824d786ce4c9ecce2db815ca3bf2206cdef93d8cb66d35f14a16045767",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/0eccd8d593bd8665d7aa3ed7000d5aa9-le64.cache-9": "4c611b54c994eb16b219cc399d094fb58505d1d3c48103af27c0cacc82b081ba",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/0eedc1bb798d742134d9ec78316b0735-le64.cache-9": "1bd838a436e6423e4ecf475a2cffaca10c221dfff1e918e9e6b08e00bbde47be",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/1124797a9aa949bf13c688a7c9602f4d-le64.cache-9": "61f262dfff10e39bd220563ec8aa4cf752da79559dd3a73d569388069f8f711b",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/123d8cdcc9d9c54627bf45219753db2c-le64.cache-9": "2fff5fc678c0f10848c05d96aa02e86e9c6f8d851a54d56022015007925c86cb",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/1419f710ec804ba35817e9e13b867123-le64.cache-9": "26a4237a210d91c2c76191d33e17a665df3fce57383065c10bd3f604328d987d",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/16d424a28d9bcd10154ebced607febd9-le64.cache-9": "a77317b745c764042a402f7eed34c35692d8edc5f54d9366b4226c31c93a36da",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/1721c67915d3f1fb0507a4bf254e8e4e-le64.cache-9": "c64ed34b244c6ab95dd2267ee84917cbb783bedb11662d9519d33c5a847c9853",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/1791c54dcde9e54a52e745f46dc41e0e-le64.cache-9": "942d923b91852114d5b44e098bbc75d34ce930e723021fe3320f58683aa5740c",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/1813949b6700a4f5d65a8c691649f341-le64.cache-9": "9205900efab90b04f44cb3906330883475c0a09a84ed16be0b59bc55b192c6bd",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/1911ff40f4cfa2c02031bf1d0ac7ea7c-le64.cache-9": "b91e60a1ed1de5ec74cc1abadd0409b637c6636a86067556a02a2f1fa2d0526a",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/19d0519b830c05777cb92350c468ce1d-le64.cache-9": "1460090dd9191f2e863971b03746083a860b22e3614e08cde7aea2f68197de9b",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/206a8e8e7cd52d1ae29fc2c9913eac40-le64.cache-9": "ef4a8961c0bead940aa595dcf3f1f430b911bac4c06c8b8781abbb0468fd09d4",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/2430bc3197962d5468c8ceaeb67d8fd7-le64.cache-9": "16bcfdad54ab22b2b30a94785a2fa6abcd3e9910bb872933b06ce40bf3665c13",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/24fbdca32a40c716c06f1b7c1fa66f1a-le64.cache-9": "43c42fc7d26ad221c2381afefc7f8dfd6a9d9541b66db77e74703a7bd31621fd",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/250926876db3955294fc78591a77c154-le64.cache-9": "8f499c70698ba3c96a79e8129e51206767c91a08057bbf905cf67218289e5575",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/2510604dc8245c9410b667c022ddf5b3-le64.cache-9": "c6ca73a9076cd967771a43ea303f6cdb058da055b91714a62a2079b9898ed230",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/25e57f8c6957da35e05fdccaa46aab1d-le64.cache-9": "f7ebe13c95f8c09e95985239a97063e760154fb9c79e32884ebb4b07088f7378",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/263f6431c1a8560a852a0517b60c5d0b-le64.cache-9": "e115fec3496ecec1718b6616824217fcedfcf9a1b901506985764f0ce544a00a",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/274ab6a40861cd8909c1d72c421c0eee-le64.cache-9": "7f664214387722b4d3ef2f1c4828ae9bb3a755f3b9d2ca88923b620b9b69a7a1",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/2c8ba6a01aca141c6963d81230b22f00-le64.cache-9": "895639b80603783967ad9670c89a1534c98f258e47cad856efdb43f6b61abc3e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/2ec88e162e06e46f45fd5ee7a42548f0-le64.cache-9": "423e5f31e97965a56073b8d1930f689c182d100251ece2a5143e19283127d669",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/2ef0360de928569203d6992f4abef246-le64.cache-9": "fdda7ad18736f4524ed7b145f3352ab79f31b498dc93d3addc048f58977ab0aa",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/2efc73688d987a1993ccee519405ee2f-le64.cache-9": "99000d994c7109e0b7f49adc89b4133b3bd2204c435dd0cb177affece6ab0d06",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/309ee98fd6ad78924502536702c396e9-le64.cache-9": "d9a1a3b68945c3c09dcebd9f72ac61386c72665502ae37dfe2013b8e5448c25f",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/31cea57640d4475bb1b5fd50bc086841-le64.cache-9": "c3a3e97dd98cdc7edc7da259a51b486d2cee1c976e5d25d5f6a4ceded8c23ce7",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/327b00e6bca9e68087ab70efc9ee160f-le64.cache-9": "2c0bc12110ed94fc8a1cba9215bbcce682271cc47539a4424936bcf7329cc85c",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/34c4889ccfbf7016e7cfc69f3879cfd2-le64.cache-9": "9d9d2b6c2e6071d0e5ef815b7ad6e452cff99750f243014c1c3a99c9be739b9b",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/350a46e5907a104211af8fcec811b83c-le64.cache-9": "8d468c6dd35036c0cca7581a0191fc007138593beae1b20539761163b31e226e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/3671855b33cfbe0bac33b03bf8ee2d84-le64.cache-9": "941549d45a17d92cafd485ff47a42f42394ea95ab4fab6cff841bddc9e135a79",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/37e8670faf572964b136effc5181a09d-le64.cache-9": "ef9d8b2cd354bc426801c201e4566d9ddec687c72a176aa6189fae4b051c53c2",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/3874c79682eb5ad26c7bcc19f21d7be2-le64.cache-9": "2242ca8a011d545cbeb0e23c97dea33b873fa00cdc1507d2126f263f9a8b9c4d",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/3de847e294b6aed933a4e7921927f509-le64.cache-9": "7ae6faa46ce33630c68b54e14816a8945e1a191779a94f6d7608d9d79aa0a0eb",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/3ec6632b2da1f02d727d99d53e0a2a44-le64.cache-9": "3970650ed6b6b891b52cfa8a5bf430e25c33baf338fe7c3dbae2296c2a8addc9",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/40df26cbe5c12fbf09761c5dd969f7e7-le64.cache-9": "4c67ec7929a4a3331fe4c1aa0ff5ffe03a87b2c19920b5c93a1d1533f383edd5",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4111988d3e3c896e86a47e25f079f4e9-le64.cache-9": "724e2f91e231b02fb88bcbecba1474b6d8b0ef8a649f956af22d4992e7101300",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4481b516860aaacab8b3ee7b8a6152d9-le64.cache-9": "5c9b29491f71465d90b742e999469d7143b736fabff45e48e59255b9575135e1",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4a6abb41b96433564091684979a713b4-le64.cache-9": "3efa2016a8c2c041afdd3e12871d038563c21a5bacb5b4ed824686f6739bb64e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4c1417fbe80b331c8cb879d784790d10-le64.cache-9": "712947e9a0a31cc20873a80fc90f698b726c9684c5a2923c6391cc58252e5472",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4d207b5d9a5e3f1ee4045fb362f92f66-le64.cache-9": "3b8c81c6b857ed508c7ffedc97860c20f2c9d48a4bd4a7919ca65dd9a4fa5e2f",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4db04ab83fe3ea0bb9da95a1844cf4a8-le64.cache-9": "1e86256b251c208cd53ddf483cd6404d600ac68cf1abcd44192fddbfa4353f68",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4e476371cf3209b9ee4a4f0e3c23f4f5-le64.cache-9": "350f9e8c7a0e0e323f17a6e5a0c112249f0d87e13db8dcd4a384137e2fb83461",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4e4ba63908408f4f6ae7dab3e2ef71b3-le64.cache-9": "7f416da09fc9958de69ef7a7ceeb60410dcd86e7776af5d74615a36983e59564",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/4f843e8797d6e4327c1b15768e5986db-le64.cache-9": "96b5f1fb0a95bdfdfe04708d1ee048cf4505411a1619e83d4c335098edae45d3",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/506335d15e553fcab5f951d2def1570b-le64.cache-9": "2abd3364a87485d3ba5b9d45534a191ba769160a97b6b1883a92fea8a1437463",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5435f9d2f484dc757230cf01ab65334d-le64.cache-9": "b9f125c425b4c999a611e309ae088fe465b77294c4d0ec96d016f61d8f5a12ce",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5450cb8583bb5e9d9905f82c5989233b-le64.cache-9": "ee27d251bc27aa498f8a9d6e5cf8d12dc67f68727c36848b711edd8b2d50716e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/54dfd562f49c7a53ab8c1bd40d3b1f4c-le64.cache-9": "7c8dd65896180b1a26ae838649b0ec5950238a2cd0e8d7cca58e7c4c662f9c60",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5656dd0cbe0b30f900d3a93fba74ee6f-le64.cache-9": "75608f68e0471b83c027d784498fe508762c9b475ac09d0985b63a5f4ecdfae6",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5988e2586de6aeb5a9def267ff850c45-le64.cache-9": "aa6bb3a62253bb4484b0df7e5f464129c659f7bc3797c01e34d512e24cecd575",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5c60d5b9b2bc6f5a0c6cea24098dc83c-le64.cache-9": "a8083cda28747ad56bda548edbb3e28d94a31fcef7ded36216f289d6b3629ca6",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5ed89007299e0dd4c0d8d3245839c27b-le64.cache-9": "ca03e2ea4331f81ad1374cfb5ad62ab383ca824a2c82deaa405bf1aaceb5aad7",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5ee24860f645185c1fa76d9bc1d9acf8-le64.cache-9": "f833872a283bc86d7b3192d1cc7f9ca0ab7690f09fe2abbdc63c30ed6fa917f9",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/5f0bf5aec848c62e5528d448365da9c6-le64.cache-9": "d024253c07c4b6c0c87aa968f4373eff7801ffdc9f6e1560195a4ececde86cba",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/63950a02114b52367112d99ac02e4a51-le64.cache-9": "c915ed5a9ee4ecb387562878f9e5f489b9ad3d7085b8904be22412679e0c6523",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/6531d94192e79474f004bf683d3d1b52-le64.cache-9": "7109306a7dfd7ce5f781665d5bca88650ed0654883147a9a523422ea9c8bf293",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/658e4ab6ae48ebe382b4f2c9c31c96c4-le64.cache-9": "c65b365216e0c1c9fe9fd5ccdec0df1a3e3338a58f477f1b2fb490ec01bde907",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/65e82de2c60a77246f127e9c19c7cfa0-le64.cache-9": "ef34917c1d294bba3c6e3ce361f3692977d7e80fcb91db57fcd836d7c87acf85",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/661fd2aef2434a9983d4bea97939d672-le64.cache-9": "106fa1398d41f99819fe2683a71b7866d4b25f5c7112f97ec2ac933b52026b8c",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/67ca583c266e9564ad84ace68bd637eb-le64.cache-9": "e9fa1a0b02401d3b71ba7cc988fc054a9abfc46d01a2da1b4d6c9dcb1075ac8e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/6a5b42f52febd879b52c5aa439a4d204-le64.cache-9": "c68367a6a03e9e884921a8f902a97367f0f84796ee625e22e9905f344ca76d15",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/6bba13f458694da28a5b75899a16a02d-le64.cache-9": "23d509502f780a39b77e876eb66eff59962898b741d06d3d3f2ca4ebc0d7ce4c",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/6d449f791f04906c94501e44a3e3c69a-le64.cache-9": "7295034bce9dad40f4f9d3246c553a5eaad1f1772143f487e9bbcebbe83a2bf5",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/73f8221ef6bf66dcb25d49f572fcebd2-le64.cache-9": "95b1d7838ce780bb0e75b8b75977c4b77535a71ecb50e42f017a2c9f5de74654",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/766e7ebeea1bbb7d473db82c28ec321e-le64.cache-9": "d85df1957fba2c8303d3e9d74da7c914e1958a9db4bef242b84a130168d1f6f4",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/77700e6abf9b33d977411569f344b1bb-le64.cache-9": "fac8ebd732a712b92a4fe59f41a573257253fab3a470f28bb16d2279d41b07cb",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/7a0cf029ae8daa2c6eb3d9506d99adfd-le64.cache-9": "1e9b69f58c5b29118693a9debfb0652766442b8574c70fa7dd3cbec0f3e01972",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/7babb309f5f4b5e625506aaf4cb2a569-le64.cache-9": "f476639f682a74b577575beac08e8072051ce147c1bd4834d5e389cf2895c25f",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/7d3183c1802d59289d8ebb84c92601dd-le64.cache-9": "f8c94e7f9839ae5affff252fa3da6bbd9fa144432b3ad2cb6242cb2f3ef19a4d",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/7e4145db9d98fae622c38b35d6e680ca-le64.cache-9": "cc3cdd32eefb22e12b5bc47ccb6f1b971ce5f9b5e1720a9b3e7c3e22bbf717d7",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/800bb972cdc3bafa9511bb9cfd08531a-le64.cache-9": "f8222c57af1f562a54297e6f51b1de6c344c248f288907fc50d023d05702c64c",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/81b132fa6593e5c8caceac15824ffbe4-le64.cache-9": "5becf7d501aaddf3ffd30939ccd67de8780eb0fa4d4d2ddf630d2b1a6f7c04ea",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/85f2644e5c1c4953ef5ca712daecff99-le64.cache-9": "a5189e4ae8ac345dd26d1cbb0b3e0b738f40e8d8103e25577394b0f52a07a0ef",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/86a2c184a653a6be5eb4eb87aed4b89d-le64.cache-9": "8d304a08b44b38c27812ca72964945cab7f11536ff9e2863823454f1c1a193ff",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/86ef07df1631de260653bf191030924c-le64.cache-9": "73239b0ae0c0d1fa2f98ceb16c48c0feca52eddfe1299dd39632d8d54975415e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/87537e10cbf5026bee6445400dcd6fdf-le64.cache-9": "6d0f7bd4cf96e1a63486835dbe02067500c5b3071dd8a2664ea04f5570aa9ac0",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/878dbe4106992d942f3ff0671adf97ef-le64.cache-9": "ce19a066b91ffbc26901974105b2252485db2246505a1784209cf35f600b90d9",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/8b0a18a5abc66c3c1de1f0a3f5e6494e-le64.cache-9": "afb916a3a670f46d50ca38f8c8775555e6641fdc5b91db80a61a0d689e9e94ff",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/8b5909f6e5c904ce4b7010a89226290f-le64.cache-9": "d5ea33628fdbbf39bf212d66dad9a3c73051961787a1c7cd88f1793f5c7cab1e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/8b981136ff71893d4eaa159cac198126-le64.cache-9": "761112f7995b20206180793924b42b0a0fd260beca34a736dc4ddfb61305b8c4",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/8ffe82d94fb8de0bff2b25f2681630cb-le64.cache-9": "5ae6183167ca60080e72847ca0682f7cf93dc7f73d6ae1a6c1a83bcff56d06d2",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/9005d7b86179e055f758a491684707de-le64.cache-9": "031659b605348fff58410199c1445be64ea6152c0811613c109b2905abac3ff6",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/90cb6c5d464ef7541b86e9da6a114d54-le64.cache-9": "fc52650a1a64b5df9b7af3a9575ea00a45a131a5b6db70b15afd3282f10ea3f5",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/9134a18744a7c4588d3dfb69074bc5bf-le64.cache-9": "d54edef5a09f91932085b01e504838b2bfcaa018a935280f2ef3eaec8b200be8",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/915cf7d8ad9616c9430c9598456ee718-le64.cache-9": "c961f7e46e8fa4bbd5644d479faa0a4c8270c79fd7469c8151461a34bbfd6cfc",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/93f2ef353f67d0d565c1e5d18bc99762-le64.cache-9": "ae4dd54e47b21f602ba56c44e4914eae7ab9c8e7f11921d4c2a45035aba7a09b",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/96ab95ca3b008d2e6deaee5bdbdacbf3-le64.cache-9": "b6ce5f25c01fe44f50986afb23ec0335a20451e6e9306983de4d12a32597a2f1",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/99b8ade9c194b40c6ce0986c20b42f70-le64.cache-9": "35777f5c1a2fea8d7d39708315b992ee9d1a88e05d8cc08392ef38436420e20e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/9d2659d12d3bd46e80de056886e8354d-le64.cache-9": "1bac4e263daa7512f00846e0db35831b5a7ed7ede83a2be971851a9d481cdc10",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/9d62434fbba09d755dac789b22b773ec-le64.cache-9": "c6c58243db63bb00686b904431058e2bbd3edcb8790f86ceebfab51be8fbaccb",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/9e934f74219887f07858652dec994c20-le64.cache-9": "5a28ec6d9cf1deddf09c157e8da866ce67710ba9803b6445705cecb91dbda9d9",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/CACHEDIR.TAG": "05e7633fb31bf1f6f8d89020c16b9f24587fdf7638e951c9745b192f5fc3b682",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/a132495a06e29760320feb9c8943fb39-le64.cache-9": "92b0ac63fe60931c6bb57a6aae770a6cd034257eecb64eab5ae8299e5ae95fca",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/a251874b8d1c1d45e137efe99c69b53a-le64.cache-9": "9f6e5928aab7de3b379b8446853d21f0d5dbb84904cf87e4318cf57f379e0dd3",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/a6c48b021d2d21fd422ff2a11c999b9f-le64.cache-9": "54d90a877b40b6c74e99bd695cfc2c44ba66cb09a70240e7c499e70cf641f02f",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/a7aa460629d440dd14542e6ba20bf263-le64.cache-9": "467e82463554dc7f3d665f1d4c6876a0059678a6ecb46ea5c307cc346b28b077",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/a917baf5def2c4b46fa208250240906b-le64.cache-9": "402a453ea46e1a0cd2b1debb27488508cb294c137ceb6fa297bb9c1bd2815a35",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/aa4ea3d72e67096ec0d6b51799be23de-le64.cache-9": "d36a00d6ebb788cbf3d15318637c14acb3fe409aa9566c6a7e0b704ec556a332",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/aa97bc070f08eebf0cc0d5d4d6ff0f5b-le64.cache-9": "5861b4a1835abd9a576970d30f52842b57ff7ff5d79673e3818228bc02e5334e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/aafb16d710e2e658010028d930c1855e-le64.cache-9": "bb37d8bf93523f478bba80fad00e334da6538b5e3343c14a0f0a3e51d85d917f",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/abd60ca01dbb826ee57a420beabc6227-le64.cache-9": "e637b09426deaa137b2138d3f5b75256fee217f906d8ffbadb08f2910ed1ecd1",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/af1e3e78b8bbb814cfa27279a28a6a2d-le64.cache-9": "75b7360be4e8e83ba46a256461d3803567e5debd50c6e1beace5486b079a6d8f",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/af5952cdb7c19defdfa3b8ffd9542c94-le64.cache-9": "b50e90ce6944d20b486380c687f9a662c4e7e222351180f4457017f8cc5c287e",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/afd55520a4e83ec3965912ceaab1b223-le64.cache-9": "82ad475c149a03ee3496e2047dfcf1acee64852c7e2ce053f94ea86421704870",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/b16e7e06e9b709c0b299bcc610ca2861-le64.cache-9": "4d629ae935dbc4ff3db75fb04506752098420eb1b27e87d348d772c4ea8dc784",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/b18655a76b88d7b9066e234ca842a60c-le64.cache-9": "d63d712f9c94d21e0c20e78c6e82c4af271dbf5ae6c3f8583d1e6ffae48695b8",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/b85772a2e0c07e7ff4722f9f1f0e086a-le64.cache-9": "bf5d30d4da33f6c5815ece4070af4646cc6e2bb473ee75d2dcbcfb7b6761f134",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/be14d972961973ca0f1d0826491c0369-le64.cache-9": "fd26f6532375b8b78bf9a671ca22f4a04888d2cd83d0cd2525e7e59629b3403d",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/c37423231fa849ab89ad8d4c534ba66d-le64.cache-9": "981ffecb99c8b9a9f52efc48b4ed94649e9cfe116a59895d3b28507477aabc96",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/c6d6d8bd229f8b48d5f22571e1abff76-le64.cache-9": "b46ff7ba0c43363340523269f1552a0da91a3c6008b670efacfedc8a23478687",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/c7a7f690f958fa29d29a014e7b9f18e0-le64.cache-9": "f439f64f5b8a1bd3cefa12611771d6c03402b5e47e85e5cb1c7faa5508ee688d",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/c7a854a86ca989a3a0bf71dcd5a0cedf-le64.cache-9": "633e1d92b77f3877195e471396657cc271d922e6532f784d6a9b0a94d2eda22c",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/caddd0cbdf3914295fc5ff0cae3bd782-le64.cache-9": "174eaed6a07f9c4704427345871b39549a55f789561083f9fbec5c817cc7afe2",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/ccf3f278387fdbbe4f02f2247cf8c50d-le64.cache-9": "95a2e29aa88e4fb8b0df0cbfd209438d0081e2a573541cfc9113c5f1b1af6cd7",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/cd7b385afc7e2eb22fcaf25de3a66316-le64.cache-9": "06445986230aaf56dbddfb86f7b13198b4f77f5ce306aef264a953e3c847c8eb",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/cfc8f98c1312cd21ddf2783968493822-le64.cache-9": "5f6175f1efe9454ebdf3330800f713a01cc6e32cdb4ffde2396e9a9481ccea81",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/d182a8604445bbdf979f821f7e792958-le64.cache-9": "b05ba0767484fe7355702f0bbc673c9dfc71c344986c73698ad4af6b18956f08",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/d4a10be3b9a81e2c64a40e64687f78bb-le64.cache-9": "493deadb2c8401685e99941faedb70ee18546894f828612009fa293d623fdf93",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/d74d0aba3a719a42cfefde932999093b-le64.cache-9": "8e6b830e4f8fad9c14252de9327ae979e23dff7795fb46fc7a723cb2150400ec",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/d933ba055d42d3045001772a91ecd73d-le64.cache-9": "5ef396815b83c5c4c17f0737fb0b434d54c478d14a0e98e90b8bd6e8064ccd06",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/d97ab2ad75077430a0616bc500a13514-le64.cache-9": "56d0ede2dad4fec45dc8f0130dcce5436995ee0bddec5920fb5a941442ce3a50",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/d99b24ff1ba3e276a24cdac3a5f741bd-le64.cache-9": "679b020bdace297b8c28e8cf4e9928eb0324b94d75a84ff889fb11bf9ed2e5be",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/d9d8bbf3902587252cd2d3ff3ea6fd54-le64.cache-9": "391bb3b0db9fbc619264e9a0811d0b770d6a183065ea52a8b059e2df95b5ccf0",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/e0b62dfb7851f6232b924be0b54aeb54-le64.cache-9": "a19e331dfda23597c63fb83f13cbc96f28a185d5b8f6482fa4d433448fd35622",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/e757c06bc762f2c2bc3cdb5ede128dd9-le64.cache-9": "dee5c863012ae5af120cd0654eacdd0301e5097f154e7f8670d32d104e2f04e0",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/e8a9459e2b4e67546c439900cfc1bf0b-le64.cache-9": "b6dc1c7402232b0f289aaa6e1413106ef26159924aab77116fc5b591c6ebda44",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/ec13e6d81b42e9fb339f6ff1e894f02c-le64.cache-9": "3e13f02f6d3185c4b4f13339e78d9166c40c070644f2c804e95f5d7cad848003",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/ec202942fbd585cc1b4f7c6176f33159-le64.cache-9": "14339eb938d6d64e8cfc0aac2c28bed08a8dcac57bf402423546102b186709e0",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/eda849782894a3627c54986f73d022a5-le64.cache-9": "10957ced7c850920eb8f5c39391c0fccd1dd49cf52c5c4546360ad20086726a3",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/f240865bedbca14fe180e0c36ec390ef-le64.cache-9": "2e45bfc9eafef4dd6896d933193538b1f6695b0e1300c2bb5b24809d3ad0d2a5",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/f5b3e14c12b677782de5a0dfb4cb2c98-le64.cache-9": "1e0e1f665e4af26c4e21f26b3d4f3e05cf0b20a886c00c63fe3d528ef8f36ff3",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/f65c1ae15e298d6811eda76c762a4db3-le64.cache-9": "c68458706f1f645eeedc31acd8a78fef6b4872c05a3b81445429aa00b1b96ac7",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/f80bdc980c963104ebb2a76f131bfc0e-le64.cache-9": "0ddf8080aa3859b43dd15ec1526329a68a1e69c23240364370f05776a6133064",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/fd645237c091b3f48712b0b39a895213-le64.cache-9": "bb5e238511cf479327d9514cee7a2a438de11788366b0aec169731e41310a306",
+    "artifacts/arc-authoring-b32/home/cache/fontconfig/fd89a0d793c8dad40a026b02e41acb48-le64.cache-9": "cf7c570ebdeeb895e4e432c4ec5b6453976e33efa683a386abd307d088144e23",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/07/e889620b49d5964551f7592c24c59b1c282b8bcc698767bd755f796af2ec18": "6d87b1007bc9a88621d331d188e728fde583168a625f37724460df952598e1c4",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/0c/f280fe5c20587e5ee731f7e8c64f62653ef0005a56f93875cb5761700d8661": "cb34c4d3d0667d432bc7f5ecb23283c57f4e64aaf63b0e3d01ea4d5b3a5dda23",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/1b/ab00d72c9450d197d5463d6093c60ea2d3ce250e8b3d70b3d3da7bf53a4776": "88c08374d84a91d10874636f7c556b37400de01ae740d7e310f70df81742a65b",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/2a/3ed2fe2f7deacc384a449f73921e86359f2eeacf9330ca7dec0e3f608e0f0f": "0e7b5d1341c1eb75889497c3d360cfaa4ac661013b07779c0b8c24234925dc6d",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/3b/3496665833fc5c59cc46617e2ba3cebf571f6f2295caf30ccda4b51e442cd6": "cc46145b5d957fcd4fee69decf3c83c89447d62b608ac54ef7b376f343b68a9c",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/45/939701c36c38304d37dadb36e403deba9e1ab4eea56b9335887d73f20c6a49": "ace79f85154d3e2868ff1d2887168be969ec72c40e4eeb706036ea541af86dff",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/50/f12357f5456dc86105b3418521d68e2abf0a290853b37ba96c7a80d3d3f514": "c88ab1d8e35ae98cb932b2b13336f3bee7af0f527e9245afeec91fc8c50f31e6",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/5b/33b0869950e67bff541e9c805e678219e3412b1d454b1bc809ceecc80e9ce0": "9f2c645fe1bf83d53fdef1e716255c8cdf4a6c743556b28c589bfefe710ba921",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/60/c05b390099600f7b28d4fa8436b0029bc3feb66b6710c5fe06be1422b52ca0": "37c4de38d2268ab03bb96f5b176a7bac064a1ddc2ed854019203a0b2d47d2ff3",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/62/597e1962ee6d0ddf2f3dd826597facbd015e7e278425a0e3885b1b856f7fa7": "f75dec613b6dda41ba2e7bcf430b8fddae066f7818b5e9bf874fd79527a8c48b",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/6a/10eb78e779a6d0a67f61e41e862872ad51fe09c215262ba64d114fd94bb14c": "e49953454f6ee15e9e5ee6ba43e6a907dfc091c875c63618b672c5f24e0e5526",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/84/dbcca5dd32affed994145e132192d12761602bd8bde281888f211d4ed8f810": "0d60d9c143a946e02274a071c6dab10a1d284f0b3fdaf272868656d4f47b2793",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/93/1991240983b79fb5b520eadaa367b5c011eba6921c9d5a2aea314689f91263": "a308f47e396738be5c3fc869012bc4e19a797b7fc0e12098a9e1451a95153c54",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/9e/49ec588ce3b5a23ccdabcb8bebe119a3ce7611c1f41c61d5f78c3d263a9c91": "a740deeed4b46764a94bb8dac717fc179106867e0b02af7e58186a4776d69657",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/9e/eb1809218846f5f9d7b76c00ba1c8e6ddb6fa73684b66034307052c737f562": "1f82181fcd10fd1f30d9fc2f72430497ed04291967eb0cd7eb79613deca8bf9e",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/a0/bb36c9891c57e9f14aa9f0f242602cbd894cdf7625f4b95ea0966c5557079d": "f7e58e51f5b2f130670f8073c9c8f036d9753626c974d8541fc6a8d43a1a0c97",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/a1/8599fa8b36468543fd677402510a736ecc77f9c4ef40e4cb800fd3475135f3": "6760afdfca391b9d84f4aa91fd97c52a8e017371e40073821aa2638a3fbb234b",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/ac/671d0cf8a5e3b86cc680d89527b69f38bfd8f40dea4fd01f77f3ae4f2e8f3c": "cca7ecf9e3b4b1df8553935d204d665c7ebf28965042f27636d6964d97cde841",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/b8/4ab82cd7deb2836bf2160a84032d109c73d9a89e8082a4324d5ca5f6282b4b": "cccebec3a7536b86e49d45a45c387df850d725a1e99d586cde537bc73ee9c68c",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/b9/018dd86fd388f724e3da179d1cad18d7b244974c850047b5a28f94d5b0a199": "959e1d194a34180fddf091ec384ccaece7fd5243c16e8e74830bdcd887411ae8",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/bb/e3ab6610c36f14bdf20db30d0093ea4223bb31f4b88ae1c2864909f1e66efd": "907d5c5df258090f491de417288479735fc981ce7b0583435dffdde7be6268d3",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/bf/89f5379bae6cff424f5391026fd436ba85fde734cc1186603d767714601950": "e7a2839b824cf84454db2177c0eb4701ef94a54bba4de8b676cb9e6dc696e0a3",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/c4/9013c31070349a57b7257be3f4ee9b3fbecef90b731f0432f2f88d60b9a039": "2dc0a5bcb57cbe1c14fe1c3043abe0659ce24cb5cee984771c05a45989ddd5d4",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/ca/c77e8be0c10fbc02b7fa516660c8b3ced75632e172bfcdf448283ce74f354c": "00e99f231defe45b05654e778f7fa846244454cb28b95cd65704e13c1c3755a9",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/e6/56419c8cd18f148896f58b4a279801a5d2c39c2a9f56c10a89f3354f275383": "1aaaa72a3ee5b8a23fb2d74e90892bd1ddb89ae2faab6560738f6e7b0ffc8989",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/f8/e793cc37a313aabf45874f8e85cdfebc4843fe8c6454d9949404727ed4aabb": "dbd8ac755dc5fc6b925444182c1314825d03fb4a3724c9a25bb3509a1b6b002f",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/index": "eb3505cdd81ac74020002129093766c7d01d5e19cab9c76ec828bbd270f570c9",
+    "artifacts/arc-authoring-b32/home/cache/mesa_shader_cache/marker": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/arc-authoring-b32/home/cache/neo_compiler_cache/c/8/c861f67d52b1b534.l0_cache": "81cf32d36e6aaafbd80585fce365b04f1f367ce5a18d4ef2cad0f8fe8b812b78",
+    "artifacts/arc-authoring-b32/home/cache/neo_compiler_cache/config.file": "8a2b3b3da14746dbe1b0ef5471799b84f10495d15b2d813dcbd8db6db1a3ed72",
+    "artifacts/arc-authoring-b32/home/cache/neo_compiler_cache/e/5/e533fbc4f968b9e9.l0_cache": "df162d46d89f4ee925b6de3453a0bbc0c999dd9cbd170038b6daadd2b0bdb93e",
+    "artifacts/arc-authoring-b32/inputs-after.json": "03a5538c52b328e0db4e04d1c1e1d4d6e94cac43ecf382c2022aa28af3fe121f",
+    "artifacts/arc-authoring-b32/inputs-before.json": "03a5538c52b328e0db4e04d1c1e1d4d6e94cac43ecf382c2022aa28af3fe121f",
+    "artifacts/arc-authoring-b32/paint-fixture-maps.txt": "867fc240e0508ba4a3fe8930899e8f19bb6a84faa3718a97134dc78c72eb5983",
+    "artifacts/arc-authoring-b32/paint-fixture.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/arc-authoring-b32/paint512.dsculpt": "3c792ddf28ab1cb86b0bac59ffcde4264b0b831c7cb9607ff46a562d4c8f3139",
+    "artifacts/arc-authoring-b32/status.json": "7a6de807571b2e120fe3dee640c70948b04ffcf3cba756c2ccb06ed4ec61ee12",
+    "artifacts/arc-authoring-b32/workflow/after-cancel-retry.dsculpt": "a18a1b982402cf68feccd732301b3697c1d0ac8cab0f6952992bcb788ee8fb7b",
+    "artifacts/arc-authoring-b32/workflow/cancel-create.dsculpt": "8850e0d3829f3955409dc19eaa1d3363e6547262cee9e32962d13e2e26720fe0",
+    "artifacts/arc-authoring-b32/workflow/cancel-replace.dsculpt": "efa549cd05c11dc134e42fce39c7dcfc7a4b032ffc552e93d760065524714fe0",
+    "artifacts/arc-authoring-b32/workflow/cc0-placed.vrm": "55174b9b2021f685369d302176746c64d6f86af58055e732a9de5da16ff6ea96",
+    "artifacts/arc-authoring-b32/workflow/cc0-rigid.vrm": "75b7d57c2b5983a5a15c399eae4662b0b7c6ec209e766e2f5ac2b0dfb792acd3",
+    "artifacts/arc-authoring-b32/workflow/cc0-source.vrm": "c79eaed5c8e9d10d8404174d1f59f92dcbef7c660e5dc091e458a7378f0cbdcd",
+    "artifacts/arc-authoring-b32/workflow/independent.png": "20912f5f8507b27b9cdfe974a7efb812430b04f4667b6499009ff45c70226090",
+    "artifacts/arc-authoring-b32/workflow/key-after-rest.dsculpt": "24ad74ab456103a10937fa445ba9bf4d6a66569f019a771c090acbad355453cb",
+    "artifacts/arc-authoring-b32/workflow/key-created.dsculpt": "efa549cd05c11dc134e42fce39c7dcfc7a4b032ffc552e93d760065524714fe0",
+    "artifacts/arc-authoring-b32/workflow/key-replaced.dsculpt": "8c5ab215847ef65541c48f30d265211b100c8429629de373936edaa27e34d2ce",
+    "artifacts/arc-authoring-b32/workflow/native.png": "20912f5f8507b27b9cdfe974a7efb812430b04f4667b6499009ff45c70226090",
+    "artifacts/arc-authoring-b32/workflow/painted-union.dsculpt": "fdbeaa73ec1f8d9a06decce52bac98f432ef00cd5bde85fd24e4c325c20569ff",
+    "artifacts/arc-authoring-b32/workflow/pending-union.dsculpt": "a18a1b982402cf68feccd732301b3697c1d0ac8cab0f6952992bcb788ee8fb7b",
+    "artifacts/arc-authoring-b32/workflow/projector.png": "2a85563f59b72651c6e3028b79b07929a2c28be5745ebc1fb19d4b4ae1e09e97",
+    "artifacts/arc-authoring-b32/workflow/raw-uv2.glb": "69f0ac081ffa140f0b2805e236ca267d79dc950d5e4d763a43084fe3a27e711b",
+    "artifacts/arc-authoring-b32/workflow/rig25.dsculpt": "141a174856d7aabd4865fded961e156c858a9434e9902ce976cc211aa26fbc1b",
+    "artifacts/arc-authoring-b32/workflow/source-fitted.dsculpt": "87e76c2b6934acd7ec61b020492208dfe51e40915ce93fad89ca72c0a0be75f6",
+    "artifacts/arc-authoring-b32/workflow/source-imported.dsculpt": "c51faa8b3690acaa8c4bee664641d8e5ba735901e4c332e1a18dc334c8a090f6",
+    "artifacts/arc-authoring-b32/workflow/stage.txt": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1",
+    "artifacts/arc-authoring-b32/workflow/union-final.glb": "0ea94213486d2b6a992da8d10edebfc3b58ffcd081dd33a362bd7d1bb4ece8e9",
+    "artifacts/arc-authoring-b32/workflow/union26.dsculpt": "24fd43e91f6a5fc2551120d6cf244d00a4eb094efe1b2b111809745a819895e0",
+    "artifacts/arc-authoring-b32/workflow/uv24.dsculpt": "8850e0d3829f3955409dc19eaa1d3363e6547262cee9e32962d13e2e26720fe0",
+    "artifacts/arc-authoring-b32/workflow-maps.txt": "d5a8a16e4f1cb724d0d655720896021bbc0f4a45169d7b3c66f84f929ba88e7f",
+    "artifacts/arc-authoring-b32/workflow.log": "eb8e6024a7621eb000508add72d057e0756afa3b72b2ee98d83924d0af4eb6f1"
+  }
+}

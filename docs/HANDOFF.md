@@ -4,6 +4,84 @@ The complete production objective in REQUIREMENTS.md and HANDOFF-466ebd1.md
 remains incomplete and is **active following the user's latest resume (2026-11-02)**. All additional polygon/holding/VRoid-only/FBX-OBJ requirements
 remain required. This extends the existing native C++20 FLTK/OpenXR application.
 
+## Coherent b32 evidence milestone — 2026-11-03
+
+This proof-only checkpoint records the frozen private candidate b32aa8b; it
+changes no runtime, header, CMake, test, asset or public main implementation.
+The candidate's full533 CPU regression remains live in
+authoring-master-3f4b2ba. Do not edit its tracked files during that run.
+
+The complete optimized OneAPI all-target build passes in1278.605s, with all1,434
+tracked inputs unchanged,407 ELF/static archives hashed and all534 registered
+test commands built. This is not an all534-OneAPI-test pass. The rebuilt CPU
+application passes actual normal35/compact37 FLTK checks, including selected-key
+editing, exact paint/source preservation, Cancel, Undo/Redo, Save/reopen and
+Close. Its latest62b6417 DomeD native Wayland/menu run passes8 checks with the
+actual canonical library paths verified.
+
+An additional selected OneAPI21/21 passes (CTest15.55s, wrapper17.45s), with
+all1,844 inputs exact. Its real A770 brush oracle passes184 analytic endpoints
+and224 independent CPU-reference batches/445,088 samples, maximum8.9407e-8;
+missing-GPU refusal, native paint, sampling/quality and skin/retopo regressions
+also pass. These baseline image consumers use softwareGL alongside Arc compute;
+the distinct actual ArcGL/application evidence below remains separately scoped.
+
+The full CUDA13.4.59/sm86 native all-target build passes in1508.837s, with
+all1,434 tracked inputs exact. Three selected runtime/host tests pass: empty
+dispatch remains a successful no-op; actual vendor status35 refuses nonempty
+1/257/2,000,007 spans without changing caller bytes or silently using CPU.
+The native FMA-capable host sampler matches
+44,217 independently validated integer words. This proves compile/link and
+missing-device behavior, not positive NVIDIA execution, device loss or latency.
+Read validation/ONEAPI-SELECTED-b32.json and
+validation/CUDA-FULL-BUILD-b32.json for exact commands, hashes and results.
+
+The full ROCm7.1/Clang20/gfx1030 native all-target build also passes in1493.641s,
+with all1,434 source inputs exact. The actual executable is PIE, with the
+project's default mixed-driver app/core PIC policy retained. Two selected
+registered tests and three direct session/Scene/quality probes pass; actual HIP
+status100 reports no device, nonempty dispatch refuses without caller changes,
+the layered/masked Scene retains its exact owner/data, and the native host
+sampler matches44,217 words. All1,843 captured probe inputs remain exact.
+CUDA additionally passes the same missing session/Scene/quality probes against
+a real current CPU-generated and successfully refined layered/masked input.
+This is current native build/failure evidence for all four backend choices;
+positive AMD/NVIDIA hardware and device-loss/performance requirements remain
+open. Read validation/ROCM-FULL-BUILD-b32.json and
+validation/CUDA-MISSING-FIELDS-b32.json. The sequential vendor build queue has
+finished; the full CPU regression and separate broad134 SAN run remain active.
+
+Strict actual A770/PCI0000:03:00.0 validation passes301 checks: the combined134
+workflow,101 key/UV commutation,59 rig/UV authoring, and7 actual application
+OpenXR checks using synthetic tracking. The complete workflow independently
+evaluates44,484 WORLD corners (maximum9.83025e-7), matches exported/native pixels
+exactly, and detects removed normal detail (maximum4). The application renders
+both real GL eyes, balances76 image acquisitions/waits/releases and records the
+production plain-paint kernel plus9 bounded device-to-host output chunks.
+This preserves existing plain-paint acceleration; complex domain, rig and bake
+authoring remain CPU paths, with no new compute-kernel claim for them.
+
+All1,844 captured hardware-run inputs remain exact. All29 GLBs (28 exports plus
+the actual generated raw-UV2 input fixture) validate with0 errors,47 unfiltered
+NODE_SKINNED_MESH_NON_ROOT warnings,43 infos and11 hints. No validator issue is
+suppressed. Exact reports, image/role comparisons, source/binary/output hashes
+and scope are in the four validation receipts named below.
+
+Separate private9f4ee1f qualifies all84 shape-query checks with matched wholly
+owned sanitizer support and a rebuilt e7 TU; it is not a fresh full frontend
+build. Separate4823a36 qualifies the queued-first phase-separated Save observer
+with CPU134 and focused SAN11; its broad134 SAN run is still live/unqualified.
+Neither test follow-up is included in this proof-only checkpoint. The derived
+seam-key factory also remains private:55 Release/owned-SAN checks and3 sanitizer
+baselines do not implement its unfinished owning codecs, generic commands or UI.
+
+Read validation/ONEAPI-FULL-BUILD-b32.json,
+validation/RETAINED-KEY-UI-COHERENT-b32.json,
+validation/TOOLKIT-62b6417-COHERENT-b32.json and
+validation/ARC-AUTHORING-COHERENT-b32.json. No physical HMD launch, system
+installation or active-session restart occurred. Full main admission and every
+unfinished REQUIREMENTS.md row remain required; the production goal is active.
+
 ## Current coherent retained-key checkpoint and freehand repair — 2026-11-03
 
 Private9050 has coherent nativeCPU/OneAPI/whole-owned sanitizer applications.
