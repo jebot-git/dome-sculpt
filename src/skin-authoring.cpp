@@ -74,7 +74,14 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
   auto target_to_source=ob::compose(ob::inverse(reference_world),target_world);
   auto reference_matrix=exact_metric?scene.world_matrix(reference.id):AffineTransform{};
   auto target_matrix=exact_metric?scene.world_matrix(target.id):AffineTransform{};
-  auto change=target_matrix.inverse()*reference_matrix;
+  // Translation does not belong to a distance metric. Use one common world
+  // origin so distant valid placements neither lose float precision nor hit
+  // the solver's local coordinate bound merely because of a shared offset.
+  auto origin=AffineTransform{}.matrix();
+  for(size_t i=0;i<3;++i)origin[12+i]=-reference_matrix.matrix()[12+i];
+  const auto shift=AffineTransform(origin);
+  const auto reference_metric=shift*reference_matrix,target_metric=shift*target_matrix;
+  auto change=target_metric.inverse()*reference_metric;
   detail::SkinGeometryWork placement_work(options.maximum_work,cancelled);
   auto skeleton=*source.skeleton;
   auto pose=source.pose;
@@ -126,20 +133,20 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
     rest.positions[i]=point(target_to_source,rest.positions[i]);
     rest.normals[i]=direction(target_to_source,rest.normals[i]);
   }
-  if(exact_metric)rest=detail::skin_world_mesh(rest,target_matrix,placement_work);
+  if(exact_metric)rest=detail::skin_world_mesh(rest,target_metric,placement_work);
   SkinWeights weights;
   if(options.mode==SkinAuthoringMode::Automatic) {
     BindOptions bind; bind.limits=options.limits; bind.maximum_work=options.maximum_work;
     bind.maximum_seed_distance=options.seed_distance/reference_world.scale;
     bind.seed_margin=options.seed_margin/reference_world.scale; bind.falloff=options.falloff;
     if(exact_metric){
-      auto world_rig=detail::skin_reframe(*source.skeleton,reference_matrix,placement_work);
+      auto world_rig=detail::skin_reframe(*source.skeleton,reference_metric,placement_work);
       bind.maximum_seed_distance=options.seed_distance;bind.seed_margin=options.seed_margin;bind.maximum_work=placement_work.remaining();
       weights=automatic_bind(rest,world_rig,bind,cancelled);
     }else weights=automatic_bind(rest,*source.skeleton,bind,cancelled);
   } else {
     if(exact_metric){
-      auto source_mesh=detail::skin_world_mesh(reference.painted->mesh(),reference_matrix,placement_work);
+      auto source_mesh=detail::skin_world_mesh(reference.painted->mesh(),reference_metric,placement_work);
       weights=transfer_weights(source_mesh,*source.skin,rest,skeleton.bones.size(),options.transfer_distance,options.limits,cancelled,placement_work.remaining());
     }else weights=transfer_weights(reference.painted->mesh(),*source.skin,rest,skeleton.bones.size(),
                              options.transfer_distance/reference_world.scale,options.limits,cancelled,options.maximum_work);

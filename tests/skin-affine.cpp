@@ -65,6 +65,13 @@ int main(int argc,char **argv)try{
   for(size_t v=0;v<mesh.positions.size();++v)for(auto i:expected.vertices[v]){float actual=0;for(auto w:scene.active().deformation->skin->vertices[v])if(w.joint==i.joint)actual=w.weight;check(std::abs(actual-i.weight)<2e-5f,"Automatic weights equal independent physical-world segment/edge metric");}
   check(scene.encode()["objects"][0]==original["objects"][0],"Automatic solve retains complete immutable source rig");
  }
+ // A common translation must change neither metric nor serialized skin data.
+ for(auto mode:{SkinAuthoringMode::Automatic,SkinAuthoringMode::Transfer}){
+  auto near=fixture(2);auto distant=near.snapshot();auto common=distant.add_group("Distant common frame");auto m=AffineTransform{}.matrix();m[12]=20000;m[13]=30000;m[14]=-20000;
+  distant.group(common).affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(m));distant.group(1).parent=common;distant.object(2).group=common;distant.validate();
+  auto operation=options();operation.mode=mode;operation.seed_distance=1;check(author_skin(near,2,operation)&&author_skin(distant,2,operation),"Valid distant scene binds without absolute-coordinate rejection");
+  check(near.active().deformation->encode(near.active().painted->mesh())==distant.active().deformation->encode(distant.active().painted->mesh()),"Common distant placement preserves exact weights/rig/pose/landmarks and morph authoring data");
+ }
  auto source=fixture(2);auto exact=source.encode();auto o=options();o.maximum_work=1;
  check(refuses([&]{author_skin(source,2,o);})&&source.encode()==exact,"World packing/rig transport budget refusal preserves entire scene");
  o=options();size_t calls=0;check(refuses([&]{author_skin(source,2,o,[&]{return ++calls>8;});})&&source.encode()==exact,"Cancellation during actual affine preparation preserves all original owners/data");
