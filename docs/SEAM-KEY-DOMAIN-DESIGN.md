@@ -1,9 +1,11 @@
 # Independent seam-key domain: private design and detached prototype
 
-This is a proposal on9050, not admitted authoring or a new file format. The
-original native seam-conflict refusal remains in force. No public headers,
-Scene/material/paint codec, CMake target, native admission or master source has
-changed. The new private kernel only returns detached geometry and two maps.
+This is private work on9050, not admitted authoring or a new file format. The
+original master/native seam-conflict refusal remains in force. The private
+factory appends frame/material/normal-preparation ABI fields and builds every
+core/support consumer coherently. Existing frame/material writers fail closed
+for the new authority until its owning codec is implemented. Master source and
+public admission remain unchanged.
 
 ## What is missing
 
@@ -128,3 +130,24 @@ fixed actual before-material anchor plus per-target endpoints, so repeated
 Replace/strokes do not add an archive edge per update. New UV/domain conversions
 may keep a genuine prior domain/node. Old frame/material encoders explicitly
 refuse this WIP representation. No new reader or writer is admitted yet.
+
+
+## Frozen owning factory proof (782faedf)
+
+Fresh Release and wholly owned O1 ASan/UBSan/leak builds pass55 actual saved
+seam-key factory assertions. Independent artist-frame geometry and UV-Jacobian
+oracles measure normal3.332e-8 and tangent1.78853e-7; the wrong edited-atlas
+basis differs4.92772e-5 at the unchanged1e-6 limit. The actual source remains
+native4 while derived POSITION6 permits opposite seam endpoints. Immutable
+before-Paint metadata survives real current layer/opacity/Clear-detail changes;
+foreign control-block aliases, missing owning node, early/middle/late Cancel
+and full original Restore are exercised. Three existing baseline suites also
+pass wholly owned sanitizers. Source/library/binary before-after manifests are
+exact (968 Release,970 sanitizer inputs). See SEAM-KEY-FACTORY.json.
+
+This proves the detached prepared Create/Replace/Rename factory, not an admitted
+Scene22 codec, native/controller/UI/pixel/export workflow, generic no-preparation
+key route, Mirror/CaptureMix/Duplicate or performance target. The universal node
+is present; generic dispatch and owning persistence remain required next work.
+Original raw attribute identities, source role coordinates and immutable
+before-deformation are separate from current derived skin/key/pose authority.
