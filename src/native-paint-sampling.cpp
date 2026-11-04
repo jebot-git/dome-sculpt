@@ -6,6 +6,19 @@
 namespace dome::detail {namespace {
 void stop(const PaintSamplingLimits &limits){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Native paint retention cancelled");}
 bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
+void replay_budget(const PaintedMesh &before,const Mesh &target,const PaintSamplingLimits &limits){
+  if(!limits.max_vertices||limits.max_vertices>2'000'000||!limits.max_triangles||limits.max_triangles>2'000'000||
+     !limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
+    throw std::invalid_argument("Invalid native paint replay limits");
+  const auto &source=before.mesh();
+  if(source.positions.size()>limits.max_vertices||target.positions.size()>limits.max_vertices||
+     source.indices.size()/3>limits.max_triangles||target.indices.size()/3>limits.max_triangles)
+    throw std::length_error("Native paint replay exceeds geometry budget before allocation");
+  const uint64_t work=uint64_t(source.positions.size())*8+uint64_t(target.positions.size())*8+uint64_t(target.indices.size())*16;
+  if(work>limits.max_work)throw std::length_error("Native paint replay exceeds work budget before allocation");
+  const size_t bytes=target.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+target.indices.size()*sizeof(uint32_t)+target.uv_pins.size()+target.uv_seams.size();
+  if(bytes>limits.max_working_bytes)throw std::length_error("Native paint replay exceeds scratch budget before allocation");
+}
 void same_mesh(const Mesh &a,const Mesh &b,const PaintSamplingLimits &limits){
   if(a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.indices!=b.indices||a.uv!=b.uv||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)
     throw std::invalid_argument("Native retained paint differs from its exact ordered REST layout");
@@ -16,6 +29,8 @@ void NativePaintSampling::validate(const PaintSamplingLimits &limits) const {
   stop(limits);native_.validate();
   if(!before_||!layout_||!domain_||!attachment_||before_->in_stroke()||attachment_->domain()!=domain_)
     throw std::invalid_argument("Native retained paint lacks its independently captured owner");
+  replay_budget(*before_,*attachment_->authored_geometry(),limits);
+  domain_->storage_bytes(limits);
   const auto target=layout_->target_mesh(before_->mesh(),limits.cancelled);
   domain_->validate_current(target,limits);same_mesh(target,*attachment_->authored_geometry(),limits);
 }
