@@ -68,7 +68,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       for (const auto &extension : node.at("extensions").items())
         require(extension.key() == "VRMC_node_constraint",
                 "node extension has no typed reference remapper");
-  struct ExpressionLayerIdentity {int source,lower,upper;};
+  struct ExpressionLayerIdentity {int source,lower,upper;bool shade_alias;std::array<float,3> shade_divisor;};
   std::vector<ExpressionLayerIdentity> expression_layers;
   std::set<int> uv_expression_materials, color_expression_materials;
   const auto &vrm = original.at("extensions").at("VRMC_vrm");
@@ -557,13 +557,22 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       const int texture=role_texture(paint);
       upper["pbrMetallicRoughness"]["baseColorFactor"]=std::array<float,4>{1,1,1,1};
       upper["pbrMetallicRoughness"]["baseColorTexture"]={{"index",texture},{"texCoord",channel},{"extensions",{{"KHR_texture_transform",{{"scale",layer->scale},{"offset",layer->offset}}}}}};
+      if(layer->shade_alias){
+        // The native shared image modifies the shade sample by P/nativeRGB.
+        // Keep that independent contribution and its actual shade expressions,
+        // rather than reuse the moving original image or tint the paint base.
+        toon["shadeMultiplyTexture"]=upper["pbrMetallicRoughness"]["baseColorTexture"];
+        auto factor=toon.value("shadeColorFactor",std::array<float,3>{1,1,1});
+        for(size_t k=0;k<3;++k){const double value=double(factor[k])/layer->shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1,"expression layer shade factor exceeds unit representation");factor[k]=float(value);}
+        toon["shadeColorFactor"]=factor;
+      }
       upper["alphaMode"]="BLEND";upper.erase("alphaCutoff");toon["transparentWithZWrite"]=false;toon["renderQueueOffsetNumber"]=0;toon["outlineWidthMode"]="none";toon["outlineWidthFactor"]=0;
       upper["name"]=object.name+" independent paint contribution";
       // Source material extras stay on the original lower material. The upper
       // is a derived standard primitive, with no editor authority of its own.
       upper.erase("extras");(void)MToonMaterial::from_vrm1(upper,j["textures"].size());
       const int upper_material=int(j["materials"].size());j["materials"].push_back(std::move(upper));auto primitive=lower;primitive.erase("extras");primitive["material"]=upper_material;primitive["attributes"]["TEXCOORD_"+std::to_string(channel)]=uv_accessor;j["meshes"][emitted.mesh]["primitives"].push_back(std::move(primitive));
-      expression_layers.push_back({a.source_material,emitted.material,upper_material});budget();
+      expression_layers.push_back({a.source_material,emitted.material,upper_material,layer->shade_alias,layer->shade_divisor});budget();
     }
 
     ++report.meshes;
@@ -623,7 +632,9 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         const auto original_binds=expression[kind];
         for(const auto &bind:original_binds)for(const auto &layer:expression_layers)if(bind.at("material").get<int>()==layer.lower){
           if(std::string_view(kind)=="materialColorBinds"&&(bind.at("type")=="color"||bind.at("type")=="outlineColor"))continue;
-          auto forwarded=bind;forwarded["material"]=layer.upper;expression[kind].push_back(std::move(forwarded));
+          auto forwarded=bind;forwarded["material"]=layer.upper;
+          if(layer.shade_alias&&std::string_view(kind)=="materialColorBinds"&&bind.at("type")=="shadeColor")for(size_t k=0;k<3;++k){const double value=bind.at("targetValue").at(k).get<double>()/layer.shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1,"expression layer shade target exceeds unit representation");forwarded["targetValue"][k]=value;}
+          expression[kind].push_back(std::move(forwarded));
         }
       }
     }

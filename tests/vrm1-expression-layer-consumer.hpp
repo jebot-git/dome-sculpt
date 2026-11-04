@@ -6,7 +6,7 @@
 #include "vrm-role-consumer.hpp"
 struct V1ExpressionLayerConsumer {
   using J=nlohmann::json;
-  float expression=0;int pose=0,selected_node=-1;bool wrong_paint_uv=false,wrong_base_tint=false;
+  float expression=0;int pose=0,selected_node=-1;bool wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
   GLuint program = 0, vao = 0, vbo = 0, ibo = 0, resolve=0,framebuffer=0,color=0,depth=0;
   V1ExpressionLayerConsumer() {
     const char *vs = R"GLSL(#version 330 core
@@ -186,6 +186,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
             base.value("baseColorFactor", std::array<float, 4>{1, 1, 1, 1});
         auto shadeColor =
             ext.value("shadeColorFactor", std::array<float, 3>{0, 0, 0});
+        if(wrong_shared_shade&&blended)shadeColor={0,0,0};
         glUniform4fv(loc("baseFactor"), 1, baseColor.data());
         glUniform3fv(loc("shadeFactor"), 1, shadeColor.data());
         scalar("seconds", float(seconds));
