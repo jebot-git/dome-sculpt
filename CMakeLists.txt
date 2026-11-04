@@ -3317,3 +3317,21 @@ if(BUILD_TESTING)
   add_test(NAME bake-recipes COMMAND dome-sculpt-bake-recipes-test ${CMAKE_CURRENT_BINARY_DIR}/bake-recipes)
   set_tests_properties(bake-recipes PROPERTIES TIMEOUT 600)
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-bake-recipe-faults-test tests/bake-recipe-faults.cpp)
+  target_include_directories(dome-sculpt-bake-recipe-faults-test PRIVATE src)
+  target_link_libraries(dome-sculpt-bake-recipe-faults-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-bake-recipe-faults-test PRIVATE
+    -Wl,--wrap=_ZN4dome19capture_bake_recipeERKNS_5SceneEmRKNS_18ObjectBakeSettingsE)
+  add_test(NAME bake-recipe-faults COMMAND dome-sculpt-bake-recipe-faults-test)
+  set_tests_properties(bake-recipe-faults PROPERTIES TIMEOUT 600)
+endif()
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
+  add_test(NAME bake-recipes-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-recipes-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-recipes-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/bake-recipes-xr)
+  set_tests_properties(bake-recipes-openxr PROPERTIES TIMEOUT 600)
+endif()

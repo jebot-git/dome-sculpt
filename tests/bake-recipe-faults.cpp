@@ -9,6 +9,16 @@ namespace {thread_local bool inject=false,denied=false;thread_local size_t calls
 [[gnu::noinline]] void *operator new(size_t n){if(inject&&++calls>=boundary){denied=true;throw std::bad_alloc();}if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
 [[gnu::noinline]] void *operator new[](size_t n){return ::operator new(n);}
 void operator delete(void *p)noexcept{std::free(p);}void operator delete[](void *p)noexcept{std::free(p);}void operator delete(void *p,size_t)noexcept{std::free(p);}void operator delete[](void *p,size_t)noexcept{std::free(p);}
+namespace {thread_local bool capture_fault=false;}
+extern "C" std::shared_ptr<const dome::ObjectBakeRecipe>
+__real__ZN4dome19capture_bake_recipeERKNS_5SceneEmRKNS_18ObjectBakeSettingsE(
+ const dome::Scene &,uint64_t,const dome::ObjectBakeSettings &);
+extern "C" std::shared_ptr<const dome::ObjectBakeRecipe>
+__wrap__ZN4dome19capture_bake_recipeERKNS_5SceneEmRKNS_18ObjectBakeSettingsE(
+ const dome::Scene &scene,uint64_t source,const dome::ObjectBakeSettings &settings){
+ if(!capture_fault)return __real__ZN4dome19capture_bake_recipeERKNS_5SceneEmRKNS_18ObjectBakeSettingsE(scene,source,settings);
+ inject=true;try{auto result=__real__ZN4dome19capture_bake_recipeERKNS_5SceneEmRKNS_18ObjectBakeSettingsE(scene,source,settings);inject=false;return result;}catch(...){inject=false;throw;}
+}
 namespace dome {struct DocumentTransactionTestAccess {
  static auto tokens(const Document &d){std::lock_guard lock(d.model_mutex_);const auto &c=d.state_.controls;const auto &s=d.state_.bake_settings;
   return std::tuple{d.content_,d.next_content_,d.saved_content_,d.undo_.size(),d.redo_.size(),d.state_.generation,d.state_.revision,d.state_.edit_authority,d.asset_work_.load(),d.native_source_scene_,d.input_.owns_control(VrParameter::BakeSource),d.input_.menu_page(),d.state_.bake_source,d.state_.bake_recipe,d.state_.bake_settings_object,bool(d.control_before_),c.parameter,c.title,c.value,c.bake_preset,c.components,c.selected,c.minimum,c.maximum,c.logarithmic,s.front_mm,s.back_mm,s.ao_distance_mm,s.ao_samples,s.padding,s.allow_partial,s.allow_backfaces,s.prepare_colors,s.color_error,s.prepare_normals,s.normal_error,s.cage_object};
@@ -28,6 +38,18 @@ std::unique_ptr<Document> prepared(bool confirm){
 }
 }
 int main()try{
+ // Deny allocations in the genuine new recipe capture reached after real
+ // projection, without denying earlier allocations in the existing baker.
+ auto baked=cage_scene();calls=0;boundary=SIZE_MAX;capture_fault=true;
+ bake_object(baked,2,cage_settings());capture_fault=false;const auto capture_count=calls;
+ require_cage(capture_count&&capture_count<4096,"Actual post-projection recipe capture allocations measured");
+ const auto positive=baked.encode();
+ for(size_t at=1;at<=capture_count;++at){auto candidate=cage_scene();const auto before=candidate.encode();const auto paint=candidate.active().painted;calls=0;boundary=at;denied=false;bool caught=false;capture_fault=true;
+  try{bake_object(candidate,2,cage_settings());}catch(const std::bad_alloc&){caught=true;}capture_fault=false;inject=false;
+  if(!caught||!denied||candidate.encode()!=before||candidate.active().painted!=paint||candidate.active().bake_recipe)throw std::runtime_error("Post-projection recipe allocation denial changed the native target or source");
+  bake_object(candidate,2,cage_settings());if(candidate.encode()!=positive)throw std::runtime_error("Post-projection recipe allocation retry differs from real positive Bake");
+ }
+ std::cout<<"PASS recipe_post_projection_capture_persistent_prefixes="<<capture_count<<'\n';
  for(bool confirm:{false,true}){
   auto measured=prepared(confirm);calls=0;boundary=SIZE_MAX;inject=true;try{DocumentTransactionTestAccess::event(*measured,confirm);}catch(...){inject=false;throw;}inject=false;const auto count=calls;
   require_cage(count&&count<4096,"Actual recipe event allocation boundaries measured");
