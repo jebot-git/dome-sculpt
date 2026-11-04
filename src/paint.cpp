@@ -1258,9 +1258,20 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const P
   }
   // Deep normal replay may legitimately visit a before-Paint that shares this
   // metadata cache. Build without holding its mutex, then publish completed maps.
-  auto detached=without_emission(paint);auto safe=material;safe.emissive={};
+  auto packet=PaintOverlayFactory::capture_native_emission(paint,cancelled);
+  const bool legacy=!overlay_uses_float_emission(*packet)&&
+    std::all_of(material.emissive.begin(),material.emissive.end(),[](float value){return value<=1;});
+  std::shared_ptr<PaintedMesh> detached;auto safe=material;
+  if(legacy){
+    // Invisible float metadata must not reinterpret existing visible legacy
+    // filtering/quantization. Keep that genuine composite as well as the real
+    // packet; the renderer still selects float for an absolute/HDR context.
+    auto fresh=std::make_shared<PaintedMesh::CompositeCache>();const auto token=next_composite_token();
+    detached=paint.snapshot();detached->composite_cache_=std::move(fresh);detached->composite_token_=token;
+    for(auto &layer:detached->layers_)layer.emission_tiles.clear();
+  }else{detached=without_emission(paint);safe.emissive={};}
   auto maps=std::make_shared<TextureMaps>(*detached->composite(safe,cancelled));
-  maps->overlay=PaintOverlayFactory::capture_native_emission(paint,cancelled);
+  maps->overlay=std::move(packet);
   // The existing compositor refuses unresolved alternate original coordinates.
   // Do not silently reinterpret those coordinates as the native writable grid.
   paint_compute::checkpoint(cancelled);

@@ -42,6 +42,12 @@ public:
  // Packed coordinate metadata shares one actual immutable contribution owner.
  const std::shared_ptr<const PaintOverlayPacket>&contribution_owner()const noexcept{return contribution_owner_;}
 };
+// Captured layers already exclude hidden and zero-opacity metadata. A real
+// float tile keeps its interpretation even when its current value is zero.
+inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexcept {
+  for(const auto &layer:packet.layers())for(const auto &tile:layer.emission_tiles)if(tile)return true;
+  return false;
+}
 struct PaintOverlayFactory {
  // Read only the sealed original coordinate owners; no sparse tile packet or
  // padding upload is needed by a CPU asset worker.
