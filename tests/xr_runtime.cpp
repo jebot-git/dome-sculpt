@@ -74,6 +74,7 @@ bool lost = false, regained = false, reference_event = false;
 bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
 std::string skin_mode(){auto mode=getenv("DOME_XR_FIXTURE_SKIN");return mode?mode:"";}
+unsigned skin_step(){return skin_mode()=="native-line"?(frame>80?frame-80:0):frame;}
 std::string retopo_mode(){auto mode=getenv("DOME_XR_FIXTURE_RETOPO");return mode?mode:"";}
 std::string cut_mode(){auto mode=getenv("DOME_XR_FIXTURE_CUT");return mode?mode:"";}
 unsigned cut_step=0;
@@ -586,6 +587,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
   if(!corner_uv_mode().empty()){focus_frame=frame;focus_at=corner_uv_mode()=="focus"?24:90;}
   if(selection_fixture()||pbr_preview_fixture())focus_at=90;
+  if(skin_mode()=="native-line")focus_at=1000;
   if(!import_atlas_mode().empty())focus_at=1000;
   if(!rig_fit_mode().empty())focus_at=rig_fit_mode()=="focus"?47:1000;
   if(!projection_mode().empty())focus_at=projection_mode()=="focus"?78:1000;
@@ -608,7 +610,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     count("focus_regains");
     return XR_SUCCESS;
   }
-  if ((import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !pbr_preview_fixture() && !selection_fixture() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
+  if ((import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !pbr_preview_fixture() && !selection_fixture() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && skin_mode()!="native-line" && frame >= 35 && !reference_event) {
     reference_event = true;
     auto e = reinterpret_cast<XrEventDataReferenceSpaceChangePending *>(out);
     e->type = XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;
@@ -707,7 +709,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && skin_mode()!="native-line" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
@@ -763,8 +765,9 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     out->changedSinceLastSync=button;
   }
   if(auto mode=skin_mode();!mode.empty()) {
-    out->currentState=button && (frame==8 || frame==10 || frame==12 || frame==14 || frame==16 || frame==18 || frame==20 ||
-      (mode!="focus" && (frame==24 || frame==26)));
+    auto step=skin_step();
+    out->currentState=button && (step==8 || step==10 || step==12 || step==14 || step==16 || step==18 || step==20 ||
+      (mode!="focus" && (step==24 || step==26)) || (mode=="native-line" && (step==30 || step==32)));
     out->changedSinceLastSync=button;
   }
   if (auto mode = retopo_mode(); !mode.empty()) {
@@ -846,7 +849,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     if (auto mode = voxel_mode(); !mode.empty())
       stroke = frame == 16 || (mode == "cancel" && frame == 18);
     if(auto mode=bake_mode();!mode.empty())stroke=frame==18||(mode=="cancel"&&frame==20);
-    if(!skin_mode().empty())stroke=frame==22;
+    if(!skin_mode().empty())stroke=skin_step()==22 || (skin_mode()=="native-line" && skin_step()==28);
     if (auto mode = retopo_mode(); !mode.empty()) {
       auto step = retopo_step;
       stroke = mode!="committed" && (step==32 || (mode=="focus" ? (step>=36 && step<=41) || step==48 || step==52
@@ -987,13 +990,15 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     if(mode=="undo"&&(frame==43||frame==44))out->currentState={-.5f,.8660254f};
   }
   if(!skin_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
+    auto step=skin_step();
     out->currentState={0,0};
-    if(frame==9 || frame==10)out->currentState={-.5f,-.8660254f};
-    if(frame==11 || frame==12 || frame==15 || frame==16)out->currentState={.5f,-.8660254f};
-    if(frame==13 || frame==14)out->currentState={-.8660254f,.5f};
-    if(frame==17 || frame==18)out->currentState={.8660254f,-.5f};
-    if(frame==19 || frame==20)out->currentState={.8660254f,.5f};
-    if(frame==25 || frame==26)out->currentState=skin_mode()=="native"?XrVector2f{.5f,.8660254f}:XrVector2f{-.8660254f,-.5f};
+    if(step==9 || step==10)out->currentState={-.5f,-.8660254f};
+    if(step==11 || step==12 || step==15 || step==16)out->currentState={.5f,-.8660254f};
+    if(step==13 || step==14)out->currentState={-.8660254f,.5f};
+    if(step==17 || step==18)out->currentState={.8660254f,-.5f};
+    if(step==19 || step==20)out->currentState={.8660254f,.5f};
+    if(step==25 || step==26)out->currentState=skin_mode()=="native-line"?XrVector2f{.8660254f,-.5f}:skin_mode()=="native"?XrVector2f{.5f,.8660254f}:XrVector2f{-.8660254f,-.5f};
+    if(skin_mode()=="native-line" && (step==31 || step==32))out->currentState={.5f,.8660254f};
   }
   if (!retopo_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
     auto step=retopo_step;
@@ -1125,6 +1130,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   // Cut controls use an independently specified world-space ray. Keep their
   // menu anchor fixed when the Holding preamble shifts the frame timeline.
   if(!cut_mode().empty()&&s->action&&right(s->hand))p->pose.position={.045f,1.48f,-.48f};
+  if(skin_mode()=="native-line")p->pose.position=s->action?XrVector3f{right(s->hand)?.045f:-.3f,1.48f,-.48f}:XrVector3f{0,1.6f,0};
   if (getenv("DOME_XR_FIXTURE_RESTART") && s->action && right(s->hand) &&
       frame >= 24 && frame <= 26)
     p->pose.position = {-.22f, 1.48f, -.48f};
@@ -1164,8 +1170,8 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     float x=frame==18?100+420*t:170,y=frame==18?240:609;
     p->pose.position={.045f+(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
   }
-  if(auto mode=skin_mode();!mode.empty() && s->action && s->action->name=="aim_pose" && right(s->hand) && frame==22) {
-    float t=mode=="fitted"?0.f:mode=="native"?1.f:1.f/3.f;
+  if(auto mode=skin_mode();!mode.empty() && s->action && s->action->name=="aim_pose" && right(s->hand) && (skin_step()==22 || (mode=="native-line" && skin_step()==28))) {
+    float t=mode=="fitted"?0.f:(mode=="native" || mode=="native-line")?1.f:1.f/3.f;
     p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
   }
   if(!cut_mode().empty()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&cut_stage()==24){
