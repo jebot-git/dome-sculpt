@@ -42,7 +42,7 @@ async def main():
   project=Path(home,'cage.dsculpt');subprocess.run([str(helper),'--ui-fixture',str(project)],check=True,env=env)
   def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=env))
   original=inspect()['scene'];report=Path(home,'widgets.json');log=(out/'app.log').open('w')
-  app=subprocess.Popen([str(app_path),str(project)],cwd=home,env={**env,'LD_PRELOAD':str(probe),'DOME_CAGE_WIDGET_REPORT':str(report)},stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
+  app=subprocess.Popen([str(app_path),str(project)],cwd=home,env={**env,'LD_PRELOAD':((os.environ['DOME_CAGE_ASAN_RUNTIME']+':') if os.environ.get('DOME_CAGE_ASAN_RUNTIME') else '')+str(probe),'DOME_CAGE_WIDGET_REPORT':str(report)},stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
   def named(title):
    for w in d.screen().root.query_tree().children:
     try:
