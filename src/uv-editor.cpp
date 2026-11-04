@@ -196,7 +196,7 @@ void edit_uv(Document &doc) {
           : (v->retain_paint_sampling||(v->retain_normal_sampling&&v->paint_sampling_available))
               ? "UV layout changes; paint and normal detail keep their existing coordinates."
           : v->retain_normal_sampling
-              ? "Original normal detail is kept. Save the native project; glTF/VRM export still needs a sampling conversion."
+              ? "Original normal detail keeps its coordinates. Save the native project to retain editable sources."
           : v->valid
               ? (v->vertices ? "Vertices: drag | Wheel: scale | Shift+wheel: "
                                "turn | Orange: pinned/cut"
