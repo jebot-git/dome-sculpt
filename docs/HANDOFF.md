@@ -27,6 +27,19 @@ optimized ALL and selected owning SAN qualification must use this actual combine
 source. A component pass does not qualify the whole candidate or complete the
 original/additional goal. Controller drawers remain required after basic targets.
 
+## Private current44 anatomical port — 2026-11-04
+
+The qualified319 packing/reference runtime is composed with the current44 ABI and
+f7 repairs. Both matching-source profiles pass actual full19 public15+15,
+worker34, linked51+51, independent4,130,228 export assertions, native32 410+22,
+components40/8,288/13 and current163+11 permanent allocation prefixes. New caller27
+sampled prefixes of1,052 pass exact rollback/retry/Cancel/dependent Save; this is
+not exhaustive helper/publication coverage. Ten native and20 actual GLB R/S pairs
+are exact;40KHR0errors/158warnings/108infos. No765 or live repaired archives, ABI,
+limits/default/guard changes, freshALL or main admission claim. Read
+ANATOMICAL-CURRENT44-PORT.md and receipt; repository-asset CTest producers and
+broader native/admission domains remain next. Full goal remains incomplete.
+
 ## Explicit portable normal model controls — 2026-11-04
 
 Universal/native/XR controls now describe portable normal/tangent target authoring,
