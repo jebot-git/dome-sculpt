@@ -7,7 +7,7 @@
 #include <fstream>
 namespace {
 void ready(Document &d){if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
-Scene pose_scene(Scene scene,int pose,float weight){auto &o=scene.active();auto d=*o.deformation;
+Scene pose_scene(Scene scene,int pose,float weight){auto &o=scene.active();if(!o.deformation)return scene;auto d=*o.deformation;
  if(d.morphs)d.morph_weights.assign(d.morphs->targets.size(),weight);
  if(d.skeleton&&pose){d.pose.clear();for(auto &b:d.skeleton->bones)d.pose.push_back(b.rest);d.pose[0].scale=pose==1?Vec3{1.1f,.85f,.55f}:Vec3{.8f,1.05f,1.6f};const float a=pose==1?.2f:-.25f;d.pose[1].rotation={std::cos(a/2),0,std::sin(a/2),0};}
  scene.set_deformation(o.id,d);return scene;
