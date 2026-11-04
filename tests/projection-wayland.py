@@ -30,7 +30,7 @@ async def main():
   with socket.socket() as sock:sock.bind(('127.0.0.1',0));port=sock.getsockname()[1]
   icd=next(p for p in (Path('/usr/share/vulkan/icd.d/lvp_icd.json'),Path('/usr/share/vulkan/icd.d/lvp_icd.'+platform.machine()+'.json')) if p.is_file())
   config=Path(home,'config/dome');config.mkdir(parents=True);(config/'keyboard.json').write_text(json.dumps({'ime':False,'layout':'us'}))
-  env={**os.environ,'HOME':home,'DISPLAY':screen,'XDG_CONFIG_HOME':home+'/config','XDG_DATA_HOME':home+'/data','XDG_CACHE_HOME':home+'/cache','XDG_RUNTIME_DIR':home,'XDG_CURRENT_DESKTOP':'Dome','XDG_SESSION_TYPE':'wayland','VK_DRIVER_FILES':str(icd),'LIBGL_ALWAYS_SOFTWARE':'1','LIBGL_KOPPER_DISABLE':'true','LP_NUM_THREADS':'2','DOME_RENDER_CAPTURE':str(out/'render.ppm'),'DOME_LOGIN_SESSION':'0','DOME_PREVIEW_PORT':str(port),'DOME_RENDERER':'vulkan','DOME_START_XR':'0','RUST_LOG':'warn','SPNAV_SOCKET':home+'/spnav.sock'}
+  env={**os.environ,'HOME':home,'DISPLAY':screen,'XDG_CONFIG_HOME':home+'/config','XDG_DATA_HOME':home+'/data','XDG_CACHE_HOME':home+'/cache','XDG_RUNTIME_DIR':home,'XDG_CURRENT_DESKTOP':'Dome','XDG_SESSION_TYPE':'wayland','VK_DRIVER_FILES':str(icd),'LIBGL_ALWAYS_SOFTWARE':'1','GIO_USE_VFS':'local','LIBGL_KOPPER_DISABLE':'true','LP_NUM_THREADS':'2','DOME_RENDER_CAPTURE':str(out/'render.ppm'),'DOME_LOGIN_SESSION':'0','DOME_PREVIEW_PORT':str(port),'DOME_RENDERER':'vulkan','DOME_START_XR':'0','DOME_START_TRAY':'0','DOME_START_IME':'0','DOME_SESSION_RESTORE':'0','DBUS_SYSTEM_BUS_ADDRESS':'unix:path=/nonexistent/viewport-test-bus','XR_RUNTIME_JSON':'/nonexistent/viewport-no-headset.json','RUST_LOG':'warn','SPNAV_SOCKET':home+'/spnav.sock'}
   for k in ('WAYLAND_DISPLAY','WAYLAND_SOCKET','FLTK_BACKEND','QT_QPA_PLATFORM'):env.pop(k,None)
   host_process=start([str(compositor),'--backend','nested'],'compositor',env);base=f'http://127.0.0.1:{port}'
   def scene():return json.load(urllib.request.urlopen(base+'/api/state',timeout=2))['scene']
@@ -40,7 +40,7 @@ async def main():
   def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=env))
   original=inspect();client=start([os.environ.get('DOME_SPACENAV_APP',str(build/'dome-sculpt')),str(project)],'client',{**env,'WAYLAND_DISPLAY':wayland,'FLTK_BACKEND':'wayland'},cwd=home)
   def named(title):return next((w for w in scene()['windows'] if title in w['title']),None)
-  window=await wait(lambda:named('projection.dsculpt'));check(window['app_id']=='org.domed.Sculpt','Native Wayland projection client publishes the Dome Sculpt identity')
+  window=await wait(lambda:named('projection.dsculpt'));(out/'runtime-maps.txt').write_text(Path('/proc/'+str(client.pid)+'/maps').read_text());check(window['app_id']=='org.domed.Sculpt','Native Wayland projection client publishes the Dome Sculpt identity')
   d=display.Display(screen);host=await wait(lambda:next((w for w in d.screen().root.query_tree().children if 'Dome' in str(w.get_wm_name() or '')),None));host.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();action({'op':'focus','id':window['id']});await asyncio.sleep(.5)
   async def key(name,down=None):
    code=d.keysym_to_keycode(XK.string_to_keysym(name))
@@ -99,7 +99,11 @@ async def main():
   check(chooser['app_id']==window['app_id'] and scene()['focused']==chooser['id'],'Canonical FLTK image chooser is native Wayland and retains focused document identity')
   await key('Escape');await wait(lambda:not named('Projection image'));check(inspect()==original,'Native Wayland Escape cancels image chooser without editing Scene')
   await exported('Load projection image...');chooser=await wait(lambda:named('Projection image'));action({'op':'focus','id':chooser['id']});await asyncio.sleep(.2)
-  await chord('Control_L','a');await type_text(str(image));await key('Tab');tap(chooser,lambda r:r['w']-119,lambda r:r['h']-22)
+  for _ in range(200):
+   if (await layout())['Select All'][1].get('enabled',False):break
+   await asyncio.sleep(.04)
+  else:raise AssertionError('Native Wayland filename focus readiness not published')
+  await exported('Select All');await type_text(str(image));await key('Return')
   await wait(lambda:not named('Projection image'))
   for _ in range(300):
    if (await layout())['Use projection image'][1].get('toggle-state')==1:break

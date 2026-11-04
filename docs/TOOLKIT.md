@@ -9,8 +9,8 @@ source/builder/config hashes and the imported core/images/gl library digests.
 An unchanged public version or copied patch files alone cannot establish this
 capability. The165 public include files and previous exports remain compatible.
 
-The qualified runtime source is DomeD6fa2624 (full pin and ordered patch hashes
-in third_party/sources.json). The bitmap stack remains the unchanged corrected
+The qualified runtime source is DomeD6fa2624, published with qualification
+metadata341152b (full pins and ordered patch hashes in third_party/sources.json). The bitmap stack remains the unchanged corrected
 53b0fca stack with Cairo patch260d2b81, whose16 library hashes are pinned. Build
 as the regular user with the canonical DomeD builder's default poll option;
 point `FLTK_DIR` at the resulting `share/fltk`, and `PKG_CONFIG_PATH` at that
@@ -24,9 +24,9 @@ public-main app/SDK-only reuse and runtime/UI checks. The earlier sections below
 preserve historical build and failure evidence; their older pins are not the
 current desktop acceptance requirement.
 
-# Current DomeD toolkit and conventions
+# Earlier24-patch lifecycle baseline
 
-The desktop application now requires canonical DomeD revision
+That baseline required canonical DomeD revision
 `53b0fcaf533ad867300d65a4178285d0a2dbef58` and its24th
 `fltk-1.4.5-process-cleanup.patch`. The native process display owner closes the
 connection only after App/widgets/GL/workers and before Fontconfig cleanup.

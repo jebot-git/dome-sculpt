@@ -184,9 +184,10 @@
       "native/toolkit-hooks/fltk-1.4.5-x11-clipboard-ownership.patch": "db6ca24a101c50c4c106a15fc8129a55ca73713a100c15e572b1dda98c248a57"
     },
     "combined_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
-    "used": "Canonical optimized FLTK1.4.5 with all27 patches, compact bitmap picker, real Enter callback reason, exact X11 clipboard ownership/reply cleanup and official poll backend. Runtime profile binds generated config, builder, patch chain and actual library digests. All165 public include files and previous exported symbols retained. Public-main save/SDK adoption qualification is recorded in ATOMIC-SAVE-SDK-INTEGRATION.md; no system installation or physical-session change.",
+    "used": "Canonical optimized FLTK1.4.5 with all27 patches and upstream poll. Actual generated configuration, builder, patchchain and selected imported library digests verified by installed profile. Runtime source6fa2624, published qualification341152b. All165 public headers and old exported symbols exact. Public8d unchanged runtime qualifies matchedSDK relink +normal/compact native export8each Release/SAN +nativeWayland9each; see ATOMIC-SAVE-SDK-INTEGRATION.md. No fullapplication rebuild/fullsuite or physicalsession claim.",
     "verified_at_commit": "6fa2624f89ddb105e482326995daec0bdbfd6643",
-    "builder_sha256_at_verified_commit": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011"
+    "builder_sha256_at_verified_commit": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011",
+    "qualification_commit": "341152b2429d28e70834917bc65c371b044481e8"
   },
   "vrm_specification": {
     "repository": "https://github.com/vrm-c/vrm-specification",
