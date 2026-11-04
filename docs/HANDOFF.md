@@ -1,5 +1,18 @@
 # Dome Sculpt production handoff
 
+## Preserve authored rest shading at zero morph weights — 2026-11-04
+
+The native evaluator now retains exact artist normals with zero/signed-zero
+weights instead of recomputing them and falsely refusing a legitimate rest Bake.
+Eight Release/eight owned sanitizer native commands pass, including actual
+Bake/Undo/Redo/Save/editable-GLB recovery; strengthened signed-zero persistence
+passes separately. Eleven output pairs are exact; six GLBs have zero Khronos
+errors and six retained warnings. Read ZERO-MORPH-REST.md and its receipt for
+complete changed-TU scope, old-core negatives and compiler-fixture corrections.
+No header/schema/default frontend changes, fresh whole-build/full610/device
+claim, system/headset/session action. General normal-map portability and all
+unfinished original/additional requirements, including later trays, remain.
+
 ## Qualified FBX generated-normal current-layout continuation — 2026-11-04
 
 On published coherentcage2f6, sealedCFBX imported-morph normal generation now
