@@ -7,6 +7,23 @@ namespace {
 Vec3 independent_unit(Vec3 v){double s=std::hypot(double(v.x),double(v.y),double(v.z));if(s<1e-12)throw std::runtime_error("Singular independent conversion oracle");return {float(v.x/s),float(v.y/s),float(v.z/s)};}
 double angle(Vec3 a,Vec3 b){a=independent_unit(a);b=independent_unit(b);return std::atan2(double(length(cross(a,b))),std::clamp(double(dot(a,b)),-1.,1.));}
 bool failure(const auto &call,std::string_view wanted){try{call();return false;}catch(const std::exception&e){return std::string_view(e.what()).find(wanted)!=std::string_view::npos;}}
+Vec3 filtered(const Image &image,double u,double v){
+ const double x=u*image.width-.5,y=v*image.height-.5;const int left=int(std::floor(x)),top=int(std::floor(y));const double fx=x-left,fy=y-top;std::array<double,3> rgb{};
+ for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto at=(size_t(std::clamp(top+dy,0,int(image.height)-1))*image.width+std::clamp(left+dx,0,int(image.width)-1))*4;const double w=(dx?fx:1-fx)*(dy?fy:1-fy);for(size_t c=0;c<3;++c)rgb[c]+=image.rgba[at+c]/255.*w;}
+ return {float(rgb[0]*2-1),float(rgb[1]*2-1),float(rgb[2]*2-1)};
+}
+void audit_filtered(const Scene &scene,const detail::CanonicalNormalConversionCandidate &candidate){
+ const auto &o=scene.active();const auto &mesh=o.painted->mesh();const auto original=o.painted->composite(o.material);const auto frames=tangent_corners(mesh);const auto target=candidate.target_frames->pbr;
+ double maximum=0;size_t samples=0;constexpr int divisions=160;
+ for(size_t face=0;face<mesh.indices.size()/3;++face)for(int i=0;i<=divisions;++i)for(int j=0;j<=divisions-i;++j){
+  const std::array<double,3>w{double(i)/divisions,double(j)/divisions,double(divisions-i-j)/divisions};double u=0,v=0;Vec3 on{},ot{},ob{},nn{},nt{},nb{};
+  for(size_t k=0;k<3;++k){const auto c=face*3+k,vertex=mesh.indices[c];u+=mesh.uv[vertex][0]*w[k];v+=mesh.uv[vertex][1]*w[k];const auto n=independent_unit(mesh.normals[vertex]);const auto t=frames[c];const Vec3 T{t[0],t[1],t[2]};on+=n*float(w[k]);ot+=T*float(w[k]);ob+=cross(n,T)*(t[3]*float(w[k]));const auto a=target->tangents[c];const auto N=independent_unit(target->normals[c]),A=independent_unit({a[0],a[1],a[2]});nn+=N*float(w[k]);nt+=A*float(w[k]);nb+=independent_unit(cross(N,A))*(a[3]*float(w[k]));}
+  const auto a=filtered(original->normal,u,v),b=filtered(*candidate.projection->pbr,u,v);
+  maximum=std::max(maximum,angle(ot*a.x+ob*a.y+on*a.z,independent_unit(nt)*b.x+independent_unit(nb)*b.y+independent_unit(nn)*b.z));++samples;
+ }
+ std::cout<<"CONVERSION_FILTERED "<<samples<<" max="<<maximum<<std::endl;
+ require_cage(maximum<=.02,"Independent dense bilinear and boundary probes preserve the original native field at the unchanged angular bound");
+}
 void audit(const Scene &scene,const detail::CanonicalNormalConversionCandidate &candidate){
  const auto &object=scene.active();const auto &mesh=object.painted->mesh();const auto original=object.painted->composite(object.material);
  const auto frames=tangent_corners(mesh);const auto target=candidate.target_frames->pbr;const auto &image=*candidate.projection->pbr;
@@ -42,7 +59,7 @@ int main()try{
   const ColorPreparationInput input{paint,scene.active().appearance,scene.active().material_bindings,deformation,scene.active().material};
   const auto result=detail::convert_native_canonical_normals(input);
   require_cage(result.original_paint==paint&&result.original_deformation==deformation&&result.sampled_centers>100&&result.raster_samples>=result.sampled_centers,"Detached real-baker conversion retains exact genuine original paint/deformation owners and actual sampling counts");
-  require_cage(result.projection->pbr->rgba==result.projection->mtoon->rgba&&result.target_frames->current_targets.size()==size_t(bool(variant&2)),"Native PBR candidate owns real paired planes and complete current morph identities");audit(scene,result);
+  require_cage(result.projection->pbr->rgba==result.projection->mtoon->rgba&&result.target_frames->current_targets.size()==size_t(bool(variant&2)),"Native PBR candidate owns real paired planes and complete current morph identities");audit(scene,result);audit_filtered(scene,result);
   require_cage(scene.encode()==exact&&scene.active().painted==paint&&scene.active().deformation==deformation,"Successful detached conversion preserves all native history, bake recipe, source, layer and shape bytes");
   NormalPreparationOptions too_small;too_small.max_working_bytes=1;
   require_cage(failure([&]{detail::convert_native_canonical_normals(input,too_small);},"memory budget")&&scene.encode()==exact,"Working memory denial preserves exact original source");
