@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Preserve authored split normals through skinning — 2026-11-04
+
+Ordinary native skinning now transports authored normals with the existing Dome
+weighted joint inverse-transpose convention instead of rebuilding triangle
+normals. Nine native commands eachR/S include77 independent/rigBake checks;
+PBR127+preparedShape51 each also pass. Actual worker GLB images max0 across
+Release/SAN/Arc; old core fails59>unchanged4. Eighteen GLBs0KHRerrors/18warnings,
+12 exact profile/device pairs; current-layout application relinks pass. Read
+AUTHORED-SKIN-NORMALS.md and receipt for complete changed-TU scope. No freshwhole
+build/full612/newUI/HMD/compute claim. Active curved native morph export remains
+a real separate gap; all unfinished original/additional requirements remain.
+
 ## Preserve authored rest shading at zero morph weights — 2026-11-04
 
 The native evaluator now retains exact artist normals with zero/signed-zero
