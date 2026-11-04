@@ -604,5 +604,12 @@
     "manifest": "third_party/softfloat/SOURCES.json",
     "generator": "tools/generate-softfloat-f64.py",
     "scope": "Integer-only nearest-even binary64 numeric results for selected-backend forward sculpt layer/mask resampling. Floating environment flags are not exposed; reconstruction and geometry quality remain host work."
+  },
+  "mesa_rtasm_lifetime_patch": {
+    "repository": "https://gitlab.freedesktop.org/mesa/mesa",
+    "version": "26.2.5",
+    "license": "MIT",
+    "manifest": "third_party/mesa/SOURCES.json",
+    "used": "Optional source patch for empty POSIX rtasm executable pool and partial initialization cleanup. No Mesa source/library bundled, no app ABI/shader/compute change, no automatic application/install. See docs/MESA-XR-RTASM-LIFETIME.md."
   }
 }

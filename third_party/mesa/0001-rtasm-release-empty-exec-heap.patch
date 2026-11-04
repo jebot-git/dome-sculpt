@@ -1,0 +1,88 @@
+--- a/src/gallium/auxiliary/rtasm/rtasm_execmem.c
++++ b/src/gallium/auxiliary/rtasm/rtasm_execmem.c
+@@ -70,24 +70,55 @@
+ static int
+ init_heap(void)
+ {
+-   if (!exec_heap)
+-      exec_heap = u_mmInit( 0, EXEC_HEAP_SIZE );
++   if (exec_heap)
++      return 1;
+ 
+-   if (!exec_mem)
+-      exec_mem = (unsigned char *) mmap(NULL, EXEC_HEAP_SIZE,
+-         PROT_EXEC | PROT_READ | PROT_WRITE,
+-         MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++   struct mem_block *heap = u_mmInit(0, EXEC_HEAP_SIZE);
++   if (!heap)
++      return 0;
++
++   void *mem = mmap(NULL, EXEC_HEAP_SIZE,
++      PROT_EXEC | PROT_READ | PROT_WRITE,
++      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++   if (mem == MAP_FAILED) {
++      u_mmDestroy(heap);
++      return 0;
++   }
+ 
+-   return (exec_mem != MAP_FAILED);
++   exec_heap = heap;
++   exec_mem = mem;
++   return 1;
+ }
+ 
+ 
++/* Keep the pool while any generated function is live.  Once the last block
++ * is freed, u_mmFreeMem coalesces the entire heap into one free block.  Drop
++ * both the executable mapping and allocator metadata before the driver DSO
++ * can unload; a later allocation initializes a new pool under exec_mutex.
++ */
++static void
++release_empty_heap(void)
++{
++   if (exec_heap && exec_heap->next->free &&
++       exec_heap->next->next == exec_heap &&
++       exec_heap->next->size == EXEC_HEAP_SIZE) {
++      u_mmDestroy(exec_heap);
++      exec_heap = NULL;
++      munmap(exec_mem, EXEC_HEAP_SIZE);
++      exec_mem = NULL;
++   }
++}
++
+ void *
+ rtasm_exec_malloc(size_t size)
+ {
+    struct mem_block *block = NULL;
+    void *addr = NULL;
+ 
++   /* Also prevent overflow in alignment rounding and the int-sized heap. */
++   if (!size || size > EXEC_HEAP_SIZE)
++      return NULL;
++
+    simple_mtx_lock(&exec_mutex);
+ 
+    if (!init_heap())
+@@ -100,8 +131,10 @@
+ 
+    if (block)
+       addr = exec_mem + block->ofs;
+-   else
++   else {
+       debug_printf("rtasm_exec_malloc failed\n");
++      release_empty_heap();
++   }
+ 
+ bail:
+    simple_mtx_unlock(&exec_mutex);
+@@ -118,8 +151,8 @@
+    if (exec_heap) {
+       struct mem_block *block = u_mmFindBlock(exec_heap, (unsigned char *)addr - exec_mem);
+ 
+-      if (block)
+-         u_mmFreeMem(block);
++      if (block && u_mmFreeMem(block) == 0)
++         release_empty_heap();
+    }
+ 
+    simple_mtx_unlock(&exec_mutex);
