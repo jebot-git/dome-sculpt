@@ -22,7 +22,9 @@ with tempfile.TemporaryDirectory(prefix='dome-mirror-xr-') as directory:
   if mode=='accept':
    check(len(after['keys'])==3 and after['keys'][:2]==original['keys'],stem+': explicit Mirror adds one real key while keeping both original targets exact')
    delta=after['keys'][2]['delta'];check(max(abs(a-b) for a,b in zip(delta[3],[-.015,0,.04]))<1e-6 and max(abs(x) for x in delta[0])<1e-6,stem+': independent off-centre counterpart oracle verifies REST-position mirroring')
-   check(after['channels']==original['channels'] and after['restored_source']==original['restored_source'],stem+': skin pose material paint placement and complete first source stay exact')
+   check(after['channels']==original['channels'] and after['first_source']==original['first_source'],stem+': skin pose material paint placement and ultimately restored first source stay exact')
+   checkpoint=original['restored_source'] if method==0 else original['scene']
+   check(after['restored_source']==checkpoint and after['restore_steps']==(1 if method==0 else 2),stem+': native first-source and explicit authored-checkpoint Restore semantics remain exact')
   else:check(after['scene']==original['scene'],stem+': actual Cancel/focus loss retains the exact complete native Scene')
   if mode=='focus':check(detail.get('focus_losses')==1 and detail.get('focus_regains')==1,stem+': fixture crosses actual loader focus loss and regain')
 print(str(len(checks))+' actual-loader Mirror checks passed',flush=True)
