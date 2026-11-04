@@ -29,11 +29,17 @@ struct NativeExtractionCost {size_t bytes=0,samples=0,raster=0;};
 NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBakeOptions &policy,
     const std::function<bool()> &cancelled) {
   NativeExtractionCost cost;
+  if(!policy.max_vertices||policy.max_vertices>2'000'000||
+     !policy.max_triangles||policy.max_triangles>2'000'000)
+    throw std::length_error("Native physical geometry budget is outside its supported range");
   auto charge=[](size_t &total,size_t n,size_t unit,size_t cap,const char *message){
     if(total>cap||n>(cap-total)/unit)throw std::length_error(message);total+=n*unit;};
   for(const auto &o:scene.objects())if(o.visible&&native_physical(o)&&o.mesh_active){
     if(cancelled&&cancelled())throw std::runtime_error("Native physical extraction cancelled");
-    const auto &p=*o.painted;const auto r=p.resolution();const size_t grid=size_t(r)*r;
+    const auto &p=*o.painted;
+    if(p.mesh().positions.size()>policy.max_vertices||p.mesh().indices.size()/3>policy.max_triangles)
+      throw std::length_error("Native physical geometry budget exceeded before extraction");
+    const auto r=p.resolution();const size_t grid=size_t(r)*r;
     if(policy.resolution&&(policy.resolution<64||policy.resolution>2048||(policy.resolution&(policy.resolution-1))))
       throw std::invalid_argument("Native physical finite resolution must be a power of two in64..2048");
     auto bytes=[&](size_t n,size_t unit){charge(cost.bytes,n,unit,policy.max_working_bytes,"Native physical extraction exceeds working budget before allocation");};
@@ -173,7 +179,10 @@ std::vector<ObjectSurface> native_authoring_surfaces(const Scene &scene,
   }
   auto surfaces=detached.preview_surfaces(cancelled);
   for(auto &surface:surfaces){const auto &original=scene.object(surface.id);
-    if(native_physical(original)){surface.material=original.material;surface.material_bindings=original.material_bindings;
+    if(native_physical(original)){
+      if(surface.mesh.positions.size()>policy.max_vertices||surface.mesh.indices.size()/3>policy.max_triangles)
+        throw std::length_error("Native physical extracted geometry exceeds its budget");
+      surface.material=original.material;surface.material_bindings=original.material_bindings;
       // The temporary's normal proof is paired with its temporary binding.
       // Export replays the actual normal recipe; it must not advertise this
       // preview-only proof under the restored original binding identity.
@@ -210,6 +219,9 @@ NativeAuthoringCompilation compile_native_authoring(
   for (const auto &surface : capture.originals()) {
     check();
     const auto &mesh = surface.mesh;
+    const auto &object = capture.scene().object(surface.id);
+    if(native_physical(object)&&(mesh.positions.size()>policy.max_vertices||mesh.indices.size()/3>policy.max_triangles))
+      throw std::length_error("Native physical captured geometry exceeds its budget before staging");
     reserve(mesh.positions.size()+mesh.normals.size(),sizeof(Vec3));
     reserve(mesh.uv.size(),sizeof(std::array<float,2>));
     reserve(mesh.indices.size(),sizeof(uint32_t));
@@ -217,7 +229,6 @@ NativeAuthoringCompilation compile_native_authoring(
     reserve(surface.name.size()+1,sizeof(char));
     reserve(surface.groups.size(),sizeof(SceneGroup));
     for(const auto &group:surface.groups)reserve(group.name.size()+1,sizeof(char));
-    const auto &object = capture.scene().object(surface.id);
     if(native_physical(object)){
       painted=true;
       if(surface.textures)reserve(texture_bytes(*surface.textures),1);
