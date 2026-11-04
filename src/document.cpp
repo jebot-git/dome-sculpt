@@ -8,6 +8,7 @@
 #include "dome/normal-sampling.hpp"
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
+#include "source-skin-world.hpp"
 #include "shapekey-preview.hpp"
 #include "shapekey-mirror-controls.hpp"
 #include "document-authority.hpp"
@@ -1748,6 +1749,7 @@ void Document::mesh_loop() {
             snapshot->source_tangents.assign(snapshot->mesh.positions.size(),{1,0,0,1});
           }
         }
+        const auto source_world_positions=detail::source_skin_world_positions(o,cancelled);
         if (o.deformation) o.mesh = o.preview_mesh();
         if(dynamic_canonical) {
           retained_pose->tangents[2]=tangent_corners(o.mesh,cancelled);
@@ -1792,7 +1794,7 @@ void Document::mesh_loop() {
             snapshot->normal_coordinates.push_back({uv[0],uv[1],toon[0],toon[1]});
           }
           if(!colors.empty() || !snapshot->source_colors.empty())snapshot->source_colors.push_back(colors.empty()?std::array<float,4>{1,1,1,1}:colors.at(vertex));
-          snapshot->mesh.positions.push_back(frame?detail::placed_position(*frame,o.mesh.positions.at(vertex)):vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
+          snapshot->mesh.positions.push_back(source_world_positions?source_world_positions->at(vertex):frame?detail::placed_position(*frame,o.mesh.positions.at(vertex)):vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
           snapshot->mesh.normals.push_back(frame?detail::placed_normal(*frame,o.mesh.normals.at(vertex)):vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));

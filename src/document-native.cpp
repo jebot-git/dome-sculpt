@@ -3,6 +3,7 @@
 #include "dome/paint-sampling.hpp"
 #include "dome/normal-preview.hpp"
 #include "affine-surface.hpp"
+#include "source-skin-world.hpp"
 #include "document-held-affine.hpp"
 #include "dome/polygon-scene.hpp"
 #include "dome/mesh-processing.hpp"
@@ -18,6 +19,24 @@ Vec3 local(CanvasTransform t,Vec3 p){auto q=ob::transform(ob::inverse(t),{p.x,p.
 Vec3 point(CanvasTransform t,Vec3 p){auto q=ob::transform(t,{p.x,p.y,p.z});return {q.x,q.y,q.z};}
 Vec3 rotate(ob::Quat q,Vec3 p){auto v=ob::rotate(q,{p.x,p.y,p.z});return {v.x,v.y,v.z};}
 bool same(CanvasTransform a,CanvasTransform b){return a.position.x==b.position.x&&a.position.y==b.position.y&&a.position.z==b.position.z&&a.scale==b.scale&&a.orientation.x==b.orientation.x&&a.orientation.y==b.orientation.y&&a.orientation.z==b.orientation.z&&a.orientation.w==b.orientation.w;}
+// Detached worker metadata only; no source parsing or live model lock is used.
+std::optional<std::vector<Vec3>> source_world_positions(const Scene &scene,
+    const SculptObject &object,const ShapeSculptDraft *shape,
+    const std::function<bool()> &cancelled) {
+  if(!object.painted||!object.deformation||!object.deformation->skin||!object.appearance)return {};
+  const auto &rest=object.painted->mesh();constexpr size_t limit=256u*1024u*1024u;
+  size_t bytes=0;auto charge=[&](size_t count,size_t stride){if(count>(limit-bytes)/stride)throw std::length_error("Native source world snapshot budget exceeded");bytes+=count*stride;};
+  charge(rest.positions.size(),sizeof(Vec3));charge(rest.normals.size(),sizeof(Vec3));charge(rest.indices.size(),sizeof(uint32_t));charge(rest.uv.size(),sizeof(std::array<float,2>));charge(rest.uv_pins.size(),1);charge(rest.uv_seams.size(),1);
+  ObjectSurface surface;surface.id=object.id;surface.transform=object.transform;
+  surface.mesh=rest;surface.deformation=object.deformation;surface.groups=scene.group_path(object.group);
+  surface.appearance=object.appearance;surface.affine_edit=object.affine_edit;surface.rig_source=object.rig_source;
+  if(shape){
+    auto deformation=std::make_shared<DeformationState>(*object.deformation);
+    MorphSet draft(rest);draft.set_target(rest,"Sculpt draft",shape->positions());
+    deformation->morphs=std::move(draft);deformation->morph_weights={1};surface.deformation=std::move(deformation);
+  }
+  return detail::source_skin_world_positions(surface,cancelled,limit-bytes);
+}
 bool same_placement(const Scene &scene,uint64_t id,CanvasTransform legacy,const std::optional<AffineTransform>&affine) {
   if(affine)return scene.world_matrix(id).matrix()==affine->matrix();
   return !scene.has_affine_placement(id)&&same(scene.world_transform(id),legacy);
@@ -162,6 +181,7 @@ void Document::native_loop(){
         if(session->affine_world) {
           auto placed=std::make_shared<Mesh>(shape?shape->preview():o.deformation?o.deformation->preview(o.painted->mesh()):o.painted->mesh());
           auto frame=detail::placement_frame(working,o.id);detail::place_mesh(*placed,frame,cancelled);
+          if(auto positions=source_world_positions(working,o,shape.get(),cancelled))placed->positions=std::move(*positions);
           reflected=frame.orientation()==AffineOrientation::Reversing;geometry=std::move(placed);
         } else geometry=shape?std::make_shared<const Mesh>(shape->preview()):o.deformation?std::make_shared<const Mesh>(o.deformation->preview(o.painted->mesh())):std::shared_ptr<const Mesh>(o.painted,&o.painted->mesh());
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
@@ -261,7 +281,7 @@ void Document::native_loop(){
         if(now-shown>=std::chrono::milliseconds(30)){
           auto preview=working.snapshot();
           if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());author_shapekey(preview,o.id,edit,cancelled);detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
-            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world)detail::place_mesh(geometry,frame,cancelled);
+            auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world){detail::place_mesh(geometry,frame,cancelled);if(auto positions=source_world_positions(working,o,shape.get(),cancelled))geometry.positions=std::move(*positions);}
             // Only evaluated geometry changes during this gesture. Preserve
             // the original immutable material, sampling attachment/proof and
             // its explicitly logical-corner paint stream for every refresh.
