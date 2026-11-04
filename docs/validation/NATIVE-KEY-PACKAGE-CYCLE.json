@@ -1,0 +1,500 @@
+{
+  "recorded_utc": "2026-11-04T00:31:42.002988+00:00",
+  "test_source": "25939b5257e5190c52b3abbae4d730abdc7990d8",
+  "runtime_source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+  "test_only_delta": "CMake/test/docs only; all own src/include/third_party bytes verified identical to currentc092 before matching new target compile/link. Versioned fixture operational text equals qualified probe plus SPDX comment.",
+  "records": {
+    "target": {
+      "status_sha256": "8fa32babef525690da3f9cf4b42f9dd13e2f7b423b7c6e63ed31c0e726061a90",
+      "result": {
+        "source": "25939b5257e5190c52b3abbae4d730abdc7990d8",
+        "runtime_source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+        "scope": "Actual new CMake target compile/link commands, complete new publicAPI test TU with byte-identical own runtime headers/sources and completed matching currentc092 core/support archives. Genuine native input files copied byte-exact; CTest -FA skips setup already qualified separately. Fixture graph automatic setup verified separately by show-only. Not fresh core/wholebuild or new setup-consumer proof.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "CMakeFiles/dome-sculpt-native-key-package-cycle-test.dir/tests/native-key-package-cycle.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/tests/native-key-package-cycle.cpp"
+            ],
+            "exit_code": 0
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt-native-key-package-cycle-test.dir/tests/native-key-package-cycle.cpp.o",
+              "-o",
+              "dome-sculpt-native-key-package-cycle-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0
+          },
+          {
+            "name": "ctest",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/build-test-wiring",
+              "--output-on-failure",
+              "-R",
+              "^native-key-package-cycle$",
+              "-FA",
+              "native-(key|paint)-cycle-input"
+            ],
+            "exit_code": 0
+          }
+        ],
+        "staged_inputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/build-test-wiring/source-paint-authoring/recovered0.dsculpt": {
+            "source": "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/source-paint-authoring/recovered0.dsculpt",
+            "sha256": "4463147ceb3456ce3285a245e3ff548253c403e7811a22eb29cfd503f0a23156"
+          },
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/build-test-wiring/key-mirror-relative-owning/relative-native.dsculpt": {
+            "source": "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-connected-8ae72c3/build-native/key-mirror-relative-owning/relative-native.dsculpt",
+            "sha256": "65787b17d6bd78403b4e599bd81b7beda1a4eb4b1e9d61f36a8335c14000a147"
+          }
+        },
+        "exit_code": 0,
+        "seconds": 6.719004324986599,
+        "inputs": 2224,
+        "drift": []
+      }
+    },
+    "wiring": {
+      "status_sha256": "09fd1cc00b7c2339f9aaa84297d37244dc3cef1297e864382a50b033c73ff31b",
+      "result": {
+        "source": "25939b5257e5190c52b3abbae4d730abdc7990d8",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-key-package-cycle-c092/build-test-wiring",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DBUILD_TESTING=ON",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk"
+        ],
+        "configure_exit": 0,
+        "scope": "Test-only CMake registration/fixture graph, no compile/runtime/fullsuite claim.",
+        "filtered_fixture_tests": [
+          "key-mirror-relative-owning",
+          "native-key-package-cycle",
+          "source-paint-authoring"
+        ],
+        "new_TU_registered": true,
+        "registered_tests": 590,
+        "seconds": 8.876441541011445,
+        "inputs": 1699,
+        "drift": []
+      }
+    },
+    "small": {
+      "status_sha256": "389613946ae6061c2ff5c1725d43a9545c11e278998d73d060ad9be38fb63048",
+      "result": {
+        "state": "terminal",
+        "pid": 413758,
+        "profile": "release",
+        "source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+        "scope": "Complete new publicAPI integration consumer TU on completed current c092 owned core/support while unrelated ALL-target tests compile; archives and inputs hashed before/after, no wholebuild claim. No runtime changes. OwningScene29 key +source-aware paint\u2192two namespace appends\u2192actual Document editableGLB export/Open/nativeSave/Import/UndoRedo/Restore. Genuine small and bothCCO converted-source fixtures. No graphics/device/fullgoal claim.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/fixture.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/union/native-key-append-cycle.cpp"
+            ],
+            "exit_code": 0
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/fixture.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0
+          },
+          {
+            "name": "small",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/small",
+              "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/source-paint-authoring/recovered0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-connected-8ae72c3/build-native/key-mirror-relative-owning/relative-native.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2782605499960482
+          }
+        ],
+        "phase": "small",
+        "child_pid": 414335,
+        "artifact_drift": [],
+        "exit_code": 0,
+        "seconds": 5.977776245010318,
+        "source_inputs": 1699,
+        "source_drift": []
+      }
+    },
+    "CCO": {
+      "status_sha256": "22e767eb625fa77a5004ffdcaa807a0abc81564bc2102e4017984d03a09207ac",
+      "result": {
+        "state": "terminal",
+        "pid": 429190,
+        "source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+        "scope": "Both realCCO converted owningScene29 sources plus actual Source4 painted source. Same completed currentc092 core/support and complete new publicAPI consumer already compiled in small24 probe, original hashes exact; no repeated compile/no wholebuild/device claim. Smallprobe scope string copiedfrom3cohort driver was overbroad; actual smallprobe ran onlysmallcase, this realprobe covers female/male.",
+        "runs": [
+          {
+            "name": "female",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/female",
+              "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/source-paint-authoring/recovered0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-export-fixed/software/female/all-role-pbr/source.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 25.220575175975682
+          },
+          {
+            "name": "male",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/male",
+              "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/source-paint-authoring/recovered0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-export-fixed/software/male/all-role-pbr/source.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 25.22387524798978
+          }
+        ],
+        "phase": "male",
+        "child_pid": 431532,
+        "exit_code": 0,
+        "seconds": 51.00122192798881,
+        "inputs": 2195,
+        "drift": []
+      }
+    }
+  },
+  "validator": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-khronos.json",
+    "sha256": "e9573f908c17dab0c637fc69d8977ebf9ab5a4cc2bf2cd49077d0e00055d9c2d",
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "files": 3,
+    "totals": {
+      "numErrors": 0,
+      "numWarnings": 39,
+      "numInfos": 10,
+      "numHints": 0
+    },
+    "warning_codes": {
+      "NODE_SKINNED_MESH_NON_ROOT": 39
+    }
+  },
+  "scope_limits": [
+    "Complete new actual target TU/declaredlinkcommand uses completed matchingc092 owned archives; not fresh core/wholebuild in this test-only worktree.",
+    "Filtered CTest graph verifies both automatic source fixtures. Actual1/1 command uses byte-exact genuine already-qualified fixture files and -FA to avoid repeating setup; not a new runtime execution of fixture setup binaries.",
+    "72 current-core original integration checks cover small+bothCCO sources. Copied small-probe scope string overbroadly mentions bothCCO, corrected by explicit separatecohort records.",
+    "Matching sanitizer72 now passes; no graphics/device or physical-headset proof.",
+    "Root589 regression remains separate:65selected Release and65selected SAN pass; remaining524Release still running with original UV/atlas failures.590here remains registered count, not590passes.",
+    "No same-object key-and-paint coupled deformation/graphics claim; this preserves genuine key and paint objects in one scene.",
+    "No main admission/systeminstall/sessionrestart or goalcompletion."
+  ],
+  "sanitizer_followup": {
+    "recorded_utc": "2026-11-04T01:24:30.274245+00:00",
+    "scope": "Same complete publicAPI operational test TU (SPDX-only versioned difference) compiled from current c092 own flags against its completed fresh whole-owned ASan+UBSan core/support. Genuine small+female+male cases;24 checks each=72. New registered590-target CMake SAN execution not claimed.",
+    "status_sha256": "663fb3dcea27e9a8716e95ad0fb094de8dc3d9d4898cd856fdbdae3b1bba0896",
+    "result": {
+      "state": "terminal",
+      "pid": 564576,
+      "profile": "sanitize",
+      "source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+      "scope": "New full publicAPI integration consumer TU on current coherent c092 core/support, no runtime changes. OwningScene29 key +source-aware paint\u2192two namespace appends\u2192actual Document editableGLB export/Open/nativeSave/Import/UndoRedo/Restore. Genuine small and bothCCO converted-source fixtures. No graphics/device/fullgoal claim.",
+      "steps": [
+        {
+          "name": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/union/native-key-append-cycle.cpp"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/consumer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0
+        },
+        {
+          "name": "small",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/consumer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/small",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/source-paint-authoring/recovered0.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/key-mirror-relative-owning/relative-native.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 2.207868474011775
+        },
+        {
+          "name": "female",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/consumer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/female",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/source-paint-authoring/recovered0.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-export-fixed/software/female/all-role-pbr/source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 226.7766725109832
+        },
+        {
+          "name": "male",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/consumer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/male",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/source-paint-authoring/recovered0.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror29-source-export-b2ca53b/artifacts/mirror-export-fixed/software/male/all-role-pbr/source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 202.71515257502324
+        }
+      ],
+      "dependency_pid": 564307,
+      "last_verified_live": 1793754273.0280433,
+      "phase": "male",
+      "child_pid": 986313,
+      "artifact_drift": [],
+      "exit_code": 0,
+      "seconds": 4149.834327824996,
+      "source_inputs": 1699,
+      "source_drift": []
+    },
+    "byte_pairs": [
+      {
+        "case": "small",
+        "file": "combined.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/small/case0/combined.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/small/case0/combined.dsculpt",
+        "release_sha256": "7c701c4fd2deaf0317238563903b03ca14c7013b3ae94fa0260fb6c196ea67d7",
+        "sanitize_sha256": "7c701c4fd2deaf0317238563903b03ca14c7013b3ae94fa0260fb6c196ea67d7",
+        "byte_equal": true
+      },
+      {
+        "case": "small",
+        "file": "editable.glb",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/small/case0/editable.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/small/case0/editable.glb",
+        "release_sha256": "df3f1697eeafd9fb3332c97258b96f00b2859bf8b6188926df2313777f4f6d77",
+        "sanitize_sha256": "df3f1697eeafd9fb3332c97258b96f00b2859bf8b6188926df2313777f4f6d77",
+        "byte_equal": true
+      },
+      {
+        "case": "small",
+        "file": "recovered.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/small/case0/recovered.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/small/case0/recovered.dsculpt",
+        "release_sha256": "7c701c4fd2deaf0317238563903b03ca14c7013b3ae94fa0260fb6c196ea67d7",
+        "sanitize_sha256": "7c701c4fd2deaf0317238563903b03ca14c7013b3ae94fa0260fb6c196ea67d7",
+        "byte_equal": true
+      },
+      {
+        "case": "small",
+        "file": "restored.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-probe-release/small/case0/restored.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/small/case0/restored.dsculpt",
+        "release_sha256": "c3c329173fc19bae65905dde395df6f8bca365690f9585f2c20ae5de13567757",
+        "sanitize_sha256": "c3c329173fc19bae65905dde395df6f8bca365690f9585f2c20ae5de13567757",
+        "byte_equal": true
+      },
+      {
+        "case": "female",
+        "file": "combined.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/female/case0/combined.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/female/case0/combined.dsculpt",
+        "release_sha256": "9f07a061e3252e96cb12c7be2959409b852ea4d24d8b41f20047059aaa596923",
+        "sanitize_sha256": "9f07a061e3252e96cb12c7be2959409b852ea4d24d8b41f20047059aaa596923",
+        "byte_equal": true
+      },
+      {
+        "case": "female",
+        "file": "editable.glb",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/female/case0/editable.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/female/case0/editable.glb",
+        "release_sha256": "55606cad540ecddf75edc9b6ad7f9ed56cc0c4328c6fd61e79de88686bb8a65f",
+        "sanitize_sha256": "55606cad540ecddf75edc9b6ad7f9ed56cc0c4328c6fd61e79de88686bb8a65f",
+        "byte_equal": true
+      },
+      {
+        "case": "female",
+        "file": "recovered.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/female/case0/recovered.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/female/case0/recovered.dsculpt",
+        "release_sha256": "9f07a061e3252e96cb12c7be2959409b852ea4d24d8b41f20047059aaa596923",
+        "sanitize_sha256": "9f07a061e3252e96cb12c7be2959409b852ea4d24d8b41f20047059aaa596923",
+        "byte_equal": true
+      },
+      {
+        "case": "female",
+        "file": "restored.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/female/case0/restored.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/female/case0/restored.dsculpt",
+        "release_sha256": "cd4ef057b0be59c7f4a7ee08653b5725f715faf95d3f37ee70e54ca2ec8ef0d4",
+        "sanitize_sha256": "cd4ef057b0be59c7f4a7ee08653b5725f715faf95d3f37ee70e54ca2ec8ef0d4",
+        "byte_equal": true
+      },
+      {
+        "case": "male",
+        "file": "combined.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/male/case0/combined.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/male/case0/combined.dsculpt",
+        "release_sha256": "d55cd5da80a1f0c7c2e74265245c849f2bfe84d3af23e0fa3ea0c42621f34f5d",
+        "sanitize_sha256": "d55cd5da80a1f0c7c2e74265245c849f2bfe84d3af23e0fa3ea0c42621f34f5d",
+        "byte_equal": true
+      },
+      {
+        "case": "male",
+        "file": "editable.glb",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/male/case0/editable.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/male/case0/editable.glb",
+        "release_sha256": "3615c6537d86a4f78fbb1e2aaab061ffb3df623cba5580bf52900a361f209806",
+        "sanitize_sha256": "3615c6537d86a4f78fbb1e2aaab061ffb3df623cba5580bf52900a361f209806",
+        "byte_equal": true
+      },
+      {
+        "case": "male",
+        "file": "recovered.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/male/case0/recovered.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/male/case0/recovered.dsculpt",
+        "release_sha256": "d55cd5da80a1f0c7c2e74265245c849f2bfe84d3af23e0fa3ea0c42621f34f5d",
+        "sanitize_sha256": "d55cd5da80a1f0c7c2e74265245c849f2bfe84d3af23e0fa3ea0c42621f34f5d",
+        "byte_equal": true
+      },
+      {
+        "case": "male",
+        "file": "restored.dsculpt",
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-real-probe-release/male/case0/restored.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/artifacts/production-proof/cross-native-v2-sanitize/male/case0/restored.dsculpt",
+        "release_sha256": "85a19e8f7aa163f0c23839564a84d8919941b8be2ebc01549c4be9a4b82bdd3e",
+        "sanitize_sha256": "85a19e8f7aa163f0c23839564a84d8919941b8be2ebc01549c4be9a4b82bdd3e",
+        "byte_equal": true
+      }
+    ],
+    "byte_pairs_sha256": "69f789a60cfdba54ee22373cd649c8114eaa12a1b4dd5f6585875481f37a043c",
+    "validator_reuse": "Three actual S GLBs match already unfiltered Khronos-qualified R outputs byte-for-byte; original0errors39NODE_SKINNED_MESH_NON_ROOTwarnings10infos retained without validator rerun."
+  }
+}

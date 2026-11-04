@@ -3050,3 +3050,32 @@ if(BUILD_TESTING)
   add_test(NAME xr-editable-export COMMAND dome-sculpt-xr-editable-export-test ${CMAKE_CURRENT_BINARY_DIR}/xr-editable-export)
   set_tests_properties(xr-editable-export PROPERTIES TIMEOUT 1200)
 endif()
+
+# Exercise the actual public file workers with genuine owning-key/source-paint
+# fixtures. CTest arranges existing generators for a filtered standalone run.
+if(BUILD_TESTING AND TARGET dome-sculpt-source-paint-authoring-test
+   AND TARGET dome-sculpt-key-mirror-relative-owning-test)
+  add_executable(dome-sculpt-native-key-package-cycle-test tests/native-key-package-cycle.cpp)
+  target_link_libraries(dome-sculpt-native-key-package-cycle-test PRIVATE dome-sculpt-core)
+  set_property(TEST key-mirror-relative-owning APPEND PROPERTY FIXTURES_SETUP native-key-cycle-input)
+  set_property(TEST source-paint-authoring APPEND PROPERTY FIXTURES_SETUP native-paint-cycle-input)
+  add_test(NAME native-key-package-cycle COMMAND dome-sculpt-native-key-package-cycle-test
+    ${CMAKE_CURRENT_BINARY_DIR}/native-key-package-cycle
+    ${CMAKE_CURRENT_BINARY_DIR}/source-paint-authoring/recovered0.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/key-mirror-relative-owning/relative-native.dsculpt)
+  set_tests_properties(native-key-package-cycle PROPERTIES
+    FIXTURES_REQUIRED "native-key-cycle-input;native-paint-cycle-input"
+    TIMEOUT 600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render AND TARGET dome-sculpt-native-key-package-cycle-test)
+  add_executable(dome-sculpt-native-key-package-render-test tests/native-key-package-render.cpp)
+  target_include_directories(dome-sculpt-native-key-package-render-test PRIVATE src tests third_party/cgltf third_party/desktop)
+  target_link_libraries(dome-sculpt-native-key-package-render-test PRIVATE dome-sculpt-render)
+  set_property(TEST native-key-package-cycle APPEND PROPERTY FIXTURES_SETUP native-combined-render-input)
+  add_test(NAME native-key-package-render COMMAND dome-sculpt-native-key-package-render-test
+    ${CMAKE_CURRENT_BINARY_DIR}/native-key-package-render
+    ${CMAKE_CURRENT_BINARY_DIR}/native-key-package-cycle/case0/combined.dsculpt)
+  set_tests_properties(native-key-package-render PROPERTIES FIXTURES_REQUIRED native-combined-render-input
+    TIMEOUT 1800 ENVIRONMENT "EGL_PLATFORM=surfaceless;LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
