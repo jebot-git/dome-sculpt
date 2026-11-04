@@ -1269,7 +1269,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if(auto mode=bake_policy_mode();!mode.empty() && s->action && right(s->hand)) {
     p->pose.position={0,1.48f,-.48f};const auto step=bake_policy_stage();
     if(s->action->name=="aim_pose" && (step==18 || step==20)) {
-      float x=520,y=bake_normal_mode()?350:bake_color_mode()?210:240;if(bake_projection_mode()&&frame<=20){y=210;if(frame==20){x=470;y=609;}}else if(step==20){x=mode=="cancel"?170:470;y=609;}
+      float x=520,y=bake_normal_mode()?350:bake_color_mode()?210:240;if(bake_projection_mode()&&frame<=20){x=100;y=210;if(frame==20){x=470;y=609;}}else if(step==20){x=mode=="cancel"?170:470;y=609;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
   }
