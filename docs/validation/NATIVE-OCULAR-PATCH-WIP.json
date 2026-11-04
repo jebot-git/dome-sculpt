@@ -1,0 +1,968 @@
+{
+  "scope": "Private geometry-generated Head and projected ocular-patch candidate; matched research overlay, not production admission",
+  "source": {
+    "src/rotary-cap-geometry.hpp": "a43a883412de3199c273ef2ba94d8a64db41c80d4679bb8457e97714f0aefe73",
+    "tests/projected-ocular-patch.cpp": "7be597e1bd34f8f150d6197c4e9602fac1560dde908cde0aa43dfdd752560ea3",
+    "tests/native-ocular-inference-field.cpp": "818e40ff9d20e3d2511a681784bb017bea9d842ec236af0218f47ad39bdec567",
+    "tests/native-seam-quality.cpp": "ca49d61d2f4164364dbcac091dab521a0b6ea8bc03f1bc707ac35e81668baba1"
+  },
+  "evidence": {
+    "patch-test.log": "PASS 11 independent flat/curved/quad/concave/crossed/affine/quota/cancel controls\n",
+    "patch-sanitize.log": "PASS 11 independent flat/curved/quad/concave/crossed/affine/quota/cancel controls\n",
+    "field-status.json": [
+      {
+        "sex": "female",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-ocular-inference-field",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female"
+        ],
+        "exit": 0,
+        "seconds": 2.569184345949907
+      },
+      {
+        "sex": "male",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-ocular-inference-field",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male"
+        ],
+        "exit": 0,
+        "seconds": 2.6693095579976216
+      }
+    ],
+    "quality-status.json": [
+      {
+        "sex": "female",
+        "kind": "global",
+        "exit": 0,
+        "seconds": 3.227501003013458,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-female.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female/bound.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global"
+        ],
+        "cohorts": 95,
+        "failed": 0
+      },
+      {
+        "sex": "female",
+        "kind": "head-eye",
+        "exit": 0,
+        "seconds": 6.431595769012347,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-female.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female/bound.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye"
+        ],
+        "cohorts": 266,
+        "failed": 0
+      },
+      {
+        "sex": "male",
+        "kind": "global",
+        "exit": 0,
+        "seconds": 2.8223357109818608,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-male.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male/bound.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global"
+        ],
+        "cohorts": 95,
+        "failed": 0
+      },
+      {
+        "sex": "male",
+        "kind": "head-eye",
+        "exit": 0,
+        "seconds": 5.077305925020482,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-male.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male/bound.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye"
+        ],
+        "cohorts": 266,
+        "failed": 0
+      }
+    ],
+    "seam-status.json": [
+      {
+        "sex": "female",
+        "exit": 1,
+        "seconds": 9.58410752902273,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-seam-quality",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female/bound.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-female.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/seam-female.json"
+        ]
+      },
+      {
+        "sex": "male",
+        "exit": 1,
+        "seconds": 9.78517401101999,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-seam-quality",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male/bound.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-male.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/seam-male.json"
+        ]
+      }
+    ],
+    "seam-female.json": {
+      "artist_values_after_solve_only": true,
+      "failed_poses": 5,
+      "groups": 1701,
+      "maximum_m": 0.018727392893592487,
+      "pairs": 2843,
+      "poses": 19,
+      "records": [
+        {
+          "failed_pairs": 708,
+          "family": "global",
+          "maximum_m": 0.018727392893592487,
+          "pairs": 2843,
+          "pose": 0,
+          "worst_objects": [
+            12,
+            12
+          ],
+          "worst_vertices": [
+            302,
+            1512
+          ]
+        },
+        {
+          "failed_pairs": 502,
+          "family": "global",
+          "maximum_m": 0.006735575615369349,
+          "pairs": 2843,
+          "pose": 1,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            988,
+            1195
+          ]
+        },
+        {
+          "failed_pairs": 274,
+          "family": "global",
+          "maximum_m": 0.005029865524990707,
+          "pairs": 2843,
+          "pose": 2,
+          "worst_objects": [
+            12,
+            12
+          ],
+          "worst_vertices": [
+            1592,
+            1681
+          ]
+        },
+        {
+          "failed_pairs": 1240,
+          "family": "global",
+          "maximum_m": 0.017049916942046855,
+          "pairs": 2843,
+          "pose": 3,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            51,
+            246
+          ]
+        },
+        {
+          "failed_pairs": 274,
+          "family": "global",
+          "maximum_m": 0.005029865524990707,
+          "pairs": 2843,
+          "pose": 4,
+          "worst_objects": [
+            12,
+            12
+          ],
+          "worst_vertices": [
+            1592,
+            1681
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 0,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 1,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 2,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 3,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 4,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 5,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 6,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 7,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 8,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 9,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 10,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 11,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 12,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.457726279441292e-07,
+          "pairs": 2843,
+          "pose": 13,
+          "worst_objects": [
+            14,
+            14
+          ],
+          "worst_vertices": [
+            426,
+            617
+          ]
+        }
+      ],
+      "seam_threshold_m": 3e-05
+    },
+    "seam-male.json": {
+      "artist_values_after_solve_only": true,
+      "failed_poses": 11,
+      "groups": 1620,
+      "maximum_m": 0.036868940760579214,
+      "pairs": 2577,
+      "poses": 19,
+      "records": [
+        {
+          "failed_pairs": 667,
+          "family": "global",
+          "maximum_m": 0.03664630537889187,
+          "pairs": 2577,
+          "pose": 0,
+          "worst_objects": [
+            18,
+            18
+          ],
+          "worst_vertices": [
+            525,
+            685
+          ]
+        },
+        {
+          "failed_pairs": 388,
+          "family": "global",
+          "maximum_m": 0.036868940760579214,
+          "pairs": 2577,
+          "pose": 1,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            590,
+            18
+          ]
+        },
+        {
+          "failed_pairs": 319,
+          "family": "global",
+          "maximum_m": 0.0069361508265094,
+          "pairs": 2577,
+          "pose": 2,
+          "worst_objects": [
+            19,
+            19
+          ],
+          "worst_vertices": [
+            430,
+            495
+          ]
+        },
+        {
+          "failed_pairs": 912,
+          "family": "global",
+          "maximum_m": 0.010965536440752556,
+          "pairs": 2577,
+          "pose": 3,
+          "worst_objects": [
+            12,
+            12
+          ],
+          "worst_vertices": [
+            441,
+            679
+          ]
+        },
+        {
+          "failed_pairs": 319,
+          "family": "global",
+          "maximum_m": 0.0069361508265094,
+          "pairs": 2577,
+          "pose": 4,
+          "worst_objects": [
+            19,
+            19
+          ],
+          "worst_vertices": [
+            430,
+            495
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.03433906480631584,
+          "pairs": 2577,
+          "pose": 0,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            590,
+            18
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.03433905226711997,
+          "pairs": 2577,
+          "pose": 1,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            553,
+            110
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.020158021008873643,
+          "pairs": 2577,
+          "pose": 2,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1373,
+            1
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.020157997320587054,
+          "pairs": 2577,
+          "pose": 3,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            38,
+            1
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.02462255850469273,
+          "pairs": 2577,
+          "pose": 4,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            590,
+            18
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.02462279554706797,
+          "pairs": 2577,
+          "pose": 5,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            553,
+            110
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 6,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 7,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 8,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 9,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 10,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 11,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 12,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 3.5762786865234375e-07,
+          "pairs": 2577,
+          "pose": 13,
+          "worst_objects": [
+            16,
+            16
+          ],
+          "worst_vertices": [
+            1179,
+            1262
+          ]
+        }
+      ],
+      "seam_threshold_m": 3e-05
+    },
+    "field-source-before.json": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/src/rotary-cap-geometry.hpp": "a43a883412de3199c273ef2ba94d8a64db41c80d4679bb8457e97714f0aefe73",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/src/native-head-geometry.hpp": "1e11317dd8fcb9b64fa3bc09c4b2da3572a9b69daaa0533421af0aa14fe13f64",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/tests/native-ocular-inference-field.cpp": "818e40ff9d20e3d2511a681784bb017bea9d842ec236af0218f47ad39bdec567",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-ocular-inference-field": "02a8ee02556b0c5beb202a421d31862fd7f83eebbac3e70f7e8f118d84821734",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/libdome-sculpt-core.a": "32c8e5ad369664072de3e88f899dac8754bb95479c6771dca030c19e9a2f85ca",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libdome-sculpt-affine.a": "60999eb9b5019f33fe09aa11ae819eb61a36bb82d3946f5f608d1cfe827f4485",
+      "/usr/lib64/liblapacke.so": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libdome-sculpt-polygon.a": "ba4bccfae5b483fc17c0a5ceb6f298016e40536b5c90585bb106b88fda7b7e4a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libxatlas.a": "6778933dbf01617bfab90b631db056e4fa124d33ec7d296e0e3bc44bd9718fef",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libmikktspace.a": "62e6af374bf8594f24e47c580e38e23c9e6edccc7830db4026ced8e22ebac826",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libmikktspace-robust.a": "75fca756a799662fe084bfb9360713b73786cac3e52869be749bb6b69f4e1183",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libufbx.a": "36a36c61138e185fc9d5f7810b73176323fb944cc59c4fd3462da5a6f3467ef6",
+      "/usr/lib64/libpng.so": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+      "/usr/lib64/libjpeg.so": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+      "/usr/lib64/libz.so": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libdome-sculpt-emission-codec.a": "d4041c515439212d4f43b9dbb5dfcd66dfd3f951600251d7e1f8ed4f9a64b750",
+      "/usr/lib64/libOpenEXR-3_2.so": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+      "/usr/lib64/libOpenEXRUtil-3_2.so": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+      "/usr/lib64/libOpenEXRCore-3_2.so": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+      "/usr/lib64/libIex-3_2.so": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+      "/usr/lib64/libIlmThread-3_2.so": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+      "/usr/lib64/libImath-3_1.so": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+    },
+    "field-source-after.json": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/src/rotary-cap-geometry.hpp": "a43a883412de3199c273ef2ba94d8a64db41c80d4679bb8457e97714f0aefe73",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/src/native-head-geometry.hpp": "1e11317dd8fcb9b64fa3bc09c4b2da3572a9b69daaa0533421af0aa14fe13f64",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/tests/native-ocular-inference-field.cpp": "818e40ff9d20e3d2511a681784bb017bea9d842ec236af0218f47ad39bdec567",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-ocular-inference-field": "02a8ee02556b0c5beb202a421d31862fd7f83eebbac3e70f7e8f118d84821734",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/libdome-sculpt-core.a": "32c8e5ad369664072de3e88f899dac8754bb95479c6771dca030c19e9a2f85ca",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libdome-sculpt-affine.a": "60999eb9b5019f33fe09aa11ae819eb61a36bb82d3946f5f608d1cfe827f4485",
+      "/usr/lib64/liblapacke.so": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libdome-sculpt-polygon.a": "ba4bccfae5b483fc17c0a5ceb6f298016e40536b5c90585bb106b88fda7b7e4a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libxatlas.a": "6778933dbf01617bfab90b631db056e4fa124d33ec7d296e0e3bc44bd9718fef",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libmikktspace.a": "62e6af374bf8594f24e47c580e38e23c9e6edccc7830db4026ced8e22ebac826",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libmikktspace-robust.a": "75fca756a799662fe084bfb9360713b73786cac3e52869be749bb6b69f4e1183",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libufbx.a": "36a36c61138e185fc9d5f7810b73176323fb944cc59c4fd3462da5a6f3467ef6",
+      "/usr/lib64/libpng.so": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+      "/usr/lib64/libjpeg.so": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+      "/usr/lib64/libz.so": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/libdome-sculpt-emission-codec.a": "d4041c515439212d4f43b9dbb5dfcd66dfd3f951600251d7e1f8ed4f9a64b750",
+      "/usr/lib64/libOpenEXR-3_2.so": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+      "/usr/lib64/libOpenEXRUtil-3_2.so": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+      "/usr/lib64/libOpenEXRCore-3_2.so": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+      "/usr/lib64/libIex-3_2.so": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+      "/usr/lib64/libIlmThread-3_2.so": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+      "/usr/lib64/libImath-3_1.so": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+    },
+    "seam-input-before.json": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-seam-quality": "cbc06e23155e5867abf584c17db175f93f8a1faed388154325d3f552b0c6924e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/tests/native-seam-quality.cpp": "ca49d61d2f4164364dbcac091dab521a0b6ea8bc03f1bc707ac35e81668baba1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female/bound.dsculpt": "14293c4d4135c83f53ad4fa85c191aa8e983dff3e9542394a1cc8831074c61d5",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-female.vrm": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-0.dsculpt": "2738937483fbe9be3bfabcb1400507b0f5d704d579e98d9173bf77329dd35117",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-1.dsculpt": "54f1955af16aaea7fc88f1a8a40e6a733446419904f3aed24e4755e1eb496f7e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-2.dsculpt": "9558a802d1d40d0da7a3129c58510d52287c5dda86ebb9fcdfe91337f0ffbcb9",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-3.dsculpt": "84bdde16e1cea3676be7330253e1389e7162e9668bfd83596c02c10cdf017062",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-4.dsculpt": "b9e158c9f3f84fe228dd7f8cebc6976e1a227b7f86ddf1bac8ebf14b62707bae",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-0.dsculpt": "ec12ad86fc56287ea884fcb8922bc894efe6da54de51d131b6b43e661cc62eb6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-1.dsculpt": "ea432ff57d77c0e0c25a178a156bec7f2b242a848fb54535ed0641fdcc3034ba",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-2.dsculpt": "9bca5e0a13075b1c55370f8ec24ea89139a5fe5ad8926a3d25233a8703c32e23",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-3.dsculpt": "1444f0dad1bd25d3d06eac926185f1201733767a1567d29d6d12b176f71ec212",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-4.dsculpt": "add676c2ffc13f297ca69b5e82bff6939e87702551ef198765b75460cb02b853",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-5.dsculpt": "2b3717b7239c760f6bf201f3202684f4c47d65d0fc476f587ab0560cbd85a6e3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-6.dsculpt": "5fd8f1cfa82995736851da8f3c37b7e3287574ee04aee669ac5b05053fc238cc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-7.dsculpt": "99752c72b7da5cbbfdc7e33e43a604020e0ff26a1bbf6486213126e3192fe888",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-8.dsculpt": "7ee59c47f90d9c78f814f881cafd6631da8017361100f568d9839835b558e2c4",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-9.dsculpt": "d3e08aa6e3244145f2530e83ae5f549fbb423a25a774ebc3d3f7f18ff2a120a3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-10.dsculpt": "ad7cf5cc29513a95019df9b85a6f63f50435c6d47bffa75a016e50315bd02a07",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-11.dsculpt": "9d5c06aa405b43715fa842ef0c8ffbd7273bed6d0f7afede7d0732f7cfa578f7",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-12.dsculpt": "99ef2dc05c49c2ab69d1a7bc402d85a1d444293b09073ef7026262ae365fef4f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-13.dsculpt": "4c0a6f22442a454102456c174bb846fe8d29c0a62feedfb4f17e407d02c11ec2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male/bound.dsculpt": "d104110cfd4126dbeab0d7635e2d2513d768616d1802f61a136f7e9cfd5bf15e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-male.vrm": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-0.dsculpt": "45a0247673f72f79efec290a35271cf540d4f872be6d6a1c4b464e795cdcde77",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-1.dsculpt": "4357fac89f0475750aa347ad61d71e373d728b2e0a86d63dfe26b02abc1fb0ca",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-2.dsculpt": "dd83fca7b63a594f6d9fcf941e4e95d336127eca0c15108974342ba80ef641e0",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-3.dsculpt": "e3b3b44b0690c0736f62164311e079d1ce1650bea777a6cbe8955940756a89bc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-4.dsculpt": "c88c87f8d2e2fe57bad59c2778afab09f338d48735cd97e76a063f13090648a8",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-0.dsculpt": "2b720d882bf377c16b9210711846701d6a8cecae5554ff214586b2ed645a8aa1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-1.dsculpt": "e011585b8c2ff4fd5e36cdd41df504a562f4adab1b978e11d78d4b6c3cab651e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-2.dsculpt": "ae2b35ae436085dd99e29af41eddfc861ca6c13be5b5a39e68f8eda3230b0ab1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-3.dsculpt": "1803b2e1a1d74dfcf9348b62a3b41db00cd1f33e3e03ef30be160cec469bb382",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-4.dsculpt": "030e843345203e146cef5137f1b0cf47e1f8cc8d0f3ddd27623b1c8d773f7371",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-5.dsculpt": "6710f3d67ab099e917701fbd2a884767569fa15a07fd61ebb5fef15df3e8c04c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-6.dsculpt": "e7715aee2c34bc723ee3fc01d997ac030db1f4a95c6ecb00be46e28892ba7bb2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-7.dsculpt": "1427b1af211bf6e2f7ce44e87a83131ed164f8554a3ef5214acccac367f39c1a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-8.dsculpt": "8cc1728f9dc09558aec632af60f93a542f6052011c8663e694251ae29ea5a7fd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-9.dsculpt": "d097ba1d9b70ee6d198bc6f646ed6f0c8deb040e74266b305c28af793d8f75e1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-10.dsculpt": "4288a88189cbd79b512da34b8e9b8df581928cd3930bc6f094be160d6163a4cd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-11.dsculpt": "23ae1a9ca1129255e986c41dbdc1852d291b29fc1800222e75567c5265c2aa62",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-12.dsculpt": "0999e7debc7abd9b10728651718414a2631812bb397c8089395d05f82e84b507",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-13.dsculpt": "bfcc663b65f2fe8235d1482923f91e3ed923b2abf9a05211ad84aeb2fa9f0b66"
+    },
+    "seam-input-after.json": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-seam-quality": "cbc06e23155e5867abf584c17db175f93f8a1faed388154325d3f552b0c6924e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/tests/native-seam-quality.cpp": "ca49d61d2f4164364dbcac091dab521a0b6ea8bc03f1bc707ac35e81668baba1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female/bound.dsculpt": "14293c4d4135c83f53ad4fa85c191aa8e983dff3e9542394a1cc8831074c61d5",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-female.vrm": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-0.dsculpt": "2738937483fbe9be3bfabcb1400507b0f5d704d579e98d9173bf77329dd35117",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-1.dsculpt": "54f1955af16aaea7fc88f1a8a40e6a733446419904f3aed24e4755e1eb496f7e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-2.dsculpt": "9558a802d1d40d0da7a3129c58510d52287c5dda86ebb9fcdfe91337f0ffbcb9",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-3.dsculpt": "84bdde16e1cea3676be7330253e1389e7162e9668bfd83596c02c10cdf017062",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-global/pose-4.dsculpt": "b9e158c9f3f84fe228dd7f8cebc6976e1a227b7f86ddf1bac8ebf14b62707bae",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-0.dsculpt": "ec12ad86fc56287ea884fcb8922bc894efe6da54de51d131b6b43e661cc62eb6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-1.dsculpt": "ea432ff57d77c0e0c25a178a156bec7f2b242a848fb54535ed0641fdcc3034ba",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-2.dsculpt": "9bca5e0a13075b1c55370f8ec24ea89139a5fe5ad8926a3d25233a8703c32e23",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-3.dsculpt": "1444f0dad1bd25d3d06eac926185f1201733767a1567d29d6d12b176f71ec212",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-4.dsculpt": "add676c2ffc13f297ca69b5e82bff6939e87702551ef198765b75460cb02b853",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-5.dsculpt": "2b3717b7239c760f6bf201f3202684f4c47d65d0fc476f587ab0560cbd85a6e3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-6.dsculpt": "5fd8f1cfa82995736851da8f3c37b7e3287574ee04aee669ac5b05053fc238cc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-7.dsculpt": "99752c72b7da5cbbfdc7e33e43a604020e0ff26a1bbf6486213126e3192fe888",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-8.dsculpt": "7ee59c47f90d9c78f814f881cafd6631da8017361100f568d9839835b558e2c4",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-9.dsculpt": "d3e08aa6e3244145f2530e83ae5f549fbb423a25a774ebc3d3f7f18ff2a120a3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-10.dsculpt": "ad7cf5cc29513a95019df9b85a6f63f50435c6d47bffa75a016e50315bd02a07",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-11.dsculpt": "9d5c06aa405b43715fa842ef0c8ffbd7273bed6d0f7afede7d0732f7cfa578f7",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-12.dsculpt": "99ef2dc05c49c2ab69d1a7bc402d85a1d444293b09073ef7026262ae365fef4f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/female-head-eye/pose-13.dsculpt": "4c0a6f22442a454102456c174bb846fe8d29c0a62feedfb4f17e407d02c11ec2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male/bound.dsculpt": "d104110cfd4126dbeab0d7635e2d2513d768616d1802f61a136f7e9cfd5bf15e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/assets/humanoid/vroid/base-male.vrm": "ab9af434a229283c192546486f9e6eb9cd855bf7d8d45b5037ac211938cb903c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-0.dsculpt": "45a0247673f72f79efec290a35271cf540d4f872be6d6a1c4b464e795cdcde77",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-1.dsculpt": "4357fac89f0475750aa347ad61d71e373d728b2e0a86d63dfe26b02abc1fb0ca",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-2.dsculpt": "dd83fca7b63a594f6d9fcf941e4e95d336127eca0c15108974342ba80ef641e0",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-3.dsculpt": "e3b3b44b0690c0736f62164311e079d1ce1650bea777a6cbe8955940756a89bc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-global/pose-4.dsculpt": "c88c87f8d2e2fe57bad59c2778afab09f338d48735cd97e76a063f13090648a8",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-0.dsculpt": "2b720d882bf377c16b9210711846701d6a8cecae5554ff214586b2ed645a8aa1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-1.dsculpt": "e011585b8c2ff4fd5e36cdd41df504a562f4adab1b978e11d78d4b6c3cab651e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-2.dsculpt": "ae2b35ae436085dd99e29af41eddfc861ca6c13be5b5a39e68f8eda3230b0ab1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-3.dsculpt": "1803b2e1a1d74dfcf9348b62a3b41db00cd1f33e3e03ef30be160cec469bb382",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-4.dsculpt": "030e843345203e146cef5137f1b0cf47e1f8cc8d0f3ddd27623b1c8d773f7371",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-5.dsculpt": "6710f3d67ab099e917701fbd2a884767569fa15a07fd61ebb5fef15df3e8c04c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-6.dsculpt": "e7715aee2c34bc723ee3fc01d997ac030db1f4a95c6ecb00be46e28892ba7bb2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-7.dsculpt": "1427b1af211bf6e2f7ce44e87a83131ed164f8554a3ef5214acccac367f39c1a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-8.dsculpt": "8cc1728f9dc09558aec632af60f93a542f6052011c8663e694251ae29ea5a7fd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-9.dsculpt": "d097ba1d9b70ee6d198bc6f646ed6f0c8deb040e74266b305c28af793d8f75e1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-10.dsculpt": "4288a88189cbd79b512da34b8e9b8df581928cd3930bc6f094be160d6163a4cd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-11.dsculpt": "23ae1a9ca1129255e986c41dbdc1852d291b29fc1800222e75567c5265c2aa62",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-12.dsculpt": "0999e7debc7abd9b10728651718414a2631812bb397c8089395d05f82e84b507",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/male-head-eye/pose-13.dsculpt": "bfcc663b65f2fe8235d1482923f91e3ed923b2abf9a05211ad84aeb2fa9f0b66"
+    },
+    "ocular-commands.json": {
+      "compile": [
+        "/usr/bin/c++",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/third_party/nlohmann",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-ocular-inference-field.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/tests/native-ocular-inference-field.cpp"
+      ],
+      "link": [
+        "/usr/bin/c++",
+        "-O3",
+        "-DNDEBUG",
+        "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/ocular.link.d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-ocular-inference-field.cpp.o",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-ocular-inference-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/libdome-sculpt-core.a",
+        "libdome-sculpt-affine.a",
+        "/usr/lib64/liblapacke.so",
+        "libdome-sculpt-polygon.a",
+        "libxatlas.a",
+        "libmikktspace.a",
+        "libmikktspace-robust.a",
+        "libufbx.a",
+        "/usr/lib64/libpng.so",
+        "/usr/lib64/libjpeg.so",
+        "/usr/lib64/libz.so",
+        "libdome-sculpt-emission-codec.a",
+        "/usr/lib64/libOpenEXR-3_2.so",
+        "/usr/lib64/libOpenEXRUtil-3_2.so",
+        "/usr/lib64/libOpenEXRCore-3_2.so",
+        "/usr/lib64/libIex-3_2.so",
+        "/usr/lib64/libIlmThread-3_2.so",
+        "/usr/lib64/libImath-3_1.so",
+        "-lgcc_s_asneeded",
+        "-lgcc_s_asneeded"
+      ],
+      "link_exit": 0
+    },
+    "seam-commands.json": {
+      "compile": [
+        "/usr/bin/c++",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/third_party/cgltf",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/third_party/nlohmann",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-seam-quality.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/tests/native-seam-quality.cpp"
+      ],
+      "link": [
+        "/usr/bin/c++",
+        "-O3",
+        "-DNDEBUG",
+        "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/seam.link.d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-seam-quality.cpp.o",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-ocular-patch-15c8de8/artifacts/native-seam-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/libdome-sculpt-core.a",
+        "libdome-sculpt-affine.a",
+        "/usr/lib64/liblapacke.so",
+        "libdome-sculpt-polygon.a",
+        "libxatlas.a",
+        "libmikktspace.a",
+        "libmikktspace-robust.a",
+        "libufbx.a",
+        "/usr/lib64/libpng.so",
+        "/usr/lib64/libjpeg.so",
+        "/usr/lib64/libz.so",
+        "libdome-sculpt-emission-codec.a",
+        "/usr/lib64/libOpenEXR-3_2.so",
+        "/usr/lib64/libOpenEXRUtil-3_2.so",
+        "/usr/lib64/libOpenEXRCore-3_2.so",
+        "/usr/lib64/libIex-3_2.so",
+        "/usr/lib64/libIlmThread-3_2.so",
+        "/usr/lib64/libImath-3_1.so",
+        "-lgcc_s_asneeded",
+        "-lgcc_s_asneeded"
+      ],
+      "link_exit": 0
+    }
+  },
+  "quality": {
+    "original_pose_cases_passed": 190,
+    "local_pose_cases_passed": 532,
+    "female_work": 411927537,
+    "male_work": 425156706,
+    "female_workspace": 116484298,
+    "male_workspace": 123526397
+  },
+  "seam_negative": {
+    "female_failed_poses": 5,
+    "male_failed_poses": 11,
+    "female_maximum_m": 0.018727392893592487,
+    "male_maximum_m": 0.036868940760579214,
+    "threshold_m": 3e-05
+  },
+  "not_claimed": [
+    "whole solver sanitizer",
+    "native app/controller/history/Save admission",
+    "rendered authored-normal identity",
+    "general edited/native-only geometry support",
+    "robust automatic weighting complete"
+  ]
+}

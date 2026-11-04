@@ -15,9 +15,9 @@ struct RotaryCapGeometry {
   double scale = 0, maximum_residual = 0, rank_ratio = 0;
 };
 template<class Budget>
-RotaryCapGeometry analyze_rotary_cap(const Mesh&m,size_t maximum_bytes,Budget&w){
+RotaryCapGeometry analyze_rotary_cap(const Mesh&m,size_t maximum_bytes,Budget&w, bool projected_disk_only=false){
  const size_t n=m.positions.size(),faces=m.indices.size()/3;
- if(n<10||n>4096||!faces||faces>16384||m.indices.size()%3)
+ if(n<(projected_disk_only?3u:10u)||n>4096||!faces||faces>16384||m.indices.size()%3)
   throw std::invalid_argument("Rotary cap descriptor dimensions");
  const size_t bytes=n*112+m.indices.size()*160+32768;
  if(bytes>maximum_bytes)throw std::length_error("Rotary cap bytes before copies");
@@ -51,6 +51,7 @@ RotaryCapGeometry analyze_rotary_cap(const Mesh&m,size_t maximum_bytes,Budget&w)
  // rejects self-crossing/projected folded caps, rather than only local turns.
  for(size_t e=0;e<ring.size();++e)for(uint32_t i=0;i<n;++i){auto sign=exact.orient2(project(ring[e]),project(ring[(e+1)%ring.size()]),project(i)).sign;if(sign&&sign!=orientation)return out;}
  out.convex_boundary=true;
+ if(projected_disk_only)return out;
  const double total=std::accumulate(mass.begin(),mass.end(),0.);
  if(!(total>0)||!std::isfinite(total))throw std::runtime_error("Rotary cap invalid area");
  for(size_t i=0;i<n;++i){auto p=m.positions[i];const double v[]={p.x,p.y,p.z};for(size_t k=0;k<3;++k){if(!std::isfinite(v[k])||std::abs(v[k])>10000)throw std::invalid_argument("Rotary cap finite coordinate bound");out.centroid[k]+=mass[i]/total*v[k];}}
@@ -82,5 +83,12 @@ RotaryCapGeometry analyze_rotary_cap(const Mesh&m,size_t maximum_bytes,Budget&w)
  for(size_t k=0;k<3;++k){out.center[k]=out.centroid[k]+out.scale*center[k];out.radii[k]=out.scale*std::sqrt(-level/out.eigenvalues[k]);}
  for(size_t i=0;i<n;++i){auto r=row(i);double f=0;for(size_t k=0;k<10;++k)f+=coef[k]*r[k];out.maximum_residual=std::max(out.maximum_residual,std::abs(f));}
  return out;
+}
+// Separate anatomical-feature hypothesis. A projected convex disk may be flat
+// or curved; it makes no ellipsoid or volume claim. Non-disk/nonconvex is a
+// defined feature negative; invalid topology/work/bytes/cancel still throw.
+template<class Budget>
+RotaryCapGeometry analyze_projected_ocular_patch(const Mesh&m,size_t bytes,Budget&w){
+ return analyze_rotary_cap(m,bytes,w,true);
 }
 } // namespace dome::detail
