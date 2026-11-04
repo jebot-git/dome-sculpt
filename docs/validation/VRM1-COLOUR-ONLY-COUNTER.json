@@ -1,0 +1,359 @@
+{
+  "scope": "Actual colour-only authored INPUT and old current c2/8f worker counterfactual; no production runtime changes or positive adapter claim.",
+  "parent": "c2f1705f07351bbb9633eca552667d23e1f5bfac",
+  "counter": {
+    "state": "terminal",
+    "pid": 2376547,
+    "steps": [
+      {
+        "name": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/worker.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 8.331696001987439
+      },
+      {
+        "name": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/worker.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-painted-expression-layers-ed56df4/artifacts/expression-layer-proof/final-v4-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.3575144979986362
+      },
+      {
+        "name": "old-counter",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/run",
+          "--old-refusal",
+          "--colour-only"
+        ],
+        "exit": 0,
+        "seconds": 0.2633956749923527
+      }
+    ],
+    "scope": "New valid authored input counterfactual; whole current test TU on exact immutable c2/8f matching headers+archives, no runtime change or root35 consumption.",
+    "child_pid": 2377468,
+    "exit": 0,
+    "seconds": 9.119137570029125,
+    "inputs": 1866,
+    "drift": []
+  },
+  "input_validation": {
+    "scope": "Actual authored colour-only INPUT validation before compiler changes, not rewritten export.",
+    "steps": [
+      {
+        "name": "official",
+        "exit": 0,
+        "seconds": 0.38920671201776713,
+        "command": [
+          "/home/blux/.local/bin/uv",
+          "run",
+          "--offline",
+          "--with",
+          "jsonschema",
+          "python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/source-validation/official.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/run/source-colour-only.vrm"
+        ]
+      },
+      {
+        "name": "khronos",
+        "exit": 0,
+        "seconds": 0.30963322595926,
+        "command": [
+          "node",
+          "-e",
+          "const fs=require('fs'),v=require('/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator');(async()=>{const r=await v.validateBytes(new Uint8Array(fs.readFileSync(process.argv[1])),{maxIssues:0,uri:process.argv[1]});process.stdout.write(JSON.stringify(r,null,2));process.exitCode=r.issues.numErrors?1:0;})();",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/run/source-colour-only.vrm"
+        ]
+      }
+    ]
+  },
+  "official": [
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-colour-expression-c2f1705/artifacts/colour-proof/counter/run/source-colour-only.vrm",
+      "checks": [
+        {
+          "kind": "VRMC_vrm-1.0",
+          "schema": "VRMC_vrm.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_springBone-1.0",
+          "schema": "VRMC_springBone.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_materials_mtoon-1.0",
+          "schema": "VRMC_materials_mtoon.schema.json",
+          "errors": []
+        }
+      ]
+    }
+  ],
+  "khronos_issues": {
+    "numErrors": 0,
+    "numWarnings": 5,
+    "numInfos": 15,
+    "numHints": 12,
+    "messages": [
+      {
+        "code": "UNSUPPORTED_EXTENSION",
+        "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+        "severity": 2,
+        "pointer": "/extensionsUsed/0"
+      },
+      {
+        "code": "UNSUPPORTED_EXTENSION",
+        "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+        "severity": 2,
+        "pointer": "/extensionsUsed/1"
+      },
+      {
+        "code": "UNSUPPORTED_EXTENSION",
+        "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+        "severity": 2,
+        "pointer": "/extensionsUsed/3"
+      },
+      {
+        "code": "UNSUPPORTED_EXTENSION",
+        "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+        "severity": 2,
+        "pointer": "/extensionsUsed/4"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/indices"
+      },
+      {
+        "code": "UNUSED_MESH_TANGENT",
+        "message": "Tangents are not used because the material has no normal texture.",
+        "severity": 2,
+        "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+      },
+      {
+        "code": "BUFFER_VIEW_TARGET_MISSING",
+        "message": "bufferView.target should be set for vertex or index data.",
+        "severity": 3,
+        "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+        "message": "Node uses skinned mesh, but has no skin defined.",
+        "severity": 1,
+        "pointer": "/nodes/23"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_NON_ROOT",
+        "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+        "severity": 1,
+        "pointer": "/nodes/1"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+        "message": "Local transforms will not affect a skinned mesh.",
+        "severity": 1,
+        "pointer": "/nodes/1"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_NON_ROOT",
+        "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+        "severity": 1,
+        "pointer": "/nodes/2"
+      },
+      {
+        "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+        "message": "Local transforms will not affect a skinned mesh.",
+        "severity": 1,
+        "pointer": "/nodes/2"
+      },
+      {
+        "code": "NODE_EMPTY",
+        "message": "Empty node encountered.",
+        "severity": 2,
+        "pointer": "/nodes/8"
+      },
+      {
+        "code": "NODE_EMPTY",
+        "message": "Empty node encountered.",
+        "severity": 2,
+        "pointer": "/nodes/11"
+      },
+      {
+        "code": "NODE_EMPTY",
+        "message": "Empty node encountered.",
+        "severity": 2,
+        "pointer": "/nodes/14"
+      },
+      {
+        "code": "NODE_EMPTY",
+        "message": "Empty node encountered.",
+        "severity": 2,
+        "pointer": "/nodes/17"
+      },
+      {
+        "code": "NODE_EMPTY",
+        "message": "Empty node encountered.",
+        "severity": 2,
+        "pointer": "/nodes/19"
+      },
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/accessors/12"
+      },
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/accessors/13"
+      },
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/bufferViews/10"
+      },
+      {
+        "code": "UNUSED_OBJECT",
+        "message": "This object may be unused.",
+        "severity": 2,
+        "pointer": "/textures/1"
+      },
+      {
+        "code": "UNUSED_MESH_WEIGHTS",
+        "message": "The static morph target weights are always overridden.",
+        "severity": 2,
+        "pointer": "/meshes/0/weights"
+      }
+    ],
+    "truncated": false
+  },
+  "source_sha256": "d7182cc643f101e6d90ecc4bd20799c3dd190cb0478d9b0609e70e293387c5b7",
+  "test_sha256": "9d89c486a72f324914f61869f836ad28bd0fad8fd325b356427358cbebcc30f5",
+  "limits": [
+    "Actual old worker refuses colour expressions after two real nonuniform native paint strokes.",
+    "All14counterfactual checks preserve prior output and exact complete source/paint Scene.",
+    "Pinned official6instances and Khronos0errors validate the new INPUT, not emitted output.",
+    "No new ABI, application, GPU, current root union or full VRM objective completion claim."
+  ]
+}
