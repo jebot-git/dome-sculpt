@@ -1,6 +1,32 @@
-# Current DomeD toolkit and conventions
+# Current canonical toolkit requirement
 
-The desktop application now requires canonical DomeD revision
+Dome Sculpt now requires the qualified27-patch FLTK1.4.5 build with the official
+poll backend. Patches25/26/27 respectively provide compact bitmap file pickers,
+actual Enter callback authority and correct X11 clipboard replies/ownership.
+The builder retains `share/fltk-bdf-source/runtime-profile.json` together with
+its actual `private-config.h`; desktop CMake checks compiled poll selection,
+source/builder/config hashes and the imported core/images/gl library digests.
+An unchanged public version or copied patch files alone cannot establish this
+capability. The165 public include files and previous exports remain compatible.
+
+The qualified runtime source is DomeD6fa2624, published with qualification
+metadata341152b (full pins and ordered patch hashes in third_party/sources.json). The bitmap stack remains the unchanged corrected
+53b0fca stack with Cairo patch260d2b81, whose16 library hashes are pinned. Build
+as the regular user with the canonical DomeD builder's default poll option;
+point `FLTK_DIR` at the resulting `share/fltk`, and `PKG_CONFIG_PATH` at that
+bitmap prefix's `lib/pkgconfig`. Keep matching Release and whole-owned sanitizer
+prefixes separate. Clear cached `*DOME_BITMAP_RUNTIME*`, `*NATIVEGL*` and
+`*RENDERFONTS*` entries when changing the bitmap prefix. No active compositor or
+display-manager restart is part of this preparation.
+
+Read ATOMIC-SAVE-SDK-INTEGRATION.md and its validation receipt for the actual
+public-main app/SDK-only reuse and runtime/UI checks. The earlier sections below
+preserve historical build and failure evidence; their older pins are not the
+current desktop acceptance requirement.
+
+# Earlier24-patch lifecycle baseline
+
+That baseline required canonical DomeD revision
 `53b0fcaf533ad867300d65a4178285d0a2dbef58` and its24th
 `fltk-1.4.5-process-cleanup.patch`. The native process display owner closes the
 connection only after App/widgets/GL/workers and before Fontconfig cleanup.
