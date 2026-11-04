@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "heat-component-intent.hpp"
+#include "weight-contact-intent.hpp"
 #include "weight-nearest-support.hpp"
 #include "weight-surface-system.hpp"
 #include <bit>
@@ -45,6 +46,7 @@ struct DeclaredWeightSupport {
   DeclaredSourceSpan source_span = DeclaredSourceSpan::ComponentProjection;
   DeclaredOriginBoundary origin_boundary =
       DeclaredOriginBoundary::StrictOwnership;
+  DeclaredContactSupport contact_support = DeclaredContactSupport::CommonMask;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
                            [&](const auto &p) { return p.object == id; });

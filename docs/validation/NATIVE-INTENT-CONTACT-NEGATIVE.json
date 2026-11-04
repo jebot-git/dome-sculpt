@@ -1,0 +1,90 @@
+{
+  "base": "8a574e0ce546a3214a57aff1d5871ef3083494b6",
+  "scope": "PRIVATE rejected identical-intent contact candidate; two affected production TUs and producer compiled against matching8a public headers; no UI/default/main admission",
+  "dense_oracle": {
+    "checks": 31,
+    "common_only_simplex_head": [
+      0.7,
+      0.3
+    ],
+    "compatible_head": [
+      0.6666666666666666,
+      0.33333333333333337
+    ],
+    "continuity_loss_retained": true,
+    "different_mask_candidate_head": [
+      0.75,
+      0.25
+    ],
+    "old_forbidden_leak": 0.125
+  },
+  "results": {
+    "female": {
+      "field": {
+        "changed": 19,
+        "contacts": 5082,
+        "partition": 1.0791367799356522e-13,
+        "policy": "private identical component intent contact, no fallback",
+        "rows": 9851,
+        "seconds": 1.224597452,
+        "work": 302849046,
+        "workspace": 103198850
+      },
+      "global_failing_rows": [
+        {
+          "max_fraction": 0.03444547435583668,
+          "maximum_m": 0.0550375736055442,
+          "mean_fraction": 0.0029391338293676696,
+          "mean_m": 0.004696198774889505,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": false,
+          "pose": 3,
+          "vertices": 1425
+        }
+      ],
+      "head_eye_combined_failures": 92,
+      "head_eye_cohorts": 266,
+      "global_head_eye_failures": 0,
+      "rigid_failures": 80,
+      "local_failures": 92,
+      "audit": "artifacts/audit-female.json",
+      "eye_surface_audit": "artifacts/eye-audit-female.json"
+    },
+    "male": {
+      "field": {
+        "changed": 19,
+        "contacts": 4918,
+        "partition": 1.219024881038422e-13,
+        "policy": "private identical component intent contact, no fallback",
+        "rows": 9878,
+        "seconds": 1.256912475,
+        "work": 306903538,
+        "workspace": 103160145
+      },
+      "global_failing_rows": [
+        {
+          "max_fraction": 0.035504685193709966,
+          "maximum_m": 0.062369413913688894,
+          "mean_fraction": 0.0035939236578143023,
+          "mean_m": 0.0063132769933172015,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": false,
+          "pose": 3,
+          "vertices": 1399
+        }
+      ],
+      "head_eye_combined_failures": 94,
+      "head_eye_cohorts": 266,
+      "global_head_eye_failures": 0,
+      "rigid_failures": 80,
+      "local_failures": 94,
+      "audit": "artifacts/audit-male.json",
+      "eye_surface_audit": "artifacts/eye-audit-male.json"
+    }
+  },
+  "remaining": "Anatomical auxiliary ownership plus continuity-preserving constrained contact energy; no parameter/cap/tolerance changes",
+  "inputs_count": 524,
+  "inputs": "artifacts/negative-sealed-inputs.json"
+}

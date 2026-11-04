@@ -85,7 +85,9 @@ anatomical_continuation(const Scene &scene, uint64_t group,
   try {
     ContinuationFields out;
     if (declared) {
-      if ((declared->policy != DeclaredSupportPolicy::AllDeformControls &&
+      if ((declared->contact_support != DeclaredContactSupport::CommonMask &&
+           declared->contact_support != DeclaredContactSupport::IdenticalMask) ||
+          (declared->policy != DeclaredSupportPolicy::AllDeformControls &&
            declared->policy != DeclaredSupportPolicy::NearestSourceUnion &&
            declared->policy != DeclaredSupportPolicy::UniqueSourceWitnesses) ||
           (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes &&
@@ -500,10 +502,9 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         if (face_owner[face] == row_owner[i])
           return false;
         size_t c = size_t(face) * 3;
-        bool common = false;
-        for (size_t word = 0; word < 4; ++word)
-          common |= (usage[i][word] & usage[mesh.indices[c]][word]) != 0;
-        if (!common)
+        budget.step(4);
+        if (!compatible_weight_contact(usage[i], usage[mesh.indices[c]],
+              declared ? declared->contact_support : DeclaredContactSupport::CommonMask))
           return false;
         auto a = s.positions[mesh.indices[c]],
              b = s.positions[mesh.indices[c + 1]],
@@ -775,6 +776,15 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         sum[i] += x[i];
       }
     }
+    if (declared && declared->contact_support == DeclaredContactSupport::IdenticalMask)
+      for (size_t i = 0; i < n; ++i)
+        for (size_t label = 0; label < labels; ++label) {
+          budget.step();
+          const auto joint = out.joints[label];
+          if (!(usage[i][joint / 64] & (uint64_t(1) << (joint % 64))) &&
+              out.fields[i * labels + label] != 0.)
+            throw std::logic_error("Exact intent contact leaked a forbidden label");
+        }
     for (double v : sum) {
       budget.step();
       out.report.partition = std::max(out.report.partition, std::abs(v - 1));
