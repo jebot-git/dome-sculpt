@@ -36,8 +36,10 @@ async def main():
   def scene():return json.load(urllib.request.urlopen(base+'/api/state',timeout=2))['scene']
   def action(data):urllib.request.urlopen(urllib.request.Request(base+'/api/action',data=json.dumps(data).encode(),headers={'Content-Type':'application/json'}),timeout=2).close()
   await wait(lambda:scene()['source']=='wayland');wayland=re.search(r'Dome Wayland socket: (\S+)',(out/'compositor.log').read_text())[1]
-  helper=Path(os.environ['DOME_CANONICAL_HELPER']);project=Path(home,'canonical.dsculpt');subprocess.run([str(helper),'--ui-fixture',str(project)],env=env,check=True)
-  def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=env))
+  helper=Path(os.environ['DOME_CANONICAL_HELPER']);project=Path(home,'canonical.dsculpt')
+  helper_env={**env,'LD_LIBRARY_PATH':os.environ.get('DOME_CANONICAL_CLIENT_LD_LIBRARY_PATH',env.get('LD_LIBRARY_PATH',''))}
+  subprocess.run([str(helper),'--ui-fixture',str(project)],env=helper_env,check=True)
+  def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=helper_env))
   original=inspect()['scene'];report=Path(home,'widgets.json');client=start([os.environ['DOME_CANONICAL_APP'],str(project)],'client',{**env,'WAYLAND_DISPLAY':wayland,'FLTK_BACKEND':'wayland','LD_LIBRARY_PATH':os.environ.get('DOME_CANONICAL_CLIENT_LD_LIBRARY_PATH',env.get('LD_LIBRARY_PATH','')),},cwd=home)
   def named(title):return next((w for w in scene()['windows'] if title in w['title']),None)
   window=await wait(lambda:named('canonical.dsculpt'));(out/'runtime-maps.txt').write_text(Path('/proc/'+str(client.pid)+'/maps').read_text());check(window['app_id']=='org.domed.Sculpt','Actual native Wayland conversion client publishes the Dome Sculpt identity')
